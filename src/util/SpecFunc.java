@@ -220,9 +220,9 @@ public class SpecFunc {
 	int i;
 	double pval = 0.0;
 
-	if (successes == 0 || trials == 0 || p == 0.0) {
-	    System.err.println("No successes and/or no trials and/or probability is zero.");
-	    return 1.0;
+	if (trials == 0 || p == 0.0) {
+	    System.err.println("No trials and/or probability is zero. Will return p=0.5");
+	    return 0.5;
 	}
 
 	for (i = successes + 1; i <= trials; i++) {

@@ -132,10 +132,67 @@ public class class_pvals {
 	class_pval_print(true);
     }
 
+    /**
+       This is stripped-down version of scoreClass. We use this when
+       doing permutations, it is much faster.
+     */
+    public double classPvalue(String class_name, Map group_pval_map, Map probesToPvals, Map input_rank_map) {
+
+	double pval = 0.0;
+	double rawscore = 0.0;
+	ArrayList values = (ArrayList)classToProbe.get(class_name);
+	Iterator classit = values.iterator();
+
+	int in_size = (int)((Integer)effective_sizes.get(class_name)).intValue(); // effective size of this class.
+	if (in_size < probe_pval.get_class_min_size() || in_size > probe_pval.get_class_max_size() ) {
+	    return -1.0;
+	}
+
+	double[] groupPvalArr = new double[in_size]; // store pvalues for items in the class.
+	
+	record.clear();
+	target_ranks.clear();
+	
+	int v_size = 0;
+	
+	// foreach item in the class. 
+	// todo: see if this loop can be optimized. Probably. It's important when we are doing random trials that this go fast.
+	while(classit.hasNext()) { 
+	    String probe = (String)classit.next();  // probe id
+	    
+	    if (probesToPvals.containsKey(probe)){ // if it is in the data set. This is invariant under permutations.
+
+		if (weight_on == true) {
+		    Double grouppval = (Double)group_pval_map.get(probe_group.get(probe)); // probe -> group
+		    if(!record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
+			record.put(probe_group.get(probe), null); // mark it as done.
+			groupPvalArr[v_size] = grouppval.doubleValue();
+			v_size++;
+		    }
+
+		} else {
+		    System.err.println("Sorry, you can't use this without weights");
+		    System.exit(1);
+		}
+	    } // if in data set
+	} // end of while over items in the class.
+	
+	// get raw score and pvalue.
+	rawscore = probe_pval.calc_rawscore(groupPvalArr, in_size);
+	pval = scoreToPval(in_size, rawscore);
+
+	if (pval < 0) {
+	    System.err.println("Warning, a rawscore yielded an invalid pvalue: Classname: " + class_name);
+	}
+	return pval;
+    }
+
 
     /**
-     * Get results for one class, based on class id. The other arguments are
-     things that are not constant under permutations of the data.
+     * Get results for one class, based on class id. The other
+     * arguments are things that are not constant under permutations
+     * of the data.
+     *
      * @param class_name a <code>String</code> value
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
@@ -175,7 +232,7 @@ public class class_pvals {
 	    String probe = (String)classit.next();  // probe id
 	    
 	    if (probesToPvals.containsKey(probe)){ // if it is in the data set. This is invariant under permutations.
-		
+
 		if (weight_on == true) {
 		    Double grouppval = (Double)group_pval_map.get(probe_group.get(probe)); // probe -> group
 		    if(!record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
@@ -226,8 +283,8 @@ public class class_pvals {
 	if (pval < 0) {
 	    System.err.println("Warning, a rawscore yielded an invalid pvalue: Classname: " + class_name);
 	}
-	
-	// our 'alternative' scoring methods.
+
+	// our 'alternative' scoring methods. First, using the AROC.
 	area_under_roc = Stats.arocRate(inputSize, target_ranks);
 	roc_pval = Stats.rocpval(target_ranks.size(), area_under_roc);
 
@@ -238,13 +295,16 @@ public class class_pvals {
 	// to be 1.0 (we can change this behavior if desired)
 	double pos_prob = (double)in_size /(double)inputSize;
 	double expected = (double)numOverThreshold * pos_prob;
-	//	System.err.println("Expecting " + expected + ", saw " + successes + " (prob of pos= " + pos_prob + ").");
-
 	if (successes < expected || pos_prob == 0.0 ) { // fewer than expected, or we didn't/cant get anything.
-	    hyper_pval = 1.0;
+	    hyper_pval = 1.0 - (double)(SpecFunc.binomialCumProb(successes, numOverThreshold, pos_prob));
 	} else {
-	    //	hyper_pval = Stats.cumHyperGeometric(numOverThreshold, successes, numUnderThreshold, failures); 
-	    hyper_pval = SpecFunc.binomialCumProb(successes, numOverThreshold, pos_prob); // successes=number of genes in class which meet criteria (successes); numOverThreshold= number of genes which meet criteria (trials); pos_prob: fractional size of class wrt data size.
+	    //	hyper_pval = Stats.cumHyperGeometric(numOverThreshold, successes, numUnderThreshold, failures); // using exact, but it runs out of precision too quickly.
+
+	    // successes=number of genes in class which meet criteria
+	    // (successes); numOverThreshold= number of genes which
+	    // meet criteria (trials); pos_prob: fractional size of
+	    // class wrt data size.
+	    hyper_pval = SpecFunc.binomialCumProb(successes, numOverThreshold, pos_prob);
 	}
 	
 	//	System.err.println(class_name + "(" + goName.get_GoName_value_map(class_name) + ") - base prob: " + pos_prob + " successes: " + successes + " failures: " + failures + " Trials: " + numOverThreshold + " Nontrials: " + numUnderThreshold + " H: " + hyper_pval);
@@ -257,8 +317,8 @@ public class class_pvals {
 	res.sethyperp(hyper_pval);
 	res.setaroc(area_under_roc);
 	res.setarocp(roc_pval);
-	
 	return res;
+
     } /* scoreClass */
 
 
@@ -289,26 +349,30 @@ public class class_pvals {
 
     /**
 
-    Same thing as class_pval_generator, but returns vector of scores (see below)
-    instead of adding them to the results object
+    Same thing as class_pval_generator, but returns a collection of
+    scores (pvalues) (see below) instead of adding them to the results
+    object. This is used to get class pvalues for permutation
+    analysis.
     
     */
-    public Vector class_v_pval_generator(Map group_pval_map, Map probesToPvals, Map input_rank_map) 
+    public HashMap class_v_pval_generator(Map group_pval_map, Map probesToPvals, Map input_rank_map) 
     {
 	Collection entries = classToProbe.entrySet(); // go -> probe map. Entries are the class names.
 	Iterator it = entries.iterator(); // the classes.
-	Vector randresults = new Vector();
+	//	Vector results = new Vector();
+	HashMap results = new HashMap();
 	
 	// For each class.
 	while(it.hasNext()) {
 	    Map.Entry e = (Map.Entry)it.next();
 	    String class_name = (String)e.getKey(); 
-	    classresult res = scoreClass(class_name, group_pval_map, probesToPvals, input_rank_map);
-	    if (res != null) 
-		randresults.add(new Double(res.get_pvalue()));
-	    // randresults.add(new Double(res.get_score()));
+	    double pval = classPvalue(class_name, group_pval_map, probesToPvals, input_rank_map);
+	    
+	    if (pval >= 0.0) 
+		results.put(class_name, new Double(pval) );
+
 	} 
-	return randresults;
+	return results;
     }
 
 
@@ -452,7 +516,7 @@ public class class_pvals {
 			size++;
 			
 			if (weight_on) { //routine for weights
-			    //compute pval for every unigene class
+			    // compute pval for every replicate group
 			    if (probe_pval.get_group_pval_map().containsKey(probe_group.get(probe)) && !record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
 				record.put(probe_group.get(probe), null); // mark it as done for this class.
 				v_size++; // this is used in any case.
@@ -579,14 +643,14 @@ public class class_pvals {
 	}
 
 	Collections.reverse(sortedclasses); // start from the worst class.
-	Vector permscores;
+	HashMap permscores;
 
-	boolean verbose = true;
+	boolean verbose = false;
 
 	for (int i=0; i < trials; i++) {
 	    //	    System.err.println("Trial: " + i );
 
-	    Map scgroup_pval_map = probe_pval.get_group_pval_map(true); // shuffle.
+	    Map scgroup_pval_map = probe_pval.get_group_pval_map(true); // shuffle the association of pvalues to genes.
 
 	    // shuffle. Stupidity: this is a different permutation
 	    // than the group one. If we are using weights, it DOES
@@ -611,7 +675,8 @@ public class class_pvals {
 
 	    int j = 0;
 	    double permp = 0.0;
-	    Double m = (Double)permscores.get(j); // first sim value (for worst class in real data)
+	    Double m = new Double(1.0);
+	    //	    Double m = (Double)permscores.get(j); // first sim value (for worst class in real data)
 	    double q = m.doubleValue(); // pvalue for the previous permutation, initialized here.
 	    double qprev = q;
 	    double actual_p = 0.0;
@@ -621,10 +686,11 @@ public class class_pvals {
 	    for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) { // going in the correct order for the 'real' data, starting from the worst class.
 
 		nextclass = (String)it.next();
+
 		classresult res = (classresult)results.get(nextclass);
 		actual_p = res.get_pvalue(); // pvalue for this class on real data.
 	
-		m = (Double)permscores.get(j);
+		m = (Double)permscores.get(nextclass);
 		permp = m.doubleValue(); // randomized pvalue for this class.
 
 		q = Math.min(qprev, permp); // The best values for
@@ -650,11 +716,25 @@ public class class_pvals {
 		    counts[j]++;
 		}
 
-		if (verbose && j == sortedclasses.size() - 1)
+		
+		/* the following tests two classes which are very similar. Their permutation p values should be correlated */
+		/*		if (nextclass.equals("GO:0006956")) {
+		    System.err.print("\tGO:0006956\t" +   nf.format(permp) + "\n");
+		}
+		if (nextclass.equals("GO:0006958")) {
+		    System.err.print("\tGO:0006958\t" + nf.format(permp));
+		}
+		*/
+
+
+		if (verbose && j == sortedclasses.size() - 1) // monitor what happens to the best class.
 		    System.err.println("Sim " + i + " class# " + j + " " + nextclass +  " size=" + res.get_effsize() + " q=" + nf.format(q) + " qprev=" + nf.format(qprev) + " pperm=" + nf.format(permp) + " actp=" + nf.format(actual_p) + " countj=" + counts[j] + " currentp=" + (double)counts[j]/(i+1));
 
 		j++;
 		qprev = q;
+	    }
+	    if (! i% 50) {
+		System.err.println(i + " Westfall-Young trials.");
 	    }
 	}
 
@@ -667,8 +747,9 @@ public class class_pvals {
 	// Step 4 and enforce monotonicity, pg 67 (step 5)
 	for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) { // starting from the best class.
 	    classresult res = (classresult)results.get((String)it.next());
-	    corrected_p = Math.max(counts[j] / trials, previous_p); // first iteration, these are the same.
-	    if (verbose)
+	    corrected_p = Math.max((double)counts[j] / (double)trials, previous_p); // first iteration, these are the same.
+
+	    if (verbose) // print the counts for each class.
 		System.err.println(j + " " + counts[j] + " " + trials + " " + corrected_p + " " + previous_p);
 
 	    res.setpvalue_corr(corrected_p);

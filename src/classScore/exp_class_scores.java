@@ -281,8 +281,10 @@ public class exp_class_scores {
 		}
 	    }
 	    if(in_size!=0) {
+
 	    	if(gp_method.equals("MEAN_PVAL"))
 		    group_pval_temp[counter] /= in_size; // take the mean
+
 		Object obb = groupTuple.getKey();
 		Double dbb = new Double(group_pval_temp[counter]);
 		if(groupTuple.getKey() != null){
@@ -306,6 +308,7 @@ public class exp_class_scores {
     /**  
 	@return Map of groups to pvalues.
     */
+
     public Map get_group_pval_map() {
 	return group_pval_map;
     }
@@ -316,7 +319,7 @@ public class exp_class_scores {
 	so, then groups are randomly associated with scores, but the
 	actual values are the same.
 	
-	@return Map of groups to pvalues.
+	@return Map of groups of genes to pvalues.
     */
     public Map get_group_pval_map(boolean shuffle) {
 	if (shuffle) {
