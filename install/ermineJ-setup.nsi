@@ -9,7 +9,7 @@
 Name "ermineJ"
 
 ; The file to write
-OutFile "ermineJ-setup-noJRE.exe"
+OutFile "ermineJ-setup.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
@@ -67,10 +67,6 @@ Section "ermineJ (required)"
   ; images
   SetOutPath "$INSTDIR\bin"
   File "bin\ermineJ.ico"
-
-  ; JRE (Java Runtime Environment)
-  ;SetOutPath "$INSTDIR\jre-install"
-  ;File "jre-install\j2re-1_4_2_05-windows-i586-p.exe"
 
   ; If upgrading, might not want to overwrite the old data folder
   IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
@@ -143,6 +139,5 @@ Section "Uninstall"
   RMDir "$INSTDIR"
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\jre-install"
 
 SectionEnd
