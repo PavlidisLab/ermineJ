@@ -60,22 +60,25 @@ public class AnalysisThread {
       this.rawDataSets = rawDataSets;
       this.geneScoreSets = geneScoreSets;
       this.geneDataSets = geneDataSets;
-      // @todo check this
+ 
       this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer(
             "original".hashCode() ) ); //this is the default geneData
 
       if ( athread != null ) throw new IllegalStateException();
       athread = new Thread( new Runnable() {
          public void run() {
-            doAnalysis();
+            try {
+               doAnalysis();
+            } catch ( IOException e ) {
+               GuiUtil.error("During analysis", e);
+            }
          }
       } );
       athread.start();
    }
 
-   private void doAnalysis( Map results ) {
-      try {
-
+   private void doAnalysis( Map results ) throws IOException {
+  
          /* read in the rawData, if we need it, and if we haven't already */
          DenseDoubleMatrix2DNamed rawData = null;
          if ( settings.getAnalysisMethod() == Settings.CORR ) {
@@ -120,17 +123,20 @@ public class AnalysisThread {
             activeProbes = new HashSet( rawData.getRowNames() );
          }
 
+         boolean needToMakeNewGeneData = true;
          for ( Iterator it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
             GeneAnnotations test = ( GeneAnnotations ) geneDataSets.get( it
                   .next() );
 
             if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
                geneData = test;
+               needToMakeNewGeneData = false;
                break;
             }
+
          }
 
-         if ( geneData == null ) {
+         if ( needToMakeNewGeneData ) {
             geneData = new GeneAnnotations( geneData, activeProbes );
             geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
          }
@@ -151,12 +157,9 @@ public class AnalysisThread {
          csframe.setSettings( settings );
          csframe.enableMenusForAnalysis();
          athread = null;
-      } catch ( IOException ioe ) {
-         //do something
-      }
    }
 
-   private void doAnalysis() {
+   private void doAnalysis() throws IOException {
       doAnalysis( null );
    }
 
