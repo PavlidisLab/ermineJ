@@ -1,11 +1,6 @@
 package classScore;
 
-import java.awt.AWTEvent;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.SystemColor;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,25 +9,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 
@@ -45,7 +24,7 @@ import javax.swing.table.AbstractTableModel;
  * @version 1.0
  */
 
-public class AnalysisFrame extends JFrame {
+public class AnalysisFrame extends JDialog {
    JPanel mainPanel;
    JFileChooser chooser = new JFileChooser();
    File startPath;
@@ -85,10 +64,6 @@ public class AnalysisFrame extends JFrame {
    JLabel step2NameFile = new JLabel();
    JTextField nameFile = new JTextField();
    JButton nameBrowseButton = new JButton();
-   JButton outputBrowseButton = new JButton();
-   JTextField outputFile = new JTextField();
-   JLabel step2OutputLabel = new JLabel();
-   JPanel step2OutputPanel = new JPanel();
    JButton probeBrowseButton = new JButton();
    JLabel step2ProbeLabel = new JLabel();
    JPanel step2ProbePanel = new JPanel();
@@ -167,6 +142,7 @@ public class AnalysisFrame extends JFrame {
    Thread aFrameRunner;
 
    public AnalysisFrame(classScoreFrame callingframe) {
+      setModal(true);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
       try {
@@ -179,7 +155,6 @@ public class AnalysisFrame extends JFrame {
 
    //Component initialization
    private void jbInit() throws Exception {
-      this.getContentPane().setBackground(Color.white);
       setResizable(true);
       mainPanel = (JPanel)this.getContentPane();
       mainPanel.setBackground(SystemColor.control);
@@ -246,7 +221,6 @@ public class AnalysisFrame extends JFrame {
       jPanel5.add(corrButton, null);
       jPanel4.add(jPanel5, null);
       jPanel12.setPreferredSize(new Dimension(175, 80));
-      jPanel12.setRequestFocusEnabled(true);
       jLabel9.setText("- Description of ORA analysis");
       jLabel9.setBorder(null);
       jLabel9.setPreferredSize(new Dimension(172, 17));
@@ -271,9 +245,7 @@ public class AnalysisFrame extends JFrame {
       rawFile.setPreferredSize(new Dimension(230, 19));
       rawFile.setMinimumSize(new Dimension(4, 19));
       rawFile.setEnabled(false);
-      rawFile.setRequestFocusEnabled(true);
       rawBrowseButton.setEnabled(true);
-      rawBrowseButton.setFocusPainted(true);
       rawBrowseButton.addActionListener(new
                                         AnalysisFrame_rawBrowseButton_actionAdapter(this));
       rawBrowseButton.setText("Browse....");
@@ -310,21 +282,6 @@ public class AnalysisFrame extends JFrame {
       jPanel7.add(step2NameFile, null);
       jPanel7.add(nameFile, null);
       jPanel7.add(nameBrowseButton, null);
-      step2OutputPanel.setPreferredSize(new Dimension(330, 50));
-      step2OutputPanel.setBackground(SystemColor.control);
-      outputBrowseButton.addActionListener(new
-                                           AnalysisFrame_outputBrowseButton_actionAdapter(this));
-      outputBrowseButton.setText("Browse....");
-      outputBrowseButton.setEnabled(true);
-      outputFile.setToolTipText("");
-      outputFile.setPreferredSize(new Dimension(230, 19));
-      outputFile.setEnabled(false);
-      outputFile.setMinimumSize(new Dimension(4, 19));
-      step2OutputLabel.setText("Output file:");
-      step2OutputLabel.setPreferredSize(new Dimension(320, 15));
-      step2OutputPanel.add(step2OutputLabel, null);
-      step2OutputPanel.add(outputFile, null);
-      step2OutputPanel.add(outputBrowseButton, null);
       probeBrowseButton.setEnabled(true);
       probeBrowseButton.setText("Browse....");
       probeBrowseButton.addActionListener(new
@@ -344,7 +301,6 @@ public class AnalysisFrame extends JFrame {
       step2Panel.add(jPanel7, null);
       step2Panel.add(jPanel11, null);
       step2Panel.add(jPanel8, null);
-      step2Panel.add(step2OutputPanel, null);
 
       //step 3 panel////////////////////////////////////////////////////////////
       step3Panel = new JPanel();
@@ -510,8 +466,6 @@ public class AnalysisFrame extends JFrame {
       jPanel14.setBackground(SystemColor.control);
       jLabel10.setMaximumSize(new Dimension(39, 15));
       jLabel10.setMinimumSize(new Dimension(76, 15));
-      jLabel10.setRequestFocusEnabled(true);
-      jLabel10.setToolTipText("");
       jLabel10.setLabelFor(jTextFieldScoreCol);
       jLabel10.setText("Score column");
       jTextFieldScoreCol.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -520,15 +474,12 @@ public class AnalysisFrame extends JFrame {
               "Column of the gene score file containing the scores");
       jTextFieldScoreCol.setMaximumSize(new Dimension(2147483647, 2147483647));
       jTextFieldScoreCol.setPreferredSize(new Dimension(30, 19));
-      jTextFieldScoreCol.setRequestFocusEnabled(true);
       jTextFieldScoreCol.setEditable(true);
       jPanel14.add(jLabel10, null);
       jPanel14.add(jTextFieldScoreCol, null);
-      jPanel13.setBackground(SystemColor.control);
       jPanel13.setBorder(null);
       jPanel13.setPreferredSize(new Dimension(160, 29));
       jLabel13.setMaximumSize(new Dimension(39, 15));
-      jLabel13.setRequestFocusEnabled(true);
       jLabel13.setLabelFor(jTextFieldIterations);
       jLabel13.setText("Iterations to run");
       jTextFieldIterations.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -573,6 +524,7 @@ public class AnalysisFrame extends JFrame {
 
       //Finally, start things off///////////////////////////////////////////////
       mainPanel.add(step1Panel);
+      this.getRootPane().setDefaultButton(nextButton);
       this.setTitle("Create New Analysis - Step 1 of 4");
       readPrefs();
       String folder = (String) nameFile.getText();
@@ -593,11 +545,10 @@ public class AnalysisFrame extends JFrame {
          System.err.println("Could not find preferences file."); // no big deal.
       }
       if (settings.size() > 0) {
-         scoreFile.setText((String) settings.get("scoreFile"));
-         nameFile.setText((String) settings.get("nameFile"));
-         outputFile.setText((String) settings.get("outputFile"));
-         probeFile.setText((String) settings.get("probeFile"));
-         rawFile.setText((String) settings.get("rawFile"));
+         scoreFile.setText( (String) settings.get("scoreFile"));
+         nameFile.setText( (String) settings.get("nameFile"));
+         probeFile.setText( (String) settings.get("probeFile"));
+         rawFile.setText( (String) settings.get("rawFile"));
          jTextFieldMaxClassSize.setText((String) settings.get("maxClassSize"));
          jTextFieldMinClassSize.setText((String) settings.get("minClassSize"));
          jCheckBoxDoLog.setSelected(Boolean.valueOf((String) settings.get(
@@ -612,7 +563,6 @@ public class AnalysisFrame extends JFrame {
       Properties settings = callingframe.settings;
       settings.setProperty("scoreFile", scoreFile.getText());
       settings.setProperty("nameFile", nameFile.getText());
-      settings.setProperty("outputFile", outputFile.getText());
       settings.setProperty("probeFile", probeFile.getText());
       settings.setProperty("rawFile", rawFile.getText());
       settings.setProperty("maxClassSize", jTextFieldMaxClassSize.getText());
@@ -652,16 +602,8 @@ public class AnalysisFrame extends JFrame {
                                     "\n" + e.getStackTrace());
    }
 
-   public void errorPopUp(String msg) {
-      ErrorFrame ef = new ErrorFrame(this, msg);
-      Dimension efSize = ef.getPreferredSize();
-      Dimension frmSize = getSize();
-      Point loc = getLocation();
-      ef.setLocation((frmSize.width - efSize.width) / 2 + loc.x,
-                     (frmSize.height - efSize.height) / 2 + loc.y);
-      ef.setModal(true);
-      ef.pack();
-      ef.show();
+   public void error(String message) {
+      JOptionPane.showMessageDialog(null, "Error: " + message + "\n");
    }
 
    void getClasses() {
@@ -748,13 +690,6 @@ public class AnalysisFrame extends JFrame {
       }
    }
 
-   void outputBrowseButton_actionPerformed(ActionEvent e) {
-      int result = chooser.showOpenDialog(this);
-      if (result == JFileChooser.APPROVE_OPTION) {
-         outputFile.setText(chooser.getSelectedFile().toString());
-      }
-   }
-
    //step 3 actions/////////////////////////////////////////////////////////////
    void addButton_actionPerformed(ActionEvent e) {
       int n = customClassTable.getSelectedRowCount();
@@ -812,14 +747,15 @@ public class AnalysisFrame extends JFrame {
          step2Panel.revalidate();
          backButton.setEnabled(true);
          this.repaint();
+         this.getRootPane().setDefaultButton(nextButton);
       } else if (step == 2) {
          if (analysisType == 2 && rawFile.getText().compareTo("") == 0) {
-            errorPopUp("Correlation analyses require a raw data file.");
+            error("Correlation analyses require a raw data file.");
          } else if ((analysisType == 0 || analysisType == 1) &&
                     scoreFile.getText().compareTo("") == 0) {
-            errorPopUp("ORA and resampling analyses require a raw data file.");
+            error("ORA and resampling analyses require a raw data file.");
          } else if (nameFile.getText().compareTo("") == 0) {
-            errorPopUp("Gene name files are required.");
+            error("Gene name files are required.");
          } else {
             step = 3;
             this.getContentPane().remove(step2Panel);
@@ -908,10 +844,9 @@ public class AnalysisFrame extends JFrame {
                                  probeFile.getText(),
                                  nameFile.getText(),
                                  new classScoreStatus(callingframe.jLabelStatus),
-                                 Double.parseDouble(jTextFieldPValueThreshold.
-                    getText()),
+                                 Double.parseDouble(jTextFieldPValueThreshold.getText()),
                                  Integer.parseInt(jTextFieldScoreCol.getText()),
-                                 outputFile.getText());
+                                 "");
          }
       };
 
@@ -1153,21 +1088,6 @@ class AnalysisFrame_outputFile_actionAdapter implements java.awt.event.
       adaptee.outputFile_actionPerformed(e);
    }
 }
-
-
-class AnalysisFrame_outputBrowseButton_actionAdapter implements java.awt.event.
-        ActionListener {
-   AnalysisFrame adaptee;
-
-   AnalysisFrame_outputBrowseButton_actionAdapter(AnalysisFrame adaptee) {
-      this.adaptee = adaptee;
-   }
-
-   public void actionPerformed(ActionEvent e) {
-      adaptee.outputBrowseButton_actionPerformed(e);
-   }
-}
-
 
 class AnalysisFrame_probeFile_actionAdapter implements java.awt.event.
         ActionListener {

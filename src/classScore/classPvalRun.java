@@ -226,7 +226,10 @@ public class classPvalRun {
          messenger.setStatus("Beginning output");
          // all done:
          // print the results
-         ResultsPrinter rpr = new ResultsPrinter(dest_file, sortedclasses, results, goName, probeToClassMap);
+         if(dest_file.compareTo("")!=0)
+         {
+            ResultsPrinter rpr = new ResultsPrinter(dest_file, sortedclasses, results, goName, probeToClassMap);
+         }
          //printResults(true);
       }
 

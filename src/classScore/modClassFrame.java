@@ -16,19 +16,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
@@ -48,7 +36,7 @@ import javax.swing.text.Document;
  * @version 1.0
  */
 
-public class modClassFrame extends JFrame {
+public class modClassFrame extends JDialog {
    JPanel jPanel1;
 
    //holds bottom buttons
@@ -130,6 +118,7 @@ public class modClassFrame extends JFrame {
 
    public modClassFrame(boolean makenew, InitialMaps imap,
                         ClassPanel classpanel, String saveFolder, String cid) {
+      setModal(true);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.makenew = makenew;
       this.imaps = imap;
@@ -386,19 +375,11 @@ public class modClassFrame extends JFrame {
       }
    }
 
-   public void errorPopUp(String msg) {
-      ErrorFrame ef = new ErrorFrame(this, msg);
-      Dimension efSize = ef.getPreferredSize();
-      Dimension frmSize = getSize();
-      Point loc = getLocation();
-      ef.setLocation((frmSize.width - efSize.width) / 2 + loc.x,
-                     (frmSize.height - efSize.height) / 2 + loc.y);
-      ef.setModal(true);
-      ef.pack();
-      ef.show();
-   }
+   public void error(String message) {
+     JOptionPane.showMessageDialog(null, "Error: " + message + "\n");
+  }
 
-   private void populateTables() {
+  private void populateTables() {
       if (!makenew) {
          SortFilterModel ocSorter = new SortFilterModel(imaps.toTableModel());
          oldClassTable.setModel(ocSorter);
@@ -480,7 +461,7 @@ public class modClassFrame extends JFrame {
    void pickClassButton_actionPerformed(ActionEvent e) {
       int n = oldClassTable.getSelectedRowCount();
       if (n != 1) {
-         errorPopUp("Only one class can be modified at a time.");
+         error("Only one class can be modified at a time.");
       }
       int row = oldClassTable.getSelectedRow();
       String id = (String) oldClassTable.getValueAt(row, 0);
@@ -530,7 +511,7 @@ public class modClassFrame extends JFrame {
       if ((newGene = imaps.geneData.getProbeGeneName(newProbe)) != null) {
          addGene(newGene);
       } else {
-         errorPopUp("Probe " + newProbe + " does not exist.");
+         error("Probe " + newProbe + " does not exist.");
          /* for adding specified probe
                if(smap.geneData.getProbeGeneName(newProbe) != null)
                {
@@ -540,7 +521,7 @@ public class modClassFrame extends JFrame {
                   updateCountLabel();
                }
                else
-                  errorPopUp("Probe " + newProbe + " does not exist.");
+                  error("Probe " + newProbe + " does not exist.");
           */
       }
    }
@@ -559,7 +540,7 @@ public class modClassFrame extends JFrame {
          ncTableModel.fireTableDataChanged();
          updateCountLabel();
       } else {
-         errorPopUp("Gene " + gene + " does not exist.");
+         error("Gene " + gene + " does not exist.");
       }
    }
 
@@ -571,7 +552,7 @@ public class modClassFrame extends JFrame {
       String classID = (String) ((DefaultCellEditor) e.getSource()).
                        getCellEditorValue();
       if (imaps.geneData.classToProbeMapContains(classID) && makenew) {
-         errorPopUp("A class by the ID " + classID + " already exists.");
+         error("A class by the ID " + classID + " already exists.");
       } else {
          newclass.id = classID;
          classIDFinal.setText(classID);
@@ -589,7 +570,7 @@ public class modClassFrame extends JFrame {
    void nextButton_actionPerformed(ActionEvent e) {
       if (step == 1) {
          if (!makenew && newclass.id.compareTo("") == 0) {
-            errorPopUp("Pick a class to be modified.");
+            error("Pick a class to be modified.");
          } else {
             if (makenew && inputMethod == 1) {
                newclass.loadClassFile(classFile.getText());
@@ -672,7 +653,7 @@ public class modClassFrame extends JFrame {
       String id = newclass.id;
       String desc = newclass.desc;
       if (id.compareTo("") == 0) {
-         errorPopUp("The class ID must be specified.");
+         error("The class ID must be specified.");
       } else {
          if (makenew) {
             imaps.addClass(id, desc, newclass.probes);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--Exported by JBuilder on Jun 17, 2004 10:30:08 AM-->
+<!--Exported by JBuilder on Jun 17, 2004 2:34:52 PM-->
 <!--It is RECOMMENDED that JBuilder builds and Ant builds done with
 this exported Ant file be kept separate and be written to different
 directories. For example, the JBuilder output directory might be "classes"
@@ -10,27 +10,19 @@ and the Ant output directory might be "classes.ant".-->
   <property name="jdk.home" value="${jbuilder.home}/jdk1.4"/>
   <property name="dest" value="classes.ant"/>
   <property name="Generated.Source" value="${dest}/Temporary_Files"/>
-  <property name="MySQL.home" value="${jbuilder.home}/thirdparty"/>
   <property name="C:/jbproject/baseCode/baseCode.jpx.home" value="C:/jbproject/baseCode"/>
-  <property name="JUnit.home" value="${MySQL.home}/junit3.8"/>
+  <property name="JUnit.home" value="${jbuilder.home}/thirdparty/junit3.8"/>
   <property name="Unit.Test.home" value="${jbuilder.home}/lib"/>
-  <property name="colt.home" value="${MySQL.home}/colt"/>
-  <property name="commons-logging.home" value="${MySQL.home}/commons-logging-1.0.3"/>
-  <property name="jakarta-log4j.home" value="${MySQL.home}/jakarta-log4j-1.2.8/dist/lib"/>
-  <property name="Xerces.home" value="${Unit.Test.home}"/>
+  <property name="COLT.home" value="${jbuilder.home}/thirdparty/colt1.0.3"/>
+  <property name="commons-logging.home" value="${jbuilder.home}/thirdparty/commons-logging-1.0.3"/>
   <property name="src" value="src"/>
   <path id="project.class.path">
     <pathelement location="${dest}"/>
-    <pathelement location="${MySQL.home}/mysql-connector-java-3.0.9-stable-bin.jar"/>
     <pathelement location="${C:/jbproject/baseCode/baseCode.jpx.home}/classes"/>
     <pathelement location="${JUnit.home}/junit.jar"/>
     <pathelement location="${Unit.Test.home}/unittest.jar"/>
-    <pathelement location="${colt.home}/colt.jar"/>
-    <pathelement location="${commons-logging.home}/commons-logging-api.jar"/>
+    <pathelement location="${COLT.home}/colt.jar"/>
     <pathelement location="${commons-logging.home}/commons-logging.jar"/>
-    <pathelement location="${jakarta-log4j.home}/log4j-1.2.8.jar"/>
-    <pathelement location="${Unit.Test.home}/xercesImpl.jar"/>
-    <pathelement location="${Unit.Test.home}/xmlParserAPIs.jar"/>
     <pathelement location="${jdk.home}/demo/jfc/Java2D/Java2Demo.jar"/>
     <pathelement location="${jdk.home}/demo/plugin/jfc/Java2D/Java2Demo.jar"/>
     <pathelement location="${jdk.home}/jre/javaws/javaws.jar"/>
@@ -75,25 +67,6 @@ and the Ant output directory might be "classes.ant".-->
       <src path="${Generated.Source}"/>
     </javac>
   </target>
-  <target depends="resource" name="archive">
-    <fail message="JBuilder ability to archive dependencies in the &quot;C:/jbproject/baseCode/baseCode.jpx&quot; library is not supported by the Ant jar task"/>
-    <fail message="JBuilder ability to archive dependencies in the &quot;colt&quot; library is not supported by the Ant jar task"/>
-    <jar compress="false" destfile="classScore.jar">
-      <fileset dir="${dest}">
-        <patternset refid="dest.exclude"/>
-        <include name="**/*.*"/>
-      </fileset>
-      <manifest>
-        <attribute name="Main-Class" value="classScore.classScoreGUI"/>
-      </manifest>
-    </jar>
-  </target>
-  <target name="cleanup">
-    <delete file="classScore.jar"/>
-    <delete failonerror="false" includeemptydirs="true">
-      <fileset dir="${dest}"/>
-    </delete>
-  </target>
   <target name="resource">
     <copy todir="${dest}">
       <fileset dir="${src}">
@@ -112,20 +85,20 @@ and the Ant output directory might be "classes.ant".-->
       </fileset>
     </copy>
   </target>
-  <target name="javadoc">
-    <javadoc destdir="doc" package="true">
-      <fileset dir="${src}"/>
-      <tag description="To Do:" name="todo" scope="all"/>
-    </javadoc>
-  </target>
+  <target name="javadoc"/>
   <target depends="cleanup" name="clean"/>
   <target name="precompile"/>
   <target depends="javacompile" name="compile"/>
   <target name="postcompile"/>
-  <target depends="archive,javadoc,resource" name="package"/>
+  <target depends="javadoc,resource" name="package"/>
   <target name="deploy"/>
   <target depends="precompile,compile,postcompile,package,deploy" name="make"/>
   <target depends="clean,make" name="rebuild"/>
+  <target name="cleanup">
+    <delete failonerror="false" includeemptydirs="true">
+      <fileset dir="${dest}"/>
+    </delete>
+  </target>
   <target name="init">
     <mkdir dir="${dest}"/>
     <mkdir dir="${Generated.Source}"/>

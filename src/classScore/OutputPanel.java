@@ -1,11 +1,8 @@
 package classScore;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Map;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import java.util.*;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
@@ -50,6 +47,13 @@ public class OutputPanel extends JScrollPane {
       table.addColumn(new TableColumn(model.getColumnCount() - 3));
       table.addColumn(new TableColumn(model.getColumnCount() - 2));
       table.addColumn(new TableColumn(model.getColumnCount() - 1));
+      table.getColumnModel().getColumn(model.getColumnCount() - 3).setPreferredWidth(30);
+      table.getColumnModel().getColumn(model.getColumnCount() - 2).setPreferredWidth(30);
+      table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
+   }
+
+   public Vector getAllRunData() {
+      return model.getAllRunData();
    }
 
 }
@@ -57,8 +61,8 @@ public class OutputPanel extends JScrollPane {
 
 class OutputTableModel extends AbstractTableModel {
    InitialMaps imaps;
-   ArrayList results = new ArrayList();
-   ArrayList columnNames = new ArrayList();
+   Vector results = new Vector();
+   Vector columnNames = new Vector();
    private NumberFormat nf = NumberFormat.getInstance();
    int state = -1;
    int cols_per_run = 3;
@@ -82,6 +86,10 @@ class OutputTableModel extends AbstractTableModel {
       columnNames.add("Run " + state + " Rank");
       columnNames.add("Run " + state + " Score");
       columnNames.add("Run " + state + " Pval");
+   }
+
+   public Vector getAllRunData() {
+      return results;
    }
 
    public String getColumnName(int i) {return (String) columnNames.get(i);

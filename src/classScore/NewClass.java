@@ -104,7 +104,7 @@ public class NewClass {
       clear();
       File infile = new File(file);
       if (!infile.exists() || !infile.canRead()) {
-         outerframe.errorPopUp("Could not find file: " + file);
+         outerframe.error("Could not find file: " + file);
       } else {
          try {
             FileInputStream fis = new FileInputStream(file);
@@ -144,7 +144,7 @@ public class NewClass {
                probes = new ArrayList(probeSet);
             }
          } catch (IOException ioe) {
-            outerframe.errorPopUp("Could not find file: " + ioe);
+            outerframe.error("Could not find file: " + ioe);
          }
       }
 

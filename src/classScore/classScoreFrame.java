@@ -1,40 +1,12 @@
 package classScore;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Point;
-import java.awt.SystemColor;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Properties;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 /**
  * <p>Title: </p>
@@ -47,33 +19,8 @@ import javax.swing.SwingConstants;
  */
 
 public class classScoreFrame extends JFrame {
+   JPanel mainPanel = (JPanel)this.getContentPane();
 
-   JButton jButtonQuit = new JButton();
-   ButtonGroup buttonGroup1 = new ButtonGroup();
-   ButtonGroup buttonGroup2 = new ButtonGroup();
-
-   File startPath;
-   JPanel jPanelMainControls = new JPanel();
-   boolean doLog;
-   JButton jButtonAbout = new JButton();
-   JFileChooser chooser = new JFileChooser();
-   JLabel jLabelStatus = new JLabel();
-   JButton jButtonCancel = new JButton();
-   JPanel jPanelStatus = new JPanel();
-   Thread runner;
-   boolean done = false;
-
-   JPanel jPanel1 = (JPanel)this.getContentPane();
-
-   JButton jButtonLoadResults = new JButton();
-
-   boolean loadResults = false;
-   JTabbedPane jTabbedPane1 = new JTabbedPane();
-   FlowLayout flowLayout9 = new FlowLayout();
-   ClassPanel cPanel;
-   OutputPanel oPanel;
-
-   int runnum = 0;
    JMenuBar jMenuBar1 = new JMenuBar();
    JMenu classMenu = new JMenu();
    JMenuItem defineClassMenuItem = new JMenuItem();
@@ -82,7 +29,28 @@ public class classScoreFrame extends JFrame {
    JMenu analysisMenu = new JMenu();
    JMenuItem runAnalysisMenuItem = new JMenuItem();
    JMenuItem loadAnalysisMenuItem = new JMenuItem();
+   JMenuItem saveAnalysisMenuItem = new JMenuItem();
+
+   JTabbedPane jTabbedPane1 = new JTabbedPane();
+   ClassPanel cPanel;
    ResultPanel resultpanel;
+   OutputPanel oPanel;
+
+   JPanel jPanelMainControls = new JPanel();
+   JButton jButtonAbout = new JButton();
+   JButton jButtonCancel = new JButton();
+   JButton jButtonLoadResults = new JButton();
+   JButton jButtonQuit = new JButton();
+
+   JLabel jLabelStatus = new JLabel();
+   JPanel jPanelStatus = new JPanel();
+
+   Thread runner;
+   File startPath;
+   JFileChooser chooser = new JFileChooser();
+   boolean done = false;
+   boolean loadResults = false;
+   int runnum = 0;
    InitialMaps imaps;
    boolean initialized = false;
    classScoreStatus statusMessenger;
@@ -107,35 +75,12 @@ public class classScoreFrame extends JFrame {
       this.setJMenuBar(jMenuBar1);
       this.setSize(new Dimension(886, 450));
       this.setTitle("Functional Class Scoring");
+      mainPanel.setMaximumSize(new Dimension(2000, 2000));
+      mainPanel.setMinimumSize(new Dimension(2000, 2000));
+      mainPanel.setPreferredSize(new Dimension(1000, 600));
+      mainPanel.setInputVerifier(null);
 
-      jLabelStatus.setBorder(null);
-      jPanelStatus.setBackground(SystemColor.control);
-      jPanelStatus.setDebugGraphicsOptions(0);
-      jPanelStatus.setPreferredSize(new Dimension(830, 33));
-      jPanelStatus.setLayout(flowLayout9);
-
-      jPanel1.setBackground(SystemColor.control);
-      jPanel1.setDebugGraphicsOptions(0);
-      jPanel1.setMaximumSize(new Dimension(2000, 2000));
-      jPanel1.setMinimumSize(new Dimension(2000, 2000));
-      jPanel1.setOpaque(true);
-      jPanel1.setPreferredSize(new Dimension(1000, 600));
-      jPanel1.setToolTipText("");
-      jPanel1.setInputVerifier(null);
-      jButtonLoadResults.setToolTipText(
-              "Click to load an existing results file from disk");
-      jButtonLoadResults.setActionCommand("jButtonLoad");
-      jButtonLoadResults.setText("Load Results");
-      jButtonLoadResults.addActionListener(new
-                                           classScoreFrame_jButtonLoadResults_actionAdapter(this));
-      jTabbedPane1.setBackground(SystemColor.control);
-      jTabbedPane1.setMaximumSize(new Dimension(32767, 32767));
-      jTabbedPane1.setMinimumSize(new Dimension(300, 530));
-      jTabbedPane1.setPreferredSize(new Dimension(830, 330));
-      jPanelMainControls.setBackground(SystemColor.control);
-      jPanelMainControls.setDebugGraphicsOptions(0);
-      jPanelMainControls.setPreferredSize(new Dimension(830, 35));
-
+      //menu stuff
       classMenu.setText("Classes");
       defineClassMenuItem.setText("Define New Class");
       defineClassMenuItem.addActionListener(new
@@ -146,62 +91,73 @@ public class classScoreFrame extends JFrame {
       loadClassMenuItem.setText("Load Class Information");
       loadClassMenuItem.addActionListener(new
                                           classScoreFrame_loadClassMenuItem_actionAdapter(this));
+      classMenu.add(loadClassMenuItem);
+      classMenu.add(defineClassMenuItem);
+      classMenu.add(modClassMenuItem);
+      analysisMenu.setText("Analysis");
       runAnalysisMenuItem.setText("Run Analysis");
       runAnalysisMenuItem.addActionListener(new
                                             classScoreFrame_runAnalysisMenuItem_actionAdapter(this));
-      analysisMenu.setText("Analysis");
       loadAnalysisMenuItem.setText("Load Analysis");
       loadAnalysisMenuItem.addActionListener(new
                                              classScoreFrame_loadAnalysisMenuItem_actionAdapter(this));
+      saveAnalysisMenuItem.setText("Save Analysis");
+      saveAnalysisMenuItem.addActionListener(new
+                                             classScoreFrame_saveAnalysisMenuItem_actionAdapter(this));
+      analysisMenu.add(runAnalysisMenuItem);
+      analysisMenu.add(loadAnalysisMenuItem);
+      analysisMenu.add(saveAnalysisMenuItem);
+      jMenuBar1.add(classMenu);
+      jMenuBar1.add(analysisMenu);
 
+      jTabbedPane1.setMaximumSize(new Dimension(32767, 32767));
+      jTabbedPane1.setMinimumSize(new Dimension(300, 530));
+      jTabbedPane1.setPreferredSize(new Dimension(830, 330));
       cPanel = new ClassPanel(this);
       oPanel = new OutputPanel();
-
       //cPanel.setModel(InitialMaps.toBlankTableModel());
-
-      jPanelMainControls.add(jButtonQuit, null);
-      jPanelMainControls.add(jButtonLoadResults, null);
-      jPanelMainControls.add(jButtonCancel, null);
-      jPanelMainControls.add(jButtonAbout, null);
-      jPanel1.add(jPanelStatus, BorderLayout.SOUTH);
-      jPanelStatus.add(jLabelStatus, null);
-      jPanel1.add(jPanelMainControls, BorderLayout.CENTER);
-      jPanel1.add(jTabbedPane1, BorderLayout.NORTH);
-      //jTabbedPane1.addTab("cPanel", cPanel);
       jTabbedPane1.addTab("oPanel", oPanel);
 
+      jPanelMainControls.setPreferredSize(new Dimension(830, 35));
+      jButtonLoadResults.setToolTipText(
+              "Click to load an existing results file from disk");
+      jButtonLoadResults.setActionCommand("jButtonLoad");
+      jButtonLoadResults.setText("Load Results");
+      jButtonLoadResults.addActionListener(new
+                                           classScoreFrame_jButtonLoadResults_actionAdapter(this));
       jButtonAbout.setToolTipText("Please click here!");
       jButtonAbout.setText("About the software");
       jButtonAbout.addActionListener(new
                                      classScoreFrame_jButtonAbout_actionAdapter(this));
-
       jButtonQuit.setText("Quit Program");
       jButtonQuit.addActionListener(new
                                     classScoreFrame_jButtonQuit_actionAdapter(this));
-
-      jLabelStatus.setFont(new java.awt.Font("Dialog", 0, 11));
-      jLabelStatus.setPreferredSize(new Dimension(500, 19));
-      jLabelStatus.setHorizontalAlignment(SwingConstants.LEFT);
-      jLabelStatus.setText("Status");
       jButtonCancel.setToolTipText("Cancel the current run");
       jButtonCancel.setText("Stop");
       jButtonCancel.addActionListener(new
                                       classScoreFrame_jButtonCancel_actionAdapter(this));
+      jPanelMainControls.add(jButtonQuit, null);
+      jPanelMainControls.add(jButtonLoadResults, null);
+      jPanelMainControls.add(jButtonCancel, null);
+      jPanelMainControls.add(jButtonAbout, null);
+
       jPanelStatus.setBorder(BorderFactory.createEtchedBorder());
+      jPanelStatus.setPreferredSize(new Dimension(830, 33));
+      jLabelStatus.setFont(new java.awt.Font("Dialog", 0, 11));
+      jLabelStatus.setPreferredSize(new Dimension(500, 19));
+      jLabelStatus.setHorizontalAlignment(SwingConstants.LEFT);
+      jLabelStatus.setText("Status");
+      jPanelStatus.add(jLabelStatus, null);
+      showStatus("Please see 'About this software' for license information.");
+      statusMessenger = new classScoreStatus(jLabelStatus);
+
+      mainPanel.add(jTabbedPane1, BorderLayout.NORTH);
+      mainPanel.add(jPanelMainControls, BorderLayout.CENTER);
+      mainPanel.add(jPanelStatus, BorderLayout.SOUTH);
 
       startPath = new File(System.getProperty("user.home"));
-      jMenuBar1.add(classMenu);
-      jMenuBar1.add(analysisMenu);
-      classMenu.add(loadClassMenuItem);
-      classMenu.add(defineClassMenuItem);
-      classMenu.add(modClassMenuItem);
-      analysisMenu.add(runAnalysisMenuItem);
-      analysisMenu.add(loadAnalysisMenuItem);
       chooser.setCurrentDirectory(startPath);
       readPrefs();
-      showStatus("Please see 'About this software' for license information.");
-
-      statusMessenger = new classScoreStatus(jLabelStatus);
    }
 
    /* init */
@@ -603,7 +559,16 @@ public class classScoreFrame extends JFrame {
       //oPanel.addColumn("new col");
    }
 
-   void showWizard(JFrame j) {
+   void saveAnalysisMenuItem_actionPerformed(ActionEvent e) {
+      if(oPanel.getAllRunData()==null)
+         System.err.println("1 data null");
+      else
+         System.err.println("1 there are "+((Vector)oPanel.getAllRunData()).size()+ " runs");
+      SaveWizard swiz = new SaveWizard(this,(Vector)oPanel.getAllRunData());
+      showWizard(swiz);
+   }
+
+   void showWizard(JDialog j) {
       Dimension dlgSize = j.getPreferredSize();
       Dimension frmSize = getSize();
       Point loc = getLocation();
@@ -739,5 +704,18 @@ class classScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.
 
    public void actionPerformed(ActionEvent e) {
       adaptee.loadAnalysisMenuItem_actionPerformed(e);
+   }
+}
+
+class classScoreFrame_saveAnalysisMenuItem_actionAdapter implements java.awt.
+        event.ActionListener {
+   classScoreFrame adaptee;
+
+   classScoreFrame_saveAnalysisMenuItem_actionAdapter(classScoreFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.saveAnalysisMenuItem_actionPerformed(e);
    }
 }
