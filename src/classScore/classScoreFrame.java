@@ -308,7 +308,7 @@ public class classScoreFrame
 
          System.err.println("DONE with CLASSPVALRUN");
 
-         resultpanel = new ResultPanel(results);
+         resultpanel = new ResultPanel(results, settings);
          resultpanel.setModel(results.toTableModel());
          runnum++;
          jTabbedPane1.addTab("Run " + Integer.toString(runnum),resultpanel);
