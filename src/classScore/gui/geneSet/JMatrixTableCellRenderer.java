@@ -1,32 +1,28 @@
-/*
- * MatrixDisplayCellRenderer.java
- *
- * Created on June 19, 2004, 12:23 AM
- */
-
 package classScore.gui.geneSet;
 
+import java.text.DecimalFormat;
+
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
-import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
-import java.text.DecimalFormat;
-import baseCode.gui.JMatrixDisplay;
 
+import baseCode.gui.JMatrixDisplay;
 
 /**
  * @author  Will Braynen
+ * @version $Id$
  */
-public class JMatrixTableCellRenderer 
-    extends JLabel 
+public class JMatrixTableCellRenderer
+    extends JLabel
     implements TableCellRenderer {
 
    JMatrixDisplay m_matrixDisplay;
    DecimalFormat m_nf;
-   
-   public JMatrixTableCellRenderer(JMatrixDisplay matrixDisplay, DecimalFormat nf) {
+
+   public JMatrixTableCellRenderer( JMatrixDisplay matrixDisplay, DecimalFormat nf ) {
 
       m_matrixDisplay = matrixDisplay;
       setOpaque( true );
@@ -96,4 +92,3 @@ public class JMatrixTableCellRenderer
                                    boolean newValue ) {}
 
 } // end class MatrixDisplayCellRenderer
-

@@ -1,35 +1,31 @@
-   /*
-    * ImageFileFilter.java
-    *
-    * Created on June 19, 2004, 10:47 AM
-    */
-
 package classScore.gui.geneSet;
 
-import javax.swing.filechooser.FileFilter;
 import java.io.File;
+
+import javax.swing.filechooser.FileFilter;
+
 import baseCode.graphics.text.Util;
 
 /**
  *
  * @author  Will Braynen
+ *  @version $Id$
  */
-public class ImageFileFilter extends FileFilter {
+public class ImageFileFilter
+    extends FileFilter {
 
-   
    public boolean accept( File f ) {
-      
+
       if ( f.isDirectory() ) {
          return true;
       }
-      
-     return Util.hasImageExtension( f.getName() );
+
+      return Util.hasImageExtension( f.getName() );
 
    } // end accept
-   
-   
+
    public String getDescription() {
-      
+
       return "PNG or GIF images";
-   }   
+   }
 }

@@ -1,49 +1,50 @@
 package classScore.gui.geneSet;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.swing.table.AbstractTableModel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.table.JTableHeader;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.reader.DoubleMatrixReader;
 import baseCode.graphics.text.Util;
-import baseCode.gui.JMatrixDisplay;
-import javax.swing.*;
-import java.awt.event.*;
 import baseCode.gui.ColorMap;
-import javax.swing.event.*;
-
+import baseCode.gui.JMatrixDisplay;
 import classScore.GeneAnnotations;
 import classScore.Settings;
 import classScore.SortFilterModel;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: </p>
- * @author not attributable
- * @version 1.0
+ * @version $Id$
  * @todo show how many rows there are in the table (I think this is done classPvalRun, line 906)
  * @todo add a graphical display of the data
  */
-
-public class JDetailsFrame extends JFrame {
+public class JDetailsFrame
+    extends JFrame {
 
    final int PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN = 12;
    final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
@@ -68,7 +69,8 @@ public class JDetailsFrame extends JFrame {
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
    DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
 
-   public JDetailsFrame(ArrayList values, Map pvals, Map classToProbe, String id, GeneAnnotations geneData, Settings settings) {
+   public JDetailsFrame( ArrayList values, Map pvals, Map classToProbe, String id,
+                         GeneAnnotations geneData, Settings settings ) {
 
       try {
          m_nf.setMaximumFractionDigits( 3 );
@@ -125,16 +127,17 @@ public class JDetailsFrame extends JFrame {
       m_normalizeMenuItem.setText( "Normalize" );
       m_normalizeMenuItem.addActionListener( new JDetailsFrame_m_normalizeMenuItem_actionAdapter( this ) );
       m_matrixDisplayCellWidthSlider.setInverted( false );
-      m_matrixDisplayCellWidthSlider.setMajorTickSpacing(0);
+      m_matrixDisplayCellWidthSlider.setMajorTickSpacing( 0 );
       m_matrixDisplayCellWidthSlider.setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
       m_matrixDisplayCellWidthSlider.setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
       m_matrixDisplayCellWidthSlider.setValue( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_matrixDisplayCellWidthSlider.setMinorTickSpacing(3 );
+      m_matrixDisplayCellWidthSlider.setMinorTickSpacing( 3 );
       m_matrixDisplayCellWidthSlider.setPaintLabels( false );
       m_matrixDisplayCellWidthSlider.setPaintTicks( true );
       m_matrixDisplayCellWidthSlider.setMaximumSize( new Dimension( 60, 24 ) );
       m_matrixDisplayCellWidthSlider.setPreferredSize( new Dimension( 50, 24 ) );
-      m_matrixDisplayCellWidthSlider.addChangeListener(new JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter(this));
+      m_matrixDisplayCellWidthSlider.addChangeListener( new
+          JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter( this ) );
       this.setResizable( true );
       m_tableScrollPane.getViewport().add( m_table, null );
 
@@ -229,14 +232,14 @@ public class JDetailsFrame extends JFrame {
       //
       // Set up the matrix display part of the table
       //
-      
+
       // Make the columns in the matrix display not too wide (cell-size)
       // and set a custom cell renderer
       JMatrixTableCellRenderer cellRenderer = new JMatrixTableCellRenderer(
           m_matrixDisplay,
-          m_nf 
+          m_nf
           ); // create one instance that will be used to draw each cell
-      
+
       JVerticalTableHeaderRenderer verticalHeaderRenderer =
           new JVerticalTableHeaderRenderer(); // create only one instance
       int matrixColumnCount = m_matrixDisplay.getColumnCount();
@@ -255,19 +258,19 @@ public class JDetailsFrame extends JFrame {
       //
       // Set up the rest of the table
       //
-      JHorizontalTableHeaderRenderer horizontalHeaderRenderer = 
+      JHorizontalTableHeaderRenderer horizontalHeaderRenderer =
           new JHorizontalTableHeaderRenderer(); // create only one instance
       TableColumn col;
-      
+
       // The columns containing text or values (not matrix display) should be a bit wider
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 0 );
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_0 );
       col.setHeaderRenderer( horizontalHeaderRenderer );
-      
+
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 1 );
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_1 );
       col.setHeaderRenderer( horizontalHeaderRenderer );
-      
+
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 2 );
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_2 );
       col.setHeaderRenderer( horizontalHeaderRenderer );
@@ -276,14 +279,12 @@ public class JDetailsFrame extends JFrame {
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_3 );
       col.setHeaderRenderer( horizontalHeaderRenderer );
 
-      
       //
       // Sort initially by the pvalue column
       //
       int modelColumn = m_table.convertColumnIndexToModel( matrixColumnCount + 1 );
       ( ( SortFilterModel ) m_table.getModel() ).sort( modelColumn );
 
-         
       //
       // Save the dimensions of the table just in case
       //
@@ -297,10 +298,9 @@ public class JDetailsFrame extends JFrame {
 
       Dimension d = new Dimension( width, height );
       m_table.setSize( d );
-      
+
    } // end createDetailsTable
 
-   
    protected String[] getProbes( Map classToProbe, String id, int count ) {
 
       // Compile a list of gene probe ID's in this probe class
@@ -333,10 +333,10 @@ public class JDetailsFrame extends JFrame {
    }
 
    void m_saveFileMenuItem_actionPerformed( ActionEvent e ) {
-            
+
       // Create a file chooser
       final JDetailsFileChooser fc = new JDetailsFileChooser();
-    
+
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -344,20 +344,20 @@ public class JDetailsFrame extends JFrame {
 
          // Make sure the filename has an image extension
          String filename = file.getPath();
-         if ( ! Util.hasImageExtension( filename ) ) {
+         if ( !Util.hasImageExtension( filename ) ) {
             filename = Util.addImageExtension( filename );
          }
          // Save the color matrix image
          try {
             boolean includeLabels = fc.includeLabels();
             boolean normalize = fc.normalized();
-            m_matrixDisplay.saveToFile( filename, includeLabels, normalize );            
+            m_matrixDisplay.saveToFile( filename, includeLabels, normalize );
          }
          catch ( IOException ex ) {
             System.err.println( "IOException error saving png to " + filename );
          }
-         
-         // Save the matrix values and the rest of the table to a data file         
+
+         // Save the matrix values and the rest of the table to a data file
          // change filename extension to .txt or whatever it is we use for data files
          filename = Util.changeExtension( filename, Util.DEFAULT_DATA_EXTENSION );
          //
@@ -374,7 +374,7 @@ public class JDetailsFrame extends JFrame {
       m_table.repaint();
    }
 
-   void m_matrixDisplayCellWidthSlider_stateChanged(ChangeEvent e) {
+   void m_matrixDisplayCellWidthSlider_stateChanged( ChangeEvent e ) {
 
       JSlider source = ( JSlider ) e.getSource();
 
@@ -384,7 +384,7 @@ public class JDetailsFrame extends JFrame {
       int width = ( int ) source.getValue();
       if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
 
-         m_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+         m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
          int matrixColumnCount = m_matrixDisplay.getColumnCount();
          for ( int i = 0; i < matrixColumnCount; i++ ) {
@@ -396,7 +396,6 @@ public class JDetailsFrame extends JFrame {
    }
 
 } // end class JDetailsFrame
-
 
 class JDetailsFrame_m_greenredColormapMenuItem_actionAdapter
     implements java.awt.event.ActionListener {
@@ -450,13 +449,15 @@ class JDetailsFrame_m_normalizeMenuItem_actionAdapter
    }
 }
 
-class JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter implements javax.swing.event.ChangeListener {
+class JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter
+    implements javax.swing.event.ChangeListener {
    JDetailsFrame adaptee;
 
-   JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter(JDetailsFrame adaptee) {
+   JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter( JDetailsFrame adaptee ) {
       this.adaptee = adaptee;
    }
-   public void stateChanged(ChangeEvent e) {
-      adaptee.m_matrixDisplayCellWidthSlider_stateChanged(e);
+
+   public void stateChanged( ChangeEvent e ) {
+      adaptee.m_matrixDisplayCellWidthSlider_stateChanged( e );
    }
 }

@@ -1,29 +1,21 @@
-/*
- * VerticalTableHeaderRenderer.java
- *
- * Created on June 19, 2004, 12:30 AM
- */
-
 package classScore.gui.geneSet;
 
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-import java.text.DecimalFormat;
+
 import baseCode.graphics.text.Util;
 
-
 /**
- *
  * @author  Will Braynen
+ * @version $Id$
  */
-public class JVerticalTableHeaderRenderer 
-    extends JTableHeader 
+public class JVerticalTableHeaderRenderer
+    extends JTableHeader
     implements TableCellRenderer {
 
    String m_columnName;
@@ -43,7 +35,7 @@ public class JVerticalTableHeaderRenderer
 
       // Configure the component with the specified value
       m_columnName = value.toString();
-      
+
       // Set tool tip if desired
       setToolTipText( m_columnName );
 

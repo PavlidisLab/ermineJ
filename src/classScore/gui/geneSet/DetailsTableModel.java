@@ -1,17 +1,13 @@
-/*
- * blah.java
- *
- * Created on June 19, 2004, 12:22 AM
- */
-
 package classScore.gui.geneSet;
 
-import javax.swing.table.AbstractTableModel;
-import baseCode.gui.JMatrixDisplay;
-import java.util.ArrayList;
-import java.awt.Point;
-import java.util.Map;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Map;
+
+import java.awt.Point;
+import javax.swing.table.AbstractTableModel;
+
+import baseCode.gui.JMatrixDisplay;
 import classScore.GeneAnnotations;
 
 /**
@@ -19,6 +15,9 @@ import classScore.GeneAnnotations;
  * <p>
  * The general picture is as follows:<br>
  * GUI -> Sort Filter -> Table Model
+ *
+ * @author  Will Braynen
+ * @version $Id$
  */
 public class DetailsTableModel
     extends AbstractTableModel {
