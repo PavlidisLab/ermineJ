@@ -29,13 +29,13 @@ public class ClassDetailFrame
     JScrollPane jScrollPane1 = new JScrollPane();
     JTable jTable1 = new JTable();
 
-    public ClassDetailFrame( 
-			    ArrayList values, 
-			    Map pvals, 
-			    Map classToProbe, 
-			    String id, 
+    public ClassDetailFrame(
+			    ArrayList values,
+			    Map pvals,
+			    Map classToProbe,
+			    String id,
 			    NumberFormat nf,
-			    GeneDataReader geneData ) 
+			    GeneDataReader geneData )
     {
 	try {
 	    jbInit();
@@ -53,25 +53,25 @@ public class ClassDetailFrame
 
 	// Enable the horizontal scroll bar
 	jTable1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-      
+
 	// Make sure the matrix display doesn't have a grid separating color cells.
 	jTable1.setIntercellSpacing( new Dimension( 0, 0 ));
-      
+
 	// The rest of the table (text and value) should have a light gray grid
 	jTable1.setGridColor(Color.lightGray);
-      
+
 	// add a viewport with a table inside it
 	this.getContentPane().add(jScrollPane1, BorderLayout.CENTER);
 	jScrollPane1.getViewport().add(jTable1, null);
     }
 
-    private void createDetailsTable( 
-				    ArrayList values, 
-				    Map pvals, 
-				    Map classToProbe, 
-				    String id, 
+    private void createDetailsTable(
+				    ArrayList values,
+				    Map pvals,
+				    Map classToProbe,
+				    String id,
 				    NumberFormat nf,
-				    GeneDataReader geneData ) 
+				    GeneDataReader geneData )
     {
 	//
 	// Create a matrix display
@@ -92,12 +92,13 @@ public class ClassDetailFrame
 	//filename = "C:\\GO_0005853.txt";
 	JMatrixDisplay matrixDisplay = new JMatrixDisplay( matrix );
 	matrixDisplay.setStandardizedEnabled( false );
-      
+
 	//
 	// Create the rest of the table
 	//
 	DetailsTableModel m = new DetailsTableModel( matrixDisplay, values, pvals, classToProbe, id, nf, geneData );
 	SortFilterModel sorter = new SortFilterModel( m );
+      jTable1.setModel( new DefaultTableModel() ); // bug in JTable (Manju said so)
 	jTable1.setModel( sorter );
 
 	jTable1.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -107,7 +108,7 @@ public class ClassDetailFrame
 		    ( (SortFilterModel) jTable1.getModel() ).sort( modelColumn );
 		}
 	    });
-      
+
 	// Make the columns in the matrix display not too wide (cell-size)
 	// and set a custom cell renderer
 	MatrixDisplayCellRenderer cellRenderer = new MatrixDisplayCellRenderer( matrixDisplay );
@@ -121,16 +122,16 @@ public class ClassDetailFrame
 		TableColumn col = jTable1.getColumnModel().getColumn( i );
 		col.setCellRenderer( cellRenderer );
 	    }
-      
+
 	// The columns containing text or values (not matrix display) should be a bit wider
 	jTable1.getColumnModel().getColumn( matrixColumnCount + 1 ).setPreferredWidth(  75 );
 	jTable1.getColumnModel().getColumn( matrixColumnCount + 2 ).setPreferredWidth( 125 );
 	jTable1.getColumnModel().getColumn( matrixColumnCount + 3 ).setPreferredWidth( 300 );
-      
+
     }
-   
+
     protected String[] getProbes( Map classToProbe, String id, int count ) {
-      
+
 	// Compile a list of gene probe ID's in this probe class
 	String[] probes = new String[ count ];
 	for (int i = 0;  i < count;  i++)
@@ -138,7 +139,7 @@ public class ClassDetailFrame
 		probes[i] = (String) ( (ArrayList)classToProbe.get(id) ).get(i);
 	    }
 	return probes;
-      
+
     } // end getProbes
 } // end class ClassDetailFrame
 
@@ -155,7 +156,7 @@ class DetailsTableModel extends AbstractTableModel {
     private String[] m_columnNames = { "Probe", "P value", "Name", "Description" };
 
     /** constructor */
-    public DetailsTableModel( 
+    public DetailsTableModel(
 			     JMatrixDisplay matrixDisplay,
 			     ArrayList values,
 			     Map pvals,
@@ -163,7 +164,7 @@ class DetailsTableModel extends AbstractTableModel {
 			     String id,
 			     NumberFormat nf,
 			     GeneDataReader geneData ) {
-      
+
 	m_matrixDisplay = matrixDisplay;
 	m_values = values;
 	m_pvals = pvals;
@@ -172,13 +173,13 @@ class DetailsTableModel extends AbstractTableModel {
 	m_nf = nf;
 	m_geneData = geneData;
     }
-   
+
     public String getColumnName( int column ) {
-      
+
 	int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
-      
+
 	if (column < offset)
-	    return ""; //m_matrixDisplay.getColumnName( column );
+	    return " "; //m_matrixDisplay.getColumnName( column );
 	else
 	    return m_columnNames[ column - offset ];
     }
@@ -194,7 +195,7 @@ class DetailsTableModel extends AbstractTableModel {
     public Object getValueAt( int row, int column ) {
 
 	int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
-      
+
 	if (column < offset)
 	    return new Point( row, column ); // coords into JMatrixDisplay
 	else
@@ -216,33 +217,33 @@ class DetailsTableModel extends AbstractTableModel {
 	    default:
 		return "";
 	    }
-      
+
     } // end getValueAt
-   
+
 } // end class DetailsTableModel
 
 
 // This renderer extends a component. It is used each time a
 // cell must be displayed.
 class MatrixDisplayCellRenderer extends JLabel implements TableCellRenderer {
-   
+
     JMatrixDisplay m_matrixDisplay;
-   
+
     public MatrixDisplayCellRenderer( JMatrixDisplay matrixDisplay ) {
 
 	m_matrixDisplay = matrixDisplay;
 	setOpaque( true );
     }
-   
+
     // This method is called each time a cell in a column
     // using this renderer needs to be rendered.
     public Component getTableCellRendererComponent(
-						   JTable table, 
+						   JTable table,
 						   Object tableCellValue,
-						   boolean isSelected, 
-						   boolean hasFocus, 
-						   int displayedRow, 
-						   int displayedColumn) 
+						   boolean isSelected,
+						   boolean hasFocus,
+						   int displayedRow,
+						   int displayedColumn)
     {
 	// 'value' is value contained in the cell located at
 	// (rowIndex, vColIndex)
@@ -260,7 +261,7 @@ class MatrixDisplayCellRenderer extends JLabel implements TableCellRenderer {
 	int column = coords.y;
 	double matrixValue = m_matrixDisplay.getValue( row, column );
 	Color matrixColor = m_matrixDisplay.getColor( row, column );
-            
+
 	// Configure the component with the specified value
 	setBackground( matrixColor );
 
