@@ -1,11 +1,11 @@
 #
-#Wed Jun 09 12:13:02 EDT 2004
+#Mon Jun 14 11:19:15 EDT 2004
 minClassSize=8
 pvalueThreshold=0.001
 maxClassSize=10
 scoreColumn=2
 GOnameFile=C\:\\jbproject\\ermineJ\\data\\goNames.txt
-annotFile=C\:\\jbproject\\ermineJ\\data\\fake-chip.txt
+annotFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
 outputFile=C\:\\jbproject\\ermineJ\\data\\test.results.txt
 doLog=true
-scoreFile=C\:\\jbproject\\ermineJ\\data\\fake-pvals.txt
+scoreFile=C\:\\jbproject\\ermineJ\\data\\one-way-anova-parsed.txt
