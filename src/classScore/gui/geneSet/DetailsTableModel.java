@@ -23,10 +23,9 @@ public class DetailsTableModel
     extends AbstractTableModel {
 
    private JMatrixDisplay m_matrixDisplay;
-   private ArrayList m_values;
    private Map m_pvals;
    private Map m_classToProbe;
-   private String m_id;
+   private String m_classID;
    private DecimalFormat m_nf;
    private GeneAnnotations m_geneData;
    private String[] m_columnNames = {
@@ -35,18 +34,16 @@ public class DetailsTableModel
    /** constructor */
    public DetailsTableModel(
        JMatrixDisplay matrixDisplay,
-       ArrayList values,
        Map pvals,
        Map classToProbe,
-       String id,
+       String classID,
        GeneAnnotations geneData,
        DecimalFormat nf ) {
 
       m_matrixDisplay = matrixDisplay;
-      m_values = values;
       m_pvals = pvals;
       m_classToProbe = classToProbe;
-      m_id = id;
+      m_classID = classID;
       m_geneData = geneData;
       m_nf = nf;
    }
@@ -63,7 +60,7 @@ public class DetailsTableModel
    } // end getColumnName
 
    public int getRowCount() {
-      return m_values.size();
+      return (( ArrayList ) m_classToProbe.get( m_classID )).size();
    }
 
    public int getColumnCount() {
@@ -82,16 +79,16 @@ public class DetailsTableModel
       }
       switch ( column ) { // after it's been offset
          case 0:
-            return ( String ) ( ( ArrayList ) m_classToProbe.get( m_id ) ).get( row ); // probe ID
+            return ( String ) ( ( ArrayList ) m_classToProbe.get( m_classID ) ).get( row ); // probe ID
          case 1:
             return new Double( m_nf.format( m_pvals.get( ( String ) ( ( ArrayList )
-                m_classToProbe.get( m_id ) ).get( row ) ) ) );
+                m_classToProbe.get( m_classID ) ).get( row ) ) ) );
          case 2:
             return m_geneData.getProbeGeneName( ( String ) ( ( ArrayList )
-                m_classToProbe.get( m_id ) ).get( row ) );
+                m_classToProbe.get( m_classID ) ).get( row ) );
          case 3:
             return m_geneData.getProbeDescription( ( String ) ( ( ArrayList )
-                m_classToProbe.get( m_id ) ).get( row ) );
+                m_classToProbe.get( m_classID ) ).get( row ) );
          default:
             return "";
       }

@@ -75,12 +75,13 @@ public class JDetailsFrame
       
    }
    
-   public JDetailsFrame( ArrayList values, Map pvals, Map classToProbe, String id,
+   public JDetailsFrame( Map pvals, Map classToProbe, String classID,
                          GeneAnnotations geneData, Settings settings ) {
 
       try {
          m_nf.setMaximumFractionDigits( 3 );
-         createDetailsTable( values, pvals, classToProbe, id, geneData, settings );
+         String filename = settings.getRawFile();
+         createDetailsTable( pvals, classToProbe, classID, geneData, filename );
          jbInit();
 
          boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
@@ -196,25 +197,23 @@ public class JDetailsFrame
    }
    
    private void createDetailsTable(
-       ArrayList values,
        Map pvals,
        Map classToProbe,
-       String id,
+       String classID,
        GeneAnnotations geneData,
-       Settings settings ) {
+       String filename ) {
 
       //
       // Create a matrix display
       //
 
       // compile the matrix data
-      String filename = settings.getRawFile();
-      String[] geneProbes = getProbes( classToProbe, id, values.size() );
+      String[] probeIDs = getProbeIDs( classToProbe, classID );
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
       try {
          matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
-             geneProbes );
+             probeIDs );
       }
       catch ( IOException e ) {
          System.err.println( "IOException: wrong filename for MatrixReader" );
@@ -229,7 +228,7 @@ public class JDetailsFrame
       //
 
       DetailsTableModel m = new DetailsTableModel(
-          m_matrixDisplay, values, pvals, classToProbe, id, geneData, m_nf
+          m_matrixDisplay, pvals, classToProbe, classID, geneData, m_nf
           );
       SortFilterModel sorter = new SortFilterModel( m, m_matrixDisplay );
       m_table.setModel( sorter );
@@ -313,14 +312,15 @@ public class JDetailsFrame
 
    } // end createDetailsTable
 
-   protected String[] getProbes( Map classToProbe, String id, int count ) {
+   protected String[] getProbeIDs( Map classToProbe, String classID ) {
 
       // Compile a list of gene probe ID's in this probe class
-      String[] probes = new String[count];
-      for ( int i = 0; i < count; i++ ) {
-         probes[i] = ( String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i );
+      final int probeCount = (( ArrayList ) classToProbe.get( classID )).size();
+      String[] probesIDs = new String[ probeCount ];
+      for ( int i = 0; i < probeCount; i++ ) {
+         probesIDs[i] = ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i );
       }
-      return probes;
+      return probesIDs;
 
    }
 

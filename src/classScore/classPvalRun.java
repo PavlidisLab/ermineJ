@@ -159,23 +159,23 @@ public class classPvalRun {
    }
 
    /**
-    * @param id String
+    * @param classID "GO000149" for example
     */
-   public void showDetails( String id ) {
-      final classresult res = (classresult) results.get(id);
+   public void showDetails( String classID ) {
+      final classresult res = (classresult) results.get( classID );
       String name = res.getClassName();
       System.out.println( name );
       Map classToProbe = geneData.getClassToProbeMap();
 
-      final ArrayList values = ( ArrayList ) classToProbe.get( id );
+      final ArrayList values = ( ArrayList ) classToProbe.get( classID );
 
       final Map pvals = new HashMap();
       for ( int i = 0, n = values.size(); i < n; i++ ) {
-         //System.err.println((String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ) );
+         //System.err.println((String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i ) );
          Double pvalue = new Double( Math.pow( 10.0,
                                                -probePvalMapper.getPval( (
-             String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ) ) ) );
-         pvals.put( ( String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ), pvalue );
+             String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i ) ) ) );
+         pvals.put( ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i ), pvalue );
       }
 
       if ( values == null ) {
@@ -184,7 +184,7 @@ public class classPvalRun {
 
       // create the details frame
       JDetailsFrame f = new JDetailsFrame(
-          values, pvals, classToProbe, id, geneData, settings
+          pvals, classToProbe, classID, geneData, settings
           );
       f.setTitle( name + " (" + values.size() + " items)" );
       f.show();
