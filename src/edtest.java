@@ -12,7 +12,7 @@ public class edtest{
       String destinFile = "q-100-01-true.txt";
       String ugFile = "MG-U74Av2.ug.txt";
       String method;
-      class_pvals test;
+      classPvalRun test;
       int iters;
 
       for(int i=1; i<=10; i++){

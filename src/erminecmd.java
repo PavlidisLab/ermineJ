@@ -1,12 +1,6 @@
-import classScore.*;
-
 import java.io.*;
 
 import classScore.*;
-
-import java.net.*;
-
-import java.util.*;
 
 /**
  Command line interface for ermineJ program.
@@ -44,28 +38,33 @@ public class erminecmd {
       String pbPvalFile = args[0];
       String affyGoFile = args[1];
       String goNameFile = args[2];
-      String ugFile = args[3];
-      String destinFile = args[4];
+      String destinFile = args[3];
       pbPvalFile = getCanonical(pbPvalFile);
       affyGoFile = getCanonical(affyGoFile);
       destinFile = getCanonical(destinFile);
       goNameFile = getCanonical(goNameFile);
-      ugFile = getCanonical(ugFile);
       classScoreStatus m = new classScoreStatus(null);
+      System.err.println("P values from " + pbPvalFile);
+      System.err.println("Probe annotations from " + affyGoFile);
+      System.err.println("Output into " + destinFile);
 
-      class_pvals test = new class_pvals(pbPvalFile, affyGoFile, goNameFile,
-                                         destinFile, ugFile, args[5], args[6],
-                                         Integer.parseInt(args[7]),
-                                         Integer.parseInt(args[8]),
-                                         Integer.parseInt(args[9]),
-                                         Integer.parseInt(args[10]),
-                                         Double.parseDouble(args[11]), args[12],
-                                         Integer.parseInt(args[13]), args[14],
-                                         args[15], m);
+      classPvalRun test = new classPvalRun(pbPvalFile, affyGoFile, goNameFile,
+                                         destinFile,
+                                         args[4], // method
+                                         args[5], // groups method
+                                         Integer.parseInt(args[6]), // max clas
+                                         Integer.parseInt(args[7]), // min class
+                                         Integer.parseInt(args[8]), // numruns
+                                         Integer.parseInt(args[9]), // quantile
+                                         Double.parseDouble(args[10]), // pvalue
+                                         args[11],
+                                         Integer.parseInt(args[12]),
+                                         args[13],
+                                         args[14], m, false);
 
     }
     catch (ArrayIndexOutOfBoundsException exception) { // this doesn't work ...
-      System.err.println("You must enter 16 command line arguments: \nprobe_pvalfile\naffy_gofile\ngo_namefile\ngroups file\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog\nmultiple test correction method (bon|bh|wy)");
+      System.err.println("You must enter 15 command line arguments: \nprobe_pvalfile\nannot file\ngo_namefile\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog\nmultiple test correction method (bon|bh|wy)");
     }
     catch (IOException e) {
       System.err.println("File reading/writing error");
@@ -77,25 +76,16 @@ public class erminecmd {
   protected static String getCanonical(String in) {
 
     if (in == null || in.length() == 0) {
-
       return in;
     }
 
     File outFile = new File(in);
-
     try {
-
       return outFile.getCanonicalPath();
-
     }
     catch (Exception e) {
-
       e.printStackTrace();
-
       return null;
-
     }
-
   }
-
 }

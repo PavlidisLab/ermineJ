@@ -228,7 +228,7 @@ public class SpecFunc {
 
     if (trials == 0 || p == 0.0) {
       System.err.println(
-          "No trials and/or probability is zero. Will return p=0.5");
+          "Binomial: No trials and/or probability is zero. Will return p=0.5");
       return 0.5;
     }
 

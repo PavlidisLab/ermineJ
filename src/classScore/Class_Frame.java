@@ -1012,13 +1012,13 @@ public class Class_Frame
         timer.start();
         //		timeCounter.start();
         try {
-          class_pvals test = new class_pvals(fileName11, fileName22, fileName44,
-                                             fileName33, fileName55,
+          classPvalRun test = new classPvalRun(fileName11, fileName22, fileName44,
+                                             fileName33,
                                              method_name,
                                              groupMethod, maxField1, minField1,
                                              numField1, quantileField1, pVal1,
                                              weight_boolean, pvalcolumn,
-                                             dolog_boolean, "bh", null);
+                                             dolog_boolean, "bh", null, false);
         }
         catch (IOException ex) {
         }

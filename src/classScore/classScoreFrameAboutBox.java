@@ -29,7 +29,7 @@ public class classScoreFrameAboutBox extends JDialog implements ActionListener {
 //  ImageIcon image1 = new ImageIcon();
   BorderLayout borderLayout2 = new BorderLayout();
   String product = "Class Scoring Software";
-  String version = "1.0";
+  String version = "1.1beta";
   String copyright = "Copyright (c) 2003";
   String comments = "Functional Class Scoring";
   JTextPane jTextPane1 = new JTextPane();

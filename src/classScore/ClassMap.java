@@ -18,85 +18,17 @@ public class ClassMap {
 
   private static Map probeToClassMap; //stores probe->Classes map
   private static Map classToProbeMap; //stores Classes->probe map
+
+  // the following are filled in by other functions.
   private static Map classesToRedundantMap; // stores classes->classes which are the same.
   private static Map classesToSimilarMap; // stores classes->classes which are similar (and therefore not considered directly)
 
   /**
    */
-  public ClassMap(String filename, Map probes) {
-    String aLine = null;
+  public ClassMap(Map probeToClassMap, Map classToProbeMap) {
 
-    //read in file
-    try {
-
-      File infile = new File(filename);
-      if (!infile.exists() || !infile.canRead()) {
-        System.err.println("Could not read " + filename);
-      }
-
-      FileInputStream fis = new FileInputStream(filename);
-
-      BufferedInputStream bis = new BufferedInputStream(fis);
-      BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
-      Double[] DoubleArray = null;
-      Vector rows = new Vector();
-      Vector cols = null;
-
-      probeToClassMap = new LinkedHashMap();
-      classToProbeMap = new LinkedHashMap();
-
-      ArrayList probe_id = new ArrayList();
-      String class_ids = null;
-      String probe = "";
-      String go = "";
-
-      //using set to prevent repeats
-      //	    Classes = new TreeSet();
-
-      // loop through rows. Makes hash map of probes to go, and map of go to probes.
-      String line = "";
-      while ( (line = dis.readLine()) != null) {
-        //tokenize file by tab character
-        StringTokenizer st = new StringTokenizer(line, "\t");
-
-        // create a new Vector for each row's columns
-        probe = st.nextToken();
-
-        if (probes.containsKey(probe)) { // only do probes we have in the data set.
-
-          probe_id.add(probe);
-          probeToClassMap.put(probe, new ArrayList());
-
-          // assumption: just 2 columns
-          if (st.hasMoreTokens()) {
-            class_ids = st.nextToken();
-
-            //another tokenizer is required since the ClassesID's are seperated by the | character
-            StringTokenizer st1 = new StringTokenizer(class_ids, "|");
-            while (st1.hasMoreTokens()) {
-              go = st1.nextToken();
-
-              // add this go to the probe->go map.
-              ( (ArrayList) probeToClassMap.get(probe)).add(go);
-
-              // add this probe this go->probe map.
-              if (!classToProbeMap.containsKey(go)) {
-                classToProbeMap.put(go, new ArrayList());
-              }
-              ( (ArrayList) classToProbeMap.get(go)).add(probe);
-            }
-          }
-        }
-      }
-
-      dis.close();
-
-    }
-    catch (IOException e) {
-      // catch possible io errors from readLine()
-      System.out.println("IOException error!");
-      e.printStackTrace();
-    }
+    this.probeToClassMap = probeToClassMap;
+    this.classToProbeMap = classToProbeMap;
 
     collapseClasses(); // identify redundant classes.
     //	ignoreSimilar(0.90); // get rid of classes which are too similar to other classes.
@@ -405,19 +337,19 @@ public class ClassMap {
 
   /**
    */
-  public Map get_class_map() {
+  public Map getClassToProbeMap() {
     return classToProbeMap;
   }
 
   /**
    */
-  public Map get_probe_map() {
+  public Map getProbeToClassMap() {
     return probeToClassMap;
   }
 
   /**
    */
-  public ArrayList get_class_value_map(String class_id) {
+  public ArrayList getClassValueMap(String class_id) {
     return (ArrayList) (classToProbeMap.get(class_id));
   }
 

@@ -78,8 +78,8 @@ public class classresult implements Comparable {
       } else {
         cleanname = "";
       }
-      out.write(cleanname +"_" +
-                class_id + "" + "\t" + size + "\t" + effective_size + "\t" +
+      out.write( cleanname +"_" +
+                class_id + "" + "\t" + class_name + "\t" + class_id + "\t" + size + "\t" + effective_size + "\t" +
                 nf.format(score) + "\t" + nf.format(pvalue) + "\t"
                  + hypercut + "\t" + nf.format(hyperpval) + "\t" +
                 /*  nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" +  */
@@ -93,7 +93,7 @@ public class classresult implements Comparable {
 
 
     public void print_headings (BufferedWriter out, String extracolumns) throws IOException {
-      out.write("Class" + "\tsize" + "\teffective_size" + "\traw score" +
+      out.write("Class" + "\tClass Name" + "\tClass ID" + "\tsize" + "\teffective_size" + "\traw score" +
                 "\tresamp pval" +
                 "\tN over pval cut\tORA pval" /* + "\tAROC" + "\tAROCpval"  */ +
                 "\tCorrected_pvalue" + extracolumns + "\n");
@@ -150,20 +150,32 @@ public class classresult implements Comparable {
 	return "I'm a classresult";
     }
 
-    public String get_class_id() {
+    public String getClassId() {
 	return class_id;
     }
 
-    public double get_pvalue() {
+    public String getClassName() {
+      return this.class_name;
+    }
+
+    public double getPvalue() {
 	return pvalue;
     }
 
-    public double get_score() {
+    public double getScore() {
 	return score;
     }
 
-    public int get_effsize() {
+    public int getEffectiveSize() {
 	return effective_size;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getSize() {
+      return size;
     }
 
 

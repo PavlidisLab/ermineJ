@@ -23,10 +23,9 @@ public class classScoreFrame
   JButton jButtonRun = new JButton();
   JButton jButtonQuit = new JButton();
   JTextField jTextFieldGeneScoreFile = new JTextField();
-  JTextField jTextFieldGOMap = new JTextField();
   JTextField jTextFieldOutPutFileName = new JTextField();
   JTextField jTextFieldGONames = new JTextField();
-  JTextField jTextFieldProbeGroupMap = new JTextField();
+  JTextField jTextFieldProbeAnnot = new JTextField();
   JRadioButton jRadioButtonMeanReplicates = new JRadioButton();
   JRadioButton jRadioButtonBestReplicates = new JRadioButton();
   JRadioButton jRadioButtonSeparateReplicates = new JRadioButton();
@@ -36,16 +35,13 @@ public class classScoreFrame
   JTextField jTextFieldIterations = new JTextField();
   JTextField jTextFieldPValueThreshold = new JTextField();
   JButton jButtonGeneScoreFileBrowse = new JButton();
-  JButton jButtonGOMapBrowse = new JButton();
   JButton jButtonOutputFileNameBrowse = new JButton();
   JButton jButtonGONamesBrowse = new JButton();
-  JButton jButtonProbeGroupMapBrowse = new JButton();
+  JButton jButtonProbeAnnotsBrowse = new JButton();
   JTextField jTextFieldMaxClassSize = new JTextField();
   JPanel jPanelFilesGroup = new JPanel();
   JPanel jPanelGeneScoreGroup = new JPanel();
   FlowLayout flowLayout1 = new FlowLayout();
-  FlowLayout flowLayout2 = new FlowLayout();
-  JPanel jPanelGOAnnotGroup = new JPanel();
   FlowLayout flowLayout3 = new FlowLayout();
   JPanel jPanelOuputGroup = new JPanel();
   FlowLayout flowLayout4 = new FlowLayout();
@@ -57,7 +53,6 @@ public class classScoreFrame
   JLabel jLabel2 = new JLabel();
   JLabel jLabel3 = new JLabel();
   JLabel jLabel4 = new JLabel();
-  JLabel jLabel5 = new JLabel();
   ButtonGroup buttonGroup1 = new ButtonGroup();
   ButtonGroup buttonGroup2 = new ButtonGroup();
 
@@ -92,6 +87,13 @@ public class classScoreFrame
   JPanel jPanel1 = (JPanel)this.getContentPane();
   BorderLayout borderLayout1 = new BorderLayout();
 
+  JButton jButtonLoadResults = new JButton();
+
+  boolean loadResults = false;
+  JTextField jTextFieldScoreCol = new JTextField();
+  JPanel jPanel14 = new JPanel();
+  JLabel jLabel10 = new JLabel();
+
   public classScoreFrame() {
     try {
       jbInit();
@@ -119,9 +121,8 @@ public class classScoreFrame
     jTextFieldIterations.setEditable(true);
 
     jTextFieldGONames.setEditable(true);
-    jTextFieldGOMap.setEditable(true);
     jTextFieldOutPutFileName.setEditable(true);
-    jTextFieldProbeGroupMap.setEditable(true);
+    jTextFieldProbeAnnot.setEditable(true);
 
     jPanel1.setLayout(borderLayout1);
 
@@ -136,7 +137,29 @@ public class classScoreFrame
     jPanel1.setMinimumSize(new Dimension(100, 0));
     jPanel1.setPreferredSize(new Dimension(500, 600));
     borderLayout1.setVgap(5);
-    jPanelGOAnnotGroup.setMinimumSize(new Dimension(250, 35));
+    jButtonLoadResults.setToolTipText(
+        "Click to load an existing results file from disk");
+    jButtonLoadResults.setActionCommand("jButtonLoad");
+    jButtonLoadResults.setText("Load Results");
+    jButtonLoadResults.addActionListener(new
+        classScoreFrame_jButtonLoadResults_actionAdapter(this));
+    jLabel2.setToolTipText("File data will be written to or read from.");
+    jTextFieldScoreCol.setHorizontalAlignment(SwingConstants.RIGHT);
+    jTextFieldScoreCol.setText("2");
+    jTextFieldScoreCol.setToolTipText(
+        "Column of the gene score file containing the scores");
+    jTextFieldScoreCol.setMaximumSize(new Dimension(2147483647, 2147483647));
+    jTextFieldScoreCol.setOpaque(true);
+    jTextFieldScoreCol.setPreferredSize(new Dimension(30, 19));
+    jTextFieldScoreCol.setRequestFocusEnabled(true);
+    jTextFieldScoreCol.setEditable(true);
+    jPanel14.setPreferredSize(new Dimension(180, 29));
+    jLabel10.setMaximumSize(new Dimension(39, 15));
+    jLabel10.setMinimumSize(new Dimension(76, 15));
+    jLabel10.setRequestFocusEnabled(true);
+    jLabel10.setToolTipText("");
+    jLabel10.setLabelFor(jTextFieldScoreCol);
+    jLabel10.setText("Score column");
     jPanelOuputGroup.add(jLabel2, null);
     jPanelOuputGroup.add(jTextFieldOutPutFileName, null);
     jPanelOuputGroup.add(jButtonOutputFileNameBrowse, null);
@@ -149,16 +172,11 @@ public class classScoreFrame
     jPanelFilesGroup.add(jPanelGONamesGroup, null);
     jPanelFilesGroup.add(jPanelProbeMapGroup, null);
     jPanelFilesGroup.add(jPanelOuputGroup, null);
-    jPanelFilesGroup.add(jPanelGOAnnotGroup, null);
     jPanelFilesGroup.add(jButtonSavePrefs, null);
 
     jPanelProbeMapGroup.add(jLabel1, null);
-    jPanelProbeMapGroup.add(jTextFieldProbeGroupMap, null);
-    jPanelProbeMapGroup.add(jButtonProbeGroupMapBrowse, null);
-
-    jPanelGOAnnotGroup.add(jLabel5, null);
-    jPanelGOAnnotGroup.add(jTextFieldGOMap, null);
-    jPanelGOAnnotGroup.add(jButtonGOMapBrowse, null);
+    jPanelProbeMapGroup.add(jTextFieldProbeAnnot, null);
+    jPanelProbeMapGroup.add(jButtonProbeAnnotsBrowse, null);
 
     GeneBasedScorePanel.add(jPanelClassScoreMethods, null);
 
@@ -167,9 +185,11 @@ public class classScoreFrame
     jPanelGONamesGroup.add(jButtonGONamesBrowse, null);
 
     jPanelMainControls.add(jButtonQuit, null);
+    jPanelMainControls.add(jButtonLoadResults, null);
     jPanelMainControls.add(jButtonRun, null);
     jPanelMainControls.add(jButtonCancel, null);
     jPanelMainControls.add(jButtonAbout, null);
+
     GeneBasedScorePanel.add(jPanelFilesGroup, null);
 
     jPanelClassScoreMethods.add(jLabelClassScoreMethod, null);
@@ -187,12 +207,6 @@ public class classScoreFrame
     jTextFieldGeneScoreFile.setToolTipText("Enter the name of your file");
     jTextFieldGeneScoreFile.setText("Enter the name of your file");
 
-    jTextFieldGOMap.setMinimumSize(new Dimension(4, 19));
-    jTextFieldGOMap.setPreferredSize(new Dimension(280, 19));
-    jTextFieldGOMap.setToolTipText(
-        "File for your microarray design with GO annotations");
-    jTextFieldGOMap.setText("File for your microarray design");
-
     jTextFieldOutPutFileName.setPreferredSize(new Dimension(280, 19));
     jTextFieldOutPutFileName.setToolTipText("Path to a file for output");
     jTextFieldOutPutFileName.setText("Path to a file for output");
@@ -203,9 +217,9 @@ public class classScoreFrame
         "File containing GO Id to description mapping");
     jTextFieldGONames.setText("File containing GO Id to description mapping");
 
-    jTextFieldProbeGroupMap.setPreferredSize(new Dimension(280, 19));
-    jTextFieldProbeGroupMap.setToolTipText("File for your microarray design");
-    jTextFieldProbeGroupMap.setText("File for your microarray design");
+    jTextFieldProbeAnnot.setPreferredSize(new Dimension(280, 19));
+    jTextFieldProbeAnnot.setToolTipText("File for your microarray design");
+    jTextFieldProbeAnnot.setText("File for your microarray design");
 
     jRadioButtonMeanReplicates.setToolTipText(
         "If a gene occurs more than once, the gene is only counted once and " +
@@ -252,18 +266,15 @@ public class classScoreFrame
     jButtonGeneScoreFileBrowse.setText("Browse....");
     jButtonGeneScoreFileBrowse.addActionListener(new
         classScoreFrame_jButtonGeneScoreFileBrowse_actionAdapter(this));
-    jButtonGOMapBrowse.setText("Browse....");
-    jButtonGOMapBrowse.addActionListener(new
-        classScoreFrame_jButtonGOMapBrowse_actionAdapter(this));
     jButtonOutputFileNameBrowse.setText("Browse....");
     jButtonOutputFileNameBrowse.addActionListener(new
         classScoreFrame_jButtonOutputFileNameBrowse_actionAdapter(this));
     jButtonGONamesBrowse.setText("Browse....");
     jButtonGONamesBrowse.addActionListener(new
         classScoreFrame_jButtonGONamesBrowse_actionAdapter(this));
-    jButtonProbeGroupMapBrowse.setText("Browse....");
-    jButtonProbeGroupMapBrowse.addActionListener(new
-        classScoreFrame_jButtonProbeGroupMapBrowse_actionAdapter(this));
+    jButtonProbeAnnotsBrowse.setText("Browse....");
+    jButtonProbeAnnotsBrowse.addActionListener(new
+        classScoreFrame_jButtonProbeAnnotsBrowse_actionAdapter(this));
 
     jTextFieldMaxClassSize.setPreferredSize(new Dimension(30, 19));
     jTextFieldMaxClassSize.setToolTipText("Largest class size to be considered");
@@ -280,9 +291,6 @@ public class classScoreFrame
     jPanelGeneScoreGroup.setBackground(UIManager.getColor("control"));
     jPanelGeneScoreGroup.setPreferredSize(new Dimension(510, 35));
     jPanelGeneScoreGroup.setLayout(flowLayout1);
-    jPanelGOAnnotGroup.setLayout(flowLayout2);
-    jPanelGOAnnotGroup.setBackground(UIManager.getColor("control"));
-    jPanelGOAnnotGroup.setPreferredSize(new Dimension(510, 35));
     jPanelOuputGroup.setLayout(flowLayout3);
     jPanelOuputGroup.setBackground(UIManager.getColor("control"));
     jPanelOuputGroup.setMinimumSize(new Dimension(250, 35));
@@ -296,22 +304,20 @@ public class classScoreFrame
     jPanelProbeMapGroup.setLayout(flowLayout5);
     jPanelParameterGroup.setBorder(BorderFactory.createEtchedBorder());
     jPanelParameterGroup.setPreferredSize(new Dimension(200, 200));
-    jPanelParameterGroup.setBounds(new Rectangle(272, 264, 200, 200));
+    jPanelParameterGroup.setBounds(new Rectangle(272, 264, 200, 202));
     jPanelParameterGroup.setLayout(flowLayout7);
     jLabel1.setPreferredSize(new Dimension(120, 15));
     jLabel1.setHorizontalAlignment(SwingConstants.RIGHT);
-    jLabel1.setText("Probe Group Map File");
+    jLabel1.setText("Probe annnotations");
     jLabel2.setPreferredSize(new Dimension(120, 15));
     jLabel2.setHorizontalAlignment(SwingConstants.RIGHT);
-    jLabel2.setText("Output File");
+    jLabel2.setText("Results File");
     jLabel3.setPreferredSize(new Dimension(120, 15));
     jLabel3.setHorizontalAlignment(SwingConstants.RIGHT);
     jLabel3.setText("Gene Score File");
     jLabel4.setPreferredSize(new Dimension(120, 15));
     jLabel4.setHorizontalAlignment(SwingConstants.RIGHT);
     jLabel4.setText("GO Names");
-    jLabel5.setHorizontalAlignment(SwingConstants.RIGHT);
-    jLabel5.setText("GO Probe annotations");
     jCheckBoxDoLog.setToolTipText(
         "If you are using p values, you should check this box.");
     jCheckBoxDoLog.setSelected(true);
@@ -367,7 +373,7 @@ public class classScoreFrame
     jButtonSavePrefs.setSelectedIcon(null);
     jButtonSavePrefs.setText("Save File Preferences");
     jPanelStatus.setBorder(BorderFactory.createEtchedBorder());
-    jPanelMainControls.setBounds(new Rectangle(76, 477, 437, 35));
+    jPanelMainControls.setBounds(new Rectangle(15, 476, 520, 35));
     jPanelReplicateTreaments.add(jLabelReplicateTreament, null);
     jPanelReplicateTreaments.add(jRadioButtonSeparateReplicates, null);
     jPanelReplicateTreaments.add(jRadioButtonBestReplicates, null);
@@ -375,6 +381,8 @@ public class classScoreFrame
     jPanel1.add(GeneBasedScorePanel, BorderLayout.NORTH);
     jPanel10.add(jLabel6, null);
     jPanel10.add(jTextFieldPValueThreshold, null);
+    jPanel14.add(jLabel10, null);
+    jPanel14.add(jTextFieldScoreCol, null);
     jPanelParameterGroup.add(jPanel12, null);
     jPanel12.add(jLabel7, null);
     jPanel12.add(jTextFieldMinClassSize, null);
@@ -386,9 +394,10 @@ public class classScoreFrame
     jPanelParameterGroup.add(jPanel11, null);
     jPanel11.add(jLabel9, null);
     jPanel11.add(jTextFieldIterations, null);
+    jPanelParameterGroup.add(jPanel14, null);
+    GeneBasedScorePanel.add(jPanelMainControls, null);
     jPanel1.add(jPanelStatus, BorderLayout.SOUTH);
     jPanelStatus.add(jLabelStatus, null);
-    GeneBasedScorePanel.add(jPanelMainControls, null);
     GeneBasedScorePanel.add(jPanelParameterGroup, null);
 
     startPath = new File(System.getProperty("user.home"));
@@ -400,8 +409,6 @@ public class classScoreFrame
     chooser.setCurrentDirectory(startPath);
     readPrefs();
     showStatus("Please see 'About this software' for license information.");
-
-
   }
 
   /* init */
@@ -429,7 +436,7 @@ public class classScoreFrame
 
   private String getUseWeights() {
 
-    if (!testfile(jTextFieldProbeGroupMap.getText())) {
+    if (!testfile(jTextFieldProbeAnnot.getText())) {
       return "false";
     }
 
@@ -445,12 +452,7 @@ public class classScoreFrame
   }
 
   private String getUseLog() {
-    if (jCheckBoxDoLog.isSelected()) {
-      return "true";
-    }
-    else {
-      return "false";
-    }
+    return Boolean.toString(jCheckBoxDoLog.isSelected());
   }
 
   void jButtonRun_actionPerformed(ActionEvent e) {
@@ -466,9 +468,18 @@ public class classScoreFrame
     final String useWeights = getUseWeights();
     final String takeLog = getUseLog();
 
-    testfile(jTextFieldGeneScoreFile.getText());
-    testfile(jTextFieldGONames.getText());
-    testfile(jTextFieldGOMap.getText());
+    boolean ok = true;
+    ok = testfile(jTextFieldGeneScoreFile.getText());
+    ok = ok && testfile(jTextFieldGONames.getText());
+    ok = ok && testfile(jTextFieldProbeAnnot.getText());
+
+    if (loadResults) {
+      ok = ok && testfile(jTextFieldOutPutFileName.getText());
+    }
+
+    if (!ok) {
+      return;
+    }
 
     writePrefs();
 
@@ -486,20 +497,28 @@ public class classScoreFrame
 
       public void run() {
         try {
-          new class_pvals(jTextFieldGeneScoreFile.getText(),
-                          jTextFieldGOMap.getText(),
-                          jTextFieldGONames.getText(),
-                          jTextFieldOutPutFileName.getText(),
-                          jTextFieldProbeGroupMap.getText(),
-                          classScoreMethod,
-                          groupMethod,
-                          maxClassSize,
-                          minClassSize,
-                          numIter, 50,
-                          oraThresh,
-                          useWeights,
-                          2, // todo:let us use other columns.
-                          takeLog, "bh", m);
+          classPvalRun results = new classPvalRun(jTextFieldGeneScoreFile.
+                                                  getText(),
+                                                  jTextFieldProbeAnnot.getText(),
+                                                  jTextFieldGONames.getText(),
+                                                  jTextFieldOutPutFileName.
+                                                  getText(),
+                                                  classScoreMethod,
+                                                  groupMethod,
+                                                  maxClassSize,
+                                                  minClassSize,
+                                                  numIter, 50,
+                                                  oraThresh,
+                                                  useWeights,
+                                                  Integer.parseInt(
+              jTextFieldScoreCol.getText()),
+                                                  takeLog, "bh", m, loadResults);
+
+          ResultFrame r = new ResultFrame(results);
+          r.setTitle(jTextFieldOutPutFileName.getText());
+          //        r.addClassDetailsListener(class_details_action_listener);
+          r.setModel(results.toTableModel());
+          r.show();
         }
         catch (IllegalArgumentException e) {
           error(e, "During class score calculation");
@@ -509,6 +528,8 @@ public class classScoreFrame
         }
         showStatus("Done");
         done = true;
+        loadResults = false;
+
       }
     };
 
@@ -548,12 +569,8 @@ public class classScoreFrame
     browse(jTextFieldOutPutFileName);
   }
 
-  void jButtonProbeGroupMapBrowse_actionPerformed(ActionEvent e) {
-    browse(jTextFieldProbeGroupMap);
-  }
-
-  void jButtonGOMapBrowse_actionPerformed(ActionEvent e) {
-    browse(jTextFieldGOMap);
+  void jButtonProbeAnnotsBrowse_actionPerformed(ActionEvent e) {
+    browse(jTextFieldProbeAnnot);
   }
 
   void jButtonSavePrefs_actionPerformed(ActionEvent e) {
@@ -715,6 +732,15 @@ public class classScoreFrame
 
   /**
    *
+   * @param e
+   */
+  void jButtonLoadResults_actionPerformed(ActionEvent e) {
+    loadResults = true;
+    this.jButtonRun_actionPerformed(e);
+  }
+
+  /**
+   *
    * @param filename
    * @return
    */
@@ -739,42 +765,66 @@ public class classScoreFrame
   /**
    *
    */
+  /*  private void writePrefs() {
+      comboWriter(getCanonical("scoreFile.pref"), jTextFieldGeneScoreFile.getText()); // gene scores
+      comboWriter(getCanonical("outputFile.pref"),
+                  jTextFieldOutPutFileName.getText()); // output file
+      comboWriter(getCanonical("nameFile.pref"), jTextFieldGONames.getText()); // biological names for go
+      comboWriter(getCanonical("annotFile.pref"), jTextFieldProbeAnnot.getText()); // probe to ug map
+    }
+   */
+
+  private void writePrefs(Properties s, String filename) {
+    try {
+      OutputStream f = new FileOutputStream(filename);
+      s.store(f, "");
+    }
+    catch (IOException ex) {
+      System.err.println("Error writing prefs.");
+    }
+
+  }
+
   private void writePrefs() {
-    comboWriter(getCanonical("scoreFile.pref"), jTextFieldGeneScoreFile.getText()); // gene scores
-    comboWriter(getCanonical("goFile.pref"), jTextFieldGOMap.getText()); // probe to go map
-    comboWriter(getCanonical("outputFile.pref"),
-                jTextFieldOutPutFileName.getText()); // output file
-    comboWriter(getCanonical("nameFile.pref"), jTextFieldGONames.getText()); // biological names for go
-    comboWriter(getCanonical("groupFile.pref"), jTextFieldProbeGroupMap.getText()); // probe to ug map
+    Properties settings = new Properties();
+    settings.setProperty("scoreFile", jTextFieldGeneScoreFile.getText());
+    settings.setProperty("outputFile", jTextFieldOutPutFileName.getText());
+    settings.setProperty("GOnameFile", jTextFieldGONames.getText());
+    settings.setProperty("annotFile", jTextFieldProbeAnnot.getText());
+    settings.setProperty("scoreColumn", jTextFieldScoreCol.getText());
+    settings.setProperty("minClassSize", jTextFieldMinClassSize.getText());
+    settings.setProperty("maxClassSize", jTextFieldMaxClassSize.getText());
+    settings.setProperty("pvalueThreshold", this.jTextFieldPValueThreshold.getText());
+    settings.setProperty("doLog", getUseLog());
+    writePrefs(settings, "classScore.prefs"); // default name.
   }
 
   /**
    *
    */
   private void readPrefs() {
-    Vector sf = comboReader(getCanonical("scoreFile.pref"));
-    if (sf != null) {
-      jTextFieldGeneScoreFile.setText( (String) sf.get(0));
+
+    Properties settings = new Properties();
+    try {
+      File fi = new File("classScore.prefs");
+      if (fi.canRead()) {
+        InputStream f = new FileInputStream("classScore.prefs");
+        settings.load(f);
+      }
+    }
+    catch (IOException ex) {
+      System.err.println("Could not find preferences file."); // no big deal.
     }
 
-    sf = comboReader(getCanonical("goFile.pref"));
-    if (sf != null) {
-      jTextFieldGOMap.setText( (String) sf.get(0));
-    }
-
-    sf = comboReader(getCanonical("outputFile.pref"));
-    if (sf != null) {
-      jTextFieldOutPutFileName.setText( (String) sf.get(0));
-    }
-
-    sf = comboReader(getCanonical("nameFile.pref"));
-    if (sf != null) {
-      jTextFieldGONames.setText( (String) sf.get(0));
-    }
-
-    sf = comboReader(getCanonical("groupFile.pref"));
-    if (sf != null) {
-      jTextFieldProbeGroupMap.setText( (String) sf.get(0));
+    if (settings.size() > 0) {
+      jTextFieldGeneScoreFile.setText( (String) settings.get("scoreFile"));
+      jTextFieldOutPutFileName.setText( (String) settings.get("outputFile"));
+      jTextFieldGONames.setText( (String) settings.get("GOnameFile"));
+      jTextFieldProbeAnnot.setText( (String) settings.get("annotFile"));
+      this.jTextFieldMaxClassSize.setText((String)settings.get("maxClassSize"));
+      this.jTextFieldMinClassSize.setText((String)settings.get("minClassSize"));
+      this.jTextFieldScoreCol.setText((String)settings.get("scoreColumn"));
+      this.jTextFieldPValueThreshold.setText((String)settings.get("pvalueThreshold"));
     }
   }
 
@@ -835,30 +885,17 @@ class classScoreFrame_jButtonOutputFileNameBrowse_actionAdapter
   }
 }
 
-class classScoreFrame_jButtonProbeGroupMapBrowse_actionAdapter
+class classScoreFrame_jButtonProbeAnnotsBrowse_actionAdapter
     implements java.awt.event.ActionListener {
   classScoreFrame adaptee;
 
-  classScoreFrame_jButtonProbeGroupMapBrowse_actionAdapter(classScoreFrame
+  classScoreFrame_jButtonProbeAnnotsBrowse_actionAdapter(classScoreFrame
       adaptee) {
     this.adaptee = adaptee;
   }
 
   public void actionPerformed(ActionEvent e) {
-    adaptee.jButtonProbeGroupMapBrowse_actionPerformed(e);
-  }
-}
-
-class classScoreFrame_jButtonGOMapBrowse_actionAdapter
-    implements java.awt.event.ActionListener {
-  classScoreFrame adaptee;
-
-  classScoreFrame_jButtonGOMapBrowse_actionAdapter(classScoreFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-
-  public void actionPerformed(ActionEvent e) {
-    adaptee.jButtonGOMapBrowse_actionPerformed(e);
+    adaptee.jButtonProbeAnnotsBrowse_actionPerformed(e);
   }
 }
 
@@ -925,5 +962,18 @@ class classScoreFrame_jButtonSavePrefs_actionAdapter
 
   public void actionPerformed(ActionEvent e) {
     adaptee.jButtonSavePrefs_actionPerformed(e);
+  }
+}
+
+class classScoreFrame_jButtonLoadResults_actionAdapter
+    implements java.awt.event.ActionListener {
+  classScoreFrame adaptee;
+
+  classScoreFrame_jButtonLoadResults_actionAdapter(classScoreFrame adaptee) {
+    this.adaptee = adaptee;
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    adaptee.jButtonLoadResults_actionPerformed(e);
   }
 }

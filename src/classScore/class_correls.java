@@ -17,7 +17,8 @@ public class class_correls {
   private Map go_probe; //stores go->probe Hashtable
   private String dest_file;
   private Map go_name;
-  private GoName_parse goName;
+  private GONameReader goName;
+  private GeneDataReader geneData = null;
 
   // command line arguments in the following way
   // data_file,probe_go_file,go_namefile,output_file,class_max_size,class_min_size,number of runs,hist range
@@ -36,20 +37,20 @@ public class class_correls {
 
   /**
    */
-  public class_correls(String probe_datafile, String probe_gofile,
+  public class_correls(String probe_datafile, String probe_annotfile,
                        String go_namefile, String destination_file,
                        int class_max_size, int class_min_size,
                        int number_of_runs, double range) throws IOException {
 
     probe_data = new corr_class_scores(probe_datafile); // main data file
-
-    ClassMap probe_go = new ClassMap(probe_gofile, probe_data.get_data_map()); //parses affy file
-    goName = new GoName_parse(go_namefile); //parse go name file
+    geneData = new GeneDataReader(probe_annotfile, probe_data.get_data_map());
+    ClassMap probe_go = new ClassMap(geneData.getProbeToClassMap(), geneData.getClassToProbeMap()); //parses affy file
+    goName = new GONameReader(go_namefile); //parse go name file
     probe_gom = new LinkedHashMap();
     go_probe = new LinkedHashMap();
     go_name = new LinkedHashMap();
-    probe_gom = probe_go.get_probe_map(); //probe go map
-    go_probe = probe_go.get_class_map(); //go probe map
+    probe_gom = probe_go.getProbeToClassMap(); //probe go map
+    go_probe = probe_go.getClassToProbeMap(); //go probe map
     go_name = goName.get_GoName_map(); //go name map
 
     // todo: this should be done by the hist class?
