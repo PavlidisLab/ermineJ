@@ -36,7 +36,8 @@ import javax.help.*;
  */
 
 public class GeneSetScoreFrame
-    extends JFrame {
+    extends JFrame 
+    implements HyperlinkListener {
 
    private JPanel mainPanel = ( JPanel )this.getContentPane();
    private JMenuBar jMenuBar1 = new JMenuBar();
@@ -94,6 +95,10 @@ public class GeneSetScoreFrame
       }
    }
 
+   /**
+    * Initializes JavaHelp by creating HelpSet and HelpBroker objects
+    * and attaching an action listener to the help menu item (helpMenuItem)
+    */
    private void initHelp() {
 
       // Create HelpSet and HelpBroker objects
@@ -114,17 +119,20 @@ public class GeneSetScoreFrame
    }
    
    /**
-    * find the helpset file and create a HelpSet object
+    * Finds the helpset file and creates a HelpSet object.
+    * @param  helpsetfile  filename of the *.hs file relative to the classpath
+    * @return the help set object created from the file; if the file was not
+    *         loaded for whatever reason, returns null.
     */
-   private HelpSet getHelpSet( String helpsetfile ) {
+   private HelpSet getHelpSet( String helpsetFilename ) {
       HelpSet hs = null;
       ClassLoader cl = this.getClass().getClassLoader();
       try {
-         URL hsURL = HelpSet.findHelpSet( cl, helpsetfile );
+         URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
          hs = new HelpSet( null, hsURL );
-      } catch( Exception ee ) {
-         System.err.println( "HelpSet: " + ee.getMessage() );
-         System.err.println( "HelpSet: "+ helpsetfile + " not found" );
+      } catch( Exception e ) {
+         System.err.println( "HelpSet: " + e.getMessage() );
+         System.err.println( "HelpSet: "+ helpsetFilename + " not found" );
       }
       return hs;
    }
