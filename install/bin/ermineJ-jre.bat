@@ -1,0 +1,1 @@
+..\jre\bin\java -jar ../lib/ermineJ-2.0b2.jar
