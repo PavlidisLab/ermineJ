@@ -9,7 +9,7 @@
 Name "ermineJ"
 
 ; The file to write
-OutFile "install_withJRE.exe"
+OutFile "ermineJ-setup-withJRE.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
@@ -114,7 +114,7 @@ Section "Start Menu Shortcuts"
 SectionEnd
 
 ; Optional section (can be disabled by the user)
-Section "Java 2 Runtime Environment, SE v1.4.2_05"
+Section "Java Runtime Environment (JRE) 1.4.2_05"
   Exec "jre-install\j2re-1_4_2_05-windows-i586-p.exe"
 SectionEnd
 
