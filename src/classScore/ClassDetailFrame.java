@@ -137,7 +137,6 @@ public class ClassDetailFrame
       m_matrixDisplayCellWidthSlider.setMinorTickSpacing(3 );
       m_matrixDisplayCellWidthSlider.setPaintLabels( false );
       m_matrixDisplayCellWidthSlider.setPaintTicks( true );
-      m_matrixDisplayCellWidthSlider.setEnabled(false);
       m_matrixDisplayCellWidthSlider.setMaximumSize( new Dimension( 60, 24 ) );
       m_matrixDisplayCellWidthSlider.setPreferredSize( new Dimension( 50, 24 ) );
       m_matrixDisplayCellWidthSlider.addChangeListener(new ClassDetailFrame_m_matrixDisplayCellWidthSlider_changeAdapter(this));
@@ -285,7 +284,7 @@ public class ClassDetailFrame
    void m_greenredColormapMenuItem_actionPerformed( ActionEvent e ) {
 
       try {
-        m_matrixDisplay.setColorMap( ColorMap.GREENRED_COLORMAP );
+         m_matrixDisplay.setColorMap( ColorMap.GREENRED_COLORMAP );
       }
       catch ( Exception ex ) {
       }
@@ -295,7 +294,7 @@ public class ClassDetailFrame
    void m_blackbodyColormapMenuItem_actionPerformed( ActionEvent e ) {
 
       try {
-        m_matrixDisplay.setColorMap( ColorMap.BLACKBODY_COLORMAP );
+         m_matrixDisplay.setColorMap( ColorMap.BLACKBODY_COLORMAP );
       }
       catch ( Exception ex ) {
       }
@@ -374,21 +373,22 @@ public class ClassDetailFrame
 
       JSlider source = ( JSlider ) e.getSource();
 
-      if ( ! source.getValueIsAdjusting() ) {
+      //if ( ! source.getValueIsAdjusting() ) {
 
          // Adjust the width of every matrix display column
          int width = ( int ) source.getValue();
          if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
 
+            m_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
             int matrixColumnCount = m_matrixDisplay.getColumnCount();
             for ( int i = 0; i < matrixColumnCount; i++ ) {
                TableColumn col = m_table.getColumnModel().getColumn( i );
                col.setResizable( false );
-               col.setPreferredWidth( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
+               col.setPreferredWidth( width );
             }
-            m_table.repaint();
          }
-      } // end if not adjusting value
+      //} // end if not adjusting value
    }
 
 } // end class ClassDetailFrame
