@@ -112,13 +112,7 @@ public class AnalysisWizard extends Wizard
 
          public void run() {
             classScoreFrame csframe = (classScoreFrame) callingframe;
-            csframe.analyze(settings,
-                            settings.getClassScoreMethod(),
-                            settings.getGroupMethod(),
-                            settings.getUseWeights(),
-                            settings.getUseLog(),
-                            new classScoreStatus(csframe.jLabelStatus),
-                            "");
+            csframe.analyze(settings,new classScoreStatus(csframe.jLabelStatus));
          }
       };
 

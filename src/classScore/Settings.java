@@ -29,6 +29,7 @@ public class Settings {
    int scorecol = 2;
    int geneRepTreatment = BEST_PVAL;
    int rawScoreMethod = MEAN_METHOD;
+   int quantile = 50;
    boolean doLog = true;
    double pValThreshold = 0.001;
 
@@ -87,6 +88,8 @@ public class Settings {
                geneRepTreatment = Integer.valueOf( properties.getProperty( "geneRepTreatment" ) ).intValue();
             if ( properties.containsKey( "rawScoreMethod" ) )
                rawScoreMethod = Integer.valueOf( properties.getProperty( "rawScoreMethod" ) ).intValue();
+            if ( properties.containsKey( "quantile" ) )
+               quantile = Integer.valueOf( properties.getProperty( "quantile" ) ).intValue();
             if ( properties.containsKey( "doLog" ) )
                doLog = Boolean.valueOf( properties.getProperty( "doLog" ) ).booleanValue();
             if ( properties.containsKey( "pValThreshold" ) )
@@ -114,6 +117,7 @@ public class Settings {
       scorecol=settings.getScorecol();
       geneRepTreatment=settings.getGeneRepTreatment();
       rawScoreMethod=settings.getRawScoreMethod();
+      quantile=settings.getQuantile();
       doLog=settings.getDoLog();
       pValThreshold=settings.getPValThreshold();
       pref_file=settings.getPrefFile();
@@ -136,6 +140,7 @@ public class Settings {
       properties.setProperty("scorecol", String.valueOf(scorecol));
       properties.setProperty("geneRepTreatment", String.valueOf(geneRepTreatment));
       properties.setProperty("rawScoreMethod", String.valueOf(rawScoreMethod));
+      properties.setProperty("quantile", String.valueOf(quantile));
       properties.setProperty("doLog", String.valueOf(doLog));
       properties.setProperty("pValThreshold", String.valueOf(pValThreshold));
       OutputStream f = new FileOutputStream(pref_file);
@@ -157,6 +162,7 @@ public class Settings {
    public int getScorecol() { return scorecol; }
    public int getGeneRepTreatment() { return geneRepTreatment; }
    public int getRawScoreMethod() { return rawScoreMethod; }
+   public int getQuantile() { return quantile; }
    public boolean getDoLog() { return doLog; }
    public double getPValThreshold() { return pValThreshold; }
    public String getPrefFile() { return pref_file; }
@@ -175,6 +181,7 @@ public class Settings {
    public void setScorecol(int val) {  scorecol=val; }
    public void setGeneRepTreatment(int val) { geneRepTreatment=val; }
    public void setRawScoreMethod(int val) { rawScoreMethod=val; }
+   public void setQuantile(int val) {  quantile=val; }
    public void setDoLog(boolean val) {  doLog=val; }
    public void setPValThreshold(double val) {  pValThreshold=val; }
    public void setPrefFile(String val) { pref_file=val; }

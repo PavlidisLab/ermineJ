@@ -238,10 +238,7 @@ public class classScoreFrame
 
    void initialize() {
       try {
-         imaps = new InitialMaps(
-             settings.getAnnotFile(),
-             settings.getClassFile(),
-             statusMessenger );
+         imaps = new InitialMaps( settings, statusMessenger );
       }
       catch ( IllegalArgumentException e ) {
          error( e, "During initialization" );
@@ -249,28 +246,21 @@ public class classScoreFrame
       catch ( IOException e ) {
          error( e, "File reading or writing" );
       }
-      //cPanel.setModel(imaps.toTableModel());
       oPanel.addInitialClassData( imaps );
       initialized = true;
    }
 
-   public void analyze( Settings settings, String classScoreMethod, String groupMethod,
-                        String useWeights, String takeLog,
-                        classScoreStatus messenger, String outputfile ) {
+   public void analyze( Settings settings, classScoreStatus messenger) {
       try {
          if ( !initialized ) {
             initialize();
          }
-         InitialMaps runmaps = new InitialMaps( settings,
-                                                classScoreMethod, groupMethod,
-                                                50, useWeights, takeLog,
-                                                messenger );
+         InitialMaps runmaps = new InitialMaps( settings, messenger );
 
          //cPanel.setModel(imaps.toTableModel());
          System.out.println( "DONE with RUNMAPS" );
-         classPvalRun runResult = new classPvalRun( settings, runmaps, outputfile,
-             useWeights, "bh", messenger,
-             loadResults );
+         classPvalRun runResult = new classPvalRun( settings, runmaps, "",
+             "bh", messenger, loadResults );
 
          System.out.println( "DONE with CLASSPVALRUN" );
 

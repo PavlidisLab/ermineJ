@@ -1,5 +1,5 @@
 #
-#Fri Jun 18 16:07:22 EDT 2004
+#Mon Jun 21 17:18:51 EDT 2004
 minClassSize=14
 dataFolder=C\:\\jbproject\\ermineJ\\data
 iterations=10
@@ -7,7 +7,10 @@ maxClassSize=15
 pValThreshold=0.0010
 annotFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
 doLog=true
+geneRepTreatment=1
 classFile=C\:\\jbproject\\ermineJ\\data\\goNames.txt
 scoreFile=C\:\\jbproject\\ermineJ\\data\\one-way-anova-parsed.txt
 rawFile=C\:\\jbproject\\ermineJ\\data\\melanoma_and_sarcomaMAS5.txt
+quantile=50
+rawScoreMethod=1
 scorecol=2

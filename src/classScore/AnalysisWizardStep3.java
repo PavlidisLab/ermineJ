@@ -23,11 +23,11 @@ public class AnalysisWizardStep3
    Settings settings;
    JTable customClassTable;
    HashMap ccHash;
-   CustomClassList addedClasses;
+   AnalysisWizardStep3_CustomClassList addedClasses;
    HashMap acHash;
    JTable addedClassTable;
    AbstractTableModel acTableModel;
-   CustomClassList customClasses;
+   AnalysisWizardStep3_CustomClassList customClasses;
    AbstractTableModel ccTableModel;
    JLabel countLabel;
 
@@ -149,8 +149,8 @@ public class AnalysisWizardStep3
    void getClasses() {
       File dir = new File( settings.getDataFolder() + File.separator + "classes" );
       if ( dir.exists() ) {
-         String[] classFiles = dir.list( new ClassFileFilter( "-class.txt" ) );
-         customClasses = new CustomClassList();
+         String[] classFiles = dir.list( new AnalysisWizardStep3_ClassFileFilter( "-class.txt" ) );
+         customClasses = new AnalysisWizardStep3_CustomClassList();
          ccHash = new HashMap();
          for ( int i = 0; i < classFiles.length; i++ ) {
             File classFile = new File( dir.getPath(), classFiles[i] );
@@ -160,7 +160,7 @@ public class AnalysisWizardStep3
          }
          ccTableModel = customClasses.toTableModel();
          customClassTable.setModel( ccTableModel );
-         addedClasses = new CustomClassList();
+         addedClasses = new AnalysisWizardStep3_CustomClassList();
          acTableModel = addedClasses.toTableModel();
          addedClassTable.setModel( acTableModel );
          acHash = new HashMap();
@@ -206,9 +206,9 @@ class AnalysisWizardStep3_addAllButton_actionAdapter implements java.awt.event.A
    }
 }
 
-class ClassFileFilter implements FilenameFilter {
+class AnalysisWizardStep3_ClassFileFilter implements FilenameFilter {
    private String extension;
-   public ClassFileFilter(String ext) {extension = ext;
+   public AnalysisWizardStep3_ClassFileFilter(String ext) {extension = ext;
    }
 
    public boolean accept(File dir, String name) {return name.endsWith(extension);
@@ -216,7 +216,7 @@ class ClassFileFilter implements FilenameFilter {
 }
 
 
-class CustomClassList extends ArrayList {
+class AnalysisWizardStep3_CustomClassList extends ArrayList {
    public AbstractTableModel toTableModel() {
       return new AbstractTableModel() {
          private String[] columnNames = {"ID", "Description", "Members"};

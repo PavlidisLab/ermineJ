@@ -81,11 +81,9 @@ public class classPvalRun {
    }
 
    /**
-    *
+    * @param settings Settings
     * @param imaps InitialMaps
     * @param resultsFile String
-    * @param pval double
-    * @param useWeights String
     * @param mtc_method String
     * @param messenger classScoreStatus
     * @param loadResults boolean
@@ -95,7 +93,6 @@ public class classPvalRun {
    public classPvalRun(Settings settings,
                        InitialMaps imaps,
                        String resultsFile,
-                       String useWeights,
                        String mtc_method,
                        classScoreStatus messenger,
                        boolean loadResults) throws
@@ -107,7 +104,7 @@ public class classPvalRun {
                  imaps.classToProbe,
                  resultsFile,
                  settings.getPValThreshold(),
-                 useWeights,
+                 settings.getUseWeights(),
                  mtc_method,
                  messenger,
                  loadResults);

@@ -812,12 +812,7 @@ public class AnalysisFrame extends JDialog {
 
          public void run() {
             callingframe.analyze(settings,
-                                 getClassScoreMethod(),
-                                 getGroupMethod(),
-                                 getUseWeights(),
-                                 getUseLog(),
-                                 new classScoreStatus(callingframe.jLabelStatus),
-                                 "");
+                                 new classScoreStatus(callingframe.jLabelStatus));
          }
       };
 

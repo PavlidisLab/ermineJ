@@ -141,16 +141,14 @@ public class expClassScore {
     * @throws IllegalArgumentException
     * @throws IOException
     */
-   public expClassScore(Settings settings, String wt_check,
-                        String in_method, boolean dolog, int quantile) throws
-           IllegalArgumentException,
-           IOException {
+   public expClassScore(Settings settings)
+       throws IllegalArgumentException, IOException {
       this.classMaxSize =  settings.getMaxClassSize();
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();
-      this.setQuantile(quantile);
-      this.useWeights = (Boolean.valueOf(wt_check)).booleanValue();
-      this.setMethod(in_method);
+      this.setQuantile(settings.getQuantile());
+      this.useWeights = (Boolean.valueOf(settings.getUseWeights())).booleanValue();
+      this.setMethod(settings.getClassScoreMethod());
 
       if (classMaxSize < classMinSize) {
          throw new IllegalArgumentException(
@@ -158,9 +156,9 @@ public class expClassScore {
       }
 
       this.numClasses = classMaxSize - classMinSize + 1;
-      this.logged = dolog;
+      this.logged = settings.getDoLog();
 
-      GeneScoreReader parser = new GeneScoreReader(settings.getScoreFile(), settings.getScorecol(), dolog); // makes the probe -> pval map.
+      GeneScoreReader parser = new GeneScoreReader(settings.getScoreFile(), settings.getScorecol(), settings.getDoLog()); // makes the probe -> pval map.
       pvals = parser.get_pval(); // array of pvalues.
       probePvalMap = parser.get_map(); // reference to the probe -> pval map.
       groupPvalMap = new HashMap(); // this gets initialized by set_input_pvals

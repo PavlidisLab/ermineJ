@@ -46,46 +46,21 @@ public class InitialMaps {
    /**
     *
     * @param settings Settings
-    * @param method String
-    * @param groupMethod String
     * @param quantile int
-    * @param useWeights String
-    * @param dolog_check String
     * @param messenger classScoreStatus
     * @throws IllegalArgumentException
     * @throws IOException
     */
-   public InitialMaps(Settings settings,
-                      String method,
-                      String groupMethod,
-                      int quantile,
-                      String useWeights,
-                      String dolog_check,
-                      classScoreStatus messenger) throws
+   public InitialMaps(Settings settings, classScoreStatus messenger) throws
            IllegalArgumentException, IOException {
-      readFiles(settings, messenger, method, quantile, useWeights, dolog_check);
+      readFiles(settings, messenger);
       GeneGroupReader gn = setupClasses(messenger);
       messenger.setStatus("Initializing gene score mapping");
-      probePvalMapper.setInputPvals(gn.get_group_probe_map(),
-                                    groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
+      probePvalMapper.setInputPvals(gn.get_group_probe_map(),settings.getGroupMethod()); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
    }
 
    /**
-    *
-    * @param probe_annotfile String
-    * @param goNamesfile String
-    * @param messenger classScoreStatus
-    * @throws IllegalArgumentException
-    * @throws IOException
-    */
-   public InitialMaps(String probe_annotfile, String goNamesfile,
-                      classScoreStatus messenger) throws
-           IllegalArgumentException, IOException {
-      readFiles(probe_annotfile, goNamesfile, messenger);
-      setupClasses(messenger);
-   }
-
-   /**
+    * I think this is just for the command line version (Homin)
     *
     * @param probePvalFile String
     * @param probe_annotfile String
@@ -117,32 +92,6 @@ public class InitialMaps {
                       String dolog_check,
                       classScoreStatus messenger) throws
            IllegalArgumentException, IOException {
-      readFiles(probe_annotfile, goNamesfile, messenger, probePvalFile,
-                method, classMaxSize, classMinSize, numberOfRuns, quantile,
-                useWeights, pvalcolumn, dolog_check);
-      GeneGroupReader gn = setupClasses(messenger);
-      messenger.setStatus("Initializing gene score mapping");
-      probePvalMapper.setInputPvals(gn.get_group_probe_map(),
-                                    groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-   }
-
-
-   private void readFiles(String probe_annotfile, String goNamesfile,
-                          classScoreStatus messenger) throws
-           IllegalArgumentException, IOException {
-      messenger.setStatus("Reading GO descriptions from " + goNamesfile);
-      goName = new GONames(goNamesfile); // parse go name file
-      messenger.setStatus("Reading gene annotations from " + probe_annotfile);
-      geneData = new GeneAnnotations(probe_annotfile);
-   }
-
-   private void readFiles(String probe_annotfile, String goNamesfile,
-                          classScoreStatus messenger, String probePvalFile,
-                          String method, int classMaxSize, int classMinSize,
-                          int numberOfRuns, int quantile,
-                          String useWeights, int pvalcolumn,
-                          String dolog_check
-                          ) throws IllegalArgumentException, IOException {
       messenger.setStatus("Reading GO descriptions " + goNamesfile);
       goName = new GONames(goNamesfile); // parse go name file
       messenger.setStatus("Reading gene scores from " + probePvalFile);
@@ -153,17 +102,18 @@ public class InitialMaps {
                                           quantile);
       messenger.setStatus("Reading gene annotations from " + probe_annotfile);
       geneData = new GeneAnnotations(probe_annotfile, probePvalMapper.get_map());
+      GeneGroupReader gn = setupClasses(messenger);
+      messenger.setStatus("Initializing gene score mapping");
+      probePvalMapper.setInputPvals(gn.get_group_probe_map(),
+                                    groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
    }
 
-   private void readFiles(Settings settings, classScoreStatus messenger,
-                          String method, int quantile,
-                          String useWeights, String dolog_check
+   private void readFiles(Settings settings, classScoreStatus messenger
                           ) throws IllegalArgumentException, IOException {
       messenger.setStatus("Reading GO descriptions " + settings.getClassFile());
       goName = new GONames(settings.getClassFile()); // parse go name file
       messenger.setStatus("Reading gene scores from " + settings.getScoreFile());
-      boolean dolog = (Boolean.valueOf(dolog_check)).booleanValue();
-      probePvalMapper = new expClassScore(settings, useWeights, method, dolog, quantile);
+      probePvalMapper = new expClassScore(settings);
       messenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
       geneData = new GeneAnnotations(settings.getAnnotFile(), probePvalMapper.get_map());
    }
