@@ -10,9 +10,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -20,17 +18,18 @@ import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.reader.DoubleMatrixReader;
 import baseCode.graphics.text.Util;
 import baseCode.gui.ColorMap;
+import baseCode.gui.JGradientBar;
 import baseCode.gui.JMatrixDisplay;
-import baseCode.gui.table.JMatrixTableCellRenderer;
 import baseCode.gui.table.JHorizontalTableHeaderRenderer;
+import baseCode.gui.table.JMatrixTableCellRenderer;
 import baseCode.gui.table.JVerticalTableHeaderRenderer;
 import classScore.GeneAnnotations;
 import classScore.Settings;
 import classScore.SortFilterModel;
 import javax.swing.*;
-import baseCode.gui.JGradientBar;
-import java.awt.FlowLayout;
-import javax.swing.event.*;
+import java.awt.event.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 /**
  * @version $Id$
@@ -60,7 +59,7 @@ public class JDetailsFrame
    JRadioButtonMenuItem m_greenredColormapMenuItem = new JRadioButtonMenuItem();
    JMenu m_viewMenu = new JMenu();
    JRadioButtonMenuItem m_blackbodyColormapMenuItem = new JRadioButtonMenuItem();
-   JMenuItem m_saveFileMenuItem = new JMenuItem();
+   JMenuItem m_saveImageMenuItem = new JMenuItem();
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
    DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
    JLabel jLabel1 = new JLabel();
@@ -68,6 +67,7 @@ public class JDetailsFrame
    JLabel jLabel3 = new JLabel();
    JSlider m_colorRangeSlider = new JSlider();
    JGradientBar m_gradientBar = new JGradientBar();
+   JMenuItem m_saveDataMenuItem = new JMenuItem();
 
    public JDetailsFrame( ArrayList values, Map pvals, Map classToProbe, String id,
                          GeneAnnotations geneData, Settings settings ) {
@@ -130,8 +130,9 @@ public class JDetailsFrame
           JDetailsFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
       m_blackbodyColormapMenuItem.addActionListener( new
           JDetailsFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
-      m_saveFileMenuItem.setText( "Save As..." );
-      m_saveFileMenuItem.addActionListener( new JDetailsFrame_m_saveFileMenuItem_actionAdapter( this ) );
+      m_saveImageMenuItem.setActionCommand("SaveImage");
+      m_saveImageMenuItem.setText("Save Image..." );
+      m_saveImageMenuItem.addActionListener( new JDetailsFrame_m_saveImageMenuItem_actionAdapter( this ) );
       m_normalizeMenuItem.setText( "Normalize" );
       m_normalizeMenuItem.addActionListener( new JDetailsFrame_m_normalizeMenuItem_actionAdapter( this ) );
       m_matrixDisplayCellWidthSlider.setInverted( false );
@@ -157,6 +158,9 @@ public class JDetailsFrame
       m_colorRangeSlider.setMaximumSize( new Dimension( 50, 24 ) );
       m_colorRangeSlider.setPreferredSize( new Dimension( 50, 24 ) );
       m_colorRangeSlider.addChangeListener( new JDetailsFrame_m_colorRangeSlider_changeAdapter( this ) );
+      m_saveDataMenuItem.setActionCommand("SaveData");
+      m_saveDataMenuItem.setText("Save Data...");
+      m_saveDataMenuItem.addActionListener(new JDetailsFrame_m_saveDataMenuItem_actionAdapter(this));
       m_tableScrollPane.getViewport().add( m_table, null );
 
       // Reposition the table inside the scrollpane
@@ -184,7 +188,8 @@ public class JDetailsFrame
       m_viewMenu.addSeparator();
       m_viewMenu.add( m_greenredColormapMenuItem );
       m_viewMenu.add( m_blackbodyColormapMenuItem );
-      m_fileMenu.add( m_saveFileMenuItem );
+      m_fileMenu.add( m_saveImageMenuItem );
+      m_fileMenu.add(m_saveDataMenuItem);
       m_matrixDisplayCellWidthSlider.setPaintTrack( true );
       m_matrixDisplayCellWidthSlider.setPaintTicks( false );
    }
@@ -361,10 +366,10 @@ public class JDetailsFrame
 
    }
 
-   void m_saveFileMenuItem_actionPerformed( ActionEvent e ) {
+   void m_saveImageMenuItem_actionPerformed( ActionEvent e ) {
 
       // Create a file chooser
-      final JDetailsFileChooser fc = new JDetailsFileChooser();
+      final JImageFileChooser fc = new JImageFileChooser();
 
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
@@ -385,16 +390,89 @@ public class JDetailsFrame
          catch ( IOException ex ) {
             System.err.println( "IOException error saving png to " + filename );
          }
-
-         // Save the matrix values and the rest of the table to a data file
-         // change filename extension to .txt or whatever it is we use for data files
-         filename = Util.changeExtension( filename, Util.DEFAULT_DATA_EXTENSION );
-         //
-         //saveTableToFile( filename );
-         //
       }
       // else canceled by user
    }
+
+   void m_saveDataMenuItem_actionPerformed(ActionEvent e) {
+
+      // Create a file chooser
+      final JFileChooser fc = new JFileChooser();
+      DataFileFilter dataFileFilter = new DataFileFilter();
+      fc.setFileFilter( dataFileFilter );
+      fc.setAcceptAllFileFilterUsed( false );
+
+      int returnVal = fc.showSaveDialog( this );
+      if ( returnVal == JFileChooser.APPROVE_OPTION ) {
+
+         File file = fc.getSelectedFile();
+
+         // Make sure the filename has an image extension
+         String filename = file.getPath();
+         if ( !Util.hasDataExtension( filename ) ) {
+            filename = Util.addDataExtension( filename );
+         }
+         // Save the color matrix image
+         try {
+            saveTableToFile( filename );
+         }
+         catch ( IOException ex ) {
+            System.err.println( "IOException error saving data to " + filename );
+         }
+      }
+      // else canceled by user
+   }
+
+   /**
+    * saveTableToFile
+    *
+    * @param filename String
+    */
+   protected void saveTableToFile( String filename ) throws IOException {
+
+      BufferedWriter out = new BufferedWriter( new FileWriter( filename ) );
+
+      int totalRows = m_table.getRowCount();
+      int totalColumns = m_table.getColumnCount();
+      int matrixColumns = m_matrixDisplay.getColumnCount();
+
+      // Make sure we are writing out non-normalized values
+      boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
+      m_matrixDisplay.setStandardizedEnabled( false );
+      try {
+         // write out the matrix values
+         for ( int row = 0; row < totalRows; row++ ) {
+
+            // write name of the row
+            out.write( m_matrixDisplay.getRowName( row ) + "\t" ); // DEBUG - DELETE THIS!!!
+
+            // write out entire row
+            for ( int col = 0; col < totalColumns; col++ ) {
+
+               Object value = m_table.getValueAt( row, col );
+               if ( col < matrixColumns ) {
+                  // matrix data
+                  Point p = ( Point ) value;
+                  double number = m_matrixDisplay.getValue( p.x, p.y );
+                  out.write( number + "\t" );
+               } else {
+                  // rest of the table data
+                  out.write( value.toString() + "\t" );
+               }
+            }
+
+            // write a newline at the end of each row
+            out.write( "\n" );
+         }
+      }
+      catch ( Exception e ) {}
+
+      m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+
+      // close the file
+      out.close();
+
+   } // end saveTableToFile
 
    void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
 
@@ -467,16 +545,16 @@ class JDetailsFrame_m_blackbodyColormapMenuItem_actionAdapter
    }
 }
 
-class JDetailsFrame_m_saveFileMenuItem_actionAdapter
+class JDetailsFrame_m_saveImageMenuItem_actionAdapter
     implements java.awt.event.ActionListener {
    JDetailsFrame adaptee;
 
-   JDetailsFrame_m_saveFileMenuItem_actionAdapter( JDetailsFrame adaptee ) {
+   JDetailsFrame_m_saveImageMenuItem_actionAdapter( JDetailsFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.m_saveFileMenuItem_actionPerformed( e );
+      adaptee.m_saveImageMenuItem_actionPerformed( e );
    }
 }
 
@@ -516,5 +594,16 @@ class JDetailsFrame_m_colorRangeSlider_changeAdapter
 
    public void stateChanged( ChangeEvent e ) {
       adaptee.m_colorRangeSlider_stateChanged( e );
+   }
+}
+
+class JDetailsFrame_m_saveDataMenuItem_actionAdapter implements java.awt.event.ActionListener {
+   JDetailsFrame adaptee;
+
+   JDetailsFrame_m_saveDataMenuItem_actionAdapter(JDetailsFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+   public void actionPerformed(ActionEvent e) {
+      adaptee.m_saveDataMenuItem_actionPerformed(e);
    }
 }

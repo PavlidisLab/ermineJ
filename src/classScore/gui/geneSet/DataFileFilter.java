@@ -8,7 +8,7 @@ import baseCode.graphics.text.Util;
  * @author  Will Braynen
  * @version $Id$
  */
-public class ImageFileFilter
+public class DataFileFilter
     extends FileFilter {
 
    public boolean accept( File f ) {
@@ -17,12 +17,12 @@ public class ImageFileFilter
          return true;
       }
 
-      return Util.hasImageExtension( f.getName() );
+      return Util.hasDataExtension( f.getName() );
 
    } // end accept
 
    public String getDescription() {
 
-      return "PNG or GIF images";
+      return "TXT data files";
    }
 }
