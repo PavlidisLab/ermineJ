@@ -19,8 +19,8 @@ import baseCode.gui.GuiUtil;
  * <p>
  * Copyright (c) 2004 Columbia University
  *
- * @author not attributable
- * @version 1.0
+ * @author Homin Lee
+ * @version $Id$
  */
 
 public class AnalysisWizard
