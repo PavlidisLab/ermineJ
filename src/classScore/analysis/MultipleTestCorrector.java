@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import classScore.*;
+import classScore.data.*;
+
 //import util.Stats;
 
 /**

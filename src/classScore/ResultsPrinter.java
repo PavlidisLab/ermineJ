@@ -2,6 +2,7 @@ package classScore;
 
 import java.util.*;
 import java.io.*;
+import classScore.data.*;
 
 /**
  * <p>Title: </p>

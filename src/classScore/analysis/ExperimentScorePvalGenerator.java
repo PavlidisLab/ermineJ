@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.GONames;
-import classScore.classresult;
-import classScore.expClassScore;
-import classScore.histogram;
+
+import classScore.*;
+import classScore.data.*;
 
 /**
  * <p>Copyright (c) 2004

@@ -4,10 +4,9 @@ import java.io.*;
 import java.text.NumberFormat;
 import java.util.*;
 
-import classScore.gui.geneSet.JDetailsFrame;
-import classScore.analysis.ClassPvalSetGenerator;
-import classScore.analysis.ClassSizeComputer;
-import classScore.analysis.MultipleTestCorrector;
+import classScore.data.*;
+import classScore.gui.geneSet.*;
+import classScore.analysis.*;
 import baseCode.math.Rank;
 
 /**

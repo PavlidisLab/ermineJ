@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.GONames;
-import classScore.classresult;
-import classScore.expClassScore;
-import classScore.histogram;
+import classScore.data.*;
 import baseCode.math.ROC;
 /**
  * <p>Copyright (c) 2004</p>

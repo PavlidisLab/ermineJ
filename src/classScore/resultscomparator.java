@@ -1,6 +1,7 @@
 package classScore;
 
 import java.util.*;
+import classScore.data.*;
 
 class resultscomparator
     implements Comparator {

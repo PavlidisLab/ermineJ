@@ -1,6 +1,8 @@
 package classScore;
 
 import java.io.*;
+import classScore.gui.*;
+import classScore.data.*;
 
 /**
  * <p>Title: </p>

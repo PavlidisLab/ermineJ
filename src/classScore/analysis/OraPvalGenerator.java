@@ -6,9 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.GONames;
-import classScore.classresult;
-import classScore.expClassScore;
+import classScore.data.*;
 import cern.jet.stat.Probability;
 /**
 * <p>Copyright (c) 2004</p>

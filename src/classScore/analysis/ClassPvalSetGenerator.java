@@ -6,11 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import classScore.GONames;
-import classScore.GeneAnnotations;
-import classScore.classresult;
-import classScore.expClassScore;
-import classScore.histogram;
+import classScore.*;
+import classScore.data.*;
 
 /**
  * <p>Title: </p>

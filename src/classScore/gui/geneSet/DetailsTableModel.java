@@ -8,7 +8,7 @@ import java.awt.Point;
 import javax.swing.table.AbstractTableModel;
 
 import baseCode.gui.JMatrixDisplay;
-import classScore.GeneAnnotations;
+import classScore.data.*;
 
 /**
  * Our table model.
@@ -26,7 +26,7 @@ public class DetailsTableModel
    private Double[] m_pvalues;
    private String[] m_probes;
    private String[] m_geneNames;
-   private String[] m_probeDescriptions;       
+   private String[] m_probeDescriptions;
    private DecimalFormat m_nf;
    private String[] m_columnNames = {
        "Probe", "P value", "Name", "Description"};
@@ -37,7 +37,7 @@ public class DetailsTableModel
        Double[] pvalues,
        String[] probes,
        String[] geneNames,
-       String[] probeDescriptions,       
+       String[] probeDescriptions,
        DecimalFormat nf ) {
 
       m_matrixDisplay = matrixDisplay;
@@ -82,7 +82,7 @@ public class DetailsTableModel
             case 0:
                return m_probes[row];
             case 1:
-               // Must return a Double rather than a String so that the sorter 
+               // Must return a Double rather than a String so that the sorter
                // filter would sort the table correctly by this column
                return new Double( m_nf.format( m_pvalues[row] ) );
             case 2:
@@ -92,8 +92,8 @@ public class DetailsTableModel
             default:
                return "";
          }
-      } catch( Exception e ) { 
-         return ""; 
+      } catch( Exception e ) {
+         return "";
       }
 
    } // end getValueAt
