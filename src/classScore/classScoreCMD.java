@@ -73,6 +73,10 @@ public class classScoreCMD {
 	}
 
 	private void options(String[] args) {
+		options(args,false);
+	}
+	
+	private void options(String[] args, boolean configged) {
 		if(args.length==0)
 			showHelp();
 		LongOpt[] longopts = new LongOpt[3];
@@ -156,14 +160,6 @@ public class classScoreCMD {
 					showHelp();
 				}
 				break;
-			case 'G': //GUI
-				try {
-					UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-				} catch ( Exception e ) {
-					e.printStackTrace();
-				}
-				new classScoreGUI();
-				System.exit(0);
 			case 'h': //iterations
 				showHelp();
 				break;
@@ -327,14 +323,28 @@ public class classScoreCMD {
 				}
 				break;
 			case 'C': //configfile
-				arg = g.getOptarg();
-				if (FileTools.testFile(arg))
-					settings=new Settings(arg);
-				else {
-					System.err.println("Invalid config file name (-C)");
-					showHelp();
+				if(!configged)
+				{
+					arg = g.getOptarg();
+					if (FileTools.testFile(arg)) {
+						settings=new Settings(arg);
+						options(args,true);
+						break;
+					}
+					else {
+						System.err.println("Invalid config file name (-C)");
+						showHelp();
+					}
 				}
 				break;
+			case 'G': //GUI
+				try {
+					UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+				} catch ( Exception e ) {
+					e.printStackTrace();
+				}
+				new classScoreGUI();
+				System.exit(0);
 			case '?':
 				showHelp();
 			default:
@@ -388,7 +398,9 @@ public class classScoreCMD {
 				"\t-y minimum class size ...\n" +
 				"\t\tSets the minimum class size.\n\n" +
 				"\t-C file ...\n" +
-				"\t\tSets the configuration file to be used.\n\n");
+				"\t\tSets the configuration file to be used.\n\n" +
+				"\t-G \n" +
+				"\t\tLaunch the GUI.\n\n");
 		System.exit(0);
 	}
 	

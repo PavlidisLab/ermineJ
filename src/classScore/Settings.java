@@ -215,6 +215,11 @@ public class Settings {
       f.close();
    }
 
+   public String toString() {
+
+    return properties.toString();
+ }
+
    /**
     * Figure out where the data directory should go.
     * 
