@@ -159,7 +159,7 @@ public class classPvalRun {
    }
 
    /**
-    * @param classID "GO000149" for example
+    * @param classID "GO:0000149" for example
     */
    public void showDetails( String classID ) {
       final classresult res = (classresult) results.get( classID );

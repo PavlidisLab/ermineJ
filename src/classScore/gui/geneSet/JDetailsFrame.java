@@ -33,9 +33,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
+ * @author Will Braynen
  * @version $Id$
- * @todo show how many rows there are in the table (I think this is done classPvalRun, line 906)
- * @todo add a graphical display of the data
  */
 public class JDetailsFrame
     extends JFrame {
@@ -63,7 +62,6 @@ public class JDetailsFrame
    JRadioButtonMenuItem m_blackbodyColormapMenuItem = new JRadioButtonMenuItem();
    JMenuItem m_saveImageMenuItem = new JMenuItem();
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
-   DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
    JLabel jLabel1 = new JLabel();
    JLabel jLabel2 = new JLabel();
    JLabel jLabel3 = new JLabel();
@@ -71,29 +69,127 @@ public class JDetailsFrame
    JGradientBar m_gradientBar = new JGradientBar();
    JMenuItem m_saveDataMenuItem = new JMenuItem();
 
+   /** 
+    * The name of the raw data file, as an absolute path, where we look up the 
+    * microarray data for each gene in the current gene set.
+    */ 
+   String m_filename;
+   DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
+   String[] m_probeIDs;
+   Double[] m_pvalues;
+   String[] m_geneNames;
+   String[] m_probeDescriptions;
+   
+   /**
+    * @param  args[0]  the name of the raw data file, as an absolute path, 
+    *                  where we look up the microarray data for each gene in 
+    *                  the current gene set.
+    */
    public static void main( String[] args ) {
       
+      // Make sure the filename was passed in
+      if (args.length < 1) {
+         System.err.println( "Please specify the name of the data file as a program argument" );
+         return;
+      }
+      String filename = args[0];
+      String[] geneSet = { "32254_at", "32533_s_at", "32534_f_at" }; // probe IDs
+      JDetailsFrame frame = new JDetailsFrame( geneSet, null, null, null, filename );
+      frame.show();
    }
    
-   public JDetailsFrame( Map pvals, Map classToProbe, String classID,
-                         GeneAnnotations geneData, Settings settings ) {
-
+   public JDetailsFrame( 
+         String[] probeIDs,
+         Double[] pvalues,
+         String[] geneNames, 
+         String[] probeDescriptions, 
+         String filename ) {
       try {
-         m_nf.setMaximumFractionDigits( 3 );
-         String filename = settings.getRawFile();
-         createDetailsTable( pvals, classToProbe, classID, geneData, filename );
+         m_probeIDs = probeIDs;
+         m_pvalues = pvalues;
+         m_geneNames = geneNames;
+         m_probeDescriptions = probeDescriptions;
+         m_filename = filename;
          jbInit();
-
-         boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
-         m_normalizeMenuItem.setSelected( isNormalized );
       }
       catch ( Exception e ) {
          e.printStackTrace();
       }
    }
 
+   public JDetailsFrame( 
+         Map pvals, 
+         Map classToProbe, 
+         String classID,
+         GeneAnnotations geneData, 
+         Settings settings ) {
+      try {
+         translateVars( pvals, classToProbe, classID, geneData, settings );         
+         jbInit();
+      }
+      catch ( Exception e ) {
+         e.printStackTrace();
+      }
+   }
+
+   /**
+    * This method of course add an unnecessary loop to this class.  We could
+    * instead look up data -- do this translation -- on the fly in the
+    * table model (DetailsTableModel).  However, I find that this translation 
+    * here greatly improves code readability in this class and in the table 
+    * model class.  It also encapsulates the class and makes it less dependent
+    * on implementation details of the calling class (classPvalRun).  This
+    * opens the possibility of using this class elsewhere and also makes
+    * the main() debug function possible.
+    *
+    * If very big gene sets (classes) are ever used and the frame starts
+    * taking noticeably longer to open, then revert the following
+    *  this class to   :  classScore.gui.JDetails to revision 1.16
+    *  the table model :  classScore.gui.DetailsTableModel to revision 1.6
+    *                     (see getValueAt() method there)
+    */
+   private void translateVars( 
+         Map pvals, 
+         Map classToProbe, 
+         String classID, 
+         GeneAnnotations geneData, 
+         Settings settings ) {
+
+      m_filename = settings.getRawFile();
+      
+      int probeCount = (( ArrayList ) classToProbe.get( classID )).size();
+      m_probeIDs  = new String[ probeCount ];
+      m_pvalues   = new Double[ probeCount ];
+      m_geneNames = new String[ probeCount ];
+      m_probeDescriptions = new String[ probeCount ];
+
+      for ( int i = 0; i < probeCount; i++ ) {
+
+         // probe ID
+         m_probeIDs[i] = 
+               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i );
+
+         // p value
+         m_pvalues[i] = ( Double ) pvals.get( 
+               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i )
+            );
+
+         // probe's gene name
+         m_geneNames[i] = geneData.getProbeGeneName( 
+               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i )
+            );
+
+         // probe description
+         m_probeDescriptions[i] = geneData.getProbeDescription( 
+               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i ) 
+            );
+      }
+   } // end init
+   
    private void jbInit() throws Exception {
 
+      createDetailsTable( m_probeIDs, m_pvalues, m_geneNames, m_probeDescriptions, m_filename );
+      
       setSize( 800, m_table.getHeight() );
       setResizable( false );
       setLocation( 200, 100 );
@@ -194,13 +290,17 @@ public class JDetailsFrame
       m_fileMenu.add(m_saveDataMenuItem);
       m_matrixDisplayCellWidthSlider.setPaintTrack( true );
       m_matrixDisplayCellWidthSlider.setPaintTicks( false );
+      
+      m_nf.setMaximumFractionDigits( 3 );
+      boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
+      m_normalizeMenuItem.setSelected( isNormalized );      
    }
-   
+      
    private void createDetailsTable(
-       Map pvals,
-       Map classToProbe,
-       String classID,
-       GeneAnnotations geneData,
+       String[] probesIDs,
+       Double[] pvalues,
+       String[] geneNames,
+       String[] probeDescriptions,
        String filename ) {
 
       //
@@ -208,12 +308,10 @@ public class JDetailsFrame
       //
 
       // compile the matrix data
-      String[] probeIDs = getProbeIDs( classToProbe, classID );
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
       try {
-         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
-             probeIDs );
+         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesIDs );
       }
       catch ( IOException e ) {
          System.err.println( "IOException: wrong filename for MatrixReader" );
@@ -228,7 +326,7 @@ public class JDetailsFrame
       //
 
       DetailsTableModel m = new DetailsTableModel(
-          m_matrixDisplay, pvals, classToProbe, classID, geneData, m_nf
+          m_matrixDisplay, pvalues, probesIDs, geneNames, probeDescriptions, m_nf
           );
       SortFilterModel sorter = new SortFilterModel( m, m_matrixDisplay );
       m_table.setModel( sorter );
@@ -312,15 +410,14 @@ public class JDetailsFrame
 
    } // end createDetailsTable
 
-   protected String[] getProbeIDs( Map classToProbe, String classID ) {
+   protected String[] getProbes( Map classToProbe, String id, int count ) {
 
       // Compile a list of gene probe ID's in this probe class
-      final int probeCount = (( ArrayList ) classToProbe.get( classID )).size();
-      String[] probesIDs = new String[ probeCount ];
-      for ( int i = 0; i < probeCount; i++ ) {
-         probesIDs[i] = ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i );
+      String[] probes = new String[count];
+      for ( int i = 0; i < count; i++ ) {
+         probes[i] = ( String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i );
       }
-      return probesIDs;
+      return probes;
 
    }
 
