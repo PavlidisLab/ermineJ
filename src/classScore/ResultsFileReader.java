@@ -17,7 +17,7 @@ public class ResultsFileReader {
 
    private Map results;
 
-   public ResultsFileReader(String filename) {
+   public ResultsFileReader(String filename) throws NumberFormatException, IOException {
       results = new LinkedHashMap();
 
       File infile = new File(filename);
@@ -25,7 +25,7 @@ public class ResultsFileReader {
          System.err.println("Could not read " + filename);
       }
 
-      try {
+
          FileInputStream fis = new FileInputStream(filename);
 
          BufferedInputStream bis = new BufferedInputStream(fis);
@@ -40,7 +40,7 @@ public class ResultsFileReader {
             if(firstword.compareTo("!")==0)
             {
                System.err.println("This is good");
-               String classNameMunged = st.nextToken();
+    //           String classNameMunged = st.nextToken();
                String className = st.nextToken();
                String classId = st.nextToken();
                int size = Integer.parseInt(st.nextToken());
@@ -55,13 +55,7 @@ public class ResultsFileReader {
                results.put(classId, c);
             }
          }
-
-      }
-      catch (FileNotFoundException ex) {
-
-      }
-      catch (IOException ex) {
-      }
+  
       System.err.println(results.size() + " class results read from file");
    }
 

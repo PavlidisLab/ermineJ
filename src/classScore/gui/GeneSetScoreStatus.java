@@ -22,7 +22,7 @@ public class GeneSetScoreStatus {
 
    public void setStatus(String s) {
       final String message = s;
-
+      System.err.println(s); 
       try {
          Thread.sleep(100);
       } catch (InterruptedException ex) {

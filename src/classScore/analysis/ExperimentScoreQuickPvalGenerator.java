@@ -8,7 +8,6 @@ import java.util.Map;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-import classScore.data.expClassScore;
 import classScore.data.Histogram;
 
 /**
@@ -26,8 +25,8 @@ public class ExperimentScoreQuickPvalGenerator extends
       ExperimentScorePvalGenerator {
 
    public ExperimentScoreQuickPvalGenerator( Settings settings, GeneAnnotations a, 
-         GeneSetSizeComputer csc, GONames gon, Histogram hi, expClassScore pvm ) {
-      super( settings, a, csc, gon, hi, pvm );
+         GeneSetSizeComputer csc, GONames gon, Histogram hi ) {
+      super( settings, a, csc, gon, hi );
    }
 
    /**
@@ -48,10 +47,10 @@ public class ExperimentScoreQuickPvalGenerator extends
       ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get( class_name );
       Iterator classit = values.iterator();
 
-      int in_size = ( int ) ( ( Integer ) effectiveSizes.get( class_name ) )
+      int in_size =  ( ( Integer ) effectiveSizes.get( class_name ) )
             .intValue(); // effective size of this class.
-      if ( in_size < probePvalMapper.get_class_min_size()
-            || in_size > probePvalMapper.get_class_max_size() ) {
+      if ( in_size < settings.getMinClassSize()
+            || in_size > settings.getMaxClassSize() ) {
          return -1.0;
       }
 
@@ -95,7 +94,7 @@ public class ExperimentScoreQuickPvalGenerator extends
       } // end of while over items in the class.
 
       // get raw score and pvalue.
-      rawscore = probePvalMapper.calc_rawscore( groupPvalArr, in_size );
+      rawscore = ResamplingExperimentGeneSetScore.calc_rawscore( groupPvalArr, in_size, settings.getAnalysisMethod() );
       pval = scoreToPval( in_size, rawscore );
 
       if ( pval < 0 ) {

@@ -11,35 +11,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
-   Parses the file of the form
-   <pre>probe_id   Classes1|Classes2|Classes3|.....</pre>
-   Stores it in the HashTable called probeToClassMap
-   Stores the reverse also int classToProbeMap in the form
-   <pre>Classes1   probe1,probe2....</pre>
-   @author Shahmil Merchant, Paul Pavlidis (major changes)
-   @version $Id$
+ * Methods to 'clean' a set of geneSets - to remove redundancies, for example.
+ * 
+ * @author Shahmil Merchant, Paul Pavlidis (major changes)
+ * @version $Id$
  */
 public class GeneSetMapTools {
 
    /**
+    * Remove classes which are too similar to some other class. Classes which
+    * have fractionSameThreshold of a larger class will be ignored. This doesn't
+    * know which classes are relevant to the data, so it does not work
+    * perfectly. The algorithm is: for each class, compare it to all other
+    * classes. If any class encountered is nearly the same as the query class,
+    * the smaller of the two classes is deleted and the query continues with the
+    * class that is left. We iterate until no changes are made (actually, the
+    * stopping criterion will need some work - we don't want to consolidate
+    * endlessly.) Typically what happens is one class will be contained in
+    * another.
     */
-
-   /**
-      Remove classes which are too similar to some other
-      class. Classes which have fractionSameThreshold of a larger
-      class will be ignored. This doesn't know which classes are
-      relevant to the data, so it does not work perfectly.
-      The algorithm is: for each class, compare it to all other
-      classes. If any class encountered is nearly the same as the
-      query class, the smaller of the two classes is deleted and the
-      query continues with the class that is left. We iterate until
-      no changes are made (actually, the stopping criterion will need
-      some work - we don't want to consolidate endlessly.)
-      Typically what happens is one class will be contained in
-      another.
-    */
-   public static void ignoreSimilar( double fractionSameThreshold, Map classToProbeMap ) {
-      Set entries = classToProbeMap.keySet();
+   public static void ignoreSimilar( double fractionSameThreshold,
+         Map geneSetToProbeMap ) {
+      Set entries = geneSetToProbeMap.keySet();
       Iterator it = entries.iterator();
       String queryClassId = "";
       String targetClassId = "";
@@ -49,12 +42,13 @@ public class GeneSetMapTools {
       HashMap seenit = new HashMap();
       ArrayList deleteUs = new ArrayList();
 
-      System.out.println( "...Highly (" + fractionSameThreshold * 100 +
-                          "%)  similar classes are being removed..." );
+      System.out.println( "...Highly (" + fractionSameThreshold * 100
+            + "%)  similar classes are being removed..." );
 
       while ( it.hasNext() ) {
          queryClassId = ( String ) it.next();
-         ArrayList queryClass = ( ArrayList ) classToProbeMap.get( queryClassId );
+         ArrayList queryClass = ( ArrayList ) geneSetToProbeMap
+               .get( queryClassId );
 
          sizeQuery = queryClass.size();
          if ( sizeQuery > 250 || sizeQuery < 5 ) {
@@ -65,21 +59,25 @@ public class GeneSetMapTools {
          while ( itb.hasNext() ) {
             targetClassId = ( String ) itb.next();
 
-            /* skip self comparisons and also symmetric comparisons. The latter half  */
-            if ( seenit.containsKey( targetClassId ) ||
-                 targetClassId.equals( queryClassId ) ) {
+            /*
+             * skip self comparisons and also symmetric comparisons. The latter
+             * half
+             */
+            if ( seenit.containsKey( targetClassId )
+                  || targetClassId.equals( queryClassId ) ) {
                continue;
             }
 
-            ArrayList targetClass = ( ArrayList ) classToProbeMap.get(
-                targetClassId );
+            ArrayList targetClass = ( ArrayList ) geneSetToProbeMap
+                  .get( targetClassId );
 
             sizeTarget = targetClass.size();
             if ( sizeTarget > 250 || sizeTarget < 2 ) {
                continue;
             }
 
-            //		System.out.println("Comparing " + targetClassId + " to " + queryClassId );
+            //		System.out.println("Comparing " + targetClassId + " to " +
+            // queryClassId );
 
             if ( sizeTarget < sizeQuery ) {
 
@@ -88,11 +86,11 @@ public class GeneSetMapTools {
                }
 
                if ( areSimilarClasses( sizeQuery, sizeTarget, queryClass,
-                                       targetClass,
-                                       fractionSameThreshold ) ) {
+                     targetClass, fractionSameThreshold ) ) {
                   deleteUs.add( targetClassId );
 
-                  //			System.out.println(targetClassId + " and " + queryClassId + " are similar (target is smaller and will be ignored)");
+                  //			System.out.println(targetClassId + " and " + queryClassId +
+                  // " are similar (target is smaller and will be ignored)");
 
                   if ( !classesToSimilarMap.containsKey( queryClassId ) ) {
                      classesToSimilarMap.put( queryClassId, new ArrayList() );
@@ -101,10 +99,10 @@ public class GeneSetMapTools {
                      classesToSimilarMap.put( targetClassId, new ArrayList() );
 
                   }
-                  ( ( ArrayList ) classesToSimilarMap.get( queryClassId ) ).add(
-                      targetClassId );
-                  ( ( ArrayList ) classesToSimilarMap.get( targetClassId ) ).add(
-                      queryClassId );
+                  ( ( ArrayList ) classesToSimilarMap.get( queryClassId ) )
+                        .add( targetClassId );
+                  ( ( ArrayList ) classesToSimilarMap.get( targetClassId ) )
+                        .add( queryClassId );
 
                }
 
@@ -115,10 +113,10 @@ public class GeneSetMapTools {
                }
 
                if ( areSimilarClasses( sizeTarget, sizeQuery, targetClass,
-                                       queryClass,
-                                       fractionSameThreshold ) ) {
+                     queryClass, fractionSameThreshold ) ) {
 
-                  //			System.out.println(targetClassId + " and " + queryClassId + " are similar (query is smaller and will be ignored)");
+                  //			System.out.println(targetClassId + " and " + queryClassId +
+                  // " are similar (query is smaller and will be ignored)");
 
                   queryClassId = targetClassId;
                   queryClass = targetClass;
@@ -131,10 +129,10 @@ public class GeneSetMapTools {
                      classesToSimilarMap.put( queryClassId, new ArrayList() );
 
                   }
-                  ( ( ArrayList ) classesToSimilarMap.get( queryClassId ) ).add(
-                      targetClassId );
-                  ( ( ArrayList ) classesToSimilarMap.get( targetClassId ) ).add(
-                      queryClassId );
+                  ( ( ArrayList ) classesToSimilarMap.get( queryClassId ) )
+                        .add( targetClassId );
+                  ( ( ArrayList ) classesToSimilarMap.get( targetClassId ) )
+                        .add( queryClassId );
 
                   break; // cant/dont test this query any more!
                }
@@ -151,42 +149,43 @@ public class GeneSetMapTools {
       Iterator itrd = deleteUs.iterator();
       while ( itrd.hasNext() ) {
          String deleteMe = ( String ) itrd.next();
-         classToProbeMap.remove( deleteMe );
+         geneSetToProbeMap.remove( deleteMe );
       }
 
-      System.out.println( "There are now " + classToProbeMap.size() +
-                          " classes represented on the chip (" + deleteUs.size() +
-                          " were ignored)" );
+      System.out.println( "There are now " + geneSetToProbeMap.size()
+            + " classes represented on the chip (" + deleteUs.size()
+            + " were ignored)" );
    }
 
    /* ignoreSimilar */
 
    /**
-      Helper function for ignoreSimilar.
+    * Helper function for ignoreSimilar.
     */
    private static boolean areSimilarClasses( int biggersize, int smallersize,
-                                             ArrayList biggerClass,
-                                             ArrayList smallerClass,
-                                             double fractionSameThreshold ) {
+         ArrayList biggerClass, ArrayList smallerClass,
+         double fractionSameThreshold ) {
 
       if ( biggersize < smallersize ) {
          System.err.println( "Invalid sizes" );
          System.exit( 1 );
       }
 
-      /* iterate over the members of the larger class. If the member
-       * is not in the smaller class, increment a counter. If this
-       * count goes over the maximum allowed missing, return
-       * false. */
-      int maxmissing = ( int ) ( ( 1.0 - fractionSameThreshold ) *
-                                 ( double ) biggersize );
+      /*
+       * iterate over the members of the larger class. If the member is not in
+       * the smaller class, increment a counter. If this count goes over the
+       * maximum allowed missing, return false.
+       */
+      int maxmissing = ( int ) ( ( 1.0 - fractionSameThreshold ) * ( double ) biggersize );
 
       int notin = 0;
       Iterator ita = biggerClass.iterator();
       while ( ita.hasNext() ) {
          String probe = ( String ) ita.next();
 
-         if ( !smallerClass.contains( probe ) ) { // using arraylists here searches are not optimally fast.
+         if ( !smallerClass.contains( probe ) ) { // using arraylists here
+                                                  // searches are not optimally
+                                                  // fast.
             notin++;
 
          }
@@ -201,14 +200,12 @@ public class GeneSetMapTools {
    }
 
    /**
-      Identify classes which are identical to others. This isn't
-      superfast, because it doesn't know which classes are actually
-      relevant in the data.
+    * Identify classes which are identical to others. This isn't superfast,
+    * because it doesn't know which classes are actually relevant in the data.
     */
    public static void collapseClasses(GeneAnnotations geneData) {
       Map classToProbeMap=geneData.getClassToProbeMap();
       Map classesToRedundantMap=geneData.getClassesToRedundantMap();
-
       LinkedHashMap seenClasses = new LinkedHashMap();
       LinkedHashMap sigs = new LinkedHashMap();
       ArrayList sortedList = null;
@@ -260,7 +257,8 @@ public class GeneSetMapTools {
          classId = ( String ) nit.next();
          signature = ( String ) sigs.get( classId );
 
-         // if the signature has already been seen, add it to the redundant list, and remove this class from the classToProbeMap.
+         // if the signature has already been seen, add it to the redundant
+         // list, and remove this class from the classToProbeMap.
          if ( seenClasses.containsKey( signature ) ) {
             if ( !classesToRedundantMap.containsKey( seenClasses.get( signature ) ) ) {
                classesToRedundantMap.put( seenClasses.get( signature ),
@@ -277,16 +275,18 @@ public class GeneSetMapTools {
          }
       }
 
-      System.out.println( "There are now " + classToProbeMap.size() +
-                          " classes represented on the chip (" + ignored +
-                          " were ignored)" );
+      System.out
+            .println( "There are now " + classToProbeMap.size()
+                  + " classes represented on the chip (" + ignored
+                  + " were ignored)" );
    }
 
    /**
     */
-   public static ArrayList getRedundancies( String classId, Map classesToRedundantMap ) {
-      if ( classesToRedundantMap != null &&
-           classesToRedundantMap.containsKey( classId ) ) {
+   public static ArrayList getRedundancies( String classId,
+         Map classesToRedundantMap ) {
+      if ( classesToRedundantMap != null
+            && classesToRedundantMap.containsKey( classId ) ) {
          return ( ArrayList ) classesToRedundantMap.get( classId );
       } else {
          return null;
@@ -295,9 +295,10 @@ public class GeneSetMapTools {
 
    /**
     */
-   public static ArrayList getSimilarities( String classId, Map classesToSimilarMap ) {
-      if ( classesToSimilarMap != null &&
-           classesToSimilarMap.containsKey( classId ) ) {
+   public static ArrayList getSimilarities( String classId,
+         Map classesToSimilarMap ) {
+      if ( classesToSimilarMap != null
+            && classesToSimilarMap.containsKey( classId ) ) {
          return ( ArrayList ) classesToSimilarMap.get( classId );
       } else {
          return null;
@@ -306,10 +307,12 @@ public class GeneSetMapTools {
 
    /**
     */
-   public String getRedundanciesString( String classId, Map classesToRedundantMap ) {
-      if ( classesToRedundantMap != null &&
-           classesToRedundantMap.containsKey( classId ) ) {
-         ArrayList redundant = ( ArrayList ) classesToRedundantMap.get( classId );
+   public String getRedundanciesString( String classId,
+         Map classesToRedundantMap ) {
+      if ( classesToRedundantMap != null
+            && classesToRedundantMap.containsKey( classId ) ) {
+         ArrayList redundant = ( ArrayList ) classesToRedundantMap
+               .get( classId );
          Iterator it = redundant.iterator();
          String returnValue = "";
          while ( it.hasNext() ) {
@@ -323,16 +326,15 @@ public class GeneSetMapTools {
 
    /**
     */
-//   public Map getClassToProbeMap() {
-//      return classToProbeMap;
-//   }
-//
-//   /**
-//    */
-//   public ArrayList getClassValueMap( String class_id ) {
-//      return ( ArrayList ) ( classToProbeMap.get( class_id ) );
-//   }
-
+   //   public Map getClassToProbeMap() {
+   //      return classToProbeMap;
+   //   }
+   //
+   //   /**
+   //    */
+   //   public ArrayList getClassValueMap( String class_id ) {
+   //      return ( ArrayList ) ( classToProbeMap.get( class_id ) );
+   //   }
    /**
     */
    public void print( Map m ) {
@@ -341,11 +343,12 @@ public class GeneSetMapTools {
       Iterator it = entries.iterator();
       while ( it.hasNext() ) {
          Map.Entry e = ( Map.Entry ) it.next();
-         System.out.println( "Key = " + e.getKey() + ", Value = " + e.getValue() );
+         System.out.println( "Key = " + e.getKey() + ", Value = "
+               + e.getValue() );
       }
    }
 
-   public static void hackGeneSetToProbeMap(Map classToProbeMap) {
+   public static void hackGeneSetToProbeMap( Map classToProbeMap ) {
       int min = 14;
       int max = 15;
       Set keys = classToProbeMap.keySet();

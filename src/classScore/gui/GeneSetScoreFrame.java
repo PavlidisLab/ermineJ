@@ -54,6 +54,10 @@ public class GeneSetScoreFrame
    GeneAnnotations geneData;
    LinkedList results = new LinkedList();
 
+   Map geneDataSets;
+   Map rawDataSets;
+   Map geneScoreSets;
+   
    AnalysisThread athread=new AnalysisThread();
 
    public GeneSetScoreFrame() {
@@ -194,6 +198,10 @@ public class GeneSetScoreFrame
 
    public void initialize() {
       try {
+         rawDataSets = new HashMap();
+         geneDataSets = new HashMap();
+         geneScoreSets = new HashMap();
+         
          statusMessenger.setStatus("Reading GO descriptions " + settings.getClassFile());
          goData = new GONames(settings.getClassFile()); // parse go name file
          statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
@@ -201,6 +209,9 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus( "Initializing gene class mapping" );
          GeneSetMapTools.collapseClasses(geneData);
          geneData.sortGeneSets();
+         
+         geneDataSets.put(new Integer("original".hashCode()) , geneData);
+         
          statusMessenger.setStatus("Done with setup");
          enableMenus();
          mainPanel.remove( progressPanel );
@@ -251,7 +262,7 @@ public class GeneSetScoreFrame
    }
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      AnalysisWizard awiz = new AnalysisWizard(this,geneData,goData);
+      AnalysisWizard awiz = new AnalysisWizard(this, geneDataSets, goData);
       awiz.showWizard();
    }
 
@@ -296,13 +307,13 @@ public class GeneSetScoreFrame
 
    public void startAnalysis(Settings runSettings)
    {
-      athread.startAnalysisThread(this,runSettings,statusMessenger,goData,geneData);
+      athread.startAnalysisThread(this,runSettings,statusMessenger,goData,geneDataSets, rawDataSets, geneScoreSets);
    }
 
    public void loadAnalysis(String loadFile)
    {
       Settings loadSettings = new Settings(loadFile);
-      athread.loadAnalysisThread(this,loadSettings,statusMessenger,goData,geneData,loadFile);
+      athread.loadAnalysisThread(this,loadSettings,statusMessenger,goData,geneDataSets, rawDataSets, geneScoreSets,loadFile);
    }
 }
 

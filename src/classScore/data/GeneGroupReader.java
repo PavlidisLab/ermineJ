@@ -33,6 +33,7 @@ import java.util.TreeSet;
  * 
  * @author Shahmil Merchant, Paul Pavlidis (major changes)
  * @version $Id$
+ * @deprecated
  */
 public class GeneGroupReader {
 
@@ -88,7 +89,7 @@ public class GeneGroupReader {
     * 
     * @todo This method is no longer needed - not used???
     */
-   public void probe_repeat() {
+ /*  public void probe_repeat() {
       Iterator it = group.iterator();
       Set myprobe = new TreeSet();
 
@@ -115,5 +116,5 @@ public class GeneGroupReader {
          ( ( ArrayList ) group_probe_list.get( group ) ).add( currprobe );
       }
    }
-
+*/
 } // end of class

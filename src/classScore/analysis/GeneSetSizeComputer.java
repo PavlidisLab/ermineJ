@@ -5,9 +5,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import classScore.data.GeneAnnotations;
-import classScore.data.expClassScore;
+import classScore.data.GeneScoreReader;
 
 /**
  * Class for computing the actual and effective sizes of gene sets.
@@ -22,18 +23,19 @@ import classScore.data.expClassScore;
 public class GeneSetSizeComputer {
    protected Map effectiveSizes = null;
    protected Map actualSizes = null;
-
-   protected expClassScore probePvalMapper;
    protected Map classToProbe;
    protected boolean weight_on = true;
    protected Map probeGroups;
+   protected GeneScoreReader geneScores;
+   protected Set activeProbes;
 
-   public GeneSetSizeComputer( expClassScore ppm, GeneAnnotations geneData,
+   public GeneSetSizeComputer( Set activeProbes, GeneAnnotations geneData, GeneScoreReader geneScores,
          boolean w ) {
-      this.probePvalMapper = ppm;
       this.weight_on = w;
+      this.activeProbes = activeProbes;
       this.classToProbe = geneData.getClassToProbeMap();
       this.probeGroups = geneData.getProbeToGeneMap();
+      this.geneScores = geneScores;
       effectiveSizes = new HashMap();
       actualSizes = new HashMap();
    }
@@ -45,12 +47,22 @@ public class GeneSetSizeComputer {
       Collection entries = classToProbe.entrySet(); // go -> probe map. Entries
       // are the class names.
       Iterator it = entries.iterator();
-      Map probetopval = probePvalMapper.get_map(); // probe->pval map. We do not
-      // use the pvalues here, just
-      // a list of probes.
+
       Map record = new HashMap();
       int size;
       int v_size;
+
+      if ( activeProbes == null ) {
+         throw new IllegalStateException( "ActiveProbes was not initialized" );
+      }
+
+      if ( geneScores == null ) {
+         throw new IllegalStateException( "GeneScores was not initialized" );
+      }
+      
+      if ( geneScores.getGroupToPvalMap() == null) {
+         throw new IllegalStateException( "getGroupToPvalMap was not initialized" );
+      }
 
       while ( it.hasNext() ) { // for each class.
          Map.Entry e = ( Map.Entry ) it.next(); // next class.
@@ -67,26 +79,24 @@ public class GeneSetSizeComputer {
             String probe = ( String ) I.next();
 
             if ( probe != null ) {
-               if ( probetopval.containsKey( probe ) ) { // if it is in the data
+               if ( activeProbes.contains( probe ) ) { // if it is in the data
                   // set
                   size++;
 
                   if ( weight_on ) { //routine for weights
                      // compute pval for every replicate group
-                     if ( probePvalMapper.get_group_pval_map().containsKey(
+                     if ( geneScores.getGroupToPvalMap().containsKey(
                            probeGroups.get( probe ) )
-                           && !record.containsKey( probeGroups.get( probe ) ) ) { // if
-                        // we
-                        // haven't
-                        // done
-                        // this
-                        // probe
-                        // already.
-                        record.put( probeGroups.get( probe ), null ); // mark it
-                        // as done
-                        // for
-                        // this
-                        // class.
+
+                           /*
+                            * if we haven't done this probe already.
+                            */
+                           && !record.containsKey( probeGroups.get( probe ) ) ) {
+
+                        /*
+                         * mark it as done for this class.
+                         */
+                        record.put( probeGroups.get( probe ), null );
                         v_size++; // this is used in any case.
                      }
                   }

@@ -8,19 +8,19 @@ import baseCode.math.Stats;
 import cern.colt.list.DoubleArrayList;
 
 /**
- * Stores distributions for geneSets ( a series of histograms). For generic histograms, use hep.aida.
+ * Stores distributions for geneSets ( a series of histograms). For generic
+ * histograms, use hep.aida.
  * 
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
- * @todo default bin size --@todo could use hep.aida Histogram for each
- *       histogram - actually this is a pain to do.
+ * @todo default bin size
  */
 public class Histogram {
    protected static final Log log = LogFactory.getLog( Histogram.class );
    private int minimumGeneSetSize = 0;
    private double binSize = 0.002; // todo: set this automatically?, so there
    // are always a reasonable # of bins.
-   private double minimum = 0.0; // todo: this is never set anywhere.
+   private double minimum = 0.0;  
    private double maximum = 5.0; // this gets adjusted if need be.
    private int numBins = 0;
    private int numItemsPerHistogram = 0;
@@ -42,14 +42,14 @@ public class Histogram {
     * @param max
     */
    public Histogram( int number_of_class, int min_class_size,
-         int number_of_runs, double max ) {
+         int number_of_runs, double max, double min ) {
 
       if ( number_of_class < 1 ) {
          throw new IllegalArgumentException( "No classes." );
       }
 
+      this.minimum = min;
       this.maximum = max;
-      //     this.hist_min = this.hist_min; // todo: fix this so it does something.
       this.minimumGeneSetSize = min_class_size;
       set_number_of_runs( number_of_runs );
       set_number_of_bins();
@@ -60,7 +60,7 @@ public class Histogram {
    /**
     */
    public void set_number_of_bins() {
-      numBins = ( int ) ( ( maximum - minimum ) / ( double ) binSize );
+      numBins = ( int ) ( ( maximum - minimum ) / binSize );
       if ( numBins < 1 ) {
          throw new IllegalStateException(
                "Histogram had no bins or too few bins. (" + numBins + ")" );
@@ -73,7 +73,7 @@ public class Histogram {
     */
    public void set_number_of_runs( int runs ) {
       numItemsPerHistogram = runs;
-      minPval = 0.5 / ( double ) numItemsPerHistogram; // the best possible
+      minPval = 0.5 / numItemsPerHistogram; // the best possible
       // pvalue for
       // a class.
       log.debug( "Minimum pvalue will be " + minPval + ", "
@@ -88,8 +88,7 @@ public class Histogram {
     */
    public void update( int row, double value ) {
 
-      int thebin = ( int ) Math
-            .floor( ( value - minimum ) / ( double ) binSize );
+      int thebin = ( int ) Math.floor( ( value - minimum ) / binSize );
 
       // make sure we're in the range
       if ( thebin < 0 ) {
@@ -167,14 +166,6 @@ public class Histogram {
       return numItemsPerHistogram;
    }
 
-   /**
-    * @todo this should be disallowed.
-    * @return Matrix
-    * @deprecated
-    */
-   public DenseDoubleMatrix2DNamed get_matrix() {
-      return M;
-   }
 
    public int get_min_class_size() {
       return minimumGeneSetSize;
@@ -200,7 +191,7 @@ public class Histogram {
 
    /**
     * 
-    * @param class_size int
+    * @param class_size int - NOT the row, that is determined here.
     * @param rawscore double
     * @return double
     */
@@ -209,20 +200,20 @@ public class Histogram {
          throw new IllegalStateException(
                "Warning, a rawscore yielded a bin number which was out of the range: "
                      + rawscore );
-      } else {
-         int row = this.getClassIndex( class_size, minimumGeneSetSize );
-         int binnum = ( int ) Math.floor( ( rawscore - minimum ) / binSize );
-
-         if ( binnum < 0 ) {
-            binnum = 0;
-
-         }
-         if ( binnum > numBins - 1 ) {
-            binnum = numBins - 1;
-
-         }
-         return this.getProbability( row, binnum );
       }
+      int row = this.getClassIndex( class_size, minimumGeneSetSize );
+      int binnum = ( int ) Math.floor( ( rawscore - minimum ) / binSize );
+
+      if ( binnum < 0 ) {
+         binnum = 0;
+
+      }
+      if ( binnum > numBins - 1 ) {
+         binnum = numBins - 1;
+
+      }
+      return this.getProbability( row, binnum );
+
    }
 
    /**
@@ -258,9 +249,8 @@ public class Histogram {
       double pval = M.getQuick( row, binnum );
       if ( pval == 0.0 ) {
          return minPval;
-      } else {
-         return pval;
       }
+      return pval;
    }
 
 }

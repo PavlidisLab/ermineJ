@@ -7,143 +7,281 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import classScore.Settings;
+import classScore.gui.GeneSetScoreStatus;
+
 /**
-  Description:Parses the file of the form
-  <pre>probe_id[tab]pval</pre>
-  <p>The values are stored in a HashTable probe_pval_map. This is used to
-  see what probes are int the data set, as well as the score for each
-  probe.   Created :09/02/02</p>
-  @author Shahmil Merchant, Paul Pavlidis
-  @version $Id$
+ * Description:Parses the file of the form
+ * 
+ * <pre>
+ * 
+ *  
+ *   
+ *    
+ *     
+ *      
+ *       probe_id[tab]pval
+ *       
+ *      
+ *     
+ *    
+ *   
+ *  
+ * </pre>
+ * 
+ * <p>
+ * The values are stored in a HashTable probe_pval_map. This is used to see what probes are int the data set, as well as
+ * the score for each probe. Created :09/02/02
+ * </p>
+ * 
+ * @author Shahmil Merchant, Paul Pavlidis
+ * @version $Id$
  */
 public class GeneScoreReader {
 
-   private String[] probeID = null;
-   private double[] pval = null;
+   double[] groupPvalues;
+   private String[] probeIDs = null;
+   private double[] probePvalues = null;
    private int num_pvals;
-   private static Map probe_pval_map;
-   private double log10 = Math.log( 10 );
+   private Map probeToPvalMap;
+   private Map groupToPvalMap;
+
+   //  private Map groupToProbeMap;
 
    /**
-     Create the probe -> pval mapping
-     @param filename: a tab-delmited file with columns probe_id pval
+    * 
+    * @param s
     */
-   public GeneScoreReader( String filename ) throws IOException {
-      this( filename, 1, true );
-   }
-
+   //  public void setGroupToProbeMap( Map s ) {
+   //     this.groupToProbeMap = s;
+   //  }
    /**
-     Create the probe -> pval mapping
-    @param filename: a tab-delmited file with columns probe_id pval pval pval...
-     @param column: which column the pvalues are in.
-     @param dolog: take the log (base 10) of the value.
+    * Create the probe -> pval mapping
+    * 
+    * @param filename: a tab-delmited file with columns probe_id pval pval pval...
+    * @param column: which column the pvalues are in.
+    * @param dolog: take the log (base 10) of the value.
     */
-   public GeneScoreReader( String filename, int column, boolean dolog ) throws
-       IOException {
+   public GeneScoreReader( String filename, Settings settings,
+         GeneSetScoreStatus messenger, Map groupToProbeMap ) throws IOException {
       //read in file
-
+      
+      groupToPvalMap = new HashMap();
+      double log10 = Math.log( 10 );
       File infile = new File( filename );
       if ( !infile.exists() || !infile.canRead() ) {
-         System.err.println( "Could not read " + filename );
+         throw new IOException( "Could not read " + filename );
       }
 
-      if ( column < 1 ) {
-         System.err.println( "Illegal column number " + column +
-                             ", must be greater or equal to 1" );
-      } else {
-         System.out.println( "Reading gene scores from column " + column );
+      if ( settings.getScorecol() < 1 ) {
+         throw new IllegalArgumentException( "Illegal column number "
+               + settings.getScorecol() + ", must be greater or equal to 1" );
       }
 
-      FileInputStream fis = new FileInputStream( filename );
-      BufferedInputStream bis = new BufferedInputStream( fis );
-      BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
-      Double[] doubleArray = null;
+      if ( messenger != null ) {
+         messenger.setStatus( "Reading gene scores from column "
+               + settings.getScorecol() );
+      }
+
+      BufferedReader dis = new BufferedReader( new InputStreamReader(
+            new BufferedInputStream( new FileInputStream( filename ) ) ) );
+
       String row;
-      String col;
+      probeToPvalMap = new LinkedHashMap();
       Vector rows = new Vector();
-      Vector cols = null;
-      probe_pval_map = new LinkedHashMap();
-
       while ( ( row = dis.readLine() ) != null ) {
          StringTokenizer st = new StringTokenizer( row, "\t" );
-         cols = new Vector();
+         Vector cols = new Vector();
          while ( st.hasMoreTokens() ) {
             cols.add( st.nextToken() );
          }
          rows.add( cols );
       }
-
       dis.close();
-      probeID = new String[rows.size() - 1];
-      pval = new double[rows.size() - 1];
-      doubleArray = new Double[rows.size() - 1];
+
+      probeIDs = new String[rows.size() - 1];
+      probePvalues = new double[rows.size() - 1];
 
       double small = 10e-16;
 
       for ( int i = 1; i < rows.size(); i++ ) {
 
-         if ( ( ( Vector ) ( rows.elementAt( i ) ) ).size() < column ) {
-            throw new IOException( "Insufficient columns in row " + i +
-                                   ", expecting file to have at least " + column +
-                                   " columns." );
+         if ( ( ( Vector ) ( rows.elementAt( i ) ) ).size() < settings
+               .getScorecol() ) {
+            throw new IOException( "Insufficient gene score columns in row "
+                  + i + ", expecting file to have at least "
+                  + settings.getScorecol() + " columns." );
          }
 
-         String name = ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) ).elementAt( 0 ) );
+         String name = ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
+               .elementAt( 0 ) );
 
          if ( name.matches( "AFFX.*" ) ) { // todo: put this rule somewhere else
-            System.err.println( "Skipping probe in pval file: " + name );
+            if ( messenger != null ) {
+               messenger.setStatus( "Skipping probe in pval file: " + name );
+               try {
+                  Thread.sleep( 20 ); // so they can read it...
+               } catch ( InterruptedException ex ) {
+                  Thread.currentThread().interrupt();
+               }
+            }
             continue;
          }
-         probeID[i - 1] = name;
-
-         pval[i - 1] =
-             Double.parseDouble( ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) ).
-                                              elementAt( column - 1 ) ) );
+         probeIDs[i - 1] = name;
+         probePvalues[i - 1] = Double
+               .parseDouble( ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
+                     .elementAt( settings.getScorecol() - 1 ) ) );
 
          // Fudge when pvalues are zero.
-         if ( dolog && pval[i - 1] <= 0 ) {
-            System.err.println(
-                "Warning: Cannot take log of non-positive value for " +
-                name +
-                " (" + pval[i - 1] + ") from gene score file: Setting to " +
-                small );
-            pval[i - 1] = small;
+         if ( settings.getDoLog() && probePvalues[i - 1] <= 0 ) {
+            if ( messenger != null ) {
+               messenger
+                     .setStatus( "Warning: Cannot take log of non-positive value for "
+                           + name
+                           + " ("
+                           + probePvalues[i - 1]
+                           + ") from gene score file: Setting to " + small );
+               probePvalues[i - 1] = small;
+               try {
+                  Thread.sleep( 20 ); // so they can read it...
+               } catch ( InterruptedException ex ) {
+                  Thread.currentThread().interrupt();
+               }
+            }
          }
 
-         if ( dolog ) {
-            pval[i - 1] = - ( Math.log( pval[i - 1] ) / log10 ); // Make -log base 10.
+         if ( settings.getDoLog() ) {
+            probePvalues[i - 1] = -( Math.log( probePvalues[i - 1] ) / log10 ); // Make
+            // -log
+            // base 10.
          }
-
-         doubleArray[i - 1] = new Double( pval[i - 1] );
-         probe_pval_map.put( probeID[i - 1], doubleArray[i - 1] ); // put key, value.
+         probeToPvalMap
+               .put( probeIDs[i - 1], new Double( probePvalues[i - 1] ) );
       }
 
-      num_pvals = Array.getLength( pval );
-
-      if ( num_pvals <= 0 ) {
-         System.err.println( "No pvalues found in the file!" );
-         System.exit( 1 );
-      } else {
-         System.out.println( "Found " + num_pvals + " pvals in the file" );
+      num_pvals = Array.getLength( probePvalues );
+      if ( num_pvals == 0 ) {
+         throw new IllegalStateException( "No pvalues found in the file!" );
       }
+
+      if ( messenger != null ) {
+         messenger.setStatus( "Found " + num_pvals + " pvals in the file" );
+      }
+      setUpGroupToPvalMap( settings.getGeneRepTreatment(), groupToProbeMap, messenger );
 
    } //
 
    /**
+    * Each pvalue is adjusted to the mean (or best) of all the values in the 'replicate group' to yield a "group to
+    * pvalue map".
+    * 
+    * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the data
+    *        set.
     */
-   public String[] get_probe_ids() {
-      return probeID;
+   private void setUpGroupToPvalMap( int gp_method, Map groupToProbeMap, GeneSetScoreStatus messenger ) {
+
+      if ( groupToProbeMap == null || groupToProbeMap.size() == 0 ) {
+         throw new IllegalStateException( "groupToProbeMap was not set." );
+      }
+
+      if ( probeToPvalMap == null ) {
+         throw new IllegalStateException( "probeToPvalMap was not set." );
+      }
+      
+      if (groupToProbeMap.size() == 0) {
+         throw new IllegalStateException("Group to probe map was empty");
+      }
+
+      
+      double[] group_pval_temp = new double[groupToProbeMap.size()];
+      int counter = 0;
+
+      for ( Iterator groupMapItr = groupToProbeMap.keySet().iterator(); groupMapItr
+            .hasNext(); ) {
+         String group = ( String ) groupMapItr.next();
+         /* probes in this group */
+         ArrayList probes = ( ArrayList ) groupToProbeMap.get( group );
+         int in_size = 0;
+         for ( Iterator pbItr = probes.iterator(); pbItr.hasNext(); ) {
+            String probe = ( String ) pbItr.next();
+           
+            if ( !probeToPvalMap.containsKey( probe ) ) {
+          //     messenger.setStatus(
+        //             "Annotations contains probe not in the probeToPvalMap: "
+         //                  + probe );
+               continue;
+            }
+
+            double pbPval = ( ( Double ) probeToPvalMap.get( probe ) )
+                  .doubleValue();
+
+            switch ( gp_method ) {
+               case Settings.MEAN_PVAL: {
+                  group_pval_temp[counter] += pbPval;
+                  break;
+               }
+               case Settings.BEST_PVAL: {
+                  group_pval_temp[counter] = Math.max( pbPval,
+                        group_pval_temp[counter] );
+                  break;
+               }
+               default: {
+                  throw new IllegalArgumentException(
+                        "Illegal selection for groups score method. Valid choices are MEAN_PVAL and BEST_PVAL" );
+               }
+            }
+            in_size++;
+         }
+
+         if ( in_size != 0 ) {
+            if ( gp_method == Settings.MEAN_PVAL ) {
+               group_pval_temp[counter] /= in_size; // take the mean
+            }
+            // messenger.setStatus("Processing " + group + " had " + in_size + " probes.");
+            Double dbb = new Double( group_pval_temp[counter] );
+            groupToPvalMap.put( group, dbb );
+            counter++;
+         }
+      } //end of while
+
+      if (counter == 0) {
+         throw new IllegalStateException("No gene to pvalue mappings were found.");
+      }
+      
+      messenger.setStatus(counter + " distinct genes found in the annotations.");
+      
+      groupPvalues = new double[counter];
+      for ( int i = 0; i < counter; i++ ) {
+         groupPvalues[i] = group_pval_temp[i];
+      }
+
    }
 
    /**
     */
-   public double[] get_pval() {
-      return pval;
+   public String[] get_probe_ids() {
+      return probeIDs;
+   }
+
+   /**
+    */
+   public double[] getPvalues() {
+      return probePvalues;
+   }
+
+   public double[] getGroupPvalues() {
+      return this.groupPvalues;
    }
 
    /**
@@ -154,8 +292,43 @@ public class GeneScoreReader {
 
    /**
     */
-   public Map get_map() {
-      return probe_pval_map;
+   public Map getProbeToPvalMap() {
+      return probeToPvalMap;
+   }
+
+   /**
+    * @param shuffle Whether the map should be scrambled first. If so, then groups are randomly associated with scores,
+    *        but the actual values are the same. This is used for resampling multiple test correction.
+    * @return Map of groups of genes to pvalues.
+    */
+   public Map getGroupToPvalMap( boolean shuffle ) {
+      if ( shuffle ) {
+         Map scrambled_map = new LinkedHashMap();
+         Set keys = groupToPvalMap.keySet();
+         Iterator it = keys.iterator();
+
+         Collection values = groupToPvalMap.values();
+         Vector valvec = new Vector( values );
+         Collections.shuffle( valvec );
+
+         // randomly associate keys and values
+         int i = 0;
+         while ( it.hasNext() ) {
+            scrambled_map.put( it.next(), valvec.get( i ) );
+            i++;
+         }
+         return scrambled_map;
+
+      }
+      return groupToPvalMap;
+
+   }
+
+   /**
+    * @return
+    */
+   public Map getGroupToPvalMap() {
+      return groupToPvalMap;
    }
 
    /**
@@ -163,24 +336,12 @@ public class GeneScoreReader {
    public double get_value_map( String probe_id ) {
       double value = 0.0;
 
-      if ( probe_pval_map.get( probe_id ) != null ) {
-         value = Double.parseDouble( ( probe_pval_map.get( probe_id ) ).toString() );
+      if ( probeToPvalMap.get( probe_id ) != null ) {
+         value = Double.parseDouble( ( probeToPvalMap.get( probe_id ) )
+               .toString() );
       }
 
       return value;
-   }
-
-   /**
-     Main
-    */
-   public static void main( String[] args ) {
-      try {
-         GeneScoreReader t = new GeneScoreReader( args[0] );
-      }
-      catch ( IOException e ) {
-         e.printStackTrace();
-      }
-
    }
 
 } // end of class

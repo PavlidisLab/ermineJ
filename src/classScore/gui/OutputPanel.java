@@ -3,7 +3,7 @@ package classScore.gui;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.Map;
-
+import java.util.Vector;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -20,7 +20,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-
 import classScore.Settings;
 import classScore.classPvalRun;
 import classScore.data.GONames;
@@ -37,7 +36,9 @@ import javax.swing.JOptionPane;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
- * @todo when a row is highlighted, and then a column is sorted, the cell with focus changes color (even when it shouldn't)
+ * @todo make columns start out better sizes
+ * @todo integers don't sort correctly
+ * @todo deletion of geneDataSets when remove is used.
  */
 
 public class OutputPanel extends JScrollPane {
@@ -482,6 +483,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
          {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " +
+
                             nf.format(res.getScore()) );
 
             if(res.getPvalue_corr() == 1)

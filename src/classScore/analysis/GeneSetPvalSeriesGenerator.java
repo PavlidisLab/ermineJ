@@ -11,7 +11,6 @@ import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
-import classScore.data.expClassScore;
 import classScore.data.Histogram;
 
 /**
@@ -26,20 +25,20 @@ import classScore.data.Histogram;
  */
 
 public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
-   
+
    private Vector sortedclasses;
    private Map results;
-   private expClassScore probePvalMapper;
+ //  private ResamplingExperimentGeneSetScore probePvalMapper;
    private Histogram hist;
    private GeneSetSizeComputer csc;
    private NumberFormat nf = NumberFormat.getInstance();
 
    public GeneSetPvalSeriesGenerator( Settings settings,
-         GeneAnnotations geneData, Histogram hi, expClassScore pvm,
+         GeneAnnotations geneData, Histogram hi,
          GeneSetSizeComputer csc, GONames gon ) {
-      super(settings, geneData, csc, gon);
+      super( settings, geneData, csc, gon );
       this.hist = hi;
-      this.probePvalMapper = pvm;
+//      this.probePvalMapper = pvm;
       this.csc = csc;
       results = new HashMap();
    }
@@ -55,23 +54,24 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
     * 
     * @param group_pval_map a <code>Map</code> value
     * @param probesToPvals a <code>Map</code> value
-    * @param input_rank_map a <code>Map</code> value
     */
-   public void classPvalGenerator( Map group_pval_map, Map probesToPvals,
-         Map input_rank_map ) {
-      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go -> probe map. Entries
+   public void classPvalGenerator( Map group_pval_map, Map probesToPvals ) {
+      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->
+                                                                       // probe
+                                                                       // map.
+                                                                       // Entries
       // are the class names.
       Iterator it = entries.iterator(); // the classes.
 
       ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator(
-            settings, geneAnnots, csc, goName, hist, probePvalMapper );
+            settings, geneAnnots, csc, goName, hist );
 
       // For each class.
       while ( it.hasNext() ) {
          Map.Entry e = ( Map.Entry ) it.next();
          String class_name = ( String ) e.getKey();
          GeneSetResult res = cpv.classPval( class_name, group_pval_map,
-               probesToPvals, input_rank_map );
+               probesToPvals );
          if ( res != null ) {
             results.put( class_name, res );
          }
@@ -86,14 +86,17 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
     * is used to get class pvalues for permutation analysis.
     */
    public HashMap class_v_pval_generator( Map group_pval_map, Map probesToPvals ) {
-      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go -> probe map. Entries
+      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->
+                                                                       // probe
+                                                                       // map.
+                                                                       // Entries
       // are the class names.
       Iterator it = entries.iterator(); // the classes.
       //	Vector results = new Vector();
       HashMap results = new HashMap();
 
       ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator(
-            settings, geneAnnots, csc, goName, hist, probePvalMapper );
+            settings, geneAnnots, csc, goName, hist );
 
       // For each class.
       while ( it.hasNext() ) {
@@ -104,7 +107,6 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
          if ( pval >= 0.0 ) {
             results.put( class_name, new Double( pval ) );
-
          }
       }
       return results;

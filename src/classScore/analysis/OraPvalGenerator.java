@@ -9,8 +9,8 @@ import cern.jet.stat.Probability;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
+import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
-import classScore.data.expClassScore;
 
 /**
  * Compute gene set scores based on over-representation analysis (ORA).
@@ -29,18 +29,15 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
    protected int inputSize;
    protected int numOverThreshold = 0; // number of genes over the threshold
    protected int numUnderThreshold = 0; // number of genes below the threshold
-   expClassScore probePvalMapper;
 
    public OraPvalGenerator( Settings settings, GeneAnnotations a,
-         GeneSetSizeComputer csc, int not, int nut, GONames gon,
-         expClassScore pvm, int inputSize ) {
+         GeneSetSizeComputer csc, int not, int nut, GONames gon, int inputSize ) {
 
       super( settings, a, csc, gon );
-      this.probePvalMapper = pvm;
       this.numOverThreshold = not;
       this.numUnderThreshold = nut;
       this.inputSize = inputSize;
-
+      
       if ( settings.getUseLog() ) {
          this.user_pvalue = -Math.log( settings.getPValThreshold() );
       } else {
@@ -49,12 +46,12 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
    }
 
    /**
-    * Get results for one class, based on class id. The other arguments are
-    * things that are not constant under permutations of the data.
+    * Get results for one class, based on class id. The other arguments are things that are not constant under
+    * permutations of the data.
     *  
     */
    public GeneSetResult classPval( String class_name, Map groupToPvalMap,
-         Map probesToPvals, Map input_rank_map ) {
+         Map probesToPvals ) {
 
       //inputs for hypergeometric distribution
       int successes = 0;
@@ -63,10 +60,13 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       //variables for outputs
       double hyper_pval = -1.0;
 
-      int effSize = ( int ) ( ( Integer ) effectiveSizes.get( class_name ) )
-            .intValue(); // effective size of this class.
-      if ( effSize < probePvalMapper.get_class_min_size()
-            || effSize > probePvalMapper.get_class_max_size() ) {
+      int effSize = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue(); // effective
+      // size
+      // of
+      // this
+      // class.
+      if ( effSize < settings.getMinClassSize()
+            || effSize > settings.getMaxClassSize() ) {
          return null;
       }
 
@@ -76,8 +76,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       double[] groupPvalArr = new double[effSize]; // store pvalues for items in
       // the class.
       Map record = new HashMap();
-      Object ranking = null;
-
       int v_size = 0;
 
       // foreach item in the class.
@@ -110,9 +108,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             } else { // no weights
 
                /*
-                * pvalue for this probe. This will not be null if things have
-                * been done correctly so far. This is the only place we need the
-                * raw pvalue for a probe.
+                * pvalue for this probe. This will not be null if things have been done correctly so far. This is the
+                * only place we need the raw pvalue for a probe.
                 */
                Double pbpval = ( Double ) probesToPvals.get( probe );
 
@@ -133,7 +130,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       // meet criteria (trials); pos_prob: fractional size of
       // class wrt data size.
       double pos_prob = ( double ) effSize / ( double ) inputSize;
-      double expected = ( double ) numOverThreshold * pos_prob;
+      double expected = numOverThreshold * pos_prob;
       // lower tail.
       if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
          // or we didn't/cant get
@@ -148,7 +145,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
       // set up the return object.
       GeneSetResult res = new GeneSetResult( class_name, goName
-            .getNameForId( class_name ), ( int ) ( ( Integer ) actualSizes
+            .getNameForId( class_name ), ( ( Integer ) actualSizes
             .get( class_name ) ).intValue(), effSize );
       res.setScore( successes );
       res.setPValue( hyper_pval );

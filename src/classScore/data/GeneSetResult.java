@@ -6,29 +6,30 @@ import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 
 /**
-  Data structure to store class scoring information about
-  a class. (experiment scores only)
-
-  @author Paul Pavlidis
-  @version $Id$
-
+ * Data structure to store class scoring information about a class.
+ * 
+ * @author Paul Pavlidis
+ * @version $Id$
+ *  
  */
-public class GeneSetResult
-    implements Comparable {
+public class GeneSetResult implements Comparable {
    private String class_id = null;
    private String class_name = null;
    private double pvalue = 1.0;
    private double score = 0.0;
    //  private double hyperpval = 1.0;
-   private int hypercut = 0; // how many genes make the pvalue threshold; this is n1 in the calculations
-//   private double rocpval = 1.0;
+   private int hypercut = 0; // how many genes make the pvalue threshold; this
+                             // is n1 in the calculations
+   //   private double rocpval = 1.0;
    //  private double aroc = 0.5;
    private int size = 0;
    private int effective_size = 0;
    private double pvalue_corr = 0.0;
    //  private double hyperpval_corr = 0.0;
    //  private double rocpval_corr = 0.0;
-   private LinkedHashMap identicalTo = null; // Defines classes this one is identical to in terms of members.
+   private LinkedHashMap identicalTo = null; // Defines classes this one is
+                                             // identical to in terms of
+                                             // members.
    private DecimalFormat nf;
    private int rank;
 
@@ -42,15 +43,9 @@ public class GeneSetResult
       this.setsizes( size, effsize );
    }
 
-   public GeneSetResult( String id,
-                         String class_name,
-                         int size,
-                         int effective_size,
-                         double score,
-                         double pvalue,
-                         double hyperpval,
-                         double aroc,
-                         double rocpval ) {
+   public GeneSetResult( String id, String class_name, int size,
+         int effective_size, double score, double pvalue, double hyperpval,
+         double aroc, double rocpval ) {
       this.class_id = id;
       this.class_name = class_name;
       this.pvalue = pvalue;
@@ -70,14 +65,17 @@ public class GeneSetResult
       this.print( out, "" );
    }
 
-   public void print( BufferedWriter out, String extracolumns ) throws
-       IOException {
+   public void print( BufferedWriter out, String extracolumns )
+         throws IOException {
 
       String fixnamea;
       String cleanname;
       if ( class_name != null ) {
-         fixnamea = class_name.replace( ' ', '_' ); // make the format compatible with the perl scripts Paul wrote.
-         cleanname = fixnamea.replace( ':', '-' ); // todo: figure out why this doesn't work.
+         fixnamea = class_name.replace( ' ', '_' ); // make the format
+                                                    // compatible with the perl
+                                                    // scripts Paul wrote.
+         cleanname = fixnamea.replace( ':', '-' ); // todo: figure out why this
+                                                   // doesn't work.
       } else {
          cleanname = "";
       }
@@ -166,7 +164,7 @@ public class GeneSetResult
    }
 
    /**
-    *
+    * 
     * @return int
     */
    public int getSize() {
@@ -175,7 +173,7 @@ public class GeneSetResult
 
    /**
     * Default comparator for this class: sorts by the pvalue.
-    *
+    * 
     * @param ob Object
     * @return int
     */

@@ -30,13 +30,13 @@ public class AnalysisWizard extends Wizard
    AnalysisWizardStep3 step3;
    AnalysisWizardStep4 step4;
    AnalysisWizardStep5 step5;
-
-   public AnalysisWizard(GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData) {
+   
+   public AnalysisWizard(GeneSetScoreFrame callingframe, Map geneDataSets, GONames goData) {
       super(callingframe,550,350);
       //enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
       this.settings = new Settings(callingframe.getSettings()); //own copy of settings
-      this.geneData = geneData;
+      this.geneData = (GeneAnnotations)geneDataSets.get(new Integer("original".hashCode()));
       this.goData = goData;
 
       step1 = new AnalysisWizardStep1(this,settings);

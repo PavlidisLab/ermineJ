@@ -10,34 +10,33 @@ import java.util.Vector;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
+import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
-import classScore.data.expClassScore;
 
 /**
- * 
- * 
- * <hr>
+ * Generate Overrepresentation p values for gene sets.
  * <p>
  * Copyright (c) 2004 Columbia University
+ * </p>
  * 
  * @author pavlidis
- * @version $Id$
+ * @version $Id: OraGeneSetPvalSeriesGenerator.java,v 1.1 2004/06/29 23:12:47
+ *          pavlidis Exp $
  */
 public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
    private Vector sortedclasses;
    private Map results;
-   private expClassScore probePvalMapper;
+   private GeneScoreReader geneScores;
    private NumberFormat nf = NumberFormat.getInstance();
    private int numOverThreshold;
    private int numUnderThreshold;
    private int inputSize;
 
    public OraGeneSetPvalSeriesGenerator( Settings settings,
-         GeneAnnotations geneData, expClassScore pvm, GeneSetSizeComputer csc,
-         GONames gon, int inputSize ) {
+         GeneAnnotations geneData,
+         GeneSetSizeComputer csc, GONames gon, int inputSize ) {
       super( settings, geneData, csc, gon );
-      this.probePvalMapper = pvm;
       this.inputSize = inputSize;
       results = new HashMap();
    }
@@ -55,14 +54,13 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     * @param probesToPvals a <code>Map</code> value
     * @param input_rank_map a <code>Map</code> value
     */
-   public void classPvalGenerator( Map group_pval_map, Map probesToPvals,
-         Map input_rank_map ) {
+   public void classPvalGenerator( Map group_pval_map, Map probesToPvals ) {
       Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->
 
       Iterator it = entries.iterator(); // the classes.
 
       OraPvalGenerator cpv = new OraPvalGenerator( settings, geneAnnots, csc,
-            numOverThreshold, numUnderThreshold, goName, probePvalMapper,
+            numOverThreshold, numUnderThreshold, goName,
             inputSize );
 
       // For each class.
@@ -70,14 +68,12 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
          Map.Entry e = ( Map.Entry ) it.next();
          String class_name = ( String ) e.getKey();
          GeneSetResult res = cpv.classPval( class_name, group_pval_map,
-               probesToPvals, input_rank_map );
+               probesToPvals );
          if ( res != null ) {
             results.put( class_name, res );
          }
       }
    }
-
-   /* class_pval_generator */
 
    /**
     * Calculate numOverThreshold and numUnderThreshold for hypergeometric
@@ -93,13 +89,13 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
       double userPval = settings.getPValThreshold();
 
       if ( settings.getDoLog() ) {
-         userPval = -Math.log( userPval )/Math.log(10.0);
+         userPval = -Math.log( userPval ) / Math.log( 10.0 );
       }
 
       Iterator itr = inp_entries.iterator();
       while ( itr.hasNext() ) {
          Map.Entry m = ( Map.Entry ) itr.next();
-         double genePvalue = Double.parseDouble( ( m.getValue() ).toString() ); // todo
+         double genePvalue = ((Double)  m.getValue() ).doubleValue(); 
          // why
          // parsing?
 

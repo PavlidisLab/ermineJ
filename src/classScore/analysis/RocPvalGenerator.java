@@ -10,7 +10,6 @@ import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
-import classScore.data.expClassScore;
 import classScore.data.Histogram;
 
 /**
@@ -28,11 +27,11 @@ import classScore.data.Histogram;
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
    protected int inputSize; /** @todo where is this set? */
-   protected expClassScore probePvalMapper;
+   protected ResamplingExperimentGeneSetScore probePvalMapper;
    protected Histogram histogram;
 
    public RocPvalGenerator( Settings set, GeneAnnotations an,
-         GeneSetSizeComputer csc, GONames gon, Histogram hi, expClassScore pvm ) {
+         GeneSetSizeComputer csc, GONames gon, Histogram hi, ResamplingExperimentGeneSetScore pvm ) {
       super( set, an, csc, gon );
       this.histogram = hi;
       this.probePvalMapper = pvm;

@@ -7,24 +7,28 @@ import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 
 /**
-* Base implementation of pvalue generator
- * <p>Copyright (c) 2004 Columbia University</p>
+ * Base implementation of pvalue generator
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * </p>
+ * 
  * @author Paul Pavlidis
- * @version $Id$
+ * @version $Id: AbstractGeneSetPvalGenerator.java,v 1.3 2004/06/29 23:09:41
+ *          pavlidis Exp $
  */
 
 public abstract class AbstractGeneSetPvalGenerator {
-   
+
    protected Map effectiveSizes = null;
    protected Map actualSizes = null;
    protected GONames goName;
    protected Settings settings;
    protected GeneAnnotations geneAnnots;
    protected GeneSetSizeComputer csc;
-   
+
    public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots,
-           GeneSetSizeComputer csc, GONames gon ) {
-      
+         GeneSetSizeComputer csc, GONames gon ) {
+
       this.settings = set;
       this.geneAnnots = annots;
       this.effectiveSizes = csc.getEffectiveSizes();
@@ -34,5 +38,5 @@ public abstract class AbstractGeneSetPvalGenerator {
          this.goName = gon;
       }
    }
-   
+
 }
