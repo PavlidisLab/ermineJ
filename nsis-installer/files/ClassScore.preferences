@@ -1,0 +1,18 @@
+#
+#Thu Jul 22 01:14:30 EDT 2004
+minClassSize=8
+dataFolder=C\:\\Program Files\\ermineJ\\ermineJ.data
+iterations=10000
+maxClassSize=150
+pValThreshold=0.0010
+analysisMethod=1
+annotFile=C\:\\Program Files\\ermineJ\\ermineJ.data\\HG-U95A.an.txt
+classFolder=C\:\\Program Files\\ermineJ\\ermineJ.data\\genesets
+doLog=true
+geneRepTreatment=1
+classFile=C\:\\Program Files\\ermineJ\\ermineJ.data\\go_200406-termdb.xml
+scoreFile=C\:\\java\\workspace\\ermineJ\\data\\one-way-anova-parsed.txt
+rawFile=C\:\\java\\workspace\\ermineJ\\data\\melanoma_and_sarcomaMAS5.txt
+quantile=50
+rawScoreMethod=0
+scorecol=2
