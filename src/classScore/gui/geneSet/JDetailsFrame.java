@@ -335,26 +335,31 @@ public class JDetailsFrame extends JFrame {
    }
 
    void m_saveFileMenuItem_actionPerformed( ActionEvent e ) {
-
-      // Create a file filter for the file chooser
-//      FileFilter fileFilter = new FileFilter
-      
+            
       // Create a file chooser
       final JFileChooser fc = new JFileChooser();
-      fc.setDialogType( JFileChooser.SAVE_DIALOG );
-//      fc.setFileFilter( fileFilter );
+      String txt = fc.getApproveButtonText();
+      
+      // Create a file filter for the file chooser
+      ImageFileFilter imageFileFilter = new ImageFileFilter();
+      fc.setFileFilter( imageFileFilter );
       fc.setAcceptAllFileFilterUsed( false );
+
+      // Create other save options (e.g. include row and column labels in image)
       JSaveOptions options = new JSaveOptions();
       fc.setAccessory( options );
 
-      int returnVal = fc.showOpenDialog( this );
-
+      int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
          File file = fc.getSelectedFile();
 
-         //This is where a real application would open the file.
+         // Make sure the filename has an image extension
          String filename = file.getPath();
+         if ( ! Util.hasImageExtension( filename ) ) {
+            filename = Util.addImageExtension( filename );
+         }         
+         // Save the color matrix image
          try {
             m_matrixDisplay.saveToFile( filename );
          }
@@ -362,16 +367,12 @@ public class JDetailsFrame extends JFrame {
             System.err.println( "IOException error saving png to " + filename );
          }
 
-         // assume extension for file is <name>.png (add a file filter to ensure this)
-         // change filename to <name>.txt
-         String[] s = filename.split( "." );
-         String extension = s[s.length - 1];
-         String filenameWithoutExtension = filename.substring( filename.length() -
-             extension.length() -
-             1, filename.length() - 1 );
-         filename = filenameWithoutExtension + ".txt";
-
+         // Save the matrix values and the rest of the table to a data file         
+         // change filename extension to .txt or whatever it is we use for data files
+         filename = Util.changeExtension( filename, Util.DEFAULT_DATA_EXTENSION );
+         //
          //saveTableToFile( filename );
+         //
       }
       // else canceled by user
    }
