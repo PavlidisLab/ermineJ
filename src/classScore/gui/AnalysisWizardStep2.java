@@ -3,6 +3,7 @@ package classScore.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -27,6 +28,7 @@ import classScore.Settings;
  * @version $Id$
  */
 public class AnalysisWizardStep2 extends WizardStep {
+    
    AnalysisWizard wiz;
    Settings settings;
    JFileChooser chooser = new JFileChooser();
@@ -44,82 +46,102 @@ public class AnalysisWizardStep2 extends WizardStep {
       wiz.clearStatus();
    }
 
-   //Component initialization
-   protected void jbInit() {
-      JPanel step2Panel = new JPanel();
-      step2Panel.setPreferredSize( new Dimension( 380, 250 ) );
 
-      //    choose the score file
-      JPanel jPanel8 = new JPanel();
-      jPanel8.setPreferredSize(new Dimension(380, 100) );
-      JLabel jLabel2 = new JLabel();
-      jLabel2.setText( "Gene score file (optional for correlation score):" );
-      jLabel2.setPreferredSize( new Dimension( 370, 15 ) );
-      JButton scoreBrowseButton = new JButton();
-      scoreBrowseButton.setEnabled( true );
-      scoreBrowseButton.setText( "Browse..." );
-      scoreBrowseButton
-            .addActionListener( new AnalysisWizardStep2_scoreBrowseButton_actionAdapter(
-                  this ) );
+    protected void jbInit(){
+      //  initialization
+      JPanel step2Panel = new JPanel();
+      step2Panel.setLayout(new GridLayout(5,1));
+      //  panel 1
+      JPanel jPanel1 = new JPanel();
+      JLabel jLabel1 = new JLabel();
+      jLabel1.setText("Gene score file (optional for correlation score):" );
+      jPanel1.add(jLabel1,null);
+      
+      // panel 2
+      JPanel jPanel2 = new JPanel();
+      JButton jButton1 = new JButton();
+      jButton1.setEnabled(true);
+      jButton1.setText("Browse");
+      jButton1
+      .addActionListener( new AnalysisWizardStep2_scoreBrowseButton_actionAdapter(
+            this ) );
       scoreFile = new JTextField();
       scoreFile.setPreferredSize( new Dimension( 230, 19 ) );
-      jPanel8.add( jLabel2, null );
-      jPanel8.add( scoreFile, null );
-      jPanel8.add( scoreBrowseButton, null );
-
-      // choose the column the scores are in.
-      JPanel jPanel1 = new JPanel();
-      jPanel1.setPreferredSize(new Dimension(111, 50));
+      jPanel2.add(scoreFile,null);
+      jPanel2.add(jButton1,null);
+      
+      // panel 3
+      JPanel jPanel3 = new JPanel();
+      JLabel jLabel3 = new JLabel();
+      jLabel3.setText( "Score column:" );
       jTextFieldScoreCol = new JTextField();
-      JLabel jLabel10 = new JLabel();
-      jLabel10.setPreferredSize( new Dimension( 100, 15 ) );
-      jLabel10.setLabelFor( jTextFieldScoreCol );
-      jLabel10.setText( "Score column" );
-      jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.RIGHT );
+      jTextFieldScoreCol.setPreferredSize( new Dimension( 30, 19 ) );
+      jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.RIGHT );  //moves textbox text to the right
       jTextFieldScoreCol.setText( "2" );
       jTextFieldScoreCol
-            .setToolTipText( "Column of the gene score file containing the scores. This must be a value of 2 or higher." );
-      jTextFieldScoreCol.setPreferredSize( new Dimension( 30, 19 ) );
-      jTextFieldScoreCol.setEditable( true );
-
-      jPanel1.add(jLabel10, null);
-      jPanel1.add(jTextFieldScoreCol, null);
-
-      // Raw data file.
-      JPanel jPanel11 = new JPanel();
-      jPanel11.setPreferredSize(new Dimension(380, 100) );
-      JLabel jLabel3 = new JLabel();
-      jLabel3.setText( "Raw data file (optional for ORA or resampling):" );
-      jLabel3.setPreferredSize( new Dimension( 370, 15 ) );
+            .setToolTipText("Column of the gene score file containing the scores. This must be a value of 2 or higher." );
+      jTextFieldScoreCol.setEditable(true);
+      JLabel jDummyLabel = new JLabel();
+      jPanel3.add(jLabel3, null);
+      jPanel3.add(jTextFieldScoreCol,null);
+      
+      // panel 4
+      JPanel jPanel4 = new JPanel();
+      JLabel jLabel4 = new JLabel();
+      jLabel4.setText("Raw data file (optional for ORA or resampling):" );
+      jPanel4.add(jLabel4, null);
+      
+      // panel 5
+      JPanel jPanel5 = new JPanel();
+      JButton jButton4 = new JButton();
+      jButton4.setEnabled(true);
+      jButton4.setText("Browse");
+      jButton4
+      .addActionListener( new AnalysisWizardStep2_rawBrowseButton_actionAdapter(
+            this ) );
       rawFile = new JTextField();
       rawFile.setPreferredSize( new Dimension( 230, 19 ) );
-      JButton rawBrowseButton = new JButton();
-      rawBrowseButton.setEnabled( true );
-      rawBrowseButton
-            .addActionListener( new AnalysisWizardStep2_rawBrowseButton_actionAdapter(
-                  this ) );
-      rawBrowseButton.setText( "Browse..." );
-      jPanel11.add( jLabel3, null );
-      jPanel11.add( rawFile, null );
-      jPanel11.add( rawBrowseButton, null );
-
-      JPanel jPanel2 = new JPanel();
-      jPanel2.add(jPanel8, null);
-      jPanel2.add(jPanel1, null);
-
-      step2Panel.add(jPanel2, null);
-      step2Panel.add(jPanel11, null);
-
+      jPanel5.add(rawFile,null);
+      jPanel5.add(jButton4,null);
+      
+      // Now create border layouts for each of the rows to get them aligned.
+      JPanel jPanelA = new JPanel();
+      jPanelA.setLayout(new BorderLayout());
+      jPanelA.add(jPanel1,BorderLayout.WEST);
+      
+      JPanel jPanelB = new JPanel();
+      jPanelB.setLayout(new BorderLayout());
+      jPanelB.add(jPanel2,BorderLayout.WEST);
+      jPanelB.add(jPanel3,BorderLayout.CENTER);
+      
+      JPanel jPanelC = new JPanel();
+      jPanelC.setLayout(new BorderLayout());
+      jPanelC.add(jPanel4,BorderLayout.WEST);
+      
+      JPanel jPanelD = new JPanel();
+      jPanelD.setLayout(new BorderLayout());
+      jPanelD.add(jPanel5,BorderLayout.WEST);
+      
+      //MAIN PANEL = GridLayout(BorderLayouts);  GridLayout is (1,6)
+      step2Panel.add(jPanelA,null);
+      step2Panel.add(jPanelB,null);
+      step2Panel.add(jPanelC,null);
+      step2Panel.add(jPanelD,null);
+            
+      
       this
-            .addHelp( "<html><b>Choose the data files to use</b><br>"
-                  + "&quot;Gene scores&quot; refer to a score or p value "
-                  + " associated with each gene in your data set. This "
-                  + "file can have as few as two columns. &quot;Raw data&quot;"
-                  + " refers to the expression profile data, usually a large matrix. "
-                  + "Files must be tab-delimited text. For details, see the user manual." );
+      .addHelp( "<html><b>Choose the data files to use</b><br>"
+            + "&quot;Gene scores&quot; refer to a score or p value "
+            + " associated with each gene in your data set. This "
+            + "file can have as few as two columns. &quot;Raw data&quot;"
+            + " refers to the expression profile data, usually a large matrix. "
+            + "Files must be tab-delimited text. For details, see the user manual." );
       this.addMain( step2Panel );
+      
    }
 
+
+   
    public boolean isReady() {
 
       if ( wiz.getAnalysisType() == Settings.CORR

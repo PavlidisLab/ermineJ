@@ -159,7 +159,8 @@ public class GeneScoreReader {
       if ( num_pvals == 0 ) {
          throw new IllegalStateException(
                "No pvalues found in the file! Please check the file has"
-                     + "the correct plain text format." );
+                     + "the correct plain text format and" 
+                     + "corresponds to the GO xml file." );
       }
 
       if ( messenger != null ) {
