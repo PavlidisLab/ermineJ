@@ -883,6 +883,16 @@ public class classPvalRun {
    }
 
    public static void main(String[] args) {
+      
+      // Check if args have been passed in.
+      if (args.length < 14) {
+         
+         System.err.println( "No filenames have been passed in." );
+         System.err.println( "If you are running this class as your main project " +
+                             "class, you might want to run classScoreGUI instead.");
+         System.exit(1);
+      }
+      
       classScoreStatus m = new classScoreStatus(null);
       try {
          SetupMaps smaps = new SetupMaps(args[0],                   // pbPval file
