@@ -47,9 +47,9 @@ public class OutputPanel extends JScrollPane {
       table.setModel(sorter);
       sorter.setTableHeader(table.getTableHeader());
       this.getViewport().add(table, null);
-      table.getColumnModel().getColumn(0).setPreferredWidth(70);
-      table.getColumnModel().getColumn(2).setPreferredWidth(50);
-      table.getColumnModel().getColumn(3).setPreferredWidth(50);
+      table.getColumnModel().getColumn(0).setPreferredWidth(30);
+      table.getColumnModel().getColumn(2).setPreferredWidth(30);
+      table.getColumnModel().getColumn(3).setPreferredWidth(30);
       table.revalidate();
    }
 

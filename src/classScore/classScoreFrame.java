@@ -27,7 +27,6 @@ public class classScoreFrame
    JMenu classMenu = new JMenu();
    JMenuItem defineClassMenuItem = new JMenuItem();
    JMenuItem modClassMenuItem = new JMenuItem();
-   JMenuItem loadClassMenuItem = new JMenuItem();
    JMenu analysisMenu = new JMenu();
    JMenuItem runAnalysisMenuItem = new JMenuItem();
    JMenuItem loadAnalysisMenuItem = new JMenuItem();
@@ -93,11 +92,6 @@ public class classScoreFrame
       modClassMenuItem.addActionListener( new
                                           classScoreFrame_modClassMenuItem_actionAdapter( this ) );
       modClassMenuItem.setMnemonic( 'M' );
-      loadClassMenuItem.setText( "Load Class Information" );
-      loadClassMenuItem.addActionListener( new
-                                           classScoreFrame_loadClassMenuItem_actionAdapter( this ) );
-      loadClassMenuItem.setMnemonic( 'L' );
-      classMenu.add( loadClassMenuItem );
       classMenu.add( defineClassMenuItem );
       classMenu.add( modClassMenuItem );
       analysisMenu.setText( "Analysis" );
@@ -191,8 +185,8 @@ public class classScoreFrame
          geneData = new GeneAnnotations(settings.getAnnotFile());
          statusMessenger.setStatus( "Initializing gene class mapping" );
          GeneSetMapTools.collapseClasses(geneData.getClassToProbeMap());
-         GeneSetMapTools.hackGeneSetToProbeMap(geneData.getClassToProbeMap());
-         System.err.println("Hacked classToProbe has size: " + geneData.getClassToProbeMap().size());
+         //GeneSetMapTools.hackGeneSetToProbeMap(geneData.getClassToProbeMap());
+         //System.err.println("Hacked classToProbe has size: " + geneData.getClassToProbeMap().size());
          geneData.sortGeneSets();
          statusMessenger.setStatus("Done with setup");
          enableMenus();
@@ -409,29 +403,12 @@ public class classScoreFrame
       showDialog( modframe );
    }
 
-   void loadClassMenuItem_actionPerformed( ActionEvent e ) {
-      showStatus( "Loading" );
-      class runthread
-          extends Thread {
-         public runthread() {}
-
-         public void run() {
-            initialize();
-            showStatus( "Loaded" );
-         }
-      };
-      runner = new runthread();
-      runner.start();
-   }
-
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
       AnalysisWizard awiz = new AnalysisWizard(this);
       awiz.showWizard();
-//      showDialog( awiz );
    }
 
    void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      //oPanel.addColumn("new col");
    }
 
    void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
@@ -528,20 +505,6 @@ class classScoreFrame_modClassMenuItem_actionAdapter
 
    public void actionPerformed( ActionEvent e ) {
       adaptee.modClassMenuItem_actionPerformed( e );
-   }
-}
-
-class classScoreFrame_loadClassMenuItem_actionAdapter
-    implements java.awt.event.
-    ActionListener {
-   classScoreFrame adaptee;
-
-   classScoreFrame_loadClassMenuItem_actionAdapter( classScoreFrame adaptee ) {
-      this.adaptee = adaptee;
-   }
-
-   public void actionPerformed( ActionEvent e ) {
-      adaptee.loadClassMenuItem_actionPerformed( e );
    }
 }
 
