@@ -127,7 +127,7 @@ public class classScoreFrame
       jButtonSavePrefs.addActionListener(new
                                          classScoreFrame_jButtonSavePrefs_actionAdapter(this));
       jLabelStatus.setBorder(null);
-      jPanelStatus.setBackground(Color.white);
+      jPanelStatus.setBackground(SystemColor.control);
       jPanelStatus.setDebugGraphicsOptions(0);
       jPanelStatus.setPreferredSize(new Dimension(534, 33));
       jPanelStatus.setLayout(flowLayout9);
@@ -153,7 +153,7 @@ public class classScoreFrame
           "Determines how the gene scores are combined to make a class score.");
 
       jButtonRun.setToolTipText("");
-      jPanel1.setBackground(Color.white);
+      jPanel1.setBackground(SystemColor.control);
       jPanel1.setForeground(Color.black);
       jPanel1.setDebugGraphicsOptions(0);
       jPanel1.setMaximumSize(new Dimension(2000, 2000));
@@ -168,7 +168,7 @@ public class classScoreFrame
       jButtonLoadResults.setText("Load Results");
       jButtonLoadResults.addActionListener(new
                                            classScoreFrame_jButtonLoadResults_actionAdapter(this));
-      jLabel2.setBackground(Color.white);
+      jLabel2.setBackground(SystemColor.control);
     jLabel2.setMaximumSize(new Dimension(45, 15));
     jLabel2.setMinimumSize(new Dimension(45, 15));
     jLabel2.setToolTipText("File data will be written to or read from.");
@@ -181,7 +181,7 @@ public class classScoreFrame
       jTextFieldScoreCol.setPreferredSize(new Dimension(30, 19));
       jTextFieldScoreCol.setRequestFocusEnabled(true);
       jTextFieldScoreCol.setEditable(true);
-      jPanel14.setBackground(Color.white);
+      jPanel14.setBackground(SystemColor.control);
     jPanel14.setPreferredSize(new Dimension(180, 29));
       jLabel10.setMaximumSize(new Dimension(39, 15));
       jLabel10.setMinimumSize(new Dimension(76, 15));
@@ -189,53 +189,53 @@ public class classScoreFrame
       jLabel10.setToolTipText("");
       jLabel10.setLabelFor(jTextFieldScoreCol);
       jLabel10.setText("Score column");
-    jPanel2.setBackground(Color.white);
+    jPanel2.setBackground(SystemColor.control);
     jPanel2.setEnabled(true);
     jPanel2.setAlignmentY((float) 0.5);
     jPanel2.setMinimumSize(new Dimension(536, 530));
     jPanel2.setOpaque(true);
     jPanel2.setPreferredSize(new Dimension(536, 530));
     jPanel2.setLayout(gridBagLayout2);
-    jPanelFilesGroup.setBackground(Color.white);
+    jPanelFilesGroup.setBackground(SystemColor.control);
     jPanelFilesGroup.setBorder(null);
     jTabbedPane1.setBackground(Color.lightGray);
     jTabbedPane1.setMaximumSize(new Dimension(32767, 32767));
     jTabbedPane1.setMinimumSize(new Dimension(300, 530));
     jTabbedPane1.setPreferredSize(new Dimension(300, 530));
-    jPanelClassScoreMethods.setBackground(Color.white);
+    jPanelClassScoreMethods.setBackground(SystemColor.control);
     jPanelClassScoreMethods.setBorder(null);
     jPanelClassScoreMethods.setLayout(gridBagLayout1);
-    jPanelReplicateTreaments.setBackground(Color.white);
+    jPanelReplicateTreaments.setBackground(SystemColor.control);
     jPanelReplicateTreaments.setBorder(null);
-    jPanelParameterGroup.setBackground(Color.white);
+    jPanelParameterGroup.setBackground(SystemColor.control);
     jPanelParameterGroup.setBorder(null);
     jPanelParameterGroup.setDebugGraphicsOptions(0);
-    jPanelMainControls.setBackground(Color.white);
+    jPanelMainControls.setBackground(SystemColor.control);
     jPanelMainControls.setDebugGraphicsOptions(0);
-    jPanel12.setBackground(Color.white);
-    jPanel11.setBackground(Color.white);
+    jPanel12.setBackground(SystemColor.control);
+    jPanel11.setBackground(SystemColor.control);
     jPanel11.setBorder(null);
-    jCheckBoxDoLog.setBackground(Color.white);
-    jPanel10.setBackground(Color.white);
-    jPanel13.setBackground(Color.white);
-    jRadioButtonMeanReplicates.setBackground(Color.white);
-    jRadioButtonBestReplicates.setBackground(Color.white);
-    jRadioButtonSeparateReplicates.setBackground(Color.white);
+    jCheckBoxDoLog.setBackground(SystemColor.control);
+    jPanel10.setBackground(SystemColor.control);
+    jPanel13.setBackground(SystemColor.control);
+    jRadioButtonMeanReplicates.setBackground(SystemColor.control);
+    jRadioButtonBestReplicates.setBackground(SystemColor.control);
+    jRadioButtonSeparateReplicates.setBackground(SystemColor.control);
 
-    jLabel4.setBackground(Color.white);
+    jLabel4.setBackground(SystemColor.control);
     jLabel4.setMaximumSize(new Dimension(45, 15));
     jLabel4.setMinimumSize(new Dimension(45, 15));
 
-    jLabel1.setBackground(Color.white);
+    jLabel1.setBackground(SystemColor.control);
     jLabel1.setMaximumSize(new Dimension(45, 15));
     jLabel1.setMinimumSize(new Dimension(45, 15));
 
-    jLabel3.setBackground(Color.white);
+    jLabel3.setBackground(SystemColor.control);
     jLabel3.setMaximumSize(new Dimension(45, 15));
     jLabel3.setMinimumSize(new Dimension(45, 15));
 
-    jRadioButtonMedian.setBackground(Color.white);
-    jRadioButtonMean.setBackground(Color.white);
+    jRadioButtonMedian.setBackground(SystemColor.control);
+    jRadioButtonMean.setBackground(SystemColor.control);
 
 
     jMenu1.setText("Classes");
@@ -351,7 +351,7 @@ public class classScoreFrame
           "class.");
 
       jRadioButtonMedian.setText("Median");
-      jTextFieldMinClassSize.setBackground(Color.white);
+      jTextFieldMinClassSize.setBackground(SystemColor.control);
       jTextFieldMinClassSize.setPreferredSize(new Dimension(30, 19));
       jTextFieldMinClassSize.setToolTipText(
           "Smallest class size to be considered");
@@ -393,16 +393,16 @@ public class classScoreFrame
       jPanelFilesGroup.setToolTipText("");
       jPanelFilesGroup.setLayout(flowLayout1);
 
-      jPanelGeneScoreGroup.setBackground(Color.white);
+      jPanelGeneScoreGroup.setBackground(SystemColor.control);
       jPanelGeneScoreGroup.setPreferredSize(new Dimension(510, 35));
       jPanelOuputGroup.setLayout(flowLayout3);
-      jPanelOuputGroup.setBackground(Color.white);
+      jPanelOuputGroup.setBackground(SystemColor.control);
       jPanelOuputGroup.setMinimumSize(new Dimension(250, 35));
       jPanelOuputGroup.setPreferredSize(new Dimension(510, 35));
-      jPanelGONamesGroup.setBackground(Color.white);
+      jPanelGONamesGroup.setBackground(SystemColor.control);
       jPanelGONamesGroup.setPreferredSize(new Dimension(510, 35));
       jPanelGONamesGroup.setLayout(flowLayout4);
-      jPanelProbeMapGroup.setBackground(Color.white);
+      jPanelProbeMapGroup.setBackground(SystemColor.control);
       jPanelProbeMapGroup.setMinimumSize(new Dimension(250, 35));
       jPanelProbeMapGroup.setPreferredSize(new Dimension(510, 35));
       jPanelProbeMapGroup.setLayout(flowLayout5);

@@ -45,8 +45,6 @@ public class ResultPanel extends JScrollPane {
    }
 
    public void setModel(TableModel m) {
-      //jTable1.setModel(m);
-
       SortFilterModel sorter = new SortFilterModel(m);
       jTable1.setModel(sorter);
       jTable1.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -61,7 +59,6 @@ public class ResultPanel extends JScrollPane {
       jTable1.getColumnModel().getColumn(2).setPreferredWidth(200);
       jTable1.getColumnModel().getColumn(3).setPreferredWidth(30);
       jTable1.getColumnModel().getColumn(4).setPreferredWidth(30);
-
    }
 
    void jTable1_mouseReleased(MouseEvent e) {

@@ -1,7 +1,7 @@
 package classScore;
 
 import java.util.*;
-
+import javax.swing.event.*;
 import javax.swing.table.*;
 
 /**
@@ -64,5 +64,4 @@ public class SortFilterModel
          }
       }
    }
-
-}
+ }

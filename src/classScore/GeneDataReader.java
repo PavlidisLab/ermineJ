@@ -15,7 +15,7 @@ import java.util.*;
 public class GeneDataReader {
    private Map probeToClassMap; //stores probe->Classes map
    private Map classToProbeMap; //stores Classes->probe map
-   private Map probeToGeneName;
+   private Map probeToGeneName; // same as probeGroupMap
    private Map probeToDescription;
    private Map probeGroupMap;
    private Map groupProbeList;
@@ -142,6 +142,10 @@ public class GeneDataReader {
 
    public String getProbeDescription(String p) {
       return (String) probeToDescription.get(p);
+   }
+
+   public ArrayList getGeneProbeList(String g) {
+      return (ArrayList) groupProbeList.get(g);
    }
 
    public static void main(String[] args) {
