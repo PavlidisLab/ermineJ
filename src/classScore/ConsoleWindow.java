@@ -1,22 +1,20 @@
 package classScore;
+
 /**
    @version 1.00 2000-06-07
    @author Cay Horstmann
-*/
+ */
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
 import java.io.*;
+
+import javax.swing.*;
 
 /**
    A window that displays the bytes sent to System.out
    and System.err
-*/
-public class ConsoleWindow
-{
-   public static void init()
-   {
+ */
+public class ConsoleWindow {
+   public static void init() {
       JFrame frame = new JFrame();
       frame.setTitle("ConsoleWindow");
       final JTextArea output = new JTextArea();
@@ -29,14 +27,13 @@ public class ConsoleWindow
       // define a PrintStream that sends its bytes to the
       // output text area
       PrintStream consoleStream = new PrintStream(new
-         OutputStream()
-         {
-            public void write(int b) {} // never called
-            public void write(byte[] b, int off, int len)
-            {
-               output.append(new String(b, off, len));
-            }
-         });
+                                                  OutputStream() {
+         public void write(int b) {} // never called
+
+         public void write(byte[] b, int off, int len) {
+            output.append(new String(b, off, len));
+         }
+      });
 
       // set both System.out and System.err to that stream
       System.setOut(consoleStream);

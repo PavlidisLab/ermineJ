@@ -1,7 +1,7 @@
 package classScore;
 
-import java.awt.EventQueue;
-import javax.swing.JLabel;
+import java.awt.*;
+import javax.swing.*;
 
 /**
  * <p>Title: </p>
@@ -13,28 +13,27 @@ import javax.swing.JLabel;
  */
 
 public class classScoreStatus {
-  private JLabel l;
+   private JLabel l;
 
-  public classScoreStatus(JLabel l) {
-    this.l = l;
-  }
+   public classScoreStatus(JLabel l) {
+      this.l = l;
+   }
 
-  public void setStatus(String s) {
-    final String message = s;
+   public void setStatus(String s) {
+      final String message = s;
 
-    try {
-      Thread.sleep(100);
-    }
-    catch (InterruptedException ex) {
-    }
-
-    EventQueue.invokeLater(new Runnable()
-    {
-      public void run() {
-        if (l != null) {
-          l.setText(message);
-        }
+      try {
+         Thread.sleep(100);
       }
-    });
-  }
+      catch (InterruptedException ex) {
+      }
+
+      EventQueue.invokeLater(new Runnable() {
+         public void run() {
+            if (l != null) {
+               l.setText(message);
+            }
+         }
+      });
+   }
 }
