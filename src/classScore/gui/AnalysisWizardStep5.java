@@ -141,21 +141,21 @@ public class AnalysisWizardStep5 extends WizardStep {
       oraPanel.add( jPanel15, null );
 
       //resampPanel stuff///////////////////////////////////////////////////////
-      resampPanel.setPreferredSize( new Dimension( 355, 150 ) );
+      resampPanel.setPreferredSize( new Dimension( 355, 180 ) );
       resampTitledBorder = new TitledBorder( "Resampling" );
       resampPanel.setBorder( resampTitledBorder );
       jPanel14.setPreferredSize( new Dimension( 110, 29 ) );
       jPanel14.setBackground( SystemColor.control );
 
       jPanel13.setBorder( null );
-      jPanel13.setPreferredSize( new Dimension( 160, 29 ) );
-      jLabel13.setMaximumSize( new Dimension( 39, 15 ) );
+      jPanel13.setPreferredSize( new Dimension( 200, 60 ) );
+      jLabel13.setMaximumSize( new Dimension( 100, 15 ) );
       jLabel13.setLabelFor( jTextFieldIterations );
-      jLabel13.setText( "Iterations to run" );
+      jLabel13.setText( "Maximum iterations to run" );
       jTextFieldIterations.setHorizontalAlignment( SwingConstants.RIGHT );
-      jTextFieldIterations.setText( "10" );
+      jTextFieldIterations.setText( "10000" );
       jTextFieldIterations
-            .setToolTipText( "Number of iterations program will run for." );
+            .setToolTipText( "Maximum number of iterations run per gene set size." );
       jTextFieldIterations.setPreferredSize( new Dimension( 70, 19 ) );
       jTextFieldIterations.setEditable( true );
       jPanel13.add( jLabel13, null );

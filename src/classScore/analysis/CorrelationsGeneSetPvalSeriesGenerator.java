@@ -36,7 +36,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
 
    private Histogram hist;
    private CorrelationPvalGenerator probeCorrelData;
-   private Map probeToGeneSetMap; // stores probe->go Hashtable
+  // private Map probeToGeneSetMap; // stores probe->go Hashtable
    private Map geneSetToProbeMap; // stores go->probe Hashtable
    private Map results;
    private DenseDoubleMatrix2DNamed rawData;
@@ -66,7 +66,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
       this.probeCorrelData = new CorrelationPvalGenerator( settings,
             geneAnnots, csc, gon, rawData ); // main data file
       this.geneAnnots = geneAnnots;
-      this.probeToGeneSetMap = geneAnnots.getProbeToClassMap();
+   //   this.probeToGeneSetMap = geneAnnots.getProbeToClassMap();
       this.geneSetToProbeMap = geneAnnots.getClassToProbeMap();
 
       this.hist = hist;
@@ -88,15 +88,15 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
       for ( Iterator it = geneSetToProbeMap.entrySet().iterator(); it.hasNext(); ) {
          Map.Entry e = ( Map.Entry ) it.next();
          ArrayList probesInSet = ( ArrayList ) e.getValue();
-         String class_name = ( String ) e.getKey();
-         int effSize = ( ( Integer ) effectiveSizes.get( class_name ) )
+         String geneSetName = ( String ) e.getKey();
+         int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) )
                .intValue();
 
          if ( effSize < probeCorrelData.getMinGeneSetSize() ) {
             continue; // then there is no hope.
          }
 
-         //this calculation is done just in case the hashtable has no value
+         // this calculation is done just in case the hashtable has no value
          // for an element...hence we keep track of the number of elements
          // with values and then create a Matrix to be used for correlation
          // based on that
@@ -151,7 +151,6 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
                      irow, jrow ) );
 
                if ( setting == Settings.BEST_PVAL ) {
-                  
                   if ( !values.containsKey( genei + "___" + genej ) || ( ( Double ) values.get( genei + "___" + genej ) )
                         .doubleValue() < corr ) { 
                      values.put( ( genei + "___" + genej ), new Double( corr ) );
@@ -165,10 +164,8 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
                } else {
                   throw new IllegalStateException("Unknown method.");
                }
-              
             }
          }
-
          
          if ( setting == Settings.BEST_PVAL ) {
             avecorrel = 0.0;
@@ -181,45 +178,14 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
 
          double geneSetMeanCorrel = avecorrel / nummeas;
 
-         //         for ( Iterator vit = probesInSet.iterator(); vit.hasNext(); ) {
-         //            String probe = ( String ) vit.next();
-         //            //check if element exists in map
-         //            if ( probeCorrelData.containsRow( probe ) ) {
-         //
-         //               double[] rawCorrelations = rawData.getRowByName( probe );
-         //
-         //               if ( rawCorrelations.length > 0 ) {
-         //                  if ( V == null ) {
-         //                     //create a new Matrix so as to add each row of data
-         //                     // for a particular probe in matrix
-         //                     V = new DenseDoubleMatrix2DNamed( classSize,
-         //                           rawCorrelations.length );
-         //                  }
-         //
-         //                  // store value in intermediate Matrix which is used to
-         //                  // do correlation calculation
-         //                  int j = 0;
-         //                  for ( int i = 0; i < rawCorrelations.length; i++ ) {
-         //                     V.setQuick( index, j, rawCorrelations[i] );
-         //                     j++;
-         //                  }
-         //                  index++;
-         //               }
-         //            }
-         //         }
-         //
-         //         if ( V == null ) {
-         //            continue;
-         //         }
-         //
-         //         DenseDoubleMatrix2DNamed C = MatrixStats.correlationMatrix( V );
-         //         double geneSetMeanCorrel = probeCorrelData.geneSetMeanCorrel( C );
-         GeneSetResult result = new GeneSetResult( class_name, goName
-               .getNameForId( class_name ), ( ( Integer ) actualSizes
-               .get( class_name ) ).intValue(), effSize );
+         GeneSetResult result = new GeneSetResult( geneSetName, goName
+               .getNameForId( geneSetName ), ( ( Integer ) actualSizes
+               .get( geneSetName ) ).intValue(), effSize );
          result.setScore( geneSetMeanCorrel );
-         result.setPValue( hist.getValue( classSize, geneSetMeanCorrel ) );
-         results.put( class_name, result );
+         result.setPValue( hist.getValue( classSize, geneSetMeanCorrel ) );     
+         results.put( geneSetName, result );
+     //    System.err.println(geneSetName + " " + hist.getValue(  classSize, geneSetMeanCorrel ) + " "   + classSize + " " + geneSetMeanCorrel);
+         count++;
       }
    }
 }

@@ -27,6 +27,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import corejava.Format;
+
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
@@ -270,9 +272,10 @@ public class OutputPanel extends JScrollPane {
       table.revalidate();
    }
 
-   public void addInitialData( GeneAnnotations geneData, GONames goData ) {
-      this.geneData = geneData;
-      this.goData = goData;
+   public void addInitialData( GeneAnnotations initialGeneData,
+         GONames initialGoData ) {
+      this.geneData = initialGeneData;
+      this.goData = initialGoData;
       model.addInitialData( geneData, goData );
       classColToolTip = new String( "Total classes shown: "
             + geneData.selectedSets() );
@@ -490,7 +493,6 @@ class OutputTableModel extends AbstractTableModel {
 
    public OutputTableModel( LinkedList results ) {
       this.results = results;
-      nf.setMaximumFractionDigits( 3 );
       columnNames.add( "Name" );
       columnNames.add( "Description" );
       columnNames.add( "# of Probes" );
@@ -572,8 +574,7 @@ class OutputTableModel extends AbstractTableModel {
             case 0: {
                Vector cid_vec = new Vector();
                cid_vec.add( classid );
-               if ( goData.newSet( classid ) )
-                     cid_vec.add( new String( "M" ) );
+               if ( goData.newSet( classid ) ) cid_vec.add( "M" );
                return cid_vec;
             }
             case 1:
@@ -606,21 +607,23 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
 
    static final Color goParent = Color.LIGHT_GRAY;
    static final Color goChild = Color.YELLOW;
-   
+
    static final Color LIGHTBLUE5 = new Color( 210, 220, 220 );
    static final Color LIGHTBLUE4 = new Color( 160, 220, 215 );
    static final Color LIGHTBLUE3 = new Color( 115, 220, 195 );
    static final Color LIGHTBLUE2 = new Color( 65, 220, 185 );
    static final Color LIGHTBLUE1 = new Color( 0, 220, 170 );
-   
+
    static final Color PINK = new Color( 220, 160, 220 );
-   private NumberFormat nf = NumberFormat.getInstance();
+   private Format nf = new Format("%g" ); // for the gene set p value.
+   private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 
    public OutputPanelTableCellRenderer( GONames goData, LinkedList results ) {
       super();
       this.goData = goData;
       this.results = results;
-      nf.setMaximumFractionDigits( 7 );
+      
+      nff.setMaximumFractionDigits( 4 );
    }
 
    public Component getTableCellRendererComponent( JTable table, Object value,
@@ -631,7 +634,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       // set cell text
       if ( value != null ) {
          if ( value.getClass().equals( ArrayList.class ) ) // pvalues and ranks.
-            setText( nf.format( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) )
+            setText( nf.form( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) )
                   .doubleValue() ) );
          else if ( value.getClass().equals( Vector.class ) ) // class ids.
             setText( ( String ) ( ( Vector ) value ).get( 0 ) );
@@ -663,7 +666,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             } else if ( res.getPvalue_corr() < 0.01 ) {
                setBackground( LIGHTBLUE2 );
             } else if ( res.getPvalue_corr() < 0.05 ) {
-               setBackground( LIGHTBLUE3);
+               setBackground( LIGHTBLUE3 );
             } else if ( res.getPvalue_corr() < 0.1 ) {
                setBackground( LIGHTBLUE5 );
             } else {
@@ -687,7 +690,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: "
-                  + nf.format( res.getScore() ) );
+                  + nff.format( res.getScore() ) );
          }
       } else {
          setToolTipText( null );

@@ -36,7 +36,15 @@ public class GeneSetTableModel extends AbstractTableModel {
          "Probe", "Score", "Score", "Symbol", "Name"
    };
 
-   /** constructor */
+   /**
+    * 
+    * @param matrixDisplay
+    * @param probeIDs
+    * @param pvalues
+    * @param pvaluesOrdinalPosition
+    * @param geneData
+    * @param nf
+    */
    public GeneSetTableModel( JMatrixDisplay matrixDisplay, ArrayList probeIDs,
          Map pvalues, Map pvaluesOrdinalPosition, GeneAnnotations geneData,
          DecimalFormat nf ) {

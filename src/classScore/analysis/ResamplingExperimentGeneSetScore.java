@@ -13,6 +13,8 @@ import baseCode.math.RandomChooser;
 import baseCode.math.Rank;
 import baseCode.math.Stats;
 import baseCode.util.StatusViewer;
+import cern.colt.list.DoubleArrayList;
+import cern.jet.stat.Descriptive;
 import classScore.Settings;
 import classScore.data.GeneScoreReader;
 import classScore.data.Histogram;
@@ -28,7 +30,7 @@ public class ResamplingExperimentGeneSetScore extends
       AbstractResamplingGeneSetScore {
    private double[] groupPvals = null; // pvalues for groups.
    private double[] pvals = null; // pvalues for probes.
-   private Map groupPvalMap; // groups -> pvalues
+  
    private Map probePvalMap; // probes -> pval
    private boolean useWeights;
    private static int quantile = 50;
@@ -71,30 +73,45 @@ public class ResamplingExperimentGeneSetScore extends
          deck[i] = i;
       }
 
-      for ( int i = classMinSize; i <= classMaxSize; i++ ) {
-         double[] random_class = new double[i]; // holds data for random class.
+      double oldnd = Double.MAX_VALUE;
+     
+      for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
+         double[] random_class = new double[geneSetSize]; // holds data for random class.
          double rawscore = 0.0;
+         DoubleArrayList values = new DoubleArrayList(); 
          for ( int k = 0; k < numRuns; k++ ) {
             RandomChooser.chooserandom( random_class, in_pval, deck, num_genes,
-                  i );
-            rawscore = calc_rawscore( random_class, i, method );
-            hist.update( i - classMinSize, rawscore );
-            Thread.yield();
+                  geneSetSize );
+            rawscore = calc_rawscore( random_class, geneSetSize, method );
+            values.add(rawscore);
+            hist.update( geneSetSize , rawscore );
+            if ( k > 0 && k % 1000 == 0 ) {
+               Thread.yield();
+
+               double mean = Descriptive.mean(values);
+               double variance = Descriptive.variance(values.size(), Descriptive.sum(values), Descriptive.sumOfSquares(values));
+               double nd = normalDeviation( mean, variance, geneSetSize);
+ 
+               if (Math.abs(oldnd - nd) <= TOLERANCE) {
+                  hist.addExactNormalProbabilityComputer(geneSetSize, mean, variance);
+                  System.err.println("Class size: " + geneSetSize + " - Reached convergence to normal after " + k + " iterations.");
+                  break; // stop simulation of this class size.
+               }
+               oldnd = nd;
+            }
          }
 
          try {
             Thread.sleep( 10 );
          } catch ( InterruptedException e ) {
-
          }
 
          if ( m != null ) {
-            m.setStatus( "Currently running class size " + i );
+            m.setStatus( "Currently running class size " + geneSetSize );
          }
       }
 
       hist.tocdf();
-
       return hist;
    }
 
@@ -122,7 +139,7 @@ public class ResamplingExperimentGeneSetScore extends
       pvals = geneScores.getPvalues(); // array of pvalues.
       groupPvals = geneScores.getGroupPvalues();
       probePvalMap = geneScores.getProbeToPvalMap(); // reference to the probe -> pval map.
-      groupPvalMap = geneScores.getGeneToPvalMap(); // this gets initialized by set_input_pvals
+     
 
       this.setHistogramRange(); // figure out the max pvalue possible.
       this.hist = new Histogram( numClasses, classMinSize, numRuns,

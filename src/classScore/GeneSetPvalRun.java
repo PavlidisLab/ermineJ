@@ -236,9 +236,9 @@ public class GeneSetPvalRun {
       //   System.out.println( name );
       Map classToProbe = geneData.getClassToProbeMap();
 
-      final ArrayList probeIDs = ( ArrayList ) classToProbe.get( classID );
-
-      final Map pvals = new HashMap();
+      ArrayList probeIDs = ( ArrayList ) classToProbe.get( classID );
+      Map pvals = new HashMap();
+      
       for ( int i = 0, n = probeIDs.size(); i < n; i++ ) {
          Double pvalue;
          String probeID = ( String ) probeIDs.get( i );

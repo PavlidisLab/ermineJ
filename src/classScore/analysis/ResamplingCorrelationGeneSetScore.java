@@ -7,6 +7,9 @@ import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.matrix.SparseDoubleMatrix2DNamed;
 import baseCode.math.RandomChooser;
 import baseCode.util.StatusViewer;
+import cern.colt.list.DoubleArrayList;
+import cern.jet.stat.Descriptive;
+import cern.jet.stat.Probability;
 import classScore.Settings;
 import classScore.data.Histogram;
 
@@ -31,6 +34,9 @@ public class ResamplingCorrelationGeneSetScore extends
 
    private double[][] selfSquaredMatrix;
 
+   private static final int SPEEDUPSIZECUT = 20;
+   private static final double SPEDUPSIZEEXTRASTEP = 0.1;
+
    /**
     * @param dataMatrix
     */
@@ -42,8 +48,9 @@ public class ResamplingCorrelationGeneSetScore extends
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();
       data = dataMatrix;
-      int numGeneSets = classMaxSize - classMinSize + 1;
-      this.hist = new Histogram( numGeneSets, classMinSize, numRuns, 1.0, 0.0 );
+      int numGeneSetSizes = classMaxSize - classMinSize + 1;
+      this.hist = new Histogram( numGeneSetSizes, classMinSize, numRuns, 1.0,
+            0.0 );
    }
 
    /**
@@ -60,36 +67,62 @@ public class ResamplingCorrelationGeneSetScore extends
       int[] deck = new int[data.rows()];
 
       dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much.
-     
+
       for ( int j = 0; j < data.rows(); j++ ) {
          double[] rowValues = data.getRow( j );
          dataAsRawMatrix[j] = rowValues;
          deck[j] = j;
       }
-      selfSquaredMatrix = selfSquaredMatrix(dataAsRawMatrix);
-      
-      for ( int i = classMinSize; i <= classMaxSize; i++ ) {
-         int[] randomnums = new int[i];
+      selfSquaredMatrix = selfSquaredMatrix( dataAsRawMatrix );
+
+      for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
+         int[] randomnums = new int[geneSetSize];
 
          if ( messenger != null ) {
-            messenger.setStatus( "Currently running class size " + i );
+            messenger.setStatus( "Currently running class size " + geneSetSize );
          }
 
+         double oldnd = Double.MAX_VALUE;
+         DoubleArrayList values = new DoubleArrayList();
          for ( int j = 0; j < numRuns; j++ ) {
-            RandomChooser.chooserandom( randomnums, deck, data.rows(), i );
+            RandomChooser.chooserandom( randomnums, deck, data.rows(),
+                  geneSetSize );
             double avecorrel = geneSetMeanCorrel( randomnums, correls );
-            hist.update( i - classMinSize, avecorrel );
-            if ( j % 100 == 0 ) {
-               Thread.yield();
+            values.add( avecorrel );
+            hist.update( geneSetSize, avecorrel );
 
-               // estimate a normal distribution
+            if ( j > 0 && j % 200 == 0 ) {
+               double mean = Descriptive.mean( values );
+               double variance = Descriptive.variance( values.size(),
+                     Descriptive.sum( values ), Descriptive
+                           .sumOfSquares( values ) );
+               double nd = normalDeviation( mean, variance, geneSetSize );
+
+               if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
+                  hist.addExactNormalProbabilityComputer( geneSetSize, mean,
+                        variance );
+                  System.err.println( "Class size: " + geneSetSize
+                        + " - Reached convergence to normal after " + j
+                        + " iterations." );
+                  break; // stop simulation of this class size.
+               }
+               oldnd = nd;
+            }
+
+            if ( j % 10 == 0 ) {
+               try {
+                  Thread.sleep( 1 );
+               } catch ( InterruptedException e ) {
+               }
             }
          }
 
-         try {
-            Thread.sleep( 10 );
-         } catch ( InterruptedException e ) {
-
+         /*
+          * To improve performance, after a certain gene set size has been surpassed, don't do every size. The
+          * distributions are very similar.
+          */
+         if ( geneSetSize >= SPEEDUPSIZECUT ) {
+            geneSetSize += Math.floor( SPEDUPSIZEEXTRASTEP * geneSetSize );
          }
 
       }
@@ -125,7 +158,8 @@ public class ResamplingCorrelationGeneSetScore extends
 
             double[] jrow = dataAsRawMatrix[indicesToSelect[j]];
 
-            double corr = Math.abs( correlation( irow, jrow, selfSquaredMatrix, indicesToSelect[i],indicesToSelect[j] ) );
+            double corr = Math.abs( correlation( irow, jrow, selfSquaredMatrix,
+                  indicesToSelect[i], indicesToSelect[j] ) );
             //         correls.setQuick( row1, row2, corr ); // too much memory.
             //       correls.setQuick( row2, row1, corr );
             //      }
@@ -139,7 +173,8 @@ public class ResamplingCorrelationGeneSetScore extends
 
    // special optimized version of correlation computation for this.
 
-   private static double correlation( double[] x, double[] y , double[][] selfSquaredMatrix, int a, int b) {
+   private static double correlation( double[] x, double[] y,
+         double[][] selfSquaredMatrix, int a, int b ) {
       double syy, sxy, sxx, sx, sy, xj, yj, ay, ax;
       int numused = 0;
       syy = 0.0;
@@ -159,10 +194,10 @@ public class ResamplingCorrelationGeneSetScore extends
          sx += xj;
          sy += yj;
          sxy += xj * yj;
-//         sxx += xj * xj;
-//         syy += yj * yj;
-         sxx+=selfSquaredMatrix[a][j];
-         syy+=selfSquaredMatrix[b][j];
+         //         sxx += xj * xj;
+         //         syy += yj * yj;
+         sxx += selfSquaredMatrix[a][j];
+         syy += selfSquaredMatrix[b][j];
          numused++;
       }
 

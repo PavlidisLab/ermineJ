@@ -7,15 +7,21 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -62,80 +68,58 @@ import classScore.gui.JHistViewer;
  */
 public class JGeneSetFrame extends JFrame {
 
-   final int PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN = 6;
+   private static final String WINDOWHEIGHT = "WindowHeight";
+   private static final String WINDOWWIDTH = "WindowWidth";
+   private static final String MATRIXCOLUMNWIDTH = "ColumnWidth";
 
-   final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
+   private static final String GUI_PREFS = "GUI.prefs";
+   private Properties properties;
+   private String pref_file;
 
-   final int MAX_WIDTH_MATRIXDISPLAY_COLUMN = 19;
-
-   final int PREFERRED_WIDTH_PROBEID_COLUMN = 75;
-
-   final int PREFERRED_WIDTH_PVALUE_COLUMN = 75;
-
-   final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
-
-   final int PREFERRED_WIDTH_GENENAME_COLUMN = 75;
-
-   final int PREFERRED_WIDTH_DESCRIPTION_COLUMN = 300;
-
-   final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
-
-   final int COLOR_RANGE_SLIDER_MIN = 1;
-
-   final int NORMALIZED_COLOR_RANGE_MAX = 12; // [-6,6] standard deviations out
+   private static final int DEFAULT_WIDTH_MATRIXDISPLAY_COLUMN = 6;
+   private static final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
+   private static final int MAX_WIDTH_MATRIXDISPLAY_COLUMN = 19;
+   private static final int PREFERRED_WIDTH_PROBEID_COLUMN = 75;
+   private static final int PREFERRED_WIDTH_PVALUE_COLUMN = 75;
+   private static final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
+   private static final int PREFERRED_WIDTH_GENENAME_COLUMN = 75;
+   private static final int PREFERRED_WIDTH_DESCRIPTION_COLUMN = 300;
+   private static final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
+   private static final int COLOR_RANGE_SLIDER_MIN = 1;
+   private static final int NORMALIZED_COLOR_RANGE_MAX = 12; // [-6,6] standard deviations out
 
    public JMatrixDisplay m_matrixDisplay = null;
-
    protected JScrollPane m_tableScrollPane = new JScrollPane();
-
    protected JTable m_table = new JTable();
-
    protected BorderLayout borderLayout1 = new BorderLayout();
-
    protected JToolBar m_toolbar = new JToolBar();
 
-   /** controls the width of the cells in the matrix display */
    JSlider m_cellWidthSlider = new JSlider();
-
+   /** controls the width of the cells in the matrix display */
    JMenuBar m_menuBar = new JMenuBar();
-
    JMenu m_fileMenu = new JMenu();
-
    JRadioButtonMenuItem m_greenredColormapMenuItem = new JRadioButtonMenuItem();
-
    JMenu m_viewMenu = new JMenu();
-
    JMenu m_analysisMenu = new JMenu();
-
    JMenuItem m_viewHistMenuItem = new JMenuItem();
-
    JRadioButtonMenuItem m_blackbodyColormapMenuItem = new JRadioButtonMenuItem();
-
    JMenuItem m_saveImageMenuItem = new JMenuItem();
-
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
-
    DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
-
    JLabel m_cellWidthLabel = new JLabel();
-
    JLabel m_spacerLabel = new JLabel();
-
    JLabel m_colorRangeLabel = new JLabel();
-
    JSlider m_colorRangeSlider = new JSlider();
-
    JGradientBar m_gradientBar = new JGradientBar();
-
    JMenuItem m_saveDataMenuItem = new JMenuItem();
-
    HashMap m_pvaluesOrdinalPosition = new HashMap();
 
    private Settings settings;
- 
    private GeneSetPvalRun analysisResults;
-
    private GeneSetResult classResults;
+   private int width;
+   private int height;
+   private int matrixColumnWidth; // how wide the color image columns are.
 
    /**
     * @param res
@@ -148,28 +132,65 @@ public class JGeneSetFrame extends JFrame {
     *        for the probe ID's contained in <code>probeIDs</code>.
     */
    public JGeneSetFrame( ArrayList probeIDs, Map pvalues,
-         GeneAnnotations geneData, Settings settings, GeneSetPvalRun run, GeneSetResult res ) {
+         GeneAnnotations geneData, Settings settings, GeneSetPvalRun run,
+         GeneSetResult res ) {
       try {
          String filename = settings.getRawFile();
-         createDetailsTable( probeIDs, pvalues, geneData, filename );
          this.settings = settings;
          this.analysisResults = run;
          this.classResults = res;
+
+         readPrefs();
+         createDetailsTable( probeIDs, pvalues, geneData, filename );
          jbInit();
       } catch ( Exception e ) {
          e.printStackTrace();
       }
    }
-   
-   
-   
+
+   private void readPrefs() {
+      pref_file = settings.getDataFolder()
+            + System.getProperty( "file.separator" ) + GUI_PREFS;
+      width = 800;
+      height = m_table.getHeight();
+      matrixColumnWidth = DEFAULT_WIDTH_MATRIXDISPLAY_COLUMN;
+
+      properties = new Properties();
+
+      try {
+         File fi = new File( pref_file );
+         if ( fi.canRead() ) {
+            InputStream f = new FileInputStream( pref_file );
+            properties.load( f );
+            f.close();
+            if ( properties.containsKey( WINDOWWIDTH ) )
+                  width = Integer.parseInt( properties
+                        .getProperty( WINDOWWIDTH ) );
+
+            if ( properties.containsKey( WINDOWHEIGHT ) )
+                  height = Integer.parseInt( properties
+                        .getProperty( WINDOWHEIGHT ) );
+
+            if ( properties.containsKey( MATRIXCOLUMNWIDTH ) )
+                  matrixColumnWidth = Integer.parseInt( properties
+                        .getProperty( MATRIXCOLUMNWIDTH ) );
+
+         }
+      } catch ( IOException ex ) {
+         ex.printStackTrace();
+      }
+   }
+
    private void jbInit() throws Exception {
 
-      setSize( 800, m_table.getHeight() );
+      setSize( width, height );
       setResizable( false );
       setLocation( 200, 100 );
       getContentPane().setLayout( borderLayout1 );
       setDefaultCloseOperation( DISPOSE_ON_CLOSE );
+
+      // Listener for window closing events.
+      this.addWindowListener( new JGeneSetFrame_windowListenerAdapter( this ) );
 
       // Enable the horizontal scroll bar
       m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
@@ -226,7 +247,6 @@ public class JGeneSetFrame extends JFrame {
                   this ) );
 
       m_analysisMenu.setText( "Analysis" );
-     
 
       m_viewHistMenuItem.setActionCommand( "View Distribution" );
       m_viewHistMenuItem.setText( "View distribution" );
@@ -241,12 +261,12 @@ public class JGeneSetFrame extends JFrame {
       m_fileMenu.add( m_saveImageMenuItem );
       m_fileMenu.add( m_saveDataMenuItem );
       m_analysisMenu.add( m_viewHistMenuItem );
-      
+
       m_cellWidthSlider.setInverted( false );
       m_cellWidthSlider.setMajorTickSpacing( 0 );
       m_cellWidthSlider.setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
       m_cellWidthSlider.setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_cellWidthSlider.setValue( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
+      m_cellWidthSlider.setValue( matrixColumnWidth );
       m_cellWidthSlider.setMinorTickSpacing( 3 );
       m_cellWidthSlider.setPaintLabels( false );
       m_cellWidthSlider.setPaintTicks( true );
@@ -296,9 +316,8 @@ public class JGeneSetFrame extends JFrame {
 
       m_menuBar.add( m_fileMenu );
       m_menuBar.add( m_viewMenu );
-      
-      
-       //m_menuBar.add( m_analysisMenu );
+
+      //m_menuBar.add( m_analysisMenu );
 
       // Color map menu items (radio button group -- only one can be selected at one time)
       ButtonGroup group = new ButtonGroup();
@@ -327,7 +346,7 @@ public class JGeneSetFrame extends JFrame {
       if ( settings.getClassScoreMethod() == Settings.ORA ) {
          m_analysisMenu.setEnabled( false );
       } else {
-         m_analysisMenu.setEnabled(true);
+         m_analysisMenu.setEnabled( true );
       }
 
       // the toolbar
@@ -349,9 +368,9 @@ public class JGeneSetFrame extends JFrame {
       //
 
       // create a probe set from probeIDs
-      HashSet probeSet = new HashSet();
+      HashSet probesInGeneSet = new HashSet();
       for ( int i = 0; i < probeIDs.size(); i++ ) {
-         probeSet.add( probeIDs.get( i ) );
+         probesInGeneSet.add( probeIDs.get( i ) );
       }
 
       // compile the matrix data
@@ -362,7 +381,7 @@ public class JGeneSetFrame extends JFrame {
 
          try {
             matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
-                  probeSet );
+                  probesInGeneSet );
          } catch ( IOException e ) {
             GuiUtil
                   .error( "Unable to load raw microarray data from file "
@@ -403,16 +422,15 @@ public class JGeneSetFrame extends JFrame {
       int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay
             .getColumnCount() : 0;
 
-      // Set each column
+      // Set each column width and renderer.
       for ( int i = 0; i < matrixColumnCount; i++ ) {
          TableColumn col = m_table.getColumnModel().getColumn( i );
-         col.setResizable( false );
-         col.setPreferredWidth( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
-         col.setMinWidth( MIN_WIDTH_MATRIXDISPLAY_COLUMN ); // no narrower than this
-         col.setMaxWidth( MAX_WIDTH_MATRIXDISPLAY_COLUMN ); // no wider than this
+         col.setMinWidth( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
+         col.setMaxWidth( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
          col.setCellRenderer( matrixCellRenderer );
          col.setHeaderRenderer( verticalHeaderRenderer );
       }
+      resizeMatrixColumns( matrixColumnWidth );
 
       //
       // Set up the rest of the table
@@ -453,13 +471,13 @@ public class JGeneSetFrame extends JFrame {
       }
 
       // Save the dimensions of the table just in case
-      int width = matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN
+      int totalWidth = matrixColumnCount * matrixColumnWidth
             + PREFERRED_WIDTH_PROBEID_COLUMN + PREFERRED_WIDTH_PVALUE_COLUMN
             + PREFERRED_WIDTH_GENENAME_COLUMN
             + PREFERRED_WIDTH_DESCRIPTION_COLUMN;
-      int height = m_table.getPreferredScrollableViewportSize().height;
+      int totalheight = m_table.getPreferredScrollableViewportSize().height;
 
-      Dimension d = new Dimension( width, height );
+      Dimension d = new Dimension( totalWidth, totalheight );
       m_table.setSize( d );
 
    } // end createDetailsTable
@@ -599,7 +617,6 @@ public class JGeneSetFrame extends JFrame {
                for ( int c = 0; c < row.length; c++ ) {
                   out.write( row[c] + "\t" );
                }
-               //out.write( probeID + "\t" ); // DEBUG - REMOVE THIS!!!
                m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
             }
 
@@ -618,6 +635,28 @@ public class JGeneSetFrame extends JFrame {
       out.close();
 
    } // end saveData
+
+   /**
+    * Adjust the width of every matrix display column
+    * 
+    * @param desiredCellWidth
+    */
+   void resizeMatrixColumns( int desiredCellWidth ) {
+      if ( desiredCellWidth >= MIN_WIDTH_MATRIXDISPLAY_COLUMN
+            && desiredCellWidth <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
+
+         System.err.println( "Setting column width to " + desiredCellWidth );
+         m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+
+         int matrixColumnCount = m_matrixDisplay.getColumnCount();
+         for ( int i = 0; i < matrixColumnCount; i++ ) {
+            TableColumn col = m_table.getColumnModel().getColumn( i );
+            col.setResizable( false );
+            col.setPreferredWidth( desiredCellWidth );
+         }
+         this.matrixColumnWidth = desiredCellWidth; // copy value into our parameter.
+      }
+   }
 
    /**
     * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay). You would probably want to call this method
@@ -660,25 +699,9 @@ public class JGeneSetFrame extends JFrame {
    }
 
    void m_cellWidthSlider_stateChanged( ChangeEvent e ) {
-
       JSlider source = ( JSlider ) e.getSource();
-
-      //if ( ! source.getValueIsAdjusting() ) {
-
-      // Adjust the width of every matrix display column
-      int width = source.getValue();
-      if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN
-            && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
-
-         m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
-
-         int matrixColumnCount = m_matrixDisplay.getColumnCount();
-         for ( int i = 0; i < matrixColumnCount; i++ ) {
-            TableColumn col = m_table.getColumnModel().getColumn( i );
-            col.setResizable( false );
-            col.setPreferredWidth( width );
-         }
-      }
+      int v = source.getValue();
+      resizeMatrixColumns( v );
    }
 
    void m_colorRangeSlider_stateChanged( ChangeEvent e ) {
@@ -761,10 +784,47 @@ public class JGeneSetFrame extends JFrame {
     * @param e
     */
    void m_viewHistMenuItem_actionPerformed( ActionEvent e ) {
-      JHistViewer f = new JHistViewer( analysisResults.getHist(), classResults.getEffectiveSize(), classResults.getScore() );
+      JHistViewer f = new JHistViewer( analysisResults.getHist(), classResults
+            .getEffectiveSize(), classResults.getScore() );
       f.setTitle( this.getTitle() + " histogram" );
       f.pack();
       f.show();
+   }
+
+   /**
+    * Writes setting values to file.
+    */
+   public void writePrefs() throws IOException {
+
+      if ( pref_file == null || pref_file.length() == 0 ) {
+         System.err.println( "Can't write prefs, no file name" );
+         return;
+      }
+
+      if ( properties == null ) {
+         properties = new Properties();
+      }
+
+      properties.setProperty( WINDOWWIDTH, String.valueOf( this.getWidth() ) );
+      properties.setProperty( WINDOWHEIGHT, String.valueOf( this.getHeight() ) );
+      properties.setProperty( MATRIXCOLUMNWIDTH, String
+            .valueOf( this.matrixColumnWidth ) );
+      OutputStream f = new FileOutputStream( pref_file );
+      properties.store( f, "" );
+      f.close();
+   }
+
+   /**
+    * @param e
+    */
+   public void closeWindow_actionPerformed( WindowEvent e ) {
+
+      try {
+         writePrefs();
+      } catch ( IOException e1 ) {
+         e1.printStackTrace();
+      }
+      this.dispose();
    }
 
 } // end class JGeneSetFrame
@@ -926,5 +986,19 @@ class JGeneSetFrame_m_mouseMotionListener implements
    }
 
    public void mouseDragged( MouseEvent e ) {
+   }
+}
+
+/* todo: add listener for window closing events, so the preferences can get written */
+
+class JGeneSetFrame_windowListenerAdapter extends java.awt.event.WindowAdapter {
+   JGeneSetFrame adaptee;
+
+   JGeneSetFrame_windowListenerAdapter( JGeneSetFrame adaptee ) {
+      this.adaptee = adaptee;
+   }
+
+   public void windowClosing( WindowEvent e ) {
+      adaptee.closeWindow_actionPerformed( e );
    }
 }
