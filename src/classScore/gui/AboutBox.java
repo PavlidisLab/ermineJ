@@ -22,6 +22,7 @@ import baseCode.gui.JLinkLabel;
  * Copyright: Copyright (c) 2003-2004 Columbia University
  * </p>
  * 
+ * @author Kiran Keshav
  * @author Paul Pavlidis
  * @version $Id$
  */
@@ -106,7 +107,7 @@ public class AboutBox extends JDialog implements ActionListener {
       labelAuthors.setHorizontalAlignment( SwingConstants.CENTER );
       labelAuthors.setHorizontalTextPosition( SwingConstants.CENTER );
       labelAuthors
-            .setText( "Authors: Paul Pavlidis, Homin Lee and Will Braynen." );
+            .setText( "Authors: Paul Pavlidis, Homin Lee Will Braynen, and Kiran Keshav." );
 
       labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
       labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
