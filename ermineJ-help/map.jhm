@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE map>
+<map version="1.0">
+	<mapID target="toplevelfolder" url="images/toplevel.gif" />
+	<mapID target="top" url="html/about.html" />
+
+	<mapID target="overview" url="html/about.html" />
+
+	<mapID target="tutorial" url="html/tutorial/index.html" />
+	<mapID target="ora" url="html/tutorial/ora.html" />
+        <mapID target="resampling" url="html/tutorial/resampling.html" />
+	<mapID target="correlation" url="html/tutorial/correlation.html" />
+	<mapID target="classes" url="html/tutorial/classes.html" />
+
+	<mapID target="format" url="html/format/index.html" />
+	<mapID target="go.format" url="html/formats/go.html" />
+	<mapID target="annotations.format" url="html/formats/annotations.html" />
+	<mapID target="microarray.format" url="html/formats/microarray.html" />
+</map>
+

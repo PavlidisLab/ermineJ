@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='ISO-8859-1'  ?>
+<!DOCTYPE toc
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
+         "../dtd/toc_2_0.dtd">
+<toc version="2.0">
+  <tocitem text="ermineJ Help" image="toplevelfolder">
+
+    <tocitem text="Overview" target="overview"/>
+   
+    <tocitem text="Tutorial" target="tutorial" expand="true">
+      <tocitem text="ORA" target="ora"/>
+      <tocitem text="Gene score resampling" target="resampling"/>
+      <tocitem text="Correlation" target="correlation"/>
+      <tocitem text="Defining your own classes" target="classes"/>
+    </tocitem>
+   
+    <tocitem text="Data File Formats" target="formats" expand="true">
+      <tocitem text="Gene names" target="go.format"/>
+      <tocitem text="Probe annotations" target="annotations.format"/>
+      <tocitem text="Raw microarray data" target="microarray.format"/>
+    </tocitem>
+         
+  </tocitem>
+</toc>
+
