@@ -99,6 +99,8 @@ public class classScoreFrame
   GridBagLayout gridBagLayout1 = new GridBagLayout();
   XYLayout xYLayout1 = new XYLayout();
   JButton jButtonLoadClassInfo = new JButton();
+  ClassPanel cPanel = new ClassPanel();
+  SetupMaps smaps = null;
 
    public classScoreFrame() {
       try {
@@ -112,7 +114,7 @@ public class classScoreFrame
    private void jbInit() throws Exception {
       ConsoleWindow.init();
       this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-      this.setSize(new Dimension(886, 521));
+      this.setSize(new Dimension(886, 730));
       this.setTitle("Functional Class Scoring");
 
       jButtonSavePrefs.addActionListener(new
@@ -149,9 +151,9 @@ public class classScoreFrame
       jPanel1.setForeground(Color.black);
       jPanel1.setDebugGraphicsOptions(0);
       jPanel1.setMaximumSize(new Dimension(2000, 2000));
-      jPanel1.setMinimumSize(new Dimension(886, 600));
+      jPanel1.setMinimumSize(new Dimension(2000, 2000));
       jPanel1.setOpaque(true);
-      jPanel1.setPreferredSize(new Dimension(1000, 800));
+      jPanel1.setPreferredSize(new Dimension(2000, 2000));
       jPanel1.setToolTipText("");
       jPanel1.setInputVerifier(null);
       jButtonLoadResults.setToolTipText(
@@ -258,14 +260,17 @@ public class classScoreFrame
     jPanelFilesGroup.add(jButtonLoadClassInfo, null);
     jPanelFilesGroup.add(jButtonSavePrefs, null);
 
-    jPanel1.add(jTabbedPane1,     new XYConstraints(545, 26, 333, -1));
-    jPanel1.add(jPanel2,      new XYConstraints(3, 26, -1, -1));
+    cPanel.setModel(SetupMaps.toBlankTableModel());
+    jPanel1.add(jPanel2,    new XYConstraints(3, 26, 861, 683));
 
       jPanelMainControls.add(jButtonQuit, null);
     jPanelMainControls.add(jButtonLoadResults, null);
     jPanelMainControls.add(jButtonRun, null);
     jPanelMainControls.add(jButtonCancel, null);
     jPanelMainControls.add(jButtonAbout, null);
+    jPanel2.add(jTabbedPane1,   new XYConstraints(11, 333, 823, 255));
+    jTabbedPane1.addTab("cPanel", cPanel);
+    jPanel2.add(jPanelReplicateTreaments, new XYConstraints(46, 212, 237, 113));
     jPanel2.add(jPanelFilesGroup, new XYConstraints(3, 3, 514, 214));
 
 
@@ -275,9 +280,10 @@ public class classScoreFrame
             ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 14, 21, 54), 0, 0));
     jPanelClassScoreMethods.add(jRadioButtonMean,  new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
             ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 57, 21, 0), 0, 0));
-    jPanel2.add(jPanelStatus, new XYConstraints(3, 474, 514, 34));
+    jPanel2.add(jPanelParameterGroup, new XYConstraints(575, 20, 223, 209));
+    jPanel2.add(jPanelMainControls, new XYConstraints(173, 598, 514, 39));
+    jPanel2.add(jPanelStatus,   new XYConstraints(10, 643, 836, 34));
     jPanelStatus.add(jLabelStatus, null);
-    jPanel2.add(jPanelParameterGroup, new XYConstraints(294, 220, 223, 209));
 
       jButtonRun.setText("Run Analysis");
       jButtonRun.addActionListener(new classScoreFrame_jButtonRun_actionAdapter(this));
@@ -336,7 +342,7 @@ public class classScoreFrame
       jTextFieldIterations.setPreferredSize(new Dimension(70, 19));
       jTextFieldIterations.setToolTipText(
           "Number of iterations program will run for.");
-      jTextFieldIterations.setText("100000");
+      jTextFieldIterations.setText("10");
       jTextFieldIterations.setHorizontalAlignment(SwingConstants.RIGHT);
 
       jTextFieldPValueThreshold.setPreferredSize(new Dimension(50, 19));
@@ -448,25 +454,23 @@ public class classScoreFrame
       jPanelReplicateTreaments.add(jRadioButtonSeparateReplicates, null);
       jPanelReplicateTreaments.add(jRadioButtonBestReplicates, null);
       jPanelReplicateTreaments.add(jRadioButtonMeanReplicates, null);
-    jPanel2.add(jPanelClassScoreMethods, new XYConstraints(3, 220, 237, 93));
-    jPanel2.add(jPanelReplicateTreaments, new XYConstraints(3, 316, 237, 113));
       jPanel10.add(jLabel6, null);
       jPanel10.add(jTextFieldPValueThreshold, null);
-    jPanel2.add(jPanelMainControls, new XYConstraints(3, 432, 514, 39));
+    jPanelParameterGroup.add(jPanel14, null);
       jPanel14.add(jLabel10, null);
       jPanel14.add(jTextFieldScoreCol, null);
     jPanelParameterGroup.add(jPanel11, null);
       jPanel12.add(jLabel7, null);
       jPanel12.add(jTextFieldMinClassSize, null);
-    jPanelParameterGroup.add(jPanel14, null);
+    jPanelParameterGroup.add(jPanel13, null);
+    jPanelParameterGroup.add(jPanel12, null);
       jPanel13.add(jLabel8, null);
       jPanel13.add(jTextFieldMaxClassSize, null);
-    jPanelParameterGroup.add(jPanel12, null);
-    jPanelParameterGroup.add(jPanel13, null);
-      jPanel11.add(jLabel9, null);
-      jPanel11.add(jTextFieldIterations, null);
     jPanelParameterGroup.add(jCheckBoxDoLog, null);
     jPanelParameterGroup.add(jPanel10, null);
+      jPanel11.add(jLabel9, null);
+      jPanel11.add(jTextFieldIterations, null);
+    jPanel2.add(jPanelClassScoreMethods,  new XYConstraints(330, 233, 237, 93));
 
       startPath = new File(System.getProperty("user.home"));
       buttonGroup2.add(jRadioButtonMean);
@@ -522,14 +526,7 @@ public class classScoreFrame
 
       final double oraThresh = Double.parseDouble(jTextFieldPValueThreshold.
                                                   getText());
-      final int maxClassSize = Integer.parseInt(jTextFieldMaxClassSize.getText());
-      final int minClassSize = Integer.parseInt(jTextFieldMinClassSize.getText());
-      final int numIter = Integer.parseInt(jTextFieldIterations.getText());
-
-      final String classScoreMethod = getClassScoreMethod();
-      final String groupMethod = getGroupMethod();
       final String useWeights = getUseWeights();
-      final String takeLog = getUseLog();
 
       boolean ok = true;
       ok = testfile(jTextFieldGeneScoreFile.getText());
@@ -560,19 +557,10 @@ public class classScoreFrame
 
          public void run() {
             try {
-               setupMaps smaps = new setupMaps(
-                   jTextFieldGeneScoreFile.getText(),
-                   jTextFieldProbeAnnot.getText(),
-                   jTextFieldGONames.getText(),
-                   classScoreMethod,
-                   groupMethod,
-                   maxClassSize,
-                   minClassSize,
-                   numIter, 50,
-                   useWeights,
-                   Integer.parseInt(jTextFieldScoreCol.getText()),
-                   takeLog,
-                   m);
+               if(smaps==null)
+               {
+                  populate_class_list(m);
+               }
 
                classPvalRun results = new classPvalRun(smaps.goName,
                    smaps.probePvalMapper,
@@ -601,12 +589,48 @@ public class classScoreFrame
             showStatus("Done");
             done = true;
             loadResults = false;
-
          }
       };
 
       runner = new runthread(m);
       runner.start();
+   }
+
+   void populate_class_list(classScoreStatus m)
+   {
+      final int maxClassSize = Integer.parseInt(jTextFieldMaxClassSize.getText());
+      final int minClassSize = Integer.parseInt(jTextFieldMinClassSize.getText());
+      final int numIter = Integer.parseInt(jTextFieldIterations.getText());
+
+      final String classScoreMethod = getClassScoreMethod();
+      final String groupMethod = getGroupMethod();
+      final String useWeights = getUseWeights();
+      final String takeLog = getUseLog();
+
+      try
+      {
+         smaps = new SetupMaps(
+             jTextFieldGeneScoreFile.getText(),
+             jTextFieldProbeAnnot.getText(),
+             jTextFieldGONames.getText(),
+             classScoreMethod,
+             groupMethod,
+             maxClassSize,
+             minClassSize,
+             numIter, 50,
+             useWeights,
+             Integer.parseInt(jTextFieldScoreCol.getText()),
+             takeLog,
+             m);
+      }
+      catch (IllegalArgumentException e) {
+         error(e, "During class score calculation");
+      }
+      catch (IOException e) {
+         error(e, "File reading or writing");
+      }
+      cPanel.setModel(smaps.toTableModel());
+
    }
 
    /* quit */
@@ -896,21 +920,32 @@ public class classScoreFrame
       }
    }
 
-  void jButtonLoadClassInfo_actionPerformed(ActionEvent e) {
-     loadClassInfo();
-  }
-
-  void loadClassInfo()
+  void jButtonLoadClassInfo_actionPerformed(ActionEvent e)
   {
-     try
+     showStatus("Loading");
+     classScoreStatus m = new classScoreStatus(jLabelStatus);
+
+     class runthread extends Thread
      {
-        GONameReader goName = new GONameReader(jTextFieldGONames.getText());
-     }
-     catch (IllegalArgumentException e) { error(e, "Class info loading"); }
-     catch (IOException e) { error(e, "File reading or writing"); }
+        classScoreStatus m;
 
+        public runthread(classScoreStatus m) { this.m = m; }
+
+        public void run()
+        {
+           try
+           {
+              populate_class_list(m);
+           }
+           catch (IllegalArgumentException e) {
+              error(e, "During class score calculation");
+           }
+           showStatus("Loaded");
+        }
+     };
+     runner = new runthread(m);
+     runner.start();
   }
-
 }
 
 /* end class */

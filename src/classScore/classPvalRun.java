@@ -23,7 +23,6 @@ public class classPvalRun {
    private Map classToProbe;
 
    private histogram hist;
-   private Map goNames;
    private double user_pvalue;
    private String dest_file;
    private boolean weight_on = true;
@@ -821,8 +820,7 @@ public class classPvalRun {
          }
 
          public Object getValueAt(int i, int j) {
-            classresult res = (classresult) results.get( (String) sortedclasses.get(
-                i));
+            classresult res = (classresult) results.get( (String) sortedclasses.get(i));
             switch (j) {
                case 0:
                   return new Integer(i + 1);
@@ -922,7 +920,7 @@ public class classPvalRun {
    public static void main(String[] args) {
       classScoreStatus m = new classScoreStatus(null);
       try {
-         setupMaps smaps = new setupMaps(args[0],                   // pbPval file
+         SetupMaps smaps = new SetupMaps(args[0],                   // pbPval file
                                          args[1],                   // affy GO File
                                          args[2],                   // GO name file
                                          args[4],args[5],           // methods

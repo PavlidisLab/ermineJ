@@ -48,7 +48,7 @@ public class erminecmd {
       System.err.println("Probe annotations from " + affyGoFile);
       System.err.println("Output into " + destinFile);
 
-      setupMaps smaps = new setupMaps(pbPvalFile, affyGoFile, goNameFile, // files
+      SetupMaps smaps = new SetupMaps(pbPvalFile, affyGoFile, goNameFile, // files
                                       args[4],args[5], // methods
                                       Integer.parseInt(args[6]), // max clas
                                       Integer.parseInt(args[7]), // min class

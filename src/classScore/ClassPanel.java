@@ -15,12 +15,25 @@ import javax.swing.table.*;
  * @todo make columns start out better sizes
  */
 
-public class ResultPanel extends JScrollPane {
+public class ClassPanel extends JScrollPane
+{
    JTable jTable1 = new JTable();
-   classPvalRun dataHolder = null;
+   SetupMaps dataHolder = null;
    // EventListenerList listenerList = null;
 
-   public ResultPanel(classPvalRun dataHolder) {
+   public ClassPanel()
+   {
+      try
+      {
+         //     listenerList = new EventListenerList();
+         jbInit();
+      }
+      catch (Exception e) {
+         e.printStackTrace();
+      }
+   }
+
+   public ClassPanel(SetupMaps dataHolder) {
       try {
          //     listenerList = new EventListenerList();
          this.dataHolder = dataHolder;
@@ -36,9 +49,7 @@ public class ResultPanel extends JScrollPane {
    // }
 
    private void jbInit() throws Exception {
-      this.setSize(660, 460);
-      this.setLocation(100, 100);
-      jTable1.addMouseListener(new ResultPanel_jTable1_mouseAdapter(this));
+      jTable1.addMouseListener(new ClassPanel_jTable1_mouseAdapter(this));
       jTable1.setGridColor(Color.lightGray);
       jTable1.setRowSelectionAllowed(true);
       this.getViewport().add(jTable1, null);
@@ -46,17 +57,15 @@ public class ResultPanel extends JScrollPane {
 
    public void setModel(TableModel m) {
       jTable1.setModel(m);
-      jTable1.getColumnModel().getColumn(0).setPreferredWidth(40);
-      jTable1.getColumnModel().getColumn(2).setPreferredWidth(200);
-      jTable1.getColumnModel().getColumn(3).setPreferredWidth(30);
-      jTable1.getColumnModel().getColumn(4).setPreferredWidth(30);
+      jTable1.getColumnModel().getColumn(0).setPreferredWidth(70);
+      jTable1.getColumnModel().getColumn(1).setPreferredWidth(200);
    }
 
    void jTable1_mouseReleased(MouseEvent e) {
       int j = jTable1.getSelectedRow();
       //   System.err.println(j);
 
-      dataHolder.showDetails(j);
+      //dataHolder.showDetails(j); FIX THIS!!!
 
       //  EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
       //  ClassDetailsEvent event = new ClassDetailsEvent(this);
@@ -64,13 +73,14 @@ public class ResultPanel extends JScrollPane {
       //  queue.postEvent(event);
    }
 
+
 }
 
-class ResultPanel_jTable1_mouseAdapter
+class ClassPanel_jTable1_mouseAdapter
     extends java.awt.event.MouseAdapter {
-   ResultPanel adaptee;
+   ClassPanel adaptee;
 
-   ResultPanel_jTable1_mouseAdapter(ResultPanel adaptee) {
+   ClassPanel_jTable1_mouseAdapter(ClassPanel adaptee) {
       this.adaptee = adaptee;
    }
 

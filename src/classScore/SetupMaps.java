@@ -11,7 +11,7 @@ import util.*;
   @author Shahmil Merchant; Paul Pavlidis (major changes)
   @version $Id$
  */
-public class setupMaps {
+public class SetupMaps {
    public GONameReader goName;
    public expClassScore probePvalMapper;
    public GeneDataReader geneData = null;
@@ -21,11 +21,12 @@ public class setupMaps {
    private GeneGroupReader groupName;
    private boolean weight_on = true;
    private boolean dolog = true;
+   private Vector sortedclasses = null;
 
    /**
     */
-   public setupMaps(String probePvalFile,
-                       String probe_annotfile,
+   public SetupMaps(String probePvalFile,
+                    String probe_annotfile,
                        String goNamesfile,
                        String method,
                        String groupMethod,
@@ -70,6 +71,92 @@ public class setupMaps {
       probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                      geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
+      sortClasses();
       messenger.setStatus("Done with setup");
    }
+
+   private void sortClasses()
+   {
+      sortedclasses = new Vector(classToProbe.entrySet().size());
+      Set keys = classToProbe.keySet();
+      Vector l = new Vector();
+      l.addAll(keys);
+      Collections.sort(l);
+      Iterator it = l.iterator();
+      while (it.hasNext())
+      {
+         sortedclasses.add(it.next());
+      }
+   }
+
+   public static TableModel toBlankTableModel() {
+      return new AbstractTableModel()
+      {
+         private String[] columnNames = {"Name", "Description","Probes"};
+
+         public String getColumnName(int i) {
+            return columnNames[i];
+         }
+
+         public int getColumnCount() {
+            return 3;
+         }
+
+         public int getRowCount() {
+            return 30;
+         }
+
+         public Object getValueAt(int i, int j)
+         {
+            return "";
+         }
+      };
+   }
+
+   public TableModel toTableModel()
+   {
+      return new AbstractTableModel()
+      {
+         private String[] columnNames = {"Name", "Description","Probes"};
+
+         public String getColumnName(int i) { return columnNames[i]; }
+
+         public int getColumnCount() { return 3; }
+
+         public int getRowCount() { return sortedclasses.size(); }
+
+         public Object getValueAt(int i, int j)
+         {
+            String classid = (String) sortedclasses.get(i);
+            String classdesc = (String) goName.get_GoName_map().get(classid);
+
+            switch (j)
+            {
+               case 0:
+                  return classid;
+               case 1:
+                  return classdesc;
+               case 2:
+               {
+                  if(classToProbe.containsKey(classid))
+                  {
+                     ArrayList probes = (ArrayList) classToProbe.get(classid);
+                     String probelist=new String();
+                     for(int k=0; k<probes.size(); k++)
+                     {
+                        probelist=probelist.concat((String) probes.get(k)+" ");
+                     }
+                     return probelist;
+                  }
+                  else
+                  {
+                      return "";
+                  }
+               }
+               default:
+                   return "";
+             }
+         }
+      };
+   };
 }
