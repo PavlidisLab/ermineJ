@@ -19,7 +19,7 @@ import javax.swing.*;
 public class classScoreFrame
     extends JFrame {
 
-   final boolean CONSOLE_WINDOW = false
+   final boolean CONSOLE_WINDOW = false;
 
    JPanel mainPanel = ( JPanel )this.getContentPane();
 
