@@ -1,5 +1,5 @@
 ; ermineJ Windows Installer
-; Written by Will Braynen
+; Written by Will Braynen, Paul Pavlidis
 ; Copyright (c) 2004  Columbia University
 
 
@@ -99,13 +99,13 @@ SectionEnd
 Section "Start Menu Shortcuts"
 
   SetOutPath $INSTDIR\bin  ; the working directory should be \bin
-  CreateShortCut "$DESKTOP\emrineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
-  CreateDirectory "$SMPROGRAMS\emrineJ"
-  CreateShortCut "$SMPROGRAMS\emrineJ\emrineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
+  CreateShortCut "$DESKTOP\ermineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
+  CreateDirectory "$SMPROGRAMS\ermineJ"
+  CreateShortCut "$SMPROGRAMS\ermineJ\ermineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
 
   SetOutPath $INSTDIR  ; reset the working directory
-  CreateShortCut "$SMPROGRAMS\emrineJ\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\emrineJ\license.txt" "$INSTDIR\license.txt"
+  CreateShortCut "$SMPROGRAMS\ermineJ\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\ermineJ\license.txt" "$INSTDIR\license.txt"
 
 SectionEnd
 
@@ -121,8 +121,8 @@ Section "Uninstall"
   DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\ermineJ"
 
   ; Remove shortcuts, if any
-  Delete "$SMPROGRAMS\emrineJ\*.*"
-  Delete "$DESKTOP\emrineJ.lnk"
+  Delete "$SMPROGRAMS\ermineJ\*.*"
+  Delete "$DESKTOP\ermineJ.lnk"
 
   ; Remove files and uninstaller
   Delete "$INSTDIR\*.*"
@@ -138,6 +138,6 @@ Section "Uninstall"
   YesRemoveDataFolder:
     RMDir /r "$INSTDIR"  ; the data folder is a subdirectory of INSTDIR
   NoRemoveDataFolder:
-  RMDir "$SMPROGRAMS\emrineJ"
+  RMDir "$SMPROGRAMS\ermineJ"
 
 SectionEnd

@@ -93,11 +93,11 @@ public class GeneSetScoreFrame extends JFrame {
 
    public GeneSetScoreFrame() {
 
-         jbInit();
-         hh = new HelpHelper();
-         hh.initHelp( helpMenuItem );
-         settings = new Settings();
-      
+      jbInit();
+      hh = new HelpHelper();
+      hh.initHelp( helpMenuItem );
+      settings = new Settings();
+
    }
 
    /* init */
@@ -185,6 +185,8 @@ public class GeneSetScoreFrame extends JFrame {
       saveAnalysisMenuItem.setMnemonic( 'S' );
       saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke(
             KeyEvent.VK_S, InputEvent.CTRL_MASK ) );
+      saveAnalysisMenuItem.setEnabled( false ); // no runs to begin with.
+
       analysisMenu.add( runAnalysisMenuItem );
       analysisMenu.add( cancelAnalysisMenuItem );
       analysisMenu.add( loadAnalysisMenuItem );
@@ -277,7 +279,11 @@ public class GeneSetScoreFrame extends JFrame {
       modClassMenuItem.setEnabled( true );
       runAnalysisMenuItem.setEnabled( true );
       loadAnalysisMenuItem.setEnabled( true );
-      saveAnalysisMenuItem.setEnabled( true );
+
+      if ( results.size() > 0 ) {
+         saveAnalysisMenuItem.setEnabled( true );
+      }
+
       cancelAnalysisMenuItem.setEnabled( false );
    }
 
@@ -389,10 +395,14 @@ public class GeneSetScoreFrame extends JFrame {
    }
 
    void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
+      if ( results.size() == 0 ) {
+         statusMessenger.setError( "There are no runs to save" );
+         return;
+      }
       SaveWizard swiz = new SaveWizard( this, results, goData );
       swiz.showWizard();
    }
-
+   
    void aboutMenuItem_actionPerformed( ActionEvent e ) {
       new AboutBox( this );
    }
@@ -418,6 +428,7 @@ public class GeneSetScoreFrame extends JFrame {
       disableMenusForAnalysis();
       athread.startAnalysisThread( this, runSettings, statusMessenger, goData,
             geneDataSets, rawDataSets, geneScoreSets );
+
    }
 
    public void loadAnalysis( String loadFile ) {

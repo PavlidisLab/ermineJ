@@ -1,6 +1,7 @@
 package classScore.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 
@@ -46,6 +47,7 @@ public class SaveWizardStep1 extends WizardStep {
       topPanel.add( runLabel );
       JPanel centerPanel = new JPanel();
       runComboBox = new JComboBox();
+      runComboBox.setPreferredSize(new Dimension(150, 15));
       runComboBox
             .addActionListener( new SaveWizardStep1_runComboBox_actionAdapter(
                   this ) );

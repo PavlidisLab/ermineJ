@@ -218,7 +218,7 @@ public class OutputPanel extends JScrollPane {
             .getSettings();
       String tooltip = new String( "<html>" );
       String coda = new String();
-      
+
       if ( runSettings.getAnalysisMethod() == Settings.ORA ) {
          tooltip += "ORA Analysis<br>";
          coda += "P value threshold: " + runSettings.getPValThreshold();
@@ -230,7 +230,7 @@ public class OutputPanel extends JScrollPane {
          tooltip += "Correlation Analysis<br>";
          coda += runSettings.getIterations() + " iterations";
       }
-      
+
       tooltip += new String( "Max set size: " + runSettings.getMaxClassSize()
             + "<br>" + "Min set size: " + runSettings.getMinClassSize()
             + "<br>" );
@@ -523,7 +523,7 @@ class OutputTableModel extends AbstractTableModel {
    }
 
    public void addRunColumns( int state ) {
-      columnNames.add(  ((GeneSetPvalRun)results.get(state)).getName() );
+      columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1 ) ).getName() );
    }
 
    public void addRunData( Map result ) {
@@ -539,7 +539,8 @@ class OutputTableModel extends AbstractTableModel {
 
    public void addRun() {
       state++;
-      columnNames.add( ((GeneSetPvalRun)results.get(state)).getName() + " Pval" );
+      columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1) ).getName()
+            + " Pval" );
    }
 
    public String getColumnName( int i ) {

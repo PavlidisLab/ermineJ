@@ -1,12 +1,8 @@
-<?xml version="1.0"?>
-
-<project 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/maven-project-3.0.0.xsd">
+<project>
     <pomVersion>3</pomVersion>
-    <id>ermineJ</id>
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
+        <id>ermineJ</id>
     <currentVersion>2.0b3</currentVersion>
     <organization>
         <name>Columbia University</name>
@@ -15,13 +11,11 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
     </organization>
     <inceptionYear>2004</inceptionYear>
     <logo>src/classScore/gui/resources/logo1small.gif</logo>
-    
     <description>ErmineJ performs analyses of gene sets in expression
     microarray data. A typical goal is to determine whether
     particular biological pathways are "doing something interesting" in
     the data. The software is designed to be used by biologists with
     little or no informatics background.</description>
-    
     <shortDescription>Software for gene set analysis.</shortDescription>
     <url>http://microarray.cu-genome.org/ermineJ</url>
     <siteAddress>microarray</siteAddress>
@@ -35,7 +29,6 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
         <version>
             <id>2.0b3</id>
             <name>beta3</name>
-            <tag/>
         </version>
     </versions>
     <developers>
@@ -70,7 +63,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
         <dependency>
             <groupId>colt</groupId>
             <artifactId>colt</artifactId>
-              <version>1.0.3</version>
+            <version>1.0.3</version>
             <type>jar</type>
             <url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
             <properties>
@@ -82,7 +75,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <artifactId>commons-logging</artifactId>
             <version>1.0.3</version>
             <type>jar</type>
-            <properties>      
+            <properties>
                 <jnlp.jar>true</jnlp.jar>
             </properties>
         </dependency>
@@ -91,7 +84,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <artifactId>baseCode</artifactId>
             <version>0.2.1</version>
             <type>jar</type>
-            <properties>      
+            <properties>
                 <jnlp.jar>true</jnlp.jar>
             </properties>
         </dependency>
@@ -100,7 +93,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <artifactId>xercesImpl</artifactId>
             <version>2.6.2</version>
             <type>jar</type>
-            <properties>    
+            <properties>
                 <jnlp.jar>true</jnlp.jar>
             </properties>
         </dependency>
@@ -110,6 +103,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <version>2.0</version>
             <jar>jh.jar</jar>
             <type>jar</type>
+            <properties/>
         </dependency>
     </dependencies>
     <build>
@@ -125,6 +119,13 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
                 <directory>${basedir}/src</directory>
                 <includes>
                     <include>**/logo1small.gif</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${basedir}</directory>
+                <includes>
+                    <include>ermineJ-help.jar</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>

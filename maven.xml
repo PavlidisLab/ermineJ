@@ -7,23 +7,31 @@
  		 xmlns:jarfile="jarfile">
 
 <!-- ==================================== -->
-<!-- help jar file and arrangements for help to be included in the webstart -->
+<!-- help jar file and arrangements for help to be included in the webstart configuration -->
 <!-- ==================================== -->
 <goal name="help" description="Update and build the javahelp jar file">
 	<ant:echo>Creating search index...</ant:echo>
 	<ant:exec executable="${java.javahelp.jhindexer}">
+	<arg value="-verbose" />
 	<arg value="-db" /> 
 	<arg path="ermineJ-help/JavaHelpSearch" />
-	<arg value="${basedir}/ermineJ-help/html" />
+	<arg value="-c" />
+	<arg path="ermineJ-help/help.config" />
+	<arg value="ermineJ-help/html" />
 	</ant:exec>
 	<ant:echo>Making help jar file...</ant:echo>
-	<ant:jar destfile="${basedir}/ermineJ-help.jar" update="true" excludes="**/CVS/*" basedir="${basedir}/ermineJ-help" />
+	<ant:jar destfile="${basedir}/ermineJ-help.jar" update="false" excludes="**/CVS/*" basedir="${basedir}/ermineJ-help" />
+	
+    <ant:copy todir="${basedir}" file="${basedir}/ermineJ-help.jar" overwrite="true" />
+	
+	<echo>Copying files to web directory...</echo>
 	<ant:copy todir="${basedir}/web/ermineJ-help" overwrite="true" >
 	<fileset dir="${basedir}/ermineJ-help">
 	 <include name="**/*" />
 	</fileset>
 	</ant:copy>
 
+	<echo>Setting up JNLP for help...</echo>
 		<maven:get plugin="maven-jnlp-plugin" property="maven.jnlp.dir" var="jnlpDir" />
 		<maven:get plugin="maven-jnlp-plugin" property="maven.jnlp.tmpdir" var="jnlpTmpDir" />
 		<maven:get plugin="maven-jnlp-plugin" property="plugin.resources" var="jnlpRsc" />
@@ -35,24 +43,21 @@
         outputDir="${jnlpTmpDir}"
     />
 	
-	
 	<ant:copy todir="${jnlpDir}" file="${basedir}/JavaWebStart/help.jnlp" overwrite="true" />
 	<ant:copy todir="${jnlpDir}" file="${maven.repo.local}/javahelp/jars/jh.jar" overwrite="true" />
 
 	<ant:copy todir="${jnlpTmpDir}" file="${basedir}/ermineJ-help.jar" overwrite="true" />
 	
 	<ant:available file="${maven.jnlp.signjar.store}" property="maven.jnlp.store.exists"/>
-	<j:if test="${maven.jnlp.store.exists}">	<echo>"Found a keystore"</echo></j:if>
+	<j:if test="${maven.jnlp.store.exists}"><echo>Found a keystore, will sign ermineJ-help.jar</echo></j:if>
 
 	<!-- sign the jar -->
     <ant:signjar
     jar="${jnlpTmpDir}/ermineJ-help.jar"
     signedjar="${jnlpDir}/ermineJ-help.jar"
-    alias="${pom.artifactId}"
+    alias="${maven.jnlp.signjar.alias}"
     storepass="${maven.jnlp.signjar.storepass}"
-    keystore="${maven.jnlp.signjar.store}"/>
-	
-
+    keystore="${maven.jnlp.signjar.store}" />
 </goal>
 
 

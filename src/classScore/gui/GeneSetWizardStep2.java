@@ -27,7 +27,7 @@ import java.awt.event.*;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin K Lee
  * @version $Id$
  */
@@ -48,7 +48,7 @@ public class GeneSetWizardStep2 extends WizardStep {
    private final static int COL2WIDTH = 200;
 
    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData,
-         NewGeneSet newGeneSet) {
+         NewGeneSet newGeneSet ) {
       super( wiz );
       this.wiz = wiz;
       this.geneData = geneData;
@@ -65,9 +65,9 @@ public class GeneSetWizardStep2 extends WizardStep {
       JPanel step2Panel;
 
       JPanel topPanel = new JPanel();
-     // countLabel = new JLabel();
+      // countLabel = new JLabel();
       showStatus( "Number of Probes selected: 0" );
-    //  topPanel.add( countLabel );
+      //  topPanel.add( countLabel );
 
       step2Panel = new JPanel();
       BorderLayout borderLayout1 = new BorderLayout();
@@ -102,7 +102,9 @@ public class GeneSetWizardStep2 extends WizardStep {
       searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
       searchTextField
             .addKeyListener( new GeneSetWizardStep2_searchText_keyAdapter( this ) );
-        searchTextField.addActionListener(new GeneSetWizardStep2_searchTextField_actionAdapter(this));
+      searchTextField
+            .addActionListener( new GeneSetWizardStep2_searchTextField_actionAdapter(
+                  this ) );
       JButton addButton = new JButton();
       addButton.setSelected( false );
       addButton.setText( "Add >" );
@@ -132,6 +134,10 @@ public class GeneSetWizardStep2 extends WizardStep {
    }
 
    public boolean isReady() {
+      if ( newGeneSet.getProbes().size() == 0 ) {
+         return false;
+      }
+      
       return true;
    }
 
@@ -198,20 +204,20 @@ public class GeneSetWizardStep2 extends WizardStep {
    }
 
    private void populateTables() {
-      ProbeTableModel model = new ProbeTableModel(geneData);
-      TableSorter sorter = new TableSorter(model);
-      probeTable.setModel(sorter);
-      sorter.setTableHeader(probeTable.getTableHeader());
-       probeTable.getColumnModel().getColumn(0).setPreferredWidth(COL0WIDTH);
-       probeTable.getColumnModel().getColumn(1).setPreferredWidth(COL1WIDTH);
-       probeTable.getColumnModel().getColumn(2).setPreferredWidth(COL2WIDTH);
+      ProbeTableModel model = new ProbeTableModel( geneData );
+      TableSorter sorter = new TableSorter( model );
+      probeTable.setModel( sorter );
+      sorter.setTableHeader( probeTable.getTableHeader() );
+      probeTable.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
+      probeTable.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
+      probeTable.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
 
       ncTableModel = newGeneSet.toTableModel( false );
       newClassTable.setModel( ncTableModel );
       newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
       newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
 
-      showStatus("Available probes: " + geneData.selectedProbes());
+      showStatus( "Available probes: " + geneData.selectedProbes() );
    }
 
    /**
@@ -221,12 +227,11 @@ public class GeneSetWizardStep2 extends WizardStep {
       find();
    }
 
-   void searchTextField_actionPerformed(ActionEvent e) {
+   void searchTextField_actionPerformed( ActionEvent e ) {
       find();
    }
 
-   void find()
-   {
+   void find() {
       String searchOn = searchTextField.getText();
 
       if ( searchOn.equals( "" ) ) {
@@ -298,6 +303,7 @@ class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
 }
 
 // hitting enter in search also activates it.
+
 class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
    GeneSetWizardStep2 adaptee;
 
@@ -313,6 +319,7 @@ class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
 
 // respond to typing in the search field.
 // todo 3.0 Stub: incremental search trigger would go here.
+
 class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
    GeneSetWizardStep2 adaptee;
@@ -334,38 +341,38 @@ class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
 class ProbeTableModel extends AbstractTableModel {
    GeneAnnotations geneData;
-      private String[] columnNames = { "Probe", "Gene", "Description" };
+   private String[] columnNames = { "Probe", "Gene", "Description" };
 
-   public ProbeTableModel(GeneAnnotations geneData) {
+   public ProbeTableModel( GeneAnnotations geneData ) {
       this.geneData = geneData;
    }
 
-         public String getColumnName( int i ) {
-            return columnNames[i];
-         }
+   public String getColumnName( int i ) {
+      return columnNames[i];
+   }
 
-         public int getColumnCount() {
-            return 3;
-         }
+   public int getColumnCount() {
+      return 3;
+   }
 
-         public int getRowCount() {
-            return geneData.getSelectedProbes().size();
-         }
+   public int getRowCount() {
+      return geneData.getSelectedProbes().size();
+   }
 
-         public Object getValueAt( int i, int j ) {
+   public Object getValueAt( int i, int j ) {
 
-            String probeid = ( String ) geneData.getSelectedProbes().get( i );
-            switch ( j ) {
-               case 0:
-                  return probeid;
-               case 1:
-                  return geneData.getProbeGeneName( probeid );
-               case 2:
-                  return geneData.getProbeDescription( probeid );
-               default:
-                  return null;
-            }
-         }
+      String probeid = ( String ) geneData.getSelectedProbes().get( i );
+      switch ( j ) {
+         case 0:
+            return probeid;
+         case 1:
+            return geneData.getProbeGeneName( probeid );
+         case 2:
+            return geneData.getProbeDescription( probeid );
+         default:
+            return null;
+      }
+   }
 }
 // respond to search request.
 
@@ -383,13 +390,15 @@ class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {
 
 }
 
-class GeneSetWizardStep2_searchTextField_actionAdapter implements java.awt.event.ActionListener {
+class GeneSetWizardStep2_searchTextField_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetWizardStep2 adaptee;
 
-   GeneSetWizardStep2_searchTextField_actionAdapter(GeneSetWizardStep2 adaptee) {
+   GeneSetWizardStep2_searchTextField_actionAdapter( GeneSetWizardStep2 adaptee ) {
       this.adaptee = adaptee;
    }
-   public void actionPerformed(ActionEvent e) {
-      adaptee.searchTextField_actionPerformed(e);
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.searchTextField_actionPerformed( e );
    }
 }
