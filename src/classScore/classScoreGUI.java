@@ -1,9 +1,9 @@
-package classScore.gui;
+package classScore;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-
 import javax.swing.UIManager;
+import classScore.gui.*;
 
 /**
  * <p>Title: </p>
