@@ -1,20 +1,41 @@
-
 <html>
 <head>
-<title>ermineJ test</title>
+<title>ermineJ webstart</title>
 </head>
 
 <body>
-<table>
- <tr>
-  <td><image src="ermineJ.gif"></td>
-  <td><h1>ermineJ test</h1></td>
- <tr>
-<table>
+
+  <img src="../images/logo1small.gif">
+  <link type="text/css" rel="stylesheet" href="../css/default.css">
+
+
 <br>
 <br>
 
+<h2>Webstart</h2>
+
+  <p>For this to work, you must satisfy the following conditions:</p>
+  <ul>
+    <li>You must install a recent version of java (1.4.2), which you can get <a href="http://javashoplm.sun.com/ECom/docs/Welcome.jsp?StoreId=22&PartDetailId=j2re-1.4.2_05-oth-JPR&SiteId=JSC&TransactionId=noreg">here</a>.
+Download it and install it.</li>
+        <li>You will have to get some annotation files, as we do not
+deliver these with the webstart package. You can get them <a
+href="/annots">here</a>. Get the annotation file(s) for the microarray
+platform(s) you are using. Unzip the files and put them somewhere you
+can find them. Do the same for the GO XML file, which is found <a
+href="http://www.godatabase.org/dev/database/archive/latest/">here</a>
+(get the file named go_[date]-termdb.xml.gz). In the first step of running ermineJ, you will be asked to 
+locate these files for the software.
+</li>
+
+      </ul>
+
 <a href="ermineJ.jnlp">Click here to launch ermineJ</a><br>
+
+<p>Note that there can be some problems with Webstart message windows coming up at the same time at
+ermineJ is trying to display dialog boxes. If you find yourself confronted with a dialog box nagging you about
+destop integration, but you can't click on it,
+try clicking on the ermineJ dialog box underneath and then going back to the Webstart.</p>
 
 </body>
 </html>
