@@ -407,14 +407,14 @@ public class JDetailsFrame
 
          File file = fc.getSelectedFile();
 
-         // Make sure the filename has an image extension
+         // Make sure the filename has a data extension
          String filename = file.getPath();
          if ( !Util.hasDataExtension( filename ) ) {
             filename = Util.addDataExtension( filename );
          }
-         // Save the color matrix image
+         // Save the values
          try {
-            saveTableToFile( filename );
+            saveTableToFile( filename, true, true, false );
          }
          catch ( IOException ex ) {
             System.err.println( "IOException error saving data to " + filename );
@@ -428,38 +428,44 @@ public class JDetailsFrame
     *
     * @param filename String
     */
-   protected void saveTableToFile( String filename ) throws IOException {
+   protected void saveTableToFile( String filename, boolean includeMatrixValues, boolean includeNonMatrix, boolean normalized ) throws IOException {
 
       BufferedWriter out = new BufferedWriter( new FileWriter( filename ) );
 
-      int totalRows = m_table.getRowCount();
-      int totalColumns = m_table.getColumnCount();
-      int matrixColumns = m_matrixDisplay.getColumnCount();
+      int totalRowCount = m_table.getRowCount();
+      int totalColumnCount = m_table.getColumnCount();
+      int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
-      // Make sure we are writing out non-normalized values
-      boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
-      m_matrixDisplay.setStandardizedEnabled( false );
+      // write out the table, one row at a time
+      for ( int r = 0; r < totalRowCount; r++ ) {
+         
+         if ( includeMatrixValues ) {
 
-      try {
-         // write out the matrix values
-         for ( int r = 0; r < totalRows; r++ ) {
-
-            // get values in that row
-            String probeID = getProbeID( r );
-            out.write( probeID + "\t" );
-
-            // write out values in the entire row
-            double[] row = m_matrixDisplay.getRowByName( probeID );
-            for ( int c = 0; c < row.length; c++ ) {
-               out.write( row[c] + "\t" );
+            boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
+            m_matrixDisplay.setStandardizedEnabled( normalized );
+            {
+               // for this row: write out matrix values
+               String probeID = getProbeID( r );
+               double[] row = m_matrixDisplay.getRowByName( probeID );
+               for ( int c = 0; c < row.length; c++ ) {
+                  out.write( row[c] + "\t" );
+               }
+               //out.write( probeID + "\t" ); // DEBUG - REMOVE THIS!!!
             }
-
-            out.write( "\r\n" );
+            m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
          }
-      } catch ( IOException exception ) { }
+            
+         if ( includeNonMatrix ) {
+            // for this row: write out the rest of the table
+            for ( int c = matrixColumnCount; c < totalColumnCount; c++) {
+               out.write( m_table.getValueAt( r, c ) + "\t" );
+            }
+         }
 
-      m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
-
+         // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
+         out.write( "\r\n" );
+      }
+      
       // close the file
       out.close();
 
