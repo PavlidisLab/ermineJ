@@ -3,7 +3,84 @@
 		 xmlns:j="jelly:core"
 		 xmlns:util="jelly:util"
 		 xmlns:ant="jelly:ant"
-		 xmlns:deploy="deploy">
+		 xmlns:deploy="deploy" >
+
+<goal name="help" description="Update and build the javahelp jar file">
+<ant:echo>Creating search index...</ant:echo>
+<ant:exec executable="${java.javahelp.jhindexer}">
+<arg value="-db" /> 
+<arg path="ermineJ-help/JavaHelpSearch" />
+<arg value="${basedir}/ermineJ-help/html" />
+</ant:exec>
+
+<ant:echo>Making help jar file...</ant:echo>
+<ant:jar destfile="${basedir}/ermineJ-help.jar" update="true" excludes="**/CVS/*" includes="${basedir}/ermineJ-help" basedir="${basedir}" />
+
+</goal>
+
+<goal name="nsis-setup" >
+<j:forEach var="lib" items="${pom.artifacts}">
+ 	  <ant:echo message=""/>
+      <ant:echo message="Name  : ${lib.dependency.artifactId}"/>
+      <ant:echo message="Group : ${lib.dependency.groupId}"/>
+      <ant:echo message="Base  : ${lib.file.parent}"/>
+      <ant:echo message="File  : ${lib.file.name}"/>
+      <ant:echo message="Path  : ${lib.path}"/>
+      <ant:copy file="${lib.path}"  tofile="${maven.build.dir}/bindist/lib/${lib.dependency.artifactId}.jar" />
+  </j:forEach>
+    
+	<ant:copy file="${maven.build.dir}/${maven.final.name}.jar" tofile="${maven.build.dir}/bindist/lib/${pom.name}.jar" />
+	<ant:copy file="${basedir}/ermineJ-help.jar" todir="${maven.build.dir}/bindist/lib" />
+	
+	<ant:mkdir dir="${maven.build.dir}/bindist/data" />
+	<ant:mkdir dir="${maven.build.dir}/bindist/bin" />
+	
+	<ant:copy todir="${maven.build.dir}/bindist/data" >
+		<fileset dir="${basedir}/data" >
+			 <include name="**/genesets" />
+			 <include name="go_200406-termdb.xml" />
+			 <include name="HG-U95A.an.txt" />
+			 <exclude name="**/fake*" />
+			 <exclude name="ClassScore.preferences" />
+			 <exclude name="melanoma_and_sarcomaMAS5.txt" />
+			 <exclude name="one-way-anova-parsed.txt" />
+			 <exclude name="test.results.txt" />
+		</fileset>
+		</ant:copy>
+	
+	
+</goal>
+
+<goal name="nsis" description="NSIS installer build" prereqs="jar:jar,help,nsis-setup">
+ 
+ <ant:copy todir="${maven.build.dir}/bindist/bin" >
+		<fileset dir="${basedir}/nsis-installer/files/bin" >
+			<exclude name="**/CVS/" />
+			<exclude name="**/*-jre.bat" />
+		</fileset>
+		</ant:copy>	
+ 
+	<ant:exec executable="${nsis.exe}">
+	<arg path="${basedir}/nsis-installer/src/ermineJ-setup.nsi" />
+	</ant:exec>
+	
+</goal>
+
+<goal name="nsis-jre" description="NSIS installer build, with JRE in the distribution" prereqs="jar:jar,help,nsis-setup">
+
+<ant:copy todir="${maven.build.dir}/bindist/bin" >
+		<fileset dir="${basedir}/nsis-installer/files/bin" >
+			<exclude name="**/CVS/" />
+			<exclude name="**/erminej.bat" />
+		</fileset>
+		</ant:copy>	
+
+    	<ant:exec executable="${nsis.exe}">
+	<arg path="${basedir}/nsis-installer/src/ermineJ-setup-jre.nsi" />
+	</ant:exec>
+</goal>
+
+
 
 </project>
 

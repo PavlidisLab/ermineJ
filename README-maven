@@ -1,0 +1,9 @@
+
+// To make the help jar:
+maven help
+
+
+// To make a regular binary distribution
+
+
+// To make the Windows installer

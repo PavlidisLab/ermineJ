@@ -1,1 +1,0 @@
-To compile the .nsi scripts found in the parent directory, place jar files here.  For more information see README.txt in the parent directory (../README.txt)
