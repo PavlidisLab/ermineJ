@@ -32,7 +32,7 @@ public class histogram {
    public histogram( int number_of_class, int min_class_size, int number_of_runs,
                      double max ) {
       this.hist_max = max;
-      this.hist_min = this.hist_min; // todo: fix this so it does something.
+ //     this.hist_min = this.hist_min; // todo: fix this so it does something.
       this.min_class_size = min_class_size;
       set_number_of_runs( number_of_runs );
       set_number_of_bins();

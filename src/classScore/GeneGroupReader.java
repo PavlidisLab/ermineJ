@@ -22,8 +22,8 @@ import java.util.TreeSet;
  */
 public class GeneGroupReader {
 
-   private static Map probe_group_map;
-   private static Map group_probe_list;
+   private Map probe_group_map;
+   private Map group_probe_list;
    private Set group;
 
    /**

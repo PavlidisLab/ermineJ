@@ -1,14 +1,16 @@
 package classScore.analysis;
-import java.util.Iterator;
-import java.util.Collections;
+import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
+
+import classScore.GONames;
+import classScore.GeneAnnotations;
 import classScore.classresult;
-import java.util.HashMap;
 import classScore.expClassScore;
-import java.text.NumberFormat;
-import classScore.*;
+import classScore.histogram;
 
 /**
  * <p>Title: </p>
