@@ -85,7 +85,6 @@ public class GeneSetScoreFrame
       //menu stuff
       fileMenu.setText( "File" );
       fileMenu.setMnemonic( 'F' );
-      fileMenu.setEnabled(false);
       quitMenuItem.setText( "Quit" );
       quitMenuItem.addActionListener( new
                                       GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
@@ -190,7 +189,6 @@ public class GeneSetScoreFrame
 
    private void enableMenus()
    {
-      fileMenu.setEnabled(true);
       classMenu.setEnabled( true );
       analysisMenu.setEnabled( true );
       helpMenu.setEnabled(true);

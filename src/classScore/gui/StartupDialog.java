@@ -1,13 +1,13 @@
 package classScore.gui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.*;
 import javax.swing.*;
 
 import baseCode.gui.*;
 import classScore.*;
 import classScore.gui.*;
+import java.awt.event.*;
 
 /**
  * <p>Title: </p>
@@ -63,6 +63,7 @@ public class StartupDialog
    //Component initialization
    private void jbInit() throws Exception {
       setResizable( true );
+      this.addWindowListener(new StartupDialog_this_windowAdapter(this));
       mainPanel = ( JPanel )this.getContentPane();
       mainPanel.setPreferredSize( new Dimension( 550, 350 ) );
 
@@ -136,16 +137,30 @@ public class StartupDialog
    }
 
    void startButton_actionPerformed( ActionEvent e ) {
-      saveValues();
-      class runthread extends Thread {
-         public runthread() {}
-         public void run() {
-            callingframe.initialize();
-         }
-      };
-      Thread aFrameRunner = new runthread();
-      aFrameRunner.start();
-      dispose();
+      String file = annotFile.getText();
+      File infile = new File( file );
+      if ( !infile.exists() || !infile.canRead() ) {
+         GuiUtil.error( "Could not find file: " + file );
+      }
+      else
+      {
+         saveValues();
+         class runthread
+             extends Thread {
+            public runthread() {}
+
+            public void run() {
+               callingframe.initialize();
+            }
+         };
+         Thread aFrameRunner = new runthread();
+         aFrameRunner.start();
+         dispose();
+      }
+   }
+
+   void this_windowClosed(WindowEvent e) {
+      System.exit( 0 );
    }
 
 }
@@ -189,5 +204,16 @@ class StartupDialog_startButton_actionAdapter
 
    public void actionPerformed( ActionEvent e ) {
       adaptee.startButton_actionPerformed( e );
+   }
+}
+
+class StartupDialog_this_windowAdapter extends java.awt.event.WindowAdapter {
+   StartupDialog adaptee;
+
+   StartupDialog_this_windowAdapter(StartupDialog adaptee) {
+      this.adaptee = adaptee;
+   }
+   public void windowClosing(WindowEvent e) {
+      adaptee.this_windowClosed(e);
    }
 }
