@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import baseCode.bio.geneset.GeneAnnotations;
+import baseCode.util.StatusViewer;
 
 import classScore.Settings;
 import classScore.data.GeneScoreReader;
@@ -33,10 +34,11 @@ public class MultipleTestCorrector {
    private NumberFormat nf = NumberFormat.getInstance();
    private GeneScoreReader geneScores;
    private Settings settings;
+   private StatusViewer messenger;
 
    public MultipleTestCorrector( Settings set, Vector sc, Histogram h,
          GeneAnnotations geneData, GeneSetSizeComputer csc,
-         GeneScoreReader geneScores, Map results ) {
+         GeneScoreReader geneScores, Map results, StatusViewer messenger ) {
       this.settings = set;
       this.sortedclasses = sc;
       this.results = results;
@@ -44,6 +46,7 @@ public class MultipleTestCorrector {
       this.geneData = geneData;
       this.csc = csc;
       this.geneScores = geneScores;
+      this.messenger = messenger;
    }
 
    /**
@@ -84,7 +87,7 @@ public class MultipleTestCorrector {
          // double thresh = fdr * n / numclasses;
 
          double thisFDR = actual_p * numclasses / n;
-         
+
          // the actual fdr at this threshold is n / (actual_p * numclasses).
          res.setCorrectedPvalue( thisFDR ); // todo this is slightly broken when there are tied pvals.
          n--;
@@ -230,9 +233,15 @@ public class MultipleTestCorrector {
             qprev = q;
          }
 
+         try {
+            Thread.sleep( 1 );
+         } catch ( InterruptedException e ) {
+         }
+
          if ( 0 == i % 100 ) {
-            System.err.println( i + " Westfall-Young trials, " + ( trials - i )
-                  + " to go." );
+            if ( messenger != null )
+                  messenger.setStatus( i + " Westfall-Young trials, "
+                        + ( trials - i ) + " to go." );
          }
 
       }

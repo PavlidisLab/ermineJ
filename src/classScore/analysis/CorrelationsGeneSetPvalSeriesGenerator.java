@@ -117,6 +117,11 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
             continue;
          }
 
+         try {
+            Thread.sleep( 5 );
+         } catch ( InterruptedException ex ) {
+         }
+         
          if ( count > 0 && count % 50 == 0 ) {
             messenger.setStatus( "Classes analyzed: " + count );
          }

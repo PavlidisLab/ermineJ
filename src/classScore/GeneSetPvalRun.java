@@ -87,7 +87,7 @@ public class GeneSetPvalRun {
 
       messenger.setStatus( "Multiple test correction..." );
       MultipleTestCorrector mt = new MultipleTestCorrector( settings,
-            sortedclasses, hist, geneData, csc, geneScores, results );
+            sortedclasses, hist, geneData, csc, geneScores, results, null );
       String mtc_method = "bh";
       if ( mtc_method.equals( "bon" ) ) {
          mt.bonferroni();
@@ -210,13 +210,14 @@ public class GeneSetPvalRun {
 
       messenger.setStatus( "Multiple test correction..." );
       MultipleTestCorrector mt = new MultipleTestCorrector( settings,
-            sortedclasses, hist, geneData, csc, geneScores, results );
-      String mtc_method = "bh"; // FIXME make this available from the command line
-      if ( mtc_method.equals( "bon" ) ) {
+            sortedclasses, hist, geneData, csc, geneScores, results, messenger );
+      int mtc_method = settings.getMtc();
+
+      if ( mtc_method == Settings.BONFERONNI ) {
          mt.bonferroni();
-      } else if ( mtc_method.equals( "bh" ) ) {
+      } else if ( mtc_method == Settings.BENJAMINIHOCHBERG ) {
          mt.benjaminihochberg( 0.05 );
-      } else if ( mtc_method.equals( "wy" ) ) {
+      } else if ( mtc_method == Settings.WESTFALLYOUNG ) {
          mt.westfallyoung( 10000 );
       }
 

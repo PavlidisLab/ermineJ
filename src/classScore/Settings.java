@@ -37,35 +37,26 @@ public class Settings {
    private int rawScoreMethod = MEAN_METHOD;
    private int analysisMethod = RESAMP;
    private int quantile = 50;
+   private int mtc = BENJAMINIHOCHBERG; // multiple test correction
    private boolean doLog = true;
    private double pValThreshold = 0.001;
    private boolean alwaysUseEmpirical;
-   
+
    public static final int BEST_PVAL = 1;
    public static final int MEAN_PVAL = 2;
+   
    public static final int MEAN_METHOD = 0;
    public static final int QUANTILE_METHOD = 1;
    public static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
+   
    public static final int ORA = 0;
    public static final int RESAMP = 1;
    public static final int CORR = 2;
    public static final int ROC = 3;
-
-   /**
-    * Westfall-Young resampling-based. Caution, this is very computationally intensive. Also not implemented for all
-    * analysis methods.
-    */
-   public static final int WY = 0;
-
-   /**
-    * Bonferroni
-    */
-   public static final int BON = 1;
-
-   /**
-    * Benjamini-Hochberg FDR
-    */
-   public static final int BH = 2;
+   
+   public static final int BONFERONNI = 0;
+   public static final int WESTFALLYOUNG = 1;
+   public static final int BENJAMINIHOCHBERG = 2;
 
 
    public Settings() {
@@ -154,6 +145,9 @@ public class Settings {
                   alwaysUseEmpirical = Boolean.valueOf(
                         properties.getProperty( "useEmpirical" ) )
                         .booleanValue();
+            if ( properties.containsKey( "mtc" ) )
+                  mtc = Integer.valueOf( properties.getProperty( "mtc" ) )
+                        .intValue();
          }
       } catch ( IOException ex ) {
          //    System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no
@@ -186,6 +180,7 @@ public class Settings {
       pValThreshold = settings.getPValThreshold();
       alwaysUseEmpirical = settings.getAlwaysUseEmpirical();
       pref_file = settings.getPrefFile();
+      mtc = settings.getMtc();
       properties = new Properties();
    }
 
@@ -212,12 +207,14 @@ public class Settings {
             .valueOf( geneRepTreatment ) );
       properties
             .setProperty( "rawScoreMethod", String.valueOf( rawScoreMethod ) );
+      properties.setProperty( "mtc", String.valueOf( mtc ) );
       properties
             .setProperty( "analysisMethod", String.valueOf( analysisMethod ) );
       properties.setProperty( "quantile", String.valueOf( quantile ) );
       properties.setProperty( "doLog", String.valueOf( doLog ) );
       properties.setProperty( "pValThreshold", String.valueOf( pValThreshold ) );
-      properties.setProperty( "useEmpirical", String.valueOf( alwaysUseEmpirical ) );
+      properties.setProperty( "useEmpirical", String
+            .valueOf( alwaysUseEmpirical ) );
       OutputStream f = new FileOutputStream( pref_file );
       properties.store( f, "" );
       f.close();
@@ -454,5 +451,17 @@ public class Settings {
       alwaysUseEmpirical = b;
    }
 
+   /**
+    * @return Returns the mtc.
+    */
+   public int getMtc() {
+      return mtc;
+   }
+   /**
+    * @param mtc The mtc to set.
+    */
+   public void setMtc( int mtc ) {
+      this.mtc = mtc;
+   }
 }
 

@@ -131,7 +131,7 @@ public class GeneAnnotations {
 
    /**
     * @param filename String
-    * @param messenger TODO
+    * @param messenger
     * @throws IOException
     */
    public GeneAnnotations( String filename, StatusViewer messenger ) throws IOException {
