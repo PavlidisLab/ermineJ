@@ -16,7 +16,7 @@ InstallDir "$PROGRAMFILES\ermineJ"
 
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
-InstallDirRegKey HKLM "Software\ermineJ" "Install_Dir"
+InstallDirRegKey HKEY_LOCAL_MACHINE "Software\ermineJ" "Install_Dir"
 
 LicenseText "You must agree to this license before installing."
 LicenseData "license.txt"
@@ -75,7 +75,7 @@ Section "ermineJ (required)"
   ; If upgrading, might not want to overwrite the old data folder
   IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
 
-    MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "You already have a data folder. Would you like to overwrite it?" IDNO NoOverwrite
+    MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "You already have an ermineJ data folder. Would you like to overwrite it?" IDNO NoOverwrite
 
     YesOverwrite:
     SetOutPath "$INSTDIR\ermineJ.data"
@@ -88,13 +88,13 @@ Section "ermineJ (required)"
   NoOverwrite:
   
   ; Write the installation path into the registry
-  WriteRegStr HKLM "SOFTWARE\ermineJ" "Install_Dir" "$INSTDIR"
+  WriteRegStr HKEY_LOCAL_MACHINE SOFTWARE\ermineJ "Install_Dir" "$INSTDIR"
   
   ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "DisplayName" "ermineJ"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoRepair" 1
+  WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "DisplayName" "ermineJ (remove only)"
+  WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoModify" 1
+  WriteRegDWORD HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoRepair" 1
   WriteUninstaller "uninstall.exe"
 
 SectionEnd
@@ -113,15 +113,31 @@ Section "Start Menu Shortcuts"
 
 SectionEnd
 
+
 ;--------------------------------
 
 ; Uninstaller
 
 Section "Uninstall"
-  
-  ; Remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\emrineJ"
-  DeleteRegKey HKLM "SOFTWARE\emrineJ"
+
+  ;
+  ; Remove registry values: we shouldn't have to do this,
+  ; but for some reason DeleteRegKey doesn't work for me at all!
+  ; so at least this removes ermineJ from "Add and Remove Programs" in
+  ; Windows' control panel (at least on WinXP; not sure about other platforms)
+  ;
+  DeleteRegValue HKEY_LOCAL_MACHINE SOFTWARE\ermineJ "Install_Dir"
+  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "DisplayName"
+  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "UninstallString"
+  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoModify"
+  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoRepair"
+
+  ;
+  ; Remove registry keys -- doesn't work for me!  (tried on WinXP)
+  ; the keys are still there (use regedit to see)
+  ; 
+  DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\emrineJ"
+  DeleteRegKey HKEY_LOCAL_MACHINE SOFTWARE\emrineJ
 
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\emrineJ\*.*"
@@ -130,14 +146,17 @@ Section "Uninstall"
   ; Remove files and uninstaller
   Delete "$INSTDIR\*.*"
 
-  ; Remove data folder
-  ;RMDir /r "$INSTDIR/ermineJ.data"
-
   ; Remove other directories used
-  RMDir "$SMPROGRAMS\emrineJ"
-  RMDir "$INSTDIR"
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\jre"
+
+  ; Remove data folder
+  IfFileExists "$INSTDIR\ermineJ.data" 0 YesRemoveDataFolder
+  MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "Do you want to remove your ermineJ data folder now too?" IDNO NoRemoveDataFolder
+  YesRemoveDataFolder:
+    RMDir /r "$INSTDIR"  ; the data folder is a subdirectory of INSTDIR
+  NoRemoveDataFolder:
+  RMDir "$SMPROGRAMS\emrineJ"
 
 SectionEnd
