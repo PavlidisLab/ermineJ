@@ -1,7 +1,7 @@
 AuthType Basic
 AuthName "Project Pages"
-AuthUserFile /proj/.htpasswd
+AuthUserFile /proj/admin/.htpasswd
 AuthGroupFile /dev/null
 <Limit GET>
-require user pzoot compbio
+require user pzoot
 </Limit>
