@@ -23,6 +23,7 @@ public class ClassMap {
     private static Map probeToClassMap;      //stores probe->Classes map
     private static Map classToProbeMap;      //stores Classes->probe map
     private static Map classesToRedundantMap; // stores classes->classes which are the same.
+    private static Map classesToSimilarMap; // stores classes->classes which are similar (and therefore not considered directly)
 
     /**
      */
@@ -102,9 +103,160 @@ public class ClassMap {
 	}
 	
 	collapseClasses(); // identify redundant classes.
+	//	ignoreSimilar(0.90); // get rid of classes which are too similar to other classes.
 	
     } // end of readMyFile()
      
+
+    /**
+       Remove classes which are too similar to some other
+       class. Classes which have fractionSameThreshold of a larger
+       class will be ignored. This doesn't know which classes are
+       relevant to the data, so it does not work perfectly.
+
+       The algorithm is: for each class, compare it to all other
+       classes. If any class encountered is nearly the same as the
+       query class, the smaller of the two classes is deleted and the
+       query continues with the class that is left. We iterate until
+       no changes are made (actually, the stopping criterion will need
+       some work - we don't want to consolidate endlessly.)
+
+       Typically what happens is one class will be contained in
+       another.
+
+     */
+    private void ignoreSimilar(double fractionSameThreshold) {
+	Set entries = classToProbeMap.keySet();
+	Iterator it = entries.iterator();
+	String queryClassId = "";
+	String targetClassId = "";
+	int sizeQuery = 0;
+	int sizeTarget = 0;
+	classesToSimilarMap = new LinkedHashMap();
+	HashMap seenit = new HashMap();
+	ArrayList deleteUs = new ArrayList();
+
+	System.err.println("...Highly (" + fractionSameThreshold * 100 + "%)  similar classes are being removed...");
+
+	while (it.hasNext()) {
+	    queryClassId = (String)it.next();
+	    ArrayList queryClass = (ArrayList)classToProbeMap.get(queryClassId);
+
+	    sizeQuery = queryClass.size();
+	    if (sizeQuery > 250 || sizeQuery < 5) {
+		continue;
+	    }
+
+	    Iterator itb = entries.iterator();
+	    while (itb.hasNext()) {
+		targetClassId = (String)itb.next();
+
+		/* skip self comparisons and also symmetric comparisons. The latter half  */
+		if (seenit.containsKey(targetClassId) || targetClassId.equals(queryClassId) )
+		    continue;
+
+		ArrayList targetClass = (ArrayList)classToProbeMap.get(targetClassId);
+
+		sizeTarget = targetClass.size();
+		if (sizeTarget > 250 || sizeTarget < 2) {
+		    continue;
+		}
+
+		//		System.err.println("Comparing " + targetClassId + " to " + queryClassId );
+
+		if (sizeTarget < sizeQuery) {
+
+		    if ((double)sizeTarget/sizeQuery < fractionSameThreshold)
+			continue;
+
+		    if(areSimilarClasses(sizeQuery, sizeTarget, queryClass, targetClass, fractionSameThreshold)) {
+			deleteUs.add(targetClassId);
+			
+			//			System.err.println(targetClassId + " and " + queryClassId + " are similar (target is smaller and will be ignored)");
+
+			if ( ! classesToSimilarMap.containsKey(queryClassId))
+			    classesToSimilarMap.put(queryClassId, new ArrayList());
+			if ( ! classesToSimilarMap.containsKey(targetClassId))
+			    classesToSimilarMap.put(targetClassId, new ArrayList());
+
+			((ArrayList)classesToSimilarMap.get(queryClassId)).add(targetClassId);
+			((ArrayList)classesToSimilarMap.get(targetClassId)).add(queryClassId);
+
+		    }
+		    
+		} else {
+
+		    if ((double)sizeQuery/sizeTarget < fractionSameThreshold)
+			continue;
+
+		    if(areSimilarClasses(sizeTarget, sizeQuery, targetClass, queryClass, fractionSameThreshold)) {
+
+			//			System.err.println(targetClassId + " and " + queryClassId + " are similar (query is smaller and will be ignored)");
+
+			queryClassId = targetClassId;
+			queryClass = targetClass;
+			deleteUs.add(queryClassId);
+			
+			if ( ! classesToSimilarMap.containsKey(targetClassId))
+			    classesToSimilarMap.put(targetClassId, new ArrayList());
+			if ( ! classesToSimilarMap.containsKey(queryClassId))
+			    classesToSimilarMap.put(queryClassId, new ArrayList());
+
+			((ArrayList)classesToSimilarMap.get(queryClassId)).add(targetClassId);
+			((ArrayList)classesToSimilarMap.get(targetClassId)).add(queryClassId);
+
+			break; // cant/dont test this query any more!
+		    }
+		    
+		}
+
+	    } /* inner while */
+	    seenit.put(queryClassId, new Boolean(true));
+	} /* end while ... */
+	
+	/* remove the ones we don't want to keep */
+	Iterator itrd = deleteUs.iterator();
+	while (itrd.hasNext()) {
+	    String deleteMe = (String)itrd.next();
+	    classToProbeMap.remove(deleteMe);
+	}
+
+	System.err.println("There are now " + classToProbeMap.size() + " classes represented on the chip (" + deleteUs.size() + " were ignored)");
+
+    } /* ignoreSimilar */
+
+    /**
+       Helper function for ignoreSimilar.
+     */
+    private boolean areSimilarClasses(int biggersize, int smallersize, ArrayList biggerClass, ArrayList smallerClass, double fractionSameThreshold) {
+
+	if (biggersize < smallersize) {
+	    System.err.println("Invalid sizes");
+	    System.exit(1);
+	}
+
+	/* iterate over the members of the larger class. If the member
+	 * is not in the smaller class, increment a counter. If this
+	 * count goes over the maximum allowed missing, return
+	 * false. */
+	int maxmissing = (int)((1.0 - fractionSameThreshold) * (double)biggersize);
+
+	int notin = 0;
+	Iterator ita = biggerClass.iterator();
+	while (ita.hasNext()) {
+	    String probe = (String)ita.next();
+	    
+	    if (!smallerClass.contains(probe) ) // using arraylists here searches are not optimally fast.
+		notin++;
+
+	    if (notin > maxmissing)
+		return false;
+	}
+	    
+	/* return true is the count is high enough */
+	return true;
+	
+    }
 
 
     /**
@@ -139,7 +291,7 @@ public class ClassMap {
 	    // classes are less likely to be identical to others,
 	    // anyway. In tests, the range shown below has no effect
 	    // on the results, but it _could_matter.
-	    if (classMembers.size() > 200 || classMembers.size() < 2) {
+	    if (classMembers.size() > 250 || classMembers.size() < 2) {
 		ignored++;
 		continue;
 	    }
@@ -179,7 +331,7 @@ public class ClassMap {
 	    }
 	}
 
-	//	System.err.println("There are now " + classToProbeMap.size() + " classes represented on the chip (" + ignored + " were ignored)");
+	System.err.println("There are now " + classToProbeMap.size() + " classes represented on the chip (" + ignored + " were ignored)");
 
     }
 
@@ -193,6 +345,18 @@ public class ClassMap {
 	    return null;
 	}
     }
+
+
+    /**
+     */
+    public ArrayList getSimilarities(String classId) {
+	if ( classesToSimilarMap != null && classesToSimilarMap.containsKey(classId) ) {
+	    return (ArrayList)classesToSimilarMap.get(classId);
+	} else {
+	    return null;
+	}
+    }
+
 
     /**
      */

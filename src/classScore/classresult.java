@@ -84,7 +84,7 @@ public class classresult implements Comparable {
 		      nf.format(score) + "\t" + nf.format(pvalue) + "\t" + 
 		      effective_size + "\t" + hypercut + "\t" + nf.format(hyperpval) + "\t" + 
 		      nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" + 
-		      nf.format(pvalue_corr) + extracolumns + "\n");
+		      nf.format(pvalue_corr) + "\t" + extracolumns + "\n");
 	} catch (IOException e) {
 	    System.err.println("There was an IO error" + e);
 	}

@@ -12,13 +12,13 @@ RUN_OPTIONS= -Xmx1024M
 SOURCEPATH = .
 
 CLASSPATH = .
-OUTPUTDIR = .
+OUTPUTDIR = ./
 
 DOCDIR = ../doc
 
 JAVAC = /usr/java/j2sdk1.4.1_03/bin/javac
 
-JAVA = java
+JAVA = /usr/java/j2sdk1.4.1_03/bin/java
 
 JAR = /usr/java/j2sdk1.4.1_03/bin/jar
 
@@ -34,36 +34,36 @@ HEADER = '<b>CLASS_SCORES</b><br><font size="-1">Columbia</font>'
 BOTTOM = '<font size="-1"><a href="mailto:pp175@columbia.edu">Submit a bug or feature request</a><br><br>Class Score is Copyright 2002 (C) Columbia Genome Center,<br>NY, U.S.A.All Rights Reserved.</font>'
 
 CLASS_FILES= \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/classresult.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/ClassMap.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/class_correls.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/exp_class_scores.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/class_pvals.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/corr_class_scores.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/histogram.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/Pval_parse.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/Group_Parse.class \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/GoName_parse.class \
-        ${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/Class_Frame.class \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/Matrix.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/Stats.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/SpecFunc.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/geneNpval.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/ConstantStuff.class  \
-        ${OUTPUTDIR}/erminecmd.class
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/classresult.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/ClassMap.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/class_correls.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/exp_class_scores.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/class_pvals.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/corr_class_scores.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/histogram.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/Pval_parse.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/Group_Parse.class \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/GoName_parse.class \
+        ${OUTPUTDIR}${APP_PACKAGE_PATH}/classScore/Class_Frame.class \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/util/Matrix.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/util/Stats.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/util/SpecFunc.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/util/geneNpval.class  \
+	${OUTPUTDIR}${APP_PACKAGE_PATH}/util/ConstantStuff.class  \
+        ${OUTPUTDIR}erminecmd.class
 
 all: class_score commandline dist
 
 run: runner
 
 tags: *.java
-	etags *.java classScore/*.java
+	etags *.java classScore/*.java util/*.java
 
 
 class_score: ${CLASS_FILES}
 
 
-${OUTPUTDIR}/%.class	: ${SOURCEPATH}/%.java
+${OUTPUTDIR}%.class	: ${SOURCEPATH}/%.java
 	${JAVAC} ${OPTIONS} \
 	-sourcepath ${SOURCEPATH} \
 	-classpath ${CLASSPATH} \
@@ -85,24 +85,24 @@ commandline:
 clean:
 #	find ./ -name "*~" -exec rm {} \;
 	find ./ -name "*.class" -exec rm -f {} \;
-#	rm -rf ${OUTPUTDIR}/*.class;
-#	rm -r -f ${OUTPUTDIR}/*;
+#	rm -rf ${OUTPUTDIR}*.class;
+#	rm -r -f ${OUTPUTDIR}*;
 #	rm -r -f ${DOCDIR}/*;
 #	mkdir ${OUTPUTDIR};
 #	mkdir ${DOCDIR};
 
 dist : class_score 
-	${JAR} cmf gui.manifest.add \
-	classScore.jar \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/*.class \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/*.class
+	${JAR} cfm \
+	classScore.jar  gui.manifest.add \
+	util/*.class \
+	classScore/*.class
 
 
 cmdline : class_score classScore.jar
 	${JAR} cmf cmdline.manifest.add \
 	classScorecmd.jar \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/*.class \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/*.class \
+	util/*.class \
+	classScore/*.class \
 	erminecmd.class	
 
 

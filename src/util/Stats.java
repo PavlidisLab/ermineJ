@@ -477,39 +477,40 @@ public class Stats implements Cloneable, ConstantStuff
     /**
        Calculate hypergeometric distribution.  Gives same answer as
        dhyper in R.
-       @param N1 Number of positives in the data
-       @param n1 Number of 'successes'
-       @param N2 Number of negatives in the data
-       @param n2 Number of 'failures'
+       @param positives Number of positives in the data
+       @param successes Number of 'successes'
+       @param negatives Number of negatives in the data
+       @param failures Number of 'failures'
        @return The hypergeometric probability for the parameters.
     */
-    public static double hypergeometric (int N1, int n1, int N2, int n2)
+    public static double hypergeometric (int positives, int successes, int negatives, int failures)
     {
-	if (n1 > N1 || n2 > N2 || n1 < 0 || n2 < 0 || N1 <= 0 || N2 <= 0 ) {
+	if (successes > positives || failures > negatives || successes < 0 || failures < 0 || positives <= 0 || negatives <= 0 ) {
 	    System.err.println("Illegal values for hyperPval");
 	    System.exit(1);
 	}
-	return SpecFunc.binomial_coeff(N1,n1)*SpecFunc.binomial_coeff(N2,n2)/SpecFunc.binomial_coeff(N1+N2,n1+n2);
+	return SpecFunc.binomial_coeff(positives,successes)*SpecFunc.binomial_coeff(negatives,failures)/SpecFunc.binomial_coeff(positives+negatives,successes+failures);
     }
     
 
     /**
        Cumulative hypergeometric probability ( for over-represented
-       categories ). Gives same pvalues as phyer in R.
-       @param N1 Number of positives in the data
-       @param n1 Number of 'successes'
-       @param N2 Number of negatives in the data
-       @param n2 Number of 'failures'
+       and uner-reprsented categories ). Gives same pvalues as phyper
+       in R.
+       @param positives Number of positives in the data
+       @param successes Number of 'successes'
+       @param negatives Number of negatives in the data
+       @param failures Number of 'failures'
        @return The cumulative hypergeometric distribution.
     */
-    public static double hyperPvalOver (int N1, int n1, int N2, int n2)
+    public static double cumHyperGeometric (int positives, int successes, int negatives, int failures)
     {
 	double pval = 0.0;
 	int i;
 
-	for (i = 0; i <= n1; i++)  {
-	    pval += hypergeometric(N1, i, N2, n1 + n2 - i ); // starts at n2, goes down to zero while i goes up to N1.
-	    //	    System.err.println(N1 + " " + i + " " + N2 + " " + ( n2 - i ));
+	for (i = 0; i <= successes; i++)  {
+	    pval += hypergeometric(positives, i, negatives, successes + failures - i ); // starts at failures, goes down to zero while i goes up to positives.
+	    //	    System.err.println(positives + " " + i + " " + negatives + " " + ( failures - i ));
 	}
 
 	if (pval > 0.5)
@@ -677,7 +678,7 @@ public class Stats implements Cloneable, ConstantStuff
 	double testhyper = hypergeometric(a,b,c,d);
 	System.err.println("Hypergeometric:" + testhyper);
 
-	double testhyperm = hyperPvalOver(a,b,c,d);
+	double testhyperm = cumHyperGeometric(a,b,c,d);
 	System.err.println("Cum hypergeo: " + testhyperm);
 
 	double binom_p = SpecFunc.binomial_prob(b, d, (double)a/(double)(a+c));

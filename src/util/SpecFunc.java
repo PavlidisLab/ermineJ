@@ -147,6 +147,53 @@ public class SpecFunc {
     
     
     /**
+       Calculate hypergeometric distribution.  Gives same answer as
+       dhyper in R.
+       @param positives Number of positives in the data
+       @param successes Number of 'successes'
+       @param negatives Number of negatives in the data
+       @param failures Number of 'failures'
+       @return The hypergeometric probability for the parameters.
+    */
+    public static double hypergeometric (int positives, int successes, int negatives, int failures)
+    {
+	if (successes > positives || failures > negatives || successes < 0 || failures < 0 || positives <= 0 || negatives <= 0 ) {
+	    System.err.println("Illegal values for hyperPval");
+	    System.exit(1);
+	}
+	return SpecFunc.binomial_coeff(positives,successes)*SpecFunc.binomial_coeff(negatives,failures)/SpecFunc.binomial_coeff(positives+negatives,successes+failures);
+    }
+    
+
+    /**
+       Cumulative hypergeometric probability ( for over-represented
+       and uner-reprsented categories ). Gives same pvalues as phyper
+       in R.
+       @param positives Number of positives in the data
+       @param successes Number of 'successes'
+       @param negatives Number of negatives in the data
+       @param failures Number of 'failures'
+       @return The cumulative hypergeometric distribution.
+    */
+    public static double cumHyperGeometric (int positives, int successes, int negatives, int failures)
+    {
+	double pval = 0.0;
+	int i;
+
+	for (i = 0; i <= successes; i++)  {
+	    pval += hypergeometric(positives, i, negatives, successes + failures - i ); // starts at failures, goes down to zero while i goes up to positives.
+	    //	    System.err.println(positives + " " + i + " " + negatives + " " + ( failures - i ));
+	}
+
+	if (pval > 0.5)
+	    return 1.0 - pval;
+
+	return pval;
+
+    }
+
+
+    /**
        Binomial coefficient
     */
     public static double binomial_coeff	(int n, int k) 
@@ -173,10 +220,21 @@ public class SpecFunc {
 	int i;
 	double pval = 0.0;
 
+	if (successes == 0 || trials == 0 || p == 0.0) {
+	    System.err.println("No successes and/or no trials and/or probability is zero.");
+	    return 1.0;
+	}
+
 	for (i = successes + 1; i <= trials; i++) {
 	    pval += binomial_prob(i, trials, p);
 	}
-	return pval;
+
+	if (pval == 0.0 || Double.isNaN(pval) ) {
+	    System.err.println("Binomial returned probability of zero or NAN for " + successes + " successes, " + trials + " trials, p=" + p);
+	    return 1.0e-15;
+	} else {
+	    return pval;
+	}
     }
 
     

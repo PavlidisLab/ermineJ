@@ -33,8 +33,8 @@ public class class_pvals {
     private Map target_ranks;
     private Map record;
     private int inputSize;
-    private int N1 = 0; // number of genes over the threshold
-    private int N2 = 0; // number of genes below the threshold
+    private int numOverThreshold = 0; // number of genes over the threshold
+    private int numUnderThreshold = 0; // number of genes below the threshold
     private NumberFormat nf = NumberFormat.getInstance();
 
 
@@ -111,9 +111,9 @@ public class class_pvals {
 	}
 
 	inputSize = input_rank_map.size(); // how many pvalues. This is constant under permutations of the data
-	hgSizes(inp_entries); // get N1 and N2. Constant under permutations of the data.
+	hgSizes(inp_entries); // get numOverThreshold and numUnderThreshold. Constant under permutations of the data.
 
-	System.err.println("input size=" +  inputSize + " N1=" + N1 + " N2=" + N2 + " " );//+  + "" + foo + "" + foo + "" + foo + "" + foo );
+	System.err.println("input size=" +  inputSize + " numOverThreshold=" + numOverThreshold + " numUnderThreshold=" + numUnderThreshold + " " );//+  + "" + foo + "" + foo + "" + foo + "" + foo );
 
 	// calculate the actual class scores and correct sorting.
 	class_pval_generator(probe_pval.get_group_pval_map(), probe_pval.get_map(), input_rank_map);
@@ -122,9 +122,9 @@ public class class_pvals {
 	if (mtc_method.equals("bon")) {
 	    correct_pvals(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
 	} else if (mtc_method.equals("bh")) {
-	    correct_pvals(0.05);
+	    correct_pvals(0.01);
 	} else if (mtc_method.equals("wy")) {
-	    correct_pvals(10000);
+	    correct_pvals(20000);
 	}
 
 	// all done:
@@ -144,8 +144,8 @@ public class class_pvals {
      */
     public classresult scoreClass (String class_name, Map group_pval_map, Map probesToPvals, Map input_rank_map) {
 	//inputs for hypergeometric distribution
-	int n1 = 0; // number of genes in this class which are above the threshold
-	int n2 = 0; // number of genes in this calss which are below the threshold
+	int successes = 0; // number of genes in this class which are above the threshold
+	int failures = 0; // number of genes in this calss which are below the threshold
 	
 	//variables for outputs
 	double pval = 0.0;
@@ -184,9 +184,9 @@ public class class_pvals {
 			
 			//  (hypergeometric) if the user_pval is met by this probe, we count it
 			if(groupPvalArr[v_size] >= user_pvalue) {
-			    n1++; // successs.
+			    successes++; // successs.
 			} else {
-			    n2++; // failure.
+			    failures++; // failure.
 			}
 			v_size++;
 
@@ -204,9 +204,9 @@ public class class_pvals {
 		    
 		    // hypergeometric pval info.
 		    if(pbpval.doubleValue() >= user_pvalue) {
-			n1++; // successs.
+			successes++; // successs.
 		    } else {
-			n2++; // failure.
+			failures++; // failure.
 		    }
 
 		    //for roc. Only difference from with weights is that we don't use probe_group.get()
@@ -231,29 +231,29 @@ public class class_pvals {
 	area_under_roc = Stats.arocRate(inputSize, target_ranks);
 	roc_pval = Stats.rocpval(target_ranks.size(), area_under_roc);
 
-	// Hypergeometric p value calculation. Using the binomial approximation.
-	// Only look at over-represented genes. Identify these by
-	// seeing if the observed is greater than the
-	// expected. Otherwise, set the hypergeometric pvalue to be
-	// 1.0 (we can change this behavior if desired)
+	// Hypergeometric p value calculation. Using the binomial
+	// approximation.  Only look at over-represented
+	// genes. Identify these by seeing if the observed is greater
+	// than the expected. Otherwise, set the hypergeometric pvalue
+	// to be 1.0 (we can change this behavior if desired)
 	double pos_prob = (double)in_size /(double)inputSize;
-	double expected = (double)N1 * pos_prob;
-	//	System.err.println("Expecting " + expected + ", saw " + n1 + " (prob of pos= " + pos_prob + ").");
+	double expected = (double)numOverThreshold * pos_prob;
+	//	System.err.println("Expecting " + expected + ", saw " + successes + " (prob of pos= " + pos_prob + ").");
 
-	if (n1 < expected) { // fewer than expected.
+	if (successes < expected || pos_prob == 0.0 ) { // fewer than expected, or we didn't/cant get anything.
 	    hyper_pval = 1.0;
 	} else {
-	    //	hyper_pval = Stats.hyperPvalOver(N1, n1, N2, n2); 
-	    hyper_pval = SpecFunc.binomialCumProb(n1, N1, pos_prob);
+	    //	hyper_pval = Stats.cumHyperGeometric(numOverThreshold, successes, numUnderThreshold, failures); 
+	    hyper_pval = SpecFunc.binomialCumProb(successes, numOverThreshold, pos_prob); // successes=number of genes in class which meet criteria (successes); numOverThreshold= number of genes which meet criteria (trials); pos_prob: fractional size of class wrt data size.
 	}
 	
-	//	System.err.println(class_name + "(" + goName.get_GoName_value_map(class_name) + ") - base prob: " + pos_prob + " successes: " + n1 + " failures: " + n2 + " Trials: " + N1 + " Nontrials: " + N2 + " H: " + hyper_pval);
+	//	System.err.println(class_name + "(" + goName.get_GoName_value_map(class_name) + ") - base prob: " + pos_prob + " successes: " + successes + " failures: " + failures + " Trials: " + numOverThreshold + " Nontrials: " + numUnderThreshold + " H: " + hyper_pval);
 
 	// set up the return object.
 	classresult res = new classresult(class_name, goName.get_GoName_value_map(class_name), (int)((Integer)actual_sizes.get(class_name)).intValue(), in_size);
 	res.setscore(rawscore);
 	res.setpval(pval);
-	res.sethypercut(n1);
+	res.sethypercut(successes);
 	res.sethyperp(hyper_pval);
 	res.setaroc(area_under_roc);
 	res.setarocp(roc_pval);
@@ -365,19 +365,19 @@ public class class_pvals {
 		    res = (classresult)results.get(it.next());
 		    if (first) {
 			first = false;
-			res.print_headings(out, "\tSame as:");
+			res.print_headings(out, "\tSame as:\tSimilar to:");
 		    }
 		    //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-		    res.print(out, format_redundant(res.get_class_id()) );
+		    res.print(out, format_redundant_and_similar(res.get_class_id()) );
 		}
 	    } else {
 		for (Iterator it=results.entrySet().iterator(); it.hasNext(); ) {
 		    res = (classresult)it.next();
 		    if (first) {
 			first = false;
-			res.print_headings(out, "\tSame as:");
+			res.print_headings(out, "\tSame as:\tSimilar to:");
 		    }
-		    res.print(out, format_redundant(res.get_class_id()) );
+		    res.print(out, format_redundant_and_similar(res.get_class_id()) );
 		    //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
 		}
 	    }
@@ -391,23 +391,37 @@ public class class_pvals {
     /**
        Set up the string the way I want it.
      */
-    private String format_redundant (String classid) {
+    private String format_redundant_and_similar (String classid) {
 	ArrayList redund = probe_class.getRedundancies(classid);
-
+	String return_value = "";
+	    
 	if (redund != null) {
-	    String return_value = "";
 	    Iterator it = redund.iterator();
 	    while (it.hasNext()) {
 		String nextid = (String)it.next();
 		String prefix;
 		return_value = return_value + nextid + "|" +  goName.get_GoName_value_map(nextid) + ", ";
 	    }
+	} 
+	
+	return_value = return_value + "\t";
+
+	ArrayList similar = probe_class.getSimilarities(classid);
+
+	if (similar != null) {
+	    Iterator it = similar.iterator();
+	    while (it.hasNext()) {
+		String nextid = (String)it.next();
+		String prefix;
+		return_value = return_value + nextid + "|" +  goName.get_GoName_value_map(nextid) + ", ";
+	    }
 	    return "\t" + return_value;
-	} else {
-	    return "";
-	}
+	} 
+
+	return return_value;
+
     }
-    
+   
     
     /**
        Calculate class sizes for all classes - both effective and actual size 
@@ -461,7 +475,7 @@ public class class_pvals {
 
     
     /**
-       Calculate N1 and N2 for hypergeometric distribution. This
+       Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution. This
        is a constant under permutations, but depends on weights.
        @param inp_entries The pvalues for the probes (no weights) or groups (weights) 
     */
@@ -473,11 +487,11 @@ public class class_pvals {
 	    double groupval = Double.parseDouble((m.getValue()).toString());
 
 	    if(groupval >= user_pvalue)
-		N1++; // how many are above the threshold.
+		numOverThreshold++;
 	    else
-		N2++; // how many are below the threshold.
+		numUnderThreshold++;
 	}
-	System.err.println(N1 + " genes are above the threshold " + user_pvalue);
+	System.err.println(numOverThreshold + " genes are above the threshold " + user_pvalue);
     }
 
 
@@ -559,7 +573,7 @@ public class class_pvals {
     private void correct_pvals(int trials) 
     {
 
-	double[] counts = new double[sortedclasses.size()];
+	int[] counts = new int[sortedclasses.size()];
 	for (int i=0; i< sortedclasses.size(); i++) {
 	    counts[i] = 0;
 	}
@@ -567,7 +581,7 @@ public class class_pvals {
 	Collections.reverse(sortedclasses); // start from the worst class.
 	Vector permscores;
 
-	boolean verbose = false;
+	boolean verbose = true;
 
 	for (int i=0; i < trials; i++) {
 	    //	    System.err.println("Trial: " + i );
@@ -592,57 +606,55 @@ public class class_pvals {
 		scinput_rank_map = Stats.rankOf(scprobepvalmap);
 	    }
 
+	    /// permscores contains a list of the p values for the shuffled data.
 	    permscores = class_v_pval_generator(scgroup_pval_map, scprobepvalmap, scinput_rank_map); // end of step 1.
 
 	    int j = 0;
 	    double permp = 0.0;
 	    Double m = (Double)permscores.get(j); // first sim value (for worst class in real data)
-	    double q = m.doubleValue(); // pvalue for the previous permutation, but based on current size.
+	    double q = m.doubleValue(); // pvalue for the previous permutation, initialized here.
+	    double qprev = q;
 	    double actual_p = 0.0;
-	    //	    int size_q = hist.get_min_class_size(); // size of the class used to calculate q.
-	    //	    Double m_q = (Double)permscores.get(0); // the score that led to the last pvalue. Initialize so it is the first one. (qk*=prk*)
-	    //	    double m_
-
+	    String nextclass = "";
 
 	    // successive minima of step 2, pg 66. Also does step 3.
-	    for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) { // going in the correct order.
-		String nextclass = (String)it.next();
+	    for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) { // going in the correct order for the 'real' data, starting from the worst class.
+
+		nextclass = (String)it.next();
 		classresult res = (classresult)results.get(nextclass);
-	
-		m = (Double)permscores.get(j); // random pvalue.
-		permp = m.doubleValue();
-		//permp = hist.get_val(res.get_effsize(), m.doubleValue()); // simulation p pvalue for this class size, for this trial.
-
-		//		q = Math.max(hist.get_val(res.get_effsize(), m_q.doubleValue()), q); // pvalue for _this_ size, based on score from  _previous_ step. (right hand side of minima, step 2). First step, this is same as permp.
-		//size_q = Math.min(res.get_effsize(), size_q); // only go down in size. This keeps us from getting stuck in ruts....but isn't right either.
-		//q = hist.get_val(size_q, m_q.doubleValue()); // pvalue for _this_ size.
-
 		actual_p = res.get_pvalue(); // pvalue for this class on real data.
-		//		actual_p = res.get_score(); // score for this class on real data.
+	
+		m = (Double)permscores.get(j);
+		permp = m.doubleValue(); // randomized pvalue for this class.
+
+		q = Math.min(qprev, permp); // The best values for
+					    // permp for this trial
+					    // bubbles up. The way
+					    // this works is that if
+					    // two classes are highly
+					    // correlated, their
+					    // permuted pvalues will
+					    // tend to be the
+					    // same. Then, whatever
+					    // decision is made here
+					    // will tend to be the
+					    // same decision made for
+					    // the next (correlated
+					    // class). That is how the
+					    // resulting corrected p
+					    // values for correlated
+					    // classes are correlated.
+
+		/* step 3 */
+		if (q <= actual_p) { // for bad classes, this will often be true. Otherwise we see it less.
+		    counts[j]++;
+		}
 
 		if (verbose && j == sortedclasses.size() - 1)
-		    System.err.print(j + " " + nextclass +  " size=" + res.get_effsize() + " q=" + nf.format(q) + " rawscperm=" + nf.format(m) + " pperm=" + nf.format(permp) + " actp=" + nf.format(actual_p));
-		//		    System.err.print(nextclass + " size=" + res.get_effsize() + " q=" + nf.format(q) + " m=" + nf.format(m) +  " act=" + nf.format(actual_p));
-
-		// use greater than if going by scores, not pvalues.
-		if (permp < q) {
-		    q = permp;
-		    //		    m_q = m; // permp comes from m. q comes from m_q.
-		    if (verbose && j == sortedclasses.size() - 1) 
-			System.err.print(" u");
-		}
-
-		//		q = Math.min(permp, q); // becomes q for next time.
-
-		if (q < actual_p) { // for bad classes, this will often be true. Otherwise we should see it less.
-		    counts[j]++;
-		    if (verbose && j == sortedclasses.size() - 1) 
-			System.err.print(" +");
-		}
-		if (verbose && j == sortedclasses.size() - 1) 
-		    System.err.print("\n");
+		    System.err.println("Sim " + i + " class# " + j + " " + nextclass +  " size=" + res.get_effsize() + " q=" + nf.format(q) + " qprev=" + nf.format(qprev) + " pperm=" + nf.format(permp) + " actp=" + nf.format(actual_p) + " countj=" + counts[j] + " currentp=" + (double)counts[j]/(i+1));
 
 		j++;
+		qprev = q;
 	    }
 	}
 
@@ -651,6 +663,7 @@ public class class_pvals {
 	int j = sortedclasses.size() - 1; // index of the best class (last one tested above).
 	double corrected_p = counts[sortedclasses.size() - 1]/trials; // pvalue for the best class.
 	double previous_p = corrected_p;
+
 	// Step 4 and enforce monotonicity, pg 67 (step 5)
 	for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) { // starting from the best class.
 	    classresult res = (classresult)results.get((String)it.next());
