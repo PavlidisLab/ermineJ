@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>ErmineJ</title>
+	<link rel="stylesheet" href="css/default.css">
+</head>
+
+<body bgcolor="#FFFFFF" link="#800000" text="#000000">
+<table border="0" cellpadding="2" cellspacing="3" width="600">
+<tr>
+	<td>
+	<!-- Logo space -->
+		<a href="index.html">Home</a>
+		
+	</td>
+	<td>
+	<!-- Header space -->
+	<h1>How the code runs</h1>
+	</td>
+</tr>
+<tr>
+	<td>
+	<!-- Left gutter space -->
+	<img src="/images/shim.gif" width="70" height="1" border="0" alt="">
+
+	</td>
+	<td>
+	<!-- main text space -->
+	
+	<p align="justify">There are 11 main classes in ermineJ:<br>    <b>1. affy_go_parse: </b>Parses the file from the form [chip_id][GO1|GO2|GO3|...]     Stores it in the Map called affy_go_map. Stores the reverse also int     go_affy_map in the form [GO1][chip1,chip2...]<br>    <b>2. Pval_parse:</b> Parses the file from the form [chip_id][pval],     determine the target genes which are going to be computed<br>    <b>3. Ug_Parse:</b> Parses the file from the form [probe][UG_ID], and then     stores the temporary reverse map of the form [UD_ID][probe1,probe2,probe3...]     then stores the values for each UG_ID in a hash map probe1-&gt;probe2,probe3     probe2-&gt;probe3,probe1 probe3-&gt;probe1,probe2&nbsp;&nbsp;&nbsp; where each     group represent items in the same unigene cluster.<br>    <b>4. GoName_parse: </b>Parses the file from the form [GoID][Biological     Name] The values are stored in a Map<br>    <b>5. ConstantStuff: </b>stores constant variables <br>    <b>6. Stats: </b>set of mathematics functions<br>    <b>7. histogram: </b>Stores information relevant to a histogram<br>    <b>8. exp_class_scores: </b>calculates a background distribution for class     scores derived from randomly selected individual gene scores, then stores     information to histogram<br>    <b>9. class_pvals: </b>calculates the raw p-values, hypergeometric p-values,     and ROC p-values<br>    <b>10.Class_Frame:</b> Front end GUI for class scores<br>    <b>11.Final_Project: </b>Final test file<br>    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The first 4 classes read in     corresponding data files then parse those file then store all the     information in maps or arrays. ConstantStuff and Stats contain necessary     constants and functions for computation, the histogram stores information     about random trails. exp_class_scores calculates the background     distribution, and class_pvals use all the information above and generates     all the results we need. Class_Frame provide GUI, which is triggered by     Final_Project, the root of&nbsp; whole program. Most of the source codes are     straight forward, but here I want to explain how replicated genes are     handled . In class_pvals, the in_pval means the p-val array that is actually     used for randomized trials. Therefore, if weight is on, we use 'ug_pval_arr',     which is pvals of all the unigenes; if weight is off, we use 'pvals', which     is pvals of all the genes. More general, the difference between weight on     and off is, when weight is off, all the computation use gene properties as     input; while weight is on, we use unigene properties instead.<br>    <br>¡@</p>
+<div class="reference">	<dl>
+	<dt>--
+	</dl></div>
+	</td>
+</tr>
+<tr name="footer">
+<td colspan="2"><img src="/images/shim.gif" width="1" height="10" border="0" alt=""></td>
+</tr>
+<tr>
+<td>
+<!-- left gutter psace -->
+</td>
+<td class="footer"><a href="mailto:pp175@columbia.edu">Paul Pavlidis</a>.&nbsp; 
+<script language="JavaScript" type="text/javascript">
+<!--
+	document.write("Last Modified " + document.lastModified);
+// -->
+</script>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

@@ -6,8 +6,7 @@
 <body>
 <h1></h1>
 
-<pre>
-HOW TO COMPILE:
+<pre>HOW TO COMPILE:
 1. [IN UNIX]under the directry ermineJ/java_proj, type in 'make' to compile the program.
 2. [IN DOS]under the directry ermineJ/java_proj, type in 'makerun' to compile the program.
 
@@ -45,20 +44,8 @@ The columns in output file are ordered as:
 5. virtual size -- only shown if the 'Weight' method is applied. Means the number of unigenes belongs to this GO class.
 6. hyper pval -- the hyper geometric distribution p-value of this GO class.
 7. roc rate -- the roc score of this GO class.
+8. rocpval -- roc method p-value of this GO class.
 
-METHODS COMPARISON:
-1. Class Pvalue -- class pval is computed based on the assumption of random distribution. With enough interations (100,000+), 
-   this value can be a good estimation of how special the data are. The precision of this method is 0.5/(number of iterations),
-   therefore we need to have an trade-off aggrement between precision and efficiency.
-2. Hyper Pvalue -- this pval is computed from hypergeometric distribution. User has to set a threshold before applying this method.
-   The computation is easy to implement, and it is fairly fast (O(n)). But there are some drawbacks: 1. the choice of threshold 
-   affects result tremendously, and there is no goldstandard for the threshold. It means we have to change the threshold again and 
-   again, then check the all the outputs to see which threshold give us more interesting result. However, even we get an extremely
-   interesting output from a certain threshold, we cannot say it is teh best threshold, since it may have exagerated the relation 
-   betwwen data. 2. the threshold is not consistent among data, it means even you can found a good threshold for certain data, 
-   very probable this threshold is not a good one for other data.
-3. Area under Receiver Operating Characteristic (AROC) -- this method cares only the rank of each genes in each class. However, it 
-   still is a good way to evaluate the specialty of a class.
 
 </pre>
 

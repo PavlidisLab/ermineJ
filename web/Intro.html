@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Program:</title>
+	<link rel="stylesheet" href="css/default.css">
+</head>
+
+<body bgcolor="#FFFFFF" link="#800000" text="#000000">
+<table border="0" cellpadding="2" cellspacing="3" width="776">
+<tr>
+	<td width="72">
+	<!-- Logo space -->
+		<a href="index.html">Home</a>
+		
+	</td>
+	<td width="687">
+	<!-- Header space -->
+	<h1>Introduction</h1>
+	</td>
+</tr>
+<tr>
+	<td width="72">
+	<!-- Left gutter space -->
+	<img src="/images/shim.gif" width="70" height="1" border="0" alt="">
+
+	</td>
+	<td width="687">
+	<!-- main text space -->
+	<p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This program     computes raw score, class p-value, hypergeometric p-value, and ROC rate for     every unigene (or single gene) in the gene score file. The class p-value is     a way to estimate how interesting a class is, but it has some drawbacks like     randomization trials, such procedure make the output unstable, especially in     the case of limited iterations. To enhance the outcome, we can apply large     iterations(100k+), but it would affect the efficiency a lot. Therefore we     seek other ways that are stable and also provide good estimation for how     interesting the classes are. Hypergeometric p-value and ROC rate are two     candidates, the computation of both methods have nothing to do with     randomization, so the experiments are repeatable under fixed settings. More     details about the two methods are described in method section.</p>    <h3><br>    methods</h3>    <p><br>    <b>I. Class p-value -- </b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Gene Ontology (GO) class p-value is     computed based on the assumption of random distribution. The steps of     calculation of GO class p-value are:<br>    1. generate background distribution -- given the size of a GO class (S) and     the number of iterations (I), in each trial the program randomly pick up S     unigenes/genes from gene score file, then take the method (mean or median)     as the result of this trial. Such trial should be repeated for I times to     generate the background distribution. This distribution means how the score     distributed if a certain size of elements are independently chosen.<br>    2. transform background distribution to corresponding p-value -- the score     distribution is split into bins (column) according to the score, then each     bins has its own p-value, which means the percentage of trials that have     better scores then this bin. After this the program generates a look-up     table for different class size (row), each row has related p-value for every     column.<br>    3. determine class p-value -- for each GO class in gene score file,     calculate its class raw score according to the method (mean or median), then     look into the background distribution table to find its corresponding     p-value. <br>    With enough iterations (100k+), this value can be a good estimation of how     special the data are. The precision of this method is 0.5/(number of     iterations), therefore we need to have an trade-off agreement between     precision and efficiency.<br>    <br>    <b>II. Hypergeometric p-value -- </b><br>    This p-value is computed from hypergeometric distribution. The steps of     calculation of hypergeometric p-value are:<br>    1. User has to set a threshold (T) for this method. For the whole gene score     dataset, there are N1 unigenes/genes have p-value greater than T and N2     unigenes/genes have p-value smaller than T. For each GO class, there are n1     unigenes/genes have p-value greater than T and n2 unigenes/genes have     p-value smaller than T.<br>    2. The hypergeometric p-value is:<br>    choose(n1, N1)*choose(n2, N2)/choose(n1+n2, N1+N2), where choose(x, y) =     (x!*(y-x)!)/y!<br>    In implementation, it's not practical to compute factorials during such     p-values computation since the number can be very big, which may cause     overflow and huge time cost. However, if we look into the equation, it can     be transformed like below:<br>    choose(x, y) = (x!*(y-x)!)/y! = x!/(y*(y-1)*(y-2)*...*(y-x+1)) =     (x/y)*((x-1)/(y-1))*((x-2)/(y-2))*...*((1)/(y-x+1))<br>    Such computation is easy to implement, it is fairly fast, and it prevents     the overflow problem since the value is always between 0 to 1 during the     computation. But there are still some fundamental drawbacks inherited from     hypergeometric distribution method that can't be get rid of:<br>    1. the choice of threshold affects result tremendously, and there is no gold     standard for the threshold. It means we have to change the threshold again     and again, then check the all the outputs to see which threshold give us     more interesting result. However, even we get an extremely interesting     output from a certain threshold, we cannot say it is the best threshold,     since it may have exaggerated the relation between data. <br>    2. the threshold is not consistent among data, it means even you can found a     good threshold for certain data, <br>    very probable the same threshold is not a good one for other data.<br>    <br>    <b>III. Area under Receiver Operating Characteristic (AROC) -- </b><br>    AROC means area under roc curve, this method cares only the rank of each     genes in each class. the algorithm for ROC is: (modified from text written     by Dr. Paul Pavlidis)<br>    inputs: set T of positives. (i.e., 10 genes which are in the class)<br>    set F of negatives (i.e., the other 10000 genes)<br>    set P of scores for all T and F, ranked so the best score is first. (i.e.,     the gene p-values)<br>    count = 0<br>    For each P (from best to worst)<br>&nbsp;&nbsp;&nbsp; if P is in T then count++<br>&nbsp;&nbsp;&nbsp; else if P is in F then area+=count<br>&nbsp;&nbsp;&nbsp; if count == T.size then area += remaining area, done<br>    <br>    AROC = area/(T * F)<br>    return AROC<br>    end<br>    <br>    If we get an extremely interesting class(all the elements are ranked as the     very top ones), the ROC rate will be 1; in worst case it can be as low as 0.     The ROC rate can be transformed into p-value (rocpval), which is an     indicator of how special the class is.<br>¡@</p>    <h3>Related</h3>    <p><a href="how.html">How the program runs</a></td>
+</tr>
+<tr name="footer">
+<td colspan="2" width="766"><img src="/images/shim.gif" width="1" height="10" border="0" alt=""></td>
+</tr>
+<tr>
+<td width="72">
+<!-- left gutter psace -->
+</td>
+<td class="footer" width="687"><a href="mailto:pp175@columbia.edu">Paul Pavlidis</a>.&nbsp; 
+<script language="JavaScript" type="text/javascript">
+<!--
+	document.write("Last Modified " + document.lastModified);
+// -->
+</script>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
