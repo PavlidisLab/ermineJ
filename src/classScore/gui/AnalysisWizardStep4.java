@@ -19,10 +19,10 @@ import classScore.Settings;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
- * @author Homin Lee
+ *
+ * @author Homin K Lee
  * @version $Id$
- * @todo the log transform should only be here if they are doing ora or resampling.
+ *
  */
 
 public class AnalysisWizardStep4 extends WizardStep {
@@ -31,7 +31,6 @@ public class AnalysisWizardStep4 extends WizardStep {
    JPanel step4Panel;
    JTextField jTextFieldMaxClassSize;
    JTextField jTextFieldMinClassSize;
-   JCheckBox jCheckBoxDoLog;
    JRadioButton jRadioButtonSeparateReplicates;
    JRadioButton jRadioButtonBestReplicates;
    JRadioButton jRadioButtonMeanReplicates;
@@ -54,7 +53,6 @@ public class AnalysisWizardStep4 extends WizardStep {
       JPanel jPanel16 = new JPanel();
       JLabel jLabel12 = new JLabel();
       jTextFieldMinClassSize = new JTextField();
-      jCheckBoxDoLog = new JCheckBox();
       //     ButtonGroup buttonGroup2 = new ButtonGroup();
       JPanel step4RightPanel = new JPanel();
       JPanel jPanelReplicateTreaments = new JPanel();
@@ -85,7 +83,6 @@ public class AnalysisWizardStep4 extends WizardStep {
       jTextFieldMaxClassSize.setHorizontalAlignment( SwingConstants.RIGHT );
       jPanel17.add( jLabel11, null );
       jPanel17.add( jTextFieldMaxClassSize, null );
-      step4LeftPanel.add( jCheckBoxDoLog, null );
       jPanel16.setPreferredSize( new Dimension( 180, 29 ) );
       jPanel16.setBackground( SystemColor.control );
       jLabel12.setLabelFor( jTextFieldMinClassSize );
@@ -99,11 +96,6 @@ public class AnalysisWizardStep4 extends WizardStep {
       jPanel16.add( jLabel12, null );
       jPanel16.add( jTextFieldMinClassSize, null );
       step4LeftPanel.add( jPanel17, null );
-      jCheckBoxDoLog.setBackground( SystemColor.control );
-      jCheckBoxDoLog
-            .setToolTipText( "If you are using p values, you should check this box." );
-      jCheckBoxDoLog.setSelected( true );
-      jCheckBoxDoLog.setText( "Log tranform the gene scores" );
       step4LeftPanel.add( jPanel16, null );
       step4RightPanel.setPreferredSize( new Dimension( 200, 160 ) );
       jLabelReplicateTreament
@@ -174,7 +166,6 @@ public class AnalysisWizardStep4 extends WizardStep {
          jRadioButtonBestReplicates.setSelected( true );
       else if ( settings.getGeneRepTreatment() == Settings.MEAN_PVAL )
             jRadioButtonMeanReplicates.setSelected( true );
-      jCheckBoxDoLog.setSelected( settings.getDoLog() );
    }
 
    public void saveValues() {
@@ -189,7 +180,6 @@ public class AnalysisWizardStep4 extends WizardStep {
       } else if ( jRadioButtonMeanReplicates.isSelected() ) {
          settings.setGeneRepTreatment( Settings.MEAN_PVAL );
       }
-      settings.setDoLog( jCheckBoxDoLog.isSelected() );
    }
 
    public boolean isReady() {

@@ -1,13 +1,5 @@
 package classScore.gui;
 
-import java.awt.AWTEvent;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -20,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import java.awt.*;
 
 /**
  * Displays 'about' information for the software.
@@ -51,7 +44,7 @@ public class AboutBox extends JDialog implements ActionListener {
    ImageIcon image1;
 
    JTextPane jTextPane1 = new JTextPane();
-   GridLayout gridLayout1 = new GridLayout();
+   FlowLayout flowLayout1 = new FlowLayout();
 
 
    public AboutBox( Frame parent ) {
@@ -80,13 +73,13 @@ public class AboutBox extends JDialog implements ActionListener {
       this.setTitle( "About " + SOFTWARENAME);
 
       panel1.setLayout( new BorderLayout() );
-      panel2.setLayout( new BorderLayout() );
       panel1.setBackground(Color.white);
       panel1.setPreferredSize(new Dimension(350, 500) );
       panel1.setRequestFocusEnabled(true);
       panel1.setVerifyInputWhenFocusTarget(true);
       panel2.setBackground(Color.white);
       panel2.setAlignmentY((float) 0.5);
+      panel2.setMaximumSize(new Dimension(2147483647, 2147483647));
       panel2.setMinimumSize(new Dimension(491, 500));
       panel2.setPreferredSize(new Dimension(350, 400));
 
@@ -99,20 +92,20 @@ public class AboutBox extends JDialog implements ActionListener {
     //  label1.setText( SOFTWARENAME );
       label2.setBackground(Color.white);
       label2.setFont(new java.awt.Font("Dialog", 1, 11));
+      label2.setMinimumSize(new Dimension(75, 15));
+      label2.setPreferredSize(new Dimension(350, 50));
       label2.setHorizontalAlignment(SwingConstants.CENTER);
       label2.setHorizontalTextPosition(SwingConstants.LEFT);
       label2.setText( "Version " + VERSION );
+      label3.setPreferredSize(new Dimension(350, 50));
       label3.setHorizontalAlignment(SwingConstants.CENTER);
       label3.setText( COPYRIGHT );
-      labelAuthors.setBackground(Color.red);
-      labelAuthors.setOpaque(false);
+      labelAuthors.setPreferredSize(new Dimension(350, 50));
       labelAuthors.setHorizontalAlignment(SwingConstants.CENTER);
       labelAuthors.setHorizontalTextPosition(SwingConstants.CENTER);
       labelAuthors.setText("Authors: Paul Pavlidis, Homin Lee and Will Braynen." );
 
-      insetsPanel3.setLayout( gridLayout1 );
-      gridLayout1.setRows(4 );
-      gridLayout1.setVgap(0);
+      insetsPanel3.setLayout(flowLayout1 );
       insetsPanel3.setBackground(Color.white);
       insetsPanel3.setOpaque(true);
       insetsPanel3.setPreferredSize(new Dimension(350, 400));
@@ -121,7 +114,7 @@ public class AboutBox extends JDialog implements ActionListener {
       jTextPane1.setBackground(Color.white);
       jTextPane1.setAlignmentX((float) 0.5);
       jTextPane1.setMinimumSize(new Dimension(20, 100));
-      jTextPane1.setPreferredSize(new Dimension(350, 200) );
+      jTextPane1.setPreferredSize(new Dimension(350, 150) );
       jTextPane1.setDisabledTextColor( Color.black );
       jTextPane1.setEditable( false );
       jTextPane1.setMargin(new Insets(10, 10, 10, 10));
@@ -143,7 +136,7 @@ public class AboutBox extends JDialog implements ActionListener {
       insetsPanel1.add( button1, null );
       panel1.add(imageLabel, BorderLayout.NORTH);
 
-      panel2.add( insetsPanel3, BorderLayout.NORTH );
+      panel2.add( insetsPanel3, null );
 
       panel1.add( panel2, BorderLayout.CENTER );
       panel1.add( insetsPanel1, BorderLayout.SOUTH );

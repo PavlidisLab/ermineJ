@@ -20,7 +20,7 @@ import classScore.Settings;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  */

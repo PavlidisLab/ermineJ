@@ -39,18 +39,17 @@ import java.util.Vector;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  * @todo deletion of geneDataSets when remove is used.
- * @todo wierd background color bugs.
- * @todo after modifying a class but not making any changes, it should not be highlighted or saved to disk.
+ *
  */
 
 public class OutputPanel extends JScrollPane {
    /**
     * Copyright (c) 2004 Columbia University
-    * 
+    *
     * @author Owner
     * @version $Id$
     */
@@ -164,7 +163,7 @@ public class OutputPanel extends JScrollPane {
     * @param e
     */
    void htmlMenuItem_actionPerformed( ActionEvent e ) {
-      GuiUtil.error( "This doesn't do anythingi yet." );
+      GuiUtil.error( "This doesn't do anything yet." );
    }
 
    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
@@ -488,7 +487,7 @@ class OutputTableModel extends AbstractTableModel {
 
    /**
     * Does not reset the state.
-    * 
+    *
     * @param geneData
     * @param goData
     */
@@ -618,10 +617,10 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          setText( null );
       }
 
-      //set cell background and possibly tooltip.
+      //set cell background
       int runcol = column - OutputTableModel.init_cols;
       setOpaque( true );
-      if ( isSelected || hasFocus )
+      if ( isSelected )
          setOpaque( true );
       else if ( value == null )
          setOpaque( false );
@@ -635,8 +634,6 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          Map data = result.getResults();
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
-            setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: "
-                  + nf.format( res.getScore() ) );
             if ( res.getPvalue_corr() < 0.01 ) {
                setBackground( spread5 );
             } else if ( res.getPvalue_corr() < 0.05 ) {
@@ -645,7 +642,13 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
                setBackground( Color.WHITE );
             }
          }
-      } else {
+      }
+      else if( hasFocus )
+      {
+         setBackground( Color.WHITE );
+         setOpaque( true );
+      }
+      else {
          setOpaque( false );
       }
 

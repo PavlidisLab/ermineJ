@@ -31,7 +31,7 @@ import baseCode.util.FileTools;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author Homin K Lee
  * @version $Id$
  */
@@ -48,6 +48,31 @@ public class NewGeneSet {
       id = new String( "" );
       desc = new String( "" );
       probes = new ArrayList();
+   }
+
+   public int compare(NewGeneSet comparee)
+   {
+      int idcomp = comparee.getId().compareTo(id);
+      if(idcomp !=0)
+         return idcomp;
+      int desccomp = comparee.getDesc().compareTo(desc);
+      if(idcomp !=0)
+         return desccomp;
+      ArrayList probes2 = comparee.getProbes();
+      if(probes.size() < probes2.size())
+         return -1;
+      else if (probes.size() > probes2.size())
+         return 1;
+      else
+      {
+          for(Iterator it = probes2.iterator(); it.hasNext();)
+          {
+             String probe2 = (String)it.next();
+             if(!probes.contains(probe2))
+                return -1;
+          }
+      }
+      return 0;
    }
 
    public void setModified( boolean val ) {

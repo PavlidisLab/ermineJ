@@ -13,6 +13,7 @@ import javax.swing.border.TitledBorder;
 
 import baseCode.gui.WizardStep;
 import classScore.Settings;
+import javax.swing.JCheckBox;
 
 /**
  * <p>Title: </p>
@@ -34,6 +35,7 @@ public class AnalysisWizardStep5 extends WizardStep
    JTextField jTextFieldPValueThreshold;
    JTextField jTextFieldScoreCol;
    JTextField jTextFieldIterations;
+   JCheckBox jCheckBoxDoLog;
    JPanel oraPanel;
    JPanel resampPanel;
    JPanel corrPanel;
@@ -57,7 +59,6 @@ public class AnalysisWizardStep5 extends WizardStep
       jRadioButtonMedian = new JRadioButton();
       jRadioButtonMean = new JRadioButton();
 
-      //panels for step 4 bottom
       oraPanel = new JPanel();
       TitledBorder oraTitledBorder;
       JPanel jPanel15 = new JPanel();
@@ -78,9 +79,16 @@ public class AnalysisWizardStep5 extends WizardStep
       JLabel corrMetricLabel = new JLabel();
       JRadioButton corrRadioButton1 = new JRadioButton();
       JRadioButton corrRadioButton2 = new JRadioButton();
+      jCheckBoxDoLog = new JCheckBox();
 
       step5Panel = new JPanel();
       step5Panel.setPreferredSize(new Dimension(550, 280));
+
+      jCheckBoxDoLog.setBackground( SystemColor.control );
+      jCheckBoxDoLog
+          .setToolTipText( "If you are using p values, you should check this box." );
+      jCheckBoxDoLog.setSelected( true );
+      jCheckBoxDoLog.setText( "Log tranform the gene scores" );
 
       //oraPanel stuff//////////////////////////////////////////////////////////
       oraPanel.setPreferredSize(new Dimension(335, 150));
@@ -196,8 +204,10 @@ public class AnalysisWizardStep5 extends WizardStep
 
    public void addVarPanel ( int analysisType ){
       if ( analysisType == Settings.ORA ) {
+         oraPanel.add( jCheckBoxDoLog, null );
          step5Panel.add( oraPanel, null );
       } else if ( analysisType == Settings.RESAMP ) {
+         resampPanel.add( jCheckBoxDoLog, null );
          resampPanel.add( jPanel13, null );
          step5Panel.add( resampPanel, null );
       } else if ( analysisType == Settings.CORR ) {
@@ -226,6 +236,7 @@ public class AnalysisWizardStep5 extends WizardStep
       else
          jRadioButtonMedian.setSelected(true);
       jTextFieldPValueThreshold.setText(String.valueOf(settings.getPValThreshold()));
+      jCheckBoxDoLog.setSelected( settings.getDoLog() );
    }
 
    public void saveValues(){
@@ -236,6 +247,7 @@ public class AnalysisWizardStep5 extends WizardStep
       else
          settings.setRawScoreMethod(Settings.QUANTILE_METHOD);
       settings.setPValThreshold(Double.valueOf(jTextFieldPValueThreshold.getText()).doubleValue());
+      settings.setDoLog( jCheckBoxDoLog.isSelected() );
    }
 
    public boolean isReady() { return true; }

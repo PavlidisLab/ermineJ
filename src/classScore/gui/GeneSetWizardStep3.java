@@ -21,8 +21,8 @@ import classScore.data.NewGeneSet;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
- * @author Homin Lee
+ *
+ * @author Homin K Lee
  * @version $Id$
  */
 

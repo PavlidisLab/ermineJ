@@ -5,44 +5,28 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
 
 import org.xml.sax.SAXException;
-
 import baseCode.gui.GuiUtil;
 import baseCode.gui.StatusJlabel;
 import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
-import classScore.Settings;
 import classScore.GeneSetPvalRun;
+import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
- * @author Homin Lee
+ *
+ * @author Homin K Lee
  * @author Paul Pavlidis
  * @version $Id$
  *
@@ -50,7 +34,7 @@ import classScore.data.GeneAnnotations;
 
 public class GeneSetScoreFrame
     extends JFrame {
-   
+
    private JPanel mainPanel = ( JPanel )this.getContentPane();
    private JMenuBar jMenuBar1 = new JMenuBar();
    private JMenu fileMenu = new JMenu();
@@ -87,9 +71,11 @@ public class GeneSetScoreFrame
    private Map geneScoreSets;
 
    private JLabel logoLabel;
-   
+
    private AnalysisThread athread=new AnalysisThread();
-   
+   JPanel jPanel1 = new JPanel();
+   FlowLayout flowLayout1 = new FlowLayout();
+
    public GeneSetScoreFrame() {
       try {
          jbInit();
@@ -119,6 +105,11 @@ public class GeneSetScoreFrame
                                       GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
       quitMenuItem.setMnemonic( 'Q' );
       quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,InputEvent.CTRL_MASK));
+      progInPanel.setBackground(Color.white);
+      progInPanel.setPreferredSize(new Dimension(800, 26));
+      jPanel1.setBackground(Color.white);
+      jPanel1.setForeground(Color.black);
+      jPanel1.setPreferredSize(new Dimension(800, 200));
       fileMenu.add( quitMenuItem );
       classMenu.setText( "Classes" );
       classMenu.setMnemonic( 'C' );
@@ -189,25 +180,26 @@ public class GeneSetScoreFrame
       logoLabel = new JLabel();
       logoLabel.setIcon( new ImageIcon( GeneSetScoreFrame.class
             .getResource( "resources/logo1small.gif" ) ) );
-      
+
       progressPanel = new JPanel();
-//      progressPanel.setPreferredSize( new Dimension( 830, 330 ) );
-      // todo make the icon and text. centered.
-      progressPanel.setLayout(new GridLayout(3, 1));
-      
-   //   progInPanel.setPreferredSize(new Dimension(350, 100));
+      progressPanel.setLayout(flowLayout1);
+
       JLabel label= new JLabel("Please wait while the files are loaded in.");
-      label.setPreferredSize(new Dimension(195, 30));
+      label.setPreferredSize(new Dimension(500, 30));
       label.setHorizontalTextPosition(JLabel.CENTER);
       label.setLabelFor(progressBar);
-      
+      label.setAlignmentX((float) 0.0);
+      label.setHorizontalAlignment(SwingConstants.CENTER);
+
       progressBar.setPreferredSize(new Dimension(300, 16));
       progressBar.setIndeterminate(false);
-      
+      progressPanel.setBackground(Color.white);
+
       progressPanel.add(logoLabel);
-      progressPanel.add(label, null);
+      progressPanel.add(jPanel1, null);
+      jPanel1.add(label, null);
+      jPanel1.add(progInPanel, null);
       progInPanel.add(progressBar, null);
-      progressPanel.add(progInPanel);
 
       //main panel
       oPanel = new OutputPanel( this, results );
@@ -260,18 +252,18 @@ public class GeneSetScoreFrame
          geneScoreSets = new HashMap();
 
          progressBar.setValue(10);
-         
+
          statusMessenger.setStatus("Reading GO descriptions " + settings.getClassFile());
          goData = new GONames(settings.getClassFile()); // parse go name file
          progressBar.setValue(70);
-         
+
          statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
          geneData = new GeneAnnotations(settings.getAnnotFile(), statusMessenger);
          progressBar.setValue(100);
-         
+
          statusMessenger.setStatus( "Initializing gene class mapping" );
          geneDataSets.put(new Integer("original".hashCode()) , geneData);
-         
+
          statusMessenger.setStatus("Done with setup");
          enableMenusOnStart();
 
@@ -280,20 +272,20 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Ready.");
       }
       catch ( IllegalArgumentException e ) {
-         GuiUtil.error( 
+         GuiUtil.error(
             "Error during initialization: " + e +
             "\nIf this problem persists, please contact the software developer. " +
             "\nPress OK to quit." );
          System.exit( 1 );
       }
       catch ( IOException e ) {
-         GuiUtil.error( 
-            "File reading or writing error during initialization: " + e.getMessage()  + 
+         GuiUtil.error(
+            "File reading or writing error during initialization: " + e.getMessage()  +
             "\nIf this problem persists, please contact the software developer. " +
             "\nPress OK to quit.", e );
          System.exit( 1 );
       } catch ( SAXException e ) {
-         GuiUtil.error( 
+         GuiUtil.error(
            "Gene Ontology file format is incorrect. " +
            "\nPlease check that it is a valid XML file. " +
            "\nIf this problem persists, please contact the software developer. " +
@@ -385,7 +377,7 @@ public class GeneSetScoreFrame
    {
       results.add( result );
       oPanel.addRun();  // this line should come after results.add() or else you'll get errors
-   } 
+   }
 
    public void startAnalysis(Settings runSettings)
    {
@@ -404,7 +396,7 @@ public class GeneSetScoreFrame
    {
       oPanel.addedNewGeneSet();
    }
-   
+
    /**
     * @return Returns the oPanel.
     */

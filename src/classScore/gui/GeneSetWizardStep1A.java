@@ -25,7 +25,7 @@ import javax.swing.JButton;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  * @todo 3.0 old table click shows class in status bar, number of probes?
@@ -37,16 +37,18 @@ public class GeneSetWizardStep1A extends WizardStep {
    GeneAnnotations geneData;
    GONames goData;
    NewGeneSet newGeneSet;
+   NewGeneSet oldGeneSet;
    JTable oldClassTable;
    JTextField searchTextField;
 
    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData,
-         GONames goData, NewGeneSet newGeneSet ) {
+         GONames goData, NewGeneSet newGeneSet, NewGeneSet oldGeneSet) {
       super( wiz );
       this.wiz = wiz;
       this.geneData = geneData;
       this.goData = goData;
       this.newGeneSet = newGeneSet;
+      this.oldGeneSet = oldGeneSet;
       wiz.clearStatus();
       populateTables();
    }
@@ -111,6 +113,12 @@ public class GeneSetWizardStep1A extends WizardStep {
       newGeneSet.setModified(true);
       if ( geneData.classExists( id ) ) {
          newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
+      }
+      oldGeneSet.setId( id );
+      oldGeneSet.setDesc( desc );
+      oldGeneSet.setModified(true);
+      if ( geneData.classExists( id ) ) {
+         oldGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
       }
       return true;
 

@@ -3,10 +3,6 @@ package classScore.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -25,13 +21,14 @@ import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
 import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
+import java.awt.event.*;
 
 /**
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
- * @author Homin Lee
+ *
+ * @author Homin K Lee
  * @version $Id$
  */
 
@@ -51,7 +48,7 @@ public class GeneSetWizardStep2 extends WizardStep {
    private final static int COL2WIDTH = 200;
 
    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData,
-         NewGeneSet newGeneSet ) {
+         NewGeneSet newGeneSet) {
       super( wiz );
       this.wiz = wiz;
       this.geneData = geneData;
@@ -105,7 +102,7 @@ public class GeneSetWizardStep2 extends WizardStep {
       searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
       searchTextField
             .addKeyListener( new GeneSetWizardStep2_searchText_keyAdapter( this ) );
-
+        searchTextField.addActionListener(new GeneSetWizardStep2_searchTextField_actionAdapter(this));
       JButton addButton = new JButton();
       addButton.setSelected( false );
       addButton.setText( "Add >" );
@@ -221,6 +218,15 @@ public class GeneSetWizardStep2 extends WizardStep {
     * do a search.
     */
    public void searchButton_actionPerformed_adapter( ActionEvent e ) {
+      find();
+   }
+
+   void searchTextField_actionPerformed(ActionEvent e) {
+      find();
+   }
+
+   void find()
+   {
       String searchOn = searchTextField.getText();
 
       if ( searchOn.equals( "" ) ) {
@@ -292,7 +298,6 @@ class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
 }
 
 // hitting enter in search also activates it.
-/** @todo hitting enter doesn't trigger reset */
 class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
    GeneSetWizardStep2 adaptee;
 
@@ -304,7 +309,6 @@ class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
    public void actionPerformed( ActionEvent e ) {
       adaptee.searchButton_actionPerformed_adapter( e );
    }
-
 }
 
 // respond to typing in the search field.
@@ -377,4 +381,15 @@ class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {
       adaptee.searchButton_actionPerformed_adapter( e );
    }
 
+}
+
+class GeneSetWizardStep2_searchTextField_actionAdapter implements java.awt.event.ActionListener {
+   GeneSetWizardStep2 adaptee;
+
+   GeneSetWizardStep2_searchTextField_actionAdapter(GeneSetWizardStep2 adaptee) {
+      this.adaptee = adaptee;
+   }
+   public void actionPerformed(ActionEvent e) {
+      adaptee.searchTextField_actionPerformed(e);
+   }
 }

@@ -14,7 +14,7 @@ import classScore.data.NewGeneSet;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author Homin K Lee
  * @ $Id$
  */
@@ -32,6 +32,7 @@ public class GeneSetWizard extends Wizard {
    boolean makenew;
    boolean nostep1=false;
    NewGeneSet newGeneSet;
+   NewGeneSet oldGeneSet;
    String cid;
 
    public GeneSetWizard(GeneSetScoreFrame callingframe, GeneAnnotations geneData,
@@ -43,6 +44,7 @@ public class GeneSetWizard extends Wizard {
       this.goData = goData;
       this.makenew = makenew;
       newGeneSet = new NewGeneSet(geneData);
+      oldGeneSet = new NewGeneSet(geneData);
 
       geneData.resetSelectedProbes();
       step=1;
@@ -53,7 +55,7 @@ public class GeneSetWizard extends Wizard {
       }
       else {
          this.setTitle("Modify Class - Step 1 of 3");
-         step1A = new GeneSetWizardStep1A(this,geneData,goData,newGeneSet);
+         step1A = new GeneSetWizardStep1A(this,geneData,goData,newGeneSet,oldGeneSet);
          this.addStep(1,step1A);
       }
       step2 = new GeneSetWizardStep2(this,geneData,newGeneSet);
@@ -75,13 +77,20 @@ public class GeneSetWizard extends Wizard {
       makenew=false;
       nostep1=true;
       newGeneSet = new NewGeneSet(geneData);
+      oldGeneSet = new NewGeneSet(geneData);
       this.setTitle("Modify Class - Step 2 of 3");
       step = 2;
       backButton.setEnabled(false);
       newGeneSet.setId(cid);
       newGeneSet.setDesc(goData.getNameForId(cid));
+      newGeneSet.setModified(true);
       if (geneData.classExists(cid))
          newGeneSet.getProbes().addAll(geneData.getClassToProbes(cid));
+      oldGeneSet.setId(cid);
+      oldGeneSet.setDesc(goData.getNameForId(cid));
+      oldGeneSet.setModified(true);
+      if (geneData.classExists(cid))
+         oldGeneSet.getProbes().addAll(geneData.getClassToProbes(cid));
       this.repaint();
       step2 = new GeneSetWizardStep2(this,geneData,newGeneSet);
       this.addStep(1,step2); //hack for starting at step 2
@@ -193,7 +202,10 @@ public class GeneSetWizard extends Wizard {
          if (makenew || !newGeneSet.modified())
             newGeneSet.addToMaps(goData);
          else
-            newGeneSet.modifyClass(goData);
+         {
+             if(newGeneSet.compare(oldGeneSet)!=0)
+                newGeneSet.modifyClass(goData);
+         }
          try {
             newGeneSet.saveClass(settings.getClassFolder(), 0);
          } catch ( IOException e1 ) {
