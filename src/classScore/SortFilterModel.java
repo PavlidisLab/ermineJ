@@ -43,7 +43,7 @@ public class SortFilterModel extends AbstractTableModel {
    public void sort( int c ) {
       sortColumn = c;
       Arrays.sort( rows );
-      //     fireTableDataChanged();
+      fireTableDataChanged(); // why was this commented out before?
    }
 
    /**
