@@ -84,9 +84,8 @@ public class SaveWizard extends Wizard
    }
 
    void finishButton_actionPerformed(ActionEvent e) {
+
       dispose();
    }
 
 }
-
-

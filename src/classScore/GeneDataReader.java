@@ -35,7 +35,7 @@ public class GeneDataReader {
    private Map probeToDescription;
    private Map probeGroupMap;
    private Map groupProbeList;
-   private Set group;
+//   private Set group;
    private String filename;
    private Map probes;
    private Vector probe_list;
@@ -80,8 +80,8 @@ public class GeneDataReader {
 
       BufferedInputStream bis = new BufferedInputStream(fis);
       BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
-      Vector rows = new Vector();
-      Vector cols = null;
+   //   Vector rows = new Vector();
+   //   Vector cols = null;
 
       ArrayList probeIds = new ArrayList();
       String classIds = null;

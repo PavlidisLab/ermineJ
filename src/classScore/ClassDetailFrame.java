@@ -285,7 +285,7 @@ public class ClassDetailFrame
    void m_greenredColormapMenuItem_actionPerformed( ActionEvent e ) {
 
       try {
-         m_matrixDisplay.setColorMap( ColorMap.GREENRED_COLORMAP );
+        m_matrixDisplay.setColorMap( ColorMap.GREENRED_COLORMAP );
       }
       catch ( Exception ex ) {
       }
@@ -295,7 +295,7 @@ public class ClassDetailFrame
    void m_blackbodyColormapMenuItem_actionPerformed( ActionEvent e ) {
 
       try {
-         m_matrixDisplay.setColorMap( ColorMap.BLACKBODY_COLORMAP );
+        m_matrixDisplay.setColorMap( ColorMap.BLACKBODY_COLORMAP );
       }
       catch ( Exception ex ) {
       }
