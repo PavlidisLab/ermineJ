@@ -79,7 +79,7 @@ public class StartupDialog extends AppDialog {
       annotPanel.add( annotBrowseButton, null );
       classPanel.setPreferredSize( new Dimension( 400, 50 ) );
       classLabel.setPreferredSize( new Dimension( 390, 15 ) );
-      classLabel.setText( "Gene name file:" );
+      classLabel.setText( "GO XML file:" );
       classFile.setPreferredSize( new Dimension( 300, 19 ) );
       classPanel.add( classLabel, null );
       classPanel.add( classFile, null );

@@ -19,6 +19,7 @@ import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.File;
 import java.net.URL;
@@ -240,7 +241,7 @@ public class GeneSetScoreFrame
 
       JLabel label= new JLabel("Please wait while the files are loaded in.");
       label.setPreferredSize(new Dimension(500, 30));
-      label.setHorizontalTextPosition(JLabel.CENTER);
+      label.setHorizontalTextPosition(SwingConstants.CENTER);
       label.setLabelFor(progressBar);
       label.setAlignmentX((float) 0.0);
       label.setHorizontalAlignment(SwingConstants.CENTER);
