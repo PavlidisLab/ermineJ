@@ -27,7 +27,7 @@ maven jar:install
 
 (in ermineJ)
 cvs update
-
+maven jar
 // To make the help jar:
 maven help
 
