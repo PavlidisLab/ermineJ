@@ -104,7 +104,7 @@ public class Ug_Parse {
 	java.util.Set pairEntries = chip_ug_map.entrySet();
 	java.util.Map.Entry nxt = null;
 	Iterator it1 = pairEntries.iterator();
-	//iterate over hashtable and store all chips for a particular ug
+	//iterate over hashtable and store all chips for a particular ug 
 	while(it1.hasNext()){
 	    nxt = (Map.Entry)it1.next();
 	    String val = (String)nxt.getValue();
@@ -124,7 +124,7 @@ public class Ug_Parse {
 	Iterator chipit = chip.iterator();
 	while (chipit.hasNext()) {
 	    String ele = (String)chipit.next();
-	    if(chips.containsKey(ele))
+	    if(chips.containsKey(ele))      //only add those occur in gene_pval file
 	        chip_repeat_val.put(ele,null);
 	}
 
@@ -148,7 +148,7 @@ public class Ug_Parse {
 		     //add all values of chips with the same UG to a hashtable with key equal to one of the UG id's chip 
 		     while(arry.hasNext()){
 			 String arr = (String)arry.next();
-			 if(chips.containsKey(arr))
+			 if(chips.containsKey(arr))  //only add those occur in gene_pval file
 			     if (!arr.equals(valx)){
 			         l1.add(arr);
 			     }
@@ -157,7 +157,7 @@ public class Ug_Parse {
 		     Iterator arri = val.iterator();
 		     while(arri.hasNext()){
 			 String arr = (String)arri.next();
-			 if(chips.containsKey(arr))
+			 if(chips.containsKey(arr)) //only add those occur in gene_pval file
 			     if (!arr.equals(valx)){
 			         l1.add(arr);
 			     }
