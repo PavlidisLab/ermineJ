@@ -24,18 +24,14 @@ import classScore.data.Histogram;
 public class ResamplingCorrelationGeneSetScore extends
       AbstractResamplingGeneSetScore {
 
-   protected static final Log log = LogFactory
-         .getLog( CorrelationsGeneSetPvalSeriesGenerator.class );
-
    private DenseDoubleMatrix2DNamed data = null;
    private Settings settings;
    private boolean weights;
    private double[][] dataAsRawMatrix;
 
    private double[][] selfSquaredMatrix;
-
-   private static final int SPEEDUPSIZECUT = 20;
-   private static final double SPEDUPSIZEEXTRASTEP = 0.1;
+   private static final int MIN_SET_SIZE_FOR_ESTIMATION = 10;
+   private static final int MIN_ITERATIONS_FOR_ESTIMATION = 1000;
 
    /**
     * @param dataMatrix
@@ -47,6 +43,8 @@ public class ResamplingCorrelationGeneSetScore extends
       this.classMaxSize = settings.getMaxClassSize();
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();
+      this.setUseNormalApprox(!settings.getAlwaysUseEmpirical());
+      this.setUseSpeedUp(!settings.getAlwaysUseEmpirical());
       data = dataMatrix;
       int numGeneSetSizes = classMaxSize - classMinSize + 1;
       this.hist = new Histogram( numGeneSetSizes, classMinSize, numRuns, 1.0,
@@ -91,7 +89,9 @@ public class ResamplingCorrelationGeneSetScore extends
             values.add( avecorrel );
             hist.update( geneSetSize, avecorrel );
 
-            if ( j > 0 && j % 200 == 0 ) {
+            if ( useNormalApprox && j > MIN_ITERATIONS_FOR_ESTIMATION
+                  && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION && j > 0
+                  && j % NORMAL_APPROX_SAMPLE_FREQUENCY == 0 ) {
                double mean = Descriptive.mean( values );
                double variance = Descriptive.variance( values.size(),
                      Descriptive.sum( values ), Descriptive
@@ -101,7 +101,7 @@ public class ResamplingCorrelationGeneSetScore extends
                if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
                   hist.addExactNormalProbabilityComputer( geneSetSize, mean,
                         variance );
-                  System.err.println( "Class size: " + geneSetSize
+                  log.debug( "Class size: " + geneSetSize
                         + " - Reached convergence to normal after " + j
                         + " iterations." );
                   break; // stop simulation of this class size.
@@ -121,7 +121,7 @@ public class ResamplingCorrelationGeneSetScore extends
           * To improve performance, after a certain gene set size has been surpassed, don't do every size. The
           * distributions are very similar.
           */
-         if ( geneSetSize >= SPEEDUPSIZECUT ) {
+         if ( useSpeedUp && geneSetSize >= SPEEDUPSIZECUT ) {
             geneSetSize += Math.floor( SPEDUPSIZEEXTRASTEP * geneSetSize );
          }
 

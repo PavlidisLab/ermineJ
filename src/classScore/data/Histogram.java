@@ -3,21 +3,16 @@ package classScore.data;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.math.NormalProbabilityComputer;
 import baseCode.math.ProbabilityComputer;
 import baseCode.math.Stats;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
-import cern.colt.list.ObjectArrayList;
 import cern.colt.map.OpenIntObjectHashMap;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
@@ -37,7 +32,6 @@ public class Histogram {
    private double maximum = 5.0; // this gets adjusted if need be.
    private int numBins = 0;
    private int numItemsPerHistogram = 0;
-   //  private DenseDoubleMatrix2DNamed M = null; // holds the actual histograms, Each row is a histogram.
    private double minPval; // the smallest possible pvalue: used when a requested score is out of the top of the range.
    private Map analyticDistributions;
 
@@ -118,24 +112,25 @@ public class Histogram {
       }
       DenseDoubleMatrix1D histRow = ( ( DenseDoubleMatrix1D ) empiricalDistributions
             .get( classSize ) );
-      histRow.setQuick( classSize, histRow.getQuick( classSize ) + 1 ); 
+      histRow.setQuick( thebin, histRow.getQuick( thebin ) + 1 );
    }
 
    /**
-    * Convert  raw histograms to CDFs.
+    * Convert raw histograms to CDFs.
     */
    public void tocdf() {
 
       IntArrayList sizes = empiricalDistributions.keys();
-      
+
       for ( int i = 0; i < sizes.size(); i++ ) {
-         DenseDoubleMatrix1D pdf = ( DenseDoubleMatrix1D ) empiricalDistributions.get( sizes.get(i) );
+         DenseDoubleMatrix1D pdf = ( DenseDoubleMatrix1D ) empiricalDistributions
+               .get( sizes.get( i ) );
          DoubleArrayList dal = new DoubleArrayList( pdf.toArray() );
-         
-         if (Descriptive.sum(dal) == 0 ) {
-            empiricalDistributions.removeKey(sizes.get(i));
+
+         if ( Descriptive.sum( dal ) == 0 ) {
+            empiricalDistributions.removeKey( sizes.get( i ) );
          }
-         
+
          DoubleArrayList cdf = Stats.cdf( dal );
          for ( int j = 0; j < cdf.size(); j++ ) {
             pdf.setQuick( j, cdf.getQuick( j ) );
@@ -206,6 +201,19 @@ public class Histogram {
       return geneSetSize - minGeneSetSize;
    }
 
+   private int findNearestUsableHistogram( int geneSetSize ) {
+      int usedGeneSetSize = geneSetSize;
+      while ( !empiricalDistributions.containsKey( usedGeneSetSize ) ) {
+         usedGeneSetSize--;
+         if ( usedGeneSetSize < minimumGeneSetSize ) {
+            throw new IllegalArgumentException(
+                  "No distribution or near distribution found for gene set size "
+                        + geneSetSize );
+         }
+      }
+      return usedGeneSetSize;
+   }
+
    /**
     * @param geneSetSize int - NOT the row, that is determined here.
     * @param rawscore double
@@ -217,24 +225,17 @@ public class Histogram {
                "Warning, a rawscore yielded a bin number which was out of the range: "
                      + rawscore );
       }
-      
-      if (!isCDF) {
-         throw new IllegalStateException("Distributions must be converted to CDFs first before getting probabilities.");
+
+      if ( !isCDF ) {
+         throw new IllegalStateException(
+               "Distributions must be converted to CDFs first before getting probabilities." );
       }
 
-      int usedGeneSetSize = geneSetSize;
-      while ( !empiricalDistributions.containsKey( usedGeneSetSize )  ) {
-         usedGeneSetSize--;
-         if ( usedGeneSetSize < minimumGeneSetSize ) {
-            throw new IllegalArgumentException(
-                  "No distribution or near distribution found for gene set size "
-                        + geneSetSize );
-         }
-      }
-      
+      int usedGeneSetSize = findNearestUsableHistogram( geneSetSize );
+
       /* use a analytical distribution if we have one for this set size */
       if ( useExactPvalue( usedGeneSetSize ) ) {
-         
+
          return this.getExactProbability( usedGeneSetSize, rawscore );
       }
 
@@ -268,10 +269,10 @@ public class Histogram {
     * @param classSize
     * @return
     */
-   public double[] getHistogram( int classSize ) {
-      int row = this.getClassIndex( classSize, minimumGeneSetSize );
+   public double[] getHistogram( int geneSetSize ) {
+      int usedGeneSetSize = findNearestUsableHistogram( geneSetSize );
       //return M.viewRow( row ).toArray();
-      return ( ( DoubleMatrix1D ) empiricalDistributions.get( classSize ) )
+      return ( ( DoubleMatrix1D ) empiricalDistributions.get( usedGeneSetSize ) )
             .toArray();
    }
 

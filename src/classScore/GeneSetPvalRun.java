@@ -141,6 +141,9 @@ public class GeneSetPvalRun {
          case Settings.RESAMP: {
             NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore(
                   settings, geneScores );
+            
+           
+            
             messenger.setStatus( "Starting resampling" );
             hist = probePvalMapper.generateNullDistribution( messenger );
 

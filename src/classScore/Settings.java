@@ -39,7 +39,8 @@ public class Settings {
    private int quantile = 50;
    private boolean doLog = true;
    private double pValThreshold = 0.001;
-
+   private boolean alwaysUseEmpirical;
+   
    public static final int BEST_PVAL = 1;
    public static final int MEAN_PVAL = 2;
    public static final int MEAN_METHOD = 0;
@@ -65,6 +66,7 @@ public class Settings {
     * Benjamini-Hochberg FDR
     */
    public static final int BH = 2;
+
 
    public Settings() {
       this( "" );
@@ -148,6 +150,10 @@ public class Settings {
                   pValThreshold = Double.valueOf(
                         properties.getProperty( "pValThreshold" ) )
                         .doubleValue();
+            if ( properties.containsKey( "useEmpirical" ) )
+                  alwaysUseEmpirical = Boolean.valueOf(
+                        properties.getProperty( "useEmpirical" ) )
+                        .booleanValue();
          }
       } catch ( IOException ex ) {
          //    System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no
@@ -178,6 +184,7 @@ public class Settings {
       quantile = settings.getQuantile();
       doLog = settings.getDoLog();
       pValThreshold = settings.getPValThreshold();
+      alwaysUseEmpirical = settings.getAlwaysUseEmpirical();
       pref_file = settings.getPrefFile();
       properties = new Properties();
    }
@@ -210,6 +217,7 @@ public class Settings {
       properties.setProperty( "quantile", String.valueOf( quantile ) );
       properties.setProperty( "doLog", String.valueOf( doLog ) );
       properties.setProperty( "pValThreshold", String.valueOf( pValThreshold ) );
+      properties.setProperty( "useEmpirical", String.valueOf( alwaysUseEmpirical ) );
       OutputStream f = new FileOutputStream( pref_file );
       properties.store( f, "" );
       f.close();
@@ -217,8 +225,8 @@ public class Settings {
 
    public String toString() {
 
-    return properties.toString();
- }
+      return properties.toString();
+   }
 
    /**
     * Figure out where the data directory should go.
@@ -430,6 +438,20 @@ public class Settings {
     */
    public boolean getUseLog() {
       return doLog;
+   }
+
+   /**
+    * @return
+    */
+   public boolean getAlwaysUseEmpirical() {
+      return alwaysUseEmpirical;
+   }
+
+   /**
+    * @param b
+    */
+   public void setAlwaysUseEmpirical( boolean b ) {
+      alwaysUseEmpirical = b;
    }
 
 }

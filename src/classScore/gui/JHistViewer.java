@@ -60,6 +60,8 @@ public class JHistViewer extends JFrame {
     */
    private void makePlot() {
 
+      if (hist == null) return;
+      
       final XYSeries distribution = new XYSeries( "Distribution" );
 
       double[] bins = hist.getBins();

@@ -37,7 +37,6 @@ public class GeneSetTableModel extends AbstractTableModel {
    };
 
    /**
-    * 
     * @param matrixDisplay
     * @param probeIDs
     * @param pvalues
@@ -86,13 +85,14 @@ public class GeneSetTableModel extends AbstractTableModel {
       int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay
             .getColumnCount() : 0;
 
+      //          get the probeID for the current row
+      String probeID = ( String ) m_probeIDs.get( row );
+
+      // If this is part of the matrix display
       if ( column < offset ) {
-         return new Point( row, column ); // coords into JMatrixDisplay
+         return new Point( m_matrixDisplay.getRowIndexByName(probeID) , column ); // coords into JMatrixDisplay
       }
       column -= offset;
-
-      // get the probeID for the current row
-      String probeID = ( String ) m_probeIDs.get( row );
 
       switch ( column ) { // after it's been offset
          case 0:
@@ -120,13 +120,14 @@ public class GeneSetTableModel extends AbstractTableModel {
             }
             return values;
          case 3:
-         	String gene_name=m_geneData.getProbeGeneName( probeID );
-         	// gene name
-         	return m_geneData == null ? null : 
-         		new JLinkLabel(gene_name,
-         				"http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?"
-         				+"db=gene&cmd=search&term="
-         				+ gene_name);
+
+            if ( m_geneData == null ) return "No data available";
+
+            String gene_name = m_geneData.getProbeGeneName( probeID );
+            // gene name. todo make this smarter about building urls.
+            return m_geneData == null ? null : new JLinkLabel( gene_name,
+                  "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?"
+                        + "db=gene&cmd=search&term=" + gene_name );
          case 4:
             // description
             return m_geneData == null ? "" : m_geneData

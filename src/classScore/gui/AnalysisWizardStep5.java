@@ -1,6 +1,8 @@
 package classScore.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.SystemColor;
 
 import javax.swing.ButtonGroup;
@@ -47,6 +49,10 @@ public class AnalysisWizardStep5 extends WizardStep {
    JPanel resampPanel;
    JPanel corrPanel;
    JPanel jPanel13;
+   JPanel jPanel16;
+   JPanel subPanel;
+   
+   JCheckBox jCheckBoxUseEmpirical;
 
    public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
       super( wiz );
@@ -72,7 +78,6 @@ public class AnalysisWizardStep5 extends WizardStep {
       jTextFieldPValueThreshold = new JTextField();
       resampPanel = new JPanel();
       TitledBorder resampTitledBorder;
-      JPanel jPanel14 = new JPanel();
 
       jPanel13 = new JPanel();
       JLabel jLabel13 = new JLabel();
@@ -141,14 +146,14 @@ public class AnalysisWizardStep5 extends WizardStep {
       oraPanel.add( jPanel15, null );
 
       //resampPanel stuff///////////////////////////////////////////////////////
-      resampPanel.setPreferredSize( new Dimension( 355, 180 ) );
+      resampPanel.setPreferredSize( new Dimension( 380, 200 ) );
       resampTitledBorder = new TitledBorder( "Resampling" );
       resampPanel.setBorder( resampTitledBorder );
-      jPanel14.setPreferredSize( new Dimension( 110, 29 ) );
-      jPanel14.setBackground( SystemColor.control );
-
+      
+       subPanel = new JPanel();
+      subPanel.setLayout(new FlowLayout());
+      
       jPanel13.setBorder( null );
-      jPanel13.setPreferredSize( new Dimension( 200, 60 ) );
       jLabel13.setMaximumSize( new Dimension( 100, 15 ) );
       jLabel13.setLabelFor( jTextFieldIterations );
       jLabel13.setText( "Maximum iterations to run" );
@@ -160,11 +165,27 @@ public class AnalysisWizardStep5 extends WizardStep {
       jTextFieldIterations.setEditable( true );
       jPanel13.add( jLabel13, null );
       jPanel13.add( jTextFieldIterations, null );
-      resampPanel.add( jPanel13, null );
-      resampPanel.add( jPanel14, null );
-
+      
+      jPanel16 = new JPanel();
+      jCheckBoxUseEmpirical = new JCheckBox();
+      JLabel jLabel14 = new JLabel();
+      jLabel14.setLabelFor( jCheckBoxUseEmpirical );
+      jCheckBoxUseEmpirical.setSelected( false );
+      jCheckBoxUseEmpirical.setHorizontalAlignment( SwingConstants.RIGHT );
+      jLabel14.setText( "Always use full resampling (slower)" );
+      jCheckBoxUseEmpirical.setToolTipText( "If this box is unchecked, "
+            + "some approximations are used which can"
+            + " dramatically speed up the resampling,"
+            + " at a possible risk of reduced accuracy" );
+      jPanel16.add( jLabel14, null );
+      jPanel16.add( jCheckBoxUseEmpirical, null );
+      subPanel.setPreferredSize(new java.awt.Dimension(340,80));
+      
+      subPanel.add(jPanel13, BorderLayout.WEST);
+      subPanel.add(jPanel16,  BorderLayout.EAST);
+      
       //corrPanel stuff/////////////////////////////////////////////////////////
-      corrPanel.setPreferredSize( new Dimension( 335, 150 ) );
+      corrPanel.setPreferredSize(new java.awt.Dimension(380,150));
       corrTitledBorder = new TitledBorder( "Correlation" );
       corrPanel.setBorder( corrTitledBorder );
       corrMetricPanel.setPreferredSize( new Dimension( 150, 50 ) );
@@ -182,12 +203,13 @@ public class AnalysisWizardStep5 extends WizardStep {
       corrRadioButton1.setBackground( SystemColor.control );
       corrRadioButton1.setToolTipText( "metric 1 tool tip" );
       corrRadioButton2.setText( "Metric 2" );
+      jPanel16.setPreferredSize(new java.awt.Dimension(330,30));
+      jPanel13.setPreferredSize(new java.awt.Dimension(234,30));
       corrButtonGroup.add( corrRadioButton1 );
       corrButtonGroup.add( corrRadioButton2 );
       corrMetricPanel.add( corrMetricLabel, null );
       corrMetricPanel.add( corrRadioButton1, null );
       corrMetricPanel.add( corrRadioButton2, null );
-      corrPanel.add( jPanel13, null );
       //   corrPanel.add(corrMetricPanel, null); // @todo disabled because there is no choice of metric.
 
       this
@@ -202,10 +224,12 @@ public class AnalysisWizardStep5 extends WizardStep {
          step5Panel.add( oraPanel, null );
       } else if ( analysisType == Settings.RESAMP ) {
          resampPanel.add( jCheckBoxDoLog, null );
-         resampPanel.add( jPanel13, null );
+         resampPanel.add( subPanel, null );
+       
          step5Panel.add( resampPanel, null );
       } else if ( analysisType == Settings.CORR ) {
-         corrPanel.add( jPanel13, null );
+         corrPanel.add( subPanel, null );
+
          step5Panel.add( corrPanel, null );
       }
    }
@@ -214,10 +238,10 @@ public class AnalysisWizardStep5 extends WizardStep {
       if ( analysisType == Settings.ORA ) {
          step5Panel.remove( oraPanel );
       } else if ( analysisType == Settings.RESAMP ) {
-         resampPanel.remove( jPanel13 );
+         resampPanel.remove( subPanel );
          step5Panel.remove( resampPanel );
       } else if ( analysisType == Settings.CORR ) {
-         corrPanel.remove( jPanel13 );
+         corrPanel.remove( subPanel );
          step5Panel.remove( corrPanel );
       }
    }
@@ -234,6 +258,8 @@ public class AnalysisWizardStep5 extends WizardStep {
       jTextFieldPValueThreshold.setText( String.valueOf( settings
             .getPValThreshold() ) );
       jCheckBoxDoLog.setSelected( settings.getDoLog() );
+      
+      jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
    }
 
    public void saveValues() {
@@ -249,6 +275,7 @@ public class AnalysisWizardStep5 extends WizardStep {
       settings.setPValThreshold( Double.valueOf(
             jTextFieldPValueThreshold.getText() ).doubleValue() );
       settings.setDoLog( jCheckBoxDoLog.isSelected() );
+      settings.setAlwaysUseEmpirical(jCheckBoxUseEmpirical.isSelected());
    }
 
    public boolean isReady() {

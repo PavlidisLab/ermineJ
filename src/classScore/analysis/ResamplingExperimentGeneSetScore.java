@@ -30,13 +30,16 @@ public class ResamplingExperimentGeneSetScore extends
       AbstractResamplingGeneSetScore {
    private double[] groupPvals = null; // pvalues for groups.
    private double[] pvals = null; // pvalues for probes.
-  
+
    private Map probePvalMap; // probes -> pval
    private boolean useWeights;
    private static int quantile = 50;
    private static double quantfract = 0.5;
    private int method;
    private Settings settings;
+   private static final int MIN_SET_SIZE_FOR_ESTIMATION = 30; // after this size, switch to doing it by normal
+   // approximation.
+   private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
 
    /**
     * Used for methods which require randomly sampling classes to generate a null distribution of scores based on
@@ -74,27 +77,34 @@ public class ResamplingExperimentGeneSetScore extends
       }
 
       double oldnd = Double.MAX_VALUE;
-     
+
       for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
          double[] random_class = new double[geneSetSize]; // holds data for random class.
          double rawscore = 0.0;
-         DoubleArrayList values = new DoubleArrayList(); 
+         DoubleArrayList values = new DoubleArrayList();
          for ( int k = 0; k < numRuns; k++ ) {
             RandomChooser.chooserandom( random_class, in_pval, deck, num_genes,
                   geneSetSize );
             rawscore = calc_rawscore( random_class, geneSetSize, method );
-            values.add(rawscore);
-            hist.update( geneSetSize , rawscore );
-            if ( k > 0 && k % 1000 == 0 ) {
+            values.add( rawscore );
+            hist.update( geneSetSize, rawscore );
+            if (   useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION
+                  && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION && k > 0
+                  && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
                Thread.yield();
 
-               double mean = Descriptive.mean(values);
-               double variance = Descriptive.variance(values.size(), Descriptive.sum(values), Descriptive.sumOfSquares(values));
-               double nd = normalDeviation( mean, variance, geneSetSize);
- 
-               if (Math.abs(oldnd - nd) <= TOLERANCE) {
-                  hist.addExactNormalProbabilityComputer(geneSetSize, mean, variance);
-                  System.err.println("Class size: " + geneSetSize + " - Reached convergence to normal after " + k + " iterations.");
+               double mean = Descriptive.mean( values );
+               double variance = Descriptive.variance( values.size(),
+                     Descriptive.sum( values ), Descriptive
+                           .sumOfSquares( values ) );
+               double nd = normalDeviation( mean, variance, geneSetSize );
+
+               if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
+                  hist.addExactNormalProbabilityComputer( geneSetSize, mean,
+                        variance );
+                  System.err.println( "Class size: " + geneSetSize
+                        + " - Reached convergence to normal after " + k
+                        + " iterations." );
                   break; // stop simulation of this class size.
                }
                oldnd = nd;
@@ -108,6 +118,14 @@ public class ResamplingExperimentGeneSetScore extends
 
          if ( m != null ) {
             m.setStatus( "Currently running class size " + geneSetSize );
+         }
+
+         /*
+          * To improve performance, after a certain gene set size has been surpassed, don't do every size. The
+          * distributions are very similar.
+          */
+         if ( useSpeedUp && geneSetSize >= SPEEDUPSIZECUT ) {
+            geneSetSize += Math.floor( SPEDUPSIZEEXTRASTEP * geneSetSize );
          }
       }
 
@@ -129,7 +147,8 @@ public class ResamplingExperimentGeneSetScore extends
       this.useWeights = ( Boolean.valueOf( settings.getUseWeights() ) )
             .booleanValue();
       this.setMethod( settings.getClassScoreMethod() );
-
+      this.setUseNormalApprox(!settings.getAlwaysUseEmpirical());
+      this.setUseSpeedUp(!settings.getAlwaysUseEmpirical());
       if ( classMaxSize < classMinSize ) {
          throw new IllegalArgumentException(
                "Error:The maximum class size is smaller than the minimum." );
@@ -139,7 +158,6 @@ public class ResamplingExperimentGeneSetScore extends
       pvals = geneScores.getPvalues(); // array of pvalues.
       groupPvals = geneScores.getGroupPvalues();
       probePvalMap = geneScores.getProbeToPvalMap(); // reference to the probe -> pval map.
-     
 
       this.setHistogramRange(); // figure out the max pvalue possible.
       this.hist = new Histogram( numClasses, classMinSize, numRuns,

@@ -317,7 +317,11 @@ public class JGeneSetFrame extends JFrame {
       m_menuBar.add( m_fileMenu );
       m_menuBar.add( m_viewMenu );
 
-      //m_menuBar.add( m_analysisMenu );
+      m_menuBar.add( m_analysisMenu );
+
+      if ( analysisResults.getHist() == null ) {
+         m_analysisMenu.setEnabled( false );
+      }
 
       // Color map menu items (radio button group -- only one can be selected at one time)
       ButtonGroup group = new ButtonGroup();
@@ -373,7 +377,7 @@ public class JGeneSetFrame extends JFrame {
          probesInGeneSet.add( probeIDs.get( i ) );
       }
 
-      // compile the matrix data
+      // Read the matrix data
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
 
@@ -387,9 +391,19 @@ public class JGeneSetFrame extends JFrame {
                   .error( "Unable to load raw microarray data from file "
                         + filename
                         + "\n"
-                        + "Please make sure the file exists, filename and directory path are correct,\n"
+                        + "Please make sure this file exists and the filename and directory path are correct,\n"
                         + "and that it is a valid raw data file (tab-delimited).\n" );
          }
+      }
+
+      if ( matrix.rows() == 0 ) {
+         GuiUtil
+               .error( "None of the probes in this gene set were found in your data file." );
+      }
+
+      if ( matrix.rows() != probesInGeneSet.size() ) {
+         System.err
+               .println( "Not all the probes in this gene set were in the data file." );
       }
 
       // create the matrix display
@@ -585,7 +599,7 @@ public class JGeneSetFrame extends JFrame {
          boolean includeNonMatrix, boolean normalized ) throws IOException {
 
       // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
-      final String NEWLINE = "\r\n";
+      final String NEWLINE = System.getProperty( "line.separator" );
 
       BufferedWriter out = new BufferedWriter( new FileWriter( filename ) );
 
@@ -645,7 +659,6 @@ public class JGeneSetFrame extends JFrame {
       if ( desiredCellWidth >= MIN_WIDTH_MATRIXDISPLAY_COLUMN
             && desiredCellWidth <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
 
-         System.err.println( "Setting column width to " + desiredCellWidth );
          m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
          int matrixColumnCount = m_matrixDisplay.getColumnCount();
@@ -663,10 +676,14 @@ public class JGeneSetFrame extends JFrame {
     * to print out the matrix in the order in which it is displayed in the table. In this case, you will want to do
     * something like this: <br>
     * <br>
-    * <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code> However, do not forget to call
-    * <code>m_matrixDisplay.resetRowKeys()</code> when you are done because the table sorter filter does its own
-    * mapping, so the matrix rows have to remain in their original order (or it might not be displayed correctly inside
-    * the table).
+    * <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code>
+    * <p>
+    * However, do not forget to call
+    * </p>
+    * <code>m_matrixDisplay.resetRowKeys()</code>
+    * <p>
+    * when you are done because the table sorter filter does its own mapping, so the matrix rows have to remain in their
+    * original order (or it might not be displayed correctly inside the table).
     */
    protected int[] getCurrentMatrixDisplayRowOrder() {
 
@@ -784,11 +801,13 @@ public class JGeneSetFrame extends JFrame {
     * @param e
     */
    void m_viewHistMenuItem_actionPerformed( ActionEvent e ) {
-      JHistViewer f = new JHistViewer( analysisResults.getHist(), classResults
-            .getEffectiveSize(), classResults.getScore() );
-      f.setTitle( this.getTitle() + " histogram" );
-      f.pack();
-      f.show();
+      if ( analysisResults != null ) {
+         JHistViewer f = new JHistViewer( analysisResults.getHist(),
+               classResults.getEffectiveSize(), classResults.getScore() );
+         f.setTitle( this.getTitle() + " histogram" );
+         f.pack();
+         f.show();
+      }
    }
 
    /**

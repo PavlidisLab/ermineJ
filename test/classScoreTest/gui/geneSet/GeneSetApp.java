@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import classScore.Settings;
 
 /**
- *  
  * Copyright: Copyright (c) 2004
  * </p>
  * <p>
@@ -29,18 +28,18 @@ public class GeneSetApp {
       settings.setRawFile( filename );
 
       final String[] PROBES = {
-            "probe6", "probe7", "probe1"
+            "31946_s_at", "31947_r_at", "31948_at", "31949_at", "31950_at"
       };
       HashMap pvalues = new HashMap();
 
       ArrayList probeIDs = new ArrayList();
       for ( int i = 0; i < PROBES.length; i++ ) {
          probeIDs.add( i, PROBES[i] );
-         pvalues.put( PROBES[i], new Double( 0.5 ) );
+         pvalues.put( PROBES[i], new Double( 0.5 - 0.02 * i ) ); // fake p values.
       }
 
       JGeneSetFrame frame = new JGeneSetFrame( probeIDs, pvalues, null,
-            settings , null, null);
+            settings, null, null );
       frame.setSize( new Dimension( 800, 600 ) );
       frame.show();
    }
