@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: baseCode-0.2.jar ermineJ-help.jar jhbasic.jar colt.jar com
- mons-logging.jar mysql-connector-java-3.0.14-production-bin.jar xerce
- sImpl-2.6.2.jar
-Created-By: NetBeans IDE
-Specified-By: ermineJ.jarContent
-Main-Class: classScore.classScoreGUI

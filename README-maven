@@ -2,8 +2,6 @@
 // To make the help jar:
 maven help
 
-
-// To make a regular binary distribution
-
-
 // To make the Windows installer
+maven nsis
+maven nsis-jre  [ for the jre version ]

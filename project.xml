@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+
 <project 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/maven-project-3.0.0.xsd">
@@ -24,7 +25,13 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
     <repository>
         <connection>scm:cvs:ext:${maven.username}@adgate.cu-genome.org:/fsnode/projects/cvs/pavlab:ermineJ</connection>
     </repository>
-
+    <versions>
+        <version>
+            <id>2.0b3</id>
+            <name>beta3</name>
+            <tag/>
+        </version>
+    </versions>
     <developers>
         <developer>
             <name>Paul Pavlidis</name>
@@ -49,21 +56,23 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
         </developer>
     </developers>
     <licenses>
-        <license><name>GPL</name></license>
+        <license>
+            <name>GPL</name>
+        </license>
     </licenses>
     <dependencies>
         <dependency>
             <groupId>colt</groupId>
             <artifactId>colt</artifactId>
-                   <version/>
+               <version/>
             <jar>colt.jar</jar>
-     
             <type>jar</type>
             <url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
             <properties>
                 <category>lib</category>
                 <jnlp.jar>true</jnlp.jar>
             </properties>
+         
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -101,7 +110,10 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <version>2.0</version>
             <jar>jh.jar</jar>
             <type>jar</type>
-            <properties/>
+            <properties>
+                <category>lib</category>
+                <jnlp.jar>true</jnlp.jar>
+            </properties>
         </dependency>
     </dependencies>
     <build>
@@ -114,9 +126,9 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
         </unitTest>
         <resources>
             <resource>
-                <directory>${basedir}/src/classScore/gui/resources</directory>
+                <directory>${basedir}/src</directory>
                 <includes>
-                    <include>*.gif</include>
+                    <include>**/logo1small.gif</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
@@ -132,7 +144,6 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
         <report>maven-jxr-plugin</report>
         <report>maven-junit-report-plugin</report>
         <report>maven-tasklist-plugin</report>
-     <!--   <report>maven-clover-plugin</report> -->
     </reports>
     <properties/>
 </project>

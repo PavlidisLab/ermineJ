@@ -14,3 +14,14 @@ When compiling the script, instead of using the default compressor, you can choo
 ZLIB:    27.3 MB (33.3%), fastest
 BZIP2:  23.3 MB (28.3%), slow
 LZMA:  18.4 MB (22.5%), takes forever to compress on my machine
+
+- WB
+
+
+These scripts can be triggered with the following maven tasks:
+
+nsis
+
+nsis-jre -- to make the package with the JRE included
+
+- PP

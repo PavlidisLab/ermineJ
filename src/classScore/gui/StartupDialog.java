@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
+import baseCode.gui.file.XMLFileFilter;
 import classScore.Settings;
 
 /**
@@ -23,18 +24,9 @@ import classScore.Settings;
  * Copyright (c) 2004 Columbia University
  * 
  * @author Homin Lee
+ * @author Paul Pavlidis
  * @version $Id$
- * @todo We should probably attach a file filter to this class. When you browser to the names (to set the annots and the
- *       go file), it shows "all files". Files can be filtered based on extension (or something else). Here's an outline
- *       of how to add file filters:
- *       <p>
- *       <code>
- *          // Subclass FileFilter and implement its 'accept' method.   <br>
- *          // Assume this subclass is called 'XMLFileFilter'           <br>
- *          XMLFileFilter fileFilter = new XMLFileFilter();             <br>
- *          chooser.setFileFilter( fileFilter ); // JFileChooser method <br>
- *          chooser.setAcceptAllFileFilterUsed( false );                <br>
- *        </code>
+ * 
  */
 
 public class StartupDialog extends AppDialog {
@@ -103,9 +95,9 @@ public class StartupDialog extends AppDialog {
             + "<a href=\"http://microarray.cpmc.columbia.edu/annots/\">http://microarray.cpmc.columbia.edu/annots</a></html>" );
       addMain( centerPanel );
       this.setTitle( "ErmineJ startup" );
-      
+
       HelpHelper hh = new HelpHelper();
-      hh.initHelp(helpButton);
+      hh.initHelp( helpButton );
    }
 
    private void setValues() {
@@ -134,6 +126,9 @@ public class StartupDialog extends AppDialog {
 
    void classBrowseButton_actionPerformed( ActionEvent e ) {
       chooser.setDialogTitle( "Choose the GO XML file:" );
+      XMLFileFilter fileFilter = new XMLFileFilter();
+      chooser.setFileFilter( fileFilter ); // JFileChooser method
+      chooser.setAcceptAllFileFilterUsed( false );
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          classFile.setText( chooser.getSelectedFile().toString() );
@@ -165,9 +160,9 @@ public class StartupDialog extends AppDialog {
          dispose();
       }
    }
-   
-   protected void helpButton_actionPerformed (ActionEvent e) {
-      
+
+   protected void helpButton_actionPerformed( ActionEvent e ) {
+
    }
 
    void this_windowClosed( WindowEvent e ) {
