@@ -61,6 +61,20 @@
 		</dependency>
 	</dependencies>
 
+<build>
+	<unitTestSourceDirectory>test</unitTestSourceDirectory>
+     <unitTest>
+       <includes>
+         <include>**/*/Test*.java </include>
+         <include>**/*/*/Test*.java </include>
+         <include>**/*/*/*/Test*.java </include>
+       </includes>
+       <excludes>
+       </excludes>
+     </unitTest>
+</build>
+
+
       <reports>
     <report>maven-jdepend-plugin</report>
     <report>maven-checkstyle-plugin</report>
