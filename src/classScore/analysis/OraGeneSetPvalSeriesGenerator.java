@@ -75,6 +75,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     * permutations, but depends on weights.
     * 
     * @param inp_entries The pvalues for the probes (no weights) or groups (weights)
+    * @return number of entries that meet the user-set threshold.
     * @todo make this private and called by OraPvalGenerator.
     */
    public int hgSizes( Collection inp_entries ) {

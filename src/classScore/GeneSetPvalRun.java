@@ -166,6 +166,12 @@ public class GeneSetPvalRun {
             OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator(
                   settings, geneData, csc, goData, inputSize );
             int numOver  = pvg.hgSizes( inp_entries );
+            
+            if (numOver == 0) {
+               messenger.setError("No genes selected at that threshold!");
+               break;
+            }
+            
             pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores
                   .getProbeToPvalMap() );
             results = pvg.getResults();
@@ -200,12 +206,12 @@ public class GeneSetPvalRun {
             // fall through. - unsupported.
          }
          
-         case Settings.TTEST: {
-            
+         case Settings.TTEST: { // todo implement this
+            // fall through. - unsupported.
          }
          
-         case Settings.KS: {
-            
+         case Settings.KS: { // todo implement this
+            // fall through. - unsupported.
          }
          
          
@@ -215,6 +221,10 @@ public class GeneSetPvalRun {
          }
       }
 
+      if (results.size() == 0) {
+         return;
+      }
+      
       sortResults();
 
       messenger.setStatus( "Multiple test correction..." );

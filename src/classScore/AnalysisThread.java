@@ -29,6 +29,7 @@ public class AnalysisThread {
    private volatile Thread athread;
    GeneSetScoreFrame csframe;
    Settings settings;
+   Settings oldSettings = null;
    StatusViewer messenger;
    GONames goData;
    GeneAnnotations geneData = null;
@@ -37,9 +38,6 @@ public class AnalysisThread {
    Map geneDataSets;
    String loadFile;
    int numRuns = 0;
-
-   public AnalysisThread() {
-   }
 
    public void startAnalysisThread( final GeneSetScoreFrame csframe,
          Settings settings, final StatusViewer messenger, GONames goData,
@@ -65,6 +63,7 @@ public class AnalysisThread {
                GuiUtil.error( "Error During analysis", e );
                cancelAnalysisThread();
                csframe.enableMenusForAnalysis();
+               messenger.setStatus( "Ready" );
             }
          }
 
@@ -94,9 +93,9 @@ public class AnalysisThread {
             rawDataSets.put( settings.getRawFile(), rawData );
          }
       }
-
       GeneScoreReader geneScores;
-      if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
+      if ( !geneScoreSettingsDirty()
+            && geneScoreSets.containsKey( settings.getScoreFile() ) ) {
          messenger.setStatus( "Gene Scores are in memory" );
          geneScores = ( GeneScoreReader ) geneScoreSets.get( settings
                .getScoreFile() );
@@ -104,7 +103,8 @@ public class AnalysisThread {
          messenger.setStatus( "Reading gene scores from file "
                + settings.getScoreFile() );
          geneScores = new GeneScoreReader( settings.getScoreFile(), settings,
-               messenger, geneData.getGeneToProbeList(), geneData.getProbeToGeneMap() );
+               messenger, geneData.getGeneToProbeList(), geneData
+                     .getProbeToGeneMap() );
          geneScoreSets.put( settings.getScoreFile(), geneScores );
       }
 
@@ -154,8 +154,9 @@ public class AnalysisThread {
                new Integer( numRuns ).toString() );
       }
 
-      csframe.addResult( runResult );;
+      csframe.addResult( runResult );
       csframe.setSettings( settings );
+      oldSettings = settings;
       csframe.enableMenusForAnalysis();
       athread = null;
    }
@@ -205,10 +206,20 @@ public class AnalysisThread {
       athread.start();
    }
 
-   void loadAnalysis() throws IOException {
+   private void loadAnalysis() throws IOException {
       ResultsFileReader rfr = new ResultsFileReader( loadFile, messenger );
       Map results = rfr.getResults();
       doAnalysis( results );
    }
 
+   // see if we have to read the gene scores or if we can just use the old ones
+   private boolean geneScoreSettingsDirty() {
+      if ( oldSettings == null ) return true;
+
+//      System.err.println( ( settings.getDoLog() != oldSettings.getDoLog() )
+//            + " " + ( settings.getScorecol() != oldSettings.getScorecol() ) );
+
+      return ( settings.getDoLog() != oldSettings.getDoLog() )
+            || ( settings.getScorecol() != oldSettings.getScorecol() );
+   }
 }
