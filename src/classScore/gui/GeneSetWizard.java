@@ -184,7 +184,7 @@ public class GeneSetWizard extends Wizard {
       } else if ( geneData.classExists( id ) && makenew ) {
          GuiUtil.error( "A class by the ID " + id + " already exists." );
       } else {
-         if (makenew)
+         if (makenew || !newGeneSet.modified())
             newGeneSet.addToMaps(goData);
          else
             newGeneSet.modifyClass(goData);

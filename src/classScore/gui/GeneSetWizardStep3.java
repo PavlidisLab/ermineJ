@@ -49,6 +49,8 @@ public class GeneSetWizardStep3 extends WizardStep {
    JTextArea classDescTA;
    JTable finalTable;
 
+   String origID;
+
    public GeneSetWizardStep3( GeneSetWizard wiz, Settings settings,
          GeneAnnotations geneData, NewGeneSet newGeneSet, boolean makenew ) {
       super( wiz );
@@ -129,6 +131,10 @@ public class GeneSetWizardStep3 extends WizardStep {
    public void nameNewGeneSet(){
       newGeneSet.setId(classIDTF.getText());
       newGeneSet.setDesc(classDescTA.getText());
+      if(newGeneSet.modified() && origID.compareTo(newGeneSet.getId())!=0)
+      {
+         newGeneSet.setModified(false);
+      }
    }
 
    public void update() {
@@ -137,6 +143,8 @@ public class GeneSetWizardStep3 extends WizardStep {
       if ( newGeneSet.getId().compareTo( "" ) != 0 ) {
          classIDFinal.setText( newGeneSet.getId() );
       }
+      if(newGeneSet.modified())
+         origID = newGeneSet.getId();
    }
 
 }

@@ -111,6 +111,7 @@ public class GeneSetWizardStep1A extends WizardStep {
       String desc = ( String ) oldClassTable.getValueAt( row, 1 );
       newGeneSet.setId( id );
       newGeneSet.setDesc( desc );
+      newGeneSet.setModified(true);
       if ( geneData.classExists( id ) ) {
          newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
       }

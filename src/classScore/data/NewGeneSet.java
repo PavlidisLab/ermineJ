@@ -40,6 +40,7 @@ public class NewGeneSet {
    private String id;
    private String desc;
    private ArrayList probes;
+   private boolean modifiedGS=false;
 
    public NewGeneSet( GeneAnnotations geneData ) {
       this.geneData = geneData;
@@ -47,6 +48,9 @@ public class NewGeneSet {
       desc = new String( "" );
       probes = new ArrayList();
    }
+
+   public void setModified(boolean val) { modifiedGS=val; }
+   public boolean modified() { return modifiedGS; }
 
    public void clear() {
       id = "";
