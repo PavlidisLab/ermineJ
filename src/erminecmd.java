@@ -36,6 +36,7 @@ public class erminecmd {
 
    public static void main(String args[]) {
 
+      /*
       try {
 
          String pbPvalFile = args[0];
@@ -78,7 +79,7 @@ public class erminecmd {
          System.err.println("File reading/writing error");
          e.printStackTrace();
       }
-
+*/
    }
 
    protected static String getCanonical(String in) {

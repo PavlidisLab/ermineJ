@@ -62,6 +62,7 @@
   <file path="src/classScore/AnalysisWizard.java"/>
   <file path="src/classScore/AnalysisWizardStep3.java"/>
   <file path="src/classScore/AnalysisWizardStep4.java"/>
+  <file path="src/classScore/GeneSetMapTools.java"/>
   <file path="src/classScore/Settings.java"/>
   <file path="src/classScore/StartupDialog.java"/>
 </project>

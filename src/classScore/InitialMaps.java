@@ -59,55 +59,6 @@ public class InitialMaps {
       probePvalMapper.setInputPvals(gn.get_group_probe_map(),settings.getGroupMethod()); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
    }
 
-   /**
-    * I think this is just for the command line version (Homin)
-    *
-    * @param probePvalFile String
-    * @param probe_annotfile String
-    * @param goNamesfile String
-    * @param method String
-    * @param groupMethod String
-    * @param classMaxSize int
-    * @param classMinSize int
-    * @param numberOfRuns int
-    * @param quantile int
-    * @param useWeights String
-    * @param pvalcolumn int
-    * @param dolog_check String
-    * @param messenger classScoreStatus
-    * @throws IllegalArgumentException
-    * @throws IOException
-    */
-   public InitialMaps(String probePvalFile,
-                      String probe_annotfile,
-                      String goNamesfile,
-                      String method,
-                      String groupMethod,
-                      int classMaxSize,
-                      int classMinSize,
-                      int numberOfRuns,
-                      int quantile,
-                      String useWeights,
-                      int pvalcolumn,
-                      String dolog_check,
-                      classScoreStatus messenger) throws
-           IllegalArgumentException, IOException {
-      messenger.setStatus("Reading GO descriptions " + goNamesfile);
-      goName = new GONames(goNamesfile); // parse go name file
-      messenger.setStatus("Reading gene scores from " + probePvalFile);
-      boolean dolog = (Boolean.valueOf(dolog_check)).booleanValue();
-      probePvalMapper = new expClassScore(probePvalFile, useWeights, method,
-                                          pvalcolumn, dolog, classMaxSize,
-                                          classMinSize, numberOfRuns,
-                                          quantile);
-      messenger.setStatus("Reading gene annotations from " + probe_annotfile);
-      geneData = new GeneAnnotations(probe_annotfile, probePvalMapper.get_map());
-      GeneGroupReader gn = setupClasses(messenger);
-      messenger.setStatus("Initializing gene score mapping");
-      probePvalMapper.setInputPvals(gn.get_group_probe_map(),
-                                    groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-   }
-
    private void readFiles(Settings settings, classScoreStatus messenger
                           ) throws IllegalArgumentException, IOException {
       messenger.setStatus("Reading GO descriptions " + settings.getClassFile());
@@ -118,7 +69,7 @@ public class InitialMaps {
       geneData = new GeneAnnotations(settings.getAnnotFile(), probePvalMapper.get_map());
    }
 
-   private GeneGroupReader setupClasses(classScoreStatus messenger) {
+   public GeneGroupReader setupClasses(classScoreStatus messenger) {
       GeneGroupReader groupName = new GeneGroupReader(geneData.getGeneToProbeList(),
               geneData.getProbeToGeneMap()); // parse group file. Yields map of probe->replicates.
       probeGroups = groupName.get_probe_group_map(); // map of probes to groups
@@ -128,14 +79,17 @@ public class InitialMaps {
       probeToClassMap.hackClassToProbeMap();
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
       System.err.println("Hacked classToProbe has size: " + classToProbe.size());
-      sortClasses();
+      sortGeneSets(classToProbe);
+      System.err.println("Sorted classes has size: " + sortedclasses.size());
       messenger.setStatus("Done with setup");
       return groupName;
    }
 
-   private void sortClasses() {
-      sortedclasses = new Vector(classToProbe.entrySet().size());
-      Set keys = classToProbe.keySet();
+   private void sortGeneSets(Map geneSetToProbe) {
+      sortedclasses = new Vector(geneSetToProbe.entrySet().size());
+      System.err.println("classes has size: " + geneSetToProbe.entrySet().size());
+      Set keys = geneSetToProbe.keySet();
+      System.err.println("keyshas size: " + keys.size());
       Vector l = new Vector();
       l.addAll(keys);
       Collections.sort(l);
@@ -221,7 +175,7 @@ public class InitialMaps {
       ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                               geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
-      sortClasses();
+      sortGeneSets(classToProbe);
    }
 
    public void modifyClass(String id, String desc, ArrayList probes) {
@@ -231,7 +185,7 @@ public class InitialMaps {
       ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                               geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
-      sortClasses();
+      sortGeneSets(classToProbe);
    }
 
    public int numClasses() {

@@ -6,15 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -45,6 +37,7 @@ public class GeneAnnotations {
    private Map geneToProbeList;
    private Vector probeList;
    private Map probes; /** @todo this should be a Set? */
+   private Vector sortedGeneSets;
 
    /**
     *
@@ -173,6 +166,22 @@ public class GeneAnnotations {
 
    /**
     *
+    * @param Map
+    */
+   public void sortGeneSets() {
+      sortedGeneSets = new Vector(classToProbeMap.entrySet().size());
+      Set keys = classToProbeMap.keySet();
+      Vector l = new Vector();
+      l.addAll(keys);
+      Collections.sort(l);
+      Iterator it = l.iterator();
+      while (it.hasNext()) {
+         sortedGeneSets.add(it.next());
+      }
+   }
+
+   /**
+    *
     * @return Map
     */
    public Map getProbeToClassMap() {
@@ -204,6 +213,28 @@ public class GeneAnnotations {
     */
    public ArrayList getGeneProbeList(String g) {
       return (ArrayList) geneToProbeList.get(g);
+   }
+
+   public int numClasses() {
+      return sortedGeneSets.size();
+   }
+
+   public String getClass(int i) {
+      return (String) sortedGeneSets.get(i);
+   }
+
+   public int numProbes(String id) {
+      return ((ArrayList) classToProbeMap.get(id)).size();
+   }
+
+   public int numGenes(String id) {
+      HashSet genes = new HashSet();
+      ArrayList probes = (ArrayList) classToProbeMap.get(id);
+      Iterator probe_it = probes.iterator();
+      while (probe_it.hasNext()) {
+         genes.add(probeToGeneName.get((String) probe_it.next()));
+      }
+      return genes.size();
    }
 
    /**

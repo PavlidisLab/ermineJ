@@ -36,11 +36,13 @@ public class StartupDialog
 
    classScoreFrame callingframe;
    Settings settings;
+   classScoreStatus messenger;
 
    public StartupDialog( classScoreFrame callingframe ) {
       setModal( true );
       this.callingframe = callingframe;
       this.settings = callingframe.getSettings();
+      this.messenger = callingframe.getStatusMessenger();
       try {
          jbInit();
          setValues();
@@ -135,8 +137,17 @@ public class StartupDialog
 
    void startButton_actionPerformed( ActionEvent e ) {
       saveValues();
+      class runthread extends Thread {
+         public runthread() {}
+         public void run() {
+            callingframe.initialize();
+         }
+      };
+      Thread aFrameRunner = new runthread();
+      aFrameRunner.start();
       dispose();
    }
+
 }
 
 class StartupDialog_annotBrowseButton_actionAdapter

@@ -3,7 +3,7 @@ package classScore;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.util.Vector;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -33,15 +33,12 @@ public class classScoreFrame
    JMenuItem loadAnalysisMenuItem = new JMenuItem();
    JMenuItem saveAnalysisMenuItem = new JMenuItem();
 
-   JTabbedPane jTabbedPane1 = new JTabbedPane();
    ClassPanel cPanel;
-   ResultPanel resultpanel;
    OutputPanel oPanel;
 
    JPanel jPanelMainControls = new JPanel();
    JButton jButtonAbout = new JButton();
    JButton jButtonCancel = new JButton();
-   JButton jButtonLoadResults = new JButton();
    JButton jButtonQuit = new JButton();
 
    JLabel jLabelStatus = new JLabel();
@@ -52,11 +49,12 @@ public class classScoreFrame
    boolean loadResults = false;
    int runnum = 0;
    InitialMaps imaps;
-   boolean initialized = false;
-   classScoreStatus statusMessenger;
-   Vector results = new Vector();
 
    Settings settings;
+   classScoreStatus statusMessenger;
+   GONames goData;
+   GeneAnnotations geneData;
+   Vector results = new Vector();
 
    public classScoreFrame() {
       try {
@@ -86,6 +84,7 @@ public class classScoreFrame
       //menu stuff
       classMenu.setText( "Classes" );
       classMenu.setMnemonic( 'C' );
+      classMenu.setEnabled(false);
       defineClassMenuItem.setText( "Define New Class" );
       defineClassMenuItem.addActionListener( new
                                              classScoreFrame_defineClassMenuItem_actionAdapter( this ) );
@@ -103,6 +102,7 @@ public class classScoreFrame
       classMenu.add( modClassMenuItem );
       analysisMenu.setText( "Analysis" );
       analysisMenu.setMnemonic( 'A' );
+      analysisMenu.setEnabled(false);
       runAnalysisMenuItem.setText( "Run Analysis" );
       runAnalysisMenuItem.addActionListener( new
                                              classScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
@@ -121,21 +121,10 @@ public class classScoreFrame
       jMenuBar1.add( classMenu );
       jMenuBar1.add( analysisMenu );
 
-      jTabbedPane1.setMaximumSize( new Dimension( 32767, 32767 ) );
-      jTabbedPane1.setMinimumSize( new Dimension( 300, 530 ) );
-      jTabbedPane1.setPreferredSize( new Dimension( 830, 330 ) );
-      cPanel = new ClassPanel( this );
       oPanel = new OutputPanel( results );
-      //cPanel.setModel(InitialMaps.toBlankTableModel());
-      jTabbedPane1.addTab( "oPanel", oPanel );
+      oPanel.setPreferredSize( new Dimension( 830, 330 ) );
 
       jPanelMainControls.setPreferredSize( new Dimension( 830, 35 ) );
-      jButtonLoadResults.setToolTipText(
-          "Click to load an existing results file from disk" );
-      jButtonLoadResults.setActionCommand( "jButtonLoad" );
-      jButtonLoadResults.setText( "Load Results" );
-      jButtonLoadResults.addActionListener( new
-                                            classScoreFrame_jButtonLoadResults_actionAdapter( this ) );
       jButtonAbout.setToolTipText( "Please click here!" );
       jButtonAbout.setText( "About the software" );
       jButtonAbout.addActionListener( new
@@ -148,7 +137,6 @@ public class classScoreFrame
       jButtonCancel.addActionListener( new
                                        classScoreFrame_jButtonCancel_actionAdapter( this ) );
       jPanelMainControls.add( jButtonQuit, null );
-      jPanelMainControls.add( jButtonLoadResults, null );
       jPanelMainControls.add( jButtonCancel, null );
       jPanelMainControls.add( jButtonAbout, null );
 
@@ -162,17 +150,13 @@ public class classScoreFrame
       showStatus( "Please see 'About this software' for license information." );
       statusMessenger = new classScoreStatus( jLabelStatus );
 
-      mainPanel.add( jTabbedPane1, BorderLayout.NORTH );
+      mainPanel.add( oPanel, BorderLayout.NORTH );
       mainPanel.add( jPanelMainControls, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
 
    void jButtonLoad_actionPerformed( ActionEvent e ) {
       /*
-       final double oraThresh = Double.parseDouble(jTextFieldPValueThreshold.
-                                                        getText());
-            final String useWeights = getUseWeights();
-
             boolean ok = true;
             ok = testfile(jTextFieldGeneScoreFile.getText());
             ok = ok && testfile(jTextFieldGONames.getText());
@@ -185,60 +169,30 @@ public class classScoreFrame
             if (!ok) {
                return;
             }
-
-            writePrefs();
-
-            showStatus("Running");
-
-            classScoreStatus m = new classScoreStatus(jLabelStatus);
-
-            class runthread
-                extends Thread {
-               classScoreStatus m;
-
-               public runthread(classScoreStatus m) {
-                  this.m = m;
-               }
-
-               public void run() {
-                  try {
                      populate_class_list(m);
                      classPvalRun results = new classPvalRun(imaps,
                          jTextFieldOutPutFileName.getText(),
                          oraThresh,
                          useWeights,
                          "bh", m, loadResults);
-
                      ResultPanel r = new ResultPanel(results);
-                     //r.setTitle(jTextFieldOutPutFileName.getText());
-                     //        r.addClassDetailsListener(class_details_action_listener);
                      r.setModel(results.toTableModel());
-                     //r.show();
-                     //jTabbedPane1.addTab(jTextFieldOutPutFileName.getText(),r);
-                     runnum++;
-       jTabbedPane1.addTab("Run " + Integer.toString(runnum),runAnalysisMenuItem);
-                     cPanel.setModel(imaps.toTableModel());
-                  }
-                  catch (IllegalArgumentException e) {
-                     error(e, "During class score calculation");
-                  }
-                  catch (IOException e) {
-                     error(e, "File reading or writing");
-                  }
-                  showStatus("Done");
-                  done = true;
-                  loadResults = false;
-               }
-            };
-
-            runner = new runthread(m);
-            runner.start();
        */
    }
 
-   void initialize() {
+   public void initialize() {
       try {
-         imaps = new InitialMaps( settings, statusMessenger );
+         statusMessenger.setStatus("Reading GO descriptions " + settings.getClassFile());
+         goData = new GONames(settings.getClassFile()); // parse go name file
+         statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
+         geneData = new GeneAnnotations(settings.getAnnotFile());
+         statusMessenger.setStatus( "Initializing gene class mapping" );
+         GeneSetMapTools.collapseClasses(geneData.getClassToProbeMap());
+         GeneSetMapTools.hackGeneSetToProbeMap(geneData.getClassToProbeMap());
+         System.err.println("Hacked classToProbe has size: " + geneData.getClassToProbeMap().size());
+         geneData.sortGeneSets();
+         statusMessenger.setStatus("Done with setup");
+         enableMenus();
       }
       catch ( IllegalArgumentException e ) {
          error( e, "During initialization" );
@@ -246,29 +200,24 @@ public class classScoreFrame
       catch ( IOException e ) {
          error( e, "File reading or writing" );
       }
-      oPanel.addInitialClassData( imaps );
-      initialized = true;
+      oPanel.addInitialData( geneData, goData );
+      statusMessenger.setStatus("Done with initialization.");
+   }
+
+   private void enableMenus()
+   {
+      classMenu.setEnabled( true );
+      analysisMenu.setEnabled( true );
    }
 
    public void analyze( Settings settings, classScoreStatus messenger) {
       try {
-         if ( !initialized ) {
-            initialize();
-         }
-         InitialMaps runmaps = new InitialMaps( settings, messenger );
-
-         //cPanel.setModel(imaps.toTableModel());
-         System.out.println( "DONE with RUNMAPS" );
-         classPvalRun runResult = new classPvalRun( settings, runmaps, "",
-             "bh", messenger, loadResults );
-
-         System.out.println( "DONE with CLASSPVALRUN" );
-
-         resultpanel = new ResultPanel( runResult, settings );
-         resultpanel.setModel( runResult.toTableModel() );
-         runnum++;
-         jTabbedPane1.addTab( "Run " + Integer.toString( runnum ), resultpanel );
-         //oPanel.addRunData( runResult.getResults() );
+         GeneGroupReader groupName = new GeneGroupReader(geneData.getGeneToProbeList(),
+             geneData.getProbeToGeneMap()); // parse group file. Yields map of probe->replicates.
+         expClassScore probePvalMapper = new expClassScore(settings);
+         probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
+                                       settings.getGroupMethod()); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
+         classPvalRun runResult = new classPvalRun( settings,geneData,goData,probePvalMapper,"","bh",messenger,loadResults);
          results.add( runResult );
          oPanel.addRun();  // this line should come after results.add() or else you'll get errors
       }
@@ -452,9 +401,6 @@ public class classScoreFrame
    }
 
    public void makeModClassFrame( boolean makenew, String classid ) {
-      if ( !initialized ) {
-         initialize();
-      }
       modClassFrame modframe = new modClassFrame( makenew, imaps, this.cPanel,
                                                   settings.getDataFolder(), classid );
       showDialog( modframe );
@@ -504,6 +450,10 @@ public class classScoreFrame
    public Settings getSettings() {
       return settings;
    }
+
+   public classScoreStatus getStatusMessenger(){
+      return statusMessenger;
+   }
 }
 
 /* end class */
@@ -547,20 +497,6 @@ class classScoreFrame_jButtonCancel_actionAdapter
 
    public void actionPerformed( ActionEvent e ) {
       adaptee.jButtonCancel_actionPerformed( e );
-   }
-}
-
-class classScoreFrame_jButtonLoadResults_actionAdapter
-    implements java.awt.
-    event.ActionListener {
-   classScoreFrame adaptee;
-
-   classScoreFrame_jButtonLoadResults_actionAdapter( classScoreFrame adaptee ) {
-      this.adaptee = adaptee;
-   }
-
-   public void actionPerformed( ActionEvent e ) {
-      adaptee.jButtonLoadResults_actionPerformed( e );
    }
 }
 

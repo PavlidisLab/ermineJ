@@ -47,38 +47,8 @@ public class classPvalRun {
    private NumberFormat nf = NumberFormat.getInstance();
    private boolean useUniform = false; // assume input values come from uniform distribution under null hypothesis.
 
-   /**
-    *
-    * @param imaps InitialMaps
-    * @param resultsFile String
-    * @param pval double
-    * @param useWeights String
-    * @param mtc_method String
-    * @param messenger classScoreStatus
-    * @param loadResults boolean
-    * @throws IllegalArgumentException
-    * @throws IOException
-    */
-   public classPvalRun(InitialMaps imaps,
-                       String resultsFile,
-                       double pval,
-                       String useWeights,
-                       String mtc_method,
-                       classScoreStatus messenger,
-                       boolean loadResults) throws
-           IllegalArgumentException, IOException {
-      initialize(imaps.goName,
-                 imaps.probePvalMapper,
-                 imaps.geneData,
-                 imaps.probeGroups,
-                 imaps.classToProbe,
-                 resultsFile,
-                 pval,
-                 useWeights,
-                 mtc_method,
-                 messenger,
-                 loadResults);
-   }
+   Settings settings;
+   classScoreStatus messenger;
 
    /**
     * @param settings Settings
@@ -90,87 +60,55 @@ public class classPvalRun {
     * @throws IllegalArgumentException
     * @throws IOException
     */
-   public classPvalRun(Settings settings,
-                       InitialMaps imaps,
-                       String resultsFile,
-                       String mtc_method,
-                       classScoreStatus messenger,
-                       boolean loadResults) throws
-           IllegalArgumentException, IOException {
-      initialize(imaps.goName,
-                 imaps.probePvalMapper,
-                 imaps.geneData,
-                 imaps.probeGroups,
-                 imaps.classToProbe,
-                 resultsFile,
-                 settings.getPValThreshold(),
-                 settings.getUseWeights(),
-                 mtc_method,
-                 messenger,
-                 loadResults);
+   public classPvalRun( Settings settings,
+                        InitialMaps imaps,
+                        String resultsFile,
+                        String mtc_method,
+                        classScoreStatus messenger,
+                        boolean loadResults ) throws
+       IllegalArgumentException, IOException {
+      this.settings = settings;
+      this.messenger = messenger;
+      initialize( imaps.goName,
+                  imaps.probePvalMapper,
+                  imaps.geneData,
+                  imaps.probeGroups,
+                  imaps.classToProbe,
+                  resultsFile,
+                  mtc_method,
+                  loadResults );
    }
 
-   /**
-    *
-    * @param gn GONameReader
-    * @param ppm expClassScore
-    * @param gd GeneDataReader
-    * @param pgm Map
-    * @param ctp Map
-    * @param resultsFile String
-    * @param pval double
-    * @param useWeights String
-    * @param mtc_method String
-    * @param messenger classScoreStatus
-    * @param loadResults boolean
-    * @throws IllegalArgumentException
-    * @throws IOException
-    */
-   public classPvalRun(GONames gn,
-                       expClassScore ppm,
-                       GeneAnnotations gd,
-                       Map pgm,
-                       Map ctp,
-                       String resultsFile,
-                       double pval,
-                       String useWeights,
-                       String mtc_method,
-                       classScoreStatus messenger,
-                       boolean loadResults) throws IllegalArgumentException,
-           IOException {
-      initialize(gn, ppm, gd, pgm, ctp,
-                 resultsFile, pval, useWeights, mtc_method,
-                 messenger, loadResults);
+   public classPvalRun( Settings settings,
+                        GeneAnnotations geneData,
+                        GONames goData,
+                        expClassScore probePvalMapper,
+                        String resultsFile,
+                        String mtc_method,
+                        classScoreStatus messenger,
+                        boolean loadResults ) throws
+       IllegalArgumentException, IOException {
+      this.settings = settings;
+      this.messenger = messenger;
+      initialize( goData,
+                  probePvalMapper,
+                  geneData,
+                  geneData.getProbeToGeneMap(),
+                  geneData.getClassToProbeMap(),
+                  resultsFile,
+                  mtc_method,
+                  loadResults );
    }
 
-   /**
-    *
-    * @param gn GONameReader
-    * @param ppm expClassScore
-    * @param gd GeneDataReader
-    * @param pgm Map
-    * @param ctp Map
-    * @param resultsFile String
-    * @param pval double
-    * @param useWeights String
-    * @param mtc_method String
-    * @param messenger classScoreStatus
-    * @param loadResults boolean
-    * @throws IllegalArgumentException
-    * @throws IOException
-    */
-   public void initialize(GONames gn,
-                          expClassScore ppm,
-                          GeneAnnotations gd,
-                          Map pgm,
-                          Map ctp,
-                          String resultsFile,
-                          double pval,
-                          String useWeights,
-                          String mtc_method,
-                          classScoreStatus messenger,
-                          boolean loadResults) throws
-           IllegalArgumentException, IOException {
+   public void initialize( GONames gn,
+                           expClassScore ppm,
+                           GeneAnnotations gd,
+                           Map pgm,
+                           Map ctp,
+                           String resultsFile,
+                           String mtc_method,
+                           boolean loadResults ) throws
+       IllegalArgumentException, IOException {
 
       goName = gn;
       probePvalMapper = ppm;
@@ -178,118 +116,118 @@ public class classPvalRun {
       probeGroups = pgm;
       classToProbe = ctp;
 
-      nf.setMaximumFractionDigits(8);
+      nf.setMaximumFractionDigits( 8 );
 
       // user flags and constants:
       //    user_pvalue = -(Math.log(pval) / Math.log(10)); // user defined pval (cutoff) for hypergeometric todo: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
-      weight_on = (Boolean.valueOf(useWeights)).booleanValue();
+      weight_on = ( Boolean.valueOf( settings.getUseWeights() ) ).booleanValue();
       dest_file = resultsFile;
 
-      if (loadResults) {
-         readResultsFromFile(resultsFile);
+      if ( loadResults ) {
+         readResultsFromFile( resultsFile );
          sortResults();
       } else {
 
          // Calculate random classes. todo: what a mess. This histogram should be held by the class that originated it.
-         if (!useUniform) {
-            messenger.setStatus("Starting resampling");
-            System.out.println("Starting resampling");
-            hist = probePvalMapper.generateNullDistribution(messenger);
-            messenger.setStatus("Finished resampling");
+         if ( !useUniform ) {
+            messenger.setStatus( "Starting resampling" );
+            System.out.println( "Starting resampling" );
+            hist = probePvalMapper.generateNullDistribution( messenger );
+            messenger.setStatus( "Finished resampling" );
          }
 
 //    messenger.setStatus(hist.toString());
-         System.out.println("Hist to string: " + hist.toString());
+         System.out.println( "Hist to string: " + hist.toString() );
 
          // Initialize the results data structure.
          results = new LinkedHashMap();
 
          // get the class sizes. /* todo use initmap */
-         ClassSizeComputer csc = new ClassSizeComputer(probePvalMapper,
-                 classToProbe, probeGroups,
-                 weight_on);
+         ClassSizeComputer csc = new ClassSizeComputer( probePvalMapper,
+             classToProbe, probeGroups,
+             weight_on );
          csc.getClassSizes();
 
          //    Collection inp_entries; // this is only used for printing.
          Map input_rank_map;
-         if (weight_on) {
+         if ( weight_on ) {
             //      inp_entries = probePvalMapper.get_group_pval_map().entrySet();
-            input_rank_map = Rank.rankTransform(probePvalMapper.
-                                                get_group_pval_map());
+            input_rank_map = Rank.rankTransform( probePvalMapper.
+                                                 get_group_pval_map() );
          } else {
             //        inp_entries = probePvalMapper.get_map().entrySet();
-            input_rank_map = Rank.rankTransform(probePvalMapper.get_map());
+            input_rank_map = Rank.rankTransform( probePvalMapper.get_map() );
          }
 
          inputSize = input_rank_map.size(); // how many pvalues. This is constant under permutations of the data
 
          // hgSizes(inp_entries); // get numOverThreshold and numUnderThreshold. Constant under permutations of the data.
 
-         System.out.println("Input size=" + inputSize + " numOverThreshold=" +
-                            numOverThreshold + " numUnderThreshold=" +
-                            numUnderThreshold + " "); //+  + "" + foo + "" + foo + "" + foo + "" + foo );
+         System.out.println( "Input size=" + inputSize + " numOverThreshold=" +
+                             numOverThreshold + " numUnderThreshold=" +
+                             numUnderThreshold + " " );
 
          /* todo use initmap */
-         ClassPvalSetGenerator pvg = new ClassPvalSetGenerator(classToProbe,
-                 probeGroups, weight_on,
-                 hist, probePvalMapper, csc, goName);
+         ClassPvalSetGenerator pvg = new ClassPvalSetGenerator( classToProbe,
+             probeGroups, weight_on,
+             hist, probePvalMapper, csc, goName );
 
          // calculate the actual class scores and correct sorting. /** todo make this use initmap */
-         pvg.classPvalGenerator(probePvalMapper.get_group_pval_map(),
-                                probePvalMapper.get_map(),
-                                input_rank_map);
+         pvg.classPvalGenerator( probePvalMapper.get_group_pval_map(),
+                                 probePvalMapper.get_map(),
+                                 input_rank_map );
          results = pvg.getResults();
          sortResults();
 
-         messenger.setStatus("Multiple test correction");
+         messenger.setStatus( "Multiple test correction" );
 
          /** todo use initmap */
-         MultipleTestCorrector mt = new MultipleTestCorrector(sortedclasses,
-                 results,
-                 probePvalMapper, weight_on, hist, probeGroups, classToProbe,
-                 csc);
-         if (mtc_method.equals("bon")) {
+         MultipleTestCorrector mt = new MultipleTestCorrector( sortedclasses,
+             results,
+             probePvalMapper, weight_on, hist, probeGroups, classToProbe,
+             csc );
+         if ( mtc_method.equals( "bon" ) ) {
             mt.bonferroni(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
-         } else if (mtc_method.equals("bh")) {
-            mt.benjaminihochberg(0.05);
-         } else if (mtc_method.equals("wy")) {
-            mt.westfallyoung(10000);
+         } else if ( mtc_method.equals( "bh" ) ) {
+            mt.benjaminihochberg( 0.05 );
+         } else if ( mtc_method.equals( "wy" ) ) {
+            mt.westfallyoung( 10000 );
          }
 
-         messenger.setStatus("Beginning output");
+         messenger.setStatus( "Beginning output" );
          // all done:
          // print the results
-         if (dest_file.compareTo("") != 0) {
-            ResultsPrinter rpr = new ResultsPrinter(dest_file, sortedclasses,
-                    results, goName, probeToClassMap);
+         if ( dest_file.compareTo( "" ) != 0 ) {
+            ResultsPrinter rpr = new ResultsPrinter( dest_file, sortedclasses,
+                results, goName, probeToClassMap );
          }
          //printResults(true);
       }
 
       //for table output
-      for (int i = 0; i < sortedclasses.size(); i++) {
-         ((classresult) results.get((String) sortedclasses.get(i))).setRank(i +
-                 1);
+      for ( int i = 0; i < sortedclasses.size(); i++ ) {
+         ( ( classresult ) results.get( ( String ) sortedclasses.get( i ) ) ).setRank( i +
+             1 );
       }
 
-      messenger.setStatus("Done!");
+      messenger.setStatus( "Done!" );
    }
+
    /* Done! */
 
    /**
     Sorted order of the class results - all this has to hold is the class names.
     */
    private void sortResults() {
-      sortedclasses = new Vector(results.entrySet().size());
+      sortedclasses = new Vector( results.entrySet().size() );
       Collection k = results.values();
       Vector l = new Vector();
-      l.addAll(k);
-      Collections.sort(l);
-      for (Iterator it = l.iterator(); it.hasNext(); ) {
-         sortedclasses.add(((classresult) it.next()).getClassId());
+      l.addAll( k );
+      Collections.sort( l );
+      for ( Iterator it = l.iterator(); it.hasNext(); ) {
+         sortedclasses.add( ( ( classresult ) it.next() ).getClassId() );
       }
    }
-
 
    /**
     *
@@ -299,11 +237,11 @@ public class classPvalRun {
       return new AbstractTableModel() {
 
          private String[] columnNames = {
-                                        "Rank", "GO Id", "Name", "Size",
-                                        "Eff. size", "Score",
-                                        "Class P value"};
+             "Rank", "GO Id", "Name", "Size",
+             "Eff. size", "Score",
+             "Class P value"};
 
-         public String getColumnName(int i) {
+         public String getColumnName( int i ) {
             return columnNames[i];
          }
 
@@ -315,26 +253,26 @@ public class classPvalRun {
             return sortedclasses.size();
          }
 
-         public Object getValueAt(int i, int j) {
-            classresult res = (classresult) results.get((String) sortedclasses.
-                    get(i));
-            switch (j) {
-            case 0:
-               return new Integer(i + 1);
-            case 1:
-               return res.getClassId();
-            case 2:
-               return res.getClassName();
-            case 3:
-               return new Integer(res.getSize());
-            case 4:
-               return new Integer(res.getEffectiveSize());
-            case 5:
-               return new Double(nf.format(res.getScore()));
-            case 6:
-               return new Double(nf.format(res.getPvalue()));
-            default:
-               return "";
+         public Object getValueAt( int i, int j ) {
+            classresult res = ( classresult ) results.get( ( String ) sortedclasses.
+                get( i ) );
+            switch ( j ) {
+               case 0:
+                  return new Integer( i + 1 );
+               case 1:
+                  return res.getClassId();
+               case 2:
+                  return res.getClassName();
+               case 3:
+                  return new Integer( res.getSize() );
+               case 4:
+                  return new Integer( res.getEffectiveSize() );
+               case 5:
+                  return new Double( nf.format( res.getScore() ) );
+               case 6:
+                  return new Double( nf.format( res.getPvalue() ) );
+               default:
+                  return "";
             }
          }
       };
@@ -346,38 +284,64 @@ public class classPvalRun {
     * @param index int
     * @param settings Settings
     */
-   public void showDetails(int index, Settings settings) {
-      final classresult res = (classresult) results.get((String) sortedclasses.
-              get(
-              index));
+   public void showDetails( int index ) {
+      final classresult res = ( classresult ) results.get( ( String ) sortedclasses.
+          get(
+          index ) );
       String name = res.getClassName();
       final String id = res.getClassId();
-      System.out.println(name);
-      final ArrayList values = (ArrayList) classToProbe.get(id);
+      System.out.println( name );
+      final ArrayList values = ( ArrayList ) classToProbe.get( id );
 
       final Map pvals = new HashMap();
-      for (int i = 0, n = values.size(); i < n; i++) {
-         Double pvalue = new Double(Math.pow(10.0,
-                                             -probePvalMapper.getPval((
-                 String) ((ArrayList) classToProbe.get(id)).get(i))));
-         pvals.put((String) ((ArrayList) classToProbe.get(id)).get(i), pvalue);
+      for ( int i = 0, n = values.size(); i < n; i++ ) {
+         Double pvalue = new Double( Math.pow( 10.0,
+                                               -probePvalMapper.getPval( (
+             String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ) ) ) );
+         pvals.put( ( String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ), pvalue );
       }
 
-      if (values == null) {
-         throw new RuntimeException("Class data retrieval error for " + name);
+      if ( values == null ) {
+         throw new RuntimeException( "Class data retrieval error for " + name );
       }
 
       // create the details frame
       JDetailsFrame f = new JDetailsFrame(
-         values, pvals, classToProbe, id, geneData, settings
-         );
-      f.setTitle(name + " (" + values.size() + " items)");
+          values, pvals, classToProbe, id, geneData, settings
+          );
+      f.setTitle( name + " (" + values.size() + " items)" );
+      f.show();
+   }
+
+   public void showDetails( String id ) {
+      final classresult res = (classresult) results.get(id);
+      String name = res.getClassName();
+      System.out.println( name );
+      final ArrayList values = ( ArrayList ) classToProbe.get( id );
+
+      final Map pvals = new HashMap();
+      for ( int i = 0, n = values.size(); i < n; i++ ) {
+         Double pvalue = new Double( Math.pow( 10.0,
+                                               -probePvalMapper.getPval( (
+             String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ) ) ) );
+         pvals.put( ( String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ), pvalue );
+      }
+
+      if ( values == null ) {
+         throw new RuntimeException( "Class data retrieval error for " + name );
+      }
+
+      // create the details frame
+      JDetailsFrame f = new JDetailsFrame(
+          values, pvals, classToProbe, id, geneData, settings
+          );
+      f.setTitle( name + " (" + values.size() + " items)" );
       f.show();
    }
 
    /* */
-   private void readResultsFromFile(String destination_file) {
-      ResultsFileReader f = new ResultsFileReader(destination_file);
+   private void readResultsFromFile( String destination_file ) {
+      ResultsFileReader f = new ResultsFileReader( destination_file );
       this.results = f.getResults();
    }
 
@@ -389,6 +353,13 @@ public class classPvalRun {
       return results;
    }
 
+   /**
+    *
+    * @return Settings
+    */
+   public Settings getSettings() {
+      return settings;
+   }
 
    /*
       public static void main(String[] args) {
@@ -434,6 +405,5 @@ public class classPvalRun {
          }
       }
     */
-
 
 }

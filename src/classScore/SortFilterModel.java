@@ -22,7 +22,6 @@ public class SortFilterModel extends AbstractTableModel {
    private JMatrixDisplay m_matrixDisplay;
 
    public SortFilterModel( TableModel m ) {
-
       this( m, null );
    }
 
