@@ -47,7 +47,8 @@ public class JDetailsFrame
    final int PREFERRED_WIDTH_COLUMN_1 = 75;
    final int PREFERRED_WIDTH_COLUMN_2 = 75;
    final int PREFERRED_WIDTH_COLUMN_3 = 300;
-   final int COLOR_RANGE_SLIDER_RESOLUTION = 10;
+   final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
+   final int NORMALIZED_COLOR_RANGE_MAX = 12;
 
    public JMatrixDisplay m_matrixDisplay = null;
    protected JScrollPane m_tableScrollPane = new JScrollPane();
@@ -70,6 +71,10 @@ public class JDetailsFrame
    JGradientBar m_gradientBar = new JGradientBar();
    JMenuItem m_saveDataMenuItem = new JMenuItem();
 
+   public static void main( String[] args ) {
+      
+   }
+   
    public JDetailsFrame( ArrayList values, Map pvals, Map classToProbe, String id,
                          GeneAnnotations geneData, Settings settings ) {
 
@@ -93,14 +98,6 @@ public class JDetailsFrame
       setLocation( 200, 100 );
       getContentPane().setLayout( borderLayout1 );
       setDefaultCloseOperation( DISPOSE_ON_CLOSE );
-
-      m_gradientBar.setMaximumSize(new Dimension(200, 30));
-      m_gradientBar.setPreferredSize(new Dimension(120, 30));
-      m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
-
-      double min = m_matrixDisplay.getDisplayMin();
-      double max = m_matrixDisplay.getDisplayMax();
-      m_gradientBar.setLabels( min, max );
 
       // Enable the horizontal scroll bar
       m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
@@ -152,10 +149,13 @@ public class JDetailsFrame
       jLabel1.setText( "Cell Width:" );
       jLabel2.setText( "    " );
       jLabel3.setText( "Color Range:" );
-      m_colorRangeSlider.setMaximum( 6 * COLOR_RANGE_SLIDER_RESOLUTION );
-      m_colorRangeSlider.setMinimum( 1 );
-      m_colorRangeSlider.setValue( ( int ) ( m_matrixDisplay.getDisplayRange() *
-                                             COLOR_RANGE_SLIDER_RESOLUTION ) );
+      
+      m_gradientBar.setMaximumSize(new Dimension(200, 30));
+      m_gradientBar.setPreferredSize(new Dimension(120, 30));
+      m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
+
+      initColorRangeWidget();
+
       m_colorRangeSlider.setMaximumSize( new Dimension( 50, 24 ) );
       m_colorRangeSlider.setPreferredSize( new Dimension( 50, 24 ) );
       m_colorRangeSlider.addChangeListener( new JDetailsFrame_m_colorRangeSlider_changeAdapter( this ) );
@@ -194,7 +194,7 @@ public class JDetailsFrame
       m_matrixDisplayCellWidthSlider.setPaintTrack( true );
       m_matrixDisplayCellWidthSlider.setPaintTicks( false );
    }
-
+   
    private void createDetailsTable(
        ArrayList values,
        Map pvals,
@@ -351,12 +351,13 @@ public class JDetailsFrame
    void m_saveImageMenuItem_actionPerformed( ActionEvent e ) {
 
       // Create a file chooser
-      final JImageFileChooser fc = new JImageFileChooser();
-
+      final JImageFileChooser fc = new JImageFileChooser( true, m_matrixDisplay.getStandardizedEnabled() );
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
          File file = fc.getSelectedFile();
+         boolean includeLabels = fc.includeLabels();
+         boolean normalize = fc.normalized();
 
          // Make sure the filename has an image extension
          String filename = file.getPath();
@@ -365,8 +366,6 @@ public class JDetailsFrame
          }
          // Save the color matrix image
          try {
-            boolean includeLabels = fc.includeLabels();
-            boolean normalize = fc.normalized();
             saveImage( filename, includeLabels, normalize );
          }
          catch ( IOException ex ) {
@@ -379,15 +378,13 @@ public class JDetailsFrame
    void m_saveDataMenuItem_actionPerformed(ActionEvent e) {
 
       // Create a file chooser
-      final JFileChooser fc = new JFileChooser();
-      DataFileFilter dataFileFilter = new DataFileFilter();
-      fc.setFileFilter( dataFileFilter );
-      fc.setAcceptAllFileFilterUsed( false );
-
+      final JDataFileChooser fc = new JDataFileChooser( true, m_matrixDisplay.getStandardizedEnabled() );
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
          File file = fc.getSelectedFile();
+         boolean includeEverything = fc.includeEverything();
+         boolean normalize = fc.normalized();
 
          // Make sure the filename has a data extension
          String filename = file.getPath();
@@ -396,7 +393,7 @@ public class JDetailsFrame
          }
          // Save the values
          try {
-            saveData( filename, true, true, false );
+            saveData( filename, true, includeEverything, normalize );
          }
          catch ( IOException ex ) {
             System.err.println( "IOException error saving data to " + filename );
@@ -430,6 +427,9 @@ public class JDetailsFrame
    
    protected void saveData( String filename, boolean includeMatrixValues, boolean includeNonMatrix, boolean normalized ) throws IOException {
 
+       // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
+      final String NEWLINE = "\r\n";
+
       BufferedWriter out = new BufferedWriter( new FileWriter( filename ) );
       
       boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
@@ -439,6 +439,16 @@ public class JDetailsFrame
          int totalColumnCount = m_table.getColumnCount();
          int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
+         // write out column names
+         if ( includeMatrixValues ) {
+            
+            for ( int c = 0; c < matrixColumnCount; c++ ) {
+               String columnName = m_matrixDisplay.getColumnName( c );
+               out.write( columnName + "\t" );
+            }
+            out.write( NEWLINE );
+         }
+         
          // write out the table, one row at a time
          for ( int r = 0; r < totalRowCount; r++ ) {
 
@@ -460,9 +470,7 @@ public class JDetailsFrame
                   out.write( m_table.getValueAt( r, c ) + "\t" );
                }
             }
-
-            // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
-            out.write( "\r\n" );
+            out.write( NEWLINE );
          }
       }
       m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
@@ -509,15 +517,12 @@ public class JDetailsFrame
       return (String) m_table.getValueAt( row, offset + 0 );
    }
    
-
    void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
 
       boolean normalize = m_normalizeMenuItem.isSelected();
       m_matrixDisplay.setStandardizedEnabled( normalize );
 
-      double min = m_matrixDisplay.getDisplayMin();
-      double max = m_matrixDisplay.getDisplayMax();
-      m_gradientBar.setLabels( min, max );
+      initColorRangeWidget();
       m_table.repaint();
    }
 
@@ -545,14 +550,55 @@ public class JDetailsFrame
    void m_colorRangeSlider_stateChanged( ChangeEvent e ) {
 
       JSlider source = ( JSlider ) e.getSource();
-      double range = source.getValue();
-      double max = + ( ( range / 2 ) / COLOR_RANGE_SLIDER_RESOLUTION );
-      double min = - ( ( range / 2 ) / COLOR_RANGE_SLIDER_RESOLUTION );
-      m_gradientBar.setLabels( min, max );
-      m_matrixDisplay.setDisplayRange( min, max );
+      double value = source.getValue();
+         
+      double displayMin, displayMax;
+      boolean normalized = m_matrixDisplay.getStandardizedEnabled();
+      if ( normalized ) {
+         double rangeMax = NORMALIZED_COLOR_RANGE_MAX;
+         double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
+         double range = value / zoomFactor;
+         displayMin = - ( range / 2 );
+         displayMax = + ( range / 2 );
+      }
+      else {
+         double rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
+         double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
+         double range = value / zoomFactor;
+         double midpoint = m_matrixDisplay.getMax() - ( rangeMax / 2 );
+         displayMin = midpoint - ( range / 2 );
+         displayMax = midpoint + ( range / 2 );
+      }
+      
+      m_gradientBar.setLabels( displayMin, displayMax );
+      m_matrixDisplay.setDisplayRange( displayMin, displayMax );
       m_table.repaint();
    }
 
+   private void initColorRangeWidget() {
+      
+      // init the slider
+      m_colorRangeSlider.setMinimum( 0 );
+      m_colorRangeSlider.setMaximum( COLOR_RANGE_SLIDER_RESOLUTION );
+
+      double rangeMax;
+      boolean normalized =  m_matrixDisplay.getStandardizedEnabled();
+      if ( normalized ) {
+         rangeMax = NORMALIZED_COLOR_RANGE_MAX;
+      }
+      else {
+         rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
+      }
+      double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
+      m_colorRangeSlider.setValue( ( int ) ( m_matrixDisplay.getDisplayRange() *
+                                             zoomFactor ) );
+      
+      // init gradient bar
+      double min = m_matrixDisplay.getDisplayMin();
+      double max = m_matrixDisplay.getDisplayMax();
+      m_gradientBar.setLabels( min, max );
+   }   
+   
 } // end class JDetailsFrame
 
 class JDetailsFrame_m_greenredColormapMenuItem_actionAdapter
