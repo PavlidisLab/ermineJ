@@ -30,7 +30,7 @@ public class AboutBox extends JDialog implements ActionListener {
 
    // todo: make this version number a resource.
    /// InputStream is = this.getClass().getResourceAsStream("resources/version");
-   private final static String VERSION = "2.0b3";
+   private final static String VERSION = "2.0b4";
    private final static String COPYRIGHT = "Copyright (c) 2002-2004 Columbia University";
    private static final String SOFTWARENAME = "ermineJ";
 
