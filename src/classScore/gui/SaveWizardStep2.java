@@ -52,12 +52,7 @@ public class SaveWizardStep2 extends WizardStep
       jLabel3.setPreferredSize(new Dimension(320, 15));
       saveFile = new JTextField();
       saveFile.setPreferredSize(new Dimension(230, 19));
-      saveFile.setMinimumSize(new Dimension(4, 19));
-      saveFile.setEnabled(false);
-      saveFile.setRequestFocusEnabled(true);
       saveBrowseButton = new JButton();
-      saveBrowseButton.setEnabled(true);
-      saveBrowseButton.setFocusPainted(true);
       saveBrowseButton.addActionListener(new SaveWizardStep2_saveBrowseButton_actionAdapter(this));
       saveBrowseButton.setText("Browse....");
       chooser = new JFileChooser();
