@@ -8,9 +8,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import baseCode.math.NormalProbabilityComputer;
-import baseCode.math.ProbabilityComputer;
 import baseCode.math.Stats;
+import baseCode.math.distribution.NormalProbabilityComputer;
+import baseCode.math.distribution.ProbabilityComputer;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
 import cern.colt.map.OpenIntObjectHashMap;
