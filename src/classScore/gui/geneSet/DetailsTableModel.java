@@ -93,8 +93,6 @@ public class DetailsTableModel
          default:
             return "";
          }
-      }
-
    } // end getValueAt
 
 } // end class DetailsTableModel
