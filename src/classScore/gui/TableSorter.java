@@ -352,11 +352,33 @@ public class TableSorter extends AbstractTableModel {
                       // interested in the value.
                       if (m_matrixDisplay != null) {
 
-                         Point p1 = (Point) o1;
-                         Point p2 = (Point) o2;
+                         Point p1 = ( Point ) o1;
+                         Point p2 = ( Point ) o2;
 
-                         o1 = new Double( m_matrixDisplay.getValue( p1.x, p1.y ));
-                         o2 = new Double( m_matrixDisplay.getValue( p2.x, p2.y ));
+                         o1 = new Double( m_matrixDisplay.getValue( p1.x, p1.y ) );
+                         o2 = new Double( m_matrixDisplay.getValue( p2.x, p2.y ) );
+                      }
+                   }
+                   else if(o1.getClass().equals(ArrayList.class)) {
+                      comparator = getComparator( Double.class );
+                      
+                      if (m_matrixDisplay != null) {
+
+                         // Because of the bar graph cell renderer, getValueAt
+                         // in our table model returns an array of two values:
+                         // the first is the actual p value, and the second is
+                         // the expected p value.  Here, we want to sort by 
+                         // the actual p value, which should be the first item
+                         // in the array list.
+                         
+                         Double a = ( Double ) ( ( ArrayList ) o1 ).get( 0 );
+                         Double b = ( Double ) ( ( ArrayList ) o2 ).get( 0 );
+
+                         // yes, we did get an array list, but we want to
+                         // compare the Double values the array lists contain,
+                         // not the array lists themselves.
+                         o1 = a;
+                         o2 = b;
                       }
                    }
                    else {
