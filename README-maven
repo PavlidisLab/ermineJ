@@ -1,19 +1,40 @@
+NOTE:
+On your pc you need to install the following with the following directories.
+nsis and javahelp.  install javahelp in ${JAVA_HOME}
+define the following in your ${HOME}/build.properties:
+java.javahelp.jhindexer="${JAVA_HOME}/jh2.0/javahelp/bin/jhindexer.bat"
+nsis.exe="${NSIS_HOME}/makensis.exe"
+
+
+ON WINDOWS:
+
+(in baseCode)
+cvs update
+maven jar:install 
+
+(in ermineJ)
+cvs update
+maven nsis
+maven nsis-jre
+
+// scp the above files, which will be target/ermineJ-setup.exe and target/ermineJ-setup-jre.exe onto microarray in /proj/projectpages/ermineJ/distributions
+
+ON LINUX (on host where you have maven -- ie pavlidis2)
+
+(in baseCode)
+cvs update
+maven jar:install 
+
+(in ermineJ)
+cvs update
 
 // To make the help jar:
 maven help
 
-// To make the Windows installer - this only works under windows, you have to have NSIS installed.
-maven nsis
-// [ for the jre version ]
-maven nsis-jre 
-
-// scp the above files, which will be target/ermineJ-setup.exe and target/ermineJ-setup-jre.exe onto microarray in /proj/projectpages/ermineJ/distributions
-
-
 // to make generic distribution for installation
 maven build-install
 
-// to make the source distribtion
+// to make the source distribution
 maven dist:build-src
 
 // to make the jnlp setup. Note that we are still using the help.jnlp which was hand-coded. The 1.4 jnlp plugin had to be 
