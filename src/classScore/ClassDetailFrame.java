@@ -47,9 +47,15 @@ public class ClassDetailFrame
 	this.setLocation(200, 100);
 	this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
+	// Enable the horizontal scroll bar
+	jTable1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
       
+	// Make sure the matrix display doesn't have a grid separating color cells.
+	jTable1.setIntercellSpacing( new Dimension( 0, 0 ));
+      
+	// The rest of the table (text and value) should have a light gray grid
 	jTable1.setGridColor(Color.lightGray);
-
+      
 	// add a viewport with a table inside it
 	this.getContentPane().add(jScrollPane1, BorderLayout.CENTER);
 	jScrollPane1.getViewport().add(jTable1, null);
@@ -68,7 +74,7 @@ public class ClassDetailFrame
 	// Create a matrix display
 	//
 	JMatrixDisplay matrixDisplay = null;
-	String filename = "C:\\GO_0005853_partial.txt"; //GO_0005853.txt";
+	String filename = "C:\\GO_0005853.txt";
 	try {
 	    matrixDisplay = new JMatrixDisplay( filename );
 	} catch (java.io.IOException e) {
@@ -106,9 +112,9 @@ public class ClassDetailFrame
 	    }
 
 	// The columns containing text or values (not matrix display) should be a bit wider
-	jTable1.getColumnModel().getColumn( matrixColumnCount + 1 ).setPreferredWidth(75);
-	jTable1.getColumnModel().getColumn( matrixColumnCount + 2 ).setPreferredWidth(125);
-	jTable1.getColumnModel().getColumn( matrixColumnCount + 3 ).setPreferredWidth(300);
+	jTable1.getColumnModel().getColumn( matrixColumnCount + 1 ).setPreferredWidth(  75 );
+	jTable1.getColumnModel().getColumn( matrixColumnCount + 2 ).setPreferredWidth( 125 );
+	jTable1.getColumnModel().getColumn( matrixColumnCount + 3 ).setPreferredWidth( 300 );
       
     }
 }
