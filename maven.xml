@@ -3,10 +3,11 @@
 		 xmlns:j="jelly:core"
 		 xmlns:util="jelly:util"
 		 xmlns:ant="jelly:ant"
-		 xmlns:deploy="deploy" >
+		 xmlns:deploy="deploy"
+ 		 xmlns:jarfile="jarfile">
 
 <!-- ==================================== -->
-<!-- help jar file -->
+<!-- help jar file and arrangements for help to be included in the webstart -->
 <!-- ==================================== -->
 <goal name="help" description="Update and build the javahelp jar file">
 	<ant:echo>Creating search index...</ant:echo>
@@ -22,6 +23,35 @@
 	 <include name="**/*" />
 	</fileset>
 	</ant:copy>
+
+	
+		<maven:get plugin="maven-jnlp-plugin" property="maven.jnlp.dir" var="jnlpDir" />
+		<maven:get plugin="maven-jnlp-plugin" property="maven.jnlp.tmpdir" var="jnlpTmpDir" />
+		<maven:get plugin="maven-jnlp-plugin" property="plugin.resources" var="jnlpRsc" />
+	 	<ant:mkdir dir="${jnlpTmpDir}"/>
+            
+    <jarfile:updateManifest
+        inputJar="${basedir}/ermineJ-help.jar"
+        manifest="${jnlpRsc}/jnlp.manifest"
+        outputDir="${jnlpTmpDir}"
+    />
+	
+	
+	<ant:copy todir="${jnlpDir}" file="${basedir}/JavaWebStart/help.jnlp" overwrite="true" />
+	<ant:copy todir="${jnlpDir}" file="${maven.repo.local}/javahelp/jars/jh.jar" overwrite="true" />
+	
+	<ant:available file="${maven.jnlp.signjar.store}" property="maven.jnlp.store.exists"/>
+	<j:if test="${maven.jnlp.store.exists}">	<echo>"Found a keystore"</echo></j:if>
+
+	<!-- sign the jar -->
+    <ant:signjar
+    jar="${jnlpTmpDir}/ermineJ-help.jar"
+    signedjar="${jnlpDir}/ermineJ-help.jar"
+    alias="${pom.artifactId}"
+    storepass="${maven.jnlp.signjar.storepass}"
+    keystore="${maven.jnlp.signjar.store}"/>
+	
+
 </goal>
 
 <!-- ==================================== -->
@@ -98,13 +128,13 @@
 
 <goal name="nsis:deploy" description="Upload the installer to the download site" prereqs="nsis">
     <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
-      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup.exe ${maven.username}@${dist.siteAddress}:${dist.distdir}"/>
+      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup.exe ${maven.username}@${dist.siteAddress}:${dist.siteDir}"/>
     </exec>
 </goal>
 
 <goal name="nsis-jre:deploy" description="Upload the installer with jre to the download site" prereqs="nsis-jre">
     <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
-      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup-jre.exe ${maven.username}@${dist.siteAddress}:${dist.distdir}"/>
+      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup-jre.exe ${maven.username}@${dist.siteAddress}:${dist.siteDir}"/>
     </exec>
 </goal>
 

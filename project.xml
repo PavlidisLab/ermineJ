@@ -70,23 +70,19 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
         <dependency>
             <groupId>colt</groupId>
             <artifactId>colt</artifactId>
-               <version/>
-            <jar>colt.jar</jar>
+              <version>1.0.3</version>
             <type>jar</type>
             <url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
             <properties>
-                <category>lib</category>
                 <jnlp.jar>true</jnlp.jar>
             </properties>
-         
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.3</version>
             <type>jar</type>
-            <properties>
-                <category>lib</category>
+            <properties>      
                 <jnlp.jar>true</jnlp.jar>
             </properties>
         </dependency>
@@ -95,8 +91,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <artifactId>baseCode</artifactId>
             <version>0.2.1</version>
             <type>jar</type>
-            <properties>
-                <category>lib</category>
+            <properties>      
                 <jnlp.jar>true</jnlp.jar>
             </properties>
         </dependency>
@@ -105,8 +100,7 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <artifactId>xercesImpl</artifactId>
             <version>2.6.2</version>
             <type>jar</type>
-            <properties>
-                <category>lib</category>
+            <properties>    
                 <jnlp.jar>true</jnlp.jar>
             </properties>
         </dependency>
@@ -116,10 +110,6 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
             <version>2.0</version>
             <jar>jh.jar</jar>
             <type>jar</type>
-            <properties>
-                <category>lib</category>
-                <jnlp.jar>true</jnlp.jar>
-            </properties>
         </dependency>
     </dependencies>
     <build>

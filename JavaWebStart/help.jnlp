@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp 
   spec="1.0+" 
-  codebase="http://microarray.genomecenter.columbia.edu/ermineJ_test/"
+  codebase="http://microarray.genomecenter.columbia.edu/ermineJ/webstart"
   href="help.jnlp">
   <information>
     <title>JavaHelp</title>
