@@ -9,7 +9,7 @@
 Name "ermineJ"
 
 ; The file to write
-OutFile "install.exe"
+OutFile "install_withJRE.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
@@ -34,11 +34,6 @@ UninstPage uninstConfirm
 UninstPage instfiles
 
 ;--------------------------------
-; Declaration of user variables (Var command), allowed charaters for variables names : [a-z][A-Z][0-9] and '_'
-
-Var "DataFolderOutPath"
-
-;--------------------------------
 
 ; The stuff to install
 Section "ermineJ (required)"
@@ -48,9 +43,6 @@ Section "ermineJ (required)"
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
 
-  ; Set the output path for the data folder
-  StrCpy "$DataFolderOutPath" "$PROGRAMFILES\ermineJ.data"
-  
   ; Put file there
 
   ; License Agreements
@@ -58,18 +50,40 @@ Section "ermineJ (required)"
   File "GNU_General_Public_License.txt"
 
   ; Jars (ours and third-party)
-  File /r "lib"
+  SetOutPath "$INSTDIR\lib"
+  File "lib\baseCode-0.2.jar"
+  File "lib\colt.jar"
+  File "lib\commons-logging.jar"
+  File "lib\ermineJ-2.0b2.jar"
+  File "lib\ermineJ-help.jar"
+  File "lib\jhbasic.jar"
+  File "lib\mysql-connector-java-3.0.14-production-bin.jar"
+  File "lib\xercesImpl-2.6.2.jar"
+
+  ; .bat file
+  SetOutPath "$INSTDIR\bin"
+  File "bin\ermineJ.bat"
+
+  ; images
+  SetOutPath "$INSTDIR\bin"
+  File "bin\ermineJ.ico"
 
   ; JRE (Java Runtime Environment)
-  File /r "bin"
+  SetOutPath "$INSTDIR\jre-install"
+  File "jre-install\j2re-1_4_2_05-windows-i586-p.exe"
 
   ; If upgrading, might not want to overwrite the old data folder
-  IfFileExists "$DataFolderOutPath" 0 YesOverwrite
+  IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
 
     MessageBox MB_YESNO|MB_ICONQUESTION "You already have a data folder; would you like to keep it?" IDYES NoOverwrite
 
     YesOverwrite:
-    File /r "ermineJ.data"
+    SetOutPath "$INSTDIR\ermineJ.data"
+    File "ermineJ.data\go_200406-termdb.xml"
+    File "ermineJ.data\HG-U133A.an.txt"
+    File "ermineJ.data\RG-U34A.an.txt"
+    File "ermineJ.data\RN-U34.an.txt"
+    CreateDirectory "$INSTDIR\ermineJ.data\genesets"
 
   NoOverwrite:
   
@@ -88,19 +102,20 @@ SectionEnd
 ; Optional section (can be disabled by the user)
 Section "Start Menu Shortcuts"
 
-  CreateShortCut "$DESKTOP\emrineJ.lnk" "$INSTDIR\ermineJ.exe"
+  SetOutPath $INSTDIR\bin  ; the working directory should be \bin
+  CreateShortCut "$DESKTOP\emrineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
   CreateDirectory "$SMPROGRAMS\emrineJ"
+  CreateShortCut "$SMPROGRAMS\emrineJ\emrineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
+
+  SetOutPath $INSTDIR  ; reset the working directory
   CreateShortCut "$SMPROGRAMS\emrineJ\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\emrineJ\emrineJ.lnk" "$INSTDIR\ermineJ.exe" "" "$INSTDIR\ermineJ.exe" 0
   CreateShortCut "$SMPROGRAMS\emrineJ\license.txt" "$INSTDIR\license.txt"
 
 SectionEnd
 
 ; Optional section (can be disabled by the user)
 Section "Java 2 Runtime Environment, SE v1.4.2_05"
-
-  Exec "bin\j2re-1_4_2_05-windows-i586-p.exe"
-
+  Exec "jre-install\j2re-1_4_2_05-windows-i586-p.exe"
 SectionEnd
 
 ;--------------------------------
@@ -113,15 +128,21 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\emrineJ"
   DeleteRegKey HKLM "SOFTWARE\emrineJ"
 
-  ; Remove files and uninstaller
-  Delete "$INSTDIR\*.*"
-
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\emrineJ\*.*"
   Delete "$DESKTOP\emrineJ.lnk"
 
-  ; Remove directories used
+  ; Remove files and uninstaller
+  Delete "$INSTDIR\*.*"
+
+  ; Remove data folder
+  ;RMDir /r "$INSTDIR/ermineJ.data"
+
+  ; Remove other directories used
   RMDir "$SMPROGRAMS\emrineJ"
   RMDir "$INSTDIR"
+  RMDir /r "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\lib"
+  RMDir /r "$INSTDIR\jre-install"
 
 SectionEnd
