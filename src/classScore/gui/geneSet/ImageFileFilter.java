@@ -5,6 +5,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 import baseCode.graphics.text.Util;
+import baseCode.util.FileTools;
 
 /**
  * <hr>
@@ -23,7 +24,7 @@ public class ImageFileFilter
          return true;
       }
 
-      return Util.hasImageExtension( f.getName() );
+      return FileTools.hasImageExtension( f.getName() );
 
    } // end accept
 

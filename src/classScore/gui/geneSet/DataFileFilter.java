@@ -5,6 +5,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 import baseCode.graphics.text.Util;
+import baseCode.util.FileTools;
 
 /**
  * <hr>
@@ -23,7 +24,7 @@ public class DataFileFilter
          return true;
       }
 
-      return Util.hasDataExtension( f.getName() );
+      return FileTools.hasDataExtension( f.getName() );
 
    } // end accept
 

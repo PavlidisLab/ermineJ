@@ -3,7 +3,6 @@ package classScore.data;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.LinkedHashMap;
 
 /**
  * Data structure to store class scoring information about a class.
@@ -17,19 +16,10 @@ public class GeneSetResult implements Comparable {
    private String class_name = null;
    private double pvalue = 1.0;
    private double score = 0.0;
-   //  private double hyperpval = 1.0;
-   private int hypercut = 0; // how many genes make the pvalue threshold; this
-                             // is n1 in the calculations
-   //   private double rocpval = 1.0;
-   //  private double aroc = 0.5;
    private int size = 0;
    private int effective_size = 0;
    private double pvalue_corr = 0.0;
-   //  private double hyperpval_corr = 0.0;
-   //  private double rocpval_corr = 0.0;
-   private LinkedHashMap identicalTo = null; // Defines classes this one is
-                                             // identical to in terms of
-                                             // members.
+
    private DecimalFormat nf;
    private int rank;
 

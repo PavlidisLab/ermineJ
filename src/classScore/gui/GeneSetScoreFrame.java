@@ -256,7 +256,7 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Reading GO descriptions " + settings.getClassFile());
          goData = new GONames(settings.getClassFile()); // parse go name file
          progressBar.setValue(70);
-
+         
          statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
          geneData = new GeneAnnotations(settings.getAnnotFile(), statusMessenger);
          progressBar.setValue(100);

@@ -44,6 +44,7 @@ import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
 import baseCode.gui.table.TableSorter;
 import baseCode.gui.GuiUtil;
+import baseCode.util.FileTools;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;
 
@@ -420,8 +421,8 @@ public class JGeneSetFrame extends JFrame {
 
          // Make sure the filename has an image extension
          String filename = file.getPath();
-         if ( !Util.hasImageExtension( filename ) ) {
-            filename = Util.addImageExtension( filename );
+         if ( !FileTools.hasImageExtension( filename ) ) {
+            filename = FileTools.addImageExtension( filename );
          }
          // Save the color matrix image
          try {
@@ -447,8 +448,8 @@ public class JGeneSetFrame extends JFrame {
 
          // Make sure the filename has a data extension
          String filename = file.getPath();
-         if ( !Util.hasDataExtension( filename ) ) {
-            filename = Util.addDataExtension( filename );
+         if ( !FileTools.hasDataExtension( filename ) ) {
+            filename = FileTools.addDataExtension( filename );
          }
          // Save the values
          try {

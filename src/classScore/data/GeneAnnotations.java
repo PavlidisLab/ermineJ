@@ -30,12 +30,16 @@ import baseCode.util.StatusViewer;
  * Maintains the following important data structures, all derived from the input file:
  * 
  * <pre>
- *           probe-&gt;Classes -- each value is a Set of the Classes that a probe belongs to.
- *           Classes-&gt;probe -- each value is a Set of the probes that belong to a class
- *           probe-&gt;gene -- each value is the gene name corresponding to the probe.
- *           gene-&gt;list of probes -- each value is a list of probes corresponding to a gene
- *           probe-&gt;description -- each value is a text description of the probe (actually...of the gene)
- *
+ * 
+ *  
+ *             probe-&gt;Classes -- each value is a Set of the Classes that a probe belongs to.
+ *             Classes-&gt;probe -- each value is a Set of the probes that belong to a class
+ *             probe-&gt;gene -- each value is the gene name corresponding to the probe.
+ *             gene-&gt;list of probes -- each value is a list of probes corresponding to a gene
+ *             probe-&gt;description -- each value is a text description of the probe (actually...of the gene)
+ *  
+ *   
+ *  
  * </pre>
  * 
  * <p>
@@ -59,16 +63,16 @@ public class GeneAnnotations {
    private Set probes;
    private Vector sortedGeneSets;
    private Map classesToRedundantMap;
-   private Vector selectedProbes;
+   Vector selectedProbes;
    private Vector selectedSets;
    private StatusViewer messenger;
    
    /**
     * This is for creating GeneAnnotations by reading from a file
+    * 
     * @param filename String
     * @param probes Map only include these probes
-    * @param messenger TODO
-    * 
+    * @param messenger StatusViewer to print status updates to.
     * @throws IOException
     */
    public GeneAnnotations( String filename, Set probes, StatusViewer messenger ) throws IOException {
@@ -143,8 +147,8 @@ public class GeneAnnotations {
       while ( it.hasNext() ) {
          String id = ( String ) it.next();
          HashSet genes = new HashSet();
-         ArrayList probes = ( ArrayList ) classToProbeMap.get( id );
-         Iterator probe_it = probes.iterator();
+         ArrayList theseProbes = ( ArrayList ) classToProbeMap.get( id );
+         Iterator probe_it = theseProbes.iterator();
          while ( probe_it.hasNext() ) {
             genes.add( probeToGeneName.get( probe_it.next() ) );
          }
@@ -429,19 +433,19 @@ public class GeneAnnotations {
     * Add a class
     * 
     * @param id String class to be added
-    * @param probes ArrayList user-defined list of members.
+    * @param probesForNew ArrayList user-defined list of members.
     */
-   public void addClass( String id, ArrayList probes ) {
-      classToProbeMap.put( id, probes );
+   public void addClass( String id, ArrayList probesForNew ) {
+      classToProbeMap.put( id, probesForNew );
 
-      Iterator probe_it = probes.iterator();
+      Iterator probe_it = probesForNew.iterator();
       while ( probe_it.hasNext() ) {
          String probe = new String( ( String ) probe_it.next() );
          ( ( ArrayList ) probeToClassMap.get( probe ) ).add( id );
       }
 
       Set genes = new HashSet();
-      Iterator probe_it2 = probes.iterator();
+      Iterator probe_it2 = probesForNew.iterator();
       while ( probe_it2.hasNext() ) {
          genes.add( probeToGeneName.get( probe_it2.next() ) );
       }
@@ -453,15 +457,15 @@ public class GeneAnnotations {
     * Redefine a class.
     * 
     * @param classId String class to be modified
-    * @param probes ArrayList current user-defined list of members. The "real" version of the class is modified to look
+    * @param probesForNew ArrayList current user-defined list of members. The "real" version of the class is modified to look
     *        like this one.
     */
-   public void modifyClass( String classId, ArrayList probes ) {
+   public void modifyClass( String classId, ArrayList probesForNew ) {
       ArrayList orig_probes = ( ArrayList ) classToProbeMap.get( classId );
       Iterator orig_probe_it = orig_probes.iterator();
       while ( orig_probe_it.hasNext() ) {
          String orig_probe = new String( ( String ) orig_probe_it.next() );
-         if ( !probes.contains( orig_probe ) ) {
+         if ( !probesForNew.contains( orig_probe ) ) {
             Set ptc = new HashSet( ( Collection ) probeToClassMap
                   .get( orig_probe ) );
             ptc.remove( classId );
@@ -469,14 +473,14 @@ public class GeneAnnotations {
             probeToClassMap.put( orig_probe, new ArrayList( ptc ) );
          }
       }
-      Iterator probe_it = probes.iterator();
+      Iterator probe_it = probesForNew.iterator();
       while ( probe_it.hasNext() ) {
          String probe = ( String ) probe_it.next();
          if ( !orig_probes.contains( probe ) ) {
             ( ( ArrayList ) probeToClassMap.get( probe ) ).add( classId );
          }
       }
-      classToProbeMap.put( classId, probes );
+      classToProbeMap.put( classId, probesForNew );
       resetSelectedSets();
    }
 
@@ -616,5 +620,6 @@ public class GeneAnnotations {
    public int selectedSets() {
       return selectedSets.size();
    }
+
 
 }
