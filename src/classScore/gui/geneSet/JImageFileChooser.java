@@ -12,6 +12,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import baseCode.gui.file.ImageFileFilter;
+
 /**
  * <hr>
  * <p>
