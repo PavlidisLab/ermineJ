@@ -1,4 +1,4 @@
-package classScore;
+package classScore.gui;
 
 import java.util.*;
 import javax.swing.table.*;

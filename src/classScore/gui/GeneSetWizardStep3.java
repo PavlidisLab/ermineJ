@@ -18,9 +18,9 @@ import classScore.data.*;
  * @version $Id$
  */
 
-public class ClassWizardStep3 extends WizardStep
+public class GeneSetWizardStep3 extends WizardStep
 {
-   ClassWizard wiz;
+   GeneSetWizard wiz;
    Settings settings;
    GeneAnnotations geneData;
    NewGeneSet newGeneSet;
@@ -32,7 +32,7 @@ public class ClassWizardStep3 extends WizardStep
    JTextArea classDescTA;
    JTable finalTable;
 
-   public ClassWizardStep3( ClassWizard wiz, Settings settings,
+   public GeneSetWizardStep3( GeneSetWizard wiz, Settings settings,
                             GeneAnnotations geneData, NewGeneSet newGeneSet,
                             boolean makenew ) {
       super( wiz );
@@ -72,7 +72,7 @@ public class ClassWizardStep3 extends WizardStep
       classDescL.setText("New Class Description: ");
       classDescTA = new JTextArea();
       classDescTA.setToolTipText("New Class ID");
-      classDescTA.getDocument().addDocumentListener(new ClassWizardStep3_ClassDescListener(this));
+      classDescTA.getDocument().addDocumentListener(new GeneSetWizardStep3_ClassDescListener(this));
       classDescTA.setLineWrap(true);
       JScrollPane classDTAScroll = new JScrollPane(classDescTA);
       classDTAScroll.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -90,7 +90,7 @@ public class ClassWizardStep3 extends WizardStep
       classIDFinal.setText("No Class Name");
       classIDFinal.setRequestFocusEnabled(true);
       DefaultCellEditor classIDEditor = new DefaultCellEditor(classIDTF);
-      classIDEditor.addCellEditorListener(new ClassWizardStep3_classIDEditorAdaptor(this));
+      classIDEditor.addCellEditorListener(new GeneSetWizardStep3_classIDEditorAdaptor(this));
       finalTable = new JTable();
       finalTable.getTableHeader().setReorderingAllowed( false );
       JScrollPane finalScrollPane = new JScrollPane(finalTable);
@@ -138,9 +138,9 @@ public class ClassWizardStep3 extends WizardStep
 
 }
 
-class ClassWizardStep3_classIDEditorAdaptor implements CellEditorListener {
-   ClassWizardStep3 adaptee;
-   ClassWizardStep3_classIDEditorAdaptor(ClassWizardStep3 adaptee) {this.adaptee = adaptee;
+class GeneSetWizardStep3_classIDEditorAdaptor implements CellEditorListener {
+   GeneSetWizardStep3 adaptee;
+   GeneSetWizardStep3_classIDEditorAdaptor(GeneSetWizardStep3 adaptee) {this.adaptee = adaptee;
    }
 
    public void editingStopped(ChangeEvent e) {
@@ -152,9 +152,9 @@ class ClassWizardStep3_classIDEditorAdaptor implements CellEditorListener {
    }
 }
 
-class ClassWizardStep3_ClassDescListener implements DocumentListener {
-   ClassWizardStep3 adaptee;
-   ClassWizardStep3_ClassDescListener(ClassWizardStep3 adaptee) {this.adaptee = adaptee;
+class GeneSetWizardStep3_ClassDescListener implements DocumentListener {
+   GeneSetWizardStep3 adaptee;
+   GeneSetWizardStep3_ClassDescListener(GeneSetWizardStep3 adaptee) {this.adaptee = adaptee;
    }
 
    public void insertUpdate(DocumentEvent e) {adaptee.

@@ -15,14 +15,14 @@ import classScore.data.*;
  * @ $Id$
  */
 
-public class ClassWizard extends Wizard {
+public class GeneSetWizard extends Wizard {
    Settings settings;
    GeneAnnotations geneData;
    GONames goData;
-   ClassWizardStep1 step1;  // case 1 (manual creating) and case 2 (new from file)
-   ClassWizardStep1A step1A; // case 3 (modifying existing)
-   ClassWizardStep2 step2;   // step 2 for cases 1-3 and step 1 for case 4
-   ClassWizardStep3 step3;
+   GeneSetWizardStep1 step1;  // case 1 (manual creating) and case 2 (new from file)
+   GeneSetWizardStep1A step1A; // case 3 (modifying existing)
+   GeneSetWizardStep2 step2;   // step 2 for cases 1-3 and step 1 for case 4
+   GeneSetWizardStep3 step3;
 
    int step;
    boolean makenew;
@@ -30,7 +30,7 @@ public class ClassWizard extends Wizard {
    NewGeneSet newGeneSet;
    String cid;
 
-   public ClassWizard(classScoreFrame callingframe, GeneAnnotations geneData,
+   public GeneSetWizard(GeneSetScoreFrame callingframe, GeneAnnotations geneData,
                       GONames goData, boolean makenew) {
       super(callingframe,550,350);
       this.callingframe = callingframe;
@@ -43,22 +43,22 @@ public class ClassWizard extends Wizard {
       step=1;
       if (makenew) {
          this.setTitle("Define New Class - Step 1 of 3");
-         step1 = new ClassWizardStep1(this,settings);
+         step1 = new GeneSetWizardStep1(this,settings);
          this.addStep(1,step1);
       }
       else {
          this.setTitle("Modify Class - Step 1 of 3");
-         step1A = new ClassWizardStep1A(this,geneData,goData,newGeneSet);
+         step1A = new GeneSetWizardStep1A(this,geneData,goData,newGeneSet);
          this.addStep(1,step1A);
       }
-      step2 = new ClassWizardStep2(this,geneData,newGeneSet);
+      step2 = new GeneSetWizardStep2(this,geneData,newGeneSet);
       this.addStep(2,step2);
-      step3 = new ClassWizardStep3(this,settings,geneData,newGeneSet,makenew);
+      step3 = new GeneSetWizardStep3(this,settings,geneData,newGeneSet,makenew);
       this.addStep(3,step3);
 
    }
 
-   public ClassWizard(classScoreFrame callingframe, GeneAnnotations geneData,
+   public GeneSetWizard(GeneSetScoreFrame callingframe, GeneAnnotations geneData,
                       GONames goData, String cid) {
       super(callingframe,550,350);
       this.callingframe = callingframe;
@@ -77,11 +77,11 @@ public class ClassWizard extends Wizard {
       if (geneData.classExists(cid))
          newGeneSet.getProbes().addAll((ArrayList) geneData.getClassToProbes(cid));
       this.repaint();
-      step2 = new ClassWizardStep2(this,geneData,newGeneSet);
+      step2 = new GeneSetWizardStep2(this,geneData,newGeneSet);
       this.addStep(1,step2); //hack for starting at step 2
       this.addStep(2,step2);
       step2.updateCountLabel();
-      step3 = new ClassWizardStep3(this,settings,geneData,newGeneSet,makenew);
+      step3 = new GeneSetWizardStep3(this,settings,geneData,newGeneSet,makenew);
       this.addStep(3,step3);
    }
 

@@ -20,7 +20,7 @@ public class classScoreGUI {
 
    public classScoreGUI() {
       //mainFrame frame = new mainFrame();
-      classScoreFrame frame = new classScoreFrame();
+      GeneSetScoreFrame frame = new GeneSetScoreFrame();
 
       //Validate frames that have preset sizes
       //Pack frames that have useful preferred size info, e.g. from their layout

@@ -42,6 +42,7 @@ import baseCode.gui.table.JHorizontalTableHeaderRenderer;
 import baseCode.gui.table.JMatrixTableCellRenderer;
 import baseCode.gui.table.JVerticalTableHeaderRenderer;
 import classScore.data.*;
+import classScore.gui.*;
 import classScore.Settings;
 import classScore.SortFilterModel;
 

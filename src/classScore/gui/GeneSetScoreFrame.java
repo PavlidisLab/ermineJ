@@ -21,7 +21,7 @@ import classScore.data.*;
  *
  */
 
-public class classScoreFrame
+public class GeneSetScoreFrame
     extends JFrame {
    final boolean CONSOLE_WINDOW = false;
    JPanel mainPanel = ( JPanel )this.getContentPane();
@@ -48,7 +48,7 @@ public class classScoreFrame
    JPanel jPanelStatus = new JPanel();
 
    Settings settings;
-   classScoreStatus statusMessenger;
+   GeneSetScoreStatus statusMessenger;
    GONames goData;
    GeneAnnotations geneData;
    Vector results = new Vector();
@@ -56,7 +56,7 @@ public class classScoreFrame
    AnalysisThread athread=new AnalysisThread();
    //javax.swing.Timer initMonitor;
 
-   public classScoreFrame() {
+   public GeneSetScoreFrame() {
       try {
          jbInit();
          settings = new Settings();
@@ -85,11 +85,11 @@ public class classScoreFrame
       classMenu.setEnabled(false);
       defineClassMenuItem.setText( "Define New Class" );
       defineClassMenuItem.addActionListener( new
-                                             classScoreFrame_defineClassMenuItem_actionAdapter( this ) );
+                                             GeneSetScoreFrame_defineClassMenuItem_actionAdapter( this ) );
       defineClassMenuItem.setMnemonic( 'D' );
       modClassMenuItem.setText( "Modify Class" );
       modClassMenuItem.addActionListener( new
-                                          classScoreFrame_modClassMenuItem_actionAdapter( this ) );
+                                          GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
       modClassMenuItem.setMnemonic( 'M' );
       classMenu.add( defineClassMenuItem );
       classMenu.add( modClassMenuItem );
@@ -98,15 +98,15 @@ public class classScoreFrame
       analysisMenu.setEnabled(false);
       runAnalysisMenuItem.setText( "Run Analysis" );
       runAnalysisMenuItem.addActionListener( new
-                                             classScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
+                                             GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
       runAnalysisMenuItem.setMnemonic( 'R' );
       loadAnalysisMenuItem.setText( "Load Analysis" );
       loadAnalysisMenuItem.addActionListener( new
-                                              classScoreFrame_loadAnalysisMenuItem_actionAdapter( this ) );
+                                              GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( this ) );
       loadAnalysisMenuItem.setMnemonic( 'L' );
       saveAnalysisMenuItem.setText( "Save Analysis" );
       saveAnalysisMenuItem.addActionListener( new
-                                              classScoreFrame_saveAnalysisMenuItem_actionAdapter( this ) );
+                                              GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( this ) );
       saveAnalysisMenuItem.setMnemonic( 'S' );
       analysisMenu.add( runAnalysisMenuItem );
       analysisMenu.add( loadAnalysisMenuItem );
@@ -151,16 +151,16 @@ public class classScoreFrame
       jButtonAbout.setText( "About the software" );
       jButtonAbout.setMnemonic('b');
       jButtonAbout.addActionListener( new
-                                      classScoreFrame_jButtonAbout_actionAdapter( this ) );
+                                      GeneSetScoreFrame_jButtonAbout_actionAdapter( this ) );
       jButtonQuit.setText( "Quit Program" );
       jButtonQuit.setMnemonic('Q');
       jButtonQuit.addActionListener( new
-                                     classScoreFrame_jButtonQuit_actionAdapter( this ) );
+                                     GeneSetScoreFrame_jButtonQuit_actionAdapter( this ) );
       jButtonCancel.setToolTipText( "Cancel the current run" );
       jButtonCancel.setText( "Stop" );
       jButtonCancel.setMnemonic('S');
       jButtonCancel.addActionListener( new
-                                       classScoreFrame_jButtonCancel_actionAdapter( this ) );
+                                       GeneSetScoreFrame_jButtonCancel_actionAdapter( this ) );
       jPanelMainControls.add( jButtonQuit, null );
       jPanelMainControls.add( jButtonCancel, null );
       jPanelMainControls.add( jButtonAbout, null );
@@ -174,7 +174,7 @@ public class classScoreFrame
       jLabelStatus.setText( "Status" );
       jPanelStatus.add( jLabelStatus, null );
       showStatus( "Please see 'About this software' for license information." );
-      statusMessenger = new classScoreStatus( jLabelStatus );
+      statusMessenger = new GeneSetScoreStatus( jLabelStatus );
 
       mainPanel.add( progressPanel, BorderLayout.NORTH );
       mainPanel.add( jPanelMainControls, BorderLayout.CENTER );
@@ -244,7 +244,7 @@ public class classScoreFrame
     * @param e
     */
    void jButtonAbout_actionPerformed( ActionEvent e ) {
-      classScoreFrameAboutBox dlg = new classScoreFrameAboutBox( this );
+      AboutBox dlg = new AboutBox( this );
       Dimension dlgSize = dlg.getPreferredSize();
       Dimension frmSize = getSize();
       Point loc = getLocation();
@@ -260,12 +260,12 @@ public class classScoreFrame
     */
 
    void defineClassMenuItem_actionPerformed( ActionEvent e ) {
-      ClassWizard cwiz = new ClassWizard(this, geneData, goData, true);
+      GeneSetWizard cwiz = new GeneSetWizard(this, geneData, goData, true);
       cwiz.showWizard();
    }
 
    void modClassMenuItem_actionPerformed( ActionEvent e ) {
-      ClassWizard cwiz = new ClassWizard(this, geneData, goData, false);
+      GeneSetWizard cwiz = new GeneSetWizard(this, geneData, goData, false);
       cwiz.showWizard();
    }
 
@@ -287,7 +287,7 @@ public class classScoreFrame
       return settings;
    }
 
-   public classScoreStatus getStatusMessenger(){
+   public GeneSetScoreStatus getStatusMessenger(){
       return statusMessenger;
    }
 
@@ -305,12 +305,12 @@ public class classScoreFrame
 
 /* end class */
 
-class classScoreFrame_jButtonQuit_actionAdapter
+class GeneSetScoreFrame_jButtonQuit_actionAdapter
     implements java.awt.event.
     ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_jButtonQuit_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_jButtonQuit_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -319,12 +319,12 @@ class classScoreFrame_jButtonQuit_actionAdapter
    }
 }
 
-class classScoreFrame_jButtonAbout_actionAdapter
+class GeneSetScoreFrame_jButtonAbout_actionAdapter
     implements java.awt.event.
     ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_jButtonAbout_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_jButtonAbout_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -333,12 +333,12 @@ class classScoreFrame_jButtonAbout_actionAdapter
    }
 }
 
-class classScoreFrame_jButtonCancel_actionAdapter
+class GeneSetScoreFrame_jButtonCancel_actionAdapter
     implements java.awt.event.
     ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_jButtonCancel_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_jButtonCancel_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -347,12 +347,12 @@ class classScoreFrame_jButtonCancel_actionAdapter
    }
 }
 
-class classScoreFrame_defineClassMenuItem_actionAdapter
+class GeneSetScoreFrame_defineClassMenuItem_actionAdapter
     implements java.awt.
     event.ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_defineClassMenuItem_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_defineClassMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -361,12 +361,12 @@ class classScoreFrame_defineClassMenuItem_actionAdapter
    }
 }
 
-class classScoreFrame_modClassMenuItem_actionAdapter
+class GeneSetScoreFrame_modClassMenuItem_actionAdapter
     implements java.awt.event.
     ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_modClassMenuItem_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_modClassMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -375,12 +375,12 @@ class classScoreFrame_modClassMenuItem_actionAdapter
    }
 }
 
-class classScoreFrame_runAnalysisMenuItem_actionAdapter
+class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter
     implements java.awt.
     event.ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_runAnalysisMenuItem_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -389,12 +389,12 @@ class classScoreFrame_runAnalysisMenuItem_actionAdapter
    }
 }
 
-class classScoreFrame_loadAnalysisMenuItem_actionAdapter
+class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter
     implements java.awt.
     event.ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_loadAnalysisMenuItem_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -403,12 +403,12 @@ class classScoreFrame_loadAnalysisMenuItem_actionAdapter
    }
 }
 
-class classScoreFrame_saveAnalysisMenuItem_actionAdapter
+class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter
     implements java.awt.
     event.ActionListener {
-   classScoreFrame adaptee;
+   GeneSetScoreFrame adaptee;
 
-   classScoreFrame_saveAnalysisMenuItem_actionAdapter( classScoreFrame adaptee ) {
+   GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 

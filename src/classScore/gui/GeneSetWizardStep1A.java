@@ -19,16 +19,16 @@ import classScore.*;
  * @version $Id$
  */
 
-public class ClassWizardStep1A extends WizardStep
+public class GeneSetWizardStep1A extends WizardStep
 {
-   ClassWizard wiz;
+   GeneSetWizard wiz;
    GeneAnnotations geneData;
    GONames goData;
    NewGeneSet newGeneSet;
    JTable oldClassTable;
    JLabel modifyClassLabel;
 
-   public ClassWizardStep1A( ClassWizard wiz, GeneAnnotations geneData,
+   public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData,
                              GONames goData, NewGeneSet newGeneSet ) {
       super( wiz );
       this.wiz = wiz;
@@ -69,7 +69,7 @@ public class ClassWizardStep1A extends WizardStep
       bottomPanel.setPreferredSize(new Dimension(210, 50));
       mLabelPanel.add(modifyLabel, null);
       mLabelPanel.add(modifyClassLabel, null);
-      pickClassButton.addActionListener(new ClassWizardStep1A_pickClassButton_actionAdapter(this));
+      pickClassButton.addActionListener(new GeneSetWizardStep1A_pickClassButton_actionAdapter(this));
       bottomPanel.add(pickClassButton, null);
       bottomPanel.add(mLabelPanel, null);
       modifyPanel.add(oldClassScrollPane, BorderLayout.CENTER);
@@ -111,10 +111,10 @@ public class ClassWizardStep1A extends WizardStep
    }
 }
 
-class ClassWizardStep1A_pickClassButton_actionAdapter implements java.awt.event.ActionListener {
-   ClassWizardStep1A adaptee;
+class GeneSetWizardStep1A_pickClassButton_actionAdapter implements java.awt.event.ActionListener {
+   GeneSetWizardStep1A adaptee;
 
-   ClassWizardStep1A_pickClassButton_actionAdapter(ClassWizardStep1A adaptee) {
+   GeneSetWizardStep1A_pickClassButton_actionAdapter(GeneSetWizardStep1A adaptee) {
       this.adaptee = adaptee;
    }
 

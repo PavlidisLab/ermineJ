@@ -21,14 +21,14 @@ public class SaveWizard extends Wizard
    //logic
    int step = 1;
    int selected_run;
-   classScoreFrame callingframe;
+   GeneSetScoreFrame callingframe;
    Vector rundata;
    Thread aFrameRunner;
    String saveFolder;
    SaveWizardStep1 step1;
    SaveWizardStep2 step2;
 
-   public SaveWizard(classScoreFrame callingframe, Vector rundata) {
+   public SaveWizard(GeneSetScoreFrame callingframe, Vector rundata) {
       super(callingframe,400,200);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;

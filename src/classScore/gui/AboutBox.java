@@ -28,7 +28,7 @@ import javax.swing.JTextPane;
  * @version 1.0
  */
 
-public class classScoreFrameAboutBox extends JDialog implements ActionListener {
+public class AboutBox extends JDialog implements ActionListener {
 
    JPanel panel1 = new JPanel();
    JPanel panel2 = new JPanel();
@@ -51,7 +51,7 @@ public class classScoreFrameAboutBox extends JDialog implements ActionListener {
    JPanel jPanel1 = new JPanel();
    BorderLayout borderLayout1 = new BorderLayout();
 
-   public classScoreFrameAboutBox(Frame parent) {
+   public AboutBox(Frame parent) {
       super(parent);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       try {
@@ -63,7 +63,7 @@ public class classScoreFrameAboutBox extends JDialog implements ActionListener {
 
    //Component initialization
    private void jbInit() throws Exception {
-//    image1 = new ImageIcon(classScoreFrame.class.getResource("about.png"));
+//    image1 = new ImageIcon(GeneSetScoreFrame.class.getResource("about.png"));
 //    imageLabel.setIcon(image1);
       this.setTitle("About");
       panel1.setLayout(borderLayout1);

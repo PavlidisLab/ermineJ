@@ -16,16 +16,16 @@ import classScore.*;
  * @version $Id$
  */
 
-public class ClassWizardStep1 extends WizardStep
+public class GeneSetWizardStep1 extends WizardStep
 {
-   ClassWizard wiz;
+   GeneSetWizard wiz;
    Settings settings;
    JButton browseButton;
    JTextField classFile;
    JFileChooser chooser;
    int inputMethod;
 
-   public ClassWizardStep1( ClassWizard wiz, Settings settings ) {
+   public GeneSetWizardStep1( GeneSetWizard wiz, Settings settings ) {
       super( wiz );
       this.wiz = wiz;
       this.settings = settings;
@@ -57,12 +57,12 @@ public class ClassWizardStep1 extends WizardStep
       fileInputButton.setBackground( SystemColor.control );
       fileInputButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
       fileInputButton.setText( "File" );
-      fileInputButton.addActionListener( new ClassWizardStep1_fileInputButton_actionAdapter( this ) );
+      fileInputButton.addActionListener( new GeneSetWizardStep1_fileInputButton_actionAdapter( this ) );
       JRadioButton manInputButton = new JRadioButton( "Manual", true );
       manInputButton.setBackground( SystemColor.control );
       manInputButton.setMaximumSize( new Dimension( 91, 23 ) );
       manInputButton.addActionListener( new
-                                        ClassWizardStep1_manInputButton_actionAdapter( this ) );
+                                        GeneSetWizardStep1_manInputButton_actionAdapter( this ) );
       manInputButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
       ButtonGroup buttonGroup1 = new ButtonGroup();
       buttonGroup1.add( fileInputButton );
@@ -104,7 +104,7 @@ public class ClassWizardStep1 extends WizardStep
       jPanel2.setPreferredSize(new Dimension(354, 150));
       browseButton = new JButton();
       browseButton.setText( "Browse...." );
-      browseButton.addActionListener( new ClassWizardStep1_browseButton_actionAdapter( this ) );
+      browseButton.addActionListener( new GeneSetWizardStep1_browseButton_actionAdapter( this ) );
       browseButton.setEnabled( false );
       classFile = new JTextField();
       classFile.setEditable( false );
@@ -149,11 +149,11 @@ public class ClassWizardStep1 extends WizardStep
    public String getLoadFile() { return classFile.getText(); }
 }
 
-class ClassWizardStep1_manInputButton_actionAdapter implements java.awt.event.
+class GeneSetWizardStep1_manInputButton_actionAdapter implements java.awt.event.
         ActionListener {
-   ClassWizardStep1 adaptee;
+   GeneSetWizardStep1 adaptee;
 
-   ClassWizardStep1_manInputButton_actionAdapter(ClassWizardStep1 adaptee) {
+   GeneSetWizardStep1_manInputButton_actionAdapter(GeneSetWizardStep1 adaptee) {
       this.adaptee = adaptee;
    }
 
@@ -162,11 +162,11 @@ class ClassWizardStep1_manInputButton_actionAdapter implements java.awt.event.
    }
 }
 
-class ClassWizardStep1_fileInputButton_actionAdapter implements java.awt.event.
+class GeneSetWizardStep1_fileInputButton_actionAdapter implements java.awt.event.
         ActionListener {
-   ClassWizardStep1 adaptee;
+   GeneSetWizardStep1 adaptee;
 
-   ClassWizardStep1_fileInputButton_actionAdapter(ClassWizardStep1 adaptee) {
+   GeneSetWizardStep1_fileInputButton_actionAdapter(GeneSetWizardStep1 adaptee) {
       this.adaptee = adaptee;
    }
 
@@ -175,10 +175,10 @@ class ClassWizardStep1_fileInputButton_actionAdapter implements java.awt.event.
    }
 }
 
-class ClassWizardStep1_browseButton_actionAdapter implements java.awt.event.ActionListener {
-   ClassWizardStep1 adaptee;
+class GeneSetWizardStep1_browseButton_actionAdapter implements java.awt.event.ActionListener {
+   GeneSetWizardStep1 adaptee;
 
-   ClassWizardStep1_browseButton_actionAdapter(ClassWizardStep1 adaptee) {
+   GeneSetWizardStep1_browseButton_actionAdapter(GeneSetWizardStep1 adaptee) {
       this.adaptee = adaptee;
    }
 

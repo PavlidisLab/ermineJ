@@ -13,6 +13,7 @@ import java.util.Vector;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.Stats;
 import classScore.*;
+import classScore.gui.*;
 
 /**
     Calculates a background distribution for class sscores derived
@@ -176,9 +177,9 @@ public class expClassScore {
     *
     * @return A histogram object containing a cdf that can be used to generate
     *   pvalues.
-    * @param m classScoreStatus
+    * @param m GeneSetScoreStatus
     */
-   public histogram generateNullDistribution(classScoreStatus m) {
+   public histogram generateNullDistribution(GeneSetScoreStatus m) {
 
       int i, j, k;
 

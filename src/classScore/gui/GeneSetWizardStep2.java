@@ -20,9 +20,9 @@ import classScore.*;
  * @version $Id$
  */
 
-public class ClassWizardStep2 extends WizardStep
+public class GeneSetWizardStep2 extends WizardStep
 {
-   ClassWizard wiz;
+   GeneSetWizard wiz;
    GeneAnnotations geneData;
    JLabel countLabel;
    JTable probeTable;
@@ -30,7 +30,7 @@ public class ClassWizardStep2 extends WizardStep
    AbstractTableModel ncTableModel;
    NewGeneSet newGeneSet;
 
-   public ClassWizardStep2( ClassWizard wiz, GeneAnnotations geneData,
+   public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData,
                             NewGeneSet newGeneSet ) {
       super( wiz );
       this.wiz = wiz;
@@ -76,12 +76,12 @@ public class ClassWizardStep2 extends WizardStep
       JButton addButton = new JButton();
       addButton.setSelected(false);
       addButton.setText("Add >");
-      addButton.addActionListener(new ClassWizardStep2_addButton_actionAdapter(this));
+      addButton.addActionListener(new GeneSetWizardStep2_addButton_actionAdapter(this));
       JButton deleteButton = new JButton();
       deleteButton.setSelected(false);
       deleteButton.setText("Delete");
       deleteButton.addActionListener(new
-                                     ClassWizardStep2_delete_actionPerformed_actionAdapter(this));
+                                     GeneSetWizardStep2_delete_actionPerformed_actionAdapter(this));
       bottomPanel.add(addButton, null);
       bottomPanel.add(deleteButton, null);
       step2Panel.add(topPanel, BorderLayout.NORTH);
@@ -186,22 +186,22 @@ public class ClassWizardStep2 extends WizardStep
        JTextField editProbe = new JTextField();
        editProbe.setBorder(BorderFactory.createEmptyBorder());
        DefaultCellEditor editorProbe = new DefaultCellEditor(editProbe);
-       editorProbe.addCellEditorListener(new ClassWizardStep2_editorProbeAdaptor(this));
+       editorProbe.addCellEditorListener(new GeneSetWizardStep2_editorProbeAdaptor(this));
        newClassTable.getColumnModel().getColumn(0).setCellEditor(editorProbe);
        JTextField editGene = new JTextField();
        editGene.setBorder(BorderFactory.createEmptyBorder());
        DefaultCellEditor editorGene = new DefaultCellEditor(editGene);
-       editorGene.addCellEditorListener(new ClassWizardStep2_editorGeneAdaptor(this));
+       editorGene.addCellEditorListener(new GeneSetWizardStep2_editorGeneAdaptor(this));
        newClassTable.getColumnModel().getColumn(1).setCellEditor(editorGene);
        newClassTable.getColumnModel().getColumn(0).setPreferredWidth(40);
     }
 }
 
-class ClassWizardStep2_delete_actionPerformed_actionAdapter implements java.awt.
+class GeneSetWizardStep2_delete_actionPerformed_actionAdapter implements java.awt.
         event.ActionListener {
-   ClassWizardStep2 adaptee;
+   GeneSetWizardStep2 adaptee;
 
-   ClassWizardStep2_delete_actionPerformed_actionAdapter(ClassWizardStep2 adaptee) {
+   GeneSetWizardStep2_delete_actionPerformed_actionAdapter(GeneSetWizardStep2 adaptee) {
       this.adaptee = adaptee;
    }
 
@@ -210,11 +210,11 @@ class ClassWizardStep2_delete_actionPerformed_actionAdapter implements java.awt.
    }
 }
 
-class ClassWizardStep2_addButton_actionAdapter implements java.awt.event.
+class GeneSetWizardStep2_addButton_actionAdapter implements java.awt.event.
         ActionListener {
-   ClassWizardStep2 adaptee;
+   GeneSetWizardStep2 adaptee;
 
-   ClassWizardStep2_addButton_actionAdapter(ClassWizardStep2 adaptee) {
+   GeneSetWizardStep2_addButton_actionAdapter(GeneSetWizardStep2 adaptee) {
       this.adaptee = adaptee;
    }
 
@@ -223,9 +223,9 @@ class ClassWizardStep2_addButton_actionAdapter implements java.awt.event.
    }
 }
 
-class ClassWizardStep2_editorProbeAdaptor implements CellEditorListener {
-   ClassWizardStep2 adaptee;
-   ClassWizardStep2_editorProbeAdaptor(ClassWizardStep2 adaptee) {this.adaptee = adaptee;
+class GeneSetWizardStep2_editorProbeAdaptor implements CellEditorListener {
+   GeneSetWizardStep2 adaptee;
+   GeneSetWizardStep2_editorProbeAdaptor(GeneSetWizardStep2 adaptee) {this.adaptee = adaptee;
    }
 
    public void editingStopped(ChangeEvent e) {adaptee.
@@ -236,9 +236,9 @@ class ClassWizardStep2_editorProbeAdaptor implements CellEditorListener {
    }
 }
 
-class ClassWizardStep2_editorGeneAdaptor implements CellEditorListener {
-   ClassWizardStep2 adaptee;
-   ClassWizardStep2_editorGeneAdaptor(ClassWizardStep2 adaptee) {this.adaptee = adaptee;
+class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
+   GeneSetWizardStep2 adaptee;
+   GeneSetWizardStep2_editorGeneAdaptor(GeneSetWizardStep2 adaptee) {this.adaptee = adaptee;
    }
 
    public void editingStopped(ChangeEvent e) {adaptee.

@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.*;
 
 import classScore.data.*;
+import classScore.gui.*;
 import classScore.gui.geneSet.*;
 import classScore.analysis.*;
 import baseCode.math.Rank;
@@ -33,14 +34,14 @@ public class classPvalRun {
    private boolean useUniform = false; // assume input values come from uniform distribution under null hypothesis.
 
    Settings settings;
-   classScoreStatus messenger;
+   GeneSetScoreStatus messenger;
 
    public classPvalRun( Settings settings,
                         GeneAnnotations geneData,
                         GONames goData,
                         expClassScore probePvalMapper,
                         String mtc_method,
-                        classScoreStatus messenger ) throws
+                        GeneSetScoreStatus messenger ) throws
        IllegalArgumentException, IOException {
       this.settings = settings;
       this.messenger = messenger;

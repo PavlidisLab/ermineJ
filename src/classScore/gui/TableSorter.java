@@ -1,4 +1,4 @@
-package classScore;
+package classScore.gui;
 
 import java.awt.*;
 import java.awt.event.*;

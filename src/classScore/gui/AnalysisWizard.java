@@ -30,7 +30,7 @@ public class AnalysisWizard extends Wizard
    AnalysisWizardStep3 step3;
    AnalysisWizardStep4 step4;
 
-   public AnalysisWizard(classScoreFrame callingframe, GeneAnnotations geneData, GONames goData) {
+   public AnalysisWizard(GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData) {
       super(callingframe,550,350);
       //enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
@@ -115,7 +115,7 @@ public class AnalysisWizard extends Wizard
    protected void finishButton_actionPerformed(ActionEvent e) {
       saveValues();
       loadAddedClasses();
-      ((classScoreFrame)callingframe).startAnalysis(settings);
+      ((GeneSetScoreFrame)callingframe).startAnalysis(settings);
       dispose();
    }
 

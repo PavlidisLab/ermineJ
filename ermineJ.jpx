@@ -44,6 +44,8 @@
   <property category="sys" name="VersionLabel" value="@version"/>
   <property category="sys" name="WorkingDirectory" value="."/>
   <property category="sys" name="uidesign.size.classScore.AnalysisWizardStep3" value="693,300"/>
+  <property category="sys" name="uidesign.size.classScore.ClassWizardStep1" value="638,300"/>
+  <property category="sys" name="uidesign.size.classScore.ClassWizardStep2" value="616,300"/>
   <property category="team" name="ignorePath.0" value="bak"/>
   <property category="team" name="ignorePath.1" value="classes"/>
   <property category="team" name="ignorePath.2" value="classScore.jar"/>
@@ -59,10 +61,9 @@
     <property category="directorynode" name="url" value="."/>
   </node>
   <node name="Export to Ant" type="Ant"/>
-  <file path="src/classScore/AnalysisWizard.java"/>
-  <file path="src/classScore/AnalysisWizardStep3.java"/>
-  <file path="src/classScore/AnalysisWizardStep4.java"/>
+  <file path="src/classScore/AnalysisThread.java"/>
   <file path="src/classScore/GeneSetMapTools.java"/>
+  <file path="src/classScore/LoadDialog.java"/>
+  <file path="src/classScore/NewGeneSet.java"/>
   <file path="src/classScore/Settings.java"/>
-  <file path="src/classScore/StartupDialog.java"/>
 </project>

@@ -37,10 +37,10 @@ public class StartupDialog
    JPanel annotPanel = new JPanel();
    JTextField annotFile = new JTextField();
 
-   classScoreFrame callingframe;
+   GeneSetScoreFrame callingframe;
    Settings settings;
 
-   public StartupDialog( classScoreFrame callingframe ) {
+   public StartupDialog( GeneSetScoreFrame callingframe ) {
       setModal( true );
       this.callingframe = callingframe;
       this.settings = callingframe.getSettings();

@@ -23,13 +23,13 @@ import classScore.*;
 public class OutputPanel extends JScrollPane {
    JTable table;
    OutputTableModel model;
-   classScoreFrame callingframe;
+   GeneSetScoreFrame callingframe;
    Vector results;
    Vector resultToolTips = new Vector();
    GeneAnnotations geneData;
    GONames goData;
 
-   public OutputPanel(classScoreFrame callingframe, Vector results) {
+   public OutputPanel(GeneSetScoreFrame callingframe, Vector results) {
       this.callingframe=callingframe;
       this.results=results;
       model = new OutputTableModel(results);
@@ -74,7 +74,7 @@ public class OutputPanel extends JScrollPane {
           ((Container) e.getSource()).getParent();
       int r = table.rowAtPoint(sourcePopup.getPoint());
       String id = (String) table.getValueAt(r, 0);
-      ClassWizard cwiz = new ClassWizard(callingframe, geneData, goData, id);
+      GeneSetWizard cwiz = new GeneSetWizard(callingframe, geneData, goData, id);
       cwiz.showWizard();
    }
 

@@ -32,11 +32,11 @@ public class LoadDialog
    JPanel loadPanel = new JPanel();
    JTextField loadFile = new JTextField();
 
-   classScoreFrame callingframe;
+   GeneSetScoreFrame callingframe;
    Settings settings;
-   classScoreStatus messenger;
+   GeneSetScoreStatus messenger;
 
-   public LoadDialog( classScoreFrame callingframe ) {
+   public LoadDialog( GeneSetScoreFrame callingframe ) {
       setModal( true );
       this.callingframe = callingframe;
       this.settings = callingframe.getSettings();

@@ -1,4 +1,4 @@
-package classScore;
+package classScore.gui;
 
 import java.awt.EventQueue;
 
@@ -13,10 +13,10 @@ import javax.swing.JLabel;
  * @version 1.0
  */
 
-public class classScoreStatus {
+public class GeneSetScoreStatus {
    private JLabel l;
 
-   public classScoreStatus(JLabel l) {
+   public GeneSetScoreStatus(JLabel l) {
       this.l = l;
    }
 

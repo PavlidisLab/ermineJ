@@ -16,16 +16,16 @@ import classScore.data.*;
 
 public class AnalysisThread {
    private volatile Thread athread;
-   classScoreFrame csframe;
+   GeneSetScoreFrame csframe;
    Settings settings;
-   classScoreStatus messenger;
+   GeneSetScoreStatus messenger;
    GONames goData;
    GeneAnnotations geneData;
 
    public AnalysisThread() { }
 
-   public void startAnalysisThread(classScoreFrame csframe, Settings settings,
-                                   classScoreStatus messenger,
+   public void startAnalysisThread(GeneSetScoreFrame csframe, Settings settings,
+                                   GeneSetScoreStatus messenger,
                                    GONames goData, GeneAnnotations geneData )
        throws IllegalStateException{
       this.csframe = csframe;
