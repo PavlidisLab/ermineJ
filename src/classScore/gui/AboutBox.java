@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -32,11 +33,14 @@ import javax.swing.JTextPane;
 
 public class AboutBox extends JDialog implements ActionListener {
 
+   private final static String VERSION = "2.0b2";
+   
    JPanel panel1 = new JPanel();
    JPanel panel2 = new JPanel();
    JPanel insetsPanel1 = new JPanel();
    JPanel insetsPanel3 = new JPanel();
    JButton button1 = new JButton();
+   JLabel labelAuthors  = new JLabel();
    //  JLabel imageLabel = new JLabel();
    JLabel label1 = new JLabel();
    JLabel label2 = new JLabel();
@@ -45,7 +49,6 @@ public class AboutBox extends JDialog implements ActionListener {
    //  ImageIcon image1 = new ImageIcon();
    BorderLayout borderLayout2 = new BorderLayout();
    String product = "Class Scoring Software";
-   String version = "1.1beta";
    String copyright = "Copyright (c) 2003";
    String comments = "Functional Class Scoring";
    JTextPane jTextPane1 = new JTextPane();
@@ -78,15 +81,15 @@ public class AboutBox extends JDialog implements ActionListener {
       panel1.setLayout( borderLayout1 );
       panel2.setLayout( borderLayout2 );
       label1.setText( product );
-      label2.setText( "Verion 2.0b1" );
+      label2.setText( VERSION );
       label3.setText( "Copyright (c) 2003-2004 Columbia University" );
-      label4
-            .setText( "Direct questions to Paul Pavlidis: pavlidis@dbmi.columbia.edu" );
+      
+      labelAuthors.setText( "Authors: Paul Pavlidis, Homin Lee and Will Braynen.");
+      label4.setText( "Direct questions to Paul Pavlidis: pavlidis@dbmi.columbia.edu" );
       insetsPanel3.setLayout( gridLayout1 );
       insetsPanel3
             .setBorder( BorderFactory.createEmptyBorder( 10, 60, 10, 10 ) );
-      insetsPanel3.setPreferredSize( new Dimension( 369, 125 ) );
-      insetsPanel3.setToolTipText( "" );
+      insetsPanel3.setPreferredSize( new Dimension( 369, 125 ) );;
       button1.setText( "Ok" );
       button1.addActionListener( this );
       //    insetsPanel2.add(imageLabel, null);
@@ -105,12 +108,13 @@ public class AboutBox extends JDialog implements ActionListener {
       jTextPane1.setBounds( new Rectangle( 62, 20, 232, 146 ) );
       panel1.setPreferredSize( new Dimension( 369, 300 ) );
       panel2.setPreferredSize( new Dimension( 369, 100 ) );
-      gridLayout1.setRows( 5 );
+      gridLayout1.setRows( 6 );
       jPanel1.setLayout( null );
       insetsPanel3.add( label1, null );
       insetsPanel3.add( label2, null );
       insetsPanel3.add( label3, null );
       insetsPanel3.add( label4, null );
+      insetsPanel3.add( labelAuthors, null );
       panel1.add( jPanel1, BorderLayout.CENTER );
       jPanel1.add( jTextPane1, null );
       panel1.add( insetsPanel1, BorderLayout.SOUTH );

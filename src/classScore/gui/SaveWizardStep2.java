@@ -60,8 +60,8 @@ public class SaveWizardStep2 extends WizardStep
       jPanel11.add(saveFile, null);
       jPanel11.add(saveBrowseButton, null);
 
-      this.addHelp("<html>This is a place holder.<br>"+
-                   "Blah, blah, blah, blah, blah.");
+      this.addHelp("<html><b>Choose the file to save the analysis in</b><br>"+
+                   "");
       this.addMain(jPanel11);
    }
 

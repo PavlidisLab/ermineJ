@@ -34,7 +34,6 @@ import classScore.Settings;
 import classScore.classPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-import classScore.data.GeneSetMapTools;
 
 /**
  * <p>Title: </p>
@@ -44,49 +43,48 @@ import classScore.data.GeneSetMapTools;
  * @author Homin Lee
  * @author Paul Pavlidis
  * @version $Id$
- * @todo All input of custom classes, identified either by probe id or official gene name.
  *
  */
 
 public class GeneSetScoreFrame
     extends JFrame {
-   final boolean CONSOLE_WINDOW = false;
-   JPanel mainPanel = ( JPanel )this.getContentPane();
-   JMenuBar jMenuBar1 = new JMenuBar();
-   JMenu fileMenu = new JMenu();
-   JMenuItem quitMenuItem = new JMenuItem();
-   JMenu classMenu = new JMenu();
-   JMenuItem defineClassMenuItem = new JMenuItem();
-   JMenuItem modClassMenuItem = new JMenuItem();
-   JMenuItem findClassMenuItem = new JMenuItem();
-   JMenu analysisMenu = new JMenu();
-   JMenuItem runAnalysisMenuItem = new JMenuItem();
-   JMenuItem cancelAnalysisMenuItem = new JMenuItem();
-   JMenuItem loadAnalysisMenuItem = new JMenuItem();
-   JMenuItem saveAnalysisMenuItem = new JMenuItem();
-   JMenu helpMenu = new JMenu();
-   JMenuItem helpMenuItem = new JMenuItem();
-   JMenuItem aboutMenuItem = new JMenuItem();
+   
+   private JPanel mainPanel = ( JPanel )this.getContentPane();
+   private JMenuBar jMenuBar1 = new JMenuBar();
+   private JMenu fileMenu = new JMenu();
+   private JMenuItem quitMenuItem = new JMenuItem();
+   private JMenu classMenu = new JMenu();
+   private JMenuItem defineClassMenuItem = new JMenuItem();
+   private JMenuItem modClassMenuItem = new JMenuItem();
+   private JMenuItem findClassMenuItem = new JMenuItem();
+   private JMenu analysisMenu = new JMenu();
+   private JMenuItem runAnalysisMenuItem = new JMenuItem();
+   private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
+   private JMenuItem loadAnalysisMenuItem = new JMenuItem();
+   private JMenuItem saveAnalysisMenuItem = new JMenuItem();
+   private JMenu helpMenu = new JMenu();
+   private JMenuItem helpMenuItem = new JMenuItem();
+   private JMenuItem aboutMenuItem = new JMenuItem();
 
-   JPanel progressPanel;
-   JPanel progInPanel = new JPanel();
-   JProgressBar progressBar = new JProgressBar();
-   OutputPanel oPanel;
+   private JPanel progressPanel;
+   private JPanel progInPanel = new JPanel();
+   private JProgressBar progressBar = new JProgressBar();
+   private OutputPanel oPanel;
 
-   JLabel jLabelStatus = new JLabel();
-   JPanel jPanelStatus = new JPanel();
+   private JLabel jLabelStatus = new JLabel();
+   private JPanel jPanelStatus = new JPanel();
 
-   Settings settings;
-   StatusViewer statusMessenger;
-   GONames goData;
-   GeneAnnotations geneData;
-   LinkedList results = new LinkedList();
+   private Settings settings;
+   private StatusViewer statusMessenger;
+   private GONames goData;
+   private GeneAnnotations geneData;
+   private LinkedList results = new LinkedList();
 
-   Map geneDataSets;
-   Map rawDataSets;
-   Map geneScoreSets;
+   private Map geneDataSets;
+   private Map rawDataSets;
+   private Map geneScoreSets;
 
-   AnalysisThread athread=new AnalysisThread();
+   private AnalysisThread athread=new AnalysisThread();
 
    public GeneSetScoreFrame() {
       try {
@@ -100,9 +98,6 @@ public class GeneSetScoreFrame
 
    /* init */
    private void jbInit() throws Exception {
-      if ( CONSOLE_WINDOW ) {
-         ConsoleWindow.init();
-      }
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
       this.setJMenuBar( jMenuBar1 );
       this.setSize( new Dimension( 886, 450 ) );
@@ -217,9 +212,6 @@ public class GeneSetScoreFrame
       jPanelStatus.add( jLabelStatus, null );
       showStatus( "Please see 'About this software' for license information." );
       statusMessenger = new StatusJlabel( jLabelStatus );
-
-      //mainPanel.add( oPanel, BorderLayout.CENTER );
-      //mainPanel.add( progressPanel, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
 
@@ -270,23 +262,23 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Ready.");
       }
       catch ( IllegalArgumentException e ) {
-         GuiUtil.error(
+         GuiUtil.error( 
             "Error during initialization: " + e +
-            "If this problem persists, please contact the software vendor. " +
+            "If this problem persists, please contact the software developer. " +
             "Press OK to quit." );
          System.exit( 1 );
       }
       catch ( IOException e ) {
-         GuiUtil.error(
-            "File reading or writing error during initialization: " + e +
-            "If this problem persists, please contact the software vendor. " +
+         GuiUtil.error( 
+            "File reading or writing error during initialization: " + e + 
+            "If this problem persists, please contact the software developer. " +
             "Press OK to quit." );
          System.exit( 1 );
       } catch ( SAXException e ) {
          GuiUtil.error( 
-           "Gene Ontology file format is incorrect.\n" +
-           "Please check that it is a valid XML file.\n" +
-           "If this problem persists, contact the software vendor.\n" +
+           "Gene Ontology file format is incorrect. " +
+           "Please check that it is a valid XML file. " +
+           "If this problem persists, please contact the software developer. " +
            "Press OK to quit." );
          System.exit( 1 );
       }
@@ -328,7 +320,7 @@ public class GeneSetScoreFrame
    }
 
    void findClassMenuItem_actionPerformed( ActionEvent e ) {
-  //    FindDialog fdlog = new FindDialog( this );
+      new FindDialog( this, geneData, goData );
    }
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
@@ -352,10 +344,11 @@ public class GeneSetScoreFrame
    }
 
    void helpMenuItem_actionPerformed( ActionEvent e ) {
+      new HelpFrame(this);
    }
 
    void aboutMenuItem_actionPerformed( ActionEvent e ) {
-      AboutBox dlg = new AboutBox( this );
+      new AboutBox( this );
    }
 
    public Settings getSettings() {
@@ -374,7 +367,7 @@ public class GeneSetScoreFrame
    {
       results.add( result );
       oPanel.addRun();  // this line should come after results.add() or else you'll get errors
-   }
+   } 
 
    public void startAnalysis(Settings runSettings)
    {
@@ -392,6 +385,13 @@ public class GeneSetScoreFrame
    public void addedNewGeneSet()
    {
       oPanel.addedNewGeneSet();
+   }
+   
+   /**
+    * @return Returns the oPanel.
+    */
+   public OutputPanel getOPanel() {
+      return oPanel;
    }
 }
 

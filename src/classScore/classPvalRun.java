@@ -233,7 +233,7 @@ public class classPvalRun {
          if ( settings.getDoLog() == true ) {
             pvalue = new Double( Math
                   .pow( 10.0, -( ( Double ) geneScores.getProbeToPvalMap().get(
-                        probeID ) ).doubleValue() ) ); // todo null pointer here on mouseup
+                        probeID ) ).doubleValue() ) );
          } else {
             pvalue = ( Double ) geneScores.getProbeToPvalMap().get(probeID
                    );

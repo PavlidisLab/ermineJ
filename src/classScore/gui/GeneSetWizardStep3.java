@@ -87,11 +87,11 @@ public class GeneSetWizardStep3 extends WizardStep {
       ncInfo1Panel.setPreferredSize( new Dimension( 165, 240 ) );
       JPanel ncDescPanel = new JPanel();
       ncDescPanel.setPreferredSize( new Dimension( 165, 180 ) );
-      classDescL = new JLabel( "New Class ID: " );
+      classDescL = new JLabel( "New gene set ID: " );
       classDescL.setRequestFocusEnabled( true );
-      classDescL.setText( "New Class Description: " );
+      classDescL.setText( "New gene set Description: " );
       classDescTA = new JTextArea();
-      classDescTA.setToolTipText( "New Class ID" );
+      classDescTA.setToolTipText( "New gene set ID" );
 
       classDescTA.setLineWrap( true );
       JScrollPane classDTAScroll = new JScrollPane( classDescTA );
@@ -106,8 +106,8 @@ public class GeneSetWizardStep3 extends WizardStep {
       BorderLayout borderLayout2 = new BorderLayout();
       ncInfo2Panel.setLayout( borderLayout2 );
       ncInfo2Panel.setPreferredSize( new Dimension( 220, 240 ) );
-      classIDFinal = new JLabel( "New Class ID: " );
-      classIDFinal.setText( "No Class Name" );
+      classIDFinal = new JLabel( "New Gene set ID: " );
+      classIDFinal.setText( "No Gene set Name" );
       classIDFinal.setRequestFocusEnabled( true );
       finalTable = new JTable();
       finalTable.getTableHeader().setReorderingAllowed( false );
@@ -119,8 +119,9 @@ public class GeneSetWizardStep3 extends WizardStep {
       step3Panel.add( ncInfo1Panel, BorderLayout.WEST );
       step3Panel.add( ncInfo2Panel, BorderLayout.CENTER );
 
-      this.addHelp( "<html>This is a place holder.<br>"
-            + "Blah, blah, blah, blah, blah." );
+      this.addHelp( "<html><b>Choose a new gene set identifier and description.</b><br>"
+            + "The custom gene set will automatically be saved to your hard drive" +
+                  "to be used again in future analyses." );
       this.addMain( step3Panel );
    }
 

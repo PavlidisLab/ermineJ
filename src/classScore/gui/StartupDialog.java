@@ -1,36 +1,40 @@
 package classScore.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.SystemColor;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
 import classScore.Settings;
-import baseCode.gui.AppDialog;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
+ * <p>
+ * Title:
+ * </p>
+ * <p>
+ * Description:
+ * </p>
+ * <p>
+ * Copyright: Copyright (c) 2003
+ * </p>
+ * <p>
+ * Company:
+ * </p>
+ * 
  * @author Homin Lee
  * @version $Id$
  */
 
-public class StartupDialog
-    extends AppDialog  {
+public class StartupDialog extends AppDialog {
    JFileChooser chooser = new JFileChooser();
    JPanel centerPanel = new JPanel();
    JPanel classPanel = new JPanel();
@@ -45,49 +49,55 @@ public class StartupDialog
    JButton classBrowseButton = new JButton();
 
    public StartupDialog( GeneSetScoreFrame callingframe ) {
-      super(callingframe,550,350);
-      this.settings = ((GeneSetScoreFrame)callingframe).getSettings();
-      try {
-         jbInit();
-         setValues();
-      }
-      catch ( Exception e ) {
-         e.printStackTrace();
-      }
+      super( callingframe, 550, 350 );
+      this.settings = callingframe.getSettings();
+      jbInit();
+      setValues();
    }
 
    //Component initialization
-   private void jbInit() throws Exception {
-      this.addWindowListener(new StartupDialog_this_windowAdapter(this));
+   private void jbInit() {
+      this.addWindowListener( new StartupDialog_this_windowAdapter( this ) );
 
-      annotBrowseButton.setText( "Browse...." );
-      annotBrowseButton.addActionListener( new StartupDialog_annotBrowseButton_actionAdapter( this ) );
-      annotLabel.setPreferredSize(new Dimension(390, 15) );
-      annotLabel.setRequestFocusEnabled(true);
+      annotBrowseButton.setText( "Browse..." );
+      annotBrowseButton
+            .addActionListener( new StartupDialog_annotBrowseButton_actionAdapter(
+                  this ) );
+      annotLabel.setPreferredSize( new Dimension( 390, 15 ) );
+      annotLabel.setRequestFocusEnabled( true );
       annotLabel.setText( "Probe annotation file:" );
-      annotPanel.setPreferredSize(new Dimension(400, 50) );
-      annotFile.setPreferredSize(new Dimension(300, 19) );
-      classBrowseButton.addActionListener(new StartupDialog_classBrowseButton_actionAdapter( this ));
-      classBrowseButton.setText("Browse....");
-      classBrowseButton.addActionListener(new StartupDialog_classBrowseButton_actionAdapter(this));
+      annotPanel.setPreferredSize( new Dimension( 400, 50 ) );
+      annotFile.setPreferredSize( new Dimension( 300, 19 ) );
+      classBrowseButton
+            .addActionListener( new StartupDialog_classBrowseButton_actionAdapter(
+                  this ) );
+      classBrowseButton.setText( "Browse..." );
+      classBrowseButton
+            .addActionListener( new StartupDialog_classBrowseButton_actionAdapter(
+                  this ) );
       annotPanel.add( annotLabel, null );
       annotPanel.add( annotFile, null );
       annotPanel.add( annotBrowseButton, null );
-      classPanel.setPreferredSize(new Dimension(400, 50) );
-      classLabel.setPreferredSize(new Dimension(390, 15) );
+      classPanel.setPreferredSize( new Dimension( 400, 50 ) );
+      classLabel.setPreferredSize( new Dimension( 390, 15 ) );
       classLabel.setText( "Gene name file:" );
-      classFile.setPreferredSize(new Dimension(300, 19) );
+      classFile.setPreferredSize( new Dimension( 300, 19 ) );
       classPanel.add( classLabel, null );
       classPanel.add( classFile, null );
-      classPanel.add(classBrowseButton, null);
+      classPanel.add( classBrowseButton, null );
       centerPanel.add( classPanel, null );
       centerPanel.add( annotPanel, null );
 
-      setActionButtonText("Start");
-      setCancelButtonText("Quit");
-      addHelp("hurdy hurdy gurdy");
+      setActionButtonText( "Start" );
+      setCancelButtonText( "Quit" );
+      addHelp( "<html><b>Starting up the program</b><br>Please confirm " +
+            "the settings below are correct; they cannot be changed during " +
+            "analysis.<p>The probe annotation file you select " +
+            "must match the microarray design you are using. " +
+            "For updated annotation files, visit " +
+            "http://microarray.cpmc.columbia.edu/annots/</html>" );
       addMain( centerPanel );
-      this.setTitle( "Specify Probe Annotation File" );
+      this.setTitle( "Gene set scoring startup" );
    }
 
    private void setValues() {
@@ -101,9 +111,8 @@ public class StartupDialog
       settings.setAnnotFile( annotFile.getText() );
       try {
          settings.writePrefs();
-      }
-      catch ( IOException ex ) {
-         GuiUtil.error("Could not write prefs.");
+      } catch ( IOException ex ) {
+         GuiUtil.error( "Could not write prefs." );
       }
    }
 
@@ -114,7 +123,7 @@ public class StartupDialog
       }
    }
 
-   void classBrowseButton_actionPerformed(ActionEvent e) {
+   void classBrowseButton_actionPerformed( ActionEvent e ) {
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          classFile.setText( chooser.getSelectedFile().toString() );
@@ -130,34 +139,31 @@ public class StartupDialog
       File infile = new File( file );
       if ( !infile.exists() || !infile.canRead() ) {
          GuiUtil.error( "Could not find file: " + file );
-      }
-      else
-      {
+      } else {
          saveValues();
-         class runthread
-             extends Thread {
-            public runthread() {}
+         class runthread extends Thread {
+            public runthread() {
+            }
 
             public void run() {
-               ((GeneSetScoreFrame)callingframe).initialize();
+               ( ( GeneSetScoreFrame ) callingframe ).initialize();
             }
-         };
+         }
+         ;
          Thread aFrameRunner = new runthread();
          aFrameRunner.start();
          dispose();
       }
    }
 
-   void this_windowClosed(WindowEvent e) {
+   void this_windowClosed( WindowEvent e ) {
       System.exit( 0 );
    }
 
-
 }
 
-class StartupDialog_annotBrowseButton_actionAdapter
-    implements java.awt.event.
-    ActionListener {
+class StartupDialog_annotBrowseButton_actionAdapter implements
+      java.awt.event.ActionListener {
    StartupDialog adaptee;
 
    StartupDialog_annotBrowseButton_actionAdapter( StartupDialog adaptee ) {
@@ -172,21 +178,24 @@ class StartupDialog_annotBrowseButton_actionAdapter
 class StartupDialog_this_windowAdapter extends java.awt.event.WindowAdapter {
    StartupDialog adaptee;
 
-   StartupDialog_this_windowAdapter(StartupDialog adaptee) {
+   StartupDialog_this_windowAdapter( StartupDialog adaptee ) {
       this.adaptee = adaptee;
    }
-   public void windowClosing(WindowEvent e) {
-      adaptee.this_windowClosed(e);
+
+   public void windowClosing( WindowEvent e ) {
+      adaptee.this_windowClosed( e );
    }
 }
 
-class StartupDialog_classBrowseButton_actionAdapter implements java.awt.event.ActionListener {
+class StartupDialog_classBrowseButton_actionAdapter implements
+      java.awt.event.ActionListener {
    StartupDialog adaptee;
 
-   StartupDialog_classBrowseButton_actionAdapter(StartupDialog adaptee) {
+   StartupDialog_classBrowseButton_actionAdapter( StartupDialog adaptee ) {
       this.adaptee = adaptee;
    }
-   public void actionPerformed(ActionEvent e) {
-      adaptee.classBrowseButton_actionPerformed(e);
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.classBrowseButton_actionPerformed( e );
    }
 }

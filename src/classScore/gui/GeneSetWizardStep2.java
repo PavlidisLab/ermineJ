@@ -47,18 +47,18 @@ import classScore.data.NewGeneSet;
 
 public class GeneSetWizardStep2 extends WizardStep {
 
-   GeneSetWizard wiz;
-   GeneAnnotations geneData;
-   JLabel countLabel;
-   JTable probeTable;
-   JTable newClassTable;
-   AbstractTableModel ncTableModel;
-   NewGeneSet newGeneSet;
-   JTextField searchTextField;
+   private GeneSetWizard wiz;
+   private GeneAnnotations geneData;
+   private JLabel countLabel;
+   private JTable probeTable;
+   private JTable newClassTable;
+   private AbstractTableModel ncTableModel;
+   private NewGeneSet newGeneSet;
+   private JTextField searchTextField;
 
-   final static int COL0WIDTH = 80;
-   final static int COL1WIDTH = 80;
-   final static int COL2WIDTH = 200;
+   private final static int COL0WIDTH = 80;
+   private final static int COL1WIDTH = 80;
+   private final static int COL2WIDTH = 200;
 
    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData,
          NewGeneSet newGeneSet ) {
@@ -302,7 +302,7 @@ class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
 }
 
 // hitting enter in search also activates it.
-/** @todo hitting enter doesn't work */
+/** @todo hitting enter doesn't trigger reset */
 class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
    GeneSetWizardStep2 adaptee;
 
@@ -318,8 +318,7 @@ class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
 }
 
 // respond to typing in the search field.
-// todo 3.0 incremental search trigger would go here.
-
+// todo 3.0 Stub: incremental search trigger would go here.
 class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
    GeneSetWizardStep2 adaptee;

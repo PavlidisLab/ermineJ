@@ -1,9 +1,6 @@
 package classScore.gui;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-
-import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
 import classScore.Settings;
 import classScore.data.GONames;
@@ -81,7 +78,7 @@ public class GeneSetWizard extends Wizard {
       newGeneSet.setId(cid);
       newGeneSet.setDesc(goData.getNameForId(cid));
       if (geneData.classExists(cid))
-         newGeneSet.getProbes().addAll((ArrayList) geneData.getClassToProbes(cid));
+         newGeneSet.getProbes().addAll(geneData.getClassToProbes(cid));
       this.repaint();
       step2 = new GeneSetWizardStep2(this,geneData,newGeneSet);
       this.addStep(1,step2); //hack for starting at step 2
@@ -180,9 +177,9 @@ public class GeneSetWizard extends Wizard {
       step3.nameNewGeneSet();
       String id = newGeneSet.getId();
       if (id.compareTo("") == 0) {
-         GuiUtil.error("The class ID must be specified.");
+         showStatus("The gene set ID must be specified.");
       } else if ( geneData.classExists( id ) && makenew ) {
-         GuiUtil.error( "A class by the ID " + id + " already exists." );
+         showStatus( "A gene set with the ID " + id + " already exists." );
       } else {
          if (makenew || !newGeneSet.modified())
             newGeneSet.addToMaps(goData);

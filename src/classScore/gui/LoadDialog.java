@@ -13,7 +13,6 @@ import javax.swing.JTextField;
 
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
-import baseCode.util.StatusViewer;
 import classScore.Settings;
 
 /**
@@ -37,7 +36,7 @@ public class LoadDialog extends AppDialog {
 
    public LoadDialog( GeneSetScoreFrame callingframe ) {
       super(callingframe,400,200);
-      this.settings = ((GeneSetScoreFrame)callingframe).getSettings();
+      this.settings = callingframe.getSettings();
       chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
       chooser.setDialogTitle("Open Saved Analysis");
       try {
@@ -64,7 +63,9 @@ public class LoadDialog extends AppDialog {
       centerPanel.add( loadPanel, null );
 
       setActionButtonText("Load" );
-      addHelp(" hurdy gurdy");
+      addHelp("<html><b>Load a previous analysis into the system.</b>" +
+            "The file selected must be an analysis file saved from this " +
+            "software.<br></html>");
       addMain( centerPanel );
       this.setTitle( "Load Results from File" );
    }
