@@ -170,6 +170,8 @@ public class GeneSetWizard extends Wizard {
    }
 
    protected void cancelButton_actionPerformed(ActionEvent e) {
+      geneData.resetSelectedProbes();
+      geneData.resetSelectedSets();
       dispose();
    }
 

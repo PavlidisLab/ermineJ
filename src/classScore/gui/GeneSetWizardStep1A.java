@@ -100,7 +100,7 @@ public class GeneSetWizardStep1A extends WizardStep {
    public boolean isReady() {
       int n = oldClassTable.getSelectedRowCount();
       if ( n < 1 ) {
-         showStatus( "You must pick a gene set to be modified." );
+         showError( "You must pick a gene set to be modified." );
          return false;
       }
       int row = oldClassTable.getSelectedRow();

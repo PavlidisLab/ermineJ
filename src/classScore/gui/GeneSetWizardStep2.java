@@ -185,7 +185,7 @@ public class GeneSetWizardStep2 extends WizardStep {
       if ( ( newGene = geneData.getProbeGeneName( newProbe ) ) != null ) {
          addGene( newGene );
       } else {
-         GuiUtil.error( "Probe " + newProbe + " does not exist." );
+         showError( "Probe " + newProbe + " does not exist." );
       }
    }
 
@@ -202,7 +202,7 @@ public class GeneSetWizardStep2 extends WizardStep {
          ncTableModel.fireTableDataChanged();
          updateCountLabel();
       } else {
-         GuiUtil.error( "Gene " + gene + " does not exist." );
+         showError( "Gene " + gene + " does not exist." );
       }
    }
 

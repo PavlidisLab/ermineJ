@@ -57,7 +57,7 @@ public class FindDialog extends JDialog {
    private GONames goData;
 
    public FindDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData ) {
-      setModal( true );
+      setModal( false );
       this.callingframe = callingframe;
       this.geneData = geneData;
       this.goData = goData;
@@ -85,7 +85,7 @@ public class FindDialog extends JDialog {
       centerPanel.setPreferredSize( new Dimension( 200, 50 ) );
       
       searchTextField = new JTextField();
-      searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
+      searchTextField.setPreferredSize( new Dimension( 180, 19 ) );
       
       centerPanel.add(searchTextField, null);
       
@@ -96,7 +96,7 @@ public class FindDialog extends JDialog {
       resetButton.addActionListener( new FindDialog_resetButton_actionAdapter(
             this ) );
 
-      cancelButton.setText( "Close this window" );
+      cancelButton.setText( "Close this window (resets display)" );
       cancelButton
             .addActionListener( new FindDialog_cancelButton_actionAdapter( this ) );
 
@@ -125,6 +125,8 @@ public class FindDialog extends JDialog {
    }
 
    void cancelButton_actionPerformed( ActionEvent e ) {
+      geneData.resetSelectedSets();
+      callingframe.getOPanel().resetTable( );
       dispose();
    }
 
