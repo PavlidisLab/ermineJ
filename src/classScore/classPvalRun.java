@@ -5,6 +5,9 @@ import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
 import java.text.*;
+import javax.swing.table.TableModel;
+import javax.swing.table.AbstractTableModel;
+import java.util.LinkedHashMap;
 
 /**
   Main class to make 'experiment score' pvalues. Includes multiple
@@ -12,141 +15,164 @@ import java.text.*;
   @author Shahmil Merchant; Paul Pavlidis (major changes)
   @version $Id$
  */
-public class class_pvals {
+public class classPvalRun {
   private histogram hist;
   private Map classToProbe;
   private Map goNames;
-  private Map probe_group;
-  private exp_class_scores probe_pval;
-  private GoName_parse goName;
-  private Group_Parse groupName;
+  private Map probeGroups;
+  private expClassScore probePvalMapper;
+  private GONameReader goName;
+  private GeneGroupReader groupName;
   private double user_pvalue;
   private String dest_file;
-  private ClassMap probe_class;
+  private ClassMap probeToClassMap;
   private boolean weight_on = true;
   private boolean dolog = true;
-  private LinkedHashMap results = null;
-  private Vector sortedclasses = null;
-  private Map effective_sizes = null;
-  private Map actual_sizes = null;
+  private Map results = null;
+  private Vector sortedclasses = null; // this holds the results.
+  private Map effectiveSizes = null;
+  private Map actualSizes = null;
   private Map target_ranks;
   private Map record;
   private int inputSize;
   private int numOverThreshold = 0; // number of genes over the threshold
   private int numUnderThreshold = 0; // number of genes below the threshold
   private NumberFormat nf = NumberFormat.getInstance();
+  private boolean useUniform = false; // assume input values come from uniform distribution under null hypothesis.
+  private GeneDataReader geneData = null;
 
   /**
    */
-  public class_pvals(String probe_pvalfile,
-                     String probe_classfile,
-                     String goNamesfile,
-                     String destination_file,
-                     String group_file,
-                     String method,
-                     String groupMethod,
-                     int class_max_size,
-                     int class_min_size,
-                     int number_of_runs,
-                     int quantile,
-                     double pval,
-                     String wt_check,
-                     int pvalcolumn,
-                     String dolog_check,
-                     String mtc_method,
-                     classScoreStatus messenger) throws IllegalArgumentException, IOException {
+  public classPvalRun(String probePvalFile,
+                      String probe_annotfile,
+                      String goNamesfile,
+                      String resultsFile,
+                      // String group_file,
+                      String method,
+                      String groupMethod,
+                      int classMaxSize,
+                      int classMinSize,
+                      int numberOfRuns,
+                      int quantile,
+                      double pval,
+                      String useWeights,
+                      int pvalcolumn,
+                      String dolog_check,
+                      String mtc_method,
+                      classScoreStatus messenger,
+                      boolean loadResults) throws
+      IllegalArgumentException, IOException {
+
+
 
     nf.setMaximumFractionDigits(8);
 
-
     // user flags and constants:
     user_pvalue = - (Math.log(pval) / Math.log(10)); // user defined pval (cutoff) for hypergeometric todo: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
-
-
-    weight_on = (Boolean.valueOf(wt_check)).booleanValue();
-
+    weight_on = (Boolean.valueOf(useWeights)).booleanValue();
     dolog = (Boolean.valueOf(dolog_check)).booleanValue();
-    classToProbe = new LinkedHashMap();
-    effective_sizes = new HashMap();
-    actual_sizes = new HashMap();
-    dest_file = destination_file;
+    effectiveSizes = new HashMap();
+    actualSizes = new HashMap();
+    dest_file = resultsFile;
     target_ranks = new HashMap(); // will hold ranks of items in a class.
     record = new HashMap(); // scratch space to record those probes that have been seen when iterating over a class.
 
     messenger.setStatus("Reading GO descriptions");
-    goName = new GoName_parse(goNamesfile); // parse go name file
+    goName = new GONameReader(goNamesfile); // parse go name file
 
     messenger.setStatus("Reading gene scores");
-    probe_pval = new exp_class_scores(probe_pvalfile, wt_check, method,
-                                      pvalcolumn, dolog, class_max_size,
-                                      class_min_size, number_of_runs, quantile);
+    probePvalMapper = new expClassScore(probePvalFile, useWeights, method,
+                                        pvalcolumn, dolog, classMaxSize,
+                                        classMinSize, numberOfRuns,
+                                        quantile);
 
-    messenger.setStatus("Reading gene duplicate map");
-    groupName = new Group_Parse(group_file, probe_pval.get_map()); // parse group file. Yields map of probe->replicates.
-    probe_group = groupName.get_probe_group_map(); // map of probes to groups
+    messenger.setStatus("Reading gene data file");
+    geneData = new GeneDataReader(probe_annotfile, probePvalMapper.get_map());
+    groupName = new GeneGroupReader(geneData.getGroupProbeList(),
+                                    geneData.getProbeGroupMap()); // parse group file. Yields map of probe->replicates.
+    probeGroups = groupName.get_probe_group_map(); // map of probes to groups
 
-    if (weight_on) {
-      probe_pval.set_input_pvals(groupName.get_group_probe_map(), groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-    }
+    messenger.setStatus("Initializing gene score mapping");
 
-    messenger.setStatus("Reading in GO class membership");
-    probe_class = new ClassMap(probe_classfile, probe_pval.get_map()); // parses affy->classes file. Yields map of go->probes
-    classToProbe = probe_class.get_class_map(); // this is the map of go->probes
+    //  if (weight_on) {
+    probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
+                                  groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
+    //  }
 
-    // Calculate random classes. todo: what a mess. This histogram should be held by the class that originated it.
-    messenger.setStatus("Starting resampling");
-    System.out.println("Starting resampling");
-    hist = probe_pval.generateNullDistribution(messenger);
-    messenger.setStatus("Finished resampling");
+    messenger.setStatus("Initializing gene class mapping");
 
-//    messenger.setStatus(hist.toString());
-    System.err.println(hist.toString());
+    //   messenger.setStatus("Reading in GO class membership");
+    probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
+                                   geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
+    classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
 
-    // Initialize the results data structure.
-    results = new LinkedHashMap();
+    messenger.setStatus("Done with setup");
 
-    // get the class sizes.
-    class_sizes();
-
-    Collection inp_entries;
-    Map input_rank_map;
-    if (weight_on) {
-      inp_entries = probe_pval.get_group_pval_map().entrySet();
-      input_rank_map = Stats.rankOf(probe_pval.get_group_pval_map());
+    if (loadResults) {
+      readResultsFromFile(resultsFile);
+      sortResults();
     }
     else {
-      inp_entries = probe_pval.get_map().entrySet();
-      input_rank_map = Stats.rankOf(probe_pval.get_map());
-    }
 
-    inputSize = input_rank_map.size(); // how many pvalues. This is constant under permutations of the data
-    hgSizes(inp_entries); // get numOverThreshold and numUnderThreshold. Constant under permutations of the data.
+      // Calculate random classes. todo: what a mess. This histogram should be held by the class that originated it.
+      if (!useUniform) {
+        messenger.setStatus("Starting resampling");
+        System.out.println("Starting resampling");
+        hist = probePvalMapper.generateNullDistribution(messenger);
+        messenger.setStatus("Finished resampling");
+      }
 
-    System.err.println("Input size=" + inputSize + " numOverThreshold=" +
-                       numOverThreshold + " numUnderThreshold=" +
-                       numUnderThreshold + " "); //+  + "" + foo + "" + foo + "" + foo + "" + foo );
+//    messenger.setStatus(hist.toString());
+      System.err.println(hist.toString());
 
-    // calculate the actual class scores and correct sorting.
-    class_pval_generator(probe_pval.get_group_pval_map(), probe_pval.get_map(),
+
+      // Initialize the results data structure.
+      results = new LinkedHashMap();
+
+      // get the class sizes.
+      getClassSizes();
+
+      Collection inp_entries;
+      Map input_rank_map;
+      if (weight_on) {
+        inp_entries = probePvalMapper.get_group_pval_map().entrySet();
+        input_rank_map = Stats.rankOf(probePvalMapper.get_group_pval_map());
+      }
+      else {
+        inp_entries = probePvalMapper.get_map().entrySet();
+        input_rank_map = Stats.rankOf(probePvalMapper.get_map());
+      }
+
+      inputSize = input_rank_map.size(); // how many pvalues. This is constant under permutations of the data
+      hgSizes(inp_entries); // get numOverThreshold and numUnderThreshold. Constant under permutations of the data.
+
+      System.err.println("Input size=" + inputSize + " numOverThreshold=" +
+                         numOverThreshold + " numUnderThreshold=" +
+                         numUnderThreshold + " "); //+  + "" + foo + "" + foo + "" + foo + "" + foo );
+
+      // calculate the actual class scores and correct sorting.
+      classPvalGenerator(probePvalMapper.get_group_pval_map(),
+                         probePvalMapper.get_map(),
                          input_rank_map);
-    sortResults();
+      sortResults();
 
-    messenger.setStatus("Multiple test correction");
+      messenger.setStatus("Multiple test correction");
 
-    if (mtc_method.equals("bon")) {
-      correct_pvals(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
-    }
-    else if (mtc_method.equals("bh")) {
-      correct_pvals(0.05);
-    }
-    else if (mtc_method.equals("wy")) {
-      correct_pvals(10000);
-    }
+      if (mtc_method.equals("bon")) {
+        correct_pvals(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
+      }
+      else if (mtc_method.equals("bh")) {
+        correct_pvals(0.05);
+      }
+      else if (mtc_method.equals("wy")) {
+        correct_pvals(10000);
+      }
 
-    messenger.setStatus("Beginning output");
-    // all done:
-    // print the results
-    class_pval_print(true);
+      messenger.setStatus("Beginning output");
+      // all done:
+      // print the results
+      printResults(true);
+    }
     messenger.setStatus("Done!");
   }
 
@@ -155,16 +181,17 @@ public class class_pvals {
      doing permutations, it is much faster.
    */
   public double classPvalue(String class_name, Map group_pval_map,
-                            Map probesToPvals, Map input_rank_map) throws IllegalStateException {
+                            Map probesToPvals, Map input_rank_map) throws
+      IllegalStateException {
 
     double pval = 0.0;
     double rawscore = 0.0;
     ArrayList values = (ArrayList) classToProbe.get(class_name);
     Iterator classit = values.iterator();
 
-    int in_size = (int) ( (Integer) effective_sizes.get(class_name)).intValue(); // effective size of this class.
-    if (in_size < probe_pval.get_class_min_size() ||
-        in_size > probe_pval.get_class_max_size()) {
+    int in_size = (int) ( (Integer) effectiveSizes.get(class_name)).intValue(); // effective size of this class.
+    if (in_size < probePvalMapper.get_class_min_size() ||
+        in_size > probePvalMapper.get_class_max_size()) {
       return -1.0;
     }
 
@@ -183,9 +210,9 @@ public class class_pvals {
       if (probesToPvals.containsKey(probe)) { // if it is in the data set. This is invariant under permutations.
 
         if (weight_on == true) {
-          Double grouppval = (Double) group_pval_map.get(probe_group.get(probe)); // probe -> group
-          if (!record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
-            record.put(probe_group.get(probe), null); // mark it as done.
+          Double grouppval = (Double) group_pval_map.get(probeGroups.get(probe)); // probe -> group
+          if (!record.containsKey(probeGroups.get(probe))) { // if we haven't done this probe already.
+            record.put(probeGroups.get(probe), null); // mark it as done.
             groupPvalArr[v_size] = grouppval.doubleValue();
             v_size++;
           }
@@ -199,14 +226,15 @@ public class class_pvals {
     } // end of while over items in the class.
 
     // get raw score and pvalue.
-    rawscore = probe_pval.calc_rawscore(groupPvalArr, in_size);
+    rawscore = probePvalMapper.calc_rawscore(groupPvalArr, in_size);
     pval = scoreToPval(in_size, rawscore);
 
     if (pval < 0) {
       System.err.println(
           "Warning, a rawscore yielded an invalid pvalue: Classname: " +
           class_name);
-      throw new IllegalStateException("Warning, a rawscore yielded an invalid pvalue: Classname: " +
+      throw new IllegalStateException(
+          "Warning, a rawscore yielded an invalid pvalue: Classname: " +
           class_name);
     }
     return pval;
@@ -223,7 +251,7 @@ public class class_pvals {
    * @param input_rank_map a <code>Map</code> value
    * @return a <code>classresult</code> value
    */
-  public classresult scoreClass(String class_name, Map group_pval_map,
+  public classresult scoreClass(String class_name, Map groupToPvalMap,
                                 Map probesToPvals, Map input_rank_map) {
     //inputs for hypergeometric distribution
     int successes = 0; // number of genes in this class which are above the threshold
@@ -236,15 +264,15 @@ public class class_pvals {
     double area_under_roc = 0.0;
     double roc_pval = 0.0;
 
-    int in_size = (int) ( (Integer) effective_sizes.get(class_name)).intValue(); // effective size of this class.
-    if (in_size < probe_pval.get_class_min_size() ||
-        in_size > probe_pval.get_class_max_size()) {
+    int effSize = (int) ( (Integer) effectiveSizes.get(class_name)).intValue(); // effective size of this class.
+    if (effSize < probePvalMapper.get_class_min_size() ||
+        effSize > probePvalMapper.get_class_max_size()) {
       return null;
     }
 
     ArrayList values = (ArrayList) classToProbe.get(class_name);
     Iterator classit = values.iterator();
-    double[] groupPvalArr = new double[in_size]; // store pvalues for items in the class.
+    double[] groupPvalArr = new double[effSize]; // store pvalues for items in the class.
 
     record.clear();
     target_ranks.clear();
@@ -260,9 +288,9 @@ public class class_pvals {
       if (probesToPvals.containsKey(probe)) { // if it is in the data set. This is invariant under permutations.
 
         if (weight_on == true) {
-          Double grouppval = (Double) group_pval_map.get(probe_group.get(probe)); // probe -> group
-          if (!record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
-            record.put(probe_group.get(probe), null); // mark it as done.
+          Double grouppval = (Double) groupToPvalMap.get(probeGroups.get(probe)); // probe -> group
+          if (!record.containsKey(probeGroups.get(probe))) { // if we haven't done this probe already.
+            record.put(probeGroups.get(probe), null); // mark it as done.
             groupPvalArr[v_size] = grouppval.doubleValue();
 
             //  (hypergeometric) if the user_pval is met by this probe, we count it
@@ -275,7 +303,7 @@ public class class_pvals {
             v_size++;
 
             //for aroc.
-            ranking = input_rank_map.get(probe_group.get(probe)); // rank of this probe group.
+            ranking = input_rank_map.get(probeGroups.get(probe)); // rank of this probe group.
             if (ranking != null) {
               target_ranks.put(ranking, null); // ranks of items in this class.
             }
@@ -306,8 +334,8 @@ public class class_pvals {
     } // end of while over items in the class.
 
     // get raw score and pvalue.
-    rawscore = probe_pval.calc_rawscore(groupPvalArr, in_size);
-    pval = scoreToPval(in_size, rawscore);
+    rawscore = probePvalMapper.calc_rawscore(groupPvalArr, effSize);
+    pval = scoreToPval(effSize, rawscore);
 
     if (pval < 0) {
       System.err.println(
@@ -324,7 +352,7 @@ public class class_pvals {
     // genes. Identify these by seeing if the observed is greater
     // than the expected. Otherwise, set the hypergeometric pvalue
     // to be 1.0 (we can change this behavior if desired)
-    double pos_prob = (double) in_size / (double) inputSize;
+    double pos_prob = (double) effSize / (double) inputSize;
     double expected = (double) numOverThreshold * pos_prob;
     if (successes < expected || pos_prob == 0.0) { // fewer than expected, or we didn't/cant get anything.
       hyper_pval = 1.0 -
@@ -344,14 +372,13 @@ public class class_pvals {
 
     //	System.err.println(class_name + "(" + goName.get_GoName_value_map(class_name) + ") - base prob: " + pos_prob + " successes: " + successes + " failures: " + failures + " Trials: " + numOverThreshold + " Nontrials: " + numUnderThreshold + " H: " + hyper_pval);
 
-
     // todo: add any other methods here.
-
 
     // set up the return object.
     classresult res = new classresult(class_name,
                                       goName.get_GoName_value_map(class_name),
-                                      (int) ( (Integer) actual_sizes.get(class_name)).intValue(), in_size);
+                                      (int) ( (Integer) actualSizes.get(
+        class_name)).intValue(), effSize);
     res.setscore(rawscore);
     res.setpval(pval);
     res.sethypercut(successes);
@@ -361,6 +388,7 @@ public class class_pvals {
     return res;
 
   }
+
   /* scoreClass */
 
   /**
@@ -372,8 +400,8 @@ public class class_pvals {
    * @param probesToPvals a <code>Map</code> value
    * @param input_rank_map a <code>Map</code> value
    */
-  public void class_pval_generator(Map group_pval_map, Map probesToPvals,
-                                   Map input_rank_map) {
+  public void classPvalGenerator(Map group_pval_map, Map probesToPvals,
+                                 Map input_rank_map) {
     Collection entries = classToProbe.entrySet(); // go -> probe map. Entries are the class names.
     Iterator it = entries.iterator(); // the classes.
 
@@ -388,6 +416,7 @@ public class class_pvals {
       }
     }
   }
+
   /* class_pval_generator */
 
   /**
@@ -421,18 +450,21 @@ public class class_pvals {
   /**
      convert a raw score into a pvalue, based on random background distribution
    */
-  public double scoreToPval(int in_size, double rawscore) throws IllegalStateException {
+  public double scoreToPval(int in_size, double rawscore) throws
+      IllegalStateException {
     double pval = hist.get_val(in_size, rawscore);
 
     if (Double.isNaN(pval)) {
       System.err.println("Warning, a pvalue was not a number: raw score = " +
                          rawscore);
-      throw new IllegalStateException("Warning, a pvalue was not a number: raw score = " +
-                         rawscore);
+      throw new IllegalStateException(
+          "Warning, a pvalue was not a number: raw score = " +
+          rawscore);
 
     }
     return pval;
   }
+
   /* scoreToPval */
 
   /**
@@ -445,23 +477,24 @@ public class class_pvals {
     l.addAll(k);
     Collections.sort(l);
     for (Iterator it = l.iterator(); it.hasNext(); ) {
-      sortedclasses.add( ( (classresult) it.next()).get_class_id());
+      sortedclasses.add( ( (classresult) it.next()).getClassId());
     }
   }
+
   /* sortResults */
 
   /**
      Print the results
    */
-  public void class_pval_print() {
-    this.class_pval_print(false);
+  public void printResults() {
+    this.printResults(false);
   }
 
   /**
      Print the results
      @param sort Sort the results so the best class (by score pvalue) is listed first.
    */
-  public void class_pval_print(boolean sort) {
+  public void printResults(boolean sort) {
     System.err.println("Beginning output");
     try {
       BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, false));
@@ -475,7 +508,7 @@ public class class_pvals {
             res.print_headings(out, "\tSame as:\tSimilar to:");
           }
           //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-          res.print(out, format_redundant_and_similar(res.get_class_id()));
+          res.print(out, format_redundant_and_similar(res.getClassId()));
         }
       }
       else {
@@ -485,7 +518,7 @@ public class class_pvals {
             first = false;
             res.print_headings(out, "\tSame as:\tSimilar to:");
           }
-          res.print(out, format_redundant_and_similar(res.get_class_id()));
+          res.print(out, format_redundant_and_similar(res.getClassId()));
           //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
         }
       }
@@ -501,7 +534,7 @@ public class class_pvals {
      Set up the string the way I want it.
    */
   private String format_redundant_and_similar(String classid) {
-    ArrayList redund = probe_class.getRedundancies(classid);
+    ArrayList redund = probeToClassMap.getRedundancies(classid);
     String return_value = "";
 
     if (redund != null) {
@@ -516,7 +549,7 @@ public class class_pvals {
 
     return_value = return_value + "\t";
 
-    ArrayList similar = probe_class.getSimilarities(classid);
+    ArrayList similar = probeToClassMap.getSimilarities(classid);
 
     if (similar != null) {
       Iterator it = similar.iterator();
@@ -536,16 +569,16 @@ public class class_pvals {
   /**
      Calculate class sizes for all classes - both effective and actual size
    */
-  public void class_sizes() {
+  public void getClassSizes() {
     Collection entries = classToProbe.entrySet(); // go -> probe map. Entries are the class names.
     Iterator it = entries.iterator();
-    Map probetopval = probe_pval.get_map(); // probe->pval map. We do not use the pvalues here, just a list of probes.
+    Map probetopval = probePvalMapper.get_map(); // probe->pval map. We do not use the pvalues here, just a list of probes.
     int size;
     int v_size;
 
     while (it.hasNext()) { // for each class.
       Map.Entry e = (Map.Entry) it.next(); // next class.
-      String class_name = (String) e.getKey(); // id of the class (GO:XXXXXX)
+      String className = (String) e.getKey(); // id of the class (GO:XXXXXX)
       ArrayList values = (ArrayList) e.getValue(); // items in the class.
       Iterator I = values.iterator();
       double grouppval;
@@ -563,9 +596,10 @@ public class class_pvals {
 
             if (weight_on) { //routine for weights
               // compute pval for every replicate group
-              if (probe_pval.get_group_pval_map().containsKey(probe_group.get(
-                  probe)) && !record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
-                record.put(probe_group.get(probe), null); // mark it as done for this class.
+              if (probePvalMapper.get_group_pval_map().containsKey(probeGroups.
+                  get(
+                  probe)) && !record.containsKey(probeGroups.get(probe))) { // if we haven't done this probe already.
+                record.put(probeGroups.get(probe), null); // mark it as done for this class.
                 v_size++; // this is used in any case.
               }
             }
@@ -577,12 +611,13 @@ public class class_pvals {
         v_size = size;
 
       }
-      effective_sizes.put(class_name, new Integer(v_size));
-      actual_sizes.put(class_name, new Integer(size));
+      effectiveSizes.put(className, new Integer(v_size));
+      actualSizes.put(className, new Integer(size));
     }
 
     System.err.println("Got class sizes");
   }
+
   /* class sizes */
 
   /**
@@ -617,7 +652,7 @@ public class class_pvals {
     for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
       String nextclass = (String) it.next();
       classresult res = (classresult) results.get(nextclass);
-      double actual_p = res.get_pvalue();
+      double actual_p = res.getPvalue();
       corrected_p = actual_p * numclasses;
       if (corrected_p > 1.0) {
         corrected_p = 1.0;
@@ -642,7 +677,7 @@ public class class_pvals {
     for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
       String nextclass = (String) it.next();
       classresult res = (classresult) results.get(nextclass);
-      double actual_p = res.get_pvalue();
+      double actual_p = res.getPvalue();
 
       double thresh = fdr * n / numclasses;
 
@@ -692,7 +727,7 @@ public class class_pvals {
     for (int i = 0; i < trials; i++) {
       //	    System.err.println("Trial: " + i );
 
-      Map scgroup_pval_map = probe_pval.get_group_pval_map(true); // shuffle the association of pvalues to genes.
+      Map scgroup_pval_map = probePvalMapper.get_group_pval_map(true); // shuffle the association of pvalues to genes.
 
       // shuffle. Stupidity: this is a different permutation
       // than the group one. If we are using weights, it DOES
@@ -701,7 +736,7 @@ public class class_pvals {
       // set). If we are not using weights, it only affects the
       // hypergeometric pvalues. (todo: add correction for those
       // values) So we don't even bother shuffling it.
-      Map scprobepvalmap = probe_pval.get_map();
+      Map scprobepvalmap = probePvalMapper.get_map();
 
       // Just for AROC:
       Map scinput_rank_map;
@@ -731,7 +766,7 @@ public class class_pvals {
         nextclass = (String) it.next();
 
         classresult res = (classresult) results.get(nextclass);
-        actual_p = res.get_pvalue(); // pvalue for this class on real data.
+        actual_p = res.getPvalue(); // pvalue for this class on real data.
 
         m = (Double) permscores.get(nextclass);
         permp = m.doubleValue(); // randomized pvalue for this class.
@@ -770,7 +805,8 @@ public class class_pvals {
 
         if (verbose && j == sortedclasses.size() - 1) { // monitor what happens to the best class.
           System.err.println("Sim " + i + " class# " + j + " " + nextclass +
-                             " size=" + res.get_effsize() + " q=" + nf.format(q) +
+                             " size=" + res.getEffectiveSize() + " q=" +
+                             nf.format(q) +
                              " qprev=" + nf.format(qprev) + " pperm=" +
                              nf.format(permp) + " actp=" + nf.format(actual_p) +
                              " countj=" + counts[j] + " currentp=" +
@@ -810,20 +846,144 @@ public class class_pvals {
     }
   }
 
+  /**
+   *
+   * @return
+   */
+  public TableModel toTableModel() {
+    return new AbstractTableModel() {
+
+      private String[] columnNames = {
+          "Rank", "GO Id", "Name", "Size", "Eff. size", "Score",
+          "Class P value"};
+
+      public String getColumnName(int i) {
+        return columnNames[i];
+      }
+
+      public int getColumnCount() {
+        return 7;
+      }
+
+      public int getRowCount() {
+        return sortedclasses.size();
+      }
+
+      public Object getValueAt(int i, int j) {
+        classresult res = (classresult) results.get( (String) sortedclasses.get(
+            i));
+        switch (j) {
+          case 0:
+            return new Integer(i + 1);
+          case 1:
+            return res.getClassId();
+          case 2:
+            return res.getClassName();
+          case 3:
+            return new Integer(res.getSize());
+          case 4:
+            return new Integer(res.getEffectiveSize());
+          case 5:
+            return new Double(nf.format(res.getScore()));
+          case 6:
+            return new Double(nf.format(res.getPvalue()));
+          default:
+            return "";
+        }
+      }
+    };
+  }
+
+  /**
+   * This should not really be here...
+   * @param i
+   * @todo gene names.
+   * @todo only show genes that were included.
+   */
+  public void showDetails(int index) {
+    final classresult res = (classresult) results.get( (String) sortedclasses.
+        get(
+        index));
+    ClassDetailFrame f = new ClassDetailFrame();
+    String name = res.getClassName();
+    final String id = res.getClassId();
+    System.err.println(name);
+    final ArrayList values = (ArrayList) classToProbe.get(id);
+
+    final Map pvals = new HashMap();
+    for (int i = 0, n = values.size(); i < n; i++) {
+      Double pvalue = new Double(Math.pow(10.0,
+                                          -probePvalMapper.getPval( (
+          String) ( (ArrayList) classToProbe.get(id)).get(i))));
+      pvals.put( (String) ( (ArrayList) classToProbe.get(id)).get(i), pvalue);
+    }
+
+    f.setTitle(name + " (" + values.size() + " items)");
+
+    if (values == null) {
+      throw new RuntimeException("Class data retrieval error for " + name);
+    }
+
+    f.setModel(new AbstractTableModel() {
+
+      private String[] columnNames = {
+          "Probe", "P value", "Name", "Description"};
+
+      public String getColumnName(int i) {
+        return columnNames[i];
+      }
+
+      public int getRowCount() {
+        return values.size();
+      }
+
+      public int getColumnCount() {
+        return 4;
+      }
+
+      public Object getValueAt(int i, int j) {
+        switch (j) {
+          case 0:
+            return (String) ( (ArrayList) classToProbe.get(id)).get(i);
+          case 1:
+            return new Double(nf.format(pvals.get( (String) ( (ArrayList)
+                classToProbe.get(id)).get(i))));
+          case 2:
+            return geneData.getProbeGeneName( (String) ( (ArrayList)
+                classToProbe.get(id)).get(i));
+          case 3:
+            return geneData.getProbeDescription( (String) ( (ArrayList)
+                classToProbe.get(id)).get(i));
+          default:
+            return "";
+        }
+      }
+    });
+    f.show();
+  }
+
+  /* */
+  private void readResultsFromFile(String destination_file) {
+    ResultsFileReader f = new ResultsFileReader(destination_file);
+    this.results = f.getResults();
+  }
+
   public static void main(String[] args) {
     classScoreStatus m = new classScoreStatus(null);
 
     try {
-      class_pvals test = new class_pvals(args[0], args[1], args[2], args[3],
-                                         args[4], args[5], args[6],
-                                         Integer.parseInt(args[7]),
-                                         Integer.parseInt(args[8]),
-                                         Integer.parseInt(args[9]),
-                                         Integer.parseInt(args[10]),
-                                         Double.parseDouble(args[11]), args[12],
-                                         Integer.parseInt(args[13]), args[14],
-                                         args[15], m);
-    } catch (IOException e ){
+      classPvalRun test = new classPvalRun(args[0], args[1], args[2], args[3],
+                                           args[5], args[6],
+                                           Integer.parseInt(args[7]),
+                                           Integer.parseInt(args[8]),
+                                           Integer.parseInt(args[9]),
+                                           Integer.parseInt(args[10]),
+                                           Double.parseDouble(args[11]),
+                                           args[12],
+                                           Integer.parseInt(args[13]), args[14],
+                                           args[15], m, false);
+    }
+    catch (IOException e) {
       e.printStackTrace();
     }
   }

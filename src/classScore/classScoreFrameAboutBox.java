@@ -3,7 +3,6 @@ package classScore;
 import java.awt.event.*;
 import java.awt.*;
 import javax.swing.*;
-//import com.borland.jbcl.layout.*;
 
 /**
  * <p>Title: </p>
