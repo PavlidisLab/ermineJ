@@ -1,13 +1,4 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Stores information relevent to a histogram
-
-                                                                                                                                                            
-*******************************************************************************/
-
 import scores.class_score.*;
 import java.util.*;
 import java.util.Locale.*;
@@ -16,8 +7,13 @@ import java.lang.reflect.*;
 import java.text.DecimalFormat;
 
 
-/*****************************************************************************************/
-/*****************************************************************************************/
+/**
+  Stores information relevent to a histogram.   Created :09/02/02
+
+  @author Shahmil Merchant
+  @version $Id$
+
+*/
 public class histogram {
 
     private int min_class_size = 0;

@@ -1,12 +1,4 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Has mathematical functions 
-                                                                                                                                                            
-*******************************************************************************/
-import scores.class_score.*;
 import java.io.*; 
 import java.util.*;
 import java.math.*;
@@ -14,19 +6,27 @@ import java.lang.*;
 import java.lang.reflect.*;
 import java.security.*;
 
+/**
+   Mathematical functions for statistics and common matrix manipulations.
+   Created 09/02/02
 
-/*****************************************************************************************/
-/*****************************************************************************************/
-public class Stats implements Cloneable, ConstantStuff// mathematical calculations
+   @author Shahmil Merchant, Edward Chen, Paul Pavlidis (major changes)
+   @version $Id$
+
+
+ 
+ */
+public class Stats implements Cloneable, ConstantStuff
 
 {
     
     private Random generator = new Random(System.currentTimeMillis());
-    public Stats() {}
+    public Stats() {
+    }
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
-    public Object clone() {
+    /**
+     */
+    public Object clone () {
 
 	Object o =null;
 	try {
@@ -37,9 +37,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 
 
 
-    /*****************************************************************************************/
-    /* calculate the sum of the elements of an array */
-    /*****************************************************************************************/
+    /**
+       calculate the sum of the elements of an array
+    */
     public static double sum(double[] x)
     {
 	int length=Array.getLength(x);
@@ -51,9 +51,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	return total;
     }
 
-    /*****************************************************************************************/
-    /* calculate the mean of an array's elements*/ 
-    /*****************************************************************************************/
+    /**
+       Calculate the mean of an array's elements
+    */
     public static double mean(double[] x)
     {
 	int length=Array.getLength(x);
@@ -69,7 +69,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	}	
     }
     
-    /* special mean calculation where we use the effective size */
+    /**
+       special mean calculation where we use the effective size
+    */
     public static double mean(double[] x, int eff_size) {
 	int length=Array.getLength(x);
 	double sum=0.0;
@@ -85,9 +87,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
 
 
-    /*****************************************************************************************/
-    /* calculate the sum of squared deviation from the mean of an array */
-    /*****************************************************************************************/
+    /**
+       calculate the sum of squared deviation from the mean of an array
+    */
     public static double ssq (double[] x,double mean)
     {
 	int length=Array.getLength(x);
@@ -102,9 +104,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
     
 
-    /*****************************************************************************************/
-    /* calculate the standard deviation of an array */
-    /*****************************************************************************************/
+    /**
+       calculate the standard deviation of an array
+    */
     public static double stdev (double[] m,double mean, double ssqs) {
 	int length=Array.getLength(m);
 	if (length < 2) {
@@ -114,9 +116,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
     
   
-    /*****************************************************************************************/  
-    /* a faster algorithm for calculating the standard deviation */
-    /*****************************************************************************************/
+    /**
+       a faster algorithm for calculating the standard deviation 
+    */
     public static double ssq_fast (double[] x) {
 	int length=Array.getLength(x);
 	double sumx=0.0;
@@ -130,9 +132,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
     
 
-    /*****************************************************************************************/ 
-    /* calculate the pearson correlation of two arrays */
-    /*****************************************************************************************/
+    /**
+       Calculate the pearson correlation of two arrays
+    */
     public static double pearson_correlation (double[] x, double[] y)
 	
     {
@@ -167,9 +169,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     
     
 
-    /*****************************************************************************************/
-    /* choose n random integers from 0 to max without repeating */
-    /*****************************************************************************************/
+    /**
+       choose n random integers from 0 to max without repeating 
+    */
     public void chooserandom(int[] randomnums, boolean[] recLog, int max, int n) {
 	int numgot;
 	int i;
@@ -242,9 +244,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	}
     } 
 
-    /*****************************************************************************************/
-    /* same as chooserandom, but with replacement */
-    /*****************************************************************************************/
+    /**
+       Same as chooserandom, but with replacement -- that is, repeats are allowed.
+    */
     public void chooserandom_wrep(int[] randomnums, int max, int n) {
 	int numgot;
 	int newnum, i;
@@ -260,9 +262,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     } /* */
     
 
-    /*****************************************************************************************/
-    /* calculate the means of a matrix's rows. */
-    /*****************************************************************************************/
+    /**
+       Calculate the means of a matrix's rows.
+    */
     public void matrix_row_means (Matrix M, double[] means) {
 	int i;
 	for (i=0; i<M.get_num_rows(); i++) {
@@ -274,7 +276,7 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     /*****************************************************************************************/
     /* calculate the sums of a matrix's rows. */
     /*****************************************************************************************/
-    public void matrix_row_sums (Matrix M,double[] sums) {
+    public void matrix_row_sums (Matrix M, double[] sums) {
 	int i;
 	for (i=0; i<M.get_num_rows(); i++) {
 	    sums[i] = sum(M.get_ith_row(i));
@@ -313,9 +315,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     } /* matrix_row_ssqs */
     
     
-    /*****************************************************************************************/   
-    /* faster algorithm for calculating the sum of squares of each row of a matrix */
-    /*****************************************************************************************/
+    /**
+       Faster algorithm for calculating the sum of squares of each row of a matrix
+    */
     public void matrix_row_ssqs_fast (Matrix M,double[] ssqs) {
 	int i;
 	for (i = 0; i<M.get_num_rows(); i++) {
@@ -324,8 +326,11 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     } /* matrix_row_ssqs */
 
     
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+       Calculate a correlation matrix for a matrix.
+       @param M input matrix
+       @param C output matrix
+     */
     public void correl_matrix (Matrix M,Matrix C)
     {
 	//int i=0, j=0, k=0;
@@ -377,6 +382,7 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     
     
     /**
+
      */
     public static double calculate_quantile (int index, double[] random_class, int size)
 	
@@ -389,7 +395,7 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 		    ans = random_class[i];
 	    //System.out.println("indx0");
 	    return ans;
-	}else{
+	} else {
 	    double[] temp = new double[size];
 	    
 	    for(int i=0; i<size; i++){
@@ -469,31 +475,22 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     
     /**
        Calculate pval of hypergeometric distribution
+       @param N1 Number of positives in the data
+       @param n1 Number of 'successes'
+       @param N2 Number of negatives in the data
+       @param n2 Number of 'failures'
     */
-    public static double hyperPval (int N1, int n1, int N2, int n2) // todo: make this use binomial approx when needed.
+    public static double hyperPval (int N1, int n1, int N2, int n2)
     {
-	return (n_choose_n(N1,n1)/n_choose_n(N1+N2,n1+n2))*n_choose_n(N2,n2);
+	//	return (n_choose_n(N1,n1)/n_choose_n(N1+N2,n1+n2))*n_choose_n(N2,n2);
+	return binomial_coeff(N1,n1)*binomial_coeff(N2,n2)/binomial_coeff(N1+N2,n1+n2);
     }
     
 
-    /** 
-	Calculate 'n choose k' todo: redo this so it doesn't overflow.
-    */
-    public static double n_choose_n (int N, int n)
-    {
-	double total = 1;
-	for(int i=0; i < n; i++){
-	    total *= ((N-i)/(double)(i+1));
-	}
-	return total;
-    }
-
-
     /**
      * Calculates the ranking of each gene in the entire data set.
-     * Todo: fix this!!!!
      * @param A map with keys strings, values doubles.
-     * @return A LinkedHashMap keys=old keys, values= integer rank of the gene.
+     * @return A LinkedHashMap keys=old keys, values=integer rank of the gene.
      */
     public static LinkedHashMap rankOf(Map m){
 	int counter = 0;
@@ -507,7 +504,7 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	while(itr.hasNext()) {
 	    Map.Entry tuple = (Map.Entry)itr.next();
 	    String key = (String)tuple.getKey();
-	    double val = (double)(((Double)tuple.getValue()).doubleValue());   //  Double.parseDouble((tuple.getValue()).toString());
+	    double val = (double)(((Double)tuple.getValue()).doubleValue());
 	    pvalArray[counter] = new geneNpval(key, val);
 	    counter++;
 	}
@@ -524,7 +521,7 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 
     
     /**
-       Calculate area under ROC                                           tt6
+       Calculate area under ROC
     */
     public static double arocRate(int totalSize, Map ranks)
     {
@@ -549,25 +546,49 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
   
     /**
+
        For an AROC value, calculates a p value based on approximation
+       for calculating the stanadard deviation.
+
        @param numpos How many positives are in the data.
-       @praam aroc The AROC
+       @param aroc The AROC
+       @return The p value.
      */
     public static double rocpval(int numpos, double aroc)
     {
-	double result = 0.0;
 	double logstdev = 0.0;
 	double stdev = Math.exp(-0.5 * (Math.log(numpos) + 1));
 	double z = (aroc - 0.5)/stdev;
 	
+	/* We are only interested in the upper tails. */
+	if (z < 0.0) {
+	    z = 0.0;
+	}
+	
 	//	System.err.println("Size: " + numpos + " Stdev: " + stdev + " aroc: " + aroc + " z: " + z);
 
-	result = 1.0 - 0.5*erfc(-z/Math.sqrt(2.0));
-	
-	return result;
+	return normdist(z);
     }
     
-    static private double erfc(double a)
+    /** 
+	The tail of the normal distribution.
+	@param z
+	@return Area under one tail of the normal distribution.
+    */
+    public static double normdist (double z) {
+	if (z < 0.0) 
+	    z = -z;
+
+	if (z == 0.0)
+	    return 0.5;
+	
+	return  1.0 - 0.5*erfc(-z/Math.sqrt(2.0));
+    }
+
+    /**
+       Cumulative error function.
+     */
+    public static double erfc(double a)
 	throws ArithmeticException { 
 	double x,y,z,p,q;
 	
@@ -647,7 +668,10 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
     
     
-    static public double erf(double x)
+    /**
+       Error function
+    */
+    public static double erf(double x)
                        throws ArithmeticException { 
 	double y, z;
 	double T[] = {
@@ -693,11 +717,10 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
     
 
-    /*****************************************************************************************/
-    // return mean of top 2 elements in array, for histogram range setting            tt12
-    /*****************************************************************************************/  
-    
-    static double meanOfTop2(double[] inArray){
+    /**
+       return mean of top 2 elements in array, for histogram range setting            tt12
+    */
+    public static double meanOfTop2(double[] inArray){
 	double max1 = 0;
 	double max2 = 0;
 	int pin = 0;
@@ -721,10 +744,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
   
   
-    /******************************************************************************************/
-    //  get file path
-    /******************************************************************************************/
-    
+    /**
+       get file path todo: why is this int the stats object?
+    */
     public static String getCanonical(String in) {
 	if (in == null || in.length() == 0)
 	    return in;
@@ -746,9 +768,168 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	return generator.nextGaussian();
     }
     
-    public static void main (String[] args) {
+ 
+    /** 
+	@param xx Value we want the ln(gamma(x)) function evaluted for.
+	@return ln(gamma(xx))
 	
+     */
+    public static  double gammaln(double xx) {
+	double x, y, tmp, ser;
+	double[] cof = {76.18009172947146, -86.50532032941677, 24.0140982408391, -1.231739572450155, 0.1208650973866179E-2, -0.5395239384953E-5};
+	int j;
+	y=x=xx;
+	tmp = x + 5.5;
+	tmp -= (x + 0.5)*Math.log(tmp);
+	ser = 1.000000000190015;
+	for (j=0; j<=5; j++)
+	    ser += cof[j]/++y;
+	return -tmp+Math.log(2.5066282746310005*ser/x);
+    }
 
+  
+
+    /**
+     * Used by betai: Evaluates continued fraction for incomplete beta
+     * function by modified Lentz's method.
+     *
+     * From Numerical Recipes in C.
+     */
+    public static  double betacf  (double a, double b, double x)
+    {
+	int MAXIT = 200;
+	double EPS = 3.0e-7;
+	double FPMIN = 1.0e-30;
+	
+	int m, m2;
+	double aa, c, d, del, h, qab, qam, qap;
+	
+	// These q's will be used in factors that occur in the coefficients.
+	qab = a + b;
+	qap = a + 1.0;
+	qam = a - 1.0;
+	
+	// First step of Lentz's method.
+	c = 1.0;
+	d = 1.0 - (qab * (x / qap));
+	
+	if (Math.abs(d) < FPMIN) d = FPMIN;
+	d = 1.0 / d;
+	h = d;
+	
+	for (m = 1; m <= MAXIT; m++) {
+	    m2 = 2*m;
+	    aa= m * (b - m) * x / ((qam + m2) * (a + m2));
+	    
+	    // One step (the even one) of the recurrence.
+	    d = 1.0 + aa * d;
+	    if (Math.abs(d) < FPMIN) d = FPMIN;
+	    c = 1.0 + aa / c;
+	    if (Math.abs(c) < FPMIN) c = FPMIN;
+	    d = 1.0 / d;
+	    h *= d * c;
+	    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+	    
+	    // Next step of the recurrence (the odd one).
+	    d = 1.0 + aa * d;
+	    if (Math.abs(d) < FPMIN) d = FPMIN;
+	    c = 1.0 + aa / c;
+	    if (Math.abs(c) < FPMIN) c = FPMIN;
+	    d = 1.0 / d;
+	    del = d * c;
+	    h *= del;
+	    
+	    // Are we done?
+	    if (Math.abs(del - 1.0) < EPS) break;
+	}
+	if (m > MAXIT)
+	    System.err.println("a (" + a + ") or b (" + b + ") too big, or MAXIT (" + MAXIT + ") too small in betacf");
+
+	return(h);
+    }
+    
+  
+    /**
+       Returns the incomplete beta function I_X(a,b).
+       
+       From Numerical Recipes in C.
+    */
+    public static  double betai	(double a, double b, double x)
+    {
+	double bt;
+	
+	if (x < 0.0 || x > 1.0) {
+	    System.err.println("Bad x (" + x + ") in routine betai.");
+	    System.exit(1);
+	}
+	
+	if (x == 0.0 || x == 1.0) {
+	    bt = 0.0;
+	} else {
+	    bt = Math.exp(gammaln(a + b) 
+		     - gammaln(a)
+		     - gammaln(b) 
+		     + (a * Math.log(x))
+		     + (b * Math.log(1.0 - x)));
+	}
+	
+	if (x < (a + 1.0)/(a + b + 2.0)) {
+	    return(bt * betacf(a, b, x) / a);
+	} // else
+	return(1.0 - (bt * betacf(b, a, 1.0 - x) / b));
+    }
+    
+    
+    /**
+       ln(n!)
+    */
+    private static  double lnfact
+	(int n) 
+    {
+	if (n<0) {
+	    System.err.println("Attempt to measure lnfact of a negative value.");
+	    System.exit(1);
+	}
+	if (n<=1)
+	    return 0.0;
+	else
+	    return gammaln(n+1.0);
+    }
+    
+    
+    /**
+       Binomial coefficient
+    */
+    public static double binomial_coeff	(int n, int k) 
+    {
+	return Math.floor(0.5+Math.exp(lnfact(n)-lnfact(k)-lnfact(n-k)));
+    }
+
+
+    /**
+
+       main tests some functions.
+
+     */
+    public static void main (String[] args) {
+	int a,b,c,d;
+	
+	a = 8;
+	b = 3;
+	c = 6;
+	d = 2;
+	double testhyper = hyperPval (a,b,c,d);
+	System.err.println(testhyper);
+
+	double testerfc = erfc(1.0);
+	double testerf = erf(1.0);
+	System.err.println(testerfc);
+	System.err.println(testerf);
+	System.err.println("one-tailed normal for " + 1.0 + ": " + normdist(1.0));
+	System.err.println("one-tailed normal for " + 2.0 + ": " + normdist(2.0));
+	System.err.println("one-tailed normal for " + 3.0 + ": " + normdist(3.0));
+	System.err.println("one-tailed normal for " + 4.0 + ": " + normdist(4.0));
+	System.err.println("one-tailed normal for " + 5.0 + ": " + normdist(5.0));
     }
     
 } // end of class

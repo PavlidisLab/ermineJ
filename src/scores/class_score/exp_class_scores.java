@@ -1,13 +1,4 @@
 package scores.class_score;
-/******************************************************************************
-  @author Shahmil Merchant, Paul Pavlidis
-  Created :09/02/02
-  Revision History: $Id$
-
-  Description: Calculates a background distribution for class sscores
-  derived from randomly selected individual gene scores...and does other things. 
-                                                                                                                                                            
-*******************************************************************************/
 import scores.class_score.*;
 import java.util.*;
 import java.lang.*;
@@ -15,17 +6,20 @@ import java.lang.reflect.*;
 
 
 /** 
- *  input format will be
- *  pval_file,method,class_max_size,class_min_size,number_of_runs,quantile,range
- */
+    Calculates a background distribution for class sscores derived
+    from randomly selected individual gene scores...and does other
+    things.   Created 09/02/02.
+    
+    @author Shahmil Merchant, Paul Pavlidis
+    @version $Id$
+    
+ 
+  */
 public class exp_class_scores {
-
     private double[] group_pval_arr = null; // pvalues for groups.
     private double[] pvals = null; // pvalues for probes.
     private Map group_pval_map; // groups -> pvalues
     private Map probe_pval; // probes -> pval
-    //    private String method = null;
-    private int method;
     private boolean weight_on;
     private int class_max_size = 100;
     private int number_of_runs = 10000;
@@ -36,6 +30,7 @@ public class exp_class_scores {
     private int class_min_size = 2;
     private histogram hist = null;
 
+    private int method;
     private static final int MEAN_METHOD = 0;
     private static final int QUANTILE_METHOD = 1;
     private static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
@@ -84,8 +79,6 @@ public class exp_class_scores {
 	pvals = parser.get_pval(); // array of pvalues.
 	probe_pval = parser.get_map(); // reference to the probe -> pval map.
 	group_pval_map = new HashMap(); // this gets initialized by set_input_pvals
-
-	hist = new histogram( number_of_class, class_min_size, number_of_runs, hist_max );
     }
 
 
@@ -298,6 +291,7 @@ public class exp_class_scores {
 	group_pval_arr = group_pval;
 
 	this.set_range(); // figure out the max pvalue possible.
+	this.hist = new histogram( number_of_class, class_min_size, number_of_runs, hist_max );
     }
 
 

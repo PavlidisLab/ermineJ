@@ -1,23 +1,22 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant, Paul Pavlidis (major changes)
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Parses the file of the form
-    probe_id   Classes1|Classes2|Classes3|.....
-    Stores it in the HashTable called probeToClassMap
-    Stores the reverse also int classToProbeMap in the form 
-    Classes1   probe1,probe2....
-                                                                                                                                                            
-*******************************************************************************/
 import scores.class_score.*;
 import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
-import java.nio.charset.*;
-     
 
 /**
+   Parses the file of the form     
+
+   <pre>probe_id   Classes1|Classes2|Classes3|.....</pre>
+
+   Stores it in the HashTable called probeToClassMap
+   Stores the reverse also int classToProbeMap in the form 
+
+   <pre>Classes1   probe1,probe2....</pre>
+
+   @author Shahmil Merchant, Paul Pavlidis (major changes)
+   @version $Id$
+
  */
 public class ClassMap { 
 
@@ -104,8 +103,7 @@ public class ClassMap {
     /**
        Identify classes which are identical to others. This isn't
        superfast, because it doesn't know which classes are actually
-       relevant in the data. So some very large classes will be looked
-       at here.
+       relevant in the data.
 
     */
     private void collapseClasses() {
@@ -117,6 +115,7 @@ public class ClassMap {
 	Iterator it = entries.iterator();
 	String signature = "";
 	String classId = "";
+	HashMap seenit = new HashMap();
 
 	System.err.println("There are " + entries.size() + " classes represented on the chip (of any size). Redundant classes are being removed...");
 
@@ -141,8 +140,13 @@ public class ClassMap {
 	    Collections.sort(classMembers);
 	    signature = "";
 	    Iterator classit = classMembers.iterator();
+	    seenit.clear();
 	    while (classit.hasNext()) {
-		signature = signature + "__" + (String)classit.next();
+		String probeid = (String)classit.next();
+		if ( ! seenit.containsKey(probeid) ) {
+		    signature = signature + "__" + probeid;
+		    seenit.put(probeid, new Boolean(true));
+		}
 	    }
 	    sigs.put(classId, signature);
 	}
@@ -176,7 +180,7 @@ public class ClassMap {
     /**
      */
     public ArrayList getRedundancies(String classId) {
-	if ( classesToRedundantMap.containsKey(classId) ) {
+	if ( classesToRedundantMap != null && classesToRedundantMap.containsKey(classId) ) {
 	    return (ArrayList)classesToRedundantMap.get(classId);
 	} else {
 	    return null;
@@ -186,7 +190,7 @@ public class ClassMap {
     /**
      */
     public String  getRedundanciesString(String classId) {
-	if ( classesToRedundantMap.containsKey(classId) ) {
+	if ( classesToRedundantMap != null && classesToRedundantMap.containsKey(classId) ) {
 	    ArrayList redundant =  (ArrayList)classesToRedundantMap.get(classId);
 	    Iterator it = redundant.iterator();
 	    String returnValue = "";
@@ -210,8 +214,13 @@ public class ClassMap {
     /**
      */
     public Map get_class_map() {
-
 	return classToProbeMap;
+    }
+
+    /**
+     */
+    public Map get_probe_map() {
+	return probeToClassMap;
     }
      
 

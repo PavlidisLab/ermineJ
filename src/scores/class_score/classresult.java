@@ -1,17 +1,17 @@
 package scores.class_score;
-/******************************************************************************
-  Author : Paul Pavlidis
-  Created :02/2003
-  Revision History: $Id$
-
-  Description: data structure to store class scoring information about
-  a class. (experiment scores only)
-                                                                                                                                                            
-*******************************************************************************/
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
+/**
+
+  Data structure to store class scoring information about
+  a class. (experiment scores only)
+
+  @author Paul Pavlidis
+  @version $Id$
+                                                                                                                                                            
+*/
 public class classresult implements Comparable {
     private String class_id = null;
     private String class_name = null;
@@ -38,7 +38,15 @@ public class classresult implements Comparable {
 	this.setsizes(size, effsize);
     }
     
-    public classresult ( String id, String class_name, int size, int effective_size, double score, double pvalue,  double hyperpval, double aroc, double rocpval) {
+    public classresult ( String id, 
+			 String class_name, 
+			 int size, 
+			 int effective_size, 
+			 double score, 
+			 double pvalue,  
+			 double hyperpval, 
+			 double aroc, 
+			 double rocpval) {
 	this.class_id = id;
 	this.class_name = class_name;
 	this.pvalue = pvalue;
@@ -48,9 +56,10 @@ public class classresult implements Comparable {
 	this.aroc = aroc;
 	this.size = size;
 	this.effective_size = effective_size;
-	nf = new DecimalFormat("0.####E00");
 
-	//	nf.setMaximumFractionDigits(2);
+	nf = new DecimalFormat();
+	nf.setMaximumFractionDigits(8);
+	nf.setMinimumFractionDigits(3);
     }
 
     public void print (BufferedWriter out) {
@@ -68,7 +77,12 @@ public class classresult implements Comparable {
 	    } else {
 		cleanname = "";
 	    }
-	    out.write(cleanname +"_" + class_id + "" + "\t" + size + "\t" + nf.format(score) + "\t" + nf.format(pvalue) + "\t" + effective_size + "\t" + nf.format(hyperpval) + "\t" + nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" + nf.format(pvalue_corr) + extracolumns + "\n");
+	    out.write(cleanname +"_" + 
+		      class_id + "" + "\t" + size + "\t" + 
+		      nf.format(score) + "\t" + nf.format(pvalue) + "\t" + 
+		      effective_size + "\t" + nf.format(hyperpval) + "\t" + 
+		      nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" + 
+		      nf.format(pvalue_corr) + extracolumns + "\n");
 	} catch (IOException e) {
 	    System.err.println("There was an IO error" + e);
 	}
@@ -82,7 +96,10 @@ public class classresult implements Comparable {
 
     public void print_headings (BufferedWriter out, String extracolumns) {
 	try {
-	    out.write("Class" + "\tsize" + "\tscore" + "\tscore pval" + "\teffective_size" + "\thyper pval" + "\tAROC" + "\tAROCpval" + "\tCorrected_pvalue" + extracolumns + "\n");
+	    out.write("Class" + "\tsize" + "\tscore" + 
+		      "\tscore pval" + "\teffective_size" + 
+		      "\thyper pval" + "\tAROC" + "\tAROCpval" + 
+		      "\tCorrected_pvalue" + extracolumns + "\n");
 	} catch (IOException e) {
 	    System.err.println("There was an IO error" + e);
 	}

@@ -1,27 +1,16 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Create background distribution of class correlation where the class correlation is the average pairwise correlation between the vectors in the class
-   
-*******************************************************************************/
-
-
-
-
-
-
-import scores.class_score.*;
-import java.util.*;
 import java.lang.*;
 import java.lang.reflect.*;
+import java.util.*;
 
-
-/*****************************************************************************************/
-// input format will be data_file,class_max_size,class_min_size,number_of_runs,range
+/**
+   Create background distribution of class correlation where the class correlation is the average pairwise correlation between the vectors in the class
+  @author Shahmil Merchant
+  @version $Id$
+   
+*/
 public class corr_class_scores {
-/*****************************************************************************************/
+
     private Matrix data =null;
     private int class_max_size = 100;
     private int number_of_runs = 10000;
@@ -29,8 +18,9 @@ public class corr_class_scores {
     private int class_min_size =2;
     
    /*****************************************************************************************/ 
+    /*****************************************************************************************/
     public corr_class_scores(String filename_data)
-/*****************************************************************************************/
+
     {
 	data = new Matrix(filename_data);
 	
@@ -74,105 +64,103 @@ public class corr_class_scores {
 
 
 
-/*****************************************************************************************/
-public double classcorrel(int[] randomnums, double[][] correls, int classsize) {/*****************************************************************************************/
-    //calculate average correlation
-  double avecorrel;
-  int i,j, nummeas;
-  avecorrel = 0;
-  nummeas = 0;
-  for (i=0; i < classsize; i++) {
-    for (j=i+1; j < classsize; j++) {
-      avecorrel +=  Math.abs(correls[ randomnums[i] ][ randomnums[j] ]);
-      nummeas++;
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    public double classcorrel(int[] randomnums, double[][] correls, int classsize) {
+	//calculate average correlation
+	double avecorrel;
+	int i,j, nummeas;
+	avecorrel = 0;
+	nummeas = 0;
+	for (i=0; i < classsize; i++) {
+	    for (j=i+1; j < classsize; j++) {
+		avecorrel +=  Math.abs(correls[ randomnums[i] ][ randomnums[j] ]);
+		nummeas++;
+	    }
+	}
+	return avecorrel / (double)nummeas ;
     }
-  }
-  return avecorrel / (double)nummeas ;
-}
-
-
-/*****************************************************************************************/
+    
+    
+    /*****************************************************************************************/
+    /*****************************************************************************************/
     public Map get_data_map()
-/*****************************************************************************************/
+	
     {
 	return data.get_row_Hash();
     }
-
-
-/*****************************************************************************************/
- public Vector get_data_chip_map(String chip)
-/*****************************************************************************************/
+    
+    
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    public Vector get_data_chip_map(String chip)
+	
     {
 	return data.retrieveONEfrom_row_map(chip);
     }
-
-/*****************************************************************************************/
-	public void set_class_max_size(int value)
-/*****************************************************************************************/
-	    {
-		class_max_size = value;
-	    }
+    
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    public void set_class_max_size(int value)
 	
-
-
-/*****************************************************************************************/
-	public void set_class_min_size(int value)
-/*****************************************************************************************/
-	    {
-		class_min_size = value;
-	    }
+    {
+	class_max_size = value;
+    }
+    
+    
+    
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    public void set_class_min_size(int value)
 	
+    {
+	class_min_size = value;
+    }
+    
+    
+    
+    /**
+     */
+    public void set_number_of_runs(int value)
+    {
+	number_of_runs = value;
+    }
+    
+    
+    /**
+     */
+    public int get_class_max_size()
+    {
+	return class_max_size;
+    }
+    
+    
+    /**
+     */
+    public void set_range(double range)
+    {
+	hist_range =range;
+    }
+    
+
+    /**
+     */
+    public double get_range()
+    {
+	return hist_range;
+    }
+    
+    
+    
+    /**
+     */
+    public int get_class_min_size()
+    {
+	return class_min_size;
+    }
 
 
-/*****************************************************************************************/
-	public void set_number_of_runs(int value)
-/*****************************************************************************************/
-	    {
-		number_of_runs = value;
-	    }
-
-
-/*****************************************************************************************/
-    	public int get_class_max_size()
-/*****************************************************************************************/
-	    {
-		return class_max_size;
-	    }
-
-
-/*****************************************************************************************/
-	public void set_range(double range)
-/*****************************************************************************************/
-	    {
-		hist_range =range;
-	    }
-
-
-/*****************************************************************************************/
-	public double get_range()
-/*****************************************************************************************/
-	    {
-		return hist_range;
-	    }
-
-
-
-/*****************************************************************************************/
-    	public int get_class_min_size()
-/*****************************************************************************************/
-	    {
-		return class_min_size;
-	    }
-
-	
-
-
-
-
-
-
-
- public static void main (String[] args) {
+    public static void main (String[] args) {
 	histogram t = new histogram(); 
 	Matrix M = null;
 	corr_class_scores test = new corr_class_scores(args[0]);

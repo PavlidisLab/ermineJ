@@ -1,14 +1,4 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Front end GUI for class scores
-                                                                                                                                                            
-*******************************************************************************/
-
-
-import scores.class_score.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.JMenu;
@@ -24,11 +14,16 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.awt.Toolkit;
-//import java.sql.Time;
 
 
-/*****************************************************************************************/
-/*****************************************************************************************/
+
+/**
+  Description:Front end GUI for class scores.   Created :09/02/02
+
+  @author Shahmil Merchant
+  @version $Id$
+  
+*/
 public class Class_Frame extends JPanel {
 
     //for pvals

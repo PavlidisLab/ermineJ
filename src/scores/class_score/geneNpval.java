@@ -1,9 +1,11 @@
 package scores.class_score;
-
-import scores.class_score.*;
 import java.util.*;
 
-
+/** 
+    Simple data structure used by Stats.rankOf().
+    @author Edward Chen
+    $Id$
+ */
 public class geneNpval implements Comparable{
     private String gene_id;
     private double pval;

@@ -33,7 +33,7 @@ APP_PACKAGE_PATH=scores
 WINDOWTITLE = 'Java 2 Platform v1.4 API Specification for Class Scores'
 DOCTITLE = 'Class Scores<sup><font size="-2">TM</font></sup> v1.4 API Specification'
 HEADER = '<b>CLASS_SCORES</b><br><font size="-1">Columbia</font>'
-BOTTOM = '<font size="-1"><a href="mailto:pp175@columbia.edu">Submit a bug or feature request</a><br><br>Class Score is the propriety of Columbia Genome Center<br>Copyright 2002 Columbia Genome Center,<br>NY, U.S.A.All Rights Reserved.</font>'
+BOTTOM = '<font size="-1"><a href="mailto:pp175@columbia.edu">Submit a bug or feature request</a><br><br>Class Score is Copyright 2002 (C) Columbia Genome Center,<br>NY, U.S.A.All Rights Reserved.</font>'
 
 #all: clean class_score 
 all: class_score commandline
@@ -90,7 +90,7 @@ runner: ${CLASS_FILES}
 	${JAVA} ${RUN_OPTIONS} -classpath ${CLASSPATH} scores.class_score.Class_Frame
 
 doc:
-	javadoc -d ${DOCDIR} -windowtitle ${WINDOWTITLE} -doctitle ${DOCTITLE} -header ${HEADER} -bottom ${BOTTOM} -classpath ${CLASSPATH} -sourcepath ${SOURCEPATH} ${PACKAGES}
+	javadoc -version -author -use -d ${DOCDIR} -windowtitle ${WINDOWTITLE} -doctitle ${DOCTITLE} -header ${HEADER} -bottom ${BOTTOM} -classpath ${CLASSPATH} -sourcepath ${SOURCEPATH} ${PACKAGES}
 
 # force this to relink.
 commandline: 

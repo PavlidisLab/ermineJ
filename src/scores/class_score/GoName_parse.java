@@ -1,14 +1,4 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Parses the file of the form
-  GoID Biological Name. This is generic in that it doesn't have to be a GO, could be any class scheme.
-
- The values are stored in a HashTable
-                                                                                                                                                            
-*******************************************************************************/
 
 
 
@@ -20,6 +10,12 @@ import java.util.regex.*;
 import java.lang.reflect.*;
      
 /**
+  Description:Parses the file of the form GoID Biological Name. This
+  is generic in that it doesn't have to be a GO, could be any class
+  scheme. The values are stored in a HashTable.  Created :09/02/02
+
+  @author Shahmil Merchant, Paul Pavlidis
+  @version $Id$
  */
  public class GoName_parse { 
 

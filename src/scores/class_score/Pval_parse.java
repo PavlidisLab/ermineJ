@@ -1,16 +1,4 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant, Paul Pavlidis
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Parses the file of the form
-  probe_id pval
-
- The values are stored in a HashTable probe_pval_map. This is used to
- see what probes are int the data set, as well as the score for each
- probe.
-
-*******************************************************************************/
 import scores.class_score.*;
 import java.io.*;
 import java.util.regex.*;
@@ -20,6 +8,17 @@ import java.lang.reflect.*;
      
 
 /**
+  Description:Parses the file of the form
+  <pre>probe_id pval</pre>
+
+  <p>The values are stored in a HashTable probe_pval_map. This is used to
+  see what probes are int the data set, as well as the score for each
+  probe.   Created :09/02/02</p>
+  
+  @author Shahmil Merchant, Paul Pavlidis
+  @version $Id$
+
+
  */
  public class Pval_parse { 
 

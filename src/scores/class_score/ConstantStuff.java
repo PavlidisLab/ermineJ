@@ -1,20 +1,15 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant
-  Version :1.0
-  Created :09/02/02
-  Revision History: none
-  Description:stores constant variables 
-
-                                                                                                                                                            
-*******************************************************************************/
-import scores.class_score.*;
 import java.util.*;
 
+/**
+  Stores constant variables.   Created :09/02/02
 
-/*****************************************************************************************/
+  @author Shahmil Merchant
+  @version $Id$
+
+*/
 public interface ConstantStuff
-/*****************************************************************************************/
+
 {
     public static final long IA = 16807;
     public static final long IM = 2147483647;

@@ -1,22 +1,18 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant; Paul Pavlidis (major changes)
-  Created :09/02/02
-  Revision History: $Id$
-
-  Description: Main class to make 'experiment score' pvalues. Includes
-  multiple test correction.
-                                                                                                                                                            
-*******************************************************************************/
 import scores.class_score.*;
 import java.io.*;
 import java.util.*;
 import java.lang.reflect.*;
 import java.text.*;
 
-/*****************************************************************************************/
-/*****************************************************************************************/
+/**
+  Main class to make 'experiment score' pvalues. Includes multiple
+  test correction.   Created :09/02/02
 
+  @author Shahmil Merchant; Paul Pavlidis (major changes)
+  @version $Id$
+                                                                                                                                                            
+*/
 public class class_pvals {
     private histogram hist ;
     private Map classToProbe;
@@ -36,7 +32,6 @@ public class class_pvals {
     private Map actual_sizes = null;
     private Map target_ranks;
     private Map record;
-    //    private Map input_rank_map;
     private int inputSize;
     private int N1 = 0;
     private int N2 = 0;
@@ -77,20 +72,19 @@ public class class_pvals {
 	target_ranks = new HashMap(); // will hold ranks of items in a class.
 	record = new HashMap(); // scratch space to record those probes that have been seen when iterating over a class.
 
+	goName = new GoName_parse(goNamesfile); // parse go name file
 
 	probe_pval = new exp_class_scores(probe_pvalfile, wt_check, method, pvalcolumn, dolog, class_max_size, class_min_size, number_of_runs, quantile);
 	groupName = new Group_Parse(group_file, probe_pval.get_map()); // parse group file. Yields map of probe->replicates.
 	probe_group = groupName.get_probe_group_map(); // map of probes to groups
-	
+
+	if(weight_on)
+	    probe_pval.set_input_pvals(groupName.get_group_probe_map(), groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
+
 	probe_class = new ClassMap(probe_classfile, probe_pval.get_map() ); // parses affy->classes file. Yields map of go->probes
 	classToProbe = probe_class.get_class_map(); // this is the map of go->probes
 	System.err.println("Read in classes and identified redundant classes");
 
-	goName = new GoName_parse(goNamesfile); // parse go name file
-
-
-	if(weight_on)
-	    probe_pval.set_input_pvals(groupName.get_group_probe_map(), groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
 
 	System.out.println("Read in the files and parameters");
 
@@ -123,7 +117,7 @@ public class class_pvals {
 	class_pval_generator(probe_pval.get_group_pval_map(), probe_pval.get_map(), input_rank_map);
 	sortResults();
 
-	correct_pvals(); // no arg: bonferroni. integer arg: w-y, int trials.
+	correct_pvals(0.05); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
 
 	// all done:
 	// print the results
@@ -472,12 +466,47 @@ public class class_pvals {
 	    classresult res = (classresult)results.get(nextclass);
 	    double actual_p = res.get_pvalue();
 	    corrected_p = actual_p * numclasses;
-	    if (corrected_p > 1.0)
+	    if (corrected_p > 1.0) {
 		corrected_p = 1.0;
+	    }
 
 	    res.setpvalue_corr(corrected_p);
 	}
     }
+
+    /**
+       
+    Benjamini-Hochberg correction of pvalues. This puts values of 1 or
+    0 int the corrected p, indicating whether the FDR has been met by
+    a particular pvalue.
+
+    */
+    private void correct_pvals(double fdr) {
+	int numclasses = sortedclasses.size();
+	int n = numclasses;
+	boolean threshpassed = false;
+
+	Collections.reverse(sortedclasses); // start from the worst class.
+	double corrected_p;
+	for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+	    String nextclass = (String)it.next();
+	    classresult res = (classresult)results.get(nextclass);
+	    double actual_p = res.get_pvalue();
+
+	    double thresh = fdr * n / numclasses;
+	    
+	    if (actual_p < thresh || threshpassed) {
+		res.setpvalue_corr(1.0);
+		threshpassed = true;
+	    } else {
+		res.setpvalue_corr(0.0);
+	    }
+
+	    n--;
+	}
+	Collections.reverse(sortedclasses); // put it back.
+    }
+
 
 
     /**

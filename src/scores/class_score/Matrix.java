@@ -1,29 +1,16 @@
 package scores.class_score;
-/******************************************************************************
-  Author :Shahmil Merchant
-  Created :09/02/02
-  Revision History: $Id$
-  Description:Matrix functions for storing a file and for creating an empty double[][] object
-                                                                                                                                                            
-*******************************************************************************/
-
-
-
-
 import scores.class_score.*;
 import java.io.*; 
 import java.util.*;
 
+/**
+  Matrix functions for storing a file and for creating an empty double[][] object.   Created :09/02/02
 
+  @author Shahmil Merchant
+  @version $Id$
 
-//Try to define class similar to MATRIX_T
-
-
-/*****************************************************************************************/
+*/
 public class Matrix extends HashMap // encapsulates a matrix
-/*****************************************************************************************/
-
-
 {
     private int rows, cols;
     private double M[][];
@@ -31,9 +18,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     private Vector row_name;
     private static Map row_map;//contains a map of each row and elements in the row
   
-
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public Matrix(int tRows, int tCols, double T[][]) //requires dims and 2D array
 	//should be run from command line
     {
@@ -48,8 +34,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public  Matrix(String filename)  //requires filename as input
      {
 	 String aLine = null;
@@ -158,8 +144,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public Matrix(int tRows,int tCols)  //requires number of rows and columns as //input
     {
 	  M = new double[tRows][tCols];
@@ -168,8 +154,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public  void allocate_Matrix()
 
     {
@@ -190,8 +176,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 	
     }
     
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public int get_num_rows() 
     {
 	return rows;
@@ -199,8 +185,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 
 
     
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public int get_num_cols() 
     {
 	return cols;
@@ -209,8 +195,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public String formatted_get_matrix()
     {
 	String string = "";
@@ -224,8 +210,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     }
     
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public String get_matrix()
     {
 	String string = "";
@@ -239,8 +225,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public double[] get_ith_row(int i)
     {
 	return M[i];
@@ -248,8 +234,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public double get_matrix_val(int i,int j)
 
     {
@@ -266,8 +252,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /*
+     */
     public void set_matrix_val(int i,int j,double value)
     {
 	try {
@@ -280,8 +266,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public void increment_matrix_val(int i, int j)
     {
 	try {
@@ -312,8 +298,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 	return answer;
     }
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public double[][] get_matrix_double()
     {
 
@@ -324,8 +310,8 @@ public class Matrix extends HashMap // encapsulates a matrix
     
 
  
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public Vector get_row_names() 
 
     {
@@ -334,8 +320,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 
 
  
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
      public Map get_row_Hash() 
     {
 	return row_map;
@@ -350,8 +336,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 	return;
     }
     
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /*
+     */
     public void removefrom_row_map(String key_value) 
     {
 	row_map.remove(key_value);
@@ -360,8 +346,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public Vector retrieveONEfrom_row_map(String key_value) 
     {
 	return (Vector)(row_map.get(key_value));
@@ -369,8 +355,8 @@ public class Matrix extends HashMap // encapsulates a matrix
 
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public static Map retrievefrom_row_map(Vector key_values) 
     {
 	Map innerMap=new LinkedHashMap();
@@ -385,9 +371,9 @@ public class Matrix extends HashMap // encapsulates a matrix
     
     
     
- /*****************************************************************************************/
+    /**
+     */
   public void print(Map m) 
- /*****************************************************************************************/
     {
 	Collection entries = m.entrySet();
 	Iterator it = entries.iterator();
@@ -396,31 +382,6 @@ public class Matrix extends HashMap // encapsulates a matrix
 	    System.out.println("Key = " + e.getKey() + ", Value = " + e.getValue());
 	}
     }
-    
- 
-/*****************************************************************************************/
-/*****************************************************************************************/
-//    END class Matrix
-/*****************************************************************************************/
-/*****************************************************************************************/
-                              
-
-  
-
-
-
-
-
-
-
-
-
-/*****************************************************************************************/
-//    FOR TESTING PURPOSES ONLY
-/*****************************************************************************************/
-
-
-
 
     public static void main(String args[]) 
     {
