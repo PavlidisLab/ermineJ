@@ -174,12 +174,12 @@ public static double pearson_correlation (double[] x, double[] y)
 		numgot++;
 	    }
 	}
-
+	
 	// reset all elements in recLog to false
 	for(i=0; i<n; i++){
-	    recLog[randomnums[i]] = false;
+		recLog[randomnums[i]] = false;
 	}
-
+	
     }
 
     /*****************************************************************************************/

@@ -41,7 +41,7 @@ public class class_pvals {
 
     /*****************************************************************************************/
     /*****************************************************************************************/
-    public class_pvals(String probe_pvalfile,String affy_gofile,String go_namefile,String destination_file,String ug_file,String method,String groupMethod, int class_max_size,int class_min_size,int number_of_runs,int quantile, double pval, String wt_check) {
+    public class_pvals(String probe_pvalfile, String affy_gofile, String go_namefile, String destination_file, String ug_file, String method, String groupMethod, int class_max_size, int class_min_size,int number_of_runs,int quantile, double pval, String wt_check) {
 
 	affy_go_Parse affy_go = new affy_go_Parse(affy_gofile);//parses affy file. Yields map of probe->go
 	goName = new GoName_parse(go_namefile); // parse go name file

@@ -68,6 +68,11 @@ public class exp_class_scores {
 	    in_pval = pvals;
 	}
 
+	if (gene_length <= 0) {
+	    System.err.println("No pvalues!");
+	    System.exit(1);
+	}
+
 	//	System.err.println("There are " + gene_length + " pvalues to choose from randomly.");
 
 	int number_of_class = class_max_size - class_min_size + 1;
@@ -110,8 +115,8 @@ public class exp_class_scores {
     			    int index = (int)Math.floor( fract*i );			    
 			    total = statistics.calculate_mean_above_quantile(index, random_class, i); 
 			} else {
-			    System.out.println("Invalid method entered");
-			    System.exit(0);
+			    System.err.println("Invalid method entered: " + method); // todo: put this kind of check at the start of the program, not here?
+			    System.exit(1);
 			}
 			//System.out.println(total);
 			//System.out.flush();
@@ -122,8 +127,11 @@ public class exp_class_scores {
 	try { 
 	    hist.tocdf(number_of_class, class_min_size);
 	} catch(NullPointerException s) {
-	    System.out.println("Null pointer Exception");
+	    System.err.println("Null pointer Exception");
 	    s.printStackTrace();
+	} catch(ArrayIndexOutOfBoundsException s) {
+	    System.err.println("ArrayIndexOutOfBoundsException");
+	    System.out.println("Null pointer Exception");
 	} 
 	return hist;
     }

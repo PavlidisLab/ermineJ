@@ -69,10 +69,9 @@ import java.lang.reflect.*;
 		     
 		     // loop through columns
 		     while (st.hasMoreTokens()) 
-			 {  
+			 {
 			     cols.add(st.nextToken());
 			 }
-		     
 		     // add the column Vector to the rows Vector
 		     rows.add(cols);
 		 }
@@ -83,8 +82,7 @@ import java.lang.reflect.*;
 	     doubleArray =new Double[rows.size()-1];
 	     for (int i=1; i < rows.size();i++)
 		 {
-
-
+		     
 		     String name = (String)(((Vector)(rows.elementAt(i))).elementAt(0));
 
 		     if (name.matches("AFFX.*")) { // todo: put this rule somewhere else
@@ -106,13 +104,19 @@ import java.lang.reflect.*;
 		 }
 	     
 	     num_pvals = Array.getLength(pval);
+	     if (num_pvals <= 0) {
+		 System.err.println("No pvalues found in the file!");
+		 System.exit(1);
+	     } else {
+		 System.err.println("Found " + num_pvals + " pvals in the file");
+	     }
              
 	 } catch (IOException e) { 
 	     // catch possible io errors from readLine()
 	     System.out.println(" IOException error!");
 	     e.printStackTrace();
 	 }
-	 
+
      } // end of readMyFile()
      
 
