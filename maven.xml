@@ -19,15 +19,13 @@
 	<ant:jar destfile="${basedir}/ermineJ-help.jar" update="true" excludes="**/CVS/*" includes="${basedir}/ermineJ-help" basedir="${basedir}" />
 	<ant:copy todir="${basedir}/web/ermineJ-help" overwrite="true" >
 	<fileset dir="${basedir}/ermineJ-help">
-	<include name="**/*" />
+	 <include name="**/*" />
 	</fileset>
 	</ant:copy>
-	
-	
 </goal>
 
 <!-- ==================================== -->
-<!-- nsis-setup -->
+<!-- nsis-setup (windows only) -->
 <!-- ==================================== -->
 <goal name="nsis-setup" prereqs="jar:jar,help" description="Set up the bindist so it is (almost) ready for making the installer.">
 <j:forEach var="lib" items="${pom.artifacts}">
@@ -58,10 +56,7 @@
 			 <exclude name="one-way-anova-parsed.txt" />
 			 <exclude name="test.results.txt" />
 		</fileset>
-		</ant:copy>
-	
-
-	
+	</ant:copy>
 </goal>
 
 <!-- ==================================== -->
