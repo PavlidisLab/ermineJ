@@ -21,6 +21,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import baseCode.gui.table.TableSorter;
 
 import classScore.Settings;
 import classScore.classPvalRun;

@@ -42,7 +42,7 @@ import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;
-import classScore.gui.TableSorter;
+import baseCode.gui.table.TableSorter;
 
 /**
  * @author Will Braynen

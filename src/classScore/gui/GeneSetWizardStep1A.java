@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import baseCode.gui.table.TableSorter;
 
 import baseCode.gui.WizardStep;
 import classScore.data.GONames;
