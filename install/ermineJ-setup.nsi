@@ -71,7 +71,7 @@ Section "ermineJ (required)"
   ; If upgrading, might not want to overwrite the old data folder
   IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
 
-    MessageBox MB_YESNO|MB_ICONQUESTION "You already have a data folder; would you like to keep it?" IDYES NoOverwrite
+    MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "You already have a data folder; would you like to overwrite it?" IDNO NoOverwrite
 
     YesOverwrite:
     SetOutPath "$INSTDIR\ermineJ.data"
