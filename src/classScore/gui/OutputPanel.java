@@ -637,7 +637,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       // set cell text
       if ( value != null ) {
          if ( value.getClass().equals( ArrayList.class ) ) // pvalues and ranks.
-            setText( nf.form( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) )
+            setText( nf.format( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) )
                   .doubleValue() ) );
          else if ( value.getClass().equals( Vector.class ) ) // class ids.
             setText( ( String ) ( ( Vector ) value ).get( 0 ) );

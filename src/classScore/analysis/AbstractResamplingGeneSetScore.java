@@ -3,9 +3,6 @@ package classScore.analysis;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive;
-import cern.jet.stat.Probability;
 import classScore.data.Histogram;
 
 /**

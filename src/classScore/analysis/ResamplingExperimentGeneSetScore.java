@@ -10,7 +10,6 @@ import java.util.Vector;
 
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.RandomChooser;
-import baseCode.math.Rank;
 import baseCode.math.Stats;
 import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
