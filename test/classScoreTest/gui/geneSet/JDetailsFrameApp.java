@@ -2,6 +2,7 @@ package test.classScoreTest.gui.geneSet;
 
 import classScore.gui.geneSet.JDetailsFrame;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.awt.Dimension;
 import classScore.Settings;
 
@@ -24,16 +25,16 @@ public class JDetailsFrameApp {
       Settings settings = new Settings();
       settings.setRawFile( filename );
 
-      final String[] PROBES = {
-          "probe1" //,"probe2"
-      };
+      final String[] PROBES = { "probe1", "probe2", "probe3", "probe4", "probe5" };
+      HashMap pvalues = new HashMap();
 
       ArrayList probeIDs = new ArrayList();
       for ( int i = 0; i < PROBES.length; i++ ) {
          probeIDs.add( i, PROBES[i] );
+         pvalues.put( PROBES[i], new Double( 0.5 ) );
       }
 
-      JDetailsFrame frame = new JDetailsFrame( probeIDs, null, null, settings );
+      JDetailsFrame frame = new JDetailsFrame( probeIDs, pvalues, null, settings );
       frame.setSize( new Dimension( 800, 600 ) );
       frame.show();
    }

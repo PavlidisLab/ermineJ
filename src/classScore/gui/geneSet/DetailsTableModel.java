@@ -28,7 +28,7 @@ public class DetailsTableModel
    private GeneAnnotations m_geneData;
    private DecimalFormat m_nf;
    private String[] m_columnNames = {
-       "Probe", "P value", "Name", "Description"};
+       "Probe", "P value", "P value", "Name", "Description"};
 
    /** constructor */
    public DetailsTableModel(
@@ -80,14 +80,33 @@ public class DetailsTableModel
 
       switch ( column ) { // after it's been offset
          case 0:
+            // probe ID
             return probeID;
          case 1:
+            // p value
             return m_pvalues == null ? new Double( Double.NaN ) :
                 new Double( m_nf.format( m_pvalues.get( probeID ) ) );
          case 2:
+            // p value bar
+            if ( m_pvalues == null ) {
+               return null; 
+            }
+            else {
+               double[] values = new double[1];
+               // actual p value
+               values[0] = Double.valueOf( m_pvalues.get( probeID ).toString() ).doubleValue();
+               // expected p value
+               //values[1] = 1.0f / getRowCount() * row;
+               // BLAH - TO DO: this row number is by probe ID, not pvalue!
+               //               how do we get pvalue's row number?
+               return values;
+            }
+         case 3:
+            // gene namne
             return m_geneData == null ? "" :
                 m_geneData.getProbeGeneName( probeID );
-         case 3:
+         case 4:
+            // description
             return m_geneData == null ? "" :
                 m_geneData.getProbeDescription( probeID );
          default:

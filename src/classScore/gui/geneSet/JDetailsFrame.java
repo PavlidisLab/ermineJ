@@ -38,8 +38,9 @@ import baseCode.gui.JGradientBar;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;
 import baseCode.gui.JMatrixDisplay;
-import baseCode.gui.table.JMatrixTableCellRenderer;
-import baseCode.gui.table.JVerticalTableHeaderRenderer;
+import baseCode.gui.table.JMatrixCellRenderer;
+import baseCode.gui.table.JBarGraphCellRenderer;
+import baseCode.gui.table.JVerticalHeaderRenderer;
 import classScore.gui.TableSorter;
 
 /**
@@ -52,10 +53,11 @@ public class JDetailsFrame
    final int PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN = 6;
    final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
    final int MAX_WIDTH_MATRIXDISPLAY_COLUMN = 19;
-   final int PREFERRED_WIDTH_COLUMN_0 = 75;
-   final int PREFERRED_WIDTH_COLUMN_1 = 75;
-   final int PREFERRED_WIDTH_COLUMN_2 = 75;
-   final int PREFERRED_WIDTH_COLUMN_3 = 300;
+   final int PREFERRED_WIDTH_PROBEID_COLUMN = 75;
+   final int PREFERRED_WIDTH_PVALUE_COLUMN = 75;
+   final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
+   final int PREFERRED_WIDTH_GENENAME_COLUMN = 75;
+   final int PREFERRED_WIDTH_DESCRIPTION_COLUMN = 300;
    final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
    final int COLOR_RANGE_SLIDER_MIN = 1;
    final int NORMALIZED_COLOR_RANGE_MAX = 12; // [-6,6] standard deviations out
@@ -259,12 +261,12 @@ public class JDetailsFrame
 
       // Make the columns in the matrix display not too wide (cell-size)
       // and set a custom cell renderer
-      JMatrixTableCellRenderer cellRenderer = new JMatrixTableCellRenderer(
+      JMatrixCellRenderer matrixCellRenderer = new JMatrixCellRenderer(
           m_matrixDisplay
           ); // create one instance that will be used to draw each cell
 
-      JVerticalTableHeaderRenderer verticalHeaderRenderer =
-          new JVerticalTableHeaderRenderer(); // create only one instance
+      JVerticalHeaderRenderer verticalHeaderRenderer =
+          new JVerticalHeaderRenderer(); // create only one instance
       int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
       // Set each column
@@ -274,7 +276,7 @@ public class JDetailsFrame
          col.setPreferredWidth( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
          col.setMinWidth( MIN_WIDTH_MATRIXDISPLAY_COLUMN ); // no narrower than this
          col.setMaxWidth( MAX_WIDTH_MATRIXDISPLAY_COLUMN ); // no wider than this
-         col.setCellRenderer( cellRenderer );
+         col.setCellRenderer( matrixCellRenderer );
          col.setHeaderRenderer( verticalHeaderRenderer );
       }
 
@@ -283,33 +285,43 @@ public class JDetailsFrame
       //
       TableColumn col;
 
-      // The columns containing text or values (not matrix display) should be a bit wider
+      // probe ID
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 0 );
-      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_0 );
+      col.setPreferredWidth( PREFERRED_WIDTH_PROBEID_COLUMN );
 
+      // p value
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 1 );
-      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_1 );
-
+      col.setPreferredWidth( PREFERRED_WIDTH_PVALUE_COLUMN );
+      
+      // p value bar
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 2 );
-      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_2 );
+      col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
+      col.setCellRenderer( new JBarGraphCellRenderer() );
 
+      // name
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 3 );
-      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_3 );
+      col.setPreferredWidth( PREFERRED_WIDTH_GENENAME_COLUMN );
 
-      //
+      // description
+      col = m_table.getColumnModel().getColumn( matrixColumnCount + 4 );
+      col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
+
+      
       // Sort initially by the pvalue column
-      //
       sorter.setSortingStatus( matrixColumnCount + 1, TableSorter.ASCENDING );
+      
+      // For the pvalue bar graph we need to know the ordinal position of each 
+      // pvalue in our list of pvalues, and now is the perfect time because 
+      // the table is sorted by pvalues
+      // BLAH - TO DO      
 
-      //
       // Save the dimensions of the table just in case
-      //
       int width =
           matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN +
-          PREFERRED_WIDTH_COLUMN_0 +
-          PREFERRED_WIDTH_COLUMN_1 +
-          PREFERRED_WIDTH_COLUMN_2 +
-          PREFERRED_WIDTH_COLUMN_3;
+          PREFERRED_WIDTH_PROBEID_COLUMN +
+          PREFERRED_WIDTH_PVALUE_COLUMN  +
+          PREFERRED_WIDTH_GENENAME_COLUMN +
+          PREFERRED_WIDTH_DESCRIPTION_COLUMN;
       int height = m_table.getPreferredScrollableViewportSize().height;
 
       Dimension d = new Dimension( width, height );
