@@ -167,10 +167,13 @@ public class GeneSetWizard extends Wizard {
    }
 
    protected void finishButton_actionPerformed(ActionEvent e) {
+      newGeneSet.setId( step3.getNewGeneSetId() );
+      newGeneSet.setDesc( step3.getNewGeneSetDesc() );
       String id = newGeneSet.getId();
-      String desc = newGeneSet.getDesc();
       if (id.compareTo("") == 0) {
          GuiUtil.error("The class ID must be specified.");
+      } else if ( geneData.classExists( id ) && makenew ) {
+         GuiUtil.error( "A class by the ID " + id + " already exists." );
       } else {
          if (makenew)
             newGeneSet.addToMaps(goData);
