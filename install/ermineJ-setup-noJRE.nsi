@@ -9,7 +9,7 @@
 Name "ermineJ"
 
 ; The file to write
-OutFile "install.exe"
+OutFile "ermineJ-setup-noJRE.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
