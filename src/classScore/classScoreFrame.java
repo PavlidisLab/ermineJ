@@ -18,6 +18,9 @@ import javax.swing.*;
 
 public class classScoreFrame
     extends JFrame {
+
+   final boolean CONSOLE_WINDOW = false
+
    JPanel mainPanel = ( JPanel )this.getContentPane();
 
    JMenuBar jMenuBar1 = new JMenuBar();
@@ -68,7 +71,11 @@ public class classScoreFrame
 
    /* init */
    private void jbInit() throws Exception {
-      ConsoleWindow.init();
+
+      if ( CONSOLE_WINDOW ) {
+         ConsoleWindow.init();
+      }
+
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
       this.setJMenuBar( jMenuBar1 );
       this.setSize( new Dimension( 886, 450 ) );
@@ -120,7 +127,7 @@ public class classScoreFrame
       jTabbedPane1.setMinimumSize( new Dimension( 300, 530 ) );
       jTabbedPane1.setPreferredSize( new Dimension( 830, 330 ) );
       cPanel = new ClassPanel( this );
-      oPanel = new OutputPanel(results);
+      oPanel = new OutputPanel( results );
       //cPanel.setModel(InitialMaps.toBlankTableModel());
       jTabbedPane1.addTab( "oPanel", oPanel );
 
@@ -162,10 +169,9 @@ public class classScoreFrame
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
 
       settings = new Settings();
-      chooser.setCurrentDirectory( new File(settings.getDataFolder()) );
-      showDialog( new StartupDialog(this) );
+      chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
+      showDialog( new StartupDialog( this ) );
    }
-
 
    void jButtonLoad_actionPerformed( ActionEvent e ) {
       /*
@@ -269,8 +275,8 @@ public class classScoreFrame
          //cPanel.setModel(imaps.toTableModel());
          System.err.println( "DONE with RUNMAPS" );
          classPvalRun runResult = new classPvalRun( settings, runmaps, outputfile,
-                                                  useWeights, "bh", messenger,
-                                                  loadResults );
+             useWeights, "bh", messenger,
+             loadResults );
 
          System.err.println( "DONE with CLASSPVALRUN" );
 
@@ -280,7 +286,7 @@ public class classScoreFrame
          jTabbedPane1.addTab( "Run " + Integer.toString( runnum ), resultpanel );
          //oPanel.addRunData( runResult.getResults() );
          oPanel.addRun();
-         results.add(runResult);
+         results.add( runResult );
       }
       catch ( IllegalArgumentException e ) {
          error( e, "During class score calculation" );
@@ -522,7 +528,9 @@ public class classScoreFrame
       j.show();
    }
 
-   public Settings getSettings() { return settings; }
+   public Settings getSettings() {
+      return settings;
+   }
 }
 
 /* end class */
