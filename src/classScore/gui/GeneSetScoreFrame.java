@@ -20,6 +20,9 @@ import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.net.URL;
+import javax.help.*;
 
 /**
  * <hr>
@@ -75,10 +78,15 @@ public class GeneSetScoreFrame
    private AnalysisThread athread=new AnalysisThread();
    JPanel jPanel1 = new JPanel();
    FlowLayout flowLayout1 = new FlowLayout();
-
+   
+   // help
+   private HelpBroker m_helpBroker = null;
+   private final boolean ENABLE_HELP = true; // when help is fully implemented, delete this line
+   
    public GeneSetScoreFrame() {
       try {
          jbInit();
+         initHelp();         
          settings = new Settings();
       }
       catch ( Exception e ) {
@@ -86,6 +94,42 @@ public class GeneSetScoreFrame
       }
    }
 
+   private void initHelp() {
+
+      // Create HelpSet and HelpBroker objects
+      HelpSet hs = ENABLE_HELP ? getHelpSet( "ermineJ-help/main.hs" ) : null;
+      if ( hs != null ) {
+         m_helpBroker = hs.createHelpBroker();
+
+         // Assign help to components
+         CSH.setHelpIDString( helpMenuItem, "top" );
+
+         // Handle events
+         helpMenuItem.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
+      }
+      else {
+         // Disable help menu
+         helpMenuItem.setEnabled( false );
+      }
+   }
+   
+   /**
+    * find the helpset file and create a HelpSet object
+    */
+   private HelpSet getHelpSet( String helpsetfile ) {
+      HelpSet hs = null;
+      ClassLoader cl = this.getClass().getClassLoader();
+      try {
+         URL hsURL = HelpSet.findHelpSet( cl, helpsetfile );
+         hs = new HelpSet( null, hsURL );
+      } catch( Exception ee ) {
+         System.err.println( "HelpSet: " + ee.getMessage() );
+         System.err.println( "HelpSet: "+ helpsetfile + " not found" );
+      }
+      return hs;
+   }
+   
+   
    /* init */
    private void jbInit() throws Exception {
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
@@ -164,8 +208,9 @@ public class GeneSetScoreFrame
       helpMenu.setMnemonic( 'H' );
       helpMenuItem.setText( "Help Topics" );
       helpMenuItem.setMnemonic( 'T' );
-      helpMenuItem.addActionListener( new
-                                      GeneSetScoreFrame_helpMenuItem_actionAdapter( this ) );
+      if ( m_helpBroker != null ) {
+         helpMenuItem.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
+      }
       aboutMenuItem.setText( "About ErmineJ" );
       aboutMenuItem.setMnemonic( 'A' );
       aboutMenuItem.addActionListener( new
@@ -356,10 +401,6 @@ public class GeneSetScoreFrame
       swiz.showWizard();
    }
 
-   void helpMenuItem_actionPerformed( ActionEvent e ) {
-      new HelpFrame(this);
-   }
-
    void aboutMenuItem_actionPerformed( ActionEvent e ) {
       new AboutBox( this );
    }
@@ -519,20 +560,6 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter
 
    public void actionPerformed( ActionEvent e ) {
       adaptee.saveAnalysisMenuItem_actionPerformed( e );
-   }
-}
-
-class GeneSetScoreFrame_helpMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
-   GeneSetScoreFrame adaptee;
-
-   GeneSetScoreFrame_helpMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
-      this.adaptee = adaptee;
-   }
-
-   public void actionPerformed( ActionEvent e ) {
-      adaptee.helpMenuItem_actionPerformed( e );
    }
 }
 
