@@ -1,4 +1,4 @@
-package test.classScoreTest.gui.geneSet;
+package classScoreTest.gui.geneSet;
 
 import classScore.gui.geneSet.JGeneSetFrame;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class GeneSetApp {
       Settings settings = new Settings();
       settings.setRawFile( filename );
 
-      final String[] PROBES = { "probe1", "probe2", "probe3", "probe4", "probe5" };
+      final String[] PROBES = { "probe6", "probe7", "probe1" };
       HashMap pvalues = new HashMap();
 
       ArrayList probeIDs = new ArrayList();
