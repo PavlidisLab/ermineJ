@@ -45,6 +45,7 @@ public class SaveWizardStep2 extends WizardStep {
       this.wiz = wiz;
       this.folder = folder;
       chooser.setCurrentDirectory( new File( folder ) );
+      chooser.setApproveButtonText("OK");
       chooser.setDialogTitle( "Save Analysis As:" );
       wiz.clearStatus();
    }

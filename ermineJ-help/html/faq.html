@@ -29,6 +29,13 @@
     web browser. It will look correct in Excel if you open it as a tab
     delimited file.</p>
 
+    <p><strong>My excel spreadsheet with my gene scores isn't being
+    accepted as input.</strong></p>
+
+    <p>You cannot input Excel spreadsheets; you have to save them as
+    text first. See <a href="excel-astext.html">this page</a> for
+    details.</p>
+
     <p><strong>I don't see annotation file for my microarray. What
     should I do?</strong></p>
 
@@ -51,14 +58,28 @@
     <p><strong>The resampling is taking too long, any
     suggestions?</strong></p>
 
-    <p>There are few ways to speed things up. One is to not look at
-    very large values for the "maximum class size" value. We usually
-    use a value near 200. Another is to reduce the number of
-    iterations. You might try temporarily setting this to 10000 while
-    you experiment with the other settings, and then, once you find a
-    setting you like, you can crank up the iterations for the "final"
-    run (for example to 200000, which still should not take very
-    long).</p>
+    <p>This problem affects the correlation score analysis in
+    particular, which is very computationally intensive.</p>
+
+    <p>There are few ways to speed things up. One is to
+    <strong>uncheck</strong> <font color="#000000">the "</font><font
+    color="#2a00ff" size="1"><font color="#000000" size="4"><font size=
+    "3"><em>Always use full resampling</em></font>" <font size=
+    "3">checkbox in the analysis setup wizard. This enables
+    approximations which, while potentially yielding less accurate
+    p-values, greatly increase processing speed. The results you get
+    with this box unchecked will be reasonably similar to what you
+    would get with full resampling.</font></font></font></p>
+
+    <p>Another tip is to not look at very large values for the "maximum
+    class size" value. We usually use a value near 200.</p>
+
+    <p>Finally, you can reduce the number of iterations. You might try
+    temporarily setting this to 10000 while you experiment with the
+    other settings, and then, once you find a setting you like, you can
+    crank up the iterations for the "final" run (for example to 200000,
+    which still should not take very long for the gene-score based
+    resampling).</p>
 
     <p><strong>What happens to probes that don't have any GO
     annotations?</strong></p>

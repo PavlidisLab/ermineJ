@@ -76,7 +76,9 @@ public class ResamplingExperimentGeneSetScore extends
          deck[i] = i;
       }
 
-      double oldnd = Double.MAX_VALUE;
+   //   double oldnd = Double.MAX_VALUE;
+      double oldmean = Double.MAX_VALUE;
+      double oldvar = Double.MAX_VALUE;
 
       for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
          double[] random_class = new double[geneSetSize]; // holds data for random class.
@@ -88,7 +90,7 @@ public class ResamplingExperimentGeneSetScore extends
             rawscore = calc_rawscore( random_class, geneSetSize, method );
             values.add( rawscore );
             hist.update( geneSetSize, rawscore );
-            if (   useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION
+            if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION
                   && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION && k > 0
                   && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
                Thread.yield();
@@ -97,17 +99,20 @@ public class ResamplingExperimentGeneSetScore extends
                double variance = Descriptive.variance( values.size(),
                      Descriptive.sum( values ), Descriptive
                            .sumOfSquares( values ) );
-               double nd = normalDeviation( mean, variance, geneSetSize );
+              // double nd = normalDeviation( mean, variance, geneSetSize );
 
-               if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
+              // if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
+               if (Math.abs(oldvar - variance) <= TOLERANCE && Math.abs(oldmean - mean ) <= TOLERANCE ) {
                   hist.addExactNormalProbabilityComputer( geneSetSize, mean,
                         variance );
-                  System.err.println( "Class size: " + geneSetSize
+                  log.debug( "Class size: " + geneSetSize
                         + " - Reached convergence to normal after " + k
                         + " iterations." );
                   break; // stop simulation of this class size.
                }
-               oldnd = nd;
+               oldmean = mean;
+               oldvar = variance;
+            //   oldnd = nd;
             }
          }
 
@@ -147,8 +152,8 @@ public class ResamplingExperimentGeneSetScore extends
       this.useWeights = ( Boolean.valueOf( settings.getUseWeights() ) )
             .booleanValue();
       this.setMethod( settings.getClassScoreMethod() );
-      this.setUseNormalApprox(!settings.getAlwaysUseEmpirical());
-      this.setUseSpeedUp(!settings.getAlwaysUseEmpirical());
+      this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
+      this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
       if ( classMaxSize < classMinSize ) {
          throw new IllegalArgumentException(
                "Error:The maximum class size is smaller than the minimum." );

@@ -38,8 +38,8 @@
       <li>
         <div>
           <strong>If your gene score are p-values</strong> , then you
-          should be sure to either -log your values, or use the
-          -log options in the ermineJ software.
+          should be sure to either -log your values, or use the -log
+          options in the ermineJ software.
         </div>
       </li>
     </ul>
@@ -59,16 +59,104 @@
     <p>The resampling-based analysis requires the gene scores, while
     for other analyses it is not required.</p>
 
-    <h2>Format</h2>
+    <h2><font color="#cc0000">!</font> Make sure your gene scores are
+    on the right format</h2>
 
-    <p>The gene score file is a simple tab-delimited text file,
-    minimally having just two columns (like <a href=
-    "../samples/geneScoresSample.txt">this example</a>). The first
-    column contains the probe identifiers, while the second column
-    contains the scores. A one-line header is expected (if you don't
-    include the header, the first line of data will be skipped). Files
-    with more than two columns are also fine.</p>
+    <p>The gene score file is a <strong>simple tab-delimited text
+    file</strong> , minimally having just two columns (like <a href=
+    "../samples/geneScoresSample.txt">this example</a> ). For a simple
+    case please use the following rules:</p>
+
+    <ul>
+      <li>
+        <div>
+          The first column contains the probe identifiers
+        </div>
+      </li>
+
+      <li>
+        <div>
+          The second column contains the scores.
+        </div>
+      </li>
+
+      <li>
+        <div>
+          A one-line header is expected (if you don't include the
+          header, the first line of data will be skipped).
+        </div>
+      </li>
+
+      <li>
+        <div>
+          Files with more than two columns are also fine.
+        </div>
+      </li>
+
+      <li>
+        <div>
+          The file <strong>CANNOT be an Excel spreadsheet</strong>. Use
+          "Save as... &nbsp;text" in Excel. For instructions on doing,
+          see <a href="excel-astext.html">this page</a> .
+        </div>
+      </li>
+    </ul>
+
+    <p>The table below shows the basic idea.</p>
+
+    <table cellspacing="1" cellpadding="1" width="200" border="1">
+      <tr>
+        <td>
+          <font size="1"></font>
+
+          <p><font size="1">Probes</font></p>
+        </td>
+
+        <td>
+          <font size="1"></font>
+
+          <p><font size="1">ProbeScore</font></p>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <font size="1"></font>
+
+          <p><font size="1">117_at</font></p>
+        </td>
+
+        <td>
+          <font size="1"></font>
+
+          <p><font size="1">0.593537874</font></p>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <font size="1"></font>
+
+          <p><font size="1">1007_s_at</font></p>
+        </td>
+
+        <td>
+          <font size="1"></font>
+
+          <p><font size="1">0.0643101</font></p>
+        </td>
+      </tr>
+
+      <tr>
+        <td>...</td>
+
+        <td>... (etc.)</td>
+      </tr>
+    </table>
     <hr>
+    <br>
+    <br>
+     
 
     <div class="tidy">
       Copyright 2004 (c) Columbia University

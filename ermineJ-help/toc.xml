@@ -10,7 +10,7 @@
     <tocitem text="Walk-throughs" target="tutorial" expand="true">
     <tocitem text="Installing the software" target="install" />
     <tocitem text="Software basics" target="starting" />
-    <tocitem text="Overview of analysis" target="analysis"/>
+    <tocitem text="Analysis" target="analysis"/>
     	
       <tocitem text="Analysis methods" expand="true" >
       <tocitem text="ORA" target="ora"/>
@@ -18,6 +18,7 @@
       <tocitem text="Correlation" target="correlation"/>
       <tocitem text="Multiple Test Correction" target="mtc"/>
        <tocitem text="How repeated genes are handled" target="reps"/>
+         <tocitem text="Methods for speeding up resampling" target="approx"/>
       </tocitem>
       
        <tocitem text="Viewing gene set details" target="visualize"/>

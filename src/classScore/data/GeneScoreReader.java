@@ -26,7 +26,11 @@ import classScore.Settings;
  * 
  * <pre>
  * 
- *           probe_id[tab]pval
+ *  
+ *   
+ *             probe_id[tab]pval
+ *    
+ *   
  *  
  * </pre>
  * 
@@ -41,6 +45,7 @@ import classScore.Settings;
  */
 public class GeneScoreReader {
 
+   private static final double SMALL = 10e-16;
    double[] groupPvalues;
    private String[] probeIDs = null;
    private double[] probePvalues = null;
@@ -95,15 +100,15 @@ public class GeneScoreReader {
       probeIDs = new String[rows.size() - 1];
       probePvalues = new double[rows.size() - 1];
 
-      double small = 10e-16;
-
       for ( int i = 1; i < rows.size(); i++ ) {
 
          if ( ( ( Vector ) ( rows.elementAt( i ) ) ).size() < settings
                .getScorecol() ) {
             throw new IOException( "Insufficient gene score columns in row "
                   + i + ", expecting file to have at least "
-                  + settings.getScorecol() + " columns." );
+                  + settings.getScorecol()
+                  + " columns. Please check that the file has the "
+                  + "correct plain text format." );
          }
 
          String name = ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
@@ -124,7 +129,7 @@ public class GeneScoreReader {
          if ( settings.getDoLog() && probePvalues[i - 1] <= 0 ) {
 
             invalidLog = true;
-            probePvalues[i - 1] = small;
+            probePvalues[i - 1] = SMALL;
 
          }
 
@@ -142,7 +147,7 @@ public class GeneScoreReader {
       if ( invalidLog ) {
          messenger
                .setError( "Warning: There were attempts to take the log of non-positive values. These are set to "
-                     + small );
+                     + SMALL );
          try {
             Thread.sleep( 1000 );
          } catch ( InterruptedException e ) {
@@ -150,7 +155,9 @@ public class GeneScoreReader {
       }
 
       if ( num_pvals == 0 ) {
-         throw new IllegalStateException( "No pvalues found in the file!" );
+         throw new IllegalStateException(
+               "No pvalues found in the file! Please check the file has"
+                     + "the correct plain text format." );
       }
 
       if ( messenger != null ) {
@@ -192,7 +199,7 @@ public class GeneScoreReader {
          /* probes in this group */
          ArrayList probes = ( ArrayList ) groupToProbeMap.get( group );
          int in_size = 0;
-         
+
          // Analyze all probes in this 'group' (pointing to the same gene)
          for ( Iterator pbItr = probes.iterator(); pbItr.hasNext(); ) {
             String probe = ( String ) pbItr.next();
@@ -214,8 +221,7 @@ public class GeneScoreReader {
                         group_pval_temp[counter] );
                   break;
                }
-               
-               
+
                default: {
                   throw new IllegalArgumentException(
                         "Illegal selection for groups score method." );

@@ -116,30 +116,30 @@ public abstract class AbstractResamplingGeneSetScore implements
     * @param class size to be checked from the table of empirical distributions.
     * @return squared deviation from the fitted normal distribution
     */
-   protected double normalDeviation( double mean, double variance, int classSize ) {
-      double[] ha = hist.getHistogram( classSize );
-
-      DoubleArrayList hal = new DoubleArrayList( ha );
-      double sum = Descriptive.sum( hal );
-      double histMin = hist.getHistMin();
-      double binSize = hist.getBinSize();
-
-      double deviation = 0.0;
-      for ( int i = 0; i < ha.length; i++ ) {
-
-         double actual = ha[i] / sum; // fraction of area in this bin.
-
-         // the value we are evaluating the normal distribution at. mean and variance are empirical.
-         double x = histMin + binSize * i;
-
-         // expected area under this part of the histogram assuming normality
-         double nval = Probability.normal( mean, variance, x )
-               - Probability.normal( mean, variance, x - binSize );
-         
-         deviation += ( nval - actual ) * ( nval - actual );
-      }
-      return deviation;
-   }
+ //  protected double normalDeviation( double mean, double variance, int classSize ) {
+//      double[] ha = hist.getHistogram( classSize );
+//
+//      DoubleArrayList hal = new DoubleArrayList( ha );
+//      double sum = Descriptive.sum( hal );
+//      double histMin = hist.getHistMin();
+//      double binSize = hist.getBinSize();
+//
+//      double deviation = 0.0;
+//      for ( int i = 0; i < ha.length; i++ ) {
+//
+//         double actual = ha[i] / sum; // fraction of area in this bin.
+//
+//         // the value we are evaluating the normal distribution at. mean and variance are empirical.
+//         double x = histMin + binSize * i;
+//
+//         // expected area under this part of the histogram assuming normality
+//         double nval = Probability.normal( mean, variance, x )
+//               - Probability.normal( mean, variance, x - binSize );
+//         
+//         deviation += ( nval - actual ) * ( nval - actual );
+//      }
+//      return deviation;
+//   }
 
   
 

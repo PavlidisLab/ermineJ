@@ -1,15 +1,11 @@
 package classScore.analysis;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.matrix.SparseDoubleMatrix2DNamed;
 import baseCode.math.RandomChooser;
 import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
-import cern.jet.stat.Probability;
 import classScore.Settings;
 import classScore.data.Histogram;
 
@@ -43,8 +39,8 @@ public class ResamplingCorrelationGeneSetScore extends
       this.classMaxSize = settings.getMaxClassSize();
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();
-      this.setUseNormalApprox(!settings.getAlwaysUseEmpirical());
-      this.setUseSpeedUp(!settings.getAlwaysUseEmpirical());
+      this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
+      this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
       data = dataMatrix;
       int numGeneSetSizes = classMaxSize - classMinSize + 1;
       this.hist = new Histogram( numGeneSetSizes, classMinSize, numRuns, 1.0,
@@ -80,7 +76,10 @@ public class ResamplingCorrelationGeneSetScore extends
             messenger.setStatus( "Currently running class size " + geneSetSize );
          }
 
-         double oldnd = Double.MAX_VALUE;
+         //     double oldnd = Double.MAX_VALUE;
+         double oldmean = Double.MAX_VALUE;
+         double oldvar = Double.MAX_VALUE;
+
          DoubleArrayList values = new DoubleArrayList();
          for ( int j = 0; j < numRuns; j++ ) {
             RandomChooser.chooserandom( randomnums, deck, data.rows(),
@@ -96,9 +95,11 @@ public class ResamplingCorrelationGeneSetScore extends
                double variance = Descriptive.variance( values.size(),
                      Descriptive.sum( values ), Descriptive
                            .sumOfSquares( values ) );
-               double nd = normalDeviation( mean, variance, geneSetSize );
+               // double nd = normalDeviation( mean, variance, geneSetSize );
 
-               if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
+               //  if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
+               if ( Math.abs( oldvar - variance ) <= TOLERANCE
+                     && Math.abs( oldmean - mean ) <= TOLERANCE ) {
                   hist.addExactNormalProbabilityComputer( geneSetSize, mean,
                         variance );
                   log.debug( "Class size: " + geneSetSize
@@ -106,7 +107,9 @@ public class ResamplingCorrelationGeneSetScore extends
                         + " iterations." );
                   break; // stop simulation of this class size.
                }
-               oldnd = nd;
+               //    oldnd = nd;
+               oldmean = mean;
+               oldvar = variance;
             }
 
             if ( j % 10 == 0 ) {

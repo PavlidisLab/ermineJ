@@ -60,8 +60,6 @@ public class ExperimentScoreQuickPvalGenerator extends
       int v_size = 0;
 
       // foreach item in the class.
-      // todo: see if this loop can be optimized. Probably. It's important when
-      // we are doing random trials that this go fast.
       while ( classit.hasNext() ) {
          String probe = ( String ) classit.next(); // probe id
 

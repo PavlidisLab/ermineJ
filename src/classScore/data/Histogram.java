@@ -25,6 +25,7 @@ import cern.jet.stat.Descriptive;
  * @version $Id$
  */
 public class Histogram {
+   private static final double SMALL = 10e-13;
    protected static final Log log = LogFactory.getLog( Histogram.class );
    private int minimumGeneSetSize = 0;
    private double binSize = 0.002; // todo: set this automatically?, so there are always a reasonable # of bins.
@@ -262,7 +263,7 @@ public class Histogram {
          throw new IllegalStateException( "Gene set size " + geneSetSize
                + " is not associated with an exact probability density." );
       }
-      return p.probability( rawScore );
+      return Math.max(SMALL, p.probability( rawScore ));
    }
 
    /**
