@@ -92,7 +92,6 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
                if ( ranking != null ) {
                   target_ranks.add( ranking  );
                }
-
             }
          } // if in data set
       } // end of while over items in the class.

@@ -2,8 +2,7 @@
     <pomVersion>3</pomVersion>
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
-        <id>ermineJ</id>
-    <currentVersion>2.0b4</currentVersion>
+    <currentVersion>2.0b5</currentVersion>
     <organization>
         <name>Columbia University</name>
         <url>http://www.columbia.edu</url>
@@ -102,37 +101,37 @@
             <artifactId>jhelp</artifactId>
             <version>2.0</version>
             <jar>jh.jar</jar>
-              <jnlp.jar>true</jnlp.jar>
             <type>jar</type>
             <properties/>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>getopt</groupId>
             <artifactId>java-getopt</artifactId>
             <version>1.0.9</version>
-              <jnlp.jar>false</jnlp.jar>
             <type>jar</type>
+            <properties/>
         </dependency>
-	    <dependency>
-      <id>forehead</id>
-      <version>1.0-beta-5</version>
-        <jnlp.jar>false</jnlp.jar>
-      <type>jar</type>
-    </dependency>   
         <dependency>
-      <id>jfreechart</id>
-      <version>0.9.20</version>
-      <type>jar</type>
-       <jnlp.jar>false</jnlp.jar>
-    </dependency>
-          
-        
+            <groupId>forehead</groupId>
+            <artifactId>forehead</artifactId>
+            <version>1.0-beta-5</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
         <dependency>
-      <id>jcommon</id>
-      <version>0.9.5</version>
-      <type>jar</type>
-    </dependency>
-    
+            <groupId>jfreechart</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>0.9.20</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>jcommon</groupId>
+            <artifactId>jcommon</artifactId>
+            <version>0.9.5</version>
+            <type>jar</type>
+            <properties/>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>
