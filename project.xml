@@ -107,6 +107,19 @@
         </properties>
             <properties/>
         </dependency>
+        
+          
+         <dependency>
+            <groupId>javahelp</groupId>
+            <artifactId>jhelp</artifactId>
+            <type>jar</type>
+            <jar>jh.jar</jar>
+            <version>2.0</version>
+             <jnlp.jar>true</jnlp.jar>
+            <type>jar</type>
+            <properties/>
+        </dependency>
+        
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>
