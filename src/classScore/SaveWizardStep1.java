@@ -65,14 +65,13 @@ public class SaveWizardStep1 extends WizardStep
           runs_exist=true;
           for(int i=0; i<rundata.size(); i++)
           {
-             Map data = (Map) rundata.get(i);
              runComboBox.insertItemAt("Run "+(i+1),i);
           }
           runComboBox.setSelectedIndex(0);
       }
    }
 
-   public int getSelectedRunNum() { return runComboBox.getSelectedIndex()+1; }
+   public int getSelectedRunNum() { return runComboBox.getSelectedIndex(); }
 
    public boolean runsExist() { return runs_exist; }
 

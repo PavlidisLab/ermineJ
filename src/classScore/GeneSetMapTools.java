@@ -210,7 +210,7 @@ public class GeneSetMapTools {
       superfast, because it doesn't know which classes are actually
       relevant in the data.
     */
-   public static void collapseClasses(Map classToProbeMap) {
+   public static Map collapseClasses(Map classToProbeMap) {
       LinkedHashMap seenClasses = new LinkedHashMap();
       LinkedHashMap sigs = new LinkedHashMap();
       Map classesToRedundantMap = new LinkedHashMap();
@@ -283,11 +283,12 @@ public class GeneSetMapTools {
       System.out.println( "There are now " + classToProbeMap.size() +
                           " classes represented on the chip (" + ignored +
                           " were ignored)" );
+      return classesToRedundantMap;
    }
 
    /**
     */
-   public ArrayList getRedundancies( String classId, Map classesToRedundantMap ) {
+   public static ArrayList getRedundancies( String classId, Map classesToRedundantMap ) {
       if ( classesToRedundantMap != null &&
            classesToRedundantMap.containsKey( classId ) ) {
          return ( ArrayList ) classesToRedundantMap.get( classId );
@@ -298,7 +299,7 @@ public class GeneSetMapTools {
 
    /**
     */
-   public ArrayList getSimilarities( String classId, Map classesToSimilarMap ) {
+   public static ArrayList getSimilarities( String classId, Map classesToSimilarMap ) {
       if ( classesToSimilarMap != null &&
            classesToSimilarMap.containsKey( classId ) ) {
          return ( ArrayList ) classesToSimilarMap.get( classId );

@@ -273,32 +273,10 @@ public class classScoreFrame
    }
 
    void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-         /*
-               boolean ok = true;
-               ok = testfile(jTextFieldGeneScoreFile.getText());
-               ok = ok && testfile(jTextFieldGONames.getText());
-               ok = ok && testfile(jTextFieldProbeAnnot.getText());
-
-               if (loadResults) {
-                  ok = ok && testfile(jTextFieldOutPutFileName.getText());
-               }
-
-               if (!ok) {
-                  return;
-               }
-                        populate_class_list(m);
-                        classPvalRun results = new classPvalRun(imaps,
-                            jTextFieldOutPutFileName.getText(),
-                            oraThresh,
-                            useWeights,
-                            "bh", m, loadResults);
-                        ResultPanel r = new ResultPanel(results);
-                        r.setModel(results.toTableModel());
-          */
+      LoadDialog sdlog = new LoadDialog( this );
    }
 
    void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-//      SaveWizard swiz = new SaveWizard( this, ( Vector ) oPanel.getAllRunData() );
       SaveWizard swiz = new SaveWizard( this, results );
       swiz.showWizard();
    }

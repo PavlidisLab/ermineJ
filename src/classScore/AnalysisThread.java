@@ -49,7 +49,7 @@ public class AnalysisThread {
          probePvalMapper.setInputPvals( groupName.get_group_probe_map(),
                                         settings.getGroupMethod() ); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
          classPvalRun runResult = new classPvalRun( settings, geneData, goData,
-             probePvalMapper, "", "bh", messenger, false );
+             probePvalMapper, "bh", messenger );
          csframe.addResult( runResult );
          athread=null;
       }

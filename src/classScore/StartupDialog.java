@@ -36,13 +36,11 @@ public class StartupDialog
 
    classScoreFrame callingframe;
    Settings settings;
-   classScoreStatus messenger;
 
    public StartupDialog( classScoreFrame callingframe ) {
       setModal( true );
       this.callingframe = callingframe;
       this.settings = callingframe.getSettings();
-      this.messenger = callingframe.getStatusMessenger();
       try {
          jbInit();
          setValues();

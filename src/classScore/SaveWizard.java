@@ -3,6 +3,7 @@ package classScore;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.io.*;
 import baseCode.gui.*;
 
 /**
@@ -20,6 +21,7 @@ public class SaveWizard extends Wizard
    int step = 1;
    int selected_run;
    classScoreFrame callingframe;
+   Vector rundata;
    Thread aFrameRunner;
    String saveFolder;
    SaveWizardStep1 step1;
@@ -29,6 +31,7 @@ public class SaveWizard extends Wizard
       super(callingframe,400,200);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
+      this.rundata = rundata;
 
       step1 = new SaveWizardStep1(this,rundata);
       this.addStep(1,step1);
@@ -83,9 +86,18 @@ public class SaveWizard extends Wizard
    }
 
    void finishButton_actionPerformed(ActionEvent e) {
-      System.err.println(step1.getSelectedRunNum());
-      System.err.println(step2.getSaveFileName());
-      //printResults(true);
+      //((classPvalRun)rundata.get(step1.getSelectedRunNum())).toFile(step2.getSaveFileName());
+      classPvalRun runToSave = (classPvalRun)rundata.get(step1.getSelectedRunNum());
+      Settings saveSettings=runToSave.getSettings();
+      saveSettings.setPrefFile(step2.getSaveFileName());
+      try
+      {
+         saveSettings.writePrefs();
+      }
+      catch(IOException ioe)
+      {
+         GuiUtil.error(ioe,"Could not write prefs: ");
+      }
       dispose();
    }
 

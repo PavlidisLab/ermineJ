@@ -43,11 +43,16 @@ public class Settings {
    public static final int RESAMP = 1;
    public static final int CORR = 2;
 
+   public Settings() {
+      this("");
+   }
+
    /**
     * Creates settings object
     * @param file - name of preferences file to read
     */
-   public Settings() {
+   public Settings(String filename) {
+      pref_file=filename;
       dataFolder=(new File(Settings.class.getResource("Settings.class").getFile())).getPath();
       int end = dataFolder.lastIndexOf(File.separatorChar);
       dataFolder = dataFolder.substring(0, end + 1) + ".." + File.separator + ".." + File.separator + "data";
@@ -59,7 +64,8 @@ public class Settings {
          System.exit(1);
       }
       classFolder = new String(dataFolder + File.separator + "genesets");
-      pref_file = dataFolder + File.separator + "ClassScore.preferences";
+      if(pref_file.compareTo("")==0)
+         pref_file = dataFolder + File.separator + "ClassScore.preferences";
       classFile = dataFolder + File.separator + "goNames.txt";
       annotFile = dataFolder + File.separator + "HG-U95A.an.txt";
       rawFile = dataFolder + File.separator + "melanoma_and_sarcomaMAS5.txt";
@@ -83,7 +89,7 @@ public class Settings {
             if ( properties.containsKey( "dataFolder" ) )
                this.dataFolder = properties.getProperty( "dataFolder" );
             if ( properties.containsKey( "classFolder" ) )
-               this.dataFolder = properties.getProperty( "classFolder" );
+               this.classFolder = properties.getProperty( "classFolder" );
             if ( properties.containsKey( "maxClassSize" ) )
                maxClassSize = Integer.valueOf( properties.getProperty( "maxClassSize" ) ).intValue();
             if ( properties.containsKey( "minClassSize" ) )
