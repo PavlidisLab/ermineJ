@@ -9,11 +9,17 @@
   <property category="javaFormatting" name="parenthesisPadding" value="1"/>
   <property category="javaFormatting" name="wrapAtColumn" value="100"/>
   <property category="javadoc" name="custom.tags.1" value="todo;a;To Do:"/>
-  <property category="runtime" name="DefaultConfiguration" value="-1"/>
+  <property category="runtime" name="ConfigurationCount" value="1"/>
+  <property category="runtime" name="DefaultConfiguration" value="1"/>
   <property category="runtime.0" name="BuildTargetOnRun" value="com.borland.jbuilder.build.ProjectBuilder$ProjectBuildAction;make"/>
   <property category="runtime.0" name="ConfigurationName" value="default"/>
   <property category="runtime.0" name="RunnableType" value="com.borland.jbuilder.runtime.ApplicationRunner"/>
   <property category="runtime.0" name="application.class" value="classScore.classScoreGUI"/>
+  <property category="runtime.1" name="BuildTargetOnRun" value="com.borland.jbuilder.build.ProjectBuilder$ProjectBuildAction;make"/>
+  <property category="runtime.1" name="ConfigurationName" value="JDetailsFrame test"/>
+  <property category="runtime.1" name="RunnableType" value="com.borland.jbuilder.runtime.ApplicationRunner"/>
+  <property category="runtime.1" name="application.class" value="test.classScoreTest.gui.geneSet.JDetailsFrameApp"/>
+  <property category="runtime.1" name="application.parameters" value="c:\temp.txt"/>
   <property category="serverservices" name="disabled.services" value="connector;jdatastore;sqlj"/>
   <property category="serverservices" name="single.server.name" value="Tomcat 4.1"/>
   <property category="sys" name="AuthorLabel" value="@author"/>
@@ -23,7 +29,7 @@
   <property category="sys" name="CompanyLabel" value="Institution::"/>
   <property category="sys" name="Copyright" value="Copyright (c) 2004"/>
   <property category="sys" name="CopyrightLabel" value="Copyright:"/>
-  <property category="sys" name="DefaultPath" value="src"/>
+  <property category="sys" name="DefaultPath" value="."/>
   <property category="sys" name="Description" value=""/>
   <property category="sys" name="DescriptionLabel" value="Description:"/>
   <property category="sys" name="DocPath" value="../doc"/>
@@ -33,16 +39,17 @@
   <property category="sys" name="JDK" value="java version 1.4.2_01-b06"/>
   <property category="sys" name="JvmVersion" value="1.2"/>
   <property category="sys" name="LastTag" value="0"/>
-  <property category="sys" name="Libraries" value="MySQL;../baseCode/baseCode.jpx"/>
+  <property category="sys" name="Libraries" value="MySQL;../baseCode/baseCode.jpx;JUnit"/>
   <property category="sys" name="MakeStable" value="0"/>
   <property category="sys" name="OutPath" value="classes"/>
-  <property category="sys" name="SourcePath" value="src;../test"/>
+  <property category="sys" name="SourcePath" value="src;../test;."/>
   <property category="sys" name="TestPath" value="../test"/>
   <property category="sys" name="Title" value=""/>
   <property category="sys" name="TitleLabel" value="Title:"/>
   <property category="sys" name="Version" value="1.0"/>
   <property category="sys" name="VersionLabel" value="@version"/>
   <property category="sys" name="WorkingDirectory" value="."/>
+  <property category="sys" name="max.package.levels" value="1"/>
   <property category="sys" name="uidesign.size.classScore.AnalysisWizardStep3" value="693,300"/>
   <property category="sys" name="uidesign.size.classScore.ClassWizardStep1" value="638,300"/>
   <property category="sys" name="uidesign.size.classScore.ClassWizardStep2" value="616,300"/>
@@ -62,8 +69,5 @@
   </node>
   <node name="Export to Ant" type="Ant"/>
   <file path="src/classScore/AnalysisThread.java"/>
-  <file path="src/classScore/GeneSetMapTools.java"/>
-  <file path="src/classScore/LoadDialog.java"/>
-  <file path="src/classScore/NewGeneSet.java"/>
   <file path="src/classScore/Settings.java"/>
 </project>
