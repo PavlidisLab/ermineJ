@@ -8,10 +8,10 @@ import javax.swing.*;
 /**
  * <p>Title: </p>
  * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
+ * <p>Copyright: Copyright (c) 2004</p>
  * <p>Company: </p>
  * @author not attributable
- * @version 1.0
+ * @version $Id$
  */
 
 public class SaveWizardStep2 extends WizardStep
@@ -29,6 +29,7 @@ public class SaveWizardStep2 extends WizardStep
       super(wiz);
       this.wiz=wiz;
       this.folder=folder;
+      chooser.setCurrentDirectory(new File(folder));
    }
 
    //Component initialization
@@ -50,15 +51,10 @@ public class SaveWizardStep2 extends WizardStep
       saveBrowseButton.addActionListener(new SaveWizardStep2_saveBrowseButton_actionAdapter(this));
       saveBrowseButton.setText("Browse....");
       chooser = new JFileChooser();
-      chooser.setCurrentDirectory(new File(folder));
       jPanel11.add(jLabel3, null);
       jPanel11.add(saveFile, null);
       jPanel11.add(saveBrowseButton, null);
       this.add(jPanel11);
-   }
-
-   void saveFile_actionPerformed(ActionEvent e) {
-
    }
 
    void saveBrowseButton_actionPerformed(ActionEvent e) {
@@ -67,6 +63,8 @@ public class SaveWizardStep2 extends WizardStep
          saveFile.setText(chooser.getSelectedFile().toString());
       }
    }
+
+   public String getSaveFileName() { return saveFile.getText(); }
 }
 
 class SaveWizardStep2_saveBrowseButton_actionAdapter implements java.awt.event.ActionListener {
@@ -75,14 +73,5 @@ class SaveWizardStep2_saveBrowseButton_actionAdapter implements java.awt.event.A
       this.adaptee = adaptee; }
    public void actionPerformed(ActionEvent e) {
       adaptee.saveBrowseButton_actionPerformed(e);
-   }
-}
-
-class SaveWizardStep2_saveFile_actionAdapter implements java.awt.event.ActionListener {
-   SaveWizardStep2 adaptee;
-   SaveWizardStep2_saveFile_actionAdapter(SaveWizardStep2 adaptee) {
-      this.adaptee = adaptee; }
-   public void actionPerformed(ActionEvent e) {
-      adaptee.saveFile_actionPerformed(e);
    }
 }

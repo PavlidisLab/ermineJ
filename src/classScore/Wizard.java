@@ -8,10 +8,10 @@ import javax.swing.*;
 /**
  * <p>Title: </p>
  * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
+ * <p>Copyright: Copyright (c) 2004</p>
  * <p>Company: </p>
  * @author not attributable
- * @version 1.0
+ * @version $Id$
  */
 
 abstract class Wizard extends JDialog {
@@ -25,6 +25,7 @@ abstract class Wizard extends JDialog {
    int step;
    classScoreFrame callingframe;
    Vector steps=new Vector();
+   Vector texts=new Vector();
 
    public Wizard(classScoreFrame callingframe, int width, int height)
    {
@@ -66,21 +67,18 @@ abstract class Wizard extends JDialog {
       this.getRootPane().setDefaultButton(nextButton);
    }
 
-   public void error(Exception e, String message) {
-      JOptionPane.showMessageDialog(null,
-                                    "Error: " + message + "\n" + e.toString() +
-                                    "\n" + e.getStackTrace());
-   }
-
-   public void error(String message) {
-      JOptionPane.showMessageDialog(null, "Error: " + message + "\n");
-   }
-
    void addStep(int step, WizardStep panel)
    {
       steps.add(step-1,panel);
       if(step==1)
-         mainPanel.add((JPanel)steps.get(0));
+         mainPanel.add((JPanel)steps.get(0),BorderLayout.CENTER);
+   }
+
+   void addStepText(int step, JPanel panel)
+   {
+      texts.add(step-1,panel);
+      if(step==1)
+         mainPanel.add((JPanel)texts.get(0),BorderLayout.NORTH);
    }
 
    abstract void nextButton_actionPerformed(ActionEvent e);
@@ -101,7 +99,6 @@ class Wizard_nextButton_actionAdapter implements java.awt.event.
       adaptee.nextButton_actionPerformed(e);
    }
 }
-
 
 class Wizard_backButton_actionAdapter implements java.awt.event.
         ActionListener {
@@ -129,7 +126,6 @@ class Wizard_cancelButton_actionAdapter implements java.awt.event.
       adaptee.cancelButton_actionPerformed(e);
    }
 }
-
 
 class Wizard_finishButton_actionAdapter implements java.awt.event.
         ActionListener {

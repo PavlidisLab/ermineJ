@@ -2,15 +2,16 @@ package classScore;
 
 import java.io.*;
 import java.util.*;
+import baseCode.gui.*;
 
 /**
  * <p>Title: </p>
  * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
+ * <p>Copyright: Copyright (c) 2004</p>
  * <p>Company: </p>
  * @author not attributable
- * @version 1.0
- * @todo All input of custom classes, identified either by probe id or official gene name.
+ * @version $Id$
+ * @todo
  */
 
 public class Settings {
@@ -40,7 +41,8 @@ public class Settings {
          dataFolder = new File(dataFolder).getCanonicalPath();
       }
       catch ( IOException ex ) {
-         System.err.println( "Could not find data folder." ); // make a big deal...
+         GuiUtil.error( "Could not find data folder." ); // make a big deal...
+         System.exit(1);
       }
       pref_file = dataFolder + File.separator + "ClassScore.preferences";
       classFile = dataFolder + File.separator + "goNames.txt";

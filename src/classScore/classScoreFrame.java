@@ -53,6 +53,7 @@ public class classScoreFrame
    InitialMaps imaps;
    boolean initialized = false;
    classScoreStatus statusMessenger;
+   Vector results = new Vector();
 
    Settings settings;
 
@@ -65,6 +66,7 @@ public class classScoreFrame
       }
    }
 
+   /* init */
    private void jbInit() throws Exception {
       ConsoleWindow.init();
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
@@ -118,7 +120,7 @@ public class classScoreFrame
       jTabbedPane1.setMinimumSize( new Dimension( 300, 530 ) );
       jTabbedPane1.setPreferredSize( new Dimension( 830, 330 ) );
       cPanel = new ClassPanel( this );
-      oPanel = new OutputPanel();
+      oPanel = new OutputPanel(results);
       //cPanel.setModel(InitialMaps.toBlankTableModel());
       jTabbedPane1.addTab( "oPanel", oPanel );
 
@@ -161,10 +163,9 @@ public class classScoreFrame
 
       settings = new Settings();
       chooser.setCurrentDirectory( new File(settings.getDataFolder()) );
-
+      showDialog( new StartupDialog(this) );
    }
 
-   /* init */
 
    void jButtonLoad_actionPerformed( ActionEvent e ) {
       /*
@@ -267,17 +268,19 @@ public class classScoreFrame
 
          //cPanel.setModel(imaps.toTableModel());
          System.err.println( "DONE with RUNMAPS" );
-         classPvalRun results = new classPvalRun( settings, runmaps, outputfile,
+         classPvalRun runResult = new classPvalRun( settings, runmaps, outputfile,
                                                   useWeights, "bh", messenger,
                                                   loadResults );
 
          System.err.println( "DONE with CLASSPVALRUN" );
 
-         resultpanel = new ResultPanel( results, settings );
-         resultpanel.setModel( results.toTableModel() );
+         resultpanel = new ResultPanel( runResult, settings );
+         resultpanel.setModel( runResult.toTableModel() );
          runnum++;
          jTabbedPane1.addTab( "Run " + Integer.toString( runnum ), resultpanel );
-         oPanel.addRunData( results.getResults() );
+         //oPanel.addRunData( runResult.getResults() );
+         oPanel.addRun();
+         results.add(runResult);
       }
       catch ( IllegalArgumentException e ) {
          error( e, "During class score calculation" );
@@ -460,28 +463,6 @@ public class classScoreFrame
 
    /**
     *
-    * @param filename
-    * @return
-    */
-   private boolean testfile( String filename ) {
-      if ( filename != null && filename.length() > 0 ) {
-         File f = new File( filename );
-         if ( f.exists() ) {
-            return true;
-         } else {
-            JOptionPane.showMessageDialog( null,
-                                           "File " + filename +
-                                           " doesn't exist.  " );
-         }
-         return false;
-      } else {
-         JOptionPane.showMessageDialog( null, "A required file field is blank." );
-         return false;
-      }
-   }
-
-   /**
-    *
     */
 
    void defineClassMenuItem_actionPerformed( ActionEvent e ) {
@@ -498,7 +479,7 @@ public class classScoreFrame
       }
       modClassFrame modframe = new modClassFrame( makenew, imaps, this.cPanel,
                                                   settings.getDataFolder(), classid );
-      showWizard( modframe );
+      showDialog( modframe );
    }
 
    void loadClassMenuItem_actionPerformed( ActionEvent e ) {
@@ -518,7 +499,7 @@ public class classScoreFrame
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
       AnalysisFrame aframe = new AnalysisFrame( this );
-      showWizard( aframe );
+      showDialog( aframe );
    }
 
    void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
@@ -526,11 +507,12 @@ public class classScoreFrame
    }
 
    void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      SaveWizard swiz = new SaveWizard( this, ( Vector ) oPanel.getAllRunData() );
-      showWizard( swiz );
+//      SaveWizard swiz = new SaveWizard( this, ( Vector ) oPanel.getAllRunData() );
+      SaveWizard swiz = new SaveWizard( this, results );
+      showDialog( swiz );
    }
 
-   void showWizard( JDialog j ) {
+   void showDialog( JDialog j ) {
       Dimension dlgSize = j.getPreferredSize();
       Dimension frmSize = getSize();
       Point loc = getLocation();

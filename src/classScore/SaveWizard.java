@@ -2,8 +2,8 @@ package classScore;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
+import baseCode.gui.*;
 
 /**
  * <p>Title: </p>
@@ -29,7 +29,6 @@ public class SaveWizard extends Wizard
       super(callingframe,400,200);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
-      System.err.println(callingframe.getSettings().getDataFolder());
 
       step1 = new SaveWizardStep1(this,rundata);
       this.addStep(1,step1);
@@ -60,7 +59,7 @@ public class SaveWizard extends Wizard
          }
          else
          {
-             error("No analyses to save.");
+             GuiUtil.error("No analyses to save.");
          }
       }
    }
@@ -84,7 +83,9 @@ public class SaveWizard extends Wizard
    }
 
    void finishButton_actionPerformed(ActionEvent e) {
-
+      System.err.println(step1.getSelectedRunNum());
+      System.err.println(step2.getSaveFileName());
+      //printResults(true);
       dispose();
    }
 

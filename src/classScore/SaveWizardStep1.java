@@ -53,10 +53,6 @@ public class SaveWizardStep1 extends WizardStep
 
    void showChoices()
    {
-      if(rundata==null)
-         System.err.println("data null");
-      else
-         System.err.println("there are "+rundata.size()+ " runs");
       if(rundata==null || rundata.size()<1)
       {
          runComboBox.addItem("No runs available to save");
@@ -73,6 +69,8 @@ public class SaveWizardStep1 extends WizardStep
           runComboBox.setSelectedIndex(0);
       }
    }
+
+   public int getSelectedRunNum() { return runComboBox.getSelectedIndex()+1; }
 
    public boolean runsExist() { return runs_exist; }
 

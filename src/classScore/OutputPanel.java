@@ -20,9 +20,9 @@ public class OutputPanel extends JScrollPane {
    JTable table;
    OutputTableModel model;
 
-   public OutputPanel() {
+   public OutputPanel(Vector results) {
       try {
-         model = new OutputTableModel();
+         model = new OutputTableModel(results);
          table = new JTable(model);
          this.getViewport().add(table, null);
          table.getColumnModel().getColumn(0).setPreferredWidth(70);
@@ -52,22 +52,29 @@ public class OutputPanel extends JScrollPane {
       table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
    }
 
-   public Vector getAllRunData() {
-      return model.getAllRunData();
+   public void addRun() {
+      model.addRun();
+      table.addColumn(new TableColumn(model.getColumnCount() - 3));
+      table.addColumn(new TableColumn(model.getColumnCount() - 2));
+      table.addColumn(new TableColumn(model.getColumnCount() - 1));
+      table.getColumnModel().getColumn(model.getColumnCount() - 3).setPreferredWidth(30);
+      table.getColumnModel().getColumn(model.getColumnCount() - 2).setPreferredWidth(30);
+      table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
    }
-
 }
 
 
 class OutputTableModel extends AbstractTableModel {
    InitialMaps imaps;
-   Vector results = new Vector();
+   //Vector results = new Vector();
+   Vector results;
    Vector columnNames = new Vector();
    private NumberFormat nf = NumberFormat.getInstance();
    int state = -1;
    int cols_per_run = 3;
 
-   public OutputTableModel() {
+   public OutputTableModel(Vector results) {
+      this.results=results;
       nf.setMaximumFractionDigits(8);
       columnNames.add("Name");
       columnNames.add("Description");
@@ -88,8 +95,11 @@ class OutputTableModel extends AbstractTableModel {
       columnNames.add("Run " + state + " Pval");
    }
 
-   public Vector getAllRunData() {
-      return results;
+   public void addRun() {
+      state++;
+      columnNames.add("Run " + state + " Rank");
+      columnNames.add("Run " + state + " Score");
+      columnNames.add("Run " + state + " Pval");
    }
 
    public String getColumnName(int i) {return (String) columnNames.get(i);
@@ -122,7 +132,8 @@ class OutputTableModel extends AbstractTableModel {
       } else if (state > 0) {
          String classid = imaps.getClass(i);
          double runnum = Math.floor((j - 4) / cols_per_run);
-         Map data = (Map) results.get((int) runnum);
+         Map data = ((classPvalRun)results.get((int) runnum)).getResults();
+         //Map data = (Map)results.get((int) runnum);
          if (data.containsKey(classid)) {
             classresult res = (classresult) data.get(classid);
             if ((j - 4) % cols_per_run == 0) {
