@@ -70,7 +70,8 @@ public class JGeneSetFrame extends JFrame {
    protected JTable m_table = new JTable();
    protected BorderLayout borderLayout1 = new BorderLayout();
    protected JToolBar m_toolbar = new JToolBar();
-   JSlider m_matrixDisplayCellWidthSlider = new JSlider();
+   /** controls the width of the cells in the matrix display */
+   JSlider m_cellWidthSlider = new JSlider();
    JMenuBar m_menuBar = new JMenuBar();
    JMenu m_fileMenu = new JMenu();
    JRadioButtonMenuItem m_greenredColormapMenuItem = new JRadioButtonMenuItem();
@@ -79,9 +80,9 @@ public class JGeneSetFrame extends JFrame {
    JMenuItem m_saveImageMenuItem = new JMenuItem();
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
    DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
-   JLabel jLabel1 = new JLabel();
-   JLabel jLabel2 = new JLabel();
-   JLabel jLabel3 = new JLabel();
+   JLabel m_cellWidthLabel = new JLabel();
+   JLabel m_spacerLabel = new JLabel();
+   JLabel m_colorRangeLabel = new JLabel();
    JSlider m_colorRangeSlider = new JSlider();
    JGradientBar m_gradientBar = new JGradientBar();
    JMenuItem m_saveDataMenuItem = new JMenuItem();
@@ -160,26 +161,26 @@ public class JGeneSetFrame extends JFrame {
       m_normalizeMenuItem
             .addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter(
                   this ) );
-      m_matrixDisplayCellWidthSlider.setInverted( false );
-      m_matrixDisplayCellWidthSlider.setMajorTickSpacing( 0 );
-      m_matrixDisplayCellWidthSlider
+      m_cellWidthSlider.setInverted( false );
+      m_cellWidthSlider.setMajorTickSpacing( 0 );
+      m_cellWidthSlider
             .setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_matrixDisplayCellWidthSlider
+      m_cellWidthSlider
             .setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_matrixDisplayCellWidthSlider
+      m_cellWidthSlider
             .setValue( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_matrixDisplayCellWidthSlider.setMinorTickSpacing( 3 );
-      m_matrixDisplayCellWidthSlider.setPaintLabels( false );
-      m_matrixDisplayCellWidthSlider.setPaintTicks( true );
-      m_matrixDisplayCellWidthSlider.setMaximumSize( new Dimension( 90, 24 ) );
-      m_matrixDisplayCellWidthSlider.setPreferredSize( new Dimension( 90, 24 ) );
-      m_matrixDisplayCellWidthSlider
-            .addChangeListener( new JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter(
+      m_cellWidthSlider.setMinorTickSpacing( 3 );
+      m_cellWidthSlider.setPaintLabels( false );
+      m_cellWidthSlider.setPaintTicks( true );
+      m_cellWidthSlider.setMaximumSize( new Dimension( 90, 24 ) );
+      m_cellWidthSlider.setPreferredSize( new Dimension( 90, 24 ) );
+      m_cellWidthSlider
+            .addChangeListener( new JGeneSetFrame_m_cellWidthSlider_changeAdapter(
                   this ) );
       this.setResizable( true );
-      jLabel1.setText( "Cell Width:" );
-      jLabel2.setText( "    " );
-      jLabel3.setText( "Color Range:" );
+      m_cellWidthLabel.setText( "Cell Width:" );
+      m_spacerLabel.setText( "    " );
+      m_colorRangeLabel.setText( "Color Range:" );
 
       m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
       m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
@@ -207,10 +208,10 @@ public class JGeneSetFrame extends JFrame {
 
       this.getContentPane().add( m_tableScrollPane, BorderLayout.CENTER );
       this.getContentPane().add( m_toolbar, BorderLayout.NORTH );
-      m_toolbar.add( jLabel1, null );
-      m_toolbar.add( m_matrixDisplayCellWidthSlider, null );
-      m_toolbar.add( jLabel2, null );
-      m_toolbar.add( jLabel3, null );
+      m_toolbar.add( m_cellWidthLabel, null );
+      m_toolbar.add( m_cellWidthSlider, null );
+      m_toolbar.add( m_spacerLabel, null );
+      m_toolbar.add( m_colorRangeLabel, null );
       m_toolbar.add( m_colorRangeSlider, null );
       m_toolbar.add( m_gradientBar, null );
 
@@ -228,8 +229,8 @@ public class JGeneSetFrame extends JFrame {
       m_viewMenu.add( m_blackbodyColormapMenuItem );
       m_fileMenu.add( m_saveImageMenuItem );
       m_fileMenu.add( m_saveDataMenuItem );
-      m_matrixDisplayCellWidthSlider.setPaintTrack( true );
-      m_matrixDisplayCellWidthSlider.setPaintTicks( false );
+      m_cellWidthSlider.setPaintTrack( true );
+      m_cellWidthSlider.setPaintTicks( false );
 
       m_nf.setMaximumFractionDigits( 3 );
       if ( m_matrixDisplay != null ) {
@@ -238,15 +239,26 @@ public class JGeneSetFrame extends JFrame {
       }
       else {
          // matrixDisplay is null!  Disable the menu
-         setMenuEnabled( false );
+         setDisplayMatrixGUIEnabled( false );
       }
    }
 
-   private void setMenuEnabled( boolean enabled ) {
+   private void setDisplayMatrixGUIEnabled( boolean enabled ) {
+
+      // the menu
+      m_menuBar.setEnabled( enabled );
+      m_fileMenu.setEnabled( enabled );
+      m_viewMenu.setEnabled( enabled );
+
+      // the toolbar
+      m_toolbar.setEnabled( enabled );
       
-      m_menuBar.setEnabled( false );
-      m_fileMenu.setEnabled( false );
-      m_viewMenu.setEnabled( false );
+      // the sliders
+      m_cellWidthSlider.setEnabled( enabled );
+      m_cellWidthLabel.setEnabled( enabled );
+      m_colorRangeSlider.setEnabled( enabled );
+      m_colorRangeLabel.setEnabled( enabled );
+      m_gradientBar.setVisible( enabled );
    }
    
    private void createDetailsTable( ArrayList probeIDs, Map pvalues,
@@ -270,8 +282,9 @@ public class JGeneSetFrame extends JFrame {
       }
       catch ( IOException e ) {
          GuiUtil.error( 
-            "Unable to load raw microarray data from file " + filename + ". " +
-            "If this problem persists, contact your software vendor." );
+            "Unable to load raw microarray data from file " + filename + "\n" +
+            "Please make sure the file exists, filename and directory path are correct,\n" +
+            "and that it is a valid raw data file (tab-delimited).\n" );
          matrix = null;
       }
             
@@ -563,7 +576,7 @@ public class JGeneSetFrame extends JFrame {
       m_table.repaint();
    }
 
-   void m_matrixDisplayCellWidthSlider_stateChanged( ChangeEvent e ) {
+   void m_cellWidthSlider_stateChanged( ChangeEvent e ) {
 
       JSlider source = ( JSlider ) e.getSource();
 
@@ -708,17 +721,17 @@ class JGeneSetFrame_m_normalizeMenuItem_actionAdapter implements
    }
 }
 
-class JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter implements
+class JGeneSetFrame_m_cellWidthSlider_changeAdapter implements
       javax.swing.event.ChangeListener {
    JGeneSetFrame adaptee;
 
-   JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter(
+   JGeneSetFrame_m_cellWidthSlider_changeAdapter(
          JGeneSetFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
    public void stateChanged( ChangeEvent e ) {
-      adaptee.m_matrixDisplayCellWidthSlider_stateChanged( e );
+      adaptee.m_cellWidthSlider_stateChanged( e );
    }
 }
 
