@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;

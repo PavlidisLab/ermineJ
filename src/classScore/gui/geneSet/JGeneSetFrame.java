@@ -33,8 +33,7 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableColumn;
 
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.dataStructure.reader.DoubleMatrixReader;
+import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.graphics.text.Util;
 import baseCode.gui.ColorMap;
 import baseCode.gui.JGradientBar;
@@ -44,6 +43,7 @@ import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
 import baseCode.gui.table.TableSorter;
 import baseCode.gui.GuiUtil;
+import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;

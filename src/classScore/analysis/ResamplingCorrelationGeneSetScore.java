@@ -3,8 +3,8 @@ package classScore.analysis;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.dataStructure.SparseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.SparseDoubleMatrix2DNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.RandomChooser;
 import baseCode.util.StatusViewer;

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.util.StatusViewer;
 import classScore.analysis.CorrelationsGeneSetPvalSeriesGenerator;
 import classScore.analysis.GeneSetPvalSeriesGenerator;

@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.dataStructure.reader.DoubleMatrixReader;
+import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.gui.GuiUtil;
+import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.StatusViewer;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;

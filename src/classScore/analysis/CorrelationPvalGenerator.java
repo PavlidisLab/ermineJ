@@ -1,6 +1,6 @@
 package classScore.analysis;
 
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
