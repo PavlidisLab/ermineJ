@@ -42,14 +42,21 @@ import java.util.Vector;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  * @todo deletion of geneDataSets when remove is used.
  */
 
 public class OutputPanel extends JScrollPane {
-   
+
+   private static final String AMIGO_URL_BASE = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=";
+   private final static int COL0WIDTH = 80;
+   private final static int COL1WIDTH = 350;
+   private final static int COL2WIDTH = 80;
+   private final static int COL3WIDTH = 80;
+   private final static int COLRWIDTH = 80;
+
    private JTable table;
    private OutputTableModel model;
    private TableSorter sorter;
@@ -59,11 +66,7 @@ public class OutputPanel extends JScrollPane {
    private GeneAnnotations geneData;
    private GONames goData;
    private String classColToolTip;
-   private final static int COL0WIDTH = 80;
-   private final static int COL1WIDTH = 350;
-   private final static int COL2WIDTH = 80;
-   private final static int COL3WIDTH = 80;
-   private final static int COLRWIDTH = 80;
+
 
    public OutputPanel( GeneSetScoreFrame callingframe, LinkedList results ) {
       this.callingframe = callingframe;
@@ -112,11 +115,12 @@ public class OutputPanel extends JScrollPane {
       table.getTableHeader().addMouseListener( removeRunPopupListener );
    }
 
-   /**
-    * @todo make this open the class even if no results are stored.
-    * @param e
-    */
-   void table_mouseReleased( MouseEvent e ) {
+  /**
+   *
+   * @todo make this open the class even if no results are stored.
+   * @param e MouseEvent
+   */
+  void table_mouseReleased( MouseEvent e ) {
       int i = table.getSelectedRow();
       int j = table.getSelectedColumn();
       if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.init_cols ) {
@@ -158,11 +162,11 @@ public class OutputPanel extends JScrollPane {
       cwiz.showWizard();
    }
 
-   /**
-    * @todo make this do something.
-    * @param e
-    */
-   void htmlMenuItem_actionPerformed( ActionEvent e ) {
+  /**
+   *
+   * @param e ActionEvent
+   */
+  void htmlMenuItem_actionPerformed( ActionEvent e ) {
 
       OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e
             .getSource() ).getParent();
@@ -170,11 +174,9 @@ public class OutputPanel extends JScrollPane {
       String classID = getClassId( r );
 
       // create the URL and show it
-      String URL = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=";
-      URL += classID; // e.g. "GO:0003824"
       try {
          //    new JWebBrowser( URL );
-         BrowserLauncher.openURL( URL );
+         BrowserLauncher.openURL( AMIGO_URL_BASE + classID);
       } catch ( IOException e1 ) {
          GuiUtil.error("Could not open a web browser window.");
       }
@@ -311,10 +313,11 @@ public class OutputPanel extends JScrollPane {
       return ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
    }
 
-   /**
-    * @return
-    */
-   public GONames getGoData() {
+  /**
+   *
+   * @return classScore.data.GONames
+   */
+  public GONames getGoData() {
       return goData;
    }
 }
@@ -492,20 +495,21 @@ class OutputTableModel extends AbstractTableModel {
       columnNames.add( "# of Genes" );
    }
 
-   /**
-    * @return
-    */
-   public int getState() {
+  /**
+   *
+   * @return int
+   */
+  public int getState() {
       return state;
    }
 
-   /**
-    * Does not reset the state.
-    * 
-    * @param geneData
-    * @param goData
-    */
-   public void setInitialData( GeneAnnotations geneData, GONames goData ) {
+  /**
+   * Does not reset the state.
+   *
+   * @param geneData GeneAnnotations
+   * @param goData GONames
+   */
+  public void setInitialData( GeneAnnotations geneData, GONames goData ) {
       this.geneData = geneData;
       this.goData = goData;
    }
