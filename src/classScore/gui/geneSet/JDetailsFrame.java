@@ -46,7 +46,7 @@ import classScore.SortFilterModel;
 public class JDetailsFrame
     extends JFrame {
 
-   final int PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN = 12;
+   final int PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN = 6;
    final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
    final int MAX_WIDTH_MATRIXDISPLAY_COLUMN = 19;
    final int PREFERRED_WIDTH_COLUMN_0 = 75;
