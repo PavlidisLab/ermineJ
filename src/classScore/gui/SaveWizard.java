@@ -77,7 +77,7 @@ public class SaveWizard extends Wizard {
             finishButton.grabFocus();
             this.repaint();
          } else {
-            showStatus( "No analyses to save." );
+            showError( "No analyses to save." );
          }
       }
    }

@@ -88,7 +88,7 @@ public class StartupDialog extends AppDialog {
             "For updated annotation files, visit " +
             "http://microarray.cpmc.columbia.edu/annots/</html>" );
       addMain( centerPanel );
-      this.setTitle( "Gene set scoring startup" );
+      this.setTitle( "ErmineJ startup" );
    }
 
    private void setValues() {
@@ -108,6 +108,7 @@ public class StartupDialog extends AppDialog {
    }
 
    void annotBrowseButton_actionPerformed( ActionEvent e ) {
+      chooser.setDialogTitle("Choose the annotation file:");
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          annotFile.setText( chooser.getSelectedFile().toString() );
@@ -115,6 +116,7 @@ public class StartupDialog extends AppDialog {
    }
 
    void classBrowseButton_actionPerformed( ActionEvent e ) {
+      chooser.setDialogTitle("Choose the GO XML file:");
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          classFile.setText( chooser.getSelectedFile().toString() );

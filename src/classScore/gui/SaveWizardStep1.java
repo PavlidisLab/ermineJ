@@ -53,8 +53,8 @@ public class SaveWizardStep1 extends WizardStep {
 
       this.addHelp( "<html><b>You may save" +
             "the results of an analysis in a file.</b><br>" + "This file" +
-                  "can be used in other software (e.g. Excel) or loaded" +
-                  "back into this application to be viewed later." );
+                  " can be used in other software (e.g. Excel) or loaded" +
+                  " back into this application to be viewed later." );
       this.addMain( runPanel );
    }
 

@@ -38,7 +38,7 @@ public class SaveWizardStep2 extends WizardStep
       this.wiz=wiz;
       this.folder=folder;
       chooser.setCurrentDirectory(new File(folder));
-      chooser.setDialogTitle("Save Analysis As");
+      chooser.setDialogTitle("Save Analysis As:");
       wiz.clearStatus();
    }
 
@@ -54,7 +54,7 @@ public class SaveWizardStep2 extends WizardStep
       saveFile.setPreferredSize(new Dimension(230, 19));
       saveBrowseButton = new JButton();
       saveBrowseButton.addActionListener(new SaveWizardStep2_saveBrowseButton_actionAdapter(this));
-      saveBrowseButton.setText("Browse....");
+      saveBrowseButton.setText("Browse...");
       chooser = new JFileChooser();
       jPanel11.add(jLabel3, null);
       jPanel11.add(saveFile, null);

@@ -116,6 +116,10 @@ public class OutputPanel extends JScrollPane {
       table.getTableHeader().addMouseListener( removeRunPopupListener );
    }
 
+   /**
+    * @todo make this open the class even if no results are stored.
+    * @param e
+    */
    void table_mouseReleased( MouseEvent e ) {
       int i = table.getSelectedRow();
       int j = table.getSelectedColumn();
