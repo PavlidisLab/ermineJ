@@ -1,19 +1,17 @@
 package classScore.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.SystemColor;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.io.File;
 
+import java.awt.Dimension;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
 import baseCode.util.StatusViewer;
 import classScore.Settings;
@@ -27,41 +25,23 @@ import classScore.Settings;
  * @version $Id$
  */
 
-public class LoadDialog
-    extends JDialog {
-   JPanel mainPanel;
+public class LoadDialog extends AppDialog {
    JFileChooser chooser = new JFileChooser();
-
-   //holds bottom buttons
-   JPanel BottomPanel = new JPanel();
-   JButton cancelButton = new JButton();
-   JButton loadButton = new JButton();
-
    JPanel centerPanel = new JPanel();
    JButton loadBrowseButton = new JButton();
    JLabel annotLabel = new JLabel();
    JPanel loadPanel = new JPanel();
    JTextField loadFile = new JTextField();
 
-   GeneSetScoreFrame callingframe;
    Settings settings;
-   StatusViewer messenger;
 
    public LoadDialog( GeneSetScoreFrame callingframe ) {
-      setModal( true );
-      this.callingframe = callingframe;
-      this.settings = callingframe.getSettings();
+      super(callingframe,400,200);
+      this.settings = ((GeneSetScoreFrame)callingframe).getSettings();
       chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
       chooser.setDialogTitle("Open Saved Analysis");
       try {
          jbInit();
-         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-         Dimension dlgSize = getPreferredSize();
-         setLocation((screenSize.width - dlgSize.width) / 2,
-                     (screenSize.height - dlgSize.height) / 2);
-         pack();
-         loadButton.requestFocusInWindow();
-         show();
       }
       catch ( Exception e ) {
          e.printStackTrace();
@@ -70,10 +50,6 @@ public class LoadDialog
 
    //Component initialization
    private void jbInit() throws Exception {
-      setResizable( true );
-      mainPanel = ( JPanel )this.getContentPane();
-      mainPanel.setPreferredSize( new Dimension( 400, 150 ) );
-
       loadBrowseButton.setEnabled( true );
       loadBrowseButton.setText( "Browse...." );
       loadBrowseButton.addActionListener( new LoadDialog_loadBrowseButton_actionAdapter( this ) );
@@ -87,18 +63,9 @@ public class LoadDialog
       loadPanel.add( loadBrowseButton, null );
       centerPanel.add( loadPanel, null );
 
-      BottomPanel.setPreferredSize( new Dimension( 200, 40 ) );
-      cancelButton.setText("Cancel" );
-      cancelButton.addActionListener( new
-                                    LoadDialog_cancelButton_actionAdapter( this ) );
-      loadButton.setText("Load" );
-      loadButton.addActionListener( new
-                                      LoadDialog_loadButton_actionAdapter( this ) );
-      BottomPanel.add( cancelButton, null );
-      BottomPanel.add( loadButton, null );
-      mainPanel.add( BottomPanel, BorderLayout.SOUTH );
-
-      mainPanel.add( centerPanel );
+      setActionButtonText("Load" );
+      addHelp(" hurdy gurdy");
+      addMain( centerPanel );
       this.setTitle( "Load Results from File" );
    }
 
@@ -109,14 +76,14 @@ public class LoadDialog
       }
    }
 
-   void cancelButton_actionPerformed( ActionEvent e ) {
+   protected void cancelButton_actionPerformed ( ActionEvent e ) {
       dispose();
    }
 
-   void loadButton_actionPerformed( ActionEvent e ) {
+   protected void actionButton_actionPerformed( ActionEvent e ) {
       if(GuiUtil.testfile(loadFile.getText()))
       {
-         callingframe.loadAnalysis(loadFile.getText());
+         ((GeneSetScoreFrame)callingframe).loadAnalysis(loadFile.getText());
          dispose();
       }
    }
@@ -151,16 +118,16 @@ class LoadDialog_cancelButton_actionAdapter
    }
 }
 
-class LoadDialog_loadButton_actionAdapter
+class LoadDialog_actionButton_actionAdapter
     implements java.awt.event.
     ActionListener {
    LoadDialog adaptee;
 
-   LoadDialog_loadButton_actionAdapter( LoadDialog adaptee ) {
+   LoadDialog_actionButton_actionAdapter( LoadDialog adaptee ) {
       this.adaptee = adaptee;
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.loadButton_actionPerformed( e );
+      adaptee.actionButton_actionPerformed( e );
    }
 }

@@ -155,7 +155,7 @@ public class NewGeneSet {
                probes = new ArrayList( probeSet );
             }
          } catch ( IOException ioe ) {
-            GuiUtil.error( "Could not find file: " + ioe );
+            GuiUtil.error( "Could not find file: " + file );
          }
       }
 

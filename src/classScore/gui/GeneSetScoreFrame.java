@@ -1,5 +1,10 @@
 package classScore.gui;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -8,11 +13,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -73,7 +73,6 @@ public class GeneSetScoreFrame
    JProgressBar progressBar = new JProgressBar();
    OutputPanel oPanel;
 
-
    JLabel jLabelStatus = new JLabel();
    JPanel jPanelStatus = new JPanel();
 
@@ -93,7 +92,6 @@ public class GeneSetScoreFrame
       try {
          jbInit();
          settings = new Settings();
-         StartupDialog sdlog = new StartupDialog( this );
       }
       catch ( Exception e ) {
          e.printStackTrace();
@@ -221,7 +219,7 @@ public class GeneSetScoreFrame
       statusMessenger = new StatusJlabel( jLabelStatus );
 
       //mainPanel.add( oPanel, BorderLayout.CENTER );
-      mainPanel.add( progressPanel, BorderLayout.CENTER );
+      //mainPanel.add( progressPanel, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
 
@@ -252,6 +250,8 @@ public class GeneSetScoreFrame
 
    public void initialize() {
       try {
+         mainPanel.add( progressPanel, BorderLayout.CENTER );
+
          rawDataSets = new HashMap();
          geneDataSets = new HashMap();
          geneScoreSets = new HashMap();
@@ -345,7 +345,8 @@ public class GeneSetScoreFrame
    }
 
    void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      LoadDialog sdlog = new LoadDialog( this );
+      LoadDialog lgsd = new LoadDialog(this);
+      lgsd.showDialog();
    }
 
    void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
@@ -389,6 +390,11 @@ public class GeneSetScoreFrame
       disableMenusForAnalysis();
       Settings loadSettings = new Settings(loadFile);
       athread.loadAnalysisThread(this,loadSettings,statusMessenger,goData,geneDataSets, rawDataSets, geneScoreSets,loadFile);
+   }
+
+   public void addedNewGeneSet()
+   {
+      oPanel.addedNewGeneSet();
    }
 }
 

@@ -30,6 +30,8 @@ import classScore.classPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
+import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * <p>
@@ -122,14 +124,14 @@ public class OutputPanel extends JScrollPane {
       int j = table.getSelectedColumn();
       if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.init_cols ) {
          int runnum = model.getRunNum( j );
-         String id = ( String ) table.getValueAt( i, 0 );
+         String id = getClassId(i);
          ( ( classPvalRun ) results.get( runnum ) ).showDetails( id );
       } else {
          for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
             if ( table.getValueAt( i, k ) != null
                   && k >= OutputTableModel.init_cols ) {
                String message;
-               String id = ( String ) table.getValueAt( i, 0 );
+               String id = getClassId( i );
                String shownRunName = model.getColumnName( k );
                shownRunName = shownRunName.substring( 0,
                      shownRunName.length() - 5 );
@@ -138,11 +140,9 @@ public class OutputPanel extends JScrollPane {
                   message = message.substring( 0, message.length() - 5 );
                   message = message + " doesn't include the class " + id
                         + ". Showing " + shownRunName + " instead.";
-               } else {
-                  message = "Showing details for " + shownRunName + ".";
+                  JOptionPane.showMessageDialog( this, message, "FYI",
+                                                 JOptionPane.PLAIN_MESSAGE );
                }
-               JOptionPane.showMessageDialog( this, message, "FYI",
-                     JOptionPane.PLAIN_MESSAGE );
                int runnum = model.getRunNum( k );
                ( ( classPvalRun ) results.get( runnum ) ).showDetails( id );
             }
@@ -155,7 +155,7 @@ public class OutputPanel extends JScrollPane {
       OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e
             .getSource() ).getParent();
       int r = table.rowAtPoint( sourcePopup.getPoint() );
-      String id = ( String ) table.getValueAt( r, 0 );
+      String id = ( String ) getClassId( r );
       GeneSetWizard cwiz = new GeneSetWizard( callingframe, geneData, goData,
             id );
       cwiz.showWizard();
@@ -266,6 +266,16 @@ public class OutputPanel extends JScrollPane {
       if ( results.size() > 4 )
          table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
       table.revalidate();
+   }
+
+   public void addedNewGeneSet() {
+      sorter.cancelSorting();
+      sorter.setSortingStatus( 0, TableSorter.ASCENDING );
+      table.revalidate();
+   }
+
+   public String getClassId(int row){
+       return (String)(( Vector ) table.getValueAt( row, 0 )).get(0);
    }
 }
 
@@ -491,7 +501,13 @@ class OutputTableModel extends AbstractTableModel {
       if ( state >= 0 && j < init_cols ) {
          switch ( j ) {
             case 0:
-               return classid;
+            {
+               Vector cid_vec=new Vector();
+               cid_vec.add(classid);
+               if ( goData.newSet( classid ) )
+                  cid_vec.add(new String("M"));
+               return cid_vec;
+            }
             case 1:
                return goData.getNameForId( classid );
             case 2:
@@ -546,6 +562,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       {
          if(value.getClass().equals(ArrayList.class))
             setText((( Double ) ( ( ArrayList ) value ).get( 1 )).toString());
+         else if(value.getClass().equals(Vector.class))
+            setText(( String ) ( ( Vector ) value ).get( 0 ));
          else
             setText(value.toString());
       }
@@ -559,12 +577,11 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          setOpaque( true );
       else if ( value == null )
          setOpaque( false );
-      else if ( column == 0 && goData.newSet( ( String ) value ) ) {
+      else if ( column == 0 && goData.newSet( (String)(( Vector ) value).get(0) ) ) {
          setBackground( modified );
       } else if ( value.getClass().equals( ArrayList.class ) )
-      //else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
       {
-         String classid = ( String ) table.getValueAt( row, 0 );
+         String classid = (String)(( Vector ) table.getValueAt( row, 0 )).get(0);
          classPvalRun result = ( classPvalRun ) results.get( runcol );
          Map data = result.getResults();
          if ( data.containsKey( classid ) ) {
@@ -581,7 +598,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       // set tool tips
       if ( value!=null && value.getClass().equals( ArrayList.class ) )
       {
-         String classid = ( String ) table.getValueAt( row, 0 );
+         String classid = (String)(( Vector ) table.getValueAt( row, 0 )).get(0);
+         //String classid = ( String ) table.getValueAt( row, 0 );
          classPvalRun result = ( classPvalRun ) results.get( runcol );
          Map data = result.getResults();
          if ( data.containsKey( classid ) ) {

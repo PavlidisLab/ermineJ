@@ -30,7 +30,7 @@ import classScore.gui.geneSet.JGeneSetFrame;
 
 /**
  * Class that does all the work in doing gene set scoring. This class holds the results as well.
- * 
+ *
  * @author Shahmil Merchant; Paul Pavlidis (major changes)
  * @version $Id$
  * @todo 3.0 make multiple test correction a 'setting'.
@@ -161,7 +161,7 @@ public class classPvalRun {
          }
          case Settings.CORR: {
             messenger.setStatus( "Starting correlation resampling" );
-            NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore(settings, 
+            NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore(settings,
                   rawData );
             hist = probePvalMapper.generateNullDistribution( messenger );
 
@@ -227,13 +227,14 @@ public class classPvalRun {
       final Map pvals = new HashMap();
       for ( int i = 0, n = probeIDs.size(); i < n; i++ ) {
          Double pvalue;
+         String probeID=(String)probeIDs.get( i );
          if ( settings.getDoLog() == true ) {
             pvalue = new Double( Math
                   .pow( 10.0, -( ( Double ) geneScores.getProbeToPvalMap().get(
-                        probeIDs.get( i ) ) ).doubleValue() ) ); // todo null pointer here on mouseup
+                        probeID ) ).doubleValue() ) ); // todo null pointer here on mouseup
          } else {
-            pvalue = ( Double ) geneScores.getProbeToPvalMap().get(
-                  probeIDs.get( i ) );
+            pvalue = ( Double ) geneScores.getProbeToPvalMap().get(probeID
+                   );
          }
          pvals.put( ( ( ArrayList ) classToProbe.get( classID ) ).get( i ),
                pvalue );
@@ -252,7 +253,7 @@ public class classPvalRun {
    }
 
    /**
-    * 
+    *
     * @return Map the results
     */
    public Map getResults() {
@@ -260,7 +261,7 @@ public class classPvalRun {
    }
 
    /**
-    * 
+    *
     * @return Map the results
     */
    public Vector getSortedClasses() {
@@ -272,7 +273,7 @@ public class classPvalRun {
    }
 
    /**
-    * 
+    *
     * @return Settings
     */
    public Settings getSettings() {

@@ -61,6 +61,7 @@ public class GeneSetWizard extends Wizard {
       step3 = new GeneSetWizardStep3(this,settings,geneData,newGeneSet,makenew);
       this.addStep(3,step3);
 
+      finishButton.setEnabled(false);
    }
 
    public GeneSetWizard(GeneSetScoreFrame callingframe, GeneAnnotations geneData,
@@ -108,6 +109,7 @@ public class GeneSetWizard extends Wizard {
                }
                step = 2;
                backButton.setEnabled(true);
+               finishButton.setEnabled(false);
                this.getContentPane().add(step2);
                step2.revalidate();
                step2.updateCountLabel();
@@ -139,6 +141,7 @@ public class GeneSetWizard extends Wizard {
          this.getContentPane().remove(step2);
          step = 1;
          backButton.setEnabled(false);
+         finishButton.setEnabled(false);
          if (makenew) {
             this.setTitle("Define New Class - Step 1 of 3");
             this.getContentPane().add(step1);
@@ -186,6 +189,7 @@ public class GeneSetWizard extends Wizard {
          else
             newGeneSet.modifyClass(goData);
          newGeneSet.saveClass(settings.getClassFolder(), 0);
+         ((GeneSetScoreFrame)callingframe).addedNewGeneSet();
          dispose();
       }
    }

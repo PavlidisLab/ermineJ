@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.Vector;
 
-import javax.swing.JButton;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,12 +22,13 @@ import baseCode.gui.table.TableSorter;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
+import javax.swing.JButton;
 
 /**
  * <p>
  * Copyright: Copyright (c) 2004 Columbia University
  * </p>
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  * @todo 3.0 old table click shows class in status bar, number of probes?

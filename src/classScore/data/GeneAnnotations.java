@@ -293,7 +293,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @return Map
     */
    public Map getClassToProbeMap() {

@@ -40,7 +40,7 @@ import classScore.data.NewGeneSet;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  */
@@ -55,6 +55,10 @@ public class GeneSetWizardStep2 extends WizardStep {
    AbstractTableModel ncTableModel;
    NewGeneSet newGeneSet;
    JTextField searchTextField;
+
+   final static int COL0WIDTH = 80;
+   final static int COL1WIDTH = 80;
+   final static int COL2WIDTH = 200;
 
    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData,
          NewGeneSet newGeneSet ) {
@@ -207,18 +211,19 @@ public class GeneSetWizardStep2 extends WizardStep {
    }
 
    private void populateTables() {
-      TableSorter sorter = new TableSorter ( geneData.toTableModel() );
-      probeTable.setModel( sorter );
-      sorter.setTableHeader( probeTable.getTableHeader() );
+      ProbeTableModel model = new ProbeTableModel(geneData);
+      TableSorter sorter = new TableSorter(model);
+      probeTable.setModel(sorter);
+      sorter.setTableHeader(probeTable.getTableHeader());
+       probeTable.getColumnModel().getColumn(0).setPreferredWidth(COL0WIDTH);
+       probeTable.getColumnModel().getColumn(1).setPreferredWidth(COL1WIDTH);
+       probeTable.getColumnModel().getColumn(2).setPreferredWidth(COL2WIDTH);
 
-      probeTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
-      probeTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
-       
       ncTableModel = newGeneSet.toTableModel( false );
       newClassTable.setModel( ncTableModel );
       newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
       newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
-      
+
       showStatus("Available probes: " + geneData.selectedProbes());
    }
 
@@ -227,14 +232,13 @@ public class GeneSetWizardStep2 extends WizardStep {
     */
    public void searchButton_actionPerformed_adapter( ActionEvent e ) {
       String searchOn = searchTextField.getText();
- 
+
       if ( searchOn.equals( "" ) ) {
          geneData.resetSelectedProbes();
       } else {
          geneData.selectProbes( searchOn );
       }
       populateTables();
-
    }
 }
 
@@ -335,6 +339,41 @@ class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
 }
 
+class ProbeTableModel extends AbstractTableModel {
+   GeneAnnotations geneData;
+      private String[] columnNames = { "Probe", "Gene", "Description" };
+
+   public ProbeTableModel(GeneAnnotations geneData) {
+      this.geneData = geneData;
+   }
+
+         public String getColumnName( int i ) {
+            return columnNames[i];
+         }
+
+         public int getColumnCount() {
+            return 3;
+         }
+
+         public int getRowCount() {
+            return geneData.getSelectedProbes().size();
+         }
+
+         public Object getValueAt( int i, int j ) {
+
+            String probeid = ( String ) geneData.getSelectedProbes().get( i );
+            switch ( j ) {
+               case 0:
+                  return probeid;
+               case 1:
+                  return geneData.getProbeGeneName( probeid );
+               case 2:
+                  return geneData.getProbeDescription( probeid );
+               default:
+                  return null;
+            }
+         }
+}
 // respond to search request.
 
 class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {

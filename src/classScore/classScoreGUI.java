@@ -6,13 +6,14 @@ import java.awt.Toolkit;
 import javax.swing.UIManager;
 
 import classScore.gui.GeneSetScoreFrame;
+import classScore.gui.StartupDialog;
 
 /**
  * Main for GUI
  * <p>
  * Copyright (c) 2003 Columbia University
  * </p>
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
@@ -44,6 +45,9 @@ public class classScoreGUI {
       frame.setLocation( ( screenSize.width - frameSize.width ) / 2,
             ( screenSize.height - frameSize.height ) / 2 );
       frame.setVisible( true );
+
+      StartupDialog sdlog = new StartupDialog( frame );
+      sdlog.showDialog();
    }
 
    public static void main( String[] args ) {

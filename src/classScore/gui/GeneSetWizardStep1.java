@@ -45,7 +45,7 @@ public class GeneSetWizardStep1 extends WizardStep
       this.wiz = wiz;
       this.settings = settings;
       chooser = new JFileChooser();
-      chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
+      chooser.setCurrentDirectory( new File( settings.getClassFolder()) );
       chooser.setDialogTitle("Choose Gene Set File");
       wiz.clearStatus();
    }
