@@ -82,34 +82,15 @@ public class JDetailsFrame
    JMenuItem m_saveDataMenuItem = new JMenuItem();
 
    /**
-    * @param  args[0]  the name of the raw data file, as an absolute path,
-    *                  where we look up the microarray data for each gene in
-    *                  the current gene set.
+    * @param  probeIDs  an array of probe ID's that has some order; the actual
+    *                   order is arbitrary, as long as it is some order.
+    * @param  pvalues   a map of probeID's to p values.
+    * @param  geneData  holds gene names and descriptions which can be retrieved
+    *                   by probe ID.
+    * @param  settings  <code>getRawFile()</code> should return the microarray
+    *                   file which contains the microarray data for the probe
+    *                   ID's contained in <code>probeIDs</code>.
     */
-   public static void main( String[] args ) {
-
-      // Make sure the filename was passed in
-      if ( args.length < 1 ) {
-         System.err.println( "Please specify the name of the data file as a program argument" );
-         return;
-      }
-
-      Settings settings = new Settings();
-      settings.setRawFile( args[0] );
-
-      final String[] PROBES = {
-          "100_g_at"};
-
-      ArrayList probeIDs = new ArrayList();
-      for ( int i = 0; i < PROBES.length; i++ ) {
-         probeIDs.add( i, PROBES[i] );
-      }
-
-      JDetailsFrame frame = new JDetailsFrame( probeIDs, null, null, settings );
-      frame.setSize( new Dimension( 800, 600 ) );
-      frame.show();
-   }
-
    public JDetailsFrame( ArrayList probeIDs, Map pvalues, GeneAnnotations geneData,
                          Settings settings ) {
       try {
