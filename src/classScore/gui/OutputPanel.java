@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import javax.swing.table.TableColumn;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
 import baseCode.gui.JWebBrowser;
+import baseCode.util.BrowserLauncher;
 import classScore.Settings;
 import classScore.GeneSetPvalRun;
 import classScore.data.GONames;
@@ -40,21 +42,14 @@ import java.util.Vector;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin Lee
  * @version $Id$
  * @todo deletion of geneDataSets when remove is used.
- *
  */
 
 public class OutputPanel extends JScrollPane {
-   /**
-    * Copyright (c) 2004 Columbia University
-    *
-    * @author Owner
-    * @version $Id$
-    */
-
+   
    private JTable table;
    private OutputTableModel model;
    private TableSorter sorter;
@@ -158,7 +153,8 @@ public class OutputPanel extends JScrollPane {
             .getSource() ).getParent();
       int r = table.rowAtPoint( sourcePopup.getPoint() );
       String classID = getClassId( r );
-      GeneSetWizard cwiz = new GeneSetWizard( callingframe, geneData, goData, classID );
+      GeneSetWizard cwiz = new GeneSetWizard( callingframe, geneData, goData,
+            classID );
       cwiz.showWizard();
    }
 
@@ -167,16 +163,21 @@ public class OutputPanel extends JScrollPane {
     * @param e
     */
    void htmlMenuItem_actionPerformed( ActionEvent e ) {
-      
+
       OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e
             .getSource() ).getParent();
       int r = table.rowAtPoint( sourcePopup.getPoint() );
       String classID = getClassId( r );
-      
+
       // create the URL and show it
       String URL = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=";
-      URL += classID;  // e.g. "GO:0003824"
-      new JWebBrowser( URL );
+      URL += classID; // e.g. "GO:0003824"
+      try {
+         //    new JWebBrowser( URL );
+         BrowserLauncher.openURL( URL );
+      } catch ( IOException e1 ) {
+         GuiUtil.error("Could not open a web browser window.");
+      }
    }
 
    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
@@ -500,7 +501,7 @@ class OutputTableModel extends AbstractTableModel {
 
    /**
     * Does not reset the state.
-    *
+    * 
     * @param geneData
     * @param goData
     */
@@ -655,13 +656,10 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
                setBackground( Color.WHITE );
             }
          }
-      }
-      else if( hasFocus )
-      {
+      } else if ( hasFocus ) {
          setBackground( Color.WHITE );
          setOpaque( true );
-      }
-      else {
+      } else {
          setOpaque( false );
       }
 
