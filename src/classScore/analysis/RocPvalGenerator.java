@@ -2,8 +2,10 @@ package classScore.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
@@ -51,7 +53,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
          Map input_rank_map ) {
 
       //variables for outputs
-      Map target_ranks = new HashMap();
+      Set target_ranks = new HashSet();
 
       int effSize = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue(); // effective size of this class.
       if ( effSize < probePvalMapper.get_class_min_size()
@@ -81,14 +83,14 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
                // probe
                // group.
                if ( ranking != null ) {
-                  target_ranks.put( ranking, null ); // ranks of items in this
+                  target_ranks.add( ranking  ); // ranks of items in this
                   // class.
                }
 
             } else { // no weights
                ranking = input_rank_map.get( probe );
                if ( ranking != null ) {
-                  target_ranks.put( ranking, null );
+                  target_ranks.add( ranking  );
                }
 
             }

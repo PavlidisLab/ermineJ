@@ -258,7 +258,7 @@ public class GeneSetPvalRun {
       }
 
       // create the details frame
-      JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings );
+      JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings, this, res );
       f.setTitle( name + " (" + probeIDs.size() + " items) p="
             + nf.format( res.getPvalue() ) );
       f.show();
@@ -309,4 +309,7 @@ public class GeneSetPvalRun {
       }
    }
 
+   public Histogram getHist() {
+      return hist;
+   }
 }

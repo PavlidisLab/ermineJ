@@ -60,6 +60,7 @@ public class ResamplingCorrelationGeneSetScore extends
 
       dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much.
       for ( int j = 0; j < data.rows(); j++ ) {
+
          double[] rowValues = data.getRow( j );
          //         DoubleArrayList row = new cern.colt.list.DoubleArrayList(
          //               rowValues );
@@ -112,26 +113,26 @@ public class ResamplingCorrelationGeneSetScore extends
       int nummeas = 0;
 
       for ( int i = 0; i < size; i++ ) {
-         int row1 = indicesToSelect[i];
-         double[] irow = dataAsRawMatrix[i];
+   //      int row1 = indicesToSelect[i];
+         double[] irow = dataAsRawMatrix[indicesToSelect[i]];
 
          for ( int j = i + 1; j < size; j++ ) {
-            int row2 = indicesToSelect[j];
+     //       int row2 = indicesToSelect[j];
             //   double corr = Math.abs( correls.getQuick( row1, row2 ) );
 
             //   if ( corr == 0.0 ) { // we haven't done this one yet it yet.
 
-            double[] jrow = dataAsRawMatrix[j];
-
+            double[] jrow = dataAsRawMatrix[indicesToSelect[j]];
+            
             double corr = Math.abs( correlation( irow, jrow ) );
             //         correls.setQuick( row1, row2, corr ); // too much memory.
             //       correls.setQuick( row2, row1, corr );
             //      }
-
             avecorrel += corr;
             nummeas++;
          }
       }
+    
       return avecorrel / nummeas;
    }
 

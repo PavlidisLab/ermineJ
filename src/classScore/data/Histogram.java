@@ -132,21 +132,21 @@ public class Histogram {
    /**
     * @return double
     */
-   public double get_hist_min() {
+   public double getHistMin() {
       return minimum;
    }
 
    /**
     * @return double
     */
-   public double get_hist_max() {
+   public double getHistMax() {
       return maximum;
    }
 
    /**
     * @return int
     */
-   public int get_number_of_bins() {
+   public int getNumBins() {
       return numBins;
    }
 
@@ -207,6 +207,29 @@ public class Histogram {
       return this.getProbability( row, binnum );
 
    }
+   
+   /**
+    * 
+    * @param classSize
+    * @return
+    */
+   public double[] getHistogram(int classSize) {
+      int row = this.getClassIndex( classSize, minimumGeneSetSize );
+      return M.viewRow(row).toArray();
+   }
+   
+   /**
+    * 
+    * @return
+    */
+   public double[] getBins() {
+      double[] returnVal = new double[numBins];
+      for ( int i = 0; i < returnVal.length; i++ ) {
+         returnVal[i] =  i * this.binSize + minimum;
+      }
+      return returnVal;
+   }
+   
 
    /**
     * Prints the histogram to stdout.
