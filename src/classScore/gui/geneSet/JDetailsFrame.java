@@ -58,7 +58,7 @@ public class JDetailsFrame
    final int PREFERRED_WIDTH_COLUMN_3 = 300;
    final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
    final int COLOR_RANGE_SLIDER_MIN = 1;
-   final int NORMALIZED_COLOR_RANGE_MAX = 12;
+   final int NORMALIZED_COLOR_RANGE_MAX = 12; // [-6,6] standard deviations out
 
    public JMatrixDisplay m_matrixDisplay = null;
    protected JScrollPane m_tableScrollPane = new JScrollPane();
