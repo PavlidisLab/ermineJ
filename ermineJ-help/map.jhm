@@ -14,6 +14,7 @@
 
 	<mapID target="format" url="html/format/index.html" />
 	<mapID target="go.format" url="html/formats/go.html" />
+	<mapID target="genescores.format" url="html/formats/genescores.html" />
 	<mapID target="annotations.format" url="html/formats/annotations.html" />
 	<mapID target="microarray.format" url="html/formats/microarray.html" />
 </map>

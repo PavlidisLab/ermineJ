@@ -15,7 +15,8 @@
     </tocitem>
    
     <tocitem text="Data File Formats" target="formats" expand="true">
-      <tocitem text="Gene names" target="go.format"/>
+      <tocitem text="Gene sets (GO)" target="go.format"/>
+      <tocitem text="Gene scores" target="genescores.format"/>
       <tocitem text="Probe annotations" target="annotations.format"/>
       <tocitem text="Raw microarray data" target="microarray.format"/>
     </tocitem>

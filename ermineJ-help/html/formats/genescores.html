@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+ <head>
+  <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+  <meta name="generator" content="Adobe GoLive">
+  <title>Untitled Page</title>
+ </head>
+
+ <body bgcolor="#ffffff">
+  <h1>Input file formats:&nbsp;gene scores</h1>
+  <p>A &quot;gene score&quot;&nbsp;is any value that is applied to genes in a microarray experiment and which represents some measure of &quot;quality&quot;&nbsp;or &quot;interest&quot;. Examples might be a t-test p value or fold change. These scores must be computed separately and then supplied to the ermineJ software for analysis.</p>
+  <p>Unlike some software packages, ermineJ requires a complete set of gene scores, rather than just those for the &quot;selected genes&quot;. Thus, if your microarray has 12,000 probe sets on it, you will provide 12,000 gene scores. A&nbsp;caveat to this is that if you have filtered your data to exclude &quot;unexpressed&quot;&nbsp;genes (for example), you might only have gene scores for some probes. This is perfectly fine and the analysis will be based only on the probes for which you provide data.</p>
+  <p>The resampling-based analysis requires the gene scores, while for other analyses it is not required.</p>
+  <p>The gene score file is a simple tab-delimited text file, minimally having just two columns. The first column contains the probe identifiers, while the second column contains the scores. A one-line header is expected (if you don't include the header, the first line of data will be skipped). Files with more than two columns are also fine.</p>
+ </body>
+
+</html>
