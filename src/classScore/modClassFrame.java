@@ -7,7 +7,6 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-import com.borland.jbcl.layout.*;
 
 /**
  * <p>Title: </p>

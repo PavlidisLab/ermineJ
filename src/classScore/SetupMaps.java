@@ -160,4 +160,41 @@ public class SetupMaps {
 
       };
    };
+
+   public TableModel toSelectTableModel()
+   {
+      return new AbstractTableModel()
+      {
+         private String[] columnNames = {"Probe", "Gene", "Description"};
+
+         public String getColumnName(int i) { return columnNames[i]; }
+
+         public int getColumnCount() { return 3; }
+
+         public int getRowCount() { return geneData.getProbeGroupMap().size(); }
+
+         public Object getValueAt(int i, int j)
+         {
+            Map pgmap=geneData.getProbeGroupMap();
+            Vector probe_list=new Vector(pgmap.keySet());
+            Collections.sort(probe_list);
+            String probeid = (String) probe_list.get(i);
+            String probegroup = (String) geneData.getProbeGeneName(probeid);
+            String description = (String) geneData.getProbeDescription(probeid);
+            switch (j)
+            {
+               case 0:
+                  return probeid;
+               case 1:
+                  return probegroup;
+               case 2:
+                  return description;
+               default:
+                   return "";
+             }
+         }
+
+      };
+   };
+
 }
