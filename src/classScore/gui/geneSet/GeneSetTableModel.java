@@ -24,17 +24,19 @@ public class GeneSetTableModel extends AbstractTableModel {
    private JMatrixDisplay m_matrixDisplay;
    private ArrayList m_probeIDs;
    private Map m_pvalues;
+   private Map m_pvaluesOrdinalPosition;
    private GeneAnnotations m_geneData;
    private DecimalFormat m_nf;
    private String[] m_columnNames = {
        "Probe", "P value", "P value", "Name", "Description"};
 
    /** constructor */
-       public GeneSetTableModel(JMatrixDisplay matrixDisplay, ArrayList probeIDs, Map pvalues, GeneAnnotations geneData, DecimalFormat nf) {
+       public GeneSetTableModel(JMatrixDisplay matrixDisplay, ArrayList probeIDs, Map pvalues, Map pvaluesOrdinalPosition, GeneAnnotations geneData, DecimalFormat nf) {
 
       m_matrixDisplay = matrixDisplay;
       m_probeIDs = probeIDs;
       m_pvalues = pvalues;
+      m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
       m_geneData = geneData;
       m_nf = nf;
    }
@@ -86,13 +88,12 @@ public class GeneSetTableModel extends AbstractTableModel {
                return null; 
             }
             else {
-               double[] values = new double[1];
+               double[] values = new double[2];
                // actual p value
                values[0] = Double.valueOf( m_pvalues.get( probeID ).toString() ).doubleValue();
                // expected p value
-               //values[1] = 1.0f / getRowCount() * row;
-               // BLAH - TO DO: this row number is by probe ID, not pvalue!
-               //               how do we get pvalue's row number?
+               int position = ( ( Integer ) m_pvaluesOrdinalPosition.get( probeID ) ).intValue();
+               values[1] = 1.0f / getRowCount() * position;
                return values;
             }
          case 3:

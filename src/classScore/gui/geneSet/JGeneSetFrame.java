@@ -42,6 +42,7 @@ import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JBarGraphCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
 import classScore.gui.TableSorter;
+import java.util.HashMap;
 
 /**
  * @author Will Braynen
@@ -81,6 +82,7 @@ public class JGeneSetFrame extends JFrame {
    JSlider m_colorRangeSlider = new JSlider();
    JGradientBar m_gradientBar = new JGradientBar();
    JMenuItem m_saveDataMenuItem = new JMenuItem();
+   HashMap m_pvaluesOrdinalPosition = new HashMap();
 
    /**
     * @param  probeIDs  an array of probe ID's that has some order; the actual
@@ -247,7 +249,7 @@ public class JGeneSetFrame extends JFrame {
       //
 
       GeneSetTableModel tableModel = new GeneSetTableModel(
-          m_matrixDisplay, probeIDs, pvalues, geneData, m_nf
+          m_matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf
           );
       TableSorter sorter = new TableSorter( tableModel, m_matrixDisplay );
       m_table.setModel( sorter );
@@ -311,7 +313,10 @@ public class JGeneSetFrame extends JFrame {
       // For the pvalue bar graph we need to know the ordinal position of each 
       // pvalue in our list of pvalues, and now is the perfect time because 
       // the table is sorted by pvalues
-      // BLAH - TO DO      
+      for ( int i = 0;  i < m_table.getRowCount();  i++ ) {
+         String probeID = ( String ) m_table.getValueAt( i, matrixColumnCount + 0 ); //probeIDs.get( i );
+         m_pvaluesOrdinalPosition.put( probeID, new Integer( i ) );
+      }
 
       // Save the dimensions of the table just in case
       int width =
@@ -326,18 +331,6 @@ public class JGeneSetFrame extends JFrame {
       m_table.setSize( d );
 
    } // end createDetailsTable
-
-   protected String[] getProbeIDs( Map classToProbe, String classID ) {
-
-      // Compile a list of gene probe ID's in this probe class
-      final int probeCount = ( ( ArrayList ) classToProbe.get( classID ) ).size();
-      String[] probesIDs = new String[probeCount];
-      for ( int i = 0; i < probeCount; i++ ) {
-         probesIDs[i] = ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i );
-      }
-      return probesIDs;
-
-   }
 
    void m_greenredColormapMenuItem_actionPerformed( ActionEvent e ) {
 
