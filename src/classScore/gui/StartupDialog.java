@@ -23,6 +23,17 @@ import classScore.Settings;
  *
  * @author Homin Lee
  * @version $Id$
+ * @todo  We should probably attach a file filter to this class.  When you 
+ *        browser to the names (to set the annots and the go file), it shows 
+ *        "all files". Files can be filtered based on extension (or something 
+ *        else).  Here's an outline of how to add file filters:<p>
+ *        <code>
+ *          // Subclass FileFilter and implement its 'accept' method.   <br>
+ *          // Assume this subclass is called 'XMLFileFilter'           <br>
+ *          XMLFileFilter fileFilter = new XMLFileFilter();             <br>
+ *          chooser.setFileFilter( fileFilter ); // JFileChooser method <br>
+ *          chooser.setAcceptAllFileFilterUsed( false );                <br>
+ *        </code>
  */
 
 public class StartupDialog extends AppDialog {
