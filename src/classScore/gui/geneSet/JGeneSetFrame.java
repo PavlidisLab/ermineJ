@@ -381,10 +381,10 @@ public class JGeneSetFrame extends JFrame {
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
       //keshav
-      if (filename.length()==0){
-            filename="dummy";
+      if ( filename.length() == 0 ) {
+         filename = "dummy";
       }
-      if (!filename.equals("dummy")) {//keshav(was filename.length() > 0, now filename != dummy)
+      if ( !filename.equals( "dummy" ) ) {//keshav(was filename.length() > 0, now filename != dummy)
          try {
             matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
                   probesInGeneSet );
@@ -396,14 +396,11 @@ public class JGeneSetFrame extends JFrame {
                         + "Please make sure this file exists and the filename and directory path are correct,\n"
                         + "and that it is a valid raw data file (tab-delimited).\n" );
          }
-      }  
-      /*
-      //if ( matrix.rows() == 0 ) { 
-      if ( matrix == null ) {//added (use row above)
-         GuiUtil
-               .error( "None of the probes in this gene set were found in your data file." );
       }
-      */
+      /*
+       * //if ( matrix.rows() == 0 ) { if ( matrix == null ) {//added (use row above) GuiUtil .error( "None of the
+       * probes in this gene set were found in your data file." ); }
+       */
       //if ( matrix.rows() != probesInGeneSet.size() ) {
       if ( matrix == null ) {//added (use row above)
          System.err
@@ -421,7 +418,7 @@ public class JGeneSetFrame extends JFrame {
       //
 
       GeneSetTableModel tableModel = new GeneSetTableModel( m_matrixDisplay,
-            probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf );
+            probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf, settings );
       TableSorter sorter = new TableSorter( tableModel, m_matrixDisplay );
       m_table.setModel( sorter );
       sorter.setTableHeader( m_table.getTableHeader() );
@@ -448,9 +445,9 @@ public class JGeneSetFrame extends JFrame {
          col.setCellRenderer( matrixCellRenderer );
          col.setHeaderRenderer( verticalHeaderRenderer );
       }
-      
-      if (matrix != null) //keshav added if (but not the guts)
-         resizeMatrixColumns( matrixColumnWidth );
+
+      if ( matrix != null ) //keshav added if (but not the guts)
+            resizeMatrixColumns( matrixColumnWidth );
 
       //
       // Set up the rest of the table
@@ -468,7 +465,7 @@ public class JGeneSetFrame extends JFrame {
       // p value bar
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 2 );
       col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
-      col.setCellRenderer( new JBarGraphCellRenderer() );
+      col.setCellRenderer( new JBarGraphCellRenderer() );//todo
 
       // name
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 3 );
@@ -479,7 +476,12 @@ public class JGeneSetFrame extends JFrame {
       col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
 
       // Sort initially by the pvalue column
-      sorter.setSortingStatus( matrixColumnCount + 1, TableSorter.ASCENDING );
+      if ( settings.getBigIsBetter() ) {
+         sorter
+               .setSortingStatus( matrixColumnCount + 1, TableSorter.DESCENDING );
+      } else {
+         sorter.setSortingStatus( matrixColumnCount + 1, TableSorter.ASCENDING );
+      }
 
       // For the pvalue bar graph we need to know the ordinal position of each
       // pvalue in our list of pvalues, and now is the perfect time because

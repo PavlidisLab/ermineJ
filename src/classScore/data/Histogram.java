@@ -26,11 +26,12 @@ import cern.jet.stat.Descriptive;
  */
 public class Histogram {
    private static final double SMALL = 10e-13;
+   private static final double BINSPERUNIT = 500;
    protected static final Log log = LogFactory.getLog( Histogram.class );
    private int minimumGeneSetSize = 0;
-   private double binSize = 0.002; // todo: set this automatically?, so there are always a reasonable # of bins.
+   private double binSize = 0.002;
    private double minimum = 0.0;
-   private double maximum = 5.0; // this gets adjusted if need be.
+   private double maximum = 5.0;
    private int numBins = 0;
    private int numItemsPerHistogram = 0;
    private double minPval; // the smallest possible pvalue: used when a requested score is out of the top of the range.
@@ -53,8 +54,14 @@ public class Histogram {
          throw new IllegalArgumentException( "No classes." );
       }
 
+      if ( max <= min ) {
+         throw new IllegalArgumentException( "Histogram has no range (max "
+               + max + " <= min " + min + ")" );
+      }
+
       this.minimum = min;
       this.maximum = max;
+      this.binSize = ( max - min ) / BINSPERUNIT;
       this.minimumGeneSetSize = minGeneSetSize;
       setNumRuns( numRuns );
       calcNumOfBins();
@@ -218,9 +225,10 @@ public class Histogram {
    /**
     * @param geneSetSize int - NOT the row, that is determined here.
     * @param rawscore double
-    * @return double
+    * @param upperTail
+    * @return double probability
     */
-   public double getValue( int geneSetSize, double rawscore ) {
+   public double getValue( int geneSetSize, double rawscore, boolean upperTail ) {
       if ( rawscore > maximum || rawscore < minimum ) { // sanity check.
          throw new IllegalStateException(
                "Warning, a rawscore yielded a bin number which was out of the range: "
@@ -236,8 +244,7 @@ public class Histogram {
 
       /* use a analytical distribution if we have one for this set size */
       if ( useExactPvalue( usedGeneSetSize ) ) {
-
-         return this.getExactProbability( usedGeneSetSize, rawscore );
+         return this.getExactProbability( usedGeneSetSize, rawscore, upperTail );
       }
 
       /* use the empirical distribution */
@@ -248,22 +255,23 @@ public class Histogram {
       if ( binnum > numBins - 1 ) {
          binnum = numBins - 1;
       }
-      return this.getProbability( usedGeneSetSize, binnum );
+      return this.getProbability( usedGeneSetSize, binnum, upperTail );
    }
 
    /**
+    * @param upperTail
     * @param geneSetSize
     * @param rawscore
     * @return
     */
-   private double getExactProbability( int geneSetSize, double rawScore ) {
+   private double getExactProbability( int geneSetSize, double rawScore, boolean upperTail ) {
       ProbabilityComputer p = ( ProbabilityComputer ) analyticDistributions
             .get( new Integer( geneSetSize ) );
       if ( p == null ) {
          throw new IllegalStateException( "Gene set size " + geneSetSize
                + " is not associated with an exact probability density." );
       }
-      return Math.max(SMALL, p.probability( rawScore ));
+      return Math.max( SMALL, p.probability( rawScore, upperTail ) );
    }
 
    /**
@@ -315,11 +323,12 @@ public class Histogram {
    }
 
    /**
+    * @param upperTail
     * @param row int
     * @param binnum int
     * @return double
     */
-   public double getProbability( int classSize, int binnum ) {
+   public double getProbability( int classSize, int binnum, boolean upperTail ) {
 
       if ( !empiricalDistributions.containsKey( classSize ) ) {
          throw new IllegalArgumentException(
@@ -328,9 +337,18 @@ public class Histogram {
 
       double pval = ( ( DoubleMatrix1D ) empiricalDistributions.get( classSize ) )
             .getQuick( binnum );
-      if ( pval == 0.0 ) {
-         return minPval;
+      if (!upperTail) {
+         pval = 1.0 - pval;
       }
+      
+      if (pval < 0.0 - SMALL || pval > 1.0 + SMALL) { // sanity check.
+         throw new IllegalStateException("Pvalue was " + pval);
+      }
+      
+      if ( pval< SMALL ) {
+         return SMALL;
+      }
+      
       return pval;
    }
 

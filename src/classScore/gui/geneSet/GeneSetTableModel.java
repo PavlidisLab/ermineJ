@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
+import classScore.Settings;
+
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.JMatrixDisplay;
 import baseCode.gui.JLinkLabel;
@@ -32,6 +34,7 @@ public class GeneSetTableModel extends AbstractTableModel {
    private Map m_pvaluesOrdinalPosition;
    private GeneAnnotations m_geneData;
    private DecimalFormat m_nf;
+   private Settings settings;
    private String[] m_columnNames = {
          "Probe", "Score", "Score", "Symbol", "Name"
    };
@@ -46,11 +49,12 @@ public class GeneSetTableModel extends AbstractTableModel {
     */
    public GeneSetTableModel( JMatrixDisplay matrixDisplay, ArrayList probeIDs,
          Map pvalues, Map pvaluesOrdinalPosition, GeneAnnotations geneData,
-         DecimalFormat nf ) {
+         DecimalFormat nf, Settings settings ) {
 
       m_matrixDisplay = matrixDisplay;
       m_probeIDs = probeIDs;
       m_pvalues = pvalues;
+      this.settings = settings;
       m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
       m_geneData = geneData;
       m_nf = nf;
@@ -105,9 +109,9 @@ public class GeneSetTableModel extends AbstractTableModel {
          case 2:
             // p value bar
             ArrayList values = new ArrayList();
-            if ( m_pvalues == null ) {
+            if ( !settings.getDoLog() || m_pvalues == null ) { // todo kludgy way to figure out if we have pvalues.
                values.add( 0, new Double( Double.NaN ) );
-            } else {
+            } else { 
                // actual p value
                Double actualValue = ( Double ) m_pvalues.get( probeID );
                values.add( 0, actualValue );

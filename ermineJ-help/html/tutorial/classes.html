@@ -10,7 +10,7 @@
   </head>
 
   <body bgcolor="#ffffff">
-    <h1>Tutorial: Gene sets</h1>
+    <h1>Viewing, defining and modifying gene sets</h1>
 
     <p>A <b>gene set</b>&nbsp;is any grouping of genes defined by
     criteria other than the data currently being analyzed. Our baseline
@@ -97,22 +97,20 @@
 
     <p>After hitting 'finish', the new gene set is shown in color in
     the output panel. The gene set is also saved to disk for future
-    use.</p>
+    use. The format and file locations are described <a href="../formats/geneset.html">here</a>.</p>
 
     <p><img height="477" alt="" src=
     "../images/output_panel_after_new.gif" width="886" border="0"></p>
 
     <h2>Entering a gene set from a file</h2>
 
+  <p>Gene sets can be loaded in from files created by the user. These files should be stored in your ermineJ installation directory
+  under ermineJ.data/genesets. For details on the format, see <a href="../formats/geneset.html">this page</a>.</p>
+  
+  <p>To load a gene set from a file, 
+
     <p><img height="377" alt="" src="../images/new_class_file1.gif"
     width="558" border="0"></p>
-
-    <p>Here is the format of a gene set file, viewed in a text editor.
-    The first line indicates the type of identifier in the
-    file:&nbsp;either 'probe' or 'gene'. Here we are using probe
-    identifiers. The second line is the name of the gene set, and the
-    third is the description. Finally, there is a list of the probes in
-    the class.</p>
 
     <p><img height="331" alt="" src=
     "../images/new_class_file_sample.gif" width="412" border="0"></p>

@@ -46,13 +46,13 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
    }
 
    /**
-    * Generate a complete set of class results. The arguments are not constant under pemutations. The second is only
+    * Generate a complete set of class results. The arguments are not constant under permutations. The second is only
     * needed for the aroc method. This is to be used only for the 'real' data since it modifies 'results',
     * 
     * @param group_pval_map a <code>Map</code> value
     * @param probesToPvals a <code>Map</code> value
     */
-   public void classPvalGenerator( Map group_pval_map, Map probesToPvals ) {
+   public void classPvalGenerator( Map geneToGeneScoreMap, Map probesToPvals ) {
       Collection entries = geneAnnots.getGeneSetToProbeMap().entrySet(); // go ->
 
       Iterator it = entries.iterator(); // the classes.
@@ -63,11 +63,11 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
       // For each class.
       while ( it.hasNext() ) {
          Map.Entry e = ( Map.Entry ) it.next();
-         String class_name = ( String ) e.getKey();
-         GeneSetResult res = cpv.classPval( class_name, group_pval_map,
+         String geneSetName = ( String ) e.getKey();
+         GeneSetResult res = cpv.classPval( geneSetName, geneToGeneScoreMap,
                probesToPvals );
          if ( res != null ) {
-            results.put( class_name, res );
+            results.put( geneSetName, res );
          }
       }
    }
@@ -81,28 +81,33 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     */
    public void hgSizes( Collection inp_entries ) {
 
-      double userPval = settings.getPValThreshold();
+      double geneScoreThreshold = settings.getPValThreshold();
 
-      if ( settings.getDoLog() ) {
-         userPval = -Math.log( userPval ) / Math.log( 10.0 );
-      }
+     // if ( settings.getDoLog() ) {
+     //    geneScoreThreshold = -Math.log( geneScoreThreshold ) / Math.log( 10.0 );
+    //  }
 
       Iterator itr = inp_entries.iterator();
       while ( itr.hasNext() ) {
          Map.Entry m = ( Map.Entry ) itr.next();
-         double genePvalue = ( ( Double ) m.getValue() ).doubleValue();
+         double geneScore = ( ( Double ) m.getValue() ).doubleValue();
          // why
          // parsing?
+         
+         if (settings.getDoLog() ) {
+            geneScore = Math.pow(10, -geneScore);
+         }
 
-         if ( genePvalue >= userPval ) {
+         if ( ( settings.getBigIsBetter() && geneScore >= geneScoreThreshold )
+               || ( !settings.getBigIsBetter() && geneScore <= geneScoreThreshold ) ) {
             numOverThreshold++;
          } else {
             numUnderThreshold++;
          }
 
       }
-      System.err.println( numOverThreshold + " genes are above the threshold "
-            + userPval );
+      System.err.println( numOverThreshold + " genes pass your threshold "
+            + geneScoreThreshold );
    }
 
    /**

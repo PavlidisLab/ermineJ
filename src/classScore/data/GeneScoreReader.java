@@ -26,17 +26,7 @@ import classScore.Settings;
  * 
  * <pre>
  * 
- *  
- *   
- *    
- *     
- *      
  *                probe_id[tab]pval
- *       
- *      
- *     
- *    
- *   
  *  
  * </pre>
  * 
@@ -74,7 +64,9 @@ public class GeneScoreReader {
       double log10 = Math.log( 10 );
       boolean invalidLog = false;
       boolean unknownProbe = false;
-      
+      boolean invalidNumber = false;
+      String badNumberString = "";
+
       File infile = new File( filename );
       if ( !infile.exists() || !infile.canRead() ) {
          throw new IOException( "Could not read " + filename );
@@ -130,25 +122,32 @@ public class GeneScoreReader {
             continue;
          }
          probeIDs[i - 1] = name;
-         probePvalues[i - 1] = Double
-               .parseDouble( ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
-                     .elementAt( settings.getScorecol() - 1 ) ) );
+
+         try {
+            probePvalues[i - 1] = Double
+                  .parseDouble( ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
+                        .elementAt( settings.getScorecol() - 1 ) ) );
+         } catch ( NumberFormatException e ) {
+            invalidNumber = true;
+            badNumberString = ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
+                  .elementAt( settings.getScorecol() - 1 ) );
+            probePvalues[i - 1] = 0.0;
+         }
 
          // Fudge when pvalues are zero.
-         if ( settings.getDoLog() && probePvalues[i - 1] <= 0 ) {
+         if ( settings.getDoLog() && probePvalues[i - 1] <= 0.0 ) {
             invalidLog = true;
             probePvalues[i - 1] = SMALL;
 
          }
 
-         if ( settings.getDoLog() ) { 
-            probePvalues[i - 1] = -( Math.log( probePvalues[i - 1] ) / log10 ); 
+         if ( settings.getDoLog() ) {
+            probePvalues[i - 1] = -( Math.log( probePvalues[i - 1] ) / log10 );
          }
 
          // only keep probes that are in our array platform.
          if ( !probeToGeneMap.containsKey( probeIDs[i - 1] ) ) {
-             unknownProbe = true;
-     //       messenger.setStatus("Probe not known for platform: " + probeIDs[i-1] + ", skipping.");
+            unknownProbe = true;
             continue;
          }
 
@@ -160,7 +159,23 @@ public class GeneScoreReader {
 
       num_pvals = Array.getLength( probePvalues );
 
-      if ( invalidLog ) {
+      if ( invalidNumber && messenger != null ) {
+
+         messenger
+               .setError( "Non-numeric gene scores(s) "
+                     + " ('"
+                     + badNumberString
+                     + "') "
+                     + " found for input file. These are set to an initial value of zero." );
+
+         try {
+            Thread.sleep( 2000 );
+         } catch ( InterruptedException e ) {
+         }
+
+      }
+
+      if ( invalidLog && messenger != null ) {
          messenger
                .setError( "Warning: There were attempts to take the log of non-positive values. These are set to "
                      + SMALL );
@@ -169,7 +184,7 @@ public class GeneScoreReader {
          } catch ( InterruptedException e ) {
          }
       }
-      
+
       if ( unknownProbe ) {
          messenger
                .setError( "Warning: Some probes in your gene score file don't match the ones in the annotation file." );
@@ -195,9 +210,8 @@ public class GeneScoreReader {
       if ( messenger != null ) {
          messenger.setStatus( "Found " + num_pvals + " pvals in the file" );
       }
-      
-      setUpGeneToPvalMap( settings.getGeneRepTreatment(), geneToProbeMap,
-            messenger );
+
+      setUpGeneToPvalMap( settings, geneToProbeMap, messenger );
 
    } //
 
@@ -208,8 +222,10 @@ public class GeneScoreReader {
     * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the data
     *        set.
     */
-   private void setUpGeneToPvalMap( int gp_method, Map geneToProbeMap,
+   private void setUpGeneToPvalMap( Settings settings, Map geneToProbeMap,
          StatusViewer messenger ) {
+
+      int gp_method = settings.getGroupMethod();
 
       if ( geneToProbeMap == null || geneToProbeMap.size() == 0 ) {
          throw new IllegalStateException( "groupToProbeMap was not set." );
@@ -229,8 +245,11 @@ public class GeneScoreReader {
       for ( Iterator groupMapItr = geneToProbeMap.keySet().iterator(); groupMapItr
             .hasNext(); ) {
          String group = ( String ) groupMapItr.next();
-       
-         ArrayList probes = ( ArrayList ) geneToProbeMap.get( group ); /* probes in this group according to the array platform. */
+
+         ArrayList probes = ( ArrayList ) geneToProbeMap.get( group ); /*
+                                                                        * probes in this group according to the array
+                                                                        * platform.
+                                                                        */
          int in_size = 0;
 
          // Analyze all probes in this 'group' (pointing to the same gene)
@@ -241,6 +260,7 @@ public class GeneScoreReader {
                continue;
             }
 
+            // these values are already log transformed if the user selected that option.
             double pbPval = ( ( Double ) probeToPvalMap.get( probe ) )
                   .doubleValue();
 
@@ -250,8 +270,13 @@ public class GeneScoreReader {
                   break;
                }
                case Settings.BEST_PVAL: {
-                  group_pval_temp[counter] = Math.max( pbPval,
-                        group_pval_temp[counter] );
+                  if (settings.upperTail() ) {
+                     group_pval_temp[counter] = Math.max( pbPval,
+                           group_pval_temp[counter] );
+                  } else {
+                     group_pval_temp[counter] = Math.min( pbPval,
+                           group_pval_temp[counter] );
+                  }
                   break;
                }
 

@@ -83,7 +83,7 @@
     "Generic" annotation files we provide, possibly with the help of
     your local friendly bioinformatician.</p>
 
-    <p><strong>Why did I see a warning "Attempt to take the log of a
+    <p><strong>When doing an analysis, why did I see a warning "Attempt to take the log of a
     non-positive value"?</strong></p>
 
     <p>If your gene score file contains negative or zero values, and
@@ -92,15 +92,25 @@
     score file. If not, ermineJ sets these values to a small number
     (10<sup>-15</sup> ).</p>
 
-    <p><strong>Why did I see a warning "<font color="#2a00ff" size=
-    "1"><font color="#000000" size="4">Some probes in your gene score
-    file don't match the ones in the annotation file</font></font>
+    <p><strong>When doing an analysis, why did I see a warning "<font color="#2a00ff" size=
+    "1"><font color="#000000" size="4">"Some probes in your gene score
+    file don't match the ones in the annotation file"</font></font>
     "?</strong></p>
 
     <p>This happens if your gene annotation file isn't the right one
     for the microarray you used (in which case your analysis will not
     work well), but can also happen if your file format isn't quite
     right. The analysis still proceeds when this happens.</p>
+
+  <p><strong>When doing an analysis, why did I see a warning"<font color="#2a00ff" size=
+    "1"><font color="#000000" size="4">"Non-numeric gene scores(s) ( '#NUM!' ) found for input file. These are set to an initial value of zero."</font></font>
+    ", or something similar?</strong></p>
+    
+    <p>This warning appears if the column you selected for your gene score file contains non-numeric data. This can happen
+    if you have missing or invalid values (sometimes appearing as '#NUM!' in Microsoft Excel), but can also happen
+    if you have chosen the wrong column in your data. Because such values are interpeted as zeros, you should be careful
+    that your file contains the data you want.  If you want to 
+          avoid problems you should remove those rows from your file entirely.</p>
 
     <p><strong>The resampling is taking too long, any
     suggestions?</strong></p>

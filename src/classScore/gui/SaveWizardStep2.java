@@ -8,26 +8,18 @@ import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import baseCode.gui.WizardStep;
 
 /**
+ * Choose the file name to save the results in.
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Company:
- * </p>
  * 
- * @author not attributable
+ * @author Homin Lee
+ * @author Paul Pavlidis
  * @version $Id$
  */
 
@@ -45,7 +37,7 @@ public class SaveWizardStep2 extends WizardStep {
       this.wiz = wiz;
       this.folder = folder;
       chooser.setCurrentDirectory( new File( folder ) );
-      chooser.setApproveButtonText("OK");
+      chooser.setApproveButtonText( "OK" );
       chooser.setDialogTitle( "Save Analysis As:" );
       wiz.clearStatus();
    }
@@ -82,7 +74,32 @@ public class SaveWizardStep2 extends WizardStep {
    void saveBrowseButton_actionPerformed( ActionEvent e ) {
       int result = chooser.showOpenDialog( this.wiz );
       if ( result == JFileChooser.APPROVE_OPTION ) {
-         saveFile.setText( chooser.getSelectedFile().toString() );
+         File f = new File( chooser.getSelectedFile().toString() );
+
+         // this doesn't work.
+//         if ( !f.canWrite() ) {
+//            JOptionPane
+//                  .showMessageDialog(
+//                        this,
+//                        "That file cannot be written to, possibly because it exists and is open by another application or "
+//                              + "has read-only permissions.",
+//                        "File is not writable", JOptionPane.OK_OPTION );
+//            saveBrowseButton_actionPerformed( null );
+//         }
+
+         if ( f.exists() ) {
+            int k = JOptionPane.showConfirmDialog( this,
+                  "That file exists. Overwrite?", "File exists",
+                  JOptionPane.YES_NO_CANCEL_OPTION );
+            if ( k == JOptionPane.YES_OPTION ) {
+               saveFile.setText( chooser.getSelectedFile().toString() );
+            } else if ( k == JOptionPane.NO_OPTION ) { // go back to the chooser for another try.
+               saveBrowseButton_actionPerformed( null );
+            } // otherwise, bail.
+         } else {
+            saveFile.setText( chooser.getSelectedFile().toString() );
+         }
+
       }
    }
 

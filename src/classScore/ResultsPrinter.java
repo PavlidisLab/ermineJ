@@ -1,6 +1,7 @@
 package classScore;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,28 +31,39 @@ import baseCode.gui.GuiUtil;
  * Institution:: Columbia University
  * </p>
  * 
- * @author not attributable
- * @version 1.0
+ * @author Pavlidis
+ * @version $Id$
  */
 
 public class ResultsPrinter {
 
-   protected String dest_file;
+   protected String destFile;
    protected Vector sortedclasses;
    protected Map results;
    protected GONames goName;
    protected GeneAnnotations geneData;
 
-   public ResultsPrinter( String dest_file, Vector sortedclasses, Map results,
+   /**
+    * @param destFile
+    * @param sortedclasses
+    * @param results
+    * @param goName
+    */
+   public ResultsPrinter( String destFile, Vector sortedclasses, Map results,
          GONames goName ) {
-      this.dest_file = dest_file;
+      this.destFile = destFile;
       this.sortedclasses = sortedclasses;
       this.results = results;
       this.goName = goName;
    }
 
-   public ResultsPrinter( String dest_file, GeneSetPvalRun run, GONames goName ) {
-      this.dest_file = dest_file;
+   /**
+    * @param destFile
+    * @param run
+    * @param goName
+    */
+   public ResultsPrinter( String destFile, GeneSetPvalRun run, GONames goName ) {
+      this.destFile = destFile;
       this.sortedclasses = run.getSortedClasses();
       this.results = run.getResults();
       this.geneData = run.getGeneData();
@@ -73,12 +85,13 @@ public class ResultsPrinter {
    public void printResults( boolean sort ) {
       System.out.println( "Beginning output" );
       try {
-      	BufferedWriter out;
-      	if(dest_file==null)
-      		out = new BufferedWriter( new PrintWriter(System.out));
-      	else
-      		out = new BufferedWriter( new FileWriter( dest_file,true ) );
-      	boolean first = true;
+         BufferedWriter out;
+         if ( destFile == null ) {
+            out = new BufferedWriter( new PrintWriter( System.out ) );
+         } else {
+            out = new BufferedWriter( new FileWriter( destFile, true ) );
+         }
+         boolean first = true;
          GeneSetResult res = null;
          if ( sort ) {
             for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
@@ -100,8 +113,9 @@ public class ResultsPrinter {
                   first = false;
                   res.print_headings( out, "\tSame as:\tSimilar to:" );
                }
-               res.print( out, format_redundant_and_similar( 
-               			res.getClassId() ) );
+               res
+                     .print( out, format_redundant_and_similar( res
+                           .getClassId() ) );
                //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
             }
          }
@@ -109,9 +123,9 @@ public class ResultsPrinter {
       } catch ( IOException e ) {
          GuiUtil
                .error( "Unable to write to file "
-                     + dest_file
+                     + destFile
                      + "\n"
-                     + "Please make sure the file is not open in another applicaiton.\n"
+                     + "Please make sure the named file is not open in another application.\n"
                      + "If this problem persists, please contact the software vendor." );
       }
    }

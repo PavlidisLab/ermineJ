@@ -114,20 +114,31 @@
 
     <p><strong>Step 5</strong> is specific to the ORA analysis.</p>
 
-    <p>The gene score threshold determines how genes are "selected".
-    This is interpreted in one of two different ways, depending on
-    whether you check the "negative log transform the gene scores"
-    box.</p>
+    <p>The gene score threshold determines how genes are "selected". Genes that meet the threshold requirement
+    are considered "good". ErmineJ operates differently from some other available tools in that you do not
+    enter the "good" genes yourself: the software selects them based on the criteria you set here.</p>
+    
+    <p><b>Tip:</b> If you are using raw p values as your gene scores, make sure your threshold is a value
+    between 0 and 1 (e.g., 0.0001), check the "log transform" box, and leave the "larger scores are better" box
+    unchecked. This is because the "larger is better" choice relates to the original threshold, not the log-tranformed
+    threshold.  On the other hand, if your p-values are already -log-transformed, you should use the exact opposite settings.</p>
+    
+    <h3>Log transformation</h3>
 
     <p>If you negative log-transform the gene scores, then your input
     gene scores are transformed according to the function f(x) =
     -<em>log<sub>10</sub></em>(x). This option is provided as a
     convenience as the most common type of gene score is a p-value. The
-    transform f(x) converts p values (where small values are better)
-    into a scale where large values are better. If you don't
-    log-transform your p-values, the analysis will not work. This is
-    explained further <a href="../formats/genescores.html">here</a>
-    .</p>
+    transform f(x) puts the p values on a more useful scale. However, you should still leave the "larger scores are better"
+    box unchecked, as this refers to your original data.</p>
+    
+    <h3>Are larger scores better?</h3>
+    
+    <p>If you are using fold change as your gene scores, you may want to check the "larger scores are better" box. 
+    This assumes that you have taken the absolute value of the fold change values before entering them into ermineJ. That way, changes
+    up and down will be considered equally. Alternatively, you could focus on changes up or down by retaining the sign
+    on the fold change values and setting this option depending on which direction of change you are interested
+    in analyzing.</p>
 
     <p><img alt="" src="../images/orastep5.jpg" border="0"></p>
 

@@ -25,7 +25,7 @@ import classScore.data.GeneSetResult;
 
 public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-   protected double user_pvalue;
+   protected double geneScoreThreshold;
    protected int inputSize;
    protected int numOverThreshold = 0; // number of genes over the threshold
    protected int numUnderThreshold = 0; // number of genes below the threshold
@@ -39,9 +39,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       this.inputSize = inputSize;
 
       if ( settings.getUseLog() ) {
-         this.user_pvalue = -Math.log( settings.getPValThreshold() );
+         this.geneScoreThreshold = -Math.log( settings.getPValThreshold() )
+               / Math.log( 10.0 );
       } else {
-         this.user_pvalue = settings.getPValThreshold();
+         this.geneScoreThreshold = settings.getPValThreshold();
       }
    }
 
@@ -97,9 +98,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
                   groupPvalArr[v_size] = grouppval.doubleValue();
 
-                  double score = groupPvalArr[v_size];
+                  double geneScore = groupPvalArr[v_size];
 
-                  if ( score >= user_pvalue ) {
+                  if ( ( settings.upperTail() && geneScore >= geneScoreThreshold )
+                        || ( !settings.upperTail() && geneScore <= geneScoreThreshold ) ) {
                      successes++;
                   } else {
                      failures++;
@@ -118,7 +120,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                double score = pbpval.doubleValue();
 
                // hypergeometric pval info.
-               if ( score >= user_pvalue ) {
+               if ( ( settings.upperTail() && score >= geneScoreThreshold )
+                     || ( !settings.upperTail() && score <= geneScoreThreshold ) ) {
                   successes++;
                } else {
                   failures++;

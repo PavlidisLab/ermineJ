@@ -56,7 +56,30 @@
     href="ora.html">ORA</a>, except for the last step.</p>
 
     <p>As for ORA, you must decide whether to take the negative
-    logarithm of the gene scores or not.</p>
+    logarithm of the gene scores or not, and whether "larger" genes scores are considered "good".</p>
+
+ <p><b>Tip:</b> If you are using raw p values as your gene scores, check the "log transform" box, and leave the "larger scores are better" box
+    unchecked. This is because the "larger is better" choice relates to the original threshold, not the log-tranformed
+    threshold. On the other hand, if your p-values are already -log-transformed, you should use the exact opposite settings.</p>
+
+<h3>Log transformation</h3>
+
+ <p>If you negative log-transform the gene scores, then your input
+    gene scores are transformed according to the function f(x) =
+    -<em>log<sub>10</sub></em>(x). This option is provided as a
+    convenience as the most common type of gene score is a p-value. The
+    transform f(x) puts the p values on a more useful scale. However, you should still leave the "larger scores are better"
+    box unchecked, as this refers to your original data.</p>
+    
+    <h3>Are larger scores better?</h3>
+    
+    <p>If you are using fold change as your gene scores, you may want to check the "larger scores are better" box. 
+    This assumes that you have taken the absolute value of the fold change values before entering them into ermineJ. That way, changes
+    up and down will be considered equally. Alternatively, you could focus on changes up or down by retaining the sign
+    on the fold change values and setting this option depending on which direction of change you are interested
+    in analyzing.</p>
+
+   <h3>How many iterations?</h3>
 
     <p>Unlike ORA, you must choose how many iterations to run. To speed
     things up, you can uncheck the "Always use full resampling"

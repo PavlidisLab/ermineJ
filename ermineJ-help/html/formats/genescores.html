@@ -21,25 +21,31 @@
     supplied to the ermineJ software for analysis.</p>
 
     <h2><font color="#cc0033">!</font> Make sure your gene scores are
-    on the right scale</h2>
+    on a sensible scale</h2>
 
     <ul>
       <li>
         <div>
-          <strong>If your gene scores are <em>not</em>
-          p-values</strong> , then your score will be interpreted as
-          "bigger is better". If this isn't the case, you should
-          transform the values so this is true. No modification should
-          be necessary for "fold-change" measures, though you might
-          want to use the absolute value of log(fold change).
+          <strong>If your gene score are raw p-values (most common
+          case)</strong>, then you should be sure to either -log
+          transform your values, or use the -log options in the ermineJ
+          software.
         </div>
       </li>
 
       <li>
         <div>
-          <strong>If your gene score are p-values</strong> , then you
-          should be sure to either -log your values, or use the -log
-          options in the ermineJ software.
+          <strong>If your gene scores are "fold-change",</strong>
+          &nbsp;you might want to use the absolute value of log(fold
+          change).
+        </div>
+      </li>
+
+      <li>
+        <div>
+          <strong>If your gene scores are NOT raw p-values,</strong>
+          then make sure you select the right combination of settings
+          to get your data interpreted correctly.
         </div>
       </li>
     </ul>
@@ -54,7 +60,8 @@
     have filtered your data to exclude "unexpressed"&nbsp;genes (for
     example), you might only have gene scores for some probes. This is
     perfectly fine and the analysis will be based only on the probes
-    for which you provide data.</p>
+    for which you provide data. However, the analysis is really only valid if you include
+    all the probes that you performed your gene selection analysis on.</p>
 
     <p>The resampling-based analysis requires the gene scores, while
     for other analyses it is not required.</p>
@@ -77,7 +84,8 @@
 
       <li>
         <div>
-          The second column contains the scores.
+          The second column contains the scores. <b>Non-numeric values such as "NaN" or "#NUM!" are interpreted to equal zero.</b> If you want to 
+          avoid this you should remove those rows from your file entirely.
         </div>
       </li>
 

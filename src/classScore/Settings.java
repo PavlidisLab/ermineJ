@@ -42,23 +42,23 @@ public class Settings {
    private boolean doLog = true;
    private double pValThreshold = 0.001;
    private boolean alwaysUseEmpirical;
+   private boolean bigIsBetter = false;
 
    public static final int BEST_PVAL = 1;
    public static final int MEAN_PVAL = 2;
-   
+
    public static final int MEAN_METHOD = 0;
    public static final int QUANTILE_METHOD = 1;
    public static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
-   
+
    public static final int ORA = 0;
    public static final int RESAMP = 1;
    public static final int CORR = 2;
    public static final int ROC = 3;
-   
+
    public static final int BONFERONNI = 0;
    public static final int WESTFALLYOUNG = 1;
    public static final int BENJAMINIHOCHBERG = 2;
-
 
    public Settings() {
       this( "" );
@@ -149,11 +149,13 @@ public class Settings {
             if ( properties.containsKey( "mtc" ) )
                   mtc = Integer.valueOf( properties.getProperty( "mtc" ) )
                         .intValue();
+            if ( properties.containsKey( "bigIsBetter" ) )
+                  bigIsBetter = Boolean.valueOf(
+                        properties.getProperty( "bigIsBetter" ) )
+                        .booleanValue();
          }
       } catch ( IOException ex ) {
-         //    System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no
-         // big
-         // deal.
+            System.err.println( "Could not find preferences file. Will probably attempt to create a new one." );
       }
    }
 
@@ -182,15 +184,20 @@ public class Settings {
       alwaysUseEmpirical = settings.getAlwaysUseEmpirical();
       pref_file = settings.getPrefFile();
       mtc = settings.getMtc();
+      bigIsBetter = settings.getBigIsBetter();
       properties = new Properties();
    }
 
+   public void writePrefs() throws IOException {
+      this.writePrefs(pref_file);
+   }
+   
    /**
     * Writes setting values to file.
     */
-   public void writePrefs() throws IOException {
+   public void writePrefs(String fileName) throws IOException {
 
-      if ( pref_file == null || pref_file.length() == 0 ) {
+      if ( fileName == null || fileName.length() == 0 ) {
          return;
       }
       properties.setProperty( "scoreFile", scoreFile );
@@ -212,13 +219,13 @@ public class Settings {
             .setProperty( "analysisMethod", String.valueOf( analysisMethod ) );
       properties.setProperty( "quantile", String.valueOf( quantile ) );
       properties.setProperty( "doLog", String.valueOf( doLog ) );
+      properties.setProperty( "bigIsBetter", String.valueOf( bigIsBetter ) );
       properties.setProperty( "pValThreshold", String.valueOf( pValThreshold ) );
       properties.setProperty( "useEmpirical", String
             .valueOf( alwaysUseEmpirical ) );
-      OutputStream f = new FileOutputStream( pref_file );
+      OutputStream f = new FileOutputStream( fileName );
       properties.store( f, "" );
       f.close();
-      pref_file=null;//keshav
    }
 
    public String toString() {
@@ -458,11 +465,37 @@ public class Settings {
    public int getMtc() {
       return mtc;
    }
+
    /**
     * @param mtc The mtc to set.
     */
    public void setMtc( int mtc ) {
       this.mtc = mtc;
    }
-}
 
+   /**
+    * @return
+    */
+   public boolean getBigIsBetter() {
+      return bigIsBetter;
+   }
+
+   /**
+    * @param b
+    */
+   public void setBigIsBetter( boolean b ) {
+      bigIsBetter = b;
+   }
+
+   /**
+    * Determine whether we should be using the upper tails of our histograms. The "big is better" setting reflects the
+    * original gene scores, not the log-transformed scores. Therefore if we are taking the log, and the user indicates
+    * smaller values are better, then we do want to use the upper tail. If we're not taking the log, then we just
+    * directly interpret what the user selected for 'bigIsBetter'.
+    * 
+    * @return
+    */
+   public boolean upperTail() {
+      return ( doLog && !bigIsBetter ) || ( !doLog && bigIsBetter );
+   }
+}

@@ -135,7 +135,16 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
     */
    protected double scoreToPval( int in_size, double rawscore )
          throws IllegalStateException {
-      double pval = hist.getValue( in_size, rawscore );
+      
+      
+      double pval = hist
+            .getValue( in_size, rawscore, settings.upperTail() );
+
+      if ( pval < 0.0 ) {
+         throw new IllegalStateException(
+               "P value less than zero. Upper tail?"
+                     + settings.upperTail() + " Raw score: " + rawscore );
+      }
 
       if ( Double.isNaN( pval ) ) {
          throw new IllegalStateException(

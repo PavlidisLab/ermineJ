@@ -76,7 +76,7 @@ public class ResamplingExperimentGeneSetScore extends
          deck[i] = i;
       }
 
-   //   double oldnd = Double.MAX_VALUE;
+      //   double oldnd = Double.MAX_VALUE;
       double oldmean = Double.MAX_VALUE;
       double oldvar = Double.MAX_VALUE;
 
@@ -99,10 +99,11 @@ public class ResamplingExperimentGeneSetScore extends
                double variance = Descriptive.variance( values.size(),
                      Descriptive.sum( values ), Descriptive
                            .sumOfSquares( values ) );
-              // double nd = normalDeviation( mean, variance, geneSetSize );
+               // double nd = normalDeviation( mean, variance, geneSetSize );
 
-              // if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
-               if (Math.abs(oldvar - variance) <= TOLERANCE && Math.abs(oldmean - mean ) <= TOLERANCE ) {
+               // if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
+               if ( Math.abs( oldvar - variance ) <= TOLERANCE
+                     && Math.abs( oldmean - mean ) <= TOLERANCE ) {
                   hist.addExactNormalProbabilityComputer( geneSetSize, mean,
                         variance );
                   log.debug( "Class size: " + geneSetSize
@@ -112,7 +113,7 @@ public class ResamplingExperimentGeneSetScore extends
                }
                oldmean = mean;
                oldvar = variance;
-            //   oldnd = nd;
+               //   oldnd = nd;
             }
          }
 
@@ -164,9 +165,9 @@ public class ResamplingExperimentGeneSetScore extends
       groupPvals = geneScores.getGroupPvalues();
       probePvalMap = geneScores.getProbeToPvalMap(); // reference to the probe -> pval map.
 
-      this.setHistogramRange(); // figure out the max pvalue possible.
+      this.setHistogramRange();
       this.hist = new Histogram( numClasses, classMinSize, numRuns,
-            histogramMax, 0.0 );
+            histogramMax, histogramMin );
    }
 
    /**
@@ -280,10 +281,17 @@ public class ResamplingExperimentGeneSetScore extends
    public void setHistogramRange() {
       if ( groupPvals == null || pvals == null ) {
          throw new IllegalStateException(
-               "Null pvalue arrays for histogram range setting" );
+               "Null gene score arrays for histogram range setting" );
       }
 
-      histogramMax = Rank.meanOfTop2( useWeights ? groupPvals : pvals );
-   }
+      histogramMax = Descriptive.max( new DoubleArrayList(
+            useWeights ? groupPvals : pvals ) );
+      histogramMin = Descriptive.min( new DoubleArrayList(
+            useWeights ? groupPvals : pvals ) );
 
+      if ( histogramMax <= histogramMin ) {
+         throw new IllegalStateException( "Histogram has no range (max "
+               + histogramMax + " <= min " + histogramMin + ")" );
+      }
+   }
 }

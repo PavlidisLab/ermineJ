@@ -45,6 +45,7 @@ public abstract class AbstractResamplingGeneSetScore implements
    protected int numRuns = 10000;
    protected int numClasses = 0;
    protected double histogramMax = 0;
+   protected double histogramMin = 0;
    protected int classMinSize = 2;
    protected Histogram hist = null;
 

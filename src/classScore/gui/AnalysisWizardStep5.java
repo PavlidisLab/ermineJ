@@ -45,13 +45,14 @@ public class AnalysisWizardStep5 extends WizardStep {
    //  JTextField jTextFieldScoreCol;
    JTextField jTextFieldIterations;
    JCheckBox jCheckBoxDoLog;
+   JCheckBox jCheckBoxBigIsBetter;
    JPanel oraPanel;
    JPanel resampPanel;
    JPanel corrPanel;
    JPanel jPanel13;
    JPanel jPanel16;
    JPanel subPanel;
-   
+
    JCheckBox jCheckBoxUseEmpirical;
 
    public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
@@ -91,14 +92,22 @@ public class AnalysisWizardStep5 extends WizardStep {
       JRadioButton corrRadioButton2 = new JRadioButton();
       jCheckBoxDoLog = new JCheckBox();
 
+      jCheckBoxBigIsBetter = new JCheckBox();
+
       step5Panel = new JPanel();
       step5Panel.setPreferredSize( new Dimension( 550, 280 ) );
 
       jCheckBoxDoLog.setBackground( SystemColor.control );
       jCheckBoxDoLog
-            .setToolTipText( "If you are using p values, you should check this box." );
+            .setToolTipText( "If you are loading raw p values, you should check this box." );
       jCheckBoxDoLog.setSelected( true );
       jCheckBoxDoLog.setText( "Take the negative log of the gene scores" );
+
+      jCheckBoxBigIsBetter
+            .setToolTipText( "If you are loading raw p values, you should not check this box." );
+      jCheckBoxBigIsBetter.setSelected( false );
+      jCheckBoxBigIsBetter
+            .setText( "Larger scores in your gene score file are better." );
 
       //oraPanel stuff//////////////////////////////////////////////////////////
       oraPanel.setPreferredSize( new Dimension( 335, 150 ) );
@@ -149,10 +158,10 @@ public class AnalysisWizardStep5 extends WizardStep {
       resampPanel.setPreferredSize( new Dimension( 380, 200 ) );
       resampTitledBorder = new TitledBorder( "Resampling" );
       resampPanel.setBorder( resampTitledBorder );
-      
-       subPanel = new JPanel();
-      subPanel.setLayout(new FlowLayout());
-      
+
+      subPanel = new JPanel();
+      subPanel.setLayout( new FlowLayout() );
+
       jPanel13.setBorder( null );
       jLabel13.setMaximumSize( new Dimension( 100, 15 ) );
       jLabel13.setLabelFor( jTextFieldIterations );
@@ -165,7 +174,7 @@ public class AnalysisWizardStep5 extends WizardStep {
       jTextFieldIterations.setEditable( true );
       jPanel13.add( jLabel13, null );
       jPanel13.add( jTextFieldIterations, null );
-      
+
       jPanel16 = new JPanel();
       jCheckBoxUseEmpirical = new JCheckBox();
       JLabel jLabel14 = new JLabel();
@@ -179,13 +188,13 @@ public class AnalysisWizardStep5 extends WizardStep {
             + " at a possible risk of reduced accuracy" );
       jPanel16.add( jLabel14, null );
       jPanel16.add( jCheckBoxUseEmpirical, null );
-      subPanel.setPreferredSize(new java.awt.Dimension(340,80));
-      
-      subPanel.add(jPanel13, BorderLayout.WEST);
-      subPanel.add(jPanel16,  BorderLayout.EAST);
-      
+      subPanel.setPreferredSize( new java.awt.Dimension( 340, 80 ) );
+
+      subPanel.add( jPanel13, BorderLayout.WEST );
+      subPanel.add( jPanel16, BorderLayout.EAST );
+
       //corrPanel stuff/////////////////////////////////////////////////////////
-      corrPanel.setPreferredSize(new java.awt.Dimension(380,150));
+      corrPanel.setPreferredSize( new java.awt.Dimension( 380, 150 ) );
       corrTitledBorder = new TitledBorder( "Correlation" );
       corrPanel.setBorder( corrTitledBorder );
       corrMetricPanel.setPreferredSize( new Dimension( 150, 50 ) );
@@ -203,8 +212,8 @@ public class AnalysisWizardStep5 extends WizardStep {
       corrRadioButton1.setBackground( SystemColor.control );
       corrRadioButton1.setToolTipText( "metric 1 tool tip" );
       corrRadioButton2.setText( "Metric 2" );
-      jPanel16.setPreferredSize(new java.awt.Dimension(330,30));
-      jPanel13.setPreferredSize(new java.awt.Dimension(234,30));
+      jPanel16.setPreferredSize( new java.awt.Dimension( 330, 30 ) );
+      jPanel13.setPreferredSize( new java.awt.Dimension( 234, 30 ) );
       corrButtonGroup.add( corrRadioButton1 );
       corrButtonGroup.add( corrRadioButton2 );
       corrMetricPanel.add( corrMetricLabel, null );
@@ -221,11 +230,13 @@ public class AnalysisWizardStep5 extends WizardStep {
    public void addVarPanel( int analysisType ) {
       if ( analysisType == Settings.ORA ) {
          oraPanel.add( jCheckBoxDoLog, null );
+         oraPanel.add( jCheckBoxBigIsBetter, null );
          step5Panel.add( oraPanel, null );
       } else if ( analysisType == Settings.RESAMP ) {
          resampPanel.add( jCheckBoxDoLog, null );
+         resampPanel.add(jCheckBoxBigIsBetter, null);
          resampPanel.add( subPanel, null );
-       
+
          step5Panel.add( resampPanel, null );
       } else if ( analysisType == Settings.CORR ) {
          corrPanel.add( subPanel, null );
@@ -258,7 +269,7 @@ public class AnalysisWizardStep5 extends WizardStep {
       jTextFieldPValueThreshold.setText( String.valueOf( settings
             .getPValThreshold() ) );
       jCheckBoxDoLog.setSelected( settings.getDoLog() );
-      
+      jCheckBoxBigIsBetter.setSelected( settings.getBigIsBetter() );
       jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
    }
 
@@ -275,7 +286,8 @@ public class AnalysisWizardStep5 extends WizardStep {
       settings.setPValThreshold( Double.valueOf(
             jTextFieldPValueThreshold.getText() ).doubleValue() );
       settings.setDoLog( jCheckBoxDoLog.isSelected() );
-      settings.setAlwaysUseEmpirical(jCheckBoxUseEmpirical.isSelected());
+      settings.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
+      settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );
    }
 
    public boolean isReady() {

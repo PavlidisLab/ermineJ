@@ -13,19 +13,6 @@ import classScore.Settings;
 import classScore.GeneSetPvalRun;
 
 /**
- * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2003
- * </p>
- * <p>
- * Company:
- * </p>
- * 
  * @author Homin Lee
  * @author Paul Pavlidis
  * @version $Id$
@@ -107,14 +94,13 @@ public class SaveWizard extends Wizard {
             .getSelectedRunNum() );
       Settings saveSettings = runToSave.getSettings();
       String saveFileName = step2.getSaveFileName();
-      saveSettings.setPrefFile( saveFileName );
       try {
-         saveSettings.writePrefs();
+         saveSettings.writePrefs( saveFileName ); // first we stream the prefs to the file.
          ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave,
-               goData );
+               goData ); // then we pile on the results.
          rp.printResults( true );
       } catch ( IOException ioe ) {
-         GuiUtil.error( "Could not write prefs file." + e );
+         GuiUtil.error( "Could not write results to the file. " + ioe );
       }
       dispose();
    }

@@ -14,6 +14,7 @@ import classScore.GeneSetPvalRun;
 import baseCode.gui.WizardStep;
 
 /**
+ * Pick the analysis results set to save.
  * <p>
  * Copyright: Copyright (c) 2003-2004 Columbia University
  * 
@@ -94,7 +95,7 @@ public class SaveWizardStep1 extends WizardStep {
    }
 
 }
-
+///
 class SaveWizardStep1_runComboBox_actionAdapter implements
       java.awt.event.ActionListener {
    SaveWizardStep1 adaptee;

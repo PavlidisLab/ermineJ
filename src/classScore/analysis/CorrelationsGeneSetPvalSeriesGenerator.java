@@ -187,7 +187,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
                .getNameForId( geneSetName ), ( ( Integer ) actualSizes
                .get( geneSetName ) ).intValue(), effSize );
          result.setScore( geneSetMeanCorrel );
-         result.setPValue( hist.getValue( classSize, geneSetMeanCorrel ) );     
+         result.setPValue( hist.getValue( classSize, geneSetMeanCorrel, true ) );  // always upper tail.
          results.put( geneSetName, result );
      //    System.err.println(geneSetName + " " + hist.getValue(  classSize, geneSetMeanCorrel ) + " "   + classSize + " " + geneSetMeanCorrel);
          count++;
