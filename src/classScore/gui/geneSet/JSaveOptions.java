@@ -1,4 +1,4 @@
-package classScore.details;
+package classScore.gui.details;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;

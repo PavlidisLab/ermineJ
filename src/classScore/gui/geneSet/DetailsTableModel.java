@@ -4,7 +4,7 @@
  * Created on June 19, 2004, 12:22 AM
  */
 
-package classScore.details;
+package classScore.gui.details;
 
 import javax.swing.table.AbstractTableModel;
 import baseCode.gui.JMatrixDisplay;

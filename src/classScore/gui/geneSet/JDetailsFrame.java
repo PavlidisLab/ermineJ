@@ -1,4 +1,4 @@
-package classScore.details;
+package classScore.gui.details;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

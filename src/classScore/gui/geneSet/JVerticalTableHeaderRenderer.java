@@ -1,10 +1,10 @@
 /*
- * VerticalTextHeaderRenderer.java
+ * VerticalTableHeaderRenderer.java
  *
  * Created on June 19, 2004, 12:30 AM
  */
 
-package classScore.details;
+package classScore.gui.details;
 
 import java.awt.Component;
 import java.awt.Graphics;

@@ -14,7 +14,7 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import classScore.details.JDetailsFrame;
+import classScore.gui.details.JDetailsFrame;
 import classScore.analysis.ClassPvalSetGenerator;
 import classScore.analysis.ClassSizeComputer;
 import classScore.analysis.MultipleTestCorrector;

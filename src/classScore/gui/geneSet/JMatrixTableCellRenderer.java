@@ -4,7 +4,7 @@
  * Created on June 19, 2004, 12:23 AM
  */
 
-package classScore.details;
+package classScore.gui.details;
 
 import java.awt.Component;
 import java.awt.Point;
