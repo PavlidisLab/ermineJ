@@ -13,11 +13,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.StatusJlabel;
 import baseCode.util.StatusViewer;
-
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 
 /**
  * <p>
@@ -56,7 +55,8 @@ public class FindDialog extends JDialog {
    private JButton resetButton;
    private GONames goData;
 
-   public FindDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData ) {
+   public FindDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData,
+         GONames goData ) {
       setModal( false );
       this.callingframe = callingframe;
       this.geneData = geneData;
@@ -83,12 +83,12 @@ public class FindDialog extends JDialog {
       mainPanel.setLayout( new BorderLayout() );
 
       centerPanel.setPreferredSize( new Dimension( 200, 50 ) );
-      
+
       searchTextField = new JTextField();
       searchTextField.setPreferredSize( new Dimension( 180, 19 ) );
-      
-      centerPanel.add(searchTextField, null);
-      
+
+      centerPanel.add( searchTextField, null );
+
       bottomPanel.setPreferredSize( new Dimension( 200, 40 ) );
 
       resetButton = new JButton();
@@ -119,42 +119,42 @@ public class FindDialog extends JDialog {
       BottomPanelWrap.add( bottomPanel, BorderLayout.NORTH );
       BottomPanelWrap.add( jPanelStatus, BorderLayout.SOUTH );
 
-      mainPanel.add(centerPanel, BorderLayout.NORTH);
+      mainPanel.add( centerPanel, BorderLayout.NORTH );
       mainPanel.add( BottomPanelWrap, BorderLayout.SOUTH );
       this.setTitle( "Find Gene Set" );
    }
 
    void cancelButton_actionPerformed( ActionEvent e ) {
       geneData.resetSelectedSets();
-      callingframe.getOPanel().resetTable( );
+      callingframe.getOPanel().resetTable();
       dispose();
    }
 
    void findButton_actionPerformed( ActionEvent e ) {
       String searchOn = searchTextField.getText();
-      statusMessenger.setStatus("Searching '" + searchOn + "'");
-      
+      statusMessenger.setStatus( "Searching '" + searchOn + "'" );
+
       if ( searchOn.equals( "" ) ) {
          geneData.resetSelectedSets();
       } else {
          geneData.selectSets( searchOn, goData );
       }
-      
+
       statusMessenger.setStatus( geneData.selectedSets()
             + " matching gene sets found." );
-      
-      callingframe.getOPanel().resetTable( );
+
+      callingframe.getOPanel().resetTable();
 
    }
 
    public void resetButton_actionPerformed( ActionEvent e ) {
-      searchTextField.setText("");
+      searchTextField.setText( "" );
       geneData.resetSelectedSets();
-      
+
       statusMessenger.setStatus( geneData.selectedSets()
             + " matching gene sets found." );
-      
-      callingframe.getOPanel().resetTable( );
+
+      callingframe.getOPanel().resetTable();
    }
 }
 

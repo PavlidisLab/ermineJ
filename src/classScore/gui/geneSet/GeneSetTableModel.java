@@ -7,9 +7,9 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.JLinkLabel;
 import baseCode.gui.JMatrixDisplay;
-import classScore.data.GeneAnnotations;
 
 /**
  * Our table model.
@@ -31,8 +31,9 @@ public class GeneSetTableModel extends AbstractTableModel {
    private Map m_pvaluesOrdinalPosition;
    private GeneAnnotations m_geneData;
    private DecimalFormat m_nf;
-   private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol",
-         "Name" };
+   private String[] m_columnNames = {
+         "Probe", "Score", "Score", "Symbol", "Name"
+   };
 
    /** constructor */
    public GeneSetTableModel( JMatrixDisplay matrixDisplay, ArrayList probeIDs,
@@ -50,7 +51,8 @@ public class GeneSetTableModel extends AbstractTableModel {
    public String getColumnName( int column ) {
 
       // matrix display ends
-      int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+      int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay
+            .getColumnCount() : 0;
 
       if ( column < offset ) {
          return m_matrixDisplay.getColumnName( column );
@@ -64,14 +66,16 @@ public class GeneSetTableModel extends AbstractTableModel {
    }
 
    public int getColumnCount() {
-      int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+      int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay
+            .getColumnCount() : 0;
       return m_columnNames.length + matrixColumnCount;
    }
 
    public Object getValueAt( int row, int column ) {
 
       // matrix display ends
-      int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+      int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay
+            .getColumnCount() : 0;
 
       if ( column < offset ) {
          return new Point( row, column ); // coords into JMatrixDisplay
@@ -108,8 +112,8 @@ public class GeneSetTableModel extends AbstractTableModel {
             return values;
          case 3:
             // gene namne
-     //       return m_geneData == null ? null : new JLinkLabel(m_geneData.getProbeGeneName( probeID ));
- 
+            //       return m_geneData == null ? null : new JLinkLabel(m_geneData.getProbeGeneName( probeID ));
+
             return m_geneData == null ? "" : m_geneData
                   .getProbeGeneName( probeID );
          case 4:

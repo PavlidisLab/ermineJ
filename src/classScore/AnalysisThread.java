@@ -6,12 +6,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.gui.GuiUtil;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.StatusViewer;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
 import classScore.gui.GeneSetScoreFrame;
 
@@ -37,7 +37,7 @@ public class AnalysisThread {
    Map geneDataSets;
    String loadFile;
    int numRuns = 0;
-   
+
    public AnalysisThread() {
    }
 
@@ -142,11 +142,13 @@ public class AnalysisThread {
       GeneSetPvalRun runResult;
       if ( results != null ) { // read from a file.
          runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-               rawData, goData, geneScores, messenger, results, new Integer(numRuns).toString() );
+               rawData, goData, geneScores, messenger, results, new Integer(
+                     numRuns ).toString() );
 
       } else {
          runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-               rawData, goData, geneScores, messenger, new Integer(numRuns).toString() );
+               rawData, goData, geneScores, messenger, new Integer( numRuns )
+                     .toString() );
       }
 
       csframe.addResult( runResult );
@@ -163,7 +165,7 @@ public class AnalysisThread {
       if ( athread != null ) {
          athread.stop();
          athread = null;
-         System.err.println("Got stop");
+         System.err.println( "Got stop" );
          csframe.enableMenusForAnalysis();
          messenger.setStatus( "Ready" );
       }

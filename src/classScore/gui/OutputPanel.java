@@ -27,14 +27,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
 import baseCode.gui.JWebBrowser;
 import baseCode.util.BrowserLauncher;
 import classScore.Settings;
 import classScore.GeneSetPvalRun;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 import java.util.Vector;
 
@@ -523,7 +523,8 @@ class OutputTableModel extends AbstractTableModel {
    }
 
    public void addRunColumns( int state ) {
-      columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1 ) ).getName() );
+      columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1 ) )
+            .getName() );
    }
 
    public void addRunData( Map result ) {
@@ -539,7 +540,8 @@ class OutputTableModel extends AbstractTableModel {
 
    public void addRun() {
       state++;
-      columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1) ).getName()
+      columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1 ) )
+            .getName()
             + " Pval" );
    }
 

@@ -1,31 +1,27 @@
 package classScore.analysis;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 
 /**
- * 
- * 
  * @author Shahmil Merchant
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator{
+public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-  
    private double histRange = 0;
    private DenseDoubleMatrix2DNamed data = null;
-   
-   public CorrelationPvalGenerator(Settings settings, GeneAnnotations a,
-         GeneSetSizeComputer csc, GONames gon, DenseDoubleMatrix2DNamed data) {
+
+   public CorrelationPvalGenerator( Settings settings, GeneAnnotations a,
+         GeneSetSizeComputer csc, GONames gon, DenseDoubleMatrix2DNamed data ) {
       super( settings, a, csc, gon );
       this.data = data;
    }
-   
+
    /**
-    * 
     * @param name
     * @return
     */
@@ -34,16 +30,15 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator{
    }
 
    /**
-    * 
     * @return
     */
    public DenseDoubleMatrix2DNamed getData() {
       return data;
    }
 
-
    /**
     * Note that we don't worry about replicates here - it would slow things down too much.
+    * 
     * @param correls
     * @return
     */
@@ -61,7 +56,6 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator{
       return avecorrel / nummeas;
    }
 
-   
    /**
     */
    public void set_range( double range ) {

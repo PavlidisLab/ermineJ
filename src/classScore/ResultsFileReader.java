@@ -26,8 +26,8 @@ public class ResultsFileReader {
 
    private Map results;
 
-   public ResultsFileReader( String filename, StatusViewer messenger ) throws NumberFormatException,
-         IOException {
+   public ResultsFileReader( String filename, StatusViewer messenger )
+         throws NumberFormatException, IOException {
       results = new LinkedHashMap();
 
       File infile = new File( filename );
@@ -57,7 +57,7 @@ public class ResultsFileReader {
             results.put( classId, c );
          }
       }
-     messenger.setStatus( results.size() + " class results read from file" );
+      messenger.setStatus( results.size() + " class results read from file" );
    }
 
    public Map getResults() {

@@ -13,7 +13,7 @@ import classScore.gui.StartupDialog;
  * <p>
  * Copyright (c) 2003 Columbia University
  * </p>
- *
+ * 
  * @author Paul Pavlidis
  * @version $Id$
  */
@@ -47,10 +47,10 @@ public class classScoreGUI {
       frame.disableMenusForLoad();
       frame.setVisible( true );
 
-      frame.showStatus("Waiting for startup dialog box");
+      frame.showStatus( "Waiting for startup dialog box" );
       StartupDialog sdlog = new StartupDialog( frame );
       sdlog.showDialog();
-      frame.showStatus("Starting up...");
+      frame.showStatus( "Starting up..." );
    }
 
    public static void main( String[] args ) {

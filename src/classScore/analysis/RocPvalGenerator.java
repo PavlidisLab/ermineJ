@@ -5,17 +5,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.math.ROC;
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
 
 /**
- * Compute gene set p values based on the receiver-operator characterisic (ROC).
- * This uses a computation developed by PP for estimating the significance of an
- * area under the ROC curve.
+ * Compute gene set p values based on the receiver-operator characterisic (ROC). This uses a computation developed by PP
+ * for estimating the significance of an area under the ROC curve.
  * <p>
  * Copyright (c) 2004 Columbia University
  * </p>
@@ -26,20 +25,22 @@ import classScore.data.Histogram;
 
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-   protected int inputSize; /** @todo where is this set? */
+   protected int inputSize;
+   /** @todo where is this set? */
    protected ResamplingExperimentGeneSetScore probePvalMapper;
    protected Histogram histogram;
 
    public RocPvalGenerator( Settings set, GeneAnnotations an,
-         GeneSetSizeComputer csc, GONames gon, Histogram hi, ResamplingExperimentGeneSetScore pvm ) {
+         GeneSetSizeComputer csc, GONames gon, Histogram hi,
+         ResamplingExperimentGeneSetScore pvm ) {
       super( set, an, csc, gon );
       this.histogram = hi;
       this.probePvalMapper = pvm;
    }
 
    /**
-    * Get results for one class, based on class id. The other arguments are
-    * things that are not constant under permutations of the data.
+    * Get results for one class, based on class id. The other arguments are things that are not constant under
+    * permutations of the data.
     * 
     * @param class_name a <code>String</code> value
     * @param probesToPvals a <code>Map</code> value
@@ -52,14 +53,14 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
       //variables for outputs
       Map target_ranks = new HashMap();
 
-      int effSize =  ( ( Integer ) effectiveSizes.get( class_name ) )
-            .intValue(); // effective size of this class.
+      int effSize = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue(); // effective size of this class.
       if ( effSize < probePvalMapper.get_class_min_size()
             || effSize > probePvalMapper.get_class_max_size() ) {
          return null;
       }
 
-      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get( class_name );
+      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get(
+            class_name );
       Iterator classit = values.iterator();
       Object ranking = null;
 
@@ -72,8 +73,9 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             // set. This is invariant
             // under permutations.
 
-            if ( settings.getUseWeights()  ) {
-               ranking = input_rank_map.get( geneAnnots.getProbeToGeneMap().get( probe ) ); // rank
+            if ( settings.getUseWeights() ) {
+               ranking = input_rank_map.get( geneAnnots.getProbeToGeneMap()
+                     .get( probe ) ); // rank
                // of
                // this
                // probe

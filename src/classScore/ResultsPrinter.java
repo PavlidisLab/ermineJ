@@ -8,18 +8,27 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
-import classScore.data.GeneSetMapTools;
 import classScore.data.GeneSetResult;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
+import baseCode.bio.geneset.GeneSetMapTools;
 import baseCode.gui.GuiUtil;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Institution:: Columbia University</p>
+ * <p>
+ * Title:
+ * </p>
+ * <p>
+ * Description:
+ * </p>
+ * <p>
+ * Copyright: Copyright (c) 2004
+ * </p>
+ * <p>
+ * Institution:: Columbia University
+ * </p>
+ * 
  * @author not attributable
  * @version 1.0
  */
@@ -32,14 +41,15 @@ public class ResultsPrinter {
    protected GONames goName;
    protected GeneAnnotations geneData;
 
-   public ResultsPrinter(String dest_file, Vector sortedclasses, Map results, GONames goName) {
+   public ResultsPrinter( String dest_file, Vector sortedclasses, Map results,
+         GONames goName ) {
       this.dest_file = dest_file;
       this.sortedclasses = sortedclasses;
       this.results = results;
       this.goName = goName;
    }
 
-   public ResultsPrinter(String dest_file, GeneSetPvalRun run, GONames goName) {
+   public ResultsPrinter( String dest_file, GeneSetPvalRun run, GONames goName ) {
       this.dest_file = dest_file;
       this.sortedclasses = run.getSortedClasses();
       this.results = run.getResults();
@@ -47,91 +57,89 @@ public class ResultsPrinter {
       this.goName = goName;
    }
 
-
    /**
-      Print the results
+    * Print the results
     */
    public void printResults() {
-      this.printResults(false);
+      this.printResults( false );
    }
 
+   /**
+    * Print the results
+    * 
+    * @param sort Sort the results so the best class (by score pvalue) is listed first.
+    */
+   public void printResults( boolean sort ) {
+      System.out.println( "Beginning output" );
+      try {
+         BufferedWriter out = new BufferedWriter( new FileWriter( dest_file,
+               true ) );
+         boolean first = true;
+         GeneSetResult res = null;
+         if ( sort ) {
+            for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+               res = ( GeneSetResult ) results.get( it.next() );
+               if ( first ) {
+                  first = false;
+                  res.print_headings( out, "\tSame as:\tSimilar to:" );
+               }
+               //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
+               res
+                     .print( out, format_redundant_and_similar( res
+                           .getClassId() ) );
+            }
+         } else {
+            for ( Iterator it = results.entrySet().iterator(); it.hasNext(); ) {
+               System.out.println( it.next().getClass().toString() );
+               res = ( GeneSetResult ) it.next();
+               if ( first ) {
+                  first = false;
+                  res.print_headings( out, "\tSame as:\tSimilar to:" );
+               }
+               res
+                     .print( out, format_redundant_and_similar( res
+                           .getClassId() ) );
+               //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
+            }
+         }
+         out.close();
+      } catch ( IOException e ) {
+         GuiUtil
+               .error( "Unable to write to file "
+                     + dest_file
+                     + "\n"
+                     + "Please make sure the file is not open in another applicaiton.\n"
+                     + "If this problem persists, please contact the software vendor." );
+      }
+   }
 
    /**
-        Print the results
-        @param sort Sort the results so the best class (by score pvalue) is listed first.
-      */
-     public void printResults(boolean sort) {
-        System.out.println("Beginning output");
-        try {
-           BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
-           boolean first = true;
-           GeneSetResult res = null;
-           if (sort) {
-              for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
-                 res = (GeneSetResult) results.get(it.next());
-                 if (first) {
-                    first = false;
-                    res.print_headings(out, "\tSame as:\tSimilar to:");
-                 }
-                 //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-                 res.print(out, format_redundant_and_similar(res.getClassId()));
-              }
-           } else {
-              for (Iterator it = results.entrySet().iterator(); it.hasNext(); ) {
-                 System.out.println(it.next().getClass().toString());
-                 res = (GeneSetResult) it.next();
-                 if (first) {
-                    first = false;
-                    res.print_headings(out, "\tSame as:\tSimilar to:");
-                 }
-                 res.print(out, format_redundant_and_similar(res.getClassId()));
-                 //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-              }
-           }
-           out.close();
-        } catch (IOException e) {
-           GuiUtil.error( 
-              "Unable to write to file " + dest_file + "\n" +
-              "Please make sure the file is not open in another applicaiton.\n" +
-              "If this problem persists, please contact the software vendor." );
-        }
-     }
+    * Set up the string the way I want it.
+    * 
+    * @param classid String
+    * @return String
+    */
+   private String format_redundant_and_similar( String classid ) {
+      ArrayList redund = GeneSetMapTools.getRedundancies( classid, geneData
+            .getClassesToRedundantMap() ); //commented just to compile (Homin)
+      String return_value = "";
+      if ( redund != null ) {
+         Iterator it = redund.iterator();
+         while ( it.hasNext() ) {
+            String nextid = ( String ) it.next();
+            return_value = return_value + nextid + "|"
+                  + goName.getNameForId( nextid ) + ", ";
+         }
+      }
+      return_value = return_value + "\t";
+      /*
+       * ArrayList similar = probeToClassMap.getSimilarities(classid); //commented just to compile (Homin) if (similar !=
+       * null) { Iterator it = similar.iterator(); while (it.hasNext()) { String nextid = (String) it.next(); String
+       * prefix; return_value = return_value + nextid + "|" + goName.getNameForId(nextid) + ", "; } return "\t" +
+       * return_value; }
+       */
+      return return_value;
 
-     /**
-      * Set up the string the way I want it.
-      *
-      * @param classid String
-      * @return String
-      */
-     private String format_redundant_and_similar(String classid) {
-        ArrayList redund = GeneSetMapTools.getRedundancies(classid,geneData.getClassesToRedundantMap());    //commented just to compile (Homin)
-        String return_value = "";
-        if (redund != null) {
-           Iterator it = redund.iterator();
-           while (it.hasNext()) {
-              String nextid = (String) it.next();
-              return_value = return_value + nextid + "|" +
-                             goName.getNameForId(nextid) + ", ";
-           }
-        }
-        return_value = return_value + "\t";
-/*
-        ArrayList similar = probeToClassMap.getSimilarities(classid);           //commented just to compile (Homin)
-
-        if (similar != null) {
-           Iterator it = similar.iterator();
-           while (it.hasNext()) {
-              String nextid = (String) it.next();
-              String prefix;
-              return_value = return_value + nextid + "|" +
-                             goName.getNameForId(nextid) + ", ";
-           }
-           return "\t" + return_value;
-        }
-*/
-        return return_value;
-
-     }
-
+   }
 
 }

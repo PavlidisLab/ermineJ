@@ -3,11 +3,11 @@ package classScore.gui;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 
 /**

@@ -7,8 +7,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
+
+import baseCode.bio.geneset.GeneAnnotations;
 
 /**
  * Class for computing the actual and effective sizes of gene sets.
@@ -29,8 +30,8 @@ public class GeneSetSizeComputer {
    protected GeneScoreReader geneScores;
    protected Set activeProbes;
 
-   public GeneSetSizeComputer( Set activeProbes, GeneAnnotations geneData, GeneScoreReader geneScores,
-         boolean w ) {
+   public GeneSetSizeComputer( Set activeProbes, GeneAnnotations geneData,
+         GeneScoreReader geneScores, boolean w ) {
       this.weight_on = w;
       this.activeProbes = activeProbes;
       this.classToProbe = geneData.getClassToProbeMap();
@@ -59,9 +60,10 @@ public class GeneSetSizeComputer {
       if ( geneScores == null ) {
          throw new IllegalStateException( "GeneScores was not initialized" );
       }
-      
-      if ( geneScores.getGroupToPvalMap() == null) {
-         throw new IllegalStateException( "getGroupToPvalMap was not initialized" );
+
+      if ( geneScores.getGroupToPvalMap() == null ) {
+         throw new IllegalStateException(
+               "getGroupToPvalMap was not initialized" );
       }
 
       while ( it.hasNext() ) { // for each class.
@@ -114,7 +116,6 @@ public class GeneSetSizeComputer {
    }
 
    /**
-    * 
     * @return Map
     */
    public Map getEffectiveSizes() {
@@ -122,7 +123,6 @@ public class GeneSetSizeComputer {
    }
 
    /**
-    * 
     * @return Map
     */
    public Map getActualSizes() {

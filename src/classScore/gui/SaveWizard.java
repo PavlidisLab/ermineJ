@@ -5,12 +5,12 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import baseCode.bio.geneset.GONames;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
 import classScore.ResultsPrinter;
 import classScore.Settings;
 import classScore.GeneSetPvalRun;
-import classScore.data.GONames;
 
 /**
  * <p>

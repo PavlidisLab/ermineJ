@@ -17,9 +17,9 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
-import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 import java.awt.event.*;
 
@@ -137,7 +137,7 @@ public class GeneSetWizardStep2 extends WizardStep {
       if ( newGeneSet.getProbes().size() == 0 ) {
          return false;
       }
-      
+
       return true;
    }
 
@@ -341,7 +341,9 @@ class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
 class ProbeTableModel extends AbstractTableModel {
    GeneAnnotations geneData;
-   private String[] columnNames = { "Probe", "Gene", "Description" };
+   private String[] columnNames = {
+         "Probe", "Gene", "Description"
+   };
 
    public ProbeTableModel( GeneAnnotations geneData ) {
       this.geneData = geneData;

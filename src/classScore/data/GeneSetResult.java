@@ -6,10 +6,9 @@ import java.text.DecimalFormat;
 
 /**
  * Data structure to store class scoring information about a class.
- *
+ * 
  * @author Paul Pavlidis
  * @version $Id$
- *
  */
 public class GeneSetResult implements Comparable {
    private String class_id = null;
@@ -24,7 +23,7 @@ public class GeneSetResult implements Comparable {
    private int rank;
 
    public GeneSetResult() {
-      this( null, null, 0, 0, 0.0, 1.0  );
+      this( null, null, 0, 0, 0.0, 1.0 );
    }
 
    public GeneSetResult( String id, String class_name, int size, int effsize ) {
@@ -34,7 +33,7 @@ public class GeneSetResult implements Comparable {
    }
 
    public GeneSetResult( String id, String class_name, int size,
-         int effective_size, double score, double pvalue  ) {
+         int effective_size, double score, double pvalue ) {
       this.class_id = id;
       this.class_name = class_name;
       this.pvalue = pvalue;
@@ -57,29 +56,24 @@ public class GeneSetResult implements Comparable {
    public void print( BufferedWriter out, String extracolumns )
          throws IOException {
 
-      out.write( "!\t" +
-                 class_name + "\t" + class_id + "\t" +
-                 size + "\t" +
-                 effective_size + "\t" +
-                 nf.format( score ) + "\t" + nf.format( pvalue )
-                 + "\t" +
-                 nf.format( pvalue_corr ) + "\t" + extracolumns + "\n" );
+      out.write( "!\t" + class_name + "\t" + class_id + "\t" + size + "\t"
+            + effective_size + "\t" + nf.format( score ) + "\t"
+            + nf.format( pvalue ) + "\t" + nf.format( pvalue_corr ) + "\t"
+            + extracolumns + "\n" );
    }
 
    public void print_headings( BufferedWriter out ) throws IOException {
       this.print_headings( out, "" );
    }
 
-   public void print_headings( BufferedWriter out, String extracolumns ) throws
-       IOException {
+   public void print_headings( BufferedWriter out, String extracolumns )
+         throws IOException {
       out.write( "#\n#!" );
-      out.write( "\tClass Name" + "\tClass ID" + "\tsize" +
-                 "\teffective_size" +
-                 "\traw score" +
-                 "\tpval" +
-                 //"\tN over pval cut\tORA pval+"
-                 /* + "\tAROC" + "\tAROCpval"  */
-                 "\tCorrected_pvalue" + extracolumns + "\n" );
+      out.write( "\tClass Name" + "\tClass ID" + "\tsize" + "\teffective_size"
+            + "\traw score" + "\tpval" +
+            //"\tN over pval cut\tORA pval+"
+            /* + "\tAROC" + "\tAROCpval" */
+            "\tCorrected_pvalue" + extracolumns + "\n" );
    }
 
    public void setnames( String id, String name ) {
@@ -141,7 +135,6 @@ public class GeneSetResult implements Comparable {
    }
 
    /**
-    *
     * @return int
     */
    public int getSize() {
@@ -150,7 +143,7 @@ public class GeneSetResult implements Comparable {
 
    /**
     * Default comparator for this class: sorts by the pvalue.
-    *
+    * 
     * @param ob Object
     * @return int
     */

@@ -111,20 +111,20 @@ public class StartupDialog extends AppDialog {
 
    private void saveValues() {
 
-//      // if we don't have the data folder, use the location of these files.
-//      if ( settings.getDataFolder() == null ) {
-//         settings.setDataFolder( classFile.getText().substring(
-//               0,
-//               classFile.getText().lastIndexOf(
-//                     System.getProperty( "file.separator" ) ) ) );
-//      }
-//      
-//      if ( settings.getClassFolder() == null ) {
-//         settings.setClassFolder( classFile.getText().substring(
-//               0,
-//               classFile.getText().lastIndexOf(
-//                     System.getProperty( "file.separator" ) ) ) + System.getProperty("file.separator" + "geneSets"));
-//      }
+      //      // if we don't have the data folder, use the location of these files.
+      //      if ( settings.getDataFolder() == null ) {
+      //         settings.setDataFolder( classFile.getText().substring(
+      //               0,
+      //               classFile.getText().lastIndexOf(
+      //                     System.getProperty( "file.separator" ) ) ) );
+      //      }
+      //      
+      //      if ( settings.getClassFolder() == null ) {
+      //         settings.setClassFolder( classFile.getText().substring(
+      //               0,
+      //               classFile.getText().lastIndexOf(
+      //                     System.getProperty( "file.separator" ) ) ) + System.getProperty("file.separator" + "geneSets"));
+      //      }
 
       settings.setClassFile( classFile.getText() );
       settings.setAnnotFile( annotFile.getText() );

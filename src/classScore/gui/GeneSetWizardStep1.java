@@ -31,8 +31,7 @@ import classScore.Settings;
  * @version $Id$
  */
 
-public class GeneSetWizardStep1 extends WizardStep
-{
+public class GeneSetWizardStep1 extends WizardStep {
    GeneSetWizard wiz;
    Settings settings;
    JButton browseButton;
@@ -45,8 +44,8 @@ public class GeneSetWizardStep1 extends WizardStep
       this.wiz = wiz;
       this.settings = settings;
       chooser = new JFileChooser();
-      chooser.setCurrentDirectory( new File( settings.getClassFolder()) );
-      chooser.setDialogTitle("Choose Gene Set File");
+      chooser.setCurrentDirectory( new File( settings.getClassFolder() ) );
+      chooser.setDialogTitle( "Choose Gene Set File" );
       wiz.clearStatus();
    }
 
@@ -54,7 +53,7 @@ public class GeneSetWizardStep1 extends WizardStep
    protected void jbInit() {
       JPanel step1Panel = new JPanel();
       BorderLayout borderLayout1 = new BorderLayout();
-      step1Panel.setLayout(borderLayout1);
+      step1Panel.setLayout( borderLayout1 );
 
       //top
       JPanel jPanel1 = new JPanel();
@@ -74,55 +73,52 @@ public class GeneSetWizardStep1 extends WizardStep
       fileInputButton.setBackground( SystemColor.control );
       fileInputButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
       fileInputButton.setText( "File" );
-      fileInputButton.addActionListener( new GeneSetWizardStep1_fileInputButton_actionAdapter( this ) );
+      fileInputButton
+            .addActionListener( new GeneSetWizardStep1_fileInputButton_actionAdapter(
+                  this ) );
       JRadioButton manInputButton = new JRadioButton( "Manual", true );
       manInputButton.setBackground( SystemColor.control );
       manInputButton.setMaximumSize( new Dimension( 91, 23 ) );
-      manInputButton.addActionListener( new
-                                        GeneSetWizardStep1_manInputButton_actionAdapter( this ) );
+      manInputButton
+            .addActionListener( new GeneSetWizardStep1_manInputButton_actionAdapter(
+                  this ) );
       manInputButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
       ButtonGroup buttonGroup1 = new ButtonGroup();
-      jPanel1.setPreferredSize(new Dimension(364, 130));
+      jPanel1.setPreferredSize( new Dimension( 364, 130 ) );
       buttonGroup1.add( fileInputButton );
       buttonGroup1.add( manInputButton );
       JLabel jLabel4 = new JLabel();
       jLabel4.setText( "- File with gene symbols or probe ids" );
       JLabel jLabel5 = new JLabel();
       jLabel5.setText( "- Enter using lists" );
-      jPanel4.add( jLabel5, new GridBagConstraints( 1, 1, 1, 1, 0.0, 0.0
-          , GridBagConstraints.WEST,
-          GridBagConstraints.NONE,
-          new Insets( 0, 16, 8, 10 ),
-          125, 10 ) );
-      jPanel4.add( jLabel4, new GridBagConstraints( 1, 0, 1, 1, 0.0, 0.0
-          , GridBagConstraints.WEST,
-          GridBagConstraints.NONE,
-          new Insets( 3, 16, 0, 10 ),
-          30, 10 ) );
-      jPanel4.add( manInputButton, new GridBagConstraints( 0, 1, 1, 1, 0.0, 0.0
-          , GridBagConstraints.CENTER, GridBagConstraints.NONE,
-          new Insets( 0, 9, 8, 0 ), 8, 12 ) );
-      jPanel4.add( fileInputButton, new GridBagConstraints( 0, 0, 1, 1, 0.0, 0.0
-          , GridBagConstraints.CENTER, GridBagConstraints.NONE,
-          new Insets( 3, 9, 0, 0 ), 26, 12 ) );
-      jPanel7.add( jLabel8, new GridBagConstraints( 0, 0, 1, 1, 0.0, 0.0
-          , GridBagConstraints.WEST,
-          GridBagConstraints.NONE,
-          new Insets( 6, 21, 0, 74 ),
-          0, 0 ) );
-      jPanel7.add( jPanel4, new GridBagConstraints( 0, 1, 1, 1, 1.0, 1.0
-          , GridBagConstraints.CENTER,
-          GridBagConstraints.HORIZONTAL,
-          new Insets( 6, 10, 12, 16 ), -1,
-          8 ) );
-      jPanel1.add(jPanel7, null);
+      jPanel4.add( jLabel5, new GridBagConstraints( 1, 1, 1, 1, 0.0, 0.0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets( 0,
+                  16, 8, 10 ), 125, 10 ) );
+      jPanel4.add( jLabel4, new GridBagConstraints( 1, 0, 1, 1, 0.0, 0.0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets( 3,
+                  16, 0, 10 ), 30, 10 ) );
+      jPanel4.add( manInputButton, new GridBagConstraints( 0, 1, 1, 1, 0.0,
+            0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+            new Insets( 0, 9, 8, 0 ), 8, 12 ) );
+      jPanel4.add( fileInputButton, new GridBagConstraints( 0, 0, 1, 1, 0.0,
+            0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+            new Insets( 3, 9, 0, 0 ), 26, 12 ) );
+      jPanel7.add( jLabel8, new GridBagConstraints( 0, 0, 1, 1, 0.0, 0.0,
+            GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets( 6,
+                  21, 0, 74 ), 0, 0 ) );
+      jPanel7.add( jPanel4, new GridBagConstraints( 0, 1, 1, 1, 1.0, 1.0,
+            GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+            new Insets( 6, 10, 12, 16 ), -1, 8 ) );
+      jPanel1.add( jPanel7, null );
 
       //bottom
       JPanel jPanel2 = new JPanel(); // holds file chooser
-      jPanel2.setPreferredSize(new Dimension(354, 100));
+      jPanel2.setPreferredSize( new Dimension( 354, 100 ) );
       browseButton = new JButton();
       browseButton.setText( "Browse...." );
-      browseButton.addActionListener( new GeneSetWizardStep1_browseButton_actionAdapter( this ) );
+      browseButton
+            .addActionListener( new GeneSetWizardStep1_browseButton_actionAdapter(
+                  this ) );
       browseButton.setEnabled( false );
       classFile = new JTextField();
       classFile.setEditable( false );
@@ -132,12 +128,13 @@ public class GeneSetWizardStep1 extends WizardStep
       jPanel2.add( browseButton, null );
       jPanel2.add( classFile, null );
 
-      step1Panel.add(jPanel1, BorderLayout.CENTER);
-      step1Panel.add(jPanel2, BorderLayout.SOUTH);
+      step1Panel.add( jPanel1, BorderLayout.CENTER );
+      step1Panel.add( jPanel2, BorderLayout.SOUTH );
 
-      this.addHelp("<html><b>Choose the source of the genes for the new class</b><br>"+
-                   "You can load them in from a file, or add them from the list of available probes.");
-      this.addMain(step1Panel);
+      this
+            .addHelp( "<html><b>Choose the source of the genes for the new class</b><br>"
+                  + "You can load them in from a file, or add them from the list of available probes." );
+      this.addMain( step1Panel );
    }
 
    public boolean isReady() {
@@ -165,45 +162,51 @@ public class GeneSetWizardStep1 extends WizardStep
       }
    }
 
-   public int getInputMethod()  { return inputMethod;  }
-   public String getLoadFile() { return classFile.getText(); }
-}
-
-class GeneSetWizardStep1_manInputButton_actionAdapter implements java.awt.event.
-        ActionListener {
-   GeneSetWizardStep1 adaptee;
-
-   GeneSetWizardStep1_manInputButton_actionAdapter(GeneSetWizardStep1 adaptee) {
-      this.adaptee = adaptee;
+   public int getInputMethod() {
+      return inputMethod;
    }
 
-   public void actionPerformed(ActionEvent e) {
-      adaptee.manInputButton_actionPerformed(e);
+   public String getLoadFile() {
+      return classFile.getText();
    }
 }
 
-class GeneSetWizardStep1_fileInputButton_actionAdapter implements java.awt.event.
-        ActionListener {
+class GeneSetWizardStep1_manInputButton_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetWizardStep1 adaptee;
 
-   GeneSetWizardStep1_fileInputButton_actionAdapter(GeneSetWizardStep1 adaptee) {
+   GeneSetWizardStep1_manInputButton_actionAdapter( GeneSetWizardStep1 adaptee ) {
       this.adaptee = adaptee;
    }
 
-   public void actionPerformed(ActionEvent e) {
-      adaptee.fileInputButton_actionPerformed(e);
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.manInputButton_actionPerformed( e );
    }
 }
 
-class GeneSetWizardStep1_browseButton_actionAdapter implements java.awt.event.ActionListener {
+class GeneSetWizardStep1_fileInputButton_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetWizardStep1 adaptee;
 
-   GeneSetWizardStep1_browseButton_actionAdapter(GeneSetWizardStep1 adaptee) {
+   GeneSetWizardStep1_fileInputButton_actionAdapter( GeneSetWizardStep1 adaptee ) {
       this.adaptee = adaptee;
    }
 
-   public void actionPerformed(ActionEvent e) {
-      adaptee.browseButton_actionPerformed(e);
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.fileInputButton_actionPerformed( e );
+   }
+}
+
+class GeneSetWizardStep1_browseButton_actionAdapter implements
+      java.awt.event.ActionListener {
+   GeneSetWizardStep1 adaptee;
+
+   GeneSetWizardStep1_browseButton_actionAdapter( GeneSetWizardStep1 adaptee ) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.browseButton_actionPerformed( e );
    }
 }
 

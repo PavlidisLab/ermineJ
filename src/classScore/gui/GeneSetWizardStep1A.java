@@ -14,10 +14,10 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 import javax.swing.JButton;
 
@@ -25,7 +25,7 @@ import javax.swing.JButton;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin Lee
  * @version $Id$
  * @todo 3.0 old table click shows class in status bar, number of probes?
@@ -42,7 +42,7 @@ public class GeneSetWizardStep1A extends WizardStep {
    JTextField searchTextField;
 
    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData,
-         GONames goData, NewGeneSet newGeneSet, NewGeneSet oldGeneSet) {
+         GONames goData, NewGeneSet newGeneSet, NewGeneSet oldGeneSet ) {
       super( wiz );
       this.wiz = wiz;
       this.geneData = geneData;
@@ -110,13 +110,13 @@ public class GeneSetWizardStep1A extends WizardStep {
       String desc = ( String ) oldClassTable.getValueAt( row, 1 );
       newGeneSet.setId( id );
       newGeneSet.setDesc( desc );
-      newGeneSet.setModified(true);
+      newGeneSet.setModified( true );
       if ( geneData.classExists( id ) ) {
          newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
       }
       oldGeneSet.setId( id );
       oldGeneSet.setDesc( desc );
-      oldGeneSet.setModified(true);
+      oldGeneSet.setModified( true );
       if ( geneData.classExists( id ) ) {
          oldGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
       }

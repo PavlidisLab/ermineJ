@@ -97,11 +97,9 @@ public class AnalysisWizardStep1 extends WizardStep {
       jPanel4.add( jPanel12, null );
       step1Panel.add( jPanel4, null );
 
-      this
-            .addHelp( "<html><b>Select the method to " +
-                  "use for scoring gene sets.</b><br>"
-                  + "</html>" );
-      this.addMain( step1Panel );  
+      this.addHelp( "<html><b>Select the method to "
+            + "use for scoring gene sets.</b><br>" + "</html>" );
+      this.addMain( step1Panel );
    }
 
    public boolean isReady() {

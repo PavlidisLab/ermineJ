@@ -88,7 +88,7 @@ public class LoadDialog extends AppDialog {
                .getText() );
          dispose();
       } else {
-         GuiUtil.error("File is not readable.");
+         GuiUtil.error( "File is not readable." );
       }
    }
 

@@ -4,15 +4,15 @@ import baseCode.util.StatusViewer;
 import classScore.data.Histogram;
 
 /**
- * 
- *
  * <hr>
- * <p>Copyright (c) 2004 Columbia University
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author pavlidis
  * @version $Id$
  */
 public interface NullDistributionGenerator {
 
-   public Histogram generateNullDistribution(StatusViewer messenger);
-   
+   public Histogram generateNullDistribution( StatusViewer messenger );
+
 }

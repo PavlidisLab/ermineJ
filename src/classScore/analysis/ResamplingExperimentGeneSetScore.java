@@ -18,9 +18,9 @@ import classScore.data.GeneScoreReader;
 import classScore.data.Histogram;
 
 /**
- * Calculates a background distribution for class sscores derived from randomly
- * selected individual gene scores...and does other things. Created 09/02/02.
- *
+ * Calculates a background distribution for class sscores derived from randomly selected individual gene scores...and
+ * does other things. Created 09/02/02.
+ * 
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
  */
@@ -34,14 +34,13 @@ public class ResamplingExperimentGeneSetScore extends
    private static int quantile = 50;
    private static double quantfract = 0.5;
    private int method;
-private Settings settings;
+   private Settings settings;
 
    /**
-    * Used for methods which require randomly sampling classes to generate a
-    * null distribution of scores based on gene-by-gene scores.
-    *
-    * @return A histogram object containing a cdf that can be used to generate
-    *         pvalues.
+    * Used for methods which require randomly sampling classes to generate a null distribution of scores based on
+    * gene-by-gene scores.
+    * 
+    * @return A histogram object containing a cdf that can be used to generate pvalues.
     * @param m GeneSetScoreStatus
     */
    public Histogram generateNullDistribution( StatusViewer m ) {
@@ -63,7 +62,7 @@ private Settings settings;
       }
 
       if ( num_genes == 0 ) {
-        throw new IllegalStateException( "No pvalues!" );
+         throw new IllegalStateException( "No pvalues!" );
       }
 
       // we use this throughout.
@@ -82,11 +81,11 @@ private Settings settings;
             hist.update( i - classMinSize, rawscore );
             Thread.yield();
          }
-         
+
          try {
-            Thread.sleep(10);
-         } catch (InterruptedException e) {
-            
+            Thread.sleep( 10 );
+         } catch ( InterruptedException e ) {
+
          }
 
          if ( m != null ) {
@@ -99,12 +98,12 @@ private Settings settings;
       return hist;
    }
 
-
    /**
     * @param settings
     * @param geneScores
     */
-   public ResamplingExperimentGeneSetScore( Settings settings, GeneScoreReader geneScores ) {
+   public ResamplingExperimentGeneSetScore( Settings settings,
+         GeneScoreReader geneScores ) {
       this.settings = settings;
       this.classMaxSize = settings.getMaxClassSize();
       this.classMinSize = settings.getMinClassSize();
@@ -131,16 +130,13 @@ private Settings settings;
    }
 
    /**
-    *
     * @return double[]
     */
    public double[] get_in_pvals() {
       return useWeights ? groupPvals : pvals;
    }
 
-
    /**
-    *
     * @param value int
     */
    public void setQuantile( int value ) {
@@ -149,16 +145,13 @@ private Settings settings;
    }
 
    /**
-    *
     * @return int
     */
    public int get_quantile() {
       return quantile;
    }
 
-
    /**
-    *
     * @return Map
     */
    public Map get_map() {
@@ -166,7 +159,6 @@ private Settings settings;
    }
 
    /**
-    *
     * @param shuffle boolean
     * @return Map
     */
@@ -197,7 +189,6 @@ private Settings settings;
    }
 
    /**
-    *
     * @param probe_id String
     * @return double
     */
@@ -211,16 +202,16 @@ private Settings settings;
    }
 
    /**
-    * Basic method to calculate the raw score, given an array of the gene scores
-    * for items in the class. Note that performance here is important.
-    *
+    * Basic method to calculate the raw score, given an array of the gene scores for items in the class. Note that
+    * performance here is important.
+    * 
     * @param genevalues double[]
     * @param effsize int
     * @throws IllegalArgumentException
     * @return double
     */
-   public static double calc_rawscore( double[] genevalues, int effsize, int method  )
-         throws IllegalArgumentException {
+   public static double calc_rawscore( double[] genevalues, int effsize,
+         int method ) throws IllegalArgumentException {
 
       if ( method == Settings.MEAN_METHOD ) {
          return DescriptiveWithMissing.mean( genevalues, effsize );
@@ -238,18 +229,18 @@ private Settings settings;
    }
 
    /**
-    *
     * @param meth String
     * @throws IllegalArgumentException
     */
-   private void setMethod( int meth )  {
+   private void setMethod( int meth ) {
       method = meth;
    }
 
    /**  */
    public void setHistogramRange() {
-      if (groupPvals == null || pvals == null) {
-         throw new IllegalStateException("Null pvalue arrays for histogram range setting");
+      if ( groupPvals == null || pvals == null ) {
+         throw new IllegalStateException(
+               "Null pvalue arrays for histogram range setting" );
       }
 
       histogramMax = Rank.meanOfTop2( useWeights ? groupPvals : pvals );

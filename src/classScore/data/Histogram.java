@@ -12,8 +12,7 @@ import baseCode.math.Stats;
 import cern.colt.list.DoubleArrayList;
 
 /**
- * Stores distributions for geneSets ( a series of histograms). For generic
- * histograms, use hep.aida.
+ * Stores distributions for geneSets ( a series of histograms). For generic histograms, use hep.aida.
  * 
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
@@ -24,7 +23,7 @@ public class Histogram {
    private int minimumGeneSetSize = 0;
    private double binSize = 0.002; // todo: set this automatically?, so there
    // are always a reasonable # of bins.
-   private double minimum = 0.0;  
+   private double minimum = 0.0;
    private double maximum = 5.0; // this gets adjusted if need be.
    private int numBins = 0;
    private int numItemsPerHistogram = 0;
@@ -39,7 +38,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @param number_of_class
     * @param min_class_size
     * @param number_of_runs
@@ -72,7 +70,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @param runs int
     */
    public void setNumRuns( int runs ) {
@@ -127,7 +124,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @return double
     */
    public double get_bin_size() {
@@ -135,7 +131,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @return double
     */
    public double get_hist_min() {
@@ -143,7 +138,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @return double
     */
    public double get_hist_max() {
@@ -151,7 +145,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @return int
     */
    public int get_number_of_bins() {
@@ -163,13 +156,11 @@ public class Histogram {
    }
 
    /**
-    * 
     * @return int
     */
    public int get_number_of_runs() {
       return numItemsPerHistogram;
    }
-
 
    public int get_min_class_size() {
       return minimumGeneSetSize;
@@ -183,7 +174,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @param class_size int
     * @param min_class_size int
     * @return int
@@ -194,7 +184,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @param class_size int - NOT the row, that is determined here.
     * @param rawscore double
     * @return double
@@ -223,7 +212,7 @@ public class Histogram {
    /**
     * Prints the histogram to stdout.
     */
-   public void print(Writer s) throws IOException {
+   public void print( Writer s ) throws IOException {
       // print a heading
       int stepsize = 20;
       s.write( "heading:" );
@@ -244,7 +233,6 @@ public class Histogram {
    }
 
    /**
-    * 
     * @param row int
     * @param binnum int
     * @return double

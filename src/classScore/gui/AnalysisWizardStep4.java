@@ -19,10 +19,9 @@ import classScore.Settings;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin K Lee
  * @version $Id$
- *
  */
 
 public class AnalysisWizardStep4 extends WizardStep {
@@ -129,7 +128,7 @@ public class AnalysisWizardStep4 extends WizardStep {
       jPanelReplicateTreaments.add( jRadioButtonBestReplicates, null );
       jPanelReplicateTreaments.add( jRadioButtonMeanReplicates, null );
       jPanelReplicateTreaments.add( jList1, null );
-      
+
       step4TopPanel.add( step4LeftPanel, null );
       step4TopPanel.add( step4RightPanel, null );
       step4Panel.add( step4TopPanel, null );

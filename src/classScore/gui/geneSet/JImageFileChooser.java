@@ -19,11 +19,10 @@ import baseCode.gui.file.ImageFileFilter;
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
- * @author  Will Braynen
+ * @author Will Braynen
  * @version $Id$
  */
-public class JImageFileChooser
-    extends JFileChooser {
+public class JImageFileChooser extends JFileChooser {
 
    // fields
    JDetailsFileChooserOptions m_options;
@@ -50,30 +49,30 @@ public class JImageFileChooser
    public boolean includeLabels() {
       return m_options.includeLabels();
    }
-   
-   /**
-    * The accessory component for the file chooser.<p>
-    *
-    * Lets the user change save options and might also in the future include
-    * a preview of what the matrix image will look like with the chosen options.
-    */
-   class JDetailsFileChooserOptions
-       extends JComponent {
 
-      JCheckBox m_includeLabels = new JCheckBox( "Include row and column labels" );
+   /**
+    * The accessory component for the file chooser.
+    * <p>
+    * Lets the user change save options and might also in the future include a preview of what the matrix image will
+    * look like with the chosen options.
+    */
+   class JDetailsFileChooserOptions extends JComponent {
+
+      JCheckBox m_includeLabels = new JCheckBox(
+            "Include row and column labels" );
       JCheckBox m_normalize = new JCheckBox( "Normalize" );
 
       GridLayout gridLayout1 = new GridLayout( 12, 2 );
       JLabel m_titleLabel = new JLabel();
       JLabel m_spacerLabel = new JLabel();
 
-      public JDetailsFileChooserOptions( boolean includeLabels, boolean normalize ) throws HeadlessException {
+      public JDetailsFileChooserOptions( boolean includeLabels,
+            boolean normalize ) throws HeadlessException {
          try {
             m_includeLabels.setSelected( includeLabels );
             m_normalize.setSelected( normalize );
             jbInit();
-         }
-         catch ( Exception e ) {
+         } catch ( Exception e ) {
             e.printStackTrace();
          }
       }
@@ -102,6 +101,6 @@ public class JImageFileChooser
       public boolean includeLabels() {
          return m_includeLabels.isSelected();
       }
-   } // end private class JImageFileChooserOptions   
+   } // end private class JImageFileChooserOptions
 
 } // end class JDetailsFileChooser

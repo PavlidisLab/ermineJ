@@ -33,6 +33,7 @@ import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableColumn;
 
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.graphics.text.Util;
 import baseCode.gui.ColorMap;
@@ -46,7 +47,6 @@ import baseCode.gui.GuiUtil;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
 import classScore.Settings;
-import classScore.data.GeneAnnotations;
 
 /**
  * <hr>
@@ -168,12 +168,9 @@ public class JGeneSetFrame extends JFrame {
                   this ) );
       m_cellWidthSlider.setInverted( false );
       m_cellWidthSlider.setMajorTickSpacing( 0 );
-      m_cellWidthSlider
-            .setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_cellWidthSlider
-            .setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_cellWidthSlider
-            .setValue( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
+      m_cellWidthSlider.setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
+      m_cellWidthSlider.setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
+      m_cellWidthSlider.setValue( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
       m_cellWidthSlider.setMinorTickSpacing( 3 );
       m_cellWidthSlider.setPaintLabels( false );
       m_cellWidthSlider.setPaintTicks( true );
@@ -208,7 +205,7 @@ public class JGeneSetFrame extends JFrame {
 
       // Reposition the table inside the scrollpane
       int x = m_table.getSize().width; // should probably subtract the size of the viewport, but it gets trimmed anyway,
-                                       // so it's okay to be lazy here
+      // so it's okay to be lazy here
       m_tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
 
       this.getContentPane().add( m_tableScrollPane, BorderLayout.CENTER );
@@ -241,9 +238,8 @@ public class JGeneSetFrame extends JFrame {
       if ( m_matrixDisplay != null ) {
          boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
          m_normalizeMenuItem.setSelected( isNormalized );
-      }
-      else {
-         // matrixDisplay is null!  Disable the menu
+      } else {
+         // matrixDisplay is null! Disable the menu
          setDisplayMatrixGUIEnabled( false );
       }
    }
@@ -257,7 +253,7 @@ public class JGeneSetFrame extends JFrame {
 
       // the toolbar
       m_toolbar.setEnabled( enabled );
-      
+
       // the sliders
       m_cellWidthSlider.setEnabled( enabled );
       m_cellWidthLabel.setEnabled( enabled );
@@ -265,7 +261,7 @@ public class JGeneSetFrame extends JFrame {
       m_colorRangeLabel.setEnabled( enabled );
       m_gradientBar.setVisible( enabled );
    }
-   
+
    private void createDetailsTable( ArrayList probeIDs, Map pvalues,
          GeneAnnotations geneData, String filename ) {
 
@@ -283,16 +279,18 @@ public class JGeneSetFrame extends JFrame {
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
       try {
-         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probeSet );
-      }
-      catch ( IOException e ) {
-         GuiUtil.error( 
-            "Unable to load raw microarray data from file " + filename + "\n" +
-            "Please make sure the file exists, filename and directory path are correct,\n" +
-            "and that it is a valid raw data file (tab-delimited).\n" );
+         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
+               probeSet );
+      } catch ( IOException e ) {
+         GuiUtil
+               .error( "Unable to load raw microarray data from file "
+                     + filename
+                     + "\n"
+                     + "Please make sure the file exists, filename and directory path are correct,\n"
+                     + "and that it is a valid raw data file (tab-delimited).\n" );
          matrix = null;
       }
-            
+
       // create the matrix display
       if ( matrix != null ) {
          m_matrixDisplay = new JMatrixDisplay( matrix );
@@ -320,7 +318,8 @@ public class JGeneSetFrame extends JFrame {
 
       JVerticalHeaderRenderer verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
 
-      int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+      int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay
+            .getColumnCount() : 0;
 
       // Set each column
       for ( int i = 0; i < matrixColumnCount; i++ ) {
@@ -539,17 +538,14 @@ public class JGeneSetFrame extends JFrame {
    } // end saveData
 
    /**
-    * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay).
-    * 
-    * You would probably want to call this method to print out the matrix in the order in which it is displayed in the
-    * table. In this case, you will want to do something like this: <br>
+    * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay). You would probably want to call this method
+    * to print out the matrix in the order in which it is displayed in the table. In this case, you will want to do
+    * something like this: <br>
     * <br>
-    * 
-    * <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code>
-    * 
-    * However, do not forget to call <code>m_matrixDisplay.resetRowKeys()</code> when you are done because the table
-    * sorter filter does its own mapping, so the matrix rows have to remain in their original order (or it might not be
-    * displayed correctly inside the table).
+    * <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code> However, do not forget to call
+    * <code>m_matrixDisplay.resetRowKeys()</code> when you are done because the table sorter filter does its own
+    * mapping, so the matrix rows have to remain in their original order (or it might not be displayed correctly inside
+    * the table).
     */
    protected int[] getCurrentMatrixDisplayRowOrder() {
 
@@ -730,8 +726,7 @@ class JGeneSetFrame_m_cellWidthSlider_changeAdapter implements
       javax.swing.event.ChangeListener {
    JGeneSetFrame adaptee;
 
-   JGeneSetFrame_m_cellWidthSlider_changeAdapter(
-         JGeneSetFrame adaptee ) {
+   JGeneSetFrame_m_cellWidthSlider_changeAdapter( JGeneSetFrame adaptee ) {
       this.adaptee = adaptee;
    }
 

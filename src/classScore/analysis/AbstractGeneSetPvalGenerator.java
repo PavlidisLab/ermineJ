@@ -2,9 +2,10 @@ package classScore.analysis;
 
 import java.util.Map;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
+
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 
 /**
  * Base implementation of pvalue generator
@@ -13,8 +14,7 @@ import classScore.data.GeneAnnotations;
  * </p>
  * 
  * @author Paul Pavlidis
- * @version $Id: AbstractGeneSetPvalGenerator.java,v 1.3 2004/06/29 23:09:41
- *          pavlidis Exp $
+ * @version $Id$
  */
 
 public abstract class AbstractGeneSetPvalGenerator {
@@ -42,7 +42,6 @@ public abstract class AbstractGeneSetPvalGenerator {
    }
 
    /**
-    * 
     * @param value
     */
    public void set_class_max_size( int value ) {
@@ -50,14 +49,12 @@ public abstract class AbstractGeneSetPvalGenerator {
    }
 
    /**
-    * 
     * @param value
     */
    public void set_class_min_size( int value ) {
       minGeneSetSize = value;
    }
 
-   
    /**
     */
    public int getMaxClassSize() {
@@ -65,7 +62,6 @@ public abstract class AbstractGeneSetPvalGenerator {
    }
 
    /**
-    * 
     * @return
     */
    public int getMinGeneSetSize() {

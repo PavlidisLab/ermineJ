@@ -16,13 +16,15 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.FileTools;
 
 /**
- * 
- *
  * <hr>
- * <p>Copyright (c) 2004 Columbia University
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author Homin K Lee
  * @version $Id$
  */
@@ -40,27 +42,21 @@ public class NewGeneSet {
       probes = new ArrayList();
    }
 
-   public int compare(NewGeneSet comparee)
-   {
-      int idcomp = comparee.getId().compareTo(id);
-      if(idcomp !=0)
-         return idcomp;
-      int desccomp = comparee.getDesc().compareTo(desc);
-      if(idcomp !=0)
-         return desccomp;
+   public int compare( NewGeneSet comparee ) {
+      int idcomp = comparee.getId().compareTo( id );
+      if ( idcomp != 0 ) return idcomp;
+      int desccomp = comparee.getDesc().compareTo( desc );
+      if ( idcomp != 0 ) return desccomp;
       ArrayList probes2 = comparee.getProbes();
-      if(probes.size() < probes2.size())
+      if ( probes.size() < probes2.size() )
          return -1;
-      else if (probes.size() > probes2.size())
+      else if ( probes.size() > probes2.size() )
          return 1;
-      else
-      {
-          for(Iterator it = probes2.iterator(); it.hasNext();)
-          {
-             String probe2 = (String)it.next();
-             if(!probes.contains(probe2))
-                return -1;
-          }
+      else {
+         for ( Iterator it = probes2.iterator(); it.hasNext(); ) {
+            String probe2 = ( String ) it.next();
+            if ( !probes.contains( probe2 ) ) return -1;
+         }
       }
       return 0;
    }
@@ -84,7 +80,9 @@ public class NewGeneSet {
 
       return new AbstractTableModel() {
 
-         private String[] columnNames = { "Probe", "Gene", "Description" };
+         private String[] columnNames = {
+               "Probe", "Gene", "Description"
+         };
 
          public String getColumnName( int i ) {
             return columnNames[i];
@@ -112,14 +110,14 @@ public class NewGeneSet {
             if ( r < probes.size() ) {
                String probeid = ( String ) probes.get( r );
                switch ( c ) {
-               case 0:
-                  return probeid;
-               case 1:
-                  return geneData.getProbeGeneName( probeid );
-               case 2:
-                  return geneData.getProbeDescription( probeid );
-               default:
-                  return null;
+                  case 0:
+                     return probeid;
+                  case 1:
+                     return geneData.getProbeGeneName( probeid );
+                  case 2:
+                     return geneData.getProbeDescription( probeid );
+                  default:
+                     return null;
                }
             }
             return null;
@@ -228,8 +226,7 @@ public class NewGeneSet {
    }
 
    /**
-    * Redefine a class. The "real" version of the class is modified to look like
-    * this one.
+    * Redefine a class. The "real" version of the class is modified to look like this one.
     */
    public void modifyClass( GONames goData ) {
       geneData.modifyClass( id, probes );

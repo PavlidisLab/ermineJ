@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.util.StatusViewer;
 import classScore.analysis.CorrelationsGeneSetPvalSeriesGenerator;
@@ -21,8 +23,6 @@ import classScore.analysis.NullDistributionGenerator;
 import classScore.analysis.OraGeneSetPvalSeriesGenerator;
 import classScore.analysis.ResamplingCorrelationGeneSetScore;
 import classScore.analysis.ResamplingExperimentGeneSetScore;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
@@ -30,7 +30,6 @@ import classScore.gui.geneSet.JGeneSetFrame;
 
 /**
  * Class that does all the work in doing gene set scoring. Holds the results as well.
- * 
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
@@ -53,9 +52,10 @@ public class GeneSetPvalRun {
    private Settings settings;
 
    private String name; // name of this run.
-   
+
    /**
     * Use this when we are loading in existing results.
+    * 
     * @param activeProbes
     * @param settings
     * @param geneData
@@ -77,7 +77,7 @@ public class GeneSetPvalRun {
       this.activeProbes = activeProbes;
       this.results = results;
       this.name = name;
-      
+
       sortResults();
       // get the class sizes.
 
@@ -107,6 +107,7 @@ public class GeneSetPvalRun {
 
    /**
     * Do a new analysis.
+    * 
     * @param activeProbes
     * @param settings
     * @param geneData
@@ -115,20 +116,19 @@ public class GeneSetPvalRun {
     * @param geneScores
     * @param messenger
     * @param name Name of the run
-    * 
     * @throws IllegalArgumentException
     */
    public GeneSetPvalRun( Set activeProbes, Settings settings,
          GeneAnnotations geneData, DenseDoubleMatrix2DNamed rawData,
-         GONames goData, GeneScoreReader geneScores, StatusViewer messenger, String name )
-         throws IllegalArgumentException {
+         GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
+         String name ) throws IllegalArgumentException {
       this.settings = settings;
       this.geneData = geneData;
       this.goData = goData;
       this.geneScores = geneScores;
       this.activeProbes = activeProbes;
       this.name = name;
-      
+
       nf.setMaximumFractionDigits( 8 );
       results = new LinkedHashMap();
 
@@ -288,10 +288,11 @@ public class GeneSetPvalRun {
    public Settings getSettings() {
       return settings;
    }
-   
+
    public String getName() {
       return "Run:" + name;
    }
+
    /* private methods */
 
    /**

@@ -5,10 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
+
 import cern.jet.stat.Probability;
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 
 /**

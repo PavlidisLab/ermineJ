@@ -12,16 +12,16 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.WizardStep;
 import classScore.Settings;
-import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 
 /**
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin K Lee
  * @version $Id$
  */
@@ -110,9 +110,10 @@ public class GeneSetWizardStep3 extends WizardStep {
       step3Panel.add( ncInfo1Panel, BorderLayout.WEST );
       step3Panel.add( ncInfo2Panel, BorderLayout.CENTER );
 
-      this.addHelp( "<html><b>Choose a new gene set identifier and description.</b><br>"
-            + "The custom gene set will automatically be saved to your hard drive" +
-                  "to be used again in future analyses." );
+      this
+            .addHelp( "<html><b>Choose a new gene set identifier and description.</b><br>"
+                  + "The custom gene set will automatically be saved to your hard drive"
+                  + "to be used again in future analyses." );
       this.addMain( step3Panel );
    }
 
@@ -120,12 +121,11 @@ public class GeneSetWizardStep3 extends WizardStep {
       return true;
    }
 
-   public void nameNewGeneSet(){
-      newGeneSet.setId(classIDTF.getText());
-      newGeneSet.setDesc(classDescTA.getText());
-      if(newGeneSet.modified() && origID.compareTo(newGeneSet.getId())!=0)
-      {
-         newGeneSet.setModified(false);
+   public void nameNewGeneSet() {
+      newGeneSet.setId( classIDTF.getText() );
+      newGeneSet.setDesc( classDescTA.getText() );
+      if ( newGeneSet.modified() && origID.compareTo( newGeneSet.getId() ) != 0 ) {
+         newGeneSet.setModified( false );
       }
    }
 
@@ -135,8 +135,7 @@ public class GeneSetWizardStep3 extends WizardStep {
       if ( newGeneSet.getId().compareTo( "" ) != 0 ) {
          classIDFinal.setText( newGeneSet.getId() );
       }
-      if(newGeneSet.modified())
-         origID = newGeneSet.getId();
+      if ( newGeneSet.modified() ) origID = newGeneSet.getId();
    }
 
 }

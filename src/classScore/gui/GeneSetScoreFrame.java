@@ -26,14 +26,14 @@ import javax.swing.SwingConstants;
 
 import org.xml.sax.SAXException;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.StatusJlabel;
 import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 
 /**
  * <hr>
@@ -402,7 +402,7 @@ public class GeneSetScoreFrame extends JFrame {
       SaveWizard swiz = new SaveWizard( this, results, goData );
       swiz.showWizard();
    }
-   
+
    void aboutMenuItem_actionPerformed( ActionEvent e ) {
       new AboutBox( this );
    }

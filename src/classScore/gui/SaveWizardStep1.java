@@ -16,6 +16,7 @@ import baseCode.gui.WizardStep;
 /**
  * <p>
  * Copyright: Copyright (c) 2003-2004 Columbia University
+ * 
  * @author Homin Lee
  * @version $Id$
  */
@@ -47,7 +48,7 @@ public class SaveWizardStep1 extends WizardStep {
       topPanel.add( runLabel );
       JPanel centerPanel = new JPanel();
       runComboBox = new JComboBox();
-      runComboBox.setPreferredSize(new Dimension(150, 15));
+      runComboBox.setPreferredSize( new Dimension( 150, 15 ) );
       runComboBox
             .addActionListener( new SaveWizardStep1_runComboBox_actionAdapter(
                   this ) );
@@ -55,10 +56,10 @@ public class SaveWizardStep1 extends WizardStep {
       runPanel.add( topPanel, BorderLayout.NORTH );
       runPanel.add( centerPanel, BorderLayout.CENTER );
 
-      this.addHelp( "<html><b>You may save " +
-            "the results of an analysis in a file.</b><br>" + "This file" +
-                  " can be used in other software (e.g. Excel) or loaded" +
-                  " back into this application to be viewed later." );
+      this.addHelp( "<html><b>You may save "
+            + "the results of an analysis in a file.</b><br>" + "This file"
+            + " can be used in other software (e.g. Excel) or loaded"
+            + " back into this application to be viewed later." );
       this.addMain( runPanel );
    }
 
@@ -73,7 +74,8 @@ public class SaveWizardStep1 extends WizardStep {
       } else {
          runs_exist = true;
          for ( int i = 0; i < rundata.size(); i++ ) {
-            runComboBox.insertItemAt( ((GeneSetPvalRun)rundata.get(i)).getName() , i );
+            runComboBox.insertItemAt( ( ( GeneSetPvalRun ) rundata.get( i ) )
+                  .getName(), i );
          }
          runComboBox.setSelectedIndex( 0 );
       }

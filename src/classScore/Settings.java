@@ -81,23 +81,23 @@ public class Settings {
       rawFile = "";
       scoreFile = "";
       properties = new Properties();
-      
+
       if ( dataFolder == null && !this.determineDataDirectory() ) {
          return;
       }
-      
+
       pref_file = filename;
       classFolder = new String( dataFolder
             + System.getProperty( "file.separator" ) + "genesets" );
-      
-      if (!FileTools.testDir(classFolder)) {
-         new File(classFolder).mkdir(); // todo should test success and do something about it.
+
+      if ( !FileTools.testDir( classFolder ) ) {
+         new File( classFolder ).mkdir(); // todo should test success and do something about it.
       }
-      
+
       if ( pref_file.compareTo( "" ) == 0 )
             pref_file = dataFolder + System.getProperty( "file.separator" )
                   + "ClassScore.preferences";
- 
+
       try {
          File fi = new File( pref_file );
          if ( fi.canRead() ) {
@@ -186,11 +186,11 @@ public class Settings {
     * Writes setting values to file.
     */
    public void writePrefs() throws IOException {
-      
-      if (pref_file == null || pref_file.length() == 0 ) {
+
+      if ( pref_file == null || pref_file.length() == 0 ) {
          return;
       }
-      
+
       properties.setProperty( "scoreFile", scoreFile );
       properties.setProperty( "classFile", classFile );
       properties.setProperty( "annotFile", annotFile );
@@ -214,8 +214,6 @@ public class Settings {
       properties.store( f, "" );
       f.close();
    }
-   
-   
 
    /**
     * Figure out where the data directory should go.
@@ -231,22 +229,20 @@ public class Settings {
 
       dataFolder = dataFolder + System.getProperty( "file.separator" )
             + "ermineJ.data";
-  
+
       if ( !FileTools.testDir( dataFolder ) ) {
          dataFolder = System.getProperty( "user.home" )
                + System.getProperty( "file.separator" ) + "ermineJ.data";
 
          if ( !FileTools.testDir( dataFolder ) ) {
-            
+
             // try to make it in the user's home directory.
-            return (new File(dataFolder)).mkdir(); 
+            return ( new File( dataFolder ) ).mkdir();
          }
       }
 
       return true;
-   }  
-
-
+   }
 
    /**
     * Returns setting values.

@@ -40,7 +40,7 @@ public class AnalysisWizardStep5 extends WizardStep {
    JRadioButton jRadioButtonMedian;
    JRadioButton jRadioButtonMean;
    JTextField jTextFieldPValueThreshold;
- //  JTextField jTextFieldScoreCol;
+   //  JTextField jTextFieldScoreCol;
    JTextField jTextFieldIterations;
    JCheckBox jCheckBoxDoLog;
    JPanel oraPanel;
@@ -73,7 +73,7 @@ public class AnalysisWizardStep5 extends WizardStep {
       resampPanel = new JPanel();
       TitledBorder resampTitledBorder;
       JPanel jPanel14 = new JPanel();
-    
+
       jPanel13 = new JPanel();
       JLabel jLabel13 = new JLabel();
       jTextFieldIterations = new JTextField();

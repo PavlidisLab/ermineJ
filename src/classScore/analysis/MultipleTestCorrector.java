@@ -7,8 +7,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import baseCode.bio.geneset.GeneAnnotations;
+
 import classScore.Settings;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;

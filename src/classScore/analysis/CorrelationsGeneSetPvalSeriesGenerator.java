@@ -8,13 +8,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
 
@@ -125,7 +125,6 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
    //      return 0 if $nummeas == 0; # this will happen if the class is made up of one replicate group.
    //      return $totalcorrel/$nummeas;
    //    }
-
    public void geneSetCorrelationGenerator( StatusViewer messenger ) {
       //iterate over each class
       int count = 0;
@@ -166,8 +165,8 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
          }
 
          double avecorrel = 0.0;
-         double nummeas = 0;       
-         
+         double nummeas = 0;
+
          for ( int i = probesInSet.size() - 1; i >= 0; i-- ) {
 
             String probei = ( String ) probesInSet.get( i );

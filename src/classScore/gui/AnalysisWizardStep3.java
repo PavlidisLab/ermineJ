@@ -19,10 +19,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import baseCode.bio.geneset.GONames;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import classScore.Settings;
-import classScore.data.GONames;
 import classScore.data.NewGeneSet;
 
 /**
@@ -66,7 +66,7 @@ public class AnalysisWizardStep3 extends WizardStep {
       wiz.clearStatus();
       makeLeftTable();
       makeRightTable();
-      
+
    }
 
    //Component initialization
@@ -197,16 +197,15 @@ public class AnalysisWizardStep3 extends WizardStep {
             File classFile = new File( dir.getPath(), classFiles[i] );
             Map cfi = null;
             try {
-               cfi = NewGeneSet.getClassFileInfo( classFile
-                     .getAbsolutePath() );
+               cfi = NewGeneSet.getClassFileInfo( classFile.getAbsolutePath() );
             } catch ( IOException e ) {
-               GuiUtil.error("Error reading class files info.");
+               GuiUtil.error( "Error reading class files info." );
             }
-            
-            if (cfi == null) {
-               throw new IllegalStateException("Null pointer");
+
+            if ( cfi == null ) {
+               throw new IllegalStateException( "Null pointer" );
             }
-            
+
             customClasses.add( cfi );
             ccHash.put( cfi.get( "id" ), cfi );
          }
@@ -214,7 +213,8 @@ public class AnalysisWizardStep3 extends WizardStep {
          customClassTable.setModel( ccTableModel );
       } else {
          // @todo it should make the folder.
-         GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
+         GuiUtil
+               .error( "There is no 'genesets' folder in the 'data' directory" );
       }
    }
 
@@ -285,7 +285,9 @@ class AnalysisWizardStep3_ClassFileFilter implements FilenameFilter {
 class AnalysisWizardStep3_CustomClassList extends ArrayList {
    public AbstractTableModel toTableModel() {
       return new AbstractTableModel() {
-         private String[] columnNames = { "ID", "Description", "Members" };
+         private String[] columnNames = {
+               "ID", "Description", "Members"
+         };
 
          public String getColumnName( int i ) {
             return columnNames[i];

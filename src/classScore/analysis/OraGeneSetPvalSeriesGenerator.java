@@ -7,9 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
+
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
 
@@ -20,8 +21,7 @@ import classScore.data.GeneSetResult;
  * </p>
  * 
  * @author pavlidis
- * @version $Id: OraGeneSetPvalSeriesGenerator.java,v 1.1 2004/06/29 23:12:47
- *          pavlidis Exp $
+ * @version $Id$
  */
 public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
@@ -34,8 +34,8 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
    private int inputSize;
 
    public OraGeneSetPvalSeriesGenerator( Settings settings,
-         GeneAnnotations geneData,
-         GeneSetSizeComputer csc, GONames gon, int inputSize ) {
+         GeneAnnotations geneData, GeneSetSizeComputer csc, GONames gon,
+         int inputSize ) {
       super( settings, geneData, csc, gon );
       this.inputSize = inputSize;
       results = new HashMap();
@@ -46,9 +46,8 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
    }
 
    /**
-    * Generate a complete set of class results. The arguments are not constant
-    * under pemutations. The second is only needed for the aroc method. This is
-    * to be used only for the 'real' data since it modifies 'results',
+    * Generate a complete set of class results. The arguments are not constant under pemutations. The second is only
+    * needed for the aroc method. This is to be used only for the 'real' data since it modifies 'results',
     * 
     * @param group_pval_map a <code>Map</code> value
     * @param probesToPvals a <code>Map</code> value
@@ -59,8 +58,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
       Iterator it = entries.iterator(); // the classes.
 
       OraPvalGenerator cpv = new OraPvalGenerator( settings, geneAnnots, csc,
-            numOverThreshold, numUnderThreshold, goName,
-            inputSize );
+            numOverThreshold, numUnderThreshold, goName, inputSize );
 
       // For each class.
       while ( it.hasNext() ) {
@@ -75,12 +73,10 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
    }
 
    /**
-    * Calculate numOverThreshold and numUnderThreshold for hypergeometric
-    * distribution. This is a constant under permutations, but depends on
-    * weights.
+    * Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution. This is a constant under
+    * permutations, but depends on weights.
     * 
-    * @param inp_entries The pvalues for the probes (no weights) or groups
-    *        (weights)
+    * @param inp_entries The pvalues for the probes (no weights) or groups (weights)
     * @todo make this private and called by OraPvalGenerator.
     */
    public void hgSizes( Collection inp_entries ) {
@@ -94,7 +90,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
       Iterator itr = inp_entries.iterator();
       while ( itr.hasNext() ) {
          Map.Entry m = ( Map.Entry ) itr.next();
-         double genePvalue = ((Double)  m.getValue() ).doubleValue(); 
+         double genePvalue = ( ( Double ) m.getValue() ).doubleValue();
          // why
          // parsing?
 
@@ -110,9 +106,8 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
    }
 
    /**
-    * Same thing as class_pval_generator, but returns a collection of scores
-    * (pvalues) (see below) instead of adding them to the results object. This
-    * is used to get class pvalues for permutation analysis.
+    * Same thing as class_pval_generator, but returns a collection of scores (pvalues) (see below) instead of adding
+    * them to the results object. This is used to get class pvalues for permutation analysis.
     */
    //      public HashMap class_v_pval_generator( Map group_pval_map, Map
    // probesToPvals ) {

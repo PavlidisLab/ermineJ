@@ -26,17 +26,13 @@ import classScore.Settings;
  * 
  * <pre>
  * 
- *  
- *   
- *         probe_id[tab]pval
- *  
- *   
+ *           probe_id[tab]pval
  *  
  * </pre>
  * 
  * <p>
- * The values are stored in a HashTable probe_pval_map. This is used to see what probes are int the data set, as well as
- * the score for each probe. Created :09/02/02
+ * The values are stored in a Map probeToPvalMap. This is used to see what probes are int the data set, as well as the
+ * score for each probe. Created :09/02/02
  * </p>
  * 
  * @author Shahmil Merchant
@@ -113,7 +109,7 @@ public class GeneScoreReader {
          String name = ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
                .elementAt( 0 ) );
 
-         if ( name.matches( "AFFX.*" ) ) { // todo: put this rule somewhere else
+         if ( name.matches( "AFFX.*" ) ) { // todo: put this rule somewhere else // todo use a filter.
             if ( messenger != null ) {
                messenger.setStatus( "Skipping probe in pval file: " + name );
             }
@@ -126,10 +122,10 @@ public class GeneScoreReader {
 
          // Fudge when pvalues are zero.
          if ( settings.getDoLog() && probePvalues[i - 1] <= 0 ) {
-         
-               invalidLog = true;
-               probePvalues[i - 1] = small;
-          
+
+            invalidLog = true;
+            probePvalues[i - 1] = small;
+
          }
 
          if ( settings.getDoLog() ) {
@@ -150,8 +146,6 @@ public class GeneScoreReader {
          try {
             Thread.sleep( 1000 );
          } catch ( InterruptedException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
          }
       }
 

@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.Wizard;
 import classScore.Settings;
-import classScore.data.GONames;
-import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 
 import baseCode.gui.GuiUtil;
@@ -18,13 +18,12 @@ import baseCode.gui.GuiUtil;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin Lee
  * @version $Id$
  */
 
-public class AnalysisWizard
-    extends Wizard {
+public class AnalysisWizard extends Wizard {
    //logic
    int step = 1;
    int analysisType = Settings.ORA;
@@ -39,13 +38,13 @@ public class AnalysisWizard
    AnalysisWizardStep5 step5;
 
    public AnalysisWizard( GeneSetScoreFrame callingframe, Map geneDataSets,
-                          GONames goData ) {
+         GONames goData ) {
       super( callingframe, 550, 350 );
       //enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
       this.settings = new Settings( callingframe.getSettings() ); //own copy of settings
       this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer(
-          "original".hashCode() ) );
+            "original".hashCode() ) );
       this.goData = goData;
 
       step1 = new AnalysisWizardStep1( this, settings );
@@ -59,9 +58,10 @@ public class AnalysisWizard
       step5 = new AnalysisWizardStep5( this, settings );
       this.addStep( 5, step5 );
       this.setTitle( "Create New Analysis - Step 1 of 5" );
-      
+
       // determine if the "finish" button should be disabled or not
-      if (settings.getRawFile().length() == 0 && settings.getScoreFile().length() == 0 ) {
+      if ( settings.getRawFile().length() == 0
+            && settings.getScoreFile().length() == 0 ) {
          setFinishDisabled();
       } else {
          setFinishEnabled();
@@ -70,7 +70,7 @@ public class AnalysisWizard
 
    protected void nextButton_actionPerformed( ActionEvent e ) {
       clearStatus();
-      if ( step == 1 && step1.isReady()  ) {
+      if ( step == 1 && step1.isReady() ) {
          step = 2;
          step1.saveValues();
          this.getContentPane().remove( step1 );
@@ -152,10 +152,9 @@ public class AnalysisWizard
       if ( step2.isReady() ) {
          try {
             loadAddedClasses();
-         }
-         catch ( IOException e1 ) {
+         } catch ( IOException e1 ) {
             GuiUtil
-                .error( "Could not load the custom classes: "
+                  .error( "Could not load the custom classes: "
                         + e
                         + "\n"
                         + "If this problem persists, please contact the software vendor. "
@@ -177,10 +176,9 @@ public class AnalysisWizard
       step5.saveValues();
       try {
          settings.writePrefs();
-      }
-      catch ( IOException e ) {
+      } catch ( IOException e ) {
          GuiUtil
-             .error( "Could not save preferences: "
+               .error( "Could not save preferences: "
                      + e
                      + "\n"
                      + "If this problem persists, please contact the software vendor. "
@@ -196,7 +194,7 @@ public class AnalysisWizard
          if ( !goData.newSet( id ) ) {
             NewGeneSet newGeneSet = new NewGeneSet( geneData );
             String filename = NewGeneSet.getFileName(
-                settings.getClassFolder(), id );
+                  settings.getClassFolder(), id );
             newGeneSet.loadClassFile( filename );
             newGeneSet.addToMaps( goData );
          }
@@ -204,7 +202,6 @@ public class AnalysisWizard
    }
 
    /**
-    *
     * @param val
     */
    public void setAnalysisType( int val ) {
@@ -212,7 +209,6 @@ public class AnalysisWizard
    }
 
    /**
-    *
     * @return
     */
    public int getAnalysisType() {

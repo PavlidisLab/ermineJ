@@ -13,16 +13,16 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import baseCode.gui.file.DataFileFilter;
+
 /**
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
- * @author  Will Braynen
+ * @author Will Braynen
  * @version $Id$
  */
-public class JDataFileChooser
-    extends JFileChooser {
+public class JDataFileChooser extends JFileChooser {
 
    // fields
    JDataFileChooserOptions m_options;
@@ -51,13 +51,12 @@ public class JDataFileChooser
    }
 
    /**
-    * The accessory component for the file chooser.<p>
-    *
-    * Lets the user change save options and might also in the future include
-    * a preview of what the matrix image will look like with the chosen options.
+    * The accessory component for the file chooser.
+    * <p>
+    * Lets the user change save options and might also in the future include a preview of what the matrix image will
+    * look like with the chosen options.
     */
-   private class JDataFileChooserOptions
-       extends JComponent {
+   private class JDataFileChooserOptions extends JComponent {
 
       JCheckBox m_includeEverything = new JCheckBox( "Include everything" );
       JCheckBox m_normalize = new JCheckBox( "Normalize" );
@@ -66,13 +65,13 @@ public class JDataFileChooser
       JLabel m_titleLabel = new JLabel();
       JLabel m_spacerLabel = new JLabel();
 
-      public JDataFileChooserOptions( boolean includeEverything, boolean normalize ) throws HeadlessException {
+      public JDataFileChooserOptions( boolean includeEverything,
+            boolean normalize ) throws HeadlessException {
          try {
             m_includeEverything.setSelected( includeEverything );
             m_normalize.setSelected( normalize );
             jbInit();
-         }
-         catch ( Exception e ) {
+         } catch ( Exception e ) {
             e.printStackTrace();
          }
       }
