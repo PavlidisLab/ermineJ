@@ -1,9 +1,13 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.Color;
+import java.util.Properties;
+
 
 /**
  * <p>Title: </p>
@@ -17,13 +21,15 @@ import javax.swing.table.*;
 
 public class ResultPanel extends JScrollPane {
    JTable jTable1 = new JTable();
-   classPvalRun dataHolder = null;
+   classPvalRun dataHolder;
+   Properties settings;
    // EventListenerList listenerList = null;
 
-   public ResultPanel(classPvalRun dataHolder) {
+   public ResultPanel(classPvalRun dataHolder, Properties settings) {
       try {
          //     listenerList = new EventListenerList();
          this.dataHolder = dataHolder;
+         this.settings = settings;
          jbInit();
       }
       catch (Exception e) {
@@ -65,7 +71,7 @@ public class ResultPanel extends JScrollPane {
       int j = jTable1.getSelectedRow();
       //   System.err.println(j);
 
-      dataHolder.showDetails(j);
+      dataHolder.showDetails(j, settings);
 
       //  EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
       //  ClassDetailsEvent event = new ClassDetailsEvent(this);
