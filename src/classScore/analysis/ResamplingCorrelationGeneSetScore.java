@@ -13,12 +13,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * 
- * 
+ *
+ *
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -31,7 +31,7 @@ public class ResamplingCorrelationGeneSetScore extends
    private DenseDoubleMatrix2DNamed data = null;
 
    /**
-    * 
+    *
     * @param dataMatrix
     */
    public ResamplingCorrelationGeneSetScore(Settings settings, DenseDoubleMatrix2DNamed dataMatrix ) {
@@ -44,7 +44,7 @@ public class ResamplingCorrelationGeneSetScore extends
    /**
     * Build background distributions of within-gene set mean correlations. This
     * requires computing a lot of correlations.
-    * 
+    *
     * @return histogram containing the random distributions of correlations.
     * @throws OutOfMemoryError
     */
@@ -54,8 +54,8 @@ public class ResamplingCorrelationGeneSetScore extends
       Histogram hist = new Histogram( numGeneSets, classMinSize, numRuns, 1.0,
             0.0 );
       SparseDoubleMatrix2DNamed correls = new SparseDoubleMatrix2DNamed( data
-            .rows(), data.rows() );  
-      
+            .rows(), data.rows() );
+
       int[] deck = new int[data.rows()];
       for ( int j = 0; j < data.rows(); j++ ) {
          deck[j] = j;
@@ -66,19 +66,19 @@ public class ResamplingCorrelationGeneSetScore extends
          if ( messenger != null ) {
             messenger.setStatus( "Currently running class size " + i );
          }
-         
+
          for ( int j = 0; j < numRuns; j++ ) {
             RandomChooser.chooserandom( randomnums, deck, data.rows(), i );
             double avecorrel = geneSetMeanCorrel( randomnums, correls );
             hist.update( i - classMinSize, avecorrel );
          }
-         
-         try {
-            Thread.sleep( 1 );
-         } catch ( InterruptedException ex ) {
-            Thread.currentThread().interrupt();
-         }
-         
+
+//         try {
+//            Thread.sleep( 1 );
+//         } catch ( InterruptedException ex ) {
+//            Thread.currentThread().interrupt();
+//         }
+
       }
       hist.tocdf();
       return hist;
@@ -86,7 +86,7 @@ public class ResamplingCorrelationGeneSetScore extends
 
    /**
     * Compute the average correlation for a set of vectors.
-    * 
+    *
     * @param indicesToSelect
     * @param correls the correlation matrix for the data. This can be passed in
     *        without having filled it in yet. This means that only values that

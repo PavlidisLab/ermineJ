@@ -25,7 +25,7 @@ import classScore.data.*;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version $Id$
  */
@@ -55,7 +55,7 @@ public class GeneSetWizardStep3 extends WizardStep {
       AbstractTableModel finalTableModel = newGeneSet.toTableModel( true );
       finalTable.setModel( finalTableModel );
    }
-   
+
    //Component initialization
    protected void jbInit() {
       BorderLayout borderLayout4 = new BorderLayout();
@@ -120,12 +120,9 @@ public class GeneSetWizardStep3 extends WizardStep {
       return true;
    }
 
-   public String getNewGeneSetId() {
-      return classIDTF.getText();
-   }
-   
-   public String getNewGeneSetDesc() {
-      return classDescTA.getText();
+   public void nameNewGeneSet(){
+      newGeneSet.setId(classIDTF.getText());
+      newGeneSet.setDesc(classDescTA.getText());
    }
 
    public void update() {

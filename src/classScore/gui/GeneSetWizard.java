@@ -1,17 +1,22 @@
 package classScore.gui;
 
-import java.awt.event.*;
-import java.util.*;
-import baseCode.gui.*;
-import classScore.*;
-import classScore.data.*;
+import java.util.ArrayList;
+
+import java.awt.event.ActionEvent;
+
+import baseCode.gui.GuiUtil;
+import baseCode.gui.Wizard;
+import classScore.Settings;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.NewGeneSet;
 
 /**
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
- * @author not attributable
+ * @author Homin K Lee
  * @ $Id$
  */
 
@@ -167,8 +172,7 @@ public class GeneSetWizard extends Wizard {
    }
 
    protected void finishButton_actionPerformed(ActionEvent e) {
-      newGeneSet.setId( step3.getNewGeneSetId() );
-      newGeneSet.setDesc( step3.getNewGeneSetDesc() );
+      step3.nameNewGeneSet();
       String id = newGeneSet.getId();
       if (id.compareTo("") == 0) {
          GuiUtil.error("The class ID must be specified.");

@@ -23,28 +23,28 @@ import classScore.gui.GeneSetScoreStatus;
 
 /**
  * Description:Parses the file of the form
- * 
+ *
  * <pre>
- * 
- *  
- *   
- *    
- *     
- *      
+ *
+ *
+ *
+ *
+ *
+ *
  *       probe_id[tab]pval
- *       
- *      
- *     
- *    
- *   
- *  
+ *
+ *
+ *
+ *
+ *
+ *
  * </pre>
- * 
+ *
  * <p>
  * The values are stored in a HashTable probe_pval_map. This is used to see what probes are int the data set, as well as
  * the score for each probe. Created :09/02/02
  * </p>
- * 
+ *
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
  */
@@ -60,7 +60,7 @@ public class GeneScoreReader {
    //  private Map groupToProbeMap;
 
    /**
-    * 
+    *
     * @param s
     */
    //  public void setGroupToProbeMap( Map s ) {
@@ -68,7 +68,7 @@ public class GeneScoreReader {
    //  }
    /**
     * Create the probe -> pval mapping
-    * 
+    *
     * @param filename: a tab-delmited file with columns probe_id pval pval pval...
     * @param column: which column the pvalues are in.
     * @param dolog: take the log (base 10) of the value.
@@ -76,7 +76,7 @@ public class GeneScoreReader {
    public GeneScoreReader( String filename, Settings settings,
          GeneSetScoreStatus messenger, Map groupToProbeMap ) throws IOException {
       //read in file
-      
+
       groupToPvalMap = new HashMap();
       double log10 = Math.log( 10 );
       File infile = new File( filename );
@@ -130,11 +130,11 @@ public class GeneScoreReader {
          if ( name.matches( "AFFX.*" ) ) { // todo: put this rule somewhere else
             if ( messenger != null ) {
                messenger.setStatus( "Skipping probe in pval file: " + name );
-               try {
-                  Thread.sleep( 20 ); // so they can read it...
-               } catch ( InterruptedException ex ) {
-                  Thread.currentThread().interrupt();
-               }
+//               try {
+//                  Thread.sleep( 20 ); // so they can read it...
+//               } catch ( InterruptedException ex ) {
+//                  Thread.currentThread().interrupt();
+//               }
             }
             continue;
          }
@@ -153,11 +153,11 @@ public class GeneScoreReader {
                            + probePvalues[i - 1]
                            + ") from gene score file: Setting to " + small );
                probePvalues[i - 1] = small;
-               try {
-                  Thread.sleep( 20 ); // so they can read it...
-               } catch ( InterruptedException ex ) {
-                  Thread.currentThread().interrupt();
-               }
+//               try {
+//                  Thread.sleep( 20 ); // so they can read it...
+//               } catch ( InterruptedException ex ) {
+//                  Thread.currentThread().interrupt();
+//               }
             }
          }
 
@@ -185,7 +185,7 @@ public class GeneScoreReader {
    /**
     * Each pvalue is adjusted to the mean (or best) of all the values in the 'replicate group' to yield a "group to
     * pvalue map".
-    * 
+    *
     * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the data
     *        set.
     */
@@ -198,12 +198,12 @@ public class GeneScoreReader {
       if ( probeToPvalMap == null ) {
          throw new IllegalStateException( "probeToPvalMap was not set." );
       }
-      
+
       if (groupToProbeMap.size() == 0) {
          throw new IllegalStateException("Group to probe map was empty");
       }
 
-      
+
       double[] group_pval_temp = new double[groupToProbeMap.size()];
       int counter = 0;
 
@@ -215,7 +215,7 @@ public class GeneScoreReader {
          int in_size = 0;
          for ( Iterator pbItr = probes.iterator(); pbItr.hasNext(); ) {
             String probe = ( String ) pbItr.next();
-           
+
             if ( !probeToPvalMap.containsKey( probe ) ) {
           //     messenger.setStatus(
         //             "Annotations contains probe not in the probeToPvalMap: "
@@ -258,9 +258,9 @@ public class GeneScoreReader {
       if (counter == 0) {
          throw new IllegalStateException("No gene to pvalue mappings were found.");
       }
-      
+
       messenger.setStatus(counter + " distinct genes found in the annotations.");
-      
+
       groupPvalues = new double[counter];
       for ( int i = 0; i < counter; i++ ) {
          groupPvalues[i] = group_pval_temp[i];

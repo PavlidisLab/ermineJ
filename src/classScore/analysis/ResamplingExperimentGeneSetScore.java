@@ -21,7 +21,7 @@ import classScore.gui.GeneSetScoreStatus;
 /**
  * Calculates a background distribution for class sscores derived from randomly
  * selected individual gene scores...and does other things. Created 09/02/02.
- * 
+ *
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
  */
@@ -40,7 +40,7 @@ public class ResamplingExperimentGeneSetScore extends
    /**
     * Used for methods which require randomly sampling classes to generate a
     * null distribution of scores based on gene-by-gene scores.
-    * 
+    *
     * @return A histogram object containing a cdf that can be used to generate
     *         pvalues.
     * @param m GeneSetScoreStatus
@@ -88,11 +88,11 @@ public class ResamplingExperimentGeneSetScore extends
             m.setStatus( "Currently running class size " + i );
          }
 
-         try {
-            Thread.sleep( 1 );
-         } catch ( InterruptedException ex ) {
-            Thread.currentThread().interrupt();
-         }
+//         try {
+//            Thread.sleep( 1 );
+//         } catch ( InterruptedException ex ) {
+//            Thread.currentThread().interrupt();
+//         }
 
       }
 
@@ -103,7 +103,7 @@ public class ResamplingExperimentGeneSetScore extends
 
    /**
     * Set everything according to parameters.
-    * 
+    *
     * @param filename_pval File that contains the scores for each probe
     * @param wt_check Whether weights should be used or not
     * @param in_method The class scoring method: Mean, Quantile, etc.
@@ -139,17 +139,17 @@ public class ResamplingExperimentGeneSetScore extends
 
       this.numClasses = classMaxSize - classMinSize + 1;
       pvals = geneScores.getPvalues(); // array of pvalues.
-      groupPvals = geneScores.getGroupPvalues(); 
+      groupPvals = geneScores.getGroupPvalues();
       probePvalMap = geneScores.getProbeToPvalMap(); // reference to the probe -> pval map.
-      groupPvalMap = geneScores.getGroupToPvalMap(); // this gets initialized by set_input_pvals 
-      
+      groupPvalMap = geneScores.getGroupToPvalMap(); // this gets initialized by set_input_pvals
+
       this.setHistogramRange(); // figure out the max pvalue possible.
       this.hist = new Histogram( numClasses, classMinSize, numRuns,
             histogramMax, 0.0 );
    }
 
    /**
-    * 
+    *
     * @return double[]
     */
    public double[] get_in_pvals() {
@@ -158,7 +158,7 @@ public class ResamplingExperimentGeneSetScore extends
 
 
    /**
-    * 
+    *
     * @param value int
     */
    public void setQuantile( int value ) {
@@ -167,16 +167,16 @@ public class ResamplingExperimentGeneSetScore extends
    }
 
    /**
-    * 
+    *
     * @return int
     */
    public int get_quantile() {
       return quantile;
    }
 
-   
+
    /**
-    * 
+    *
     * @return Map
     */
    public Map get_map() {
@@ -184,7 +184,7 @@ public class ResamplingExperimentGeneSetScore extends
    }
 
    /**
-    * 
+    *
     * @param shuffle boolean
     * @return Map
     */
@@ -215,7 +215,7 @@ public class ResamplingExperimentGeneSetScore extends
    }
 
    /**
-    * 
+    *
     * @param probe_id String
     * @return double
     */
@@ -231,7 +231,7 @@ public class ResamplingExperimentGeneSetScore extends
    /**
     * Basic method to calculate the raw score, given an array of the gene scores
     * for items in the class. Note that performance here is important.
-    * 
+    *
     * @param genevalues double[]
     * @param effsize int
     * @throws IllegalArgumentException
@@ -256,7 +256,7 @@ public class ResamplingExperimentGeneSetScore extends
    }
 
    /**
-    * 
+    *
     * @param meth String
     * @throws IllegalArgumentException
     */
@@ -269,7 +269,7 @@ public class ResamplingExperimentGeneSetScore extends
       if (groupPvals == null || pvals == null) {
          throw new IllegalStateException("Null pvalue arrays for histogram range setting");
       }
-      
+
       histogramMax = Rank.meanOfTop2( useWeights ? groupPvals : pvals );
    }
 

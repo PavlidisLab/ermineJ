@@ -27,7 +27,7 @@ import classScore.gui.GeneSetScoreStatus;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version $Id$
  * @todo don't use stop. use interrupt instead, and stop the readers
@@ -59,7 +59,6 @@ public class AnalysisThread {
       this.rawDataSets = rawDataSets;
       this.geneScoreSets = geneScoreSets;
       this.geneDataSets = geneDataSets;
-
       // @todo check this
       this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer(
             "original".hashCode() ) ); //this is the default geneData
@@ -79,7 +78,8 @@ public class AnalysisThread {
 
          /* read in the rawData, if we haven't already */
          // todo maybe only read if we need it.
-         DenseDoubleMatrix2DNamed rawData;
+         DenseDoubleMatrix2DNamed rawData=null;
+         /*
          if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
             messenger.setStatus( "Raw data are in memory");
             rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings
@@ -92,7 +92,7 @@ public class AnalysisThread {
                   .getRawFile() );
             rawDataSets.put( settings.getRawFile(), rawData );
          }
-
+         */
          GeneScoreReader geneScores;
          if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
             messenger.setStatus( "Gene Scores are in memory");
@@ -105,7 +105,7 @@ public class AnalysisThread {
                   settings, messenger, geneData.getGeneToProbeList() );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
          }
-         
+
          if (!settings.getScoreFile().equals("") && geneScores == null) {
             messenger.setStatus("Didn't get geneScores");
          }
@@ -152,6 +152,7 @@ public class AnalysisThread {
 
          csframe.addResult( runResult );
          csframe.setSettings( settings );
+         csframe.enableMenusForAnalysis();
          athread = null;
       } catch ( IOException ioe ) {
          //do something
@@ -167,6 +168,7 @@ public class AnalysisThread {
          athread.stop();
          //athread.interrupt();
          athread = null;
+         csframe.enableMenusForAnalysis();
       }
    }
 
@@ -182,10 +184,10 @@ public class AnalysisThread {
       this.rawDataSets = rawDataSets;
       this.geneScoreSets = geneScoreSets;
       this.geneDataSets = geneDataSets;
-      
+
       this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer(
             "original".hashCode() ) ); //this is the default geneData
-      
+
       if ( athread != null ) throw new IllegalStateException();
       athread = new Thread( new Runnable() {
          public void run() {

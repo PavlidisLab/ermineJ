@@ -29,6 +29,7 @@ import classScore.classPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
+import java.util.ArrayList;
 
 /**
  * <p>
@@ -43,7 +44,7 @@ import classScore.data.GeneSetResult;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  * @todo make columns start out better sizes
@@ -57,7 +58,7 @@ public class OutputPanel extends JScrollPane {
     * @author Owner
     * @version $Id$
     */
-   
+
    JTable table;
    OutputTableModel model;
    TableSorter sorter;
@@ -66,6 +67,12 @@ public class OutputPanel extends JScrollPane {
    LinkedList resultToolTips = new LinkedList();
    GeneAnnotations geneData;
    GONames goData;
+   String classColToolTip;
+   final static int COL0WIDTH = 80;
+   final static int COL1WIDTH = 350;
+   final static int COL2WIDTH = 80;
+   final static int COL3WIDTH = 80;
+   final static int COLRWIDTH = 80;
 
    public OutputPanel( GeneSetScoreFrame callingframe, LinkedList results ) {
       this.callingframe = callingframe;
@@ -76,7 +83,6 @@ public class OutputPanel extends JScrollPane {
          protected JTableHeader createDefaultTableHeader() {
             return new JTableHeader( columnModel ) {
                public String getToolTipText( MouseEvent e ) {
-                  String tip = null;
                   java.awt.Point p = e.getPoint();
                   int index = columnModel.getColumnIndexAtX( p.x );
                   int realIndex = columnModel.getColumn( index )
@@ -89,12 +95,16 @@ public class OutputPanel extends JScrollPane {
       table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
       table.getTableHeader().setReorderingAllowed( false );
       table.getTableHeader().addMouseListener( new TableHeader_mouseAdapterCursorChanger( this ));
-      
+
       OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
-      JMenuItem menuItem = new JMenuItem( "Modify this class (Step 1 of 3)" );
-      menuItem
-            .addActionListener( new OutputPanel_PopupMenu_actionAdapter( this ) );
-      popup.add( menuItem );
+      JMenuItem modMenuItem = new JMenuItem( "Modify this class (Step 1 of 3)" );
+      modMenuItem
+          .addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
+      JMenuItem htmlMenuItem = new JMenuItem( "See some html stuff about this class, blah..." );
+      htmlMenuItem
+          .addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
+      popup.add( htmlMenuItem );
+      popup.add( modMenuItem );
       MouseListener popupListener = new OutputPanel_PopupListener( popup );
       table.addMouseListener( popupListener );
 
@@ -143,7 +153,7 @@ public class OutputPanel extends JScrollPane {
       }
    }
 
-   void popupMenu_actionPerformed( ActionEvent e ) {
+   void modMenuItem_actionPerformed( ActionEvent e ) {
       OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e
             .getSource() ).getParent();
       int r = table.rowAtPoint( sourcePopup.getPoint() );
@@ -151,6 +161,10 @@ public class OutputPanel extends JScrollPane {
       GeneSetWizard cwiz = new GeneSetWizard( callingframe, geneData, goData,
             id );
       cwiz.showWizard();
+   }
+
+   void htmlMenuItem_actionPerformed( ActionEvent e ) {
+      System.err.println("Right now this is just a stub.");
    }
 
    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
@@ -176,7 +190,11 @@ public class OutputPanel extends JScrollPane {
    }
 
    String getHeaderToolTip( int index ) {
-      if ( index >= OutputTableModel.init_cols ) {
+      if(index==0)
+      {
+         return this.classColToolTip;
+      }
+      else if ( index >= OutputTableModel.init_cols ) {
          //int runnum=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
          int runnum = model.getRunNum( index );
          return ( String ) resultToolTips.get( runnum );
@@ -221,16 +239,19 @@ public class OutputPanel extends JScrollPane {
       this.geneData = geneData;
       this.goData = goData;
       model.addInitialData( geneData, goData );
+      classColToolTip = new String("Total classes: "+geneData.numClasses());
       sorter = new TableSorter( model );
       table.setModel( sorter );
       sorter.setTableHeader( table.getTableHeader() );
       this.getViewport().add( table, null );
-      table.getColumnModel().getColumn( 0 ).setPreferredWidth( 80 );
-      table.getColumnModel().getColumn( 1 ).setPreferredWidth( 300 );
-      table.getColumnModel().getColumn( 2 ).setPreferredWidth( 80 );
-      table.getColumnModel().getColumn( 3 ).setPreferredWidth( 80 );
+      table.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
+      table.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
+      table.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
+      table.getColumnModel().getColumn( 3 ).setPreferredWidth( COL3WIDTH );
       table.setDefaultRenderer( Object.class, new OutputPanelTableCellRenderer(
             goData, results ) );
+      sorter.cancelSorting();
+      sorter.setSortingStatus( 1, TableSorter.ASCENDING );
       table.revalidate();
    }
 
@@ -240,12 +261,12 @@ public class OutputPanel extends JScrollPane {
       TableColumn col = new TableColumn( c );
       col.setIdentifier( model.getColumnName( c ) );
       table.addColumn( col );
-      table.getColumnModel().getColumn( c ).setPreferredWidth( 80 );
+      table.getColumnModel().getColumn( c ).setPreferredWidth(COLRWIDTH );
       generateToolTip( model.getColumnCount() - OutputTableModel.init_cols - 1 );
       sorter.cancelSorting();
       sorter.setSortingStatus( c, TableSorter.ASCENDING );
       if ( results.size() > 4 )
-            table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+         table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
       table.revalidate();
    }
 }
@@ -274,12 +295,12 @@ class TableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter 
    }
 
    public void mouseEntered( MouseEvent e ) {
-      Container c = adaptee.getParent();  
+      Container c = adaptee.getParent();
       c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
    }
 
    public void mouseExited( MouseEvent e ) {
-      Container c = adaptee.getParent();  
+      Container c = adaptee.getParent();
       c.setCursor(Cursor.getDefaultCursor());
    }
 
@@ -287,16 +308,30 @@ class TableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter 
 
 
 
-class OutputPanel_PopupMenu_actionAdapter implements
+class OutputPanel_modMenuItem_actionAdapter implements
       java.awt.event.ActionListener {
    OutputPanel adaptee;
 
-   OutputPanel_PopupMenu_actionAdapter( OutputPanel adaptee ) {
+   OutputPanel_modMenuItem_actionAdapter( OutputPanel adaptee ) {
       this.adaptee = adaptee;
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.popupMenu_actionPerformed( e );
+      adaptee.modMenuItem_actionPerformed( e );
+   }
+}
+
+
+class OutputPanel_htmlMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
+   OutputPanel adaptee;
+
+   OutputPanel_htmlMenuItem_actionAdapter( OutputPanel adaptee ) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.htmlMenuItem_actionPerformed( e );
    }
 }
 
@@ -405,7 +440,7 @@ class OutputTableModel extends AbstractTableModel {
 
    public OutputTableModel( LinkedList results ) {
       this.results = results;
-      nf.setMaximumFractionDigits( 2 );
+      nf.setMaximumFractionDigits( 3 );
       columnNames.add( "Name" );
       columnNames.add( "Description" );
       columnNames.add( "# of Probes" );
@@ -471,7 +506,11 @@ class OutputTableModel extends AbstractTableModel {
          Map data = ( ( classPvalRun ) results.get( runnum ) ).getResults();
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
-            return new Double( nf.format( res.getPvalue() ) );
+            ArrayList vals=new ArrayList();
+            vals.add(new Double(nf.format( res.getRank())));
+            vals.add(new Double(nf.format( res.getPvalue())));
+            return vals;
+            //return new Double( nf.format( res.getPvalue() ) );
          }
          return null;
       }
@@ -482,7 +521,7 @@ class OutputTableModel extends AbstractTableModel {
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
    GONames goData;
    LinkedList results;
-   
+
    static Color goParent = Color.LIGHT_GRAY;
    static Color goChild = Color.YELLOW;
    static Color spread1 = new Color( 220, 220, 160 );
@@ -504,6 +543,19 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          boolean isSelected, boolean hasFocus, int row, int column ) {
       super.getTableCellRendererComponent( table, value, isSelected, hasFocus,
             row, column );
+
+      // set cell text
+      if(value!=null)
+      {
+         if(value.getClass().equals(ArrayList.class))
+            setText((( Double ) ( ( ArrayList ) value ).get( 1 )).toString());
+         else
+            setText(value.toString());
+      }
+      else
+         setText(null);
+
+      //set cell background
       int runcol = column - OutputTableModel.init_cols;
       setOpaque( true );
       if ( isSelected || hasFocus )
@@ -512,7 +564,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          setOpaque( false );
       else if ( column == 0 && goData.newSet( ( String ) value ) ) {
          setBackground( modified );
-      } else if ( value.getClass().equals( Double.class ) )
+      } else if ( value.getClass().equals( ArrayList.class ) )
       //else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
       {
          String classid = ( String ) table.getValueAt( row, 0 );
@@ -521,17 +573,34 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " +
-
             nf.format( res.getScore() ) );
-
             if ( res.getPvalue_corr() == 1 )
                setBackground( spread5 );
             else if ( res.getPvalue_corr() == 0 ) setBackground( spread1 );
          }
       } else
          setOpaque( false );
+
+      // set tool tips
+      if ( value!=null && value.getClass().equals( ArrayList.class ) )
+      {
+         String classid = ( String ) table.getValueAt( row, 0 );
+         classPvalRun result = ( classPvalRun ) results.get( runcol );
+         Map data = result.getResults();
+         if ( data.containsKey( classid ) ) {
+            GeneSetResult res = ( GeneSetResult ) data.get( classid );
+            setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " +
+                            nf.format( res.getScore() ) );
+         }
+      }
+      else
+         setToolTipText(null);
+
       return this;
    }
 
+   //public void setValue(Object value)
+   //{
+   //}
 }
 

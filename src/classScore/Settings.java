@@ -18,7 +18,7 @@ import baseCode.gui.*;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author not attributable
  * @version $Id$
  * @todo
@@ -76,7 +76,7 @@ public class Settings {
 
    /**
     * Creates settings object
-    * 
+    *
     * @param file - name of preferences file to read
     */
    public Settings( String filename ) {
@@ -96,7 +96,7 @@ public class Settings {
       classFolder = new String( dataFolder + File.separator + "genesets" );
       if ( pref_file.compareTo( "" ) == 0 )
             pref_file = dataFolder + File.separator + "ClassScore.preferences";
-      classFile = dataFolder + File.separator + "goNames.txt";
+      classFile = dataFolder + File.separator + "go_200406-termdb.xml";
       annotFile = dataFolder + File.separator + "HG-U95A.an.txt";
       rawFile = dataFolder + File.separator + "melanoma_and_sarcomaMAS5.txt";
       scoreFile = dataFolder + File.separator + "one-way-anova-parsed.txt";
@@ -161,7 +161,7 @@ public class Settings {
 
    /**
     * Creates settings object
-    * 
+    *
     * @param settings - settings object to copy
     */
    public Settings( Settings settings ) {
@@ -370,7 +370,7 @@ public class Settings {
       else
          return "MEAN_PVAL"; // dummy. It won't be used.
    }
-   
+
    public int getGroupMethod() {
       return geneRepTreatment;
    }

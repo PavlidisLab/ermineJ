@@ -30,9 +30,9 @@ import baseCode.gui.GuiUtil;
  * <p>
  * Company:
  * </p>
- * 
- * @author not attributable
- * @version 1.0
+ *
+ * @author Homin K Lee
+ * @version $Id$
  */
 
 public class NewGeneSet {

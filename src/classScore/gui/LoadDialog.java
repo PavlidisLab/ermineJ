@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import classScore.Settings;
+import baseCode.gui.GuiUtil;
 
 /**
  * <p>Title: </p>
@@ -70,7 +71,7 @@ public class LoadDialog
    private void jbInit() throws Exception {
       setResizable( true );
       mainPanel = ( JPanel )this.getContentPane();
-      mainPanel.setPreferredSize( new Dimension( 550, 350 ) );
+      mainPanel.setPreferredSize( new Dimension( 400, 150 ) );
 
       loadBrowseButton.setEnabled( true );
       loadBrowseButton.setText( "Browse...." );
@@ -79,10 +80,7 @@ public class LoadDialog
       annotLabel.setText("Load file:" );
       loadPanel.setBackground( SystemColor.control );
       loadPanel.setPreferredSize( new Dimension( 330, 50 ) );
-      loadFile.setToolTipText( "" );
       loadFile.setPreferredSize( new Dimension( 230, 19 ) );
-      loadFile.setEnabled( false );
-      loadFile.setMinimumSize( new Dimension( 4, 19 ) );
       loadPanel.add( annotLabel, null );
       loadPanel.add( loadFile, null );
       loadPanel.add( loadBrowseButton, null );
@@ -111,12 +109,15 @@ public class LoadDialog
    }
 
    void cancelButton_actionPerformed( ActionEvent e ) {
-      System.exit( 0 );
+      dispose();
    }
 
    void loadButton_actionPerformed( ActionEvent e ) {
-      callingframe.loadAnalysis(loadFile.getText());
-      dispose();
+      if(GuiUtil.testfile(loadFile.getText()))
+      {
+         callingframe.loadAnalysis(loadFile.getText());
+         dispose();
+      }
    }
 
 }

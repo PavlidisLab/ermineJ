@@ -17,7 +17,7 @@ import javax.swing.table.TableModel;
  * <p>
  * Maintains the following important data structures, all derived from the input
  * file:
- * 
+ *
  * <pre>
  * probe->Classes -- each value is a Set of the Classes that a probe belongs to.
  * Classes->probe -- each value is a Set of the probes that belong to a class
@@ -66,7 +66,7 @@ public class GeneAnnotations {
 
    /**
     * This is for creating GeneAnnotations by pruning a copy
-    * 
+    *
     * @param geneData GeneAnnotations copy to prune from
     * @param probes Map only include these probes
     */
@@ -111,7 +111,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @param filename String
     * @throws IOException
     */
@@ -219,7 +219,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @return Map
     */
    public Map getProbeToGeneMap() {
@@ -227,7 +227,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @return Map
     */
    public Map getGeneToProbeList() {
@@ -235,7 +235,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @return Map
     */
    public Map getClassToProbeMap() {
@@ -243,7 +243,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @param p String class id
     * @return ArrayList list of probes in class
     */
@@ -252,7 +252,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @param Map
     */
    public void sortGeneSets() {
@@ -268,7 +268,7 @@ public class GeneAnnotations {
    }
 
    /**
-    * 
+    *
     * @return Map
     */
    public Map getProbeToClassMap() {
@@ -285,7 +285,7 @@ public class GeneAnnotations {
 
    /**
     * Get the gene that a probe belongs to.
-    * 
+    *
     * @param p String
     * @return String
     */
@@ -295,7 +295,7 @@ public class GeneAnnotations {
 
    /**
     * Get the description for a gene.
-    * 
+    *
     * @param p String
     * @return String
     */
@@ -305,7 +305,7 @@ public class GeneAnnotations {
 
    /**
     * Get a list of the probes that correspond to a particular gene.
-    * 
+    *
     * @param g String a gene name
     * @return ArrayList list of the probes for gene g
     */
@@ -323,7 +323,7 @@ public class GeneAnnotations {
 
    /**
     * Get the number of probes in a class
-    * 
+    *
     * @param id String a class id
     * @return int number of probes in the class
     */
@@ -333,7 +333,7 @@ public class GeneAnnotations {
 
    /**
     * Returns true if the class is in the classToProbe map
-    * 
+    *
     * @param id String a class id
     * @return boolean
     */
@@ -347,7 +347,7 @@ public class GeneAnnotations {
 
    /**
     * Add a class
-    * 
+    *
     * @param id String class to be added
     * @param probes ArrayList user-defined list of members.
     */
@@ -359,11 +359,19 @@ public class GeneAnnotations {
          String probe = new String( ( String ) probe_it.next() );
          ( ( ArrayList ) probeToClassMap.get( probe ) ).add( id );
       }
+
+      HashMap map = new HashMap();
+      HashSet genes = new HashSet();
+      Iterator probe_it2 = probes.iterator();
+      while ( probe_it2.hasNext() ) {
+         genes.add( probeToGeneName.get(probe_it2.next() ) );
+      }
+      classToGeneMap.put( id, genes );
    }
 
    /**
     * Redefine a class.
-    * 
+    *
     * @param id String class to be modified
     * @param probes ArrayList current user-defined list of members. The "real"
     *        version of the class is modified to look like this one.

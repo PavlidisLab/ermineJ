@@ -36,10 +36,9 @@ public class ResultsFileReader {
          while ( (line = dis.readLine()) != null) {
             StringTokenizer st = new StringTokenizer(line, "\t");
             String firstword = st.nextToken();
-            System.err.println(firstword);
             if(firstword.compareTo("!")==0)
             {
-               System.err.println("This is good");
+               String classNameMunged = st.nextToken();
                String className = st.nextToken();
                String classId = st.nextToken();
                int size = Integer.parseInt(st.nextToken());
@@ -50,7 +49,7 @@ public class ResultsFileReader {
                results.put(classId, c);
             }
          }
-  
+
       System.err.println(results.size() + " class results read from file");
    }
 
