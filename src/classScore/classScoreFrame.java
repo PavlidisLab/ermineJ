@@ -269,8 +269,8 @@ public class classScoreFrame
          runnum++;
          jTabbedPane1.addTab( "Run " + Integer.toString( runnum ), resultpanel );
          //oPanel.addRunData( runResult.getResults() );
-         oPanel.addRun();
          results.add( runResult );
+         oPanel.addRun();  // this line should come after results.add() or else you'll get errors
       }
       catch ( IllegalArgumentException e ) {
          error( e, "During class score calculation" );

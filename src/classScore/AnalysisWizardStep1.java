@@ -27,7 +27,7 @@ public class AnalysisWizardStep1 extends WizardStep
    //Component initialization
    void jbInit(){
       JPanel step1Panel = new JPanel();
-      JPanel jPanel4 = new JPanel(); // holds stuff
+      JPanel jPanel4 = new JPanel();
       JLabel jLabel8 = new JLabel();
       JPanel jPanel5 = new JPanel();
       ButtonGroup buttonGroup1 = new ButtonGroup();

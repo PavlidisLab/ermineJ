@@ -89,10 +89,10 @@ class OutputTableModel extends AbstractTableModel {
 
    public void addRunData(Map result) {
       state++;
-      results.add(result);
       columnNames.add("Run " + state + " Rank");
       columnNames.add("Run " + state + " Score");
       columnNames.add("Run " + state + " Pval");
+      results.add(result);
    }
 
    public void addRun() {
