@@ -84,18 +84,20 @@ public class GeneSetTableModel extends AbstractTableModel {
                 new Double( m_nf.format( m_pvalues.get( probeID ) ) );
          case 2:
             // p value bar
+            ArrayList values = new ArrayList();
             if ( m_pvalues == null ) {
-               return null; 
+               values.add( 0, new Double( Double.NaN ) );
             }
             else {
-               double[] values = new double[2];
                // actual p value
-               values[0] = Double.valueOf( m_pvalues.get( probeID ).toString() ).doubleValue();
+               Double actualValue = new Double( m_nf.format( m_pvalues.get( probeID ) ) );
+               values.add( 0, actualValue );
                // expected p value
                int position = ( ( Integer ) m_pvaluesOrdinalPosition.get( probeID ) ).intValue();
-               values[1] = 1.0f / getRowCount() * position;
-               return values;
+               Double expectedValue = new Double( 1.0f / getRowCount() * position );
+               values.add( 1, expectedValue );
             }
+            return values;
          case 3:
             // gene namne
             return m_geneData == null ? "" :
