@@ -15,6 +15,8 @@ WINDOWS:
 (in baseCode)
 cvs update
 maven jar:install 
+if you have made changes to baseCode, do a maven jar:deploy to update the repository on 
+microarray
 
 (in ermineJ)
 cvs update
