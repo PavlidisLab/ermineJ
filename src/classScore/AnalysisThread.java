@@ -60,7 +60,8 @@ public class AnalysisThread {
             try {
                doAnalysis();
             } catch ( Exception e ) {
-               GuiUtil.error( "Error During analysis", e );
+               GuiUtil.error( "Error During analysis: ", e );
+               e.printStackTrace();
                cancelAnalysisThread();
                csframe.enableMenusForAnalysis();
                messenger.setStatus( "Ready" );
@@ -197,7 +198,8 @@ public class AnalysisThread {
             try {
                loadAnalysis();
             } catch ( Exception e ) {
-               GuiUtil.error( "Error During analysis", e );
+               GuiUtil.error( "Error During analysis: ", e );
+               e.printStackTrace();
                csframe.enableMenusForAnalysis();
                messenger.setStatus( "Ready" );
             }

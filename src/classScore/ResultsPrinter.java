@@ -6,7 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -71,6 +74,20 @@ public class ResultsPrinter {
    }
 
    /**
+    * @return
+    */
+   public String getDestFile() {
+      return destFile;
+   }
+
+   /**
+    * @param destFile
+    */
+   public void setDestFile( String destFile ) {
+      this.destFile = destFile;
+   }
+
+   /**
     * Print the results
     */
    public void printResults() {
@@ -83,7 +100,6 @@ public class ResultsPrinter {
     * @param sort Sort the results so the best class (by score pvalue) is listed first.
     */
    public void printResults( boolean sort ) {
-      System.out.println( "Beginning output" );
       try {
          BufferedWriter out;
          if ( destFile == null ) {
@@ -94,6 +110,7 @@ public class ResultsPrinter {
          boolean first = true;
          GeneSetResult res = null;
          if ( sort ) {
+            // in order of best score.
             for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
                res = ( GeneSetResult ) results.get( it.next() );
                if ( first ) {
@@ -106,9 +123,11 @@ public class ResultsPrinter {
                            .getClassId() ) );
             }
          } else {
-            for ( Iterator it = results.entrySet().iterator(); it.hasNext(); ) {
-               System.out.println( it.next().getClass().toString() );
-               res = ( GeneSetResult ) it.next();
+            // output them in natural order. This is useful for testing.
+            List c = new ArrayList(results.keySet());
+            Collections.sort(c);
+            for ( Iterator it = c.iterator(); it.hasNext(); ) {
+               res = ( GeneSetResult ) results.get( it.next() );
                if ( first ) {
                   first = false;
                   res.print_headings( out, "\tSame as:\tSimilar to:" );
@@ -122,6 +141,7 @@ public class ResultsPrinter {
          out.close();
       } catch ( IOException e ) {
          GuiUtil
+               // todo this shouldn't be here!
                .error( "Unable to write to file "
                      + destFile
                      + "\n"

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,18 +36,25 @@ import baseCode.util.StatusViewer;
 
 public class classScoreCMD {
 
-   private Settings settings;
-   private StatusViewer statusMessenger;
-   private GONames goData;
-   private GeneAnnotations geneData;
-   private Map geneDataSets;
-   private Map rawDataSets;
-   private Map geneScoreSets;
+   protected Settings settings;
+   protected StatusViewer statusMessenger;
+   protected GONames goData;
+   protected GeneAnnotations geneData;
+   protected Map geneDataSets;
+   protected Map rawDataSets;
+   protected Map geneScoreSets;
    private String saveFileName = null;//"C:\\Documents and Settings\\hkl7\\ermineJ.data\\outout.txt";
    private boolean commandline = true;
 
-   public classScoreCMD( String[] args ) {
+   public classScoreCMD() {
       settings = new Settings();
+      rawDataSets = new HashMap();
+      geneDataSets = new HashMap();
+      geneScoreSets = new HashMap();
+   }
+
+   public classScoreCMD( String[] args ) {
+      this();
       options( args );
       if ( commandline ) {
          initialize();
@@ -82,7 +88,6 @@ public class classScoreCMD {
    private void options( String[] args, boolean configged ) {
       if ( args.length == 0 ) showHelp();
       LongOpt[] longopts = new LongOpt[5];
-      StringBuffer sb = new StringBuffer();
       longopts[0] = new LongOpt( "help", LongOpt.NO_ARGUMENT, null, 'h' );
       longopts[1] = new LongOpt( "config", LongOpt.REQUIRED_ARGUMENT, null, 'C' );
       longopts[2] = new LongOpt( "gui", LongOpt.NO_ARGUMENT, null, 'G' );
@@ -402,16 +407,14 @@ public class classScoreCMD {
                   + "\t\tSets the analysis method:  " + Settings.ORA
                   + " (ORA),  " + Settings.RESAMP
                   + " (resampling of gene scores),  " + Settings.CORR
-                  + " (profile correlation),  " + Settings.ROC
-                  + " (ROC), "
-                  + Settings.TTEST + " (T-test), "
-                  + Settings.KS + " (Kolmogorov-Smirnov test)"
-                  +
-                        "[not all methods may be implemented]\n\n" 
-                  + "\t-o file ...\n"
-                  + "\t\tSets the output file.\n\n" + "\t-q int ...\n"
-                  + "\t\tSets the quantile.\n\n" + "\t-r file ...\n"
-                  + "\t\tSets the raw file to be used.\n\n" + "\t-s file ...\n"
+                  + " (profile correlation),  " + Settings.ROC + " (ROC), "
+                  + Settings.TTEST + " (T-test), " + Settings.KS
+                  + " (Kolmogorov-Smirnov test)"
+                  + "[not all methods may be implemented]\n\n"
+                  + "\t-o file ...\n" + "\t\tSets the output file.\n\n"
+                  + "\t-q int ...\n" + "\t\tSets the quantile.\n\n"
+                  + "\t-r file ...\n" + "\t\tSets the raw file to be used.\n\n"
+                  + "\t-s file ...\n"
                   + "\t\tSets the score file to be used.\n\n"
                   + "\t-t double ...\n" + "\t\tSets the pvalue threshold.\n\n"
                   + "\t-x maximum class size ...\n"
@@ -432,16 +435,13 @@ public class classScoreCMD {
       System.exit( 0 );
    }
 
-   private void initialize() {
+   protected void initialize() {
       try {
          statusMessenger = new StatusStderr();
-         rawDataSets = new HashMap();
-         geneDataSets = new HashMap();
-         geneScoreSets = new HashMap();
-
-         statusMessenger.setStatus( "Reading GO descriptions "
+         statusMessenger.setStatus( "Reading GO descriptions from "
                + settings.getClassFile() );
-         goData = new GONames( settings.getClassFile() ); // parse go name file
+
+         goData = new GONames( settings.getClassFile() );
 
          statusMessenger.setStatus( "Reading gene annotations from "
                + settings.getAnnotFile() );
@@ -473,7 +473,7 @@ public class classScoreCMD {
     * @return
     * @throws IOException
     */
-   GeneSetPvalRun analyze() throws IOException {
+   protected GeneSetPvalRun analyze() throws IOException {
       DenseDoubleMatrix2DNamed rawData = null;
       if ( settings.getAnalysisMethod() == Settings.CORR ) {
          if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
