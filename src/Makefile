@@ -82,7 +82,8 @@ commandline:
 
 clean:
 #	find ./ -name "*~" -exec rm {} \;
-#	rm -rf ${OUTPUTDIR}/${APP_PACKAGE_PATH}/*.class;
+	find ./ -name "*.class" -exec rm -f {} \;
+#	rm -rf ${OUTPUTDIR}/*.class;
 #	rm -r -f ${OUTPUTDIR}/*;
 #	rm -r -f ${DOCDIR}/*;
 #	mkdir ${OUTPUTDIR};

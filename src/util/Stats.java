@@ -474,18 +474,48 @@ public class Stats implements Cloneable, ConstantStuff
     
     
     /**
-       Calculate pval of hypergeometric distribution
+       Calculate hypergeometric distribution.  Gives same answer as
+       dhyper in R.
        @param N1 Number of positives in the data
        @param n1 Number of 'successes'
        @param N2 Number of negatives in the data
        @param n2 Number of 'failures'
     */
-    public static double hyperPval (int N1, int n1, int N2, int n2)
+    public static double hypergeometric (int N1, int n1, int N2, int n2)
     {
-	//	return (n_choose_n(N1,n1)/n_choose_n(N1+N2,n1+n2))*n_choose_n(N2,n2);
+	if (n1 > N1 || n2 > N2 || n1 < 0 || n2 < 0 || N1 <= 0 || N2 <= 0 ) {
+	    System.err.println("Illegal values for hyperPval");
+	    System.exit(1);
+	}
 	return SpecFunc.binomial_coeff(N1,n1)*SpecFunc.binomial_coeff(N2,n2)/SpecFunc.binomial_coeff(N1+N2,n1+n2);
     }
     
+
+    /**
+       Cumulative hypergeometric probability ( for over-represented
+       categories ). Gives same pvalues as phyer in R.
+       @param N1 Number of positives in the data
+       @param n1 Number of 'successes'
+       @param N2 Number of negatives in the data
+       @param n2 Number of 'failures'
+    */
+    public static double hyperPvalOver (int N1, int n1, int N2, int n2)
+    {
+	double pval = 0.0;
+	int i;
+
+	for (i = 0; i <= n1; i++)  {
+	    pval += hypergeometric(N1, i, N2, n1 + n2 - i ); // starts at n2, goes down to zero while i goes up to N1.
+	    //	    System.err.println(N1 + " " + i + " " + N2 + " " + ( n2 - i ));
+	}
+
+	if (pval > 0.5)
+	    return 1.0 - pval;
+
+	return pval;
+
+    }
+
 
     /**
      * Calculates the ranking of each gene in the entire data set.
@@ -621,7 +651,6 @@ public class Stats implements Cloneable, ConstantStuff
     public double randomGaussian () {
 	return generator.nextGaussian();
     }
-    
 
 
     /**
@@ -632,12 +661,28 @@ public class Stats implements Cloneable, ConstantStuff
     public static void main (String[] args) {
 	int a,b,c,d;
 	
-	a = 8;
-	b = 3;
-	c = 6;
-	d = 2;
-	double testhyper = hyperPval (a,b,c,d);
-	System.err.println(testhyper);
+	//		a = 8;
+	//		b = 3;
+	//		c = 6;
+	//		d = 2;
+	
+	a = 7; // number in the class
+	b = 2; // successes
+ 	c = 884; // number not in the class
+ 	d = 51; // failures
+
+	double testhyper = hypergeometric(a,b,c,d);
+	System.err.println("Hypergeometric:" + testhyper);
+
+	double testhyperm = hyperPvalOver(a,b,c,d);
+	System.err.println("Cum hypergeo: " + testhyperm);
+
+	double binom_p = SpecFunc.binomial_prob(b, d, (double)a/(double)(a+c));
+	System.err.println("Binom: " + binom_p);
+
+
+	double binom_pval = SpecFunc.binomialCumProb(b, d, (double)a/(double)(a+c));
+	System.err.println("Cum binom: " + binom_pval);
 
 	double testerfc = SpecFunc.erfc(1.0);
 	double testerf = SpecFunc.erf(1.0);

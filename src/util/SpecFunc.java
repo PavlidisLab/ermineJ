@@ -136,7 +136,7 @@ public class SpecFunc {
 	(int n) 
     {
 	if (n<0) {
-	    System.err.println("Attempt to measure lnfact of a negative value.");
+	    System.err.println("Attempt to measure lnfact of a negative value: " + n);
 	    System.exit(1);
 	}
 	if (n<=1)
@@ -152,6 +152,31 @@ public class SpecFunc {
     public static double binomial_coeff	(int n, int k) 
     {
 	return Math.floor(0.5+Math.exp(lnfact(n)-lnfact(k)-lnfact(n-k)));
+    }
+
+
+    /**
+      Binomial distribution. This function gives the same results as R's dbinom.
+    */
+    public static double binomial_prob (int successes, int trials, double p)
+    {
+	return binomial_coeff(trials, successes) * Math.pow(p, successes)*Math.pow(1.0 - p, trials - successes);
+    }
+
+
+     /**
+      Cumulative Binomial distribution for n up to k., upper
+      tail. This function gives the same results as R's pbinom, upper tail.
+    */
+    public static double binomialCumProb (int successes, int trials, double p)
+    {
+	int i;
+	double pval = 0.0;
+
+	for (i = successes + 1; i <= trials; i++) {
+	    pval += binomial_prob(i, trials, p);
+	}
+	return pval;
     }
 
     

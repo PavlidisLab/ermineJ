@@ -222,8 +222,10 @@ public class class_pvals {
 	// our 'alternative' scoring methods.
 	area_under_roc = Stats.arocRate(inputSize, target_ranks);
 	roc_pval = Stats.rocpval(target_ranks.size(), area_under_roc);
-	hyper_pval = Stats.hyperPval(N1, n1, N2, n2);
-	
+	hyper_pval = Stats.hyperPvalOver(N1, n1, N2, n2);
+	//	double binom_pval = SpecFunc.binomialCumProb(n1, N1+N2, (double)N1/(double)(N1+N2));
+	//	System.err.println(class_name + ":: n1: " + n1 + " n2: " + n2 + " selected: " + N1 + " not in class: " + N2 + " H: " + hyper_pval + " B: " + binom_pval);
+
 	// set up the return object.
 	classresult res = new classresult(class_name, goName.get_GoName_value_map(class_name), (int)((Integer)actual_sizes.get(class_name)).intValue(), in_size);
 	res.setscore(rawscore);
