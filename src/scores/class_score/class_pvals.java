@@ -31,9 +31,9 @@ public class class_pvals {
     private boolean weight_on = false;
 
     // command line arguments in the following way
-    // pval_file,affy_go_file,Go_name_file,destination_file,ug_file,method,class_max_size,class_min_size,number of runs,quantile, p-value, weightcheck
+    // pval_file,affy_go_file,Go_name_file,destination_file,ug_file,method,groupMethod,class_max_size,class_min_size,number of runs,quantile, p-value, weightcheck
     public static void main (String[] args) {
-	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],Integer.parseInt(args[6]),Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]), Double.parseDouble(args[10]),args[11]);
+	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],args[6],Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]),args[12]);
 	test.class_pval_generator();
     }
      
@@ -41,7 +41,7 @@ public class class_pvals {
 
     /*****************************************************************************************/
     /*****************************************************************************************/
-    public class_pvals(String probe_pvalfile,String affy_gofile,String go_namefile,String destination_file,String ug_file,String method,int class_max_size,int class_min_size,int number_of_runs,int quantile, double pval, String wt_check) {
+    public class_pvals(String probe_pvalfile,String affy_gofile,String go_namefile,String destination_file,String ug_file,String method,String groupMethod, int class_max_size,int class_min_size,int number_of_runs,int quantile, double pval, String wt_check) {
 
 	affy_go_Parse affy_go = new affy_go_Parse(affy_gofile);//parses affy file. Yields map of probe->go
 	goName = new GoName_parse(go_namefile); // parse go name file
@@ -74,7 +74,7 @@ public class class_pvals {
 	
 	
 	if(weight_on)
-	    probe_pval.set_input_pvals(ugName.get_ug_chip_map()); // this initializes the ug_pval_map.
+	    probe_pval.set_input_pvals(ugName.get_ug_chip_map(), groupMethod); // this initializes the ug_pval_map.
 
 	ug_pval_map = probe_pval.get_ug_pval_map(); // the ug_pval_map
 						    // is empty if
@@ -175,12 +175,12 @@ public class class_pvals {
 
 		while(I.hasNext()){ // foreach item in the class.
 		    String element = (String)I.next();  // probe id
-		    //System.out.println("   element :" + element);
 		    if (element !=null){
 			if(chips.containsKey(element)){ // if it is in the data set. pp: todo This seems inconsistent with the choice of inp_entries?
 			    size++;
 			    
 			    if (weight_on == true) { //routine for weights
+				/*
 				if(method.equals("MEAN_METHOD")){
 				    ArrayList chip_list = new ArrayList();
 				    chip_list = ugName.get_chip_value_map(element); // list of repeat members.
@@ -208,7 +208,7 @@ public class class_pvals {
 					//	System.err.println(element + "\t" + weight + "\t" +  raw_score + "\t" +  total );
 				    }
 
-				}
+				}*/
 
         			//compute pval for every unigene class
 				Object ugpval = ug_pval_map.get(probe_ug.get(element)); // probe -> ug
@@ -216,6 +216,8 @@ public class class_pvals {
 				    if(!record.containsKey(probe_ug.get(element))){ // if we haven't done this probe already.
 					record.put(probe_ug.get(element), null); // mark it as done.
 					ugPvalArr[v_size] = Double.parseDouble(ugpval.toString()); // pval of one unigene in the class. This is only used by the quantile methods.
+					
+					total += ugPvalArr[v_size];
 					
 					if(ugPvalArr[v_size] >= user_pvalue) { // part of the hypergeometic calc.
 					    n1++;
@@ -243,11 +245,9 @@ public class class_pvals {
 				//compute pval for every GO class
 				Object pbpval = chips.get(element);
 				if(pbpval != null){
-				    //System.out.println("Get it! " + element);
 				    double pb_pvalue = Double.parseDouble(pbpval.toString()); //pval of one unigene in the class
 				    if(pb_pvalue >= user_pvalue){
 					n2++;
-					//System.out.println("Get it! " + class_name + "     " + element + "  " + pb_pvalue);
 				    } else {
 					n1++;
 				    }
@@ -276,15 +276,17 @@ public class class_pvals {
 		    if(method.equals("MEAN_METHOD"))
 			rawscore=total/in_size;
 		    
-		    if( method.equals("QUANTILE_METHOD") ) {
+		    else if( method.equals("QUANTILE_METHOD") ) {
 			double fract = (double)probe_pval.get_quantile()/100.0;
 			int index = (int)Math.floor( fract*in_size );
 			double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   // **wrong when weight_on == false ** todo -- PP figure out what this means.
 			rawscore =  Stats.calculate_quantile(index,pvalArr,in_size);            	
-		    }
-		    
-		    if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")) {
-			System.err.println("MEAN_ABOVE_QUANTILE_METHOD not fully implemented"); // todo: do this
+		    } else if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")) {
+			double fract = (double)probe_pval.get_quantile()/100.0;
+			int index = (int)Math.floor( fract*in_size );
+			double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   
+			rawscore =  Stats.calculate_mean_above_quantile(index,pvalArr,in_size);            	
+		    } else {
 		    }
 
 		    if (rawscore < hist.get_hist_range() && rawscore > hist.get_hist_min() ) {

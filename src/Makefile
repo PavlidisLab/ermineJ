@@ -61,7 +61,6 @@ class_score:  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
-        ${OUTPUTDIR}/erminecmd.class
 
 CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/affy_go_Parse.class  \
@@ -79,7 +78,6 @@ CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
-        ${OUTPUTDIR}/erminecmd.class
 
 ${OUTPUTDIR}/%.class	: ${SOURCEPATH}/%.java
 	${JAVAC} ${OPTIONS} \

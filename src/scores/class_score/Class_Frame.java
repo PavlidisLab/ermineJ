@@ -65,7 +65,7 @@ public class Class_Frame extends JPanel {
     JButton browseButton44;
     JButton browseButton55;
     //for weights for pvals
-    JCheckBox weightbox;
+    //JCheckBox weightbox;
     String weight_boolean = "true";
     //correls
     JButton commitButton;
@@ -100,6 +100,7 @@ public class Class_Frame extends JPanel {
     static String fileName44;// = "C:\Documents and Settings\Edward\Desktop\ermineJ\java_proj\data\goNames.txt";
     static String fileName55;// = "C:\Documents and Settings\Edward\Desktop\ermineJ\java_proj\data\HG-U95Av2.ug.txt";
     static String method_name = "MEAN_METHOD";
+    static String groupMethod = "MEAN_PVAL";
     
     //various parameters for class_correls
     JTextField text_numField;
@@ -303,11 +304,11 @@ protected Component make_Pval_Panel() {
 /*****************************************************************************************/
 
     JPanel panel = new JPanel(false);
-    fileNameField11 = new JComboBox(); // gene scores
-    fileNameField22 = new JComboBox(); // probe to go map
-    fileNameField33 = new JComboBox(); // output file
-    fileNameField44 = new JComboBox(); // biological names for go
-    fileNameField55 = new JComboBox(); // probe to ug map
+    fileNameField11 = new JComboBox(comboReader(getCanonical("../data/scoreFile"))); // gene scores
+    fileNameField22 = new JComboBox(comboReader(getCanonical("../data/goFile"))); // probe to go map
+    fileNameField33 = new JComboBox(comboReader(getCanonical("../data/outputFile"))); // output file
+    fileNameField44 = new JComboBox(comboReader(getCanonical("../data/nameFile"))); // biological names for go
+    fileNameField55 = new JComboBox(comboReader(getCanonical("../data/ugFile"))); // probe to ug map
 
     fileNameField44.addItem("../data/goNames.txt");
 
@@ -418,51 +419,85 @@ protected Component make_Pval_Panel() {
     panel.add(fileName55Box);
     panel.add(Box.createVerticalStrut(20));
     
-    weightbox = new JCheckBox("Use Weights");
-    weightbox.setToolTipText("Genes which occur repeatedly in a data set are weighted accordingly");
-    weightbox.setSelected(true);
-    CheckBoxListener checkListener = new CheckBoxListener();
-    weightbox.addItemListener(checkListener);
-    panel.add(weightbox);
-    panel.add(Box.createVerticalStrut(20));
+    //weightbox = new JCheckBox("Use Weights");
+    //weightbox.setToolTipText("Genes which occur repeatedly in a data set are weighted accordingly");
+    //weightbox.setSelected(true);
+    //CheckBoxListener checkListener = new CheckBoxListener();
+    //weightbox.addItemListener(checkListener);
+    //panel.add(weightbox);
+    //panel.add(Box.createVerticalStrut(20));
     
     //set radio button options 
-    JRadioButton meanButton = new JRadioButton("Mean");
+    JRadioButton meanButton = new JRadioButton("Use Mean method");
     meanButton.setToolTipText("Use the mean of the class's gene scores.");
     meanButton.setActionCommand("MEAN_METHOD");
     meanButton.setSelected(true);
      
-    JRadioButton quantileButton = new JRadioButton("Quantile");
+    JRadioButton quantileButton = new JRadioButton("Use Quantile method");
     quantileButton.setToolTipText("Use a quantile of the class's gene scores.");
     quantileButton.setActionCommand("QUANTILE_METHOD");
-    //    JRadioButton medianButton = new JRadioButton("MEAN_ABOVE_QUANTILE_METHOD");
-    //    medianButton.setActionCommand("MEAN_ABOVE_QUANTILE_METHOD");
+    
+    JRadioButton meanAboveButton = new JRadioButton("Use Mean Above Quantile method");
+    meanAboveButton.setToolTipText("Use the mean above quantile of the class's gene scores.");
+    meanAboveButton.setActionCommand("MEAN_ABOVE_QUANTILE_METHOD");
         
     ButtonGroup group = new ButtonGroup();
     group.add(meanButton);
     group.add(quantileButton);
-    //    group.add(medianButton);
+    group.add(meanAboveButton);
     
+    JRadioButton meanGroupButton = new JRadioButton("Use Mean group pvalues");
+    meanGroupButton.setToolTipText("Use the mean of the group's pvalues.");
+    meanGroupButton.setActionCommand("MEAN_PVAL");
+    meanGroupButton.setSelected(true);
+     
+    JRadioButton bestGroupButton = new JRadioButton("Use Best group pvalues");
+    bestGroupButton.setToolTipText("Use the mean of the group's pvalues.");
+    bestGroupButton.setActionCommand("BEST_PVAL");
+    
+    JRadioButton noWeightButton = new JRadioButton("Use Single gene pvalues");
+    noWeightButton.setToolTipText("Use single gene's pvalues.");
+    noWeightButton.setActionCommand("NO_WEIGHT");
+        
+    ButtonGroup group2 = new ButtonGroup();
+    group2.add(meanGroupButton);
+    group2.add(bestGroupButton);
+    group2.add(noWeightButton);
+    
+    JPanel radioPanel2 = new JPanel();
+    radioPanel2.setLayout(new BoxLayout(radioPanel2,BoxLayout.Y_AXIS));
+    radioPanel2.add(Box.createHorizontalStrut(40));
+    radioPanel2.add(meanGroupButton);
+    radioPanel2.add(Box.createHorizontalGlue());
+    radioPanel2.add(bestGroupButton);
+    radioPanel2.add(Box.createHorizontalGlue());
+    radioPanel2.add(noWeightButton);
+    radioPanel2.add(Box.createHorizontalGlue());
+    panel.add(radioPanel2);
+
     JPanel radioPanel = new JPanel();
     radioPanel.setLayout(new BoxLayout(radioPanel,BoxLayout.Y_AXIS));
     radioPanel.add(meanButton);
     radioPanel.add(Box.createHorizontalGlue());
     radioPanel.add(quantileButton);
     radioPanel.add(Box.createHorizontalGlue());
-    //    radioPanel.add(medianButton);
+    radioPanel.add(meanAboveButton);
     radioPanel.add(Box.createHorizontalGlue());
     panel.add(radioPanel);
-    panel.add(Box.createHorizontalStrut(20));
-    panel.add(Box.createVerticalStrut(20));
     
     RadioListener myListener = new RadioListener();
     meanButton.addActionListener(myListener);
     quantileButton.addActionListener(myListener);
-    //    medianButton.addActionListener(myListener);
+    meanAboveButton.addActionListener(myListener);
+    
+    RadioListener2 myListener2 = new RadioListener2();
+    meanGroupButton.addActionListener(myListener2);
+    bestGroupButton.addActionListener(myListener2);
+    noWeightButton.addActionListener(myListener2);
     
         
     //various other parameters
-    panel.add(Box.createHorizontalStrut(80));
+    
     JLabel num1 = new JLabel("Iterations");
     num1.setToolTipText("Applies to mean and quantile methods: more trials take longer.");
     text_numField1 = new JTextField("10000",5);
@@ -925,14 +960,17 @@ protected Component make_Pval_Panel() {
 		progress.setValue(0);
 		progress.setIndeterminate(true);
 		timer.start();
-		//for(int i=0; i<100; i++){ //test only
 		timeCounter.start();
-		class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,maxField1,minField1,numField1,quantileField1,pVal1,weight_boolean);
+		class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,groupMethod,maxField1,minField1,numField1,quantileField1,pVal1,weight_boolean);
 		test.class_pval_generator();
-		timeCounter.stop();  
-		//}
+		timeCounter.stop();
 		timer.stop();
 		frame.setVisible(false); 
+	            comboWriter(getCanonical("../data/scoreFile"), fileName11); // gene scores            
+                    comboWriter(getCanonical("../data/goFile"), fileName22); // probe to go map           
+                    comboWriter(getCanonical("../data/outputFile"), fileName33); // output file           
+                    comboWriter(getCanonical("../data/nameFile"), fileName44); // biological names for go 
+                    comboWriter(getCanonical("../data/ugFile"), fileName55); // probe to ug map 
 		
 	    }
         }.start();  
@@ -1069,7 +1107,7 @@ protected Component make_Pval_Panel() {
 		    frame_correl.setVisible(false);
 		}
 	    }.start();
-	    
+
 	    
 	    
 	    
@@ -1088,12 +1126,24 @@ protected Component make_Pval_Panel() {
 	}
     }
     
+/*****************************************************************************************/
+    private class RadioListener2 implements ActionListener { 
+/*****************************************************************************************/
+        public void actionPerformed(ActionEvent e) {
+	    groupMethod=e.getActionCommand();
+	    if(groupMethod.equals("NO_WEIGHT"))
+	        weight_boolean="false";
+	    else
+	        weight_boolean="true";
+	}
+    }    
+    
 
 
 /*****************************************************************************************/    
- private class CheckBoxListener implements ItemListener {
+ //private class CheckBoxListener implements ItemListener {
 /*****************************************************************************************/
-     public void itemStateChanged(ItemEvent e) {
+     /*public void itemStateChanged(ItemEvent e) {
 	
 	 int state =e.getStateChange();
 	 if (state == e.SELECTED) {
@@ -1103,7 +1153,7 @@ protected Component make_Pval_Panel() {
 		 weight_boolean="false";
 	     }   
      }
- }
+ }*/
     
 
 
@@ -1154,6 +1204,53 @@ protected Component make_Pval_Panel() {
 		startpath = chooser.getSelectedFile();
 	    }
 	}
+    }
+    
+
+    public Vector comboReader(String inFilename){
+    	 Vector fileList = new Vector();
+    	 try { 
+	     FileInputStream fis = new FileInputStream(inFilename);
+	     BufferedInputStream bis = new BufferedInputStream(fis);
+	     BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
+	     while(dis.ready())
+	     {  
+	         String line = dis.readLine();
+	         fileList.add(line);
+	     }
+	     dis.close();
+	    
+		     
+	 } catch (IOException e) { 
+	     // catch possible io errors from readLine()
+	     System.out.println("IOException error!");
+	     e.printStackTrace();
+	 }
+    	 return fileList;
+    }
+    
+    public void comboWriter(String outFilename, String names){
+        boolean writeFlag = true;
+        try{
+             FileInputStream fis = new FileInputStream(outFilename);
+	     BufferedInputStream bis = new BufferedInputStream(fis);
+	     BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
+	     while(dis.ready())
+	     {  
+	         String line = dis.readLine();
+	         if (line.equals(names))
+	             writeFlag = false;
+	     }
+	     dis.close();
+            if(writeFlag){
+                 BufferedWriter out = new BufferedWriter(new FileWriter(outFilename, true));    	 
+                 out.write(names+"\n");
+                 out.close();
+            }
+        }catch (IOException e) { 
+	     System.out.println("combo writer error!");
+	     e.printStackTrace();
+	 }
     }
 
 

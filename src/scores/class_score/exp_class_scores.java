@@ -78,7 +78,7 @@ public class exp_class_scores {
 	histogram hist= new histogram(number_of_class, class_min_size, number_of_runs, hist_range);
 	
 	//check for method and accordingly generate values 
-	for (i = class_min_size; i <= class_max_size; i++)
+	for (i = class_min_size; i<class_max_size; i++)
 	    //	    System.err.println("Running class size " + i);
 	    { 
 		random = new int[i];
@@ -89,19 +89,18 @@ public class exp_class_scores {
 			
 			//			showArray.show(random, i);
 			if (method.equals("MEAN_METHOD")) { 
-			    for (j=0; j<i; j++) {
-				//System.err.println("random["+j+"]="+random[j]);
-				total += in_pval[random[j]];
+			    for (j= 0; j<i; j++) {
+				//System.out.println("random["+j+"]="+random[j]);
+				total+=in_pval[random[j]];
 			    }
-			    total = total/(double)i;
+			    total=total/(double)i;
 			    
 			}  else if (method.equals("QUANTILE_METHOD")) {
-			    for (j=0; j<i; j++) {
+			    for (j=0;j<i;j++) {
 				random_class[j] = in_pval[random[j]];
-				//System.out.println("random_class ["+j+"]= "+random_class[j]+"    random[]= "+random[j]);
 			    }
 			    double fract = (double)quantile/100.0;
-    			    int index = (int)Math.floor( fract * i );
+    			    int index = (int)Math.floor( fract*i );
 			    total =  statistics.calculate_quantile(index,random_class,i);
 			}  else if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")){
 			    for (j=0; j<i; j++) {
@@ -111,24 +110,21 @@ public class exp_class_scores {
     			    int index = (int)Math.floor( fract*i );			    
 			    total = statistics.calculate_mean_above_quantile(index, random_class, i); 
 			} else {
-			    System.err.println("Invalid method entered"); // todo: put this kind of check at the start of the program, not here?
+			    System.out.println("Invalid method entered");
 			    System.exit(0);
 			}
 			//System.out.println(total);
 			//System.out.flush();
 			hist.update(i - class_min_size, total);
-		    }
+		    }		
 	    }
 	
 	try { 
 	    hist.tocdf(number_of_class, class_min_size);
 	} catch(NullPointerException s) {
-	    System.err.println("Null pointer Exception");
+	    System.out.println("Null pointer Exception");
 	    s.printStackTrace();
-	} catch(ArrayIndexOutOfBoundsException s) {
-	    System.err.println("ArrayIndexOutOfBoundsException");
-	    s.printStackTrace();
-	}
+	} 
 	return hist;
     }
 
@@ -231,7 +227,7 @@ public class exp_class_scores {
     /**
      * Each pvalue is adjusted to the mean of all the values in the
      * 'replicate group' */
-    public void set_input_pvals(Map ugProbeMap)
+    public void set_input_pvals(Map ugProbeMap, String gp_method)
     {
 	Collection ugEntries = ugProbeMap.entrySet(); // map of ug to probes.
 	Iterator ugMapItr = ugEntries.iterator();
@@ -247,14 +243,17 @@ public class exp_class_scores {
 		Object key = chip_pval.get(pbItr.next());  // pvalue for the next probe in this unigene.
 		if (key != null) {
 		    String pbPval = key.toString();
-		    //  ug_pval_temp[counter] += Math.pow(10, -1*Double.parseDouble(pbPval));
-		    ug_pval_temp[counter] += Double.parseDouble(pbPval);
+		    if(gp_method.equals("MEAN_PVAL")){
+		        ug_pval_temp[counter] += Double.parseDouble(pbPval);
+		    }else if(gp_method.equals("BEST_PVAL")){//use best method for group
+		        ug_pval_temp[counter] = Math.max(Double.parseDouble(pbPval),ug_pval_temp[counter]);
+		    }
 		    in_size++;
 		}
 	    }
 	    if(in_size!=0) {
-		ug_pval_temp[counter] /= in_size;     // take the mean
-		//		ug_pval_temp[counter] = -(Math.log(ug_pval_temp[counter])/Math.log(10));   //transform to -log (base 10) value
+	    	if(gp_method.equals("MEAN_PVAL"))
+		    ug_pval_temp[counter] /= in_size;     // take the mean
 		Object obb = ugTuple.getKey();
 		Double dbb = new Double(ug_pval_temp[counter]);
 		if(ugTuple.getKey()!=null){
