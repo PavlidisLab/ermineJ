@@ -47,7 +47,7 @@ public class HelpHelper {
          c.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
          return true;
       }
-      GuiUtil.error( "Couldn't load help" );
+   //   GuiUtil.error( "Couldn't load help" );
       return false;
 
    }
