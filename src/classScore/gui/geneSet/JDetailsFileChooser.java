@@ -4,7 +4,7 @@
  * Created on June 19, 2004, 1:47 PM
  */
 
-package classScore.gui.details;
+package classScore.gui.geneSet;
 
 // for JDetailsFileChooser
 import javax.swing.JFileChooser;

@@ -4,7 +4,7 @@
  * Created on June 19, 2004, 12:22 AM
  */
 
-package classScore.gui.details;
+package classScore.gui.geneSet;
 
 import javax.swing.table.AbstractTableModel;
 import baseCode.gui.JMatrixDisplay;
