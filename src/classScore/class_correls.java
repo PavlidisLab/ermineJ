@@ -65,12 +65,12 @@ public class class_correls {
 	Collection entries = go_probe.entrySet();
 	Iterator it = entries.iterator();
 	//to store each class number
-	Map class_list = new LinkedHashMap();
+	//	Map class_list = new LinkedHashMap();
 	//stores Matrix of class histograms
 	Matrix M= new Matrix((probe_data.get_class_max_size()-probe_data.get_class_min_size() +1),hist.get_number_of_bins());
 	M= hist.get_matrix();
 	//stores map of class sizes
-	class_list=hist.get_matrix_map();
+	//	class_list=hist.get_matrix_map();
 	try {
 	    BufferedWriter out = new BufferedWriter(new FileWriter(dest_file,true));
 	    out.write("class                                  " + "\t" + "size  " + "\t" + "raw score " + "\t" +"pval " + "\n");
@@ -143,10 +143,10 @@ public class class_correls {
 			size = mat_size;
 			double pval=0.0;
 			double rawscore=0.0;
-			if (class_list.containsKey(Integer.toString(size))==false) {
+			//			if (class_list.containsKey(Integer.toString(size))==false) {
 			    //  System.out.println("Class size does not exist");
 			
-			} else {
+			//			} else {
 			    //calcualte raw score and get corresponding value from histogram of that particular class
 			    rawscore=avecorrel/(double)size;
 			    if (rawscore < hist.get_hist_max()) {
@@ -163,7 +163,7 @@ public class class_correls {
 				out.write(goName.get_GoName_value_map(class_name) +"(" + class_name + ")" + "\t" + size + "\t" + rawscore + "\t" +pval + "\n");
 			    //	 System.out.println(class_name + "\t" + size + "\t" + rawscore + "\t" +pval);
 			    }	
-			}
+			    //			}
 		    }
 		} else {
 		    continue;

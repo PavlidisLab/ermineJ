@@ -10,22 +10,19 @@ import java.text.DecimalFormat;
 /**
   Stores information relevent to a histogram.   Created :09/02/02
 
-  @author Shahmil Merchant
+  @author Shahmil Merchant, Paul Pavlidis
   @version $Id$
 
 */
 public class histogram {
 
     private int min_class_size = 0;
-    private double bin_size = 0.002; // todo: set this automatically, so there are always a reasonable # of bins.
+    private double bin_size = 0.002; // todo: set this automatically?, so there are always a reasonable # of bins.
     private double hist_min = 0.0; // todo: this is never set anywhere.
-    private double hist_max = 5.0;
+    private double hist_max = 5.0; // this gets adjusted if need be.
     private int number_of_bins = 0;
     private int number_of_runs = 0;
-    private int row = 0;
-    private int column = 0;
-    private Matrix M = null; // holds the actual histograms.
-    private Map list;
+    private Matrix M = null; // holds the actual histograms. Each row is a histogram.
     private double minPval; // the smallest possible pvalue: used when a requested score is out of the top of the range.
 
 
@@ -51,7 +48,6 @@ public class histogram {
 	}
 
 	M = new Matrix(number_of_class, number_of_bins + 1 );
-	list = new HashMap();
     }
 
 
@@ -91,7 +87,7 @@ public class histogram {
 	    thebin = 0;
 	}
 
-	if (thebin > number_of_bins - 1) { // this shouldn't happen since we make sure there enough bins. Might give slight speedup.
+	if (thebin > number_of_bins - 1) { // this shouldn't happen since we make sure there enough bins.
 	    System.err.println("Warning, last bin exceeded!");
 	    thebin = number_of_bins - 1;
 	}
@@ -106,29 +102,16 @@ public class histogram {
     */
     public void tocdf(int number_of_class, int class_min_size) {
 
-	// todo: get rid of this if we don't use it???
-	for (int s = class_min_size; s < (number_of_class + class_min_size - 1); s++){
-	    String number = Integer.toString(s);
-	    list.put(number, null);
-	}
-	
 	for (int i = 0; i < M.get_num_rows(); i++ ) { // for each histogram (class size)
 	    double total = M.get_row_sum(i);
 
-	    //	    System.err.println(total + " trials observed.");
 	    double sum = 0.0; 
-	    for (int j = M.get_num_cols() - 1; j >= 0; j--) { // for each bin in this histogram.
+	    for (int j = M.get_num_cols() - 1; j >= 0; j--) { // for each bin in this histogram. Go from right to avoid roundoff problems where it matters.
 		sum += M.get_matrix_val(i,j) / total;
 		M.set_matrix_val(i, j, sum);
 	    }
 	}
 	System.err.println("Made cdf");
-
-	// debug
-	//	Stats statistics = new Stats();
-	//	showArray.show(M.get_ith_row(105), M.get_num_cols());
-	//	showArray.show(M.get_ith_row(20), M.get_num_cols());
-	//	showArray.show(M.get_ith_row(40), M.get_num_cols());
     }
 
 
@@ -137,7 +120,6 @@ public class histogram {
        
      */
     public double get_bin_size()
-
     {
 	return bin_size;
     }
@@ -189,14 +171,6 @@ public class histogram {
     }
 
 
-    /**
-     */
-    public Map get_matrix_map()
-    {
-	return list;
-    }
-
-
     public int get_min_class_size() {
 	return min_class_size;
     }
@@ -235,8 +209,32 @@ public class histogram {
 	}
     }
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+       Print the histogram to stderr.
+    
+    */
+    public void print() {
+	/* print a heading */
+	int stepsize = 20;
+	System.err.print("heading:");
+	for (int j =0 ; j < M.get_num_cols(); j+=stepsize) { // for each bin in this histogram.
+	    System.err.print("\t" + (hist_min + bin_size * j));
+	}
+	System.err.print("\n");
+
+	for (int i = 0; i < M.get_num_rows(); i++ ) { // for each histogram (class size)
+	    System.err.print("row:");
+	    for (int j =0 ; j < M.get_num_cols(); j+=stepsize) { // for each bin in this histogram.
+		System.err.print("\t" + M.get_matrix_val(i,j));
+	    }
+	    System.err.print("\n");
+	}
+	//	M.print();
+    }
+
+
+    /**
+     */
     public double get_pval(int row, int binnum) {
 	double pval = M.get_matrix_val(row, binnum);
 	if (pval == 0.0)

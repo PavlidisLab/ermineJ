@@ -101,69 +101,38 @@ public class exp_class_scores {
 	
 	int i,j,k;
 	
-	int gene_length;
+	int num_genes;
 	double[] in_pval;
 
 	// do the right thing if we are using weights.
 	if (weight_on) {
-	    gene_length = Array.getLength(group_pval_arr);
+	    num_genes = Array.getLength(group_pval_arr);
 	    in_pval = group_pval_arr;
 	} else {
-	    gene_length = Array.getLength(pvals);
+	    num_genes = Array.getLength(pvals);
 	    in_pval = pvals;
 	}
 
-	if (gene_length <= 0) {
+	if (num_genes == 0) {
 	    System.err.println("No pvalues!");
 	    System.exit(1);
 	}
-
-	//	System.err.println("There are " + gene_length + " pvalues to choose from randomly.");
-
-	int[] random = null;
-	double[] random_class = new double[gene_length];
-	boolean[] recLog = new boolean[gene_length];  //recLog records the numbers been choosed
-
-	//	System.err.println(number_of_class + " " +  class_min_size + " " +   number_of_runs + " " +   hist_max);
-
 	
-	//check for method and accordingly generate values 
+	// we use this throughout.
+	int[] deck = new int[num_genes];
+	for (i=0; i<num_genes; i++)
+	    deck[i] = i;
+
+	// Check for method and accordingly generate values at random.
 	for (i = class_min_size; i<=class_max_size; i++)
-	    //	    System.err.println("Running class size " + i);
 	    { 
-		random = new int[i];
-		for (k =0 ; k< number_of_runs; k++)
-		    {
-			double total=0.0;
-			statistics.chooserandom (random, recLog, gene_length, i);
-			
-			//			showArray.show(random, i);
-			//todo: this is a good place for a switch.
-			if (method == MEAN_METHOD) { 
-			    for (j= 0; j<i; j++) {
-				//System.out.println("random["+j+"]="+random[j]);
-				total+=in_pval[random[j]];
-			    }
-			    total=total/(double)i;
-			}  else if (method == QUANTILE_METHOD) {
-			    for (j=0;j<i;j++) {
-				random_class[j] = in_pval[random[j]];
-			    }
-			    double fract = (double)quantile/100.0;
-    			    int index = (int)Math.floor( fract*i );
-			    total =  statistics.calculate_quantile(index,random_class,i);
-			}  else if (method == MEAN_ABOVE_QUANTILE_METHOD){
-			    for (j=0; j<i; j++) {
-				random_class[j]= in_pval[random[j]];
-			    }
-			    double fract = (double)quantile/100.0;
-    			    int index = (int)Math.floor( fract*i );			    
-			    total = statistics.calculate_mean_above_quantile(index, random_class, i); 
-			}
-			//System.out.println(total);
-			//System.out.flush();
-			hist.update(i - class_min_size, total);
-		    } 	
+		double[] random_class = new double[i]; // holds data for random class.
+		double rawscore = 0.0;
+		for (k =0 ; k< number_of_runs; k++) {
+		    statistics.chooserandom(random_class, in_pval, deck, num_genes, i);
+		    rawscore = calc_rawscore(random_class, i);
+		    hist.update(i - class_min_size, rawscore);
+		}
 	    }
 	
 	try { 

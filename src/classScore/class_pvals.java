@@ -122,9 +122,9 @@ public class class_pvals {
 	if (mtc_method.equals("bon")) {
 	    correct_pvals(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
 	} else if (mtc_method.equals("bh")) {
-	    correct_pvals(0.01);
+	    correct_pvals(0.05);
 	} else if (mtc_method.equals("wy")) {
-	    correct_pvals(20000);
+	    correct_pvals(10000);
 	}
 
 	// all done:
@@ -229,6 +229,7 @@ public class class_pvals {
 	// foreach item in the class.
 	// todo: see if this loop can be optimized. Probably. It's important when we are doing random trials that this go fast.
 	while(classit.hasNext()) {
+
 	    String probe = (String)classit.next();  // probe id
 
 	    if (probesToPvals.containsKey(probe)){ // if it is in the data set. This is invariant under permutations.
@@ -658,8 +659,7 @@ public class class_pvals {
 	    // used only to check for presence of a probe in the data
 	    // set). If we are not using weights, it only affects the
 	    // hypergeometric pvalues. (todo: add correction for those
-	    // values)
-	    //	    Map scprobepvalmap = probe_pval.get_map(true);
+	    // values) So we don't even bother shuffling it.
 	    Map scprobepvalmap =  probe_pval.get_map();
 
 	    // Just for AROC:
@@ -733,9 +733,11 @@ public class class_pvals {
 		j++;
 		qprev = q;
 	    }
-	    if (i % 50 == 0) {
-		System.err.println(i + " Westfall-Young trials.");
+
+	    if (0 == i % 100) {
+		System.err.println(i + " Westfall-Young trials, " + (trials - i) + " to go.");
 	    }
+
 	}
 
 	Collections.reverse(sortedclasses); // now the best class is first.
@@ -750,7 +752,7 @@ public class class_pvals {
 	    corrected_p = Math.max((double)counts[j] / (double)trials, previous_p); // first iteration, these are the same.
 
 	    if (verbose) // print the counts for each class.
-		System.err.println(j + " " + counts[j] + " " + trials + " " + corrected_p + " " + previous_p);
+		System.err.println(j + " " + counts[j] + " " + trials + " " + corrected_p );
 
 	    res.setpvalue_corr(corrected_p);
 	    previous_p = corrected_p;

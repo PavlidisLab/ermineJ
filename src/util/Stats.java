@@ -167,9 +167,48 @@ public class Stats implements Cloneable, ConstantStuff
     } /* pearson_correlation */
 
 
+    
+    /**
+       Fill randomvals with random things from sourcedata, without replacement.
+       @param randomnums: answers go here.
+       @param deck: an array pre-filled with integers from 0 to max, but they don't have to be in order.
+       @param n: how many values we need.
+    */
+    public void chooserandom(double[] randomvals, double[] sourcedata, int[] deck, int max, int n) {
+	int rand;
+	int i;
+	int temp;
+	for (i=0; i<n; i++) {
+	    rand = generator.nextInt(max - i) + i; // a value between i and max.
+	    temp = deck[rand];
+	    deck[rand] = deck[i];
+	    deck[i] = temp;
+	    randomvals[i] = sourcedata[temp];
+	}
+    }
+
+    /**
+       choose n random integers from 0 to max without repeating 
+       @param randomnums: answers go here.
+       @param deck: an array pre-filled with integers from 0 to max, but they don't have to be in order.
+       @param n: how many values we need.
+    */
+    public void chooserandom(int[] randomnums, int[] deck, int max, int n) {
+	int rand;
+	int i;
+	for (i=0; i<n; i++) {
+	    rand = generator.nextInt(max - i) + i; // a value between i and max.
+	    randomnums[i] = deck[rand];
+	    deck[rand] = deck[i];
+	    deck[i] = randomnums[i];
+	}
+    }
+
+
 
     /**
        choose n random integers from 0 to max without repeating
+       @param recLog record of what values are already chosen.
     */
     public void chooserandom(int[] randomnums, boolean[] recLog, int max, int n) {
 	int numgot;

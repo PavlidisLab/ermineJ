@@ -368,7 +368,16 @@ public class Matrix extends HashMap // encapsulates a matrix
 	
     }
     
-    
+    public void print() {
+        for(int i=0; i<rows; i++) {
+	    System.err.print("row:");
+            for(int j=0; j<cols; j++) {
+                System.err.print("\t" + M[i][j]);
+	    }
+	    System.err.print("\n");
+	}
+    }
+
     
     /**
      */

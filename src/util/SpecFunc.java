@@ -219,6 +219,8 @@ public class SpecFunc {
     {
 	int i;
 	double pval = 0.0;
+	double binomprob;
+	double LIMIT = 1.0e-15;
 
 	if (trials == 0 || p == 0.0) {
 	    System.err.println("No trials and/or probability is zero. Will return p=0.5");
@@ -226,12 +228,26 @@ public class SpecFunc {
 	}
 
 	for (i = successes + 1; i <= trials; i++) {
+	    binomprob = binomial_prob(i, trials, p);
+	    
+	    if (binomprob < LIMIT)
+		break;
+
 	    pval += binomial_prob(i, trials, p);
 	}
 
 	if (pval == 0.0 || Double.isNaN(pval) ) {
-	    System.err.println("Binomial returned probability of zero or NAN for " + successes + " successes, " + trials + " trials, p=" + p);
-	    return 1.0e-15;
+	    System.err.println("Binomial returned probability of zero, or NAN (" + pval + ") for " + successes + " successes, " + trials + " trials, p=" + p);
+	    return LIMIT;
+	} else if ( Double.isInfinite(pval) ) {
+	    System.err.println("Binomial returned probability of infinity (" + pval + ") for " + successes + " successes, " + trials + " trials, p=" + p + ", diagnostic follows:");
+	    pval = LIMIT;
+	    for (i = successes + 1; i <= trials; i++) {
+		pval += binomial_prob(i, trials, p);
+		System.err.println(binomial_prob(i, trials, p) + " " + i + " " + trials + " " + p + ", Current p=" + pval);
+	    }
+	    System.err.println("----");
+	    return pval;
 	} else {
 	    return pval;
 	}
