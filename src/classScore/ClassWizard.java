@@ -17,13 +17,14 @@ public class ClassWizard extends Wizard {
    Settings settings;
    GeneAnnotations geneData;
    GONames goData;
-   ClassWizardStep1 step1;
-   ClassWizardStep1A step1A;
-   ClassWizardStep2 step2;
+   ClassWizardStep1 step1;  // case 1 (manual creating) and case 2 (new from file)
+   ClassWizardStep1A step1A; // case 3 (modifying existing)
+   ClassWizardStep2 step2;   // step 2 for cases 1-3 and step 1 for case 4
    ClassWizardStep3 step3;
 
    int step;
    boolean makenew;
+   boolean nostep1=false;
    NewGeneSet newGeneSet;
    String cid;
 
@@ -64,35 +65,39 @@ public class ClassWizard extends Wizard {
       this.goData = goData;
       this.cid = cid;
       makenew=false;
+      nostep1=true;
       newGeneSet = new NewGeneSet(geneData);
       this.setTitle("Modify Class - Step 2 of 3");
       step = 2;
-      backButton.setEnabled(true);
+      backButton.setEnabled(false);
       newGeneSet.setId(cid);
       newGeneSet.setDesc(goData.getNameForId(cid));
       if (geneData.classExists(cid))
          newGeneSet.getProbes().addAll((ArrayList) geneData.getClassToProbes(cid));
       this.repaint();
       step2 = new ClassWizardStep2(this,geneData,newGeneSet);
+      this.addStep(1,step2); //hack for starting at step 2
       this.addStep(2,step2);
+      step2.updateCountLabel();
       step3 = new ClassWizardStep3(this,settings,geneData,newGeneSet,makenew);
       this.addStep(3,step3);
    }
 
    void nextButton_actionPerformed(ActionEvent e) {
       if (step == 1) {
-         if (!makenew && !step1A.isReady()) {
+         if (!makenew && !step1A.isReady()) {                       //case 3 and no class picked
             GuiUtil.error("Pick a class to be modified.");
          }
          else {
-            if (makenew && step1.getInputMethod() == 1) {
+            if (makenew && step1.getInputMethod() == 1) {           //case 2, load from file
                newGeneSet.loadClassFile(step1.getLoadFile());
             }
-            if (!(makenew && step1.getInputMethod() == 1 && newGeneSet.getId().compareTo("") == 0)) {
-               if (makenew) {
+            if (!(makenew && step1.getInputMethod() == 1 &&         //all cases (except case 2 and bad file)
+                  newGeneSet.getId().compareTo("") == 0)) {
+               if (makenew) {                                       //cases 1 & 2
                   this.getContentPane().remove(step1);
                   this.setTitle("Define New Class - Step 2 of 3");
-               } else {
+               } else {                                             //case 3
                   this.getContentPane().remove(step1A);
                   this.setTitle("Modify Class - Step 2 of 3");
                }
@@ -146,6 +151,8 @@ public class ClassWizard extends Wizard {
             this.setTitle("Define New Class - Step 2 of 3");
          } else {
             this.setTitle("Modify Class - Step 2 of 3");
+            if(nostep1)
+               backButton.setEnabled(false);
          }
          nextButton.setEnabled(true);
          finishButton.setEnabled(false);

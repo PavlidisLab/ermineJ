@@ -110,13 +110,10 @@ public class modClassFrame extends JDialog {
    boolean makenew;
 
    NewGeneSet newGeneSet;
-   InitialMaps imaps;
-   ClassPanel classpanel;
    String folder;
    String cid;
 
-   public modClassFrame(boolean makenew, InitialMaps imap,
-                        ClassPanel classpanel, String saveFolder, String cid) {
+   public modClassFrame(boolean makenew, String saveFolder, String cid) {
 /*
       setModal(true);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);

@@ -21,17 +21,50 @@ import javax.swing.table.*;
 public class OutputPanel extends JScrollPane {
    JTable table;
    OutputTableModel model;
+   classScoreFrame callingframe;
    Vector results;
+   GeneAnnotations geneData;
+   GONames goData;
 
-   public OutputPanel(Vector results) {
+   public OutputPanel(classScoreFrame callingframe, Vector results) {
+      this.callingframe=callingframe;
       this.results=results;
       model = new OutputTableModel(results);
       table = new JTable();
       table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
       table.getTableHeader().setReorderingAllowed( false );
+
+      OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
+      JMenuItem menuItem = new JMenuItem("Modify this class (Step 1 of 3)");
+      menuItem.addActionListener(new OutputPanel_PopupMenu_actionAdapter(this));
+      popup.add(menuItem);
+      MouseListener popupListener = new OutputPanel_PopupListener(popup);
+      table.addMouseListener(popupListener);
+   }
+
+   void table_mouseReleased( MouseEvent e ) {
+      int i = table.getSelectedRow();
+      int j = table.getSelectedColumn();
+      if(!table.getValueAt(i,j).equals("") && j>=OutputTableModel.init_cols)
+      {
+         int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
+         String id = (String)table.getValueAt(i,0);
+         ((classPvalRun)results.get(runnum)).showDetails(id);
+      }
+   }
+
+   void popupMenu_actionPerformed(ActionEvent e) {
+      OutputPanelPopupMenu sourcePopup = (OutputPanelPopupMenu)
+          ((Container) e.getSource()).getParent();
+      int r = table.rowAtPoint(sourcePopup.getPoint());
+      String id = (String) table.getValueAt(r, 0);
+      ClassWizard cwiz = new ClassWizard(callingframe, geneData, goData, id);
+      cwiz.showWizard();
    }
 
    public void addInitialData(GeneAnnotations geneData, GONames goData) {
+      this.geneData=geneData;
+      this.goData=goData;
       model.addInitialData(geneData, goData);
       TableSorter sorter = new TableSorter(model);
       table.setModel(sorter);
@@ -64,17 +97,6 @@ public class OutputPanel extends JScrollPane {
       table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer());
       table.revalidate();
    }
-
-   void table_mouseReleased( MouseEvent e ) {
-      int i = table.getSelectedRow();
-      int j = table.getSelectedColumn();
-      if(!table.getValueAt(i,j).equals("") && j>=OutputTableModel.init_cols)
-      {
-         int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
-         String id = (String)table.getValueAt(i,0);
-         ((classPvalRun)results.get(runnum)).showDetails(id);
-      }
-   }
 }
 
 class OutputPanel_mouseAdapter
@@ -90,6 +112,52 @@ class OutputPanel_mouseAdapter
          return;
       }
       adaptee.table_mouseReleased( e );
+   }
+}
+
+class OutputPanel_PopupMenu_actionAdapter implements java.awt.event.ActionListener {
+   OutputPanel adaptee;
+
+   OutputPanel_PopupMenu_actionAdapter(OutputPanel adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.popupMenu_actionPerformed(e);
+   }
+}
+
+
+class OutputPanelPopupMenu extends JPopupMenu {
+   Point popupPoint;
+   public Point getPoint() {return popupPoint;
+   }
+
+   public void setPoint(Point point) {popupPoint = point;
+   }
+}
+
+class OutputPanel_PopupListener extends MouseAdapter {
+   OutputPanelPopupMenu popup;
+   OutputPanel_PopupListener(OutputPanelPopupMenu popupMenu) {popup = popupMenu;
+   }
+
+   public void mousePressed(MouseEvent e) {maybeShowPopup(e);
+   }
+
+   public void mouseReleased(MouseEvent e) {maybeShowPopup(e);
+   }
+
+   private void maybeShowPopup(MouseEvent e) {
+      if (e.isPopupTrigger()) {
+         JTable source = (JTable) e.getSource();
+         int r = source.rowAtPoint(e.getPoint());
+         String id = (String) source.getValueAt(r, 0);
+         if (id.compareTo("") != 0) {
+            popup.show(e.getComponent(), e.getX(), e.getY());
+            popup.setPoint(e.getPoint());
+         }
+      }
    }
 }
 

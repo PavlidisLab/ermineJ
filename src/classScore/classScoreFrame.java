@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import baseCode.gui.*;
 
 /**
  * <p>Title: </p>
@@ -20,11 +21,8 @@ import javax.swing.*;
 
 public class classScoreFrame
     extends JFrame {
-
    final boolean CONSOLE_WINDOW = false;
-
    JPanel mainPanel = ( JPanel )this.getContentPane();
-
    JMenuBar jMenuBar1 = new JMenuBar();
    JMenu classMenu = new JMenu();
    JMenuItem defineClassMenuItem = new JMenuItem();
@@ -34,7 +32,6 @@ public class classScoreFrame
    JMenuItem loadAnalysisMenuItem = new JMenuItem();
    JMenuItem saveAnalysisMenuItem = new JMenuItem();
 
-   ClassPanel cPanel;
    JPanel progressPanel;
    JPanel progInPanel = new JPanel();
    JProgressBar jProgressBar1 = new JProgressBar();
@@ -48,17 +45,13 @@ public class classScoreFrame
    JLabel jLabelStatus = new JLabel();
    JPanel jPanelStatus = new JPanel();
 
-   Thread runner;
-   boolean done = false;
-   boolean loadResults = false;
-   int runnum = 0;
-   InitialMaps imaps;
-
    Settings settings;
    classScoreStatus statusMessenger;
    GONames goData;
    GeneAnnotations geneData;
    Vector results = new Vector();
+
+   AnalysisThread athread=new AnalysisThread();
 
    public classScoreFrame() {
       try {
@@ -80,8 +73,6 @@ public class classScoreFrame
       this.setJMenuBar( jMenuBar1 );
       this.setSize( new Dimension( 886, 450 ) );
       this.setTitle( "Functional Class Scoring" );
-      mainPanel.setMaximumSize( new Dimension( 2000, 2000 ) );
-      mainPanel.setMinimumSize( new Dimension( 2000, 2000 ) );
       mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
       mainPanel.setInputVerifier( null );
 
@@ -120,6 +111,7 @@ public class classScoreFrame
       jMenuBar1.add( classMenu );
       jMenuBar1.add( analysisMenu );
 
+      //initialization panel (replaced by main panel when done)
       progressPanel = new JPanel();
       progressPanel.setPreferredSize( new Dimension( 830, 330 ) );
       GridBagLayout gridBagLayout1 = new GridBagLayout();
@@ -134,9 +126,11 @@ public class classScoreFrame
       progressPanel.add(progInPanel,     new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
           ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(114, 268, 87, 268), 0, 0));
 
-      oPanel = new OutputPanel( results );
+      //main panel
+      oPanel = new OutputPanel( this, results );
       oPanel.setPreferredSize( new Dimension( 830, 330 ) );
 
+      //controls
       jPanelMainControls.setPreferredSize( new Dimension( 830, 35 ) );
       jButtonAbout.setToolTipText( "Please click here!" );
       jButtonAbout.setText( "About the software" );
@@ -156,6 +150,7 @@ public class classScoreFrame
       jPanelMainControls.add( jButtonCancel, null );
       jPanelMainControls.add( jButtonAbout, null );
 
+      //status bar
       jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
       jPanelStatus.setPreferredSize( new Dimension( 830, 33 ) );
       jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
@@ -166,35 +161,15 @@ public class classScoreFrame
       showStatus( "Please see 'About this software' for license information." );
       statusMessenger = new classScoreStatus( jLabelStatus );
 
-      //mainPanel.add( oPanel, BorderLayout.NORTH );
       mainPanel.add( progressPanel, BorderLayout.NORTH );
       mainPanel.add( jPanelMainControls, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
 
-   void jButtonLoad_actionPerformed( ActionEvent e ) {
-      /*
-            boolean ok = true;
-            ok = testfile(jTextFieldGeneScoreFile.getText());
-            ok = ok && testfile(jTextFieldGONames.getText());
-            ok = ok && testfile(jTextFieldProbeAnnot.getText());
-
-            if (loadResults) {
-               ok = ok && testfile(jTextFieldOutPutFileName.getText());
-            }
-
-            if (!ok) {
-               return;
-            }
-                     populate_class_list(m);
-                     classPvalRun results = new classPvalRun(imaps,
-                         jTextFieldOutPutFileName.getText(),
-                         oraThresh,
-                         useWeights,
-                         "bh", m, loadResults);
-                     ResultPanel r = new ResultPanel(results);
-                     r.setModel(results.toTableModel());
-       */
+   private void enableMenus()
+   {
+      classMenu.setEnabled( true );
+      analysisMenu.setEnabled( true );
    }
 
    public void initialize() {
@@ -214,19 +189,13 @@ public class classScoreFrame
          mainPanel.add( oPanel, BorderLayout.NORTH );
       }
       catch ( IllegalArgumentException e ) {
-         error( e, "During initialization" );
+         GuiUtil.error( e, "During initialization" );
       }
       catch ( IOException e ) {
-         error( e, "File reading or writing" );
+         GuiUtil.error( e, "File reading or writing" );
       }
       oPanel.addInitialData( geneData, goData );
       statusMessenger.setStatus("Done with initialization.");
-   }
-
-   private void enableMenus()
-   {
-      classMenu.setEnabled( true );
-      analysisMenu.setEnabled( true );
    }
 
    public void analyze( Settings settings, classScoreStatus messenger) {
@@ -236,15 +205,15 @@ public class classScoreFrame
          expClassScore probePvalMapper = new expClassScore(settings);
          probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
                                        settings.getGroupMethod()); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-         classPvalRun runResult = new classPvalRun( settings,geneData,goData,probePvalMapper,"","bh",messenger,loadResults);
+         classPvalRun runResult = new classPvalRun( settings,geneData,goData,probePvalMapper,"","bh",messenger,false);
          results.add( runResult );
          oPanel.addRun();  // this line should come after results.add() or else you'll get errors
       }
       catch ( IllegalArgumentException e ) {
-         error( e, "During class score calculation" );
+         GuiUtil.error( e, "During class score calculation" );
       }
       catch ( IOException e ) {
-         error( e, "File reading or writing" );
+         GuiUtil.error( e, "File reading or writing" );
       }
    }
 
@@ -254,80 +223,8 @@ public class classScoreFrame
    }
 
    void jButtonCancel_actionPerformed( ActionEvent e ) {
-
-      if ( runner != null ) {
-         runner.stop();
-      }
-      try {
-         Thread.sleep( 200 );
-      }
-      catch ( InterruptedException ex ) {
-         Thread.currentThread().interrupt();
-      }
+      athread.cancelAnalysisThread();
       showStatus( "Ready" );
-      System.out.println( "Ready" );
-   }
-
-   /**
-    *
-    * @param e
-    * @param message
-    */
-   public void error( Exception e, String message ) {
-      showStatus( "Error: " + message + " (" + e.toString() + ")" );
-      JOptionPane.showMessageDialog( null,
-                                     "Error: " + message + "\n" + e.toString() +
-                                     "\n" + e.getStackTrace() );
-   }
-
-   /**
-    *
-    * @param comp
-    * @return
-    */
-   public String getString( JComboBox comp ) {
-
-      String selectedPath = ( String ) comp.getSelectedItem();
-      if ( selectedPath == null ||
-           !selectedPath.equals( comp.getEditor().getItem() ) ) {
-         selectedPath = ( String ) comp.getEditor().getItem();
-      }
-      return selectedPath;
-   }
-
-   /**
-    *
-    * @param inFilename
-    * @return
-    */
-   public Vector Reader( String inFilename ) {
-      File file = new File( inFilename );
-
-      showStatus( "Reading " + inFilename );
-
-      if ( file.exists() && file.isFile() && file.canRead() ) {
-
-         Vector fileList = new Vector();
-         try {
-            FileInputStream fis = new FileInputStream( inFilename );
-            BufferedInputStream bis = new BufferedInputStream( fis );
-            BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
-            while ( dis.ready() ) {
-               String line = dis.readLine();
-               fileList.add( line );
-            }
-            dis.close();
-         }
-         catch ( IOException e ) {
-            // catch possible io errors from readLine()
-            error( e, "Reading preferences." );
-         }
-
-         clearStatus();
-         return fileList;
-      } else {
-         return null;
-      }
    }
 
    /**
@@ -346,43 +243,6 @@ public class classScoreFrame
    }
 
    /**
-    *
-    * @param outFilename
-    * @param names
-    */
-   public void comboWriter( String outFilename, String names ) {
-      try {
-         BufferedWriter out = new BufferedWriter( new FileWriter( outFilename, false ) );
-         showStatus( "Writing preferences to " + outFilename );
-         out.write( names + "\n" );
-         out.close();
-      }
-      catch ( IOException e ) {
-         error( e, "Writing preferences" );
-      }
-      clearStatus();
-   }
-
-   /**
-    *
-    * @param in
-    * @return
-    */
-   private String getCanonical( String in ) {
-      if ( in == null || in.length() == 0 ) {
-         return in;
-      }
-      File outFile = new File( in );
-      try {
-         return outFile.getCanonicalPath();
-      }
-      catch ( Exception e ) {
-         error( e, "Getting path for preferences file" );
-         return null;
-      }
-   }
-
-   /**
     * About
     * @param e
     */
@@ -396,15 +256,6 @@ public class classScoreFrame
       dlg.setModal( true );
       dlg.pack();
       dlg.show();
-   }
-
-   /**
-    *
-    * @param e
-    */
-   void jButtonLoadResults_actionPerformed( ActionEvent e ) {
-      loadResults = true;
-      this.jButtonLoad_actionPerformed( e );
    }
 
    /**
@@ -427,22 +278,34 @@ public class classScoreFrame
    }
 
    void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
+         /*
+               boolean ok = true;
+               ok = testfile(jTextFieldGeneScoreFile.getText());
+               ok = ok && testfile(jTextFieldGONames.getText());
+               ok = ok && testfile(jTextFieldProbeAnnot.getText());
+
+               if (loadResults) {
+                  ok = ok && testfile(jTextFieldOutPutFileName.getText());
+               }
+
+               if (!ok) {
+                  return;
+               }
+                        populate_class_list(m);
+                        classPvalRun results = new classPvalRun(imaps,
+                            jTextFieldOutPutFileName.getText(),
+                            oraThresh,
+                            useWeights,
+                            "bh", m, loadResults);
+                        ResultPanel r = new ResultPanel(results);
+                        r.setModel(results.toTableModel());
+          */
    }
 
    void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
 //      SaveWizard swiz = new SaveWizard( this, ( Vector ) oPanel.getAllRunData() );
       SaveWizard swiz = new SaveWizard( this, results );
-      showDialog( swiz );
-   }
-
-   void showDialog( JDialog j ) {
-      Dimension dlgSize = j.getPreferredSize();
-      Dimension frmSize = getSize();
-      Point loc = getLocation();
-      j.setLocation( ( frmSize.width - dlgSize.width ) / 2 + loc.x,
-                     ( frmSize.height - dlgSize.height ) / 2 + loc.y );
-      j.pack();
-      j.show();
+      swiz.showWizard();
    }
 
    public Settings getSettings() {
@@ -451,6 +314,17 @@ public class classScoreFrame
 
    public classScoreStatus getStatusMessenger(){
       return statusMessenger;
+   }
+
+   public void addResult(classPvalRun result)
+   {
+      results.add( result );
+      oPanel.addRun();  // this line should come after results.add() or else you'll get errors
+   }
+
+   public void startAnalysis(Settings runSettings)
+   {
+      athread.startAnalysisThread(this,runSettings,statusMessenger,goData,geneData);
    }
 }
 

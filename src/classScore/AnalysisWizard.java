@@ -106,18 +106,7 @@ public class AnalysisWizard extends Wizard
 
    void finishButton_actionPerformed(ActionEvent e) {
       saveValues();
-
-      class runthread extends Thread {
-         public runthread() {}
-
-         public void run() {
-            classScoreFrame csframe = (classScoreFrame) callingframe;
-            csframe.analyze(settings,csframe.getStatusMessenger());
-         }
-      };
-
-      Thread aFrameRunner = new runthread();
-      aFrameRunner.start();
+      ((classScoreFrame)callingframe).startAnalysis(settings);
       dispose();
    }
 
