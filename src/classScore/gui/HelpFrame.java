@@ -1,6 +1,7 @@
 package classScore.gui;
 
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 
 /**
  * 
@@ -10,13 +11,21 @@ import javax.swing.JEditorPane;
  * @author pavlidis
  * @version $Id$
  */
-public class HelpFrame extends JEditorPane {
+public class HelpFrame extends JFrame {
 
    /**
     * @param callingframe
     */
+   
+   private JEditorPane helpPane;
+   
    public HelpFrame( GeneSetScoreFrame callingframe ) {
       // TODO Auto-generated constructor stub
+      init();
    }
 
+   private void init() {
+      helpPane = new JEditorPane();
+   }
+   
 }
