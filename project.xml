@@ -7,12 +7,15 @@
     <organization>
         <name>Columbia University</name>
         <url>http://www.columbia.edu</url>
+        <logo>src/classScore/gui/resources/logo1small.gif</logo>
     </organization>
     <inceptionYear>2004</inceptionYear>
     <description>Software for gene set analysis.</description>
     <shortDescription>Software for gene set analysis.</shortDescription>
     <siteAddress>microarray</siteAddress>
     <siteDirectory>/proj/pavlidis/protected/classScore</siteDirectory>
+    <distributionSite>microarray</distributionSite>
+    <distributionDirectory>/proj/projectpages/classScore_webStart</distributionDirectory>
     <repository>
         <connection>scm:cvs:ext:${maven.username}@adgate.cu-genome.org:/fsnode/projects/cvs/pavlab:ermineJ</connection>
     </repository>
@@ -55,6 +58,7 @@
             <groupId>colt</groupId>
             <artifactId>colt</artifactId>
             <jar>colt.jar</jar>
+            <type>jar</type>
             <url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
             <properties/>
         </dependency>
@@ -62,15 +66,17 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.3</version>
+            <type>jar</type>
             <properties/>
         </dependency>
         <dependency>
             <groupId>baseCode</groupId>
             <artifactId>baseCode</artifactId>
             <version>0.2</version>
+            <type>jar</type>
             <properties/>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <version>2.6.2</version>
@@ -99,5 +105,12 @@
         <report>maven-tasklist-plugin</report>
         <report>maven-clover-plugin</report>
     </reports>
+    
+     <jnlp>
+     	<description>Gene functional class statistical scoring tool</description>
+<homepage>http://microarray.cu-genome.org/ermineJ</homepage>
+     </jnlp>
+    
+    
     <properties/>
 </project>
