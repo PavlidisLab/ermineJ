@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JMenuItem;
@@ -401,7 +402,7 @@ class OutputPanel_PopupListener extends MouseAdapter {
       if ( e.isPopupTrigger() ) {
          JTable source = ( JTable ) e.getSource();
          int r = source.rowAtPoint( e.getPoint() );
-         String id = ( String ) source.getValueAt( r, 0 );
+         List id = ( Vector ) source.getValueAt( r, 0 );
          if ( id != null ) {
             popup.show( e.getComponent(), e.getX(), e.getY() );
             popup.setPoint( e.getPoint() );
@@ -470,7 +471,8 @@ class OutputTableModel extends AbstractTableModel {
    private NumberFormat nf = NumberFormat.getInstance();
    private int state = -1;
    public static final int init_cols = 4;
-
+   ArrayList vals = new ArrayList();
+   
    //public static final int cols_per_run = 3;
 
    public OutputTableModel( LinkedList results ) {
@@ -548,7 +550,8 @@ class OutputTableModel extends AbstractTableModel {
    public Object getValueAt( int i, int j ) {
 
       String classid = ( String ) geneData.getSelectedSets().get( i );
-
+     
+      
       if ( state >= 0 && j < init_cols ) {
          switch ( j ) {
             case 0: {
@@ -567,11 +570,11 @@ class OutputTableModel extends AbstractTableModel {
 
          }
       } else if ( state > 0 ) {
+         vals.clear();
          int runnum = getRunNum( j );
          Map data = ( ( classPvalRun ) results.get( runnum ) ).getResults();
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
-            ArrayList vals = new ArrayList();
             vals.add( new Double( nf.format( res.getRank() ) ) );
             vals.add( new Double( nf.format( res.getPvalue() ) ) );
             return vals;
