@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * <p>Title: </p>
@@ -21,6 +22,8 @@ public class SaveWizardStep1 extends WizardStep
    JPanel runPanel;
    JComboBox runComboBox;
    JLabel runLabel;
+   BorderLayout borderLayout;
+   boolean runs_exist;
 
    public SaveWizardStep1(SaveWizard wiz, Vector rundata)
    {
@@ -28,22 +31,23 @@ public class SaveWizardStep1 extends WizardStep
       this.wiz=wiz;
       this.rundata=rundata;
       showChoices();
-      if(this.rundata==null)
-         System.err.println("3 data null");
-      else
-         System.err.println("there are "+this.rundata.size()+ " runs");
    }
 
    //Component initialization
    void jbInit() throws Exception{
       runPanel = new JPanel();
+      borderLayout = new BorderLayout();
+      runPanel.setLayout(borderLayout);
+      JPanel topPanel = new JPanel();
       runLabel = new JLabel();
       runLabel.setText("Choose the analysis to save:");
+      topPanel.add(runLabel);
+      JPanel centerPanel = new JPanel();
       runComboBox = new JComboBox();
       runComboBox.addActionListener(new SaveWizardStep1_runComboBox_actionAdapter(this));
-
-      runPanel.add(runLabel, null);
-      runPanel.add(runComboBox, null);
+      centerPanel.add(runComboBox);
+      runPanel.add(topPanel, BorderLayout.NORTH);
+      runPanel.add(centerPanel, BorderLayout.CENTER);
       this.add(runPanel);
    }
 
@@ -54,20 +58,27 @@ public class SaveWizardStep1 extends WizardStep
       else
          System.err.println("there are "+rundata.size()+ " runs");
       if(rundata==null || rundata.size()<1)
+      {
          runComboBox.addItem("No runs available to save");
+         runs_exist=false;
+      }
       else
       {
+          runs_exist=true;
           for(int i=0; i<rundata.size(); i++)
           {
              Map data = (Map) rundata.get(i);
-             runComboBox.addItem("Run "+(i+1));
+             runComboBox.insertItemAt("Run "+(i+1),i);
           }
+          runComboBox.setSelectedIndex(0);
       }
    }
 
-  void runComboBox_actionPerformed(ActionEvent e) {
+   public boolean runsExist() { return runs_exist; }
 
-  }
+   void runComboBox_actionPerformed(ActionEvent e) {
+      wiz.selectRun(runComboBox.getSelectedIndex());
+   }
 
 }
 

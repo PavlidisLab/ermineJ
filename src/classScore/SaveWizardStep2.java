@@ -50,7 +50,7 @@ public class SaveWizardStep2 extends WizardStep
       saveBrowseButton.addActionListener(new SaveWizardStep2_saveBrowseButton_actionAdapter(this));
       saveBrowseButton.setText("Browse....");
       chooser = new JFileChooser();
-      //chooser.setCurrentDirectory(new File(folder));
+      chooser.setCurrentDirectory(new File(folder));
       jPanel11.add(jLabel3, null);
       jPanel11.add(saveFile, null);
       jPanel11.add(saveBrowseButton, null);
