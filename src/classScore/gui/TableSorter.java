@@ -195,7 +195,7 @@ public class TableSorter extends AbstractTableModel {
         return new Arrow(directive.direction == DESCENDING, size, sortingColumns.indexOf(directive));
     }
 
-    private void cancelSorting() {
+    public void cancelSorting() {
         sortingColumns.clear();
         sortingStatusChanged();
     }
@@ -403,21 +403,24 @@ public class TableSorter extends AbstractTableModel {
 
     private class MouseHandler extends MouseAdapter {
         public void mouseClicked(MouseEvent e) {
-            JTableHeader h = (JTableHeader) e.getSource();
-            TableColumnModel columnModel = h.getColumnModel();
-            int viewColumn = columnModel.getColumnIndexAtX(e.getX());
-            int column = columnModel.getColumn(viewColumn).getModelIndex();
-            if (column != -1) {
-                int status = getSortingStatus(column);
-                if (!e.isControlDown()) {
+           if(e.getButton()==MouseEvent.BUTTON1)
+           {
+              JTableHeader h = ( JTableHeader ) e.getSource();
+              TableColumnModel columnModel = h.getColumnModel();
+              int viewColumn = columnModel.getColumnIndexAtX( e.getX() );
+              int column = columnModel.getColumn( viewColumn ).getModelIndex();
+              if ( column != -1 ) {
+                 int status = getSortingStatus( column );
+                 if ( !e.isControlDown() ) {
                     cancelSorting();
-                }
-                // Cycle the sorting states through {NOT_SORTED, ASCENDING, DESCENDING} or
-                // {NOT_SORTED, DESCENDING, ASCENDING} depending on whether shift is pressed.
-                status = status + (e.isShiftDown() ? -1 : 1);
-                status = (status + 4) % 3 - 1; // signed mod, returning {-1, 0, 1}
-                setSortingStatus(column, status);
-            }
+                 }
+                 // Cycle the sorting states through {NOT_SORTED, ASCENDING, DESCENDING} or
+                 // {NOT_SORTED, DESCENDING, ASCENDING} depending on whether shift is pressed.
+                 status = status + ( e.isShiftDown() ? -1 : 1 );
+                 status = ( status + 4 ) % 3 - 1; // signed mod, returning {-1, 0, 1}
+                 setSortingStatus( column, status );
+              }
+           }
         }
     }
 

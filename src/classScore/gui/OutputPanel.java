@@ -24,6 +24,8 @@ import classScore.classPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.classresult;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 /**
  * <p>Title: </p>
@@ -41,12 +43,12 @@ public class OutputPanel extends JScrollPane {
    OutputTableModel model;
    TableSorter sorter;
    GeneSetScoreFrame callingframe;
-   Vector results;
-   Vector resultToolTips = new Vector();
+   LinkedList results;
+   LinkedList resultToolTips = new LinkedList();
    GeneAnnotations geneData;
    GONames goData;
 
-   public OutputPanel(GeneSetScoreFrame callingframe, Vector results) {
+   public OutputPanel(GeneSetScoreFrame callingframe, LinkedList results) {
       this.callingframe=callingframe;
       this.results=results;
       model = new OutputTableModel(results);
@@ -73,6 +75,13 @@ public class OutputPanel extends JScrollPane {
       popup.add(menuItem);
       MouseListener popupListener = new OutputPanel_PopupListener(popup);
       table.addMouseListener(popupListener);
+
+      RemoveRunPopupMenu removeRunPopup = new RemoveRunPopupMenu();
+      JMenuItem removeRunMenuItem = new JMenuItem("Remove this run...");
+      removeRunMenuItem.addActionListener(new OutputPanel_removeRunPopupMenu_actionAdapter(this));
+      removeRunPopup.add(removeRunMenuItem);
+      MouseListener removeRunPopupListener = new OutputPanel_removeRunPopupListener(removeRunPopup);
+      table.getTableHeader().addMouseListener(removeRunPopupListener);
    }
 
    void table_mouseReleased( MouseEvent e ) {
@@ -81,7 +90,7 @@ public class OutputPanel extends JScrollPane {
       if(table.getValueAt(i,j) != null && j>=OutputTableModel.init_cols)
       {
          //int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
-         int runnum = j - OutputTableModel.init_cols;
+         int runnum = model.getRunNum(j);
          String id = (String)table.getValueAt(i,0);
          ((classPvalRun)results.get(runnum)).showDetails(id);
       }
@@ -96,12 +105,27 @@ public class OutputPanel extends JScrollPane {
       cwiz.showWizard();
    }
 
+   void removeRunPopupMenu_actionPerformed(ActionEvent e) {
+      RemoveRunPopupMenu sourcePopup = (RemoveRunPopupMenu)
+          ((Container) e.getSource()).getParent();
+      int c = table.getTableHeader().columnAtPoint(sourcePopup.getPoint());
+      TableColumn col = table.getColumn(model.getColumnName(c));
+      System.err.println("remove popup for col: " + c);
+      table.removeColumn(col);
+      model.removeRunData(c);
+      model.fireTableStructureChanged();
+      int runnum = model.getRunNum(c);
+      results.remove(runnum);
+      resultToolTips.remove(runnum);
+      table.revalidate();
+   }
+
    String getHeaderToolTip(int index)
    {
       if(index>=OutputTableModel.init_cols)
       {
          //int runnum=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
-         int runnum=index - OutputTableModel.init_cols;
+         int runnum=model.getRunNum(index);
          return (String) resultToolTips.get(runnum);
       }
       else
@@ -162,17 +186,14 @@ public class OutputPanel extends JScrollPane {
 
    public void addRun() {
       model.addRun();
-      int pval_col = model.getColumnCount() - 1;
-      //int score_col = model.getColumnCount() - 2;
-      //int rank_col = model.getColumnCount() - 3;
-      //table.addColumn(new TableColumn(rank_col));
-      //table.addColumn(new TableColumn(score_col));
-      table.addColumn(new TableColumn(pval_col));
-      //table.getColumnModel().getColumn(rank_col).setPreferredWidth(30);
-      //table.getColumnModel().getColumn(score_col).setPreferredWidth(30);
-      table.getColumnModel().getColumn(pval_col).setPreferredWidth(30);
+      int c = model.getColumnCount() - 1;
+      TableColumn col = new TableColumn(c);
+      col.setIdentifier(model.getColumnName(c));
+      table.addColumn(col);
+      table.getColumnModel().getColumn(c).setPreferredWidth(30);
       generateToolTip(model.getColumnCount()-OutputTableModel.init_cols-1);
-      sorter.setSortingStatus(pval_col,TableSorter.ASCENDING);
+      sorter.cancelSorting();
+      sorter.setSortingStatus(c,TableSorter.ASCENDING);
       table.revalidate();
    }
 }
@@ -231,8 +252,53 @@ class OutputPanel_PopupListener extends MouseAdapter {
          JTable source = (JTable) e.getSource();
          int r = source.rowAtPoint(e.getPoint());
          String id = (String) source.getValueAt(r, 0);
-         //if (id.compareTo("") != 0) {
          if (id != null) {
+            popup.show(e.getComponent(), e.getX(), e.getY());
+            popup.setPoint(e.getPoint());
+         }
+      }
+   }
+}
+
+class OutputPanel_removeRunPopupMenu_actionAdapter implements java.awt.event.ActionListener {
+   OutputPanel adaptee;
+
+   OutputPanel_removeRunPopupMenu_actionAdapter(OutputPanel adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.removeRunPopupMenu_actionPerformed(e);
+   }
+}
+
+
+class RemoveRunPopupMenu extends JPopupMenu {
+   Point popupPoint;
+   public Point getPoint() {return popupPoint;
+   }
+
+   public void setPoint(Point point) {popupPoint = point;
+   }
+}
+
+class OutputPanel_removeRunPopupListener extends MouseAdapter {
+   RemoveRunPopupMenu popup;
+   OutputPanel_removeRunPopupListener(RemoveRunPopupMenu popupMenu) {popup = popupMenu;
+   }
+
+   public void mousePressed(MouseEvent e) {maybeShowPopup(e);
+   }
+
+   public void mouseReleased(MouseEvent e) {maybeShowPopup(e);
+   }
+
+   private void maybeShowPopup(MouseEvent e) {
+      if (e.isPopupTrigger()) {
+         JTableHeader source = (JTableHeader) e.getSource();
+         int c = source.columnAtPoint(e.getPoint());
+         if(c >= OutputTableModel.init_cols)
+         {
             popup.show(e.getComponent(), e.getX(), e.getY());
             popup.setPoint(e.getPoint());
          }
@@ -243,14 +309,14 @@ class OutputPanel_PopupListener extends MouseAdapter {
 class OutputTableModel extends AbstractTableModel {
    GeneAnnotations geneData;
    GONames goData;
-   Vector results;
-   Vector columnNames = new Vector();
+   LinkedList results;
+   LinkedList columnNames = new LinkedList();
    private NumberFormat nf = NumberFormat.getInstance();
    int state = -1;
    public static final int init_cols = 4;
    //public static final int cols_per_run = 3;
 
-   public OutputTableModel(Vector results) {
+   public OutputTableModel(LinkedList results) {
       this.results=results;
       nf.setMaximumFractionDigits(2);
       columnNames.add("Name");
@@ -267,23 +333,27 @@ class OutputTableModel extends AbstractTableModel {
 
    public void addRunData(Map result) {
       state++;
-      //columnNames.add("Run " + state + " Rank");
-      //columnNames.add("Run " + state + " Score");
       columnNames.add("Run " + state + " Pval");
       results.add(result);
    }
 
+   public void removeRunData(int c) {
+      columnNames.remove(c);
+      System.err.println("number of cols: " + columnNames.size());
+   }
+
    public void addRun() {
       state++;
-      //columnNames.add("Run " + state + " Rank");
-      //columnNames.add("Run " + state + " Score");
       columnNames.add("Run " + state + " Pval");
    }
 
-   public String getColumnName(int i) {return (String) columnNames.get(i);
+   public String getColumnName(int i) {
+      return (String) columnNames.get(i);
    }
 
-   public int getColumnCount() {return columnNames.size();
+   public int getColumnCount() {
+      System.err.println(columnNames.size());
+      return columnNames.size();
    }
 
    public int getRowCount() {
@@ -294,10 +364,13 @@ class OutputTableModel extends AbstractTableModel {
       }
    }
 
+   public int getRunNum(int c) {
+      return c-init_cols;
+   }
+
    public Object getValueAt(int i, int j) {
+      String classid = geneData.getClass(i);
       if (state >= 0 && j < init_cols) {
-         String classid;
-            classid = geneData.getClass(i);
          switch (j) {
          case 0:
             return classid;
@@ -309,8 +382,7 @@ class OutputTableModel extends AbstractTableModel {
                return new Integer(geneData.numGenes(classid));
          }
       } else if (state > 0) {
-         String classid = geneData.getClass(i);
-         int runnum = j - init_cols;
+         int runnum = getRunNum(j);
          Map data = ((classPvalRun)results.get(runnum)).getResults();
          if (data.containsKey(classid)) {
             classresult res = (classresult) data.get(classid);
@@ -327,7 +399,7 @@ class OutputTableModel extends AbstractTableModel {
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
 {
    GONames goData;
-   Vector results;
+   LinkedList results;
    static Color spread1 = new Color(220,220,160);
    static Color spread2 = new Color(205,222,180);
    static Color spread3 = new Color(190,224,200);
@@ -335,7 +407,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
    static Color spread5 = new Color(160,228,240);
    static Color modified = new Color(220,160,220);
 
-   public OutputPanelTableCellRenderer(GONames goData, Vector results)
+   public OutputPanelTableCellRenderer(GONames goData, LinkedList results)
    {
       super();
       this.goData=goData;
@@ -385,4 +457,5 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
    }
 
 }
+
 

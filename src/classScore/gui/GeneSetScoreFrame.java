@@ -53,7 +53,7 @@ public class GeneSetScoreFrame
    GeneSetScoreStatus statusMessenger;
    GONames goData;
    GeneAnnotations geneData;
-   Vector results = new Vector();
+   LinkedList results = new LinkedList();
 
    AnalysisThread athread=new AnalysisThread();
    //javax.swing.Timer initMonitor;
@@ -280,6 +280,10 @@ public class GeneSetScoreFrame
 
    public Settings getSettings() {
       return settings;
+   }
+
+   public void setSettings(Settings settings) {
+      this.settings=settings;
    }
 
    public GeneSetScoreStatus getStatusMessenger(){

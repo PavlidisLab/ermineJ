@@ -53,7 +53,11 @@ public class GONames {
     * @return String
     */
    public String getNameForId(String go_ID) {
-      return (String) (goNameMap.get(go_ID));
+      String name=(String) (goNameMap.get(go_ID));
+      if(name==null)
+         return "<no description available>";
+      else
+         return name;
    }
 
    /**

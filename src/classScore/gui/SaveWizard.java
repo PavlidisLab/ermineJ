@@ -22,13 +22,13 @@ public class SaveWizard extends Wizard
    int step = 1;
    int selected_run;
    GeneSetScoreFrame callingframe;
-   Vector rundata;
+   LinkedList rundata;
    Thread aFrameRunner;
    String saveFolder;
    SaveWizardStep1 step1;
    SaveWizardStep2 step2;
 
-   public SaveWizard(GeneSetScoreFrame callingframe, Vector rundata) {
+   public SaveWizard(GeneSetScoreFrame callingframe, LinkedList rundata) {
       super(callingframe,400,200);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;

@@ -44,6 +44,7 @@ public class AnalysisThread {
 
    private void doAnalysis() {
       try {
+         messenger.setStatus("Starting analysis...");
          expClassScore probePvalMapper = new expClassScore( settings );
          geneData = new GeneAnnotations(geneData, probePvalMapper.get_map()); //default replaced by new geneData
          GeneGroupReader groupName = new GeneGroupReader(
@@ -53,6 +54,7 @@ public class AnalysisThread {
          classPvalRun runResult = new classPvalRun( settings, geneData, goData,
              probePvalMapper, "bh", messenger );
          csframe.addResult( runResult );
+         csframe.setSettings(settings);
          athread=null;
       }
       catch ( IOException ioe ) {

@@ -19,14 +19,14 @@ import baseCode.gui.*;
 public class SaveWizardStep1 extends WizardStep
 {
    SaveWizard wiz;
-   Vector rundata;
+   LinkedList rundata;
    JPanel runPanel;
    JComboBox runComboBox;
    JLabel runLabel;
    BorderLayout borderLayout;
    boolean runs_exist;
 
-   public SaveWizardStep1(SaveWizard wiz, Vector rundata)
+   public SaveWizardStep1(SaveWizard wiz, LinkedList rundata)
    {
       super(wiz);
       this.wiz=wiz;

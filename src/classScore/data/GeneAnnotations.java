@@ -31,10 +31,11 @@ import javax.swing.table.TableModel;
 
 public class GeneAnnotations {
    private Map probeToClassMap; //stores probe->Classes map
-   private Map classToProbeMap; //stores Classes->probe map
+   private Map classToProbeMap; //stores Classes->probes map
    private Map probeToGeneName;
    private Map probeToDescription;
    private Map geneToProbeList;
+   private Map classToGeneMap; //stores Classes->genes map
    private Vector probeList;
    private Map probes; /** @todo this should be a Set? */
    private Vector sortedGeneSets;
@@ -56,6 +57,7 @@ public class GeneAnnotations {
       probeToDescription = new HashMap();
       geneToProbeList = new HashMap();
       this.readFile( filename );
+      classToGeneMap = makeClassToGeneMap();
    }
 
    /**
@@ -100,6 +102,7 @@ public class GeneAnnotations {
                probeToDescription.remove(probe);
          }
       }
+      classToGeneMap = makeClassToGeneMap();
    }
 
    /**
@@ -109,6 +112,22 @@ public class GeneAnnotations {
     */
    public GeneAnnotations( String filename ) throws IOException {
       this( filename, null );
+   }
+
+   private HashMap makeClassToGeneMap() {
+      HashMap map = new HashMap();
+      Iterator it = classToProbeMap.keySet().iterator();
+      while ( it.hasNext() ) {
+         String id = (String)it.next();
+         HashSet genes = new HashSet();
+         ArrayList probes = ( ArrayList ) classToProbeMap.get( id );
+         Iterator probe_it = probes.iterator();
+         while ( probe_it.hasNext() ) {
+            genes.add( probeToGeneName.get( ( String ) probe_it.next() ) );
+         }
+         map.put(id,genes);
+      }
+      return map;
    }
 
 //read in file
@@ -298,13 +317,7 @@ public class GeneAnnotations {
    }
 
    public int numGenes( String id ) {
-      HashSet genes = new HashSet();
-      ArrayList probes = ( ArrayList ) classToProbeMap.get( id );
-      Iterator probe_it = probes.iterator();
-      while ( probe_it.hasNext() ) {
-         genes.add( probeToGeneName.get( ( String ) probe_it.next() ) );
-      }
-      return genes.size();
+      return ((HashSet)classToGeneMap.get(id)).size();
    }
 
    /**
