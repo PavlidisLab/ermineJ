@@ -19,13 +19,14 @@ public class histogram {
    private Matrix M = null; // holds the actual histograms. Each row is a histogram.
    private double minPval; // the smallest possible pvalue: used when a requested score is out of the top of the range.
 
-   /**
-    */
-   public histogram() {
-      ;
-   }
+   public histogram() {}
 
    /**
+    *
+    * @param number_of_class int
+    * @param min_class_size int
+    * @param number_of_runs int
+    * @param max double
     */
    public histogram(int number_of_class, int min_class_size, int number_of_runs,
                     double max) {
@@ -55,6 +56,8 @@ public class histogram {
    }
 
    /**
+    *
+    * @param runs int
     */
    public void set_number_of_runs(int runs) {
       number_of_runs = runs;
@@ -64,7 +67,10 @@ public class histogram {
    }
 
    /**
-    Update the count for one bin.
+    * Update the count for one bin.
+    *
+    * @param row int
+    * @param value double
     */
    public void update(int row, double value) {
 
@@ -83,7 +89,10 @@ public class histogram {
    }
 
    /**
-     Convert a raw histogram to a cdf.
+    * Convert a raw histogram to a cdf.
+    *
+    * @param number_of_class int
+    * @param class_min_size int
     */
    public void tocdf(int number_of_class, int class_min_size) {
 
@@ -100,24 +109,32 @@ public class histogram {
    }
 
    /**
+    *
+    * @return double
     */
    public double get_bin_size() {
       return bin_size;
    }
 
    /**
+    *
+    * @return double
     */
    public double get_hist_min() {
       return hist_min;
    }
 
    /**
+    *
+    * @return double
     */
    public double get_hist_max() {
       return hist_max;
    }
 
    /**
+    *
+    * @return int
     */
    public int get_number_of_bins() {
       return number_of_bins;
@@ -128,12 +145,17 @@ public class histogram {
    }
 
    /**
+    *
+    * @return int
     */
    public int get_number_of_runs() {
       return number_of_runs;
    }
 
-   /** todo: this should be disallowed.
+   /**
+    * todo: this should be disallowed.
+    *
+    * @return Matrix
     */
    public Matrix get_matrix() {
       return M;
@@ -152,6 +174,10 @@ public class histogram {
    }
 
    /**
+    *
+    * @param class_size int
+    * @param min_class_size int
+    * @return int
     */
    public int class_index(int class_size, int min_class_size) {
       //get corresponding index for each class size
@@ -159,6 +185,10 @@ public class histogram {
    }
 
    /**
+    *
+    * @param class_size int
+    * @param rawscore double
+    * @return double
     */
    public double get_val(int class_size, double rawscore) {
       if (rawscore > hist_max || rawscore < hist_min) { // sanity check.
@@ -205,6 +235,10 @@ public class histogram {
    }
 
    /**
+    *
+    * @param row int
+    * @param binnum int
+    * @return double
     */
    public double get_pval(int row, int binnum) {
       double pval = M.get_matrix_val(row, binnum);
@@ -214,5 +248,35 @@ public class histogram {
          return pval;
       }
    }
+
+   /**
+    * return mean of top 2 elements in array, for histogram range setting
+    *
+    * @param inArray double[]
+    * @return double
+    */
+   public static double meanOfTop2(double[] inArray) {
+      double max1 = 0;
+      double max2 = 0;
+      int pin = 0;
+
+      if (inArray.length == 0) {
+         throw new IllegalArgumentException("No values for meanofTop2!");
+      }
+
+      for (int i = 0; i < inArray.length; i++) {
+         if (max1 < inArray[i]) {
+            max1 = inArray[i];
+            pin = i;
+         }
+      }
+      for (int i = 0; i < inArray.length; i++) {
+         if (max2 < inArray[i] && i != pin) {
+            max2 = inArray[i];
+         }
+      }
+      return (max1 + max2) / 2;
+   }
+
 
 }

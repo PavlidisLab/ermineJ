@@ -1,7 +1,6 @@
 package classScore;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,8 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
-import util.Stats;
+import baseCode.math.DescriptiveWithMissing;
+import baseCode.math.Stats;
 
 /**
     Calculates a background distribution for class sscores derived
@@ -43,7 +42,12 @@ public class expClassScore {
    private static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
 
    /**
-     Can use when pvalue column is 1, and taking logs, and defaults are ok.
+    * Can use when pvalue column is 1, and taking logs, and defaults are ok.
+    *
+    * @param pvalFilename String
+    * @param wt_check String
+    * @param in_method String
+    * @throws IOException
     */
    public expClassScore(String pvalFilename, String wt_check,
                         String in_method) throws IOException {
@@ -51,7 +55,14 @@ public class expClassScore {
    }
 
    /**
-     Use defaults for most things.
+    * Use defaults for most things.
+    *
+    * @param pvalFilename String
+    * @param wt_check String
+    * @param in_method String
+    * @param pvalcolumn int
+    * @param dolog boolean
+    * @throws IOException
     */
    public expClassScore(String pvalFilename, String wt_check,
                         String in_method, int pvalcolumn, boolean dolog) throws
@@ -61,16 +72,25 @@ public class expClassScore {
    }
 
    /**
-     Set everything according to parameters.
-     @param filename_pval File that contains the scores for each probe
-     @param wt_check Whether weights should be used or not
-     @param in_method The class scoring method: Mean, Quantile, etc.
-     @param pvalcolumn Which column in the data file contains the scores we will use. The first column contains probe labels and is not counted.
-     @param dolog Whether the log of the scores should be used. Use true when working with p-values
-    @param class_max_size The largest class that will be considered. This refers to the apparent size.
-    @param class_min_size The smallest  class that will be considered. This refers to the apparent size.
-    @param number_of_runs How many random trials are done when generating background distributions.
-     @param quantile A number from 1-100. This is ignored unless a quantile method is selected.
+    * Set everything according to parameters.
+    *
+    * @param filename_pval File that contains the scores for each probe
+    * @param wt_check Whether weights should be used or not
+    * @param in_method The class scoring method: Mean, Quantile, etc.
+    * @param pvalcolumn Which column in the data file contains the scores we
+    *   will use. The first column contains probe labels and is not counted.
+    * @param dolog Whether the log of the scores should be used. Use true when
+    *   working with p-values
+    * @param classMaxSize The largest class that will be considered. This
+    *   refers to the apparent size.
+    * @param classMinSize The smallest class that will be considered. This
+    *   refers to the apparent size.
+    * @param number_of_runs How many random trials are done when generating
+    *   background distributions.
+    * @param quantile A number from 1-100. This is ignored unless a quantile
+    *   method is selected.
+    * @throws IllegalArgumentException
+    * @throws IOException
     */
    public expClassScore(String filename_pval, String wt_check,
                         String in_method, int pvalcolumn, boolean dolog,
@@ -102,19 +122,21 @@ public class expClassScore {
 
    /**
     *
-    * @return
+    * @return classScore.histogram
     */
    public histogram generateNullDistribution() {
       return this.generateNullDistribution(null);
    }
 
    /**
-    * Used for methods which require randomly sampling classes to
-    * generate a null distribution of scores.
-    * @return A histogram object containing a cdf that can be used to generate pvalues.
+    * Used for methods which require randomly sampling classes to generate a
+    * null distribution of scores.
+    *
+    * @return A histogram object containing a cdf that can be used to generate
+    *   pvalues.
+    * @param m classScoreStatus
     */
    public histogram generateNullDistribution(classScoreStatus m) {
-      Stats statistics = new Stats();
 
       int i, j, k;
 
@@ -127,10 +149,10 @@ public class expClassScore {
 
       // do the right thing if we are using weights.
       if (useWeights) {
-         num_genes = Array.getLength(groupPvals);
+         num_genes = groupPvals.length;
          in_pval = groupPvals;
       } else {
-         num_genes = Array.getLength(pvals);
+         num_genes = pvals.length;
          in_pval = pvals;
       }
 
@@ -150,7 +172,7 @@ public class expClassScore {
          double[] random_class = new double[i]; // holds data for random class.
          double rawscore = 0.0;
          for (k = 0; k < numRuns; k++) {
-            statistics.chooserandom(random_class, in_pval, deck, num_genes, i);
+            baseCode.math.RandomChooser.chooserandom(random_class, in_pval, deck, num_genes, i);
             rawscore = calc_rawscore(random_class, i);
             hist.update(i - classMinSize, rawscore);
          }
@@ -179,39 +201,54 @@ public class expClassScore {
       return hist;
    }
 
-   /**  */
+   /**
+    *
+    * @param value int
+    */
    public void setClassMaxSize(int value) {
       classMaxSize = value;
    }
 
-   /**  */
+   /**
+    *
+    * @return int
+    */
    public int get_number_of_runs() {
       return numRuns;
    }
 
-   /**  */
+   /**
+    *
+    * @return int
+    */
    public int get_class_max_size() {
       return classMaxSize;
    }
 
    /**  */
    public void set_range() {
-      histogramMax = Stats.meanOfTop2(useWeights ? groupPvals : pvals);
+      histogramMax = histogram.meanOfTop2(useWeights ? groupPvals : pvals);
    }
 
-   /**  */
+   /**
+    *
+    * @return double
+    */
    public double get_range() {
       return histogramMax;
    }
 
-   /**  */
+   /**
+    *
+    * @return double[]
+    */
    public double[] get_pvals() {
       return pvals;
    }
 
    /**
     *
-    * @return
+    * @return double[]
     */
    public double[] get_in_pvals() {
       return useWeights ? groupPvals : pvals;
@@ -219,25 +256,34 @@ public class expClassScore {
 
    /**
     *
-    * @param probe
-    * @return
+    * @param probe String
+    * @return double
     */
    public double getPval(String probe) {
       return ((Double)this.probePvalMap.get(probe)).doubleValue();
    }
 
-   /**  */
+   /**
+    *
+    * @return int
+    */
    public int get_class_min_size() {
       return classMinSize;
    }
 
-   /**  */
+   /**
+    *
+    * @param value int
+    */
    public void setQuantile(int value) {
       quantile = value;
       quantfract = (double) quantile / 100.0;
    }
 
-   /**  */
+   /**
+    *
+    * @return int
+    */
    public int get_quantile() {
       return quantile;
    }
@@ -245,9 +291,11 @@ public class expClassScore {
    /**
     * Each pvalue is adjusted to the mean (or best) of all the values in the
     * 'replicate group'
-    * @param Map groupProbeMap Map of groups to probes.
-    * @param String gp_method Which method we use to calculate scores
-    * for genes that occur more than once in the data set.
+    *
+    * @param groupProbeMap groupProbeMap Map of groups to probes.
+    * @param gp_method gp_method Which method we use to calculate scores for
+    *   genes that occur more than once in the data set.
+    * @throws IllegalArgumentException
     */
    public void setInputPvals(Map groupProbeMap, String gp_method) throws
            IllegalArgumentException {
@@ -341,12 +389,19 @@ public class expClassScore {
       }
    }
 
-   /**  */
+   /**
+    *
+    * @return Map
+    */
    public Map get_map() {
       return probePvalMap;
    }
 
-   /**  */
+   /**
+    *
+    * @param shuffle boolean
+    * @return Map
+    */
    public Map get_map(boolean shuffle) {
 
       if (shuffle) {
@@ -373,12 +428,11 @@ public class expClassScore {
       }
    }
 
-   /**  */
-   //    public int get_method() {
-   //	return method; // todo: make this return the appropriate string..not used anyway
-   //}
-
-   /**  */
+   /**
+    *
+    * @param probe_id String
+    * @return double
+    */
    public double get_value_map(String probe_id) {
       double value = 0.0;
       if (probePvalMap.get(probe_id) != null) {
@@ -388,33 +442,46 @@ public class expClassScore {
    }
 
    /**
-    Basic method to calculate the raw score, given an array of the gene scores for items in the class.
+    * Basic method to calculate the raw score, given an array of the gene scores
+    * for items in the class. Note that performance here is important.
+    *
+    * @param genevalues double[]
+    * @param effsize int
+    * @throws IllegalArgumentException
+    * @return double
     */
    public double calc_rawscore(double[] genevalues, int effsize) throws
            IllegalArgumentException {
 
       if (method == MEAN_METHOD) {
-         return Stats.mean(genevalues, effsize);
+         return DescriptiveWithMissing.mean(genevalues, effsize);
       } else {
          int index = (int) Math.floor(quantfract * effsize);
          if (method == QUANTILE_METHOD) {
-            return Stats.calculate_quantile(index, genevalues, effsize);
+            return Stats.quantile(index, genevalues, effsize);
          } else if (method == MEAN_ABOVE_QUANTILE_METHOD) {
-            return Stats.calculate_mean_above_quantile(index, genevalues,
+            return Stats.meanAboveQuantile(index, genevalues,
                     effsize);
          } else {
-            throw new IllegalArgumentException(
-                    "Illegal raw score calculation method selected");
+            throw new IllegalStateException(
+                    "Unknown raw score calculation method selected");
          }
       }
    }
 
-   /** */
+   /**
+    *
+    * @return histogram
+    */
    public histogram get_hist() {
       return hist;
    }
 
-   /** */
+   /**
+    *
+    * @param meth String
+    * @throws IllegalArgumentException
+    */
    private void setMethod(String meth) throws IllegalArgumentException {
       if (meth.equals("MEAN_METHOD")) {
          method = MEAN_METHOD;

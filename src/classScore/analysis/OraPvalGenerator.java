@@ -9,15 +9,14 @@ import java.util.Map;
 import classScore.GONameReader;
 import classScore.classresult;
 import classScore.expClassScore;
-import util.SpecFunc;
-
+import cern.jet.stat.Probability;
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Institution:: Columbia University</p>
- * @author not attributable
+* <p>Copyright (c) 2004</p>
+ * <p>Institution: Columbia University</p>
+ * @author Paul Pavlidis
  * @version 1.0
+ *  @todo add tests
+ * @todo returns a new result object, probably not what we want (?)
  */
 
 public class OraPvalGenerator
@@ -138,23 +137,21 @@ public class OraPvalGenerator
          } // if in data set
       } // end of while over items in the class.
 
-      // Hypergeometric p value calculation. Using the binomial
-      // approximation.  Only look at over-represented
-      // genes. Identify these by seeing if the observed is greater
-      // than the expected. Otherwise, set the hypergeometric pvalue
-      // to be 1.0 (we can change this behavior if desired)
+      // Hypergeometric p value calculation.
+      // successes=number of genes in class which meet criteria
+ // (successes); numOverThreshold= number of genes which
+ // meet criteria (trials); pos_prob: fractional size of
+ // class wrt data size.
       double pos_prob = (double) effSize / (double) inputSize;
       double expected = (double) numOverThreshold * pos_prob;
+      // lower tail.
       if (successes < expected || pos_prob == 0.0) { // fewer than expected, or we didn't/cant get anything.
-         hyper_pval = 1.0 -
-             (double) (SpecFunc.binomialCumProb(successes, numOverThreshold,
+         hyper_pval =
+             (double) (Probability.binomial(numOverThreshold, successes,
                                                 pos_prob));
       } else {
-         // successes=number of genes in class which meet criteria
-         // (successes); numOverThreshold= number of genes which
-         // meet criteria (trials); pos_prob: fractional size of
-         // class wrt data size.
-         hyper_pval = SpecFunc.binomialCumProb(successes, numOverThreshold,
+         // Upper tail.
+         hyper_pval = Probability.binomialComplemented(numOverThreshold, successes,
                                                pos_prob);
       }
 

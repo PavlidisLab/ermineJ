@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import util.Matrix;
-import util.Stats;
 
 /**
    Create background distribution of class correlation where the class correlation is the average pairwise correlation between the vectors in the class
@@ -39,20 +38,19 @@ public class corr_class_scores {
       int count = 0;
       int[] randomnums = null;
       double avecorrel = 0.0;
-      Stats statistics = new Stats();
       histogram hist = new histogram();
       //create matrix object from probe data file size
       Matrix correls = new Matrix(data.get_num_rows(), data.get_num_rows());
       int number_of_class = class_max_size - class_min_size + 1;
       Matrix mat = new Matrix(number_of_class, number_of_runs);
 
-      statistics.correl_matrix(data, correls);
+  //    statistics.correl_matrix(data, correls);
 
       for (i = class_min_size; i <= class_max_size; i++) {
          randomnums = new int[i];
          for (j = 0; j < number_of_runs; j++) {
             avecorrel = 0.0;
-            statistics.chooserandom_1(randomnums, data.get_num_rows(), i);
+      //      statistics.chooserandom_1(randomnums, data.get_num_rows(), i);
             avecorrel = classcorrel(randomnums, correls.get_matrix_double(), i);
             mat.set_matrix_val(count, j, avecorrel);
          }

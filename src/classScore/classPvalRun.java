@@ -18,7 +18,7 @@ import javax.swing.table.TableModel;
 import classScore.analysis.ClassPvalSetGenerator;
 import classScore.analysis.ClassSizeComputer;
 import classScore.analysis.MultipleTestCorrector;
-import util.Stats;
+import baseCode.math.Rank;
 
 /**
   Main class to make 'experiment score' pvalues. Includes multiple
@@ -183,10 +183,10 @@ public class classPvalRun {
          Map input_rank_map;
          if (weight_on) {
       //      inp_entries = probePvalMapper.get_group_pval_map().entrySet();
-            input_rank_map = Stats.rankOf(probePvalMapper.get_group_pval_map());
+            input_rank_map = Rank.rankTransform(probePvalMapper.get_group_pval_map());
          } else {
     //        inp_entries = probePvalMapper.get_map().entrySet();
-            input_rank_map = Stats.rankOf(probePvalMapper.get_map());
+            input_rank_map = Rank.rankTransform(probePvalMapper.get_map());
          }
 
          inputSize = input_rank_map.size(); // how many pvalues. This is constant under permutations of the data

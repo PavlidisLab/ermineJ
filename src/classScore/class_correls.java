@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import util.Matrix;
-import util.Stats;
+//import util.Stats;
 
 /**
  Calculates the raw average class correlations using a background distribution.    Created :09/02/02
@@ -83,7 +83,6 @@ public class class_correls {
    public void class_correl_generator()
 
    {
-      Stats statistics = new Stats();
       Collection entries = go_probe.entrySet();
       Iterator it = entries.iterator();
       //to store each class number
@@ -164,7 +163,7 @@ public class class_correls {
                   double avecorrel = 0.0;
                   //calculate correlation
                   Matrix C = new Matrix(V.get_num_rows(), V.get_num_rows());
-                  statistics.correl_matrix(V, C);
+             //     statistics.correl_matrix(V, C); /** @todo we need this */
 
                   avecorrel = classcorrel(C.get_matrix_double(), C.get_num_rows());
 

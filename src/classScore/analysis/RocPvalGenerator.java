@@ -9,12 +9,11 @@ import classScore.GONameReader;
 import classScore.classresult;
 import classScore.expClassScore;
 import classScore.histogram;
-import util.Stats;
-
+import baseCode.math.ROC;
 /**
  * <p>Copyright (c) 2004</p>
  * <p>Institution: Columbia University</p>
- * @author not attributable
+ * @author Paul Pavlidis
  * @version 1.0
  */
 
@@ -59,9 +58,6 @@ public class RocPvalGenerator
 
       ArrayList values = (ArrayList) classToProbe.get(class_name);
       Iterator classit = values.iterator();
-
-      // record.clear();
-      //  target_ranks.clear();
       Object ranking = null;
 
       // foreach item in the class.
@@ -87,8 +83,8 @@ public class RocPvalGenerator
          } // if in data set
       } // end of while over items in the class.
 
-      double area_under_roc = Stats.arocRate(inputSize, target_ranks);
-      double roc_pval = Stats.rocpval(target_ranks.size(), area_under_roc);
+      double area_under_roc = ROC.aroc(inputSize, target_ranks);
+      double roc_pval = ROC.rocpval(target_ranks.size(), area_under_roc);
 
       // set up the return object.
       classresult res = new classresult(class_name,

@@ -7,10 +7,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import baseCode.math.Rank;
 import classScore.classresult;
 import classScore.expClassScore;
 import classScore.histogram;
-import util.Stats;
+//import util.Stats;
 
 /**
  * Perform multiple test correction on class scores.
@@ -157,9 +158,9 @@ public class MultipleTestCorrector {
          // Just for AROC:
          Map scinput_rank_map;
          if (weight_on) {
-            scinput_rank_map = Stats.rankOf(scgroup_pval_map);
+            scinput_rank_map = Rank.rankTransform(scgroup_pval_map);
          } else {
-            scinput_rank_map = Stats.rankOf(scprobepvalmap);
+            scinput_rank_map = Rank.rankTransform(scprobepvalmap);
          }
 
          /// permscores contains a list of the p values for the shuffled data.
