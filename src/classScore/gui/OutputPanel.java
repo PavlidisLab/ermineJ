@@ -1,13 +1,29 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.text.NumberFormat;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import classScore.data.*;
-import classScore.*;
+import java.util.Map;
+import java.util.Vector;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import classScore.Settings;
+import classScore.classPvalRun;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.classresult;
 
 /**
  * <p>Title: </p>
@@ -23,6 +39,7 @@ import classScore.*;
 public class OutputPanel extends JScrollPane {
    JTable table;
    OutputTableModel model;
+   TableSorter sorter;
    GeneSetScoreFrame callingframe;
    Vector results;
    Vector resultToolTips = new Vector();
@@ -63,7 +80,8 @@ public class OutputPanel extends JScrollPane {
       int j = table.getSelectedColumn();
       if(table.getValueAt(i,j) != null && j>=OutputTableModel.init_cols)
       {
-         int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
+         //int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
+         int runnum = j - OutputTableModel.init_cols;
          String id = (String)table.getValueAt(i,0);
          ((classPvalRun)results.get(runnum)).showDetails(id);
       }
@@ -82,7 +100,8 @@ public class OutputPanel extends JScrollPane {
    {
       if(index>=OutputTableModel.init_cols)
       {
-         int runnum=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
+         //int runnum=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
+         int runnum=index - OutputTableModel.init_cols;
          return (String) resultToolTips.get(runnum);
       }
       else
@@ -130,26 +149,30 @@ public class OutputPanel extends JScrollPane {
       this.geneData=geneData;
       this.goData=goData;
       model.addInitialData(geneData, goData);
-      TableSorter sorter = new TableSorter(model);
+      sorter = new TableSorter(model);
       table.setModel(sorter);
       sorter.setTableHeader(table.getTableHeader());
       this.getViewport().add(table, null);
       table.getColumnModel().getColumn(0).setPreferredWidth(30);
       table.getColumnModel().getColumn(2).setPreferredWidth(30);
       table.getColumnModel().getColumn(3).setPreferredWidth(30);
-      table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer(goData));
+      table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer(goData,results));
       table.revalidate();
    }
 
    public void addRun() {
       model.addRun();
-      table.addColumn(new TableColumn(model.getColumnCount() - 3));
-      table.addColumn(new TableColumn(model.getColumnCount() - 2));
-      table.addColumn(new TableColumn(model.getColumnCount() - 1));
-      table.getColumnModel().getColumn(model.getColumnCount() - 3).setPreferredWidth(30);
-      table.getColumnModel().getColumn(model.getColumnCount() - 2).setPreferredWidth(30);
-      table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
-      generateToolTip(((model.getColumnCount()-OutputTableModel.init_cols)/OutputTableModel.cols_per_run)-1);
+      int pval_col = model.getColumnCount() - 1;
+      //int score_col = model.getColumnCount() - 2;
+      //int rank_col = model.getColumnCount() - 3;
+      //table.addColumn(new TableColumn(rank_col));
+      //table.addColumn(new TableColumn(score_col));
+      table.addColumn(new TableColumn(pval_col));
+      //table.getColumnModel().getColumn(rank_col).setPreferredWidth(30);
+      //table.getColumnModel().getColumn(score_col).setPreferredWidth(30);
+      table.getColumnModel().getColumn(pval_col).setPreferredWidth(30);
+      generateToolTip(model.getColumnCount()-OutputTableModel.init_cols-1);
+      sorter.setSortingStatus(pval_col,TableSorter.ASCENDING);
       table.revalidate();
    }
 }
@@ -225,7 +248,7 @@ class OutputTableModel extends AbstractTableModel {
    private NumberFormat nf = NumberFormat.getInstance();
    int state = -1;
    public static final int init_cols = 4;
-   public static final int cols_per_run = 3;
+   //public static final int cols_per_run = 3;
 
    public OutputTableModel(Vector results) {
       this.results=results;
@@ -244,16 +267,16 @@ class OutputTableModel extends AbstractTableModel {
 
    public void addRunData(Map result) {
       state++;
-      columnNames.add("Run " + state + " Rank");
-      columnNames.add("Run " + state + " Score");
+      //columnNames.add("Run " + state + " Rank");
+      //columnNames.add("Run " + state + " Score");
       columnNames.add("Run " + state + " Pval");
       results.add(result);
    }
 
    public void addRun() {
       state++;
-      columnNames.add("Run " + state + " Rank");
-      columnNames.add("Run " + state + " Score");
+      //columnNames.add("Run " + state + " Rank");
+      //columnNames.add("Run " + state + " Score");
       columnNames.add("Run " + state + " Pval");
    }
 
@@ -286,20 +309,12 @@ class OutputTableModel extends AbstractTableModel {
                return new Integer(geneData.numGenes(classid));
          }
       } else if (state > 0) {
-         String classid;
-         classid = geneData.getClass(i);
-         double runnum = Math.floor((j - init_cols) / cols_per_run);
-         Map data = ((classPvalRun)results.get((int) runnum)).getResults();
+         String classid = geneData.getClass(i);
+         int runnum = j - init_cols;
+         Map data = ((classPvalRun)results.get(runnum)).getResults();
          if (data.containsKey(classid)) {
             classresult res = (classresult) data.get(classid);
-            if ((j - init_cols) % cols_per_run == 0) {
-               //return new Integer(res.getRank());
-               return new Integer(res.getRank());
-            } else if ((j - init_cols) % cols_per_run == 1) {
-               return new Double(nf.format(res.getScore()));
-            } else {
-               return new Double(nf.format(res.getPvalue()));
-            }
+            return new Double(nf.format(res.getPvalue()));
          } else {
             return null;
          }
@@ -312,6 +327,7 @@ class OutputTableModel extends AbstractTableModel {
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
 {
    GONames goData;
+   Vector results;
    static Color spread1 = new Color(220,220,160);
    static Color spread2 = new Color(205,222,180);
    static Color spread3 = new Color(190,224,200);
@@ -319,10 +335,11 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
    static Color spread5 = new Color(160,228,240);
    static Color modified = new Color(220,160,220);
 
-   public OutputPanelTableCellRenderer(GONames goData)
+   public OutputPanelTableCellRenderer(GONames goData, Vector results)
    {
       super();
       this.goData=goData;
+      this.results=results;
    }
 
    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -340,7 +357,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
       {
          setBackground(modified);
       }
-      else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
+      else if(value.getClass().equals(Double.class))
+      //else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
       {
          if(((Double)value).doubleValue() > 0.8)
             setBackground(spread1);
@@ -352,6 +370,14 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
             setBackground(spread4);
          else
             setBackground(spread5);
+         String classid=(String)table.getValueAt(row,0);
+         Map data = ((classPvalRun)results.get(runcol)).getResults();
+         if (data.containsKey(classid))
+         {
+            classresult res = ( classresult ) data.get( classid );
+            setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " +
+                            res.getScore() );
+         }
       }
       else
          setOpaque(false);

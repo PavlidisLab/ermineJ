@@ -98,6 +98,7 @@ public class AnalysisWizardStep2
    }
 
    void rawBrowseButton_actionPerformed( ActionEvent e ) {
+      chooser.setDialogTitle("Choose Raw Data File");
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          rawFile.setText( chooser.getSelectedFile().toString() );
@@ -105,6 +106,7 @@ public class AnalysisWizardStep2
    }
 
    void scoreBrowseButton_actionPerformed( ActionEvent e ) {
+      chooser.setDialogTitle("Choose Gene Score File");
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          scoreFile.setText( chooser.getSelectedFile().toString() );

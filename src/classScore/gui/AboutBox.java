@@ -8,10 +8,10 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -59,6 +59,13 @@ public class AboutBox extends JDialog implements ActionListener {
       } catch (Exception e) {
          e.printStackTrace();
       }
+      setModal(true);
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      Dimension dlgSize = getPreferredSize();
+      setLocation((screenSize.width - dlgSize.width) / 2,
+                        (screenSize.height - dlgSize.height) / 2);
+      pack();
+      show();
    }
 
    //Component initialization

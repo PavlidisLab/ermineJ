@@ -41,6 +41,7 @@ public class LoadDialog
       this.callingframe = callingframe;
       this.settings = callingframe.getSettings();
       chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
+      chooser.setDialogTitle("Open Saved Analysis");
       try {
          jbInit();
          Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
