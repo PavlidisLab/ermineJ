@@ -58,8 +58,6 @@ public class JDetailsFrame extends JFrame {
    protected JTable m_table = new JTable();
    protected BorderLayout borderLayout1 = new BorderLayout();
    protected JToolBar m_toolBar = new JToolBar();
-   protected final String[] m_normalizeButtonLabels = {
-       "Normalize ON", "Normalize OFF"};
    JSlider m_matrixDisplayCellWidthSlider = new JSlider();
    JMenuBar m_menuBar = new JMenuBar();
    JMenu m_fileMenu = new JMenu();
@@ -337,18 +335,8 @@ public class JDetailsFrame extends JFrame {
    void m_saveFileMenuItem_actionPerformed( ActionEvent e ) {
             
       // Create a file chooser
-      final JFileChooser fc = new JFileChooser();
-      String txt = fc.getApproveButtonText();
-      
-      // Create a file filter for the file chooser
-      ImageFileFilter imageFileFilter = new ImageFileFilter();
-      fc.setFileFilter( imageFileFilter );
-      fc.setAcceptAllFileFilterUsed( false );
-
-      // Create other save options (e.g. include row and column labels in image)
-      JSaveOptions options = new JSaveOptions();
-      fc.setAccessory( options );
-
+      final JDetailsFileChooser fc = new JDetailsFileChooser();
+    
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -358,15 +346,17 @@ public class JDetailsFrame extends JFrame {
          String filename = file.getPath();
          if ( ! Util.hasImageExtension( filename ) ) {
             filename = Util.addImageExtension( filename );
-         }         
+         }
          // Save the color matrix image
          try {
-            m_matrixDisplay.saveToFile( filename );
+            boolean includeLabels = fc.includeLabels();
+            boolean normalize = fc.normalized();
+            m_matrixDisplay.saveToFile( filename, includeLabels, normalize );            
          }
          catch ( IOException ex ) {
             System.err.println( "IOException error saving png to " + filename );
          }
-
+         
          // Save the matrix values and the rest of the table to a data file         
          // change filename extension to .txt or whatever it is we use for data files
          filename = Util.changeExtension( filename, Util.DEFAULT_DATA_EXTENSION );
@@ -379,12 +369,8 @@ public class JDetailsFrame extends JFrame {
 
    void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
 
-      if ( m_normalizeMenuItem.isSelected() ) {
-         m_matrixDisplay.setStandardizedEnabled( true );
-      } else {
-         m_matrixDisplay.setStandardizedEnabled( false );
-      }
-
+      boolean normalize = m_normalizeMenuItem.isSelected();
+      m_matrixDisplay.setStandardizedEnabled( normalize );
       m_table.repaint();
    }
 
