@@ -18,7 +18,7 @@ import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.classresult;
 import classScore.data.expClassScore;
-import classScore.data.histogram;
+import classScore.data.Histogram;
 import classScore.gui.GeneSetScoreStatus;
 import classScore.gui.geneSet.JDetailsFrame;
 
@@ -35,7 +35,7 @@ public class classPvalRun {
    private expClassScore probePvalMapper;
    private GeneAnnotations geneData;
    GONames goData; // shared by all
-   private histogram hist;
+   private Histogram hist;
    private boolean weight_on = true;
    private Map results = null;
    private Vector sortedclasses = null; // this holds the results.

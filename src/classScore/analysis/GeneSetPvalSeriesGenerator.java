@@ -11,7 +11,7 @@ import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.classresult;
 import classScore.data.expClassScore;
-import classScore.data.histogram;
+import classScore.data.Histogram;
 
 /**
  * Generate gene set p values for a bunch of gene sets.
@@ -29,7 +29,7 @@ public class GeneSetPvalSeriesGenerator {
    private Map results;
    private expClassScore probePvalMapper;
    private boolean weight_on = true;
-   private histogram hist;
+   private Histogram hist;
    private Map probeGroups;
    private Map classToProbe;
    private GeneSetSizeComputer csc;
@@ -37,7 +37,7 @@ public class GeneSetPvalSeriesGenerator {
    private GONames goName;
 
    public GeneSetPvalSeriesGenerator( GeneAnnotations geneData, boolean w,
-         histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
+         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
       this.weight_on = w;
       this.classToProbe = geneData.getClassToProbeMap();
       this.probeGroups = geneData.getProbeToGeneMap();

@@ -10,10 +10,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.Stats;
-import classScore.*;
+import classScore.Settings;
+import classScore.gui.GeneSetScoreStatus;
 import classScore.gui.*;
+import classScore.data.*;
 
 /**
     Calculates a background distribution for class sscores derived
@@ -35,7 +38,7 @@ public class expClassScore {
    private double quantfract = 0.5;
    private double histogramMax = 0; // todo: this should not be set here, should it? it is in the histogram object
    private int classMinSize = 2;
-   private histogram hist = null;
+   private Histogram hist = null;
 
    private int method;
    private static final int MEAN_METHOD = 0;
@@ -167,7 +170,7 @@ public class expClassScore {
     *
     * @return classScore.histogram
     */
-   public histogram generateNullDistribution() {
+   public Histogram generateNullDistribution() {
       return this.generateNullDistribution(null);
    }
 
@@ -179,7 +182,7 @@ public class expClassScore {
     *   pvalues.
     * @param m GeneSetScoreStatus
     */
-   public histogram generateNullDistribution(GeneSetScoreStatus m) {
+   public Histogram generateNullDistribution(GeneSetScoreStatus m) {
 
       int i, j, k;
 
@@ -225,7 +228,7 @@ public class expClassScore {
          }
 
          try {
-            Thread.currentThread().sleep(1);
+            Thread.sleep(1);
          } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
          }
@@ -270,7 +273,7 @@ public class expClassScore {
 
    /**  */
    public void set_range() {
-      histogramMax = histogram.meanOfTop2(useWeights ? groupPvals : pvals);
+      histogramMax = Histogram.meanOfTop2(useWeights ? groupPvals : pvals);
    }
 
    /**
@@ -395,7 +398,7 @@ public class expClassScore {
       groupPvals = group_pval;
 
       this.set_range(); // figure out the max pvalue possible.
-      this.hist = new histogram(numClasses, classMinSize, numRuns,
+      this.hist = new Histogram(numClasses, classMinSize, numRuns,
                                 histogramMax);
    }
 
@@ -520,7 +523,7 @@ public class expClassScore {
     *
     * @return histogram
     */
-   public histogram get_hist() {
+   public Histogram get_hist() {
       return hist;
    }
 

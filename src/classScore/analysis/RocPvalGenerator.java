@@ -9,7 +9,7 @@ import baseCode.math.ROC;
 import classScore.data.GONames;
 import classScore.data.classresult;
 import classScore.data.expClassScore;
-import classScore.data.histogram;
+import classScore.data.Histogram;
 
 /**
  * Compute gene set p values based on the receiver-operator characterisic (ROC).
@@ -27,7 +27,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
    protected int inputSize; /** @todo where is this set? */
 
-   public RocPvalGenerator( Map ctp, Map pg, boolean w, histogram hi,
+   public RocPvalGenerator( Map ctp, Map pg, boolean w, Histogram hi,
          expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
       super( ctp, pg, w, hi, pvm, csc, gon );
    }

@@ -33,14 +33,14 @@ public class corr_class_scores {
    /*****************************************************************************************/
    // this is broken. need to replace with new way of making histograms.
    /*****************************************************************************************/
-   public histogram random_class_generator()
+   public Histogram random_class_generator()
 
    {
       int i, j, k;
       int count = 0;
       int[] randomnums = null;
       double avecorrel = 0.0;
-      histogram hist = new histogram();
+      Histogram hist = new Histogram();
       //create matrix object from probe data file size
       Matrix correls = new Matrix(data.get_num_rows(), data.get_num_rows());
       int number_of_class = class_max_size - class_min_size + 1;
@@ -146,7 +146,7 @@ public class corr_class_scores {
    }
 
    public static void main(String[] args) {
-      histogram t = new histogram();
+      Histogram t = new Histogram();
       DenseDoubleMatrix2DNamed M = null;
       corr_class_scores test = new corr_class_scores(args[0]);
       test.set_class_max_size(Integer.parseInt(args[1]));

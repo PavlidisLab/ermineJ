@@ -1,91 +1,96 @@
-<?xml version="1.0"?>
 <project>
-	<pomVersion>3</pomVersion>
-	<name>classScore</name>
-	<groupId>classScore</groupId>
-	<artifactId>classScore</artifactId>
-	<currentVersion>1.1</currentVersion>
-	<versions>
-		<version>
-			<id>1.1</id>
-			<name>1.1</name>
-		</version>
-	</versions>
-	<repository>
-		<connection>scm:cvs:ext:${maven.username}@adgate.cu-genome.org:/fsnode/projects/cvs/pavlab:ermineJ</connection>
-	</repository>
-
-
-	<siteAddress>microarray</siteAddress>
-	<siteDirectory>/proj/pavlidis/protected/classScore</siteDirectory>
-
-	<developers>
-		<developer>
-			<name>Paul Pavlidis</name>
-			<id>pavlidis</id>
-			<email>pavlidis@dbmi.columbia.edu</email>
-			<organization>Columbia University</organization>
-		</developer>
-		<developer>
-			<name>William Braynen</name>
-			<id>wbraynen</id>
-			<email>wbraynen@ic.sunysb.edu</email>
-			<organization>Columbia University</organization>
-		</developer>
-		<developer>
-			<name>Homin Lee</name>
-			<id>hkl7</id>
-			<email>hkl7@cs.columbia.edu</email>
-			<organization>Columbia University</organization>
-		</developer>
-	</developers>
-
-
-	<dependencies>
-		<dependency>
-			<id>colt</id>
-			<artifactId>colt</artifactId>
-			<url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
-			<jar>colt.jar</jar>
-		</dependency>
-                		<dependency>
-			<id>commons-logging</id>
-			<artifactId>commons-logging</artifactId>
-			<version>1.0.3</version>
-		</dependency>
-            <dependency>
-			<id>baseCode</id>
-			<artifactId>baseCode</artifactId>
-			<version>0.2</version>
-		</dependency>
-	
-	</dependencies>
-
-<build>
-		<sourceDirectory>src</sourceDirectory>
-	<unitTestSourceDirectory>test</unitTestSourceDirectory>
-     <unitTest>
-       <includes>
-         <include>**/Test*.java </include>
-       </includes>
-       <excludes>
-       </excludes>
-     </unitTest>
-</build>
-
-
-      <reports>
-    <report>maven-jdepend-plugin</report>
-    <report>maven-checkstyle-plugin</report>
-    <report>maven-pmd-plugin</report>
-    <report>maven-changelog-plugin</report>
-    <report>maven-file-activity-plugin</report>
-    <report>maven-developer-activity-plugin</report>
-    <report>maven-javadoc-plugin</report>
-    <report>maven-jxr-plugin</report>
-    <report>maven-junit-report-plugin</report>
-    <report>maven-tasklist-plugin</report>
-    <report>maven-clover-plugin</report>
-  </reports>
-
+    <pomVersion>3</pomVersion>
+    <name>classScore</name>
+    <groupId>classScore</groupId>
+    <artifactId>classScore</artifactId>
+    <currentVersion>1.1</currentVersion>
+    <organization>
+        <name>Columbia University</name>
+        <url>http://www.columbia.edu</url>
+    </organization>
+    <inceptionYear>2004</inceptionYear>
+    <description>Software for gene set analysis.</description>
+    <shortDescription>Software for gene set analysis.</shortDescription>
+    <siteAddress>microarray</siteAddress>
+    <siteDirectory>/proj/pavlidis/protected/classScore</siteDirectory>
+    <repository>
+        <connection>scm:cvs:ext:${maven.username}@adgate.cu-genome.org:/fsnode/projects/cvs/pavlab:ermineJ</connection>
+    </repository>
+    <versions>
+        <version>
+            <id>1.1</id>
+            <name>1.1</name>
+        </version>
+    </versions>
+    <branches/>
+    <mailingLists/>
+    <developers>
+        <developer>
+            <name>Paul Pavlidis</name>
+            <id>pavlidis</id>
+            <email>pavlidis@dbmi.columbia.edu</email>
+            <organization>Columbia University</organization>
+            <roles/>
+        </developer>
+        <developer>
+            <name>William Braynen</name>
+            <id>wbraynen</id>
+            <email>wbraynen@ic.sunysb.edu</email>
+            <organization>Columbia University</organization>
+            <roles/>
+        </developer>
+        <developer>
+            <name>Homin Lee</name>
+            <id>hkl7</id>
+            <email>hkl7@cs.columbia.edu</email>
+            <organization>Columbia University</organization>
+            <roles/>
+        </developer>
+    </developers>
+    <licenses>
+        <license/>
+    </licenses>
+    <dependencies>
+        <dependency>
+            <groupId>colt</groupId>
+            <artifactId>colt</artifactId>
+            <jar>colt.jar</jar>
+            <url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.3</version>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>baseCode</groupId>
+            <artifactId>baseCode</artifactId>
+            <version>0.1</version>
+            <properties/>
+        </dependency>
+    </dependencies>
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <unitTestSourceDirectory>test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/Test*.java</include>
+            </includes>
+        </unitTest>
+    </build>
+    <reports>
+        <report>maven-jdepend-plugin</report>
+        <report>maven-pmd-plugin</report>
+        <report>maven-changelog-plugin</report>
+        <report>maven-file-activity-plugin</report>
+        <report>maven-developer-activity-plugin</report>
+        <report>maven-javadoc-plugin</report>
+        <report>maven-jxr-plugin</report>
+        <report>maven-junit-report-plugin</report>
+        <report>maven-tasklist-plugin</report>
+        <report>maven-clover-plugin</report>
+    </reports>
+    <properties/>
 </project>

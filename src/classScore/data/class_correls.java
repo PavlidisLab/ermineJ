@@ -12,8 +12,6 @@ import java.util.Vector;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 
-//import util.Stats;
-
 /**
  Calculates the raw average class correlations using a background distribution.    Created :09/02/02
    @author Shahmil Merchant
@@ -23,7 +21,7 @@ import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
  * @todo use colt instead of Matrix
  */
 public class class_correls {
-   private histogram hist; //histogram object stores background related information
+   private Histogram hist; //histogram object stores background related information
    private corr_class_scores probe_data; // stores information regarding random values
    private Map probe_gom; //stores probe->go Hashtable
    private Map go_probe; //stores go->probe Hashtable
@@ -68,7 +66,7 @@ public class class_correls {
       go_name = goName.getMap(); //go name map
 
       // todo: this should be done by the hist class?
-      hist = new histogram();
+      hist = new Histogram();
       //set histogram parameters
       probe_data.set_class_max_size(class_max_size);
       probe_data.set_class_min_size(class_min_size);
@@ -177,7 +175,7 @@ public class class_correls {
                   rawscore = avecorrel / (double) size;
                   if (rawscore < hist.get_hist_max()) {
                      double[] class_row = new double[hist.get_number_of_bins()];
-                     class_row =  M.viewRow(hist.class_index(size,
+                     class_row =  M.viewRow(hist.getClassIndex(size,
                              probe_data.get_class_min_size())).toArray();
                      int binnum = (int) Math.floor((rawscore -
                              hist.get_hist_min()) /

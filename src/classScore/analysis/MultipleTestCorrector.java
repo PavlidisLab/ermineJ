@@ -10,7 +10,7 @@ import java.util.Vector;
 import classScore.data.GeneAnnotations;
 import classScore.data.classresult;
 import classScore.data.expClassScore;
-import classScore.data.histogram;
+import classScore.data.Histogram;
 
 /**
  * Perform multiple test correction on class scores.
@@ -25,7 +25,7 @@ public class MultipleTestCorrector {
    private Map results;
    private expClassScore probePvalMapper;
    private boolean weight_on = true;
-   private histogram hist;
+   private Histogram hist;
    private GeneAnnotations geneData;
    private GeneSetSizeComputer csc;
    private NumberFormat nf = NumberFormat.getInstance();
@@ -39,7 +39,7 @@ public class MultipleTestCorrector {
     * @param csc ClassSizeComputer
     */
    public MultipleTestCorrector(Vector sc, Map r, expClassScore ppm, boolean w,
-                                histogram h, GeneAnnotations geneData, GeneSetSizeComputer csc) {
+                                Histogram h, GeneAnnotations geneData, GeneSetSizeComputer csc) {
       this.sortedclasses = sc;
       this.results = r;
       this.probePvalMapper = ppm;

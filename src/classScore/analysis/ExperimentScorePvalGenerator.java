@@ -8,7 +8,7 @@ import java.util.Map;
 import classScore.data.GONames;
 import classScore.data.classresult;
 import classScore.data.expClassScore;
-import classScore.data.histogram;
+import classScore.data.Histogram;
 
 /**
  * Generates gene set p values using the resamplin-based 'experiment score'
@@ -33,7 +33,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
     * @param csc ClassSizeComputer
     */
    public ExperimentScorePvalGenerator( Map ctp, Map pg, boolean w,
-         histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
+         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
       super( ctp, pg, w, hi, pvm, csc, gon );
    }
 
@@ -146,7 +146,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
     */
    protected double scoreToPval( int in_size, double rawscore )
          throws IllegalStateException {
-      double pval = hist.get_val( in_size, rawscore );
+      double pval = hist.getValue( in_size, rawscore );
 
       if ( Double.isNaN( pval ) ) {
          throw new IllegalStateException(

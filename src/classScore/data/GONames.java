@@ -1,7 +1,11 @@
 package classScore.data;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import baseCode.dataStructure.reader.MapReader;
 /**

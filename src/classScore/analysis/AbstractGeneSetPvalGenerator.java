@@ -4,7 +4,7 @@ import java.util.Map;
 
 import classScore.data.GONames;
 import classScore.data.expClassScore;
-import classScore.data.histogram;
+import classScore.data.Histogram;
 
 /**
 * Base implementation of pvalue generator
@@ -19,13 +19,13 @@ public abstract class AbstractGeneSetPvalGenerator {
    protected Map actualSizes = null;
    protected expClassScore probePvalMapper;
    protected Map classToProbe;
-   protected histogram hist;
+   protected Histogram hist;
    protected GONames goName;
    protected Map probeGroups;
    protected boolean weight_on;
    
    public AbstractGeneSetPvalGenerator( Map ctp, Map pg, boolean w,
-         histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
+         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
       this.weight_on = w;
       this.classToProbe = ctp;
       this.probeGroups = pg;

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import classScore.data.expClassScore;
-import classScore.data.histogram;
+import classScore.data.Histogram;
 
 /**
  * Does the same thing as {@link ExperimentScorePvalGenerator}but is
@@ -23,7 +23,7 @@ public class ExperimentScoreQuickPvalGenerator extends
       ExperimentScorePvalGenerator {
 
    public ExperimentScoreQuickPvalGenerator( Map ctp, Map pg, boolean w,
-         histogram hi, expClassScore pvm, GeneSetSizeComputer csc ) {
+         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc ) {
       super( ctp, pg, w, hi, pvm, csc, null );
    }
 
