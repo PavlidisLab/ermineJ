@@ -1,13 +1,15 @@
 scores.class_scores README
 Copyright (C) 2002, Columbia Genome Center
-Author:       Shahmil Merchant, Paul Pavlidis
-Version:      1.0
-Release date: December 16, 2002
+Author:       Shahmil Merchant, Paul Pavlidis, Edward Chen
+Version:      0.5
+Release date: January 20, 2003
 
 The scores.class_scores is a package which enables one to study
 different gene functional classes and their importance on the basis of
 their pvals.These pvals are calculated using 2 algorithms using
 experiment scores and correlation scores.
+
+See web/index.html for instructions on using the software.
 
 Contacting us
 -----------
@@ -17,7 +19,7 @@ Contacting us
 Archive Contents:
 -----------
 If you have downloaded the source distribution, your archive will contain
-the following files:
+the following files. The end-user distributon does not contain all of these files:
 
   src/	         - source files.
 
