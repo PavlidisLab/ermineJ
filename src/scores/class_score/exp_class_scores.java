@@ -1,13 +1,13 @@
 package scores.class_score;
 /******************************************************************************
-  Author :Shahmil Merchant, Paul Pavlidis
+  @author Shahmil Merchant, Paul Pavlidis
   Created :09/02/02
   Revision History: $Id$
-  Description:calculates a background distribution for class sscores derived from randomly selected individual gene scores
 
+  Description: Calculates a background distribution for class sscores
+  derived from randomly selected individual gene scores...and does other things. 
                                                                                                                                                             
 *******************************************************************************/
-
 import scores.class_score.*;
 import java.util.*;
 import java.lang.*;
@@ -19,48 +19,73 @@ import java.lang.reflect.*;
  *  pval_file,method,class_max_size,class_min_size,number_of_runs,quantile,range
  */
 public class exp_class_scores {
+
     private double[] group_pval_arr = null; // pvalues for groups.
     private double[] pvals = null; // pvalues for probes.
     private Map group_pval_map; // groups -> pvalues
     private Map probe_pval; // probes -> pval
-    private String method = null;
+    //    private String method = null;
+    private int method;
     private boolean weight_on;
     private int class_max_size = 100;
     private int number_of_runs = 10000;
     private int quantile = 50;
+    private int number_of_class = 0;
     private double quantfract = 0.5;
     private double hist_max = 0; // todo: this should not be set here, should it? it is in the histogram object
     private int class_min_size = 2;
     private histogram hist = null;
 
-    /** Can use when pvalue column is 1, and taking logs. */
+    private static final int MEAN_METHOD = 0;
+    private static final int QUANTILE_METHOD = 1;
+    private static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
+
+
+    /** 
+	Can use when pvalue column is 1, and taking logs, and defaults are ok.
+    */
     public exp_class_scores(String filename_pval, String wt_check, String in_method) {
 	this(filename_pval, wt_check, in_method, 1, true);
     }
     
 
-    /** Use defaults for most things.  */
+    /** 
+	Use defaults for most things.  
+    */
     public exp_class_scores(String filename_pval, String wt_check, String in_method, int pvalcolumn, boolean dolog)
     {
-	Pval_parse parser = new Pval_parse(filename_pval, pvalcolumn, dolog); // makes the probe -> pval map.
-	probe_pval = new LinkedHashMap();
-	probe_pval = parser.get_map(); // reference to the probe -> pval map.
-	group_pval_map = new HashMap(); // this gets initialized by set_input_pvals
-	weight_on = (Boolean.valueOf(wt_check)).booleanValue();
-	hist = new histogram();
-	pvals = parser.get_pval(); // array of pvalues.
-	method = in_method;
+	this(filename_pval, wt_check, in_method, pvalcolumn, dolog, 100, 2, 10000, 50);
     }
 
 
-    /** Set everything.  */
+    /** 
+	Set everything according to parameters.
+	@param filename_pval File that contains the scores for each probe
+	@param wt_check Whether weights should be used or not
+	@param in_method The class scoring method: Mean, Quantile, etc.
+	@param pvalcolumn Which column in the data file contains the scores we will use. The first column contains probe labels and is not counted.
+	@param dolog Whether the log of the scores should be used. Use true when working with p-values
+	@param class_max_size The largest class that will be considered. This refers to the apparent size.
+	@param class_min_size The smallest  class that will be considered. This refers to the apparent size.
+	@param number_of_runs How many random trials are done when generating background distributions.
+	@param quantile A number from 1-100. This is ignored unless a quantile method is selected.
+    */
     public exp_class_scores(String filename_pval, String wt_check, String in_method, int pvalcolumn, boolean dolog, int class_max_size, int class_min_size, int number_of_runs, int quantile)
     {
-	this(filename_pval, wt_check, in_method, pvalcolumn, dolog);
 	this.set_class_max_size(class_max_size);
-	this.set_class_min_size(class_min_size);
-	this.set_number_of_runs(number_of_runs);
+	this.class_min_size = class_min_size;
+	this.number_of_runs = number_of_runs;
 	this.set_quantile(quantile);
+	this.weight_on = (Boolean.valueOf(wt_check)).booleanValue();
+	this.set_method(in_method);
+	this.number_of_class = class_max_size - class_min_size + 1;
+
+	Pval_parse parser = new Pval_parse(filename_pval, pvalcolumn, dolog); // makes the probe -> pval map.
+	pvals = parser.get_pval(); // array of pvalues.
+	probe_pval = parser.get_map(); // reference to the probe -> pval map.
+	group_pval_map = new HashMap(); // this gets initialized by set_input_pvals
+
+	hist = new histogram( number_of_class, class_min_size, number_of_runs, hist_max );
     }
 
 
@@ -69,7 +94,7 @@ public class exp_class_scores {
      * generate a null distribution of scores.
      * @return A histogram object containing a cdf that can be used to generate pvalues.
      */
-    public histogram random_class_generator()
+    public histogram generateNullDistribution () 
     {
 	Stats statistics = new Stats();
 	
@@ -94,13 +119,12 @@ public class exp_class_scores {
 
 	//	System.err.println("There are " + gene_length + " pvalues to choose from randomly.");
 
-	int number_of_class = class_max_size - class_min_size + 1;
 	int[] random = null;
 	double[] random_class = new double[gene_length];
 	boolean[] recLog = new boolean[gene_length];  //recLog records the numbers been choosed
 
 	//	System.err.println(number_of_class + " " +  class_min_size + " " +   number_of_runs + " " +   hist_max);
-	hist= new histogram(number_of_class, class_min_size, number_of_runs, hist_max);
+
 	
 	//check for method and accordingly generate values 
 	for (i = class_min_size; i<=class_max_size; i++)
@@ -113,35 +137,32 @@ public class exp_class_scores {
 			statistics.chooserandom (random, recLog, gene_length, i);
 			
 			//			showArray.show(random, i);
-			if (method.equals("MEAN_METHOD")) { 
+			//todo: this is a good place for a switch.
+			if (method == MEAN_METHOD) { 
 			    for (j= 0; j<i; j++) {
 				//System.out.println("random["+j+"]="+random[j]);
 				total+=in_pval[random[j]];
 			    }
 			    total=total/(double)i;
-			    
-			}  else if (method.equals("QUANTILE_METHOD")) {
+			}  else if (method == QUANTILE_METHOD) {
 			    for (j=0;j<i;j++) {
 				random_class[j] = in_pval[random[j]];
 			    }
 			    double fract = (double)quantile/100.0;
     			    int index = (int)Math.floor( fract*i );
 			    total =  statistics.calculate_quantile(index,random_class,i);
-			}  else if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")){
+			}  else if (method == MEAN_ABOVE_QUANTILE_METHOD){
 			    for (j=0; j<i; j++) {
 				random_class[j]= in_pval[random[j]];
 			    }
 			    double fract = (double)quantile/100.0;
     			    int index = (int)Math.floor( fract*i );			    
 			    total = statistics.calculate_mean_above_quantile(index, random_class, i); 
-			} else {
-			    System.err.println("Invalid method entered: " + method); // todo: put this kind of check at the start of the program, not here?
-			    System.exit(1);
 			}
 			//System.out.println(total);
 			//System.out.flush();
 			hist.update(i - class_min_size, total);
-		    }		
+		    } 	
 	    }
 	
 	try { 
@@ -157,29 +178,12 @@ public class exp_class_scores {
     }
 
 
-
     /**  */	
     public void set_class_max_size(int value)
     {
 	class_max_size = value;
     }
 
-
-    /**  
-    */	
-    public void set_class_min_size(int value)
-    {
-	class_min_size = value;
-    }
-
-
-
-    /**  */	
-    public void set_number_of_runs(int value)
-    {
-	number_of_runs = value;
-    }
-    
 	    
     /**  */	
     public int get_number_of_runs()
@@ -196,9 +200,9 @@ public class exp_class_scores {
     
 
     /**  */
-    public void set_range(double range)
+    public void set_range()
     {
-	hist_max =range;
+	hist_max = Stats.meanOfTop2( weight_on ? group_pval_arr : pvals );
     }
 
 	    
@@ -218,7 +222,7 @@ public class exp_class_scores {
     /**  */
     public double[] get_in_pvals()
     {
-	return weight_on? group_pval_arr : pvals;	    	
+	return weight_on ? group_pval_arr : pvals;	    	
     }
     
     /**  */
@@ -244,26 +248,29 @@ public class exp_class_scores {
     /**
      * Each pvalue is adjusted to the mean (or best) of all the values in the
      * 'replicate group' 
+     * @param Map groupProbeMap Map of groups to probes.
+     * @param String gp_method Which method we use to calculate scores
+     * for genes that occur more than once in the data set.
      */
     public void set_input_pvals(Map groupProbeMap, String gp_method)
     {
-	Collection groupEntries = groupProbeMap.entrySet(); // map of ug to probes.
+	Collection groupEntries = groupProbeMap.entrySet(); // map of groups -> probes in group
 	Iterator groupMapItr = groupEntries.iterator();
 	double[] group_pval_temp = new double[groupProbeMap.size()];
 	int counter = 0;
 	
 	while(groupMapItr.hasNext()){
 	    Map.Entry groupTuple = (Map.Entry)groupMapItr.next();
-	    ArrayList probes = (ArrayList)groupTuple.getValue(); // list of probes in this unigene
+	    ArrayList probes = (ArrayList)groupTuple.getValue(); // list of probes in this group
 	    Iterator pbItr = probes.iterator();
 	    int in_size = 0;
 	    while(pbItr.hasNext()) {
-		Object key = probe_pval.get(pbItr.next());  // pvalue for the next probe in this unigene.
+		Object key = probe_pval.get(pbItr.next()); // pvalue for the next probe in this group.
 		if (key != null) {
 		    String pbPval = key.toString();
 		    if(gp_method.equals("MEAN_PVAL")){
 		        group_pval_temp[counter] += Double.parseDouble(pbPval);
-		    } else if(gp_method.equals("BEST_PVAL")){//use best method for group
+		    } else if(gp_method.equals("BEST_PVAL")){ 
 		        group_pval_temp[counter] = Math.max(Double.parseDouble(pbPval),group_pval_temp[counter]);
 		    } else {
 			System.err.println("Illegal selection for groups score method. Valid choices are MEAN_PVAL and BEST_PVAL");
@@ -289,15 +296,25 @@ public class exp_class_scores {
 	    group_pval[i] = group_pval_temp[i];
 	}
 	group_pval_arr = group_pval;
+
+	this.set_range(); // figure out the max pvalue possible.
     }
 
 
-    /**  */
+    /**  
+	@return Map of groups to pvalues.
+    */
     public Map get_group_pval_map() {
 	return group_pval_map;
     }
 
-    /**  */
+    /** 
+	@param shuffle Whether the map should be scrambled first. If
+	so, then groups are randomly associated with scores, but the
+	actual values are the same.
+	
+	@return Map of groups to pvalues.
+    */
     public Map get_group_pval_map(boolean shuffle) {
 	if (shuffle) {
 	    Map scrambled_map = new LinkedHashMap();
@@ -347,28 +364,28 @@ public class exp_class_scores {
 		scrambled_probe_pval_map.put(it.next(), valvec.get(i));
 		//		 System.err.println(it.next() + " " + valvec.get(i));
 		i++;
-	     }
+	    }
 	    return scrambled_probe_pval_map;
 	    
 	} else {
 	    return probe_pval;
 	}
-     }
+    }
 
 
     /**  */
-    public String get_method() {
-	return method;
-    }
+    //    public int get_method() {
+    //	return method; // todo: make this return the appropriate string..not used anyway
+    //}
     
 
     /**  */	
     public double get_value_map(String probe_id) {
-	 double value=0.0;
-	 if (probe_pval.get(probe_id)!=null){ 
+	double value=0.0;
+	if (probe_pval.get(probe_id)!=null){ 
 	    value= Double.parseDouble((probe_pval.get(probe_id)).toString());
-	 }
-	 return value;
+	}
+	return value;
     }
 
     /**  
@@ -378,13 +395,13 @@ public class exp_class_scores {
     */	
     public double calc_rawscore (double[] genevalues, int effsize) {
 	
-	if (method.equals("MEAN_METHOD"))
+	if (method == MEAN_METHOD)
 	    return Stats.mean(genevalues, effsize);
 	else {
 	    int index = (int)Math.floor( quantfract * effsize );
-	    if ( method.equals("QUANTILE_METHOD") ) {
+	    if ( method == QUANTILE_METHOD ) {
 		return  Stats.calculate_quantile(index, genevalues, effsize);            	
-	    } else if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")) {
+	    } else if (method == MEAN_ABOVE_QUANTILE_METHOD ) {
 		return  Stats.calculate_mean_above_quantile(index, genevalues, effsize);            	
 	    } else {
 		System.err.println("Illegal method selected, somehow");
@@ -399,32 +416,20 @@ public class exp_class_scores {
 	return hist;
     }
 
-
-    /**  */
-    public static void main (String[] args) {
-	histogram hi = new histogram(); 
-	Matrix M = null;
-	exp_class_scores test = new exp_class_scores(args[0],args[1], args[2]);
-	test.set_class_max_size(Integer.parseInt(args[3]));
-	test.set_class_min_size(Integer.parseInt(args[4]));
-	test.set_number_of_runs(Integer.parseInt(args[5]));
-	test.set_quantile(Integer.parseInt(args[6]));
-	test.set_range(Double.parseDouble(args[7]));
-	hi=test.random_class_generator();
-		/*	
-	M= new Matrix((hi.get_matrix()).get_num_rows(),(hi.get_matrix()).get_num_cols());
-	M=hi.get_matrix();
-	double total =0.0;
-	for(int i=0;i<M.get_num_rows();i++){
-	    total=0.0;
-	    for(int j=1;j<M.get_num_cols();j++){
-		System.out.print(M.get_matrix_val(i,j) + "\t");
-		total=total + M.get_matrix_val(i,j);
-	    }
-	    System.out.println("total\t" + total);
-	    System.out.println("");
-	}*/
-	
-	
+    /** */ 
+    private void set_method(String meth) {
+	if (meth.equals("MEAN_METHOD")) { 
+	    method = MEAN_METHOD;
+	}  else if (meth.equals("QUANTILE_METHOD")) {
+	    method = QUANTILE_METHOD;
+	}  else if (meth.equals("MEAN_ABOVE_QUANTILE_METHOD")){
+	    method = MEAN_ABOVE_QUANTILE_METHOD;
+	} else {
+	    System.err.println("Invalid method entered: " + meth); // todo: put this kind of check at the start of the program, not here?
+	    System.exit(1);
+	}
     }
+
+
+
 }

@@ -54,8 +54,12 @@ public class classresult implements Comparable {
     }
 
     public void print (BufferedWriter out) {
-	try {
+	this.print(out, "");
+   }
 
+    public void print (BufferedWriter out, String extracolumns) {
+	try {
+	    
 	    String fixnamea;
 	    String cleanname;
 	    if (class_name != null) {
@@ -64,15 +68,21 @@ public class classresult implements Comparable {
 	    } else {
 		cleanname = "";
 	    }
-	    out.write(cleanname +"_" + class_id + "" + "\t" + size + "\t" + nf.format(score) + "\t" + nf.format(pvalue) + "\t" + effective_size + "\t" + nf.format(hyperpval) + "\t" + nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" + nf.format(pvalue_corr) + "\n");
+	    out.write(cleanname +"_" + class_id + "" + "\t" + size + "\t" + nf.format(score) + "\t" + nf.format(pvalue) + "\t" + effective_size + "\t" + nf.format(hyperpval) + "\t" + nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" + nf.format(pvalue_corr) + extracolumns + "\n");
 	} catch (IOException e) {
 	    System.err.println("There was an IO error" + e);
 	}
     }
 
+   
     public void print_headings (BufferedWriter out) {
+	this.print_headings(out, "");
+    }
+
+
+    public void print_headings (BufferedWriter out, String extracolumns) {
 	try {
-	    out.write("Class" + "\tsize" + "\tscore" + "\tscore pval" + "\teffective_size" + "\thyper pval" + "\tAROC" + "\tAROCpval" + "\tCorrected_pvalue" + "\n");
+	    out.write("Class" + "\tsize" + "\tscore" + "\tscore pval" + "\teffective_size" + "\thyper pval" + "\tAROC" + "\tAROCpval" + "\tCorrected_pvalue" + extracolumns + "\n");
 	} catch (IOException e) {
 	    System.err.println("There was an IO error" + e);
 	}
@@ -146,7 +156,7 @@ public class classresult implements Comparable {
        
     Default comparator for this class: sorts by the pvalue.
     
-     */
+    */
     public int compareTo(Object ob) {
 	classresult other = (classresult)ob;
 	if (this.pvalue>other.pvalue)

@@ -6,10 +6,6 @@ package scores.class_score;
   Description:Has mathematical functions 
                                                                                                                                                             
 *******************************************************************************/
-
-
-
-
 import scores.class_score.*;
 import java.io.*; 
 import java.util.*;
@@ -19,11 +15,10 @@ import java.lang.reflect.*;
 import java.security.*;
 
 
-
-
+/*****************************************************************************************/
 /*****************************************************************************************/
 public class Stats implements Cloneable, ConstantStuff// mathematical calculations
-/*****************************************************************************************/
+
 {
     
     private Random generator = new Random(System.currentTimeMillis());
@@ -381,8 +376,8 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     } /* correl_matrix */
     
     
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public static double calculate_quantile (int index, double[] random_class, int size)
 	
     {
@@ -441,76 +436,25 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 
     
     
-    /*****************************************************************************************/
-    /*****************************************************************************************/
-    public static double calculate_quantile_1 (int quantile, double[] random_class, int size)
-    {
-	int[] temp = new int[size];
-	int[] count = new int[25000];
-	double returnvalue = 0.0;
-	double fract = (double)quantile/100.0;
-	int index = (int)Math.ceil(fract*(size-1));
-	
-	if (fract > 1.0 || fract < 0.0) {
-	    System.out.println("Quantile is illegal\n");
-	}
-	//for (int i=0; i<Math.min(10,random_class.length); i++)
-	//  System.out.println("rdm  " + random_class[i]);
-	
-	/* make a O(n) sorting algorithm, return the Median. */
-	for (int i=0; i<size; i++){
-	    temp[i] = (int)(1000*random_class[i]);
-	}
-	
-	for (int i=0; i<size; i++){
-	    count[temp[i]]++;
-	}
-	
-	for (int i=0; i<25000; i++){
-	    index -= count[i];
-	    if(index <= 0){
-		//    System.out.println("medium p_val= " + (i/1000.00));
-		return(i/1000.00);          
-	    }
-	}
-  return 0.0;
-    }
-    
-    /*****************************************************************************************/
-    /*****************************************************************************************/
-    public static double calculate_quantile_2 (int quantile, double[] random_class, int size)
-    {
-	double[] temp = new double[size];
-	double returnvalue = 0.0;
-	double fract = (double)quantile/100.0;
-	int index = (int)Math.ceil(fract*(size-1));
-	
-	if (fract > 1.0 || fract < 0.0) {
-	    System.out.println("Quantile is illegal\n");
-	}
-	
-	/* make a sorted copy of the array, return the index value. */
-	temp = random_class;
-	Arrays.sort(temp);  
-	returnvalue = random_class[index];
-	return(returnvalue);
-    }
-  
 
 
-    /*****************************************************************************************/
-    /* calculate the mean of the values above a particular quantile of an
-       array.  Quantile must be a value from 0 to 100.*/
-    /*****************************************************************************************/
-    public static double calculate_mean_above_quantile (int quantile, double[] random_class, int size) 
+    /**
+       calculate the mean of the values above a particular quantile of an
+       array.  Quantile must be a value from 0 to 100.
+       @param quantile A value from 0 to 100
+       @param array Array for which we want to get the quantile.
+       @param size The size of the array.
+       
+    */
+    public static double calculate_mean_above_quantile (int quantile, double[] array, int size) 
     {
 	double[] temp = new double[size];
 	double median;
 	double returnvalue = 0.0;
 	int k = 0;
-	/* make a sorted copy of the array, return the index value. */
-	temp = random_class;
-	median = calculate_quantile(quantile, random_class, size);
+
+	temp = array;
+	median = calculate_quantile(quantile, array, size);
     
 	for (int i=0; i<size; i++) {
 	    if(temp[i] >= median){
@@ -521,51 +465,35 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	return(returnvalue/k);
     }
 
-    /*****************************************************************************************/
-    /* calculate the mean of the values above a particular quantile of an
-       array.  Quantile must be a value from 0 to 100.*/
-    /*****************************************************************************************/
-    public static double calculate_mean_above_quantile_2 (int quantile, double[] random_class, int size) 
-    {
-	double[] temp = new double[size];
-	double returnvalue = 0.0;
-	int i,k;
-	double fract = (double)quantile/100.0;
-	int index = (int)Math.floor(fract*size);
-	/* make a sorted copy of the array, return the index value. */
-	temp = random_class;
-	Arrays.sort(temp);
-	k=0;
-	for (i=index; i<size; i++) {
-	    returnvalue += temp[i];
-	    k++;
-	}
-	return(returnvalue/k);
-    }
     
     
-    /*****************************************************************************************/
-    // method to calculate pval of hypergeometric distribution
-    /*****************************************************************************************/  
+    /**
+       Calculate pval of hypergeometric distribution
+    */
     public static double hyperPval (int N1, int n1, int N2, int n2) // todo: make this use binomial approx when needed.
     {
 	return (n_choose_n(N1,n1)/n_choose_n(N1+N2,n1+n2))*n_choose_n(N2,n2);
     }
     
 
+    /** 
+	Calculate 'n choose k' todo: redo this so it doesn't overflow.
+    */
     public static double n_choose_n (int N, int n)
     {
 	double total = 1;
 	for(int i=0; i < n; i++){
 	    total *= ((N-i)/(double)(i+1));
 	}
-    return total;
+	return total;
     }
 
 
     /**
      * Calculates the ranking of each gene in the entire data set.
-     * @return A LinkedHashMap keys=gene ids, values= rank of the gene.
+     * Todo: fix this!!!!
+     * @param A map with keys strings, values doubles.
+     * @return A LinkedHashMap keys=old keys, values= integer rank of the gene.
      */
     public static LinkedHashMap rankOf(Map m){
 	int counter = 0;
@@ -578,8 +506,8 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	 * pvalue and the gene id */
 	while(itr.hasNext()) {
 	    Map.Entry tuple = (Map.Entry)itr.next();
-	    String key = (tuple.getKey()).toString();
-	    double val = Double.parseDouble((tuple.getValue()).toString());
+	    String key = (String)tuple.getKey();
+	    double val = (double)(((Double)tuple.getValue()).doubleValue());   //  Double.parseDouble((tuple.getValue()).toString());
 	    pvalArray[counter] = new gene_pval(key, val);
 	    counter++;
 	}
@@ -595,9 +523,9 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }
 
     
-    /*****************************************************************************************/
-    // method to calculate area under ROC                                           tt6
-    /*****************************************************************************************/  
+    /**
+       Calculate area under ROC                                           tt6
+    */
     public static double arocRate(int totalSize, Map ranks)
     {
 	int k = 0;
@@ -620,16 +548,19 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	return result/(k*(totalSize-k));
     }
   
-    
-    public static double rocpval(Map ranks, double aroc)
+    /**
+       For an AROC value, calculates a p value based on approximation
+       @param numpos How many positives are in the data.
+       @praam aroc The AROC
+     */
+    public static double rocpval(int numpos, double aroc)
     {
 	double result = 0.0;
 	double logstdev = 0.0;
-	int size = ranks.size();
-	double stdev = Math.exp(-0.5 * (Math.log(size) + 1));
+	double stdev = Math.exp(-0.5 * (Math.log(numpos) + 1));
 	double z = (aroc - 0.5)/stdev;
 	
-	//	System.err.println("Size: " + size + " Stdev: " + stdev + " aroc: " + aroc + " z: " + z);
+	//	System.err.println("Size: " + numpos + " Stdev: " + stdev + " aroc: " + aroc + " z: " + z);
 
 	result = 1.0 - 0.5*erfc(-z/Math.sqrt(2.0));
 	
@@ -807,10 +738,10 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     }  
     
     
-    /*****************************************************************************************/
-    /* Select a random number from a normal distribution with mean zero
-       and variance 1*/
-    /*****************************************************************************************/
+    /**
+       Select a random number from a normal distribution with mean zero
+       and variance 1
+    */
     public double randomGaussian () {
 	return generator.nextGaussian();
     }
@@ -822,11 +753,11 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     
 } // end of class
 
-/*****************************************************************************************/
-/* Record the execution time between start() and stop() for testing                */
-/*****************************************************************************************/
 
-class timeCounter{
+/**
+   Record the execution time between start() and stop() for testing                
+*/
+class timeCounter {
     static long tempTime;
     
     public static void start(){	
@@ -838,10 +769,9 @@ class timeCounter{
     }
 }
 
-/*****************************************************************************************/
-/* Show the elements in array for testing                */
-/*****************************************************************************************/
-
+/**
+ Show the elements in array for testing                
+*/
 class showArray{
     public static void show(int[] a, int n){	
     	for(int i=0; i<n; i++){

@@ -56,11 +56,9 @@ class_score:  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Matrix.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Pval_parse.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Stats.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/testcomparator.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Group_Parse.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
-        ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
         ${OUTPUTDIR}/erminecmd.class
 
 CLASS_FILES= \
@@ -75,11 +73,10 @@ CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Matrix.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Pval_parse.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Stats.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/testcomparator.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Group_Parse.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
-        ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
+
 
 ${OUTPUTDIR}/%.class	: ${SOURCEPATH}/%.java
 	${JAVAC} ${OPTIONS} \
@@ -88,7 +85,7 @@ ${OUTPUTDIR}/%.class	: ${SOURCEPATH}/%.java
 	-d ${OUTPUTDIR} $<
 
 runner: ${CLASS_FILES}
-	${JAVA} ${RUN_OPTIONS} -classpath ${CLASSPATH} scores.class_score.Final_Project
+	${JAVA} ${RUN_OPTIONS} -classpath ${CLASSPATH} scores.class_score.Class_Frame
 
 doc:
 	javadoc -d ${DOCDIR} -windowtitle ${WINDOWTITLE} -doctitle ${DOCTITLE} -header ${HEADER} -bottom ${BOTTOM} -classpath ${CLASSPATH} -sourcepath ${SOURCEPATH} ${PACKAGES}

@@ -1,17 +1,16 @@
 package scores.class_score;
 /******************************************************************************
-  Author :Shahmil Merchant
+  Author :Shahmil Merchant, Paul Pavlidis
   Created :09/02/02
   Revision History: $Id$
   Description:Parses the file of the form
   probe_id pval
 
- The values are stored in a HashTable
-                                                                                                                                                            
+ The values are stored in a HashTable probe_pval_map. This is used to
+ see what probes are int the data set, as well as the score for each
+ probe.
+
 *******************************************************************************/
-
-
-
 import scores.class_score.*;
 import java.io.*;
 import java.util.regex.*;
@@ -20,33 +19,32 @@ import java.util.regex.*;
 import java.lang.reflect.*;
      
 
-/*****************************************************************************************/
+/**
+ */
  public class Pval_parse { 
-/*****************************************************************************************/
+
 
      private String[] probe_id = null;
      private double[] pval = null;
      private int num_pvals;
      private static Map probe_pval_map;
      private double log10 = Math.log(10);
-     //private gene_pval[] gene_list = null;
 
-     //--------------------------------------------------< main >--------//
-
-     public static void main (String[] args) {
-	 Pval_parse t = new Pval_parse(args[0]);
-     }
-     
-
-     //--------------------------------------------< readMyFile >--------//
-
-     /*****************************************************************************************/
-     /* creates the probe -> pval mapping.
-     /*****************************************************************************************/
+     /**
+	Create the probe -> pval mapping
+	@param filename: a tab-delmited file with columns probe_id pval
+     */
      public Pval_parse(String filename) {
 	 this(filename, 1, true);
      }
 
+
+     /**
+	Create the probe -> pval mapping
+	@param filename: a tab-delmited file with columns probe_id pval pval pval...
+	@param column: which column the pvalues are in.
+	@param dolog: take the log (base 10) of the value.
+      */
      public Pval_parse(String filename, int column, boolean dolog) {
 	 String aLine = null;
 	 int count = 0;
@@ -95,37 +93,38 @@ import java.lang.reflect.*;
 	     probe_id = new String[rows.size()-1];
 	     pval = new double[rows.size()-1];
 	     doubleArray =new Double[rows.size()-1];
-	     for (int i=1; i < rows.size();i++)
-		 {
-		     
-		     String name = (String)(((Vector)(rows.elementAt(i))).elementAt(0));
+	     
+	     double small = 10e-16;
 
-		     if (name.matches("AFFX.*")) { // todo: put this rule somewhere else
-			 System.err.println("Skipping probe in pval file: " + name);
-			 continue;
-		     }
-		     probe_id[i-1] = name;
-
-		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(column)));
-
-		     //		     System.err.println("p " + pval[i-1]);
-
-		     // Do not add probes whose pvals cannot be logged.
-		     if (pval[i-1] <= 0 && dolog) {
-			 System.err.println("Warning: Cannot take log of non-positive value for " + name  +  " (" + pval[i-1] + ") from gene score file: Setting to 10e-12.");
-			 //			 continue;
-			 pval[i-1] = 10e-12;
-		     }
-
-		     if (dolog) {
-			 pval[i-1]= -(Math.log(pval[i-1])/log10); // Make -log base 10.
-		     }
-
-		     doubleArray[i-1] = new Double(pval[i-1]);
-		     probe_pval_map.put(probe_id[i-1], doubleArray[i-1]);	      // put key, value.
+	     for (int i=1; i < rows.size();i++) {
+		 
+		 String name = (String)(((Vector)(rows.elementAt(i))).elementAt(0));
+		 
+		 if (name.matches("AFFX.*")) { // todo: put this rule somewhere else
+		     System.err.println("Skipping probe in pval file: " + name);
+		     continue;
 		 }
+		 probe_id[i-1] = name;
+		 
+		 pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(column)));
+		 
+		 // Fudge when pvalues are zero.
+		 if ( dolog && pval[i-1] <= 0) {
+		     System.err.println("Warning: Cannot take log of non-positive value for " + name  +  " (" + pval[i-1] + ") from gene score file: Setting to " + small);
+		     //			 continue;
+		     pval[i-1] = small;
+		 }
+		 
+		 if (dolog) {
+		     pval[i-1]= -(Math.log(pval[i-1])/log10); // Make -log base 10.
+		 }
+		     
+		 doubleArray[i-1] = new Double(pval[i-1]);
+		 probe_pval_map.put(probe_id[i-1], doubleArray[i-1]);	      // put key, value.
+	     }
 	     
 	     num_pvals = Array.getLength(pval);
+
 	     if (num_pvals <= 0) {
 		 System.err.println("No pvalues found in the file!");
 		 System.exit(1);
@@ -142,34 +141,36 @@ import java.lang.reflect.*;
      } //
 
 
-     /*****************************************************************************************/
-     /*****************************************************************************************/
+    /**
+      */
      public String[] get_probe_ids(){
 	 return probe_id;
      }
 
      
-     /*****************************************************************************************/
-     /*****************************************************************************************/
+
+    /**
+      */
       public double[] get_pval(){
 	 return pval;
      }
 
 
-     /*****************************************************************************************/
-     /*****************************************************************************************/
+    /**
+      */
      public int get_numpvals(){
 	 return num_pvals;
      }
 
-
-     public Map get_map() {
+    /**
+      */
+      public Map get_map() {
 	 return probe_pval_map;
      }
 
 
-     /*****************************************************************************************/
-     /*****************************************************************************************/
+     /**
+      */
      public double get_value_map(String probe_id) {
 	 double value=0.0;
 	 
@@ -180,6 +181,14 @@ import java.lang.reflect.*;
 	 return value;
      }
      
+
+     /**
+	Main
+     */
+     public static void main (String[] args) {
+	 Pval_parse t = new Pval_parse(args[0]);
+     }
+
 
  } // end of class
 

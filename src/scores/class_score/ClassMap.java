@@ -1,17 +1,15 @@
 package scores.class_score;
 /******************************************************************************
-  Author :Shahmil Merchant
+  Author :Shahmil Merchant, Paul Pavlidis (major changes)
   Created :09/02/02
   Revision History: $Id$
   Description:Parses the file of the form
-    chip_id   Classes1|Classes2|Classes3|.....
-    Stores it in the HashTable called probe_class_map
-    Stores the reverse also int class_probe_map in the form 
-    Classes1   chip1,chip2....
+    probe_id   Classes1|Classes2|Classes3|.....
+    Stores it in the HashTable called probeToClassMap
+    Stores the reverse also int classToProbeMap in the form 
+    Classes1   probe1,probe2....
                                                                                                                                                             
 *******************************************************************************/
-
-
 import scores.class_score.*;
 import java.io.*;
 import java.util.*;
@@ -23,187 +21,225 @@ import java.nio.charset.*;
  */
 public class ClassMap { 
 
-     //stores probe->Classes map
-     private static Map probe_class_map;
-     //stores Classes->probe map
-     private static Map class_probe_map;
-     //store list of unique Go_IDS
-     private Set Classes;
+    private static Map probeToClassMap;      //stores probe->Classes map
+    private static Map classToProbeMap;      //stores Classes->probe map
+    private static Map classesToRedundantMap; // stores classes->classes which are the same.
 
-     /**
-      */
-     public ClassMap(String filename)
-     {
-	 String aLine = null;
-	 //read in file 	
-	 try { 
-	     FileInputStream fis = new FileInputStream(filename);
-	     BufferedInputStream bis = new BufferedInputStream(fis);
-	     BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
-	     Double[] DoubleArray = null;
-	     String row;
-	     String col;
-	     Vector rows = new Vector();
-	     Vector cols = null;
-	     probe_class_map = new LinkedHashMap();
-	     ArrayList chip_id = new ArrayList();
-	     String go_ids = null;
-	     //using set to prevent repeats
-	     Classes = new TreeSet();
+    /**
+     */
+    public ClassMap(String filename, Map probes)
+    {
+	String aLine = null;
+
+	//read in file 	
+	try { 
+	    FileInputStream fis = new FileInputStream(filename);
+	    BufferedInputStream bis = new BufferedInputStream(fis);
+	    BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
+	    Double[] DoubleArray = null;
+	    Vector rows = new Vector();
+	    Vector cols = null;
+
+	    probeToClassMap = new LinkedHashMap();
+	    classToProbeMap = new LinkedHashMap();
+
+	    ArrayList probe_id = new ArrayList();
+	    String class_ids = null;
+	    String probe = "";
+	    String go = "";
+
+	    //using set to prevent repeats
+	    //	    Classes = new TreeSet();
 	     
-	     // loop through rows
-	     while((row = dis.readLine())!= null)
-		 {  
-		     //tokenize file by tab character
-		     StringTokenizer st = new StringTokenizer(row, "\t");
-		     
-		     // create a new Vector for each row's columns
-		     cols = new Vector();
-		     //String pp = st.nextToken();
-		     //System.out.println(pp);
-		     //chip_id.add(pp);
-		     chip_id.add(st.nextToken());
-		     // assumption just 2 columns
-		     if (st.hasMoreTokens()){
-			 go_ids = st.nextToken();
-			 //another tokenizer is required since the ClassesID's are seperated by the | character
-			 StringTokenizer st1 = new StringTokenizer(go_ids,"|");
-			 while(st1.hasMoreTokens())
-			     cols.add(st1.nextToken());
-		     } else {
-			 cols.add(null);
-		     }
-		     // add the column Vector to the rows Vector
-		     rows.add(cols);
-		 }
+	    // loop through rows. Makes hash map of probes to go, and map of go to probes.
+	    String line = "";
+	    while(( line = dis.readLine() ) != null) {  
+		//tokenize file by tab character
+		StringTokenizer st = new StringTokenizer(line, "\t");
+		
+		// create a new Vector for each row's columns
+		probe = st.nextToken();
+
+		if (probes.containsKey(probe)) { // only do probes we have in the data set.
+		    
+		    probe_id.add(probe);
+		    probeToClassMap.put(probe, new ArrayList());
+		    
+		    // assumption: just 2 columns
+		    if (st.hasMoreTokens()) {
+			class_ids = st.nextToken();
+			
+			//another tokenizer is required since the ClassesID's are seperated by the | character
+			StringTokenizer st1 = new StringTokenizer(class_ids, "|");
+			while(st1.hasMoreTokens()) {
+			    go = st1.nextToken();
+			    
+			    // add this go to the probe->go map.
+			    ((ArrayList)probeToClassMap.get(probe)).add(go);
+			    
+			    // add this probe this go->probe map.
+			    if (! classToProbeMap.containsKey(go) ) {
+				classToProbeMap.put(go, new ArrayList());
+			    }
+			    ((ArrayList)classToProbeMap.get(go)).add(probe);
+			}
+		    }
+		}
+	    }
 	     
-	     dis.close();
-	     
-	     // for hash map of probe -> go
-	     for (int i =0;i<rows.size();i++){
-		 ArrayList go = new ArrayList();
-		 for(int j=0;j < ((Vector)rows.elementAt(i)).size(); j++) {
-		     String element_ij = (String)(((Vector)(rows.elementAt(i))).elementAt(j));
-		     if (element_ij !=null){
-			 go.add(element_ij);
-			 //stores uniques list of GoIDs
-			 Classes.add(element_ij);
-		     }
-		 }
-		 probe_class_map.put(chip_id.get(i), go);
-	     }   
-			     
-	 } catch (IOException e) { 
-	     // catch possible io errors from readLine()
-	     System.out.println("IOException error!");
-	     e.printStackTrace();
-	 }
-	 
-     } // end of readMyFile()
+	    dis.close();
+
+	} catch (IOException e) { 
+	    // catch possible io errors from readLine()
+	    System.out.println("IOException error!");
+	    e.printStackTrace();
+	}
+	
+	collapseClasses(); // identify redundant classes.
+	
+    } // end of readMyFile()
      
-    
-    
-     /**
-      */
-     public Map get_probe_map() {
-	 return probe_class_map;
-     }
 
 
-     /**
-      */
-     public ArrayList get_probe_value_map(String chip_id) {
-	 return (ArrayList)(probe_class_map.get(chip_id));
-     }
+    /**
+       Identify classes which are identical to others. This isn't
+       superfast, because it doesn't know which classes are actually
+       relevant in the data. So some very large classes will be looked
+       at here.
+
+    */
+    private void collapseClasses() {
+	LinkedHashMap seenClasses = new LinkedHashMap();
+	LinkedHashMap sigs = new LinkedHashMap();
+	classesToRedundantMap = new LinkedHashMap();
+	ArrayList sortedList = null;
+	Set entries = classToProbeMap.keySet();
+	Iterator it = entries.iterator();
+	String signature = "";
+	String classId = "";
+
+	System.err.println("There are " + entries.size() + " classes represented on the chip (of any size). Redundant classes are being removed...");
+
+	// sort each arraylist in for each go and create a string that is a signature for this class. 
+	int ignored = 0;
+	while (it.hasNext()) {
+	    classId = (String)it.next();
+	    ArrayList classMembers = (ArrayList)classToProbeMap.get(classId);
+	    
+	    // skip classes that are huge. It's too slow
+	    // otherwise. This is a total heuristic. Note that this
+	    // doesn't mean the class won't get analyzed, it just
+	    // means we don't bother looking for redundancies. Big
+	    // classes are less likely to be identical to others,
+	    // anyway. In tests, the range shown below has no effect
+	    // on the results, but it _could_matter.
+	    if (classMembers.size() > 200 || classMembers.size() < 2) {
+		ignored++;
+		continue;
+	    }
+
+	    Collections.sort(classMembers);
+	    signature = "";
+	    Iterator classit = classMembers.iterator();
+	    while (classit.hasNext()) {
+		signature = signature + "__" + (String)classit.next();
+	    }
+	    sigs.put(classId, signature);
+	}
+	
+	// look at the signatures for repeats.
+	entries = sigs.keySet();
+	it = entries.iterator();
+	while (it.hasNext() ) {
+	    classId = (String)it.next();
+	    signature = (String)sigs.get( classId );
+
+	    // if the signature has already been seen, add it to the redundant list, and remove this class from the classToProbeMap.
+	    if (seenClasses.containsKey(signature)) {
+		if ( ! classesToRedundantMap.containsKey(seenClasses.get(signature)) )
+		    classesToRedundantMap.put(seenClasses.get(signature), new ArrayList());
+
+		((ArrayList)classesToRedundantMap.get(seenClasses.get(signature))).add(classId);
+		classToProbeMap.remove(classId);
+		//		System.err.println(classId + " is the same as an existing class, " + seenClasses.get(signature));
+	    } else {
+		// add string to hash
+		seenClasses.put(signature, classId);
+	    }
+	}
+
+	//	System.err.println("There are now " + classToProbeMap.size() + " classes represented on the chip (" + ignored + " were ignored)");
+
+    }
+
+
+    /**
+     */
+    public ArrayList getRedundancies(String classId) {
+	if ( classesToRedundantMap.containsKey(classId) ) {
+	    return (ArrayList)classesToRedundantMap.get(classId);
+	} else {
+	    return null;
+	}
+    }
+
+    /**
+     */
+    public String  getRedundanciesString(String classId) {
+	if ( classesToRedundantMap.containsKey(classId) ) {
+	    ArrayList redundant =  (ArrayList)classesToRedundantMap.get(classId);
+	    Iterator it = redundant.iterator();
+	    String returnValue = "";
+	    while (it.hasNext()) {
+		returnValue = returnValue + ", " + it.next();
+	    }
+	    return returnValue;
+	} else {
+	    return "";
+	}
+    }
+
+ 
+    /**
+     */
+    private ArrayList get_probe_value_map(String probe_id) {
+	return (ArrayList)(probeToClassMap.get(probe_id));
+    }
 
   
-     /**
-      */
-     public Map get_class_map() {
+    /**
+     */
+    public Map get_class_map() {
 
-	 ArrayList[] arry = new ArrayList[Classes.size()];
-	 //iterators over  Set 
-	 Iterator it = Classes.iterator();
-	 class_probe_map = new LinkedHashMap();
-	 //stores entrySet
-	 java.util.Set pairEntries = probe_class_map.entrySet();
-	 java.util.Map.Entry nxt = null;
-	 //stores entires over pair values of Hashtable
-	 Iterator it1 = pairEntries.iterator();
-	 int length =Classes.size();
-	 int x;
-	 class_probe_map = new LinkedHashMap();
-	 
-	 // define a mulitmap using a list interface
-
-
-         //create a hashtable with keys as the Classes elements and values null 
-	 while (it.hasNext()) {
-	     String element = (String)it.next();
-	     class_probe_map.put(element,null);
-	 }
-	 
-	 //iterate over each key value pair of probe_class_map
-	 while(it1.hasNext()){
-	     nxt = (Map.Entry)it1.next();
-	     ArrayList arr= (ArrayList)nxt.getValue();
-	     //since each key has a list of values define an interator to go over the values
-	     Iterator I=arr.iterator();
-	     while (I.hasNext()){
-		 String val = (String)I.next();
-		 
-		 String ke = (String)nxt.getKey();
-		 List l = (List) class_probe_map.get(val);
-		 //to implement multimap using an ArrayList....get created only when the value 
-		 //associated with a particular go_probe key is null and if not just add to the list 
-		 if (l ==null){
-		     class_probe_map.put(val,l= new ArrayList());
-		     l.add(ke);
-		 } else {
-		     class_probe_map.put(val,l);
-		     l.add(ke);
-		 }
-	     }
-	 }
-
-	 return class_probe_map;
-     }
+	return classToProbeMap;
+    }
      
 
-     /**
+    /**
 
 
-      */
-     public ArrayList get_class_value_map(String go_id) {
-	 return (ArrayList)(class_probe_map.get(go_id));
-     }
+    */
+    public ArrayList get_class_value_map(String class_id) {
+	return (ArrayList)(classToProbeMap.get(class_id));
+    }
 
 
 
-     /**
+    /**
 
 
-      */
-     public void print(Map m) 
-     {
-	 //print the entire map
-	 Collection entries = m.entrySet();
-	 Iterator it = entries.iterator();
-	 while(it.hasNext()) {
-	     Map.Entry e = (Map.Entry)it.next();
-	     System.out.println("Key = " + e.getKey() + ", Value = " + e.getValue());
-	 }
-     }
+    */
+    public void print(Map m) 
+    {
+	//print the entire map
+	Collection entries = m.entrySet();
+	Iterator it = entries.iterator();
+	while(it.hasNext()) {
+	    Map.Entry e = (Map.Entry)it.next();
+	    System.out.println("Key = " + e.getKey() + ", Value = " + e.getValue());
+	}
+    }
 
 
-   
-     public static void main (String[] args) {
-	 ClassMap test = new ClassMap(args[0]); // creates the probe -> go map.
-	 test.print(probe_class_map);
-	 test.get_class_map(); // creates the go -> probe map
-	 test.print(class_probe_map);
-     }
- 
-
- } // end of class
+} // end of class
 

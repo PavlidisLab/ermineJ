@@ -28,18 +28,20 @@ public class histogram {
     private int number_of_runs = 0;
     private int row = 0;
     private int column = 0;
-    private Matrix M = null;
+    private Matrix M = null; // holds the actual histograms.
     private Map list;
-    private double minPval;
+    private double minPval; // the smallest possible pvalue: used when a requested score is out of the top of the range.
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
-    public histogram(){
+
+    /**
+     */
+    public histogram() {
+	;
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public histogram(int number_of_class, int min_class_size, int number_of_runs, double max) {
 	this.hist_max = max;
 	this.hist_min = this.hist_min; // todo: fix this so it does something.
@@ -63,8 +65,8 @@ public class histogram {
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public void set_number_of_runs(int runs)
     {
 	number_of_runs = runs;
@@ -139,24 +141,24 @@ public class histogram {
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public double get_hist_min()
     {
 	return hist_min;
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public double get_hist_max()
     {
 	return hist_max;
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public int get_number_of_bins()
 
     {
@@ -168,8 +170,8 @@ public class histogram {
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public int get_number_of_runs()
 	
     {
@@ -177,29 +179,33 @@ public class histogram {
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /** todo: this should be disallowed.
+     */
     public Matrix get_matrix()
     {
 	return M;
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public Map get_matrix_map()
     {
 	return list;
     }
 
 
+    public int get_min_class_size() {
+	return min_class_size;
+    }
+
     public String toString () {
 	return "There are " + number_of_bins + " bins in the histogram. The maximum possible value is " + hist_max + ", the minimum is " + hist_min + "." + " Min class is " + min_class_size + ".";
     }
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+     */
     public int class_index(int class_size, int min_class_size)
     {
 	//get corresponding index for each class size

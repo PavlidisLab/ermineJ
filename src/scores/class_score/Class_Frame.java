@@ -1296,8 +1296,11 @@ public class Class_Frame extends JPanel {
 
 
 
-    /*****************************************************************************************/
-    /*****************************************************************************************/
+    /**
+       
+    This is the driver for running the GUI.
+
+     */
     public static void main(String[] args) {
 	try {
 	    UIManager.setLookAndFeel(
@@ -1315,7 +1318,8 @@ public class Class_Frame extends JPanel {
 				  BorderLayout.CENTER);
 	test.setTitle("Functional Class Scoring");
 	//test.pack();
-	test.setSize(450,400);
+	//	test.setSize(450,400);
+	test.setSize(465,600);
 	test.setVisible(true);
     }
 
