@@ -1,11 +1,13 @@
+import classScore.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 /**
  Command line interface for ermineJ program.
 
  This needs major work!!!
 
- $Id$
-
- #command line arguments in the following way
+ command line arguments in the following way
   args[0]:pval_file, 
   args[1]:affy_go_file, 
   args[2]:Go_name_file, 
@@ -21,18 +23,13 @@
 
   **notce: all "data files" and this "command line file" should be put uncer the directory ermineJ\java_proj\src
 
-examples:
-1. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-quantile-log2.txt QUANTILE_METHOD 100 4 10000 50 0.001 true 1 true
-2. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-mean-log3.txt MEAN_METHOD 100 4 10000 50 0.0001 true 1 true
+  examples:
+  1. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-quantile-log2.txt QUANTILE_METHOD 100 4 10000 50 0.001 true 1 true
+  2. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-mean-log3.txt MEAN_METHOD 100 4 10000 50 0.0001 true 1 true
 
-***************************************************************************************/
-
-
-import scores.class_score.*;
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
+  @author Edward Chen, Paul Pavlidis
+  @version $Id$
+*/
 public class erminecmd{
     public static void main(String args[]){
 	try {

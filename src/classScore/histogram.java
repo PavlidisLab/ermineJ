@@ -1,7 +1,7 @@
-package scores.class_score;
-import scores.class_score.*;
+package classScore;
+import util.*;
 import java.util.*;
-import java.util.Locale.*;
+//import java.util.Locale.*;
 import java.lang.*;
 import java.lang.reflect.*;
 import java.text.DecimalFormat;

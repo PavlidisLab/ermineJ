@@ -1,4 +1,5 @@
-package scores.class_score;
+package classScore;
+import util.*;
 import java.lang.*;
 import java.lang.reflect.*;
 import java.util.*;

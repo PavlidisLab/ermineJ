@@ -1,4 +1,4 @@
-package scores.class_score;
+package classScore;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.JMenu;

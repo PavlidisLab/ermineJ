@@ -1,5 +1,5 @@
-package scores.class_score;
-import scores.class_score.*;
+package classScore;
+import util.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;

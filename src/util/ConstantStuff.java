@@ -1,4 +1,4 @@
-package scores.class_score;
+package util;
 import java.util.*;
 
 /**
