@@ -36,8 +36,7 @@ import javax.help.*;
  */
 
 public class GeneSetScoreFrame
-    extends JFrame 
-    implements HyperlinkListener {
+    extends JFrame {
 
    private JPanel mainPanel = ( JPanel )this.getContentPane();
    private JMenuBar jMenuBar1 = new JMenuBar();
