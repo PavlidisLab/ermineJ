@@ -21,7 +21,7 @@ import classScore.data.GeneSetResult;
 import classScore.data.expClassScore;
 import classScore.data.Histogram;
 import classScore.gui.GeneSetScoreStatus;
-import classScore.gui.geneSet.JDetailsFrame;
+import classScore.gui.geneSet.JGeneSetFrame;
 
 /**
  * Main class to make 'experiment score' pvalues. Includes multiple test
@@ -158,7 +158,7 @@ public class classPvalRun {
       }
 
       // create the details frame
-      JDetailsFrame f = new JDetailsFrame( probeIDs, pvals, geneData, settings );
+      JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings );
       f.setTitle( name + " (" + probeIDs.size() + " items) p="
             + nf.format( res.getPvalue() ) );
       f.show();
