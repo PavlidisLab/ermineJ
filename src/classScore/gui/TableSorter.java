@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
+import baseCode.gui.JMatrixDisplay;
 
 /**
  * TableSorter is a decorator for TableModels; adding sorting
@@ -64,6 +65,7 @@ import javax.swing.table.*;
 
 public class TableSorter extends AbstractTableModel {
     protected TableModel tableModel;
+   private JMatrixDisplay m_matrixDisplay;
 
     public static final int DESCENDING = -1;
     public static final int NOT_SORTED = 0;
@@ -107,6 +109,11 @@ public class TableSorter extends AbstractTableModel {
         setTableModel(tableModel);
     }
 
+    public TableSorter( TableModel tableModel, JMatrixDisplay matrixDisplay ) {
+        this( tableModel );
+        m_matrixDisplay = matrixDisplay;
+    }
+    
     private void clearSortingState() {
         viewToModel = null;
         modelToView = null;
@@ -329,12 +336,33 @@ public class TableSorter extends AbstractTableModel {
                       comparison = -1;
                 }
                 else if ( o1 != null && o2 != null ) {
-                   if(o1.getClass().equals(Double.class))
-                      comparator=getComparator( Double.class );
-                   else if(o1.getClass().equals(Integer.class))
-                      comparator= getComparator( Integer.class );
-                   else
+                   if(o1.getClass().equals(Double.class)) {
+                      comparator = getComparator( Double.class );
+                   }
+                   else if(o1.getClass().equals(Integer.class)) {
+                      comparator = getComparator( Integer.class );
+                   }
+                   else if(o1.getClass().equals(Point.class)) {
+                      comparator = getComparator( Double.class );
+                      
+                      // If sortColumn is in the matrix display, then model.getValueAt()
+                      // returns a Point object that represents a coordinate into the
+                      // display matrix.  This is done so that the display matrix object
+                      // can be asked for both the color and the value.  We are here only
+                      // interested in the value.
+                      if (m_matrixDisplay != null) {
+
+                         Point p1 = (Point) o1;
+                         Point p2 = (Point) o2;
+
+                         o1 = new Double( m_matrixDisplay.getValue( p1.x, p1.y ));
+                         o2 = new Double( m_matrixDisplay.getValue( p2.x, p2.y ));
+                      }
+                   }
+                   else {
                       comparator=getComparator( column );
+                   }
+
                    comparison = comparator.compare( o1, o2 );
                 }
 
