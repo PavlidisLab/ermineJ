@@ -73,7 +73,6 @@ public class AnalysisWizardStep5 extends WizardStep {
       resampPanel = new JPanel();
       TitledBorder resampTitledBorder;
       JPanel jPanel14 = new JPanel();
-      JLabel jLabel10 = new JLabel();
     
       jPanel13 = new JPanel();
       JLabel jLabel13 = new JLabel();
@@ -94,7 +93,7 @@ public class AnalysisWizardStep5 extends WizardStep {
       jCheckBoxDoLog
             .setToolTipText( "If you are using p values, you should check this box." );
       jCheckBoxDoLog.setSelected( true );
-      jCheckBoxDoLog.setText( "Log tranform the gene scores" );
+      jCheckBoxDoLog.setText( "Take the negative log of the gene scores" );
 
       //oraPanel stuff//////////////////////////////////////////////////////////
       oraPanel.setPreferredSize( new Dimension( 335, 150 ) );
@@ -129,7 +128,7 @@ public class AnalysisWizardStep5 extends WizardStep {
       jPanel15.setMinimumSize( new Dimension( 180, 29 ) );
       jPanel15.setBackground( SystemColor.control );
       jLabel6.setLabelFor( jTextFieldPValueThreshold );
-      jLabel6.setText( "P value threshold" );
+      jLabel6.setText( "Gene score threshold" );
       jTextFieldPValueThreshold.setEditable( true );
       jTextFieldPValueThreshold.setPreferredSize( new Dimension( 50, 19 ) );
       jTextFieldPValueThreshold

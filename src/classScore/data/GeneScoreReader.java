@@ -61,7 +61,6 @@ public class GeneScoreReader {
     */
    public GeneScoreReader( String filename, Settings settings,
          StatusViewer messenger, Map groupToProbeMap ) throws IOException {
-      //read in file
 
       groupToPvalMap = new HashMap();
       double log10 = Math.log( 10 );
@@ -71,9 +70,9 @@ public class GeneScoreReader {
          throw new IOException( "Could not read " + filename );
       }
 
-      if ( settings.getScorecol() < 1 ) {
+      if ( settings.getScorecol() < 2 ) {
          throw new IllegalArgumentException( "Illegal column number "
-               + settings.getScorecol() + ", must be greater or equal to 1" );
+               + settings.getScorecol() + ", must be greater than 1" );
       }
 
       if ( messenger != null ) {

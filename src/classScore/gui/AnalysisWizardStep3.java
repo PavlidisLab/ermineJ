@@ -125,8 +125,8 @@ public class AnalysisWizardStep3 extends WizardStep {
       step3Panel.add( jPanel9, BorderLayout.SOUTH );
 
       this
-            .addHelp( "<html><b>Select custom classes to include in the analysis</b><br>"
-                  + "If you have not defined any custom classes, the left-hand panel will be blank. " );
+            .addHelp( "<html><b>Select custom gene sets to include in the analysis</b><br>"
+                  + "If you have not defined any custom gene sets, the left-hand panel will be blank. " );
       this.addMain( step3Panel );
    }
 

@@ -44,10 +44,13 @@ public class classScoreGUI {
       }
       frame.setLocation( ( screenSize.width - frameSize.width ) / 2,
             ( screenSize.height - frameSize.height ) / 2 );
+      frame.disableMenusForLoad();
       frame.setVisible( true );
 
+      frame.showStatus("Waiting for startup dialog box");
       StartupDialog sdlog = new StartupDialog( frame );
       sdlog.showDialog();
+      frame.showStatus("Starting up...");
    }
 
    public static void main( String[] args ) {

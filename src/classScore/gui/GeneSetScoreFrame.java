@@ -42,18 +42,16 @@ import org.xml.sax.SAXException;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @author Will Braynen
  * @version $Id$
- *
  */
 
-public class GeneSetScoreFrame
-    extends JFrame {
+public class GeneSetScoreFrame extends JFrame {
 
-   private JPanel mainPanel = ( JPanel )this.getContentPane();
+   private JPanel mainPanel = ( JPanel ) this.getContentPane();
    private JMenuBar jMenuBar1 = new JMenuBar();
    private JMenu fileMenu = new JMenu();
    private JMenuItem quitMenuItem = new JMenuItem();
@@ -90,26 +88,22 @@ public class GeneSetScoreFrame
 
    private JLabel logoLabel;
 
-   private AnalysisThread athread=new AnalysisThread();
+   private AnalysisThread athread = new AnalysisThread();
    JPanel jPanel1 = new JPanel();
    FlowLayout flowLayout1 = new FlowLayout();
 
    private HelpHelper hh;
- 
+
    public GeneSetScoreFrame() {
       try {
          jbInit();
          hh = new HelpHelper();
-         hh.initHelp(helpMenuItem);
+         hh.initHelp( helpMenuItem );
          settings = new Settings();
-      }
-      catch ( Exception e ) {
+      } catch ( Exception e ) {
          e.printStackTrace();
       }
    }
-
-
-
 
    /* init */
    private void jbInit() throws Exception {
@@ -118,7 +112,7 @@ public class GeneSetScoreFrame
       this.setSize( new Dimension( 886, 450 ) );
       this.setTitle( "ErmineJ" );
       BorderLayout borderLayout1 = new BorderLayout();
-      mainPanel.setLayout(borderLayout1);
+      mainPanel.setLayout( borderLayout1 );
       mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
       mainPanel.setInputVerifier( null );
 
@@ -126,61 +120,76 @@ public class GeneSetScoreFrame
       fileMenu.setText( "File" );
       fileMenu.setMnemonic( 'F' );
       quitMenuItem.setText( "Quit" );
-      quitMenuItem.addActionListener( new
-                                      GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
+      quitMenuItem
+            .addActionListener( new GeneSetScoreFrame_quitMenuItem_actionAdapter(
+                  this ) );
       quitMenuItem.setMnemonic( 'Q' );
-      quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q,InputEvent.CTRL_MASK));
-      progInPanel.setBackground(Color.white);
-      progInPanel.setPreferredSize(new Dimension(800, 26));
-      jPanel1.setBackground(Color.white);
-      jPanel1.setForeground(Color.black);
-      jPanel1.setPreferredSize(new Dimension(800, 200));
+      quitMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Q,
+            InputEvent.CTRL_MASK ) );
+      progInPanel.setBackground( Color.white );
+      progInPanel.setPreferredSize( new Dimension( 800, 26 ) );
+      jPanel1.setBackground( Color.white );
+      jPanel1.setForeground( Color.black );
+      jPanel1.setPreferredSize( new Dimension( 800, 200 ) );
       fileMenu.add( quitMenuItem );
       classMenu.setText( "Gene Sets" );
       classMenu.setMnemonic( 'C' );
-      classMenu.setEnabled(false);
+      classMenu.setEnabled( false );
       defineClassMenuItem.setText( "Define New Gene Set" );
-      defineClassMenuItem.addActionListener( new
-                                             GeneSetScoreFrame_defineClassMenuItem_actionAdapter( this ) );
+      defineClassMenuItem
+            .addActionListener( new GeneSetScoreFrame_defineClassMenuItem_actionAdapter(
+                  this ) );
       defineClassMenuItem.setMnemonic( 'D' );
-      defineClassMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,InputEvent.CTRL_MASK));
+      defineClassMenuItem.setAccelerator( KeyStroke.getKeyStroke(
+            KeyEvent.VK_D, InputEvent.CTRL_MASK ) );
       modClassMenuItem.setText( "Modify Gene Set" );
-      modClassMenuItem.addActionListener( new
-                                          GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
+      modClassMenuItem
+            .addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter(
+                  this ) );
       modClassMenuItem.setMnemonic( 'M' );
       findClassMenuItem.setText( "Find Gene Set" );
-      findClassMenuItem.addActionListener( new
-                                          GeneSetScoreFrame_findClassMenuItem_actionAdapter( this ) );
+      findClassMenuItem
+            .addActionListener( new GeneSetScoreFrame_findClassMenuItem_actionAdapter(
+                  this ) );
       findClassMenuItem.setMnemonic( 'F' );
-      findClassMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F,InputEvent.CTRL_MASK));
+      findClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F,
+            InputEvent.CTRL_MASK ) );
       classMenu.add( defineClassMenuItem );
       classMenu.add( modClassMenuItem );
       classMenu.add( findClassMenuItem );
       analysisMenu.setText( "Analysis" );
       analysisMenu.setMnemonic( 'A' );
-      analysisMenu.setEnabled(false);
+      analysisMenu.setEnabled( false );
       runAnalysisMenuItem.setText( "Run Analysis" );
-      runAnalysisMenuItem.addActionListener( new
-                                             GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
+      runAnalysisMenuItem
+            .addActionListener( new GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter(
+                  this ) );
       runAnalysisMenuItem.setMnemonic( 'R' );
-      runAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,InputEvent.CTRL_MASK));
+      runAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke(
+            KeyEvent.VK_R, InputEvent.CTRL_MASK ) );
       cancelAnalysisMenuItem.setText( "Cancel Analysis" );
-      cancelAnalysisMenuItem.setEnabled(false);
-      cancelAnalysisMenuItem.addActionListener( new
-                                             GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( this ) );
+      cancelAnalysisMenuItem.setEnabled( false );
+      cancelAnalysisMenuItem
+            .addActionListener( new GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter(
+                  this ) );
       cancelAnalysisMenuItem.setMnemonic( 'C' );
-      cancelAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,InputEvent.CTRL_MASK));
+      cancelAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke(
+            KeyEvent.VK_C, InputEvent.CTRL_MASK ) );
 
       loadAnalysisMenuItem.setText( "Load Analysis" );
-      loadAnalysisMenuItem.addActionListener( new
-                                              GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( this ) );
+      loadAnalysisMenuItem
+            .addActionListener( new GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter(
+                  this ) );
       loadAnalysisMenuItem.setMnemonic( 'L' );
-      loadAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L,InputEvent.CTRL_MASK));
+      loadAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke(
+            KeyEvent.VK_L, InputEvent.CTRL_MASK ) );
       saveAnalysisMenuItem.setText( "Save Analysis" );
-      saveAnalysisMenuItem.addActionListener( new
-                                              GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( this ) );
+      saveAnalysisMenuItem
+            .addActionListener( new GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter(
+                  this ) );
       saveAnalysisMenuItem.setMnemonic( 'S' );
-      saveAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_MASK));
+      saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke(
+            KeyEvent.VK_S, InputEvent.CTRL_MASK ) );
       analysisMenu.add( runAnalysisMenuItem );
       analysisMenu.add( cancelAnalysisMenuItem );
       analysisMenu.add( loadAnalysisMenuItem );
@@ -192,8 +201,9 @@ public class GeneSetScoreFrame
 
       aboutMenuItem.setText( "About ErmineJ" );
       aboutMenuItem.setMnemonic( 'A' );
-      aboutMenuItem.addActionListener( new
-                                       GeneSetScoreFrame_aboutMenuItem_actionAdapter( this ) );
+      aboutMenuItem
+            .addActionListener( new GeneSetScoreFrame_aboutMenuItem_actionAdapter(
+                  this ) );
       helpMenu.add( helpMenuItem );
       helpMenu.add( aboutMenuItem );
       jMenuBar1.add( fileMenu );
@@ -207,24 +217,24 @@ public class GeneSetScoreFrame
             .getResource( "resources/logo1small.gif" ) ) );
 
       progressPanel = new JPanel();
-      progressPanel.setLayout(flowLayout1);
+      progressPanel.setLayout( flowLayout1 );
 
-      JLabel label= new JLabel("Please wait while the files are loaded in.");
-      label.setPreferredSize(new Dimension(500, 30));
-      label.setHorizontalTextPosition(SwingConstants.CENTER);
-      label.setLabelFor(progressBar);
-      label.setAlignmentX((float) 0.0);
-      label.setHorizontalAlignment(SwingConstants.CENTER);
+      JLabel label = new JLabel( "Please wait while the files are loaded in." );
+      label.setPreferredSize( new Dimension( 500, 30 ) );
+      label.setHorizontalTextPosition( SwingConstants.CENTER );
+      label.setLabelFor( progressBar );
+      label.setAlignmentX( ( float ) 0.0 );
+      label.setHorizontalAlignment( SwingConstants.CENTER );
 
-      progressBar.setPreferredSize(new Dimension(300, 16));
-      progressBar.setIndeterminate(false);
-      progressPanel.setBackground(Color.white);
+      progressBar.setPreferredSize( new Dimension( 300, 16 ) );
+      progressBar.setIndeterminate( false );
+      progressPanel.setBackground( Color.white );
 
-      progressPanel.add(logoLabel);
-      progressPanel.add(jPanel1, null);
-      jPanel1.add(label, null);
-      jPanel1.add(progInPanel, null);
-      progInPanel.add(progressBar, null);
+      progressPanel.add( logoLabel );
+      progressPanel.add( jPanel1, null );
+      jPanel1.add( label, null );
+      jPanel1.add( progInPanel, null );
+      progInPanel.add( progressBar, null );
 
       //main panel
       oPanel = new OutputPanel( this, results );
@@ -236,38 +246,44 @@ public class GeneSetScoreFrame
       jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
       jPanelStatus.setPreferredSize( new Dimension( 830, 33 ) );
       jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
-      jLabelStatus.setPreferredSize(new Dimension(800, 19) );
+      jLabelStatus.setPreferredSize( new Dimension( 800, 19 ) );
       jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
       jPanelStatus.add( jLabelStatus, null );
-      showStatus( "Please see 'About this software'" );
+      showStatus( "This window is not usable until you confirm the startup settings in the dialog box." );
       statusMessenger = new StatusJlabel( jLabelStatus );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
 
    private void enableMenusOnStart() {
+      fileMenu.setEnabled( true );
       classMenu.setEnabled( true );
       analysisMenu.setEnabled( true );
-      helpMenu.setEnabled(true);
+      helpMenu.setEnabled( true );
    }
 
-   public void disableMenusForAnalysis()
-   {
-      defineClassMenuItem.setEnabled(false);
-      modClassMenuItem.setEnabled(false);
-      runAnalysisMenuItem.setEnabled(false);
-      loadAnalysisMenuItem.setEnabled(false);
-      saveAnalysisMenuItem.setEnabled(false);
-      cancelAnalysisMenuItem.setEnabled(true);
+   public void disableMenusForLoad() {
+      fileMenu.setEnabled( false );
+      classMenu.setEnabled( false );
+      analysisMenu.setEnabled( false );
+      helpMenu.setEnabled( false );
    }
 
-   public void enableMenusForAnalysis()
-   {
-      defineClassMenuItem.setEnabled(true);
-      modClassMenuItem.setEnabled(true);
-      runAnalysisMenuItem.setEnabled(true);
-      loadAnalysisMenuItem.setEnabled(true);
-      saveAnalysisMenuItem.setEnabled(true);
-      cancelAnalysisMenuItem.setEnabled(false);
+   public void disableMenusForAnalysis() {
+      defineClassMenuItem.setEnabled( false );
+      modClassMenuItem.setEnabled( false );
+      runAnalysisMenuItem.setEnabled( false );
+      loadAnalysisMenuItem.setEnabled( false );
+      saveAnalysisMenuItem.setEnabled( false );
+      cancelAnalysisMenuItem.setEnabled( true );
+   }
+
+   public void enableMenusForAnalysis() {
+      defineClassMenuItem.setEnabled( true );
+      modClassMenuItem.setEnabled( true );
+      runAnalysisMenuItem.setEnabled( true );
+      loadAnalysisMenuItem.setEnabled( true );
+      saveAnalysisMenuItem.setEnabled( true );
+      cancelAnalysisMenuItem.setEnabled( false );
    }
 
    public void initialize() {
@@ -278,56 +294,59 @@ public class GeneSetScoreFrame
          geneDataSets = new HashMap();
          geneScoreSets = new HashMap();
 
-         progressBar.setValue(10);
+         progressBar.setValue( 10 );
 
-         statusMessenger.setStatus("Reading GO descriptions " + settings.getClassFile());
-         goData = new GONames(settings.getClassFile()); // parse go name file
-         progressBar.setValue(70);
+         statusMessenger.setStatus( "Reading GO descriptions "
+               + settings.getClassFile() );
+         goData = new GONames( settings.getClassFile() ); // parse go name file
+         progressBar.setValue( 70 );
 
-         statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
-         geneData = new GeneAnnotations(settings.getAnnotFile(), statusMessenger);
-         progressBar.setValue(100);
+         statusMessenger.setStatus( "Reading gene annotations from "
+               + settings.getAnnotFile() );
+         geneData = new GeneAnnotations( settings.getAnnotFile(),
+               statusMessenger );
+         progressBar.setValue( 100 );
 
          statusMessenger.setStatus( "Initializing gene class mapping" );
-         geneDataSets.put(new Integer("original".hashCode()) , geneData);
+         geneDataSets.put( new Integer( "original".hashCode() ), geneData );
 
-         statusMessenger.setStatus("Done with setup");
+         statusMessenger.setStatus( "Done with setup" );
          enableMenusOnStart();
 
          mainPanel.remove( progressPanel );
          mainPanel.add( oPanel, BorderLayout.CENTER );
-         statusMessenger.setStatus("Ready.");
-      }
-      catch ( IllegalArgumentException e ) {
-         GuiUtil.error(
-            "Error during initialization: " + e +
-            "\nIf this problem persists, please contact the software developer. " +
-            "\nPress OK to quit." );
+         statusMessenger.setStatus( "Ready." );
+      } catch ( IllegalArgumentException e ) {
+         GuiUtil
+               .error( "Error during initialization: "
+                     + e
+                     + "\nIf this problem persists, please contact the software developer. "
+                     + "\nPress OK to quit." );
          System.exit( 1 );
-      }
-      catch ( IOException e ) {
-         GuiUtil.error(
-            "File reading or writing error during initialization: " + e.getMessage()  +
-            "\nIf this problem persists, please contact the software developer. " +
-            "\nPress OK to quit.", e );
+      } catch ( IOException e ) {
+         GuiUtil
+               .error(
+                     "File reading or writing error during initialization: "
+                           + e.getMessage()
+                           + "\nIf this problem persists, please contact the software developer. "
+                           + "\nPress OK to quit.", e );
          System.exit( 1 );
       } catch ( SAXException e ) {
-         GuiUtil.error(
-           "Gene Ontology file format is incorrect. " +
-           "\nPlease check that it is a valid XML file. " +
-           "\nIf this problem persists, please contact the software developer. " +
-           "\nPress OK to quit." );
+         GuiUtil
+               .error( "Gene Ontology file format is incorrect. "
+                     + "\nPlease check that it is a valid XML file. "
+                     + "\nIf this problem persists, please contact the software developer. "
+                     + "\nPress OK to quit." );
          System.exit( 1 );
       }
       oPanel.addInitialData( geneData, goData );
-      statusMessenger.setStatus("Done with initialization.");
+      statusMessenger.setStatus( "Done with initialization." );
    }
 
-  /**
-   *
-   * @param a String
-   */
-  private void showStatus( String a ) {
+   /**
+    * @param a String
+    */
+   public void showStatus( String a ) {
       jLabelStatus.setText( a );
    }
 
@@ -338,21 +357,20 @@ public class GeneSetScoreFrame
       jLabelStatus.setText( "" );
    }
 
-  /**
-   *
-   * @param e ActionEvent
-   */
-  void quitMenuItem_actionPerformed( ActionEvent e ) {
+   /**
+    * @param e ActionEvent
+    */
+   void quitMenuItem_actionPerformed( ActionEvent e ) {
       System.exit( 0 );
    }
 
    void defineClassMenuItem_actionPerformed( ActionEvent e ) {
-      GeneSetWizard cwiz = new GeneSetWizard(this, geneData, goData, true);
+      GeneSetWizard cwiz = new GeneSetWizard( this, geneData, goData, true );
       cwiz.showWizard();
    }
 
    void modClassMenuItem_actionPerformed( ActionEvent e ) {
-      GeneSetWizard cwiz = new GeneSetWizard(this, geneData, goData, false);
+      GeneSetWizard cwiz = new GeneSetWizard( this, geneData, goData, false );
       cwiz.showWizard();
    }
 
@@ -361,7 +379,7 @@ public class GeneSetScoreFrame
    }
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      AnalysisWizard awiz = new AnalysisWizard(this, geneDataSets, goData);
+      AnalysisWizard awiz = new AnalysisWizard( this, geneDataSets, goData );
       awiz.showWizard();
    }
 
@@ -371,7 +389,7 @@ public class GeneSetScoreFrame
    }
 
    void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      LoadDialog lgsd = new LoadDialog(this);
+      LoadDialog lgsd = new LoadDialog( this );
       lgsd.showDialog();
    }
 
@@ -388,35 +406,33 @@ public class GeneSetScoreFrame
       return settings;
    }
 
-   public void setSettings(Settings settings) {
-      this.settings=settings;
+   public void setSettings( Settings settings ) {
+      this.settings = settings;
    }
 
-   public StatusViewer getStatusMessenger(){
+   public StatusViewer getStatusMessenger() {
       return statusMessenger;
    }
 
-   public void addResult(GeneSetPvalRun result)
-   {
+   public void addResult( GeneSetPvalRun result ) {
       results.add( result );
-      oPanel.addRun();  // this line should come after results.add() or else you'll get errors
+      oPanel.addRun(); // this line should come after results.add() or else you'll get errors
    }
 
-   public void startAnalysis(Settings runSettings)
-   {
+   public void startAnalysis( Settings runSettings ) {
       disableMenusForAnalysis();
-      athread.startAnalysisThread(this,runSettings,statusMessenger,goData,geneDataSets, rawDataSets, geneScoreSets);
+      athread.startAnalysisThread( this, runSettings, statusMessenger, goData,
+            geneDataSets, rawDataSets, geneScoreSets );
    }
 
-   public void loadAnalysis(String loadFile)
-   {
+   public void loadAnalysis( String loadFile ) {
       disableMenusForAnalysis();
-      Settings loadSettings = new Settings(loadFile);
-      athread.loadAnalysisThread(this,loadSettings,statusMessenger,goData,geneDataSets, rawDataSets, geneScoreSets,loadFile);
+      Settings loadSettings = new Settings( loadFile );
+      athread.loadAnalysisThread( this, loadSettings, statusMessenger, goData,
+            geneDataSets, rawDataSets, geneScoreSets, loadFile );
    }
 
-   public void addedNewGeneSet()
-   {
+   public void addedNewGeneSet() {
       oPanel.addedNewGeneSet();
    }
 
@@ -426,13 +442,13 @@ public class GeneSetScoreFrame
    public OutputPanel getOPanel() {
       return oPanel;
    }
+
 }
 
 /* end class */
 
-class GeneSetScoreFrame_quitMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
+class GeneSetScoreFrame_quitMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
    GeneSetScoreFrame_quitMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
@@ -444,12 +460,12 @@ class GeneSetScoreFrame_quitMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_defineClassMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
+class GeneSetScoreFrame_defineClassMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
-   GeneSetScoreFrame_defineClassMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+   GeneSetScoreFrame_defineClassMenuItem_actionAdapter(
+         GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -458,9 +474,8 @@ class GeneSetScoreFrame_defineClassMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_modClassMenuItem_actionAdapter
-    implements java.awt.event.
-    ActionListener {
+class GeneSetScoreFrame_modClassMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
    GeneSetScoreFrame_modClassMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
@@ -472,9 +487,8 @@ class GeneSetScoreFrame_modClassMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_findClassMenuItem_actionAdapter
-    implements java.awt.event.
-    ActionListener {
+class GeneSetScoreFrame_findClassMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
    GeneSetScoreFrame_findClassMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
@@ -486,12 +500,12 @@ class GeneSetScoreFrame_findClassMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
+class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
-   GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+   GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter(
+         GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -500,12 +514,12 @@ class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
+class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
-   GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+   GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter(
+         GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -514,12 +528,12 @@ class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
+class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
-   GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+   GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter(
+         GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -528,12 +542,12 @@ class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
+class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
-   GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+   GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter(
+         GeneSetScoreFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -542,9 +556,8 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter
    }
 }
 
-class GeneSetScoreFrame_aboutMenuItem_actionAdapter
-    implements java.awt.
-    event.ActionListener {
+class GeneSetScoreFrame_aboutMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    GeneSetScoreFrame adaptee;
 
    GeneSetScoreFrame_aboutMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
@@ -555,5 +568,4 @@ class GeneSetScoreFrame_aboutMenuItem_actionAdapter
       adaptee.aboutMenuItem_actionPerformed( e );
    }
 }
-
 

@@ -19,7 +19,7 @@ import classScore.gui.GeneSetScoreFrame;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author not attributable
  * @version $Id$
  * @todo don't use stop. use interrupt instead, and stop the readers
@@ -40,10 +40,10 @@ public class AnalysisThread {
    public AnalysisThread() {
    }
 
-   public void startAnalysisThread( GeneSetScoreFrame csframe,
-                                    Settings settings, StatusViewer messenger, GONames goData,
-                                    Map geneDataSets, Map rawDataSets, Map geneScoreSets ) throws
-       IllegalStateException {
+   public void startAnalysisThread( final GeneSetScoreFrame csframe,
+         Settings settings, final StatusViewer messenger, GONames goData,
+         Map geneDataSets, Map rawDataSets, Map geneScoreSets )
+         throws IllegalStateException {
       this.csframe = csframe;
       this.settings = settings;
       this.messenger = messenger;
@@ -53,20 +53,22 @@ public class AnalysisThread {
       this.geneDataSets = geneDataSets;
 
       this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer(
-          "original".hashCode() ) ); //this is the default geneData
+            "original".hashCode() ) ); //this is the default geneData
 
-      if ( athread != null )throw new IllegalStateException();
+      if ( athread != null ) throw new IllegalStateException(); // two analyses at once.
       athread = new Thread( new Runnable() {
          public void run() {
             try {
                doAnalysis();
-            }
-            catch ( IOException e ) {
-               GuiUtil.error( "During analysis", e );
+            } catch ( Exception e ) {
+               GuiUtil.error( "Error During analysis", e );
+               csframe.enableMenusForAnalysis();
+               messenger.setStatus("Ready");
             }
          }
       } );
       athread.start();
+      athread = null; // if there is an error, we need to make sure athread is null afterwards.
    }
 
    private void doAnalysis( Map results ) throws IOException {
@@ -77,13 +79,13 @@ public class AnalysisThread {
          if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
             messenger.setStatus( "Raw data are in memory" );
             rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings
-                .getRawFile() );
+                  .getRawFile() );
          } else {
             messenger.setStatus( "Reading raw data from file "
-                                 + settings.getRawFile() );
+                  + settings.getRawFile() );
             DoubleMatrixReader r = new DoubleMatrixReader();
             rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings
-                .getRawFile() );
+                  .getRawFile() );
             rawDataSets.put( settings.getRawFile(), rawData );
          }
       }
@@ -92,12 +94,12 @@ public class AnalysisThread {
       if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
          messenger.setStatus( "Gene Scores are in memory" );
          geneScores = ( GeneScoreReader ) geneScoreSets.get( settings
-             .getScoreFile() );
+               .getScoreFile() );
       } else {
          messenger.setStatus( "Reading gene scores from file "
-                              + settings.getScoreFile() );
-         geneScores = new GeneScoreReader( settings.getScoreFile(),
-                                           settings, messenger, geneData.getGeneToProbeList() );
+               + settings.getScoreFile() );
+         geneScores = new GeneScoreReader( settings.getScoreFile(), settings,
+               messenger, geneData.getGeneToProbeList() );
          geneScoreSets.put( settings.getScoreFile(), geneScores );
       }
 
@@ -117,8 +119,8 @@ public class AnalysisThread {
 
       boolean needToMakeNewGeneData = true;
       for ( Iterator it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
-         GeneAnnotations test = ( GeneAnnotations ) geneDataSets.get( it
-             .next() );
+         GeneAnnotations test = ( GeneAnnotations ) geneDataSets
+               .get( it.next() );
 
          if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
             geneData = test;
@@ -138,11 +140,11 @@ public class AnalysisThread {
       GeneSetPvalRun runResult;
       if ( results != null ) {
          runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-                                       rawData, goData, geneScores, messenger, results );
+               rawData, goData, geneScores, messenger, results );
 
       } else {
          runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-                                       rawData, goData, geneScores, messenger );
+               rawData, goData, geneScores, messenger );
       }
 
       csframe.addResult( runResult );
@@ -164,10 +166,10 @@ public class AnalysisThread {
       }
    }
 
-   public void loadAnalysisThread( GeneSetScoreFrame csframe,
-                                   Settings settings, StatusViewer messenger, GONames goData,
-                                   Map geneDataSets, Map rawDataSets, Map geneScoreSets,
-                                   String loadFile ) throws IllegalStateException {
+   public void loadAnalysisThread( final GeneSetScoreFrame csframe,
+         Settings settings, final StatusViewer messenger, GONames goData,
+         Map geneDataSets, Map rawDataSets, Map geneScoreSets, String loadFile )
+         throws IllegalStateException {
       this.csframe = csframe;
       this.settings = settings;
       this.messenger = messenger;
@@ -178,26 +180,28 @@ public class AnalysisThread {
       this.geneDataSets = geneDataSets;
 
       this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer(
-          "original".hashCode() ) ); //this is the default geneData
+            "original".hashCode() ) ); //this is the default geneData
 
-      if ( athread != null )throw new IllegalStateException();
+      if ( athread != null ) throw new IllegalStateException(); // two analyses at once.
       athread = new Thread( new Runnable() {
          public void run() {
-            loadAnalysis();
+            try {
+               loadAnalysis();
+            } catch ( Exception e ) {
+               GuiUtil.error( "Error During analysis", e );
+               csframe.enableMenusForAnalysis();
+               messenger.setStatus("Ready");
+            }
          }
       } );
       athread.start();
+      athread = null; // if there is an error, we need to make sure athread is null afterwards.
    }
 
-   private void loadAnalysis() {
-      try {
-         ResultsFileReader rfr = new ResultsFileReader( loadFile, messenger );
-         Map results = rfr.getResults();
-         doAnalysis( results );
-      }
-      catch ( Exception e ) {
-         GuiUtil.error( "File format is not valid." );
-      }
+   private void loadAnalysis() throws IOException {
+      ResultsFileReader rfr = new ResultsFileReader( loadFile, messenger );
+      Map results = rfr.getResults();
+      doAnalysis( results );
    }
 
 }

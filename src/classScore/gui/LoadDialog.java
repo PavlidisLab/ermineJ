@@ -68,6 +68,8 @@ public class LoadDialog extends AppDialog {
             "software.<br></html>");
       addMain( centerPanel );
       this.setTitle( "Load Results from File" );
+      HelpHelper hh = new HelpHelper();
+      hh.initHelp(helpButton);
    }
 
    void loadBrowseButton_actionPerformed( ActionEvent e ) {

@@ -73,12 +73,12 @@ public class AnalysisWizardStep4 extends WizardStep {
       step4LeftPanel.setPreferredSize( new Dimension( 200, 160 ) );
       jPanel17.setBackground( SystemColor.control );
       jPanel17.setPreferredSize( new Dimension( 180, 29 ) );
-      jLabel11.setText( "Maximum class size" );
+      jLabel11.setText( "Maximum gene set size" );
       jLabel11.setLabelFor( jTextFieldMaxClassSize );
       jTextFieldMaxClassSize.setEditable( true );
       jTextFieldMaxClassSize.setPreferredSize( new Dimension( 30, 19 ) );
       jTextFieldMaxClassSize
-            .setToolTipText( "Largest class size to be considered" );
+            .setToolTipText( "Largest gene set size to be considered" );
       jTextFieldMaxClassSize.setText( "150" );
       jTextFieldMaxClassSize.setHorizontalAlignment( SwingConstants.RIGHT );
       jPanel17.add( jLabel11, null );
@@ -86,11 +86,11 @@ public class AnalysisWizardStep4 extends WizardStep {
       jPanel16.setPreferredSize( new Dimension( 180, 29 ) );
       jPanel16.setBackground( SystemColor.control );
       jLabel12.setLabelFor( jTextFieldMinClassSize );
-      jLabel12.setText( "Minimum class size" );
+      jLabel12.setText( "Minimum gene set size" );
       jTextFieldMinClassSize.setEditable( true );
       jTextFieldMinClassSize.setPreferredSize( new Dimension( 30, 19 ) );
       jTextFieldMinClassSize
-            .setToolTipText( "Smallest class size to be considered" );
+            .setToolTipText( "Smallest gene set size to be considered" );
       jTextFieldMinClassSize.setText( "8" );
       jTextFieldMinClassSize.setHorizontalAlignment( SwingConstants.RIGHT );
       jPanel16.add( jLabel12, null );
