@@ -2,6 +2,7 @@
     <pomVersion>3</pomVersion>
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
+        <id>ermineJ</id>
     <currentVersion>2.0b4</currentVersion>
     <organization>
         <name>Columbia University</name>
@@ -110,6 +111,11 @@
             <version>1.0.9</version>
             <type>jar</type>
         </dependency>
+	    <dependency>
+      <id>forehead</id>
+      <version>1.0-beta-5</version>
+      <type>jar</type>
+    </dependency>
         
     </dependencies>
     <build>

@@ -17,3 +17,9 @@ maven jnlp:generate-keystore
 maven jnlp
 
 // deploy the builds to the web site (must be able to ssh to the site)
+
+scp target/jnlp/*.jar microarray:/proj/projectpages/ermineJ/webstart
+
+scp target/distributions/* microarray:/proj/projectpages/ermineJ/distributions
+
+scp -r web/* microarray:/proj/projectpages/ermineJ

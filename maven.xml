@@ -7,6 +7,38 @@
  		 xmlns:jarfile="jarfile">
 
 <!-- ==================================== -->
+<!-- Ceate the distribution -->
+<!-- ==================================== -->
+
+  <goal name="build-install" prereqs="jar:jar">
+    <j:set var="tag" value="${pom.artifactId}-${pom.currentVersion}" />
+    <j:set var="installerDir" value="${maven.build.dir}/installer/${tag}" />
+    <ant:delete dir="${installerDir}" />
+    <ant:mkdir dir="${installerDir}" />
+    <ant:mkdir dir="${installerDir}/bin" />
+    <ant:mkdir dir="${installerDir}/lib" />
+    
+    <j:forEach var="lib" items="${pom.artifacts}">
+      <j:set var="dep" value="${lib.dependency}" />
+      <j:if test="${dep.type=='jar'}">
+            <ant:copy todir="${installerDir}/lib" file="${lib.path}" />
+      </j:if>
+    </j:forEach>
+    <ant:copy todir="${installerDir}/lib" file="${maven.build.dir}/${maven.final.name}.jar" />
+
+    <ant:copy todir="${installerDir}/bin" file="${maven.src.dir}/bin/ermineJ.sh" />
+    <ant:copy todir="${installerDir}/bin" file="${maven.src.dir}/bin/forehead.conf" />
+
+    <ant:fixcrlf srcdir="${installerDir}" eol="crlf" includes="**/*.bat" />
+    <ant:fixcrlf srcdir="${installerDir}" eol="lf" includes="**/*.sh,**/maven" />
+
+    <ant:chmod file="${installerDir}/bin/ermineJ.sh" perm="ugo+x"/>
+
+  </goal>
+
+
+
+<!-- ==================================== -->
 <!-- help jar file and arrangements for help to be included in the webstart configuration -->
 <!-- ==================================== -->
 <goal name="help" description="Update and build the javahelp jar file">
