@@ -476,6 +476,7 @@ class OutputTableModel extends AbstractTableModel {
    private LinkedList columnNames = new LinkedList();
    private NumberFormat nf = NumberFormat.getInstance();
    private NumberFormat pvalnf = new DecimalFormat( "0.##E0" );
+  
    private int state = -1;
    public static final int init_cols = 4;
    ArrayList vals = new ArrayList();
@@ -485,6 +486,7 @@ class OutputTableModel extends AbstractTableModel {
    public OutputTableModel( LinkedList results ) {
       this.results = results;
       nf.setMaximumFractionDigits( 3 );
+      pvalnf.setMaximumFractionDigits( 3 );
       columnNames.add( "Name" );
       columnNames.add( "Description" );
       columnNames.add( "# of Probes" );
