@@ -76,9 +76,9 @@ public class ResamplingCorrelationGeneSetScore extends
             double avecorrel = geneSetMeanCorrel( randomnums, correls );
             hist.update( i - classMinSize, avecorrel );
             if ( j % 100 == 0 ) {
-                  Thread.yield();
-                  
-                  // estimate a normal distribution
+               Thread.yield();
+
+               // estimate a normal distribution
             }
          }
 
@@ -149,14 +149,16 @@ public class ResamplingCorrelationGeneSetScore extends
          xj = x[j];
          yj = y[j];
 
-         if ( !Double.isNaN( xj ) && !Double.isNaN( yj ) ) {
-            sx += xj;
-            sy += yj;
-            sxy += xj * yj;
-            sxx += xj * xj;
-            syy += yj * yj;
-            numused++;
+         if ( Double.isNaN( xj ) || Double.isNaN( yj ) ) {
+            continue;
          }
+         sx += xj;
+         sy += yj;
+         sxy += xj * yj;
+         sxx += xj * xj;
+         syy += yj * yj;
+         numused++;
+
       }
 
       if ( numused > 0 ) {

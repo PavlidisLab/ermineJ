@@ -297,7 +297,9 @@ public class JGeneSetFrame extends JFrame {
 
       m_menuBar.add( m_fileMenu );
       m_menuBar.add( m_viewMenu );
-      m_menuBar.add( m_analysisMenu );
+      
+      
+       //m_menuBar.add( m_analysisMenu );
 
       // Color map menu items (radio button group -- only one can be selected at one time)
       ButtonGroup group = new ButtonGroup();

@@ -7,21 +7,15 @@ import java.awt.Dimension;
 import classScore.Settings;
 
 /**
- * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
+ *  
  * Copyright: Copyright (c) 2004
  * </p>
  * <p>
  * Institution:: Columbia University
  * </p>
  * 
- * @Will Braynen
- * @version 1.0
+ * @author Will Braynen
+ * @version $Id$
  */
 
 public class GeneSetApp {
@@ -46,7 +40,7 @@ public class GeneSetApp {
       }
 
       JGeneSetFrame frame = new JGeneSetFrame( probeIDs, pvalues, null,
-            settings );
+            settings , null, null);
       frame.setSize( new Dimension( 800, 600 ) );
       frame.show();
    }
@@ -62,8 +56,8 @@ public class GeneSetApp {
          System.err
                .println( "Please specify the name of the data file as a program argument" );
          return;
-      } else {
-         GeneSetApp app = new GeneSetApp( args[0] );
       }
+      GeneSetApp app = new GeneSetApp( args[0] );
+
    } // end main
 } // end class
