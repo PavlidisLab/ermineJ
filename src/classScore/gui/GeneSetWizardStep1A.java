@@ -53,7 +53,7 @@ public class GeneSetWizardStep1A extends WizardStep {
 
    //Component initialization
    protected void jbInit() {
-      
+
       BorderLayout borderLayout1 = new BorderLayout();
       this.setLayout( borderLayout1 );
 
@@ -102,17 +102,17 @@ public class GeneSetWizardStep1A extends WizardStep {
       if ( n < 1 ) {
          showStatus( "You must pick a gene set to be modified." );
          return false;
-      } else {
-         int row = oldClassTable.getSelectedRow();
-         String id = ( String ) oldClassTable.getValueAt( row, 0 );
-         String desc = ( String ) oldClassTable.getValueAt( row, 1 );
-         newGeneSet.setId( id );
-         newGeneSet.setDesc( desc );
-         if ( geneData.classExists( id ) ) {
-            newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
-         }
-         return true;
       }
+      int row = oldClassTable.getSelectedRow();
+      String id = ( String ) oldClassTable.getValueAt( row, 0 );
+      String desc = ( String ) oldClassTable.getValueAt( row, 1 );
+      newGeneSet.setId( id );
+      newGeneSet.setDesc( desc );
+      if ( geneData.classExists( id ) ) {
+         newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
+      }
+      return true;
+
    }
 
    private void populateTables() {
@@ -124,8 +124,8 @@ public class GeneSetWizardStep1A extends WizardStep {
       oldClassTable.getColumnModel().getColumn( 2 ).setPreferredWidth( 30 );
       oldClassTable.getColumnModel().getColumn( 3 ).setPreferredWidth( 30 );
       oldClassTable.revalidate();
-      
-      showStatus("Available sets: " + geneData.selectedSets());
+
+      showStatus( "Available sets: " + geneData.selectedSets() );
    }
 
    public void searchButton_actionPerformed_adapter( ActionEvent e ) {
@@ -138,7 +138,7 @@ public class GeneSetWizardStep1A extends WizardStep {
       }
       populateTables();
    }
-   
+
 }
 
 class ModClassTableModel extends AbstractTableModel {
@@ -170,20 +170,20 @@ class ModClassTableModel extends AbstractTableModel {
    }
 
    public Object getValueAt( int i, int j ) {
-   
-      String classid = (String)geneData.getSelectedSets().get(i);
-      
+
+      String classid = ( String ) geneData.getSelectedSets().get( i );
+
       switch ( j ) {
-      case 0:
-         return classid;
-      case 1:
-         return goData.getNameForId( classid );
-      case 2:
-         return new Integer( geneData.numProbes( classid ) );
-      case 3:
-         return new Integer( geneData.numGenes( classid ) );
-      default:
-         return "";
+         case 0:
+            return classid;
+         case 1:
+            return goData.getNameForId( classid );
+         case 2:
+            return new Integer( geneData.numProbes( classid ) );
+         case 3:
+            return new Integer( geneData.numGenes( classid ) );
+         default:
+            return "";
       }
    }
 }

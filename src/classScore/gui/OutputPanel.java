@@ -47,8 +47,6 @@ import classScore.data.GeneSetResult;
  *
  * @author Homin Lee
  * @version $Id$
- * @todo make columns start out better sizes
- * @todo integers don't sort correctly
  * @todo deletion of geneDataSets when remove is used.
  */
 
@@ -489,7 +487,7 @@ class OutputTableModel extends AbstractTableModel {
    }
 
    public Object getValueAt( int i, int j ) {
-      String classid = geneData.getClass( i );
+      String classid = (String)geneData.getSelectedSets().get( i );
       if ( state >= 0 && j < init_cols ) {
          switch ( j ) {
             case 0:
@@ -510,7 +508,6 @@ class OutputTableModel extends AbstractTableModel {
             vals.add(new Double(nf.format( res.getRank())));
             vals.add(new Double(nf.format( res.getPvalue())));
             return vals;
-            //return new Double( nf.format( res.getPvalue() ) );
          }
          return null;
       }

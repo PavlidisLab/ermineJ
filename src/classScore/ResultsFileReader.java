@@ -56,7 +56,7 @@ public class ResultsFileReader {
          String firstword = st.nextToken();
          if ( firstword.compareTo( "!" ) == 0 ) {
             // todo mungedname might not be here.
-            String classMungedName = st.nextToken();
+        //    String classMungedName = st.nextToken();
             String className = st.nextToken();
             String classId = st.nextToken();
             int size = Integer.parseInt( st.nextToken() );

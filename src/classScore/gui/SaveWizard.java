@@ -108,7 +108,7 @@ public class SaveWizard extends Wizard
       }
       catch(IOException ioe)
       {
-         GuiUtil.error(ioe,"Could not write prefs: ");
+         GuiUtil.error("Could not write prefs file.");
       }
       dispose();
    }

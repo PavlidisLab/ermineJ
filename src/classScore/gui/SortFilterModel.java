@@ -9,12 +9,22 @@ import javax.swing.table.TableModel;
 import baseCode.gui.JMatrixDisplay;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: </p>
+ * <p>
+ * Title:
+ * </p>
+ * <p>
+ * Description:
+ * </p>
+ * <p>
+ * Copyright: Copyright (c) 2004
+ * </p>
+ * <p>
+ * Company:
+ * </p>
+ * 
  * @author not attributable
- * @version 1.0
+ * @version $Id$
+ * @deprecated
  */
 
 public class SortFilterModel extends AbstractTableModel {
@@ -49,8 +59,7 @@ public class SortFilterModel extends AbstractTableModel {
    }
 
    /**
-    * Translate from the row order that is displayed
-    * to the underlying row order.
+    * Translate from the row order that is displayed to the underlying row order.
     */
    public Object getValueAt( int r, int c ) {
       return model.getValueAt( rows[r].index, c );
@@ -71,30 +80,32 @@ public class SortFilterModel extends AbstractTableModel {
    private class Row implements Comparable {
 
       public int index;
+
       public int compareTo( Object other ) {
-         Row otherRow = ( Row )other;
+         Row otherRow = ( Row ) other;
          Object a = model.getValueAt( index, sortColumn );
          Object b = model.getValueAt( otherRow.index, sortColumn );
 
          // If sortColumn is in the matrix display, then model.getValueAt()
          // returns a Point object that represents a coordinate into the
-         // display matrix.  This is done so that the display matrix object
-         // can be asked for both the color and the value.  We are here only
+         // display matrix. This is done so that the display matrix object
+         // can be asked for both the color and the value. We are here only
          // interested in the value.
-         if (m_matrixDisplay != null  &&  sortColumn < m_matrixDisplay.getColumnCount()) {
+         if ( m_matrixDisplay != null
+               && sortColumn < m_matrixDisplay.getColumnCount() ) {
 
-            Point p1 = (Point) a;
-            Point p2 = (Point) b;
+            Point p1 = ( Point ) a;
+            Point p2 = ( Point ) b;
 
-            a = new Double( m_matrixDisplay.getValue( p1.x, p1.y ));
-            b = new Double( m_matrixDisplay.getValue( p2.x, p2.y ));
+            a = new Double( m_matrixDisplay.getValue( p1.x, p1.y ) );
+            b = new Double( m_matrixDisplay.getValue( p2.x, p2.y ) );
          }
 
          if ( a instanceof Comparable ) {
-            return ( ( Comparable )a ).compareTo( b );
-         } else {
-            return a.toString().compareTo( b.toString() );
+            return ( ( Comparable ) a ).compareTo( b );
          }
+         return a.toString().compareTo( b.toString() );
+
       }
    }
 }

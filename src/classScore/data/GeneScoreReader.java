@@ -23,29 +23,22 @@ import classScore.Settings;
 
 /**
  * Description:Parses the file of the form
- *
+ * 
  * <pre>
- *
- *
- *
- *
- *
- *
- *       probe_id[tab]pval
- *
- *
- *
- *
- *
- *
+ * 
+ *  
+ *        probe_id[tab]pval
+ * 
+ *  
  * </pre>
- *
+ * 
  * <p>
  * The values are stored in a HashTable probe_pval_map. This is used to see what probes are int the data set, as well as
  * the score for each probe. Created :09/02/02
  * </p>
- *
- * @author Shahmil Merchant, Paul Pavlidis
+ * 
+ * @author Shahmil Merchant
+ * @author Paul Pavlidis
  * @version $Id$
  */
 public class GeneScoreReader {
@@ -56,7 +49,6 @@ public class GeneScoreReader {
    private int num_pvals;
    private Map probeToPvalMap;
    private Map groupToPvalMap;
-   
 
    /**
     * @param filename
@@ -160,18 +152,20 @@ public class GeneScoreReader {
       if ( messenger != null ) {
          messenger.setStatus( "Found " + num_pvals + " pvals in the file" );
       }
-      setUpGroupToPvalMap( settings.getGeneRepTreatment(), groupToProbeMap, messenger );
+      setUpGroupToPvalMap( settings.getGeneRepTreatment(), groupToProbeMap,
+            messenger );
 
    } //
 
    /**
     * Each pvalue is adjusted to the mean (or best) of all the values in the 'replicate group' to yield a "group to
     * pvalue map".
-    *
+    * 
     * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the data
     *        set.
     */
-   private void setUpGroupToPvalMap( int gp_method, Map groupToProbeMap, StatusViewer messenger ) {
+   private void setUpGroupToPvalMap( int gp_method, Map groupToProbeMap,
+         StatusViewer messenger ) {
 
       if ( groupToProbeMap == null || groupToProbeMap.size() == 0 ) {
          throw new IllegalStateException( "groupToProbeMap was not set." );
@@ -181,10 +175,9 @@ public class GeneScoreReader {
          throw new IllegalStateException( "probeToPvalMap was not set." );
       }
 
-      if (groupToProbeMap.size() == 0) {
-         throw new IllegalStateException("Group to probe map was empty");
+      if ( groupToProbeMap.size() == 0 ) {
+         throw new IllegalStateException( "Group to probe map was empty" );
       }
-
 
       double[] group_pval_temp = new double[groupToProbeMap.size()];
       int counter = 0;
@@ -199,9 +192,9 @@ public class GeneScoreReader {
             String probe = ( String ) pbItr.next();
 
             if ( !probeToPvalMap.containsKey( probe ) ) {
-          //     messenger.setStatus(
-        //             "Annotations contains probe not in the probeToPvalMap: "
-         //                  + probe );
+               //     messenger.setStatus(
+               //             "Annotations contains probe not in the probeToPvalMap: "
+               //                  + probe );
                continue;
             }
 
@@ -237,11 +230,13 @@ public class GeneScoreReader {
          }
       } //end of while
 
-      if (counter == 0) {
-         throw new IllegalStateException("No gene to pvalue mappings were found.");
+      if ( counter == 0 ) {
+         throw new IllegalStateException(
+               "No gene to pvalue mappings were found." );
       }
 
-      messenger.setStatus(counter + " distinct genes found in the annotations.");
+      messenger.setStatus( counter
+            + " distinct genes found in the annotations." );
 
       groupPvalues = new double[counter];
       for ( int i = 0; i < counter; i++ ) {

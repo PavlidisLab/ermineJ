@@ -52,7 +52,7 @@ public class classScoreGUI {
       } catch ( Exception e ) {
          e.printStackTrace();
       }
-      classScoreGUI classScoreGUI1 = new classScoreGUI();
+      new classScoreGUI();
    }
 
 }

@@ -76,8 +76,8 @@ public class GONames {
             .getChildNodes();
       for ( Iterator it = children.iterator(); it.hasNext(); ) {
          DirectedGraphNode child = ( DirectedGraphNode ) it.next();
-         String childKey = ( ( OntologyEntry ) child.getItem() ).getId();
-         returnVal.add( childKey );
+         String childKey = ( ( OntologyEntry ) child.getItem() ).getId().intern();
+         returnVal.add( childKey.intern() );
       }
       return returnVal;
    }
@@ -94,8 +94,8 @@ public class GONames {
             .getParentNodes();
       for ( Iterator it = parents.iterator(); it.hasNext(); ) {
          DirectedGraphNode parent = ( DirectedGraphNode ) it.next();
-         String parentKey = ( ( OntologyEntry ) parent.getItem() ).getId();
-         returnVal.add( parentKey );
+         String parentKey = ( ( OntologyEntry ) parent.getItem() ).getId().intern();
+         returnVal.add( parentKey.intern() );
       }
       return returnVal;
    }
@@ -115,11 +115,12 @@ public class GONames {
     * @return String
     */
    public String getNameForId( String go_ID ) {
-      String name = ( String ) ( goNameMap.get( go_ID ) );
-      if ( name == null ) {
+      
+      if (! goNameMap.containsKey( go_ID )  ) {
          return "<no description available>";
       }
-      return name;
+      
+      return (( String ) ( goNameMap.get( go_ID ) )).intern();
    }
 
    /**

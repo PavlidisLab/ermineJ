@@ -131,7 +131,7 @@ public class StartupDialog
          settings.writePrefs();
       }
       catch ( IOException ex ) {
-         GuiUtil.error(ex,"Could not write prefs: ");
+         GuiUtil.error("Could not write prefs");
       }
    }
 

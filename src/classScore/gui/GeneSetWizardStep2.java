@@ -151,7 +151,6 @@ public class GeneSetWizardStep2 extends WizardStep {
          newGeneSet.getProbes().remove(
                newClassTable.getValueAt( rows[i] - i, 0 ) );
       }
-      int s = newGeneSet.getProbes().size();
       ncTableModel.fireTableDataChanged();
       updateCountLabel();
    }
@@ -171,7 +170,6 @@ public class GeneSetWizardStep2 extends WizardStep {
       HashSet noDupes = new HashSet( newGeneSet.getProbes() );
       newGeneSet.getProbes().clear();
       newGeneSet.getProbes().addAll( noDupes );
-      int s = newGeneSet.getProbes().size();
       ncTableModel.fireTableDataChanged();
       updateCountLabel();
    }
@@ -197,7 +195,6 @@ public class GeneSetWizardStep2 extends WizardStep {
       ArrayList probelist = geneData.getGeneProbeList( gene );
       if ( probelist != null ) {
          newGeneSet.getProbes().addAll( probelist );
-         int s = newGeneSet.getProbes().size();
          ncTableModel.fireTableDataChanged();
          updateCountLabel();
       } else {

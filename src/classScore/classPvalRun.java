@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.math.Rank;
 import baseCode.util.StatusViewer;
 import classScore.analysis.CorrelationsGeneSetPvalSeriesGenerator;
 import classScore.analysis.GeneSetPvalSeriesGenerator;
@@ -34,7 +33,7 @@ import classScore.gui.geneSet.JGeneSetFrame;
  * 
  * @author Shahmil Merchant; Paul Pavlidis (major changes)
  * @version $Id$
- * @todo make multiple test correction a 'setting'.
+ * @todo 3.0 make multiple test correction a 'setting'.
  */
 public class classPvalRun {
 
@@ -176,14 +175,14 @@ public class classPvalRun {
             break;
          }
          case Settings.ROC: { // todo implement this.
-            Map input_rank_map;
-            if ( settings.getUseWeights() ) {
-               input_rank_map = Rank.rankTransform( geneScores
-                     .getGroupToPvalMap() );
-            } else {
-               input_rank_map = Rank.rankTransform( geneScores
-                     .getProbeToPvalMap() );
-            }
+//            Map input_rank_map;
+//            if ( settings.getUseWeights() ) {
+//               input_rank_map = Rank.rankTransform( geneScores
+//                     .getGroupToPvalMap() );
+//            } else {
+//               input_rank_map = Rank.rankTransform( geneScores
+//                     .getProbeToPvalMap() );
+//            }
             // fall through. - unsupported.
          }
          default: {

@@ -13,10 +13,10 @@ import classScore.data.GeneAnnotations;
 /**
  * Our table model.
  * <p>
- * The general picture is as follows:<br>
+ * The general picture is as follows: <br>
  * GUI -> Sort Filter -> Table Model
- *
- * @author  Will Braynen
+ * 
+ * @author Will Braynen
  * @version $Id$
  */
 public class GeneSetTableModel extends AbstractTableModel {
@@ -27,11 +27,13 @@ public class GeneSetTableModel extends AbstractTableModel {
    private Map m_pvaluesOrdinalPosition;
    private GeneAnnotations m_geneData;
    private DecimalFormat m_nf;
-   private String[] m_columnNames = {
-       "Probe", "Score", "Score", "Symbol", "Name"};
+   private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol",
+         "Name" };
 
    /** constructor */
-       public GeneSetTableModel(JMatrixDisplay matrixDisplay, ArrayList probeIDs, Map pvalues, Map pvaluesOrdinalPosition, GeneAnnotations geneData, DecimalFormat nf) {
+   public GeneSetTableModel( JMatrixDisplay matrixDisplay, ArrayList probeIDs,
+         Map pvalues, Map pvaluesOrdinalPosition, GeneAnnotations geneData,
+         DecimalFormat nf ) {
 
       m_matrixDisplay = matrixDisplay;
       m_probeIDs = probeIDs;
@@ -47,9 +49,9 @@ public class GeneSetTableModel extends AbstractTableModel {
 
       if ( column < offset ) {
          return m_matrixDisplay.getColumnName( column );
-      } else {
-         return m_columnNames[column - offset];
       }
+      return m_columnNames[column - offset];
+
    } // end getColumnName
 
    public int getRowCount() {
@@ -66,10 +68,8 @@ public class GeneSetTableModel extends AbstractTableModel {
 
       if ( column < offset ) {
          return new Point( row, column ); // coords into JMatrixDisplay
-      } else {
-         column -= offset;
-
       }
+      column -= offset;
 
       // get the probeID for the current row
       String probeID = ( String ) m_probeIDs.get( row );
@@ -80,35 +80,36 @@ public class GeneSetTableModel extends AbstractTableModel {
             return probeID;
          case 1:
             // p value
-            return m_pvalues == null ? new Double( Double.NaN ) :
-                new Double( m_nf.format( m_pvalues.get( probeID ) ) );
+            return m_pvalues == null ? new Double( Double.NaN ) : new Double(
+                  m_nf.format( m_pvalues.get( probeID ) ) );
          case 2:
             // p value bar
             ArrayList values = new ArrayList();
             if ( m_pvalues == null ) {
                values.add( 0, new Double( Double.NaN ) );
-            }
-            else {
+            } else {
                // actual p value
-               Double actualValue =(Double) m_pvalues.get( probeID );
+               Double actualValue = ( Double ) m_pvalues.get( probeID );
                values.add( 0, actualValue );
                // expected p value
-               int position = ( ( Integer ) m_pvaluesOrdinalPosition.get( probeID ) ).intValue();
-               Double expectedValue = new Double( 1.0f / getRowCount() * ( position + 1 ) );
+               int position = ( ( Integer ) m_pvaluesOrdinalPosition
+                     .get( probeID ) ).intValue();
+               Double expectedValue = new Double( 1.0f / getRowCount()
+                     * ( position + 1 ) );
                values.add( 1, expectedValue );
             }
             return values;
          case 3:
             // gene namne
-            return m_geneData == null ? "" :
-                m_geneData.getProbeGeneName( probeID );
+            return m_geneData == null ? "" : m_geneData
+                  .getProbeGeneName( probeID );
          case 4:
             // description
-            return m_geneData == null ? "" :
-                m_geneData.getProbeDescription( probeID );
+            return m_geneData == null ? "" : m_geneData
+                  .getProbeDescription( probeID );
          default:
             return "";
-         }
+      }
    } // end getValueAt
 
 } // end class DetailsTableModel

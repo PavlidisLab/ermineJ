@@ -23,18 +23,18 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
 /**
- * Reads tab-delimited file to create maps of probes to classes, classes to
- * probes, probes to genes, genes to probes.
+ * Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
  * <p>
- * Maintains the following important data structures, all derived from the input
- * file:
+ * Maintains the following important data structures, all derived from the input file:
  * 
- * <pre> 
- *          probe-&gt;Classes -- each value is a Set of the Classes that a probe belongs to.
- *          Classes-&gt;probe -- each value is a Set of the probes that belong to a class
- *          probe-&gt;gene -- each value is the gene name corresponding to the probe.
- *          gene-&gt;list of probes -- each value is a list of probes corresponding to a gene
- *          probe-&gt;description -- each value is a text description of the probe (actually...of the gene)
+ * <pre>
+ *  
+ *           probe-&gt;Classes -- each value is a Set of the Classes that a probe belongs to.
+ *           Classes-&gt;probe -- each value is a Set of the probes that belong to a class
+ *           probe-&gt;gene -- each value is the gene name corresponding to the probe.
+ *           gene-&gt;list of probes -- each value is a list of probes corresponding to a gene
+ *           probe-&gt;description -- each value is a text description of the probe (actually...of the gene)
+ *  
  * </pre>
  * 
  * <p>
@@ -80,7 +80,7 @@ public class GeneAnnotations {
       classesToRedundantMap = new HashMap();
       this.readFile( filename );
       classToGeneMap = makeClassToGeneMap();
-      prune(2, 1000);
+      prune( 2, 1000 );
       resetSelectedProbes();
       resetSelectedSets();
    }
@@ -115,7 +115,8 @@ public class GeneAnnotations {
                gene = ( String ) probeToGeneName.get( probe );
                probeToGeneName.remove( probe );
                if ( geneToProbeList.containsKey( gene ) )
-                  ( ( ArrayList ) geneToProbeList.get( gene ) ).remove( probe );
+                     ( ( ArrayList ) geneToProbeList.get( gene ) )
+                           .remove( probe );
             }
             if ( probeToClassMap.containsKey( probe ) ) {
                Iterator cit = ( ( ArrayList ) probeToClassMap.get( probe ) )
@@ -123,17 +124,17 @@ public class GeneAnnotations {
                while ( cit.hasNext() ) {
                   String geneSet = ( String ) cit.next();
                   if ( classToProbeMap.containsKey( geneSet ) )
-                     ( ( ArrayList ) classToProbeMap.get( geneSet ) )
-                           .remove( probe );
+                        ( ( ArrayList ) classToProbeMap.get( geneSet ) )
+                              .remove( probe );
                }
                probeToClassMap.remove( probe );
             }
             if ( probeToDescription.containsKey( probe ) )
-               probeToDescription.remove( probe );
+                  probeToDescription.remove( probe );
          }
       }
       classToGeneMap = makeClassToGeneMap();
-      prune(2, 1000);
+      prune( 2, 1000 );
       resetSelectedProbes();
       resetSelectedSets();
    }
@@ -186,8 +187,7 @@ public class GeneAnnotations {
       // probes.
       String line = "";
       while ( ( line = dis.readLine() ) != null ) {
-         if ( line.startsWith( "#" ) )
-            continue;
+         if ( line.startsWith( "#" ) ) continue;
          StringTokenizer st = new StringTokenizer( line, "\t" );
 
          String probe = st.nextToken().intern();
@@ -250,29 +250,31 @@ public class GeneAnnotations {
       dis.close();
       resetSelectedProbes();
    }
-   
+
    // remove classes that have too few members
-   private void prune(int lowThreshold, int highThreshold) {
+   // todo this doesn't affect the tree representation of the genesets.
+   private void prune( int lowThreshold, int highThreshold ) {
 
       Set removeUs = new HashSet();
-      for (Iterator it = classToProbeMap.keySet().iterator();  it.hasNext(); ) {
+      for ( Iterator it = classToProbeMap.keySet().iterator(); it.hasNext(); ) {
          String id = ( String ) it.next();
-         if (numProbes(id) < lowThreshold || numGenes(id) < lowThreshold
-               || numProbes(id) > highThreshold || numGenes(id) > highThreshold) {
-            removeUs.add(id);
+         if ( numProbes( id ) < lowThreshold || numGenes( id ) < lowThreshold
+               || numProbes( id ) > highThreshold
+               || numGenes( id ) > highThreshold ) {
+            removeUs.add( id );
          }
       }
 
-      for (Iterator it = removeUs.iterator();  it.hasNext(); ) {
+      for ( Iterator it = removeUs.iterator(); it.hasNext(); ) {
          String id = ( String ) it.next();
-         if (classToProbeMap.containsKey(id)) classToProbeMap.remove(id);        
-         if (classToGeneMap.containsKey(id)) classToGeneMap.remove(id);
-         if (classesToRedundantMap.containsKey(id)) classesToRedundantMap.remove(id);
-      }  
-      
+         if ( classToProbeMap.containsKey( id ) ) classToProbeMap.remove( id );
+         if ( classToGeneMap.containsKey( id ) ) classToGeneMap.remove( id );
+         if ( classesToRedundantMap.containsKey( id ) )
+               classesToRedundantMap.remove( id );
+      }
+
       sortGeneSets();
    }
-   
 
    /**
     * 
@@ -384,7 +386,7 @@ public class GeneAnnotations {
     */
    public int numProbes( String id ) {
       if ( !classToProbeMap.containsKey( id ) ) {
-        return 0;
+         return 0;
       }
 
       return ( ( ArrayList ) classToProbeMap.get( id ) ).size();
@@ -419,7 +421,6 @@ public class GeneAnnotations {
          ( ( ArrayList ) probeToClassMap.get( probe ) ).add( id );
       }
 
-      HashMap map = new HashMap();
       HashSet genes = new HashSet();
       Iterator probe_it2 = probes.iterator();
       while ( probe_it2.hasNext() ) {
@@ -433,8 +434,8 @@ public class GeneAnnotations {
     * Redefine a class.
     * 
     * @param classId String class to be modified
-    * @param probes ArrayList current user-defined list of members. The "real"
-    *           version of the class is modified to look like this one.
+    * @param probes ArrayList current user-defined list of members. The "real" version of the class is modified to look
+    *        like this one.
     */
    public void modifyClass( String classId, ArrayList probes ) {
       ArrayList orig_probes = ( ArrayList ) classToProbeMap.get( classId );
@@ -484,14 +485,14 @@ public class GeneAnnotations {
 
             String probeid = ( String ) selectedProbes.get( i );
             switch ( j ) {
-            case 0:
-               return probeid;
-            case 1:
-               return getProbeGeneName( probeid );
-            case 2:
-               return getProbeDescription( probeid );
-            default:
-               return null;
+               case 0:
+                  return probeid;
+               case 1:
+                  return getProbeGeneName( probeid );
+               case 2:
+                  return getProbeDescription( probeid );
+               default:
+                  return null;
             }
          }
 
@@ -556,7 +557,7 @@ public class GeneAnnotations {
 
    /**
     * @param searchOn
-    * @param goData TODO
+    * @param goData
     */
    public void selectSets( String searchOn, GONames goData ) {
 
@@ -567,8 +568,7 @@ public class GeneAnnotations {
          String candidate = ( String ) it.next();
 
          // look in the name too
-         String candidateN = ( ( String ) goData.getNameForId( candidate ) )
-               .toUpperCase();
+         String candidateN = goData.getNameForId( candidate ).toUpperCase();
 
          if ( !candidate.toUpperCase().startsWith( searchOnUp )
                && candidateN.indexOf( searchOnUp ) < 0 ) {

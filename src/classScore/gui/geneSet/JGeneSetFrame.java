@@ -87,22 +87,20 @@ public class JGeneSetFrame extends JFrame {
    HashMap m_pvaluesOrdinalPosition = new HashMap();
 
    /**
-    * @param  probeIDs  an array of probe ID's that has some order; the actual
-    *                   order is arbitrary, as long as it is some order.
-    * @param  pvalues   a map of probeID's to p values.
-    * @param  geneData  holds gene names and descriptions which can be retrieved
-    *                   by probe ID.
-    * @param  settings  <code>getRawFile()</code> should return the microarray
-    *                   file which contains the microarray data for the probe
-    *                   ID's contained in <code>probeIDs</code>.
+    * @param probeIDs an array of probe ID's that has some order; the actual order is arbitrary, as long as it is some
+    *        order.
+    * @param pvalues a map of probeID's to p values.
+    * @param geneData holds gene names and descriptions which can be retrieved by probe ID.
+    * @param settings <code>getRawFile()</code> should return the microarray file which contains the microarray data
+    *        for the probe ID's contained in <code>probeIDs</code>.
     */
-   public JGeneSetFrame(ArrayList probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings) {
+   public JGeneSetFrame( ArrayList probeIDs, Map pvalues,
+         GeneAnnotations geneData, Settings settings ) {
       try {
          String filename = settings.getRawFile();
          createDetailsTable( probeIDs, pvalues, geneData, filename );
          jbInit();
-      }
-      catch ( Exception e ) {
+      } catch ( Exception e ) {
          e.printStackTrace();
       }
    }
@@ -121,9 +119,10 @@ public class JGeneSetFrame extends JFrame {
       // Prevent user from moving tables around
       m_table.getTableHeader().setReorderingAllowed( false );
 
-      // change the cursor to a hand over a header 
-      m_table.getTableHeader().addMouseListener( new JGeneSetFrameTableHeader_mouseAdapterCursorChanger( this ));
-      
+      // change the cursor to a hand over a header
+      m_table.getTableHeader().addMouseListener(
+            new JGeneSetFrameTableHeader_mouseAdapterCursorChanger( this ) );
+
       // Make sure the matrix display doesn't have a grid separating color cells.
       m_table.setIntercellSpacing( new Dimension( 0, 0 ) );
 
@@ -136,34 +135,46 @@ public class JGeneSetFrame extends JFrame {
       m_fileMenu.setText( "File" );
       m_greenredColormapMenuItem.setSelected( false );
       m_greenredColormapMenuItem.setText( "Green-Red" );
-      m_greenredColormapMenuItem.addActionListener( new
-          JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( this ) );
-      m_greenredColormapMenuItem.addActionListener( new
-          JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( this ) );
+      m_greenredColormapMenuItem
+            .addActionListener( new JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter(
+                  this ) );
+      m_greenredColormapMenuItem
+            .addActionListener( new JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter(
+                  this ) );
       m_viewMenu.setText( "View" );
       m_blackbodyColormapMenuItem.setSelected( true );
       m_blackbodyColormapMenuItem.setText( "Blackbody" );
-      m_blackbodyColormapMenuItem.addActionListener( new
-          JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
-      m_blackbodyColormapMenuItem.addActionListener( new
-          JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
+      m_blackbodyColormapMenuItem
+            .addActionListener( new JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter(
+                  this ) );
+      m_blackbodyColormapMenuItem
+            .addActionListener( new JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter(
+                  this ) );
       m_saveImageMenuItem.setActionCommand( "SaveImage" );
       m_saveImageMenuItem.setText( "Save Image..." );
-      m_saveImageMenuItem.addActionListener( new JGeneSetFrame_m_saveImageMenuItem_actionAdapter( this ) );
+      m_saveImageMenuItem
+            .addActionListener( new JGeneSetFrame_m_saveImageMenuItem_actionAdapter(
+                  this ) );
       m_normalizeMenuItem.setText( "Normalize" );
-      m_normalizeMenuItem.addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter( this ) );
+      m_normalizeMenuItem
+            .addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter(
+                  this ) );
       m_matrixDisplayCellWidthSlider.setInverted( false );
       m_matrixDisplayCellWidthSlider.setMajorTickSpacing( 0 );
-      m_matrixDisplayCellWidthSlider.setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_matrixDisplayCellWidthSlider.setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
-      m_matrixDisplayCellWidthSlider.setValue( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
+      m_matrixDisplayCellWidthSlider
+            .setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
+      m_matrixDisplayCellWidthSlider
+            .setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
+      m_matrixDisplayCellWidthSlider
+            .setValue( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
       m_matrixDisplayCellWidthSlider.setMinorTickSpacing( 3 );
       m_matrixDisplayCellWidthSlider.setPaintLabels( false );
       m_matrixDisplayCellWidthSlider.setPaintTicks( true );
       m_matrixDisplayCellWidthSlider.setMaximumSize( new Dimension( 90, 24 ) );
       m_matrixDisplayCellWidthSlider.setPreferredSize( new Dimension( 90, 24 ) );
-      m_matrixDisplayCellWidthSlider.addChangeListener( new
-          JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter( this ) );
+      m_matrixDisplayCellWidthSlider
+            .addChangeListener( new JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter(
+                  this ) );
       this.setResizable( true );
       jLabel1.setText( "Cell Width:" );
       jLabel2.setText( "    " );
@@ -177,14 +188,19 @@ public class JGeneSetFrame extends JFrame {
 
       m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
       m_colorRangeSlider.setPreferredSize( new Dimension( 90, 24 ) );
-      m_colorRangeSlider.addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter( this ) );
+      m_colorRangeSlider
+            .addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter(
+                  this ) );
       m_saveDataMenuItem.setActionCommand( "SaveData" );
       m_saveDataMenuItem.setText( "Save Data..." );
-      m_saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
+      m_saveDataMenuItem
+            .addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter(
+                  this ) );
       m_tableScrollPane.getViewport().add( m_table, null );
 
       // Reposition the table inside the scrollpane
-      int x = m_table.getSize().width; // should probably subtract the size of the viewport, but it gets trimmed anyway, so it's okay to be lazy here
+      int x = m_table.getSize().width; // should probably subtract the size of the viewport, but it gets trimmed anyway,
+                                       // so it's okay to be lazy here
       m_tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
 
       this.getContentPane().add( m_tableScrollPane, BorderLayout.CENTER );
@@ -218,11 +234,8 @@ public class JGeneSetFrame extends JFrame {
       m_normalizeMenuItem.setSelected( isNormalized );
    }
 
-   private void createDetailsTable(
-       ArrayList probeIDs,
-       Map pvalues,
-       GeneAnnotations geneData,
-       String filename ) {
+   private void createDetailsTable( ArrayList probeIDs, Map pvalues,
+         GeneAnnotations geneData, String filename ) {
 
       //
       // Create a matrix display
@@ -239,9 +252,8 @@ public class JGeneSetFrame extends JFrame {
       DenseDoubleMatrix2DNamed matrix = null;
       try {
          matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
-             probeSet );
-      }
-      catch ( IOException e ) {
+               probeSet );
+      } catch ( IOException e ) {
          System.err.println( "IOException: wrong filename for MatrixReader" );
       }
 
@@ -253,13 +265,12 @@ public class JGeneSetFrame extends JFrame {
       // Create the rest of the table
       //
 
-      GeneSetTableModel tableModel = new GeneSetTableModel(
-          m_matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf
-          );
+      GeneSetTableModel tableModel = new GeneSetTableModel( m_matrixDisplay,
+            probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf );
       TableSorter sorter = new TableSorter( tableModel, m_matrixDisplay );
       m_table.setModel( sorter );
       sorter.setTableHeader( m_table.getTableHeader() );
-      
+
       //
       // Set up the matrix display part of the table
       //
@@ -267,11 +278,9 @@ public class JGeneSetFrame extends JFrame {
       // Make the columns in the matrix display not too wide (cell-size)
       // and set a custom cell renderer
       JMatrixCellRenderer matrixCellRenderer = new JMatrixCellRenderer(
-          m_matrixDisplay
-          ); // create one instance that will be used to draw each cell
+            m_matrixDisplay ); // create one instance that will be used to draw each cell
 
-      JVerticalHeaderRenderer verticalHeaderRenderer =
-          new JVerticalHeaderRenderer(); // create only one instance
+      JVerticalHeaderRenderer verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
       int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
       // Set each column
@@ -297,7 +306,7 @@ public class JGeneSetFrame extends JFrame {
       // p value
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 1 );
       col.setPreferredWidth( PREFERRED_WIDTH_PVALUE_COLUMN );
-      
+
       // p value bar
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 2 );
       col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
@@ -311,25 +320,23 @@ public class JGeneSetFrame extends JFrame {
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 4 );
       col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
 
-      
       // Sort initially by the pvalue column
       sorter.setSortingStatus( matrixColumnCount + 1, TableSorter.ASCENDING );
-      
-      // For the pvalue bar graph we need to know the ordinal position of each 
-      // pvalue in our list of pvalues, and now is the perfect time because 
+
+      // For the pvalue bar graph we need to know the ordinal position of each
+      // pvalue in our list of pvalues, and now is the perfect time because
       // the table is sorted by pvalues
-      for ( int i = 0;  i < m_table.getRowCount();  i++ ) {
-         String probeID = ( String ) m_table.getValueAt( i, matrixColumnCount + 0 ); //probeIDs.get( i );
+      for ( int i = 0; i < m_table.getRowCount(); i++ ) {
+         String probeID = ( String ) m_table.getValueAt( i,
+               matrixColumnCount + 0 ); //probeIDs.get( i );
          m_pvaluesOrdinalPosition.put( probeID, new Integer( i ) );
       }
 
       // Save the dimensions of the table just in case
-      int width =
-          matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN +
-          PREFERRED_WIDTH_PROBEID_COLUMN +
-          PREFERRED_WIDTH_PVALUE_COLUMN  +
-          PREFERRED_WIDTH_GENENAME_COLUMN +
-          PREFERRED_WIDTH_DESCRIPTION_COLUMN;
+      int width = matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN
+            + PREFERRED_WIDTH_PROBEID_COLUMN + PREFERRED_WIDTH_PVALUE_COLUMN
+            + PREFERRED_WIDTH_GENENAME_COLUMN
+            + PREFERRED_WIDTH_DESCRIPTION_COLUMN;
       int height = m_table.getPreferredScrollableViewportSize().height;
 
       Dimension d = new Dimension( width, height );
@@ -344,8 +351,7 @@ public class JGeneSetFrame extends JFrame {
          m_matrixDisplay.setColorMap( colorMap );
          m_gradientBar.setColorMap( colorMap );
          m_table.repaint();
-      }
-      catch ( Exception ex ) {
+      } catch ( Exception ex ) {
       }
 
    }
@@ -357,8 +363,7 @@ public class JGeneSetFrame extends JFrame {
          m_matrixDisplay.setColorMap( colorMap );
          m_gradientBar.setColorMap( colorMap );
          m_table.repaint();
-      }
-      catch ( Exception ex ) {
+      } catch ( Exception ex ) {
       }
 
    }
@@ -366,8 +371,8 @@ public class JGeneSetFrame extends JFrame {
    void m_saveImageMenuItem_actionPerformed( ActionEvent e ) {
 
       // Create a file chooser
-      final JImageFileChooser fc = new JImageFileChooser( true,
-          m_matrixDisplay.getStandardizedEnabled() );
+      final JImageFileChooser fc = new JImageFileChooser( true, m_matrixDisplay
+            .getStandardizedEnabled() );
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -383,8 +388,7 @@ public class JGeneSetFrame extends JFrame {
          // Save the color matrix image
          try {
             saveImage( filename, includeLabels, normalize );
-         }
-         catch ( IOException ex ) {
+         } catch ( IOException ex ) {
             System.err.println( "IOException error saving png to " + filename );
          }
       }
@@ -394,8 +398,8 @@ public class JGeneSetFrame extends JFrame {
    void m_saveDataMenuItem_actionPerformed( ActionEvent e ) {
 
       // Create a file chooser
-      final JDataFileChooser fc = new JDataFileChooser( true,
-          m_matrixDisplay.getStandardizedEnabled() );
+      final JDataFileChooser fc = new JDataFileChooser( true, m_matrixDisplay
+            .getStandardizedEnabled() );
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -411,24 +415,22 @@ public class JGeneSetFrame extends JFrame {
          // Save the values
          try {
             saveData( filename, true, includeEverything, normalize );
-         }
-         catch ( IOException ex ) {
+         } catch ( IOException ex ) {
             System.err.println( "IOException error saving data to " + filename );
          }
       }
       // else canceled by user
    }
 
-   protected void saveImage( String filename, boolean includeLabels, boolean normalized ) throws
-       IOException {
+   protected void saveImage( String filename, boolean includeLabels,
+         boolean normalized ) throws IOException {
 
       boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
       m_matrixDisplay.setStandardizedEnabled( normalized );
       m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
       try {
          m_matrixDisplay.saveImage( filename, includeLabels, normalized );
-      }
-      catch ( IOException e ) {
+      } catch ( IOException e ) {
          // clean up
          m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
          m_matrixDisplay.resetRowKeys();
@@ -441,8 +443,8 @@ public class JGeneSetFrame extends JFrame {
 
    } // end saveImage
 
-   protected void saveData( String filename, boolean includeMatrixValues, boolean includeNonMatrix,
-                            boolean normalized ) throws IOException {
+   protected void saveData( String filename, boolean includeMatrixValues,
+         boolean includeNonMatrix, boolean normalized ) throws IOException {
 
       // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
       final String NEWLINE = "\r\n";
@@ -499,17 +501,16 @@ public class JGeneSetFrame extends JFrame {
 
    /**
     * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay).
-    *
-    * You would probably want to call this method to print out the matrix in
-    * the order in which it is displayed in the table.  In this case, you will
-    * want to do something like this:<br><br>
-    *
-    *  <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code>
-    *
-    * However, do not forget to call <code>m_matrixDisplay.resetRowKeys()</code>
-    * when you are done because the table sorter filter does its own mapping,
-    * so the matrix rows have to remain in their original order (or it might
-    * not be displayed correctly inside the table).
+    * 
+    * You would probably want to call this method to print out the matrix in the order in which it is displayed in the
+    * table. In this case, you will want to do something like this: <br>
+    * <br>
+    * 
+    * <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code>
+    * 
+    * However, do not forget to call <code>m_matrixDisplay.resetRowKeys()</code> when you are done because the table
+    * sorter filter does its own mapping, so the matrix rows have to remain in their original order (or it might not be
+    * displayed correctly inside the table).
     */
    protected int[] getCurrentMatrixDisplayRowOrder() {
 
@@ -548,8 +549,9 @@ public class JGeneSetFrame extends JFrame {
       //if ( ! source.getValueIsAdjusting() ) {
 
       // Adjust the width of every matrix display column
-      int width = ( int ) source.getValue();
-      if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
+      int width = source.getValue();
+      if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN
+            && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
 
          m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
@@ -573,8 +575,8 @@ public class JGeneSetFrame extends JFrame {
          double rangeMax = NORMALIZED_COLOR_RANGE_MAX;
          double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
          double range = value / zoomFactor;
-         displayMin = - ( range / 2 );
-         displayMax = + ( range / 2 );
+         displayMin = -( range / 2 );
+         displayMax = +( range / 2 );
       } else {
          double rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
          double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
@@ -603,8 +605,8 @@ public class JGeneSetFrame extends JFrame {
          rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
       }
       double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
-      m_colorRangeSlider.setValue( ( int ) ( m_matrixDisplay.getDisplayRange() *
-                                             zoomFactor ) );
+      m_colorRangeSlider
+            .setValue( ( int ) ( m_matrixDisplay.getDisplayRange() * zoomFactor ) );
 
       // init gradient bar
       double min = m_matrixDisplay.getDisplayMin();
@@ -614,7 +616,8 @@ public class JGeneSetFrame extends JFrame {
 
 } // end class JGeneSetFrame
 
-class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter  {
+class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends
+      java.awt.event.MouseAdapter {
    JGeneSetFrame adaptee;
 
    JGeneSetFrameTableHeader_mouseAdapterCursorChanger( JGeneSetFrame adaptee ) {
@@ -622,17 +625,17 @@ class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends java.awt.event.
    }
 
    public void mouseEntered( MouseEvent e ) {
-      adaptee.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+      adaptee.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
    }
 
    public void mouseExited( MouseEvent e ) {
-      adaptee.setCursor(Cursor.getDefaultCursor());
+      adaptee.setCursor( Cursor.getDefaultCursor() );
    }
 
 }
 
-class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter
-    implements java.awt.event.ActionListener {
+class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    JGeneSetFrame adaptee;
 
    JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
@@ -644,11 +647,12 @@ class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter
    }
 }
 
-class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter
-    implements java.awt.event.ActionListener {
+class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    JGeneSetFrame adaptee;
 
-   JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
+   JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter(
+         JGeneSetFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -657,8 +661,8 @@ class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter
    }
 }
 
-class JGeneSetFrame_m_saveImageMenuItem_actionAdapter
-    implements java.awt.event.ActionListener {
+class JGeneSetFrame_m_saveImageMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    JGeneSetFrame adaptee;
 
    JGeneSetFrame_m_saveImageMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
@@ -670,8 +674,8 @@ class JGeneSetFrame_m_saveImageMenuItem_actionAdapter
    }
 }
 
-class JGeneSetFrame_m_normalizeMenuItem_actionAdapter
-    implements java.awt.event.ActionListener {
+class JGeneSetFrame_m_normalizeMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    JGeneSetFrame adaptee;
 
    JGeneSetFrame_m_normalizeMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
@@ -683,11 +687,12 @@ class JGeneSetFrame_m_normalizeMenuItem_actionAdapter
    }
 }
 
-class JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter
-    implements javax.swing.event.ChangeListener {
+class JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter implements
+      javax.swing.event.ChangeListener {
    JGeneSetFrame adaptee;
 
-   JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter( JGeneSetFrame adaptee ) {
+   JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter(
+         JGeneSetFrame adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -696,8 +701,8 @@ class JGeneSetFrame_m_matrixDisplayCellWidthSlider_changeAdapter
    }
 }
 
-class JGeneSetFrame_m_colorRangeSlider_changeAdapter
-    implements javax.swing.event.ChangeListener {
+class JGeneSetFrame_m_colorRangeSlider_changeAdapter implements
+      javax.swing.event.ChangeListener {
    JGeneSetFrame adaptee;
 
    JGeneSetFrame_m_colorRangeSlider_changeAdapter( JGeneSetFrame adaptee ) {
@@ -709,8 +714,8 @@ class JGeneSetFrame_m_colorRangeSlider_changeAdapter
    }
 }
 
-class JGeneSetFrame_m_saveDataMenuItem_actionAdapter
-    implements java.awt.event.ActionListener {
+class JGeneSetFrame_m_saveDataMenuItem_actionAdapter implements
+      java.awt.event.ActionListener {
    JGeneSetFrame adaptee;
 
    JGeneSetFrame_m_saveDataMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
