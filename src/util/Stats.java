@@ -14,7 +14,7 @@ import java.lang.reflect.*;
    todo: get rid of constantstuff interface.
  */
 public class Stats
-    implements Cloneable, ConstantStuff
+    implements Cloneable
 
 {
 

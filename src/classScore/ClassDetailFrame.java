@@ -12,8 +12,8 @@ import javax.swing.table.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
- * @todo make columns sortable
  * @todo show how many rows there are in the table
+* @todo add a graphical display of the data
  */
 
 public class ClassDetailFrame

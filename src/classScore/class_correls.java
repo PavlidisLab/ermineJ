@@ -9,6 +9,8 @@ import util.*;
  Calculates the raw average class correlations using a background distribution.    Created :09/02/02
    @author Shahmil Merchant
    @version $Id$
+* @todo: Get this working again. It should be presented as an alternative 'tab' to the GUI.
+* @todo: Rename this class and its methods
  */
 public class class_correls {
    private histogram hist; //histogram object stores background related information

@@ -8,7 +8,7 @@ import util.*;
    Create background distribution of class correlation where the class correlation is the average pairwise correlation between the vectors in the class
   @author Shahmil Merchant
   @version $Id$
-
+@todo tidy up all the code.
  */
 public class corr_class_scores {
 

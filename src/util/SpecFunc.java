@@ -1,10 +1,5 @@
 package util;
 
-import java.io.*;
-import java.util.*;
-import java.math.*;
-import java.lang.*;
-
 /**
   Calculation of various functions and statistical distributions.
   @author Paul Pavlidis

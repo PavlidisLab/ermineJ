@@ -14,6 +14,7 @@ import javax.swing.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
+* @todo All input of custom classes, identified either by probe id or official gene name.
  */
 
 public class classScoreFrame

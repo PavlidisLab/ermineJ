@@ -10,6 +10,8 @@ import javax.swing.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
+* @todo Allow the user to input the data
+* @todo use a Properties instance instead of our own configuration format
  */
 
 public class classScoreGUI {
