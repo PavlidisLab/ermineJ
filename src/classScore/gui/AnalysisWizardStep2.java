@@ -66,7 +66,7 @@ public class AnalysisWizardStep2 extends WizardStep {
       .addActionListener( new AnalysisWizardStep2_scoreBrowseButton_actionAdapter(
             this ) );
       scoreFile = new JTextField();
-      scoreFile.setPreferredSize( new Dimension( 230, 19 ) );
+      scoreFile.setPreferredSize( new Dimension( 250, 19 ) );
       jPanel2.add(scoreFile,null);
       jPanel2.add(jButton1,null);
       
@@ -100,7 +100,7 @@ public class AnalysisWizardStep2 extends WizardStep {
       .addActionListener( new AnalysisWizardStep2_rawBrowseButton_actionAdapter(
             this ) );
       rawFile = new JTextField();
-      rawFile.setPreferredSize( new Dimension( 230, 19 ) );
+      rawFile.setPreferredSize( new Dimension( 250, 19 ) );
       jPanel5.add(rawFile,null);
       jPanel5.add(jButton4,null);
       

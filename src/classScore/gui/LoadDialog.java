@@ -4,6 +4,7 @@ import java.io.File;
 
 import java.awt.Dimension;
 import java.awt.SystemColor;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -45,6 +46,7 @@ public class LoadDialog extends AppDialog {
 
    //Component initialization
    private void jbInit() {
+      centerPanel.setLayout(new BorderLayout()); //new
       loadBrowseButton.setEnabled( true );
       loadBrowseButton.setText( "Browse...." );
       loadBrowseButton
@@ -53,12 +55,12 @@ public class LoadDialog extends AppDialog {
       annotLabel.setPreferredSize( new Dimension( 320, 15 ) );
       annotLabel.setText( "Load file:" );
       loadPanel.setBackground( SystemColor.control );
-      loadPanel.setPreferredSize( new Dimension( 330, 50 ) );
+      loadPanel.setPreferredSize( new Dimension( 330, 100 ) );
       loadFile.setPreferredSize( new Dimension( 230, 19 ) );
       loadPanel.add( annotLabel, null );
       loadPanel.add( loadFile, null );
       loadPanel.add( loadBrowseButton, null );
-      centerPanel.add( loadPanel, null );
+      centerPanel.add( loadPanel, BorderLayout.CENTER );
       setActionButtonText( "Load" );
       setCancelButtonText( "Cancel" );
       setHelpButtonText( "Help" );
