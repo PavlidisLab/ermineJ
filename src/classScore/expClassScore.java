@@ -307,6 +307,10 @@ public class expClassScore {
       return ((Double)this.probePvalMap.get(probe)).doubleValue();
    }
 
+   public boolean containsProbe(String probe) {
+      return this.probePvalMap.containsKey(probe);
+   }
+
    /**
     *
     * @return int

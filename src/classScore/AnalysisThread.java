@@ -30,8 +30,7 @@ public class AnalysisThread {
       this.settings = settings;
       this.messenger = messenger;
       this.goData = goData;
-      this.geneData = geneData;
-
+      this.geneData = geneData; //this is the default geneData
       if ( athread != null )throw new IllegalStateException();
       athread = new Thread( new Runnable() {
          public void run() {
@@ -43,9 +42,10 @@ public class AnalysisThread {
 
    private void doAnalysis() {
       try {
+         expClassScore probePvalMapper = new expClassScore( settings );
+         geneData = new GeneAnnotations(geneData, probePvalMapper.get_map()); //default replaced by new geneData
          GeneGroupReader groupName = new GeneGroupReader(
              geneData.getGeneToProbeList(), geneData.getProbeToGeneMap() ); // parse group file. Yields map of probe->replicates.
-         expClassScore probePvalMapper = new expClassScore( settings );
          probePvalMapper.setInputPvals( groupName.get_group_probe_map(),
                                         settings.getGroupMethod() ); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
          classPvalRun runResult = new classPvalRun( settings, geneData, goData,
