@@ -45,13 +45,17 @@ abstract class Wizard extends JDialog {
       BottomPanel.setPreferredSize(new Dimension(width, 40));
       nextButton.setText("Next >");
       nextButton.addActionListener(new Wizard_nextButton_actionAdapter(this));
+      nextButton.setMnemonic('n');
       backButton.setText("< Back");
       backButton.addActionListener(new Wizard_backButton_actionAdapter(this));
       backButton.setEnabled(false);
+      backButton.setMnemonic('b');
       cancelButton.setText("Cancel");
       cancelButton.addActionListener(new
                                      Wizard_cancelButton_actionAdapter(this));
+      cancelButton.setMnemonic('c');
       finishButton.setText("Finish");
+      finishButton.setMnemonic('f');
       finishButton.addActionListener(new
                                      Wizard_finishButton_actionAdapter(this));
       BottomPanel.add(cancelButton, null);
@@ -59,8 +63,7 @@ abstract class Wizard extends JDialog {
       BottomPanel.add(nextButton, null);
       BottomPanel.add(finishButton, null);
       mainPanel.add(BottomPanel, BorderLayout.SOUTH);
-      //mainPanel.add(step1Panel);
-      //this.setTitle("Create New Analysis - Step 1 of 4");
+      this.getRootPane().setDefaultButton(nextButton);
    }
 
    public void error(Exception e, String message) {

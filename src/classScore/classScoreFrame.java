@@ -55,10 +55,6 @@ public class classScoreFrame extends JFrame {
    boolean initialized = false;
    classScoreStatus statusMessenger;
 
-   String defaultNameFile;
-   String defaultProbeFile;
-   String defaultFolder;
-
    Properties settings = new Properties();
 
    public classScoreFrame() {
@@ -235,8 +231,8 @@ public class classScoreFrame extends JFrame {
    void initialize() {
       try {
          imaps = new InitialMaps(
-                 defaultProbeFile,
-                 defaultNameFile,
+                 (String)settings.get("probeFile"),
+                 (String)settings.get("nameFile"),
                  statusMessenger);
       } catch (IllegalArgumentException e) {
          error(e, "During class score calculation");
@@ -477,45 +473,19 @@ public class classScoreFrame extends JFrame {
       }
    }
 
-
-   private void writePrefs(Properties s, String filename) {
-      try {
-         OutputStream f = new FileOutputStream(filename);
-         s.store(f, "");
-      } catch (IOException ex) {
-         System.err.println("Error writing prefs.");
-      }
-   }
-
-
    /**
     *
     */
    private void readPrefs() {
       Properties settings = new Properties();
       try {
-         File fi = new File("classScore.prefs");
+         File fi = new File("ClassScore.prefs");
          if (fi.canRead()) {
-            InputStream f = new FileInputStream("classScore.prefs");
+            InputStream f = new FileInputStream("ClassScore.prefs");
             settings.load(f);
          }
       } catch (IOException ex) {
          System.err.println("Could not find preferences file."); // no big deal.
-      }
-
-      if (settings.size() > 0) {
-         defaultNameFile = (String) settings.get("GOnameFile");
-         defaultProbeFile = (String) settings.get("annotFile");
-         int end = defaultNameFile.lastIndexOf(File.separatorChar);
-         defaultFolder = defaultNameFile.substring(0, end + 1);
-         /*
-          jTextFieldGeneScoreFile.setText( (String) settings.get("scoreFile"));
-          jTextFieldOutPutFileName.setText( (String) settings.get("outputFile"));
-          this.jTextFieldMaxClassSize.setText( (String) settings.get("maxClassSize"));
-          this.jTextFieldMinClassSize.setText( (String) settings.get("minClassSize"));
-          this.jTextFieldScoreCol.setText( (String) settings.get("scoreColumn"));
-                  this.jTextFieldPValueThreshold.setText( (String) settings.get("pvalueThreshold"));
-          */
       }
    }
 
@@ -532,7 +502,7 @@ public class classScoreFrame extends JFrame {
          initialize();
       }
       modClassFrame modframe = new modClassFrame(makenew, imaps, this.cPanel,
-                                                 defaultFolder, classid);
+                                                 (String)settings.get("saveFolder"), classid);
       showWizard(modframe);
    }
 

@@ -22,63 +22,38 @@ public class SaveWizard extends Wizard
    classScoreFrame callingframe;
    Thread aFrameRunner;
    String saveFolder;
+   SaveWizardStep1 step1;
+   SaveWizardStep2 step2;
 
    public SaveWizard(classScoreFrame callingframe, Vector rundata) {
       super(callingframe,550,350);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
-      readPrefs();
 
       if(rundata==null)
          System.err.println("2 data null");
       else
          System.err.println("2 there are "+rundata.size()+ " runs");
 
-      SaveWizardStep1 step1 = new SaveWizardStep1(this,rundata);
+      step1 = new SaveWizardStep1(this,rundata);
       this.addStep(1,step1);
-      SaveWizardStep2 step2 = new SaveWizardStep2(this,"");
+      step2 = new SaveWizardStep2(this,(String)callingframe.settings.get("saveFile"));
       this.addStep(2,step2);
-   }
 
-   private void readPrefs() {
-      Properties settings = callingframe.settings;
-      try {
-         File fi = new File("AnalysisFrame.prefs");
-         if (fi.canRead()) {
-            InputStream f = new FileInputStream("AnalysisFrame.prefs");
-            settings.load(f);
-         }
-      } catch (IOException ex) {
-         System.err.println("Could not find preferences file."); // no big deal.
-      }
-      if (settings.size() > 0) {
-         saveFolder=(String) settings.get("saveFolder");
-      }
-   }
-
-   private void writePrefs() {
-      Properties settings = callingframe.settings;
-      settings.setProperty("saveFolder",saveFolder);
-      try {
-         OutputStream f = new FileOutputStream("AnalysisFrame.prefs");
-         settings.store(f, "");
-      } catch (IOException ex) {
-         System.err.println("Error writing prefs.");
-      }
+      this.setTitle("Save Analysis - Step 1 of 2");
    }
 
    void nextButton_actionPerformed(ActionEvent e) {
       if (step == 1) {
-/*
          step = 2;
-         this.getContentPane().remove(step1Panel);
+         this.getContentPane().remove(step1);
          this.setTitle("Create New Analysis - Step 2 of 4");
-         this.getContentPane().add(step2Panel);
-         step2Panel.revalidate();
+         this.getContentPane().add(step2);
+         step2.revalidate();
          backButton.setEnabled(true);
          nextButton.setEnabled(false);
+         finishButton.setEnabled(true);
          this.repaint();
-*/
       }
    }
 

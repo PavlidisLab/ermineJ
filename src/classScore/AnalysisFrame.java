@@ -536,9 +536,9 @@ public class AnalysisFrame extends JDialog {
    private void readPrefs() {
       Properties settings = callingframe.settings;
       try {
-         File fi = new File("AnalysisFrame.prefs");
+         File fi = new File("ClassScore.prefs");
          if (fi.canRead()) {
-            InputStream f = new FileInputStream("AnalysisFrame.prefs");
+            InputStream f = new FileInputStream("ClassScore.prefs");
             settings.load(f);
          }
       } catch (IOException ex) {
@@ -572,7 +572,7 @@ public class AnalysisFrame extends JDialog {
       settings.setProperty("iterations", jTextFieldIterations.getText());
       settings.setProperty("scorecol", jTextFieldScoreCol.getText());
       try {
-         OutputStream f = new FileOutputStream("AnalysisFrame.prefs");
+         OutputStream f = new FileOutputStream("ClassScore.prefs");
          settings.store(f, "");
       } catch (IOException ex) {
          System.err.println("Error writing prefs.");
@@ -747,7 +747,7 @@ public class AnalysisFrame extends JDialog {
          step2Panel.revalidate();
          backButton.setEnabled(true);
          this.repaint();
-         this.getRootPane().setDefaultButton(nextButton);
+         nextButton.grabFocus();
       } else if (step == 2) {
          if (analysisType == 2 && rawFile.getText().compareTo("") == 0) {
             error("Correlation analyses require a raw data file.");
