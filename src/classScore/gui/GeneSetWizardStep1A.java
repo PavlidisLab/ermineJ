@@ -111,13 +111,13 @@ public class GeneSetWizardStep1A extends WizardStep {
       newGeneSet.setId( id );
       newGeneSet.setDesc( desc );
       newGeneSet.setModified( true );
-      if ( geneData.classExists( id ) ) {
+      if ( geneData.geneSetExists( id ) ) {
          newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
       }
       oldGeneSet.setId( id );
       oldGeneSet.setDesc( desc );
       oldGeneSet.setModified( true );
-      if ( geneData.classExists( id ) ) {
+      if ( geneData.geneSetExists( id ) ) {
          oldGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
       }
       return true;
@@ -188,9 +188,9 @@ class ModClassTableModel extends AbstractTableModel {
          case 1:
             return goData.getNameForId( classid );
          case 2:
-            return new Integer( geneData.numProbes( classid ) );
+            return new Integer( geneData.numProbesInGeneSet( classid ) );
          case 3:
-            return new Integer( geneData.numGenes( classid ) );
+            return new Integer( geneData.numGenesInGeneSet( classid ) );
          default:
             return "";
       }

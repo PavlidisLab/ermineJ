@@ -141,9 +141,7 @@ public class GeneSetPvalRun {
          case Settings.RESAMP: {
             NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore(
                   settings, geneScores );
-            
-           
-            
+
             messenger.setStatus( "Starting resampling" );
             hist = probePvalMapper.generateNullDistribution( messenger );
 
@@ -213,7 +211,7 @@ public class GeneSetPvalRun {
       messenger.setStatus( "Multiple test correction..." );
       MultipleTestCorrector mt = new MultipleTestCorrector( settings,
             sortedclasses, hist, geneData, csc, geneScores, results );
-      String mtc_method = "bh";
+      String mtc_method = "bh"; // FIXME make this available from the command line
       if ( mtc_method.equals( "bon" ) ) {
          mt.bonferroni();
       } else if ( mtc_method.equals( "bh" ) ) {
@@ -241,7 +239,7 @@ public class GeneSetPvalRun {
 
       ArrayList probeIDs = ( ArrayList ) classToProbe.get( classID );
       Map pvals = new HashMap();
-      
+
       for ( int i = 0, n = probeIDs.size(); i < n; i++ ) {
          Double pvalue;
          String probeID = ( String ) probeIDs.get( i );
@@ -261,7 +259,8 @@ public class GeneSetPvalRun {
       }
 
       // create the details frame
-      JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings, this, res );
+      JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings,
+            this, res );
       f.setTitle( name + " (" + probeIDs.size() + " items) p="
             + nf.format( res.getPvalue() ) );
       f.show();

@@ -51,7 +51,8 @@ import java.util.Vector;
 
 public class OutputPanel extends JScrollPane {
 
-   private static final String AMIGO_URL_BASE = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=";
+   private static final String AMIGO_URL_BASE = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?"
+         + "view=details&search_constraint=terms&depth=0&query=";
    private final static int COL0WIDTH = 80;
    private final static int COL1WIDTH = 350;
    private final static int COL2WIDTH = 80;
@@ -64,7 +65,7 @@ public class OutputPanel extends JScrollPane {
    private GeneSetScoreFrame callingframe;
    private LinkedList results;
    private LinkedList resultToolTips = new LinkedList();
-   private GeneAnnotations geneData;
+   private GeneAnnotations geneData = null;
    private GONames goData;
    private String classColToolTip;
 
@@ -72,6 +73,7 @@ public class OutputPanel extends JScrollPane {
       this.callingframe = callingframe;
       this.results = results;
       model = new OutputTableModel( results );
+
       table = new JTable() {
          //Implement table header tool tips.
          protected JTableHeader createDefaultTableHeader() {
@@ -122,20 +124,20 @@ public class OutputPanel extends JScrollPane {
    void table_mouseReleased( MouseEvent e ) {
       int i = table.getSelectedRow();
       int j = table.getSelectedColumn();
-      if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.init_cols ) {
+      if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.INIT_COLUMNS ) {
          int runnum = model.getRunNum( j );
          String id = getClassId( i );
          ( ( GeneSetPvalRun ) results.get( runnum ) ).showDetails( id );
       } else {
          for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
             if ( table.getValueAt( i, k ) != null
-                  && k >= OutputTableModel.init_cols ) {
+                  && k >= OutputTableModel.INIT_COLUMNS ) {
                String message;
                String id = getClassId( i );
                String shownRunName = model.getColumnName( k );
                shownRunName = shownRunName.substring( 0,
                      shownRunName.length() - 5 );
-               if ( j >= OutputTableModel.init_cols ) {
+               if ( j >= OutputTableModel.INIT_COLUMNS ) {
                   message = model.getColumnName( j );
                   message = message.substring( 0, message.length() - 5 );
                   message = message + " doesn't include the class " + id
@@ -205,7 +207,7 @@ public class OutputPanel extends JScrollPane {
    String getHeaderToolTip( int index ) {
       if ( index == 0 ) {
          return this.classColToolTip;
-      } else if ( index >= OutputTableModel.init_cols ) {
+      } else if ( index >= OutputTableModel.INIT_COLUMNS ) {
          //int runnum=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
          int runnum = model.getRunNum( index );
          return ( String ) resultToolTips.get( runnum );
@@ -253,34 +255,35 @@ public class OutputPanel extends JScrollPane {
       resultToolTips.add( runnum, tooltip );
    }
 
+   // called if 'cancel', 'find' or 'reset' have been hit.
    public void resetTable() {
-      classColToolTip = new String( "Total classes shown: "
-            + geneData.selectedSets() );
 
+      this.geneData = callingframe.getOriginalGeneData();
       model.setInitialData( geneData, goData );
-      sorter = new TableSorter( model );
-      table.setModel( sorter );
-      sorter.setTableHeader( table.getTableHeader() );
 
-      this.getViewport().add( table, null );
-      table.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
-      table.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
-      table.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
-      table.getColumnModel().getColumn( 3 ).setPreferredWidth( COL3WIDTH );
-      table.setDefaultRenderer( Object.class, new OutputPanelTableCellRenderer(
-            goData, results ) );
+      setTableAttributes();
       table.revalidate();
    }
 
-   public void addInitialData( GeneAnnotations initialGeneData,
-         GONames initialGoData ) {
-      this.geneData = initialGeneData;
+   // called when we first set up the table.
+   public void addInitialData( GONames initialGoData ) {
+      this.geneData = callingframe.getOriginalGeneData();
       this.goData = initialGoData;
-      model.addInitialData( geneData, goData );
-      classColToolTip = new String( "Total classes shown: "
-            + geneData.selectedSets() );
+      model.addInitialData( geneData, initialGoData );
+
+      setTableAttributes();
+      sorter.cancelSorting();
+      sorter.setSortingStatus( 1, TableSorter.ASCENDING );
+      table.revalidate();
+   }
+
+   /**
+    * 
+    */
+   private void setTableAttributes() {
       sorter = new TableSorter( model );
       table.setModel( sorter );
+
       sorter.setTableHeader( table.getTableHeader() );
       this.getViewport().add( table, null );
       table.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
@@ -289,9 +292,8 @@ public class OutputPanel extends JScrollPane {
       table.getColumnModel().getColumn( 3 ).setPreferredWidth( COL3WIDTH );
       table.setDefaultRenderer( Object.class, new OutputPanelTableCellRenderer(
             goData, results ) );
-      sorter.cancelSorting();
-      sorter.setSortingStatus( 1, TableSorter.ASCENDING );
-      table.revalidate();
+      classColToolTip = new String( "Total classes shown: "
+            + geneData.selectedSets() );
    }
 
    public void addRun() {
@@ -299,9 +301,10 @@ public class OutputPanel extends JScrollPane {
       int c = model.getColumnCount() - 1;
       TableColumn col = new TableColumn( c );
       col.setIdentifier( model.getColumnName( c ) );
+
       table.addColumn( col );
       table.getColumnModel().getColumn( c ).setPreferredWidth( COLRWIDTH );
-      generateToolTip( model.getColumnCount() - OutputTableModel.init_cols - 1 );
+      generateToolTip( model.getColumnCount() - OutputTableModel.INIT_COLUMNS - 1 );
       sorter.cancelSorting();
       sorter.setSortingStatus( c, TableSorter.ASCENDING );
       if ( results.size() > 3 )
@@ -326,6 +329,8 @@ public class OutputPanel extends JScrollPane {
       return goData;
    }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 class OutputPanel_mouseAdapter extends java.awt.event.MouseAdapter {
    OutputPanel adaptee;
@@ -471,7 +476,7 @@ class OutputPanel_removeRunPopupListener extends MouseAdapter {
       if ( e.isPopupTrigger() ) {
          JTableHeader source = ( JTableHeader ) e.getSource();
          int c = source.columnAtPoint( e.getPoint() );
-         if ( c >= OutputTableModel.init_cols ) {
+         if ( c >= OutputTableModel.INIT_COLUMNS ) {
             popup.show( e.getComponent(), e.getX(), e.getY() );
             popup.setPoint( e.getPoint() );
          }
@@ -484,13 +489,10 @@ class OutputTableModel extends AbstractTableModel {
    private GONames goData;
    private LinkedList results;
    private LinkedList columnNames = new LinkedList();
-   private NumberFormat nf = new DecimalFormat( "0.##E0" );
 
    private int state = -1;
-   public static final int init_cols = 4;
-
-   //public static final int cols_per_run = 3;
-
+   public static final int INIT_COLUMNS = 4;
+   
    public OutputTableModel( LinkedList results ) {
       this.results = results;
       columnNames.add( "Name" );
@@ -512,15 +514,14 @@ class OutputTableModel extends AbstractTableModel {
     * @param geneData GeneAnnotations
     * @param goData GONames
     */
-   public void setInitialData( GeneAnnotations geneData, GONames goData ) {
-      this.geneData = geneData;
-      this.goData = goData;
+   public void setInitialData( GeneAnnotations origGeneData, GONames origGoData ) {
+      this.geneData = origGeneData;
+      this.goData = origGoData;
    }
 
-   public void addInitialData( GeneAnnotations geneData, GONames goData ) {
+   public void addInitialData( GeneAnnotations origGeneData, GONames origGoData ) {
       state = 0;
-      this.setInitialData( geneData, goData );
-
+      this.setInitialData( origGeneData, origGoData );
    }
 
    public void addRunColumns( int state ) {
@@ -562,14 +563,14 @@ class OutputTableModel extends AbstractTableModel {
    }
 
    public int getRunNum( int c ) {
-      return c - init_cols;
+      return c - INIT_COLUMNS;
    }
 
    public Object getValueAt( int i, int j ) {
 
       String classid = ( String ) geneData.getSelectedSets().get( i );
 
-      if ( state >= 0 && j < init_cols ) {
+      if ( state >= 0 && j < INIT_COLUMNS ) {
          switch ( j ) {
             case 0: {
                Vector cid_vec = new Vector();
@@ -580,9 +581,9 @@ class OutputTableModel extends AbstractTableModel {
             case 1:
                return goData.getNameForId( classid );
             case 2:
-               return new Integer( geneData.numProbes( classid ) );
+               return new Integer( geneData.numProbesInGeneSet( classid ) );
             case 3:
-               return new Integer( geneData.numGenes( classid ) );
+               return new Integer( geneData.numGenesInGeneSet( classid ) );
 
          }
       } else if ( state > 0 ) {
@@ -615,14 +616,14 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
    static final Color LIGHTBLUE1 = new Color( 0, 220, 170 );
 
    static final Color PINK = new Color( 220, 160, 220 );
-   private Format nf = new Format("%g" ); // for the gene set p value.
+   private Format nf = new Format( "%g" ); // for the gene set p value.
    private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 
    public OutputPanelTableCellRenderer( GONames goData, LinkedList results ) {
       super();
       this.goData = goData;
       this.results = results;
-      
+
       nff.setMaximumFractionDigits( 4 );
    }
 
@@ -645,7 +646,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       }
 
       //set cell background
-      int runcol = column - OutputTableModel.init_cols;
+      int runcol = column - OutputTableModel.INIT_COLUMNS;
       setOpaque( true );
       if ( isSelected )
          setOpaque( true );
@@ -690,7 +691,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: "
-                  + nff.format( res.getScore() ) );
+                  + nff.format( res.getScore() ) + "<br>Genes: "
+                  + res.getEffectiveSize() + "<br>Probes: " + res.getSize() );
          }
       } else {
          setToolTipText( null );

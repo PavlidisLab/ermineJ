@@ -13,6 +13,30 @@
   <body>
     <h1>Frequently asked questions</h1>
 
+    <p><strong>How do I know if a gene set p value is
+    'significant'</strong></p>
+
+    <p>One has to consider the problem of multiple testing, but because
+    the gene sets (Gene Onotology group) overlap, simple methods will
+    be too conservative. For this reason we don't recommend using a
+    Bonferroni correction, though if a Bonferonni correction yields
+    'significant' results, you can certainly consider them reasonably
+    trustworth.</p>
+
+    <p>The software implements a false discovery rate (FDR) algorithm
+    that leads to p values shown in a color at different levels of
+    false discovery rate (see this <a href=
+    "tutorial/mtc.html">page</a>). However, this method still assumes
+    the gene sets are independent and will lead to a convervative
+    estimate of the FDR.</p>
+
+    <p>If you want to use Bonferroni, you can either use the
+    command-line interface, or compute them yourself.&nbsp;To compute
+    the Bonferroni-corrected p values, multiply your gene set p values
+    by the number of gene sets analyzed (maximum of 1). Then you can
+    use a threshold of 0.05 (which would not otherwise be
+    reasonable).</p>
+
     <p><strong>Do I input the list of gene scores for the significantly
     changed genes, or all the genes?</strong></p>
 
@@ -20,7 +44,11 @@
     the genes. The built-in overrepresentation analysis will use the
     threshold you set in the gene score threshold parameter to select
     genes. Note that we find that removing unexpressed genes can help
-    the analysis, but it isn't required.</p>
+    the analysis, but it isn't required. Note that if your data have
+    been filtered, the output panel does not list the actual number of
+    probes or genes in your gene sets. See <a href=
+    "tutorial/numitems.html">this page</a> &nbsp;for a
+    clarification.</p>
 
     <p><strong>When I open the output file in Notepad it looks like a
     mess of letters and numbers.</strong></p>
@@ -36,7 +64,7 @@
     text first. See <a href="excel-astext.html">this page</a> for
     details.</p>
 
-    <p><strong>I don't see annotation file for my microarray. What
+    <p><strong>I don't see an annotation file for my microarray. What
     should I do?</strong></p>
 
     <p>Unfortunately we cannot generally create annotations for
@@ -44,7 +72,9 @@
     used platform, we will add it. This means that 'home made' spotted
     microarrays are not supported in most cases. Feel free to let us
     know if you have a microarray design that needs annotations for
-    class scoring.</p>
+    class scoring. In the meantime, you could try to use one of the
+    "Generic" annotation files we provide, possibly with the help of
+    your local friendly bioinformatician.</p>
 
     <p><strong>Why did I see a warning "Attempt to take the log of a
     non-positive value"?</strong></p>
@@ -72,7 +102,7 @@
     would get with full resampling.</font></font></font></p>
 
     <p>Another tip is to not look at very large values for the "maximum
-    class size" value. We usually use a value near 200.</p>
+    class size" value. We usually use a value on the order of 200.</p>
 
     <p>Finally, you can reduce the number of iterations. You might try
     temporarily setting this to 10000 while you experiment with the
@@ -98,5 +128,11 @@
     gene?</strong></p>
 
     <p>See <a href="tutorial/genereps.html">this page</a> .</p>
+
+    <p><strong>Why are the number of gene and probes shown in the
+    output panel incorrect when my data set has been
+    filtered?</strong></p>
+
+    <p>See <a href="tutorial/numitems.html">this page</a>.</p>
   </body>
 </html>

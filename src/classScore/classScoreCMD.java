@@ -456,6 +456,11 @@ public class classScoreCMD {
 		statusMessenger.setStatus("Done with initialization.");
 	}
 
+   /**
+    * 
+    * @return
+    * @throws IOException
+    */
 	GeneSetPvalRun analyze() throws IOException {
 		DenseDoubleMatrix2DNamed rawData = null;
 		if (settings.getAnalysisMethod() == Settings.CORR) {

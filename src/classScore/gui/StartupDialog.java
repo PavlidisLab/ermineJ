@@ -68,7 +68,7 @@ public class StartupDialog extends AppDialog {
       annotLabel.setPreferredSize( new Dimension( 390, 15 ) );
       annotLabel.setRequestFocusEnabled( true );
       annotLabel.setText( "Probe annotation file:" );
-      annotPanel.setPreferredSize( new Dimension( 400, 50 ) );
+      annotPanel.setPreferredSize(new java.awt.Dimension(400,70));
       annotFile.setPreferredSize( new Dimension( 300, 19 ) );
       classBrowseButton
             .addActionListener( new StartupDialog_classBrowseButton_actionAdapter(
@@ -77,7 +77,7 @@ public class StartupDialog extends AppDialog {
       annotPanel.add( annotLabel, null );
       annotPanel.add( annotFile, null );
       annotPanel.add( annotBrowseButton, null );
-      classPanel.setPreferredSize( new Dimension( 400, 50 ) );
+      classPanel.setPreferredSize(new java.awt.Dimension(400,70));
       classLabel.setPreferredSize( new Dimension( 390, 15 ) );
       classLabel.setText( "GO XML file:" );
       classFile.setPreferredSize( new Dimension( 300, 19 ) );
@@ -85,6 +85,7 @@ public class StartupDialog extends AppDialog {
       classPanel.add( classFile, null );
       classPanel.add( classBrowseButton, null );
       centerPanel.add( classPanel, null );
+			centerPanel.setPreferredSize(new java.awt.Dimension(500,300));
       centerPanel.add( annotPanel, null );
 
       setActionButtonText( "Start" );

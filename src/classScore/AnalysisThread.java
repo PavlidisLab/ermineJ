@@ -63,8 +63,8 @@ public class AnalysisThread {
                doAnalysis();
             } catch ( Exception e ) {
                GuiUtil.error( "Error During analysis", e );
+               cancelAnalysisThread();
                csframe.enableMenusForAnalysis();
-               messenger.setStatus( "Ready" );
             }
          }
 
@@ -72,6 +72,10 @@ public class AnalysisThread {
       athread.start();
    }
 
+   /**
+    * @param results
+    * @throws IOException
+    */
    private void doAnalysis( Map results ) throws IOException {
 
       /* read in the rawData, if we need it, and if we haven't already */
@@ -108,7 +112,6 @@ public class AnalysisThread {
          messenger.setStatus( "Didn't get geneScores" );
       }
 
-      // todo need logic to choose which source of probes to use.
       Set activeProbes = null;
       if ( rawData != null && geneScores != null ) { // favor the geneScores list.
          activeProbes = geneScores.getProbeToPvalMap().keySet();
@@ -128,12 +131,13 @@ public class AnalysisThread {
             needToMakeNewGeneData = false;
             break;
          }
-
       }
 
+      GeneAnnotations useTheseAnnots = geneData;
       if ( needToMakeNewGeneData ) {
-         geneData = new GeneAnnotations( geneData, activeProbes );
-         geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
+         useTheseAnnots = new GeneAnnotations( geneData, activeProbes );
+         geneDataSets.put( new Integer( useTheseAnnots.hashCode() ),
+               useTheseAnnots ); // todo I don't like this way of keeping track of the different geneData sets.
       }
 
       /* do work */
@@ -141,17 +145,16 @@ public class AnalysisThread {
       numRuns++;
       GeneSetPvalRun runResult;
       if ( results != null ) { // read from a file.
-         runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-               rawData, goData, geneScores, messenger, results, new Integer(
-                     numRuns ).toString() );
-
+         runResult = new GeneSetPvalRun( activeProbes, settings,
+               useTheseAnnots, rawData, goData, geneScores, messenger, results,
+               new Integer( numRuns ).toString() );
       } else {
-         runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-               rawData, goData, geneScores, messenger, new Integer( numRuns )
-                     .toString() );
+         runResult = new GeneSetPvalRun( activeProbes, settings,
+               useTheseAnnots, rawData, goData, geneScores, messenger,
+               new Integer( numRuns ).toString() );
       }
 
-      csframe.addResult( runResult );
+      csframe.addResult( runResult );;
       csframe.setSettings( settings );
       csframe.enableMenusForAnalysis();
       athread = null;

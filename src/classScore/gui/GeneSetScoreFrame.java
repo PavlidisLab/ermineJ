@@ -76,7 +76,7 @@ public class GeneSetScoreFrame extends JFrame {
    private Settings settings;
    private StatusViewer statusMessenger;
    private GONames goData;
-   private GeneAnnotations geneData;
+   private GeneAnnotations geneData = null;
    private LinkedList results = new LinkedList();
 
    private Map geneDataSets;
@@ -97,7 +97,16 @@ public class GeneSetScoreFrame extends JFrame {
       hh = new HelpHelper();
       hh.initHelp( helpMenuItem );
       settings = new Settings();
+   }
 
+   /**
+    * Get the original, "fresh" gene annotation data.
+    * 
+    * @return
+    */
+   public GeneAnnotations getOriginalGeneData() {
+      return ( GeneAnnotations ) geneDataSets.get( new Integer( "original"
+            .hashCode() ) );
    }
 
    /* init */
@@ -340,7 +349,7 @@ public class GeneSetScoreFrame extends JFrame {
                      + "\nPress OK to quit." );
          System.exit( 1 );
       }
-      oPanel.addInitialData( geneData, goData );
+      oPanel.addInitialData( goData );
       statusMessenger.setStatus( "Done with initialization." );
    }
 
@@ -365,36 +374,36 @@ public class GeneSetScoreFrame extends JFrame {
       System.exit( 0 );
    }
 
-   void defineClassMenuItem_actionPerformed( ActionEvent e ) {
+   void defineClassMenuItem_actionPerformed() {
       GeneSetWizard cwiz = new GeneSetWizard( this, geneData, goData, true );
       cwiz.showWizard();
    }
 
-   void modClassMenuItem_actionPerformed( ActionEvent e ) {
+   void modClassMenuItem_actionPerformed() {
       GeneSetWizard cwiz = new GeneSetWizard( this, geneData, goData, false );
       cwiz.showWizard();
    }
 
-   void findClassMenuItem_actionPerformed( ActionEvent e ) {
+   void findClassMenuItem_actionPerformed() {
       new FindDialog( this, geneData, goData );
    }
 
-   void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
+   void runAnalysisMenuItem_actionPerformed() {
       AnalysisWizard awiz = new AnalysisWizard( this, geneDataSets, goData );
       awiz.showWizard();
    }
 
-   void cancelAnalysisMenuItem_actionPerformed( ActionEvent e ) {
+   void cancelAnalysisMenuItem_actionPerformed() {
       athread.cancelAnalysisThread();
       showStatus( "Ready" );
    }
 
-   void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
+   void loadAnalysisMenuItem_actionPerformed() {
       LoadDialog lgsd = new LoadDialog( this );
       lgsd.showDialog();
    }
 
-   void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
+   void saveAnalysisMenuItem_actionPerformed() {
       if ( results.size() == 0 ) {
          statusMessenger.setError( "There are no runs to save" );
          return;
@@ -403,7 +412,7 @@ public class GeneSetScoreFrame extends JFrame {
       swiz.showWizard();
    }
 
-   void aboutMenuItem_actionPerformed( ActionEvent e ) {
+   void aboutMenuItem_actionPerformed() {
       new AboutBox( this );
    }
 
@@ -428,7 +437,6 @@ public class GeneSetScoreFrame extends JFrame {
       disableMenusForAnalysis();
       athread.startAnalysisThread( this, runSettings, statusMessenger, goData,
             geneDataSets, rawDataSets, geneScoreSets );
-
    }
 
    public void loadAnalysis( String loadFile ) {
@@ -449,8 +457,14 @@ public class GeneSetScoreFrame extends JFrame {
       return oPanel;
    }
 
+   /**
+    * @return Returns the geneDataSets.
+    */
+   public Map getGeneDataSets() {
+      return geneDataSets;
+   }
 }
-
+////////////////////////////////////////////////////////////////////////////////
 /* end class */
 
 class GeneSetScoreFrame_quitMenuItem_actionAdapter implements
@@ -476,7 +490,7 @@ class GeneSetScoreFrame_defineClassMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.defineClassMenuItem_actionPerformed( e );
+      adaptee.defineClassMenuItem_actionPerformed(  );
    }
 }
 
@@ -489,7 +503,7 @@ class GeneSetScoreFrame_modClassMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.modClassMenuItem_actionPerformed( e );
+      adaptee.modClassMenuItem_actionPerformed();
    }
 }
 
@@ -502,7 +516,7 @@ class GeneSetScoreFrame_findClassMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.findClassMenuItem_actionPerformed( e );
+      adaptee.findClassMenuItem_actionPerformed();
    }
 }
 
@@ -516,8 +530,9 @@ class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.runAnalysisMenuItem_actionPerformed( e );
+      adaptee.runAnalysisMenuItem_actionPerformed();
    }
+
 }
 
 class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter implements
@@ -530,7 +545,7 @@ class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.cancelAnalysisMenuItem_actionPerformed( e );
+      adaptee.cancelAnalysisMenuItem_actionPerformed();
    }
 }
 
@@ -544,7 +559,7 @@ class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.loadAnalysisMenuItem_actionPerformed( e );
+      adaptee.loadAnalysisMenuItem_actionPerformed();
    }
 }
 
@@ -558,7 +573,7 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.saveAnalysisMenuItem_actionPerformed( e );
+      adaptee.saveAnalysisMenuItem_actionPerformed( );
    }
 }
 
@@ -571,7 +586,7 @@ class GeneSetScoreFrame_aboutMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.aboutMenuItem_actionPerformed( e );
+      adaptee.aboutMenuItem_actionPerformed(   );
    }
 }
 

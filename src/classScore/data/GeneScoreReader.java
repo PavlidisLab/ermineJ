@@ -28,7 +28,9 @@ import classScore.Settings;
  * 
  *  
  *   
- *             probe_id[tab]pval
+ *    
+ *              probe_id[tab]pval
+ *     
  *    
  *   
  *  
@@ -93,7 +95,7 @@ public class GeneScoreReader {
          while ( st.hasMoreTokens() ) {
             cols.add( st.nextToken() );
          }
-         rows.add( cols );
+         if ( cols.size() > 0 ) rows.add( cols );
       }
       dis.close();
 

@@ -30,6 +30,7 @@
 	<mapID target="visualize" url="html/tutorial/visualize.html" />
 	<mapID target="faq" url="html/faq.html" />
 	<mapID target="install" url="html/tutorial/install.html" />
+	<mapID target="numitems" url="html/tutorial/numitems.html" />
 	
 </map>
 

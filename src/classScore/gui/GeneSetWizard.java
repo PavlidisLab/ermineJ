@@ -84,12 +84,12 @@ public class GeneSetWizard extends Wizard {
       newGeneSet.setId( cid );
       newGeneSet.setDesc( goData.getNameForId( cid ) );
       newGeneSet.setModified( true );
-      if ( geneData.classExists( cid ) )
+      if ( geneData.geneSetExists( cid ) )
             newGeneSet.getProbes().addAll( geneData.getClassToProbes( cid ) );
       oldGeneSet.setId( cid );
       oldGeneSet.setDesc( goData.getNameForId( cid ) );
       oldGeneSet.setModified( true );
-      if ( geneData.classExists( cid ) )
+      if ( geneData.geneSetExists( cid ) )
             oldGeneSet.getProbes().addAll( geneData.getClassToProbes( cid ) );
       this.repaint();
       step2 = new GeneSetWizardStep2( this, geneData, newGeneSet );
@@ -200,7 +200,7 @@ public class GeneSetWizard extends Wizard {
       String id = newGeneSet.getId();
       if ( id.compareTo( "" ) == 0 ) {
          showError( "The gene set ID must be specified." );
-      } else if ( geneData.classExists( id ) && makenew ) {
+      } else if ( geneData.geneSetExists( id ) && makenew ) {
          showError( "A gene set with the ID " + id + " already exists." );
       } else {
          if ( makenew || !newGeneSet.modified() )

@@ -8,22 +8,28 @@
     <tocitem text="Overview" target="overview"/>
    
     <tocitem text="Walk-throughs" target="tutorial" expand="true">
-    <tocitem text="Installing the software" target="install" />
-    <tocitem text="Software basics" target="starting" />
-    <tocitem text="Analysis" target="analysis"/>
-    	
-      <tocitem text="Analysis methods" expand="true" >
-      <tocitem text="ORA" target="ora"/>
-      <tocitem text="Gene score resampling" target="resampling"/>
-      <tocitem text="Correlation" target="correlation"/>
-      <tocitem text="Multiple Test Correction" target="mtc"/>
-       <tocitem text="How repeated genes are handled" target="reps"/>
-         <tocitem text="Methods for speeding up resampling" target="approx"/>
+		    <tocitem text="Installing the software" target="install" />
+		    <tocitem text="Software basics" target="starting" />
+		    <tocitem text="Analysis" target="analysis"/>
+	    	
+	      <tocitem text="Analysis methods" expand="true" >
+	      <tocitem text="ORA" target="ora"/>
+	      <tocitem text="Gene score resampling" target="resampling"/>
+	      <tocitem text="Correlation" target="correlation"/>
+
       </tocitem>
       
        <tocitem text="Viewing gene set details" target="visualize"/>
       <tocitem text="Loading and saving analysis" target="loadsave"/>
       <tocitem text="Defining your own gene sets" target="classes"/>
+      
+   </tocitem>
+   
+   <tocitem text="More information about analysis" expand="true">
+         <tocitem text="Multiple Test Correction" target="mtc"/>
+       <tocitem text="How repeated genes are handled" target="reps"/>
+         <tocitem text="Methods for speeding up resampling" target="approx"/>
+         <tocitem text="How gene set sizes are displayed in the results" target="numitems"/>
    </tocitem>
    
     <tocitem text="Data File Formats" target="formats" expand="true">

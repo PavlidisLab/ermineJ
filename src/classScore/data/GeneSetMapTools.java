@@ -20,6 +20,8 @@ import baseCode.util.StatusViewer;
  */
 public class GeneSetMapTools {
 
+   private static final int TOO_SMALL = 2;
+   private static final int TOO_BIG = 250;
    /**
     * Remove classes which are too similar to some other class. Classes which have fractionSameThreshold of a larger
     * class will be ignored. This doesn't know which classes are relevant to the data, so it does not work perfectly.
@@ -228,7 +230,7 @@ public class GeneSetMapTools {
          // classes are less likely to be identical to others,
          // anyway. In tests, the range shown below has no effect
          // on the results, but it _could_ matter.
-         if ( classMembers.size() > 250 || classMembers.size() < 2 ) {
+         if ( classMembers.size() > TOO_BIG || classMembers.size() < TOO_SMALL ) {
             ignored++;
             continue;
          }
@@ -319,31 +321,6 @@ public class GeneSetMapTools {
          return returnValue;
       }
       return "";
-   }
-
-   /**
-    * 
-    * @param classToProbeMap
-    * @todo this should be removed, I think - PP
-    */
-   public static void hackGeneSetToProbeMap( Map classToProbeMap ) {
-      int min = 14;
-      int max = 15;
-      Set keys = classToProbeMap.keySet();
-      HashSet removekeys = new HashSet();
-      Iterator it = keys.iterator();
-      while ( it.hasNext() ) {
-         String geneclass = ( String ) it.next();
-         int size = ( ( ArrayList ) classToProbeMap.get( geneclass ) ).size();
-         if ( size < min || size > max ) {
-            removekeys.add( geneclass );
-         }
-      }
-      Iterator rit = removekeys.iterator();
-      while ( rit.hasNext() ) {
-         String geneclass = ( String ) rit.next();
-         classToProbeMap.remove( geneclass );
-      }
    }
 
 } // end of class
