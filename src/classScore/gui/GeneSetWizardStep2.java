@@ -6,13 +6,6 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
@@ -22,12 +15,13 @@ import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
 import classScore.data.NewGeneSet;
 import java.awt.event.*;
+import javax.swing.*;
 
 /**
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author Homin K Lee
  * @version $Id$
  */
@@ -66,8 +60,16 @@ public class GeneSetWizardStep2 extends WizardStep {
 
       JPanel topPanel = new JPanel();
       // countLabel = new JLabel();
+      JLabel jLabel1 = new JLabel();
+      JLabel jLabel2 = new JLabel();
+      jLabel1.setPreferredSize(new Dimension(250, 15));
+      jLabel1.setText("Available Probes");
+      jLabel2.setPreferredSize(new Dimension(250, 15));
+      jLabel2.setText("Probes in gene set");
       showStatus( "Number of Probes selected: 0" );
       //  topPanel.add( countLabel );
+      topPanel.add(jLabel1, null);
+      topPanel.add(jLabel2, null);
 
       step2Panel = new JPanel();
       BorderLayout borderLayout1 = new BorderLayout();
