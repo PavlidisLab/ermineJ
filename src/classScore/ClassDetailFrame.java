@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
@@ -90,7 +91,7 @@ public class ClassDetailFrame extends JFrame {
 
    private void jbInit() throws Exception {
 
-      setSize(800, 460);
+      setSize(800, m_table.getHeight());
       setResizable(false);
       setLocation(200, 100);
       getContentPane().setLayout(borderLayout1);
@@ -228,7 +229,7 @@ public class ClassDetailFrame extends JFrame {
               PREFERRED_WIDTH_COLUMN_2 +
               PREFERRED_WIDTH_COLUMN_3 +
               matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN;
-      int height = 0; // the height shouldn't be zero of course, but for now all we really need is the width (to position the viewport)
+      int height = m_table.getPreferredScrollableViewportSize().height;
 
       Dimension d = new Dimension(width, height);
       m_table.setSize(d);
@@ -388,11 +389,17 @@ class DetailsTableModel extends AbstractTableModel {
 class MatrixDisplayCellRenderer extends JLabel implements TableCellRenderer {
 
    JMatrixDisplay m_matrixDisplay;
+   DecimalFormat m_nf;
 
    public MatrixDisplayCellRenderer(JMatrixDisplay matrixDisplay) {
 
       m_matrixDisplay = matrixDisplay;
-      setOpaque(true);
+      setOpaque( true );
+
+      // to format tooltips
+      m_nf = new DecimalFormat();
+      m_nf.setMaximumFractionDigits(2);
+      m_nf.setMinimumFractionDigits(0);
    }
 
    // This method is called each time a cell in a column
@@ -418,15 +425,17 @@ class MatrixDisplayCellRenderer extends JLabel implements TableCellRenderer {
       Point coords = (Point) tableCellValue;
       int row = coords.x;
       int column = coords.y;
-      double matrixValue = m_matrixDisplay.getValue(row, column);
+      
+      // Set the color
       Color matrixColor = m_matrixDisplay.getColor(row, column);
-
-      // Configure the component with the specified value
       setBackground(matrixColor);
 
-      // Set tool tip if desired
-
-      setToolTipText("" + format(matrixValue, 2) + " = " + matrixValue);
+      // The tooltip should always show the actual (non-normalized) value
+      boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
+      m_matrixDisplay.setStandardizedEnabled( false );
+      double matrixValue = m_matrixDisplay.getValue(row, column);
+      m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+      setToolTipText( "" + m_nf.format( matrixValue ));
 
       // Since the renderer is a component, return itself
       return this;
