@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.Map;
+import java.awt.Cursor;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -51,6 +52,12 @@ import classScore.data.GeneSetResult;
  */
 
 public class OutputPanel extends JScrollPane {
+   /**
+    * Copyright (c) 2004 Columbia University
+    * @author Owner
+    * @version $Id$
+    */
+   
    JTable table;
    OutputTableModel model;
    TableSorter sorter;
@@ -81,7 +88,8 @@ public class OutputPanel extends JScrollPane {
       };
       table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
       table.getTableHeader().setReorderingAllowed( false );
-
+      table.getTableHeader().addMouseListener( new TableHeader_mouseAdapterCursorChanger( this ));
+      
       OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
       JMenuItem menuItem = new JMenuItem( "Modify this class (Step 1 of 3)" );
       menuItem
@@ -256,6 +264,28 @@ class OutputPanel_mouseAdapter extends java.awt.event.MouseAdapter {
       adaptee.table_mouseReleased( e );
    }
 }
+
+
+class TableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter  {
+   OutputPanel adaptee;
+
+   TableHeader_mouseAdapterCursorChanger( OutputPanel adaptee ) {
+      this.adaptee = adaptee;
+   }
+
+   public void mouseEntered( MouseEvent e ) {
+      Container c = adaptee.getParent();  
+      c.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+   }
+
+   public void mouseExited( MouseEvent e ) {
+      Container c = adaptee.getParent();  
+      c.setCursor(Cursor.getDefaultCursor());
+   }
+
+}
+
+
 
 class OutputPanel_PopupMenu_actionAdapter implements
       java.awt.event.ActionListener {
@@ -453,8 +483,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
    GONames goData;
    LinkedList results;
    
-   static Color parent = Color.LIGHT_GRAY;
-   static Color child = Color.YELLOW;
+   static Color goParent = Color.LIGHT_GRAY;
+   static Color goChild = Color.YELLOW;
    static Color spread1 = new Color( 220, 220, 160 );
    static Color spread2 = new Color( 205, 222, 180 );
    static Color spread3 = new Color( 190, 224, 200 );

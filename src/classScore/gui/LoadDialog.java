@@ -1,19 +1,28 @@
 package classScore.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.SystemColor;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.io.*;
-import javax.swing.*;
-import baseCode.gui.*;
-import classScore.*;
+import java.io.File;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import classScore.Settings;
 
 /**
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
- * @author not attributable
- * @version 1.0
+ * @author Homin Lee
+ * @version $Id$
  */
 
 public class LoadDialog

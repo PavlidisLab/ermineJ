@@ -28,7 +28,7 @@ public class GeneSetTableModel extends AbstractTableModel {
    private GeneAnnotations m_geneData;
    private DecimalFormat m_nf;
    private String[] m_columnNames = {
-       "Probe", "P value", "P value", "Name", "Description"};
+       "Probe", "Score", "Score", "Symbol", "Name"};
 
    /** constructor */
        public GeneSetTableModel(JMatrixDisplay matrixDisplay, ArrayList probeIDs, Map pvalues, Map pvaluesOrdinalPosition, GeneAnnotations geneData, DecimalFormat nf) {
@@ -90,11 +90,11 @@ public class GeneSetTableModel extends AbstractTableModel {
             }
             else {
                // actual p value
-               Double actualValue = new Double( m_nf.format( m_pvalues.get( probeID ) ) );
+               Double actualValue =(Double) m_pvalues.get( probeID );
                values.add( 0, actualValue );
                // expected p value
                int position = ( ( Integer ) m_pvaluesOrdinalPosition.get( probeID ) ).intValue();
-               Double expectedValue = new Double( 1.0f / getRowCount() * position );
+               Double expectedValue = new Double( 1.0f / getRowCount() * ( position + 1 ) );
                values.add( 1, expectedValue );
             }
             return values;

@@ -2,9 +2,11 @@ package classScore.gui.geneSet;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -119,6 +121,9 @@ public class JGeneSetFrame extends JFrame {
       // Prevent user from moving tables around
       m_table.getTableHeader().setReorderingAllowed( false );
 
+      // change the cursor to a hand over a header 
+      m_table.getTableHeader().addMouseListener( new JGeneSetFrameTableHeader_mouseAdapterCursorChanger( this ));
+      
       // Make sure the matrix display doesn't have a grid separating color cells.
       m_table.setIntercellSpacing( new Dimension( 0, 0 ) );
 
@@ -608,6 +613,23 @@ public class JGeneSetFrame extends JFrame {
    }
 
 } // end class JGeneSetFrame
+
+class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter  {
+   JGeneSetFrame adaptee;
+
+   JGeneSetFrameTableHeader_mouseAdapterCursorChanger( JGeneSetFrame adaptee ) {
+      this.adaptee = adaptee;
+   }
+
+   public void mouseEntered( MouseEvent e ) {
+      adaptee.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+   }
+
+   public void mouseExited( MouseEvent e ) {
+      adaptee.setCursor(Cursor.getDefaultCursor());
+   }
+
+}
 
 class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter
     implements java.awt.event.ActionListener {
