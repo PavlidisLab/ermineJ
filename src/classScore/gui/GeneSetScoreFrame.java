@@ -1,15 +1,33 @@
 package classScore.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import javax.help.CSH;
+import javax.help.HelpBroker;
+import javax.help.HelpSet;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 
-import org.xml.sax.SAXException;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.StatusJlabel;
 import baseCode.util.StatusViewer;
@@ -18,12 +36,7 @@ import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-import javax.swing.*;
-
-import java.awt.*;
-import java.io.File;
-import java.net.URL;
-import javax.help.*;
+import org.xml.sax.SAXException;
 
 /**
  * <hr>
@@ -80,11 +93,11 @@ public class GeneSetScoreFrame
    private AnalysisThread athread=new AnalysisThread();
    JPanel jPanel1 = new JPanel();
    FlowLayout flowLayout1 = new FlowLayout();
-   
+
    // JavaHelp
    private HelpBroker m_helpBroker = null;
    private final boolean ENABLE_HELP = true; // when help is fully implemented, delete this line
-      
+
    public GeneSetScoreFrame() {
       try {
          jbInit();
@@ -103,7 +116,7 @@ public class GeneSetScoreFrame
    private void initHelp() {
 
       // Create HelpSet and HelpBroker objects
-      HelpSet hs = ENABLE_HELP ? getHelpSet( "ermineJ-help/main.hs" ) : null;
+      HelpSet hs = ENABLE_HELP ? getHelpSet( "main.hs" ) : null;
       if ( hs != null ) {
          m_helpBroker = hs.createHelpBroker();
 
@@ -118,14 +131,15 @@ public class GeneSetScoreFrame
          helpMenuItem.setEnabled( false );
       }
    }
-   
-   /**
-    * Finds the helpset file and creates a HelpSet object.
-    * @param  helpsetfile  filename of the *.hs file relative to the classpath
-    * @return the help set object created from the file; if the file was not
-    *         loaded for whatever reason, returns null.
-    */
-   private HelpSet getHelpSet( String helpsetFilename ) {
+
+  /**
+   * Finds the helpset file and creates a HelpSet object.
+   *
+   * @param helpsetFilename filename of the *.hs file relative to the classpath
+   * @return the help set object created from the file; if the file was not
+   *   loaded for whatever reason, returns null.
+   */
+  private HelpSet getHelpSet( String helpsetFilename ) {
       HelpSet hs = null;
       ClassLoader cl = this.getClass().getClassLoader();
       try {
@@ -137,8 +151,8 @@ public class GeneSetScoreFrame
       }
       return hs;
    }
-   
-   
+
+
    /* init */
    private void jbInit() throws Exception {
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
@@ -353,11 +367,11 @@ public class GeneSetScoreFrame
       statusMessenger.setStatus("Done with initialization.");
    }
 
-   /**
-    *
-    * @param a
-    */
-   private void showStatus( String a ) {
+  /**
+   *
+   * @param a String
+   */
+  private void showStatus( String a ) {
       jLabelStatus.setText( a );
    }
 
@@ -368,11 +382,11 @@ public class GeneSetScoreFrame
       jLabelStatus.setText( "" );
    }
 
-   /**
-    *
-    */
-
-   void quitMenuItem_actionPerformed( ActionEvent e ) {
+  /**
+   *
+   * @param e ActionEvent
+   */
+  void quitMenuItem_actionPerformed( ActionEvent e ) {
       System.exit( 0 );
    }
 
