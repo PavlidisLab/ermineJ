@@ -1,4 +1,5 @@
 bak
+bak/*
 classes
 hs_*
 doc
@@ -22,3 +23,5 @@ ermineJ.oif
 .project
 ermineJ.jpx
 ermineJ.library
+.settings
+*.jar

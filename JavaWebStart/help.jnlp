@@ -8,7 +8,7 @@
     <vendor>Sun Microsystems, Inc.</vendor>
   </information>
   <resources>
-    <jar href="jhbasic.jar"/>
+    <jar href="jh.jar"/>
   </resources>
   <component-desc/>
 </jnlp>

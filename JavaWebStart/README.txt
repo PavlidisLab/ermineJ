@@ -1,1 +1,0 @@
-All the files in this directory currently reside at http://microarray.cu-genome.org/ermineJ_test/

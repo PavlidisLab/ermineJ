@@ -15,7 +15,13 @@ xsi:schemaLocation="http://maven.apache.org/xsd/ http://maven.apache.org/xsd/mav
     </organization>
     <inceptionYear>2004</inceptionYear>
     <logo>src/classScore/gui/resources/logo1small.gif</logo>
-    <description>Software for gene set analysis.</description>
+    
+    <description>ErmineJ performs analyses of gene sets in expression
+    microarray data. A typical goal is to determine whether
+    particular biological pathways are "doing something interesting" in
+    the data. The software is designed to be used by biologists with
+    little or no informatics background.</description>
+    
     <shortDescription>Software for gene set analysis.</shortDescription>
     <url>http://microarray.cu-genome.org/ermineJ</url>
     <siteAddress>microarray</siteAddress>

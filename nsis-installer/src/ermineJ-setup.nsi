@@ -51,21 +51,21 @@ Section "ermineJ (required)"
 
   ; Jars (ours and third-party)
   SetOutPath "$INSTDIR\lib"
-  File "..\..\target\bindist\lib\baseCode.jar"
-  File "..\..\target\bindist\lib\colt.jar"
-  File "..\..\target\bindist\lib\commons-logging.jar"
-  File "..\..\target\bindist\lib\ermineJ.jar"
-  File "..\..\target\bindist\lib\ermineJ-help.jar"
-  File "..\..\target\bindist\lib\jhelp.jar"
-  File "..\..\target\bindist\lib\xercesImpl.jar"
+  File "..\..\target\nsis-build\lib\baseCode.jar"
+  File "..\..\target\nsis-build\lib\colt.jar"
+  File "..\..\target\nsis-build\lib\commons-logging.jar"
+  File "..\..\target\nsis-build\lib\ermineJ.jar"
+  File "..\..\target\nsis-build\lib\ermineJ-help.jar"
+  File "..\..\target\nsis-build\lib\jhelp.jar"
+  File "..\..\target\nsis-build\lib\xercesImpl.jar"
 
   ; .bat file
   SetOutPath "$INSTDIR\bin"
-  File "..\..\target\bindist\bin\ermineJ.bat"
+  File "..\..\target\nsis-build\bin\ermineJ.bat"
 
   ; images
   SetOutPath "$INSTDIR\bin"
-  File "..\..\target\bindist\bin\ermineJ.ico"
+  File "..\..\target\nsis-build\bin\ermineJ.ico"
 
   ; If upgrading, might not want to overwrite the old data folder
   IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
@@ -74,11 +74,11 @@ Section "ermineJ (required)"
 
     YesOverwrite:
     SetOutPath "$INSTDIR\ermineJ.data"
-    File "..\..\target\bindist\data\go_200406-termdb.xml"
-  ;  File "..\..\target\bindist\data\HG-U133A.an.txt"
-    File "..\..\target\bindist\data\HG-U95A.an.txt"
-  ;  File "..\..\target\bindist\data\RG-U34A.an.txt"
-  ;  File "..\..\target\bindist\data\RN-U34.an.txt"
+    File "..\..\target\nsis-build\data\go_200406-termdb.xml"
+  ;  File "..\..\target\nsis-build\data\HG-U133A.an.txt"
+    File "..\..\target\nsis-build\data\HG-U95A.an.txt"
+  ;  File "..\..\target\nsis-build\data\RG-U34A.an.txt"
+  ;  File "..\..\target\nsis-build\data\RN-U34.an.txt"
     CreateDirectory "$INSTDIR\ermineJ.data\genesets"
 
   NoOverwrite:

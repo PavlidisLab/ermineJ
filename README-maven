@@ -4,4 +4,16 @@ maven help
 
 // To make the Windows installer
 maven nsis
-maven nsis-jre  [ for the jre version ]
+// [ for the jre version ]
+maven nsis-jre 
+
+
+// to make the source distribtion
+maven dist:build-src
+
+// to make the jnlp setup. Note that we are still using the help.jnlp which was hand-coded. The 1.4 jnlp plugin had to be 
+// modified to include the extension element.
+maven jnlp:generate-keystore
+maven jnlp
+
+// deploy the builds to the web site (must be able to ssh to the site)
