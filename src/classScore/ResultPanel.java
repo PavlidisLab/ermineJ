@@ -15,25 +15,13 @@ import javax.swing.table.*;
  * @todo make columns start out better sizes
  */
 
-public class ResultFrame
-    extends JFrame {
-   JScrollPane jScrollPane1 = new JScrollPane();
+public class ResultPanel
+    extends JScrollPane {
    JTable jTable1 = new JTable();
    classPvalRun dataHolder = null;
    // EventListenerList listenerList = null;
 
-   public ResultFrame() {
-      try {
-         //     listenerList = new EventListenerList();
-         this.dataHolder = dataHolder;
-         jbInit();
-      }
-      catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
-
-   public ResultFrame(classPvalRun dataHolder) {
+   public ResultPanel(classPvalRun dataHolder) {
       try {
          //     listenerList = new EventListenerList();
          this.dataHolder = dataHolder;
@@ -49,15 +37,12 @@ public class ResultFrame
    // }
 
    private void jbInit() throws Exception {
-      this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
       this.setSize(660, 460);
       this.setLocation(100, 100);
-      this.setTitle("Results summary");
-      jTable1.addMouseListener(new ResultFrame_jTable1_mouseAdapter(this));
+      jTable1.addMouseListener(new ResultPanel_jTable1_mouseAdapter(this));
       jTable1.setGridColor(Color.lightGray);
       jTable1.setRowSelectionAllowed(true);
-      this.getContentPane().add(jScrollPane1, BorderLayout.CENTER);
-      jScrollPane1.getViewport().add(jTable1, null);
+      this.getViewport().add(jTable1, null);
    }
 
    public void setModel(TableModel m) {
@@ -66,11 +51,6 @@ public class ResultFrame
       jTable1.getColumnModel().getColumn(2).setPreferredWidth(200);
       jTable1.getColumnModel().getColumn(3).setPreferredWidth(30);
       jTable1.getColumnModel().getColumn(4).setPreferredWidth(30);
-   }
-
-   public static void main(String[] args) {
-      JFrame frame = new ResultFrame(null);
-      frame.show();
    }
 
    void jTable1_mouseReleased(MouseEvent e) {
@@ -87,11 +67,11 @@ public class ResultFrame
 
 }
 
-class ResultFrame_jTable1_mouseAdapter
+class ResultPanel_jTable1_mouseAdapter
     extends java.awt.event.MouseAdapter {
-   ResultFrame adaptee;
+   ResultPanel adaptee;
 
-   ResultFrame_jTable1_mouseAdapter(ResultFrame adaptee) {
+   ResultPanel_jTable1_mouseAdapter(ResultPanel adaptee) {
       this.adaptee = adaptee;
    }
 

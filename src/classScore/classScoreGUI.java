@@ -18,6 +18,7 @@ public class classScoreGUI {
    boolean packFrame = false;
 
    public classScoreGUI() {
+      //mainFrame frame = new mainFrame();
       classScoreFrame frame = new classScoreFrame();
 
       //Validate frames that have preset sizes

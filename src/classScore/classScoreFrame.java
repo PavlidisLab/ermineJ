@@ -6,6 +6,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import com.borland.jbcl.layout.*;
 
 /**
  * <p>Title: </p>
@@ -20,7 +21,6 @@ import javax.swing.*;
 public class classScoreFrame
     extends JFrame {
 
-   JPanel GeneBasedScorePanel = new JPanel();
    JButton jButtonRun = new JButton();
    JButton jButtonQuit = new JButton();
    JTextField jTextFieldGeneScoreFile = new JTextField();
@@ -42,7 +42,6 @@ public class classScoreFrame
    JTextField jTextFieldMaxClassSize = new JTextField();
    JPanel jPanelFilesGroup = new JPanel();
    JPanel jPanelGeneScoreGroup = new JPanel();
-   FlowLayout flowLayout1 = new FlowLayout();
    FlowLayout flowLayout3 = new FlowLayout();
    JPanel jPanelOuputGroup = new JPanel();
    FlowLayout flowLayout4 = new FlowLayout();
@@ -81,12 +80,10 @@ public class classScoreFrame
    JButton jButtonCancel = new JButton();
    JButton jButtonSavePrefs = new JButton();
    JPanel jPanelStatus = new JPanel();
-   FlowLayout flowLayout6 = new FlowLayout();
    Thread runner;
    boolean done = false;
 
    JPanel jPanel1 = (JPanel)this.getContentPane();
-   BorderLayout borderLayout1 = new BorderLayout();
 
    JButton jButtonLoadResults = new JButton();
 
@@ -94,6 +91,14 @@ public class classScoreFrame
    JTextField jTextFieldScoreCol = new JTextField();
    JPanel jPanel14 = new JPanel();
    JLabel jLabel10 = new JLabel();
+  JPanel jPanel2 = new JPanel();
+  JTabbedPane jTabbedPane1 = new JTabbedPane();
+  FlowLayout flowLayout9 = new FlowLayout();
+  FlowLayout flowLayout1 = new FlowLayout();
+  XYLayout xYLayout2 = new XYLayout();
+  GridBagLayout gridBagLayout1 = new GridBagLayout();
+  XYLayout xYLayout1 = new XYLayout();
+  JButton jButtonLoadClassInfo = new JButton();
 
    public classScoreFrame() {
       try {
@@ -107,14 +112,16 @@ public class classScoreFrame
    private void jbInit() throws Exception {
       ConsoleWindow.init();
       this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-      this.setSize(new Dimension(550, 600));
+      this.setSize(new Dimension(886, 521));
       this.setTitle("Functional Class Scoring");
 
-      GeneBasedScorePanel.setPreferredSize(new Dimension(500, 530));
       jButtonSavePrefs.addActionListener(new
                                          classScoreFrame_jButtonSavePrefs_actionAdapter(this));
       jLabelStatus.setBorder(null);
+      jPanelStatus.setBackground(Color.white);
+      jPanelStatus.setDebugGraphicsOptions(0);
       jPanelStatus.setPreferredSize(new Dimension(534, 33));
+      jPanelStatus.setLayout(flowLayout9);
 
       jTextFieldPValueThreshold.setEditable(true);
       jTextFieldMinClassSize.setEditable(true);
@@ -125,26 +132,38 @@ public class classScoreFrame
       jTextFieldOutPutFileName.setEditable(true);
       jTextFieldProbeAnnot.setEditable(true);
 
-      jPanel1.setLayout(borderLayout1);
+      jPanel1.setLayout(xYLayout1);
 
       jButtonSavePrefs.setToolTipText(
           "Save the names of the five files listed in a file that will be loaded " +
           "next time you run the software.");
+
+      jLabelClassScoreMethod.setMaximumSize(new Dimension(167, 18));
+      jLabelClassScoreMethod.setMinimumSize(new Dimension(167, 18));
       jLabelClassScoreMethod.setToolTipText(
           "Determines how the gene scores are combined to make a class score.");
+
       jButtonRun.setToolTipText("");
       jButtonAbout.setToolTipText("Please click here!");
-      jPanel1.setBackground(UIManager.getColor("control"));
-      jPanel1.setMinimumSize(new Dimension(100, 0));
-      jPanel1.setPreferredSize(new Dimension(500, 600));
-      borderLayout1.setVgap(5);
+      jPanel1.setBackground(Color.white);
+      jPanel1.setForeground(Color.black);
+      jPanel1.setDebugGraphicsOptions(0);
+      jPanel1.setMaximumSize(new Dimension(2000, 2000));
+      jPanel1.setMinimumSize(new Dimension(886, 600));
+      jPanel1.setOpaque(true);
+      jPanel1.setPreferredSize(new Dimension(1000, 800));
+      jPanel1.setToolTipText("");
+      jPanel1.setInputVerifier(null);
       jButtonLoadResults.setToolTipText(
           "Click to load an existing results file from disk");
       jButtonLoadResults.setActionCommand("jButtonLoad");
       jButtonLoadResults.setText("Load Results");
       jButtonLoadResults.addActionListener(new
                                            classScoreFrame_jButtonLoadResults_actionAdapter(this));
-      jLabel2.setToolTipText("File data will be written to or read from.");
+      jLabel2.setBackground(Color.white);
+    jLabel2.setMaximumSize(new Dimension(45, 15));
+    jLabel2.setMinimumSize(new Dimension(45, 15));
+    jLabel2.setToolTipText("File data will be written to or read from.");
       jTextFieldScoreCol.setHorizontalAlignment(SwingConstants.RIGHT);
       jTextFieldScoreCol.setText("2");
       jTextFieldScoreCol.setToolTipText(
@@ -154,49 +173,111 @@ public class classScoreFrame
       jTextFieldScoreCol.setPreferredSize(new Dimension(30, 19));
       jTextFieldScoreCol.setRequestFocusEnabled(true);
       jTextFieldScoreCol.setEditable(true);
-      jPanel14.setPreferredSize(new Dimension(180, 29));
+      jPanel14.setBackground(Color.white);
+    jPanel14.setPreferredSize(new Dimension(180, 29));
       jLabel10.setMaximumSize(new Dimension(39, 15));
       jLabel10.setMinimumSize(new Dimension(76, 15));
       jLabel10.setRequestFocusEnabled(true);
       jLabel10.setToolTipText("");
       jLabel10.setLabelFor(jTextFieldScoreCol);
       jLabel10.setText("Score column");
-      jPanelOuputGroup.add(jLabel2, null);
-      jPanelOuputGroup.add(jTextFieldOutPutFileName, null);
-      jPanelOuputGroup.add(jButtonOutputFileNameBrowse, null);
+    jPanel2.setBackground(Color.white);
+    jPanel2.setEnabled(true);
+    jPanel2.setAlignmentY((float) 0.5);
+    jPanel2.setMinimumSize(new Dimension(536, 530));
+    jPanel2.setOpaque(true);
+    jPanel2.setPreferredSize(new Dimension(536, 530));
+    jPanel2.setLayout(xYLayout2);
+    jPanelFilesGroup.setBackground(Color.white);
+    jPanelFilesGroup.setBorder(null);
+    jTabbedPane1.setBackground(Color.lightGray);
+    jTabbedPane1.setMaximumSize(new Dimension(32767, 32767));
+    jTabbedPane1.setMinimumSize(new Dimension(300, 530));
+    jTabbedPane1.setPreferredSize(new Dimension(300, 530));
+    jPanelClassScoreMethods.setBackground(Color.white);
+    jPanelClassScoreMethods.setBorder(null);
+    jPanelClassScoreMethods.setLayout(gridBagLayout1);
+    jPanelReplicateTreaments.setBackground(Color.white);
+    jPanelReplicateTreaments.setBorder(null);
+    jPanelParameterGroup.setBackground(Color.white);
+    jPanelParameterGroup.setBorder(null);
+    jPanelParameterGroup.setDebugGraphicsOptions(0);
+    jPanelMainControls.setBackground(Color.white);
+    jPanelMainControls.setDebugGraphicsOptions(0);
+    jPanel12.setBackground(Color.white);
+    jPanel11.setBackground(Color.white);
+    jPanel11.setBorder(null);
+    jCheckBoxDoLog.setBackground(Color.white);
+    jPanel10.setBackground(Color.white);
+    jPanel13.setBackground(Color.white);
+    jRadioButtonMeanReplicates.setBackground(Color.white);
+    jRadioButtonBestReplicates.setBackground(Color.white);
+    jRadioButtonSeparateReplicates.setBackground(Color.white);
 
-      jPanelGeneScoreGroup.add(jLabel3, null);
-      jPanelGeneScoreGroup.add(jTextFieldGeneScoreFile, null);
-      jPanelGeneScoreGroup.add(jButtonGeneScoreFileBrowse, null);
+    jLabel4.setBackground(Color.white);
+    jLabel4.setMaximumSize(new Dimension(45, 15));
+    jLabel4.setMinimumSize(new Dimension(45, 15));
 
-      jPanelFilesGroup.add(jPanelGeneScoreGroup, null);
-      jPanelFilesGroup.add(jPanelGONamesGroup, null);
-      jPanelFilesGroup.add(jPanelProbeMapGroup, null);
-      jPanelFilesGroup.add(jPanelOuputGroup, null);
-      jPanelFilesGroup.add(jButtonSavePrefs, null);
+    jLabel1.setBackground(Color.white);
+    jLabel1.setMaximumSize(new Dimension(45, 15));
+    jLabel1.setMinimumSize(new Dimension(45, 15));
 
-      jPanelProbeMapGroup.add(jLabel1, null);
-      jPanelProbeMapGroup.add(jTextFieldProbeAnnot, null);
-      jPanelProbeMapGroup.add(jButtonProbeAnnotsBrowse, null);
+    jLabel3.setBackground(Color.white);
+    jLabel3.setMaximumSize(new Dimension(45, 15));
+    jLabel3.setMinimumSize(new Dimension(45, 15));
 
-      GeneBasedScorePanel.add(jPanelClassScoreMethods, null);
+    jRadioButtonMedian.setBackground(Color.white);
+    jRadioButtonMean.setBackground(Color.white);
 
-      jPanelGONamesGroup.add(jLabel4, null);
-      jPanelGONamesGroup.add(jTextFieldGONames, null);
-      jPanelGONamesGroup.add(jButtonGONamesBrowse, null);
+    jButtonLoadClassInfo.setMargin(new Insets(2, 14, 2, 14));
+    jButtonLoadClassInfo.setText("Load Class Information");
+    jButtonLoadClassInfo.addActionListener(new classScoreFrame_jButtonLoadClassInfo_actionAdapter(this));
+
+    jPanelOuputGroup.add(jLabel2, null);
+    jPanelOuputGroup.add(jTextFieldOutPutFileName, null);
+    jPanelOuputGroup.add(jButtonOutputFileNameBrowse, null);
+
+
+    jPanelGeneScoreGroup.add(jLabel3, null);
+    jPanelGeneScoreGroup.add(jTextFieldGeneScoreFile, null);
+    jPanelGeneScoreGroup.add(jButtonGeneScoreFileBrowse, null);
+
+
+    jPanelProbeMapGroup.add(jLabel1, null);
+    jPanelProbeMapGroup.add(jTextFieldProbeAnnot, null);
+    jPanelProbeMapGroup.add(jButtonProbeAnnotsBrowse, null);
+
+    jPanelGONamesGroup.add(jLabel4, null);
+    jPanelGONamesGroup.add(jTextFieldGONames, null);
+    jPanelGONamesGroup.add(jButtonGONamesBrowse, null);
+
+    jPanelFilesGroup.add(jPanelGONamesGroup, null);
+    jPanelFilesGroup.add(jPanelOuputGroup, null);
+    jPanelFilesGroup.add(jPanelGeneScoreGroup, null);
+    jPanelFilesGroup.add(jPanelProbeMapGroup, null);
+    jPanelFilesGroup.add(jButtonLoadClassInfo, null);
+    jPanelFilesGroup.add(jButtonSavePrefs, null);
+
+    jPanel1.add(jTabbedPane1,     new XYConstraints(545, 26, 333, -1));
+    jPanel1.add(jPanel2,      new XYConstraints(3, 26, -1, -1));
 
       jPanelMainControls.add(jButtonQuit, null);
-      jPanelMainControls.add(jButtonLoadResults, null);
-      jPanelMainControls.add(jButtonRun, null);
-      jPanelMainControls.add(jButtonCancel, null);
-      jPanelMainControls.add(jButtonAbout, null);
+    jPanelMainControls.add(jButtonLoadResults, null);
+    jPanelMainControls.add(jButtonRun, null);
+    jPanelMainControls.add(jButtonCancel, null);
+    jPanelMainControls.add(jButtonAbout, null);
+    jPanel2.add(jPanelFilesGroup, new XYConstraints(3, 3, 514, 214));
 
-      GeneBasedScorePanel.add(jPanelFilesGroup, null);
 
-      jPanelClassScoreMethods.add(jLabelClassScoreMethod, null);
-      jPanelClassScoreMethods.add(jRadioButtonMean, null);
-      jPanelClassScoreMethods.add(jRadioButtonMedian, null);
-      GeneBasedScorePanel.add(jPanelReplicateTreaments, null);
+    jPanelClassScoreMethods.add(jLabelClassScoreMethod,  new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0
+            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(19, 39, 0, 39), 0, 0));
+    jPanelClassScoreMethods.add(jRadioButtonMedian,  new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 14, 21, 54), 0, 0));
+    jPanelClassScoreMethods.add(jRadioButtonMean,  new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 57, 21, 0), 0, 0));
+    jPanel2.add(jPanelStatus, new XYConstraints(3, 474, 514, 34));
+    jPanelStatus.add(jLabelStatus, null);
+    jPanel2.add(jPanelParameterGroup, new XYConstraints(294, 220, 223, 209));
 
       jButtonRun.setText("Run Analysis");
       jButtonRun.addActionListener(new classScoreFrame_jButtonRun_actionAdapter(this));
@@ -282,30 +363,25 @@ public class classScoreFrame
       jTextFieldMaxClassSize.setText("150");
       jTextFieldMaxClassSize.setHorizontalAlignment(SwingConstants.RIGHT);
 
-      jPanelFilesGroup.setBorder(BorderFactory.createEtchedBorder());
       jPanelFilesGroup.setDebugGraphicsOptions(0);
       jPanelFilesGroup.setPreferredSize(new Dimension(530, 225));
       jPanelFilesGroup.setToolTipText("");
-      jPanelFilesGroup.setBounds(new Rectangle(7, 11, 520, 238));
-      jPanelFilesGroup.setLayout(flowLayout6);
+      jPanelFilesGroup.setLayout(flowLayout1);
 
-      jPanelGeneScoreGroup.setBackground(UIManager.getColor("control"));
+      jPanelGeneScoreGroup.setBackground(Color.white);
       jPanelGeneScoreGroup.setPreferredSize(new Dimension(510, 35));
-      jPanelGeneScoreGroup.setLayout(flowLayout1);
       jPanelOuputGroup.setLayout(flowLayout3);
-      jPanelOuputGroup.setBackground(UIManager.getColor("control"));
+      jPanelOuputGroup.setBackground(Color.white);
       jPanelOuputGroup.setMinimumSize(new Dimension(250, 35));
       jPanelOuputGroup.setPreferredSize(new Dimension(510, 35));
-      jPanelGONamesGroup.setBackground(UIManager.getColor("control"));
+      jPanelGONamesGroup.setBackground(Color.white);
       jPanelGONamesGroup.setPreferredSize(new Dimension(510, 35));
       jPanelGONamesGroup.setLayout(flowLayout4);
-      jPanelProbeMapGroup.setBackground(UIManager.getColor("control"));
+      jPanelProbeMapGroup.setBackground(Color.white);
       jPanelProbeMapGroup.setMinimumSize(new Dimension(250, 35));
       jPanelProbeMapGroup.setPreferredSize(new Dimension(510, 35));
       jPanelProbeMapGroup.setLayout(flowLayout5);
-      jPanelParameterGroup.setBorder(BorderFactory.createEtchedBorder());
       jPanelParameterGroup.setPreferredSize(new Dimension(200, 200));
-      jPanelParameterGroup.setBounds(new Rectangle(272, 264, 200, 202));
       jPanelParameterGroup.setLayout(flowLayout7);
       jLabel1.setPreferredSize(new Dimension(120, 15));
       jLabel1.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -325,16 +401,12 @@ public class classScoreFrame
       jCheckBoxDoLog.setText("Take log of Gene scores");
       jCheckBoxDoLog.addActionListener(new
                                        classScoreFrame_jCheckBoxDoLog_actionAdapter(this));
-      jPanelReplicateTreaments.setBorder(BorderFactory.createEtchedBorder());
       jPanelReplicateTreaments.setPreferredSize(new Dimension(220, 120));
       jPanelReplicateTreaments.setToolTipText(
           "How will replicates of the same gene be treated?");
-      jPanelReplicateTreaments.setBounds(new Rectangle(27, 348, 220, 120));
       jPanelReplicateTreaments.setLayout(flowLayout8);
-      jPanelClassScoreMethods.setBorder(BorderFactory.createEtchedBorder());
       jPanelClassScoreMethods.setMinimumSize(new Dimension(301, 37));
       jPanelClassScoreMethods.setPreferredSize(new Dimension(170, 60));
-      jPanelClassScoreMethods.setBounds(new Rectangle(28, 286, 220, 60));
       jLabelReplicateTreament.setFont(new java.awt.Font("Dialog", 1, 13));
       jLabelReplicateTreament.setToolTipText(
           "How will replicates of the same gene be treated?");
@@ -356,8 +428,6 @@ public class classScoreFrame
       jLabel9.setLabelFor(jTextFieldIterations);
       jLabel9.setText("Iterations to run");
       flowLayout7.setAlignment(FlowLayout.CENTER);
-      GeneBasedScorePanel.setMinimumSize(new Dimension(1, 1));
-      GeneBasedScorePanel.setLayout(null);
       jButtonAbout.setText("About the software");
       jButtonAbout.addActionListener(new
                                      classScoreFrame_jButtonAbout_actionAdapter(this));
@@ -374,32 +444,29 @@ public class classScoreFrame
       jButtonSavePrefs.setSelectedIcon(null);
       jButtonSavePrefs.setText("Save File Preferences");
       jPanelStatus.setBorder(BorderFactory.createEtchedBorder());
-      jPanelMainControls.setBounds(new Rectangle(15, 476, 520, 35));
       jPanelReplicateTreaments.add(jLabelReplicateTreament, null);
       jPanelReplicateTreaments.add(jRadioButtonSeparateReplicates, null);
       jPanelReplicateTreaments.add(jRadioButtonBestReplicates, null);
       jPanelReplicateTreaments.add(jRadioButtonMeanReplicates, null);
-      jPanel1.add(GeneBasedScorePanel, BorderLayout.NORTH);
+    jPanel2.add(jPanelClassScoreMethods, new XYConstraints(3, 220, 237, 93));
+    jPanel2.add(jPanelReplicateTreaments, new XYConstraints(3, 316, 237, 113));
       jPanel10.add(jLabel6, null);
       jPanel10.add(jTextFieldPValueThreshold, null);
+    jPanel2.add(jPanelMainControls, new XYConstraints(3, 432, 514, 39));
       jPanel14.add(jLabel10, null);
       jPanel14.add(jTextFieldScoreCol, null);
-      jPanelParameterGroup.add(jPanel12, null);
+    jPanelParameterGroup.add(jPanel11, null);
       jPanel12.add(jLabel7, null);
       jPanel12.add(jTextFieldMinClassSize, null);
-      jPanelParameterGroup.add(jPanel13, null);
-      jPanelParameterGroup.add(jCheckBoxDoLog, null);
-      jPanelParameterGroup.add(jPanel10, null);
+    jPanelParameterGroup.add(jPanel14, null);
       jPanel13.add(jLabel8, null);
       jPanel13.add(jTextFieldMaxClassSize, null);
-      jPanelParameterGroup.add(jPanel11, null);
+    jPanelParameterGroup.add(jPanel12, null);
+    jPanelParameterGroup.add(jPanel13, null);
       jPanel11.add(jLabel9, null);
       jPanel11.add(jTextFieldIterations, null);
-      jPanelParameterGroup.add(jPanel14, null);
-      GeneBasedScorePanel.add(jPanelMainControls, null);
-      jPanel1.add(jPanelStatus, BorderLayout.SOUTH);
-      jPanelStatus.add(jLabelStatus, null);
-      GeneBasedScorePanel.add(jPanelParameterGroup, null);
+    jPanelParameterGroup.add(jCheckBoxDoLog, null);
+    jPanelParameterGroup.add(jPanel10, null);
 
       startPath = new File(System.getProperty("user.home"));
       buttonGroup2.add(jRadioButtonMean);
@@ -493,28 +560,37 @@ public class classScoreFrame
 
          public void run() {
             try {
-               classPvalRun results = new classPvalRun(jTextFieldGeneScoreFile.
-                   getText(),
+               setupMaps smaps = new setupMaps(
+                   jTextFieldGeneScoreFile.getText(),
                    jTextFieldProbeAnnot.getText(),
                    jTextFieldGONames.getText(),
-                   jTextFieldOutPutFileName.
-                   getText(),
                    classScoreMethod,
                    groupMethod,
                    maxClassSize,
                    minClassSize,
                    numIter, 50,
+                   useWeights,
+                   Integer.parseInt(jTextFieldScoreCol.getText()),
+                   takeLog,
+                   m);
+
+               classPvalRun results = new classPvalRun(smaps.goName,
+                   smaps.probePvalMapper,
+                   smaps.geneData,
+                   smaps.probeGroups,
+                   smaps.probeToClassMap,
+                   smaps.classToProbe,
+                   jTextFieldOutPutFileName.getText(),
                    oraThresh,
                    useWeights,
-                   Integer.parseInt(
-                   jTextFieldScoreCol.getText()),
-                   takeLog, "bh", m, loadResults);
+                   "bh", m, loadResults);
 
-               ResultFrame r = new ResultFrame(results);
-               r.setTitle(jTextFieldOutPutFileName.getText());
+               ResultPanel r = new ResultPanel(results);
+               //r.setTitle(jTextFieldOutPutFileName.getText());
                //        r.addClassDetailsListener(class_details_action_listener);
                r.setModel(results.toTableModel());
-               r.show();
+               //r.show();
+               jTabbedPane1.addTab(jTextFieldOutPutFileName.getText(),r);
             }
             catch (IllegalArgumentException e) {
                error(e, "During class score calculation");
@@ -820,6 +896,21 @@ public class classScoreFrame
       }
    }
 
+  void jButtonLoadClassInfo_actionPerformed(ActionEvent e) {
+     loadClassInfo();
+  }
+
+  void loadClassInfo()
+  {
+     try
+     {
+        GONameReader goName = new GONameReader(jTextFieldGONames.getText());
+     }
+     catch (IllegalArgumentException e) { error(e, "Class info loading"); }
+     catch (IOException e) { error(e, "File reading or writing"); }
+
+  }
+
 }
 
 /* end class */
@@ -968,4 +1059,15 @@ class classScoreFrame_jButtonLoadResults_actionAdapter
    public void actionPerformed(ActionEvent e) {
       adaptee.jButtonLoadResults_actionPerformed(e);
    }
+}
+
+class classScoreFrame_jButtonLoadClassInfo_actionAdapter implements java.awt.event.ActionListener {
+  classScoreFrame adaptee;
+
+  classScoreFrame_jButtonLoadClassInfo_actionAdapter(classScoreFrame adaptee) {
+    this.adaptee = adaptee;
+  }
+  public void actionPerformed(ActionEvent e) {
+    adaptee.jButtonLoadClassInfo_actionPerformed(e);
+  }
 }

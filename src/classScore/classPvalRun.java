@@ -15,18 +15,18 @@ import util.*;
   @version $Id$
  */
 public class classPvalRun {
-   private histogram hist;
-   private Map classToProbe;
-   private Map goNames;
-   private Map probeGroups;
-   private expClassScore probePvalMapper;
    private GONameReader goName;
-   private GeneGroupReader groupName;
+   private expClassScore probePvalMapper;
+   private GeneDataReader geneData;
+   private Map probeGroups;
+   private ClassMap probeToClassMap;
+   private Map classToProbe;
+
+   private histogram hist;
+   private Map goNames;
    private double user_pvalue;
    private String dest_file;
-   private ClassMap probeToClassMap;
    private boolean weight_on = true;
-   private boolean dolog = true;
    private Map results = null;
    private Vector sortedclasses = null; // this holds the results.
    private Map effectiveSizes = null;
@@ -38,72 +38,40 @@ public class classPvalRun {
    private int numUnderThreshold = 0; // number of genes below the threshold
    private NumberFormat nf = NumberFormat.getInstance();
    private boolean useUniform = false; // assume input values come from uniform distribution under null hypothesis.
-   private GeneDataReader geneData = null;
 
    /**
     */
-   public classPvalRun(String probePvalFile,
-                       String probe_annotfile,
-                       String goNamesfile,
+   public classPvalRun(GONameReader gn,
+                       expClassScore ppm,
+                       GeneDataReader gd,
+                       Map pgm,
+                       ClassMap ptcm,
+                       Map ctp,
                        String resultsFile,
-                       // String group_file,
-                       String method,
-                       String groupMethod,
-                       int classMaxSize,
-                       int classMinSize,
-                       int numberOfRuns,
-                       int quantile,
                        double pval,
                        String useWeights,
-                       int pvalcolumn,
-                       String dolog_check,
                        String mtc_method,
                        classScoreStatus messenger,
                        boolean loadResults) throws
        IllegalArgumentException, IOException {
+
+      goName=gn;
+      probePvalMapper=ppm;
+      geneData=gd;
+      probeGroups=pgm;
+      probeToClassMap=ptcm;
+      classToProbe=ctp;
 
       nf.setMaximumFractionDigits(8);
 
       // user flags and constants:
       user_pvalue = - (Math.log(pval) / Math.log(10)); // user defined pval (cutoff) for hypergeometric todo: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
       weight_on = (Boolean.valueOf(useWeights)).booleanValue();
-      dolog = (Boolean.valueOf(dolog_check)).booleanValue();
       effectiveSizes = new HashMap();
       actualSizes = new HashMap();
       dest_file = resultsFile;
       target_ranks = new HashMap(); // will hold ranks of items in a class.
       record = new HashMap(); // scratch space to record those probes that have been seen when iterating over a class.
-
-      messenger.setStatus("Reading GO descriptions");
-      goName = new GONameReader(goNamesfile); // parse go name file
-
-      messenger.setStatus("Reading gene scores");
-      probePvalMapper = new expClassScore(probePvalFile, useWeights, method,
-                                          pvalcolumn, dolog, classMaxSize,
-                                          classMinSize, numberOfRuns,
-                                          quantile);
-
-      messenger.setStatus("Reading gene data file");
-      geneData = new GeneDataReader(probe_annotfile, probePvalMapper.get_map());
-      groupName = new GeneGroupReader(geneData.getGroupProbeList(),
-                                      geneData.getProbeGroupMap()); // parse group file. Yields map of probe->replicates.
-      probeGroups = groupName.get_probe_group_map(); // map of probes to groups
-
-      messenger.setStatus("Initializing gene score mapping");
-
-      //  if (weight_on) {
-      probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
-                                    groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-      //  }
-
-      messenger.setStatus("Initializing gene class mapping");
-
-      //   messenger.setStatus("Reading in GO class membership");
-      probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
-                                     geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
-      classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
-
-      messenger.setStatus("Done with setup");
 
       if (loadResults) {
          readResultsFromFile(resultsFile);
@@ -119,7 +87,7 @@ public class classPvalRun {
          }
 
 //    messenger.setStatus(hist.toString());
-         System.err.println(hist.toString());
+         System.err.println("Hist to string: "+hist.toString());
 
          // Initialize the results data structure.
          results = new LinkedHashMap();
@@ -953,24 +921,36 @@ public class classPvalRun {
 
    public static void main(String[] args) {
       classScoreStatus m = new classScoreStatus(null);
-
       try {
-         classPvalRun test = new classPvalRun(args[0], args[1], args[2], args[3],
-                                              args[5], args[6],
-                                              Integer.parseInt(args[7]),
-                                              Integer.parseInt(args[8]),
-                                              Integer.parseInt(args[9]),
-                                              Integer.parseInt(args[10]),
-                                              Double.parseDouble(args[11]),
-                                              args[12],
-                                              Integer.parseInt(args[13]), args[14],
-                                              args[15], m, false);
+         setupMaps smaps = new setupMaps(args[0],                   // pbPval file
+                                         args[1],                   // affy GO File
+                                         args[2],                   // GO name file
+                                         args[4],args[5],           // methods
+                                         Integer.parseInt(args[6]), // max class
+                                         Integer.parseInt(args[7]), // min class
+                                         Integer.parseInt(args[8]), // numruns
+                                         Integer.parseInt(args[9]), // quantile
+                                         args[11], // use weights
+                                         Integer.parseInt(args[12]), // column
+                                         args[13], // takeLog
+                                         m);
+
+         classPvalRun test = new classPvalRun(smaps.goName,
+                         smaps.probePvalMapper,
+                         smaps.geneData,
+                         smaps.probeGroups,
+                         smaps.probeToClassMap,
+                         smaps.classToProbe,
+                         args[3],                      // output file
+                         Double.parseDouble(args[10]), // pvalue
+                         args[11],                     // use weights
+                         args[14],                     // mtc method
+                         m, false);
       }
       catch (IOException e) {
          e.printStackTrace();
       }
    }
-
 }
 
 /* class_pvals */

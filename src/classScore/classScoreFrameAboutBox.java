@@ -67,7 +67,7 @@ public class classScoreFrameAboutBox
       button1.setText("Ok");
       button1.addActionListener(this);
 //    insetsPanel2.add(imageLabel, null);
-      jTextPane1.setBackground(UIManager.getColor("control"));
+      jTextPane1.setBackground(Color.white);
       jTextPane1.setFont(new java.awt.Font("Dialog", 1, 11));
       jTextPane1.setMinimumSize(new Dimension(211, 150));
       jTextPane1.setPreferredSize(new Dimension(211, 150));

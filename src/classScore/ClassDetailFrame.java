@@ -12,7 +12,7 @@ import javax.swing.table.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
- * @todo show how many rows there are in the table
+ * @todo show how many rows there are in the table (I think this is done classPvalRun, line 906)
 * @todo add a graphical display of the data
  */
 

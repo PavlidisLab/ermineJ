@@ -27,7 +27,14 @@ public class ClassMap {
       this.probeToClassMap = probeToClassMap;
       this.classToProbeMap = classToProbeMap;
 
+      System.err.println("Um, do you see me? CM1");
+      System.err.println("Ha: "+this.classToProbeMap.keySet().size());
+
       collapseClasses(); // identify redundant classes.
+
+      System.err.println("Um, do you see me? CM2");
+      System.err.println("Ha: "+this.classToProbeMap.keySet().size());
+
       //	ignoreSimilar(0.90); // get rid of classes which are too similar to other classes.
 
    } // end of readMyFile()

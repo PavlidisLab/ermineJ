@@ -1,11 +1,11 @@
 #
-#Mon May 24 09:46:17 EDT 2004
+#Thu May 27 15:05:51 EDT 2004
 minClassSize=8
 pvalueThreshold=0.001
-maxClassSize=150
+maxClassSize=10
 scoreColumn=2
-GOnameFile=G\:\\databases\\GO\\data\\goNames.txt
-annotFile=G\:\\databases\\affymetrix\\HG-U95A.an.txt
-outputFile=H\:\\projects\\ermineJ\\test\\melanoma-sarcoma-test.txt
+GOnameFile=C\:\\jbproject\\ermineJ\\data\\goNames.txt
+annotFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
+outputFile=C\:\\jbproject\\ermineJ\\data\\test.results.txt
 doLog=true
-scoreFile=H\:\\projects\\ermineJ\\data\\one-way-anova-parsed.txt
+scoreFile=C\:\\jbproject\\ermineJ\\data\\one-way-anova-parsed.txt

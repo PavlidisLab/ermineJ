@@ -48,20 +48,28 @@ public class erminecmd {
       System.err.println("Probe annotations from " + affyGoFile);
       System.err.println("Output into " + destinFile);
 
-      classPvalRun test = new classPvalRun(pbPvalFile, affyGoFile, goNameFile,
-                                         destinFile,
-                                         args[4], // method
-                                         args[5], // groups method
-                                         Integer.parseInt(args[6]), // max clas
-                                         Integer.parseInt(args[7]), // min class
-                                         Integer.parseInt(args[8]), // numruns
-                                         Integer.parseInt(args[9]), // quantile
-                                         Double.parseDouble(args[10]), // pvalue
-                                         args[11],
-                                         Integer.parseInt(args[12]),
-                                         args[13],
-                                         args[14], m, false);
+      setupMaps smaps = new setupMaps(pbPvalFile, affyGoFile, goNameFile, // files
+                                      args[4],args[5], // methods
+                                      Integer.parseInt(args[6]), // max clas
+                                      Integer.parseInt(args[7]), // min class
+                                      Integer.parseInt(args[8]), // numruns
+                                      Integer.parseInt(args[9]), // quantile
+                                      args[11], // use weights
+                                      Integer.parseInt(args[12]), // column
+                                      args[13], // takeLog
+                                      m);
 
+       classPvalRun test = new classPvalRun(smaps.goName,
+                                            smaps.probePvalMapper,
+                                            smaps.geneData,
+                                            smaps.probeGroups,
+                                            smaps.probeToClassMap,
+                                            smaps.classToProbe,
+                                            destinFile,                   // output file
+                                            Double.parseDouble(args[10]), // pvalue
+                                            args[11],                     // use weights
+                                            args[14],                     // mtc method
+                                            m, false);
     }
     catch (ArrayIndexOutOfBoundsException exception) { // this doesn't work ...
       System.err.println("You must enter 15 command line arguments: \nprobe_pvalfile\nannot file\ngo_namefile\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog\nmultiple test correction method (bon|bh|wy)");
