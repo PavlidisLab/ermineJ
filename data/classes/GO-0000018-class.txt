@@ -1,0 +1,20 @@
+probe
+GO:0000018
+regulation of DNA recombination
+1370_at
+1533_at
+2003_s_at
+32869_at
+32870_g_at
+35350_at
+35443_at
+35725_at
+36154_at
+36227_at
+39233_at
+39941_at
+40275_at
+40407_at
+40474_r_at
+860_at
+861_g_at
