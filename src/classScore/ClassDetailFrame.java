@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.text.NumberFormat;
 import baseCode.gui.JMatrixDisplay;
 
+import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.reader.DoubleMatrixReader;
+import java.io.IOException;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -69,18 +73,25 @@ public class ClassDetailFrame
 				    NumberFormat nf,
 				    GeneDataReader geneData ) 
     {
-      
 	//
 	// Create a matrix display
 	//
-	JMatrixDisplay matrixDisplay = null;
-	String filename = "C:\\GO_0005853.txt";
+
+	// compile the matrix data
+	String filename = "C:\\melanoma_and_sarcomaMAS5.txt";
+	String[] geneProbes = getProbes( classToProbe, id, values.size() );
+	DoubleMatrixReader matrixReader = new DoubleMatrixReader();
+	DenseDoubleMatrix2DNamed matrix = null;
 	try {
-	    matrixDisplay = new JMatrixDisplay( filename );
-	} catch (java.io.IOException e) {
-	    System.err.println( "IOException: wrong filename for JMatrixDisplay");
+	    matrix = (DenseDoubleMatrix2DNamed) matrixReader.read( filename, geneProbes );
+	} catch (IOException e) {
+	    System.err.println( "IOException: wrong filename for MatrixReader" );
 	}
-	matrixDisplay.setStandardizedEnabled( true );
+
+	// create the matrix display
+	//filename = "C:\\GO_0005853.txt";
+	JMatrixDisplay matrixDisplay = new JMatrixDisplay( matrix );
+	matrixDisplay.setStandardizedEnabled( false );
       
 	//
 	// Create the rest of the table
@@ -110,14 +121,27 @@ public class ClassDetailFrame
 		TableColumn col = jTable1.getColumnModel().getColumn( i );
 		col.setCellRenderer( cellRenderer );
 	    }
-
+      
 	// The columns containing text or values (not matrix display) should be a bit wider
 	jTable1.getColumnModel().getColumn( matrixColumnCount + 1 ).setPreferredWidth(  75 );
 	jTable1.getColumnModel().getColumn( matrixColumnCount + 2 ).setPreferredWidth( 125 );
 	jTable1.getColumnModel().getColumn( matrixColumnCount + 3 ).setPreferredWidth( 300 );
       
     }
-}
+   
+    protected String[] getProbes( Map classToProbe, String id, int count ) {
+      
+	// Compile a list of gene probe ID's in this probe class
+	String[] probes = new String[ count ];
+	for (int i = 0;  i < count;  i++)
+	    {
+		probes[i] = (String) ( (ArrayList)classToProbe.get(id) ).get(i);
+	    }
+	return probes;
+      
+    } // end getProbes
+} // end class ClassDetailFrame
+
 
 class DetailsTableModel extends AbstractTableModel {
 
@@ -179,7 +203,7 @@ class DetailsTableModel extends AbstractTableModel {
 	switch( column ) // after it's been offset
 	    {
 	    case 0:
-		return (String) ( (ArrayList) m_classToProbe.get(m_id)).get(row);
+		return (String) ( (ArrayList)m_classToProbe.get(m_id) ).get(row);
 	    case 1:
 		return new Double(m_nf.format(m_pvals.get( (String) ( (ArrayList)
 								      m_classToProbe.get(m_id)).get(row))));
@@ -248,8 +272,8 @@ class MatrixDisplayCellRenderer extends JLabel implements TableCellRenderer {
     }
 
     // The following methods override the defaults for performance reasons
-    //public void validate() {}
-    //public void revalidate() {}
+    public void validate() {}
+    public void revalidate() {}
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
 
