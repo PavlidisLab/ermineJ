@@ -91,13 +91,14 @@ public class classScoreCMD {
 	private void options(String[] args, boolean configged) {
 		if(args.length==0)
 			showHelp();
-		LongOpt[] longopts = new LongOpt[3];
+		LongOpt[] longopts = new LongOpt[4];
 		StringBuffer sb = new StringBuffer();
 		longopts[0] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[1] = new LongOpt("config", LongOpt.REQUIRED_ARGUMENT, null, 'C');
-		longopts[2] = new LongOpt("gui", LongOpt.NO_ARGUMENT, null, 'G');
+		longopts[2] = new LongOpt("gui", LongOpt.NO_ARGUMENT, null, 'G');		
+		longopts[3] = new LongOpt("save", LongOpt.NO_ARGUMENT, null, 'S');
 		Getopt g = new Getopt("classScoreCMD", args,
-				"a:c:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CG",longopts);
+				"a:c:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CGS:",longopts);
 		int c;
 		String arg;
 		int intarg;
@@ -352,6 +353,10 @@ public class classScoreCMD {
 			case 'G': //GUI
 				commandline=false;
 				break;
+			case 'S': //save pref file
+				arg = g.getOptarg();
+				settings.setPrefFile(arg);
+				break;
 			case '?':
 				showHelp();
 			default:
@@ -408,7 +413,9 @@ public class classScoreCMD {
 				"\t-C file ... or --config file ...\n" +
 				"\t\tSets the configuration file to be used.\n\n" +
 				"\t-G or --gui\n" +
-				"\t\tLaunch the GUI.\n\n");
+				"\t\tLaunch the GUI.\n\n" +
+				"\t-S file ... or --save file ...\n" +
+				"\t\tSave preferences in the specified file.\n\n");
 		System.exit(0);
 	}
 	
