@@ -29,6 +29,8 @@
     <data>index.xml</data>
   </view>
 -->
+
+<!--
 <view xml:lang="en">
 <name>Search</name>
 <label>Search</label>
@@ -37,6 +39,7 @@
 JavaHelpSearch
 </data>
 </view>
+-->
 
   <presentation>
      <name>main</name>
