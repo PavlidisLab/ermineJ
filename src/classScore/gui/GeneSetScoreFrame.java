@@ -261,9 +261,6 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
          geneData = new GeneAnnotations(settings.getAnnotFile());
          statusMessenger.setStatus( "Initializing gene class mapping" );
-         GeneSetMapTools.collapseClasses(geneData);
-         geneData.sortGeneSets();
-
          geneDataSets.put(new Integer("original".hashCode()) , geneData);
 
          statusMessenger.setStatus("Done with setup");
@@ -273,16 +270,16 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Ready.");
       }
       catch ( IllegalArgumentException e ) {
-         GuiUtil.error( 
-            "Error during initialization: " + e + "\n" +
-            "If this problem persists, contact the software vendor.\n" +
+         GuiUtil.error(
+            "Error during initialization: " + e +
+            "If this problem persists, please contact the software vendor. " +
             "Press OK to quit." );
          System.exit( 1 );
       }
       catch ( IOException e ) {
-         GuiUtil.error( 
-            "File reading or writing error during initialization: " + e + "\n" +
-            "If this problem persists, contact the software vendor.\n" +
+         GuiUtil.error(
+            "File reading or writing error during initialization: " + e +
+            "If this problem persists, please contact the software vendor. " +
             "Press OK to quit." );
          System.exit( 1 );
       } catch ( SAXException e ) {

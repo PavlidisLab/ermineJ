@@ -12,7 +12,7 @@ import java.util.Set;
 
 /**
  * Methods to 'clean' a set of geneSets - to remove redundancies, for example.
- * 
+ *
  * @author Shahmil Merchant, Paul Pavlidis (major changes)
  * @version $Id$
  */
@@ -264,7 +264,8 @@ public class GeneSetMapTools {
             }
             ( ( ArrayList ) classesToRedundantMap.get( seenClasses
                   .get( signature ) ) ).add( classId );
-            classToProbeMap.remove( classId );
+            geneData.removeClassFromMaps(classId);
+              //classToProbeMap.remove( classId );
             //		System.err.println(classId + " is the same as an existing class, " + seenClasses.get(signature));
          } else {
             // add string to hash
