@@ -10,18 +10,43 @@
   </head>
 
   <body bgcolor="#ffffff">
-    <h2>Tutorial: Correlation resampling</h2>
-    Please note that the correlation resampling method still does not
-    completely implement corrections for multiply-represented genes. In
-    the meantime this method should be considered experimental. <br>
-     
-    <hr>
+    <h1>Tutorial: Correlation resampling</h1>
 
-    <div class="tidy">
-      Copyright 2004 (c) Columbia University
-    </div><br>
+    <h2>Method Overview</h2>
+
+    <p>Please note that the correlation resampling method still does
+    not completely implement corrections for multiply-represented
+    genes. In the meantime this method should be considered
+    experimental. (basically I'm too busy to fix it)</p>
+
+    <p>Unlike ORA and Gene Score Resampling, this method examines the
+    gene expression profiles themselves, not the gene scores for each
+    gene. A score is computed for a gene set based on how correlated
+    the expression profiles are.</p>
+
+    <p>This can be thought of as a measure of how well the genes in the
+    set cluster together, but they need not all be in the same cluster.
+    Thus a gene set that contains two coherent clusters that encompass
+    most of the genes in the set will tend to get a good score (though
+    not as good as a gene set that is just one big cluster).</p>
+
+    <p>Correlatoin resampling is the most computationally intensive
+    method implemented by ermineJ. For this reason we recommend setting
+    the number of iterations lower. Future versions of ermineJ will use
+    some optimizations to make this method more usable.</p>
+
+    <h2>Walkthrough</h2>
+
+    <p>If you have read the ORA and Gene Score resampling pages, you
+    will recognize the first 4 steps of the wizard. The only different
+    one is the last one:</p>
+
+    <p><img alt="" src="../images/correlationstep5.jpg" border="0"></p>
      
     <hr>
+    <br>
+     <br>
+     
 
     <div class="tidy">
       Copyright 2004 (c) Columbia University

@@ -9,11 +9,12 @@
 	<mapID target="tutorial" url="html/tutorial/index.html" />
 	<mapID target="ora" url="html/tutorial/ora.html" />
 	
+	<mapID target="analysis" url="html/tutorial/analysis.html" />
    <mapID target="resampling" url="html/tutorial/resampling.html" />
 	<mapID target="correlation" url="html/tutorial/correlation.html" />
 	<mapID target="classes" url="html/tutorial/classes.html" />
-<mapID target="starting" url="html/tutorial/starting.html" />
-
+   <mapID target="starting" url="html/tutorial/starting.html" />
+<mapID target="mtc" url="html/tutorial/mtc.html" />
 	<mapID target="format" url="html/formats/index.html" />
 	<mapID target="go.format" url="html/formats/go.html" />
 	<mapID target="genescores.format" url="html/formats/genescores.html" />

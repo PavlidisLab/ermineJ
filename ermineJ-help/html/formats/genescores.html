@@ -20,6 +20,33 @@
     fold change. These scores must be computed separately and then
     supplied to the ermineJ software for analysis.</p>
 
+    <h2><font color="#cc0033">!</font> Make sure your gene scores are
+    on the right scale</h2>
+
+    <ul>
+      <li>
+        <div>
+          <strong>If your gene scores are <em>not</em>
+          p-values</strong> , then your score will be interpreted as
+          "bigger is better". If this isn't the case, you should
+          transform the values so this is true. No modification should
+          be necessary for "fold-change" measures, though you might
+          want to use the absolute value of log(fold change).
+        </div>
+      </li>
+
+      <li>
+        <div>
+          <strong>If your gene score are p-values</strong> , then you
+          should be sure to either -log your values, or use the
+          -log options in the ermineJ software.
+        </div>
+      </li>
+    </ul>
+
+    <h2><font color="#cc0033">!</font> You need a complete set of gene
+    scores, not just the "selected gene list"</h2>
+
     <p>Unlike some software packages, ermineJ requires a complete set
     of gene scores, rather than just those for the "selected genes".
     Thus, if your microarray has 12,000 probe sets on it, you will
@@ -31,6 +58,8 @@
 
     <p>The resampling-based analysis requires the gene scores, while
     for other analyses it is not required.</p>
+
+    <h2>Format</h2>
 
     <p>The gene score file is a simple tab-delimited text file,
     minimally having just two columns (like <a href=

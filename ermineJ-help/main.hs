@@ -15,24 +15,33 @@
   </maps>
 
   <!-- views -->
-  <view>
+  <view xml:lang="en">
     <name>TOC</name>
     <label>Table Of Contents</label>
     <type>javax.help.TOCView</type>
     <data>toc.xml</data>
   </view>
 
-  <view>
+<!--  <view>
     <name>Index</name>
     <label>Index</label>
     <type>javax.help.IndexView</type>
     <data>index.xml</data>
   </view>
+-->
+<view xml:lang="en">
+<name>Search</name>
+<label>Search</label>
+<type>javax.help.SearchView</type>
+<data engine="com.sun.java.help.search.DefaultSearchEngine">
+JavaHelpSearch
+</data>
+</view>
 
   <presentation>
      <name>main</name>
-     <size width="400" height="400" />
-     <location x="200" y="200" />
+     <size width="600" height="400" />
+     <location x="300" y="300" />
      <title>ermineJ Help</title>
   </presentation>
 </helpset>
