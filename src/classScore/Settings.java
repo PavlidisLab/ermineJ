@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import baseCode.util.FileTools;
@@ -23,13 +24,16 @@ import baseCode.util.FileTools;
 
 public class Settings {
    private Properties properties;
-   private String pref_file;
-   private String classFile;
-   private String annotFile;
-   private String rawFile;
-   private String dataFolder;
-   private String classFolder;
-   private String scoreFile;
+   private String pref_file = "";
+   private String classFile = "";
+   private String annotFile = "";
+   private String rawFile = "";
+   private String dataFolder = "";
+   private String classFolder = "";
+   private String scoreFile = "";
+   private String outputFile = "";
+   private String goldStandardFile = ""; // for testing;
+
    private int maxClassSize = 100;
    private int minClassSize = 8;
    private int iterations = 10000;
@@ -43,6 +47,7 @@ public class Settings {
    private double pValThreshold = 0.001;
    private boolean alwaysUseEmpirical = false;
    private boolean bigIsBetter = false;
+   private boolean isTester = false; //  set to true if this is running in the test framework.
 
    public static final int BEST_PVAL = 1;
    public static final int MEAN_PVAL = 2;
@@ -57,7 +62,7 @@ public class Settings {
    public static final int ROC = 3;
    public static final int TTEST = 4;
    public static final int KS = 5;
-   
+
    public static final int BONFERONNI = 0;
    public static final int WESTFALLYOUNG = 1;
    public static final int BENJAMINIHOCHBERG = 2;
@@ -66,18 +71,31 @@ public class Settings {
       this( "" );
    }
 
+   public Settings( URL resource ) {
+      properties = new Properties();
+
+      File fi = new File( resource.getFile() );
+      pref_file = fi.getAbsolutePath();
+
+      if ( fi.canRead() ) {
+         try {
+            InputStream f = new FileInputStream( pref_file );
+            read( f );
+         } catch ( IOException e ) {
+            System.err.println( "Couldn't read from the file" );
+            System.exit( 0 );
+         }
+      }
+   }
+
    /**
     * Creates settings object
     * 
     * @param filename name of preferences file to read
     */
    public Settings( String filename ) {
-      classFile = "";
-      annotFile = "";
-      rawFile = "";
-      scoreFile = "";
-      properties = new Properties();
 
+      properties = new Properties();
       if ( dataFolder == null && !this.determineDataDirectory() ) {
          return;
       }
@@ -90,75 +108,22 @@ public class Settings {
          new File( classFolder ).mkdir(); // todo should test success and do something about it.
       }
 
+      // make a new file if it was empty.
       if ( pref_file.compareTo( "" ) == 0 )
             pref_file = dataFolder + System.getProperty( "file.separator" )
                   + "ClassScore.preferences";
 
-      try {
-         File fi = new File( pref_file );
-         if ( fi.canRead() ) {
+      // read the file if we can.
+      File fi = new File( pref_file );
+      if ( fi.canRead() ) {
+         try {
             InputStream f = new FileInputStream( pref_file );
-            properties.load( f );
-            f.close();
-            if ( properties.containsKey( "scoreFile" ) )
-                  scoreFile = properties.getProperty( "scoreFile" );
-            if ( properties.containsKey( "classFile" ) )
-                  classFile = properties.getProperty( "classFile" );
-            if ( properties.containsKey( "annotFile" ) )
-                  annotFile = properties.getProperty( "annotFile" );
-            if ( properties.containsKey( "rawFile" ) )
-                  rawFile = properties.getProperty( "rawFile" );
-            if ( properties.containsKey( "dataFolder" ) )
-                  this.dataFolder = properties.getProperty( "dataFolder" );
-            if ( properties.containsKey( "classFolder" ) )
-                  this.classFolder = properties.getProperty( "classFolder" );
-            if ( properties.containsKey( "maxClassSize" ) )
-                  maxClassSize = Integer.valueOf(
-                        properties.getProperty( "maxClassSize" ) ).intValue();
-            if ( properties.containsKey( "minClassSize" ) )
-                  minClassSize = Integer.valueOf(
-                        properties.getProperty( "minClassSize" ) ).intValue();
-            if ( properties.containsKey( "iterations" ) )
-                  iterations = Integer.valueOf(
-                        properties.getProperty( "iterations" ) ).intValue();
-            if ( properties.containsKey( "scorecol" ) )
-                  scorecol = Integer.valueOf(
-                        properties.getProperty( "scorecol" ) ).intValue();
-            if ( properties.containsKey( "geneRepTreatment" ) )
-                  geneRepTreatment = Integer.valueOf(
-                        properties.getProperty( "geneRepTreatment" ) )
-                        .intValue();
-            if ( properties.containsKey( "rawScoreMethod" ) )
-                  rawScoreMethod = Integer.valueOf(
-                        properties.getProperty( "rawScoreMethod" ) ).intValue();
-            if ( properties.containsKey( "analysisMethod" ) )
-                  analysisMethod = Integer.valueOf(
-                        properties.getProperty( "analysisMethod" ) ).intValue();
-            if ( properties.containsKey( "quantile" ) )
-                  quantile = Integer.valueOf(
-                        properties.getProperty( "quantile" ) ).intValue();
-            if ( properties.containsKey( "doLog" ) )
-                  doLog = Boolean.valueOf( properties.getProperty( "doLog" ) )
-                        .booleanValue();
-            if ( properties.containsKey( "pValThreshold" ) )
-                  pValThreshold = Double.valueOf(
-                        properties.getProperty( "pValThreshold" ) )
-                        .doubleValue();
-            if ( properties.containsKey( "useEmpirical" ) )
-                  alwaysUseEmpirical = Boolean.valueOf(
-                        properties.getProperty( "useEmpirical" ) )
-                        .booleanValue();
-            if ( properties.containsKey( "mtc" ) )
-                  mtc = Integer.valueOf( properties.getProperty( "mtc" ) )
-                        .intValue();
-            if ( properties.containsKey( "bigIsBetter" ) )
-                  bigIsBetter = Boolean.valueOf(
-                        properties.getProperty( "bigIsBetter" ) )
-                        .booleanValue();
+            read( f );
+         } catch ( IOException e ) {
+            System.err.println( "Couldn't read from the file" );
          }
-      } catch ( IOException ex ) {
-            System.err.println( "Could not find preferences file. Will probably attempt to create a new one." );
       }
+
    }
 
    /**
@@ -170,6 +135,8 @@ public class Settings {
       classFile = settings.getClassFile();
       annotFile = settings.getAnnotFile();
       rawFile = settings.getRawFile();
+      goldStandardFile = settings.getGoldStandardFile();
+      outputFile = settings.getOutputFile();
       dataFolder = settings.getDataFolder();
       classFolder = settings.getClassFolder();
       scoreFile = settings.getScoreFile();
@@ -187,17 +154,18 @@ public class Settings {
       pref_file = settings.getPrefFile();
       mtc = settings.getMtc();
       bigIsBetter = settings.getBigIsBetter();
+      isTester = settings.isTester();
       properties = new Properties();
    }
 
    public void writePrefs() throws IOException {
-      this.writePrefs(pref_file);
+      this.writePrefs( pref_file );
    }
-   
+
    /**
     * Writes setting values to file.
     */
-   public void writePrefs(String fileName) throws IOException {
+   public void writePrefs( String fileName ) throws IOException {
 
       if ( fileName == null || fileName.length() == 0 ) {
          return;
@@ -206,6 +174,8 @@ public class Settings {
       properties.setProperty( "classFile", classFile );
       properties.setProperty( "annotFile", annotFile );
       properties.setProperty( "rawFile", rawFile );
+      properties.setProperty( "goldStandardFile", goldStandardFile );
+      properties.setProperty( "outputFile", outputFile );
       properties.setProperty( "dataFolder", dataFolder );
       properties.setProperty( "classFolder", classFolder );
       properties.setProperty( "maxClassSize", String.valueOf( maxClassSize ) );
@@ -225,6 +195,7 @@ public class Settings {
       properties.setProperty( "pValThreshold", String.valueOf( pValThreshold ) );
       properties.setProperty( "useEmpirical", String
             .valueOf( alwaysUseEmpirical ) );
+      properties.setProperty( "isTester", String.valueOf( isTester ) );
       OutputStream f = new FileOutputStream( fileName );
       properties.store( f, "" );
       f.close();
@@ -489,6 +460,50 @@ public class Settings {
       bigIsBetter = b;
    }
 
+   public boolean isTester() {
+      return isTester;
+   }
+
+   public void setTester( boolean isTester ) {
+      this.isTester = isTester;
+   }
+
+   /**
+    * Mostly used for testing
+    * 
+    * @return
+    */
+   public String getOutputFile() {
+      return outputFile;
+   }
+
+   /**
+    * Mostly used for testing
+    * 
+    * @param outputFile
+    */
+   public void setOutputFile( String outputFile ) {
+      this.outputFile = outputFile;
+   }
+
+   /**
+    * Mostly used for testing
+    * 
+    * @return
+    */
+   public String getGoldStandardFile() {
+      return goldStandardFile;
+   }
+
+   /**
+    * Mostly used for testing
+    * 
+    * @param goldStandardFile
+    */
+   public void setGoldStandardFile( String goldStandardFile ) {
+      this.goldStandardFile = goldStandardFile;
+   }
+
    /**
     * Determine whether we should be using the upper tails of our histograms. The "big is better" setting reflects the
     * original gene scores, not the log-transformed scores. Therefore if we are taking the log, and the user indicates
@@ -500,4 +515,133 @@ public class Settings {
    public boolean upperTail() {
       return ( doLog && !bigIsBetter ) || ( !doLog && bigIsBetter );
    }
+
+   private void read( InputStream s ) {
+
+      try {
+         properties.load( s );
+         s.close();
+
+         if ( properties.containsKey( "isTester" ) )
+               this.isTester = Boolean.valueOf(
+                     properties.getProperty( "isTester" ) ).booleanValue();
+
+         if ( properties.containsKey( "scoreFile" ) ) {
+            if ( isTester ) {
+               this.scoreFile = Settings.class.getResource(
+                     properties.getProperty( "scoreFile" ) ).getFile();
+            } else {
+               this.scoreFile = properties.getProperty( "scoreFile" );
+            }
+         }
+
+         if ( properties.containsKey( "classFile" ) ) {
+            if ( isTester ) {
+               this.classFile = Settings.class.getResource(
+                     properties.getProperty( "classFile" ) ).getFile();
+            } else {
+               this.classFile = properties.getProperty( "classFile" );
+            }
+         }
+
+         if ( properties.containsKey( "annotFile" ) ) {
+            if ( isTester ) {
+               this.annotFile = Settings.class.getResource(
+                     properties.getProperty( "annotFile" ) ).getFile();
+            } else {
+               this.annotFile = properties.getProperty( "annotFile" );
+            }
+         }
+
+         if ( properties.containsKey( "rawFile" ) ) {
+            if ( isTester ) {
+               this.rawFile = Settings.class.getResource(
+                     properties.getProperty( "rawFile" ) ).getFile();
+            } else {
+               this.rawFile = properties.getProperty( "rawFile" );
+            }
+         }
+
+         if ( properties.containsKey( "goldStandardFile" ) ) {
+            if ( isTester ) {
+               String goldStandardFileName = properties.getProperty( "goldStandardFile" ) ;
+
+               String path = Settings.class.getResource(
+                     properties.getProperty( "rawFile" ) ).getPath();
+               
+               path = path.substring(0, path.lastIndexOf("/data"));
+               
+               this.goldStandardFile = path + goldStandardFileName;
+               System.err.println( "Gold standard is or will be in " + goldStandardFile );
+            } else {
+               this.goldStandardFile = properties
+                     .getProperty( "goldStandardFile" );
+            }
+         }
+
+         if ( properties.containsKey( "dataFolder" ) )
+               this.dataFolder = properties.getProperty( "dataFolder" );
+
+         if ( properties.containsKey( "classFolder" ) )
+               this.classFolder = properties.getProperty( "classFolder" );
+
+         if ( properties.containsKey( "maxClassSize" ) )
+               this.maxClassSize = Integer.valueOf(
+                     properties.getProperty( "maxClassSize" ) ).intValue();
+
+         if ( properties.containsKey( "minClassSize" ) )
+               this.minClassSize = Integer.valueOf(
+                     properties.getProperty( "minClassSize" ) ).intValue();
+
+         if ( properties.containsKey( "iterations" ) )
+               this.iterations = Integer.valueOf(
+                     properties.getProperty( "iterations" ) ).intValue();
+
+         if ( properties.containsKey( "scorecol" ) )
+               this.scorecol = Integer.valueOf(
+                     properties.getProperty( "scorecol" ) ).intValue();
+
+         if ( properties.containsKey( "geneRepTreatment" ) )
+               this.geneRepTreatment = Integer.valueOf(
+                     properties.getProperty( "geneRepTreatment" ) ).intValue();
+
+         if ( properties.containsKey( "rawScoreMethod" ) )
+               this.rawScoreMethod = Integer.valueOf(
+                     properties.getProperty( "rawScoreMethod" ) ).intValue();
+
+         if ( properties.containsKey( "analysisMethod" ) )
+               this.analysisMethod = Integer.valueOf(
+                     properties.getProperty( "analysisMethod" ) ).intValue();
+
+         if ( properties.containsKey( "quantile" ) )
+               this.quantile = Integer.valueOf(
+                     properties.getProperty( "quantile" ) ).intValue();
+
+         if ( properties.containsKey( "doLog" ) )
+               this.doLog = Boolean.valueOf( properties.getProperty( "doLog" ) )
+                     .booleanValue();
+
+         if ( properties.containsKey( "pValThreshold" ) )
+               this.pValThreshold = Double.valueOf(
+                     properties.getProperty( "pValThreshold" ) ).doubleValue();
+
+         if ( properties.containsKey( "useEmpirical" ) )
+               this.alwaysUseEmpirical = Boolean.valueOf(
+                     properties.getProperty( "useEmpirical" ) ).booleanValue();
+
+         if ( properties.containsKey( "mtc" ) )
+               this.mtc = Integer.valueOf( properties.getProperty( "mtc" ) )
+                     .intValue();
+
+         if ( properties.containsKey( "bigIsBetter" ) )
+               this.bigIsBetter = Boolean.valueOf(
+                     properties.getProperty( "bigIsBetter" ) ).booleanValue();
+
+         //  System.err.println(this);
+      } catch ( IOException ex ) {
+         System.err
+               .println( "Could not find preferences file. Will probably attempt to create a new one." );
+      }
+   }
+
 }
