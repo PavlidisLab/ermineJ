@@ -10,6 +10,7 @@ import java.util.Vector;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 
+import cern.jet.math.Arithmetic;
 import classScore.Settings;
 import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
@@ -25,10 +26,7 @@ import classScore.data.GeneSetResult;
  */
 public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
-   private Vector sortedclasses;
    private Map results;
-   private GeneScoreReader geneScores;
-   private NumberFormat nf = NumberFormat.getInstance();
    private int numOverThreshold;
    private int numUnderThreshold;
    private int inputSize;
@@ -83,14 +81,14 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
 
       double geneScoreThreshold = settings.getPValThreshold();
 
+      if ( settings.getDoLog() ) {
+         geneScoreThreshold = -Arithmetic.log10(geneScoreThreshold);
+      }
+      
       Iterator itr = inp_entries.iterator();
       while ( itr.hasNext() ) {
          Map.Entry m = ( Map.Entry ) itr.next();
          double geneScore = ( ( Double ) m.getValue() ).doubleValue();
-
-         if ( settings.getDoLog() ) {
-            geneScore = Math.pow( 10, -geneScore );
-         }
 
          if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
             numOverThreshold++;

@@ -82,7 +82,7 @@ public class GeneSetPvalRun {
 
       GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes,
             geneData, geneScores, settings.getUseWeights() );
-      csc.getClassSizes();
+
 
       messenger.setStatus( "Multiple test correction..." );
       MultipleTestCorrector mt = new MultipleTestCorrector( settings,
@@ -134,7 +134,7 @@ public class GeneSetPvalRun {
       // get the class sizes.
       GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes,
             geneData, geneScores, settings.getUseWeights() );
-      csc.getClassSizes();
+
 
       switch ( settings.getAnalysisMethod() ) {
          case Settings.RESAMP: {

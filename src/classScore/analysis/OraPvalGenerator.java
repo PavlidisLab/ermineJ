@@ -7,6 +7,7 @@ import java.util.Map;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
+import baseCode.math.SpecFunc;
 
 import cern.jet.math.Arithmetic;
 import cern.jet.stat.Probability;
@@ -28,8 +29,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
    protected double geneScoreThreshold;
    protected int inputSize;
-   protected int numOverThreshold = 0; // number of genes over the threshold
-   protected int numUnderThreshold = 0; // number of genes below the threshold
+   protected int numOverThreshold = 0;
+   protected int numUnderThreshold = 0;
 
    public OraPvalGenerator( Settings settings, GeneAnnotations a,
          GeneSetSizeComputer csc, int not, int nut, GONames gon, int inputSize ) {
@@ -40,7 +41,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       this.inputSize = inputSize;
 
       if ( settings.getUseLog() ) {
-         this.geneScoreThreshold = -Arithmetic.log10( settings.getPValThreshold() );
+         this.geneScoreThreshold = -Arithmetic.log10( settings
+               .getPValThreshold() );
       } else {
          this.geneScoreThreshold = settings.getPValThreshold();
       }
@@ -58,9 +60,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       int failures = 0;
 
       //variables for outputs
-      double hyper_pval = -1.0;
+      double oraPval = -1.0;
 
-      int effectiveGeneSetSize = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue(); 
+      if ( !effectiveSizes.containsKey( class_name ) ) {
+         return null;
+      }
+
+      int effectiveGeneSetSize = ( ( Integer ) effectiveSizes.get( class_name ) )
+            .intValue();
       if ( effectiveGeneSetSize < settings.getMinClassSize()
             || effectiveGeneSetSize > settings.getMaxClassSize() ) {
          return null;
@@ -74,7 +81,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       Map record = new HashMap();
       int v_size = 0;
 
-      // foreach item in the class.
       while ( classit.hasNext() ) {
 
          String probe = ( String ) classit.next(); // probe id
@@ -115,7 +121,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                double score = pbpval.doubleValue();
 
                // hypergeometric pval info.
-               if (  scorePassesThreshold( score, geneScoreThreshold ) ) {
+               if ( scorePassesThreshold( score, geneScoreThreshold ) ) {
                   successes++;
                } else {
                   failures++;
@@ -125,27 +131,39 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
          } // if in data set
       } // end of while over items in the class.
 
-      // Hypergeometric p value calculation.
+      // Hypergeometric p value calculation (or binomial approximation)
       // successes=number of genes in class which meet criteria
       // (successes); numOverThreshold= number of genes which
       // meet criteria (trials); pos_prob: fractional size of
       // class wrt data size.
       double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
       double expected = numOverThreshold * pos_prob;
-      // lower tail.
-      if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
-         // or we didn't/cant get
-         // anything.
-         //   hyper_pval = Probability.binomial( successes, numOverThreshold,
-         //        pos_prob );
 
-         // upper tail. this is more consistent with the other methods.
-         hyper_pval = Probability.binomialComplemented( successes,
-               numOverThreshold, pos_prob );
+      System.err.println( successes + ", " + effectiveGeneSetSize + ", "
+            + ( inputSize - effectiveGeneSetSize ) + ", "
+            + numOverThreshold );
+
+      if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
+         // still do upper tail - to be consistent with other methods.
+
+         // successes, positives, negatives, trials
+         oraPval = SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize
+               - effectiveGeneSetSize, numOverThreshold, false );
+
+         if ( Double.isNaN( oraPval ) ) {
+            oraPval = Probability.binomialComplemented( successes,
+                  numOverThreshold, pos_prob );
+         }
+
       } else {
-         // Upper tail.
-         hyper_pval = Probability.binomialComplemented( successes,
-               numOverThreshold, pos_prob );
+
+         oraPval = SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize
+               - effectiveGeneSetSize, numOverThreshold, false );
+
+         if ( Double.isNaN( oraPval ) ) {
+            oraPval = Probability.binomialComplemented( successes,
+                  numOverThreshold, pos_prob );
+         }
       }
 
       // set up the return object.
@@ -153,7 +171,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             .getNameForId( class_name ), ( ( Integer ) actualSizes
             .get( class_name ) ).intValue(), effectiveGeneSetSize );
       res.setScore( successes );
-      res.setPValue( hyper_pval );
+      res.setPValue( oraPval );
       return res;
 
    }

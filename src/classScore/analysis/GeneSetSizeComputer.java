@@ -39,12 +39,13 @@ public class GeneSetSizeComputer {
       this.geneScores = geneScores;
       effectiveSizes = new HashMap();
       actualSizes = new HashMap();
+      getClassSizes();
    }
 
    /**
     * Calculate class sizes for all classes - both effective and actual size
     */
-   public void getClassSizes() {
+   private void getClassSizes() {
       Collection entries = classToProbe.entrySet(); // go -> probe map. Entries
       // are the class names.
       Iterator it = entries.iterator();
@@ -53,20 +54,13 @@ public class GeneSetSizeComputer {
       int size;
       int v_size;
 
-      if ( activeProbes == null ) {
-         throw new IllegalStateException( "ActiveProbes was not initialized" );
-      }
+      assert !( activeProbes == null || activeProbes.size() == 0 ) : "ActiveProbes was not initialized or was empty";
+      assert !( geneScores == null ) : "GeneScores was not initialized";
+      assert !( geneScores.getGeneToPvalMap() == null ) : "getGroupToPvalMap was not initialized";
 
-      if ( geneScores == null ) {
-         throw new IllegalStateException( "GeneScores was not initialized" );
-      }
+      boolean gotAtLeastOneNonZero = false;
 
-      if ( geneScores.getGeneToPvalMap() == null ) {
-         throw new IllegalStateException(
-               "getGroupToPvalMap was not initialized" );
-      }
-
-      while ( it.hasNext() ) { // for each class.
+      while ( it.hasNext() ) {
          Map.Entry e = ( Map.Entry ) it.next(); // next class.
          String className = ( String ) e.getKey(); // id of the class
          // (GO:XXXXXX)
@@ -108,11 +102,16 @@ public class GeneSetSizeComputer {
 
          if ( !weight_on ) {
             v_size = size;
-
          }
+
+         gotAtLeastOneNonZero = gotAtLeastOneNonZero || v_size > 0;
+
          effectiveSizes.put( className, new Integer( v_size ) );
          actualSizes.put( className, new Integer( size ) );
       }
+
+      assert gotAtLeastOneNonZero;
+
    }
 
    /**

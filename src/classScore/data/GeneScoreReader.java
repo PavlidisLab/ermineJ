@@ -83,6 +83,7 @@ public class GeneScoreReader {
    public GeneScoreReader( InputStream is, Settings settings,
          StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
          throws IOException {
+      this();
       read( is, settings, messenger, geneToProbeMap, probeToGeneMap );
    }
 

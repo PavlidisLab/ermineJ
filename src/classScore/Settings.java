@@ -41,7 +41,7 @@ public class Settings {
    private int mtc = BENJAMINIHOCHBERG; // multiple test correction
    private boolean doLog = true;
    private double pValThreshold = 0.001;
-   private boolean alwaysUseEmpirical;
+   private boolean alwaysUseEmpirical = false;
    private boolean bigIsBetter = false;
 
    public static final int BEST_PVAL = 1;
@@ -495,7 +495,7 @@ public class Settings {
     * smaller values are better, then we do want to use the upper tail. If we're not taking the log, then we just
     * directly interpret what the user selected for 'bigIsBetter'.
     * 
-    * @return
+    * @return true if we are using the "upper tail" of our distributions.
     */
    public boolean upperTail() {
       return ( doLog && !bigIsBetter ) || ( !doLog && bigIsBetter );

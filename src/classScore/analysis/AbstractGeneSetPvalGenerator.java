@@ -4,7 +4,6 @@ import java.util.Map;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
-
 import classScore.Settings;
 
 /**
@@ -27,7 +26,7 @@ public abstract class AbstractGeneSetPvalGenerator {
    protected GeneSetSizeComputer csc;
    private int maxGeneSetSize;
    private int minGeneSetSize;
-
+   
    public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots,
          GeneSetSizeComputer csc, GONames gon ) {
 
