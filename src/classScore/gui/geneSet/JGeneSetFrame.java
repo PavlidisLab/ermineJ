@@ -338,6 +338,7 @@ public class JGeneSetFrame extends JFrame {
          Color[] colorMap = ColorMap.GREENRED_COLORMAP;
          m_matrixDisplay.setColorMap( colorMap );
          m_gradientBar.setColorMap( colorMap );
+         m_table.repaint();
       }
       catch ( Exception ex ) {
       }
@@ -350,6 +351,7 @@ public class JGeneSetFrame extends JFrame {
          Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
          m_matrixDisplay.setColorMap( colorMap );
          m_gradientBar.setColorMap( colorMap );
+         m_table.repaint();
       }
       catch ( Exception ex ) {
       }
