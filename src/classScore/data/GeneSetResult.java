@@ -34,7 +34,7 @@ public class GeneSetResult implements Comparable {
    private int rank;
 
    public GeneSetResult() {
-      this( null, null, 0, 0, 0.0, 1.0, 1.0, 0.5, 1.0 );
+      this( null, null, 0, 0, 0.0, 1.0  );
    }
 
    public GeneSetResult( String id, String class_name, int size, int effsize ) {
@@ -44,8 +44,7 @@ public class GeneSetResult implements Comparable {
    }
 
    public GeneSetResult( String id, String class_name, int size,
-         int effective_size, double score, double pvalue, double hyperpval,
-         double aroc, double rocpval ) {
+         int effective_size, double score, double pvalue  ) {
       this.class_id = id;
       this.class_name = class_name;
       this.pvalue = pvalue;

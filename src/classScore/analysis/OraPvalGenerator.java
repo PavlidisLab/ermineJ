@@ -9,7 +9,6 @@ import cern.jet.stat.Probability;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
 
 /**

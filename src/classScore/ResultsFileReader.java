@@ -40,18 +40,13 @@ public class ResultsFileReader {
             if(firstword.compareTo("!")==0)
             {
                System.err.println("This is good");
-    //           String classNameMunged = st.nextToken();
                String className = st.nextToken();
                String classId = st.nextToken();
                int size = Integer.parseInt(st.nextToken());
                int effsize = Integer.parseInt(st.nextToken());
                double score = Double.parseDouble(st.nextToken());
                double pval = Double.parseDouble(st.nextToken());
-               //int hypercut = Integer.parseInt(st.nextToken());
-               double hyperpval = Double.parseDouble(st.nextToken());
-
-               GeneSetResult c = new GeneSetResult(classId, className, size, effsize, score, pval,
-                   hyperpval, 0.5, 1.0);
+               GeneSetResult c = new GeneSetResult(classId, className, size, effsize, score, pval );
                results.put(classId, c);
             }
          }

@@ -98,7 +98,6 @@ public class ResultsPrinter {
            Iterator it = redund.iterator();
            while (it.hasNext()) {
               String nextid = (String) it.next();
-              String prefix;
               return_value = return_value + nextid + "|" +
                              goName.getNameForId(nextid) + ", ";
            }

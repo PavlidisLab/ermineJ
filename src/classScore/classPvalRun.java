@@ -1,6 +1,5 @@
 package classScore;
 
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;

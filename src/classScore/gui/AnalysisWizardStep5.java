@@ -220,7 +220,7 @@ public class AnalysisWizardStep5 extends WizardStep
    private void setValues() {
       jTextFieldIterations.setText(String.valueOf(settings.getIterations()));
       jTextFieldScoreCol.setText(String.valueOf(settings.getScorecol()));
-      if(settings.getRawScoreMethod()==settings.MEAN_METHOD)
+      if(settings.getRawScoreMethod()==Settings.MEAN_METHOD)
          jRadioButtonMean.setSelected(true);
       else
          jRadioButtonMedian.setSelected(true);
@@ -231,9 +231,9 @@ public class AnalysisWizardStep5 extends WizardStep
       settings.setIterations(Integer.valueOf(jTextFieldIterations.getText()).intValue());
       settings.setScorecol(Integer.valueOf(jTextFieldScoreCol.getText()).intValue());
       if(jRadioButtonMean.isSelected())
-         settings.setRawScoreMethod(settings.MEAN_METHOD);
+         settings.setRawScoreMethod(Settings.MEAN_METHOD);
       else
-         settings.setRawScoreMethod(settings.QUANTILE_METHOD);
+         settings.setRawScoreMethod(Settings.QUANTILE_METHOD);
       settings.setPValThreshold(Double.valueOf(jTextFieldPValueThreshold.getText()).doubleValue());
    }
 

@@ -128,7 +128,7 @@ public class GeneAnnotations {
          ArrayList probes = ( ArrayList ) classToProbeMap.get( id );
          Iterator probe_it = probes.iterator();
          while ( probe_it.hasNext() ) {
-            genes.add( probeToGeneName.get( ( String ) probe_it.next() ) );
+            genes.add( probeToGeneName.get(probe_it.next() ) );
          }
          map.put( id, genes );
       }
@@ -379,7 +379,7 @@ public class GeneAnnotations {
             ptc.remove( classId );
             probeToClassMap.remove( orig_probe );
             probeToClassMap
-                  .put( orig_probe, new ArrayList( ( Collection ) ptc ) );
+                  .put( orig_probe, new ArrayList( ptc ) );
          }
       }
       Iterator probe_it = probes.iterator();
@@ -416,9 +416,9 @@ public class GeneAnnotations {
                case 0:
                   return probeid;
                case 1:
-                  return ( String ) getProbeGeneName( probeid );
+                  return getProbeGeneName( probeid );
                case 2:
-                  return ( String ) getProbeDescription( probeid );
+                  return getProbeDescription( probeid );
                default:
                   return null;
             }

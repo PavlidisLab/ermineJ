@@ -1,20 +1,20 @@
 package classScore.gui.geneSet;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -30,19 +30,19 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableColumn;
+
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.reader.DoubleMatrixReader;
 import baseCode.graphics.text.Util;
 import baseCode.gui.ColorMap;
 import baseCode.gui.JGradientBar;
+import baseCode.gui.JMatrixDisplay;
+import baseCode.gui.table.JBarGraphCellRenderer;
+import baseCode.gui.table.JMatrixCellRenderer;
+import baseCode.gui.table.JVerticalHeaderRenderer;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;
-import baseCode.gui.JMatrixDisplay;
-import baseCode.gui.table.JMatrixCellRenderer;
-import baseCode.gui.table.JBarGraphCellRenderer;
-import baseCode.gui.table.JVerticalHeaderRenderer;
 import classScore.gui.TableSorter;
-import java.util.HashMap;
 
 /**
  * @author Will Braynen

@@ -52,7 +52,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
       //variables for outputs
       Map target_ranks = new HashMap();
 
-      int effSize = ( int ) ( ( Integer ) effectiveSizes.get( class_name ) )
+      int effSize =  ( ( Integer ) effectiveSizes.get( class_name ) )
             .intValue(); // effective size of this class.
       if ( effSize < probePvalMapper.get_class_min_size()
             || effSize > probePvalMapper.get_class_max_size() ) {
@@ -98,7 +98,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
       // set up the return object.
       GeneSetResult res = new GeneSetResult( class_name, goName
-            .getNameForId( class_name ), ( int ) ( ( Integer ) actualSizes
+            .getNameForId( class_name ), ( ( Integer ) actualSizes
             .get( class_name ) ).intValue(), effSize );
       res.setScore( areaUnderROC );
       res.setPValue( roc_pval );

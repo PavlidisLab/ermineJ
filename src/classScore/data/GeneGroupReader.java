@@ -1,11 +1,9 @@
 package classScore.data;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Description:Parses the file of the form:

@@ -24,16 +24,24 @@ import classScore.data.GONames;
 import classScore.data.NewGeneSet;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: </p>
+ * <p>
+ * Title:
+ * </p>
+ * <p>
+ * Description:
+ * </p>
+ * <p>
+ * Copyright: Copyright (c) 2004
+ * </p>
+ * <p>
+ * Company:
+ * </p>
+ * 
  * @author not attributable
  * @version $Id$
  */
 
-public class AnalysisWizardStep3
-    extends WizardStep {
+public class AnalysisWizardStep3 extends WizardStep {
    AnalysisWizard wiz;
    Settings settings;
    GONames goData;
@@ -47,7 +55,8 @@ public class AnalysisWizardStep3
    AbstractTableModel acTableModel;
    JLabel countLabel;
 
-   public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings, GONames goData ) {
+   public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings,
+         GONames goData ) {
       super( wiz );
       this.wiz = wiz;
       this.settings = settings;
@@ -76,38 +85,44 @@ public class AnalysisWizardStep3
       countLabel.setText( "Number of Classes: 0" );
       customClassTable = new JTable();
       customClassTable.setPreferredScrollableViewportSize( new Dimension( 250,
-          150 ) );
+            150 ) );
       customClassScrollPane = new JScrollPane( customClassTable );
       customClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
       addedClassTable = new JTable();
-      addedClassTable.setPreferredScrollableViewportSize( new Dimension( 250, 150 ) );
+      addedClassTable.setPreferredScrollableViewportSize( new Dimension( 250,
+            150 ) );
       addedClassScrollPane = new JScrollPane( addedClassTable );
       addedClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
       GridLayout gridLayout1 = new GridLayout();
       jPanel10.setLayout( gridLayout1 );
       JButton addAllButton = new JButton();
-      addAllButton.setText("Add All >");
-      addAllButton.addActionListener(new AnalysisWizardStep3_addAllButton_actionAdapter(this));
+      addAllButton.setText( "Add All >" );
+      addAllButton
+            .addActionListener( new AnalysisWizardStep3_addAllButton_actionAdapter(
+                  this ) );
       jPanel10.add( customClassScrollPane, null );
       jPanel10.add( addedClassScrollPane, null );
       jPanel9.setPreferredSize( new Dimension( 200, 50 ) );
       addButton.setSelected( false );
       addButton.setText( "Add >" );
-      addButton.addActionListener( new AnalysisWizardStep3_addButton_actionAdapter( this ) );
+      addButton
+            .addActionListener( new AnalysisWizardStep3_addButton_actionAdapter(
+                  this ) );
       deleteButton.setSelected( false );
       deleteButton.setText( "Delete" );
-      deleteButton.addActionListener( new
-                                      AnalysisWizardStep3_delete_actionPerformed_actionAdapter( this ) );
+      deleteButton
+            .addActionListener( new AnalysisWizardStep3_delete_actionPerformed_actionAdapter(
+                  this ) );
       jPanel9.add( addButton, null );
-      jPanel9.add(addAllButton, null);
+      jPanel9.add( addAllButton, null );
       jPanel9.add( deleteButton, null );
       step3Panel.add( countLabel, BorderLayout.NORTH );
       step3Panel.add( jPanel10, BorderLayout.CENTER );
       step3Panel.add( jPanel9, BorderLayout.SOUTH );
 
-      this.addHelp("<html>This is a place holder.<br>"+
-                   "Blah, blah, blah, blah, blah.");
-      this.addMain(step3Panel);
+      this.addHelp( "<html>This is a place holder.<br>"
+            + "Blah, blah, blah, blah, blah." );
+      this.addMain( step3Panel );
    }
 
    public boolean isReady() {
@@ -131,7 +146,7 @@ public class AnalysisWizardStep3
       updateCountLabel();
    }
 
-   void addAllButton_actionPerformed(ActionEvent e) {
+   void addAllButton_actionPerformed( ActionEvent e ) {
       for ( int i = 0; i < ccTableModel.getRowCount(); i++ ) {
          String id = ( String ) customClassTable.getValueAt( i, 0 );
          if ( id != null ) {
@@ -167,23 +182,25 @@ public class AnalysisWizardStep3
    }
 
    void makeLeftTable() {
-      File dir = new File(settings.getClassFolder());
+      File dir = new File( settings.getClassFolder() );
       if ( dir.exists() ) {
-         String[] classFiles = dir.list( new AnalysisWizardStep3_ClassFileFilter( "-class.txt" ) );
+         String[] classFiles = dir
+               .list( new AnalysisWizardStep3_ClassFileFilter( "-class.txt" ) );
          customClasses = new AnalysisWizardStep3_CustomClassList();
          ccHash = new HashMap();
          for ( int i = 0; i < classFiles.length; i++ ) {
             File classFile = new File( dir.getPath(), classFiles[i] );
-            HashMap cfi = NewGeneSet.getClassFileInfo( classFile.getAbsolutePath() );
+            HashMap cfi = NewGeneSet.getClassFileInfo( classFile
+                  .getAbsolutePath() );
             customClasses.add( cfi );
             ccHash.put( cfi.get( "id" ), cfi );
          }
          ccTableModel = customClasses.toTableModel();
          customClassTable.setModel( ccTableModel );
       } else
-         GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
+         GuiUtil
+               .error( "There is no 'genesets' folder in the 'data' directory" );
    }
-
 
    void makeRightTable() {
       addedClasses = new AnalysisWizardStep3_CustomClassList();
@@ -192,14 +209,17 @@ public class AnalysisWizardStep3
       acHash = new HashMap();
    }
 
-   public ArrayList getAddedClasses() { return addedClasses; }
+   public ArrayList getAddedClasses() {
+      return addedClasses;
+   }
 }
 
-class AnalysisWizardStep3_delete_actionPerformed_actionAdapter
-    implements java.awt.event.ActionListener {
+class AnalysisWizardStep3_delete_actionPerformed_actionAdapter implements
+      java.awt.event.ActionListener {
    AnalysisWizardStep3 adaptee;
 
-   AnalysisWizardStep3_delete_actionPerformed_actionAdapter( AnalysisWizardStep3 adaptee ) {
+   AnalysisWizardStep3_delete_actionPerformed_actionAdapter(
+         AnalysisWizardStep3 adaptee ) {
       this.adaptee = adaptee;
    }
 
@@ -208,7 +228,8 @@ class AnalysisWizardStep3_delete_actionPerformed_actionAdapter
    }
 }
 
-class AnalysisWizardStep3_addButton_actionAdapter implements java.awt.event.ActionListener {
+class AnalysisWizardStep3_addButton_actionAdapter implements
+      java.awt.event.ActionListener {
    AnalysisWizardStep3 adaptee;
 
    AnalysisWizardStep3_addButton_actionAdapter( AnalysisWizardStep3 adaptee ) {
@@ -220,65 +241,72 @@ class AnalysisWizardStep3_addButton_actionAdapter implements java.awt.event.Acti
    }
 }
 
-class AnalysisWizardStep3_addAllButton_actionAdapter implements java.awt.event.ActionListener {
+class AnalysisWizardStep3_addAllButton_actionAdapter implements
+      java.awt.event.ActionListener {
    AnalysisWizardStep3 adaptee;
 
-   AnalysisWizardStep3_addAllButton_actionAdapter(AnalysisWizardStep3 adaptee) {
+   AnalysisWizardStep3_addAllButton_actionAdapter( AnalysisWizardStep3 adaptee ) {
       this.adaptee = adaptee;
    }
-   public void actionPerformed(ActionEvent e) {
-      adaptee.addAllButton_actionPerformed(e);
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.addAllButton_actionPerformed( e );
    }
 }
 
 class AnalysisWizardStep3_ClassFileFilter implements FilenameFilter {
    private String extension;
-   public AnalysisWizardStep3_ClassFileFilter(String ext) {extension = ext;
+
+   public AnalysisWizardStep3_ClassFileFilter( String ext ) {
+      extension = ext;
    }
 
-   public boolean accept(File dir, String name) {return name.endsWith(extension);
+   public boolean accept( File dir, String name ) {
+      return name.endsWith( extension );
    }
 }
-
 
 class AnalysisWizardStep3_CustomClassList extends ArrayList {
    public AbstractTableModel toTableModel() {
       return new AbstractTableModel() {
-         private String[] columnNames = {"ID", "Description", "Members"};
-         public String getColumnName(int i) {return columnNames[i];
+         private String[] columnNames = { "ID", "Description", "Members" };
+
+         public String getColumnName( int i ) {
+            return columnNames[i];
          }
 
-         public int getColumnCount() {return columnNames.length;
+         public int getColumnCount() {
+            return columnNames.length;
          }
 
          public int getRowCount() {
             int windowrows = 10;
             int extra = 1;
-            if (size() < windowrows) {
+            if ( size() < windowrows ) {
                extra = windowrows - size();
             }
             return size() + extra;
          }
 
-         public Object getValueAt(int i, int j) {
-            if (i < size()) {
-               HashMap cinfo = (HashMap) get(i);
-               switch (j) {
-               case 0:
-                  return cinfo.get("id");
-               case 1:
-                  return cinfo.get("desc");
-               case 2: {
-                  String type = (String) cinfo.get("type");
-                  ArrayList members = (ArrayList) cinfo.get("members");
-                  return (Integer.toString(members.size()) + " " + type + "s");
+         public Object getValueAt( int i, int j ) {
+            if ( i < size() ) {
+               HashMap cinfo = ( HashMap ) get( i );
+               switch ( j ) {
+                  case 0:
+                     return cinfo.get( "id" );
+                  case 1:
+                     return cinfo.get( "desc" );
+                  case 2: {
+                     String type = ( String ) cinfo.get( "type" );
+                     ArrayList members = ( ArrayList ) cinfo.get( "members" );
+                     return ( Integer.toString( members.size() ) + " " + type + "s" );
+                  }
+                  default:
+                     return null;
                }
-               default:
-                  return null;
-               }
-            } else {
-               return null;
             }
+            return null;
+
          }
       };
    };
