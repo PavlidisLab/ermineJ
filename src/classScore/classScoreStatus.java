@@ -31,7 +31,9 @@ public class classScoreStatus {
     EventQueue.invokeLater(new Runnable()
     {
       public void run() {
-        l.setText(message);
+        if (l != null) {
+          l.setText(message);
+        }
       }
     });
   }

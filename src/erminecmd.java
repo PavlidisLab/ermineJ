@@ -65,9 +65,7 @@ public class erminecmd {
 
     }
     catch (ArrayIndexOutOfBoundsException exception) { // this doesn't work ...
-
       System.err.println("You must enter 16 command line arguments: \nprobe_pvalfile\naffy_gofile\ngo_namefile\ngroups file\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog\nmultiple test correction method (bon|bh|wy)");
-
     }
     catch (IOException e) {
       System.err.println("File reading/writing error");
