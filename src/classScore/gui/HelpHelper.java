@@ -7,6 +7,8 @@ import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.swing.AbstractButton;
 
+import baseCode.gui.GuiUtil;
+
 /**
  * Makes it easier to add help access wherever we want To use this, you can do the following, for example for a menu
  * item.
@@ -20,14 +22,13 @@ import javax.swing.AbstractButton;
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
- * @author pavlidis
+ * @author Paul Pavlidis
  * @version $Id$
  */
 public class HelpHelper {
 
    // JavaHelp
    private HelpBroker m_helpBroker = null;
-   private final boolean ENABLE_HELP = true; // when help is fully implemented, delete this line
 
    /**
     * Initializes JavaHelp by creating HelpSet and HelpBroker objects and attaching an action listener an AbstractButton
@@ -38,16 +39,15 @@ public class HelpHelper {
    public boolean initHelp( AbstractButton c ) {
 
       // Create HelpSet and HelpBroker objects
-      HelpSet hs = ENABLE_HELP ? getHelpSet( "main.hs" ) : null;
+      HelpSet hs = getHelpSet( "main.hs" );
       if ( hs != null ) {
          m_helpBroker = hs.createHelpBroker();
          // Assign help to components
          CSH.setHelpIDString( c, "top" );
          c.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
-
-         // Handle events
          return true;
       }
+      GuiUtil.error( "Couldn't load help" );
       return false;
 
    }
@@ -67,6 +67,7 @@ public class HelpHelper {
       } catch ( Exception e ) {
          System.err.println( "HelpSet: " + e.getMessage() );
          System.err.println( "HelpSet: " + helpsetFilename + " not found" );
+         e.printStackTrace();
       }
       return hs;
    }

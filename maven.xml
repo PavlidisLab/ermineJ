@@ -55,6 +55,13 @@
 
 </goal>
 
+
+<!-- ==================================== -->
+<!-- ==================================== -->
+<goal name="jnlp:deploy" prereqs="jar:jar,help,jnlp" description="Deploy the webstart files to the server.">
+</goal>
+
+
 <!-- ==================================== -->
 <!-- nsis-setup (windows only) -->
 <!-- ==================================== -->
@@ -89,6 +96,7 @@
 		</fileset>
 	</ant:copy>
 </goal>
+
 
 <!-- ==================================== -->
 <!-- NSIS installer build -->
@@ -127,18 +135,26 @@
 </goal>
 
 
+<!-- ==================================== -->
+<!-- ==================================== -->
 <goal name="nsis:deploy" description="Upload the installer to the download site" prereqs="nsis">
     <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
       <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup.exe ${maven.username}@${maven.dist.siteAddress}:${dist.distdir}"/>
     </exec>
 </goal>
 
+
+<!-- ==================================== -->
+<!-- ==================================== -->
 <goal name="nsis-jre:deploy" description="Upload the installer with jre to the download site" prereqs="nsis-jre">
     <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
       <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup-jre.exe ${maven.username}@${maven.dist.siteAddress}:${dist.distdir}"/>
     </exec>
 </goal>
 
+
+<!-- ==================================== -->
+<!-- ==================================== -->
 <goal name="src-deploy" description="Upload the source distribution to the site" >
 
    <attainGoal name="dist:build-src" />
@@ -150,7 +166,6 @@
       srcDirectory = ${maven.dist.distDir}
       srcUser = ${maven.username}
     </echo>
- 
 
    <exec dir="." executable="${maven.ssh.executable}">
       <arg line="${maven.ssh.args} -l ${maven.username} ${maven.dist.siteAddress} 'mkdir -p ${maven.dist.distdir}'"/>

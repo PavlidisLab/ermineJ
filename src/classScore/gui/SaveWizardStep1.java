@@ -8,6 +8,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import classScore.GeneSetPvalRun;
+
 import baseCode.gui.WizardStep;
 
 /**
@@ -69,7 +71,7 @@ public class SaveWizardStep1 extends WizardStep {
       } else {
          runs_exist = true;
          for ( int i = 0; i < rundata.size(); i++ ) {
-            runComboBox.insertItemAt( "Run " + ( i + 1 ), i );
+            runComboBox.insertItemAt( ((GeneSetPvalRun)rundata.get(i)).getName() , i );
          }
          runComboBox.setSelectedIndex( 0 );
       }

@@ -27,6 +27,7 @@ import classScore.data.GONames;
  * </p>
  * 
  * @author Homin Lee
+ * @author Paul Pavlidis
  * @version $Id$
  */
 

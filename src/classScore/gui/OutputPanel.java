@@ -523,7 +523,7 @@ class OutputTableModel extends AbstractTableModel {
    }
 
    public void addRunColumns( int state ) {
-      columnNames.add( "Run " + state + " Pval" );
+      columnNames.add(  ((GeneSetPvalRun)results.get(state)).getName() );
    }
 
    public void addRunData( Map result ) {
@@ -539,7 +539,7 @@ class OutputTableModel extends AbstractTableModel {
 
    public void addRun() {
       state++;
-      columnNames.add( "Run " + state + " Pval" );
+      columnNames.add( ((GeneSetPvalRun)results.get(state)).getName() + " Pval" );
    }
 
    public String getColumnName( int i ) {

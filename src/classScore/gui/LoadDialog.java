@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
+import baseCode.util.FileTools;
 import classScore.Settings;
 
 /**
@@ -35,20 +36,22 @@ public class LoadDialog extends AppDialog {
    Settings settings;
 
    public LoadDialog( GeneSetScoreFrame callingframe ) {
-      super(callingframe,400,200);
+      super( callingframe, 550, 250 );
       this.settings = callingframe.getSettings();
       chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
-      chooser.setDialogTitle("Open Saved Analysis");
+      chooser.setDialogTitle( "Open Saved Analysis" );
       jbInit();
    }
 
    //Component initialization
-   private void jbInit()  {
+   private void jbInit() {
       loadBrowseButton.setEnabled( true );
       loadBrowseButton.setText( "Browse...." );
-      loadBrowseButton.addActionListener( new LoadDialog_loadBrowseButton_actionAdapter( this ) );
+      loadBrowseButton
+            .addActionListener( new LoadDialog_loadBrowseButton_actionAdapter(
+                  this ) );
       annotLabel.setPreferredSize( new Dimension( 320, 15 ) );
-      annotLabel.setText("Load file:" );
+      annotLabel.setText( "Load file:" );
       loadPanel.setBackground( SystemColor.control );
       loadPanel.setPreferredSize( new Dimension( 330, 50 ) );
       loadFile.setPreferredSize( new Dimension( 230, 19 ) );
@@ -56,15 +59,16 @@ public class LoadDialog extends AppDialog {
       loadPanel.add( loadFile, null );
       loadPanel.add( loadBrowseButton, null );
       centerPanel.add( loadPanel, null );
-
-      setActionButtonText("Load" );
-      addHelp("<html><b>Load a previous analysis into the system.</b>" +
-            "The file selected must be an analysis file saved from this " +
-            "software.<br></html>");
+      setActionButtonText( "Load" );
+      setCancelButtonText( "Cancel" );
+      setHelpButtonText( "Help" );
+      addHelp( "<html><b>Load a previous analysis into the system.</b>"
+            + "The file selected must be an analysis file saved from this "
+            + "software.<br></html>" );
       addMain( centerPanel );
       this.setTitle( "Load Results from File" );
       HelpHelper hh = new HelpHelper();
-      hh.initHelp(helpButton);
+      hh.initHelp( helpButton );
    }
 
    void loadBrowseButton_actionPerformed( ActionEvent e ) {
@@ -74,31 +78,33 @@ public class LoadDialog extends AppDialog {
       }
    }
 
-   protected void cancelButton_actionPerformed ( ActionEvent e ) {
+   protected void cancelButton_actionPerformed( ActionEvent e ) {
       dispose();
    }
 
    protected void actionButton_actionPerformed( ActionEvent e ) {
-      if(GuiUtil.testFile(loadFile.getText()))
-      {
-         ((GeneSetScoreFrame)callingframe).loadAnalysis(loadFile.getText());
+      if ( FileTools.testFile( loadFile.getText() ) ) {
+         ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile
+               .getText() );
          dispose();
+      } else {
+         GuiUtil.error("File is not readable.");
       }
    }
 
-   /* (non-Javadoc)
+   /*
+    * (non-Javadoc)
+    * 
     * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
     */
    protected void helpButton_actionPerformed( ActionEvent e ) {
       // TODO Auto-generated method stub
-      
    }
 
 }
 
-class LoadDialog_loadBrowseButton_actionAdapter
-    implements java.awt.event.
-    ActionListener {
+class LoadDialog_loadBrowseButton_actionAdapter implements
+      java.awt.event.ActionListener {
    LoadDialog adaptee;
 
    LoadDialog_loadBrowseButton_actionAdapter( LoadDialog adaptee ) {
@@ -110,9 +116,8 @@ class LoadDialog_loadBrowseButton_actionAdapter
    }
 }
 
-class LoadDialog_cancelButton_actionAdapter
-    implements java.awt.event.
-    ActionListener {
+class LoadDialog_cancelButton_actionAdapter implements
+      java.awt.event.ActionListener {
    LoadDialog adaptee;
 
    LoadDialog_cancelButton_actionAdapter( LoadDialog adaptee ) {
@@ -124,9 +129,8 @@ class LoadDialog_cancelButton_actionAdapter
    }
 }
 
-class LoadDialog_actionButton_actionAdapter
-    implements java.awt.event.
-    ActionListener {
+class LoadDialog_actionButton_actionAdapter implements
+      java.awt.event.ActionListener {
    LoadDialog adaptee;
 
    LoadDialog_actionButton_actionAdapter( LoadDialog adaptee ) {

@@ -13,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import java.awt.*;
+import java.io.InputStream;
+
 import baseCode.gui.JLinkLabel;
 
 /**
@@ -27,8 +29,10 @@ import baseCode.gui.JLinkLabel;
 
 public class AboutBox extends JDialog implements ActionListener {
 
-   private final static String VERSION = "2.0b2";
-   private final static String COPYRIGHT = "Copyright (c) 2003-2004 Columbia University";
+   // todo: make this version number a resource.  
+ ///  InputStream is = this.getClass().getResourceAsStream("resources/version");
+   private final static String VERSION = "2.0b3";
+   private final static String COPYRIGHT = "Copyright (c) 2002-2004 Columbia University";
    private static final String SOFTWARENAME = "ermineJ";
 
    JPanel panel1 = new JPanel();
@@ -125,7 +129,8 @@ public class AboutBox extends JDialog implements ActionListener {
       jTextPane1.setDisabledTextColor( Color.black );
       jTextPane1.setEditable( false );
       jTextPane1.setMargin(new Insets(10, 10, 10, 10));
-      jTextPane1.setText("<html><p>ErmineJ is licensed under the Gnu Public License</p><p>Direct questions about ermineJ to Paul " +
+      jTextPane1.setContentType("text/html");
+      jTextPane1.setText("<p>ErmineJ is licensed under the Gnu Public License</p><p>Direct questions about ermineJ to Paul " +
     "Pavlidis: pavlidis@dbmi.columbia.edu.</p><p>If you use this software for your work, please cite Pavlidis, P., " +
     "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data" +
     " with class scores. Proceedings of the Pacific Symposium on Biocomputing" +

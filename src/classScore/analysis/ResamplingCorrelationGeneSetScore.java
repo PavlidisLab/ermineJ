@@ -59,11 +59,19 @@ public class ResamplingCorrelationGeneSetScore extends
             .rows(), data.rows() );
 
       int[] deck = new int[data.rows()];
+      
       dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much.
       for ( int j = 0; j < data.rows(); j++ ) {
-         deck[j] = j;
-         dataAsRawMatrix[j] = data.getRow( j );
+         double[] rowValues = data.getRow( j );
+//         DoubleArrayList row = new cern.colt.list.DoubleArrayList(
+//               rowValues );
+//         DescriptiveWithMissing.standardize( row );
+//         dataAsRawMatrix[j] = row.elements();
+         dataAsRawMatrix[j] = rowValues;
+         deck[j] = j;;
       }
+      
+      
 
       for ( int i = classMinSize; i <= classMaxSize; i++ ) {
          int[] randomnums = new int[i];
@@ -130,7 +138,8 @@ public class ResamplingCorrelationGeneSetScore extends
       return avecorrel / nummeas;
    }
 
-   // special optimized version of correlation computation.
+   // special optimized version of correlation computation for this.
+   
    private static double correlation( double[] x, double[] y ) {
       double syy, sxy, sxx, sx, sy, xj, yj, ay, ax;
       int numused = 0;

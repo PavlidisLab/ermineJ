@@ -35,7 +35,7 @@ import classScore.gui.geneSet.JGeneSetFrame;
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
- * @author Shahmil Merchant; Paul Pavlidis (major changes)
+ * @author Paul Pavlidis
  * @version $Id$
  * @todo 3.0 make multiple test correction a 'setting'.
  */
@@ -52,9 +52,10 @@ public class GeneSetPvalRun {
    private Set activeProbes;
    private Settings settings;
 
+   private String name; // name of this run.
+   
    /**
     * Use this when we are loading in existing results.
-    * 
     * @param activeProbes
     * @param settings
     * @param geneData
@@ -63,18 +64,20 @@ public class GeneSetPvalRun {
     * @param geneScores
     * @param messenger
     * @param results
+    * @param name Name of the run
     */
    public GeneSetPvalRun( Set activeProbes, Settings settings,
          GeneAnnotations geneData, DenseDoubleMatrix2DNamed rawData,
          GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
-         Map results ) {
+         Map results, String name ) {
       this.settings = settings;
       this.geneData = geneData;
       this.goData = goData;
       this.geneScores = geneScores;
       this.activeProbes = activeProbes;
       this.results = results;
-
+      this.name = name;
+      
       sortResults();
       // get the class sizes.
 
@@ -104,7 +107,6 @@ public class GeneSetPvalRun {
 
    /**
     * Do a new analysis.
-    * 
     * @param activeProbes
     * @param settings
     * @param geneData
@@ -112,18 +114,21 @@ public class GeneSetPvalRun {
     * @param goData
     * @param geneScores
     * @param messenger
+    * @param name Name of the run
+    * 
     * @throws IllegalArgumentException
     */
    public GeneSetPvalRun( Set activeProbes, Settings settings,
          GeneAnnotations geneData, DenseDoubleMatrix2DNamed rawData,
-         GONames goData, GeneScoreReader geneScores, StatusViewer messenger )
+         GONames goData, GeneScoreReader geneScores, StatusViewer messenger, String name )
          throws IllegalArgumentException {
       this.settings = settings;
       this.geneData = geneData;
       this.goData = goData;
       this.geneScores = geneScores;
       this.activeProbes = activeProbes;
-
+      this.name = name;
+      
       nf.setMaximumFractionDigits( 8 );
       results = new LinkedHashMap();
 
@@ -283,7 +288,10 @@ public class GeneSetPvalRun {
    public Settings getSettings() {
       return settings;
    }
-
+   
+   public String getName() {
+      return "Run:" + name;
+   }
    /* private methods */
 
    /**

@@ -36,7 +36,8 @@ public class AnalysisThread {
    Map geneScoreSets;
    Map geneDataSets;
    String loadFile;
-
+   int numRuns = 0;
+   
    public AnalysisThread() {
    }
 
@@ -63,12 +64,12 @@ public class AnalysisThread {
             } catch ( Exception e ) {
                GuiUtil.error( "Error During analysis", e );
                csframe.enableMenusForAnalysis();
-               messenger.setStatus("Ready");
+               messenger.setStatus( "Ready" );
             }
          }
+
       } );
       athread.start();
-      athread = null; // if there is an error, we need to make sure athread is null afterwards.
    }
 
    private void doAnalysis( Map results ) throws IOException {
@@ -137,14 +138,15 @@ public class AnalysisThread {
 
       /* do work */
       messenger.setStatus( "Starting analysis..." );
+      numRuns++;
       GeneSetPvalRun runResult;
-      if ( results != null ) {
+      if ( results != null ) { // read from a file.
          runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-               rawData, goData, geneScores, messenger, results );
+               rawData, goData, geneScores, messenger, results, new Integer(numRuns).toString() );
 
       } else {
          runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
-               rawData, goData, geneScores, messenger );
+               rawData, goData, geneScores, messenger, new Integer(numRuns).toString() );
       }
 
       csframe.addResult( runResult );
@@ -160,9 +162,10 @@ public class AnalysisThread {
    public void cancelAnalysisThread() {
       if ( athread != null ) {
          athread.stop();
-         //athread.interrupt();
          athread = null;
+         System.err.println("Got stop");
          csframe.enableMenusForAnalysis();
+         messenger.setStatus( "Ready" );
       }
    }
 
@@ -190,15 +193,14 @@ public class AnalysisThread {
             } catch ( Exception e ) {
                GuiUtil.error( "Error During analysis", e );
                csframe.enableMenusForAnalysis();
-               messenger.setStatus("Ready");
+               messenger.setStatus( "Ready" );
             }
          }
       } );
       athread.start();
-      athread = null; // if there is an error, we need to make sure athread is null afterwards.
    }
 
-   private void loadAnalysis() throws IOException {
+   void loadAnalysis() throws IOException {
       ResultsFileReader rfr = new ResultsFileReader( loadFile, messenger );
       Map results = rfr.getResults();
       doAnalysis( results );
