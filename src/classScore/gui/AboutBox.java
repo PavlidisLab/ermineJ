@@ -24,8 +24,8 @@ import javax.swing.JTextPane;
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
- * @author not attributable
- * @version 1.0
+ * @author Paul Pavlidis
+ * @version $Id$
  */
 
 public class AboutBox extends JDialog implements ActionListener {
@@ -69,9 +69,9 @@ public class AboutBox extends JDialog implements ActionListener {
       panel1.setLayout(borderLayout1);
       panel2.setLayout(borderLayout2);
       label1.setText(product);
-      label2.setText("1.0.1  Free for academic use only.");
-      label3.setText("Copyright (c) 2003 Columbia University");
-      label4.setText("Direct questions to Paul Pavlidis: pp175@columbia.edu");
+      label2.setText("Verion 2.0b1");
+      label3.setText("Copyright (c) 2003-2004 Columbia University");
+      label4.setText("Direct questions to Paul Pavlidis: pavlidis@dbmi.columbia.edu");
       insetsPanel3.setLayout(gridLayout1);
       insetsPanel3.setBorder(BorderFactory.createEmptyBorder(10, 60, 10, 10));
       insetsPanel3.setPreferredSize(new Dimension(369, 125));

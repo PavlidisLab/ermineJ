@@ -11,8 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 import baseCode.math.Rank;
-import classScore.analysis.ClassPvalSetGenerator;
-import classScore.analysis.ClassSizeComputer;
+import classScore.analysis.GeneSetPvalSeriesGenerator;
+import classScore.analysis.GeneSetSizeComputer;
 import classScore.analysis.MultipleTestCorrector;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
@@ -77,7 +77,7 @@ public class classPvalRun {
       // Initialize the results data structure.
       results = new LinkedHashMap();
       // get the class sizes.
-      ClassSizeComputer csc = new ClassSizeComputer( probePvalMapper,
+      GeneSetSizeComputer csc = new GeneSetSizeComputer( probePvalMapper,
           geneData, weight_on );
       csc.getClassSizes();
 
@@ -99,7 +99,7 @@ public class classPvalRun {
                           numOverThreshold + " numUnderThreshold=" +
                           numUnderThreshold + " " );
 
-      ClassPvalSetGenerator pvg = new ClassPvalSetGenerator( geneData, weight_on,
+      GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( geneData, weight_on,
           hist, probePvalMapper, csc, goData );
 
       // calculate the actual class scores and correct sorting. /** todo make this use initmap */

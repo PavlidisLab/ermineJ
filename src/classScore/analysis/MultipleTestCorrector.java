@@ -7,17 +7,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import classScore.*;
-import classScore.data.*;
-
-//import util.Stats;
+import classScore.data.GeneAnnotations;
+import classScore.data.classresult;
+import classScore.data.expClassScore;
+import classScore.data.histogram;
 
 /**
  * Perform multiple test correction on class scores.
- * Copyright (c) 2004</p>
- * <p>Institution: Columbia University</p>
- * @author not attributable
- * @version 1.0
+ * Copyright (c) 2004 Columbia University</p>
+ * @author Paul Pavlidis
+ * @version $Id$
  */
 
 public class MultipleTestCorrector {
@@ -28,7 +27,7 @@ public class MultipleTestCorrector {
    private boolean weight_on = true;
    private histogram hist;
    private GeneAnnotations geneData;
-   private ClassSizeComputer csc;
+   private GeneSetSizeComputer csc;
    private NumberFormat nf = NumberFormat.getInstance();
    /**
     *
@@ -37,12 +36,10 @@ public class MultipleTestCorrector {
     * @param ppm expClassScore
     * @param w boolean
     * @param h histogram
-    * @param pg Map
-    * @param ctp Map
     * @param csc ClassSizeComputer
     */
    public MultipleTestCorrector(Vector sc, Map r, expClassScore ppm, boolean w,
-                                histogram h, GeneAnnotations geneData, ClassSizeComputer csc) {
+                                histogram h, GeneAnnotations geneData, GeneSetSizeComputer csc) {
       this.sortedclasses = sc;
       this.results = r;
       this.probePvalMapper = ppm;
@@ -132,7 +129,7 @@ public class MultipleTestCorrector {
       Collections.reverse(sortedclasses); // start from the worst class.
       HashMap permscores;
 
-      ClassPvalSetGenerator cver = new ClassPvalSetGenerator(geneData, weight_on,
+      GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator(geneData, weight_on,
           hist, probePvalMapper, csc, null);
 
       boolean verbose = false;

@@ -3,6 +3,8 @@ package classScore.data;
 import java.util.Map;
 import java.util.Vector;
 
+import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
+
 import util.Matrix;
 
 /**
@@ -145,7 +147,7 @@ public class corr_class_scores {
 
    public static void main(String[] args) {
       histogram t = new histogram();
-      Matrix M = null;
+      DenseDoubleMatrix2DNamed M = null;
       corr_class_scores test = new corr_class_scores(args[0]);
       test.set_class_max_size(Integer.parseInt(args[1]));
       test.set_class_min_size(Integer.parseInt(args[2]));
@@ -153,15 +155,15 @@ public class corr_class_scores {
       test.set_range(Double.parseDouble(args[4]));
       t = test.random_class_generator();
 
-      M = new Matrix((t.get_matrix()).get_num_rows(),
-                     (t.get_matrix()).get_num_cols());
+      M = new DenseDoubleMatrix2DNamed((t.get_matrix()).rows(),
+                     (t.get_matrix()).columns());
       M = t.get_matrix();
       double total = 0.0;
-      for (int i = 0; i < M.get_num_rows(); i++) {
+      for (int i = 0; i < M.rows(); i++) {
          total = 0.0;
-         for (int j = 1; j < M.get_num_cols(); j++) {
-            System.out.print(M.get_matrix_val(i, j) + "\t");
-            total = total + M.get_matrix_val(i, j);
+         for (int j = 1; j < M.columns(); j++) {
+            System.out.print(M.get(i, j) + "\t");
+            total = total + M.get(i, j);
          }
          System.out.println("total\t" + total);
          System.out.println("");

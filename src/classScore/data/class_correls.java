@@ -10,8 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 
-import util.Matrix;
-import classScore.data.*;
+import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 
 //import util.Stats;
 
@@ -91,10 +90,7 @@ public class class_correls {
       //to store each class number
       //	Map class_list = new LinkedHashMap();
       //stores Matrix of class histograms
-      Matrix M = new Matrix((probe_data.get_class_max_size() -
-                             probe_data.get_class_min_size() + 1),
-                            hist.get_number_of_bins());
-      M = hist.get_matrix();
+      DenseDoubleMatrix2DNamed M = hist.get_matrix();
       //stores map of class sizes
       //	class_list=hist.get_matrix_map();
       try {
@@ -114,7 +110,7 @@ public class class_correls {
             double total = 0.0;
             int size = 0;
             Vector raw_score = null;
-            Matrix V = null;
+            DenseDoubleMatrix2DNamed V = null;
             boolean check = false;
             int index = 0;
             int mat_size = 0;
@@ -140,7 +136,7 @@ public class class_correls {
                      if (raw_score.size() > 0) {
                         if (check == false) {
                            //create a new Matrix so as to add each row of data for a particular probe in matrix
-                           V = new Matrix(mat_size, raw_score.size());
+                           V = new DenseDoubleMatrix2DNamed(mat_size, raw_score.size());
                            check = true;
                         }
                         //define an iteraor for the values over the probe in the date file
@@ -150,7 +146,7 @@ public class class_correls {
                         //store value in intermediate Matrix which is used to correlation calculation
                         while (vec_val.hasNext()) {
 
-                           V.set_matrix_val(index, j,
+                           V.setQuick(index, j,
                                             Double.parseDouble((String) vec_val.
                                    next()));
                            j++;
@@ -165,10 +161,10 @@ public class class_correls {
                } else {
                   double avecorrel = 0.0;
                   //calculate correlation
-                  Matrix C = new Matrix(V.get_num_rows(), V.get_num_rows());
+                  DenseDoubleMatrix2DNamed C = new DenseDoubleMatrix2DNamed(V.rows(), V.columns());
              //     statistics.correl_matrix(V, C); /** @todo we need this */
 
-                  avecorrel = classcorrel(C.get_matrix_double(), C.get_num_rows());
+                  avecorrel = classcorrel(C.toArray(), C.rows());
 
                   size = mat_size;
                   double pval = 0.0;
@@ -181,8 +177,8 @@ public class class_correls {
                   rawscore = avecorrel / (double) size;
                   if (rawscore < hist.get_hist_max()) {
                      double[] class_row = new double[hist.get_number_of_bins()];
-                     class_row = M.get_ith_row(hist.class_index(size,
-                             probe_data.get_class_min_size()));
+                     class_row =  M.viewRow(hist.class_index(size,
+                             probe_data.get_class_min_size())).toArray();
                      int binnum = (int) Math.floor((rawscore -
                              hist.get_hist_min()) /
                              (double) hist.get_bin_size());
