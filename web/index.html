@@ -1,399 +1,233 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
-<head>
-	<title>Class Scoring</title>
-<link rel="stylesheet" href="css/default.css">
-</head>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
 
-<body bgcolor="#FFFFFF" link="#800000" text="#000000">
-<table border="0" cellpadding="2" cellspacing="3" width="776">
-  <tr>
-    <td width="72">
-    <!-- Logo space -->
-    <a href="/pavlidis">Home</a>
-    
-    </td>
-	<td width="687">
-    <!-- Header space -->
-    <h1>Gene Ontology analysis for microarray data</h1>
-    </td>
-  </tr>
-  <tr>
-    <td width="72">
-    <!-- Left gutter space -->
-    
-    <img src="/images/shim.gif" width="70" height="1" border="0" alt="">
-    
-    </td>
-    <td width="687">
-    <!-- main text space -->
-    <h2>News</h2>
-    
-    <p>April 1 2004 - New version released (1.1), adding the ability to
-interactively browse your results. This version also uses a new format
-for the input annotations files, reducing the number of input files by
-one.  It is not compatible with the old format annotation.</p>
-    
-    <p>November 24 2003 - Minor but catastrophic bug fixed. Please <a
-href="download.html">download a new copy</a> of the software! In
-    addition, we have updated the format of the <a href="/pavlidis/pub/annots/">annotation files</a>, which were accidentally left without file names in the archives. As an aid to debugging, we have also added a feature to the software: while the software is running a "console window" will open that has additional
-    messages that do not appear on the graphical interface. If you
-encounter a problem with the software, please <a href="mailto:pp175@columbia.edu">send us</a> a copy of the error messages to assist us in improving
-    the software.</p>
+    <title>Class Scoring</title>
+    <link type="text/css" rel="stylesheet" href="css/default.css">
+  </head>
 
-    <p>November 20 2003 - First release</p>
+  <body bgcolor="#ffffff" link="#800000" text="#000000">
+    <table border="0" cellpadding="2" cellspacing="3" width="776">
+      <tr>
+        <td width="72"><!-- Logo space -->
+        <a href="/pavlidis">Home</a></td>
 
-        
-    <h2>Introduction</h2>
-    <p><em>ClassScore</em> is a software tool for generating
-"functional class scores" based on scores given to individual genes,
-typically from a microarray data set. It implements two major methods
-for doing this analysis: Over-representation analysis (essentially
-based on the hypergeometric distribution) and a resampling based
-approach described by Pavlidis, Lewis and Noble, Proceedings of the
-Pacific Symposium on Biocomputing 7. pp 474-485, 2002. (<a
-href="/pavlidis/doc/reprints/pavlidis-psb2002.pdf">Download a
-reprint</a>; the methods implemented are variants on the
-"experiment score" referred to in that paper).</p>
+        <td width="687">
+          <!-- Header space -->
 
-    <p>Other publications using this software include:</p>
+          <h1><img height="112" alt="ermineJ logo" src=
+          "images/logo1small.gif" width="266" border="0"></h1>
 
-    <ul>
-    <li>Sibille, E., Arango, V., Galfalvy, H.C., Pavlidis, P., Ellis,
-S.P. and Mann, J.J. (to appear) Genomic analysis of depression and
-suicide in human prefrontal cortex. Neuropsychopharmacology, in
-press.</li>
+          <h1>Gene Ontology analysis for&nbsp; microarray data</h1>
+        </td>
+      </tr>
 
-    <li>Pavlidis P., Qin J, Arango V, Mann J, Sibille E. (2003) Using the
-	Gene Ontology for microarray data mining: A comparison of methods and
-	application to age effects in human prefrontal cortex. Neurochemical
-	Research, in press.</li>
+      <tr>
+        <td width="72"><!-- Left gutter space -->
+        <img height="1" alt="" src="/images/shim.gif" width="70"
+        border="0"></td>
 
-<li>Pavlidis, P., Qin, J and Sibille E (2003) Statistical analysis of Gene Ontology classes as tools for understanding gene expression changes in the brain. Society for neuroscience Annual Meeting Abstract 758.12. (<a href="neurosci2003.ppt">download the powerpoint version of the poster</a>)</li>
-  </ul>
+        <td valign="top" width="687">
+          <h2>Overview</h2>
 
-<p><a href="images/methodoutline.gif">This diagram</a> shows an
-outline of the process use for the resampling-based method.</p>
-  
-    <p>This page describes how to use the graphical user interface
-(GUI) for ClassScore. You can <strong>download the software using <a
-href="download.html">this link</a></strong>. The software is free to
-academic users.  Users interested in the source code
-should contact <a href="mailto:pp175@columbia.edu">Paul
-Pavlidis</a>.</p>
+          <p>ErmineJ performs analyses of <b>gene sets</b> in
+          <b>expression microarray data</b>. A typical goal is to
+          determine whether particular biological pathways are "doing
+          something interesting" in the data. The software is designed
+          to be used by biologists with little or no informatics
+          background. A command-line interface is available for users
+          who wish to script the use of ermineJ.</p>
 
-<h3>Getting more help</h3>
-  <p>You might look at the following:</p>
+          <p>Key features include:</p>
 
-  <ul>
+          <ul>
+            <li>
+              Implementation of several methods for gene set analysis: 
 
-    <li>A <a href="glossary.html">glossary</a> of terms that are used in this document.</li>
-	
-    <li>A <a href="faq.html">FAQ</a> (Frequently asked questions)</li>
-	
-    <li>Example <a href="inputExample.txt">input</a> and <a href="outputExample.txt">output</a> files. These are from the Affymetrix HG-U133A array.</li>
-    
-  </ul>
+              <ul>
+                <li><a href=
+                "ermineJ-help/html/tutorial/ora.html">Over-representation
+                analysis</a></li>
 
-  
-  <h3>Credits</h3>
+                <li><a href="ermineJ-help/html/tutorial/resampling.html">A
+                resampling-based method that uses gene scores</a></li>
 
-  <p>The software was written by Paul Pavlidis,
-based on an earlier version of the software written by Shahmil
-Merchant and Edward Chen, based in turn on a Perl implementation by
-Paul Pavlidis. Our Gene Ontology annotations were obtained through the
-<a href="http://www.geneontology.org/">Gene Ontology Consortium web
-site</a>.</p>
-    
-    <h2>Installing the software</h2>
+                <li>A resampling-based method that uses <a href=
+                "ermineJ-help/html/tutorial/correlation.html">correlation between
+                gene expression profiles</a> .</li>
+              </ul>
+            </li>
 
-<p>To run the software, you need four things:</p>
+            <li>Gene sets receive statistical scores (p-values), and
+            multiple test correction is supported.</li>
 
-<ol>
+            <li>Support of the Gene Ontology terminology</li>
 
-  <li><strong>Software file</strong>: You can <strong>download the
-software using <a href="download.html">this link</a></strong>. The
-software file is "zipped" and must be unpacked before use. Save the
-software file (classScore.jar) to your hard drive in some convenient
-location.</li>
+            <li>User files use <a href="formats">simple text
+            formats</a>.</li>
 
- <li><strong>Java 1.4 or higher</strong>: You must have a recent
-Java runtime installed on your computer. You can get it from <a
-href="http://java.sun.com/j2se/1.4.2/download.html">Sun</a> (look for
-"Download J2SE JRE") but there is a good chance it is already
-installed on your machine.</li>
+            <li>Users can <a href="ermineJ-help/html/tutorial/classes.html">modify
+            gene sets or create new ones</a>.</li>
 
-    <li><strong>Annotation files for your microarray design</strong>:
-You will need several files besides the data you provide in order to
-run the analysis. See Inputs, below. These files contain the
-annotations for GO categories and common microarray designs. You can
-<a href="/pavlidis/pub/annots/">download these files</a> from our web site.</li>
+            <li>The results can be <a href=
+            "ermineJ-help/html/tutorial/visualize.html">visualized within the
+            software</a>.</li>
 
-<li><strong>Your data file</strong>: This is explained in more detail
-below, but look at a sample <a href="inputExample.txt">input file</a>.</li>
-    
-    </ol>
+            <li>It is simple to compare multiple analyses of the same
+            data set with different settings.</li>
 
-    
-    <h2>Running the software</h2>
+            <li>Hyperlinks are provided to external sites to allow more
+            efficient browsing of the results.</li>
+          </ul>
 
-    <p>Double-click on 'classScore.jar'. You may see a plain text
-'console' window but shortly a graphical
-    window should appear containing several fields for input. To
-perform a run, you have to set the fields appropriately and then press
-"OK". You can perform multiple runs without closing and restarting the
-    software. The window should like something like this (we're working
-    on the interface, so if it looks a little different, don't be alarmed).</p>
+          <p><a href="ermineJ-help/html/license.html">License information</a></p>
 
-<img src="images/gui2.gif" border="0" alt=""><br>
+          <h3>News</h3>
 
-<h2>Inputs</h2>
-<p>The following fields must be set by the user on startup.</p>
-<ul>
-  
-  <li><b>Gene Score File</b> <br>
-      <img src="images/genescores.gif" width="475" height="39" border="0" alt="">
-      <p>A user-supplied file containing the data. This is a set of
-gene scores (typically be p-values, which the software converts to
--log(pvalues)). The first column is the probe id, the second (or higher) column is
-the p value. A one-line header is expected. Here is an <a href="inputExample.txt">example</a>. Note that we have found that removing
-      genes that are "not expressed" can be beneficial to the
-analysis. Otherwise, this file should contain scores for <em>all</em> the genes on your microarray, <em>not just the selected genes</em>. So if your microarray
-      has 10,000 genes on it, and you filter out 3000 that are not
-detectable, the file you use for the analysis will have 7000
-rows.</p><p>If the gene scores are not in the second column of the file, you need to set the "score column" parameter, explained <a href="#scorecol">below</a>.</li>
-      
-  <li><b>GO Biological Names File</b>:  <br>
-      <img src="images/gonames.gif" width="477" height="40" border="0"
-      alt=""><p>A file containing the names of the gene classes. We supply
-      this.</p></li>
-      
+          <p>July 20 2004 - Version 2.0b3 released. This is an
+          extensive rewrite of the user interface, with numerous new
+          features, including the ability to define your own gene sets
+          and visualize the analysis results. This is a late-beta
+          release as we iron out bugs and performance issues.</p>
 
-  <li><b>Probe annotation file:</b> <br> <img
-      src="images/goannots.gif" border="0"
-      alt=""><p>A file containing a list of the class membership of probes
-      on the array and the relationship between probes and genes. We supply this.</p></li>
-      
-  <li><b>Results File</b>: <br><img src="images/output.gif" border="0" alt=""><p>A name of an output file. Your
-      results will be saved to this file. Here is an <a
-      href="outputExample.txt">example</a>.</p></li>
-</ul>
+          <h3>Download and installation</h3>
 
-<h2>Options</h2>
+          <h4>Requirements</h4>
 
-<p>You can run the software without setting any of the following
-options, but you will probably want to at least understand what they
-do.</p>
+          <p>ermineJ requires a Java 2 Runtime Environment (JRE) 1.4 or
+          newer to run. You can download the platform-specific packages
+          from SUN's website (http://java.sun.com/j2se/). Users of MS
+          Windows NT/2000/XP can alternatively download the
+          out-of-the-box package below (which contains a bundled JRE
+          1.4.2_05).</p>
 
-<ul>    
-  <li>
-      <h3>Raw Class Scoring generation</h3>
-      
-      <p><img src="images/rawscoremethod.gif" width="239" height="72" border="0" alt=""></p>
-      
-      <p>Choose the method to be used for class scoring based on
-resampling. Over-representation p values are always generated as
-well.</p>
-      
-      <ul>
-	
-	<li><strong>Mean</strong>: A GO class is scored based on the mean of the scores of the genes in the class (Default).</li>
-	    
-	<li><strong>Median</strong>: Use the median instead of the mean. This method is slower than calculating the mean.</li>
-	    
-      </ul>
+          <h4>Files</h4>
 
-  </li><br>
-      
-  <li>
-      <h3>Replicate treatment</h3>
-      
-      <p><img src="images/replicatetreatment.gif" width="237" height="132" border="0" alt=""></p>
-      
-      <p>This refers to how 'replicates' of genes are handled. A replicate is when two probes on an array
-      assay the same gene, as indicated in the 'probe to group mapping file'. Normally, Default=mean</p>
-      
-      <ul>
-	<li><strong>Count all occurrences separately</strong>:
-	    Ignores the replicate issue entirely and treats each probe as a
-	    separate gene. This can yield inflated (or deflated) class scores so
-	    normally you won't use this option. (we keep it for experimental
-	    purposes)</li>
-	    
-	    
-	<li><strong>Use best scoring repliat</strong>e: If a gene
-	    occurs twice (or more) in the data, it is only counted
-once, and given the score of the best-scoring replicate. This option
-is less conservative than using the mean. We use it as the default.</li>
+          <table width="100%" border="0" cellspacing="1" cellpadding=
+          "3" bgcolor="#aaaaaa">
+            <tr bgcolor="#eeeeee">
+              <td width="37%"><strong>Description</strong></td>
 
-	    
-	  <li><strong>Use mean of replicates</strong>: A single value
-is calculated for all data points representing the gene. This value is
-the mean of the pvalues for all probes in the group. This option
-assumes that taking the mean is a sensible thing to do: if you don't
-log transform your pvalues (by checking the 'log transform' box,
-explained below), this won't work right.</li>
-	      
-	</ul>
-    </li>
-	<br>
-	
-    <li>
-	<h3>Other parameters you can set</h3>
-	<p><img src="images/params.gif"  border="0" alt=""></p>
-	<ul>	
-	  <li><b>Min class size</b>: Classes with fewer genes than this will not be evaluated. Default=8</li>
-	  <li><b>Largest (max) class size</b>: Classes with more genes than this will not be evaluated. Default=150</li>
-	  <li><b>Take log of gene scores</b>: This should be checked if your input values are p values.</li>
-	  <li><b>Iterations</b>: This sets the number of random trials which will be used to generate background distributions. 
-	      The higher you set this, the longer it will take to run, but your p-values may be more precise. We don't suggest setting
-	      this above 200,000 unless you find you have many classes which have 'maxed out' p values. 
-	      The number of iterations has no effect on the over-representation analysis.	
-	      Default=100,000</li>
-	  <li><b><a name="orascore">ORA score threshold</b>: This option sets the gene score which will
-	      be used to select genes for over-representation analysis. Default=0.001 (assuming you are using p values)</li>
-	      
-	      <li><b><a name="scorecol">Score column</b>: The column in the data file
-where your gene scores are stored. The default is 2 (the first column,
-containing the probe identifiers, is column 1). Changing this allows
-you to have multiple gene scores in the same input file and analyze
-them without loading a new file.</li>
-		  
-	</ul>
-    </li>
-  </ul>
+              <td width="30%"><strong>File</strong></td>
 
-  <h2>Ready to run?</h2>
-  <img src="images/maincontrols.gif" border="0" alt="">
-  <ul>
-    <li>The "Quit program" Button quits the software. This can also be done by clicking on the 'close' box on the window title bar.</li>
-    <li>The "Load results" button allows you to review a previous analysis. The file to be loaded is the one named in the "Results file" field. In this case, the settings of the various parameters don't matter.</li>
-    <li>The "Run analysis" button starts the process of calculating the scores. 
-	This can take a couple of minutes especially if you have set a large number of iterations. The status bar will say "Running" once the run
-	is underway.</li>
+              <td width="33%"><strong>Size</strong></td>
+            </tr>
 
-    <li>The "Cancel" button will abort your run. The status bar should read "Ready" after you hit cancel.</li>
+            <tr>
+              <td bgcolor="#ffffff">Windows installer with bundled
+              JRE</td>
 
+              <td bgcolor="#ffffff"><a href=
+              "distributions/ermineJ-setup-jre.exe">ermineJ-setup-jre.exe</a></td>
 
-  </ul>
-  <p>When the software is done with an analysis, the status bar will read "Done".</p>
-  
-  <h2>Outputs</h2>
+              <td bgcolor="#ffffff">~20 MB</td>
+            </tr>
 
-  <p>When your analysis is done or loaded, you will see a new window
-that lets you browse the results. The results are also saved in the
-chosen results file, if this is a new analysis and not a reloaded
-one. Here is an example:</p>
+            <tr>
+              <td bgcolor="#ffffff">Windows installer without JRE</td>
 
-  <img src="images/results_browse1.gif">
+              <td bgcolor="#ffffff"><a href=
+              "distributions/ermineJ-setup.exe">ermineJ-setup.exe</a></td>
 
+              <td bgcolor="#ffffff">~5 MB</td>
+            </tr>
 
-  <p>The columns in this table are:</p>
-  <ul>
-    <li><b>class</b> : Name of the class, with the GO id number.</li>
-	
-    <li><b>size</b> : How many probes on the array are in the class.
-Note that this is the NOT the number of genes, which is the "effective
-size" (see below).</li>
+            <tr>
+              <td bgcolor="#ffffff">Generic bundle</td>
 
-		
-    <li><b>effective size</b> : If you used <strong>Count all occurrences separately</strong>, then this will be equal to the
-    "size"; otherwise it will be the number of unique genes (e.g.,
-replicate groups).  This is always less than or equal to the
-<b>size</b> since some genes are represented multiple times on an
-array (see "replicate groups", above). This is the value used in the
-calculations. </li>
+              <td bgcolor="#ffffff">coming soon</td>
 
-	
-    <li><b>raw score</b> : The raw class statistic based on the
-selected method. High values are better. See "raw class score",
-above.</li>
+              <td bgcolor="#ffffff">&nbsp;</td>
+            </tr>
 
-	<li><b>resamp pval</b> : The p value based on the raw score. Low
-values are better. Note that p values that would be calculated as zero
-	are adjusted to be 1/(2*iterations). Thus if you had 100,000 iterations, the best p value would be 1/(2*100000) or 5x10^-6.
-    </li>
-  </ul>
-  
-  <p>Note that the flat text file output contains additional columns that may be of interest.</p>
-	
-  <p>Clicking on one of the classes will open a new window that allows you to browse the results in more detail:</p>
+            <tr>
+              <td bgcolor="#ffffff">Source code</td>
 
-  <img src="images/results_browse2.gif">
+              <td bgcolor="#ffffff"><a href=
+              "src/ermineJ-src.tgz">ermineJ-src.tgz</a></td>
 
-  <p>Clicking on the headings of the columns in this window re-sorts the table by that column.</p>
+              <td bgcolor="#ffffff">&lt; 1 MB</td>
+            </tr>
+          </table><br>
+          <br>
+           
 
-  <h3>About the flat file output</h3>
-  
-    <p>The output is a tab-delimited text file that contains the results for each class in a simple tabular format. The best-scoring
-	classes (based on the resampling-based score) are listed
-first. The output file can be opened in Excel and sorted etc. easily.
-There is an <a href="outputExample.html">example</a> output file
-  to look at. The columns are:</p>
-  
-  <ul>
-    
-    <li><b>class</b> : Name of the class, with the GO id number.</li>
-	
-    <li><b>size</b> : How many probes on the array are in the class.
-Note that this is the NOT the number of genes, which is the "effective
-size" (see below).</li>
+          <h3>Installation</h3>
 
-		
-    <li><b>effective size</b> : If you used <strong>Count all occurrences separately</strong>, then this will be equal to the
-    "size"; otherwise it will be the number of unique genes (e.g.,
-replicate groups).  This is always less than or equal to the
-<b>size</b> since some genes are represented multiple times on an
-array (see "replicate groups", above). This is the value used in the
-calculations. </li>
+          <p>On MS Windows NT/2000/XP, simply run the installer.</p>
 
-	
-    <li><b>raw score</b> : The raw class statistic based on the
-selected method. High values are better. See "raw class score",
-above.</li>
-	
-    <li><b>resamp pval</b> : The p value based on the raw score. Low
-values are better. Note that p values that would be calculated as zero
-	are adjusted to be 1/(2*iterations). Thus if you had 100,000 iterations, the best p value would be 1/(2*100000) or 5x10^-6.
-    </li>
-	
-    <li><b>N over pval cut</b>: For overrepresentation analysis, the
-number of genes which met the criterion set in "ORA score
-threshold"</li>
-	
-    <li><b>ORA pval</b> : p-value for the classed based on the
-overrepresentation analysis. This is calculated using the cumulative
-binomial approximation to the cumulative hypergeometric
-distribution.</li>
-	
-    <li><b>Corrected pval</b>: An experimental feature to apply
-multiple test correction to the resampling-based class scores.
-	The method used is Benjamini-Hochberg's false discovery rate. Rows where this column is 1 meet a FDR criterion of 0.05.</li>
-	
-     <li><b>Same as</b>: Lists classes that are identical in the genes they contain to the one listed in the first column.
-	Most slots will be blank.</li>
-     <li><b>Similar to</b>: Lists classes that are similar in the genes they contain to the one listed in the first column.
-	 (Experimental, currently not used)</li>
+          <h4>WebStart</h4>
 
-	<!--	<li><b>aroc rate</b> : The area under the receiver operator characteristic (AROC).</li>	<li><b>rocpval</b> : The p-value for the AROC.</li>-->
-      </ul>
-      
-</tr>
-<tr name="footer">
-<td colspan="2" width="766"><img src="/images/shim.gif" width="1" height="10" border="0" alt=""></td>
-</tr>
-<tr>
-  <td width="72">
-  <!-- left gutter psace -->
-  </td>
-  <td class="footer" width="687"><a href="mailto:pp175@columbia.edu">Paul Pavlidis</a>.&nbsp;
-  <!-- hhmts start -->
-Last modified: Wed Apr 28 13:17:43 EDT 2004
-<!-- hhmts end -->
-  </td>
-</tr>
-</table>
+          <p>You can <a href="webstart">run ermineJ</a> without running
+          the installer by using java webstart. This is the best way to
+          get the latest version, as we will keep the link updated with
+          the most recent development build. On the other hand, this
+          version should be considered less stable than the other
+          releases.</p>
 
-</body>
+          <h3>Documentation</h3>
+
+          <p>The software comes with on-line help. The manual is also
+          available <a href="ermineJ-help">here</a> .</p>
+          <hr>
+
+          <h3>Publications using the software or methods</h3>
+
+          <ul>
+            <li><!--StartFragment -->Sibille, E., Arango, V., Galfalvy,
+            H.C., Pavlidis, P., Ellis, S.P. and Mann, J.J. (2004)
+            Genomic analysis of depression and suicide in human
+            prefrontal cortex. Neuropsychopharmacology 29:351-361
+            .</li>
+
+            <li><!--StartFragment -->&nbsp;Pavlidis P., Qin J, Arango
+            V, Mann J, Sibille E. (2004) Using the Gene Ontology for
+            microarray data mining: A comparison of methods and
+            application to age effects in human prefrontal cortex.
+            Neurochemical Research, 29(6) 1213-1222&nbsp;.</li>
+
+            <li>Pavlidis, P., Qin, J and Sibille E (2003) Statistical
+            analysis of Gene Ontology classes as tools for
+            understanding gene expression changes in the brain. Society
+            for neuroscience Annual Meeting Abstract 758.12. (<a href=
+            "neurosci2003.ppt"><font color="#0000ff">download the
+            powerpoint version of the poster</font></a> )</li>
+
+            <li>Pavlidis, Lewis and Noble, Proceedings of the Pacific
+            Symposium on Biocomputing 7. pp 474-485, 2002. (<a href=
+            "/pavlidis/doc/reprints/pavlidis-psb2002.pdf"><font color=
+            "#0000ff">Download a reprint</font></a> .</li>
+          </ul>
+
+          <h3>Credits</h3>
+
+          <p>The software was written by Paul Pavlidis, Homin Lee and
+          William Braynen. Some code is based on an earlier version of
+          the software written by Shahmil Merchant and Edward Chen,
+          based in turn on a Perl implementation by Paul Pavlidis. Our
+          Gene Ontology annotations were obtained through the <a href=
+          "http://www.geneontology.org/">Gene Ontology Consortium web
+          site</a>.</p>
+        </td>
+      </tr>
+
+      <tr name="footer">
+        <td colspan="2" width="766"><img height="10" alt="" src=
+        "/images/shim.gif" width="1" border="0"></td>
+      </tr>
+
+      <tr>
+        <td width="72"><!-- left gutter psace -->
+        </td>
+
+        <td class="footer" width="687"><a href=
+        "mailto:pp175@columbia.edu">Paul Pavlidis</a>.&nbsp; 
+        <!-- hhmts start -->Last modified: Wed Apr 28 13:17:43 EDT 2004
+        <!-- hhmts end -->
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
