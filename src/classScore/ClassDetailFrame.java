@@ -18,6 +18,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.JTableHeader;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.reader.DoubleMatrixReader;
@@ -45,8 +46,9 @@ public class ClassDetailFrame
    final int PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN = 12;
    final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
    final int MAX_WIDTH_MATRIXDISPLAY_COLUMN = 19;
+   final int PREFERRED_WIDTH_COLUMN_0 = 75;
    final int PREFERRED_WIDTH_COLUMN_1 = 75;
-   final int PREFERRED_WIDTH_COLUMN_2 = 125;
+   final int PREFERRED_WIDTH_COLUMN_2 = 75;
    final int PREFERRED_WIDTH_COLUMN_3 = 300;
 
    public JMatrixDisplay m_matrixDisplay = null;
@@ -231,12 +233,16 @@ public class ClassDetailFrame
           */
       } );
 
+      //
+      // Set up the matrix display part of the table
+      //
+      
       // Make the columns in the matrix display not too wide (cell-size)
       // and set a custom cell renderer
       MatrixDisplayCellRenderer cellRenderer = new MatrixDisplayCellRenderer(
           m_matrixDisplay ); // create one instance that will be used to draw each cell
-      MatrixDisplayColumnHeaderRenderer columnHeaderRenderer =
-          new MatrixDisplayColumnHeaderRenderer(); // create only one instance
+      VerticalTextHeaderRenderer verticalTextHeaderRenderer =
+          new VerticalTextHeaderRenderer(); // create only one instance
       int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
       for ( int i = 0; i < matrixColumnCount; i++ ) {
@@ -246,29 +252,58 @@ public class ClassDetailFrame
          col.setMinWidth( MIN_WIDTH_MATRIXDISPLAY_COLUMN ); // no narrower than this
          col.setMaxWidth( MAX_WIDTH_MATRIXDISPLAY_COLUMN ); // no wider than this
          col.setCellRenderer( cellRenderer );
-         col.setHeaderRenderer( columnHeaderRenderer );
+         col.setHeaderRenderer( verticalTextHeaderRenderer );
       }
 
+      //
+      // Set up the rest of the table
+      //
+      HorizontalTextHeaderRenderer horizontalTextHeaderRenderer = 
+          new HorizontalTextHeaderRenderer(); // create only one instance
+      TableColumn col;
+      
       // The columns containing text or values (not matrix display) should be a bit wider
-      m_table.getColumnModel().getColumn( matrixColumnCount + 1 ).
-          setPreferredWidth( PREFERRED_WIDTH_COLUMN_1 );
-      m_table.getColumnModel().getColumn( matrixColumnCount + 2 ).
-          setPreferredWidth( PREFERRED_WIDTH_COLUMN_2 );
-      m_table.getColumnModel().getColumn( matrixColumnCount + 3 ).
-          setPreferredWidth( PREFERRED_WIDTH_COLUMN_3 );
+      col = m_table.getColumnModel().getColumn( matrixColumnCount + 0 );
+      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_0 );
+      col.setHeaderRenderer( horizontalTextHeaderRenderer );
+      
+      col = m_table.getColumnModel().getColumn( matrixColumnCount + 1 );
+      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_1 );
+      col.setHeaderRenderer( horizontalTextHeaderRenderer );
+      
+      col = m_table.getColumnModel().getColumn( matrixColumnCount + 2 );
+      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_2 );
+      col.setHeaderRenderer( horizontalTextHeaderRenderer );
 
+      col = m_table.getColumnModel().getColumn( matrixColumnCount + 3 );
+      col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_3 );
+      col.setHeaderRenderer( horizontalTextHeaderRenderer );
+
+      
+      //
+      // Sort initially by the pvalue column
+      //
+      int modelColumn = m_table.convertColumnIndexToModel( matrixColumnCount + 1 );
+      ( ( SortFilterModel ) m_table.getModel() ).sort( modelColumn );
+
+         
+      //
       // Save the dimensions of the table just in case
+      //
       int width =
+          matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN +
+          PREFERRED_WIDTH_COLUMN_0 +
           PREFERRED_WIDTH_COLUMN_1 +
           PREFERRED_WIDTH_COLUMN_2 +
-          PREFERRED_WIDTH_COLUMN_3 +
-          matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN;
+          PREFERRED_WIDTH_COLUMN_3;
       int height = m_table.getPreferredScrollableViewportSize().height;
 
       Dimension d = new Dimension( width, height );
       m_table.setSize( d );
-   }
+      
+   } // end createDetailsTable
 
+   
    protected String[] getProbes( Map classToProbe, String id, int count ) {
 
       // Compile a list of gene probe ID's in this probe class
@@ -347,47 +382,25 @@ public class ClassDetailFrame
       m_table.repaint();
    }
 
-   void m_matrixDisplayCellWidthSlider_caretPositionChanged( InputMethodEvent e ) {
-
-      JSlider source = ( JSlider ) e.getSource();
-
-      if ( ! source.getValueIsAdjusting() ) {
-
-         // Adjust the width of every matrix display column
-         int width = ( int ) source.getValue();
-         if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
-
-            int matrixColumnCount = m_matrixDisplay.getColumnCount();
-            for ( int i = 0; i < matrixColumnCount; i++ ) {
-               TableColumn col = m_table.getColumnModel().getColumn( i );
-               col.setResizable( false );
-               col.setPreferredWidth( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
-            }
-            m_table.repaint();
-         }
-      }
-   }
-
    void m_matrixDisplayCellWidthSlider_stateChanged(ChangeEvent e) {
 
       JSlider source = ( JSlider ) e.getSource();
 
       //if ( ! source.getValueIsAdjusting() ) {
 
-         // Adjust the width of every matrix display column
-         int width = ( int ) source.getValue();
-         if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
+      // Adjust the width of every matrix display column
+      int width = ( int ) source.getValue();
+      if ( width >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && width <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
 
-            m_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+         m_table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-            int matrixColumnCount = m_matrixDisplay.getColumnCount();
-            for ( int i = 0; i < matrixColumnCount; i++ ) {
-               TableColumn col = m_table.getColumnModel().getColumn( i );
-               col.setResizable( false );
-               col.setPreferredWidth( width );
-            }
+         int matrixColumnCount = m_matrixDisplay.getColumnCount();
+         for ( int i = 0; i < matrixColumnCount; i++ ) {
+            TableColumn col = m_table.getColumnModel().getColumn( i );
+            col.setResizable( false );
+            col.setPreferredWidth( width );
          }
-      //} // end if not adjusting value
+      }
    }
 
 } // end class ClassDetailFrame
@@ -561,10 +574,69 @@ class MatrixDisplayCellRenderer
 
 } // end class MatrixDisplayCellRenderer
 
-class MatrixDisplayColumnHeaderRenderer
-    extends JButton
-    implements
-    TableCellRenderer {
+
+class HorizontalTextHeaderRenderer
+    extends JTableHeader
+    implements TableCellRenderer {
+
+   String m_columnName;
+   JLabel m_label = new JLabel();
+   
+   public HorizontalTextHeaderRenderer() {
+      
+      //add( m_label );
+      //validate();
+   }
+   
+   
+   // This method is called each time a column header
+   // using this renderer needs to be rendered.
+   public Component getTableCellRendererComponent( JTable table, Object value,
+       boolean isSelected,
+       boolean hasFocus,
+       int rowIndex, int vColIndex ) {
+      // 'value' is column header value of column 'vColIndex'
+      // rowIndex is always -1
+      // isSelected is always false
+      // hasFocus is always false
+
+      // Configure the component with the specified value
+      m_columnName = value.toString();
+
+      // Set tool tip if desired
+      //setToolTipText( columnName );
+
+      // Since the renderer is a component, return itself
+      return this;
+   }
+   
+   protected void paintComponent( Graphics g ) {
+
+      super.paintComponent( g );
+
+      int x = getSize().width / 2 - Util.stringPixelWidth( m_columnName, getFont(), this ) / 2;
+      int y = getSize().height - 10;
+      g.drawString( m_columnName, x, y );
+      
+   }
+
+   // The following methods override the defaults for performance reasons
+   public void validate() {}
+
+   public void revalidate() {}
+
+   protected void firePropertyChange( String propertyName, Object oldValue,
+                                      Object newValue ) {}
+
+   public void firePropertyChange( String propertyName, boolean oldValue,
+                                   boolean newValue ) {}
+   
+} // end class HorizontalTextHeaderRenderer   
+       
+
+class VerticalTextHeaderRenderer
+    extends JTableHeader
+    implements TableCellRenderer {
 
    String m_columnName;
    final int PREFERRED_HEIGHT = 80;
@@ -583,7 +655,7 @@ class MatrixDisplayColumnHeaderRenderer
 
       // Configure the component with the specified value
       m_columnName = value.toString();
-
+      
       // Set tool tip if desired
       setToolTipText( m_columnName );
 
@@ -620,7 +692,7 @@ class MatrixDisplayColumnHeaderRenderer
 
    public void firePropertyChange( String propertyName, boolean oldValue,
                                    boolean newValue ) {}
-}
+} // end VerticalTextHeaderRenderer
 
 class ClassDetailFrame_m_greenredColormapMenuItem_actionAdapter
     implements java.awt.event.ActionListener {
