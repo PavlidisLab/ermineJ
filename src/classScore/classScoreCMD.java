@@ -55,16 +55,28 @@ public class classScoreCMD {
 
 	private String saveFileName = null;//"C:\\Documents and Settings\\hkl7\\ermineJ.data\\outout.txt";
 
+	private boolean commandline=true;
+	
 	public classScoreCMD(String[] args) {
 		settings = new Settings();
 		options(args);
-		initialize();
+		if(commandline) {
+			initialize();
 		try {
 			GeneSetPvalRun result = analyze();
 			ResultsPrinter rp = new ResultsPrinter(saveFileName, result, goData);
 			rp.printResults(true);
 		} catch (Exception e) {
 			statusMessenger.setStatus("Error During analysis" + e);
+		}}
+		else
+		{
+			try {
+				UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+			new classScoreGUI();
 		}
 	}
 
@@ -85,7 +97,7 @@ public class classScoreCMD {
 		longopts[1] = new LongOpt("config", LongOpt.REQUIRED_ARGUMENT, null, 'C');
 		longopts[2] = new LongOpt("gui", LongOpt.NO_ARGUMENT, null, 'G');
 		Getopt g = new Getopt("classScoreCMD", args,
-				"a:c:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:",longopts);
+				"a:c:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CG",longopts);
 		int c;
 		String arg;
 		int intarg;
@@ -338,13 +350,8 @@ public class classScoreCMD {
 				}
 				break;
 			case 'G': //GUI
-				try {
-					UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-				} catch ( Exception e ) {
-					e.printStackTrace();
-				}
-				new classScoreGUI();
-				System.exit(0);
+				commandline=false;
+				break;
 			case '?':
 				showHelp();
 			default:
@@ -374,7 +381,8 @@ public class classScoreCMD {
 				"\t\tSets the class folder to be used.\n\n" +
 				"\t-g int ...\n" +
 				"\t\tSets the gene replicant treatment: 1 (BEST_PVAL) or 2 (MEAN_PVAL).\n\n" +
-				"\t-h\thelp\n\n" +
+				"\t-h or --help\n"+
+				"\t\tShows help.\n\n" +
 				"\t-i int ...\n" +
 				"\t\tSets the number of iterations.\n\n" +
 				"\t-l {0/1} ...\n" +
@@ -397,9 +405,9 @@ public class classScoreCMD {
 				"\t\tSets the maximum class size.\n\n" +
 				"\t-y minimum class size ...\n" +
 				"\t\tSets the minimum class size.\n\n" +
-				"\t-C file ...\n" +
+				"\t-C file ... or --config file ...\n" +
 				"\t\tSets the configuration file to be used.\n\n" +
-				"\t-G \n" +
+				"\t-G or --gui\n" +
 				"\t\tLaunch the GUI.\n\n");
 		System.exit(0);
 	}

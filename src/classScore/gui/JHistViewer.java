@@ -85,7 +85,7 @@ public class JHistViewer extends JFrame {
             "Random score distribution for gene set size " + inSize,
             "Raw Score", "Cumulative Probability", xydata,
             PlotOrientation.VERTICAL, true, true, false );
-
+      
       XYPlot plot = (XYPlot) chart.getPlot();
       plot.getDomainAxis().setUpperBound(rawScore + 1);
       

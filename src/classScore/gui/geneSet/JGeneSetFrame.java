@@ -50,7 +50,6 @@ import baseCode.util.FileTools;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
-import classScore.data.Histogram;
 import classScore.gui.JHistViewer;
 
 /**
