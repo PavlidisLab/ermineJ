@@ -20,10 +20,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
+ * Displays 'about' information for the software.
+ * <p>
+ * Copyright: Copyright (c) 2003-2004 Columbia University
+ * </p>
+ * 
  * @author Paul Pavlidis
  * @version $Id$
  */
@@ -35,12 +36,12 @@ public class AboutBox extends JDialog implements ActionListener {
    JPanel insetsPanel1 = new JPanel();
    JPanel insetsPanel3 = new JPanel();
    JButton button1 = new JButton();
-//  JLabel imageLabel = new JLabel();
+   //  JLabel imageLabel = new JLabel();
    JLabel label1 = new JLabel();
    JLabel label2 = new JLabel();
    JLabel label3 = new JLabel();
    JLabel label4 = new JLabel();
-//  ImageIcon image1 = new ImageIcon();
+   //  ImageIcon image1 = new ImageIcon();
    BorderLayout borderLayout2 = new BorderLayout();
    String product = "Class Scoring Software";
    String version = "1.1beta";
@@ -51,78 +52,80 @@ public class AboutBox extends JDialog implements ActionListener {
    JPanel jPanel1 = new JPanel();
    BorderLayout borderLayout1 = new BorderLayout();
 
-   public AboutBox(Frame parent) {
-      super(parent);
-      enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+   public AboutBox( Frame parent ) {
+      super( parent );
+      enableEvents( AWTEvent.WINDOW_EVENT_MASK );
       try {
          jbInit();
-      } catch (Exception e) {
+      } catch ( Exception e ) {
          e.printStackTrace();
       }
-      setModal(true);
+      setModal( true );
       Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
       Dimension dlgSize = getPreferredSize();
-      setLocation((screenSize.width - dlgSize.width) / 2,
-                        (screenSize.height - dlgSize.height) / 2);
+      setLocation( ( screenSize.width - dlgSize.width ) / 2,
+            ( screenSize.height - dlgSize.height ) / 2 );
       pack();
       show();
    }
 
    //Component initialization
    private void jbInit() throws Exception {
-//    image1 = new ImageIcon(GeneSetScoreFrame.class.getResource("about.png"));
-//    imageLabel.setIcon(image1);
-      this.setTitle("About");
-      panel1.setLayout(borderLayout1);
-      panel2.setLayout(borderLayout2);
-      label1.setText(product);
-      label2.setText("Verion 2.0b1");
-      label3.setText("Copyright (c) 2003-2004 Columbia University");
-      label4.setText("Direct questions to Paul Pavlidis: pavlidis@dbmi.columbia.edu");
-      insetsPanel3.setLayout(gridLayout1);
-      insetsPanel3.setBorder(BorderFactory.createEmptyBorder(10, 60, 10, 10));
-      insetsPanel3.setPreferredSize(new Dimension(369, 125));
-      insetsPanel3.setToolTipText("");
-      button1.setText("Ok");
-      button1.addActionListener(this);
-//    insetsPanel2.add(imageLabel, null);
-      jTextPane1.setBackground(Color.white);
-      jTextPane1.setFont(new java.awt.Font("Dialog", 1, 11));
-      jTextPane1.setMinimumSize(new Dimension(211, 150));
-      jTextPane1.setPreferredSize(new Dimension(211, 150));
-      jTextPane1.setDisabledTextColor(Color.black);
-      jTextPane1.setEditable(false);
-      jTextPane1.setMargin(new Insets(0, 0, 0, 0));
-      jTextPane1.setText(
-              "If you use this software for your work, please cite Pavlidis, P., " +
-              "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data " +
-              "with class scores.Proceedings of the Pacific Symposium on Biocomputing " +
-              "7. pp 474-485");
-      jTextPane1.setBounds(new Rectangle(62, 20, 232, 146));
-      panel1.setPreferredSize(new Dimension(369, 300));
-      panel2.setPreferredSize(new Dimension(369, 100));
-      gridLayout1.setRows(5);
-      jPanel1.setLayout(null);
-      insetsPanel3.add(label1, null);
-      insetsPanel3.add(label2, null);
-      insetsPanel3.add(label3, null);
-      insetsPanel3.add(label4, null);
-      panel1.add(jPanel1, BorderLayout.CENTER);
-      jPanel1.add(jTextPane1, null);
-      panel1.add(insetsPanel1, BorderLayout.SOUTH);
-      insetsPanel1.add(button1, null);
-      panel1.add(panel2, BorderLayout.NORTH);
-      panel2.add(insetsPanel3, BorderLayout.NORTH);
-      this.getContentPane().add(panel1, BorderLayout.CENTER);
-      setResizable(true);
+      //    image1 = new ImageIcon(GeneSetScoreFrame.class.getResource("about.png"));
+      //    imageLabel.setIcon(image1);
+      this.setTitle( "About" );
+      panel1.setLayout( borderLayout1 );
+      panel2.setLayout( borderLayout2 );
+      label1.setText( product );
+      label2.setText( "Verion 2.0b1" );
+      label3.setText( "Copyright (c) 2003-2004 Columbia University" );
+      label4
+            .setText( "Direct questions to Paul Pavlidis: pavlidis@dbmi.columbia.edu" );
+      insetsPanel3.setLayout( gridLayout1 );
+      insetsPanel3
+            .setBorder( BorderFactory.createEmptyBorder( 10, 60, 10, 10 ) );
+      insetsPanel3.setPreferredSize( new Dimension( 369, 125 ) );
+      insetsPanel3.setToolTipText( "" );
+      button1.setText( "Ok" );
+      button1.addActionListener( this );
+      //    insetsPanel2.add(imageLabel, null);
+      jTextPane1.setBackground( Color.WHITE );
+      jTextPane1.setMinimumSize( new Dimension( 211, 150 ) );
+      jTextPane1.setPreferredSize( new Dimension( 211, 150 ) );
+      jTextPane1.setDisabledTextColor( Color.black );
+      jTextPane1.setEditable( false );
+      jTextPane1.setMargin( new Insets( 10, 10, 10, 10 ) );
+      
+      jTextPane1
+            .setText( "If you use this software for your work, please cite Pavlidis, P., "
+                  + "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data "
+                  + "with class scores.Proceedings of the Pacific Symposium on Biocomputing "
+                  + "7. pp 474-485" );
+      jTextPane1.setBounds( new Rectangle( 62, 20, 232, 146 ) );
+      panel1.setPreferredSize( new Dimension( 369, 300 ) );
+      panel2.setPreferredSize( new Dimension( 369, 100 ) );
+      gridLayout1.setRows( 5 );
+      jPanel1.setLayout( null );
+      insetsPanel3.add( label1, null );
+      insetsPanel3.add( label2, null );
+      insetsPanel3.add( label3, null );
+      insetsPanel3.add( label4, null );
+      panel1.add( jPanel1, BorderLayout.CENTER );
+      jPanel1.add( jTextPane1, null );
+      panel1.add( insetsPanel1, BorderLayout.SOUTH );
+      insetsPanel1.add( button1, null );
+      panel1.add( panel2, BorderLayout.NORTH );
+      panel2.add( insetsPanel3, BorderLayout.NORTH );
+      this.getContentPane().add( panel1, BorderLayout.CENTER );
+      setResizable( true );
    }
 
    //Overridden so we can exit when window is closed
-   protected void processWindowEvent(WindowEvent e) {
-      if (e.getID() == WindowEvent.WINDOW_CLOSING) {
+   protected void processWindowEvent( WindowEvent e ) {
+      if ( e.getID() == WindowEvent.WINDOW_CLOSING ) {
          cancel();
       }
-      super.processWindowEvent(e);
+      super.processWindowEvent( e );
    }
 
    //Close the dialog
@@ -131,8 +134,8 @@ public class AboutBox extends JDialog implements ActionListener {
    }
 
    //Close the dialog on a button event
-   public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == button1) {
+   public void actionPerformed( ActionEvent e ) {
+      if ( e.getSource() == button1 ) {
          cancel();
       }
    }

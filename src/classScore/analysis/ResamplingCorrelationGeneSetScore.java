@@ -5,6 +5,7 @@ import baseCode.dataStructure.SparseDoubleMatrix2DNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.RandomChooser;
 import cern.colt.list.DoubleArrayList;
+import classScore.Settings;
 import classScore.data.Histogram;
 import classScore.gui.GeneSetScoreStatus;
 
@@ -33,7 +34,10 @@ public class ResamplingCorrelationGeneSetScore extends
     * 
     * @param dataMatrix
     */
-   public ResamplingCorrelationGeneSetScore( DenseDoubleMatrix2DNamed dataMatrix ) {
+   public ResamplingCorrelationGeneSetScore(Settings settings, DenseDoubleMatrix2DNamed dataMatrix ) {
+      this.classMaxSize = settings.getMaxClassSize();
+      this.classMinSize = settings.getMinClassSize();
+      this.numRuns = settings.getIterations();
       data = dataMatrix;
    }
 

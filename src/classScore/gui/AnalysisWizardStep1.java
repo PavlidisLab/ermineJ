@@ -53,7 +53,7 @@ public class AnalysisWizardStep1 extends WizardStep
       JLabel jLabel9 = new JLabel();
       step1Panel.setPreferredSize(new Dimension(550, 120));
       jPanel4.setBorder(BorderFactory.createEtchedBorder());
-      jLabel8.setText("Choose the method of analysis:");
+      jLabel8.setText("");
       jLabel8.setPreferredSize(new Dimension(274, 17));
       step1Panel.add(jLabel8, null);
       jPanel5.setPreferredSize(new Dimension(80, 80));
@@ -63,7 +63,7 @@ public class AnalysisWizardStep1 extends WizardStep
       oraButton.addActionListener(new AnalysisWizardStep1_oraButton_actionAdapter(this));
       buttonGroup1.add(oraButton);
       jPanel5.add(oraButton, null);
-      resampButton.setText("Resampling");
+      resampButton.setText("Gene score resampling");
       resampButton.setSelected(true);
       resampButton.setPreferredSize(new Dimension(75, 17));
       resampButton.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -78,20 +78,20 @@ public class AnalysisWizardStep1 extends WizardStep
       jPanel5.add(corrButton, null);
       jPanel4.add(jPanel5, null);
       jPanel12.setPreferredSize(new Dimension(175, 80));
-      jLabel9.setText("- Description of ORA analysis");
+      jLabel9.setText(" Over-representation analysis");
       jLabel9.setPreferredSize(new Dimension(172, 17));
       jPanel12.add(jLabel9, null);
-      jLabel4.setText("- Description of resampling analysis");
+      jLabel4.setText(" Examines distribution of gene scores");
       jLabel4.setPreferredSize(new Dimension(172, 17));
       jPanel12.add(jLabel4, null);
-      jLabel5.setText("- Description of correlation analysis");
+      jLabel5.setText(" Uses correlation of expression profiles");
       jLabel5.setPreferredSize(new Dimension(172, 17));
       jPanel12.add(jLabel5, null);
       jPanel4.add(jPanel12, null);
       step1Panel.add(jPanel4, null);
 
-      this.addHelp("<html>This is a place holder.<br>"+
-                   "Blah, blah, blah, blah, blah.");
+      this.addHelp("<html><b>Select the method to use for scoring gene sets.</b><br>"+
+                   "</html>");
       this.addMain(step1Panel);
    }
 

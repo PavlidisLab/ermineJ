@@ -120,8 +120,9 @@ public class AnalysisWizardStep3 extends WizardStep {
       step3Panel.add( jPanel10, BorderLayout.CENTER );
       step3Panel.add( jPanel9, BorderLayout.SOUTH );
 
-      this.addHelp( "<html>This is a place holder.<br>"
-            + "Blah, blah, blah, blah, blah." );
+      this
+            .addHelp( "<html><b>Select custom classes to include in the analysis</b><br>"
+                  + "If you have not defined any custom classes, the left-hand panel will be blank. " );
       this.addMain( step3Panel );
    }
 

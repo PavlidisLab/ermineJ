@@ -162,7 +162,7 @@ public class classPvalRun {
          }
          case Settings.CORR: {
             messenger.setStatus( "Starting correlation resampling" );
-            NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore(
+            NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore(settings, 
                   rawData );
             hist = probePvalMapper.generateNullDistribution( messenger );
 

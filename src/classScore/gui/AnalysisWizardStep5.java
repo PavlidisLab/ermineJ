@@ -3,9 +3,7 @@ package classScore.gui;
 import java.awt.Dimension;
 import java.awt.SystemColor;
 import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -55,7 +53,7 @@ public class AnalysisWizardStep5 extends WizardStep
       ButtonGroup buttonGroup2 = new ButtonGroup();
       jRadioButtonMedian = new JRadioButton();
       jRadioButtonMean = new JRadioButton();
-      ButtonGroup replicateButtonGroup = new ButtonGroup();
+  //    ButtonGroup replicateButtonGroup = new ButtonGroup();
       //panels for step 4 bottom
       oraPanel = new JPanel();
       TitledBorder oraTitledBorder;
@@ -188,8 +186,8 @@ public class AnalysisWizardStep5 extends WizardStep
       corrPanel.add(jPanel13, null);
       corrPanel.add(corrMetricPanel, null);
 
-      this.addHelp("<html>This is a place holder.<br>"+
-                   "Blah, blah, blah, blah, blah.");
+      this.addHelp("<html><b>Adjust settings specific for your analysis method.</b><br>"+
+                   " ");
       this.addMain(step5Panel);
    }
 

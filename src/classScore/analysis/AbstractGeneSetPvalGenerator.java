@@ -25,6 +25,8 @@ public abstract class AbstractGeneSetPvalGenerator {
    protected Settings settings;
    protected GeneAnnotations geneAnnots;
    protected GeneSetSizeComputer csc;
+   private int maxGeneSetSize;
+   private int minGeneSetSize;
 
    public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots,
          GeneSetSizeComputer csc, GONames gon ) {
@@ -37,6 +39,37 @@ public abstract class AbstractGeneSetPvalGenerator {
       if ( gon != null ) {
          this.goName = gon;
       }
+   }
+
+   /**
+    * 
+    * @param value
+    */
+   public void set_class_max_size( int value ) {
+      maxGeneSetSize = value;
+   }
+
+   /**
+    * 
+    * @param value
+    */
+   public void set_class_min_size( int value ) {
+      minGeneSetSize = value;
+   }
+
+   
+   /**
+    */
+   public int getMaxClassSize() {
+      return maxGeneSetSize;
+   }
+
+   /**
+    * 
+    * @return
+    */
+   public int getMinGeneSetSize() {
+      return minGeneSetSize;
    }
 
 }

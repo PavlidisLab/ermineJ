@@ -81,8 +81,12 @@ public class AnalysisWizardStep2
       step2Panel.add(jPanel11, null);
 
       //this.add( step2Panel );
-      this.addHelp("<html>This is a place holder.<br>"+
-                   "Blah, blah, blah, blah, blah.");
+      this.addHelp("<html><b>Choose the data files to use</b><br>"+
+                   "&quot;Gene scores&quot; refer to a score or p value " +
+                   " associated with each gene in your data set. This " +
+                   "file can have as few as two columns. &quot;Raw data&quot;" +
+                   " refers to the expression profile data, usually a large matrix. " +
+                   "Files must be tab-delimited text. For details, see the user manual.");
       this.addMain(step2Panel);
    }
 
