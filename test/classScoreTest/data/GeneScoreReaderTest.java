@@ -1,14 +1,12 @@
 package classScoreTest.data;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 
+import junit.framework.TestCase;
 import baseCode.bio.geneset.GeneAnnotations;
-import baseCodeTest.io.reader.TestStringMatrixReader;
 import classScore.Settings;
 import classScore.data.GeneScoreReader;
-import junit.framework.TestCase;
 
 /**
  * <hr>
