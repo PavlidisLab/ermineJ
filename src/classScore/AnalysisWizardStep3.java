@@ -249,10 +249,10 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
                   return (Integer.toString(members.size()) + " " + type + "s");
                }
                default:
-                  return "";
+                  return null;
                }
             } else {
-               return "";
+               return null;
             }
          }
       };

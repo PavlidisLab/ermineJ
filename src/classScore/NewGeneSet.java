@@ -82,10 +82,10 @@ public class NewGeneSet {
                case 2:
                   return geneData.getProbeDescription(probeid);
                default:
-                  return "";
+                  return null;
                }
             } else {
-               return "";
+               return null;
             }
          }
 

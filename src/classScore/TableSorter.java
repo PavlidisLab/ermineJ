@@ -220,6 +220,18 @@ public class TableSorter extends AbstractTableModel {
         return LEXICAL_COMPARATOR;
     }
 
+    protected Comparator getComparator(Class columnClass) {
+        Class columnType = columnClass;
+        Comparator comparator = (Comparator) columnComparators.get(columnType);
+        if (comparator != null) {
+            return comparator;
+        }
+        if (Comparable.class.isAssignableFrom(columnType)) {
+            return COMPARABLE_COMAPRATOR;
+        }
+        return LEXICAL_COMPARATOR;
+    }
+
     private Row[] getViewToModel() {
         if (viewToModel == null) {
             int tableModelRowCount = tableModel.getRowCount();
@@ -298,20 +310,40 @@ public class TableSorter extends AbstractTableModel {
                 int column = directive.column;
                 Object o1 = tableModel.getValueAt(row1, column);
                 Object o2 = tableModel.getValueAt(row2, column);
+                Comparator comparator;
+                if(o1.getClass().equals(Double.class))
+                   comparator=getComparator( Double.class );
+                else if(o1.getClass().equals(Integer.class))
+                   comparator= getComparator( Integer.class );
+                else
+                   comparator=getComparator( column );
 
                 int comparison = 0;
+
+                if ( o1 == null && o2 == null ) {
+                   comparison = 0;
+                }
+                else if ( o1 != null && o2 != null ) {
+                   comparison = comparator.compare( o1, o2 );
+                }
                 // Define null less than everything, except null.
-                if (o1 == null && o2 == null) {
-                    comparison = 0;
-                } else if (o1 == null) {
-                    comparison = -1;
-                } else if (o2 == null) {
-                    comparison = 1;
-                } else {
-                    comparison = getComparator(column).compare(o1, o2);
+                else if ( directive.direction == DESCENDING) {
+                   if ( o1 == null ) {
+                      comparison = -1;
+                   } else if ( o2 == null ) {
+                      comparison = 1;
+                   }
+                }
+                // Define null greater than everything, except null.
+                else {
+                   if ( o1 == null ) {
+                      comparison = 1;
+                   } else if ( o2 == null) {
+                      comparison = -1;
+                   }
                 }
                 if (comparison != 0) {
-                    return directive.direction == DESCENDING ? -comparison : comparison;
+                   return directive.direction == DESCENDING ? -comparison : comparison;
                 }
             }
             return 0;

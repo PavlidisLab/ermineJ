@@ -45,7 +45,8 @@ public class OutputPanel extends JScrollPane {
    void table_mouseReleased( MouseEvent e ) {
       int i = table.getSelectedRow();
       int j = table.getSelectedColumn();
-      if(!table.getValueAt(i,j).equals("") && j>=OutputTableModel.init_cols)
+      //if(!table.getValueAt(i,j).equals("") && j>=OutputTableModel.init_cols)
+      if(table.getValueAt(i,j) != null && j>=OutputTableModel.init_cols)
       {
          int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
          String id = (String)table.getValueAt(i,0);
@@ -74,16 +75,6 @@ public class OutputPanel extends JScrollPane {
       table.getColumnModel().getColumn(2).setPreferredWidth(30);
       table.getColumnModel().getColumn(3).setPreferredWidth(30);
       table.revalidate();
-   }
-
-   public void addRunData(Map data) {
-      model.addRunData(data);
-      table.addColumn(new TableColumn(model.getColumnCount() - 3));
-      table.addColumn(new TableColumn(model.getColumnCount() - 2));
-      table.addColumn(new TableColumn(model.getColumnCount() - 1));
-      table.getColumnModel().getColumn(model.getColumnCount() - 3).setPreferredWidth(30);
-      table.getColumnModel().getColumn(model.getColumnCount() - 2).setPreferredWidth(30);
-      table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
    }
 
    public void addRun() {
@@ -153,7 +144,8 @@ class OutputPanel_PopupListener extends MouseAdapter {
          JTable source = (JTable) e.getSource();
          int r = source.rowAtPoint(e.getPoint());
          String id = (String) source.getValueAt(r, 0);
-         if (id.compareTo("") != 0) {
+         //if (id.compareTo("") != 0) {
+         if (id != null) {
             popup.show(e.getComponent(), e.getX(), e.getY());
             popup.setPoint(e.getPoint());
          }
@@ -231,12 +223,13 @@ class OutputTableModel extends AbstractTableModel {
          }
       } else if (state > 0) {
          String classid;
-            classid = geneData.getClass(i);
+         classid = geneData.getClass(i);
          double runnum = Math.floor((j - init_cols) / cols_per_run);
          Map data = ((classPvalRun)results.get((int) runnum)).getResults();
          if (data.containsKey(classid)) {
             classresult res = (classresult) data.get(classid);
             if ((j - init_cols) % cols_per_run == 0) {
+               //return new Integer(res.getRank());
                return new Integer(res.getRank());
             } else if ((j - init_cols) % cols_per_run == 1) {
                return new Double(nf.format(res.getScore()));
@@ -244,10 +237,10 @@ class OutputTableModel extends AbstractTableModel {
                return new Double(nf.format(res.getPvalue()));
             }
          } else {
-            return "";
+            return null;
          }
       }
-      return "";
+      return null;
    }
 }
 
@@ -269,6 +262,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
       setOpaque(true);
       if(isSelected || hasFocus)
          setOpaque(true);
+      else if(value==null)
+         setOpaque(false);
       else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
       {
          if(((Double)value).doubleValue() > 0.8)
@@ -283,9 +278,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
             setBackground(spread5);
       }
       else
-      {
-          setOpaque(false);
-      }
+         setOpaque(false);
       return this;
    }
 

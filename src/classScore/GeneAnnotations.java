@@ -379,7 +379,7 @@ public class GeneAnnotations {
                case 2:
                   return ( String ) getProbeDescription( probeid );
                default:
-                  return "";
+                  return null;
             }
          }
 
