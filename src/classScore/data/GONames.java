@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.xml.sax.SAXException;
 
@@ -17,8 +18,9 @@ import baseCode.dataStructure.graph.DirectedGraphNode;
 import baseCode.xml.GOParser;
 
 /**
- * Gets geneclass names from tab-delimited file of the form GoID[tab]Biological Name. This is generic in that it doesn't
- * have to be a GO, could be any class scheme. The values are stored in a HashTable. Created 09/02/02
+ * Gets geneclass names from tab-delimited file of the form GoID[tab]Biological
+ * Name. This is generic in that it doesn't have to be a GO, could be any class
+ * scheme. The values are stored in a HashTable. Created 09/02/02
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
@@ -30,11 +32,13 @@ public class GONames {
    private static Map goNameMap;
    private Set newGeneSets = new HashSet();
    private GOParser parser;
+   private Vector selectedSets;
 
    /**
     * 
-    * @param filename <code>String</code> The XML file containing class to name mappings. First column is the class
-    *        id, second is a description that will be used int program output.
+    * @param filename <code>String</code> The XML file containing class to
+    *           name mappings. First column is the class id, second is a
+    *           description that will be used int program output.
     * @throws IllegalArgumentException
     * @throws IOException
     */
@@ -47,16 +51,12 @@ public class GONames {
 
       InputStream i = new FileInputStream( filename );
       parser = new GOParser( i );
-
-      //     MapReader m = new MapReader();
-      //    goNameMap = m.read( filename, true );
-
       goNameMap = parser.getGONameMap();
-
    }
 
    /**
-    * Get the graph representation of the GO hierarchy. This can be used to support JTree representations.
+    * Get the graph representation of the GO hierarchy. This can be used to
+    * support JTree representations.
     * 
     * @return
     */
@@ -67,7 +67,8 @@ public class GONames {
    /**
     * 
     * @param id
-    * @return a Set containing the ids of geneSets which are immediately below the selected one in the hierarchy.
+    * @return a Set containing the ids of geneSets which are immediately below
+    *         the selected one in the hierarchy.
     */
    public Set getChildren( String id ) {
       Set returnVal = new HashSet();
@@ -84,7 +85,8 @@ public class GONames {
    /**
     * 
     * @param id
-    * @return a Set containing the ids of geneSets which are immediately above the selected one in the hierarchy.
+    * @return a Set containing the ids of geneSets which are immediately above
+    *         the selected one in the hierarchy.
     */
    public Set getParents( String id ) {
       Set returnVal = new HashSet();
@@ -163,4 +165,7 @@ public class GONames {
    public Set getNewGeneSets() {
       return newGeneSets;
    }
+
+  
+
 }

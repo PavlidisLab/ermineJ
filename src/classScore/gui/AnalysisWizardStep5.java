@@ -2,6 +2,7 @@ package classScore.gui;
 
 import java.awt.Dimension;
 import java.awt.SystemColor;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,6 +43,7 @@ public class AnalysisWizardStep5 extends WizardStep
       super(wiz);
       this.wiz=wiz;
       this.settings=settings;
+      wiz.clearStatus();
       setValues();
    }
 

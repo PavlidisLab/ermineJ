@@ -1,9 +1,15 @@
 package classScore;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import baseCode.gui.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.util.Properties;
+
+import baseCode.gui.GuiUtil;
 
 /**
  * <p>
@@ -77,7 +83,7 @@ public class Settings {
    /**
     * Creates settings object
     *
-    * @param file - name of preferences file to read
+    * @param filename name of preferences file to read
     */
    public Settings( String filename ) {
       pref_file = filename;

@@ -14,8 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import classScore.Settings;
 import baseCode.gui.GuiUtil;
+import baseCode.util.StatusViewer;
+import classScore.Settings;
 
 /**
  * <p>Title: </p>
@@ -44,7 +45,7 @@ public class LoadDialog
 
    GeneSetScoreFrame callingframe;
    Settings settings;
-   GeneSetScoreStatus messenger;
+   StatusViewer messenger;
 
    public LoadDialog( GeneSetScoreFrame callingframe ) {
       setModal( true );

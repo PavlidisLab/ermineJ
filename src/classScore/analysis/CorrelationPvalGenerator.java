@@ -1,10 +1,9 @@
 package classScore.analysis;
 
+import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 
 /**
  * 
@@ -45,7 +44,6 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator{
    /**
     * 
     * @param correls
-    * @param classsize
     * @return
     */
    public double geneSetMeanCorrel( DenseDoubleMatrix2DNamed correls ) {

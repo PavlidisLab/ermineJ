@@ -1,11 +1,15 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.io.*;
-import baseCode.gui.*;
-import classScore.*;
+import java.awt.AWTEvent;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.util.LinkedList;
+
+import baseCode.gui.GuiUtil;
+import baseCode.gui.Wizard;
+import classScore.ResultsPrinter;
+import classScore.Settings;
+import classScore.classPvalRun;
 import classScore.data.GONames;
 
 /**
@@ -50,6 +54,7 @@ public class SaveWizard extends Wizard
    }
 
    protected void nextButton_actionPerformed(ActionEvent e) {
+      clearStatus();
       if (step == 1) {
          if(step1.runsExist())
          {
@@ -72,6 +77,7 @@ public class SaveWizard extends Wizard
    }
 
    protected void backButton_actionPerformed(ActionEvent e) {
+      clearStatus();
       if (step == 2) {
          step = 1;
          this.getContentPane().remove(step2);

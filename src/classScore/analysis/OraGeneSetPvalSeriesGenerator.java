@@ -52,7 +52,6 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     * 
     * @param group_pval_map a <code>Map</code> value
     * @param probesToPvals a <code>Map</code> value
-    * @param input_rank_map a <code>Map</code> value
     */
    public void classPvalGenerator( Map group_pval_map, Map probesToPvals ) {
       Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->

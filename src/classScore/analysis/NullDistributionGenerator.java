@@ -1,7 +1,7 @@
 package classScore.analysis;
 
+import baseCode.util.StatusViewer;
 import classScore.data.Histogram;
-import classScore.gui.GeneSetScoreStatus;
 
 /**
  * 
@@ -13,6 +13,6 @@ import classScore.gui.GeneSetScoreStatus;
  */
 public interface NullDistributionGenerator {
 
-   public Histogram generateNullDistribution(GeneSetScoreStatus messenger);
+   public Histogram generateNullDistribution(StatusViewer messenger);
    
 }

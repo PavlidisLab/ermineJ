@@ -1,15 +1,15 @@
 package classScore.gui;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,8 +61,10 @@ public class AnalysisWizardStep3 extends WizardStep {
       this.wiz = wiz;
       this.settings = settings;
       this.goData = goData;
+      wiz.clearStatus();
       makeLeftTable();
       makeRightTable();
+      
    }
 
    //Component initialization

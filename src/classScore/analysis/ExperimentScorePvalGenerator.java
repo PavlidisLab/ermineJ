@@ -27,14 +27,13 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
    Histogram hist;
 
+ 
    /**
-    * 
-    * @param ctp Map
-    * @param pg Map
-    * @param w boolean
-    * @param hi histogram
-    * @param pvm expClassScore
-    * @param csc ClassSizeComputer
+    * @param settings
+    * @param a
+    * @param csc
+    * @param gon
+    * @param hi
     */
    public ExperimentScorePvalGenerator( Settings settings, GeneAnnotations a,
          GeneSetSizeComputer csc, GONames gon, Histogram hi

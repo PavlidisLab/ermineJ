@@ -1,23 +1,48 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 
 import org.xml.sax.SAXException;
 
-import baseCode.gui.*;
-import classScore.*;
-import classScore.data.*;
+import baseCode.gui.GuiUtil;
+import baseCode.gui.StatusJlabel;
+import baseCode.util.StatusViewer;
+import classScore.AnalysisThread;
+import classScore.Settings;
+import classScore.classPvalRun;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.GeneSetMapTools;
 
 /**
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
- * @author not attributable
+ * @author Homin Lee
+ * @author Paul Pavlidis
  * @version $Id$
  * @todo All input of custom classes, identified either by probe id or official gene name.
  *
@@ -53,7 +78,7 @@ public class GeneSetScoreFrame
    JPanel jPanelStatus = new JPanel();
 
    Settings settings;
-   GeneSetScoreStatus statusMessenger;
+   StatusViewer statusMessenger;
    GONames goData;
    GeneAnnotations geneData;
    LinkedList results = new LinkedList();
@@ -193,7 +218,7 @@ public class GeneSetScoreFrame
       jLabelStatus.setText( "Status" );
       jPanelStatus.add( jLabelStatus, null );
       showStatus( "Please see 'About this software' for license information." );
-      statusMessenger = new GeneSetScoreStatus( jLabelStatus );
+      statusMessenger = new StatusJlabel( jLabelStatus );
 
       //mainPanel.add( oPanel, BorderLayout.CENTER );
       mainPanel.add( progressPanel, BorderLayout.CENTER );
@@ -330,7 +355,7 @@ public class GeneSetScoreFrame
       this.settings=settings;
    }
 
-   public GeneSetScoreStatus getStatusMessenger(){
+   public StatusViewer getStatusMessenger(){
       return statusMessenger;
    }
 

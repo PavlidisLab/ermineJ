@@ -1,11 +1,26 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.*;
-import baseCode.gui.*;
-import classScore.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.io.File;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+import baseCode.gui.WizardStep;
+import classScore.Settings;
 
 /**
  * <p>Title: </p>
@@ -32,6 +47,7 @@ public class GeneSetWizardStep1 extends WizardStep
       chooser = new JFileChooser();
       chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
       chooser.setDialogTitle("Choose Gene Set File");
+      wiz.clearStatus();
    }
 
    //Component initialization

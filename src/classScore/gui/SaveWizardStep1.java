@@ -1,21 +1,23 @@
 package classScore.gui;
 
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
-import java.awt.*;
-import baseCode.gui.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.util.LinkedList;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import baseCode.gui.WizardStep;
 
 /**
  * <p>Title: </p>
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
- * @author not attributable
- * @version 1.0
+ * @author Homin Lee
+ * @version $Id$
  */
-
 public class SaveWizardStep1 extends WizardStep
 {
    SaveWizard wiz;
@@ -32,6 +34,7 @@ public class SaveWizardStep1 extends WizardStep
       this.wiz=wiz;
       this.rundata=rundata;
       showChoices();
+      wiz.clearStatus();
    }
 
    //Component initialization

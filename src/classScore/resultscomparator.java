@@ -1,7 +1,8 @@
 package classScore;
 
-import java.util.*;
-import classScore.data.*;
+import java.util.Comparator;
+
+import classScore.data.GeneSetResult;
 
 class resultscomparator
     implements Comparator {

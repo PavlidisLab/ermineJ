@@ -134,8 +134,12 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
          // or we didn't/cant get
          // anything.
-         hyper_pval = Probability.binomial( successes, numOverThreshold,
-               pos_prob );
+      //   hyper_pval = Probability.binomial( successes, numOverThreshold,
+       //        pos_prob );
+         
+         // upper tail. this is more consistent with the other methods.
+         hyper_pval = Probability.binomialComplemented( successes,
+               numOverThreshold, pos_prob );
       } else {
          // Upper tail.
          hyper_pval = Probability.binomialComplemented( successes,

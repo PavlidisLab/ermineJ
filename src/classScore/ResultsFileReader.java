@@ -1,9 +1,17 @@
 package classScore;
 
-import java.io.*;
-import java.util.*;
-import classScore.data.*;
-import classScore.gui.GeneSetScoreStatus;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import baseCode.util.StatusViewer;
+import classScore.data.GeneSetResult;
 
 /**
  * <p>
@@ -27,7 +35,7 @@ public class ResultsFileReader {
 
    private Map results;
 
-   public ResultsFileReader( String filename, GeneSetScoreStatus messenger ) throws NumberFormatException,
+   public ResultsFileReader( String filename, StatusViewer messenger ) throws NumberFormatException,
          IOException {
       results = new LinkedHashMap();
 

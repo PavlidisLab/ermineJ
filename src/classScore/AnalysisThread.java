@@ -9,11 +9,11 @@ import java.util.Set;
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.reader.DoubleMatrixReader;
 import baseCode.gui.GuiUtil;
+import baseCode.util.StatusViewer;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
 import classScore.gui.GeneSetScoreFrame;
-import classScore.gui.GeneSetScoreStatus;
 
 /**
  * <p>
@@ -38,7 +38,7 @@ public class AnalysisThread {
    private volatile Thread athread;
    GeneSetScoreFrame csframe;
    Settings settings;
-   GeneSetScoreStatus messenger;
+   StatusViewer messenger;
    GONames goData;
    GeneAnnotations geneData = null;
    Map rawDataSets;
@@ -50,7 +50,7 @@ public class AnalysisThread {
    }
 
    public void startAnalysisThread( GeneSetScoreFrame csframe,
-         Settings settings, GeneSetScoreStatus messenger, GONames goData,
+         Settings settings, StatusViewer messenger, GONames goData,
          Map geneDataSets, Map rawDataSets, Map geneScoreSets )
          throws IllegalStateException {
       this.csframe = csframe;
@@ -170,7 +170,7 @@ public class AnalysisThread {
    }
 
    public void loadAnalysisThread( GeneSetScoreFrame csframe,
-         Settings settings, GeneSetScoreStatus messenger, GONames goData,
+         Settings settings, StatusViewer messenger, GONames goData,
          Map geneDataSets, Map rawDataSets, Map geneScoreSets, String loadFile )
          throws IllegalStateException {
       this.csframe = csframe;

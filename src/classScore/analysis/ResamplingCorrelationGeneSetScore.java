@@ -1,16 +1,16 @@
 package classScore.analysis;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.SparseDoubleMatrix2DNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.RandomChooser;
+import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
 import classScore.Settings;
 import classScore.data.Histogram;
-import classScore.gui.GeneSetScoreStatus;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -48,7 +48,7 @@ public class ResamplingCorrelationGeneSetScore extends
     * @return histogram containing the random distributions of correlations.
     * @throws OutOfMemoryError
     */
-   public Histogram generateNullDistribution( GeneSetScoreStatus messenger )
+   public Histogram generateNullDistribution( StatusViewer messenger )
          throws OutOfMemoryError {
       int numGeneSets = classMaxSize - classMinSize + 1;
       Histogram hist = new Histogram( numGeneSets, classMinSize, numRuns, 1.0,
@@ -92,7 +92,6 @@ public class ResamplingCorrelationGeneSetScore extends
     *        without having filled it in yet. This means that only values that
     *        are visited during resampling are actually computed - this is a big
     *        memory saver.
-    * @param classsize How big this class is.
     * @return
     */
    public double geneSetMeanCorrel( int[] indicesToSelect,

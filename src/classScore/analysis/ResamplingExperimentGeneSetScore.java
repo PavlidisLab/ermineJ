@@ -1,6 +1,5 @@
 package classScore.analysis;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -13,10 +12,10 @@ import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.RandomChooser;
 import baseCode.math.Rank;
 import baseCode.math.Stats;
+import baseCode.util.StatusViewer;
 import classScore.Settings;
 import classScore.data.GeneScoreReader;
 import classScore.data.Histogram;
-import classScore.gui.GeneSetScoreStatus;
 
 /**
  * Calculates a background distribution for class sscores derived from randomly
@@ -45,7 +44,7 @@ public class ResamplingExperimentGeneSetScore extends
     *         pvalues.
     * @param m GeneSetScoreStatus
     */
-   public Histogram generateNullDistribution( GeneSetScoreStatus m ) {
+   public Histogram generateNullDistribution( StatusViewer m ) {
 
       int num_genes;
       double[] in_pval;
@@ -101,27 +100,10 @@ public class ResamplingExperimentGeneSetScore extends
       return hist;
    }
 
+
    /**
-    * Set everything according to parameters.
-    *
-    * @param filename_pval File that contains the scores for each probe
-    * @param wt_check Whether weights should be used or not
-    * @param in_method The class scoring method: Mean, Quantile, etc.
-    * @param pvalcolumn Which column in the data file contains the scores we
-    *        will use. The first column contains probe labels and is not
-    *        counted.
-    * @param dolog Whether the log of the scores should be used. Use true when
-    *        working with p-values
-    * @param classMaxSize The largest class that will be considered. This refers
-    *        to the apparent size.
-    * @param classMinSize The smallest class that will be considered. This
-    *        refers to the apparent size.
-    * @param number_of_runs How many random trials are done when generating
-    *        background distributions.
-    * @param quantile A number from 1-100. This is ignored unless a quantile
-    *        method is selected.
-    * @throws IllegalArgumentException
-    * @throws IOException
+    * @param settings
+    * @param geneScores
     */
    public ResamplingExperimentGeneSetScore( Settings settings, GeneScoreReader geneScores ) {
       this.classMaxSize = settings.getMaxClassSize();

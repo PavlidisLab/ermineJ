@@ -1,8 +1,17 @@
 package classScore;
 
-import java.util.*;
-import java.io.*;
-import classScore.data.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
+
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.GeneSetMapTools;
+import classScore.data.GeneSetResult;
 
 /**
  * <p>Title: </p>

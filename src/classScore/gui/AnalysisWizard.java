@@ -1,11 +1,16 @@
 package classScore.gui;
 
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import classScore.*;
-import classScore.data.*;
-import baseCode.gui.*;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import baseCode.gui.Wizard;
+import classScore.Settings;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.NewGeneSet;
 
 /**
  * <p>Title: </p>
@@ -53,6 +58,7 @@ public class AnalysisWizard extends Wizard
    }
 
    protected void nextButton_actionPerformed(ActionEvent e) {
+      clearStatus();
       if (step == 1) {
          step = 2;
          this.getContentPane().remove(step1);
@@ -92,6 +98,7 @@ public class AnalysisWizard extends Wizard
    }
 
    protected void backButton_actionPerformed(ActionEvent e) {
+      clearStatus();
       if (step == 2) {
          step = 1;
          this.getContentPane().remove(step2);

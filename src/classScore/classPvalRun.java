@@ -13,6 +13,7 @@ import java.util.Vector;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.math.Rank;
+import baseCode.util.StatusViewer;
 import classScore.analysis.CorrelationsGeneSetPvalSeriesGenerator;
 import classScore.analysis.GeneSetPvalSeriesGenerator;
 import classScore.analysis.GeneSetSizeComputer;
@@ -26,7 +27,6 @@ import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
-import classScore.gui.GeneSetScoreStatus;
 import classScore.gui.geneSet.JGeneSetFrame;
 
 /**
@@ -51,19 +51,19 @@ public class classPvalRun {
 
    /**
     * Use this when we are loading in existing results.
-    * 
+    * @param activeProbes
     * @param settings
     * @param geneData
+    * @param rawData
     * @param goData
-    * @param mtc_method
+    * @param geneScores
     * @param messenger
     * @param results
-    * @todo could combine with other constructor.
     */
    public classPvalRun(  Set activeProbes, Settings settings,
          GeneAnnotations geneData, DenseDoubleMatrix2DNamed rawData,
          GONames goData, GeneScoreReader geneScores,
-         GeneSetScoreStatus messenger,
+         StatusViewer messenger,
          Map results ) {
       this.settings = settings;
       this.geneData = geneData;
@@ -111,7 +111,7 @@ public class classPvalRun {
    public classPvalRun( Set activeProbes, Settings settings,
          GeneAnnotations geneData, DenseDoubleMatrix2DNamed rawData,
          GONames goData, GeneScoreReader geneScores,
-         GeneSetScoreStatus messenger ) throws IllegalArgumentException {
+         StatusViewer messenger ) throws IllegalArgumentException {
       this.settings = settings;
       this.geneData = geneData;
       this.goData = goData;

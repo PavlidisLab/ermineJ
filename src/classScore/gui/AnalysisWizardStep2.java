@@ -1,9 +1,9 @@
 package classScore.gui;
 
-import java.io.File;
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.File;
+
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -37,6 +37,7 @@ public class AnalysisWizardStep2
       this.settings = settings;
       chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
       setValues();
+      wiz.clearStatus();
    }
 
    //Component initialization

@@ -1,14 +1,14 @@
 package classScore.gui.geneSet;
 
+import java.awt.Point;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
-import java.awt.Point;
 import javax.swing.table.AbstractTableModel;
 
 import baseCode.gui.JMatrixDisplay;
-import classScore.data.*;
+import classScore.data.GeneAnnotations;
 
 /**
  * Our table model.

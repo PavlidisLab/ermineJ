@@ -42,9 +42,9 @@ import baseCode.gui.JMatrixDisplay;
 import baseCode.gui.table.JBarGraphCellRenderer;
 import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
+import baseCode.gui.table.TableSorter;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;
-import baseCode.gui.table.TableSorter;
 
 /**
  * @author Will Braynen

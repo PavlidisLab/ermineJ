@@ -1,9 +1,12 @@
 package classScore.gui;
 
-import java.util.*;
-import javax.swing.table.*;
-import baseCode.gui.JMatrixDisplay;
 import java.awt.Point;
+import java.util.Arrays;
+
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+
+import baseCode.gui.JMatrixDisplay;
 
 /**
  * <p>Title: </p>

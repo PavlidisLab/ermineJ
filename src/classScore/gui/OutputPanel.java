@@ -3,15 +3,16 @@ package classScore.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
-import java.awt.Cursor;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -22,14 +23,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-import baseCode.gui.table.TableSorter;
 
+import baseCode.gui.table.TableSorter;
 import classScore.Settings;
 import classScore.classPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
-import java.util.ArrayList;
 
 /**
  * <p>
@@ -45,8 +45,8 @@ import java.util.ArrayList;
  * Company:
  * </p>
  *
- * @author not attributable
- * @version 1.0
+ * @author Homin Lee
+ * @version $Id$
  * @todo make columns start out better sizes
  * @todo integers don't sort correctly
  * @todo deletion of geneDataSets when remove is used.
@@ -97,7 +97,7 @@ public class OutputPanel extends JScrollPane {
       table.getTableHeader().addMouseListener( new TableHeader_mouseAdapterCursorChanger( this ));
 
       OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
-      JMenuItem modMenuItem = new JMenuItem( "Modify this class (Step 1 of 3)" );
+      JMenuItem modMenuItem = new JMenuItem( "Modify this class..." );
       modMenuItem
           .addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
       JMenuItem htmlMenuItem = new JMenuItem( "See some html stuff about this class, blah..." );
@@ -481,7 +481,7 @@ class OutputTableModel extends AbstractTableModel {
       if ( state == -1 ) {
          return 20;
       }
-      return geneData.numClasses();
+      return geneData.selectedSets();
    }
 
    public int getRunNum( int c ) {

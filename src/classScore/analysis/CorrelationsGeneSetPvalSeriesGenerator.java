@@ -1,24 +1,21 @@
 package classScore.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import cern.colt.matrix.impl.SparseDoubleMatrix2D;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
+import baseCode.math.MatrixStats;
+import baseCode.util.StatusViewer;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
-import classScore.gui.GeneSetScoreStatus;
-
-import baseCode.dataFilter.RowNameFilter;
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.math.MatrixStats;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Calculates the raw average class correlations using a background distribution.
@@ -48,15 +45,12 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
    }
 
    /**
-    * 
-    * @param probe_datafile
-    * @param probe_annotfile
-    * @param class_max_size
-    * @param class_min_size
-    * @param number_of_runs
-    * @param range
-    * @throws IOException
-    * @todo do we need to pass the data file name here.
+    * @param settings
+    * @param geneAnnots
+    * @param csc
+    * @param gon
+    * @param rawData
+    * @param hist
     */
    public CorrelationsGeneSetPvalSeriesGenerator( Settings settings,
          GeneAnnotations geneAnnots, GeneSetSizeComputer csc, GONames gon,
@@ -75,12 +69,12 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
    }
 
    /**
-    * @param
+    * @param messenger
     * @todo make this faster. cache values?
     * @todo need to do weighting
     *  
     */
-   public void geneSetCorrelationGenerator( GeneSetScoreStatus messenger ) {
+   public void geneSetCorrelationGenerator( StatusViewer messenger ) {
       //iterate over each class
       for ( Iterator it = geneSetToProbeMap.entrySet().iterator(); it.hasNext(); ) {
          Map.Entry e = ( Map.Entry ) it.next();

@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import baseCode.util.StatusViewer;
 import classScore.Settings;
-import classScore.gui.GeneSetScoreStatus;
 
 /**
  * Description:Parses the file of the form
@@ -56,25 +56,17 @@ public class GeneScoreReader {
    private int num_pvals;
    private Map probeToPvalMap;
    private Map groupToPvalMap;
-
-   //  private Map groupToProbeMap;
+   
 
    /**
-    *
-    * @param s
-    */
-   //  public void setGroupToProbeMap( Map s ) {
-   //     this.groupToProbeMap = s;
-   //  }
-   /**
-    * Create the probe -> pval mapping
-    *
-    * @param filename: a tab-delmited file with columns probe_id pval pval pval...
-    * @param column: which column the pvalues are in.
-    * @param dolog: take the log (base 10) of the value.
+    * @param filename
+    * @param settings
+    * @param messenger
+    * @param groupToProbeMap
+    * @throws IOException
     */
    public GeneScoreReader( String filename, Settings settings,
-         GeneSetScoreStatus messenger, Map groupToProbeMap ) throws IOException {
+         StatusViewer messenger, Map groupToProbeMap ) throws IOException {
       //read in file
 
       groupToPvalMap = new HashMap();
@@ -130,11 +122,6 @@ public class GeneScoreReader {
          if ( name.matches( "AFFX.*" ) ) { // todo: put this rule somewhere else
             if ( messenger != null ) {
                messenger.setStatus( "Skipping probe in pval file: " + name );
-//               try {
-//                  Thread.sleep( 20 ); // so they can read it...
-//               } catch ( InterruptedException ex ) {
-//                  Thread.currentThread().interrupt();
-//               }
             }
             continue;
          }
@@ -153,11 +140,6 @@ public class GeneScoreReader {
                            + probePvalues[i - 1]
                            + ") from gene score file: Setting to " + small );
                probePvalues[i - 1] = small;
-//               try {
-//                  Thread.sleep( 20 ); // so they can read it...
-//               } catch ( InterruptedException ex ) {
-//                  Thread.currentThread().interrupt();
-//               }
             }
          }
 
@@ -189,7 +171,7 @@ public class GeneScoreReader {
     * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the data
     *        set.
     */
-   private void setUpGroupToPvalMap( int gp_method, Map groupToProbeMap, GeneSetScoreStatus messenger ) {
+   private void setUpGroupToPvalMap( int gp_method, Map groupToProbeMap, StatusViewer messenger ) {
 
       if ( groupToProbeMap == null || groupToProbeMap.size() == 0 ) {
          throw new IllegalStateException( "groupToProbeMap was not set." );

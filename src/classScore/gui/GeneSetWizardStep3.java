@@ -1,16 +1,21 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
-import baseCode.gui.*;
-import classScore.*;
-import classScore.data.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.table.AbstractTableModel;
+
+import baseCode.gui.WizardStep;
+import classScore.Settings;
+import classScore.data.GeneAnnotations;
+import classScore.data.NewGeneSet;
 
 /**
  * <p>
@@ -54,6 +59,7 @@ public class GeneSetWizardStep3 extends WizardStep {
       this.makenew = makenew;
       AbstractTableModel finalTableModel = newGeneSet.toTableModel( true );
       finalTable.setModel( finalTableModel );
+      wiz.clearStatus();
    }
 
    //Component initialization

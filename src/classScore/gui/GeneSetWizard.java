@@ -1,8 +1,7 @@
 package classScore.gui;
 
-import java.util.ArrayList;
-
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
@@ -45,7 +44,7 @@ public class GeneSetWizard extends Wizard {
       this.makenew = makenew;
       newGeneSet = new NewGeneSet(geneData);
 
-      geneData.resetSelected();
+      geneData.resetSelectedProbes();
       step=1;
       if (makenew) {
          this.setTitle("Define New Class - Step 1 of 3");
@@ -92,6 +91,7 @@ public class GeneSetWizard extends Wizard {
    }
 
    protected void nextButton_actionPerformed(ActionEvent e) {
+      clearStatus();
       if (step == 1) {
          if (makenew || step1A.isReady()) {                       //not (case 3 with no class picked)
             if (makenew && step1.getInputMethod() == 1) {           //case 2, load from file
@@ -134,6 +134,7 @@ public class GeneSetWizard extends Wizard {
    }
 
    protected void backButton_actionPerformed(ActionEvent e) {
+      clearStatus();
       if (step == 2) {
          this.getContentPane().remove(step2);
          step = 1;

@@ -1,10 +1,17 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.*;
-import baseCode.gui.*;
+import java.awt.Dimension;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.io.File;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import baseCode.gui.WizardStep;
 
 /**
  * <p>Title: </p>
@@ -32,6 +39,7 @@ public class SaveWizardStep2 extends WizardStep
       this.folder=folder;
       chooser.setCurrentDirectory(new File(folder));
       chooser.setDialogTitle("Save Analysis As");
+      wiz.clearStatus();
    }
 
    //Component initialization

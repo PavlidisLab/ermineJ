@@ -40,10 +40,10 @@ public class GeneGroupReader {
    private Set group;
 
    /**
-    * @param String filename: name of the tab-delimited file that has the group
+    * @param group_probe_list name of the tab-delimited file that has the group
     *        map, columns probe GROUP_ID. GROUP_ID is the same for probes which
     *        are from the same group (roughly, group==gene)
-    * @param Map probesFromList: Just a list of what probes are in the file, so
+    * @param probe_group_map Just a list of what probes are in the file, so
     *        we skip any that aren't in there.
     */
    public GeneGroupReader( Map group_probe_list, Map probe_group_map ) {

@@ -2,6 +2,7 @@ package classScore.gui;
 
 import java.awt.Dimension;
 import java.awt.SystemColor;
+
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -10,7 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
 
 import baseCode.gui.WizardStep;
 import classScore.Settings;
@@ -29,8 +29,9 @@ import classScore.Settings;
  * Company:
  * </p>
  * 
- * @author not attributable
+ * @author Homin Lee
  * @version $Id$
+ * @todo the log transform should only be here if they are doing ora or resampling.
  */
 
 public class AnalysisWizardStep4 extends WizardStep {
@@ -48,6 +49,7 @@ public class AnalysisWizardStep4 extends WizardStep {
       super( wiz );
       this.wiz = wiz;
       this.settings = settings;
+      wiz.clearStatus();
       setValues();
    }
 

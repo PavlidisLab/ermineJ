@@ -1,15 +1,31 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import baseCode.gui.*;
-import classScore.data.*;
-import classScore.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.AbstractTableModel;
+
+import baseCode.gui.GuiUtil;
+import baseCode.gui.WizardStep;
+import baseCode.gui.table.TableSorter;
+import classScore.data.GeneAnnotations;
+import classScore.data.NewGeneSet;
 
 /**
  * <p>
@@ -25,7 +41,7 @@ import classScore.*;
  * Company:
  * </p>
  * 
- * @author not attributable
+ * @author Homin Lee
  * @version $Id$
  */
 
@@ -39,13 +55,15 @@ public class GeneSetWizardStep2 extends WizardStep {
    AbstractTableModel ncTableModel;
    NewGeneSet newGeneSet;
    JTextField searchTextField;
-   
+
    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData,
          NewGeneSet newGeneSet ) {
       super( wiz );
       this.wiz = wiz;
       this.geneData = geneData;
       this.newGeneSet = newGeneSet;
+      wiz.clearStatus();
+      geneData.resetSelectedProbes();
       populateTables();
    }
 
@@ -56,9 +74,9 @@ public class GeneSetWizardStep2 extends WizardStep {
       JPanel step2Panel;
 
       JPanel topPanel = new JPanel();
-      countLabel = new JLabel();
-      countLabel.setText( "Number of Probes: 0" );
-      topPanel.add( countLabel );
+     // countLabel = new JLabel();
+      showStatus( "Number of Probes selected: 0" );
+    //  topPanel.add( countLabel );
 
       step2Panel = new JPanel();
       BorderLayout borderLayout1 = new BorderLayout();
@@ -88,11 +106,9 @@ public class GeneSetWizardStep2 extends WizardStep {
       searchButton
             .addActionListener( new GeneSetWizardStep2_searchButton_actionAdapter(
                   this ) );
-      // JLabel searchLabel = new JLabel();
-      //  searchLabel.setText("Find:");
 
       searchTextField = new JTextField();
-      searchTextField.setPreferredSize( new Dimension( 60, 19 ) );
+      searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
       searchTextField
             .addKeyListener( new GeneSetWizardStep2_searchText_keyAdapter( this ) );
 
@@ -119,8 +135,8 @@ public class GeneSetWizardStep2 extends WizardStep {
       step2Panel.add( bottomPanel, BorderLayout.SOUTH );
 
       this.addHelp( "<html><b>Set up the gene set</b><br>"
-                  + "Add or remove probes/genes using the buttons below the table. " +
-                        "To find a specific gene use the 'find' tool." );
+            + "Add or remove probes/genes using the buttons below the table. "
+            + "To find a specific gene use the 'find' tool." );
       this.addMain( step2Panel );
    }
 
@@ -144,7 +160,8 @@ public class GeneSetWizardStep2 extends WizardStep {
       int n = probeTable.getSelectedRowCount();
       int[] rows = probeTable.getSelectedRows();
       for ( int i = 0; i < n; i++ ) {
-         //newGeneSet.probes.add(probeTable.getValueAt(rows[i], 0)); (for just deleting probes)
+         //newGeneSet.probes.add(probeTable.getValueAt(rows[i], 0)); (for just
+         // deleting probes)
          String newGene;
          if ( ( newGene = geneData.getProbeGeneName( ( String ) probeTable
                .getValueAt( rows[i], 0 ) ) ) != null ) {
@@ -189,57 +206,38 @@ public class GeneSetWizardStep2 extends WizardStep {
    }
 
    public void updateCountLabel() {
-      countLabel.setText( "Number of Probes: " + newGeneSet.getProbes().size() );
+      showStatus( "Number of Probes selected: " + newGeneSet.getProbes().size() );
    }
 
-   // todo shouldn't this use the TableSorter?
    private void populateTables() {
-      SortFilterModel sorter = new SortFilterModel( geneData.toTableModel() );
+      TableSorter sorter = new TableSorter ( geneData.toTableModel() );
       probeTable.setModel( sorter );
-      probeTable.getTableHeader().addMouseListener( new MouseAdapter() {
-         public void mouseClicked( MouseEvent event ) {
-            int tableColumn = probeTable.columnAtPoint( event.getPoint() );
-            int modelColumn = probeTable
-                  .convertColumnIndexToModel( tableColumn );
-            ( ( SortFilterModel ) probeTable.getModel() ).sort( modelColumn );
-         }
-      } );
-      probeTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
+      sorter.setTableHeader( probeTable.getTableHeader() );
 
+      probeTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
+      probeTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
+       
       ncTableModel = newGeneSet.toTableModel( false );
       newClassTable.setModel( ncTableModel );
-//      JTextField editProbe = new JTextField();
-//      editProbe.setBorder( BorderFactory.createEmptyBorder() );
-//      DefaultCellEditor editorProbe = new DefaultCellEditor( editProbe );
-//      editorProbe
-//            .addCellEditorListener( new GeneSetWizardStep2_editorProbeAdaptor(
-//                  this ) );
-//      newClassTable.getColumnModel().getColumn( 0 ).setCellEditor( editorProbe );
-//      JTextField editGene = new JTextField();
-//      editGene.setBorder( BorderFactory.createEmptyBorder() );
-//      DefaultCellEditor editorGene = new DefaultCellEditor( editGene );
-//      editorGene
-//            .addCellEditorListener( new GeneSetWizardStep2_editorGeneAdaptor(
-//                  this ) );
-//      newClassTable.getColumnModel().getColumn( 1 ).setCellEditor( editorGene );
       newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
+      newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
+      
+      showStatus("Available probes: " + geneData.selectedProbes());
    }
 
    /**
     * do a search.
     */
    public void searchButton_actionPerformed_adapter( ActionEvent e ) {
-      // TODO Auto-generated method stub
       String searchOn = searchTextField.getText();
-      
-      // reset
-      if (searchOn.equals("")) {
-         geneData.resetSelected();
-      } else {   
-         geneData.select(searchOn);
+ 
+      if ( searchOn.equals( "" ) ) {
+         geneData.resetSelectedProbes();
+      } else {
+         geneData.selectProbes( searchOn );
       }
       populateTables();
-      
+
    }
 }
 
@@ -302,42 +300,56 @@ class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
    }
 }
 
+// hitting enter in search also activates it.
+/** @todo hitting enter doesn't work */
+class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
+   GeneSetWizardStep2 adaptee;
+
+   public GeneSetWizardStep2_searchText_actionAdapter(
+         GeneSetWizardStep2 adaptee ) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.searchButton_actionPerformed_adapter( e );
+   }
+
+}
+
 // respond to typing in the search field.
-// todo incremental search trigger would go here.
+// todo 3.0 incremental search trigger would go here.
+
 class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
    GeneSetWizardStep2 adaptee;
-   
+
    public GeneSetWizardStep2_searchText_keyAdapter( GeneSetWizardStep2 adaptee ) {
       this.adaptee = adaptee;
-      // TODO Auto-generated constructor stub
    }
 
    public void keyPressed( KeyEvent e ) {
-      // TODO Auto-generated method stub
    }
 
    public void keyReleased( KeyEvent e ) {
-      // TODO Auto-generated method stub
    }
 
    public void keyTyped( KeyEvent e ) {
-      // TODO Auto-generated method stub
    }
 
 }
 
 // respond to search request.
+
 class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {
    GeneSetWizardStep2 adaptee;
-   
+
    public GeneSetWizardStep2_searchButton_actionAdapter(
          GeneSetWizardStep2 adaptee ) {
       this.adaptee = adaptee;
    }
-   
+
    public void actionPerformed( ActionEvent e ) {
-      adaptee.searchButton_actionPerformed_adapter(e);
+      adaptee.searchButton_actionPerformed_adapter( e );
    }
 
 }
