@@ -217,8 +217,8 @@ public class GeneAnnotations {
 
    /**
     * Add a class
-    * @param id String
-    * @param probes ArrayList
+    * @param id String class to be added
+    * @param probes ArrayList user-defined list of members.
     */
    public void addClass(String id, ArrayList probes) {
       classToProbeMap.put(id, probes);
@@ -231,19 +231,20 @@ public class GeneAnnotations {
    }
 
    /**
-    * Add a gene to a class.
-    * @param id String
-    * @param probes ArrayList
+    * Redefine a class.
+    * @param id String class to be modified
+    * @param probes ArrayList current user-defined list of members.
+    * The "real" version of the class is modified to look like this one.
     */
-   public void modifyClass(String id, ArrayList probes) {
-      ArrayList orig_probes = (ArrayList) classToProbeMap.get(id);
+   public void modifyClass(String classId, ArrayList probes) {
+      ArrayList orig_probes = (ArrayList) classToProbeMap.get(classId);
       Iterator orig_probe_it = orig_probes.iterator();
       while (orig_probe_it.hasNext()) {
          String orig_probe = new String((String) orig_probe_it.next());
          if (!probes.contains(orig_probe)) {
             HashSet ptc = new HashSet((Collection) probeToClassMap.get(
                     orig_probe));
-            ptc.remove(id);
+            ptc.remove(classId);
             probeToClassMap.remove(orig_probe);
             probeToClassMap.put(orig_probe, new ArrayList((Collection) ptc));
          }
@@ -252,10 +253,10 @@ public class GeneAnnotations {
       while (probe_it.hasNext()) {
          String probe = (String) probe_it.next();
          if (!orig_probes.contains(probe)) {
-            ((ArrayList) probeToClassMap.get(probe)).add(id);
+            ((ArrayList) probeToClassMap.get(probe)).add(classId);
          }
       }
-      classToProbeMap.put(id, probes);
+      classToProbeMap.put(classId, probes);
    }
 
    public TableModel toTableModel() {
