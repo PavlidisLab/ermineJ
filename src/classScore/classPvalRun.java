@@ -853,7 +853,6 @@ public class classPvalRun {
       final classresult res = (classresult) results.get( (String) sortedclasses.
           get(
           index));
-      ClassDetailFrame f = new ClassDetailFrame();
       String name = res.getClassName();
       final String id = res.getClassId();
       System.err.println(name);
@@ -867,47 +866,13 @@ public class classPvalRun {
          pvals.put( (String) ( (ArrayList) classToProbe.get(id)).get(i), pvalue);
       }
 
-      f.setTitle(name + " (" + values.size() + " items)");
-
       if (values == null) {
          throw new RuntimeException("Class data retrieval error for " + name);
       }
 
-      f.setModel(new AbstractTableModel() {
-
-         private String[] columnNames = {
-             "Probe", "P value", "Name", "Description"};
-
-         public String getColumnName(int i) {
-            return columnNames[i];
-         }
-
-         public int getRowCount() {
-            return values.size();
-         }
-
-         public int getColumnCount() {
-            return 4;
-         }
-
-         public Object getValueAt(int i, int j) {
-            switch (j) {
-               case 0:
-                  return (String) ( (ArrayList) classToProbe.get(id)).get(i);
-               case 1:
-                  return new Double(nf.format(pvals.get( (String) ( (ArrayList)
-                      classToProbe.get(id)).get(i))));
-               case 2:
-                  return geneData.getProbeGeneName( (String) ( (ArrayList)
-                      classToProbe.get(id)).get(i));
-               case 3:
-                  return geneData.getProbeDescription( (String) ( (ArrayList)
-                      classToProbe.get(id)).get(i));
-               default:
-                  return "";
-            }
-         }
-      });
+      // create the details frame
+      ClassDetailFrame f = new ClassDetailFrame( values, pvals, classToProbe, id, nf, geneData );
+      f.setTitle(name + " (" + values.size() + " items)");
       f.show();
    }
 
