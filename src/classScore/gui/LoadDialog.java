@@ -106,8 +106,7 @@ public class LoadDialog
    }
 
    void loadButton_actionPerformed( ActionEvent e ) {
-      Settings loadSettings = new Settings(loadFile.getText());
-      callingframe.startAnalysis(loadSettings);
+      callingframe.loadAnalysis(loadFile.getText());
       dispose();
    }
 

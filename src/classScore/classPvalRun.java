@@ -26,7 +26,7 @@ import classScore.gui.geneSet.JGeneSetFrame;
 /**
  * Main class to make 'experiment score' pvalues. Includes multiple test
  * correction. Created :09/02/02
- * 
+ *
  * @author Shahmil Merchant; Paul Pavlidis (major changes)
  * @version $Id$
  * @todo set up way to do different types of analysis
@@ -49,6 +49,42 @@ public class classPvalRun {
    GeneSetScoreStatus messenger;
 
    public classPvalRun( Settings settings, GeneAnnotations geneData,
+                        GONames goData, expClassScore probePvalMapper,
+                        String mtc_method, GeneSetScoreStatus messenger,
+                        Map results) {
+       this.settings = settings;
+       this.messenger = messenger;
+       this.probePvalMapper = probePvalMapper;
+       this.geneData = geneData;
+       this.goData = goData;
+       this.results = results;
+       sortResults();
+
+       // get the class sizes.
+       GeneSetSizeComputer csc = new GeneSetSizeComputer( probePvalMapper,
+             geneData, settings.getUseWeights());
+       csc.getClassSizes();
+
+       messenger.setStatus( "Multiple test correction..." );
+       MultipleTestCorrector mt = new MultipleTestCorrector( settings,
+             sortedclasses, probePvalMapper, hist, geneData, csc, results );
+       if ( mtc_method.equals( "bon" ) ) {
+          mt.bonferroni();
+       } else if ( mtc_method.equals( "bh" ) ) {
+          mt.benjaminihochberg( 0.05 );
+       } else if ( mtc_method.equals( "wy" ) ) {
+          mt.westfallyoung( 10000 );
+       }
+
+       // For table output
+       for ( int i = 0; i < sortedclasses.size(); i++ ) {
+          ( ( GeneSetResult ) results.get( ( String ) sortedclasses.get( i ) ) )
+                .setRank( i + 1 );
+       }
+       messenger.setStatus( "Done!" );
+   }
+
+   public classPvalRun( Settings settings, GeneAnnotations geneData,
          GONames goData, expClassScore probePvalMapper, String mtc_method,
          GeneSetScoreStatus messenger ) throws IllegalArgumentException,
          IOException {
@@ -60,20 +96,20 @@ public class classPvalRun {
 
       nf.setMaximumFractionDigits( 8 );
       results = new LinkedHashMap();
-      
+
       // get the class sizes.
       GeneSetSizeComputer csc = new GeneSetSizeComputer( probePvalMapper,
             geneData, settings.getUseWeights());
       csc.getClassSizes();
-      
+
       Map input_rank_map;
       if ( settings.getUseWeights()  ) {
          input_rank_map = Rank.rankTransform( probePvalMapper
                .get_group_pval_map() );
-      } else {     
+      } else {
          input_rank_map = Rank.rankTransform( probePvalMapper.get_map() );
       }
-     
+
       if ( settings.getAnalysisMethod() == Settings.RESAMP ) {
       //   if ( !useUniform ) {
             messenger.setStatus( "Starting resampling" );
@@ -89,7 +125,7 @@ public class classPvalRun {
          results = pvg.getResults();
       } else if ( settings.getAnalysisMethod() == Settings.ORA ) {
          Collection inp_entries = probePvalMapper.get_map().entrySet();
-         
+
          messenger.setStatus("Starting ORA analysis");
          int inputSize = input_rank_map.size();
          OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator(
@@ -123,7 +159,7 @@ public class classPvalRun {
       messenger.setStatus( "Done!" );
    }
 
-  
+
 
    /**
     * @param classID "GO:0000149" for example
@@ -165,7 +201,7 @@ public class classPvalRun {
    }
 
    /**
-    * 
+    *
     * @return Map the results
     */
    public Map getResults() {
@@ -173,15 +209,27 @@ public class classPvalRun {
    }
 
    /**
-    * 
+    *
+    * @return Map the results
+    */
+   public Vector getSortedClasses() {
+      return sortedclasses;
+   }
+
+   public GeneAnnotations getGeneData() {
+      return geneData;
+   }
+
+   /**
+    *
     * @return Settings
     */
    public Settings getSettings() {
       return settings;
    }
-   
+
    /* private methods */
-   
+
    /**
     * Sorted order of the class results - all this has to hold is the class
     * names.
@@ -196,5 +244,5 @@ public class classPvalRun {
          sortedclasses.add( ( ( GeneSetResult ) it.next() ).getClassId() );
       }
    }
-   
+
 }

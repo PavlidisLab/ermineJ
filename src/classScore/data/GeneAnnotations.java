@@ -39,6 +39,7 @@ public class GeneAnnotations {
    private Vector probeList;
    private Map probes; /** @todo this should be a Set? */
    private Vector sortedGeneSets;
+   private Map classesToRedundantMap;
 
    /**
     * This is for creating GeneAnnotations by reading from a file
@@ -56,6 +57,7 @@ public class GeneAnnotations {
       probeToGeneName = new HashMap();
       probeToDescription = new HashMap();
       geneToProbeList = new HashMap();
+      classesToRedundantMap = new HashMap();
       this.readFile( filename );
       classToGeneMap = makeClassToGeneMap();
    }
@@ -74,6 +76,7 @@ public class GeneAnnotations {
       probeToDescription = new HashMap(geneData.probeToDescription);
       geneToProbeList = new HashMap(geneData.geneToProbeList);
       probeList = new Vector(geneData.probeList);
+      classesToRedundantMap = new HashMap(geneData.classesToRedundantMap);
 
       Iterator it = probeList.iterator();
       while ( it.hasNext() ) {
@@ -261,6 +264,14 @@ public class GeneAnnotations {
     */
    public Map getProbeToClassMap() {
       return probeToClassMap;
+   }
+
+   /**
+    *
+    * @return Map
+    */
+   public Map getClassesToRedundantMap(){
+      return classesToRedundantMap;
    }
 
    /**

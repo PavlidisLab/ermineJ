@@ -32,24 +32,28 @@ public class ResultsFileReader {
          BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
 
          String line;
-         line = dis.readLine(); // ditch the header.
+         //line = dis.readLine(); // ditch the header.
          while ( (line = dis.readLine()) != null) {
             StringTokenizer st = new StringTokenizer(line, "\t");
+            String firstword = st.nextToken();
+            System.err.println(firstword);
+            if(firstword.compareTo("!")==0)
+            {
+               System.err.println("This is good");
+               String classNameMunged = st.nextToken();
+               String className = st.nextToken();
+               String classId = st.nextToken();
+               int size = Integer.parseInt(st.nextToken());
+               int effsize = Integer.parseInt(st.nextToken());
+               double score = Double.parseDouble(st.nextToken());
+               double pval = Double.parseDouble(st.nextToken());
+               //int hypercut = Integer.parseInt(st.nextToken());
+               double hyperpval = Double.parseDouble(st.nextToken());
 
-            String classNameMunged = st.nextToken();
-            String className = st.nextToken();
-            String classId = st.nextToken();
-            int size = Integer.parseInt(st.nextToken());
-            int effsize = Integer.parseInt(st.nextToken());
-            double score = Double.parseDouble(st.nextToken());
-            double pval = Double.parseDouble(st.nextToken());
-            int hypercut = Integer.parseInt(st.nextToken());
-            double hyperpval = Double.parseDouble(st.nextToken());
-
-            GeneSetResult c = new GeneSetResult(classId, className, size, effsize, score, pval,
-                                            hyperpval, 0.5, 1.0);
-            results.put(classId, c);
-
+               GeneSetResult c = new GeneSetResult(classId, className, size, effsize, score, pval,
+                   hyperpval, 0.5, 1.0);
+               results.put(classId, c);
+            }
          }
 
       }

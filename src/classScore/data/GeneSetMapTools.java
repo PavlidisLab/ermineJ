@@ -20,11 +20,6 @@ import java.util.Set;
    @version $Id$
  */
 public class GeneSetMapTools {
-//   private static Map classToProbeMap; //stores Classes->probe map
-
-   // the following are filled in by other functions.
-//   private static Map classesToRedundantMap; // stores classes->classes which are the same.
-//   private static Map classesToSimilarMap; // stores classes->classes which are similar (and therefore not considered directly)
 
    /**
     */
@@ -210,10 +205,12 @@ public class GeneSetMapTools {
       superfast, because it doesn't know which classes are actually
       relevant in the data.
     */
-   public static Map collapseClasses(Map classToProbeMap) {
+   public static void collapseClasses(GeneAnnotations geneData) {
+      Map classToProbeMap=geneData.getClassToProbeMap();
+      Map classesToRedundantMap=geneData.getClassesToRedundantMap();
+
       LinkedHashMap seenClasses = new LinkedHashMap();
       LinkedHashMap sigs = new LinkedHashMap();
-      Map classesToRedundantMap = new LinkedHashMap();
       ArrayList sortedList = null;
       Set entries = classToProbeMap.keySet();
       Iterator it = entries.iterator();
@@ -283,7 +280,6 @@ public class GeneSetMapTools {
       System.out.println( "There are now " + classToProbeMap.size() +
                           " classes represented on the chip (" + ignored +
                           " were ignored)" );
-      return classesToRedundantMap;
    }
 
    /**

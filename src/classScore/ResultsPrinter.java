@@ -19,14 +19,21 @@ public class ResultsPrinter {
    protected Vector sortedclasses;
    protected Map results;
    protected GONames goName;
-   //private ClassMap probeToClassMap;
+   protected GeneAnnotations geneData;
 
    public ResultsPrinter(String dest_file, Vector sortedclasses, Map results, GONames goName) {
       this.dest_file = dest_file;
       this.sortedclasses = sortedclasses;
       this.results = results;
       this.goName = goName;
-      //this.probeToClassMap = probeToClassMap;
+   }
+
+   public ResultsPrinter(String dest_file, classPvalRun run, GONames goName) {
+      this.dest_file = dest_file;
+      this.sortedclasses = run.getSortedClasses();
+      this.results = run.getResults();
+      this.geneData = run.getGeneData();
+      this.goName = goName;
    }
 
 
@@ -45,7 +52,7 @@ public class ResultsPrinter {
      public void printResults(boolean sort) {
         System.err.println("Beginning output");
         try {
-           BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, false));
+           BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
            boolean first = true;
            GeneSetResult res = null;
            if (sort) {
@@ -60,6 +67,7 @@ public class ResultsPrinter {
               }
            } else {
               for (Iterator it = results.entrySet().iterator(); it.hasNext(); ) {
+                 System.err.println(it.next().getClass().toString());
                  res = (GeneSetResult) it.next();
                  if (first) {
                     first = false;
@@ -84,9 +92,8 @@ public class ResultsPrinter {
       * @return String
       */
      private String format_redundant_and_similar(String classid) {
-        //ArrayList redund = GeneSetMapTools.getRedundancies(classid);    //commented just to compile (Homin)
+        ArrayList redund = GeneSetMapTools.getRedundancies(classid,geneData.getClassesToRedundantMap());    //commented just to compile (Homin)
         String return_value = "";
-/*                                                                               //commented just to compile (Homin)
         if (redund != null) {
            Iterator it = redund.iterator();
            while (it.hasNext()) {
@@ -96,9 +103,7 @@ public class ResultsPrinter {
                              goName.getNameForId(nextid) + ", ";
            }
         }
-*/
         return_value = return_value + "\t";
-
 /*
         ArrayList similar = probeToClassMap.getSimilarities(classid);           //commented just to compile (Homin)
 

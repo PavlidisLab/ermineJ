@@ -447,12 +447,14 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
    static Color spread4 = new Color(175,226,220);
    static Color spread5 = new Color(160,228,240);
    static Color modified = new Color(220,160,220);
+   private NumberFormat nf = NumberFormat.getInstance();
 
    public OutputPanelTableCellRenderer(GONames goData, LinkedList results)
    {
       super();
       this.goData=goData;
       this.results=results;
+      nf.setMaximumFractionDigits(2);
    }
 
    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -480,7 +482,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
          {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " +
-                            res.getScore() );
+                            nf.format(res.getScore()) );
 
             if(res.getPvalue_corr() == 1)
                setBackground(spread5);

@@ -15,9 +15,8 @@ import classScore.data.*;
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
  * @author not attributable
- * @version 1.0
+ * @version $Id$
  * @todo All input of custom classes, identified either by probe id or official gene name.
- * @todo (6/23/04 Homin) probePvalMapper includes too many probes (ones that don't have pvals).
  *
  */
 
@@ -134,7 +133,6 @@ public class GeneSetScoreFrame
       analysisMenu.add( saveAnalysisMenuItem );
       helpMenu.setText( "Help" );
       helpMenu.setMnemonic( 'H' );
-      helpMenu.setEnabled(false);
       helpMenuItem.setText( "Help Topics" );
       helpMenuItem.setMnemonic( 'T' );
       helpMenuItem.addActionListener( new
@@ -201,7 +199,7 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
          geneData = new GeneAnnotations(settings.getAnnotFile());
          statusMessenger.setStatus( "Initializing gene class mapping" );
-         GeneSetMapTools.collapseClasses(geneData.getClassToProbeMap());
+         GeneSetMapTools.collapseClasses(geneData);
          geneData.sortGeneSets();
          statusMessenger.setStatus("Done with setup");
          enableMenus();
@@ -267,7 +265,7 @@ public class GeneSetScoreFrame
    }
 
    void saveAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      SaveWizard swiz = new SaveWizard( this, results );
+      SaveWizard swiz = new SaveWizard( this, results, goData );
       swiz.showWizard();
    }
 
@@ -299,6 +297,12 @@ public class GeneSetScoreFrame
    public void startAnalysis(Settings runSettings)
    {
       athread.startAnalysisThread(this,runSettings,statusMessenger,goData,geneData);
+   }
+
+   public void loadAnalysis(String loadFile)
+   {
+      Settings loadSettings = new Settings(loadFile);
+      athread.loadAnalysisThread(this,loadSettings,statusMessenger,goData,geneData,loadFile);
    }
 }
 

@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.*;
 import baseCode.gui.*;
 import classScore.*;
+import classScore.data.GONames;
 
 /**
  * <p>Title: </p>
@@ -23,22 +24,24 @@ public class SaveWizard extends Wizard
    int selected_run;
    GeneSetScoreFrame callingframe;
    LinkedList rundata;
-   Thread aFrameRunner;
+   GONames goData;
    String saveFolder;
    SaveWizardStep1 step1;
    SaveWizardStep2 step2;
 
-   public SaveWizard(GeneSetScoreFrame callingframe, LinkedList rundata) {
+   public SaveWizard(GeneSetScoreFrame callingframe, LinkedList rundata, GONames goData) {
       super(callingframe,400,200);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
       this.rundata = rundata;
+      this.goData = goData;
 
       step1 = new SaveWizardStep1(this,rundata);
       this.addStep(1,step1);
       step2 = new SaveWizardStep2(this,callingframe.getSettings().getDataFolder());
       this.addStep(2,step2);
       this.setTitle("Save Analysis - Step 1 of 2");
+      finishButton.setEnabled(false);
    }
 
    void selectRun(int i)
@@ -87,13 +90,15 @@ public class SaveWizard extends Wizard
    }
 
    protected void finishButton_actionPerformed(ActionEvent e) {
-      //((classPvalRun)rundata.get(step1.getSelectedRunNum())).toFile(step2.getSaveFileName());
       classPvalRun runToSave = (classPvalRun)rundata.get(step1.getSelectedRunNum());
       Settings saveSettings=runToSave.getSettings();
-      saveSettings.setPrefFile(step2.getSaveFileName());
+      String saveFileName = step2.getSaveFileName();
+      saveSettings.setPrefFile(saveFileName);
       try
       {
          saveSettings.writePrefs();
+         ResultsPrinter rp = new ResultsPrinter(saveFileName, runToSave, goData);
+         rp.printResults(true);
       }
       catch(IOException ioe)
       {
