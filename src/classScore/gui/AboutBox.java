@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import java.awt.*;
+import baseCode.gui.JLinkLabel;
 
 /**
  * Displays 'about' information for the software.
@@ -36,6 +37,7 @@ public class AboutBox extends JDialog implements ActionListener {
    JPanel insetsPanel3 = new JPanel();
    JButton button1 = new JButton();
    JLabel labelAuthors = new JLabel();
+   JLinkLabel labelHomepage = new JLinkLabel();
    JLabel imageLabel = new JLabel();
    JLabel label1 = new JLabel();
    JLabel label2 = new JLabel();
@@ -103,6 +105,12 @@ public class AboutBox extends JDialog implements ActionListener {
       labelAuthors.setHorizontalAlignment(SwingConstants.CENTER);
       labelAuthors.setHorizontalTextPosition(SwingConstants.CENTER);
       labelAuthors.setText("Authors: Paul Pavlidis, Homin Lee and Will Braynen." );
+      
+      labelHomepage.setHorizontalAlignment(SwingConstants.CENTER);
+      labelHomepage.setHorizontalTextPosition(SwingConstants.CENTER);
+      String homepageURL = "http://microarray.cu-genome.org/ermineJ/";
+      labelHomepage.setText( homepageURL );
+      labelHomepage.setURL( homepageURL );
 
       insetsPanel3.setLayout(flowLayout1 );
       insetsPanel3.setBackground(Color.white);
@@ -127,6 +135,7 @@ public class AboutBox extends JDialog implements ActionListener {
       insetsPanel3.add( label2, null );
       insetsPanel3.add(label3, null);
       insetsPanel3.add(labelAuthors, null);
+      insetsPanel3.add( labelHomepage, null );
 
       insetsPanel3.add(jTextPane1, null);
 
