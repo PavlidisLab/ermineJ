@@ -45,7 +45,6 @@ public class erminecmd{
 	    ugFile = getCanonical(ugFile);
 
 	    class_pvals test = new class_pvals(pbPvalFile, affyGoFile, goNameFile, destinFile, ugFile, args[5], args[6], Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]), args[12], Integer.parseInt(args[13]), args[14]);
-	    test.class_pval_generator();       
 	} catch (ArrayIndexOutOfBoundsException exception) {
 	    System.err.println("You must enter 15 command line arguments: \nprobe_pvalfile\naffy_gofile\ngo_namefile\ngroups file\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog");
 	}

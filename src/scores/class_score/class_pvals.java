@@ -1,9 +1,8 @@
 package scores.class_score;
 /******************************************************************************
   Author :Shahmil Merchant
-  Version :1.0
   Created :09/02/02
-  Revision History: none
+  Revision History: $Id$
   Description:calculates the raw pvals using a background distribution
 
                                                                                                                                                             
@@ -14,13 +13,13 @@ import java.util.*;
 import java.lang.reflect.*;
 
 /*****************************************************************************************/
-public class class_pvals {
 /*****************************************************************************************/
+
+public class class_pvals {
     private histogram hist ;
     private Map probe_go;
     private Map go_probe;
     private Map go_name;
-    //    private Map ug_name;
     private Map probe_ug;
     private Map ug_pval_map;
     private exp_class_scores probe_pval;
@@ -30,9 +29,9 @@ public class class_pvals {
     private String dest_file;
     private boolean weight_on = true;
     private boolean dolog = true;
+    private LinkedHashMap results = null;
 
-    // command line arguments in the following way
-    // pval_file,affy_go_file,Go_name_file,destination_file,ug_file,method,groupMethod,class_max_size,class_min_size,number of runs,quantile, p-value, weightcheck
+
     public static void main (String[] args) {
 	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],args[6],Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]),args[12], Integer.parseInt(args[13]), args[14]);
 	test.class_pval_generator();
@@ -52,11 +51,11 @@ public class class_pvals {
 	probe_ug = new LinkedHashMap();
 	ug_pval_map = new LinkedHashMap();
 
-	probe_go = affy_go.get_affy_map(); //probe go map
-	go_probe = affy_go.get_go_map(); //go probe map
-	go_name = goName.get_GoName_map(); //go name map
+	probe_go = affy_go.get_affy_map(); //probe to go map
+	go_probe = affy_go.get_go_map(); //go probe map to go.
+	go_name = goName.get_GoName_map(); //go id to name map 
 	//	ug_name = ugName.get_chip_map(); //ug map (chip_repeat_val) todo: this isn't used anywhere.??
-	user_pvalue = -(Math.log(pval)/Math.log(10));//user defined pval (cutoff)
+	user_pvalue = -(Math.log(pval)/Math.log(10));//user defined pval (cutoff) for hypergeometric TODO: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
 	weight_on =(Boolean.valueOf(wt_check)).booleanValue();
 	dolog = (Boolean.valueOf(dolog_check)).booleanValue();
 
@@ -88,11 +87,20 @@ public class class_pvals {
 
 	//calculate random classes
 	hist = probe_pval.random_class_generator();
+
+	// initialize the results data structure.
+	results = new LinkedHashMap();
+
+	// calculate the actual class scores.
+	class_pval_generator();
+
+	// print the results.
+	class_pval_print();
     }
     
 
     /*****************************************************************************************/
-    // use the objects created from constructor
+    // Generate a complete set of class results.
     /*****************************************************************************************/
     public void class_pval_generator()
     {
@@ -134,224 +142,227 @@ public class class_pvals {
 	//to store each class number
 	Map class_list = new LinkedHashMap();
 	Matrix M= new Matrix((probe_pval.get_class_max_size()-probe_pval.get_class_min_size() +1),hist.get_number_of_bins());
+
+
 	M = hist.get_matrix();
 
 	class_list=hist.get_matrix_map(); // list of all class sizes.
+	
+	// get each class values at a time and iterate through each value and calulate
+	while(it.hasNext()) { // for each class.
+	    Map.Entry e = (Map.Entry)it.next(); // next class.
+	    String class_name = (String)e.getKey(); 
+	    //		System.err.println(class_name);
+	    
+	    ArrayList values =(ArrayList)e.getValue();  // items in the class.
+	    Iterator I = values.iterator();
+	    
+	    //variables for calculations
+	    Map record = new HashMap(); // to record those unigenes that have been used
+	    Map target_ranks = new HashMap();
+	    double[] ugPvalArr = new double[values.size()];
+	    int above_pval_counter = 0;
+	    int below_pval_counter = 0;
+	    double weight =0.0;
+	    double raw_score=0.0;
+	    double total =0.0;
+	    int n1 = 0;
+	    int n2 = 0;      //inputs for hypergeometric distribution
+	    
+	    //variables for outputs
+	    int size =0;
+	    int v_size =0;
+	    double pval=0.0;
+	    double rawscore=0.0;
+	    double hyper_pval = -1.0;
+	    double area_under_roc = 0.0;
+	    double roc_pval = 0.0;
+	    
+	    while(I.hasNext()){ // foreach item in the class.
+		String element = (String)I.next();  // probe id
+		if (element !=null){
+		    if(chips.containsKey(element)){ // if it is in the data set. pp: todo This seems inconsistent with the choice of inp_entries?
+			size++;
+			
+			if (weight_on == true) { //routine for weights
+			    
+			    //compute pval for every unigene class
+			    Object ugpval = ug_pval_map.get(probe_ug.get(element)); // probe -> ug
+			    if (ugpval != null) {  
+				if(!record.containsKey(probe_ug.get(element))){ // if we haven't done this probe already.
+				    record.put(probe_ug.get(element), null); // mark it as done.
+				    ugPvalArr[v_size] = Double.parseDouble(ugpval.toString()); // pval of one unigene in the class. This is only used by the quantile methods.
+				    
+				    total += ugPvalArr[v_size];
+				    
+				    if(ugPvalArr[v_size] >= user_pvalue) { // part of the hypergeometic calc.
+					n1++;
+				    } else {
+					n2++;
+				    }
+				    v_size++; // this is used in any case.
+				    }
+			    }
+			    
+			    //for aroc
+			    Object ranking = input_rank_map.get(probe_ug.get(element)); // rank of this probe.
+			    if (ranking!=null){
+				target_ranks.put(ranking, null); // ranks of items in this class.
+			    }
+			} else {//no weights
+			    if(method.equals("MEAN_METHOD")){
+				raw_score = probe_pval.get_value_map(element);
+				//get value from map and calcualte total
+				if(Double.toString(raw_score) != null){
+				    total += raw_score;
+				} 
+			    }
+			    
+			    //compute pval for every GO class
+			    Object pbpval = chips.get(element);
+			    if(pbpval != null){
+				double pb_pvalue = Double.parseDouble(pbpval.toString()); //pval of one unigene in the class
+				if(pb_pvalue >= user_pvalue){
+				    n2++;
+				} else {
+				    n1++;
+				}
+			    }
+			    //for roc
+			    Object ranking = input_rank_map.get(element);
+			    if(ranking!=null){
+				target_ranks.put(ranking, null);
+			    }
+			} // weights...
+		    }
+		} // end of null check
+	    } // end of while I has next. - over items in the class.
+	    
+	    int in_size = weight_on? v_size : size;
+	    
+	    if (in_size < probe_pval.get_class_min_size() || in_size > probe_pval.get_class_max_size() ) {
+		//		    System.err.println("Skipping class size " + in_size);
+		continue;
+	    }
+	    
+	    int binnum = 0; // I put this here so it remains in scope for error messages following this block. pp
+	    
+	    if(in_size != 0) {
+		
+		if(method.equals("MEAN_METHOD"))
+		    rawscore=total/in_size;
+		
+		else if( method.equals("QUANTILE_METHOD") ) {
+		    double fract = (double)probe_pval.get_quantile()/100.0;
+		    int index = (int)Math.floor( fract*in_size );
+		    double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   // **wrong when weight_on == false ** todo -- PP figure out what this means.
+		    rawscore =  Stats.calculate_quantile(index,pvalArr,in_size);            	
+		} else if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")) {
+		    double fract = (double)probe_pval.get_quantile()/100.0;
+		    int index = (int)Math.floor( fract*in_size );
+		    double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   
+		    rawscore =  Stats.calculate_mean_above_quantile(index,pvalArr,in_size);            	
+		} else {
+		}
+		
+		if (rawscore < hist.get_hist_range() && rawscore > hist.get_hist_min() ) {
+		    
+		    int row =  hist.class_index(in_size, probe_pval.get_class_min_size());
+		    binnum = (int)Math.floor((rawscore - hist.get_hist_min()) / (double)hist.get_bin_size());
+		    
+		    if (binnum < 0) 
+			binnum = 0;
+		    
+		    if (binnum > (hist.get_hist_range() - hist.get_hist_min())/hist.get_bin_size()) // todo: calculate this only once.
+			binnum = (int)Math.floor(hist.get_hist_range()/hist.get_bin_size());
+		    
+		    // todo: the need for this check is indicative of a problem
+		    if (row > M.get_num_rows() - 1 || binnum > M.get_num_cols() - 1) {
+			System.err.println("Warning, a rawscore yielded a bin number which was out of the range: Classname: " + class_name + " row: " + row + " bin number: " + binnum);
+			continue;
+		    }
+		    
+		    pval = M.get_matrix_val(row, binnum);
+		    
+		    if (class_name.equals("GO:0006783")) {
+			//						    System.err.println(class_name + ": " + "binnum: " + binnum + " pval: " + pval + " row: " + row + " rawscore: " + rawscore + " class size: " + v_size + " bin size" + (double)hist.get_bin_size() + " hist min: " + hist.get_hist_min() );
+		    }
+		    
+		} else {
+		    System.err.println("Warning, a raw score (" + rawscore + ", " + class_name + ") out of the histogram range was encountered ");
+		    pval = -1.0;
+		}
+		
+		area_under_roc = Stats.arocRate(inputSize, target_ranks);
+		roc_pval = Stats.rocpval(target_ranks, area_under_roc); 
+		hyper_pval = Stats.hyperPval(N1, n1, N2, n2);
+	    }
+	    
+	    if(pval == 0.0)
+		pval = minPval;
+	    
+	    if (Double.isNaN(pval))
+		System.err.println("Warning, a pvalue was not a number (raw score = " + rawscore + ", virtual class size = " + in_size + ", " + "binnum: " + binnum + ", " + class_name +  ")");
+	    
+	    String classname = goName.get_GoName_value_map(class_name); // actual name, e.g. 'protein kinase'
+	    String fixnamea;
+	    String name;
+	    if (classname != null) {
+		fixnamea = classname.replace(' ', '_'); // make the format compatible with the perl scripts Paul wrote.
+		name = fixnamea.replace(':', '-'); // todo: figure out why this doesn't work.
+	    } else {
+		name = "";
+	    }
+	    
+	    if (weight_on == false) {
+		v_size = size;
+	    }
+
+	    // add the results to the hashmap.
+	    // First insert this class if it doesn't exist.
+	    classresult res;
+	    if (!results.containsKey(name)) {
+		results.put(name, new classresult(class_name, name, size, v_size));
+	    }
+
+	    res = (classresult)results.get(name);
+	    res.setscore(rawscore);
+	    res.setpval(pval);
+	    res.sethyperp(hyper_pval);
+	    res.setaroc(area_under_roc);
+	    res.setarocp(roc_pval);
+
+	} // end of while it has next (classes)
+	System.err.println("inputSize is "+ inputSize);
+    } /* class_pval_generator */
+
+
+    /* print the results */
+    public void class_pval_print ()
+    {
 	try {
 	    BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, false));
-
-	    // headings
-	    out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "virtual_size" + "\t" + "hyper pval" + "\t" + "aroc rate" + "\t" + "rocpval" + "\n");
-
-	    // get each class values at a time and iterate through each value and calulate
-	    while(it.hasNext()) { // for each class.
-		Map.Entry e = (Map.Entry)it.next();
-		String class_name = (String)e.getKey();
-		//		System.err.println(class_name);
-
-		ArrayList values =(ArrayList)e.getValue();  // items in the class.
-		Iterator I = values.iterator();
-		
-		//variables for claculations
-		Map record = new HashMap(); // to record those unigenes that have been used
-		Map target_ranks = new HashMap();
-		double[] ugPvalArr = new double[values.size()];
-		int above_pval_counter = 0;
-		int below_pval_counter = 0;
-		double weight =0.0;
-		double raw_score=0.0;
-		double total =0.0;
-		int n1 = 0;
-		int n2 = 0;      //inputs for hypergeometric distribution
-		
-		//variables for outputs
-		int size =0;
-		int v_size =0;
-		double pval=0.0;
-		double rawscore=0.0;
-		double hyper_pval = -1.0;
-		double area_under_roc = 0.0;
-		double roc_pval = 0.0;
-
-		while(I.hasNext()){ // foreach item in the class.
-		    String element = (String)I.next();  // probe id
-		    if (element !=null){
-			if(chips.containsKey(element)){ // if it is in the data set. pp: todo This seems inconsistent with the choice of inp_entries?
-			    size++;
-			    
-			    if (weight_on == true) { //routine for weights
-				/*
-				if(method.equals("MEAN_METHOD")){
-				    ArrayList chip_list = new ArrayList();
-				    chip_list = ugName.get_chip_value_map(element); // list of repeat members.
-
-
-				    if (chip_list == null) {
-					// probably this is because there are no replicates. todo: this is a bug work around.
-					weight = 1;
-				    } else if (chip_list.isEmpty()) {
-					weight = 1;
-				    } else {
-					weight = 1/(double)(chip_list.size() + 1 ); // weight per member of this group. todo: BUG This is not the right size if the data set is not complete.
-        			    }
-				    
-
-				    
-				    raw_score =  probe_pval.get_value_map(element); // raw score of the probe, not of the class.
-				    //get value from map and calcualte total
-				    if(Double.toString(raw_score) !=null) {
-					total +=  raw_score*weight;
-				    }
-
-				    // debug: test class.
-				    if (class_name.equals("GO:0006783")) {
-					//	System.err.println(element + "\t" + weight + "\t" +  raw_score + "\t" +  total );
-				    }
-
-				}*/
-
-        			//compute pval for every unigene class
-				Object ugpval = ug_pval_map.get(probe_ug.get(element)); // probe -> ug
-				if (ugpval != null) {  
-				    if(!record.containsKey(probe_ug.get(element))){ // if we haven't done this probe already.
-					record.put(probe_ug.get(element), null); // mark it as done.
-					ugPvalArr[v_size] = Double.parseDouble(ugpval.toString()); // pval of one unigene in the class. This is only used by the quantile methods.
-					
-					total += ugPvalArr[v_size];
-					
-					if(ugPvalArr[v_size] >= user_pvalue) { // part of the hypergeometic calc.
-					    n1++;
-					} else {
-					    n2++;
-					}
-					v_size++; // this is used in any case.
-				    }
-				}
-				
-				//for aroc
-				Object ranking = input_rank_map.get(probe_ug.get(element)); // rank of this probe.
-				if (ranking!=null){
-				    target_ranks.put(ranking, null); // ranks of items in this class.
-				}
-			    } else {//no weights
-				if(method.equals("MEAN_METHOD")){
-				    raw_score = probe_pval.get_value_map(element);
-				    //get value from map and calcualte total
-				    if(Double.toString(raw_score) != null){
-					total += raw_score;
-				    } 
-				}
-				
-				//compute pval for every GO class
-				Object pbpval = chips.get(element);
-				if(pbpval != null){
-				    double pb_pvalue = Double.parseDouble(pbpval.toString()); //pval of one unigene in the class
-				    if(pb_pvalue >= user_pvalue){
-					n2++;
-				    } else {
-					n1++;
-				    }
-				}
-				//for roc
-				Object ranking = input_rank_map.get(element);
-				if(ranking!=null){
-				    target_ranks.put(ranking, null);
-				}
-			    } // weights...
-			}
-		    } // end of null check
-		} // end of while I has next. - over items in the class.
-		
-		int in_size = weight_on? v_size : size;
-		
-		if(in_size < probe_pval.get_class_min_size() || in_size > probe_pval.get_class_max_size()) {
-		    //		    System.err.println("Skipping class size " + in_size);
-		    continue;
+	    boolean first = true;
+	    for (Iterator i=results.entrySet().iterator(); i.hasNext(); ) {
+		Map.Entry e = (Map.Entry) i.next();
+		classresult res = (classresult)e.getValue();
+		if (first) {
+		    first = false;
+		    res.print_headings(out);
 		}
-
-		int binnum = 0; // I put this here so it remains in scope for error messages following this block. pp
-		
-		if(in_size != 0) {
-
-		    if(method.equals("MEAN_METHOD"))
-			rawscore=total/in_size;
-		    
-		    else if( method.equals("QUANTILE_METHOD") ) {
-			double fract = (double)probe_pval.get_quantile()/100.0;
-			int index = (int)Math.floor( fract*in_size );
-			double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   // **wrong when weight_on == false ** todo -- PP figure out what this means.
-			rawscore =  Stats.calculate_quantile(index,pvalArr,in_size);            	
-		    } else if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")) {
-			double fract = (double)probe_pval.get_quantile()/100.0;
-			int index = (int)Math.floor( fract*in_size );
-			double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   
-			rawscore =  Stats.calculate_mean_above_quantile(index,pvalArr,in_size);            	
-		    } else {
-		    }
-
-		    if (rawscore < hist.get_hist_range() && rawscore > hist.get_hist_min() ) {
-
- 			int row =  hist.class_index(in_size, probe_pval.get_class_min_size());
-			binnum = (int)Math.floor((rawscore - hist.get_hist_min()) / (double)hist.get_bin_size());
-
-			if (binnum < 0) 
-			    binnum = 0;
-
-			if (binnum > (hist.get_hist_range() - hist.get_hist_min())/hist.get_bin_size()) // todo: calculate this only once.
-			    binnum = (int)Math.floor(hist.get_hist_range()/hist.get_bin_size());
-
-			// todo: the need for this check is indicative of a problem
-			if (row > M.get_num_rows() - 1 || binnum > M.get_num_cols() - 1) {
-			    System.err.println("Warning, a rawscore yielded a bin number which was out of the range: Classname: " + class_name + " row: " + row + " bin number: " + binnum);
-			    continue;
-			}
-
-			pval = M.get_matrix_val(row, binnum);
-
-						if (class_name.equals("GO:0006783")) {
-						    //						    System.err.println(class_name + ": " + "binnum: " + binnum + " pval: " + pval + " row: " + row + " rawscore: " + rawscore + " class size: " + v_size + " bin size" + (double)hist.get_bin_size() + " hist min: " + hist.get_hist_min() );
-						}
-
-
-		    } else {
-			System.err.println("Warning, a raw score (" + rawscore + ", " + class_name + ") out of the histogram range was encountered ");
-			pval = -1.0;
-		    }
-		    
-		    area_under_roc = Stats.arocRate(inputSize, target_ranks);
-		    roc_pval = Stats.rocpval(target_ranks, area_under_roc); 
-		    hyper_pval = Stats.hyperPval(N1, n1, N2, n2);
-		}
-		
-		if(pval == 0.0)
-		    pval = minPval;
-		
-		if (Double.isNaN(pval))
-		    System.err.println("Warning, a pvalue was not a number (raw score = " + rawscore + ", virtual class size = " + in_size + ", " + "binnum: " + binnum + ", " + class_name +  ")");
-
-		String classname = goName.get_GoName_value_map(class_name);
-		String fixnamea;
-		String name;
-		if (classname != null) {
-		    fixnamea = classname.replace(' ', '_'); // make the format compatible with the perl scripts Paul wrote.
-		    name = fixnamea.replace(':', '-'); // todo: figure out why this doesn't work.
-		} else {
-		    name = "";
-		}
-
-		if (weight_on == false) {
-		    v_size = size;
-		}
-		//todo: make column order compatible with the perl scripts.
-		out.write(name +"_" + class_name + "" + "\t" + size + "\t" + rawscore + "\t" + pval + "\t" + v_size + "\t" + hyper_pval + "\t" + area_under_roc + "\t" + roc_pval +"\n");
-
-	    } // end of while it has next (classes)
+		res.print(out);
+	    }
 	    out.close();
 	} catch (IOException e) {
 	    System.err.println("There was an IO error");
 	    ; // todo: do something
 	}
-	System.err.println("inputSize is "+ inputSize);
+
+
     }
-}
+
+    
+    
+
+} /* class_pvals */
 

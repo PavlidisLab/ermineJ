@@ -1,8 +1,7 @@
 #******************************************************************************
 #  Author :Shahmil Merchant
-#  Version :1.0
 #  Created :09/02/02
-#  Revision History: none
+#  Revision History: $Id$
 #  Description:MakeFile
 #  
 #                                                                                                                                                            
@@ -36,7 +35,8 @@ DOCTITLE = 'Class Scores<sup><font size="-2">TM</font></sup> v1.4 API Specificat
 HEADER = '<b>CLASS_SCORES</b><br><font size="-1">Columbia</font>'
 BOTTOM = '<font size="-1"><a href="mailto:pp175@columbia.edu">Submit a bug or feature request</a><br><br>Class Score is the propriety of Columbia Genome Center<br>Copyright 2002 Columbia Genome Center,<br>NY, U.S.A.All Rights Reserved.</font>'
 
-all: clean class_score 
+#all: clean class_score 
+all: class_score 
 
 run: runner
 
@@ -46,6 +46,7 @@ etags:	\
 	etags *.java scores/class_score/*.java
 
 class_score:  \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/classresult.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/affy_go_Parse.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_correls.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_pvals.class  \
@@ -64,6 +65,7 @@ class_score:  \
         ${OUTPUTDIR}/erminecmd.class
 
 CLASS_FILES= \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/classresult.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/affy_go_Parse.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_correls.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_pvals.class  \

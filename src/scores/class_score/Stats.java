@@ -1,9 +1,8 @@
 package scores.class_score;
 /******************************************************************************
   Author :Shahmil Merchant
-  Version :1.0
   Created :09/02/02
-  Revision History: none
+  Revision History: $Id$
   Description:Has mathematical functions 
                                                                                                                                                             
 *******************************************************************************/

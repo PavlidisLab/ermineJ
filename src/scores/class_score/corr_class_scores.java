@@ -1,9 +1,8 @@
 package scores.class_score;
 /******************************************************************************
   Author :Shahmil Merchant
-  Version :1.0
   Created :09/02/02
-  Revision History: none
+  Revision History: $Id$
   Description:Create background distribution of class correlation where the class correlation is the average pairwise correlation between the vectors in the class
    
 *******************************************************************************/

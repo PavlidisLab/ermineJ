@@ -1,9 +1,8 @@
 package scores.class_score;
 /******************************************************************************
   Author :Shahmil Merchant
-  Version :1.0
   Created :09/02/02
-  Revision History: none
+  Revision History: $Id$
   Description:Front end GUI for class scores
                                                                                                                                                             
 *******************************************************************************/
@@ -1000,7 +999,7 @@ public class Class_Frame extends JPanel {
 		timer.start();
 		timeCounter.start();
 		class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,groupMethod,maxField1,minField1,numField1,quantileField1,pVal1, weight_boolean, pvalcolumn, dolog_boolean);
-		test.class_pval_generator();
+		//		test.class_pval_generator(); // this does the work. This should not be here.
 		timeCounter.stop();
 		timer.stop();
 		frame.setVisible(false);

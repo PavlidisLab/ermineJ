@@ -1,9 +1,8 @@
 package scores.class_score;
 /******************************************************************************
   Author :Shahmil Merchant
-  Version :1.0
   Created :09/02/02
-  Revision History: none
+  Revision History: $Id$
   Description:Stores information relevent to a histogram
 
                                                                                                                                                             
@@ -31,8 +30,8 @@ public class histogram {
     private int column = 0;
     private Matrix M = null;
     private Map list;
-   
-/*****************************************************************************************/
+
+    /*****************************************************************************************/
     /*****************************************************************************************/
     public histogram(){}
 
@@ -90,7 +89,7 @@ public void set_hist_min(double histmin)
 
     {
 	number_of_bins =(int)((hist_max-hist_min)/(double)bin_size);
-	System.err.println("There are " + number_of_bins + " bins in the histogram");
+	System.err.println("There are " + number_of_bins + " bins in the histogram. The maximum possible value is " + hist_max + ", the minimum is " + hist_min + ".");
     }
 
 
