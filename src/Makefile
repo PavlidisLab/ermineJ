@@ -47,6 +47,7 @@ tags: *.java
 class_score:  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/classresult.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/ClassMap.class  \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/geneNpval.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_correls.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/exp_class_scores.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_pvals.class  \
@@ -64,6 +65,7 @@ class_score:  \
 CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/classresult.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/ClassMap.class  \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/geneNpval.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_correls.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_pvals.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/ConstantStuff.class  \

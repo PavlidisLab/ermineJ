@@ -498,7 +498,7 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
     public static LinkedHashMap rankOf(Map m){
 	int counter = 0;
 	LinkedHashMap result = new LinkedHashMap();
-	gene_pval[] pvalArray = new gene_pval[m.size()];
+	geneNpval[] pvalArray = new geneNpval[m.size()];
 	Collection entries = m.entrySet();
 	Iterator itr = entries.iterator();
 
@@ -508,7 +508,7 @@ public class Stats implements Cloneable, ConstantStuff// mathematical calculatio
 	    Map.Entry tuple = (Map.Entry)itr.next();
 	    String key = (String)tuple.getKey();
 	    double val = (double)(((Double)tuple.getValue()).doubleValue());   //  Double.parseDouble((tuple.getValue()).toString());
-	    pvalArray[counter] = new gene_pval(key, val);
+	    pvalArray[counter] = new geneNpval(key, val);
 	    counter++;
 	}
 	
