@@ -1,0 +1,93 @@
+scores.class_scores README
+Copyright (C) 2002, Columbia Genome Center
+Author:       Shahmil Merchant, Paul Pavlidis
+Version:      1.0
+Release date: December 16, 2002
+
+The scores.class_scores is a package which enables one to study
+different gene functional classes and their importance on the basis of
+their pvals.These pvals are calculated using 2 algorithms using
+experiment scores and correlation scores.
+
+Contacting us
+-----------
+  Updates, announcements, and other information can be obtained from
+  Paul Pavlidis at http://microarray.cpmc.columbia.edu/pavlidis/.
+
+Archive Contents:
+-----------
+If you have downloaded the source distribution, your archive will contain
+the following files:
+
+  src/	         - source files.
+
+  bin/               - class files.
+
+  src/Makefile	         - makefile for Class_Scores.
+  
+  data/                  - data files for pvals ,genes ,classes etc.
+  
+  README                 - This File.	
+
+src/ contains the following files:
+ 
+affy_go_Parse.java       - This file parses the Affymetrix chips and their 
+                           corresponding GOiD's.
+
+class_correls.java       - Generates raw average class correlations from 
+                           a matrix file and then converted to pvalues.
+
+class_pvals.java         - Generates raw class scores from pvals and then
+                           converted to pvalues.
+
+ConstantStuff.java       - Define constant variables for Gaussian functions
+                           (deprecated).
+
+corr_class_scores.java   - Generates background distribution of class 
+                           correlation scores.
+
+exp_class_scores.java    - Generates background distribution from randomly 
+                           selected individual gene scores.
+ 
+histogram.java           - Stores histogram for each class.
+
+Matrix.java              - Matrix handling methods for handling data.
+
+Pval_parse.java          - Parse the Pvalue file to store respective Pvalues.
+
+Stats.java               - Various Mathematical functions/tools.
+
+testcomparator.java      - Overides Java compare method used in Array.sort().
+
+Ug_Parse.java            - Parses UnigeneID file to get chips with repeats.
+
+goName_parse.java        - Parses GoID's file with biological names.
+
+Class_Frame.java         - Constructs the front-end GUI and event handling.
+
+Final_Project.java       - Program that instantiates the GUI.
+
+
+Building the sources:
+-----------
+
+  If you have downloaded the source distribution, you may want to build your
+  own version of Class_Scores from modified sources. The makefile provides 
+  build options using unix make.The make options are:
+
+  make  	         - Rebuilds the package,
+			
+  make clean	         - Erases all compiled classes and files ending in ~.
+
+  make docs	         - Builds javadocs for the Class_Scores classes.
+
+  make run               - Runs executable.
+
+Revision History:
+-----------
+none
+  
+How to report bugs:
+-----------
+Contact Paul Pavlidis(pp175@columbia.edu)
+

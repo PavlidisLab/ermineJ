@@ -86,10 +86,8 @@ runner: ${CLASS_FILES}
 	${JAVA} ${RUN_OPTIONS} -classpath ${CLASSPATH} scores.class_score.Final_Project
 
 
-
-
 doc:
-	javadoc -d docs -windowtitle ${WINDOWTITLE} -doctitle ${DOCTITLE} -header ${HEADER} -bottom ${BOTTOM} -classpath ${CLASSPATH} -sourcepath ${SOURCEPATH} ${PACKAGES}
+	javadoc -d ${DOCDIR} -windowtitle ${WINDOWTITLE} -doctitle ${DOCTITLE} -header ${HEADER} -bottom ${BOTTOM} -classpath ${CLASSPATH} -sourcepath ${SOURCEPATH} ${PACKAGES}
 
 clean:
 	find ./ -name "*~" -exec rm {} \;
