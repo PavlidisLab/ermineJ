@@ -537,6 +537,7 @@ class OutputTableModel extends AbstractTableModel {
    }
 
    public void removeRunData( int c ) {
+      state--;
       columnNames.remove( c );
       System.err.println( "number of cols: " + columnNames.size() );
    }
