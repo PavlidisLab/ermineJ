@@ -33,10 +33,10 @@ public class class_pvals {
 
     // command line arguments in the following way
     // pval_file,affy_go_file,Go_name_file,destination_file,ug_file,method,class_max_size,class_min_size,number of runs,quantile, p-value, weightcheck
-  public static void main (String[] args) {
-      class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],Integer.parseInt(args[6]),Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]), Double.parseDouble(args[10]),args[11]);
-      test.class_pval_generator();
-     }
+    public static void main (String[] args) {
+	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],Integer.parseInt(args[6]),Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]), Double.parseDouble(args[10]),args[11]);
+	test.class_pval_generator();
+    }
      
 
 
@@ -112,13 +112,13 @@ public class class_pvals {
 
 	class_list=hist.get_matrix_map();
  try {
-        BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
-	if (weight_on == false){
-	   out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "hyper pval" + "\t" + "aroc rate" + "\t" +"\n");
-	} else {
-	   out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "virtual_size" + "\t" + "hyper pval" + "\t" + "aroc rate" + "\t" + "\n");
-	}
-	//get each class values at a time and iterate through each value and calulate
+     BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
+     if (weight_on == false){
+	 out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "hyper pval" + "\t" + "aroc rate" +  "\t" + "rocpval" + "\n");
+     } else {
+	 out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "virtual_size" + "\t" + "hyper pval" + "\t" + "aroc rate" + "\t" + "rocpval" + "\n");
+     }
+     //get each class values at a time and iterate through each value and calulate
 	while(it.hasNext()) {
 	    Map.Entry e = (Map.Entry)it.next();
 	    String class_name = (String)e.getKey();
@@ -144,6 +144,7 @@ public class class_pvals {
 	    double rawscore=0.0;
 	    double hyper_pval = -1.0;
 	    double area_under_roc = 0.0;
+	    double roc_pval = 0.0;
 	    
 	    while(I.hasNext()){
 		String element = (String)I.next();  //store probe id
@@ -234,11 +235,13 @@ public class class_pvals {
                   rawscore=total/in_size;
                   
                area_under_roc = Stats.arocRate(inputSize, target_ranks);		    
-               
+               roc_pval = Stats.rocpval(target_ranks, area_under_roc);
+	       
+
                if(method.equals("QUANTILE_METHOD")){
 		    double fract = (double)probe_pval.get_quantile()/100.0;
     		    int index = (int)Math.floor( fract*in_size );
-    		    double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   // **wrong when weight_on == false **
+    		    double[] pvalArr = weight_on ? ugPvalArr : probe_pval.get_pvals();   // **wrong when weight_on == false ** todo
 		    rawscore =  Stats.calculate_quantile(index,pvalArr,in_size);            	
 	       }
                if (rawscore <hist.get_hist_range()) {
@@ -260,13 +263,13 @@ public class class_pvals {
                pval = minPval;
               
             if (weight_on == true) { 
-                out.write(goName.get_GoName_value_map(class_name) +"(" + class_name + ")" + "\t" + size + "\t" + rawscore + "\t" +pval + "\t" + v_size + "\t"+ hyper_pval + "\t" + area_under_roc + "\n");
+                out.write(goName.get_GoName_value_map(class_name) +"(" + class_name + ")" + "\t" + size + "\t" + rawscore + "\t" +pval + "\t" + v_size + "\t"+ hyper_pval + "\t" + area_under_roc + "\t" + roc_pval + "\n");
                 //out.write( size + "\t" + rawscore + "\t" +pval + "\t" + v_size + "\t"+ hyper_pval + "\t" + area_under_roc + "\t" + goName.get_GoName_value_map(class_name) + "\t" + "(" + class_name + ")" +"\n");
             } else {
-                out.write(goName.get_GoName_value_map(class_name) +"(" + class_name + ")" + "\t" + size + "\t" + rawscore + "\t" +pval + "\t" + hyper_pval + "\t" + area_under_roc +"\n");
+                out.write(goName.get_GoName_value_map(class_name) +"(" + class_name + ")" + "\t" + size + "\t" + rawscore + "\t" +pval + "\t" + hyper_pval + "\t" + area_under_roc + "\t" + roc_pval +"\n");
                 //out.write(size + "\t" + rawscore + "\t" +pval + "\t" + hyper_pval + "\t" + area_under_roc + "\t" + goName.get_GoName_value_map(class_name) +"(" + class_name + ")" + "\n");
             }
-            if(class_name.equals("GO:0000051"))System.out.println("N1=" + N1 + "  N2=" + N2 + "  n1=" + n1 + "  n2=" + n2);
+	    ///            if(class_name.equals("GO:0000051"))System.out.println("N1=" + N1 + "  N2=" + N2 + "  n1=" + n1 + "  n2=" + n2); // todo: what is this for?
 	}
 	out.close();
  } catch (IOException e) {

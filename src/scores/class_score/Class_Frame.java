@@ -130,24 +130,20 @@ public class Class_Frame extends JPanel {
 
 
     //constructor for creating initial tabbed panel calls corresponding components to display
- /*****************************************************************************************/   
+    /*****************************************************************************************/   
     public Class_Frame() {
 /*****************************************************************************************/
 	JTabbedPane tabbedPane= new JTabbedPane();
 	Component panel1 = make_Pval_Panel();
-        tabbedPane.addTab("Class_Pvals",null,panel1, "Calculates class scores using pvals");
+        tabbedPane.addTab("Gene score-based",null,panel1, "Calculates class scores using gene scores");
         tabbedPane.setSelectedIndex(0);
-
+	
         Component panel2 = make_Correl_Panel();
-        tabbedPane.addTab("Class_Correls",null,panel2, "Calculates class scores using data file");
+        tabbedPane.addTab("Gene Correlation-based",null,panel2, "Calculates class scores using gene correlations");
 
 	//Add the tabbed pane to this panel.
         setLayout(new GridLayout(1, 1)); 
         add(tabbedPane);
-
-
-
-	
     }
 
 
@@ -246,17 +242,12 @@ public class Class_Frame extends JPanel {
      panel.add(fileNameLabel4Box);
      panel.add(fileName4Box);
      panel.add(Box.createVerticalStrut(20));
-   
-    
-
     
      JLabel num = new JLabel("Number of Iterations");
      text_numField = new JTextField("10000",5);
-    
 
      panel.add(num);
      panel.add(text_numField);
-     
     
      JLabel class_max = new JLabel("Max class size");
      text_maxField = new JTextField("100",5);
@@ -274,15 +265,13 @@ public class Class_Frame extends JPanel {
      panel.add(class_min);
      panel.add(text_minField);
      
+          JLabel histogram = new JLabel("Histogram Range");
+          text_histoField = new JTextField("5.0",5);
     
-        
-     JLabel histogram = new JLabel("Histogram Range");
-     text_histoField = new JTextField("5.0",5);
-    
-     panel.add(histogram);
-     panel.add(text_histoField);
-     panel.add(Box.createHorizontalStrut(40));
-     panel.add(Box.createVerticalStrut(40));
+          panel.add(histogram);
+          panel.add(text_histoField);
+          panel.add(Box.createHorizontalStrut(40));
+          panel.add(Box.createVerticalStrut(40));
      
      Box commitBox = new Box(BoxLayout.X_AXIS);
      commitBox.add(Box.createHorizontalGlue());
@@ -357,7 +346,7 @@ protected Component make_Pval_Panel() {
     
     //set layouts for file fields
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    fileNameLabel11 = new JLabel("Pval File",JLabel.LEFT);
+    fileNameLabel11 = new JLabel("Gene score File",JLabel.LEFT);
     Box fileNameLabel11Box = new Box(BoxLayout.X_AXIS);
     fileNameLabel11Box.add(fileNameLabel11);
     fileNameLabel11Box.add(Box.createHorizontalGlue());
@@ -367,8 +356,7 @@ protected Component make_Pval_Panel() {
     fileName11Box.add(browseButton11);
     fileName11Box.add(Box.createHorizontalGlue());
     
-    
-    fileNameLabel22 = new JLabel("Affy GO File",JLabel.LEFT);
+    fileNameLabel22 = new JLabel("Probe to GO Mapping File",JLabel.LEFT);
     Box fileNameLabel22Box = new Box(BoxLayout.X_AXIS);
     fileNameLabel22Box.add(fileNameLabel22);
     fileNameLabel22Box.add(Box.createHorizontalGlue());
@@ -378,7 +366,7 @@ protected Component make_Pval_Panel() {
     fileName22Box.add(browseButton22);
     fileName22Box.add(Box.createHorizontalGlue());
     
-    fileNameLabel33 = new JLabel("Destination File",JLabel.LEFT);
+    fileNameLabel33 = new JLabel("Output File",JLabel.LEFT);
     Box fileNameLabel33Box = new Box(BoxLayout.X_AXIS);
     fileNameLabel33Box.add(fileNameLabel33);
     fileNameLabel33Box.add(Box.createHorizontalGlue());
@@ -388,7 +376,7 @@ protected Component make_Pval_Panel() {
     fileName33Box.add(browseButton33);
     fileName33Box.add(Box.createHorizontalGlue());
     
-    fileNameLabel44 = new JLabel("Go Biological Names File",JLabel.LEFT);
+    fileNameLabel44 = new JLabel("GO Biological Names File",JLabel.LEFT);
     Box fileNameLabel44Box = new Box(BoxLayout.X_AXIS);
     fileNameLabel44Box.add(fileNameLabel44);
     fileNameLabel44Box.add(Box.createHorizontalGlue());
@@ -398,7 +386,7 @@ protected Component make_Pval_Panel() {
     fileName44Box.add(browseButton44);
     fileName44Box.add(Box.createHorizontalGlue());
     
-    fileNameLabel55 = new JLabel("Unigene File",JLabel.LEFT);
+    fileNameLabel55 = new JLabel("Probe to Unigene Mapping File",JLabel.LEFT);
     Box fileNameLabel55Box = new Box(BoxLayout.X_AXIS);
     fileNameLabel55Box.add(fileNameLabel55);
     fileNameLabel55Box.add(Box.createHorizontalGlue());
@@ -420,7 +408,7 @@ protected Component make_Pval_Panel() {
     panel.add(fileName55Box);
     panel.add(Box.createVerticalStrut(20));
     
-    weightbox = new JCheckBox("Weights");
+    weightbox = new JCheckBox("Use Weights");
     weightbox.setSelected(true);
     CheckBoxListener checkListener = new CheckBoxListener();
     weightbox.addItemListener(checkListener);
@@ -428,21 +416,21 @@ protected Component make_Pval_Panel() {
     panel.add(Box.createVerticalStrut(20));
     
     //set radio button options 
-    JRadioButton meanButton = new JRadioButton("MEAN_METHOD");
+    JRadioButton meanButton = new JRadioButton("Mean");
     meanButton.setActionCommand("MEAN_METHOD");
     meanButton.setSelected(true);
      
-    JRadioButton quantileButton = new JRadioButton("QUANTILE_METHOD");
+    JRadioButton quantileButton = new JRadioButton("Quantile");
     quantileButton.setActionCommand("QUANTILE_METHOD");
     
-    JRadioButton medianButton = new JRadioButton("MEAN_ABOVE_QUANTILE_METHOD");
-    medianButton.setActionCommand("MEAN_ABOVE_QUANTILE_METHOD");
+    //    JRadioButton medianButton = new JRadioButton("MEAN_ABOVE_QUANTILE_METHOD");
+    //    medianButton.setActionCommand("MEAN_ABOVE_QUANTILE_METHOD");
     
     
     ButtonGroup group = new ButtonGroup();
     group.add(meanButton);
     group.add(quantileButton);
-    group.add(medianButton);
+    //    group.add(medianButton);
     
     JPanel radioPanel = new JPanel();
     radioPanel.setLayout(new BoxLayout(radioPanel,BoxLayout.Y_AXIS));
@@ -450,7 +438,7 @@ protected Component make_Pval_Panel() {
     radioPanel.add(Box.createHorizontalGlue());
     radioPanel.add(quantileButton);
     radioPanel.add(Box.createHorizontalGlue());
-    radioPanel.add(medianButton);
+    //    radioPanel.add(medianButton);
     radioPanel.add(Box.createHorizontalGlue());
     panel.add(radioPanel);
     panel.add(Box.createHorizontalStrut(20));
@@ -459,7 +447,7 @@ protected Component make_Pval_Panel() {
     RadioListener myListener = new RadioListener();
     meanButton.addActionListener(myListener);
     quantileButton.addActionListener(myListener);
-    medianButton.addActionListener(myListener);
+    //    medianButton.addActionListener(myListener);
     
     
     
@@ -513,10 +501,10 @@ protected Component make_Pval_Panel() {
 
 
 
-/*****************************************************************************************/
+    /*****************************************************************************************/
     public class TimerListener implements ActionListener {
-/*****************************************************************************************/
-
+	/*****************************************************************************************/
+	
         public void actionPerformed(ActionEvent evt) {
 	    //SwingUtilities.invokeLater(new Update());
 	    try {
@@ -767,111 +755,111 @@ protected Component make_Pval_Panel() {
 	}
 
 
-	    if (foundFiles1.size() > 0) {
-		String message = "Are you sure these are the files\n";
-		for(int i=0; i < foundFiles1.size(); i++) {
-		    message += "   "+((String) foundFiles1.elementAt(i))
-			+ "\n";
-		}
-		message += "Weight:" + weight_boolean + "\n";
-		message += "Method:" + method_name + "\n";
-		message += "Use these files?";
-		int response = JOptionPane.showConfirmDialog(null,
-				      message,
-				      "Use files?",
-				      JOptionPane.YES_NO_OPTION);
-		if (response != JOptionPane.YES_OPTION)
-		    return;
+	if (foundFiles1.size() > 0) {
+	    String message = "Are you sure these are the files\n";
+	    for(int i=0; i < foundFiles1.size(); i++) {
+		message += "   "+((String) foundFiles1.elementAt(i))
+		    + "\n";
 	    }
-
+	    message += "Weight:" + weight_boolean + "\n";
+	    message += "Method:" + method_name + "\n";
+	    message += "Use these files?";
+	    int response = JOptionPane.showConfirmDialog(null,
+							 message,
+							 "Use files?",
+							 JOptionPane.YES_NO_OPTION);
+	    if (response != JOptionPane.YES_OPTION)
+		return;
+	    }
+	
 
 	  
-	    String numFieldS1;
-	    numFieldS1 =text_numField1.getText();
-	    if (numFieldS1 !=null){
-		numField1=Integer.parseInt(numFieldS1);
-	    }else {
-	    	JOptionPane.showMessageDialog(null,
-					      "Number of iterations is empty!!  "+
-					      "Rewrite number!!");
-		return;
-	    }
+	String numFieldS1;
+	numFieldS1 =text_numField1.getText();
+	if (numFieldS1 !=null){
+	    numField1=Integer.parseInt(numFieldS1);
+	}else {
+	    JOptionPane.showMessageDialog(null,
+					  "Number of iterations is empty!!  "+
+					  "Rewrite number!!");
+	    return;
+	}
+	
+	String maxFieldS1;
+	maxFieldS1 = text_maxField1.getText();
+	if (maxFieldS1 !=null){
+	    maxField1=Integer.parseInt(maxFieldS1);
+	} else {
+	    JOptionPane.showMessageDialog(null,
+					  "Max size is empty!!  "+
+					  "Rewrite Max Size!!");
+	    return;
+	}
 	    
-	    String maxFieldS1;
-	    maxFieldS1 = text_maxField1.getText();
-	    if (maxFieldS1 !=null){
-		maxField1=Integer.parseInt(maxFieldS1);
-	    } else {
-		JOptionPane.showMessageDialog(null,
-					      "Max size is empty!!  "+
-					      "Rewrite Max Size!!");
-		return;
-	    }
-	    
-	    String minFieldS1;
-	    minFieldS1 = text_minField1.getText();
-	    if (minFieldS1 !=null){
-		minField1=Integer.parseInt(minFieldS1);
-	    } else {
-		JOptionPane.showMessageDialog(null,
-					      "Min size is empty!!  "+
-					      "Rewrite Min Size!!");
-		return;
-	    }
-
-	    if (minField1 > maxField1) {
-		JOptionPane.showMessageDialog(null,
-					      "Values of min class > max!!  "+
+	String minFieldS1;
+	minFieldS1 = text_minField1.getText();
+	if (minFieldS1 !=null){
+	    minField1=Integer.parseInt(minFieldS1);
+	} else {
+	    JOptionPane.showMessageDialog(null,
+					  "Min size is empty!!  "+
+					  "Rewrite Min Size!!");
+	    return;
+	}
+	
+	if (minField1 > maxField1) {
+	    JOptionPane.showMessageDialog(null,
+					  "Values of min class > max!!  "+
 					  "Rewrite class Sizes!!");
 	    return;
+	}
+	
+
+	String quantileFieldS1;
+	quantileFieldS1 = text_quantileField1.getText();
+	if (quantileFieldS1 !=null){
+	    quantileField1=Integer.parseInt(quantileFieldS1);
+	} else  {
+	    JOptionPane.showMessageDialog(null,
+					  "Quantile is empty!!  "+
+					  "Rewrite quantile!!");
+	    return;
+	}
+	
+	String pValS1;
+	pValS1 = text_pVal1.getText();
+	if (pValS1 !=null){
+	    pVal1=Double.parseDouble(pValS1);
+	} else {
+	    JOptionPane.showMessageDialog(null,
+					  "P-value is empty!!  "+
+					  "Rewrite range!!");
+	    return; 
+	} 
+	
+
+	new Thread() {
+	    public void run() {
+		progress = new JProgressBar();
+		JFrame frame = new JFrame("Progress");
+		//frame.setContentPane(progress);
+		frame.getContentPane().add(progress);
+		frame.setSize(50,50);
+		frame.setVisible(true);
+		progress.setMinimum(0);
+		progress.setValue(0);
+		progress.setIndeterminate(true);
+		timer.start();
+		//for(int i=0; i<100; i++){ //test only
+		timeCounter.start();
+		class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,maxField1,minField1,numField1,quantileField1,pVal1,weight_boolean);
+		test.class_pval_generator();
+		timeCounter.stop();  
+		//}
+		timer.stop();
+		frame.setVisible(false); 
+		
 	    }
-
-
-	    String quantileFieldS1;
-	    quantileFieldS1 = text_quantileField1.getText();
-	    if (quantileFieldS1 !=null){
-		quantileField1=Integer.parseInt(quantileFieldS1);
-	    } else  {
-		JOptionPane.showMessageDialog(null,
-					      "Quantile is empty!!  "+
-					      "Rewrite quantile!!");
-		return;
-	    }
-
-	    String pValS1;
-	    pValS1 = text_pVal1.getText();
-	    if (pValS1 !=null){
-		pVal1=Double.parseDouble(pValS1);
-	    } else {
-	    	JOptionPane.showMessageDialog(null,
-					      "P-value is empty!!  "+
-					      "Rewrite range!!");
-		return; 
-	    } 
-
-
-	    new Thread() {
-		public void run() {
-		    progress = new JProgressBar();
-		    JFrame frame = new JFrame("Progress");
-		    //frame.setContentPane(progress);
-		    frame.getContentPane().add(progress);
-		    frame.setSize(50,50);
-		    frame.setVisible(true);
-		    progress.setMinimum(0);
-		    progress.setValue(0);
-		    progress.setIndeterminate(true);
-	   	    timer.start();
-		    //for(int i=0; i<100; i++){ //test only
-		      timeCounter.start();
-		      class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,maxField1,minField1,numField1,quantileField1,pVal1,weight_boolean);
-		      test.class_pval_generator();
-		      timeCounter.stop();  
-		    //}
-		    timer.stop();
-		    frame.setVisible(false); 
-		    
-		}
         }.start();  
     }
 
@@ -975,16 +963,16 @@ protected Component make_Pval_Panel() {
 
 
 
-	    String histoFieldS;
-	    histoFieldS = text_histoField.getText();
-	    if (histoFieldS !=null){
-		histoField=Double.parseDouble(histoFieldS);
-	    } else {
-	    	JOptionPane.showMessageDialog(null,
-					      "Histogram range is empty!!  "+
-					      "Rewrite range!!");
-	    return; 
-	    }
+	    	    String histoFieldS;
+	    	    histoFieldS = text_histoField.getText();
+	    	    if (histoFieldS !=null){
+	    		histoField=Double.parseDouble(histoFieldS);
+	    	    } else {
+	    	    	JOptionPane.showMessageDialog(null,
+	    					      "Histogram range is empty!!  "+
+	    					      "Rewrite range!!");
+	    	    return; 
+	    	    }
  
 	  
 	    new Thread() {
