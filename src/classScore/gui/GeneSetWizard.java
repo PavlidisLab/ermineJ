@@ -45,6 +45,7 @@ public class GeneSetWizard extends Wizard {
       this.makenew = makenew;
       newGeneSet = new NewGeneSet(geneData);
 
+      geneData.resetSelected();
       step=1;
       if (makenew) {
          this.setTitle("Define New Class - Step 1 of 3");

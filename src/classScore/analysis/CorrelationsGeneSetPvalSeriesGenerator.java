@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
+import classScore.gui.GeneSetScoreStatus;
 
 import baseCode.dataFilter.RowNameFilter;
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
@@ -26,10 +28,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CorrelationsGeneSetPvalSeriesGenerator extends
       AbstractGeneSetPvalGenerator {
-   
+
    protected static final Log log = LogFactory
          .getLog( CorrelationsGeneSetPvalSeriesGenerator.class );
-   
+
    private Histogram hist;
    private CorrelationPvalGenerator probeCorrelData;
    private Map probeToGeneSetMap; // stores probe->go Hashtable
@@ -73,12 +75,12 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
    }
 
    /**
-    * 
+    * @param
+    * @todo make this faster. cache values?
+    * @todo need to do weighting
     *  
     */
-   public void geneSetCorrelationGenerator() {
-      RowNameFilter f = new RowNameFilter();
-      
+   public void geneSetCorrelationGenerator( GeneSetScoreStatus messenger ) {
       //iterate over each class
       for ( Iterator it = geneSetToProbeMap.entrySet().iterator(); it.hasNext(); ) {
          Map.Entry e = ( Map.Entry ) it.next();
@@ -101,7 +103,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
             if ( probeCorrelData.containsRow( element ) ) {
                classSize++;
             }
-            if (classSize > probeCorrelData.getMaxClassSize()) {
+            if ( classSize > probeCorrelData.getMaxClassSize() ) {
                break;
             }
          }
@@ -112,14 +114,11 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
             continue;
          }
 
-      
          DenseDoubleMatrix2DNamed V = null;
          int index = 0;
 
-         System.err.println( class_name + " " + classSize );
+         messenger.setStatus( class_name + " " + classSize );
 
-         /** @todo this is too slooow
-          * @todo need to do weighting */
          for ( Iterator vit = probesInSet.iterator(); vit.hasNext(); ) {
             String probe = ( String ) vit.next();
             //check if element exists in map
@@ -158,7 +157,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
                .get( class_name ) ).intValue(), effSize );
          result.setScore( geneSetMeanCorrel );
          result.setPValue( hist.getValue( classSize, geneSetMeanCorrel ) );
-         results.put(class_name, result);
+         results.put( class_name, result );
       }
    }
 }

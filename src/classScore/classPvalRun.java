@@ -170,7 +170,7 @@ public class classPvalRun {
                   settings, geneData, csc, goData, rawData, hist );
             messenger
                   .setStatus( "Finished resampling, computing for gene sets" );
-            pvg.geneSetCorrelationGenerator();
+            pvg.geneSetCorrelationGenerator(messenger);
             messenger.setStatus( "Finished computing scores" );
             results = pvg.getResults();
             break;

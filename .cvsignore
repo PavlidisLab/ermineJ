@@ -17,3 +17,6 @@ ClassScore.prefs
 classScore.jar
 ermineJ.jpx.local
 ermineJ.oif
+.clover*
+.classpath
+.project

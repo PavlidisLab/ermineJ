@@ -8,6 +8,7 @@ import java.util.Set;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.reader.DoubleMatrixReader;
+import baseCode.gui.GuiUtil;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneScoreReader;
@@ -27,7 +28,7 @@ import classScore.gui.GeneSetScoreStatus;
  * <p>
  * Company:
  * </p>
- *
+ * 
  * @author not attributable
  * @version $Id$
  * @todo don't use stop. use interrupt instead, and stop the readers
@@ -74,28 +75,27 @@ public class AnalysisThread {
 
    private void doAnalysis( Map results ) {
       try {
-         messenger.setStatus( "Starting analysis..." );
 
-         /* read in the rawData, if we haven't already */
-         // todo maybe only read if we need it.
-         DenseDoubleMatrix2DNamed rawData=null;
-         /*
-         if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
-            messenger.setStatus( "Raw data are in memory");
-            rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings
-                  .getRawFile() );
-         } else {
-            messenger.setStatus( "Reading raw data from file "
-                  + settings.getRawFile() );
-            DoubleMatrixReader r = new DoubleMatrixReader();
-            rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings
-                  .getRawFile() );
-            rawDataSets.put( settings.getRawFile(), rawData );
+         /* read in the rawData, if we need it, and if we haven't already */
+         DenseDoubleMatrix2DNamed rawData = null;
+         if ( settings.getAnalysisMethod() == Settings.CORR ) {
+            if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
+               messenger.setStatus( "Raw data are in memory" );
+               rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings
+                     .getRawFile() );
+            } else {
+               messenger.setStatus( "Reading raw data from file "
+                     + settings.getRawFile() );
+               DoubleMatrixReader r = new DoubleMatrixReader();
+               rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings
+                     .getRawFile() );
+               rawDataSets.put( settings.getRawFile(), rawData );
+            }
          }
-         */
+
          GeneScoreReader geneScores;
          if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-            messenger.setStatus( "Gene Scores are in memory");
+            messenger.setStatus( "Gene Scores are in memory" );
             geneScores = ( GeneScoreReader ) geneScoreSets.get( settings
                   .getScoreFile() );
          } else {
@@ -106,8 +106,8 @@ public class AnalysisThread {
             geneScoreSets.put( settings.getScoreFile(), geneScores );
          }
 
-         if (!settings.getScoreFile().equals("") && geneScores == null) {
-            messenger.setStatus("Didn't get geneScores");
+         if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
+            messenger.setStatus( "Didn't get geneScores" );
          }
 
          // todo need logic to choose which source of probes to use.
@@ -128,7 +128,6 @@ public class AnalysisThread {
                geneData = test;
                break;
             }
-
          }
 
          if ( geneData == null ) {
@@ -136,10 +135,8 @@ public class AnalysisThread {
             geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
          }
 
-         //         GeneGroupReader groupName = new GeneGroupReader( geneData
-         //               .getGeneToProbeList(), geneData.getProbeToGeneMap() );
-
          /* do work */
+         messenger.setStatus( "Starting analysis..." );
          classPvalRun runResult;
          if ( results != null ) {
             runResult = new classPvalRun( activeProbes, settings, geneData,
@@ -199,12 +196,12 @@ public class AnalysisThread {
 
    private void loadAnalysis() {
       try {
-         messenger.setStatus( "Loading analysis..." );
-         ResultsFileReader rfr = new ResultsFileReader( loadFile );
+         ResultsFileReader rfr = new ResultsFileReader( loadFile, messenger );
          Map results = rfr.getResults();
-         doAnalysis(results);
-      } catch ( IOException ioe ) {
-         ioe.printStackTrace();
+         doAnalysis( results );
+      } catch ( Exception e ) {
+         cancelAnalysisThread();
+         GuiUtil.error( "File format is not valid." );
       }
    }
 

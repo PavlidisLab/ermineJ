@@ -119,8 +119,8 @@ public class GeneSetWizardStep1 extends WizardStep
       step1Panel.add(jPanel1, BorderLayout.CENTER);
       step1Panel.add(jPanel2, BorderLayout.SOUTH);
 
-      this.addHelp("<html>This is a place holder.<br>"+
-                   "Blah, blah, blah, blah, blah.");
+      this.addHelp("<html><b>Choose the source of the genes for the new class</b><br>"+
+                   "You can load them in from a file, or add them from the list of available probes.");
       this.addMain(step1Panel);
    }
 

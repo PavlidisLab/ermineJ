@@ -6,7 +6,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -43,6 +53,8 @@ public class GeneAnnotations {
    private Vector sortedGeneSets;
    private Map classesToRedundantMap;
 
+   private Vector selectedProbes;
+   
    /**
     * This is for creating GeneAnnotations by reading from a file
     *
@@ -62,6 +74,7 @@ public class GeneAnnotations {
       classesToRedundantMap = new HashMap();
       this.readFile( filename );
       classToGeneMap = makeClassToGeneMap();
+      resetSelected();
    }
 
    /**
@@ -108,6 +121,7 @@ public class GeneAnnotations {
          }
       }
       classToGeneMap = makeClassToGeneMap();
+      selectedProbes = new Vector(probeToGeneName.keySet());
    }
 
    /**
@@ -215,7 +229,7 @@ public class GeneAnnotations {
 
       /* Fill in the genegroupreader and the classmap */
       dis.close();
-      probeList = new Vector( probeToGeneName.keySet() );
+      resetSelected( );
    }
 
    /**
@@ -400,6 +414,10 @@ public class GeneAnnotations {
       classToProbeMap.put( classId, probes );
    }
 
+   /**
+    * 
+    * @return
+    */
    public TableModel toTableModel() {
       return new AbstractTableModel() {
          private String[] columnNames = {
@@ -418,8 +436,11 @@ public class GeneAnnotations {
          }
 
          public Object getValueAt( int i, int j ) {
-            //  Collections.sort(probe_list);
-            String probeid = ( String ) probeList.get( i );
+            if (i > selectedProbes.size() - 1) {
+               return null;
+            }
+            
+            String probeid = ( String ) selectedProbes.get( i );
             switch ( j ) {
                case 0:
                   return probeid;
@@ -433,5 +454,43 @@ public class GeneAnnotations {
          }
 
       };
-   };
+   }
+
+   /**
+    * @param searchOn
+    */
+   public void select( String searchOn ) {
+      
+      if (selectedProbes == null) {
+         throw new IllegalStateException("selectedGenes was not initialized.");
+      }
+      
+      String searchOnUp = searchOn.toUpperCase();
+      resetSelected();
+      Set removeUs = new HashSet();
+      for (Iterator it = probeToGeneName.keySet().iterator(); it.hasNext();) {
+         String probe = (String)it.next();
+         
+         String candidate = ((String)probeToGeneName.get((probe))).toUpperCase();
+          
+         if (! candidate.startsWith(searchOnUp)) {
+            removeUs.add(probe);
+         }
+      }
+      
+      for (Iterator it = removeUs.iterator(); it.hasNext();) {
+         selectedProbes.remove(it.next());
+      }
+      
+      System.err.println(selectedProbes.size() + " probes found.");
+   }
+   
+   /**
+    * Set the selected gene set to be the entire set.
+    *
+    */
+   public void resetSelected() {
+      selectedProbes = new Vector(probeToGeneName.keySet());
+   }
+   
 }

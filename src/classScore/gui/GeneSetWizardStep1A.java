@@ -62,8 +62,8 @@ public class GeneSetWizardStep1A extends WizardStep
       step1MPanel.setPreferredSize(new Dimension(250, 250));
       step1MPanel.add(oldClassScrollPane,  BorderLayout.CENTER);
 
-      this.addHelp("<html>This is a place holder.<br>"+
-                   "Blah, blah, blah, blah, blah.");
+      this.addHelp("<html><b>Pick a gene set to modify.</b><br>"+
+                   "You will be asked to add or remove genes from this set in the next step.");
       this.addMain(step1MPanel);
    }
 
@@ -88,7 +88,7 @@ public class GeneSetWizardStep1A extends WizardStep
          newGeneSet.setId( id );
          newGeneSet.setDesc( desc );
          if ( geneData.classExists( id ) ) {
-            newGeneSet.getProbes().addAll( ( ArrayList ) geneData.getClassToProbes( id ) );
+            newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
          }
          return true;
       }

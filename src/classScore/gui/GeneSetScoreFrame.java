@@ -253,7 +253,7 @@ public class GeneSetScoreFrame
       catch ( IOException e ) {
          GuiUtil.error( e, "File reading or writing" );
       } catch ( SAXException e ) {
-         GuiUtil.error( e, "XML parsing" );
+         GuiUtil.error( "Gene Ontology file format is incorrect. Please check that it is a valid XML file." );
       }
       oPanel.addInitialData( geneData, goData );
       statusMessenger.setStatus("Done with initialization.");
@@ -293,7 +293,7 @@ public class GeneSetScoreFrame
    }
 
    void findClassMenuItem_actionPerformed( ActionEvent e ) {
-      FindDialog fdlog = new FindDialog( this );
+  //    FindDialog fdlog = new FindDialog( this );
    }
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {

@@ -21,7 +21,7 @@ import baseCode.gui.*;
  *
  * @author not attributable
  * @version $Id$
- * @todo
+
  */
 
 public class Settings {
@@ -390,7 +390,6 @@ public class Settings {
    }
 
    /**
-    * @todo this should return a boolean.
     * @return
     */
    public boolean getUseLog() {
