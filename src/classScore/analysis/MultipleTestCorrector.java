@@ -2,7 +2,6 @@ package classScore.analysis;
 
 import java.text.NumberFormat;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;

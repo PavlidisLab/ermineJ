@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Vector;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
