@@ -1,11 +1,16 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.*;
-import baseCode.gui.*;
-import classScore.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
+import baseCode.gui.WizardStep;
+import classScore.Settings;
 
 /**
  * <p>Title: </p>
@@ -84,7 +89,10 @@ public class AnalysisWizardStep1 extends WizardStep
       jPanel12.add(jLabel5, null);
       jPanel4.add(jPanel12, null);
       step1Panel.add(jPanel4, null);
-      this.add(step1Panel);
+
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(step1Panel);
    }
 
    public boolean isReady() { return true; }

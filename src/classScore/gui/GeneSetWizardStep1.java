@@ -66,6 +66,7 @@ public class GeneSetWizardStep1 extends WizardStep
                                         GeneSetWizardStep1_manInputButton_actionAdapter( this ) );
       manInputButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
       ButtonGroup buttonGroup1 = new ButtonGroup();
+      jPanel1.setPreferredSize(new Dimension(364, 130));
       buttonGroup1.add( fileInputButton );
       buttonGroup1.add( manInputButton );
       JLabel jLabel4 = new JLabel();
@@ -102,7 +103,7 @@ public class GeneSetWizardStep1 extends WizardStep
 
       //bottom
       JPanel jPanel2 = new JPanel(); // holds file chooser
-      jPanel2.setPreferredSize(new Dimension(354, 150));
+      jPanel2.setPreferredSize(new Dimension(354, 100));
       browseButton = new JButton();
       browseButton.setText( "Browse...." );
       browseButton.addActionListener( new GeneSetWizardStep1_browseButton_actionAdapter( this ) );
@@ -118,7 +119,9 @@ public class GeneSetWizardStep1 extends WizardStep
       step1Panel.add(jPanel1, BorderLayout.CENTER);
       step1Panel.add(jPanel2, BorderLayout.SOUTH);
 
-      this.add( step1Panel );
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(step1Panel);
    }
 
    public boolean isReady() {

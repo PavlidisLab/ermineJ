@@ -87,10 +87,7 @@ public class GeneSetWizard extends Wizard {
 
    protected void nextButton_actionPerformed(ActionEvent e) {
       if (step == 1) {
-         if (!makenew && !step1A.isReady()) {                       //case 3 and no class picked
-            GuiUtil.error("Pick a class to be modified.");
-         }
-         else {
+         if (makenew || step1A.isReady()) {                       //not (case 3 with no class picked)
             if (makenew && step1.getInputMethod() == 1) {           //case 2, load from file
                newGeneSet.loadClassFile(step1.getLoadFile());
             }
@@ -142,6 +139,7 @@ public class GeneSetWizard extends Wizard {
          } else {
             this.setTitle("Modify Class - Step 1 of 3");
             this.getContentPane().add(step1A);
+            newGeneSet.clear();
             step1A.revalidate();
          }
          this.repaint();

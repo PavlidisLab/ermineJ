@@ -75,7 +75,6 @@ public class StartupDialog
       annotPanel.setPreferredSize( new Dimension( 330, 50 ) );
       annotFile.setToolTipText( "" );
       annotFile.setPreferredSize( new Dimension( 230, 19 ) );
-      annotFile.setEnabled( false );
       annotFile.setMinimumSize( new Dimension( 4, 19 ) );
       annotPanel.add( annotLabel, null );
       annotPanel.add( annotFile, null );

@@ -1,8 +1,9 @@
 package classScore.gui;
 
 import java.text.NumberFormat;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.Vector;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -19,6 +20,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+
 import classScore.Settings;
 import classScore.classPvalRun;
 import classScore.data.GONames;
@@ -26,6 +28,7 @@ import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
 
 /**
  * <p>Title: </p>
@@ -34,8 +37,7 @@ import java.util.StringTokenizer;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
- * @todo make columns start out better sizes
- * @todo integers don't sort correctly
+ * @todo when a row is highlighted, and then a column is sorted, the cell with focus changes color (even when it shouldn't)
  */
 
 public class OutputPanel extends JScrollPane {
@@ -89,10 +91,39 @@ public class OutputPanel extends JScrollPane {
       int j = table.getSelectedColumn();
       if(table.getValueAt(i,j) != null && j>=OutputTableModel.init_cols)
       {
-         //int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
          int runnum = model.getRunNum(j);
          String id = (String)table.getValueAt(i,0);
          ((classPvalRun)results.get(runnum)).showDetails(id);
+      }
+      else
+      {
+          for (int k=model.getColumnCount()-1; k>=0; k--)
+          {
+             if(table.getValueAt(i,k) != null && k>=OutputTableModel.init_cols)
+             {
+                String message;
+                String id = (String)table.getValueAt(i,0);
+                String shownRunName=model.getColumnName(k);
+                shownRunName=shownRunName.substring(0,shownRunName.length()-5);
+                if(j>=OutputTableModel.init_cols)
+                {
+                   message=model.getColumnName(j);
+                   message=message.substring(0,message.length()-5);
+                   message=message + " doesn't include the class " + id +
+                       ". Showing " + shownRunName + " instead.";
+                }
+                else
+                {
+                    message="Showing details for "+shownRunName+".";
+                }
+                JOptionPane.showMessageDialog(this, message,
+                                              "FYI",
+                                              JOptionPane.PLAIN_MESSAGE);
+                int runnum = model.getRunNum(k);
+                ((classPvalRun)results.get(runnum)).showDetails(id);
+             }
+          }
+
       }
    }
 
@@ -109,15 +140,23 @@ public class OutputPanel extends JScrollPane {
       RemoveRunPopupMenu sourcePopup = (RemoveRunPopupMenu)
           ((Container) e.getSource()).getParent();
       int c = table.getTableHeader().columnAtPoint(sourcePopup.getPoint());
-      TableColumn col = table.getColumn(model.getColumnName(c));
-      System.err.println("remove popup for col: " + c);
-      table.removeColumn(col);
-      model.removeRunData(c);
-      model.fireTableStructureChanged();
-      int runnum = model.getRunNum(c);
-      results.remove(runnum);
-      resultToolTips.remove(runnum);
-      table.revalidate();
+      String colname=model.getColumnName(c);
+      TableColumn col = table.getColumn(colname);
+      int yesno=JOptionPane.showConfirmDialog(null,
+                                              "Are you sure you want to remove " +
+                                              colname.substring(0,colname.length()-5)+"?",
+                                              "Remove Run", JOptionPane.YES_NO_OPTION);
+      if(yesno==JOptionPane.YES_OPTION)
+      {
+         System.err.println("remove popup for col: " + c);
+         table.removeColumn(col);
+         model.removeRunData(c);
+         model.fireTableStructureChanged();
+         int runnum = model.getRunNum(c);
+         results.remove(runnum);
+         resultToolTips.remove(runnum);
+         table.revalidate();
+      }
    }
 
    String getHeaderToolTip(int index)
@@ -177,9 +216,10 @@ public class OutputPanel extends JScrollPane {
       table.setModel(sorter);
       sorter.setTableHeader(table.getTableHeader());
       this.getViewport().add(table, null);
-      table.getColumnModel().getColumn(0).setPreferredWidth(30);
-      table.getColumnModel().getColumn(2).setPreferredWidth(30);
-      table.getColumnModel().getColumn(3).setPreferredWidth(30);
+      table.getColumnModel().getColumn(0).setPreferredWidth(80);
+      table.getColumnModel().getColumn(1).setPreferredWidth(300);
+      table.getColumnModel().getColumn(2).setPreferredWidth(80);
+      table.getColumnModel().getColumn(3).setPreferredWidth(80);
       table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer(goData,results));
       table.revalidate();
    }
@@ -190,10 +230,12 @@ public class OutputPanel extends JScrollPane {
       TableColumn col = new TableColumn(c);
       col.setIdentifier(model.getColumnName(c));
       table.addColumn(col);
-      table.getColumnModel().getColumn(c).setPreferredWidth(30);
+      table.getColumnModel().getColumn(c).setPreferredWidth(80);
       generateToolTip(model.getColumnCount()-OutputTableModel.init_cols-1);
       sorter.cancelSorting();
       sorter.setSortingStatus(c,TableSorter.ASCENDING);
+      if(results.size()>4)
+         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
       table.revalidate();
    }
 }
@@ -352,7 +394,6 @@ class OutputTableModel extends AbstractTableModel {
    }
 
    public int getColumnCount() {
-      System.err.println(columnNames.size());
       return columnNames.size();
    }
 
@@ -432,23 +473,19 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
       else if(value.getClass().equals(Double.class))
       //else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
       {
-         if(((Double)value).doubleValue() > 0.8)
-            setBackground(spread1);
-         else if(((Double)value).doubleValue() > 0.6)
-            setBackground(spread2);
-         else if(((Double)value).doubleValue() > 0.4)
-            setBackground(spread3);
-         else if(((Double)value).doubleValue() > 0.2)
-            setBackground(spread4);
-         else
-            setBackground(spread5);
          String classid=(String)table.getValueAt(row,0);
-         Map data = ((classPvalRun)results.get(runcol)).getResults();
+         classPvalRun result=(classPvalRun)results.get(runcol);
+         Map data = result.getResults();
          if (data.containsKey(classid))
          {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " +
                             res.getScore() );
+
+            if(res.getPvalue_corr() == 1)
+               setBackground(spread5);
+            else if(res.getPvalue_corr() == 0 )
+               setBackground(spread1);
          }
       }
       else

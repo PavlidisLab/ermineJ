@@ -1,14 +1,27 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import baseCode.gui.*;
-import classScore.*;
-import classScore.data.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+
+import baseCode.gui.GuiUtil;
+import baseCode.gui.WizardStep;
+import classScore.Settings;
+import classScore.data.GONames;
+import classScore.data.NewGeneSet;
 
 /**
  * <p>Title: </p>
@@ -92,7 +105,9 @@ public class AnalysisWizardStep3
       step3Panel.add( jPanel10, BorderLayout.CENTER );
       step3Panel.add( jPanel9, BorderLayout.SOUTH );
 
-      this.add( step3Panel, BorderLayout.CENTER );
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(step3Panel);
    }
 
    public boolean isReady() {
@@ -237,7 +252,7 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
          }
 
          public int getRowCount() {
-            int windowrows = 8;
+            int windowrows = 10;
             int extra = 1;
             if (size() < windowrows) {
                extra = windowrows - size();

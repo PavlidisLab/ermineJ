@@ -1,14 +1,20 @@
 package classScore.gui;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Vector;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+
+import baseCode.gui.WizardStep;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.NewGeneSet;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.text.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import baseCode.gui.*;
-import classScore.data.*;
-import classScore.*;
 
 /**
  * <p>Title: </p>
@@ -26,7 +32,6 @@ public class GeneSetWizardStep1A extends WizardStep
    GONames goData;
    NewGeneSet newGeneSet;
    JTable oldClassTable;
-   JLabel modifyClassLabel;
 
    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData,
                              GONames goData, NewGeneSet newGeneSet ) {
@@ -51,51 +56,40 @@ public class GeneSetWizardStep1A extends WizardStep
       oldClassTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
       oldClassTable.getTableHeader().setReorderingAllowed( false );
       JScrollPane oldClassScrollPane = new JScrollPane(oldClassTable);
-      oldClassScrollPane.setPreferredSize(new Dimension(250, 200));
+      oldClassScrollPane.setPreferredSize(new Dimension(250, 230));
 
-      JPanel bottomPanel=new JPanel();
-      JButton pickClassButton = new JButton("Select");
-      pickClassButton.setEnabled(true);
-      JPanel modifyPanel = new JPanel();
-      modifyPanel.setPreferredSize(new Dimension(250, 250));
-      BorderLayout borderLayout2 = new BorderLayout();
-      modifyPanel.setLayout(borderLayout2);
-      JLabel modifyLabel = new JLabel();
-      modifyLabel.setText("Modify: ");
-      modifyClassLabel = new JLabel();
-      modifyClassLabel.setPreferredSize(new Dimension(77, 15));
-      modifyClassLabel.setText("No Class Picked");
-      JPanel mLabelPanel = new JPanel();
-      bottomPanel.setPreferredSize(new Dimension(210, 50));
-      mLabelPanel.add(modifyLabel, null);
-      mLabelPanel.add(modifyClassLabel, null);
-      pickClassButton.addActionListener(new GeneSetWizardStep1A_pickClassButton_actionAdapter(this));
-      bottomPanel.add(pickClassButton, null);
-      bottomPanel.add(mLabelPanel, null);
-      modifyPanel.add(oldClassScrollPane, BorderLayout.CENTER);
-      modifyPanel.add(bottomPanel, BorderLayout.SOUTH);
-      step1MPanel.add(modifyPanel, BorderLayout.CENTER);
+      step1MPanel.setPreferredSize(new Dimension(250, 250));
+      step1MPanel.add(oldClassScrollPane,  BorderLayout.CENTER);
 
-      this.add( step1MPanel );
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(step1MPanel);
    }
 
    public boolean isReady() {
-      return (newGeneSet.getId().compareTo("")!=0);
-   }
-
-   void pickClassButton_actionPerformed(ActionEvent e) {
       int n = oldClassTable.getSelectedRowCount();
-      if (n != 1) {
-         GuiUtil.error("Only one class can be modified at a time.");
+      if (n > 1) {
+         JOptionPane.showMessageDialog(wiz, "Only one class can be modified at a time.",
+                                       "Error", JOptionPane.ERROR_MESSAGE);
+         return false;
       }
-      int row = oldClassTable.getSelectedRow();
-      String id = (String) oldClassTable.getValueAt(row, 0);
-      String desc = (String) oldClassTable.getValueAt(row, 1);
-      newGeneSet.setId(id);
-      modifyClassLabel.setText(id);
-      newGeneSet.setDesc(desc);
-      if (geneData.classExists(id)) {
-         newGeneSet.getProbes().addAll((ArrayList) geneData.getClassToProbes(id));
+      else if(n<1)
+      {
+          JOptionPane.showMessageDialog(wiz, "Pick a class to be modified.",
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+          return false;
+      }
+      else
+      {
+         int row = oldClassTable.getSelectedRow();
+         String id = ( String ) oldClassTable.getValueAt( row, 0 );
+         String desc = ( String ) oldClassTable.getValueAt( row, 1 );
+         newGeneSet.setId( id );
+         newGeneSet.setDesc( desc );
+         if ( geneData.classExists( id ) ) {
+            newGeneSet.getProbes().addAll( ( ArrayList ) geneData.getClassToProbes( id ) );
+         }
+         return true;
       }
    }
 
@@ -108,18 +102,6 @@ public class GeneSetWizardStep1A extends WizardStep
       oldClassTable.getColumnModel().getColumn(2).setPreferredWidth(30);
       oldClassTable.getColumnModel().getColumn(3).setPreferredWidth(30);
       oldClassTable.revalidate();
-   }
-}
-
-class GeneSetWizardStep1A_pickClassButton_actionAdapter implements java.awt.event.ActionListener {
-   GeneSetWizardStep1A adaptee;
-
-   GeneSetWizardStep1A_pickClassButton_actionAdapter(GeneSetWizardStep1A adaptee) {
-      this.adaptee = adaptee;
-   }
-
-   public void actionPerformed(ActionEvent e) {
-      adaptee.pickClassButton_actionPerformed(e);
    }
 }
 

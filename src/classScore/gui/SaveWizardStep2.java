@@ -56,7 +56,10 @@ public class SaveWizardStep2 extends WizardStep
       jPanel11.add(jLabel3, null);
       jPanel11.add(saveFile, null);
       jPanel11.add(saveBrowseButton, null);
-      this.add(jPanel11);
+
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(jPanel11);
    }
 
    public boolean isReady() { return true; }

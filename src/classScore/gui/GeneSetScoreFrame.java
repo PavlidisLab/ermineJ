@@ -56,7 +56,6 @@ public class GeneSetScoreFrame
    LinkedList results = new LinkedList();
 
    AnalysisThread athread=new AnalysisThread();
-   //javax.swing.Timer initMonitor;
 
    public GeneSetScoreFrame() {
       try {
@@ -78,6 +77,8 @@ public class GeneSetScoreFrame
       this.setJMenuBar( jMenuBar1 );
       this.setSize( new Dimension( 886, 450 ) );
       this.setTitle( "Functional Class Scoring" );
+      BorderLayout borderLayout1 = new BorderLayout();
+      mainPanel.setLayout(borderLayout1);
       mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
       mainPanel.setInputVerifier( null );
 
@@ -182,7 +183,8 @@ public class GeneSetScoreFrame
       showStatus( "Please see 'About this software' for license information." );
       statusMessenger = new GeneSetScoreStatus( jLabelStatus );
 
-      mainPanel.add( progressPanel, BorderLayout.NORTH );
+      //mainPanel.add( oPanel, BorderLayout.CENTER );
+      mainPanel.add( progressPanel, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
 
@@ -206,7 +208,7 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Done with setup");
          enableMenus();
          mainPanel.remove( progressPanel );
-         mainPanel.add( oPanel, BorderLayout.NORTH );
+         mainPanel.add( oPanel, BorderLayout.CENTER );
          statusMessenger.setStatus("Ready.");
       }
       catch ( IllegalArgumentException e ) {
@@ -429,4 +431,5 @@ class GeneSetScoreFrame_aboutMenuItem_actionAdapter
       adaptee.aboutMenuItem_actionPerformed( e );
    }
 }
+
 

@@ -101,7 +101,9 @@ public class GeneSetWizardStep3 extends WizardStep
       step3Panel.add(ncInfo1Panel, BorderLayout.WEST);
       step3Panel.add(ncInfo2Panel, BorderLayout.CENTER);
 
-      this.add( step3Panel, BorderLayout.CENTER );
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(step3Panel);
    }
 
    public boolean isReady() {

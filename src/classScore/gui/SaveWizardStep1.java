@@ -49,7 +49,10 @@ public class SaveWizardStep1 extends WizardStep
       centerPanel.add(runComboBox);
       runPanel.add(topPanel, BorderLayout.NORTH);
       runPanel.add(centerPanel, BorderLayout.CENTER);
-      this.add(runPanel);
+
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(runPanel);
    }
 
    public boolean isReady() { return true; }

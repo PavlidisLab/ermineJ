@@ -84,8 +84,8 @@ public class GeneSetResult implements Comparable {
                 class_id + "" + "\t" + class_name + "\t" + class_id + "\t" +
                 size + "\t" +
                 effective_size + "\t" +
-                nf.format(score) + "\t" + nf.format(pvalue) 
-                 + "\t" + 
+                nf.format(score) + "\t" + nf.format(pvalue)
+                 + "\t" +
                 nf.format(pvalue_corr) + "\t" + extracolumns + "\n");
    }
 
@@ -159,6 +159,10 @@ public class GeneSetResult implements Comparable {
 
    public void setRank(int n) {
       rank = n;
+   }
+
+   public double getPvalue_corr() {
+      return pvalue_corr;
    }
 
    /**

@@ -1,12 +1,18 @@
 package classScore.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.*;
+import java.io.File;
 
-import baseCode.gui.*;
-import classScore.*;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import baseCode.gui.GuiUtil;
+import baseCode.gui.WizardStep;
+import classScore.Settings;
 
 /**
  * <p>Title: </p>
@@ -22,7 +28,6 @@ public class AnalysisWizardStep2
    AnalysisWizard wiz;
    Settings settings;
    JFileChooser chooser = new JFileChooser();
-
    JTextField rawFile;
    JTextField scoreFile;
 
@@ -48,14 +53,11 @@ public class AnalysisWizardStep2
 
       step2Panel.setPreferredSize( new Dimension( 340, 250 ) );
 
-      jPanel11.setPreferredSize( new Dimension( 330, 50 ) );
-      jPanel11.setBackground( SystemColor.control );
+      jPanel11.setPreferredSize(new Dimension(380, 50) );
       jLabel3.setText( "Raw data file (optional for ORA or resampling):" );
-      jLabel3.setPreferredSize( new Dimension( 320, 15 ) );
-      rawFile.setToolTipText( "" );
-      rawFile.setPreferredSize( new Dimension( 230, 19 ) );
+      jLabel3.setPreferredSize(new Dimension(370, 15) );
+      rawFile.setPreferredSize(new Dimension(280, 19) );
       rawFile.setMinimumSize( new Dimension( 4, 19 ) );
-      rawFile.setEnabled( false );
       rawBrowseButton.setEnabled( true );
       rawBrowseButton.addActionListener( new
                                          AnalysisWizardStep2_rawBrowseButton_actionAdapter( this ) );
@@ -63,13 +65,11 @@ public class AnalysisWizardStep2
       jPanel11.add( jLabel3, null );
       jPanel11.add( rawFile, null );
       jPanel11.add( rawBrowseButton, null );
-      jPanel8.setPreferredSize( new Dimension( 330, 50 ) );
-      jPanel8.setBackground( SystemColor.control );
+      step2Panel.add(jPanel8, null);
+      jPanel8.setPreferredSize(new Dimension(380, 50) );
       jLabel2.setText( "Gene score file (optional for correlation score):" );
-      jLabel2.setPreferredSize( new Dimension( 320, 15 ) );
-      scoreFile.setToolTipText( "" );
-      scoreFile.setEnabled( false );
-      scoreFile.setPreferredSize( new Dimension( 230, 19 ) );
+      jLabel2.setPreferredSize(new Dimension(370, 15) );
+      scoreFile.setPreferredSize(new Dimension(280, 19) );
       scoreFile.setMinimumSize( new Dimension( 4, 19 ) );
       scoreBrowseButton.setEnabled( true );
       scoreBrowseButton.setText( "Browse...." );
@@ -78,10 +78,12 @@ public class AnalysisWizardStep2
       jPanel8.add( jLabel2, null );
       jPanel8.add( scoreFile, null );
       jPanel8.add( scoreBrowseButton, null );
-      step2Panel.add( jPanel11, null );
-      step2Panel.add( jPanel8, null );
+      step2Panel.add(jPanel11, null);
 
-      this.add( step2Panel );
+      //this.add( step2Panel );
+      this.addHelp("<html>This is a place holder.<br>"+
+                   "Blah, blah, blah, blah, blah.");
+      this.addMain(step2Panel);
    }
 
    public boolean isReady() {
