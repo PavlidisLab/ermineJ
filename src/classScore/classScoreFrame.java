@@ -127,13 +127,16 @@ public class classScoreFrame
       jPanelMainControls.setPreferredSize( new Dimension( 830, 35 ) );
       jButtonAbout.setToolTipText( "Please click here!" );
       jButtonAbout.setText( "About the software" );
+      jButtonAbout.setMnemonic('b');
       jButtonAbout.addActionListener( new
                                       classScoreFrame_jButtonAbout_actionAdapter( this ) );
       jButtonQuit.setText( "Quit Program" );
+      jButtonQuit.setMnemonic('Q');
       jButtonQuit.addActionListener( new
                                      classScoreFrame_jButtonQuit_actionAdapter( this ) );
       jButtonCancel.setToolTipText( "Cancel the current run" );
       jButtonCancel.setText( "Stop" );
+      jButtonCancel.setMnemonic('S');
       jButtonCancel.addActionListener( new
                                        classScoreFrame_jButtonCancel_actionAdapter( this ) );
       jPanelMainControls.add( jButtonQuit, null );

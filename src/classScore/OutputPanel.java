@@ -71,6 +71,7 @@ public class OutputPanel extends JScrollPane {
       table.getColumnModel().getColumn(model.getColumnCount() - 3).setPreferredWidth(30);
       table.getColumnModel().getColumn(model.getColumnCount() - 2).setPreferredWidth(30);
       table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
+      table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer());
       table.revalidate();
    }
 
@@ -80,9 +81,6 @@ public class OutputPanel extends JScrollPane {
       if(!table.getValueAt(i,j).equals("") && j>=OutputTableModel.init_cols)
       {
          int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
-         int rankcol = (runnum * OutputTableModel.cols_per_run) + OutputTableModel.init_cols;
-         int rank = ((Integer)table.getValueAt(i,rankcol)).intValue();
-         System.err.println(rankcol + " : " + rank);
          String id = (String)table.getValueAt(i,0);
          ((classPvalRun)results.get(runnum)).showDetails(id);
       }
@@ -194,3 +192,48 @@ class OutputTableModel extends AbstractTableModel {
       return "";
    }
 }
+
+
+class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
+{
+   static Color spread1 = new Color(220,220,160);
+   static Color spread2 = new Color(205,222,180);
+   static Color spread3 = new Color(190,224,200);
+   static Color spread4 = new Color(175,226,220);
+   static Color spread5 = new Color(160,228,240);
+
+   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                  boolean hasFocus, int row, int column)
+   {
+      super.getTableCellRendererComponent(table, value, isSelected,
+                                          hasFocus, row, column);
+      int runcol = column - OutputTableModel.init_cols;
+      setOpaque(true);
+      if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
+      {
+         if(((Double)value).doubleValue() > 0.8)
+            setBackground(spread1);
+         else if(((Double)value).doubleValue() > 0.6)
+            setBackground(spread2);
+         else if(((Double)value).doubleValue() > 0.4)
+            setBackground(spread3);
+         else if(((Double)value).doubleValue() > 0.2)
+            setBackground(spread4);
+         else
+            setBackground(spread5);
+      }
+      else
+      {
+          setOpaque(false);
+      }
+//      {
+ //        if(((Double)value).doubleValue() > 0.5)
+ //           panel.setBackground(new Color(220,220,160));
+ //        else
+ //           panel.setBackground(new Color(160,230,240));
+//      }
+      return this;
+   }
+
+}
+
