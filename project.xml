@@ -1,21 +1,25 @@
-<project>
+<?xml version="1.0" ?>
+<project xmlns:maven="jelly:maven"
+		 xmlns:j="jelly:core"
+		 xmlns:util="jelly:util"
+		 xmlns:ant="jelly:ant">
     <pomVersion>3</pomVersion>
-    <name>classScore</name>
-    <groupId>classScore</groupId>
-    <artifactId>classScore</artifactId>
-    <currentVersion>1.1</currentVersion>
+    <name>ermineJ</name>
+    <groupId>ermineJ</groupId>
+    <artifactId>ermineJ</artifactId>
+    <currentVersion>2.0b2</currentVersion>
     <organization>
         <name>Columbia University</name>
         <url>http://www.columbia.edu</url>
-        <logo>src/classScore/gui/resources/logo1small.gif</logo>
+        <logo>src/ermineJ/gui/resources/logo1small.gif</logo>
     </organization>
     <inceptionYear>2004</inceptionYear>
     <description>Software for gene set analysis.</description>
     <shortDescription>Software for gene set analysis.</shortDescription>
     <siteAddress>microarray</siteAddress>
-    <siteDirectory>/proj/pavlidis/protected/classScore</siteDirectory>
+    <siteDirectory>/proj/pavlidis/protected/ermineJ</siteDirectory>
     <distributionSite>microarray</distributionSite>
-    <distributionDirectory>/proj/projectpages/classScore_webStart</distributionDirectory>
+    <distributionDirectory>/proj/projectpages/ermineJ_webStart</distributionDirectory>
     <repository>
         <connection>scm:cvs:ext:${maven.username}@adgate.cu-genome.org:/fsnode/projects/cvs/pavlab:ermineJ</connection>
     </repository>
@@ -59,14 +63,24 @@
             <artifactId>colt</artifactId>
             <jar>colt.jar</jar>
             <type>jar</type>
+
             <url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
+   <properties>
+<jnlp.jar>true</jnlp.jar>
+            <category>lib</category>
+        </properties>
             <properties/>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.3</version>
+
             <type>jar</type>
+   <properties>
+<jnlp.jar>true</jnlp.jar>
+            <category>lib</category>
+        </properties>
             <properties/>
         </dependency>
         <dependency>
@@ -74,13 +88,23 @@
             <artifactId>baseCode</artifactId>
             <version>0.2</version>
             <type>jar</type>
+
+   <properties>
+<jnlp.jar>true</jnlp.jar>
+            <category>lib</category>
+        </properties>
             <properties/>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
+
             <version>2.6.2</version>
             <type>jar</type>
+        <properties>
+<jnlp.jar>true</jnlp.jar>
+            <category>lib</category>
+        </properties>
             <properties/>
         </dependency>
     </dependencies>
@@ -92,7 +116,22 @@
                 <include>**/Test*.java</include>
             </includes>
         </unitTest>
+
+<resources>
+<resource>
+<directory>${basedir}/src/classScore/gui/resources</directory>
+ <includes>
+<include>
+*.gif
+</include>
+ </includes>
+</resource>
+</resources>
+
     </build>
+
+
+
     <reports>
         <report>maven-jdepend-plugin</report>
         <report>maven-pmd-plugin</report>
@@ -105,12 +144,7 @@
         <report>maven-tasklist-plugin</report>
         <report>maven-clover-plugin</report>
     </reports>
-    
-     <jnlp>
-     	<description>Gene functional class statistical scoring tool</description>
-<homepage>http://microarray.cu-genome.org/ermineJ</homepage>
-     </jnlp>
-    
-    
+
+<category>main</category>    
     <properties/>
 </project>
