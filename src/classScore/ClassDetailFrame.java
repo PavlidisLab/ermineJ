@@ -7,12 +7,14 @@ import javax.swing.table.*;
 import java.util.Map;
 import java.util.ArrayList;
 import java.text.NumberFormat;
-import baseCode.gui.JMatrixDisplay;
-
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.dataStructure.reader.DoubleMatrixReader;
 import java.io.IOException;
 import java.io.File;
+
+import baseCode.gui.JMatrixDisplay;
+import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.reader.DoubleMatrixReader;
+import baseCode.graphics.text.Util;
+
 
 /**
  * <p>Title: </p>
@@ -382,6 +384,12 @@ class MatrixDisplayCellRenderer
 
 
 class MatrixDisplayColumnHeaderRenderer extends JButton implements TableCellRenderer {
+   
+    String m_columnName;
+    final int PREFERRED_WIDTH  =  5;
+    final int PREFERRED_HEIGHT = 80;
+    final int MAX_TEXT_LENGTH  = 12;
+       
     // This method is called each time a column header
     // using this renderer needs to be rendered.
     public Component getTableCellRendererComponent(JTable table, Object value,
@@ -392,15 +400,33 @@ class MatrixDisplayColumnHeaderRenderer extends JButton implements TableCellRend
         // hasFocus is always false
 
         // Configure the component with the specified value
-        setText( "X" ); //value.toString());
-
+        m_columnName = value.toString();
+                
         // Set tool tip if desired
-        setToolTipText((String)value);
+        setToolTipText( m_columnName );
 
         // Since the renderer is a component, return itself
         return this;
     }
+    
+    protected void paintComponent( Graphics g ) {
+       
+        super.paintComponent( g );
+        Font font = getFont();
 
+        if (m_columnName.length() > MAX_TEXT_LENGTH)
+           m_columnName = m_columnName.substring( 0, MAX_TEXT_LENGTH );
+        
+        int x = getSize().width  - 2;
+        int y = getSize().height - 3;    
+        Util.drawVerticalString( g, m_columnName, font, x, y );
+    }
+    
+    public Dimension getPreferredSize() {
+       
+       return new Dimension( PREFERRED_WIDTH, PREFERRED_HEIGHT );
+    }
+    
     // The following methods override the defaults for performance reasons
     public void validate() {}
     public void revalidate() {}
