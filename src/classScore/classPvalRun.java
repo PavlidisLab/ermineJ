@@ -139,10 +139,10 @@ public class classPvalRun {
       System.out.println( name );
       Map classToProbe = geneData.getClassToProbeMap();
 
-      final ArrayList probes = ( ArrayList ) classToProbe.get( classID );
+      final ArrayList probeIDs = ( ArrayList ) classToProbe.get( classID );
 
       final Map pvals = new HashMap();
-      for ( int i = 0, n = probes.size(); i < n; i++ ) {
+      for ( int i = 0, n = probeIDs.size(); i < n; i++ ) {
          //System.err.println((String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i ) );
          Double pvalue = new Double( Math.pow( 10.0,
                                                -probePvalMapper.getPval( (
@@ -150,15 +150,13 @@ public class classPvalRun {
          pvals.put( ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i ), pvalue );
       }
 
-      if ( probes == null ) {
+      if ( probeIDs == null ) {
          throw new RuntimeException( "Class data retrieval error for " + name );
       }
 
       // create the details frame
-      JDetailsFrame f = new JDetailsFrame(
-          pvals, classToProbe, classID, geneData, settings
-          );
-      f.setTitle( name + " (" + probes.size() + " items)" );
+      JDetailsFrame f = new JDetailsFrame( probeIDs, pvals, geneData, settings );
+      f.setTitle( name + " (" + probeIDs.size() + " items)" );
       f.show();
    }
 
