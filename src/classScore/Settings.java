@@ -96,7 +96,9 @@ public class Settings {
          dataFolder = URLDecoder.decode( ( new File( dataFolder )
                .getCanonicalPath() ), "ISO-8859-1" );
       } catch ( IOException ex ) {
-         GuiUtil.error( "Could not find data folder.  Press OK to quit." ); // make a big deal...
+         GuiUtil.error( 
+            "Could not find data folder." +
+            "Press OK to quit." ); // make a big deal...
          System.exit( 1 );
       }
       classFolder = new String( dataFolder + File.separator + "genesets" );

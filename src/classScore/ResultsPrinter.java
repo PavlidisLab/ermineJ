@@ -90,7 +90,10 @@ public class ResultsPrinter {
            }
            out.close();
         } catch (IOException e) {
-           GuiUtil.error( "An error occured while writing to file " + dest_file + ": " + e + ". If this problem persists, please contact the software vendor." );
+           GuiUtil.error( 
+              "Unable to write to file " + dest_file + "\n" +
+              "Please make sure the file is not open in another applicaiton.\n" +
+              "If this problem persists, please contact the software vendor." );
         }
      }
 

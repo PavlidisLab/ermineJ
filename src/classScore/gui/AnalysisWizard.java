@@ -155,7 +155,7 @@ public class AnalysisWizard extends Wizard
          settings.writePrefs();
       } catch (IOException e) {
          GuiUtil.error( 
-            "Could not save preferences: " + e +
+            "Could not save preferences: " + e + "\n" +
             "If this problem persists, please contact the software vendor. " +
             "Press OK to quit." );
          System.exit( 1 );
