@@ -34,15 +34,15 @@
 	Primarily they center around the issue of establishing which method for scoring classes 'works best'. </p>
 	
 	<h2>Implement gene weighting methods</h2>
-	<p>This is basically the last thing that needs to be done before we can really use the software.</p>
+	<p><strong>DONE</strong> This is basically the last thing that needs to be done before we can really use the software.</p>
 	
 	<h2>Additional class scoring methods (experiment score)</h2>
 	<p>The methods we already have available. Here 'score' means the raw score for a gene, typically the -log(p value) for group comparisions.</p>
 	<ul>
-	<li>Mean of scores in the class</li>
-	<li>Median of scores in the class</li>
-	<li>Quantile: Variant of median: using an arbitrary quantile, such as the 75th.</li>
-	<li>Variant of quantile/mean: Using the mean of values above a quantile.</li>
+	<li><strong>DONE</strong>Mean of scores in the class</li>
+	<li><strong>DONE</strong>Median of scores in the class</li>
+	<li><strong>DONE</strong>Quantile: Variant of median: using an arbitrary quantile, such as the 75th.</li>
+	<li><strong>DONE</strong>Variant of quantile/mean: Using the mean of values above a quantile.</li>
 	</ul>
 	
 	<h4>Additional methods for experiment scores:</h4>
@@ -61,27 +61,29 @@
 	of raw scores for genes in the experiment. The procedure would break the distribution  into bins (perhaps 10), and compare
 	the distribution of scores in the class to the distribution for the whole data set.</p>
 	
-	<p><b>An additional method</b> uses the hypergeometric distribution (no binning required). It differs from all the other methods in that it requires
+	<p><strong>DONE</strong>  <b>An additional method</b> uses the hypergeometric distribution (no binning required). It differs from all the other methods in that it requires
 	selecting a set of genes with a threshold, and then seeing if the number of genes in a class are concentrated in that section
 	of the data. Note that this is similar in flavor to the knn method described in our paper.</p>
 	
-	<p><b>A final method</b>, inspired by the previous, is to measure the AUC (area under the receiver operator characteristic) for
+	<p><strong>DONE</strong>  <b>A final method</b>, inspired by the previous, is to measure the AUC (area under the receiver operator characteristic) for
 	the genes in the class vis the ranking provided by the gene scores. 
 	This does not require using a threshold. However, it does require calibration. Unlike the other methods, this is not data dependent
 	(but it is still class size dependent, as a proportion of the full data set).</p>
 	
 	<h2>Randomization trials for multiple test correction</h2>
-	<p>An interesting issue is how, or if, to correct for multiple testing when considering 100s of classes.</p>	
-	
-	<p>Multiple testing correction here would involve...</p>
+	<p><strong>DONE</strong>(sort of) An interesting issue is how, or if, to correct for multiple testing when considering 100s of classes. I have implemented Westfall-Young, Benjamini-Hochberg, and Bonferroni.</p>	
 	
 	<h2>Optimization of background distribution calculation</h2>
+	<p><strong>DONE</strong>: The code runs reasonably fast.</p>
+
+	
+	
 	<p>The slow step in class scoring where empirical pvalues are found
 	is determining the background distribution. There are several approaches to improving performance:</p>
 	<ul>
 	<li>Only calculate backgrounds for class sizes which are populated. - if no classes have that size, skip it.</li>
 	<li>For larger classes, we can probably skip every 2 or 3 classes.</li>
-	<li>How many iterations do we need before the ranking at the top stops changing? 10k? 100k? 500k?</li>
+	<li><strong>DONE</strong>How many iterations do we need before the ranking at the top stops changing? 10k? 100k? 500k?</li>
 	<li>We can interactively refine the background distributions for classes which have high scores. In other words, we would first
 	calculate the raw class scores. Then, the background calculation would proceed on the basis of how well the distribution
 	accounts for the score. This is complex because it requires interaction between two parts of the software.</li>
@@ -94,8 +96,8 @@
 
 	<p>Factors which I want to quantify and evaluate:</p>
 	<ul>
-	<li>The effect of weighting/not weighting repeated appearances of genes.</li>
-	<li>The effect of different scoring methods on the results obtained.</li>
+	<li><strong>DONE</strong>The effect of weighting/not weighting repeated appearances of genes. (you have to do weighting)</li>
+	<li>The effect of different scoring methods on the results obtained. </li>
 	<li>The effect of filtering the data first: removing genes which are not expressed, for example.</li>
 	</ul>
 	
