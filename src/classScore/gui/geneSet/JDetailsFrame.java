@@ -13,19 +13,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
-import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -40,6 +27,10 @@ import baseCode.gui.table.JVerticalTableHeaderRenderer;
 import classScore.GeneAnnotations;
 import classScore.Settings;
 import classScore.SortFilterModel;
+import javax.swing.*;
+import baseCode.gui.JGradientBar;
+import java.awt.FlowLayout;
+import javax.swing.event.*;
 
 /**
  * @version $Id$
@@ -56,12 +47,13 @@ public class JDetailsFrame
    final int PREFERRED_WIDTH_COLUMN_1 = 75;
    final int PREFERRED_WIDTH_COLUMN_2 = 75;
    final int PREFERRED_WIDTH_COLUMN_3 = 300;
+   final int COLOR_RANGE_SLIDER_RESOLUTION = 10;
 
    public JMatrixDisplay m_matrixDisplay = null;
    protected JScrollPane m_tableScrollPane = new JScrollPane();
    protected JTable m_table = new JTable();
    protected BorderLayout borderLayout1 = new BorderLayout();
-   protected JToolBar m_toolBar = new JToolBar();
+   protected JToolBar m_toolbar = new JToolBar();
    JSlider m_matrixDisplayCellWidthSlider = new JSlider();
    JMenuBar m_menuBar = new JMenuBar();
    JMenu m_fileMenu = new JMenu();
@@ -71,6 +63,11 @@ public class JDetailsFrame
    JMenuItem m_saveFileMenuItem = new JMenuItem();
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
    DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
+   JLabel jLabel1 = new JLabel();
+   JLabel jLabel2 = new JLabel();
+   JLabel jLabel3 = new JLabel();
+   JSlider m_colorRangeSlider = new JSlider();
+   JGradientBar m_gradientBar = new JGradientBar();
 
    public JDetailsFrame( ArrayList values, Map pvals, Map classToProbe, String id,
                          GeneAnnotations geneData, Settings settings ) {
@@ -96,6 +93,14 @@ public class JDetailsFrame
       getContentPane().setLayout( borderLayout1 );
       setDefaultCloseOperation( DISPOSE_ON_CLOSE );
 
+      m_gradientBar.setMaximumSize(new Dimension(200, 30));
+      m_gradientBar.setPreferredSize(new Dimension(120, 30));
+      m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
+
+      double min = m_matrixDisplay.getDisplayMin();
+      double max = m_matrixDisplay.getDisplayMax();
+      m_gradientBar.setLabels( min, max );
+
       // Enable the horizontal scroll bar
       m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
@@ -109,7 +114,7 @@ public class JDetailsFrame
       m_table.setGridColor( Color.lightGray );
 
       // add a viewport with a table inside it
-      m_toolBar.setFloatable( false );
+      m_toolbar.setFloatable( false );
       this.setJMenuBar( m_menuBar );
       m_fileMenu.setText( "File" );
       m_greenredColormapMenuItem.setSelected( false );
@@ -137,11 +142,21 @@ public class JDetailsFrame
       m_matrixDisplayCellWidthSlider.setMinorTickSpacing( 3 );
       m_matrixDisplayCellWidthSlider.setPaintLabels( false );
       m_matrixDisplayCellWidthSlider.setPaintTicks( true );
-      m_matrixDisplayCellWidthSlider.setMaximumSize( new Dimension( 60, 24 ) );
-      m_matrixDisplayCellWidthSlider.setPreferredSize( new Dimension( 50, 24 ) );
+      m_matrixDisplayCellWidthSlider.setMaximumSize( new Dimension( 90, 24 ) );
+      m_matrixDisplayCellWidthSlider.setPreferredSize( new Dimension( 90, 24 ) );
       m_matrixDisplayCellWidthSlider.addChangeListener( new
           JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter( this ) );
       this.setResizable( true );
+      jLabel1.setText( "Cell Width:" );
+      jLabel2.setText( "    " );
+      jLabel3.setText( "Color Range:" );
+      m_colorRangeSlider.setMaximum( 6 * COLOR_RANGE_SLIDER_RESOLUTION );
+      m_colorRangeSlider.setMinimum( 1 );
+      m_colorRangeSlider.setValue( ( int ) ( m_matrixDisplay.getDisplayRange() *
+                                             COLOR_RANGE_SLIDER_RESOLUTION ) );
+      m_colorRangeSlider.setMaximumSize( new Dimension( 50, 24 ) );
+      m_colorRangeSlider.setPreferredSize( new Dimension( 50, 24 ) );
+      m_colorRangeSlider.addChangeListener( new JDetailsFrame_m_colorRangeSlider_changeAdapter( this ) );
       m_tableScrollPane.getViewport().add( m_table, null );
 
       // Reposition the table inside the scrollpane
@@ -149,12 +164,18 @@ public class JDetailsFrame
       m_tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
 
       this.getContentPane().add( m_tableScrollPane, BorderLayout.CENTER );
-      this.getContentPane().add( m_toolBar, BorderLayout.NORTH );
-      m_toolBar.add( m_matrixDisplayCellWidthSlider, null );
+      this.getContentPane().add( m_toolbar, BorderLayout.NORTH );
+      m_toolbar.add( jLabel1, null );
+      m_toolbar.add( m_matrixDisplayCellWidthSlider, null );
+      m_toolbar.add( jLabel2, null );
+      m_toolbar.add( jLabel3, null );
+      m_toolbar.add( m_colorRangeSlider, null );
+      m_toolbar.add( m_gradientBar, null );
+
       m_menuBar.add( m_fileMenu );
       m_menuBar.add( m_viewMenu );
 
-      // Color map menu items (radio button group -- only one can be selected at one time)
+     // Color map menu items (radio button group -- only one can be selected at one time)
       ButtonGroup group = new ButtonGroup();
       group.add( m_greenredColormapMenuItem );
       group.add( m_blackbodyColormapMenuItem );
@@ -164,6 +185,8 @@ public class JDetailsFrame
       m_viewMenu.add( m_greenredColormapMenuItem );
       m_viewMenu.add( m_blackbodyColormapMenuItem );
       m_fileMenu.add( m_saveFileMenuItem );
+      m_matrixDisplayCellWidthSlider.setPaintTrack( true );
+      m_matrixDisplayCellWidthSlider.setPaintTicks( false );
    }
 
    private void createDetailsTable(
@@ -239,8 +262,7 @@ public class JDetailsFrame
       // Make the columns in the matrix display not too wide (cell-size)
       // and set a custom cell renderer
       JMatrixTableCellRenderer cellRenderer = new JMatrixTableCellRenderer(
-          m_matrixDisplay,
-          m_nf
+          m_matrixDisplay
           ); // create one instance that will be used to draw each cell
 
       JVerticalTableHeaderRenderer verticalHeaderRenderer =
@@ -318,7 +340,9 @@ public class JDetailsFrame
    void m_greenredColormapMenuItem_actionPerformed( ActionEvent e ) {
 
       try {
-         m_matrixDisplay.setColorMap( ColorMap.GREENRED_COLORMAP );
+         Color[] colorMap = ColorMap.GREENRED_COLORMAP;
+         m_matrixDisplay.setColorMap( colorMap );
+         m_gradientBar.setColorMap( colorMap );
       }
       catch ( Exception ex ) {
       }
@@ -328,7 +352,9 @@ public class JDetailsFrame
    void m_blackbodyColormapMenuItem_actionPerformed( ActionEvent e ) {
 
       try {
-         m_matrixDisplay.setColorMap( ColorMap.BLACKBODY_COLORMAP );
+         Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
+         m_matrixDisplay.setColorMap( colorMap );
+         m_gradientBar.setColorMap( colorMap );
       }
       catch ( Exception ex ) {
       }
@@ -374,6 +400,10 @@ public class JDetailsFrame
 
       boolean normalize = m_normalizeMenuItem.isSelected();
       m_matrixDisplay.setStandardizedEnabled( normalize );
+
+      double min = m_matrixDisplay.getDisplayMin();
+      double max = m_matrixDisplay.getDisplayMax();
+      m_gradientBar.setLabels( min, max );
       m_table.repaint();
    }
 
@@ -396,6 +426,17 @@ public class JDetailsFrame
             col.setPreferredWidth( width );
          }
       }
+   }
+
+   void m_colorRangeSlider_stateChanged( ChangeEvent e ) {
+
+      JSlider source = ( JSlider ) e.getSource();
+      double range = source.getValue();
+      double max = + ( ( range / 2 ) / COLOR_RANGE_SLIDER_RESOLUTION );
+      double min = - ( ( range / 2 ) / COLOR_RANGE_SLIDER_RESOLUTION );
+      m_gradientBar.setLabels( min, max );
+      m_matrixDisplay.setDisplayRange( min, max );
+      m_table.repaint();
    }
 
 } // end class JDetailsFrame
@@ -462,5 +503,18 @@ class JDetailsFrame_m_matrixDisplayCellWidthSlider_changeAdapter
 
    public void stateChanged( ChangeEvent e ) {
       adaptee.m_matrixDisplayCellWidthSlider_stateChanged( e );
+   }
+}
+
+class JDetailsFrame_m_colorRangeSlider_changeAdapter
+    implements javax.swing.event.ChangeListener {
+   JDetailsFrame adaptee;
+
+   JDetailsFrame_m_colorRangeSlider_changeAdapter( JDetailsFrame adaptee ) {
+      this.adaptee = adaptee;
+   }
+
+   public void stateChanged( ChangeEvent e ) {
+      adaptee.m_colorRangeSlider_stateChanged( e );
    }
 }
