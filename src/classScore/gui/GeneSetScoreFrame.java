@@ -140,6 +140,7 @@ public class GeneSetScoreFrame
       runAnalysisMenuItem.setMnemonic( 'R' );
       runAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,InputEvent.CTRL_MASK));
       cancelAnalysisMenuItem.setText( "Cancel Analysis" );
+      cancelAnalysisMenuItem.setEnabled(false);
       cancelAnalysisMenuItem.addActionListener( new
                                              GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( this ) );
       cancelAnalysisMenuItem.setMnemonic( 'C' );
@@ -232,6 +233,7 @@ public class GeneSetScoreFrame
       runAnalysisMenuItem.setEnabled(false);
       loadAnalysisMenuItem.setEnabled(false);
       saveAnalysisMenuItem.setEnabled(false);
+      cancelAnalysisMenuItem.setEnabled(true);
    }
 
    public void enableMenusForAnalysis()
@@ -241,6 +243,7 @@ public class GeneSetScoreFrame
       runAnalysisMenuItem.setEnabled(true);
       loadAnalysisMenuItem.setEnabled(true);
       saveAnalysisMenuItem.setEnabled(true);
+      cancelAnalysisMenuItem.setEnabled(false);
    }
 
    public void initialize() {
@@ -256,7 +259,7 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Reading GO descriptions " + settings.getClassFile());
          goData = new GONames(settings.getClassFile()); // parse go name file
          progressBar.setValue(70);
-         
+
          statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
          geneData = new GeneAnnotations(settings.getAnnotFile(), statusMessenger);
          progressBar.setValue(100);

@@ -63,9 +63,6 @@ public class StartupDialog extends AppDialog {
             .addActionListener( new StartupDialog_classBrowseButton_actionAdapter(
                   this ) );
       classBrowseButton.setText( "Browse..." );
-      classBrowseButton
-            .addActionListener( new StartupDialog_classBrowseButton_actionAdapter(
-                  this ) );
       annotPanel.add( annotLabel, null );
       annotPanel.add( annotFile, null );
       annotPanel.add( annotBrowseButton, null );

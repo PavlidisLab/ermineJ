@@ -15,7 +15,7 @@ import baseCode.gui.GuiUtil;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author Homin Lee
  * @author Will Braynen
  * @version $Id$
@@ -85,7 +85,7 @@ public class Settings {
          dataFolder = URLDecoder.decode( ( new File( dataFolder )
                .getCanonicalPath() ), "ISO-8859-1" );
       } catch ( IOException ex ) {
-         GuiUtil.error( 
+         GuiUtil.error(
             "Could not find data folder.\n" +
             "Expected to find it at " + dataFolder + "\n" +
             "Press OK to quit." ); // make a big deal...
@@ -94,10 +94,10 @@ public class Settings {
       classFolder = new String( dataFolder + File.separator + "genesets" );
       if ( pref_file.compareTo( "" ) == 0 )
             pref_file = dataFolder + File.separator + "ClassScore.preferences";
-      classFile = dataFolder + File.separator + "go_200406-termdb.xml";
-      annotFile = dataFolder + File.separator + "HG-U95A.an.txt";
-      rawFile = dataFolder + File.separator + "melanoma_and_sarcomaMAS5.txt";
-      scoreFile = dataFolder + File.separator + "one-way-anova-parsed.txt";
+      classFile = "";
+      annotFile = "";
+      rawFile = "";
+      scoreFile = "";
 
       properties = new Properties();
       try {
