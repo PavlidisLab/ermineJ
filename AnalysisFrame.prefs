@@ -1,10 +1,10 @@
 #
-#Wed Jun 16 13:01:10 EDT 2004
+#Wed Jun 16 15:35:38 EDT 2004
 nameFile=C\:\\jbproject\\ermineJ\\data\\goNames.txt
-minClassSize=5
+minClassSize=14
 probeFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
 iterations=10
-maxClassSize=20
+maxClassSize=15
 pValTheshold=0.001
 outputFile=C\:\\jbproject\\ermineJ\\data\\test.results.txt
 doLog=true

@@ -3,7 +3,6 @@ package classScore;
 import java.io.*;
 import java.text.*;
 import java.util.*;
-
 import javax.swing.table.*;
 
 import util.*;
@@ -171,13 +170,12 @@ public class classPvalRun {
          //printResults(true);
       }
 
-/*
-      goName = null;
-      probePvalMapper = null;
-      geneData = null;
-      probeGroups = null;
-      classToProbe = null;
-*/
+      //for table output
+      for(int i=0; i<sortedclasses.size(); i++)
+      {
+         ((classresult) results.get( (String) sortedclasses.get(i))).setRank(i+1);
+      }
+
       messenger.setStatus("Done!");
    }
 
@@ -968,6 +966,11 @@ public class classPvalRun {
       catch (IOException e) {
          e.printStackTrace();
       }
+   }
+
+   public Map getResults()
+   {
+      return results;
    }
 }
 

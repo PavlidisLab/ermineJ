@@ -1,7 +1,6 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.text.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -38,9 +37,20 @@ public class OutputPanel extends JScrollPane {
    //   listenerList.add(ClassDetailsEventListener.class, listener);
    // }
    public void addInitialClassData(InitialMaps data)
-   { model.addInitialClassData(data); }
-   public void addRunData(classPvalRun data)
-   { model.addRunData(data); }
+   {
+      model.addInitialClassData(data);
+      table.setModel(model);
+      table.revalidate();
+   }
+
+   public void addRunData(Map data)
+   {
+      model.addRunData(data);
+      table.addColumn(new TableColumn(model.getColumnCount()-3));
+      table.addColumn(new TableColumn(model.getColumnCount()-2));
+      table.addColumn(new TableColumn(model.getColumnCount()-1));
+   }
+
 }
 
 class OutputTableModel extends AbstractTableModel
@@ -48,10 +58,13 @@ class OutputTableModel extends AbstractTableModel
    InitialMaps imaps;
    ArrayList results=new ArrayList();
    ArrayList columnNames = new ArrayList();
+   private NumberFormat nf = NumberFormat.getInstance();
    int state = -1;
+   int cols_per_run=3;
 
    public OutputTableModel()
    {
+      nf.setMaximumFractionDigits(8);
       columnNames.add("Name");
       columnNames.add("Description");
       columnNames.add("# of Probes");
@@ -60,35 +73,34 @@ class OutputTableModel extends AbstractTableModel
 
    public void addInitialClassData(InitialMaps imaps)
    {
-      this.imaps=imaps;
       state=0;
+      this.imaps=imaps;
    }
 
-   public void addRunData(classPvalRun result)
+   public void addRunData(Map result)
    {
+      state++;
       results.add(result);
       columnNames.add("Run " + state + " Rank");
+      columnNames.add("Run " + state + " Score");
       columnNames.add("Run " + state + " Pval");
-      state++;
    }
 
    public String getColumnName(int i) { return (String)columnNames.get(i); }
+
    public int getColumnCount() { return columnNames.size(); }
 
    public int getRowCount()
    {
-      switch(state)
-      {
-          case 0:
-             return imaps.numClasses();
-          default:
-             return 20;
-      }
+      if(state==-1)
+         return 20;
+      else
+         return imaps.numClasses();
    }
 
    public Object getValueAt(int i, int j)
    {
-      if(state>=0 && j<=3)
+      if(state>=0 && j<4)
       {
          String classid = imaps.getClass(i);
          switch (j)
@@ -105,10 +117,21 @@ class OutputTableModel extends AbstractTableModel
       }
       else if(state>0)
       {
-         if(j%2 == 0)
-            return "Run " + state + " Rank";
+         String classid = imaps.getClass(i);
+         double runnum=Math.floor((j-4)/cols_per_run);
+         Map data = (Map)results.get((int)runnum);
+         if(data.containsKey(classid))
+         {
+            classresult res = (classresult) data.get(classid);
+            if((j-4)%cols_per_run == 0)
+               return new Integer(res.getRank());
+            else if((j-4)%cols_per_run == 1)
+               return new Double(nf.format(res.getScore()));
+            else
+               return new Double(nf.format(res.getPvalue()));
+         }
          else
-            return "Run " + state + " Pval";
+            return "";
       }
       return "";
    }

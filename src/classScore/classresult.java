@@ -29,6 +29,7 @@ public class classresult
    private double rocpval_corr = 0.0;
    private LinkedHashMap identicalTo = null; // Defines classes this one is identical to in terms of members.
    private DecimalFormat nf;
+   private int rank;
 
    public classresult() {
       this(null, null, 0, 0, 0.0, 1.0, 1.0, 0.5, 1.0);
@@ -168,6 +169,14 @@ public class classresult
 
    public int getEffectiveSize() {
       return effective_size;
+   }
+
+   public int getRank() {
+      return rank;
+   }
+
+   public void setRank(int n) {
+      rank=n;
    }
 
    /**

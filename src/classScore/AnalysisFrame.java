@@ -532,7 +532,7 @@ public class AnalysisFrame extends JFrame {
 
    private void readPrefs()
    {
-      Properties settings = new Properties();
+      Properties settings=callingframe.settings;
       try {
          File fi = new File("AnalysisFrame.prefs");
          if (fi.canRead()) {
@@ -551,8 +551,6 @@ public class AnalysisFrame extends JFrame {
          rawFile.setText( (String) settings.get("rawFile"));
          jTextFieldMaxClassSize.setText((String) settings.get("maxClassSize"));
          jTextFieldMinClassSize.setText((String) settings.get("minClassSize"));
-         System.err.println((String)settings.get("doLog"));
-         System.err.println(Boolean.valueOf((String)settings.get("doLog")));
          jCheckBoxDoLog.setSelected(Boolean.valueOf((String)settings.get("doLog")).booleanValue());
          jTextFieldPValueThreshold.setText((String) settings.get("pValTheshold"));
          jTextFieldIterations.setText((String) settings.get("iterations"));
@@ -561,7 +559,7 @@ public class AnalysisFrame extends JFrame {
    }
 
    private void writePrefs() {
-      Properties settings = new Properties();
+      Properties settings=callingframe.settings;
       settings.setProperty("scoreFile", scoreFile.getText());
       settings.setProperty("nameFile", nameFile.getText());
       settings.setProperty("outputFile", outputFile.getText());
@@ -573,8 +571,6 @@ public class AnalysisFrame extends JFrame {
       settings.setProperty("pValTheshold", jTextFieldPValueThreshold.getText());
       settings.setProperty("iterations", jTextFieldIterations.getText());
       settings.setProperty("scorecol", jTextFieldScoreCol.getText());
-
-
       try {
          OutputStream f = new FileOutputStream("AnalysisFrame.prefs");
          settings.store(f, "");

@@ -52,6 +52,7 @@ public class classScoreFrame
    JMenuItem loadClassMenuItem = new JMenuItem();
    JMenu analysisMenu = new JMenu();
    JMenuItem runAnalysisMenuItem = new JMenuItem();
+   JMenuItem loadAnalysisMenuItem = new JMenuItem();
   ResultPanel resultpanel;
   InitialMaps imaps;
   boolean initialized=false;
@@ -60,6 +61,8 @@ public class classScoreFrame
   String defaultNameFile;
   String defaultProbeFile;
   String defaultFolder;
+
+  Properties settings = new Properties();
 
    public classScoreFrame() {
       try {
@@ -125,16 +128,13 @@ public class classScoreFrame
     runAnalysisMenuItem.setText("Run Analysis");
     runAnalysisMenuItem.addActionListener(new classScoreFrame_runAnalysisMenuItem_actionAdapter(this));
     analysisMenu.setText("Analysis");
-    cPanel = new ClassPanel(this);
-    cPanel.getViewport().setBackground(SystemColor.control);
+    loadAnalysisMenuItem.setText("Load Analysis");
+    loadAnalysisMenuItem.addActionListener(new classScoreFrame_loadAnalysisMenuItem_actionAdapter(this));
 
-    //oPanel = new OutputPanel();
+//cPanel = new ClassPanel(this);
+    oPanel = new OutputPanel();
 
-
-
-
-
-    cPanel.setModel(InitialMaps.toBlankTableModel());
+    //cPanel.setModel(InitialMaps.toBlankTableModel());
 
       jPanelMainControls.add(jButtonQuit, null);
     jPanelMainControls.add(jButtonLoadResults, null);
@@ -144,7 +144,7 @@ public class classScoreFrame
     jPanelStatus.add(jLabelStatus, null);
     jPanel1.add(jPanelMainControls, BorderLayout.CENTER);
     jPanel1.add(jTabbedPane1, BorderLayout.NORTH);
-    jTabbedPane1.addTab("cPanel", cPanel);
+    //jTabbedPane1.addTab("cPanel", cPanel);
     jTabbedPane1.addTab("oPanel", oPanel);
 
 
@@ -187,6 +187,7 @@ public class classScoreFrame
       classMenu.add(defineClassMenuItem);
       classMenu.add(modClassMenuItem);
       analysisMenu.add(runAnalysisMenuItem);
+      analysisMenu.add(loadAnalysisMenuItem);
       chooser.setCurrentDirectory(startPath);
       readPrefs();
       showStatus("Please see 'About this software' for license information.");
@@ -281,8 +282,8 @@ public class classScoreFrame
       catch (IOException e) {
          error(e, "File reading or writing");
       }
-      cPanel.setModel(imaps.toTableModel());
-      //oPanel.addInitialClassData(imaps);
+      //cPanel.setModel(imaps.toTableModel());
+      oPanel.addInitialClassData(imaps);
       initialized=true;
    }
 
@@ -293,8 +294,8 @@ public class classScoreFrame
    {
       try
       {
-         //if(!initialized)
-         //   initialize();
+         if(!initialized)
+            initialize();
          InitialMaps runmaps = new InitialMaps(geneScoreFile, probeAnnotFile, goNameFile,
                                                classScoreMethod, groupMethod,
                                                maxClassSize, minClassSize, numIter, 50,
@@ -311,7 +312,7 @@ public class classScoreFrame
          resultpanel.setModel(results.toTableModel());
          runnum++;
          jTabbedPane1.addTab("Run " + Integer.toString(runnum),resultpanel);
-         //oPanel.addRunData(results);
+         oPanel.addRunData(results.getResults());
       }
       catch (IllegalArgumentException e) {
          error(e, "During class score calculation");
@@ -597,6 +598,10 @@ public class classScoreFrame
      showWizard(aframe);
   }
 
+  void loadAnalysisMenuItem_actionPerformed(ActionEvent e) {
+     //oPanel.addColumn("new col");
+  }
+
   void showWizard(JFrame j)
   {
      Dimension dlgSize = j.getPreferredSize();
@@ -704,5 +709,16 @@ class classScoreFrame_runAnalysisMenuItem_actionAdapter implements java.awt.even
   }
   public void actionPerformed(ActionEvent e) {
     adaptee.runAnalysisMenuItem_actionPerformed(e);
+  }
+}
+
+class classScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
+  classScoreFrame adaptee;
+
+  classScoreFrame_loadAnalysisMenuItem_actionAdapter(classScoreFrame adaptee) {
+    this.adaptee = adaptee;
+  }
+  public void actionPerformed(ActionEvent e) {
+    adaptee.loadAnalysisMenuItem_actionPerformed(e);
   }
 }

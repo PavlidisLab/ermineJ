@@ -371,13 +371,16 @@ public class ClassMap {
    }
 
    public void hackClassToProbeMap() {
+      int min=14;
+      int max=15;
       Set keys = classToProbeMap.keySet();
       HashSet removekeys = new HashSet();
       Iterator it = keys.iterator();
       while(it.hasNext())
       {
          String geneclass = (String) it.next();
-         if(((ArrayList)classToProbeMap.get(geneclass)).size() < 2)
+         int size=((ArrayList)classToProbeMap.get(geneclass)).size();
+         if(size < min || size > max)
             removekeys.add(geneclass);
       }
 
