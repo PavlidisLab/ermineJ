@@ -53,44 +53,53 @@ public class class_pvals {
                      String wt_check,
                      int pvalcolumn,
                      String dolog_check,
-                     String mtc_method) {
+                     String mtc_method,
+                     classScoreStatus messenger) throws IllegalArgumentException, IOException {
 
     nf.setMaximumFractionDigits(8);
 
+
     // user flags and constants:
     user_pvalue = - (Math.log(pval) / Math.log(10)); // user defined pval (cutoff) for hypergeometric todo: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
+
+
     weight_on = (Boolean.valueOf(wt_check)).booleanValue();
+
     dolog = (Boolean.valueOf(dolog_check)).booleanValue();
-
     classToProbe = new LinkedHashMap();
-
     effective_sizes = new HashMap();
     actual_sizes = new HashMap();
     dest_file = destination_file;
     target_ranks = new HashMap(); // will hold ranks of items in a class.
     record = new HashMap(); // scratch space to record those probes that have been seen when iterating over a class.
 
+    messenger.setStatus("Reading GO descriptions");
     goName = new GoName_parse(goNamesfile); // parse go name file
 
+    messenger.setStatus("Reading gene scores");
     probe_pval = new exp_class_scores(probe_pvalfile, wt_check, method,
                                       pvalcolumn, dolog, class_max_size,
                                       class_min_size, number_of_runs, quantile);
 
+    messenger.setStatus("Reading gene duplicate map");
     groupName = new Group_Parse(group_file, probe_pval.get_map()); // parse group file. Yields map of probe->replicates.
     probe_group = groupName.get_probe_group_map(); // map of probes to groups
 
     if (weight_on) {
       probe_pval.set_input_pvals(groupName.get_group_probe_map(), groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-
     }
+
+    messenger.setStatus("Reading in GO class membership");
     probe_class = new ClassMap(probe_classfile, probe_pval.get_map()); // parses affy->classes file. Yields map of go->probes
     classToProbe = probe_class.get_class_map(); // this is the map of go->probes
-    System.err.println("Read in classes and identified redundant classes");
-
-    System.out.println("Read in the files and parameters");
 
     // Calculate random classes. todo: what a mess. This histogram should be held by the class that originated it.
-    hist = probe_pval.generateNullDistribution();
+    messenger.setStatus("Starting resampling");
+    System.out.println("Starting resampling");
+    hist = probe_pval.generateNullDistribution(messenger);
+    messenger.setStatus("Finished resampling");
+
+//    messenger.setStatus(hist.toString());
     System.err.println(hist.toString());
 
     // Initialize the results data structure.
@@ -113,7 +122,7 @@ public class class_pvals {
     inputSize = input_rank_map.size(); // how many pvalues. This is constant under permutations of the data
     hgSizes(inp_entries); // get numOverThreshold and numUnderThreshold. Constant under permutations of the data.
 
-    System.err.println("input size=" + inputSize + " numOverThreshold=" +
+    System.err.println("Input size=" + inputSize + " numOverThreshold=" +
                        numOverThreshold + " numUnderThreshold=" +
                        numUnderThreshold + " "); //+  + "" + foo + "" + foo + "" + foo + "" + foo );
 
@@ -121,6 +130,8 @@ public class class_pvals {
     class_pval_generator(probe_pval.get_group_pval_map(), probe_pval.get_map(),
                          input_rank_map);
     sortResults();
+
+    messenger.setStatus("Multiple test correction");
 
     if (mtc_method.equals("bon")) {
       correct_pvals(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
@@ -132,9 +143,11 @@ public class class_pvals {
       correct_pvals(10000);
     }
 
+    messenger.setStatus("Beginning output");
     // all done:
     // print the results
     class_pval_print(true);
+    messenger.setStatus("Done!");
   }
 
   /**
@@ -142,7 +155,7 @@ public class class_pvals {
      doing permutations, it is much faster.
    */
   public double classPvalue(String class_name, Map group_pval_map,
-                            Map probesToPvals, Map input_rank_map) {
+                            Map probesToPvals, Map input_rank_map) throws IllegalStateException {
 
     double pval = 0.0;
     double rawscore = 0.0;
@@ -192,6 +205,8 @@ public class class_pvals {
     if (pval < 0) {
       System.err.println(
           "Warning, a rawscore yielded an invalid pvalue: Classname: " +
+          class_name);
+      throw new IllegalStateException("Warning, a rawscore yielded an invalid pvalue: Classname: " +
           class_name);
     }
     return pval;
@@ -406,11 +421,13 @@ public class class_pvals {
   /**
      convert a raw score into a pvalue, based on random background distribution
    */
-  public double scoreToPval(int in_size, double rawscore) {
+  public double scoreToPval(int in_size, double rawscore) throws IllegalStateException {
     double pval = hist.get_val(in_size, rawscore);
 
     if (Double.isNaN(pval)) {
       System.err.println("Warning, a pvalue was not a number: raw score = " +
+                         rawscore);
+      throw new IllegalStateException("Warning, a pvalue was not a number: raw score = " +
                          rawscore);
 
     }
@@ -794,15 +811,21 @@ public class class_pvals {
   }
 
   public static void main(String[] args) {
-    class_pvals test = new class_pvals(args[0], args[1], args[2], args[3],
-                                       args[4], args[5], args[6],
-                                       Integer.parseInt(args[7]),
-                                       Integer.parseInt(args[8]),
-                                       Integer.parseInt(args[9]),
-                                       Integer.parseInt(args[10]),
-                                       Double.parseDouble(args[11]), args[12],
-                                       Integer.parseInt(args[13]), args[14],
-                                       args[15]);
+    classScoreStatus m = new classScoreStatus(null);
+
+    try {
+      class_pvals test = new class_pvals(args[0], args[1], args[2], args[3],
+                                         args[4], args[5], args[6],
+                                         Integer.parseInt(args[7]),
+                                         Integer.parseInt(args[8]),
+                                         Integer.parseInt(args[9]),
+                                         Integer.parseInt(args[10]),
+                                         Double.parseDouble(args[11]), args[12],
+                                         Integer.parseInt(args[13]), args[14],
+                                         args[15], m);
+    } catch (IOException e ){
+      e.printStackTrace();
+    }
   }
 
 }

@@ -11,7 +11,7 @@ import java.text.*;
 
   @author Paul Pavlidis
   @version $Id$
-                                                                                                                                                            
+
 */
 public class classresult implements Comparable {
     private String class_id = null;
@@ -39,15 +39,15 @@ public class classresult implements Comparable {
 	this.setnames(id, class_name);
 	this.setsizes(size, effsize);
     }
-    
-    public classresult ( String id, 
-			 String class_name, 
-			 int size, 
-			 int effective_size, 
-			 double score, 
-			 double pvalue,  
-			 double hyperpval, 
-			 double aroc, 
+
+    public classresult ( String id,
+			 String class_name,
+			 int size,
+			 int effective_size,
+			 double score,
+			 double pvalue,
+			 double hyperpval,
+			 double aroc,
 			 double rocpval) {
 	this.class_id = id;
 	this.class_name = class_name;
@@ -64,47 +64,39 @@ public class classresult implements Comparable {
 	nf.setMinimumFractionDigits(3);
     }
 
-    public void print (BufferedWriter out) {
+    public void print (BufferedWriter out) throws IOException {
 	this.print(out, "");
    }
 
-    public void print (BufferedWriter out, String extracolumns) {
-	try {
-	    
-	    String fixnamea;
-	    String cleanname;
-	    if (class_name != null) {
-		fixnamea = class_name.replace(' ', '_'); // make the format compatible with the perl scripts Paul wrote.
-		cleanname = fixnamea.replace(':', '-'); // todo: figure out why this doesn't work.
-	    } else {
-		cleanname = "";
-	    }
-	    out.write(cleanname +"_" + 
-		      class_id + "" + "\t" + size + "\t" + 
-		      nf.format(score) + "\t" + nf.format(pvalue) + "\t" + 
-		      effective_size + "\t" + hypercut + "\t" + nf.format(hyperpval) + "\t" + 
-		      nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" + 
-		      nf.format(pvalue_corr) + "\t" + extracolumns + "\n");
-	} catch (IOException e) {
-	    System.err.println("There was an IO error" + e);
-	}
+    public void print (BufferedWriter out, String extracolumns) throws IOException {
+
+      String fixnamea;
+      String cleanname;
+      if (class_name != null) {
+        fixnamea = class_name.replace(' ', '_'); // make the format compatible with the perl scripts Paul wrote.
+        cleanname = fixnamea.replace(':', '-'); // todo: figure out why this doesn't work.
+      } else {
+        cleanname = "";
+      }
+      out.write(cleanname +"_" +
+                class_id + "" + "\t" + size + "\t" + effective_size + "\t" +
+                nf.format(score) + "\t" + nf.format(pvalue) + "\t"
+                 + hypercut + "\t" + nf.format(hyperpval) + "\t" +
+                /*  nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" +  */
+                nf.format(pvalue_corr) + "\t" + extracolumns + "\n");
     }
 
-   
-    public void print_headings (BufferedWriter out) {
+
+    public void print_headings (BufferedWriter out) throws IOException {
 	this.print_headings(out, "");
     }
 
 
-    public void print_headings (BufferedWriter out, String extracolumns) {
-	try {
-	    out.write("Class" + "\tsize" + "\tscore" + 
-		      "\tscore pval" + "\teffective_size" + 
-		      "\tN over pval cut\thyper pval" + "\tAROC" + "\tAROCpval" + 
-		      "\tCorrected_pvalue" + extracolumns + "\n");
-	} catch (IOException e) {
-	    System.err.println("There was an IO error" + e);
-	}
+    public void print_headings (BufferedWriter out, String extracolumns) throws IOException {
+      out.write("Class" + "\tsize" + "\teffective_size" + "\traw score" +
+                "\tresamp pval" +
+                "\tN over pval cut\tORA pval" /* + "\tAROC" + "\tAROCpval"  */ +
+                "\tCorrected_pvalue" + extracolumns + "\n");
     }
 
     public void setnames (String id, String name) {
@@ -177,9 +169,9 @@ public class classresult implements Comparable {
 
 
     /**
-       
+
     Default comparator for this class: sorts by the pvalue.
-    
+
     */
     public int compareTo(Object ob) {
 	classresult other = (classresult)ob;
