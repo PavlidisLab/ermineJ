@@ -294,6 +294,7 @@ public class OutputPanel extends JScrollPane {
             goData, results ) );
       classColToolTip = new String( "Total classes shown: "
             + geneData.selectedSets() );
+      table.revalidate();
    }
 
    public void addRun() {

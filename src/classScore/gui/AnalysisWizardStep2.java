@@ -1,14 +1,21 @@
 package classScore.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import baseCode.gui.WizardStep;
 import baseCode.util.FileTools;
 import classScore.Settings;
-import javax.swing.*;
 
 /**
  * <hr>
@@ -40,9 +47,9 @@ public class AnalysisWizardStep2 extends WizardStep {
    //Component initialization
    protected void jbInit() {
       JPanel step2Panel = new JPanel();
-      step2Panel.setPreferredSize( new Dimension( 340, 250 ) );
+      step2Panel.setPreferredSize( new Dimension( 380, 250 ) );
 
-      JPanel jPanel2 = new JPanel();
+      JPanel jPanel2 = new JPanel(); // holds everything...
       //    choose the score file
       JPanel jPanel8 = new JPanel();
       jPanel8.setPreferredSize(new Dimension(380, 50) );
@@ -56,8 +63,7 @@ public class AnalysisWizardStep2 extends WizardStep {
             .addActionListener( new AnalysisWizardStep2_scoreBrowseButton_actionAdapter(
                   this ) );
       scoreFile = new JTextField();
-      scoreFile.setPreferredSize( new Dimension( 280, 19 ) );
-      scoreFile.setMinimumSize( new Dimension( 4, 19 ) );
+      scoreFile.setPreferredSize( new Dimension( 230, 19 ) );
       jPanel8.add( jLabel2, null );
       jPanel8.add( scoreFile, null );
       jPanel8.add( scoreBrowseButton, null );
@@ -67,8 +73,7 @@ public class AnalysisWizardStep2 extends WizardStep {
       jPanel1.setPreferredSize(new Dimension(111, 50));
       jTextFieldScoreCol = new JTextField();
       JLabel jLabel10 = new JLabel();
-      jLabel10.setMaximumSize( new Dimension( 39, 15 ) );
-      jLabel10.setMinimumSize( new Dimension( 76, 15 ) );
+      jLabel10.setPreferredSize( new Dimension( 76, 15 ) );
       jLabel10.setLabelFor( jTextFieldScoreCol );
       jLabel10.setText( "Score column" );
       jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.RIGHT );
@@ -77,9 +82,9 @@ public class AnalysisWizardStep2 extends WizardStep {
             .setToolTipText( "Column of the gene score file containing the scores. This must be a value of 2 or higher." );
       jTextFieldScoreCol.setPreferredSize( new Dimension( 30, 19 ) );
       jTextFieldScoreCol.setEditable( true );
-      JPanel jPanel23 = new JPanel();
-      jPanel23.setPreferredSize(new Dimension(111, 18));
-      jPanel1.add(jPanel23, null);
+//      JPanel jPanel23 = new JPanel();
+//      jPanel23.setPreferredSize(new Dimension(120, 18));
+//      jPanel1.add(jPanel23, null);
       jPanel1.add(jLabel10, null);
       jPanel1.add(jTextFieldScoreCol, null);
 
@@ -93,7 +98,7 @@ public class AnalysisWizardStep2 extends WizardStep {
       jLabel3.setText( "Raw data file (optional for ORA or resampling):" );
       jLabel3.setPreferredSize( new Dimension( 370, 15 ) );
       rawFile = new JTextField();
-      rawFile.setPreferredSize( new Dimension( 280, 19 ) );
+      rawFile.setPreferredSize( new Dimension( 230, 19 ) );
       rawFile.setMinimumSize( new Dimension( 4, 19 ) );
       JButton rawBrowseButton = new JButton();
       rawBrowseButton.setEnabled( true );
