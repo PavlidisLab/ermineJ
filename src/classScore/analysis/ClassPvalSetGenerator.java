@@ -7,7 +7,6 @@ import java.util.Vector;
 import classScore.classresult;
 import java.util.HashMap;
 import classScore.expClassScore;
-import util.Stats;
 import java.text.NumberFormat;
 import classScore.histogram;
 import classScore.ClassMap;
