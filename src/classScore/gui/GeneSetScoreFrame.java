@@ -31,6 +31,7 @@ import javax.help.*;
  *
  * @author Homin K Lee
  * @author Paul Pavlidis
+ * @author Will Braynen
  * @version $Id$
  *
  */
@@ -79,14 +80,14 @@ public class GeneSetScoreFrame
    JPanel jPanel1 = new JPanel();
    FlowLayout flowLayout1 = new FlowLayout();
    
-   // help
+   // JavaHelp
    private HelpBroker m_helpBroker = null;
    private final boolean ENABLE_HELP = true; // when help is fully implemented, delete this line
-   
+      
    public GeneSetScoreFrame() {
       try {
          jbInit();
-         initHelp();         
+         initHelp();
          settings = new Settings();
       }
       catch ( Exception e ) {
