@@ -96,7 +96,7 @@ public class Settings {
          dataFolder = URLDecoder.decode( ( new File( dataFolder )
                .getCanonicalPath() ), "ISO-8859-1" );
       } catch ( IOException ex ) {
-         GuiUtil.error( "Could not find data folder." ); // make a big deal...
+         GuiUtil.error( "Could not find data folder.  Press OK to quit." ); // make a big deal...
          System.exit( 1 );
       }
       classFolder = new String( dataFolder + File.separator + "genesets" );
@@ -160,8 +160,7 @@ public class Settings {
                         .doubleValue();
          }
       } catch ( IOException ex ) {
-         System.err.println( "Could not find preferences file." ); // no big
-         // deal.
+         System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no big deal.
       }
    }
 

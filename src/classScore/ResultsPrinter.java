@@ -13,6 +13,8 @@ import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetMapTools;
 import classScore.data.GeneSetResult;
 
+import baseCode.gui.GuiUtil;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -59,7 +61,7 @@ public class ResultsPrinter {
         @param sort Sort the results so the best class (by score pvalue) is listed first.
       */
      public void printResults(boolean sort) {
-        System.err.println("Beginning output");
+        System.out.println("Beginning output");
         try {
            BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
            boolean first = true;
@@ -76,7 +78,7 @@ public class ResultsPrinter {
               }
            } else {
               for (Iterator it = results.entrySet().iterator(); it.hasNext(); ) {
-                 System.err.println(it.next().getClass().toString());
+                 System.out.println(it.next().getClass().toString());
                  res = (GeneSetResult) it.next();
                  if (first) {
                     first = false;
@@ -88,9 +90,7 @@ public class ResultsPrinter {
            }
            out.close();
         } catch (IOException e) {
-           System.err.println(
-                   "There was an IO error while printing the results: " +
-                   e);
+           GuiUtil.error( "An error occured while writing to file " + dest_file + ": " + e + ". If this problem persists, please contact the software vendor." );
         }
      }
 

@@ -12,6 +12,8 @@ import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 
+import baseCode.gui.GuiUtil;
+
 /**
  * <p>Title: </p>
  * <p>Description: </p>
@@ -151,9 +153,12 @@ public class AnalysisWizard extends Wizard
       step5.saveValues();
       try{
          settings.writePrefs();
-      } catch (IOException ex) {
-         System.err.println("Could not write prefs:" + ex);
-         ex.printStackTrace();
+      } catch (IOException e) {
+         GuiUtil.error( 
+            "Could not save preferences: " + e +
+            "If this problem persists, please contact the software vendor. " +
+            "Press OK to quit." );
+         System.exit( 1 );
       }
    }
 
