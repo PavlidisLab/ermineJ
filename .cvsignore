@@ -34,3 +34,5 @@ configure.sh
 goFile.pref
 groupFile.pref
 build.xml
+AnalysisFrame.prefs
+MavenAutoUpdated.library
