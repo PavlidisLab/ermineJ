@@ -26,7 +26,7 @@ public class histogram {
 /*****************************************************************************************/
     //default values
     private int class_size = 0;
-    private double bin_size = 0.01;
+    private double bin_size = 0.002;
     private double hist_min = 0.0;
     private double hist_max = 5.0;
     private int number_of_bins =0;
@@ -42,6 +42,13 @@ public class histogram {
 /*****************************************************************************************/
 
 
+
+    public histogram(int number_of_class,int class_min_size,int number_of_runs, double range) {
+	set_hist_range(range);
+	set_number_of_bins();
+	M = new Matrix(number_of_class,number_of_bins+1);	
+	list = new HashMap();
+    }
 
 
 /*****************************************************************************************/
@@ -102,84 +109,48 @@ public void set_hist_min(double histmin)
 
 
 /*****************************************************************************************/
-    public void convert_hist(int number_of_class,int class_min_size,int number_of_runs,Matrix raw_scores,double range){
+    public void update(int row, double value) {
 /*****************************************************************************************/
-    
-	set_hist_range(range);
-	set_number_of_bins();
+
+	int thebin = (int)Math.floor((value - hist_min)/(double)bin_size);
 	
-	M = new Matrix(number_of_class,number_of_bins+1);
-	row= number_of_class;
-	column =number_of_bins+1;
-	int classes = class_min_size;
-	double[] bin = new double[number_of_bins];
-	long[] count = new long[number_of_bins];
-	double v = 0;
-	list = new HashMap();
-	//list =M.get_row_Hash();
-	//initialise bin values
-	for (int i=0;i<number_of_bins;i++){ 
-	bin[i]=v;
-	v+=bin_size;
+	// make sure we're in the range.
+	if (thebin < 0) {
+	    thebin = 0;
 	}
-	//store classes in a map
-	int s=0;
-	for (s=class_min_size;s<(number_of_class +class_min_size -1);s++){
+	
+	if (thebin > number_of_bins - 1) {
+	    thebin = number_of_bins - 1;
+	}
+	M.increment_matrix_val(row, thebin);
+    }
+
+
+/*****************************************************************************************/
+// convert a raw histogram to a cdf.
+    public void tocdf(int number_of_class, int class_min_size) {
+/*****************************************************************************************/
+	for (int s = class_min_size; s < (number_of_class + class_min_size - 1); s++){
 	    String number = Integer.toString(s);
 	    list.put(number,null);
 	}
+	
+	for (int i = 0; i < M.get_num_rows() - 1; i++ ) { // for each histogram (class size) : todo fix this -1 thing. The last row is empty.
+	    double total = M.get_row_sum(i);
 
-	for(int i =0;i<raw_scores.get_num_rows();i++)
-	    {
-		//set count value to zero for each bin for each histogram when appropriately called by each class size 
-		for (s =0;s<number_of_bins;s++)
-		    count[s]=0;
-		//		System.out.println("class_size " + classes);
-		for (int j=0;j<raw_scores.get_num_cols();j++)
-		    {
-			
-			double value = raw_scores.get_matrix_val(i,j);
-			//get each value from matrix and check for range and then increment count correspondingly
-			for (int k =0;k<number_of_bins;k++)
-			    {
-				if( k==(number_of_bins -1)){
-				    if (value>=bin[k])
-					count[k]+=1;
-				    break;
-				} else {
-				    if(value>=bin[k] && value<bin[k+1])
-					{
-					    count[k]+=1;
-					    break;
-					}
-				}
-			    }
-		    }
-		//M.set_matrix_val(i,0,classes);
-		double sum =0.0;
-		
-		for (int l =number_of_bins -1;l>=0;l--)
-		    {
-			//calcualte cdf and also store values in map
-			sum+=count[l];
-
-			double convert=(sum/(double)number_of_runs);
-
-			List lis = (List) list.get(Integer.toString(classes));
-			if (lis ==null){
-			      list.put(Integer.toString(classes),lis= new ArrayList());
-			      lis.add(Double.valueOf(Double.toString(convert)));
-			} else {
-			    list.put(Integer.toString(classes),lis);
-			    lis.add(Double.valueOf(Double.toString(convert)));
-			}
-			M.set_matrix_val(i,l,convert);
-			//System.out.println(convert);
-		    }
-		classes = classes +1;
+	    //	    System.err.println(total + " trials observed.");
+	    double sum = 0.0;
+	    for (int j = M.get_num_cols() - 1; j >= 0; j--) {
+		sum += M.get_matrix_val(i,j) / total;
+		M.set_matrix_val(i, j, sum);
 	    }
+	}
+	System.err.println("Made cdf");
 
+	//	Stats statistics = new Stats();
+	//	showArray.show(M.get_ith_row(0), M.get_num_cols());
     }
+
 
 
 /*****************************************************************************************/

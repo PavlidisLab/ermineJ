@@ -14,9 +14,10 @@ RUN_OPTIONS= -Xmx1024M
 
 SOURCEPATH = .
 
-CLASSPATH =  ../bin
-
-OUTPUTDIR = ../bin
+#CLASSPATH =  ../bin
+CLASSPATH = .
+#OUTPUTDIR = ../bin
+OUTPUTDIR = .
 
 DOCDIR = ../doc
 
@@ -79,8 +80,6 @@ CLASS_FILES= \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class
 
 
-
-
 ${OUTPUTDIR}/%.class	: ${SOURCEPATH}/%.java
 	${JAVAC} ${OPTIONS} \
 	-sourcepath ${SOURCEPATH} \
@@ -96,8 +95,8 @@ doc:
 
 clean:
 	find ./ -name "*~" -exec rm {} \;
-	rm -rf *.class;
-	rm -r -f ${OUTPUTDIR};
-	rm -r -f ${DOCDIR};
-	mkdir ${OUTPUTDIR};
-	mkdir ${DOCDIR};
+	rm -rf ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/*.class;
+#	rm -r -f ${OUTPUTDIR}/*;
+#	rm -r -f ${DOCDIR}/*;
+#	mkdir ${OUTPUTDIR};
+#	mkdir ${DOCDIR};

@@ -37,9 +37,11 @@ public class corr_class_scores {
 	
     }
 
-/*****************************************************************************************/
- public histogram random_class_generator()
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    // this is broken. need to replace with new way of making histograms.
+    /*****************************************************************************************/
+    public histogram random_class_generator()
+	
     {
 	int i,j,k;
 	int count =0;
@@ -58,14 +60,15 @@ public class corr_class_scores {
 	    randomnums = new int[i];
 	    for (j=0; j<number_of_runs; j++) {
 		avecorrel=0.0;
-		statistics.chooserandom_2(randomnums, data.get_num_rows(), i);
+		statistics.chooserandom_1 (randomnums, data.get_num_rows(), i);
 		avecorrel = classcorrel(randomnums,correls.get_matrix_double(), i);
 		mat.set_matrix_val(count,j,avecorrel);
 	    }
 	    count++;
 	}
 	//takes the the matrix having the random values for a particular class and gets its corresponding histogram
-	hist.convert_hist(number_of_class,class_min_size,number_of_runs,mat,hist_range);
+	//	hist.convert_hist(number_of_class, class_min_size, number_of_runs, mat, hist_range);
+	// todo: fix this.
 	return hist;
 			
     }

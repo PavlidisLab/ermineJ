@@ -33,24 +33,17 @@ import java.nio.charset.*;
      private static Map go_affy_map;
      //store list of unique Go_IDS
      private Set GO;
-     
    
      public static void main (String[] args) {
-	 affy_go_Parse test = new affy_go_Parse(args[0]);
-	 test.get_go_map();
+	 affy_go_Parse test = new affy_go_Parse(args[0]); // creates the affy -> go map.
+	 test.print(affy_go_map);
+	 test.get_go_map(); // creates the go -> affy map
 	 test.print(go_affy_map);
-	  
      }
      
-
-    
-
-
-
-/*****************************************************************************************/
+     /*****************************************************************************************/
+     /*****************************************************************************************/
      public affy_go_Parse(String filename)
-
-/*****************************************************************************************/
      {
 	 String aLine = null;
 	 //read in file 	
@@ -58,7 +51,7 @@ import java.nio.charset.*;
 	     FileInputStream fis = new FileInputStream(filename);
 	     BufferedInputStream bis = new BufferedInputStream(fis);
 	     BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
-	     Double[] DoubleArray= null;
+	     Double[] DoubleArray = null;
 	     String row;
 	     String col;
 	     Vector rows = new Vector();
@@ -69,7 +62,6 @@ import java.nio.charset.*;
 	     //using set to prevent repeats
 	     GO = new TreeSet();
 	     
-	
 	     // loop through rows
 	     while((row = dis.readLine())!= null)
 		 {  
@@ -78,7 +70,7 @@ import java.nio.charset.*;
 		     
 		     // create a new Vector for each row's columns
 		     cols = new Vector();
-		   
+		     
 		     chip_id.add(st.nextToken());
 		     // assumption just 2 columns
 		     if (st.hasMoreTokens()){
@@ -92,32 +84,27 @@ import java.nio.charset.*;
 		     }
 		     // add the column Vector to the rows Vector
 		     rows.add(cols);
-	
 		 }
 	     
 	     dis.close();
-	  
+	     
 	     // for hash map of affy -> go
 	     for (int i =0;i<rows.size();i++){
-		  ArrayList go = new ArrayList();
+		 ArrayList go = new ArrayList();
 		 for(int j=0;j < ((Vector)rows.elementAt(i)).size(); j++) {
 		     String element_ij = (String)(((Vector)(rows.elementAt(i))).elementAt(j));
 		     if (element_ij !=null){
 			 go.add(element_ij);
 			 //stores uniques list of GoIDs
 			 GO.add(element_ij);
-			 
 		     }
 		 }
-		 affy_go_map.put(chip_id.get(i),go);
+		 affy_go_map.put(chip_id.get(i), go);
 	     }   
-
-	   
-	  	     
 			     
 	 } catch (IOException e) { 
 	     // catch possible io errors from readLine()
-	     System.out.println(" IOException error!");
+	     System.out.println("IOException error!");
 	     e.printStackTrace();
 	 }
 	 
@@ -125,29 +112,25 @@ import java.nio.charset.*;
      
     
     
-/*****************************************************************************************/     
+     /*****************************************************************************************/     
+     /*****************************************************************************************/
      public Map get_affy_map() {
-
-/*****************************************************************************************/
 	 return affy_go_map;
      }
 
 
 
-/*****************************************************************************************/
+     /*****************************************************************************************/
+     /*****************************************************************************************/
      public ArrayList get_affy_value_map(String chip_id) {
-
-/*****************************************************************************************/
 	 return (ArrayList)(affy_go_map.get(chip_id));
      }
 
   
-
-
-/*****************************************************************************************/
+     /*****************************************************************************************/
+     /*****************************************************************************************/
      public Map get_go_map() {
 
-/*****************************************************************************************/
 	 ArrayList[] arry = new ArrayList[GO.size()];
 	 //iterators over  Set 
 	 Iterator it = GO.iterator();
@@ -192,50 +175,16 @@ import java.nio.charset.*;
 		 }
 	     }
 	 }
-        
-	 
-     // comment ...may not work correctly sometimes as depends on hashcodes
-     /*
-	 while(it.hasNext()){
-	     nxt = (String)it.next();
-	     go_affy_map.put(nxt,null);
-	     x = nxt.hashCode() % length;
-	     arry[x] = new ArrayList();
-	 }
-	 while(it1.hasNext()){
-	     nxt1 = (Map.Entry)it1.next();	
-	     ArrayList arr = new ArrayList();
-	     arr = (ArrayList)nxt1.getValue();
-	     
-	     for (int i =0;i<arr.size();i++)
-		 {
-		     if (arr.get(i) !=null){ 
-			 String myVal = (String)arr.get(i);
-			 String myKey= (String)nxt1.getKey();
-			 x =myVal.hashCode() % length;
-			 if (myKey!= null) {
-			     (arry[x]).add(myKey);
-			 }
-			
-		     }
-		 }
-	 }
-	  while(git.hasNext()){
-	     nxt = (String)git.next();
-	     x = nxt.hashCode() % length;
-	     go_affy_map.put(nxt,arry[x]);
-	     }
-	 */
+
 	 return go_affy_map;
      }
      
 
 
 
-/*****************************************************************************************/
-       public ArrayList get_go_value_map(String go_id) {
-
-/*****************************************************************************************/
+     /*****************************************************************************************/
+     /*****************************************************************************************/
+     public ArrayList get_go_value_map(String go_id) {
 	 return (ArrayList)(go_affy_map.get(go_id));
      }
 

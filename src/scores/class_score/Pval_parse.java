@@ -40,9 +40,10 @@ import java.lang.reflect.*;
 
      //--------------------------------------------< readMyFile >--------//
 
-/*****************************************************************************************/
+     /*****************************************************************************************/
+     /* creates the probe -> pval mapping.
+     /*****************************************************************************************/
      public Pval_parse(String filename)
-/*****************************************************************************************/
      {
 	 String aLine = null;
 	 int count = 0;
@@ -71,7 +72,7 @@ import java.lang.reflect.*;
 			 {  
 			     cols.add(st.nextToken());
 			 }
-
+		     
 		     // add the column Vector to the rows Vector
 		     rows.add(cols);
 		 }
@@ -83,14 +84,17 @@ import java.lang.reflect.*;
 	     for (int i=1; i < rows.size();i++)
 		 {
 		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(1)));
-		     //uncommented do not add chips whose pvals ==0
+
 		     chip_id[i-1]=(String)(((Vector)(rows.elementAt(i))).elementAt(0));
+
+		     //uncommented do not add probes whose pvals ==0
 		     if (pval[i-1]==0) {
-		        continue;
+			 continue;
 		     }
-		     pval[i-1]= -(Math.log(pval[i-1])/Math.log(10));
+
+		     pval[i-1]= -(Math.log(pval[i-1])/Math.log(10)); // Make -log base 10.
 		     doubleArray[i-1] = new Double(pval[i-1]);
-		     chip_pval_map.put(chip_id[i-1],doubleArray[i-1]);	      
+		     chip_pval_map.put(chip_id[i-1],doubleArray[i-1]);	      // put key, value.
 		 }
 	     
 	     num_pvals = Array.getLength(pval);
@@ -146,7 +150,7 @@ import java.lang.reflect.*;
 	 double value=0.0;
 	 
 	 if (chip_pval_map.get(chip_id)!=null){ 
-	    value= Double.parseDouble((chip_pval_map.get(chip_id)).toString());
+	    value = Double.parseDouble((chip_pval_map.get(chip_id)).toString());
 	 }
 	 
 	 return value;

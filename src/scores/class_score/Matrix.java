@@ -262,8 +262,16 @@ public class Matrix extends HashMap // encapsulates a matrix
     public double get_matrix_val(int i,int j)
  /*****************************************************************************************/
     {
-
-	return M[i][j];
+	try {
+	    double answer = 0.0;
+	    answer = M[i][j];
+	    return answer;
+	} catch (ArrayIndexOutOfBoundsException exception ) {
+	    System.out.println("get_matrix_val::Cannot access " + i + ", " + j + " in that matrix! Matrix has only " + rows + " rows and " + cols + " columns");
+	    exception.printStackTrace();
+	    System.exit(1);
+	}
+	return 0.0;
     }
 
 
@@ -271,12 +279,47 @@ public class Matrix extends HashMap // encapsulates a matrix
     public void set_matrix_val(int i,int j,double value)
  /*****************************************************************************************/
     {
-       M[i][j] = value;
+	try {
+	    M[i][j] = value;
+	} catch (ArrayIndexOutOfBoundsException exception ) {
+	    System.out.println("set_matrix_val::Cannot access " + i + ", " + j + " in that matrix! Matrix has only " + rows + " rows and " + cols + " columns");
+	    exception.printStackTrace();
+	    System.exit(1);
+	}
     }
 
 
+ /*****************************************************************************************/
+    public void increment_matrix_val(int i, int j)
+	/*****************************************************************************************/
+    {
+	try {
+	    M[i][j] = M[i][j] + 1.0;
+	} catch (ArrayIndexOutOfBoundsException exception ) {
+	    System.out.println("increment_matrix_val::Cannot access " + i + ", " + j + " in that matrix! Matrix has only " + rows + " rows and " + cols + " columns");
+	    exception.printStackTrace();
+	    System.exit(1);
+	}
+    }
 
 
+    public double get_row_sum(int row)
+    {
+	double answer = 0.0;
+	for (int i = 0; i < cols; i++) {
+	    answer += get_matrix_val(row, i);
+	}
+	return answer;
+    }
+
+    public double get_col_sum(int col)
+    {
+	double answer = 0.0;
+	for (int i = 0; i < rows; i++) {
+	    answer += get_matrix_val(i, col);
+	}
+	return answer;
+    }
 
  /*****************************************************************************************/
     public double[][] get_matrix_double()
