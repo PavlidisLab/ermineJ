@@ -52,10 +52,10 @@ public class AnalysisWizardStep2 extends WizardStep {
       JPanel jPanel2 = new JPanel(); // holds everything...
       //    choose the score file
       JPanel jPanel8 = new JPanel();
-      jPanel8.setPreferredSize(new Dimension(380, 50) );
+      jPanel8.setPreferredSize(new Dimension(380, 80) );
       JLabel jLabel2 = new JLabel();
       jLabel2.setText( "Gene score file (optional for correlation score):" );
-      jLabel2.setPreferredSize( new Dimension( 370, 15 ) );
+  //    jLabel2.setPreferredSize( new Dimension( 370, 15 ) );
       JButton scoreBrowseButton = new JButton();
       scoreBrowseButton.setEnabled( true );
       scoreBrowseButton.setText( "Browse...." );
@@ -93,10 +93,10 @@ public class AnalysisWizardStep2 extends WizardStep {
 
       JPanel jPanel4 = new JPanel();
       JPanel jPanel11 = new JPanel();
-      jPanel11.setPreferredSize(new Dimension(380, 50) );
+      jPanel11.setPreferredSize(new Dimension(380, 80) );
       JLabel jLabel3 = new JLabel();
       jLabel3.setText( "Raw data file (optional for ORA or resampling):" );
-      jLabel3.setPreferredSize( new Dimension( 370, 15 ) );
+ //     jLabel3.setPreferredSize( new Dimension( 370, 15 ) );
       rawFile = new JTextField();
       rawFile.setPreferredSize( new Dimension( 230, 19 ) );
       rawFile.setMinimumSize( new Dimension( 4, 19 ) );
