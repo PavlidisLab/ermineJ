@@ -73,14 +73,24 @@ public class edtest{
       
          if (!isURL(pbPvalFile))
    	    pbPvalFile = getCanonical(pbPvalFile);
+	 else
+	     ;
          if (!isURL(affyGoFile))
    	    affyGoFile = getCanonical(affyGoFile);
+	 else
+	     ;
          if (!isURL(destinFile))
    	    destinFile = getCanonical(destinFile);
+	 else
+	     ;
          if (!isURL(goNameFile))
    	    goNameFile = getCanonical(goNameFile);
+	 else
+	     ;
          if (!isURL(ugFile))
    	    ugFile = getCanonical(ugFile);
+	 else
+	     ;
       
          test = new class_pvals(pbPvalFile,affyGoFile,goNameFile,destinFile,ugFile,"MEAN_METHOD", 100, 2,iters, 50, 5.0, 0.0001, method);
          test.class_pval_generator();       

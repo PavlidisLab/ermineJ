@@ -38,6 +38,7 @@ public class Class_Frame extends JPanel {
     //for correls
     private javax.swing.Timer timer_correl;
     private JProgressBar progress_correl;
+    private File startpath;
 
 //variables used for different UI components
 //Combobox for file names
@@ -134,12 +135,17 @@ public class Class_Frame extends JPanel {
     public Class_Frame() {
 /*****************************************************************************************/
 	JTabbedPane tabbedPane= new JTabbedPane();
+	startpath = new File(System.getProperty("user.dir"));
+
 	Component panel1 = make_Pval_Panel();
-        tabbedPane.addTab("Gene score-based",null,panel1, "Calculates class scores using gene scores");
+        tabbedPane.addTab("Gene score-based", null, panel1, "Calculates class scores using gene scores");
         tabbedPane.setSelectedIndex(0);
+
+
 	
-        Component panel2 = make_Correl_Panel();
-        tabbedPane.addTab("Gene Correlation-based",null,panel2, "Calculates class scores using gene correlations");
+	/* todo: fix up the correlation score code */
+	//        Component panel2 = make_Correl_Panel();
+	//        tabbedPane.addTab("Gene Correlation-based",null,panel2, "Calculates class scores using gene correlations");
 
 	//Add the tabbed pane to this panel.
         setLayout(new GridLayout(1, 1)); 
@@ -149,139 +155,140 @@ public class Class_Frame extends JPanel {
 
 
    //for correl panel
-/*****************************************************************************************/    
- protected Component make_Correl_Panel() {
-/*****************************************************************************************/    
-     JPanel panel = new JPanel(false);
-     fileNameField1 = new JComboBox();
-     fileNameField2 = new JComboBox();
-     fileNameField3 = new JComboBox();
-     fileNameField4 = new JComboBox();
-     fileNameField1.setEditable(true);
-     fileNameField2.setEditable(true);
-     fileNameField3.setEditable(true);
-     fileNameField4.setEditable(true);
-     fileNameField1.setPreferredSize(new Dimension(300, 20));
-     fileNameField2.setPreferredSize(new Dimension(300, 20));
-     fileNameField3.setPreferredSize(new Dimension(300, 20));
-     fileNameField4.setPreferredSize(new Dimension(300, 20));
-     browseButton1 = new JButton("Browse...");
-     browseButton2 = new JButton("Browse...");
-     browseButton3 = new JButton("Browse...");
-     browseButton4 = new JButton("Browse...");
-     commitButton = new JButton("Ok");
-     cancelButton = new JButton("Cancel");
-     try {
-	 browseButton1.addActionListener(new BrowseListener(fileNameField1));
-	 browseButton2.addActionListener(new BrowseListener(fileNameField2));	     browseButton3.addActionListener(new BrowseListener(fileNameField3));
-	 browseButton4.addActionListener(new BrowseListener(fileNameField4));	 
-	 cancelButton.addActionListener(new ActionListener() {
-		 public void actionPerformed(ActionEvent e) {
-		     cancel();
-		 }
-	     });
-	 commitButton.addActionListener(new ActionListener() {
-		 public void actionPerformed(ActionEvent e) {
-		     commit_correl();
-		 }
-	     });
-	 
-     } catch (Exception e) {
-	 e.printStackTrace();
-     }
+    /*****************************************************************************************/    
+    protected Component make_Correl_Panel() {
+	/*****************************************************************************************/    
+	JPanel panel = new JPanel(false);
+	fileNameField1 = new JComboBox();
+	fileNameField2 = new JComboBox();
+	fileNameField3 = new JComboBox();
+	fileNameField4 = new JComboBox();
+	fileNameField1.setEditable(true);
+	fileNameField2.setEditable(true);
+	fileNameField3.setEditable(true);
+	fileNameField4.setEditable(true);
+	fileNameField1.setPreferredSize(new Dimension(300, 20));
+	fileNameField2.setPreferredSize(new Dimension(300, 20));
+	fileNameField3.setPreferredSize(new Dimension(300, 20));
+	fileNameField4.setPreferredSize(new Dimension(300, 20));
+	browseButton1 = new JButton("Browse...");
+	browseButton2 = new JButton("Browse...");
+	browseButton3 = new JButton("Browse...");
+	browseButton4 = new JButton("Browse...");
+	commitButton = new JButton("Ok");
+	cancelButton = new JButton("Cancel");
+	try {
+	    browseButton1.addActionListener(new BrowseListener(fileNameField1));
+	    browseButton2.addActionListener(new BrowseListener(fileNameField2));
+	    browseButton3.addActionListener(new BrowseListener(fileNameField3));
+	    browseButton4.addActionListener(new BrowseListener(fileNameField4));	 
+	    cancelButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+			cancel();
+		    }
+		});
+	    commitButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+			commit_correl();
+		    }
+		});
+	    
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	
+	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	fileNameLabel1 = new JLabel("Data File",JLabel.LEFT);
+	Box fileNameLabel1Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel1Box.add(fileNameLabel1);
+	fileNameLabel1Box.add(Box.createHorizontalGlue());
+	Box fileName1Box = new Box(BoxLayout.X_AXIS);
+	fileName1Box.add(fileNameField1);
+	fileName1Box.add(Box.createHorizontalStrut(10));
+	fileName1Box.add(browseButton1);
+	fileName1Box.add(Box.createHorizontalGlue());
+	
      
-     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-     fileNameLabel1 = new JLabel("Data File",JLabel.LEFT);
-     Box fileNameLabel1Box = new Box(BoxLayout.X_AXIS);
-     fileNameLabel1Box.add(fileNameLabel1);
-     fileNameLabel1Box.add(Box.createHorizontalGlue());
-     Box fileName1Box = new Box(BoxLayout.X_AXIS);
-     fileName1Box.add(fileNameField1);
-     fileName1Box.add(Box.createHorizontalStrut(10));
-     fileName1Box.add(browseButton1);
-     fileName1Box.add(Box.createHorizontalGlue());
+	fileNameLabel2 = new JLabel("Affy GO File",JLabel.LEFT);
+	Box fileNameLabel2Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel2Box.add(fileNameLabel2);
+	fileNameLabel2Box.add(Box.createHorizontalGlue());
+	Box fileName2Box = new Box(BoxLayout.X_AXIS);
+	fileName2Box.add(fileNameField2);
+	fileName2Box.add(Box.createHorizontalStrut(10));
+	fileName2Box.add(browseButton2);
+	fileName2Box.add(Box.createHorizontalGlue());
      
+	fileNameLabel3 = new JLabel("Destination File",JLabel.LEFT);
+	Box fileNameLabel3Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel3Box.add(fileNameLabel3);
+	fileNameLabel3Box.add(Box.createHorizontalGlue());
+	Box fileName3Box = new Box(BoxLayout.X_AXIS);
+	fileName3Box.add(fileNameField3);
+	fileName3Box.add(Box.createHorizontalStrut(10));
+	fileName3Box.add(browseButton3);
+	fileName3Box.add(Box.createHorizontalGlue());
      
-     fileNameLabel2 = new JLabel("Affy GO File",JLabel.LEFT);
-     Box fileNameLabel2Box = new Box(BoxLayout.X_AXIS);
-     fileNameLabel2Box.add(fileNameLabel2);
-     fileNameLabel2Box.add(Box.createHorizontalGlue());
-     Box fileName2Box = new Box(BoxLayout.X_AXIS);
-     fileName2Box.add(fileNameField2);
-     fileName2Box.add(Box.createHorizontalStrut(10));
-     fileName2Box.add(browseButton2);
-     fileName2Box.add(Box.createHorizontalGlue());
-     
-     fileNameLabel3 = new JLabel("Destination File",JLabel.LEFT);
-     Box fileNameLabel3Box = new Box(BoxLayout.X_AXIS);
-     fileNameLabel3Box.add(fileNameLabel3);
-     fileNameLabel3Box.add(Box.createHorizontalGlue());
-     Box fileName3Box = new Box(BoxLayout.X_AXIS);
-     fileName3Box.add(fileNameField3);
-     fileName3Box.add(Box.createHorizontalStrut(10));
-     fileName3Box.add(browseButton3);
-     fileName3Box.add(Box.createHorizontalGlue());
-     
-     fileNameLabel4 = new JLabel("Go Biological names File",JLabel.LEFT);
-     Box fileNameLabel4Box = new Box(BoxLayout.X_AXIS);
-     fileNameLabel4Box.add(fileNameLabel4);
-     fileNameLabel4Box.add(Box.createHorizontalGlue());
-     Box fileName4Box = new Box(BoxLayout.X_AXIS);
-     fileName4Box.add(fileNameField4);
-     fileName4Box.add(Box.createHorizontalStrut(10));
-     fileName4Box.add(browseButton4);
-     fileName4Box.add(Box.createHorizontalGlue());
+	fileNameLabel4 = new JLabel("Go Biological names File",JLabel.LEFT);
+	Box fileNameLabel4Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel4Box.add(fileNameLabel4);
+	fileNameLabel4Box.add(Box.createHorizontalGlue());
+	Box fileName4Box = new Box(BoxLayout.X_AXIS);
+	fileName4Box.add(fileNameField4);
+	fileName4Box.add(Box.createHorizontalStrut(10));
+	fileName4Box.add(browseButton4);
+	fileName4Box.add(Box.createHorizontalGlue());
 
 
-     panel.add(fileNameLabel1Box);
-     panel.add(fileName1Box);
-     panel.add(fileNameLabel2Box);
-     panel.add(fileName2Box);
-     panel.add(fileNameLabel3Box);
-     panel.add(fileName3Box);
-     panel.add(fileNameLabel4Box);
-     panel.add(fileName4Box);
-     panel.add(Box.createVerticalStrut(20));
+	panel.add(fileNameLabel1Box);
+	panel.add(fileName1Box);
+	panel.add(fileNameLabel2Box);
+	panel.add(fileName2Box);
+	panel.add(fileNameLabel3Box);
+	panel.add(fileName3Box);
+	panel.add(fileNameLabel4Box);
+	panel.add(fileName4Box);
+	panel.add(Box.createVerticalStrut(20));
     
-     JLabel num = new JLabel("Number of Iterations");
-     text_numField = new JTextField("10000",5);
+	JLabel num = new JLabel("Number of Iterations");
+	text_numField = new JTextField("10000",5);
 
-     panel.add(num);
-     panel.add(text_numField);
+	panel.add(num);
+	panel.add(text_numField);
     
-     JLabel class_max = new JLabel("Max class size");
-     text_maxField = new JTextField("100",5);
-    
-
-     panel.add(class_max);
-     panel.add(text_maxField);
-     panel.add(Box.createHorizontalStrut(40));     
-     panel.add(Box.createVerticalStrut(20)); 
-
-     JLabel class_min = new JLabel("Min class size");
-     text_minField = new JTextField("4",5);
+	JLabel class_max = new JLabel("Max class size");
+	text_maxField = new JTextField("100",5);
     
 
-     panel.add(class_min);
-     panel.add(text_minField);
-     
-          JLabel histogram = new JLabel("Histogram Range");
-          text_histoField = new JTextField("5.0",5);
+	panel.add(class_max);
+	panel.add(text_maxField);
+	panel.add(Box.createHorizontalStrut(40));     
+	panel.add(Box.createVerticalStrut(20)); 
+
+	JLabel class_min = new JLabel("Min class size");
+	text_minField = new JTextField("4",5);
     
-          panel.add(histogram);
-          panel.add(text_histoField);
-          panel.add(Box.createHorizontalStrut(40));
-          panel.add(Box.createVerticalStrut(40));
+
+	panel.add(class_min);
+	panel.add(text_minField);
      
-     Box commitBox = new Box(BoxLayout.X_AXIS);
-     commitBox.add(Box.createHorizontalGlue());
-     commitBox.add(commitButton);
-     commitBox.add(Box.createHorizontalStrut(40));
-     commitBox.add(cancelButton);
-     commitBox.add(Box.createHorizontalGlue());
-     panel.add(commitBox,BorderLayout.SOUTH);
-     panel.add(Box.createVerticalGlue());
-     timer_correl = new javax.swing.Timer(ONE_SECOND, new TimerListener_correl());
+	JLabel histogram = new JLabel("Histogram Range");
+	text_histoField = new JTextField("5.0",5);
+    
+	panel.add(histogram);
+	panel.add(text_histoField);
+	panel.add(Box.createHorizontalStrut(40));
+	panel.add(Box.createVerticalStrut(40));
+     
+	Box commitBox = new Box(BoxLayout.X_AXIS);
+	commitBox.add(Box.createHorizontalGlue());
+	commitBox.add(commitButton);
+	commitBox.add(Box.createHorizontalStrut(40));
+	commitBox.add(cancelButton);
+	commitBox.add(Box.createHorizontalGlue());
+	panel.add(commitBox,BorderLayout.SOUTH);
+	panel.add(Box.createVerticalGlue());
+	timer_correl = new javax.swing.Timer(ONE_SECOND, new TimerListener_correl());
 
      return panel;
     }
@@ -296,11 +303,14 @@ protected Component make_Pval_Panel() {
 /*****************************************************************************************/
 
     JPanel panel = new JPanel(false);
-    fileNameField11 = new JComboBox();
-    fileNameField22 = new JComboBox();
-    fileNameField33 = new JComboBox();
-    fileNameField44 = new JComboBox();
-    fileNameField55 = new JComboBox();
+    fileNameField11 = new JComboBox(); // gene scores
+    fileNameField22 = new JComboBox(); // probe to go map
+    fileNameField33 = new JComboBox(); // output file
+    fileNameField44 = new JComboBox(); // biological names for go
+    fileNameField55 = new JComboBox(); // probe to ug map
+
+    fileNameField44.addItem("../data/goNames.txt");
+
     fileNameField11.setEditable(true);
     fileNameField22.setEditable(true);
     fileNameField33.setEditable(true);
@@ -516,51 +526,51 @@ protected Component make_Pval_Panel() {
     }
  
    
-/*****************************************************************************************/
- public class Updater implements Runnable {
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    public class Updater implements Runnable {
+	/*****************************************************************************************/
 	public void run() {
-	progress.setIndeterminate(true);
+	    progress.setIndeterminate(true);
 	}
- }
-
-/*****************************************************************************************/
+    }
+    
+    /*****************************************************************************************/
     public class TimerListener_correl implements ActionListener {
-/*****************************************************************************************/
-
+	/*****************************************************************************************/
+	
         public void actionPerformed(ActionEvent evt) {
 	    //SwingUtilities.invokeLater(new Update());
 	    try {
-	    SwingUtilities.invokeLater(new Updater_correl());
+		SwingUtilities.invokeLater(new Updater_correl());
 	    } catch (Exception e){
-
+		
 	    }
 	}
     }
  
    
-/*****************************************************************************************/
- public class Updater_correl implements Runnable {
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    public class Updater_correl implements Runnable {
+	/*****************************************************************************************/
 	public void run() {
-	progress_correl.setIndeterminate(true);
+	    progress_correl.setIndeterminate(true);
 	}
- }
+    }
+    
 
-
-  
-/*****************************************************************************************/
+    
+    /*****************************************************************************************/
     public class Update implements Runnable {
-/*****************************************************************************************/
+	/*****************************************************************************************/
 	public void run() {
 	    /*    if (progressMonitor.isCanceled()) {
-                progressMonitor.close();
-	    }
-	    progressMonitor.setProgress(counter);
-	    progressMonitor.setNote("Operation is "+counter+ "%complete");
-	    counter+=2;
+		  progressMonitor.close();
+		  }
+		  progressMonitor.setProgress(counter);
+		  progressMonitor.setNote("Operation is "+counter+ "%complete");
+		  counter+=2;
 	    */
-	  
+	    
 	}
     }
     
@@ -576,15 +586,15 @@ protected Component make_Pval_Panel() {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    browse(target);
+	    browse(target); // target will be a combo box  always ??
 	}
     }
 
 
 
 /*****************************************************************************************/  
-  protected boolean isURL(String filename) {
-/*****************************************************************************************/
+    protected boolean isURL(String filename) {
+	/*****************************************************************************************/
 	try {
 	    URL url = new URL(filename);
 	} catch (MalformedURLException e) {
@@ -595,9 +605,9 @@ protected Component make_Pval_Panel() {
 
 
 
-/*****************************************************************************************/
-  protected String getCanonical(String in) {
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    protected String getCanonical(String in) {
+	/*****************************************************************************************/
 	if (in == null || in.length() == 0)
 	    return in;
 	File outFile = new File(in);
@@ -611,10 +621,10 @@ protected Component make_Pval_Panel() {
 
 
 
-    //collects field variables
-/*****************************************************************************************/
- protected void collectParams_pval() {
-/*****************************************************************************************/
+    //collects field variables - just the filenames.
+    /*****************************************************************************************/
+    protected boolean collectParams_pval() {
+	/*****************************************************************************************/
 	
 	fileNames1 = new Vector();
         
@@ -624,44 +634,100 @@ protected Component make_Pval_Panel() {
 	fileName44 = getString(fileNameField44);
 	fileName55 = getString(fileNameField55);
 	
-    if(	fileName11.equals(""))
-	fileName11 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/age.welch.pvals.highexpression.forerminej.txt"; 
+	//    if(	fileName11.equals(""))
+	//	fileName11 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/age.welch.pvals.highexpression.forerminej.txt"; 
 	//fileName11 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/pp50.txt"; 
-    if(	fileName22.equals(""))
-	fileName22 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/MG-U74Av2.go.txt";                              
-	fileName33 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/Results/" + getString(fileNameField33);                               
-    if(	fileName44.equals(""))
-	fileName44 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/goNames.txt";   
-    if(	fileName55.equals(""))
-	fileName55 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/MG-U74Av2.ug.txt";                                  
+	//    if(	fileName22.equals(""))
+	//	fileName22 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/MG-U74Av2.go.txt";                              
+	//fileName33 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/Results/" + getString(fileNameField33);                               
+	//    if(	fileName44.equals(""))
+	//fileName44 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/goNames.txt";   
+	//if(	fileName55.equals(""))
+	//fileName55 = "C:/Documents and Settings/Edward/Desktop/ermineJ/java_proj/data/MG-U74Av2.ug.txt";                                  
 	
-	if (!isURL(fileName11))
+	/* todo: why is this code necessary ??? */
+	/*	if (!isURL(fileName11))
 	    fileName11 = getCanonical(fileName11);
-	if (!isURL(fileName22))
-	    fileName22 = getCanonical(fileName22);
-	if (!isURL(fileName33))
-	    fileName33 = getCanonical(fileName33);
-	if (!isURL(fileName44))
-	    fileName44 = getCanonical(fileName44);
+	else
+	    ;
+ 
+	 if (!isURL(fileName22))
+	     fileName22 = getCanonical(fileName22);
+	else
+	     ;
+
+	if  (!isURL(fileName33))
+	     fileName33 = getCanonical(fileName33);
+	else 
+	    ; 
+ 
+	 if (!isURL(fileName44))
+	     fileName44 = getCanonical(fileName44);
+	else
+	      ;
+ 
 	if (!isURL(fileName55))
-	    fileName55 = getCanonical(fileName55);
-
-	if (fileName11 != null &&
-	    fileName11.length() > 0)
+	     fileName55 = getCanonical(fileName55);
+	else
+	     ;
+	*/
+	
+	if (testfile(fileName11))
 	    fileNames1.addElement(fileName11);
-        if (fileName22 != null &&
-	    fileName22.length() > 0)
-	    fileNames1.addElement(fileName22);
-	if (fileName33 != null &&
-	    fileName33.length() > 0)
-	    fileNames1.addElement(fileName33);
-        if (fileName44 != null &&
-	    fileName44.length() > 0)
-	    fileNames1.addElement(fileName44);
-        if (fileName55 != null &&
-	    fileName55.length() > 0)
-	    fileNames1.addElement(fileName55);
+	else
+	    return false;
 
+
+	if (testfile(fileName22)) 
+	    fileNames1.addElement(fileName22);
+	else return false;
+
+	if (fileName33 != null && fileName33.length() > 0) // okay if
+							   // this
+							   // file
+							   // doesn't
+							   // exist,
+							   // we will
+							   // make
+							   // it. should
+							   // test
+							   // that the
+							   // path is
+							   // valid --
+							   // todo
+	    fileNames1.addElement(fileName33);
+	else
+	    return false;
+
+	if (testfile(fileName44)) 
+	    fileNames1.addElement(fileName44);
+	else
+	    return false;
+
+	if (testfile(fileName55))
+	    fileNames1.addElement(fileName55);
+	else
+	    return false;
+
+
+	return true;
+
+    }
+    
+
+
+    private boolean testfile(String filename) {
+	if (filename != null && filename.length() > 0) {
+	    File  f = new File(filename);
+	    if ( f.exists() )
+		return true;
+	    else
+		JOptionPane.showMessageDialog(null, "File " + filename + " doesn't exist!!  ");
+	    return false;
+	} else {
+	    JOptionPane.showMessageDialog(null, "A required file field is blank");
+	    return false;
+	}
     }
 
 
@@ -717,18 +783,20 @@ protected Component make_Pval_Panel() {
 	 }
 
 
-/*****************************************************************************************/
+    /*****************************************************************************************/
     public void commit() {
-/*****************************************************************************************/
+	/*****************************************************************************************/
 	//progressMonitor = new ProgressMonitor(this,"Monitoring Progress","Initialising....", 0,100);
 	//progressMonitor.setProgress(0);
 
-	collectParams_pval();
+	if(!collectParams_pval())
+	    return; // something is wrong.
+
 	Vector files1 = (Vector) fileNames1.clone();
 	if(files1.size() < 5) { 
 	    JOptionPane.showMessageDialog(null, "Enter all 5 file names.");
 	    return;
-	}	    
+	}
 	
 
 	int filesFound1 = 0;
@@ -866,10 +934,11 @@ protected Component make_Pval_Panel() {
 
 
 
-/*****************************************************************************************/
- public void commit_correl() {
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    public void commit_correl() {
+	/*****************************************************************************************/
 	collectParams_correl();
+	
 	Vector files = (Vector) fileNames.clone();
 	
 	if(files.size() < 4) {
@@ -1048,6 +1117,7 @@ protected Component make_Pval_Panel() {
 /*****************************************************************************************/
 	JFileChooser chooser = new JFileChooser();
 	chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
 	if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 	    target.setText(chooser.getSelectedFile().toString());
     }
@@ -1059,20 +1129,23 @@ protected Component make_Pval_Panel() {
 /*****************************************************************************************/
 	String selectedPath = getString(target);
 	File currentFile = new File(selectedPath);
-	String startPath;
-	if (selectedPath.length() > 0 &&
-	    currentFile.exists())
-	    startPath = currentFile.getPath();
-	else
-	    startPath = System.getProperty("user.dir");
+	//String startPath;
+	//	if (selectedPath.length() > 0 &&
+	//	    currentFile.exists())
+	//   startPath = currentFile.getPath();
+ 	//else
+	//    startPath = System.getProperty("user.dir");
 
-	JFileChooser chooser = new JFileChooser(startPath);
+	JFileChooser chooser = new JFileChooser(startpath);
 
 	int returnVal = chooser.showOpenDialog(this);
 
 	if (returnVal == JFileChooser.APPROVE_OPTION) {
 	    target.configureEditor(target.getEditor(),
 				   chooser.getSelectedFile().toString());
+	    if (chooser.getSelectedFile().exists()) {
+		startpath = chooser.getSelectedFile();
+	    }
 	}
     }
 
