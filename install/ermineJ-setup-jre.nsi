@@ -9,7 +9,7 @@
 Name "ermineJ"
 
 ; The file to write
-OutFile "ermineJ-setup-withJRE.exe"
+OutFile "ermineJ-setup-jre.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
@@ -62,15 +62,15 @@ Section "ermineJ (required)"
 
   ; .bat file
   SetOutPath "$INSTDIR\bin"
-  File "bin\ermineJ.bat"
+  File "bin\ermineJ-jre.bat"
 
   ; images
   SetOutPath "$INSTDIR\bin"
   File "bin\ermineJ.ico"
 
   ; JRE (Java Runtime Environment)
-  SetOutPath "$INSTDIR\jre-install"
-  File "jre-install\j2re-1_4_2_05-windows-i586-p.exe"
+  SetOutPath "$INSTDIR"
+  File /r "C:\j2sdk1.4.2_04\jre"
 
   ; If upgrading, might not want to overwrite the old data folder
   IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
@@ -103,19 +103,14 @@ SectionEnd
 Section "Start Menu Shortcuts"
 
   SetOutPath $INSTDIR\bin  ; the working directory should be \bin
-  CreateShortCut "$DESKTOP\emrineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
+  CreateShortCut "$DESKTOP\emrineJ.lnk" "$INSTDIR\bin\ermineJ-jre.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
   CreateDirectory "$SMPROGRAMS\emrineJ"
-  CreateShortCut "$SMPROGRAMS\emrineJ\emrineJ.lnk" "$INSTDIR\bin\ermineJ.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
+  CreateShortCut "$SMPROGRAMS\emrineJ\emrineJ.lnk" "$INSTDIR\bin\ermineJ-jre.bat" "" "$INSTDIR\bin\ermineJ.ico" 0 SW_SHOWMINIMIZED CONTROL|SHIFT|J
 
   SetOutPath $INSTDIR  ; reset the working directory
   CreateShortCut "$SMPROGRAMS\emrineJ\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\emrineJ\license.txt" "$INSTDIR\license.txt"
 
-SectionEnd
-
-; Optional section (can be disabled by the user)
-Section "Java Runtime Environment (JRE) 1.4.2_05"
-  Exec "jre-install\j2re-1_4_2_05-windows-i586-p.exe"
 SectionEnd
 
 ;--------------------------------
@@ -143,6 +138,6 @@ Section "Uninstall"
   RMDir "$INSTDIR"
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\jre-install"
+  RMDir /r "$INSTDIR\jre"
 
 SectionEnd
