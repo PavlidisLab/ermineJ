@@ -452,7 +452,7 @@ class DetailsTableModel
       } else {
          return m_columnNames[column - offset];
       }
-   }
+   } // end getColumnName
 
    public int getRowCount() {
       return m_values.size();
