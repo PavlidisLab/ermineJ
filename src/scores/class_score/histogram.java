@@ -37,13 +37,17 @@ public class histogram {
     public histogram(){}
 
 
-/*****************************************************************************************/
+    /*****************************************************************************************/
     /*****************************************************************************************/
     public histogram(int number_of_class,int class_min_size,int number_of_runs, double range) {
 	set_hist_range(range);
 	set_number_of_bins();
-	M = new Matrix(number_of_class, number_of_bins + 1 );	
+	M = new Matrix(number_of_class, number_of_bins + 1 );
 	list = new HashMap();
+	if (number_of_bins == 0) {
+	    System.err.println("Error: Histogram had no bins (" + number_of_class + " classes, " + class_min_size + " min size, " + range + " range).");
+	    System.exit(1);
+	}
     }
 
 
@@ -86,6 +90,7 @@ public void set_hist_min(double histmin)
 
     {
 	number_of_bins =(int)((hist_max-hist_min)/(double)bin_size);
+	System.err.println("There are " + number_of_bins + " bins in the histogram");
     }
 
 
@@ -113,13 +118,14 @@ public void set_hist_min(double histmin)
     public void update(int row, double value) {
 
 	int thebin = (int)Math.floor((value - hist_min)/(double)bin_size);
-	
+
 	// make sure we're in the range.
 	if (thebin < 0) {
 	    thebin = 0;
 	}
-	
-	if (thebin > number_of_bins - 1) {
+
+	if (thebin > number_of_bins - 1) { // this shouldn't happen since we make sure there enough bins. Might give slight speedup.
+	    System.err.println("Warning, last bin exceeded!");
 	    thebin = number_of_bins - 1;
 	}
 	M.increment_matrix_val(row, thebin);
@@ -150,7 +156,7 @@ public void set_hist_min(double histmin)
 	System.err.println("Made cdf");
 
 	// debug
-	Stats statistics = new Stats();
+	//	Stats statistics = new Stats();
 	//	showArray.show(M.get_ith_row(105), M.get_num_cols());
 	//	showArray.show(M.get_ith_row(20), M.get_num_cols());
 	//	showArray.show(M.get_ith_row(40), M.get_num_cols());

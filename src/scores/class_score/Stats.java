@@ -798,17 +798,22 @@ public static double pearson_correlation (double[] x, double[] y)
 	double max1 = 0;
 	double max2 = 0;
 	int pin = 0;
+	
+	if (inArray.length == 0) {
+	    System.err.println("No values for meanofTop2!");
+	    System.exit(1);
+	}
+
 	for(int i=0; i<inArray.length; i++){
 	    if(max1 < inArray[i]){
 		max1 = inArray[i];
 		pin = i;
-	    }	
+	    }
 	}	
 	for(int i=0; i<inArray.length; i++){
 	    if(max2 < inArray[i] && i != pin)
 		max2 = inArray[i];	
 	}	
-	//System.out.println("ans = " + (max1+max2)/2);	
 	return (max1+max2)/2;
     }
   
@@ -881,7 +886,3 @@ class showArray{
     }
 
 }
-
-
-
-

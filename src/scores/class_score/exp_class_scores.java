@@ -33,11 +33,15 @@ public class exp_class_scores {
     private double pvalue = 0;
     private int class_min_size = 2;
    
+    public exp_class_scores(String filename_pval, String wt_check, String in_method) {
+	this(filename_pval, wt_check, in_method, 1, true);
+    }
     
+
     /**  */
-    public exp_class_scores(String filename_pval, String wt_check, String in_method)
+    public exp_class_scores(String filename_pval, String wt_check, String in_method, int pvalcolumn, boolean dolog)
     {
-	Pval_parse parser = new Pval_parse(filename_pval); // makes the probe -> pval map.
+	Pval_parse parser = new Pval_parse(filename_pval, pvalcolumn, dolog); // makes the probe -> pval map.
 	chip_pval = new LinkedHashMap();
 	chip_pval = parser.get_map(); // reference to the probe -> pval map.
 	ug_pval_map = new HashMap(); // this gets initialized by set_input_pvals
@@ -131,7 +135,7 @@ public class exp_class_scores {
 	    s.printStackTrace();
 	} catch(ArrayIndexOutOfBoundsException s) {
 	    System.err.println("ArrayIndexOutOfBoundsException");
-	    System.out.println("Null pointer Exception");
+	    s.printStackTrace();
 	} 
 	return hist;
     }
@@ -253,8 +257,11 @@ public class exp_class_scores {
 		    String pbPval = key.toString();
 		    if(gp_method.equals("MEAN_PVAL")){
 		        ug_pval_temp[counter] += Double.parseDouble(pbPval);
-		    }else if(gp_method.equals("BEST_PVAL")){//use best method for group
+		    } else if(gp_method.equals("BEST_PVAL")){//use best method for group
 		        ug_pval_temp[counter] = Math.max(Double.parseDouble(pbPval),ug_pval_temp[counter]);
+		    } else {
+			System.err.println("Illegal selection for groups score method. Valid choices are MEAN_PVAL and BEST_PVAL");
+			System.exit(1);
 		    }
 		    in_size++;
 		}

@@ -29,9 +29,10 @@ import java.awt.Toolkit;
 
 
 /*****************************************************************************************/
-public class Class_Frame extends JPanel {
 /*****************************************************************************************/
-//for pvals
+public class Class_Frame extends JPanel {
+
+    //for pvals
     public final static int ONE_SECOND = 1000;
     private javax.swing.Timer timer;
     private JProgressBar progress;
@@ -40,8 +41,8 @@ public class Class_Frame extends JPanel {
     private JProgressBar progress_correl;
     private File startpath;
 
-//variables used for different UI components
-//Combobox for file names
+    //variables used for different UI components
+    //Combobox for file names
     JComboBox fileNameField1;
     JComboBox fileNameField2;
     JComboBox fileNameField3;
@@ -53,11 +54,13 @@ public class Class_Frame extends JPanel {
     JComboBox fileNameField33;
     JComboBox fileNameField44;
     JComboBox fileNameField55;
+
     //help browsing for class_correls
     JButton browseButton1;
     JButton browseButton2;
     JButton browseButton3;
     JButton browseButton4;
+
     //for class_pvals
     JButton browseButton11;
     JButton browseButton22;
@@ -65,34 +68,44 @@ public class Class_Frame extends JPanel {
     JButton browseButton44;
     JButton browseButton55;
     //for weights for pvals
-    //JCheckBox weightbox;
+    JCheckBox dologbox;
     String weight_boolean = "true";
+
+    String dolog_boolean = "true"; // do we take the log of the gene scores?
+    int pvalcolumn = 1; // which column in the file has the gene scores?
+
     //correls
     JButton commitButton;
     JButton cancelButton;
     //pvals
     JButton commitButton1;
     JButton cancelButton1;
+
     //correls
     JLabel fileNameLabel1;
     JLabel fileNameLabel2;
     JLabel fileNameLabel3;
     JLabel fileNameLabel4;
+
     //pvals
     JLabel fileNameLabel11;
     JLabel fileNameLabel22;
     JLabel fileNameLabel33;
     JLabel fileNameLabel44;
     JLabel fileNameLabel55;
+
     //correls
     Vector fileNames;
+
     //pvals
     Vector fileNames1;
+
     //correls
     static String fileName1; 
     static String fileName2;
     static String fileName3; 
     static String fileName4;
+
     //pvals
     static String fileName11;// = "C:\Documents and Settings\Edward\Desktop\ermineJ\java_proj\data\one-way-anova-parsed.txt";
     static String fileName22;// = "C:\Documents and Settings\Edward\Desktop\ermineJ\java_proj\data\AffyGO.txt";          
@@ -131,18 +144,17 @@ public class Class_Frame extends JPanel {
 
 
 
-    //constructor for creating initial tabbed panel calls corresponding components to display
-    /*****************************************************************************************/   
+    /**
+       constructor for creating initial tabbed panel calls corresponding components to display
+    */
     public Class_Frame() {
-/*****************************************************************************************/
+
 	JTabbedPane tabbedPane= new JTabbedPane();
 	startpath = new File(System.getProperty("user.dir"));
 
 	Component panel1 = make_Pval_Panel();
         tabbedPane.addTab("Gene score-based", null, panel1, "Calculates class scores using gene scores");
         tabbedPane.setSelectedIndex(0);
-
-
 	
 	/* todo: fix up the correlation score code */
 	//        Component panel2 = make_Correl_Panel();
@@ -155,10 +167,10 @@ public class Class_Frame extends JPanel {
 
 
 
-   //for correl panel
+    /*****************************************************************************************/    
+    //for correl panel
     /*****************************************************************************************/    
     protected Component make_Correl_Panel() {
-	/*****************************************************************************************/    
 	JPanel panel = new JPanel(false);
 	fileNameField1 = new JComboBox();
 	fileNameField2 = new JComboBox();
@@ -176,7 +188,7 @@ public class Class_Frame extends JPanel {
 	browseButton2 = new JButton("Browse...");
 	browseButton3 = new JButton("Browse...");
 	browseButton4 = new JButton("Browse...");
-	commitButton = new JButton("Ok");
+	commitButton = new JButton("Run");
 	cancelButton = new JButton("Quit");
 	try {
 	    browseButton1.addActionListener(new BrowseListener(fileNameField1));
@@ -295,270 +307,301 @@ public class Class_Frame extends JPanel {
     }
   
 
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    protected Component make_Pval_Panel() {
+	
+	JPanel panel = new JPanel(false);
+	
+	Vector sf = comboReader(getCanonical("scoreFile.pref"));
+	if (sf != null) 
+	    fileNameField11 = new JComboBox(sf); // gene scores
+	else
+	    fileNameField11 = new JComboBox(); // gene scores
+	
+	Vector gf = comboReader(getCanonical("goFile.pref"));
+	if (gf != null) 
+	    fileNameField22 = new JComboBox(gf); // go names
+	else
+	    fileNameField22 = new JComboBox();
+	
+	Vector of = comboReader(getCanonical("outputFile.pref"));
+	if (of != null) 
+	fileNameField33 = new JComboBox(of); // output
+	else
+	    fileNameField33 = new JComboBox();
+	
+	Vector nf = comboReader(getCanonical("nameFile.pref"));
+	if (nf != null) 
+	    fileNameField44 = new JComboBox(nf);
+	else
+	    fileNameField44 = new JComboBox(); 
 
+	Vector grf = comboReader(getCanonical("groupFile.pref"));
+	if (grf != null) 
+	    fileNameField55 = new JComboBox(grf);
+	else
+	    fileNameField55 = new JComboBox();
+	
+	//    fileNameField22 = new JComboBox(comboReader(getCanonical("goFile"))); // probe to go map
+	//   fileNameField33 = new JComboBox(comboReader(getCanonical("outputFile"))); // output file
+	//   fileNameField44 = new JComboBox(comboReader(getCanonical("nameFile"))); // biological names for go
+	//   fileNameField55 = new JComboBox(comboReader(getCanonical("groupFile"))); // probe to ug map
+	
+	fileNameField44.addItem("../data/goNames.txt");
+	
+	fileNameField11.setEditable(true);
+	fileNameField22.setEditable(true);
+	fileNameField33.setEditable(true);
+	fileNameField44.setEditable(true);
+	fileNameField55.setEditable(true);
+	fileNameField11.setPreferredSize(new Dimension(300, 20));
+	fileNameField22.setPreferredSize(new Dimension(300, 20));
+	fileNameField33.setPreferredSize(new Dimension(300, 20));
+	fileNameField44.setPreferredSize(new Dimension(300, 20));
+	fileNameField55.setPreferredSize(new Dimension(300, 20));
+	browseButton11 = new JButton("Browse...");
+	browseButton22 = new JButton("Browse...");
+	browseButton33 = new JButton("Browse...");
+	browseButton44 = new JButton("Browse...");
+	browseButton55 = new JButton("Browse...");
+	commitButton1 = new JButton("Run");
+	cancelButton1 = new JButton("Quit");
 
-
-
-/*****************************************************************************************/
-protected Component make_Pval_Panel() {
-/*****************************************************************************************/
-
-    JPanel panel = new JPanel(false);
-    fileNameField11 = new JComboBox(comboReader(getCanonical("../data/scoreFile"))); // gene scores
-    fileNameField22 = new JComboBox(comboReader(getCanonical("../data/goFile"))); // probe to go map
-    fileNameField33 = new JComboBox(comboReader(getCanonical("../data/outputFile"))); // output file
-    fileNameField44 = new JComboBox(comboReader(getCanonical("../data/nameFile"))); // biological names for go
-    fileNameField55 = new JComboBox(comboReader(getCanonical("../data/ugFile"))); // probe to ug map
-
-    fileNameField44.addItem("../data/goNames.txt");
-
-    fileNameField11.setEditable(true);
-    fileNameField22.setEditable(true);
-    fileNameField33.setEditable(true);
-    fileNameField44.setEditable(true);
-    fileNameField55.setEditable(true);
-    fileNameField11.setPreferredSize(new Dimension(300, 20));
-    fileNameField22.setPreferredSize(new Dimension(300, 20));
-    fileNameField33.setPreferredSize(new Dimension(300, 20));
-    fileNameField44.setPreferredSize(new Dimension(300, 20));
-    fileNameField55.setPreferredSize(new Dimension(300, 20));
-    browseButton11 = new JButton("Browse...");
-    browseButton22 = new JButton("Browse...");
-    browseButton33 = new JButton("Browse...");
-    browseButton44 = new JButton("Browse...");
-    browseButton55 = new JButton("Browse...");
-    commitButton1 = new JButton("Ok");
-    cancelButton1 = new JButton("Quit");
-    //listeners for browse button
-    try {
+	//listeners for browse button
+	try {
 	browseButton11.addActionListener(new BrowseListener(fileNameField11));
 	browseButton22.addActionListener(new BrowseListener(fileNameField22));
 	browseButton33.addActionListener(new BrowseListener(fileNameField33));
 	browseButton44.addActionListener(new BrowseListener(fileNameField44));
 	browseButton55.addActionListener(new BrowseListener(fileNameField55));
-
+	
 	cancelButton1.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    //close window
 		    cancel();
 		}
 	    });
+
 	commitButton1.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    //extract data from fields and use class_pvals
-		  
+		    
 		    commit();
 		}
 	    });
 	
-    } catch (Exception e) {
-	e.printStackTrace();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	
+	//set layouts for file fields
+	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	fileNameLabel11 = new JLabel("Gene P value File",JLabel.LEFT);
+	Box fileNameLabel11Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel11Box.add(fileNameLabel11);
+	fileNameLabel11Box.add(Box.createHorizontalGlue());
+	Box fileName11Box = new Box(BoxLayout.X_AXIS);
+	fileName11Box.add(fileNameField11);
+	fileName11Box.add(Box.createHorizontalStrut(20));
+	fileName11Box.add(browseButton11);
+	fileName11Box.add(Box.createHorizontalGlue());
+	
+	fileNameLabel22 = new JLabel("Probe to Functional class Mapping File",JLabel.LEFT);
+	Box fileNameLabel22Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel22Box.add(fileNameLabel22);
+	fileNameLabel22Box.add(Box.createHorizontalGlue());
+	Box fileName22Box = new Box(BoxLayout.X_AXIS);
+	fileName22Box.add(fileNameField22);
+	fileName22Box.add(Box.createHorizontalStrut(10));
+	fileName22Box.add(browseButton22);
+	fileName22Box.add(Box.createHorizontalGlue());
+	
+	fileNameLabel33 = new JLabel("Output File",JLabel.LEFT);
+	Box fileNameLabel33Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel33Box.add(fileNameLabel33);
+	fileNameLabel33Box.add(Box.createHorizontalGlue());
+	Box fileName33Box = new Box(BoxLayout.X_AXIS);
+	fileName33Box.add(fileNameField33);
+	fileName33Box.add(Box.createHorizontalStrut(10));
+	fileName33Box.add(browseButton33);
+	fileName33Box.add(Box.createHorizontalGlue());
+	
+	fileNameLabel44 = new JLabel("GO Biological Names File",JLabel.LEFT);
+	Box fileNameLabel44Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel44Box.add(fileNameLabel44);
+	fileNameLabel44Box.add(Box.createHorizontalGlue());
+	Box fileName44Box = new Box(BoxLayout.X_AXIS);
+	fileName44Box.add(fileNameField44);
+	fileName44Box.add(Box.createHorizontalStrut(10));
+	fileName44Box.add(browseButton44);
+	fileName44Box.add(Box.createHorizontalGlue());
+	
+	fileNameLabel55 = new JLabel("Probe Group Mapping File",JLabel.LEFT);
+	Box fileNameLabel55Box = new Box(BoxLayout.X_AXIS);
+	fileNameLabel55Box.add(fileNameLabel55);
+	fileNameLabel55Box.add(Box.createHorizontalGlue());
+	Box fileName55Box = new Box(BoxLayout.X_AXIS);
+	fileName55Box.add(fileNameField55);
+	fileName55Box.add(Box.createHorizontalStrut(10));
+	fileName55Box.add(browseButton55);
+	fileName55Box.add(Box.createHorizontalGlue());
+	
+	panel.add(fileNameLabel11Box);
+	panel.add(fileName11Box);
+	panel.add(fileNameLabel22Box);
+	panel.add(fileName22Box);
+	panel.add(fileNameLabel33Box);
+	panel.add(fileName33Box);
+	panel.add(fileNameLabel44Box);
+	panel.add(fileName44Box);
+	panel.add(fileNameLabel55Box);
+	panel.add(fileName55Box);
+	panel.add(Box.createVerticalStrut(20));
+	
+	
+	//set radio button options 
+	JRadioButton meanButton = new JRadioButton("Use Mean method");
+	meanButton.setToolTipText("Use the mean of the class's gene scores.");
+	meanButton.setActionCommand("MEAN_METHOD");
+	meanButton.setSelected(true);
+	
+	JRadioButton quantileButton = new JRadioButton("Use Quantile method");
+	quantileButton.setToolTipText("Use a quantile of the class's gene scores.");
+	quantileButton.setActionCommand("QUANTILE_METHOD");
+	
+	JRadioButton meanAboveButton = new JRadioButton("Use Mean Above Quantile method");
+	meanAboveButton.setToolTipText("Use the mean above quantile of the class's gene scores.");
+	meanAboveButton.setActionCommand("MEAN_ABOVE_QUANTILE_METHOD");
+        
+	ButtonGroup group = new ButtonGroup();
+	group.add(meanButton);
+	group.add(quantileButton);
+	group.add(meanAboveButton);
+	
+	JRadioButton meanGroupButton = new JRadioButton("Use Mean group pvalues");
+	meanGroupButton.setToolTipText("Use the mean of the group's pvalues.");
+	meanGroupButton.setActionCommand("MEAN_PVAL");
+	meanGroupButton.setSelected(true);
+     
+	JRadioButton bestGroupButton = new JRadioButton("Use Best group pvalues");
+	bestGroupButton.setToolTipText("Use the mean of the group's pvalues.");
+	bestGroupButton.setActionCommand("BEST_PVAL");
+    
+	JRadioButton noWeightButton = new JRadioButton("Use Single gene pvalues");
+	noWeightButton.setToolTipText("Treat replicates as separate genes.");
+	noWeightButton.setActionCommand("NO_WEIGHT");
+	
+	ButtonGroup group2 = new ButtonGroup();
+	group2.add(meanGroupButton);
+	group2.add(bestGroupButton);
+	group2.add(noWeightButton);
+	
+	
+	JPanel radioPanel2 = new JPanel();
+	radioPanel2.setLayout(new BoxLayout(radioPanel2,BoxLayout.Y_AXIS));
+	radioPanel2.add(Box.createHorizontalStrut(40));
+	radioPanel2.add(meanGroupButton);
+	radioPanel2.add(Box.createHorizontalGlue());
+	radioPanel2.add(bestGroupButton);
+	radioPanel2.add(Box.createHorizontalGlue());
+	radioPanel2.add(noWeightButton);
+	radioPanel2.add(Box.createHorizontalGlue());
+	panel.add(radioPanel2);
+	
+	JPanel radioPanel = new JPanel();
+	radioPanel.setLayout(new BoxLayout(radioPanel,BoxLayout.Y_AXIS));
+	radioPanel.add(meanButton);
+	radioPanel.add(Box.createHorizontalGlue());
+	radioPanel.add(quantileButton);
+	radioPanel.add(Box.createHorizontalGlue());
+	radioPanel.add(meanAboveButton);
+	radioPanel.add(Box.createHorizontalGlue());
+	panel.add(radioPanel);
+	
+	RadioListener myListener = new RadioListener();
+	meanButton.addActionListener(myListener);
+	quantileButton.addActionListener(myListener);
+	meanAboveButton.addActionListener(myListener);
+    
+	RadioListener2 myListener2 = new RadioListener2();
+	meanGroupButton.addActionListener(myListener2);
+	bestGroupButton.addActionListener(myListener2);
+	noWeightButton.addActionListener(myListener2);
+	
+        
+	//various other parameters
+	
+	JLabel num1 = new JLabel("Iterations");
+	num1.setToolTipText("Applies to mean and quantile methods: more trials take longer.");
+	text_numField1 = new JTextField("10000",10);
+	panel.add(num1);
+	panel.add(text_numField1);
+	panel.add(Box.createHorizontalStrut(10));
+	
+	JLabel quantile1 = new JLabel("Quantile");
+	quantile1.setToolTipText("Applies to quantile method only. Use 50 for the median");
+	text_quantileField1 = new JTextField("50",10);
+	panel.add(quantile1);
+	panel.add(text_quantileField1);
+	panel.add(Box.createHorizontalStrut(10));
+	
+	JLabel pval1 = new JLabel("P-value cutoff");
+	pval1.setToolTipText("The pvalue cutoff to use for the hypergeometric distribution class evaluation");
+	text_pVal1 = new JTextField("0.00001", 10);
+	panel.add(pval1);
+	panel.add(text_pVal1);
+	panel.add(Box.createVerticalStrut(40));
+
+	JLabel class_max1 = new JLabel("Max class size");
+	class_max1.setToolTipText("Classes with more members will not be considered");
+	text_maxField1 = new JTextField("100",10);
+	panel.add(class_max1);
+	panel.add(text_maxField1);
+	panel.add(Box.createHorizontalStrut(10));
+	
+	JLabel class_min1 = new JLabel("Min class size");
+	class_min1.setToolTipText("Classes with fewer members will not be considered");
+	text_minField1 = new JTextField("4",5);
+	panel.add(class_min1);
+	panel.add(text_minField1);
+	panel.add(Box.createHorizontalStrut(40));
+	panel.add(Box.createVerticalStrut(40)); 
+	
+	dologbox = new JCheckBox("Use -log of input values");
+	dologbox.setToolTipText("Leave this checked if you are using p values. Otherwise you might want to uncheck it.");
+	dologbox.setSelected(true);
+	dologListener checkListener = new dologListener();
+	dologbox.addItemListener(checkListener);
+	panel.add(dologbox);
+	panel.add(Box.createVerticalStrut(20));
+
+    
+	Box commitBox1 = new Box(BoxLayout.X_AXIS);
+	commitBox1.add(Box.createHorizontalGlue());
+	commitBox1.add(commitButton1);
+	commitBox1.add(Box.createHorizontalStrut(40));
+	commitBox1.add(Box.createVerticalStrut(80));
+	commitBox1.add(cancelButton1);
+	commitBox1.add(Box.createHorizontalGlue());
+	panel.add(commitBox1,BorderLayout.SOUTH);
+	panel.add(Box.createVerticalGlue());
+    
+	timer = new javax.swing.Timer(ONE_SECOND, new TimerListener());
+	return panel; 
     }
-    
-    //set layouts for file fields
-    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    fileNameLabel11 = new JLabel("Gene score File",JLabel.LEFT);
-    Box fileNameLabel11Box = new Box(BoxLayout.X_AXIS);
-    fileNameLabel11Box.add(fileNameLabel11);
-    fileNameLabel11Box.add(Box.createHorizontalGlue());
-    Box fileName11Box = new Box(BoxLayout.X_AXIS);
-    fileName11Box.add(fileNameField11);
-    fileName11Box.add(Box.createHorizontalStrut(20));
-    fileName11Box.add(browseButton11);
-    fileName11Box.add(Box.createHorizontalGlue());
-    
-    fileNameLabel22 = new JLabel("Probe to GO Mapping File",JLabel.LEFT);
-    Box fileNameLabel22Box = new Box(BoxLayout.X_AXIS);
-    fileNameLabel22Box.add(fileNameLabel22);
-    fileNameLabel22Box.add(Box.createHorizontalGlue());
-    Box fileName22Box = new Box(BoxLayout.X_AXIS);
-    fileName22Box.add(fileNameField22);
-    fileName22Box.add(Box.createHorizontalStrut(10));
-    fileName22Box.add(browseButton22);
-    fileName22Box.add(Box.createHorizontalGlue());
-    
-    fileNameLabel33 = new JLabel("Output File",JLabel.LEFT);
-    Box fileNameLabel33Box = new Box(BoxLayout.X_AXIS);
-    fileNameLabel33Box.add(fileNameLabel33);
-    fileNameLabel33Box.add(Box.createHorizontalGlue());
-    Box fileName33Box = new Box(BoxLayout.X_AXIS);
-    fileName33Box.add(fileNameField33);
-    fileName33Box.add(Box.createHorizontalStrut(10));
-    fileName33Box.add(browseButton33);
-    fileName33Box.add(Box.createHorizontalGlue());
-    
-    fileNameLabel44 = new JLabel("GO Biological Names File",JLabel.LEFT);
-    Box fileNameLabel44Box = new Box(BoxLayout.X_AXIS);
-    fileNameLabel44Box.add(fileNameLabel44);
-    fileNameLabel44Box.add(Box.createHorizontalGlue());
-    Box fileName44Box = new Box(BoxLayout.X_AXIS);
-    fileName44Box.add(fileNameField44);
-    fileName44Box.add(Box.createHorizontalStrut(10));
-    fileName44Box.add(browseButton44);
-    fileName44Box.add(Box.createHorizontalGlue());
-    
-    fileNameLabel55 = new JLabel("Probe to Unigene Mapping File",JLabel.LEFT);
-    Box fileNameLabel55Box = new Box(BoxLayout.X_AXIS);
-    fileNameLabel55Box.add(fileNameLabel55);
-    fileNameLabel55Box.add(Box.createHorizontalGlue());
-    Box fileName55Box = new Box(BoxLayout.X_AXIS);
-    fileName55Box.add(fileNameField55);
-    fileName55Box.add(Box.createHorizontalStrut(10));
-    fileName55Box.add(browseButton55);
-    fileName55Box.add(Box.createHorizontalGlue());
-    
-    panel.add(fileNameLabel11Box);
-    panel.add(fileName11Box);
-    panel.add(fileNameLabel22Box);
-    panel.add(fileName22Box);
-    panel.add(fileNameLabel33Box);
-    panel.add(fileName33Box);
-    panel.add(fileNameLabel44Box);
-    panel.add(fileName44Box);
-    panel.add(fileNameLabel55Box);
-    panel.add(fileName55Box);
-    panel.add(Box.createVerticalStrut(20));
-    
-    //weightbox = new JCheckBox("Use Weights");
-    //weightbox.setToolTipText("Genes which occur repeatedly in a data set are weighted accordingly");
-    //weightbox.setSelected(true);
-    //CheckBoxListener checkListener = new CheckBoxListener();
-    //weightbox.addItemListener(checkListener);
-    //panel.add(weightbox);
-    //panel.add(Box.createVerticalStrut(20));
-    
-    //set radio button options 
-    JRadioButton meanButton = new JRadioButton("Use Mean method");
-    meanButton.setToolTipText("Use the mean of the class's gene scores.");
-    meanButton.setActionCommand("MEAN_METHOD");
-    meanButton.setSelected(true);
-     
-    JRadioButton quantileButton = new JRadioButton("Use Quantile method");
-    quantileButton.setToolTipText("Use a quantile of the class's gene scores.");
-    quantileButton.setActionCommand("QUANTILE_METHOD");
-    
-    JRadioButton meanAboveButton = new JRadioButton("Use Mean Above Quantile method");
-    meanAboveButton.setToolTipText("Use the mean above quantile of the class's gene scores.");
-    meanAboveButton.setActionCommand("MEAN_ABOVE_QUANTILE_METHOD");
-        
-    ButtonGroup group = new ButtonGroup();
-    group.add(meanButton);
-    group.add(quantileButton);
-    group.add(meanAboveButton);
-    
-    JRadioButton meanGroupButton = new JRadioButton("Use Mean group pvalues");
-    meanGroupButton.setToolTipText("Use the mean of the group's pvalues.");
-    meanGroupButton.setActionCommand("MEAN_PVAL");
-    meanGroupButton.setSelected(true);
-     
-    JRadioButton bestGroupButton = new JRadioButton("Use Best group pvalues");
-    bestGroupButton.setToolTipText("Use the mean of the group's pvalues.");
-    bestGroupButton.setActionCommand("BEST_PVAL");
-    
-    JRadioButton noWeightButton = new JRadioButton("Use Single gene pvalues");
-    noWeightButton.setToolTipText("Use single gene's pvalues.");
-    noWeightButton.setActionCommand("NO_WEIGHT");
-        
-    ButtonGroup group2 = new ButtonGroup();
-    group2.add(meanGroupButton);
-    group2.add(bestGroupButton);
-    group2.add(noWeightButton);
-    
-    JPanel radioPanel2 = new JPanel();
-    radioPanel2.setLayout(new BoxLayout(radioPanel2,BoxLayout.Y_AXIS));
-    radioPanel2.add(Box.createHorizontalStrut(40));
-    radioPanel2.add(meanGroupButton);
-    radioPanel2.add(Box.createHorizontalGlue());
-    radioPanel2.add(bestGroupButton);
-    radioPanel2.add(Box.createHorizontalGlue());
-    radioPanel2.add(noWeightButton);
-    radioPanel2.add(Box.createHorizontalGlue());
-    panel.add(radioPanel2);
-
-    JPanel radioPanel = new JPanel();
-    radioPanel.setLayout(new BoxLayout(radioPanel,BoxLayout.Y_AXIS));
-    radioPanel.add(meanButton);
-    radioPanel.add(Box.createHorizontalGlue());
-    radioPanel.add(quantileButton);
-    radioPanel.add(Box.createHorizontalGlue());
-    radioPanel.add(meanAboveButton);
-    radioPanel.add(Box.createHorizontalGlue());
-    panel.add(radioPanel);
-    
-    RadioListener myListener = new RadioListener();
-    meanButton.addActionListener(myListener);
-    quantileButton.addActionListener(myListener);
-    meanAboveButton.addActionListener(myListener);
-    
-    RadioListener2 myListener2 = new RadioListener2();
-    meanGroupButton.addActionListener(myListener2);
-    bestGroupButton.addActionListener(myListener2);
-    noWeightButton.addActionListener(myListener2);
-    
-        
-    //various other parameters
-    
-    JLabel num1 = new JLabel("Iterations");
-    num1.setToolTipText("Applies to mean and quantile methods: more trials take longer.");
-    text_numField1 = new JTextField("10000",5);
-    panel.add(num1);
-    panel.add(text_numField1);
-    panel.add(Box.createHorizontalStrut(10));
-     
-    JLabel quantile1 = new JLabel("Quantile");
-    quantile1.setToolTipText("Applies to quantile method only. Use 50 for the median");
-    text_quantileField1 = new JTextField("50",5);
-    panel.add(quantile1);
-    panel.add(text_quantileField1);
-    panel.add(Box.createHorizontalStrut(10));
-    
-    JLabel pval1 = new JLabel("P-value cutoff");
-    pval1.setToolTipText("The pvalue cutoff to use for the hypergeometric distribution class evaluation");
-    text_pVal1 = new JTextField("0.00001", 5);
-    panel.add(pval1);
-    panel.add(text_pVal1);
-    panel.add(Box.createVerticalStrut(40));
-
-    JLabel class_max1 = new JLabel("Max class size");
-    class_max1.setToolTipText("Classes with more members will not be considered");
-    text_maxField1 = new JTextField("100",5);
-    panel.add(class_max1);
-    panel.add(text_maxField1);
-    panel.add(Box.createHorizontalStrut(10));
-    
-    JLabel class_min1 = new JLabel("Min class size");
-    class_min1.setToolTipText("Classes with fewer members will not be considered");
-    text_minField1 = new JTextField("4",5);
-    panel.add(class_min1);
-    panel.add(text_minField1);
-    panel.add(Box.createHorizontalStrut(40));
-    panel.add(Box.createVerticalStrut(40)); 
-    
-    Box commitBox1 = new Box(BoxLayout.X_AXIS);
-    commitBox1.add(Box.createHorizontalGlue());
-    commitBox1.add(commitButton1);
-    commitBox1.add(Box.createHorizontalStrut(40));
-    commitBox1.add(Box.createVerticalStrut(80));
-    commitBox1.add(cancelButton1);
-    commitBox1.add(Box.createHorizontalGlue());
-    panel.add(commitBox1,BorderLayout.SOUTH);
-    panel.add(Box.createVerticalGlue());
-    
-    timer = new javax.swing.Timer(ONE_SECOND, new TimerListener());
-    return panel; 
-}
 
 
 
 
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public class TimerListener implements ActionListener {
-	/*****************************************************************************************/
 	
         public void actionPerformed(ActionEvent evt) {
 	    //SwingUtilities.invokeLater(new Update());
 	    try {
-	    SwingUtilities.invokeLater(new Updater());
+		SwingUtilities.invokeLater(new Updater());
 	    } catch (Exception e){
 
 	    }
@@ -567,16 +610,16 @@ protected Component make_Pval_Panel() {
  
    
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public class Updater implements Runnable {
-	/*****************************************************************************************/
 	public void run() {
 	    progress.setIndeterminate(true);
 	}
     }
     
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public class TimerListener_correl implements ActionListener {
-	/*****************************************************************************************/
 	
         public void actionPerformed(ActionEvent evt) {
 	    //SwingUtilities.invokeLater(new Update());
@@ -590,18 +633,17 @@ protected Component make_Pval_Panel() {
  
    
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public class Updater_correl implements Runnable {
-	/*****************************************************************************************/
 	public void run() {
 	    progress_correl.setIndeterminate(true);
 	}
     }
-    
 
     
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public class Update implements Runnable {
-	/*****************************************************************************************/
 	public void run() {
 	    /*    if (progressMonitor.isCanceled()) {
 		  progressMonitor.close();
@@ -613,7 +655,6 @@ protected Component make_Pval_Panel() {
 	    
 	}
     }
-    
     
     
     /****************************************************************************************/
@@ -632,7 +673,7 @@ protected Component make_Pval_Panel() {
 
 
 
-/*****************************************************************************************/  
+    /*****************************************************************************************/  
     protected boolean isURL(String filename) {
 	/*****************************************************************************************/
 	try {
@@ -646,8 +687,8 @@ protected Component make_Pval_Panel() {
 
 
     /*****************************************************************************************/
+    /*****************************************************************************************/
     protected String getCanonical(String in) {
-	/*****************************************************************************************/
 	if (in == null || in.length() == 0)
 	    return in;
 	File outFile = new File(in);
@@ -660,15 +701,13 @@ protected Component make_Pval_Panel() {
     }
 
 
-
+    /*****************************************************************************************/
     //collects field variables - just the filenames.
     /*****************************************************************************************/
     protected boolean collectParams_pval() {
-	/*****************************************************************************************/
 	
 	fileNames1 = new Vector();
-        
-	fileName11 = getString(fileNameField11);
+    	fileName11 = getString(fileNameField11);
 	fileName22 = getString(fileNameField22);
 	fileName33 = getString(fileNameField33);
 	fileName44 = getString(fileNameField44);
@@ -762,7 +801,7 @@ protected Component make_Pval_Panel() {
 	    if ( f.exists() )
 		return true;
 	    else
-		JOptionPane.showMessageDialog(null, "File " + filename + " doesn't exist!!  ");
+		JOptionPane.showMessageDialog(null, "File " + filename + " doesn't exist.  ");
 	    return false;
 	} else {
 	    JOptionPane.showMessageDialog(null, "A required file field is blank");
@@ -772,10 +811,9 @@ protected Component make_Pval_Panel() {
 
 
 
-/*****************************************************************************************/
- protected void collectParams_correl() {
-/*****************************************************************************************/
-	
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    protected void collectParams_correl() {
 	fileNames = new Vector();
 
 	fileName1 = getString(fileNameField1);
@@ -815,12 +853,12 @@ protected Component make_Pval_Panel() {
 
 
 
-
-/*****************************************************************************************/
+    
+    /*****************************************************************************************/
+    /*****************************************************************************************/
     public void cancel() {
-/*****************************************************************************************/
 	System.exit(0);
-	 }
+    }
 
 
     /*****************************************************************************************/
@@ -871,6 +909,7 @@ protected Component make_Pval_Panel() {
 	    }
 	    message += "Weight:" + weight_boolean + "\n";
 	    message += "Method:" + method_name + "\n";
+	    message += "Take -log of input values:" + dolog_boolean + "\n";
 	    message += "Use these files?";
 	    int response = JOptionPane.showConfirmDialog(null,
 							 message,
@@ -878,18 +917,17 @@ protected Component make_Pval_Panel() {
 							 JOptionPane.YES_NO_OPTION);
 	    if (response != JOptionPane.YES_OPTION)
 		return;
-	    }
+	}
 	
 
-	  
 	String numFieldS1;
 	numFieldS1 =text_numField1.getText();
 	if (numFieldS1 !=null){
 	    numField1=Integer.parseInt(numFieldS1);
 	}else {
 	    JOptionPane.showMessageDialog(null,
-					  "Number of iterations is empty!!  "+
-					  "Rewrite number!!");
+					  "Number of iterations is empty. " +
+					  "Please change number.");
 	    return;
 	}
 	
@@ -899,8 +937,8 @@ protected Component make_Pval_Panel() {
 	    maxField1=Integer.parseInt(maxFieldS1);
 	} else {
 	    JOptionPane.showMessageDialog(null,
-					  "Max size is invalid (must be 3 or more)!!  "+
-					  "Rewrite Max Size!!");
+					  "Max size is invalid (must be 3 or more). " +
+					  "Please change Max Size.");
 	    return;
 	}
 	    
@@ -910,15 +948,15 @@ protected Component make_Pval_Panel() {
 	    minField1=Integer.parseInt(minFieldS1);
 	} else {
 	    JOptionPane.showMessageDialog(null,
-					  "Min size is invald (must be 2 or more)!!  "+
-					  "Rewrite Min Size!!");
+					  "Min size is invald (must be 2 or more). " +
+					  "Please change Min Size.");
 	    return;
 	}
 	
 	if (minField1 > maxField1) {
 	    JOptionPane.showMessageDialog(null,
-					  "Values of min class > max!!  "+
-					  "Rewrite class Sizes!!");
+					  "Values of min class > max. " +
+					  "Please change class Sizes.");
 	    return;
 	}
 	
@@ -930,8 +968,8 @@ protected Component make_Pval_Panel() {
 		quantileField1=Integer.parseInt(quantileFieldS1);
 	    } else  {
 		JOptionPane.showMessageDialog(null,
-					      "Quantile is empty!!  "+
-					      "Rewrite quantile!!");
+					      "Quantile is empty. " +
+					      "Please change quantile.");
 		return;
 	    }
 	}
@@ -942,8 +980,8 @@ protected Component make_Pval_Panel() {
 	    pVal1=Double.parseDouble(pValS1);
 	} else {
 	    JOptionPane.showMessageDialog(null,
-					  "P-value is empty!!  "+
-					  "Rewrite range!!");
+					  "P-value is empty. " +
+					  "Please change range.");
 	    return; 
 	} 
 	
@@ -961,27 +999,27 @@ protected Component make_Pval_Panel() {
 		progress.setIndeterminate(true);
 		timer.start();
 		timeCounter.start();
-		class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,groupMethod,maxField1,minField1,numField1,quantileField1,pVal1,weight_boolean);
+		class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,groupMethod,maxField1,minField1,numField1,quantileField1,pVal1, weight_boolean, pvalcolumn, dolog_boolean);
 		test.class_pval_generator();
 		timeCounter.stop();
 		timer.stop();
-		frame.setVisible(false); 
-	            comboWriter(getCanonical("../data/scoreFile"), fileName11); // gene scores            
-                    comboWriter(getCanonical("../data/goFile"), fileName22); // probe to go map           
-                    comboWriter(getCanonical("../data/outputFile"), fileName33); // output file           
-                    comboWriter(getCanonical("../data/nameFile"), fileName44); // biological names for go 
-                    comboWriter(getCanonical("../data/ugFile"), fileName55); // probe to ug map 
-		
+		frame.setVisible(false);
+		comboWriter(getCanonical("scoreFile.pref"), fileName11); // gene scores            
+		comboWriter(getCanonical("goFile.pref"), fileName22); // probe to go map           
+		comboWriter(getCanonical("outputFile.pref"), fileName33); // output file           
+		comboWriter(getCanonical("nameFile.pref"), fileName44); // biological names for go 
+		comboWriter(getCanonical("groupFile.pref"), fileName55); // probe to ug map 
 	    }
-        }.start();  
+        }.start();
     }
 
 
 
 
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public void commit_correl() {
-	/*****************************************************************************************/
+
 	collectParams_correl();
 	
 	Vector files = (Vector) fileNames.clone();
@@ -1040,8 +1078,8 @@ protected Component make_Pval_Panel() {
 		numField=Integer.parseInt(numFieldS);
 	    } else {
 	    	JOptionPane.showMessageDialog(null,
-					      "Number of iterations is empty!!  "+
-					      "Rewrite number!!");	
+					      "Number of iterations is empty. "+
+					      "Please change number.");	
 		return;
 	    }
 
@@ -1051,8 +1089,8 @@ protected Component make_Pval_Panel() {
 		maxField=Integer.parseInt(maxFieldS);
 	    } else {
 		JOptionPane.showMessageDialog(null,
-					      "Max size is empty!!  "+
-					      "Rewrite Max Size!!");
+					      "Max size is empty. "+
+					      "Please change Max Size.");
 		return;
 	    }
 
@@ -1061,16 +1099,16 @@ protected Component make_Pval_Panel() {
 	    if (minFieldS !=null){
 		minField=Integer.parseInt(minFieldS);
 	    } else {
-	JOptionPane.showMessageDialog(null,
-					      "Min size is empty!!  "+
-					      "Rewrite Min Size!!");
-	    return;
+		JOptionPane.showMessageDialog(null,
+					      "Min size is empty. "+
+					      "Please change Min Size.");
+		return;
 	    }
 
 	    if (minField > maxField) {
 		JOptionPane.showMessageDialog(null,
-					      "Values of min class > max!!  "+
-					  "Rewrite class Sizes!!");
+					      "Values of min class > max. "+
+					      "Please change class Size.");
 	    return;
 	    }
 
@@ -1083,8 +1121,8 @@ protected Component make_Pval_Panel() {
 	    		histoField=Double.parseDouble(histoFieldS);
 	    	    } else {
 	    	    	JOptionPane.showMessageDialog(null,
-	    					      "Histogram range is empty!!  "+
-	    					      "Rewrite range!!");
+	    					      "Histogram range is empty.  "+
+	    					      "Please change range.");
 	    	    return; 
 	    	    }
  
@@ -1114,21 +1152,17 @@ protected Component make_Pval_Panel() {
     }
 
 
-
-
-
-
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    /*****************************************************************************************/
     private class RadioListener implements ActionListener { 
-/*****************************************************************************************/
         public void actionPerformed(ActionEvent e) {
 	    method_name=e.getActionCommand();
 	}
     }
     
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    /*****************************************************************************************/
     private class RadioListener2 implements ActionListener { 
-/*****************************************************************************************/
         public void actionPerformed(ActionEvent e) {
 	    groupMethod=e.getActionCommand();
 	    if(groupMethod.equals("NO_WEIGHT"))
@@ -1137,29 +1171,40 @@ protected Component make_Pval_Panel() {
 	        weight_boolean="true";
 	}
     }    
+
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    private class dologListener implements ItemListener { 
+        public void itemStateChanged(ItemEvent e) {
+	    int state = e.getStateChange();
+	    if (state == e.SELECTED)
+	        dolog_boolean="true";
+	    else
+	        dolog_boolean="false";
+	}
+    }    
+
+    /*****************************************************************************************/    
+    //private class CheckBoxListener implements ItemListener {
+    /*****************************************************************************************/
+    /*public void itemStateChanged(ItemEvent e) {
+      
+    int state =e.getStateChange();
+    if (state == e.SELECTED) {
+    weight_boolean="true";
+    } else if (state == e.DESELECTED)
+    {
+    weight_boolean="false";
+    }   
+    }
+    }*/
     
 
 
-/*****************************************************************************************/    
- //private class CheckBoxListener implements ItemListener {
-/*****************************************************************************************/
-     /*public void itemStateChanged(ItemEvent e) {
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    public String getString(JComboBox comp) {
 	
-	 int state =e.getStateChange();
-	 if (state == e.SELECTED) {
-	     weight_boolean="true";
-	 } else if (state == e.DESELECTED)
-	     {
-		 weight_boolean="false";
-	     }   
-     }
- }*/
-    
-
-
-/*****************************************************************************************/
-   public String getString(JComboBox comp) {
-/*****************************************************************************************/
 	String selectedPath = (String) comp.getSelectedItem();
 	if (selectedPath == null ||
 	    !selectedPath.equals(comp.getEditor().getItem())) {
@@ -1169,9 +1214,9 @@ protected Component make_Pval_Panel() {
     }
 
  
-/*****************************************************************************************/
-   public void browse(JTextField target) {
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    /*****************************************************************************************/
+    public void browse(JTextField target) {
 	JFileChooser chooser = new JFileChooser();
 	chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
@@ -1179,11 +1224,11 @@ protected Component make_Pval_Panel() {
 	    target.setText(chooser.getSelectedFile().toString());
     }
 
+    
 
-
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    /*****************************************************************************************/
     public void browse(JComboBox target) {
-/*****************************************************************************************/
 	String selectedPath = getString(target);
 	File currentFile = new File(selectedPath);
 	//String startPath;
@@ -1208,74 +1253,71 @@ protected Component make_Pval_Panel() {
     
 
     public Vector comboReader(String inFilename){
-    	 Vector fileList = new Vector();
-    	 try { 
-	     FileInputStream fis = new FileInputStream(inFilename);
-	     BufferedInputStream bis = new BufferedInputStream(fis);
-	     BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
-	     while(dis.ready())
-	     {  
-	         String line = dis.readLine();
-	         fileList.add(line);
-	     }
-	     dis.close();
-	    
-		     
-	 } catch (IOException e) { 
-	     // catch possible io errors from readLine()
-	     System.out.println("IOException error!");
-	     e.printStackTrace();
-	 }
-    	 return fileList;
+	File file = new File(inFilename);
+
+	System.err.println("Reading " + inFilename);
+
+	if (file.exists() && file.isFile() && file.canRead() ) {
+
+	    Vector fileList = new Vector();
+	    try {
+		FileInputStream fis = new FileInputStream(inFilename);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
+		while(dis.ready())
+		    {
+			String line = dis.readLine();
+			fileList.add(line);
+			System.err.println(line);
+		    }
+		dis.close();
+	    } catch (IOException e) { 
+		// catch possible io errors from readLine()
+		System.out.println("IOException error!");
+		e.printStackTrace();
+	    }
+	    return fileList;
+	} else {
+	    return null;
+	}
     }
     
     public void comboWriter(String outFilename, String names){
-        boolean writeFlag = true;
-        try{
-             FileInputStream fis = new FileInputStream(outFilename);
-	     BufferedInputStream bis = new BufferedInputStream(fis);
-	     BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
-	     while(dis.ready())
-	     {  
-	         String line = dis.readLine();
-	         if (line.equals(names))
-	             writeFlag = false;
-	     }
-	     dis.close();
-            if(writeFlag){
-                 BufferedWriter out = new BufferedWriter(new FileWriter(outFilename, true));    	 
-                 out.write(names+"\n");
-                 out.close();
-            }
-        }catch (IOException e) { 
-	     System.out.println("combo writer error!");
-	     e.printStackTrace();
-	 }
+        try {
+	    BufferedWriter out = new BufferedWriter(new FileWriter(outFilename, false));
+	    System.err.println(names);
+	    out.write(names+"\n");
+	    out.close();
+        } catch (IOException e) { 
+	    System.out.println("Combo writer error!");
+	    e.printStackTrace();
+	}
     }
 
 
 
 
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    /*****************************************************************************************/
     public static void main(String[] args) {
-/*****************************************************************************************/
 	try {
-        UIManager.setLookAndFeel(
-            UIManager.getCrossPlatformLookAndFeelClassName());
+	    UIManager.setLookAndFeel(
+				     UIManager.getCrossPlatformLookAndFeelClassName());
 	} catch (Exception e){ }
         JFrame test = new JFrame();
 	test.setResizable(false);
-		
+	
 	test.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
 		    System.exit(0);
 		}
 	    });
-	 test.getContentPane().add(new Class_Frame(), 
-                                   BorderLayout.CENTER);
-        test.setTitle("Class_Score");
+	test.getContentPane().add(new Class_Frame(), 
+				  BorderLayout.CENTER);
+	test.setTitle("Functional Class Scoring");
 	//test.pack();
 	test.setSize(450,400);
 	test.setVisible(true);
-	}
     }
+
+}

@@ -26,9 +26,10 @@ import java.lang.reflect.*;
 /*****************************************************************************************/
 
      private String[] chip_id = null;
-     private double[] pval =null;
+     private double[] pval = null;
      private int num_pvals;
      private static Map chip_pval_map;
+     private double log10 = Math.log(10);
      //private gene_pval[] gene_list = null;
 
      //--------------------------------------------------< main >--------//
@@ -43,11 +44,26 @@ import java.lang.reflect.*;
      /*****************************************************************************************/
      /* creates the probe -> pval mapping.
      /*****************************************************************************************/
-     public Pval_parse(String filename)
-     {
+     public Pval_parse(String filename) {
+	 this(filename, 1, true);
+     }
+
+     public Pval_parse(String filename, int column, boolean dolog) {
 	 String aLine = null;
 	 int count = 0;
 	 //read in file
+
+	 File infile = new File(filename);
+	 if (!infile.exists() || !infile.canRead()) {
+	     System.err.println("Could not read " + filename);
+	 }
+
+	 if (column < 1) {
+	     System.err.println("Illegal column number " + column + ", must be greater or equal to 1");
+	 } else {
+	     System.err.println("Reading gene scores from column " + column);
+	 }
+	 
 	 try { 
 	     FileInputStream fis = new FileInputStream(filename);
 	     BufferedInputStream bis = new BufferedInputStream(fis);
@@ -91,14 +107,21 @@ import java.lang.reflect.*;
 		     }
 		     chip_id[i-1] = name;
 
-		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(1)));
+		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(column)));
 
-		     //uncommented do not add probes whose pvals ==0
-		     if (pval[i-1] == 0) {
-			 continue;
+		     //		     System.err.println("p " + pval[i-1]);
+
+		     // Do not add probes whose pvals cannot be logged.
+		     if (pval[i-1] <= 0 && dolog) {
+			 System.err.println("Warning: Cannot take log of non-positive value for " + name  +  " (" + pval[i-1] + ") from gene score file: Setting to 10e-12.");
+			 //			 continue;
+			 pval[i-1] = 10e-12;
 		     }
 
-		     pval[i-1]= -(Math.log(pval[i-1])/Math.log(10)); // Make -log base 10.
+		     if (dolog) {
+			 pval[i-1]= -(Math.log(pval[i-1])/log10); // Make -log base 10.
+		     }
+
 		     doubleArray[i-1] = new Double(pval[i-1]);
 		     chip_pval_map.put(chip_id[i-1],doubleArray[i-1]);	      // put key, value.
 		 }
@@ -117,8 +140,10 @@ import java.lang.reflect.*;
 	     e.printStackTrace();
 	 }
 
-     } // end of readMyFile()
+     } //
      
+
+
 
 /*****************************************************************************************/
      public String[] get_chip_ids(){

@@ -57,6 +57,12 @@ public class Ug_Parse {
 	String aLine = null;
 	int count = 0;
 	chips = chipsFromList;
+
+	File infile = new File(filename);
+	if (!infile.exists() || !infile.canRead()) {
+	    System.err.println("Could not read " + filename);
+	}
+
 	try { 
 	    FileInputStream fis = new FileInputStream(filename);
 	    BufferedInputStream bis = new BufferedInputStream(fis);

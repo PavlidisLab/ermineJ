@@ -28,20 +28,19 @@ public class class_pvals {
     private Ug_Parse ugName;
     private double user_pvalue;
     private String dest_file;
-    private boolean weight_on = false;
+    private boolean weight_on = true;
+    private boolean dolog = true;
 
     // command line arguments in the following way
     // pval_file,affy_go_file,Go_name_file,destination_file,ug_file,method,groupMethod,class_max_size,class_min_size,number of runs,quantile, p-value, weightcheck
     public static void main (String[] args) {
-	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],args[6],Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]),args[12]);
+	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],args[6],Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]),args[12], Integer.parseInt(args[13]), args[14]);
 	test.class_pval_generator();
     }
-     
-
 
     /*****************************************************************************************/
     /*****************************************************************************************/
-    public class_pvals(String probe_pvalfile, String affy_gofile, String go_namefile, String destination_file, String ug_file, String method, String groupMethod, int class_max_size, int class_min_size,int number_of_runs,int quantile, double pval, String wt_check) {
+    public class_pvals(String probe_pvalfile, String affy_gofile, String go_namefile, String destination_file, String ug_file, String method, String groupMethod, int class_max_size, int class_min_size,int number_of_runs,int quantile, double pval, String wt_check, int pvalcolumn, String dolog_check ) {
 
 	affy_go_Parse affy_go = new affy_go_Parse(affy_gofile);//parses affy file. Yields map of probe->go
 	goName = new GoName_parse(go_namefile); // parse go name file
@@ -59,9 +58,10 @@ public class class_pvals {
 	//	ug_name = ugName.get_chip_map(); //ug map (chip_repeat_val) todo: this isn't used anywhere.??
 	user_pvalue = -(Math.log(pval)/Math.log(10));//user defined pval (cutoff)
 	weight_on =(Boolean.valueOf(wt_check)).booleanValue();
+	dolog = (Boolean.valueOf(dolog_check)).booleanValue();
 
 	hist = new histogram();
-	probe_pval = new exp_class_scores(probe_pvalfile, wt_check, method);
+	probe_pval = new exp_class_scores(probe_pvalfile, wt_check, method, pvalcolumn, dolog);
 
 	probe_pval.set_class_max_size(class_max_size);
 	probe_pval.set_class_min_size(class_min_size);
@@ -92,7 +92,7 @@ public class class_pvals {
     
 
     /*****************************************************************************************/
-    //use the objects created from constructor
+    // use the objects created from constructor
     /*****************************************************************************************/
     public void class_pval_generator()
     {
@@ -299,7 +299,6 @@ public class class_pvals {
 
 			if (binnum > (hist.get_hist_range() - hist.get_hist_min())/hist.get_bin_size()) // todo: calculate this only once.
 			    binnum = (int)Math.floor(hist.get_hist_range()/hist.get_bin_size());
-
 
 			// todo: the need for this check is indicative of a problem
 			if (row > M.get_num_rows() - 1 || binnum > M.get_num_cols() - 1) {

@@ -46,6 +46,13 @@ import java.lang.reflect.*;
 	 String go_id = "";
 	 String go_name = "";
 	 //read in file 	
+
+
+	File infile = new File(filename);
+	if (!infile.exists() || !infile.canRead()) {
+	    System.err.println("Could not read " + filename);
+	}
+
 	 try { 
 	     FileInputStream fis = new FileInputStream(filename);
 	     BufferedInputStream bis = new BufferedInputStream(fis);
