@@ -146,7 +146,7 @@ public class GeneSetScoreFrame extends JFrame {
       defineClassMenuItem.setMnemonic( 'D' );
       defineClassMenuItem.setAccelerator( KeyStroke.getKeyStroke(
             KeyEvent.VK_D, InputEvent.CTRL_MASK ) );
-      modClassMenuItem.setText( "Modify Gene Set" );
+      modClassMenuItem.setText( "View/Modify Gene Set" );
       modClassMenuItem
             .addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter(
                   this ) );

@@ -21,7 +21,7 @@ import javax.swing.*;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin K Lee
  * @version $Id$
  */
@@ -62,14 +62,14 @@ public class GeneSetWizardStep2 extends WizardStep {
       // countLabel = new JLabel();
       JLabel jLabel1 = new JLabel();
       JLabel jLabel2 = new JLabel();
-      jLabel1.setPreferredSize(new Dimension(250, 15));
-      jLabel1.setText("Available Probes");
-      jLabel2.setPreferredSize(new Dimension(250, 15));
-      jLabel2.setText("Probes in gene set");
+      jLabel1.setPreferredSize( new Dimension( 250, 15 ) );
+      jLabel1.setText( "All available probes and genes" );
+      jLabel2.setPreferredSize( new Dimension( 250, 15 ) );
+      jLabel2.setText( "Gene set members" );
       showStatus( "Number of Probes selected: 0" );
       //  topPanel.add( countLabel );
-      topPanel.add(jLabel1, null);
-      topPanel.add(jLabel2, null);
+      topPanel.add( jLabel1, null );
+      topPanel.add( jLabel2, null );
 
       step2Panel = new JPanel();
       BorderLayout borderLayout1 = new BorderLayout();
@@ -131,7 +131,10 @@ public class GeneSetWizardStep2 extends WizardStep {
 
       this.addHelp( "<html><b>Set up the gene set</b><br>"
             + "Add or remove probes/genes using the buttons below the table. "
-            + "To find a specific gene use the 'find' tool." );
+            + "The list of all possible available probes is provided at the left. "
+            + "The list of probes/genes that are in the gene set is given at right. "
+            + "To find a specific gene use the 'find' tool. "
+            + "If you don't want to make any changes, press 'cancel'." );
       this.addMain( step2Panel );
    }
 
