@@ -62,11 +62,6 @@ public class AnalysisWizardStep4 extends WizardStep {
       jRadioButtonBestReplicates = new JRadioButton();
       jRadioButtonSeparateReplicates = new JRadioButton();
       jRadioButtonMeanReplicates = new JRadioButton();
-      //panels for step 4 bottom
-      //    TitledBorder oraTitledBorder;
-      //    TitledBorder resampTitledBorder;
-      //    TitledBorder corrTitledBorder;
-      //    ButtonGroup corrButtonGroup = new ButtonGroup();
 
       step4Panel = new JPanel();
       step4Panel.setPreferredSize( new Dimension( 550, 280 ) );
@@ -105,7 +100,8 @@ public class AnalysisWizardStep4 extends WizardStep {
       jPanelReplicateTreaments.setBorder( null );
       jPanelReplicateTreaments.setPreferredSize( new Dimension( 175, 100 ) );
       jPanelReplicateTreaments
-            .setToolTipText( "How will replicates of the same gene be treated?" );
+            .setToolTipText( "How will replicates of the same gene be treated? (this setting doesn't apply to correlation analysis)" );
+      // todo replicate treatments for correlation tooltip.
       jRadioButtonBestReplicates.setBackground( SystemColor.control );
       jRadioButtonBestReplicates.setPreferredSize( new Dimension( 171, 23 ) );
       jRadioButtonBestReplicates
@@ -133,20 +129,10 @@ public class AnalysisWizardStep4 extends WizardStep {
       jPanelReplicateTreaments.add( jRadioButtonBestReplicates, null );
       jPanelReplicateTreaments.add( jRadioButtonMeanReplicates, null );
       jPanelReplicateTreaments.add( jList1, null );
-      step4RightPanel.add( jPanelReplicateTreaments, null );
+      
       step4TopPanel.add( step4LeftPanel, null );
       step4TopPanel.add( step4RightPanel, null );
       step4Panel.add( step4TopPanel, null );
-
-      //oraPanel stuff//////////////////////////////////////////////////////////
-      //   oraTitledBorder = new TitledBorder("ORA");
-      //resampPanel stuff///////////////////////////////////////////////////////
-      //  resampTitledBorder = new TitledBorder("Resampling");
-      //corrPanel stuff/////////////////////////////////////////////////////////
-      //   corrTitledBorder = new TitledBorder("Correlation");
-      //step4Panel.add(oraPanel);
-      //step4Panel.add(resampPanel);
-      //step4Panel.add(corrPanel);
 
       this
             .addHelp( "<html><b>Set parameters that are general for all analysis methods.</b><br>"

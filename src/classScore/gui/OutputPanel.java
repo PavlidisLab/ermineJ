@@ -42,7 +42,7 @@ import java.util.Vector;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin Lee
  * @version $Id$
  * @todo deletion of geneDataSets when remove is used.
@@ -66,7 +66,6 @@ public class OutputPanel extends JScrollPane {
    private GeneAnnotations geneData;
    private GONames goData;
    private String classColToolTip;
-
 
    public OutputPanel( GeneSetScoreFrame callingframe, LinkedList results ) {
       this.callingframe = callingframe;
@@ -115,12 +114,11 @@ public class OutputPanel extends JScrollPane {
       table.getTableHeader().addMouseListener( removeRunPopupListener );
    }
 
-  /**
-   *
-   * @todo make this open the class even if no results are stored.
-   * @param e MouseEvent
-   */
-  void table_mouseReleased( MouseEvent e ) {
+   /**
+    * @todo make this open the class even if no results are stored.
+    * @param e MouseEvent
+    */
+   void table_mouseReleased( MouseEvent e ) {
       int i = table.getSelectedRow();
       int j = table.getSelectedColumn();
       if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.init_cols ) {
@@ -162,11 +160,10 @@ public class OutputPanel extends JScrollPane {
       cwiz.showWizard();
    }
 
-  /**
-   *
-   * @param e ActionEvent
-   */
-  void htmlMenuItem_actionPerformed( ActionEvent e ) {
+   /**
+    * @param e ActionEvent
+    */
+   void htmlMenuItem_actionPerformed( ActionEvent e ) {
 
       OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e
             .getSource() ).getParent();
@@ -176,9 +173,9 @@ public class OutputPanel extends JScrollPane {
       // create the URL and show it
       try {
          //    new JWebBrowser( URL );
-         BrowserLauncher.openURL( AMIGO_URL_BASE + classID);
+         BrowserLauncher.openURL( AMIGO_URL_BASE + classID );
       } catch ( IOException e1 ) {
-         GuiUtil.error("Could not open a web browser window.");
+         GuiUtil.error( "Could not open a web browser window." );
       }
    }
 
@@ -221,6 +218,7 @@ public class OutputPanel extends JScrollPane {
             .getSettings();
       String tooltip = new String( "<html>" );
       String coda = new String();
+      
       if ( runSettings.getAnalysisMethod() == Settings.ORA ) {
          tooltip += "ORA Analysis<br>";
          coda += "P value threshold: " + runSettings.getPValThreshold();
@@ -232,18 +230,24 @@ public class OutputPanel extends JScrollPane {
          tooltip += "Correlation Analysis<br>";
          coda += runSettings.getIterations() + " iterations";
       }
+      
       tooltip += new String( "Max set size: " + runSettings.getMaxClassSize()
             + "<br>" + "Min set size: " + runSettings.getMinClassSize()
             + "<br>" );
       if ( runSettings.getDoLog() ) tooltip += "Log normalized<br>";
+
       if ( runSettings.getGeneRepTreatment() == Settings.MEAN_PVAL )
          tooltip += "Gene Rep Treatment: Mean <br>";
       else if ( runSettings.getGeneRepTreatment() == Settings.BEST_PVAL )
             tooltip += "Gene Rep Treatment: Best <br>";
-      if ( runSettings.getRawScoreMethod() == Settings.MEAN_METHOD )
-         tooltip += "Class Raw Score Method: Mean <br>";
-      else if ( runSettings.getRawScoreMethod() == Settings.QUANTILE_METHOD )
-            tooltip += "Class Raw Score Method: Median <br>";
+
+      if ( runSettings.getAnalysisMethod() == Settings.RESAMP
+            || runSettings.getAnalysisMethod() == Settings.ORA ) {
+         if ( runSettings.getRawScoreMethod() == Settings.MEAN_METHOD )
+            tooltip += "Class Raw Score Method: Mean <br>";
+         else if ( runSettings.getRawScoreMethod() == Settings.QUANTILE_METHOD )
+               tooltip += "Class Raw Score Method: Median <br>";
+      }
       tooltip += coda;
       resultToolTips.add( runnum, tooltip );
    }
@@ -313,11 +317,10 @@ public class OutputPanel extends JScrollPane {
       return ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
    }
 
-  /**
-   *
-   * @return classScore.data.GONames
-   */
-  public GONames getGoData() {
+   /**
+    * @return classScore.data.GONames
+    */
+   public GONames getGoData() {
       return goData;
    }
 }
@@ -495,21 +498,20 @@ class OutputTableModel extends AbstractTableModel {
       columnNames.add( "# of Genes" );
    }
 
-  /**
-   *
-   * @return int
-   */
-  public int getState() {
+   /**
+    * @return int
+    */
+   public int getState() {
       return state;
    }
 
-  /**
-   * Does not reset the state.
-   *
-   * @param geneData GeneAnnotations
-   * @param goData GONames
-   */
-  public void setInitialData( GeneAnnotations geneData, GONames goData ) {
+   /**
+    * Does not reset the state.
+    * 
+    * @param geneData GeneAnnotations
+    * @param goData GONames
+    */
+   public void setInitialData( GeneAnnotations geneData, GONames goData ) {
       this.geneData = geneData;
       this.goData = goData;
    }
