@@ -30,6 +30,7 @@ public class Settings {
    int scorecol = 2;
    int geneRepTreatment = BEST_PVAL;
    int rawScoreMethod = MEAN_METHOD;
+   int analysisMethod = RESAMP;
    int quantile = 50;
    boolean doLog = true;
    double pValThreshold = 0.001;
@@ -38,6 +39,9 @@ public class Settings {
    public static final int MEAN_PVAL = 2;
    public static final int MEAN_METHOD = 0;
    public static final int QUANTILE_METHOD = 1;
+   public static final int ORA = 0;
+   public static final int RESAMP = 1;
+   public static final int CORR = 2;
 
    /**
     * Creates settings object
@@ -92,6 +96,8 @@ public class Settings {
                geneRepTreatment = Integer.valueOf( properties.getProperty( "geneRepTreatment" ) ).intValue();
             if ( properties.containsKey( "rawScoreMethod" ) )
                rawScoreMethod = Integer.valueOf( properties.getProperty( "rawScoreMethod" ) ).intValue();
+            if ( properties.containsKey( "analysisMethod" ) )
+               analysisMethod = Integer.valueOf( properties.getProperty( "analysisMethod" ) ).intValue();
             if ( properties.containsKey( "quantile" ) )
                quantile = Integer.valueOf( properties.getProperty( "quantile" ) ).intValue();
             if ( properties.containsKey( "doLog" ) )
@@ -122,6 +128,7 @@ public class Settings {
       scorecol=settings.getScorecol();
       geneRepTreatment=settings.getGeneRepTreatment();
       rawScoreMethod=settings.getRawScoreMethod();
+      analysisMethod=settings.getAnalysisMethod();
       quantile=settings.getQuantile();
       doLog=settings.getDoLog();
       pValThreshold=settings.getPValThreshold();
@@ -146,6 +153,7 @@ public class Settings {
       properties.setProperty("scorecol", String.valueOf(scorecol));
       properties.setProperty("geneRepTreatment", String.valueOf(geneRepTreatment));
       properties.setProperty("rawScoreMethod", String.valueOf(rawScoreMethod));
+      properties.setProperty("analysisMethod", String.valueOf(analysisMethod));
       properties.setProperty("quantile", String.valueOf(quantile));
       properties.setProperty("doLog", String.valueOf(doLog));
       properties.setProperty("pValThreshold", String.valueOf(pValThreshold));
@@ -169,6 +177,7 @@ public class Settings {
    public int getScorecol() { return scorecol; }
    public int getGeneRepTreatment() { return geneRepTreatment; }
    public int getRawScoreMethod() { return rawScoreMethod; }
+   public int getAnalysisMethod() { return analysisMethod; }
    public int getQuantile() { return quantile; }
    public boolean getDoLog() { return doLog; }
    public double getPValThreshold() { return pValThreshold; }
@@ -189,6 +198,7 @@ public class Settings {
    public void setScorecol(int val) {  scorecol=val; }
    public void setGeneRepTreatment(int val) { geneRepTreatment=val; }
    public void setRawScoreMethod(int val) { rawScoreMethod=val; }
+   public void setAnalysisMethod(int val) { analysisMethod=val; }
    public void setQuantile(int val) {  quantile=val; }
    public void setDoLog(boolean val) {  doLog=val; }
    public void setPValThreshold(double val) {  pValThreshold=val; }

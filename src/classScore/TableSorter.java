@@ -311,37 +311,33 @@ public class TableSorter extends AbstractTableModel {
                 Object o1 = tableModel.getValueAt(row1, column);
                 Object o2 = tableModel.getValueAt(row2, column);
                 Comparator comparator;
-                if(o1.getClass().equals(Double.class))
-                   comparator=getComparator( Double.class );
-                else if(o1.getClass().equals(Integer.class))
-                   comparator= getComparator( Integer.class );
-                else
-                   comparator=getComparator( column );
-
                 int comparison = 0;
 
                 if ( o1 == null && o2 == null ) {
                    comparison = 0;
                 }
+                else if ( o1 == null ) {
+                   if ( directive.direction == DESCENDING)      // Define null less than everything, except null.
+                      comparison = -1;
+                   else                                         // Define null greater than everything, except null.
+                      comparison = 1;
+                }
+                else if ( o2 == null) {
+                   if ( directive.direction == DESCENDING)
+                      comparison = 1;
+                   else
+                      comparison = -1;
+                }
                 else if ( o1 != null && o2 != null ) {
+                   if(o1.getClass().equals(Double.class))
+                      comparator=getComparator( Double.class );
+                   else if(o1.getClass().equals(Integer.class))
+                      comparator= getComparator( Integer.class );
+                   else
+                      comparator=getComparator( column );
                    comparison = comparator.compare( o1, o2 );
                 }
-                // Define null less than everything, except null.
-                else if ( directive.direction == DESCENDING) {
-                   if ( o1 == null ) {
-                      comparison = -1;
-                   } else if ( o2 == null ) {
-                      comparison = 1;
-                   }
-                }
-                // Define null greater than everything, except null.
-                else {
-                   if ( o1 == null ) {
-                      comparison = 1;
-                   } else if ( o2 == null) {
-                      comparison = -1;
-                   }
-                }
+
                 if (comparison != 0) {
                    return directive.direction == DESCENDING ? -comparison : comparison;
                 }

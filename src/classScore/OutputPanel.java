@@ -23,6 +23,7 @@ public class OutputPanel extends JScrollPane {
    OutputTableModel model;
    classScoreFrame callingframe;
    Vector results;
+   Vector resultToolTips = new Vector();
    GeneAnnotations geneData;
    GONames goData;
 
@@ -30,7 +31,20 @@ public class OutputPanel extends JScrollPane {
       this.callingframe=callingframe;
       this.results=results;
       model = new OutputTableModel(results);
-      table = new JTable();
+      table = new JTable(){
+         //Implement table header tool tips.
+         protected JTableHeader createDefaultTableHeader() {
+            return new JTableHeader(columnModel) {
+               public String getToolTipText(MouseEvent e) {
+                  String tip = null;
+                  java.awt.Point p = e.getPoint();
+                  int index = columnModel.getColumnIndexAtX(p.x);
+                  int realIndex = columnModel.getColumn(index).getModelIndex();
+                  return getHeaderToolTip(realIndex);
+               }
+            };
+         }
+      };
       table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
       table.getTableHeader().setReorderingAllowed( false );
 
@@ -45,7 +59,6 @@ public class OutputPanel extends JScrollPane {
    void table_mouseReleased( MouseEvent e ) {
       int i = table.getSelectedRow();
       int j = table.getSelectedColumn();
-      //if(!table.getValueAt(i,j).equals("") && j>=OutputTableModel.init_cols)
       if(table.getValueAt(i,j) != null && j>=OutputTableModel.init_cols)
       {
          int runnum=(int)Math.floor((j - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
@@ -61,6 +74,55 @@ public class OutputPanel extends JScrollPane {
       String id = (String) table.getValueAt(r, 0);
       ClassWizard cwiz = new ClassWizard(callingframe, geneData, goData, id);
       cwiz.showWizard();
+   }
+
+   String getHeaderToolTip(int index)
+   {
+      if(index>=OutputTableModel.init_cols)
+      {
+         int runnum=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
+         return (String) resultToolTips.get(runnum);
+      }
+      else
+         return null;
+   }
+
+   void generateToolTip(int runnum)
+   {
+      Settings runSettings=((classPvalRun)results.get(runnum)).getSettings();
+      String tooltip = new String("<html>");
+      String coda = new String();
+      if(runSettings.getAnalysisMethod()==Settings.ORA)
+      {
+         tooltip += "ORA Analysis<br>";
+         coda += "P value threshold: " + runSettings.getPValThreshold();
+      }
+      else if(runSettings.getAnalysisMethod()==Settings.RESAMP)
+      {
+         tooltip += "Resampling Analysis<br>";
+         coda += runSettings.getIterations() + " iterations<br>";
+         coda += "Using score column: " + runSettings.getScorecol();
+      }
+      else if(runSettings.getAnalysisMethod()==Settings.CORR)
+      {
+         tooltip += "Correlation Analysis<br>";
+         coda += runSettings.getIterations() + " iterations";
+      }
+         tooltip += new String("Max set size: " + runSettings.getMaxClassSize() + "<br>" +
+                            "Min set size: " + runSettings.getMinClassSize() + "<br>");
+      if(runSettings.getDoLog())
+         tooltip+="Log normalized<br>";
+      if(runSettings.getGeneRepTreatment()==Settings.MEAN_PVAL)
+         tooltip+="Gene Rep Treatment: Mean <br>";
+      else if(runSettings.getGeneRepTreatment()==Settings.BEST_PVAL)
+         tooltip+="Gene Rep Treatment: Best <br>";
+      if(runSettings.getRawScoreMethod()==Settings.MEAN_METHOD)
+         tooltip+="Class Raw Score Method: Mean <br>";
+      else if(runSettings.getRawScoreMethod()==Settings.QUANTILE_METHOD)
+         tooltip+="Class Raw Score Method: Median <br>";
+      tooltip+=coda;
+      resultToolTips.add(runnum,tooltip);
+      System.err.println(tooltip);
    }
 
    public void addInitialData(GeneAnnotations geneData, GONames goData) {
@@ -85,6 +147,7 @@ public class OutputPanel extends JScrollPane {
       table.getColumnModel().getColumn(model.getColumnCount() - 3).setPreferredWidth(30);
       table.getColumnModel().getColumn(model.getColumnCount() - 2).setPreferredWidth(30);
       table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
+      generateToolTip(((model.getColumnCount()-OutputTableModel.init_cols)/OutputTableModel.cols_per_run)-1);
       table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer());
       table.revalidate();
    }

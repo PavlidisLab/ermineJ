@@ -30,7 +30,7 @@ public class AnalysisWizard extends Wizard
       this.callingframe = callingframe;
       this.settings = new Settings(callingframe.getSettings());
 
-      step1 = new AnalysisWizardStep1(this);
+      step1 = new AnalysisWizardStep1(this,settings);
       this.addStep(1,step1);
       step2 = new AnalysisWizardStep2(this,settings);
       this.addStep(2,step2);
@@ -111,6 +111,7 @@ public class AnalysisWizard extends Wizard
    }
 
    void saveValues(){
+      step1.saveValues();
       step2.saveValues();
       step4.saveValues();
       try{

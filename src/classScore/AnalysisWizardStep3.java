@@ -99,7 +99,7 @@ public class AnalysisWizardStep3
       int[] rows = customClassTable.getSelectedRows();
       for ( int i = 0; i < n; i++ ) {
          String id = ( String ) customClassTable.getValueAt( rows[i], 0 );
-         if ( id.compareTo( "" ) != 0 ) {
+         if ( id != null ) {
             HashMap cfi = ( HashMap ) ccHash.get( id );
             if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
                addedClasses.add( cfi );
@@ -114,7 +114,7 @@ public class AnalysisWizardStep3
    void addAllButton_actionPerformed(ActionEvent e) {
       for ( int i = 0; i < ccTableModel.getRowCount(); i++ ) {
          String id = ( String ) customClassTable.getValueAt( i, 0 );
-         if ( id.compareTo( "" ) != 0 ) {
+         if ( id != null ) {
             HashMap cfi = ( HashMap ) ccHash.get( id );
             if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
                addedClasses.add( cfi );
@@ -132,7 +132,7 @@ public class AnalysisWizardStep3
       for ( int i = 0; i < n; i++ ) {
          String id = ( String ) addedClassTable.getValueAt( rows[i] - i, 0 );
          System.err.println( id );
-         if ( id.compareTo( "" ) != 0 ) {
+         if ( id != null ) {
             HashMap cfi = ( HashMap ) ccHash.get( id );
             acHash.remove( cfi.get( "id" ) );
             addedClasses.remove( cfi );

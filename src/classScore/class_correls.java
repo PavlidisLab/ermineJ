@@ -56,14 +56,14 @@ public class class_correls {
 
       probe_data = new corr_class_scores(probe_datafile); // main data file
       geneData = new GeneAnnotations(probe_annotfile, probe_data.get_data_map());
-      ClassMap probe_go = new ClassMap(geneData.getProbeToClassMap(),
-                                       geneData.getClassToProbeMap()); //parses affy file
+      //ClassMap probe_go = new ClassMap(geneData.getProbeToClassMap(),                          //commented by Homin just to compile
+      //                                 geneData.getClassToProbeMap()); //parses affy file      //commented by Homin just to compile
       goName = new GONames(go_namefile); //parse go name file
       probe_gom = new LinkedHashMap();
       go_probe = new LinkedHashMap();
       go_name = new LinkedHashMap();
-      probe_gom = probe_go.getProbeToClassMap(); //probe go map
-      go_probe = probe_go.getClassToProbeMap(); //go probe map
+      //probe_gom = probe_go.getProbeToClassMap(); //probe go map                                //commented by Homin just to compile
+      //go_probe = probe_go.getClassToProbeMap(); //go probe map                                 //commented by Homin just to compile
       go_name = goName.getMap(); //go name map
 
       // todo: this should be done by the hist class?

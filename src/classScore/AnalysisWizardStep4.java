@@ -306,9 +306,9 @@ public class AnalysisWizardStep4 extends WizardStep
       jTextFieldScoreCol.setText(String.valueOf(settings.getScorecol()));
       if(settings.getGeneRepTreatment()==0)
          jRadioButtonSeparateReplicates.setSelected(true);
-      else if(settings.getGeneRepTreatment()==1)
+      else if(settings.getGeneRepTreatment()==Settings.BEST_PVAL)
          jRadioButtonBestReplicates.setSelected(true);
-      else if(settings.getGeneRepTreatment()==2)
+      else if(settings.getGeneRepTreatment()==Settings.MEAN_PVAL)
          jRadioButtonMeanReplicates.setSelected(true);
       if(settings.rawScoreMethod==settings.MEAN_METHOD)
          jRadioButtonMean.setSelected(true);
@@ -324,11 +324,11 @@ public class AnalysisWizardStep4 extends WizardStep
       settings.setIterations(Integer.valueOf(jTextFieldIterations.getText()).intValue());
       settings.setScorecol(Integer.valueOf(jTextFieldScoreCol.getText()).intValue());
       if(jRadioButtonSeparateReplicates.isSelected()) {
-         settings.setGeneRepTreatment(0);
+         settings.setGeneRepTreatment(0);                             //not implemented?
       } else if (jRadioButtonBestReplicates.isSelected()) {
-         settings.setGeneRepTreatment(1);
+         settings.setGeneRepTreatment(Settings.BEST_PVAL);
       } else if (jRadioButtonMeanReplicates.isSelected()) {
-         settings.setGeneRepTreatment(2);
+         settings.setGeneRepTreatment(Settings.MEAN_PVAL);
       }
       if(jRadioButtonMean.isSelected())
          settings.setRawScoreMethod(settings.MEAN_METHOD);

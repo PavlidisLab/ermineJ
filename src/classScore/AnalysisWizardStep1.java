@@ -17,11 +17,17 @@ import javax.swing.*;
 public class AnalysisWizardStep1 extends WizardStep
 {
    AnalysisWizard wiz;
+   Settings settings;
+   JRadioButton oraButton;
+   JRadioButton resampButton;
+   JRadioButton corrButton;
 
-   public AnalysisWizardStep1(AnalysisWizard wiz)
+   public AnalysisWizardStep1(AnalysisWizard wiz, Settings settings)
    {
       super(wiz);
       this.wiz=wiz;
+      this.settings=settings;
+      setValues();
    }
 
    //Component initialization
@@ -31,9 +37,9 @@ public class AnalysisWizardStep1 extends WizardStep
       JLabel jLabel8 = new JLabel();
       JPanel jPanel5 = new JPanel();
       ButtonGroup buttonGroup1 = new ButtonGroup();
-      JRadioButton oraButton = new JRadioButton();
-      JRadioButton resampButton = new JRadioButton();
-      JRadioButton corrButton = new JRadioButton();
+      oraButton = new JRadioButton();
+      resampButton = new JRadioButton();
+      corrButton = new JRadioButton();
       JPanel jPanel12 = new JPanel();
       JLabel jLabel4 = new JLabel();
       JLabel jLabel5 = new JLabel();
@@ -81,7 +87,7 @@ public class AnalysisWizardStep1 extends WizardStep
 
    public boolean isReady() { return true; }
 
-  void corrButton_actionPerformed(ActionEvent e) {
+   void corrButton_actionPerformed(ActionEvent e) {
       wiz.setAnalysisType(2);
    }
 
@@ -93,7 +99,25 @@ public class AnalysisWizardStep1 extends WizardStep
       wiz.setAnalysisType(0);
    }
 
- }
+   private void setValues() {
+      if(settings.getAnalysisMethod()==Settings.ORA)
+         oraButton.setSelected(true);
+      else if(settings.getAnalysisMethod()==Settings.RESAMP)
+         resampButton.setSelected(true);
+      else if(settings.getAnalysisMethod()==Settings.CORR)
+         corrButton.setSelected(true);
+   }
+
+   public void saveValues(){
+      if(oraButton.isSelected()) {
+         settings.setAnalysisMethod(Settings.ORA);
+      } else if (resampButton.isSelected()) {
+         settings.setAnalysisMethod(Settings.RESAMP);
+      } else if (corrButton.isSelected()) {
+         settings.setAnalysisMethod(Settings.CORR);
+      }
+   }
+}
 
 class AnalysisWizardStep1_oraButton_actionAdapter implements java.awt.event.
         ActionListener {
