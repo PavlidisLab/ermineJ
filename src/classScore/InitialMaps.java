@@ -13,10 +13,8 @@ public class InitialMaps {
    public GONameReader goName;
    public GeneDataReader geneData = null;
    public Map probeGroups;
-   public ClassMap probeToClassMap; //get rid of this
    public Map classToProbe;
    public expClassScore probePvalMapper;
-   private GeneGroupReader groupName;
    private Vector sortedclasses = null;
 
    /**
@@ -47,9 +45,9 @@ public class InitialMaps {
       readFiles(probe_annotfile, goNamesfile, messenger, probePvalFile,
                 method, classMaxSize, classMinSize, numberOfRuns, quantile,
                 useWeights, pvalcolumn, dolog_check);
-      setupClasses(messenger);
+      GeneGroupReader gn = setupClasses(messenger);
       messenger.setStatus("Initializing gene score mapping");
-      probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
+      probePvalMapper.setInputPvals(gn.get_group_probe_map(),
                                     groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
    }
 
@@ -82,17 +80,20 @@ public class InitialMaps {
       geneData = new GeneDataReader(probe_annotfile, probePvalMapper.get_map());
    }
 
-   private void setupClasses(classScoreStatus messenger)
+   private GeneGroupReader setupClasses(classScoreStatus messenger)
    {
-      groupName = new GeneGroupReader(geneData.getGroupProbeList(),
+      GeneGroupReader groupName = new GeneGroupReader(geneData.getGroupProbeList(),
                                       geneData.getProbeGroupMap()); // parse group file. Yields map of probe->replicates.
       probeGroups = groupName.get_probe_group_map(); // map of probes to groups
       messenger.setStatus("Initializing gene class mapping");
-      probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
+      ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                      geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
+      probeToClassMap.hackClassToProbeMap();
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
+      System.err.println("Hacked classToProbe has size: "+classToProbe.size());
       sortClasses();
       messenger.setStatus("Done with setup");
+      return groupName;
    }
 
    private void sortClasses()
@@ -148,14 +149,13 @@ public class InitialMaps {
          public Object getValueAt(int i, int j)
          {
             String classid = (String) sortedclasses.get(i);
-            String classdesc = (String) goName.get_GoName_map().get(classid);
 
             switch (j)
             {
                case 0:
                   return classid;
                case 1:
-                  return classdesc;
+                  return goName.get_GoName_value_map(classid);
                case 2:
                {
                   int numprobes = 0;
@@ -187,7 +187,7 @@ public class InitialMaps {
       System.err.println("adding " + id + " to setupmap");
       geneData.addClass(id, probes);
       goName.addClass(id,desc);
-      probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
+      ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                      geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
       sortClasses();
@@ -198,7 +198,7 @@ public class InitialMaps {
       System.err.println("modifying " + id + " to setupmap");
       geneData.modifyClass(id, probes);
       goName.modifyClass(id,desc);
-      probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
+      ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                      geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
       sortClasses();
@@ -206,7 +206,7 @@ public class InitialMaps {
 
    public int numClasses() { return sortedclasses.size(); }
    public String getClass(int i) { return (String) sortedclasses.get(i); }
-   public String getClassDesc(String id) { return (String) goName.get_GoName_map().get(id); }
+   public String getClassDesc(String id) { return (String) goName.get_GoName_value_map(id); }
    public int numProbes(String id) { return ((ArrayList)classToProbe.get(id)).size(); }
    public int numGenes(String id)
    {

@@ -63,7 +63,6 @@ public class erminecmd {
                                             smaps.probePvalMapper,
                                             smaps.geneData,
                                             smaps.probeGroups,
-                                            smaps.probeToClassMap,
                                             smaps.classToProbe,
                                             destinFile,                   // output file
                                             Double.parseDouble(args[10]), // pvalue

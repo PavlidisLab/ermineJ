@@ -260,9 +260,9 @@ public class ClassMap {
 
       // look at the signatures for repeats.
       entries = sigs.keySet();
-      it = entries.iterator();
-      while (it.hasNext()) {
-         classId = (String) it.next();
+      Iterator nit = entries.iterator();
+      while (nit.hasNext()) {
+         classId = (String) nit.next();
          signature = (String) sigs.get(classId);
 
          // if the signature has already been seen, add it to the redundant list, and remove this class from the classToProbeMap.
@@ -281,6 +281,15 @@ public class ClassMap {
          }
       }
 
+/*
+      Set classes = classToProbeMap.keySet();
+      it = classes.iterator();
+      while (it.hasNext()) {
+         Object considered_class = it.next();
+         if(((ArrayList)classToProbeMap.get(considered_class)).size()<5)
+            classToProbeMap.remove(considered_class);
+      }
+*/
       System.err.println("There are now " + classToProbeMap.size() +
                          " classes represented on the chip (" + ignored +
                          " were ignored)");
@@ -358,6 +367,25 @@ public class ClassMap {
       while (it.hasNext()) {
          Map.Entry e = (Map.Entry) it.next();
          System.out.println("Key = " + e.getKey() + ", Value = " + e.getValue());
+      }
+   }
+
+   public void hackClassToProbeMap() {
+      Set keys = classToProbeMap.keySet();
+      HashSet removekeys = new HashSet();
+      Iterator it = keys.iterator();
+      while(it.hasNext())
+      {
+         String geneclass = (String) it.next();
+         if(((ArrayList)classToProbeMap.get(geneclass)).size() < 2)
+            removekeys.add(geneclass);
+      }
+
+      Iterator rit = removekeys.iterator();
+      while(rit.hasNext())
+      {
+         String geneclass = (String) rit.next();
+         classToProbeMap.remove(geneclass);
       }
    }
 

@@ -1,7 +1,13 @@
 #
-#Tue Jun 15 14:52:09 EDT 2004
-probeFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
+#Wed Jun 16 13:01:10 EDT 2004
 nameFile=C\:\\jbproject\\ermineJ\\data\\goNames.txt
-rawFile=C\:\\jbproject\\ermineJ\\data\\melanoma_and_sarcomaMAS5.txt
+minClassSize=5
+probeFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
+iterations=10
+maxClassSize=20
+pValTheshold=0.001
 outputFile=C\:\\jbproject\\ermineJ\\data\\test.results.txt
+doLog=true
 scoreFile=C\:\\jbproject\\ermineJ\\data\\one-way-anova-parsed.txt
+rawFile=C\:\\jbproject\\ermineJ\\data\\melanoma_and_sarcomaMAS5.txt
+scorecol=2

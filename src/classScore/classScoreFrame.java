@@ -57,7 +57,6 @@ public class classScoreFrame
   boolean initialized=false;
   classScoreStatus statusMessenger;
 
-
   String defaultNameFile;
   String defaultProbeFile;
   String defaultFolder;
@@ -129,7 +128,7 @@ public class classScoreFrame
     cPanel = new ClassPanel(this);
     cPanel.getViewport().setBackground(SystemColor.control);
 
-    oPanel = new OutputPanel();
+    //oPanel = new OutputPanel();
 
 
 
@@ -282,9 +281,8 @@ public class classScoreFrame
       catch (IOException e) {
          error(e, "File reading or writing");
       }
-      //cPanel.setModel(imaps.toTableModel());
-      oPanel.addInitialClassData(imaps);
-      oPanel.revalidate();
+      cPanel.setModel(imaps.toTableModel());
+      //oPanel.addInitialClassData(imaps);
       initialized=true;
    }
 
@@ -295,8 +293,8 @@ public class classScoreFrame
    {
       try
       {
-         if(!initialized)
-            initialize();
+         //if(!initialized)
+         //   initialize();
          InitialMaps runmaps = new InitialMaps(geneScoreFile, probeAnnotFile, goNameFile,
                                                classScoreMethod, groupMethod,
                                                maxClassSize, minClassSize, numIter, 50,
@@ -306,13 +304,14 @@ public class classScoreFrame
          System.err.println("DONE with RUNMAPS");
          classPvalRun results = new classPvalRun(runmaps, outputfile, oraThresh,
                                                  useWeights, "bh", messenger, loadResults);
+
          System.err.println("DONE with CLASSPVALRUN");
 
          resultpanel = new ResultPanel(results);
          resultpanel.setModel(results.toTableModel());
          runnum++;
          jTabbedPane1.addTab("Run " + Integer.toString(runnum),resultpanel);
-         oPanel.addRunData(results);
+         //oPanel.addRunData(results);
       }
       catch (IllegalArgumentException e) {
          error(e, "During class score calculation");

@@ -176,7 +176,6 @@ public class AnalysisFrame extends JFrame {
       finishButton.setAlignmentY( (float) 0.5);
       finishButton.setText("Finish");
       finishButton.addActionListener(new AnalysisFrame_finishButton_actionAdapter(this));
-      finishButton.setEnabled(false);
       step4TopPanel.setPreferredSize(new Dimension(410, 170));
     BottomPanel.add(cancelButton, null);
       BottomPanel.add(backButton, null);
@@ -550,6 +549,14 @@ public class AnalysisFrame extends JFrame {
          outputFile.setText( (String) settings.get("outputFile"));
          probeFile.setText( (String) settings.get("probeFile"));
          rawFile.setText( (String) settings.get("rawFile"));
+         jTextFieldMaxClassSize.setText((String) settings.get("maxClassSize"));
+         jTextFieldMinClassSize.setText((String) settings.get("minClassSize"));
+         System.err.println((String)settings.get("doLog"));
+         System.err.println(Boolean.valueOf((String)settings.get("doLog")));
+         jCheckBoxDoLog.setSelected(Boolean.valueOf((String)settings.get("doLog")).booleanValue());
+         jTextFieldPValueThreshold.setText((String) settings.get("pValTheshold"));
+         jTextFieldIterations.setText((String) settings.get("iterations"));
+         jTextFieldScoreCol.setText((String) settings.get("scorecol"));
       }
    }
 
@@ -560,6 +567,14 @@ public class AnalysisFrame extends JFrame {
       settings.setProperty("outputFile", outputFile.getText());
       settings.setProperty("probeFile", probeFile.getText());
       settings.setProperty("rawFile", rawFile.getText());
+      settings.setProperty("maxClassSize", jTextFieldMaxClassSize.getText());
+      settings.setProperty("minClassSize", jTextFieldMinClassSize.getText());
+      settings.setProperty("doLog", Boolean.toString(jCheckBoxDoLog.isSelected()));
+      settings.setProperty("pValTheshold", jTextFieldPValueThreshold.getText());
+      settings.setProperty("iterations", jTextFieldIterations.getText());
+      settings.setProperty("scorecol", jTextFieldScoreCol.getText());
+
+
       try {
          OutputStream f = new FileOutputStream("AnalysisFrame.prefs");
          settings.store(f, "");
@@ -795,7 +810,6 @@ public class AnalysisFrame extends JFrame {
          this.getContentPane().add(step4Panel);
          step4Panel.revalidate();
          nextButton.setEnabled(false);
-         finishButton.setEnabled(true);
          this.repaint();
       }
    }
@@ -840,7 +854,6 @@ public class AnalysisFrame extends JFrame {
          this.getContentPane().add(step3Panel);
          step3Panel.revalidate();
          nextButton.setEnabled(true);
-         finishButton.setEnabled(false);
          this.repaint();
       }
    }

@@ -53,7 +53,6 @@ public class classPvalRun {
                  imaps.probePvalMapper,
                  imaps.geneData,
                  imaps.probeGroups,
-                 imaps.probeToClassMap,
                  imaps.classToProbe,
                  resultsFile,
                  pval,
@@ -67,7 +66,6 @@ public class classPvalRun {
                        expClassScore ppm,
                        GeneDataReader gd,
                        Map pgm,
-                       ClassMap ptcm,
                        Map ctp,
                        String resultsFile,
                        double pval,
@@ -77,7 +75,7 @@ public class classPvalRun {
                        boolean loadResults)
        throws IllegalArgumentException, IOException
    {
-      initialize(gn, ppm, gd, pgm, ptcm, ctp,
+      initialize(gn, ppm, gd, pgm, ctp,
                  resultsFile, pval, useWeights, mtc_method,
                  messenger, loadResults);
    }
@@ -86,7 +84,6 @@ public class classPvalRun {
                        expClassScore ppm,
                        GeneDataReader gd,
                        Map pgm,
-                       ClassMap ptcm,
                        Map ctp,
                        String resultsFile,
                        double pval,
@@ -100,7 +97,6 @@ public class classPvalRun {
       probePvalMapper=ppm;
       geneData=gd;
       probeGroups=pgm;
-      probeToClassMap=ptcm;
       classToProbe=ctp;
 
       nf.setMaximumFractionDigits(8);
@@ -172,8 +168,16 @@ public class classPvalRun {
          messenger.setStatus("Beginning output");
          // all done:
          // print the results
-         printResults(true);
+         //printResults(true);
       }
+
+/*
+      goName = null;
+      probePvalMapper = null;
+      geneData = null;
+      probeGroups = null;
+      classToProbe = null;
+*/
       messenger.setStatus("Done!");
    }
 
@@ -925,16 +929,16 @@ public class classPvalRun {
    }
 
    public static void main(String[] args) {
-      
+
       // Check if args have been passed in.
       if (args.length < 14) {
-         
+
          System.err.println( "No filenames have been passed in." );
          System.err.println( "If you are running this class as your main project " +
                              "class, you might want to run classScoreGUI instead.");
          System.exit(1);
       }
-      
+
       classScoreStatus m = new classScoreStatus(null);
       try {
          SetupMaps smaps = new SetupMaps(args[0],                   // pbPval file
@@ -954,7 +958,6 @@ public class classPvalRun {
                          smaps.probePvalMapper,
                          smaps.geneData,
                          smaps.probeGroups,
-                         smaps.probeToClassMap,
                          smaps.classToProbe,
                          args[3],                      // output file
                          Double.parseDouble(args[10]), // pvalue
