@@ -44,7 +44,6 @@ import baseCode.gui.table.JVerticalTableHeaderRenderer;
 import classScore.data.*;
 import classScore.gui.*;
 import classScore.Settings;
-import classScore.SortFilterModel;
 
 /**
  * @author Will Braynen
@@ -84,12 +83,6 @@ public class JDetailsFrame
    JGradientBar m_gradientBar = new JGradientBar();
    JMenuItem m_saveDataMenuItem = new JMenuItem();
 
-   /**
-    * The name of the raw data file, as an absolute path, where we look up the
-    * microarray data for each gene in the current gene set.
-    */
-   String m_filename;
-   DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
 
    /**
     * @param  args[0]  the name of the raw data file, as an absolute path,
@@ -119,25 +112,6 @@ public class JDetailsFrame
       frame.show();
    }
 
-   public JDetailsFrame(
-         String[] probeIDs,
-         Double[] pvalues,
-         String[] geneNames,
-         String[] probeDescriptions,
-         String filename ) {
-      try {
-         m_probeIDs = probeIDs;
-         m_pvalues = pvalues;
-         m_geneNames = geneNames;
-         m_probeDescriptions = probeDescriptions;
-         m_filename = filename;
-         jbInit();
-      }
-      catch ( Exception e ) {
-         e.printStackTrace();
-      }
-   }
-
    public JDetailsFrame( ArrayList probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings ) {
       try {
          String filename = settings.getRawFile();
@@ -149,63 +123,7 @@ public class JDetailsFrame
       }
    }
 
-   /**
-    * This method of course add an unnecessary loop to this class.  We could
-    * instead look up data -- do this translation -- on the fly in the
-    * table model (DetailsTableModel).  However, I find that this translation
-    * here greatly improves code readability in this class and in the table
-    * model class.  It also encapsulates the class and makes it less dependent
-    * on implementation details of the calling class (classPvalRun).  This
-    * opens the possibility of using this class elsewhere and also makes
-    * the main() debug function possible.
-    *
-    * If very big gene sets (classes) are ever used and the frame starts
-    * taking noticeably longer to open, then revert the following
-    *  this class to   :  classScore.gui.JDetails to revision 1.16
-    *  the table model :  classScore.gui.DetailsTableModel to revision 1.6
-    *                     (see getValueAt() method there)
-    */
-   private void translateVars(
-         Map pvals,
-         Map classToProbe,
-         String classID,
-         GeneAnnotations geneData,
-         Settings settings ) {
-
-      m_filename = settings.getRawFile();
-
-      int probeCount = (( ArrayList ) classToProbe.get( classID )).size();
-      m_probeIDs  = new String[ probeCount ];
-      m_pvalues   = new Double[ probeCount ];
-      m_geneNames = new String[ probeCount ];
-      m_probeDescriptions = new String[ probeCount ];
-
-      for ( int i = 0; i < probeCount; i++ ) {
-
-         // probe ID
-         m_probeIDs[i] =
-               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i );
-
-         // p value
-         m_pvalues[i] = ( Double ) pvals.get(
-               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i )
-            );
-
-         // probe's gene name
-         m_geneNames[i] = geneData.getProbeGeneName(
-               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i )
-            );
-
-         // probe description
-         m_probeDescriptions[i] = geneData.getProbeDescription(
-               ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i )
-            );
-      }
-   } // end init
-
    private void jbInit() throws Exception {
-
-      createDetailsTable( m_probeIDs, m_pvalues, m_geneNames, m_probeDescriptions, m_filename );
 
       setSize( 800, m_table.getHeight() );
       setResizable( false );
