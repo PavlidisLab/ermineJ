@@ -440,7 +440,7 @@ public class GeneAnnotations {
          genes.add( probeToGeneName.get( probe_it2.next() ) );
       }
       classToGeneMap.put( id, genes );
-    //  resetSelectedSets(); // todo could need this
+      resetSelectedSets();
    }
 
    /**
@@ -471,7 +471,7 @@ public class GeneAnnotations {
          }
       }
       classToProbeMap.put( classId, probes );
-   //   resetSelectedSets(); // todo could need this
+      resetSelectedSets();
    }
 
    /**
