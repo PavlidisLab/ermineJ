@@ -97,11 +97,19 @@ public class AnalysisWizardStep2
          return false;
       } else if ( ( wiz.getAnalysisType() == 0 || wiz.getAnalysisType() == 1 ) &&
                   scoreFile.getText().compareTo( "" ) == 0 ) {
-         GuiUtil.error( "ORA and resampling analyses require a raw data file." );
+         GuiUtil.error( "ORA and resampling analyses require a gene score file." );
+         return false;
+      } 
+      
+      if (rawFile.getText().compareTo( "" ) != 0 && ! GuiUtil.testFile(rawFile.getText())) {
          return false;
       }
-      else
-         return true;
+
+      if (scoreFile.getText().compareTo( "" ) != 0 && ! GuiUtil.testFile(scoreFile.getText())) {
+         return false;
+      }
+      
+      return true;
    }
 
    void rawBrowseButton_actionPerformed( ActionEvent e ) {

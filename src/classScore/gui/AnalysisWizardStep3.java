@@ -213,6 +213,7 @@ public class AnalysisWizardStep3 extends WizardStep {
          ccTableModel = customClasses.toTableModel();
          customClassTable.setModel( ccTableModel );
       } else {
+         // @todo it should make the folder.
          GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
       }
    }

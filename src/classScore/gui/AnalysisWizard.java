@@ -139,7 +139,7 @@ public class AnalysisWizard extends Wizard {
    }
 
    protected void finishButton_actionPerformed( ActionEvent e ) {
-      saveValues();
+      
       try {
          loadAddedClasses();
       } catch ( IOException e1 ) {
@@ -152,6 +152,8 @@ public class AnalysisWizard extends Wizard {
          System.exit( 1 );
       }
       ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( settings );
+      
+      saveValues();
       dispose();
    }
 
@@ -187,10 +189,18 @@ public class AnalysisWizard extends Wizard {
       }
    }
 
+   /**
+    * 
+    * @param val
+    */
    public void setAnalysisType( int val ) {
       this.analysisType = val;
    }
 
+   /**
+    * 
+    * @return
+    */
    public int getAnalysisType() {
       return this.analysisType;
    }
