@@ -157,8 +157,7 @@ public class class_correls {
 			rawscore=avecorrel/(double)size;
 			if (rawscore <hist.get_hist_range()) {
 			    double[] class_row = new double[hist.get_number_of_bins()];
-			    class_row=M.get_ith_row(hist.class_index(size));
-			    
+			    class_row=M.get_ith_row(hist.class_index(size, probe_data.get_class_min_size()));
 			    int binnum = (int)Math.floor((rawscore - hist.get_hist_min()) / (double)hist.get_bin_size());
 			    
 			    

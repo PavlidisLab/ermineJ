@@ -11,12 +11,12 @@
 <tr>
 	<td width="72">
 	<!-- Logo space -->
-		<a href="index.html">Home</a>
+		
 		
 	</td>
 	<td width="687">
 	<!-- Header space -->
-	<h1>Introduction</h1>
+	<h1>Introduction to ErmineJ</h1>
 	</td>
 </tr>
 <tr>
@@ -27,7 +27,179 @@
 	</td>
 	<td width="687">
 	<!-- main text space -->
-	<p align="justify">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This program     computes raw score, class p-value, hypergeometric p-value, and ROC rate for     every unigene (or single gene) in the gene score file. The class p-value is     a way to estimate how interesting a class is, but it has some drawbacks like     randomization trials, such procedure make the output unstable, especially in     the case of limited iterations. To enhance the outcome, we can apply large     iterations(100k+), but it would affect the efficiency a lot. Therefore we     seek other ways that are stable and also provide good estimation for how     interesting the classes are. Hypergeometric p-value and ROC rate are two     candidates, the computation of both methods have nothing to do with     randomization, so the experiments are repeatable under fixed settings. More     details about the two methods are described in method section.</p>    <h3><br>    methods</h3>    <p><br>    <b>I. Class p-value -- </b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Gene Ontology (GO) class p-value is     computed based on the assumption of random distribution. The steps of     calculation of GO class p-value are:<br>    1. generate background distribution -- given the size of a GO class (S) and     the number of iterations (I), in each trial the program randomly pick up S     unigenes/genes from gene score file, then take the method (mean or median)     as the result of this trial. Such trial should be repeated for I times to     generate the background distribution. This distribution means how the score     distributed if a certain size of elements are independently chosen.<br>    2. transform background distribution to corresponding p-value -- the score     distribution is split into bins (column) according to the score, then each     bins has its own p-value, which means the percentage of trials that have     better scores then this bin. After this the program generates a look-up     table for different class size (row), each row has related p-value for every     column.<br>    3. determine class p-value -- for each GO class in gene score file,     calculate its class raw score according to the method (mean or median), then     look into the background distribution table to find its corresponding     p-value. <br>    With enough iterations (100k+), this value can be a good estimation of how     special the data are. The precision of this method is 0.5/(number of     iterations), therefore we need to have an trade-off agreement between     precision and efficiency.<br>    <br>    <b>II. Hypergeometric p-value -- </b><br>    This p-value is computed from hypergeometric distribution. The steps of     calculation of hypergeometric p-value are:<br>    1. User has to set a threshold (T) for this method. For the whole gene score     dataset, there are N1 unigenes/genes have p-value greater than T and N2     unigenes/genes have p-value smaller than T. For each GO class, there are n1     unigenes/genes have p-value greater than T and n2 unigenes/genes have     p-value smaller than T.<br>    2. The hypergeometric p-value is:<br>    choose(n1, N1)*choose(n2, N2)/choose(n1+n2, N1+N2), where choose(x, y) =     (x!*(y-x)!)/y!<br>    In implementation, it's not practical to compute factorials during such     p-values computation since the number can be very big, which may cause     overflow and huge time cost. However, if we look into the equation, it can     be transformed like below:<br>    choose(x, y) = (x!*(y-x)!)/y! = x!/(y*(y-1)*(y-2)*...*(y-x+1)) =     (x/y)*((x-1)/(y-1))*((x-2)/(y-2))*...*((1)/(y-x+1))<br>    Such computation is easy to implement, it is fairly fast, and it prevents     the overflow problem since the value is always between 0 to 1 during the     computation. But there are still some fundamental drawbacks inherited from     hypergeometric distribution method that can't be get rid of:<br>    1. the choice of threshold affects result tremendously, and there is no gold     standard for the threshold. It means we have to change the threshold again     and again, then check the all the outputs to see which threshold give us     more interesting result. However, even we get an extremely interesting     output from a certain threshold, we cannot say it is the best threshold,     since it may have exaggerated the relation between data. <br>    2. the threshold is not consistent among data, it means even you can found a     good threshold for certain data, <br>    very probable the same threshold is not a good one for other data.<br>    <br>    <b>III. Area under Receiver Operating Characteristic (AROC) -- </b><br>    AROC means area under roc curve, this method cares only the rank of each     genes in each class. the algorithm for ROC is: (modified from text written     by Dr. Paul Pavlidis)<br>    inputs: set T of positives. (i.e., 10 genes which are in the class)<br>    set F of negatives (i.e., the other 10000 genes)<br>    set P of scores for all T and F, ranked so the best score is first. (i.e.,     the gene p-values)<br>    count = 0<br>    For each P (from best to worst)<br>&nbsp;&nbsp;&nbsp; if P is in T then count++<br>&nbsp;&nbsp;&nbsp; else if P is in F then area+=count<br>&nbsp;&nbsp;&nbsp; if count == T.size then area += remaining area, done<br>    <br>    AROC = area/(T * F)<br>    return AROC<br>    end<br>    <br>    If we get an extremely interesting class(all the elements are ranked as the     very top ones), the ROC rate will be 1; in worst case it can be as low as 0.     The ROC rate can be transformed into p-value (rocpval), which is an     indicator of how special the class is.<br>¡@</p>    <h3>Related</h3>    <p><a href="how.html">How the program runs</a></td>
+	<p>ErmineJ is a software tool for generating "functional class scores" based on scores given to individual genes
+	or based on the similarity of data vectors (e.g., expression profiles) for each gene.</p>
+
+	<p>There is a command line tool which is very primitive and largely undocumented. This page describes how to use the graphical user interface (GUI) but
+	contains general information relevant to the command line tool as well.</p>
+	
+	<h2>Installing the software</h2>
+	<p>You must have a java runtime installed on your machine. You can get it from <a href="http://java.sun.com/j2se/1.4.1/download.html">Sun</a> but
+	there is a good chance it is already installed on your machine.</p>
+	
+	<p>Once you have a java runtime, just copy the software files to your hard drive in some convenient location.</p>
+	
+	<h2>Running the software</h2>
+	
+	<p>Just double-click on 'ermineJ.bat'. You will see a plain text 'console' window but shortly a graphical 
+	window should appear containing several fields for input. To perform a run, you have to set the fields appropriately and then press "OK". You
+	can perform multiple runs without closing and restarting the software.</p>
+	
+	<h2>Inputs</h2>
+	<p>The following fields must be set by the user on startup.</p>
+	<ul>
+	<li><b>Gene Score File</b> (Gene score based) or <b>Data File</b> (Correlation-based):
+	 A user-supplied file containing the data. This is either a set of gene scores (currently these should
+	 be p-values), or the raw data for the genes. See below.</li>
+	<li><b>GO Biological Names File</b>: A file containing the names of the gene classes. We supply this.</li>
+	<li><b>Probe to Unigene Mapping File</b>: A file containing a list of the 'duplicates' for the array. This is needed if you use 'weights'. We supply this</li>
+	<li><b>Probe to GO mapping file:</b> A file containing a list of the class membership of probes on the array. We supply this.</li>
+	<li><b>Output File</b>: A name of an output file. Your results will be saved to this file.</li></ul>
+		
+	<h2>Options</h2>
+	<ul>
+	<li><b>Mean, Quantile, or Mean above Quantile</b>: Choose one method to be used for class scoring. See descriptions
+	below for details. Note that
+	ROC and hypergeometric p values are always generated as well. Default=mean</li>
+	<li><b>Use weights</b>: Usually you will want to use this. Default=yes (checked)</li>
+	<li><b>Iterations</b>: This sets the number of random trials which will be used to generate background distributions. 
+	The higher you set this, the longer it will take to run, but your p-values may be more precise. We don't suggest setting
+	this above 100,000 unless you find you have many classes which have 'maxed out' p values. Default=10000</li>
+	<li><b>Quantile: </b> This option only applies if you use the "quantile" or "mean above quantile" method. Default=50 (median).</li>
+	<li><b>Min class size</b>: Classes with fewer genes than this will not be evaluated. Default=4</li>
+	<li><b>Max class size</b>: Classes with more genes than this will not be evaluated. Default=100</li>
+	<li><b>P-value cutoff</b>: This option sets the gene p-value threshold which will
+	be applied for the hypergeometric distribution p values. Default=0.00001</li>
+	</ul>
+	
+	<h2>Outputs</h2>
+	<ul>
+	<li>A text file containing 8 columns: class	size	raw score	pval 	virtual_size	hyper pval	aroc rate	rocpval. The meanings:
+	<ul>
+	<li><b>class</b> : Name of the class, with the GO id number.</li>
+	<li><b>size</b> : How many probes on the array are in the class.</li>
+	<li><b>raw score</b> : The raw class statistic based on the selected method (mean, quantile or mean above quantile). High values are better.</li>
+	<li><b>pval</b> : The p value based on the raw score. Low values are better.</li>
+	<li><b>virtual_size</b> : How many independent genes are in the class. This is always less than or equal to the <b>size</b> since some genes are represented
+	multiple times on an array. This is the value used in the calculations.</li>
+	<li><b>hyper pval</b> : p-value for the classed based on the hypergeometric distribution (see below for details)</li>
+	<li><b>aroc rate</b> : The area under the receiver operator characteristic (AROC).</li>
+	<li><b>rocpval</b> : The p-value for the AROC.</li>
+	</ul>
+	
+	</li>
+	
+	</ul>
+	
+	<p>The output file can be opened in Excel and sorted easily.</p>
+	
+	<h2>More information</h2>
+	<p>ErmineJ
+    computes raw score, class p-value, hypergeometric p-value, and ROC rate for 
+    every unigene (or single gene) in the gene score file. The class p-value is 
+    a way to estimate how interesting a class is, but it has some drawbacks like 
+    randomization trials, such procedure make the output unstable, especially in 
+    the case of limited iterations. To enhance the outcome, we can apply large 
+    iterations(100k+), but it would affect the efficiency a lot. Therefore we 
+    seek other ways that are stable and also provide good estimation for how 
+    interesting the classes are. Hypergeometric p-value and ROC rate are two 
+    candidates, the computation of both methods have nothing to do with 
+    randomization, so the experiments are repeatable under fixed settings. More 
+    details about the two methods are described in method section.</p>
+	 
+    <h3>Methods</h3>
+	 
+<h3> <b>I. Class pvalues based on sampling distribution of gene scores.</b><br></h3>
+<p>Gene Ontology (GO) class p-value is 
+    computed based on the assumption of random distribution. The steps of 
+    calculation of GO class p-value are:
+	 <ol>
+	 <li>Generate background distribution -- given the size of a GO class (S) and 
+    the number of iterations (I), in each trial the program randomly pick up S 
+    unigenes/genes from gene score file, then take the method (mean or median) 
+    as the result of this trial. Such trial should be repeated for I times to 
+    generate the background distribution. This distribution means how the score 
+    distributed if a certain size of elements are independently chosen.</li>
+    <li>Transform background distribution to corresponding p-value -- the score 
+    distribution is split into bins (column) according to the score, then each 
+    bins has its own p-value, which means the percentage of trials that have 
+    better scores then this bin. After this the program generates a look-up 
+    table for different class size (row), each row has related p-value for every 
+    column.</li>
+    <li>Determine class p-value -- for each GO class in gene score file, 
+    calculate its class raw score according to the method (mean or median), then 
+    look into the background distribution table to find its corresponding 
+    p-value. With enough iterations (100k+), this value can be a good estimation of how 
+    special the data are. The precision of this method is 0.5/(number of 
+    iterations), therefore we need to have an trade-off agreement between 
+    precision and efficiency.</li>
+	 </ol>
+    
+    <br>
+    <h3><b>II. Hypergeometric p-value -- </b><br></h3>
+    This p-value is computed from hypergeometric distribution. The steps of 
+    calculation of hypergeometric p-value are:
+    <ol><li>1. User has to set a threshold (T) for this method. For the whole gene score 
+    dataset, there are N1 unigenes/genes have p-value greater than T and N2 
+    unigenes/genes have p-value smaller than T. For each GO class, there are n1 
+    unigenes/genes have p-value greater than T and n2 unigenes/genes have 
+    p-value smaller than T.</li>
+    <li>2. The hypergeometric p-value is:<br>
+    choose(n1, N1)*choose(n2, N2)/choose(n1+n2, N1+N2), where choose(x, y) = 
+    (x!*(y-x)!)/y!<br>
+    In implementation, it's not practical to compute factorials during such 
+    p-values computation since the number can be very big, which may cause 
+    overflow and huge time cost. However, if we look into the equation, it can 
+    be transformed like below:<br>
+    choose(x, y) = (x!*(y-x)!)/y! = x!/(y*(y-1)*(y-2)*...*(y-x+1)) = 
+    (x/y)*((x-1)/(y-1))*((x-2)/(y-2))*...*((1)/(y-x+1))<br>
+    Such computation is easy to implement, it is fairly fast, and it prevents 
+    the overflow problem since the value is always between 0 to 1 during the 
+    computation. But there are still some fundamental drawbacks inherited from 
+    hypergeometric distribution method that can't be get rid of:</li></ol>
+	 
+	 <ul>
+	 <li>The choice of threshold affects result tremendously, and there is no gold 
+    standard for the threshold. It means we have to change the threshold again 
+    and again, then check the all the outputs to see which threshold give us 
+    more interesting result. However, even we get an extremely interesting 
+    output from a certain threshold, we cannot say it is the best threshold, 
+    since it may have exaggerated the relation between data. <br>
+    <li>the threshold is not consistent among data, it means even you can found a 
+    good threshold for certain data, <br>
+    very probable the same threshold is not a good one for other data.</li>
+	 </ul>
+    
+	<h3> III. Area under Receiver Operating Characteristic (AROC)</h3>
+    <p>This is a new method and is thus quite experimental. AROC means area under roc curve, this method cares only the rank of each 
+    genes in each class. the algorithm for ROC is: (modified from text written 
+    by Dr. Paul Pavlidis)</p>
+    
+<pre>inputs: set T of positives. (i.e., 10 genes which are in the class)
+set F of negatives (i.e., the other 10000 genes)
+set P of scores for all T and F, ranked so the best score is first. (i.e., 
+the gene p-values)
+count = 0
+For each P (from best to worst)
+    if P is in T then count++
+     else if P is in F then area+=count
+     if count == T.size then area += remaining area, done
+AROC = area/(T * F)
+return AROC
+end
+	 </pre>
+	 
+    <p>If we get an extremely interesting class(all the elements are ranked as the 
+    very top ones), the ROC rate will be 1; in worst case it can be as low as 0. 
+    The ROC rate can be transformed into p-value (rocpval), which is an 
+    indicator of how special the class is.
+</p>
+
+<p>ROC scores are converted to pvalues using an approximate formula that holds as long as the number of genes in the class
+is reasonably small compared to the number of total genes (fraction less than 0.5 or so)</p>
+
+    <h3>Related</h3>
+    <p><a href="how.html">How the program runs</a></td>
 </tr>
 <tr name="footer">
 <td colspan="2" width="766"><img src="/images/shim.gif" width="1" height="10" border="0" alt=""></td>

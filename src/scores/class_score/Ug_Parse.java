@@ -48,7 +48,6 @@ public class Ug_Parse {
     }
     
     
-    //--------------------------------------------< readMyFile >--------//
     /*****************************************************************************************/
     /* Note that this does not store anything for probes which do not
      * have a unigene cluster. */

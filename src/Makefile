@@ -36,7 +36,7 @@ DOCTITLE = 'Class Scores<sup><font size="-2">TM</font></sup> v1.4 API Specificat
 HEADER = '<b>CLASS_SCORES</b><br><font size="-1">Columbia</font>'
 BOTTOM = '<font size="-1"><a href="mailto:pp175@columbia.edu">Submit a bug or feature request</a><br><br>Class Score is the propriety of Columbia Genome Center<br>Copyright 2002 Columbia Genome Center,<br>NY, U.S.A.All Rights Reserved.</font>'
 
-all: class_score 
+all: clean class_score 
 
 run: runner
 
@@ -60,7 +60,8 @@ class_score:  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Ug_Parse.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
-        ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class
+        ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
+        ${OUTPUTDIR}/erminecmd.class
 
 CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/affy_go_Parse.class  \
@@ -77,8 +78,8 @@ CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Ug_Parse.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
-        ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class
-
+        ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
+        ${OUTPUTDIR}/erminecmd.class
 
 ${OUTPUTDIR}/%.class	: ${SOURCEPATH}/%.java
 	${JAVAC} ${OPTIONS} \

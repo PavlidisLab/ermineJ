@@ -654,11 +654,12 @@ public static double pearson_correlation (double[] x, double[] y)
 	double result = 0.0;
 	double logstdev = 0.0;
 	int size = ranks.size();
-	double stdev = Math.exp(-0.5 * (Math.log(size) + 1));    
+	double stdev = Math.exp(-0.5 * (Math.log(size) + 1));
 	double z = (aroc - 0.5)/stdev;
 	
+	//	System.err.println("Size: " + size + " Stdev: " + stdev + " aroc: " + aroc + " z: " + z);
+
 	result = 1.0 - 0.5*erfc(-z/Math.sqrt(2.0));
-	
 	
 	return result;
     }

@@ -92,7 +92,7 @@ public class class_pvals {
     
 
     /*****************************************************************************************/
-    //use the objects created from constructor  -- this is too slow todo
+    //use the objects created from constructor
     /*****************************************************************************************/
     public void class_pval_generator()
     {
@@ -139,7 +139,7 @@ public class class_pvals {
 	class_list=hist.get_matrix_map(); // list of all class sizes.
 	try {
 	    BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
-	    
+
 	    // headings
 	    out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "virtual_size" + "\t" + "hyper pval" + "\t" + "aroc rate" + "\t" + "rocpval" + "\n");
 
@@ -184,22 +184,30 @@ public class class_pvals {
 				if(method.equals("MEAN_METHOD")){
 				    ArrayList chip_list = new ArrayList();
 				    chip_list = ugName.get_chip_value_map(element); // list of repeat members.
-				    
-				    if (chip_list.isEmpty()) {
+
+
+				    if (chip_list == null) {
+					// probably this is because there are no replicates. todo: this is a bug work around.
+					weight = 1;
+				    } else if (chip_list.isEmpty()) {
 					weight = 1;
 				    } else {
 					weight = 1/(double)(chip_list.size() + 1 ); // weight per member of this group. todo: BUG This is not the right size if the data set is not complete.
         			    }
 				    
-				    if (class_name.equals("GO:0005180")) {
-					System.err.println(element + "\t" + weight);
-				    }
 
+				    
 				    raw_score =  probe_pval.get_value_map(element); // raw score of the probe, not of the class.
 				    //get value from map and calcualte total
-				    if(Double.toString(raw_score) !=null){
+				    if(Double.toString(raw_score) !=null) {
 					total +=  raw_score*weight;
 				    }
+
+				    // debug: test class.
+				    if (class_name.equals("GO:0006783")) {
+					//	System.err.println(element + "\t" + weight + "\t" +  raw_score + "\t" +  total );
+				    }
+
 				}
 
         			//compute pval for every unigene class
@@ -210,7 +218,7 @@ public class class_pvals {
 					ugPvalArr[v_size] = Double.parseDouble(ugpval.toString()); // pval of one unigene in the class. This is only used by the quantile methods.
 					
 					if(ugPvalArr[v_size] >= user_pvalue) { // part of the hypergeometic calc.
-					    n1++;	
+					    n1++;
 					} else {
 					    n2++;
 					}
@@ -256,8 +264,12 @@ public class class_pvals {
 		
 		int in_size = weight_on? v_size : size;
 		
-		if(in_size < probe_pval.get_class_min_size() || in_size > probe_pval.get_class_max_size())
+		if(in_size < probe_pval.get_class_min_size() || in_size > probe_pval.get_class_max_size()) {
+		    //		    System.err.println("Skipping class size " + in_size);
 		    continue;
+		}
+
+		int binnum = 0; // I put this here so it remains in scope for error messages following this block. pp
 		
 		if(in_size != 0) {
 
@@ -272,20 +284,13 @@ public class class_pvals {
 		    }
 		    
 		    if (method.equals("MEAN_ABOVE_QUANTILE_METHOD")) {
-			;
+			System.err.println("MEAN_ABOVE_QUANTILE_METHOD not fully implemented"); // todo: do this
 		    }
-
 
 		    if (rawscore < hist.get_hist_range() && rawscore > hist.get_hist_min() ) {
 
-			int row;
-			if (weight_on == true) { 
-			    row = hist.class_index(v_size);
-			} else {
-			    row = hist.class_index(size);
-			}
-
-			int binnum = (int)Math.floor((rawscore - hist.get_hist_min()) / (double)hist.get_bin_size());
+ 			int row =  hist.class_index(in_size, probe_pval.get_class_min_size());
+			binnum = (int)Math.floor((rawscore - hist.get_hist_min()) / (double)hist.get_bin_size());
 
 			if (binnum < 0) 
 			    binnum = 0;
@@ -293,14 +298,26 @@ public class class_pvals {
 			if (binnum > (hist.get_hist_range() - hist.get_hist_min())/hist.get_bin_size()) // todo: calculate this only once.
 			    binnum = (int)Math.floor(hist.get_hist_range()/hist.get_bin_size());
 
+
+			// todo: the need for this check is indicative of a problem
+			if (row > M.get_num_rows() - 1 || binnum > M.get_num_cols() - 1) {
+			    System.err.println("Warning, a rawscore yielded a bin number which was out of the range: Classname: " + class_name + " row: " + row + " bin number: " + binnum);
+			    continue;
+			}
+
 			pval = M.get_matrix_val(row, binnum);
+
+						if (class_name.equals("GO:0006783")) {
+						    //						    System.err.println(class_name + ": " + "binnum: " + binnum + " pval: " + pval + " row: " + row + " rawscore: " + rawscore + " class size: " + v_size + " bin size" + (double)hist.get_bin_size() + " hist min: " + hist.get_hist_min() );
+						}
+
 
 		    } else {
 			System.err.println("Warning, a raw score (" + rawscore + ", " + class_name + ") out of the histogram range was encountered ");
 			pval = -1.0;
 		    }
 		    
-		    area_under_roc = Stats.arocRate(inputSize, target_ranks);		    
+		    area_under_roc = Stats.arocRate(inputSize, target_ranks);
 		    roc_pval = Stats.rocpval(target_ranks, area_under_roc); 
 		    hyper_pval = Stats.hyperPval(N1, n1, N2, n2);
 		}
@@ -309,7 +326,7 @@ public class class_pvals {
 		    pval = minPval;
 		
 		if (Double.isNaN(pval))
-		    System.err.println("Warning, a pvalue was not a number (raw score = " + rawscore + ", class size = " + size + ", " + class_name +  ")");
+		    System.err.println("Warning, a pvalue was not a number (raw score = " + rawscore + ", virtual class size = " + in_size + ", " + "binnum: " + binnum + ", " + class_name +  ")");
 
 		String classname = goName.get_GoName_value_map(class_name);
 		String fixnamea;
@@ -327,9 +344,10 @@ public class class_pvals {
 		//todo: make column order compatible with the perl scripts.
 		out.write(name +"_" + class_name + "" + "\t" + size + "\t" + rawscore + "\t" + pval + "\t" + v_size + "\t" + hyper_pval + "\t" + area_under_roc + "\t" + roc_pval +"\n");
 
-	    } // end of while it has next
+	    } // end of while it has next (classes)
 	    out.close();
 	} catch (IOException e) {
+	    System.err.println("There was an IO error");
 	    ; // todo: do something
 	}
 	System.err.println("inputSize is "+ inputSize);

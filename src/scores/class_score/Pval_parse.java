@@ -83,11 +83,20 @@ import java.lang.reflect.*;
 	     doubleArray =new Double[rows.size()-1];
 	     for (int i=1; i < rows.size();i++)
 		 {
-		     chip_id[i-1]=(String)(((Vector)(rows.elementAt(i))).elementAt(0));
+
+
+		     String name = (String)(((Vector)(rows.elementAt(i))).elementAt(0));
+
+		     if (name.matches("AFFX.*")) { // todo: put this rule somewhere else
+			 System.err.println("Skipping probe in pval file: " + name);
+			 continue;
+		     }
+		     chip_id[i-1] = name;
+
 		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(1)));
 
 		     //uncommented do not add probes whose pvals ==0
-		     if (pval[i-1]==0) {
+		     if (pval[i-1] == 0) {
 			 continue;
 		     }
 

@@ -43,6 +43,8 @@ import java.lang.reflect.*;
 	 /*****************************************************************************************/
      {
 	 String aLine = null;
+	 String go_id = "";
+	 String go_name = "";
 	 //read in file 	
 	 try { 
 	     FileInputStream fis = new FileInputStream(filename);
@@ -51,21 +53,40 @@ import java.lang.reflect.*;
 	     go_name_map = new LinkedHashMap();
 	     String row;
 	     
+	     //	     Pattern patt = Pattern.compile("^(?:.*?) \\(GO:[0-9]{7}\\)$");
+	     Pattern patt = Pattern.compile("( \\(GO:[0-9]+\\))?");
+	     Matcher m = patt.matcher("");
 	     
 	     while((row = dis.readLine())!= null)
 		 {  
 		     //tokenize file by tab character
 		     StringTokenizer st = new StringTokenizer(row, "\t");
-		     String go_id =  st.nextToken();
-		     String go_name = st.nextToken();
-		     go_name_map.put(go_id,go_name);
+		     go_id =  st.nextToken();
+		     if (go_id.equals("Gene_Ontology")) {
+			 continue;
+		     }
+
+		     go_name = st.nextToken();
+		     //		     go_name.replaceFirst(" \\(GO:[0-9]+\\)", "");
+
+		     m.reset(go_name);
+
+		     String result = m.replaceAll("");
+
+		     //		     if (go_id.matches("GO:0000157")) {
+		     //			 System.err.println("Match! " + result);
+		     //		     }
+
+		     go_name_map.put(go_id, result);
 		 }
 	     dis.close();
-	     
 	     
 	 } catch (IOException e) { 
 	     // catch possible io errors from readLine()
 	     System.out.println(" IOException error!");
+	     e.printStackTrace();
+	 } catch (NoSuchElementException e) {
+	     System.out.println(" NO such element error! " + go_id + " " + go_name);
 	     e.printStackTrace();
 	 }
 	 

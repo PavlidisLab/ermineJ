@@ -1167,6 +1167,7 @@ protected Component make_Pval_Panel() {
             UIManager.getCrossPlatformLookAndFeelClassName());
 	} catch (Exception e){ }
         JFrame test = new JFrame();
+	test.setResizable(false);
 		
 	test.addWindowListener(new WindowAdapter() {
 		public void windowClosing(WindowEvent e) {
