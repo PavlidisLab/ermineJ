@@ -439,33 +439,26 @@ public class JDetailsFrame
       // Make sure we are writing out non-normalized values
       boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
       m_matrixDisplay.setStandardizedEnabled( false );
+
       try {
          // write out the matrix values
-         for ( int row = 0; row < totalRows; row++ ) {
+         int r = 0;
+         {
+         //for ( int r = 0; r < totalRows; r++ ) {
 
-            // write name of the row
-            out.write( m_matrixDisplay.getRowName( row ) + "\t" ); // DEBUG - DELETE THIS!!!
+            // get values in that row
+            String probeID = getProbeID( r );
+            out.write( probeID + "\t" );
 
-            // write out entire row
-            for ( int col = 0; col < totalColumns; col++ ) {
-
-               Object value = m_table.getValueAt( row, col );
-               if ( col < matrixColumns ) {
-                  // matrix data
-                  Point p = ( Point ) value;
-                  double number = m_matrixDisplay.getValue( p.x, p.y );
-                  out.write( number + "\t" );
-               } else {
-                  // rest of the table data
-                  out.write( value.toString() + "\t" );
-               }
+            // write out values in the entire row
+            double[] row = m_matrixDisplay.getRowByName( probeID );
+            for ( int c = 0; c < row.length; c++ ) {
+               out.write( row[c] + "\t" );
             }
 
-            // write a newline at the end of each row
-            out.write( "\n" );
+            out.write( "\r\n" );
          }
-      }
-      catch ( Exception e ) {}
+      } catch ( IOException exception ) { }
 
       m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
 
@@ -473,6 +466,11 @@ public class JDetailsFrame
       out.close();
 
    } // end saveTableToFile
+
+   private String getProbeID( int row ) {
+      int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
+      return (String) m_table.getValueAt( row, offset + 0 );
+   }
 
    void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
 
