@@ -199,7 +199,9 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
                                           hasFocus, row, column);
       int runcol = column - OutputTableModel.init_cols;
       setOpaque(true);
-      if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
+      if(isSelected || hasFocus)
+         setOpaque(true);
+      else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
       {
          if(((Double)value).doubleValue() > 0.8)
             setBackground(spread1);
