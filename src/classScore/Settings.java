@@ -19,7 +19,7 @@ public class Settings {
    String classFile;
    String annotFile;
    String rawFile;
-   String saveFolder;
+   String dataFolder;
    String scoreFile;
    int maxClassSize = 15;
    int minClassSize = 14;
@@ -32,13 +32,21 @@ public class Settings {
     * Creates settings object
     * @param file - name of preferences file to read
     */
-   public Settings( String pref_file ) {
-      this.pref_file = pref_file;
-      classFile = "C:\\jbproject\\ermineJ\\data\\goNames.txt";
-      annotFile = "C:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt";
-      rawFile = "C:\\jbproject\\ermineJ\\data\\melanoma_and_sarcomaMAS5.txt";
-      saveFolder = "C:\\jbproject\\ermineJ\\data\\";
-      scoreFile = "C:\\jbproject\\ermineJ\\data\\one-way-anova-parsed.txt";
+   public Settings() {
+      dataFolder=(new File(Settings.class.getResource("Settings.class").getFile())).getPath();
+      int end = dataFolder.lastIndexOf(File.separatorChar);
+      dataFolder = dataFolder.substring(0, end + 1) + ".." + File.separator + ".." + File.separator + "data";
+      try{
+         dataFolder = new File(dataFolder).getCanonicalPath();
+      }
+      catch ( IOException ex ) {
+         System.err.println( "Could not find data folder." ); // make a big deal...
+      }
+      pref_file = dataFolder + File.separator + "ClassScore.preferences";
+      classFile = dataFolder + File.separator + "goNames.txt";
+      annotFile = dataFolder + File.separator + "HG-U95A.an.txt";
+      rawFile = dataFolder + File.separator + "melanoma_and_sarcomaMAS5.txt";
+      scoreFile = dataFolder + File.separator + "one-way-anova-parsed.txt";
 
       properties = new Properties();
       try {
@@ -46,6 +54,7 @@ public class Settings {
          if ( fi.canRead() ) {
             InputStream f = new FileInputStream( pref_file );
             properties.load( f );
+            f.close();
             if ( properties.containsKey( "scoreFile" ) )
                scoreFile = properties.getProperty( "scoreFile" );
             if ( properties.containsKey( "classFile" ) )
@@ -54,8 +63,8 @@ public class Settings {
                annotFile = properties.getProperty( "annotFile" );
             if ( properties.containsKey( "rawFile" ) )
                rawFile = properties.getProperty( "rawFile" );
-            if ( properties.containsKey( "saveFolder" ) )
-               saveFolder = properties.getProperty( "saveFolder" );
+            if ( properties.containsKey( "dataFolder" ) )
+               this.dataFolder = properties.getProperty( "dataFolder" );
             if ( properties.containsKey( "maxClassSize" ) )
                maxClassSize = Integer.valueOf( properties.getProperty( "maxClassSize" ) ).intValue();
             if ( properties.containsKey( "minClassSize" ) )
@@ -76,6 +85,26 @@ public class Settings {
    }
 
    /**
+    * Creates settings object
+    * @param settings - settings object to copy
+    */
+   public Settings( Settings settings) {
+      classFile=settings.getClassFile();
+      annotFile=settings.getAnnotFile();
+      rawFile=settings.getRawFile();
+      dataFolder=settings.getDataFolder();
+      scoreFile=settings.getScoreFile();
+      maxClassSize=settings.getMaxClassSize();
+      minClassSize=settings.getMinClassSize();
+      iterations=settings.getIterations();
+      scorecol=settings.getScorecol();
+      doLog=settings.getDoLog();
+      pValThreshold=settings.getPValThreshold();
+      pref_file=settings.getPrefFile();
+      properties = new Properties();
+   }
+
+   /**
     * Writes setting values to file.
     */
    public void writePrefs() throws IOException
@@ -84,7 +113,7 @@ public class Settings {
       properties.setProperty("classFile", classFile);
       properties.setProperty("annotFile", annotFile);
       properties.setProperty("rawFile", rawFile);
-      properties.setProperty("saveFolder", saveFolder);
+      properties.setProperty("dataFolder", dataFolder);
       properties.setProperty("maxClassSize", String.valueOf(maxClassSize));
       properties.setProperty("minClassSize", String.valueOf(minClassSize));
       properties.setProperty("doLog", String.valueOf(doLog));
@@ -93,6 +122,7 @@ public class Settings {
       properties.setProperty("scorecol", String.valueOf(scorecol));
       OutputStream f = new FileOutputStream(pref_file);
       properties.store(f, "");
+      f.close();
    }
 
    /**
@@ -101,7 +131,7 @@ public class Settings {
    public String getClassFile() { return classFile; }
    public String getAnnotFile() { return annotFile; }
    public String getRawFile() { return rawFile; }
-   public String getSaveFolder() { return saveFolder; }
+   public String getDataFolder() { return dataFolder; }
    public String getScoreFile() { return scoreFile; }
    public int getMaxClassSize() { return maxClassSize; }
    public int getMinClassSize() { return minClassSize; }
@@ -109,6 +139,7 @@ public class Settings {
    public int getScorecol() { return scorecol; }
    public boolean getDoLog() { return doLog; }
    public double getPValThreshold() { return pValThreshold; }
+   public String getPrefFile() { return pref_file; }
 
    /**
     * Sets setting values.
@@ -116,7 +147,7 @@ public class Settings {
    public void setClassFile(String val) {  classFile=val; }
    public void setAnnotFile(String val) {  annotFile=val; }
    public void setRawFile(String val) {  rawFile=val; }
-   public void setSaveFolder(String val) {  saveFolder=val; }
+   public void setDataFolder(String val) {  dataFolder=val; }
    public void setScoreFile(String val) {  scoreFile=val; }
    public void setMaxClassSize(int val) {  maxClassSize=val; }
    public void setMinClassSize(int val) {  minClassSize=val; }
@@ -124,4 +155,5 @@ public class Settings {
    public void setScorecol(int val) {  scorecol=val; }
    public void setDoLog(boolean val) {  doLog=val; }
    public void setPValThreshold(double val) {  pValThreshold=val; }
+   public void setPrefFile(String val) { pref_file=val; }
 }

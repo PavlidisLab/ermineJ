@@ -3,9 +3,7 @@ package classScore;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.util.Properties;
 import java.util.Vector;
-
 import javax.swing.*;
 
 /**
@@ -56,7 +54,7 @@ public class classScoreFrame
    boolean initialized = false;
    classScoreStatus statusMessenger;
 
-   Properties settings = new Properties();
+   Settings settings;
 
    public classScoreFrame() {
       try {
@@ -161,9 +159,9 @@ public class classScoreFrame
       mainPanel.add( jPanelMainControls, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
 
-      startPath = new File( System.getProperty( "user.home" ) );
-      chooser.setCurrentDirectory( startPath );
-      readPrefs();
+      settings = new Settings();
+      chooser.setCurrentDirectory( new File(settings.getDataFolder()) );
+
    }
 
    /* init */
@@ -240,8 +238,8 @@ public class classScoreFrame
    void initialize() {
       try {
          imaps = new InitialMaps(
-             ( String ) settings.get( "probeFile" ),
-             ( String ) settings.get( "nameFile" ),
+             settings.getAnnotFile(),
+             settings.getClassFile(),
              statusMessenger );
       }
       catch ( IllegalArgumentException e ) {
@@ -255,28 +253,21 @@ public class classScoreFrame
       initialized = true;
    }
 
-   public void analyze( int maxClassSize, int minClassSize, int numIter,
-                        String classScoreMethod, String groupMethod,
+   public void analyze( Settings settings, String classScoreMethod, String groupMethod,
                         String useWeights, String takeLog,
-                        String geneScoreFile, String probeAnnotFile,
-                        String goNameFile,
-                        classScoreStatus messenger, double oraThresh,
-                        int scoreCol, String outputfile ) {
+                        classScoreStatus messenger, String outputfile ) {
       try {
          if ( !initialized ) {
             initialize();
          }
-         InitialMaps runmaps = new InitialMaps( geneScoreFile, probeAnnotFile,
-                                                goNameFile,
+         InitialMaps runmaps = new InitialMaps( settings,
                                                 classScoreMethod, groupMethod,
-                                                maxClassSize, minClassSize,
-                                                numIter, 50,
-                                                useWeights, scoreCol, takeLog,
+                                                50, useWeights, takeLog,
                                                 messenger );
 
          //cPanel.setModel(imaps.toTableModel());
          System.err.println( "DONE with RUNMAPS" );
-         classPvalRun results = new classPvalRun( runmaps, outputfile, oraThresh,
+         classPvalRun results = new classPvalRun( settings, runmaps, outputfile,
                                                   useWeights, "bh", messenger,
                                                   loadResults );
 
@@ -492,36 +483,6 @@ public class classScoreFrame
    /**
     *
     */
-   private void readPrefs() {
-      Properties settings = new Properties();
-      try {
-         String filename = "ClassScore.prefs";
-         String dir = "C:\\jbproject\\ermineJ\\";
-         String path = dir + filename;
-         File file = new File( path );
-         if (file.canRead()) {
-            InputStream f = new FileInputStream( file );
-            settings.load( f );
-         }
-      }
-      catch ( IOException ex ) {
-         System.err.println( "Could not find preferences file." ); // no big deal.
-      }
-      if (settings.size() > 0) {
-         System.err.println(settings.getProperty("scoreFile"));
-         System.err.println(settings.getProperty("nameFile"));
-         System.err.println(settings.getProperty("probeFile"));
-         System.err.println(settings.getProperty("outputFile"));
-         System.err.println(settings.getProperty("rawFile"));
-         System.err.println(settings.getProperty("maxClassSize"));
-         System.err.println(settings.getProperty("minClassSize"));
-         System.err.println(settings.getProperty("doLog"));
-         System.err.println(settings.getProperty("pValTheshold"));
-         System.err.println(settings.getProperty("iterations"));
-         System.err.println(settings.getProperty("scorecol"));
-         System.err.println(settings.getProperty("saveFile"));
-      }
-   }
 
    void defineClassMenuItem_actionPerformed( ActionEvent e ) {
       makeModClassFrame( true, "" );
@@ -536,7 +497,7 @@ public class classScoreFrame
          initialize();
       }
       modClassFrame modframe = new modClassFrame( makenew, imaps, this.cPanel,
-                                                  ( String ) settings.get( "saveFolder" ), classid );
+                                                  settings.getDataFolder(), classid );
       showWizard( modframe );
    }
 
@@ -578,6 +539,8 @@ public class classScoreFrame
       j.pack();
       j.show();
    }
+
+   public Settings getSettings() { return settings; }
 }
 
 /* end class */

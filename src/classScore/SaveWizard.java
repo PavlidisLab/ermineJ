@@ -29,11 +29,11 @@ public class SaveWizard extends Wizard
       super(callingframe,400,200);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
-      System.err.println(callingframe.settings.get("saveFile"));
+      System.err.println(callingframe.getSettings().getDataFolder());
 
       step1 = new SaveWizardStep1(this,rundata);
       this.addStep(1,step1);
-      step2 = new SaveWizardStep2(this,(String)callingframe.settings.get("saveFile"));
+      step2 = new SaveWizardStep2(this,callingframe.getSettings().getDataFolder());
       this.addStep(2,step2);
       this.setTitle("Save Analysis - Step 1 of 2");
    }

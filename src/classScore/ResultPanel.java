@@ -22,10 +22,10 @@ public class ResultPanel
     extends JScrollPane {
    JTable jTable1 = new JTable();
    classPvalRun dataHolder;
-   Properties settings;
+   Settings settings;
    // EventListenerList listenerList = null;
 
-   public ResultPanel(classPvalRun dataHolder, Properties settings) {
+   public ResultPanel(classPvalRun dataHolder, Settings settings) {
       try {
          //     listenerList = new EventListenerList();
          this.dataHolder = dataHolder;

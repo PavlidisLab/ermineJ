@@ -121,6 +121,52 @@ public class expClassScore {
    }
 
    /**
+    * Set everything according to parameters.
+    *
+    * @param filename_pval File that contains the scores for each probe
+    * @param wt_check Whether weights should be used or not
+    * @param in_method The class scoring method: Mean, Quantile, etc.
+    * @param pvalcolumn Which column in the data file contains the scores we
+    *   will use. The first column contains probe labels and is not counted.
+    * @param dolog Whether the log of the scores should be used. Use true when
+    *   working with p-values
+    * @param classMaxSize The largest class that will be considered. This
+    *   refers to the apparent size.
+    * @param classMinSize The smallest class that will be considered. This
+    *   refers to the apparent size.
+    * @param number_of_runs How many random trials are done when generating
+    *   background distributions.
+    * @param quantile A number from 1-100. This is ignored unless a quantile
+    *   method is selected.
+    * @throws IllegalArgumentException
+    * @throws IOException
+    */
+   public expClassScore(Settings settings, String wt_check,
+                        String in_method, boolean dolog, int quantile) throws
+           IllegalArgumentException,
+           IOException {
+      this.classMaxSize =  settings.getMaxClassSize();
+      this.classMinSize = settings.getMinClassSize();
+      this.numRuns = settings.getIterations();
+      this.setQuantile(quantile);
+      this.useWeights = (Boolean.valueOf(wt_check)).booleanValue();
+      this.setMethod(in_method);
+
+      if (classMaxSize < classMinSize) {
+         throw new IllegalArgumentException(
+                 "Error:The maximum class size is smaller than the minimum.");
+      }
+
+      this.numClasses = classMaxSize - classMinSize + 1;
+      this.logged = dolog;
+
+      GeneScoreReader parser = new GeneScoreReader(settings.getScoreFile(), settings.getScorecol(), dolog); // makes the probe -> pval map.
+      pvals = parser.get_pval(); // array of pvalues.
+      probePvalMap = parser.get_map(); // reference to the probe -> pval map.
+      groupPvalMap = new HashMap(); // this gets initialized by set_input_pvals
+   }
+
+   /**
     *
     * @return classScore.histogram
     */

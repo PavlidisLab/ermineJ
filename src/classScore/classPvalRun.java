@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
@@ -74,6 +73,39 @@ public class classPvalRun {
                  imaps.classToProbe,
                  resultsFile,
                  pval,
+                 useWeights,
+                 mtc_method,
+                 messenger,
+                 loadResults);
+   }
+
+   /**
+    *
+    * @param imaps InitialMaps
+    * @param resultsFile String
+    * @param pval double
+    * @param useWeights String
+    * @param mtc_method String
+    * @param messenger classScoreStatus
+    * @param loadResults boolean
+    * @throws IllegalArgumentException
+    * @throws IOException
+    */
+   public classPvalRun(Settings settings,
+                       InitialMaps imaps,
+                       String resultsFile,
+                       String useWeights,
+                       String mtc_method,
+                       classScoreStatus messenger,
+                       boolean loadResults) throws
+           IllegalArgumentException, IOException {
+      initialize(imaps.goName,
+                 imaps.probePvalMapper,
+                 imaps.geneData,
+                 imaps.probeGroups,
+                 imaps.classToProbe,
+                 resultsFile,
+                 settings.getPValThreshold(),
                  useWeights,
                  mtc_method,
                  messenger,
@@ -314,9 +346,9 @@ public class classPvalRun {
     * This should not really be here...
     *
     * @param index int
-    * @param settings Properties
+    * @param settings Settings
     */
-   public void showDetails(int index, Properties settings) {
+   public void showDetails(int index, Settings settings) {
       final classresult res = (classresult) results.get((String) sortedclasses.
               get(
               index));

@@ -2,13 +2,7 @@ package classScore;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -140,13 +134,16 @@ public class AnalysisFrame extends JDialog {
    boolean doLog;
    classScoreFrame callingframe;
    Thread aFrameRunner;
+   Settings settings;
 
    public AnalysisFrame(classScoreFrame callingframe) {
       setModal(true);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
+      this.settings = new Settings(callingframe.getSettings());
       try {
          jbInit();
+         setValues();
          getClasses();
       } catch (Exception e) {
          e.printStackTrace();
@@ -526,60 +523,39 @@ public class AnalysisFrame extends JDialog {
       mainPanel.add(step1Panel);
       this.getRootPane().setDefaultButton(nextButton);
       this.setTitle("Create New Analysis - Step 1 of 4");
-      readPrefs();
-      String folder = (String) nameFile.getText();
-      int end = folder.lastIndexOf(File.separatorChar);
-      folder = folder.substring(0, end + 1);
-      chooser.setCurrentDirectory(new File(folder));
    }
 
-   private void readPrefs() {
-      Properties settings = callingframe.settings;
-      try {
-         String filename = "ClassScore.prefs";
-         String dir = "C:\\jbproject\\ermineJ\\";
-         String path = dir + filename;
-         File file = new File( path );
-         if (file.canRead()) {
-            InputStream f = new FileInputStream( file );
-            settings.load( f );
-         }
+   private void setValues() {
+      scoreFile.setText(settings.getScoreFile());
+      nameFile.setText( settings.getClassFile());
+      probeFile.setText(settings.getAnnotFile());
+      rawFile.setText( settings.getRawFile());
+      jTextFieldMaxClassSize.setText(String.valueOf(settings.getMaxClassSize()));
+      jTextFieldMinClassSize.setText(String.valueOf(settings.getMinClassSize()));
+      jTextFieldIterations.setText(String.valueOf(settings.getIterations()));
+      jTextFieldScoreCol.setText(String.valueOf(settings.getScorecol()));
+      jCheckBoxDoLog.setSelected(settings.getDoLog());
+      jTextFieldPValueThreshold.setText(String.valueOf(settings.getPValThreshold()));
+      chooser.setCurrentDirectory(new File(settings.getDataFolder()));
+   }
+
+   private void saveValues(){
+      settings.setScoreFile(scoreFile.getText());
+      settings.setClassFile(nameFile.getText());
+      settings.setAnnotFile(probeFile.getText());
+      settings.setRawFile(rawFile.getText());
+      settings.setMaxClassSize(Integer.valueOf(jTextFieldMaxClassSize.getText()).intValue());
+      settings.setMinClassSize(Integer.valueOf(jTextFieldMinClassSize.getText()).intValue());
+      settings.setIterations(Integer.valueOf(jTextFieldIterations.getText()).intValue());
+      settings.setScorecol(Integer.valueOf(jTextFieldScoreCol.getText()).intValue());
+      settings.setDoLog(jCheckBoxDoLog.isSelected());
+      settings.setPValThreshold(Double.valueOf(jTextFieldPValueThreshold.getText()).doubleValue());
+      try{
+         settings.writePrefs();
       } catch (IOException ex) {
-         System.err.println("Could not find preferences file."); // no big deal.
+         System.err.println("Could not write prefs:" + ex);
+         ex.printStackTrace();
       }
-      if (settings.size() > 0) {
-         scoreFile.setText( settings.getProperty("scoreFile"));
-         nameFile.setText( settings.getProperty("nameFile"));
-         probeFile.setText( settings.getProperty("probeFile"));
-         rawFile.setText( settings.getProperty("rawFile"));
-         jTextFieldMaxClassSize.setText( settings.getProperty("maxClassSize"));
-         jTextFieldMinClassSize.setText( settings.getProperty("minClassSize"));
-         jCheckBoxDoLog.setSelected(Boolean.valueOf( settings.getProperty(
-                 "doLog")).booleanValue());
-         jTextFieldPValueThreshold.setText( settings.getProperty("pValTheshold"));
-         jTextFieldIterations.setText( settings.getProperty("iterations"));
-         jTextFieldScoreCol.setText( settings.getProperty("scorecol"));
-      }
-   }
-
-   private void writePrefs() throws IOException {
-      Properties settings = callingframe.settings;
-      settings.setProperty("scoreFile", scoreFile.getText());
-      settings.setProperty("nameFile", nameFile.getText());
-      settings.setProperty("probeFile", probeFile.getText());
-      settings.setProperty("rawFile", rawFile.getText());
-      settings.setProperty("maxClassSize", jTextFieldMaxClassSize.getText());
-      settings.setProperty("minClassSize", jTextFieldMinClassSize.getText());
-      settings.setProperty("doLog", Boolean.toString(jCheckBoxDoLog.isSelected()));
-      settings.setProperty("pValTheshold", jTextFieldPValueThreshold.getText());
-      settings.setProperty("iterations", jTextFieldIterations.getText());
-      settings.setProperty("scorecol", jTextFieldScoreCol.getText());
-
-      String filename = "ClassScore.prefs";
-      String dir = "C:\\jbproject\\ermineJ\\";
-      String path = dir + filename;      
-      OutputStream f = new FileOutputStream( path );
-      settings.store(f, "");
    }
 
    private boolean testfile(String filename) {
@@ -829,33 +805,18 @@ public class AnalysisFrame extends JDialog {
 
    void finishButton_actionPerformed(ActionEvent e) {
 
-
-      try {
-         writePrefs();
-      } catch (IOException ex) {
-         System.err.println("Could not write prefs:" + ex);
-         ex.printStackTrace();
-      }
+      saveValues();
 
       class runthread extends Thread {
          public runthread() {}
 
          public void run() {
-            callingframe.analyze(Integer.parseInt(jTextFieldMaxClassSize.
-                                                  getText()),
-                                 Integer.parseInt(jTextFieldMinClassSize.
-                                                  getText()),
-                                 Integer.parseInt(jTextFieldIterations.getText()),
+            callingframe.analyze(settings,
                                  getClassScoreMethod(),
                                  getGroupMethod(),
                                  getUseWeights(),
                                  getUseLog(),
-                                 scoreFile.getText(),
-                                 probeFile.getText(),
-                                 nameFile.getText(),
                                  new classScoreStatus(callingframe.jLabelStatus),
-                                 Double.parseDouble(jTextFieldPValueThreshold.getText()),
-                                 Integer.parseInt(jTextFieldScoreCol.getText()),
                                  "");
          }
       };

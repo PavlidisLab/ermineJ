@@ -13,7 +13,6 @@ import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
@@ -73,7 +72,7 @@ public class ClassDetailFrame
        String id,
        NumberFormat nf,
        GeneAnnotations geneData,
-       Properties settings ) {
+       Settings settings ) {
 
       try {
          createDetailsTable( values, pvals, classToProbe, id, nf, geneData,
@@ -172,14 +171,14 @@ public class ClassDetailFrame
        String id,
        NumberFormat nf,
        GeneAnnotations geneData,
-       Properties settings ) {
+       Settings settings ) {
 
       //
       // Create a matrix display
       //
 
       // compile the matrix data
-      String filename = settings.getProperty( "rawFile" );
+      String filename = settings.getRawFile();
       String[] geneProbes = getProbes( classToProbe, id, values.size() );
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
