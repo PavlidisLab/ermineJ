@@ -23,7 +23,7 @@
     <jar href="ermineJ-help.jar"/>
     <jar href="baseCode-0.2.jar"/>
     <jar href="xercesImpl-2.6.2.jar"/>
-    <jar href="colt.jar"/>
+    <jar href="colt-1.0.3.jar"/>
     <jar href="commons-logging-1.0.3.jar"/>
     <extension name="Java Help" href="help.jnlp"/>
   </resources> 

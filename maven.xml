@@ -17,14 +17,13 @@
 	<arg value="${basedir}/ermineJ-help/html" />
 	</ant:exec>
 	<ant:echo>Making help jar file...</ant:echo>
-	<ant:jar destfile="${basedir}/ermineJ-help.jar" update="true" excludes="**/CVS/*" includes="${basedir}/ermineJ-help" basedir="${basedir}" />
+	<ant:jar destfile="${basedir}/ermineJ-help.jar" update="true" excludes="**/CVS/*" basedir="${basedir}/ermineJ-help" />
 	<ant:copy todir="${basedir}/web/ermineJ-help" overwrite="true" >
 	<fileset dir="${basedir}/ermineJ-help">
 	 <include name="**/*" />
 	</fileset>
 	</ant:copy>
 
-	
 		<maven:get plugin="maven-jnlp-plugin" property="maven.jnlp.dir" var="jnlpDir" />
 		<maven:get plugin="maven-jnlp-plugin" property="maven.jnlp.tmpdir" var="jnlpTmpDir" />
 		<maven:get plugin="maven-jnlp-plugin" property="plugin.resources" var="jnlpRsc" />
@@ -39,6 +38,8 @@
 	
 	<ant:copy todir="${jnlpDir}" file="${basedir}/JavaWebStart/help.jnlp" overwrite="true" />
 	<ant:copy todir="${jnlpDir}" file="${maven.repo.local}/javahelp/jars/jh.jar" overwrite="true" />
+
+	<ant:copy todir="${jnlpTmpDir}" file="${basedir}/ermineJ-help.jar" overwrite="true" />
 	
 	<ant:available file="${maven.jnlp.signjar.store}" property="maven.jnlp.store.exists"/>
 	<j:if test="${maven.jnlp.store.exists}">	<echo>"Found a keystore"</echo></j:if>
@@ -128,17 +129,39 @@
 
 <goal name="nsis:deploy" description="Upload the installer to the download site" prereqs="nsis">
     <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
-      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup.exe ${maven.username}@${dist.siteAddress}:${dist.siteDir}"/>
+      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup.exe ${maven.username}@${maven.dist.siteAddress}:${dist.distdir}"/>
     </exec>
 </goal>
 
 <goal name="nsis-jre:deploy" description="Upload the installer with jre to the download site" prereqs="nsis-jre">
     <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
-      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup-jre.exe ${maven.username}@${dist.siteAddress}:${dist.siteDir}"/>
+      <arg line="${maven.scp.args} ${maven.build.dir}/ermineJ-setup-jre.exe ${maven.username}@${maven.dist.siteAddress}:${dist.distdir}"/>
     </exec>
 </goal>
 
+<goal name="src-deploy" description="Upload the source distribution to the site" >
 
+   <attainGoal name="dist:build-src" />
+
+   <maven:user-check user="${maven.username}"/>
+
+    <echo>
+      srcAddress = ${maven.dist.siteAddress}
+      srcDirectory = ${maven.dist.distDir}
+      srcUser = ${maven.username}
+    </echo>
+ 
+
+   <exec dir="." executable="${maven.ssh.executable}">
+      <arg line="${maven.ssh.args} -l ${maven.username} ${maven.dist.siteAddress} 'mkdir -p ${maven.dist.distdir}'"/>
+    </exec>
+
+    <echo>"${maven.scp.executable} ${maven.scp.args} ${maven.build.dir}/distributions/${maven.final.name}-src.tar.gz ${maven.username}@${maven.dist.siteAddress}:${maven.dist.distDir}"</echo>
+
+    <exec dir="${maven.build.dir}" executable="${maven.scp.executable}" failonerror="true">
+      <arg line="-v ${maven.build.dir}/distributions/${maven.final.name}-src.tar.gz ${maven.username}@${maven.dist.siteAddress}:${mmaven.dist.distdir}"/>
+    </exec>
+</goal>
 
 </project>
 
