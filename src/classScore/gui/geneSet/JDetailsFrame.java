@@ -30,6 +30,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @version $Id$
@@ -231,7 +232,6 @@ public class JDetailsFrame
           m_matrixDisplay, values, pvals, classToProbe, id, geneData, m_nf
           );
       SortFilterModel sorter = new SortFilterModel( m, m_matrixDisplay );
-      m_table.setModel( new DefaultTableModel() ); // bug in JTable (Manju said so) -- if called repeatedly, this line should be here... as-is, makes no difference
       m_table.setModel( sorter );
 
       m_table.getTableHeader().addMouseListener( new MouseAdapter() {
@@ -240,24 +240,6 @@ public class JDetailsFrame
             int modelColumn = m_table.convertColumnIndexToModel( tableColumn );
             ( ( SortFilterModel ) m_table.getModel() ).sort( modelColumn );
          }
-
-         /*
-                   public void mouseReleased( MouseEvent event ) {
-            // make all the matrix display columns equally wide
-            int matrixColumnCount = m_matrixDisplay.getColumnCount();
-            for ( int i = 0; i < matrixColumnCount; i++ ) {
-               TableColumn col = m_table.getColumnModel().getColumn( i );
-
-               int width = col.getPreferredWidth();
-
-               //String s = evt.getNewValue().toString();
-               //int width = (new Integer( s )).intValue();
-
-               col.setPreferredWidth( width );
-            }
-            m_table.revalidate();
-                   }
-          */
       } );
 
       //
@@ -385,7 +367,7 @@ public class JDetailsFrame
          try {
             boolean includeLabels = fc.includeLabels();
             boolean normalize = fc.normalized();
-            m_matrixDisplay.saveToFile( filename, includeLabels, normalize );
+            saveImage( filename, includeLabels, normalize );
          }
          catch ( IOException ex ) {
             System.err.println( "IOException error saving png to " + filename );
@@ -414,7 +396,7 @@ public class JDetailsFrame
          }
          // Save the values
          try {
-            saveTableToFile( filename, true, true, false );
+            saveData( filename, true, true, false );
          }
          catch ( IOException ex ) {
             System.err.println( "IOException error saving data to " + filename );
@@ -423,27 +405,45 @@ public class JDetailsFrame
       // else canceled by user
    }
 
-   /**
-    * saveTableToFile
-    *
-    * @param filename String
-    */
-   protected void saveTableToFile( String filename, boolean includeMatrixValues, boolean includeNonMatrix, boolean normalized ) throws IOException {
+   
+   protected void saveImage( String filename, boolean includeLabels, boolean normalized ) throws IOException {
+
+      boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
+      m_matrixDisplay.setStandardizedEnabled( normalized );
+      m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
+      try {
+         m_matrixDisplay.saveImage( filename, includeLabels, normalized );
+      }
+      catch (IOException e) {
+         // clean up
+         m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+         m_matrixDisplay.resetRowKeys();
+         throw e;
+      }
+      
+      // clean up
+      m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+      m_matrixDisplay.resetRowKeys();
+      
+   } // end saveImage
+   
+   
+   protected void saveData( String filename, boolean includeMatrixValues, boolean includeNonMatrix, boolean normalized ) throws IOException {
 
       BufferedWriter out = new BufferedWriter( new FileWriter( filename ) );
+      
+      boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
+      m_matrixDisplay.setStandardizedEnabled( normalized );
+      {
+         int totalRowCount = m_table.getRowCount();
+         int totalColumnCount = m_table.getColumnCount();
+         int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
-      int totalRowCount = m_table.getRowCount();
-      int totalColumnCount = m_table.getColumnCount();
-      int matrixColumnCount = m_matrixDisplay.getColumnCount();
+         // write out the table, one row at a time
+         for ( int r = 0; r < totalRowCount; r++ ) {
 
-      // write out the table, one row at a time
-      for ( int r = 0; r < totalRowCount; r++ ) {
-         
-         if ( includeMatrixValues ) {
+            if ( includeMatrixValues ) {
 
-            boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
-            m_matrixDisplay.setStandardizedEnabled( normalized );
-            {
                // for this row: write out matrix values
                String probeID = getProbeID( r );
                double[] row = m_matrixDisplay.getRowByName( probeID );
@@ -451,30 +451,64 @@ public class JDetailsFrame
                   out.write( row[c] + "\t" );
                }
                //out.write( probeID + "\t" ); // DEBUG - REMOVE THIS!!!
+               m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
             }
-            m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
-         }
-            
-         if ( includeNonMatrix ) {
-            // for this row: write out the rest of the table
-            for ( int c = matrixColumnCount; c < totalColumnCount; c++) {
-               out.write( m_table.getValueAt( r, c ) + "\t" );
-            }
-         }
 
-         // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
-         out.write( "\r\n" );
+            if ( includeNonMatrix ) {
+               // for this row: write out the rest of the table
+               for ( int c = matrixColumnCount; c < totalColumnCount; c++) {
+                  out.write( m_table.getValueAt( r, c ) + "\t" );
+               }
+            }
+
+            // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
+            out.write( "\r\n" );
+         }
       }
+      m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
       
       // close the file
       out.close();
 
-   } // end saveTableToFile
+   } // end saveData
+   
+   
+   /**
+    * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay).
+    *
+    * You would probably want to call this method to print out the matrix in
+    * the order in which it is displayed in the table.  In this case, you will
+    * want to do something like this:<br><br>
+    *
+    *  <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code>
+    * 
+    * However, do not forget to call <code>m_matrixDisplay.resetRowKeys()</code>
+    * when you are done because the table sorter filter does its own mapping, 
+    * so the matrix rows have to remain in their original order (or it might
+    * not be displayed correctly inside the table).
+    */
+   protected int[] getCurrentMatrixDisplayRowOrder() {
+   
+      int matrixRowCount = m_matrixDisplay.getRowCount();
+      int[] rowKeys = new int[matrixRowCount];
 
+      // write out the table, one row at a time
+      for ( int r = 0; r < matrixRowCount; r++ ) {
+         // for this row: write out matrix values
+         String probeID = getProbeID( r );
+         rowKeys[r] = m_matrixDisplay.getRowIndexByName( probeID );
+      }
+
+      return rowKeys;
+      
+   } // end createRowKeys
+
+   
    private String getProbeID( int row ) {
       int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
       return (String) m_table.getValueAt( row, offset + 0 );
    }
+   
 
    void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
 
