@@ -442,9 +442,7 @@ public class JDetailsFrame
 
       try {
          // write out the matrix values
-         int r = 0;
-         {
-         //for ( int r = 0; r < totalRows; r++ ) {
+         for ( int r = 0; r < totalRows; r++ ) {
 
             // get values in that row
             String probeID = getProbeID( r );
