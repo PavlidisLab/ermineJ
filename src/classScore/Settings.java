@@ -80,7 +80,7 @@ public class Settings {
    public Settings( String filename ) {
       pref_file = filename;
       String homeDir = System.getProperty( "user.home" );
-      dataFolder = homeDir + File.separator + "classScore.data";
+      dataFolder = homeDir + File.separator + "ermineJ.data";
       try {
          dataFolder = URLDecoder.decode( ( new File( dataFolder )
                .getCanonicalPath() ), "ISO-8859-1" );
