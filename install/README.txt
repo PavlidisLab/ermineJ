@@ -5,5 +5,6 @@ The .nsi scripts found here have to be compiled with the Nullsoft Installation S
 For the .nsi scripts to be compiled successfully, this folder should contain the following files and folders:
 .   - this folder contains license.txt and GNU_General_Public_License.txt
 lib - a folder containing jar files
-bin - a folder containing JRE (Java 2 Runtime Environment) installation executable for Windows
+bin - a folder containing ermineJ.bat that runs the java virtual machine executing the main jar.
+jre-install - a folder containing JRE (Java 2 Runtime Environment) installation executable for Windows
 ermineJ.data - the data folder containing sample or configuration data files to be included with the installation
