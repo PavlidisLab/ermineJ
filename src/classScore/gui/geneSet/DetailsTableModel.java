@@ -82,7 +82,7 @@ public class DetailsTableModel
       }
       switch ( column ) { // after it's been offset
          case 0:
-            return ( String ) ( ( ArrayList ) m_classToProbe.get( m_id ) ).get( row );
+            return ( String ) ( ( ArrayList ) m_classToProbe.get( m_id ) ).get( row ); // probe ID
          case 1:
             return new Double( m_nf.format( m_pvals.get( ( String ) ( ( ArrayList )
                 m_classToProbe.get( m_id ) ).get( row ) ) ) );
