@@ -1,7 +1,8 @@
 package classScore;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.EventQueue;
+
+import javax.swing.JLabel;
 
 /**
  * <p>Title: </p>
@@ -24,8 +25,7 @@ public class classScoreStatus {
 
       try {
          Thread.sleep(100);
-      }
-      catch (InterruptedException ex) {
+      } catch (InterruptedException ex) {
       }
 
       EventQueue.invokeLater(new Runnable() {

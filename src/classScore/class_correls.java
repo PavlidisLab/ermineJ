@@ -1,16 +1,24 @@
 package classScore;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Vector;
 
-import util.*;
+import util.Matrix;
+import util.Stats;
 
 /**
  Calculates the raw average class correlations using a background distribution.    Created :09/02/02
    @author Shahmil Merchant
    @version $Id$
-* @todo: Get this working again. It should be presented as an alternative 'tab' to the GUI.
-* @todo: Rename this class and its methods
+ * @todo: Get this working again. It should be presented as an alternative 'tab' to the GUI.
+ * @todo: Rename this class and its methods
  */
 public class class_correls {
    private histogram hist; //histogram object stores background related information
@@ -26,14 +34,14 @@ public class class_correls {
    // data_file,probe_go_file,go_namefile,output_file,class_max_size,class_min_size,number of runs,hist range
    public static void main(String[] args) {
       try {
-         class_correls test = new class_correls(args[0], args[1], args[2], args[3],
+         class_correls test = new class_correls(args[0], args[1], args[2],
+                                                args[3],
                                                 Integer.parseInt(args[4]),
                                                 Integer.parseInt(args[5]),
                                                 Integer.parseInt(args[6]),
                                                 Double.parseDouble(args[7]));
          test.class_correl_generator();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
          e.printStackTrace();
       }
    }
@@ -47,7 +55,8 @@ public class class_correls {
 
       probe_data = new corr_class_scores(probe_datafile); // main data file
       geneData = new GeneDataReader(probe_annotfile, probe_data.get_data_map());
-      ClassMap probe_go = new ClassMap(geneData.getProbeToClassMap(), geneData.getClassToProbeMap()); //parses affy file
+      ClassMap probe_go = new ClassMap(geneData.getProbeToClassMap(),
+                                       geneData.getClassToProbeMap()); //parses affy file
       goName = new GONameReader(go_namefile); //parse go name file
       probe_gom = new LinkedHashMap();
       go_probe = new LinkedHashMap();
@@ -80,8 +89,8 @@ public class class_correls {
       //to store each class number
       //	Map class_list = new LinkedHashMap();
       //stores Matrix of class histograms
-      Matrix M = new Matrix( (probe_data.get_class_max_size() -
-                              probe_data.get_class_min_size() + 1),
+      Matrix M = new Matrix((probe_data.get_class_max_size() -
+                             probe_data.get_class_min_size() + 1),
                             hist.get_number_of_bins());
       M = hist.get_matrix();
       //stores map of class sizes
@@ -111,7 +120,7 @@ public class class_correls {
             //this calculation is done just in case the hashtable has no value for an element...hence we keep track of the number of elements with values and then create a Matrix to be used for correlation based on that
             while (I1.hasNext()) {
                String element = (String) I1.next();
-               if ( (probe_data.get_data_map()).containsKey(element) == true) {
+               if ((probe_data.get_data_map()).containsKey(element) == true) {
                   mat_size++;
                }
             }
@@ -123,7 +132,7 @@ public class class_correls {
                   //System.out.flush();
                   //check if element exists in map
                   if (element != null &&
-                      ( (probe_data.get_data_map()).containsKey(element) == true)) {
+                      ((probe_data.get_data_map()).containsKey(element) == true)) {
                      raw_score = new Vector();
                      raw_score = (Vector) (probe_data.get_data_chip_map(element));
                      if (raw_score.size() > 0) {
@@ -140,7 +149,8 @@ public class class_correls {
                         while (vec_val.hasNext()) {
 
                            V.set_matrix_val(index, j,
-                                            Double.parseDouble( (String) vec_val.next()));
+                                            Double.parseDouble((String) vec_val.
+                                   next()));
                            j++;
                         }
                         index++;
@@ -170,9 +180,10 @@ public class class_correls {
                   if (rawscore < hist.get_hist_max()) {
                      double[] class_row = new double[hist.get_number_of_bins()];
                      class_row = M.get_ith_row(hist.class_index(size,
-                         probe_data.get_class_min_size()));
-                     int binnum = (int) Math.floor( (rawscore - hist.get_hist_min()) /
-                         (double) hist.get_bin_size());
+                             probe_data.get_class_min_size()));
+                     int binnum = (int) Math.floor((rawscore -
+                             hist.get_hist_min()) /
+                             (double) hist.get_bin_size());
 
                      pval = class_row[binnum];
                   } else {
@@ -180,7 +191,8 @@ public class class_correls {
                   }
                   if (rawscore > 0) {
                      out.write(goName.get_GoName_value_map(class_name) + "(" +
-                               class_name + ")" + "\t" + size + "\t" + rawscore + "\t" +
+                               class_name + ")" + "\t" + size + "\t" + rawscore +
+                               "\t" +
                                pval + "\n");
                      //	 System.out.println(class_name + "\t" + size + "\t" + rawscore + "\t" +pval);
                   }
@@ -191,8 +203,7 @@ public class class_correls {
             }
          }
          out.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
       }
    }
 

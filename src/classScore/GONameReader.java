@@ -1,7 +1,16 @@
 package classScore;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
   Description:Parses the file of the form GoID Biological Name. This
@@ -23,7 +32,8 @@ public class GONameReader {
      id, second is a description that will be used int program
      output.
     */
-   public GONameReader(String filename) throws IllegalArgumentException, IOException {
+   public GONameReader(String filename) throws IllegalArgumentException,
+           IOException {
       String aLine = null;
       String go_id = "";
       String go_name = "";
@@ -41,15 +51,15 @@ public class GONameReader {
       BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
       String row;
 
-      while ( (row = dis.readLine()) != null) {
+      while ((row = dis.readLine()) != null) {
          //tokenize file by tab character
          StringTokenizer st = new StringTokenizer(row, "\t");
-         go_id = st.nextToken();
+         go_id = st.nextToken().intern();
          if (go_id.equals("Gene_Ontology")) { // note: this should no longer occur in our data files.
             continue;
          }
 
-         go_name = st.nextToken();
+         go_name = st.nextToken().intern();
          go_name_map.put(go_id, go_name);
       }
       dis.close();
@@ -79,13 +89,11 @@ public class GONameReader {
       }
    }
 
-   public void addClass(String id, String name)
-   {
+   public void addClass(String id, String name) {
       go_name_map.put(id, name);
    }
 
-   public void modifyClass(String id, String name)
-   {
+   public void modifyClass(String id, String name) {
       go_name_map.put(id, name);
    }
 }

@@ -1,8 +1,16 @@
 package classScore;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /**
   Description:Parses the file of the form
@@ -31,12 +39,12 @@ public class GeneScoreReader {
 
    /**
      Create the probe -> pval mapping
-        @param filename: a tab-delmited file with columns probe_id pval pval pval...
+    @param filename: a tab-delmited file with columns probe_id pval pval pval...
      @param column: which column the pvalues are in.
      @param dolog: take the log (base 10) of the value.
     */
    public GeneScoreReader(String filename, int column, boolean dolog) throws
-       IOException {
+           IOException {
       String aLine = null;
       int count = 0;
       //read in file
@@ -64,7 +72,7 @@ public class GeneScoreReader {
       probe_pval_map = new LinkedHashMap();
       int colnumber = 0;
 
-      while ( (row = dis.readLine()) != null) {
+      while ((row = dis.readLine()) != null) {
          StringTokenizer st = new StringTokenizer(row, "\t");
          cols = new Vector();
          while (st.hasMoreTokens()) {
@@ -82,12 +90,13 @@ public class GeneScoreReader {
 
       for (int i = 1; i < rows.size(); i++) {
 
-         if ( ( (Vector) (rows.elementAt(i))).size() < column) {
+         if (((Vector) (rows.elementAt(i))).size() < column) {
             throw new IOException("Insufficient columns in row " + i +
-                                  ", expecting file to have at least " + column + " columns.");
+                                  ", expecting file to have at least " + column +
+                                  " columns.");
          }
 
-         String name = (String) ( ( (Vector) (rows.elementAt(i))).elementAt(0));
+         String name = (String) (((Vector) (rows.elementAt(i))).elementAt(0));
 
          if (name.matches("AFFX.*")) { // todo: put this rule somewhere else
             System.err.println("Skipping probe in pval file: " + name);
@@ -96,20 +105,21 @@ public class GeneScoreReader {
          probeID[i - 1] = name;
 
          pval[i - 1] =
-             Double.parseDouble( (String) ( ( (Vector) (rows.elementAt(i))).
-                                           elementAt(column - 1)));
+                 Double.parseDouble((String) (((Vector) (rows.elementAt(i))).
+                                              elementAt(column - 1)));
 
          // Fudge when pvalues are zero.
          if (dolog && pval[i - 1] <= 0) {
             System.err.println(
-                "Warning: Cannot take log of non-positive value for " + name +
-                " (" + pval[i - 1] + ") from gene score file: Setting to " +
-                small);
+                    "Warning: Cannot take log of non-positive value for " +
+                    name +
+                    " (" + pval[i - 1] + ") from gene score file: Setting to " +
+                    small);
             pval[i - 1] = small;
          }
 
          if (dolog) {
-            pval[i - 1] = - (Math.log(pval[i - 1]) / log10); // Make -log base 10.
+            pval[i - 1] = -(Math.log(pval[i - 1]) / log10); // Make -log base 10.
          }
 
          doubleArray[i - 1] = new Double(pval[i - 1]);
@@ -157,7 +167,7 @@ public class GeneScoreReader {
       double value = 0.0;
 
       if (probe_pval_map.get(probe_id) != null) {
-         value = Double.parseDouble( (probe_pval_map.get(probe_id)).toString());
+         value = Double.parseDouble((probe_pval_map.get(probe_id)).toString());
       }
 
       return value;
@@ -169,8 +179,7 @@ public class GeneScoreReader {
    public static void main(String[] args) {
       try {
          GeneScoreReader t = new GeneScoreReader(args[0]);
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
          e.printStackTrace();
       }
 

@@ -1,14 +1,16 @@
 package classScore;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Vector;
 
-import util.*;
+import util.Matrix;
+import util.Stats;
 
 /**
    Create background distribution of class correlation where the class correlation is the average pairwise correlation between the vectors in the class
   @author Shahmil Merchant
   @version $Id$
-@todo tidy up all the code.
+ @todo tidy up all the code.
  */
 public class corr_class_scores {
 
@@ -65,7 +67,8 @@ public class corr_class_scores {
 
    /*****************************************************************************************/
    /*****************************************************************************************/
-   public double classcorrel(int[] randomnums, double[][] correls, int classsize) {
+   public double classcorrel(int[] randomnums, double[][] correls,
+                             int classsize) {
       //calculate average correlation
       double avecorrel;
       int i, j, nummeas;
@@ -152,7 +155,8 @@ public class corr_class_scores {
       test.set_range(Double.parseDouble(args[4]));
       t = test.random_class_generator();
 
-      M = new Matrix( (t.get_matrix()).get_num_rows(), (t.get_matrix()).get_num_cols());
+      M = new Matrix((t.get_matrix()).get_num_rows(),
+                     (t.get_matrix()).get_num_cols());
       M = t.get_matrix();
       double total = 0.0;
       for (int i = 0; i < M.get_num_rows(); i++) {

@@ -1,9 +1,17 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
+import java.awt.Container;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 /**
  * <p>Title: </p>
@@ -15,22 +23,18 @@ import javax.swing.table.*;
  * @todo make columns start out better sizes
  */
 
-public class ClassPanel extends JScrollPane
-{
+public class ClassPanel extends JScrollPane {
    JTable jTable1 = new JTable();
    ClassMap dataHolder = null;
    // EventListenerList listenerList = null;
    classScoreFrame csFrame;
 
-   public ClassPanel(classScoreFrame csFrame)
-   {
-      this.csFrame=csFrame;
-      try
-      {
+   public ClassPanel(classScoreFrame csFrame) {
+      this.csFrame = csFrame;
+      try {
          //     listenerList = new EventListenerList();
          jbInit();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
    }
@@ -40,8 +44,7 @@ public class ClassPanel extends JScrollPane
          //     listenerList = new EventListenerList();
          this.dataHolder = dataHolder;
          jbInit();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
    }
@@ -71,8 +74,9 @@ public class ClassPanel extends JScrollPane
          public void mouseClicked(MouseEvent event) {
             int tableColumn = jTable1.columnAtPoint(event.getPoint());
             int modelColumn = jTable1.convertColumnIndexToModel(tableColumn);
-            if(modelColumn == 0 || modelColumn == 2)
-               ( (SortFilterModel) jTable1.getModel()).sort(modelColumn);
+            if (modelColumn == 0 || modelColumn == 2) {
+               ((SortFilterModel) jTable1.getModel()).sort(modelColumn);
+            }
          }
       });
 
@@ -81,13 +85,13 @@ public class ClassPanel extends JScrollPane
    }
 
 
-   void popupMenu_actionPerformed(ActionEvent e)
-   {
-      modclassPopupMenu sourcePopup=(modclassPopupMenu)((Container)e.getSource()).getParent();
-      int r =jTable1.rowAtPoint(sourcePopup.getPoint());
-      String id=(String)jTable1.getValueAt(r,0);
+   void popupMenu_actionPerformed(ActionEvent e) {
+      modclassPopupMenu sourcePopup = (modclassPopupMenu) ((Container) e.
+              getSource()).getParent();
+      int r = jTable1.rowAtPoint(sourcePopup.getPoint());
+      String id = (String) jTable1.getValueAt(r, 0);
       System.err.println("Doing some action: " + id);
-      csFrame.makeModClassFrame(false,id);
+      csFrame.makeModClassFrame(false, id);
    }
 
    void jTable1_mouseReleased(MouseEvent e) {
@@ -96,7 +100,7 @@ public class ClassPanel extends JScrollPane
 
       //dataHolder.showDetails(j); FIX THIS!!!
       //
-      // If calling classPvalRun.showDetails, then the second arg should be 
+      // If calling classPvalRun.showDetails, then the second arg should be
       // csFrame.settings so that ClassDetailFrame will know the name of the
       // master microarray file.
       //
@@ -108,11 +112,10 @@ public class ClassPanel extends JScrollPane
    }
 
 
-
 }
 
-class ClassPanel_jTable1_mouseAdapter
-    extends java.awt.event.MouseAdapter {
+
+class ClassPanel_jTable1_mouseAdapter extends java.awt.event.MouseAdapter {
    ClassPanel adaptee;
 
    ClassPanel_jTable1_mouseAdapter(ClassPanel adaptee) {
@@ -132,24 +135,31 @@ class ClassPanel_jTable1_mouseAdapter
    }
 }
 
+
 class PopupListener extends MouseAdapter {
    modclassPopupMenu popup;
-   PopupListener(modclassPopupMenu popupMenu) { popup = popupMenu; }
-   public void mousePressed(MouseEvent e) { maybeShowPopup(e); }
-   public void mouseReleased(MouseEvent e) { maybeShowPopup(e); }
+   PopupListener(modclassPopupMenu popupMenu) {popup = popupMenu;
+   }
+
+   public void mousePressed(MouseEvent e) {maybeShowPopup(e);
+   }
+
+   public void mouseReleased(MouseEvent e) {maybeShowPopup(e);
+   }
+
    private void maybeShowPopup(MouseEvent e) {
       if (e.isPopupTrigger()) {
          JTable source = (JTable) e.getSource();
-         int r =source.rowAtPoint(e.getPoint());
-         String id=(String)source.getValueAt(r,0);
-         if(id.compareTo("")!=0)
-         {
+         int r = source.rowAtPoint(e.getPoint());
+         String id = (String) source.getValueAt(r, 0);
+         if (id.compareTo("") != 0) {
             popup.show(e.getComponent(), e.getX(), e.getY());
             popup.setPoint(e.getPoint());
          }
       }
    }
 }
+
 
 class popupMenu_actionAdapter implements java.awt.event.ActionListener {
    ClassPanel adaptee;
@@ -163,9 +173,12 @@ class popupMenu_actionAdapter implements java.awt.event.ActionListener {
    }
 }
 
-class modclassPopupMenu extends JPopupMenu
-{
+
+class modclassPopupMenu extends JPopupMenu {
    Point popupPoint;
-   public Point getPoint() {return popupPoint;}
-   public void setPoint(Point point) {popupPoint=point;}
+   public Point getPoint() {return popupPoint;
+   }
+
+   public void setPoint(Point point) {popupPoint = point;
+   }
 }

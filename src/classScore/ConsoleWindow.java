@@ -5,9 +5,12 @@ package classScore;
    @author Cay Horstmann
  */
 
-import java.io.*;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
    A window that displays the bytes sent to System.out

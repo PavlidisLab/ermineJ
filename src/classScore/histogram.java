@@ -1,7 +1,7 @@
 package classScore;
 
 //import java.util.Locale.*;
-import util.*;
+import util.Matrix;
 
 /**
   Stores information relevent to a histogram.   Created :09/02/02
@@ -46,7 +46,7 @@ public class histogram {
    /**
     */
    public void set_number_of_bins() {
-      number_of_bins = (int) ( (hist_max - hist_min) / (double) bin_size);
+      number_of_bins = (int) ((hist_max - hist_min) / (double) bin_size);
       if (number_of_bins < 1) {
          System.err.println("Error: Histogram had no bins or too few bins. (" +
                             number_of_bins + ")");
@@ -68,7 +68,7 @@ public class histogram {
     */
    public void update(int row, double value) {
 
-      int thebin = (int) Math.floor( (value - hist_min) / (double) bin_size);
+      int thebin = (int) Math.floor((value - hist_min) / (double) bin_size);
 
       // make sure we're in the range
       if (thebin < 0) {
@@ -145,9 +145,10 @@ public class histogram {
 
    public String toString() {
       return "There are " + number_of_bins +
-          " bins in the histogram. The maximum possible value is " + hist_max +
-          ", the minimum is " + hist_min + "." + " Min class is " +
-          min_class_size + ".";
+              " bins in the histogram. The maximum possible value is " +
+              hist_max +
+              ", the minimum is " + hist_min + "." + " Min class is " +
+              min_class_size + ".";
    }
 
    /**
@@ -162,12 +163,12 @@ public class histogram {
    public double get_val(int class_size, double rawscore) {
       if (rawscore > hist_max || rawscore < hist_min) { // sanity check.
          System.err.println(
-             "Warning, a rawscore yielded a bin number which was out of the range: " +
-             rawscore);
+                 "Warning, a rawscore yielded a bin number which was out of the range: " +
+                 rawscore);
          return -1.0;
       } else {
          int row = this.class_index(class_size, min_class_size);
-         int binnum = (int) Math.floor( (rawscore - hist_min) / bin_size);
+         int binnum = (int) Math.floor((rawscore - hist_min) / bin_size);
 
          if (binnum < 0) {
             binnum = 0;

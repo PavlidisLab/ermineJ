@@ -1,8 +1,23 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
 
 /**
  * <p>Title: </p>
@@ -13,9 +28,7 @@ import javax.swing.*;
  * @version 1.0
  */
 
-public class classScoreFrameAboutBox
-    extends JDialog
-    implements ActionListener {
+public class classScoreFrameAboutBox extends JDialog implements ActionListener {
 
    JPanel panel1 = new JPanel();
    JPanel panel2 = new JPanel();
@@ -43,8 +56,7 @@ public class classScoreFrameAboutBox
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       try {
          jbInit();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
    }
@@ -74,10 +86,11 @@ public class classScoreFrameAboutBox
       jTextPane1.setDisabledTextColor(Color.black);
       jTextPane1.setEditable(false);
       jTextPane1.setMargin(new Insets(0, 0, 0, 0));
-      jTextPane1.setText("If you use this software for your work, please cite Pavlidis, P., " +
-                         "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data " +
-                         "with class scores.Proceedings of the Pacific Symposium on Biocomputing " +
-                         "7. pp 474-485");
+      jTextPane1.setText(
+              "If you use this software for your work, please cite Pavlidis, P., " +
+              "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data " +
+              "with class scores.Proceedings of the Pacific Symposium on Biocomputing " +
+              "7. pp 474-485");
       jTextPane1.setBounds(new Rectangle(62, 20, 232, 146));
       panel1.setPreferredSize(new Dimension(369, 300));
       panel2.setPreferredSize(new Dimension(369, 100));

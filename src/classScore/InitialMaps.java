@@ -1,8 +1,16 @@
 package classScore;
 
-import java.io.*;
-import java.util.*;
-import javax.swing.table.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 /**
   Makes the initial maps based on the input files. Created :05/27/04
@@ -16,32 +24,45 @@ public class InitialMaps {
    public Map classToProbe;
    public expClassScore probePvalMapper;
    private Vector sortedclasses = null;
+   public GONameReader getGoName() {
+      return goName;
+   }
+
+   public Map getProbeGroups() {
+      return probeGroups;
+   }
+
+   public Map getClassToProbe() {
+      return classToProbe;
+   }
+
+   public expClassScore getProbePvalMapper() {
+      return probePvalMapper;
+   }
 
    /**
     */
    public InitialMaps(String probe_annotfile, String goNamesfile,
-                      classScoreStatus messenger)
-       throws IllegalArgumentException, IOException
-   {
+                      classScoreStatus messenger) throws
+           IllegalArgumentException, IOException {
       readFiles(probe_annotfile, goNamesfile, messenger);
       setupClasses(messenger);
    }
 
    public InitialMaps(String probePvalFile,
                       String probe_annotfile,
-                       String goNamesfile,
-                       String method,
-                       String groupMethod,
-                       int classMaxSize,
-                       int classMinSize,
-                       int numberOfRuns,
-                       int quantile,
-                       String useWeights,
-                       int pvalcolumn,
-                       String dolog_check,
-                       classScoreStatus messenger)
-       throws IllegalArgumentException, IOException
-   {
+                      String goNamesfile,
+                      String method,
+                      String groupMethod,
+                      int classMaxSize,
+                      int classMinSize,
+                      int numberOfRuns,
+                      int quantile,
+                      String useWeights,
+                      int pvalcolumn,
+                      String dolog_check,
+                      classScoreStatus messenger) throws
+           IllegalArgumentException, IOException {
       readFiles(probe_annotfile, goNamesfile, messenger, probePvalFile,
                 method, classMaxSize, classMinSize, numberOfRuns, quantile,
                 useWeights, pvalcolumn, dolog_check);
@@ -52,8 +73,8 @@ public class InitialMaps {
    }
 
    private void readFiles(String probe_annotfile, String goNamesfile,
-                          classScoreStatus messenger) throws IllegalArgumentException, IOException
-   {
+                          classScoreStatus messenger) throws
+           IllegalArgumentException, IOException {
       messenger.setStatus("Reading GO descriptions");
       goName = new GONameReader(goNamesfile); // parse go name file
       messenger.setStatus("Reading gene data file");
@@ -66,8 +87,7 @@ public class InitialMaps {
                           int numberOfRuns, int quantile,
                           String useWeights, int pvalcolumn,
                           String dolog_check
-                          ) throws IllegalArgumentException, IOException
-   {
+                          ) throws IllegalArgumentException, IOException {
       messenger.setStatus("Reading GO descriptions");
       goName = new GONameReader(goNamesfile); // parse go name file
       messenger.setStatus("Reading gene scores");
@@ -80,40 +100,38 @@ public class InitialMaps {
       geneData = new GeneDataReader(probe_annotfile, probePvalMapper.get_map());
    }
 
-   private GeneGroupReader setupClasses(classScoreStatus messenger)
-   {
-      GeneGroupReader groupName = new GeneGroupReader(geneData.getGroupProbeList(),
-                                      geneData.getProbeGroupMap()); // parse group file. Yields map of probe->replicates.
+   private GeneGroupReader setupClasses(classScoreStatus messenger) {
+      GeneGroupReader groupName = new GeneGroupReader(geneData.
+              getGroupProbeList(),
+              geneData.getProbeGroupMap()); // parse group file. Yields map of probe->replicates.
       probeGroups = groupName.get_probe_group_map(); // map of probes to groups
       messenger.setStatus("Initializing gene class mapping");
       ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
-                                     geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
+                                              geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       probeToClassMap.hackClassToProbeMap();
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
-      System.err.println("Hacked classToProbe has size: "+classToProbe.size());
+      System.err.println("Hacked classToProbe has size: " + classToProbe.size());
       sortClasses();
       messenger.setStatus("Done with setup");
       return groupName;
    }
 
-   private void sortClasses()
-   {
+   private void sortClasses() {
       sortedclasses = new Vector(classToProbe.entrySet().size());
       Set keys = classToProbe.keySet();
       Vector l = new Vector();
       l.addAll(keys);
       Collections.sort(l);
       Iterator it = l.iterator();
-      while (it.hasNext())
-      {
+      while (it.hasNext()) {
          sortedclasses.add(it.next());
       }
    }
 
    public static TableModel toBlankTableModel() {
-      return new AbstractTableModel()
-      {
-         private String[] columnNames = {"Name", "Description","# of Probes","# of Genes"};
+      return new AbstractTableModel() {
+         private String[] columnNames = {"Name", "Description", "# of Probes",
+                                        "# of Genes"};
 
          public String getColumnName(int i) {
             return columnNames[i];
@@ -127,94 +145,98 @@ public class InitialMaps {
             return 30;
          }
 
-         public Object getValueAt(int i, int j)
-         {
+         public Object getValueAt(int i, int j) {
             return "";
          }
       };
    }
 
-   public TableModel toTableModel()
-   {
-      return new AbstractTableModel()
-      {
-         private String[] columnNames = {"Name", "Description","# of Probes","# of Genes"};
+   public TableModel toTableModel() {
+      return new AbstractTableModel() {
+         private String[] columnNames = {"Name", "Description", "# of Probes",
+                                        "# of Genes"};
 
-         public String getColumnName(int i) { return columnNames[i]; }
+         public String getColumnName(int i) {return columnNames[i];
+         }
 
-         public int getColumnCount() { return columnNames.length; }
+         public int getColumnCount() {return columnNames.length;
+         }
 
-         public int getRowCount() { return sortedclasses.size(); }
+         public int getRowCount() {return sortedclasses.size();
+         }
 
-         public Object getValueAt(int i, int j)
-         {
+         public Object getValueAt(int i, int j) {
             String classid = (String) sortedclasses.get(i);
 
-            switch (j)
-            {
-               case 0:
-                  return classid;
-               case 1:
-                  return goName.get_GoName_value_map(classid);
-               case 2:
-               {
-                  int numprobes = 0;
-                  if(classToProbe.containsKey(classid))
-                     numprobes = ((ArrayList)classToProbe.get(classid)).size();
-                  return Integer.toString(numprobes);
+            switch (j) {
+            case 0:
+               return classid;
+            case 1:
+               return goName.get_GoName_value_map(classid);
+            case 2: {
+               int numprobes = 0;
+               if (classToProbe.containsKey(classid)) {
+                  numprobes = ((ArrayList) classToProbe.get(classid)).size();
                }
-               case 3:
-               {
-                  HashSet genes = new HashSet();
-                  ArrayList probes=(ArrayList)classToProbe.get(classid);
-                  Iterator probe_it=probes.iterator();
-                  while(probe_it.hasNext())
-                  {
-                     genes.add(geneData.getProbeGeneName((String) probe_it.next()));
-                  }
-                  int numgenes = genes.size();
-                  return Integer.toString(numgenes);
+               return Integer.toString(numprobes);
+            }
+            case 3: {
+               HashSet genes = new HashSet();
+               ArrayList probes = (ArrayList) classToProbe.get(classid);
+               Iterator probe_it = probes.iterator();
+               while (probe_it.hasNext()) {
+                  genes.add(geneData.getProbeGeneName((String) probe_it.next()));
                }
-               default:
-                   return "";
-             }
+               int numgenes = genes.size();
+               return Integer.toString(numgenes);
+            }
+            default:
+               return "";
+            }
          }
       };
    };
 
-   public void addClass(String id, String desc, ArrayList probes)
-   {
+   public void addClass(String id, String desc, ArrayList probes) {
       System.err.println("adding " + id + " to setupmap");
       geneData.addClass(id, probes);
-      goName.addClass(id,desc);
+      goName.addClass(id, desc);
       ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
-                                     geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
+                                              geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
       sortClasses();
    }
 
-   public void modifyClass(String id, String desc, ArrayList probes)
-   {
+   public void modifyClass(String id, String desc, ArrayList probes) {
       System.err.println("modifying " + id + " to setupmap");
       geneData.modifyClass(id, probes);
-      goName.modifyClass(id,desc);
+      goName.modifyClass(id, desc);
       ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
-                                     geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
+                                              geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
       sortClasses();
    }
 
-   public int numClasses() { return sortedclasses.size(); }
-   public String getClass(int i) { return (String) sortedclasses.get(i); }
-   public String getClassDesc(String id) { return (String) goName.get_GoName_value_map(id); }
-   public int numProbes(String id) { return ((ArrayList)classToProbe.get(id)).size(); }
-   public int numGenes(String id)
-   {
+   public int numClasses() {return sortedclasses.size();
+   }
+
+   public String getClass(int i) {return (String) sortedclasses.get(i);
+   }
+
+   public String getClassDesc(String id) {return (String) goName.
+           get_GoName_value_map(id);
+   }
+
+   public int numProbes(String id) {return ((ArrayList) classToProbe.get(id)).
+           size();
+   }
+
+   public int numGenes(String id) {
       HashSet genes = new HashSet();
       ArrayList probes = (ArrayList) classToProbe.get(id);
       Iterator probe_it = probes.iterator();
       while (probe_it.hasNext()) {
-         genes.add(geneData.getProbeGeneName( (String) probe_it.next()));
+         genes.add(geneData.getProbeGeneName((String) probe_it.next()));
       }
       return genes.size();
    }

@@ -1,10 +1,18 @@
 package classScore;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
-import util.*;
+import util.Stats;
 
 /**
     Calculates a background distribution for class sscores derived
@@ -46,7 +54,8 @@ public class expClassScore {
      Use defaults for most things.
     */
    public expClassScore(String pvalFilename, String wt_check,
-                        String in_method, int pvalcolumn, boolean dolog) throws IOException {
+                        String in_method, int pvalcolumn, boolean dolog) throws
+           IOException {
       this(pvalFilename, wt_check, in_method, pvalcolumn, dolog, 100, 2, 10000,
            50);
    }
@@ -66,8 +75,9 @@ public class expClassScore {
    public expClassScore(String filename_pval, String wt_check,
                         String in_method, int pvalcolumn, boolean dolog,
                         int classMaxSize, int classMinSize,
-                        int number_of_runs, int quantile) throws IllegalArgumentException,
-       IOException {
+                        int number_of_runs, int quantile) throws
+           IllegalArgumentException,
+           IOException {
       this.setClassMaxSize(classMaxSize);
       this.classMinSize = classMinSize;
       this.numRuns = number_of_runs;
@@ -77,13 +87,14 @@ public class expClassScore {
 
       if (classMaxSize < classMinSize) {
          throw new IllegalArgumentException(
-             "Error:The maximum class size is smaller than the minimum.");
+                 "Error:The maximum class size is smaller than the minimum.");
       }
 
       this.numClasses = classMaxSize - classMinSize + 1;
       this.logged = dolog;
 
-      GeneScoreReader parser = new GeneScoreReader(filename_pval, pvalcolumn, dolog); // makes the probe -> pval map.
+      GeneScoreReader parser = new GeneScoreReader(filename_pval, pvalcolumn,
+              dolog); // makes the probe -> pval map.
       pvals = parser.get_pval(); // array of pvalues.
       probePvalMap = parser.get_map(); // reference to the probe -> pval map.
       groupPvalMap = new HashMap(); // this gets initialized by set_input_pvals
@@ -150,8 +161,7 @@ public class expClassScore {
 
          try {
             Thread.currentThread().sleep(1);
-         }
-         catch (InterruptedException ex) {
+         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
          }
 
@@ -159,12 +169,10 @@ public class expClassScore {
 
       try {
          hist.tocdf(numClasses, classMinSize);
-      }
-      catch (NullPointerException s) {
+      } catch (NullPointerException s) {
          System.err.println("Null pointer Exception");
          s.printStackTrace();
-      }
-      catch (ArrayIndexOutOfBoundsException s) {
+      } catch (ArrayIndexOutOfBoundsException s) {
          System.err.println("ArrayIndexOutOfBoundsException");
          s.printStackTrace();
       }
@@ -215,7 +223,7 @@ public class expClassScore {
     * @return
     */
    public double getPval(String probe) {
-      return ( (Double)this.probePvalMap.get(probe)).doubleValue();
+      return ((Double)this.probePvalMap.get(probe)).doubleValue();
    }
 
    /**  */
@@ -242,7 +250,7 @@ public class expClassScore {
     * for genes that occur more than once in the data set.
     */
    public void setInputPvals(Map groupProbeMap, String gp_method) throws
-       IllegalArgumentException {
+           IllegalArgumentException {
       Collection groupEntries = groupProbeMap.entrySet(); // map of groups -> probes in group
       Iterator groupMapItr = groupEntries.iterator();
       double[] group_pval_temp = new double[groupProbeMap.size()];
@@ -261,10 +269,10 @@ public class expClassScore {
                   group_pval_temp[counter] += Double.parseDouble(pbPval);
                } else if (gp_method.equals("BEST_PVAL")) {
                   group_pval_temp[counter] = Math.max(Double.parseDouble(pbPval),
-                      group_pval_temp[counter]);
+                          group_pval_temp[counter]);
                } else {
                   throw new IllegalArgumentException(
-                      "Illegal selection for groups score method. Valid choices are MEAN_PVAL and BEST_PVAL");
+                          "Illegal selection for groups score method. Valid choices are MEAN_PVAL and BEST_PVAL");
                }
                in_size++;
             }
@@ -374,7 +382,7 @@ public class expClassScore {
    public double get_value_map(String probe_id) {
       double value = 0.0;
       if (probePvalMap.get(probe_id) != null) {
-         value = Double.parseDouble( (probePvalMap.get(probe_id)).toString());
+         value = Double.parseDouble((probePvalMap.get(probe_id)).toString());
       }
       return value;
    }
@@ -382,7 +390,8 @@ public class expClassScore {
    /**
     Basic method to calculate the raw score, given an array of the gene scores for items in the class.
     */
-   public double calc_rawscore(double[] genevalues, int effsize) throws IllegalArgumentException {
+   public double calc_rawscore(double[] genevalues, int effsize) throws
+           IllegalArgumentException {
 
       if (method == MEAN_METHOD) {
          return Stats.mean(genevalues, effsize);
@@ -391,9 +400,11 @@ public class expClassScore {
          if (method == QUANTILE_METHOD) {
             return Stats.calculate_quantile(index, genevalues, effsize);
          } else if (method == MEAN_ABOVE_QUANTILE_METHOD) {
-            return Stats.calculate_mean_above_quantile(index, genevalues, effsize);
+            return Stats.calculate_mean_above_quantile(index, genevalues,
+                    effsize);
          } else {
-            throw new IllegalArgumentException("Illegal raw score calculation method selected");
+            throw new IllegalArgumentException(
+                    "Illegal raw score calculation method selected");
          }
       }
    }

@@ -1,9 +1,13 @@
 package classScore;
 
-import java.text.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Map;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
 
 /**
  * <p>Title: </p>
@@ -27,8 +31,7 @@ public class OutputPanel extends JScrollPane {
          table.getColumnModel().getColumn(0).setPreferredWidth(70);
          table.getColumnModel().getColumn(2).setPreferredWidth(50);
          table.getColumnModel().getColumn(3).setPreferredWidth(50);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
    }
@@ -36,34 +39,31 @@ public class OutputPanel extends JScrollPane {
    // public void addClassDetailsListener(ClassDetailsEventListener listener) {
    //   listenerList.add(ClassDetailsEventListener.class, listener);
    // }
-   public void addInitialClassData(InitialMaps data)
-   {
+   public void addInitialClassData(InitialMaps data) {
       model.addInitialClassData(data);
       table.setModel(model);
       table.revalidate();
    }
 
-   public void addRunData(Map data)
-   {
+   public void addRunData(Map data) {
       model.addRunData(data);
-      table.addColumn(new TableColumn(model.getColumnCount()-3));
-      table.addColumn(new TableColumn(model.getColumnCount()-2));
-      table.addColumn(new TableColumn(model.getColumnCount()-1));
+      table.addColumn(new TableColumn(model.getColumnCount() - 3));
+      table.addColumn(new TableColumn(model.getColumnCount() - 2));
+      table.addColumn(new TableColumn(model.getColumnCount() - 1));
    }
 
 }
 
-class OutputTableModel extends AbstractTableModel
-{
+
+class OutputTableModel extends AbstractTableModel {
    InitialMaps imaps;
-   ArrayList results=new ArrayList();
+   ArrayList results = new ArrayList();
    ArrayList columnNames = new ArrayList();
    private NumberFormat nf = NumberFormat.getInstance();
    int state = -1;
-   int cols_per_run=3;
+   int cols_per_run = 3;
 
-   public OutputTableModel()
-   {
+   public OutputTableModel() {
       nf.setMaximumFractionDigits(8);
       columnNames.add("Name");
       columnNames.add("Description");
@@ -71,14 +71,12 @@ class OutputTableModel extends AbstractTableModel
       columnNames.add("# of Genes");
    }
 
-   public void addInitialClassData(InitialMaps imaps)
-   {
-      state=0;
-      this.imaps=imaps;
+   public void addInitialClassData(InitialMaps imaps) {
+      state = 0;
+      this.imaps = imaps;
    }
 
-   public void addRunData(Map result)
-   {
+   public void addRunData(Map result) {
       state++;
       results.add(result);
       columnNames.add("Run " + state + " Rank");
@@ -86,52 +84,49 @@ class OutputTableModel extends AbstractTableModel
       columnNames.add("Run " + state + " Pval");
    }
 
-   public String getColumnName(int i) { return (String)columnNames.get(i); }
-
-   public int getColumnCount() { return columnNames.size(); }
-
-   public int getRowCount()
-   {
-      if(state==-1)
-         return 20;
-      else
-         return imaps.numClasses();
+   public String getColumnName(int i) {return (String) columnNames.get(i);
    }
 
-   public Object getValueAt(int i, int j)
-   {
-      if(state>=0 && j<4)
-      {
-         String classid = imaps.getClass(i);
-         switch (j)
-         {
-             case 0:
-                return classid;
-             case 1:
-                return imaps.getClassDesc(classid);
-             case 2:
-                return Integer.toString(imaps.numProbes(classid));
-             case 3:
-                return Integer.toString(imaps.numGenes(classid));
-         }
+   public int getColumnCount() {return columnNames.size();
+   }
+
+   public int getRowCount() {
+      if (state == -1) {
+         return 20;
+      } else {
+         return imaps.numClasses();
       }
-      else if(state>0)
-      {
+   }
+
+   public Object getValueAt(int i, int j) {
+      if (state >= 0 && j < 4) {
          String classid = imaps.getClass(i);
-         double runnum=Math.floor((j-4)/cols_per_run);
-         Map data = (Map)results.get((int)runnum);
-         if(data.containsKey(classid))
-         {
-            classresult res = (classresult) data.get(classid);
-            if((j-4)%cols_per_run == 0)
-               return new Integer(res.getRank());
-            else if((j-4)%cols_per_run == 1)
-               return new Double(nf.format(res.getScore()));
-            else
-               return new Double(nf.format(res.getPvalue()));
+         switch (j) {
+         case 0:
+            return classid;
+         case 1:
+            return imaps.getClassDesc(classid);
+         case 2:
+            return Integer.toString(imaps.numProbes(classid));
+         case 3:
+            return Integer.toString(imaps.numGenes(classid));
          }
-         else
+      } else if (state > 0) {
+         String classid = imaps.getClass(i);
+         double runnum = Math.floor((j - 4) / cols_per_run);
+         Map data = (Map) results.get((int) runnum);
+         if (data.containsKey(classid)) {
+            classresult res = (classresult) data.get(classid);
+            if ((j - 4) % cols_per_run == 0) {
+               return new Integer(res.getRank());
+            } else if ((j - 4) % cols_per_run == 1) {
+               return new Double(nf.format(res.getScore()));
+            } else {
+               return new Double(nf.format(res.getPvalue()));
+            }
+         } else {
             return "";
+         }
       }
       return "";
    }

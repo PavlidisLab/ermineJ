@@ -1,12 +1,40 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.border.*;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Properties;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.AbstractTableModel;
 
 /**
  * <p>Title: </p>
@@ -138,16 +166,13 @@ public class AnalysisFrame extends JFrame {
    classScoreFrame callingframe;
    Thread aFrameRunner;
 
-   public AnalysisFrame(classScoreFrame callingframe)
-   {
+   public AnalysisFrame(classScoreFrame callingframe) {
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-      this.callingframe=callingframe;
-      try
-      {
+      this.callingframe = callingframe;
+      try {
          jbInit();
          getClasses();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
    }
@@ -158,8 +183,8 @@ public class AnalysisFrame extends JFrame {
       setResizable(true);
       mainPanel = (JPanel)this.getContentPane();
       mainPanel.setBackground(SystemColor.control);
-      mainPanel.setAlignmentX( (float) 0.5);
-      mainPanel.setAlignmentY( (float) 0.5);
+      mainPanel.setAlignmentX((float) 0.5);
+      mainPanel.setAlignmentY((float) 0.5);
       mainPanel.setMaximumSize(new Dimension(32767, 32767));
       mainPanel.setPreferredSize(new Dimension(550, 350));
 
@@ -172,12 +197,14 @@ public class AnalysisFrame extends JFrame {
       backButton.addActionListener(new AnalysisFrame_backButton_actionAdapter(this));
       backButton.setEnabled(false);
       cancelButton.setText("Cancel");
-      cancelButton.addActionListener(new AnalysisFrame_cancelButton_actionAdapter(this));
-      finishButton.setAlignmentY( (float) 0.5);
+      cancelButton.addActionListener(new
+                                     AnalysisFrame_cancelButton_actionAdapter(this));
+      finishButton.setAlignmentY((float) 0.5);
       finishButton.setText("Finish");
-      finishButton.addActionListener(new AnalysisFrame_finishButton_actionAdapter(this));
+      finishButton.addActionListener(new
+                                     AnalysisFrame_finishButton_actionAdapter(this));
       step4TopPanel.setPreferredSize(new Dimension(410, 170));
-    BottomPanel.add(cancelButton, null);
+      BottomPanel.add(cancelButton, null);
       BottomPanel.add(backButton, null);
       BottomPanel.add(nextButton, null);
       BottomPanel.add(finishButton, null);
@@ -206,7 +233,8 @@ public class AnalysisFrame extends JFrame {
       resampButton.setBackground(SystemColor.control);
       resampButton.setPreferredSize(new Dimension(75, 17));
       resampButton.setBorder(BorderFactory.createLineBorder(Color.black));
-      resampButton.addActionListener(new AnalysisFrame_resampButton_actionAdapter(this));
+      resampButton.addActionListener(new
+                                     AnalysisFrame_resampButton_actionAdapter(this));
       buttonGroup1.add(resampButton);
       jPanel5.add(resampButton, null);
       corrButton.setText("Correlation");
@@ -246,7 +274,8 @@ public class AnalysisFrame extends JFrame {
       rawFile.setRequestFocusEnabled(true);
       rawBrowseButton.setEnabled(true);
       rawBrowseButton.setFocusPainted(true);
-      rawBrowseButton.addActionListener(new AnalysisFrame_rawBrowseButton_actionAdapter(this));
+      rawBrowseButton.addActionListener(new
+                                        AnalysisFrame_rawBrowseButton_actionAdapter(this));
       rawBrowseButton.setText("Browse....");
       jPanel11.add(jLabel3, null);
       jPanel11.add(rawFile, null);
@@ -261,7 +290,8 @@ public class AnalysisFrame extends JFrame {
       scoreFile.setMinimumSize(new Dimension(4, 19));
       scoreBrowseButton.setEnabled(true);
       scoreBrowseButton.setText("Browse....");
-      scoreBrowseButton.addActionListener(new AnalysisFrame_scoreBrowseButton_actionAdapter(this));
+      scoreBrowseButton.addActionListener(new
+                                          AnalysisFrame_scoreBrowseButton_actionAdapter(this));
       jPanel8.add(jLabel2, null);
       jPanel8.add(scoreFile, null);
       jPanel8.add(scoreBrowseButton, null);
@@ -275,13 +305,15 @@ public class AnalysisFrame extends JFrame {
       nameFile.setToolTipText("");
       nameBrowseButton.setEnabled(true);
       nameBrowseButton.setText("Browse....");
-      nameBrowseButton.addActionListener(new AnalysisFrame_nameBrowseButton_actionAdapter(this));
+      nameBrowseButton.addActionListener(new
+                                         AnalysisFrame_nameBrowseButton_actionAdapter(this));
       jPanel7.add(step2NameFile, null);
       jPanel7.add(nameFile, null);
       jPanel7.add(nameBrowseButton, null);
       step2OutputPanel.setPreferredSize(new Dimension(330, 50));
       step2OutputPanel.setBackground(SystemColor.control);
-      outputBrowseButton.addActionListener(new AnalysisFrame_outputBrowseButton_actionAdapter(this));
+      outputBrowseButton.addActionListener(new
+                                           AnalysisFrame_outputBrowseButton_actionAdapter(this));
       outputBrowseButton.setText("Browse....");
       outputBrowseButton.setEnabled(true);
       outputFile.setToolTipText("");
@@ -295,7 +327,8 @@ public class AnalysisFrame extends JFrame {
       step2OutputPanel.add(outputBrowseButton, null);
       probeBrowseButton.setEnabled(true);
       probeBrowseButton.setText("Browse....");
-      probeBrowseButton.addActionListener(new AnalysisFrame_probeBrowseButton_actionAdapter(this));
+      probeBrowseButton.addActionListener(new
+                                          AnalysisFrame_probeBrowseButton_actionAdapter(this));
       step2ProbeLabel.setPreferredSize(new Dimension(320, 15));
       step2ProbeLabel.setText("Probe annotation file:");
       step2ProbePanel.setBackground(SystemColor.control);
@@ -319,7 +352,8 @@ public class AnalysisFrame extends JFrame {
       countLabel.setForeground(Color.black);
       countLabel.setText("Number of Classes: 0");
       customClassTable = new JTable();
-      customClassTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
+      customClassTable.setPreferredScrollableViewportSize(new Dimension(250,
+              150));
       customClassScrollPane = new JScrollPane(customClassTable);
       customClassScrollPane.setMaximumSize(new Dimension(32767, 32767));
       customClassScrollPane.setPreferredSize(new Dimension(250, 150));
@@ -337,7 +371,8 @@ public class AnalysisFrame extends JFrame {
       addButton.addActionListener(new AnalysisFrame_addButton_actionAdapter(this));
       deleteButton.setSelected(false);
       deleteButton.setText("Delete");
-      deleteButton.addActionListener(new AnalysisFrame_delete_actionPerformed_actionAdapter(this));
+      deleteButton.addActionListener(new
+                                     AnalysisFrame_delete_actionPerformed_actionAdapter(this));
       jPanel9.add(addButton, null);
       jPanel9.add(deleteButton, null);
       step3Panel.add(countLabel, null);
@@ -354,7 +389,8 @@ public class AnalysisFrame extends JFrame {
       jLabel11.setLabelFor(jTextFieldMaxClassSize);
       jTextFieldMaxClassSize.setEditable(true);
       jTextFieldMaxClassSize.setPreferredSize(new Dimension(30, 19));
-      jTextFieldMaxClassSize.setToolTipText("Largest class size to be considered");
+      jTextFieldMaxClassSize.setToolTipText(
+              "Largest class size to be considered");
       jTextFieldMaxClassSize.setText("150");
       jTextFieldMaxClassSize.setHorizontalAlignment(SwingConstants.RIGHT);
       jPanel17.add(jLabel11, null);
@@ -367,33 +403,40 @@ public class AnalysisFrame extends JFrame {
       jLabel12.setText("Minimum class size");
       jTextFieldMinClassSize.setEditable(true);
       jTextFieldMinClassSize.setPreferredSize(new Dimension(30, 19));
-      jTextFieldMinClassSize.setToolTipText("Smallest class size to be considered");
+      jTextFieldMinClassSize.setToolTipText(
+              "Smallest class size to be considered");
       jTextFieldMinClassSize.setText("8");
       jTextFieldMinClassSize.setHorizontalAlignment(SwingConstants.RIGHT);
       jPanel16.add(jLabel12, null);
       jPanel16.add(jTextFieldMinClassSize, null);
       step4LeftPanel.add(jPanel17, null);
-      jCheckBoxDoLog.addActionListener(new AnalysisFrame_jCheckBoxDoLog_actionAdapter(this));
+      jCheckBoxDoLog.addActionListener(new
+                                       AnalysisFrame_jCheckBoxDoLog_actionAdapter(this));
       jCheckBoxDoLog.setBackground(SystemColor.control);
-      jCheckBoxDoLog.setToolTipText("If you are using p values, you should check this box.");
+      jCheckBoxDoLog.setToolTipText(
+              "If you are using p values, you should check this box.");
       jCheckBoxDoLog.setSelected(true);
       jCheckBoxDoLog.setText("Log tranform the gene scores");
-      jCheckBoxDoLog.addActionListener(new AnalysisFrame_jCheckBoxDoLog_actionAdapter(this));
+      jCheckBoxDoLog.addActionListener(new
+                                       AnalysisFrame_jCheckBoxDoLog_actionAdapter(this));
       jPanelAnalysisFrameMethods.setBackground(SystemColor.control);
       jPanelAnalysisFrameMethods.setBorder(null);
       jPanelAnalysisFrameMethods.setMinimumSize(new Dimension(150, 37));
       jPanelAnalysisFrameMethods.setPreferredSize(new Dimension(150, 45));
       jLabelAnalysisFrameMethod.setMaximumSize(new Dimension(167, 18));
       jLabelAnalysisFrameMethod.setMinimumSize(new Dimension(167, 18));
-      jLabelAnalysisFrameMethod.setToolTipText("Determines how the gene scores are combined to make a class score.");
+      jLabelAnalysisFrameMethod.setToolTipText(
+              "Determines how the gene scores are combined to make a class score.");
       jLabelAnalysisFrameMethod.setText("Class Raw Score Method");
       jRadioButtonMedian.setText("Median");
-      jRadioButtonMedian.setToolTipText("The score for a class is the median of the score of genes in the " +
-                                        "class.");
+      jRadioButtonMedian.setToolTipText(
+              "The score for a class is the median of the score of genes in the " +
+              "class.");
       jRadioButtonMedian.setBackground(SystemColor.control);
       jRadioButtonMean.setBackground(SystemColor.control);
-      jRadioButtonMean.setToolTipText("The raw score for the class is the mean of the scores for genes in " +
-                                      "the class");
+      jRadioButtonMean.setToolTipText(
+              "The raw score for the class is the mean of the scores for genes in " +
+              "the class");
       jRadioButtonMean.setSelected(true);
       jRadioButtonMean.setText("Mean");
       buttonGroup2.add(jRadioButtonMean);
@@ -403,25 +446,30 @@ public class AnalysisFrame extends JFrame {
       jPanelAnalysisFrameMethods.add(jLabelAnalysisFrameMethod, null);
       jPanelAnalysisFrameMethods.add(jRadioButtonMean, null);
       jPanelAnalysisFrameMethods.add(jRadioButtonMedian, null);
-      jLabelReplicateTreament.setToolTipText("How will replicates of the same gene be treated?");
+      jLabelReplicateTreament.setToolTipText(
+              "How will replicates of the same gene be treated?");
       jLabelReplicateTreament.setText("Gene replicate treatment");
       jPanelReplicateTreaments.setBackground(SystemColor.control);
       jPanelReplicateTreaments.setBorder(null);
       jPanelReplicateTreaments.setPreferredSize(new Dimension(175, 100));
-      jPanelReplicateTreaments.setToolTipText("How will replicates of the same gene be treated?");
+      jPanelReplicateTreaments.setToolTipText(
+              "How will replicates of the same gene be treated?");
       jRadioButtonBestReplicates.setBackground(SystemColor.control);
       jRadioButtonBestReplicates.setPreferredSize(new Dimension(171, 23));
-      jRadioButtonBestReplicates.setToolTipText("If a gene occurs more than once, it is counted only once and the " +
-                                                "score used is that of the highest-scoring occurrence.");
+      jRadioButtonBestReplicates.setToolTipText(
+              "If a gene occurs more than once, it is counted only once and the " +
+              "score used is that of the highest-scoring occurrence.");
       jRadioButtonBestReplicates.setSelected(true);
       jRadioButtonBestReplicates.setText("Use Best scoring replicate");
       jRadioButtonSeparateReplicates.setBackground(SystemColor.control);
-      jRadioButtonSeparateReplicates.setToolTipText("Genes occurring more than once are counted more than once.");
+      jRadioButtonSeparateReplicates.setToolTipText(
+              "Genes occurring more than once are counted more than once.");
       jRadioButtonSeparateReplicates.setText("Count all replicates separately");
       jRadioButtonMeanReplicates.setBackground(SystemColor.control);
       jRadioButtonMeanReplicates.setPreferredSize(new Dimension(171, 23));
-      jRadioButtonMeanReplicates.setToolTipText("If a gene occurs more than once, the gene is only counted once and " +
-                                                "the score is the mean of all occurrences.");
+      jRadioButtonMeanReplicates.setToolTipText(
+              "If a gene occurs more than once, the gene is only counted once and " +
+              "the score is the mean of all occurrences.");
       jRadioButtonMeanReplicates.setSelected(false);
       jRadioButtonMeanReplicates.setText("Use Mean of replicates");
       replicateButtonGroup.add(jRadioButtonBestReplicates);
@@ -447,7 +495,8 @@ public class AnalysisFrame extends JFrame {
       jLabel6.setText("P value threshold");
       jTextFieldPValueThreshold.setEditable(true);
       jTextFieldPValueThreshold.setPreferredSize(new Dimension(50, 19));
-      jTextFieldPValueThreshold.setToolTipText("Score Threshold used for Over-Representation analysis");
+      jTextFieldPValueThreshold.setToolTipText(
+              "Score Threshold used for Over-Representation analysis");
       jTextFieldPValueThreshold.setText("0.001");
       jTextFieldPValueThreshold.setHorizontalAlignment(SwingConstants.RIGHT);
       jPanel15.add(jLabel6, null);
@@ -467,7 +516,8 @@ public class AnalysisFrame extends JFrame {
       jLabel10.setText("Score column");
       jTextFieldScoreCol.setHorizontalAlignment(SwingConstants.RIGHT);
       jTextFieldScoreCol.setText("2");
-      jTextFieldScoreCol.setToolTipText("Column of the gene score file containing the scores");
+      jTextFieldScoreCol.setToolTipText(
+              "Column of the gene score file containing the scores");
       jTextFieldScoreCol.setMaximumSize(new Dimension(2147483647, 2147483647));
       jTextFieldScoreCol.setPreferredSize(new Dimension(30, 19));
       jTextFieldScoreCol.setRequestFocusEnabled(true);
@@ -483,7 +533,8 @@ public class AnalysisFrame extends JFrame {
       jLabel13.setText("Iterations to run");
       jTextFieldIterations.setHorizontalAlignment(SwingConstants.RIGHT);
       jTextFieldIterations.setText("10");
-      jTextFieldIterations.setToolTipText("Number of iterations program will run for.");
+      jTextFieldIterations.setToolTipText(
+              "Number of iterations program will run for.");
       jTextFieldIterations.setPreferredSize(new Dimension(70, 19));
       jTextFieldIterations.setEditable(true);
       jPanel13.add(jLabel13, null);
@@ -524,34 +575,33 @@ public class AnalysisFrame extends JFrame {
       mainPanel.add(step1Panel);
       this.setTitle("Create New Analysis - Step 1 of 4");
       readPrefs();
-      String folder=(String) nameFile.getText();
-      int end=folder.lastIndexOf(File.separatorChar);
-      folder=folder.substring(0,end+1);
+      String folder = (String) nameFile.getText();
+      int end = folder.lastIndexOf(File.separatorChar);
+      folder = folder.substring(0, end + 1);
       chooser.setCurrentDirectory(new File(folder));
    }
 
-   private void readPrefs()
-   {
-      Properties settings=callingframe.settings;
+   private void readPrefs() {
+      Properties settings = callingframe.settings;
       try {
          File fi = new File("AnalysisFrame.prefs");
          if (fi.canRead()) {
             InputStream f = new FileInputStream("AnalysisFrame.prefs");
             settings.load(f);
          }
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
          System.err.println("Could not find preferences file."); // no big deal.
       }
       if (settings.size() > 0) {
-         scoreFile.setText( (String) settings.get("scoreFile"));
-         nameFile.setText( (String) settings.get("nameFile"));
-         outputFile.setText( (String) settings.get("outputFile"));
-         probeFile.setText( (String) settings.get("probeFile"));
-         rawFile.setText( (String) settings.get("rawFile"));
+         scoreFile.setText((String) settings.get("scoreFile"));
+         nameFile.setText((String) settings.get("nameFile"));
+         outputFile.setText((String) settings.get("outputFile"));
+         probeFile.setText((String) settings.get("probeFile"));
+         rawFile.setText((String) settings.get("rawFile"));
          jTextFieldMaxClassSize.setText((String) settings.get("maxClassSize"));
          jTextFieldMinClassSize.setText((String) settings.get("minClassSize"));
-         jCheckBoxDoLog.setSelected(Boolean.valueOf((String)settings.get("doLog")).booleanValue());
+         jCheckBoxDoLog.setSelected(Boolean.valueOf((String) settings.get(
+                 "doLog")).booleanValue());
          jTextFieldPValueThreshold.setText((String) settings.get("pValTheshold"));
          jTextFieldIterations.setText((String) settings.get("iterations"));
          jTextFieldScoreCol.setText((String) settings.get("scorecol"));
@@ -559,7 +609,7 @@ public class AnalysisFrame extends JFrame {
    }
 
    private void writePrefs() {
-      Properties settings=callingframe.settings;
+      Properties settings = callingframe.settings;
       settings.setProperty("scoreFile", scoreFile.getText());
       settings.setProperty("nameFile", nameFile.getText());
       settings.setProperty("outputFile", outputFile.getText());
@@ -574,8 +624,7 @@ public class AnalysisFrame extends JFrame {
       try {
          OutputStream f = new FileOutputStream("AnalysisFrame.prefs");
          settings.store(f, "");
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
          System.err.println("Error writing prefs.");
       }
    }
@@ -587,7 +636,8 @@ public class AnalysisFrame extends JFrame {
             return true;
          } else {
             JOptionPane.showMessageDialog(null,
-                                          "File " + filename + " doesn't exist.  ");
+                                          "File " + filename +
+                                          " doesn't exist.  ");
          }
          return false;
       } else {
@@ -602,36 +652,34 @@ public class AnalysisFrame extends JFrame {
                                     "\n" + e.getStackTrace());
    }
 
-   public void errorPopUp(String msg)
-   {
-      ErrorFrame ef = new ErrorFrame(this,msg);
+   public void errorPopUp(String msg) {
+      ErrorFrame ef = new ErrorFrame(this, msg);
       Dimension efSize = ef.getPreferredSize();
       Dimension frmSize = getSize();
       Point loc = getLocation();
-      ef.setLocation( (frmSize.width - efSize.width) / 2 + loc.x,
-                       (frmSize.height - efSize.height) / 2 + loc.y);
+      ef.setLocation((frmSize.width - efSize.width) / 2 + loc.x,
+                     (frmSize.height - efSize.height) / 2 + loc.y);
       ef.setModal(true);
       ef.pack();
       ef.show();
    }
 
-   void getClasses()
-   {
-      File dir=new File(chooser.getCurrentDirectory().getName()+File.separator+"classes");
-      if(dir.exists())
-      {
+   void getClasses() {
+      File dir = new File(chooser.getCurrentDirectory().getName() +
+                          File.separator + "classes");
+      if (dir.exists()) {
          String[] classFiles = dir.list(new ClassFileFilter("-class.txt"));
-         customClasses=new CustomClassList();
+         customClasses = new CustomClassList();
          ccHash = new HashMap();
          for (int i = 0; i < classFiles.length; i++) {
             File classFile = new File(dir.getPath(), classFiles[i]);
-            HashMap cfi=NewClass.getClassFileInfo(classFile.getAbsolutePath());
+            HashMap cfi = NewClass.getClassFileInfo(classFile.getAbsolutePath());
             customClasses.add(cfi);
-            ccHash.put(cfi.get("id"),cfi);
+            ccHash.put(cfi.get("id"), cfi);
          }
          ccTableModel = customClasses.toTableModel();
          customClassTable.setModel(ccTableModel);
-         addedClasses=new CustomClassList();
+         addedClasses = new CustomClassList();
          acTableModel = addedClasses.toTableModel();
          addedClassTable.setModel(acTableModel);
          acHash = new HashMap();
@@ -712,9 +760,8 @@ public class AnalysisFrame extends JFrame {
       int n = customClassTable.getSelectedRowCount();
       int[] rows = customClassTable.getSelectedRows();
       for (int i = 0; i < n; i++) {
-         String id = (String)customClassTable.getValueAt(rows[i], 0);
-         if(id.compareTo("")!=0)
-         {
+         String id = (String) customClassTable.getValueAt(rows[i], 0);
+         if (id.compareTo("") != 0) {
             HashMap cfi = (HashMap) ccHash.get(id);
             if (!acHash.containsKey(cfi.get("id"))) {
                addedClasses.add(cfi);
@@ -730,10 +777,9 @@ public class AnalysisFrame extends JFrame {
       int n = addedClassTable.getSelectedRowCount();
       int[] rows = addedClassTable.getSelectedRows();
       for (int i = 0; i < n; i++) {
-         String id = (String)addedClassTable.getValueAt(rows[i]-i, 0);
+         String id = (String) addedClassTable.getValueAt(rows[i] - i, 0);
          System.err.println(id);
-         if(id.compareTo("")!=0)
-         {
+         if (id.compareTo("") != 0) {
             HashMap cfi = (HashMap) ccHash.get(id);
             acHash.remove(cfi.get("id"));
             addedClasses.remove(cfi);
@@ -743,9 +789,8 @@ public class AnalysisFrame extends JFrame {
       updateCountLabel();
    }
 
-   void updateCountLabel()
-   {
-      countLabel.setText("Number of Classes: "+addedClasses.size());
+   void updateCountLabel() {
+      countLabel.setText("Number of Classes: " + addedClasses.size());
    }
 
    //step 4 actions/////////////////////////////////////////////////////////////
@@ -767,17 +812,15 @@ public class AnalysisFrame extends JFrame {
          step2Panel.revalidate();
          backButton.setEnabled(true);
          this.repaint();
-      }
-      else if(step == 2)
-      {
-         if(analysisType==2 && rawFile.getText().compareTo("")==0)
+      } else if (step == 2) {
+         if (analysisType == 2 && rawFile.getText().compareTo("") == 0) {
             errorPopUp("Correlation analyses require a raw data file.");
-         else if((analysisType==0 || analysisType==1) && scoreFile.getText().compareTo("")==0)
+         } else if ((analysisType == 0 || analysisType == 1) &&
+                    scoreFile.getText().compareTo("") == 0) {
             errorPopUp("ORA and resampling analyses require a raw data file.");
-         else if(nameFile.getText().compareTo("")==0)
+         } else if (nameFile.getText().compareTo("") == 0) {
             errorPopUp("Gene name files are required.");
-         else
-         {
+         } else {
             step = 3;
             this.getContentPane().remove(step2Panel);
             this.setTitle("Create New Analysis - Step 3 of 4");
@@ -785,20 +828,15 @@ public class AnalysisFrame extends JFrame {
             step3Panel.revalidate();
             this.repaint();
          }
-      }
-      else if(step == 3)
-      {
+      } else if (step == 3) {
          step = 4;
          this.getContentPane().remove(step3Panel);
-         if(analysisType==0)
+         if (analysisType == 0) {
             step4Panel.add(oraPanel, null);
-         else if(analysisType==1)
-         {
+         } else if (analysisType == 1) {
             resampPanel.add(jPanel13, null);
             step4Panel.add(resampPanel, null);
-         }
-         else if(analysisType==2)
-         {
+         } else if (analysisType == 2) {
             corrPanel.add(jPanel13, null);
             step4Panel.add(corrPanel, null);
          }
@@ -811,8 +849,7 @@ public class AnalysisFrame extends JFrame {
    }
 
    void backButton_actionPerformed(ActionEvent e) {
-      if(step == 2)
-      {
+      if (step == 2) {
          step = 1;
          this.getContentPane().remove(step2Panel);
          this.setTitle("Create New Analysis - Step 1 of 4");
@@ -820,28 +857,21 @@ public class AnalysisFrame extends JFrame {
          step1Panel.revalidate();
          backButton.setEnabled(false);
          this.repaint();
-      }
-      else if(step == 3)
-      {
+      } else if (step == 3) {
          step = 2;
          this.getContentPane().remove(step3Panel);
          this.setTitle("Create New Analysis - Step 2 of 4");
          this.getContentPane().add(step2Panel);
          step2Panel.revalidate();
          this.repaint();
-      }
-      else if(step == 4)
-      {
+      } else if (step == 4) {
          step = 3;
-         if(analysisType==0)
+         if (analysisType == 0) {
             step4Panel.remove(oraPanel);
-         else if(analysisType==1)
-         {
+         } else if (analysisType == 1) {
             resampPanel.remove(jPanel13);
             step4Panel.remove(resampPanel);
-         }
-         else if(nameFile.getText().compareTo("")==0)
-         {
+         } else if (nameFile.getText().compareTo("") == 0) {
             corrPanel.remove(jPanel13);
             step4Panel.remove(corrPanel);
          }
@@ -862,11 +892,13 @@ public class AnalysisFrame extends JFrame {
       writePrefs();
 
       class runthread extends Thread {
-         public runthread() {  }
+         public runthread() {}
 
          public void run() {
-            callingframe.analyze(Integer.parseInt(jTextFieldMaxClassSize.getText()),
-                                 Integer.parseInt(jTextFieldMinClassSize.getText()),
+            callingframe.analyze(Integer.parseInt(jTextFieldMaxClassSize.
+                                                  getText()),
+                                 Integer.parseInt(jTextFieldMinClassSize.
+                                                  getText()),
                                  Integer.parseInt(jTextFieldIterations.getText()),
                                  getClassScoreMethod(),
                                  getGroupMethod(),
@@ -876,7 +908,8 @@ public class AnalysisFrame extends JFrame {
                                  probeFile.getText(),
                                  nameFile.getText(),
                                  new classScoreStatus(callingframe.jLabelStatus),
-                                 Double.parseDouble(jTextFieldPValueThreshold.getText()),
+                                 Double.parseDouble(jTextFieldPValueThreshold.
+                    getText()),
                                  Integer.parseInt(jTextFieldScoreCol.getText()),
                                  outputFile.getText());
          }
@@ -924,71 +957,79 @@ public class AnalysisFrame extends JFrame {
    }
 }
 
+
 //classes///////////////////////////////////////////////////////////////////////
-class ClassFileFilter implements FilenameFilter
-{
+class ClassFileFilter implements FilenameFilter {
    private String extension;
-   public ClassFileFilter(String ext) { extension = ext; }
-   public boolean accept(File dir, String name) { return name.endsWith(extension); }
+   public ClassFileFilter(String ext) {extension = ext;
+   }
+
+   public boolean accept(File dir, String name) {return name.endsWith(extension);
+   }
 }
 
-class CustomClassList extends ArrayList
-{
-   public AbstractTableModel toTableModel()
-   {
-      return new AbstractTableModel()
-      {
-         private String[] columnNames = {"ID", "Description", "Members"};
-         public String getColumnName(int i) { return columnNames[i]; }
-         public int getColumnCount() { return columnNames.length; }
 
-         public int getRowCount()
-         {
-            int windowrows=8;
-            int extra=1;
-            if(size()<windowrows)
-               extra=windowrows-size();
+class CustomClassList extends ArrayList {
+   public AbstractTableModel toTableModel() {
+      return new AbstractTableModel() {
+         private String[] columnNames = {"ID", "Description", "Members"};
+         public String getColumnName(int i) {return columnNames[i];
+         }
+
+         public int getColumnCount() {return columnNames.length;
+         }
+
+         public int getRowCount() {
+            int windowrows = 8;
+            int extra = 1;
+            if (size() < windowrows) {
+               extra = windowrows - size();
+            }
             return size() + extra;
          }
 
-         public Object getValueAt(int i, int j)
-         {
+         public Object getValueAt(int i, int j) {
             if (i < size()) {
                HashMap cinfo = (HashMap) get(i);
                switch (j) {
-                  case 0:
-                     return cinfo.get("id");
-                  case 1:
-                     return cinfo.get("desc");
-                  case 2: {
-                     String type = (String) cinfo.get("type");
-                     ArrayList members = (ArrayList) cinfo.get("members");
-                     return (Integer.toString(members.size()) + " " + type + "s");
-                  }
-                  default:
-                     return "";
+               case 0:
+                  return cinfo.get("id");
+               case 1:
+                  return cinfo.get("desc");
+               case 2: {
+                  String type = (String) cinfo.get("type");
+                  ArrayList members = (ArrayList) cinfo.get("members");
+                  return (Integer.toString(members.size()) + " " + type + "s");
                }
-            }
-            else
+               default:
+                  return "";
+               }
+            } else {
                return "";
+            }
          }
       };
    };
 }
 
-//step 1 classes////////////////////////////////////////////////////////////////
-class AnalysisFrame_oraButton_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_oraButton_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.oraButton_actionPerformed(e);
-  }
+//step 1 classes////////////////////////////////////////////////////////////////
+class AnalysisFrame_oraButton_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_oraButton_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.oraButton_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_corrButton_actionAdapter implements java.awt.event.ActionListener {
+
+class AnalysisFrame_corrButton_actionAdapter implements java.awt.event.
+        ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_corrButton_actionAdapter(AnalysisFrame adaptee) {
@@ -1000,8 +1041,9 @@ class AnalysisFrame_corrButton_actionAdapter implements java.awt.event.ActionLis
    }
 }
 
-class AnalysisFrame_resampButton_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class AnalysisFrame_resampButton_actionAdapter implements java.awt.event.
+        ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_resampButton_actionAdapter(AnalysisFrame adaptee) {
@@ -1013,120 +1055,151 @@ class AnalysisFrame_resampButton_actionAdapter
    }
 }
 
+
 //step 2 classes////////////////////////////////////////////////////////////////
-class AnalysisFrame_rawBrowseButton_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
+class AnalysisFrame_rawBrowseButton_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
 
-  AnalysisFrame_rawBrowseButton_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.rawBrowseButton_actionPerformed(e);
-  }
+   AnalysisFrame_rawBrowseButton_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.rawBrowseButton_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_rawFile_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_rawFile_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.rawFile_actionPerformed(e);
-  }
+class AnalysisFrame_rawFile_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_rawFile_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.rawFile_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_scoreBrowseButton_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_scoreBrowseButton_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.scoreBrowseButton_actionPerformed(e);
-  }
+class AnalysisFrame_scoreBrowseButton_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_scoreBrowseButton_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.scoreBrowseButton_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_scoreFile_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_scoreFile_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.scoreFile_actionPerformed(e);
-  }
+class AnalysisFrame_scoreFile_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_scoreFile_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.scoreFile_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_nameFile_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_nameFile_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.nameFile_actionPerformed(e);
-  }
+class AnalysisFrame_nameFile_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_nameFile_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.nameFile_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_nameBrowseButton_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_nameBrowseButton_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.nameBrowseButton_actionPerformed(e);
-  }
+class AnalysisFrame_nameBrowseButton_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_nameBrowseButton_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.nameBrowseButton_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_outputFile_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_outputFile_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.outputFile_actionPerformed(e);
-  }
+class AnalysisFrame_outputFile_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_outputFile_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.outputFile_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_outputBrowseButton_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_outputBrowseButton_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.outputBrowseButton_actionPerformed(e);
-  }
+class AnalysisFrame_outputBrowseButton_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_outputBrowseButton_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.outputBrowseButton_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_probeFile_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_probeFile_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.probeFile_actionPerformed(e);
-  }
+class AnalysisFrame_probeFile_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_probeFile_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.probeFile_actionPerformed(e);
+   }
 }
 
-class AnalysisFrame_probeBrowseButton_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_probeBrowseButton_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.probeBrowseButton_actionPerformed(e);
-  }
+class AnalysisFrame_probeBrowseButton_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_probeBrowseButton_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.probeBrowseButton_actionPerformed(e);
+   }
 }
+
 
 //step 3 classes////////////////////////////////////////////////////////////////
-class AnalysisFrame_delete_actionPerformed_actionAdapter
-    implements java.awt.event.ActionListener {
+class AnalysisFrame_delete_actionPerformed_actionAdapter implements java.awt.
+        event.ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_delete_actionPerformed_actionAdapter(AnalysisFrame adaptee) {
@@ -1138,8 +1211,9 @@ class AnalysisFrame_delete_actionPerformed_actionAdapter
    }
 }
 
-class AnalysisFrame_addButton_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class AnalysisFrame_addButton_actionAdapter implements java.awt.event.
+        ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_addButton_actionAdapter(AnalysisFrame adaptee) {
@@ -1151,21 +1225,25 @@ class AnalysisFrame_addButton_actionAdapter
    }
 }
 
-//setp 4 classes/////////////////////////////////////////////////////////////
-class AnalysisFrame_jCheckBoxDoLog_actionAdapter implements java.awt.event.ActionListener {
-  AnalysisFrame adaptee;
 
-  AnalysisFrame_jCheckBoxDoLog_actionAdapter(AnalysisFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.jCheckBoxDoLog_actionPerformed(e);
-  }
+//setp 4 classes/////////////////////////////////////////////////////////////
+class AnalysisFrame_jCheckBoxDoLog_actionAdapter implements java.awt.event.
+        ActionListener {
+   AnalysisFrame adaptee;
+
+   AnalysisFrame_jCheckBoxDoLog_actionAdapter(AnalysisFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.jCheckBoxDoLog_actionPerformed(e);
+   }
 }
 
+
 //bottom button classes//////////////////////////////////////////////////////
-class AnalysisFrame_nextButton_actionAdapter
-    implements java.awt.event.ActionListener {
+class AnalysisFrame_nextButton_actionAdapter implements java.awt.event.
+        ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_nextButton_actionAdapter(AnalysisFrame adaptee) {
@@ -1177,8 +1255,9 @@ class AnalysisFrame_nextButton_actionAdapter
    }
 }
 
-class AnalysisFrame_backButton_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class AnalysisFrame_backButton_actionAdapter implements java.awt.event.
+        ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_backButton_actionAdapter(AnalysisFrame adaptee) {
@@ -1190,8 +1269,9 @@ class AnalysisFrame_backButton_actionAdapter
    }
 }
 
-class AnalysisFrame_cancelButton_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class AnalysisFrame_cancelButton_actionAdapter implements java.awt.event.
+        ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_cancelButton_actionAdapter(AnalysisFrame adaptee) {
@@ -1203,8 +1283,9 @@ class AnalysisFrame_cancelButton_actionAdapter
    }
 }
 
-class AnalysisFrame_finishButton_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class AnalysisFrame_finishButton_actionAdapter implements java.awt.event.
+        ActionListener {
    AnalysisFrame adaptee;
 
    AnalysisFrame_finishButton_actionAdapter(AnalysisFrame adaptee) {
@@ -1215,4 +1296,3 @@ class AnalysisFrame_finishButton_actionAdapter
       adaptee.finishButton_actionPerformed(e);
    }
 }
-

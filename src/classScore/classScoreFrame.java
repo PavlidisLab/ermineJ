@@ -1,10 +1,40 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Point;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.Properties;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 /**
  * <p>Title: </p>
@@ -13,11 +43,10 @@ import javax.swing.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
-* @todo All input of custom classes, identified either by probe id or official gene name.
+ * @todo All input of custom classes, identified either by probe id or official gene name.
  */
 
-public class classScoreFrame
-    extends JFrame {
+public class classScoreFrame extends JFrame {
 
    JButton jButtonQuit = new JButton();
    ButtonGroup buttonGroup1 = new ButtonGroup();
@@ -53,22 +82,21 @@ public class classScoreFrame
    JMenu analysisMenu = new JMenu();
    JMenuItem runAnalysisMenuItem = new JMenuItem();
    JMenuItem loadAnalysisMenuItem = new JMenuItem();
-  ResultPanel resultpanel;
-  InitialMaps imaps;
-  boolean initialized=false;
-  classScoreStatus statusMessenger;
+   ResultPanel resultpanel;
+   InitialMaps imaps;
+   boolean initialized = false;
+   classScoreStatus statusMessenger;
 
-  String defaultNameFile;
-  String defaultProbeFile;
-  String defaultFolder;
+   String defaultNameFile;
+   String defaultProbeFile;
+   String defaultFolder;
 
-  Properties settings = new Properties();
+   Properties settings = new Properties();
 
    public classScoreFrame() {
       try {
          jbInit();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
    }
@@ -86,11 +114,6 @@ public class classScoreFrame
       jPanelStatus.setPreferredSize(new Dimension(830, 33));
       jPanelStatus.setLayout(flowLayout9);
 
-
-
-
-
-
       jPanel1.setBackground(SystemColor.control);
       jPanel1.setDebugGraphicsOptions(0);
       jPanel1.setMaximumSize(new Dimension(2000, 2000));
@@ -100,75 +123,61 @@ public class classScoreFrame
       jPanel1.setToolTipText("");
       jPanel1.setInputVerifier(null);
       jButtonLoadResults.setToolTipText(
-          "Click to load an existing results file from disk");
+              "Click to load an existing results file from disk");
       jButtonLoadResults.setActionCommand("jButtonLoad");
       jButtonLoadResults.setText("Load Results");
       jButtonLoadResults.addActionListener(new
                                            classScoreFrame_jButtonLoadResults_actionAdapter(this));
-    jTabbedPane1.setBackground(SystemColor.control);
-    jTabbedPane1.setMaximumSize(new Dimension(32767, 32767));
-    jTabbedPane1.setMinimumSize(new Dimension(300, 530));
-    jTabbedPane1.setPreferredSize(new Dimension(830, 330));
-    jPanelMainControls.setBackground(SystemColor.control);
-    jPanelMainControls.setDebugGraphicsOptions(0);
-    jPanelMainControls.setPreferredSize(new Dimension(830, 35));
+      jTabbedPane1.setBackground(SystemColor.control);
+      jTabbedPane1.setMaximumSize(new Dimension(32767, 32767));
+      jTabbedPane1.setMinimumSize(new Dimension(300, 530));
+      jTabbedPane1.setPreferredSize(new Dimension(830, 330));
+      jPanelMainControls.setBackground(SystemColor.control);
+      jPanelMainControls.setDebugGraphicsOptions(0);
+      jPanelMainControls.setPreferredSize(new Dimension(830, 35));
 
+      classMenu.setText("Classes");
+      defineClassMenuItem.setText("Define New Class");
+      defineClassMenuItem.addActionListener(new
+                                            classScoreFrame_defineClassMenuItem_actionAdapter(this));
+      modClassMenuItem.setText("Modify Class");
+      modClassMenuItem.addActionListener(new
+                                         classScoreFrame_modClassMenuItem_actionAdapter(this));
+      loadClassMenuItem.setText("Load Class Information");
+      loadClassMenuItem.addActionListener(new
+                                          classScoreFrame_loadClassMenuItem_actionAdapter(this));
+      runAnalysisMenuItem.setText("Run Analysis");
+      runAnalysisMenuItem.addActionListener(new
+                                            classScoreFrame_runAnalysisMenuItem_actionAdapter(this));
+      analysisMenu.setText("Analysis");
+      loadAnalysisMenuItem.setText("Load Analysis");
+      loadAnalysisMenuItem.addActionListener(new
+                                             classScoreFrame_loadAnalysisMenuItem_actionAdapter(this));
 
+      cPanel = new ClassPanel(this);
+      oPanel = new OutputPanel();
 
-
-
-
-    classMenu.setText("Classes");
-    defineClassMenuItem.setText("Define New Class");
-    defineClassMenuItem.addActionListener(new classScoreFrame_defineClassMenuItem_actionAdapter(this));
-    modClassMenuItem.setText("Modify Class");
-    modClassMenuItem.addActionListener(new classScoreFrame_modClassMenuItem_actionAdapter(this));
-    loadClassMenuItem.setText("Load Class Information");
-    loadClassMenuItem.addActionListener(new classScoreFrame_loadClassMenuItem_actionAdapter(this));
-    runAnalysisMenuItem.setText("Run Analysis");
-    runAnalysisMenuItem.addActionListener(new classScoreFrame_runAnalysisMenuItem_actionAdapter(this));
-    analysisMenu.setText("Analysis");
-    loadAnalysisMenuItem.setText("Load Analysis");
-    loadAnalysisMenuItem.addActionListener(new classScoreFrame_loadAnalysisMenuItem_actionAdapter(this));
-
-    cPanel = new ClassPanel(this);
-    oPanel = new OutputPanel();
-
-    //cPanel.setModel(InitialMaps.toBlankTableModel());
+      //cPanel.setModel(InitialMaps.toBlankTableModel());
 
       jPanelMainControls.add(jButtonQuit, null);
-    jPanelMainControls.add(jButtonLoadResults, null);
-    jPanelMainControls.add(jButtonCancel, null);
-    jPanelMainControls.add(jButtonAbout, null);
-    jPanel1.add(jPanelStatus, BorderLayout.SOUTH);
-    jPanelStatus.add(jLabelStatus, null);
-    jPanel1.add(jPanelMainControls, BorderLayout.CENTER);
-    jPanel1.add(jTabbedPane1, BorderLayout.NORTH);
-    //jTabbedPane1.addTab("cPanel", cPanel);
-    jTabbedPane1.addTab("oPanel", oPanel);
+      jPanelMainControls.add(jButtonLoadResults, null);
+      jPanelMainControls.add(jButtonCancel, null);
+      jPanelMainControls.add(jButtonAbout, null);
+      jPanel1.add(jPanelStatus, BorderLayout.SOUTH);
+      jPanelStatus.add(jLabelStatus, null);
+      jPanel1.add(jPanelMainControls, BorderLayout.CENTER);
+      jPanel1.add(jTabbedPane1, BorderLayout.NORTH);
+      //jTabbedPane1.addTab("cPanel", cPanel);
+      jTabbedPane1.addTab("oPanel", oPanel);
 
-
-
-    jButtonAbout.setToolTipText("Please click here!");
-    jButtonAbout.setText("About the software");
-    jButtonAbout.addActionListener(new
-                                   classScoreFrame_jButtonAbout_actionAdapter(this));
-
-
+      jButtonAbout.setToolTipText("Please click here!");
+      jButtonAbout.setText("About the software");
+      jButtonAbout.addActionListener(new
+                                     classScoreFrame_jButtonAbout_actionAdapter(this));
 
       jButtonQuit.setText("Quit Program");
-      jButtonQuit.addActionListener(new classScoreFrame_jButtonQuit_actionAdapter(this));
-
-
-
-
-
-
-
-
-
-
-
+      jButtonQuit.addActionListener(new
+                                    classScoreFrame_jButtonQuit_actionAdapter(this));
 
       jLabelStatus.setFont(new java.awt.Font("Dialog", 0, 11));
       jLabelStatus.setPreferredSize(new Dimension(500, 19));
@@ -198,126 +207,126 @@ public class classScoreFrame
    /* init */
 
 
-  void jButtonLoad_actionPerformed(ActionEvent e) {
-/*
-      final double oraThresh = Double.parseDouble(jTextFieldPValueThreshold.
-                                                  getText());
-      final String useWeights = getUseWeights();
+   void jButtonLoad_actionPerformed(ActionEvent e) {
+      /*
+       final double oraThresh = Double.parseDouble(jTextFieldPValueThreshold.
+                                                        getText());
+            final String useWeights = getUseWeights();
 
-      boolean ok = true;
-      ok = testfile(jTextFieldGeneScoreFile.getText());
-      ok = ok && testfile(jTextFieldGONames.getText());
-      ok = ok && testfile(jTextFieldProbeAnnot.getText());
+            boolean ok = true;
+            ok = testfile(jTextFieldGeneScoreFile.getText());
+            ok = ok && testfile(jTextFieldGONames.getText());
+            ok = ok && testfile(jTextFieldProbeAnnot.getText());
 
-      if (loadResults) {
-         ok = ok && testfile(jTextFieldOutPutFileName.getText());
-      }
-
-      if (!ok) {
-         return;
-      }
-
-      writePrefs();
-
-      showStatus("Running");
-
-      classScoreStatus m = new classScoreStatus(jLabelStatus);
-
-      class runthread
-          extends Thread {
-         classScoreStatus m;
-
-         public runthread(classScoreStatus m) {
-            this.m = m;
-         }
-
-         public void run() {
-            try {
-               populate_class_list(m);
-               classPvalRun results = new classPvalRun(imaps,
-                   jTextFieldOutPutFileName.getText(),
-                   oraThresh,
-                   useWeights,
-                   "bh", m, loadResults);
-
-               ResultPanel r = new ResultPanel(results);
-               //r.setTitle(jTextFieldOutPutFileName.getText());
-               //        r.addClassDetailsListener(class_details_action_listener);
-               r.setModel(results.toTableModel());
-               //r.show();
-               //jTabbedPane1.addTab(jTextFieldOutPutFileName.getText(),r);
-               runnum++;
-               jTabbedPane1.addTab("Run " + Integer.toString(runnum),runAnalysisMenuItem);
-               cPanel.setModel(imaps.toTableModel());
+            if (loadResults) {
+               ok = ok && testfile(jTextFieldOutPutFileName.getText());
             }
-            catch (IllegalArgumentException e) {
-               error(e, "During class score calculation");
-            }
-            catch (IOException e) {
-               error(e, "File reading or writing");
-            }
-            showStatus("Done");
-            done = true;
-            loadResults = false;
-         }
-      };
 
-      runner = new runthread(m);
-      runner.start();
-*/
+            if (!ok) {
+               return;
+            }
+
+            writePrefs();
+
+            showStatus("Running");
+
+            classScoreStatus m = new classScoreStatus(jLabelStatus);
+
+            class runthread
+                extends Thread {
+               classScoreStatus m;
+
+               public runthread(classScoreStatus m) {
+                  this.m = m;
+               }
+
+               public void run() {
+                  try {
+                     populate_class_list(m);
+                     classPvalRun results = new classPvalRun(imaps,
+                         jTextFieldOutPutFileName.getText(),
+                         oraThresh,
+                         useWeights,
+                         "bh", m, loadResults);
+
+                     ResultPanel r = new ResultPanel(results);
+                     //r.setTitle(jTextFieldOutPutFileName.getText());
+                     //        r.addClassDetailsListener(class_details_action_listener);
+                     r.setModel(results.toTableModel());
+                     //r.show();
+                     //jTabbedPane1.addTab(jTextFieldOutPutFileName.getText(),r);
+                     runnum++;
+       jTabbedPane1.addTab("Run " + Integer.toString(runnum),runAnalysisMenuItem);
+                     cPanel.setModel(imaps.toTableModel());
+                  }
+                  catch (IllegalArgumentException e) {
+                     error(e, "During class score calculation");
+                  }
+                  catch (IOException e) {
+                     error(e, "File reading or writing");
+                  }
+                  showStatus("Done");
+                  done = true;
+                  loadResults = false;
+               }
+            };
+
+            runner = new runthread(m);
+            runner.start();
+       */
    }
 
-   void initialize()
-   {
-      try
-      {
+   void initialize() {
+      try {
          imaps = new InitialMaps(
-             defaultProbeFile,
-             defaultNameFile,
-             statusMessenger);
-      }
-      catch (IllegalArgumentException e) {
+                 defaultProbeFile,
+                 defaultNameFile,
+                 statusMessenger);
+      } catch (IllegalArgumentException e) {
          error(e, "During class score calculation");
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
          error(e, "File reading or writing");
       }
       //cPanel.setModel(imaps.toTableModel());
       oPanel.addInitialClassData(imaps);
-      initialized=true;
+      initialized = true;
    }
 
    public void analyze(int maxClassSize, int minClassSize, int numIter,
-                       String classScoreMethod, String groupMethod, String useWeights, String takeLog,
-                       String geneScoreFile, String probeAnnotFile, String goNameFile,
-                       classScoreStatus messenger, double oraThresh, int scoreCol, String outputfile)
-   {
-      try
-      {
-         if(!initialized)
+                       String classScoreMethod, String groupMethod,
+                       String useWeights, String takeLog,
+                       String geneScoreFile, String probeAnnotFile,
+                       String goNameFile,
+                       classScoreStatus messenger, double oraThresh,
+                       int scoreCol, String outputfile) {
+      try {
+         if (!initialized) {
             initialize();
-         InitialMaps runmaps = new InitialMaps(geneScoreFile, probeAnnotFile, goNameFile,
+         }
+         InitialMaps runmaps = new InitialMaps(geneScoreFile, probeAnnotFile,
+                                               goNameFile,
                                                classScoreMethod, groupMethod,
-                                               maxClassSize, minClassSize, numIter, 50,
-                                               useWeights, scoreCol, takeLog, messenger);
+                                               maxClassSize, minClassSize,
+                                               numIter, 50,
+                                               useWeights, scoreCol, takeLog,
+                                               messenger);
 
          //cPanel.setModel(imaps.toTableModel());
          System.err.println("DONE with RUNMAPS");
          classPvalRun results = new classPvalRun(runmaps, outputfile, oraThresh,
-                                                 useWeights, "bh", messenger, loadResults);
+                                                 useWeights, "bh", messenger,
+                                                 loadResults);
 
          System.err.println("DONE with CLASSPVALRUN");
 
          resultpanel = new ResultPanel(results, settings);
          resultpanel.setModel(results.toTableModel());
          runnum++;
-         jTabbedPane1.addTab("Run " + Integer.toString(runnum),resultpanel);
+         jTabbedPane1.addTab("Run " + Integer.toString(runnum), resultpanel);
          oPanel.addRunData(results.getResults());
-      }
-      catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException e) {
          error(e, "During class score calculation");
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
          error(e, "File reading or writing");
       }
    }
@@ -334,8 +343,7 @@ public class classScoreFrame
       }
       try {
          Thread.sleep(200);
-      }
-      catch (InterruptedException ex) {
+      } catch (InterruptedException ex) {
          Thread.currentThread().interrupt();
       }
       showStatus("Ready");
@@ -385,7 +393,7 @@ public class classScoreFrame
     * @param inFilename
     * @return
     */
-   public Vector  Reader(String inFilename) {
+   public Vector Reader(String inFilename) {
       File file = new File(inFilename);
 
       showStatus("Reading " + inFilename);
@@ -403,8 +411,7 @@ public class classScoreFrame
                //         System.err.println(line);
             }
             dis.close();
-         }
-         catch (IOException e) {
+         } catch (IOException e) {
             // catch possible io errors from readLine()
             error(e, "Reading preferences.");
          }
@@ -442,8 +449,7 @@ public class classScoreFrame
          showStatus("Writing preferences to " + outFilename);
          out.write(names + "\n");
          out.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
          error(e, "Writing preferences");
       }
       clearStatus();
@@ -461,8 +467,7 @@ public class classScoreFrame
       File outFile = new File(in);
       try {
          return outFile.getCanonicalPath();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          error(e, "Getting path for preferences file");
          return null;
       }
@@ -477,13 +482,12 @@ public class classScoreFrame
       Dimension dlgSize = dlg.getPreferredSize();
       Dimension frmSize = getSize();
       Point loc = getLocation();
-      dlg.setLocation( (frmSize.width - dlgSize.width) / 2 + loc.x,
+      dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
                       (frmSize.height - dlgSize.height) / 2 + loc.y);
       dlg.setModal(true);
       dlg.pack();
       dlg.show();
    }
-
 
 
    /**
@@ -507,7 +511,8 @@ public class classScoreFrame
             return true;
          } else {
             JOptionPane.showMessageDialog(null,
-                                          "File " + filename + " doesn't exist.  ");
+                                          "File " + filename +
+                                          " doesn't exist.  ");
          }
          return false;
       } else {
@@ -517,13 +522,11 @@ public class classScoreFrame
    }
 
 
-
    private void writePrefs(Properties s, String filename) {
       try {
          OutputStream f = new FileOutputStream(filename);
          s.store(f, "");
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
          System.err.println("Error writing prefs.");
       }
    }
@@ -532,8 +535,7 @@ public class classScoreFrame
    /**
     *
     */
-   private void readPrefs()
-   {
+   private void readPrefs() {
       Properties settings = new Properties();
       try {
          File fi = new File("classScore.prefs");
@@ -541,83 +543,82 @@ public class classScoreFrame
             InputStream f = new FileInputStream("classScore.prefs");
             settings.load(f);
          }
-      }
-      catch (IOException ex) {
+      } catch (IOException ex) {
          System.err.println("Could not find preferences file."); // no big deal.
       }
 
       if (settings.size() > 0) {
          defaultNameFile = (String) settings.get("GOnameFile");
          defaultProbeFile = (String) settings.get("annotFile");
-         int end=defaultNameFile.lastIndexOf(File.separatorChar);
-         defaultFolder=defaultNameFile.substring(0,end+1);
-/*
-         jTextFieldGeneScoreFile.setText( (String) settings.get("scoreFile"));
-         jTextFieldOutPutFileName.setText( (String) settings.get("outputFile"));
-         this.jTextFieldMaxClassSize.setText( (String) settings.get("maxClassSize"));
-         this.jTextFieldMinClassSize.setText( (String) settings.get("minClassSize"));
-         this.jTextFieldScoreCol.setText( (String) settings.get("scoreColumn"));
-         this.jTextFieldPValueThreshold.setText( (String) settings.get("pvalueThreshold"));
-*/
+         int end = defaultNameFile.lastIndexOf(File.separatorChar);
+         defaultFolder = defaultNameFile.substring(0, end + 1);
+         /*
+          jTextFieldGeneScoreFile.setText( (String) settings.get("scoreFile"));
+          jTextFieldOutPutFileName.setText( (String) settings.get("outputFile"));
+          this.jTextFieldMaxClassSize.setText( (String) settings.get("maxClassSize"));
+          this.jTextFieldMinClassSize.setText( (String) settings.get("minClassSize"));
+          this.jTextFieldScoreCol.setText( (String) settings.get("scoreColumn"));
+                  this.jTextFieldPValueThreshold.setText( (String) settings.get("pvalueThreshold"));
+          */
       }
    }
 
-  void defineClassMenuItem_actionPerformed(ActionEvent e) {
-     makeModClassFrame(true,"");
-  }
+   void defineClassMenuItem_actionPerformed(ActionEvent e) {
+      makeModClassFrame(true, "");
+   }
 
-  void modClassMenuItem_actionPerformed(ActionEvent e) {
-     makeModClassFrame(false,"");
-  }
+   void modClassMenuItem_actionPerformed(ActionEvent e) {
+      makeModClassFrame(false, "");
+   }
 
-  public void makeModClassFrame(boolean makenew, String classid)
-  {
-     if(!initialized)
-        initialize();
-     modClassFrame modframe = new modClassFrame(makenew,imaps,this.cPanel,defaultFolder,classid);
-     showWizard(modframe);
-  }
+   public void makeModClassFrame(boolean makenew, String classid) {
+      if (!initialized) {
+         initialize();
+      }
+      modClassFrame modframe = new modClassFrame(makenew, imaps, this.cPanel,
+                                                 defaultFolder, classid);
+      showWizard(modframe);
+   }
 
-  void loadClassMenuItem_actionPerformed(ActionEvent e) {
-     showStatus("Loading");
-     class runthread extends Thread
-     {
-        public runthread() { }
-        public void run()
-        {
-           initialize();
-           showStatus("Loaded");
-        }
-     };
-     runner = new runthread();
-     runner.start();
-  }
+   void loadClassMenuItem_actionPerformed(ActionEvent e) {
+      showStatus("Loading");
+      class runthread extends Thread {
+         public runthread() {}
 
-  void runAnalysisMenuItem_actionPerformed(ActionEvent e) {
-     AnalysisFrame aframe = new AnalysisFrame(this);
-     showWizard(aframe);
-  }
+         public void run() {
+            initialize();
+            showStatus("Loaded");
+         }
+      };
+      runner = new runthread();
+      runner.start();
+   }
 
-  void loadAnalysisMenuItem_actionPerformed(ActionEvent e) {
-     //oPanel.addColumn("new col");
-  }
+   void runAnalysisMenuItem_actionPerformed(ActionEvent e) {
+      AnalysisFrame aframe = new AnalysisFrame(this);
+      showWizard(aframe);
+   }
 
-  void showWizard(JFrame j)
-  {
-     Dimension dlgSize = j.getPreferredSize();
-     Dimension frmSize = getSize();
-     Point loc = getLocation();
-     j.setLocation( (frmSize.width - dlgSize.width) / 2 + loc.x,
-                      (frmSize.height - dlgSize.height) / 2 + loc.y);
-     j.pack();
-     j.show();
-  }
+   void loadAnalysisMenuItem_actionPerformed(ActionEvent e) {
+      //oPanel.addColumn("new col");
+   }
+
+   void showWizard(JFrame j) {
+      Dimension dlgSize = j.getPreferredSize();
+      Dimension frmSize = getSize();
+      Point loc = getLocation();
+      j.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
+                    (frmSize.height - dlgSize.height) / 2 + loc.y);
+      j.pack();
+      j.show();
+   }
 }
+
 
 /* end class */
 
-class classScoreFrame_jButtonQuit_actionAdapter
-    implements java.awt.event.ActionListener {
+class classScoreFrame_jButtonQuit_actionAdapter implements java.awt.event.
+        ActionListener {
    classScoreFrame adaptee;
 
    classScoreFrame_jButtonQuit_actionAdapter(classScoreFrame adaptee) {
@@ -629,8 +630,9 @@ class classScoreFrame_jButtonQuit_actionAdapter
    }
 }
 
-class classScoreFrame_jButtonAbout_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class classScoreFrame_jButtonAbout_actionAdapter implements java.awt.event.
+        ActionListener {
    classScoreFrame adaptee;
 
    classScoreFrame_jButtonAbout_actionAdapter(classScoreFrame adaptee) {
@@ -642,8 +644,9 @@ class classScoreFrame_jButtonAbout_actionAdapter
    }
 }
 
-class classScoreFrame_jButtonCancel_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class classScoreFrame_jButtonCancel_actionAdapter implements java.awt.event.
+        ActionListener {
    classScoreFrame adaptee;
 
    classScoreFrame_jButtonCancel_actionAdapter(classScoreFrame adaptee) {
@@ -655,8 +658,9 @@ class classScoreFrame_jButtonCancel_actionAdapter
    }
 }
 
-class classScoreFrame_jButtonLoadResults_actionAdapter
-    implements java.awt.event.ActionListener {
+
+class classScoreFrame_jButtonLoadResults_actionAdapter implements java.awt.
+        event.ActionListener {
    classScoreFrame adaptee;
 
    classScoreFrame_jButtonLoadResults_actionAdapter(classScoreFrame adaptee) {
@@ -668,57 +672,72 @@ class classScoreFrame_jButtonLoadResults_actionAdapter
    }
 }
 
-class classScoreFrame_defineClassMenuItem_actionAdapter implements java.awt.event.ActionListener {
-  classScoreFrame adaptee;
 
-  classScoreFrame_defineClassMenuItem_actionAdapter(classScoreFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.defineClassMenuItem_actionPerformed(e);
-  }
+class classScoreFrame_defineClassMenuItem_actionAdapter implements java.awt.
+        event.ActionListener {
+   classScoreFrame adaptee;
+
+   classScoreFrame_defineClassMenuItem_actionAdapter(classScoreFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.defineClassMenuItem_actionPerformed(e);
+   }
 }
 
-class classScoreFrame_modClassMenuItem_actionAdapter implements java.awt.event.ActionListener {
-  classScoreFrame adaptee;
 
-  classScoreFrame_modClassMenuItem_actionAdapter(classScoreFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.modClassMenuItem_actionPerformed(e);
-  }
+class classScoreFrame_modClassMenuItem_actionAdapter implements java.awt.event.
+        ActionListener {
+   classScoreFrame adaptee;
+
+   classScoreFrame_modClassMenuItem_actionAdapter(classScoreFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.modClassMenuItem_actionPerformed(e);
+   }
 }
 
-class classScoreFrame_loadClassMenuItem_actionAdapter implements java.awt.event.ActionListener {
-  classScoreFrame adaptee;
 
-  classScoreFrame_loadClassMenuItem_actionAdapter(classScoreFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.loadClassMenuItem_actionPerformed(e);
-  }
+class classScoreFrame_loadClassMenuItem_actionAdapter implements java.awt.event.
+        ActionListener {
+   classScoreFrame adaptee;
+
+   classScoreFrame_loadClassMenuItem_actionAdapter(classScoreFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.loadClassMenuItem_actionPerformed(e);
+   }
 }
 
-class classScoreFrame_runAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
-  classScoreFrame adaptee;
 
-  classScoreFrame_runAnalysisMenuItem_actionAdapter(classScoreFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.runAnalysisMenuItem_actionPerformed(e);
-  }
+class classScoreFrame_runAnalysisMenuItem_actionAdapter implements java.awt.
+        event.ActionListener {
+   classScoreFrame adaptee;
+
+   classScoreFrame_runAnalysisMenuItem_actionAdapter(classScoreFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.runAnalysisMenuItem_actionPerformed(e);
+   }
 }
 
-class classScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
-  classScoreFrame adaptee;
 
-  classScoreFrame_loadAnalysisMenuItem_actionAdapter(classScoreFrame adaptee) {
-    this.adaptee = adaptee;
-  }
-  public void actionPerformed(ActionEvent e) {
-    adaptee.loadAnalysisMenuItem_actionPerformed(e);
-  }
+class classScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.
+        event.ActionListener {
+   classScoreFrame adaptee;
+
+   classScoreFrame_loadAnalysisMenuItem_actionAdapter(classScoreFrame adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.loadAnalysisMenuItem_actionPerformed(e);
+   }
 }

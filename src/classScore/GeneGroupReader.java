@@ -1,6 +1,11 @@
 package classScore;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
   Description:Parses the file of the form:
@@ -90,7 +95,7 @@ public class GeneGroupReader {
          if (group_probe_list.get(group) == null) {
             group_probe_list.put(group, new ArrayList());
          }
-         ( (ArrayList) group_probe_list.get(group)).add(currprobe);
+         ((ArrayList) group_probe_list.get(group)).add(currprobe);
       }
    }
 

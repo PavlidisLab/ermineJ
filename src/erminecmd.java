@@ -1,6 +1,9 @@
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-import classScore.*;
+import classScore.InitialMaps;
+import classScore.classPvalRun;
+import classScore.classScoreStatus;
 
 /**
  Command line interface for ermineJ program.
@@ -31,68 +34,65 @@ import classScore.*;
 
 public class erminecmd {
 
-  public static void main(String args[]) {
+   public static void main(String args[]) {
 
-    try {
+      try {
 
-      String pbPvalFile = args[0];
-      String affyGoFile = args[1];
-      String goNameFile = args[2];
-      String destinFile = args[3];
-      pbPvalFile = getCanonical(pbPvalFile);
-      affyGoFile = getCanonical(affyGoFile);
-      destinFile = getCanonical(destinFile);
-      goNameFile = getCanonical(goNameFile);
-      classScoreStatus m = new classScoreStatus(null);
-      System.err.println("P values from " + pbPvalFile);
-      System.err.println("Probe annotations from " + affyGoFile);
-      System.err.println("Output into " + destinFile);
+         String pbPvalFile = args[0];
+         String affyGoFile = args[1];
+         String goNameFile = args[2];
+         String destinFile = args[3];
+         pbPvalFile = getCanonical(pbPvalFile);
+         affyGoFile = getCanonical(affyGoFile);
+         destinFile = getCanonical(destinFile);
+         goNameFile = getCanonical(goNameFile);
+         classScoreStatus m = new classScoreStatus(null);
+         System.err.println("P values from " + pbPvalFile);
+         System.err.println("Probe annotations from " + affyGoFile);
+         System.err.println("Output into " + destinFile);
 
-      SetupMaps smaps = new SetupMaps(pbPvalFile, affyGoFile, goNameFile, // files
-                                      args[4],args[5], // methods
-                                      Integer.parseInt(args[6]), // max clas
-                                      Integer.parseInt(args[7]), // min class
-                                      Integer.parseInt(args[8]), // numruns
-                                      Integer.parseInt(args[9]), // quantile
-                                      args[11], // use weights
-                                      Integer.parseInt(args[12]), // column
-                                      args[13], // takeLog
-                                      m);
+         InitialMaps smaps = new InitialMaps(pbPvalFile, affyGoFile, goNameFile, // files
+                                             args[4], args[5], // methods
+                                             Integer.parseInt(args[6]), // max clas
+                                             Integer.parseInt(args[7]), // min class
+                                             Integer.parseInt(args[8]), // numruns
+                                             Integer.parseInt(args[9]), // quantile
+                                             args[11], // use weights
+                                             Integer.parseInt(args[12]), // column
+                                             args[13], // takeLog
+                                             m);
 
-       classPvalRun test = new classPvalRun(smaps.goName,
-                                            smaps.probePvalMapper,
-                                            smaps.geneData,
-                                            smaps.probeGroups,
-                                            smaps.classToProbe,
-                                            destinFile,                   // output file
-                                            Double.parseDouble(args[10]), // pvalue
-                                            args[11],                     // use weights
-                                            args[14],                     // mtc method
-                                            m, false);
-    }
-    catch (ArrayIndexOutOfBoundsException exception) { // this doesn't work ...
-      System.err.println("You must enter 15 command line arguments: \nprobe_pvalfile\nannot file\ngo_namefile\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog\nmultiple test correction method (bon|bh|wy)");
-    }
-    catch (IOException e) {
-      System.err.println("File reading/writing error");
-      e.printStackTrace();
-    }
+         classPvalRun test = new classPvalRun(smaps.goName,
+                                              smaps.probePvalMapper,
+                                              smaps.geneData,
+                                              smaps.probeGroups,
+                                              smaps.classToProbe,
+                                              destinFile, // output file
+                                              Double.parseDouble(args[10]), // pvalue
+                                              args[11], // use weights
+                                              args[14], // mtc method
+                                              m, false);
+      } catch (ArrayIndexOutOfBoundsException exception) { // this doesn't work ...
+         System.err.println("You must enter 15 command line arguments: \nprobe_pvalfile\nannot file\ngo_namefile\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog\nmultiple test correction method (bon|bh|wy)");
+      } catch (IOException e) {
+         System.err.println("File reading/writing error");
+         e.printStackTrace();
+      }
 
-  }
+   }
 
-  protected static String getCanonical(String in) {
+   protected static String getCanonical(String in) {
 
-    if (in == null || in.length() == 0) {
-      return in;
-    }
+      if (in == null || in.length() == 0) {
+         return in;
+      }
 
-    File outFile = new File(in);
-    try {
-      return outFile.getCanonicalPath();
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
+      File outFile = new File(in);
+      try {
+         return outFile.getCanonicalPath();
+      } catch (Exception e) {
+         e.printStackTrace();
+         return null;
+      }
+   }
 }

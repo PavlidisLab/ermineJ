@@ -1,7 +1,9 @@
 package classScore;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import javax.swing.UIManager;
 
 /**
  * <p>Title: </p>
@@ -10,8 +12,8 @@ import javax.swing.*;
  * <p>Company: </p>
  * @author not attributable
  * @version 1.0
-* @todo Allow the user to input the data
-* @todo use a Properties instance instead of our own configuration format
+ * @todo Allow the user to input the data
+ * @todo use a Properties instance instead of our own configuration format
  */
 
 public class classScoreGUI {
@@ -37,7 +39,7 @@ public class classScoreGUI {
       if (frameSize.width > screenSize.width) {
          frameSize.width = screenSize.width;
       }
-      frame.setLocation( (screenSize.width - frameSize.width) / 2,
+      frame.setLocation((screenSize.width - frameSize.width) / 2,
                         (screenSize.height - frameSize.height) / 2);
       frame.setVisible(true);
    }
@@ -45,8 +47,7 @@ public class classScoreGUI {
    public static void main(String[] args) {
       try {
          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
       classScoreGUI classScoreGUI1 = new classScoreGUI();

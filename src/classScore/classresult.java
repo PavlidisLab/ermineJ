@@ -1,8 +1,9 @@
 package classScore;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
 
 /**
   Data structure to store class scoring information about
@@ -12,8 +13,7 @@ import java.util.*;
   @version $Id$
 
  */
-public class classresult
-    implements Comparable {
+public class classresult implements Comparable {
    private String class_id = null;
    private String class_name = null;
    private double pvalue = 1.0;
@@ -69,7 +69,8 @@ public class classresult
       this.print(out, "");
    }
 
-   public void print(BufferedWriter out, String extracolumns) throws IOException {
+   public void print(BufferedWriter out, String extracolumns) throws
+           IOException {
 
       String fixnamea;
       String cleanname;
@@ -80,7 +81,8 @@ public class classresult
          cleanname = "";
       }
       out.write(cleanname + "_" +
-                class_id + "" + "\t" + class_name + "\t" + class_id + "\t" + size + "\t" +
+                class_id + "" + "\t" + class_name + "\t" + class_id + "\t" +
+                size + "\t" +
                 effective_size + "\t" +
                 nf.format(score) + "\t" + nf.format(pvalue) + "\t"
                 + hypercut + "\t" + nf.format(hyperpval) + "\t" +
@@ -92,12 +94,15 @@ public class classresult
       this.print_headings(out, "");
    }
 
-   public void print_headings(BufferedWriter out, String extracolumns) throws IOException {
-      out.write("Class" + "\tClass Name" + "\tClass ID" + "\tsize" + "\teffective_size" +
+   public void print_headings(BufferedWriter out, String extracolumns) throws
+           IOException {
+      out.write("Class" + "\tClass Name" + "\tClass ID" + "\tsize" +
+                "\teffective_size" +
                 "\traw score" +
                 "\tresamp pval" +
                 "\tN over pval cut\tORA pval"
-                /* + "\tAROC" + "\tAROCpval"  */ +
+                /* + "\tAROC" + "\tAROCpval"  */
+                +
                 "\tCorrected_pvalue" + extracolumns + "\n");
    }
 
@@ -176,20 +181,22 @@ public class classresult
    }
 
    public void setRank(int n) {
-      rank=n;
+      rank = n;
    }
 
    /**
     *
-    * @return
+    * @return int
     */
    public int getSize() {
       return size;
    }
 
    /**
-        Default comparator for this class: sorts by the pvalue.
-
+    * Default comparator for this class: sorts by the pvalue.
+    *
+    * @param ob Object
+    * @return int
     */
    public int compareTo(Object ob) {
       classresult other = (classresult) ob;

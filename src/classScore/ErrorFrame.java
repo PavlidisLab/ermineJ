@@ -1,8 +1,19 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 /**
  * <p>Title: </p>
@@ -13,25 +24,22 @@ import javax.swing.*;
  * @version 1.0
  */
 
-public class ErrorFrame
-    extends JDialog
-    implements ActionListener {
+public class ErrorFrame extends JDialog implements ActionListener {
 
    JPanel panel1 = new JPanel();
    JPanel insetsPanel1 = new JPanel();
    JButton button1 = new JButton();
    JLabel label1 = new JLabel();
-  // String error = "Class Scoring Software";
+   // String error = "Class Scoring Software";
    BorderLayout borderLayout1 = new BorderLayout();
 
-   public ErrorFrame(Frame parent,String error) {
+   public ErrorFrame(Frame parent, String error) {
       super(parent);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       try {
          jbInit(error);
 //jbInit();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
          e.printStackTrace();
       }
    }
