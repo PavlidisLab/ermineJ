@@ -397,12 +397,13 @@ public class JGeneSetFrame extends JFrame {
                         + "and that it is a valid raw data file (tab-delimited).\n" );
          }
       }  
+      /*
       //if ( matrix.rows() == 0 ) { 
       if ( matrix == null ) {//added (use row above)
          GuiUtil
                .error( "None of the probes in this gene set were found in your data file." );
       }
-
+      */
       //if ( matrix.rows() != probesInGeneSet.size() ) {
       if ( matrix == null ) {//added (use row above)
          System.err
