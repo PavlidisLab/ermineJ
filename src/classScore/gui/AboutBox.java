@@ -6,13 +6,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -85,7 +82,7 @@ public class AboutBox extends JDialog implements ActionListener {
       imageLabel.setIcon( new ImageIcon( GeneSetScoreFrame.class
             .getResource( "resources/logo1small.gif" ) ) );
     //  label1.setText( SOFTWARENAME );
-      label2.setText( VERSION );
+      label2.setText( "Version " + VERSION );
       label3.setText( COPYRIGHT );
       labelAuthors.setText( "Authors: Paul Pavlidis, Homin Lee "
             + "and Will Braynen." );

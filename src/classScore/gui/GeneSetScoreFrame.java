@@ -9,11 +9,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -84,8 +86,10 @@ public class GeneSetScoreFrame
    private Map rawDataSets;
    private Map geneScoreSets;
 
+   private JLabel logoLabel;
+   
    private AnalysisThread athread=new AnalysisThread();
-
+   
    public GeneSetScoreFrame() {
       try {
          jbInit();
@@ -182,19 +186,28 @@ public class GeneSetScoreFrame
       jMenuBar1.add( helpMenu );
 
       //initialization panel (replaced by main panel when done)
+      logoLabel = new JLabel();
+      logoLabel.setIcon( new ImageIcon( GeneSetScoreFrame.class
+            .getResource( "resources/logo1small.gif" ) ) );
+      
       progressPanel = new JPanel();
-      progressPanel.setPreferredSize( new Dimension( 830, 330 ) );
-      GridBagLayout gridBagLayout1 = new GridBagLayout();
-      progressPanel.setLayout(gridBagLayout1);
-      progInPanel.setPreferredSize(new Dimension(350, 100));
+//      progressPanel.setPreferredSize( new Dimension( 830, 330 ) );
+      // todo make the icon and text. centered.
+      progressPanel.setLayout(new GridLayout(3, 1));
+      
+   //   progInPanel.setPreferredSize(new Dimension(350, 100));
       JLabel label= new JLabel("Please wait while the files are loaded in.");
       label.setPreferredSize(new Dimension(195, 30));
+      label.setHorizontalTextPosition(JLabel.CENTER);
+      label.setLabelFor(progressBar);
+      
       progressBar.setPreferredSize(new Dimension(300, 16));
-      progressBar.setIndeterminate(true);
-      progInPanel.add(label, null);
+      progressBar.setIndeterminate(false);
+      
+      progressPanel.add(logoLabel);
+      progressPanel.add(label, null);
       progInPanel.add(progressBar, null);
-      progressPanel.add(progInPanel,     new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
-          ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(114, 268, 87, 268), 0, 0));
+      progressPanel.add(progInPanel);
 
       //main panel
       oPanel = new OutputPanel( this, results );
@@ -208,15 +221,13 @@ public class GeneSetScoreFrame
       jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
       jLabelStatus.setPreferredSize(new Dimension(800, 19) );
       jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
-      jLabelStatus.setText( "Status" );
       jPanelStatus.add( jLabelStatus, null );
-      showStatus( "Please see 'About this software' for license information." );
+      showStatus( "Please see 'About this software'" );
       statusMessenger = new StatusJlabel( jLabelStatus );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
 
-   private void enableMenusOnStart()
-   {
+   private void enableMenusOnStart() {
       classMenu.setEnabled( true );
       analysisMenu.setEnabled( true );
       helpMenu.setEnabled(true);
@@ -248,15 +259,22 @@ public class GeneSetScoreFrame
          geneDataSets = new HashMap();
          geneScoreSets = new HashMap();
 
+         progressBar.setValue(10);
+         
          statusMessenger.setStatus("Reading GO descriptions " + settings.getClassFile());
          goData = new GONames(settings.getClassFile()); // parse go name file
+         progressBar.setValue(70);
+         
          statusMessenger.setStatus("Reading gene annotations from " + settings.getAnnotFile());
-         geneData = new GeneAnnotations(settings.getAnnotFile());
+         geneData = new GeneAnnotations(settings.getAnnotFile(), statusMessenger);
+         progressBar.setValue(100);
+         
          statusMessenger.setStatus( "Initializing gene class mapping" );
          geneDataSets.put(new Integer("original".hashCode()) , geneData);
-
+         
          statusMessenger.setStatus("Done with setup");
          enableMenusOnStart();
+
          mainPanel.remove( progressPanel );
          mainPanel.add( oPanel, BorderLayout.CENTER );
          statusMessenger.setStatus("Ready.");
@@ -264,22 +282,22 @@ public class GeneSetScoreFrame
       catch ( IllegalArgumentException e ) {
          GuiUtil.error( 
             "Error during initialization: " + e +
-            "If this problem persists, please contact the software developer. " +
-            "Press OK to quit." );
+            "\nIf this problem persists, please contact the software developer. " +
+            "\nPress OK to quit." );
          System.exit( 1 );
       }
       catch ( IOException e ) {
          GuiUtil.error( 
-            "File reading or writing error during initialization: " + e + 
-            "If this problem persists, please contact the software developer. " +
-            "Press OK to quit." );
+            "File reading or writing error during initialization: " + e.getMessage()  + 
+            "\nIf this problem persists, please contact the software developer. " +
+            "\nPress OK to quit.", e );
          System.exit( 1 );
       } catch ( SAXException e ) {
          GuiUtil.error( 
            "Gene Ontology file format is incorrect. " +
-           "Please check that it is a valid XML file. " +
-           "If this problem persists, please contact the software developer. " +
-           "Press OK to quit." );
+           "\nPlease check that it is a valid XML file. " +
+           "\nIf this problem persists, please contact the software developer. " +
+           "\nPress OK to quit." );
          System.exit( 1 );
       }
       oPanel.addInitialData( geneData, goData );

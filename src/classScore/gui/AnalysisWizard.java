@@ -139,9 +139,17 @@ public class AnalysisWizard extends Wizard
       dispose();
    }
 
-   protected void finishButton_actionPerformed(ActionEvent e) {
+   protected void finishButton_actionPerformed( ActionEvent e ) {
       saveValues();
-      loadAddedClasses();
+         try {
+            loadAddedClasses();
+         } catch ( IOException e1 ) {
+            GuiUtil.error( 
+                  "Could not load the new classes: " + e + "\n" +
+                  "If this problem persists, please contact the software vendor. " +
+                  "Press OK to quit." );
+               System.exit( 1 );
+         }
       ((GeneSetScoreFrame)callingframe).startAnalysis(settings);
       dispose();
    }
@@ -162,7 +170,7 @@ public class AnalysisWizard extends Wizard
       }
    }
 
-   void loadAddedClasses()
+   void loadAddedClasses() throws IOException
    {
       Iterator it=step3.getAddedClasses().iterator();
       while(it.hasNext())

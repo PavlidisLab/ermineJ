@@ -13,6 +13,7 @@ import javax.swing.JTextField;
 
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
+import baseCode.util.FileTools;
 import classScore.Settings;
 
 /**
@@ -82,7 +83,7 @@ public class LoadDialog extends AppDialog {
    }
 
    protected void actionButton_actionPerformed( ActionEvent e ) {
-      if(GuiUtil.testfile(loadFile.getText()))
+      if(GuiUtil.testFile(loadFile.getText()))
       {
          ((GeneSetScoreFrame)callingframe).loadAnalysis(loadFile.getText());
          dispose();

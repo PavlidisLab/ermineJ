@@ -24,7 +24,8 @@ import baseCode.xml.GOParser;
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
- * @author Shahmil Merchant, Paul Pavlidis
+ * @author Paul Pavlidis
+ * @author Homin Lee
  * @version $Id$
  */
 public class GONames {
@@ -39,8 +40,8 @@ public class GONames {
     * @param filename <code>String</code> The XML file containing class to
     *           name mappings. First column is the class id, second is a
     *           description that will be used int program output.
-    * @throws IllegalArgumentException
     * @throws IOException
+    * @throws SAXException
     */
    public GONames( String filename ) throws SAXException, IOException {
 

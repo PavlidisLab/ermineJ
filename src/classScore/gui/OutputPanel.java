@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,6 +26,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
 import classScore.Settings;
 import classScore.classPvalRun;
@@ -103,7 +105,7 @@ public class OutputPanel extends JScrollPane {
       modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter(
             this ) );
       JMenuItem htmlMenuItem = new JMenuItem(
-            "See some html stuff about this class, blah..." );
+            "Search GO database" );
       htmlMenuItem
             .addActionListener( new OutputPanel_htmlMenuItem_actionAdapter(
                   this ) );
@@ -165,8 +167,12 @@ public class OutputPanel extends JScrollPane {
       cwiz.showWizard();
    }
 
+   /**
+    * @todo make this do something.
+    * @param e
+    */
    void htmlMenuItem_actionPerformed( ActionEvent e ) {
-      System.err.println( "Right now this is just a stub." );
+     GuiUtil.error("This doesn't do anythingi yet.");
    }
 
    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
@@ -469,6 +475,7 @@ class OutputTableModel extends AbstractTableModel {
    private LinkedList results;
    private LinkedList columnNames = new LinkedList();
    private NumberFormat nf = NumberFormat.getInstance();
+   private NumberFormat pvalnf = new DecimalFormat( "0.##E0" );
    private int state = -1;
    public static final int init_cols = 4;
    ArrayList vals = new ArrayList();
@@ -576,7 +583,7 @@ class OutputTableModel extends AbstractTableModel {
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             vals.add( new Double( nf.format( res.getRank() ) ) );
-            vals.add( new Double( nf.format( res.getPvalue() ) ) );
+            vals.add( new Double( pvalnf.format( res.getPvalue() ) ) );
             return vals;
          }
          return null;

@@ -21,7 +21,6 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 
-import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
 import classScore.data.GeneAnnotations;

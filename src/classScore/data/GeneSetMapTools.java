@@ -1,7 +1,6 @@
 package classScore.data;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,10 +9,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import baseCode.util.StatusViewer;
+
 /**
  * Methods to 'clean' a set of geneSets - to remove redundancies, for example.
  *
- * @author Shahmil Merchant, Paul Pavlidis (major changes)
+ * @author Shahmil Merchant
+ * @author Paul Pavlidis (major changes)
  * @version $Id$
  */
 public class GeneSetMapTools {
@@ -25,9 +27,10 @@ public class GeneSetMapTools {
     * the query class, the smaller of the two classes is deleted and the query continues with the class that is left. We
     * iterate until no changes are made (actually, the stopping criterion will need some work - we don't want to
     * consolidate endlessly.) Typically what happens is one class will be contained in another.
+    * @param messenger TODO
     */
    public static void ignoreSimilar( double fractionSameThreshold,
-         Map geneSetToProbeMap ) {
+         Map geneSetToProbeMap, StatusViewer messenger ) {
       Set entries = geneSetToProbeMap.keySet();
       Iterator it = entries.iterator();
       String queryClassId = "";
@@ -38,7 +41,7 @@ public class GeneSetMapTools {
       HashMap seenit = new HashMap();
       ArrayList deleteUs = new ArrayList();
 
-      System.out.println( "...Highly (" + fractionSameThreshold * 100
+      messenger.setStatus( "...Highly (" + fractionSameThreshold * 100
             + "%)  similar classes are being removed..." );
 
       while ( it.hasNext() ) {
@@ -147,7 +150,7 @@ public class GeneSetMapTools {
          geneSetToProbeMap.remove( deleteMe );
       }
 
-      System.out.println( "There are now " + geneSetToProbeMap.size()
+      messenger.setStatus( "There are now " + geneSetToProbeMap.size()
             + " classes represented on the chip (" + deleteUs.size()
             + " were ignored)" );
    }
@@ -162,8 +165,7 @@ public class GeneSetMapTools {
          double fractionSameThreshold ) {
 
       if ( biggersize < smallersize ) {
-         System.err.println( "Invalid sizes" );
-         System.exit( 1 );
+         throw new IllegalArgumentException( "Invalid sizes" );
       }
 
       /*
@@ -197,7 +199,7 @@ public class GeneSetMapTools {
     * Identify classes which are identical to others. This isn't superfast, because it doesn't know which classes are
     * actually relevant in the data.
     */
-   public static void collapseClasses( GeneAnnotations geneData ) {
+   public static void collapseClasses( GeneAnnotations geneData, StatusViewer messenger ) {
       Map classToProbeMap = geneData.getClassToProbeMap();
       Map classesToRedundantMap = geneData.getClassesToRedundantMap();
       LinkedHashMap seenClasses = new LinkedHashMap();
@@ -209,8 +211,7 @@ public class GeneSetMapTools {
       String classId = "";
       HashMap seenit = new HashMap();
 
-      System.out
-            .println( "There are "
+      messenger.setStatus( "There are "
                   + entries.size()
                   + " classes represented on the chip (of any size). Redundant classes are being removed..." );
 
@@ -273,8 +274,7 @@ public class GeneSetMapTools {
          }
       }
 
-      System.out
-            .println( "There are now " + classToProbeMap.size()
+      messenger.setStatus( "There are now " + classToProbeMap.size()
                   + " classes represented on the chip (" + ignored
                   + " were ignored)" );
    }
@@ -322,29 +322,10 @@ public class GeneSetMapTools {
    }
 
    /**
+    * 
+    * @param classToProbeMap
+    * @todo this should be removed, I think - PP
     */
-   //   public Map getClassToProbeMap() {
-   //      return classToProbeMap;
-   //   }
-   //
-   //   /**
-   //    */
-   //   public ArrayList getClassValueMap( String class_id ) {
-   //      return ( ArrayList ) ( classToProbeMap.get( class_id ) );
-   //   }
-   /**
-    */
-   public void print( Map m ) {
-      //print the entire map
-      Collection entries = m.entrySet();
-      Iterator it = entries.iterator();
-      while ( it.hasNext() ) {
-         Map.Entry e = ( Map.Entry ) it.next();
-         System.out.println( "Key = " + e.getKey() + ", Value = "
-               + e.getValue() );
-      }
-   }
-
    public static void hackGeneSetToProbeMap( Map classToProbeMap ) {
       int min = 14;
       int max = 15;

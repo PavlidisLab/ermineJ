@@ -12,10 +12,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import baseCode.gui.GuiUtil;
+import baseCode.util.FileTools;
 
 /**
  * <p>
@@ -30,7 +31,7 @@ import baseCode.gui.GuiUtil;
  * <p>
  * Company:
  * </p>
- *
+ * 
  * @author Homin K Lee
  * @version $Id$
  */
@@ -40,7 +41,7 @@ public class NewGeneSet {
    private String id;
    private String desc;
    private ArrayList probes;
-   private boolean modifiedGS=false;
+   private boolean modifiedGS = false;
 
    public NewGeneSet( GeneAnnotations geneData ) {
       this.geneData = geneData;
@@ -49,8 +50,13 @@ public class NewGeneSet {
       probes = new ArrayList();
    }
 
-   public void setModified(boolean val) { modifiedGS=val; }
-   public boolean modified() { return modifiedGS; }
+   public void setModified( boolean val ) {
+      modifiedGS = val;
+   }
+
+   public boolean modified() {
+      return modifiedGS;
+   }
 
    public void clear() {
       id = "";
@@ -91,14 +97,14 @@ public class NewGeneSet {
             if ( r < probes.size() ) {
                String probeid = ( String ) probes.get( r );
                switch ( c ) {
-                  case 0:
-                     return probeid;
-                  case 1:
-                     return geneData.getProbeGeneName( probeid );
-                  case 2:
-                     return geneData.getProbeDescription( probeid );
-                  default:
-                     return null;
+               case 0:
+                  return probeid;
+               case 1:
+                  return geneData.getProbeGeneName( probeid );
+               case 2:
+                  return geneData.getProbeDescription( probeid );
+               default:
+                  return null;
                }
             }
             return null;
@@ -114,53 +120,43 @@ public class NewGeneSet {
       };
    }
 
-   public void loadClassFile( String file ) {
+   public void loadClassFile( String file ) throws IOException {
       clear();
-      File infile = new File( file );
-      if ( !infile.exists() || !infile.canRead() ) {
-         GuiUtil.error( "Could not find file: " + file );
-      } else {
-         try {
-            FileInputStream fis = new FileInputStream( file );
-            BufferedInputStream bis = new BufferedInputStream( fis );
-            BufferedReader dis = new BufferedReader(
-                  new InputStreamReader( bis ) );
-            String row;
-            ArrayList genes = new ArrayList();
-            String type = new String( "" );
-            int filetype = 0;
-            while ( ( row = dis.readLine() ) != null ) {
-               if ( type.compareTo( "" ) == 0 ) {
-                  type = row;
-                  if ( type.compareTo( "probe" ) == 0 ) {
-                     filetype = 0;
-                  } else if ( type.compareTo( "gene" ) == 0 ) {
-                     filetype = 1;
-                  }
-               } else if ( id.compareTo( "" ) == 0 ) {
-                  id = row;
-               } else if ( desc.compareTo( "" ) == 0 ) {
-                  desc = row;
-               } else {
-                  if ( filetype == 0 ) {
-                     probes.add( row );
-                  } else if ( filetype == 1 ) {
-                     genes.add( row );
-                  }
-               }
+      FileTools.checkPathIsReadableFile( file );
+      FileInputStream fis = new FileInputStream( file );
+      BufferedInputStream bis = new BufferedInputStream( fis );
+      BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
+      String row;
+      ArrayList genes = new ArrayList();
+      String type = new String( "" );
+      int filetype = 0;
+      while ( ( row = dis.readLine() ) != null ) {
+         if ( type.compareTo( "" ) == 0 ) {
+            type = row;
+            if ( type.compareTo( "probe" ) == 0 ) {
+               filetype = 0;
+            } else if ( type.compareTo( "gene" ) == 0 ) {
+               filetype = 1;
             }
-            dis.close();
-            if ( filetype == 1 ) {
-               HashSet probeSet = new HashSet();
-               for ( Iterator it = genes.iterator(); it.hasNext(); ) {
-                  probeSet.addAll( geneData.getGeneProbeList( ( String ) it
-                        .next() ) );
-               }
-               probes = new ArrayList( probeSet );
+         } else if ( id.compareTo( "" ) == 0 ) {
+            id = row;
+         } else if ( desc.compareTo( "" ) == 0 ) {
+            desc = row;
+         } else {
+            if ( filetype == 0 ) {
+               probes.add( row );
+            } else if ( filetype == 1 ) {
+               genes.add( row );
             }
-         } catch ( IOException ioe ) {
-            GuiUtil.error( "Could not find file: " + file );
          }
+      }
+      dis.close();
+      if ( filetype == 1 ) {
+         HashSet probeSet = new HashSet();
+         for ( Iterator it = genes.iterator(); it.hasNext(); ) {
+            probeSet.addAll( geneData.getGeneProbeList( ( String ) it.next() ) );
+         }
+         probes = new ArrayList( probeSet );
       }
 
    }
@@ -169,57 +165,44 @@ public class NewGeneSet {
       return new String( folder + File.separatorChar + id + "-class.txt" );
    }
 
-   public void saveClass( String folder, int type ) {
-      try {
-         String fileid = id.replace( ':', '-' );
-         String filedesc = desc.replace( '\n', ' ' );
-         String filetype = ( type == 0 ) ? "probe" : "gene";
-         BufferedWriter out = new BufferedWriter( new FileWriter( getFileName(
-               folder, fileid ), false ) );
-         out.write( filetype + "\n" );
-         out.write( id + "\n" );
-         out.write( filedesc + "\n" );
-         for ( Iterator it = probes.iterator(); it.hasNext(); ) {
-            out.write( ( String ) it.next() + "\n" );
-         }
-         out.close();
-      } catch ( IOException e ) {
-         System.err
-               .println( "There was an IO error while printing the results: "
-                     + e );
+   public void saveClass( String folder, int type ) throws IOException {
+
+      String fileid = id.replace( ':', '-' );
+      String filedesc = desc.replace( '\n', ' ' );
+      String filetype = ( type == 0 ) ? "probe" : "gene";
+      BufferedWriter out = new BufferedWriter( new FileWriter( getFileName(
+            folder, fileid ), false ) );
+      out.write( filetype + "\n" );
+      out.write( id + "\n" );
+      out.write( filedesc + "\n" );
+      for ( Iterator it = probes.iterator(); it.hasNext(); ) {
+         out.write( ( String ) it.next() + "\n" );
       }
+      out.close();
    }
 
-   public static HashMap getClassFileInfo( String file ) {
+   public static Map getClassFileInfo( String file ) throws IOException {
       HashMap cinfo = new HashMap();
-      File infile = new File( file );
-      if ( !infile.exists() || !infile.canRead() ) {
-         System.err.println( "Could not find file: " + file );
-      } else {
-         try {
-            FileInputStream fis = new FileInputStream( file );
-            BufferedInputStream bis = new BufferedInputStream( fis );
-            BufferedReader dis = new BufferedReader(
-                  new InputStreamReader( bis ) );
-            String row;
-            ArrayList members = new ArrayList();
-            while ( ( row = dis.readLine() ) != null ) {
-               if ( !cinfo.containsKey( "type" ) ) {
-                  cinfo.put( "type", row );
-               } else if ( !cinfo.containsKey( "id" ) ) {
-                  cinfo.put( "id", row );
-               } else if ( !cinfo.containsKey( "desc" ) ) {
-                  cinfo.put( "desc", row );
-               } else {
-                  members.add( row );
-               }
-            }
-            cinfo.put( "members", members );
-            dis.close();
-         } catch ( IOException ioe ) {
-            System.err.println( "Could not find file: " + ioe );
+      FileTools.checkPathIsReadableFile( file );
+      FileInputStream fis = new FileInputStream( file );
+      BufferedInputStream bis = new BufferedInputStream( fis );
+      BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
+      String row;
+      ArrayList members = new ArrayList();
+      while ( ( row = dis.readLine() ) != null ) {
+         if ( !cinfo.containsKey( "type" ) ) {
+            cinfo.put( "type", row );
+         } else if ( !cinfo.containsKey( "id" ) ) {
+            cinfo.put( "id", row );
+         } else if ( !cinfo.containsKey( "desc" ) ) {
+            cinfo.put( "desc", row );
+         } else {
+            members.add( row );
          }
       }
+      cinfo.put( "members", members );
+      dis.close();
+
       return cinfo;
    }
 
@@ -230,7 +213,8 @@ public class NewGeneSet {
    }
 
    /**
-    * Redefine a class. The "real" version of the class is modified to look like this one.
+    * Redefine a class. The "real" version of the class is modified to look like
+    * this one.
     */
    public void modifyClass( GONames goData ) {
       geneData.modifyClass( id, probes );

@@ -22,6 +22,8 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import baseCode.util.StatusViewer;
+
 /**
  * Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
  * <p>
@@ -59,15 +61,17 @@ public class GeneAnnotations {
    private Map classesToRedundantMap;
    private Vector selectedProbes;
    private Vector selectedSets;
-
+   private StatusViewer messenger;
+   
    /**
     * This is for creating GeneAnnotations by reading from a file
-    * 
     * @param filename String
     * @param probes Map only include these probes
+    * @param messenger TODO
+    * 
     * @throws IOException
     */
-   public GeneAnnotations( String filename, Set probes ) throws IOException {
+   public GeneAnnotations( String filename, Set probes, StatusViewer messenger ) throws IOException {
       if ( probes != null ) {
          this.probes = probes;
       }
@@ -79,7 +83,8 @@ public class GeneAnnotations {
       classesToRedundantMap = new HashMap();
       this.readFile( filename );
       classToGeneMap = makeClassToGeneMap();
-      GeneSetMapTools.collapseClasses(this);
+      this.messenger = messenger;
+      GeneSetMapTools.collapseClasses(this, messenger);
       prune( 2, 1000 );
       resetSelectedProbes();
       resetSelectedSets();
@@ -122,10 +127,11 @@ public class GeneAnnotations {
 
    /**
     * @param filename String
+    * @param messenger TODO
     * @throws IOException
     */
-   public GeneAnnotations( String filename ) throws IOException {
-      this( filename, null );
+   public GeneAnnotations( String filename, StatusViewer messenger ) throws IOException {
+      this( filename, null, messenger );
    }
 
    /**

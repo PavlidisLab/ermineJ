@@ -221,7 +221,7 @@ public class classPvalRun {
    public void showDetails( String classID ) {
       final GeneSetResult res = ( GeneSetResult ) results.get( classID );
       String name = res.getClassName();
-      System.out.println( name );
+   //   System.out.println( name );
       Map classToProbe = geneData.getClassToProbeMap();
 
       final ArrayList probeIDs = ( ArrayList ) classToProbe.get( classID );

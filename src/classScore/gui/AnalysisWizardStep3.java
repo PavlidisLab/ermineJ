@@ -7,8 +7,10 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -193,15 +195,26 @@ public class AnalysisWizardStep3 extends WizardStep {
          ccHash = new HashMap();
          for ( int i = 0; i < classFiles.length; i++ ) {
             File classFile = new File( dir.getPath(), classFiles[i] );
-            HashMap cfi = NewGeneSet.getClassFileInfo( classFile
-                  .getAbsolutePath() );
+            Map cfi = null;
+            try {
+               cfi = NewGeneSet.getClassFileInfo( classFile
+                     .getAbsolutePath() );
+            } catch ( IOException e ) {
+               GuiUtil.error("Error reading class files info.");
+            }
+            
+            if (cfi == null) {
+               throw new IllegalStateException("Null pointer");
+            }
+            
             customClasses.add( cfi );
             ccHash.put( cfi.get( "id" ), cfi );
          }
          ccTableModel = customClasses.toTableModel();
          customClassTable.setModel( ccTableModel );
-      } else
+      } else {
          GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
+      }
    }
 
    void makeRightTable() {

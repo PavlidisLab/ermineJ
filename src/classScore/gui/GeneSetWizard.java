@@ -1,6 +1,9 @@
 package classScore.gui;
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+
+import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
 import classScore.Settings;
 import classScore.data.GONames;
@@ -93,7 +96,11 @@ public class GeneSetWizard extends Wizard {
       if (step == 1) {
          if (makenew || step1A.isReady()) {                       //not (case 3 with no class picked)
             if (makenew && step1.getInputMethod() == 1) {           //case 2, load from file
-               newGeneSet.loadClassFile(step1.getLoadFile());
+               try {
+                  newGeneSet.loadClassFile(step1.getLoadFile());
+               } catch ( IOException e1 ) {
+                  GuiUtil.error("Error loading class files info.");
+               }
             }
             if (!(makenew && step1.getInputMethod() == 1 &&         //all cases (except case 2 and bad file)
                   newGeneSet.getId().compareTo("") == 0)) {
@@ -179,15 +186,19 @@ public class GeneSetWizard extends Wizard {
       step3.nameNewGeneSet();
       String id = newGeneSet.getId();
       if (id.compareTo("") == 0) {
-         showStatus("The gene set ID must be specified.");
+         showError("The gene set ID must be specified.");
       } else if ( geneData.classExists( id ) && makenew ) {
-         showStatus( "A gene set with the ID " + id + " already exists." );
+         showError( "A gene set with the ID " + id + " already exists." );
       } else {
          if (makenew || !newGeneSet.modified())
             newGeneSet.addToMaps(goData);
          else
             newGeneSet.modifyClass(goData);
-         newGeneSet.saveClass(settings.getClassFolder(), 0);
+         try {
+            newGeneSet.saveClass(settings.getClassFolder(), 0);
+         } catch ( IOException e1 ) {
+            GuiUtil.error("Error writing the new gene set to file:", e1);
+         }
          ((GeneSetScoreFrame)callingframe).addedNewGeneSet();
          dispose();
       }
