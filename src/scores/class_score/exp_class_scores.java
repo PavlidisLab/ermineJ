@@ -83,7 +83,7 @@ public class exp_class_scores {
 	histogram hist= new histogram(number_of_class, class_min_size, number_of_runs, hist_range);
 	
 	//check for method and accordingly generate values 
-	for (i = class_min_size; i<class_max_size; i++)
+	for (i = class_min_size; i<=class_max_size; i++)
 	    //	    System.err.println("Running class size " + i);
 	    { 
 		random = new int[i];

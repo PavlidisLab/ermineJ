@@ -138,7 +138,7 @@ public class class_pvals {
 
 	class_list=hist.get_matrix_map(); // list of all class sizes.
 	try {
-	    BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
+	    BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, false));
 
 	    // headings
 	    out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "virtual_size" + "\t" + "hyper pval" + "\t" + "aroc rate" + "\t" + "rocpval" + "\n");
