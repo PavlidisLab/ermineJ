@@ -56,7 +56,19 @@ public class ClassPanel extends JScrollPane
    }
 
    public void setModel(TableModel m) {
-      jTable1.setModel(m);
+      //jTable1.setModel(m);
+
+      SortFilterModel sorter = new SortFilterModel(m);
+      jTable1.setModel(sorter);
+      jTable1.getTableHeader().addMouseListener(new MouseAdapter() {
+         public void mouseClicked(MouseEvent event) {
+            int tableColumn = jTable1.columnAtPoint(event.getPoint());
+            int modelColumn = jTable1.convertColumnIndexToModel(tableColumn);
+            if(modelColumn == 0)
+               ( (SortFilterModel) jTable1.getModel()).sort(modelColumn);
+         }
+      });
+
       jTable1.getColumnModel().getColumn(0).setPreferredWidth(70);
       jTable1.getColumnModel().getColumn(1).setPreferredWidth(200);
    }

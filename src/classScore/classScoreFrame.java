@@ -6,7 +6,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import com.borland.jbcl.layout.*;
 
 /**
  * <p>Title: </p>
@@ -95,12 +94,19 @@ public class classScoreFrame
   JTabbedPane jTabbedPane1 = new JTabbedPane();
   FlowLayout flowLayout9 = new FlowLayout();
   FlowLayout flowLayout1 = new FlowLayout();
-  XYLayout xYLayout2 = new XYLayout();
   GridBagLayout gridBagLayout1 = new GridBagLayout();
-  XYLayout xYLayout1 = new XYLayout();
-  JButton jButtonLoadClassInfo = new JButton();
   ClassPanel cPanel = new ClassPanel();
+
   SetupMaps smaps = null;
+  int runnum = 0;
+  JList jList1 = new JList();
+  JMenuBar jMenuBar1 = new JMenuBar();
+  JMenu jMenu1 = new JMenu();
+  JMenuItem jMenuItem1 = new JMenuItem();
+  JMenuItem jMenuItem2 = new JMenuItem();
+  JMenuItem jMenuItem3 = new JMenuItem();
+  GridBagLayout gridBagLayout2 = new GridBagLayout();
+  GridBagLayout gridBagLayout3 = new GridBagLayout();
 
    public classScoreFrame() {
       try {
@@ -114,6 +120,7 @@ public class classScoreFrame
    private void jbInit() throws Exception {
       ConsoleWindow.init();
       this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    this.setJMenuBar(jMenuBar1);
       this.setSize(new Dimension(886, 730));
       this.setTitle("Functional Class Scoring");
 
@@ -134,7 +141,7 @@ public class classScoreFrame
       jTextFieldOutPutFileName.setEditable(true);
       jTextFieldProbeAnnot.setEditable(true);
 
-      jPanel1.setLayout(xYLayout1);
+      jPanel1.setLayout(gridBagLayout3);
 
       jButtonSavePrefs.setToolTipText(
           "Save the names of the five files listed in a file that will be loaded " +
@@ -146,7 +153,6 @@ public class classScoreFrame
           "Determines how the gene scores are combined to make a class score.");
 
       jButtonRun.setToolTipText("");
-      jButtonAbout.setToolTipText("Please click here!");
       jPanel1.setBackground(Color.white);
       jPanel1.setForeground(Color.black);
       jPanel1.setDebugGraphicsOptions(0);
@@ -189,7 +195,7 @@ public class classScoreFrame
     jPanel2.setMinimumSize(new Dimension(536, 530));
     jPanel2.setOpaque(true);
     jPanel2.setPreferredSize(new Dimension(536, 530));
-    jPanel2.setLayout(xYLayout2);
+    jPanel2.setLayout(gridBagLayout2);
     jPanelFilesGroup.setBackground(Color.white);
     jPanelFilesGroup.setBorder(null);
     jTabbedPane1.setBackground(Color.lightGray);
@@ -231,47 +237,53 @@ public class classScoreFrame
     jRadioButtonMedian.setBackground(Color.white);
     jRadioButtonMean.setBackground(Color.white);
 
-    jButtonLoadClassInfo.setMargin(new Insets(2, 14, 2, 14));
-    jButtonLoadClassInfo.setText("Load Class Information");
-    jButtonLoadClassInfo.addActionListener(new classScoreFrame_jButtonLoadClassInfo_actionAdapter(this));
 
+    jMenu1.setText("Classes");
+    jMenuItem1.setText("Define New Class");
+    jMenuItem1.addActionListener(new classScoreFrame_jMenuItem1_actionAdapter(this));
+    jMenuItem2.setText("Modify Class");
+    jMenuItem3.setText("Load Class Information");
+    jMenuItem3.addActionListener(new classScoreFrame_jMenuItem3_actionAdapter(this));
     jPanelOuputGroup.add(jLabel2, null);
     jPanelOuputGroup.add(jTextFieldOutPutFileName, null);
     jPanelOuputGroup.add(jButtonOutputFileNameBrowse, null);
+    jPanelFilesGroup.add(jButtonSavePrefs, null);
+    jPanelFilesGroup.add(jPanelGONamesGroup, null);
 
 
     jPanelGeneScoreGroup.add(jLabel3, null);
     jPanelGeneScoreGroup.add(jTextFieldGeneScoreFile, null);
     jPanelGeneScoreGroup.add(jButtonGeneScoreFileBrowse, null);
+    jPanelFilesGroup.add(jPanelProbeMapGroup, null);
 
 
     jPanelProbeMapGroup.add(jLabel1, null);
     jPanelProbeMapGroup.add(jTextFieldProbeAnnot, null);
     jPanelProbeMapGroup.add(jButtonProbeAnnotsBrowse, null);
+    jPanelFilesGroup.add(jPanelOuputGroup, null);
 
     jPanelGONamesGroup.add(jLabel4, null);
     jPanelGONamesGroup.add(jTextFieldGONames, null);
     jPanelGONamesGroup.add(jButtonGONamesBrowse, null);
-
-    jPanelFilesGroup.add(jPanelGONamesGroup, null);
-    jPanelFilesGroup.add(jPanelOuputGroup, null);
     jPanelFilesGroup.add(jPanelGeneScoreGroup, null);
-    jPanelFilesGroup.add(jPanelProbeMapGroup, null);
-    jPanelFilesGroup.add(jButtonLoadClassInfo, null);
-    jPanelFilesGroup.add(jButtonSavePrefs, null);
+
 
     cPanel.setModel(SetupMaps.toBlankTableModel());
-    jPanel1.add(jPanel2,    new XYConstraints(3, 26, 861, 683));
+    jPanel1.add(jPanel2,  new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(4, 3, 21, 22), 325, 175));
 
       jPanelMainControls.add(jButtonQuit, null);
     jPanelMainControls.add(jButtonLoadResults, null);
     jPanelMainControls.add(jButtonRun, null);
     jPanelMainControls.add(jButtonCancel, null);
+    jButtonAbout.setToolTipText("Please click here!");
+    jButtonAbout.setText("About the software");
+    jButtonAbout.addActionListener(new
+                                   classScoreFrame_jButtonAbout_actionAdapter(this));
     jPanelMainControls.add(jButtonAbout, null);
-    jPanel2.add(jTabbedPane1,   new XYConstraints(11, 333, 823, 255));
-    jTabbedPane1.addTab("cPanel", cPanel);
-    jPanel2.add(jPanelReplicateTreaments, new XYConstraints(46, 212, 237, 113));
-    jPanel2.add(jPanelFilesGroup, new XYConstraints(3, 3, 514, 214));
+    jPanel2.add(jTabbedPane1,  new GridBagConstraints(0, 1, 2, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(103, 10, 0, 27), 523, -275));
+    jTabbedPane1.addTab("Classes", cPanel);
 
 
     jPanelClassScoreMethods.add(jLabelClassScoreMethod,  new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0
@@ -280,9 +292,16 @@ public class classScoreFrame
             ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 14, 21, 54), 0, 0));
     jPanelClassScoreMethods.add(jRadioButtonMean,  new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
             ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 57, 21, 0), 0, 0));
-    jPanel2.add(jPanelParameterGroup, new XYConstraints(575, 20, 223, 209));
-    jPanel2.add(jPanelMainControls, new XYConstraints(173, 598, 514, 39));
-    jPanel2.add(jPanelStatus,   new XYConstraints(10, 643, 836, 34));
+    jPanel2.add(jPanelFilesGroup,  new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(16, 16, 0, 0), -16, -11));
+    jPanel2.add(jPanelReplicateTreaments,  new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 54, 240, 40), 17, -7));
+    jPanel2.add(jPanelParameterGroup,  new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(16, 45, 0, 63), 23, 9));
+    jPanel2.add(jPanelMainControls,  new GridBagConstraints(0, 2, 2, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(10, 173, 0, 49), 130, 4));
+    jPanel2.add(jPanelStatus,  new GridBagConstraints(0, 3, 2, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(6, 10, 28, 15), 302, 1));
     jPanelStatus.add(jLabelStatus, null);
 
       jButtonRun.setText("Run Analysis");
@@ -434,9 +453,6 @@ public class classScoreFrame
       jLabel9.setLabelFor(jTextFieldIterations);
       jLabel9.setText("Iterations to run");
       flowLayout7.setAlignment(FlowLayout.CENTER);
-      jButtonAbout.setText("About the software");
-      jButtonAbout.addActionListener(new
-                                     classScoreFrame_jButtonAbout_actionAdapter(this));
       jLabelStatus.setBackground(UIManager.getColor("control"));
       jLabelStatus.setFont(new java.awt.Font("Dialog", 0, 11));
       jLabelStatus.setForeground(Color.black);
@@ -454,6 +470,9 @@ public class classScoreFrame
       jPanelReplicateTreaments.add(jRadioButtonSeparateReplicates, null);
       jPanelReplicateTreaments.add(jRadioButtonBestReplicates, null);
       jPanelReplicateTreaments.add(jRadioButtonMeanReplicates, null);
+    jPanelReplicateTreaments.add(jList1, null);
+    jPanel2.add(jPanelClassScoreMethods,  new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(17, 84, 248, 209), 67, 33));
       jPanel10.add(jLabel6, null);
       jPanel10.add(jTextFieldPValueThreshold, null);
     jPanelParameterGroup.add(jPanel14, null);
@@ -470,7 +489,6 @@ public class classScoreFrame
     jPanelParameterGroup.add(jPanel10, null);
       jPanel11.add(jLabel9, null);
       jPanel11.add(jTextFieldIterations, null);
-    jPanel2.add(jPanelClassScoreMethods,  new XYConstraints(330, 233, 237, 93));
 
       startPath = new File(System.getProperty("user.home"));
       buttonGroup2.add(jRadioButtonMean);
@@ -478,6 +496,10 @@ public class classScoreFrame
       buttonGroup1.add(jRadioButtonMeanReplicates);
       buttonGroup1.add(jRadioButtonBestReplicates);
       buttonGroup1.add(jRadioButtonSeparateReplicates);
+    jMenuBar1.add(jMenu1);
+    jMenu1.add(jMenuItem3);
+    jMenu1.add(jMenuItem1);
+    jMenu1.add(jMenuItem2);
       chooser.setCurrentDirectory(startPath);
       readPrefs();
       showStatus("Please see 'About this software' for license information.");
@@ -578,7 +600,10 @@ public class classScoreFrame
                //        r.addClassDetailsListener(class_details_action_listener);
                r.setModel(results.toTableModel());
                //r.show();
-               jTabbedPane1.addTab(jTextFieldOutPutFileName.getText(),r);
+               //jTabbedPane1.addTab(jTextFieldOutPutFileName.getText(),r);
+               runnum++;
+               jTabbedPane1.addTab("Run " + Integer.toString(runnum),r);
+               cPanel.setModel(smaps.toTableModel());
             }
             catch (IllegalArgumentException e) {
                error(e, "During class score calculation");
@@ -824,6 +849,8 @@ public class classScoreFrame
       dlg.show();
    }
 
+
+
    /**
     *
     * @param e
@@ -854,17 +881,7 @@ public class classScoreFrame
       }
    }
 
-   /**
-    *
-    */
-   /*  private void writePrefs() {
-    comboWriter(getCanonical("scoreFile.pref"), jTextFieldGeneScoreFile.getText()); // gene scores
-       comboWriter(getCanonical("outputFile.pref"),
-                   jTextFieldOutPutFileName.getText()); // output file
-    comboWriter(getCanonical("nameFile.pref"), jTextFieldGONames.getText()); // biological names for go
-    comboWriter(getCanonical("annotFile.pref"), jTextFieldProbeAnnot.getText()); // probe to ug map
-     }
-    */
+
 
    private void writePrefs(Properties s, String filename) {
       try {
@@ -894,8 +911,8 @@ public class classScoreFrame
    /**
     *
     */
-   private void readPrefs() {
-
+   private void readPrefs()
+   {
       Properties settings = new Properties();
       try {
          File fi = new File("classScore.prefs");
@@ -920,8 +937,18 @@ public class classScoreFrame
       }
    }
 
-  void jButtonLoadClassInfo_actionPerformed(ActionEvent e)
-  {
+  void jMenuItem1_actionPerformed(ActionEvent e) {
+     modClassFrame dlg = new modClassFrame(smaps);
+     Dimension dlgSize = dlg.getPreferredSize();
+     Dimension frmSize = getSize();
+     Point loc = getLocation();
+     dlg.setLocation( (frmSize.width - dlgSize.width) / 2 + loc.x,
+                      (frmSize.height - dlgSize.height) / 2 + loc.y);
+     dlg.pack();
+     dlg.show();
+  }
+
+  void jMenuItem3_actionPerformed(ActionEvent e) {
      showStatus("Loading");
      classScoreStatus m = new classScoreStatus(jLabelStatus);
 
@@ -945,6 +972,7 @@ public class classScoreFrame
      };
      runner = new runthread(m);
      runner.start();
+
   }
 }
 
@@ -1096,13 +1124,24 @@ class classScoreFrame_jButtonLoadResults_actionAdapter
    }
 }
 
-class classScoreFrame_jButtonLoadClassInfo_actionAdapter implements java.awt.event.ActionListener {
+class classScoreFrame_jMenuItem1_actionAdapter implements java.awt.event.ActionListener {
   classScoreFrame adaptee;
 
-  classScoreFrame_jButtonLoadClassInfo_actionAdapter(classScoreFrame adaptee) {
+  classScoreFrame_jMenuItem1_actionAdapter(classScoreFrame adaptee) {
     this.adaptee = adaptee;
   }
   public void actionPerformed(ActionEvent e) {
-    adaptee.jButtonLoadClassInfo_actionPerformed(e);
+    adaptee.jMenuItem1_actionPerformed(e);
+  }
+}
+
+class classScoreFrame_jMenuItem3_actionAdapter implements java.awt.event.ActionListener {
+  classScoreFrame adaptee;
+
+  classScoreFrame_jMenuItem3_actionAdapter(classScoreFrame adaptee) {
+    this.adaptee = adaptee;
+  }
+  public void actionPerformed(ActionEvent e) {
+    adaptee.jMenuItem3_actionPerformed(e);
   }
 }
