@@ -19,7 +19,7 @@ import classScore.gui.GeneSetScoreFrame;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author not attributable
  * @version $Id$
  * @todo don't use stop. use interrupt instead, and stop the readers
@@ -62,6 +62,7 @@ public class AnalysisThread {
                doAnalysis();
             }
             catch ( IOException e ) {
+               cancelAnalysisThread();
                GuiUtil.error( "During analysis", e );
             }
          }
