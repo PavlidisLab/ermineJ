@@ -9,7 +9,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
@@ -66,19 +65,19 @@ public class ClassDetailFrame
    JRadioButtonMenuItem m_blackbodyColormapMenuItem = new JRadioButtonMenuItem();
    JMenuItem m_saveFileMenuItem = new JMenuItem();
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
+   DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
 
    public ClassDetailFrame(
        ArrayList values,
        Map pvals,
        Map classToProbe,
        String id,
-       NumberFormat nf,
        GeneAnnotations geneData,
        Settings settings ) {
 
       try {
-         createDetailsTable( values, pvals, classToProbe, id, nf, geneData,
-                             settings );
+         m_nf.setMaximumFractionDigits( 3 );
+         createDetailsTable( values, pvals, classToProbe, id, geneData, settings );
          jbInit();
 
          boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
@@ -171,7 +170,6 @@ public class ClassDetailFrame
        Map pvals,
        Map classToProbe,
        String id,
-       NumberFormat nf,
        GeneAnnotations geneData,
        Settings settings ) {
 
@@ -201,7 +199,7 @@ public class ClassDetailFrame
       //
 
       DetailsTableModel m = new DetailsTableModel(
-          m_matrixDisplay, values, pvals, classToProbe, id, nf, geneData
+          m_matrixDisplay, values, pvals, classToProbe, id, geneData, m_nf
           );
       SortFilterModel sorter = new SortFilterModel( m, m_matrixDisplay );
       m_table.setModel( new DefaultTableModel() ); // bug in JTable (Manju said so) -- if called repeatedly, this line should be here... as-is, makes no difference
@@ -240,11 +238,15 @@ public class ClassDetailFrame
       // Make the columns in the matrix display not too wide (cell-size)
       // and set a custom cell renderer
       MatrixDisplayCellRenderer cellRenderer = new MatrixDisplayCellRenderer(
-          m_matrixDisplay ); // create one instance that will be used to draw each cell
+          m_matrixDisplay,
+          m_nf 
+          ); // create one instance that will be used to draw each cell
+      
       VerticalTextHeaderRenderer verticalTextHeaderRenderer =
           new VerticalTextHeaderRenderer(); // create only one instance
       int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
+      // Set each column
       for ( int i = 0; i < matrixColumnCount; i++ ) {
          TableColumn col = m_table.getColumnModel().getColumn( i );
          col.setResizable( false );
@@ -419,7 +421,7 @@ class DetailsTableModel
    private Map m_pvals;
    private Map m_classToProbe;
    private String m_id;
-   private NumberFormat m_nf;
+   private DecimalFormat m_nf;
    private GeneAnnotations m_geneData;
    private String[] m_columnNames = {
        "Probe", "P value", "Name", "Description"};
@@ -431,16 +433,16 @@ class DetailsTableModel
        Map pvals,
        Map classToProbe,
        String id,
-       NumberFormat nf,
-       GeneAnnotations geneData ) {
+       GeneAnnotations geneData,
+       DecimalFormat nf ) {
 
       m_matrixDisplay = matrixDisplay;
       m_values = values;
       m_pvals = pvals;
       m_classToProbe = classToProbe;
       m_id = id;
-      m_nf = nf;
       m_geneData = geneData;
+      m_nf = nf;
    }
 
    public String getColumnName( int column ) {
@@ -500,16 +502,14 @@ class MatrixDisplayCellRenderer
 
    JMatrixDisplay m_matrixDisplay;
    DecimalFormat m_nf;
-
-   public MatrixDisplayCellRenderer( JMatrixDisplay matrixDisplay ) {
+   
+   public MatrixDisplayCellRenderer( JMatrixDisplay matrixDisplay, DecimalFormat nf ) {
 
       m_matrixDisplay = matrixDisplay;
       setOpaque( true );
 
       // to format tooltips
-      m_nf = new DecimalFormat();
-      m_nf.setMaximumFractionDigits( 2 );
-      m_nf.setMinimumFractionDigits( 0 );
+      m_nf = nf;
    }
 
    // This method is called each time a cell in a column

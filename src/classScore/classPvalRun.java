@@ -370,8 +370,9 @@ public class classPvalRun {
       }
 
       // create the details frame
-      ClassDetailFrame f = new ClassDetailFrame(values, pvals, classToProbe, id,
-                                                nf, geneData, settings);
+      ClassDetailFrame f = new ClassDetailFrame(
+         values, pvals, classToProbe, id, geneData, settings
+         );
       f.setTitle(name + " (" + values.size() + " items)");
       f.show();
    }
