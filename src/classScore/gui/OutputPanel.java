@@ -451,6 +451,9 @@ class OutputTableModel extends AbstractTableModel {
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
    GONames goData;
    LinkedList results;
+   
+   static Color parent = Color.LIGHT_GRAY;
+   static Color child = Color.YELLOW;
    static Color spread1 = new Color( 220, 220, 160 );
    static Color spread2 = new Color( 205, 222, 180 );
    static Color spread3 = new Color( 190, 224, 200 );
@@ -463,7 +466,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       super();
       this.goData = goData;
       this.results = results;
-      nf.setMaximumFractionDigits( 2 );
+      nf.setMaximumFractionDigits( 5 );
    }
 
    public Component getTableCellRendererComponent( JTable table, Object value,

@@ -5,6 +5,9 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
+
+import org.xml.sax.SAXException;
+
 import baseCode.gui.*;
 import classScore.*;
 import classScore.data.*;
@@ -223,6 +226,8 @@ public class GeneSetScoreFrame
       }
       catch ( IOException e ) {
          GuiUtil.error( e, "File reading or writing" );
+      } catch ( SAXException e ) {
+         GuiUtil.error( e, "XML parsing" );
       }
       oPanel.addInitialData( geneData, goData );
       statusMessenger.setStatus("Done with initialization.");
