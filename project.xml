@@ -65,7 +65,6 @@
             <artifactId>colt</artifactId>
             <version>1.0.3</version>
             <type>jar</type>
-            <url>http://hoschek.home.cern.ch/hoschek/colt/V1.0.3/download</url>
             <properties>
                 <jnlp.jar>true</jnlp.jar>
             </properties>
@@ -82,7 +81,7 @@
         <dependency>
             <groupId>baseCode</groupId>
             <artifactId>baseCode</artifactId>
-            <version>0.2.1</version>
+            <version>0.2.2</version>
             <type>jar</type>
             <properties>
                 <jnlp.jar>true</jnlp.jar>
@@ -103,6 +102,7 @@
             <version>2.0</version>
             <jar>jh.jar</jar>
             <type>jar</type>
+            <jnlp.jar>true</jnlp.jar>
             <properties/>
         </dependency>
         <dependency>
@@ -110,12 +110,14 @@
             <artifactId>java-getopt</artifactId>
             <version>1.0.9</version>
             <type>jar</type>
+            <jnlp.jar>false</jnlp.jar>
             <properties/>
         </dependency>
         <dependency>
             <groupId>forehead</groupId>
             <artifactId>forehead</artifactId>
             <version>1.0-beta-5</version>
+            <jnlp.jar>false</jnlp.jar>
             <type>jar</type>
             <properties/>
         </dependency>
@@ -124,6 +126,7 @@
             <artifactId>jfreechart</artifactId>
             <version>0.9.20</version>
             <type>jar</type>
+            <jnlp.jar>false</jnlp.jar>
             <properties/>
         </dependency>
         <dependency>
@@ -131,6 +134,7 @@
             <artifactId>jcommon</artifactId>
             <version>0.9.5</version>
             <type>jar</type>
+            <jnlp.jar>false</jnlp.jar>
             <properties/>
         </dependency>
     </dependencies>
