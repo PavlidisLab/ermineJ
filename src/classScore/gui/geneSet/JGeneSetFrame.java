@@ -170,8 +170,8 @@ public class JGeneSetFrame extends JFrame {
 
       initColorRangeWidget();
 
-      m_colorRangeSlider.setMaximumSize( new Dimension( 50, 24 ) );
-      m_colorRangeSlider.setPreferredSize( new Dimension( 50, 24 ) );
+      m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
+      m_colorRangeSlider.setPreferredSize( new Dimension( 90, 24 ) );
       m_colorRangeSlider.addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter( this ) );
       m_saveDataMenuItem.setActionCommand( "SaveData" );
       m_saveDataMenuItem.setText( "Save Data..." );
