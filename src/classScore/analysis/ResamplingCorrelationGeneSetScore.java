@@ -66,7 +66,7 @@ public class ResamplingCorrelationGeneSetScore extends
          dataAsRawMatrix[j] = rowValues;
          deck[j] = j;
       }
-      selfSquaredMatrix = this.selfSquaredMatrix(dataAsRawMatrix);
+      selfSquaredMatrix = selfSquaredMatrix(dataAsRawMatrix);
       
       for ( int i = classMinSize; i <= classMaxSize; i++ ) {
          int[] randomnums = new int[i];

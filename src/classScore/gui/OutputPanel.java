@@ -604,21 +604,23 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
    GONames goData;
    LinkedList results;
 
-   static Color goParent = Color.LIGHT_GRAY;
-   static Color goChild = Color.YELLOW;
-   static Color spread1 = new Color( 220, 220, 160 );
-   static Color spread2 = new Color( 205, 222, 180 );
-   static Color spread3 = new Color( 190, 224, 200 );
-   static Color spread4 = new Color( 175, 226, 220 );
-   static Color spread5 = new Color( 160, 228, 240 );
-   static Color modified = new Color( 220, 160, 220 );
+   static final Color goParent = Color.LIGHT_GRAY;
+   static final Color goChild = Color.YELLOW;
+   
+   static final Color LIGHTBLUE5 = new Color( 210, 220, 220 );
+   static final Color LIGHTBLUE4 = new Color( 160, 220, 215 );
+   static final Color LIGHTBLUE3 = new Color( 115, 220, 195 );
+   static final Color LIGHTBLUE2 = new Color( 65, 220, 185 );
+   static final Color LIGHTBLUE1 = new Color( 0, 220, 170 );
+   
+   static final Color PINK = new Color( 220, 160, 220 );
    private NumberFormat nf = NumberFormat.getInstance();
 
    public OutputPanelTableCellRenderer( GONames goData, LinkedList results ) {
       super();
       this.goData = goData;
       this.results = results;
-      nf.setMaximumFractionDigits( 5 );
+      nf.setMaximumFractionDigits( 7 );
    }
 
    public Component getTableCellRendererComponent( JTable table, Object value,
@@ -648,7 +650,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          setOpaque( false );
       else if ( column == 0
             && goData.newSet( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
-         setBackground( modified );
+         setBackground( PINK );
       } else if ( value.getClass().equals( ArrayList.class ) ) {
          String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) )
                .get( 0 );
@@ -656,10 +658,14 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
          Map data = result.getResults();
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
-            if ( res.getPvalue_corr() < 0.01 ) {
-               setBackground( spread5 );
+            if ( res.getPvalue_corr() < 0.001 ) {
+               setBackground( LIGHTBLUE1 );
+            } else if ( res.getPvalue_corr() < 0.01 ) {
+               setBackground( LIGHTBLUE2 );
             } else if ( res.getPvalue_corr() < 0.05 ) {
-               setBackground( spread4 );
+               setBackground( LIGHTBLUE3);
+            } else if ( res.getPvalue_corr() < 0.1 ) {
+               setBackground( LIGHTBLUE5 );
             } else {
                setBackground( Color.WHITE );
             }

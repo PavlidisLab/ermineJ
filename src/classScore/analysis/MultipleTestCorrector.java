@@ -83,17 +83,10 @@ public class MultipleTestCorrector {
 
          // double thresh = fdr * n / numclasses;
 
+         double thisFDR = actual_p * numclasses / n;
+         
          // the actual fdr at this threshold is n / (actual_p * numclasses).
-
-         res.setCorrectedPvalue( actual_p * numclasses / n ); // todo this is slightly broken when there are tied pvals.
-
-         //         if ( actual_p < thresh || threshpassed ) {
-         //            res.setCorrectedPvalue( 1.0 );
-         //            threshpassed = true;
-         //         } else {
-         //            res.setCorrectedPvalue( 0.0 );
-         //         }
-
+         res.setCorrectedPvalue( thisFDR ); // todo this is slightly broken when there are tied pvals.
          n--;
       }
       Collections.reverse( sortedclasses ); // put it back.

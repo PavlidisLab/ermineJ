@@ -29,7 +29,6 @@ public class AnalysisWizardStep4 extends WizardStep {
    JPanel step4Panel;
    JTextField jTextFieldMaxClassSize;
    JTextField jTextFieldMinClassSize;
-   JRadioButton jRadioButtonSeparateReplicates;
    JRadioButton jRadioButtonBestReplicates;
    JRadioButton jRadioButtonMeanReplicates;
 
@@ -58,7 +57,6 @@ public class AnalysisWizardStep4 extends WizardStep {
       JList jList1 = new JList();
       ButtonGroup replicateButtonGroup = new ButtonGroup();
       jRadioButtonBestReplicates = new JRadioButton();
-      jRadioButtonSeparateReplicates = new JRadioButton();
       jRadioButtonMeanReplicates = new JRadioButton();
 
       step4Panel = new JPanel();
@@ -91,6 +89,7 @@ public class AnalysisWizardStep4 extends WizardStep {
       step4LeftPanel.add( jPanel17, null );
       step4LeftPanel.add( jPanel16, null );
       step4RightPanel.setPreferredSize( new Dimension( 200, 160 ) );
+
       jLabelReplicateTreament
             .setToolTipText( "How will replicates of the same gene be treated?" );
       jLabelReplicateTreament.setText( "Gene replicate treatment" );
@@ -107,11 +106,7 @@ public class AnalysisWizardStep4 extends WizardStep {
                   + "score used is that of the highest-scoring occurrence." );
       jRadioButtonBestReplicates.setSelected( true );
       jRadioButtonBestReplicates.setText( "Use Best scoring replicate" );
-      jRadioButtonSeparateReplicates.setBackground( SystemColor.control );
-      jRadioButtonSeparateReplicates
-            .setToolTipText( "Genes occurring more than once are counted more than once." );
-      jRadioButtonSeparateReplicates
-            .setText( "Count all replicates separately" );
+
       jRadioButtonMeanReplicates.setBackground( SystemColor.control );
       jRadioButtonMeanReplicates.setPreferredSize( new Dimension( 171, 23 ) );
       jRadioButtonMeanReplicates
@@ -120,22 +115,24 @@ public class AnalysisWizardStep4 extends WizardStep {
       jRadioButtonMeanReplicates.setSelected( false );
       jRadioButtonMeanReplicates.setText( "Use Mean of replicates" );
       replicateButtonGroup.add( jRadioButtonBestReplicates );
-      replicateButtonGroup.add( jRadioButtonSeparateReplicates );
+
       replicateButtonGroup.add( jRadioButtonMeanReplicates );
       jPanelReplicateTreaments.add( jLabelReplicateTreament, null );
-      jPanelReplicateTreaments.add( jRadioButtonSeparateReplicates, null );
+
       jPanelReplicateTreaments.add( jRadioButtonBestReplicates, null );
       jPanelReplicateTreaments.add( jRadioButtonMeanReplicates, null );
       jPanelReplicateTreaments.add( jList1, null );
+
+      step4RightPanel.add( jPanelReplicateTreaments, null );
+      this
+            .addHelp( "<html>"
+                  + "<b>Choose"
+                  + " the range of class sizes to be considered and how genes occuring more than once are handled.</b>" );
 
       step4TopPanel.add( step4LeftPanel, null );
       step4TopPanel.add( step4RightPanel, null );
       step4Panel.add( step4TopPanel, null );
 
-      this
-            .addHelp( "<html><b>Set parameters that are general for all analysis methods.</b><br>"
-                  + "You must decide how genes occurring more than once on the array will be treated,"
-                  + " and the range of class sizes to be considered." );
       this.addMain( step4Panel );
    }
 
@@ -144,12 +141,14 @@ public class AnalysisWizardStep4 extends WizardStep {
             .getMaxClassSize() ) );
       jTextFieldMinClassSize.setText( String.valueOf( settings
             .getMinClassSize() ) );
-      if ( settings.getGeneRepTreatment() == 0 )
-         jRadioButtonSeparateReplicates.setSelected( true );
-      else if ( settings.getGeneRepTreatment() == Settings.BEST_PVAL )
+
+      if ( settings.getGeneRepTreatment() == Settings.BEST_PVAL ) {
          jRadioButtonBestReplicates.setSelected( true );
-      else if ( settings.getGeneRepTreatment() == Settings.MEAN_PVAL )
-            jRadioButtonMeanReplicates.setSelected( true );
+      } else if ( settings.getGeneRepTreatment() == Settings.MEAN_PVAL ) {
+         jRadioButtonMeanReplicates.setSelected( true );
+      } else {
+         throw new IllegalStateException( "Invalid gene rep treatment method" );
+      }
    }
 
    public void saveValues() {
@@ -157,12 +156,13 @@ public class AnalysisWizardStep4 extends WizardStep {
             jTextFieldMaxClassSize.getText() ).intValue() );
       settings.setMinClassSize( Integer.valueOf(
             jTextFieldMinClassSize.getText() ).intValue() );
-      if ( jRadioButtonSeparateReplicates.isSelected() ) {
-         settings.setGeneRepTreatment( 0 ); //not implemented?
-      } else if ( jRadioButtonBestReplicates.isSelected() ) {
+
+      if ( jRadioButtonBestReplicates.isSelected() ) {
          settings.setGeneRepTreatment( Settings.BEST_PVAL );
       } else if ( jRadioButtonMeanReplicates.isSelected() ) {
          settings.setGeneRepTreatment( Settings.MEAN_PVAL );
+      } else {
+         throw new IllegalStateException( "Invalid gene rep treatment method" );
       }
    }
 

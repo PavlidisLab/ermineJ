@@ -17,6 +17,7 @@
 	<mapID target="classes" url="html/tutorial/classes.html" />
    <mapID target="starting" url="html/tutorial/starting.html" />
 	<mapID target="mtc" url="html/tutorial/mtc.html" />
+	<mapID target="reps" url="html/tutorial/genereps.html" />
 	<mapID target="format" url="html/formats/index.html" />
 	<mapID target="go.format" url="html/formats/go.html" />
 	<mapID target="genescores.format" url="html/formats/genescores.html" />

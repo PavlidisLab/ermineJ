@@ -214,9 +214,11 @@ public class GeneScoreReader {
                         group_pval_temp[counter] );
                   break;
                }
+               
+               
                default: {
                   throw new IllegalArgumentException(
-                        "Illegal selection for groups score method. Valid choices are MEAN_PVAL and BEST_PVAL" );
+                        "Illegal selection for groups score method." );
                }
             }
             in_size++;

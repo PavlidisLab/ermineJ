@@ -17,6 +17,7 @@
       <tocitem text="Gene score resampling" target="resampling"/>
       <tocitem text="Correlation" target="correlation"/>
       <tocitem text="Multiple Test Correction" target="mtc"/>
+       <tocitem text="How repeated genes are handled" target="reps"/>
       </tocitem>
       
        <tocitem text="Viewing gene set details" target="visualize"/>

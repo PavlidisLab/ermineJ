@@ -80,54 +80,11 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
     * @param messenger
     * @todo make this faster. cache values?
     */
-
-   // here is the original perl implementation.
-   //   sub classcorrel {
-   //      my ($classdata, $classweights, $replicategroups) = @_;
-   //      $numfeat = scalar @{$$classdata[0]};
-   //      my $numclass = scalar @$classdata;
-   //      my $nummeas = 0;
-   //      my $totalcorrel = 0;
-   //      # calculate the correlation. This is optimized to avoid
-   //      # recalculation of info about vector x.
-   //      my $numskipped = 0;
-   //      for ($i = 0; $i < $numclass; $i++) {
-   //        $meanx = mean($$classdata[$i]);
-   //        $sumx = 0;
-   //        $sumxs = 0;
-   //        $weightx = $$classweights[$i];
-   //        $repgroupx = $$replicategroups[$i];
-   //        for ($m=0; $m<$numfeat; $m++) {
-   //          $sumx+=$$classdata[$i][$m];
-   //          $sumxs+=$$classdata[$i][$m]*$$classdata[$i][$m];
-   //        }
-   //        # Weighting scheme skips comparisons between replicates, and
-   //        # comprisions of replicates to other things are given lower
-   //        # weight. For example, if a replicate group has 2 members, when
-   //        # we compare those to another gene, we get a total of 1 effective
-   //        # measurement.
-   //        for ($j = $i+1; $j < $numclass; $j++) { # start from $i+1 so we skip self comparisons.
-   //          $repgroupy = $$replicategroups[$j];
-   //          if ($doweighting && $repgroupy == $repgroupx) { # skip comparisons between "replicates"
-   //            $numskipped++;
-   //            next;
-   //          }
-   //          $weighty = $$classweights[$j];
-   //          $meany = mean($$classdata[$j]);
-   //          $correlation = correlation_op($sumx, $sumxs, $meanx, $$classdata[$i], $meany, $$classdata[$j]);
-   //          $totalweight = $weighty * $weightx;
-   //          $totalcorrel += $correlation * $totalweight;
-   //          $nummeas+=$totalweight;
-   //        }
-   //      }
-   //      print STDERR "$nummeas effective measurements. $numskipped comparisons skipped. Total weight $totalweight. Total
-   // correl $totalcorrel.\n";
-   //      return 0 if $nummeas == 0; # this will happen if the class is made up of one replicate group.
-   //      return $totalcorrel/$nummeas;
-   //    }
    public void geneSetCorrelationGenerator( StatusViewer messenger ) {
       //iterate over each class
       int count = 0;
+      int setting = settings.getGeneRepTreatment();
+
       for ( Iterator it = geneSetToProbeMap.entrySet().iterator(); it.hasNext(); ) {
          Map.Entry e = ( Map.Entry ) it.next();
          ArrayList probesInSet = ( ArrayList ) e.getValue();
@@ -167,6 +124,8 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
          double avecorrel = 0.0;
          double nummeas = 0;
 
+         Map values = new HashMap();
+         
          for ( int i = probesInSet.size() - 1; i >= 0; i-- ) {
 
             String probei = ( String ) probesInSet.get( i );
@@ -188,20 +147,38 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
                DoubleArrayList jrow = new DoubleArrayList( rawData
                      .getRowByName( probej ) );
 
-               // todo - implement the 'best' method.
                double corr = Math.abs( DescriptiveWithMissing.correlation(
                      irow, jrow ) );
 
-               // The weight is inversely proportional to the number of times this specific pair is going to get tested.
-               double weight = 1.0 / ( geneAnnots.getGeneProbeList( genej )
-                     .size() * repsi );
-
-               corr *= weight;
-
-               avecorrel += corr;
-               nummeas += weight;
+               if ( setting == Settings.BEST_PVAL ) {
+                  
+                  if ( !values.containsKey( genei + "___" + genej ) || ( ( Double ) values.get( genei + "___" + genej ) )
+                        .doubleValue() < corr ) { 
+                     values.put( ( genei + "___" + genej ), new Double( corr ) );
+                  }
+               } else if ( setting == Settings.MEAN_PVAL ) {
+                  double weight = weight = 1.0 / ( geneAnnots.getGeneProbeList(
+                        genej ).size() * repsi );
+                  corr *= weight;
+                  avecorrel += corr;
+                  nummeas += weight;
+               } else {
+                  throw new IllegalStateException("Unknown method.");
+               }
+              
             }
          }
+
+         
+         if ( setting == Settings.BEST_PVAL ) {
+            avecorrel = 0.0;
+            nummeas = 0;
+            for ( Iterator iter = values.values().iterator(); iter.hasNext(); ) {
+               avecorrel += ( ( Double ) iter.next() ).doubleValue();
+               nummeas++;
+            }
+         }
+
          double geneSetMeanCorrel = avecorrel / nummeas;
 
          //         for ( Iterator vit = probesInSet.iterator(); vit.hasNext(); ) {
