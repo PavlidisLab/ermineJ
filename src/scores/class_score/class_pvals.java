@@ -44,7 +44,6 @@ public class class_pvals {
     public class_pvals(String probe_pvalfile,String affy_gofile,String go_namefile,String destination_file,String ug_file,String method,int class_max_size,int class_min_size,int number_of_runs,int quantile, double pval, String wt_check) {
 
 	affy_go_Parse affy_go = new affy_go_Parse(affy_gofile);//parses affy file. Yields map of probe->go
-	ugName = new Ug_Parse(ug_file); //parse ug file. yields map of probe->replicates. Probes which have no replicates are not listed.
 	goName = new GoName_parse(go_namefile); // parse go name file
 	
 	probe_go = new LinkedHashMap();
@@ -54,12 +53,10 @@ public class class_pvals {
 	probe_ug = new LinkedHashMap();
 	ug_pval_map = new LinkedHashMap();
 
-	ugName.chip_repeat(); // this IS used.
 	probe_go = affy_go.get_affy_map(); //probe go map
 	go_probe = affy_go.get_go_map(); //go probe map
 	go_name = goName.get_GoName_map(); //go name map
 	//	ug_name = ugName.get_chip_map(); //ug map (chip_repeat_val) todo: this isn't used anywhere.??
-	probe_ug = ugName.get_chip_ug_map(); //ug chip map  (chip_ug_map -- map of probes to unigene
 	user_pvalue = -(Math.log(pval)/Math.log(10));//user defined pval (cutoff)
 	weight_on =(Boolean.valueOf(wt_check)).booleanValue();
 
@@ -71,6 +68,11 @@ public class class_pvals {
 	probe_pval.set_number_of_runs(number_of_runs);
 	probe_pval.set_quantile(quantile);
 
+	ugName = new Ug_Parse(ug_file, probe_pval.get_map()); //parse ug file. yields map of probe->replicates. Probes which have no replicates are not listed.
+	ugName.chip_repeat(); // this IS used.
+	probe_ug = ugName.get_chip_ug_map(); //ug chip map  (chip_ug_map -- map of probes to unigene
+	
+	
 	if(weight_on)
 	    probe_pval.set_input_pvals(ugName.get_ug_chip_map()); // this initializes the ug_pval_map.
 

@@ -83,9 +83,8 @@ import java.lang.reflect.*;
 	     doubleArray =new Double[rows.size()-1];
 	     for (int i=1; i < rows.size();i++)
 		 {
-		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(1)));
-
 		     chip_id[i-1]=(String)(((Vector)(rows.elementAt(i))).elementAt(0));
+		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(1)));
 
 		     //uncommented do not add probes whose pvals ==0
 		     if (pval[i-1]==0) {

@@ -35,13 +35,14 @@ public class Ug_Parse {
     private static Map chip_ug_map;//map of chip ->ug..input file
     private static Map chip_repeat_val;//map of chips final weights file  todo: is this used?
     private static Map ug_chip_list;//map of ug->chips
+    private Map chips;
     private Set ug;
     
     //--------------------------------------------------< main >--------//
     
     public static void main (String[] args) {
-	Ug_Parse fi = new Ug_Parse(args[0]);
-	fi.print(chip_ug_map);
+	//Ug_Parse fi = new Ug_Parse(args[0]);
+	//fi.print(chip_ug_map);
 	//	fi.chip_repeat();
 	//	fi.print(chip_repeat_val);
     }
@@ -52,11 +53,11 @@ public class Ug_Parse {
     /* Note that this does not store anything for probes which do not
      * have a unigene cluster. */
     /*****************************************************************************************/
-    public Ug_Parse(String filename)
+    public Ug_Parse(String filename, Map chipsFromList)
     {
 	String aLine = null;
 	int count = 0;
-	
+	chips = chipsFromList;
 	try { 
 	    FileInputStream fis = new FileInputStream(filename);
 	    BufferedInputStream bis = new BufferedInputStream(fis);
@@ -123,7 +124,8 @@ public class Ug_Parse {
 	Iterator chipit = chip.iterator();
 	while (chipit.hasNext()) {
 	    String ele = (String)chipit.next();
-	    chip_repeat_val.put(ele,null);
+	    if(chips.containsKey(ele))
+	        chip_repeat_val.put(ele,null);
 	}
 
 	//iterate over earlier table values
@@ -146,17 +148,19 @@ public class Ug_Parse {
 		     //add all values of chips with the same UG to a hashtable with key equal to one of the UG id's chip 
 		     while(arry.hasNext()){
 			 String arr = (String)arry.next();
-			 if (!arr.equals(valx)){
-			     l1.add(arr);
-			 }
+			 if(chips.containsKey(arr))
+			     if (!arr.equals(valx)){
+			         l1.add(arr);
+			     }
 		     } 
 		 } else {
 		     Iterator arri = val.iterator();
 		     while(arri.hasNext()){
 			 String arr = (String)arri.next();
-			 if (!arr.equals(valx)){
-			     l1.add(arr);
-			 }
+			 if(chips.containsKey(arr))
+			     if (!arr.equals(valx)){
+			         l1.add(arr);
+			     }
 		     } 
 		     chip_repeat_val.put(valx,l1);
 		 }

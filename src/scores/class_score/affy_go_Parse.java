@@ -70,7 +70,9 @@ import java.nio.charset.*;
 		     
 		     // create a new Vector for each row's columns
 		     cols = new Vector();
-		     
+		     //String pp = st.nextToken();
+		     //System.out.println(pp);
+		     //chip_id.add(pp);
 		     chip_id.add(st.nextToken());
 		     // assumption just 2 columns
 		     if (st.hasMoreTokens()){
