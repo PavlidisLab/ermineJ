@@ -36,7 +36,6 @@ import classScore.gui.geneSet.JGeneSetFrame;
  * 
  * @author Paul Pavlidis
  * @version $Id$
- * @todo 3.0 make multiple test correction a 'setting'.
  */
 public class GeneSetPvalRun {
 
@@ -236,7 +235,7 @@ public class GeneSetPvalRun {
       final GeneSetResult res = ( GeneSetResult ) results.get( classID );
       String name = res.getClassName();
       //   System.out.println( name );
-      Map classToProbe = geneData.getClassToProbeMap();
+      Map classToProbe = geneData.getGeneSetToProbeMap();
 
       ArrayList probeIDs = ( ArrayList ) classToProbe.get( classID );
       Map pvals = new HashMap();

@@ -54,7 +54,7 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
     * @param probesToPvals a <code>Map</code> value
     */
    public void classPvalGenerator( Map group_pval_map, Map probesToPvals ) {
-      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->
+      Collection entries = geneAnnots.getGeneSetToProbeMap().entrySet(); // go ->
       // probe
       // map.
       // Entries
@@ -83,7 +83,7 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
     * them to the results object. This is used to get class pvalues for permutation analysis.
     */
    public Map class_v_pval_generator( Map group_pval_map, Map probesToPvals ) {
-      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->
+      Collection entries = geneAnnots.getGeneSetToProbeMap().entrySet(); // go ->
       // probe
       // map.
       // Entries

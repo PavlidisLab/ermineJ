@@ -67,7 +67,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
             geneAnnots, csc, gon, rawData ); // main data file
       this.geneAnnots = geneAnnots;
    //   this.probeToGeneSetMap = geneAnnots.getProbeToClassMap();
-      this.geneSetToProbeMap = geneAnnots.getClassToProbeMap();
+      this.geneSetToProbeMap = geneAnnots.getGeneSetToProbeMap();
 
       this.hist = hist;
       this.rawData = rawData;

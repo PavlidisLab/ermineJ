@@ -29,7 +29,11 @@ import classScore.Settings;
  *  
  *   
  *    
- *              probe_id[tab]pval
+ *     
+ *      
+ *                probe_id[tab]pval
+ *       
+ *      
  *     
  *    
  *   
@@ -63,11 +67,14 @@ public class GeneScoreReader {
     * @throws IOException
     */
    public GeneScoreReader( String filename, Settings settings,
-         StatusViewer messenger, Map geneToProbeMap ) throws IOException {
+         StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
+         throws IOException {
 
       geneToPvalMap = new HashMap();
       double log10 = Math.log( 10 );
       boolean invalidLog = false;
+      boolean unknownProbe = false;
+      
       File infile = new File( filename );
       if ( !infile.exists() || !infile.canRead() ) {
          throw new IOException( "Could not read " + filename );
@@ -101,7 +108,7 @@ public class GeneScoreReader {
 
       probeIDs = new String[rows.size() - 1];
       probePvalues = new double[rows.size() - 1];
-
+      int numProbesKept = 0;
       for ( int i = 1; i < rows.size(); i++ ) {
 
          if ( ( ( Vector ) ( rows.elementAt( i ) ) ).size() < settings
@@ -129,17 +136,24 @@ public class GeneScoreReader {
 
          // Fudge when pvalues are zero.
          if ( settings.getDoLog() && probePvalues[i - 1] <= 0 ) {
-
             invalidLog = true;
             probePvalues[i - 1] = SMALL;
 
          }
 
-         if ( settings.getDoLog() ) {
-            probePvalues[i - 1] = -( Math.log( probePvalues[i - 1] ) / log10 ); // Make
-            // -log
-            // base 10.
+         if ( settings.getDoLog() ) { 
+            probePvalues[i - 1] = -( Math.log( probePvalues[i - 1] ) / log10 ); 
          }
+
+         // only keep probes that are in our array platform.
+         if ( !probeToGeneMap.containsKey( probeIDs[i - 1] ) ) {
+             unknownProbe = true;
+     //       messenger.setStatus("Probe not known for platform: " + probeIDs[i-1] + ", skipping.");
+            continue;
+         }
+
+         numProbesKept++;
+
          probeToPvalMap
                .put( probeIDs[i - 1], new Double( probePvalues[i - 1] ) );
       }
@@ -151,21 +165,37 @@ public class GeneScoreReader {
                .setError( "Warning: There were attempts to take the log of non-positive values. These are set to "
                      + SMALL );
          try {
-            Thread.sleep( 1000 );
+            Thread.sleep( 2000 );
+         } catch ( InterruptedException e ) {
+         }
+      }
+      
+      if ( unknownProbe ) {
+         messenger
+               .setError( "Warning: Some probes in your gene score file don't match the ones in the annotation file." );
+         try {
+            Thread.sleep( 2000 );
          } catch ( InterruptedException e ) {
          }
       }
 
+      if ( numProbesKept == 0 ) {
+         throw new IllegalStateException(
+               "None of the probes in the gene score file correspond to probes in the "
+                     + "annotation (\".an\") file you selected." );
+      }
+
       if ( num_pvals == 0 ) {
          throw new IllegalStateException(
-               "No pvalues found in the file! Please check the file has"
-                     + "the correct plain text format and" 
-                     + "corresponds to the GO xml file." );
+               "No pvalues found in the gene score file! Please check the file has"
+                     + " the correct plain text format and"
+                     + " corresponds to the microarray annotation (\".an\") file you selected." );
       }
 
       if ( messenger != null ) {
          messenger.setStatus( "Found " + num_pvals + " pvals in the file" );
       }
+      
       setUpGeneToPvalMap( settings.getGeneRepTreatment(), geneToProbeMap,
             messenger );
 
@@ -178,10 +208,10 @@ public class GeneScoreReader {
     * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the data
     *        set.
     */
-   private void setUpGeneToPvalMap( int gp_method, Map groupToProbeMap,
+   private void setUpGeneToPvalMap( int gp_method, Map geneToProbeMap,
          StatusViewer messenger ) {
 
-      if ( groupToProbeMap == null || groupToProbeMap.size() == 0 ) {
+      if ( geneToProbeMap == null || geneToProbeMap.size() == 0 ) {
          throw new IllegalStateException( "groupToProbeMap was not set." );
       }
 
@@ -189,18 +219,18 @@ public class GeneScoreReader {
          throw new IllegalStateException( "probeToPvalMap was not set." );
       }
 
-      if ( groupToProbeMap.size() == 0 ) {
+      if ( geneToProbeMap.size() == 0 ) {
          throw new IllegalStateException( "Group to probe map was empty" );
       }
 
-      double[] group_pval_temp = new double[groupToProbeMap.size()];
+      double[] group_pval_temp = new double[geneToProbeMap.size()];
       int counter = 0;
 
-      for ( Iterator groupMapItr = groupToProbeMap.keySet().iterator(); groupMapItr
+      for ( Iterator groupMapItr = geneToProbeMap.keySet().iterator(); groupMapItr
             .hasNext(); ) {
          String group = ( String ) groupMapItr.next();
-         /* probes in this group */
-         ArrayList probes = ( ArrayList ) groupToProbeMap.get( group );
+       
+         ArrayList probes = ( ArrayList ) geneToProbeMap.get( group ); /* probes in this group according to the array platform. */
          int in_size = 0;
 
          // Analyze all probes in this 'group' (pointing to the same gene)
@@ -233,7 +263,7 @@ public class GeneScoreReader {
             in_size++;
          }
 
-         if ( in_size != 0 ) {
+         if ( in_size > 0 ) {
             if ( gp_method == Settings.MEAN_PVAL ) {
                group_pval_temp[counter] /= in_size; // take the mean
             }
@@ -248,8 +278,9 @@ public class GeneScoreReader {
                "No gene to pvalue mappings were found." );
       }
 
-      messenger.setStatus( counter
-            + " distinct genes found in the annotations." );
+      if ( messenger != null )
+            messenger.setStatus( counter
+                  + " distinct genes found in the annotations." );
 
       groupPvalues = new double[counter];
       for ( int i = 0; i < counter; i++ ) {

@@ -69,7 +69,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
          return null;
       }
 
-      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get(
+      ArrayList values = ( ArrayList ) geneAnnots.getGeneSetToProbeMap().get(
             class_name );
       Iterator classit = values.iterator();
       double[] groupPvalArr = new double[effSize]; // store pvalues for items in

@@ -496,7 +496,7 @@ public class classScoreCMD {
          statusMessenger.setStatus( "Reading gene scores from file "
                + settings.getScoreFile() );
          geneScores = new GeneScoreReader( settings.getScoreFile(), settings,
-               statusMessenger, geneData.getGeneToProbeList() );
+               statusMessenger, geneData.getGeneToProbeList(), geneData.getProbeToGeneMap() );
          geneScoreSets.put( settings.getScoreFile(), geneScores );
       }
 

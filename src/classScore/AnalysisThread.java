@@ -104,7 +104,7 @@ public class AnalysisThread {
          messenger.setStatus( "Reading gene scores from file "
                + settings.getScoreFile() );
          geneScores = new GeneScoreReader( settings.getScoreFile(), settings,
-               messenger, geneData.getGeneToProbeList() );
+               messenger, geneData.getGeneToProbeList(), geneData.getProbeToGeneMap() );
          geneScoreSets.put( settings.getScoreFile(), geneScores );
       }
 

@@ -58,7 +58,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
          return null;
       }
 
-      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get(
+      ArrayList values = ( ArrayList ) geneAnnots.getGeneSetToProbeMap().get(
             classId );
       Iterator classit = values.iterator();
       double[] groupPvalArr = new double[effSize]; // store pvalues for items in

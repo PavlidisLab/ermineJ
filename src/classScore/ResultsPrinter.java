@@ -124,7 +124,7 @@ public class ResultsPrinter {
     */
    private String format_redundant_and_similar( String classid ) {
       ArrayList redund = GeneSetMapTools.getRedundancies( classid, geneData
-            .getClassesToRedundantMap() ); //commented just to compile (Homin)
+            .geneSetToRedundantMap() ); //commented just to compile (Homin)
       String return_value = "";
       if ( redund != null ) {
          Iterator it = redund.iterator();

@@ -34,7 +34,7 @@ public class GeneSetSizeComputer {
          GeneScoreReader geneScores, boolean w ) {
       this.weight_on = w;
       this.activeProbes = activeProbes;
-      this.classToProbe = geneData.getClassToProbeMap();
+      this.classToProbe = geneData.getGeneSetToProbeMap();
       this.probeGroups = geneData.getProbeToGeneMap();
       this.geneScores = geneScores;
       effectiveSizes = new HashMap();
