@@ -8,7 +8,7 @@
 #                                                                                                                                                            
 #*******************************************************************************
 
-OPTIONS = -g
+OPTIONS = -g -O
 
 RUN_OPTIONS= -Xmx1024M
 
@@ -34,6 +34,11 @@ WINDOWTITLE = 'Java 2 Platform v1.4 API Specification for Class Scores'
 DOCTITLE = 'Class Scores<sup><font size="-2">TM</font></sup> v1.4 API Specification'
 HEADER = '<b>CLASS_SCORES</b><br><font size="-1">Columbia</font>'
 BOTTOM = '<font size="-1"><a href="mailto:pp175@columbia.edu">Submit a bug or feature request</a><br><br>Class Score is the propriety of Columbia Genome Center<br>Copyright 2002 Columbia Genome Center,<br>NY, U.S.A.All Rights Reserved.</font>'
+
+tags: etags
+
+etags:
+	etags *.java scores/class_score/*.java
 
 all: class_score 
 
