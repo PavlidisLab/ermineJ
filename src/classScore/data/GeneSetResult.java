@@ -7,10 +7,10 @@ import java.util.LinkedHashMap;
 
 /**
  * Data structure to store class scoring information about a class.
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
- *  
+ *
  */
 public class GeneSetResult implements Comparable {
    private String class_id = null;
@@ -67,18 +67,7 @@ public class GeneSetResult implements Comparable {
    public void print( BufferedWriter out, String extracolumns )
          throws IOException {
 
-      String fixnamea;
-      String cleanname;
-      if ( class_name != null ) {
-         fixnamea = class_name.replace( ' ', '_' ); // make the format
-                                                    // compatible with the perl
-                                                    // scripts Paul wrote.
-         cleanname = fixnamea.replace( ':', '-' ); // todo: figure out why this
-                                                   // doesn't work.
-      } else {
-         cleanname = "";
-      }
-      out.write( "!\t" + cleanname + "_" + class_id + "" + "\t" +
+      out.write( "!\t" +
                  class_name + "\t" + class_id + "\t" +
                  size + "\t" +
                  effective_size + "\t" +
@@ -93,14 +82,13 @@ public class GeneSetResult implements Comparable {
 
    public void print_headings( BufferedWriter out, String extracolumns ) throws
        IOException {
-      out.write( "#\n#" );
-      out.write( "Class" + "\tClass Name" + "\tClass ID" + "\tsize" +
+      out.write( "#\n#!" );
+      out.write( "\tClass Name" + "\tClass ID" + "\tsize" +
                  "\teffective_size" +
                  "\traw score" +
-                 "\tresamp pval" +
-                 "\tN over pval cut\tORA pval"
+                 "\tpval" +
+                 //"\tN over pval cut\tORA pval+"
                  /* + "\tAROC" + "\tAROCpval"  */
-                 +
                  "\tCorrected_pvalue" + extracolumns + "\n" );
    }
 
@@ -163,7 +151,7 @@ public class GeneSetResult implements Comparable {
    }
 
    /**
-    * 
+    *
     * @return int
     */
    public int getSize() {
@@ -172,7 +160,7 @@ public class GeneSetResult implements Comparable {
 
    /**
     * Default comparator for this class: sorts by the pvalue.
-    * 
+    *
     * @param ob Object
     * @return int
     */

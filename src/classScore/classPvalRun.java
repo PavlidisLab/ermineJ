@@ -69,9 +69,11 @@ public class classPvalRun {
       this.goData = goData;
       this.geneScores = geneScores;
       this.activeProbes = activeProbes;
-      sortResults();
+      this.results = results;
 
+      sortResults();
       // get the class sizes.
+
       GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes,
             geneData,  geneScores, settings.getUseWeights() );
       csc.getClassSizes();

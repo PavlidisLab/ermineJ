@@ -26,7 +26,7 @@ import classScore.data.GeneSetResult;
  * <p>
  * Company:
  * </p>
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  */
@@ -47,7 +47,7 @@ public class ResultsFileReader {
       FileInputStream fis = new FileInputStream( filename );
       BufferedInputStream bis = new BufferedInputStream( fis );
       BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
-      
+
       messenger.setStatus( "Loading analysis..." );
       String line;
       //line = dis.readLine(); // ditch the header.
@@ -55,8 +55,6 @@ public class ResultsFileReader {
          StringTokenizer st = new StringTokenizer( line, "\t" );
          String firstword = st.nextToken();
          if ( firstword.compareTo( "!" ) == 0 ) {
-            // todo mungedname might not be here.
-        //    String classMungedName = st.nextToken();
             String className = st.nextToken();
             String classId = st.nextToken();
             int size = Integer.parseInt( st.nextToken() );
