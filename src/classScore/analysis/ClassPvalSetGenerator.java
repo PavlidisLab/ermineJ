@@ -6,8 +6,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import classScore.*;
-import classScore.data.*;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.classresult;
+import classScore.data.expClassScore;
+import classScore.data.histogram;
 
 /**
  * <p>Title: </p>
@@ -27,12 +30,12 @@ public class ClassPvalSetGenerator {
      private histogram hist;
      private Map probeGroups;
      private Map classToProbe;
-     private ClassSizeComputer csc;
+     private GeneSetSizeComputer csc;
      private NumberFormat nf = NumberFormat.getInstance();
      private GONames goName;
 
      public ClassPvalSetGenerator(GeneAnnotations geneData, boolean w, histogram hi,
-                                         expClassScore pvm, ClassSizeComputer csc, GONames gon) {
+                                         expClassScore pvm, GeneSetSizeComputer csc, GONames gon) {
         this.weight_on = w;
         this.classToProbe = geneData.getClassToProbeMap();
         this.probeGroups = geneData.getProbeToGeneMap();
