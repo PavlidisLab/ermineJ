@@ -13,6 +13,7 @@ import javax.swing.SwingConstants;
 
 import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
+import baseCode.util.FileTools;
 import classScore.Settings;
 
 /**
@@ -110,11 +111,11 @@ public class AnalysisWizardStep2
                    "file can have as few as two columns. &quot;Raw data&quot;" +
                    " refers to the expression profile data, usually a large matrix. " +
                    "Files must be tab-delimited text. For details, see the user manual.");
-      this.addMain(step2Panel);
-      wiz.setFinishEnabled();
+      this.addMain(step2Panel);   
    }
 
    public boolean isReady() {
+
       if ( wiz.getAnalysisType() == Settings.CORR && rawFile.getText().compareTo( "" ) == 0 ) {
          wiz.showError( "Correlation analyses require a raw data file." );
          return false;
@@ -132,14 +133,16 @@ public class AnalysisWizardStep2
          return false;
       }
       
-      if (rawFile.getText().compareTo( "" ) != 0 && ! GuiUtil.testFile(rawFile.getText())) {
+      // make sure we got at least one file that's readable.
+      if (rawFile.getText().length() != 0 && ! FileTools.testFile(rawFile.getText())) {
+         wiz.showError("The raw data file is not valid.");
          return false;
       }
 
-      if (scoreFile.getText().compareTo( "" ) != 0 && ! GuiUtil.testFile(scoreFile.getText())) {
+      if (scoreFile.getText().length() != 0 && ! FileTools.testFile(scoreFile.getText())) {
+         wiz.showError("The gene score file is not valid.");
          return false;
       }
-      
       return true;
    }
 

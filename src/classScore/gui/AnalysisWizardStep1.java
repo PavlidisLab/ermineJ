@@ -34,13 +34,7 @@ public class AnalysisWizardStep1 extends WizardStep {
       this.wiz = wiz;
       this.settings = settings;
       setValues();
-      
-      // determine if the "finish" button should be disabled or not
-      if (settings.getAnnotFile() == null && settings.getScoreFile() == null ) {
-         wiz.setFinishDisabled();
-      } else {
-         wiz.setFinishEnabled();
-      }
+
    }
 
    //Component initialization

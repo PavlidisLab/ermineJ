@@ -69,6 +69,7 @@ private Map probeToGeneMap;
       this.geneAnnots = geneAnnots;
       this.probeToGeneSetMap = geneAnnots.getProbeToClassMap();
       this.geneSetToProbeMap = geneAnnots.getClassToProbeMap();
+
       this.hist = hist;
       this.rawData = rawData;
       probeCorrelData.set_class_max_size( settings.getMaxClassSize() );
@@ -79,8 +80,53 @@ private Map probeToGeneMap;
    /**
     * @param messenger
     * @todo make this faster. cache values?
-    * @todo need to do weighting
     */
+   
+   // here is the original perl implementation.
+//   sub classcorrel {
+//      my ($classdata, $classweights, $replicategroups) = @_;
+//      $numfeat = scalar @{$$classdata[0]};
+//      my $numclass = scalar @$classdata;
+//      my $nummeas = 0;
+//      my $totalcorrel = 0;
+//      # calculate the correlation. This is optimized to avoid
+//      # recalculation of info about vector x.
+//      my $numskipped = 0;
+//      for ($i = 0; $i < $numclass; $i++) {
+//        $meanx = mean($$classdata[$i]);
+//        $sumx = 0;
+//        $sumxs = 0;
+//        $weightx = $$classweights[$i];
+//        $repgroupx = $$replicategroups[$i];
+//        for ($m=0; $m<$numfeat; $m++) {
+//          $sumx+=$$classdata[$i][$m];
+//          $sumxs+=$$classdata[$i][$m]*$$classdata[$i][$m];
+//        }
+//        # Weighting scheme skips comparisons between replicates, and
+//        # comprisions of replicates to other things are given lower
+//        # weight.  For example, if a replicate group has 2 members, when
+//        # we compare those to another gene, we get a total of 1 effective
+//        # measurement.
+//        for ($j = $i+1; $j < $numclass; $j++) { # start from $i+1 so we skip self comparisons.
+//          $repgroupy = $$replicategroups[$j];
+//          if ($doweighting && $repgroupy == $repgroupx) { # skip comparisons between "replicates"
+//            $numskipped++;
+//            next;
+//          }
+//          $weighty = $$classweights[$j];
+//          $meany = mean($$classdata[$j]);
+//          $correlation =  correlation_op($sumx, $sumxs, $meanx, $$classdata[$i], $meany, $$classdata[$j]);
+//          $totalweight = $weighty * $weightx;
+//          $totalcorrel += $correlation * $totalweight;
+//          $nummeas+=$totalweight;
+//        }
+//      }
+//      print STDERR "$nummeas effective measurements. $numskipped comparisons skipped. Total weight $totalweight. Total correl $totalcorrel.\n";
+//      return 0 if $nummeas == 0; # this will happen if the class is made up of one replicate group.
+//      return $totalcorrel/$nummeas;
+//    }
+
+   
    public void geneSetCorrelationGenerator( StatusViewer messenger ) {
       //iterate over each class
       int count = 0;
@@ -132,6 +178,9 @@ private Map probeToGeneMap;
             String genei = (String)probeToGeneMap.get(probei);
             DoubleArrayList irow = new DoubleArrayList( rawData.getRowByName(probei)  );
             
+            // number of probes for this gene.
+            int repsi = geneAnnots.getGeneProbeList(genei).size();
+            
             for (int j = i - 1; j >= 0; j--) {
                String probej = (String)probesInSet.get(j);
                String genej = (String)probeToGeneMap.get(probej);
@@ -146,8 +195,13 @@ private Map probeToGeneMap;
                double corr = Math
                .abs( DescriptiveWithMissing.correlation( irow, jrow ) );
                
+               // The weight is inversely proportional to the number of times this specific pair is going to get tested.
+               double weight = 1.0/(geneAnnots.getGeneProbeList(genej).size() * repsi);
+               
+               corr *= weight; 
+                  
                avecorrel += corr;
-               nummeas++;
+               nummeas+=weight;
             }
          }
          double geneSetMeanCorrel = avecorrel/nummeas;

@@ -59,6 +59,13 @@ public class AnalysisWizard
       step5 = new AnalysisWizardStep5( this, settings );
       this.addStep( 5, step5 );
       this.setTitle( "Create New Analysis - Step 1 of 5" );
+      
+      // determine if the "finish" button should be disabled or not
+      if (settings.getRawFile().length() == 0 && settings.getScoreFile().length() == 0 ) {
+         setFinishDisabled();
+      } else {
+         setFinishEnabled();
+      }
    }
 
    protected void nextButton_actionPerformed( ActionEvent e ) {
@@ -71,6 +78,7 @@ public class AnalysisWizard
          this.getContentPane().add( step2 );
          step2.revalidate();
          backButton.setEnabled( true );
+         setFinishEnabled();
          this.repaint();
          nextButton.grabFocus();
          this.analysisType = settings.getAnalysisMethod();

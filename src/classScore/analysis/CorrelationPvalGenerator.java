@@ -8,7 +8,8 @@ import classScore.data.GeneAnnotations;
 /**
  * 
  * 
- * @author Shahmil Merchant, Paul Pavlidis
+ * @author Shahmil Merchant
+ * @author Paul Pavlidis
  * @version $Id$
  */
 public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator{
