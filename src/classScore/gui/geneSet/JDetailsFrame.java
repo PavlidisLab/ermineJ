@@ -8,7 +8,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,7 +30,6 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableColumn;
-
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.reader.DoubleMatrixReader;
 import baseCode.graphics.text.Util;
@@ -41,9 +39,9 @@ import baseCode.gui.JMatrixDisplay;
 import baseCode.gui.table.JHorizontalTableHeaderRenderer;
 import baseCode.gui.table.JMatrixTableCellRenderer;
 import baseCode.gui.table.JVerticalTableHeaderRenderer;
-import classScore.data.*;
-import classScore.gui.*;
 import classScore.Settings;
+import classScore.data.GeneAnnotations;
+import classScore.gui.SortFilterModel;
 
 /**
  * @author Will Braynen
@@ -83,7 +81,6 @@ public class JDetailsFrame
    JGradientBar m_gradientBar = new JGradientBar();
    JMenuItem m_saveDataMenuItem = new JMenuItem();
 
-
    /**
     * @param  args[0]  the name of the raw data file, as an absolute path,
     *                  where we look up the microarray data for each gene in
@@ -92,7 +89,7 @@ public class JDetailsFrame
    public static void main( String[] args ) {
 
       // Make sure the filename was passed in
-      if (args.length < 1) {
+      if ( args.length < 1 ) {
          System.err.println( "Please specify the name of the data file as a program argument" );
          return;
       }
@@ -100,10 +97,11 @@ public class JDetailsFrame
       Settings settings = new Settings();
       settings.setRawFile( args[0] );
 
-      final String[] PROBES = { "100_g_at" };
+      final String[] PROBES = {
+          "100_g_at"};
 
       ArrayList probeIDs = new ArrayList();
-      for (int i = 0; i < PROBES.length; i++) {
+      for ( int i = 0; i < PROBES.length; i++ ) {
          probeIDs.add( i, PROBES[i] );
       }
 
@@ -112,7 +110,8 @@ public class JDetailsFrame
       frame.show();
    }
 
-   public JDetailsFrame( ArrayList probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings ) {
+   public JDetailsFrame( ArrayList probeIDs, Map pvalues, GeneAnnotations geneData,
+                         Settings settings ) {
       try {
          String filename = settings.getRawFile();
          createDetailsTable( probeIDs, pvalues, geneData, filename );
@@ -160,8 +159,8 @@ public class JDetailsFrame
           JDetailsFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
       m_blackbodyColormapMenuItem.addActionListener( new
           JDetailsFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
-      m_saveImageMenuItem.setActionCommand("SaveImage");
-      m_saveImageMenuItem.setText("Save Image..." );
+      m_saveImageMenuItem.setActionCommand( "SaveImage" );
+      m_saveImageMenuItem.setText( "Save Image..." );
       m_saveImageMenuItem.addActionListener( new JDetailsFrame_m_saveImageMenuItem_actionAdapter( this ) );
       m_normalizeMenuItem.setText( "Normalize" );
       m_normalizeMenuItem.addActionListener( new JDetailsFrame_m_normalizeMenuItem_actionAdapter( this ) );
@@ -182,8 +181,8 @@ public class JDetailsFrame
       jLabel2.setText( "    " );
       jLabel3.setText( "Color Range:" );
 
-      m_gradientBar.setMaximumSize(new Dimension(200, 30));
-      m_gradientBar.setPreferredSize(new Dimension(120, 30));
+      m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
+      m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
       m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
 
       initColorRangeWidget();
@@ -191,9 +190,9 @@ public class JDetailsFrame
       m_colorRangeSlider.setMaximumSize( new Dimension( 50, 24 ) );
       m_colorRangeSlider.setPreferredSize( new Dimension( 50, 24 ) );
       m_colorRangeSlider.addChangeListener( new JDetailsFrame_m_colorRangeSlider_changeAdapter( this ) );
-      m_saveDataMenuItem.setActionCommand("SaveData");
-      m_saveDataMenuItem.setText("Save Data...");
-      m_saveDataMenuItem.addActionListener(new JDetailsFrame_m_saveDataMenuItem_actionAdapter(this));
+      m_saveDataMenuItem.setActionCommand( "SaveData" );
+      m_saveDataMenuItem.setText( "Save Data..." );
+      m_saveDataMenuItem.addActionListener( new JDetailsFrame_m_saveDataMenuItem_actionAdapter( this ) );
       m_tableScrollPane.getViewport().add( m_table, null );
 
       // Reposition the table inside the scrollpane
@@ -212,7 +211,7 @@ public class JDetailsFrame
       m_menuBar.add( m_fileMenu );
       m_menuBar.add( m_viewMenu );
 
-     // Color map menu items (radio button group -- only one can be selected at one time)
+      // Color map menu items (radio button group -- only one can be selected at one time)
       ButtonGroup group = new ButtonGroup();
       group.add( m_greenredColormapMenuItem );
       group.add( m_blackbodyColormapMenuItem );
@@ -222,7 +221,7 @@ public class JDetailsFrame
       m_viewMenu.add( m_greenredColormapMenuItem );
       m_viewMenu.add( m_blackbodyColormapMenuItem );
       m_fileMenu.add( m_saveImageMenuItem );
-      m_fileMenu.add(m_saveDataMenuItem);
+      m_fileMenu.add( m_saveDataMenuItem );
       m_matrixDisplayCellWidthSlider.setPaintTrack( true );
       m_matrixDisplayCellWidthSlider.setPaintTicks( false );
 
@@ -243,7 +242,7 @@ public class JDetailsFrame
 
       // create a probe set from probeIDs
       HashSet probeSet = new HashSet();
-      for (int i = 0; i < probeIDs.size(); i++) {
+      for ( int i = 0; i < probeIDs.size(); i++ ) {
          probeSet.add( probeIDs.get( i ) );
       }
 
@@ -354,8 +353,8 @@ public class JDetailsFrame
    protected String[] getProbeIDs( Map classToProbe, String classID ) {
 
       // Compile a list of gene probe ID's in this probe class
-      final int probeCount = (( ArrayList ) classToProbe.get( classID )).size();
-      String[] probesIDs = new String[ probeCount ];
+      final int probeCount = ( ( ArrayList ) classToProbe.get( classID ) ).size();
+      String[] probesIDs = new String[probeCount];
       for ( int i = 0; i < probeCount; i++ ) {
          probesIDs[i] = ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i );
       }
@@ -390,7 +389,8 @@ public class JDetailsFrame
    void m_saveImageMenuItem_actionPerformed( ActionEvent e ) {
 
       // Create a file chooser
-      final JImageFileChooser fc = new JImageFileChooser( true, m_matrixDisplay.getStandardizedEnabled() );
+      final JImageFileChooser fc = new JImageFileChooser( true,
+          m_matrixDisplay.getStandardizedEnabled() );
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -414,10 +414,11 @@ public class JDetailsFrame
       // else canceled by user
    }
 
-   void m_saveDataMenuItem_actionPerformed(ActionEvent e) {
+   void m_saveDataMenuItem_actionPerformed( ActionEvent e ) {
 
       // Create a file chooser
-      final JDataFileChooser fc = new JDataFileChooser( true, m_matrixDisplay.getStandardizedEnabled() );
+      final JDataFileChooser fc = new JDataFileChooser( true,
+          m_matrixDisplay.getStandardizedEnabled() );
       int returnVal = fc.showSaveDialog( this );
       if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -441,8 +442,8 @@ public class JDetailsFrame
       // else canceled by user
    }
 
-
-   protected void saveImage( String filename, boolean includeLabels, boolean normalized ) throws IOException {
+   protected void saveImage( String filename, boolean includeLabels, boolean normalized ) throws
+       IOException {
 
       boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
       m_matrixDisplay.setStandardizedEnabled( normalized );
@@ -450,7 +451,7 @@ public class JDetailsFrame
       try {
          m_matrixDisplay.saveImage( filename, includeLabels, normalized );
       }
-      catch (IOException e) {
+      catch ( IOException e ) {
          // clean up
          m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
          m_matrixDisplay.resetRowKeys();
@@ -463,10 +464,10 @@ public class JDetailsFrame
 
    } // end saveImage
 
+   protected void saveData( String filename, boolean includeMatrixValues, boolean includeNonMatrix,
+                            boolean normalized ) throws IOException {
 
-   protected void saveData( String filename, boolean includeMatrixValues, boolean includeNonMatrix, boolean normalized ) throws IOException {
-
-       // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
+      // Should this be a newline (UNIX) or a carriage return & newline (Windows/DOS)?
       final String NEWLINE = "\r\n";
 
       BufferedWriter out = new BufferedWriter( new FileWriter( filename ) );
@@ -505,7 +506,7 @@ public class JDetailsFrame
 
             if ( includeNonMatrix ) {
                // for this row: write out the rest of the table
-               for ( int c = matrixColumnCount; c < totalColumnCount; c++) {
+               for ( int c = matrixColumnCount; c < totalColumnCount; c++ ) {
                   out.write( m_table.getValueAt( r, c ) + "\t" );
                }
             }
@@ -518,7 +519,6 @@ public class JDetailsFrame
       out.close();
 
    } // end saveData
-
 
    /**
     * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay).
@@ -550,10 +550,9 @@ public class JDetailsFrame
 
    } // end createRowKeys
 
-
    private String getProbeID( int row ) {
       int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
-      return (String) m_table.getValueAt( row, offset + 0 );
+      return ( String ) m_table.getValueAt( row, offset + 0 );
    }
 
    void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
@@ -599,8 +598,7 @@ public class JDetailsFrame
          double range = value / zoomFactor;
          displayMin = - ( range / 2 );
          displayMax = + ( range / 2 );
-      }
-      else {
+      } else {
          double rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
          double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
          double range = value / zoomFactor;
@@ -621,11 +619,10 @@ public class JDetailsFrame
       m_colorRangeSlider.setMaximum( COLOR_RANGE_SLIDER_RESOLUTION );
 
       double rangeMax;
-      boolean normalized =  m_matrixDisplay.getStandardizedEnabled();
+      boolean normalized = m_matrixDisplay.getStandardizedEnabled();
       if ( normalized ) {
          rangeMax = NORMALIZED_COLOR_RANGE_MAX;
-      }
-      else {
+      } else {
          rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
       }
       double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
@@ -718,13 +715,15 @@ class JDetailsFrame_m_colorRangeSlider_changeAdapter
    }
 }
 
-class JDetailsFrame_m_saveDataMenuItem_actionAdapter implements java.awt.event.ActionListener {
+class JDetailsFrame_m_saveDataMenuItem_actionAdapter
+    implements java.awt.event.ActionListener {
    JDetailsFrame adaptee;
 
-   JDetailsFrame_m_saveDataMenuItem_actionAdapter(JDetailsFrame adaptee) {
+   JDetailsFrame_m_saveDataMenuItem_actionAdapter( JDetailsFrame adaptee ) {
       this.adaptee = adaptee;
    }
-   public void actionPerformed(ActionEvent e) {
-      adaptee.m_saveDataMenuItem_actionPerformed(e);
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.m_saveDataMenuItem_actionPerformed( e );
    }
 }

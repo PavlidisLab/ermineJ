@@ -1,14 +1,26 @@
 package classScore;
 
-import java.io.*;
+import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.*;
-
-import classScore.data.*;
-import classScore.gui.*;
-import classScore.gui.geneSet.*;
-import classScore.analysis.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Vector;
 import baseCode.math.Rank;
+import classScore.analysis.ClassPvalSetGenerator;
+import classScore.analysis.ClassSizeComputer;
+import classScore.analysis.MultipleTestCorrector;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.classresult;
+import classScore.data.expClassScore;
+import classScore.data.histogram;
+import classScore.gui.GeneSetScoreStatus;
+import classScore.gui.geneSet.JDetailsFrame;
 
 /**
   Main class to make 'experiment score' pvalues. Includes multiple
