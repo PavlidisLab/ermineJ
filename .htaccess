@@ -1,0 +1,7 @@
+AuthType Basic
+AuthName "Project Pages"
+AuthUserFile /proj/.htpasswd
+AuthGroupFile /dev/null
+<Limit GET>
+require user pzoot compbio
+</Limit>
