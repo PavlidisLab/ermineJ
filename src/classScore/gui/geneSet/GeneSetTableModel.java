@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.swing.table.AbstractTableModel;
 
 import baseCode.bio.geneset.GeneAnnotations;
-import baseCode.gui.JLinkLabel;
 import baseCode.gui.JMatrixDisplay;
+import baseCode.gui.JLinkLabel;
 
 /**
  * Our table model.
@@ -111,11 +111,14 @@ public class GeneSetTableModel extends AbstractTableModel {
             }
             return values;
          case 3:
-            // gene namne
-            //       return m_geneData == null ? null : new JLinkLabel(m_geneData.getProbeGeneName( probeID ));
+         	String gene_name=m_geneData.getProbeGeneName( probeID );
+         	// gene namne
+         	return m_geneData == null ? null : 
 
-            return m_geneData == null ? "" : m_geneData
-                  .getProbeGeneName( probeID );
+         		new JLinkLabel(gene_name,
+         				"http://www.google.com/search?hl=en&ie=UTF-8&q="+gene_name+"&btnG=Google+Search");
+            //return m_geneData == null ? "" : m_geneData
+            //      .getProbeGeneName( probeID );
          case 4:
             // description
             return m_geneData == null ? "" : m_geneData

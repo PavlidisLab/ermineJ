@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.SystemColor;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;

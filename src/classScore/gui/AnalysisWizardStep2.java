@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import baseCode.util.FileTools;
 import classScore.Settings;

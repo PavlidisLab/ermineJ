@@ -31,7 +31,6 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
-import baseCode.gui.JWebBrowser;
 import baseCode.util.BrowserLauncher;
 import classScore.Settings;
 import classScore.GeneSetPvalRun;

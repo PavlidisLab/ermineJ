@@ -7,8 +7,6 @@ import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.swing.AbstractButton;
 
-import baseCode.gui.GuiUtil;
-
 /**
  * Makes it easier to add help access wherever we want To use this, you can do the following, for example for a menu
  * item.

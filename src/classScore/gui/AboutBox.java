@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import java.awt.*;
-import java.io.InputStream;
 
 import baseCode.gui.JLinkLabel;
 

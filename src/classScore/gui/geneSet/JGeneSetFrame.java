@@ -35,9 +35,9 @@ import javax.swing.table.TableColumn;
 
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
-import baseCode.graphics.text.Util;
 import baseCode.gui.ColorMap;
 import baseCode.gui.JGradientBar;
+import baseCode.gui.JLinkLabel;
 import baseCode.gui.JMatrixDisplay;
 import baseCode.gui.table.JBarGraphCellRenderer;
 import baseCode.gui.table.JMatrixCellRenderer;
@@ -125,6 +125,9 @@ public class JGeneSetFrame extends JFrame {
 
       // Prevent user from moving tables around
       m_table.getTableHeader().setReorderingAllowed( false );
+
+      // For html links on gene names
+      m_table.addMouseListener( new JGeneSetFrame_m_mouseAdapter( this ) );
 
       // change the cursor to a hand over a header
       m_table.getTableHeader().addMouseListener(
@@ -649,6 +652,14 @@ public class JGeneSetFrame extends JFrame {
       m_gradientBar.setLabels( min, max );
    }
 
+   void table_mouseReleased( MouseEvent e ) {
+    int i = m_table.getSelectedRow();
+    int j = m_table.getSelectedColumn();
+	if ( m_table.getValueAt( i, j ) != null && j==m_table.getColumnCount()-2) {
+    	JLinkLabel geneLink = (JLinkLabel) m_table.getValueAt( i, j );
+    	geneLink.mouseClicked(e);
+	}
+   }
 } // end class JGeneSetFrame
 
 class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends
@@ -760,3 +771,18 @@ class JGeneSetFrame_m_saveDataMenuItem_actionAdapter implements
       adaptee.m_saveDataMenuItem_actionPerformed( e );
    }
 }
+
+class JGeneSetFrame_m_mouseAdapter extends java.awt.event.MouseAdapter {
+	JGeneSetFrame adaptee;
+
+	   JGeneSetFrame_m_mouseAdapter( JGeneSetFrame adaptee ) {
+	      this.adaptee = adaptee;
+	   }
+
+	   public void mouseReleased( MouseEvent e ) {
+	      if ( e.getClickCount() < 2 ) {
+	         return;
+	      }
+	      adaptee.table_mouseReleased( e );
+	   }
+	}
