@@ -1,13 +1,16 @@
 package classScore.analysis;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.data.*;
 import cern.jet.stat.Probability;
+import classScore.Settings;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
+import classScore.data.GeneSetResult;
+import classScore.data.expClassScore;
 
 /**
  * Compute gene set scores based on over-representation analysis (ORA).
@@ -18,69 +21,44 @@ import cern.jet.stat.Probability;
  * @author Paul Pavlidis
  * @version $Id$
  * @todo add tests
- * @todo returns a new result object, probably not what we want (?)
  */
 
 public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
- 
+
    protected double user_pvalue;
    protected int inputSize;
    protected int numOverThreshold = 0; // number of genes over the threshold
    protected int numUnderThreshold = 0; // number of genes below the threshold
-   
-   public OraPvalGenerator( Map ctp, Map pg, boolean w, expClassScore pvm,
-         GeneSetSizeComputer csc, GONames gon, int nuot, int nuut ) {
-      super( ctp, pg, w, null, pvm, csc, gon );
-      this.numOverThreshold = nuot;
-      this.numUnderThreshold = nuut;
-   }
-   
+   expClassScore probePvalMapper;
 
-   /**
-    * Calculate numOverThreshold and numUnderThreshold for hypergeometric
-    * distribution. This is a constant under permutations, but depends on
-    * weights.
-    * 
-    * @param inp_entries The pvalues for the probes (no weights) or groups
-    *           (weights)
-    * @todo make this private and called by OraPvalGenerator.
-    */
-   public void hgSizes( Collection inp_entries ) {
+   public OraPvalGenerator( Settings settings, GeneAnnotations a,
+         GeneSetSizeComputer csc, int not, int nut, GONames gon,
+         expClassScore pvm, int inputSize ) {
 
-      Iterator itr = inp_entries.iterator();
-      while ( itr.hasNext() ) {
-         Map.Entry m = ( Map.Entry ) itr.next();
-         double groupval = Double.parseDouble( ( m.getValue() ).toString() );
+      super( settings, a, csc, gon );
+      this.probePvalMapper = pvm;
+      this.numOverThreshold = not;
+      this.numUnderThreshold = nut;
+      this.inputSize = inputSize;
 
-         if ( groupval >= user_pvalue ) {
-            numOverThreshold++;
-         } else {
-            numUnderThreshold++;
-         }
+      if ( settings.getUseLog() ) {
+         this.user_pvalue = -Math.log( settings.getPValThreshold() );
+      } else {
+         this.user_pvalue = settings.getPValThreshold();
       }
-      System.err.println( numOverThreshold + " genes are above the threshold "
-            + user_pvalue );
    }
-
-   
 
    /**
     * Get results for one class, based on class id. The other arguments are
     * things that are not constant under permutations of the data.
-    * 
-    * @param class_name a <code>String</code> value
-    * @param groupToPvalMap a <code>Map</code> value
-    * @param probesToPvals a <code>Map</code> value
-    * @param input_rank_map a <code>Map</code> value
-    * @return a <code>classresult</code> value
+    *  
     */
-   public classresult classPval( String class_name, Map groupToPvalMap,
+   public GeneSetResult classPval( String class_name, Map groupToPvalMap,
          Map probesToPvals, Map input_rank_map ) {
+
       //inputs for hypergeometric distribution
-      int successes = 0; // number of genes in this class which are above the
-                         // threshold
-      int failures = 0; // number of genes in this calss which are below the
-                        // threshold
+      int successes = 0;
+      int failures = 0;
 
       //variables for outputs
       double hyper_pval = -1.0;
@@ -92,10 +70,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
          return null;
       }
 
-      ArrayList values = ( ArrayList ) classToProbe.get( class_name );
+      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get(
+            class_name );
       Iterator classit = values.iterator();
       double[] groupPvalArr = new double[effSize]; // store pvalues for items in
-                                                   // the class.
+      // the class.
       Map record = new HashMap();
       Object ranking = null;
 
@@ -107,24 +86,19 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
          String probe = ( String ) classit.next(); // probe id
 
          if ( probesToPvals.containsKey( probe ) ) { // if it is in the data
-                                                     // set. This is invariant
-                                                     // under permutations.
+            // set. This is invariant
+            // under permutations.
 
-            if ( weight_on == true ) {
-               Double grouppval = ( Double ) groupToPvalMap.get( probeGroups
-                     .get( probe ) ); // probe -> group
-               if ( !record.containsKey( probeGroups.get( probe ) ) ) { // if we
-                                                                        // haven't
-                                                                        // done
-                                                                        // this
-                                                                        // probe
-                                                                        // already.
-                  record.put( probeGroups.get( probe ), null ); // mark it as
-                                                                // done.
+            if ( settings.getUseWeights() ) {
+               Double grouppval = ( Double ) groupToPvalMap.get( geneAnnots
+                     .getProbeToGeneMap().get( probe ) ); // probe -> group
+               if ( !record.containsKey( geneAnnots.getProbeToGeneMap().get(
+                     probe ) ) ) {
+
+                  record
+                        .put( geneAnnots.getProbeToGeneMap().get( probe ), null );
                   groupPvalArr[v_size] = grouppval.doubleValue();
 
-                  //  (hypergeometric) if the user_pval is met by this probe, we
-                  // count it
                   if ( groupPvalArr[v_size] >= user_pvalue ) {
                      successes++; // successs.
                   } else {
@@ -134,29 +108,13 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                }
 
             } else { // no weights
-               Double pbpval = ( Double ) probesToPvals.get( probe ); // pvalue
-                                                                      // for
-                                                                      // this
-                                                                      // probe.
-                                                                      // This
-                                                                      // will
-                                                                      // not be
-                                                                      // null if
-                                                                      // things
-                                                                      // have
-                                                                      // been
-                                                                      // done
-                                                                      // correctly
-                                                                      // so far.
-                                                                      // This is
-                                                                      // the
-                                                                      // only
-                                                                      // place
-                                                                      // we need
-                                                                      // the raw
-                                                                      // pvalue
-                                                                      // for a
-                                                                      // probe.
+
+               /*
+                * pvalue for this probe. This will not be null if things have
+                * been done correctly so far. This is the only place we need the
+                * raw pvalue for a probe.
+                */
+               Double pbpval = ( Double ) probesToPvals.get( probe );
 
                // hypergeometric pval info.
                if ( pbpval.doubleValue() >= user_pvalue ) {
@@ -178,22 +136,22 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       double expected = ( double ) numOverThreshold * pos_prob;
       // lower tail.
       if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
-                                                       // or we didn't/cant get
-                                                       // anything.
-         hyper_pval = ( double ) ( Probability.binomial( numOverThreshold,
-               successes, pos_prob ) );
+         // or we didn't/cant get
+         // anything.
+         hyper_pval = Probability.binomial( successes, numOverThreshold,
+               pos_prob );
       } else {
          // Upper tail.
-         hyper_pval = Probability.binomialComplemented( numOverThreshold,
-               successes, pos_prob );
+         hyper_pval = Probability.binomialComplemented( successes,
+               numOverThreshold, pos_prob );
       }
 
       // set up the return object.
-      classresult res = new classresult( class_name, goName
+      GeneSetResult res = new GeneSetResult( class_name, goName
             .getNameForId( class_name ), ( int ) ( ( Integer ) actualSizes
             .get( class_name ) ).intValue(), effSize );
-      res.sethypercut( successes );
-      res.sethyperp( hyper_pval );
+      res.setScore( successes );
+      res.setPValue( hyper_pval );
       return res;
 
    }

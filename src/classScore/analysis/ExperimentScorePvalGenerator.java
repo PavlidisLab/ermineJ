@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import classScore.Settings;
 import classScore.data.GONames;
-import classScore.data.classresult;
+import classScore.data.GeneAnnotations;
+import classScore.data.GeneSetResult;
 import classScore.data.expClassScore;
 import classScore.data.Histogram;
 
@@ -23,6 +25,9 @@ import classScore.data.Histogram;
 
 public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
+   Histogram hist;
+   expClassScore probePvalMapper;
+   
    /**
     * 
     * @param ctp Map
@@ -32,9 +37,11 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
     * @param pvm expClassScore
     * @param csc ClassSizeComputer
     */
-   public ExperimentScorePvalGenerator( Map ctp, Map pg, boolean w,
-         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
-      super( ctp, pg, w, hi, pvm, csc, gon );
+   public ExperimentScorePvalGenerator( Settings settings, GeneAnnotations a, 
+           GeneSetSizeComputer csc, GONames gon, Histogram hi, expClassScore pvm ) {
+      super( settings, a, csc, gon );
+      this.hist = hi;
+      this.probePvalMapper = pvm;
    }
 
    /**
@@ -47,7 +54,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
     * @param input_rank_map a <code>Map</code> value
     * @return a <code>classresult</code> value
     */
-   public classresult classPval( String class_name, Map groupToPvalMap,
+   public GeneSetResult classPval( String class_name, Map groupToPvalMap,
          Map probesToPvals, Map input_rank_map ) {
       //variables for outputs
       double pval = 0.0;
@@ -60,7 +67,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
          return null;
       }
 
-      ArrayList values = ( ArrayList ) classToProbe.get( class_name );
+      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get( class_name );
       Iterator classit = values.iterator();
       double[] groupPvalArr = new double[effSize]; // store pvalues for items in
       // the class.
@@ -83,16 +90,16 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
             // set. This is invariant
             // under permutations.
 
-            if ( weight_on == true ) {
-               Double grouppval = ( Double ) groupToPvalMap.get( probeGroups
+            if ( settings.getUseWeights()  ) {
+               Double grouppval = ( Double ) groupToPvalMap.get( geneAnnots.getProbeToGeneMap()
                      .get( probe ) ); // probe -> group
 
                /*
                 * if we haven't done this probe already.
                 */
-               if ( !record.containsKey( probeGroups.get( probe ) ) ) {
+               if ( !record.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) {
 
-                  record.put( probeGroups.get( probe ), null ); // mark it as
+                  record.put( geneAnnots.getProbeToGeneMap().get( probe ), null ); // mark it as
                   // done.
                   groupPvalArr[v_size] = grouppval.doubleValue();
                   v_size++;
@@ -125,11 +132,11 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
       }
 
       // set up the return object.
-      classresult res = new classresult( class_name, goName
+      GeneSetResult res = new GeneSetResult( class_name, goName
             .getNameForId( class_name ), ( int ) ( ( Integer ) actualSizes
             .get( class_name ) ).intValue(), effSize );
-      res.setscore( rawscore );
-      res.setpval( pval );
+      res.setScore( rawscore );
+      res.setPValue( pval );
       return res;
 
    }

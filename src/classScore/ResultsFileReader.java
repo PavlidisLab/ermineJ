@@ -46,7 +46,7 @@ public class ResultsFileReader {
             int hypercut = Integer.parseInt(st.nextToken());
             double hyperpval = Double.parseDouble(st.nextToken());
 
-            classresult c = new classresult(classId, className, size, effsize, score, pval,
+            GeneSetResult c = new GeneSetResult(classId, className, size, effsize, score, pval,
                                             hyperpval, 0.5, 1.0);
             results.put(classId, c);
 

@@ -7,9 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-import classScore.data.classresult;
+import classScore.data.GeneSetResult;
 import classScore.data.expClassScore;
 import classScore.data.Histogram;
 
@@ -20,33 +21,26 @@ import classScore.data.Histogram;
  * </p>
  * 
  * @author Paul Pavlidis
- * @version $Id$
+ * @version $Id: GeneSetPvalSeriesGenerator.java,v 1.2 2004/06/29 14:31:35
+ *          pavlidis Exp $
  */
 
-public class GeneSetPvalSeriesGenerator {
-
+public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
+   
    private Vector sortedclasses;
    private Map results;
    private expClassScore probePvalMapper;
-   private boolean weight_on = true;
    private Histogram hist;
-   private Map probeGroups;
-   private Map classToProbe;
    private GeneSetSizeComputer csc;
    private NumberFormat nf = NumberFormat.getInstance();
-   private GONames goName;
 
-   public GeneSetPvalSeriesGenerator( GeneAnnotations geneData, boolean w,
-         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
-      this.weight_on = w;
-      this.classToProbe = geneData.getClassToProbeMap();
-      this.probeGroups = geneData.getProbeToGeneMap();
+   public GeneSetPvalSeriesGenerator( Settings settings,
+         GeneAnnotations geneData, Histogram hi, expClassScore pvm,
+         GeneSetSizeComputer csc, GONames gon ) {
+      super(settings, geneData, csc, gon);
       this.hist = hi;
       this.probePvalMapper = pvm;
       this.csc = csc;
-      if ( gon != null ) {
-         this.goName = gon;
-      }
       results = new HashMap();
    }
 
@@ -65,19 +59,18 @@ public class GeneSetPvalSeriesGenerator {
     */
    public void classPvalGenerator( Map group_pval_map, Map probesToPvals,
          Map input_rank_map ) {
-      Collection entries = classToProbe.entrySet(); // go -> probe map. Entries
-                                                    // are the class names.
+      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go -> probe map. Entries
+      // are the class names.
       Iterator it = entries.iterator(); // the classes.
 
       ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator(
-            classToProbe, probeGroups, weight_on, hist, probePvalMapper, csc,
-            goName );
+            settings, geneAnnots, csc, goName, hist, probePvalMapper );
 
       // For each class.
       while ( it.hasNext() ) {
          Map.Entry e = ( Map.Entry ) it.next();
          String class_name = ( String ) e.getKey();
-         classresult res = cpv.classPval( class_name, group_pval_map,
+         GeneSetResult res = cpv.classPval( class_name, group_pval_map,
                probesToPvals, input_rank_map );
          if ( res != null ) {
             results.put( class_name, res );
@@ -93,14 +86,14 @@ public class GeneSetPvalSeriesGenerator {
     * is used to get class pvalues for permutation analysis.
     */
    public HashMap class_v_pval_generator( Map group_pval_map, Map probesToPvals ) {
-      Collection entries = classToProbe.entrySet(); // go -> probe map. Entries
-                                                    // are the class names.
+      Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go -> probe map. Entries
+      // are the class names.
       Iterator it = entries.iterator(); // the classes.
       //	Vector results = new Vector();
       HashMap results = new HashMap();
 
       ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator(
-            classToProbe, probeGroups, weight_on, hist, probePvalMapper, csc );
+            settings, geneAnnots, csc, goName, hist, probePvalMapper );
 
       // For each class.
       while ( it.hasNext() ) {

@@ -23,7 +23,7 @@ import classScore.Settings;
 import classScore.classPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-import classScore.data.classresult;
+import classScore.data.GeneSetResult;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
@@ -385,7 +385,7 @@ class OutputTableModel extends AbstractTableModel {
          int runnum = getRunNum(j);
          Map data = ((classPvalRun)results.get(runnum)).getResults();
          if (data.containsKey(classid)) {
-            classresult res = (classresult) data.get(classid);
+            GeneSetResult res = (GeneSetResult) data.get(classid);
             return new Double(nf.format(res.getPvalue()));
          } else {
             return null;
@@ -446,7 +446,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
          Map data = ((classPvalRun)results.get(runcol)).getResults();
          if (data.containsKey(classid))
          {
-            classresult res = ( classresult ) data.get( classid );
+            GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " +
                             res.getScore() );
          }

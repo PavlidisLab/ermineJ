@@ -4,18 +4,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.math.MatrixRowStats;
 import baseCode.math.Stats;
 import cern.colt.list.DoubleArrayList;
 
 /**
- * Stores information relevent to a histogram. Created :09/02/02
+ * Stores distributions for geneSets ( a series of histograms). For generic histograms, use hep.aida.
  * 
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
- * @todo consider making this part of baseCode in some form.
- * @todo default bin size
- * @todo could use hep.aida Histogram for each histogram.
+ * @todo default bin size --@todo could use hep.aida Histogram for each
+ *       histogram - actually this is a pain to do.
  */
 public class Histogram {
    protected static final Log log = LogFactory.getLog( Histogram.class );
@@ -71,8 +69,7 @@ public class Histogram {
 
    /**
     * 
-    * @param runs
-    *           int
+    * @param runs int
     */
    public void set_number_of_runs( int runs ) {
       numItemsPerHistogram = runs;
@@ -86,10 +83,8 @@ public class Histogram {
    /**
     * Update the count for one bin.
     * 
-    * @param row
-    *           int
-    * @param value
-    *           double
+    * @param row int
+    * @param value double
     */
    public void update( int row, double value ) {
 
@@ -107,9 +102,7 @@ public class Histogram {
          thebin = numBins - 1;
       }
 
-      double val = M.get( row, thebin );
-      val++;
-      M.set( row, thebin, val );
+      M.setQuick( row, thebin, M.getQuick( row, thebin ) + 1 );
    }
 
    /**
@@ -196,10 +189,8 @@ public class Histogram {
 
    /**
     * 
-    * @param class_size
-    *           int
-    * @param min_class_size
-    *           int
+    * @param class_size int
+    * @param min_class_size int
     * @return int
     */
    public int getClassIndex( int class_size, int min_class_size ) {
@@ -209,10 +200,8 @@ public class Histogram {
 
    /**
     * 
-    * @param class_size
-    *           int
-    * @param rawscore
-    *           double
+    * @param class_size int
+    * @param rawscore double
     * @return double
     */
    public double getValue( int class_size, double rawscore ) {
@@ -257,15 +246,12 @@ public class Histogram {
          }
          System.out.print( "\n" );
       }
-      //	M.print();
    }
 
    /**
     * 
-    * @param row
-    *           int
-    * @param binnum
-    *           int
+    * @param row int
+    * @param binnum int
     * @return double
     */
    public double getProbability( int row, int binnum ) {
@@ -275,37 +261,6 @@ public class Histogram {
       } else {
          return pval;
       }
-   }
-
-   /**
-    * return mean of top 2 elements in array, for histogram range setting
-    * 
-    * @param inArray
-    *           double[]
-    * @return double
-    * @todo should be in descriptive.
-    */
-   public static double meanOfTop2( double[] inArray ) {
-      double max1 = 0;
-      double max2 = 0;
-      int pin = 0;
-
-      if ( inArray.length == 0 ) {
-         throw new IllegalArgumentException( "No values for meanofTop2!" );
-      }
-
-      for ( int i = 0; i < inArray.length; i++ ) {
-         if ( max1 < inArray[i] ) {
-            max1 = inArray[i];
-            pin = i;
-         }
-      }
-      for ( int i = 0; i < inArray.length; i++ ) {
-         if ( max2 < inArray[i] && i != pin ) {
-            max2 = inArray[i];
-         }
-      }
-      return ( max1 + max2 ) / 2;
    }
 
 }

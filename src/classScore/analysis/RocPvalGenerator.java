@@ -6,8 +6,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import baseCode.math.ROC;
+import classScore.Settings;
 import classScore.data.GONames;
-import classScore.data.classresult;
+import classScore.data.GeneAnnotations;
+import classScore.data.GeneSetResult;
 import classScore.data.expClassScore;
 import classScore.data.Histogram;
 
@@ -26,10 +28,14 @@ import classScore.data.Histogram;
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
    protected int inputSize; /** @todo where is this set? */
+   protected expClassScore probePvalMapper;
+   protected Histogram histogram;
 
-   public RocPvalGenerator( Map ctp, Map pg, boolean w, Histogram hi,
-         expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
-      super( ctp, pg, w, hi, pvm, csc, gon );
+   public RocPvalGenerator( Settings set, GeneAnnotations an,
+         GeneSetSizeComputer csc, GONames gon, Histogram hi, expClassScore pvm ) {
+      super( set, an, csc, gon );
+      this.histogram = hi;
+      this.probePvalMapper = pvm;
    }
 
    /**
@@ -41,7 +47,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     * @param input_rank_map a <code>Map</code> value
     * @return a <code>classresult</code> value
     */
-   public classresult classPval( String class_name, Map probesToPvals,
+   public GeneSetResult classPval( String class_name, Map probesToPvals,
          Map input_rank_map ) {
 
       //variables for outputs
@@ -54,7 +60,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
          return null;
       }
 
-      ArrayList values = ( ArrayList ) classToProbe.get( class_name );
+      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get( class_name );
       Iterator classit = values.iterator();
       Object ranking = null;
 
@@ -64,18 +70,18 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
          String probe = ( String ) classit.next(); // probe id
 
          if ( probesToPvals.containsKey( probe ) ) { // if it is in the data
-                                                     // set. This is invariant
-                                                     // under permutations.
+            // set. This is invariant
+            // under permutations.
 
-            if ( weight_on == true ) {
-               ranking = input_rank_map.get( probeGroups.get( probe ) ); // rank
-                                                                         // of
-                                                                         // this
-                                                                         // probe
-                                                                         // group.
+            if ( settings.getUseWeights()  ) {
+               ranking = input_rank_map.get( geneAnnots.getProbeToGeneMap().get( probe ) ); // rank
+               // of
+               // this
+               // probe
+               // group.
                if ( ranking != null ) {
                   target_ranks.put( ranking, null ); // ranks of items in this
-                                                     // class.
+                  // class.
                }
 
             } else { // no weights
@@ -88,15 +94,15 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
          } // if in data set
       } // end of while over items in the class.
 
-      double area_under_roc = ROC.aroc( inputSize, target_ranks );
-      double roc_pval = ROC.rocpval( target_ranks.size(), area_under_roc );
+      double areaUnderROC = ROC.aroc( inputSize, target_ranks );
+      double roc_pval = ROC.rocpval( target_ranks.size(), areaUnderROC );
 
       // set up the return object.
-      classresult res = new classresult( class_name, goName
+      GeneSetResult res = new GeneSetResult( class_name, goName
             .getNameForId( class_name ), ( int ) ( ( Integer ) actualSizes
             .get( class_name ) ).intValue(), effSize );
-      res.setaroc( area_under_roc );
-      res.setarocp( roc_pval );
+      res.setScore( areaUnderROC );
+      res.setPValue( roc_pval );
       return res;
 
    }

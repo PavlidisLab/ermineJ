@@ -47,10 +47,10 @@ public class ResultsPrinter {
         try {
            BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, false));
            boolean first = true;
-           classresult res = null;
+           GeneSetResult res = null;
            if (sort) {
               for (Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
-                 res = (classresult) results.get(it.next());
+                 res = (GeneSetResult) results.get(it.next());
                  if (first) {
                     first = false;
                     res.print_headings(out, "\tSame as:\tSimilar to:");
@@ -60,7 +60,7 @@ public class ResultsPrinter {
               }
            } else {
               for (Iterator it = results.entrySet().iterator(); it.hasNext(); ) {
-                 res = (classresult) it.next();
+                 res = (GeneSetResult) it.next();
                  if (first) {
                     first = false;
                     res.print_headings(out, "\tSame as:\tSimilar to:");

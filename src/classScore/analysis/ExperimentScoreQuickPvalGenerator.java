@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import classScore.Settings;
+import classScore.data.GONames;
+import classScore.data.GeneAnnotations;
 import classScore.data.expClassScore;
 import classScore.data.Histogram;
 
@@ -22,9 +25,9 @@ import classScore.data.Histogram;
 public class ExperimentScoreQuickPvalGenerator extends
       ExperimentScorePvalGenerator {
 
-   public ExperimentScoreQuickPvalGenerator( Map ctp, Map pg, boolean w,
-         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc ) {
-      super( ctp, pg, w, hi, pvm, csc, null );
+   public ExperimentScoreQuickPvalGenerator( Settings settings, GeneAnnotations a, 
+         GeneSetSizeComputer csc, GONames gon, Histogram hi, expClassScore pvm ) {
+      super( settings, a, csc, gon, hi, pvm );
    }
 
    /**
@@ -42,7 +45,7 @@ public class ExperimentScoreQuickPvalGenerator extends
 
       double pval = 0.0;
       double rawscore = 0.0;
-      ArrayList values = ( ArrayList ) classToProbe.get( class_name );
+      ArrayList values = ( ArrayList ) geneAnnots.getClassToProbeMap().get( class_name );
       Iterator classit = values.iterator();
 
       int in_size = ( int ) ( ( Integer ) effectiveSizes.get( class_name ) )
@@ -68,16 +71,16 @@ public class ExperimentScoreQuickPvalGenerator extends
                                                      // set. This is invariant
                                                      // under permutations.
 
-            if ( weight_on == true ) {
-               Double grouppval = ( Double ) group_pval_map.get( probeGroups
+            if ( settings.getUseWeights() ) {
+               Double grouppval = ( Double ) group_pval_map.get( geneAnnots.getProbeToGeneMap()
                      .get( probe ) ); // probe -> group
-               if ( !record.containsKey( probeGroups.get( probe ) ) ) { // if we
+               if ( !record.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) { // if we
                                                                         // haven't
                                                                         // done
                                                                         // this
                                                                         // probe
                                                                         // already.
-                  record.put( probeGroups.get( probe ), null ); // mark it as
+                  record.put( geneAnnots.getProbeToGeneMap().get( probe ), null ); // mark it as
                                                                 // done.
                   groupPvalArr[v_size] = grouppval.doubleValue();
                   v_size++;

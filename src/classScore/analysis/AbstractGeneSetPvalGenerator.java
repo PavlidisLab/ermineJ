@@ -2,9 +2,9 @@ package classScore.analysis;
 
 import java.util.Map;
 
+import classScore.Settings;
 import classScore.data.GONames;
-import classScore.data.expClassScore;
-import classScore.data.Histogram;
+import classScore.data.GeneAnnotations;
 
 /**
 * Base implementation of pvalue generator
@@ -17,22 +17,19 @@ public abstract class AbstractGeneSetPvalGenerator {
    
    protected Map effectiveSizes = null;
    protected Map actualSizes = null;
-   protected expClassScore probePvalMapper;
-   protected Map classToProbe;
-   protected Histogram hist;
    protected GONames goName;
-   protected Map probeGroups;
-   protected boolean weight_on;
+   protected Settings settings;
+   protected GeneAnnotations geneAnnots;
+   protected GeneSetSizeComputer csc;
    
-   public AbstractGeneSetPvalGenerator( Map ctp, Map pg, boolean w,
-         Histogram hi, expClassScore pvm, GeneSetSizeComputer csc, GONames gon ) {
-      this.weight_on = w;
-      this.classToProbe = ctp;
-      this.probeGroups = pg;
-      this.hist = hi;
-      this.probePvalMapper = pvm;
+   public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots,
+           GeneSetSizeComputer csc, GONames gon ) {
+      
+      this.settings = set;
+      this.geneAnnots = annots;
       this.effectiveSizes = csc.getEffectiveSizes();
       this.actualSizes = csc.getActualSizes();
+      this.csc = csc;
       if ( gon != null ) {
          this.goName = gon;
       }

@@ -16,24 +16,24 @@ import baseCode.gui.*;
  */
 
 public class Settings {
-   Properties properties;
-   String pref_file;
-   String classFile;
-   String annotFile;
-   String rawFile;
-   String dataFolder;
-   String classFolder;
-   String scoreFile;
-   int maxClassSize = 15;
-   int minClassSize = 14;
-   int iterations = 10;
-   int scorecol = 2;
-   int geneRepTreatment = BEST_PVAL;
-   int rawScoreMethod = MEAN_METHOD;
-   int analysisMethod = RESAMP;
-   int quantile = 50;
-   boolean doLog = true;
-   double pValThreshold = 0.001;
+   private Properties properties;
+   private String pref_file;
+   private String classFile;
+   private String annotFile;
+   private String rawFile;
+   private String dataFolder;
+   private String classFolder;
+   private String scoreFile;
+   private int maxClassSize = 15;
+   private int minClassSize = 14;
+   private int iterations = 10;
+   private int scorecol = 2;
+   private  int geneRepTreatment = BEST_PVAL;
+   private int rawScoreMethod = MEAN_METHOD;
+   private int analysisMethod = RESAMP;
+   private  int quantile = 50;
+   private boolean doLog = true;
+   private  double pValThreshold = 0.001;
 
    public static final int BEST_PVAL = 1;
    public static final int MEAN_PVAL = 2;
@@ -42,7 +42,25 @@ public class Settings {
    public static final int ORA = 0;
    public static final int RESAMP = 1;
    public static final int CORR = 2;
-
+   public static final int ROC = 3;
+   
+   /**
+    * Westfall-Young resampling-based.
+    * Caution, this is very computationally intensive.
+    * Also not implemented for all analysis methods.
+    */
+   public static final int WY = 0;
+   
+   /**
+    * Bonferroni
+    */
+   public static final int BON = 1;
+   
+   /**
+    * Benjamini-Hochberg FDR
+    */
+   public static final int BH = 2;
+   
    public Settings() {
       this("");
    }
@@ -210,11 +228,11 @@ public class Settings {
    public void setPValThreshold(double val) {  pValThreshold=val; }
    public void setPrefFile(String val) { pref_file=val; }
 
-   public String getUseWeights() {
+   public boolean getUseWeights() {
       if (geneRepTreatment==MEAN_PVAL || geneRepTreatment==BEST_PVAL)
-         return "true";
+         return true;
       else
-         return "false";
+         return false;
    }
 
    public String getGroupMethod() {
@@ -234,8 +252,12 @@ public class Settings {
       }
    }
 
-   public String getUseLog() {
-      return Boolean.toString(doLog);
+   /**
+    * @todo this should return a boolean.
+    * @return
+    */
+   public boolean getUseLog() {
+      return doLog;
    }
 
 }

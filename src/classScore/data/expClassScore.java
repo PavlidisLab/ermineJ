@@ -12,11 +12,10 @@ import java.util.Set;
 import java.util.Vector;
 
 import baseCode.math.DescriptiveWithMissing;
+import baseCode.math.Rank;
 import baseCode.math.Stats;
 import classScore.Settings;
 import classScore.gui.GeneSetScoreStatus;
-import classScore.gui.*;
-import classScore.data.*;
 
 /**
     Calculates a background distribution for class sscores derived
@@ -273,7 +272,7 @@ public class expClassScore {
 
    /**  */
    public void set_range() {
-      histogramMax = Histogram.meanOfTop2(useWeights ? groupPvals : pvals);
+      histogramMax = Rank.meanOfTop2(useWeights ? groupPvals : pvals);
    }
 
    /**
@@ -510,8 +509,7 @@ public class expClassScore {
          if (method == QUANTILE_METHOD) {
             return Stats.quantile(index, genevalues, effsize);
          } else if (method == MEAN_ABOVE_QUANTILE_METHOD) {
-            return Stats.meanAboveQuantile(index, genevalues,
-                    effsize);
+            return Stats.meanAboveQuantile(index, genevalues, effsize);
          } else {
             throw new IllegalStateException(
                     "Unknown raw score calculation method selected");
