@@ -1011,12 +1011,19 @@ public class Class_Frame
         progress.setIndeterminate(true);
         timer.start();
         //		timeCounter.start();
-        class_pvals test = new class_pvals(fileName11, fileName22, fileName44,
-                                           fileName33, fileName55, method_name,
-                                           groupMethod, maxField1, minField1,
-                                           numField1, quantileField1, pVal1,
-                                           weight_boolean, pvalcolumn,
-                                           dolog_boolean, "bh");
+        try {
+          class_pvals test = new class_pvals(fileName11, fileName22, fileName44,
+                                             fileName33, fileName55,
+                                             method_name,
+                                             groupMethod, maxField1, minField1,
+                                             numField1, quantileField1, pVal1,
+                                             weight_boolean, pvalcolumn,
+                                             dolog_boolean, "bh", null);
+        }
+        catch (IOException ex) {
+        }
+        catch (IllegalArgumentException ex) {
+        }
         //		test.class_pval_generator(); // this does the work. This should not be here.
         //		timeCounter.stop();
         timer.stop();
@@ -1158,9 +1165,14 @@ public class Class_Frame
         progress_correl.setValue(0);
         progress_correl.setIndeterminate(true);
         timer_correl.start();
-        class_correls test = new class_correls(fileName1, fileName2, fileName4,
-                                               fileName3, maxField, minField,
-                                               numField, histoField);
+        class_correls test = null;
+        try {
+          test = new class_correls(fileName1, fileName2, fileName4,
+                                   fileName3, maxField, minField,
+                                   numField, histoField);
+        }
+        catch (IOException ex) {
+        }
         test.class_correl_generator();
         timer_correl.stop();
         frame_correl.setVisible(false);

@@ -22,12 +22,16 @@ public class class_correls {
   // command line arguments in the following way
   // data_file,probe_go_file,go_namefile,output_file,class_max_size,class_min_size,number of runs,hist range
   public static void main(String[] args) {
-    class_correls test = new class_correls(args[0], args[1], args[2], args[3],
-                                           Integer.parseInt(args[4]),
-                                           Integer.parseInt(args[5]),
-                                           Integer.parseInt(args[6]),
-                                           Double.parseDouble(args[7]));
-    test.class_correl_generator();
+    try {
+      class_correls test = new class_correls(args[0], args[1], args[2], args[3],
+                                             Integer.parseInt(args[4]),
+                                             Integer.parseInt(args[5]),
+                                             Integer.parseInt(args[6]),
+                                             Double.parseDouble(args[7]));
+      test.class_correl_generator();
+    } catch (IOException e ) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -35,7 +39,7 @@ public class class_correls {
   public class_correls(String probe_datafile, String probe_gofile,
                        String go_namefile, String destination_file,
                        int class_max_size, int class_min_size,
-                       int number_of_runs, double range) {
+                       int number_of_runs, double range) throws IOException {
 
     probe_data = new corr_class_scores(probe_datafile); // main data file
 

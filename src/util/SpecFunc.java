@@ -5,9 +5,6 @@ import java.util.*;
 import java.math.*;
 import java.lang.*;
 
-//import java.lang.reflect.*;
-//import java.security.*;
-
 /**
   Calculation of various functions and statistical distributions.
   @author Paul Pavlidis
@@ -33,7 +30,6 @@ public class SpecFunc {
     ser = 1.000000000190015;
     for (j = 0; j <= 5; j++) {
       ser += cof[j] / ++y;
-
     }
     return -tmp + Math.log(2.5066282746310005 * ser / x);
   }

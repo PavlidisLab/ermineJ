@@ -28,7 +28,7 @@ public class Pval_parse {
     Create the probe -> pval mapping
     @param filename: a tab-delmited file with columns probe_id pval
    */
-  public Pval_parse(String filename) {
+  public Pval_parse(String filename) throws IOException {
     this(filename, 1, true);
   }
 
@@ -38,7 +38,8 @@ public class Pval_parse {
     @param column: which column the pvalues are in.
     @param dolog: take the log (base 10) of the value.
    */
-  public Pval_parse(String filename, int column, boolean dolog) {
+  public Pval_parse(String filename, int column, boolean dolog) throws
+      IOException {
     String aLine = null;
     int count = 0;
     //read in file
@@ -56,86 +57,82 @@ public class Pval_parse {
       System.err.println("Reading gene scores from column " + column);
     }
 
-    try {
-      FileInputStream fis = new FileInputStream(filename);
-      BufferedInputStream bis = new BufferedInputStream(fis);
-      BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
-      Double[] doubleArray = null;
-      String row;
-      String col;
-      Vector rows = new Vector();
-      Vector cols = null;
-      probe_pval_map = new LinkedHashMap();
-      int colnumber = 0;
-      // loop through rows
-      while ( (row = dis.readLine()) != null) {
-        StringTokenizer st = new StringTokenizer(row, "\t");
+    FileInputStream fis = new FileInputStream(filename);
+    BufferedInputStream bis = new BufferedInputStream(fis);
+    BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
+    Double[] doubleArray = null;
+    String row;
+    String col;
+    Vector rows = new Vector();
+    Vector cols = null;
+    probe_pval_map = new LinkedHashMap();
+    int colnumber = 0;
+    // loop through rows
+    while ( (row = dis.readLine()) != null) {
+      StringTokenizer st = new StringTokenizer(row, "\t");
 
-        // create a new Vector for each row's columns
-        cols = new Vector();
+      // create a new Vector for each row's columns
+      cols = new Vector();
 
-        // loop through columns
-        while (st.hasMoreTokens()) {
-          cols.add(st.nextToken());
-        }
-        // add the column Vector to the rows Vector
-        rows.add(cols);
+      // loop through columns
+      while (st.hasMoreTokens()) {
+        cols.add(st.nextToken());
       }
-
-      dis.close();
-      probe_id = new String[rows.size() - 1];
-      pval = new double[rows.size() - 1];
-      doubleArray = new Double[rows.size() - 1];
-
-      double small = 10e-16;
-
-      for (int i = 1; i < rows.size(); i++) {
-
-        String name = (String) ( ( (Vector) (rows.elementAt(i))).elementAt(0));
-
-        if (name.matches("AFFX.*")) { // todo: put this rule somewhere else
-          System.err.println("Skipping probe in pval file: " + name);
-          continue;
-        }
-        probe_id[i - 1] = name;
-
-        pval[i -
-            1] = Double.parseDouble( (String) ( ( (Vector) (rows.elementAt(i))).
-                                               elementAt(column)));
-
-        // Fudge when pvalues are zero.
-        if (dolog && pval[i - 1] <= 0) {
-          System.err.println(
-              "Warning: Cannot take log of non-positive value for " + name +
-              " (" + pval[i - 1] + ") from gene score file: Setting to " +
-              small);
-          //			 continue;
-          pval[i - 1] = small;
-        }
-
-        if (dolog) {
-          pval[i - 1] = - (Math.log(pval[i - 1]) / log10); // Make -log base 10.
-        }
-
-        doubleArray[i - 1] = new Double(pval[i - 1]);
-        probe_pval_map.put(probe_id[i - 1], doubleArray[i - 1]); // put key, value.
-      }
-
-      num_pvals = Array.getLength(pval);
-
-      if (num_pvals <= 0) {
-        System.err.println("No pvalues found in the file!");
-        System.exit(1);
-      }
-      else {
-        System.err.println("Found " + num_pvals + " pvals in the file");
-      }
-
+      // add the column Vector to the rows Vector
+      rows.add(cols);
     }
-    catch (IOException e) {
-      // catch possible io errors from readLine()
-      System.out.println(" IOException error!");
-      e.printStackTrace();
+
+    dis.close();
+    probe_id = new String[rows.size() - 1];
+    pval = new double[rows.size() - 1];
+    doubleArray = new Double[rows.size() - 1];
+
+    double small = 10e-16;
+
+    for (int i = 1; i < rows.size(); i++) {
+
+      if ( ((Vector) (rows.elementAt(i))).size() < column) {
+        throw new IOException("Insufficient columns in row " + i + ", expecting file to have at least " + column + " columns.");
+      }
+
+      String name = (String) ( ( (Vector) (rows.elementAt(i))).elementAt(0));
+
+      if (name.matches("AFFX.*")) { // todo: put this rule somewhere else
+        System.err.println("Skipping probe in pval file: " + name);
+        continue;
+      }
+      probe_id[i - 1] = name;
+
+      pval[i - 1] =
+          Double.parseDouble( (String) ( ( (Vector) (rows.elementAt(i))).
+                                             elementAt(column - 1)));
+
+      // Fudge when pvalues are zero.
+      if (dolog && pval[i - 1] <= 0) {
+        System.err.println(
+            "Warning: Cannot take log of non-positive value for " + name +
+            " (" + pval[i - 1] + ") from gene score file: Setting to " +
+            small);
+        //			 continue;
+        pval[i - 1] = small;
+      }
+
+      if (dolog) {
+        pval[i - 1] = - (Math.log(pval[i - 1]) / log10); // Make -log base 10.
+      }
+
+      doubleArray[i - 1] = new Double(pval[i - 1]);
+      probe_pval_map.put(probe_id[i - 1], doubleArray[i - 1]); // put key, value.
+    }
+
+    num_pvals = Array.getLength(pval);
+
+    if (num_pvals <= 0) {
+      System.err.println("No pvalues found in the file!");
+      System.exit(1);
+    }
+    else {
+      System.err.println("Found " + num_pvals + " pvals in the file");
     }
 
   } //
@@ -179,8 +176,13 @@ public class Pval_parse {
   /**
     Main
    */
-  public static void main(String[] args) {
-    Pval_parse t = new Pval_parse(args[0]);
+  public static void main(String[] args)  {
+    try {
+      Pval_parse t = new Pval_parse(args[0]);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
   }
 
 } // end of class

@@ -1,0 +1,83 @@
+
+Unexpected Signal : EXCEPTION_ACCESS_VIOLATION occurred at PC=0x6D376FCC
+Function=[Unknown.]
+Library=C:\JBuilder9\jdk1.4\jre\bin\client\jvm.dll
+
+NOTE: We are unable to locate the function name symbol for the error
+      just occurred. Please refer to release documentation for possible
+      reason and solutions.
+
+
+Current Java thread:
+	at java.util.Vector.<init>(Vector.java:104)
+	at java.util.Vector.<init>(Vector.java:121)
+	at java.util.Vector.<init>(Vector.java:130)
+	at classScore.Pval_parse.<init>(Pval_parse.java:75)
+	at classScore.exp_class_scores.<init>(exp_class_scores.java:84)
+	at classScore.class_pvals.<init>(class_pvals.java:85)
+	at classScore.classScoreFrame$1$runthread.run(classScoreFrame.java:500)
+
+Dynamic libraries:
+0x00400000 - 0x00407000 	C:\JBuilder9\jdk1.4\bin\javaw.exe
+0x77F80000 - 0x77FFB000 	C:\WINNT\system32\ntdll.dll
+0x7C2D0000 - 0x7C332000 	C:\WINNT\system32\ADVAPI32.dll
+0x7C570000 - 0x7C623000 	C:\WINNT\system32\KERNEL32.DLL
+0x77D30000 - 0x77D9E000 	C:\WINNT\system32\RPCRT4.DLL
+0x77E10000 - 0x77E6F000 	C:\WINNT\system32\USER32.dll
+0x77F40000 - 0x77F79000 	C:\WINNT\system32\GDI32.dll
+0x78000000 - 0x78045000 	C:\WINNT\system32\MSVCRT.dll
+0x6D340000 - 0x6D46A000 	C:\JBuilder9\jdk1.4\jre\bin\client\jvm.dll
+0x77570000 - 0x775A0000 	C:\WINNT\system32\WINMM.dll
+0x6BD00000 - 0x6BD0D000 	C:\WINNT\system32\SYNCOR11.DLL
+0x6D1E0000 - 0x6D1E7000 	C:\JBuilder9\jdk1.4\jre\bin\hpi.dll
+0x6D310000 - 0x6D31E000 	C:\JBuilder9\jdk1.4\jre\bin\verify.dll
+0x6D220000 - 0x6D239000 	C:\JBuilder9\jdk1.4\jre\bin\java.dll
+0x6D330000 - 0x6D33D000 	C:\JBuilder9\jdk1.4\jre\bin\zip.dll
+0x6D000000 - 0x6D105000 	C:\JBuilder9\jdk1.4\jre\bin\awt.dll
+0x77800000 - 0x7781E000 	C:\WINNT\system32\WINSPOOL.DRV
+0x76620000 - 0x76631000 	C:\WINNT\system32\MPR.DLL
+0x75E60000 - 0x75E7A000 	C:\WINNT\system32\IMM32.dll
+0x77A50000 - 0x77B3C000 	C:\WINNT\system32\ole32.dll
+0x51000000 - 0x51047000 	C:\WINNT\system32\ddraw.dll
+0x728A0000 - 0x728A6000 	C:\WINNT\system32\DCIMAN32.dll
+0x5C000000 - 0x5C0C8000 	C:\WINNT\system32\D3DIM700.DLL
+0x6D190000 - 0x6D1E0000 	C:\JBuilder9\jdk1.4\jre\bin\fontmanager.dll
+0x782F0000 - 0x78538000 	C:\WINNT\system32\shell32.dll
+0x63180000 - 0x631E5000 	C:\WINNT\system32\SHLWAPI.DLL
+0x71710000 - 0x71794000 	C:\WINNT\system32\COMCTL32.DLL
+0x779B0000 - 0x77A4B000 	C:\WINNT\system32\OLEAUT32.DLL
+0x775A0000 - 0x77626000 	C:\WINNT\system32\CLBCATQ.DLL
+0x77840000 - 0x7787E000 	C:\WINNT\system32\cscui.dll
+0x770C0000 - 0x770E3000 	C:\WINNT\system32\CSCDLL.DLL
+0x10000000 - 0x10055000 	C:\Program Files\TortoiseCVS\TrtseShl.dll
+0x76DF0000 - 0x76E01000 	C:\WINNT\system32\mydocs.dll
+0x0DB80000 - 0x0DCC9000 	C:\WINNT\system32\SHDOCVW.DLL
+0x76FA0000 - 0x76FAF000 	C:\WINNT\system32\ntshrui.dll
+0x773E0000 - 0x773F5000 	C:\WINNT\system32\ATL.DLL
+0x75170000 - 0x751BF000 	C:\WINNT\system32\NETAPI32.DLL
+0x7C340000 - 0x7C34F000 	C:\WINNT\system32\SECUR32.DLL
+0x751C0000 - 0x751C6000 	C:\WINNT\system32\NETRAP.DLL
+0x75150000 - 0x7515F000 	C:\WINNT\system32\SAMLIB.DLL
+0x75030000 - 0x75044000 	C:\WINNT\system32\WS2_32.DLL
+0x75020000 - 0x75028000 	C:\WINNT\system32\WS2HELP.DLL
+0x77950000 - 0x7797A000 	C:\WINNT\system32\WLDAP32.DLL
+0x77980000 - 0x779A4000 	C:\WINNT\system32\DNSAPI.DLL
+0x75050000 - 0x75058000 	C:\WINNT\system32\WSOCK32.DLL
+0x75160000 - 0x7516C000 	C:\WINNT\System32\ntlanman.dll
+0x75210000 - 0x75225000 	C:\WINNT\System32\NETUI0.DLL
+0x751D0000 - 0x75208000 	C:\WINNT\System32\NETUI1.DLL
+0x30000000 - 0x30017000 	C:\Program Files\Iomega\DriveIcons\IMGHOOK.DLL
+0x77920000 - 0x77943000 	C:\WINNT\system32\imagehlp.dll
+0x72A00000 - 0x72A2D000 	C:\WINNT\system32\DBGHELP.dll
+0x690A0000 - 0x690AB000 	C:\WINNT\system32\PSAPI.DLL
+
+Local Time = Thu Nov 20 21:35:18 2003
+Elapsed Time = 6
+#
+# HotSpot Virtual Machine Error : EXCEPTION_ACCESS_VIOLATION
+# Error ID : 4F530E43505002E6
+# Please report this error at
+# http://java.sun.com/cgi-bin/bugreport.cgi
+#
+# Java VM: Java HotSpot(TM) Client VM (1.4.1_02-b06 mixed mode)
+#

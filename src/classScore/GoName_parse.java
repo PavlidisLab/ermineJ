@@ -27,7 +27,7 @@ public class GoName_parse {
     id, second is a description that will be used int program
     output.
    */
-  public GoName_parse(String filename) {
+  public GoName_parse(String filename) throws IllegalArgumentException, IOException {
     String aLine = null;
     String go_id = "";
     String go_name = "";
@@ -35,40 +35,29 @@ public class GoName_parse {
     File infile = new File(filename);
     if (!infile.exists() || !infile.canRead()) {
       System.err.println("Could not read " + filename);
+      throw new IllegalArgumentException("Could not read " + filename);
     }
 
     go_name_map = new LinkedHashMap();
 
-    try {
-      FileInputStream fis = new FileInputStream(filename);
-      BufferedInputStream bis = new BufferedInputStream(fis);
-      BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
-      String row;
+    FileInputStream fis = new FileInputStream(filename);
+    BufferedInputStream bis = new BufferedInputStream(fis);
+    BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
+    String row;
 
-      while ( (row = dis.readLine()) != null) {
-        //tokenize file by tab character
-        StringTokenizer st = new StringTokenizer(row, "\t");
-        go_id = st.nextToken();
-        if (go_id.equals("Gene_Ontology")) { // note: this should no longer occur in our data files.
-          continue;
-        }
-
-        go_name = st.nextToken();
-        go_name_map.put(go_id, go_name);
+    while ( (row = dis.readLine()) != null) {
+      //tokenize file by tab character
+      StringTokenizer st = new StringTokenizer(row, "\t");
+      go_id = st.nextToken();
+      if (go_id.equals("Gene_Ontology")) { // note: this should no longer occur in our data files.
+        continue;
       }
-      dis.close();
 
+      go_name = st.nextToken();
+      go_name_map.put(go_id, go_name);
     }
-    catch (IOException e) {
-      // catch possible io errors from readLine()
-      System.err.println(" IOException error!");
-      e.printStackTrace();
-    }
-    catch (NoSuchElementException e) {
-      System.err.println(" No such element error! GOID:" + go_id + " NAME:" +
-                         go_name);
-      e.printStackTrace();
-    }
+    dis.close();
+
 
   }
 

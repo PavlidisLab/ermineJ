@@ -1,19 +1,11 @@
 package classScore;
 
-import javax.swing.*;
+import java.io.*;
+import java.util.*;
+
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.event.*;
-import java.io.File;
-import com.borland.jbcl.layout.*;
-import java.util.Vector;
-import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import javax.swing.*;
 
 /**
  * <p>Title: </p>
@@ -110,7 +102,7 @@ public class classScoreFrame
   }
 
   private void jbInit() throws Exception {
-//    ConsoleWindow.init();
+    ConsoleWindow.init();
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     this.setSize(new Dimension(550, 600));
     this.setTitle("Functional Class Scoring");
@@ -663,7 +655,6 @@ public class classScoreFrame
 
   /**
    *
-   * @param a
    */
   private void clearStatus() {
     jLabelStatus.setText("");
