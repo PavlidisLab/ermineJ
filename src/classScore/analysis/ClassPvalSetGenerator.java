@@ -8,9 +8,7 @@ import classScore.classresult;
 import java.util.HashMap;
 import classScore.expClassScore;
 import java.text.NumberFormat;
-import classScore.histogram;
-import classScore.ClassMap;
-import classScore.GONames;
+import classScore.*;
 
 /**
  * <p>Title: </p>
@@ -29,17 +27,16 @@ public class ClassPvalSetGenerator {
      private boolean weight_on = true;
      private histogram hist;
      private Map probeGroups;
-     private ClassMap probeToClassMap;
      private Map classToProbe;
      private ClassSizeComputer csc;
      private NumberFormat nf = NumberFormat.getInstance();
      private GONames goName;
 
-     public ClassPvalSetGenerator(Map ctp, Map pg, boolean w, histogram hi,
+     public ClassPvalSetGenerator(GeneAnnotations geneData, boolean w, histogram hi,
                                          expClassScore pvm, ClassSizeComputer csc, GONames gon) {
         this.weight_on = w;
-        this.classToProbe = ctp;
-        this.probeGroups = pg;
+        this.classToProbe = geneData.getClassToProbeMap();
+        this.probeGroups = geneData.getProbeToGeneMap();
         this.hist = hi;
         this.probePvalMapper = pvm;
         this.csc = csc;
@@ -88,8 +85,7 @@ public class ClassPvalSetGenerator {
          object. This is used to get class pvalues for permutation
          analysis.
      */
-    public HashMap class_v_pval_generator(Map group_pval_map, Map probesToPvals,
-                                          Map input_rank_map) {
+    public HashMap class_v_pval_generator(Map group_pval_map, Map probesToPvals) {
        Collection entries = classToProbe.entrySet(); // go -> probe map. Entries are the class names.
        Iterator it = entries.iterator(); // the classes.
        //	Vector results = new Vector();

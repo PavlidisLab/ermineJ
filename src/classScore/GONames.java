@@ -1,9 +1,7 @@
 package classScore;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import baseCode.dataStructure.reader.MapReader;
 /**
@@ -17,6 +15,7 @@ import baseCode.dataStructure.reader.MapReader;
 public class GONames {
 
    private static Map goNameMap;
+   private Set newGeneSets = new HashSet();
 
    /**
     *
@@ -73,6 +72,7 @@ public class GONames {
     */
    public void addClass(String id, String name) {
       goNameMap.put(id, name);
+      newGeneSets.add(id);
    }
 
    /**
@@ -82,5 +82,9 @@ public class GONames {
     */
    public void modifyClass(String id, String name) {
       goNameMap.put(id, name);
+      newGeneSets.add(id);
    }
+
+   public boolean newSet(String id) { return newGeneSets.contains(id); }
+   public Set getNewGeneSets() { return newGeneSets; }
 }

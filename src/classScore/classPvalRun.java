@@ -29,8 +29,6 @@ public class classPvalRun {
 
    private expClassScore probePvalMapper;
    private GeneAnnotations geneData;
-   private Map probeGroups;
-   private Map classToProbe;
    private histogram hist;
    private boolean weight_on = true;
    private Map results = null;
@@ -57,8 +55,6 @@ public class classPvalRun {
       this.messenger = messenger;
       this.probePvalMapper = probePvalMapper;
       this.geneData = geneData;
-      this.probeGroups = geneData.getProbeToGeneMap();
-      this.classToProbe = geneData.getClassToProbeMap();
 
       nf.setMaximumFractionDigits( 8 );
 
@@ -68,7 +64,7 @@ public class classPvalRun {
       //dest_file = resultsFile;
 
       if ( loadResults ) {
-         readResultsFromFile( resultsFile );
+         //readResultsFromFile( resultsFile );
          sortResults();
       }
       else {
@@ -82,10 +78,9 @@ public class classPvalRun {
          System.out.println( "Hist to string: " + hist.toString() );
          // Initialize the results data structure.
          results = new LinkedHashMap();
-         // get the class sizes. /* todo use initmap */
+         // get the class sizes.
          ClassSizeComputer csc = new ClassSizeComputer( probePvalMapper,
-             classToProbe, probeGroups,
-             weight_on );
+             geneData, weight_on );
          csc.getClassSizes();
 
          //    Collection inp_entries; // this is only used for printing.
@@ -107,9 +102,7 @@ public class classPvalRun {
                              numOverThreshold + " numUnderThreshold=" +
                              numUnderThreshold + " " );
 
-         /* todo use initmap */
-         ClassPvalSetGenerator pvg = new ClassPvalSetGenerator( classToProbe,
-             probeGroups, weight_on,
+         ClassPvalSetGenerator pvg = new ClassPvalSetGenerator( geneData, weight_on,
              hist, probePvalMapper, csc, goData );
 
          // calculate the actual class scores and correct sorting. /** todo make this use initmap */
@@ -121,11 +114,8 @@ public class classPvalRun {
 
          messenger.setStatus( "Multiple test correction" );
 
-         /** todo use initmap */
          MultipleTestCorrector mt = new MultipleTestCorrector( sortedclasses,
-             results,
-             probePvalMapper, weight_on, hist, probeGroups, classToProbe,
-             csc );
+             results, probePvalMapper, weight_on, hist, geneData, csc );
          if ( mtc_method.equals( "bon" ) ) {
             mt.bonferroni(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
          } else if ( mtc_method.equals( "bh" ) ) {
@@ -175,6 +165,8 @@ public class classPvalRun {
       final classresult res = (classresult) results.get(id);
       String name = res.getClassName();
       System.out.println( name );
+      Map classToProbe = geneData.getClassToProbeMap();
+
       final ArrayList values = ( ArrayList ) classToProbe.get( id );
 
       final Map pvals = new HashMap();
@@ -199,11 +191,12 @@ public class classPvalRun {
    }
 
    /* */
+/*
    private void readResultsFromFile( String destination_file ) {
       ResultsFileReader f = new ResultsFileReader( destination_file );
       this.results = f.getResults();
    }
-
+*/
    /**
     *
     * @return Map the results

@@ -280,15 +280,6 @@ public class GeneSetMapTools {
          }
       }
 
-      /*
-            Set classes = classToProbeMap.keySet();
-            it = classes.iterator();
-            while (it.hasNext()) {
-               Object considered_class = it.next();
-               if(((ArrayList)classToProbeMap.get(considered_class)).size()<5)
-                  classToProbeMap.remove(considered_class);
-            }
-       */
       System.out.println( "There are now " + classToProbeMap.size() +
                           " classes represented on the chip (" + ignored +
                           " were ignored)" );

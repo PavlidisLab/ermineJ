@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.expClassScore;
+import classScore.*;
 
 /**
  * <p>Title: </p>
@@ -27,11 +27,11 @@ public class ClassSizeComputer {
    protected boolean weight_on = true;
    protected Map probeGroups;
 
-   public ClassSizeComputer(expClassScore ppm, Map ctp, Map pg, boolean w) {
+   public ClassSizeComputer(expClassScore ppm, GeneAnnotations geneData, boolean w) {
       this.probePvalMapper = ppm;
       this.weight_on = w;
-      this.classToProbe = ctp;
-      this.probeGroups = pg;
+      this.classToProbe = geneData.getClassToProbeMap();
+      this.probeGroups = geneData.getProbeToGeneMap();
       effectiveSizes = new HashMap();
       actualSizes = new HashMap();
    }

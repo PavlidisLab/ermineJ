@@ -21,21 +21,24 @@ public class AnalysisWizardStep3
     extends WizardStep {
    AnalysisWizard wiz;
    Settings settings;
+   GONames goData;
+   AnalysisWizardStep3_CustomClassList customClasses;
+   AbstractTableModel ccTableModel;
    JTable customClassTable;
    HashMap ccHash;
    AnalysisWizardStep3_CustomClassList addedClasses;
    HashMap acHash;
    JTable addedClassTable;
    AbstractTableModel acTableModel;
-   AnalysisWizardStep3_CustomClassList customClasses;
-   AbstractTableModel ccTableModel;
    JLabel countLabel;
 
-   public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings ) {
+   public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings, GONames goData ) {
       super( wiz );
       this.wiz = wiz;
       this.settings = settings;
-      getClasses();
+      this.goData = goData;
+      makeLeftTable();
+      makeRightTable();
    }
 
    //Component initialization
@@ -146,7 +149,7 @@ public class AnalysisWizardStep3
       countLabel.setText( "Number of Classes: " + addedClasses.size() );
    }
 
-   void getClasses() {
+   void makeLeftTable() {
       File dir = new File(settings.getClassFolder());
       if ( dir.exists() ) {
          String[] classFiles = dir.list( new AnalysisWizardStep3_ClassFileFilter( "-class.txt" ) );
@@ -160,14 +163,19 @@ public class AnalysisWizardStep3
          }
          ccTableModel = customClasses.toTableModel();
          customClassTable.setModel( ccTableModel );
-         addedClasses = new AnalysisWizardStep3_CustomClassList();
-         acTableModel = addedClasses.toTableModel();
-         addedClassTable.setModel( acTableModel );
-         acHash = new HashMap();
       } else
          GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
    }
 
+
+   void makeRightTable() {
+      addedClasses = new AnalysisWizardStep3_CustomClassList();
+      acTableModel = addedClasses.toTableModel();
+      addedClassTable.setModel( acTableModel );
+      acHash = new HashMap();
+   }
+
+   public ArrayList getAddedClasses() { return addedClasses; }
 }
 
 class AnalysisWizardStep3_delete_actionPerformed_actionAdapter

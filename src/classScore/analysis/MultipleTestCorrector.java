@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import baseCode.math.Rank;
-import classScore.classresult;
-import classScore.expClassScore;
-import classScore.histogram;
+import classScore.*;
 //import util.Stats;
 
 /**
@@ -28,8 +26,7 @@ public class MultipleTestCorrector {
    private expClassScore probePvalMapper;
    private boolean weight_on = true;
    private histogram hist;
-   private Map probeGroups;
-   private Map classToProbe;
+   private GeneAnnotations geneData;
    private ClassSizeComputer csc;
    private NumberFormat nf = NumberFormat.getInstance();
    /**
@@ -43,15 +40,14 @@ public class MultipleTestCorrector {
     * @param ctp Map
     * @param csc ClassSizeComputer
     */
-   public MultipleTestCorrector(Vector sc, Map r, expClassScore ppm, boolean w, histogram h, Map pg,
-                                Map ctp, ClassSizeComputer csc) {
+   public MultipleTestCorrector(Vector sc, Map r, expClassScore ppm, boolean w,
+                                histogram h, GeneAnnotations geneData, ClassSizeComputer csc) {
       this.sortedclasses = sc;
       this.results = r;
       this.probePvalMapper = ppm;
       this.weight_on = w;
       this.hist = h;
-      this.probeGroups = pg;
-      this.classToProbe = ctp;
+      this.geneData = geneData;
       this.csc = csc;
    }
 
@@ -135,8 +131,7 @@ public class MultipleTestCorrector {
       Collections.reverse(sortedclasses); // start from the worst class.
       HashMap permscores;
 
-      ClassPvalSetGenerator cver = new ClassPvalSetGenerator(classToProbe, probeGroups,
-          weight_on,
+      ClassPvalSetGenerator cver = new ClassPvalSetGenerator(geneData, weight_on,
           hist, probePvalMapper, csc, null);
 
       boolean verbose = false;
@@ -156,16 +151,17 @@ public class MultipleTestCorrector {
          Map scprobepvalmap = probePvalMapper.get_map();
 
          // Just for AROC:
+         /* doesn't seem to get used??? (homin 7/25)
          Map scinput_rank_map;
          if (weight_on) {
             scinput_rank_map = Rank.rankTransform(scgroup_pval_map);
          } else {
             scinput_rank_map = Rank.rankTransform(scprobepvalmap);
          }
+         */
 
          /// permscores contains a list of the p values for the shuffled data.
-         permscores = cver.class_v_pval_generator(scgroup_pval_map, scprobepvalmap,
-                                                  scinput_rank_map); // end of step 1.
+         permscores = cver.class_v_pval_generator(scgroup_pval_map, scprobepvalmap); // end of step 1.
 
          int j = 0;
          double permp = 0.0;

@@ -34,7 +34,6 @@ public class expClassScore {
    private double histogramMax = 0; // todo: this should not be set here, should it? it is in the histogram object
    private int classMinSize = 2;
    private histogram hist = null;
-   private boolean logged = true;
 
    private int method;
    private static final int MEAN_METHOD = 0;
@@ -111,7 +110,6 @@ public class expClassScore {
       }
 
       this.numClasses = classMaxSize - classMinSize + 1;
-      this.logged = dolog;
 
       GeneScoreReader parser = new GeneScoreReader(filename_pval, pvalcolumn,
               dolog); // makes the probe -> pval map.
@@ -156,7 +154,6 @@ public class expClassScore {
       }
 
       this.numClasses = classMaxSize - classMinSize + 1;
-      this.logged = settings.getDoLog();
 
       GeneScoreReader parser = new GeneScoreReader(settings.getScoreFile(), settings.getScorecol(), settings.getDoLog()); // makes the probe -> pval map.
       pvals = parser.get_pval(); // array of pvalues.

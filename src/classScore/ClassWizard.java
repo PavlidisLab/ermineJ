@@ -172,14 +172,10 @@ public class ClassWizard extends Wizard {
       if (id.compareTo("") == 0) {
          GuiUtil.error("The class ID must be specified.");
       } else {
-         if (makenew) {
-            System.err.println("adding " + id + " to setupmap");
-            geneData.addClass(id, newGeneSet.getProbes());
-            goData.addClass(id, desc);
-            geneData.sortGeneSets();
-         } else {
-            //geneData.modifyClass(id, desc, newGeneSet.probes);
-         }
+         if (makenew)
+            newGeneSet.addToMaps(goData);
+         else
+            newGeneSet.modifyClass(goData);
          newGeneSet.saveClass(settings.getClassFolder(), 0);
          dispose();
       }

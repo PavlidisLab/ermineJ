@@ -122,7 +122,6 @@ public class OutputPanel extends JScrollPane {
          tooltip+="Class Raw Score Method: Median <br>";
       tooltip+=coda;
       resultToolTips.add(runnum,tooltip);
-      System.err.println(tooltip);
    }
 
    public void addInitialData(GeneAnnotations geneData, GONames goData) {
@@ -136,6 +135,7 @@ public class OutputPanel extends JScrollPane {
       table.getColumnModel().getColumn(0).setPreferredWidth(30);
       table.getColumnModel().getColumn(2).setPreferredWidth(30);
       table.getColumnModel().getColumn(3).setPreferredWidth(30);
+      table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer(goData));
       table.revalidate();
    }
 
@@ -148,7 +148,6 @@ public class OutputPanel extends JScrollPane {
       table.getColumnModel().getColumn(model.getColumnCount() - 2).setPreferredWidth(30);
       table.getColumnModel().getColumn(model.getColumnCount() - 1).setPreferredWidth(30);
       generateToolTip(((model.getColumnCount()-OutputTableModel.init_cols)/OutputTableModel.cols_per_run)-1);
-      table.setDefaultRenderer(Object.class,new OutputPanelTableCellRenderer());
       table.revalidate();
    }
 }
@@ -310,11 +309,19 @@ class OutputTableModel extends AbstractTableModel {
 
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
 {
+   GONames goData;
    static Color spread1 = new Color(220,220,160);
    static Color spread2 = new Color(205,222,180);
    static Color spread3 = new Color(190,224,200);
    static Color spread4 = new Color(175,226,220);
    static Color spread5 = new Color(160,228,240);
+   static Color modified = new Color(220,160,220);
+
+   public OutputPanelTableCellRenderer(GONames goData)
+   {
+      super();
+      this.goData=goData;
+   }
 
    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                   boolean hasFocus, int row, int column)
@@ -327,6 +334,10 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
          setOpaque(true);
       else if(value==null)
          setOpaque(false);
+      else if(column == 0 && goData.newSet((String)value))
+      {
+         setBackground(modified);
+      }
       else if(runcol % OutputTableModel.cols_per_run == 2 && value.getClass().equals(Double.class))
       {
          if(((Double)value).doubleValue() > 0.8)

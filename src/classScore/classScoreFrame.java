@@ -268,7 +268,7 @@ public class classScoreFrame
    }
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      AnalysisWizard awiz = new AnalysisWizard(this);
+      AnalysisWizard awiz = new AnalysisWizard(this,geneData,goData);
       awiz.showWizard();
    }
 

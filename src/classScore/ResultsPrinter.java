@@ -18,14 +18,14 @@ public class ResultsPrinter {
    protected Vector sortedclasses;
    protected Map results;
    protected GONames goName;
-   private ClassMap probeToClassMap;
+   //private ClassMap probeToClassMap;
 
-   public ResultsPrinter(String dest_file, Vector sortedclasses, Map results, GONames goName, ClassMap probeToClassMap) {
+   public ResultsPrinter(String dest_file, Vector sortedclasses, Map results, GONames goName) {
       this.dest_file = dest_file;
       this.sortedclasses = sortedclasses;
       this.results = results;
       this.goName = goName;
-      this.probeToClassMap = probeToClassMap;
+      //this.probeToClassMap = probeToClassMap;
    }
 
 
@@ -83,9 +83,9 @@ public class ResultsPrinter {
       * @return String
       */
      private String format_redundant_and_similar(String classid) {
-        ArrayList redund = probeToClassMap.getRedundancies(classid);
+        //ArrayList redund = GeneSetMapTools.getRedundancies(classid);    //commented just to compile (Homin)
         String return_value = "";
-
+/*                                                                               //commented just to compile (Homin)
         if (redund != null) {
            Iterator it = redund.iterator();
            while (it.hasNext()) {
@@ -95,10 +95,11 @@ public class ResultsPrinter {
                              goName.getNameForId(nextid) + ", ";
            }
         }
-
+*/
         return_value = return_value + "\t";
 
-        ArrayList similar = probeToClassMap.getSimilarities(classid);
+/*
+        ArrayList similar = probeToClassMap.getSimilarities(classid);           //commented just to compile (Homin)
 
         if (similar != null) {
            Iterator it = similar.iterator();
@@ -110,7 +111,7 @@ public class ResultsPrinter {
            }
            return "\t" + return_value;
         }
-
+*/
         return return_value;
 
      }

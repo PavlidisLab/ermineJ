@@ -2,6 +2,7 @@ package classScore;
 
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 
 /**
  * <p>Title: </p>
@@ -19,22 +20,26 @@ public class AnalysisWizard extends Wizard
    int analysisType = 1;
 
    Settings settings;
+   GeneAnnotations geneData;
+   GONames goData;
    AnalysisWizardStep1 step1;
    AnalysisWizardStep2 step2;
    AnalysisWizardStep3 step3;
    AnalysisWizardStep4 step4;
 
-   public AnalysisWizard(classScoreFrame callingframe) {
+   public AnalysisWizard(classScoreFrame callingframe, GeneAnnotations geneData, GONames goData) {
       super(callingframe,550,350);
       //enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
-      this.settings = new Settings(callingframe.getSettings());
+      this.settings = new Settings(callingframe.getSettings()); //own copy of settings
+      this.geneData = geneData;
+      this.goData = goData;
 
       step1 = new AnalysisWizardStep1(this,settings);
       this.addStep(1,step1);
       step2 = new AnalysisWizardStep2(this,settings);
       this.addStep(2,step2);
-      step3 = new AnalysisWizardStep3(this,settings);
+      step3 = new AnalysisWizardStep3(this,settings,goData);
       this.addStep(3,step3);
       step4 = new AnalysisWizardStep4(this,settings);
       this.addStep(4,step4);
@@ -106,6 +111,7 @@ public class AnalysisWizard extends Wizard
 
    void finishButton_actionPerformed(ActionEvent e) {
       saveValues();
+      loadAddedClasses();
       ((classScoreFrame)callingframe).startAnalysis(settings);
       dispose();
    }
@@ -119,6 +125,22 @@ public class AnalysisWizard extends Wizard
       } catch (IOException ex) {
          System.err.println("Could not write prefs:" + ex);
          ex.printStackTrace();
+      }
+   }
+
+   void loadAddedClasses()
+   {
+      Iterator it=step3.getAddedClasses().iterator();
+      while(it.hasNext())
+      {
+         String id=(String)((HashMap)it.next()).get("id");
+         if(!goData.newSet(id))
+         {
+            NewGeneSet newGeneSet=new NewGeneSet(geneData);
+            String filename = NewGeneSet.getFileName(settings.getClassFolder(),id);
+            newGeneSet.loadClassFile(filename);
+            newGeneSet.addToMaps(goData);
+         }
       }
    }
 
