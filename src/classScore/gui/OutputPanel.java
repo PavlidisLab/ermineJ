@@ -28,6 +28,7 @@ import javax.swing.table.TableColumn;
 
 import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
+import baseCode.gui.JWebBrowser;
 import classScore.Settings;
 import classScore.GeneSetPvalRun;
 import classScore.data.GONames;
@@ -156,9 +157,8 @@ public class OutputPanel extends JScrollPane {
       OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e
             .getSource() ).getParent();
       int r = table.rowAtPoint( sourcePopup.getPoint() );
-      String id = getClassId( r );
-      GeneSetWizard cwiz = new GeneSetWizard( callingframe, geneData, goData,
-            id );
+      String classID = getClassId( r );
+      GeneSetWizard cwiz = new GeneSetWizard( callingframe, geneData, goData, classID );
       cwiz.showWizard();
    }
 
@@ -167,7 +167,16 @@ public class OutputPanel extends JScrollPane {
     * @param e
     */
    void htmlMenuItem_actionPerformed( ActionEvent e ) {
-      GuiUtil.error( "This doesn't do anything yet." );
+      
+      OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e
+            .getSource() ).getParent();
+      int r = table.rowAtPoint( sourcePopup.getPoint() );
+      String classID = getClassId( r );
+      
+      // create the URL and show it
+      String URL = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=";
+      URL += classID;  // e.g. "GO:0003824"
+      new JWebBrowser( URL );
    }
 
    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
