@@ -52,7 +52,6 @@ public class ClassPanel extends JScrollPane
 
    private void jbInit() throws Exception {
       jTable1.addMouseListener(new ClassPanel_jTable1_mouseAdapter(this));
-      jTable1.setGridColor(Color.lightGray);
       jTable1.setRowSelectionAllowed(true);
 
       modclassPopupMenu popup = new modclassPopupMenu();

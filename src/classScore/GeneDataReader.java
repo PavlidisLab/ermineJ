@@ -37,6 +37,18 @@ public class GeneDataReader {
       this.readFile();
    }
 
+   public GeneDataReader(String filename) {
+      this.filename = filename;
+      probeToClassMap = new LinkedHashMap();
+      classToProbeMap = new LinkedHashMap();
+//    probeGroupMap = new HashMap();
+      probeToGeneName = new HashMap();
+      probeGroupMap = probeToGeneName;
+      probeToDescription = new HashMap();
+      groupProbeList = new HashMap();
+      this.readFile();
+   }
+
 //read in file
    private void readFile() {
       try {
@@ -65,7 +77,7 @@ public class GeneDataReader {
 
             // create a new Vector for each row's columns
             String probe = st.nextToken();
-            if (probes.containsKey(probe)) { // only do probes we have in the data set.
+            if (probes==null || probes.containsKey(probe)) { // only do probes we have in the data set.
 
                /* read gene name */
                String group = st.nextToken();

@@ -9,22 +9,28 @@ import javax.swing.table.*;
   @author Shahmil Merchant; Paul Pavlidis (major changes)
   @version $Id$
  */
-public class SetupMaps {
+public class InitialMaps {
    public GONameReader goName;
-   public expClassScore probePvalMapper;
    public GeneDataReader geneData = null;
    public Map probeGroups;
-   public ClassMap probeToClassMap;
+   public ClassMap probeToClassMap; //get rid of this
    public Map classToProbe;
+   public expClassScore probePvalMapper;
    private GeneGroupReader groupName;
-   private boolean weight_on = true;
-   private boolean dolog = true;
    private Vector sortedclasses = null;
 
    /**
     */
-   public SetupMaps(String probePvalFile,
-                    String probe_annotfile,
+   public InitialMaps(String probe_annotfile, String goNamesfile,
+                      classScoreStatus messenger)
+       throws IllegalArgumentException, IOException
+   {
+      readFiles(probe_annotfile, goNamesfile, messenger);
+      setupClasses(messenger);
+   }
+
+   public InitialMaps(String probePvalFile,
+                      String probe_annotfile,
                        String goNamesfile,
                        String method,
                        String groupMethod,
@@ -36,36 +42,52 @@ public class SetupMaps {
                        int pvalcolumn,
                        String dolog_check,
                        classScoreStatus messenger)
-          throws IllegalArgumentException, IOException{
+       throws IllegalArgumentException, IOException
+   {
+      readFiles(probe_annotfile, goNamesfile, messenger, probePvalFile,
+                method, classMaxSize, classMinSize, numberOfRuns, quantile,
+                useWeights, pvalcolumn, dolog_check);
+      setupClasses(messenger);
+      messenger.setStatus("Initializing gene score mapping");
+      probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
+                                    groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
+   }
 
-      // user flags and constants:
-      dolog = (Boolean.valueOf(dolog_check)).booleanValue();
-
+   private void readFiles(String probe_annotfile, String goNamesfile,
+                          classScoreStatus messenger) throws IllegalArgumentException, IOException
+   {
       messenger.setStatus("Reading GO descriptions");
       goName = new GONameReader(goNamesfile); // parse go name file
+      messenger.setStatus("Reading gene data file");
+      geneData = new GeneDataReader(probe_annotfile);
+   }
 
+   private void readFiles(String probe_annotfile, String goNamesfile,
+                          classScoreStatus messenger, String probePvalFile,
+                          String method, int classMaxSize, int classMinSize,
+                          int numberOfRuns, int quantile,
+                          String useWeights, int pvalcolumn,
+                          String dolog_check
+                          ) throws IllegalArgumentException, IOException
+   {
+      messenger.setStatus("Reading GO descriptions");
+      goName = new GONameReader(goNamesfile); // parse go name file
       messenger.setStatus("Reading gene scores");
+      boolean dolog = (Boolean.valueOf(dolog_check)).booleanValue();
       probePvalMapper = new expClassScore(probePvalFile, useWeights, method,
                                           pvalcolumn, dolog, classMaxSize,
                                           classMinSize, numberOfRuns,
                                           quantile);
-
       messenger.setStatus("Reading gene data file");
       geneData = new GeneDataReader(probe_annotfile, probePvalMapper.get_map());
+   }
+
+   private void setupClasses(classScoreStatus messenger)
+   {
       groupName = new GeneGroupReader(geneData.getGroupProbeList(),
                                       geneData.getProbeGroupMap()); // parse group file. Yields map of probe->replicates.
       probeGroups = groupName.get_probe_group_map(); // map of probes to groups
-
-      messenger.setStatus("Initializing gene score mapping");
-
-      //  if (weight_on) {
-      probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
-                                    groupMethod); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-      //  }
-
       messenger.setStatus("Initializing gene class mapping");
-
-      //   messenger.setStatus("Reading in GO class membership");
       probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                      geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
@@ -180,5 +202,20 @@ public class SetupMaps {
                                      geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
       sortClasses();
+   }
+
+   public int numClasses() { return sortedclasses.size(); }
+   public String getClass(int i) { return (String) sortedclasses.get(i); }
+   public String getClassDesc(String id) { return (String) goName.get_GoName_map().get(id); }
+   public int numProbes(String id) { return ((ArrayList)classToProbe.get(id)).size(); }
+   public int numGenes(String id)
+   {
+      HashSet genes = new HashSet();
+      ArrayList probes = (ArrayList) classToProbe.get(id);
+      Iterator probe_it = probes.iterator();
+      while (probe_it.hasNext()) {
+         genes.add(geneData.getProbeGeneName( (String) probe_it.next()));
+      }
+      return genes.size();
    }
 }

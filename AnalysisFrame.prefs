@@ -1,0 +1,7 @@
+#
+#Tue Jun 15 14:52:09 EDT 2004
+probeFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
+nameFile=C\:\\jbproject\\ermineJ\\data\\goNames.txt
+rawFile=C\:\\jbproject\\ermineJ\\data\\melanoma_and_sarcomaMAS5.txt
+outputFile=C\:\\jbproject\\ermineJ\\data\\test.results.txt
+scoreFile=C\:\\jbproject\\ermineJ\\data\\one-way-anova-parsed.txt

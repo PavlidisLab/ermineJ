@@ -40,7 +40,49 @@ public class classPvalRun {
 
    /**
     */
+   public classPvalRun(InitialMaps imaps,
+                       String resultsFile,
+                       double pval,
+                       String useWeights,
+                       String mtc_method,
+                       classScoreStatus messenger,
+                       boolean loadResults) throws
+       IllegalArgumentException, IOException
+   {
+      initialize(imaps.goName,
+                 imaps.probePvalMapper,
+                 imaps.geneData,
+                 imaps.probeGroups,
+                 imaps.probeToClassMap,
+                 imaps.classToProbe,
+                 resultsFile,
+                 pval,
+                 useWeights,
+                 mtc_method,
+                 messenger,
+                 loadResults);
+   }
+
    public classPvalRun(GONameReader gn,
+                       expClassScore ppm,
+                       GeneDataReader gd,
+                       Map pgm,
+                       ClassMap ptcm,
+                       Map ctp,
+                       String resultsFile,
+                       double pval,
+                       String useWeights,
+                       String mtc_method,
+                       classScoreStatus messenger,
+                       boolean loadResults)
+       throws IllegalArgumentException, IOException
+   {
+      initialize(gn, ppm, gd, pgm, ptcm, ctp,
+                 resultsFile, pval, useWeights, mtc_method,
+                 messenger, loadResults);
+   }
+
+   public void initialize(GONameReader gn,
                        expClassScore ppm,
                        GeneDataReader gd,
                        Map pgm,

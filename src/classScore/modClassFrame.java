@@ -41,25 +41,16 @@ public class modClassFrame
    JLabel jLabel4 = new JLabel();
    JLabel jLabel5 = new JLabel();
    ButtonGroup buttonGroup1 = new ButtonGroup();
-   JRadioButton jRadioButton1 = new JRadioButton();
-   JRadioButton jRadioButton2;
+   JRadioButton fileInputButton = new JRadioButton();
+   JRadioButton manInputButton;
    //step 1 bottom
    JPanel jPanel3 = new JPanel(); //outer file details
-   GridBagLayout gridBagLayout3 = new GridBagLayout();
    JPanel jPanel2 = new JPanel(); // holds file chooser
    JButton browseButton = new JButton();
    JTextField classFile = new JTextField();
    JFileChooser chooser = new JFileChooser();
-   File startPath;
-   JPanel jPanel8 = new JPanel(); // holds file type stuff
-   JLabel jLabel3 = new JLabel(); //  'choose file type'
-   JPanel jPanel6 = new JPanel(); //  holds radio buttons
-   GridBagLayout gridBagLayout2 = new GridBagLayout();
+   File startPath;// holds file type stuff//  'choose file type'//  holds radio buttons
    ButtonGroup buttonGroup2 = new ButtonGroup();
-   JRadioButton jRadioButton3 = new JRadioButton();
-   JRadioButton jRadioButton4 = new JRadioButton();
-   JLabel jLabel6 = new JLabel();
-   JLabel jLabel7 = new JLabel();
 
    //panels for step 1M
    JPanel step1MPanel = new JPanel();
@@ -99,21 +90,21 @@ public class modClassFrame
    JLabel modifyClassLabel = new JLabel();
 
    //logic
-   int inputMethod = 0;
    int step = 1;
+   int inputMethod = 0;
    boolean makenew;
 
    NewClass newclass;
-   SetupMaps smap;
+   InitialMaps imaps;
    ClassPanel classpanel;
    String folder;
    String cid;
 
-   public modClassFrame(boolean makenew, SetupMaps smap, ClassPanel classpanel, String saveFolder, String cid)
+   public modClassFrame(boolean makenew, InitialMaps imap, ClassPanel classpanel, String saveFolder, String cid)
    {
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.makenew=makenew;
-      this.smap=smap;
+      this.imaps=imap;
       this.classpanel=classpanel;
       this.folder=saveFolder;
       this.cid=cid;
@@ -152,7 +143,9 @@ public class modClassFrame
       finishButton.setText("Finish");
       finishButton.addActionListener(new finishButton_actionAdapter(this));
       finishButton.setEnabled(false);
-      BottomPanel.add(cancelButton, null);
+      jPanel4.setPreferredSize(new Dimension(354, 73));
+    jPanel2.setPreferredSize(new Dimension(379, 35));
+    BottomPanel.add(cancelButton, null);
       BottomPanel.add(backButton, null);
       BottomPanel.add(nextButton, null);
       BottomPanel.add(finishButton, null);
@@ -171,18 +164,18 @@ public class modClassFrame
          jPanel4.setForeground(Color.black);
          jPanel4.setBorder(BorderFactory.createEtchedBorder());
          jPanel4.setLayout(gridBagLayout1);
-         jRadioButton1.setBackground(SystemColor.control);
-         jRadioButton1.setBorder(BorderFactory.createLineBorder(Color.black));
-         jRadioButton1.setText("File");
-         jRadioButton1.addActionListener(new modClassFrame_jRadioButton1_actionAdapter(this));
-         jPanel3.setPreferredSize(new Dimension(380, 133));
-         buttonGroup1.add(jRadioButton1);
-         jRadioButton2 = new JRadioButton("Manual", true);
-         jRadioButton2.setBackground(SystemColor.control);
-         jRadioButton2.setMaximumSize(new Dimension(91, 23));
-         jRadioButton2.addActionListener(new modClassFrame_jRadioButton2_actionAdapter(this));
-         jRadioButton2.setBorder(BorderFactory.createLineBorder(Color.black));
-         buttonGroup1.add(jRadioButton2);
+         fileInputButton.setBackground(SystemColor.control);
+         fileInputButton.setBorder(BorderFactory.createLineBorder(Color.black));
+         fileInputButton.setText("File");
+         fileInputButton.addActionListener(new modClassFrame_fileInputButton_actionAdapter(this));
+         jPanel3.setPreferredSize(new Dimension(354, 50));
+         buttonGroup1.add(fileInputButton);
+         manInputButton = new JRadioButton("Manual", true);
+         manInputButton.setBackground(SystemColor.control);
+         manInputButton.setMaximumSize(new Dimension(91, 23));
+         manInputButton.addActionListener(new modClassFrame_manInputButton_actionAdapter(this));
+         manInputButton.setBorder(BorderFactory.createLineBorder(Color.black));
+         buttonGroup1.add(manInputButton);
          jLabel4.setBorder(null);
          jLabel4.setText("- File with gene symbols or probe ids");
          jLabel5.setBorder(null);
@@ -195,23 +188,20 @@ public class modClassFrame
              , GridBagConstraints.WEST,
              GridBagConstraints.NONE, new Insets(3, 16, 0, 10),
              30, 10));
-         jPanel4.add(jRadioButton2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
+         jPanel4.add(manInputButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
              , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 9, 8, 0), 8, 12));
-         jPanel4.add(jRadioButton1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
+         jPanel4.add(fileInputButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
              , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 9, 0, 0), 26, 12));
          jPanel7.add(jLabel8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
              , GridBagConstraints.WEST,
              GridBagConstraints.NONE, new Insets(6, 21, 0, 74),
              0, 0));
-         jPanel7.add(jPanel4, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
-             , GridBagConstraints.CENTER,
-             GridBagConstraints.HORIZONTAL,
-             new Insets(6, 10, 12, 36), -1, 8));
+         jPanel7.add(jPanel4,   new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(6, 10, 12, 16), -1, 8));
 
          /////////////////////////
          //step 1 bottom
          jPanel3.setBackground(SystemColor.control);
-         jPanel3.setLayout(gridBagLayout3);
          //file chooser stuff
          jPanel2.setBackground(SystemColor.control);
          browseButton.setText("Browse....");
@@ -226,51 +216,11 @@ public class modClassFrame
          chooser.setCurrentDirectory(new File(folder));
          jPanel2.add(browseButton, null);
          jPanel2.add(classFile, null);
-         jPanel3.add(jPanel8,  new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
-             ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 3, 0, 103), -181, 21));
          //file type stuff
-         jPanel8.setBackground(SystemColor.control);
-         jPanel8.setBorder(null);
-         jPanel6.setBorder(null);
-         jLabel3.setMaximumSize(new Dimension(999, 15));
-         jLabel3.setMinimumSize(new Dimension(209, 15));
-         jLabel3.setPreferredSize(new Dimension(209, 15));
-         jLabel3.setToolTipText("");
-         jLabel3.setText("Choose the file type:");
 
-         jPanel6.setLayout(gridBagLayout2);
-         jPanel6.setForeground(Color.black);
-         jPanel6.setBackground(SystemColor.control);
-         jLabel6.setText("- e.g. 36735_f_at");
-         jLabel7.setText("- e.g. KIR3DL2");
-         jRadioButton3.setText("Gene symbols");
-         jRadioButton3.setBackground(SystemColor.control);
-         jRadioButton3.setEnabled(false);
-         jRadioButton4.setText("Probe IDs");
-         jRadioButton4.setMaximumSize(new Dimension(91, 23));
-         jRadioButton4.setBackground(SystemColor.control);
-         jRadioButton4.setSelected(true);
-         jRadioButton4.setEnabled(false);
-         buttonGroup2.add(jRadioButton3);
-         buttonGroup2.add(jRadioButton4);
-         jPanel6.add(jLabel6, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0
-             , GridBagConstraints.WEST,
-             GridBagConstraints.NONE, new Insets(0, 23, 0, 9),
-             15, 12));
-         jPanel6.add(jLabel7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0
-             , GridBagConstraints.WEST,
-             GridBagConstraints.NONE, new Insets(2, 23, 0, 9),
-             32, 12));
-         jPanel6.add(jRadioButton4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
-             , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 2, 0, 0), 25, 6));
-         jPanel6.add(jRadioButton3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
-             , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(2, 2, 0, 0), 0, 6));
          step1Panel.add(jPanel7, null);
          step1Panel.add(jPanel3, null);
-         jPanel3.add(jPanel2,  new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
-             ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 3, 7, 7), 40, -1));
-         jPanel8.add(jLabel3, null);
-         jPanel8.add(jPanel6, null);
+         jPanel3.add(jPanel2, null);
          jPanel1.add(step1Panel, BorderLayout.CENTER);
          jPanel1.remove(step1Panel);
 //      }
@@ -293,9 +243,9 @@ public class modClassFrame
           mLabelPanel.add(modifyLabel, null);
           mLabelPanel.add(modifyClassLabel, null);
           pickClassButton.addActionListener(new pickClassButton_actionAdapter(this));
-          jPanel1.add(step1MPanel, BorderLayout.CENTER);
           step1MPanel.add(modifyPanel, null);
-          jPanel1.remove(step1MPanel);
+//        jPanel1.add(step1MPanel, BorderLayout.CENTER);
+//        jPanel1.remove(step1MPanel);
 //      }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -333,8 +283,8 @@ public class modClassFrame
       jPanel9.add(deleteButton, null);
       step2Panel.add(jPanel9, null);
 
-      jPanel1.add(step2Panel, BorderLayout.CENTER);
-      jPanel1.remove(step2Panel);
+//    jPanel1.add(step2Panel, BorderLayout.CENTER);
+//    jPanel1.remove(step2Panel);
 
 ///////////////////////////////////////////////////////////////////////////////
       //panels for step 3
@@ -376,8 +326,8 @@ public class modClassFrame
       ncIDPanel.setPreferredSize(new Dimension(128, 51));
       classIDTF.setBorder(BorderFactory.createLoweredBevelBorder());
 
-      jPanel1.add(step3Panel, BorderLayout.CENTER);
-      jPanel1.remove(step3Panel);
+//    jPanel1.add(step3Panel, BorderLayout.CENTER);
+//    jPanel1.remove(step3Panel);
 
 ///////////////
       newclass = new NewClass(this);
@@ -420,7 +370,7 @@ public class modClassFrame
    private void populateTables() {
       if(!makenew)
       {
-         SortFilterModel ocSorter = new SortFilterModel(smap.toTableModel());
+         SortFilterModel ocSorter = new SortFilterModel(imaps.toTableModel());
          oldClassTable.setModel(ocSorter);
          oldClassTable.getTableHeader().addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
@@ -433,7 +383,7 @@ public class modClassFrame
          oldClassTable.getColumnModel().getColumn(0).setPreferredWidth(40);
       }
 
-      SortFilterModel sorter = new SortFilterModel(smap.geneData.toTableModel());
+      SortFilterModel sorter = new SortFilterModel(imaps.geneData.toTableModel());
       probeTable.setModel(sorter);
       probeTable.getTableHeader().addMouseListener(new MouseAdapter() {
          public void mouseClicked(MouseEvent event) {
@@ -466,27 +416,23 @@ public class modClassFrame
    void gotoStep2()
    {
       newclass.id=cid;
-      newclass.desc=smap.goName.get_GoName_value_map(cid);
-      if(smap.classToProbe.containsKey(cid))
-      newclass.probes.addAll((ArrayList)smap.classToProbe.get(cid));
+      newclass.desc=imaps.goName.get_GoName_value_map(cid);
+      if(imaps.classToProbe.containsKey(cid))
+      newclass.probes.addAll((ArrayList)imaps.classToProbe.get(cid));
       step2Panel.revalidate();
       updateCountLabel();
       this.repaint();
    }
 
-   void jRadioButton2_actionPerformed(ActionEvent e) {
+   void manInputButton_actionPerformed(ActionEvent e) {
       classFile.setEditable(false);
-      jRadioButton3.setEnabled(false);
-      jRadioButton4.setEnabled(false);
       classFile.setEnabled(false);
       browseButton.setEnabled(false);
       inputMethod = 0;
    }
 
-   void jRadioButton1_actionPerformed(ActionEvent e) {
+   void fileInputButton_actionPerformed(ActionEvent e) {
       classFile.setEditable(true);
-      jRadioButton3.setEnabled(true);
-      jRadioButton4.setEnabled(true);
       classFile.setEnabled(true);
       browseButton.setEnabled(true);
       inputMethod = 1;
@@ -510,8 +456,8 @@ public class modClassFrame
       newclass.id=id;
       modifyClassLabel.setText(id);
       newclass.desc=desc;
-      if(smap.classToProbe.containsKey(id))
-         newclass.probes.addAll((ArrayList)smap.classToProbe.get(id));
+      if(imaps.classToProbe.containsKey(id))
+         newclass.probes.addAll((ArrayList)imaps.classToProbe.get(id));
    }
 
    void delete_actionPerformed(ActionEvent e) {
@@ -525,11 +471,14 @@ public class modClassFrame
       updateCountLabel();
    }
 
-   void jButton1_actionPerformed(ActionEvent e) {
+   void addButton_actionPerformed(ActionEvent e) {
       int n = probeTable.getSelectedRowCount();
       int[] rows = probeTable.getSelectedRows();
       for (int i = 0; i < n; i++) {
-         newclass.probes.add(probeTable.getValueAt(rows[i], 0));
+         //newclass.probes.add(probeTable.getValueAt(rows[i], 0)); (for just deleting probes)
+         String newGene;
+         if((newGene=imaps.geneData.getProbeGeneName((String)probeTable.getValueAt(rows[i], 0))) != null)
+            addGene(newGene);
       }
       HashSet noDupes=new HashSet(newclass.probes);
       newclass.probes.clear();
@@ -542,7 +491,12 @@ public class modClassFrame
    void editorProbe_actionPerformed(ChangeEvent e)
    {
       String newProbe = (String)((DefaultCellEditor) e.getSource()).getCellEditorValue();
-      System.err.println(newProbe);
+      String newGene;
+      if((newGene=imaps.geneData.getProbeGeneName(newProbe)) != null)
+         addGene(newGene);
+      else
+         errorPopUp("Probe " + newProbe + " does not exist.");
+/* for adding specified probe
       if(smap.geneData.getProbeGeneName(newProbe) != null)
       {
          newclass.probes.add(newProbe);
@@ -552,13 +506,18 @@ public class modClassFrame
       }
       else
          errorPopUp("Probe " + newProbe + " does not exist.");
+*/
    }
 
    void editorGene_actionPerformed(ChangeEvent e)
    {
       String newGene = (String)((DefaultCellEditor) e.getSource()).getCellEditorValue();
-      System.err.println(newGene);
-      ArrayList probelist = smap.geneData.getGeneProbeList(newGene);
+      addGene(newGene);
+   }
+
+   void addGene(String gene)
+   {
+      ArrayList probelist = imaps.geneData.getGeneProbeList(gene);
       if(probelist != null)
       {
          newclass.probes.addAll(probelist);
@@ -567,9 +526,8 @@ public class modClassFrame
          updateCountLabel();
       }
       else
-         errorPopUp("Gene " + newGene + " does not exist.");
+         errorPopUp("Gene " + gene + " does not exist.");
    }
-
 
    void updateCountLabel()
    {
@@ -579,7 +537,7 @@ public class modClassFrame
    void classIDEditor_actionPerformed(ChangeEvent e)
    {
       String classID = (String)((DefaultCellEditor) e.getSource()).getCellEditorValue();
-      if(smap.geneData.classToProbeMapContains(classID) && makenew)
+      if(imaps.geneData.classToProbeMapContains(classID) && makenew)
          errorPopUp("A class by the ID " + classID + " already exists.");
       else
       {
@@ -602,21 +560,24 @@ public class modClassFrame
             errorPopUp("Pick a class to be modified.");
          else
          {
-            step = 2;
-            if (makenew) {
-               this.getContentPane().remove(step1Panel);
-               this.setTitle("Define New Class - Step 2 of 3");
-               if (inputMethod == 1)
-                  newclass.loadClassFile(classFile.getText());
-            } else {
-               this.getContentPane().remove(step1MPanel);
-               this.setTitle("Modify Class - Step 2 of 3");
+            if (makenew && inputMethod == 1)
+               newclass.loadClassFile(classFile.getText());
+            if (!(inputMethod == 1 && newclass.id.compareTo("") == 0))
+                {
+               if (makenew) {
+                  this.getContentPane().remove(step1Panel);
+                  this.setTitle("Define New Class - Step 2 of 3");
+               } else {
+                  this.getContentPane().remove(step1MPanel);
+                  this.setTitle("Modify Class - Step 2 of 3");
+               }
+               step = 2;
+               backButton.setEnabled(true);
+               this.getContentPane().add(step2Panel);
+               step2Panel.revalidate();
+               updateCountLabel();
+               this.repaint();
             }
-            backButton.setEnabled(true);
-            this.getContentPane().add(step2Panel);
-            step2Panel.revalidate();
-            updateCountLabel();
-            this.repaint();
          }
       }
       else if(step == 2)
@@ -689,168 +650,39 @@ public class modClassFrame
       else
       {
           if(makenew)
-             smap.addClass(id, desc, newclass.probes);
+             imaps.addClass(id, desc, newclass.probes);
           else
-             smap.modifyClass(id, desc, newclass.probes);
-          newclass.saveClass(folder);
-          classpanel.setModel(smap.toTableModel());
+             imaps.modifyClass(id, desc, newclass.probes);
+          newclass.saveClass(folder,0);
+          classpanel.setModel(imaps.toTableModel());
           dispose();
       }
    }
-
 }
 
-class NewClass {
-   modClassFrame outerframe;
-   String id;
-   String desc;
-   ArrayList probes;
-
-   public NewClass(modClassFrame outerframe) {
-      this.outerframe=outerframe;
-      id = new String();
-      desc = new String();
-      probes = new ArrayList();
-   }
-
-   public void clear()
-   {
-      id="";
-      desc="";
-      probes.clear();
-   }
-
-   public AbstractTableModel toTableModel(boolean editable) {
-      final boolean finalized=editable;
-
-      return new AbstractTableModel() {
-
-         private String[] columnNames = {"Probe", "Gene", "Description"};
-
-         public String getColumnName(int i) { return columnNames[i]; }
-
-         public int getRowCount() {
-            int windowrows;
-            if(finalized)
-               windowrows=11;
-            else
-               windowrows=8;
-            int extra=1;
-            if(probes.size()<windowrows)
-               extra=windowrows-probes.size();
-            return probes.size() + extra;
-         }
-
-         public int getColumnCount() {
-            return 3;
-         }
-
-         public Object getValueAt(int r, int c) {
-             if (r < probes.size())
-            {
-               String probeid = (String) probes.get(r);
-               GeneDataReader geneData=outerframe.smap.geneData;
-               switch (c) {
-                  case 0:
-                     return probeid;
-                  case 1:
-                     return geneData.getProbeGeneName(probeid);
-                  case 2:
-                     return geneData.getProbeDescription(probeid);
-                  default:
-                     return "";
-               }
-            }
-            else {
-               return "";
-            }
-         }
-
-         public boolean isCellEditable(int r, int c) {
-            if(!finalized && (c==0 || c==1))
-               return true;
-            else
-               return false;
-         }
-      };
-   }
-
-   public void loadClassFile(String file)
-   {
-      clear();
-      File infile = new File(file);
-      if (!infile.exists() || !infile.canRead()) {
-         outerframe.errorPopUp("Could not find file: "+file);
-         throw new IllegalArgumentException("Could not read " + file);
-      }
-      try
-      {
-         FileInputStream fis = new FileInputStream(file);
-         BufferedInputStream bis = new BufferedInputStream(fis);
-         BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
-         String row;
-         while ( (row = dis.readLine()) != null)
-         {
-            if(id.compareTo("")==0)
-               id=row;
-            else if(desc.compareTo("")==0)
-               desc=row;
-            else
-               probes.add(row);
-         }
-         dis.close();
-      }
-      catch (IOException ioe)
-      {
-         outerframe.errorPopUp("Could not find file: "+ioe);
-      }
-   }
-
-   public void saveClass(String folder)
-   {
-      try
-      {
-         BufferedWriter out = new BufferedWriter(new FileWriter(folder+id+"-class.txt", false));
-         out.write(id+"\n");
-         out.write(desc+"\n");
-         for (Iterator it = probes.iterator(); it.hasNext(); )
-         {
-            out.write((String)it.next()+"\n");
-         }
-         out.close();
-      }
-      catch (IOException e)
-      {
-         System.err.println("There was an IO error while printing the results: " + e);
-      }
-   }
-
-
-}
-
-class modClassFrame_jRadioButton2_actionAdapter
+class modClassFrame_manInputButton_actionAdapter
     implements java.awt.event.ActionListener {
    modClassFrame adaptee;
 
-   modClassFrame_jRadioButton2_actionAdapter(modClassFrame adaptee) {
+   modClassFrame_manInputButton_actionAdapter(modClassFrame adaptee) {
       this.adaptee = adaptee;
    }
 
    public void actionPerformed(ActionEvent e) {
-      adaptee.jRadioButton2_actionPerformed(e);
+      adaptee.manInputButton_actionPerformed(e);
    }
 }
 
-class modClassFrame_jRadioButton1_actionAdapter
+class modClassFrame_fileInputButton_actionAdapter
     implements java.awt.event.ActionListener {
    modClassFrame adaptee;
 
-   modClassFrame_jRadioButton1_actionAdapter(modClassFrame adaptee) {
+   modClassFrame_fileInputButton_actionAdapter(modClassFrame adaptee) {
       this.adaptee = adaptee;
    }
 
    public void actionPerformed(ActionEvent e) {
-      adaptee.jRadioButton1_actionPerformed(e);
+      adaptee.fileInputButton_actionPerformed(e);
    }
 }
 
@@ -902,7 +734,7 @@ class modClassFrame_jButton1_actionAdapter
    }
 
    public void actionPerformed(ActionEvent e) {
-      adaptee.jButton1_actionPerformed(e);
+      adaptee.addButton_actionPerformed(e);
    }
 }
 
