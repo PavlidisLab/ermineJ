@@ -111,6 +111,7 @@ public class AnalysisWizardStep2
                    " refers to the expression profile data, usually a large matrix. " +
                    "Files must be tab-delimited text. For details, see the user manual.");
       this.addMain(step2Panel);
+      wiz.setFinishEnabled();
    }
 
    public boolean isReady() {

@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
+import baseCode.gui.file.DataFileFilter;
 import baseCode.gui.file.XMLFileFilter;
 import classScore.Settings;
 
@@ -26,11 +27,10 @@ import classScore.Settings;
  * @author Homin Lee
  * @author Paul Pavlidis
  * @version $Id$
- * 
  */
 
 public class StartupDialog extends AppDialog {
-   JFileChooser chooser = new JFileChooser();
+   JFileChooser chooser;
    JPanel centerPanel = new JPanel();
    JPanel classPanel = new JPanel();
    JLabel classLabel = new JLabel();
@@ -56,6 +56,9 @@ public class StartupDialog extends AppDialog {
 
    //Component initialization
    private void jbInit() {
+
+      chooser = new JFileChooser( settings.getDataFolder() );
+
       this.addWindowListener( new StartupDialog_this_windowAdapter( this ) );
 
       annotBrowseButton.setText( "Browse..." );
@@ -107,17 +110,35 @@ public class StartupDialog extends AppDialog {
    }
 
    private void saveValues() {
+
+//      // if we don't have the data folder, use the location of these files.
+//      if ( settings.getDataFolder() == null ) {
+//         settings.setDataFolder( classFile.getText().substring(
+//               0,
+//               classFile.getText().lastIndexOf(
+//                     System.getProperty( "file.separator" ) ) ) );
+//      }
+//      
+//      if ( settings.getClassFolder() == null ) {
+//         settings.setClassFolder( classFile.getText().substring(
+//               0,
+//               classFile.getText().lastIndexOf(
+//                     System.getProperty( "file.separator" ) ) ) + System.getProperty("file.separator" + "geneSets"));
+//      }
+
       settings.setClassFile( classFile.getText() );
       settings.setAnnotFile( annotFile.getText() );
       try {
          settings.writePrefs();
       } catch ( IOException ex ) {
-         GuiUtil.error( "Could not write prefs." );
+         GuiUtil.error( "Could not write preferences to a file." );
       }
    }
 
    void annotBrowseButton_actionPerformed( ActionEvent e ) {
       chooser.setDialogTitle( "Choose the annotation file:" );
+      DataFileFilter fileFilter = new DataFileFilter();
+      chooser.setFileFilter( fileFilter ); // JFileChooser method
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          annotFile.setText( chooser.getSelectedFile().toString() );

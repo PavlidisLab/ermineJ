@@ -8,14 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import javax.help.CSH;
-import javax.help.HelpBroker;
-import javax.help.HelpSet;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -28,6 +24,8 @@ import javax.swing.JProgressBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
+import org.xml.sax.SAXException;
+
 import baseCode.gui.GuiUtil;
 import baseCode.gui.StatusJlabel;
 import baseCode.util.StatusViewer;
@@ -36,7 +34,6 @@ import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
-import org.xml.sax.SAXException;
 
 /**
  * <hr>
@@ -95,18 +92,16 @@ public class GeneSetScoreFrame extends JFrame {
    private HelpHelper hh;
 
    public GeneSetScoreFrame() {
-      try {
+
          jbInit();
          hh = new HelpHelper();
          hh.initHelp( helpMenuItem );
          settings = new Settings();
-      } catch ( Exception e ) {
-         e.printStackTrace();
-      }
+      
    }
 
    /* init */
-   private void jbInit() throws Exception {
+   private void jbInit() {
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
       this.setJMenuBar( jMenuBar1 );
       this.setSize( new Dimension( 886, 450 ) );

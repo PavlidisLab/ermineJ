@@ -39,16 +39,11 @@ public class LoadDialog extends AppDialog {
       this.settings = callingframe.getSettings();
       chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
       chooser.setDialogTitle("Open Saved Analysis");
-      try {
-         jbInit();
-      }
-      catch ( Exception e ) {
-         e.printStackTrace();
-      }
+      jbInit();
    }
 
    //Component initialization
-   private void jbInit() throws Exception {
+   private void jbInit()  {
       loadBrowseButton.setEnabled( true );
       loadBrowseButton.setText( "Browse...." );
       loadBrowseButton.addActionListener( new LoadDialog_loadBrowseButton_actionAdapter( this ) );

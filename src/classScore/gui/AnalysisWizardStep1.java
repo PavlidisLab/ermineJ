@@ -34,6 +34,13 @@ public class AnalysisWizardStep1 extends WizardStep {
       this.wiz = wiz;
       this.settings = settings;
       setValues();
+      
+      // determine if the "finish" button should be disabled or not
+      if (settings.getAnnotFile() == null && settings.getScoreFile() == null ) {
+         wiz.setFinishDisabled();
+      } else {
+         wiz.setFinishEnabled();
+      }
    }
 
    //Component initialization
@@ -100,7 +107,7 @@ public class AnalysisWizardStep1 extends WizardStep {
             .addHelp( "<html><b>Select the method to " +
                   "use for scoring gene sets.</b><br>"
                   + "</html>" );
-      this.addMain( step1Panel );
+      this.addMain( step1Panel );  
    }
 
    public boolean isReady() {

@@ -6,20 +6,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLDecoder;
 import java.util.Properties;
 
-import baseCode.gui.GuiUtil;
+import baseCode.util.FileTools;
 
 /**
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin Lee
  * @author Will Braynen
  * @version $Id$
-
  */
 
 public class Settings {
@@ -31,9 +29,9 @@ public class Settings {
    private String dataFolder;
    private String classFolder;
    private String scoreFile;
-   private int maxClassSize = 15;
-   private int minClassSize = 14;
-   private int iterations = 10;
+   private int maxClassSize = 100;
+   private int minClassSize = 8;
+   private int iterations = 10000;
    private int scorecol = 2;
    private int geneRepTreatment = BEST_PVAL;
    private int rawScoreMethod = MEAN_METHOD;
@@ -53,8 +51,8 @@ public class Settings {
    public static final int ROC = 3;
 
    /**
-    * Westfall-Young resampling-based. Caution, this is very computationally
-    * intensive. Also not implemented for all analysis methods.
+    * Westfall-Young resampling-based. Caution, this is very computationally intensive. Also not implemented for all
+    * analysis methods.
     */
    public static final int WY = 0;
 
@@ -74,49 +72,32 @@ public class Settings {
 
    /**
     * Creates settings object
-    *
+    * 
     * @param filename name of preferences file to read
     */
    public Settings( String filename ) {
-      pref_file = filename;
-      
-      /* Expect the data directory to be in the installation directory.*/
-      dataFolder = ( new File( Settings.class.getResource( "Settings.class" )
-            .getFile() ) ).getPath();
-      int end = dataFolder.lastIndexOf( File.separatorChar );
-      dataFolder = dataFolder.substring( 0, end + 1 ) + ".." + File.separator
-            + ".." + File.separator + "data";
-      try {
-         dataFolder = URLDecoder.decode( ( new File( dataFolder )
-               .getCanonicalPath() ), "ISO-8859-1" );
-      } catch ( IOException ex ) {
-         GuiUtil.error( "Could not find data folder."  +
-             "Expected to find it at " + dataFolder); // make a big deal...
-      }
-      
-      /* Look in the user's home */
-//      String homeDir = System.getProperty( "user.home" );
-//      dataFolder = homeDir + File.separator + "ermineJ.data";
-//      try {
-//         dataFolder = URLDecoder.decode( ( new File( dataFolder )
-//               .getCanonicalPath() ), "ISO-8859-1" );
-//      } catch ( IOException ex ) {
-//         GuiUtil.error(
-//            "Could not find data folder.\n" +
-//            "Expected to find it at " + dataFolder + "\n" +
-//            "Press OK to quit." ); // make a big deal...
-//         System.exit( 1 );
-//      }
-      
-      classFolder = new String( dataFolder + File.separator + "genesets" );
-      if ( pref_file.compareTo( "" ) == 0 )
-            pref_file = dataFolder + File.separator + "ClassScore.preferences";
       classFile = "";
       annotFile = "";
       rawFile = "";
       scoreFile = "";
-
       properties = new Properties();
+      
+      if ( dataFolder == null && !this.determineDataDirectory() ) {
+         return;
+      }
+      
+      pref_file = filename;
+      classFolder = new String( dataFolder
+            + System.getProperty( "file.separator" ) + "genesets" );
+      
+      if (!FileTools.testDir(classFolder)) {
+         new File(classFolder).mkdir(); // todo should test success and do something about it.
+      }
+      
+      if ( pref_file.compareTo( "" ) == 0 )
+            pref_file = dataFolder + System.getProperty( "file.separator" )
+                  + "ClassScore.preferences";
+ 
       try {
          File fi = new File( pref_file );
          if ( fi.canRead() ) {
@@ -169,13 +150,15 @@ public class Settings {
                         .doubleValue();
          }
       } catch ( IOException ex ) {
-     //    System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no big deal.
+         //    System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no
+         // big
+         // deal.
       }
    }
 
    /**
     * Creates settings object
-    *
+    * 
     * @param settings - settings object to copy
     */
    public Settings( Settings settings ) {
@@ -203,6 +186,11 @@ public class Settings {
     * Writes setting values to file.
     */
    public void writePrefs() throws IOException {
+      
+      if (pref_file == null || pref_file.length() == 0 ) {
+         return;
+      }
+      
       properties.setProperty( "scoreFile", scoreFile );
       properties.setProperty( "classFile", classFile );
       properties.setProperty( "annotFile", annotFile );
@@ -226,6 +214,39 @@ public class Settings {
       properties.store( f, "" );
       f.close();
    }
+   
+   
+
+   /**
+    * Figure out where the data directory should go.
+    * 
+    * @return
+    */
+   public boolean determineDataDirectory() {
+      dataFolder = System.getProperty( "user.dir" ); // directory from which we are running the software. This is not
+      // platform independent so we fall back on the user home directory.
+
+      dataFolder = dataFolder.substring( 0, dataFolder.lastIndexOf( System
+            .getProperty( "file.separator" ) ) ); // up one level.
+
+      dataFolder = dataFolder + System.getProperty( "file.separator" )
+            + "ermineJ.data";
+  
+      if ( !FileTools.testDir( dataFolder ) ) {
+         dataFolder = System.getProperty( "user.home" )
+               + System.getProperty( "file.separator" ) + "ermineJ.data";
+
+         if ( !FileTools.testDir( dataFolder ) ) {
+            
+            // try to make it in the user's home directory.
+            return (new File(dataFolder)).mkdir(); 
+         }
+      }
+
+      return true;
+   }  
+
+
 
    /**
     * Returns setting values.
