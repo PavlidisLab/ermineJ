@@ -935,7 +935,8 @@ public class classPvalRun {
 
       classScoreStatus m = new classScoreStatus( null );
       try {
-         SetupMaps smaps = new SetupMaps( args[0], // pbPval file
+         InitialMaps smaps = new InitialMaps( 
+                                          args[0], // pbPval file
                                           args[1], // affy GO File
                                           args[2], // GO name file
                                           args[4], args[5], // methods

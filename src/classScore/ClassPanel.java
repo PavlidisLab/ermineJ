@@ -18,7 +18,7 @@ import javax.swing.table.*;
 public class ClassPanel extends JScrollPane
 {
    JTable jTable1 = new JTable();
-   SetupMaps dataHolder = null;
+   ClassMap dataHolder = null;
    // EventListenerList listenerList = null;
    classScoreFrame csFrame;
 
@@ -35,7 +35,7 @@ public class ClassPanel extends JScrollPane
       }
    }
 
-   public ClassPanel(SetupMaps dataHolder) {
+   public ClassPanel(ClassMap dataHolder) {
       try {
          //     listenerList = new EventListenerList();
          this.dataHolder = dataHolder;
@@ -95,6 +95,11 @@ public class ClassPanel extends JScrollPane
       //   System.err.println(j);
 
       //dataHolder.showDetails(j); FIX THIS!!!
+      //
+      // If calling classPvalRun.showDetails, then the second arg should be 
+      // csFrame.settings so that ClassDetailFrame will know the name of the
+      // master microarray file.
+      //
 
       //  EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
       //  ClassDetailsEvent event = new ClassDetailsEvent(this);

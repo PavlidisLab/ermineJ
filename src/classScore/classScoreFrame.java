@@ -131,7 +131,7 @@ public class classScoreFrame
     loadAnalysisMenuItem.setText("Load Analysis");
     loadAnalysisMenuItem.addActionListener(new classScoreFrame_loadAnalysisMenuItem_actionAdapter(this));
 
-//cPanel = new ClassPanel(this);
+    cPanel = new ClassPanel(this);
     oPanel = new OutputPanel();
 
     //cPanel.setModel(InitialMaps.toBlankTableModel());
