@@ -119,7 +119,7 @@ public class MultipleTestCorrector {
       }
 
       Collections.reverse( sortedclasses ); // start from the worst class.
-      HashMap permscores;
+      Map permscores;
 
       GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator(
             settings, geneData, hist, csc, null );
@@ -129,7 +129,7 @@ public class MultipleTestCorrector {
       for ( int i = 0; i < trials; i++ ) {
          //	    System.err.println("Trial: " + i );
 
-         Map scgroup_pval_map = geneScores.getGroupToPvalMap( true ); // shuffle
+         Map scgroup_pval_map = geneScores.getGeneToPvalMap( true ); // shuffle
          // the
          // association
          // of

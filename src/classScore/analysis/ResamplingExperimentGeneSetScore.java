@@ -122,7 +122,7 @@ public class ResamplingExperimentGeneSetScore extends
       pvals = geneScores.getPvalues(); // array of pvalues.
       groupPvals = geneScores.getGroupPvalues();
       probePvalMap = geneScores.getProbeToPvalMap(); // reference to the probe -> pval map.
-      groupPvalMap = geneScores.getGroupToPvalMap(); // this gets initialized by set_input_pvals
+      groupPvalMap = geneScores.getGeneToPvalMap(); // this gets initialized by set_input_pvals
 
       this.setHistogramRange(); // figure out the max pvalue possible.
       this.hist = new Histogram( numClasses, classMinSize, numRuns,

@@ -225,10 +225,12 @@ public class AnalysisWizardStep5 extends WizardStep {
    private void setValues() {
       jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
 
-      if ( settings.getRawScoreMethod() == Settings.MEAN_METHOD )
+      if ( settings.getRawScoreMethod() == Settings.MEAN_METHOD ) {
          jRadioButtonMean.setSelected( true );
-      else
+      } else {
          jRadioButtonMedian.setSelected( true );
+      }
+
       jTextFieldPValueThreshold.setText( String.valueOf( settings
             .getPValThreshold() ) );
       jCheckBoxDoLog.setSelected( settings.getDoLog() );
@@ -238,10 +240,12 @@ public class AnalysisWizardStep5 extends WizardStep {
       settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() )
             .intValue() );
 
-      if ( jRadioButtonMean.isSelected() )
+      if ( jRadioButtonMean.isSelected() ) {
          settings.setRawScoreMethod( Settings.MEAN_METHOD );
-      else
+      } else {
          settings.setRawScoreMethod( Settings.QUANTILE_METHOD );
+      }
+
       settings.setPValThreshold( Double.valueOf(
             jTextFieldPValueThreshold.getText() ).doubleValue() );
       settings.setDoLog( jCheckBoxDoLog.isSelected() );

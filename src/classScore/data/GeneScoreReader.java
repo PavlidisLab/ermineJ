@@ -46,7 +46,7 @@ public class GeneScoreReader {
    private double[] probePvalues = null;
    private int num_pvals;
    private Map probeToPvalMap;
-   private Map groupToPvalMap;
+   private Map geneToPvalMap;
 
    /**
     * @param filename
@@ -56,9 +56,9 @@ public class GeneScoreReader {
     * @throws IOException
     */
    public GeneScoreReader( String filename, Settings settings,
-         StatusViewer messenger, Map groupToProbeMap ) throws IOException {
+         StatusViewer messenger, Map geneToProbeMap ) throws IOException {
 
-      groupToPvalMap = new HashMap();
+      geneToPvalMap = new HashMap();
       double log10 = Math.log( 10 );
       boolean invalidLog = false;
       File infile = new File( filename );
@@ -156,7 +156,7 @@ public class GeneScoreReader {
       if ( messenger != null ) {
          messenger.setStatus( "Found " + num_pvals + " pvals in the file" );
       }
-      setUpGroupToPvalMap( settings.getGeneRepTreatment(), groupToProbeMap,
+      setUpGeneToPvalMap( settings.getGeneRepTreatment(), geneToProbeMap,
             messenger );
 
    } //
@@ -168,7 +168,7 @@ public class GeneScoreReader {
     * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the data
     *        set.
     */
-   private void setUpGroupToPvalMap( int gp_method, Map groupToProbeMap,
+   private void setUpGeneToPvalMap( int gp_method, Map groupToProbeMap,
          StatusViewer messenger ) {
 
       if ( groupToProbeMap == null || groupToProbeMap.size() == 0 ) {
@@ -192,13 +192,12 @@ public class GeneScoreReader {
          /* probes in this group */
          ArrayList probes = ( ArrayList ) groupToProbeMap.get( group );
          int in_size = 0;
+         
+         // Analyze all probes in this 'group' (pointing to the same gene)
          for ( Iterator pbItr = probes.iterator(); pbItr.hasNext(); ) {
             String probe = ( String ) pbItr.next();
 
             if ( !probeToPvalMap.containsKey( probe ) ) {
-               //     messenger.setStatus(
-               //             "Annotations contains probe not in the probeToPvalMap: "
-               //                  + probe );
                continue;
             }
 
@@ -227,9 +226,8 @@ public class GeneScoreReader {
             if ( gp_method == Settings.MEAN_PVAL ) {
                group_pval_temp[counter] /= in_size; // take the mean
             }
-            // messenger.setStatus("Processing " + group + " had " + in_size + " probes.");
             Double dbb = new Double( group_pval_temp[counter] );
-            groupToPvalMap.put( group, dbb );
+            geneToPvalMap.put( group, dbb );
             counter++;
          }
       } //end of while
@@ -282,13 +280,13 @@ public class GeneScoreReader {
     *        but the actual values are the same. This is used for resampling multiple test correction.
     * @return Map of groups of genes to pvalues.
     */
-   public Map getGroupToPvalMap( boolean shuffle ) {
+   public Map getGeneToPvalMap( boolean shuffle ) {
       if ( shuffle ) {
          Map scrambled_map = new LinkedHashMap();
-         Set keys = groupToPvalMap.keySet();
+         Set keys = geneToPvalMap.keySet();
          Iterator it = keys.iterator();
 
-         Collection values = groupToPvalMap.values();
+         Collection values = geneToPvalMap.values();
          Vector valvec = new Vector( values );
          Collections.shuffle( valvec );
 
@@ -301,15 +299,15 @@ public class GeneScoreReader {
          return scrambled_map;
 
       }
-      return groupToPvalMap;
+      return geneToPvalMap;
 
    }
 
    /**
     * @return
     */
-   public Map getGroupToPvalMap() {
-      return groupToPvalMap;
+   public Map getGeneToPvalMap() {
+      return geneToPvalMap;
    }
 
    /**

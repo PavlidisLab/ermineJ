@@ -26,7 +26,7 @@ import classScore.data.Histogram;
 
 public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
-   private Vector sortedclasses;
+ //  private Vector sortedclasses;
    private Map results;
    //  private ResamplingExperimentGeneSetScore probePvalMapper;
    private Histogram hist;
@@ -83,7 +83,7 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
     * Same thing as class_pval_generator, but returns a collection of scores (pvalues) (see below) instead of adding
     * them to the results object. This is used to get class pvalues for permutation analysis.
     */
-   public HashMap class_v_pval_generator( Map group_pval_map, Map probesToPvals ) {
+   public Map class_v_pval_generator( Map group_pval_map, Map probesToPvals ) {
       Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->
       // probe
       // map.
@@ -91,7 +91,6 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
       // are the class names.
       Iterator it = entries.iterator(); // the classes.
       //	Vector results = new Vector();
-      HashMap results = new HashMap();
 
       ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator(
             settings, geneAnnots, csc, goName, hist );

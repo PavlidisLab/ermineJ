@@ -150,7 +150,7 @@ public class GeneSetPvalRun {
                   settings, geneData, hist, csc, goData );
 
             // calculate the actual class scores and correct sorting.
-            pvg.classPvalGenerator( geneScores.getGroupToPvalMap(), geneScores
+            pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores
                   .getProbeToPvalMap() );
             results = pvg.getResults();
             break;
@@ -166,7 +166,7 @@ public class GeneSetPvalRun {
             OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator(
                   settings, geneData, csc, goData, inputSize );
             pvg.hgSizes( inp_entries );
-            pvg.classPvalGenerator( geneScores.getGroupToPvalMap(), geneScores
+            pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores
                   .getProbeToPvalMap() );
             results = pvg.getResults();
             messenger.setStatus( "Finished with ORA computations" );

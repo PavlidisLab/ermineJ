@@ -61,7 +61,7 @@ public class GeneSetSizeComputer {
          throw new IllegalStateException( "GeneScores was not initialized" );
       }
 
-      if ( geneScores.getGroupToPvalMap() == null ) {
+      if ( geneScores.getGeneToPvalMap() == null ) {
          throw new IllegalStateException(
                "getGroupToPvalMap was not initialized" );
       }
@@ -87,7 +87,7 @@ public class GeneSetSizeComputer {
 
                   if ( weight_on ) { //routine for weights
                      // compute pval for every replicate group
-                     if ( geneScores.getGroupToPvalMap().containsKey(
+                     if ( geneScores.getGeneToPvalMap().containsKey(
                            probeGroups.get( probe ) )
 
                            /*
