@@ -112,13 +112,10 @@ public class GeneSetTableModel extends AbstractTableModel {
             return values;
          case 3:
          	String gene_name=m_geneData.getProbeGeneName( probeID );
-         	// gene namne
+         	// gene name
          	return m_geneData == null ? null : 
-
          		new JLinkLabel(gene_name,
          				"http://www.google.com/search?hl=en&ie=UTF-8&q="+gene_name+"&btnG=Google+Search");
-            //return m_geneData == null ? "" : m_geneData
-            //      .getProbeGeneName( probeID );
          case 4:
             // description
             return m_geneData == null ? "" : m_geneData
