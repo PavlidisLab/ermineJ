@@ -23,10 +23,9 @@ public class DetailsTableModel
     extends AbstractTableModel {
 
    private JMatrixDisplay m_matrixDisplay;
-   private Double[] m_pvalues;
-   private String[] m_probes;
-   private String[] m_geneNames;
-   private String[] m_probeDescriptions;
+   private ArrayList m_probeIDs;
+   private Map m_pvalues;
+   private GeneAnnotations m_geneData;
    private DecimalFormat m_nf;
    private String[] m_columnNames = {
        "Probe", "P value", "Name", "Description"};
@@ -34,17 +33,15 @@ public class DetailsTableModel
    /** constructor */
    public DetailsTableModel(
        JMatrixDisplay matrixDisplay,
-       Double[] pvalues,
-       String[] probes,
-       String[] geneNames,
-       String[] probeDescriptions,
+       ArrayList probeIDs,
+       Map pvalues,
+       GeneAnnotations geneData,
        DecimalFormat nf ) {
 
       m_matrixDisplay = matrixDisplay;
+      m_probeIDs = probeIDs;
       m_pvalues = pvalues;
-      m_probes = probes;
-      m_geneNames = geneNames;
-      m_probeDescriptions = probeDescriptions;
+      m_geneData = geneData;
       m_nf = nf;
    }
 
@@ -60,7 +57,7 @@ public class DetailsTableModel
    } // end getColumnName
 
    public int getRowCount() {
-      return m_probes.length;
+      return m_probeIDs.size();
    }
 
    public int getColumnCount() {
@@ -69,31 +66,33 @@ public class DetailsTableModel
 
    public Object getValueAt( int row, int column ) {
 
-      try {
-         int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
+      int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
 
-         if ( column < offset ) {
-            return new Point( row, column ); // coords into JMatrixDisplay
-         } else {
-            column -= offset;
+      if ( column < offset ) {
+         return new Point( row, column ); // coords into JMatrixDisplay
+      } else {
+         column -= offset;
 
+      }
+
+      // get the probeID for the current row
+      String probeID = ( String ) m_probeIDs.get( row );
+
+      switch ( column ) { // after it's been offset
+         case 0:
+            return probeID;
+         case 1:
+            return m_pvalues == null ? new Double( Double.NaN ) :
+                new Double( m_nf.format( m_pvalues.get( probeID ) ) );
+         case 2:
+            return m_geneData == null ? "" :
+                m_geneData.getProbeGeneName( probeID );
+         case 3:
+            return m_geneData == null ? "" :
+                m_geneData.getProbeDescription( probeID );
+         default:
+            return "";
          }
-         switch ( column ) { // after it's been offset
-            case 0:
-               return m_probes[row];
-            case 1:
-               // Must return a Double rather than a String so that the sorter
-               // filter would sort the table correctly by this column
-               return new Double( m_nf.format( m_pvalues[row] ) );
-            case 2:
-               return m_geneNames[row];
-            case 3:
-               return m_probeDescriptions[row];
-            default:
-               return "";
-         }
-      } catch( Exception e ) {
-         return "";
       }
 
    } // end getValueAt

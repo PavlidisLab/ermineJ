@@ -1,17 +1,35 @@
 package classScore.gui.geneSet;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
@@ -26,11 +44,6 @@ import baseCode.gui.table.JVerticalTableHeaderRenderer;
 import classScore.data.*;
 import classScore.Settings;
 import classScore.SortFilterModel;
-import javax.swing.*;
-import java.awt.event.*;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * @author Will Braynen
@@ -62,6 +75,7 @@ public class JDetailsFrame
    JRadioButtonMenuItem m_blackbodyColormapMenuItem = new JRadioButtonMenuItem();
    JMenuItem m_saveImageMenuItem = new JMenuItem();
    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
+   DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
    JLabel jLabel1 = new JLabel();
    JLabel jLabel2 = new JLabel();
    JLabel jLabel3 = new JLabel();
@@ -75,10 +89,6 @@ public class JDetailsFrame
     */
    String m_filename;
    DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
-   String[] m_probeIDs;
-   Double[] m_pvalues;
-   String[] m_geneNames;
-   String[] m_probeDescriptions;
 
    /**
     * @param  args[0]  the name of the raw data file, as an absolute path,
@@ -92,9 +102,19 @@ public class JDetailsFrame
          System.err.println( "Please specify the name of the data file as a program argument" );
          return;
       }
-      String filename = args[0];
-      String[] geneSet = { "32254_at", "32533_s_at", "32534_f_at" }; // probe IDs
-      JDetailsFrame frame = new JDetailsFrame( geneSet, null, null, null, filename );
+
+      Settings settings = new Settings();
+      settings.setRawFile( args[0] );
+
+      final String[] PROBES = { "100_g_at" };
+
+      ArrayList probeIDs = new ArrayList();
+      for (int i = 0; i < PROBES.length; i++) {
+         probeIDs.add( i, PROBES[i] );
+      }
+
+      JDetailsFrame frame = new JDetailsFrame( probeIDs, null, null, settings );
+      frame.setSize( new Dimension( 800, 600 ) );
       frame.show();
    }
 
@@ -117,14 +137,10 @@ public class JDetailsFrame
       }
    }
 
-   public JDetailsFrame(
-         Map pvals,
-         Map classToProbe,
-         String classID,
-         GeneAnnotations geneData,
-         Settings settings ) {
+   public JDetailsFrame( ArrayList probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings ) {
       try {
-         translateVars( pvals, classToProbe, classID, geneData, settings );
+         String filename = settings.getRawFile();
+         createDetailsTable( probeIDs, pvalues, geneData, filename );
          jbInit();
       }
       catch ( Exception e ) {
@@ -297,21 +313,27 @@ public class JDetailsFrame
    }
 
    private void createDetailsTable(
-       String[] probesIDs,
-       Double[] pvalues,
-       String[] geneNames,
-       String[] probeDescriptions,
+       ArrayList probeIDs,
+       Map pvalues,
+       GeneAnnotations geneData,
        String filename ) {
 
       //
       // Create a matrix display
       //
 
+      // create a probe set from probeIDs
+      HashSet probeSet = new HashSet();
+      for (int i = 0; i < probeIDs.size(); i++) {
+         probeSet.add( probeIDs.get( i ) );
+      }
+
       // compile the matrix data
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
       try {
-         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesIDs );
+         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
+             probeSet );
       }
       catch ( IOException e ) {
          System.err.println( "IOException: wrong filename for MatrixReader" );
@@ -325,10 +347,10 @@ public class JDetailsFrame
       // Create the rest of the table
       //
 
-      DetailsTableModel m = new DetailsTableModel(
-          m_matrixDisplay, pvalues, probesIDs, geneNames, probeDescriptions, m_nf
+      DetailsTableModel tableModel = new DetailsTableModel(
+          m_matrixDisplay, probeIDs, pvalues, geneData, m_nf
           );
-      SortFilterModel sorter = new SortFilterModel( m, m_matrixDisplay );
+      SortFilterModel sorter = new SortFilterModel( tableModel, m_matrixDisplay );
       m_table.setModel( sorter );
 
       m_table.getTableHeader().addMouseListener( new MouseAdapter() {
@@ -410,14 +432,15 @@ public class JDetailsFrame
 
    } // end createDetailsTable
 
-   protected String[] getProbes( Map classToProbe, String id, int count ) {
+   protected String[] getProbeIDs( Map classToProbe, String classID ) {
 
       // Compile a list of gene probe ID's in this probe class
-      String[] probes = new String[count];
-      for ( int i = 0; i < count; i++ ) {
-         probes[i] = ( String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i );
+      final int probeCount = (( ArrayList ) classToProbe.get( classID )).size();
+      String[] probesIDs = new String[ probeCount ];
+      for ( int i = 0; i < probeCount; i++ ) {
+         probesIDs[i] = ( String ) ( ( ArrayList ) classToProbe.get( classID ) ).get( i );
       }
-      return probes;
+      return probesIDs;
 
    }
 
