@@ -20,7 +20,7 @@ public class class_correls {
     // stores information regarding random values
     private corr_class_scores probe_data;
     //stores probe->go Hashtable 
-    private Map probe_go;
+    private Map probe_gom;
     //stores go->probe Hashtable
     private Map go_probe;
     private String dest_file;
@@ -28,7 +28,7 @@ public class class_correls {
     private GoName_parse goName;
 
     // command line arguments in the following way
-    // data_file,affy_go_file,go_namefile,output_file,class_max_size,class_min_size,number of runs,hist range
+    // data_file,probe_go_file,go_namefile,output_file,class_max_size,class_min_size,number of runs,hist range
   public static void main (String[] args) {
       class_correls test = new class_correls(args[0],args[1],args[2],args[3],Integer.parseInt(args[4]),Integer.parseInt(args[5]),Integer.parseInt(args[6]),Double.parseDouble(args[7]));
       test.class_correl_generator();
@@ -36,18 +36,18 @@ public class class_correls {
      
 
 /*****************************************************************************************/
-    public class_correls(String probe_datafile,String affy_gofile,String go_namefile,String destination_file,int class_max_size,int class_min_size,int number_of_runs,double range){
+    public class_correls(String probe_datafile,String probe_gofile,String go_namefile,String destination_file,int class_max_size,int class_min_size,int number_of_runs,double range){
 /*****************************************************************************************/
 
 	probe_data = new corr_class_scores(probe_datafile); // main data file
 
-	ClassMap  affy_go = new ClassMap(affy_gofile);//parses affy file
+	ClassMap probe_go = new ClassMap(probe_gofile);//parses affy file
 	goName = new GoName_parse(go_namefile); //parse go name file
-	probe_go = new LinkedHashMap();
+	probe_gom = new LinkedHashMap();
 	go_probe = new LinkedHashMap();
 	go_name = new LinkedHashMap();
-	probe_go =affy_go.get_affy_map();//probe go map
-	go_probe =affy_go.get_go_map();//go probe map
+	probe_gom =probe_go.get_probe_map();//probe go map
+	go_probe =probe_go.get_class_map();//go probe map
 	go_name = goName.get_GoName_map();//go name map
 	hist = new histogram();
 	//set histogram parameters
@@ -153,7 +153,7 @@ public class class_correls {
 		    } else {
 			//calcualte raw score and get corresponding value from histogram of that particular class
 			rawscore=avecorrel/(double)size;
-			if (rawscore <hist.get_hist_range()) {
+			if (rawscore < hist.get_hist_max()) {
 			    double[] class_row = new double[hist.get_number_of_bins()];
 			    class_row=M.get_ith_row(hist.class_index(size, probe_data.get_class_min_size()));
 			    int binnum = (int)Math.floor((rawscore - hist.get_hist_min()) / (double)hist.get_bin_size());
