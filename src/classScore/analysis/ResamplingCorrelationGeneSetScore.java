@@ -29,6 +29,7 @@ public class ResamplingCorrelationGeneSetScore extends
    private DenseDoubleMatrix2DNamed data = null;
    private Settings settings;
    private boolean weights;
+   private double[][] dataAsRawMatrix;
 
    /**
     * @param dataMatrix
@@ -41,6 +42,8 @@ public class ResamplingCorrelationGeneSetScore extends
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();
       data = dataMatrix;
+      int numGeneSets = classMaxSize - classMinSize + 1;
+      this.hist = new Histogram( numGeneSets, classMinSize, numRuns, 1.0, 0.0 );
    }
 
    /**
@@ -50,17 +53,16 @@ public class ResamplingCorrelationGeneSetScore extends
     * @return histogram containing the random distributions of correlations.
     * @throws OutOfMemoryError
     */
-   public Histogram generateNullDistribution( StatusViewer messenger )
-         throws OutOfMemoryError {
-      int numGeneSets = classMaxSize - classMinSize + 1;
-      Histogram hist = new Histogram( numGeneSets, classMinSize, numRuns, 1.0,
-            0.0 );
+   public Histogram generateNullDistribution( StatusViewer messenger ) {
+
       SparseDoubleMatrix2DNamed correls = new SparseDoubleMatrix2DNamed( data
             .rows(), data.rows() );
 
       int[] deck = new int[data.rows()];
+      dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much.
       for ( int j = 0; j < data.rows(); j++ ) {
          deck[j] = j;
+         dataAsRawMatrix[j] = data.getRow( j );
       }
 
       for ( int i = classMinSize; i <= classMaxSize; i++ ) {
@@ -74,14 +76,15 @@ public class ResamplingCorrelationGeneSetScore extends
             RandomChooser.chooserandom( randomnums, deck, data.rows(), i );
             double avecorrel = geneSetMeanCorrel( randomnums, correls );
             hist.update( i - classMinSize, avecorrel );
+            Thread.yield();
          }
-         
+
          try {
             Thread.sleep( 10 );
-         } catch ( InterruptedException ex ) {
-            Thread.currentThread().interrupt();
+         } catch ( InterruptedException e ) {
+
          }
-         
+
       }
       hist.tocdf();
       return hist;
@@ -93,39 +96,73 @@ public class ResamplingCorrelationGeneSetScore extends
     * @param indicesToSelect
     * @param correls the correlation matrix for the data. This can be passed in without having filled it in yet. This
     *        means that only values that are visited during resampling are actually computed - this is a big memory
-    *        saver.
+    *        saver. NOT used because it still uses too much memory.
     * @return mean correlation within the matrix.
     */
    public double geneSetMeanCorrel( int[] indicesToSelect,
          SparseDoubleMatrix2DNamed correls ) {
+
       int size = indicesToSelect.length;
-      double avecorrel;
-      int i, j, nummeas;
-      avecorrel = 0.0;
-      nummeas = 0;
-      for ( i = 0; i < size; i++ ) {
+      double avecorrel = 0.0;
+      int nummeas = 0;
+
+      for ( int i = 0; i < size; i++ ) {
          int row1 = indicesToSelect[i];
-         DoubleArrayList irow = new DoubleArrayList( data.getRow( row1 ) );
+         double[] irow = dataAsRawMatrix[i];
 
-         for ( j = i + 1; j < size; j++ ) {
+         for ( int j = i + 1; j < size; j++ ) {
             int row2 = indicesToSelect[j];
-            double corr = Math.abs( correls.getQuick( row1, row2 ) );
+            //   double corr = Math.abs( correls.getQuick( row1, row2 ) );
 
-            if ( corr == 0.0 ) { // we haven't done this one yet it yet.
-               
-               DoubleArrayList jrow = new DoubleArrayList( data.getRow( row2 ) );
+            //   if ( corr == 0.0 ) { // we haven't done this one yet it yet.
 
-               corr = Math
-                     .abs( DescriptiveWithMissing.correlation( irow, jrow ) );
-               //         correls.setQuick( row1, row2, corr ); // too much memory.
-               //       correls.setQuick( row2, row1, corr );
-            }
+            double[] jrow = dataAsRawMatrix[j];
+
+            double corr = Math.abs( correlation( irow, jrow ) );
+            //         correls.setQuick( row1, row2, corr ); // too much memory.
+            //       correls.setQuick( row2, row1, corr );
+            //      }
 
             avecorrel += corr;
             nummeas++;
          }
       }
       return avecorrel / nummeas;
+   }
+
+   // special optimized version of correlation computation.
+   private static double correlation( double[] x, double[] y ) {
+      double syy, sxy, sxx, sx, sy, xj, yj, ay, ax;
+      int numused = 0;
+      syy = 0.0;
+      sxy = 0.0;
+      sxx = 0.0;
+      sx = 0.0;
+      sy = 0.0;
+
+      int length = x.length;
+      for ( int j = 0; j < length; j++ ) {
+         xj = x[j];
+         yj = y[j];
+
+         if ( !Double.isNaN( xj ) && !Double.isNaN( yj ) ) {
+            sx += xj;
+            sy += yj;
+            sxy += xj * yj;
+            sxx += xj * xj;
+            syy += yj * yj;
+            numused++;
+         }
+      }
+
+      if ( numused > 0 ) {
+         ay = sy / numused;
+         ax = sx / numused;
+         return ( sxy - sx * ay )
+               / Math.sqrt( ( sxx - sx * ax ) * ( syy - sy * ay ) );
+      }
+      return Double.NaN; // signifies that it could not be calculated.
+
    }
 
 }

@@ -43,7 +43,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator{
 
 
    /**
-    * 
+    * Note that we don't worry about replicates here - it would slow things down too much.
     * @param correls
     * @return
     */

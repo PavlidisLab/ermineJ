@@ -50,7 +50,7 @@ private Settings settings;
       double[] in_pval;
 
       if ( hist == null ) {
-         throw new NullPointerException( "Histogram object was null." );
+         throw new IllegalStateException( "Histogram object was null." );
       }
 
       // do the right thing if we are using weights.
@@ -63,8 +63,7 @@ private Settings settings;
       }
 
       if ( num_genes == 0 ) {
-         System.err.println( "No pvalues!" );
-         System.exit( 1 );
+        throw new IllegalStateException( "No pvalues!" );
       }
 
       // we use this throughout.
@@ -81,18 +80,18 @@ private Settings settings;
                   i );
             rawscore = calc_rawscore( random_class, i, method );
             hist.update( i - classMinSize, rawscore );
+            Thread.yield();
+         }
+         
+         try {
+            Thread.sleep(10);
+         } catch (InterruptedException e) {
+            
          }
 
          if ( m != null ) {
             m.setStatus( "Currently running class size " + i );
          }
-
-         try {
-            Thread.sleep( 10 );
-         } catch ( InterruptedException ex ) {
-            Thread.currentThread().interrupt();
-         }
-
       }
 
       hist.tocdf();

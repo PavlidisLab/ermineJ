@@ -20,7 +20,6 @@ import classScore.data.Histogram;
 
 /**
  * Calculates the raw average class correlations using a background distribution.
- *
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
@@ -41,8 +40,8 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends
    private Map geneSetToProbeMap; // stores go->probe Hashtable
    private Map results;
    private DenseDoubleMatrix2DNamed rawData;
-private Map probeToGeneMap;
-   
+   private Map probeToGeneMap;
+
    /**
     * @return
     */
@@ -62,7 +61,7 @@ private Map probeToGeneMap;
          GeneAnnotations geneAnnots, GeneSetSizeComputer csc, GONames gon,
          DenseDoubleMatrix2DNamed rawData, Histogram hist ) {
       super( settings, geneAnnots, csc, gon );
-      
+
       this.probeToGeneMap = geneAnnots.getProbeToGeneMap();
       this.probeCorrelData = new CorrelationPvalGenerator( settings,
             geneAnnots, csc, gon, rawData ); // main data file
@@ -81,52 +80,52 @@ private Map probeToGeneMap;
     * @param messenger
     * @todo make this faster. cache values?
     */
-   
-   // here is the original perl implementation.
-//   sub classcorrel {
-//      my ($classdata, $classweights, $replicategroups) = @_;
-//      $numfeat = scalar @{$$classdata[0]};
-//      my $numclass = scalar @$classdata;
-//      my $nummeas = 0;
-//      my $totalcorrel = 0;
-//      # calculate the correlation. This is optimized to avoid
-//      # recalculation of info about vector x.
-//      my $numskipped = 0;
-//      for ($i = 0; $i < $numclass; $i++) {
-//        $meanx = mean($$classdata[$i]);
-//        $sumx = 0;
-//        $sumxs = 0;
-//        $weightx = $$classweights[$i];
-//        $repgroupx = $$replicategroups[$i];
-//        for ($m=0; $m<$numfeat; $m++) {
-//          $sumx+=$$classdata[$i][$m];
-//          $sumxs+=$$classdata[$i][$m]*$$classdata[$i][$m];
-//        }
-//        # Weighting scheme skips comparisons between replicates, and
-//        # comprisions of replicates to other things are given lower
-//        # weight.  For example, if a replicate group has 2 members, when
-//        # we compare those to another gene, we get a total of 1 effective
-//        # measurement.
-//        for ($j = $i+1; $j < $numclass; $j++) { # start from $i+1 so we skip self comparisons.
-//          $repgroupy = $$replicategroups[$j];
-//          if ($doweighting && $repgroupy == $repgroupx) { # skip comparisons between "replicates"
-//            $numskipped++;
-//            next;
-//          }
-//          $weighty = $$classweights[$j];
-//          $meany = mean($$classdata[$j]);
-//          $correlation =  correlation_op($sumx, $sumxs, $meanx, $$classdata[$i], $meany, $$classdata[$j]);
-//          $totalweight = $weighty * $weightx;
-//          $totalcorrel += $correlation * $totalweight;
-//          $nummeas+=$totalweight;
-//        }
-//      }
-//      print STDERR "$nummeas effective measurements. $numskipped comparisons skipped. Total weight $totalweight. Total correl $totalcorrel.\n";
-//      return 0 if $nummeas == 0; # this will happen if the class is made up of one replicate group.
-//      return $totalcorrel/$nummeas;
-//    }
 
-   
+   // here is the original perl implementation.
+   //   sub classcorrel {
+   //      my ($classdata, $classweights, $replicategroups) = @_;
+   //      $numfeat = scalar @{$$classdata[0]};
+   //      my $numclass = scalar @$classdata;
+   //      my $nummeas = 0;
+   //      my $totalcorrel = 0;
+   //      # calculate the correlation. This is optimized to avoid
+   //      # recalculation of info about vector x.
+   //      my $numskipped = 0;
+   //      for ($i = 0; $i < $numclass; $i++) {
+   //        $meanx = mean($$classdata[$i]);
+   //        $sumx = 0;
+   //        $sumxs = 0;
+   //        $weightx = $$classweights[$i];
+   //        $repgroupx = $$replicategroups[$i];
+   //        for ($m=0; $m<$numfeat; $m++) {
+   //          $sumx+=$$classdata[$i][$m];
+   //          $sumxs+=$$classdata[$i][$m]*$$classdata[$i][$m];
+   //        }
+   //        # Weighting scheme skips comparisons between replicates, and
+   //        # comprisions of replicates to other things are given lower
+   //        # weight. For example, if a replicate group has 2 members, when
+   //        # we compare those to another gene, we get a total of 1 effective
+   //        # measurement.
+   //        for ($j = $i+1; $j < $numclass; $j++) { # start from $i+1 so we skip self comparisons.
+   //          $repgroupy = $$replicategroups[$j];
+   //          if ($doweighting && $repgroupy == $repgroupx) { # skip comparisons between "replicates"
+   //            $numskipped++;
+   //            next;
+   //          }
+   //          $weighty = $$classweights[$j];
+   //          $meany = mean($$classdata[$j]);
+   //          $correlation = correlation_op($sumx, $sumxs, $meanx, $$classdata[$i], $meany, $$classdata[$j]);
+   //          $totalweight = $weighty * $weightx;
+   //          $totalcorrel += $correlation * $totalweight;
+   //          $nummeas+=$totalweight;
+   //        }
+   //      }
+   //      print STDERR "$nummeas effective measurements. $numskipped comparisons skipped. Total weight $totalweight. Total
+   // correl $totalcorrel.\n";
+   //      return 0 if $nummeas == 0; # this will happen if the class is made up of one replicate group.
+   //      return $totalcorrel/$nummeas;
+   //    }
+
    public void geneSetCorrelationGenerator( StatusViewer messenger ) {
       //iterate over each class
       int count = 0;
@@ -156,89 +155,89 @@ private Map probeToGeneMap;
             }
          }
 
-         // to check if class size
+         // to check if class size is ok.
          if ( classSize < probeCorrelData.getMinGeneSetSize()
                || classSize > probeCorrelData.getMaxClassSize() ) {
             continue;
          }
 
-  //       DenseDoubleMatrix2DNamed V = null;
-   //      int index = 0;
-
          if ( count > 0 && count % 50 == 0 ) {
             messenger.setStatus( "Classes analyzed: " + count );
          }
-         
+
          double avecorrel = 0.0;
-         double nummeas = 0;
+         double nummeas = 0;       
          
-         for (int i = probesInSet.size() - 1; i >= 0; i--) {
-            
-            String probei = (String)probesInSet.get(i);
-            String genei = (String)probeToGeneMap.get(probei);
-            DoubleArrayList irow = new DoubleArrayList( rawData.getRowByName(probei)  );
-            
+         for ( int i = probesInSet.size() - 1; i >= 0; i-- ) {
+
+            String probei = ( String ) probesInSet.get( i );
+            String genei = ( String ) probeToGeneMap.get( probei );
+            DoubleArrayList irow = new DoubleArrayList( rawData
+                  .getRowByName( probei ) );
+
             // number of probes for this gene.
-            int repsi = geneAnnots.getGeneProbeList(genei).size();
-            
-            for (int j = i - 1; j >= 0; j--) {
-               String probej = (String)probesInSet.get(j);
-               String genej = (String)probeToGeneMap.get(probej);
-               
-               if (genei.equals(genej)) {
+            int repsi = geneAnnots.getGeneProbeList( genei ).size();
+
+            for ( int j = i - 1; j >= 0; j-- ) {
+               String probej = ( String ) probesInSet.get( j );
+               String genej = ( String ) probeToGeneMap.get( probej );
+
+               if ( genei.equals( genej ) ) {
                   continue; // always ignore self-comparisons.
                }
-               // todo still need to weight repeated comparisons with the same gene.
-               
-               DoubleArrayList jrow = new DoubleArrayList( rawData.getRowByName(probej) );
-               
-               double corr = Math
-               .abs( DescriptiveWithMissing.correlation( irow, jrow ) );
-               
+
+               DoubleArrayList jrow = new DoubleArrayList( rawData
+                     .getRowByName( probej ) );
+
+               // todo - implement the 'best' method.
+               double corr = Math.abs( DescriptiveWithMissing.correlation(
+                     irow, jrow ) );
+
                // The weight is inversely proportional to the number of times this specific pair is going to get tested.
-               double weight = 1.0/(geneAnnots.getGeneProbeList(genej).size() * repsi);
-               
-               corr *= weight; 
-                  
+               double weight = 1.0 / ( geneAnnots.getGeneProbeList( genej )
+                     .size() * repsi );
+
+               corr *= weight;
+
                avecorrel += corr;
-               nummeas+=weight;
+               nummeas += weight;
             }
          }
-         double geneSetMeanCorrel = avecorrel/nummeas;
+         double geneSetMeanCorrel = avecorrel / nummeas;
 
-//         for ( Iterator vit = probesInSet.iterator(); vit.hasNext(); ) {
-//            String probe = ( String ) vit.next();
-//            //check if element exists in map
-//            if ( probeCorrelData.containsRow( probe ) ) {
-//
-//               double[] rawCorrelations = rawData.getRowByName( probe );
-//
-//               if ( rawCorrelations.length > 0 ) {
-//                  if ( V == null ) {
-//                     //create a new Matrix so as to add each row of data
-//                     // for a particular probe in matrix
-//                     V = new DenseDoubleMatrix2DNamed( classSize,
-//                           rawCorrelations.length );
-//                  }
-//
-//                  // store value in intermediate Matrix which is used to
-//                  // do correlation calculation
-//                  int j = 0;
-//                  for ( int i = 0; i < rawCorrelations.length; i++ ) {
-//                     V.setQuick( index, j, rawCorrelations[i] );
-//                     j++;
-//                  }
-//                  index++;
-//               }
-//            }
-//         }
-//
-//         if ( V == null ) {
-//            continue;
-//         }
-//
-//         DenseDoubleMatrix2DNamed C = MatrixStats.correlationMatrix( V );
-//         double geneSetMeanCorrel = probeCorrelData.geneSetMeanCorrel( C );
+         //         for ( Iterator vit = probesInSet.iterator(); vit.hasNext(); ) {
+         //            String probe = ( String ) vit.next();
+         //            //check if element exists in map
+         //            if ( probeCorrelData.containsRow( probe ) ) {
+         //
+         //               double[] rawCorrelations = rawData.getRowByName( probe );
+         //
+         //               if ( rawCorrelations.length > 0 ) {
+         //                  if ( V == null ) {
+         //                     //create a new Matrix so as to add each row of data
+         //                     // for a particular probe in matrix
+         //                     V = new DenseDoubleMatrix2DNamed( classSize,
+         //                           rawCorrelations.length );
+         //                  }
+         //
+         //                  // store value in intermediate Matrix which is used to
+         //                  // do correlation calculation
+         //                  int j = 0;
+         //                  for ( int i = 0; i < rawCorrelations.length; i++ ) {
+         //                     V.setQuick( index, j, rawCorrelations[i] );
+         //                     j++;
+         //                  }
+         //                  index++;
+         //               }
+         //            }
+         //         }
+         //
+         //         if ( V == null ) {
+         //            continue;
+         //         }
+         //
+         //         DenseDoubleMatrix2DNamed C = MatrixStats.correlationMatrix( V );
+         //         double geneSetMeanCorrel = probeCorrelData.geneSetMeanCorrel( C );
          GeneSetResult result = new GeneSetResult( class_name, goName
                .getNameForId( class_name ), ( ( Integer ) actualSizes
                .get( class_name ) ).intValue(), effSize );
