@@ -331,9 +331,9 @@ public class AnalysisWizardStep4 extends WizardStep
          settings.setGeneRepTreatment(2);
       }
       if(jRadioButtonMean.isSelected())
-         settings.rawScoreMethod=settings.MEAN_PVAL;
+         settings.setRawScoreMethod(settings.MEAN_METHOD);
       else
-         settings.rawScoreMethod=settings.QUANTILE_METHOD;
+         settings.setRawScoreMethod(settings.QUANTILE_METHOD);
       settings.setDoLog(jCheckBoxDoLog.isSelected());
       settings.setPValThreshold(Double.valueOf(jTextFieldPValueThreshold.getText()).doubleValue());
    }

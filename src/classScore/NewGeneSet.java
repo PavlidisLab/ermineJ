@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-
 import javax.swing.table.AbstractTableModel;
+import baseCode.gui.*;
 
 /**
  * <p>Title: </p>
@@ -24,16 +24,16 @@ import javax.swing.table.AbstractTableModel;
  * @version 1.0
  */
 
-public class NewClass {
-   modClassFrame outerframe;
-   String id;
-   String desc;
-   ArrayList probes;
+public class NewGeneSet {
+   private GeneAnnotations geneData;
+   private String id;
+   private String desc;
+   private ArrayList probes;
 
-   public NewClass(modClassFrame outerframe) {
-      this.outerframe = outerframe;
-      id = new String();
-      desc = new String();
+   public NewGeneSet(GeneAnnotations geneData) {
+      this.geneData = geneData;
+      id = new String("");
+      desc = new String("");
       probes = new ArrayList();
    }
 
@@ -56,9 +56,9 @@ public class NewClass {
          public int getRowCount() {
             int windowrows;
             if (finalized) {
-               windowrows = 11;
+               windowrows = 16;
             } else {
-               windowrows = 8;
+               windowrows = 13;
             }
             int extra = 1;
             if (probes.size() < windowrows) {
@@ -74,7 +74,6 @@ public class NewClass {
          public Object getValueAt(int r, int c) {
             if (r < probes.size()) {
                String probeid = (String) probes.get(r);
-               GeneAnnotations geneData = outerframe.imaps.geneData;
                switch (c) {
                case 0:
                   return probeid;
@@ -104,7 +103,7 @@ public class NewClass {
       clear();
       File infile = new File(file);
       if (!infile.exists() || !infile.canRead()) {
-         outerframe.error("Could not find file: " + file);
+         GuiUtil.error("Could not find file: " + file);
       } else {
          try {
             FileInputStream fis = new FileInputStream(file);
@@ -138,13 +137,12 @@ public class NewClass {
             if (filetype == 1) {
                HashSet probeSet = new HashSet();
                for (Iterator it = genes.iterator(); it.hasNext(); ) {
-                  probeSet.addAll(outerframe.imaps.geneData.getGeneProbeList((
-                          String) it.next()));
+                  probeSet.addAll(geneData.getGeneProbeList((String) it.next()));
                }
                probes = new ArrayList(probeSet);
             }
          } catch (IOException ioe) {
-            outerframe.error("Could not find file: " + ioe);
+            GuiUtil.error("Could not find file: " + ioe);
          }
       }
 
@@ -156,7 +154,7 @@ public class NewClass {
          String filedesc = desc.replace('\n', ' ');
          String filetype = (type == 0) ? "probe" : "gene";
          BufferedWriter out = new BufferedWriter(new FileWriter(folder +
-                 "classes" + File.separatorChar + fileid + "-class.txt", false));
+             File.separatorChar + fileid + "-class.txt", false));
          out.write(filetype + "\n");
          out.write(id + "\n");
          out.write(filedesc + "\n");
@@ -201,4 +199,12 @@ public class NewClass {
       }
       return cinfo;
    }
+
+   public void setId(String val) { id=val; }
+   public void setDesc(String val) { desc=val; }
+   public void setProbes(ArrayList val) { probes=val; }
+   public String getId() { return id; }
+   public String getDesc() { return desc; }
+   public ArrayList getProbes() { return probes; }
+
 }

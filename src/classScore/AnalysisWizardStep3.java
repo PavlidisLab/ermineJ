@@ -147,14 +147,14 @@ public class AnalysisWizardStep3
    }
 
    void getClasses() {
-      File dir = new File( settings.getDataFolder() + File.separator + "classes" );
+      File dir = new File(settings.getClassFolder());
       if ( dir.exists() ) {
          String[] classFiles = dir.list( new AnalysisWizardStep3_ClassFileFilter( "-class.txt" ) );
          customClasses = new AnalysisWizardStep3_CustomClassList();
          ccHash = new HashMap();
          for ( int i = 0; i < classFiles.length; i++ ) {
             File classFile = new File( dir.getPath(), classFiles[i] );
-            HashMap cfi = NewClass.getClassFileInfo( classFile.getAbsolutePath() );
+            HashMap cfi = NewGeneSet.getClassFileInfo( classFile.getAbsolutePath() );
             customClasses.add( cfi );
             ccHash.put( cfi.get( "id" ), cfi );
          }
@@ -165,7 +165,7 @@ public class AnalysisWizardStep3
          addedClassTable.setModel( acTableModel );
          acHash = new HashMap();
       } else
-         GuiUtil.error( "There is no 'classes' folder in the 'data' directory" );
+         GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
    }
 
 }

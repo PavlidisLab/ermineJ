@@ -20,28 +20,18 @@ import javax.swing.table.*;
 
 public class OutputPanel extends JScrollPane {
    JTable table;
-   JPanel labelPanel;
    OutputTableModel model;
    Vector results;
 
    public OutputPanel(Vector results) {
       this.results=results;
       model = new OutputTableModel(results);
-      labelPanel= new JPanel();
-      JLabel label= new JLabel("Please wait while the files are loaded in.");
-      label.setPreferredSize(new Dimension(250,250));
-      labelPanel.add(label,BorderLayout.CENTER);
-      this.getViewport().add(labelPanel);
       table = new JTable();
       table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
+      table.getTableHeader().setReorderingAllowed( false );
    }
 
-   // public void addClassDetailsListener(ClassDetailsEventListener listener) {
-   //   listenerList.add(ClassDetailsEventListener.class, listener);
-   // }
-
    public void addInitialData(GeneAnnotations geneData, GONames goData) {
-      this.getViewport().remove(labelPanel);
       model.addInitialData(geneData, goData);
       TableSorter sorter = new TableSorter(model);
       table.setModel(sorter);
@@ -115,7 +105,7 @@ class OutputTableModel extends AbstractTableModel {
 
    public OutputTableModel(Vector results) {
       this.results=results;
-      nf.setMaximumFractionDigits(8);
+      nf.setMaximumFractionDigits(2);
       columnNames.add("Name");
       columnNames.add("Description");
       columnNames.add("# of Probes");
@@ -226,12 +216,6 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer
       {
           setOpaque(false);
       }
-//      {
- //        if(((Double)value).doubleValue() > 0.5)
- //           panel.setBackground(new Color(220,220,160));
- //        else
- //           panel.setBackground(new Color(160,230,240));
-//      }
       return this;
    }
 

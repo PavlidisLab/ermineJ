@@ -109,7 +109,7 @@ public class modClassFrame extends JDialog {
    int inputMethod = 0;
    boolean makenew;
 
-   NewClass newclass;
+   NewGeneSet newGeneSet;
    InitialMaps imaps;
    ClassPanel classpanel;
    String folder;
@@ -117,6 +117,7 @@ public class modClassFrame extends JDialog {
 
    public modClassFrame(boolean makenew, InitialMaps imap,
                         ClassPanel classpanel, String saveFolder, String cid) {
+/*
       setModal(true);
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.makenew = makenew;
@@ -130,8 +131,9 @@ public class modClassFrame extends JDialog {
       } catch (Exception e) {
          e.printStackTrace();
       }
+*/
    }
-
+/*
    //Component initialization
    private void jbInit() throws Exception {
       this.getContentPane().setBackground(Color.white);
@@ -356,7 +358,7 @@ public class modClassFrame extends JDialog {
 //    jPanel1.remove(step3Panel);
 
 ///////////////
-      newclass = new NewClass(this);
+      newGeneSet = new NewGeneSet(imaps.geneData);
       if (makenew) {
          jPanel1.add(step1Panel);
          this.setTitle("Define New Class - Step 1 of 3");
@@ -406,7 +408,7 @@ public class modClassFrame extends JDialog {
       });
       probeTable.getColumnModel().getColumn(0).setPreferredWidth(40);
 
-      ncTableModel = newclass.toTableModel(false);
+      ncTableModel = newGeneSet.toTableModel(false);
       newClassTable.setModel(ncTableModel);
       JTextField editProbe = new JTextField();
       editProbe.setBorder(BorderFactory.createEmptyBorder());
@@ -420,16 +422,16 @@ public class modClassFrame extends JDialog {
       newClassTable.getColumnModel().getColumn(1).setCellEditor(editorGene);
       newClassTable.getColumnModel().getColumn(0).setPreferredWidth(40);
 
-      finalTableModel = newclass.toTableModel(true);
+      finalTableModel = newGeneSet.toTableModel(true);
       finalTable.setModel(finalTableModel);
       newClassTable.getColumnModel().getColumn(0).setPreferredWidth(40);
    }
 
    void gotoStep2() {
-      newclass.id = cid;
-      newclass.desc = imaps.goName.getNameForId(cid);
+      newGeneSet.id = cid;
+      newGeneSet.desc = imaps.goName.getNameForId(cid);
       if (imaps.classToProbe.containsKey(cid)) {
-         newclass.probes.addAll((ArrayList) imaps.classToProbe.get(cid));
+         newGeneSet.probes.addAll((ArrayList) imaps.classToProbe.get(cid));
       }
       step2Panel.revalidate();
       updateCountLabel();
@@ -465,11 +467,11 @@ public class modClassFrame extends JDialog {
       int row = oldClassTable.getSelectedRow();
       String id = (String) oldClassTable.getValueAt(row, 0);
       String desc = (String) oldClassTable.getValueAt(row, 1);
-      newclass.id = id;
+      newGeneSet.id = id;
       modifyClassLabel.setText(id);
-      newclass.desc = desc;
+      newGeneSet.desc = desc;
       if (imaps.classToProbe.containsKey(id)) {
-         newclass.probes.addAll((ArrayList) imaps.classToProbe.get(id));
+         newGeneSet.probes.addAll((ArrayList) imaps.classToProbe.get(id));
       }
    }
 
@@ -477,9 +479,9 @@ public class modClassFrame extends JDialog {
       int n = newClassTable.getSelectedRowCount();
       int[] rows = newClassTable.getSelectedRows();
       for (int i = 0; i < n; i++) {
-         newclass.probes.remove(newClassTable.getValueAt(rows[i] - i, 0));
+         newGeneSet.probes.remove(newClassTable.getValueAt(rows[i] - i, 0));
       }
-      int s = newclass.probes.size();
+      int s = newGeneSet.probes.size();
       ncTableModel.fireTableDataChanged();
       updateCountLabel();
    }
@@ -488,17 +490,17 @@ public class modClassFrame extends JDialog {
       int n = probeTable.getSelectedRowCount();
       int[] rows = probeTable.getSelectedRows();
       for (int i = 0; i < n; i++) {
-         //newclass.probes.add(probeTable.getValueAt(rows[i], 0)); (for just deleting probes)
+         //newGeneSet.probes.add(probeTable.getValueAt(rows[i], 0)); (for just deleting probes)
          String newGene;
          if ((newGene = imaps.geneData.getProbeGeneName((String) probeTable.
                  getValueAt(rows[i], 0))) != null) {
             addGene(newGene);
          }
       }
-      HashSet noDupes = new HashSet(newclass.probes);
-      newclass.probes.clear();
-      newclass.probes.addAll(noDupes);
-      int s = newclass.probes.size();
+      HashSet noDupes = new HashSet(newGeneSet.probes);
+      newGeneSet.probes.clear();
+      newGeneSet.probes.addAll(noDupes);
+      int s = newGeneSet.probes.size();
       ncTableModel.fireTableDataChanged();
       updateCountLabel();
    }
@@ -511,17 +513,16 @@ public class modClassFrame extends JDialog {
          addGene(newGene);
       } else {
          error("Probe " + newProbe + " does not exist.");
-         /* for adding specified probe
+         for adding specified probe
                if(smap.geneData.getProbeGeneName(newProbe) != null)
                {
-                  newclass.probes.add(newProbe);
-                  int s = newclass.probes.size();
+                  newGeneSet.probes.add(newProbe);
+                  int s = newGeneSet.probes.size();
                   ncTableModel.fireTableDataChanged();
                   updateCountLabel();
                }
                else
                   error("Probe " + newProbe + " does not exist.");
-          */
       }
    }
 
@@ -534,8 +535,8 @@ public class modClassFrame extends JDialog {
    void addGene(String gene) {
       ArrayList probelist = imaps.geneData.getGeneProbeList(gene);
       if (probelist != null) {
-         newclass.probes.addAll(probelist);
-         int s = newclass.probes.size();
+         newGeneSet.probes.addAll(probelist);
+         int s = newGeneSet.probes.size();
          ncTableModel.fireTableDataChanged();
          updateCountLabel();
       } else {
@@ -544,16 +545,16 @@ public class modClassFrame extends JDialog {
    }
 
    void updateCountLabel() {
-      countLabel.setText("Number of Probes: " + newclass.probes.size());
+      countLabel.setText("Number of Probes: " + newGeneSet.probes.size());
    }
 
    void classIDEditor_actionPerformed(ChangeEvent e) {
       String classID = (String) ((DefaultCellEditor) e.getSource()).
                        getCellEditorValue();
-      if (imaps.geneData.classContainsProbe(classID) && makenew) {
+      if (imaps.geneData.numProbes(classID)>0 && makenew) {
          error("A class by the ID " + classID + " already exists.");
       } else {
-         newclass.id = classID;
+         newGeneSet.id = classID;
          classIDFinal.setText(classID);
       }
    }
@@ -561,20 +562,20 @@ public class modClassFrame extends JDialog {
    void classDescListener_actionPerformed(DocumentEvent e) {
       Document doc = (Document) e.getDocument();
       int length = doc.getLength();
-      try {newclass.desc = doc.getText(0, length);
+      try {newGeneSet.desc = doc.getText(0, length);
       } catch (BadLocationException be) {be.printStackTrace();
       }
    }
 
    void nextButton_actionPerformed(ActionEvent e) {
       if (step == 1) {
-         if (!makenew && newclass.id.compareTo("") == 0) {
+         if (!makenew && newGeneSet.id.compareTo("") == 0) {
             error("Pick a class to be modified.");
          } else {
             if (makenew && inputMethod == 1) {
-               newclass.loadClassFile(classFile.getText());
+               newGeneSet.loadClassFile(classFile.getText());
             }
-            if (!(inputMethod == 1 && newclass.id.compareTo("") == 0)) {
+            if (!(inputMethod == 1 && newGeneSet.id.compareTo("") == 0)) {
                if (makenew) {
                   this.getContentPane().remove(step1Panel);
                   this.setTitle("Define New Class - Step 2 of 3");
@@ -599,10 +600,10 @@ public class modClassFrame extends JDialog {
             this.setTitle("Modify Class - Step 3 of 3");
          }
          backButton.setEnabled(true);
-         classIDTF.setText(newclass.id);
-         classDescTA.setText(newclass.desc);
-         if (newclass.id.compareTo("") != 0) {
-            classIDFinal.setText(newclass.id);
+         classIDTF.setText(newGeneSet.id);
+         classDescTA.setText(newGeneSet.desc);
+         if (newGeneSet.id.compareTo("") != 0) {
+            classIDFinal.setText(newGeneSet.id);
          }
          nextButton.setEnabled(false);
          finishButton.setEnabled(true);
@@ -649,23 +650,24 @@ public class modClassFrame extends JDialog {
    }
 
    void finishButton_actionPerformed(ActionEvent e) {
-      String id = newclass.id;
-      String desc = newclass.desc;
+      String id = newGeneSet.id;
+      String desc = newGeneSet.desc;
       if (id.compareTo("") == 0) {
          error("The class ID must be specified.");
       } else {
          if (makenew) {
-            imaps.addClass(id, desc, newclass.probes);
+            imaps.addClass(id, desc, newGeneSet.probes);
          } else {
-            imaps.modifyClass(id, desc, newclass.probes);
+            imaps.modifyClass(id, desc, newGeneSet.probes);
          }
-         newclass.saveClass(folder, 0);
+         newGeneSet.saveClass(folder, 0);
          classpanel.setModel(imaps.toTableModel());
          dispose();
       }
    }
+*/
 }
-
+/*
 
 class modClassFrame_manInputButton_actionAdapter implements java.awt.event.
         ActionListener {
@@ -858,3 +860,4 @@ class finishButton_actionAdapter implements java.awt.event.ActionListener {
       adaptee.finishButton_actionPerformed(e);
    }
 }
+*/

@@ -14,6 +14,8 @@ import javax.swing.*;
  * @author not attributable
  * @version 1.0
  * @todo All input of custom classes, identified either by probe id or official gene name.
+ * @todo (6/23/04 Homin) probePvalMapper includes too many probes (ones that don't have pvals).
+ *
  */
 
 public class classScoreFrame
@@ -33,6 +35,9 @@ public class classScoreFrame
    JMenuItem saveAnalysisMenuItem = new JMenuItem();
 
    ClassPanel cPanel;
+   JPanel progressPanel;
+   JPanel progInPanel = new JPanel();
+   JProgressBar jProgressBar1 = new JProgressBar();
    OutputPanel oPanel;
 
    JPanel jPanelMainControls = new JPanel();
@@ -115,6 +120,20 @@ public class classScoreFrame
       jMenuBar1.add( classMenu );
       jMenuBar1.add( analysisMenu );
 
+      progressPanel = new JPanel();
+      progressPanel.setPreferredSize( new Dimension( 830, 330 ) );
+      GridBagLayout gridBagLayout1 = new GridBagLayout();
+      progressPanel.setLayout(gridBagLayout1);
+      progInPanel.setPreferredSize(new Dimension(350, 100));
+      JLabel label= new JLabel("Please wait while the files are loaded in.");
+      label.setPreferredSize(new Dimension(195, 30));
+      jProgressBar1.setMinimumSize(new Dimension(10, 16));
+      jProgressBar1.setPreferredSize(new Dimension(300, 16));
+      progInPanel.add(label, null);
+      progInPanel.add(jProgressBar1, null);
+      progressPanel.add(progInPanel,     new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
+          ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(114, 268, 87, 268), 0, 0));
+
       oPanel = new OutputPanel( results );
       oPanel.setPreferredSize( new Dimension( 830, 330 ) );
 
@@ -147,7 +166,8 @@ public class classScoreFrame
       showStatus( "Please see 'About this software' for license information." );
       statusMessenger = new classScoreStatus( jLabelStatus );
 
-      mainPanel.add( oPanel, BorderLayout.NORTH );
+      //mainPanel.add( oPanel, BorderLayout.NORTH );
+      mainPanel.add( progressPanel, BorderLayout.NORTH );
       mainPanel.add( jPanelMainControls, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
    }
@@ -190,6 +210,8 @@ public class classScoreFrame
          geneData.sortGeneSets();
          statusMessenger.setStatus("Done with setup");
          enableMenus();
+         mainPanel.remove( progressPanel );
+         mainPanel.add( oPanel, BorderLayout.NORTH );
       }
       catch ( IllegalArgumentException e ) {
          error( e, "During initialization" );
@@ -390,17 +412,13 @@ public class classScoreFrame
     */
 
    void defineClassMenuItem_actionPerformed( ActionEvent e ) {
-      makeModClassFrame( true, "" );
+      ClassWizard cwiz = new ClassWizard(this, geneData, goData, true);
+      cwiz.showWizard();
    }
 
    void modClassMenuItem_actionPerformed( ActionEvent e ) {
-      makeModClassFrame( false, "" );
-   }
-
-   public void makeModClassFrame( boolean makenew, String classid ) {
-      modClassFrame modframe = new modClassFrame( makenew, imaps, this.cPanel,
-                                                  settings.getDataFolder(), classid );
-      showDialog( modframe );
+      ClassWizard cwiz = new ClassWizard(this, geneData, goData, false);
+      cwiz.showWizard();
    }
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {

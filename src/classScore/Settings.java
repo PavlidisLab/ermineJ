@@ -22,6 +22,7 @@ public class Settings {
    String annotFile;
    String rawFile;
    String dataFolder;
+   String classFolder;
    String scoreFile;
    int maxClassSize = 15;
    int minClassSize = 14;
@@ -53,6 +54,7 @@ public class Settings {
          GuiUtil.error( "Could not find data folder." ); // make a big deal...
          System.exit(1);
       }
+      classFolder = new String(dataFolder + File.separator + "genesets");
       pref_file = dataFolder + File.separator + "ClassScore.preferences";
       classFile = dataFolder + File.separator + "goNames.txt";
       annotFile = dataFolder + File.separator + "HG-U95A.an.txt";
@@ -76,6 +78,8 @@ public class Settings {
                rawFile = properties.getProperty( "rawFile" );
             if ( properties.containsKey( "dataFolder" ) )
                this.dataFolder = properties.getProperty( "dataFolder" );
+            if ( properties.containsKey( "classFolder" ) )
+               this.dataFolder = properties.getProperty( "classFolder" );
             if ( properties.containsKey( "maxClassSize" ) )
                maxClassSize = Integer.valueOf( properties.getProperty( "maxClassSize" ) ).intValue();
             if ( properties.containsKey( "minClassSize" ) )
@@ -110,6 +114,7 @@ public class Settings {
       annotFile=settings.getAnnotFile();
       rawFile=settings.getRawFile();
       dataFolder=settings.getDataFolder();
+      classFolder=settings.getClassFolder();
       scoreFile=settings.getScoreFile();
       maxClassSize=settings.getMaxClassSize();
       minClassSize=settings.getMinClassSize();
@@ -134,6 +139,7 @@ public class Settings {
       properties.setProperty("annotFile", annotFile);
       properties.setProperty("rawFile", rawFile);
       properties.setProperty("dataFolder", dataFolder);
+      properties.setProperty("classFolder", classFolder);
       properties.setProperty("maxClassSize", String.valueOf(maxClassSize));
       properties.setProperty("minClassSize", String.valueOf(minClassSize));
       properties.setProperty("iterations", String.valueOf(iterations));
@@ -155,6 +161,7 @@ public class Settings {
    public String getAnnotFile() { return annotFile; }
    public String getRawFile() { return rawFile; }
    public String getDataFolder() { return dataFolder; }
+   public String getClassFolder() { return classFolder; }
    public String getScoreFile() { return scoreFile; }
    public int getMaxClassSize() { return maxClassSize; }
    public int getMinClassSize() { return minClassSize; }
@@ -174,6 +181,7 @@ public class Settings {
    public void setAnnotFile(String val) {  annotFile=val; }
    public void setRawFile(String val) {  rawFile=val; }
    public void setDataFolder(String val) {  dataFolder=val; }
+   public void setClassFolder(String val) {  classFolder=val; }
    public void setScoreFile(String val) {  scoreFile=val; }
    public void setMaxClassSize(int val) {  maxClassSize=val; }
    public void setMinClassSize(int val) {  minClassSize=val; }

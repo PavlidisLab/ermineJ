@@ -1,13 +1,8 @@
 package classScore;
 
-import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.text.*;
+import baseCode.gui.*;
 
 /**
  * <p>Title: </p>
@@ -20,87 +15,98 @@ import javax.swing.text.*;
 
 public class ClassWizard extends Wizard {
    Settings settings;
-//   ClassWizardStep1 step1;
-//   ClassWizardStep2 step2;
-//   ClassWizardStep3 step3;
-//   ClassWizardStep4 step4;
+   GeneAnnotations geneData;
+   GONames goData;
+   ClassWizardStep1 step1;
+   ClassWizardStep1A step1A;
+   ClassWizardStep2 step2;
+   ClassWizardStep3 step3;
 
-   int step = 1;
-   int inputMethod = 0;
+   int step;
    boolean makenew;
-   NewClass newclass;
-   InitialMaps imaps;
-   ClassPanel classpanel;
-   String folder;
+   NewGeneSet newGeneSet;
    String cid;
 
-   public ClassWizard(classScoreFrame callingframe, boolean makenew, InitialMaps imap,
-                      ClassPanel classpanel, String saveFolder, String cid) {
-      super(callingframe,550,300);
+   public ClassWizard(classScoreFrame callingframe, GeneAnnotations geneData,
+                      GONames goData, boolean makenew) {
+      super(callingframe,550,350);
       this.callingframe = callingframe;
       this.settings = callingframe.getSettings();
-
+      this.geneData = geneData;
+      this.goData = goData;
       this.makenew = makenew;
-      this.imaps = imap;
-      this.classpanel = classpanel;
-      this.folder = saveFolder;
-      this.cid = cid;
+      newGeneSet = new NewGeneSet(geneData);
 
-/*
-      step1 = new ClassWizardStep1(this);
-      this.addStep(1,step1);
-      step2 = new ClassWizardStep2(this,settings);
+      step=1;
+      if (makenew) {
+         this.setTitle("Define New Class - Step 1 of 3");
+         step1 = new ClassWizardStep1(this,settings);
+         this.addStep(1,step1);
+      }
+      else {
+         this.setTitle("Modify Class - Step 1 of 3");
+         step1A = new ClassWizardStep1A(this,geneData,goData,newGeneSet);
+         this.addStep(1,step1A);
+      }
+      step2 = new ClassWizardStep2(this,geneData,newGeneSet);
       this.addStep(2,step2);
-      step3 = new ClassWizardStep3(this,settings);
+      step3 = new ClassWizardStep3(this,settings,geneData,newGeneSet,makenew);
       this.addStep(3,step3);
-      step4 = new ClassWizardStep4(this,settings);
-      this.addStep(4,step4);
-*/
+
    }
 
-   void gotoStep2() {
-/*
-      newclass.id = cid;
-      newclass.desc = imaps.goName.getNameForId(cid);
-      if (imaps.classToProbe.containsKey(cid)) {
-         newclass.probes.addAll((ArrayList) imaps.classToProbe.get(cid));
-      }
-      step2Panel.revalidate();
-      updateCountLabel();
+   public ClassWizard(classScoreFrame callingframe, GeneAnnotations geneData,
+                      GONames goData, String cid) {
+      super(callingframe,550,350);
+      this.callingframe = callingframe;
+      this.settings = callingframe.getSettings();
+      this.geneData = geneData;
+      this.goData = goData;
+      this.cid = cid;
+      makenew=false;
+      newGeneSet = new NewGeneSet(geneData);
+      this.setTitle("Modify Class - Step 2 of 3");
+      step = 2;
+      backButton.setEnabled(true);
+      newGeneSet.setId(cid);
+      newGeneSet.setDesc(goData.getNameForId(cid));
+      if (geneData.classExists(cid))
+         newGeneSet.getProbes().addAll((ArrayList) geneData.getClassToProbes(cid));
       this.repaint();
-*/
+      step2 = new ClassWizardStep2(this,geneData,newGeneSet);
+      this.addStep(2,step2);
+      step3 = new ClassWizardStep3(this,settings,geneData,newGeneSet,makenew);
+      this.addStep(3,step3);
    }
 
    void nextButton_actionPerformed(ActionEvent e) {
       if (step == 1) {
-/*
-         if (!makenew && newclass.id.compareTo("") == 0) {
-            error("Pick a class to be modified.");
-         } else {
-            if (makenew && inputMethod == 1) {
-               newclass.loadClassFile(classFile.getText());
+         if (!makenew && !step1A.isReady()) {
+            GuiUtil.error("Pick a class to be modified.");
+         }
+         else {
+            if (makenew && step1.getInputMethod() == 1) {
+               newGeneSet.loadClassFile(step1.getLoadFile());
             }
-            if (!(inputMethod == 1 && newclass.id.compareTo("") == 0)) {
+            if (!(makenew && step1.getInputMethod() == 1 && newGeneSet.getId().compareTo("") == 0)) {
                if (makenew) {
-                  this.getContentPane().remove(step1Panel);
+                  this.getContentPane().remove(step1);
                   this.setTitle("Define New Class - Step 2 of 3");
                } else {
-                  this.getContentPane().remove(step1MPanel);
+                  this.getContentPane().remove(step1A);
                   this.setTitle("Modify Class - Step 2 of 3");
                }
                step = 2;
                backButton.setEnabled(true);
-               this.getContentPane().add(step2Panel);
-               step2Panel.revalidate();
-               updateCountLabel();
+               this.getContentPane().add(step2);
+               step2.revalidate();
+               step2.updateCountLabel();
                this.repaint();
             }
          }
-*/
       }
-   /*
        else if (step == 2) {
-         this.getContentPane().remove(step2Panel);
+         this.getContentPane().remove(step2);
          step = 3;
          if (makenew) {
             this.setTitle("Define New Class - Step 3 of 3");
@@ -108,39 +114,33 @@ public class ClassWizard extends Wizard {
             this.setTitle("Modify Class - Step 3 of 3");
          }
          backButton.setEnabled(true);
-         classIDTF.setText(newclass.id);
-         classDescTA.setText(newclass.desc);
-         if (newclass.id.compareTo("") != 0) {
-            classIDFinal.setText(newclass.id);
-         }
          nextButton.setEnabled(false);
          finishButton.setEnabled(true);
-         this.getContentPane().add(step3Panel);
-         step3Panel.revalidate();
+         step3.update();
+         this.getContentPane().add(step3);
+         step3.revalidate();
          this.repaint();
       }
-*/
    }
 
    void backButton_actionPerformed(ActionEvent e) {
-  /*
       if (step == 2) {
-         this.getContentPane().remove(step2Panel);
+         this.getContentPane().remove(step2);
          step = 1;
          backButton.setEnabled(false);
          if (makenew) {
             this.setTitle("Define New Class - Step 1 of 3");
-            this.getContentPane().add(step1Panel);
-            step1Panel.revalidate();
+            this.getContentPane().add(step1);
+            step1.revalidate();
          } else {
             this.setTitle("Modify Class - Step 1 of 3");
-            this.getContentPane().add(step1MPanel);
-            step1MPanel.revalidate();
+            this.getContentPane().add(step1A);
+            step1A.revalidate();
          }
          this.repaint();
       }
       if (step == 3) {
-         this.getContentPane().remove(step3Panel);
+         this.getContentPane().remove(step3);
          step = 2;
          if (makenew) {
             this.setTitle("Define New Class - Step 2 of 3");
@@ -149,12 +149,10 @@ public class ClassWizard extends Wizard {
          }
          nextButton.setEnabled(true);
          finishButton.setEnabled(false);
-         this.getContentPane().add(step2Panel);
-         step2Panel.revalidate();
+         this.getContentPane().add(step2);
+         step2.revalidate();
          this.repaint();
       }
-   */
-
    }
 
    void cancelButton_actionPerformed(ActionEvent e) {
@@ -162,35 +160,22 @@ public class ClassWizard extends Wizard {
    }
 
    void finishButton_actionPerformed(ActionEvent e) {
-/*
-      String id = newclass.id;
-      String desc = newclass.desc;
+      String id = newGeneSet.getId();
+      String desc = newGeneSet.getDesc();
       if (id.compareTo("") == 0) {
-         error("The class ID must be specified.");
+         GuiUtil.error("The class ID must be specified.");
       } else {
          if (makenew) {
-            imaps.addClass(id, desc, newclass.probes);
+            System.err.println("adding " + id + " to setupmap");
+            geneData.addClass(id, newGeneSet.getProbes());
+            goData.addClass(id, desc);
+            geneData.sortGeneSets();
          } else {
-            imaps.modifyClass(id, desc, newclass.probes);
+            //geneData.modifyClass(id, desc, newGeneSet.probes);
          }
-         newclass.saveClass(folder, 0);
-         classpanel.setModel(imaps.toTableModel());
+         newGeneSet.saveClass(settings.getClassFolder(), 0);
          dispose();
       }
-*/
-   }
-
-   void saveValues(){
-/*
-      step2.saveValues();
-      step4.saveValues();
-      try{
-         settings.writePrefs();
-      } catch (IOException ex) {
-         System.err.println("Could not write prefs:" + ex);
-         ex.printStackTrace();
-      }
-*/
    }
 }
 

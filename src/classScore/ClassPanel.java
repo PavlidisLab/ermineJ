@@ -91,7 +91,7 @@ public class ClassPanel extends JScrollPane {
       int r = jTable1.rowAtPoint(sourcePopup.getPoint());
       String id = (String) jTable1.getValueAt(r, 0);
       System.err.println("Doing some action: " + id);
-      csFrame.makeModClassFrame(false, id);
+      //csFrame.makeModClassFrame(false, id);
    }
 
    void jTable1_mouseReleased(MouseEvent e) {

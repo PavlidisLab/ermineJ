@@ -84,6 +84,8 @@ public class GeneAnnotations {
       // loop through rows. Makes hash map of probes to go, and map of go to probes.
       String line = "";
       while ((line = dis.readLine()) != null) {
+         if(line.startsWith("#"))
+            continue;
          StringTokenizer st = new StringTokenizer(line, "\t");
 
          String probe = st.nextToken().intern();
@@ -166,6 +168,15 @@ public class GeneAnnotations {
 
    /**
     *
+    * @param p String class id
+    * @return ArrayList list of probes in class
+    */
+   public ArrayList getClassToProbes(String id) {
+      return (ArrayList) classToProbeMap.get(id);
+   }
+
+   /**
+    *
     * @param Map
     */
    public void sortGeneSets() {
@@ -223,8 +234,22 @@ public class GeneAnnotations {
       return (String) sortedGeneSets.get(i);
    }
 
+   /**
+    * Get the number of probes in a class
+    * @param id String a class id
+    * @return int number of probes in the class
+    */
    public int numProbes(String id) {
       return ((ArrayList) classToProbeMap.get(id)).size();
+   }
+
+   /**
+    * Returns true if the class is in the classToProbe map
+    * @param id String a class id
+    * @return boolean
+    */
+   public boolean classExists(String id) {
+      return classToProbeMap.containsKey(id);
    }
 
    public int numGenes(String id) {
@@ -235,15 +260,6 @@ public class GeneAnnotations {
          genes.add(probeToGeneName.get((String) probe_it.next()));
       }
       return genes.size();
-   }
-
-   /**
-    * Find out if a class contains a given probe
-    * @param className String
-    * @return boolean
-    */
-   public boolean classContainsProbe(String className) {
-      return classToProbeMap.containsKey(className);
    }
 
    /**

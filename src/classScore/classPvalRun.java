@@ -321,6 +321,7 @@ public class classPvalRun {
 
       final Map pvals = new HashMap();
       for ( int i = 0, n = values.size(); i < n; i++ ) {
+         System.err.println((String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ) );
          Double pvalue = new Double( Math.pow( 10.0,
                                                -probePvalMapper.getPval( (
              String ) ( ( ArrayList ) classToProbe.get( id ) ).get( i ) ) ) );
