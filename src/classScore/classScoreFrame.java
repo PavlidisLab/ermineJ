@@ -495,9 +495,12 @@ public class classScoreFrame
    private void readPrefs() {
       Properties settings = new Properties();
       try {
-         File fi = new File( "ClassScore.prefs" );
-         if ( fi.canRead() ) {
-            InputStream f = new FileInputStream( "ClassScore.prefs" );
+         String filename = "ClassScore.prefs";
+         String dir = "C:\\jbproject\\ermineJ\\";
+         String path = dir + filename;
+         File file = new File( path );
+         if (file.canRead()) {
+            InputStream f = new FileInputStream( file );
             settings.load( f );
          }
       }
@@ -505,17 +508,18 @@ public class classScoreFrame
          System.err.println( "Could not find preferences file." ); // no big deal.
       }
       if (settings.size() > 0) {
-         System.err.println(settings.get("scoreFile"));
-         System.err.println(settings.get("nameFile"));
-         System.err.println(settings.get("probeFile"));
-         System.err.println(settings.get("rawFile"));
-         System.err.println(settings.get("maxClassSize"));
-         System.err.println(settings.get("minClassSize"));
-         System.err.println(settings.get("doLog"));
-         System.err.println(settings.get("pValTheshold"));
-         System.err.println(settings.get("iterations"));
-         System.err.println(settings.get("scorecol"));
-         System.err.println(settings.get("saveFile"));
+         System.err.println(settings.getProperty("scoreFile"));
+         System.err.println(settings.getProperty("nameFile"));
+         System.err.println(settings.getProperty("probeFile"));
+         System.err.println(settings.getProperty("outputFile"));
+         System.err.println(settings.getProperty("rawFile"));
+         System.err.println(settings.getProperty("maxClassSize"));
+         System.err.println(settings.getProperty("minClassSize"));
+         System.err.println(settings.getProperty("doLog"));
+         System.err.println(settings.getProperty("pValTheshold"));
+         System.err.println(settings.getProperty("iterations"));
+         System.err.println(settings.getProperty("scorecol"));
+         System.err.println(settings.getProperty("saveFile"));
       }
    }
 

@@ -536,26 +536,29 @@ public class AnalysisFrame extends JDialog {
    private void readPrefs() {
       Properties settings = callingframe.settings;
       try {
-         File fi = new File("ClassScore.prefs");
-         if (fi.canRead()) {
-            InputStream f = new FileInputStream("ClassScore.prefs");
-            settings.load(f);
+         String filename = "ClassScore.prefs";
+         String dir = "C:\\jbproject\\ermineJ\\";
+         String path = dir + filename;
+         File file = new File( path );
+         if (file.canRead()) {
+            InputStream f = new FileInputStream( file );
+            settings.load( f );
          }
       } catch (IOException ex) {
          System.err.println("Could not find preferences file."); // no big deal.
       }
       if (settings.size() > 0) {
-         scoreFile.setText( (String) settings.get("scoreFile"));
-         nameFile.setText( (String) settings.get("nameFile"));
-         probeFile.setText( (String) settings.get("probeFile"));
-         rawFile.setText( (String) settings.get("rawFile"));
-         jTextFieldMaxClassSize.setText((String) settings.get("maxClassSize"));
-         jTextFieldMinClassSize.setText((String) settings.get("minClassSize"));
-         jCheckBoxDoLog.setSelected(Boolean.valueOf((String) settings.get(
+         scoreFile.setText( settings.getProperty("scoreFile"));
+         nameFile.setText( settings.getProperty("nameFile"));
+         probeFile.setText( settings.getProperty("probeFile"));
+         rawFile.setText( settings.getProperty("rawFile"));
+         jTextFieldMaxClassSize.setText( settings.getProperty("maxClassSize"));
+         jTextFieldMinClassSize.setText( settings.getProperty("minClassSize"));
+         jCheckBoxDoLog.setSelected(Boolean.valueOf( settings.getProperty(
                  "doLog")).booleanValue());
-         jTextFieldPValueThreshold.setText((String) settings.get("pValTheshold"));
-         jTextFieldIterations.setText((String) settings.get("iterations"));
-         jTextFieldScoreCol.setText((String) settings.get("scorecol"));
+         jTextFieldPValueThreshold.setText( settings.getProperty("pValTheshold"));
+         jTextFieldIterations.setText( settings.getProperty("iterations"));
+         jTextFieldScoreCol.setText( settings.getProperty("scorecol"));
       }
    }
 
@@ -572,8 +575,11 @@ public class AnalysisFrame extends JDialog {
       settings.setProperty("iterations", jTextFieldIterations.getText());
       settings.setProperty("scorecol", jTextFieldScoreCol.getText());
 
-         OutputStream f = new FileOutputStream("ClassScore.prefs");
-         settings.store(f, "");
+      String filename = "ClassScore.prefs";
+      String dir = "C:\\jbproject\\ermineJ\\";
+      String path = dir + filename;      
+      OutputStream f = new FileOutputStream( path );
+      settings.store(f, "");
    }
 
    private boolean testfile(String filename) {
