@@ -15,6 +15,7 @@ import baseCode.util.FileTools;
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
+ * @author Kiran Keshav
  * @author Homin Lee
  * @author Will Braynen
  * @version $Id$
@@ -192,7 +193,6 @@ public class Settings {
       if ( pref_file == null || pref_file.length() == 0 ) {
          return;
       }
-
       properties.setProperty( "scoreFile", scoreFile );
       properties.setProperty( "classFile", classFile );
       properties.setProperty( "annotFile", annotFile );
@@ -217,7 +217,10 @@ public class Settings {
             .valueOf( alwaysUseEmpirical ) );
       OutputStream f = new FileOutputStream( pref_file );
       properties.store( f, "" );
+      //System.out.println("::::FileOutputStream Before Close :::: " + pref_file);//keshav
       f.close();
+      pref_file=null;//keshav
+      //System.out.println("::::FileOutputStream After Close :::: " + pref_file);//keshav
    }
 
    public String toString() {

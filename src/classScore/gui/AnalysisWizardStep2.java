@@ -23,6 +23,7 @@ import classScore.Settings;
  * <p>
  * Copyright (c) 2004 Columbia University
  *
+ * @author Kiran Keshav
  * @author Homin Lee
  * @author Paul Pavlidis
  * @version $Id$
