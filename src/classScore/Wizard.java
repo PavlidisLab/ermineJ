@@ -23,15 +23,15 @@ abstract class Wizard extends JDialog {
    JButton cancelButton = new JButton();
    JButton finishButton = new JButton();
    int step;
-   classScoreFrame callingframe;
    Vector steps=new Vector();
    Vector texts=new Vector();
+   JFrame callingframe;
 
-   public Wizard(classScoreFrame callingframe, int width, int height)
+   public Wizard(JFrame callingframe, int width, int height)
    {
       //enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+      this.callingframe=callingframe;
       setModal(true);
-      this.callingframe = callingframe;
       jbInit(width, height);
    }
 
@@ -64,7 +64,6 @@ abstract class Wizard extends JDialog {
       BottomPanel.add(nextButton, null);
       BottomPanel.add(finishButton, null);
       mainPanel.add(BottomPanel, BorderLayout.SOUTH);
-      this.getRootPane().setDefaultButton(nextButton);
    }
 
    void addStep(int step, WizardStep panel)
@@ -79,6 +78,18 @@ abstract class Wizard extends JDialog {
       texts.add(step-1,panel);
       if(step==1)
          mainPanel.add((JPanel)texts.get(0),BorderLayout.NORTH);
+   }
+
+   public void showWizard()
+   {
+      Dimension dlgSize = getPreferredSize();
+      Dimension frmSize = callingframe.getSize();
+      Point loc = callingframe.getLocation();
+      setLocation( ( frmSize.width - dlgSize.width ) / 2 + loc.x,
+                     ( frmSize.height - dlgSize.height ) / 2 + loc.y );
+      pack();
+      nextButton.requestFocusInWindow();
+      show();
    }
 
    abstract void nextButton_actionPerformed(ActionEvent e);

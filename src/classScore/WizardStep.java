@@ -1,19 +1,7 @@
 package classScore;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.*;
-
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.AbstractTableModel;
 
 /**
  * <p>Title: </p>
@@ -21,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Company: </p>
  * @author not attributable
- * @version 1.0
+ * @version $Id$
  */
 
 abstract class WizardStep extends JPanel{
@@ -36,6 +24,8 @@ abstract class WizardStep extends JPanel{
 
    //Component initialization
    abstract void jbInit() throws Exception;
+
+   abstract public boolean isReady();
 
    private boolean testfile(String filename) {
       if (filename != null && filename.length() > 0) {
@@ -55,4 +45,3 @@ abstract class WizardStep extends JPanel{
    }
 
 }
-

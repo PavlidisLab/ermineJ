@@ -39,12 +39,18 @@ public class StartupDialog
 
    public StartupDialog( classScoreFrame callingframe ) {
       setModal( true );
-      //enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
       this.settings = callingframe.getSettings();
       try {
          jbInit();
          setValues();
+         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+         Dimension dlgSize = getPreferredSize();
+         setLocation((screenSize.width - dlgSize.width) / 2,
+                           (screenSize.height - dlgSize.height) / 2);
+         pack();
+         startButton.requestFocusInWindow();
+         show();
       }
       catch ( Exception e ) {
          e.printStackTrace();
@@ -96,11 +102,7 @@ public class StartupDialog
       classFile.setToolTipText( "" );
       classPanel.add( classLabel, null );
       classPanel.add( classFile, null );
-
-
       mainPanel.add( centerPanel );
-      this.getRootPane().setDefaultButton( startButton );
-      startButton.grabFocus();
       this.setTitle( "Specify Probe Annotation File" );
    }
 

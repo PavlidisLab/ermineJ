@@ -57,6 +57,8 @@ public class SaveWizardStep2 extends WizardStep
       this.add(jPanel11);
    }
 
+   public boolean isReady() { return true; }
+
    void saveBrowseButton_actionPerformed(ActionEvent e) {
       int result = chooser.showOpenDialog(this.wiz);
       if (result == JFileChooser.APPROVE_OPTION) {

@@ -51,6 +51,8 @@ public class SaveWizardStep1 extends WizardStep
       this.add(runPanel);
    }
 
+   public boolean isReady() { return true; }
+
    void showChoices()
    {
       if(rundata==null || rundata.size()<1)

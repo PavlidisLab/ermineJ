@@ -1,6 +1,7 @@
 package classScore;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import baseCode.gui.*;
 
@@ -26,8 +27,15 @@ public class Settings {
    int minClassSize = 14;
    int iterations = 10;
    int scorecol = 2;
+   int geneRepTreatment = BEST_PVAL;
+   int rawScoreMethod = MEAN_METHOD;
    boolean doLog = true;
    double pValThreshold = 0.001;
+
+   public static final int BEST_PVAL = 1;
+   public static final int MEAN_PVAL = 2;
+   public static final int MEAN_METHOD = 0;
+   public static final int QUANTILE_METHOD = 1;
 
    /**
     * Creates settings object
@@ -38,7 +46,7 @@ public class Settings {
       int end = dataFolder.lastIndexOf(File.separatorChar);
       dataFolder = dataFolder.substring(0, end + 1) + ".." + File.separator + ".." + File.separator + "data";
       try{
-         dataFolder = new File(dataFolder).getCanonicalPath();
+         dataFolder = URLDecoder.decode((new File(dataFolder).getCanonicalPath()), "ISO-8859-1");
       }
       catch ( IOException ex ) {
          GuiUtil.error( "Could not find data folder." ); // make a big deal...
@@ -75,6 +83,10 @@ public class Settings {
                iterations = Integer.valueOf( properties.getProperty( "iterations" ) ).intValue();
             if ( properties.containsKey( "scorecol" ) )
                scorecol = Integer.valueOf( properties.getProperty( "scorecol" ) ).intValue();
+            if ( properties.containsKey( "geneRepTreatment" ) )
+               geneRepTreatment = Integer.valueOf( properties.getProperty( "geneRepTreatment" ) ).intValue();
+            if ( properties.containsKey( "rawScoreMethod" ) )
+               rawScoreMethod = Integer.valueOf( properties.getProperty( "rawScoreMethod" ) ).intValue();
             if ( properties.containsKey( "doLog" ) )
                doLog = Boolean.valueOf( properties.getProperty( "doLog" ) ).booleanValue();
             if ( properties.containsKey( "pValThreshold" ) )
@@ -100,6 +112,8 @@ public class Settings {
       minClassSize=settings.getMinClassSize();
       iterations=settings.getIterations();
       scorecol=settings.getScorecol();
+      geneRepTreatment=settings.getGeneRepTreatment();
+      rawScoreMethod=settings.getRawScoreMethod();
       doLog=settings.getDoLog();
       pValThreshold=settings.getPValThreshold();
       pref_file=settings.getPrefFile();
@@ -118,10 +132,12 @@ public class Settings {
       properties.setProperty("dataFolder", dataFolder);
       properties.setProperty("maxClassSize", String.valueOf(maxClassSize));
       properties.setProperty("minClassSize", String.valueOf(minClassSize));
-      properties.setProperty("doLog", String.valueOf(doLog));
-      properties.setProperty("pValThreshold", String.valueOf(pValThreshold));
       properties.setProperty("iterations", String.valueOf(iterations));
       properties.setProperty("scorecol", String.valueOf(scorecol));
+      properties.setProperty("geneRepTreatment", String.valueOf(geneRepTreatment));
+      properties.setProperty("rawScoreMethod", String.valueOf(rawScoreMethod));
+      properties.setProperty("doLog", String.valueOf(doLog));
+      properties.setProperty("pValThreshold", String.valueOf(pValThreshold));
       OutputStream f = new FileOutputStream(pref_file);
       properties.store(f, "");
       f.close();
@@ -139,6 +155,8 @@ public class Settings {
    public int getMinClassSize() { return minClassSize; }
    public int getIterations() { return iterations; }
    public int getScorecol() { return scorecol; }
+   public int getGeneRepTreatment() { return geneRepTreatment; }
+   public int getRawScoreMethod() { return rawScoreMethod; }
    public boolean getDoLog() { return doLog; }
    public double getPValThreshold() { return pValThreshold; }
    public String getPrefFile() { return pref_file; }
@@ -155,7 +173,39 @@ public class Settings {
    public void setMinClassSize(int val) {  minClassSize=val; }
    public void setIterations(int  val) {  iterations=val; }
    public void setScorecol(int val) {  scorecol=val; }
+   public void setGeneRepTreatment(int val) { geneRepTreatment=val; }
+   public void setRawScoreMethod(int val) { rawScoreMethod=val; }
    public void setDoLog(boolean val) {  doLog=val; }
    public void setPValThreshold(double val) {  pValThreshold=val; }
    public void setPrefFile(String val) { pref_file=val; }
+
+   public String getUseWeights() {
+      if (geneRepTreatment==MEAN_PVAL || geneRepTreatment==BEST_PVAL)
+         return "true";
+      else
+         return "false";
+   }
+
+   public String getGroupMethod() {
+      if (geneRepTreatment==MEAN_PVAL)
+         return "MEAN_PVAL";
+      else if (geneRepTreatment==BEST_PVAL)
+         return "BEST_PVAL";
+      else
+         return "MEAN_PVAL"; // dummy. It won't be used.
+   }
+
+   public String getClassScoreMethod() {
+      if (rawScoreMethod==MEAN_METHOD) {
+         return "MEAN_METHOD";
+      } else {
+         return "QUANTILE_METHOD"; // note that quantile is hard-coded to be 50 for the gui.
+      }
+   }
+
+   public String getUseLog() {
+      return Boolean.toString(doLog);
+   }
+
 }
+

@@ -48,8 +48,6 @@ public class classScoreFrame
    JPanel jPanelStatus = new JPanel();
 
    Thread runner;
-   File startPath;
-   JFileChooser chooser = new JFileChooser();
    boolean done = false;
    boolean loadResults = false;
    int runnum = 0;
@@ -63,6 +61,8 @@ public class classScoreFrame
    public classScoreFrame() {
       try {
          jbInit();
+         settings = new Settings();
+         StartupDialog sdlog = new StartupDialog( this );
       }
       catch ( Exception e ) {
          e.printStackTrace();
@@ -71,11 +71,9 @@ public class classScoreFrame
 
    /* init */
    private void jbInit() throws Exception {
-
       if ( CONSOLE_WINDOW ) {
          ConsoleWindow.init();
       }
-
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
       this.setJMenuBar( jMenuBar1 );
       this.setSize( new Dimension( 886, 450 ) );
@@ -167,10 +165,6 @@ public class classScoreFrame
       mainPanel.add( jTabbedPane1, BorderLayout.NORTH );
       mainPanel.add( jPanelMainControls, BorderLayout.CENTER );
       mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
-
-      settings = new Settings();
-      chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
-      showDialog( new StartupDialog( this ) );
    }
 
    void jButtonLoad_actionPerformed( ActionEvent e ) {
@@ -345,17 +339,6 @@ public class classScoreFrame
 
    /**
     *
-    * @param target
-    */
-   public void browse( JTextField target ) {
-      int result = chooser.showOpenDialog( this );
-      if ( result == JFileChooser.APPROVE_OPTION ) {
-         target.setText( chooser.getSelectedFile().toString() );
-      }
-   }
-
-   /**
-    *
     * @param inFilename
     * @return
     */
@@ -504,8 +487,9 @@ public class classScoreFrame
    }
 
    void runAnalysisMenuItem_actionPerformed( ActionEvent e ) {
-      AnalysisFrame aframe = new AnalysisFrame( this );
-      showDialog( aframe );
+      AnalysisWizard awiz = new AnalysisWizard(this);
+      awiz.showWizard();
+//      showDialog( awiz );
    }
 
    void loadAnalysisMenuItem_actionPerformed( ActionEvent e ) {
