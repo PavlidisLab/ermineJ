@@ -139,9 +139,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
       double expected = numOverThreshold * pos_prob;
 
-      System.err.println( successes + ", " + effectiveGeneSetSize + ", "
-            + ( inputSize - effectiveGeneSetSize ) + ", "
-            + numOverThreshold );
+//      System.err.println( successes + ", " + effectiveGeneSetSize + ", "
+//            + ( inputSize - effectiveGeneSetSize ) + ", "
+//            + numOverThreshold );
 
       if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
          // still do upper tail - to be consistent with other methods.
