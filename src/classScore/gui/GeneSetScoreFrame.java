@@ -92,7 +92,6 @@ public class GeneSetScoreFrame extends JFrame {
    private HelpHelper hh;
 
    public GeneSetScoreFrame() {
-
       jbInit();
       hh = new HelpHelper();
       hh.initHelp( helpMenuItem );
@@ -317,6 +316,16 @@ public class GeneSetScoreFrame extends JFrame {
                statusMessenger );
          progressBar.setValue( 100 );
 
+         if (geneData.getGeneSetToProbeMap().size() == 0) {
+            throw new IllegalArgumentException("The gene annotation file contains no gene set information. " +
+                  "Check that the file format is correct.\n");
+         }
+         
+         if (geneData.getGeneToProbeList().size() == 0) {
+            throw new IllegalArgumentException("The gene annotation file contains no probes. "
+                  + "Check that the file format is correct.\n");
+         }
+         
          statusMessenger.setStatus( "Initializing gene class mapping" );
          geneDataSets.put( new Integer( "original".hashCode() ), geneData );
 
@@ -348,8 +357,8 @@ public class GeneSetScoreFrame extends JFrame {
                      + "\nIf this problem persists, please contact the software developer. "
                      + "\nPress OK to quit." );
          System.exit( 1 );
-      } catch (Exception e ) {
-	  e.printStackTrace();
+      } catch ( Exception e ) {
+         e.printStackTrace();
       }
       oPanel.addInitialData( goData );
       statusMessenger.setStatus( "Done with initialization." );
@@ -431,6 +440,7 @@ public class GeneSetScoreFrame extends JFrame {
    }
 
    public void addResult( GeneSetPvalRun result ) {
+      if ( result.getResults().size() == 0 ) return;
       results.add( result );
       oPanel.addRun(); // this line should come after results.add() or else you'll get errors
    }
@@ -492,7 +502,7 @@ class GeneSetScoreFrame_defineClassMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.defineClassMenuItem_actionPerformed(  );
+      adaptee.defineClassMenuItem_actionPerformed();
    }
 }
 
@@ -575,7 +585,7 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.saveAnalysisMenuItem_actionPerformed( );
+      adaptee.saveAnalysisMenuItem_actionPerformed();
    }
 }
 
@@ -588,7 +598,7 @@ class GeneSetScoreFrame_aboutMenuItem_actionAdapter implements
    }
 
    public void actionPerformed( ActionEvent e ) {
-      adaptee.aboutMenuItem_actionPerformed(   );
+      adaptee.aboutMenuItem_actionPerformed();
    }
 }
 
