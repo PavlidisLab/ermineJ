@@ -53,6 +53,13 @@
             <organization>Columbia University</organization>
             <roles/>
         </developer>
+        <developer>
+            <name>Kiran Keshav</name>
+            <id>keshav</id>
+            <email>keshav@cu-genome.org</email>
+            <organization>Columbia University</organization>
+            <roles/>
+        </developer>
     </developers>
     <licenses>
         <license>
