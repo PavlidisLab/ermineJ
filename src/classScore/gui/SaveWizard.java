@@ -9,7 +9,7 @@ import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
 import classScore.ResultsPrinter;
 import classScore.Settings;
-import classScore.classPvalRun;
+import classScore.GeneSetPvalRun;
 import classScore.data.GONames;
 
 /**
@@ -102,7 +102,7 @@ public class SaveWizard extends Wizard {
    }
 
    protected void finishButton_actionPerformed( ActionEvent e ) {
-      classPvalRun runToSave = ( classPvalRun ) rundata.get( step1
+      GeneSetPvalRun runToSave = ( GeneSetPvalRun ) rundata.get( step1
             .getSelectedRunNum() );
       Settings saveSettings = runToSave.getSettings();
       String saveFileName = step2.getSaveFileName();

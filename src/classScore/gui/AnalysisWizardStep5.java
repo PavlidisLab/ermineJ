@@ -19,8 +19,9 @@ import classScore.Settings;
  * <p>Description: </p>
  * <p>Copyright: Copyright (c) 2004</p>
  * <p>Company: </p>
- * @author not attributable
+ * @author Homin Lee
  * @version $Id$
+ * @todo this panel doesn't show up right for correlation analysis - shows the resampling one instead.
  */
 
 public class AnalysisWizardStep5 extends WizardStep
@@ -55,7 +56,7 @@ public class AnalysisWizardStep5 extends WizardStep
       ButtonGroup buttonGroup2 = new ButtonGroup();
       jRadioButtonMedian = new JRadioButton();
       jRadioButtonMean = new JRadioButton();
-  //    ButtonGroup replicateButtonGroup = new ButtonGroup();
+
       //panels for step 4 bottom
       oraPanel = new JPanel();
       TitledBorder oraTitledBorder;
@@ -194,24 +195,24 @@ public class AnalysisWizardStep5 extends WizardStep
    }
 
    public void addVarPanel ( int analysisType ){
-      if ( analysisType == 0 ) {
+      if ( analysisType == Settings.ORA ) {
          step5Panel.add( oraPanel, null );
-      } else if ( analysisType == 1 ) {
+      } else if ( analysisType == Settings.RESAMP ) {
          resampPanel.add( jPanel13, null );
          step5Panel.add( resampPanel, null );
-      } else if ( analysisType == 2 ) {
+      } else if ( analysisType == Settings.CORR ) {
          corrPanel.add( jPanel13, null );
          step5Panel.add( corrPanel, null );
       }
    }
 
    public void removeVarPanel( int analysisType ) {
-      if ( analysisType == 0 ) {
+      if ( analysisType == Settings.ORA ) {
          step5Panel.remove( oraPanel );
-      } else if ( analysisType == 1 ) {
+      } else if ( analysisType == Settings.RESAMP ) {
          resampPanel.remove( jPanel13 );
          step5Panel.remove( resampPanel );
-      } else if ( analysisType == 2 ) {
+      } else if ( analysisType == Settings.CORR ) {
          corrPanel.remove( jPanel13 );
          step5Panel.remove( corrPanel );
       }

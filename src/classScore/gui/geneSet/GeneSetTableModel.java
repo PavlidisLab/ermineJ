@@ -15,6 +15,9 @@ import classScore.data.GeneAnnotations;
  * <p>
  * The general picture is as follows: <br>
  * GUI -> Sort Filter -> Table Model
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
  * 
  * @author Will Braynen
  * @version $Id$

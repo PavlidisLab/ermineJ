@@ -33,15 +33,15 @@ import baseCode.gui.StatusJlabel;
 import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
 import classScore.Settings;
-import classScore.classPvalRun;
+import classScore.GeneSetPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author Homin Lee
  * @author Paul Pavlidis
  * @version $Id$
@@ -381,7 +381,7 @@ public class GeneSetScoreFrame
       return statusMessenger;
    }
 
-   public void addResult(classPvalRun result)
+   public void addResult(GeneSetPvalRun result)
    {
       results.add( result );
       oPanel.addRun();  // this line should come after results.add() or else you'll get errors

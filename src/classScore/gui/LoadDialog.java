@@ -13,14 +13,13 @@ import javax.swing.JTextField;
 
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
-import baseCode.util.FileTools;
 import classScore.Settings;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author Homin K Lee
  * @version $Id$
  */

@@ -29,29 +29,22 @@ import javax.swing.table.TableColumn;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
 import classScore.Settings;
-import classScore.classPvalRun;
+import classScore.GeneSetPvalRun;
 import classScore.data.GONames;
 import classScore.data.GeneAnnotations;
 import classScore.data.GeneSetResult;
 import java.util.Vector;
 
 /**
+ * <hr>
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Company:
- * </p>
+ * Copyright (c) 2004 Columbia University
  * 
  * @author Homin Lee
  * @version $Id$
  * @todo deletion of geneDataSets when remove is used.
+ * @todo wierd background color bugs.
+ * @todo after modifying a class but not making any changes, it should not be highlighted or saved to disk.
  */
 
 public class OutputPanel extends JScrollPane {
@@ -104,8 +97,7 @@ public class OutputPanel extends JScrollPane {
       JMenuItem modMenuItem = new JMenuItem( "Modify this class..." );
       modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter(
             this ) );
-      JMenuItem htmlMenuItem = new JMenuItem(
-            "Search GO database" );
+      JMenuItem htmlMenuItem = new JMenuItem( "Search GO database" );
       htmlMenuItem
             .addActionListener( new OutputPanel_htmlMenuItem_actionAdapter(
                   this ) );
@@ -131,7 +123,7 @@ public class OutputPanel extends JScrollPane {
       if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.init_cols ) {
          int runnum = model.getRunNum( j );
          String id = getClassId( i );
-         ( ( classPvalRun ) results.get( runnum ) ).showDetails( id );
+         ( ( GeneSetPvalRun ) results.get( runnum ) ).showDetails( id );
       } else {
          for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
             if ( table.getValueAt( i, k ) != null
@@ -150,7 +142,7 @@ public class OutputPanel extends JScrollPane {
                         JOptionPane.PLAIN_MESSAGE );
                }
                int runnum = model.getRunNum( k );
-               ( ( classPvalRun ) results.get( runnum ) ).showDetails( id );
+               ( ( GeneSetPvalRun ) results.get( runnum ) ).showDetails( id );
             }
          }
 
@@ -172,7 +164,7 @@ public class OutputPanel extends JScrollPane {
     * @param e
     */
    void htmlMenuItem_actionPerformed( ActionEvent e ) {
-     GuiUtil.error("This doesn't do anythingi yet.");
+      GuiUtil.error( "This doesn't do anythingi yet." );
    }
 
    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
@@ -210,7 +202,7 @@ public class OutputPanel extends JScrollPane {
    }
 
    void generateToolTip( int runnum ) {
-      Settings runSettings = ( ( classPvalRun ) results.get( runnum ) )
+      Settings runSettings = ( ( GeneSetPvalRun ) results.get( runnum ) )
             .getSettings();
       String tooltip = new String( "<html>" );
       String coda = new String();
@@ -240,17 +232,16 @@ public class OutputPanel extends JScrollPane {
       tooltip += coda;
       resultToolTips.add( runnum, tooltip );
    }
-   
-   
+
    public void resetTable() {
       classColToolTip = new String( "Total classes shown: "
             + geneData.selectedSets() );
-      
+
       model.setInitialData( geneData, goData );
       sorter = new TableSorter( model );
       table.setModel( sorter );
       sorter.setTableHeader( table.getTableHeader() );
-      
+
       this.getViewport().add( table, null );
       table.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
       table.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
@@ -279,10 +270,8 @@ public class OutputPanel extends JScrollPane {
             goData, results ) );
       sorter.cancelSorting();
       sorter.setSortingStatus( 1, TableSorter.ASCENDING );
-
       table.revalidate();
    }
-   
 
    public void addRun() {
       model.addRun();
@@ -474,19 +463,16 @@ class OutputTableModel extends AbstractTableModel {
    private GONames goData;
    private LinkedList results;
    private LinkedList columnNames = new LinkedList();
-   private NumberFormat nf = NumberFormat.getInstance();
-   private NumberFormat pvalnf = new DecimalFormat( "0.##E0" );
-  
+   private NumberFormat nf = new DecimalFormat( "0.##E0" );
+
    private int state = -1;
    public static final int init_cols = 4;
-   ArrayList vals = new ArrayList();
-   
+
    //public static final int cols_per_run = 3;
 
    public OutputTableModel( LinkedList results ) {
       this.results = results;
       nf.setMaximumFractionDigits( 3 );
-      pvalnf.setMaximumFractionDigits( 3 );
       columnNames.add( "Name" );
       columnNames.add( "Description" );
       columnNames.add( "# of Probes" );
@@ -514,16 +500,16 @@ class OutputTableModel extends AbstractTableModel {
    public void addInitialData( GeneAnnotations geneData, GONames goData ) {
       state = 0;
       this.setInitialData( geneData, goData );
-      
+
    }
 
-   public void addRunColumns(int state) {
+   public void addRunColumns( int state ) {
       columnNames.add( "Run " + state + " Pval" );
    }
-   
+
    public void addRunData( Map result ) {
       state++;
-      addRunColumns(state);
+      addRunColumns( state );
       results.add( result );
    }
 
@@ -559,8 +545,7 @@ class OutputTableModel extends AbstractTableModel {
    public Object getValueAt( int i, int j ) {
 
       String classid = ( String ) geneData.getSelectedSets().get( i );
-     
-      
+
       if ( state >= 0 && j < init_cols ) {
          switch ( j ) {
             case 0: {
@@ -579,13 +564,13 @@ class OutputTableModel extends AbstractTableModel {
 
          }
       } else if ( state > 0 ) {
-         vals.clear();
+         ArrayList vals = new ArrayList();
          int runnum = getRunNum( j );
-         Map data = ( ( classPvalRun ) results.get( runnum ) ).getResults();
+         Map data = ( ( GeneSetPvalRun ) results.get( runnum ) ).getResults();
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
-            vals.add( new Double( nf.format( res.getRank() ) ) );
-            vals.add( new Double( pvalnf.format( res.getPvalue() ) ) );
+            vals.add( new Double( res.getRank() ) );
+            vals.add( new Double( res.getPvalue() ) );
             return vals;
          }
          return null;
@@ -622,16 +607,18 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
 
       // set cell text
       if ( value != null ) {
-         if ( value.getClass().equals( ArrayList.class ) )
-            setText( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) ).toString() );
-         else if ( value.getClass().equals( Vector.class ) )
+         if ( value.getClass().equals( ArrayList.class ) ) // pvalues and ranks.
+            setText( nf.format( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) )
+                  .doubleValue() ) );
+         else if ( value.getClass().equals( Vector.class ) ) // class ids.
             setText( ( String ) ( ( Vector ) value ).get( 0 ) );
          else
             setText( value.toString() );
-      } else
+      } else {
          setText( null );
+      }
 
-      //set cell background
+      //set cell background and possibly tooltip.
       int runcol = column - OutputTableModel.init_cols;
       setOpaque( true );
       if ( isSelected || hasFocus )
@@ -644,26 +631,30 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       } else if ( value.getClass().equals( ArrayList.class ) ) {
          String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) )
                .get( 0 );
-         classPvalRun result = ( classPvalRun ) results.get( runcol );
+         GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
          Map data = result.getResults();
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: "
                   + nf.format( res.getScore() ) );
-            if ( res.getPvalue_corr() == 1 )
+            if ( res.getPvalue_corr() < 0.01 ) {
                setBackground( spread5 );
-            else if ( res.getPvalue_corr() == 0 ) setBackground( spread1 );
+            } else if ( res.getPvalue_corr() < 0.05 ) {
+               setBackground( spread4 );
+            } else {
+               setBackground( Color.WHITE );
+            }
          }
       } else {
          setOpaque( false );
       }
-      
+
       // set tool tips
       if ( value != null && value.getClass().equals( ArrayList.class ) ) {
          String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) )
                .get( 0 );
          //String classid = ( String ) table.getValueAt( row, 0 );
-         classPvalRun result = ( classPvalRun ) results.get( runcol );
+         GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
          Map data = result.getResults();
          if ( data.containsKey( classid ) ) {
             GeneSetResult res = ( GeneSetResult ) data.get( classid );
@@ -673,9 +664,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
       } else {
          setToolTipText( null );
       }
-      
+
       return this;
    }
-
 }
 

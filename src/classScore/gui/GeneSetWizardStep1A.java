@@ -22,10 +22,10 @@ import classScore.data.NewGeneSet;
 import javax.swing.JButton;
 
 /**
+ * <hr>
  * <p>
- * Copyright: Copyright (c) 2004 Columbia University
- * </p>
- *
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author Homin Lee
  * @version $Id$
  * @todo 3.0 old table click shows class in status bar, number of probes?

@@ -7,6 +7,10 @@ import javax.swing.filechooser.FileFilter;
 import baseCode.graphics.text.Util;
 
 /**
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author  Will Braynen
  * @version $Id$
  */

@@ -11,10 +11,10 @@ import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: </p>
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author Homin K Lee
  * @ $Id$
  */

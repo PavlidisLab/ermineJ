@@ -48,6 +48,10 @@ import classScore.Settings;
 import classScore.data.GeneAnnotations;
 
 /**
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author Will Braynen
  * @version $Id$
  */

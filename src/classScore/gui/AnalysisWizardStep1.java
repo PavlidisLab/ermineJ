@@ -14,10 +14,10 @@ import baseCode.gui.WizardStep;
 import classScore.Settings;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: </p>
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author not attributable
  * @version $Id$
  */
@@ -91,7 +91,7 @@ public class AnalysisWizardStep1 extends WizardStep
       jPanel12.add(jLabel5, null);
       jPanel4.add(jPanel12, null);
       step1Panel.add(jPanel4, null);
-
+      
       this.addHelp("<html><b>Select the method to use for scoring gene sets.</b><br>"+
                    "</html>");
       this.addMain(step1Panel);
@@ -100,15 +100,15 @@ public class AnalysisWizardStep1 extends WizardStep
    public boolean isReady() { return true; }
 
    void corrButton_actionPerformed(ActionEvent e) {
-      wiz.setAnalysisType(2);
+      wiz.setAnalysisType(Settings.CORR);
    }
 
    void resampButton_actionPerformed(ActionEvent e) {
-      wiz.setAnalysisType(1);
+      wiz.setAnalysisType(Settings.RESAMP);
    }
 
    void oraButton_actionPerformed(ActionEvent e) {
-      wiz.setAnalysisType(0);
+      wiz.setAnalysisType(Settings.ORA);
    }
 
    private void setValues() {

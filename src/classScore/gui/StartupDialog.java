@@ -17,18 +17,9 @@ import baseCode.gui.GuiUtil;
 import classScore.Settings;
 
 /**
+ * <hr>
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2003
- * </p>
- * <p>
- * Company:
- * </p>
+ * Copyright (c) 2004 Columbia University
  * 
  * @author Homin Lee
  * @version $Id$

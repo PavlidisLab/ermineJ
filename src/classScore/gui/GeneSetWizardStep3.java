@@ -18,20 +18,11 @@ import classScore.data.GeneAnnotations;
 import classScore.data.NewGeneSet;
 
 /**
+ * <hr>
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Company:
- * </p>
- *
- * @author not attributable
+ * Copyright (c) 2004 Columbia University
+ * 
+ * @author Homin Lee
  * @version $Id$
  */
 
