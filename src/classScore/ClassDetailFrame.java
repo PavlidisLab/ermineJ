@@ -1,20 +1,20 @@
 package classScore;
 
+import java.beans.*;
+import java.io.*;
+import java.text.*;
+import java.util.*;
+
 import java.awt.*;
+import java.awt.Point;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import java.util.Map;
-import java.util.ArrayList;
-import java.text.NumberFormat;
-import java.io.IOException;
-import java.io.File;
 
-import baseCode.gui.JMatrixDisplay;
-import baseCode.dataStructure.DenseDoubleMatrix2DNamed;
-import baseCode.dataStructure.reader.DoubleMatrixReader;
-import baseCode.graphics.text.Util;
-
+import baseCode.dataStructure.*;
+import baseCode.dataStructure.reader.*;
+import baseCode.graphics.text.*;
+import baseCode.gui.*;
 
 /**
  * <p>Title: </p>
@@ -30,14 +30,21 @@ import baseCode.graphics.text.Util;
 public class ClassDetailFrame
     extends JFrame {
 
-   public JMatrixDisplay m_matrixDisplay = null;
+   final int PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN = 12;
+   final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
+   final int MAX_WIDTH_MATRIXDISPLAY_COLUMN = 20;
+   final int PREFERRED_WIDTH_COLUMN_1 = 75;
+   final int PREFERRED_WIDTH_COLUMN_2 = 125;
+   final int PREFERRED_WIDTH_COLUMN_3 = 300;
 
+   public JMatrixDisplay m_matrixDisplay = null;
    protected JScrollPane m_tableScrollPane = new JScrollPane();
    protected JTable m_table = new JTable();
    protected BorderLayout borderLayout1 = new BorderLayout();
    protected JToolBar m_toolBar = new JToolBar();
    protected JToggleButton m_normalizeButton = new JToggleButton();
-   protected final String[] m_normalizeButtonLabels = { "Normalize ON", "Normalize OFF" };
+   protected final String[] m_normalizeButtonLabels = {
+       "Normalize ON", "Normalize OFF"};
    protected JButton m_saveButton = new JButton();
 
    public ClassDetailFrame(
@@ -46,13 +53,16 @@ public class ClassDetailFrame
        Map classToProbe,
        String id,
        NumberFormat nf,
-       GeneDataReader geneData ) {
+       GeneDataReader geneData,
+       Properties settings ) {
+
       try {
-         createDetailsTable( values, pvals, classToProbe, id, nf, geneData );
+         createDetailsTable( values, pvals, classToProbe, id, nf, geneData, settings );
          jbInit();
 
          boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
-         m_normalizeButton.setText( isNormalized ? m_normalizeButtonLabels[0] : m_normalizeButtonLabels[1]  );
+         m_normalizeButton.setText( isNormalized ? m_normalizeButtonLabels[0] :
+                                    m_normalizeButtonLabels[1] );
          m_normalizeButton.setSelected( isNormalized );
       }
       catch ( Exception e ) {
@@ -61,10 +71,12 @@ public class ClassDetailFrame
    }
 
    private void jbInit() throws Exception {
-      this.setSize( 500, 460 );
-      this.setLocation( 200, 100 );
-      this.getContentPane().setLayout( borderLayout1 );
-      this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
+
+      setSize( 800, 460 );
+      setResizable( false );
+      setLocation( 200, 100 );
+      getContentPane().setLayout( borderLayout1 );
+      setDefaultCloseOperation( DISPOSE_ON_CLOSE );
 
       // Enable the horizontal scroll bar
       m_table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
@@ -79,17 +91,22 @@ public class ClassDetailFrame
       m_table.setGridColor( Color.lightGray );
 
       // add a viewport with a table inside it
-      m_normalizeButton.setToolTipText("Normalize to variance 1, mean 0" );
+      m_normalizeButton.setToolTipText( "Normalize to variance 1, mean 0" );
       m_normalizeButton.setActionCommand( "jToggleButton1" );
-      m_normalizeButton.setText("Normalize OFF" );
+      m_normalizeButton.setText( "Normalize OFF" );
       m_normalizeButton.addActionListener( new ClassDetailFrame_m_normalizeButton_actionAdapter( this ) );
-      m_saveButton.setToolTipText("Save to file");
-      m_saveButton.setText("Save to file...");
-      m_saveButton.addActionListener(new ClassDetailFrame_m_saveButton_actionAdapter(this));
-      m_toolBar.setFloatable(false);
+      m_saveButton.setToolTipText( "Save to file" );
+      m_saveButton.setText( "Save to file..." );
+      m_saveButton.addActionListener( new ClassDetailFrame_m_saveButton_actionAdapter( this ) );
+      m_toolBar.setFloatable( false );
       m_tableScrollPane.getViewport().add( m_table, null );
+
+      // Reposition the table inside the scrollpane
+      int x = m_table.getSize().width; // should probably subtract the size of the viewport, but it gets trimmed anyway, so it's okay to be lazy here
+      m_tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
+
       this.getContentPane().add( m_tableScrollPane, BorderLayout.CENTER );
-      m_toolBar.add(m_saveButton, null);
+      m_toolBar.add( m_saveButton, null );
       m_toolBar.add( m_normalizeButton, null );
       this.getContentPane().add( m_toolBar, BorderLayout.NORTH );
    }
@@ -100,14 +117,15 @@ public class ClassDetailFrame
        Map classToProbe,
        String id,
        NumberFormat nf,
-       GeneDataReader geneData ) {
+       GeneDataReader geneData,
+       Properties settings ) {
 
       //
       // Create a matrix display
       //
 
       // compile the matrix data
-      String filename = "C:\\melanoma_and_sarcomaMAS5.txt";
+      String filename = settings.getProperty( "rawFile" );
       String[] geneProbes = getProbes( classToProbe, id, values.size() );
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
@@ -127,8 +145,8 @@ public class ClassDetailFrame
       //
 
       DetailsTableModel m = new DetailsTableModel(
-       m_matrixDisplay, values, pvals, classToProbe, id, nf, geneData
-       );
+          m_matrixDisplay, values, pvals, classToProbe, id, nf, geneData
+          );
       SortFilterModel sorter = new SortFilterModel( m, m_matrixDisplay );
       m_table.setModel( new DefaultTableModel() ); // bug in JTable (Manju said so) -- if called repeatedly, this line should be here... as-is, makes no difference
       m_table.setModel( sorter );
@@ -139,28 +157,57 @@ public class ClassDetailFrame
             int modelColumn = m_table.convertColumnIndexToModel( tableColumn );
             ( ( SortFilterModel )m_table.getModel() ).sort( modelColumn );
          }
+         /*
+         public void mouseReleased( MouseEvent event ) {
+            // make all the matrix display columns equally wide
+            int matrixColumnCount = m_matrixDisplay.getColumnCount();
+            for ( int i = 0; i < matrixColumnCount; i++ ) {
+               TableColumn col = m_table.getColumnModel().getColumn( i );
+
+               int width = col.getPreferredWidth();
+
+               //String s = evt.getNewValue().toString();
+               //int width = (new Integer( s )).intValue();
+
+               col.setPreferredWidth( width );
+            }
+            m_table.revalidate();
+         }
+         */
       } );
 
       // Make the columns in the matrix display not too wide (cell-size)
       // and set a custom cell renderer
       MatrixDisplayCellRenderer cellRenderer = new MatrixDisplayCellRenderer( m_matrixDisplay ); // create one instance that will be used to draw each cell
-      MatrixDisplayColumnHeaderRenderer columnHeaderRenderer = new MatrixDisplayColumnHeaderRenderer(); // create only one instance
+      MatrixDisplayColumnHeaderRenderer columnHeaderRenderer =
+          new MatrixDisplayColumnHeaderRenderer(); // create only one instance
       int matrixColumnCount = m_matrixDisplay.getColumnCount();
+
       for ( int i = 0; i < matrixColumnCount; i++ ) {
          TableColumn col = m_table.getColumnModel().getColumn( i );
-         //col.setResizable( false );
-         col.setPreferredWidth( 10 );
-         col.setMaxWidth( 10 );
-         col.setMinWidth( 10 );
+         col.setResizable( false );
+         col.setPreferredWidth( PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN );
+         col.setMinWidth( MIN_WIDTH_MATRIXDISPLAY_COLUMN ); // no narrower than this
+         col.setMaxWidth( MAX_WIDTH_MATRIXDISPLAY_COLUMN ); // no wider than this
          col.setCellRenderer( cellRenderer );
          col.setHeaderRenderer( columnHeaderRenderer );
       }
 
       // The columns containing text or values (not matrix display) should be a bit wider
-      m_table.getColumnModel().getColumn( matrixColumnCount + 1 ).setPreferredWidth( 75 );
-      m_table.getColumnModel().getColumn( matrixColumnCount + 2 ).setPreferredWidth( 125 );
-      m_table.getColumnModel().getColumn( matrixColumnCount + 3 ).setPreferredWidth( 300 );
+      m_table.getColumnModel().getColumn( matrixColumnCount + 1 ).setPreferredWidth( PREFERRED_WIDTH_COLUMN_1 );
+      m_table.getColumnModel().getColumn( matrixColumnCount + 2 ).setPreferredWidth( PREFERRED_WIDTH_COLUMN_2 );
+      m_table.getColumnModel().getColumn( matrixColumnCount + 3 ).setPreferredWidth( PREFERRED_WIDTH_COLUMN_3 );
 
+      // Save the dimensions of the table just in case
+      int width =
+          PREFERRED_WIDTH_COLUMN_1 +
+          PREFERRED_WIDTH_COLUMN_2 +
+          PREFERRED_WIDTH_COLUMN_3 +
+          matrixColumnCount * PREFERRED_WIDTH_MATRIXDISPLAY_COLUMN;
+      int height = 0; // the height shouldn't be zero of course, but for now all we really need is the width (to position the viewport)
+
+      Dimension d = new Dimension( width, height );
+      m_table.setSize( d );
    }
 
    protected String[] getProbes( Map classToProbe, String id, int count ) {
@@ -179,8 +226,7 @@ public class ClassDetailFrame
       if ( m_normalizeButton.isSelected() ) {
          m_matrixDisplay.setStandardizedEnabled( true );
          m_normalizeButton.setText( m_normalizeButtonLabels[0] );
-      }
-      else {
+      } else {
          m_matrixDisplay.setStandardizedEnabled( false );
          m_normalizeButton.setText( m_normalizeButtonLabels[1] );
       }
@@ -188,7 +234,7 @@ public class ClassDetailFrame
       m_table.repaint();
    }
 
-   void m_saveButton_actionPerformed(ActionEvent e) {
+   void m_saveButton_actionPerformed( ActionEvent e ) {
 
       //Create a file chooser
       final JFileChooser fc = new JFileChooser();
@@ -197,7 +243,7 @@ public class ClassDetailFrame
 
       int returnVal = fc.showOpenDialog( this );
 
-      if (returnVal == JFileChooser.APPROVE_OPTION) {
+      if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
          File file = fc.getSelectedFile();
 
@@ -213,8 +259,9 @@ public class ClassDetailFrame
          // assume extension for file is <name>.png (add a file filter to ensure this)
          // change filename to <name>.txt
          String[] s = filename.split( "." );
-         String extension = s[ s.length - 1 ];
-         String filenameWithoutExtension = filename.substring( filename.length() - extension.length() - 1, filename.length() - 1);
+         String extension = s[s.length - 1];
+         String filenameWithoutExtension = filename.substring( filename.length() - extension.length() -
+             1, filename.length() - 1 );
          filename = filenameWithoutExtension + ".txt";
 
          //saveTableToFile( filename );
@@ -364,8 +411,8 @@ class MatrixDisplayCellRenderer
 
    static public double format( double value, int precision ) {
 
-      int integerPart = (int) value;
-      int fractionalPart = (int)( ( value - integerPart ) * Math.pow( 10, precision ));
+      int integerPart = ( int )value;
+      int fractionalPart = ( int ) ( ( value - integerPart ) * Math.pow( 10, precision ) );
 
       double fraction = fractionalPart / Math.pow( 10, precision );
       return integerPart + fraction;
@@ -382,58 +429,60 @@ class MatrixDisplayCellRenderer
 
 } // end class MatrixDisplayCellRenderer
 
+class MatrixDisplayColumnHeaderRenderer
+    extends JButton
+    implements TableCellRenderer {
 
-class MatrixDisplayColumnHeaderRenderer extends JButton implements TableCellRenderer {
-   
-    String m_columnName;
-    final int PREFERRED_WIDTH  =  5;
-    final int PREFERRED_HEIGHT = 80;
-    final int MAX_TEXT_LENGTH  = 12;
-       
-    // This method is called each time a column header
-    // using this renderer needs to be rendered.
-    public Component getTableCellRendererComponent(JTable table, Object value,
-            boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
-        // 'value' is column header value of column 'vColIndex'
-        // rowIndex is always -1
-        // isSelected is always false
-        // hasFocus is always false
+   String m_columnName;
+   final int PREFERRED_HEIGHT = 80;
+   final int MAX_TEXT_LENGTH = 12;
 
-        // Configure the component with the specified value
-        m_columnName = value.toString();
-                
-        // Set tool tip if desired
-        setToolTipText( m_columnName );
+   // This method is called each time a column header
+   // using this renderer needs to be rendered.
+   public Component getTableCellRendererComponent( JTable table, Object value,
+       boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex ) {
+      // 'value' is column header value of column 'vColIndex'
+      // rowIndex is always -1
+      // isSelected is always false
+      // hasFocus is always false
 
-        // Since the renderer is a component, return itself
-        return this;
-    }
-    
-    protected void paintComponent( Graphics g ) {
-       
-        super.paintComponent( g );
-        Font font = getFont();
+      // Configure the component with the specified value
+      m_columnName = value.toString();
 
-        if (m_columnName.length() > MAX_TEXT_LENGTH)
-           m_columnName = m_columnName.substring( 0, MAX_TEXT_LENGTH );
-        
-        int x = getSize().width  - 2;
-        int y = getSize().height - 3;    
-        Util.drawVerticalString( g, m_columnName, font, x, y );
-    }
-    
-    public Dimension getPreferredSize() {
-       
-       return new Dimension( PREFERRED_WIDTH, PREFERRED_HEIGHT );
-    }
-    
-    // The following methods override the defaults for performance reasons
-    public void validate() {}
-    public void revalidate() {}
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+      // Set tool tip if desired
+      setToolTipText( m_columnName );
+
+      // Since the renderer is a component, return itself
+      return this;
+   }
+
+   protected void paintComponent( Graphics g ) {
+
+      super.paintComponent( g );
+      Font font = getFont();
+
+      if ( m_columnName.length() > MAX_TEXT_LENGTH )
+         m_columnName = m_columnName.substring( 0, MAX_TEXT_LENGTH );
+
+      int x = getSize().width - 4;
+      int y = getSize().height - 4;
+      Util.drawVerticalString( g, m_columnName, font, x, y );
+   }
+
+   public Dimension getPreferredSize() {
+
+      return new Dimension( super.getPreferredSize().width, PREFERRED_HEIGHT );
+   }
+
+   // The following methods override the defaults for performance reasons
+   public void validate() {}
+
+   public void revalidate() {}
+
+   protected void firePropertyChange( String propertyName, Object oldValue, Object newValue ) {}
+
+   public void firePropertyChange( String propertyName, boolean oldValue, boolean newValue ) {}
 }
-
 
 class ClassDetailFrame_m_normalizeButton_actionAdapter
     implements java.awt.event.ActionListener {
@@ -448,14 +497,15 @@ class ClassDetailFrame_m_normalizeButton_actionAdapter
    }
 }
 
-class ClassDetailFrame_m_saveButton_actionAdapter implements java.awt.event.ActionListener {
+class ClassDetailFrame_m_saveButton_actionAdapter
+    implements java.awt.event.ActionListener {
    ClassDetailFrame adaptee;
 
-   ClassDetailFrame_m_saveButton_actionAdapter(ClassDetailFrame adaptee) {
+   ClassDetailFrame_m_saveButton_actionAdapter( ClassDetailFrame adaptee ) {
       this.adaptee = adaptee;
    }
-   public void actionPerformed(ActionEvent e) {
-      adaptee.m_saveButton_actionPerformed(e);
+
+   public void actionPerformed( ActionEvent e ) {
+      adaptee.m_saveButton_actionPerformed( e );
    }
 }
-
