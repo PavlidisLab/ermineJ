@@ -27,7 +27,7 @@ public class AnalysisWizard
     extends Wizard {
    //logic
    int step = 1;
-   int analysisType = 1;
+   int analysisType = Settings.ORA;
 
    Settings settings;
    GeneAnnotations geneData;
@@ -63,7 +63,7 @@ public class AnalysisWizard
 
    protected void nextButton_actionPerformed( ActionEvent e ) {
       clearStatus();
-      if ( step == 1 ) {
+      if ( step == 1 && step1.isReady()  ) {
          step = 2;
          step1.saveValues();
          this.getContentPane().remove( step1 );
@@ -73,6 +73,7 @@ public class AnalysisWizard
          backButton.setEnabled( true );
          this.repaint();
          nextButton.grabFocus();
+         this.analysisType = settings.getAnalysisMethod();
       } else if ( step == 2 && step2.isReady() ) {
          step = 3;
          this.getContentPane().remove( step2 );

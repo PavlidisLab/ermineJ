@@ -158,7 +158,7 @@ public class GeneSetScoreFrame
       this.setDefaultCloseOperation( EXIT_ON_CLOSE );
       this.setJMenuBar( jMenuBar1 );
       this.setSize( new Dimension( 886, 450 ) );
-      this.setTitle( "Functional Class Scoring" );
+      this.setTitle( "ErmineJ" );
       BorderLayout borderLayout1 = new BorderLayout();
       mainPanel.setLayout(borderLayout1);
       mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
@@ -178,19 +178,19 @@ public class GeneSetScoreFrame
       jPanel1.setForeground(Color.black);
       jPanel1.setPreferredSize(new Dimension(800, 200));
       fileMenu.add( quitMenuItem );
-      classMenu.setText( "Classes" );
+      classMenu.setText( "Gene Sets" );
       classMenu.setMnemonic( 'C' );
       classMenu.setEnabled(false);
-      defineClassMenuItem.setText( "Define New Class" );
+      defineClassMenuItem.setText( "Define New Gene Set" );
       defineClassMenuItem.addActionListener( new
                                              GeneSetScoreFrame_defineClassMenuItem_actionAdapter( this ) );
       defineClassMenuItem.setMnemonic( 'D' );
       defineClassMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D,InputEvent.CTRL_MASK));
-      modClassMenuItem.setText( "Modify Class" );
+      modClassMenuItem.setText( "Modify Gene Set" );
       modClassMenuItem.addActionListener( new
                                           GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
       modClassMenuItem.setMnemonic( 'M' );
-      findClassMenuItem.setText( "Find Class" );
+      findClassMenuItem.setText( "Find Gene Set" );
       findClassMenuItem.addActionListener( new
                                           GeneSetScoreFrame_findClassMenuItem_actionAdapter( this ) );
       findClassMenuItem.setMnemonic( 'F' );

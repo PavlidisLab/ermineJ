@@ -121,7 +121,7 @@ public class FindDialog extends JDialog {
 
       mainPanel.add(centerPanel, BorderLayout.NORTH);
       mainPanel.add( BottomPanelWrap, BorderLayout.SOUTH );
-      this.setTitle( "Find Class" );
+      this.setTitle( "Find Gene Set" );
    }
 
    void cancelButton_actionPerformed( ActionEvent e ) {

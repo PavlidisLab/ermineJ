@@ -49,12 +49,12 @@ public class GeneSetWizard extends Wizard {
       geneData.resetSelectedProbes();
       step=1;
       if (makenew) {
-         this.setTitle("Define New Class - Step 1 of 3");
+         this.setTitle("Define New Gene Set - Step 1 of 3");
          step1 = new GeneSetWizardStep1(this,settings);
          this.addStep(1,step1);
       }
       else {
-         this.setTitle("Modify Class - Step 1 of 3");
+         this.setTitle("Modify Gene Set - Step 1 of 3");
          step1A = new GeneSetWizardStep1A(this,geneData,goData,newGeneSet,oldGeneSet);
          this.addStep(1,step1A);
       }
@@ -78,7 +78,7 @@ public class GeneSetWizard extends Wizard {
       nostep1=true;
       newGeneSet = new NewGeneSet(geneData);
       oldGeneSet = new NewGeneSet(geneData);
-      this.setTitle("Modify Class - Step 2 of 3");
+      this.setTitle("Modify Gene Set - Step 2 of 3");
       step = 2;
       backButton.setEnabled(false);
       newGeneSet.setId(cid);
@@ -115,10 +115,10 @@ public class GeneSetWizard extends Wizard {
                   newGeneSet.getId().compareTo("") == 0)) {
                if (makenew) {                                       //cases 1 & 2
                   this.getContentPane().remove(step1);
-                  this.setTitle("Define New Class - Step 2 of 3");
+                  this.setTitle("Define New Gene Set - Step 2 of 3");
                } else {                                             //case 3
                   this.getContentPane().remove(step1A);
-                  this.setTitle("Modify Class - Step 2 of 3");
+                  this.setTitle("Modify Gene Set - Step 2 of 3");
                }
                step = 2;
                backButton.setEnabled(true);
@@ -134,9 +134,9 @@ public class GeneSetWizard extends Wizard {
          this.getContentPane().remove(step2);
          step = 3;
          if (makenew) {
-            this.setTitle("Define New Class - Step 3 of 3");
+            this.setTitle("Define New Gene Set - Step 3 of 3");
          } else {
-            this.setTitle("Modify Class - Step 3 of 3");
+            this.setTitle("Modify Gene Set - Step 3 of 3");
          }
          backButton.setEnabled(true);
          nextButton.setEnabled(false);
@@ -156,11 +156,11 @@ public class GeneSetWizard extends Wizard {
          backButton.setEnabled(false);
          finishButton.setEnabled(false);
          if (makenew) {
-            this.setTitle("Define New Class - Step 1 of 3");
+            this.setTitle("Define New Gene Set - Step 1 of 3");
             this.getContentPane().add(step1);
             step1.revalidate();
          } else {
-            this.setTitle("Modify Class - Step 1 of 3");
+            this.setTitle("Modify Gene Set - Step 1 of 3");
             this.getContentPane().add(step1A);
             newGeneSet.clear();
             step1A.revalidate();
@@ -171,9 +171,9 @@ public class GeneSetWizard extends Wizard {
          this.getContentPane().remove(step3);
          step = 2;
          if (makenew) {
-            this.setTitle("Define New Class - Step 2 of 3");
+            this.setTitle("Define New Gene Set - Step 2 of 3");
          } else {
-            this.setTitle("Modify Class - Step 2 of 3");
+            this.setTitle("Modify Gene Set - Step 2 of 3");
             if(nostep1)
                backButton.setEnabled(false);
          }

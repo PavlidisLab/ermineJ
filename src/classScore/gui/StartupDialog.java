@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -47,6 +48,10 @@ public class StartupDialog extends AppDialog {
    JPanel annotPanel = new JPanel();
    JTextField annotFile = new JTextField();
 
+   // @todo we need to use these.
+   JLabel askAgainLabel = new JLabel();
+   JCheckBox askAgain = new JCheckBox();
+   
    Settings settings;
    JButton classBrowseButton = new JButton();
 
@@ -94,7 +99,7 @@ public class StartupDialog extends AppDialog {
             "analysis.<p>The probe annotation file you select " +
             "must match the microarray design you are using. " +
             "For updated annotation files, visit " +
-            "http://microarray.cpmc.columbia.edu/annots/</html>" );
+            "<a href=\"http://microarray.cpmc.columbia.edu/annots/\">http://microarray.cpmc.columbia.edu/annots</a></html>" );
       addMain( centerPanel );
       this.setTitle( "ErmineJ startup" );
    }
@@ -200,3 +205,4 @@ class StartupDialog_classBrowseButton_actionAdapter implements
       adaptee.classBrowseButton_actionPerformed( e );
    }
 }
+

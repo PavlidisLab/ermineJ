@@ -9,20 +9,21 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import classScore.Settings;
 
 /**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2004</p>
- * <p>Company: </p>
- * @author not attributable
+ * 
+ *
+ * <hr>
+ * <p>Copyright (c) 2004 Columbia University
+ * @author Homin Lee
+ * @author Paul Pavlidis
  * @version $Id$
  */
-
 public class AnalysisWizardStep2
     extends WizardStep {
    AnalysisWizard wiz;
@@ -30,6 +31,8 @@ public class AnalysisWizardStep2
    JFileChooser chooser = new JFileChooser();
    JTextField rawFile;
    JTextField scoreFile;
+   
+   private JTextField jTextFieldScoreCol;
 
    public AnalysisWizardStep2( AnalysisWizard wiz, Settings settings ) {
       super( wiz );
@@ -49,6 +52,7 @@ public class AnalysisWizardStep2
       JButton rawBrowseButton = new JButton();
       JPanel jPanel8 = new JPanel();
       JLabel jLabel2 = new JLabel();
+      JLabel jLabel10 = new JLabel();
       scoreFile = new JTextField();
       JButton scoreBrowseButton = new JButton();
 
@@ -67,11 +71,26 @@ public class AnalysisWizardStep2
       jPanel11.add( rawFile, null );
       jPanel11.add( rawBrowseButton, null );
       step2Panel.add(jPanel8, null);
-      jPanel8.setPreferredSize(new Dimension(380, 50) );
+      jPanel8.setPreferredSize(new Dimension(490, 50) );
       jLabel2.setText( "Gene score file (optional for correlation score):" );
       jLabel2.setPreferredSize(new Dimension(370, 15) );
       scoreFile.setPreferredSize(new Dimension(280, 19) );
       scoreFile.setMinimumSize( new Dimension( 4, 19 ) );
+      
+      // choose the column the scores are in.
+      jTextFieldScoreCol = new JTextField();
+      jLabel10.setMaximumSize( new Dimension( 39, 15 ) );
+      jLabel10.setMinimumSize( new Dimension( 76, 15 ) );
+      jLabel10.setLabelFor( jTextFieldScoreCol );
+      jLabel10.setText( "Score column" );
+      jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.RIGHT );
+      jTextFieldScoreCol.setText( "2" );
+      jTextFieldScoreCol
+            .setToolTipText( "Column of the gene score file containing the scores. This must be a value of 2 or higher." );
+      jTextFieldScoreCol.setPreferredSize( new Dimension( 30, 19 ) );
+      jTextFieldScoreCol.setEditable( true );
+     
+      
       scoreBrowseButton.setEnabled( true );
       scoreBrowseButton.setText( "Browse...." );
       scoreBrowseButton.addActionListener( new
@@ -79,6 +98,9 @@ public class AnalysisWizardStep2
       jPanel8.add( jLabel2, null );
       jPanel8.add( scoreFile, null );
       jPanel8.add( scoreBrowseButton, null );
+      jPanel8.add( jLabel10, null );
+      jPanel8.add( jTextFieldScoreCol, null );
+      
       step2Panel.add(jPanel11, null);
 
       //this.add( step2Panel );
@@ -92,14 +114,22 @@ public class AnalysisWizardStep2
    }
 
    public boolean isReady() {
-      if ( wiz.getAnalysisType() == 2 && rawFile.getText().compareTo( "" ) == 0 ) {
-         GuiUtil.error( "Correlation analyses require a raw data file." );
+      if ( wiz.getAnalysisType() == Settings.CORR && rawFile.getText().compareTo( "" ) == 0 ) {
+         wiz.showError( "Correlation analyses require a raw data file." );
          return false;
-      } else if ( ( wiz.getAnalysisType() == 0 || wiz.getAnalysisType() == 1 ) &&
+      } else if ( ( wiz.getAnalysisType() == Settings.RESAMP || wiz.getAnalysisType() == Settings.ORA ) &&
                   scoreFile.getText().compareTo( "" ) == 0 ) {
-         GuiUtil.error( "ORA and resampling analyses require a gene score file." );
+         wiz.showError( "ORA and resampling analyses require a gene score file." );
          return false;
       } 
+      
+      if ( (wiz.getAnalysisType() == 0  || wiz.getAnalysisType() == 1) && 
+            Integer.valueOf( jTextFieldScoreCol.getText() )
+            .intValue() < 2 ) {
+         wiz.showError("The score column must be 2 or higher");
+         // @todo test that the score column exists.
+         return false;
+      }
       
       if (rawFile.getText().compareTo( "" ) != 0 && ! GuiUtil.testFile(rawFile.getText())) {
          return false;
@@ -129,11 +159,14 @@ public class AnalysisWizardStep2
    }
 
    void setValues() {
+      jTextFieldScoreCol.setText( String.valueOf( settings.getScorecol() ) );
       scoreFile.setText( settings.getScoreFile() );
       rawFile.setText( settings.getRawFile() );
    }
 
    public void saveValues(){
+      settings.setScorecol( Integer.valueOf( jTextFieldScoreCol.getText() )
+            .intValue() );
       settings.setScoreFile(scoreFile.getText());
       settings.setRawFile(rawFile.getText());
    }
