@@ -2,10 +2,12 @@
 // To make the help jar:
 maven help
 
-// To make the Windows installer
+// To make the Windows installer - this only works under windows, you have to have NSIS installed.
 maven nsis
 // [ for the jre version ]
 maven nsis-jre 
+
+// scp the above files, which will be target/ermineJ-setup.exe and target/ermineJ-setup-jre.exe onto microarray in /proj/projectpages/ermineJ/distributions
 
 
 // to make generic distribution for installation
@@ -16,13 +18,17 @@ maven dist:build-src
 
 // to make the jnlp setup. Note that we are still using the help.jnlp which was hand-coded. The 1.4 jnlp plugin had to be 
 // modified to include the extension element.
-// maven jnlp:generate-keystore // only needs to be done once.
+// maven jnlp:generate-keystore // only needs to be done once. 
 maven jnlp
+
+// DO NOT copy the ermineJ.jnlp file that is generated onto the web
+server. That file has to be fixed by hand to make the ermineJ jar file
+version current.
+
 
 // deploy the builds to the web site (must be able to ssh to the site)
 
 scp target/jnlp/*.jar microarray:/proj/projectpages/ermineJ/webstart
-
 scp target/distributions/* microarray:/proj/projectpages/ermineJ/distributions
 
 scp -r web/* microarray:/proj/projectpages/ermineJ
