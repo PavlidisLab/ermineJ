@@ -8,12 +8,15 @@ maven nsis
 maven nsis-jre 
 
 
+// to make generic distribution for installation
+maven build-install
+
 // to make the source distribtion
 maven dist:build-src
 
 // to make the jnlp setup. Note that we are still using the help.jnlp which was hand-coded. The 1.4 jnlp plugin had to be 
 // modified to include the extension element.
-maven jnlp:generate-keystore
+// maven jnlp:generate-keystore // only needs to be done once.
 maven jnlp
 
 // deploy the builds to the web site (must be able to ssh to the site)
@@ -23,3 +26,9 @@ scp target/jnlp/*.jar microarray:/proj/projectpages/ermineJ/webstart
 scp target/distributions/* microarray:/proj/projectpages/ermineJ/distributions
 
 scp -r web/* microarray:/proj/projectpages/ermineJ
+
+
+// to set up the distribution use build-install and then
+
+scp target/*.tar.gz microarray:/proj/projectpages/ermineJ/distributions
+scp target/*.zip microarray:/proj/projectpages/ermineJ/distributions

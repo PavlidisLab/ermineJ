@@ -46,6 +46,7 @@ public class HelpHelper {
          return true;
       }
       //   GuiUtil.error( "Couldn't load help" );
+      System.err.println("Couldn't load help");
       return false;
 
    }

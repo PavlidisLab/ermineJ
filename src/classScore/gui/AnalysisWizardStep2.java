@@ -49,16 +49,15 @@ public class AnalysisWizardStep2 extends WizardStep {
       JPanel step2Panel = new JPanel();
       step2Panel.setPreferredSize( new Dimension( 380, 250 ) );
 
-      JPanel jPanel2 = new JPanel(); // holds everything...
       //    choose the score file
       JPanel jPanel8 = new JPanel();
-      jPanel8.setPreferredSize(new Dimension(380, 80) );
+      jPanel8.setPreferredSize(new Dimension(380, 100) );
       JLabel jLabel2 = new JLabel();
       jLabel2.setText( "Gene score file (optional for correlation score):" );
-  //    jLabel2.setPreferredSize( new Dimension( 370, 15 ) );
+      jLabel2.setPreferredSize( new Dimension( 370, 15 ) );
       JButton scoreBrowseButton = new JButton();
       scoreBrowseButton.setEnabled( true );
-      scoreBrowseButton.setText( "Browse...." );
+      scoreBrowseButton.setText( "Browse..." );
       scoreBrowseButton
             .addActionListener( new AnalysisWizardStep2_scoreBrowseButton_actionAdapter(
                   this ) );
@@ -73,7 +72,7 @@ public class AnalysisWizardStep2 extends WizardStep {
       jPanel1.setPreferredSize(new Dimension(111, 50));
       jTextFieldScoreCol = new JTextField();
       JLabel jLabel10 = new JLabel();
-      jLabel10.setPreferredSize( new Dimension( 76, 15 ) );
+      jLabel10.setPreferredSize( new Dimension( 100, 15 ) );
       jLabel10.setLabelFor( jTextFieldScoreCol );
       jLabel10.setText( "Score column" );
       jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.RIGHT );
@@ -82,41 +81,34 @@ public class AnalysisWizardStep2 extends WizardStep {
             .setToolTipText( "Column of the gene score file containing the scores. This must be a value of 2 or higher." );
       jTextFieldScoreCol.setPreferredSize( new Dimension( 30, 19 ) );
       jTextFieldScoreCol.setEditable( true );
-//      JPanel jPanel23 = new JPanel();
-//      jPanel23.setPreferredSize(new Dimension(120, 18));
-//      jPanel1.add(jPanel23, null);
+
       jPanel1.add(jLabel10, null);
       jPanel1.add(jTextFieldScoreCol, null);
 
-      jPanel2.add(jPanel8, null);
-      jPanel2.add(jPanel1, null);
-
-      JPanel jPanel4 = new JPanel();
+      // Raw data file.
       JPanel jPanel11 = new JPanel();
-      jPanel11.setPreferredSize(new Dimension(380, 80) );
+      jPanel11.setPreferredSize(new Dimension(380, 100) );
       JLabel jLabel3 = new JLabel();
       jLabel3.setText( "Raw data file (optional for ORA or resampling):" );
- //     jLabel3.setPreferredSize( new Dimension( 370, 15 ) );
+      jLabel3.setPreferredSize( new Dimension( 370, 15 ) );
       rawFile = new JTextField();
       rawFile.setPreferredSize( new Dimension( 230, 19 ) );
-      rawFile.setMinimumSize( new Dimension( 4, 19 ) );
       JButton rawBrowseButton = new JButton();
       rawBrowseButton.setEnabled( true );
       rawBrowseButton
             .addActionListener( new AnalysisWizardStep2_rawBrowseButton_actionAdapter(
                   this ) );
-      rawBrowseButton.setText( "Browse...." );
+      rawBrowseButton.setText( "Browse..." );
       jPanel11.add( jLabel3, null );
       jPanel11.add( rawFile, null );
       jPanel11.add( rawBrowseButton, null );
-      JPanel jPanel3 = new JPanel();
-      jPanel3.setPreferredSize(new Dimension(111, 30));
 
-      jPanel4.add(jPanel11, null);
-      jPanel4.add(jPanel3, null);
+      JPanel jPanel2 = new JPanel();
+      jPanel2.add(jPanel8, null);
+      jPanel2.add(jPanel1, null);
 
       step2Panel.add(jPanel2, null);
-      step2Panel.add(jPanel4, null);
+      step2Panel.add(jPanel11, null);
 
       this
             .addHelp( "<html><b>Choose the data files to use</b><br>"

@@ -154,13 +154,15 @@
                 </includes>
                 <filtering>false</filtering>
             </resource>
-            <resource>
+<!--            <resource>
                 <directory>${basedir}</directory>
                 <includes>
                     <include>ermineJ-help.jar</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
+-->
+
         </resources>
     </build>
     <reports>

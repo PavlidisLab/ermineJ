@@ -348,6 +348,8 @@ public class GeneSetScoreFrame extends JFrame {
                      + "\nIf this problem persists, please contact the software developer. "
                      + "\nPress OK to quit." );
          System.exit( 1 );
+      } catch (Exception e ) {
+	  e.printStackTrace();
       }
       oPanel.addInitialData( goData );
       statusMessenger.setStatus( "Done with initialization." );
