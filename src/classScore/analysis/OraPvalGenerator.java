@@ -8,6 +8,7 @@ import java.util.Map;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 
+import cern.jet.math.Arithmetic;
 import cern.jet.stat.Probability;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
@@ -39,8 +40,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       this.inputSize = inputSize;
 
       if ( settings.getUseLog() ) {
-         this.geneScoreThreshold = -Math.log( settings.getPValThreshold() )
-               / Math.log( 10.0 );
+         this.geneScoreThreshold = -Arithmetic.log10( settings.getPValThreshold() );
       } else {
          this.geneScoreThreshold = settings.getPValThreshold();
       }
@@ -60,20 +60,16 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       //variables for outputs
       double hyper_pval = -1.0;
 
-      int effSize = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue(); // effective
-      // size
-      // of
-      // this
-      // class.
-      if ( effSize < settings.getMinClassSize()
-            || effSize > settings.getMaxClassSize() ) {
+      int effectiveGeneSetSize = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue(); 
+      if ( effectiveGeneSetSize < settings.getMinClassSize()
+            || effectiveGeneSetSize > settings.getMaxClassSize() ) {
          return null;
       }
 
       ArrayList values = ( ArrayList ) geneAnnots.getGeneSetToProbeMap().get(
             class_name );
       Iterator classit = values.iterator();
-      double[] groupPvalArr = new double[effSize]; // store pvalues for items in
+      double[] groupPvalArr = new double[effectiveGeneSetSize]; // store pvalues for items in
       // the class.
       Map record = new HashMap();
       int v_size = 0;
@@ -100,8 +96,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
                   double geneScore = groupPvalArr[v_size];
 
-                  if ( ( settings.upperTail() && geneScore >= geneScoreThreshold )
-                        || ( !settings.upperTail() && geneScore <= geneScoreThreshold ) ) {
+                  if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
                      successes++;
                   } else {
                      failures++;
@@ -120,8 +115,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                double score = pbpval.doubleValue();
 
                // hypergeometric pval info.
-               if ( ( settings.upperTail() && score >= geneScoreThreshold )
-                     || ( !settings.upperTail() && score <= geneScoreThreshold ) ) {
+               if (  scorePassesThreshold( score, geneScoreThreshold ) ) {
                   successes++;
                } else {
                   failures++;
@@ -136,7 +130,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       // (successes); numOverThreshold= number of genes which
       // meet criteria (trials); pos_prob: fractional size of
       // class wrt data size.
-      double pos_prob = ( double ) effSize / ( double ) inputSize;
+      double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
       double expected = numOverThreshold * pos_prob;
       // lower tail.
       if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
@@ -157,13 +151,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       // set up the return object.
       GeneSetResult res = new GeneSetResult( class_name, goName
             .getNameForId( class_name ), ( ( Integer ) actualSizes
-            .get( class_name ) ).intValue(), effSize );
+            .get( class_name ) ).intValue(), effectiveGeneSetSize );
       res.setScore( successes );
       res.setPValue( hyper_pval );
       return res;
 
    }
-
-   /* scoreClass */
 
 }

@@ -38,23 +38,13 @@ import baseCode.util.StatusViewer;
 public class classScoreCMD {
 
    private Settings settings;
-
    private StatusViewer statusMessenger;
-
    private GONames goData;
-
    private GeneAnnotations geneData;
-
- //  private LinkedList results = new LinkedList();
-
    private Map geneDataSets;
-
    private Map rawDataSets;
-
    private Map geneScoreSets;
-
    private String saveFileName = null;//"C:\\Documents and Settings\\hkl7\\ermineJ.data\\outout.txt";
-
    private boolean commandline = true;
 
    public classScoreCMD( String[] args ) {
@@ -99,7 +89,7 @@ public class classScoreCMD {
       longopts[3] = new LongOpt( "save", LongOpt.NO_ARGUMENT, null, 'S' );
       longopts[4] = new LongOpt( "mtc", LongOpt.REQUIRED_ARGUMENT, null, 'M' );
       Getopt g = new Getopt( "classScoreCMD", args,
-            "a:c:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CGS:M:", longopts );
+            "a:bc:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CGS:M:", longopts );
       int c;
       String arg;
       int intarg;
@@ -114,6 +104,9 @@ public class classScoreCMD {
                   System.err.println( "Invalid annotation file name (-a)" );
                   showHelp();
                }
+               break;
+            case 'b': // bigger is better
+               settings.setBigIsBetter( true );
                break;
             case 'c': //classfile
                arg = g.getOptarg();
@@ -353,7 +346,7 @@ public class classScoreCMD {
                arg = g.getOptarg();
                int mtc = Integer.parseInt( arg );
                settings.setMtc( mtc );
-               System.err.println("Got " + mtc);
+               System.err.println( "Got " + mtc );
                break;
             case 'G': //GUI
                commandline = false;
@@ -391,22 +384,31 @@ public class classScoreCMD {
                   + "\t\tSets the class folder to be used.\n\n"
                   + "\t-g int ...\n"
                   + "\t\tSets the gene replicant treatment:  "
-                  + Settings.BEST_PVAL + " (best gene score used) or  "
-                  + Settings.MEAN_PVAL + " (mean gene score used).\n\n"
-                  + "\t-h or --help\n" + "\t\tShows help.\n\n"
-                  + "\t-i int ...\n" + "\t\tSets the number of iterations.\n\n"
+                  + Settings.BEST_PVAL
+                  + " (best gene score used) or  "
+                  + Settings.MEAN_PVAL
+                  + " (mean gene score used).\n\n"
+                  + "\t-b Sets 'big is better' option for gene scores (default is "
+                  + settings.getBigIsBetter() + ").\n\n" + "\t-h or --help\n"
+                  + "\t\tShows help.\n\n" + "\t-i int ...\n"
+                  + "\t\tSets the number of iterations.\n\n"
                   + "\t-l {0/1} ...\n"
-                  + "\t\tSets whether or not to take logs.\n\n"
-                  + "\t-m int ...\n" + "\t\tSets the raw score method:  "
-                  + Settings.MEAN_METHOD + " (mean),  "
-                  + Settings.QUANTILE_METHOD + " (quantile), or  "
-                  + Settings.MEAN_ABOVE_QUANTILE_METHOD
+                  + "\t\tSets whether or not to take logs (default is "
+                  + settings.getDoLog() + ").\n\n" + "\t-m int ...\n"
+                  + "\t\tSets the raw score method:  " + Settings.MEAN_METHOD
+                  + " (mean),  " + Settings.QUANTILE_METHOD
+                  + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
                   + " (mean above quantile).\n\n" + "\t-n int ...\n"
                   + "\t\tSets the analysis method:  " + Settings.ORA
                   + " (ORA),  " + Settings.RESAMP
                   + " (resampling of gene scores),  " + Settings.CORR
-                  + " (profile correlation), or  " + Settings.ROC
-                  + " (ROC)\n\n" + "\t-o file ...\n"
+                  + " (profile correlation),  " + Settings.ROC
+                  + " (ROC), "
+                  + Settings.TTEST + " (T-test), "
+                  + Settings.KS + " (Kolmogorov-Smirnov test)"
+                  +
+                        "[not all methods may be implemented]\n\n" 
+                  + "\t-o file ...\n"
                   + "\t\tSets the output file.\n\n" + "\t-q int ...\n"
                   + "\t\tSets the quantile.\n\n" + "\t-r file ...\n"
                   + "\t\tSets the raw file to be used.\n\n" + "\t-s file ...\n"
@@ -468,7 +470,8 @@ public class classScoreCMD {
    }
 
    /**
-    * @return @throws IOException
+    * @return
+    * @throws IOException
     */
    GeneSetPvalRun analyze() throws IOException {
       DenseDoubleMatrix2DNamed rawData = null;
@@ -496,7 +499,8 @@ public class classScoreCMD {
          statusMessenger.setStatus( "Reading gene scores from file "
                + settings.getScoreFile() );
          geneScores = new GeneScoreReader( settings.getScoreFile(), settings,
-               statusMessenger, geneData.getGeneToProbeList(), geneData.getProbeToGeneMap() );
+               statusMessenger, geneData.getGeneToProbeList(), geneData
+                     .getProbeToGeneMap() );
          geneScoreSets.put( settings.getScoreFile(), geneScores );
       }
 

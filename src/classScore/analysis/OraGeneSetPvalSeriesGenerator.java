@@ -79,68 +79,27 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     * @param inp_entries The pvalues for the probes (no weights) or groups (weights)
     * @todo make this private and called by OraPvalGenerator.
     */
-   public void hgSizes( Collection inp_entries ) {
+   public int hgSizes( Collection inp_entries ) {
 
       double geneScoreThreshold = settings.getPValThreshold();
-
-     // if ( settings.getDoLog() ) {
-     //    geneScoreThreshold = -Math.log( geneScoreThreshold ) / Math.log( 10.0 );
-    //  }
 
       Iterator itr = inp_entries.iterator();
       while ( itr.hasNext() ) {
          Map.Entry m = ( Map.Entry ) itr.next();
          double geneScore = ( ( Double ) m.getValue() ).doubleValue();
-         // why
-         // parsing?
-         
-         if (settings.getDoLog() ) {
-            geneScore = Math.pow(10, -geneScore);
+
+         if ( settings.getDoLog() ) {
+            geneScore = Math.pow( 10, -geneScore );
          }
 
-         if ( ( settings.getBigIsBetter() && geneScore >= geneScoreThreshold )
-               || ( !settings.getBigIsBetter() && geneScore <= geneScoreThreshold ) ) {
+         if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
             numOverThreshold++;
          } else {
             numUnderThreshold++;
          }
 
       }
-      System.err.println( numOverThreshold + " genes pass your threshold "
-            + geneScoreThreshold );
+      return numOverThreshold;
    }
 
-   /**
-    * Same thing as class_pval_generator, but returns a collection of scores (pvalues) (see below) instead of adding
-    * them to the results object. This is used to get class pvalues for permutation analysis.
-    */
-   //      public HashMap class_v_pval_generator( Map group_pval_map, Map
-   // probesToPvals ) {
-   //         Collection entries = geneAnnots.getClassToProbeMap().entrySet(); // go ->
-   // probe map. Entries
-   //         // are the class names.
-   //         Iterator it = entries.iterator(); // the classes.
-   //         // Vector results = new Vector();
-   //         HashMap results = new HashMap();
-   //
-   //         OraPvalGenerator cpv = new OraPvalGenerator(
-   //               settings, geneAnnots, csc, goName, numOverThreshold, numUnderThreshold,
-   // probePvalMapper );
-   //
-   //         // For each class.
-   //         while ( it.hasNext() ) {
-   //            Map.Entry e = ( Map.Entry ) it.next();
-   //            String class_name = ( String ) e.getKey();
-   //            double pval = cpv.classPvalue( class_name, group_pval_map,
-   //                  probesToPvals );
-   //
-   //            if ( pval >= 0.0 ) {
-   //               results.put( class_name, new Double( pval ) );
-   //
-   //            }
-   //         }
-   //         return results;
-   //      }
-   //
-   //   }
 }

@@ -55,7 +55,9 @@ public class Settings {
    public static final int RESAMP = 1;
    public static final int CORR = 2;
    public static final int ROC = 3;
-
+   public static final int TTEST = 4;
+   public static final int KS = 5;
+   
    public static final int BONFERONNI = 0;
    public static final int WESTFALLYOUNG = 1;
    public static final int BENJAMINIHOCHBERG = 2;

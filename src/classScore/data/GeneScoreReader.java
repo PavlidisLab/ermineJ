@@ -2,9 +2,9 @@ package classScore.data;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -18,7 +18,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import baseCode.util.FileTools;
 import baseCode.util.StatusViewer;
+import cern.jet.math.Arithmetic;
 import classScore.Settings;
 
 /**
@@ -26,13 +28,17 @@ import classScore.Settings;
  * 
  * <pre>
  * 
- *                probe_id[tab]pval
+ *  
+ *  
+ *                     probe_id[tab]pval
+ *  
+ *   
  *  
  * </pre>
  * 
  * <p>
  * The values are stored in a Map probeToPvalMap. This is used to see what probes are int the data set, as well as the
- * score for each probe. Created :09/02/02
+ * score for each probe.
  * </p>
  * 
  * @author Shahmil Merchant
@@ -50,27 +56,44 @@ public class GeneScoreReader {
    private Map geneToPvalMap;
 
    /**
+    * @throws IOException
     * @param filename
     * @param settings
-    * @param messenger
-    * @param groupToProbeMap
-    * @throws IOException
+    * @param StatusViewer messenger
+    * @param geneToProbeMap
+    * @param probeToGeneMap
     */
    public GeneScoreReader( String filename, Settings settings,
          StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
          throws IOException {
+      this();
+      FileTools.checkPathIsReadableFile( filename );
+      InputStream is = new FileInputStream( filename );
+      read( is, settings, messenger, geneToProbeMap, probeToGeneMap );
+   }
 
+   /**
+    * @param is - input stream
+    * @param settings
+    * @param messenger
+    * @param groupToProbeMap
+    * @param probeToGeneMap
+    * @throws IOException
+    */
+   public GeneScoreReader( InputStream is, Settings settings,
+         StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
+         throws IOException {
+      read( is, settings, messenger, geneToProbeMap, probeToGeneMap );
+   }
+
+   private GeneScoreReader() {
       geneToPvalMap = new HashMap();
-      double log10 = Math.log( 10 );
-      boolean invalidLog = false;
-      boolean unknownProbe = false;
-      boolean invalidNumber = false;
-      String badNumberString = "";
+      probeToPvalMap = new LinkedHashMap();
+   }
 
-      File infile = new File( filename );
-      if ( !infile.exists() || !infile.canRead() ) {
-         throw new IOException( "Could not read " + filename );
-      }
+   private void read( InputStream is, Settings settings,
+         StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
+         throws IOException {
 
       if ( settings.getScorecol() < 2 ) {
          throw new IllegalArgumentException( "Illegal column number "
@@ -83,10 +106,12 @@ public class GeneScoreReader {
       }
 
       BufferedReader dis = new BufferedReader( new InputStreamReader(
-            new BufferedInputStream( new FileInputStream( filename ) ) ) );
-
+            new BufferedInputStream( is ) ) );
       String row;
-      probeToPvalMap = new LinkedHashMap();
+      boolean invalidLog = false;
+      boolean unknownProbe = false;
+      boolean invalidNumber = false;
+      String badNumberString = "";
       Vector rows = new Vector();
       while ( ( row = dis.readLine() ) != null ) {
          StringTokenizer st = new StringTokenizer( row, "\t" );
@@ -142,7 +167,7 @@ public class GeneScoreReader {
          }
 
          if ( settings.getDoLog() ) {
-            probePvalues[i - 1] = -( Math.log( probePvalues[i - 1] ) / log10 );
+            probePvalues[i - 1] = -Arithmetic.log10( probePvalues[i - 1] );
          }
 
          // only keep probes that are in our array platform.
@@ -270,7 +295,7 @@ public class GeneScoreReader {
                   break;
                }
                case Settings.BEST_PVAL: {
-                  if (settings.upperTail() ) {
+                  if ( settings.upperTail() ) {
                      group_pval_temp[counter] = Math.max( pbPval,
                            group_pval_temp[counter] );
                   } else {
@@ -316,7 +341,7 @@ public class GeneScoreReader {
 
    /**
     */
-   public String[] get_probe_ids() {
+   public String[] getProbeIds() {
       return probeIDs;
    }
 
@@ -332,7 +357,7 @@ public class GeneScoreReader {
 
    /**
     */
-   public int get_numpvals() {
+   public int getNumGeneScores() {
       return num_pvals;
    }
 
@@ -377,9 +402,12 @@ public class GeneScoreReader {
       return geneToPvalMap;
    }
 
-   /**
-    */
-   public double get_value_map( String probe_id ) {
+  /**
+   * 
+   * @param probe_id
+   * @return
+   */
+   public double getValueMap( String probe_id ) {
       double value = 0.0;
 
       if ( probeToPvalMap.get( probe_id ) != null ) {

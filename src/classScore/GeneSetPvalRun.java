@@ -165,11 +165,11 @@ public class GeneSetPvalRun {
 
             OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator(
                   settings, geneData, csc, goData, inputSize );
-            pvg.hgSizes( inp_entries );
+            int numOver  = pvg.hgSizes( inp_entries );
             pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores
                   .getProbeToPvalMap() );
             results = pvg.getResults();
-            messenger.setStatus( "Finished with ORA computations" );
+            messenger.setStatus( "Finished with ORA computations: " + numOver + " probes passed your threshold." );
             break;
          }
          case Settings.CORR: {
@@ -199,6 +199,16 @@ public class GeneSetPvalRun {
             //            }
             // fall through. - unsupported.
          }
+         
+         case Settings.TTEST: {
+            
+         }
+         
+         case Settings.KS: {
+            
+         }
+         
+         
          default: {
             throw new UnsupportedOperationException(
                   "Unsupported analysis method" );
