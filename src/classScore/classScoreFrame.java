@@ -267,12 +267,12 @@ public class classScoreFrame
                                                 messenger );
 
          //cPanel.setModel(imaps.toTableModel());
-         System.err.println( "DONE with RUNMAPS" );
+         System.out.println( "DONE with RUNMAPS" );
          classPvalRun runResult = new classPvalRun( settings, runmaps, outputfile,
              useWeights, "bh", messenger,
              loadResults );
 
-         System.err.println( "DONE with CLASSPVALRUN" );
+         System.out.println( "DONE with CLASSPVALRUN" );
 
          resultpanel = new ResultPanel( runResult, settings );
          resultpanel.setModel( runResult.toTableModel() );
@@ -307,7 +307,7 @@ public class classScoreFrame
          Thread.currentThread().interrupt();
       }
       showStatus( "Ready" );
-      System.err.println( "Ready" );
+      System.out.println( "Ready" );
    }
 
    /**
@@ -357,7 +357,6 @@ public class classScoreFrame
             while ( dis.ready() ) {
                String line = dis.readLine();
                fileList.add( line );
-               //         System.err.println(line);
             }
             dis.close();
          }

@@ -30,7 +30,7 @@ public class ClassMap {
 
    /**
     */
-   public ClassMap(Map probeToClassMap, Map classToProbeMap) {
+   public ClassMap( Map probeToClassMap, Map classToProbeMap ) {
 
       this.probeToClassMap = probeToClassMap;
       this.classToProbeMap = classToProbeMap;
@@ -55,7 +55,7 @@ public class ClassMap {
       Typically what happens is one class will be contained in
       another.
     */
-   private void ignoreSimilar(double fractionSameThreshold) {
+   private void ignoreSimilar( double fractionSameThreshold ) {
       Set entries = classToProbeMap.keySet();
       Iterator it = entries.iterator();
       String queryClassId = "";
@@ -66,92 +66,92 @@ public class ClassMap {
       HashMap seenit = new HashMap();
       ArrayList deleteUs = new ArrayList();
 
-      System.err.println("...Highly (" + fractionSameThreshold * 100 +
-                         "%)  similar classes are being removed...");
+      System.out.println( "...Highly (" + fractionSameThreshold * 100 +
+                          "%)  similar classes are being removed..." );
 
-      while (it.hasNext()) {
-         queryClassId = (String) it.next();
-         ArrayList queryClass = (ArrayList) classToProbeMap.get(queryClassId);
+      while ( it.hasNext() ) {
+         queryClassId = ( String ) it.next();
+         ArrayList queryClass = ( ArrayList ) classToProbeMap.get( queryClassId );
 
          sizeQuery = queryClass.size();
-         if (sizeQuery > 250 || sizeQuery < 5) {
+         if ( sizeQuery > 250 || sizeQuery < 5 ) {
             continue;
          }
 
          Iterator itb = entries.iterator();
-         while (itb.hasNext()) {
-            targetClassId = (String) itb.next();
+         while ( itb.hasNext() ) {
+            targetClassId = ( String ) itb.next();
 
             /* skip self comparisons and also symmetric comparisons. The latter half  */
-            if (seenit.containsKey(targetClassId) ||
-                targetClassId.equals(queryClassId)) {
+            if ( seenit.containsKey( targetClassId ) ||
+                 targetClassId.equals( queryClassId ) ) {
                continue;
             }
 
-            ArrayList targetClass = (ArrayList) classToProbeMap.get(
-                    targetClassId);
+            ArrayList targetClass = ( ArrayList ) classToProbeMap.get(
+                targetClassId );
 
             sizeTarget = targetClass.size();
-            if (sizeTarget > 250 || sizeTarget < 2) {
+            if ( sizeTarget > 250 || sizeTarget < 2 ) {
                continue;
             }
 
-            //		System.err.println("Comparing " + targetClassId + " to " + queryClassId );
+            //		System.out.println("Comparing " + targetClassId + " to " + queryClassId );
 
-            if (sizeTarget < sizeQuery) {
+            if ( sizeTarget < sizeQuery ) {
 
-               if ((double) sizeTarget / sizeQuery < fractionSameThreshold) {
+               if ( ( double ) sizeTarget / sizeQuery < fractionSameThreshold ) {
                   continue;
                }
 
-               if (areSimilarClasses(sizeQuery, sizeTarget, queryClass,
-                                     targetClass,
-                                     fractionSameThreshold)) {
-                  deleteUs.add(targetClassId);
+               if ( areSimilarClasses( sizeQuery, sizeTarget, queryClass,
+                                       targetClass,
+                                       fractionSameThreshold ) ) {
+                  deleteUs.add( targetClassId );
 
-                  //			System.err.println(targetClassId + " and " + queryClassId + " are similar (target is smaller and will be ignored)");
+                  //			System.out.println(targetClassId + " and " + queryClassId + " are similar (target is smaller and will be ignored)");
 
-                  if (!classesToSimilarMap.containsKey(queryClassId)) {
-                     classesToSimilarMap.put(queryClassId, new ArrayList());
+                  if ( !classesToSimilarMap.containsKey( queryClassId ) ) {
+                     classesToSimilarMap.put( queryClassId, new ArrayList() );
                   }
-                  if (!classesToSimilarMap.containsKey(targetClassId)) {
-                     classesToSimilarMap.put(targetClassId, new ArrayList());
+                  if ( !classesToSimilarMap.containsKey( targetClassId ) ) {
+                     classesToSimilarMap.put( targetClassId, new ArrayList() );
 
                   }
-                  ((ArrayList) classesToSimilarMap.get(queryClassId)).add(
-                          targetClassId);
-                  ((ArrayList) classesToSimilarMap.get(targetClassId)).add(
-                          queryClassId);
+                  ( ( ArrayList ) classesToSimilarMap.get( queryClassId ) ).add(
+                      targetClassId );
+                  ( ( ArrayList ) classesToSimilarMap.get( targetClassId ) ).add(
+                      queryClassId );
 
                }
 
             } else {
 
-               if ((double) sizeQuery / sizeTarget < fractionSameThreshold) {
+               if ( ( double ) sizeQuery / sizeTarget < fractionSameThreshold ) {
                   continue;
                }
 
-               if (areSimilarClasses(sizeTarget, sizeQuery, targetClass,
-                                     queryClass,
-                                     fractionSameThreshold)) {
+               if ( areSimilarClasses( sizeTarget, sizeQuery, targetClass,
+                                       queryClass,
+                                       fractionSameThreshold ) ) {
 
-                  //			System.err.println(targetClassId + " and " + queryClassId + " are similar (query is smaller and will be ignored)");
+                  //			System.out.println(targetClassId + " and " + queryClassId + " are similar (query is smaller and will be ignored)");
 
                   queryClassId = targetClassId;
                   queryClass = targetClass;
-                  deleteUs.add(queryClassId);
+                  deleteUs.add( queryClassId );
 
-                  if (!classesToSimilarMap.containsKey(targetClassId)) {
-                     classesToSimilarMap.put(targetClassId, new ArrayList());
+                  if ( !classesToSimilarMap.containsKey( targetClassId ) ) {
+                     classesToSimilarMap.put( targetClassId, new ArrayList() );
                   }
-                  if (!classesToSimilarMap.containsKey(queryClassId)) {
-                     classesToSimilarMap.put(queryClassId, new ArrayList());
+                  if ( !classesToSimilarMap.containsKey( queryClassId ) ) {
+                     classesToSimilarMap.put( queryClassId, new ArrayList() );
 
                   }
-                  ((ArrayList) classesToSimilarMap.get(queryClassId)).add(
-                          targetClassId);
-                  ((ArrayList) classesToSimilarMap.get(targetClassId)).add(
-                          queryClassId);
+                  ( ( ArrayList ) classesToSimilarMap.get( queryClassId ) ).add(
+                      targetClassId );
+                  ( ( ArrayList ) classesToSimilarMap.get( targetClassId ) ).add(
+                      queryClassId );
 
                   break; // cant/dont test this query any more!
                }
@@ -160,20 +160,20 @@ public class ClassMap {
 
          }
          /* inner while */
-         seenit.put(queryClassId, new Boolean(true));
+         seenit.put( queryClassId, new Boolean( true ) );
       }
       /* end while ... */
 
       /* remove the ones we don't want to keep */
       Iterator itrd = deleteUs.iterator();
-      while (itrd.hasNext()) {
-         String deleteMe = (String) itrd.next();
-         classToProbeMap.remove(deleteMe);
+      while ( itrd.hasNext() ) {
+         String deleteMe = ( String ) itrd.next();
+         classToProbeMap.remove( deleteMe );
       }
 
-      System.err.println("There are now " + classToProbeMap.size() +
-                         " classes represented on the chip (" + deleteUs.size() +
-                         " were ignored)");
+      System.out.println( "There are now " + classToProbeMap.size() +
+                          " classes represented on the chip (" + deleteUs.size() +
+                          " were ignored)" );
 
    }
 
@@ -182,33 +182,33 @@ public class ClassMap {
    /**
       Helper function for ignoreSimilar.
     */
-   private boolean areSimilarClasses(int biggersize, int smallersize,
-                                     ArrayList biggerClass,
-                                     ArrayList smallerClass,
-                                     double fractionSameThreshold) {
+   private boolean areSimilarClasses( int biggersize, int smallersize,
+                                      ArrayList biggerClass,
+                                      ArrayList smallerClass,
+                                      double fractionSameThreshold ) {
 
-      if (biggersize < smallersize) {
-         System.err.println("Invalid sizes");
-         System.exit(1);
+      if ( biggersize < smallersize ) {
+         System.err.println( "Invalid sizes" );
+         System.exit( 1 );
       }
 
       /* iterate over the members of the larger class. If the member
        * is not in the smaller class, increment a counter. If this
        * count goes over the maximum allowed missing, return
        * false. */
-      int maxmissing = (int) ((1.0 - fractionSameThreshold) *
-                              (double) biggersize);
+      int maxmissing = ( int ) ( ( 1.0 - fractionSameThreshold ) *
+                                 ( double ) biggersize );
 
       int notin = 0;
       Iterator ita = biggerClass.iterator();
-      while (ita.hasNext()) {
-         String probe = (String) ita.next();
+      while ( ita.hasNext() ) {
+         String probe = ( String ) ita.next();
 
-         if (!smallerClass.contains(probe)) { // using arraylists here searches are not optimally fast.
+         if ( !smallerClass.contains( probe ) ) { // using arraylists here searches are not optimally fast.
             notin++;
 
          }
-         if (notin > maxmissing) {
+         if ( notin > maxmissing ) {
             return false;
          }
       }
@@ -234,14 +234,14 @@ public class ClassMap {
       String classId = "";
       HashMap seenit = new HashMap();
 
-      System.err.println("There are " + entries.size() +
-                         " classes represented on the chip (of any size). Redundant classes are being removed...");
+      System.out.println( "There are " + entries.size() +
+                          " classes represented on the chip (of any size). Redundant classes are being removed..." );
 
       // sort each arraylist in for each go and create a string that is a signature for this class.
       int ignored = 0;
-      while (it.hasNext()) {
-         classId = (String) it.next();
-         ArrayList classMembers = (ArrayList) classToProbeMap.get(classId);
+      while ( it.hasNext() ) {
+         classId = ( String ) it.next();
+         ArrayList classMembers = ( ArrayList ) classToProbeMap.get( classId );
 
          // skip classes that are huge. It's too slow
          // otherwise. This is a total heuristic. Note that this
@@ -250,46 +250,46 @@ public class ClassMap {
          // classes are less likely to be identical to others,
          // anyway. In tests, the range shown below has no effect
          // on the results, but it _could_ matter.
-         if (classMembers.size() > 250 || classMembers.size() < 2) {
+         if ( classMembers.size() > 250 || classMembers.size() < 2 ) {
             ignored++;
             continue;
          }
 
-         Collections.sort(classMembers);
+         Collections.sort( classMembers );
          signature = "";
          Iterator classit = classMembers.iterator();
          seenit.clear();
-         while (classit.hasNext()) {
-            String probeid = (String) classit.next();
-            if (!seenit.containsKey(probeid)) {
+         while ( classit.hasNext() ) {
+            String probeid = ( String ) classit.next();
+            if ( !seenit.containsKey( probeid ) ) {
                signature = signature + "__" + probeid;
-               seenit.put(probeid, new Boolean(true));
+               seenit.put( probeid, new Boolean( true ) );
             }
          }
-         sigs.put(classId, signature);
+         sigs.put( classId, signature );
       }
 
       // look at the signatures for repeats.
       entries = sigs.keySet();
       Iterator nit = entries.iterator();
-      while (nit.hasNext()) {
-         classId = (String) nit.next();
-         signature = (String) sigs.get(classId);
+      while ( nit.hasNext() ) {
+         classId = ( String ) nit.next();
+         signature = ( String ) sigs.get( classId );
 
          // if the signature has already been seen, add it to the redundant list, and remove this class from the classToProbeMap.
-         if (seenClasses.containsKey(signature)) {
-            if (!classesToRedundantMap.containsKey(seenClasses.get(signature))) {
-               classesToRedundantMap.put(seenClasses.get(signature),
-                                         new ArrayList());
+         if ( seenClasses.containsKey( signature ) ) {
+            if ( !classesToRedundantMap.containsKey( seenClasses.get( signature ) ) ) {
+               classesToRedundantMap.put( seenClasses.get( signature ),
+                                          new ArrayList() );
 
             }
-            ((ArrayList) classesToRedundantMap.get(seenClasses.get(signature))).
-                    add(classId);
-            classToProbeMap.remove(classId);
+            ( ( ArrayList ) classesToRedundantMap.get( seenClasses.get( signature ) ) ).
+                add( classId );
+            classToProbeMap.remove( classId );
             //		System.err.println(classId + " is the same as an existing class, " + seenClasses.get(signature));
          } else {
             // add string to hash
-            seenClasses.put(signature, classId);
+            seenClasses.put( signature, classId );
          }
       }
 
@@ -302,18 +302,18 @@ public class ClassMap {
                   classToProbeMap.remove(considered_class);
             }
        */
-      System.err.println("There are now " + classToProbeMap.size() +
-                         " classes represented on the chip (" + ignored +
-                         " were ignored)");
+      System.out.println( "There are now " + classToProbeMap.size() +
+                          " classes represented on the chip (" + ignored +
+                          " were ignored)" );
 
    }
 
    /**
     */
-   public ArrayList getRedundancies(String classId) {
-      if (classesToRedundantMap != null &&
-          classesToRedundantMap.containsKey(classId)) {
-         return (ArrayList) classesToRedundantMap.get(classId);
+   public ArrayList getRedundancies( String classId ) {
+      if ( classesToRedundantMap != null &&
+           classesToRedundantMap.containsKey( classId ) ) {
+         return ( ArrayList ) classesToRedundantMap.get( classId );
       } else {
          return null;
       }
@@ -321,10 +321,10 @@ public class ClassMap {
 
    /**
     */
-   public ArrayList getSimilarities(String classId) {
-      if (classesToSimilarMap != null &&
-          classesToSimilarMap.containsKey(classId)) {
-         return (ArrayList) classesToSimilarMap.get(classId);
+   public ArrayList getSimilarities( String classId ) {
+      if ( classesToSimilarMap != null &&
+           classesToSimilarMap.containsKey( classId ) ) {
+         return ( ArrayList ) classesToSimilarMap.get( classId );
       } else {
          return null;
       }
@@ -332,13 +332,13 @@ public class ClassMap {
 
    /**
     */
-   public String getRedundanciesString(String classId) {
-      if (classesToRedundantMap != null &&
-          classesToRedundantMap.containsKey(classId)) {
-         ArrayList redundant = (ArrayList) classesToRedundantMap.get(classId);
+   public String getRedundanciesString( String classId ) {
+      if ( classesToRedundantMap != null &&
+           classesToRedundantMap.containsKey( classId ) ) {
+         ArrayList redundant = ( ArrayList ) classesToRedundantMap.get( classId );
          Iterator it = redundant.iterator();
          String returnValue = "";
-         while (it.hasNext()) {
+         while ( it.hasNext() ) {
             returnValue = returnValue + ", " + it.next();
          }
          return returnValue;
@@ -349,8 +349,8 @@ public class ClassMap {
 
    /**
     */
-   private ArrayList get_probe_value_map(String probe_id) {
-      return (ArrayList) (probeToClassMap.get(probe_id));
+   private ArrayList get_probe_value_map( String probe_id ) {
+      return ( ArrayList ) ( probeToClassMap.get( probe_id ) );
    }
 
    /**
@@ -367,19 +367,19 @@ public class ClassMap {
 
    /**
     */
-   public ArrayList getClassValueMap(String class_id) {
-      return (ArrayList) (classToProbeMap.get(class_id));
+   public ArrayList getClassValueMap( String class_id ) {
+      return ( ArrayList ) ( classToProbeMap.get( class_id ) );
    }
 
    /**
     */
-   public void print(Map m) {
+   public void print( Map m ) {
       //print the entire map
       Collection entries = m.entrySet();
       Iterator it = entries.iterator();
-      while (it.hasNext()) {
-         Map.Entry e = (Map.Entry) it.next();
-         System.out.println("Key = " + e.getKey() + ", Value = " + e.getValue());
+      while ( it.hasNext() ) {
+         Map.Entry e = ( Map.Entry ) it.next();
+         System.out.println( "Key = " + e.getKey() + ", Value = " + e.getValue() );
       }
    }
 
@@ -389,18 +389,18 @@ public class ClassMap {
       Set keys = classToProbeMap.keySet();
       HashSet removekeys = new HashSet();
       Iterator it = keys.iterator();
-      while (it.hasNext()) {
-         String geneclass = (String) it.next();
-         int size = ((ArrayList) classToProbeMap.get(geneclass)).size();
-         if (size < min || size > max) {
-            removekeys.add(geneclass);
+      while ( it.hasNext() ) {
+         String geneclass = ( String ) it.next();
+         int size = ( ( ArrayList ) classToProbeMap.get( geneclass ) ).size();
+         if ( size < min || size > max ) {
+            removekeys.add( geneclass );
          }
       }
 
       Iterator rit = removekeys.iterator();
-      while (rit.hasNext()) {
-         String geneclass = (String) rit.next();
-         classToProbeMap.remove(geneclass);
+      while ( rit.hasNext() ) {
+         String geneclass = ( String ) rit.next();
+         classToProbeMap.remove( geneclass );
       }
    }
 

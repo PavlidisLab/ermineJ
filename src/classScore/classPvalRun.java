@@ -202,7 +202,7 @@ public class classPvalRun {
          }
 
 //    messenger.setStatus(hist.toString());
-         System.err.println("Hist to string: " + hist.toString());
+         System.out.println("Hist to string: " + hist.toString());
 
          // Initialize the results data structure.
          results = new LinkedHashMap();
@@ -228,7 +228,7 @@ public class classPvalRun {
 
          // hgSizes(inp_entries); // get numOverThreshold and numUnderThreshold. Constant under permutations of the data.
 
-         System.err.println("Input size=" + inputSize + " numOverThreshold=" +
+         System.out.println("Input size=" + inputSize + " numOverThreshold=" +
                             numOverThreshold + " numUnderThreshold=" +
                             numUnderThreshold + " "); //+  + "" + foo + "" + foo + "" + foo + "" + foo );
 
@@ -355,7 +355,7 @@ public class classPvalRun {
               index));
       String name = res.getClassName();
       final String id = res.getClassId();
-      System.err.println(name);
+      System.out.println(name);
       final ArrayList values = (ArrayList) classToProbe.get(id);
 
       final Map pvals = new HashMap();
