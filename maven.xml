@@ -25,6 +25,7 @@
       </j:if>
     </j:forEach>
     <ant:copy todir="${installerDir}/lib" file="${maven.build.dir}/${maven.final.name}.jar" />
+    <ant:copy todir="${installerDir}/lib" file="${maven.build.dir}/classes/ermineJ-help.jar" />
 
     <ant:copy todir="${installerDir}/bin" file="${maven.src.dir}/bin/ermineJ.sh" />
     <ant:copy todir="${installerDir}/bin" file="${maven.src.dir}/bin/forehead.conf" />
