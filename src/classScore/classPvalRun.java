@@ -14,6 +14,7 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import classScore.details.JDetailsFrame;
 import classScore.analysis.ClassPvalSetGenerator;
 import classScore.analysis.ClassSizeComputer;
 import classScore.analysis.MultipleTestCorrector;
@@ -370,7 +371,7 @@ public class classPvalRun {
       }
 
       // create the details frame
-      ClassDetailFrame f = new ClassDetailFrame(
+      JDetailsFrame f = new JDetailsFrame(
          values, pvals, classToProbe, id, geneData, settings
          );
       f.setTitle(name + " (" + values.size() + " items)");
