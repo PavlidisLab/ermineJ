@@ -245,7 +245,7 @@ public class classScoreFrame
              statusMessenger );
       }
       catch ( IllegalArgumentException e ) {
-         error( e, "During class score calculation" );
+         error( e, "During initialization" );
       }
       catch ( IOException e ) {
          error( e, "File reading or writing" );

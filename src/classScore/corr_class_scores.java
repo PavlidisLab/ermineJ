@@ -24,7 +24,7 @@ public class corr_class_scores {
    public corr_class_scores(String filename_data)
 
    {
-      data = new Matrix(filename_data);
+     // data = new Matrix(filename_data); /** @todo make this use colt */
 
    }
 

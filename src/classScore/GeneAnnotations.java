@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -22,78 +21,78 @@ import javax.swing.table.TableModel;
 
 /**
  *  Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
+ *<p>
+ * Maintains the following important data structures, all derived from the input file:
+ *
+ * <pre>
+ * probe->Classes -- each value is a Set of the Classes that a probe belongs to.
+ * Classes->probe -- each value is a Set of the probes that belong to a class
+ * probe->gene -- each value is the gene name corresponding to the probe.
+ * gene->list of probes -- each value is a list of probes corresponding to a gene
+ * probe->description -- each value is a text description of the probe (actually...of the gene)
+ *</pre>
+ *
  * <p>Copyright (c) 2004 Columbia University</p>
  * @author Paul Pavlidis, Shamhil Merchant, Homin Lee
- * @version 1.0
- * @todo constructors should throw IOException.
+ * @version $Id$
  */
 
-public class GeneDataReader {
+public class GeneAnnotations {
    private Map probeToClassMap; //stores probe->Classes map
    private Map classToProbeMap; //stores Classes->probe map
-   private Map probeToGeneName; // same as probeGroupMap
+   private Map probeToGeneName;
    private Map probeToDescription;
-   private Map probeGroupMap;
-   private Map groupProbeList;
-//   private Set group;
-   private String filename;
-   private Map probes;
-   private Vector probe_list;
+   private Map geneToProbeList;
+   private Vector probeList;
+   private Map probes; /** @todo this should be a Set? */
 
-   public GeneDataReader(String filename, Map probes) {
-      this.filename = filename;
-      this.probes = probes;
+   /**
+    *
+    * @param filename String
+    * @param probes Map
+    * @throws IOException
+    */
+   public GeneAnnotations(String filename, Map probes) throws IOException {
+      if (probes != null) {
+         this.probes = probes;
+      }
       probeToClassMap = new LinkedHashMap();
       classToProbeMap = new LinkedHashMap();
       probeToGeneName = new HashMap();
-      probeGroupMap = probeToGeneName;
       probeToDescription = new HashMap();
-      groupProbeList = new HashMap();
-      try {
-         this.readFile();
-      } catch (IOException ex) {
-      }
+      geneToProbeList = new HashMap();
+      this.readFile(filename);
    }
 
-   public GeneDataReader(String filename) {
-      this.filename = filename;
-      probeToClassMap = new LinkedHashMap();
-      classToProbeMap = new LinkedHashMap();
-      probeToGeneName = new HashMap();
-      probeGroupMap = probeToGeneName;
-      probeToDescription = new HashMap();
-      groupProbeList = new HashMap();
-      try {
-         this.readFile();
-      } catch (IOException ex) {
-      }
+   /**
+    *
+    * @param filename String
+    * @throws IOException
+    */
+   public GeneAnnotations(String filename) throws IOException {
+      this(filename, null);
    }
 
 //read in file
-   private void readFile() throws IOException {
+   private void readFile(String filename) throws IOException {
       File infile = new File(filename);
       if (!infile.exists() || !infile.canRead()) {
-         System.err.println("Could not read " + filename);
+         throw new IOException("Could not read from " + filename);
       }
 
       FileInputStream fis = new FileInputStream(filename);
 
       BufferedInputStream bis = new BufferedInputStream(fis);
       BufferedReader dis = new BufferedReader(new InputStreamReader(bis));
-   //   Vector rows = new Vector();
-   //   Vector cols = null;
 
       ArrayList probeIds = new ArrayList();
       String classIds = null;
-      String go = "";
 
       // loop through rows. Makes hash map of probes to go, and map of go to probes.
       String line = "";
       while ((line = dis.readLine()) != null) {
-         //tokenize file by tab character
          StringTokenizer st = new StringTokenizer(line, "\t");
 
-         // create a new Vector for each row's columns
          String probe = st.nextToken().intern();
          if (probes == null || probes.containsKey(probe)) { // only do probes we have in the data set.
 
@@ -102,10 +101,10 @@ public class GeneDataReader {
             probeToGeneName.put(probe.intern(), group.intern());
 
             // create the list if need be.
-            if (groupProbeList.get(group) == null) {
-               groupProbeList.put(group.intern(), new ArrayList());
+            if (geneToProbeList.get(group) == null) {
+               geneToProbeList.put(group.intern(), new ArrayList());
             }
-            ((ArrayList) groupProbeList.get(group)).add(probe.intern());
+            ((ArrayList) geneToProbeList.get(group)).add(probe.intern());
 
             probeIds.add(probe);
             probeToClassMap.put(probe.intern(), new ArrayList());
@@ -128,7 +127,7 @@ public class GeneDataReader {
                //another tokenizer is required since the ClassesID's are seperated by the | character
                StringTokenizer st1 = new StringTokenizer(classIds, "|");
                while (st1.hasMoreTokens()) {
-                  go = st1.nextToken().intern();
+                  String go = st1.nextToken().intern();
 
                   // add this go to the probe->go map.
                   ((ArrayList) probeToClassMap.get(probe)).add(go);
@@ -145,41 +144,82 @@ public class GeneDataReader {
 
       /* Fill in the genegroupreader and the classmap */
       dis.close();
-      probe_list = new Vector(probeGroupMap.keySet());
+      probeList = new Vector(probeToGeneName.keySet());
    }
 
-   public Map getProbeGroupMap() {
-      return probeGroupMap;
+   /**
+    *
+    * @return Map
+    */
+   public Map getProbeToGeneMap() {
+      return probeToGeneName;
    }
 
-   public Map getGroupProbeList() {
-      return groupProbeList;
+   /**
+    *
+    * @return Map
+    */
+   public Map getGeneToProbeList() {
+      return geneToProbeList;
    }
 
+   /**
+    *
+    * @return Map
+    */
    public Map getClassToProbeMap() {
       return classToProbeMap;
    }
 
+   /**
+    *
+    * @return Map
+    */
    public Map getProbeToClassMap() {
       return probeToClassMap;
    }
 
+   /**
+    * Get the gene that a probe belongs to.
+    * @param p String
+    * @return String
+    */
    public String getProbeGeneName(String p) {
       return (String) probeToGeneName.get(p);
    }
 
+   /**
+    * Get the description for a gene.
+    * @param p String
+    * @return String
+    */
    public String getProbeDescription(String p) {
       return (String) probeToDescription.get(p);
    }
 
+   /**
+    * Get a list of the probes that correspond to a particular gene.
+    * @param g String a gene name
+    * @return ArrayList list of the probes for gene g
+    */
    public ArrayList getGeneProbeList(String g) {
-      return (ArrayList) groupProbeList.get(g);
+      return (ArrayList) geneToProbeList.get(g);
    }
 
-   public boolean classToProbeMapContains(String className) {
+   /**
+    * Find out if a class contains a given probe
+    * @param className String
+    * @return boolean
+    */
+   public boolean classContainsProbe(String className) {
       return classToProbeMap.containsKey(className);
    }
 
+   /**
+    * Add a class
+    * @param id String
+    * @param probes ArrayList
+    */
    public void addClass(String id, ArrayList probes) {
       classToProbeMap.put(id, probes);
 
@@ -232,12 +272,12 @@ public class GeneDataReader {
          }
 
          public int getRowCount() {
-            return getProbeGroupMap().size();
+            return getProbeToGeneMap().size();
          }
 
          public Object getValueAt(int i, int j) {
             //  Collections.sort(probe_list);
-            String probeid = (String) probe_list.get(i);
+            String probeid = (String) probeList.get(i);
             switch (j) {
             case 0:
                return probeid;

@@ -10,7 +10,7 @@ import classScore.expClassScore;
 import java.text.NumberFormat;
 import classScore.histogram;
 import classScore.ClassMap;
-import classScore.GONameReader;
+import classScore.GONames;
 
 /**
  * <p>Title: </p>
@@ -33,10 +33,10 @@ public class ClassPvalSetGenerator {
      private Map classToProbe;
      private ClassSizeComputer csc;
      private NumberFormat nf = NumberFormat.getInstance();
-     private GONameReader goName;
+     private GONames goName;
 
      public ClassPvalSetGenerator(Map ctp, Map pg, boolean w, histogram hi,
-                                         expClassScore pvm, ClassSizeComputer csc, GONameReader gon) {
+                                         expClassScore pvm, ClassSizeComputer csc, GONames gon) {
         this.weight_on = w;
         this.classToProbe = ctp;
         this.probeGroups = pg;

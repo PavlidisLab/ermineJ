@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.GONameReader;
+import classScore.GONames;
 import classScore.classresult;
 import classScore.expClassScore;
 import classScore.histogram;
@@ -27,11 +27,11 @@ public class RocPvalGenerator
    protected boolean weight_on = true;
    protected Map probeGroups;
    protected int inputSize;
-   protected GONameReader goName;
+   protected GONames goName;
    protected Map actualSizes = null;
 
    public RocPvalGenerator(Map ctp, Map pg, boolean w,
-                           histogram hi, expClassScore pvm, ClassSizeComputer csc, GONameReader gon) {
+                           histogram hi, expClassScore pvm, ClassSizeComputer csc, GONames gon) {
       super(ctp, pg, w, hi, pvm, csc, gon);
    }
 
@@ -88,7 +88,7 @@ public class RocPvalGenerator
 
       // set up the return object.
       classresult res = new classresult(class_name,
-                                        goName.get_GoName_value_map(class_name),
+                                        goName.getNameForId(class_name),
                                         (int) ( (Integer) actualSizes.get(
           class_name)).intValue(), effSize);
       res.setaroc(area_under_roc);

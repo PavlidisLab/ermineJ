@@ -428,7 +428,7 @@ public class modClassFrame extends JDialog {
 
    void gotoStep2() {
       newclass.id = cid;
-      newclass.desc = imaps.goName.get_GoName_value_map(cid);
+      newclass.desc = imaps.goName.getNameForId(cid);
       if (imaps.classToProbe.containsKey(cid)) {
          newclass.probes.addAll((ArrayList) imaps.classToProbe.get(cid));
       }
@@ -551,7 +551,7 @@ public class modClassFrame extends JDialog {
    void classIDEditor_actionPerformed(ChangeEvent e) {
       String classID = (String) ((DefaultCellEditor) e.getSource()).
                        getCellEditorValue();
-      if (imaps.geneData.classToProbeMapContains(classID) && makenew) {
+      if (imaps.geneData.classContainsProbe(classID) && makenew) {
          error("A class by the ID " + classID + " already exists.");
       } else {
          newclass.id = classID;

@@ -190,7 +190,7 @@ public class expClassScore {
       }
 
       try {
-         hist.tocdf(numClasses, classMinSize);
+         hist.tocdf();
       } catch (NullPointerException s) {
          System.err.println("Null pointer Exception");
          s.printStackTrace();

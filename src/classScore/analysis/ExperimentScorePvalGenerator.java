@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.GONameReader;
+import classScore.GONames;
 import classScore.classresult;
 import classScore.expClassScore;
 import classScore.histogram;
@@ -25,7 +25,7 @@ public class ExperimentScorePvalGenerator
    protected expClassScore probePvalMapper;
    protected Map classToProbe;
    protected histogram hist;
-   private GONameReader goName;
+   private GONames goName;
    protected boolean weight_on = true;
    protected Map probeGroups;
 
@@ -41,7 +41,7 @@ public class ExperimentScorePvalGenerator
     * @param csc ClassSizeComputer
     */
    public ExperimentScorePvalGenerator(Map ctp, Map pg, boolean w, histogram hi,
-                                       expClassScore pvm, ClassSizeComputer csc, GONameReader gon) {
+                                       expClassScore pvm, ClassSizeComputer csc, GONames gon) {
       this.weight_on = w;
       this.classToProbe = ctp;
       this.probeGroups = pg;
@@ -125,7 +125,7 @@ public class ExperimentScorePvalGenerator
 
       // set up the return object.
       classresult res = new classresult(class_name,
-                                        goName.get_GoName_value_map(class_name),
+                                        goName.getNameForId(class_name),
                                         (int) ( (Integer) actualSizes.get(
           class_name)).intValue(), effSize);
       res.setscore(rawscore);

@@ -7,6 +7,7 @@ import java.util.*;
   Matrix functions for storing a file and for creating an empty double[][] object.   Created :09/02/02
   @author Shahmil Merchant
   @version $Id$
+ * @deprecated
  */
 public class Matrix
     extends HashMap { // encapsulates a matrix
@@ -342,38 +343,6 @@ public class Matrix
     }
   }
 
-  public static void main(String args[]) {
-    /*
-           int rows;
-           int cols;
-      double[][] M;
-      int n=0;
-         BufferedReader d  = new BufferedReader(new InputStreamReader(System.in));
-           System.out.print("\nPlease enter number of matrix rows: ");
-           System.out.flush();
-           rows = Integer.parseInt(d.readLine());
-           System.out.print("\nPlease enter number of matrix cols: ");
-           System.out.flush();
-           cols = Integer.parseInt(d.readLine());
-      M = new double[rows][cols];
-      for(int i=0;i<rows;i++){
-               for(int j=0;j<cols;j++){
-                   System.out.print("Element "+i+", "+j+"> ");
-                   System.out.flush();
-                   M[i][j] = Double.parseDouble(d.readLine());
-               }
-        }
-           Matrix matrix = new Matrix(args[0]);
-      System.out.println(matrix.get_num_rows());
-      System.out.println(matrix.get_num_cols());
-      for (int i = 0;i<matrix.get_num_rows();i++){
-        for (int j = 0;j<matrix.get_num_cols();j++){
-     System.out.print(matrix.get_matrix_val(i,j) + "\t");
-        }
-        System.out.println();
-      }
-     */
 
-  }
 
 }

@@ -29,9 +29,10 @@ import baseCode.math.Rank;
  * @todo pass all the maps around in a container instead of as lots of parameters.
  */
 public class classPvalRun {
-   private GONameReader goName;
+
+   private GONames goName;
    private expClassScore probePvalMapper;
-   private GeneDataReader geneData;
+   private GeneAnnotations geneData;
    private Map probeGroups;
    private ClassMap probeToClassMap;
    private Map classToProbe;
@@ -95,9 +96,9 @@ public class classPvalRun {
     * @throws IllegalArgumentException
     * @throws IOException
     */
-   public classPvalRun(GONameReader gn,
+   public classPvalRun(GONames gn,
                        expClassScore ppm,
-                       GeneDataReader gd,
+                       GeneAnnotations gd,
                        Map pgm,
                        Map ctp,
                        String resultsFile,
@@ -128,9 +129,9 @@ public class classPvalRun {
     * @throws IllegalArgumentException
     * @throws IOException
     */
-   public void initialize(GONameReader gn,
+   public void initialize(GONames gn,
                           expClassScore ppm,
-                          GeneDataReader gd,
+                          GeneAnnotations gd,
                           Map pgm,
                           Map ctp,
                           String resultsFile,
@@ -150,7 +151,7 @@ public class classPvalRun {
       nf.setMaximumFractionDigits(8);
 
       // user flags and constants:
-  //    user_pvalue = -(Math.log(pval) / Math.log(10)); // user defined pval (cutoff) for hypergeometric todo: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
+      //    user_pvalue = -(Math.log(pval) / Math.log(10)); // user defined pval (cutoff) for hypergeometric todo: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
       weight_on = (Boolean.valueOf(useWeights)).booleanValue();
       dest_file = resultsFile;
 
@@ -173,24 +174,24 @@ public class classPvalRun {
          // Initialize the results data structure.
          results = new LinkedHashMap();
 
-         // get the class sizes.
+         // get the class sizes. /* todo use initmap */
          ClassSizeComputer csc = new ClassSizeComputer(probePvalMapper,
                  classToProbe, probeGroups,
                  weight_on);
          csc.getClassSizes();
 
-     //    Collection inp_entries; // this is only used for printing.
+         //    Collection inp_entries; // this is only used for printing.
          Map input_rank_map;
          if (weight_on) {
-      //      inp_entries = probePvalMapper.get_group_pval_map().entrySet();
-            input_rank_map = Rank.rankTransform(probePvalMapper.get_group_pval_map());
+            //      inp_entries = probePvalMapper.get_group_pval_map().entrySet();
+            input_rank_map = Rank.rankTransform(probePvalMapper.
+                                                get_group_pval_map());
          } else {
-    //        inp_entries = probePvalMapper.get_map().entrySet();
+            //        inp_entries = probePvalMapper.get_map().entrySet();
             input_rank_map = Rank.rankTransform(probePvalMapper.get_map());
          }
 
          inputSize = input_rank_map.size(); // how many pvalues. This is constant under permutations of the data
-
 
          // hgSizes(inp_entries); // get numOverThreshold and numUnderThreshold. Constant under permutations of the data.
 
@@ -198,11 +199,12 @@ public class classPvalRun {
                             numOverThreshold + " numUnderThreshold=" +
                             numUnderThreshold + " "); //+  + "" + foo + "" + foo + "" + foo + "" + foo );
 
+         /* todo use initmap */
          ClassPvalSetGenerator pvg = new ClassPvalSetGenerator(classToProbe,
                  probeGroups, weight_on,
                  hist, probePvalMapper, csc, goName);
 
-         // calculate the actual class scores and correct sorting.
+         // calculate the actual class scores and correct sorting. /** todo make this use initmap */
          pvg.classPvalGenerator(probePvalMapper.get_group_pval_map(),
                                 probePvalMapper.get_map(),
                                 input_rank_map);
@@ -211,6 +213,7 @@ public class classPvalRun {
 
          messenger.setStatus("Multiple test correction");
 
+         /** todo use initmap */
          MultipleTestCorrector mt = new MultipleTestCorrector(sortedclasses,
                  results,
                  probePvalMapper, weight_on, hist, probeGroups, classToProbe,
@@ -226,9 +229,9 @@ public class classPvalRun {
          messenger.setStatus("Beginning output");
          // all done:
          // print the results
-         if(dest_file.compareTo("")!=0)
-         {
-            ResultsPrinter rpr = new ResultsPrinter(dest_file, sortedclasses, results, goName, probeToClassMap);
+         if (dest_file.compareTo("") != 0) {
+            ResultsPrinter rpr = new ResultsPrinter(dest_file, sortedclasses,
+                    results, goName, probeToClassMap);
          }
          //printResults(true);
       }
@@ -241,6 +244,7 @@ public class classPvalRun {
 
       messenger.setStatus("Done!");
    }
+   /* Done! */
 
    /**
     Sorted order of the class results - all this has to hold is the class names.
@@ -255,10 +259,6 @@ public class classPvalRun {
          sortedclasses.add(((classresult) it.next()).getClassId());
       }
    }
-
-   /* sortResults */
-
-
 
 
    /**
@@ -350,50 +350,59 @@ public class classPvalRun {
       this.results = f.getResults();
    }
 
-   public static void main(String[] args) {
-
-      // Check if args have been passed in.
-      if (args.length < 14) {
-
-         System.err.println("No filenames have been passed in.");
-         System.err.println(
-                 "If you are running this class as your main project " +
-                 "class, you might want to run classScoreGUI instead.");
-         System.exit(1);
-      }
-
-      classScoreStatus m = new classScoreStatus(null);
-      try {
-         InitialMaps smaps = new InitialMaps(
-                 args[0], // pbPval file
-                 args[1], // affy GO File
-                 args[2], // GO name file
-                 args[4], args[5], // methods
-                 Integer.parseInt(args[6]), // max class
-                 Integer.parseInt(args[7]), // min class
-                 Integer.parseInt(args[8]), // numruns
-                 Integer.parseInt(args[9]), // quantile
-                 args[11], // use weights
-                 Integer.parseInt(args[12]), // column
-                 args[13], // takeLog
-                 m);
-
-         classPvalRun test = new classPvalRun(smaps.goName,
-                                              smaps.probePvalMapper,
-                                              smaps.geneData,
-                                              smaps.probeGroups,
-                                              smaps.classToProbe,
-                                              args[3], // output file
-                                              Double.parseDouble(args[10]), // pvalue
-                                              args[11], // use weights
-                                              args[14], // mtc method
-                                              m, false);
-      } catch (IOException e) {
-         e.printStackTrace();
-      }
-   }
-
+   /**
+    *
+    * @return Map the results
+    */
    public Map getResults() {
       return results;
    }
+
+
+   /*
+      public static void main(String[] args) {
+
+         // Check if args have been passed in.
+         if (args.length < 14) {
+
+            System.err.println("No filenames have been passed in.");
+            System.err.println(
+                    "If you are running this class as your main project " +
+                    "class, you might want to run classScoreGUI instead.");
+            System.exit(1);
+         }
+
+         classScoreStatus m = new classScoreStatus(null);
+         try {
+            InitialMaps smaps = new InitialMaps(
+                    args[0], // pbPval file
+                    args[1], // affy GO File
+                    args[2], // GO name file
+                    args[4], args[5], // methods
+                    Integer.parseInt(args[6]), // max class
+                    Integer.parseInt(args[7]), // min class
+                    Integer.parseInt(args[8]), // numruns
+                    Integer.parseInt(args[9]), // quantile
+                    args[11], // use weights
+                    Integer.parseInt(args[12]), // column
+                    args[13], // takeLog
+                    m);
+
+            classPvalRun test = new classPvalRun(smaps.goName,
+                                                 smaps.probePvalMapper,
+                                                 smaps.geneData,
+                                                 smaps.probeGroups,
+                                                 smaps.classToProbe,
+                                                 args[3], // output file
+    Double.parseDouble(args[10]), // pvalue
+                                                 args[11], // use weights
+                                                 args[14], // mtc method
+                                                 m, false);
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+      }
+    */
+
+
 }

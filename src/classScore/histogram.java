@@ -1,12 +1,13 @@
 package classScore;
 
-//import java.util.Locale.*;
 import util.Matrix;
 
 /**
   Stores information relevent to a histogram.   Created :09/02/02
   @author Shahmil Merchant, Paul Pavlidis
   @version $Id$
+ * @todo use colt instead of Matrix
+ * @todo consider making this part of baseCode in some form.
  */
 public class histogram {
 
@@ -90,11 +91,8 @@ public class histogram {
 
    /**
     * Convert a raw histogram to a cdf.
-    *
-    * @param number_of_class int
-    * @param class_min_size int
     */
-   public void tocdf(int number_of_class, int class_min_size) {
+   public void tocdf() {
 
       for (int i = 0; i < M.get_num_rows(); i++) { // for each histogram (class size)
          double total = M.get_row_sum(i);

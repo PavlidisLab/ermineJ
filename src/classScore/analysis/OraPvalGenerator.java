@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import classScore.GONameReader;
+import classScore.GONames;
 import classScore.classresult;
 import classScore.expClassScore;
 import cern.jet.stat.Probability;
@@ -31,7 +31,7 @@ public class OraPvalGenerator
    protected int inputSize;
    protected int numOverThreshold = 0; // number of genes over the threshold
    protected int numUnderThreshold = 0; // number of genes below the threshold
-   protected GONameReader goName;
+   protected GONames goName;
    protected Map actualSizes = null;
 
    /**
@@ -61,7 +61,7 @@ public class OraPvalGenerator
 
 
    public OraPvalGenerator(Map ctp, Map pg, boolean w,
-                                            expClassScore pvm, ClassSizeComputer csc, GONameReader gon, int nuot, int nuut) {
+                                            expClassScore pvm, ClassSizeComputer csc, GONames gon, int nuot, int nuut) {
       super(ctp, pg, w, null, pvm, csc, gon);
       this.numOverThreshold = nuot;
       this.numUnderThreshold = nuut;
@@ -157,7 +157,7 @@ public class OraPvalGenerator
 
       // set up the return object.
       classresult res = new classresult(class_name,
-                                        goName.get_GoName_value_map(class_name),
+                                        goName.getNameForId(class_name),
                                         (int) ( (Integer) actualSizes.get(
           class_name)).intValue(), effSize);
       res.sethypercut(successes);

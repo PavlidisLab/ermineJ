@@ -17,8 +17,9 @@ import util.Matrix;
  Calculates the raw average class correlations using a background distribution.    Created :09/02/02
    @author Shahmil Merchant
    @version $Id$
- * @todo: Get this working again. It should be presented as an alternative 'tab' to the GUI.
- * @todo: Rename this class and its methods
+ * @todo Get this working again. It should be presented as an alternative 'tab' to the GUI.
+ * @todo Rename this class and its methods
+ * @todo use colt instead of Matrix
  */
 public class class_correls {
    private histogram hist; //histogram object stores background related information
@@ -27,8 +28,8 @@ public class class_correls {
    private Map go_probe; //stores go->probe Hashtable
    private String dest_file;
    private Map go_name;
-   private GONameReader goName;
-   private GeneDataReader geneData = null;
+   private GONames goName;
+   private GeneAnnotations geneData = null;
 
    // command line arguments in the following way
    // data_file,probe_go_file,go_namefile,output_file,class_max_size,class_min_size,number of runs,hist range
@@ -54,16 +55,16 @@ public class class_correls {
                         int number_of_runs, double range) throws IOException {
 
       probe_data = new corr_class_scores(probe_datafile); // main data file
-      geneData = new GeneDataReader(probe_annotfile, probe_data.get_data_map());
+      geneData = new GeneAnnotations(probe_annotfile, probe_data.get_data_map());
       ClassMap probe_go = new ClassMap(geneData.getProbeToClassMap(),
                                        geneData.getClassToProbeMap()); //parses affy file
-      goName = new GONameReader(go_namefile); //parse go name file
+      goName = new GONames(go_namefile); //parse go name file
       probe_gom = new LinkedHashMap();
       go_probe = new LinkedHashMap();
       go_name = new LinkedHashMap();
       probe_gom = probe_go.getProbeToClassMap(); //probe go map
       go_probe = probe_go.getClassToProbeMap(); //go probe map
-      go_name = goName.get_GoName_map(); //go name map
+      go_name = goName.getMap(); //go name map
 
       // todo: this should be done by the hist class?
       hist = new histogram();
@@ -189,7 +190,7 @@ public class class_correls {
                      //    System.out.println("out of range");
                   }
                   if (rawscore > 0) {
-                     out.write(goName.get_GoName_value_map(class_name) + "(" +
+                     out.write(goName.getNameForId(class_name) + "(" +
                                class_name + ")" + "\t" + size + "\t" + rawscore +
                                "\t" +
                                pval + "\n");
