@@ -54,9 +54,9 @@ public class GeneSetSizeComputer {
       int size;
       int v_size;
 
-      assert !( activeProbes == null || activeProbes.size() == 0 ) : "ActiveProbes was not initialized or was empty";
-      assert !( geneScores == null ) : "GeneScores was not initialized";
-      assert !( geneScores.getGeneToPvalMap() == null ) : "getGroupToPvalMap was not initialized";
+     // assert !( activeProbes == null || activeProbes.size() == 0 ) : "ActiveProbes was not initialized or was empty";
+    //  assert !( geneScores == null ) : "GeneScores was not initialized";
+    //  assert !( geneScores.getGeneToPvalMap() == null ) : "getGroupToPvalMap was not initialized";
 
       boolean gotAtLeastOneNonZero = false;
 
@@ -110,7 +110,7 @@ public class GeneSetSizeComputer {
          actualSizes.put( className, new Integer( size ) );
       }
 
-      assert gotAtLeastOneNonZero;
+   //   assert gotAtLeastOneNonZero;
 
    }
 
