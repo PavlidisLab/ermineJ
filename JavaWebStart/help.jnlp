@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp 
+  spec="1.0+" 
+  codebase="http://microarray.genomecenter.columbia.edu/ermineJ_test/"
+  href="help.jnlp">
+  <information>
+    <title>JavaHelp</title>
+    <vendor>Sun Microsystems, Inc.</vendor>
+  </information>
+  <resources>
+    <jar href="jhbasic.jar"/>
+  </resources>
+  <component-desc/>
+</jnlp>

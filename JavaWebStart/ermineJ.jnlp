@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<jnlp 
+  spec="1.0+" 
+  codebase="http://microarray.genomecenter.columbia.edu/ermineJ_test/"
+  href="ermineJ.jnlp">
+  <information> 
+    <title>ermineJ</title> 
+    <vendor>Columbia University</vendor>
+    <homepage href="index.html"/>
+    <description>A software tool for generating functional class scores based on scores given to individual genes, typically from a microarray data set.</description>
+    <icon href="ermineJ.gif"/>
+    <offline-allowed/> 
+  </information> 
+  <security> 
+      <all-permissions/> 
+  </security>
+  <resources> 
+    <j2se version="1.4+" max-heap-size="256m" initial-heap-size="32m"/>
+    <jar href="ermineJ-2.0b2.jar"/>
+    <jar href="ermineJ-help.jar"/>
+    <jar href="baseCode-0.2.jar"/>
+    <jar href="xercesImpl-2.6.2.jar"/>
+    <jar href="colt.jar"/>
+    <jar href="commons-logging-1.0.3.jar"/>
+    <extension name="Java Help" href="help.jnlp"/>
+  </resources> 
+  <application-desc main-class="classScore.classScoreGUI"/> 
+</jnlp> 
