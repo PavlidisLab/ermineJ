@@ -32,7 +32,14 @@ public class ClassMap {
 
 	//read in file 	
 	try { 
+
+	    File infile = new File(filename);
+	    if (!infile.exists() || !infile.canRead()) {
+		System.err.println("Could not read " + filename);
+	    }
+
 	    FileInputStream fis = new FileInputStream(filename);
+		 
 	    BufferedInputStream bis = new BufferedInputStream(fis);
 	    BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
 	    Double[] DoubleArray = null;

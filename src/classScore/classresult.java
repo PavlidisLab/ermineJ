@@ -19,6 +19,7 @@ public class classresult implements Comparable {
     private double pvalue = 1.0;
     private double score = 0.0;
     private double hyperpval = 1.0;
+    private int hypercut = 0; // how many genes make the pvalue threshold; this is n1 in the calculations
     private double rocpval = 1.0;
     private double aroc = 0.5;
     private int size = 0;
@@ -81,7 +82,7 @@ public class classresult implements Comparable {
 	    out.write(cleanname +"_" + 
 		      class_id + "" + "\t" + size + "\t" + 
 		      nf.format(score) + "\t" + nf.format(pvalue) + "\t" + 
-		      effective_size + "\t" + nf.format(hyperpval) + "\t" + 
+		      effective_size + "\t" + hypercut + "\t" + nf.format(hyperpval) + "\t" + 
 		      nf.format(aroc) + "\t" + nf.format(rocpval) + "\t" + 
 		      nf.format(pvalue_corr) + extracolumns + "\n");
 	} catch (IOException e) {
@@ -99,7 +100,7 @@ public class classresult implements Comparable {
 	try {
 	    out.write("Class" + "\tsize" + "\tscore" + 
 		      "\tscore pval" + "\teffective_size" + 
-		      "\thyper pval" + "\tAROC" + "\tAROCpval" + 
+		      "\tN over pval cut\thyper pval" + "\tAROC" + "\tAROCpval" + 
 		      "\tCorrected_pvalue" + extracolumns + "\n");
 	} catch (IOException e) {
 	    System.err.println("There was an IO error" + e);
@@ -127,6 +128,11 @@ public class classresult implements Comparable {
     public void sethyperp (double ahyperp) {
 	hyperpval = ahyperp;
     }
+
+    public void sethypercut (int ahypercut) {
+	hypercut = ahypercut;
+    }
+
 
     public void setaroc (double aroc) {
 	this.aroc = aroc;

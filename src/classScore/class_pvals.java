@@ -33,8 +33,8 @@ public class class_pvals {
     private Map target_ranks;
     private Map record;
     private int inputSize;
-    private int N1 = 0;
-    private int N2 = 0;
+    private int N1 = 0; // number of genes over the threshold
+    private int N2 = 0; // number of genes below the threshold
     private NumberFormat nf = NumberFormat.getInstance();
 
 
@@ -54,7 +54,8 @@ public class class_pvals {
 		       double pval, 
 		       String wt_check, 
 		       int pvalcolumn, 
-		       String dolog_check ) {
+		       String dolog_check,
+		       String mtc_method) {
 
 	nf.setMaximumFractionDigits(8);
 
@@ -75,6 +76,7 @@ public class class_pvals {
 	goName = new GoName_parse(goNamesfile); // parse go name file
 
 	probe_pval = new exp_class_scores(probe_pvalfile, wt_check, method, pvalcolumn, dolog, class_max_size, class_min_size, number_of_runs, quantile);
+
 	groupName = new Group_Parse(group_file, probe_pval.get_map()); // parse group file. Yields map of probe->replicates.
 	probe_group = groupName.get_probe_group_map(); // map of probes to groups
 
@@ -117,7 +119,13 @@ public class class_pvals {
 	class_pval_generator(probe_pval.get_group_pval_map(), probe_pval.get_map(), input_rank_map);
 	sortResults();
 
-	correct_pvals(0.05); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
+	if (mtc_method.equals("bon")) {
+	    correct_pvals(); // no arg: bonferroni. integer arg: w-y, int trials. Double arg: FDR
+	} else if (mtc_method.equals("bh")) {
+	    correct_pvals(0.05);
+	} else if (mtc_method.equals("wy")) {
+	    correct_pvals(10000);
+	}
 
 	// all done:
 	// print the results
@@ -136,8 +144,8 @@ public class class_pvals {
      */
     public classresult scoreClass (String class_name, Map group_pval_map, Map probesToPvals, Map input_rank_map) {
 	//inputs for hypergeometric distribution
-	int n1 = 0;
-	int n2 = 0;
+	int n1 = 0; // number of genes in this class which are above the threshold
+	int n2 = 0; // number of genes in this calss which are below the threshold
 	
 	//variables for outputs
 	double pval = 0.0;
@@ -146,7 +154,7 @@ public class class_pvals {
 	double area_under_roc = 0.0;
 	double roc_pval = 0.0;
 	
-	int in_size = (int)((Integer)effective_sizes.get(class_name)).intValue();
+	int in_size = (int)((Integer)effective_sizes.get(class_name)).intValue(); // effective size of this class.
 	if (in_size < probe_pval.get_class_min_size() || in_size > probe_pval.get_class_max_size() ) {
 	    return null;
 	}
@@ -196,9 +204,9 @@ public class class_pvals {
 		    
 		    // hypergeometric pval info.
 		    if(pbpval.doubleValue() >= user_pvalue) {
-			n2++;
+			n1++; // successs.
 		    } else {
-			n1++;
+			n2++; // failure.
 		    }
 
 		    //for roc. Only difference from with weights is that we don't use probe_group.get()
@@ -222,14 +230,30 @@ public class class_pvals {
 	// our 'alternative' scoring methods.
 	area_under_roc = Stats.arocRate(inputSize, target_ranks);
 	roc_pval = Stats.rocpval(target_ranks.size(), area_under_roc);
-	hyper_pval = Stats.hyperPvalOver(N1, n1, N2, n2);
-	//	double binom_pval = SpecFunc.binomialCumProb(n1, N1+N2, (double)N1/(double)(N1+N2));
-	//	System.err.println(class_name + ":: n1: " + n1 + " n2: " + n2 + " selected: " + N1 + " not in class: " + N2 + " H: " + hyper_pval + " B: " + binom_pval);
+
+	// Hypergeometric p value calculation. Using the binomial approximation.
+	// Only look at over-represented genes. Identify these by
+	// seeing if the observed is greater than the
+	// expected. Otherwise, set the hypergeometric pvalue to be
+	// 1.0 (we can change this behavior if desired)
+	double pos_prob = (double)in_size /(double)inputSize;
+	double expected = (double)N1 * pos_prob;
+	//	System.err.println("Expecting " + expected + ", saw " + n1 + " (prob of pos= " + pos_prob + ").");
+
+	if (n1 < expected) { // fewer than expected.
+	    hyper_pval = 1.0;
+	} else {
+	    //	hyper_pval = Stats.hyperPvalOver(N1, n1, N2, n2); 
+	    hyper_pval = SpecFunc.binomialCumProb(n1, N1, pos_prob);
+	}
+	
+	//	System.err.println(class_name + "(" + goName.get_GoName_value_map(class_name) + ") - base prob: " + pos_prob + " successes: " + n1 + " failures: " + n2 + " Trials: " + N1 + " Nontrials: " + N2 + " H: " + hyper_pval);
 
 	// set up the return object.
 	classresult res = new classresult(class_name, goName.get_GoName_value_map(class_name), (int)((Integer)actual_sizes.get(class_name)).intValue(), in_size);
 	res.setscore(rawscore);
 	res.setpval(pval);
+	res.sethypercut(n1);
 	res.sethyperp(hyper_pval);
 	res.setaroc(area_under_roc);
 	res.setarocp(roc_pval);
@@ -447,11 +471,13 @@ public class class_pvals {
 	while(itr.hasNext()) {
 	    Map.Entry m = (Map.Entry)itr.next();	
 	    double groupval = Double.parseDouble((m.getValue()).toString());
+
 	    if(groupval >= user_pvalue)
 		N1++; // how many are above the threshold.
 	    else
 		N2++; // how many are below the threshold.
 	}
+	System.err.println(N1 + " genes are above the threshold " + user_pvalue);
     }
 
 
@@ -643,7 +669,7 @@ public class class_pvals {
 	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],args[6],
 					   Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),
 					   Integer.parseInt(args[10]), Double.parseDouble(args[11]),args[12], 
-					   Integer.parseInt(args[13]), args[14]);
+					   Integer.parseInt(args[13]), args[14], args[15]);
     }
 
 

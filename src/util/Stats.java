@@ -194,9 +194,9 @@ public class Stats implements Cloneable, ConstantStuff
 	
     }
 
-    /*****************************************************************************************/
-    /* choose n random integers from 0 to max without repeating */
-    /*****************************************************************************************/
+    /**
+       choose n random integers from 0 to max without repeating
+   */
     public void chooserandom_1(int[] randomnums,  int max, int n) {
 
 	int numgot;
@@ -214,11 +214,12 @@ public class Stats implements Cloneable, ConstantStuff
 		numgot++;
 	    }
 	}
-    }
+    } /* */
+
     
-    /*****************************************************************************************/
-    /* choose n random integers from 0 to max without repeating */
-    /*****************************************************************************************/
+    /**
+       choose n random integers from 0 to max without repeating
+    */
     public void chooserandom_2(int[] randomnums, int max, int n) {
 	int numgot;
 	int i;
@@ -241,7 +242,7 @@ public class Stats implements Cloneable, ConstantStuff
 		numgot++;
 	    }
 	}
-    } 
+    }  /* */
 
     /**
        Same as chooserandom, but with replacement -- that is, repeats are allowed.
@@ -272,9 +273,9 @@ public class Stats implements Cloneable, ConstantStuff
     } /* matrix_row_sums */   
     
     
-    /*****************************************************************************************/
-    /* calculate the sums of a matrix's rows. */
-    /*****************************************************************************************/
+    /**
+       calculate the sums of a matrix's rows.
+    */
     public void matrix_row_sums (Matrix M, double[] sums) {
 	int i;
 	for (i=0; i<M.get_num_rows(); i++) {
@@ -283,9 +284,9 @@ public class Stats implements Cloneable, ConstantStuff
     } /* matrix_row_sums */
     
     
-    /*****************************************************************************************/
-    /* calculate the standard deviation of each row of a matrix */
-    /*****************************************************************************************/
+    /**
+     calculate the standard deviation of each row of a matrix 
+    */
     public void matrix_row_stdevs (Matrix M, double[] means, double[] ssqs,double[] stdevs) {
 	int i;
 	for (i = 0; i<M.get_num_rows(); i++) {
@@ -294,9 +295,9 @@ public class Stats implements Cloneable, ConstantStuff
     }
     
     
-    /*****************************************************************************************/
-    /* calculate the sum of squares for each row of a matrix */
-    /*****************************************************************************************/
+    /**
+       Calculate the sum of squares for each row of a matrix
+    */
     public void matrix_row_ssqs (Matrix M, double[] means,double[] ssqs) {
 	int i;
 	if (means == null) {
@@ -480,6 +481,7 @@ public class Stats implements Cloneable, ConstantStuff
        @param n1 Number of 'successes'
        @param N2 Number of negatives in the data
        @param n2 Number of 'failures'
+       @return The hypergeometric probability for the parameters.
     */
     public static double hypergeometric (int N1, int n1, int N2, int n2)
     {
@@ -498,6 +500,7 @@ public class Stats implements Cloneable, ConstantStuff
        @param n1 Number of 'successes'
        @param N2 Number of negatives in the data
        @param n2 Number of 'failures'
+       @return The cumulative hypergeometric distribution.
     */
     public static double hyperPvalOver (int N1, int n1, int N2, int n2)
     {
@@ -602,7 +605,7 @@ public class Stats implements Cloneable, ConstantStuff
     
 
     /**
-       return mean of top 2 elements in array, for histogram range setting            tt12
+       return mean of top 2 elements in array, for histogram range setting
     */
     public static double meanOfTop2(double[] inArray){
 	double max1 = 0;
@@ -655,7 +658,7 @@ public class Stats implements Cloneable, ConstantStuff
 
     /**
 
-       main tests some functions.
+       main: tests some functions.
 
      */
     public static void main (String[] args) {
@@ -714,9 +717,9 @@ class timeCounter {
 }
 
 /**
- Show the elements in array for testing                
+   Show the elements in array for testing                
 */
-class showArray{
+class showArray {
     public static void show(int[] a, int n){	
     	for(int i=0; i<n; i++){
     	    System.out.println(i + "\t" + a[i]);	

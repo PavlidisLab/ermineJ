@@ -29,6 +29,7 @@ public class exp_class_scores {
     private double hist_max = 0; // todo: this should not be set here, should it? it is in the histogram object
     private int class_min_size = 2;
     private histogram hist = null;
+    private boolean logged = true;
 
     private int method;
     private static final int MEAN_METHOD = 0;
@@ -73,7 +74,14 @@ public class exp_class_scores {
 	this.set_quantile(quantile);
 	this.weight_on = (Boolean.valueOf(wt_check)).booleanValue();
 	this.set_method(in_method);
+
+	if (class_max_size < class_min_size) {
+	    System.err.println("Error:The maximum class size is smaller than the minimum.");
+	    System.exit(1);
+	}
+
 	this.number_of_class = class_max_size - class_min_size + 1;
+	this.logged = dolog;
 
 	Pval_parse parser = new Pval_parse(filename_pval, pvalcolumn, dolog); // makes the probe -> pval map.
 	pvals = parser.get_pval(); // array of pvalues.

@@ -21,7 +21,9 @@ import java.util.*;
   args[9]:quantile, 
   args[10]:p-value, 
   args[11]:weightcheck
-
+  args[12]
+  args[13]
+  args[14]
   **notce: all "data files" and this "command line file" should be put uncer the directory ermineJ\java_proj\src
 
   examples:
@@ -46,9 +48,9 @@ public class erminecmd{
 	    goNameFile = getCanonical(goNameFile);
 	    ugFile = getCanonical(ugFile);
 
-	    class_pvals test = new class_pvals(pbPvalFile, affyGoFile, goNameFile, destinFile, ugFile, args[5], args[6], Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]), args[12], Integer.parseInt(args[13]), args[14]);
+	    class_pvals test = new class_pvals(pbPvalFile, affyGoFile, goNameFile, destinFile, ugFile, args[5], args[6], Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]), args[12], Integer.parseInt(args[13]), args[14], args[15]);
 	} catch (ArrayIndexOutOfBoundsException exception) { // this doesn't work ...
-	    System.err.println("You must enter 15 command line arguments: \nprobe_pvalfile\naffy_gofile\ngo_namefile\ngroups file\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog");
+	    System.err.println("You must enter 16 command line arguments: \nprobe_pvalfile\naffy_gofile\ngo_namefile\ngroups file\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog\nmultiple test correction method (bon|bh|wy)");
 	}
     }
 

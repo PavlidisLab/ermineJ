@@ -65,10 +65,10 @@ import java.lang.reflect.*;
 	    
 	} catch (IOException e) { 
 	    // catch possible io errors from readLine()
-	    System.out.println(" IOException error!");
+	    System.err.println(" IOException error!");
 	    e.printStackTrace();
 	} catch (NoSuchElementException e) {
-	    System.out.println(" NO such element error! " + go_id + " " + go_name);
+	    System.err.println(" No such element error! GOID:" + go_id + " NAME:" + go_name);
 	    e.printStackTrace();
 	}
 	

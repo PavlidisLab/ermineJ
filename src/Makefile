@@ -16,9 +16,11 @@ OUTPUTDIR = .
 
 DOCDIR = ../doc
 
-JAVAC = javac
+JAVAC = /usr/java/j2sdk1.4.1_03/bin/javac
 
 JAVA = java
+
+JAR = /usr/java/j2sdk1.4.1_03/bin/jar
 
 APP_PACKAGE = classScore
 
@@ -90,14 +92,14 @@ clean:
 #	mkdir ${DOCDIR};
 
 dist : class_score 
-	jar cmf gui.manifest.add \
+	${JAR} cmf gui.manifest.add \
 	classScore.jar \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/*.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/*.class
 
 
 cmdline : class_score classScore.jar
-	jar cmf cmdline.manifest.add \
+	${JAR} cmf cmdline.manifest.add \
 	classScorecmd.jar \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/*.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/*.class \

@@ -44,6 +44,12 @@ public class histogram {
 	this.min_class_size = min_class_size;
 	set_number_of_runs(number_of_runs);
 	set_number_of_bins();
+
+	if (number_of_class < 1) {
+	    System.err.println("Error: No classes.");
+	    System.exit(1);
+	}
+
 	M = new Matrix(number_of_class, number_of_bins + 1 );
 	list = new HashMap();
     }
@@ -54,8 +60,8 @@ public class histogram {
     public void set_number_of_bins()  
     {
 	number_of_bins =(int)((hist_max - hist_min)/(double)bin_size);
-	if (number_of_bins == 0) {
-	    System.err.println("Error: Histogram had no bins.");
+	if (number_of_bins < 1) {
+	    System.err.println("Error: Histogram had no bins or too few bins. (" + number_of_bins + ")");
 	    System.exit(1);
 	}
     }
