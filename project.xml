@@ -104,6 +104,13 @@
             <type>jar</type>
             <properties/>
         </dependency>
+         <dependency>
+            <groupId>getopt</groupId>
+            <artifactId>java-getopt</artifactId>
+            <version>1.0.9</version>
+            <type>jar</type>
+        </dependency>
+        
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>
