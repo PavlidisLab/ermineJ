@@ -1,6 +1,7 @@
 package classScore;
 
 import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.UIManager;
 
 import org.xml.sax.SAXException;
 
@@ -53,6 +56,7 @@ public class classScoreCMD {
 	private String saveFileName = null;//"C:\\Documents and Settings\\hkl7\\ermineJ.data\\outout.txt";
 
 	public classScoreCMD(String[] args) {
+		settings = new Settings();
 		options(args);
 		initialize();
 		try {
@@ -69,9 +73,15 @@ public class classScoreCMD {
 	}
 
 	private void options(String[] args) {
-		settings = new Settings();
+		if(args.length==0)
+			showHelp();
+		LongOpt[] longopts = new LongOpt[3];
+		StringBuffer sb = new StringBuffer();
+		longopts[0] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
+		longopts[1] = new LongOpt("config", LongOpt.REQUIRED_ARGUMENT, null, 'C');
+		longopts[2] = new LongOpt("gui", LongOpt.NO_ARGUMENT, null, 'G');
 		Getopt g = new Getopt("classScoreCMD", args,
-				"a:c:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:");
+				"a:c:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:",longopts);
 		int c;
 		String arg;
 		int intarg;
@@ -84,7 +94,7 @@ public class classScoreCMD {
 					settings.setAnnotFile(arg);
 				else {
 					System.err.println("Invalid annotation file name (-a)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'c': //classfile
@@ -93,7 +103,7 @@ public class classScoreCMD {
 					settings.setClassFile(arg);
 				else {
 					System.err.println("Invalid class file name (-c)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'd': //datafolder
@@ -102,7 +112,7 @@ public class classScoreCMD {
 					settings.setDataFolder(arg);
 				else {
 					System.err.println("Invalid path for data folder (-d)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'e': //scorecol
@@ -113,11 +123,11 @@ public class classScoreCMD {
 						settings.setScorecol(intarg);
 					else {
 						System.err.println("Invalid score column (-e)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err.println("Invalid score column (-e)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'f': //classfolder
@@ -126,7 +136,7 @@ public class classScoreCMD {
 					settings.setClassFolder(arg);
 				else {
 					System.err.println("Invalid path for class folder (-f)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'g': //gene rep treatment
@@ -138,53 +148,24 @@ public class classScoreCMD {
 					else {
 						System.err.println("Gene rep treatment must be either "
 								+ "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err.println("Gene rep treatment must be either "
 							+ "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
-			case 'h': //iterations
-				System.out.print("OPTIONS\n" +
-						"\tThe following options are supported:\n\n" +
-						"\t-a file ...\n" +
-						"\t\tSets the annotation file to be used.\n\n" +
-						"\t-c file ...\n" +
-						"\t\tSets the class file to be used.\n\n" +
-						"\t-c dir ...\n" +
-						"\t\tSets the data folder to be used.\n\n" +
-						"\t-e int ...\n" +
-						"\t\tSets the column in the score file to be used for scores.\n\n" +
-						"\t-f die ...\n" +
-						"\t\tSets the class folder to be used.\n\n" +
-						"\t-g int ...\n" +
-						"\t\tSets the gene replicant treatment: 1 (BEST_PVAL) or 2 (MEAN_PVAL).\n\n" +
-						"\t-h\thelp\n\n" +
-						"\t-i int ...\n" +
-						"\t\tSets the number of iterations.\n\n" +
-						"\t-l {0/1} ...\n" +
-						"\t\tSets whether or not to take logs.\n\n" +
-						"\t-m int ...\n" +
-						"\t\tSets the raw score method: 0 (MEAN_METHOD), 1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD).\n\n" +
-						"\t-n int ...\n" +
-						"\t\tSets the analysis method: 0 (ORA), 1 (RESAMPLING), 2 (CORRELATION), or 3 (ROC)\n\n" +
-						"\t-o file ...\n" +
-						"\t\tSets the output file.\n\n" +
-						"\t-q int ...\n" +
-						"\t\tSets the quantile.\n\n" +
-						"\t-r file ...\n" +
-						"\t\tSets the raw file to be used.\n\n" +
-						"\t-s file ...\n" +
-						"\t\tSets the score file to be used.\n\n" +
-						"\t-t double ...\n" +
-						"\t\tSets the pvalue threshold.\n\n" +
-						"\t-x maximum class size ...\n" +
-						"\t\tSets the maximum class size.\n\n" +
-						"\t-y minimum class size ...\n" +
-						"\t\tSets the minimum class size.\n\n");
+			case 'G': //GUI
+				try {
+					UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+				} catch ( Exception e ) {
+					e.printStackTrace();
+				}
+				new classScoreGUI();
 				System.exit(0);
+			case 'h': //iterations
+				showHelp();
 				break;
 			case 'i': //iterations
 				arg = g.getOptarg();
@@ -195,12 +176,12 @@ public class classScoreCMD {
 					else {
 						System.err
 								.println("Iterations must be greater than 0 (-i)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err
 							.println("Iterations must be greater than 0 (-i)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'l': //dolog
@@ -214,12 +195,12 @@ public class classScoreCMD {
 					else {
 						System.err
 								.println("Do Log must be set to 0 (false) or 1 (true) (-l)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err
 							.println("Do Log must be set to 0 (false) or 1 (true) (-l)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'm': //rawscoremethod
@@ -231,7 +212,7 @@ public class classScoreCMD {
 					System.err
 							.println("Raw score method must be set to 0 (MEAN_METHOD), "
 									+ "1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD) (-m)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'n': //analysis method
@@ -244,13 +225,13 @@ public class classScoreCMD {
 						System.err
 								.println("Analysis method must be set to 0 (ORA), 1 (RESAMP), "
 										+ "2 (CORR), or 3 (ROC) (-n)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err
 							.println("Analysis method must be set to 0 (ORA), 1 (RESAMP), "
 									+ "2 (CORR), or 3 (ROC) (-n)");
-					System.exit(-1);
+					showHelp();
 				}
 
 				break;
@@ -267,12 +248,12 @@ public class classScoreCMD {
 					else {
 						System.err
 								.println("Quantile must be between 0 and 100 (-q)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err
 							.println("Quantile must be between 0 and 100 (-q)");
-					System.exit(-1);
+					showHelp();
 				}
 
 				break;
@@ -282,7 +263,7 @@ public class classScoreCMD {
 					settings.setRawFile(arg);
 				else {
 					System.err.println("Invalid raw file name (-r)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 's': //scorefile
@@ -291,7 +272,7 @@ public class classScoreCMD {
 					settings.setScoreFile(arg);
 				else {
 					System.err.println("Invalid score file name (-s)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 't': //pval threshold
@@ -303,12 +284,12 @@ public class classScoreCMD {
 					else {
 						System.err
 								.println("The p value threshold must be between 0 and 1 (-x)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err
 							.println("The p value threshold must be between 0 and 1 (-x)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'x': //max class size
@@ -320,12 +301,12 @@ public class classScoreCMD {
 					else {
 						System.err
 								.println("The maximum class size must be greater than 1 (-x)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err
 							.println("The maximum class size must be greater than 1 (-x)");
-					System.exit(-1);
+					showHelp();
 				}
 				break;
 			case 'y': //min class size
@@ -337,18 +318,27 @@ public class classScoreCMD {
 					else {
 						System.err
 								.println("The minimum class size must be greater than 0 (-y)");
-						System.exit(-1);
+						showHelp();
 					}
 				} catch (NumberFormatException e) {
 					System.err
 							.println("The minimum class size must be greater than 0 (-y)");
-					System.exit(-1);
+					showHelp();
+				}
+				break;
+			case 'C': //configfile
+				arg = g.getOptarg();
+				if (FileTools.testFile(arg))
+					settings=new Settings(arg);
+				else {
+					System.err.println("Invalid config file name (-C)");
+					showHelp();
 				}
 				break;
 			case '?':
-				break; // getopt() already printed an error
+				showHelp();
 			default:
-				System.out.print("getopt() returned " + c + "\n");
+				showHelp();
 			}
 		}
 		try {
@@ -358,6 +348,50 @@ public class classScoreCMD {
 		}
 	}
 
+	private void showHelp()
+	{
+		System.out.print("OPTIONS\n" +
+				"\tThe following options are supported:\n\n" +
+				"\t-a file ...\n" +
+				"\t\tSets the annotation file to be used.\n\n" +
+				"\t-c file ...\n" +
+				"\t\tSets the class file to be used.\n\n" +
+				"\t-d dir ...\n" +
+				"\t\tSets the data folder to be used.\n\n" +
+				"\t-e int ...\n" +
+				"\t\tSets the column in the score file to be used for scores.\n\n" +
+				"\t-f die ...\n" +
+				"\t\tSets the class folder to be used.\n\n" +
+				"\t-g int ...\n" +
+				"\t\tSets the gene replicant treatment: 1 (BEST_PVAL) or 2 (MEAN_PVAL).\n\n" +
+				"\t-h\thelp\n\n" +
+				"\t-i int ...\n" +
+				"\t\tSets the number of iterations.\n\n" +
+				"\t-l {0/1} ...\n" +
+				"\t\tSets whether or not to take logs.\n\n" +
+				"\t-m int ...\n" +
+				"\t\tSets the raw score method: 0 (MEAN_METHOD), 1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD).\n\n" +
+				"\t-n int ...\n" +
+				"\t\tSets the analysis method: 0 (ORA), 1 (RESAMPLING), 2 (CORRELATION), or 3 (ROC)\n\n" +
+				"\t-o file ...\n" +
+				"\t\tSets the output file.\n\n" +
+				"\t-q int ...\n" +
+				"\t\tSets the quantile.\n\n" +
+				"\t-r file ...\n" +
+				"\t\tSets the raw file to be used.\n\n" +
+				"\t-s file ...\n" +
+				"\t\tSets the score file to be used.\n\n" +
+				"\t-t double ...\n" +
+				"\t\tSets the pvalue threshold.\n\n" +
+				"\t-x maximum class size ...\n" +
+				"\t\tSets the maximum class size.\n\n" +
+				"\t-y minimum class size ...\n" +
+				"\t\tSets the minimum class size.\n\n" +
+				"\t-C file ...\n" +
+				"\t\tSets the configuration file to be used.\n\n");
+		System.exit(0);
+	}
+	
 	private void initialize() {
 		try {
 			statusMessenger = new StatusStderr();
