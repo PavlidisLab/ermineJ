@@ -11,7 +11,7 @@ import java.text.*;
 
   @author Shahmil Merchant; Paul Pavlidis (major changes)
   @version $Id$
-                                                                                                                                                            
+
 */
 public class class_pvals {
     private histogram hist ;
@@ -40,20 +40,20 @@ public class class_pvals {
 
     /**
      */
-    public class_pvals(String probe_pvalfile, 
-		       String probe_classfile, 
-		       String goNamesfile, 
-		       String destination_file, 
-		       String group_file, 
-		       String method, 
-		       String groupMethod, 
-		       int class_max_size, 
+    public class_pvals(String probe_pvalfile,
+		       String probe_classfile,
+		       String goNamesfile,
+		       String destination_file,
+		       String group_file,
+		       String method,
+		       String groupMethod,
+		       int class_max_size,
 		       int class_min_size,
 		       int number_of_runs,
-		       int quantile, 
-		       double pval, 
-		       String wt_check, 
-		       int pvalcolumn, 
+		       int quantile,
+		       double pval,
+		       String wt_check,
+		       int pvalcolumn,
 		       String dolog_check,
 		       String mtc_method) {
 
@@ -63,7 +63,7 @@ public class class_pvals {
 	user_pvalue = -(Math.log(pval)/Math.log(10));// user defined pval (cutoff) for hypergeometric todo: this should NOT be here. What if the cutoff isn't a pvalue. See pvalue parse.
 	weight_on =(Boolean.valueOf(wt_check)).booleanValue();
 	dolog = (Boolean.valueOf(dolog_check)).booleanValue();
-	
+
 	classToProbe = new LinkedHashMap();
 
 
@@ -149,17 +149,17 @@ public class class_pvals {
 	}
 
 	double[] groupPvalArr = new double[in_size]; // store pvalues for items in the class.
-	
+
 	record.clear();
 	target_ranks.clear();
-	
+
 	int v_size = 0;
-	
-	// foreach item in the class. 
+
+	// foreach item in the class.
 	// todo: see if this loop can be optimized. Probably. It's important when we are doing random trials that this go fast.
-	while(classit.hasNext()) { 
+	while(classit.hasNext()) {
 	    String probe = (String)classit.next();  // probe id
-	    
+
 	    if (probesToPvals.containsKey(probe)){ // if it is in the data set. This is invariant under permutations.
 
 		if (weight_on == true) {
@@ -176,7 +176,7 @@ public class class_pvals {
 		}
 	    } // if in data set
 	} // end of while over items in the class.
-	
+
 	// get raw score and pvalue.
 	rawscore = probe_pval.calc_rawscore(groupPvalArr, in_size);
 	pval = scoreToPval(in_size, rawscore);
@@ -203,34 +203,34 @@ public class class_pvals {
 	//inputs for hypergeometric distribution
 	int successes = 0; // number of genes in this class which are above the threshold
 	int failures = 0; // number of genes in this calss which are below the threshold
-	
+
 	//variables for outputs
 	double pval = 0.0;
 	double rawscore = 0.0;
 	double hyper_pval = -1.0;
 	double area_under_roc = 0.0;
 	double roc_pval = 0.0;
-	
+
 	int in_size = (int)((Integer)effective_sizes.get(class_name)).intValue(); // effective size of this class.
 	if (in_size < probe_pval.get_class_min_size() || in_size > probe_pval.get_class_max_size() ) {
 	    return null;
 	}
-	
+
 	ArrayList values = (ArrayList)classToProbe.get(class_name);
 	Iterator classit = values.iterator();
 	double[] groupPvalArr = new double[in_size]; // store pvalues for items in the class.
-	
+
 	record.clear();
 	target_ranks.clear();
 	Object ranking = null;
-	
+
 	int v_size = 0;
-	
-	// foreach item in the class. 
+
+	// foreach item in the class.
 	// todo: see if this loop can be optimized. Probably. It's important when we are doing random trials that this go fast.
-	while(classit.hasNext()) { 
+	while(classit.hasNext()) {
 	    String probe = (String)classit.next();  // probe id
-	    
+
 	    if (probesToPvals.containsKey(probe)){ // if it is in the data set. This is invariant under permutations.
 
 		if (weight_on == true) {
@@ -238,7 +238,7 @@ public class class_pvals {
 		    if(!record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
 			record.put(probe_group.get(probe), null); // mark it as done.
 			groupPvalArr[v_size] = grouppval.doubleValue();
-			
+
 			//  (hypergeometric) if the user_pval is met by this probe, we count it
 			if(groupPvalArr[v_size] >= user_pvalue) {
 			    successes++; // successs.
@@ -258,7 +258,7 @@ public class class_pvals {
 		    Double pbpval = (Double)probesToPvals.get(probe); // pvalue for this probe. This will not be null if things have been done correctly so far. This is the only place we need the raw pvalue for a probe.
 		    groupPvalArr[v_size] = pbpval.doubleValue();
 		    v_size++;
-		    
+
 		    // hypergeometric pval info.
 		    if(pbpval.doubleValue() >= user_pvalue) {
 			successes++; // successs.
@@ -275,7 +275,7 @@ public class class_pvals {
 		}
 	    } // if in data set
 	} // end of while over items in the class.
-	
+
 	// get raw score and pvalue.
 	rawscore = probe_pval.calc_rawscore(groupPvalArr, in_size);
 	pval = scoreToPval(in_size, rawscore);
@@ -306,7 +306,7 @@ public class class_pvals {
 	    // class wrt data size.
 	    hyper_pval = SpecFunc.binomialCumProb(successes, numOverThreshold, pos_prob);
 	}
-	
+
 	//	System.err.println(class_name + "(" + goName.get_GoName_value_map(class_name) + ") - base prob: " + pos_prob + " successes: " + successes + " failures: " + failures + " Trials: " + numOverThreshold + " Nontrials: " + numUnderThreshold + " H: " + hyper_pval);
 
 	// set up the return object.
@@ -339,11 +339,11 @@ public class class_pvals {
 	// For each class.
 	while(it.hasNext()) {
 	    Map.Entry e = (Map.Entry)it.next();
-	    String class_name = (String)e.getKey(); 
+	    String class_name = (String)e.getKey();
 	    classresult res = scoreClass(class_name, group_pval_map, probesToPvals, input_rank_map);
-	    if (res != null) 
+	    if (res != null)
 		results.put(class_name, res);
-	} 
+	}
     } /* class_pval_generator */
 
 
@@ -353,31 +353,31 @@ public class class_pvals {
     scores (pvalues) (see below) instead of adding them to the results
     object. This is used to get class pvalues for permutation
     analysis.
-    
+
     */
-    public HashMap class_v_pval_generator(Map group_pval_map, Map probesToPvals, Map input_rank_map) 
+    public HashMap class_v_pval_generator(Map group_pval_map, Map probesToPvals, Map input_rank_map)
     {
 	Collection entries = classToProbe.entrySet(); // go -> probe map. Entries are the class names.
 	Iterator it = entries.iterator(); // the classes.
 	//	Vector results = new Vector();
 	HashMap results = new HashMap();
-	
+
 	// For each class.
 	while(it.hasNext()) {
 	    Map.Entry e = (Map.Entry)it.next();
-	    String class_name = (String)e.getKey(); 
+	    String class_name = (String)e.getKey();
 	    double pval = classPvalue(class_name, group_pval_map, probesToPvals, input_rank_map);
-	    
-	    if (pval >= 0.0) 
+
+	    if (pval >= 0.0)
 		results.put(class_name, new Double(pval) );
 
-	} 
+	}
 	return results;
     }
 
 
     /**
-       convert a raw score into a pvalue, based on random background distribution 
+       convert a raw score into a pvalue, based on random background distribution
     */
     public double scoreToPval (int in_size, double rawscore) {
 	double pval = hist.get_val(in_size, rawscore);
@@ -391,7 +391,7 @@ public class class_pvals {
 
 
     /**
-       Sorted order of the class results - all this has to hold is the class names. 
+       Sorted order of the class results - all this has to hold is the class names.
     */
     private void sortResults () {
 	sortedclasses = new Vector(results.entrySet().size());
@@ -458,7 +458,7 @@ public class class_pvals {
     private String format_redundant_and_similar (String classid) {
 	ArrayList redund = probe_class.getRedundancies(classid);
 	String return_value = "";
-	    
+
 	if (redund != null) {
 	    Iterator it = redund.iterator();
 	    while (it.hasNext()) {
@@ -466,8 +466,8 @@ public class class_pvals {
 		String prefix;
 		return_value = return_value + nextid + "|" +  goName.get_GoName_value_map(nextid) + ", ";
 	    }
-	} 
-	
+	}
+
 	return_value = return_value + "\t";
 
 	ArrayList similar = probe_class.getSimilarities(classid);
@@ -480,15 +480,15 @@ public class class_pvals {
 		return_value = return_value + nextid + "|" +  goName.get_GoName_value_map(nextid) + ", ";
 	    }
 	    return "\t" + return_value;
-	} 
+	}
 
 	return return_value;
 
     }
-   
-    
+
+
     /**
-       Calculate class sizes for all classes - both effective and actual size 
+       Calculate class sizes for all classes - both effective and actual size
     */
     public void class_sizes () {
 	Collection entries = classToProbe.entrySet(); // go -> probe map. Entries are the class names.
@@ -514,7 +514,7 @@ public class class_pvals {
 		if (probe != null) {
 		    if (probetopval.containsKey(probe)){ // if it is in the data set
 			size++;
-			
+
 			if (weight_on) { //routine for weights
 			    // compute pval for every replicate group
 			    if (probe_pval.get_group_pval_map().containsKey(probe_group.get(probe)) && !record.containsKey(probe_group.get(probe))) { // if we haven't done this probe already.
@@ -527,7 +527,7 @@ public class class_pvals {
 	    } // end of while over items in the class.
 
 
-	    if (!weight_on) 
+	    if (!weight_on)
 		v_size = size;
 
 	    effective_sizes.put(class_name, new Integer(v_size));
@@ -537,17 +537,17 @@ public class class_pvals {
 	System.err.println("Got class sizes");
     } /* class sizes */
 
-    
+
     /**
        Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution. This
        is a constant under permutations, but depends on weights.
-       @param inp_entries The pvalues for the probes (no weights) or groups (weights) 
+       @param inp_entries The pvalues for the probes (no weights) or groups (weights)
     */
     private void hgSizes (Collection inp_entries) {
 
 	Iterator itr = inp_entries.iterator();
 	while(itr.hasNext()) {
-	    Map.Entry m = (Map.Entry)itr.next();	
+	    Map.Entry m = (Map.Entry)itr.next();
 	    double groupval = Double.parseDouble((m.getValue()).toString());
 
 	    if(groupval >= user_pvalue)
@@ -560,7 +560,7 @@ public class class_pvals {
 
 
     /**
-       
+
     Bonferroni correction of class pvalues.
 
     */
@@ -581,7 +581,7 @@ public class class_pvals {
     }
 
     /**
-       
+
     Benjamini-Hochberg correction of pvalues. This puts values of 1 or
     0 int the corrected p, indicating whether the FDR has been met by
     a particular pvalue.
@@ -600,7 +600,7 @@ public class class_pvals {
 	    double actual_p = res.get_pvalue();
 
 	    double thresh = fdr * n / numclasses;
-	    
+
 	    if (actual_p < thresh || threshpassed) {
 		res.setpvalue_corr(1.0);
 		threshpassed = true;
@@ -622,7 +622,7 @@ public class class_pvals {
        0. Sort the pvalues for the real data (assume worst pvalue is first)
        1. Make an array of count variables, one for each class, intialize to zero.
        loop: (n=10,000).
-       2. Generate class pvalues for randomized values (see above); 
+       2. Generate class pvalues for randomized values (see above);
        3. Iterate over this in the same order as the actual order.
        4. Define successive minima: (q is the trial; p is real, already ranked)
        a. qk = pk (class with worst pvalue)
@@ -634,7 +634,7 @@ public class class_pvals {
        7. enforce monotonicity by using successive maximization.
        @param trials  How many random trials to do. According to W-Y, it should be >=10,000.
     */
-    private void correct_pvals(int trials) 
+    private void correct_pvals(int trials)
     {
 
 	int[] counts = new int[sortedclasses.size()];
@@ -661,7 +661,7 @@ public class class_pvals {
 	    // values)
 	    //	    Map scprobepvalmap = probe_pval.get_map(true);
 	    Map scprobepvalmap =  probe_pval.get_map();
-	    
+
 	    // Just for AROC:
 	    Map scinput_rank_map;
 	    if (weight_on) {
@@ -689,7 +689,7 @@ public class class_pvals {
 
 		classresult res = (classresult)results.get(nextclass);
 		actual_p = res.get_pvalue(); // pvalue for this class on real data.
-	
+
 		m = (Double)permscores.get(nextclass);
 		permp = m.doubleValue(); // randomized pvalue for this class.
 
@@ -716,7 +716,7 @@ public class class_pvals {
 		    counts[j]++;
 		}
 
-		
+
 		/* the following tests two classes which are very similar. Their permutation p values should be correlated */
 		/*		if (nextclass.equals("GO:0006956")) {
 		    System.err.print("\tGO:0006956\t" +   nf.format(permp) + "\n");
@@ -733,13 +733,13 @@ public class class_pvals {
 		j++;
 		qprev = q;
 	    }
-	    if (! i% 50) {
+	    if (i % 50 == 0) {
 		System.err.println(i + " Westfall-Young trials.");
 	    }
 	}
 
 	Collections.reverse(sortedclasses); // now the best class is first.
-	
+
 	int j = sortedclasses.size() - 1; // index of the best class (last one tested above).
 	double corrected_p = counts[sortedclasses.size() - 1]/trials; // pvalue for the best class.
 	double previous_p = corrected_p;
@@ -762,7 +762,7 @@ public class class_pvals {
     public static void main (String[] args) {
 	class_pvals test = new class_pvals(args[0],args[1],args[2],args[3],args[4],args[5],args[6],
 					   Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),
-					   Integer.parseInt(args[10]), Double.parseDouble(args[11]),args[12], 
+					   Integer.parseInt(args[10]), Double.parseDouble(args[11]),args[12],
 					   Integer.parseInt(args[13]), args[14], args[15]);
     }
 
