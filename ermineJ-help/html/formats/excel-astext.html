@@ -1,52 +1,87 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+    <meta http-equiv="content-type" content=
+    "text/html;charset=iso-8859-1">
+    <meta name="generator" content="Adobe GoLive">
 
- <head>
-  <meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
-  <meta name="generator" content="Adobe GoLive">
-  <title>Untitled Page</title>
-  <link href="../style.css" rel="stylesheet" type="text/css" media="all">
- </head>
+    <title>Untitled Page</title>
+    <link href="../style.css" rel="stylesheet" type="text/css" media=
+    "all">
+  </head>
 
- <body bgcolor="#ffffff">
-  <table width="523" border="0" cellspacing="3" cellpadding="2">
-   <tbody>
-    <tr>
-     <td>
-      <h2>Saving Excel spreadsheet tables as tab-delimited text files</h2>
-     </td>
-    </tr>
-    <tr>
-     <td>
-      <p>All of the software we provide uses plain text files as input; they cannot use Excel spreadsheets or any other format. This page describes in detail how to convert an excel spreadsheet into a suitable text file. These instructions refer specifically to how to set up the main data matrix for statistical analysis but parts of the instructions are generic.</p>
-      <p>First make sure you know about the following important points.</p>
-      <ul>
-       <li>Your original Excel file will not be affected by this procedure, because you are saving a copy of the file.
-       <li>The worksheet you are viewing now is the one which will saved. Other worksheets are not saved.
-       <li>All row and column names must not contain spaces. This is because our parsers may get confused by names containing spaces.
-       <li>Missing values should just look blank; avoid putting spaces or other characters in any fields.<li>The values in the file, other than the row and column labels, must be numbers (no letters or other characters)</ul>
-      <p>Here is what a reasonable spreadsheet might look like in Excel before you save it as text. Note that all the pretty formatting will be lost when you save it as text. If you open the saved text file in excel again, the colors, formulas, etc. will be gone. So make sure you have already saved the file as an &quot;xls&quot; document.</p>
-      <img src="http://microarray.cpmc.columbia.edu/pavlidis/pub/stats/web/images/excel-spreadsheet-example1.jpg" alt="" height="472" width="521" border="0"><br>
-      <p>Okay, on to the instructions. From the file menu, select &quot;save as...&quot;. You should see the following dialog box. Select &quot;text (tab delimited)&quot; from the pull down menu. Fill in the file name you want to use. Remember that Unix file names cannot contain spaces or other cetain 'special' characters. (Details about unix are beyond the scope of this tutorial).</p>
-      <img src="http://microarray.cpmc.columbia.edu/pavlidis/pub/stats/web/images/excel-saveasdialog.gif" alt="" height="385" width="599" border="0"><br>
-      <p>Then, for some silly reason, Excel shows you the following dialog box. Click &quot;yes&quot;.</p>
-      <img src="http://microarray.cpmc.columbia.edu/pavlidis/pub/stats/web/images/excel-warning1.gif" alt="" height="140" width="719" border="0"><br>
-      <p>If you now close the document, Excel will usually give you the following prompt. Select &quot;no&quot; (otherwise you go back to the beginning again).</p>
-      <img src="http://microarray.cpmc.columbia.edu/pavlidis/pub/stats/web/images/excel-warning2.gif" alt="" height="108" width="362" border="0"><br>
-      <p>That's it, you're done.</p>
-     </td>
-    </tr>
-    <tr name="footer">
-     <td><img src="http://microarray.cpmc.columbia.edu/images/shim.gif" alt="" height="10" width="1" border="0"></td>
-    </tr>
-   
-   </tbody>
-  </table>
+  <body bgcolor="#ffffff">
+    <h1>Saving Excel spreadsheet tables as tab-delimited text
+    files</h1>
 
-  <hr>
-  <div class="tidy">Copyright 2004 (c) Columbia University</div>
-  
- </body>
+    <p>All of the software we provide uses plain text files as input;
+    they cannot use Excel spreadsheets or any other format. This page
+    describes in detail how to convert an excel spreadsheet into a
+    suitable text file. These instructions were set up under Windows
+    but for MacOS X it should be similar.</p>
 
+    <p>First make sure you know about the following important
+    points.</p>
+
+    <ul>
+      <li>Your original Excel file will not be affected by this
+      procedure, because you are saving a copy of the file.</li>
+
+      <li>The worksheet you are viewing now is the one which will
+      saved. Other worksheets are not saved.</li>
+
+      <li>All row and column names must not contain spaces. This is
+      because our parsers may get confused by names containing
+      spaces.</li>
+
+      <li>Missing values should just look blank; avoid putting spaces
+      or other characters in any fields.</li>
+
+      <li>The values in the file, other than the row and column labels,
+      must be numbers (no letters or other characters)</li>
+    </ul>
+
+    <p>Here is what a reasonable spreadsheet might look like in Excel
+    before you save it as text. Note that all the pretty formatting
+    will be lost when you save it as text. If you open the saved text
+    file in excel again, the colors, formulas, etc. will be gone. So
+    make sure you have already saved the file as an "xls" document.</p>
+    <img alt="" src="../images/excel-example.JPG" border="0"><br>
+     
+
+    <p>From the file menu, select "save as...". You should see the
+    following dialog box. Select "text (tab delimited)" from the pull
+    down menu. Fill in the file name you want to use. Remember that
+    Unix file names cannot contain spaces or other cetain 'special'
+    characters. (Details about unix are beyond the scope of this
+    tutorial).</p>
+    <img src=
+    "http://microarray.cpmc.columbia.edu/pavlidis/pub/stats/web/images/excel-saveasdialog.gif"
+     alt="" height="385" width="599" border="0"><br>
+     
+
+    <p>Then, for some silly reason, Excel shows you the following
+    dialog box. Click "yes".</p>
+    <img src=
+    "http://microarray.cpmc.columbia.edu/pavlidis/pub/stats/web/images/excel-warning1.gif"
+     alt="" height="140" width="719" border="0"><br>
+     
+
+    <p>If you now close the document, Excel will usually give you the
+    following prompt. Select "no" (otherwise you go back to the
+    beginning again).</p>
+    <img src=
+    "http://microarray.cpmc.columbia.edu/pavlidis/pub/stats/web/images/excel-warning2.gif"
+     alt="" height="108" width="362" border="0"><br>
+     
+
+    <p>That's it, you're done.</p>
+    <hr>
+
+    <div class="tidy">
+      Copyright 2004 (c) Columbia University
+    </div>
+  </body>
 </html>

@@ -92,7 +92,7 @@ public class OutputPanel extends JScrollPane {
             new TableHeader_mouseAdapterCursorChanger( this ) );
 
       OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
-      JMenuItem modMenuItem = new JMenuItem( "Modify this gee set..." );
+      JMenuItem modMenuItem = new JMenuItem( "Modify this gene set..." );
       modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter(
             this ) );
       JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );

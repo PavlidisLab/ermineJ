@@ -1,9 +1,9 @@
 body {font-family:sans-serif}
 p {font-family:sans-serif}
 td {font-family:sans-serif}
-h1{font-size:2em;font-family:sans-serif;font-weight:bold;margin:0.67em 0}
-h2{font-size:1.5em;font-family:sans-serif;font-weight:bold;margin:0.83em 0}
-h3{font-size:1.17em;font-family:sans-serif;font-weight:bold;margin:1em 0}
+h1{font-size:24px;font-family:sans-serif;font-weight:bold;margin:0.67em 0}
+h2{font-size:18px;font-family:sans-serif;font-weight:bold;margin:0.83em 0}
+h3{font-size:14px;font-family:sans-serif;font-weight:bold;margin:1em 0}
 h4{font-family:sans-serif;font-weight:bold;margin:1.33em 0}
 .tidy{font-size:x-small;font-family:sans-serif;font-variant:small-caps}
 ol{font-family:sans-serif}

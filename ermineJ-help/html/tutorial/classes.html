@@ -1,62 +1,127 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
 <html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+    <link href="../style.css" rel="stylesheet" type="text/css" media=
+    "all">
 
- <head>
-  <link href="../style.css" rel="stylesheet" type="text/css" media="all">
-  <title>Defining and modifying gene sets</title>
- </head>
+    <title>Defining and modifying gene sets</title>
+  </head>
 
- <body bgcolor="#ffffff">
-  <h2>Tutorial: Gene sets</h2>
-  <p>A <b>gene set</b>&nbsp;is any grouping of genes defined by criteria other than the data currently being analyzed. Our baseline gene sets are defined using Gene Ontology terms as applied in the publicly available sources listed on the GO web site.</p>
-  <p>You can import, define, or modify gene sets as you like. This page explains how.</p>
-  <h2>Creating a new gene set</h2>
-  <p>Select &quot;create new gene set&quot; from the &quot;gene set&quot;&nbsp;menu. This gets you to the new gene set wizard.</p>
-  <p>You can import a file describing a gene set, or you can create one manually from the list of genes on the array you are using. You choose which to use by selecting &quot;file&quot; or &quot;manual&quot;&nbsp;in the first step of the new gene set wizard:</p>
-  <p><img src="../images/new_class1.gif" alt="" width="558" height="377" border="0"></p>
-  <h2>Adding new genes manually</h2>
-  <p>Select probes from the left panel and click &quot;add&quot;&nbsp;to move them to the right panel. Note that here we added one probe for the ABCA1 gene, but four probes were moved to the right. This is because there are four probes which assay ABCA1; all of them are added to the gene set automatically. Similarly you can delete probes from the right panel by using the 'delete' button.</p>
-  <p><img src="../images/new_class_manual2.gif" alt="" width="558" height="377" border="0"></p>
-  <h3>Using the 'find' function to help locate genes.</h3>
-  <p>To make it easier to build new gene sets, a 'find' function is provided. Here we searched for &quot;cell cycle&quot; and found 6 probes.</p>
-  <p><img src="../images/new_class_manual_find2.gif" alt="" width="558" height="377" border="0"></p>
-  <h3>Giving the new gene set a name and description</h3>
-  <p>After adding the probes and genes to the gene set and hitting &quot;next&quot;, you will be asked to enter a new identifier and description for the gene set you defined. When you hit finish, the information about this gene set is saved to disk and you are returned to the main panel.</p>
-  <p><img src="../images/new_class_manual3.gif" alt="" width="558" height="377" border="0"></p>
-  <p>After hitting 'finish', the new gene set is shown in color in the output panel. The gene set is also saved to disk for future use.</p>
-  <p><img src="../images/output_panel_after_new.gif" alt="" width="886" height="477" border="0"></p>
-  <p></p>
-  <h2>Entering a gene set from a file</h2>
-  <p><img src="../images/new_class_file1.gif" alt="" width="558" height="377" border="0"></p>
-  <p>Here is the format of a gene set file, viewed in a text editor. The first line indicates the type of identifier in the file:&nbsp;either 'probe' or 'gene'. Here we are using probe identifiers. The second line is the name of the gene set, and the third is the description. Finally, there is a list of the probes in the class.</p>
-  <p><img src="../images/new_class_file_sample.gif" alt="" width="412" height="331" border="0"></p>
-  <h2>Modifying an existing gene set</h2>
-  <p>You can modify a pre-existing gene set by adding or removing genes. This is done using the &quot;Modify gene set&quot; wizard. This can be accessed either by right-clicking on the gene set in the Output Panel or by selecting the &quot;modify&quot; item from the Gene set menu.</p>
-  <p>If you use the &quot;Gene set&quot; menu, you will get a list of all the available gene sets. Select one by clicking on it. You can use the find function to help locate a specific set. After this step, the procedure is very similar to the &quot;create new&quot; gene set procedure explained above.</p>
-  <p><img src="../images/modify_class1.gif" alt="" width="558" height="377" border="0"></p>
-  <p>The next screen lists the available probes on the left, and the probes in the set on the right. Similar to the 'create new gene set' procedure shown above, you can add or remove probes.</p>
-  <p><img src="../images/modify_class2.gif" alt="" width="558" height="377" border="0"></p>
-  <p>Finally, you can provide your gene set with a new name. This is actually optional:&nbsp;if you don't provide a new name, the old gene set will simply be replaced.</p>
-  <p><img src="../images/modify_class3.gif" alt="" width="558" height="377" border="0"></p>
-  <p>As for new gene sets, the modified gene sets are shown on the main panel in a different color to indicate they were modified by the user.</p>
-  <p><img src="../images/modify_class4.gif" alt="" width="886" height="477" border="0"></p>
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+  <body bgcolor="#ffffff">
+    <h1>Tutorial: Gene sets</h1>
 
+    <p>A <b>gene set</b>&nbsp;is any grouping of genes defined by
+    criteria other than the data currently being analyzed. Our baseline
+    gene sets are defined using Gene Ontology terms as applied in the
+    publicly available sources listed on the GO web site.</p>
+
+    <p>You can import, define, or modify gene sets as you like, using
+    the "gene set" menu on the main panel of the software. This page
+    explains how.</p>
+
+    <h2>Creating a new gene set</h2>
+
+    <p>Select "create new gene set" from the "gene set"&nbsp;menu. This
+    gets you to the new gene set wizard.</p>
+
+    <p>You can import a file describing a gene set, or you can create
+    one manually from the list of genes on the array you are using. You
+    choose which to use by selecting "file" or "manual"&nbsp;in the
+    first step of the new gene set wizard:</p>
+
+    <p><img height="377" alt="" src="../images/new_class1.gif" width=
+    "558" border="0"></p>
+
+    <h2>Adding new genes manually</h2>
+
+    <p>Select probes from the left panel and click "add"&nbsp;to move
+    them to the right panel. Note that here we added one probe for the
+    ABCA1 gene, but four probes were moved to the right. This is
+    because there are four probes which assay ABCA1; all of them are
+    added to the gene set automatically. Similarly you can delete
+    probes from the right panel by using the 'delete' button.</p>
+
+    <p><img height="377" alt="" src="../images/new_class_manual2.gif"
+    width="558" border="0"></p>
+
+    <h3>Using the 'find' function to help locate genes.</h3>
+
+    <p>To make it easier to build new gene sets, a 'find' function is
+    provided. Here we searched for "cell cycle" and found 6 probes.</p>
+
+    <p><img height="377" alt="" src=
+    "../images/new_class_manual_find2.gif" width="558" border="0"></p>
+
+    <h3>Giving the new gene set a name and description</h3>
+
+    <p>After adding the probes and genes to the gene set and hitting
+    "next", you will be asked to enter a new identifier and description
+    for the gene set you defined. When you hit finish, the information
+    about this gene set is saved to disk and you are returned to the
+    main panel.</p>
+
+    <p><img height="377" alt="" src="../images/new_class_manual3.gif"
+    width="558" border="0"></p>
+
+    <p>After hitting 'finish', the new gene set is shown in color in
+    the output panel. The gene set is also saved to disk for future
+    use.</p>
+
+    <p><img height="477" alt="" src=
+    "../images/output_panel_after_new.gif" width="886" border="0"></p>
+
+    <h2>Entering a gene set from a file</h2>
+
+    <p><img height="377" alt="" src="../images/new_class_file1.gif"
+    width="558" border="0"></p>
+
+    <p>Here is the format of a gene set file, viewed in a text editor.
+    The first line indicates the type of identifier in the
+    file:&nbsp;either 'probe' or 'gene'. Here we are using probe
+    identifiers. The second line is the name of the gene set, and the
+    third is the description. Finally, there is a list of the probes in
+    the class.</p>
+
+    <p><img height="331" alt="" src=
+    "../images/new_class_file_sample.gif" width="412" border="0"></p>
+
+    <h2>Modifying an existing gene set</h2>
+
+    <p>You can modify a pre-existing gene set by adding or removing
+    genes. This is done using the "Modify gene set" wizard. This can be
+    accessed either by right-clicking on the gene set in the Output
+    Panel or by selecting the "modify" item from the Gene set menu.</p>
+
+    <p>If you use the "Gene set" menu, you will get a list of all the
+    available gene sets. Select one by clicking on it. You can use the
+    find function to help locate a specific set. After this step, the
+    procedure is very similar to the "create new" gene set procedure
+    explained above.</p>
+
+    <p><img height="377" alt="" src="../images/modify_class1.gif"
+    width="558" border="0"></p>
+
+    <p>The next screen lists the available probes on the left, and the
+    probes in the set on the right. Similar to the 'create new gene
+    set' procedure shown above, you can add or remove probes.</p>
+
+    <p><img height="377" alt="" src="../images/modify_class2.gif"
+    width="558" border="0"></p>
+
+    <p>Finally, you can provide your gene set with a new name. This is
+    actually optional:&nbsp;if you don't provide a new name, the old
+    gene set will simply be replaced.</p>
+
+    <p><img height="377" alt="" src="../images/modify_class3.gif"
+    width="558" border="0"></p>
+
+    <p>As for new gene sets, the modified gene sets are shown on the
+    main panel in a different color to indicate they were modified by
+    the user.</p>
+
+    <p><img height="477" alt="" src="../images/modify_class4.gif"
+    width="886" border="0"></p>
+  </body>
 </html>

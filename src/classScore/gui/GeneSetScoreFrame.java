@@ -94,14 +94,13 @@ public class GeneSetScoreFrame
    JPanel jPanel1 = new JPanel();
    FlowLayout flowLayout1 = new FlowLayout();
 
-   // JavaHelp
-   private HelpBroker m_helpBroker = null;
-   private final boolean ENABLE_HELP = true; // when help is fully implemented, delete this line
-
+   private HelpHelper hh;
+ 
    public GeneSetScoreFrame() {
       try {
          jbInit();
-         initHelp();
+         hh = new HelpHelper();
+         hh.initHelp(helpMenuItem);
          settings = new Settings();
       }
       catch ( Exception e ) {
@@ -109,48 +108,7 @@ public class GeneSetScoreFrame
       }
    }
 
-   /**
-    * Initializes JavaHelp by creating HelpSet and HelpBroker objects
-    * and attaching an action listener to the help menu item (helpMenuItem)
-    */
-   private void initHelp() {
 
-      // Create HelpSet and HelpBroker objects
-      HelpSet hs = ENABLE_HELP ? getHelpSet( "main.hs" ) : null;
-      if ( hs != null ) {
-         m_helpBroker = hs.createHelpBroker();
-
-         // Assign help to components
-         CSH.setHelpIDString( helpMenuItem, "top" );
-
-         // Handle events
-         helpMenuItem.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
-      }
-      else {
-         // Disable help menu
-         helpMenuItem.setEnabled( false );
-      }
-   }
-
-  /**
-   * Finds the helpset file and creates a HelpSet object.
-   *
-   * @param helpsetFilename filename of the *.hs file relative to the classpath
-   * @return the help set object created from the file; if the file was not
-   *   loaded for whatever reason, returns null.
-   */
-  private HelpSet getHelpSet( String helpsetFilename ) {
-      HelpSet hs = null;
-      ClassLoader cl = this.getClass().getClassLoader();
-      try {
-         URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
-         hs = new HelpSet( null, hsURL );
-      } catch( Exception e ) {
-         System.err.println( "HelpSet: " + e.getMessage() );
-         System.err.println( "HelpSet: "+ helpsetFilename + " not found" );
-      }
-      return hs;
-   }
 
 
    /* init */
@@ -231,9 +189,7 @@ public class GeneSetScoreFrame
       helpMenu.setMnemonic( 'H' );
       helpMenuItem.setText( "Help Topics" );
       helpMenuItem.setMnemonic( 'T' );
-      if ( m_helpBroker != null ) {
-         helpMenuItem.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
-      }
+
       aboutMenuItem.setText( "About ErmineJ" );
       aboutMenuItem.setMnemonic( 'A' );
       aboutMenuItem.addActionListener( new

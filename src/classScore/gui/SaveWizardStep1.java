@@ -51,7 +51,7 @@ public class SaveWizardStep1 extends WizardStep {
       runPanel.add( topPanel, BorderLayout.NORTH );
       runPanel.add( centerPanel, BorderLayout.CENTER );
 
-      this.addHelp( "<html><b>You may save" +
+      this.addHelp( "<html><b>You may save " +
             "the results of an analysis in a file.</b><br>" + "This file" +
                   " can be used in other software (e.g. Excel) or loaded" +
                   " back into this application to be viewed later." );

@@ -19,28 +19,18 @@ import javax.swing.table.AbstractTableModel;
 import baseCode.util.FileTools;
 
 /**
- * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2003
- * </p>
- * <p>
- * Company:
- * </p>
+ * 
  *
+ * <hr>
+ * <p>Copyright (c) 2004 Columbia University
  * @author Homin K Lee
  * @version $Id$
  */
-
 public class NewGeneSet {
    private GeneAnnotations geneData;
    private String id;
    private String desc;
-   private ArrayList probes;
+   ArrayList probes;
    private boolean modifiedGS = false;
 
    public NewGeneSet( GeneAnnotations geneData ) {

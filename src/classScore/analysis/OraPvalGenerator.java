@@ -36,7 +36,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       this.numOverThreshold = not;
       this.numUnderThreshold = nut;
       this.inputSize = inputSize;
-      
+
       if ( settings.getUseLog() ) {
          this.user_pvalue = -Math.log( settings.getPValThreshold() );
       } else {
@@ -47,7 +47,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
    /**
     * Get results for one class, based on class id. The other arguments are things that are not constant under
     * permutations of the data.
-    *  
     */
    public GeneSetResult classPval( String class_name, Map groupToPvalMap,
          Map probesToPvals ) {
@@ -94,12 +93,15 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
                   record
                         .put( geneAnnots.getProbeToGeneMap().get( probe ), null );
+
                   groupPvalArr[v_size] = grouppval.doubleValue();
 
-                  if ( groupPvalArr[v_size] >= user_pvalue ) {
-                     successes++; // successs.
+                  double score = groupPvalArr[v_size];
+
+                  if ( score >= user_pvalue ) {
+                     successes++;
                   } else {
-                     failures++; // failure.
+                     failures++;
                   }
                   v_size++;
                }
@@ -112,11 +114,13 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 */
                Double pbpval = ( Double ) probesToPvals.get( probe );
 
+               double score = pbpval.doubleValue();
+
                // hypergeometric pval info.
-               if ( pbpval.doubleValue() >= user_pvalue ) {
-                  successes++; // successs.
+               if ( score >= user_pvalue ) {
+                  successes++;
                } else {
-                  failures++; // failure.
+                  failures++;
                }
 
             }
@@ -134,9 +138,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
          // or we didn't/cant get
          // anything.
-      //   hyper_pval = Probability.binomial( successes, numOverThreshold,
-       //        pos_prob );
-         
+         //   hyper_pval = Probability.binomial( successes, numOverThreshold,
+         //        pos_prob );
+
          // upper tail. this is more consistent with the other methods.
          hyper_pval = Probability.binomialComplemented( successes,
                numOverThreshold, pos_prob );

@@ -79,18 +79,35 @@ public class Settings {
     */
    public Settings( String filename ) {
       pref_file = filename;
-      String homeDir = System.getProperty( "user.home" );
-      dataFolder = homeDir + File.separator + "ermineJ.data";
+      
+      /* Expect the data directory to be in the installation directory.*/
+      dataFolder = ( new File( Settings.class.getResource( "Settings.class" )
+            .getFile() ) ).getPath();
+      int end = dataFolder.lastIndexOf( File.separatorChar );
+      dataFolder = dataFolder.substring( 0, end + 1 ) + ".." + File.separator
+            + ".." + File.separator + "data";
       try {
          dataFolder = URLDecoder.decode( ( new File( dataFolder )
                .getCanonicalPath() ), "ISO-8859-1" );
       } catch ( IOException ex ) {
-         GuiUtil.error(
-            "Could not find data folder.\n" +
-            "Expected to find it at " + dataFolder + "\n" +
-            "Press OK to quit." ); // make a big deal...
-         System.exit( 1 );
+         GuiUtil.error( "Could not find data folder."  +
+             "Expected to find it at " + dataFolder); // make a big deal...
       }
+      
+      /* Look in the user's home */
+//      String homeDir = System.getProperty( "user.home" );
+//      dataFolder = homeDir + File.separator + "ermineJ.data";
+//      try {
+//         dataFolder = URLDecoder.decode( ( new File( dataFolder )
+//               .getCanonicalPath() ), "ISO-8859-1" );
+//      } catch ( IOException ex ) {
+//         GuiUtil.error(
+//            "Could not find data folder.\n" +
+//            "Expected to find it at " + dataFolder + "\n" +
+//            "Press OK to quit." ); // make a big deal...
+//         System.exit( 1 );
+//      }
+      
       classFolder = new String( dataFolder + File.separator + "genesets" );
       if ( pref_file.compareTo( "" ) == 0 )
             pref_file = dataFolder + File.separator + "ClassScore.preferences";
@@ -152,7 +169,7 @@ public class Settings {
                         .doubleValue();
          }
       } catch ( IOException ex ) {
-         System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no big deal.
+     //    System.err.println( "Could not find preferences file. Will probably attempt to create a new one." ); // no big deal.
       }
    }
 

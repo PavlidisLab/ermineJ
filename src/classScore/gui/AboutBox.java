@@ -125,11 +125,11 @@ public class AboutBox extends JDialog implements ActionListener {
       jTextPane1.setDisabledTextColor( Color.black );
       jTextPane1.setEditable( false );
       jTextPane1.setMargin(new Insets(10, 10, 10, 10));
-      jTextPane1.setText("For license information, see LICENSE.txt. Direct questions to Paul " +
-    "Pavlidis: pavlidis@dbmi.columbia.edu. If you use this software for your work, please cite Pavlidis, P., " +
+      jTextPane1.setText("<html><p>ErmineJ is licensed under the Gnu Public License</p><p>Direct questions about ermineJ to Paul " +
+    "Pavlidis: pavlidis@dbmi.columbia.edu.</p><p>If you use this software for your work, please cite Pavlidis, P., " +
     "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data" +
     " with class scores. Proceedings of the Pacific Symposium on Biocomputing" +
-    " 7. pp 474-485." );
+    " 7. pp 474-485.</p></html>" );
 
       insetsPanel1.setBorder(BorderFactory.createEtchedBorder());
       insetsPanel3.add( label2, null );

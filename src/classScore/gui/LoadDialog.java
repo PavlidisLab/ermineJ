@@ -89,6 +89,14 @@ public class LoadDialog extends AppDialog {
       }
    }
 
+   /* (non-Javadoc)
+    * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
+    */
+   protected void helpButton_actionPerformed( ActionEvent e ) {
+      // TODO Auto-generated method stub
+      
+   }
+
 }
 
 class LoadDialog_loadBrowseButton_actionAdapter

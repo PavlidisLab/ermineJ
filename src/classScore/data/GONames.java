@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
-
 import org.xml.sax.SAXException;
 
 import baseCode.dataStructure.OntologyEntry;
@@ -33,7 +31,6 @@ public class GONames {
    private static Map goNameMap;
    private Set newGeneSets = new HashSet();
    private GOParser parser;
-   private Vector selectedSets;
 
    /**
     * 
@@ -160,10 +157,19 @@ public class GONames {
       newGeneSets.add( id );
    }
 
+   /**
+    * 
+    * @param id
+    * @return
+    */
    public boolean newSet( String id ) {
       return newGeneSets.contains( id );
    }
 
+   /**
+    * 
+    * @return
+    */
    public Set getNewGeneSets() {
       return newGeneSets;
    }

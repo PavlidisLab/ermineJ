@@ -1,1 +1,0 @@
-To compile the install_jre.nsi script found in the parent directory, place the JRE windows installation executable here.  For more information see README.txt in the parent directory (../README.txt)

@@ -21,14 +21,14 @@ import classScore.Settings;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author Homin Lee
  * @version $Id$
- * @todo  We should probably attach a file filter to this class.  When you 
- *        browser to the names (to set the annots and the go file), it shows 
- *        "all files". Files can be filtered based on extension (or something 
- *        else).  Here's an outline of how to add file filters:<p>
- *        <code>
+ * @todo We should probably attach a file filter to this class. When you browser to the names (to set the annots and the
+ *       go file), it shows "all files". Files can be filtered based on extension (or something else). Here's an outline
+ *       of how to add file filters:
+ *       <p>
+ *       <code>
  *          // Subclass FileFilter and implement its 'accept' method.   <br>
  *          // Assume this subclass is called 'XMLFileFilter'           <br>
  *          XMLFileFilter fileFilter = new XMLFileFilter();             <br>
@@ -51,7 +51,7 @@ public class StartupDialog extends AppDialog {
    // @todo we need to use these.
    JLabel askAgainLabel = new JLabel();
    JCheckBox askAgain = new JCheckBox();
-   
+
    Settings settings;
    JButton classBrowseButton = new JButton();
 
@@ -94,14 +94,18 @@ public class StartupDialog extends AppDialog {
 
       setActionButtonText( "Start" );
       setCancelButtonText( "Quit" );
-      addHelp( "<html><b>Starting up the program</b><br>Please confirm " +
-            "the settings below are correct; they cannot be changed during " +
-            "analysis.<p>The probe annotation file you select " +
-            "must match the microarray design you are using. " +
-            "For updated annotation files, visit " +
-            "<a href=\"http://microarray.cpmc.columbia.edu/annots/\">http://microarray.cpmc.columbia.edu/annots</a></html>" );
+      setHelpButtonText( "Help" );
+      addHelp( "<html><b>Starting up the program</b><br>Please confirm "
+            + "the settings below are correct; they cannot be changed during "
+            + "analysis.<p>The probe annotation file you select "
+            + "must match the microarray design you are using. "
+            + "For updated annotation files, visit "
+            + "<a href=\"http://microarray.cpmc.columbia.edu/annots/\">http://microarray.cpmc.columbia.edu/annots</a></html>" );
       addMain( centerPanel );
       this.setTitle( "ErmineJ startup" );
+      
+      HelpHelper hh = new HelpHelper();
+      hh.initHelp(helpButton);
    }
 
    private void setValues() {
@@ -121,7 +125,7 @@ public class StartupDialog extends AppDialog {
    }
 
    void annotBrowseButton_actionPerformed( ActionEvent e ) {
-      chooser.setDialogTitle("Choose the annotation file:");
+      chooser.setDialogTitle( "Choose the annotation file:" );
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          annotFile.setText( chooser.getSelectedFile().toString() );
@@ -129,7 +133,7 @@ public class StartupDialog extends AppDialog {
    }
 
    void classBrowseButton_actionPerformed( ActionEvent e ) {
-      chooser.setDialogTitle("Choose the GO XML file:");
+      chooser.setDialogTitle( "Choose the GO XML file:" );
       int result = chooser.showOpenDialog( this );
       if ( result == JFileChooser.APPROVE_OPTION ) {
          classFile.setText( chooser.getSelectedFile().toString() );
@@ -160,6 +164,10 @@ public class StartupDialog extends AppDialog {
          aFrameRunner.start();
          dispose();
       }
+   }
+   
+   protected void helpButton_actionPerformed (ActionEvent e) {
+      
    }
 
    void this_windowClosed( WindowEvent e ) {
