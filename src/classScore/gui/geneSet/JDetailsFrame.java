@@ -57,6 +57,7 @@ public class JDetailsFrame
    final int PREFERRED_WIDTH_COLUMN_2 = 75;
    final int PREFERRED_WIDTH_COLUMN_3 = 300;
    final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
+   final int COLOR_RANGE_SLIDER_MIN = 1;
    final int NORMALIZED_COLOR_RANGE_MAX = 12;
 
    public JMatrixDisplay m_matrixDisplay = null;
@@ -581,7 +582,7 @@ public class JDetailsFrame
    private void initColorRangeWidget() {
 
       // init the slider
-      m_colorRangeSlider.setMinimum( 0 );
+      m_colorRangeSlider.setMinimum( COLOR_RANGE_SLIDER_MIN );
       m_colorRangeSlider.setMaximum( COLOR_RANGE_SLIDER_RESOLUTION );
 
       double rangeMax;
