@@ -1,5 +1,5 @@
 package util;
-import java.io.*; 
+import java.io.*;
 import java.util.*;
 import java.math.*;
 import java.lang.*;
@@ -14,12 +14,12 @@ import java.lang.reflect.*;
    @version $Id$
 
    todo: get rid of constantstuff interface.
- 
+
  */
 public class Stats implements Cloneable, ConstantStuff
 
 {
-    
+
     private Random generator = new Random(System.currentTimeMillis());
     public Stats() {
     }
@@ -62,12 +62,12 @@ public class Stats implements Cloneable, ConstantStuff
 	    sum += x[i];
 	}
 	if (length == 0) {
-	    return 0.0; 
+	    return 0.0;
 	} else {
-	    return sum / length; 
-	}	
+	    return sum / length;
+	}
     }
-    
+
     /**
        special mean calculation where we use the effective size
     */
@@ -79,9 +79,9 @@ public class Stats implements Cloneable, ConstantStuff
 	    sum += x[i];
 	}
 	if (length == 0 || eff_size == 0) {
-	    return 0.0; 
+	    return 0.0;
 	} else {
-	    return sum / eff_size; 
+	    return sum / eff_size;
 	}
     }
 
@@ -101,7 +101,7 @@ public class Stats implements Cloneable, ConstantStuff
 	}
 	return result;
     }
-    
+
 
     /**
        calculate the standard deviation of an array
@@ -113,10 +113,10 @@ public class Stats implements Cloneable, ConstantStuff
 	}
 	return Math.sqrt(ssqs / (length - 1));
     }
-    
-  
+
+
     /**
-       a faster algorithm for calculating the standard deviation 
+       a faster algorithm for calculating the standard deviation
     */
     public static double ssq_fast (double[] x) {
 	int length=Array.getLength(x);
@@ -129,13 +129,13 @@ public class Stats implements Cloneable, ConstantStuff
 	}
 	return (sumxs - sumx * sumx / length) / (length - 1);
     }
-    
+
 
     /**
        Calculate the pearson correlation of two arrays
     */
     public static double pearson_correlation (double[] x, double[] y)
-	
+
     {
 	char length=(char)(Array.getLength(x));
 	char j;
@@ -146,16 +146,16 @@ public class Stats implements Cloneable, ConstantStuff
 	sxx = 0.0;
 	ay = 0.0;
 	ax = 0.0;
-	
+
 	/* mean */
-	
+
 	for (j=0; j<length; j++) {
 	    ax+=x[j];
 	    ay+=y[j];
 	}
 	ax/=length;
 	ay/=length;
-	
+
 	for (j=0;j<length;j++) {
 	    xt=x[j]-ax;
 	    yt=y[j]-ay;
@@ -165,17 +165,17 @@ public class Stats implements Cloneable, ConstantStuff
 	}
 	return sxy/Math.sqrt(sxx*syy);
     } /* pearson_correlation */
-    
-    
+
+
 
     /**
-       choose n random integers from 0 to max without repeating 
+       choose n random integers from 0 to max without repeating
     */
     public void chooserandom(int[] randomnums, boolean[] recLog, int max, int n) {
 	int numgot;
 	int i;
 	int newnum;
-	
+
 	numgot = 0;
 
 	while (numgot < n) { /* numgot is the index of the last gotten item */
@@ -186,12 +186,12 @@ public class Stats implements Cloneable, ConstantStuff
 		numgot++;
 	    }
 	}
-	
+
 	// reset all elements in recLog to false
 	for(i=0; i<n; i++){
 		recLog[randomnums[i]] = false;
 	}
-	
+
     }
 
     /**
@@ -203,7 +203,7 @@ public class Stats implements Cloneable, ConstantStuff
 	int i;
 	int newnum;
 	boolean[] recLog = new boolean[max];
-	
+
 	numgot = 0;
 
 	while (numgot < n) { /* numgot is the index of the last gotten item */
@@ -216,7 +216,7 @@ public class Stats implements Cloneable, ConstantStuff
 	}
     } /* */
 
-    
+
     /**
        choose n random integers from 0 to max without repeating
     */
@@ -225,9 +225,9 @@ public class Stats implements Cloneable, ConstantStuff
 	int i;
 	int newnum;
 	boolean repeat = false;
-	
+
 	numgot = 0;
-	
+
 	while (numgot < n) { /* numgot is the index of the last gotten item */
 	    newnum =generator.nextInt(max);
 	    repeat = false;
@@ -251,16 +251,16 @@ public class Stats implements Cloneable, ConstantStuff
 	int numgot;
 	int newnum, i;
 	int repeat;
-	
+
 	numgot = 0;
 	for (i = 0 ; i<n; i++) {
 	    newnum = (char)(generator.nextInt() % max);
 	    repeat = 0;
 	    randomnums[i] = newnum;
-	    
+
 	}
     } /* */
-    
+
 
     /**
        Calculate the means of a matrix's rows.
@@ -270,9 +270,9 @@ public class Stats implements Cloneable, ConstantStuff
 	for (i=0; i<M.get_num_rows(); i++) {
 	    means[i] = mean(M.get_ith_row(i));
 	}
-    } /* matrix_row_sums */   
-    
-    
+    } /* matrix_row_sums */
+
+
     /**
        calculate the sums of a matrix's rows.
     */
@@ -282,10 +282,10 @@ public class Stats implements Cloneable, ConstantStuff
 	    sums[i] = sum(M.get_ith_row(i));
 	}
     } /* matrix_row_sums */
-    
-    
+
+
     /**
-     calculate the standard deviation of each row of a matrix 
+     calculate the standard deviation of each row of a matrix
     */
     public void matrix_row_stdevs (Matrix M, double[] means, double[] ssqs,double[] stdevs) {
 	int i;
@@ -293,8 +293,8 @@ public class Stats implements Cloneable, ConstantStuff
 	    stdevs[i] = stdev(M.get_ith_row(i), means[i], ssqs[i]);
 	}
     }
-    
-    
+
+
     /**
        Calculate the sum of squares for each row of a matrix
     */
@@ -306,15 +306,15 @@ public class Stats implements Cloneable, ConstantStuff
 	    for (i = 0; i<M.get_num_rows(); i++) {
 		ssqs[i] = ssq(M.get_ith_row(i), my_means[i]);
 	    }
-	    
+
 	} else {
 	    for (i = 0; i<M.get_num_rows(); i++) {
 	  ssqs[i] = ssq(M.get_ith_row(i), means[i]);
 	    }
 	}
     } /* matrix_row_ssqs */
-    
-    
+
+
     /**
        Faster algorithm for calculating the sum of squares of each row of a matrix
     */
@@ -325,7 +325,7 @@ public class Stats implements Cloneable, ConstantStuff
 	}
     } /* matrix_row_ssqs */
 
-    
+
     /**
        Calculate a correlation matrix for a matrix.
        @param M input matrix
@@ -350,18 +350,16 @@ public class Stats implements Cloneable, ConstantStuff
 		ax+=M.get_matrix_val(i,j);
 	    }
 	    means[i] = (ax /M.get_num_cols());
-	    
+
 	    for (int j=0; j<M.get_num_cols(); j++) {
 		xt = M.get_matrix_val(i,j) - means[i]; /* deviation from mean */
 		sxx += xt*xt; /* sum of squared error */
 	    }
 	    sss[i]=sxx;
 	}
-	
-	/* now for each vector, compare it to all other vectors, avoid repeating things */
 
-	
-	for (int i=0; i<M.get_num_rows(); i++) { 
+	/* now for each vector, compare it to all other vectors, avoid repeating things */
+	for (int i=0; i<M.get_num_rows(); i++) {
 	    int l=i;
 	    for (int j=l; j<M.get_num_rows();j++) {
 		if (j==i) {
@@ -379,14 +377,14 @@ public class Stats implements Cloneable, ConstantStuff
 	sss=null;
 	means=null;
     } /* correl_matrix */
-    
-    
+
+
     /**
        Given an array, calculate the quantile requested.
-    
+
      */
     public static double calculate_quantile (int index, double[] random_class, int size)
-	
+
     {
 	double pivot = -1.0;
 	if(index == 0){
@@ -398,14 +396,14 @@ public class Stats implements Cloneable, ConstantStuff
 	    return ans;
 	} else {
 	    double[] temp = new double[size];
-	    
+
 	    for(int i=0; i<size; i++){
 		temp[i] = random_class[i];
 	      //System.out.println("temp["+i+"]= "+temp[i]);
 	    }
 	    try{
 		pivot = temp[0];
-		
+
 		double[] smaller = new double[size];
 		double[] bigger = new double[size];
 		int itrSm = 0;
@@ -413,10 +411,10 @@ public class Stats implements Cloneable, ConstantStuff
 		for(int i=1; i<size; i++){
 		    if(temp[i] <= pivot){
 			smaller[itrSm] = temp[i];
-			itrSm++;	
-		    }else if(temp[i] > pivot){	
+			itrSm++;
+		    }else if(temp[i] > pivot){
 			bigger[itrBg] = temp[i];
-			itrBg++;	
+			itrBg++;
 		    }
 		}
 		if(itrSm > index){
@@ -441,8 +439,8 @@ public class Stats implements Cloneable, ConstantStuff
 	}
     }
 
-    
-    
+
+
 
 
     /**
@@ -451,9 +449,9 @@ public class Stats implements Cloneable, ConstantStuff
        @param quantile A value from 0 to 100
        @param array Array for which we want to get the quantile.
        @param size The size of the array.
-       
+
     */
-    public static double calculate_mean_above_quantile (int quantile, double[] array, int size) 
+    public static double calculate_mean_above_quantile (int quantile, double[] array, int size)
     {
 	double[] temp = new double[size];
 	double median;
@@ -462,7 +460,7 @@ public class Stats implements Cloneable, ConstantStuff
 
 	temp = array;
 	median = calculate_quantile(quantile, array, size);
-    
+
 	for (int i=0; i<size; i++) {
 	    if(temp[i] >= median){
 		returnvalue += temp[i];
@@ -472,8 +470,8 @@ public class Stats implements Cloneable, ConstantStuff
 	return(returnvalue/k);
     }
 
-    
-    
+
+
     /**
        Calculate hypergeometric distribution.  Gives same answer as
        dhyper in R.
@@ -491,7 +489,7 @@ public class Stats implements Cloneable, ConstantStuff
 	}
 	return SpecFunc.binomial_coeff(positives,successes)*SpecFunc.binomial_coeff(negatives,failures)/SpecFunc.binomial_coeff(positives+negatives,successes+failures);
     }
-    
+
 
     /**
        Cumulative hypergeometric probability ( for over-represented
@@ -542,10 +540,10 @@ public class Stats implements Cloneable, ConstantStuff
 	    pvalArray[counter] = new geneNpval(key, val);
 	    counter++;
 	}
-	
+
 	/* sort it */
-	Arrays.sort(pvalArray); 
-	
+	Arrays.sort(pvalArray);
+
 	/* put the sorted items back into a hashmap with the rank */
 	for(int i=0; i<m.size(); i++){
 	    result.put(pvalArray[i].getId(), new Integer(m.size()-i));
@@ -553,7 +551,7 @@ public class Stats implements Cloneable, ConstantStuff
 	return result;
     }
 
-    
+
     /**
        Calculate area under ROC
     */
@@ -570,15 +568,15 @@ public class Stats implements Cloneable, ConstantStuff
 	    } else {
 		result += k;
 	    }
-	    
+
 	    if(k == targetSize){
 		result += targetSize*(totalSize - i);
-		break;	
-	    }	
+		break;
+	    }
 	}
 	return result/(k*(totalSize-k));
     }
-  
+
     /**
 
        For an AROC value, calculates a p value based on approximation
@@ -593,17 +591,17 @@ public class Stats implements Cloneable, ConstantStuff
 	double logstdev = 0.0;
 	double stdev = Math.exp(-0.5 * (Math.log(numpos) + 1));
 	double z = (aroc - 0.5)/stdev;
-	
+
 	/* We are only interested in the upper tails. */
 	if (z < 0.0) {
 	    z = 0.0;
 	}
-	
+
 	//	System.err.println("Size: " + numpos + " Stdev: " + stdev + " aroc: " + aroc + " z: " + z);
 
 	return SpecFunc.normdist(z);
     }
-    
+
 
     /**
        return mean of top 2 elements in array, for histogram range setting
@@ -612,7 +610,7 @@ public class Stats implements Cloneable, ConstantStuff
 	double max1 = 0;
 	double max2 = 0;
 	int pin = 0;
-	
+
 	if (inArray.length == 0) {
 	    System.err.println("No values for meanofTop2!");
 	    System.exit(1);
@@ -623,15 +621,15 @@ public class Stats implements Cloneable, ConstantStuff
 		max1 = inArray[i];
 		pin = i;
 	    }
-	}	
+	}
 	for(int i=0; i<inArray.length; i++){
 	    if(max2 < inArray[i] && i != pin)
-		max2 = inArray[i];	
-	}	
+		max2 = inArray[i];
+	}
 	return (max1+max2)/2;
     }
-  
-  
+
+
     /**
        get file path todo: why is this int the stats object?
     */
@@ -645,9 +643,9 @@ public class Stats implements Cloneable, ConstantStuff
 	    e.printStackTrace();
 	    return null;
 	}
-    }  
-    
-    
+    }
+
+
     /**
        Select a random number from a normal distribution with mean zero
        and variance 1
@@ -664,12 +662,12 @@ public class Stats implements Cloneable, ConstantStuff
      */
     public static void main (String[] args) {
 	int a,b,c,d;
-	
+
 	//		a = 8;
 	//		b = 3;
 	//		c = 6;
 	//		d = 2;
-	
+
 	a = 7; // number in the class
 	b = 2; // successes
  	c = 884; // number not in the class
@@ -698,61 +696,61 @@ public class Stats implements Cloneable, ConstantStuff
 	System.err.println("one-tailed normal for " + 4.0 + ": " + SpecFunc.normdist(4.0));
 	System.err.println("one-tailed normal for " + 5.0 + ": " + SpecFunc.normdist(5.0));
     }
-    
+
 } // end of class
 
 
 /**
-   Record the execution time between start() and stop() for testing                
+   Record the execution time between start() and stop() for testing
 */
 class timeCounter {
     static long tempTime;
-    
-    public static void start(){	
+
+    public static void start(){
     	tempTime = System.currentTimeMillis();
     }
-    
-    public static void stop(){	
+
+    public static void stop(){
     	System.out.println("Excution time: " + (System.currentTimeMillis()-tempTime));
     }
 }
 
 /**
-   Show the elements in array for testing                
+   Show the elements in array for testing
 */
 class showArray {
-    public static void show(int[] a, int n){	
+    public static void show(int[] a, int n){
     	for(int i=0; i<n; i++){
-    	    System.out.println(i + "\t" + a[i]);	
+    	    System.out.println(i + "\t" + a[i]);
     	}
 	System.out.println("\n");
     }
 
-    public static void show(double[] a, int n){	
+    public static void show(double[] a, int n){
     	for(int i=0; i<n; i++){
-    	    System.out.println(i + "\t" + a[i]);	
+    	    System.out.println(i + "\t" + a[i]);
     	}
 	System.out.println("\n");
     }
 
 }
 
-/** 
+/**
     Simple data structure used by Stats.rankOf().
     @author Edward Chen
  */
 class geneNpval implements Comparable{
     private String gene_id;
     private double pval;
-    
+
     public geneNpval(String id, double pv){
 	gene_id = id;
-	pval = pv;	
+	pval = pv;
     }
-    
+
     public int compareTo(Object ob){
 	geneNpval other = (geneNpval)ob;
-	
+
 	if(this.pval>other.pval)
 	    return 1;
 	else if(this.pval<other.pval)
@@ -760,12 +758,12 @@ class geneNpval implements Comparable{
 	else
 	    return 0;
     }
-    
+
     public String getId(){
-	return gene_id;	
+	return gene_id;
     }
-    
+
     public double getPval(){
-	return pval;  
+	return pval;
     }
 }
