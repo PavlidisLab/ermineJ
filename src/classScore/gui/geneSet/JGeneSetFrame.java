@@ -63,6 +63,7 @@ import classScore.gui.JHistViewer;
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
+ * @author Kiran Keshav
  * @author Will Braynen
  * @version $Id$
  */
@@ -370,7 +371,6 @@ public class JGeneSetFrame extends JFrame {
       //
       // Create a matrix display
       //
-
       // create a probe set from probeIDs
       HashSet probesInGeneSet = new HashSet();
       for ( int i = 0; i < probeIDs.size(); i++ ) {
@@ -380,9 +380,11 @@ public class JGeneSetFrame extends JFrame {
       // Read the matrix data
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
-
-      if ( filename.length() > 0 ) {
-
+      //keshav
+      if (filename.length()==0){
+            filename="dummy";
+      }
+      if (!filename.equals("dummy")) {//keshav(was filename.length() > 0, now filename != dummy)
          try {
             matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
                   probesInGeneSet );
@@ -394,14 +396,15 @@ public class JGeneSetFrame extends JFrame {
                         + "Please make sure this file exists and the filename and directory path are correct,\n"
                         + "and that it is a valid raw data file (tab-delimited).\n" );
          }
-      }
-
-      if ( matrix.rows() == 0 ) {
+      }  
+      //if ( matrix.rows() == 0 ) { 
+      if ( matrix == null ) {//added (use row above)
          GuiUtil
                .error( "None of the probes in this gene set were found in your data file." );
       }
 
-      if ( matrix.rows() != probesInGeneSet.size() ) {
+      //if ( matrix.rows() != probesInGeneSet.size() ) {
+      if ( matrix == null ) {//added (use row above)
          System.err
                .println( "Not all the probes in this gene set were in the data file." );
       }
@@ -444,7 +447,9 @@ public class JGeneSetFrame extends JFrame {
          col.setCellRenderer( matrixCellRenderer );
          col.setHeaderRenderer( verticalHeaderRenderer );
       }
-      resizeMatrixColumns( matrixColumnWidth );
+      
+      if (matrix != null) //keshav added if (but not the guts)
+         resizeMatrixColumns( matrixColumnWidth );
 
       //
       // Set up the rest of the table
