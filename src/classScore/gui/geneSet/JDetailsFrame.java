@@ -35,13 +35,12 @@ import baseCode.dataStructure.reader.DoubleMatrixReader;
 import baseCode.graphics.text.Util;
 import baseCode.gui.ColorMap;
 import baseCode.gui.JGradientBar;
-import baseCode.gui.JMatrixDisplay;
-import baseCode.gui.table.JHorizontalTableHeaderRenderer;
-import baseCode.gui.table.JMatrixTableCellRenderer;
-import baseCode.gui.table.JVerticalTableHeaderRenderer;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;
-import classScore.gui.SortFilterModel;
+import baseCode.gui.JMatrixDisplay;
+import baseCode.gui.table.JMatrixTableCellRenderer;
+import baseCode.gui.table.JVerticalTableHeaderRenderer;
+import classScore.gui.TableSorter;
 
 /**
  * @author Will Braynen
@@ -249,17 +248,10 @@ public class JDetailsFrame
       DetailsTableModel tableModel = new DetailsTableModel(
           m_matrixDisplay, probeIDs, pvalues, geneData, m_nf
           );
-      SortFilterModel sorter = new SortFilterModel( tableModel, m_matrixDisplay );
+      TableSorter sorter = new TableSorter( tableModel, m_matrixDisplay );
       m_table.setModel( sorter );
-
-      m_table.getTableHeader().addMouseListener( new MouseAdapter() {
-         public void mouseClicked( MouseEvent event ) {
-            int tableColumn = m_table.columnAtPoint( event.getPoint() );
-            int modelColumn = m_table.convertColumnIndexToModel( tableColumn );
-            ( ( SortFilterModel ) m_table.getModel() ).sort( modelColumn );
-         }
-      } );
-
+      sorter.setTableHeader( m_table.getTableHeader() );
+      
       //
       // Set up the matrix display part of the table
       //
@@ -288,32 +280,25 @@ public class JDetailsFrame
       //
       // Set up the rest of the table
       //
-      JHorizontalTableHeaderRenderer horizontalHeaderRenderer =
-          new JHorizontalTableHeaderRenderer(); // create only one instance
       TableColumn col;
 
       // The columns containing text or values (not matrix display) should be a bit wider
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 0 );
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_0 );
-      col.setHeaderRenderer( horizontalHeaderRenderer );
 
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 1 );
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_1 );
-      col.setHeaderRenderer( horizontalHeaderRenderer );
 
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 2 );
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_2 );
-      col.setHeaderRenderer( horizontalHeaderRenderer );
 
       col = m_table.getColumnModel().getColumn( matrixColumnCount + 3 );
       col.setPreferredWidth( PREFERRED_WIDTH_COLUMN_3 );
-      col.setHeaderRenderer( horizontalHeaderRenderer );
 
       //
       // Sort initially by the pvalue column
       //
-      int modelColumn = m_table.convertColumnIndexToModel( matrixColumnCount + 1 );
-      ( ( SortFilterModel ) m_table.getModel() ).sort( modelColumn );
+      sorter.setSortingStatus( matrixColumnCount + 1, TableSorter.ASCENDING );
 
       //
       // Save the dimensions of the table just in case
