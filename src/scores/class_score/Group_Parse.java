@@ -4,12 +4,12 @@ package scores.class_score;
   Created :09/02/02
   Revision History: $Id$
   Description:Parses the file of the form
-   probe UG_ID
+   probe GROUP_ID
 
 and then stores the temporary reverse map of the form
 UD_ID probe1,probe2,probe3
 
-then stores the values for each UG_ID in a hash map
+then stores the values for each GROUP_ID in a hash map
 probe1->probe2,probe3
 probe2->probe3,probe1
 probe3->probe1,probe2
@@ -30,20 +30,20 @@ import java.lang.reflect.*;
 
 /*****************************************************************************************/
 /*****************************************************************************************/
-public class Ug_Parse { 
-    private static Map chip_ug_map;//map of chip ->ug..input file
-    private static Map chip_repeat_val;//map of chips final weights file  todo: is this used?
-    private static Map ug_chip_list;//map of ug->chips
-    private Map chips;
-    private Set ug;
+public class Group_Parse { 
+    private static Map probe_group_map;//map of probe ->group..input file
+    private static Map probe_repeat_val;//map of probes final weights file  todo: is this used?
+    private static Map group_probe_list;//map of group->probes
+    private Map probes;
+    private Set group;
     
     //--------------------------------------------------< main >--------//
     
     public static void main (String[] args) {
-	//Ug_Parse fi = new Ug_Parse(args[0]);
-	//fi.print(chip_ug_map);
-	//	fi.chip_repeat();
-	//	fi.print(chip_repeat_val);
+	//Group_Parse fi = new Group_Parse(args[0]);
+	//fi.print(probe_group_map);
+	//	fi.probe_repeat();
+	//	fi.print(probe_repeat_val);
     }
     
     
@@ -51,11 +51,11 @@ public class Ug_Parse {
     /* Note that this does not store anything for probes which do not
      * have a unigene cluster. */
     /*****************************************************************************************/
-    public Ug_Parse(String filename, Map chipsFromList)
+    public Group_Parse(String filename, Map probesFromList)
     {
 	String aLine = null;
 	int count = 0;
-	chips = chipsFromList;
+	probes = probesFromList;
 
 	File infile = new File(filename);
 	if (!infile.exists() || !infile.canRead()) {
@@ -67,18 +67,18 @@ public class Ug_Parse {
 	    BufferedInputStream bis = new BufferedInputStream(fis);
 	    BufferedReader      dis = new BufferedReader(new InputStreamReader(bis));
 	    String row;
-	    chip_ug_map = new LinkedHashMap();
-	    ug = new TreeSet();
+	    probe_group_map = new LinkedHashMap();
+	    group = new TreeSet();
 	    //read in file
 	    while((row = dis.readLine())!= null)
 		{  
 		    StringTokenizer st = new StringTokenizer(row, "\t");
 		    if (st.countTokens()>1){ // i.e., if there is a unigene id.
-			String chip = st.nextToken();
+			String probe = st.nextToken();
 			String uni = st.nextToken();
-			chip_ug_map.put(chip,uni);
-			//store list of unique ug ids
-			ug.add(uni);
+			probe_group_map.put(probe,uni);
+			//store list of unique group ids
+			group.add(uni);
 		    }
 		}
 	    dis.close();
@@ -93,47 +93,47 @@ public class Ug_Parse {
     
     /*****************************************************************************************/
     /*****************************************************************************************/
-    public void chip_repeat()
+    public void probe_repeat()
     {
-	ug_chip_list = new HashMap();
-	chip_repeat_val = new HashMap();	 
-	Iterator it = ug.iterator();
-	Set chip = new TreeSet();
-	//store map of ug with list of chips intially with value zero
+	group_probe_list = new HashMap();
+	probe_repeat_val = new HashMap();	 
+	Iterator it = group.iterator();
+	Set probe = new TreeSet();
+	//store map of group with list of probes intially with value zero
 	while (it.hasNext()) {
 	    String element = (String)it.next();
-	    ug_chip_list.put(element,null);
+	    group_probe_list.put(element,null);
 	}
 	
-	java.util.Set pairEntries = chip_ug_map.entrySet();
+	java.util.Set pairEntries = probe_group_map.entrySet();
 	java.util.Map.Entry nxt = null;
 	Iterator it1 = pairEntries.iterator();
-	//iterate over hashtable and store all chips for a particular ug 
+	//iterate over hashtable and store all probes for a particular group 
 	while(it1.hasNext()){
 	    nxt = (Map.Entry)it1.next();
 	    String val = (String)nxt.getValue();
 	     
 	    String ke = (String)nxt.getKey();
-	    chip.add(ke);//list of all the gene id 
+	    probe.add(ke);//list of all the gene id 
 
 	    // create the list if need be.
-	     List l = (List) ug_chip_list.get(val);
+	     List l = (List) group_probe_list.get(val);
 	     if (l == null)
 		 l = new ArrayList();
 
-	     ug_chip_list.put(val,l);
+	     group_probe_list.put(val,l);
 	     l.add(ke);	 
 	}   
 	 
-	Iterator chipit = chip.iterator();
-	while (chipit.hasNext()) {
-	    String ele = (String)chipit.next();
-	    if(chips.containsKey(ele))      //only add those occur in gene_pval file
-	        chip_repeat_val.put(ele,null);
+	Iterator probeit = probe.iterator();
+	while (probeit.hasNext()) {
+	    String ele = (String)probeit.next();
+	    if(probes.containsKey(ele))      //only add those occur in gene_pval file
+	        probe_repeat_val.put(ele,null);
 	}
 
 	//iterate over earlier table values
-	java.util.Set pairEntriess = ug_chip_list.entrySet();
+	java.util.Set pairEntriess = group_probe_list.entrySet();
 	java.util.Map.Entry nxts = null;
 	Iterator it11 = pairEntriess.iterator();
 	while(it11.hasNext()){
@@ -143,16 +143,16 @@ public class Ug_Parse {
 	     Iterator I = val.iterator();
 	     while(I.hasNext()){
 		 String valx = (String)I.next();
-		 //create a new list if a probe has another probe with the same UG ...hence list to be stored in Hashtable as values
-		 List l1 = (List) chip_repeat_val.get(valx);
+		 //create a new list if a probe has another probe with the same GROUP ...hence list to be stored in Hashtable as values
+		 List l1 = (List) probe_repeat_val.get(valx);
 		 
 		 if (l1 ==null){
-		     chip_repeat_val.put(valx,l1= new ArrayList());
+		     probe_repeat_val.put(valx,l1= new ArrayList());
 		     Iterator arry = val.iterator();
-		     //add all values of chips with the same UG to a hashtable with key equal to one of the UG id's chip 
+		     //add all values of probes with the same GROUP to a hashtable with key equal to one of the GROUP id's probe 
 		     while(arry.hasNext()){
 			 String arr = (String)arry.next();
-			 if(chips.containsKey(arr))  //only add those occur in gene_pval file
+			 if(probes.containsKey(arr))  //only add those occur in gene_pval file
 			     if (!arr.equals(valx)){
 			         l1.add(arr);
 			     }
@@ -161,12 +161,12 @@ public class Ug_Parse {
 		     Iterator arri = val.iterator();
 		     while(arri.hasNext()){
 			 String arr = (String)arri.next();
-			 if(chips.containsKey(arr)) //only add those occur in gene_pval file
+			 if(probes.containsKey(arr)) //only add those occur in gene_pval file
 			     if (!arr.equals(valx)){
 			         l1.add(arr);
 			     }
 		     } 
-		     chip_repeat_val.put(valx,l1);
+		     probe_repeat_val.put(valx,l1);
 		 }
 	     }
 	}
@@ -177,34 +177,34 @@ public class Ug_Parse {
     /*****************************************************************************************/     
     /* todo: is this used? */
     /*****************************************************************************************/
-    public Map get_chip_map() {
-	return chip_repeat_val;
+    public Map get_probe_map() {
+	return probe_repeat_val;
     }
     
     
     /*****************************************************************************************/     
     /*****************************************************************************************/
-    public Map get_ug_chip_map() {
-	return ug_chip_list;
+    public Map get_group_probe_map() {
+	return group_probe_list;
     } 
     
     /*****************************************************************************************/     
     /*****************************************************************************************/
-    public Map get_chip_ug_map() {
-	return chip_ug_map;
+    public Map get_probe_group_map() {
+	return probe_group_map;
     }          
     
     /*****************************************************************************************/
     /*****************************************************************************************/
-    public ArrayList get_chip_value_map(String chip_id) {
-	return (ArrayList)(chip_repeat_val.get(chip_id));
+    public ArrayList get_probe_value_map(String probe_id) {
+	return (ArrayList)(probe_repeat_val.get(probe_id));
     }
     
     
     /*****************************************************************************************/
     /*****************************************************************************************/
-    public ArrayList get_ug_chip_value_map(String chip_id) {
-	 return (ArrayList)(ug_chip_list.get(chip_id));
+    public ArrayList get_group_probe_value_map(String probe_id) {
+	 return (ArrayList)(group_probe_list.get(probe_id));
     }     
     
     

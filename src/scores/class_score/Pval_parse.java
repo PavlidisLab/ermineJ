@@ -4,7 +4,7 @@ package scores.class_score;
   Created :09/02/02
   Revision History: $Id$
   Description:Parses the file of the form
-  chip_id pval
+  probe_id pval
 
  The values are stored in a HashTable
                                                                                                                                                             
@@ -24,10 +24,10 @@ import java.lang.reflect.*;
  public class Pval_parse { 
 /*****************************************************************************************/
 
-     private String[] chip_id = null;
+     private String[] probe_id = null;
      private double[] pval = null;
      private int num_pvals;
-     private static Map chip_pval_map;
+     private static Map probe_pval_map;
      private double log10 = Math.log(10);
      //private gene_pval[] gene_list = null;
 
@@ -72,7 +72,7 @@ import java.lang.reflect.*;
 	     String col;
 	     Vector rows = new Vector();
 	     Vector cols = null;
-	     chip_pval_map = new LinkedHashMap();
+	     probe_pval_map = new LinkedHashMap();
 	     int colnumber =0;
 	     // loop through rows
 	     while((row = dis.readLine())!= null)
@@ -92,7 +92,7 @@ import java.lang.reflect.*;
 		 }
 	     
 	     dis.close();
-	     chip_id = new String[rows.size()-1];
+	     probe_id = new String[rows.size()-1];
 	     pval = new double[rows.size()-1];
 	     doubleArray =new Double[rows.size()-1];
 	     for (int i=1; i < rows.size();i++)
@@ -104,7 +104,7 @@ import java.lang.reflect.*;
 			 System.err.println("Skipping probe in pval file: " + name);
 			 continue;
 		     }
-		     chip_id[i-1] = name;
+		     probe_id[i-1] = name;
 
 		     pval[i-1] = Double.parseDouble((String)(((Vector)(rows.elementAt(i))).elementAt(column)));
 
@@ -122,7 +122,7 @@ import java.lang.reflect.*;
 		     }
 
 		     doubleArray[i-1] = new Double(pval[i-1]);
-		     chip_pval_map.put(chip_id[i-1],doubleArray[i-1]);	      // put key, value.
+		     probe_pval_map.put(probe_id[i-1], doubleArray[i-1]);	      // put key, value.
 		 }
 	     
 	     num_pvals = Array.getLength(pval);
@@ -140,53 +140,41 @@ import java.lang.reflect.*;
 	 }
 
      } //
-     
 
 
-
-/*****************************************************************************************/
-     public String[] get_chip_ids(){
-/*****************************************************************************************/
-	 return chip_id;
+     /*****************************************************************************************/
+     /*****************************************************************************************/
+     public String[] get_probe_ids(){
+	 return probe_id;
      }
 
-
-/*****************************************************************************************/
+     
+     /*****************************************************************************************/
+     /*****************************************************************************************/
       public double[] get_pval(){
 	 return pval;
      }
-/*****************************************************************************************/
 
 
-/*****************************************************************************************/
+     /*****************************************************************************************/
+     /*****************************************************************************************/
      public int get_numpvals(){
-/*****************************************************************************************/
 	 return num_pvals;
      }
-   
 
 
-/*****************************************************************************************/  
      public Map get_map() {
-/*****************************************************************************************/
-	 return chip_pval_map;
+	 return probe_pval_map;
      }
-     
-/*****************************************************************************************/  
-     //public gene_pval[] get_gene_list() {
-/*****************************************************************************************/
-	// return gene_list;
-     //}
 
 
-
-/*****************************************************************************************/
-     public double get_value_map(String chip_id) {
-/*****************************************************************************************/
+     /*****************************************************************************************/
+     /*****************************************************************************************/
+     public double get_value_map(String probe_id) {
 	 double value=0.0;
 	 
-	 if (chip_pval_map.get(chip_id)!=null){ 
-	    value = Double.parseDouble((chip_pval_map.get(chip_id)).toString());
+	 if (probe_pval_map.get(probe_id)!=null){ 
+	    value = Double.parseDouble((probe_pval_map.get(probe_id)).toString());
 	 }
 	 
 	 return value;

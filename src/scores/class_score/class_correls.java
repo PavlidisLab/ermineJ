@@ -41,8 +41,7 @@ public class class_correls {
 
 	probe_data = new corr_class_scores(probe_datafile); // main data file
 
-
-	affy_go_Parse  affy_go = new affy_go_Parse(affy_gofile);//parses affy file
+	ClassMap  affy_go = new ClassMap(affy_gofile);//parses affy file
 	goName = new GoName_parse(go_namefile); //parse go name file
 	probe_go = new LinkedHashMap();
 	go_probe = new LinkedHashMap();

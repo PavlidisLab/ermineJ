@@ -22,16 +22,17 @@ import java.security.*;
 
 
 /*****************************************************************************************/
-public class Stats implements Cloneable,ConstantStuff// mathematical calculations
+public class Stats implements Cloneable, ConstantStuff// mathematical calculations
 /*****************************************************************************************/
 {
     
     private Random generator = new Random(System.currentTimeMillis());
     public Stats() {}
 
-/*****************************************************************************************/
+    /*****************************************************************************************/
+    /*****************************************************************************************/
     public Object clone() {
-/*****************************************************************************************/
+
 	Object o =null;
 	try {
 	    o=super.clone();
@@ -41,10 +42,10 @@ public class Stats implements Cloneable,ConstantStuff// mathematical calculation
 
 
 
-/*****************************************************************************************/
-/* calculate the sum of the elements of an array */
+    /*****************************************************************************************/
+    /* calculate the sum of the elements of an array */
+    /*****************************************************************************************/
     public static double sum(double[] x)
-/*****************************************************************************************/
     {
 	int length=Array.getLength(x);
 	double total =0.0;
@@ -55,10 +56,10 @@ public class Stats implements Cloneable,ConstantStuff// mathematical calculation
 	return total;
     }
 
-/*****************************************************************************************/
-/* calculate the mean of an array's elements*/ 
+    /*****************************************************************************************/
+    /* calculate the mean of an array's elements*/ 
+    /*****************************************************************************************/
     public static double mean(double[] x)
-/*****************************************************************************************/
     {
 	int length=Array.getLength(x);
 	double sum=0.0;
@@ -66,18 +67,33 @@ public class Stats implements Cloneable,ConstantStuff// mathematical calculation
 	for (i=0; i<length; i++) {
 	    sum += x[i];
 	}
-	if (length == 0.0) {
+	if (length == 0) {
 	    return 0.0; 
 	} else {
 	    return sum / length; 
 	}	
     }
     
+    /* special mean calculation where we use the effective size */
+    public static double mean(double[] x, int eff_size) {
+	int length=Array.getLength(x);
+	double sum=0.0;
+	int i;
+	for (i=0; i<length; i++) {
+	    sum += x[i];
+	}
+	if (length == 0 || eff_size == 0) {
+	    return 0.0; 
+	} else {
+	    return sum / eff_size; 
+	}
+    }
 
-/*****************************************************************************************/
+
+    /*****************************************************************************************/
     /* calculate the sum of squared deviation from the mean of an array */
+    /*****************************************************************************************/
     public static double ssq (double[] x,double mean)
-/*****************************************************************************************/
     {
 	int length=Array.getLength(x);
 	double result= 0.0;
@@ -91,10 +107,10 @@ public class Stats implements Cloneable,ConstantStuff// mathematical calculation
     }
     
 
-/*****************************************************************************************/
+    /*****************************************************************************************/
     /* calculate the standard deviation of an array */
+    /*****************************************************************************************/
     public static double stdev (double[] m,double mean, double ssqs) {
-/*****************************************************************************************/
 	int length=Array.getLength(m);
 	if (length < 2) {
 	    return -1.0;
@@ -103,10 +119,10 @@ public class Stats implements Cloneable,ConstantStuff// mathematical calculation
     }
     
   
-/*****************************************************************************************/  
+    /*****************************************************************************************/  
     /* a faster algorithm for calculating the standard deviation */
+    /*****************************************************************************************/
     public static double ssq_fast (double[] x) {
-/*****************************************************************************************/
 	int length=Array.getLength(x);
 	double sumx=0.0;
 	double sumxs=0.0;
@@ -119,41 +135,42 @@ public class Stats implements Cloneable,ConstantStuff// mathematical calculation
     }
     
 
-/*****************************************************************************************/ 
-/* calculate the pearson correlation of two arrays */
-public static double pearson_correlation (double[] x, double[] y)
-/*****************************************************************************************/
-{
-    char length=(char)(Array.getLength(x));
-  char j;
-  double yt, xt;
-  double syy, sxy, sxx, ay, ax;
-  syy = 0.0;
-  sxy = 0.0;
-  sxx = 0.0;
-  ay = 0.0;
-  ax = 0.0;
-
-  /* mean */
- 
-  for (j=0; j<length; j++) {
-    ax+=x[j];
-    ay+=y[j];
-  }
-  ax/=length;
-  ay/=length;
-  
-  for (j=0;j<length;j++) {
-      xt=x[j]-ax;
-      yt=y[j]-ay;
-      sxx+=xt*xt;
-      syy+=yt*yt;
-      sxy+=xt*yt;
-  }
-  return sxy/Math.sqrt(sxx*syy);
-} /* pearson_correlation */
+    /*****************************************************************************************/ 
+    /* calculate the pearson correlation of two arrays */
+    /*****************************************************************************************/
+    public static double pearson_correlation (double[] x, double[] y)
+	
+    {
+	char length=(char)(Array.getLength(x));
+	char j;
+	double yt, xt;
+	double syy, sxy, sxx, ay, ax;
+	syy = 0.0;
+	sxy = 0.0;
+	sxx = 0.0;
+	ay = 0.0;
+	ax = 0.0;
+	
+	/* mean */
+	
+	for (j=0; j<length; j++) {
+	    ax+=x[j];
+	    ay+=y[j];
+	}
+	ax/=length;
+	ay/=length;
+	
+	for (j=0;j<length;j++) {
+	    xt=x[j]-ax;
+	    yt=y[j]-ay;
+	    sxx+=xt*xt;
+	    syy+=yt*yt;
+	    sxy+=xt*yt;
+	}
+	return sxy/Math.sqrt(sxx*syy);
+    } /* pearson_correlation */
     
-
+    
 
     /*****************************************************************************************/
     /* choose n random integers from 0 to max without repeating */
@@ -229,50 +246,7 @@ public static double pearson_correlation (double[] x, double[] y)
 	    }
 	}
     } 
-    
-    /*****************************************************************************************/
-    // create double[] ug_pval 
-    /*****************************************************************************************/
-    /*    
-	  public double[] ugPvalGenerator(Map ugProbeMap, Map probePvalMap){
-	  Collection ugEntries = ugProbeMap.entrySet();
-	  Iterator ugMapItr = ugEntries.iterator();
-	  double[] ug_pval_temp = new double[ugProbeMap.size()];
-	  int counter = 0;
-	  while(ugMapItr.hasNext()){
-	  Map.Entry ugTuple = (Map.Entry)ugMapItr.next();
-	  ArrayList probes = (ArrayList)ugTuple.getValue();
-	  Iterator pbItr = probes.iterator();
-	  //System.out.println("pos = "+pos+"   probes.size() = "+probes.size());
-	  boolean ugFlag=true;
-	  while(pbItr.hasNext()){
-	  Object key = probePvalMap.get(pbItr.next());
-	  if(key != null){	
-	  String pbPval = key.toString();    	        
-	  //System.out.println("pbPval = "+pbPval);
-	  ug_pval_temp[counter] += Math.pow(10, -1*Double.parseDouble(pbPval));
-	  }else{
-	  ugFlag = false;
-	  //ug_pval_map.put(ugTuple.getKey(), new Double(1.0));
-	  break;
-	  }
-	  }
-	  if(ugFlag){
-	  ug_pval_temp[counter] /= probes.size();            //take the mean
-	  ug_pval_temp[counter] = -(Math.log(ug_pval_temp[counter])/Math.log(10));   //transform to -log (base 10) value
-	  //System.out.println("pval["+pos+"] = "+ug_pval[pos]);	    
-	  //ug_pval_map.put(ugTuple.getKey(), new Double(ug_pval_temp[counter]));
-	  counter++;
-	  }
-	  }//end of while   
-	  ug_pval = new double[counter];   // counter = the number of unigene_id that actually appears in pval file
-	  for(int i=0; i<counter; i++){
-	  ug_pval[i] = ug_pval_temp[i];	
-	  }
-	  return ug_pval;
-	  }    
-    */    
-    
+
     /*****************************************************************************************/
     /* same as chooserandom, but with replacement */
     /*****************************************************************************************/
@@ -293,8 +267,8 @@ public static double pearson_correlation (double[] x, double[] y)
 
     /*****************************************************************************************/
     /* calculate the means of a matrix's rows. */
+    /*****************************************************************************************/
     public void matrix_row_means (Matrix M, double[] means) {
-	/*****************************************************************************************/
 	int i;
 	for (i=0; i<M.get_num_rows(); i++) {
 	    means[i] = mean(M.get_ith_row(i));
@@ -304,8 +278,8 @@ public static double pearson_correlation (double[] x, double[] y)
     
     /*****************************************************************************************/
     /* calculate the sums of a matrix's rows. */
+    /*****************************************************************************************/
     public void matrix_row_sums (Matrix M,double[] sums) {
-	/*****************************************************************************************/
 	int i;
 	for (i=0; i<M.get_num_rows(); i++) {
 	    sums[i] = sum(M.get_ith_row(i));
@@ -468,8 +442,8 @@ public static double pearson_correlation (double[] x, double[] y)
     
     
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public static double calculate_quantile_1 (int quantile, double[] random_class, int size)
-	/*****************************************************************************************/
     {
 	int[] temp = new int[size];
 	int[] count = new int[25000];
@@ -503,8 +477,8 @@ public static double pearson_correlation (double[] x, double[] y)
     }
     
     /*****************************************************************************************/
+    /*****************************************************************************************/
     public static double calculate_quantile_2 (int quantile, double[] random_class, int size)
-	/*****************************************************************************************/
     {
 	double[] temp = new double[size];
 	double returnvalue = 0.0;
@@ -527,8 +501,8 @@ public static double pearson_correlation (double[] x, double[] y)
     /*****************************************************************************************/
     /* calculate the mean of the values above a particular quantile of an
        array.  Quantile must be a value from 0 to 100.*/
+    /*****************************************************************************************/
     public static double calculate_mean_above_quantile (int quantile, double[] random_class, int size) 
-	/*****************************************************************************************/
     {
 	double[] temp = new double[size];
 	double median;
@@ -550,8 +524,8 @@ public static double pearson_correlation (double[] x, double[] y)
     /*****************************************************************************************/
     /* calculate the mean of the values above a particular quantile of an
        array.  Quantile must be a value from 0 to 100.*/
+    /*****************************************************************************************/
     public static double calculate_mean_above_quantile_2 (int quantile, double[] random_class, int size) 
-	/*****************************************************************************************/
     {
 	double[] temp = new double[size];
 	double returnvalue = 0.0;
@@ -582,7 +556,7 @@ public static double pearson_correlation (double[] x, double[] y)
     public static double n_choose_n (int N, int n)
     {
 	double total = 1;
-	for(int i=0; i<n; i++){
+	for(int i=0; i < n; i++){
 	    total *= ((N-i)/(double)(i+1));
 	}
     return total;
@@ -590,7 +564,7 @@ public static double pearson_correlation (double[] x, double[] y)
 
 
     /**
-     * Calculates the ranking of each gene.
+     * Calculates the ranking of each gene in the entire data set.
      * @return A LinkedHashMap keys=gene ids, values= rank of the gene.
      */
     public static LinkedHashMap rankOf(Map m){
@@ -607,7 +581,7 @@ public static double pearson_correlation (double[] x, double[] y)
 	    String key = (tuple.getKey()).toString();
 	    double val = Double.parseDouble((tuple.getValue()).toString());
 	    pvalArray[counter] = new gene_pval(key, val);
-	    counter ++;
+	    counter++;
 	}
 	
 	/* sort it */
@@ -617,7 +591,6 @@ public static double pearson_correlation (double[] x, double[] y)
 	for(int i=0; i<m.size(); i++){
 	    result.put(pvalArray[i].getId(), new Integer(m.size()-i));
 	}
-	
 	return result;
     }
 

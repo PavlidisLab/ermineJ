@@ -36,29 +36,28 @@ HEADER = '<b>CLASS_SCORES</b><br><font size="-1">Columbia</font>'
 BOTTOM = '<font size="-1"><a href="mailto:pp175@columbia.edu">Submit a bug or feature request</a><br><br>Class Score is the propriety of Columbia Genome Center<br>Copyright 2002 Columbia Genome Center,<br>NY, U.S.A.All Rights Reserved.</font>'
 
 #all: clean class_score 
-all: class_score 
+all: class_score commandline
 
 run: runner
 
-tags: etags
-
-etags:	\
+tags: *.java
 	etags *.java scores/class_score/*.java
+
 
 class_score:  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/classresult.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/affy_go_Parse.class  \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/ClassMap.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_correls.class  \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/exp_class_scores.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_pvals.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/ConstantStuff.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/corr_class_scores.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/exp_class_scores.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/histogram.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Matrix.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Pval_parse.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Stats.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/testcomparator.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Ug_Parse.class \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Group_Parse.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
@@ -66,7 +65,7 @@ class_score:  \
 
 CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/classresult.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/affy_go_Parse.class  \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/ClassMap.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_correls.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/class_pvals.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/ConstantStuff.class  \
@@ -77,11 +76,10 @@ CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Pval_parse.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Stats.class  \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/testcomparator.class  \
-	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Ug_Parse.class \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Group_Parse.class \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/GoName_parse.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Class_Frame.class \
         ${OUTPUTDIR}/${APP_PACKAGE_PATH}/class_score/Final_Project.class \
-        ${OUTPUTDIR}/erminecmd.class
 
 ${OUTPUTDIR}/%.class	: ${SOURCEPATH}/%.java
 	${JAVAC} ${OPTIONS} \
@@ -94,6 +92,13 @@ runner: ${CLASS_FILES}
 
 doc:
 	javadoc -d ${DOCDIR} -windowtitle ${WINDOWTITLE} -doctitle ${DOCTITLE} -header ${HEADER} -bottom ${BOTTOM} -classpath ${CLASSPATH} -sourcepath ${SOURCEPATH} ${PACKAGES}
+
+# force this to relink.
+commandline: 
+	${JAVAC} ${OPTIONS} \
+	-sourcepath ${SOURCEPATH} \
+	-classpath ${CLASSPATH} \
+	erminecmd.java
 
 clean:
 	find ./ -name "*~" -exec rm {} \;

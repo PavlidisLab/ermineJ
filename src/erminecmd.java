@@ -1,5 +1,9 @@
-/***************************************************************************************
- command line interface for ermineJ program
+/**
+ Command line interface for ermineJ program.
+
+ This needs major work!!!
+
+ $Id$
 
  #command line arguments in the following way
   args[0]:pval_file, 
@@ -18,8 +22,8 @@
   **notce: all "data files" and this "command line file" should be put uncer the directory ermineJ\java_proj\src
 
 examples:
-1. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-quantile-log2.txt QUANTILE_METHOD 100 4 10000 50 0.001 true
-2. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-mean-log3.txt MEAN_METHOD 100 4 10000 50 0.0001 true
+1. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-quantile-log2.txt QUANTILE_METHOD 100 4 10000 50 0.001 true 1 true
+2. java ermine age.welch.pvals.highexpression.forerminej.txt MG-U74Av2.go.txt goNames.txt MG-U74Av2.ug.txt output-mean-log3.txt MEAN_METHOD 100 4 10000 50 0.0001 true 1 true
 
 ***************************************************************************************/
 
@@ -45,7 +49,7 @@ public class erminecmd{
 	    ugFile = getCanonical(ugFile);
 
 	    class_pvals test = new class_pvals(pbPvalFile, affyGoFile, goNameFile, destinFile, ugFile, args[5], args[6], Integer.parseInt(args[7]),Integer.parseInt(args[8]),Integer.parseInt(args[9]),Integer.parseInt(args[10]), Double.parseDouble(args[11]), args[12], Integer.parseInt(args[13]), args[14]);
-	} catch (ArrayIndexOutOfBoundsException exception) {
+	} catch (ArrayIndexOutOfBoundsException exception) { // this doesn't work ...
 	    System.err.println("You must enter 15 command line arguments: \nprobe_pvalfile\naffy_gofile\ngo_namefile\ngroups file\ndestination_file\nmethod\ngroups method\nmax class size\nmin class size\nnum runs\nquantile\npval\nwt_check\npvalcolumn\ndolog");
 	}
     }
