@@ -83,4 +83,9 @@ public class GONameReader {
    {
       go_name_map.put(id, name);
    }
+
+   public void modifyClass(String id, String name)
+   {
+      go_name_map.put(id, name);
+   }
 }

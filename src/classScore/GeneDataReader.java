@@ -2,6 +2,7 @@ package classScore;
 
 import java.io.*;
 import java.util.*;
+import javax.swing.table.*;
 
 /**
  * <p>Title: </p>
@@ -152,17 +153,79 @@ public class GeneDataReader {
        return classToProbeMap.containsKey(className);
    }
 
-   public void addClass(String ID, ArrayList probes)
+   public void addClass(String id, ArrayList probes)
    {
-      classToProbeMap.put(ID,probes);
+      classToProbeMap.put(id,probes);
 
       Iterator probe_it=probes.iterator();
       while(probe_it.hasNext())
       {
          String probe = new String((String) probe_it.next());
-         probeToClassMap.put(probe,ID);
+         ((ArrayList)probeToClassMap.get(probe)).add(id);
       }
    }
+
+   public void modifyClass(String id, ArrayList probes)
+   {
+      ArrayList orig_probes=(ArrayList)classToProbeMap.get(id);
+      Iterator orig_probe_it=orig_probes.iterator();
+      while(orig_probe_it.hasNext())
+      {
+         String orig_probe = new String((String) orig_probe_it.next());
+         if(!probes.contains(orig_probe))
+         {
+            HashSet ptc = new HashSet((Collection)probeToClassMap.get(orig_probe));
+            ptc.remove(id);
+            probeToClassMap.remove(orig_probe);
+            probeToClassMap.put(orig_probe,new ArrayList((Collection)ptc));
+         }
+      }
+      Iterator probe_it=probes.iterator();
+      while(probe_it.hasNext())
+      {
+         String probe = (String) probe_it.next();
+         if(!orig_probes.contains(probe))
+            ((ArrayList)probeToClassMap.get(probe)).add(id);
+      }
+      classToProbeMap.put(id,probes);
+   }
+
+   public TableModel toTableModel()
+   {
+      return new AbstractTableModel()
+      {
+         private String[] columnNames = {"Probe", "Gene", "Description"};
+
+         public String getColumnName(int i) { return columnNames[i]; }
+
+         public int getColumnCount() { return 3; }
+
+         public int getRowCount() { return getProbeGroupMap().size(); }
+
+         public Object getValueAt(int i, int j)
+         {
+            Map pgmap=getProbeGroupMap();
+            Vector probe_list=new Vector(pgmap.keySet());
+            Collections.sort(probe_list);
+            String probeid = (String) probe_list.get(i);
+            String probegroup = (String) getProbeGeneName(probeid);
+            String description = (String) getProbeDescription(probeid);
+            switch (j)
+            {
+               case 0:
+                  return probeid;
+               case 1:
+                  return probegroup;
+               case 2:
+                  return description;
+               default:
+                   return "";
+             }
+         }
+
+      };
+   };
+
 
    public static void main(String[] args) {
    }

@@ -39,7 +39,7 @@ public class ErrorFrame
    //Component initialization
 //   private void jbInit() throws Exception {
    private void jbInit(String error) throws Exception {
-      this.setTitle("About");
+      this.setTitle("Error");
       panel1.setLayout(borderLayout1);
       label1.setFont(new java.awt.Font("MS Sans Serif", 0, 11));
       label1.setForeground(Color.black);

@@ -92,14 +92,14 @@ public class SetupMaps {
    public static TableModel toBlankTableModel() {
       return new AbstractTableModel()
       {
-         private String[] columnNames = {"Name", "Description","Probes"};
+         private String[] columnNames = {"Name", "Description","# of Probes","# of Genes"};
 
          public String getColumnName(int i) {
             return columnNames[i];
          }
 
          public int getColumnCount() {
-            return 3;
+            return columnNames.length;
          }
 
          public int getRowCount() {
@@ -117,11 +117,11 @@ public class SetupMaps {
    {
       return new AbstractTableModel()
       {
-         private String[] columnNames = {"Name", "Description","Probes"};
+         private String[] columnNames = {"Name", "Description","# of Probes","# of Genes"};
 
          public String getColumnName(int i) { return columnNames[i]; }
 
-         public int getColumnCount() { return 3; }
+         public int getColumnCount() { return columnNames.length; }
 
          public int getRowCount() { return sortedclasses.size(); }
 
@@ -143,47 +143,22 @@ public class SetupMaps {
                      numprobes = ((ArrayList)classToProbe.get(classid)).size();
                   return Integer.toString(numprobes);
                }
+               case 3:
+               {
+                  HashSet genes = new HashSet();
+                  ArrayList probes=(ArrayList)classToProbe.get(classid);
+                  Iterator probe_it=probes.iterator();
+                  while(probe_it.hasNext())
+                  {
+                     genes.add(geneData.getProbeGeneName((String) probe_it.next()));
+                  }
+                  int numgenes = genes.size();
+                  return Integer.toString(numgenes);
+               }
                default:
                    return "";
              }
          }
-
-      };
-   };
-
-   public TableModel toSelectTableModel()
-   {
-      return new AbstractTableModel()
-      {
-         private String[] columnNames = {"Probe", "Gene", "Description"};
-
-         public String getColumnName(int i) { return columnNames[i]; }
-
-         public int getColumnCount() { return 3; }
-
-         public int getRowCount() { return geneData.getProbeGroupMap().size(); }
-
-         public Object getValueAt(int i, int j)
-         {
-            Map pgmap=geneData.getProbeGroupMap();
-            Vector probe_list=new Vector(pgmap.keySet());
-            Collections.sort(probe_list);
-            String probeid = (String) probe_list.get(i);
-            String probegroup = (String) geneData.getProbeGeneName(probeid);
-            String description = (String) geneData.getProbeDescription(probeid);
-            switch (j)
-            {
-               case 0:
-                  return probeid;
-               case 1:
-                  return probegroup;
-               case 2:
-                  return description;
-               default:
-                   return "";
-             }
-         }
-
       };
    };
 
@@ -192,6 +167,17 @@ public class SetupMaps {
       System.err.println("adding " + id + " to setupmap");
       geneData.addClass(id, probes);
       goName.addClass(id,desc);
+      probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
+                                     geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
+      classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
+      sortClasses();
+   }
+
+   public void modifyClass(String id, String desc, ArrayList probes)
+   {
+      System.err.println("modifying " + id + " to setupmap");
+      geneData.modifyClass(id, probes);
+      goName.modifyClass(id,desc);
       probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
                                      geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
       classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes

@@ -20,9 +20,11 @@ public class ClassPanel extends JScrollPane
    JTable jTable1 = new JTable();
    SetupMaps dataHolder = null;
    // EventListenerList listenerList = null;
+   classScoreFrame csFrame;
 
-   public ClassPanel()
+   public ClassPanel(classScoreFrame csFrame)
    {
+      this.csFrame=csFrame;
       try
       {
          //     listenerList = new EventListenerList();
@@ -52,6 +54,13 @@ public class ClassPanel extends JScrollPane
       jTable1.addMouseListener(new ClassPanel_jTable1_mouseAdapter(this));
       jTable1.setGridColor(Color.lightGray);
       jTable1.setRowSelectionAllowed(true);
+
+      modclassPopupMenu popup = new modclassPopupMenu();
+      JMenuItem menuItem = new JMenuItem("Modify this class (Step 1 of 3)");
+      menuItem.addActionListener(new popupMenu_actionAdapter(this));
+      popup.add(menuItem);
+      MouseListener popupListener = new PopupListener(popup);
+      jTable1.addMouseListener(popupListener);
       this.getViewport().add(jTable1, null);
    }
 
@@ -72,6 +81,16 @@ public class ClassPanel extends JScrollPane
       jTable1.getColumnModel().getColumn(1).setPreferredWidth(200);
    }
 
+
+   void popupMenu_actionPerformed(ActionEvent e)
+   {
+      modclassPopupMenu sourcePopup=(modclassPopupMenu)((Container)e.getSource()).getParent();
+      int r =jTable1.rowAtPoint(sourcePopup.getPoint());
+      String id=(String)jTable1.getValueAt(r,0);
+      System.err.println("Doing some action: " + id);
+      csFrame.makeModClassFrame(false,id);
+   }
+
    void jTable1_mouseReleased(MouseEvent e) {
       int j = jTable1.getSelectedRow();
       //   System.err.println(j);
@@ -85,6 +104,7 @@ public class ClassPanel extends JScrollPane
    }
 
 
+
 }
 
 class ClassPanel_jTable1_mouseAdapter
@@ -95,10 +115,53 @@ class ClassPanel_jTable1_mouseAdapter
       this.adaptee = adaptee;
    }
 
+   public void mouseClicked(MouseEvent e) {
+//    if((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK)
+//       adaptee.jTable1_mouseRightClicked(e);
+   }
+
    public void mouseReleased(MouseEvent e) {
       if (e.getClickCount() < 2) {
          return;
       }
       adaptee.jTable1_mouseReleased(e);
    }
+}
+
+class PopupListener extends MouseAdapter {
+   modclassPopupMenu popup;
+   PopupListener(modclassPopupMenu popupMenu) { popup = popupMenu; }
+   public void mousePressed(MouseEvent e) { maybeShowPopup(e); }
+   public void mouseReleased(MouseEvent e) { maybeShowPopup(e); }
+   private void maybeShowPopup(MouseEvent e) {
+      if (e.isPopupTrigger()) {
+         JTable source = (JTable) e.getSource();
+         int r =source.rowAtPoint(e.getPoint());
+         String id=(String)source.getValueAt(r,0);
+         if(id.compareTo("")!=0)
+         {
+            popup.show(e.getComponent(), e.getX(), e.getY());
+            popup.setPoint(e.getPoint());
+         }
+      }
+   }
+}
+
+class popupMenu_actionAdapter implements java.awt.event.ActionListener {
+   ClassPanel adaptee;
+
+   popupMenu_actionAdapter(ClassPanel adaptee) {
+      this.adaptee = adaptee;
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      adaptee.popupMenu_actionPerformed(e);
+   }
+}
+
+class modclassPopupMenu extends JPopupMenu
+{
+   Point popupPoint;
+   public Point getPoint() {return popupPoint;}
+   public void setPoint(Point point) {popupPoint=point;}
 }

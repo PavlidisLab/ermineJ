@@ -95,7 +95,7 @@ public class classScoreFrame
   FlowLayout flowLayout9 = new FlowLayout();
   FlowLayout flowLayout1 = new FlowLayout();
   GridBagLayout gridBagLayout1 = new GridBagLayout();
-  ClassPanel cPanel = new ClassPanel();
+  ClassPanel cPanel = new ClassPanel(this);
 
   SetupMaps smaps = null;
   int runnum = 0;
@@ -242,6 +242,7 @@ public class classScoreFrame
     jMenuItem1.setText("Define New Class");
     jMenuItem1.addActionListener(new classScoreFrame_jMenuItem1_actionAdapter(this));
     jMenuItem2.setText("Modify Class");
+    jMenuItem2.addActionListener(new classScoreFrame_jMenuItem2_actionAdapter(this));
     jMenuItem3.setText("Load Class Information");
     jMenuItem3.addActionListener(new classScoreFrame_jMenuItem3_actionAdapter(this));
     jPanelOuputGroup.add(jLabel2, null);
@@ -938,7 +939,19 @@ public class classScoreFrame
    }
 
   void jMenuItem1_actionPerformed(ActionEvent e) {
-     modClassFrame dlg = new modClassFrame(smaps,this.cPanel);
+     makeModClassFrame(true,"");
+  }
+
+  void jMenuItem2_actionPerformed(ActionEvent e) {
+     makeModClassFrame(false,"");
+  }
+
+  public void makeModClassFrame(boolean makenew, String classid)
+  {
+     String folder=(String) jTextFieldOutPutFileName.getText();
+     int end=folder.lastIndexOf('\\');
+     folder=folder.substring(0,end+1);
+     modClassFrame dlg = new modClassFrame(makenew,smaps,this.cPanel,folder,classid);
      Dimension dlgSize = dlg.getPreferredSize();
      Dimension frmSize = getSize();
      Point loc = getLocation();
@@ -1132,6 +1145,17 @@ class classScoreFrame_jMenuItem1_actionAdapter implements java.awt.event.ActionL
   }
   public void actionPerformed(ActionEvent e) {
     adaptee.jMenuItem1_actionPerformed(e);
+  }
+}
+
+class classScoreFrame_jMenuItem2_actionAdapter implements java.awt.event.ActionListener {
+  classScoreFrame adaptee;
+
+  classScoreFrame_jMenuItem2_actionAdapter(classScoreFrame adaptee) {
+    this.adaptee = adaptee;
+  }
+  public void actionPerformed(ActionEvent e) {
+    adaptee.jMenuItem2_actionPerformed(e);
   }
 }
 
