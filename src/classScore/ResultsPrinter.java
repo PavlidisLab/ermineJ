@@ -17,10 +17,10 @@ public class ResultsPrinter {
    protected String dest_file;
    protected Vector sortedclasses;
    protected Map results;
-   protected GONameReader goName;
+   protected GONames goName;
    private ClassMap probeToClassMap;
 
-   public ResultsPrinter(String dest_file, Vector sortedclasses, Map results, GONameReader goName, ClassMap probeToClassMap) {
+   public ResultsPrinter(String dest_file, Vector sortedclasses, Map results, GONames goName, ClassMap probeToClassMap) {
       this.dest_file = dest_file;
       this.sortedclasses = sortedclasses;
       this.results = results;
@@ -92,7 +92,7 @@ public class ResultsPrinter {
               String nextid = (String) it.next();
               String prefix;
               return_value = return_value + nextid + "|" +
-                             goName.get_GoName_value_map(nextid) + ", ";
+                             goName.getNameForId(nextid) + ", ";
            }
         }
 
@@ -106,7 +106,7 @@ public class ResultsPrinter {
               String nextid = (String) it.next();
               String prefix;
               return_value = return_value + nextid + "|" +
-                             goName.get_GoName_value_map(nextid) + ", ";
+                             goName.getNameForId(nextid) + ", ";
            }
            return "\t" + return_value;
         }

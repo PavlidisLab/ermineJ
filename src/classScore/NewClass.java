@@ -74,7 +74,7 @@ public class NewClass {
          public Object getValueAt(int r, int c) {
             if (r < probes.size()) {
                String probeid = (String) probes.get(r);
-               GeneDataReader geneData = outerframe.imaps.geneData;
+               GeneAnnotations geneData = outerframe.imaps.geneData;
                switch (c) {
                case 0:
                   return probeid;

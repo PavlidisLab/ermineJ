@@ -72,7 +72,7 @@ public class ClassDetailFrame
        Map classToProbe,
        String id,
        NumberFormat nf,
-       GeneDataReader geneData,
+       GeneAnnotations geneData,
        Properties settings ) {
 
       try {
@@ -171,7 +171,7 @@ public class ClassDetailFrame
        Map classToProbe,
        String id,
        NumberFormat nf,
-       GeneDataReader geneData,
+       GeneAnnotations geneData,
        Properties settings ) {
 
       //
@@ -408,7 +408,7 @@ class DetailsTableModel
    private Map m_classToProbe;
    private String m_id;
    private NumberFormat m_nf;
-   private GeneDataReader m_geneData;
+   private GeneAnnotations m_geneData;
    private String[] m_columnNames = {
        "Probe", "P value", "Name", "Description"};
 
@@ -420,7 +420,7 @@ class DetailsTableModel
        Map classToProbe,
        String id,
        NumberFormat nf,
-       GeneDataReader geneData ) {
+       GeneAnnotations geneData ) {
 
       m_matrixDisplay = matrixDisplay;
       m_values = values;

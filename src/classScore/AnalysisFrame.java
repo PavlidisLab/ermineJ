@@ -559,7 +559,7 @@ public class AnalysisFrame extends JDialog {
       }
    }
 
-   private void writePrefs() {
+   private void writePrefs() throws IOException {
       Properties settings = callingframe.settings;
       settings.setProperty("scoreFile", scoreFile.getText());
       settings.setProperty("nameFile", nameFile.getText());
@@ -571,12 +571,9 @@ public class AnalysisFrame extends JDialog {
       settings.setProperty("pValTheshold", jTextFieldPValueThreshold.getText());
       settings.setProperty("iterations", jTextFieldIterations.getText());
       settings.setProperty("scorecol", jTextFieldScoreCol.getText());
-      try {
+
          OutputStream f = new FileOutputStream("ClassScore.prefs");
          settings.store(f, "");
-      } catch (IOException ex) {
-         System.err.println("Error writing prefs.");
-      }
    }
 
    private boolean testfile(String filename) {
@@ -825,7 +822,14 @@ public class AnalysisFrame extends JDialog {
    }
 
    void finishButton_actionPerformed(ActionEvent e) {
-      writePrefs();
+
+
+      try {
+         writePrefs();
+      } catch (IOException ex) {
+         System.err.println("Could not write prefs:" + ex);
+         ex.printStackTrace();
+      }
 
       class runthread extends Thread {
          public runthread() {}

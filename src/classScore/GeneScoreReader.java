@@ -14,7 +14,7 @@ import java.util.Vector;
 
 /**
   Description:Parses the file of the form
-  <pre>probe_id pval</pre>
+  <pre>probe_id[tab]pval</pre>
   <p>The values are stored in a HashTable probe_pval_map. This is used to
   see what probes are int the data set, as well as the score for each
   probe.   Created :09/02/02</p>
@@ -45,8 +45,6 @@ public class GeneScoreReader {
     */
    public GeneScoreReader(String filename, int column, boolean dolog) throws
            IOException {
-      String aLine = null;
-      int count = 0;
       //read in file
 
       File infile = new File(filename);
@@ -70,7 +68,6 @@ public class GeneScoreReader {
       Vector rows = new Vector();
       Vector cols = null;
       probe_pval_map = new LinkedHashMap();
-      int colnumber = 0;
 
       while ((row = dis.readLine()) != null) {
          StringTokenizer st = new StringTokenizer(row, "\t");

@@ -16,15 +16,18 @@ import javax.swing.table.TableModel;
   Makes the initial maps based on the input files. Created :05/27/04
   @author Shahmil Merchant; Paul Pavlidis (major changes)
   @version $Id$
+ * @todo remove redundant readers
  */
 public class InitialMaps {
-   public GONameReader goName;
-   public GeneDataReader geneData = null;
+   public GONames goName;
+   public GeneAnnotations geneData = null;
    public Map probeGroups;
    public Map classToProbe;
    public expClassScore probePvalMapper;
    private Vector sortedclasses = null;
-   public GONameReader getGoName() {
+
+
+   public GONames getGoName() {
       return goName;
    }
 
@@ -41,6 +44,12 @@ public class InitialMaps {
    }
 
    /**
+    *
+    * @param probe_annotfile String
+    * @param goNamesfile String
+    * @param messenger classScoreStatus
+    * @throws IllegalArgumentException
+    * @throws IOException
     */
    public InitialMaps(String probe_annotfile, String goNamesfile,
                       classScoreStatus messenger) throws
@@ -49,6 +58,24 @@ public class InitialMaps {
       setupClasses(messenger);
    }
 
+   /**
+    *
+    * @param probePvalFile String
+    * @param probe_annotfile String
+    * @param goNamesfile String
+    * @param method String
+    * @param groupMethod String
+    * @param classMaxSize int
+    * @param classMinSize int
+    * @param numberOfRuns int
+    * @param quantile int
+    * @param useWeights String
+    * @param pvalcolumn int
+    * @param dolog_check String
+    * @param messenger classScoreStatus
+    * @throws IllegalArgumentException
+    * @throws IOException
+    */
    public InitialMaps(String probePvalFile,
                       String probe_annotfile,
                       String goNamesfile,
@@ -75,10 +102,10 @@ public class InitialMaps {
    private void readFiles(String probe_annotfile, String goNamesfile,
                           classScoreStatus messenger) throws
            IllegalArgumentException, IOException {
-      messenger.setStatus("Reading GO descriptions");
-      goName = new GONameReader(goNamesfile); // parse go name file
-      messenger.setStatus("Reading gene data file");
-      geneData = new GeneDataReader(probe_annotfile);
+      messenger.setStatus("Reading GO descriptions from " + goNamesfile);
+      goName = new GONames(goNamesfile); // parse go name file
+      messenger.setStatus("Reading gene annotations from " + probe_annotfile);
+      geneData = new GeneAnnotations(probe_annotfile);
    }
 
    private void readFiles(String probe_annotfile, String goNamesfile,
@@ -88,22 +115,21 @@ public class InitialMaps {
                           String useWeights, int pvalcolumn,
                           String dolog_check
                           ) throws IllegalArgumentException, IOException {
-      messenger.setStatus("Reading GO descriptions");
-      goName = new GONameReader(goNamesfile); // parse go name file
-      messenger.setStatus("Reading gene scores");
+      messenger.setStatus("Reading GO descriptions " + goNamesfile);
+      goName = new GONames(goNamesfile); // parse go name file
+      messenger.setStatus("Reading gene scores from " + probePvalFile);
       boolean dolog = (Boolean.valueOf(dolog_check)).booleanValue();
       probePvalMapper = new expClassScore(probePvalFile, useWeights, method,
                                           pvalcolumn, dolog, classMaxSize,
                                           classMinSize, numberOfRuns,
                                           quantile);
-      messenger.setStatus("Reading gene data file");
-      geneData = new GeneDataReader(probe_annotfile, probePvalMapper.get_map());
+      messenger.setStatus("Reading gene annotations from " + probe_annotfile);
+      geneData = new GeneAnnotations(probe_annotfile, probePvalMapper.get_map());
    }
 
    private GeneGroupReader setupClasses(classScoreStatus messenger) {
-      GeneGroupReader groupName = new GeneGroupReader(geneData.
-              getGroupProbeList(),
-              geneData.getProbeGroupMap()); // parse group file. Yields map of probe->replicates.
+      GeneGroupReader groupName = new GeneGroupReader(geneData.getGeneToProbeList(),
+              geneData.getProbeToGeneMap()); // parse group file. Yields map of probe->replicates.
       probeGroups = groupName.get_probe_group_map(); // map of probes to groups
       messenger.setStatus("Initializing gene class mapping");
       ClassMap probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
@@ -172,7 +198,7 @@ public class InitialMaps {
             case 0:
                return classid;
             case 1:
-               return goName.get_GoName_value_map(classid);
+               return goName.getNameForId(classid);
             case 2: {
                int numprobes = 0;
                if (classToProbe.containsKey(classid)) {
@@ -217,17 +243,21 @@ public class InitialMaps {
       sortClasses();
    }
 
-   public int numClasses() {return sortedclasses.size();
+   public int numClasses() {
+      return sortedclasses.size();
    }
 
-   public String getClass(int i) {return (String) sortedclasses.get(i);
+   public String getClass(int i) {
+      return (String) sortedclasses.get(i);
    }
 
-   public String getClassDesc(String id) {return (String) goName.
-           get_GoName_value_map(id);
+   public String getClassDesc(String id) {
+      return (String) goName.getNameForId(
+           id);
    }
 
-   public int numProbes(String id) {return ((ArrayList) classToProbe.get(id)).
+   public int numProbes(String id) {
+      return ((ArrayList) classToProbe.get(id)).
            size();
    }
 
