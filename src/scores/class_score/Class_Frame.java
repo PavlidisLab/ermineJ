@@ -176,7 +176,7 @@ public class Class_Frame extends JPanel {
 	browseButton3 = new JButton("Browse...");
 	browseButton4 = new JButton("Browse...");
 	commitButton = new JButton("Ok");
-	cancelButton = new JButton("Cancel");
+	cancelButton = new JButton("Quit");
 	try {
 	    browseButton1.addActionListener(new BrowseListener(fileNameField1));
 	    browseButton2.addActionListener(new BrowseListener(fileNameField2));
@@ -327,7 +327,7 @@ protected Component make_Pval_Panel() {
     browseButton44 = new JButton("Browse...");
     browseButton55 = new JButton("Browse...");
     commitButton1 = new JButton("Ok");
-    cancelButton1 = new JButton("Cancel");
+    cancelButton1 = new JButton("Quit");
     //listeners for browse button
     try {
 	browseButton11.addActionListener(new BrowseListener(fileNameField11));
@@ -419,6 +419,7 @@ protected Component make_Pval_Panel() {
     panel.add(Box.createVerticalStrut(20));
     
     weightbox = new JCheckBox("Use Weights");
+    weightbox.setToolTipText("Genes which occur repeatedly in a data set are weighted accordingly");
     weightbox.setSelected(true);
     CheckBoxListener checkListener = new CheckBoxListener();
     weightbox.addItemListener(checkListener);
@@ -427,16 +428,16 @@ protected Component make_Pval_Panel() {
     
     //set radio button options 
     JRadioButton meanButton = new JRadioButton("Mean");
+    meanButton.setToolTipText("Use the mean of the class's gene scores.");
     meanButton.setActionCommand("MEAN_METHOD");
     meanButton.setSelected(true);
      
     JRadioButton quantileButton = new JRadioButton("Quantile");
+    quantileButton.setToolTipText("Use a quantile of the class's gene scores.");
     quantileButton.setActionCommand("QUANTILE_METHOD");
-    
     //    JRadioButton medianButton = new JRadioButton("MEAN_ABOVE_QUANTILE_METHOD");
     //    medianButton.setActionCommand("MEAN_ABOVE_QUANTILE_METHOD");
-    
-    
+        
     ButtonGroup group = new ButtonGroup();
     group.add(meanButton);
     group.add(quantileButton);
@@ -459,35 +460,39 @@ protected Component make_Pval_Panel() {
     quantileButton.addActionListener(myListener);
     //    medianButton.addActionListener(myListener);
     
-    
-    
+        
     //various other parameters
     panel.add(Box.createHorizontalStrut(80));
-    JLabel num1 = new JLabel("Number of Iterations");
+    JLabel num1 = new JLabel("Iterations");
+    num1.setToolTipText("Applies to mean and quantile methods: more trials take longer.");
     text_numField1 = new JTextField("10000",5);
     panel.add(num1);
     panel.add(text_numField1);
     panel.add(Box.createHorizontalStrut(10));
      
     JLabel quantile1 = new JLabel("Quantile");
+    quantile1.setToolTipText("Applies to quantile method only. Use 50 for the median");
     text_quantileField1 = new JTextField("50",5);
     panel.add(quantile1);
     panel.add(text_quantileField1);
     panel.add(Box.createHorizontalStrut(10));
     
-    JLabel pval1 = new JLabel("P-value");
-    text_pVal1 = new JTextField("0.00001",5);
+    JLabel pval1 = new JLabel("P-value cutoff");
+    pval1.setToolTipText("The pvalue cutoff to use for the hypergeometric distribution class evaluation");
+    text_pVal1 = new JTextField("0.00001", 5);
     panel.add(pval1);
     panel.add(text_pVal1);
     panel.add(Box.createVerticalStrut(40));
 
     JLabel class_max1 = new JLabel("Max class size");
+    class_max1.setToolTipText("Classes with more members will not be considered");
     text_maxField1 = new JTextField("100",5);
     panel.add(class_max1);
     panel.add(text_maxField1);
     panel.add(Box.createHorizontalStrut(10));
     
     JLabel class_min1 = new JLabel("Min class size");
+    class_min1.setToolTipText("Classes with fewer members will not be considered");
     text_minField1 = new JTextField("4",5);
     panel.add(class_min1);
     panel.add(text_minField1);
@@ -855,22 +860,22 @@ protected Component make_Pval_Panel() {
 	
 	String maxFieldS1;
 	maxFieldS1 = text_maxField1.getText();
-	if (maxFieldS1 !=null){
+	if (maxFieldS1 !=null && Integer.parseInt(maxFieldS1) >= 3){
 	    maxField1=Integer.parseInt(maxFieldS1);
 	} else {
 	    JOptionPane.showMessageDialog(null,
-					  "Max size is empty!!  "+
+					  "Max size is invalid (must be 3 or more)!!  "+
 					  "Rewrite Max Size!!");
 	    return;
 	}
 	    
 	String minFieldS1;
 	minFieldS1 = text_minField1.getText();
-	if (minFieldS1 !=null){
+	if (minFieldS1 !=null &&  Integer.parseInt(minFieldS1) > 2 ){
 	    minField1=Integer.parseInt(minFieldS1);
 	} else {
 	    JOptionPane.showMessageDialog(null,
-					  "Min size is empty!!  "+
+					  "Min size is invald (must be 2 or more)!!  "+
 					  "Rewrite Min Size!!");
 	    return;
 	}
@@ -885,18 +890,20 @@ protected Component make_Pval_Panel() {
 
 	String quantileFieldS1;
 	quantileFieldS1 = text_quantileField1.getText();
-	if (quantileFieldS1 !=null){
-	    quantileField1=Integer.parseInt(quantileFieldS1);
-	} else  {
-	    JOptionPane.showMessageDialog(null,
-					  "Quantile is empty!!  "+
-					  "Rewrite quantile!!");
-	    return;
+	if (method_name == "QUANTILE_METHOD") {
+	    if (quantileFieldS1 !=null){
+		quantileField1=Integer.parseInt(quantileFieldS1);
+	    } else  {
+		JOptionPane.showMessageDialog(null,
+					      "Quantile is empty!!  "+
+					      "Rewrite quantile!!");
+		return;
+	    }
 	}
 	
 	String pValS1;
 	pValS1 = text_pVal1.getText();
-	if (pValS1 !=null){
+	if (pValS1 !=null) {
 	    pVal1=Double.parseDouble(pValS1);
 	} else {
 	    JOptionPane.showMessageDialog(null,
@@ -982,7 +989,7 @@ protected Component make_Pval_Panel() {
 		int response = JOptionPane.
 		    showConfirmDialog(null,
 				      message,
-				      "Use files?",
+				      "Proceed?",
 				      JOptionPane.YES_NO_OPTION);
 		if (response != JOptionPane.YES_OPTION)
 		    return;
@@ -997,7 +1004,7 @@ protected Component make_Pval_Panel() {
 	    	JOptionPane.showMessageDialog(null,
 					      "Number of iterations is empty!!  "+
 					      "Rewrite number!!");	
-	    return;
+		return;
 	    }
 
 	    String maxFieldS;
@@ -1005,10 +1012,10 @@ protected Component make_Pval_Panel() {
 	    if (maxFieldS !=null){
 		maxField=Integer.parseInt(maxFieldS);
 	    } else {
-	JOptionPane.showMessageDialog(null,
+		JOptionPane.showMessageDialog(null,
 					      "Max size is empty!!  "+
 					      "Rewrite Max Size!!");
-	    return;
+		return;
 	    }
 
 	    String minFieldS;

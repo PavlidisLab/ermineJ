@@ -101,7 +101,7 @@ public class class_pvals {
 	String method = probe_pval.get_method();
 	Map input_rank_map = weight_on ? Stats.rankOf(ug_pval_map) : Stats.rankOf(chips);
 	int inputSize = input_rank_map.size();
-	double minPval = 0.5 / (double)probe_pval.get_number_of_runs();
+	double minPval = 0.5 / (double)probe_pval.get_number_of_runs(); // the best possible score.
 	
 	Collection entries = go_probe.entrySet();
 	Iterator it = entries.iterator();
@@ -113,7 +113,7 @@ public class class_pvals {
 	class_list=hist.get_matrix_map();
  try {
      BufferedWriter out = new BufferedWriter(new FileWriter(dest_file, true));
-     if (weight_on == false){
+     if (weight_on == false){ // headings.
 	 out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "hyper pval" + "\t" + "aroc rate" +  "\t" + "rocpval" + "\n");
      } else {
 	 out.write("class" + "\t" + "size" + "\t" + "raw score" + "\t" + "pval " + "\t" + "virtual_size" + "\t" + "hyper pval" + "\t" + "aroc rate" + "\t" + "rocpval" + "\n");
@@ -258,7 +258,8 @@ public class class_pvals {
                }
                
                hyper_pval = Stats.hyperPval(N1, n1, N2, n2);   //geometric distribution calculations
-            }  
+            }
+
             if(pval == 0)
                pval = minPval;
               
