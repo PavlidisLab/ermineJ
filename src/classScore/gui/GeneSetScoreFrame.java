@@ -273,12 +273,15 @@ public class GeneSetScoreFrame
          statusMessenger.setStatus("Ready.");
       }
       catch ( IllegalArgumentException e ) {
-         GuiUtil.error( e, "During initialization" );
+         GuiUtil.error( e, "During initialization. Press OK to quit." );
+         System.exit(0);
       }
       catch ( IOException e ) {
-         GuiUtil.error( e, "File reading or writing" );
+         GuiUtil.error( e, "File reading or writing. Press OK to quit." );
+         System.exit(0);
       } catch ( SAXException e ) {
-         GuiUtil.error( "Gene Ontology file format is incorrect. Please check that it is a valid XML file." );
+         GuiUtil.error( "Gene Ontology file format is incorrect. Please check that it is a valid XML file.  Press OK to quit." );
+         System.exit(0);
       }
       oPanel.addInitialData( geneData, goData );
       statusMessenger.setStatus("Done with initialization.");
