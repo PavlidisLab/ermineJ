@@ -49,7 +49,6 @@ public class ResamplingCorrelationGeneSetScore extends
     * correlations.
     * 
     * @return histogram containing the random distributions of correlations.
-    * @throws OutOfMemoryError
     */
    public Histogram generateNullDistribution( StatusViewer messenger ) {
 
@@ -60,15 +59,9 @@ public class ResamplingCorrelationGeneSetScore extends
 
       dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much.
       for ( int j = 0; j < data.rows(); j++ ) {
-
          double[] rowValues = data.getRow( j );
-         //         DoubleArrayList row = new cern.colt.list.DoubleArrayList(
-         //               rowValues );
-         //         DescriptiveWithMissing.standardize( row );
-         //         dataAsRawMatrix[j] = row.elements();
          dataAsRawMatrix[j] = rowValues;
          deck[j] = j;
-         ;
       }
 
       for ( int i = classMinSize; i <= classMaxSize; i++ ) {
@@ -82,7 +75,11 @@ public class ResamplingCorrelationGeneSetScore extends
             RandomChooser.chooserandom( randomnums, deck, data.rows(), i );
             double avecorrel = geneSetMeanCorrel( randomnums, correls );
             hist.update( i - classMinSize, avecorrel );
-            Thread.yield();
+            if ( j % 100 == 0 ) {
+                  Thread.yield();
+                  
+                  // estimate a normal distribution
+            }
          }
 
          try {
@@ -113,17 +110,17 @@ public class ResamplingCorrelationGeneSetScore extends
       int nummeas = 0;
 
       for ( int i = 0; i < size; i++ ) {
-   //      int row1 = indicesToSelect[i];
+         //      int row1 = indicesToSelect[i];
          double[] irow = dataAsRawMatrix[indicesToSelect[i]];
 
          for ( int j = i + 1; j < size; j++ ) {
-     //       int row2 = indicesToSelect[j];
+            //       int row2 = indicesToSelect[j];
             //   double corr = Math.abs( correls.getQuick( row1, row2 ) );
 
             //   if ( corr == 0.0 ) { // we haven't done this one yet it yet.
 
             double[] jrow = dataAsRawMatrix[indicesToSelect[j]];
-            
+
             double corr = Math.abs( correlation( irow, jrow ) );
             //         correls.setQuick( row1, row2, corr ); // too much memory.
             //       correls.setQuick( row2, row1, corr );
@@ -132,7 +129,7 @@ public class ResamplingCorrelationGeneSetScore extends
             nummeas++;
          }
       }
-    
+
       return avecorrel / nummeas;
    }
 

@@ -15,7 +15,6 @@ import cern.colt.list.DoubleArrayList;
  * 
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
- * @todo default bin size
  */
 public class Histogram {
    protected static final Log log = LogFactory.getLog( Histogram.class );
@@ -37,29 +36,33 @@ public class Histogram {
    }
 
    /**
-    * @param number_of_class
-    * @param min_class_size
-    * @param number_of_runs
+    * 
+    * @param numGeneSets
+    * @param minGeneSetSize
+    * @param numRuns
     * @param max
+    * @param min
     */
-   public Histogram( int number_of_class, int min_class_size,
-         int number_of_runs, double max, double min ) {
+   public Histogram( int numGeneSets, int minGeneSetSize,
+         int numRuns, double max, double min ) {
 
-      if ( number_of_class < 1 ) {
+      if ( numGeneSets < 1 ) {
          throw new IllegalArgumentException( "No classes." );
       }
 
       this.minimum = min;
       this.maximum = max;
-      this.minimumGeneSetSize = min_class_size;
-      setNumRuns( number_of_runs );
+      this.minimumGeneSetSize = minGeneSetSize;
+      setNumRuns( numRuns );
       calcNumOfBins();
 
-      M = new DenseDoubleMatrix2DNamed( number_of_class, numBins + 1 );
+      M = new DenseDoubleMatrix2DNamed( numGeneSets, numBins + 1 );
    }
 
-   /**
-    */
+  /**
+   * 
+   *
+   */
    public void calcNumOfBins() {
       numBins = ( int ) ( ( maximum - minimum ) / binSize );
       if ( numBins < 1 ) {
@@ -107,12 +110,10 @@ public class Histogram {
    /**
     * Convert a raw histogram to a cdf.
     * 
-    * @todo this is probably not very efficient - calls new a lot.
     */
    public void tocdf() {
 
       for ( int i = 0; i < M.rows(); i++ ) { // for each histogram (class size)
-
          DoubleArrayList cdf = Stats.cdf( new DoubleArrayList( M.viewRow( i )
                .toArray() ) );
          for ( int j = 0; j < M.columns(); j++ ) {
@@ -125,7 +126,7 @@ public class Histogram {
    /**
     * @return double
     */
-   public double get_bin_size() {
+   public double getBinSize() {
       return binSize;
    }
 
@@ -150,18 +151,18 @@ public class Histogram {
       return numBins;
    }
 
-   public int get_number_of_histograms() {
+   public int getNumHistograms() {
       return M.rows();
    }
 
    /**
     * @return int
     */
-   public int get_number_of_runs() {
+   public int getNumRuns() {
       return numItemsPerHistogram;
    }
 
-   public int get_min_class_size() {
+   public int getMinGeneSetSize() {
       return minimumGeneSetSize;
    }
 
@@ -177,23 +178,23 @@ public class Histogram {
     * @param min_class_size int
     * @return int
     */
-   public int getClassIndex( int class_size, int min_class_size ) {
+   public int getClassIndex( int geneSetSize, int minGeneSetSize ) {
       //get corresponding index for each class size
-      return class_size - min_class_size;
+      return geneSetSize - minGeneSetSize;
    }
 
    /**
-    * @param class_size int - NOT the row, that is determined here.
+    * @param geneSetSize int - NOT the row, that is determined here.
     * @param rawscore double
     * @return double
     */
-   public double getValue( int class_size, double rawscore ) {
+   public double getValue( int geneSetSize, double rawscore ) {
       if ( rawscore > maximum || rawscore < minimum ) { // sanity check.
          throw new IllegalStateException(
                "Warning, a rawscore yielded a bin number which was out of the range: "
                      + rawscore );
       }
-      int row = this.getClassIndex( class_size, minimumGeneSetSize );
+      int row = this.getClassIndex( geneSetSize, minimumGeneSetSize );
       int binnum = ( int ) Math.floor( ( rawscore - minimum ) / binSize );
 
       if ( binnum < 0 ) {
