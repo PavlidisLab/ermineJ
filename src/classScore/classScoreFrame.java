@@ -1,7 +1,7 @@
 package classScore;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -34,7 +34,7 @@ public class classScoreFrame
 
    JPanel progressPanel;
    JPanel progInPanel = new JPanel();
-   JProgressBar jProgressBar1 = new JProgressBar();
+   JProgressBar progressBar = new JProgressBar();
    OutputPanel oPanel;
 
    JPanel jPanelMainControls = new JPanel();
@@ -52,6 +52,7 @@ public class classScoreFrame
    Vector results = new Vector();
 
    AnalysisThread athread=new AnalysisThread();
+   //javax.swing.Timer initMonitor;
 
    public classScoreFrame() {
       try {
@@ -119,10 +120,22 @@ public class classScoreFrame
       progInPanel.setPreferredSize(new Dimension(350, 100));
       JLabel label= new JLabel("Please wait while the files are loaded in.");
       label.setPreferredSize(new Dimension(195, 30));
-      jProgressBar1.setMinimumSize(new Dimension(10, 16));
-      jProgressBar1.setPreferredSize(new Dimension(300, 16));
+      progressBar.setPreferredSize(new Dimension(300, 16));
+      progressBar.setIndeterminate(true);
+      /*
+      initMonitor=new javax.swing.Timer(500, new ActionListener()
+      {
+         public void actionPerformed(ActionEvent e)
+         {
+            int current = ithread.getInitCurrent();
+            progressBar.setValue(current);
+            if(current == ithread.getInitTarget())
+               initMonitor.stop();
+         }
+      });
+      */
       progInPanel.add(label, null);
-      progInPanel.add(jProgressBar1, null);
+      progInPanel.add(progressBar, null);
       progressPanel.add(progInPanel,     new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
           ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(114, 268, 87, 268), 0, 0));
 
@@ -187,6 +200,7 @@ public class classScoreFrame
          enableMenus();
          mainPanel.remove( progressPanel );
          mainPanel.add( oPanel, BorderLayout.NORTH );
+         statusMessenger.setStatus("Ready.");
       }
       catch ( IllegalArgumentException e ) {
          GuiUtil.error( e, "During initialization" );
@@ -196,25 +210,6 @@ public class classScoreFrame
       }
       oPanel.addInitialData( geneData, goData );
       statusMessenger.setStatus("Done with initialization.");
-   }
-
-   public void analyze( Settings settings, classScoreStatus messenger) {
-      try {
-         GeneGroupReader groupName = new GeneGroupReader(geneData.getGeneToProbeList(),
-             geneData.getProbeToGeneMap()); // parse group file. Yields map of probe->replicates.
-         expClassScore probePvalMapper = new expClassScore(settings);
-         probePvalMapper.setInputPvals(groupName.get_group_probe_map(),
-                                       settings.getGroupMethod()); // this initializes the group_pval_map, Calculates the ave/best pvalue for each group
-         classPvalRun runResult = new classPvalRun( settings,geneData,goData,probePvalMapper,"","bh",messenger,false);
-         results.add( runResult );
-         oPanel.addRun();  // this line should come after results.add() or else you'll get errors
-      }
-      catch ( IllegalArgumentException e ) {
-         GuiUtil.error( e, "During class score calculation" );
-      }
-      catch ( IOException e ) {
-         GuiUtil.error( e, "File reading or writing" );
-      }
    }
 
    /* quit */
