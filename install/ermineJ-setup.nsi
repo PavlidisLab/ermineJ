@@ -84,7 +84,7 @@ Section "ermineJ (required)"
   NoOverwrite:
   
   ; Write the installation path into the registry
-  WriteRegStr HKEY_LOCAL_MACHINE SOFTWARE\ermineJ "Install_Dir" "$INSTDIR"
+  WriteRegStr HKEY_LOCAL_MACHINE "SOFTWARE\ermineJ" "Install_Dir" "$INSTDIR"
   
   ; Write the uninstall keys for Windows
   WriteRegStr HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "DisplayName" "ermineJ (remove only)"
@@ -116,24 +116,9 @@ SectionEnd
 
 Section "Uninstall"
 
-  ;
-  ; Remove registry values: we shouldn't have to do this,
-  ; but for some reason DeleteRegKey doesn't work for me at all!
-  ; so at least this removes ermineJ from "Add and Remove Programs" in
-  ; Windows' control panel (at least on WinXP; not sure about other platforms)
-  ;
-  DeleteRegValue HKEY_LOCAL_MACHINE SOFTWARE\ermineJ "Install_Dir"
-  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "DisplayName"
-  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "UninstallString"
-  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoModify"
-  DeleteRegValue HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ" "NoRepair"
-
-  ;
-  ; Remove registry keys -- doesn't work for me!  (tried on WinXP)
-  ; the keys are still there (use regedit to see)
-  ; 
-  DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\emrineJ"
-  DeleteRegKey HKEY_LOCAL_MACHINE SOFTWARE\emrineJ
+  ; Remove registry keys
+  DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\ermineJ"
+  DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\ermineJ"
 
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\emrineJ\*.*"
