@@ -2,6 +2,7 @@
     <pomVersion>3</pomVersion>
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
+    <id>ermineJ</id>
     <currentVersion>2.0b5</currentVersion>
     <organization>
         <name>Columbia University</name>
