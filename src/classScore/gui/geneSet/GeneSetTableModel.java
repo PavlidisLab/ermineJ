@@ -23,6 +23,7 @@ import baseCode.gui.JLinkLabel;
  * @author Will Braynen
  * @version $Id$
  */
+
 public class GeneSetTableModel extends AbstractTableModel {
 
    private JMatrixDisplay m_matrixDisplay;
@@ -115,7 +116,9 @@ public class GeneSetTableModel extends AbstractTableModel {
          	// gene name
          	return m_geneData == null ? null : 
          		new JLinkLabel(gene_name,
-         				"http://www.google.com/search?hl=en&ie=UTF-8&q="+gene_name+"&btnG=Google+Search");
+         				"http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?"
+         				+"db=gene&cmd=search&term="
+         				+ gene_name);
          case 4:
             // description
             return m_geneData == null ? "" : m_geneData
