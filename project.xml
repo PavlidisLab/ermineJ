@@ -14,6 +14,11 @@
 	<repository>
 		<connection>scm:cvs:ext:${maven.username}@adgate.cu-genome.org:/fsnode/projects/cvs/pavlab:ermineJ</connection>
 	</repository>
+
+
+	<siteAddress>microarray</siteAddress>
+	<siteDirectory>/proj/pavlidis/protected/classScore</siteDirectory>
+
 	<developers>
 		<developer>
 			<name>Paul Pavlidis</name>
@@ -55,4 +60,18 @@
 			<version>0.1</version>
 		</dependency>
 	</dependencies>
+
+      <reports>
+    <report>maven-jdepend-plugin</report>
+    <report>maven-checkstyle-plugin</report>
+    <report>maven-pmd-plugin</report>
+    <report>maven-changelog-plugin</report>
+    <report>maven-file-activity-plugin</report>
+    <report>maven-developer-activity-plugin</report>
+    <report>maven-javadoc-plugin</report>
+    <report>maven-jxr-plugin</report>
+    <report>maven-junit-report-plugin</report>
+    <report>maven-tasklist-plugin</report>
+  </reports>
+
 </project>
