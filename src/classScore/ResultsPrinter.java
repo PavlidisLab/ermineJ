@@ -3,6 +3,7 @@ package classScore;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -72,9 +73,12 @@ public class ResultsPrinter {
    public void printResults( boolean sort ) {
       System.out.println( "Beginning output" );
       try {
-         BufferedWriter out = new BufferedWriter( new FileWriter( dest_file,
-               true ) );
-         boolean first = true;
+      	BufferedWriter out;
+      	if(dest_file==null)
+      		out = new BufferedWriter( new PrintWriter(System.out));
+      	else
+      		out = new BufferedWriter( new FileWriter( dest_file,true ) );
+      	boolean first = true;
          GeneSetResult res = null;
          if ( sort ) {
             for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
@@ -96,9 +100,8 @@ public class ResultsPrinter {
                   first = false;
                   res.print_headings( out, "\tSame as:\tSimilar to:" );
                }
-               res
-                     .print( out, format_redundant_and_similar( res
-                           .getClassId() ) );
+               res.print( out, format_redundant_and_similar( 
+               			res.getClassId() ) );
                //		    res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
             }
          }
