@@ -992,10 +992,10 @@ public class Class_Frame extends JPanel {
 		progress.setValue(0);
 		progress.setIndeterminate(true);
 		timer.start();
-		timeCounter.start();
+		//		timeCounter.start();
 		class_pvals test = new class_pvals(fileName11,fileName22,fileName44,fileName33,fileName55,method_name,groupMethod,maxField1,minField1,numField1,quantileField1,pVal1, weight_boolean, pvalcolumn, dolog_boolean);
 		//		test.class_pval_generator(); // this does the work. This should not be here.
-		timeCounter.stop();
+		//		timeCounter.stop();
 		timer.stop();
 		frame.setVisible(false);
 		comboWriter(getCanonical("scoreFile.pref"), fileName11); // gene scores            

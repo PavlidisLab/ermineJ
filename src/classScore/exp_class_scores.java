@@ -302,6 +302,7 @@ public class exp_class_scores {
 	return group_pval_map;
     }
 
+
     /** 
 	@param shuffle Whether the map should be scrambled first. If
 	so, then groups are randomly associated with scores, but the

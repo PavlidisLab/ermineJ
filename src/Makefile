@@ -3,8 +3,6 @@
 #  Created :09/02/02
 #  Revision History: $Id$
 #  Description:MakeFile
-#  
-#                                                                                                                                                            
 #*******************************************************************************
 
 OPTIONS = -g -O
@@ -13,9 +11,7 @@ RUN_OPTIONS= -Xmx1024M
 
 SOURCEPATH = .
 
-#CLASSPATH =  ../bin
 CLASSPATH = .
-#OUTPUTDIR = ../bin
 OUTPUTDIR = .
 
 DOCDIR = ../doc
@@ -54,7 +50,7 @@ CLASS_FILES= \
 	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/ConstantStuff.class  \
         ${OUTPUTDIR}/erminecmd.class
 
-all: class_score commandline
+all: class_score commandline dist
 
 run: runner
 
@@ -91,3 +87,20 @@ clean:
 #	rm -r -f ${DOCDIR}/*;
 #	mkdir ${OUTPUTDIR};
 #	mkdir ${DOCDIR};
+
+dist : class_score 
+	jar cmf gui.manifest.add \
+	classScore.jar \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/*.class \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/*.class
+
+
+cmdline : class_score classScore.jar
+	jar cmf cmdline.manifest.add \
+	classScorecmd.jar \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/util/*.class \
+	${OUTPUTDIR}/${APP_PACKAGE_PATH}/classScore/*.class \
+	erminecmd.class	
+
+
+#	jar cf \
