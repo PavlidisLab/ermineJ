@@ -87,17 +87,15 @@ public class Settings {
     */
    public Settings( String filename ) {
       pref_file = filename;
-      dataFolder = ( new File( Settings.class.getResource( "Settings.class" )
-            .getFile() ) ).getPath();
-      int end = dataFolder.lastIndexOf( File.separatorChar );
-      dataFolder = dataFolder.substring( 0, end + 1 ) + ".." + File.separator
-            + ".." + File.separator + "data";
+      String homeDir = System.getProperty( "user.home" );
+      dataFolder = homeDir + File.separator + "classScore.data";
       try {
          dataFolder = URLDecoder.decode( ( new File( dataFolder )
                .getCanonicalPath() ), "ISO-8859-1" );
       } catch ( IOException ex ) {
          GuiUtil.error( 
-            "Could not find data folder." +
+            "Could not find data folder.\n" +
+            "Expected to find it at " + dataFolder + "\n" +
             "Press OK to quit." ); // make a big deal...
          System.exit( 1 );
       }
