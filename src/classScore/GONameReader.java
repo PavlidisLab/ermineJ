@@ -79,4 +79,8 @@ public class GONameReader {
       }
    }
 
+   public void addClass(String id, String name)
+   {
+      go_name_map.put(id, name);
+   }
 }

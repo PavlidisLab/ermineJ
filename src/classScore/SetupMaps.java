@@ -138,20 +138,10 @@ public class SetupMaps {
                   return classdesc;
                case 2:
                {
+                  int numprobes = 0;
                   if(classToProbe.containsKey(classid))
-                  {
-                     ArrayList probes = (ArrayList) classToProbe.get(classid);
-                     String probelist=new String();
-                     for(int k=0; k<probes.size(); k++)
-                     {
-                        probelist=probelist.concat((String) probes.get(k)+" ");
-                     }
-                     return probelist;
-                  }
-                  else
-                  {
-                      return "";
-                  }
+                     numprobes = ((ArrayList)classToProbe.get(classid)).size();
+                  return Integer.toString(numprobes);
                }
                default:
                    return "";
@@ -197,4 +187,14 @@ public class SetupMaps {
       };
    };
 
+   public void addClass(String id, String desc, ArrayList probes)
+   {
+      System.err.println("adding " + id + " to setupmap");
+      geneData.addClass(id, probes);
+      goName.addClass(id,desc);
+      probeToClassMap = new ClassMap(geneData.getProbeToClassMap(),
+                                     geneData.getClassToProbeMap()); // parses affy->classes file. Yields map of go->probes
+      classToProbe = probeToClassMap.getClassToProbeMap(); // this is the map of go->probes
+      sortClasses();
+   }
 }

@@ -938,7 +938,7 @@ public class classScoreFrame
    }
 
   void jMenuItem1_actionPerformed(ActionEvent e) {
-     modClassFrame dlg = new modClassFrame(smaps);
+     modClassFrame dlg = new modClassFrame(smaps,this.cPanel);
      Dimension dlgSize = dlg.getPreferredSize();
      Dimension frmSize = getSize();
      Point loc = getLocation();

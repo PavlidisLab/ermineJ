@@ -148,6 +148,22 @@ public class GeneDataReader {
       return (ArrayList) groupProbeList.get(g);
    }
 
+   public boolean classToProbeMapContains(String className) {
+       return classToProbeMap.containsKey(className);
+   }
+
+   public void addClass(String ID, ArrayList probes)
+   {
+      classToProbeMap.put(ID,probes);
+
+      Iterator probe_it=probes.iterator();
+      while(probe_it.hasNext())
+      {
+         String probe = new String((String) probe_it.next());
+         probeToClassMap.put(probe,ID);
+      }
+   }
+
    public static void main(String[] args) {
    }
 }

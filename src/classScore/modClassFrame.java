@@ -7,6 +7,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+import javax.swing.text.*;
+import com.borland.jbcl.layout.*;
 
 /**
  * <p>Title: </p>
@@ -29,6 +31,7 @@ public class modClassFrame
    JButton finishButton = new JButton();
 
    //panels for step 1
+   JPanel step1Panel = new JPanel();
    //step 1 top
    JPanel jPanel7 = new JPanel(); //outer method choice
    GridBagLayout gridBagLayout4 = new GridBagLayout();
@@ -59,43 +62,47 @@ public class modClassFrame
    JLabel jLabel7 = new JLabel();
 
    //panels for step two
-   JPanel step2topPanel;
+   JPanel step2Panel;
+   JLabel countLabel = new JLabel();
+   JPanel jPanel10 = new JPanel();
    JScrollPane probeScrollPane;
-   JList probeList;
-   DefaultListModel listModel;
+//   JList probeList;
+//   DefaultListModel listModel;
    JTable probeTable;
    JScrollPane newClassScrollPane;
    JTable newClassTable;
    SortFilterModel ncsorter;
    AbstractTableModel ncTableModel;
+   JPanel jPanel9 = new JPanel();
+   JButton jButton1 = new JButton();
+   JButton deleteButton = new JButton();
+
+   //panels for step three
+   JPanel step3Panel;
+   JTable finalTable;
+   JLabel classDescL = new JLabel("New Class ID: ");
+   JLabel classIDFinal = new JLabel("New Class ID: ");
+   AbstractTableModel finalTableModel;
 
    //logic
    int inputMethod = 0;
    int step = 1;
 
    NewClass newclass;
-   JPanel jPanel9 = new JPanel();
-   JButton jButton1 = new JButton();
-   JButton jButton2 = new JButton();
-   GridBagLayout gridBagLayout5 = new GridBagLayout();
    SetupMaps smap;
+   ClassPanel classpanel;
+  JPanel ncDescPanel = new JPanel();
+  JPanel ncInfo2Panel = new JPanel();
+  JPanel ncInfo1Panel = new JPanel();
+  JTextArea classDescTA = new JTextArea();
 
-   public modClassFrame(SetupMaps smap) {
+   public modClassFrame(SetupMaps smap, ClassPanel classpanel) {
       enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.smap=smap;
+      this.classpanel=classpanel;
       try {
          jbInit();
-         populateList();
-      }
-      catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
-
-   public modClassFrame() {
-      enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-      try {
-         jbInit();
+         populateTables();
       }
       catch (Exception e) {
          e.printStackTrace();
@@ -111,11 +118,8 @@ public class modClassFrame
       jPanel1.setBackground(SystemColor.control);
       jPanel1.setAlignmentX( (float) 0.5);
       jPanel1.setAlignmentY( (float) 0.5);
-      //jPanel1.setDebugGraphicsOptions(DebugGraphics.LOG_OPTION);
       jPanel1.setMaximumSize(new Dimension(32767, 32767));
-      jPanel1.setMinimumSize(new Dimension(505, 333));
-      jPanel1.setPreferredSize(new Dimension(505, 333));
-      jPanel1.setLayout(gridBagLayout5);
+      jPanel1.setPreferredSize(new Dimension(550, 300));
 
       //step 1 top
       jPanel7.setBackground(SystemColor.control);
@@ -127,12 +131,13 @@ public class modClassFrame
       jPanel4.setBackground(SystemColor.control);
       jPanel4.setForeground(Color.black);
       jPanel4.setBorder(BorderFactory.createEtchedBorder());
-      //jPanel4.setDebugGraphicsOptions(0);
       jPanel4.setLayout(gridBagLayout1);
       jRadioButton1.setBackground(SystemColor.control);
       jRadioButton1.setBorder(BorderFactory.createLineBorder(Color.black));
       jRadioButton1.setText("File");
       jRadioButton1.addActionListener(new modClassFrame_jRadioButton1_actionAdapter(this));
+      jPanel5.setPreferredSize(new Dimension(200, 40));
+      jPanel3.setPreferredSize(new Dimension(380, 133));
       buttonGroup1.add(jRadioButton1);
       jRadioButton2 = new JRadioButton("Manual", true);
       jRadioButton2.setBackground(SystemColor.control);
@@ -156,6 +161,7 @@ public class modClassFrame
           , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 9, 8, 0), 8, 12));
       jPanel4.add(jRadioButton1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
           , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 9, 0, 0), 26, 12));
+    jPanel1.add(jPanel5, BorderLayout.SOUTH);
       jPanel7.add(jLabel8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
                                                   , GridBagConstraints.WEST,
                                                   GridBagConstraints.NONE, new Insets(6, 21, 0, 74),
@@ -168,29 +174,25 @@ public class modClassFrame
       /////////////////////////
       //step 1 bottom
       jPanel3.setBackground(SystemColor.control);
-      //jPanel3.setDebugGraphicsOptions(0);
       jPanel3.setLayout(gridBagLayout3);
       //file chooser stuff
       jPanel2.setBackground(SystemColor.control);
       browseButton.setText("Browse....");
       browseButton.addActionListener(new browseButton_actionAdapter(this));
       browseButton.setEnabled(false);
-      jPanel2.add(browseButton, null);
       classFile.setEditable(false);
       classFile.setMinimumSize(new Dimension(4, 19));
-      classFile.setPreferredSize(new Dimension(280, 19));
+      classFile.setPreferredSize(new Dimension(230, 19));
       classFile.setToolTipText("File containing class members");
       classFile.setText("File containing class members");
       startPath = new File(System.getProperty("user.home"));
       chooser.setCurrentDirectory(startPath);
+      jPanel2.add(browseButton, null);
       jPanel2.add(classFile, null);
-      jPanel3.add(jPanel2, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
-                                                  , GridBagConstraints.CENTER,
-                                                  GridBagConstraints.BOTH, new Insets(0, 3, 7, 7),
-                                                  6, -1));
+      jPanel3.add(jPanel8,  new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(1, 3, 0, 103), -181, 21));
       //file type stuff
       jPanel8.setBackground(SystemColor.control);
-      //jPanel8.setDebugGraphicsOptions(0);
       jPanel8.setBorder(null);
       jPanel6.setBorder(null);
       jLabel3.setMaximumSize(new Dimension(999, 15));
@@ -198,9 +200,7 @@ public class modClassFrame
       jLabel3.setPreferredSize(new Dimension(209, 15));
       jLabel3.setToolTipText("");
       jLabel3.setText("Choose the file type:");
-      jPanel8.add(jLabel3, null);
       jPanel6.setLayout(gridBagLayout2);
-      //jPanel6.setDebugGraphicsOptions(0);
       jPanel6.setForeground(Color.black);
       jPanel6.setBackground(SystemColor.control);
       jLabel6.setText("- e.g. 36735_f_at");
@@ -211,6 +211,7 @@ public class modClassFrame
       jRadioButton4.setText("Probe IDs");
       jRadioButton4.setMaximumSize(new Dimension(91, 23));
       jRadioButton4.setBackground(SystemColor.control);
+      jRadioButton4.setSelected(true);
       jRadioButton4.setEnabled(false);
       buttonGroup2.add(jRadioButton3);
       buttonGroup2.add(jRadioButton4);
@@ -226,11 +227,15 @@ public class modClassFrame
           , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 2, 0, 0), 25, 6));
       jPanel6.add(jRadioButton3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
           , GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(2, 2, 0, 0), 0, 6));
+      step1Panel.add(jPanel7, null);
+      step1Panel.add(jPanel3, null);
+      jPanel3.add(jPanel2,  new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
+            ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 3, 7, 7), 40, -1));
+      jPanel8.add(jLabel3, null);
       jPanel8.add(jPanel6, null);
-      jPanel3.add(jPanel8, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
-                                                  , GridBagConstraints.CENTER,
-                                                  GridBagConstraints.BOTH, new Insets(1, 3, 0, 155),
-                                                  -216, 21));
+      jPanel1.add(step1Panel, BorderLayout.CENTER);
+      jPanel1.remove(step1Panel);
+
       /////////////////////////
       //bottom buttons
       jPanel5.setBackground(SystemColor.control);
@@ -244,66 +249,94 @@ public class modClassFrame
       finishButton.setAlignmentY( (float) 0.5);
       finishButton.setText("Finish");
       finishButton.addActionListener(new finishButton_actionAdapter(this));
+      finishButton.setEnabled(false);
       jPanel5.add(cancelButton, null);
       jPanel5.add(backButton, null);
       jPanel5.add(nextButton, null);
       jPanel5.add(finishButton, null);
-//      jPanel1.add(jPanel3,  new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
-//          ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(16, 9, 0, 96), 0, 0));
-//      jPanel1.add(jPanel7,    new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
-//          ,GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(8, 9, 0, 141), 0, -4));
-//      jPanel1.add(jPanel5,   new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0
-//          ,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(15, 107, 13, 110), 0, 0));
 
       //step 2
-      step2topPanel = new JPanel();
-      step2topPanel.setBorder(BorderFactory.createEtchedBorder());
-      listModel = new DefaultListModel();
-      probeList = new JList(listModel);
-      probeList.setAutoscrolls(true);
-      //probeScrollPane=new JScrollPane(probeList);
-      //probeTable.setModel(newclass.toTableModel());
+      step2Panel = new JPanel();
+      step2Panel.setBorder(BorderFactory.createEtchedBorder());
+      countLabel.setForeground(Color.black);
+      countLabel.setText("Number of Probes: 0");
+      step2Panel.add(countLabel, null);
 
       probeTable = new JTable();
-      //probeTable.setMaximumSize(new Dimension(32767, 32767));
-      //probeTable.setMinimumSize(new Dimension(200, 150));
-      //probeTable.setPreferredSize(new Dimension(200, 150));
-      probeTable.setPreferredScrollableViewportSize(new Dimension(200, 150));
+      probeTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
       probeScrollPane = new JScrollPane(probeTable);
       probeScrollPane.setMaximumSize(new Dimension(32767, 32767));
-      probeScrollPane.setPreferredSize(new Dimension(200, 150));
+      probeScrollPane.setPreferredSize(new Dimension(250, 150));
+      jPanel10.add(probeScrollPane, null);
 
       newClassTable = new JTable();
-      newClassTable.setPreferredScrollableViewportSize(new Dimension(200, 150));
+      newClassTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
       newClassScrollPane = new JScrollPane(newClassTable);
       newClassScrollPane.setMaximumSize(new Dimension(32767, 32767));
-      newClassScrollPane.setPreferredSize(new Dimension(200, 150));
+      newClassScrollPane.setPreferredSize(new Dimension(250, 150));
+      jPanel10.add(newClassScrollPane, null);
+      step2Panel.add(jPanel10, null);
 
       jPanel9.setMinimumSize(new Dimension(1, 1));
       jPanel9.setPreferredSize(new Dimension(200, 30));
       jButton1.setSelected(false);
       jButton1.setText("Add >");
       jButton1.addActionListener(new modClassFrame_jButton1_actionAdapter(this));
-      jButton2.setSelected(false);
-      jButton2.setText("Delete");
-      jButton2.addActionListener(new modClassFrame_jButton2_actionAdapter(this));
+      deleteButton.setSelected(false);
+      deleteButton.setText("Delete");
+      deleteButton.addActionListener(new modClassFrame_delete_actionPerformed_actionAdapter(this));
       jPanel9.add(jButton1, null);
-      jPanel9.add(jButton2, null);
+      jPanel9.add(deleteButton, null);
+      step2Panel.add(jPanel9, null);
 
-      step2topPanel.add(probeScrollPane, null);
-      step2topPanel.add(newClassScrollPane, null);
-      step2topPanel.add(jPanel9, null);
-      //step2topPanel.add(probeTable);
+      jPanel1.add(step2Panel, BorderLayout.CENTER);
+      jPanel1.remove(step2Panel);
 
-      jPanel1.add(jPanel5, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0
-                                                  , GridBagConstraints.CENTER,
-                                                  GridBagConstraints.BOTH, new Insets(0, 0, 0, 0),
-                                                  219, 0));
-      jPanel1.add(step2topPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
-          , GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), -118, 140));
-      //////////
+      //panels for step 3
+      step3Panel = new JPanel();
+      JPanel ncIDPanel = new JPanel();
+      JLabel classIDL = new JLabel("New Class ID: ");
+      ncDescPanel.setPreferredSize(new Dimension(143, 180));
+      ncInfo1Panel.setPreferredSize(new Dimension(150, 240));
+      JTextField classIDTF = new JTextField();
+      classIDTF.setPreferredSize(new Dimension(100, 19));
+      classIDTF.setToolTipText("New Class ID");
+      DefaultCellEditor classIDEditor = new DefaultCellEditor(classIDTF);
+      classIDEditor.addCellEditorListener(new classIDEditorAdaptor(this));
+      ncIDPanel.add(classIDL);
+      ncIDPanel.add(classIDTF);
+      ncInfo1Panel.add(ncIDPanel, null);
+      ncInfo1Panel.add(ncDescPanel, null);
+      classDescL.setRequestFocusEnabled(true);
+      classDescL.setText("New Class Description: ");
+      ncDescPanel.add(classDescL);
+      classDescTA.setToolTipText("New Class ID");
+      classDescTA.getDocument().addDocumentListener(new ClassDescListener(this));
+      classDescTA.setLineWrap(true);
+      JScrollPane classDTAScroll = new JScrollPane(classDescTA);
+      classDTAScroll.setBorder(BorderFactory.createLoweredBevelBorder());
+      classDTAScroll.setPreferredSize(new Dimension(130, 140));
+      ncDescPanel.add(classDTAScroll, null);
+      step3Panel.add(ncInfo1Panel, null);
+      step3Panel.add(ncInfo2Panel, null);
+      classIDFinal.setText("No Class Name");
+      classIDFinal.setRequestFocusEnabled(true);
+      finalTable = new JTable();
+      finalTable.setPreferredScrollableViewportSize(new Dimension(250, 150));
+      JScrollPane finalScrollPane = new JScrollPane(finalTable);
+      finalScrollPane.setPreferredSize(new Dimension(200, 200));
+      ncInfo2Panel.add(classIDFinal, null);
+      ncInfo2Panel.add(finalScrollPane, null);
+      ncInfo2Panel.setPreferredSize(new Dimension(220, 240));
+      ncIDPanel.setPreferredSize(new Dimension(128, 51));
+      classIDTF.setBorder(BorderFactory.createLoweredBevelBorder());
 
+      jPanel1.add(step3Panel, BorderLayout.CENTER);
+      jPanel1.remove(step3Panel);
+
+///////////////
       newclass = new NewClass(this);
+      jPanel1.add(step1Panel);
    }
 
    void errorPopUp(String msg)
@@ -348,30 +381,7 @@ public class modClassFrame
       browse(classFile);
    }
 
-   private void steptwo(int inputMethod) {
-      step = 2;
-      this.getContentPane().remove(jPanel7);
-      this.getContentPane().remove(jPanel3);
-      this.setTitle("Define New Class - Step 2 of 3");
-      backButton.setEnabled(true);
-      if (inputMethod == 0) {
-         this.getContentPane().add(step2topPanel);
-         System.err.println("added probe list");
-      }
-      this.repaint();
-   }
-
-   private void populateList() {
-      System.err.println("populating list");
-      //Vector probe_list=new Vector(smap.geneData.getProbeGroupMap().keySet());
-      //Collections.sort(probe_list);
-      //Iterator probes_it = probe_list.iterator();
-      //while (probes_it.hasNext())
-      //{
-      //  listModel.addElement((String) probes_it.next());
-      //}
-      //probeList.repaint();
-
+   private void populateTables() {
       SortFilterModel sorter = new SortFilterModel(smap.toSelectTableModel());
       probeTable.setModel(sorter);
       probeTable.getTableHeader().addMouseListener(new MouseAdapter() {
@@ -383,7 +393,7 @@ public class modClassFrame
       });
       probeTable.getColumnModel().getColumn(0).setPreferredWidth(40);
 
-      ncTableModel = newclass.toTableModel();
+      ncTableModel = newclass.toTableModel(false);
       newClassTable.setModel(ncTableModel);
       JTextField editProbe = new JTextField();
       editProbe.setBorder(BorderFactory.createEmptyBorder());
@@ -395,25 +405,22 @@ public class modClassFrame
       DefaultCellEditor editorGene = new DefaultCellEditor(editGene);
       editorGene.addCellEditorListener(new editorGeneAdaptor(this));
       newClassTable.getColumnModel().getColumn(1).setCellEditor(editorGene);
-
-      /*
-           ncsorter = new SortFilterModel(ncTableModel);
-           newClassTable.setModel(ncsorter);
-
-           newClassTable.getTableHeader().addMouseListener(new MouseAdapter() {
-              public void mouseClicked(MouseEvent event) {
-                 int tableColumn = newClassTable.columnAtPoint(event.getPoint());
-                 int modelColumn = newClassTable.convertColumnIndexToModel(tableColumn);
-                 ( (SortFilterModel) newClassTable.getModel()).sort(modelColumn);
-              }
-           });
-       */
       newClassTable.getColumnModel().getColumn(0).setPreferredWidth(40);
 
+      finalTableModel = newclass.toTableModel(true);
+      finalTable.setModel(finalTableModel);
+      newClassTable.getColumnModel().getColumn(0).setPreferredWidth(40);
    }
 
-   void jButton2_actionPerformed(ActionEvent e) {
-
+   void delete_actionPerformed(ActionEvent e) {
+      int n = newClassTable.getSelectedRowCount();
+      int[] rows = newClassTable.getSelectedRows();
+      for (int i = 0; i < n; i++) {
+         newclass.probes.remove(newClassTable.getValueAt(rows[i]-i, 0));
+      }
+      int s = newclass.probes.size();
+      ncTableModel.fireTableDataChanged();
+      updateCountLabel();
    }
 
    void jButton1_actionPerformed(ActionEvent e) {
@@ -422,9 +429,12 @@ public class modClassFrame
       for (int i = 0; i < n; i++) {
          newclass.probes.add(probeTable.getValueAt(rows[i], 0));
       }
+      HashSet noDupes=new HashSet(newclass.probes);
+      newclass.probes.clear();
+      newclass.probes.addAll(noDupes);
       int s = newclass.probes.size();
-      System.err.println("originially: " + (s - 1) + " now: " + (s + n - 1));
       ncTableModel.fireTableDataChanged();
+      updateCountLabel();
    }
 
    void editorProbe_actionPerformed(ChangeEvent e)
@@ -435,8 +445,8 @@ public class modClassFrame
       {
          newclass.probes.add(newProbe);
          int s = newclass.probes.size();
-         System.err.println("originially: " + (s - 1) + " now: " + s);
          ncTableModel.fireTableDataChanged();
+         updateCountLabel();
       }
       else
          errorPopUp("Probe " + newProbe + " does not exist.");
@@ -446,31 +456,87 @@ public class modClassFrame
    {
       String newGene = (String)((DefaultCellEditor) e.getSource()).getCellEditorValue();
       System.err.println(newGene);
-      if(smap.geneData.getProbeGeneName(newGene) != null)
+      ArrayList probelist = smap.geneData.getGeneProbeList(newGene);
+      if(probelist != null)
       {
-         //newclass.probes.add(newGene);
-         //int s = newclass.probes.size();
-         //System.err.println("originially: " + (s - 1) + " now: " + s);
-         //ncTableModel.fireTableDataChanged();
+         newclass.probes.addAll(probelist);
+         int s = newclass.probes.size();
+         ncTableModel.fireTableDataChanged();
+         updateCountLabel();
       }
       else
          errorPopUp("Gene " + newGene + " does not exist.");
    }
 
 
+   void updateCountLabel()
+   {
+      countLabel.setText("Number of Probes: "+newclass.probes.size());
+   }
+
+   void classIDEditor_actionPerformed(ChangeEvent e)
+   {
+      String classID = (String)((DefaultCellEditor) e.getSource()).getCellEditorValue();
+      if(smap.geneData.classToProbeMapContains(classID))
+         errorPopUp("A class by the ID " + classID + " already exists.");
+      else
+      {
+         newclass.id=classID;
+         classIDFinal.setText(classID);
+      }
+   }
+
+   void classDescListener_actionPerformed(DocumentEvent e)
+   {
+      Document doc = (Document)e.getDocument();
+      int length = doc.getLength();
+      try{newclass.desc=doc.getText(0,length);}
+      catch(BadLocationException be) { be.printStackTrace();}
+   }
+
    void nextButton_actionPerformed(ActionEvent e) {
       if (step == 1) {
-         steptwo(inputMethod);
+         this.getContentPane().remove(step1Panel);
+         step = 2;
+         this.setTitle("Define New Class - Step 2 of 3");
+         backButton.setEnabled(true);
+         if (inputMethod == 0) {
+            this.getContentPane().add(step2Panel);
+            step2Panel.revalidate();
+         }
+         this.repaint();
+      }
+      else if(step == 2)
+      {
+         this.getContentPane().remove(step2Panel);
+         step = 3;
+         this.setTitle("Define New Class - Step 3 of 3");
+         nextButton.setEnabled(false);
+         finishButton.setEnabled(true);
+         this.getContentPane().add(step3Panel);
+         step3Panel.revalidate();
+         this.repaint();
       }
    }
 
    void backButton_actionPerformed(ActionEvent e) {
       if (step == 2) {
+         this.getContentPane().remove(step2Panel);
          step = 1;
          this.setTitle("Define New Class - Step 1 of 3");
-         this.getContentPane().add(jPanel7);
-         this.getContentPane().add(jPanel3);
          backButton.setEnabled(false);
+         this.getContentPane().add(step1Panel);
+         step1Panel.revalidate();
+         this.repaint();
+      }
+      if (step == 3) {
+         this.getContentPane().remove(step3Panel);
+         step = 2;
+         this.setTitle("Define New Class - Step 2 of 3");
+         nextButton.setEnabled(true);
+         finishButton.setEnabled(false);
+         this.getContentPane().add(step2Panel);
+         step2Panel.revalidate();
          this.repaint();
       }
    }
@@ -480,7 +546,18 @@ public class modClassFrame
    }
 
    void finishButton_actionPerformed(ActionEvent e) {
-      dispose();
+      String id=newclass.id;
+      String desc=newclass.desc;
+      if(id.compareTo("")==0)
+      {
+         errorPopUp("The class ID must be specified.");
+      }
+      else
+      {
+          smap.addClass(id, desc, newclass.probes);
+          classpanel.setModel(smap.toTableModel());
+          dispose();
+      }
    }
 
 }
@@ -488,24 +565,31 @@ public class modClassFrame
 class NewClass {
    modClassFrame outerframe;
    String id;
-   String name;
+   String desc;
    ArrayList probes;
 
    public NewClass(modClassFrame outerframe) {
       this.outerframe=outerframe;
       id = new String();
-      name = new String();
+      desc = new String();
       probes = new ArrayList();
    }
 
-   public AbstractTableModel toTableModel() {
+   public AbstractTableModel toTableModel(boolean editable) {
+      final boolean finalized=editable;
+
       return new AbstractTableModel() {
+
          private String[] columnNames = {"Probe", "Gene", "Description"};
 
          public String getColumnName(int i) { return columnNames[i]; }
 
          public int getRowCount() {
-            int windowrows=8;
+            int windowrows;
+            if(finalized)
+               windowrows=11;
+            else
+               windowrows=8;
             int extra=1;
             if(probes.size()<windowrows)
                extra=windowrows-probes.size();
@@ -538,7 +622,7 @@ class NewClass {
          }
 
          public boolean isCellEditable(int r, int c) {
-            if(c==0 || c==1)
+            if(!finalized && (c==0 || c==1))
                return true;
             else
                return false;
@@ -586,16 +670,16 @@ class browseButton_actionAdapter
    }
 }
 
-class modClassFrame_jButton2_actionAdapter
+class modClassFrame_delete_actionPerformed_actionAdapter
     implements java.awt.event.ActionListener {
    modClassFrame adaptee;
 
-   modClassFrame_jButton2_actionAdapter(modClassFrame adaptee) {
+   modClassFrame_delete_actionPerformed_actionAdapter(modClassFrame adaptee) {
       this.adaptee = adaptee;
    }
 
    public void actionPerformed(ActionEvent e) {
-      adaptee.jButton2_actionPerformed(e);
+      adaptee.delete_actionPerformed(e);
    }
 }
 
@@ -626,6 +710,23 @@ class editorGeneAdaptor implements CellEditorListener
    editorGeneAdaptor(modClassFrame adaptee) { this.adaptee=adaptee; }
    public void editingStopped(ChangeEvent e) { adaptee.editorGene_actionPerformed(e); }
    public void editingCanceled(ChangeEvent e) { editingCanceled(e); }
+}
+
+class classIDEditorAdaptor implements CellEditorListener
+{
+   modClassFrame adaptee;
+   classIDEditorAdaptor(modClassFrame adaptee) { this.adaptee=adaptee; }
+   public void editingStopped(ChangeEvent e) { adaptee.classIDEditor_actionPerformed(e); }
+   public void editingCanceled(ChangeEvent e) { editingCanceled(e); }
+}
+
+class ClassDescListener implements DocumentListener
+{
+   modClassFrame adaptee;
+   ClassDescListener(modClassFrame adaptee) { this.adaptee=adaptee; }
+   public void insertUpdate(DocumentEvent e) { adaptee.classDescListener_actionPerformed(e); }
+   public void removeUpdate(DocumentEvent e) { adaptee.classDescListener_actionPerformed(e); }
+   public void changedUpdate(DocumentEvent e) { }
 }
 
 class nextButton_actionAdapter
