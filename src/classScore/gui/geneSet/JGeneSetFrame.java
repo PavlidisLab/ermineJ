@@ -43,6 +43,7 @@ import baseCode.gui.table.JBarGraphCellRenderer;
 import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
 import baseCode.gui.table.TableSorter;
+import baseCode.gui.GuiUtil;
 import classScore.Settings;
 import classScore.data.GeneAnnotations;
 
@@ -182,9 +183,10 @@ public class JGeneSetFrame extends JFrame {
 
       m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
       m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
-      m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
-
-      initColorRangeWidget();
+      if ( m_matrixDisplay != null ) {
+         m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
+         initColorRangeWidget();
+      }
 
       m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
       m_colorRangeSlider.setPreferredSize( new Dimension( 90, 24 ) );
@@ -230,10 +232,23 @@ public class JGeneSetFrame extends JFrame {
       m_matrixDisplayCellWidthSlider.setPaintTicks( false );
 
       m_nf.setMaximumFractionDigits( 3 );
-      boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
-      m_normalizeMenuItem.setSelected( isNormalized );
+      if ( m_matrixDisplay != null ) {
+         boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
+         m_normalizeMenuItem.setSelected( isNormalized );
+      }
+      else {
+         // matrixDisplay is null!  Disable the menu
+         setMenuEnabled( false );
+      }
    }
 
+   private void setMenuEnabled( boolean enabled ) {
+      
+      m_menuBar.setEnabled( false );
+      m_fileMenu.setEnabled( false );
+      m_viewMenu.setEnabled( false );
+   }
+   
    private void createDetailsTable( ArrayList probeIDs, Map pvalues,
          GeneAnnotations geneData, String filename ) {
 
@@ -251,15 +266,20 @@ public class JGeneSetFrame extends JFrame {
       DoubleMatrixReader matrixReader = new DoubleMatrixReader();
       DenseDoubleMatrix2DNamed matrix = null;
       try {
-         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename,
-               probeSet );
-      } catch ( IOException e ) {
-         System.err.println( "IOException: wrong filename for MatrixReader" );
+         matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probeSet );
       }
-
+      catch ( IOException e ) {
+         GuiUtil.error( 
+            "Unable to load raw microarray data from file " + filename + ". " +
+            "If this problem persists, contact your software vendor." );
+         matrix = null;
+      }
+            
       // create the matrix display
-      m_matrixDisplay = new JMatrixDisplay( matrix );
-      m_matrixDisplay.setStandardizedEnabled( true );
+      if ( matrix != null ) {
+         m_matrixDisplay = new JMatrixDisplay( matrix );
+         m_matrixDisplay.setStandardizedEnabled( true );
+      }
 
       //
       // Create the rest of the table
@@ -281,7 +301,8 @@ public class JGeneSetFrame extends JFrame {
             m_matrixDisplay ); // create one instance that will be used to draw each cell
 
       JVerticalHeaderRenderer verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
-      int matrixColumnCount = m_matrixDisplay.getColumnCount();
+
+      int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
       // Set each column
       for ( int i = 0; i < matrixColumnCount; i++ ) {

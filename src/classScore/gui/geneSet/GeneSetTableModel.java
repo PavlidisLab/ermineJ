@@ -45,7 +45,8 @@ public class GeneSetTableModel extends AbstractTableModel {
 
    public String getColumnName( int column ) {
 
-      int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
+      // matrix display ends
+      int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
       if ( column < offset ) {
          return m_matrixDisplay.getColumnName( column );
@@ -59,12 +60,14 @@ public class GeneSetTableModel extends AbstractTableModel {
    }
 
    public int getColumnCount() {
-      return m_columnNames.length + m_matrixDisplay.getColumnCount();
+      int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+      return m_columnNames.length + matrixColumnCount;
    }
 
    public Object getValueAt( int row, int column ) {
 
-      int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
+      // matrix display ends
+      int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
       if ( column < offset ) {
          return new Point( row, column ); // coords into JMatrixDisplay
