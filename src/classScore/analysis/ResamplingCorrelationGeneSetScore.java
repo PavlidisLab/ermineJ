@@ -29,6 +29,8 @@ public class ResamplingCorrelationGeneSetScore extends
    private boolean weights;
    private double[][] dataAsRawMatrix;
 
+   private double[][] selfSquaredMatrix;
+
    /**
     * @param dataMatrix
     */
@@ -58,12 +60,14 @@ public class ResamplingCorrelationGeneSetScore extends
       int[] deck = new int[data.rows()];
 
       dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much.
+     
       for ( int j = 0; j < data.rows(); j++ ) {
          double[] rowValues = data.getRow( j );
          dataAsRawMatrix[j] = rowValues;
          deck[j] = j;
       }
-
+      selfSquaredMatrix = this.selfSquaredMatrix(dataAsRawMatrix);
+      
       for ( int i = classMinSize; i <= classMaxSize; i++ ) {
          int[] randomnums = new int[i];
 
@@ -121,7 +125,7 @@ public class ResamplingCorrelationGeneSetScore extends
 
             double[] jrow = dataAsRawMatrix[indicesToSelect[j]];
 
-            double corr = Math.abs( correlation( irow, jrow ) );
+            double corr = Math.abs( correlation( irow, jrow, selfSquaredMatrix, indicesToSelect[i],indicesToSelect[j] ) );
             //         correls.setQuick( row1, row2, corr ); // too much memory.
             //       correls.setQuick( row2, row1, corr );
             //      }
@@ -135,7 +139,7 @@ public class ResamplingCorrelationGeneSetScore extends
 
    // special optimized version of correlation computation for this.
 
-   private static double correlation( double[] x, double[] y ) {
+   private static double correlation( double[] x, double[] y , double[][] selfSquaredMatrix, int a, int b) {
       double syy, sxy, sxx, sx, sy, xj, yj, ay, ax;
       int numused = 0;
       syy = 0.0;
@@ -155,10 +159,11 @@ public class ResamplingCorrelationGeneSetScore extends
          sx += xj;
          sy += yj;
          sxy += xj * yj;
-         sxx += xj * xj;
-         syy += yj * yj;
+//         sxx += xj * xj;
+//         syy += yj * yj;
+         sxx+=selfSquaredMatrix[a][j];
+         syy+=selfSquaredMatrix[b][j];
          numused++;
-
       }
 
       if ( numused > 0 ) {
@@ -168,7 +173,19 @@ public class ResamplingCorrelationGeneSetScore extends
                / Math.sqrt( ( sxx - sx * ax ) * ( syy - sy * ay ) );
       }
       return Double.NaN; // signifies that it could not be calculated.
+   }
 
+   private static double[][] selfSquaredMatrix( double[][] input ) {
+      double[][] returnValue = new double[input.length][];
+      for ( int i = 0; i < returnValue.length; i++ ) {
+         returnValue[i] = new double[input[i].length];
+
+         for ( int j = 0; j < returnValue[i].length; j++ ) {
+            returnValue[i][j] = input[i][j] * input[i][j];
+         }
+
+      }
+      return returnValue;
    }
 
 }
