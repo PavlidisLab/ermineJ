@@ -18,12 +18,13 @@ import baseCode.gui.GuiUtil;
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
 
-public class AnalysisWizard extends Wizard {
+public class AnalysisWizard
+    extends Wizard {
    //logic
    int step = 1;
    int analysisType = 1;
@@ -38,13 +39,13 @@ public class AnalysisWizard extends Wizard {
    AnalysisWizardStep5 step5;
 
    public AnalysisWizard( GeneSetScoreFrame callingframe, Map geneDataSets,
-         GONames goData ) {
+                          GONames goData ) {
       super( callingframe, 550, 350 );
       //enableEvents(AWTEvent.WINDOW_EVENT_MASK);
       this.callingframe = callingframe;
       this.settings = new Settings( callingframe.getSettings() ); //own copy of settings
       this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer(
-            "original".hashCode() ) );
+          "original".hashCode() ) );
       this.goData = goData;
 
       step1 = new AnalysisWizardStep1( this, settings );
@@ -139,21 +140,24 @@ public class AnalysisWizard extends Wizard {
    }
 
    protected void finishButton_actionPerformed( ActionEvent e ) {
-      
-      try {
-         loadAddedClasses();
-      } catch ( IOException e1 ) {
-         GuiUtil
-               .error( "Could not load the custom classes: "
-                     + e
-                     + "\n"
-                     + "If this problem persists, please contact the software vendor. "
-                     + "Press OK to quit." );
-         System.exit( 1 );
+      if ( step2.isReady() ) {
+         try {
+            loadAddedClasses();
+         }
+         catch ( IOException e1 ) {
+            GuiUtil
+                .error( "Could not load the custom classes: "
+                        + e
+                        + "\n"
+                        + "If this problem persists, please contact the software vendor. "
+                        + "Press OK to quit." );
+            System.exit( 1 );
+         }
+         ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( settings );
+
+         saveValues();
+         dispose();
       }
-      ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( settings );
-      
-      saveValues();
       dispose();
    }
 
@@ -164,9 +168,10 @@ public class AnalysisWizard extends Wizard {
       step5.saveValues();
       try {
          settings.writePrefs();
-      } catch ( IOException e ) {
+      }
+      catch ( IOException e ) {
          GuiUtil
-               .error( "Could not save preferences: "
+             .error( "Could not save preferences: "
                      + e
                      + "\n"
                      + "If this problem persists, please contact the software vendor. "
@@ -182,7 +187,7 @@ public class AnalysisWizard extends Wizard {
          if ( !goData.newSet( id ) ) {
             NewGeneSet newGeneSet = new NewGeneSet( geneData );
             String filename = NewGeneSet.getFileName(
-                  settings.getClassFolder(), id );
+                settings.getClassFolder(), id );
             newGeneSet.loadClassFile( filename );
             newGeneSet.addToMaps( goData );
          }
@@ -190,7 +195,7 @@ public class AnalysisWizard extends Wizard {
    }
 
    /**
-    * 
+    *
     * @param val
     */
    public void setAnalysisType( int val ) {
@@ -198,7 +203,7 @@ public class AnalysisWizard extends Wizard {
    }
 
    /**
-    * 
+    *
     * @return
     */
    public int getAnalysisType() {

@@ -62,7 +62,6 @@ public class AnalysisThread {
                doAnalysis();
             }
             catch ( IOException e ) {
-               cancelAnalysisThread();
                GuiUtil.error( "During analysis", e );
             }
          }
@@ -197,7 +196,6 @@ public class AnalysisThread {
          doAnalysis( results );
       }
       catch ( Exception e ) {
-         cancelAnalysisThread();
          GuiUtil.error( "File format is not valid." );
       }
    }
