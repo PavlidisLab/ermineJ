@@ -25,7 +25,8 @@ public class JDetailsFrameApp {
       settings.setRawFile( filename );
 
       final String[] PROBES = {
-          "probe1"};
+          "probe1" //,"probe2"
+      };
 
       ArrayList probeIDs = new ArrayList();
       for ( int i = 0; i < PROBES.length; i++ ) {
