@@ -1,8 +1,5 @@
 package classScore;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +29,11 @@ import classScore.data.Histogram;
 import classScore.gui.geneSet.JGeneSetFrame;
 
 /**
- * Class that does all the work in doing gene set scoring. This class holds the results as well.
+ * Class that does all the work in doing gene set scoring. Holds the results as well.
+ * 
+ * <hr>
+ * <p>
+ * Copyright (c) 2004 Columbia University
  * 
  * @author Shahmil Merchant; Paul Pavlidis (major changes)
  * @version $Id$

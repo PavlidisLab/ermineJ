@@ -13,12 +13,10 @@ import classScore.Settings;
 import classScore.data.Histogram;
 
 /**
- *
- *
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
- *
+ * 
  * @author pavlidis
  * @version $Id$
  */
@@ -29,12 +27,16 @@ public class ResamplingCorrelationGeneSetScore extends
          .getLog( CorrelationsGeneSetPvalSeriesGenerator.class );
 
    private DenseDoubleMatrix2DNamed data = null;
+   private Settings settings;
+   private boolean weights;
 
    /**
-    *
     * @param dataMatrix
     */
-   public ResamplingCorrelationGeneSetScore(Settings settings, DenseDoubleMatrix2DNamed dataMatrix ) {
+   public ResamplingCorrelationGeneSetScore( Settings settings,
+         DenseDoubleMatrix2DNamed dataMatrix ) {
+      this.settings = settings;
+      this.weights = settings.getUseWeights();
       this.classMaxSize = settings.getMaxClassSize();
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();
@@ -42,9 +44,9 @@ public class ResamplingCorrelationGeneSetScore extends
    }
 
    /**
-    * Build background distributions of within-gene set mean correlations. This
-    * requires computing a lot of correlations.
-    *
+    * Build background distributions of within-gene set mean correlations. This requires computing a lot of
+    * correlations.
+    * 
     * @return histogram containing the random distributions of correlations.
     * @throws OutOfMemoryError
     */
@@ -63,6 +65,7 @@ public class ResamplingCorrelationGeneSetScore extends
 
       for ( int i = classMinSize; i <= classMaxSize; i++ ) {
          int[] randomnums = new int[i];
+
          if ( messenger != null ) {
             messenger.setStatus( "Currently running class size " + i );
          }
@@ -72,13 +75,13 @@ public class ResamplingCorrelationGeneSetScore extends
             double avecorrel = geneSetMeanCorrel( randomnums, correls );
             hist.update( i - classMinSize, avecorrel );
          }
-
-//         try {
-//            Thread.sleep( 1 );
-//         } catch ( InterruptedException ex ) {
-//            Thread.currentThread().interrupt();
-//         }
-
+         
+         try {
+            Thread.sleep( 10 );
+         } catch ( InterruptedException ex ) {
+            Thread.currentThread().interrupt();
+         }
+         
       }
       hist.tocdf();
       return hist;
@@ -86,31 +89,36 @@ public class ResamplingCorrelationGeneSetScore extends
 
    /**
     * Compute the average correlation for a set of vectors.
-    *
+    * 
     * @param indicesToSelect
-    * @param correls the correlation matrix for the data. This can be passed in
-    *        without having filled it in yet. This means that only values that
-    *        are visited during resampling are actually computed - this is a big
-    *        memory saver.
-    * @return
+    * @param correls the correlation matrix for the data. This can be passed in without having filled it in yet. This
+    *        means that only values that are visited during resampling are actually computed - this is a big memory
+    *        saver.
+    * @return mean correlation within the matrix.
     */
    public double geneSetMeanCorrel( int[] indicesToSelect,
          SparseDoubleMatrix2DNamed correls ) {
       int size = indicesToSelect.length;
       double avecorrel;
       int i, j, nummeas;
-      avecorrel = 0;
+      avecorrel = 0.0;
       nummeas = 0;
       for ( i = 0; i < size; i++ ) {
-         for ( j = i + 1; j < size; j++ ) {
-            double corr = Math.abs( correls.getQuick( i, j ) );
+         int row1 = indicesToSelect[i];
+         DoubleArrayList irow = new DoubleArrayList( data.getRow( row1 ) );
 
-            if ( corr == 0.0 ) { // we haven't done it yet.
-               DoubleArrayList irow = new DoubleArrayList( data.getRow( i ) );
-               DoubleArrayList jrow = new DoubleArrayList( data.getRow( j ) );
-               corr = DescriptiveWithMissing.correlation( irow, jrow );
-               correls.setQuick( i, j, corr );
-               correls.setQuick( j, i, corr );
+         for ( j = i + 1; j < size; j++ ) {
+            int row2 = indicesToSelect[j];
+            double corr = Math.abs( correls.getQuick( row1, row2 ) );
+
+            if ( corr == 0.0 ) { // we haven't done this one yet it yet.
+               
+               DoubleArrayList jrow = new DoubleArrayList( data.getRow( row2 ) );
+
+               corr = Math
+                     .abs( DescriptiveWithMissing.correlation( irow, jrow ) );
+               //         correls.setQuick( row1, row2, corr ); // too much memory.
+               //       correls.setQuick( row2, row1, corr );
             }
 
             avecorrel += corr;

@@ -15,7 +15,6 @@ import classScore.data.Histogram;
 
 /**
  * Perform multiple test correction on class scores.
- * 
  * <p>
  * Copyright (c) 2004 Columbia University
  * </p>
@@ -67,10 +66,9 @@ public class MultipleTestCorrector {
    }
 
    /**
-    * Benjamini-Hochberg correction of pvalues. This puts values of 1 or 0 int the corrected p, indicating whether the
-    * FDR has been met by a particular pvalue.
+    * Benjamini-Hochberg correction of pvalues.
     * 
-    * @param fdr double
+    * @param fdr double desired false discovery rate.
     */
    public void benjaminihochberg( double fdr ) {
       int numclasses = sortedclasses.size();
@@ -83,14 +81,18 @@ public class MultipleTestCorrector {
          GeneSetResult res = ( GeneSetResult ) results.get( nextclass );
          double actual_p = res.getPvalue();
 
-         double thresh = fdr * n / numclasses;
+         // double thresh = fdr * n / numclasses;
 
-         if ( actual_p < thresh || threshpassed ) {
-            res.setCorrectedPvalue( 1.0 );
-            threshpassed = true;
-         } else {
-            res.setCorrectedPvalue( 0.0 );
-         }
+         // the actual fdr at this threshold is n / (actual_p * numclasses).
+
+         res.setCorrectedPvalue( actual_p * numclasses / n ); // todo this is slightly broken when there are tied pvals.
+
+         //         if ( actual_p < thresh || threshpassed ) {
+         //            res.setCorrectedPvalue( 1.0 );
+         //            threshpassed = true;
+         //         } else {
+         //            res.setCorrectedPvalue( 0.0 );
+         //         }
 
          n--;
       }

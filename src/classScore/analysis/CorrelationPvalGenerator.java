@@ -49,10 +49,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator{
    public double geneSetMeanCorrel( DenseDoubleMatrix2DNamed correls ) {
       int classSize = correls.rows();
 
-      double avecorrel;
-      int nummeas;
-      avecorrel = 0;
-      nummeas = 0;
+      double avecorrel = 0.0;
+      int nummeas = 0;
       for ( int i = 0; i < classSize; i++ ) {
          for ( int j = i + 1; j < classSize; j++ ) {
             avecorrel += Math.abs( correls.getQuick( i, j ) );

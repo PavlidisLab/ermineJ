@@ -34,7 +34,7 @@ public class ResamplingExperimentGeneSetScore extends
    private static int quantile = 50;
    private static double quantfract = 0.5;
    private int method;
-
+private Settings settings;
 
    /**
     * Used for methods which require randomly sampling classes to generate a
@@ -87,11 +87,11 @@ public class ResamplingExperimentGeneSetScore extends
             m.setStatus( "Currently running class size " + i );
          }
 
-//         try {
-//            Thread.sleep( 1 );
-//         } catch ( InterruptedException ex ) {
-//            Thread.currentThread().interrupt();
-//         }
+         try {
+            Thread.sleep( 10 );
+         } catch ( InterruptedException ex ) {
+            Thread.currentThread().interrupt();
+         }
 
       }
 
@@ -106,6 +106,7 @@ public class ResamplingExperimentGeneSetScore extends
     * @param geneScores
     */
    public ResamplingExperimentGeneSetScore( Settings settings, GeneScoreReader geneScores ) {
+      this.settings = settings;
       this.classMaxSize = settings.getMaxClassSize();
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();

@@ -27,8 +27,10 @@ import classScore.Settings;
  * <pre>
  * 
  *  
- *        probe_id[tab]pval
- * 
+ *   
+ *         probe_id[tab]pval
+ *  
+ *   
  *  
  * </pre>
  * 
@@ -63,6 +65,7 @@ public class GeneScoreReader {
 
       groupToPvalMap = new HashMap();
       double log10 = Math.log( 10 );
+      boolean invalidLog = false;
       File infile = new File( filename );
       if ( !infile.exists() || !infile.canRead() ) {
          throw new IOException( "Could not read " + filename );
@@ -124,15 +127,10 @@ public class GeneScoreReader {
 
          // Fudge when pvalues are zero.
          if ( settings.getDoLog() && probePvalues[i - 1] <= 0 ) {
-            if ( messenger != null ) {
-               messenger
-                     .setStatus( "Warning: Cannot take log of non-positive value for "
-                           + name
-                           + " ("
-                           + probePvalues[i - 1]
-                           + ") from gene score file: Setting to " + small );
+         
+               invalidLog = true;
                probePvalues[i - 1] = small;
-            }
+          
          }
 
          if ( settings.getDoLog() ) {
@@ -145,6 +143,19 @@ public class GeneScoreReader {
       }
 
       num_pvals = Array.getLength( probePvalues );
+
+      if ( invalidLog ) {
+         messenger
+               .setError( "Warning: There were attempts to take the log of non-positive values. These are set to "
+                     + small );
+         try {
+            Thread.sleep( 1000 );
+         } catch ( InterruptedException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+
       if ( num_pvals == 0 ) {
          throw new IllegalStateException( "No pvalues found in the file!" );
       }

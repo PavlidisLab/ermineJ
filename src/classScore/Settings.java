@@ -12,20 +12,12 @@ import java.util.Properties;
 import baseCode.gui.GuiUtil;
 
 /**
+ * <hr>
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Company:
- * </p>
- *
- * @author not attributable
+ * Copyright (c) 2004 Columbia University
+ * 
+ * @author Homin Lee
+ * @author Will Braynen
  * @version $Id$
 
  */

@@ -14,19 +14,10 @@ import baseCode.util.StatusViewer;
 import classScore.data.GeneSetResult;
 
 /**
+ * <hr>
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Company:
- * </p>
- *
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author Homin Lee
  * @version $Id$
  */

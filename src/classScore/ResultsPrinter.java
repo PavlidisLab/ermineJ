@@ -39,7 +39,7 @@ public class ResultsPrinter {
       this.goName = goName;
    }
 
-   public ResultsPrinter(String dest_file, classPvalRun run, GONames goName) {
+   public ResultsPrinter(String dest_file, GeneSetPvalRun run, GONames goName) {
       this.dest_file = dest_file;
       this.sortedclasses = run.getSortedClasses();
       this.results = run.getResults();

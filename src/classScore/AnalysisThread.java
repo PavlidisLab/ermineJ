@@ -16,19 +16,10 @@ import classScore.data.GeneScoreReader;
 import classScore.gui.GeneSetScoreFrame;
 
 /**
+ * <hr>
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2003
- * </p>
- * <p>
- * Company:
- * </p>
- *
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author not attributable
  * @version $Id$
  * @todo don't use stop. use interrupt instead, and stop the readers
@@ -144,13 +135,13 @@ public class AnalysisThread {
 
       /* do work */
       messenger.setStatus( "Starting analysis..." );
-      classPvalRun runResult;
+      GeneSetPvalRun runResult;
       if ( results != null ) {
-         runResult = new classPvalRun( activeProbes, settings, geneData,
+         runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
                                        rawData, goData, geneScores, messenger, results );
 
       } else {
-         runResult = new classPvalRun( activeProbes, settings, geneData,
+         runResult = new GeneSetPvalRun( activeProbes, settings, geneData,
                                        rawData, goData, geneScores, messenger );
       }
 

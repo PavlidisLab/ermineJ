@@ -1,833 +1,293 @@
-Class	Class Name	Class ID	size	effective_size	raw score	resamp pval	N over pval cut	ORA pval	Corrected_pvalue	Same as:	Similar to:
-eukaryotic_translation_elongation_factor_1_complex_GO:0005853	eukaryotic translation elongation factor 1 complex	GO:0005853	15	10	4.71419193	0.050	6	0.00642431	0.000		
-protein-synthesizing_GTPase_activity_GO:0008547	protein-synthesizing GTPase activity	GO:0008547	23	15	3.28555198	0.050	7	0.01699456	0.000		
-phorbol_ester_receptor_activity_GO:0001565	phorbol ester receptor activity	GO:0001565	22	14	3.48395911	0.050	6	0.03314477	0.000		
-protein_kinase_C_activity_GO:0004697	protein kinase C activity	GO:0004697	20	12	3.6048596	0.050	5	0.04654618	0.000		
-regulation_of_epithelial_cell_differentiation_GO:0030856	regulation of epithelial cell differentiation	GO:0030856	15	8	2.46191356	0.050	2	0.24575955	0.000		
-mRNA-nucleus_export_GO:0006406	mRNA-nucleus export	GO:0006406	29	20	2.74325716	0.050	7	0.06926445	0.000		
-proton-transporting_ATP_synthase_complex_(sensu_Eukarya)_GO:0005753	proton-transporting ATP synthase complex (sensu Eukarya)	GO:0005753	17	14	3.39112407	0.050	6	0.03314477	0.000	GO:0045255|hydrogen-translocating F-type ATPase complex, GO:0045259|proton-transporting ATP synthase complex, 	
-lipid_binding_GO:0006630	lipid binding	GO:0006630	11	11	4.18884862	0.050	5	0.03283845	0.000		
-histone_acetyltransferase_complex_GO:0000123	histone acetyltransferase complex	GO:0000123	23	17	2.95943106	0.050	6	0.07616756	0.000		
-histone_acetyltransferase_activity_GO:0004402	histone acetyltransferase activity	GO:0004402	11	10	3.47242726	0.050	5	0.02206413	0.000		
-histone_deacetylase_activity_GO:0004407	histone deacetylase activity	GO:0004407	11	10	3.19443003	0.050	4	0.06599089	0.000		
-protein_amino_acid_acetylation_GO:0006473	protein amino acid acetylation	GO:0006473	10	10	4.95450284	0.050	6	0.00642431	0.000		
-N-acetyltransferase_activity_GO:0008080	N-acetyltransferase activity	GO:0008080	16	12	3.50930091	0.050	5	0.04654618	0.000		
-peptide_hormone_secretion_GO:0030072	peptide hormone secretion	GO:0030072	16	10	3.6291743	0.050	4	0.06599089	0.000		
-covalent_chromatin_modification_GO:0016569	covalent chromatin modification	GO:0016569	19	18	3.14169513	0.050	7	0.04257834	0.000	GO:0016570|histone modification, 	
-glial_cell_differentiation_GO:0010001	glial cell differentiation	GO:0010001	17	8	2.63068099	0.050	3	0.09482195	0.000		
-fructose_metabolism_GO:0006000	fructose metabolism	GO:0006000	20	16	2.8082146	0.050	6	0.05934378	0.000		
-cell-substrate_adherens_junction_GO:0005924	cell-substrate adherens junction	GO:0005924	14	13	3.74097851	0.050	8	0.00230711	0.000	GO:0005925|focal adhesion, 	
-cell-matrix_junction_GO:0030055	cell-matrix junction	GO:0030055	19	15	3.40813734	0.050	8	0.00577126	0.000		
-cAMP_biosynthesis_GO:0006171	cAMP biosynthesis	GO:0006171	19	16	3.28047226	0.050	4	0.25997657	0.000		
-cAMP_metabolism_GO:0046058	cAMP metabolism	GO:0046058	23	18	3.08084912	0.050	4	0.34198921	0.000		
-glutamine_family_amino_acid_biosynthesis_GO:0009084	glutamine family amino acid biosynthesis	GO:0009084	18	12	2.92223131	0.050	5	0.04654618	0.000		
-GTPase_inhibitor_activity_GO:0005095	GTPase inhibitor activity	GO:0005095	10	8	2.65129339	0.050	2	0.24575955	0.000		
-response_to_toxin_GO:0009636	response to toxin	GO:0009636	27	19	3.75045848	0.050	11	0.00103198	0.000		
-extrachromosomal_DNA_GO:0046821	extrachromosomal DNA	GO:0046821	21	16	2.68299931	0.050	6	0.05934378	0.000		
-single-stranded_RNA_binding_GO:0003727	single-stranded RNA binding	GO:0003727	27	20	2.94073752	0.050	7	0.06926445	0.000		
-DNA_repair_protein_GO:0003685	DNA repair protein	GO:0003685	18	8	2.78707442	0.050	3	0.09482195	0.000		
-regulation_of_transforming_growth_factor_beta_receptor_signaling_pathway_GO:0017015	regulation of transforming growth factor beta receptor signaling pathway	GO:0017015	13	10	3.32689686	0.050	4	0.06599089	0.000		
-monovalent_inorganic_cation_homeostasis_GO:0030004	monovalent inorganic cation homeostasis	GO:0030004	17	16	3.22473991	0.050	5	0.13218726	0.000		
-insulin_receptor_signaling_pathway_GO:0008286	insulin receptor signaling pathway	GO:0008286	32	20	2.83851501	0.050	8	0.0307107	0.000		
-protein-mitochondrial_targeting_GO:0006626	protein-mitochondrial targeting	GO:0006626	17	12	3.13100717	0.050	6	0.01607861	0.000		
-fatty_acid_beta-oxidation_GO:0006635	fatty acid beta-oxidation	GO:0006635	17	16	3.74866612	0.050	6	0.05934378	0.000		
-C-acyltransferase_activity_GO:0016408	C-acyltransferase activity	GO:0016408	13	10	4.40376045	0.050	5	0.02206413	0.000		
-regulation_of_endocytosis_GO:0030100	regulation of endocytosis	GO:0030100	30	20	3.18157799	0.050	7	0.06926445	0.000		
-calpain_activity_GO:0004198	calpain activity	GO:0004198	9	8	2.85604125	0.050	4	0.03028377	0.000		
-regulation_of_long-term_neuronal_synaptic_plasticity_GO:0048169	regulation of long-term neuronal synaptic plasticity	GO:0048169	18	10	3.1964194	0.050	3	0.16875276	0.000		
-oxidoreduction_coenzyme_metabolism_GO:0006733	oxidoreduction coenzyme metabolism	GO:0006733	18	18	3.75555246	0.050	9	0.00628061	0.000		
-vitamin_biosynthesis_GO:0009110	vitamin biosynthesis	GO:0009110	16	13	4.24574572	0.050	5	0.06333905	0.000		
-pyridine_nucleotide_metabolism_GO:0019362	pyridine nucleotide metabolism	GO:0019362	16	16	3.43294435	0.050	8	0.0085768	0.000		
-protein_kinase_activator_activity_GO:0030295	protein kinase activator activity	GO:0030295	12	8	2.41795817	0.050	3	0.09482195	0.000		
-drug_resistance_GO:0009315	drug resistance	GO:0009315	12	8	2.87060284	0.050	3	0.09482195	0.000		
-protein_carrier_activity_GO:0008320	protein carrier activity	GO:0008320	9	8	2.3626776	0.050	2	0.24575955	0.000		
-heterogeneous_nuclear_ribonucleoprotein_complex_GO:0030530	heterogeneous nuclear ribonucleoprotein complex	GO:0030530	26	20	3.01518999	0.050	8	0.0307107	0.000		
-GTP_biosynthesis_GO:0006183	GTP biosynthesis	GO:0006183	14	9	4.05298884	0.050	5	0.01397072	0.000	GO:0046039|GTP metabolism, 	
-pyrimidine_nucleotide_metabolism_GO:0006220	pyrimidine nucleotide metabolism	GO:0006220	26	19	3.43983965	0.050	8	0.02322492	0.000		
-pyrimidine_nucleotide_biosynthesis_GO:0006221	pyrimidine nucleotide biosynthesis	GO:0006221	19	13	3.90331723	0.050	7	0.00778099	0.000		
-pyrimidine_nucleoside_triphosphate_metabolism_GO:0009147	pyrimidine nucleoside triphosphate metabolism	GO:0009147	12	8	3.96975517	0.050	4	0.03028377	0.000		
-pyrimidine_ribonucleotide_metabolism_GO:0009218	pyrimidine ribonucleotide metabolism	GO:0009218	13	9	3.98642219	0.050	5	0.01397072	0.000		
-pyrimidine_ribonucleotide_biosynthesis_GO:0009220	pyrimidine ribonucleotide biosynthesis	GO:0009220	12	8	4.01319859	0.050	4	0.03028377	0.000		
-nucleobase_metabolism_GO:0009112	nucleobase metabolism	GO:0009112	23	20	2.57074585	0.050	7	0.06926445	0.000		
-oxidoreductase_activity,_acting_on_the_CH-CH_group_of_donors,_oxygen_as_acceptor_GO:0016634	oxidoreductase activity, acting on the CH-CH group of donors, oxygen as acceptor	GO:0016634	9	8	3.43760458	0.050	3	0.09482195	0.000		
-oxidoreductase_activity,_acting_on_the_CH-CH_group_of_donors,_other_acceptors_GO:0016637	oxidoreductase activity, acting on the CH-CH group of donors, other acceptors	GO:0016637	17	16	2.94158635	0.050	6	0.05934378	0.000		
-pyrimidine_base_biosynthesis_GO:0019856	pyrimidine base biosynthesis	GO:0019856	9	8	3.69168095	0.050	4	0.03028377	0.000		
-nucleobase_biosynthesis_GO:0046112	nucleobase biosynthesis	GO:0046112	13	12	3.34986663	0.050	6	0.01607861	0.000		
-glycerol_metabolism_GO:0006071	glycerol metabolism	GO:0006071	12	8	5.25636015	0.050	3	0.09482195	0.000		
-neutral_lipid_metabolism_GO:0006638	neutral lipid metabolism	GO:0006638	26	20	3.06996131	0.050	5	0.25964831	0.000	GO:0006639|acylglycerol metabolism, 	
-triacylglycerol_metabolism_GO:0006641	triacylglycerol metabolism	GO:0006641	24	18	3.26583682	0.050	5	0.19182459	0.000		
-polyol_metabolism_GO:0019751	polyol metabolism	GO:0019751	13	9	4.83907	0.050	3	0.12957321	0.000		
-superoxide_dismutase_activity_GO:0004784	superoxide dismutase activity	GO:0004784	10	8	2.56547267	0.050	3	0.09482195	0.000	GO:0016721|oxidoreductase activity, acting on superoxide radicals as acceptor, 	
-eukaryotic_translation_initiation_factor_3_complex_GO:0005852	eukaryotic translation initiation factor 3 complex	GO:0005852	10	9	4.15511587	0.050	8	0.00017812	0.000		
-double-stranded_RNA_binding_GO:0003725	double-stranded RNA binding	GO:0003725	28	20	2.61240189	0.050	7	0.06926445	0.000		
-carbonate_dehydratase_activity_GO:0004089	carbonate dehydratase activity	GO:0004089	14	13	3.67596929	0.050	6	0.02355992	0.000		
-iron_ion_homeostasis_GO:0006879	iron ion homeostasis	GO:0006879	20	16	3.85624675	0.050	8	0.0085768	0.000		
-inorganic_anion_transporter_activity_GO:0015103	inorganic anion transporter activity	GO:0015103	18	16	3.01151599	0.050	4	0.25997657	0.000		
-anion-anion_antiporter_activity_GO:0015301	anion:anion antiporter activity	GO:0015301	10	8	4.03044375	0.050	3	0.09482195	0.000		
-transmembrane_receptor_protein_serine/threonine_kinase_activity_GO:0004675	transmembrane receptor protein serine/threonine kinase activity	GO:0004675	23	15	3.93624225	0.050	7	0.01699456	0.000	GO:0005024|transforming growth factor beta receptor activity, 	
-SNARE_binding_GO:0000149	SNARE binding	GO:0000149	18	15	3.27156021	0.050	5	0.10626267	0.000		
-signal_recognition_particle_GO:0005786	signal recognition particle	GO:0005786	11	8	3.04763093	0.050	3	0.09482195	0.000		
-aminoacyl-tRNA_hydrolase_reaction_GO:0006439	aminoacyl-tRNA hydrolase reaction	GO:0006439	10	9	4.43849039	0.050	6	0.00368078	0.000		
-other_carbon-nitrogen_ligase_activity_GO:0016883	other carbon-nitrogen ligase activity	GO:0016883	18	16	3.60635615	0.050	7	0.02377027	0.000		
-inositol/phosphatidylinositol_phosphatase_activity_GO:0004437	inositol/phosphatidylinositol phosphatase activity	GO:0004437	29	20	3.15839483	0.050	7	0.06926445	0.000		
-nucleotide_catabolism_GO:0009166	nucleotide catabolism	GO:0009166	13	12	3.31901274	0.050	6	0.01607861	0.000		
-calcium-dependent_phospholipid_binding_GO:0005544	calcium-dependent phospholipid binding	GO:0005544	17	15	3.56166044	0.050	5	0.10626267	0.000		
-cGMP_biosynthesis_GO:0006182	cGMP biosynthesis	GO:0006182	10	8	2.93067209	0.050	2	0.24575955	0.000		
-posttranslational_membrane_targeting_GO:0006620	posttranslational membrane targeting	GO:0006620	22	15	3.12942913	0.050	6	0.04502723	0.000		
-pteridine_and_derivative_metabolism_GO:0042558	pteridine and derivative metabolism	GO:0042558	12	10	3.66705576	0.050	3	0.16875276	0.000		
-hydrolase_activity,_acting_on_ether_bonds_GO:0016801	hydrolase activity, acting on ether bonds	GO:0016801	11	8	3.89517544	0.050	6	0.00193464	0.000		
-aromatic_compound_catabolism_GO:0019439	aromatic compound catabolism	GO:0019439	18	15	3.27889252	0.050	7	0.01699456	0.000		
-insulin-like_growth_factor_receptor_binding_GO:0005159	insulin-like growth factor receptor binding	GO:0005159	16	8	4.69400607	0.050	5	0.00821833	0.000		
-fat-soluble_vitamin_metabolism_GO:0006775	fat-soluble vitamin metabolism	GO:0006775	18	15	3.42631031	0.050	7	0.01699456	0.000		
-copper_ion_transport_GO:0006825	copper ion transport	GO:0006825	8	8	3.3948996	0.050	4	0.03028377	0.000		
-regulation_of_DNA_replication_GO:0006275	regulation of DNA replication	GO:0006275	19	12	3.49299135	0.050	4	0.11784181	0.000		
-aromatic_amino_acid_family_metabolism_GO:0009072	aromatic amino acid family metabolism	GO:0009072	30	19	3.47054454	0.050	6	0.11730521	0.000		
-regulation_of_actin_polymerization_and/or_depolymerization_GO:0008064	regulation of actin polymerization and/or depolymerization	GO:0008064	21	16	2.60784058	0.050	5	0.13218726	0.000		
-salivary_gland_development_GO:0007431	salivary gland development	GO:0007431	15	8	2.67040125	0.050	3	0.09482195	0.000		
-cell_fate_specification_GO:0001708	cell fate specification	GO:0001708	11	8	3.24958866	0.050	2	0.24575955	0.000		
-male_gonad_development_GO:0008584	male gonad development	GO:0008584	14	12	3.28669178	0.050	4	0.11784181	0.000		
-myoblast_differentiation_GO:0045445	myoblast differentiation	GO:0045445	11	8	4.0047108	0.050	5	0.00821833	0.000		
-sulfur_amino_acid_biosynthesis_GO:0000097	sulfur amino acid biosynthesis	GO:0000097	10	8	3.04840493	0.050	3	0.09482195	0.000		
-cyclin-dependent_protein_kinase_activity_GO:0004693	cyclin-dependent protein kinase activity	GO:0004693	29	15	4.00496488	0.050	5	0.10626267	0.000		
-mitotic_spindle_assembly_GO:0007052	mitotic spindle assembly	GO:0007052	18	16	3.01556502	0.050	5	0.13218726	0.000		
-Arp2/3_protein_complex_GO:0005885	Arp2/3 protein complex	GO:0005885	10	8	4.31647057	0.050	5	0.00821833	0.000		
-TCA_intermediate_metabolism_GO:0006100	TCA intermediate metabolism	GO:0006100	17	12	2.92852134	0.050	3	0.25680291	0.000		
-sensory_organ_development_GO:0007423	sensory organ development	GO:0007423	27	20	2.66169575	0.050	7	0.06926445	0.000		
-cellular_respiration_GO:0045333	cellular respiration	GO:0045333	21	12	3.66955924	0.050	8	0.00135245	0.000		
-oxidoreductase_activity,_acting_on_paired_donors,_with_incorporation_or_reduction_of_molecular_oxygen,_2-oxoglutarate_as_one_donor,_and_incorporation_of_one_atom_each_of_oxygen_into_both_donors_GO:0016706	oxidoreductase activity, acting on paired donors, with incorporation or reduction of molecular oxygen, 2-oxoglutarate as one donor, and incorporation of one atom each of oxygen into both donors	GO:0016706	15	12	3.26353268	0.050	5	0.04654618	0.000		
-aromatic_compound_biosynthesis_GO:0019438	aromatic compound biosynthesis	GO:0019438	9	9	4.00418233	0.050	3	0.12957321	0.000	GO:0042559|pteridine and derivative biosynthesis, 	
-frizzled_signaling_pathway_GO:0007222	frizzled signaling pathway	GO:0007222	15	13	3.71672263	0.050	6	0.02355992	0.000		
-neutral_amino_acid_transporter_activity_GO:0015175	neutral amino acid transporter activity	GO:0015175	14	11	3.51984588	0.050	4	0.08997463	0.000		
-telomerase-dependent_telomere_maintenance_GO:0007004	telomerase-dependent telomere maintenance	GO:0007004	28	12	3.23304408	0.050	6	0.01607861	0.000		
-receptor_signaling_protein_tyrosine_kinase_activity_GO:0004716	receptor signaling protein tyrosine kinase activity	GO:0004716	26	12	3.09202868	0.050	4	0.11784181	0.000		
-fibrillar_collagen_GO:0005583	fibrillar collagen	GO:0005583	15	8	2.48948627	0.050	2	0.24575955	0.000		
-tumor_antigen_GO:0008222	tumor antigen	GO:0008222	10	8	2.3871784	0.050	1	0.48961825	0.000		
-cAMP-dependent_protein_kinase_regulator_activity_GO:0008603	cAMP-dependent protein kinase regulator activity	GO:0008603	14	10	3.17988087	0.050	2	0.6390215	0.000		
-AMP_binding_GO:0016208	AMP binding	GO:0016208	13	9	3.89294101	0.050	3	0.12957321	0.000	GO:0030552|3',5'-cAMP binding, 	
-drug_transport_GO:0015893	drug transport	GO:0015893	11	8	2.41601806	0.050	2	0.24575955	0.000		
-muscle_attachment_GO:0016203	muscle attachment	GO:0016203	11	8	3.47545113	0.050	4	0.03028377	0.000		
-poly(U)_binding_GO:0008266	poly(U) binding	GO:0008266	11	8	3.26172488	0.050	3	0.09482195	0.000		
-organic_acid_catabolism_GO:0016054	organic acid catabolism	GO:0016054	8	8	3.11421217	0.050	2	0.24575955	0.000	GO:0046395|carboxylic acid catabolism, 	
-adipocyte_differentiation_GO:0045444	adipocyte differentiation	GO:0045444	14	10	3.79215325	0.050	4	0.06599089	0.000		
-cell_wall_GO:0005618	cell wall	GO:0005618	14	12	2.95949742	0.050	5	0.04654618	0.000		
-DNA_topological_change_GO:0006265	DNA topological change	GO:0006265	18	8	3.27393816	0.050	3	0.09482195	0.000		
-small-molecule_carrier_or_transporter_GO:0005468	small-molecule carrier or transporter	GO:0005468	12	10	4.90398826	0.050	6	0.00642431	0.000		
-amino_acid_permease_activity_GO:0015359	amino acid permease activity	GO:0015359	9	8	3.40099182	0.050	2	0.24575955	0.000		
-neutral_amino_acid_transport_GO:0015804	neutral amino acid transport	GO:0015804	15	9	4.06898389	0.050	4	0.04608612	0.000		
-germ-cell_development_GO:0007281	germ-cell development	GO:0007281	20	12	3.08913534	0.050	4	0.11784181	0.000		
-poly(A)_binding_GO:0008143	poly(A) binding	GO:0008143	14	10	4.33156067	0.050	6	0.00642431	0.000		
-RNA_cap_binding_GO:0000339	RNA cap binding	GO:0000339	11	8	3.70781704	0.050	5	0.00821833	0.000		
-ubiquinol-cytochrome-c_reductase_activity_GO:0008121	ubiquinol-cytochrome-c reductase activity	GO:0008121	9	8	3.46682325	0.050	4	0.03028377	0.000	GO:0016679|oxidoreductase activity, acting on diphenols and related substances as donors, GO:0016681|oxidoreductase activity, acting on diphenols and related substances as donors, cytochrome as acceptor, 	
-retinoic_acid_receptor_activity_GO:0003708	retinoic acid receptor activity	GO:0003708	22	11	3.72825308	0.050	5	0.03283845	0.000		
-neuromuscular_junction_development_GO:0007528	neuromuscular junction development	GO:0007528	11	8	2.83914605	0.050	3	0.09482195	0.000		
-ion_channel_clustering_GO:0045161	ion channel clustering	GO:0045161	11	8	2.4035299	0.050	2	0.24575955	0.000		
-base-excision_repair_GO:0006284	base-excision repair	GO:0006284	20	12	3.13028618	0.050	7	0.00492404	0.000		
-rRNA_binding_GO:0019843	rRNA binding	GO:0019843	11	9	4.44213709	0.050	5	0.01397072	0.000		
-oxidoreductase_activity,_acting_on_the_aldehyde_or_oxo_group_of_donors,_NAD_or_NADP_as_acceptor_GO:0016620	oxidoreductase activity, acting on the aldehyde or oxo group of donors, NAD or NADP as acceptor	GO:0016620	24	20	2.97783453	0.050	6	0.14144891	0.000		
-post-Golgi_transport_GO:0006892	post-Golgi transport	GO:0006892	24	15	3.03165919	0.050	5	0.10626267	0.000		
-mitochondrion_organization_and_biogenesis_GO:0007005	mitochondrion organization and biogenesis	GO:0007005	20	15	3.0889372	0.050	6	0.04502723	0.000		
-apoptotic_nuclear_changes_GO:0030262	apoptotic nuclear changes	GO:0030262	14	8	2.8233666	0.050	4	0.03028377	0.000		
-actin_filament_GO:0005884	actin filament	GO:0005884	19	17	3.02672433	0.050	7	0.03224572	0.000		
-hydrogen-translocating_V-type_ATPase_activity_GO:0000260	hydrogen-translocating V-type ATPase activity	GO:0000260	10	8	3.76494781	0.050	3	0.09482195	0.000		
-vacuole_organization_and_biogenesis_GO:0007033	vacuole organization and biogenesis	GO:0007033	15	14	3.43028216	0.050	6	0.03314477	0.000		
-ribonucleoprotein_GO:0003733	ribonucleoprotein	GO:0003733	14	12	3.7320268	0.050	7	0.00492404	0.000		
-sodium/potassium-exchanging_ATPase_activity_GO:0005391	sodium/potassium-exchanging ATPase activity	GO:0005391	9	9	4.90291624	0.050	4	0.04608612	0.000		
-sodium/potassium-exchanging_ATPase_complex_GO:0005890	sodium/potassium-exchanging ATPase complex	GO:0005890	9	9	4.93563781	0.050	4	0.04608612	0.000		
-synaptic_vesicle_membrane_GO:0030672	synaptic vesicle membrane	GO:0030672	9	8	3.02972444	0.050	3	0.09482195	0.000		
-nicotinamide_metabolism_GO:0006769	nicotinamide metabolism	GO:0006769	15	15	3.61252062	0.050	8	0.00577126	0.000		
-fatty_acid_binding_GO:0005504	fatty acid binding	GO:0005504	14	12	3.95645735	0.050	5	0.04654618	0.000		
-androgen_receptor_signaling_pathway_GO:0030521	androgen receptor signaling pathway	GO:0030521	13	8	2.99912038	0.050	4	0.03028377	0.000		
-regulation_of_fatty_acid_metabolism_GO:0019217	regulation of fatty acid metabolism	GO:0019217	10	8	2.882007	0.050	3	0.09482195	0.000		
-polysaccharide_catabolism_GO:0000272	polysaccharide catabolism	GO:0000272	8	8	2.51813626	0.050	1	0.48961825	0.000		
-ATP/ADP_exchange_GO:0006854	ATP/ADP exchange	GO:0006854	9	8	2.78802771	0.050	3	0.09482195	0.000		
-ruffles_GO:0001726	ruffles	GO:0001726	9	8	2.74731763	0.050	2	0.24575955	0.000		
-protein_kinase_C_binding_GO:0005080	protein kinase C binding	GO:0005080	32	19	2.81313634	0.100	9	0.00895168	0.000		
-N-acyltransferase_activity_GO:0016410	N-acyltransferase activity	GO:0016410	23	17	2.83073715	0.100	5	0.16080648	0.000		
-proteasome_core_complex_(sensu_Eukarya)_GO:0005839	proteasome core complex (sensu Eukarya)	GO:0005839	23	18	2.59080696	0.100	8	0.0171416	0.000		
-protein-histidine_kinase_activity_GO:0004673	protein-histidine kinase activity	GO:0004673	13	8	2.14119406	0.100	2	0.24575955	0.000		
-response_to_hypoxia_GO:0001666	response to hypoxia	GO:0001666	14	11	3.43095568	0.100	2	0.58193185	0.000		
-deacetylase_activity_GO:0019213	deacetylase activity	GO:0019213	12	11	2.97392502	0.100	4	0.08997463	0.000		
-insulin_secretion_GO:0030073	insulin secretion	GO:0030073	15	9	3.02722437	0.100	3	0.12957321	0.000		
-hormone_secretion_GO:0046879	hormone secretion	GO:0046879	28	17	2.89523394	0.100	5	0.16080648	0.000		
-G1_phase_of_mitotic_cell_cycle_GO:0000080	G1 phase of mitotic cell cycle	GO:0000080	28	14	3.21870175	0.100	4	0.18376775	0.000		
-replisome_GO:0030894	replisome	GO:0030894	28	17	2.64281282	0.100	4	0.30053959	0.000		
-chromosome,_telomeric_region_GO:0000781	chromosome, telomeric region	GO:0000781	20	9	2.79390639	0.100	4	0.04608612	0.000		
-drug_transporter_activity_GO:0015238	drug transporter activity	GO:0015238	15	9	3.39393153	0.100	3	0.12957321	0.000		
-lipid_raft_GO:0045121	lipid raft	GO:0045121	21	14	2.78276755	0.100	5	0.0832633	0.000		
-neuronal_migration_GO:0001764	neuronal migration	GO:0001764	13	9	3.23638886	0.100	4	0.04608612	0.000		
-dicarboxylic_acid_transporter_activity_GO:0005310	dicarboxylic acid transporter activity	GO:0005310	15	11	2.89372636	0.100	3	0.21147448	0.000	GO:0017153|sodium:dicarboxylate symporter activity, 	
-thyroid_hormone_receptor_activity_GO:0004887	thyroid hormone receptor activity	GO:0004887	22	9	3.31732898	0.100	5	0.01397072	0.000		
-arginine_metabolism_GO:0006525	arginine metabolism	GO:0006525	14	12	2.73177882	0.100	4	0.11784181	0.000		
-protein_translocase_activity_GO:0015450	protein translocase activity	GO:0015450	14	10	2.96651214	0.100	3	0.16875276	0.000		
-insulin_receptor_binding_GO:0005158	insulin receptor binding	GO:0005158	15	8	2.29944951	0.100	1	0.48961825	0.000		
-somatic_muscle_development_GO:0007525	somatic muscle development	GO:0007525	10	8	2.11952384	0.100	2	0.24575955	0.000		
-B-cell_proliferation_GO:0042100	B-cell proliferation	GO:0042100	21	14	2.945247	0.100	5	0.0832633	0.000		
-regulation_of_caspase_activation_GO:0043026	regulation of caspase activation	GO:0043026	16	8	2.07312046	0.100	2	0.24575955	0.000		
-mediator_complex_GO:0000119	mediator complex	GO:0000119	11	8	2.11904961	0.100	2	0.24575955	0.000		
-behavioral_fear_response_GO:0001662	behavioral fear response	GO:0001662	12	9	3.1199847	0.100	2	0.30311413	0.000	GO:0042596|fear response, 	
-mitochondrial_transport_GO:0006839	mitochondrial transport	GO:0006839	24	17	2.89155832	0.100	6	0.07616756	0.000		
-pyrimidine_base_metabolism_GO:0006206	pyrimidine base metabolism	GO:0006206	10	9	3.47855796	0.100	4	0.04608612	0.000		
-oogenesis_(sensu_Insecta)_GO:0009993	oogenesis (sensu Insecta)	GO:0009993	15	9	2.98183829	0.100	5	0.01397072	0.000		
-response_to_osmotic_stress_GO:0006970	response to osmotic stress	GO:0006970	19	17	2.65892001	0.100	5	0.16080648	0.000		
-deoxyribonuclease_activity_GO:0004536	deoxyribonuclease activity	GO:0004536	28	17	2.69864545	0.100	7	0.03224572	0.000		
-alcohol_dehydrogenase_activity,_zinc-dependent_GO:0004024	alcohol dehydrogenase activity, zinc-dependent	GO:0004024	16	11	2.88239117	0.100	3	0.21147448	0.000		
-ABC-type_efflux_porter_activity_GO:0015427	ABC-type efflux porter activity	GO:0015427	8	8	2.18773066	0.100	1	0.48961825	0.000		
-regulation_of_exocytosis_GO:0017157	regulation of exocytosis	GO:0017157	24	17	2.62059833	0.100	6	0.07616756	0.000		
-chloride_transporter_activity_GO:0015108	chloride transporter activity	GO:0015108	11	9	3.20017721	0.100	2	0.30311413	0.000		
-regulation_of_action_potential_GO:0001508	regulation of action potential	GO:0001508	17	11	3.05799696	0.100	5	0.03283845	0.000		
-proteoglycan_GO:0005203	proteoglycan	GO:0005203	12	8	2.23539618	0.100	3	0.09482195	0.000		
-nucleoside_monophosphate_metabolism_GO:0009123	nucleoside monophosphate metabolism	GO:0009123	24	20	2.40998508	0.100	5	0.25964831	0.000		
-purine_nucleoside_monophosphate_biosynthesis_GO:0009127	purine nucleoside monophosphate biosynthesis	GO:0009127	13	12	2.81402561	0.100	4	0.11784181	0.000	GO:0009168|purine ribonucleoside monophosphate biosynthesis, 	
-ribonucleoside_monophosphate_metabolism_GO:0009161	ribonucleoside monophosphate metabolism	GO:0009161	21	18	2.57108833	0.100	5	0.19182459	0.000		
-cartilage_condensation_GO:0001502	cartilage condensation	GO:0001502	25	18	2.75654103	0.100	6	0.09550656	0.000		
-cGMP_metabolism_GO:0046068	cGMP metabolism	GO:0046068	12	9	2.91467851	0.100	2	0.30311413	0.000		
-cAMP-dependent_protein_kinase_complex_GO:0005952	cAMP-dependent protein kinase complex	GO:0005952	17	11	3.02548953	0.100	2	0.58193185	0.000		
-transition_metal_ion_transporter_activity_GO:0046915	transition metal ion transporter activity	GO:0046915	20	18	2.61412532	0.100	6	0.09550656	0.000		
-SAP_kinase_activity_GO:0016909	SAP kinase activity	GO:0016909	18	9	3.63756726	0.100	5	0.01397072	0.000		
-aldehyde_metabolism_GO:0006081	aldehyde metabolism	GO:0006081	11	11	2.97340161	0.100	2	0.58193185	0.000		
-androgen_metabolism_GO:0008209	androgen metabolism	GO:0008209	9	9	2.8005735	0.100	3	0.12957321	0.000		
-tyrosine_metabolism_GO:0006570	tyrosine metabolism	GO:0006570	19	11	3.42007098	0.100	3	0.21147448	0.000		
-FGF_receptor_signaling_pathway_GO:0008543	FGF receptor signaling pathway	GO:0008543	16	11	2.91852828	0.100	4	0.08997463	0.000		
-DNA_topoisomerase_activity_GO:0003916	DNA topoisomerase activity	GO:0003916	20	9	2.89868529	0.100	3	0.12957321	0.000	GO:0016873|other isomerase activity, 	
-negative_regulation_of_transcription_factor-nucleus_import_GO:0042992	negative regulation of transcription factor-nucleus import	GO:0042992	10	8	2.27255562	0.100	3	0.09482195	0.000	GO:0042994|cytoplasmic sequestering of transcription factor, 	
-apoptosis_activator_activity_GO:0016506	apoptosis activator activity	GO:0016506	30	18	2.67780477	0.100	5	0.19182459	0.000		
-SMAD_protein_heteromerization_GO:0007183	SMAD protein heteromerization	GO:0007183	17	8	2.22041749	0.100	1	0.48961825	0.000		
-DNA-directed_RNA_polymerase_II_activity_GO:0003901	DNA-directed RNA polymerase II activity	GO:0003901	13	11	2.90724603	0.100	4	0.08997463	0.000		
-ligase_activity,_forming_carbon-sulfur_bonds_GO:0016877	ligase activity, forming carbon-sulfur bonds	GO:0016877	15	9	3.79693098	0.100	3	0.12957321	0.000		
-natural_killer_cell_mediated_cytolysis_GO:0042267	natural killer cell mediated cytolysis	GO:0042267	13	9	3.20464876	0.100	4	0.04608612	0.000		
-ankyrin_binding_GO:0030506	ankyrin binding	GO:0030506	14	9	3.5180179	0.100	5	0.01397072	0.000		
-cortical_cytoskeleton_GO:0030863	cortical cytoskeleton	GO:0030863	14	8	2.21084192	0.100	3	0.09482195	0.000	GO:0030864|cortical actin cytoskeleton, 	
-N_signaling_pathway_GO:0007219	N signaling pathway	GO:0007219	10	9	3.03410487	0.100	4	0.04608612	0.000		
-aerobic_respiration_GO:0009060	aerobic respiration	GO:0009060	9	9	3.50648524	0.100	5	0.01397072	0.000		
-trypsin_inhibitor_activity_GO:0030304	trypsin inhibitor activity	GO:0030304	8	8	2.28754118	0.100	1	0.48961825	0.000		
-site_of_polarized_growth_GO:0030427	site of polarized growth	GO:0030427	12	9	2.83476939	0.100	3	0.12957321	0.000		
-ephrin_receptor_activity_GO:0005003	ephrin receptor activity	GO:0005003	19	14	2.95477413	0.100	4	0.18376775	0.000		
-cyclic_nucleotide_binding_GO:0030551	cyclic nucleotide binding	GO:0030551	19	14	3.0298223	0.100	3	0.35163952	0.000		
-estrogen_receptor_signaling_pathway_GO:0030520	estrogen receptor signaling pathway	GO:0030520	14	8	2.29324114	0.100	1	0.48961825	0.000		
-intracellular_receptor-mediated_signaling_pathway_GO:0030522	intracellular receptor-mediated signaling pathway	GO:0030522	26	16	2.45097295	0.100	4	0.25997657	0.000		
-nucleobase_transporter_activity_GO:0015205	nucleobase transporter activity	GO:0015205	10	9	2.90650473	0.100	3	0.12957321	0.000		
-structural_constituent_of_cell_wall_GO:0005199	structural constituent of cell wall	GO:0005199	12	11	3.07467744	0.100	5	0.03283845	0.000		
-external_encapsulating_structure_GO:0030312	external encapsulating structure	GO:0030312	21	17	2.59866881	0.100	6	0.07616756	0.000		
-eukaryotic_translation_initiation_factor_4F_complex_GO:0016281	eukaryotic translation initiation factor 4F complex	GO:0016281	13	9	3.22158713	0.100	5	0.01397072	0.000		
-apoptotic_mitochondrial_changes_GO:0008637	apoptotic mitochondrial changes	GO:0008637	18	8	2.21873744	0.100	2	0.24575955	0.000		
-lipid_phosphatase_activity_GO:0042577	lipid phosphatase activity	GO:0042577	12	9	2.7826926	0.100	2	0.30311413	0.000		
-clathrin_vesicle_coat_GO:0030125	clathrin vesicle coat	GO:0030125	23	20	2.42145595	0.100	5	0.25964831	0.000		
-acyl-CoA_dehydrogenase_activity_GO:0003995	acyl-CoA dehydrogenase activity	GO:0003995	10	9	3.52865858	0.100	4	0.04608612	0.000		
-NADPH_metabolism_GO:0006739	NADPH metabolism	GO:0006739	11	11	3.09779655	0.100	6	0.01045886	0.000		
-intramolecular_isomerase_activity,_interconverting_aldoses_and_ketoses_GO:0016861	intramolecular isomerase activity, interconverting aldoses and ketoses	GO:0016861	10	9	3.49565058	0.100	5	0.01397072	0.000		
-regulation_of_neuronal_synaptic_plasticity_GO:0048168	regulation of neuronal synaptic plasticity	GO:0048168	34	18	2.54457254	0.200	4	0.34198921	0.000		
-mitotic_anaphase_GO:0000090	mitotic anaphase	GO:0000090	16	12	2.57765041	0.200	2	0.52662607	0.000		
-protein_amino_acid_methylation_GO:0006479	protein amino acid methylation	GO:0006479	13	9	2.5217468	0.200	4	0.04608612	0.000		
-pyruvate_metabolism_GO:0006090	pyruvate metabolism	GO:0006090	14	9	2.29552438	0.200	3	0.12957321	0.000		
-telomere_maintenance_GO:0000723	telomere maintenance	GO:0000723	29	13	2.99289156	0.200	6	0.02355992	0.000		
-lamellipodium_GO:0030027	lamellipodium	GO:0030027	17	14	2.62569631	0.200	4	0.18376775	0.000		
-glutathione_biosynthesis_GO:0006750	glutathione biosynthesis	GO:0006750	12	9	2.30784934	0.200	3	0.12957321	0.000		
-dicarboxylic_acid_transport_GO:0006835	dicarboxylic acid transport	GO:0006835	18	14	2.61792413	0.200	3	0.35163952	0.000		
-urea_cycle_intermediate_metabolism_GO:0000051	urea cycle intermediate metabolism	GO:0000051	15	13	2.62167175	0.200	4	0.14925475	0.000		
-protein-nucleus_export_GO:0006611	protein-nucleus export	GO:0006611	11	9	2.19610106	0.200	3	0.12957321	0.000		
-regulation_of_pH_GO:0006885	regulation of pH	GO:0006885	11	10	2.9188797	0.200	2	0.6390215	0.000		
-hydrogen_ion_homeostasis_GO:0030641	hydrogen ion homeostasis	GO:0030641	14	13	3.00673928	0.200	3	0.30381406	0.000		
-transmembrane_receptor_protein_tyrosine_phosphatase_activity_GO:0005001	transmembrane receptor protein tyrosine phosphatase activity	GO:0005001	37	19	2.52968114	0.200	8	0.02322492	0.000	GO:0019198|transmembrane receptor protein phosphatase activity, 	
-vascular_endothelial_growth_factor_receptor_activity_GO:0005021	vascular endothelial growth factor receptor activity	GO:0005021	23	11	2.79329793	0.200	2	0.58193185	0.000		
-chemosensory_behavior_GO:0007635	chemosensory behavior	GO:0007635	17	10	2.8862014	0.200	4	0.06599089	0.000		
-actin_modulating_activity_GO:0003790	actin modulating activity	GO:0003790	9	9	2.62840661	0.200	4	0.04608612	0.000		
-positive_regulation_of_endocytosis_GO:0045807	positive regulation of endocytosis	GO:0045807	14	9	2.31837079	0.200	2	0.30311413	0.000		
-regulation_of_T-cell_differentiation_GO:0045580	regulation of T-cell differentiation	GO:0045580	14	9	2.38702981	0.200	3	0.12957321	0.000		
-carbon-sulfur_lyase_activity_GO:0016846	carbon-sulfur lyase activity	GO:0016846	10	9	2.44833576	0.200	2	0.30311413	0.000		
-low-density_lipoprotein_receptor_activity_GO:0005041	low-density lipoprotein receptor activity	GO:0005041	14	9	2.26247735	0.200	2	0.30311413	0.000	GO:0030169|low-density lipoprotein binding, GO:0030228|lipoprotein receptor activity, 	
-protein_binding,_bridging_GO:0030674	protein binding, bridging	GO:0030674	13	9	2.36415255	0.200	2	0.30311413	0.000		
-endodeoxyribonuclease_activity_GO:0004520	endodeoxyribonuclease activity	GO:0004520	22	11	2.82214613	0.200	5	0.03283845	0.000		
-cell-substrate_junction_assembly_GO:0007044	cell-substrate junction assembly	GO:0007044	18	10	2.87656247	0.200	3	0.16875276	0.000		
-memory_GO:0007613	memory	GO:0007613	22	13	2.950909	0.200	4	0.14925475	0.000		
-regulation_of_neuron_differentiation_GO:0045664	regulation of neuron differentiation	GO:0045664	22	13	3.0551975	0.200	5	0.06333905	0.000		
-alcohol_dehydrogenase_activity_GO:0004022	alcohol dehydrogenase activity	GO:0004022	18	13	2.82171539	0.200	4	0.14925475	0.000		
-mannosidase_activity_GO:0015923	mannosidase activity	GO:0015923	11	9	2.49396826	0.200	4	0.04608612	0.000		
-acid_secretion_GO:0046717	acid secretion	GO:0046717	11	11	2.81474694	0.200	3	0.21147448	0.000		
-guanylate_kinase_activity_GO:0004385	guanylate kinase activity	GO:0004385	18	12	2.68823617	0.200	4	0.11784181	0.000		
-purine_nucleoside_monophosphate_metabolism_GO:0009126	purine nucleoside monophosphate metabolism	GO:0009126	14	13	2.96055954	0.200	5	0.06333905	0.000	GO:0009167|purine ribonucleoside monophosphate metabolism, 	
-membrane_coat_adaptor_complex_GO:0030119	membrane coat adaptor complex	GO:0030119	10	9	2.45600979	0.200	2	0.30311413	0.000		
-death_receptor_activity_GO:0005035	death receptor activity	GO:0005035	15	10	2.83326456	0.200	4	0.06599089	0.000		
-MAP_kinase_activity_GO:0004707	MAP kinase activity	GO:0004707	18	10	2.87049737	0.200	4	0.06599089	0.000		
-DNA_damage_response,_signal_transduction_resulting_in_induction_of_apoptosis_GO:0008630	DNA damage response, signal transduction resulting in induction of apoptosis	GO:0008630	32	13	2.72982165	0.200	7	0.00778099	0.000		
-regulation_of_actin_filament_length_GO:0030832	regulation of actin filament length	GO:0030832	27	19	2.43971337	0.200	5	0.22489731	0.000		
-regulation_of_myogenesis_GO:0016202	regulation of myogenesis	GO:0016202	16	11	2.8372524	0.200	5	0.03283845	0.000		
-MAP_kinase_phosphatase_activity_GO:0017017	MAP kinase phosphatase activity	GO:0017017	14	10	2.69252423	0.200	4	0.06599089	0.000		
-oxidoreductase_activity,_acting_on_the_CH-NH_group_of_donors,_NAD_or_NADP_as_acceptor_GO:0016646	oxidoreductase activity, acting on the CH-NH group of donors, NAD or NADP as acceptor	GO:0016646	14	10	2.69297728	0.200	3	0.16875276	0.000		
-RNA_polymerase_complex_GO:0030880	RNA polymerase complex	GO:0030880	25	19	2.4664452	0.200	6	0.11730521	0.000		
-regulation_of_axon_extension_GO:0030516	regulation of axon extension	GO:0030516	17	12	2.52090672	0.200	4	0.11784181	0.000		
-MAP_kinase_kinase_activity_GO:0004708	MAP kinase kinase activity	GO:0004708	19	9	2.50843185	0.200	1	0.42646971	0.000		
-respiratory_chain_complex_IV_(sensu_Eukarya)_GO:0005751	respiratory chain complex IV (sensu Eukarya)	GO:0005751	11	10	2.82294966	0.200	3	0.16875276	0.000	GO:0045277|respiratory chain complex IV, 	
-transmembrane-ephrin_receptor_activity_GO:0005005	transmembrane-ephrin receptor activity	GO:0005005	18	13	3.16835604	0.200	4	0.14925475	0.000		
-heterogeneous_nuclear_ribonucleoprotein_GO:0008436	heterogeneous nuclear ribonucleoprotein	GO:0008436	18	13	2.6368624	0.200	4	0.14925475	0.000		
-adult_locomotory_behavior_GO:0008344	adult locomotory behavior	GO:0008344	15	11	2.82948752	0.200	2	0.58193185	0.000	GO:0030534|adult behavior, 	
-segment_specification_GO:0007379	segment specification	GO:0007379	14	9	2.61381372	0.200	2	0.30311413	0.000		
-aspartic-type_endopeptidase_activity_GO:0004190	aspartic-type endopeptidase activity	GO:0004190	14	13	2.72327804	0.200	6	0.02355992	0.000		
-L-phenylalanine_metabolism_GO:0006558	L-phenylalanine metabolism	GO:0006558	10	10	2.87270785	0.200	3	0.16875276	0.000		
-O-acyltransferase_activity_GO:0008374	O-acyltransferase activity	GO:0008374	13	13	2.89124017	0.200	3	0.30381406	0.000		
-actin_bundling_activity_GO:0003781	actin bundling activity	GO:0003781	15	12	2.68326854	0.200	4	0.11784181	0.000		
-hydrogen/potassium-exchanging_ATPase_activity_GO:0008900	hydrogen/potassium-exchanging ATPase activity	GO:0008900	9	9	2.36597299	0.200	2	0.30311413	0.000		
-mRNA_cleavage_GO:0006379	mRNA cleavage	GO:0006379	11	9	2.24888424	0.200	2	0.30311413	0.000		
-mitochondrial_electron_transport,_NADH_to_ubiquinone_GO:0006120	mitochondrial electron transport, NADH to ubiquinone	GO:0006120	23	20	2.19064095	0.200	3	0.380785	0.000		
-mechanosensory_behavior_GO:0007638	mechanosensory behavior	GO:0007638	11	10	2.91876981	0.200	2	0.6390215	0.000		
-establishment_of_tissue_polarity_GO:0007164	establishment of tissue polarity	GO:0007164	12	9	2.63421077	0.200	4	0.04608612	0.000		
-phosphoinositide_3-kinase_complex_GO:0005942	phosphoinositide 3-kinase complex	GO:0005942	20	12	2.62323296	0.200	3	0.25680291	0.000		
-endoderm_development_GO:0007492	endoderm development	GO:0007492	16	11	2.83350467	0.200	4	0.08997463	0.000		
-transcription_from_Pol_I_promoter_GO:0006360	transcription from Pol I promoter	GO:0006360	12	9	2.42786608	0.200	3	0.12957321	0.000		
-phospholipase_inhibitor_activity_GO:0004859	phospholipase inhibitor activity	GO:0004859	15	13	3.02818831	0.200	4	0.14925475	0.000		
-non-membrane_spanning_protein_tyrosine_phosphatase_activity_GO:0004726	non-membrane spanning protein tyrosine phosphatase activity	GO:0004726	13	9	2.22583481	0.200	2	0.30311413	0.000		
-RNA_polymerase_II_transcription_mediator_activity_GO:0016455	RNA polymerase II transcription mediator activity	GO:0016455	12	9	2.23478692	0.200	2	0.30311413	0.000		
-autophosphorylation_GO:0046777	autophosphorylation	GO:0046777	24	14	2.43950923	0.300	3	0.35163952	0.000		
-tyrosine_phosphorylation_of_STAT_protein_GO:0007260	tyrosine phosphorylation of STAT protein	GO:0007260	21	14	2.26402272	0.300	4	0.18376775	0.000		
-STAT_protein_nuclear_translocation_GO:0007262	STAT protein nuclear translocation	GO:0007262	13	9	2.15507134	0.300	2	0.30311413	0.000		
-lactation_GO:0007595	lactation	GO:0007595	19	11	2.58463956	0.300	3	0.21147448	0.000		
-oxidoreductase_activity,_acting_on_the_CH-CH_group_of_donors,_NAD_or_NADP_as_acceptor_GO:0016628	oxidoreductase activity, acting on the CH-CH group of donors, NAD or NADP as acceptor	GO:0016628	11	11	2.57685361	0.300	3	0.21147448	0.000		
-two-component_signal_transduction_system_(phosphorelay)_GO:0000160	two-component signal transduction system (phosphorelay)	GO:0000160	22	14	2.38107643	0.300	4	0.18376775	0.000		
-mRNA_splice_site_selection_GO:0006376	mRNA splice site selection	GO:0006376	20	13	2.47356127	0.300	5	0.06333905	0.000		
-intra-Golgi_transport_GO:0006891	intra-Golgi transport	GO:0006891	22	17	2.42428647	0.300	6	0.07616756	0.000		
-organic_cation_porter_activity_GO:0008513	organic cation porter activity	GO:0008513	17	14	2.49263638	0.300	2	0.42415472	0.000		
-protein_localization_GO:0008104	protein localization	GO:0008104	27	17	2.29225213	0.300	5	0.16080648	0.000		
-inactivation_of_MAPK_GO:0000188	inactivation of MAPK	GO:0000188	23	15	2.6552725	0.300	6	0.04502723	0.000		
-gamma_DNA-directed_DNA_polymerase_activity_GO:0003895	gamma DNA-directed DNA polymerase activity	GO:0003895	16	12	2.48297825	0.300	4	0.11784181	0.000		
-glycogen_biosynthesis_GO:0005978	glycogen biosynthesis	GO:0005978	14	11	2.67317783	0.300	4	0.08997463	0.000	GO:0009250|glucan biosynthesis, 	
-eta_DNA_polymerase_activity_GO:0015999	eta DNA polymerase activity	GO:0015999	12	9	2.1243825	0.300	3	0.12957321	0.000	GO:0016000|iota DNA polymerase activity, GO:0016449|lambda DNA polymerase activity, GO:0016450|kappa DNA polymerase activity, GO:0016451|nu DNA polymerase activity, GO:0016452|theta DNA polymerase activity, GO:0017125|deoxycytidyl transferase activity, GO:0019984|sigma DNA polymerase activity, GO:0019986|deoxycytidyl transferase activity, template dependent, 	
-cytoskeletal_adaptor_activity_GO:0008093	cytoskeletal adaptor activity	GO:0008093	13	9	2.1132058	0.300	2	0.30311413	0.000		
-immunoglobulin_binding_GO:0019865	immunoglobulin binding	GO:0019865	21	14	2.20109318	0.300	3	0.35163952	0.000		
-establishment_and/or_maintenance_of_cell_polarity_GO:0007163	establishment and/or maintenance of cell polarity	GO:0007163	27	19	2.23709978	0.300	5	0.22489731	0.000		
-regulation_of_protein-nucleus_import_GO:0042306	regulation of protein-nucleus import	GO:0042306	20	14	2.27533588	0.300	4	0.18376775	0.000		
-isoprenoid_metabolism_GO:0006720	isoprenoid metabolism	GO:0006720	15	13	2.34393732	0.300	3	0.30381406	0.000		
-vesicle_transport_GO:0005480	vesicle transport	GO:0005480	16	13	2.34822546	0.300	3	0.30381406	0.000		
-F-actin_capping_activity_GO:0003782	F-actin capping activity	GO:0003782	10	8	1.95451406	0.300	2	0.24575955	0.000		
-glutamine_family_amino_acid_catabolism_GO:0009065	glutamine family amino acid catabolism	GO:0009065	20	14	2.18758611	0.300	4	0.18376775	0.000		
-Golgi_vesicle_GO:0005798	Golgi vesicle	GO:0005798	22	14	2.46427232	0.300	3	0.35163952	0.000		
-protein_amino_acid_ADP-ribosylation_GO:0006471	protein amino acid ADP-ribosylation	GO:0006471	29	20	2.1079785	0.300	6	0.14144891	0.000		
-perception_of_pain_GO:0019233	perception of pain	GO:0019233	13	11	2.71579446	0.300	2	0.58193185	0.000		
-Golgi_stack_GO:0005795	Golgi stack	GO:0005795	24	14	2.37930017	0.300	4	0.18376775	0.000		
-steroid_catabolism_GO:0006706	steroid catabolism	GO:0006706	20	14	2.29024215	0.300	3	0.35163952	0.000		
-MHC_class_I_protein_binding_GO:0042288	MHC class I protein binding	GO:0042288	16	13	2.43013043	0.300	4	0.14925475	0.000		
-vitamin/cofactor_transporter_activity_GO:0015223	vitamin/cofactor transporter activity	GO:0015223	17	13	2.34401124	0.300	3	0.30381406	0.000		
-chromatin_remodeling_complex_GO:0016585	chromatin remodeling complex	GO:0016585	23	14	2.36319098	0.300	4	0.18376775	0.000		
-nucleoside_monophosphate_biosynthesis_GO:0009124	nucleoside monophosphate biosynthesis	GO:0009124	23	19	2.28845974	0.300	4	0.61620642	0.000		
-ribonucleoside_monophosphate_biosynthesis_GO:0009156	ribonucleoside monophosphate biosynthesis	GO:0009156	20	17	2.44474255	0.300	4	0.30053959	0.000		
-regulation_of_actin_filament_polymerization_GO:0030833	regulation of actin filament polymerization	GO:0030833	15	11	2.52984902	0.300	4	0.08997463	0.000		
-sex_determination_GO:0007530	sex determination	GO:0007530	17	14	2.35233702	0.300	3	0.35163952	0.000		
-hydrolase_activity,_acting_on_carbon-nitrogen_(but_not_peptide)_bonds,_in_cyclic_amidines_GO:0016814	hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds, in cyclic amidines	GO:0016814	18	14	2.29679178	0.300	4	0.18376775	0.000		
-sialyltransferase_activity_GO:0008373	sialyltransferase activity	GO:0008373	13	12	2.50557784	0.300	3	0.25680291	0.000	GO:0016764|transferase activity, transferring other glycosyl groups, 	
-cell-cell_adherens_junction_GO:0005913	cell-cell adherens junction	GO:0005913	26	17	2.37039359	0.300	5	0.16080648	0.000		
-nuclear_body_GO:0016604	nuclear body	GO:0016604	20	13	2.39465437	0.300	4	0.14925475	0.000		
-phosphoinositide_binding_GO:0035091	phosphoinositide binding	GO:0035091	15	11	2.63201066	0.300	2	0.58193185	0.000		
-DNA-directed_RNA_polymerase_I_activity_GO:0003900	DNA-directed RNA polymerase I activity	GO:0003900	12	11	2.69719932	0.300	3	0.21147448	0.000		
-DNA-directed_RNA_polymerase_III_activity_GO:0003902	DNA-directed RNA polymerase III activity	GO:0003902	13	11	2.69081162	0.300	3	0.21147448	0.000		
-cytochrome-c_oxidase_activity_GO:0004129	cytochrome-c oxidase activity	GO:0004129	19	17	2.33286508	0.300	3	0.50731325	0.000	GO:0015002|heme-copper terminal oxidase activity, GO:0016675|oxidoreductase activity, acting on heme group of donors, GO:0016676|oxidoreductase activity, acting on heme group of donors, oxygen as acceptor, 	
-actin_cross-linking_activity_GO:0003780	actin cross-linking activity	GO:0003780	21	14	2.28248955	0.300	4	0.18376775	0.000		
-small_nuclear_ribonucleoprotein_GO:0003734	small nuclear ribonucleoprotein	GO:0003734	17	13	2.39487072	0.300	5	0.06333905	0.000		
-limb_morphogenesis_GO:0030326	limb morphogenesis	GO:0030326	24	17	2.41488467	0.300	4	0.30053959	0.000		
-protein_ubiquitination_GO:0016567	protein ubiquitination	GO:0016567	26	16	2.28352529	0.300	4	0.25997657	0.000		
-tubulin_folding_GO:0007021	tubulin folding	GO:0007021	9	8	1.96050314	0.300	2	0.24575955	0.000		
-mRNA_polyadenylation_GO:0006378	mRNA polyadenylation	GO:0006378	23	19	2.20377897	0.300	5	0.22489731	0.000		
-nucleobase,_nucleoside,_nucleotide_and_nucleic_acid_transporter_activity_GO:0015932	nucleobase, nucleoside, nucleotide and nucleic acid transporter activity	GO:0015932	14	13	2.43576853	0.300	3	0.30381406	0.000		
-protease_activator_activity_GO:0016504	protease activator activity	GO:0016504	9	8	1.94303868	0.300	3	0.09482195	0.000		
-energy_coupled_proton_transport,_against_electrochemical_gradient_GO:0015988	energy coupled proton transport, against electrochemical gradient	GO:0015988	11	10	2.6210838	0.300	3	0.16875276	0.000		
-serine_family_amino_acid_biosynthesis_GO:0009070	serine family amino acid biosynthesis	GO:0009070	15	11	2.61978933	0.300	3	0.21147448	0.000		
-cyclin-dependent_protein_kinase_inhibitor_activity_GO:0004861	cyclin-dependent protein kinase inhibitor activity	GO:0004861	14	8	1.99032741	0.300	2	0.24575955	0.000		
-phosphatidylinositol_3-kinase_activity_GO:0016303	phosphatidylinositol 3-kinase activity	GO:0016303	18	11	2.63236067	0.300	3	0.21147448	0.000		
-phosphoinositide-mediated_signaling_GO:0048015	phosphoinositide-mediated signaling	GO:0048015	13	13	2.55235454	0.300	2	0.47385773	0.000		
-transport_vesicle_GO:0030133	transport vesicle	GO:0030133	19	14	2.59797138	0.300	3	0.35163952	0.000		
-epithelial_cell_differentiation_GO:0030855	epithelial cell differentiation	GO:0030855	25	15	2.47832131	0.400	5	0.10626267	0.000		
-retinoid_binding_GO:0005501	retinoid binding	GO:0005501	17	11	2.40020555	0.400	3	0.21147448	0.000	GO:0019840|isoprenoid binding, 	
-response_to_organic_substance_GO:0010033	response to organic substance	GO:0010033	18	14	2.1230946	0.400	5	0.0832633	0.000		
-intramolecular_transferase_activity,_phosphotransferases_GO:0016868	intramolecular transferase activity, phosphotransferases	GO:0016868	9	8	1.87130985	0.400	1	0.48961825	0.000		
-mitotic_chromosome_segregation_GO:0000070	mitotic chromosome segregation	GO:0000070	12	8	1.91967238	0.400	1	0.48961825	0.000		
-dendrite_morphogenesis_GO:0016358	dendrite morphogenesis	GO:0016358	28	15	2.2125422	0.400	5	0.10626267	0.000		
-lysosomal_membrane_GO:0005765	lysosomal membrane	GO:0005765	11	10	1.94412238	0.400	3	0.16875276	0.000		
-myelination_GO:0042552	myelination	GO:0042552	21	15	2.07267622	0.400	4	0.22086173	0.000		
-transcription_factor_TFIID_complex_GO:0005669	transcription factor TFIID complex	GO:0005669	19	13	2.1218297	0.400	3	0.30381406	0.000		
-histone_deacetylase_complex_GO:0000118	histone deacetylase complex	GO:0000118	16	10	2.15116512	0.400	3	0.16875276	0.000		
-acetate_metabolism_GO:0006083	acetate metabolism	GO:0006083	12	8	1.91314031	0.400	2	0.24575955	0.000		
-acetyl-CoA_metabolism_GO:0006084	acetyl-CoA metabolism	GO:0006084	13	9	1.99114127	0.400	2	0.30311413	0.000		
-hexosaminidase_activity_GO:0015929	hexosaminidase activity	GO:0015929	10	8	1.91455837	0.400	2	0.24575955	0.000		
-glutathione_metabolism_GO:0006749	glutathione metabolism	GO:0006749	20	15	2.45361367	0.400	4	0.22086173	0.000		
-intramolecular_isomerase_activity,_transposing_C=C_bonds_GO:0016863	intramolecular isomerase activity, transposing C=C bonds	GO:0016863	15	9	2.09854856	0.400	2	0.30311413	0.000		
-3'-5'_exoribonuclease_activity_GO:0000175	3'-5' exoribonuclease activity	GO:0000175	13	10	1.91505239	0.400	2	0.6390215	0.000	GO:0004532|exoribonuclease activity, GO:0016896|exoribonuclease activity, producing 5'-phosphomonoesters, 	
-anion-cation_symporter_activity_GO:0015296	anion:cation symporter activity	GO:0015296	21	15	2.3632861	0.400	3	0.60050409	0.000		
-BMP_signaling_pathway_GO:0030509	BMP signaling pathway	GO:0030509	23	15	2.40482272	0.400	4	0.22086173	0.000		
-calcium/calmodulin-dependent_protein_kinase_activity_GO:0004685	calcium/calmodulin-dependent protein kinase activity	GO:0004685	18	10	2.17640541	0.400	1	0.36947159	0.000		
-DNA-directed_DNA_polymerase_activity_GO:0003887	DNA-directed DNA polymerase activity	GO:0003887	24	19	2.09689063	0.400	4	0.61620642	0.000		
-O-linked_glycosylation_GO:0006493	O-linked glycosylation	GO:0006493	17	13	2.16138918	0.400	4	0.14925475	0.000		
-solute-solute_antiporter_activity_GO:0015300	solute:solute antiporter activity	GO:0015300	9	9	2.03391882	0.400	2	0.30311413	0.000		
-beta_DNA_polymerase_activity_GO:0003890	beta DNA polymerase activity	GO:0003890	13	10	1.91382383	0.400	3	0.16875276	0.000	GO:0003894|zeta DNA polymerase activity, 	
-mu_DNA_polymerase_activity_GO:0016448	mu DNA polymerase activity	GO:0016448	13	10	2.00393943	0.400	3	0.16875276	0.000		
-substrate-bound_cell_migration_GO:0006929	substrate-bound cell migration	GO:0006929	16	10	1.74291588	0.400	1	0.36947159	0.000		
-phagocytosis,_engulfment_GO:0006911	phagocytosis, engulfment	GO:0006911	16	10	2.4809125	0.400	2	0.6390215	0.000		
-protein_prenyltransferase_activity_GO:0008318	protein prenyltransferase activity	GO:0008318	25	17	2.19740506	0.400	5	0.16080648	0.000		
-ceramide_metabolism_GO:0006672	ceramide metabolism	GO:0006672	28	20	2.03339866	0.400	5	0.25964831	0.000		
-Rho_guanyl-nucleotide_exchange_factor_activity_GO:0005089	Rho guanyl-nucleotide exchange factor activity	GO:0005089	17	14	2.10059886	0.400	1	0.19968178	0.000		
-kinase_activator_activity_GO:0019209	kinase activator activity	GO:0019209	16	10	2.24923728	0.400	3	0.16875276	0.000		
-cotranslational_membrane_targeting_GO:0006613	cotranslational membrane targeting	GO:0006613	17	15	2.27804234	0.400	5	0.10626267	0.000		
-cytoplasmic_dynein_complex_GO:0005868	cytoplasmic dynein complex	GO:0005868	13	10	2.06860007	0.400	3	0.16875276	0.000		
-dynein_complex_GO:0030286	dynein complex	GO:0030286	18	14	2.05878349	0.400	5	0.0832633	0.000		
-immune_cell_homeostasis_GO:0001776	immune cell homeostasis	GO:0001776	19	9	2.01732834	0.400	2	0.30311413	0.000		
-induction_of_apoptosis_via_death_domain_receptors_GO:0008625	induction of apoptosis via death domain receptors	GO:0008625	18	10	2.31966572	0.400	3	0.16875276	0.000		
-N-terminal_protein_myristoylation_GO:0006499	N-terminal protein myristoylation	GO:0006499	14	10	1.78841956	0.400	1	0.36947159	0.000	GO:0018319|protein amino acid myristoylation, GO:0018377|protein myristoylation, 	
-nuclear_chromatin_GO:0000790	nuclear chromatin	GO:0000790	14	9	2.04171642	0.400	2	0.30311413	0.000		
-DNA_damage_response,_signal_transduction_by_p53_class_mediator_GO:0030330	DNA damage response, signal transduction by p53 class mediator	GO:0030330	22	11	2.3818239	0.400	4	0.08997463	0.000		
-oocyte_construction_GO:0007308	oocyte construction	GO:0007308	14	10	2.58864876	0.400	4	0.06599089	0.000	GO:0007309|oocyte axis determination, 	
-anterior/posterior_axis_specification_GO:0009948	anterior/posterior axis specification	GO:0009948	14	10	2.59952724	0.400	4	0.06599089	0.000		
-nuclear_inner_membrane_GO:0005637	nuclear inner membrane	GO:0005637	19	15	2.04374692	0.400	3	0.60050409	0.000		
-endocytic_vesicle_GO:0030139	endocytic vesicle	GO:0030139	17	15	2.18285139	0.400	2	0.37785299	0.000		
-Golgi_organization_and_biogenesis_GO:0007030	Golgi organization and biogenesis	GO:0007030	13	10	2.31225873	0.400	2	0.6390215	0.000		
-male_meiosis_GO:0007140	male meiosis	GO:0007140	24	15	2.0714744	0.400	4	0.22086173	0.000		
-antigen_presentation,_endogenous_antigen_GO:0019883	antigen presentation, endogenous antigen	GO:0019883	14	10	1.82838757	0.400	1	0.36947159	0.000		
-vitamin/cofactor_transport_GO:0015875	vitamin/cofactor transport	GO:0015875	20	15	2.05831803	0.400	2	0.37785299	0.000		
-iron_ion_transport_GO:0006826	iron ion transport	GO:0006826	18	15	2.11002444	0.400	4	0.22086173	0.000		
-potassium_channel_regulator_activity_GO:0015459	potassium channel regulator activity	GO:0015459	18	13	2.21648177	0.400	3	0.30381406	0.000		
-drug_binding_GO:0008144	drug binding	GO:0008144	22	15	2.06768028	0.400	3	0.60050409	0.000		
-nucleotide_kinase_activity_GO:0019201	nucleotide kinase activity	GO:0019201	22	15	2.57387972	0.400	4	0.22086173	0.000		
-early_endosome_GO:0005769	early endosome	GO:0005769	22	18	2.3795311	0.400	3	0.4630115	0.000		
-nitric_oxide_mediated_signal_transduction_GO:0007263	nitric oxide mediated signal transduction	GO:0007263	20	15	2.51086194	0.400	5	0.10626267	0.000		
-porphyrin_biosynthesis_GO:0006779	porphyrin biosynthesis	GO:0006779	16	14	2.16952609	0.400	3	0.35163952	0.000		
-calcium_ion_dependent_exocytosis_GO:0017156	calcium ion dependent exocytosis	GO:0017156	19	15	2.06829057	0.400	4	0.22086173	0.000		
-RAC_protein_signal_transduction_GO:0016601	RAC protein signal transduction	GO:0016601	11	10	2.27052193	0.400	2	0.6390215	0.000		
-copper_ion_homeostasis_GO:0006878	copper ion homeostasis	GO:0006878	12	10	2.37860978	0.400	3	0.16875276	0.000		
-bile_acid_transport_GO:0015721	bile acid transport	GO:0015721	10	10	1.76327372	0.400	2	0.6390215	0.000		
-microtubule_nucleation_GO:0007020	microtubule nucleation	GO:0007020	13	10	2.07912647	0.400	3	0.16875276	0.000		
-lamellipodium_biogenesis_GO:0030032	lamellipodium biogenesis	GO:0030032	14	10	2.25861899	0.400	3	0.16875276	0.000		
-ear_morphogenesis_GO:0042471	ear morphogenesis	GO:0042471	18	10	1.91408066	0.400	2	0.6390215	0.000	GO:0042472|inner ear morphogenesis, 	
-aspartate_family_amino_acid_metabolism_GO:0009066	aspartate family amino acid metabolism	GO:0009066	19	15	2.3384722	0.400	4	0.22086173	0.000		
-common-partner_SMAD_protein_phosphorylation_GO:0007182	common-partner SMAD protein phosphorylation	GO:0007182	23	10	2.38034098	0.400	2	0.6390215	0.000		
-DNA-directed_RNA_polymerase_II,_core_complex_GO:0005665	DNA-directed RNA polymerase II, core complex	GO:0005665	20	15	2.32751517	0.400	4	0.22086173	0.000		
-ATP_dependent_DNA_helicase_activity_GO:0004003	ATP dependent DNA helicase activity	GO:0004003	24	15	2.42295163	0.400	6	0.04502723	0.000		
-regulation_of_mitotic_cell_cycle_GO:0007346	regulation of mitotic cell cycle	GO:0007346	20	14	1.96055816	0.400	3	0.35163952	0.000		
-GPI_anchor_metabolism_GO:0006505	GPI anchor metabolism	GO:0006505	14	8	1.88149811	0.400	2	0.24575955	0.000		
-synaptic_vesicle_docking_GO:0016081	synaptic vesicle docking	GO:0016081	13	9	2.06079633	0.400	3	0.12957321	0.000		
-acetylglucosaminyltransferase_activity_GO:0008375	acetylglucosaminyltransferase activity	GO:0008375	20	15	2.0319142	0.400	5	0.10626267	0.000		
-Rho_GTPase_activator_activity_GO:0005100	Rho GTPase activator activity	GO:0005100	28	19	2.1388877	0.400	4	0.61620642	0.000		
-vitamin_A_metabolism_GO:0006776	vitamin A metabolism	GO:0006776	13	11	2.38802041	0.400	4	0.08997463	0.000		
-caspase_activity_GO:0004199	caspase activity	GO:0004199	24	10	2.05393288	0.400	3	0.16875276	0.000		
-acidic_amino_acid_transporter_activity_GO:0015172	acidic amino acid transporter activity	GO:0015172	14	10	2.14749325	0.400	3	0.16875276	0.000		
-acidic_amino_acid_transport_GO:0015800	acidic amino acid transport	GO:0015800	14	10	2.0787528	0.400	3	0.16875276	0.000		
-L-amino_acid_transport_GO:0015807	L-amino acid transport	GO:0015807	23	15	2.35579473	0.400	5	0.10626267	0.000		
-glycine_metabolism_GO:0006544	glycine metabolism	GO:0006544	11	10	2.3521135	0.400	3	0.16875276	0.000		
-amino_acid_derivative_catabolism_GO:0042219	amino acid derivative catabolism	GO:0042219	17	11	2.44597552	0.400	2	0.58193185	0.000		
-glutamine_metabolism_GO:0006541	glutamine metabolism	GO:0006541	15	13	2.24837559	0.400	5	0.06333905	0.000		
-axon_guidance_receptor_activity_GO:0008046	axon guidance receptor activity	GO:0008046	19	15	1.98679675	0.400	3	0.60050409	0.000		
-regulation_of_body_size_GO:0040014	regulation of body size	GO:0040014	14	10	2.24911335	0.400	3	0.16875276	0.000		
-intracellular_ligand-gated_ion_channel_activity_GO:0005217	intracellular ligand-gated ion channel activity	GO:0005217	15	10	2.22556481	0.400	3	0.16875276	0.000		
-steroid_dehydrogenase_activity_GO:0016229	steroid dehydrogenase activity	GO:0016229	12	11	2.41989396	0.400	3	0.21147448	0.000		
-steroid_hormone_receptor_signaling_pathway_GO:0030518	steroid hormone receptor signaling pathway	GO:0030518	25	15	2.60565487	0.400	4	0.22086173	0.000		
-inorganic_phosphate_transporter_activity_GO:0005315	inorganic phosphate transporter activity	GO:0005315	13	11	2.37747035	0.400	3	0.21147448	0.000		
-metanephros_development_GO:0001656	metanephros development	GO:0001656	27	15	1.81355492	0.400	4	0.22086173	0.000	GO:0001822|null, 	
-ureteric_bud_development_GO:0001657	ureteric bud development	GO:0001657	19	10	2.08447062	0.400	3	0.16875276	0.000		
-deaminase_activity_GO:0019239	deaminase activity	GO:0019239	13	10	2.25205673	0.400	2	0.6390215	0.000		
-regulation_of_growth_rate_GO:0040009	regulation of growth rate	GO:0040009	13	11	2.37452009	0.400	5	0.03283845	0.000		
-response_to_inorganic_substance_GO:0010035	response to inorganic substance	GO:0010035	9	8	1.90190316	0.400	1	0.48961825	0.000		
-organellar_ribosome_GO:0000313	organellar ribosome	GO:0000313	13	10	2.18016793	0.400	2	0.6390215	0.000	GO:0005761|mitochondrial ribosome, 	
-antimicrobial_humoral_response_(sensu_Invertebrata)_GO:0006960	antimicrobial humoral response (sensu Invertebrata)	GO:0006960	21	13	2.03762916	0.400	2	0.47385773	0.000	GO:0016065|humoral defense mechanism (sensu Invertebrata), 	
-receptor_signaling_protein_serine/threonine_kinase_signaling_protein_activity_GO:0005076	receptor signaling protein serine/threonine kinase signaling protein activity	GO:0005076	23	19	2.06058052	0.400	3	0.42074889	0.000		
-positive_regulation_of_growth_rate_GO:0040010	positive regulation of growth rate	GO:0040010	11	10	2.20637098	0.400	4	0.06599089	0.000		
-non-G-protein_coupled_7TM_receptor_activity_GO:0004926	non-G-protein coupled 7TM receptor activity	GO:0004926	13	10	2.43852387	0.400	4	0.06599089	0.000		
-DNA_catabolism_GO:0006308	DNA catabolism	GO:0006308	13	10	2.44580043	0.400	3	0.16875276	0.000		
-thyroid_hormone_receptor_binding_GO:0046966	thyroid hormone receptor binding	GO:0046966	16	12	2.47504383	0.400	4	0.11784181	0.000		
-L-glutamate_transporter_activity_GO:0005313	L-glutamate transporter activity	GO:0005313	13	9	1.96618911	0.400	2	0.30311413	0.000		
-phosphoinositide_3-kinase_activity_GO:0035004	phosphoinositide 3-kinase activity	GO:0035004	19	12	2.47037891	0.400	3	0.25680291	0.000		
-oligosaccharide_metabolism_GO:0009311	oligosaccharide metabolism	GO:0009311	10	9	2.01749086	0.400	2	0.30311413	0.000		
-cortical_cytoskeleton_organization_and_biogenesis_GO:0030865	cortical cytoskeleton organization and biogenesis	GO:0030865	11	8	1.89645493	0.400	2	0.24575955	0.000	GO:0030866|cortical actin cytoskeleton organization and biogenesis, 	
-tRNA_binding_GO:0000049	tRNA binding	GO:0000049	10	10	2.36326086	0.400	3	0.16875276	0.000		
-aldehyde_dehydrogenase_(NAD)_activity_GO:0004029	aldehyde dehydrogenase (NAD) activity	GO:0004029	12	10	2.05992592	0.400	2	0.6390215	0.000		
-protein_kinase_A_anchoring_activity_GO:0005079	protein kinase A anchoring activity	GO:0005079	15	13	2.18578546	0.400	3	0.30381406	0.000		
-ATP_dependent_RNA_helicase_activity_GO:0004004	ATP dependent RNA helicase activity	GO:0004004	18	15	2.04005491	0.400	4	0.22086173	0.000	GO:0008186|RNA dependent ATPase activity, 	
-ligand-dependent_nuclear_receptor_transcription_coactivator_activity_GO:0030374	ligand-dependent nuclear receptor transcription coactivator activity	GO:0030374	13	10	1.9620515	0.400	1	0.36947159	0.000		
-hydrolase_activity,_hydrolyzing_N-glycosyl_compounds_GO:0016799	hydrolase activity, hydrolyzing N-glycosyl compounds	GO:0016799	14	10	2.49080557	0.400	4	0.06599089	0.000		
-MHC_class_I_receptor_activity_GO:0030106	MHC class I receptor activity	GO:0030106	21	14	1.91113202	0.500	2	0.42415472	0.000		
-hexose_transport_GO:0008645	hexose transport	GO:0008645	23	17	2.11023827	0.500	5	0.16080648	0.000	GO:0015749|monosaccharide transport, GO:0015758|glucose transport, 	
-cyclophilin_GO:0004600	cyclophilin	GO:0004600	16	13	1.84571071	0.500	2	0.47385773	0.000		
-FK506-sensitive_peptidyl-prolyl_cis-trans_isomerase_GO:0030051	FK506-sensitive peptidyl-prolyl cis-trans isomerase	GO:0030051	14	13	1.78214248	0.500	2	0.47385773	0.000		
-cyclophilin-type_peptidyl-prolyl_cis-trans_isomerase_activity_GO:0042027	cyclophilin-type peptidyl-prolyl cis-trans isomerase activity	GO:0042027	20	15	1.75593263	0.500	2	0.37785299	0.000		
-protein_kinase_C_activation_GO:0007205	protein kinase C activation	GO:0007205	22	20	1.87639914	0.500	4	0.57453566	0.000		
-nucleosome_GO:0005718	nucleosome	GO:0005718	17	15	1.77487008	0.500	3	0.60050409	0.000		
-cell_cortex_GO:0005938	cell cortex	GO:0005938	23	16	2.21430264	0.500	4	0.25997657	0.000		
-cytoplasmic_vesicle_membrane_GO:0030659	cytoplasmic vesicle membrane	GO:0030659	17	13	1.68082782	0.500	1	0.23411686	0.000		
-fibroblast_growth_factor_receptor_binding_GO:0005104	fibroblast growth factor receptor binding	GO:0005104	29	16	2.17845362	0.500	5	0.13218726	0.000		
-post-embryonic_development_GO:0009791	post-embryonic development	GO:0009791	23	14	1.87464444	0.500	2	0.42415472	0.000		
-B-cell_differentiation_GO:0030183	B-cell differentiation	GO:0030183	24	20	1.76200967	0.500	6	0.14144891	0.000		
-negative_regulation_of_cell_differentiation_GO:0045596	negative regulation of cell differentiation	GO:0045596	26	20	1.76378056	0.500	5	0.25964831	0.000		
-gliogenesis_GO:0042063	gliogenesis	GO:0042063	26	14	1.94495633	0.500	3	0.35163952	0.000		
-integral_to_endoplasmic_reticulum_membrane_GO:0030176	integral to endoplasmic reticulum membrane	GO:0030176	17	13	1.67753221	0.500	2	0.47385773	0.000		
-protein_threonine/tyrosine_kinase_activity_GO:0004712	protein threonine/tyrosine kinase activity	GO:0004712	25	12	2.43822636	0.500	2	0.52662607	0.000		
-glycosphingolipid_metabolism_GO:0006687	glycosphingolipid metabolism	GO:0006687	20	13	1.67795951	0.500	2	0.47385773	0.000		
-response_to_UV_GO:0009411	response to UV	GO:0009411	20	15	1.69141522	0.500	2	0.37785299	0.000		
-regulation_of_proteolysis_and_peptidolysis_GO:0030162	regulation of proteolysis and peptidolysis	GO:0030162	22	17	2.09799986	0.500	2	0.29603961	0.000		
-regulation_of_protein_catabolism_GO:0042176	regulation of protein catabolism	GO:0042176	21	17	2.0888431	0.500	2	0.29603961	0.000		
-polysaccharide_biosynthesis_GO:0000271	polysaccharide biosynthesis	GO:0000271	20	17	2.09177673	0.500	4	0.30053959	0.000		
-collagen_GO:0005202	collagen	GO:0005202	23	13	1.70681171	0.500	2	0.47385773	0.000		
-membrane_lipid_catabolism_GO:0046466	membrane lipid catabolism	GO:0046466	19	13	1.74915206	0.500	2	0.47385773	0.000		
-regulation_of_synapse_GO:0007273	regulation of synapse	GO:0007273	18	14	1.95412576	0.500	2	0.42415472	0.000		
-transferase_activity,_transferring_pentosyl_groups_GO:0016763	transferase activity, transferring pentosyl groups	GO:0016763	25	18	2.28776358	0.500	7	0.04257834	0.000		
-protein_amino_acid_prenylation_GO:0018346	protein amino acid prenylation	GO:0018346	19	13	1.72892778	0.500	3	0.30381406	0.000		
-regulation_of_nucleocytoplasmic_transport_GO:0046822	regulation of nucleocytoplasmic transport	GO:0046822	23	17	2.09821289	0.500	4	0.30053959	0.000		
-neuronal_cell_recognition_GO:0008038	neuronal cell recognition	GO:0008038	21	16	2.22050437	0.500	4	0.25997657	0.000		
-regulation_of_DNA_recombination_GO:0000018	regulation of DNA recombination	GO:0000018	17	11	2.25724524	0.500	2	0.58193185	0.000		
-DNA_alkylation_GO:0006305	DNA alkylation	GO:0006305	29	20	1.96416878	0.500	3	0.380785	0.000	GO:0006306|DNA methylation, 	
-catecholamine_metabolism_GO:0006584	catecholamine metabolism	GO:0006584	23	20	1.85100618	0.500	4	0.57453566	0.000		
-axoneme_GO:0005930	axoneme	GO:0005930	18	12	2.32100451	0.500	4	0.11784181	0.000		
-ubiquitin-specific_protease_activity_GO:0004843	ubiquitin-specific protease activity	GO:0004843	22	15	1.71319776	0.500	2	0.37785299	0.000		
-postsynaptic_membrane_GO:0045211	postsynaptic membrane	GO:0045211	14	13	1.88182105	0.500	2	0.47385773	0.000		
-vesicle_docking_during_the_process_of_exocytosis_GO:0006904	vesicle docking during the process of exocytosis	GO:0006904	26	18	2.22891975	0.500	5	0.19182459	0.000	GO:0048278|vesicle docking, 	
-sulfuric_ester_hydrolase_activity_GO:0008484	sulfuric ester hydrolase activity	GO:0008484	24	13	2.00521937	0.500	3	0.30381406	0.000		
-heme_biosynthesis_GO:0006783	heme biosynthesis	GO:0006783	15	13	1.82193224	0.500	2	0.47385773	0.000		
-regulation_of_protein_kinase_activity_GO:0045859	regulation of protein kinase activity	GO:0045859	30	20	1.87353357	0.500	4	0.57453566	0.000		
-synaptic_vesicle_exocytosis_GO:0016079	synaptic vesicle exocytosis	GO:0016079	25	20	1.9247947	0.500	4	0.57453566	0.000		
-aging_GO:0007568	aging	GO:0007568	17	11	2.27525375	0.500	3	0.21147448	0.000		
-protein_phosphatase_inhibitor_activity_GO:0004864	protein phosphatase inhibitor activity	GO:0004864	21	13	1.68128753	0.500	3	0.30381406	0.000		
-phosphatidylinositol_metabolism_GO:0046488	phosphatidylinositol metabolism	GO:0046488	13	13	1.81412422	0.500	4	0.14925475	0.000		
-DNA_replication_initiation_GO:0006270	DNA replication initiation	GO:0006270	26	20	1.79904401	0.500	4	0.57453566	0.000		
-antiviral_response_protein_activity_GO:0003800	antiviral response protein activity	GO:0003800	27	20	1.71454782	0.500	1	0.07297284	0.000		
-caspase_activity_GO:0030693	caspase activity	GO:0030693	28	13	1.82645008	0.500	3	0.30381406	0.000		
-intercellular_junction_assembly_and/or_maintenance_GO:0045216	intercellular junction assembly and/or maintenance	GO:0045216	19	15	1.80597729	0.500	3	0.60050409	0.000		
-protein_phosphatase_type_2A_complex_GO:0000159	protein phosphatase type 2A complex	GO:0000159	21	13	1.9483878	0.500	4	0.14925475	0.000		
-protein_phosphatase_type_2A_regulator_activity_GO:0008601	protein phosphatase type 2A regulator activity	GO:0008601	21	13	1.83798466	0.500	4	0.14925475	0.000		
-inotropic_glutamate_receptor_activity_GO:0004970	inotropic glutamate receptor activity	GO:0004970	25	13	1.70800713	0.500	3	0.30381406	0.000		
-aminoglycan_biosynthesis_GO:0006023	aminoglycan biosynthesis	GO:0006023	15	13	1.8479992	0.500	3	0.30381406	0.000		
-transferase_activity,_transferring_amino-acyl_groups_GO:0016755	transferase activity, transferring amino-acyl groups	GO:0016755	15	13	1.91619511	0.500	3	0.30381406	0.000		
-aromatic_amino_acid_family_catabolism_GO:0009074	aromatic amino acid family catabolism	GO:0009074	14	11	2.16233465	0.500	3	0.21147448	0.000		
-amino_sugar_metabolism_GO:0006040	amino sugar metabolism	GO:0006040	9	8	1.85232248	0.500	1	0.48961825	0.000		
-nerve_ensheathment_GO:0008366	nerve ensheathment	GO:0008366	25	19	1.8642348	0.600	4	0.61620642	0.000	GO:0042551|nerve maturation, 	
-positive_regulation_of_interleukin-12_biosynthesis_GO:0045084	positive regulation of interleukin-12 biosynthesis	GO:0045084	18	10	1.68569673	0.600	2	0.6390215	0.000		
-guanylate_cyclase_activity_GO:0004383	guanylate cyclase activity	GO:0004383	19	16	2.123803	0.600	2	0.3351306	0.000		
-phosphorus-oxygen_lyase_activity_GO:0016849	phosphorus-oxygen lyase activity	GO:0016849	20	17	2.02134441	0.600	2	0.29603961	0.000		
-membrane_organization_and_biogenesis_GO:0016044	membrane organization and biogenesis	GO:0016044	28	19	1.92911598	0.600	4	0.61620642	0.000		
-oxidoreductase_activity,_acting_on_the_CH-NH2_group_of_donors_GO:0016638	oxidoreductase activity, acting on the CH-NH2 group of donors	GO:0016638	26	19	1.89579398	0.600	4	0.61620642	0.000		
-phospholipase_A2_activity_GO:0004623	phospholipase A2 activity	GO:0004623	17	16	2.12856487	0.600	2	0.3351306	0.000		
-biogenic_amine_biosynthesis_GO:0042401	biogenic amine biosynthesis	GO:0042401	24	17	1.96673557	0.600	5	0.16080648	0.000		
-peptide_hormone_GO:0005180	peptide hormone	GO:0005180	25	18	2.07064053	0.600	3	0.4630115	0.000		
-receptor_signaling_complex_scaffold_activity_GO:0030159	receptor signaling complex scaffold activity	GO:0030159	26	19	1.86319484	0.600	4	0.61620642	0.000		
-protein_prenylation_GO:0018342	protein prenylation	GO:0018342	21	14	1.86782246	0.600	4	0.18376775	0.000		
-integral_to_peroxisomal_membrane_GO:0005779	integral to peroxisomal membrane	GO:0005779	10	10	1.64194535	0.600	2	0.6390215	0.000		
-intramolecular_isomerase_activity,_other_intramolecular_oxidoreductases_GO:0016865	intramolecular isomerase activity, other intramolecular oxidoreductases	GO:0016865	16	9	1.9291767	0.600	1	0.42646971	0.000		
-insulin-like_growth_factor_binding_GO:0005520	insulin-like growth factor binding	GO:0005520	29	19	1.86866083	0.600	5	0.22489731	0.000		
-sperm_motility_GO:0030317	sperm motility	GO:0030317	15	14	1.85907167	0.600	2	0.42415472	0.000		
-lysosome_organization_and_biogenesis_GO:0007040	lysosome organization and biogenesis	GO:0007040	12	10	1.62853552	0.600	1	0.36947159	0.000		
-interleukin-8_receptor_activity_GO:0004918	interleukin-8 receptor activity	GO:0004918	14	10	1.68840588	0.600	3	0.16875276	0.000	GO:0004944|C5a anaphylatoxin receptor activity, GO:0019959|interleukin-8 binding, 	
-porphyrin_metabolism_GO:0006778	porphyrin metabolism	GO:0006778	21	19	1.93329103	0.600	4	0.61620642	0.000		
-mRNA_3'_UTR_binding_GO:0003730	mRNA 3' UTR binding	GO:0003730	16	12	2.23374102	0.600	2	0.52662607	0.000		
-selenium_binding_GO:0008430	selenium binding	GO:0008430	8	8	1.83377026	0.600	1	0.48961825	0.000		
-negative_regulation_of_protein_kinase_activity_GO:0006469	negative regulation of protein kinase activity	GO:0006469	27	17	2.04136809	0.600	4	0.30053959	0.000		
-secretory_granule_GO:0030141	secretory granule	GO:0030141	25	19	1.87341741	0.600	4	0.61620642	0.000		
-pancreatic_ribonuclease_activity_GO:0004522	pancreatic ribonuclease activity	GO:0004522	13	10	1.6870796	0.600	2	0.6390215	0.000	GO:0016892|endoribonuclease activity, producing other than 5'-phosphomonoesters, 	
-oxidoreductase_activity,_acting_on_NADH_or_NADPH,_NAD_or_NADP_as_acceptor_GO:0016652	oxidoreductase activity, acting on NADH or NADPH, NAD or NADP as acceptor	GO:0016652	14	9	1.90101399	0.600	2	0.30311413	0.000		
-cell_projection_organization_and_biogenesis_GO:0030030	cell projection organization and biogenesis	GO:0030030	25	18	2.07939464	0.600	5	0.19182459	0.000	GO:0030031|cell projection biogenesis, 	
-calcium-dependent_cell_adhesion_molecule_activity_GO:0008014	calcium-dependent cell adhesion molecule activity	GO:0008014	17	12	2.21705099	0.600	4	0.11784181	0.000		
-embryonic_pattern_specification_GO:0009880	embryonic pattern specification	GO:0009880	28	18	2.10715521	0.600	3	0.4630115	0.000		
-small_nucleolar_ribonucleoprotein_complex_GO:0005732	small nucleolar ribonucleoprotein complex	GO:0005732	23	19	1.93834384	0.600	6	0.11730521	0.000		
-protein_disulfide_oxidoreductase_activity_GO:0015035	protein disulfide oxidoreductase activity	GO:0015035	12	10	1.67069662	0.600	0	0.11760965	0.000		
-MAP_kinase_kinase_kinase_activity_GO:0004709	MAP kinase kinase kinase activity	GO:0004709	18	10	1.62589922	0.600	0	0.11760965	0.000		
-phenylalanine_catabolism_GO:0006559	phenylalanine catabolism	GO:0006559	9	9	1.81817405	0.600	2	0.30311413	0.000		
-positive_regulation_of_growth_GO:0045927	positive regulation of growth	GO:0045927	15	14	1.86731931	0.600	4	0.18376775	0.000		
-L-glutamate_transport_GO:0015813	L-glutamate transport	GO:0015813	13	9	1.88981083	0.600	2	0.30311413	0.000		
-regulation_of_viral_life_cycle_GO:0050792	regulation of viral life cycle	GO:0050792	13	9	1.9037851	0.600	1	0.42646971	0.000		
-cholesterol_binding_GO:0015485	cholesterol binding	GO:0015485	11	9	1.9451423	0.600	1	0.42646971	0.000		
-superoxide_metabolism_GO:0006801	superoxide metabolism	GO:0006801	21	16	1.9828605	0.700	4	0.25997657	0.000		
-negative_regulation_of_biosynthesis_GO:0009890	negative regulation of biosynthesis	GO:0009890	23	18	2.06440025	0.700	5	0.19182459	0.000		
-regulation_of_lymphocyte_differentiation_GO:0045619	regulation of lymphocyte differentiation	GO:0045619	18	12	2.11966862	0.700	3	0.25680291	0.000		
-regulation_of_ossification_GO:0030278	regulation of ossification	GO:0030278	26	16	1.86260796	0.700	2	0.3351306	0.000	GO:0046850|regulation of bone remodeling, 	
-bone_mineralization_GO:0030282	bone mineralization	GO:0030282	23	16	1.9390483	0.700	3	0.55329789	0.000		
-brush_border_GO:0005903	brush border	GO:0005903	16	14	1.7533857	0.700	3	0.35163952	0.000		
-dopamine_receptor_signaling_pathway_GO:0007212	dopamine receptor signaling pathway	GO:0007212	21	16	1.89722914	0.700	3	0.55329789	0.000		
-nucleotide-excision_repair_GO:0006289	nucleotide-excision repair	GO:0006289	33	19	1.75407489	0.700	4	0.61620642	0.000		
-axon_GO:0030424	axon	GO:0030424	25	14	1.80976584	0.700	2	0.42415472	0.000		
-regulation_of_Wnt_receptor_signaling_pathway_GO:0030111	regulation of Wnt receptor signaling pathway	GO:0030111	17	13	1.59932066	0.700	2	0.47385773	0.000		
-regulation_of_transcription_factor-nucleus_import_GO:0042990	regulation of transcription factor-nucleus import	GO:0042990	16	12	2.0982645	0.700	3	0.25680291	0.000	GO:0042991|transcription factor-nucleus import, 	
-double-strand_break_repair_via_homologous_recombination_GO:0000724	double-strand break repair via homologous recombination	GO:0000724	19	13	1.60393166	0.700	2	0.47385773	0.000	GO:0000725|recombinational repair, 	
-axis_specification_GO:0009798	axis specification	GO:0009798	22	16	2.09829339	0.700	4	0.25997657	0.000		
-osteoclast_differentiation_GO:0030316	osteoclast differentiation	GO:0030316	16	13	1.58970143	0.700	2	0.47385773	0.000		
-interleukin-6_biosynthesis_GO:0042226	interleukin-6 biosynthesis	GO:0042226	13	9	1.706321	0.700	2	0.30311413	0.000	GO:0045408|regulation of interleukin-6 biosynthesis, 	
-negative_regulation_of_osteoclast_differentiation_GO:0045671	negative regulation of osteoclast differentiation	GO:0045671	11	9	1.75554637	0.700	2	0.30311413	0.000		
-icosanoid_biosynthesis_GO:0046456	icosanoid biosynthesis	GO:0046456	30	19	1.68367901	0.700	3	0.42074889	0.000		
-MHC_protein_binding_GO:0042287	MHC protein binding	GO:0042287	22	18	2.00340075	0.700	4	0.34198921	0.000		
-viral_replication_GO:0008166	viral replication	GO:0008166	12	10	1.60532647	0.700	2	0.6390215	0.000		
-calcium_channel_regulator_activity_GO:0005246	calcium channel regulator activity	GO:0005246	20	16	1.85756542	0.700	3	0.55329789	0.000		
-hyaluronic_acid_binding_GO:0005540	hyaluronic acid binding	GO:0005540	16	9	1.79688169	0.700	2	0.30311413	0.000		
-aldehyde_reductase_activity_GO:0004032	aldehyde reductase activity	GO:0004032	8	8	1.82143312	0.700	2	0.24575955	0.000		
-phosphatase_inhibitor_activity_GO:0019212	phosphatase inhibitor activity	GO:0019212	23	14	1.73957949	0.700	3	0.35163952	0.000		
-oxidoreductase_activity,_acting_on_the_CH-NH_group_of_donors_GO:0016645	oxidoreductase activity, acting on the CH-NH group of donors	GO:0016645	23	16	1.99888178	0.700	3	0.55329789	0.000		
-complement_activity_GO:0003811	complement activity	GO:0003811	15	14	1.73432477	0.700	1	0.19968178	0.000		
-exo-alpha-sialidase_activity_GO:0004308	exo-alpha-sialidase activity	GO:0004308	18	15	1.58521323	0.700	2	0.37785299	0.000	GO:0016997|alpha-sialidase activity, 	
-phosphatidylinositol_biosynthesis_GO:0006661	phosphatidylinositol biosynthesis	GO:0006661	9	9	1.74404111	0.700	3	0.12957321	0.000		
-cilium_GO:0005929	cilium	GO:0005929	21	14	1.82310115	0.700	3	0.35163952	0.000		
-racemase_and_epimerase_activity_GO:0016854	racemase and epimerase activity	GO:0016854	12	11	2.03078354	0.700	3	0.21147448	0.000		
-negative_regulation_of_cell_adhesion_GO:0007162	negative regulation of cell adhesion	GO:0007162	17	14	1.75959463	0.700	3	0.35163952	0.000		
-aldolase_activity_GO:0016228	aldolase activity	GO:0016228	11	9	1.79686371	0.700	1	0.42646971	0.000		
-branching_morphogenesis_GO:0001763	branching morphogenesis	GO:0001763	13	9	1.72234092	0.700	2	0.30311413	0.000		
-fucose_metabolism_GO:0006004	fucose metabolism	GO:0006004	13	12	2.04134452	0.700	3	0.25680291	0.000		
-L-serine_metabolism_GO:0006563	L-serine metabolism	GO:0006563	12	9	1.68601632	0.700	2	0.30311413	0.000		
-phosphatidylinositol_phosphate_kinase_activity_GO:0016307	phosphatidylinositol phosphate kinase activity	GO:0016307	11	11	2.030954	0.700	3	0.21147448	0.000		
-phosphatase_binding_GO:0019902	phosphatase binding	GO:0019902	10	9	1.74578734	0.700	2	0.30311413	0.000	GO:0019903|protein phosphatase binding, 	
-microvillus_GO:0005902	microvillus	GO:0005902	10	9	1.78413649	0.700	2	0.30311413	0.000		
-natural_killer_cell_activation_GO:0030101	natural killer cell activation	GO:0030101	14	10	1.08481555	0.800	0	0.11760965	0.000		
-neutrophil_chemotaxis_GO:0030593	neutrophil chemotaxis	GO:0030593	30	15	1.53957738	0.800	2	0.37785299	0.000		
-diacylglycerol_kinase_activity_GO:0004143	diacylglycerol kinase activity	GO:0004143	9	8	1.38432449	0.800	0	0.18048138	0.000		
-mRNA_catabolism,_nonsense-mediated_GO:0000184	mRNA catabolism, nonsense-mediated	GO:0000184	11	8	1.74435894	0.800	1	0.48961825	0.000		
-nuclear_matrix_GO:0016363	nuclear matrix	GO:0016363	18	11	2.01967925	0.800	3	0.21147448	0.000		
-chromosome_condensation_GO:0030261	chromosome condensation	GO:0030261	19	16	1.71892948	0.800	3	0.55329789	0.000		
-nucleotide-sugar_metabolism_GO:0009225	nucleotide-sugar metabolism	GO:0009225	13	11	1.78551223	0.800	3	0.21147448	0.000		
-intramolecular_transferase_activity_GO:0016866	intramolecular transferase activity	GO:0016866	13	11	1.87620168	0.800	2	0.58193185	0.000		
-phosphotransferase_activity,_nitrogenous_group_as_acceptor_GO:0016775	phosphotransferase activity, nitrogenous group as acceptor	GO:0016775	18	12	1.93770625	0.800	2	0.52662607	0.000		
-kinetochore_GO:0000776	kinetochore	GO:0000776	24	17	1.84444853	0.800	1	0.12189709	0.000		
-mitotic_checkpoint_GO:0007093	mitotic checkpoint	GO:0007093	18	12	1.9087287	0.800	2	0.52662607	0.000		
-non-membrane_spanning_protein_tyrosine_kinase_activity_GO:0004715	non-membrane spanning protein tyrosine kinase activity	GO:0004715	38	20	1.57140802	0.800	3	0.380785	0.000		
-ovarian_follicle_development_GO:0001541	ovarian follicle development	GO:0001541	10	8	1.40123816	0.800	0	0.18048138	0.000		
-menstrual_cycle_GO:0042698	menstrual cycle	GO:0042698	15	10	1.23515243	0.800	0	0.11760965	0.000		
-regulation_of_bone_mineralization_GO:0030500	regulation of bone mineralization	GO:0030500	11	8	1.77088203	0.800	1	0.48961825	0.000		
-subtilase_activity_GO:0004289	subtilase activity	GO:0004289	19	14	1.64584717	0.800	2	0.42415472	0.000		
-protein_methyltransferase_activity_GO:0008276	protein methyltransferase activity	GO:0008276	14	11	1.9227104	0.800	2	0.58193185	0.000		
-glycolipid_metabolism_GO:0006664	glycolipid metabolism	GO:0006664	25	18	1.83323388	0.800	4	0.34198921	0.000		
-interleukin-12_biosynthesis_GO:0042090	interleukin-12 biosynthesis	GO:0042090	21	11	1.80766539	0.800	3	0.21147448	0.000	GO:0045075|regulation of interleukin-12 biosynthesis, 	
-perception_of_biotic_stimulus_GO:0009595	perception of biotic stimulus	GO:0009595	19	14	1.37750327	0.800	2	0.42415472	0.000	GO:0009596|perception of pest/pathogen/parasite, 	
-SNAP_receptor_activity_GO:0005484	SNAP receptor activity	GO:0005484	18	8	1.74961556	0.800	1	0.48961825	0.000		
-phosphoenolpyruvate-dependent_sugar_phosphotransferase_system_GO:0009401	phosphoenolpyruvate-dependent sugar phosphotransferase system	GO:0009401	16	14	1.51276512	0.800	1	0.19968178	0.000		
-dystrophin-associated_glycoprotein_complex_GO:0016010	dystrophin-associated glycoprotein complex	GO:0016010	16	11	1.75234997	0.800	3	0.21147448	0.000		
-synaptic_transmission,_cholinergic_GO:0007271	synaptic transmission, cholinergic	GO:0007271	18	15	1.38972441	0.800	1	0.16981952	0.000		
-serine_esterase_activity_GO:0004759	serine esterase activity	GO:0004759	14	11	1.8160256	0.800	2	0.58193185	0.000		
-oxidoreductase_activity,_acting_on_the_CH-NH2_group_of_donors,_oxygen_as_acceptor_GO:0016641	oxidoreductase activity, acting on the CH-NH2 group of donors, oxygen as acceptor	GO:0016641	22	16	1.71940987	0.800	3	0.55329789	0.000		
-solute-cation_antiporter_activity_GO:0015298	solute:cation antiporter activity	GO:0015298	8	8	1.56791444	0.800	1	0.48961825	0.000	GO:0015299|solute:hydrogen antiporter activity, 	
-alpha_DNA_polymerase_activity_GO:0003889	alpha DNA polymerase activity	GO:0003889	14	11	1.95099547	0.800	3	0.21147448	0.000		
-delta_DNA_polymerase_activity_GO:0003891	delta DNA polymerase activity	GO:0003891	14	11	1.79544195	0.800	3	0.21147448	0.000		
-epsilon_DNA_polymerase_activity_GO:0003893	epsilon DNA polymerase activity	GO:0003893	15	12	1.92101511	0.800	3	0.25680291	0.000		
-response_to_reactive_oxygen_species_GO:0000302	response to reactive oxygen species	GO:0000302	11	8	1.69723493	0.800	1	0.48961825	0.000		
-polyamine_metabolism_GO:0006595	polyamine metabolism	GO:0006595	17	10	1.4584561	0.800	1	0.36947159	0.000		
-tumor_necrosis_factor-alpha_biosynthesis_GO:0042533	tumor necrosis factor-alpha biosynthesis	GO:0042533	13	8	1.56090255	0.800	1	0.48961825	0.000	GO:0042534|regulation of tumor necrosis factor-alpha biosynthesis, GO:0042535|positive regulation of tumor necrosis factor-alpha biosynthesis, 	
-regulation_of_phagocytosis_GO:0050764	regulation of phagocytosis	GO:0050764	13	8	1.79189489	0.800	1	0.48961825	0.000	GO:0050766|positive regulation of phagocytosis, 	
-isoprenoid_biosynthesis_GO:0008299	isoprenoid biosynthesis	GO:0008299	9	8	1.69834986	0.800	0	0.18048138	0.000		
-peroxisomal_membrane_GO:0005778	peroxisomal membrane	GO:0005778	18	16	1.74845734	0.800	2	0.3351306	0.000		
-peroxisome_organization_and_biogenesis_GO:0007031	peroxisome organization and biogenesis	GO:0007031	22	19	1.61740006	0.800	3	0.42074889	0.000		
-mitotic_recombination_GO:0006312	mitotic recombination	GO:0006312	25	16	1.79951628	0.800	3	0.55329789	0.000		
-nuclear_localization_sequence_binding_GO:0008139	nuclear localization sequence binding	GO:0008139	14	10	1.45286924	0.800	1	0.36947159	0.000		
-negative_regulation_of_signal_transduction_GO:0009968	negative regulation of signal transduction	GO:0009968	11	10	1.14080434	0.800	1	0.36947159	0.000		
-odontogenesis_GO:0042476	odontogenesis	GO:0042476	16	11	1.71225569	0.800	2	0.58193185	0.000		
-centrosome_cycle_GO:0007098	centrosome cycle	GO:0007098	11	8	1.5009244	0.800	1	0.48961825	0.000		
-lipoprotein_binding_GO:0008034	lipoprotein binding	GO:0008034	27	20	1.5481606	0.800	2	0.19976083	0.000		
-hyperosmotic_response_GO:0006972	hyperosmotic response	GO:0006972	13	11	1.75347846	0.800	2	0.58193185	0.000		
-RAN_protein_binding_GO:0008536	RAN protein binding	GO:0008536	8	8	1.58750299	0.800	1	0.48961825	0.000		
-prostanoid_metabolism_GO:0006692	prostanoid metabolism	GO:0006692	27	19	1.62921087	0.800	2	0.22849824	0.000	GO:0006693|prostaglandin metabolism, 	
-complement_activation,_alternative_pathway_GO:0006957	complement activation, alternative pathway	GO:0006957	17	14	1.62739462	0.800	2	0.42415472	0.000		
-endoplasmic_reticulum_lumen_GO:0005788	endoplasmic reticulum lumen	GO:0005788	15	14	1.57423339	0.800	1	0.19968178	0.000		
-antigen_processing,_endogenous_antigen_via_MHC_class_I_GO:0019885	antigen processing, endogenous antigen via MHC class I	GO:0019885	15	11	1.90702565	0.800	1	0.31859819	0.000		
-microtubule_stabilization_GO:0007026	microtubule stabilization	GO:0007026	19	8	1.61514313	0.800	2	0.24575955	0.000		
-dorsal/ventral_pattern_formation_GO:0009953	dorsal/ventral pattern formation	GO:0009953	13	8	1.55296055	0.800	0	0.18048138	0.000		
-arachidonic_acid_monooxygenase_activity_GO:0008391	arachidonic acid monooxygenase activity	GO:0008391	16	10	1.37536388	0.800	1	0.36947159	0.000		
-blood_coagulation_factor_activity_GO:0003801	blood coagulation factor activity	GO:0003801	14	14	1.42790891	0.800	2	0.42415472	0.000		
-anaphylatoxin_receptor_activity_GO:0004942	anaphylatoxin receptor activity	GO:0004942	16	12	1.9502817	0.800	4	0.11784181	0.000		
-mating_behavior_GO:0007617	mating behavior	GO:0007617	19	14	1.48469335	0.800	3	0.35163952	0.000		
-growth_hormone-releasing_hormone_receptor_activity_GO:0016520	growth hormone-releasing hormone receptor activity	GO:0016520	17	12	1.94152918	0.800	4	0.11784181	0.000		
-reproductive_behavior_GO:0019098	reproductive behavior	GO:0019098	20	15	1.392804	0.800	3	0.60050409	0.000		
-galactosyltransferase_activity_GO:0008378	galactosyltransferase activity	GO:0008378	18	15	1.46658129	0.800	2	0.37785299	0.000		
-cGMP-specific_phosphodiesterase_activity_GO:0004116	cGMP-specific phosphodiesterase activity	GO:0004116	10	8	1.49925561	0.800	1	0.48961825	0.000		
-purine_base_metabolism_GO:0006144	purine base metabolism	GO:0006144	13	11	1.82799048	0.800	3	0.21147448	0.000		
-thrombin_receptor_activity_GO:0015057	thrombin receptor activity	GO:0015057	10	8	1.37020438	0.800	1	0.48961825	0.000		
-microfilament_motor_activity_GO:0000146	microfilament motor activity	GO:0000146	22	16	1.57472861	0.800	3	0.55329789	0.000		
-calcium_ion_sensing_GO:0005513	calcium ion sensing	GO:0005513	13	8	1.75803094	0.800	1	0.48961825	0.000		
-water_channel_activity_GO:0015250	water channel activity	GO:0015250	14	10	1.42516335	0.800	1	0.36947159	0.000		
-leukotriene_metabolism_GO:0006691	leukotriene metabolism	GO:0006691	18	16	1.59554444	0.800	2	0.3351306	0.000		
-platelet_activation_GO:0030168	platelet activation	GO:0030168	18	15	1.49093716	0.800	3	0.60050409	0.000		
-proteoglycan_biosynthesis_GO:0030166	proteoglycan biosynthesis	GO:0030166	13	10	1.49843977	0.800	2	0.6390215	0.000		
-collagen_fibril_organization_GO:0030199	collagen fibril organization	GO:0030199	15	8	1.5511138	0.800	1	0.48961825	0.000		
-acetyl_choline_receptor_signaling,_muscarinic_pathway_GO:0007213	acetyl choline receptor signaling, muscarinic pathway	GO:0007213	13	8	1.53883131	0.800	2	0.24575955	0.000		
-GPI-anchored_membrane-bound_receptor_GO:0015025	GPI-anchored membrane-bound receptor	GO:0015025	12	8	1.46598262	0.800	0	0.18048138	0.000		
-induction_of_apoptosis_by_hormones_GO:0008628	induction of apoptosis by hormones	GO:0008628	17	10	1.56945464	0.800	1	0.36947159	0.000	GO:0035081|induction of programmed cell death by hormones, 	
-glucuronosyltransferase_activity_GO:0015020	glucuronosyltransferase activity	GO:0015020	15	10	1.04206993	0.800	0	0.11760965	0.000		
-endoribonuclease_activity,_producing_5'-phosphomonoesters_GO:0016891	endoribonuclease activity, producing 5'-phosphomonoesters	GO:0016891	20	15	1.49157731	0.800	1	0.16981952	0.000		
-heavy_metal_binding_GO:0005505	heavy metal binding	GO:0005505	24	18	1.8937044	0.800	4	0.34198921	0.000		
-phosphoinositide_biosynthesis_GO:0046489	phosphoinositide biosynthesis	GO:0046489	20	16	1.83730972	0.800	5	0.13218726	0.000		
-dihydropyridine-sensitive_calcium_channel_activity_GO:0015270	dihydropyridine-sensitive calcium channel activity	GO:0015270	14	8	1.35311712	0.800	1	0.48961825	0.000		
-ribonuclease_P_activity_GO:0004526	ribonuclease P activity	GO:0004526	10	8	1.5760554	0.800	1	0.48961825	0.000	GO:0004549|tRNA-specific ribonuclease activity, 	
-cellular_morphogenesis_during_differentiation_GO:0000904	cellular morphogenesis during differentiation	GO:0000904	13	10	1.49783492	0.800	2	0.6390215	0.000		
-cytoskeletal_anchoring_GO:0007016	cytoskeletal anchoring	GO:0007016	15	11	1.91940995	0.800	1	0.31859819	0.000		
-protein_disulfide_isomerase_activity_GO:0003756	protein disulfide isomerase activity	GO:0003756	10	8	1.73561793	0.800	0	0.18048138	0.000	GO:0016864|intramolecular isomerase activity, transposing S-S bonds, 	
-biogenic_amine_catabolism_GO:0042402	biogenic amine catabolism	GO:0042402	16	10	1.35750476	0.800	1	0.36947159	0.000		
-tumor_necrosis_factor_receptor_binding_GO:0005164	tumor necrosis factor receptor binding	GO:0005164	22	18	1.91349146	0.800	4	0.34198921	0.000		
-SH3-domain_binding_GO:0017124	SH3-domain binding	GO:0017124	14	11	1.98947313	0.800	2	0.58193185	0.000		
-scavenger_receptor_activity_GO:0005044	scavenger receptor activity	GO:0005044	18	15	1.38780265	0.800	2	0.37785299	0.000		
-phospholipid_transporter_activity_GO:0005548	phospholipid transporter activity	GO:0005548	21	17	1.86850879	0.800	3	0.50731325	0.000		
-voltage-gated_chloride_channel_activity_GO:0005247	voltage-gated chloride channel activity	GO:0005247	17	15	1.50037726	0.800	2	0.37785299	0.000		
-response_to_fungi_GO:0009620	response to fungi	GO:0009620	11	10	1.51403056	0.800	2	0.6390215	0.000		
-protein_amino_acid_deacetylation_GO:0006476	protein amino acid deacetylation	GO:0006476	9	8	1.67742531	0.800	1	0.48961825	0.000		
-lysosphingolipid_and_lysophosphatidic_acid_receptor_activity_GO:0001619	lysosphingolipid and lysophosphatidic acid receptor activity	GO:0001619	9	8	1.34642358	0.800	0	0.18048138	0.000		
-phosphatidylinositol-4,5-bisphosphate_hydrolysis_GO:0007203	phosphatidylinositol-4,5-bisphosphate hydrolysis	GO:0007203	12	8	1.73461218	0.800	1	0.48961825	0.000		
-oxidoreductase_activity,_acting_on_paired_donors,_with_incorporation_or_reduction_of_molecular_oxygen,_miscellaneous_GO:0016718	oxidoreductase activity, acting on paired donors, with incorporation or reduction of molecular oxygen, miscellaneous	GO:0016718	14	11	1.79828939	0.800	2	0.58193185	0.000		
-26S_proteasome_GO:0005837	26S proteasome	GO:0005837	14	11	1.91632525	0.800	2	0.58193185	0.000		
-calcium-transporting_ATPase_activity_GO:0005388	calcium-transporting ATPase activity	GO:0005388	15	10	1.51799212	0.800	1	0.36947159	0.000		
-calcium_ion_transporter_activity_GO:0015085	calcium ion transporter activity	GO:0015085	21	14	1.55003368	0.800	2	0.42415472	0.000		
-gap-junction_forming_channel_activity_GO:0005243	gap-junction forming channel activity	GO:0005243	13	10	1.15336408	0.800	1	0.36947159	0.000	GO:0005922|connexon complex, GO:0015285|connexon channel activity, 	
-odontogenesis_(sensu_Vertebrata)_GO:0042475	odontogenesis (sensu Vertebrata)	GO:0042475	12	8	1.62743527	0.800	1	0.48961825	0.000		
-myosin_ATPase_activity_GO:0008570	myosin ATPase activity	GO:0008570	10	8	1.69991834	0.800	2	0.24575955	0.000		
-ribonucleoside_metabolism_GO:0009119	ribonucleoside metabolism	GO:0009119	13	10	1.44712735	0.800	1	0.36947159	0.000		
-purine_nucleoside_metabolism_GO:0042278	purine nucleoside metabolism	GO:0042278	11	8	1.71532342	0.800	1	0.48961825	0.000	GO:0046128|purine ribonucleoside metabolism, 	
-phospholipid-translocating_ATPase_activity_GO:0004012	phospholipid-translocating ATPase activity	GO:0004012	12	10	1.46872277	0.800	1	0.36947159	0.000	GO:0015247|aminophospholipid transporter activity, 	
-benzodiazepine_receptor_activity_GO:0008503	benzodiazepine receptor activity	GO:0008503	10	10	1.31608614	0.800	2	0.6390215	0.000		
-meiotic_chromosome_segregation_GO:0045132	meiotic chromosome segregation	GO:0045132	11	8	1.45258987	0.800	1	0.48961825	0.000		
-glucosidase_activity_GO:0015926	glucosidase activity	GO:0015926	9	8	1.38399361	0.800	2	0.24575955	0.000		
-olfactory_receptor_activity_GO:0004984	olfactory receptor activity	GO:0004984	12	9	1.61072882	0.800	0	0.1456943	0.000		
-regulation_of_peptidyl-tyrosine_phosphorylation_GO:0050730	regulation of peptidyl-tyrosine phosphorylation	GO:0050730	19	12	1.80106639	0.900	0	0.07663276	0.000		
-cytokine_and_chemokine_mediated_signaling_pathway_GO:0019221	cytokine and chemokine mediated signaling pathway	GO:0019221	26	18	1.7819904	0.900	3	0.4630115	0.000		
-_GO:0001818	null	GO:0001818	12	8	1.26674434	0.900	1	0.48961825	0.000	GO:0042036|negative regulation of cytokine biosynthesis, 	
-female_gonad_development_GO:0008585	female gonad development	GO:0008585	17	11	1.1424235	0.900	0	0.09493658	0.000		
-metalloendopeptidase_inhibitor_activity_GO:0008191	metalloendopeptidase inhibitor activity	GO:0008191	20	12	1.439878	0.900	2	0.52662607	0.000		
-positive_regulation_of_T-cell_proliferation_GO:0042102	positive regulation of T-cell proliferation	GO:0042102	12	8	1.27989864	0.900	0	0.18048138	0.000		
-positive_regulation_of_lymphocyte_proliferation_GO:0050671	positive regulation of lymphocyte proliferation	GO:0050671	18	12	1.38523279	0.900	0	0.07663276	0.000		
-transcriptional_elongation_regulator_activity_GO:0003711	transcriptional elongation regulator activity	GO:0003711	16	12	1.79555948	0.900	2	0.52662607	0.000		
-formation_of_primary_germ_layer_GO:0001704	formation of primary germ layer	GO:0001704	18	12	1.82313699	0.900	2	0.52662607	0.000	GO:0001707|mesoderm formation, 	
-antigen_presentation,_exogenous_antigen_GO:0019884	antigen presentation, exogenous antigen	GO:0019884	28	16	1.31545674	0.900	1	0.14404688	0.000		
-adenylate_cyclase_activity_GO:0004016	adenylate cyclase activity	GO:0004016	9	8	1.3169339	0.900	0	0.18048138	0.000		
-neurotransmitter_metabolism_GO:0042133	neurotransmitter metabolism	GO:0042133	26	18	1.70005669	0.900	2	0.26053474	0.000		
-carboxylesterase_activity_GO:0004091	carboxylesterase activity	GO:0004091	15	12	1.72699835	0.900	2	0.52662607	0.000		
-peroxidase_reaction_GO:0006804	peroxidase reaction	GO:0006804	19	17	1.7300471	0.900	4	0.30053959	0.000		
-metabotropic_glutamate,_GABA-B-like_receptor_activity_GO:0008067	metabotropic glutamate, GABA-B-like receptor activity	GO:0008067	19	12	1.41209542	0.900	1	0.27360565	0.000		
-glycosphingolipid_biosynthesis_GO:0006688	glycosphingolipid biosynthesis	GO:0006688	10	8	1.12722192	0.900	1	0.48961825	0.000		
-glycolipid_biosynthesis_GO:0009247	glycolipid biosynthesis	GO:0009247	13	11	1.13983484	0.900	1	0.31859819	0.000		
-axon_cargo_transport_GO:0008088	axon cargo transport	GO:0008088	13	8	1.24034181	0.900	0	0.18048138	0.000		
-amiloride-sensitive_sodium_channel_activity_GO:0015280	amiloride-sensitive sodium channel activity	GO:0015280	10	10	0.70464823	0.900	0	0.11760965	0.000		
-delayed_rectifier_potassium_channel_activity_GO:0005251	delayed rectifier potassium channel activity	GO:0005251	14	11	1.11489948	0.900	1	0.31859819	0.000		
-NLS-bearing_substrate-nucleus_import_GO:0006607	NLS-bearing substrate-nucleus import	GO:0006607	15	12	1.81414984	0.900	3	0.25680291	0.000		
-protein-nucleus_import,_docking_GO:0000059	protein-nucleus import, docking	GO:0000059	16	12	1.7504187	0.900	2	0.52662607	0.000		
-ciliary/flagellar_motility_GO:0001539	ciliary/flagellar motility	GO:0001539	15	11	1.10870372	0.900	1	0.31859819	0.000		
-genital_morphogenesis_GO:0030538	genital morphogenesis	GO:0030538	17	11	1.38762522	0.900	1	0.31859819	0.000		
-male_genital_morphogenesis_GO:0030539	male genital morphogenesis	GO:0030539	16	10	0.85516791	0.900	0	0.11760965	0.000		
-interleukin-1_receptor_activity_GO:0004908	interleukin-1 receptor activity	GO:0004908	15	13	1.37158067	0.900	2	0.47385773	0.000	GO:0019966|interleukin-1 binding, 	
-positive_regulation_of_interleukin-6_biosynthesis_GO:0045410	positive regulation of interleukin-6 biosynthesis	GO:0045410	12	8	1.2951513	0.900	1	0.48961825	0.000		
-regulation_of_osteoclast_differentiation_GO:0045670	regulation of osteoclast differentiation	GO:0045670	15	12	1.59382515	0.900	2	0.52662607	0.000		
-steroid_hydroxylase_activity_GO:0008395	steroid hydroxylase activity	GO:0008395	36	20	1.44675511	0.900	1	0.07297284	0.000		
-peptide_transporter_activity_GO:0015197	peptide transporter activity	GO:0015197	10	8	1.25967562	0.900	0	0.18048138	0.000		
-peptide_antigen_binding_GO:0042605	peptide antigen binding	GO:0042605	13	11	1.21951641	0.900	0	0.09493658	0.000		
-RNA_elongation_from_Pol_II_promoter_GO:0006368	RNA elongation from Pol II promoter	GO:0006368	9	8	1.1729562	0.900	1	0.48961825	0.000		
-N-formyl_peptide_receptor_activity_GO:0004982	N-formyl peptide receptor activity	GO:0004982	17	13	1.40366517	0.900	3	0.30381406	0.000		
-melatonin_receptor_activity_GO:0008502	melatonin receptor activity	GO:0008502	16	12	1.50175218	0.900	3	0.25680291	0.000		
-C-X-C_chemokine_receptor_activity_GO:0016494	C-X-C chemokine receptor activity	GO:0016494	19	13	1.50696635	0.900	3	0.30381406	0.000	GO:0019958|C-X-C chemokine binding, 	
-heme_metabolism_GO:0042168	heme metabolism	GO:0042168	20	18	1.66912685	0.900	3	0.4630115	0.000		
-C21-steroid_hormone_biosynthesis_GO:0006700	C21-steroid hormone biosynthesis	GO:0006700	25	18	1.62455999	0.900	2	0.26053474	0.000	GO:0008207|C21-steroid hormone metabolism, 	
-troponin_complex_GO:0005861	troponin complex	GO:0005861	20	16	1.27645439	0.900	2	0.3351306	0.000		
-calcium-mediated_signaling_GO:0019722	calcium-mediated signaling	GO:0019722	20	16	1.44466564	0.900	2	0.3351306	0.000		
-water_transport_GO:0006833	water transport	GO:0006833	16	12	1.26020757	0.900	1	0.27360565	0.000		
-leukotriene_biosynthesis_GO:0019370	leukotriene biosynthesis	GO:0019370	12	11	1.5524827	0.900	1	0.31859819	0.000		
-proteoglycan_metabolism_GO:0006029	proteoglycan metabolism	GO:0006029	22	16	1.31014595	0.900	2	0.3351306	0.000		
-negative_regulation_of_adenylate_cyclase_activity_GO:0007194	negative regulation of adenylate cyclase activity	GO:0007194	21	16	1.51142789	0.900	2	0.3351306	0.000	GO:0045761|regulation of adenylate cyclase activity, 	
-photoreceptor_activity_GO:0009881	photoreceptor activity	GO:0009881	31	20	1.34375666	0.900	1	0.07297284	0.000		
-bile_acid_transporter_activity_GO:0015125	bile acid transporter activity	GO:0015125	11	11	1.43856326	0.900	1	0.31859819	0.000		
-synaptic_vesicle_endocytosis_GO:0008099	synaptic vesicle endocytosis	GO:0008099	21	17	1.74832878	0.900	2	0.29603961	0.000		
-alpha-adrenergic_receptor_activity_GO:0004936	alpha-adrenergic receptor activity	GO:0004936	13	11	0.85501253	0.900	0	0.09493658	0.000		
-alpha1-adrenergic_receptor_activity_GO:0004937	alpha1-adrenergic receptor activity	GO:0004937	12	10	0.92469164	0.900	0	0.11760965	0.000		
-ion_channel_inhibitor_activity_GO:0008200	ion channel inhibitor activity	GO:0008200	15	11	1.33271982	0.900	1	0.31859819	0.000	GO:0016248|channel inhibitor activity, 	
-striated_muscle_thick_filament_GO:0005863	striated muscle thick filament	GO:0005863	18	12	1.52715163	0.900	2	0.52662607	0.000		
-photoreceptor_cell_development_GO:0042461	photoreceptor cell development	GO:0042461	11	8	1.18397927	0.900	1	0.48961825	0.000	GO:0046530|photoreceptor cell differentiation, 	
-leukocyte_cell_adhesion_GO:0007159	leukocyte cell adhesion	GO:0007159	15	11	1.65691425	0.900	2	0.58193185	0.000		
-fusion_of_sperm_to_egg_plasma_membrane_GO:0007342	fusion of sperm to egg plasma membrane	GO:0007342	15	11	1.09818342	0.900	0	0.09493658	0.000		
-angiotensin_receptor_activity_GO:0001595	angiotensin receptor activity	GO:0001595	15	10	0.71416228	0.900	0	0.11760965	0.000	GO:0004945|angiotensin type II receptor activity, 	
-integral_to_Golgi_membrane_GO:0030173	integral to Golgi membrane	GO:0030173	14	11	1.70575454	0.900	3	0.21147448	0.000		
-COPII_vesicle_coat_GO:0030127	COPII vesicle coat	GO:0030127	8	8	1.22089069	0.900	1	0.48961825	0.000		
-glutamate-gated_ion_channel_activity_GO:0005234	glutamate-gated ion channel activity	GO:0005234	23	12	1.30830308	0.900	2	0.52662607	0.000	GO:0015256|monocarboxylate channel activity, GO:0015259|glutamate channel activity, 	
-gene_silencing_GO:0016458	gene silencing	GO:0016458	16	13	1.43149814	0.900	1	0.23411686	0.000		
-glycosaminoglycan_biosynthesis_GO:0006024	glycosaminoglycan biosynthesis	GO:0006024	14	12	1.74839135	0.900	2	0.52662607	0.000		
-urogenital_system_development_GO:0001655	urogenital system development	GO:0001655	30	17	1.74305994	0.900	4	0.30053959	0.000		
-calcium-dependent_cell-cell_adhesion_GO:0016339	calcium-dependent cell-cell adhesion	GO:0016339	14	11	1.09136869	0.900	2	0.58193185	0.000		
-protein_homooligomerization_activity_GO:0042804	protein homooligomerization activity	GO:0042804	18	11	1.6407422	0.900	3	0.21147448	0.000		
-non-muscle_myosin_GO:0005860	non-muscle myosin	GO:0005860	13	8	1.13097397	0.900	0	0.18048138	0.000		
-glucose_homeostasis_GO:0042593	glucose homeostasis	GO:0042593	13	9	1.60114398	0.900	2	0.30311413	0.000		
-fucosyltransferase_activity_GO:0008417	fucosyltransferase activity	GO:0008417	12	11	1.27410986	0.900	1	0.31859819	0.000		
-proteasome_regulatory_particle_(sensu_Eukarya)_GO:0005838	proteasome regulatory particle (sensu Eukarya)	GO:0005838	11	8	1.1625982	0.900	0	0.18048138	0.000		
-interferon-alpha/beta_receptor_binding_GO:0005132	interferon-alpha/beta receptor binding	GO:0005132	14	12	1.59692966	0.900	1	0.27360565	0.000		
-acid_phosphatase_activity_GO:0003993	acid phosphatase activity	GO:0003993	18	13	1.44006267	0.900	2	0.47385773	0.000		
-condensed_nuclear_chromosome_GO:0000794	condensed nuclear chromosome	GO:0000794	13	11	1.17628919	0.900	1	0.31859819	0.000		
-determination_of_left/right_symmetry_GO:0007368	determination of left/right symmetry	GO:0007368	9	8	1.1387928	0.900	0	0.18048138	0.000	GO:0009799|determination of symmetry, GO:0009855|determination of bilateral symmetry, 	
-aldehyde_dehydrogenase_activity_GO:0004028	aldehyde dehydrogenase activity	GO:0004028	14	12	1.84817538	0.900	2	0.52662607	0.000		
-prostaglandin_receptor_activity_GO:0004955	prostaglandin receptor activity	GO:0004955	12	8	1.11812738	0.900	1	0.48961825	0.000		
-regulation_of_anti-apoptosis_GO:0045767	regulation of anti-apoptosis	GO:0045767	13	11	1.42323732	0.900	1	0.31859819	0.000		
-negative_regulation_of_blood_coagulation_GO:0030195	negative regulation of blood coagulation	GO:0030195	10	10	0.96018109	0.900	0	0.11760965	0.000		
-regulation_of_innate_immune_response_GO:0045088	regulation of innate immune response	GO:0045088	10	8	0.7106028	1.000	0	0.18048138	0.000		
-regulation_of_immune_response_GO:0050776	regulation of immune response	GO:0050776	19	13	1.24845752	1.000	1	0.23411686	0.000		
-sphingolipid_biosynthesis_GO:0030148	sphingolipid biosynthesis	GO:0030148	16	14	1.27333315	1.000	1	0.19968178	0.000		
-fluid_secretion_GO:0007589	fluid secretion	GO:0007589	17	13	1.24102546	1.000	1	0.23411686	0.000		
-macrophage_differentiation_GO:0030225	macrophage differentiation	GO:0030225	10	8	0.89266325	1.000	0	0.18048138	0.000		
-regulation_of_myeloid_blood_cell_differentiation_GO:0045637	regulation of myeloid blood cell differentiation	GO:0045637	11	8	0.87957693	1.000	0	0.18048138	0.000		
-cysteine_protease_inhibitor_activity_GO:0004869	cysteine protease inhibitor activity	GO:0004869	27	18	1.04213656	1.000	0	0.02118822	0.000		
-intermediate_filament-based_process_GO:0045103	intermediate filament-based process	GO:0045103	13	9	1.35904448	1.000	2	0.30311413	0.000		
-regulation_of_T-cell_proliferation_GO:0042129	regulation of T-cell proliferation	GO:0042129	16	12	1.0580383	1.000	0	0.07663276	0.000		
-regulation_of_lymphocyte_proliferation_GO:0050670	regulation of lymphocyte proliferation	GO:0050670	28	19	1.23611488	1.000	0	0.01710043	0.000		
-serotonin_receptor_activity_GO:0004993	serotonin receptor activity	GO:0004993	29	19	1.3930157	1.000	3	0.42074889	0.000		
-voltage-gated_sodium_channel_activity_GO:0005248	voltage-gated sodium channel activity	GO:0005248	10	9	1.18676766	1.000	1	0.42646971	0.000		
-sodium_channel_activity_GO:0005272	sodium channel activity	GO:0005272	20	19	0.93302059	1.000	1	0.08674553	0.000		
-collagen_binding_GO:0005518	collagen binding	GO:0005518	29	19	1.32318474	1.000	1	0.08674553	0.000		
-antigen_processing,_exogenous_antigen_via_MHC_class_II_GO:0019886	antigen processing, exogenous antigen via MHC class II	GO:0019886	23	13	0.99976412	1.000	0	0.06185653	0.000		
-MHC_class_II_receptor_activity_GO:0045012	MHC class II receptor activity	GO:0045012	22	13	0.92638309	1.000	0	0.06185653	0.000		
-neurotransmitter_catabolism_GO:0042135	neurotransmitter catabolism	GO:0042135	14	8	1.00347586	1.000	0	0.18048138	0.000		
-cation-cation_antiporter_activity_GO:0015491	cation:cation antiporter activity	GO:0015491	11	9	1.23344619	1.000	0	0.1456943	0.000		
-frizzled-2_signaling_pathway_GO:0007223	frizzled-2 signaling pathway	GO:0007223	15	9	1.50945005	1.000	1	0.42646971	0.000		
-activation_of_NF-kappaB-inducing_kinase_GO:0007250	activation of NF-kappaB-inducing kinase	GO:0007250	13	9	1.37105792	1.000	1	0.42646971	0.000		
-RNA_dependent_DNA_replication_GO:0006278	RNA dependent DNA replication	GO:0006278	11	9	0.81444261	1.000	0	0.1456943	0.000		
-regulation_of_NF-kappaB-nucleus_import_GO:0042345	regulation of NF-kappaB-nucleus import	GO:0042345	11	9	1.50611413	1.000	1	0.42646971	0.000	GO:0042348|NF-kappaB-nucleus import, 	
-caspase_regulator_activity_GO:0043028	caspase regulator activity	GO:0043028	10	9	1.26715198	1.000	2	0.30311413	0.000		
-regulation_of_JNK_cascade_GO:0046328	regulation of JNK cascade	GO:0046328	10	9	1.1940298	1.000	0	0.1456943	0.000		
-eye_morphogenesis_(sensu_Mammalia)_GO:0001747	eye morphogenesis (sensu Mammalia)	GO:0001747	19	12	0.84802612	1.000	0	0.07663276	0.000	GO:0043010|eye morphogenesis (sensu Vertebrata), GO:0048048|embryonic eye morphogenesis, 	
-opioid_receptor_activity_GO:0004985	opioid receptor activity	GO:0004985	16	13	0.89317456	1.000	0	0.06185653	0.000		
-catecholamine_biosynthesis_GO:0042423	catecholamine biosynthesis	GO:0042423	9	9	1.54576949	1.000	2	0.30311413	0.000		
-interleukin-1,_Type_I,_activating_receptor_activity_GO:0004909	interleukin-1, Type I, activating receptor activity	GO:0004909	11	9	1.39945351	1.000	1	0.42646971	0.000	GO:0019967|interleukin-1, Type I, activating binding, 	
-autophagy_GO:0006914	autophagy	GO:0006914	12	9	1.20512391	1.000	0	0.1456943	0.000		
-tryptase_activity_GO:0030019	tryptase activity	GO:0030019	11	10	0.49121321	1.000	0	0.11760965	0.000		
-peptide_transport_GO:0015833	peptide transport	GO:0015833	10	8	1.0450865	1.000	0	0.18048138	0.000		
-inward_rectifier_potassium_channel_activity_GO:0005242	inward rectifier potassium channel activity	GO:0005242	13	13	1.00544575	1.000	1	0.23411686	0.000		
-organic_cation_transport_GO:0015695	organic cation transport	GO:0015695	9	9	1.08992512	1.000	0	0.1456943	0.000		
-adrenoceptor_activity_GO:0004935	adrenoceptor activity	GO:0004935	19	14	0.99879799	1.000	0	0.04992831	0.000		
-beta-adrenergic_receptor_activity_GO:0004939	beta-adrenergic receptor activity	GO:0004939	9	8	0.87253879	1.000	0	0.18048138	0.000		
-arylsulfatase_activity_GO:0004065	arylsulfatase activity	GO:0004065	9	8	0.66260065	1.000	0	0.18048138	0.000		
-somatostatin_receptor_activity_GO:0004994	somatostatin receptor activity	GO:0004994	25	19	1.30087563	1.000	3	0.42074889	0.000		
-rhodopsin_mediated_phototransduction_GO:0009586	rhodopsin mediated phototransduction	GO:0009586	19	9	1.35811034	1.000	0	0.1456943	0.000		
-perception_of_chemical_substance_GO:0009593	perception of chemical substance	GO:0009593	19	13	1.31279554	1.000	1	0.23411686	0.000		
-flagellum_GO:0019861	flagellum	GO:0019861	13	9	1.00958652	1.000	0	0.1456943	0.000		
-fluid_transport_GO:0042044	fluid transport	GO:0042044	18	13	1.22019248	1.000	1	0.23411686	0.000		
-gamma-aminobutyric_acid_signaling_pathway_GO:0007214	gamma-aminobutyric acid signaling pathway	GO:0007214	18	18	0.86314736	1.000	1	0.10293138	0.000		
-G-protein_coupled_photoreceptor_activity_GO:0008020	G-protein coupled photoreceptor activity	GO:0008020	30	19	1.33800191	1.000	1	0.08674553	0.000		
-negative_regulation_of_coagulation_GO:0050819	negative regulation of coagulation	GO:0050819	18	18	1.42084419	1.000	2	0.26053474	0.000		
-regulation_of_blood_coagulation_GO:0030193	regulation of blood coagulation	GO:0030193	14	13	0.90266907	1.000	0	0.06185653	0.000		
-bile_acid_metabolism_GO:0008206	bile acid metabolism	GO:0008206	14	13	1.25756758	1.000	0	0.06185653	0.000		
-tRNA_processing_GO:0008033	tRNA processing	GO:0008033	20	17	1.4270573	1.000	2	0.29603961	0.000		
-regulation_of_S_phase_of_mitotic_cell_cycle_GO:0007090	regulation of S phase of mitotic cell cycle	GO:0007090	13	9	1.51142141	1.000	2	0.30311413	0.000		
-glucose_transporter_activity_GO:0005355	glucose transporter activity	GO:0005355	9	8	0.90515922	1.000	0	0.18048138	0.000	GO:0015145|monosaccharide transporter activity, GO:0015149|hexose transporter activity, 	
-serine_carboxypeptidase_activity_GO:0004185	serine carboxypeptidase activity	GO:0004185	11	11	0.75404829	1.000	1	0.31859819	0.000		
-alpha2-adrenergic_receptor_activity_GO:0004938	alpha2-adrenergic receptor activity	GO:0004938	9	8	0.78518917	1.000	0	0.18048138	0.000		
-dopamine_receptor_activity_GO:0004952	dopamine receptor activity	GO:0004952	13	11	0.79991514	1.000	0	0.09493658	0.000		
-glutathione_transferase_activity_GO:0004364	glutathione transferase activity	GO:0004364	26	18	1.45191392	1.000	2	0.26053474	0.000		
-voltage-gated_calcium_channel_complex_GO:0005891	voltage-gated calcium channel complex	GO:0005891	29	18	1.42198162	1.000	2	0.26053474	0.000		
-nicotinic_acetylcholine-activated_cation-selective_channel_activity_GO:0004889	nicotinic acetylcholine-activated cation-selective channel activity	GO:0004889	13	13	1.12462154	1.000	0	0.06185653	0.000		
-nicotinic_acetylcholine-gated_receptor-channel_complex_GO:0005892	nicotinic acetylcholine-gated receptor-channel complex	GO:0005892	12	12	1.05488612	1.000	0	0.07663276	0.000		
-acetylcholine_receptor_activity_GO:0015464	acetylcholine receptor activity	GO:0015464	14	14	1.0800027	1.000	0	0.04992831	0.000		
-acetylcholine_binding_GO:0042166	acetylcholine binding	GO:0042166	17	15	1.05910595	1.000	0	0.04029939	0.000		
-negative_regulation_of_angiogenesis_GO:0016525	negative regulation of angiogenesis	GO:0016525	21	14	1.05866662	1.000	1	0.19968178	0.000		
-plasma_membrane_fusion_GO:0045026	plasma membrane fusion	GO:0045026	16	12	1.01212477	1.000	0	0.07663276	0.000		
-neurotransmitter_transporter_activity_GO:0005326	neurotransmitter transporter activity	GO:0005326	18	14	1.04080373	1.000	1	0.19968178	0.000		
-neurotransmitter-sodium_symporter_activity_GO:0005328	neurotransmitter:sodium symporter activity	GO:0005328	15	12	1.04611729	1.000	1	0.27360565	0.000		
-muscle_motor_activity_GO:0003776	muscle motor activity	GO:0003776	25	19	1.16164009	1.000	1	0.08674553	0.000		
-tissue_kallikrein_activity_GO:0004293	tissue kallikrein activity	GO:0004293	14	11	0.68738742	1.000	1	0.31859819	0.000		
-oxidoreductase_activity,_acting_on_paired_donors,_with_incorporation_or_reduction_of_molecular_oxygen,_reduced_iron-sulfur_protein_as_one_donor,_and_incorporation_of_one_atom_of_oxygen_GO:0016713	oxidoreductase activity, acting on paired donors, with incorporation or reduction of molecular oxygen, reduced iron-sulfur protein as one donor, and incorporation of one atom of oxygen	GO:0016713	13	9	1.39478419	1.000	1	0.42646971	0.000		
-dopamine_receptor,_adenylate_cyclase_activating_pathway_GO:0007191	dopamine receptor, adenylate cyclase activating pathway	GO:0007191	10	8	0.84345969	1.000	0	0.18048138	0.000		
-co-chaperone_activity_GO:0003767	co-chaperone activity	GO:0003767	10	9	1.44496366	1.000	1	0.42646971	0.000		
-meiotic_recombination_GO:0007131	meiotic recombination	GO:0007131	30	18	1.40617463	1.000	2	0.26053474	0.000		
-COPII-coated_vesicle_GO:0030138	COPII-coated vesicle	GO:0030138	9	9	1.30941045	1.000	1	0.42646971	0.000		
-pancreatic_elastase_activity_GO:0008132	pancreatic elastase activity	GO:0008132	15	9	0.90583203	1.000	1	0.42646971	0.000		
-tissue_regeneration_GO:0042246	tissue regeneration	GO:0042246	10	9	1.29652495	1.000	1	0.42646971	0.000		
-elastase_activity_GO:0042708	elastase activity	GO:0042708	28	19	0.78920087	1.000	1	0.08674553	0.000		
-bioactive_lipid_receptor_activity_GO:0045125	bioactive lipid receptor activity	GO:0045125	10	9	1.27066171	1.000	0	0.1456943	0.000		
-chitin_binding_GO:0008061	chitin binding	GO:0008061	10	9	1.54921799	1.000	2	0.30311413	0.000	GO:0030247|polysaccharide binding, 	
-interstitial_collagenase_activity_GO:0004232	interstitial collagenase activity	GO:0004232	14	11	0.71761407	1.000	0	0.09493658	0.000		
-collagenase_activity_GO:0008133	collagenase activity	GO:0008133	19	16	0.84996347	1.000	0	0.03252672	0.000		
-icosanoid_receptor_activity_GO:0004953	icosanoid receptor activity	GO:0004953	13	9	1.17139126	1.000	1	0.42646971	0.000	GO:0004954|prostanoid receptor activity, 	
-macrophage_elastase_activity_GO:0004234	macrophage elastase activity	GO:0004234	13	10	0.68423282	1.000	0	0.11760965	0.000		
-stromelysin_3_activity_GO:0004249	stromelysin 3 activity	GO:0004249	11	8	0.73883455	1.000	0	0.18048138	0.000		
-glycine-inhibited_chloride_channel_activity_GO:0004891	glycine-inhibited chloride channel activity	GO:0004891	9	8	0.58502431	1.000	0	0.18048138	0.000	GO:0005237|inhibitory extracellular ligand-gated ion channel activity, GO:0016934|glycine-gated chloride channel activity, 	
-glycine-gated_ion_channel_activity_GO:0016933	glycine-gated ion channel activity	GO:0016933	11	9	0.71951139	1.000	0	0.1456943	0.000		
-protein-hormone_receptor_activity_GO:0016500	protein-hormone receptor activity	GO:0016500	21	12	0.90516512	1.000	0	0.07663276	0.000		
-aldehyde-lyase_activity_GO:0016832	aldehyde-lyase activity	GO:0016832	11	9	1.52501853	1.000	0	0.1456943	0.000		
-hemocyte_development_GO:0007516	hemocyte development	GO:0007516	15	13	1.27817509	1.000	2	0.47385773	0.000		
-L-fucose_metabolism_GO:0042354	L-fucose metabolism	GO:0042354	10	9	1.31849276	1.000	1	0.42646971	0.000		
-monosaccharide_binding_GO:0048029	monosaccharide binding	GO:0048029	11	9	1.36675885	1.000	0	0.1456943	0.000		
-nitric_oxide_biosynthesis_GO:0006809	nitric oxide biosynthesis	GO:0006809	22	17	1.45948309	1.000	1	0.12189709	0.000	GO:0046209|nitric oxide metabolism, 	
-female_meiosis_GO:0007143	female meiosis	GO:0007143	11	9	1.56287702	1.000	1	0.42646971	0.000		
-neurotransmitter_uptake_GO:0001504	neurotransmitter uptake	GO:0001504	13	9	1.17381779	1.000	0	0.1456943	0.000		
-toxin_activity_GO:0015070	toxin activity	GO:0015070	10	9	0.96232394	1.000	0	0.1456943	0.000		
-membrane_alanyl_aminopeptidase_activity_GO:0004179	membrane alanyl aminopeptidase activity	GO:0004179	9	9	1.36007744	1.000	2	0.30311413	0.000	GO:0016284|alanine aminopeptidase activity, 	
+#
+#Fri Jul 02 18:33:18 EDT 2004
+minClassSize=14
+dataFolder=C\:\\jbproject\\ermineJ\\data\\genesets
+iterations=1000
+maxClassSize=20
+pValThreshold=1.0E-4
+analysisMethod=0
+annotFile=C\:\\jbproject\\ermineJ\\data\\HG-U95A.an.txt
+classFolder=C\:\\jbproject\\ermineJ\\data\\genesets
+doLog=true
+geneRepTreatment=1
+classFile=C\:\\jbproject\\ermineJ\\data\\go_200406-termdb.xml
+scoreFile=C\:\\jbproject\\ermineJ\\data\\one-way-anova-parsed.txt
+rawFile=C\:\\jbproject\\ermineJ\\data\\melanoma_and_sarcomaMAS5.txt
+quantile=50
+rawScoreMethod=1
+scorecol=2
+#
+#!	Class Name	Class ID	size	effective_size	raw score	pval	Corrected_pvalue	Same as:	Similar to:
+!	cyclin-dependent protein kinase activity	GO:0004693	29	15	3.000	0.0901578	0.000		
+!	cAMP biosynthesis	GO:0006171	19	16	2.000	0.26730591	0.000		
+!	triacylglycerol metabolism	GO:0006641	24	18	2.000	0.32777554	0.000		
+!	oxidoreduction coenzyme metabolism	GO:0006733	18	18	2.000	0.32777554	0.000		
+!	cAMP metabolism	GO:0046058	23	18	2.000	0.32777554	0.000		
+!	aromatic amino acid family metabolism	GO:0009072	30	19	2.000	0.35807411	0.000		
+!	neutral lipid metabolism	GO:0006638	26	20	2.000	0.38817217	0.000	GO:0006639|acylglycerol metabolism, 	
+!	organic cation porter activity	GO:0008513	17	14	1.000	0.46488518	0.000		
+!	B-cell proliferation	GO:0042100	21	14	1.000	0.46488518	0.000		
+!	hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds, in cyclic amidines	GO:0016814	18	14	1.000	0.46488518	0.000		
+!	steroid catabolism	GO:0006706	20	14	1.000	0.46488518	0.000		
+!	vacuole organization and biogenesis	GO:0007033	15	14	1.000	0.46488518	0.000		
+!	dicarboxylic acid transport	GO:0006835	18	14	1.000	0.46488518	0.000		
+!	regulation of synapse	GO:0007273	18	14	1.000	0.46488518	0.000		
+!	axon	GO:0030424	25	14	1.000	0.46488518	0.000		
+!	proton-transporting ATP synthase complex (sensu Eukarya)	GO:0005753	17	14	1.000	0.46488518	0.000	GO:0045255|hydrogen-translocating F-type ATPase complex, GO:0045259|proton-transporting ATP synthase complex, 	
+!	phorbol ester receptor activity	GO:0001565	22	14	1.000	0.46488518	0.000		
+!	lamellipodium	GO:0030027	17	14	1.000	0.46488518	0.000		
+!	ephrin receptor activity	GO:0005003	19	14	1.000	0.46488518	0.000		
+!	sex determination	GO:0007530	17	14	1.000	0.46488518	0.000		
+!	cilium	GO:0005929	21	14	1.000	0.46488518	0.000		
+!	G1 phase of mitotic cell cycle	GO:0000080	28	14	1.000	0.46488518	0.000		
+!	cyclic nucleotide binding	GO:0030551	19	14	1.000	0.46488518	0.000		
+!	immunoglobulin binding	GO:0019865	21	14	1.000	0.46488518	0.000		
+!	autophosphorylation	GO:0046777	24	14	1.000	0.46488518	0.000		
+!	mitochondrion organization and biogenesis	GO:0007005	20	15	1.000	0.50075919	0.000		
+!	SNARE binding	GO:0000149	18	15	1.000	0.50075919	0.000		
+!	glutathione metabolism	GO:0006749	20	15	1.000	0.50075919	0.000		
+!	myelination	GO:0042552	21	15	1.000	0.50075919	0.000		
+!	protein-synthesizing GTPase activity	GO:0008547	23	15	1.000	0.50075919	0.000		
+!	post-Golgi transport	GO:0006892	24	15	1.000	0.50075919	0.000		
+!	aromatic compound catabolism	GO:0019439	18	15	1.000	0.50075919	0.000		
+!	vitamin/cofactor transport	GO:0015875	20	15	1.000	0.50075919	0.000		
+!	nitric oxide mediated signal transduction	GO:0007263	20	15	1.000	0.50075919	0.000		
+!	posttranslational membrane targeting	GO:0006620	22	15	1.000	0.50075919	0.000		
+!	nicotinamide metabolism	GO:0006769	15	15	1.000	0.50075919	0.000		
+!	transmembrane receptor protein serine/threonine kinase activity	GO:0004675	23	15	1.000	0.50075919	0.000	GO:0005024|transforming growth factor beta receptor activity, 	
+!	fat-soluble vitamin metabolism	GO:0006775	18	15	1.000	0.50075919	0.000		
+!	calcium-dependent phospholipid binding	GO:0005544	17	15	1.000	0.50075919	0.000		
+!	anion:cation symporter activity	GO:0015296	21	15	1.000	0.50075919	0.000		
+!	neuronal cell recognition	GO:0008038	21	16	1.000	0.53504555	0.000		
+!	mitotic spindle assembly	GO:0007052	18	16	1.000	0.53504555	0.000		
+!	other carbon-nitrogen ligase activity	GO:0016883	18	16	1.000	0.53504555	0.000		
+!	iron ion homeostasis	GO:0006879	20	16	1.000	0.53504555	0.000		
+!	guanylate cyclase activity	GO:0004383	19	16	1.000	0.53504555	0.000		
+!	monovalent inorganic cation homeostasis	GO:0030004	17	16	1.000	0.53504555	0.000		
+!	pyridine nucleotide metabolism	GO:0019362	16	16	1.000	0.53504555	0.000		
+!	inorganic anion transporter activity	GO:0015103	18	16	1.000	0.53504555	0.000		
+!	oxidoreductase activity, acting on the CH-CH group of donors, other acceptors	GO:0016637	17	16	1.000	0.53504555	0.000		
+!	extrachromosomal DNA	GO:0046821	21	16	1.000	0.53504555	0.000		
+!	fatty acid beta-oxidation	GO:0006635	17	16	1.000	0.53504555	0.000		
+!	phosphorus-oxygen lyase activity	GO:0016849	20	17	1.000	0.56767766	0.000		
+!	regulation of protein catabolism	GO:0042176	21	17	1.000	0.56767766	0.000		
+!	N-acyltransferase activity	GO:0016410	23	17	1.000	0.56767766	0.000		
+!	ribonucleoside monophosphate biosynthesis	GO:0009156	20	17	1.000	0.56767766	0.000		
+!	mitochondrial transport	GO:0006839	24	17	1.000	0.56767766	0.000		
+!	nitric oxide biosynthesis	GO:0006809	22	17	1.000	0.56767766	0.000	GO:0046209|nitric oxide metabolism, 	
+!	regulation of proteolysis and peptidolysis	GO:0030162	22	17	1.000	0.56767766	0.000		
+!	actin filament	GO:0005884	19	17	1.000	0.56767766	0.000		
+!	response to osmotic stress	GO:0006970	19	17	1.000	0.56767766	0.000		
+!	histone acetyltransferase complex	GO:0000123	23	17	1.000	0.56767766	0.000		
+!	replisome	GO:0030894	28	17	1.000	0.56767766	0.000		
+!	cell-cell adherens junction	GO:0005913	26	17	1.000	0.56767766	0.000		
+!	cartilage condensation	GO:0001502	25	18	1.000	0.59862086	0.000		
+!	apoptosis activator activity	GO:0016506	30	18	1.000	0.59862086	0.000		
+!	ribonucleoside monophosphate metabolism	GO:0009161	21	18	1.000	0.59862086	0.000		
+!	MHC protein binding	GO:0042287	22	18	1.000	0.59862086	0.000		
+!	neurotransmitter metabolism	GO:0042133	26	18	1.000	0.59862086	0.000		
+!	early endosome	GO:0005769	22	18	1.000	0.59862086	0.000		
+!	peptide hormone	GO:0005180	25	18	1.000	0.59862086	0.000		
+!	embryonic pattern specification	GO:0009880	28	18	1.000	0.59862086	0.000		
+!	regulation of neuronal synaptic plasticity	GO:0048168	34	18	1.000	0.59862086	0.000		
+!	covalent chromatin modification	GO:0016569	19	18	1.000	0.59862086	0.000	GO:0016570|histone modification, 	
+!	response to toxin	GO:0009636	27	19	1.000	0.62786637	0.000		
+!	nerve ensheathment	GO:0008366	25	19	1.000	0.62786637	0.000	GO:0042551|nerve maturation, 	
+!	DNA-directed DNA polymerase activity	GO:0003887	24	19	1.000	0.62786637	0.000		
+!	nucleoside monophosphate biosynthesis	GO:0009124	23	19	1.000	0.62786637	0.000		
+!	catecholamine metabolism	GO:0006584	23	20	1.000	0.65542626	0.000		
+!	inositol/phosphatidylinositol phosphatase activity	GO:0004437	29	20	1.000	0.65542626	0.000		
+!	single-stranded RNA binding	GO:0003727	27	20	1.000	0.65542626	0.000		
+!	sensory organ development	GO:0007423	27	20	1.000	0.65542626	0.000		
+!	insulin receptor signaling pathway	GO:0008286	32	20	1.000	0.65542626	0.000		
+!	oxidoreductase activity, acting on the aldehyde or oxo group of donors, NAD or NADP as acceptor	GO:0016620	24	20	1.000	0.65542626	0.000		
+!	regulation of endocytosis	GO:0030100	30	20	1.000	0.65542626	0.000		
+!	nucleoside monophosphate metabolism	GO:0009123	24	20	1.000	0.65542626	0.000		
+!	regulation of protein-nucleus import	GO:0042306	20	14	0.000	0.79179169	0.000		
+!	actin cross-linking activity	GO:0003780	21	14	0.000	0.79179169	0.000		
+!	phosphoenolpyruvate-dependent sugar phosphotransferase system	GO:0009401	16	14	0.000	0.79179169	0.000		
+!	Golgi stack	GO:0005795	24	14	0.000	0.79179169	0.000		
+!	regulation of mitotic cell cycle	GO:0007346	20	14	0.000	0.79179169	0.000		
+!	porphyrin biosynthesis	GO:0006779	16	14	0.000	0.79179169	0.000		
+!	transport vesicle	GO:0030133	19	14	0.000	0.79179169	0.000		
+!	calcium ion transporter activity	GO:0015085	21	14	0.000	0.79179169	0.000		
+!	brush border	GO:0005903	16	14	0.000	0.79179169	0.000		
+!	glutamine family amino acid catabolism	GO:0009065	20	14	0.000	0.79179169	0.000		
+!	lipid raft	GO:0045121	21	14	0.000	0.79179169	0.000		
+!	blood coagulation factor activity	GO:0003801	14	14	0.000	0.79179169	0.000		
+!	adrenoceptor activity	GO:0004935	19	14	0.000	0.79179169	0.000		
+!	phosphatase inhibitor activity	GO:0019212	23	14	0.000	0.79179169	0.000		
+!	mating behavior	GO:0007617	19	14	0.000	0.79179169	0.000		
+!	two-component signal transduction system (phosphorelay)	GO:0000160	22	14	0.000	0.79179169	0.000		
+!	tyrosine phosphorylation of STAT protein	GO:0007260	21	14	0.000	0.79179169	0.000		
+!	acetylcholine receptor activity	GO:0015464	14	14	0.000	0.79179169	0.000		
+!	Rho guanyl-nucleotide exchange factor activity	GO:0005089	17	14	0.000	0.79179169	0.000		
+!	endoplasmic reticulum lumen	GO:0005788	15	14	0.000	0.79179169	0.000		
+!	post-embryonic development	GO:0009791	23	14	0.000	0.79179169	0.000		
+!	complement activity	GO:0003811	15	14	0.000	0.79179169	0.000		
+!	sphingolipid biosynthesis	GO:0030148	16	14	0.000	0.79179169	0.000		
+!	chromatin remodeling complex	GO:0016585	23	14	0.000	0.79179169	0.000		
+!	MHC class I receptor activity	GO:0030106	21	14	0.000	0.79179169	0.000		
+!	negative regulation of cell adhesion	GO:0007162	17	14	0.000	0.79179169	0.000		
+!	dynein complex	GO:0030286	18	14	0.000	0.79179169	0.000		
+!	complement activation, alternative pathway	GO:0006957	17	14	0.000	0.79179169	0.000		
+!	positive regulation of growth	GO:0045927	15	14	0.000	0.79179169	0.000		
+!	detection of biotic stimulus	GO:0009595	19	14	0.000	0.79179169	0.000	GO:0009596|detection of pest/pathogen/parasite, 	
+!	sperm motility	GO:0030317	15	14	0.000	0.79179169	0.000		
+!	negative regulation of angiogenesis	GO:0016525	21	14	0.000	0.79179169	0.000		
+!	neurotransmitter transporter activity	GO:0005326	18	14	0.000	0.79179169	0.000		
+!	subtilase activity	GO:0004289	19	14	0.000	0.79179169	0.000		
+!	protein prenylation	GO:0018342	21	14	0.000	0.79179169	0.000		
+!	gliogenesis	GO:0042063	26	14	0.000	0.79179169	0.000		
+!	response to organic substance	GO:0010033	18	14	0.000	0.79179169	0.000		
+!	Golgi vesicle	GO:0005798	22	14	0.000	0.79179169	0.000		
+!	galactosyltransferase activity	GO:0008378	18	15	0.000	0.81388122	0.000		
+!	aspartate family amino acid metabolism	GO:0009066	19	15	0.000	0.81388122	0.000		
+!	iron ion transport	GO:0006826	18	15	0.000	0.81388122	0.000		
+!	L-amino acid transport	GO:0015807	23	15	0.000	0.81388122	0.000		
+!	ubiquitin-specific protease activity	GO:0004843	22	15	0.000	0.81388122	0.000		
+!	synaptic transmission, cholinergic	GO:0007271	18	15	0.000	0.81388122	0.000		
+!	ATP-dependent RNA helicase activity	GO:0004004	18	15	0.000	0.81388122	0.000	GO:0008186|RNA-dependent ATPase activity, 	
+!	inactivation of MAPK	GO:0000188	23	15	0.000	0.81388122	0.000		
+!	response to UV	GO:0009411	20	15	0.000	0.81388122	0.000		
+!	acetylcholine binding	GO:0042166	17	15	0.000	0.81388122	0.000		
+!	metanephros development	GO:0001656	27	15	0.000	0.81388122	0.000	GO:0001822|kidney development, 	
+!	exo-alpha-sialidase activity	GO:0004308	18	15	0.000	0.81388122	0.000	GO:0016997|alpha-sialidase activity, 	
+!	dendrite morphogenesis	GO:0016358	28	15	0.000	0.81388122	0.000		
+!	platelet activation	GO:0030168	18	15	0.000	0.81388122	0.000		
+!	drug binding	GO:0008144	22	15	0.000	0.81388122	0.000		
+!	male meiosis	GO:0007140	24	15	0.000	0.81388122	0.000		
+!	BMP signaling pathway	GO:0030509	23	15	0.000	0.81388122	0.000		
+!	reproductive behavior	GO:0019098	20	15	0.000	0.81388122	0.000		
+!	cell-matrix junction	GO:0030055	19	15	0.000	0.81388122	0.000		
+!	acetylglucosaminyltransferase activity	GO:0008375	20	15	0.000	0.81388122	0.000		
+!	nucleotide kinase activity	GO:0019201	22	15	0.000	0.81388122	0.000		
+!	scavenger receptor activity	GO:0005044	18	15	0.000	0.81388122	0.000		
+!	voltage-gated chloride channel activity	GO:0005247	17	15	0.000	0.81388122	0.000		
+!	neutrophil chemotaxis	GO:0030593	30	15	0.000	0.81388122	0.000		
+!	endoribonuclease activity, producing 5'-phosphomonoesters	GO:0016891	20	15	0.000	0.81388122	0.000		
+!	endocytic vesicle	GO:0030139	17	15	0.000	0.81388122	0.000		
+!	cyclophilin-type peptidyl-prolyl cis-trans isomerase activity	GO:0042027	20	15	0.000	0.81388122	0.000		
+!	DNA-directed RNA polymerase II, core complex	GO:0005665	20	15	0.000	0.81388122	0.000		
+!	nuclear inner membrane	GO:0005637	19	15	0.000	0.81388122	0.000		
+!	epithelial cell differentiation	GO:0030855	25	15	0.000	0.81388122	0.000		
+!	ATP-dependent DNA helicase activity	GO:0004003	24	15	0.000	0.81388122	0.000		
+!	calcium ion-dependent exocytosis	GO:0017156	19	15	0.000	0.81388122	0.000		
+!	intercellular junction assembly and/or maintenance	GO:0045216	19	15	0.000	0.81388122	0.000		
+!	cotranslational membrane targeting	GO:0006613	17	15	0.000	0.81388122	0.000		
+!	steroid hormone receptor signaling pathway	GO:0030518	25	15	0.000	0.81388122	0.000		
+!	axon guidance receptor activity	GO:0008046	19	15	0.000	0.81388122	0.000		
+!	nucleosome	GO:0005718	17	15	0.000	0.81388122	0.000		
+!	regulation of ossification	GO:0030278	26	16	0.000	0.83362869	0.000	GO:0046850|regulation of bone remodeling, 	
+!	protein ubiquitination	GO:0016567	26	16	0.000	0.83362869	0.000		
+!	superoxide metabolism	GO:0006801	21	16	0.000	0.83362869	0.000		
+!	intracellular receptor-mediated signaling pathway	GO:0030522	26	16	0.000	0.83362869	0.000		
+!	oxidoreductase activity, acting on the CH-NH group of donors	GO:0016645	23	16	0.000	0.83362869	0.000		
+!	microfilament motor activity	GO:0000146	22	16	0.000	0.83362869	0.000		
+!	negative regulation of adenylate cyclase activity	GO:0007194	21	16	0.000	0.83362869	0.000	GO:0045761|regulation of adenylate cyclase activity, 	
+!	oxidoreductase activity, acting on the CH-NH2 group of donors, oxygen as acceptor	GO:0016641	22	16	0.000	0.83362869	0.000		
+!	proteoglycan metabolism	GO:0006029	22	16	0.000	0.83362869	0.000		
+!	phosphoinositide biosynthesis	GO:0046489	20	16	0.000	0.83362869	0.000		
+!	calcium-mediated signaling	GO:0019722	20	16	0.000	0.83362869	0.000		
+!	chromosome condensation	GO:0030261	19	16	0.000	0.83362869	0.000		
+!	fibroblast growth factor receptor binding	GO:0005104	29	16	0.000	0.83362869	0.000		
+!	phospholipase A2 activity	GO:0004623	17	16	0.000	0.83362869	0.000		
+!	axis specification	GO:0009798	22	16	0.000	0.83362869	0.000		
+!	bone mineralization	GO:0030282	23	16	0.000	0.83362869	0.000		
+!	troponin complex	GO:0005861	20	16	0.000	0.83362869	0.000		
+!	collagenase activity	GO:0008133	19	16	0.000	0.83362869	0.000		
+!	dopamine receptor signaling pathway	GO:0007212	21	16	0.000	0.83362869	0.000		
+!	calcium channel regulator activity	GO:0005246	20	16	0.000	0.83362869	0.000		
+!	leukotriene metabolism	GO:0006691	18	16	0.000	0.83362869	0.000		
+!	peroxisomal membrane	GO:0005778	18	16	0.000	0.83362869	0.000		
+!	cell cortex	GO:0005938	23	16	0.000	0.83362869	0.000		
+!	mitotic recombination	GO:0006312	25	16	0.000	0.83362869	0.000		
+!	regulation of actin polymerization and/or depolymerization	GO:0008064	21	16	0.000	0.83362869	0.000		
+!	fructose metabolism	GO:0006000	20	16	0.000	0.83362869	0.000		
+!	antigen presentation, exogenous antigen	GO:0019884	28	16	0.000	0.83362869	0.000		
+!	biogenic amine biosynthesis	GO:0042401	24	17	0.000	0.85128226	0.000		
+!	external encapsulating structure	GO:0030312	21	17	0.000	0.85128226	0.000		
+!	kinetochore	GO:0000776	24	17	0.000	0.85128226	0.000		
+!	regulation of exocytosis	GO:0017157	24	17	0.000	0.85128226	0.000		
+!	deoxyribonuclease activity	GO:0004536	28	17	0.000	0.85128226	0.000		
+!	negative regulation of protein kinase activity	GO:0006469	27	17	0.000	0.85128226	0.000		
+!	peroxidase reaction	GO:0006804	19	17	0.000	0.85128226	0.000		
+!	urogenital system development	GO:0001655	30	17	0.000	0.85128226	0.000		
+!	protein localization	GO:0008104	27	17	0.000	0.85128226	0.000		
+!	hexose transport	GO:0008645	23	17	0.000	0.85128226	0.000	GO:0015749|monosaccharide transport, GO:0015758|glucose transport, 	
+!	synaptic vesicle endocytosis	GO:0008099	21	17	0.000	0.85128226	0.000		
+!	intra-Golgi transport	GO:0006891	22	17	0.000	0.85128226	0.000		
+!	tRNA processing	GO:0008033	20	17	0.000	0.85128226	0.000		
+!	polysaccharide biosynthesis	GO:0000271	20	17	0.000	0.85128226	0.000		
+!	regulation of nucleocytoplasmic transport	GO:0046822	23	17	0.000	0.85128226	0.000		
+!	phospholipid transporter activity	GO:0005548	21	17	0.000	0.85128226	0.000		
+!	protein prenyltransferase activity	GO:0008318	25	17	0.000	0.85128226	0.000		
+!	hormone secretion	GO:0046879	28	17	0.000	0.85128226	0.000		
+!	embryonic limb morphogenesis	GO:0030326	24	17	0.000	0.85128226	0.000		
+!	cytochrome-c oxidase activity	GO:0004129	19	17	0.000	0.85128226	0.000	GO:0015002|heme-copper terminal oxidase activity, GO:0016675|oxidoreductase activity, acting on heme group of donors, GO:0016676|oxidoreductase activity, acting on heme group of donors, oxygen as acceptor, 	
+!	meiotic recombination	GO:0007131	30	18	0.000	0.86706381	0.000		
+!	negative regulation of biosynthesis	GO:0009890	23	18	0.000	0.86706381	0.000		
+!	negative regulation of coagulation	GO:0050819	18	18	0.000	0.86706381	0.000		
+!	transferase activity, transferring pentosyl groups	GO:0016763	25	18	0.000	0.86706381	0.000		
+!	glutathione transferase activity	GO:0004364	26	18	0.000	0.86706381	0.000		
+!	cell projection organization and biogenesis	GO:0030030	25	18	0.000	0.86706381	0.000	GO:0030031|cell projection biogenesis, 	
+!	vesicle docking during exocytosis	GO:0006904	26	18	0.000	0.86706381	0.000	GO:0048278|vesicle docking, 	
+!	transition metal ion transporter activity	GO:0046915	20	18	0.000	0.86706381	0.000		
+!	heme metabolism	GO:0042168	20	18	0.000	0.86706381	0.000		
+!	heavy metal binding	GO:0005505	24	18	0.000	0.86706381	0.000		
+!	cytokine and chemokine mediated signaling pathway	GO:0019221	26	18	0.000	0.86706381	0.000		
+!	glycolipid metabolism	GO:0006664	25	18	0.000	0.86706381	0.000		
+!	voltage-gated calcium channel complex	GO:0005891	29	18	0.000	0.86706381	0.000		
+!	cysteine protease inhibitor activity	GO:0004869	27	18	0.000	0.86706381	0.000		
+!	proteasome core complex (sensu Eukarya)	GO:0005839	23	18	0.000	0.86706381	0.000		
+!	gamma-aminobutyric acid signaling pathway	GO:0007214	18	18	0.000	0.86706381	0.000		
+!	tumor necrosis factor receptor binding	GO:0005164	22	18	0.000	0.86706381	0.000		
+!	C21-steroid hormone biosynthesis	GO:0006700	25	18	0.000	0.86706381	0.000	GO:0008207|C21-steroid hormone metabolism, 	
+!	collagen binding	GO:0005518	29	19	0.000	0.88117172	0.000		
+!	nucleotide-excision repair	GO:0006289	33	19	0.000	0.88117172	0.000		
+!	insulin-like growth factor binding	GO:0005520	29	19	0.000	0.88117172	0.000		
+!	protein kinase C binding	GO:0005080	32	19	0.000	0.88117172	0.000		
+!	receptor signaling complex scaffold activity	GO:0030159	26	19	0.000	0.88117172	0.000		
+!	muscle motor activity	GO:0003776	25	19	0.000	0.88117172	0.000		
+!	RNA polymerase complex	GO:0030880	25	19	0.000	0.88117172	0.000		
+!	elastase activity	GO:0042708	28	19	0.000	0.88117172	0.000		
+!	receptor signaling protein serine/threonine kinase signaling protein activity	GO:0005076	23	19	0.000	0.88117172	0.000		
+!	small nucleolar ribonucleoprotein complex	GO:0005732	23	19	0.000	0.88117172	0.000		
+!	membrane organization and biogenesis	GO:0016044	28	19	0.000	0.88117172	0.000		
+!	serotonin receptor activity	GO:0004993	29	19	0.000	0.88117172	0.000		
+!	peroxisome organization and biogenesis	GO:0007031	22	19	0.000	0.88117172	0.000		
+!	somatostatin receptor activity	GO:0004994	25	19	0.000	0.88117172	0.000		
+!	prostanoid metabolism	GO:0006692	27	19	0.000	0.88117172	0.000	GO:0006693|prostaglandin metabolism, 	
+!	secretory granule	GO:0030141	25	19	0.000	0.88117172	0.000		
+!	regulation of lymphocyte proliferation	GO:0050670	28	19	0.000	0.88117172	0.000		
+!	mRNA polyadenylation	GO:0006378	23	19	0.000	0.88117172	0.000		
+!	G-protein coupled photoreceptor activity	GO:0008020	30	19	0.000	0.88117172	0.000		
+!	Rho GTPase activator activity	GO:0005100	28	19	0.000	0.88117172	0.000		
+!	sodium channel activity	GO:0005272	20	19	0.000	0.88117172	0.000		
+!	oxidoreductase activity, acting on the CH-NH2 group of donors	GO:0016638	26	19	0.000	0.88117172	0.000		
+!	icosanoid biosynthesis	GO:0046456	30	19	0.000	0.88117172	0.000		
+!	pyrimidine nucleotide metabolism	GO:0006220	26	19	0.000	0.88117172	0.000		
+!	establishment and/or maintenance of cell polarity	GO:0007163	27	19	0.000	0.88117172	0.000		
+!	porphyrin metabolism	GO:0006778	21	19	0.000	0.88117172	0.000		
+!	transmembrane receptor protein tyrosine phosphatase activity	GO:0005001	37	19	0.000	0.88117172	0.000	GO:0019198|transmembrane receptor protein phosphatase activity, 	
+!	regulation of actin filament length	GO:0030832	27	19	0.000	0.88117172	0.000		
+!	antiviral response protein activity	GO:0003800	27	20	0.000	0.89378338	0.000		
+!	mRNA-nucleus export	GO:0006406	29	20	0.000	0.89378338	0.000		
+!	clathrin vesicle coat	GO:0030125	23	20	0.000	0.89378338	0.000		
+!	DNA replication initiation	GO:0006270	26	20	0.000	0.89378338	0.000		
+!	protein amino acid ADP-ribosylation	GO:0006471	29	20	0.000	0.89378338	0.000		
+!	negative regulation of cell differentiation	GO:0045596	26	20	0.000	0.89378338	0.000		
+!	protein kinase C activation	GO:0007205	22	20	0.000	0.89378338	0.000		
+!	B-cell differentiation	GO:0030183	24	20	0.000	0.89378338	0.000		
+!	non-membrane spanning protein tyrosine kinase activity	GO:0004715	38	20	0.000	0.89378338	0.000		
+!	nucleobase metabolism	GO:0009112	23	20	0.000	0.89378338	0.000		
+!	ceramide metabolism	GO:0006672	28	20	0.000	0.89378338	0.000		
+!	DNA alkylation	GO:0006305	29	20	0.000	0.89378338	0.000	GO:0006306|DNA methylation, 	
+!	photoreceptor activity	GO:0009881	31	20	0.000	0.89378338	0.000		
+!	mitochondrial electron transport, NADH to ubiquinone	GO:0006120	23	20	0.000	0.89378338	0.000		
+!	double-stranded RNA binding	GO:0003725	28	20	0.000	0.89378338	0.000		
+!	lipoprotein binding	GO:0008034	27	20	0.000	0.89378338	0.000		
+!	steroid hydroxylase activity	GO:0008395	36	20	0.000	0.89378338	0.000		
+!	regulation of protein kinase activity	GO:0045859	30	20	0.000	0.89378338	0.000		
+!	synaptic vesicle exocytosis	GO:0016079	25	20	0.000	0.89378338	0.000		
+!	heterogeneous nuclear ribonucleoprotein complex	GO:0030530	26	20	0.000	0.89378338	0.000		

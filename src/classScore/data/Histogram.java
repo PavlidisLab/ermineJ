@@ -1,5 +1,9 @@
 package classScore.data;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,15 +55,15 @@ public class Histogram {
       this.minimum = min;
       this.maximum = max;
       this.minimumGeneSetSize = min_class_size;
-      set_number_of_runs( number_of_runs );
-      set_number_of_bins();
+      setNumRuns( number_of_runs );
+      calcNumOfBins();
 
       M = new DenseDoubleMatrix2DNamed( number_of_class, numBins + 1 );
    }
 
    /**
     */
-   public void set_number_of_bins() {
+   public void calcNumOfBins() {
       numBins = ( int ) ( ( maximum - minimum ) / binSize );
       if ( numBins < 1 ) {
          throw new IllegalStateException(
@@ -71,7 +75,7 @@ public class Histogram {
     * 
     * @param runs int
     */
-   public void set_number_of_runs( int runs ) {
+   public void setNumRuns( int runs ) {
       numItemsPerHistogram = runs;
       minPval = 0.5 / numItemsPerHistogram; // the best possible
       // pvalue for
@@ -219,23 +223,23 @@ public class Histogram {
    /**
     * Prints the histogram to stdout.
     */
-   public void print() {
+   public void print(Writer s) throws IOException {
       // print a heading
       int stepsize = 20;
-      System.out.print( "heading:" );
+      s.write( "heading:" );
       for ( int j = 0; j < M.columns(); j += stepsize ) { // for each bin in
          // this histogram.
-         System.out.print( "\t" + ( minimum + binSize * j ) );
+         s.write( "\t" + ( minimum + binSize * j ) );
       }
-      System.out.print( "\n" );
+      s.write( "\n" );
 
       for ( int i = 0; i < M.rows(); i++ ) { // for each histogram (class size)
-         System.out.print( "row:" );
+         s.write( "row:" );
          for ( int j = 0; j < M.columns(); j += stepsize ) { // for each bin in
             // this histogram.
             System.out.print( "\t" + M.getQuick( i, j ) );
          }
-         System.out.print( "\n" );
+         s.write( "\n" );
       }
    }
 
