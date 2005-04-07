@@ -73,6 +73,7 @@ public class JGeneSetFrame extends JFrame {
     private static final String WINDOWWIDTH = "WindowWidth";
     private static final String MATRIXCOLUMNWIDTH = "ColumnWidth";
     private static final String SAVESTARTPATH = "StartPath";
+    private static final String INCLUDELABELS = "includeImageLabels";
     private static final String GUI_PREFS = "GUI.prefs";
     private Properties properties;
     private String pref_file;
@@ -124,6 +125,9 @@ public class JGeneSetFrame extends JFrame {
     private int height;
     private int matrixColumnWidth; // how wide the color image columns are.
 
+    private boolean includeLabels = true; // whether when saving data we include the row/column labels.
+    
+    
     /**
      * @param res
      * @param run
@@ -203,6 +207,9 @@ public class JGeneSetFrame extends JFrame {
 
                 if ( properties.containsKey( MATRIXCOLUMNWIDTH ) )
                     matrixColumnWidth = Integer.parseInt( properties.getProperty( MATRIXCOLUMNWIDTH ) );
+                
+                if (properties.containsKey(INCLUDELABELS)) 
+                    this.includeLabels = Boolean.getBoolean(properties.getProperty(INCLUDELABELS));
 
             }
         } catch ( IOException ex ) {
@@ -358,9 +365,9 @@ public class JGeneSetFrame extends JFrame {
      */
     private void initChoosers() {
         if ( m_matrixDisplay == null ) return;
-       
-        imageChooser = new JImageFileChooser( true, m_matrixDisplay.getStandardizedEnabled() );
-        fileChooser = new JDataFileChooser( true, m_matrixDisplay.getStandardizedEnabled() );
+        
+        imageChooser = new JImageFileChooser( this.includeLabels, m_matrixDisplay.getStandardizedEnabled() );
+        fileChooser = new JDataFileChooser( this.includeLabels, m_matrixDisplay.getStandardizedEnabled() );
         readPathPrefs();
     }
 
@@ -837,7 +844,8 @@ public class JGeneSetFrame extends JFrame {
         properties.setProperty( WINDOWWIDTH, String.valueOf( this.getWidth() ) );
         properties.setProperty( WINDOWHEIGHT, String.valueOf( this.getHeight() ) );
         properties.setProperty( MATRIXCOLUMNWIDTH, String.valueOf( this.matrixColumnWidth ) );
-
+        properties.setProperty(INCLUDELABELS, String.valueOf(this.includeLabels));
+        
         if ( imageChooser != null )
             properties.setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
 

@@ -31,8 +31,6 @@ public class JImageFileChooser extends JFileChooser {
    public JImageFileChooser( boolean includeLabels, boolean normalize ) {
 
       super();
-
-      //super.setSelectedFile();
       
       // Create a file filter for the file chooser
       ImageFileFilter imageFileFilter = new ImageFileFilter();
