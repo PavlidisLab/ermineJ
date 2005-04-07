@@ -32,6 +32,8 @@ public class JImageFileChooser extends JFileChooser {
 
       super();
 
+      //super.setSelectedFile();
+      
       // Create a file filter for the file chooser
       ImageFileFilter imageFileFilter = new ImageFileFilter();
       super.setFileFilter( imageFileFilter );
