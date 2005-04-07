@@ -868,7 +868,7 @@ public class JGeneSetFrame extends JFrame {
     void table_mouseMoved( MouseEvent e ) {
         int i = m_table.rowAtPoint( e.getPoint() );
         int j = m_table.columnAtPoint( e.getPoint() );
-        if ( i > 0 && j > 0 && j == m_table.getColumnCount() - 2 && m_table.getValueAt( i, j ) != null ) {
+        if ( i >= 0 && j == m_table.getColumnCount() - 2 && m_table.getValueAt( i, j ) != null ) {
             setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
         } else
             setCursor( Cursor.getDefaultCursor() );
