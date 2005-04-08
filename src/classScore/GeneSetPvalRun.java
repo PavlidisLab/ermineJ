@@ -50,6 +50,8 @@ public class GeneSetPvalRun {
    private Set activeProbes;
    private Settings settings;
 
+   private long randomSeed = -1;
+
    private String name; // name of this run.
 
    /**
@@ -65,9 +67,8 @@ public class GeneSetPvalRun {
     * @param results
     * @param name Name of the run
     */
-   public GeneSetPvalRun( Set activeProbes, Settings settings,
-         GeneAnnotations geneData, DenseDoubleMatrix2DNamed rawData,
-         GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
+   public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData,
+         DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
          Map results, String name ) {
       this.settings = settings;
       this.geneData = geneData;
@@ -80,13 +81,11 @@ public class GeneSetPvalRun {
       sortResults();
       // get the class sizes.
 
-      GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes,
-            geneData, geneScores, settings.getUseWeights() );
-
+      GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
 
       messenger.setStatus( "Multiple test correction..." );
-      MultipleTestCorrector mt = new MultipleTestCorrector( settings,
-            sortedclasses, hist, geneData, csc, geneScores, results, null );
+      MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
+            results, null );
       String mtc_method = "bh";
       if ( mtc_method.equals( "bon" ) ) {
          mt.bonferroni();
@@ -98,8 +97,7 @@ public class GeneSetPvalRun {
 
       // For table output
       for ( int i = 0; i < sortedclasses.size(); i++ ) {
-         ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) )
-               .setRank( i + 1 );
+         ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) ).setRank( i + 1 );
       }
       messenger.setStatus( "Done!" );
    }
@@ -117,9 +115,8 @@ public class GeneSetPvalRun {
     * @param name Name of the run
     * @throws IllegalArgumentException
     */
-   public GeneSetPvalRun( Set activeProbes, Settings settings,
-         GeneAnnotations geneData, DenseDoubleMatrix2DNamed rawData,
-         GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
+   public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData,
+         DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
          String name ) throws IllegalArgumentException {
       this.settings = settings;
       this.geneData = geneData;
@@ -132,26 +129,25 @@ public class GeneSetPvalRun {
       results = new LinkedHashMap();
 
       // get the class sizes.
-      GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes,
-            geneData, geneScores, settings.getUseWeights() );
-
+      GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
 
       switch ( settings.getAnalysisMethod() ) {
          case Settings.RESAMP: {
-            NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore(
-                  settings, geneScores );
+            NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings, geneScores );
 
             messenger.setStatus( "Starting resampling" );
+
+            if ( randomSeed >= 0 ) {
+               probePvalMapper.setRandomSeed( randomSeed );
+            }
             hist = probePvalMapper.generateNullDistribution( messenger );
 
             messenger.setStatus( "Finished resampling" );
 
-            GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator(
-                  settings, geneData, hist, csc, goData );
+            GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, goData );
 
             // calculate the actual class scores and correct sorting.
-            pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores
-                  .getProbeToPvalMap() );
+            pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToPvalMap() );
             results = pvg.getResults();
             break;
          }
@@ -163,31 +159,33 @@ public class GeneSetPvalRun {
 
             messenger.setStatus( "Starting ORA analysis" );
 
-            OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator(
-                  settings, geneData, csc, goData, inputSize );
-            int numOver  = pvg.hgSizes( inp_entries );
-            
-            if (numOver == 0) {
-               messenger.setError("No genes selected at that threshold!");
+            OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator( settings, geneData, csc, goData,
+                  inputSize );
+            int numOver = pvg.hgSizes( inp_entries );
+
+            if ( numOver == 0 ) {
+               messenger.setError( "No genes selected at that threshold!" );
                break;
             }
-            
-            pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores
-                  .getProbeToPvalMap() );
+
+            pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToPvalMap() );
             results = pvg.getResults();
             messenger.setStatus( "Finished with ORA computations: " + numOver + " probes passed your threshold." );
             break;
          }
          case Settings.CORR: {
             messenger.setStatus( "Starting correlation resampling" );
-            NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore(
-                  settings, rawData );
+            NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings, rawData );
+
+            if ( randomSeed >= 0 ) {
+               probePvalMapper.setRandomSeed( randomSeed );
+            }
+
             hist = probePvalMapper.generateNullDistribution( messenger );
 
-            CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator(
-                  settings, geneData, csc, goData, rawData, hist );
-            messenger
-                  .setStatus( "Finished resampling, computing for gene sets" );
+            CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings,
+                  geneData, csc, goData, rawData, hist );
+            messenger.setStatus( "Finished resampling, computing for gene sets" );
             pvg.geneSetCorrelationGenerator( messenger );
             messenger.setStatus( "Finished computing scores" );
             results = pvg.getResults();
@@ -205,31 +203,29 @@ public class GeneSetPvalRun {
             //            }
             // fall through. - unsupported.
          }
-         
+
          case Settings.TTEST: { // todo implement this
             // fall through. - unsupported.
          }
-         
+
          case Settings.KS: { // todo implement this
             // fall through. - unsupported.
          }
-         
-         
+
          default: {
-            throw new UnsupportedOperationException(
-                  "Unsupported analysis method" );
+            throw new UnsupportedOperationException( "Unsupported analysis method" );
          }
       }
 
-      if (results.size() == 0) {
+      if ( results.size() == 0 ) {
          return;
       }
-      
+
       sortResults();
 
       messenger.setStatus( "Multiple test correction..." );
-      MultipleTestCorrector mt = new MultipleTestCorrector( settings,
-            sortedclasses, hist, geneData, csc, geneScores, results, messenger );
+      MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
+            results, messenger );
       int mtc_method = settings.getMtc();
 
       if ( mtc_method == Settings.BONFERONNI ) {
@@ -242,8 +238,7 @@ public class GeneSetPvalRun {
 
       // For table output
       for ( int i = 0; i < sortedclasses.size(); i++ ) {
-         ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) )
-               .setRank( i + 1 );
+         ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) ).setRank( i + 1 );
       }
       messenger.setStatus( "Done!" );
    }
@@ -264,25 +259,21 @@ public class GeneSetPvalRun {
          Double pvalue;
          String probeID = ( String ) probeIDs.get( i );
          if ( settings.getDoLog() == true ) {
-            pvalue = new Double( Math.pow( 10.0, -( ( Double ) geneScores
-                  .getProbeToPvalMap().get( probeID ) ).doubleValue() ) );
+            pvalue = new Double( Math.pow( 10.0, -( ( Double ) geneScores.getProbeToPvalMap().get( probeID ) )
+                  .doubleValue() ) );
          } else {
             pvalue = ( Double ) geneScores.getProbeToPvalMap().get( probeID );
          }
-         pvals.put( ( ( ArrayList ) classToProbe.get( classID ) ).get( i ),
-               pvalue );
+         pvals.put( ( ( ArrayList ) classToProbe.get( classID ) ).get( i ), pvalue );
       }
 
       if ( probeIDs == null ) {
-         throw new IllegalStateException( "Class data retrieval error for "
-               + name );
+         throw new IllegalStateException( "Class data retrieval error for " + name );
       }
 
       // create the details frame
-      JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings,
-            this, res );
-      f.setTitle( name + " (" + probeIDs.size() + " items) p="
-            + nf.format( res.getPvalue() ) );
+      JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings, this, res );
+      f.setTitle( name + " (" + probeIDs.size() + " items) p=" + nf.format( res.getPvalue() ) );
       f.show();
    }
 
@@ -333,5 +324,16 @@ public class GeneSetPvalRun {
 
    public Histogram getHist() {
       return hist;
+   }
+
+   /**
+    * Set a specific random seed for use in all resampling-based runs. If not set, the seed is chosen by the software.
+    * <p>
+    * 
+    * @param randomSeed A positive value. Negative values are ignored.
+    */
+   public void setRandomSeed( long randomSeed ) {
+      if ( randomSeed < 0 ) return;
+      this.randomSeed = randomSeed;
    }
 }

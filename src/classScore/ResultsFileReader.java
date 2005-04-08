@@ -16,7 +16,7 @@ import classScore.data.GeneSetResult;
 /**
  * <hr>
  * <p>
- * Copyright (c) 2004 Columbia University
+ * Copyright (c) 2004-2005 Columbia University
  * 
  * @author Homin Lee
  * @version $Id$
@@ -24,44 +24,42 @@ import classScore.data.GeneSetResult;
 
 public class ResultsFileReader {
 
-   private Map results;
+    private Map results;
 
-   public ResultsFileReader( String filename, StatusViewer messenger )
-         throws NumberFormatException, IOException {
-      results = new LinkedHashMap();
+    public ResultsFileReader( String filename, StatusViewer messenger ) throws NumberFormatException, IOException {
+        results = new LinkedHashMap();
 
-      File infile = new File( filename );
-      if ( !infile.exists() || !infile.canRead() ) {
-         throw new IOException( "Could not read " + filename );
-      }
+        File infile = new File( filename );
+        if ( !infile.exists() || !infile.canRead() ) {
+            throw new IOException( "Could not read " + filename );
+        }
 
-      FileInputStream fis = new FileInputStream( filename );
-      BufferedInputStream bis = new BufferedInputStream( fis );
-      BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
+        BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( new FileInputStream(
+                filename ) ) ) );
 
-      messenger.setStatus( "Loading analysis..." );
-      String line;
-      //line = dis.readLine(); // ditch the header.
-      while ( ( line = dis.readLine() ) != null ) {
-         StringTokenizer st = new StringTokenizer( line, "\t" );
-         String firstword = st.nextToken();
-         if ( firstword.compareTo( "!" ) == 0 ) {
-            String className = st.nextToken();
-            String classId = st.nextToken();
-            int size = Integer.parseInt( st.nextToken() );
-            int effsize = Integer.parseInt( st.nextToken() );
-            double score = Double.parseDouble( st.nextToken() );
-            double pval = Double.parseDouble( st.nextToken() );
-            GeneSetResult c = new GeneSetResult( classId, className, size,
-                  effsize, score, pval );
-            results.put( classId, c );
-         }
-      }
-      messenger.setStatus( results.size() + " class results read from file" );
-   }
+        messenger.setStatus( "Loading analysis..." );
+        String line;
+        // line = dis.readLine(); // ditch the header.
+        while ( ( line = dis.readLine() ) != null ) {
+            StringTokenizer st = new StringTokenizer( line, "\t" );
+            String firstword = st.nextToken();
+            if ( firstword.compareTo( "!" ) == 0 ) {
+                String className = st.nextToken();
+                String classId = st.nextToken();
+                int size = Integer.parseInt( st.nextToken() );
+                int effsize = Integer.parseInt( st.nextToken() );
+                double score = Double.parseDouble( st.nextToken() );
+                double pval = Double.parseDouble( st.nextToken() );
+                GeneSetResult c = new GeneSetResult( classId, className, size, effsize, score, pval );
+                results.put( classId, c );
+            }
+        }
+        dis.close();
+        messenger.setStatus( results.size() + " class results read from file" );
+    }
 
-   public Map getResults() {
-      return results;
-   }
+    public Map getResults() {
+        return results;
+    }
 
 }

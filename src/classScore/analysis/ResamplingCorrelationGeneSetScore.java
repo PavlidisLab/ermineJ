@@ -17,8 +17,7 @@ import classScore.data.Histogram;
  * @author pavlidis
  * @version $Id$
  */
-public class ResamplingCorrelationGeneSetScore extends
-      AbstractResamplingGeneSetScore {
+public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSetScore {
 
    private DenseDoubleMatrix2DNamed data = null;
    private Settings settings;
@@ -32,8 +31,7 @@ public class ResamplingCorrelationGeneSetScore extends
    /**
     * @param dataMatrix
     */
-   public ResamplingCorrelationGeneSetScore( Settings settings,
-         DenseDoubleMatrix2DNamed dataMatrix ) {
+   public ResamplingCorrelationGeneSetScore( Settings settings, DenseDoubleMatrix2DNamed dataMatrix ) {
       this.settings = settings;
       this.weights = settings.getUseWeights();
       this.classMaxSize = settings.getMaxClassSize();
@@ -43,9 +41,21 @@ public class ResamplingCorrelationGeneSetScore extends
       this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
       data = dataMatrix;
       int numGeneSetSizes = classMaxSize - classMinSize + 1;
-      this.hist = new Histogram( numGeneSetSizes, classMinSize, numRuns, 1.0,
-            0.0 );
+      this.hist = new Histogram( numGeneSetSizes, classMinSize, numRuns, 1.0, 0.0 );
    }
+   
+   
+   /**
+    * Generate a null distribution, using a selected random seed.
+    * @param m
+    * @param randomSeed
+    * @return
+    */
+   public Histogram generateNulldistribution(StatusViewer m, long randomSeed) {
+      RandomChooser.init(randomSeed);
+      return this.generateNullDistribution(m);
+   }
+   
 
    /**
     * Build background distributions of within-gene set mean correlations. This requires computing a lot of
@@ -55,12 +65,12 @@ public class ResamplingCorrelationGeneSetScore extends
     */
    public Histogram generateNullDistribution( StatusViewer messenger ) {
 
-      SparseDoubleMatrix2DNamed correls = new SparseDoubleMatrix2DNamed( data
-            .rows(), data.rows() );
+      SparseDoubleMatrix2DNamed correls = new SparseDoubleMatrix2DNamed( data.rows(), data.rows() );
 
       int[] deck = new int[data.rows()];
 
-      dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much.
+      dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much. Probably doesn't
+                                                   // matter.
 
       for ( int j = 0; j < data.rows(); j++ ) {
          double[] rowValues = data.getRow( j );
@@ -82,28 +92,22 @@ public class ResamplingCorrelationGeneSetScore extends
 
          DoubleArrayList values = new DoubleArrayList();
          for ( int j = 0; j < numRuns; j++ ) {
-            RandomChooser.chooserandom( randomnums, deck, data.rows(),
-                  geneSetSize );
+            RandomChooser.chooserandom( randomnums, deck, data.rows(), geneSetSize );
             double avecorrel = geneSetMeanCorrel( randomnums, correls );
             values.add( avecorrel );
             hist.update( geneSetSize, avecorrel );
 
-            if ( useNormalApprox && j > MIN_ITERATIONS_FOR_ESTIMATION
-                  && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION && j > 0
-                  && j % NORMAL_APPROX_SAMPLE_FREQUENCY == 0 ) {
+            if ( useNormalApprox && j > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
+                  && j > 0 && j % NORMAL_APPROX_SAMPLE_FREQUENCY == 0 ) {
                double mean = Descriptive.mean( values );
-               double variance = Descriptive.variance( values.size(),
-                     Descriptive.sum( values ), Descriptive
-                           .sumOfSquares( values ) );
+               double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
+                     .sumOfSquares( values ) );
                // double nd = normalDeviation( mean, variance, geneSetSize );
 
                //  if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
-               if ( Math.abs( oldvar - variance ) <= TOLERANCE
-                     && Math.abs( oldmean - mean ) <= TOLERANCE ) {
-                  hist.addExactNormalProbabilityComputer( geneSetSize, mean,
-                        variance );
-                  log.debug( "Class size: " + geneSetSize
-                        + " - Reached convergence to normal after " + j
+               if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
+                  hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
+                  log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + j
                         + " iterations." );
                   break; // stop simulation of this class size.
                }
@@ -142,8 +146,7 @@ public class ResamplingCorrelationGeneSetScore extends
     *        saver. NOT used because it still uses too much memory.
     * @return mean correlation within the matrix.
     */
-   public double geneSetMeanCorrel( int[] indicesToSelect,
-         SparseDoubleMatrix2DNamed correls ) {
+   public double geneSetMeanCorrel( int[] indicesToSelect, SparseDoubleMatrix2DNamed correls ) {
 
       int size = indicesToSelect.length;
       double avecorrel = 0.0;
@@ -161,8 +164,8 @@ public class ResamplingCorrelationGeneSetScore extends
 
             double[] jrow = dataAsRawMatrix[indicesToSelect[j]];
 
-            double corr = Math.abs( correlation( irow, jrow, selfSquaredMatrix,
-                  indicesToSelect[i], indicesToSelect[j] ) );
+            double corr = Math
+                  .abs( correlation( irow, jrow, selfSquaredMatrix, indicesToSelect[i], indicesToSelect[j] ) );
             //         correls.setQuick( row1, row2, corr ); // too much memory.
             //       correls.setQuick( row2, row1, corr );
             //      }
@@ -176,8 +179,7 @@ public class ResamplingCorrelationGeneSetScore extends
 
    // special optimized version of correlation computation for this.
 
-   private static double correlation( double[] x, double[] y,
-         double[][] selfSquaredMatrix, int a, int b ) {
+   private static double correlation( double[] x, double[] y, double[][] selfSquaredMatrix, int a, int b ) {
       double syy, sxy, sxx, sx, sy, xj, yj, ay, ax;
       int numused = 0;
       syy = 0.0;
@@ -207,8 +209,7 @@ public class ResamplingCorrelationGeneSetScore extends
       if ( numused > 0 ) {
          ay = sy / numused;
          ax = sx / numused;
-         return ( sxy - sx * ay )
-               / Math.sqrt( ( sxx - sx * ax ) * ( syy - sy * ay ) );
+         return ( sxy - sx * ay ) / Math.sqrt( ( sxx - sx * ax ) * ( syy - sy * ay ) );
       }
       return Double.NaN; // signifies that it could not be calculated.
    }
@@ -224,6 +225,15 @@ public class ResamplingCorrelationGeneSetScore extends
 
       }
       return returnValue;
+   }
+   
+   /*
+    * (non-Javadoc)
+    * 
+    * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
+    */
+   public void setRandomSeed( long randomSeed ) {
+      RandomChooser.init( randomSeed );
    }
 
 }

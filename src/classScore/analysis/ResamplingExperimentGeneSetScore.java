@@ -25,8 +25,7 @@ import classScore.data.Histogram;
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
  */
-public class ResamplingExperimentGeneSetScore extends
-      AbstractResamplingGeneSetScore {
+public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetScore {
    private double[] groupPvals = null; // pvalues for groups.
    private double[] pvals = null; // pvalues for probes.
 
@@ -41,11 +40,23 @@ public class ResamplingExperimentGeneSetScore extends
    private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
 
    /**
+    * Generate a null distribution, using a selected random seed.
+    * 
+    * @param m
+    * @param randomSeed
+    * @return
+    */
+   public Histogram generateNulldistribution( StatusViewer m, long randomSeed ) {
+      RandomChooser.init( randomSeed );
+      return this.generateNullDistribution( m );
+   }
+
+   /**
     * Used for methods which require randomly sampling classes to generate a null distribution of scores based on
     * gene-by-gene scores.
     * 
     * @return A histogram object containing a cdf that can be used to generate pvalues.
-    * @param m GeneSetScoreStatus
+    * @param m
     */
    public Histogram generateNullDistribution( StatusViewer m ) {
 
@@ -84,29 +95,23 @@ public class ResamplingExperimentGeneSetScore extends
          double rawscore = 0.0;
          DoubleArrayList values = new DoubleArrayList();
          for ( int k = 0; k < numRuns; k++ ) {
-            RandomChooser.chooserandom( random_class, in_pval, deck, num_genes,
-                  geneSetSize );
+            RandomChooser.chooserandom( random_class, in_pval, deck, num_genes, geneSetSize );
             rawscore = calc_rawscore( random_class, geneSetSize, method );
             values.add( rawscore );
             hist.update( geneSetSize, rawscore );
-            if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION
-                  && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION && k > 0
-                  && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
+            if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
+                  && k > 0 && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
                Thread.yield();
 
                double mean = Descriptive.mean( values );
-               double variance = Descriptive.variance( values.size(),
-                     Descriptive.sum( values ), Descriptive
-                           .sumOfSquares( values ) );
+               double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
+                     .sumOfSquares( values ) );
                // double nd = normalDeviation( mean, variance, geneSetSize );
 
                // if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
-               if ( Math.abs( oldvar - variance ) <= TOLERANCE
-                     && Math.abs( oldmean - mean ) <= TOLERANCE ) {
-                  hist.addExactNormalProbabilityComputer( geneSetSize, mean,
-                        variance );
-                  log.debug( "Class size: " + geneSetSize
-                        + " - Reached convergence to normal after " + k
+               if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
+                  hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
+                  log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + k
                         + " iterations." );
                   break; // stop simulation of this class size.
                }
@@ -142,21 +147,18 @@ public class ResamplingExperimentGeneSetScore extends
     * @param settings
     * @param geneScores
     */
-   public ResamplingExperimentGeneSetScore( Settings settings,
-         GeneScoreReader geneScores ) {
+   public ResamplingExperimentGeneSetScore( Settings settings, GeneScoreReader geneScores ) {
       this.settings = settings;
       this.classMaxSize = settings.getMaxClassSize();
       this.classMinSize = settings.getMinClassSize();
       this.numRuns = settings.getIterations();
       this.setQuantile( settings.getQuantile() );
-      this.useWeights = ( Boolean.valueOf( settings.getUseWeights() ) )
-            .booleanValue();
+      this.useWeights = ( Boolean.valueOf( settings.getUseWeights() ) ).booleanValue();
       this.setMethod( settings.getClassScoreMethod() );
       this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
       this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
       if ( classMaxSize < classMinSize ) {
-         throw new IllegalArgumentException(
-               "Error:The maximum class size is smaller than the minimum." );
+         throw new IllegalArgumentException( "Error:The maximum class size is smaller than the minimum." );
       }
 
       this.numClasses = classMaxSize - classMinSize + 1;
@@ -165,8 +167,7 @@ public class ResamplingExperimentGeneSetScore extends
       probePvalMap = geneScores.getProbeToPvalMap(); // reference to the probe -> pval map.
 
       this.setHistogramRange();
-      this.hist = new Histogram( numClasses, classMinSize, numRuns,
-            histogramMax, histogramMin );
+      this.hist = new Histogram( numClasses, classMinSize, numRuns, histogramMax, histogramMin );
    }
 
    /**
@@ -235,8 +236,7 @@ public class ResamplingExperimentGeneSetScore extends
    public double get_value_map( String probe_id ) {
       double value = 0.0;
       if ( probePvalMap.get( probe_id ) != null ) {
-         value = Double.parseDouble( ( probePvalMap.get( probe_id ) )
-               .toString() );
+         value = Double.parseDouble( ( probePvalMap.get( probe_id ) ).toString() );
       }
       return value;
    }
@@ -250,8 +250,7 @@ public class ResamplingExperimentGeneSetScore extends
     * @throws IllegalArgumentException
     * @return double
     */
-   public static double calc_rawscore( double[] genevalues, int effsize,
-         int method ) throws IllegalArgumentException {
+   public static double calc_rawscore( double[] genevalues, int effsize, int method ) throws IllegalArgumentException {
 
       if ( method == Settings.MEAN_METHOD ) {
          return DescriptiveWithMissing.mean( genevalues, effsize );
@@ -262,8 +261,7 @@ public class ResamplingExperimentGeneSetScore extends
       } else if ( method == Settings.MEAN_ABOVE_QUANTILE_METHOD ) {
          return Stats.meanAboveQuantile( index, genevalues, effsize );
       } else {
-         throw new IllegalStateException(
-               "Unknown raw score calculation method selected" );
+         throw new IllegalStateException( "Unknown raw score calculation method selected" );
       }
 
    }
@@ -279,18 +277,24 @@ public class ResamplingExperimentGeneSetScore extends
    /**  */
    public void setHistogramRange() {
       if ( groupPvals == null || pvals == null ) {
-         throw new IllegalStateException(
-               "Null gene score arrays for histogram range setting" );
+         throw new IllegalStateException( "Null gene score arrays for histogram range setting" );
       }
 
-      histogramMax = Descriptive.max( new DoubleArrayList(
-            useWeights ? groupPvals : pvals ) );
-      histogramMin = Descriptive.min( new DoubleArrayList(
-            useWeights ? groupPvals : pvals ) );
+      histogramMax = Descriptive.max( new DoubleArrayList( useWeights ? groupPvals : pvals ) );
+      histogramMin = Descriptive.min( new DoubleArrayList( useWeights ? groupPvals : pvals ) );
 
       if ( histogramMax <= histogramMin ) {
-         throw new IllegalStateException( "Histogram has no range (max "
-               + histogramMax + " <= min " + histogramMin + ")" );
+         throw new IllegalStateException( "Histogram has no range (max " + histogramMax + " <= min " + histogramMin
+               + ")" );
       }
+   }
+
+   /*
+    * (non-Javadoc)
+    * 
+    * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
+    */
+   public void setRandomSeed( long randomSeed ) {
+      RandomChooser.init( randomSeed );
    }
 }
