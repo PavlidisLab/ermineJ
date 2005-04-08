@@ -124,8 +124,9 @@
 	<ant:copy todir="${maven.build.dir}/${maven.nsis.build.dir}/data" >
 		<fileset dir="${basedir}/data" >
 			 <include name="**/genesets" />
-			 <include name="go_200406-termdb.xml" />
-			 <include name="HG-U95A.an.txt" />
+			 <include name="go_200502-termdb.rdf-xml" />
+			 <include name="HG-U95Av2.an.txt" />
+			  <include name="GUI.prefs" />
 			 <exclude name="**/fake*" />
 			 <exclude name="ClassScore.preferences" />
 			 <exclude name="melanoma_and_sarcomaMAS5.txt" />
