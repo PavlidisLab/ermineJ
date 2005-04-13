@@ -470,10 +470,12 @@ public class classScoreCMD {
    }
 
    /**
+ * @throws InterruptedException 
+ * @throws IllegalArgumentException 
     * @return
     * @throws IOException
     */
-   protected GeneSetPvalRun analyze() throws IOException {
+   protected GeneSetPvalRun analyze() throws IOException, InterruptedException {
       DenseDoubleMatrix2DNamed rawData = null;
       if ( settings.getAnalysisMethod() == Settings.CORR ) {
          if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
