@@ -66,7 +66,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
       Object ranking = null;
 
       // foreach item in the class.
-      while ( classit.hasNext() ) {
+      while ( classit.hasNext()  && !isInterrupted()) {
 
          String probe = ( String ) classit.next(); // probe id
 

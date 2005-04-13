@@ -73,7 +73,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
       int v_size = 0;
 
       // foreach item in the class.
-      while ( classit.hasNext() ) {
+      while ( classit.hasNext()  && !isInterrupted()) {
 
          String probe = ( String ) classit.next(); // probe id
 
@@ -104,7 +104,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
       } // end of while over items in the class.
 
       // get raw score and pvalue.
-      double rawscore = ResamplingExperimentGeneSetScore.calc_rawscore(
+      double rawscore = ResamplingExperimentGeneSetScore.computeRawScore(
             groupPvalArr, effSize, settings.getRawScoreMethod() );
       double pval = scoreToPval( effSize, rawscore );
 

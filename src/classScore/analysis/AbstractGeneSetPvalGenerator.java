@@ -2,6 +2,9 @@ package classScore.analysis;
 
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import classScore.Settings;
@@ -9,7 +12,7 @@ import classScore.Settings;
 /**
  * Base implementation of pvalue generator
  * <p>
- * Copyright (c) 2004 Columbia University
+ * Copyright (c) 2004-2005 Columbia University
  * </p>
  * 
  * @author Paul Pavlidis
@@ -17,65 +20,73 @@ import classScore.Settings;
  */
 
 public abstract class AbstractGeneSetPvalGenerator {
+    protected static final Log log = LogFactory.getLog( AbstractGeneSetPvalGenerator.class );
+    protected Map effectiveSizes = null;
+    protected Map actualSizes = null;
+    protected GONames goName;
+    protected Settings settings;
+    protected GeneAnnotations geneAnnots;
+    protected GeneSetSizeComputer csc;
+    private int maxGeneSetSize;
+    private int minGeneSetSize;
 
-   protected Map effectiveSizes = null;
-   protected Map actualSizes = null;
-   protected GONames goName;
-   protected Settings settings;
-   protected GeneAnnotations geneAnnots;
-   protected GeneSetSizeComputer csc;
-   private int maxGeneSetSize;
-   private int minGeneSetSize;
-   
-   public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots,
-         GeneSetSizeComputer csc, GONames gon ) {
+    public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots, GeneSetSizeComputer csc, GONames gon ) {
 
-      this.settings = set;
-      this.geneAnnots = annots;
-      this.effectiveSizes = csc.getEffectiveSizes();
-      this.actualSizes = csc.getActualSizes();
-      this.csc = csc;
-      if ( gon != null ) {
-         this.goName = gon;
-      }
-   }
+        this.settings = set;
+        this.geneAnnots = annots;
+        this.effectiveSizes = csc.getEffectiveSizes();
+        this.actualSizes = csc.getActualSizes();
+        this.csc = csc;
+        if ( gon != null ) {
+            this.goName = gon;
+        }
+    }
 
-   /**
-    * @param value
-    */
-   public void set_class_max_size( int value ) {
-      maxGeneSetSize = value;
-   }
+    /**
+     * @param value
+     */
+    public void set_class_max_size( int value ) {
+        maxGeneSetSize = value;
+    }
 
-   /**
-    * @param value
-    */
-   public void set_class_min_size( int value ) {
-      minGeneSetSize = value;
-   }
+    /**
+     * @param value
+     */
+    public void set_class_min_size( int value ) {
+        minGeneSetSize = value;
+    }
 
-   /**
-    */
-   public int getMaxClassSize() {
-      return maxGeneSetSize;
-   }
+    /**
+     */
+    public int getMaxClassSize() {
+        return maxGeneSetSize;
+    }
 
-   /**
-    * @return
-    */
-   public int getMinGeneSetSize() {
-      return minGeneSetSize;
-   }
+    /**
+     * @return
+     */
+    public int getMinGeneSetSize() {
+        return minGeneSetSize;
+    }
 
-   /**
-    * Test whether a score meets a threshold. todo this might not really belong here.
-    * @param geneScore
-    * @param geneScoreThreshold
-    * @return
-    */
-   protected boolean scorePassesThreshold( double geneScore, double geneScoreThreshold ) {
-      return ( settings.upperTail() && geneScore >= geneScoreThreshold )
-            || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
-   }
+    /**
+     * Test whether a score meets a threshold. todo this might not really belong here.
+     * 
+     * @param geneScore
+     * @param geneScoreThreshold
+     * @return
+     */
+    protected boolean scorePassesThreshold( double geneScore, double geneScoreThreshold ) {
+        return ( settings.upperTail() && geneScore >= geneScoreThreshold )
+                || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
+    }
+
+    /**
+     * @return Returns the isInterrupted.
+     */
+    public boolean isInterrupted() {
+      //  log.debug( Thread.currentThread().getName() + " " + Thread.currentThread().isInterrupted() );
+        return Thread.currentThread().isInterrupted();
+    }
 
 }

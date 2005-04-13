@@ -16,8 +16,10 @@ public interface NullDistributionGenerator {
    public Histogram generateNullDistribution( StatusViewer messenger );
 
    /**
-    * @param randomSeed
-    */
+     * @param randomSeed
+     */
    public void setRandomSeed( long randomSeed );
+   
+   public boolean isInterrupted();
 
 }

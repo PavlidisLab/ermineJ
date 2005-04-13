@@ -59,7 +59,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
             numOverThreshold, numUnderThreshold, goName, inputSize );
 
       // For each class.
-      while ( it.hasNext() ) {
+      while ( it.hasNext() && !isInterrupted()) {
          Map.Entry e = ( Map.Entry ) it.next();
          String geneSetName = ( String ) e.getKey();
          GeneSetResult res = cpv.classPval( geneSetName, geneToGeneScoreMap,
@@ -87,7 +87,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
       }
       
       Iterator itr = inp_entries.iterator();
-      while ( itr.hasNext() ) {
+      while ( itr.hasNext() && !isInterrupted() ) {
          Map.Entry m = ( Map.Entry ) itr.next();
          double geneScore = ( ( Double ) m.getValue() ).doubleValue();
 

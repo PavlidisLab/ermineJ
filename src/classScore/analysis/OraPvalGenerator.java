@@ -81,7 +81,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
       Map record = new HashMap();
       int v_size = 0;
 
-      while ( classit.hasNext() ) {
+      while ( classit.hasNext()  && !isInterrupted()) {
 
          String probe = ( String ) classit.next(); // probe id
 
