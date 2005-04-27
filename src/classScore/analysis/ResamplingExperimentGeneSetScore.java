@@ -40,7 +40,8 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
 
     /**
-     * @throws InterruptedException Generate a null distribution, using a selected random seed.
+     * Generate a null distribution, using a selected random seed.
+     * 
      * @param m
      * @param randomSeed
      * @return
@@ -51,8 +52,9 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     }
 
     /**
-     * @throws InterruptedException Used for methods which require randomly sampling classes to generate a null
-     *         distribution of scores based on gene-by-gene scores.
+     * Used for methods which require randomly sampling classes to generate a null distribution of scores based on
+     * gene-by-gene scores.
+     * 
      * @return A histogram object containing a cdf that can be used to generate pvalues.
      * @param m
      */
@@ -125,11 +127,11 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
                     // oldnd = nd;
 
                 }
-                if ( k % 100 == 0 ) {
+                if ( k % 1000 == 0 ) {
                     try {
                         Thread.sleep( 10 );
                     } catch ( InterruptedException e ) {
-                        log.debug("Interrupted");
+                        log.debug( "Interrupted" );
                         throw new RuntimeException( "Interrupted" );
                     }
                 }

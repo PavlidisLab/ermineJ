@@ -67,7 +67,7 @@ public class Settings {
     public static final int WESTFALLYOUNG = 1;
     public static final int BENJAMINIHOCHBERG = 2;
 
-    public Settings() {
+    public Settings() throws IOException {
         this( "" );
     }
 
@@ -89,11 +89,13 @@ public class Settings {
     }
 
     /**
+     * 
      * Creates settings object
      * 
      * @param filename name of preferences file to read
+     * @throws IOException 
      */
-    public Settings( String filename ) {
+    public Settings( String filename ) throws IOException {
 
         properties = new Properties();
         if ( dataFolder == null && !this.determineDataDirectory() ) {
@@ -104,7 +106,9 @@ public class Settings {
         classFolder = new String( dataFolder + System.getProperty( "file.separator" ) + "genesets" );
 
         if ( !FileTools.testDir( classFolder ) ) {
-            new File( classFolder ).mkdir(); // todo should test success and do something about it.
+            if (! new File( classFolder ).mkdir()) {
+                throw new IOException("Could not create the class directory at " + classFolder);
+            }
         }
 
         // make a new file if it was empty.

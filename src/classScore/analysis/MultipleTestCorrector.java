@@ -6,9 +6,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.StatusViewer;
-
 import classScore.Settings;
 import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
@@ -25,7 +27,7 @@ import classScore.data.Histogram;
  */
 
 public class MultipleTestCorrector {
-
+    protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
     private Vector sortedclasses;
     private Map results;
     private Histogram hist;
@@ -237,6 +239,7 @@ public class MultipleTestCorrector {
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
+                    log.debug( "Interrupted" );
                     throw new RuntimeException( "Interrupted" );
                 }
             }

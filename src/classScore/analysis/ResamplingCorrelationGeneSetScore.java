@@ -120,17 +120,11 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
                     oldmean = mean;
                     oldvar = variance;
                 }
-                
-                if ( j % 100 == 0 ) {
-                    try {
-                        Thread.sleep( 10 );
-                    } catch ( InterruptedException e ) {
-                        log.debug("Interrupted");
-                        throw new RuntimeException( "Interrupted" );
-                    }
-                }
 
-               
+                if ( j % 500 == 0 ) {
+                    takeABreak();
+                }
+                takeABreak();
             }
 
             /*
@@ -144,6 +138,18 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         }
         hist.tocdf();
         return hist;
+    }
+
+    /**
+     * 
+     */
+    private void takeABreak() {
+        try {
+            Thread.sleep( 10 );
+        } catch ( InterruptedException e ) {
+            log.debug( "Interrupted" );
+            throw new RuntimeException( "Interrupted" );
+        }
     }
 
     /**
@@ -162,27 +168,15 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         int nummeas = 0;
 
         for ( int i = 0; i < size; i++ ) {
-            // int row1 = indicesToSelect[i];
             double[] irow = dataAsRawMatrix[indicesToSelect[i]];
-
             for ( int j = i + 1; j < size; j++ ) {
-                // int row2 = indicesToSelect[j];
-                // double corr = Math.abs( correls.getQuick( row1, row2 ) );
-
-                // if ( corr == 0.0 ) { // we haven't done this one yet it yet.
-
                 double[] jrow = dataAsRawMatrix[indicesToSelect[j]];
-
                 double corr = Math.abs( correlation( irow, jrow, selfSquaredMatrix, indicesToSelect[i],
                         indicesToSelect[j] ) );
-                // correls.setQuick( row1, row2, corr ); // too much memory.
-                // correls.setQuick( row2, row1, corr );
-                // }
                 avecorrel += corr;
                 nummeas++;
             }
         }
-
         return avecorrel / nummeas;
     }
 

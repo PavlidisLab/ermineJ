@@ -253,19 +253,24 @@ public class GeneSetPvalRun {
         // System.out.println( name );
         Map classToProbe = geneData.getGeneSetToProbeMap();
 
-        ArrayList probeIDs = ( ArrayList ) classToProbe.get( classID );
+        Collection probeIDs = ( Collection ) classToProbe.get( classID );
         Map pvals = new HashMap();
 
-        for ( int i = 0, n = probeIDs.size(); i < n; i++ ) {
+        for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
+            String probeID = ( String ) iter.next();
+
+            // }
+            //        
+            // for ( int i = 0, n = probeIDs.size(); i < n; i++ ) {
             Double pvalue;
-            String probeID = ( String ) probeIDs.get( i );
+            // String probeID = ( String ) probeIDs.get( i );
             if ( settings.getDoLog() == true ) {
                 pvalue = new Double( Math.pow( 10.0, -( ( Double ) geneScores.getProbeToPvalMap().get( probeID ) )
                         .doubleValue() ) );
             } else {
                 pvalue = ( Double ) geneScores.getProbeToPvalMap().get( probeID );
             }
-            pvals.put( ( ( ArrayList ) classToProbe.get( classID ) ).get( i ), pvalue );
+            pvals.put( probeID, pvalue );
         }
 
         if ( probeIDs == null ) {
@@ -273,7 +278,7 @@ public class GeneSetPvalRun {
         }
 
         // create the details frame
-        JGeneSetFrame f = new JGeneSetFrame( probeIDs, pvals, geneData, settings, this, res );
+        JGeneSetFrame f = new JGeneSetFrame( new ArrayList( probeIDs ), pvals, geneData, settings, this, res );
         f.setTitle( name + " (" + probeIDs.size() + " items) p=" + nf.format( res.getPvalue() ) );
         f.show();
     }

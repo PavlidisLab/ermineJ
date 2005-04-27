@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -43,6 +43,7 @@ import javax.swing.table.TableColumn;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.gui.ColorMap;
+import baseCode.gui.GuiUtil;
 import baseCode.gui.JGradientBar;
 import baseCode.gui.JLinkLabel;
 import baseCode.gui.JMatrixDisplay;
@@ -50,7 +51,6 @@ import baseCode.gui.table.JBarGraphCellRenderer;
 import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
 import baseCode.gui.table.TableSorter;
-import baseCode.gui.GuiUtil;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
 import classScore.GeneSetPvalRun;
@@ -139,8 +139,8 @@ public class JGeneSetFrame extends JFrame {
      * @param settings <code>getRawFile()</code> should return the microarray file which contains the microarray data
      *        for the probe ID's contained in <code>probeIDs</code>.
      */
-    public JGeneSetFrame( ArrayList probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings,
-            GeneSetPvalRun run, GeneSetResult res ) {
+    public JGeneSetFrame( List probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings, GeneSetPvalRun run,
+            GeneSetResult res ) {
         try {
             String filename = settings.getRawFile();
             this.settings = settings;
@@ -169,7 +169,7 @@ public class JGeneSetFrame extends JFrame {
         this.dispose();
     }
 
-    private void createDetailsTable( ArrayList probeIDs, Map pvalues, GeneAnnotations geneData, String filename ) {
+    private void createDetailsTable( List probeIDs, Map pvalues, GeneAnnotations geneData, String filename ) {
 
         readPrefs();
 
@@ -686,12 +686,13 @@ public class JGeneSetFrame extends JFrame {
 
     /**
      * Ridiculously simple to remove anchor tag.
+     * 
      * @param s
      * @return
      */
     private String stripHtml( String s ) {
-       String m = s.replaceAll("<.+?>", "");
-        m = m.replaceAll("</.+?>", "");
+        String m = s.replaceAll( "<.+?>", "" );
+        m = m.replaceAll( "</.+?>", "" );
         return m;
     }
 

@@ -1,8 +1,10 @@
 package classScore.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -84,11 +86,11 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
 
         for ( Iterator it = geneSetToProbeMap.entrySet().iterator(); it.hasNext(); ) {
             if ( isInterrupted() ) {
-                log.debug("Canceling");
+                log.debug( "Canceling" );
                 break;
             }
             Map.Entry e = ( Map.Entry ) it.next();
-            ArrayList probesInSet = ( ArrayList ) e.getValue();
+            Collection probesInSet = ( Collection ) e.getValue();
             String geneSetName = ( String ) e.getKey();
             int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
 
@@ -116,31 +118,35 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
                 continue;
             }
 
-            try {
-                Thread.sleep( 5 );
-            } catch ( InterruptedException ex ) {
-            }
-
-            if ( count > 0 && count % 50 == 0 ) {
+            if ( count % 10 == 0 ) {
                 messenger.setStatus( "Classes analyzed: " + count );
+                try {
+                    Thread.sleep( 5 );
+                } catch ( InterruptedException ex ) {
+                    log.debug( "Interrupted" );
+                    throw new RuntimeException( "Interrupted" );
+                }
             }
 
+            /*
+             * Iterate over the probes to get pairwise correlations.; we do this in a list so we can do each comparison
+             * just once.
+             */
             double avecorrel = 0.0;
             double nummeas = 0;
-
             Map values = new HashMap();
+            int b = 0;
+            List probeList = new ArrayList( probesInSet );
 
-            for ( int i = probesInSet.size() - 1; i >= 0; i-- ) {
+            for ( int i = probeList.size() - 1; i >= 0; i-- ) {
 
-                String probei = ( String ) probesInSet.get( i );
+                String probei = ( String ) probeList.get( i );
                 String genei = ( String ) probeToGeneMap.get( probei );
                 DoubleArrayList irow = new DoubleArrayList( rawData.getRowByName( probei ) );
-
-                // number of probes for this gene.
-                int repsi = geneAnnots.getGeneProbeList( genei ).size();
+                int numProbesForGene = geneAnnots.getGeneProbeList( genei ).size();
 
                 for ( int j = i - 1; j >= 0; j-- ) {
-                    String probej = ( String ) probesInSet.get( j );
+                    String probej = ( String ) probeList.get( j );
                     String genej = ( String ) probeToGeneMap.get( probej );
 
                     if ( genei.equals( genej ) ) {
@@ -152,17 +158,26 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
                     double corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow ) );
 
                     if ( setting == Settings.BEST_PVAL ) {
-                        if ( !values.containsKey( genei + "___" + genej )
-                                || ( ( Double ) values.get( genei + "___" + genej ) ).doubleValue() < corr ) {
-                            values.put( ( genei + "___" + genej ), new Double( corr ) );
+                        String key = genei + "___" + genej;
+                        if ( !values.containsKey( key ) || ( ( Double ) values.get( key ) ).doubleValue() < corr ) {
+                            values.put( ( key ), new Double( corr ) );
                         }
                     } else if ( setting == Settings.MEAN_PVAL ) {
-                        double weight = weight = 1.0 / ( geneAnnots.getGeneProbeList( genej ).size() * repsi );
+                        double weight = weight = 1.0 / ( geneAnnots.getGeneProbeList( genej ).size() * numProbesForGene );
                         corr *= weight;
                         avecorrel += corr;
                         nummeas += weight;
                     } else {
                         throw new IllegalStateException( "Unknown method." );
+                    }
+                    b++;
+                    if ( b % 500 == 0 ) {
+                        try {
+                            Thread.sleep( 5 );
+                        } catch ( InterruptedException ex ) {
+                            log.debug( "Interrupted" );
+                            throw new RuntimeException( "Interrupted" );
+                        }
                     }
                 }
             }
@@ -183,7 +198,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
             result.setScore( geneSetMeanCorrel );
             result.setPValue( hist.getValue( classSize, geneSetMeanCorrel, true ) ); // always upper tail.
             results.put( geneSetName, result );
-            // System.err.println(geneSetName + " " + hist.getValue( classSize, geneSetMeanCorrel ) + " " + classSize +
+            // log.debug(geneSetName + " " + hist.getValue( classSize, geneSetMeanCorrel ) + " " + classSize +
             // " " + geneSetMeanCorrel);
             count++;
         }

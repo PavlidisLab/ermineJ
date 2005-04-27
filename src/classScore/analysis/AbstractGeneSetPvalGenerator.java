@@ -70,7 +70,7 @@ public abstract class AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * Test whether a score meets a threshold. todo this might not really belong here.
+     * Test whether a score meets a threshold. This might not really belong here.
      * 
      * @param geneScore
      * @param geneScoreThreshold
@@ -85,7 +85,7 @@ public abstract class AbstractGeneSetPvalGenerator {
      * @return Returns the isInterrupted.
      */
     public boolean isInterrupted() {
-      //  log.debug( Thread.currentThread().getName() + " " + Thread.currentThread().isInterrupted() );
+        // log.debug( Thread.currentThread().getName() + " " + Thread.currentThread().isInterrupted() );
         return Thread.currentThread().isInterrupted();
     }
 

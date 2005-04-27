@@ -13,13 +13,13 @@ import classScore.data.Histogram;
  */
 public interface NullDistributionGenerator {
 
-   public Histogram generateNullDistribution( StatusViewer messenger );
+    public Histogram generateNullDistribution( StatusViewer messenger );
 
-   /**
+    /**
      * @param randomSeed
      */
-   public void setRandomSeed( long randomSeed );
-   
-   public boolean isInterrupted();
+    public void setRandomSeed( long randomSeed );
+
+    public boolean isInterrupted();
 
 }

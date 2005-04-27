@@ -87,7 +87,7 @@ public class FindDialog extends JDialog {
 
         cancelButton.setText( "Close this window (resets display)" );
         cancelButton.addActionListener( new FindDialog_cancelButton_actionAdapter( this ) );
-        cancelButton.setToolTipText("You can leave this window open while you continue analysis.");
+        cancelButton.setToolTipText( "You can leave this window open while you continue analysis." );
 
         findButton.setText( "Find" );
         findButton.addActionListener( new FindDialog_findButton_actionAdapter( this ) );

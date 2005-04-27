@@ -140,7 +140,7 @@ public abstract class AbstractResamplingGeneSetScore implements NullDistribution
      * Test whether this job has been canceled.
      */
     public boolean isInterrupted() {
-       // log.debug( Thread.currentThread().getName() + " " + Thread.currentThread().isInterrupted() );
+        // log.debug( Thread.currentThread().getName() + " " + Thread.currentThread().isInterrupted() );
         return Thread.currentThread().isInterrupted();
     }
 

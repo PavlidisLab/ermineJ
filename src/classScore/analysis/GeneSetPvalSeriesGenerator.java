@@ -8,7 +8,6 @@ import java.util.Map;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
-
 import classScore.Settings;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;

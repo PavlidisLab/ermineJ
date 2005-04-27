@@ -95,7 +95,7 @@ public class GeneSetScoreFrame extends JFrame {
 
     private HelpHelper hh;
 
-    public GeneSetScoreFrame() {
+    public GeneSetScoreFrame() throws IOException {
         jbInit();
         hh = new HelpHelper();
         hh.initHelp( helpMenuItem );
@@ -282,13 +282,16 @@ public class GeneSetScoreFrame extends JFrame {
 
             progressBar.setValue( 10 );
 
+            // TODO: this stuff should be in another thread.
             statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
             goData = new GONames( settings.getClassFile() ); // parse go name file
             progressBar.setValue( 70 );
 
             statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger );
+            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
+
             progressBar.setValue( 100 );
+            // end slow part.
 
             if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
                 throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
@@ -415,7 +418,7 @@ public class GeneSetScoreFrame extends JFrame {
                 geneScoreSets );
     }
 
-    public void loadAnalysis( String loadFile ) {
+    public void loadAnalysis( String loadFile ) throws IOException {
         disableMenusForAnalysis();
         Settings loadSettings = new Settings( loadFile );
         if ( !checkValid( loadSettings ) ) {

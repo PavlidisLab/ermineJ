@@ -6,17 +6,16 @@ import classScore.Settings;
 
 /**
  * Use the Kolmogorov-Smirnov test to evaluate the ranking of the probes.
- *
  * <hr>
- * <p>Copyright (c) 2004 Columbia University
+ * <p>
+ * Copyright (c) 2004 Columbia University
+ * 
  * @author pavlidis
  * @version $Id$
  */
 public class KSPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-   
-   public KSPvalGenerator( Settings set, GeneAnnotations an,
-         GeneSetSizeComputer csc, GONames gon ) {
-      super( set, an, csc, gon );
-   }
+    public KSPvalGenerator( Settings set, GeneAnnotations an, GeneSetSizeComputer csc, GONames gon ) {
+        super( set, an, csc, gon );
+    }
 }

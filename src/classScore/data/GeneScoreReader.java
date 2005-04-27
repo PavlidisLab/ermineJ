@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -24,30 +25,7 @@ import cern.jet.math.Arithmetic;
 import classScore.Settings;
 
 /**
- * Description:Parses the file of the form
- * 
- * <pre>
- * 
- *  
- *   
- *    
- *     
- *      
- *       
- *        
- *        
- *                           probe_id[tab]pval
- *        
- *         
- *        
- *       
- *      
- *     
- *    
- *   
- *  
- * </pre>
- * 
+ * Parse and store probe->pvalue associations.
  * <p>
  * The values are stored in a Map probeToPvalMap. This is used to see what probes are int the data set, as well as the
  * score for each probe.
@@ -61,11 +39,13 @@ public class GeneScoreReader {
 
     private static final double SMALL = 10e-16;
     double[] groupPvalues;
-    private String[] probeIDs = null;
-    private double[] probePvalues = null;
-    private int num_pvals;
+    private List probeIDs = null;
+    private List probePvalues = null;
+    private int numPvals;
     private Map probeToPvalMap;
     private Map geneToPvalMap;
+    private String[] probeIDsArray;
+    private double[] probePvaluesArray;
 
     /**
      * @throws IOException
@@ -77,10 +57,11 @@ public class GeneScoreReader {
      */
     public GeneScoreReader( String filename, Settings settings, StatusViewer messenger, Map geneToProbeMap,
             Map probeToGeneMap ) throws IOException {
-        this();
+        this.init();
         FileTools.checkPathIsReadableFile( filename );
         InputStream is = new FileInputStream( filename );
         read( is, settings, messenger, geneToProbeMap, probeToGeneMap );
+        is.close();
     }
 
     /**
@@ -93,13 +74,15 @@ public class GeneScoreReader {
      */
     public GeneScoreReader( InputStream is, Settings settings, StatusViewer messenger, Map geneToProbeMap,
             Map probeToGeneMap ) throws IOException {
-        this();
+        this.init();
         read( is, settings, messenger, geneToProbeMap, probeToGeneMap );
     }
 
-    private GeneScoreReader() {
-        geneToPvalMap = new HashMap();
-        probeToPvalMap = new LinkedHashMap();
+    private void init() {
+        this.geneToPvalMap = new HashMap();
+        this.probeToPvalMap = new LinkedHashMap();
+        this.probePvalues = new ArrayList();
+        this.probeIDs = new ArrayList();
     }
 
     private void read( InputStream is, Settings settings, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
@@ -120,132 +103,140 @@ public class GeneScoreReader {
         boolean unknownProbe = false;
         boolean invalidNumber = false;
         String badNumberString = "";
-        Vector rows = new Vector();
-        while ( ( row = dis.readLine() ) != null ) {
-            StringTokenizer st = new StringTokenizer( row, "\t" );
-            Vector cols = new Vector();
-            while ( st.hasMoreTokens() ) {
-                cols.add( st.nextToken() );
-            }
-            if ( cols.size() > 0 ) rows.add( cols );
-            if ( Thread.currentThread().isInterrupted() ) {
-                dis.close();
-                throw new RuntimeException( "Interrupted" );
-            }
-        }
-        dis.close();
-
-        probeIDs = new String[rows.size() - 1];
-        probePvalues = new double[rows.size() - 1];
+        int scoreColumnIndex = settings.getScorecol() - 1;
         int numProbesKept = 0;
-        for ( int i = 1; i < rows.size(); i++ ) {
 
-            if ( Thread.currentThread().isInterrupted() ) {
-                throw new RuntimeException( "Interrupted" );
-            }
+        while ( ( row = dis.readLine() ) != null ) {
+            String[] fields = row.split( "\t" );
 
-            if ( ( ( Vector ) ( rows.elementAt( i ) ) ).size() < settings.getScorecol() ) {
-                throw new IOException( "Insufficient gene score columns in row " + i
-                        + ", expecting file to have at least " + settings.getScorecol()
-                        + " columns. Please check that the file has the " + "correct plain text format." );
-            }
-
-            String name = ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) ).elementAt( 0 ) );
-
-            if ( name.matches( "AFFX.*" ) ) { // todo: put this rule somewhere else // todo use a filter.
-                if ( messenger != null ) {
-                    messenger.setStatus( "Skipping probe in pval file: " + name );
-                }
+            // ignore rows that have insufficient columns.
+            if ( fields.length < settings.getScorecol() ) {
                 continue;
             }
-            probeIDs[i - 1] = name;
 
-            try {
-                probePvalues[i - 1] = Double.parseDouble( ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
-                        .elementAt( settings.getScorecol() - 1 ) ) );
-            } catch ( NumberFormatException e ) {
-                invalidNumber = true;
-                badNumberString = ( String ) ( ( ( Vector ) ( rows.elementAt( i ) ) )
-                        .elementAt( settings.getScorecol() - 1 ) );
-                probePvalues[i - 1] = 0.0;
-            }
-
-            // Fudge when pvalues are zero.
-            if ( settings.getDoLog() && probePvalues[i - 1] <= 0.0 ) {
-                invalidLog = true;
-                probePvalues[i - 1] = SMALL;
-
-            }
-
-            if ( settings.getDoLog() ) {
-                probePvalues[i - 1] = -Arithmetic.log10( probePvalues[i - 1] );
-            }
+            String probeId = fields[0];
 
             // only keep probes that are in our array platform.
-            if ( !probeToGeneMap.containsKey( probeIDs[i - 1] ) ) {
+            if ( !probeToGeneMap.containsKey( probeId ) ) {
                 unknownProbe = true;
                 continue;
             }
 
+            if ( probeId.matches( "AFFX.*" ) ) { // FIXME: put this rule somewhere else // todo use a filter.
+                if ( messenger != null ) {
+                    messenger.setStatus( "Skipping probe in pval file: " + probeId );
+                }
+                continue;
+            }
+
+            double pValue = 0.0;
+            try {
+                pValue = Double.parseDouble( fields[scoreColumnIndex] );
+            } catch ( NumberFormatException e ) {
+                /* the first line can be a header; we ignore it if it looks bad */
+                if ( probeIDs.size() > 0 ) {
+                    invalidNumber = true;
+                    badNumberString = fields[scoreColumnIndex];
+                }
+            }
+
+            // Fudge when pvalues are zero.
+            if ( settings.getDoLog() && pValue <= 0.0 ) {
+                invalidLog = true;
+                pValue = SMALL;
+
+            }
+
+            if ( settings.getDoLog() ) {
+                pValue = -Arithmetic.log10( pValue );
+            }
+
+            /* we're done... */
             numProbesKept++;
+            probeIDs.add( probeId );
+            probePvalues.add( new Double( pValue ) );
+            probeToPvalMap.put( probeId, new Double( pValue ) );
 
-            probeToPvalMap.put( probeIDs[i - 1], new Double( probePvalues[i - 1] ) );
+            if ( Thread.currentThread().isInterrupted() ) {
+                dis.close();
+                throw new RuntimeException( "Interrupted" );
+            }
+
         }
+        dis.close();
+        numPvals = probePvalues.size();
+        assert numPvals == probeIDs.size();
 
-        num_pvals = Array.getLength( probePvalues );
+        setUpRawArrays();
+        reportProblems( messenger, invalidLog, unknownProbe, invalidNumber, badNumberString, numProbesKept );
+        setUpGeneToPvalMap( settings, geneToProbeMap, messenger );
 
+    } // 
+
+    /**
+     * 
+     */
+    private void setUpRawArrays() {
+        probePvaluesArray = new double[numPvals];
+        probeIDsArray = new String[numPvals];
+        for ( int i = 0; i < numPvals; i++ ) {
+            probePvaluesArray[i] = ( ( Double ) probePvalues.get( i ) ).doubleValue();
+            probeIDsArray[i] = ( String ) probeIDs.get( i );
+        }
+    }
+
+    /**
+     * @param messenger
+     * @param invalidLog
+     * @param unknownProbe
+     * @param invalidNumber
+     * @param badNumberString
+     * @param numProbesKept
+     */
+    private void reportProblems( StatusViewer messenger, boolean invalidLog, boolean unknownProbe,
+            boolean invalidNumber, String badNumberString, int numProbesKept ) {
         if ( invalidNumber && messenger != null ) {
 
             messenger.setError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
                     + " found for input file. These are set to an initial value of zero." );
-
-            try {
-                Thread.sleep( 2000 );
-            } catch ( InterruptedException e ) {
-                throw new RuntimeException( "Interrupted" );
-            }
-
+            letUserReadMessage();
         }
-
         if ( invalidLog && messenger != null ) {
             messenger
                     .setError( "Warning: There were attempts to take the log of non-positive values. These are set to "
                             + SMALL );
-            try {
-                Thread.sleep( 2000 );
-            } catch ( InterruptedException e ) {
-                throw new RuntimeException( "Interrupted" );
-            }
+            letUserReadMessage();
         }
-
         if ( unknownProbe ) {
             messenger
                     .setError( "Warning: Some probes in your gene score file don't match the ones in the annotation file." );
-            try {
-                Thread.sleep( 2000 );
-            } catch ( InterruptedException e ) {
-                throw new RuntimeException( "Interrupted" );
-            }
+            letUserReadMessage();
         }
-
         if ( numProbesKept == 0 ) {
             throw new IllegalStateException( "None of the probes in the gene score file correspond to probes in the "
                     + "annotation (\".an\") file you selected." );
         }
-
-        if ( num_pvals == 0 ) {
+        if ( numPvals == 0 ) {
             throw new IllegalStateException( "No pvalues found in the gene score file! Please check the file has"
                     + " the correct plain text format and"
                     + " corresponds to the microarray annotation (\".an\") file you selected." );
         }
-
         if ( messenger != null ) {
-            messenger.setStatus( "Found " + num_pvals + " pvals in the file" );
+            messenger.setStatus( "Found " + numPvals + " pvals in the file" );
         }
+    }
 
-        setUpGeneToPvalMap( settings, geneToProbeMap, messenger );
-
-    } //
+    /**
+     * 
+     *
+     */
+    private void letUserReadMessage() {
+        try {
+            Thread.sleep( 2000 );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( "Interrupted" );
+        }
+    }
 
     /**
      * Each pvalue is adjusted to the mean (or best) of all the values in the 'replicate group' to yield a "group to
@@ -270,7 +261,7 @@ public class GeneScoreReader {
             throw new IllegalStateException( "Group to probe map was empty" );
         }
 
-        double[] group_pval_temp = new double[geneToProbeMap.size()];
+        double[] groupPvalTemp = new double[geneToProbeMap.size()];
         int counter = 0;
 
         for ( Iterator groupMapItr = geneToProbeMap.keySet().iterator(); groupMapItr.hasNext(); ) {
@@ -281,7 +272,7 @@ public class GeneScoreReader {
 
             String group = ( String ) groupMapItr.next();
 
-            ArrayList probes = ( ArrayList ) geneToProbeMap.get( group ); /*
+            Collection probes = ( Collection ) geneToProbeMap.get( group ); /*
                                                                              * probes in this group according to the
                                                                              * array platform.
                                                                              */
@@ -300,14 +291,14 @@ public class GeneScoreReader {
 
                 switch ( gp_method ) {
                     case Settings.MEAN_PVAL: {
-                        group_pval_temp[counter] += pbPval;
+                        groupPvalTemp[counter] += pbPval;
                         break;
                     }
                     case Settings.BEST_PVAL: {
                         if ( settings.upperTail() ) {
-                            group_pval_temp[counter] = Math.max( pbPval, group_pval_temp[counter] );
+                            groupPvalTemp[counter] = Math.max( pbPval, groupPvalTemp[counter] );
                         } else {
-                            group_pval_temp[counter] = Math.min( pbPval, group_pval_temp[counter] );
+                            groupPvalTemp[counter] = Math.min( pbPval, groupPvalTemp[counter] );
                         }
                         break;
                     }
@@ -321,9 +312,9 @@ public class GeneScoreReader {
 
             if ( in_size > 0 ) {
                 if ( gp_method == Settings.MEAN_PVAL ) {
-                    group_pval_temp[counter] /= in_size; // take the mean
+                    groupPvalTemp[counter] /= in_size; // take the mean
                 }
-                Double dbb = new Double( group_pval_temp[counter] );
+                Double dbb = new Double( groupPvalTemp[counter] );
                 geneToPvalMap.put( group, dbb );
                 counter++;
             }
@@ -337,7 +328,7 @@ public class GeneScoreReader {
 
         groupPvalues = new double[counter];
         for ( int i = 0; i < counter; i++ ) {
-            groupPvalues[i] = group_pval_temp[i];
+            groupPvalues[i] = groupPvalTemp[i];
         }
 
     }
@@ -345,13 +336,13 @@ public class GeneScoreReader {
     /**
      */
     public String[] getProbeIds() {
-        return probeIDs;
+        return probeIDsArray;
     }
 
     /**
      */
     public double[] getPvalues() {
-        return probePvalues;
+        return probePvaluesArray;
     }
 
     public double[] getGroupPvalues() {
@@ -361,7 +352,7 @@ public class GeneScoreReader {
     /**
      */
     public int getNumGeneScores() {
-        return num_pvals;
+        return numPvals;
     }
 
     /**

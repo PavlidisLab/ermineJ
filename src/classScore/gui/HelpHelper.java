@@ -25,50 +25,51 @@ import javax.swing.AbstractButton;
  */
 public class HelpHelper {
 
-   // JavaHelp
-   private HelpBroker m_helpBroker = null;
+    // JavaHelp
+    private HelpBroker m_helpBroker = null;
 
-   /**
-    * Initializes JavaHelp by creating HelpSet and HelpBroker objects and attaching an action listener an AbstractButton
-    * 
-    * @param c an AbstractButton (typically a JButton or JMenuItem) which will respond to help requests.
-    * @return true if successful
-    */
-   public boolean initHelp( AbstractButton c ) {
+    /**
+     * Initializes JavaHelp by creating HelpSet and HelpBroker objects and attaching an action listener an
+     * AbstractButton
+     * 
+     * @param c an AbstractButton (typically a JButton or JMenuItem) which will respond to help requests.
+     * @return true if successful
+     */
+    public boolean initHelp( AbstractButton c ) {
 
-      // Create HelpSet and HelpBroker objects
-      HelpSet hs = getHelpSet( "main.hs" );
-      if ( hs != null ) {
-         m_helpBroker = hs.createHelpBroker();
-         // Assign help to components
-         CSH.setHelpIDString( c, "top" );
-         c.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
-         return true;
-      }
-      //   GuiUtil.error( "Couldn't load help" );
-      System.err.println("Couldn't load help");
-      return false;
+        // Create HelpSet and HelpBroker objects
+        HelpSet hs = getHelpSet( "main.hs" );
+        if ( hs != null ) {
+            m_helpBroker = hs.createHelpBroker();
+            // Assign help to components
+            CSH.setHelpIDString( c, "top" );
+            c.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
+            return true;
+        }
+        // GuiUtil.error( "Couldn't load help" );
+        System.err.println( "Couldn't load help" );
+        return false;
 
-   }
+    }
 
-   /**
-    * Finds the helpset file and creates a HelpSet object.
-    * 
-    * @param helpsetFilename filename of the *.hs file relative to the classpath
-    * @return the help set object created from the file; if the file was not loaded for whatever reason, returns null.
-    */
-   private HelpSet getHelpSet( String helpsetFilename ) {
-      HelpSet hs = null;
-      ClassLoader cl = this.getClass().getClassLoader();
-      try {
-         URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
-         hs = new HelpSet( null, hsURL );
-      } catch ( Exception e ) {
-         System.err.println( "HelpSet: " + e.getMessage() );
-         System.err.println( "HelpSet: " + helpsetFilename + " not found" );
-         e.printStackTrace();
-      }
-      return hs;
-   }
+    /**
+     * Finds the helpset file and creates a HelpSet object.
+     * 
+     * @param helpsetFilename filename of the *.hs file relative to the classpath
+     * @return the help set object created from the file; if the file was not loaded for whatever reason, returns null.
+     */
+    private HelpSet getHelpSet( String helpsetFilename ) {
+        HelpSet hs = null;
+        ClassLoader cl = this.getClass().getClassLoader();
+        try {
+            URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
+            hs = new HelpSet( null, hsURL );
+        } catch ( Exception e ) {
+            System.err.println( "HelpSet: " + e.getMessage() );
+            System.err.println( "HelpSet: " + helpsetFilename + " not found" );
+            e.printStackTrace();
+        }
+        return hs;
+    }
 
 }

@@ -154,7 +154,7 @@ public class AnalysisThread {
         if ( athread != null ) throw new IllegalStateException(); // two analyses at once.
         try {
             athread = new Athread( AnalysisThread.class.getMethod( "loadAnalysis", new Class[] {} ), this );
-            athread.setName( "Loaded analysis thread" );
+            athread.setName( "Loading analysis thread" );
             athread.start();
         } catch ( SecurityException e ) {
             e.printStackTrace();
@@ -198,7 +198,6 @@ public class AnalysisThread {
         } catch ( NoSuchMethodException e ) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -211,13 +210,9 @@ public class AnalysisThread {
             messenger.setStatus( "Gene Scores are in memory" );
             geneScores = ( GeneScoreReader ) geneScoreSets.get( settings.getScoreFile() );
         } else {
-            try {
             messenger.setStatus( "Reading gene scores from file " + settings.getScoreFile() );
             geneScores = new GeneScoreReader( settings.getScoreFile(), settings, messenger, geneData
                     .getGeneToProbeList(), geneData.getProbeToGeneMap() );
-            } catch (RuntimeException e) {
-                return null; // interrupted.
-            }
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
         if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
@@ -256,13 +251,14 @@ public class AnalysisThread {
         }
         GeneScoreReader geneScores = addGeneScores();
         if ( Thread.currentThread().isInterrupted() ) return;
+
         Set activeProbes = getActiveProbes( rawData, geneScores );
         if ( activeProbes == null || Thread.currentThread().isInterrupted() ) return;
 
         boolean needToMakeNewGeneData = needNewGeneData( activeProbes );
         GeneAnnotations useTheseAnnots = geneData;
         if ( needToMakeNewGeneData ) {
-            useTheseAnnots = new GeneAnnotations( geneData, activeProbes );
+            useTheseAnnots = new GeneAnnotations( geneData, activeProbes ); // / don't redo the parent adding.
             // todo I don't like this
             // way of keeping track of
             // the different geneData
@@ -280,12 +276,8 @@ public class AnalysisThread {
             runResult = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
                     messenger, results, new Integer( numRuns ).toString() );
         } else {
-            try {
-                runResult = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
-                        messenger, new Integer( numRuns ).toString() );
-            } catch ( RuntimeException e ) {
-                return;
-            }
+            runResult = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
+                    messenger, new Integer( numRuns ).toString() );
         }
 
         if ( Thread.currentThread().isInterrupted() ) return;
