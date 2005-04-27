@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -25,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.xml.sax.SAXException;
 
@@ -71,7 +73,7 @@ public class GeneSetScoreFrame extends JFrame {
 
     private JPanel progressPanel;
     private JPanel progInPanel = new JPanel();
-    private JProgressBar progressBar = new JProgressBar();
+    JProgressBar progressBar = new JProgressBar();
     private OutputPanel oPanel;
 
     private JLabel jLabelStatus = new JLabel();
@@ -272,25 +274,51 @@ public class GeneSetScoreFrame extends JFrame {
         cancelAnalysisMenuItem.setEnabled( false );
     }
 
-    public void initialize() {
+    // private final class InitThread extends Thread {
+    //            
+    // public void run() {
+    //            
+    // }
+    //        
+    // }
+
+    public void updateProgress( int val ) {
+        final int value = val;
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            progressBar.setValue( value );
+        } else {
+
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    public void run() {
+                        progressBar.setValue( value );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public void run() {
+
         try {
-            mainPanel.add( progressPanel, BorderLayout.CENTER );
-
-            rawDataSets = new HashMap();
-            geneDataSets = new HashMap();
-            geneScoreSets = new HashMap();
-
-            progressBar.setValue( 10 );
-
-            // TODO: this stuff should be in another thread.
+            updateProgress( 10 );
             statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
-            goData = new GONames( settings.getClassFile() ); // parse go name file
-            progressBar.setValue( 70 );
+            goData = new GONames( settings.getClassFile() );
+            updateProgress( 70 );
+            if ( Thread.currentThread().isInterrupted() ) return;
 
             statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
             geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
 
-            progressBar.setValue( 100 );
+            updateProgress( 100 );
+            if ( Thread.currentThread().isInterrupted() ) return;
+
             // end slow part.
 
             if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
@@ -306,24 +334,39 @@ public class GeneSetScoreFrame extends JFrame {
             statusMessenger.setStatus( "Initializing gene class mapping" );
             geneDataSets.put( new Integer( "original".hashCode() ), geneData );
 
-            statusMessenger.setStatus( "Done with setup" );
-            enableMenusOnStart();
-
-            mainPanel.remove( progressPanel );
-            mainPanel.add( oPanel, BorderLayout.CENTER );
-            statusMessenger.setStatus( "Ready." );
-        } catch ( IllegalArgumentException e ) {
-            GuiUtil.error( "Error during initialization: " + e
+        } catch ( SAXException e ) {
+            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
         } catch ( IOException e ) {
             GuiUtil.error( "File reading or writing error during initialization: " + e.getMessage()
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit.", e );
             System.exit( 1 );
-        } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
+        } catch ( IllegalArgumentException e ) {
+            GuiUtil.error( "Error during initialization: " + e
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
+        }
+
+    }
+
+    public void initialize() {
+        try {
+            mainPanel.add( progressPanel, BorderLayout.CENTER );
+
+            rawDataSets = new HashMap();
+            geneDataSets = new HashMap();
+            geneScoreSets = new HashMap();
+
+            run();
+
+            statusMessenger.setStatus( "Done with setup" );
+            enableMenusOnStart();
+
+            mainPanel.remove( progressPanel );
+            mainPanel.add( oPanel, BorderLayout.CENTER );
+            statusMessenger.setStatus( "Ready." );
+
         } catch ( Exception e ) {
             e.printStackTrace();
         }
