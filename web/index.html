@@ -1,266 +1,237 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
-  <head>
-    <meta name="generator" content="HTML Tidy, see www.w3.org">
-
-    <title>Class Scoring</title>
-    <link type="text/css" rel="stylesheet" href="css/default.css">
-  </head>
-
-  <body bgcolor="#ffffff" link="#800000" text="#000000">
-    <table border="0" cellpadding="2" cellspacing="3" width="776">
-      <tr>
-        <td width="72"><!-- Logo space -->
-        <a href="/pavlidis">Home</a></td>
-
-        <td width="687">
-          <!-- Header space -->
-
-          <h1><img height="112" alt="ermineJ logo" src=
-          "images/logo1small.gif" width="266" border="0"></h1>
-
-          <h1>Gene Ontology analysis for&nbsp;microarray data</h1>
-        </td>
-      </tr>
-
-      <tr>
-        <td width="72"><!-- Left gutter space -->
-        <img height="1" alt="" src="/images/shim.gif" width="70"
-        border="0"></td>
-
-        <td valign="top" width="687">
-          <h2>Overview</h2>
-
-          <p>ErmineJ performs analyses of <b>gene sets</b> in
-          <b>expression microarray data</b>. A typical goal is to
-          determine whether particular biological pathways are "doing
-          something interesting" in the data. The software is designed
-          to be used by biologists with little or no informatics
-          background. A command-line interface is available for users
-          who wish to script the use of ermineJ.</p>
-
-          <p>Key features include:</p>
-
-          <ul>
-            <li>
-              Implementation of several methods for gene set analysis: 
-
-              <ul>
-                <li><a href=
-                "ermineJ-help/html/tutorial/ora.html">Over-representation
-                analysis</a></li>
-
-                <li><a href=
-                "ermineJ-help/html/tutorial/resampling.html">A
-                resampling-based method that uses gene scores</a></li>
-
-                <li>A resampling-based method that uses <a href=
-                "ermineJ-help/html/tutorial/correlation.html">correlation
-                between gene expression profiles</a> .</li>
-              </ul>
-            </li>
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
+
+<title>Class Scoring</title>
+<link type="text/css" rel="stylesheet" href="css/default.css">
+</head>
+
+<body bgcolor="#ffffff" link="#800000" text="#000000">
+<table border="0" cellpadding="2" cellspacing="3" width="776">
+	<tr>
+		<td width="72"><!-- Logo space --> <A href="/pavlidis">Home</A></td>
+
+		<td width="687"><!-- Header space -->
+
+		<h1><IMG height="112" alt="ermineJ logo" src="images/logo1small.gif"
+			width="266" border="0"></h1>
+
+		<h1>Gene Ontology analysis for&nbsp;microarray data</h1>
+		</td>
+	</tr>
+
+	<tr>
+		<td width="72"><!-- Left gutter space --> <IMG height="1" alt=""
+			src="/images/shim.gif" width="70" border="0"></td>
+
+		<td valign="top" width="687">
+		<h2>Overview</h2>
+
+		<p>ErmineJ performs analyses of <b>gene sets</b> in <b>expression
+		microarray data</b>. A typical goal is to determine whether particular
+		biological pathways are "doing something interesting" in the data. The
+		software is designed to be used by biologists with little or no
+		informatics background. A command-line interface is available for
+		users who wish to script the use of ermineJ.</p>
+
+		<p>Key features include:</p>
+
+		<ul>
+			<li>Implementation of several methods for gene set analysis:
+
+			<ul>
+				<li><A href="ermineJ-help/html/tutorial/ora.html">Over-representation
+				analysis</A>
+				<li><A href="ermineJ-help/html/tutorial/resampling.html">A
+				resampling-based method that uses gene scores</A>
+				<li>A resampling-based method that uses <a
+					href="ermineJ-help/html/tutorial/correlation.html">correlation
+				between gene expression profiles</a> .</li>
+			</ul>
+			<li>Gene sets receive statistical scores (p-values), and multiple
+			test correction is supported.
+			<li>Support of the Gene Ontology terminology
+			<li>User files use <A href="ermineJ-help/html/formats/go.html">simple
+			text formats</A>.
+			<li>Users can <A href="ermineJ-help/html/tutorial/classes.html">modify
+			gene sets or create new ones</A>.
+			<li>The results can be <a
+				href="ermineJ-help/html/tutorial/visualize.html">visualized within
+			the software</a>.
+			<li>It is simple to compare multiple analyses of the same data set
+			with different settings.
+			<li>Hyperlinks are provided to external sites to allow more efficient
+			browsing of the results.</li>
+		</ul>
 
-            <li>Gene sets receive statistical scores (p-values), and
-            multiple test correction is supported.</li>
+		<p><A href="ermineJ-help/html/license.html">License information</A> -
+		ermineJ is free software.</p>
 
-            <li>Support of the Gene Ontology terminology</li>
+		<h3>News</h3>
 
-            <li>User files use <a href="ermineJ-help/html/formats/go.html">simple text
-            formats</a>.</li>
+		<p>April 27 2005: Version 2.0.4 released. Annotation files no longer
+		need to contain lists of all parent terms, these are added b the
+		software. This means initializing the software is a little slower but
+		makes it much easier to use third-party annotation files. A number of
+		other minor issues and bugs were also fixed.</p>
 
-            <li>Users can <a href=
-            "ermineJ-help/html/tutorial/classes.html">modify gene sets
-            or create new ones</a>.</li>
+		<p>April 7 2005: Version 2.0.3 released. This fixes a few GUI bugs and
+		increases the usability of the 'load analysis' feature.</p>
 
-            <li>The results can be <a href=
-            "ermineJ-help/html/tutorial/visualize.html">visualized
-            within the software</a>.</li>
+		<p>January 4 2005: Version 2.0.2 released. This release addresses
+		several minor bugs relating to software usability. The software now
+		handles gene scores that are not p values more gracefully.</p>
 
-            <li>It is simple to compare multiple analyses of the same
-            data set with different settings.</li>
+		<p>December 23 2004: Version 2.0.1 released. This maintenance release
+		addresses a number of bugs, the most serious of which was a bug in the
+		"ORA" analysis that could lead to inaccurate findings in some cases.
+		In addition, the handling of gene scores that are not raw p-values has
+		been made more flexible. Most of the remaining bugs are minor and
+		relate to the usability of the software, but all users should update
+		to this version. There are also many improvements to the
+		documentation.</p>
 
-            <li>Hyperlinks are provided to external sites to allow more
-            efficient browsing of the results.</li>
-          </ul>
+		<p>October 13 2004 Version 2.0 released. This fixes several GUI bugs
+		that affected use under Linux and Mac, as well as some other minor
+		bugs and documentation improvements.</p>
 
-          <p><a href="ermineJ-help/html/license.html">License
-          information</a> - ermineJ is free software.</p>
+		<p><A href="versions.html">Full version history</A></p>
 
-          <h3>News</h3>
-			 
-			 <p>April 7 2005: Version 2.0.3 released. This fixes a few GUI bugs and increases the usability of the 'load analysis' feature.</p>
+		<h3>Download and installation</h3>
 
-			 <p>January 4 2005: Version 2.0.2 released. This release addresses several
-			 minor bugs relating to software usability.  The software now handles gene 
-			 scores that are not p values more gracefully.</p>
-				
-          <p>December 23 2004: Version 2.0.1 released. This maintenance release addresses a
-          number of bugs, the most serious of which was a bug in the "ORA" analysis that
-          could lead to inaccurate findings in some cases. In addition, the handling
-          of gene scores that are not raw p-values has been made more
-          flexible. Most of the remaining bugs are minor and relate to
-          the usability of the software, but all users should update to
-          this version. There are also many improvements to the
-          documentation.</p>
+		<h4>Requirements</h4>
 
-          <p>October 13 2004 Version 2.0 released. This fixes several
-          GUI bugs that affected use under Linux and Mac, as well as
-          some other minor bugs and documentation improvements.</p>
+		<p>ermineJ requires a Java 2 Runtime Environment (JRE) 1.4 or newer to
+		run. You can download the platform-specific packages from SUN's
+		website (<a href="http://java.sun.com/j2se/">http://java.sun.com/j2se/</a>
+		). Users of MS Windows NT/2000/XP can alternatively download the
+		Windows installer with bundled JRE package below.</p>
 
-      <p><a href="versions.html">Full version history</a></p>
-    
-    
-          <h3>Download and installation</h3>
+		<h4>Software Files</h4>
 
-          <h4>Requirements</h4>
+		<table width="100%" border="0" cellspacing="1" cellpadding="3"
+			bgcolor="#aaaaaa">
+			<tr bgcolor="#eeeeee">
+				<td width="37%"><strong>Description</strong></td>
 
-          <p>ermineJ requires a Java 2 Runtime Environment (JRE) 1.4 or
-          newer to run. You can download the platform-specific packages
-          from SUN's website (<a href=
-          "http://java.sun.com/j2se/">http://java.sun.com/j2se/</a> ).
-          Users of MS Windows NT/2000/XP can alternatively download the
-          Windows installer with bundled JRE package below.</p>
+				<td width="30%"><strong>File</strong></td>
 
-          <h4>Software Files</h4>
+				<td width="33%"><strong>Size</strong></td>
+			</tr>
 
-          <table width="100%" border="0" cellspacing="1" cellpadding=
-          "3" bgcolor="#aaaaaa">
-            <tr bgcolor="#eeeeee">
-              <td width="37%"><strong>Description</strong></td>
+			<tr>
+				<td bgcolor="#ffffff">Windows installer with bundled JRE</td>
 
-              <td width="30%"><strong>File</strong></td>
+				<td bgcolor="#ffffff"><a href="distributions/ermineJ-setup-jre.exe">ermineJ-setup-jre.exe</a></td>
 
-              <td width="33%"><strong>Size</strong></td>
-            </tr>
+				<td bgcolor="#ffffff">~30 MB</td>
+			</tr>
 
-            <tr>
-              <td bgcolor="#ffffff">Windows installer with bundled
-              JRE</td>
+			<tr>
+				<td bgcolor="#ffffff">Windows installer without JRE</td>
 
-              <td bgcolor="#ffffff"><a href=
-              "distributions/ermineJ-setup-jre.exe">ermineJ-setup-jre.exe</a></td>
+				<td bgcolor="#ffffff"><a href="distributions/ermineJ-setup.exe">ermineJ-setup.exe</a></td>
 
-              <td bgcolor="#ffffff">~30 MB</td>
-            </tr>
+				<td bgcolor="#ffffff">~7 MB</td>
+			</tr>
 
-            <tr>
-              <td bgcolor="#ffffff">Windows installer without JRE</td>
+			<tr>
+				<td bgcolor="#ffffff">Generic bundle</td>
 
-              <td bgcolor="#ffffff"><a href=
-              "distributions/ermineJ-setup.exe">ermineJ-setup.exe</a></td>
+				<td bgcolor="#ffffff"><a
+					href="distributions/ermineJ-2.0.4-bindist.tar.gz">ermineJ-2.0.4-bindist.tar.gz</a></td>
 
-              <td bgcolor="#ffffff">~7 MB</td>
-            </tr>
+				<td bgcolor="#ffffff">~7 MB</td>
+			</tr>
 
-            <tr>
-              <td bgcolor="#ffffff">Generic bundle</td>
+			<tr>
+				<td bgcolor="#ffffff">Source code</td>
 
-              <td bgcolor="#ffffff"><a href=
-              "distributions/ermineJ-2.0.3-bindist.tar.gz">ermineJ-2.0.3-bindist.tar.gz</a></td>
+				<td bgcolor="#ffffff"><u><a
+					href="distributions/ermineJ-2.0.4-src.tar.gz"><font color="#800000">ermineJ-2.0.4-src.tar.gz</font></a></u></td>
 
-              <td bgcolor="#ffffff">~7 MB</td>
-            </tr>
+				<td bgcolor="#ffffff">&lt; 1 MB</td>
+			</tr>
+		</table>
 
-            <tr>
-              <td bgcolor="#ffffff">Source code</td>
+		<h3>Annotation files</h3>
 
-              <td bgcolor="#ffffff"><u><a href=
-              "distributions/ermineJ-2.0.3-src.tar.gz"><font color=
-              "#800000">ermineJ-2.0.3-src.tar.gz</font></a></u></td>
+		<p>To use the software, you have to have microarray annotation files
+		and a recent Gene Ontology XML file.</p>
 
-              <td bgcolor="#ffffff">&lt; 1 MB</td>
-            </tr>
-          </table>
+		<p>Go <A href="/annots/">here</A> to get annotation files.&nbsp; Unzip
+		the one(s) you need and put them somewhere you can find them.</p>
 
-          <h3>Annotation files</h3>
+		<p>Go <a href="http://www.godatabase.org/dev/database/archive/latest/">here</a>
+		to get the XML file (something like go_200503-termdb.rdf-xml.gz, found
+		here: <a href="http://www.godatabase.org/dev/database/archive/latest/">http://www.godatabase.org/dev/database/archive/latest/</a>;
+		the date portion of the name may have changed). Unzip it and put it
+		somewhere you can locate it later.</p>
 
-          <p>To use the software, you have to have microarray
-          annotation files and a recent Gene Ontology XML file.</p>
+		<h3>Installation</h3>
 
-          <p>Go <a href="/annots/">here</a> to get annotation
-          files.&nbsp; Unzip the one(s) you need and put them somewhere
-          you can find them.</p>
+		<p>On MS Windows NT/2000/XP, simply run the installer.</p>
 
-          <p>Go <a href=
-          "http://www.godatabase.org/dev/database/archive/latest/">here</a>
-          to get the XML file (something like go_200503-termdb.rdf-xml.gz, found here: <a href=
-          "http://www.godatabase.org/dev/database/archive/latest/">http://www.godatabase.org/dev/database/archive/latest/</a>;
-          the date portion of the name may have changed). Unzip it and
-          put it somewhere you can locate it later.</p>
+		<p>For other platforms, you should be able to use the "Generic
+		bundle". There is a README file included that gives some instructions.</p>
 
-          <h3>Installation</h3>
+		<h3>WebStart</h3>
 
-          <p>On MS Windows NT/2000/XP, simply run the installer.</p>
+		<p>You can <A href="webstart">run ermineJ</A> from any operating
+		system that supports Java (in theory) without running the installer by
+		using java webstart.</p>
 
-          <p>For other platforms, you should be able to use the
-          "Generic bundle". There is a README file included that gives
-          some instructions.</p>
+		<p>This a good way to get the latest version, as we will keep the link
+		updated with the most recent development build. On the other hand,
+		this version should be considered less stable than the other releases.
+		This is here partly for our own testing purposes.</p>
 
-          <h3>WebStart</h3>
+		<h3>Documentation</h3>
 
-          <p>You can <a href="webstart">run ermineJ</a> from any
-          operating system that supports Java (in theory) without
-          running the installer by using java webstart.</p>
+		<p>The software comes with on-line help. The manual is also available
+		<a href="ermineJ-help/html">here</a> .</p>
+		<hr>
 
-          <p>This a good way to get the latest version, as we will keep
-          the link updated with the most recent development build. On
-          the other hand, this version should be considered less stable
-          than the other releases. This is here partly for our own
-          testing purposes.</p>
+		<h3>Contact</h3>
 
-          <h3>Documentation</h3>
+		<p>Contact <A href="mailto:pavlidis@dbmi.columbia.edu">Paul Pavlidis</A>
+		or <A href="mailto:keshav@cu-genome.org">Kiran Keshav</A> with bug
+		reports, feature requests, and questions.</p>
 
-          <p>The software comes with on-line help. The manual is also
-          available <a href="ermineJ-help/html">here</a> .</p>
-          <hr>
+		<h3>Publications using the software or methods</h3>
 
-          <h3>Contact</h3>
+		<ul>
+			<li><!--StartFragment -->Sibille, E., Arango, V., Galfalvy, H.C.,
+			Pavlidis, P., Ellis, S.P. and Mann, J.J. (2004) Genomic analysis of
+			depression and suicide in human prefrontal cortex.
+			Neuropsychopharmacology 29:351-361 .
+			<li><!--StartFragment -->&nbsp;Pavlidis P., Qin J, Arango V, Mann J,
+			Sibille E. (2004) Using the Gene Ontology for microarray data mining:
+			A comparison of methods and application to age effects in human
+			prefrontal cortex. Neurochemical Research, 29(6) 1213-1222&nbsp;.
+			<li>Pavlidis, P., Qin, J and Sibille E (2003) Statistical analysis of
+			Gene Ontology classes as tools for understanding gene expression
+			changes in the brain. Society for neuroscience Annual Meeting
+			Abstract 758.12. (<a href="neurosci2003.ppt"><font color="#0000ff">download
+			the powerpoint version of the poster</font></a> )
+			<li>Pavlidis, Lewis and Noble, Proceedings of the Pacific Symposium
+			on Biocomputing 7. pp 474-485, 2002. (<a
+				href="/pavlidis/doc/reprints/pavlidis-psb2002.pdf"><font
+				color="#0000ff">Download a reprint</font></a> .</li>
+		</ul>
 
-          <p>Contact <a href="mailto:pavlidis@dbmi.columbia.edu">Paul
-          Pavlidis</a> or <a href="mailto:keshav@cu-genome.org">
-          Kiran Keshav</a> with bug reports, feature requests, and
-          questions.</p>
+		<h3>Credits</h3>
 
-          <h3>Publications using the software or methods</h3>
-
-          <ul>
-            <li><!--StartFragment -->Sibille, E., Arango, V., Galfalvy,
-            H.C., Pavlidis, P., Ellis, S.P. and Mann, J.J. (2004)
-            Genomic analysis of depression and suicide in human
-            prefrontal cortex. Neuropsychopharmacology 29:351-361
-            .</li>
-
-            <li><!--StartFragment -->&nbsp;Pavlidis P., Qin J, Arango
-            V, Mann J, Sibille E. (2004) Using the Gene Ontology for
-            microarray data mining: A comparison of methods and
-            application to age effects in human prefrontal cortex.
-            Neurochemical Research, 29(6) 1213-1222&nbsp;.</li>
-
-            <li>Pavlidis, P., Qin, J and Sibille E (2003) Statistical
-            analysis of Gene Ontology classes as tools for
-            understanding gene expression changes in the brain. Society
-            for neuroscience Annual Meeting Abstract 758.12. (<a href=
-            "neurosci2003.ppt"><font color="#0000ff">download the
-            powerpoint version of the poster</font></a> )</li>
-
-            <li>Pavlidis, Lewis and Noble, Proceedings of the Pacific
-            Symposium on Biocomputing 7. pp 474-485, 2002. (<a href=
-            "/pavlidis/doc/reprints/pavlidis-psb2002.pdf"><font color=
-            "#0000ff">Download a reprint</font></a> .</li>
-          </ul>
-
-          <h3>Credits</h3>
-
-          <p>The software was written by Paul Pavlidis, Homin Lee,
-          William Braynen, and Kiran Keshav. Some code is based on 
-			 an earlier version of the software written by Shahmil Merchant 
-			 and Edward Chen, based in turn on a Perl implementation by 
-			 Paul Pavlidis. Our Gene Ontology annotations were obtained through 
-			 the <a href="http://www.geneontology.org/">Gene Ontology Consortium 
-			 web site</a>.</p>
-        </td>
-      </tr>
-    </table>
-  </body>
+		<p>The software was written by Paul Pavlidis, Homin Lee, William
+		Braynen, and Kiran Keshav. Some code is based on an earlier version of
+		the software written by Shahmil Merchant and Edward Chen, based in
+		turn on a Perl implementation by Paul Pavlidis. Our Gene Ontology
+		annotations were obtained through the <a
+			href="http://www.geneontology.org/">Gene Ontology Consortium web site</a>.</p>
+		</td>
+	</tr>
+</table>
+</body>
 </html>
