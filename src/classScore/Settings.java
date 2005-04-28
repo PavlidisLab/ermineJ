@@ -12,7 +12,6 @@ import java.util.Properties;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,7 +19,7 @@ import baseCode.util.FileTools;
 
 /**
  * <hr>
- * FIXME use commons configuration throughout.
+ * FIXME use commons configuration throughout (or as much as possible).
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
@@ -115,14 +114,23 @@ public class Settings {
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
 
             this.config = new PropertiesConfiguration( configFileLocation );
-            this.config.setAutoSave(true);
+            this.config.setAutoSave( true );
             log.debug( "Got configuration " + ConfigurationUtils.toString( this.config ) );
         } catch ( ConfigurationException e ) {
 
             try {
-                log.warn( "User properties file doesn't exist, creating new one from defaults" );
+                log.info( "User properties file doesn't exist, creating new one from defaults" );
+                URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
+
+                if ( defaultConfigFileLocation == null )
+                    throw new ConfigurationException( "Defaults not found either!" );
+
+                log.info( "Found defaults at " + defaultConfigFileLocation );
                 config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
-              //  config.save( USERGUI_PROPERTIES );
+                config.save( USERGUI_PROPERTIES ); // copy over to where they should be.
+                URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
+                log.info( "Saved the new configuration in " + configFileLocation );
+
             } catch ( ConfigurationException e1 ) {
                 e1.printStackTrace();
             }
@@ -220,11 +228,11 @@ public class Settings {
      * Writes setting values to file.
      */
     public void writePrefs( String fileName ) throws IOException {
-//        try {
-//            this.config.save();
-//        } catch ( ConfigurationException e ) {
-//            e.printStackTrace();
-//        }
+        // try {
+        // this.config.save();
+        // } catch ( ConfigurationException e ) {
+        // e.printStackTrace();
+        // }
         if ( fileName == null || fileName.length() == 0 ) {
             return;
         }
