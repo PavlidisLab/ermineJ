@@ -14,27 +14,17 @@ import java.util.Vector;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.bio.geneset.GeneSetMapTools;
-import baseCode.gui.GuiUtil;
 import classScore.data.GeneSetResult;
 
 /**
- * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Institution:: Columbia University
- * </p>
  * 
- * @author Pavlidis
+ * 
+ *
+ * <hr>
+ * <p>Copyright (c) 2004-2005 Columbia University
+ * @author pavlidis
  * @version $Id$
  */
-
 public class ResultsPrinter {
 
     protected String destFile;

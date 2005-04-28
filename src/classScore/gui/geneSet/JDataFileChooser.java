@@ -58,7 +58,8 @@ public class JDataFileChooser extends JFileChooser {
      */
     private class JDataFileChooserOptions extends JComponent {
 
-        JCheckBox m_includeEverything = new JCheckBox( "Include everything" );
+        JCheckBox m_includeEverything = new JCheckBox( "Include annotations and scores" );
+
         JCheckBox m_normalize = new JCheckBox( "Normalize" );
 
         GridLayout gridLayout1 = new GridLayout( 12, 2 );
@@ -77,6 +78,8 @@ public class JDataFileChooser extends JFileChooser {
 
         private void jbInit() throws Exception {
             setLayout( gridLayout1 );
+            m_includeEverything
+                    .setToolTipText( "Leave this box unchecked if you just want the expression value matrix" );
             this.setMaximumSize( new Dimension( 264, 63 ) );
             this.setMinimumSize( new Dimension( 264, 63 ) );
             m_titleLabel.setHorizontalAlignment( SwingConstants.CENTER );

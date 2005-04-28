@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -31,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -626,63 +629,111 @@ public class JGeneSetFrame extends JFrame {
 
     } // end createRowKeys
 
-    protected void saveData( String filename, boolean includeMatrixValues, boolean includeNonMatrix, boolean normalized )
-            throws IOException {
+    /**
+     * fixme - this should not be in the gui.
+     * 
+     * @param filename
+     * @param includeMatrixValues
+     * @param includeNonMatrix
+     * @param normalized
+     * @throws IOException
+     */
+    protected void saveData( String filename, boolean includeMatrixValues, boolean includeAnnotations,
+            boolean normalized ) throws IOException {
 
         final String NEWLINE = System.getProperty( "line.separator" );
 
-        BufferedWriter out = new BufferedWriter( new FileWriter( filename ) );
+        File outputFile = new File( filename );
+
+        BufferedWriter out = new BufferedWriter( new FileWriter( outputFile ) );
 
         boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
         m_matrixDisplay.setStandardizedEnabled( normalized );
-        {
-            int totalRowCount = m_table.getRowCount();
-            int totalColumnCount = m_table.getColumnCount();
-            int matrixColumnCount = m_matrixDisplay.getColumnCount();
 
-            // write out column names
+        int totalRowCount = m_table.getRowCount();
+        int matrixColumnCount = m_matrixDisplay.getColumnCount();
+
+        printHeader( includeMatrixValues, includeAnnotations, out, matrixColumnCount );
+
+        DecimalFormat nf;
+        nf = new DecimalFormat();
+        nf.setMaximumFractionDigits( 8 );
+        nf.setMinimumFractionDigits( 3 );
+        // write out the table, one row at a time
+        for ( int r = 0; r < totalRowCount; r++ ) {
+
+            String probeID = getProbeID( r );
+            out.write( probeID );
+
+            if ( includeAnnotations ) {
+                printAnnotationsForRow( out, matrixColumnCount, r );
+            }
+
             if ( includeMatrixValues ) {
-                for ( int c = 0; c < matrixColumnCount; c++ ) {
-                    String columnName = m_matrixDisplay.getColumnName( c );
-                    out.write( columnName + "\t" );
-                }
+                printMatrixValueForRow( out, nf, probeID );
+                m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
             }
-
-            if ( includeNonMatrix ) {// FIXME - this is not maintainable!
-                out.write( "Probe\tScore\tScore\tSymbol\tName" );
-            }
-
-            if ( includeMatrixValues || includeNonMatrix ) out.write( NEWLINE );
-
-            // write out the table, one row at a time
-            for ( int r = 0; r < totalRowCount; r++ ) {
-
-                if ( includeMatrixValues ) {
-
-                    // for this row: write out matrix values
-                    String probeID = getProbeID( r );
-                    double[] row = m_matrixDisplay.getRowByName( probeID );
-                    for ( int c = 0; c < row.length; c++ ) {
-                        out.write( row[c] + "\t" );
-                    }
-                    m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
-                }
-
-                if ( includeNonMatrix ) {
-                    // for this row: write out the rest of the table
-                    for ( int c = matrixColumnCount; c < totalColumnCount; c++ ) {
-                        out.write( stripHtml( m_table.getValueAt( r, c ).toString() ) + "\t" );
-                    }
-                }
-                out.write( NEWLINE );
-            }
+            out.write( NEWLINE );
         }
+
         m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
 
         // close the file
         out.close();
 
     } // end saveData
+
+    /**
+     * @param out
+     * @param nf
+     * @param probeID
+     * @throws IOException
+     */
+    private void printMatrixValueForRow( BufferedWriter out, DecimalFormat nf, String probeID ) throws IOException {
+        double[] row = m_matrixDisplay.getRowByName( probeID );
+        for ( int c = 0; c < row.length; c++ ) {
+            out.write( "\t" + nf.format( row[c] ) );
+        }
+    }
+
+    /**
+     * @param out
+     * @param matrixColumnCount
+     * @param r
+     * @throws IOException
+     */
+    private void printAnnotationsForRow( BufferedWriter out, int matrixColumnCount, int r ) throws IOException {
+        int interestingStuffStartsAt = matrixColumnCount;
+        int scoreColumn = interestingStuffStartsAt + 1;
+        int symbolColumn = interestingStuffStartsAt + 3;
+        int nameColumn = interestingStuffStartsAt + 4;
+        out.write( "\t" + m_table.getValueAt( r, scoreColumn ).toString() );
+        out.write( stripHtml( "\t" + m_table.getValueAt( r, symbolColumn ).toString() ) );
+        out.write( "\t" + m_table.getValueAt( r, nameColumn ).toString() );
+    }
+
+    /**
+     * @param includeMatrixValues
+     * @param includeAnnotations
+     * @param out
+     * @param matrixColumnCount
+     * @throws IOException
+     */
+    private void printHeader( boolean includeMatrixValues, boolean includeAnnotations, BufferedWriter out,
+            int matrixColumnCount ) throws IOException {
+        out.write( "Probe" );
+        if ( includeAnnotations ) {// FIXME - this is not maintainable!
+            out.write( "\tScore\tSymbol\tName" );
+        }
+        // write out column names
+        if ( includeMatrixValues ) {
+            for ( int c = 0; c < matrixColumnCount; c++ ) {
+                String columnName = m_matrixDisplay.getColumnName( c );
+                out.write( "\t" + columnName );
+            }
+        }
+        out.write( System.getProperty( "line.separator" ) );
+    }
 
     /**
      * Ridiculously simple to remove anchor tag.
@@ -787,6 +838,12 @@ public class JGeneSetFrame extends JFrame {
         if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
             File file = fileChooser.getSelectedFile();
+
+            if ( file.exists() ) {
+                returnVal = JOptionPane.showConfirmDialog( null, "File exists. Overwrite?" );
+                if ( returnVal != JOptionPane.OK_OPTION ) return;
+            }
+
             includeEverything = fileChooser.includeEverything();
             boolean normalize = fileChooser.normalized();
 
@@ -811,6 +868,12 @@ public class JGeneSetFrame extends JFrame {
         if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
             File file = imageChooser.getSelectedFile();
+
+            if ( file.exists() ) {
+                returnVal = JOptionPane.showConfirmDialog( null, "File exists. Overwrite?" );
+                if ( returnVal != JOptionPane.OK_OPTION ) return;
+            }
+
             includeLabels = imageChooser.includeLabels();
             boolean normalize = imageChooser.normalized();
 
