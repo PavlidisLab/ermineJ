@@ -21,6 +21,7 @@ import baseCode.gui.StatusJlabel;
 import baseCode.util.StatusViewer;
 
 /**
+ * FIXME this nominally extends JDialog but it isn't set up right.
  * <hr>
  * <p>
  * Copyright (c) 2003-2005 Columbia University

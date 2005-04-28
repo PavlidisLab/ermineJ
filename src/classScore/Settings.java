@@ -9,10 +9,18 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationUtils;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.util.FileTools;
 
 /**
  * <hr>
+ * FIXME use commons configuration throughout.
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
@@ -23,6 +31,16 @@ import baseCode.util.FileTools;
  */
 
 public class Settings {
+
+    /**
+     * 
+     */
+
+    private static final Log log = LogFactory.getLog( Settings.class );
+    private static final String USERGUI_PROPERTIES = "ermineJ.properties";
+    private static final String USERGUI_DEFAULT_PROPERTIES = "ermineJdefault.properties";
+    private PropertiesConfiguration config;
+
     private Properties properties;
     private String pref_file = "";
     private String classFile = "";
@@ -62,7 +80,7 @@ public class Settings {
     public static final int ROC = 3;
     public static final int TTEST = 4;
     public static final int KS = 5;
-
+    public static final String GENE_URL_BASE = "gene.url.base";
     public static final int BONFERONNI = 0;
     public static final int WESTFALLYOUNG = 1;
     public static final int BENJAMINIHOCHBERG = 2;
@@ -73,7 +91,7 @@ public class Settings {
 
     public Settings( URL resource ) {
         properties = new Properties();
-
+        initConfig();
         File fi = new File( resource.getFile() );
         pref_file = fi.getAbsolutePath();
 
@@ -90,13 +108,46 @@ public class Settings {
 
     /**
      * 
+     */
+    private void initConfig() {
+        try {
+            URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
+            if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
+
+            this.config = new PropertiesConfiguration( configFileLocation );
+            this.config.setAutoSave(true);
+            log.debug( "Got configuration " + ConfigurationUtils.toString( this.config ) );
+        } catch ( ConfigurationException e ) {
+
+            try {
+                log.warn( "User properties file doesn't exist, creating new one from defaults" );
+                config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
+              //  config.save( USERGUI_PROPERTIES );
+            } catch ( ConfigurationException e1 ) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * @return
+     */
+    public PropertiesConfiguration getConfig() {
+        if ( config == null ) initConfig();
+        if ( config == null ) {
+            return null;
+        }
+        return config;
+    }
+
+    /**
      * Creates settings object
      * 
      * @param filename name of preferences file to read
-     * @throws IOException 
+     * @throws IOException
      */
     public Settings( String filename ) throws IOException {
-
+        initConfig();
         properties = new Properties();
         if ( dataFolder == null && !this.determineDataDirectory() ) {
             return;
@@ -106,8 +157,8 @@ public class Settings {
         classFolder = new String( dataFolder + System.getProperty( "file.separator" ) + "genesets" );
 
         if ( !FileTools.testDir( classFolder ) ) {
-            if (! new File( classFolder ).mkdir()) {
-                throw new IOException("Could not create the class directory at " + classFolder);
+            if ( !new File( classFolder ).mkdir() ) {
+                throw new IOException( "Could not create the class directory at " + classFolder );
             }
         }
 
@@ -134,6 +185,7 @@ public class Settings {
      * @param settings - settings object to copy
      */
     public Settings( Settings settings ) {
+        initConfig();
         classFile = settings.getClassFile();
         annotFile = settings.getAnnotFile();
         rawFile = settings.getRawFile();
@@ -168,7 +220,11 @@ public class Settings {
      * Writes setting values to file.
      */
     public void writePrefs( String fileName ) throws IOException {
-
+//        try {
+//            this.config.save();
+//        } catch ( ConfigurationException e ) {
+//            e.printStackTrace();
+//        }
         if ( fileName == null || fileName.length() == 0 ) {
             return;
         }
@@ -200,7 +256,6 @@ public class Settings {
     }
 
     public String toString() {
-
         return properties.toString();
     }
 

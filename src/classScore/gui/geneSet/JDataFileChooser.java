@@ -27,7 +27,6 @@ public class JDataFileChooser extends JFileChooser {
     // fields
     JDataFileChooserOptions m_options;
 
-    /** Creates a new instance of JDetailsFileChooser */
     public JDataFileChooser( boolean includeEverything, boolean normalize ) {
 
         super();

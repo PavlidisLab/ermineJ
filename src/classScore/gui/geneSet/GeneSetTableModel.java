@@ -8,6 +8,10 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.JLinkLabel;
 import baseCode.gui.JMatrixDisplay;
@@ -28,6 +32,11 @@ import classScore.Settings;
 
 public class GeneSetTableModel extends AbstractTableModel {
 
+    /**
+     * 
+     */
+  
+    private static final String URL_REPLACE_TAG = "@@";
     private JMatrixDisplay m_matrixDisplay;
     private List m_probeIDs;
     private Map m_pvalues;
@@ -36,6 +45,9 @@ public class GeneSetTableModel extends AbstractTableModel {
     private DecimalFormat m_nf;
     private Settings settings;
     private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name" };
+    private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
+    protected static final Log log = LogFactory.getLog( GeneSetTableModel.class );
+    private Configuration config;
 
     /**
      * @param matrixDisplay
@@ -55,6 +67,21 @@ public class GeneSetTableModel extends AbstractTableModel {
         m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
         m_geneData = geneData;
         m_nf = nf;
+        configure();
+    }
+
+    /**
+     * 
+     */
+    protected void configure() {
+        String candidateUrlBase = settings.getConfig().getString( Settings.GENE_URL_BASE );
+        if ( candidateUrlBase != null && candidateUrlBase.indexOf( URL_REPLACE_TAG ) >= 0 ) {
+            this.urlbase = candidateUrlBase;
+            log.debug( "Setting urlbase to " + urlbase );
+        } else {
+            this.urlbase = "no setting found";
+            log.warn( "No gene tag in user's url base" );
+        }
     }
 
     public String getColumnName( int column ) {
@@ -121,8 +148,8 @@ public class GeneSetTableModel extends AbstractTableModel {
 
                 String gene_name = m_geneData.getProbeGeneName( probeID );
                 // gene name. todo make this smarter about building urls.
-                return m_geneData == null ? null : new JLinkLabel( gene_name,
-                        "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?" + "db=gene&cmd=search&term=" + gene_name );
+                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene_name );
+                return m_geneData == null ? null : new JLinkLabel( gene_name, url );
             case 4:
                 // description
                 return m_geneData == null ? "" : m_geneData.getProbeDescription( probeID );
