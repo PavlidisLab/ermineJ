@@ -32,10 +32,6 @@ import classScore.Settings;
 
 public class GeneSetTableModel extends AbstractTableModel {
 
-    /**
-     * 
-     */
-  
     private static final String URL_REPLACE_TAG = "@@";
     private JMatrixDisplay m_matrixDisplay;
     private List m_probeIDs;
@@ -47,7 +43,6 @@ public class GeneSetTableModel extends AbstractTableModel {
     private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name" };
     private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
     protected static final Log log = LogFactory.getLog( GeneSetTableModel.class );
-    private Configuration config;
 
     /**
      * @param matrixDisplay
@@ -143,11 +138,8 @@ public class GeneSetTableModel extends AbstractTableModel {
                 }
                 return values;
             case 3:
-
                 if ( m_geneData == null ) return "No data available";
-
                 String gene_name = m_geneData.getProbeGeneName( probeID );
-                // gene name. todo make this smarter about building urls.
                 String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene_name );
                 return m_geneData == null ? null : new JLinkLabel( gene_name, url );
             case 4:

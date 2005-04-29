@@ -53,6 +53,10 @@ import classScore.Settings;
 
 public class GeneSetScoreFrame extends JFrame {
 
+    /**
+     * 
+     */
+    private static final int STARTING_OVERALL_WIDTH = 830;
     private JPanel mainPanel = ( JPanel ) this.getContentPane();
     private JMenuBar jMenuBar1 = new JMenuBar();
     private JMenu fileMenu = new JMenu();
@@ -228,7 +232,7 @@ public class GeneSetScoreFrame extends JFrame {
 
         // status bar
         jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
-        jPanelStatus.setPreferredSize( new Dimension( 830, 33 ) );
+        jPanelStatus.setPreferredSize( new Dimension( STARTING_OVERALL_WIDTH, 33 ) );
         jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
         jLabelStatus.setPreferredSize( new Dimension( 800, 19 ) );
         jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );

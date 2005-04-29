@@ -17,7 +17,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -27,17 +29,21 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
@@ -46,6 +52,7 @@ import baseCode.gui.GuiUtil;
 import baseCode.gui.JGradientBar;
 import baseCode.gui.JLinkLabel;
 import baseCode.gui.JMatrixDisplay;
+import baseCode.gui.StatusJlabel;
 import baseCode.gui.table.JBarGraphCellRenderer;
 import baseCode.gui.table.JMatrixCellRenderer;
 import baseCode.gui.table.JVerticalHeaderRenderer;
@@ -68,41 +75,42 @@ import classScore.gui.JHistViewer;
  * @version $Id$
  */
 public class JGeneSetFrame extends JFrame {
-
+    protected static final Log log = LogFactory.getLog( JGeneSetFrame.class );
     private static final int COLOR_RANGE_SLIDER_MIN = 1;
     private static final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
 
-    private static final int DEFAULT_WIDTH_MATRIXDISPLAY_COLUMN = 6;
+    private static final String INCLUDEEVERYTHING = "detailsview.savedata.includeEverything";
+    private static final String INCLUDELABELS = "detailsview.saveimage.includeImageLabels";
+    private static final String MATRIXCOLUMNWIDTH = "detailsview.ColumnWidth";
+    private static final String WINDOWHEIGHT = "detailsview.WindowHeight";
+    private static final String WINDOWWIDTH = "detailsview.WindowWidth";
+    private static final String WINDOWPOSITIONX = "detailsview.WindowXPosition";
+    private static final String WINDOWPOSITIONY = "detailsview.WindowYPosition";
 
     private static final int MAX_WIDTH_MATRIXDISPLAY_COLUMN = 19;
     private static final int MIN_WIDTH_MATRIXDISPLAY_COLUMN = 1;
+    private static final int PREFERRED__WIDTH_MATRIXDISPLAY_COLUMN = 9;
     private static final int NORMALIZED_COLOR_RANGE_MAX = 12; // [-6,6] standard deviations out
     private static final int PREFERRED_WIDTH_DESCRIPTION_COLUMN = 300;
     private static final int PREFERRED_WIDTH_GENENAME_COLUMN = 75;
     private static final int PREFERRED_WIDTH_PROBEID_COLUMN = 75;
+
     private static final int PREFERRED_WIDTH_PVALUE_COLUMN = 75;
     private static final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
-    private static final String SAVESTARTPATH = "StartPath";
-
-    private static final String MATRIXCOLUMNWIDTH = "detailsview.ColumnWidth";
-    private static final String WINDOWHEIGHT = "detailsview.WindowHeight";
-    private static final String WINDOWWIDTH = "detailsview.WindowWidth";
-    private static final String INCLUDEEVERYTHING = "savedata.includeEverything";
-    private static final String INCLUDELABELS = "includeImageLabels";
+    private static final String SAVESTARTPATH = "detailsview.startPath";
 
     public JMatrixDisplay m_matrixDisplay = null;
     private GeneSetPvalRun analysisResults;
     private GeneSetResult classResults;
+    private int width;
     private int height;
     private boolean includeEverything = true;
 
     private boolean includeLabels = true; // whether when saving data we include the row/column labels.
     private int matrixColumnWidth; // how wide the color image columns are.
-    private PropertiesConfiguration properties;
-
     private Settings settings;
-    private int width;
-    protected BorderLayout borderLayout1 = new BorderLayout();
+    private GeneSetTableModel tableModel;
+
     protected JTable table = new JTable();
     protected JScrollPane tableScrollPane = new JScrollPane();
     protected JToolBar toolBar = new JToolBar();
@@ -110,8 +118,8 @@ public class JGeneSetFrame extends JFrame {
     JRadioButtonMenuItem blackbodyColormapMenuItem = new JRadioButtonMenuItem();
     JDataFileChooser fileChooser = null;
     JMenu fileMenu = new JMenu();
-    JRadioButtonMenuItem greenredColormapMenuItem = new JRadioButtonMenuItem();
 
+    JRadioButtonMenuItem greenredColormapMenuItem = new JRadioButtonMenuItem();
     JImageFileChooser imageChooser = null;
     JLabel m_cellWidthLabel = new JLabel();
     JSlider m_cellWidthSlider = new JSlider();
@@ -130,7 +138,9 @@ public class JGeneSetFrame extends JFrame {
     JMenuItem saveImageMenuItem = new JMenuItem();
     JMenuItem setOptionsMenuItem = new JMenuItem();
     JMenu viewMenu = new JMenu();
-    private GeneSetTableModel tableModel;
+    private JPanel jPanelStatus = new JPanel();
+    private JLabel jLabelStatus = new JLabel();
+    private StatusJlabel statusMessenger;
 
     /**
      * @param probeIDs an array of probe ID's that has some order; the actual order is arbitrary, as long as it is some
@@ -150,14 +160,13 @@ public class JGeneSetFrame extends JFrame {
             } else {
                 this.settings = settings;
             }
-            String filename = settings.getRawFile();
 
             this.analysisResults = run;
             this.classResults = res;
-
+            readPrefs();
+            String filename = settings.getRawFile();
             createDetailsTable( probeIDs, pvalues, geneData, filename );
             initChoosers();
-
             jbInit();
         } catch ( Exception e ) {
             throw new RuntimeException( e );
@@ -167,18 +176,21 @@ public class JGeneSetFrame extends JFrame {
     /**
      * @param e
      */
-    public void closeWindow_actionPerformed( WindowEvent e ) {
+    protected void closeWindow_actionPerformed( WindowEvent e ) {
         writePrefs();
         this.dispose();
     }
 
+    /**
+     * Create a matrix display.
+     * 
+     * @param probeIDs
+     * @param pvalues
+     * @param geneData
+     * @param filename
+     */
     private void createDetailsTable( List probeIDs, Map pvalues, GeneAnnotations geneData, String filename ) {
 
-        readPrefs();
-
-        //
-        // Create a matrix display
-        //
         // create a probe set from probeIDs
         HashSet probesInGeneSet = new HashSet();
         for ( int i = 0; i < probeIDs.size(); i++ ) {
@@ -188,11 +200,8 @@ public class JGeneSetFrame extends JFrame {
         // Read the matrix data
         DoubleMatrixReader matrixReader = new DoubleMatrixReader();
         DenseDoubleMatrix2DNamed matrix = null;
-        // keshav
-        if ( filename.length() == 0 ) {
-            filename = "dummy";
-        }
-        if ( !filename.equals( "dummy" ) ) {// keshav(was filename.length() > 0, now filename != dummy)
+
+        if ( filename != null && filename.length() > 0 ) {
             try {
                 matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesInGeneSet );
             } catch ( IOException e ) {
@@ -201,13 +210,9 @@ public class JGeneSetFrame extends JFrame {
                         + "and that it is a valid raw data file (tab-delimited).\n" );
             }
         }
-        /*
-         * //if ( matrix.rows() == 0 ) { if ( matrix == null ) {//added (use row above) GuiUtil .error( "None of the
-         * probes in this gene set were found in your data file." ); }
-         */
-        // if ( matrix.rows() != probesInGeneSet.size() ) {
-        if ( matrix == null ) {// added (use row above)
-            System.err.println( "Not all the probes in this gene set were in the data file." );
+
+        if ( matrix == null ) {
+            statusMessenger.setError( "Not all the probes in this gene set were in the data file." );
         }
 
         // create the matrix display
@@ -240,43 +245,7 @@ public class JGeneSetFrame extends JFrame {
 
         int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
-        // Set each column width and renderer.
-        for ( int i = 0; i < matrixColumnCount; i++ ) {
-            TableColumn col = table.getColumnModel().getColumn( i );
-            col.setMinWidth( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
-            col.setMaxWidth( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
-            col.setCellRenderer( matrixCellRenderer );
-            col.setHeaderRenderer( verticalHeaderRenderer );
-        }
-
-        if ( matrix != null ) // keshav added if (but not the guts)
-            resizeMatrixColumns( matrixColumnWidth );
-
-        //
-        // Set up the rest of the table
-        //
-        TableColumn col;
-
-        // probe ID
-        col = table.getColumnModel().getColumn( matrixColumnCount + 0 );
-        col.setPreferredWidth( PREFERRED_WIDTH_PROBEID_COLUMN );
-
-        // p value
-        col = table.getColumnModel().getColumn( matrixColumnCount + 1 );
-        col.setPreferredWidth( PREFERRED_WIDTH_PVALUE_COLUMN );
-
-        // p value bar
-        col = table.getColumnModel().getColumn( matrixColumnCount + 2 );
-        col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
-        col.setCellRenderer( new JBarGraphCellRenderer() );// todo
-
-        // name
-        col = table.getColumnModel().getColumn( matrixColumnCount + 3 );
-        col.setPreferredWidth( PREFERRED_WIDTH_GENENAME_COLUMN );
-
-        // description
-        col = table.getColumnModel().getColumn( matrixColumnCount + 4 );
-        col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
+        setColumnWidths( matrixColumnCount, matrixCellRenderer, matrix, verticalHeaderRenderer );
 
         // Sort initially by the pvalue column
         if ( settings.getBigIsBetter() ) {
@@ -302,6 +271,50 @@ public class JGeneSetFrame extends JFrame {
         table.setSize( d );
 
     } // end createDetailsTable
+
+    /**
+     * @param verticalHeaderRenderer
+     * @param matrix
+     * @param matrixCellRenderer
+     * @param matrixColumnCount
+     */
+    private void setColumnWidths( int matrixColumnCount, TableCellRenderer matrixCellRenderer, Object matrix,
+            TableCellRenderer verticalHeaderRenderer ) {
+
+        // Set each column width and renderer.
+        for ( int i = 0; i < matrixColumnCount; i++ ) {
+            TableColumn col = table.getColumnModel().getColumn( i );
+            col.setMinWidth( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
+            col.setMaxWidth( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
+            col.setCellRenderer( matrixCellRenderer );
+            col.setHeaderRenderer( verticalHeaderRenderer );
+            col.setPreferredWidth( PREFERRED__WIDTH_MATRIXDISPLAY_COLUMN );
+        }
+
+        if ( matrix != null ) // keshav added if (but not the guts)
+            resizeMatrixColumns( matrixColumnWidth );
+
+        //
+        // Set up the rest of the table
+        //
+        TableColumn col;
+        // probe ID
+        col = table.getColumnModel().getColumn( matrixColumnCount + 0 );
+        col.setPreferredWidth( PREFERRED_WIDTH_PROBEID_COLUMN );
+        // p value
+        col = table.getColumnModel().getColumn( matrixColumnCount + 1 );
+        col.setPreferredWidth( PREFERRED_WIDTH_PVALUE_COLUMN );
+        // p value bar
+        col = table.getColumnModel().getColumn( matrixColumnCount + 2 );
+        col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
+        col.setCellRenderer( new JBarGraphCellRenderer() );// todo
+        // name
+        col = table.getColumnModel().getColumn( matrixColumnCount + 3 );
+        col.setPreferredWidth( PREFERRED_WIDTH_GENENAME_COLUMN );
+        // description
+        col = table.getColumnModel().getColumn( matrixColumnCount + 4 );
+        col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
+    }
 
     private String getProbeID( int row ) {
         int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
@@ -343,141 +356,19 @@ public class JGeneSetFrame extends JFrame {
 
     private void jbInit() throws Exception {
 
-        setSize( width, height );
-        setResizable( false );
-        setLocation( 200, 100 );
-        getContentPane().setLayout( borderLayout1 );
-        setDefaultCloseOperation( DISPOSE_ON_CLOSE );
-
         // Listener for window closing events.
         this.addWindowListener( new JGeneSetFrame_windowListenerAdapter( this ) );
 
-        // Enable the horizontal scroll bar
-        table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
-
-        // Prevent user from moving tables around
-        table.getTableHeader().setReorderingAllowed( false );
-
-        // For html links on gene names
-        table.addMouseListener( new JGeneSetFrame_m_mouseAdapter( this ) );
-        table.addMouseMotionListener( new JGeneSetFrame_m_mouseMotionListener( this ) );
-
-        // change the cursor to a hand over a header
-        table.getTableHeader().addMouseListener( new JGeneSetFrameTableHeader_mouseAdapterCursorChanger( this ) );
-
-        // Make sure the matrix display doesn't have a grid separating color cells.
-        table.setIntercellSpacing( new Dimension( 0, 0 ) );
-
-        // The rest of the table (text and value) should have a light gray grid
-        table.setGridColor( Color.lightGray );
-
-        // add a viewport with a table inside it
-        toolBar.setFloatable( false );
-        this.setJMenuBar( menuBar );
-
-        fileMenu.setText( "File" );
-        greenredColormapMenuItem.setSelected( false );
-        greenredColormapMenuItem.setText( "Green-Red" );
-        greenredColormapMenuItem.addActionListener( new JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( this ) );
-        greenredColormapMenuItem.addActionListener( new JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( this ) );
-
-        viewMenu.setText( "View" );
-        blackbodyColormapMenuItem.setSelected( true );
-        blackbodyColormapMenuItem.setText( "Blackbody" );
-        blackbodyColormapMenuItem
-                .addActionListener( new JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
-        blackbodyColormapMenuItem
-                .addActionListener( new JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
-        saveImageMenuItem.setActionCommand( "SaveImage" );
-        saveImageMenuItem.setText( "Save Image..." );
-        saveImageMenuItem.addActionListener( new JGeneSetFrame_m_saveImageMenuItem_actionAdapter( this ) );
-        m_normalizeMenuItem.setText( "Normalize" );
-        m_normalizeMenuItem.addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter( this ) );
-
-        optionsMenu.setText( "Options" );
-        setOptionsMenuItem.setActionCommand( "Change gene name URL" );
-        setOptionsMenuItem.setText( "Change gene name URL..." );
-        setOptionsMenuItem.addActionListener( new JGeneSetFrame_viewGeneUrlDialog_actionAdapter( this ) );
-
-        analysisMenu.setText( "Analysis" );
-        m_viewHistMenuItem.setActionCommand( "View Distribution" );
-        m_viewHistMenuItem.setText( "View distribution" );
-        m_viewHistMenuItem.addActionListener( new JGeneSetFrame_m_viewHistMenuItem_actionAdapter( this ) );
-
-        viewMenu.add( m_normalizeMenuItem );
-        viewMenu.addSeparator();
-        viewMenu.add( greenredColormapMenuItem );
-        viewMenu.add( blackbodyColormapMenuItem );
-        fileMenu.add( saveImageMenuItem );
-        fileMenu.add( m_saveDataMenuItem );
-
-        optionsMenu.add( setOptionsMenuItem );
-
-        analysisMenu.add( m_viewHistMenuItem );
-
-        m_cellWidthSlider.setInverted( false );
-        m_cellWidthSlider.setMajorTickSpacing( 0 );
-        m_cellWidthSlider.setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
-        m_cellWidthSlider.setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
-        m_cellWidthSlider.setValue( matrixColumnWidth );
-        m_cellWidthSlider.setMinorTickSpacing( 3 );
-        m_cellWidthSlider.setPaintLabels( false );
-        m_cellWidthSlider.setPaintTicks( true );
-        m_cellWidthSlider.setMaximumSize( new Dimension( 90, 24 ) );
-        m_cellWidthSlider.setPreferredSize( new Dimension( 90, 24 ) );
-        m_cellWidthSlider.addChangeListener( new JGeneSetFrame_m_cellWidthSlider_changeAdapter( this ) );
-        this.setResizable( true );
-        m_cellWidthLabel.setText( "Cell Width:" );
-        m_spacerLabel.setText( "    " );
-        m_colorRangeLabel.setText( "Color Range:" );
-
-        m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
-        m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
-
-        if ( m_matrixDisplay != null ) {
-            m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
-            initColorRangeWidget();
-        }
-
-        m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
-        m_colorRangeSlider.setPreferredSize( new Dimension( 90, 24 ) );
-        m_colorRangeSlider.addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter( this ) );
-        m_saveDataMenuItem.setActionCommand( "SaveData" );
-        m_saveDataMenuItem.setText( "Save Data..." );
-        m_saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
-        tableScrollPane.getViewport().add( table, null );
-
-        // Reposition the table inside the scrollpane
-        int x = table.getSize().width; // should probably subtract the size of the viewport, but it gets trimmed
-        // anyway,
-        // so it's okay to be lazy here
-        tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
+        setupTable();
+        setupMenus();
+        setupToolBar();
+        setUpStatusBar();
+        setupWindow();
+        repositionViewport();
 
         this.getContentPane().add( tableScrollPane, BorderLayout.CENTER );
         this.getContentPane().add( toolBar, BorderLayout.NORTH );
-        toolBar.add( m_cellWidthLabel, null );
-        toolBar.add( m_cellWidthSlider, null );
-        toolBar.add( m_spacerLabel, null );
-        toolBar.add( m_colorRangeLabel, null );
-        toolBar.add( m_colorRangeSlider, null );
-        toolBar.add( m_gradientBar, null );
-
-        menuBar.add( fileMenu );
-        menuBar.add( viewMenu );
-        menuBar.add( optionsMenu );
-        menuBar.add( analysisMenu );
-
-        if ( analysisResults == null || analysisResults.getHist() == null ) {
-            analysisMenu.setEnabled( false );
-        }
-
-        // Color map menu items (radio button group -- only one can be selected at one time)
-        ButtonGroup group = new ButtonGroup();
-        group.add( greenredColormapMenuItem );
-        group.add( blackbodyColormapMenuItem );
-
-        m_cellWidthSlider.setPaintTrack( true );
-        m_cellWidthSlider.setPaintTicks( false );
+        this.getContentPane().add( jPanelStatus, BorderLayout.SOUTH );
 
         m_nf.setMaximumFractionDigits( 3 );
         if ( m_matrixDisplay != null ) {
@@ -487,6 +378,176 @@ public class JGeneSetFrame extends JFrame {
             // matrixDisplay is null! Disable the menu
             setDisplayMatrixGUIEnabled( false );
         }
+    }
+
+    /**
+     * 
+     */
+    private void setupTable() {
+        // Enable the horizontal scroll bar
+        table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+        // Prevent user from moving columns around
+        table.getTableHeader().setReorderingAllowed( false );
+        // For html links on gene names
+        table.addMouseListener( new JGeneSetFrame_m_mouseAdapter( this ) );
+        table.addMouseMotionListener( new JGeneSetFrame_m_mouseMotionListener( this ) );
+        // change the cursor to a hand over a header
+        table.getTableHeader().addMouseListener( new JGeneSetFrameTableHeader_mouseAdapterCursorChanger( this ) );
+        // Make sure the matrix display doesn't have a grid separating color cells.
+        table.setIntercellSpacing( new Dimension( 0, 0 ) );
+        // The rest of the table (text and value) should have a light gray grid
+        table.setGridColor( Color.lightGray );
+    }
+
+    /**
+     * 
+     */
+    private void repositionViewport() {
+        tableScrollPane.getViewport().add( table, null );
+        // Reposition the table inside the scrollpane
+        int x = table.getSize().width;
+        // should probably subtract the size of the viewport, but it gets trimmed
+        // anyway,
+        // so it's okay to be lazy here
+        tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
+        statusMessenger.setError( "You may need to scroll horizontally or adjust the column width to see all the data" );
+    }
+
+    /**
+     * 
+     */
+    private void setupWindow() {
+
+        this.setSize( this.width, this.height );
+        log.debug( "Size: " + this.getWidth() + " X " + this.getHeight() );
+        this.setResizable( true );
+
+        try {
+            int startX = ( int ) settings.getConfig().getDouble( WINDOWPOSITIONX );
+            int startY = ( int ) settings.getConfig().getDouble( WINDOWPOSITIONY );
+            this.setLocation( new Point( startX, startY ) );
+        } catch ( NoSuchElementException e ) {
+            this.setLocation( new Point( 100, 100 ) );
+        }
+        this.getContentPane().setLayout( new BorderLayout() );
+        this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
+        this.setTitle( "Gene set details" );
+    }
+
+    /**
+     * 
+     */
+    private void setUpStatusBar() {
+        // status bar
+        jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
+        jPanelStatus.setPreferredSize( new Dimension( this.width, 33 ) );
+        jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
+        jLabelStatus.setPreferredSize( new Dimension( this.width - 30, 19 ) );
+        jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
+        jPanelStatus.add( jLabelStatus, null );
+        statusMessenger = new StatusJlabel( jLabelStatus );
+    }
+
+    /**
+     * 
+     */
+    private void setupToolBar() {
+        toolBar.setFloatable( false );
+        m_cellWidthSlider.setInverted( false );
+        m_cellWidthSlider.setMajorTickSpacing( 0 );
+        m_cellWidthSlider.setMaximum( MAX_WIDTH_MATRIXDISPLAY_COLUMN );
+        m_cellWidthSlider.setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
+        m_cellWidthSlider.setValue( matrixColumnWidth );
+        m_cellWidthSlider.setMinorTickSpacing( 3 );
+        m_cellWidthSlider.setPaintLabels( false );
+        m_cellWidthSlider.setPaintTicks( true );
+        m_cellWidthSlider.setPaintTrack( true );
+        m_cellWidthSlider.setPaintTicks( false );
+        m_cellWidthSlider.setMaximumSize( new Dimension( 90, 24 ) );
+        m_cellWidthSlider.setPreferredSize( new Dimension( 90, 24 ) );
+        m_cellWidthSlider.addChangeListener( new JGeneSetFrame_m_cellWidthSlider_changeAdapter( this ) );
+        this.setResizable( true );
+        m_cellWidthLabel.setText( "Cell Width:" );
+        m_spacerLabel.setText( "    " );
+        m_colorRangeLabel.setText( "Color Range:" );
+        m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
+        m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
+        if ( m_matrixDisplay != null ) {
+            m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
+            initColorRangeWidget();
+        }
+        m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
+        m_colorRangeSlider.setPreferredSize( new Dimension( 90, 24 ) );
+        m_colorRangeSlider.addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter( this ) );
+        toolBar.add( m_cellWidthLabel, null );
+        toolBar.add( m_cellWidthSlider, null );
+        toolBar.add( m_spacerLabel, null );
+        toolBar.add( m_colorRangeLabel, null );
+        toolBar.add( m_colorRangeSlider, null );
+        toolBar.add( m_gradientBar, null );
+    }
+
+    /**
+     * 
+     */
+    private void setupMenus() {
+
+        this.setJMenuBar( menuBar );
+        fileMenu.setText( "File" );
+        fileMenu.add( saveImageMenuItem );
+        fileMenu.add( m_saveDataMenuItem );
+
+        greenredColormapMenuItem.setSelected( false );
+        greenredColormapMenuItem.setText( "Green-Red" );
+        greenredColormapMenuItem.addActionListener( new JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( this ) );
+        greenredColormapMenuItem.addActionListener( new JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( this ) );
+        viewMenu.setText( "View" );
+        blackbodyColormapMenuItem.setSelected( true );
+        blackbodyColormapMenuItem.setText( "Blackbody" );
+        blackbodyColormapMenuItem
+                .addActionListener( new JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
+        blackbodyColormapMenuItem
+                .addActionListener( new JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( this ) );
+        // Color map menu items (radio button group -- only one can be selected at one time)
+        ButtonGroup group = new ButtonGroup();
+        group.add( greenredColormapMenuItem );
+        group.add( blackbodyColormapMenuItem );
+
+        saveImageMenuItem.setActionCommand( "SaveImage" );
+        saveImageMenuItem.setText( "Save Image..." );
+        saveImageMenuItem.addActionListener( new JGeneSetFrame_m_saveImageMenuItem_actionAdapter( this ) );
+        m_normalizeMenuItem.setText( "Normalize" );
+        m_normalizeMenuItem.addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter( this ) );
+        optionsMenu.setText( "Options" );
+        setOptionsMenuItem.setActionCommand( "Change gene name URL" );
+        setOptionsMenuItem.setText( "Change gene name URL..." );
+        setOptionsMenuItem.addActionListener( new JGeneSetFrame_viewGeneUrlDialog_actionAdapter( this ) );
+
+        viewMenu.add( m_normalizeMenuItem );
+        viewMenu.addSeparator();
+        viewMenu.add( greenredColormapMenuItem );
+        viewMenu.add( blackbodyColormapMenuItem );
+
+        optionsMenu.add( setOptionsMenuItem );
+
+        analysisMenu.setText( "Analysis" );
+        m_viewHistMenuItem.setActionCommand( "View Distribution" );
+        m_viewHistMenuItem.setText( "View distribution" );
+        m_viewHistMenuItem.addActionListener( new JGeneSetFrame_m_viewHistMenuItem_actionAdapter( this ) );
+        analysisMenu.add( m_viewHistMenuItem );
+
+        m_saveDataMenuItem.setActionCommand( "SaveData" );
+        m_saveDataMenuItem.setText( "Save Data..." );
+        m_saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
+
+        if ( analysisResults == null || analysisResults.getHist() == null ) {
+            analysisMenu.setEnabled( false );
+        }
+
+        menuBar.add( fileMenu );
+        menuBar.add( viewMenu );
+        menuBar.add( optionsMenu );
+        menuBar.add( analysisMenu );
     }
 
     /**
@@ -558,34 +619,42 @@ public class JGeneSetFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      *
      */
     private void readPrefs() {
 
-        if ( settings == null ) return;
+        if ( settings == null ) {
+            return;
+        }
 
         width = 800;
         height = table.getHeight();
-        matrixColumnWidth = DEFAULT_WIDTH_MATRIXDISPLAY_COLUMN;
+        matrixColumnWidth = PREFERRED__WIDTH_MATRIXDISPLAY_COLUMN;
 
         if ( settings.getConfig() == null ) return;
 
-        if ( settings.getConfig().containsKey( WINDOWWIDTH ) )
-            width = Integer.parseInt( settings.getConfig().getString( WINDOWWIDTH ) );
+        if ( settings.getConfig().containsKey( WINDOWWIDTH ) ) {
+            this.width = Integer.parseInt( settings.getConfig().getString( WINDOWWIDTH ) );
+            log.debug( "Got: " + width );
+        }
 
-        if ( settings.getConfig().containsKey( WINDOWHEIGHT ) )
-            height = Integer.parseInt( settings.getConfig().getString( WINDOWHEIGHT ) );
-
-        if ( settings.getConfig().containsKey( MATRIXCOLUMNWIDTH ) )
-            matrixColumnWidth = Integer.parseInt( settings.getConfig().getString( MATRIXCOLUMNWIDTH ) );
-
-        if ( settings.getConfig().containsKey( INCLUDELABELS ) )
+        if ( settings.getConfig().containsKey( WINDOWHEIGHT ) ) {
+            this.height = Integer.parseInt( settings.getConfig().getString( WINDOWHEIGHT ) );
+            log.debug( "Got: " + height );
+        }
+        if ( settings.getConfig().containsKey( MATRIXCOLUMNWIDTH ) ) {
+            this.matrixColumnWidth = Integer.parseInt( settings.getConfig().getString( MATRIXCOLUMNWIDTH ) );
+            log.debug( "Got: " + matrixColumnWidth );
+        }
+        if ( settings.getConfig().containsKey( INCLUDELABELS ) ) {
             this.includeLabels = Boolean.getBoolean( settings.getConfig().getString( INCLUDELABELS ) );
-
-        if ( settings.getConfig().containsKey( INCLUDEEVERYTHING ) )
+            log.debug( "Got: " + includeLabels );
+        }
+        if ( settings.getConfig().containsKey( INCLUDEEVERYTHING ) ) {
             this.includeEverything = Boolean.getBoolean( settings.getConfig().getString( INCLUDEEVERYTHING ) );
-
+            log.debug( "Got: " + includeEverything );
+        }
     }
 
     private void setDisplayMatrixGUIEnabled( boolean enabled ) {
@@ -633,6 +702,8 @@ public class JGeneSetFrame extends JFrame {
         settings.getConfig().setProperty( MATRIXCOLUMNWIDTH, String.valueOf( this.matrixColumnWidth ) );
         settings.getConfig().setProperty( INCLUDELABELS, String.valueOf( this.includeLabels ) );
         settings.getConfig().setProperty( INCLUDEEVERYTHING, String.valueOf( this.includeEverything ) );
+        settings.getConfig().setProperty( WINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
+        settings.getConfig().setProperty( WINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
         if ( imageChooser != null )
             settings.getConfig().setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
 
@@ -813,14 +884,6 @@ public class JGeneSetFrame extends JFrame {
         table.repaint();
     }
 
-    /**
-     * @param e
-     */
-    void viewGeneUrlDialogMenuItem_actionPerformed( ActionEvent e ) {
-        GeneUrlDialog d = new GeneUrlDialog( this, settings, this.tableModel );
-        d.setVisible( true );
-    }
-
     void m_saveDataMenuItem_actionPerformed( ActionEvent e ) {
         int returnVal = fileChooser.showSaveDialog( this );
         if ( returnVal == JFileChooser.APPROVE_OPTION ) {
@@ -920,8 +983,15 @@ public class JGeneSetFrame extends JFrame {
     void table_mouseMoved( MouseEvent e ) {
         int i = table.rowAtPoint( e.getPoint() );
         int j = table.columnAtPoint( e.getPoint() );
-        if ( i >= 0 && j == table.getColumnCount() - 2 && table.getValueAt( i, j ) != null ) {
+        if ( onGeneSymbolCell( i, j ) ) {
             setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+            if ( table.getValueAt( i, j ) instanceof JLinkLabel ) {
+                JLinkLabel geneLink = ( JLinkLabel ) table.getValueAt( i, j );
+                if ( geneLink.getURL() != null ) statusMessenger.setStatus( geneLink.getURL(), false );
+            } else {
+                statusMessenger.setStatus( table.getValueAt( i, j ).toString(), false );
+            }
+
         } else
             setCursor( Cursor.getDefaultCursor() );
     }
@@ -930,11 +1000,32 @@ public class JGeneSetFrame extends JFrame {
         if ( SwingUtilities.isLeftMouseButton( e ) ) {
             int i = table.getSelectedRow();
             int j = table.getSelectedColumn();
-            if ( table.getValueAt( i, j ) != null && j == table.getColumnCount() - 2 ) {
-                JLinkLabel geneLink = ( JLinkLabel ) table.getValueAt( i, j );
-                geneLink.mouseClicked( e );
+            if ( onGeneSymbolCell( i, j ) ) {
+                if ( table.getValueAt( i, j ) instanceof JLinkLabel ) {
+                    JLinkLabel geneLink = ( JLinkLabel ) table.getValueAt( i, j );
+                    if ( geneLink != null ) geneLink.mouseClicked( e );
+                } else {
+                    statusMessenger.setStatus( table.getValueAt( i, j ).toString(), false );
+                }
             }
         }
+    }
+
+    /**
+     * @param i
+     * @param j
+     * @return
+     */
+    private boolean onGeneSymbolCell( int i, int j ) {
+        return table.getValueAt( i, j ) != null && j == table.getColumnCount() - 2;
+    }
+
+    /**
+     * @param e
+     */
+    void viewGeneUrlDialogMenuItem_actionPerformed( ActionEvent e ) {
+        GeneUrlDialog d = new GeneUrlDialog( this, settings, this.tableModel );
+        d.setVisible( true );
     }
 
 } // end class JGeneSetFrame

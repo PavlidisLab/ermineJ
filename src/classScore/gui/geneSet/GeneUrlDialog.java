@@ -57,7 +57,7 @@ public class GeneUrlDialog extends JFrame {
         this.settings = settings;
         this.tableModel = model;
         this.callingframe = parent;
-       // this.setModal( true );
+        // this.setModal( true );
         try {
             jbInit();
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -80,12 +80,10 @@ public class GeneUrlDialog extends JFrame {
         mainPanel.setLayout( new BorderLayout() );
 
         centerPanel.setPreferredSize( new Dimension( 200, 50 ) );
-
+        
         urlTextField = new JTextField();
+        initializeFieldText();
         urlTextField.setPreferredSize( new Dimension( 500, 19 ) );
-
-        initField();
-
         urlTextField.addMouseListener( new SetTextMouseButton_actionAdapter( this ) );
         centerPanel.add( urlTextField, null );
 
@@ -120,52 +118,39 @@ public class GeneUrlDialog extends JFrame {
     /**
      * 
      */
-    private void initField() {
-        try {
-            PropertiesConfiguration config = new PropertiesConfiguration( "ermineJ.properties" );
-            if ( config != null ) {
-                String oldUrlBase = config.getString( Settings.GENE_URL_BASE );
-                log.debug("Found url base " + oldUrlBase);
-                urlTextField.setText( oldUrlBase );
-                hasOld = true;
-            }
+    private void initializeFieldText() {
 
-        } catch ( org.apache.commons.configuration.ConfigurationException e ) {
-            urlTextField.setText( "Click here and type a URL containing '@@' where the gene name will go." );
-            hasOld = false;
+        if ( this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
+            String oldUrlBase = this.settings.getConfig().getString( Settings.GENE_URL_BASE );
+            log.debug( "Found url base " + oldUrlBase );
+            urlTextField.setText( oldUrlBase );
+            hasOld = true;
         }
     }
 
     void cancelButton_actionPerformed() {
-        log.debug("got cancel");
         dispose();
     }
 
     void setActionPerformed() {
-        String candidateUrlBase = urlTextField.getText();
+        String candidateUrlBase = urlTextField.getText().trim();
 
-        if ( candidateUrlBase.length() == 0) {
+        if ( candidateUrlBase.length() == 0 ) {
             statusMessenger.setError( "URL must not be blank." );
             return;
         }
-        
+
         if ( candidateUrlBase.indexOf( "@@" ) < 0 ) {
             statusMessenger.setError( "URL must contain the string '@@' for substitution with the gene name" );
             return;
         }
 
-        if ( candidateUrlBase.indexOf( " " ) > 0 ) {
+        if ( candidateUrlBase.indexOf( " " ) >= 0 ) {
             statusMessenger.setError( "URL should not contain spaces" );
             return;
         }
 
         settings.getConfig().setProperty( Settings.GENE_URL_BASE, candidateUrlBase );
-//        try {
-//            settings.getConfig().save();
-//            log.debug("Saved configuration");
-//        } catch ( ConfigurationException e ) {
-//            e.printStackTrace();
-//        }
         tableModel.configure();
         dispose();
     }
