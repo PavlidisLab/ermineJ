@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <pomVersion>3</pomVersion>
-    <id>ermineJ:null</id>
+    <id>ermineJ</id>
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
     <currentVersion>2.0.4</currentVersion>
