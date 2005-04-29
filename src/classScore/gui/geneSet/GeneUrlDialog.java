@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -119,8 +120,15 @@ public class GeneUrlDialog extends JFrame {
      * 
      */
     private void initializeFieldText() {
-
-        if ( this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
+       if (this.settings == null ) {
+           try {
+            this.settings = new Settings();
+        } catch ( IOException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+       }
+        if (  this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
             String oldUrlBase = this.settings.getConfig().getString( Settings.GENE_URL_BASE );
             log.debug( "Found url base " + oldUrlBase );
             urlTextField.setText( oldUrlBase );
