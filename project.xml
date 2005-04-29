@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
     <pomVersion>3</pomVersion>
+    <id>ermineJ:null</id>
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
-    <id>ermineJ</id>
     <currentVersion>2.0.4</currentVersion>
     <organization>
         <name>Columbia University</name>
@@ -30,7 +31,7 @@
             <id>2.0b3</id>
             <name>beta3</name>
         </version>
- 		<version>
+        <version>
             <id>2.0.2</id>
             <name>2.0.2</name>
         </version>
@@ -41,28 +42,24 @@
             <id>pavlidis</id>
             <email>pavlidis@dbmi.columbia.edu</email>
             <organization>Columbia University</organization>
-            <roles/>
         </developer>
         <developer>
             <name>William Braynen</name>
             <id>wbraynen</id>
             <email>wbraynen@ic.sunysb.edu</email>
             <organization>Columbia University</organization>
-            <roles/>
         </developer>
         <developer>
             <name>Homin Lee</name>
             <id>hkl7</id>
             <email>hkl7@cs.columbia.edu</email>
             <organization>Columbia University</organization>
-            <roles/>
         </developer>
         <developer>
             <name>Kiran Keshav</name>
             <id>keshav</id>
             <email>keshav@cu-genome.org</email>
             <organization>Columbia University</organization>
-            <roles/>
         </developer>
     </developers>
     <licenses>
@@ -84,6 +81,15 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.0.3</version>
+            <type>jar</type>
+            <properties>
+                <jnlp.jar>true</jnlp.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.1</version>
             <type>jar</type>
             <properties>
                 <jnlp.jar>true</jnlp.jar>
@@ -113,40 +119,44 @@
             <version>2.0</version>
             <jar>jh.jar</jar>
             <type>jar</type>
-            <jnlp.jar>true</jnlp.jar>
-            <properties/>
         </dependency>
         <dependency>
             <groupId>getopt</groupId>
             <artifactId>java-getopt</artifactId>
             <version>1.0.9</version>
             <type>jar</type>
-            <jnlp.jar>false</jnlp.jar>
-            <properties/>
         </dependency>
         <dependency>
             <groupId>forehead</groupId>
             <artifactId>forehead</artifactId>
             <version>1.0-beta-5</version>
-            <jnlp.jar>false</jnlp.jar>
             <type>jar</type>
-            <properties/>
         </dependency>
         <dependency>
             <groupId>jfreechart</groupId>
             <artifactId>jfreechart</artifactId>
             <version>0.9.20</version>
             <type>jar</type>
-            <jnlp.jar>false</jnlp.jar>
-            <properties/>
         </dependency>
         <dependency>
             <groupId>jcommon</groupId>
             <artifactId>jcommon</artifactId>
             <version>0.9.5</version>
             <type>jar</type>
-            <jnlp.jar>false</jnlp.jar>
-            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.1</version>
+            <jar>commons-collections-3.1.jar</jar>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.0</version>
+            <jar>commons-lang-2.0.jar</jar>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
@@ -165,15 +175,6 @@
                 </includes>
                 <filtering>false</filtering>
             </resource>
-<!--            <resource>
-                <directory>${basedir}</directory>
-                <includes>
-                    <include>ermineJ-help.jar</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
--->
-
         </resources>
     </build>
     <reports>
@@ -187,5 +188,5 @@
         <report>maven-junit-report-plugin</report>
         <report>maven-tasklist-plugin</report>
     </reports>
-    <properties/>
 </project>
+
