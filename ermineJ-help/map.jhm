@@ -31,6 +31,7 @@
 	<mapID target="faq" url="html/faq.html" />
 	<mapID target="install" url="html/tutorial/install.html" />
 	<mapID target="numitems" url="html/tutorial/numitems.html" />
-	
+	<mapID target="findgenesets" url="html/tutorial/findgenesets.html" />
+	<mapID target="setgeneurl" url="html/tutorial/setgeneurl.html" />
 </map>
 

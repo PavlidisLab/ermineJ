@@ -22,6 +22,7 @@
        <tocitem text="Viewing gene set details" target="visualize"/>
       <tocitem text="Loading and saving analysis" target="loadsave"/>
       <tocitem text="Defining your own gene sets" target="classes"/>
+      <tocitem text="Finding gene sets" target="findgenesets" />
       
    </tocitem>
    
