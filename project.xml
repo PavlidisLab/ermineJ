@@ -113,6 +113,15 @@
                 <jnlp.jar>true</jnlp.jar>
             </properties>
         </dependency>
+         <dependency>
+            <groupId>ostermiller</groupId>
+            <artifactId>ostermillerutils</artifactId>
+            <type>jar</type>
+            <jar>ostermillerutils_1_04_03_for_java_1_4.jar</jar>
+             <properties>
+                <jnlp.jar>true</jnlp.jar>
+            </properties>
+        </dependency>
         <dependency>
             <groupId>javahelp</groupId>
             <artifactId>jhelp</artifactId>
