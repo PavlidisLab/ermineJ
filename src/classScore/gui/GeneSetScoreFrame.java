@@ -24,6 +24,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -74,7 +76,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenuItem helpMenuItem = new JMenuItem();
     private JMenuItem aboutMenuItem = new JMenuItem();
     private final JFileChooser fc = new JFileChooser();
-
+    private JTabbedPane tabs = new JTabbedPane();
     private JPanel progressPanel;
     private JPanel progInPanel = new JPanel();
     JProgressBar progressBar = new JProgressBar();
@@ -227,6 +229,17 @@ public class GeneSetScoreFrame extends JFrame {
         // main panel
         oPanel = new OutputPanel( this, results );
         oPanel.setPreferredSize( new Dimension( 830, 330 ) );
+        tabs.setPreferredSize( new Dimension( 830, 330 ) );
+
+        JPanel treePanel = new JPanel();
+
+        // TODO: populate the tree
+        JTree tree = new JTree(new Object[] {});
+        tree.setPreferredSize( new Dimension( 830, 330 ) );
+        treePanel.add( tree, BorderLayout.CENTER );
+        
+        tabs.addTab( "Table", oPanel );
+        tabs.addTab( "Tree", treePanel );
 
         // controls
 
@@ -318,7 +331,7 @@ public class GeneSetScoreFrame extends JFrame {
             if ( Thread.currentThread().isInterrupted() ) return;
 
             statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
+            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
 
             updateProgress( 100 );
             if ( Thread.currentThread().isInterrupted() ) return;
@@ -350,7 +363,7 @@ public class GeneSetScoreFrame extends JFrame {
             GuiUtil.error( "Error during initialization: " + e
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
-        }
+        }  
 
     }
 
@@ -368,7 +381,10 @@ public class GeneSetScoreFrame extends JFrame {
             enableMenusOnStart();
 
             mainPanel.remove( progressPanel );
-            mainPanel.add( oPanel, BorderLayout.CENTER );
+
+            mainPanel.add( tabs, BorderLayout.CENTER );
+
+            // mainPanel.add( oPanel, BorderLayout.CENTER );
             statusMessenger.setStatus( "Ready." );
 
         } catch ( Exception e ) {

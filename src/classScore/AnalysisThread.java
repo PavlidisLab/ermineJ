@@ -52,7 +52,7 @@ public class AnalysisThread {
         }
 
         public void run() {
-            Thread myThread = Thread.currentThread();
+            // Thread myThread = Thread.currentThread();
             try {
                 runningMethod.invoke( owner, null );
             }

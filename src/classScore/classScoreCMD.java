@@ -88,13 +88,14 @@ public class classScoreCMD {
 
     private void options( String[] args, boolean configged ) {
         if ( args.length == 0 ) showHelp();
-        LongOpt[] longopts = new LongOpt[5];
+        LongOpt[] longopts = new LongOpt[6];
         longopts[0] = new LongOpt( "help", LongOpt.NO_ARGUMENT, null, 'h' );
         longopts[1] = new LongOpt( "config", LongOpt.REQUIRED_ARGUMENT, null, 'C' );
         longopts[2] = new LongOpt( "gui", LongOpt.NO_ARGUMENT, null, 'G' );
         longopts[3] = new LongOpt( "save", LongOpt.NO_ARGUMENT, null, 'S' );
         longopts[4] = new LongOpt( "mtc", LongOpt.REQUIRED_ARGUMENT, null, 'M' );
-        Getopt g = new Getopt( "classScoreCMD", args, "a:bc:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CGS:M:", longopts );
+        longopts[5] = new LongOpt( "format", LongOpt.REQUIRED_ARGUMENT, null, 'F' );
+        Getopt g = new Getopt( "classScoreCMD", args, "a:bc:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CGS:M:F:", longopts );
         int c;
         String arg;
         int intarg;
@@ -350,6 +351,10 @@ public class classScoreCMD {
                     arg = g.getOptarg();
                     settings.setPrefFile( arg );
                     break;
+                case 'F': // format for the annotation file.
+                    arg = g.getOptarg();
+                    settings.setAnnotFormat( arg );
+                    break;
                 case '?':
                     showHelp();
                 default:
@@ -365,7 +370,8 @@ public class classScoreCMD {
 
     private void showHelp() {
         System.out.print( "OPTIONS\n" + "\tThe following options are supported:\n\n" + "\t-a file ...\n"
-                + "\t\tSets the annotation file to be used.\n\n" + "\t-c file ...\n"
+                + "\t\tSets the annotation file to be used.\n\n" + "\t-F format (--format)"
+                + "\t\tSet format (default is our own; 'affy' is other valid value)" + "\t-c file ...\n"
                 + "\t\tSets the class file to be used.\n\n" + "\t-d dir ...\n"
                 + "\t\tSets the data folder to be used.\n\n" + "\t-e int ...\n"
                 + "\t\tSets the column in the score file to be used for scores.\n\n" + "\t-f die ...\n"

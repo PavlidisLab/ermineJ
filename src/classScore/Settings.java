@@ -15,6 +15,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.FileTools;
 
 /**
@@ -31,121 +32,104 @@ import baseCode.util.FileTools;
 
 public class Settings {
 
+    public static final int BENJAMINIHOCHBERG = 2;
+    public static final int BEST_PVAL = 1;
+    public static final int BONFERONNI = 0;
+    public static final int CORR = 2;
+
+    public static final String GENE_URL_BASE = "gene.url.base";
+    public static final int KS = 5;
+    public static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
+    public static final int MEAN_METHOD = 0;
+    public static final int MEAN_PVAL = 2;
+    public static final int ORA = 0;
+    public static final int QUANTILE_METHOD = 1;
+    public static final int RESAMP = 1;
+    public static final int ROC = 3;
+    public static final int TTEST = 4;
+
+    public static final int WESTFALLYOUNG = 1;
     /**
      * 
      */
 
     private static final Log log = LogFactory.getLog( Settings.class );
-    private static final String USERGUI_PROPERTIES = "ermineJ.properties";
     private static final String USERGUI_DEFAULT_PROPERTIES = "ermineJdefault.properties";
-    private PropertiesConfiguration config;
-
-    private Properties properties;
-    private String pref_file = "";
-    private String classFile = "";
-    private String annotFile = "";
-    private String rawFile = "";
-    private String dataFolder = "";
-    private String classFolder = "";
-    private String scoreFile = "";
-    private String outputFile = "";
-    private String goldStandardFile = ""; // for testing;
-
-    private int maxClassSize = 100;
-    private int minClassSize = 8;
-    private int iterations = 10000;
-    private int scorecol = 2;
-    private int geneRepTreatment = BEST_PVAL;
-    private int rawScoreMethod = MEAN_METHOD;
-    private int analysisMethod = RESAMP;
-    private int quantile = 50;
-    private int mtc = BENJAMINIHOCHBERG; // multiple test correction
-    private boolean doLog = true;
-    private double pValThreshold = 0.001;
+    private static final String USERGUI_PROPERTIES = "ermineJ.properties";
     private boolean alwaysUseEmpirical = false;
+    private int analysisMethod = RESAMP;
+    private String annotFile = "";
+    private int annotFormat = GeneAnnotations.DEFAULT;
     private boolean bigIsBetter = false;
+    private String classFile = "";
+    private String classFolder = "";
+    private PropertiesConfiguration config;
+    private String dataFolder = "";
+    private boolean doLog = true;
+    private int geneRepTreatment = BEST_PVAL;
+
+    private String goldStandardFile = ""; // for testing;
     private boolean isTester = false; // set to true if this is running in the test framework.
 
-    public static final int BEST_PVAL = 1;
-    public static final int MEAN_PVAL = 2;
+    private int iterations = 10000;
+    private int maxClassSize = 100;
+    private int minClassSize = 8;
 
-    public static final int MEAN_METHOD = 0;
-    public static final int QUANTILE_METHOD = 1;
-    public static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
-
-    public static final int ORA = 0;
-    public static final int RESAMP = 1;
-    public static final int CORR = 2;
-    public static final int ROC = 3;
-    public static final int TTEST = 4;
-    public static final int KS = 5;
-    public static final String GENE_URL_BASE = "gene.url.base";
-    public static final int BONFERONNI = 0;
-    public static final int WESTFALLYOUNG = 1;
-    public static final int BENJAMINIHOCHBERG = 2;
+    private int mtc = BENJAMINIHOCHBERG; // multiple test correction
+    private String outputFile = "";
+    private String pref_file = "";
+    private Properties properties;
+    private double pValThreshold = 0.001;
+    private int quantile = 50;
+    private String rawFile = "";
+    private int rawScoreMethod = MEAN_METHOD;
+    private int scorecol = 2;
+    private String scoreFile = "";
 
     public Settings() throws IOException {
         this( "" );
     }
 
-    public Settings( URL resource ) {
-        properties = new Properties();
-        initConfig();
-        File fi = new File( resource.getFile() );
-        pref_file = fi.getAbsolutePath();
-
-        if ( fi.canRead() ) {
-            try {
-                InputStream f = new FileInputStream( pref_file );
-                read( f );
-            } catch ( IOException e ) {
-                System.err.println( "Couldn't read from the file" );
-                System.exit( 0 );
-            }
-        }
-    }
-
     /**
+     * Creates settings object
      * 
+     * @param settings - settings object to copy
      */
-    private void initConfig() {
-        try {
-            URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
-            if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
+    public Settings( Settings settings ) {
+        initConfig();
+        classFile = settings.getClassFile();
+        annotFile = settings.getAnnotFile();
+        rawFile = settings.getRawFile();
+        goldStandardFile = settings.getGoldStandardFile();
+        outputFile = settings.getOutputFile();
+        dataFolder = settings.getDataFolder();
+        classFolder = settings.getClassFolder();
+        scoreFile = settings.getScoreFile();
+        maxClassSize = settings.getMaxClassSize();
+        minClassSize = settings.getMinClassSize();
+        iterations = settings.getIterations();
+        scorecol = settings.getScorecol();
+        geneRepTreatment = settings.getGeneRepTreatment();
+        rawScoreMethod = settings.getRawScoreMethod();
+        analysisMethod = settings.getAnalysisMethod();
+        quantile = settings.getQuantile();
+        doLog = settings.getDoLog();
+        pValThreshold = settings.getPValThreshold();
+        alwaysUseEmpirical = settings.getAlwaysUseEmpirical();
+        pref_file = settings.getPrefFile();
+        mtc = settings.getMtc();
+        bigIsBetter = settings.getBigIsBetter();
+        isTester = settings.isTester();
+        annotFormat = settings.getAnnotFormat();
+        properties = new Properties();
 
-            this.config = new PropertiesConfiguration( configFileLocation );
-            this.config.setAutoSave( true );
-            log.debug( "Got configuration " + ConfigurationUtils.toString( this.config ) );
-        } catch ( ConfigurationException e ) {
-
-            try {
-                log.info( "User properties file doesn't exist, creating new one from defaults" );
-                URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
-
-                if ( defaultConfigFileLocation == null )
-                    throw new ConfigurationException( "Defaults not found either!" );
-
-                log.info( "Found defaults at " + defaultConfigFileLocation );
-                config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
-                config.save( USERGUI_PROPERTIES ); // copy over to where they should be.
-                URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
-                log.info( "Saved the new configuration in " + configFileLocation );
-
-            } catch ( ConfigurationException e1 ) {
-                e1.printStackTrace();
-            }
-        }
     }
 
     /**
      * @return
      */
-    public PropertiesConfiguration getConfig() {
-        if ( config == null ) initConfig();
-        if ( config == null ) {
-            return null;
-        }
-        return config;
+    public int getAnnotFormat() {
+        return this.annotFormat;
     }
 
     /**
@@ -187,37 +171,356 @@ public class Settings {
 
     }
 
-    /**
-     * Creates settings object
-     * 
-     * @param settings - settings object to copy
-     */
-    public Settings( Settings settings ) {
-        initConfig();
-        classFile = settings.getClassFile();
-        annotFile = settings.getAnnotFile();
-        rawFile = settings.getRawFile();
-        goldStandardFile = settings.getGoldStandardFile();
-        outputFile = settings.getOutputFile();
-        dataFolder = settings.getDataFolder();
-        classFolder = settings.getClassFolder();
-        scoreFile = settings.getScoreFile();
-        maxClassSize = settings.getMaxClassSize();
-        minClassSize = settings.getMinClassSize();
-        iterations = settings.getIterations();
-        scorecol = settings.getScorecol();
-        geneRepTreatment = settings.getGeneRepTreatment();
-        rawScoreMethod = settings.getRawScoreMethod();
-        analysisMethod = settings.getAnalysisMethod();
-        quantile = settings.getQuantile();
-        doLog = settings.getDoLog();
-        pValThreshold = settings.getPValThreshold();
-        alwaysUseEmpirical = settings.getAlwaysUseEmpirical();
-        pref_file = settings.getPrefFile();
-        mtc = settings.getMtc();
-        bigIsBetter = settings.getBigIsBetter();
-        isTester = settings.isTester();
+    public Settings( URL resource ) {
         properties = new Properties();
+        initConfig();
+        File fi = new File( resource.getFile() );
+        pref_file = fi.getAbsolutePath();
+
+        if ( fi.canRead() ) {
+            try {
+                InputStream f = new FileInputStream( pref_file );
+                read( f );
+            } catch ( IOException e ) {
+                System.err.println( "Couldn't read from the file" );
+                System.exit( 0 );
+            }
+        }
+    }
+
+    /**
+     * Figure out where the data directory should go.
+     * 
+     * @return
+     */
+    public boolean determineDataDirectory() {
+        dataFolder = System.getProperty( "user.dir" ); // directory from which we are running the software. This is not
+        // platform independent so we fall back on the user home directory.
+
+        dataFolder = dataFolder.substring( 0, dataFolder.lastIndexOf( System.getProperty( "file.separator" ) ) ); // up
+        // one
+        // level.
+
+        dataFolder = dataFolder + System.getProperty( "file.separator" ) + "ermineJ.data";
+
+        if ( !FileTools.testDir( dataFolder ) ) {
+            dataFolder = System.getProperty( "user.home" ) + System.getProperty( "file.separator" ) + "ermineJ.data";
+
+            if ( !FileTools.testDir( dataFolder ) ) {
+
+                // try to make it in the user's home directory.
+                return ( new File( dataFolder ) ).mkdir();
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return
+     */
+    public boolean getAlwaysUseEmpirical() {
+        return alwaysUseEmpirical;
+    }
+
+    public int getAnalysisMethod() {
+        return analysisMethod;
+    }
+
+    public String getAnnotFile() {
+        return annotFile;
+    }
+
+    /**
+     * @return
+     */
+    public boolean getBigIsBetter() {
+        return bigIsBetter;
+    }
+
+    /**
+     * Returns setting values.
+     */
+    public String getClassFile() {
+        return classFile;
+    }
+
+    public String getClassFolder() {
+        return classFolder;
+    }
+
+    public int getClassScoreMethod() {
+        return rawScoreMethod;
+
+    }
+
+    public String getClassScoreMethodString() {
+        if ( rawScoreMethod == MEAN_METHOD ) {
+            return "Mean";
+        }
+        return "Quantile"; // note that quantile is hard-coded to be 50 for the
+        // gui.
+
+    }
+
+    /**
+     * @return
+     */
+    public PropertiesConfiguration getConfig() {
+        if ( config == null ) initConfig();
+        if ( config == null ) {
+            return null;
+        }
+        return config;
+    }
+
+    public String getDataFolder() {
+        return dataFolder;
+    }
+
+    public boolean getDoLog() {
+        return doLog;
+    }
+
+    public int getGeneRepTreatment() {
+        return geneRepTreatment;
+    }
+
+    /**
+     * Mostly used for testing
+     * 
+     * @return
+     */
+    public String getGoldStandardFile() {
+        return goldStandardFile;
+    }
+
+    public int getGroupMethod() {
+        return geneRepTreatment;
+    }
+
+    public String getGroupMethodString() {
+        if ( geneRepTreatment == MEAN_PVAL )
+            return "MEAN_PVAL";
+        else if ( geneRepTreatment == BEST_PVAL )
+            return "BEST_PVAL";
+        else
+            return "MEAN_PVAL"; // dummy. It won't be used.
+    }
+
+    public int getIterations() {
+        return iterations;
+    }
+
+    public int getMaxClassSize() {
+        return maxClassSize;
+    }
+
+    public int getMinClassSize() {
+        return minClassSize;
+    }
+
+    /**
+     * @return Returns the mtc.
+     */
+    public int getMtc() {
+        return mtc;
+    }
+
+    /**
+     * Mostly used for testing
+     * 
+     * @return
+     */
+    public String getOutputFile() {
+        return outputFile;
+    }
+
+    public String getPrefFile() {
+        return pref_file;
+    }
+
+    public double getPValThreshold() {
+        return pValThreshold;
+    }
+
+    public int getQuantile() {
+        return quantile;
+    }
+
+    public String getRawFile() {
+        return rawFile;
+    }
+
+    public int getRawScoreMethod() {
+        return rawScoreMethod;
+    }
+
+    public int getScorecol() {
+        return scorecol;
+    }
+
+    public String getScoreFile() {
+        return scoreFile;
+    }
+
+    /**
+     * @return
+     */
+    public boolean getUseLog() {
+        return doLog;
+    }
+
+    public boolean getUseWeights() {
+        if ( geneRepTreatment == MEAN_PVAL || geneRepTreatment == BEST_PVAL ) return true;
+
+        return false;
+    }
+
+    public boolean isTester() {
+        return isTester;
+    }
+
+    /**
+     * @param b
+     */
+    public void setAlwaysUseEmpirical( boolean b ) {
+        alwaysUseEmpirical = b;
+    }
+
+    public void setAnalysisMethod( int val ) {
+        analysisMethod = val;
+    }
+
+    public void setAnnotFile( String val ) {
+        annotFile = val;
+    }
+
+    /**
+     * @param arg
+     */
+    public void setAnnotFormat( String arg ) {
+        if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) { // fixme, this is hard to maintain.
+            this.annotFormat = GeneAnnotations.AFFYCSV;
+        } else {
+            this.annotFormat = GeneAnnotations.DEFAULT;
+        }
+
+    }
+
+    /**
+     * @param b
+     */
+    public void setBigIsBetter( boolean b ) {
+        bigIsBetter = b;
+    }
+
+    /**
+     * Sets setting values.
+     */
+    public void setClassFile( String val ) {
+        classFile = val;
+    }
+
+    public void setClassFolder( String val ) {
+        classFolder = val;
+    }
+
+    public void setDataFolder( String val ) {
+        dataFolder = val;
+    }
+
+    public void setDoLog( boolean val ) {
+        doLog = val;
+    }
+
+    public void setGeneRepTreatment( int val ) {
+        geneRepTreatment = val;
+    }
+
+    /**
+     * Mostly used for testing
+     * 
+     * @param goldStandardFile
+     */
+    public void setGoldStandardFile( String goldStandardFile ) {
+        this.goldStandardFile = goldStandardFile;
+    }
+
+    public void setIterations( int val ) {
+        iterations = val;
+    }
+
+    public void setMaxClassSize( int val ) {
+        maxClassSize = val;
+    }
+
+    public void setMinClassSize( int val ) {
+        minClassSize = val;
+    }
+
+    /**
+     * @param mtc The mtc to set.
+     */
+    public void setMtc( int mtc ) {
+        this.mtc = mtc;
+    }
+
+    /**
+     * Mostly used for testing
+     * 
+     * @param outputFile
+     */
+    public void setOutputFile( String outputFile ) {
+        this.outputFile = outputFile;
+    }
+
+    public void setPrefFile( String val ) {
+        pref_file = val;
+    }
+
+    public void setPValThreshold( double val ) {
+        pValThreshold = val;
+    }
+
+    public void setQuantile( int val ) {
+        quantile = val;
+    }
+
+    public void setRawFile( String val ) {
+        rawFile = val;
+    }
+
+    public void setRawScoreMethod( int val ) {
+        rawScoreMethod = val;
+    }
+
+    public void setScorecol( int val ) {
+        scorecol = val;
+    }
+
+    public void setScoreFile( String val ) {
+        scoreFile = val;
+    }
+
+    public void setTester( boolean isTester ) {
+        this.isTester = isTester;
+    }
+
+    public String toString() {
+        return properties.toString();
+    }
+
+    /**
+     * Determine whether we should be using the upper tails of our histograms. The "big is better" setting reflects the
+     * original gene scores, not the log-transformed scores. Therefore if we are taking the log, and the user indicates
+     * smaller values are better, then we do want to use the upper tail. If we're not taking the log, then we just
+     * directly interpret what the user selected for 'bigIsBetter'.
+     * 
+     * @return true if we are using the "upper tail" of our distributions.
+     */
+    public boolean upperTail() {
+        return ( doLog && !bigIsBetter ) || ( !doLog && bigIsBetter );
     }
 
     public void writePrefs() throws IOException {
@@ -258,321 +561,42 @@ public class Settings {
         properties.setProperty( "pValThreshold", String.valueOf( pValThreshold ) );
         properties.setProperty( "useEmpirical", String.valueOf( alwaysUseEmpirical ) );
         properties.setProperty( "isTester", String.valueOf( isTester ) );
+        properties.setProperty( "annotFormat", String.valueOf( annotFormat ) );
         OutputStream f = new FileOutputStream( fileName );
         properties.store( f, "" );
         f.close();
     }
 
-    public String toString() {
-        return properties.toString();
-    }
-
     /**
-     * Figure out where the data directory should go.
      * 
-     * @return
      */
-    public boolean determineDataDirectory() {
-        dataFolder = System.getProperty( "user.dir" ); // directory from which we are running the software. This is not
-        // platform independent so we fall back on the user home directory.
+    private void initConfig() {
+        try {
+            URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
+            if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
 
-        dataFolder = dataFolder.substring( 0, dataFolder.lastIndexOf( System.getProperty( "file.separator" ) ) ); // up
-        // one
-        // level.
+            this.config = new PropertiesConfiguration( configFileLocation );
+            this.config.setAutoSave( true );
+            log.debug( "Got configuration " + ConfigurationUtils.toString( this.config ) );
+        } catch ( ConfigurationException e ) {
 
-        dataFolder = dataFolder + System.getProperty( "file.separator" ) + "ermineJ.data";
+            try {
+                log.info( "User properties file doesn't exist, creating new one from defaults" );
+                URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
 
-        if ( !FileTools.testDir( dataFolder ) ) {
-            dataFolder = System.getProperty( "user.home" ) + System.getProperty( "file.separator" ) + "ermineJ.data";
+                if ( defaultConfigFileLocation == null )
+                    throw new ConfigurationException( "Defaults not found either!" );
 
-            if ( !FileTools.testDir( dataFolder ) ) {
+                log.info( "Found defaults at " + defaultConfigFileLocation );
+                config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
+                config.save( USERGUI_PROPERTIES ); // copy over to where they should be.
+                URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
+                log.info( "Saved the new configuration in " + configFileLocation );
 
-                // try to make it in the user's home directory.
-                return ( new File( dataFolder ) ).mkdir();
+            } catch ( ConfigurationException e1 ) {
+                e1.printStackTrace();
             }
         }
-
-        return true;
-    }
-
-    /**
-     * Returns setting values.
-     */
-    public String getClassFile() {
-        return classFile;
-    }
-
-    public String getAnnotFile() {
-        return annotFile;
-    }
-
-    public String getRawFile() {
-        return rawFile;
-    }
-
-    public String getDataFolder() {
-        return dataFolder;
-    }
-
-    public String getClassFolder() {
-        return classFolder;
-    }
-
-    public String getScoreFile() {
-        return scoreFile;
-    }
-
-    public int getMaxClassSize() {
-        return maxClassSize;
-    }
-
-    public int getMinClassSize() {
-        return minClassSize;
-    }
-
-    public int getIterations() {
-        return iterations;
-    }
-
-    public int getScorecol() {
-        return scorecol;
-    }
-
-    public int getGeneRepTreatment() {
-        return geneRepTreatment;
-    }
-
-    public int getRawScoreMethod() {
-        return rawScoreMethod;
-    }
-
-    public int getAnalysisMethod() {
-        return analysisMethod;
-    }
-
-    public int getQuantile() {
-        return quantile;
-    }
-
-    public boolean getDoLog() {
-        return doLog;
-    }
-
-    public double getPValThreshold() {
-        return pValThreshold;
-    }
-
-    public String getPrefFile() {
-        return pref_file;
-    }
-
-    /**
-     * Sets setting values.
-     */
-    public void setClassFile( String val ) {
-        classFile = val;
-    }
-
-    public void setAnnotFile( String val ) {
-        annotFile = val;
-    }
-
-    public void setRawFile( String val ) {
-        rawFile = val;
-    }
-
-    public void setDataFolder( String val ) {
-        dataFolder = val;
-    }
-
-    public void setClassFolder( String val ) {
-        classFolder = val;
-    }
-
-    public void setScoreFile( String val ) {
-        scoreFile = val;
-    }
-
-    public void setMaxClassSize( int val ) {
-        maxClassSize = val;
-    }
-
-    public void setMinClassSize( int val ) {
-        minClassSize = val;
-    }
-
-    public void setIterations( int val ) {
-        iterations = val;
-    }
-
-    public void setScorecol( int val ) {
-        scorecol = val;
-    }
-
-    public void setGeneRepTreatment( int val ) {
-        geneRepTreatment = val;
-    }
-
-    public void setRawScoreMethod( int val ) {
-        rawScoreMethod = val;
-    }
-
-    public void setAnalysisMethod( int val ) {
-        analysisMethod = val;
-    }
-
-    public void setQuantile( int val ) {
-        quantile = val;
-    }
-
-    public void setDoLog( boolean val ) {
-        doLog = val;
-    }
-
-    public void setPValThreshold( double val ) {
-        pValThreshold = val;
-    }
-
-    public void setPrefFile( String val ) {
-        pref_file = val;
-    }
-
-    public boolean getUseWeights() {
-        if ( geneRepTreatment == MEAN_PVAL || geneRepTreatment == BEST_PVAL ) return true;
-
-        return false;
-    }
-
-    public String getGroupMethodString() {
-        if ( geneRepTreatment == MEAN_PVAL )
-            return "MEAN_PVAL";
-        else if ( geneRepTreatment == BEST_PVAL )
-            return "BEST_PVAL";
-        else
-            return "MEAN_PVAL"; // dummy. It won't be used.
-    }
-
-    public int getGroupMethod() {
-        return geneRepTreatment;
-    }
-
-    public int getClassScoreMethod() {
-        return rawScoreMethod;
-
-    }
-
-    public String getClassScoreMethodString() {
-        if ( rawScoreMethod == MEAN_METHOD ) {
-            return "Mean";
-        }
-        return "Quantile"; // note that quantile is hard-coded to be 50 for the
-        // gui.
-
-    }
-
-    /**
-     * @return
-     */
-    public boolean getUseLog() {
-        return doLog;
-    }
-
-    /**
-     * @return
-     */
-    public boolean getAlwaysUseEmpirical() {
-        return alwaysUseEmpirical;
-    }
-
-    /**
-     * @param b
-     */
-    public void setAlwaysUseEmpirical( boolean b ) {
-        alwaysUseEmpirical = b;
-    }
-
-    /**
-     * @return Returns the mtc.
-     */
-    public int getMtc() {
-        return mtc;
-    }
-
-    /**
-     * @param mtc The mtc to set.
-     */
-    public void setMtc( int mtc ) {
-        this.mtc = mtc;
-    }
-
-    /**
-     * @return
-     */
-    public boolean getBigIsBetter() {
-        return bigIsBetter;
-    }
-
-    /**
-     * @param b
-     */
-    public void setBigIsBetter( boolean b ) {
-        bigIsBetter = b;
-    }
-
-    public boolean isTester() {
-        return isTester;
-    }
-
-    public void setTester( boolean isTester ) {
-        this.isTester = isTester;
-    }
-
-    /**
-     * Mostly used for testing
-     * 
-     * @return
-     */
-    public String getOutputFile() {
-        return outputFile;
-    }
-
-    /**
-     * Mostly used for testing
-     * 
-     * @param outputFile
-     */
-    public void setOutputFile( String outputFile ) {
-        this.outputFile = outputFile;
-    }
-
-    /**
-     * Mostly used for testing
-     * 
-     * @return
-     */
-    public String getGoldStandardFile() {
-        return goldStandardFile;
-    }
-
-    /**
-     * Mostly used for testing
-     * 
-     * @param goldStandardFile
-     */
-    public void setGoldStandardFile( String goldStandardFile ) {
-        this.goldStandardFile = goldStandardFile;
-    }
-
-    /**
-     * Determine whether we should be using the upper tails of our histograms. The "big is better" setting reflects the
-     * original gene scores, not the log-transformed scores. Therefore if we are taking the log, and the user indicates
-     * smaller values are better, then we do want to use the upper tail. If we're not taking the log, then we just
-     * directly interpret what the user selected for 'bigIsBetter'.
-     * 
-     * @return true if we are using the "upper tail" of our distributions.
-     */
-    public boolean upperTail() {
-        return ( doLog && !bigIsBetter ) || ( !doLog && bigIsBetter );
     }
 
     private void read( InputStream s ) {
@@ -673,6 +697,9 @@ public class Settings {
 
             if ( properties.containsKey( "bigIsBetter" ) )
                 this.bigIsBetter = Boolean.valueOf( properties.getProperty( "bigIsBetter" ) ).booleanValue();
+
+            if ( properties.containsKey( "annotFormat" ) )
+                this.annotFormat = Integer.valueOf( properties.getProperty( "annotFormat" ) ).intValue();
 
             // System.err.println(this);
         } catch ( IOException ex ) {

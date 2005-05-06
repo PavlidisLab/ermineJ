@@ -8,11 +8,14 @@ import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.file.DataFileFilter;
@@ -35,10 +38,12 @@ public class StartupDialog extends AppDialog {
     JPanel classPanel = new JPanel();
     JLabel classLabel = new JLabel();
     JTextField classFile = new JTextField();
+    JLabel annotFileFormatLabel = new JLabel();
     JButton annotBrowseButton = new JButton();
     JLabel annotLabel = new JLabel();
     JPanel annotPanel = new JPanel();
     JTextField annotFile = new JTextField();
+    JComboBox annotFormat = new JComboBox();
 
     // @todo we need to use these.
     JLabel askAgainLabel = new JLabel();
@@ -61,6 +66,18 @@ public class StartupDialog extends AppDialog {
 
         this.addWindowListener( new StartupDialog_this_windowAdapter( this ) );
 
+        annotFileFormatLabel.setText( "Annotation file format" );
+        annotFileFormatLabel.setLabelFor( annotFormat );
+        annotFormat.setEditable( false );
+        annotFormat.addItem( "ErmineJ" );
+        annotFormat.addItem( "Affy CSV" );
+
+        if ( settings.getAnnotFormat() == GeneAnnotations.AFFYCSV ) {
+            annotFormat.setSelectedItem( "Affy CSV" );
+        } else {
+            annotFormat.setSelectedItem( "ErmineJ" );
+        }
+
         annotBrowseButton.setText( "Browse..." );
         annotBrowseButton.addActionListener( new StartupDialog_annotBrowseButton_actionAdapter( this ) );
         annotLabel.setPreferredSize( new Dimension( 390, 15 ) );
@@ -73,6 +90,8 @@ public class StartupDialog extends AppDialog {
         annotPanel.add( annotLabel, null );
         annotPanel.add( annotFile, null );
         annotPanel.add( annotBrowseButton, null );
+        annotPanel.add( annotFileFormatLabel, null ); // /////////////////
+        annotPanel.add( annotFormat, null );
         classPanel.setPreferredSize( new java.awt.Dimension( 400, 70 ) );
         classLabel.setPreferredSize( new Dimension( 390, 15 ) );
         classLabel.setText( "GO XML file:" );
@@ -125,6 +144,7 @@ public class StartupDialog extends AppDialog {
 
         settings.setClassFile( classFile.getText() );
         settings.setAnnotFile( annotFile.getText() );
+        settings.setAnnotFormat( ( String ) annotFormat.getSelectedItem() );
         try {
             settings.writePrefs();
         } catch ( IOException ex ) {

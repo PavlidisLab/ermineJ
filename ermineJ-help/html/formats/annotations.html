@@ -1,43 +1,81 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-  <head>
-    <meta name="generator" content="HTML Tidy, see www.w3.org">
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
 
-    <title>Annotation file format</title>
-    <link href="../style.css" rel="stylesheet" type="text/css" media=
-    "all">
-  </head>
+<title>Annotation file format</title>
+<link href="../style.css" rel="stylesheet" type="text/css" media="all">
+</head>
 
-  <body bgcolor="#ffffff">
-    <h1>File information: gene annotations</h1>
+<body bgcolor="#ffffff">
+<h1>File information: gene annotations</h1>
 
-    <p>Annotation files are provided for some popular (and some
-    not-so-popular) array formats. These files contain the probe (or
-    probe set)&nbsp;identifiers, the gene symbols and names, and gene
-    set membership information. For our current annotations, this means
-    that a list of the Gene Ontology terms associated with a gene are
-    listed. For each term, the 'parent' terms are also listed, so that
-    genes associated with very specific terms are also included in the
-    less specific categories.</p>
+<p>You can use two types of annotation files, ones we provide on our web
+site, or ones provided by Affymetrix for their microarray platforms.
+Requests for support of other formats will gladly be entertained. You
+can also use files you have created, so long as they follow one of the
+accepted formats.</p>
 
-    <p>You can <a href=
-    "http://microarray.genomecenter.columbia.edu/annots/">download
-    annotation files here</a>
-    (http://microarray.cpmc.columbia.edu/annots/)</p>
+<p>You inform ermineJ of which format you are using with the pull-down
+menu used at startup.</p>
 
-    <p>For species or platforms we don't support, ask us for assistance
-    or set it up yourself. The files are not hard to prepare if you
-    have Gene Ontology (or other gene set descriptor) annotations
-    available.</p>
+<h2>Using files we provide</h2>
 
-    <p>For species we support, but for new platforms, often you will be
-    able to create a new annotation file by pulling information out of
-    our existing files using a simple Perl script.</p>
-    <hr>
+<p>In ermineJ, we refer to these as "ermineJ format", but the files are
+very simple and useful in other contexts</p>
 
-    <div class="tidy">
-      Copyright 2004 (c) Columbia University
-    </div>
-  </body>
+<p>You can <a href="http://microarray.genomecenter.columbia.edu/annots/">download
+annotation files here</a> (http://microarray.cpmc.columbia.edu/annots/)</p>
+
+<p>We provide annotation files for some popular (and some
+not-so-popular) array formats. These files contain the probe (or probe
+set)&nbsp;identifiers, the gene symbols and names, and gene set
+membership information. For our current annotations, this means that a
+list of the Gene Ontology terms associated with a gene are listed. For
+each term, the 'parent' terms are also listed, so that genes associated
+with very specific terms are also included in the less specific
+categories.</p>
+
+<p>For species or platforms we don't support, ask us for assistance or
+set it up yourself. The files are not hard to prepare if you have Gene
+Ontology (or other gene set descriptor) annotations available.</p>
+
+<p>For species we support, but for new platforms, often you will be able
+to create a new annotation file by pulling information out of our
+existing files using a simple Perl script.</p>
+
+<h2>Using Affymetrix files</h2>
+
+<p>Obviously this only helps you if you are using an <a
+	href="http://www.affymetrix.com">Affymetrix GeneChip</a>. (The writers
+of ermineJ are not affiliated with Affymetrix in any way).</p>
+
+<p>The files we tested our software on were obtained from the Affymetrix
+site and are in CSV (comma-separated value) format. As of May 2005
+ermineJ worked with these files, but if Affymetrix changes the format
+(they have in the past)&nbsp;it is possible that they will no longer
+work with ermineJ.</p>
+<H2>Using files you create</H2>
+<P>Annotation files that you created can be used so long as they adhere
+to one of the accepted formats. There are a few things to consider:</P>
+<UL>
+	<LI>The probe IDs must exactly match the ones you provide in your Gene
+	score file. Any probes not having an entry will be ignored.</LI>
+	<LI>The gene symbols are used internally by the software to decide
+	which genes are present on the array more than once. Therefore, if two
+	probes refer to the same gene, make sure the symbol you use is the same
+	for both probes. (It doesn't matter what the symbol is).</LI>
+	<LI>The gene names or descriptions are optional, and blank values will
+	just show up as "No description" or something similar.</LI>
+	<LI>In the ermineJ format, the GO ids must be in "long" format (with
+	the GO: prefix). The GO terms themselves should be omitted. The parents
+	of all terms listed are automatically included in the analysis (subject
+	to other constraints such as the maximum Gene Set size you set in the
+	analysis), so there is no need to list these explicitly.</LI>
+</UL>
+<hr>
+
+<div class="tidy">Copyright 2004 (c) Columbia University</div>
+</body>
 </html>
