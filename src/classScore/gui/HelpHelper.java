@@ -63,7 +63,7 @@ public class HelpHelper {
         ClassLoader cl = this.getClass().getClassLoader();
         try {
             URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
-            hs = new HelpSet( null, hsURL );
+            hs = new HelpSet( cl, hsURL );
         } catch ( Exception e ) {
             System.err.println( "HelpSet: " + e.getMessage() );
             System.err.println( "HelpSet: " + helpsetFilename + " not found" );
