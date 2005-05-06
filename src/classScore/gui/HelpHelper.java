@@ -62,7 +62,7 @@ public class HelpHelper {
     private HelpSet getHelpSet( String helpsetFilename ) {
         HelpSet hs = null;
         try {
-            ClassLoader cl = ResourceAnchor.class.getClassLoader();
+            ClassLoader cl = this.getClass().getClassLoader();
             URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
             hs = new HelpSet( cl, hsURL );
         } catch ( Exception e ) {
