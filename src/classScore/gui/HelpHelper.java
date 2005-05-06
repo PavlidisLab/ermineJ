@@ -49,7 +49,6 @@ public class HelpHelper {
         // GuiUtil.error( "Couldn't load help" );
         System.err.println( "Couldn't load help" );
         return false;
-
     }
 
     /**
@@ -60,10 +59,9 @@ public class HelpHelper {
      */
     private HelpSet getHelpSet( String helpsetFilename ) {
         HelpSet hs = null;
-        ClassLoader cl = this.getClass().getClassLoader();
         try {
-            URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
-            hs = new HelpSet( cl, hsURL );
+            URL hsURL = HelpSet.findHelpSet( null, helpsetFilename );
+            hs = new HelpSet( null, hsURL );
         } catch ( Exception e ) {
             System.err.println( "HelpSet: " + e.getMessage() );
             System.err.println( "HelpSet: " + helpsetFilename + " not found" );
