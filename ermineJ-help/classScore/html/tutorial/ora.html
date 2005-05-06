@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+    <link href="../style.css" rel="stylesheet" type="text/css" media=
+    "all">
+
+    <title>ORA</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+    <h2>Tutorial: General analysis steps and Over-representation
+    analysis (ORA)</h2>
+
+    <p>We suggest that you read this page first, as it explains some
+    aspects of analysis that are common to all the methods.</p>
+
+    <h2>Overview of the method</h2>
+
+    <p>Over-representation analysis (ORA) examines the genes that meet
+    a selection criterion and determines if there are gene sets which
+    are statistically over-represented. This method differs from the
+    resampling-based analysis in that you must set a gene score
+    threshold for gene selection. The software does not support
+    entering a list of selected genes. Instead, you input the list of
+    all genes along with their scores, and set the threshold.</p>
+
+    <p>The probabilities produced by ermineJ ORA are computed using the
+    binomal approximation to the hypergeometric distribution.</p>
+
+    <h2>Walkthrough</h2>
+
+    <p><strong>Step 1</strong> is to choose the type of analysis; this
+    walk-through picks up after you've done that.</p>
+
+    <p>The next window is common to all analysis methods. Two data
+    files are requested. For ORA, only the Gene Score File is required.
+    However, entering the raw data file will allow you to visualize the
+    results later.</p>
+
+    <p>The Gene Score file format is explained <a href=
+    "../formats/genescores.html">here.</a> &nbsp;In this panel, you
+    must also select the score column. The first column in the gene
+    score file contains the probe identifiers; the gene scores
+    themselves are in the second or higher column. If your gene score
+    file only has two columns, just use the default value of 2.</p>
+
+    <p>The Raw data file format is explained <a href=
+    "../formats/microarray.html">here</a> .</p>
+
+    <p><img alt="" src="../images/orastep2.jpg" border="0"></p>
+
+    <p>The next step, also common to all analysis methods, asks you to
+    add any custom gene sets you may have defined.</p>
+
+    <p><img alt="" src="../images/orastep3.jpg" border="0"></p>
+
+    <p><strong>Step 4</strong> is also common to all the methods.</p>
+
+    <p>The <strong>maximum and minimum gene set sizes</strong>
+    determine the range of gene set sizes that will be considered. We
+    recommend avoiding the use of very small or very large gene sets.
+    There are several reasons to avoid using extremes:</p>
+
+    <ul>
+      <li>
+        <div>
+          The more gene sets you examine, the worse the multiple
+          testing issue.
+        </div>
+      </li>
+
+      <li>
+        <div>
+          Using more gene sets increases computation time for the
+          resamping-based methods (not an issue for ORA).
+        </div>
+      </li>
+
+      <li>
+        <div>
+          Very large or very small gene sets are less informative:
+        </div>
+      </li>
+
+      <li style="LIST-STYLE-TYPE: none">
+        <ul>
+          <li>
+            <div>
+              Very large gene sets are rather non-specific and tend not
+              to tell you as much.
+            </div>
+          </li>
+
+          <li>
+            <div>
+              Very small gene sets defeat the purpose of examining
+              genes in groups.
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <p>The "<strong>Gene replicate treatment</strong> " refers to what
+    is done when a gene occurs more than once in the dataset.</p>
+
+    <p>There are two options, "Best" and "Mean". The application of
+    these methods differs for the different methods. There is more
+    information <a href="genereps">here</a></p>
+
+    <p><img alt="" src="../images/orastep4.jpg" border="0"></p>
+
+    <p><strong>Step 5</strong> is specific to the ORA analysis.</p>
+
+    <p>The gene score threshold determines how genes are "selected". Genes that meet the threshold requirement
+    are considered "good". ErmineJ operates differently from some other available tools in that you do not
+    enter the "good" genes yourself: the software selects them based on the criteria you set here.</p>
+    
+    <p><b>Tip:</b> If you are using raw p values as your gene scores, make sure your threshold is a value
+    between 0 and 1 (e.g., 0.0001), check the "log transform" box, and leave the "larger scores are better" box
+    unchecked. This is because the "larger is better" choice relates to the original threshold, not the log-tranformed
+    threshold.  On the other hand, if your p-values are already -log-transformed, you should use the exact opposite settings.</p>
+    
+    <h3>Log transformation</h3>
+
+    <p>If you negative log-transform the gene scores, then your input
+    gene scores are transformed according to the function f(x) =
+    -<em>log<sub>10</sub></em>(x). This option is provided as a
+    convenience as the most common type of gene score is a p-value. The
+    transform f(x) puts the p values on a more useful scale. However, you should still leave the "larger scores are better"
+    box unchecked, as this refers to your original data.</p>
+    
+    <h3>Are larger scores better?</h3>
+    
+    <p>If you are using fold change as your gene scores, you may want to check the "larger scores are better" box. 
+    This assumes that you have taken the absolute value of the fold change values before entering them into ermineJ. That way, changes
+    up and down will be considered equally. Alternatively, you could focus on changes up or down by retaining the sign
+    on the fold change values and setting this option depending on which direction of change you are interested
+    in analyzing.</p>
+
+    <p><img alt="" src="../images/orastep5.jpg" border="0"></p>
+
+    <p>After hitting finish, you will rapidly get a new result set in
+    the output (results) table.</p>
+    <hr>
+
+    <div class="tidy">
+      Copyright 2004 (c) Columbia University
+    </div>
+  </body>
+</html>

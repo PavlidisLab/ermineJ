@@ -7,6 +7,8 @@ import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.swing.AbstractButton;
 
+import classScore.ResourceAnchor;
+
 /**
  * Makes it easier to add help access wherever we want To use this, you can do the following, for example for a menu
  * item.
@@ -38,7 +40,7 @@ public class HelpHelper {
     public boolean initHelp( AbstractButton c ) {
 
         // Create HelpSet and HelpBroker objects
-        HelpSet hs = getHelpSet( "main.hs" );
+        HelpSet hs = getHelpSet( "classScore/main.hs" );
         if ( hs != null ) {
             m_helpBroker = hs.createHelpBroker();
             // Assign help to components
@@ -60,8 +62,9 @@ public class HelpHelper {
     private HelpSet getHelpSet( String helpsetFilename ) {
         HelpSet hs = null;
         try {
-            URL hsURL = HelpSet.findHelpSet( null, helpsetFilename );
-            hs = new HelpSet( null, hsURL );
+            ClassLoader cl = ResourceAnchor.class.getClassLoader();
+            URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
+            hs = new HelpSet( cl, hsURL );
         } catch ( Exception e ) {
             System.err.println( "HelpSet: " + e.getMessage() );
             System.err.println( "HelpSet: " + helpsetFilename + " not found" );

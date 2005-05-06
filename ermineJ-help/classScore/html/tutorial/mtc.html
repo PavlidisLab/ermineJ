@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title>Multiple test correction</title>
+    <link rel="stylesheet" type="text/css" href="../style.css">
+  </head>
+
+  <body>
+    <h2>Multiple Test Correction in ermineJ</h2>
+
+    <p>ErmineJ uses Benjamini-Hochberg correction of p values to
+    determine which gene sets are selected with a false discovery rate
+    (FDR) of 0.05. Such sets are colored blue in the pval column, as
+    shown in the figure below. Gene sets which meet an FDR of 0.1 are
+    grey. Gene sets which to not meet this criterion are not
+    colored.</p>
+
+    <p>Brighter shades of color indicate even lower FDRs. Currently the
+    colors indicate FDRs of 0.001, 0.01, and 0.05.</p>
+
+    <p>Note that the color reflects the FDR when the p values for the
+    gene set indicated is used as the threshold. Thus it is possible
+    for the FDR to go up and down as you go down the list. It is not
+    uncommon for the FDR at very stringent thresholds to be above 0.05,
+    while at less stringent thresholds is can be lower. This
+    counterintuitive result is due to the way the FDR is computed. If
+    you want to control the FDR at 0.05, you should pick the
+    lowest-ranked 'blue' gene set, and all gene sets listed above would
+    be selected.</p>
+
+    <p>If you feel using the FDR is not appropriate, other multiple
+    test correction methods such as Bonferroni can be accessed from the
+    command line interface. You can also work with the results file you
+    save to compute Bonferroni or other types of corrected p values
+    from your data.</p>
+
+    <p><img alt="" src="../images/mtc.gif" border="0"></p>
+  </body>
+</html>
