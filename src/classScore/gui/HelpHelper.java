@@ -61,7 +61,8 @@ public class HelpHelper {
         HelpSet hs = null;
         try {
             ClassLoader cl = this.getClass().getClassLoader();
-            URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
+            //URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
+            URL hsURL = cl.getResource(helpsetFilename);
             hs = new HelpSet( cl, hsURL );
         } catch ( Exception e ) {
             System.err.println( "HelpSet: " + e.getMessage() );
