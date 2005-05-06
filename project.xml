@@ -166,6 +166,9 @@
             <version>2.0</version>
             <jar>commons-lang-2.0.jar</jar>
             <type>jar</type>
+            <properties>
+                <jnlp.jar>true</jnlp.jar>
+            </properties>
         </dependency>
     </dependencies>
     <build>
