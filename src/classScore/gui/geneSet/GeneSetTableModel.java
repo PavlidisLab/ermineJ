@@ -120,13 +120,20 @@ public class GeneSetTableModel extends AbstractTableModel {
                 return probeID;
             case 1:
                 // p value
-                return m_pvalues == null ? new Double( Double.NaN ) : new Double( m_nf
-                        .format( m_pvalues.get( probeID ) ) );
+                try {
+                    if ( m_pvalues == null ) return new Double( Double.NaN );
+
+                    return new Double( m_nf.format( m_pvalues.get( probeID ) ) );
+
+                } catch ( NumberFormatException e ) {
+                    return new Double( Double.NaN );
+                }
             case 2:
                 // p value bar
                 ArrayList values = new ArrayList();
                 if ( !settings.getDoLog() || m_pvalues == null ) { // kludgy way to figure out if we have pvalues.
                     values.add( 0, new Double( Double.NaN ) );
+                    values.add( 1, new Double( Double.NaN ) );
                 } else {
                     // actual p value
                     Double actualValue = ( Double ) m_pvalues.get( probeID );
@@ -149,5 +156,4 @@ public class GeneSetTableModel extends AbstractTableModel {
                 return "";
         }
     } // end getValueAt
-
 } // end class DetailsTableModel

@@ -35,6 +35,7 @@ import baseCode.util.BrowserLauncher;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
+import classScore.gui.geneSet.GeneSetDetails;
 import corejava.Format;
 
 /**
@@ -65,11 +66,13 @@ public class OutputPanel extends JScrollPane {
     private LinkedList resultToolTips = new LinkedList();
     private GeneAnnotations geneData = null;
     private GONames goData;
+    private Settings settings;
     private String classColToolTip;
 
-    public OutputPanel( GeneSetScoreFrame callingframe, LinkedList results ) {
+    public OutputPanel( GeneSetScoreFrame callingframe, LinkedList results, Settings settings ) {
         this.callingframe = callingframe;
         this.results = results;
+        this.settings = settings;
         model = new OutputTableModel( results );
 
         table = new JTable() {
@@ -117,8 +120,11 @@ public class OutputPanel extends JScrollPane {
         if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.INIT_COLUMNS ) {
             int runnum = model.getRunNum( j );
             String id = getClassId( i );
-            ( ( GeneSetPvalRun ) results.get( runnum ) ).showDetails( id );
-        } else {
+            showDetailsForGeneSet( runnum, id );
+        } else if ( table.getValueAt( i, j ) != null && j < OutputTableModel.INIT_COLUMNS ) {
+            String id = getClassId( i );
+            showDetailsForGeneSet( -1, id );
+        } else { // does this ever get triggered?
             for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
                 if ( table.getValueAt( i, k ) != null && k >= OutputTableModel.INIT_COLUMNS ) {
                     String message;
@@ -133,10 +139,25 @@ public class OutputPanel extends JScrollPane {
                         JOptionPane.showMessageDialog( this, message, "FYI", JOptionPane.PLAIN_MESSAGE );
                     }
                     int runnum = model.getRunNum( k );
-                    ( ( GeneSetPvalRun ) results.get( runnum ) ).showDetails( id );
+                    showDetailsForGeneSet( runnum, id );
                 }
             }
 
+        }
+    }
+
+    /**
+     * @param runnum
+     * @param id
+     */
+    private void showDetailsForGeneSet( int runnum, String id ) {
+        GeneSetDetails details = new GeneSetDetails( goData, geneData, settings, id );
+        if ( runnum < 0 ) {
+            details.show();
+        } else {
+            GeneSetPvalRun run = ( GeneSetPvalRun ) results.get( runnum );
+            GeneSetResult res = ( GeneSetResult ) run.getResults().get( id );
+            details.show( res, run.getGeneScores() );
         }
     }
 
@@ -576,16 +597,6 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
     GONames goData;
     LinkedList results;
 
-    static final Color goParent = Color.LIGHT_GRAY;
-    static final Color goChild = Color.YELLOW;
-
-    static final Color LIGHTBLUE5 = new Color( 210, 220, 220 );
-    static final Color LIGHTBLUE4 = new Color( 160, 220, 215 );
-    static final Color LIGHTBLUE3 = new Color( 115, 220, 195 );
-    static final Color LIGHTBLUE2 = new Color( 65, 220, 185 );
-    static final Color LIGHTBLUE1 = new Color( 0, 220, 170 );
-
-    static final Color PINK = new Color( 220, 160, 220 );
     private Format nf = new Format( "%g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 
@@ -621,7 +632,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         else if ( value == null )
             setOpaque( false );
         else if ( column == 0 && goData.newSet( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
-            setBackground( PINK );
+            setBackground( Colors.PINK );
         } else if ( value.getClass().equals( ArrayList.class ) ) {
             String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
             GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
@@ -629,13 +640,13 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             if ( data.containsKey( classid ) ) {
                 GeneSetResult res = ( GeneSetResult ) data.get( classid );
                 if ( res.getPvalue_corr() < 0.001 ) {
-                    setBackground( LIGHTBLUE1 );
+                    setBackground( Colors.LIGHTBLUE1 );
                 } else if ( res.getPvalue_corr() < 0.01 ) {
-                    setBackground( LIGHTBLUE2 );
+                    setBackground( Colors.LIGHTBLUE2 );
                 } else if ( res.getPvalue_corr() < 0.05 ) {
-                    setBackground( LIGHTBLUE3 );
+                    setBackground( Colors.LIGHTBLUE3 );
                 } else if ( res.getPvalue_corr() < 0.1 ) {
-                    setBackground( LIGHTBLUE5 );
+                    setBackground( Colors.LIGHTBLUE5 );
                 } else {
                     setBackground( Color.WHITE );
                 }

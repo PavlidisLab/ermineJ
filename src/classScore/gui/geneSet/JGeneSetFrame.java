@@ -101,7 +101,6 @@ public class JGeneSetFrame extends JFrame {
 
     public JMatrixDisplay m_matrixDisplay = null;
     private GeneSetPvalRun analysisResults;
-    private GeneSetResult classResults;
     private int width;
     private int height;
     private boolean includeEverything = true;
@@ -149,11 +148,8 @@ public class JGeneSetFrame extends JFrame {
      * @param geneData holds gene names and descriptions which can be retrieved by probe ID.
      * @param settings <code>getRawFile()</code> should return the microarray file which contains the microarray data
      *        for the probe ID's contained in <code>probeIDs</code>.
-     * @param res
-     * @param run
      */
-    public JGeneSetFrame( List probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings, GeneSetPvalRun run,
-            GeneSetResult res ) {
+    public JGeneSetFrame( List probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings ) {
         try {
             if ( settings == null ) {
                 this.settings = new Settings();
@@ -161,8 +157,6 @@ public class JGeneSetFrame extends JFrame {
                 this.settings = settings;
             }
 
-            this.analysisResults = run;
-            this.classResults = res;
             readPrefs();
             String filename = settings.getRawFile();
             createDetailsTable( probeIDs, pvalues, geneData, filename );
@@ -209,6 +203,8 @@ public class JGeneSetFrame extends JFrame {
                         + "Please make sure this file exists and the filename and directory path are correct,\n"
                         + "and that it is a valid raw data file (tab-delimited).\n" );
             }
+        } else {
+            log.info("No data filename provided");
         }
 
         if ( matrix == null ) {
@@ -258,7 +254,7 @@ public class JGeneSetFrame extends JFrame {
         // pvalue in our list of pvalues, and now is the perfect time because
         // the table is sorted by pvalues
         for ( int i = 0; i < table.getRowCount(); i++ ) {
-            String probeID = ( String ) table.getValueAt( i, matrixColumnCount + 0 ); // probeIDs.get( i );
+            String probeID = ( String ) table.getValueAt( i, matrixColumnCount );
             m_pvaluesOrdinalPosition.put( probeID, new Integer( i ) );
         }
 
@@ -947,13 +943,13 @@ public class JGeneSetFrame extends JFrame {
      * @param e
      */
     void m_viewHistMenuItem_actionPerformed( ActionEvent e ) {
-        if ( analysisResults != null ) {
-            JHistViewer f = new JHistViewer( analysisResults.getHist(), classResults.getEffectiveSize(), classResults
-                    .getScore() );
-            f.setTitle( this.getTitle() + " histogram" );
-            f.pack();
-            f.show();
-        }
+        // if ( analysisResults != null ) {
+        // JHistViewer f = new JHistViewer( analysisResults.getHist(), classResults.getEffectiveSize(), classResults
+        // .getScore() );
+        // f.setTitle( this.getTitle() + " histogram" );
+        // f.pack();
+        // f.show();
+        // }
     }
 
     /**

@@ -244,44 +244,7 @@ public class GeneSetPvalRun {
         messenger.setStatus( "Done!" );
     }
 
-    /**
-     * @param classID "GO:0000149" for example
-     */
-    public void showDetails( String classID ) {
-        final GeneSetResult res = ( GeneSetResult ) results.get( classID );
-        String name = res.getClassName();
-        // System.out.println( name );
-        Map classToProbe = geneData.getGeneSetToProbeMap();
-
-        Collection probeIDs = ( Collection ) classToProbe.get( classID );
-        Map pvals = new HashMap();
-
-        for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
-            String probeID = ( String ) iter.next();
-
-            // }
-            //        
-            // for ( int i = 0, n = probeIDs.size(); i < n; i++ ) {
-            Double pvalue;
-            // String probeID = ( String ) probeIDs.get( i );
-            if ( settings.getDoLog() == true ) {
-                pvalue = new Double( Math.pow( 10.0, -( ( Double ) geneScores.getProbeToPvalMap().get( probeID ) )
-                        .doubleValue() ) );
-            } else {
-                pvalue = ( Double ) geneScores.getProbeToPvalMap().get( probeID );
-            }
-            pvals.put( probeID, pvalue );
-        }
-
-        if ( probeIDs == null ) {
-            throw new IllegalStateException( "Class data retrieval error for " + name );
-        }
-
-        // create the details frame
-        JGeneSetFrame f = new JGeneSetFrame( new ArrayList( probeIDs ), pvals, geneData, settings, this, res );
-        f.setTitle( name + " (" + probeIDs.size() + " items) p=" + nf.format( res.getPvalue() ) );
-        f.show();
-    }
+   
 
     /**
      * @return Map the results
@@ -341,5 +304,12 @@ public class GeneSetPvalRun {
     public void setRandomSeed( long randomSeed ) {
         if ( randomSeed < 0 ) return;
         this.randomSeed = randomSeed;
+    }
+
+    /**
+     * @return Returns the geneScores.
+     */
+    public GeneScoreReader getGeneScores() {
+        return this.geneScores;
     }
 }

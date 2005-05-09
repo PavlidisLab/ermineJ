@@ -58,6 +58,14 @@ public class GeneSetScoreFrame extends JFrame {
     /**
      * 
      */
+    private static final int START_HEIGHT = 330;
+    /**
+     * 
+     */
+    private static final int START_WIDTH = 830;
+    /**
+     * 
+     */
     private static final int STARTING_OVERALL_WIDTH = 830;
     private JPanel mainPanel = ( JPanel ) this.getContentPane();
     private JMenuBar jMenuBar1 = new JMenuBar();
@@ -100,14 +108,15 @@ public class GeneSetScoreFrame extends JFrame {
     private AnalysisThread athread = new AnalysisThread();
     JPanel jPanel1 = new JPanel();
     FlowLayout flowLayout1 = new FlowLayout();
+    private GoTreePanel treePanel;
 
     private HelpHelper hh;
 
     public GeneSetScoreFrame() throws IOException {
+        settings = new Settings();
         jbInit();
         hh = new HelpHelper();
         hh.initHelp( helpMenuItem );
-        settings = new Settings();
     }
 
     /**
@@ -227,17 +236,13 @@ public class GeneSetScoreFrame extends JFrame {
         progInPanel.add( progressBar, null );
 
         // main panel
-        oPanel = new OutputPanel( this, results );
-        oPanel.setPreferredSize( new Dimension( 830, 330 ) );
-        tabs.setPreferredSize( new Dimension( 830, 330 ) );
+        oPanel = new OutputPanel( this, results, settings );
+        oPanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
-        JPanel treePanel = new JPanel();
+        treePanel = new GoTreePanel( this, results );
+        treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
-        // TODO: populate the tree
-        JTree tree = new JTree(new Object[] {});
-        tree.setPreferredSize( new Dimension( 830, 330 ) );
-        treePanel.add( tree, BorderLayout.CENTER );
-        
+        tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
         tabs.addTab( "Table", oPanel );
         tabs.addTab( "Tree", treePanel );
 
@@ -327,6 +332,7 @@ public class GeneSetScoreFrame extends JFrame {
             updateProgress( 10 );
             statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
             goData = new GONames( settings.getClassFile() );
+
             updateProgress( 70 );
             if ( Thread.currentThread().isInterrupted() ) return;
 
@@ -363,7 +369,7 @@ public class GeneSetScoreFrame extends JFrame {
             GuiUtil.error( "Error during initialization: " + e
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
-        }  
+        }
 
     }
 
@@ -380,8 +386,9 @@ public class GeneSetScoreFrame extends JFrame {
             statusMessenger.setStatus( "Done with setup" );
             enableMenusOnStart();
 
-            mainPanel.remove( progressPanel );
+            treePanel.initialize( goData );
 
+            mainPanel.remove( progressPanel );
             mainPanel.add( tabs, BorderLayout.CENTER );
 
             // mainPanel.add( oPanel, BorderLayout.CENTER );
