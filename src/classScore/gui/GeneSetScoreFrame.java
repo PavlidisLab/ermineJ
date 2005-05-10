@@ -75,6 +75,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenuItem defineClassMenuItem = new JMenuItem();
     private JMenuItem modClassMenuItem = new JMenuItem();
     private JMenuItem findClassMenuItem = new JMenuItem();
+    private JMenuItem findGeneMenuItem = new JMenuItem();
     private JMenu analysisMenu = new JMenu();
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
@@ -106,7 +107,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JLabel logoLabel;
 
     private AnalysisThread athread = new AnalysisThread();
-    JPanel jPanel1 = new JPanel();
+    JPanel loadingPanel = new JPanel();
     FlowLayout flowLayout1 = new FlowLayout();
     private GoTreePanel treePanel;
 
@@ -138,78 +139,13 @@ public class GeneSetScoreFrame extends JFrame {
         mainPanel.setLayout( borderLayout1 );
         mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
         mainPanel.setInputVerifier( null );
-
-        // menu stuff
-        fileMenu.setText( "File" );
-        fileMenu.setMnemonic( 'F' );
-        quitMenuItem.setText( "Quit" );
-        quitMenuItem.addActionListener( new GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
-        quitMenuItem.setMnemonic( 'Q' );
-        quitMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Q, InputEvent.CTRL_MASK ) );
         progInPanel.setBackground( Color.white );
         progInPanel.setPreferredSize( new Dimension( 800, 26 ) );
-        jPanel1.setBackground( Color.white );
-        jPanel1.setForeground( Color.black );
-        jPanel1.setPreferredSize( new Dimension( 800, 200 ) );
-        fileMenu.add( quitMenuItem );
-        classMenu.setText( "Gene Sets" );
-        classMenu.setMnemonic( 'C' );
-        classMenu.setEnabled( false );
-        defineClassMenuItem.setText( "Define New Gene Set" );
-        defineClassMenuItem.addActionListener( new GeneSetScoreFrame_defineClassMenuItem_actionAdapter( this ) );
-        defineClassMenuItem.setMnemonic( 'D' );
-        defineClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_D, InputEvent.CTRL_MASK ) );
-        modClassMenuItem.setText( "View/Modify Gene Set" );
-        modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
-        modClassMenuItem.setMnemonic( 'M' );
-        findClassMenuItem.setText( "Find Gene Set" );
-        findClassMenuItem.addActionListener( new GeneSetScoreFrame_findClassMenuItem_actionAdapter( this ) );
-        findClassMenuItem.setMnemonic( 'F' );
-        findClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ) );
-        classMenu.add( defineClassMenuItem );
-        classMenu.add( modClassMenuItem );
-        classMenu.add( findClassMenuItem );
-        analysisMenu.setText( "Analysis" );
-        analysisMenu.setMnemonic( 'A' );
-        analysisMenu.setEnabled( false );
-        runAnalysisMenuItem.setText( "Run Analysis" );
-        runAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
-        runAnalysisMenuItem.setMnemonic( 'R' );
-        runAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_R, InputEvent.CTRL_MASK ) );
-        cancelAnalysisMenuItem.setText( "Cancel Analysis" );
-        cancelAnalysisMenuItem.setEnabled( false );
-        cancelAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( this ) );
-        cancelAnalysisMenuItem.setMnemonic( 'C' );
-        cancelAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.CTRL_MASK ) );
+        loadingPanel.setBackground( Color.white );
+        loadingPanel.setForeground( Color.black );
+        loadingPanel.setPreferredSize( new Dimension( 800, 200 ) );
 
-        loadAnalysisMenuItem.setText( "Load Analysis" );
-        loadAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( this ) );
-        loadAnalysisMenuItem.setMnemonic( 'L' );
-        loadAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_L, InputEvent.CTRL_MASK ) );
-        saveAnalysisMenuItem.setText( "Save Analysis" );
-        saveAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( this ) );
-        saveAnalysisMenuItem.setMnemonic( 'S' );
-        saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_MASK ) );
-        saveAnalysisMenuItem.setEnabled( false ); // no runs to begin with.
-
-        analysisMenu.add( runAnalysisMenuItem );
-        analysisMenu.add( cancelAnalysisMenuItem );
-        analysisMenu.add( loadAnalysisMenuItem );
-        analysisMenu.add( saveAnalysisMenuItem );
-        helpMenu.setText( "Help" );
-        helpMenu.setMnemonic( 'H' );
-        helpMenuItem.setText( "Help Topics" );
-        helpMenuItem.setMnemonic( 'T' );
-
-        aboutMenuItem.setText( "About ErmineJ" );
-        aboutMenuItem.setMnemonic( 'A' );
-        aboutMenuItem.addActionListener( new GeneSetScoreFrame_aboutMenuItem_actionAdapter( this ) );
-        helpMenu.add( helpMenuItem );
-        helpMenu.add( aboutMenuItem );
-        jMenuBar1.add( fileMenu );
-        jMenuBar1.add( classMenu );
-        jMenuBar1.add( analysisMenu );
-        jMenuBar1.add( helpMenu );
+        setupMenus();
 
         // initialization panel (replaced by main panel when done)
         logoLabel = new JLabel();
@@ -230,9 +166,9 @@ public class GeneSetScoreFrame extends JFrame {
         progressPanel.setBackground( Color.white );
 
         progressPanel.add( logoLabel );
-        progressPanel.add( jPanel1, null );
-        jPanel1.add( label, null );
-        jPanel1.add( progInPanel, null );
+        progressPanel.add( loadingPanel, null );
+        loadingPanel.add( label, null );
+        loadingPanel.add( progInPanel, null );
         progInPanel.add( progressBar, null );
 
         // main panel
@@ -258,6 +194,89 @@ public class GeneSetScoreFrame extends JFrame {
         showStatus( "This window is not usable until you confirm the startup settings in the dialog box." );
         statusMessenger = new StatusJlabel( jLabelStatus );
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
+    }
+
+    /**
+     * 
+     */
+    private void setupMenus() {
+        // menu stuff
+        fileMenu.setText( "File" );
+        fileMenu.setMnemonic( 'F' );
+        quitMenuItem.setText( "Quit" );
+        quitMenuItem.addActionListener( new GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
+        quitMenuItem.setMnemonic( 'Q' );
+        quitMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Q, InputEvent.CTRL_MASK ) );
+        ;
+
+        fileMenu.add( quitMenuItem );
+
+        classMenu.setText( "Gene Sets" );
+        classMenu.setMnemonic( 'C' );
+        classMenu.setEnabled( false );
+
+        defineClassMenuItem.setText( "Define New Gene Set" );
+        defineClassMenuItem.addActionListener( new GeneSetScoreFrame_defineClassMenuItem_actionAdapter( this ) );
+        defineClassMenuItem.setMnemonic( 'D' );
+        defineClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_D, InputEvent.CTRL_MASK ) );
+
+        modClassMenuItem.setText( "View/Modify Gene Set" );
+        modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
+        modClassMenuItem.setMnemonic( 'M' );
+
+        findClassMenuItem.setText( "Find Gene Set" );
+        findClassMenuItem.addActionListener( new GeneSetScoreFrame_findClassMenuItem_actionAdapter( this ) );
+        findClassMenuItem.setMnemonic( 'F' );
+        findClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ) );
+
+        findGeneMenuItem.setText( "Find Gene sets by gene" );
+        findGeneMenuItem.addActionListener( new GeneSetScoreFrame_findGeneMenuItem_actionAdapter( this ) );
+        findGeneMenuItem.setMnemonic( 'G' );
+        findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
+
+        classMenu.add( defineClassMenuItem );
+        classMenu.add( modClassMenuItem );
+        classMenu.add( findClassMenuItem );
+        classMenu.add( findGeneMenuItem );
+
+        analysisMenu.setText( "Analysis" );
+        analysisMenu.setMnemonic( 'A' );
+        analysisMenu.setEnabled( false );
+        runAnalysisMenuItem.setText( "Run Analysis" );
+        runAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
+        runAnalysisMenuItem.setMnemonic( 'R' );
+        runAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_R, InputEvent.CTRL_MASK ) );
+        cancelAnalysisMenuItem.setText( "Cancel Analysis" );
+        cancelAnalysisMenuItem.setEnabled( false );
+        cancelAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( this ) );
+        cancelAnalysisMenuItem.setMnemonic( 'C' );
+        cancelAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.CTRL_MASK ) );
+        loadAnalysisMenuItem.setText( "Load Analysis" );
+        loadAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( this ) );
+        loadAnalysisMenuItem.setMnemonic( 'L' );
+        loadAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_L, InputEvent.CTRL_MASK ) );
+        saveAnalysisMenuItem.setText( "Save Analysis" );
+        saveAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( this ) );
+        saveAnalysisMenuItem.setMnemonic( 'S' );
+        saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_MASK ) );
+        saveAnalysisMenuItem.setEnabled( false ); // no runs to begin with.
+        analysisMenu.add( runAnalysisMenuItem );
+        analysisMenu.add( cancelAnalysisMenuItem );
+        analysisMenu.add( loadAnalysisMenuItem );
+        analysisMenu.add( saveAnalysisMenuItem );
+        helpMenu.setText( "Help" );
+        helpMenu.setMnemonic( 'H' );
+        helpMenuItem.setText( "Help Topics" );
+        helpMenuItem.setMnemonic( 'T' );
+        aboutMenuItem.setText( "About ErmineJ" );
+        aboutMenuItem.setMnemonic( 'A' );
+        aboutMenuItem.addActionListener( new GeneSetScoreFrame_aboutMenuItem_actionAdapter( this ) );
+        helpMenu.add( helpMenuItem );
+        helpMenu.add( aboutMenuItem );
+        jMenuBar1.add( fileMenu );
+        jMenuBar1.add( classMenu );
+        jMenuBar1.add( analysisMenu );
+        jMenuBar1.add( helpMenu );
     }
 
     private void enableMenusOnStart() {
@@ -434,6 +453,10 @@ public class GeneSetScoreFrame extends JFrame {
 
     void findClassMenuItem_actionPerformed() {
         new FindDialog( this, geneData, goData );
+    }
+
+    void findGeneMenuItem_actionPerformed() {
+        new FindByGeneDialog( this, geneData, goData );
     }
 
     void runAnalysisMenuItem_actionPerformed() {
@@ -617,6 +640,18 @@ class GeneSetScoreFrame_findClassMenuItem_actionAdapter implements java.awt.even
 
     public void actionPerformed( ActionEvent e ) {
         adaptee.findClassMenuItem_actionPerformed();
+    }
+}
+
+class GeneSetScoreFrame_findGeneMenuItem_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetScoreFrame adaptee;
+
+    GeneSetScoreFrame_findGeneMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.findGeneMenuItem_actionPerformed();
     }
 }
 

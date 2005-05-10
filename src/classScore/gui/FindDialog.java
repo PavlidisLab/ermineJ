@@ -38,15 +38,15 @@ public class FindDialog extends JDialog {
     private JButton cancelButton = new JButton();
     private JButton findButton = new JButton();
     private JPanel centerPanel = new JPanel();
-    private JTextField searchTextField;
+    protected JTextField searchTextField;
     private JLabel jLabelStatus = new JLabel();
     private JPanel jPanelStatus = new JPanel();
     private JPanel BottomPanelWrap = new JPanel();
-    private GeneSetScoreFrame callingframe;
-    private GeneAnnotations geneData;
-    private StatusViewer statusMessenger;
+    protected GeneSetScoreFrame callingframe;
+    protected GeneAnnotations geneData;
+    protected StatusViewer statusMessenger;
     private JButton resetButton;
-    private GONames goData;
+    protected GONames goData;
 
     public FindDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData ) {
         setModal( false );
