@@ -204,7 +204,7 @@ public class JGeneSetFrame extends JFrame {
                         + "and that it is a valid raw data file (tab-delimited).\n" );
             }
         } else {
-            log.info("No data filename provided");
+            log.info( "No data filename provided" );
         }
 
         if ( matrix == null ) {
@@ -973,7 +973,15 @@ public class JGeneSetFrame extends JFrame {
     }
 
     void table_mouseExited( MouseEvent e ) {
+        resetUrl();
+    }
+
+    /**
+     * 
+     */
+    private void resetUrl() {
         setCursor( Cursor.getDefaultCursor() );
+        statusMessenger.clear();
     }
 
     void table_mouseMoved( MouseEvent e ) {
@@ -988,8 +996,9 @@ public class JGeneSetFrame extends JFrame {
                 statusMessenger.setStatus( table.getValueAt( i, j ).toString(), false );
             }
 
-        } else
-            setCursor( Cursor.getDefaultCursor() );
+        } else {
+            resetUrl();
+        }
     }
 
     void table_mouseReleased( MouseEvent e ) {
