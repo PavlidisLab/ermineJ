@@ -3,6 +3,7 @@ package classScore.analysis;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.matrix.SparseDoubleMatrix2DNamed;
 import baseCode.math.RandomChooser;
+import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
@@ -94,7 +95,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
                 if ( Thread.currentThread().isInterrupted() ) {
                     log.debug( "Got cancel" );
-                    throw new RuntimeException( "Interrupted" );
+                    throw new CancellationException( );
                 }
 
                 RandomChooser.chooserandom( randomnums, deck, data.rows(), geneSetSize );
@@ -148,7 +149,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             Thread.sleep( 10 );
         } catch ( InterruptedException e ) {
             log.debug( "Interrupted" );
-            throw new RuntimeException( "Interrupted" );
+            throw new CancellationException( );
         }
     }
 

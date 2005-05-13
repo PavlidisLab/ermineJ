@@ -11,6 +11,7 @@ import java.util.Vector;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.RandomChooser;
 import baseCode.math.Stats;
+import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
@@ -99,7 +100,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
                 if ( Thread.currentThread().isInterrupted() ) {
                     log.debug( "Got cancel" );
-                    throw new RuntimeException( "Interrupted" );
+                    throw new CancellationException( );
                 }
 
                 RandomChooser.chooserandom( random_class, in_pval, deck, num_genes, geneSetSize );

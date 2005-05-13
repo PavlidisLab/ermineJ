@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GeneAnnotations;
+import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
 import classScore.Settings;
 import classScore.data.GeneScoreReader;
@@ -99,12 +100,20 @@ public class MultipleTestCorrector {
     }
 
     /**
-     * Westfall-Young pvalue correction. Based on algorithm 2.8, pg 66 of 'resampling-based multiple testing'. 0. Sort
-     * the pvalues for the real data (assume worst pvalue is first) 1. Make an array of count variables, one for each
-     * class, intialize to zero. loop: (n=10,000). 2. Generate class pvalues for randomized values (see above); 3.
-     * Iterate over this in the same order as the actual order. 4. Define successive minima: (q is the trial; p is real,
-     * already ranked) a. qk = pk (class with worst pvalue) b. qk-1 = min (qk, pk-1) ... 5. at each step a.... if qi <=
-     * pi, count_i++ end loop. 6. p_i* = count_i/n 7. enforce monotonicity by using successive maximization.
+     * Westfall-Young pvalue correction. Based on algorithm 2.8, pg 66 of 'Resampling-based Multiple Testing'.
+     * <ol>
+     * <li>Sort the pvalues for the real data (assume worst pvalue is first)
+     * <li>Make an array of count variables, one for each class, intialize to zero. loop: (n=10,000).
+     * <li> Generate class pvalues for randomized values (see above); 3. Iterate over this in the same order as the
+     * actual order.
+     * <li>Define successive minima: (q is the trial; p is real, already ranked)
+     * <ol>
+     * <li>a. qk = pk (class with worst pvalue)
+     * <li>b. qk-1 = min (qk, pk-1) ...
+     * </ol>
+     * <li>at each step a.... if qi <= pi, count_i++ end loop.
+     * <li>p_i* = count_i/n 7. enforce monotonicity by using successive maximization.
+     * </ol>
      * 
      * @param trials How many random trials to do. According to W-Y, it should be >=10,000.
      * @todo get this working with the other types of scoring methods (ORA, ROC for example)
@@ -120,8 +129,6 @@ public class MultipleTestCorrector {
         Map permscores;
 
         GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, null );
-
-        boolean verbose = false;
 
         for ( int i = 0; i < trials; i++ ) {
             // System.err.println("Trial: " + i );
@@ -179,7 +186,7 @@ public class MultipleTestCorrector {
                 // worst
                 // class.
                 if ( Thread.currentThread().isInterrupted() ) {
-                    throw new RuntimeException( "Interrupted" );
+                    throw new CancellationException( );
                 }
                 nextclass = ( String ) it.next();
 
@@ -222,7 +229,7 @@ public class MultipleTestCorrector {
                  * if (nextclass.equals("GO:0006958")) { System.err.print("\tGO:0006958\t" + nf.format(permp)); }
                  */
 
-                if ( verbose && j == sortedclasses.size() - 1 ) { // monitor what
+                if ( log.isDebugEnabled() && j == sortedclasses.size() - 1 ) { // monitor what
                     // happens to the
                     // best class.
                     System.err.println( "Sim " + i + " class# " + j + " " + nextclass + " size="
@@ -235,7 +242,7 @@ public class MultipleTestCorrector {
                 qprev = q;
             }
 
-            if ( i % 10 == 0 ) {
+            if ( i % 100 == 0 ) {
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
@@ -272,10 +279,8 @@ public class MultipleTestCorrector {
             corrected_p = Math.max( ( double ) counts[j] / ( double ) trials, previous_p ); // first iteration, these
             // are the same.
 
-            if ( verbose ) { // print the counts for each class.
-                System.err.println( j + " " + counts[j] + " " + trials + " " + corrected_p );
+            if ( log.isDebugEnabled() ) log.debug( j + " " + counts[j] + " " + trials + " " + corrected_p );
 
-            }
             res.setCorrectedPvalue( corrected_p );
             previous_p = corrected_p;
             j--;

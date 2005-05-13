@@ -1,10 +1,8 @@
 package classScore;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,7 +24,6 @@ import classScore.analysis.ResamplingExperimentGeneSetScore;
 import classScore.data.GeneScoreReader;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
-import classScore.gui.geneSet.JGeneSetFrame;
 
 /**
  * Class that does all the work in doing gene set scoring. Holds the results as well.
@@ -39,6 +36,10 @@ import classScore.gui.geneSet.JGeneSetFrame;
  */
 public class GeneSetPvalRun {
 
+    /**
+     * 
+     */
+    private static final int NUM_WY_SAMPLES = 10000;
     private GeneAnnotations geneData;
     private GeneScoreReader geneScores;
     private GONames goData; // shared by all
@@ -224,27 +225,47 @@ public class GeneSetPvalRun {
 
         sortResults();
         if ( Thread.currentThread().isInterrupted() ) return;
-        messenger.setStatus( "Multiple test correction..." );
-        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
-                results, messenger );
-        int mtc_method = settings.getMtc();
+        multipleTestCorrect( messenger, csc );
 
-        if ( mtc_method == Settings.BONFERONNI ) {
-            mt.bonferroni();
-        } else if ( mtc_method == Settings.BENJAMINIHOCHBERG ) {
-            mt.benjaminihochberg( 0.05 );
-        } else if ( mtc_method == Settings.WESTFALLYOUNG ) {
-            mt.westfallyoung( 10000 );
-        }
+        setGeneSetRanks();
+        messenger.setStatus( "Done!" );
+    }
 
+    /**
+     * 
+     */
+    private void setGeneSetRanks() {
         // For table output
         for ( int i = 0; i < sortedclasses.size(); i++ ) {
             ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) ).setRank( i + 1 );
         }
-        messenger.setStatus( "Done!" );
     }
 
-   
+    /**
+     * @param settings
+     * @param geneData
+     * @param geneScores
+     * @param messenger
+     * @param csc
+     */
+    private void multipleTestCorrect( StatusViewer messenger, GeneSetSizeComputer csc ) {
+        messenger.setStatus( "Multiple test correction..." );
+        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
+                results, messenger );
+        int multipleTestCorrMethod = settings.getMtc();
+        if ( multipleTestCorrMethod == Settings.BONFERONNI ) {
+            mt.bonferroni();
+        } else if ( multipleTestCorrMethod == Settings.BENJAMINIHOCHBERG ) {
+            mt.benjaminihochberg( 0.05 );
+        } else if ( multipleTestCorrMethod == Settings.WESTFALLYOUNG ) {
+            if ( settings.getAnalysisMethod() != Settings.RESAMP )
+                throw new UnsupportedOperationException(
+                        "Westfall-Young correction is not supported for this analysis method" );
+            mt.westfallyoung( NUM_WY_SAMPLES );
+        } else {
+            throw new IllegalArgumentException( "Unknown multiple test correction method: " + multipleTestCorrMethod );
+        }
+    }
 
     /**
      * @return Map the results

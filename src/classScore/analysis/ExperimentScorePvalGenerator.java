@@ -128,6 +128,8 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      */
     protected double scoreToPval( int in_size, double rawscore ) throws IllegalStateException {
 
+        if ( hist == null ) throw new IllegalStateException( "Histogram is null" );
+
         double pval = hist.getValue( in_size, rawscore, settings.upperTail() );
 
         if ( pval < 0.0 ) {
