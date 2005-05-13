@@ -1,6 +1,7 @@
 package classScore;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +16,7 @@ import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.gui.GuiUtil;
 import baseCode.io.reader.DoubleMatrixReader;
+import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
 import classScore.data.GeneScoreReader;
 import classScore.gui.GeneSetScoreFrame;
@@ -34,7 +36,7 @@ public class AnalysisThread {
      */
     private final class Athread extends Thread {
 
-        private boolean stop = false;
+        private volatile boolean stop = false;
         Object owner;
 
         Method runningMethod;
@@ -55,19 +57,30 @@ public class AnalysisThread {
             // Thread myThread = Thread.currentThread();
             try {
                 runningMethod.invoke( owner, null );
-            }
-            // catch ( RuntimeException e ) {
-            // // interruption
-            // csframe.enableMenusForAnalysis();
-            // messenger.setStatus( "Ready" );
-            // return;
-            // }
-            catch ( Exception e ) {
-                GuiUtil.error( "Error During analysis: ", e );
-                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+
+                if ( !( e.getCause() instanceof CancellationException ) ) {
+                    showError( e.getCause() );
+                } else {
+                    log.debug( "Cancelled" );
+                }
+
                 csframe.enableMenusForAnalysis();
                 messenger.setStatus( "Ready" );
+                return;
+            } catch ( Exception e ) {
+                showError( e );
             }
+        }
+
+        /**
+         * @param e
+         */
+        private void showError( Throwable e ) {
+            GuiUtil.error( "Error During analysis: ", e );
+            e.printStackTrace();
+            csframe.enableMenusForAnalysis();
+            messenger.setStatus( "Ready" );
         }
 
         /**
@@ -285,6 +298,7 @@ public class AnalysisThread {
         if ( runResult != null ) csframe.addResult( runResult );
 
         csframe.setSettings( settings );
+        settings.writePrefs();
         oldSettings = settings;
         csframe.enableMenusForAnalysis();
         athread = null;
