@@ -175,8 +175,8 @@ public class GeneSetScoreFrame extends JFrame {
 
         // main panel
         oPanel = new OutputPanel( this, results, settings );
+       
         oPanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-
         treePanel = new GoTreePanel( this, results );
         treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
@@ -196,6 +196,7 @@ public class GeneSetScoreFrame extends JFrame {
         showStatus( "This window is not usable until you confirm the startup settings in the dialog box." );
         statusMessenger = new StatusJlabel( jLabelStatus );
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
+        oPanel.setMessenger( this.statusMessenger );
     }
 
     /**

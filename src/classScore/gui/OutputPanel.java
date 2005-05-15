@@ -35,6 +35,7 @@ import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
 import baseCode.util.BrowserLauncher;
+import baseCode.util.StatusViewer;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
@@ -72,6 +73,14 @@ public class OutputPanel extends JScrollPane {
     private GONames goData;
     private Settings settings;
     private String classColToolTip;
+    private StatusViewer messenger;
+
+    /**
+     * @param messenger The messenger to set.
+     */
+    public void setMessenger( StatusViewer messenger ) {
+        this.messenger = messenger;
+    }
 
     public OutputPanel( GeneSetScoreFrame callingframe, LinkedList results, Settings settings ) {
         this.callingframe = callingframe;
@@ -115,7 +124,6 @@ public class OutputPanel extends JScrollPane {
     }
 
     /**
-     * @todo make this open the class even if no results are stored.
      * @param e MouseEvent
      */
     void table_mouseReleased( MouseEvent e ) {
@@ -129,7 +137,7 @@ public class OutputPanel extends JScrollPane {
         } else if ( table.getValueAt( i, j ) != null && j < OutputTableModel.INIT_COLUMNS ) {
             _id = getClassId( i );
             _runnum = -1;
-        } else { // does this ever get triggered?
+        } else { // FIXME does this ever get triggered?
             log.debug( "Seeking column to show" );
             for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
                 if ( table.getValueAt( i, k ) != null && k >= OutputTableModel.INIT_COLUMNS ) {
@@ -153,6 +161,7 @@ public class OutputPanel extends JScrollPane {
         final String id = _id;
         final int runnum = _runnum;
         log.debug( "Showing details for " + id );
+        if ( messenger != null ) messenger.setStatus( "Viewing data for " + id + "..." );
         new Thread() {
             public void run() {
                 showDetailsForGeneSet( runnum, id );
