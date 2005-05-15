@@ -109,7 +109,6 @@ public class GeneSetScoreFrame extends JFrame {
     private JLabel logoLabel;
 
     private AnalysisThread athread;
-    private boolean analysisResultReady = false;
     JPanel loadingPanel = new JPanel();
     FlowLayout flowLayout1 = new FlowLayout();
     private GoTreePanel treePanel;
@@ -512,11 +511,7 @@ public class GeneSetScoreFrame extends JFrame {
         log.debug( "Starting analysis thread" );
         athread.run();
         log.debug( "Waiting" );
-        if ( athread.getLatestResults() == null ) {
-            this.doCancel();
-        } else {
-            addResult( athread.getLatestResults() );
-        }
+        addResult( athread.getLatestResults() );
         log.debug( "done" );
         enableMenusForAnalysis();
     }

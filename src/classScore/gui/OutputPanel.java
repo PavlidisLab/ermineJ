@@ -27,6 +27,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
@@ -50,6 +53,7 @@ import corejava.Format;
 
 public class OutputPanel extends JScrollPane {
 
+    private static Log log = LogFactory.getLog( OutputPanel.class.getName() );
     private static final String AMIGO_URL_BASE = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
     private final static int COL0WIDTH = 80;
@@ -117,33 +121,43 @@ public class OutputPanel extends JScrollPane {
     void table_mouseReleased( MouseEvent e ) {
         int i = table.getSelectedRow();
         int j = table.getSelectedColumn();
+        int _runnum = -1;
+        String _id = "";
         if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.INIT_COLUMNS ) {
-            int runnum = model.getRunNum( j );
-            String id = getClassId( i );
-            showDetailsForGeneSet( runnum, id );
+            _runnum = model.getRunNum( j );
+            _id = getClassId( i );
         } else if ( table.getValueAt( i, j ) != null && j < OutputTableModel.INIT_COLUMNS ) {
-            String id = getClassId( i );
-            showDetailsForGeneSet( -1, id );
+            _id = getClassId( i );
+            _runnum = -1;
         } else { // does this ever get triggered?
+            log.debug( "Seeking column to show" );
             for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
                 if ( table.getValueAt( i, k ) != null && k >= OutputTableModel.INIT_COLUMNS ) {
                     String message;
-                    String id = getClassId( i );
+                    _id = getClassId( i );
                     String shownRunName = model.getColumnName( k );
                     shownRunName = shownRunName.substring( 0, shownRunName.length() - 5 );
                     if ( j >= OutputTableModel.INIT_COLUMNS ) {
                         message = model.getColumnName( j );
                         message = message.substring( 0, message.length() - 5 );
-                        message = message + " doesn't include the class " + id + ". Showing " + shownRunName
+                        message = message + " doesn't include the class " + _id + ". Showing " + shownRunName
                                 + " instead.";
                         JOptionPane.showMessageDialog( this, message, "FYI", JOptionPane.PLAIN_MESSAGE );
                     }
-                    int runnum = model.getRunNum( k );
-                    showDetailsForGeneSet( runnum, id );
+                    _runnum = model.getRunNum( k );
+                    break;
                 }
             }
 
         }
+        final String id = _id;
+        final int runnum = _runnum;
+        log.debug( "Showing details for " + id );
+        new Thread() {
+            public void run() {
+                showDetailsForGeneSet( runnum, id );
+            }
+        }.start();
     }
 
     /**
@@ -151,6 +165,7 @@ public class OutputPanel extends JScrollPane {
      * @param id
      */
     private void showDetailsForGeneSet( int runnum, String id ) {
+        log.debug( "Request for details of gene set: " + id );
         GeneSetDetails details = new GeneSetDetails( goData, geneData, settings, id );
         if ( runnum < 0 ) {
             details.show();
