@@ -160,12 +160,14 @@ public class AnalysisWizardStep2 extends WizardStep {
             wiz.showError( "The gene score file is not valid." );
             return false;
         }
+
+        wiz.clearStatus();
         return true;
     }
 
     void rawBrowseButton_actionPerformed( ActionEvent e ) {
         chooser.setDialogTitle( "Choose Raw Data File" );
-
+        wiz.clearStatus();
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             rawFile.setText( chooser.getSelectedFile().toString() );
@@ -175,6 +177,7 @@ public class AnalysisWizardStep2 extends WizardStep {
 
     void scoreBrowseButton_actionPerformed( ActionEvent e ) {
         chooser.setDialogTitle( "Choose Gene Score File" );
+        wiz.clearStatus();
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             scoreFile.setText( chooser.getSelectedFile().toString() );
