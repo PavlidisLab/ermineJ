@@ -6,10 +6,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
+import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.NewGeneSet;
 
@@ -23,6 +27,9 @@ import classScore.data.NewGeneSet;
  */
 
 public class AnalysisWizard extends Wizard {
+
+    private static Log log = LogFactory.getLog( AnalysisWizard.class.getName() );
+
     // logic
     int step = 1;
     int analysisType = Settings.ORA;
@@ -150,15 +157,19 @@ public class AnalysisWizard extends Wizard {
                 loadAddedClasses();
             } catch ( IOException e1 ) {
                 GuiUtil.error( "Could not load the custom classes: " + e + "\n"
-                        + "If this problem persists, please contact the software vendor. " + "Press OK to quit." );
-                System.exit( 1 );
+                        + "If this problem persists, please contact the software vendor. " );
             }
-            ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( settings );
-
             saveValues();
-            dispose();
+            log.info( "Starting analysis" );
+
+            new Thread() {
+                public void run() {
+                    ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( settings );
+                }
+            }.start();
+            this.dispose();
         }
-        dispose();
+        this.dispose();
     }
 
     void saveValues() {
@@ -170,8 +181,7 @@ public class AnalysisWizard extends Wizard {
             settings.writePrefs();
         } catch ( IOException e ) {
             GuiUtil.error( "Could not save preferences: " + e + "\n"
-                    + "If this problem persists, please contact the software vendor. " + "Press OK to quit." );
-            System.exit( 1 );
+                    + "If this problem persists, please contact the software vendor. " );
         }
     }
 

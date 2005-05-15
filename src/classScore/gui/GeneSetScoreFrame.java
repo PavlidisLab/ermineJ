@@ -30,6 +30,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import baseCode.bio.geneset.GONames;
@@ -54,7 +56,7 @@ import classScore.Settings;
  */
 
 public class GeneSetScoreFrame extends JFrame {
-
+    private static Log log = LogFactory.getLog( GeneSetScoreFrame.class.getName() );
     /**
      * 
      */
@@ -106,7 +108,8 @@ public class GeneSetScoreFrame extends JFrame {
 
     private JLabel logoLabel;
 
-    private AnalysisThread athread = new AnalysisThread();
+    private AnalysisThread athread;
+    private boolean analysisResultReady = false;
     JPanel loadingPanel = new JPanel();
     FlowLayout flowLayout1 = new FlowLayout();
     private GoTreePanel treePanel;
@@ -315,14 +318,6 @@ public class GeneSetScoreFrame extends JFrame {
         cancelAnalysisMenuItem.setEnabled( false );
     }
 
-    // private final class InitThread extends Thread {
-    //            
-    // public void run() {
-    //            
-    // }
-    //        
-    // }
-
     public void updateProgress( int val ) {
         final int value = val;
 
@@ -373,21 +368,20 @@ public class GeneSetScoreFrame extends JFrame {
                         + "Check that the file format is correct.\n" );
             }
 
-            statusMessenger.setStatus( "Initializing gene class mapping" );
             geneDataSets.put( new Integer( "original".hashCode() ), geneData );
 
         } catch ( SAXException e ) {
             GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 );
+            System.exit( 1 ); // FIXME - go back to the start.
         } catch ( IOException e ) {
             GuiUtil.error( "File reading or writing error during initialization: " + e.getMessage()
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit.", e );
-            System.exit( 1 );
+            System.exit( 1 ); // FIXME - go back to the start
         } catch ( IllegalArgumentException e ) {
             GuiUtil.error( "Error during initialization: " + e
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 );
+            System.exit( 1 ); // FIXME - go back to the start
         }
 
     }
@@ -464,8 +458,12 @@ public class GeneSetScoreFrame extends JFrame {
         awiz.showWizard();
     }
 
-    void cancelAnalysisMenuItem_actionPerformed() {
-        athread.cancelAnalysisThread();
+    void doCancel() {
+        log.debug( "Got cancel" );
+        assert athread != null : "Attempt to cancel a null analysis thread";
+        athread.interrupt();
+        athread.setStop( true );
+        enableMenusForAnalysis();
         showStatus( "Ready" );
     }
 
@@ -500,15 +498,27 @@ public class GeneSetScoreFrame extends JFrame {
     }
 
     public void addResult( GeneSetPvalRun result ) {
-        if ( result.getResults().size() == 0 ) return;
+        if ( result == null || result.getResults().size() == 0 ) return;
         results.add( result );
-        oPanel.addRun(); // this line should come after results.add() or else you'll get errors
+        oPanel.addRun();
     }
 
     public void startAnalysis( Settings runSettings ) {
         disableMenusForAnalysis();
-        athread.startAnalysisThread( this, runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
+
+        assert athread == null : "Analysis running already!     ";
+        this.athread = new AnalysisThread( runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
                 geneScoreSets );
+        log.debug( "Starting analysis thread" );
+        athread.run();
+        log.debug( "Waiting" );
+        if ( athread.getLatestResults() == null ) {
+            this.doCancel();
+        } else {
+            addResult( athread.getLatestResults() );
+        }
+        log.debug( "done" );
+        enableMenusForAnalysis();
     }
 
     public void loadAnalysis( String loadFile ) throws IOException {
@@ -519,8 +529,13 @@ public class GeneSetScoreFrame extends JFrame {
             return;
         }
 
-        athread.loadAnalysisThread( this, loadSettings, statusMessenger, goData, geneDataSets, rawDataSets,
+        this.athread = new AnalysisThread( loadSettings, statusMessenger, goData, geneDataSets, rawDataSets,
                 geneScoreSets, loadFile );
+        athread.run();
+        log.debug( "Waiting" );
+        addResult( athread.getLatestResults() );
+        log.debug( "done" );
+        enableMenusForAnalysis();
     }
 
     /**
@@ -529,14 +544,6 @@ public class GeneSetScoreFrame extends JFrame {
     private boolean checkValid( Settings loadSettings ) {
 
         String file;
-
-        // file = checkFile( loadSettings.getAnnotFile() );
-        // if ( file == null ) return false;
-        // loadSettings.setAnnotFile( file );
-
-        // file = checkFile( loadSettings.getClassFile() );
-        // if ( file == null ) return false;
-        // loadSettings.setClassFile( file );
 
         file = checkFile( loadSettings.getRawFile() );
         if ( file == null ) return false;
@@ -676,7 +683,7 @@ class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter implements java.awt
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.cancelAnalysisMenuItem_actionPerformed();
+        adaptee.doCancel();
     }
 }
 
