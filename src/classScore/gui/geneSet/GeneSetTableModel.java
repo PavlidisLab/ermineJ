@@ -138,10 +138,12 @@ public class GeneSetTableModel extends AbstractTableModel {
                     // actual p value
                     Double actualValue = ( Double ) m_pvalues.get( probeID );
                     values.add( 0, actualValue );
-                    // expected p value
-                    int position = ( ( Integer ) m_pvaluesOrdinalPosition.get( probeID ) ).intValue();
-                    Double expectedValue = new Double( 1.0f / getRowCount() * ( position + 1 ) );
-                    values.add( 1, expectedValue );
+                    // expected p value, but only if we had an actual pvalue
+                    if ( !Double.isNaN( actualValue.doubleValue() ) ) {
+                        int position = ( ( Integer ) m_pvaluesOrdinalPosition.get( probeID ) ).intValue();
+                        Double expectedValue = new Double( 1.0f / getRowCount() * ( position + 1 ) );
+                        values.add( 1, expectedValue );
+                    }
                 }
                 return values;
             case 3:

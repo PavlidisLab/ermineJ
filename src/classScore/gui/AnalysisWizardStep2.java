@@ -41,7 +41,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         super( wiz );
         this.wiz = wiz;
         this.settings = settings;
-        chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         setValues();
         wiz.clearStatus();
     }
@@ -57,18 +57,18 @@ public class AnalysisWizardStep2 extends WizardStep {
         jPanel1.add( jLabel1, null );
 
         // panel 2
-        JPanel jPanel2 = new JPanel();
+        JPanel scoreFileBrowsePanel = new JPanel();
         JButton jButton1 = new JButton();
         jButton1.setEnabled( true );
         jButton1.setText( "Browse" );
         jButton1.addActionListener( new AnalysisWizardStep2_scoreBrowseButton_actionAdapter( this ) );
         scoreFile = new JTextField();
         scoreFile.setPreferredSize( new Dimension( 325, 19 ) );
-        jPanel2.add( scoreFile, null );
-        jPanel2.add( jButton1, null );
+        scoreFileBrowsePanel.add( scoreFile, null );
+        scoreFileBrowsePanel.add( jButton1, null );
 
         // panel 3
-        JPanel jPanel3 = new JPanel();
+        JPanel scoreColumnPanel = new JPanel();
         JLabel jLabel3 = new JLabel();
         jLabel3.setText( "Score column:" );
         jTextFieldScoreCol = new JTextField();
@@ -78,26 +78,25 @@ public class AnalysisWizardStep2 extends WizardStep {
         jTextFieldScoreCol
                 .setToolTipText( "Column of the gene score file containing the scores. This must be a value of 2 or higher." );
         jTextFieldScoreCol.setEditable( true );
-        JLabel jDummyLabel = new JLabel();
-        jPanel3.add( jLabel3, null );
-        jPanel3.add( jTextFieldScoreCol, null );
+        scoreColumnPanel.add( jLabel3, null );
+        scoreColumnPanel.add( jTextFieldScoreCol, null );
 
         // panel 4
-        JPanel jPanel4 = new JPanel();
+        JPanel rawDataPanel = new JPanel();
         JLabel jLabel4 = new JLabel();
         jLabel4.setText( "Raw data file (optional for ORA or resampling):" );
-        jPanel4.add( jLabel4, null );
+        rawDataPanel.add( jLabel4, null );
 
         // panel 5
-        JPanel jPanel5 = new JPanel();
+        JPanel rawDataBrowsePanel = new JPanel();
         JButton jButton4 = new JButton();
         jButton4.setEnabled( true );
         jButton4.setText( "Browse" );
         jButton4.addActionListener( new AnalysisWizardStep2_rawBrowseButton_actionAdapter( this ) );
         rawFile = new JTextField();
         rawFile.setPreferredSize( new Dimension( 325, 19 ) );
-        jPanel5.add( rawFile, null );
-        jPanel5.add( jButton4, null );
+        rawDataBrowsePanel.add( rawFile, null );
+        rawDataBrowsePanel.add( jButton4, null );
 
         // Now create border layouts for each of the rows to get them aligned.
         JPanel jPanelA = new JPanel();
@@ -106,16 +105,16 @@ public class AnalysisWizardStep2 extends WizardStep {
 
         JPanel jPanelB = new JPanel();
         jPanelB.setLayout( new BorderLayout() );
-        jPanelB.add( jPanel2, BorderLayout.WEST );
-        jPanelB.add( jPanel3, BorderLayout.EAST );
+        jPanelB.add( scoreFileBrowsePanel, BorderLayout.WEST );
+        jPanelB.add( scoreColumnPanel, BorderLayout.EAST );
 
         JPanel jPanelC = new JPanel();
         jPanelC.setLayout( new BorderLayout() );
-        jPanelC.add( jPanel4, BorderLayout.WEST );
+        jPanelC.add( rawDataPanel, BorderLayout.WEST );
 
         JPanel jPanelD = new JPanel();
         jPanelD.setLayout( new BorderLayout() );
-        jPanelD.add( jPanel5, BorderLayout.WEST );
+        jPanelD.add( rawDataBrowsePanel, BorderLayout.WEST );
 
         // MAIN PANEL = GridLayout(BorderLayouts); GridLayout is (1,6)
         step2Panel.add( jPanelA, null );
@@ -170,7 +169,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             rawFile.setText( chooser.getSelectedFile().toString() );
-            settings.setDataFolder( chooser.getCurrentDirectory().toString() );
+            settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
         }
     }
 
@@ -179,7 +178,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             scoreFile.setText( chooser.getSelectedFile().toString() );
-            settings.setDataFolder( chooser.getCurrentDirectory().toString() );
+            settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
         }
     }
 
@@ -194,7 +193,7 @@ public class AnalysisWizardStep2 extends WizardStep {
 
         settings.setScoreFile( scoreFile.getText() );
         settings.setRawFile( rawFile.getText() );
-        settings.setDataFolder( chooser.getCurrentDirectory().toString() );
+        settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
     }
 
 }
