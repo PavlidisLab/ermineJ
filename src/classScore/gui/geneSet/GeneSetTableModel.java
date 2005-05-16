@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

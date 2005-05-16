@@ -35,7 +35,7 @@ public class FindByGeneDialog extends FindDialog {
 
         statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
 
-        callingframe.getOPanel().resetTable();
+        callingframe.getOPanel().resetView();
 
     }
 

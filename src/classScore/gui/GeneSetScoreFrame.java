@@ -91,7 +91,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JPanel progressPanel;
     private JPanel progInPanel = new JPanel();
     JProgressBar progressBar = new JProgressBar();
-    private OutputPanel oPanel;
+    private GeneSetTablePanel oPanel;
 
     private JLabel jLabelStatus = new JLabel();
     private JPanel jPanelStatus = new JPanel();
@@ -111,7 +111,7 @@ public class GeneSetScoreFrame extends JFrame {
     private AnalysisThread athread;
     JPanel loadingPanel = new JPanel();
     FlowLayout flowLayout1 = new FlowLayout();
-    private GoTreePanel treePanel;
+    private GeneSetTreePanel treePanel;
 
     private HelpHelper hh;
 
@@ -174,10 +174,10 @@ public class GeneSetScoreFrame extends JFrame {
         progInPanel.add( progressBar, null );
 
         // main panel
-        oPanel = new OutputPanel( this, results, settings );
-       
+        oPanel = new GeneSetTablePanel( this, results, settings );
+
         oPanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-        treePanel = new GoTreePanel( this, results );
+        treePanel = new GeneSetTreePanel( this, results );
         treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
         tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
@@ -399,7 +399,7 @@ public class GeneSetScoreFrame extends JFrame {
             statusMessenger.setStatus( "Done with setup" );
             enableMenusOnStart();
 
-            treePanel.initialize( goData );
+            treePanel.initialize( goData, geneData );
 
             mainPanel.remove( progressPanel );
             mainPanel.add( tabs, BorderLayout.CENTER );
@@ -583,7 +583,7 @@ public class GeneSetScoreFrame extends JFrame {
     /**
      * @return Returns the oPanel.
      */
-    public OutputPanel getOPanel() {
+    public GeneSetTablePanel getOPanel() {
         return oPanel;
     }
 
