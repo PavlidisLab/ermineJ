@@ -155,7 +155,7 @@ public class Settings {
         // make a new file if it was empty.
         if ( preferencesFileName.compareTo( "" ) == 0 ) {
             preferencesFileName = dataDirectory + System.getProperty( "file.separator" ) + "ermineJ.preferences";
-            log.info( "Determined preferences file " + preferencesFileName);
+            log.debug( "Determined preferences file " + preferencesFileName);
         }
 
         // read the file if we can.

@@ -37,7 +37,16 @@ public class GeneSetDetails {
         this.classID = classID;
         this.goData = goData;
         this.geneData = geneData;
-        this.settings = settings;
+        if ( settings == null ) {
+            try {
+                settings = new Settings();
+            } catch ( IOException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            this.settings = settings;
+        }
         this.className = goData.getNameForId( classID );
     }
 
@@ -48,7 +57,7 @@ public class GeneSetDetails {
         Map pvals = new HashMap();
 
         if ( geneData == null ) {
-            // prompt the user to enter some; if they don't have any, they can just skip it.
+            // FIXME what we should do: prompt the user to enter some; if they don't have any, they can just skip it.
             log.warn( "No gene data found" );
         } else {
             classToProbe = geneData.getGeneSetToProbeMap();
@@ -108,7 +117,7 @@ public class GeneSetDetails {
      * @return
      */
     private GeneScoreReader tryToGetGeneScores( GeneScoreReader geneScores ) {
-        // see if the user has a pvalue file configured already;
+        assert settings != null : "Null settings.";
         String scoreFile = settings.getScoreFile();
         if ( scoreFile != null ) {
             try {
