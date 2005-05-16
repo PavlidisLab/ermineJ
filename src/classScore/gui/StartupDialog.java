@@ -62,7 +62,7 @@ public class StartupDialog extends AppDialog {
     // Component initialization
     private void jbInit() {
 
-        chooser = new JFileChooser( settings.getDataFolder() );
+        chooser = new JFileChooser( settings.getDataDirectory() );
 
         this.addWindowListener( new StartupDialog_this_windowAdapter( this ) );
 
@@ -122,7 +122,7 @@ public class StartupDialog extends AppDialog {
     private void setValues() {
         classFile.setText( settings.getClassFile() );
         annotFile.setText( settings.getAnnotFile() );
-        chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
     }
 
     private void saveValues() {

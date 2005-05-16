@@ -126,7 +126,7 @@ public class classScoreCMD {
                 case 'd': // datafolder
                     arg = g.getOptarg();
                     if ( FileTools.testDir( arg ) )
-                        settings.setDataFolder( arg );
+                        settings.setDataDirectory( arg );
                     else {
                         System.err.println( "Invalid path for data folder (-d)" );
                         showHelp();

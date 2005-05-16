@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,9 +15,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import baseCode.util.CancellationException;
 import baseCode.util.FileTools;
 import baseCode.util.StatusViewer;
 import cern.jet.math.Arithmetic;
@@ -36,7 +38,7 @@ import classScore.Settings;
  * @version $Id$
  */
 public class GeneScoreReader {
-
+    protected static final Log log = LogFactory.getLog( GeneScoreReader.class );
     private static final double SMALL = 10e-16;
     double[] groupPvalues;
     private List probeIDs = null;
@@ -46,6 +48,7 @@ public class GeneScoreReader {
     private Map geneToPvalMap;
     private String[] probeIDsArray;
     private double[] probePvaluesArray;
+    private Settings settings;
 
     /**
      * @throws IOException
@@ -57,10 +60,11 @@ public class GeneScoreReader {
      */
     public GeneScoreReader( String filename, Settings settings, StatusViewer messenger, Map geneToProbeMap,
             Map probeToGeneMap ) throws IOException {
+        this.settings = settings;
         this.init();
         FileTools.checkPathIsReadableFile( filename );
         InputStream is = new FileInputStream( filename );
-        read( is, settings, messenger, geneToProbeMap, probeToGeneMap );
+        read( is, messenger, geneToProbeMap, probeToGeneMap );
         is.close();
     }
 
@@ -75,7 +79,8 @@ public class GeneScoreReader {
     public GeneScoreReader( InputStream is, Settings settings, StatusViewer messenger, Map geneToProbeMap,
             Map probeToGeneMap ) throws IOException {
         this.init();
-        read( is, settings, messenger, geneToProbeMap, probeToGeneMap );
+        this.settings = settings;
+        read( is, messenger, geneToProbeMap, probeToGeneMap );
     }
 
     private void init() {
@@ -85,7 +90,7 @@ public class GeneScoreReader {
         this.probeIDs = new ArrayList();
     }
 
-    private void read( InputStream is, Settings settings, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
+    private void read( InputStream is, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
             throws IOException {
 
         if ( settings.getScorecol() < 2 ) {
@@ -159,7 +164,7 @@ public class GeneScoreReader {
 
             if ( Thread.currentThread().isInterrupted() ) {
                 dis.close();
-                throw new RuntimeException( "Interrupted" );
+                throw new CancellationException();
             }
 
         }
@@ -207,7 +212,7 @@ public class GeneScoreReader {
                             + SMALL );
             letUserReadMessage();
         }
-        if ( unknownProbe ) {
+        if ( messenger != null && unknownProbe ) {
             messenger
                     .setError( "Warning: Some probes in your gene score file don't match the ones in the annotation file." );
             letUserReadMessage();
@@ -234,7 +239,7 @@ public class GeneScoreReader {
         try {
             Thread.sleep( 2000 );
         } catch ( InterruptedException e ) {
-            throw new RuntimeException( "Interrupted" );
+            throw new CancellationException( );
         }
     }
 
@@ -408,6 +413,13 @@ public class GeneScoreReader {
         }
 
         return value;
+    }
+
+    /**
+     * @return Returns the settings.
+     */
+    public Settings getSettings() {
+        return this.settings;
     }
 
 } // end of class

@@ -32,11 +32,15 @@ import baseCode.util.FileTools;
 
 public class Settings {
 
+    /*
+     * Multiple test correction methods
+     */
+    public static final int WESTFALLYOUNG = 1;
     public static final int BENJAMINIHOCHBERG = 2;
-    public static final int BEST_PVAL = 1;
     public static final int BONFERONNI = 0;
-    public static final int CORR = 2;
 
+    public static final int CORR = 2;
+    public static final int BEST_PVAL = 1;
     public static final String GENE_URL_BASE = "gene.url.base";
     public static final int KS = 5;
     public static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
@@ -48,7 +52,6 @@ public class Settings {
     public static final int ROC = 3;
     public static final int TTEST = 4;
 
-    public static final int WESTFALLYOUNG = 1;
     /**
      * 
      */
@@ -64,7 +67,7 @@ public class Settings {
     private String classFile = "";
     private String classFolder = "";
     private PropertiesConfiguration config;
-    private String dataFolder = "";
+    private String dataDirectory = null;
     private boolean doLog = true;
     private int geneRepTreatment = BEST_PVAL;
 
@@ -77,7 +80,7 @@ public class Settings {
 
     private int mtc = BENJAMINIHOCHBERG; // multiple test correction
     private String outputFile = "";
-    private String pref_file = "";
+    private String preferencesFileName = "";
     private Properties properties;
     private double pValThreshold = 0.001;
     private int quantile = 50;
@@ -102,7 +105,7 @@ public class Settings {
         rawFile = settings.getRawFile();
         goldStandardFile = settings.getGoldStandardFile();
         outputFile = settings.getOutputFile();
-        dataFolder = settings.getDataFolder();
+        dataDirectory = settings.getDataDirectory();
         classFolder = settings.getClassFolder();
         scoreFile = settings.getScoreFile();
         maxClassSize = settings.getMaxClassSize();
@@ -116,7 +119,7 @@ public class Settings {
         doLog = settings.getDoLog();
         pValThreshold = settings.getPValThreshold();
         alwaysUseEmpirical = settings.getAlwaysUseEmpirical();
-        pref_file = settings.getPrefFile();
+        preferencesFileName = settings.getPrefFile();
         mtc = settings.getMtc();
         bigIsBetter = settings.getBigIsBetter();
         isTester = settings.isTester();
@@ -141,49 +144,59 @@ public class Settings {
     public Settings( String filename ) throws IOException {
         initConfig();
         properties = new Properties();
-        if ( dataFolder == null && !this.determineDataDirectory() ) {
+        if ( dataDirectory == null && !this.determineDataDirectory() ) {
+            log.info( "Can't find data directory, using default settings" );
             return;
         }
 
-        pref_file = filename;
-        classFolder = new String( dataFolder + System.getProperty( "file.separator" ) + "genesets" );
+        preferencesFileName = filename;
+        createCustomGeneSetDirectory();
 
+        // make a new file if it was empty.
+        if ( preferencesFileName.compareTo( "" ) == 0 ) {
+            preferencesFileName = dataDirectory + System.getProperty( "file.separator" ) + "ermineJ.preferences";
+            log.info( "Determined preferences file " + preferencesFileName);
+        }
+
+        // read the file if we can.
+        File fi = new File( preferencesFileName );
+        if ( fi.canRead() ) {
+            try {
+                log.info( "Reading settings from " + preferencesFileName );
+                InputStream f = new FileInputStream( preferencesFileName );
+                read( f );
+            } catch ( IOException e ) {
+                log.error( "Couldn't read from the file " + preferencesFileName );
+            }
+        }
+
+    }
+
+    /**
+     * @throws IOException
+     */
+    private void createCustomGeneSetDirectory() throws IOException {
+        classFolder = new String( dataDirectory + System.getProperty( "file.separator" ) + "genesets" );
         if ( !FileTools.testDir( classFolder ) ) {
+            log.info( "Creating custom class folder at " + classFolder );
             if ( !new File( classFolder ).mkdir() ) {
                 throw new IOException( "Could not create the class directory at " + classFolder );
             }
         }
-
-        // make a new file if it was empty.
-        if ( pref_file.compareTo( "" ) == 0 )
-            pref_file = dataFolder + System.getProperty( "file.separator" ) + "ClassScore.preferences";
-
-        // read the file if we can.
-        File fi = new File( pref_file );
-        if ( fi.canRead() ) {
-            try {
-                InputStream f = new FileInputStream( pref_file );
-                read( f );
-            } catch ( IOException e ) {
-                System.err.println( "Couldn't read from the file" );
-            }
-        }
-
     }
 
     public Settings( URL resource ) {
         properties = new Properties();
         initConfig();
         File fi = new File( resource.getFile() );
-        pref_file = fi.getAbsolutePath();
+        preferencesFileName = fi.getAbsolutePath();
 
         if ( fi.canRead() ) {
             try {
-                InputStream f = new FileInputStream( pref_file );
+                InputStream f = new FileInputStream( preferencesFileName );
                 read( f );
             } catch ( IOException e ) {
-                System.err.println( "Couldn't read from the file" );
-                System.exit( 0 );
+                log.error( "Couldn't read from the file " + preferencesFileName );
             }
         }
     }
@@ -194,25 +207,25 @@ public class Settings {
      * @return
      */
     public boolean determineDataDirectory() {
-        dataFolder = System.getProperty( "user.dir" ); // directory from which we are running the software. This is not
+        dataDirectory = System.getProperty( "user.dir" ); // directory from which we are running the software. This is not
         // platform independent so we fall back on the user home directory.
 
-        dataFolder = dataFolder.substring( 0, dataFolder.lastIndexOf( System.getProperty( "file.separator" ) ) ); // up
+        dataDirectory = dataDirectory.substring( 0, dataDirectory.lastIndexOf( System.getProperty( "file.separator" ) ) ); // up
         // one
         // level.
 
-        dataFolder = dataFolder + System.getProperty( "file.separator" ) + "ermineJ.data";
+        dataDirectory = dataDirectory + System.getProperty( "file.separator" ) + "ermineJ.data";
 
-        if ( !FileTools.testDir( dataFolder ) ) {
-            dataFolder = System.getProperty( "user.home" ) + System.getProperty( "file.separator" ) + "ermineJ.data";
+        if ( !FileTools.testDir( dataDirectory ) ) {
+            dataDirectory = System.getProperty( "user.home" ) + System.getProperty( "file.separator" ) + "ermineJ.data";
 
-            if ( !FileTools.testDir( dataFolder ) ) {
-
+            if ( !FileTools.testDir( dataDirectory ) ) {
+                log.info( "Creating data directory " + dataDirectory );
                 // try to make it in the user's home directory.
-                return ( new File( dataFolder ) ).mkdir();
+                return ( new File( dataDirectory ) ).mkdir();
             }
         }
-
+        log.info( "Data directory is " + dataDirectory );
         return true;
     }
 
@@ -274,8 +287,8 @@ public class Settings {
         return config;
     }
 
-    public String getDataFolder() {
-        return dataFolder;
+    public String getDataDirectory() {
+        return dataDirectory;
     }
 
     public boolean getDoLog() {
@@ -337,7 +350,7 @@ public class Settings {
     }
 
     public String getPrefFile() {
-        return pref_file;
+        return preferencesFileName;
     }
 
     public double getPValThreshold() {
@@ -400,7 +413,8 @@ public class Settings {
      * @param arg
      */
     public void setAnnotFormat( String arg ) {
-        if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) { // fixme, this is hard to maintain.
+        if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) { // fixme, this is hard to
+            // maintain.
             this.annotFormat = GeneAnnotations.AFFYCSV;
         } else {
             this.annotFormat = GeneAnnotations.DEFAULT;
@@ -426,8 +440,8 @@ public class Settings {
         classFolder = val;
     }
 
-    public void setDataFolder( String val ) {
-        dataFolder = val;
+    public void setDataDirectory( String val ) {
+        dataDirectory = val;
     }
 
     public void setDoLog( boolean val ) {
@@ -476,7 +490,7 @@ public class Settings {
     }
 
     public void setPrefFile( String val ) {
-        pref_file = val;
+        preferencesFileName = val;
     }
 
     public void setPValThreshold( double val ) {
@@ -524,7 +538,7 @@ public class Settings {
     }
 
     public void writePrefs() throws IOException {
-        this.writePrefs( pref_file );
+        this.writePrefs( preferencesFileName );
     }
 
     /**
@@ -545,7 +559,7 @@ public class Settings {
         properties.setProperty( "rawFile", rawFile );
         properties.setProperty( "goldStandardFile", goldStandardFile );
         properties.setProperty( "outputFile", outputFile );
-        properties.setProperty( "dataFolder", dataFolder );
+        properties.setProperty( "dataFolder", dataDirectory );
         properties.setProperty( "classFolder", classFolder );
         properties.setProperty( "maxClassSize", String.valueOf( maxClassSize ) );
         properties.setProperty( "minClassSize", String.valueOf( minClassSize ) );
@@ -655,7 +669,7 @@ public class Settings {
                 }
             }
 
-            if ( properties.containsKey( "dataFolder" ) ) this.dataFolder = properties.getProperty( "dataFolder" );
+            if ( properties.containsKey( "dataFolder" ) ) this.dataDirectory = properties.getProperty( "dataFolder" );
 
             if ( properties.containsKey( "classFolder" ) ) this.classFolder = properties.getProperty( "classFolder" );
 

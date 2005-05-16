@@ -6,6 +6,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -128,18 +130,26 @@ public class JGeneSetFrame extends JFrame {
     DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
     JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
     HashMap m_pvaluesOrdinalPosition = new HashMap();
-    JMenuItem m_saveDataMenuItem = new JMenuItem();
+    JMenuItem saveDataMenuItem = new JMenuItem();
     JLabel m_spacerLabel = new JLabel();
     JMenuItem m_viewHistMenuItem = new JMenuItem();
     /** controls the width of the cells in the matrix display */
     JMenuBar menuBar = new JMenuBar();
     JMenu optionsMenu = new JMenu();
     JMenuItem saveImageMenuItem = new JMenuItem();
-    JMenuItem setOptionsMenuItem = new JMenuItem();
+    JMenuItem setGeneUrlBaseMenuItem = new JMenuItem();
+    JMenuItem switchDataFileMenuItem = new JMenuItem();
     JMenu viewMenu = new JMenu();
     private JPanel jPanelStatus = new JPanel();
     private JLabel jLabelStatus = new JLabel();
     private StatusJlabel statusMessenger;
+    private Collection probesInGeneSet;
+    private int matrixColumnCount;
+    private JMatrixCellRenderer matrixCellRenderer;
+    private JVerticalHeaderRenderer verticalHeaderRenderer;
+    private List probeIDs;
+    private Map pvalues;
+    private GeneAnnotations geneData;
 
     /**
      * @param probeIDs an array of probe ID's that has some order; the actual order is arbitrary, as long as it is some
@@ -159,7 +169,10 @@ public class JGeneSetFrame extends JFrame {
 
             readPrefs();
             String filename = settings.getRawFile();
-            createDetailsTable( probeIDs, pvalues, geneData, filename );
+            this.probeIDs = probeIDs;
+            this.pvalues = pvalues;
+            this.geneData = geneData;
+            createDetailsTable( filename );
             initChoosers();
             jbInit();
         } catch ( Exception e ) {
@@ -176,46 +189,22 @@ public class JGeneSetFrame extends JFrame {
     }
 
     /**
-     * Create a matrix display.
+     * 
      * 
      * @param probeIDs
      * @param pvalues
      * @param geneData
      * @param filename
      */
-    private void createDetailsTable( List probeIDs, Map pvalues, GeneAnnotations geneData, String filename ) {
+    private void createDetailsTable( String filename ) {
 
         // create a probe set from probeIDs
-        HashSet probesInGeneSet = new HashSet();
+        probesInGeneSet = new HashSet();
         for ( int i = 0; i < probeIDs.size(); i++ ) {
             probesInGeneSet.add( probeIDs.get( i ) );
         }
 
-        // Read the matrix data
-        DoubleMatrixReader matrixReader = new DoubleMatrixReader();
-        DenseDoubleMatrix2DNamed matrix = null;
-
-        if ( filename != null && filename.length() > 0 ) {
-            try {
-                matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesInGeneSet );
-            } catch ( IOException e ) {
-                GuiUtil.error( "Unable to load raw microarray data from file " + filename + "\n"
-                        + "Please make sure this file exists and the filename and directory path are correct,\n"
-                        + "and that it is a valid raw data file (tab-delimited).\n" );
-            }
-        } else {
-            log.info( "No data filename provided" );
-        }
-
-        if ( matrix == null ) {
-            statusMessenger.setError( "Not all the probes in this gene set were in the data file." );
-        }
-
-        // create the matrix display
-        if ( matrix != null ) {
-            m_matrixDisplay = new JMatrixDisplay( matrix );
-            m_matrixDisplay.setStandardizedEnabled( true );
-        }
+        DenseDoubleMatrix2DNamed matrix = setUpMatrixData( filename );
 
         //
         // Create the rest of the table
@@ -226,20 +215,6 @@ public class JGeneSetFrame extends JFrame {
         TableSorter sorter = new TableSorter( tableModel, m_matrixDisplay );
         table.setModel( sorter );
         sorter.setTableHeader( table.getTableHeader() );
-
-        //
-        // Set up the matrix display part of the table
-        //
-
-        // Make the columns in the matrix display not too wide (cell-size)
-        // and set a custom cell renderer
-        JMatrixCellRenderer matrixCellRenderer = new JMatrixCellRenderer( m_matrixDisplay ); // create one instance
-        // that will be used to
-        // draw each cell
-
-        JVerticalHeaderRenderer verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
-
-        int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
         setColumnWidths( matrixColumnCount, matrixCellRenderer, matrix, verticalHeaderRenderer );
 
@@ -267,6 +242,52 @@ public class JGeneSetFrame extends JFrame {
         table.setSize( d );
 
     } // end createDetailsTable
+
+    /**
+     * @param filename
+     * @param probesInGeneSet
+     * @return
+     */
+    private DenseDoubleMatrix2DNamed setUpMatrixData( String filename ) {
+        // Read the matrix data
+        DoubleMatrixReader matrixReader = new DoubleMatrixReader();
+        DenseDoubleMatrix2DNamed matrix = null;
+        if ( filename != null && filename.length() > 0 ) {
+            try {
+                matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesInGeneSet );
+            } catch ( IOException e ) {
+                GuiUtil.error( "Unable to load raw microarray data from file " + filename + "\n"
+                        + "Please make sure this file exists and the filename and directory path are correct,\n"
+                        + "and that it is a valid raw data file (tab-delimited).\n" );
+            }
+        } else {
+            log.info( "No data filename provided" );
+        }
+        if ( matrix == null ) {
+            statusMessenger.setError( "Not all the probes in this gene set were in the data file." );
+        }
+        // create the matrix display
+        if ( matrix != null ) {
+            m_matrixDisplay = new JMatrixDisplay( matrix );
+            m_matrixDisplay.setStandardizedEnabled( true );
+        }
+
+        //
+        // Set up the matrix display part of the table
+        //
+
+        // Make the columns in the matrix display not too wide (cell-size)
+        // and set a custom cell renderer
+        matrixCellRenderer = new JMatrixCellRenderer( m_matrixDisplay ); // create one instance
+        // that will be used to
+        // draw each cell
+
+        verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
+
+        matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+
+        return matrix;
+    }
 
     /**
      * @param verticalHeaderRenderer
@@ -303,7 +324,7 @@ public class JGeneSetFrame extends JFrame {
         // p value bar
         col = table.getColumnModel().getColumn( matrixColumnCount + 2 );
         col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
-        col.setCellRenderer( new JBarGraphCellRenderer() );// todo
+        col.setCellRenderer( new JBarGraphCellRenderer() );
         // name
         col = table.getColumnModel().getColumn( matrixColumnCount + 3 );
         col.setPreferredWidth( PREFERRED_WIDTH_GENENAME_COLUMN );
@@ -491,7 +512,8 @@ public class JGeneSetFrame extends JFrame {
         this.setJMenuBar( menuBar );
         fileMenu.setText( "File" );
         fileMenu.add( saveImageMenuItem );
-        fileMenu.add( m_saveDataMenuItem );
+        fileMenu.add( saveDataMenuItem );
+       
 
         greenredColormapMenuItem.setSelected( false );
         greenredColormapMenuItem.setText( "Green-Red" );
@@ -512,29 +534,39 @@ public class JGeneSetFrame extends JFrame {
         saveImageMenuItem.setActionCommand( "SaveImage" );
         saveImageMenuItem.setText( "Save Image..." );
         saveImageMenuItem.addActionListener( new JGeneSetFrame_m_saveImageMenuItem_actionAdapter( this ) );
+
         m_normalizeMenuItem.setText( "Normalize" );
         m_normalizeMenuItem.addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter( this ) );
         optionsMenu.setText( "Options" );
-        setOptionsMenuItem.setActionCommand( "Change gene name URL" );
-        setOptionsMenuItem.setText( "Change gene name URL..." );
-        setOptionsMenuItem.addActionListener( new JGeneSetFrame_viewGeneUrlDialog_actionAdapter( this ) );
+        setGeneUrlBaseMenuItem.setActionCommand( "Change gene name URL" );
+        setGeneUrlBaseMenuItem.setText( "Change gene name URL..." );
+        setGeneUrlBaseMenuItem.addActionListener( new JGeneSetFrame_viewGeneUrlDialog_actionAdapter( this ) );
 
         viewMenu.add( m_normalizeMenuItem );
         viewMenu.addSeparator();
         viewMenu.add( greenredColormapMenuItem );
         viewMenu.add( blackbodyColormapMenuItem );
 
-        optionsMenu.add( setOptionsMenuItem );
-
+        optionsMenu.add( setGeneUrlBaseMenuItem );
+        optionsMenu.add( switchDataFileMenuItem );
+        
         analysisMenu.setText( "Analysis" );
         m_viewHistMenuItem.setActionCommand( "View Distribution" );
         m_viewHistMenuItem.setText( "View distribution" );
         m_viewHistMenuItem.addActionListener( new JGeneSetFrame_m_viewHistMenuItem_actionAdapter( this ) );
         analysisMenu.add( m_viewHistMenuItem );
 
-        m_saveDataMenuItem.setActionCommand( "SaveData" );
-        m_saveDataMenuItem.setText( "Save Data..." );
-        m_saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
+        saveDataMenuItem.setActionCommand( "SaveData" );
+        saveDataMenuItem.setText( "Save Data..." );
+        saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
+
+        switchDataFileMenuItem.setActionCommand( "Switch Data Shown" );
+        switchDataFileMenuItem.setText( "Change Dataset..." );
+        switchDataFileMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                switchDataFileAction();
+            }
+        } );
 
         if ( analysisResults == null || analysisResults.getHist() == null ) {
             analysisMenu.setEnabled( false );
@@ -544,6 +576,18 @@ public class JGeneSetFrame extends JFrame {
         menuBar.add( viewMenu );
         menuBar.add( optionsMenu );
         menuBar.add( analysisMenu );
+    }
+
+    /**
+     * 
+     */
+    protected void switchDataFileAction() {
+        JFileChooser fc = new JFileChooser( settings.getDataDirectory() );
+        if ( fc.showDialog( this, "Choose new data file to show" ) == JFileChooser.APPROVE_OPTION ) {
+            settings.setRawFile( fc.getSelectedFile().getAbsolutePath() );
+            createDetailsTable(settings.getRawFile());
+            table.revalidate();
+        }
     }
 
     /**

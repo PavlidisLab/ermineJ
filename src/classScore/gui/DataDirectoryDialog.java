@@ -96,7 +96,7 @@ public class DataDirectoryDialog extends AppDialog {
      */
     protected void actionButton_actionPerformed( ActionEvent e ) {
         if ( GuiUtil.testDir( dataDir.getText() ) ) {
-            settings.setDataFolder( dataDir.getText() );
+            settings.setDataDirectory( dataDir.getText() );
             dispose();
         }
     }

@@ -4,7 +4,10 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
 
+import javax.swing.JFrame;
 import javax.swing.UIManager;
+
+import baseCode.gui.GuiUtil;
 
 import classScore.gui.GeneSetScoreFrame;
 import classScore.gui.StartupDialog;
@@ -34,16 +37,7 @@ public class classScoreGUI {
         } else {
             frame.validate();
         }
-        // Center the window
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension frameSize = frame.getSize();
-        if ( frameSize.height > screenSize.height ) {
-            frameSize.height = screenSize.height;
-        }
-        if ( frameSize.width > screenSize.width ) {
-            frameSize.width = screenSize.width;
-        }
-        frame.setLocation( ( screenSize.width - frameSize.width ) / 2, ( screenSize.height - frameSize.height ) / 2 );
+        GuiUtil.centerFrame( frame );
         frame.disableMenusForLoad();
         frame.setVisible( true );
 

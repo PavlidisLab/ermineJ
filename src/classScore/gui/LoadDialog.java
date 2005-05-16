@@ -41,7 +41,7 @@ public class LoadDialog extends AppDialog {
     public LoadDialog( GeneSetScoreFrame callingframe ) {
         super( callingframe, 550, 250 );
         this.settings = callingframe.getSettings();
-        chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         chooser.setDialogTitle( "Open Saved Analysis" );
         jbInit();
     }
@@ -87,6 +87,8 @@ public class LoadDialog extends AppDialog {
         if ( FileTools.testFile( loadFile.getText() ) ) {
             try {
                 ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile.getText() );
+                ( ( GeneSetScoreFrame ) callingframe ).setSettings( settings );
+                ( ( GeneSetScoreFrame ) callingframe ).enableMenusForAnalysis();
             } catch ( IOException e1 ) {
                GuiUtil.error("There was a problem: " + e1.getMessage());
             }

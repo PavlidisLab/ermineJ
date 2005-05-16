@@ -38,7 +38,7 @@ public class SaveWizard extends Wizard {
 
         step1 = new SaveWizardStep1( this, rundata );
         this.addStep( 1, step1 );
-        step2 = new SaveWizardStep2( this, callingframe.getSettings().getDataFolder() );
+        step2 = new SaveWizardStep2( this, callingframe.getSettings().getDataDirectory() );
         this.addStep( 2, step2 );
         this.setTitle( "Save Analysis - Step 1 of 2" );
         finishButton.setEnabled( false );
