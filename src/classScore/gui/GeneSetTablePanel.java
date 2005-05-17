@@ -19,7 +19,6 @@ import java.util.Vector;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -62,12 +61,8 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
     private OutputTableModel model;
     private TableSorter sorter;
     List results;
-    private LinkedList resultToolTips = new LinkedList();
-    GeneAnnotations geneData = null;
-    GONames goData;
-    Settings settings;
+    private List resultToolTips = new LinkedList();
     private String classColToolTip;
-    private StatusViewer messenger;
 
     /**
      * @param messenger The messenger to set.
@@ -76,10 +71,9 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         this.messenger = messenger;
     }
 
-    public GeneSetTablePanel( GeneSetScoreFrame callingframe, LinkedList results, Settings settings ) {
-        this.callingframe = callingframe;
-        this.results = results;
-        this.settings = settings;
+    public GeneSetTablePanel( GeneSetScoreFrame callingFrame, LinkedList results, Settings settings ) {
+
+        super( settings, results, callingFrame );
         model = new OutputTableModel( results );
 
         table = new JTable() {
@@ -109,7 +103,7 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         MouseListener removeRunPopupListener = new OutputPanel_removeRunPopupListener( removeRunPopup );
         table.getTableHeader().addMouseListener( removeRunPopupListener );
     }
-    
+
     protected MouseListener configurePopupMenu() {
         OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
         JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
@@ -129,29 +123,29 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         int i = table.getSelectedRow();
         int j = table.getSelectedColumn();
         int _runnum = -1;
-        String _id = ( String ) table.getValueAt( i, 0 );
+        String _id = ( String ) ( ( Vector ) table.getValueAt( i, 0 ) ).get( 0 );
         if ( table.getValueAt( i, j ) != null && j >= OutputTableModel.INIT_COLUMNS ) {
             _runnum = model.getRunNum( j );
         } else if ( table.getValueAt( i, j ) != null && j < OutputTableModel.INIT_COLUMNS ) {
             _runnum = -1;
-        } else { // FIXME does this ever get triggered?
+        } else {
             log.debug( "Seeking column to show" );
-            for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
-                if ( table.getValueAt( i, k ) != null && k >= OutputTableModel.INIT_COLUMNS ) {
-                    String message;
-                    String shownRunName = model.getColumnName( k );
-                    shownRunName = shownRunName.substring( 0, shownRunName.length() - 5 );
-                    if ( j >= OutputTableModel.INIT_COLUMNS ) {
-                        message = model.getColumnName( j );
-                        message = message.substring( 0, message.length() - 5 );
-                        message = message + " doesn't include the class " + _id + ". Showing " + shownRunName
-                                + " instead.";
-                        JOptionPane.showMessageDialog( this, message, "FYI", JOptionPane.PLAIN_MESSAGE );
-                    }
-                    _runnum = model.getRunNum( k );
-                    break;
-                }
-            }
+            // for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
+            // if ( table.getValueAt( i, k ) != null && k >= OutputTableModel.INIT_COLUMNS ) {
+            // String message;
+            // String shownRunName = model.getColumnName( k );
+            // shownRunName = shownRunName.substring( 0, shownRunName.length() - 5 );
+            // if ( j >= OutputTableModel.INIT_COLUMNS ) {
+            // message = model.getColumnName( j );
+            // message = message.substring( 0, message.length() - 5 );
+            // message = message + " doesn't include the class " + _id + ". Showing " + shownRunName
+            // + " instead.";
+            // JOptionPane.showMessageDialog( this, message, "FYI", JOptionPane.PLAIN_MESSAGE );
+            // }
+            // _runnum = model.getRunNum( k );
+            // break;
+            // }
+            // }
         }
         final String id = _id;
         final int runnum = _runnum;
@@ -231,7 +225,7 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
 
     // called if 'cancel', 'find' or 'reset' have been hit.
     public void resetView() {
-        this.geneData = callingframe.getOriginalGeneData();
+        this.geneData = callingFrame.getOriginalGeneData();
         model.setInitialData( geneData, goData );
         setTableAttributes();
         table.revalidate();
@@ -239,10 +233,8 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
 
     // called when we first set up the table.
     public void addInitialData( GONames initialGoData ) {
-        this.geneData = callingframe.getOriginalGeneData();
-        this.goData = initialGoData;
+        super.addInitialData( initialGoData );
         model.addInitialData( geneData, initialGoData );
-
         setTableAttributes();
         sorter.cancelSorting();
         sorter.setSortingStatus( 1, TableSorter.ASCENDING );

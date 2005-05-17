@@ -185,9 +185,6 @@ public class StartupDialog extends AppDialog {
         } else {
             saveValues();
             class runthread extends Thread {
-                public runthread() {
-                }
-
                 public void run() {
                     ( ( GeneSetScoreFrame ) callingframe ).initialize();
                 }

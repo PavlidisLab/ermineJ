@@ -39,7 +39,9 @@ public class GeneSetDetails {
         this.geneData = geneData;
         if ( settings == null ) {
             try {
+                log.debug( "No settings, reading them in" );
                 settings = new Settings();
+                if ( settings == null ) throw new NullPointerException( "No settings!" );
             } catch ( IOException e ) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -89,6 +91,7 @@ public class GeneSetDetails {
      * @param pvals
      */
     private void getGeneScoresForGeneSet( GeneScoreReader geneScores, Collection probeIDs, Map pvals ) {
+        if ( probeIDs == null ) return;
         for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
             String probeID = ( String ) iter.next();
 
@@ -124,6 +127,7 @@ public class GeneSetDetails {
                 GeneScoreReader localReader = new GeneScoreReader( scoreFile, settings, null, geneData
                         .getGeneToProbeList(), geneData.getProbeToGeneMap() );
                 geneScores = localReader;
+                log.debug( "Getting gene scores from " + scoreFile );
             } catch ( IOException e ) {
                 log.error( e, e );
             }

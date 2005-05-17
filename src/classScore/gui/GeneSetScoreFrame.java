@@ -25,7 +25,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -131,7 +130,9 @@ public class GeneSetScoreFrame extends JFrame {
         return ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) );
     }
 
-    /* init */
+    /**
+     * Called by the constructor .
+     */
     private void jbInit() {
         this.setDefaultCloseOperation( EXIT_ON_CLOSE );
         this.setJMenuBar( jMenuBar1 );
@@ -175,9 +176,8 @@ public class GeneSetScoreFrame extends JFrame {
 
         // main panel
         oPanel = new GeneSetTablePanel( this, results, settings );
-
         oPanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-        treePanel = new GeneSetTreePanel( this, results );
+        treePanel = new GeneSetTreePanel( this, results, settings );
         treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
         tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
@@ -340,7 +340,7 @@ public class GeneSetScoreFrame extends JFrame {
 
     }
 
-    public void run() {
+    public void readDataFilesForStartup() {
 
         try {
             updateProgress( 10 );
@@ -386,6 +386,9 @@ public class GeneSetScoreFrame extends JFrame {
 
     }
 
+    /**
+     * Called by the startupDialog.
+     */
     public void initialize() {
         try {
             mainPanel.add( progressPanel, BorderLayout.CENTER );
@@ -394,12 +397,11 @@ public class GeneSetScoreFrame extends JFrame {
             geneDataSets = new HashMap();
             geneScoreSets = new HashMap();
 
-            run();
+            // do the work.
+            readDataFilesForStartup();
 
             statusMessenger.setStatus( "Done with setup" );
             enableMenusOnStart();
-
-            treePanel.initialize( goData, geneData );
 
             mainPanel.remove( progressPanel );
             mainPanel.add( tabs, BorderLayout.CENTER );
@@ -410,7 +412,9 @@ public class GeneSetScoreFrame extends JFrame {
         } catch ( Exception e ) {
             e.printStackTrace();
         }
+        treePanel.initialize( goData, geneData );
         oPanel.addInitialData( goData );
+        // treePanel.addInitialData( goData ); // this doesn't really do anything useful.
         statusMessenger.setStatus( "Done with initialization." );
     }
 

@@ -20,6 +20,7 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.util.BrowserLauncher;
+import baseCode.util.StatusViewer;
 
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
@@ -42,9 +43,16 @@ public abstract class GeneSetsResultsScrollPane extends JScrollPane {
     protected GONames goData;
     protected List results;
     protected int selectedRun;
-    protected GeneSetScoreFrame callingframe;
+    protected GeneSetScoreFrame callingFrame;
     static final String AMIGO_URL_BASE = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
+    protected StatusViewer messenger;
+
+    public GeneSetsResultsScrollPane( Settings settings, List results, GeneSetScoreFrame callingFrame ) {
+        this.settings = settings;
+        this.results = results;
+        this.callingFrame = callingFrame;
+    }
 
     protected void showDetailsForGeneSet( int runnum, String id ) {
         log.debug( "Request for details of gene set: " + id );
@@ -68,14 +76,12 @@ public abstract class GeneSetsResultsScrollPane extends JScrollPane {
         this.selectedRun = selectedRun;
     }
 
-   
-
     protected void modMenuItem_actionPerformed( ActionEvent e ) {
         OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         String classID = null;
         classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
-        GeneSetWizard cwiz = new GeneSetWizard( callingframe, geneData, goData, classID );
+        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, goData, classID );
         cwiz.showWizard();
     }
 
@@ -91,6 +97,13 @@ public abstract class GeneSetsResultsScrollPane extends JScrollPane {
         } catch ( IOException e1 ) {
             GuiUtil.error( "Could not open a web browser window." );
         }
+    }
+
+    public void addInitialData( GONames goData ) {
+        assert callingFrame.getOriginalGeneData() != null : "Gene data is still null";
+        assert goData != null : "GO data is still null";
+        this.geneData = callingFrame.getOriginalGeneData();
+        this.goData = goData;
     }
 }
 

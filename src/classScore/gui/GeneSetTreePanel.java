@@ -1,45 +1,34 @@
 package classScore.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.text.TableView.TableCell;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import corejava.Format;
+import classScore.Settings;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.graph.DirectedGraphNode;
 import baseCode.dataStructure.graph.GraphNode;
+import corejava.Format;
 
 /**
  * A Tree display that shows Gene Sets and their scores, and allows uer interaction.
@@ -56,13 +45,19 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
     private MutableTreeNode userRoot;
     protected String currentlySelectedGeneSet;
 
-    public GeneSetTreePanel( GeneSetScoreFrame callingframe, LinkedList results ) {
-        this.callingframe = callingframe;
-        this.results = results;
-
+    public GeneSetTreePanel( GeneSetScoreFrame callingFrame, List results, Settings settings ) {
+        super( settings, results, callingFrame );
     }
 
+    /**
+     * Called after data files are read in.
+     * 
+     * @param goData
+     * @param geneData
+     */
     public void initialize( GONames goData, GeneAnnotations geneData ) {
+        assert goData != null : "Go data is still null";
+        assert geneData != null : "Gene data is still null";
         this.geneData = geneData;
         this.goTree = goData.getGraph().treeView();
         this.goData = goData;
@@ -76,6 +71,7 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
             public void valueChanged( TreeSelectionEvent e ) {
                 log.debug( "value changed" );
                 TreePath path = e.getPath();
+                // FIXME - user classes causes npe
                 currentlySelectedGeneSet = ( String ) ( ( GraphNode ) ( ( DefaultMutableTreeNode ) path
                         .getLastPathComponent() ).getUserObject() ).getKey();
             }
@@ -257,7 +253,7 @@ class CellRenderer extends DefaultTreeCellRenderer {
     /**
      * <ul>
      * <li>Make non-searched-for nodes greyed out
-     * <li>Make custom nodes pink.
+     * <li>Make customized nodes pink.
      * <li>Add the pvalue and size to each node
      * <li>Color node by pvalue.
      * </ul>
