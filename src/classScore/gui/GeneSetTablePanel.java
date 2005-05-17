@@ -46,7 +46,6 @@ import corejava.Format;
  * @author Homin Lee
  * @author Paul Pavlidis
  * @version $Id$
- * @todo deletion of geneDataSets when remove is used.
  */
 public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
 
@@ -158,7 +157,7 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         }.start();
     }
 
-    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
+void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
         RemoveRunPopupMenu sourcePopup = ( RemoveRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         int c = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
         String colname = model.getColumnName( c );
@@ -171,13 +170,12 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
             model.removeRunData( c );
             model.fireTableStructureChanged();
             int runnum = model.getRunNum( c );
+            // FIXME deletion of corresponding GeneAnnotations when remove is used.
             results.remove( runnum );
             resultToolTips.remove( runnum );
             table.revalidate();
         }
-    }
-
-    String getHeaderToolTip( int index ) {
+    }    String getHeaderToolTip( int index ) {
         if ( index == 0 ) {
             return this.classColToolTip;
         } else if ( index >= OutputTableModel.INIT_COLUMNS ) {
@@ -189,6 +187,9 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
     }
 
     void generateToolTip( int runnum ) {
+        assert results != null : "Null results";
+        assert results.get( runnum ) != null : "No results with index " + runnum;
+
         Settings runSettings = ( ( GeneSetPvalRun ) results.get( runnum ) ).getSettings();
         String tooltip = new String( "<html>" );
         String coda = new String();

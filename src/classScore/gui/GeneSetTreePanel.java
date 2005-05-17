@@ -73,9 +73,13 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
             public void valueChanged( TreeSelectionEvent e ) {
                 log.debug( "value changed" );
                 TreePath path = e.getPath();
-                // FIXME - user classes causes npe
-                currentlySelectedGeneSet = ( String ) ( ( GraphNode ) ( ( DefaultMutableTreeNode ) path
-                        .getLastPathComponent() ).getUserObject() ).getKey();
+
+                DefaultMutableTreeNode currentNode = ( DefaultMutableTreeNode ) path.getLastPathComponent();
+                if ( currentNode.getUserObject() instanceof GraphNode ) { // FIXME - what about user node.
+                    currentlySelectedGeneSet = ( String ) ( ( GraphNode ) ( currentNode ).getUserObject() ).getKey();
+                } else {
+                    log.debug( currentNode.getUserObject().getClass().getName() );
+                }
             }
         } );
         this.getViewport().add( goTree );
@@ -260,11 +264,12 @@ class CellRenderer extends DefaultTreeCellRenderer {
      * TODO
      * <ul>
      * <li>Make non-searched-for nodes greyed out
-     * <li>Make customized nodes pink.
-     * <li>Add the pvalue and size to each node
-     * <li>Color node by pvalue.
+     * <li>Make customized nodes pink.(text color?)
+     * <li>Add the pvalue to each node
+     * <li>Tool tip for node.
+     * <li>Color node by pvalue.(background color?)
      * <li>Nodes at higher levels that are not significant, but which have significant classes under them, should be
-     * shown in contrasting color.
+     * shown in contrasting color, or something.
      * </ul>
      * 
      * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean,
@@ -294,11 +299,15 @@ class CellRenderer extends DefaultTreeCellRenderer {
             this.setBackground( Color.WHITE );
         }
 
-        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) ) {
+        // watchit, selectedSets is a list....
+        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) || !geneData.getSelectedSets().contains( id ) ) {
             this.setFont( italic );
             this.setForeground( Color.GRAY );
             if ( !hasUsableChildren( node ) ) {
-                this.setEnabled( false );
+                // this.setEnabled( false ); // FIXME this is broken.
+                // setText( name + " --- No usable children" );
+            } else {
+                setText( name );
             }
         } else {
             setText( name + " -- " + ( ( Collection ) geneData.getGeneSetToProbeMap().get( id ) ).size() + " probes, "
