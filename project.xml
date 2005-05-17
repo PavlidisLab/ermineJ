@@ -184,6 +184,7 @@
                 <directory>${basedir}/src</directory>
                 <includes>
                     <include>**/logo1small.gif</include>
+                    <include>**/Play16.gif</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
