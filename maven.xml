@@ -51,12 +51,13 @@
 <goal name="help" description="Update and build the javahelp jar file">
 	<ant:echo>Creating search index...</ant:echo>
 	<ant:exec executable="${java.javahelp.jhindexer}">
-	<arg value="-verbose" />
+	<arg value="-verbose" /> 
 	<arg value="-db" /> 
 	<arg path="ermineJ-help/JavaHelpSearch" />
 	<arg value="-c" />
 	<arg path="ermineJ-help/help.config" />
-	<arg value="ermineJ-help/html" />
+	<arg value="ermineJ-help/html/tutorial" />
+	<arg value="ermineJ-help/html/formats" />
 	</ant:exec>
 	<ant:echo>Making help jar file...</ant:echo>
 	<ant:jar destfile="${basedir}/ermineJ-help.jar" update="false" excludes="**/CVS/*" basedir="${basedir}/ermineJ-help" />
@@ -67,6 +68,7 @@
 	<ant:copy todir="${basedir}/web/ermineJ-help" overwrite="true" >
 	<fileset dir="${basedir}/ermineJ-help">
 	 <include name="**/*" />
+	 <exclude name="JavaHelpSearch,help.config,main.hs,map.jhm,joc.xml" />
 	</fileset>
 	</ant:copy>
 
