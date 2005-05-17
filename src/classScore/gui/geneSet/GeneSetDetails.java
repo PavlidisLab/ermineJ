@@ -63,6 +63,8 @@ public class GeneSetDetails {
             log.warn( "No gene data found" );
         } else {
             classToProbe = geneData.getGeneSetToProbeMap();
+            if ( !classToProbe.containsKey( classID ) )
+                log.info( "Information about gene set " + classID + " is not available" );
             probeIDs = ( Collection ) classToProbe.get( classID );
         }
 
@@ -73,7 +75,7 @@ public class GeneSetDetails {
         getGeneScoresForGeneSet( geneScores, probeIDs, pvals );
 
         if ( probeIDs == null ) {
-            throw new IllegalStateException( "Class data retrieval error for " + className );
+            log.warn( "Class data retrieval error for " + className + "( no probes )" );
         }
 
         // create the details frame

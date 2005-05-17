@@ -2,10 +2,12 @@ package classScore.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -119,7 +121,7 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         Icon closedIcon = new ImageIcon( this.getClass().getResource( "resources/Play16.gif" ) );
         Icon leafIcon = new ImageIcon( this.getClass().getResource( "resources/Play16.gif" ) );
 
-        CellRenderer rend = new CellRenderer( goData, results );
+        CellRenderer rend = new CellRenderer( goData, geneData, results );
         // DefaultTreeCellRenderer rend = new DefaultTreeCellRenderer();
         rend.setOpenIcon( openIcon );
         rend.setLeafIcon( leafIcon );
@@ -242,20 +244,27 @@ class CellRenderer extends DefaultTreeCellRenderer {
     private final GONames goData;
     private Format nf = new Format( "%g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
+    private GeneAnnotations geneData;
+    private Font italic = new Font( "SansSerif", Font.ITALIC, 11 );
+    private Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
 
-    public CellRenderer( GONames goData, List results ) {
+    public CellRenderer( GONames goData, GeneAnnotations geneData, List results ) {
         super();
         this.results = results;
         this.goData = goData;
+        this.geneData = geneData;
         nff.setMaximumFractionDigits( 4 );
     }
 
     /**
+     * TODO
      * <ul>
      * <li>Make non-searched-for nodes greyed out
      * <li>Make customized nodes pink.
      * <li>Add the pvalue and size to each node
      * <li>Color node by pvalue.
+     * <li>Nodes at higher levels that are not significant, but which have significant classes under them, should be
+     * shown in contrasting color.
      * </ul>
      * 
      * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean,
@@ -266,15 +275,18 @@ class CellRenderer extends DefaultTreeCellRenderer {
         super.getTreeCellRendererComponent( tree, value, selected, expanded, leaf, row, hasFocus );
         DefaultMutableTreeNode node = ( DefaultMutableTreeNode ) value;
         String name;
+        String id = "";
         if ( node.getUserObject() instanceof DirectedGraphNode ) {
             DirectedGraphNode nodeObj = ( DirectedGraphNode ) node.getUserObject();
+            id = ( String ) nodeObj.getKey();
             name = nodeObj.toString();
         } else {
             Object nodeObj = node.getUserObject();
             name = nodeObj.toString();
         }
         this.selected = selected;
-        setText( name );
+        this.hasFocus = hasFocus;
+
         setOpaque( true );
         if ( this.selected ) {
             this.setBackground( Color.LIGHT_GRAY );
@@ -282,7 +294,34 @@ class CellRenderer extends DefaultTreeCellRenderer {
             this.setBackground( Color.WHITE );
         }
 
+        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) ) {
+            this.setFont( italic );
+            this.setForeground( Color.GRAY );
+            if ( !hasUsableChildren( node ) ) {
+                this.setEnabled( false );
+            }
+        } else {
+            setText( name + " -- " + ( ( Collection ) geneData.getGeneSetToProbeMap().get( id ) ).size() + " probes, "
+                    + ( ( Collection ) geneData.getGeneSetToGeneMap().get( id ) ).size() + " genes" );
+            this.setFont( plain );
+            this.setForeground( Color.BLACK );
+        }
+
         return this;
     }
 
+    /**
+     * @return
+     */
+    private boolean hasUsableChildren( DefaultMutableTreeNode node ) {
+        for ( int i = 0; i < node.getChildCount(); i++ ) {
+            DefaultMutableTreeNode child = ( DefaultMutableTreeNode ) node.getChildAt( i );
+            String id = ( String ) ( ( DirectedGraphNode ) child.getUserObject() ).getKey();
+            if ( geneData.getGeneSetToProbeMap().containsKey( id ) ) {
+                return true;
+            }
+            return hasUsableChildren( child );
+        }
+        return false;
+    }
 }

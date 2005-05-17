@@ -55,7 +55,15 @@ public abstract class GeneSetsResultsScrollPane extends JScrollPane {
     }
 
     protected void showDetailsForGeneSet( int runnum, String id ) {
+        if ( id == null ) {
+            log.debug( "Got null geneset id" );
+            return;
+        }
         log.debug( "Request for details of gene set: " + id );
+        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) ) {
+            callingFrame.getStatusMessenger().setError( id + " is not available for viewing in your data." );
+            return;
+        }
         GeneSetDetails details = new GeneSetDetails( goData, geneData, settings, id );
         if ( runnum < 0 ) {
             details.show();
