@@ -3,14 +3,9 @@ package classScore.gui;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
@@ -22,7 +17,6 @@ import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.util.BrowserLauncher;
 import baseCode.util.StatusViewer;
-
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
@@ -39,20 +33,71 @@ import classScore.gui.geneSet.GeneSetDetails;
  */
 public abstract class GeneSetsResultsScrollPane extends JScrollPane {
     private static Log log = LogFactory.getLog( GeneSetsResultsScrollPane.class.getName() );
-    protected GeneAnnotations geneData;
-    protected Settings settings;
-    protected GONames goData;
-    protected List results;
-    protected int selectedRun;
-    protected GeneSetScoreFrame callingFrame;
     static final String AMIGO_URL_BASE = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
+    protected GeneSetScoreFrame callingFrame;
+    protected GeneAnnotations geneData;
+    protected GONames goData;
     protected StatusViewer messenger;
+    protected List results;
+    protected int selectedRun;
+    protected Settings settings;
 
     public GeneSetsResultsScrollPane( Settings settings, List results, GeneSetScoreFrame callingFrame ) {
         this.settings = settings;
         this.results = results;
         this.callingFrame = callingFrame;
+    }
+
+    public abstract void addedNewGeneSet();
+
+    public void addInitialData( GONames goData ) {
+        assert callingFrame.getOriginalGeneData() != null : "Gene data is still null";
+        assert goData != null : "GO data is still null";
+        this.geneData = callingFrame.getOriginalGeneData();
+        this.goData = goData;
+    }
+
+    public abstract void addRun();
+
+    /**
+     * @param e
+     */
+    public void findInTreeMenuItem_actionAdapter( ActionEvent e ) {
+        OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        String classID = null;
+        classID = sourcePopup.getSelectedItem();
+        if ( classID == null ) return;
+        callingFrame.findGeneSetInTree( classID );
+    }
+
+    public abstract void resetView();
+
+    public void setSelectedRun( int selectedRun ) {
+        this.selectedRun = selectedRun;
+    }
+
+    protected void htmlMenuItem_actionPerformed( ActionEvent e ) {
+        OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        String classID = null;
+        classID = sourcePopup.getSelectedItem();
+        if ( classID == null ) return;
+        // create the URL and show it
+        try {
+            // new JWebBrowser( URL );
+            BrowserLauncher.openURL( AMIGO_URL_BASE + classID );
+        } catch ( IOException e1 ) {
+            GuiUtil.error( "Could not open a web browser window." );
+        }
+    }
+
+    protected void modMenuItem_actionPerformed( ActionEvent e ) {
+        OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        String classID = null;
+        classID = sourcePopup.getSelectedItem();
+        if ( classID == null ) return;
+        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, goData, classID );
+        cwiz.showWizard();
     }
 
     protected void showDetailsForGeneSet( int runnum, String id ) {
@@ -74,83 +119,17 @@ public abstract class GeneSetsResultsScrollPane extends JScrollPane {
             details.show( res, run.getGeneScores() );
         }
     }
-
-    public abstract void addRun();
-
-    public abstract void addedNewGeneSet();
-
-    public abstract void resetView();
-
-    public void setSelectedRun( int selectedRun ) {
-        this.selectedRun = selectedRun;
-    }
-
-    protected void modMenuItem_actionPerformed( ActionEvent e ) {
-        OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        String classID = null;
-        classID = sourcePopup.getSelectedItem();
-        if ( classID == null ) return;
-        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, goData, classID );
-        cwiz.showWizard();
-    }
-
-    protected void htmlMenuItem_actionPerformed( ActionEvent e ) {
-        OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        String classID = null;
-        classID = sourcePopup.getSelectedItem();
-        if ( classID == null ) return;
-        // create the URL and show it
-        try {
-            // new JWebBrowser( URL );
-            BrowserLauncher.openURL( AMIGO_URL_BASE + classID );
-        } catch ( IOException e1 ) {
-            GuiUtil.error( "Could not open a web browser window." );
-        }
-    }
-
-    public void addInitialData( GONames goData ) {
-        assert callingFrame.getOriginalGeneData() != null : "Gene data is still null";
-        assert goData != null : "GO data is still null";
-        this.geneData = callingFrame.getOriginalGeneData();
-        this.goData = goData;
-    }
-
-    /**
-     * @param e
-     */
-    public void findInTreeMenuItem_actionAdapter( ActionEvent e ) {
-        OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        String classID = null;
-        classID = sourcePopup.getSelectedItem();
-        if ( classID == null ) return;
-        callingFrame.findGeneSetInTree( classID );
-    }
 }
 
-class OutputPanelPopupMenu extends JPopupMenu {
-    Point popupPoint;
-    String selectedItem = null;
+class OutputPanel_htmlMenuItem_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetsResultsScrollPane adaptee;
 
-    /**
-     * @return Returns the selectedItem.
-     */
-    public String getSelectedItem() {
-        return this.selectedItem;
+    OutputPanel_htmlMenuItem_actionAdapter( GeneSetsResultsScrollPane adaptee ) {
+        this.adaptee = adaptee;
     }
 
-    /**
-     * @param selectedItem The selectedItem to set.
-     */
-    public void setSelectedItem( String selectedItem ) {
-        this.selectedItem = selectedItem;
-    }
-
-    public Point getPoint() {
-        return popupPoint;
-    }
-
-    public void setPoint( Point point ) {
-        popupPoint = point;
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.htmlMenuItem_actionPerformed( e );
     }
 }
 
@@ -166,14 +145,29 @@ class OutputPanel_modMenuItem_actionAdapter implements java.awt.event.ActionList
     }
 }
 
-class OutputPanel_htmlMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetsResultsScrollPane adaptee;
+class OutputPanelPopupMenu extends JPopupMenu {
+    Point popupPoint;
+    String selectedItem = null;
 
-    OutputPanel_htmlMenuItem_actionAdapter( GeneSetsResultsScrollPane adaptee ) {
-        this.adaptee = adaptee;
+    public Point getPoint() {
+        return popupPoint;
     }
 
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.htmlMenuItem_actionPerformed( e );
+    /**
+     * @return Returns the selectedItem.
+     */
+    public String getSelectedItem() {
+        return this.selectedItem;
+    }
+
+    public void setPoint( Point point ) {
+        popupPoint = point;
+    }
+
+    /**
+     * @param selectedItem The selectedItem to set.
+     */
+    public void setSelectedItem( String selectedItem ) {
+        this.selectedItem = selectedItem;
     }
 }
