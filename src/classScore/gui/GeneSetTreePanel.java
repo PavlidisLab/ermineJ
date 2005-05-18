@@ -409,6 +409,34 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         return popupListener;
     }
 
+    /**
+     * @return Returns the currentlySelectedGeneSet.
+     */
+    public String getCurrentlySelectedGeneSet() {
+        return this.currentlySelectedGeneSet;
+    }
+
+    /**
+     * @param currentlySelectedGeneSet The currentlySelectedGeneSet to set.
+     */
+    public void setCurrentlySelectedGeneSet( String currentlySelectedGeneSet ) {
+        this.currentlySelectedGeneSet = currentlySelectedGeneSet;
+    }
+
+    /**
+     * @return Returns the currentlySelectedResultSetIndex.
+     */
+    public int getCurrentlySelectedResultSetIndex() {
+        return this.currentlySelectedResultSetIndex;
+    }
+
+    /**
+     * @param currentlySelectedResultSetIndex The currentlySelectedResultSetIndex to set.
+     */
+    public void setCurrentlySelectedResultSetIndex( int currentlySelectedResultSetIndex ) {
+        this.currentlySelectedResultSetIndex = currentlySelectedResultSetIndex;
+    }
+
 }
 
 class BaseCellRenderer extends DefaultTreeCellRenderer {
@@ -490,7 +518,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             this.setIcon( regularIcon );
         }
 
-        if ( currentlySelectedResultSet >= 0 ) {
+        if ( currentlySelectedResultSet >= 0 && results.size() >= currentlySelectedResultSet + 1 ) {
             GeneSetPvalRun res = ( GeneSetPvalRun ) results.get( currentlySelectedResultSet );
             assert res != null;
             assert res.getResults() != null;

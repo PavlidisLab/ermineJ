@@ -254,14 +254,13 @@ public class AnalysisThread extends Thread {
 
         /* do work */
         messenger.setStatus( "Starting analysis..." );
-        numRuns++;
         GeneSetPvalRun newResults = null;
         if ( results != null ) { // read from a file.
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
-                    messenger, results, new Integer( numRuns ).toString() );
+                    messenger, results, "LoadedRun" );
         } else {
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
-                    messenger, new Integer( numRuns ).toString() );
+                    messenger, "NewRun" );
         }
 
         if ( this.stop ) return null;

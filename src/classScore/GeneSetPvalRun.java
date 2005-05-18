@@ -293,7 +293,11 @@ public class GeneSetPvalRun {
     }
 
     public String getName() {
-        return "Run:" + name;
+        return name;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
     }
 
     /* private methods */

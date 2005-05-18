@@ -1,7 +1,5 @@
 package classScore.gui;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -10,19 +8,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
@@ -30,13 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GONames;
-import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.table.TableSorter;
 import baseCode.util.StatusViewer;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
-import classScore.data.GeneSetResult;
-import corejava.Format;
 
 /**
  * A table that lists the Gene Sets with their scores, and allows user interaction.
@@ -50,25 +40,31 @@ import corejava.Format;
  */
 public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
 
-    private final static int COL0WIDTH = 80;
-    private final static int COL1WIDTH = 350;
-    private final static int COL2WIDTH = 80;
-    private final static int COL3WIDTH = 80;
-    private final static int COLRWIDTH = 80;
+    private final static int GENESET_ID_COLUMN_WIDTH = 80;
+    private final static int GENESET_NAME_COLUMN_WIDTH = 350;
+    private final static int NUMPROBES_COLUMN_WIDTH = 40;
+    private final static int NUMGENES_COLUMN_WIDTH = 40;
+    private final static int RUN_COLUMN_START_WIDTH = 80;
     static Log log = LogFactory.getLog( GeneSetTablePanel.class.getName() );
 
     private String classColToolTip;
     private int currentResultSetIndex = -1;
-    private GeneSetTableModel model = null;
-    private List resultToolTips = new LinkedList();
+    protected GeneSetTableModel model = null;
+    protected List resultToolTips = new LinkedList();
     private TableSorter sorter;
-    private JTable table = null;
+    protected JTable table = null;
 
     public GeneSetTablePanel( GeneSetScoreFrame callingFrame, LinkedList results, Settings settings ) {
-
         super( settings, results, callingFrame );
         model = new GeneSetTableModel( results );
+        setUpTable();
+        setUpPopupMenus();
+    }
 
+    /**
+     * 
+     */
+    private void setUpTable() {
         table = new JTable() {
             // Implement table header tool tips.
             protected JTableHeader createDefaultTableHeader() {
@@ -85,16 +81,54 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
         table.getTableHeader().setReorderingAllowed( false );
         table.getTableHeader().addMouseListener( new TableHeader_mouseAdapterCursorChanger( this ) );
+    }
+
+    /**
+     * 
+     */
+    private void setUpPopupMenus() {
 
         MouseListener popupListener = configurePopupMenu();
         table.addMouseListener( popupListener );
 
-        RemoveRunPopupMenu removeRunPopup = new RemoveRunPopupMenu();
+        EditRunPopupMenu removeRunPopup = new EditRunPopupMenu();
         JMenuItem removeRunMenuItem = new JMenuItem( "Remove this run..." );
-        removeRunMenuItem.addActionListener( new OutputPanel_removeRunPopupMenu_actionAdapter( this ) );
+        removeRunMenuItem.addActionListener( new RemoveRunPopupMenu_actionAdapter( this ) );
         removeRunPopup.add( removeRunMenuItem );
-        MouseListener removeRunPopupListener = new OutputPanel_removeRunPopupListener( removeRunPopup );
+        JMenuItem renameRunMenuItem = new JMenuItem( "Rename this run..." );
+        renameRunMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+                int columnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
+                int runIndex = model.getRunIndex( columnIndex );
+                String newName = JOptionPane.showInputDialog( table, "Enter a new name", getRunName( runIndex ) );
+
+                if ( newName != null && newName.length() > 0 ) {
+                    renameRun( runIndex, newName );
+                }
+            }
+        } );
+        removeRunPopup.add( renameRunMenuItem );
+        MouseListener removeRunPopupListener = new EditRunPopupListener( removeRunPopup );
         table.getTableHeader().addMouseListener( removeRunPopupListener );
+    }
+
+    /**
+     * @param runIndex
+     * @return
+     */
+    protected String getRunName( int runIndex ) {
+        return ( ( GeneSetPvalRun ) results.get( runIndex ) ).getName();
+    }
+
+    /**
+     * @param runIndex
+     * @param newName
+     */
+    protected void renameRun( int runIndex, String newName ) {
+        model.renameRun( runIndex, newName );
+        ( ( GeneSetPvalRun ) results.get( runIndex ) ).setName( newName );
+        table.revalidate();
     }
 
     public void addedNewGeneSet() {
@@ -120,7 +154,7 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         col.setIdentifier( model.getColumnName( c ) );
 
         table.addColumn( col );
-        table.getColumnModel().getColumn( c ).setPreferredWidth( COLRWIDTH );
+        table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
         generateToolTip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
         sorter.cancelSorting();
         sorter.setSortingStatus( c, TableSorter.ASCENDING );
@@ -167,10 +201,10 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
 
         sorter.setTableHeader( table.getTableHeader() );
         this.getViewport().add( table, null );
-        table.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
-        table.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
-        table.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
-        table.getColumnModel().getColumn( 3 ).setPreferredWidth( COL3WIDTH );
+        table.getColumnModel().getColumn( 0 ).setPreferredWidth( GENESET_ID_COLUMN_WIDTH );
+        table.getColumnModel().getColumn( 1 ).setPreferredWidth( GENESET_NAME_COLUMN_WIDTH );
+        table.getColumnModel().getColumn( 2 ).setPreferredWidth( NUMPROBES_COLUMN_WIDTH );
+        table.getColumnModel().getColumn( 3 ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
         table.setDefaultRenderer( Object.class, new OutputPanelTableCellRenderer( goData, results ) );
         classColToolTip = new String( "Total classes shown: " + geneData.selectedSets() );
         table.revalidate();
@@ -191,11 +225,11 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         return popupListener;
     }
 
-    void generateToolTip( int runnum ) {
+    void generateToolTip( int runIndex ) {
         assert results != null : "Null results";
-        assert results.get( runnum ) != null : "No results with index " + runnum;
-        log.debug( "Generating tooltip for run #" + runnum );
-        Settings runSettings = ( ( GeneSetPvalRun ) results.get( runnum ) ).getSettings();
+        assert results.get( runIndex ) != null : "No results with index " + runIndex;
+        log.debug( "Generating tooltip for run #" + runIndex );
+        Settings runSettings = ( ( GeneSetPvalRun ) results.get( runIndex ) ).getSettings();
         String tooltip = new String( "<html>" );
         String coda = new String();
 
@@ -226,36 +260,52 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
                 tooltip += "Class Raw Score Method: Median <br>";
         }
         tooltip += coda;
-        resultToolTips.add( runnum, tooltip );
+        resultToolTips.add( runIndex, tooltip );
     }
 
     String getHeaderToolTip( int index ) {
         if ( index == 0 ) {
             return this.classColToolTip;
         } else if ( index >= GeneSetTableModel.INIT_COLUMNS ) {
-            // int runnum=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
-            int runnum = model.getRunNum( index );
-            return ( String ) resultToolTips.get( runnum );
+            // int runIndex=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
+            int runIndex = model.getRunIndex( index );
+            return ( String ) resultToolTips.get( runIndex );
         }
         return null;
     }
 
     void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
-        RemoveRunPopupMenu sourcePopup = ( RemoveRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        int c = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
-        String colname = model.getColumnName( c );
-        TableColumn col = table.getColumn( colname );
-        int yesno = JOptionPane.showConfirmDialog( null, "Are you sure you want to remove "
-                + colname.substring( 0, colname.length() - 5 ) + "?", "Remove Run", JOptionPane.YES_NO_OPTION );
+        EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        int currentColumnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
+        String columnName = model.getColumnName( currentColumnIndex );
+        TableColumn col = table.getColumn( columnName );
+        assert col != null;
+
+        int yesno = JOptionPane.showConfirmDialog( null, "Are you sure you want to remove " + columnName + "?",
+                "Remove Run", JOptionPane.YES_NO_OPTION );
         if ( yesno == JOptionPane.YES_OPTION ) {
-            System.err.println( "remove popup for col: " + c );
+            log.debug( "remove popup for col: " + currentColumnIndex );
+            int runIndex = model.getRunIndex( currentColumnIndex );
             table.removeColumn( col );
-            model.removeRunData( c );
+            model.removeRunData( currentColumnIndex );
             model.fireTableStructureChanged();
-            int runnum = model.getRunNum( c );
-            // FIXME deletion of corresponding GeneAnnotations when remove is used.
-            results.remove( runnum );
-            resultToolTips.remove( runnum );
+
+            if ( runIndex < 0 )
+                throw new IllegalStateException( "Runindex was not found for column " + currentColumnIndex );
+
+            // FIXME deletion of corresponding GeneAnnotations when remove is used, if there is a copy made.
+            results.remove( runIndex );
+
+            int treeRunSelected = callingFrame.getTreePanel().getCurrentlySelectedResultSetIndex();
+            if ( treeRunSelected >= 1 && results.size() > 0 ) {
+                log.debug( "Setting tree to show results " + ( treeRunSelected - 1 ) );
+                callingFrame.getTreePanel().setCurrentlySelectedResultSetIndex( treeRunSelected - 1 );
+            } else {
+                log.debug( "No results, resetting tree" );
+                callingFrame.getTreePanel().setCurrentlySelectedResultSetIndex( -1 );
+            }
+
+            resultToolTips.remove( runIndex );
             table.revalidate();
         }
     }
@@ -270,11 +320,11 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         int _runnum = -1;
         String _id = ( String ) ( ( Vector ) table.getValueAt( i, 0 ) ).get( 0 );
         if ( table.getValueAt( i, j ) != null && j >= GeneSetTableModel.INIT_COLUMNS ) {
-            _runnum = model.getRunNum( j );
+            _runnum = model.getRunIndex( j );
         } else if ( table.getValueAt( i, j ) != null && j < GeneSetTableModel.INIT_COLUMNS ) {
             _runnum = -1;
         } else {
-            log.debug( "Seeking column to show" );
+            log.debug( "Seeking column to show" ); // this code is never reached?
             // for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
             // if ( table.getValueAt( i, k ) != null && k >= OutputTableModel.INIT_COLUMNS ) {
             // String message;
@@ -294,12 +344,12 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         }
         this.currentResultSetIndex = _runnum;
         final String id = _id;
-        final int runnum = _runnum;
+        final int runIndex = _runnum;
         log.debug( "Showing details for " + id );
         if ( messenger != null ) messenger.setStatus( "Viewing data for " + id + "..." );
         new Thread() {
             public void run() {
-                showDetailsForGeneSet( runnum, id );
+                showDetailsForGeneSet( runIndex, id );
             }
         }.start();
     }
@@ -307,126 +357,35 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
 }
 
 // //////////////////////////////////////////////////////////////////////////////
+class EditRunPopupMenu extends JPopupMenu {
+    Point popupPoint;
 
-/**
- * 
- * 
- *
- */
-class GeneSetTableModel extends AbstractTableModel {
-    public static final int INIT_COLUMNS = 4;
-    private LinkedList columnNames = new LinkedList();
-    private GeneAnnotations geneData;
-    private GONames goData;
-
-    private LinkedList results;
-    private int state = -1;
-
-    public GeneSetTableModel( LinkedList results ) {
-        this.results = results;
-        columnNames.add( "Name" );
-        columnNames.add( "Description" );
-        columnNames.add( "# of Probes" );
-        columnNames.add( "# of Genes" );
+    public Point getPoint() {
+        return popupPoint;
     }
 
-    public void addInitialData( GeneAnnotations origGeneData, GONames origGoData ) {
-        state = 0;
-        this.setInitialData( origGeneData, origGoData );
+    public void setPoint( Point point ) {
+        popupPoint = point;
+    }
+}
+
+class TableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter {
+    GeneSetTablePanel adaptee;
+
+    TableHeader_mouseAdapterCursorChanger( GeneSetTablePanel adaptee ) {
+        this.adaptee = adaptee;
     }
 
-    public void addRun() {
-        state++;
-        columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1 ) ).getName() + " Pval" );
+    public void mouseEntered( MouseEvent e ) {
+        Container c = adaptee.getParent();
+        c.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
     }
 
-    public void addRunColumns( int state ) {
-        columnNames.add( ( ( GeneSetPvalRun ) results.get( state - 1 ) ).getName() );
+    public void mouseExited( MouseEvent e ) {
+        Container c = adaptee.getParent();
+        c.setCursor( Cursor.getDefaultCursor() );
     }
 
-    public void addRunData( Map result ) {
-        state++;
-        addRunColumns( state );
-        results.add( result );
-    }
-
-    public int getColumnCount() {
-        return columnNames.size();
-    }
-
-    public String getColumnName( int i ) {
-        return ( String ) columnNames.get( i );
-    }
-
-    public int getRowCount() {
-        if ( state == -1 ) {
-            return 20;
-        }
-        return geneData.selectedSets();
-    }
-
-    public int getRunNum( int c ) {
-        return c - INIT_COLUMNS;
-    }
-
-    /**
-     * @return int
-     */
-    public int getState() {
-        return state;
-    }
-
-    public Object getValueAt( int i, int j ) {
-
-        String classid = ( String ) geneData.getSelectedSets().get( i );
-
-        if ( state >= 0 && j < INIT_COLUMNS ) {
-            switch ( j ) {
-                case 0: {
-                    Vector cid_vec = new Vector();
-                    cid_vec.add( classid );
-                    if ( goData.newSet( classid ) ) cid_vec.add( "M" );
-                    return cid_vec;
-                }
-                case 1:
-                    return goData.getNameForId( classid );
-                case 2:
-                    return new Integer( geneData.numProbesInGeneSet( classid ) );
-                case 3:
-                    return new Integer( geneData.numGenesInGeneSet( classid ) );
-
-            }
-        } else if ( state > 0 ) {
-            ArrayList vals = new ArrayList();
-            int runnum = getRunNum( j );
-            Map data = ( ( GeneSetPvalRun ) results.get( runnum ) ).getResults();
-            if ( data.containsKey( classid ) ) {
-                GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                vals.add( new Double( res.getRank() ) );
-                vals.add( new Double( res.getPvalue() ) );
-                return vals;
-            }
-            return null;
-        }
-        return null;
-    }
-
-    public void removeRunData( int c ) {
-        state--;
-        columnNames.remove( c );
-        System.err.println( "number of cols: " + columnNames.size() );
-    }
-
-    /**
-     * Does not reset the state.
-     * 
-     * @param geneData GeneAnnotations
-     * @param goData GONames
-     */
-    public void setInitialData( GeneAnnotations origGeneData, GONames origGoData ) {
-        this.geneData = origGeneData;
-        this.goData = origGoData;
-    }
 }
 
 class OutputPanel_findInTreeMenuItem_actionAdapter implements ActionListener {
@@ -497,10 +456,10 @@ class OutputPanel_PopupListener extends MouseAdapter {
     }
 }
 
-class OutputPanel_removeRunPopupListener extends MouseAdapter {
-    RemoveRunPopupMenu popup;
+class EditRunPopupListener extends MouseAdapter {
+    EditRunPopupMenu popup;
 
-    OutputPanel_removeRunPopupListener( RemoveRunPopupMenu popupMenu ) {
+    EditRunPopupListener( EditRunPopupMenu popupMenu ) {
         popup = popupMenu;
     }
 
@@ -524,132 +483,14 @@ class OutputPanel_removeRunPopupListener extends MouseAdapter {
     }
 }
 
-class OutputPanel_removeRunPopupMenu_actionAdapter implements java.awt.event.ActionListener {
+class RemoveRunPopupMenu_actionAdapter implements java.awt.event.ActionListener {
     GeneSetTablePanel adaptee;
 
-    OutputPanel_removeRunPopupMenu_actionAdapter( GeneSetTablePanel adaptee ) {
+    RemoveRunPopupMenu_actionAdapter( GeneSetTablePanel adaptee ) {
         this.adaptee = adaptee;
     }
 
     public void actionPerformed( ActionEvent e ) {
         adaptee.removeRunPopupMenu_actionPerformed( e );
     }
-}
-
-/**
- *  
- */
-class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
-    private Format nf = new Format( "%g" ); // for the gene set p value.
-    private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
-
-    GONames goData;
-    List results;
-
-    public OutputPanelTableCellRenderer( GONames goData, List results ) {
-        super();
-        this.goData = goData;
-        this.results = results;
-
-        nff.setMaximumFractionDigits( 4 );
-    }
-
-    public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
-            int row, int column ) {
-        super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
-
-        // set cell text
-        if ( value != null ) {
-            if ( value.getClass().equals( ArrayList.class ) ) // pvalues and ranks.
-                setText( nf.format( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) ).doubleValue() ) );
-            else if ( value.getClass().equals( Vector.class ) ) // class ids.
-                setText( ( String ) ( ( Vector ) value ).get( 0 ) );
-            else
-                setText( value.toString() );
-        } else {
-            setText( null );
-        }
-
-        // set cell background
-        int runcol = column - GeneSetTableModel.INIT_COLUMNS;
-        setOpaque( true );
-        if ( isSelected )
-            setOpaque( true );
-        else if ( value == null )
-            setOpaque( false );
-        else if ( column == 0 && goData.newSet( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
-            setBackground( Colors.PINK );
-        } else if ( value.getClass().equals( ArrayList.class ) ) {
-            String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
-            GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
-            Map data = result.getResults();
-            if ( data.containsKey( classid ) ) {
-                GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                if ( res.getPvalue_corr() < 0.001 ) {
-                    setBackground( Colors.LIGHTBLUE1 );
-                } else if ( res.getPvalue_corr() < 0.01 ) {
-                    setBackground( Colors.LIGHTBLUE2 );
-                } else if ( res.getPvalue_corr() < 0.05 ) {
-                    setBackground( Colors.LIGHTBLUE3 );
-                } else if ( res.getPvalue_corr() < 0.1 ) {
-                    setBackground( Colors.LIGHTBLUE5 );
-                } else {
-                    setBackground( Color.WHITE );
-                }
-            }
-        } else if ( hasFocus ) {
-            setBackground( Color.WHITE );
-            setOpaque( true );
-        } else {
-            setOpaque( false );
-        }
-
-        // set tool tips
-        if ( value != null && value.getClass().equals( ArrayList.class ) ) {
-            String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
-            // String classid = ( String ) table.getValueAt( row, 0 );
-            GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
-            Map data = result.getResults();
-            if ( data.containsKey( classid ) ) {
-                GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
-                        + "<br>Genes: " + res.getEffectiveSize() + "<br>Probes: " + res.getSize() );
-            }
-        } else {
-            setToolTipText( null );
-        }
-
-        return this;
-    }
-}
-
-class RemoveRunPopupMenu extends JPopupMenu {
-    Point popupPoint;
-
-    public Point getPoint() {
-        return popupPoint;
-    }
-
-    public void setPoint( Point point ) {
-        popupPoint = point;
-    }
-}
-
-class TableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter {
-    GeneSetTablePanel adaptee;
-
-    TableHeader_mouseAdapterCursorChanger( GeneSetTablePanel adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void mouseEntered( MouseEvent e ) {
-        Container c = adaptee.getParent();
-        c.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-    }
-
-    public void mouseExited( MouseEvent e ) {
-        Container c = adaptee.getParent();
-        c.setCursor( Cursor.getDefaultCursor() );
-    }
-
 }

@@ -503,6 +503,7 @@ public class GeneSetScoreFrame extends JFrame {
 
     public void addResult( GeneSetPvalRun result ) {
         if ( result == null || result.getResults().size() == 0 ) return;
+        result.setName( "Run " + ( results.size() + 1 ) );
         results.add( result );
         oPanel.addRun();
         treePanel.addRun();
@@ -612,6 +613,13 @@ public class GeneSetScoreFrame extends JFrame {
     public void findGeneSetInTree( String classID ) {
         this.tabs.setSelectedIndex( 1 );
         treePanel.expandToGeneSet( classID );
+    }
+
+    /**
+     * @return Returns the treePanel.
+     */
+    public GeneSetTreePanel getTreePanel() {
+        return this.treePanel;
     }
 }
 
