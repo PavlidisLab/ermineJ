@@ -3,6 +3,7 @@ package classScore.gui;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
@@ -112,6 +113,17 @@ public abstract class GeneSetsResultsScrollPane extends JScrollPane {
         assert goData != null : "GO data is still null";
         this.geneData = callingFrame.getOriginalGeneData();
         this.goData = goData;
+    }
+
+    /**
+     * @param e
+     */
+    public void findInTreeMenuItem_actionAdapter( ActionEvent e ) {
+        OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        String classID = null;
+        classID = sourcePopup.getSelectedItem();
+        if ( classID == null ) return;
+        callingFrame.findGeneSetInTree( classID );
     }
 }
 

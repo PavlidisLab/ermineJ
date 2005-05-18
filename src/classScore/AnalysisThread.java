@@ -146,6 +146,7 @@ public class AnalysisThread extends Thread {
         notifyAll();
         GeneSetPvalRun lastResults = latestResults;
         this.latestResults = null;
+        log.debug( "Got results!" );
         return lastResults;
     }
 

@@ -28,6 +28,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -505,6 +506,7 @@ public class GeneSetScoreFrame extends JFrame {
         if ( result == null || result.getResults().size() == 0 ) return;
         results.add( result );
         oPanel.addRun();
+        treePanel.addRun();
     }
 
     public void startAnalysis( Settings runSettings ) {
@@ -515,7 +517,7 @@ public class GeneSetScoreFrame extends JFrame {
                 geneScoreSets );
         log.debug( "Starting analysis thread" );
         athread.run();
-        log.debug( "Waiting" );
+        log.debug( "Waiting..." );
         addResult( athread.getLatestResults() );
         log.debug( "done" );
         enableMenusForAnalysis();
@@ -596,6 +598,21 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public Map getGeneDataSets() {
         return geneDataSets;
+    }
+
+    /**
+     * @return
+     */
+    public int getCurrentResultSet() {
+        return this.getOPanel().getCurrentResultSet();
+    }
+
+    /**
+     * @param classID
+     */
+    public void findGeneSetInTree( String classID ) {
+        this.tabs.setSelectedIndex( 1 );
+        treePanel.expandToGeneSet( classID );
     }
 }
 
