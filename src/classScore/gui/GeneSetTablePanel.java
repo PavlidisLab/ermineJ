@@ -126,9 +126,11 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
      * @param newName
      */
     protected void renameRun( int runIndex, String newName ) {
+        TableColumn col = table.getColumn( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
         model.renameRun( runIndex, newName );
+        col.setIdentifier( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
         ( ( GeneSetPvalRun ) results.get( runIndex ) ).setName( newName );
-        table.revalidate();
+        model.fireTableStructureChanged();
     }
 
     public void addedNewGeneSet() {
@@ -277,6 +279,13 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
     void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
         EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         int currentColumnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
+        removeRun( currentColumnIndex );
+    }
+
+    /**
+     * @param currentColumnIndex
+     */
+    private void removeRun( int currentColumnIndex ) {
         String columnName = model.getColumnName( currentColumnIndex );
         TableColumn col = table.getColumn( columnName );
         assert col != null;
@@ -300,10 +309,13 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
             if ( treeRunSelected >= 1 && results.size() > 0 ) {
                 log.debug( "Setting tree to show results " + ( treeRunSelected - 1 ) );
                 callingFrame.getTreePanel().setCurrentlySelectedResultSetIndex( treeRunSelected - 1 );
+                callingFrame.getTreePanel().setCurrentResultSet( ( GeneSetPvalRun ) results.get( treeRunSelected - 1 ) );
             } else {
                 log.debug( "No results, resetting tree" );
                 callingFrame.getTreePanel().setCurrentlySelectedResultSetIndex( -1 );
+                callingFrame.getTreePanel().setCurrentResultSet( null );
             }
+            callingFrame.getTreePanel().updateNodeStyles();
 
             resultToolTips.remove( runIndex );
             table.revalidate();

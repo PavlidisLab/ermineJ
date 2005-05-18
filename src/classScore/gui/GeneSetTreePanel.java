@@ -50,9 +50,10 @@ import corejava.Format;
  */
 public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
     private static Log log = LogFactory.getLog( GeneSetTreePanel.class.getName() );
-    private GeneSetPvalRun currentResultSet;
     private JTree goTree = null;
     private MutableTreeNode userRoot = null;
+
+    private GeneSetPvalRun currentResultSet;
     protected String currentlySelectedGeneSet = null;
     protected int currentlySelectedResultSetIndex = -1;
 
@@ -83,15 +84,7 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         }
 
         currentResultSet = ( GeneSetPvalRun ) results.get( currentlySelectedResultSetIndex );
-        try {
-            goData.getGraph().unmarkAll();
-            visitAllNodes( goTree, this.getClass().getMethod( "hasGoodPValue", new Class[] { GeneSetTreeNode.class } ) );
-            goData.getGraph().unmarkAll();
-            visitAllNodes( goTree, this.getClass().getMethod( "hasUsableChildren",
-                    new Class[] { GeneSetTreeNode.class } ) );
-        } catch ( Exception e ) {
-            log.error( e, e );
-        }
+        updateNodeStyles();
 
         // for ( Iterator iter = currentResultSet.getResults().keySet().iterator(); iter.hasNext(); ) {
         // String id = ( String ) iter.next();
@@ -104,6 +97,21 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         // }
         // }
         goTree.revalidate();
+    }
+
+    /**
+     * 
+     */
+    public void updateNodeStyles() {
+        try {
+            goData.getGraph().unmarkAll();
+            visitAllNodes( goTree, this.getClass().getMethod( "hasGoodPValue", new Class[] { GeneSetTreeNode.class } ) );
+            goData.getGraph().unmarkAll();
+            visitAllNodes( goTree, this.getClass().getMethod( "hasUsableChildren",
+                    new Class[] { GeneSetTreeNode.class } ) );
+        } catch ( Exception e ) {
+            log.error( e, e );
+        }
     }
 
     /**
@@ -142,11 +150,15 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         DirectedGraphNode n = ( DirectedGraphNode ) node.getUserObject();
         // if ( n.isVisited() ) return;
         // n.mark();
-        GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
-        if ( result == null ) return;
-        if ( result.getPvalue_corr() < 0.05 ) { // FIXME
-            // log.debug( n.getKey() + " is a good node" );
-            node.setHasGoodChild( true );
+        if ( currentResultSet == null ) {
+            node.setHasGoodChild( false );
+        } else {
+            GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
+            if ( result == null ) return;
+            if ( result.getPvalue_corr() < 0.05 ) { // FIXME
+                // log.debug( n.getKey() + " is a good node" );
+                node.setHasGoodChild( true );
+            }
         }
 
         GeneSetTreeNode parent = ( GeneSetTreeNode ) node.getParent();
@@ -435,6 +447,13 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      */
     public void setCurrentlySelectedResultSetIndex( int currentlySelectedResultSetIndex ) {
         this.currentlySelectedResultSetIndex = currentlySelectedResultSetIndex;
+    }
+
+    /**
+     * @param resultSet
+     */
+    public void setCurrentResultSet( GeneSetPvalRun resultSet ) {
+        this.currentResultSet = resultSet;
     }
 
 }

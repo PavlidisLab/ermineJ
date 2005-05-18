@@ -73,6 +73,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         if ( newName == null || newName.length() == 0 ) return;
         if ( columnNum < 0 || columnNum > this.getColumnCount() - 1 )
             throw new IllegalArgumentException( "Invalid column " + columnNum );
+        log.debug( "Renaming column " + columnNum + " to " + newName );
         columnNames.set( columnNum, newName );
     }
 
