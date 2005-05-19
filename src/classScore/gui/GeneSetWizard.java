@@ -206,6 +206,7 @@ public class GeneSetWizard extends Wizard {
             } catch ( IOException e1 ) {
                 GuiUtil.error( "Error writing the new gene set to file:", e1 );
             }
+            ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
             dispose();
         }

@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -31,16 +32,14 @@ import baseCode.util.FileTools;
  * @version $Id$
  */
 public class NewGeneSet {
-    private GeneAnnotations geneData;
-    private String id;
-    private String desc;
+    protected GeneAnnotations geneData;
+    private String id = "";
+    private String desc = "";
     List probes;
     private boolean modifiedGS = false;
 
     public NewGeneSet( GeneAnnotations geneData ) {
         this.geneData = geneData;
-        id = new String( "" );
-        desc = new String( "" );
         probes = new ArrayList();
     }
 
@@ -133,6 +132,12 @@ public class NewGeneSet {
         };
     }
 
+    /**
+     * Add a new gene set to the GeneData
+     * 
+     * @param file which stores the probes or genes.
+     * @throws IOException
+     */
     public void loadClassFile( String file ) throws IOException {
         clear();
         FileTools.checkPathIsReadableFile( file );
@@ -142,30 +147,30 @@ public class NewGeneSet {
         String row;
         Collection genes = new ArrayList();
         String type = new String( "" );
-        int filetype = 0;
+        boolean isGenes = true;
         while ( ( row = dis.readLine() ) != null ) {
             if ( type.compareTo( "" ) == 0 ) {
                 type = row;
                 if ( type.compareTo( "probe" ) == 0 ) {
-                    filetype = 0;
+                    isGenes = false;
                 } else if ( type.compareTo( "gene" ) == 0 ) {
-                    filetype = 1;
+                    isGenes = true;
                 }
             } else if ( id.compareTo( "" ) == 0 ) {
                 id = row;
             } else if ( desc.compareTo( "" ) == 0 ) {
                 desc = row;
             } else {
-                if ( filetype == 0 ) {
+                if ( !isGenes ) {
                     probes.add( row );
-                } else if ( filetype == 1 ) {
+                } else {
                     genes.add( row );
                 }
             }
         }
         dis.close();
-        if ( filetype == 1 ) {
-            HashSet probeSet = new HashSet();
+        if ( isGenes ) {
+            Set probeSet = new HashSet();
             for ( Iterator it = genes.iterator(); it.hasNext(); ) {
                 probeSet.addAll( geneData.getGeneProbeList( ( String ) it.next() ) );
             }
@@ -179,7 +184,6 @@ public class NewGeneSet {
     }
 
     public void saveClass( String folder, int type ) throws IOException {
-
         String fileid = id.replace( ':', '-' );
         String filedesc = desc.replace( '\n', ' ' );
         String filetype = ( type == 0 ) ? "probe" : "gene";
@@ -194,7 +198,7 @@ public class NewGeneSet {
     }
 
     public static Map getClassFileInfo( String file ) throws IOException {
-        HashMap cinfo = new HashMap();
+        Map cinfo = new HashMap();
         FileTools.checkPathIsReadableFile( file );
         FileInputStream fis = new FileInputStream( file );
         BufferedInputStream bis = new BufferedInputStream( fis );

@@ -42,6 +42,7 @@ import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
+import classScore.data.NewGeneSet;
 
 /**
  * <hr>
@@ -113,6 +114,7 @@ public class GeneSetScoreFrame extends JFrame {
     private GeneSetTreePanel treePanel;
 
     private HelpHelper hh;
+    private JMenu resultsSetMenu;
 
     public GeneSetScoreFrame() throws IOException {
         settings = new Settings();
@@ -267,6 +269,11 @@ public class GeneSetScoreFrame extends JFrame {
         analysisMenu.add( cancelAnalysisMenuItem );
         analysisMenu.add( loadAnalysisMenuItem );
         analysisMenu.add( saveAnalysisMenuItem );
+
+        // resultsSetMenu = new JMenu();
+        // resultsSetMenu.setMnemonic('R');
+        // resultsSetMenu.setEnabled(false);
+
         helpMenu.setText( "Help" );
         helpMenu.setMnemonic( 'H' );
         helpMenuItem.setText( "Help Topics" );
@@ -279,6 +286,7 @@ public class GeneSetScoreFrame extends JFrame {
         jMenuBar1.add( fileMenu );
         jMenuBar1.add( classMenu );
         jMenuBar1.add( analysisMenu );
+        // jMenuBar1.add(resultsSetMenu);
         jMenuBar1.add( helpMenu );
     }
 
@@ -340,50 +348,55 @@ public class GeneSetScoreFrame extends JFrame {
 
     }
 
-    public void readDataFilesForStartup() {
+    public void readDataFilesForStartup() throws SAXException, IOException {
 
-        try {
-            updateProgress( 10 );
-            statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
-            goData = new GONames( settings.getClassFile() );
+        updateProgress( 10 );
+        statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
+        goData = new GONames( settings.getClassFile() );
 
-            updateProgress( 70 );
-            if ( Thread.currentThread().isInterrupted() ) return;
+        updateProgress( 70 );
+        if ( Thread.currentThread().isInterrupted() ) return;
 
-            statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
+        statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
+        geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
 
-            updateProgress( 100 );
-            if ( Thread.currentThread().isInterrupted() ) return;
+        updateProgress( 90 );
+        if ( Thread.currentThread().isInterrupted() ) return;
 
-            // end slow part.
+        statusMessenger.setStatus( "Reading user-defined gene sets from directory " + settings.getClassFolder() );
+        loadUserGeneSets();
 
-            if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
-                throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
-                        + "Check that the file format is correct.\n" );
-            }
+        // end slow part.
 
-            if ( geneData.getGeneToProbeList().size() == 0 ) {
-                throw new IllegalArgumentException( "The gene annotation file contains no probes. "
-                        + "Check that the file format is correct.\n" );
-            }
-
-            geneDataSets.put( new Integer( "original".hashCode() ), geneData );
-
-        } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 ); // FIXME - go back to the start.
-        } catch ( IOException e ) {
-            GuiUtil.error( "File reading or writing error during initialization: " + e.getMessage()
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit.", e );
-            System.exit( 1 ); // FIXME - go back to the start
-        } catch ( IllegalArgumentException e ) {
-            GuiUtil.error( "Error during initialization: " + e
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 ); // FIXME - go back to the start
+        if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
+            throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
+                    + "Check that the file format is correct.\n" );
         }
 
+        if ( geneData.getGeneToProbeList().size() == 0 ) {
+            throw new IllegalArgumentException( "The gene annotation file contains no probes. "
+                    + "Check that the file format is correct.\n" );
+        }
+
+        geneDataSets.put( new Integer( "original".hashCode() ), geneData );
+
+    }
+
+    /**
+     * Load the user-defined gene sets.
+     */
+    private void loadUserGeneSets() throws IOException {
+        File dir = new File( settings.getClassFolder() );
+        if ( dir.exists() ) {
+            String[] classFiles = dir.list();
+            for ( int i = 0; i < classFiles.length; i++ ) {
+                String classFile = dir.getAbsolutePath() + System.getProperty( "file.separator" ) + classFiles[i];
+                log.debug( "Loading " + classFile );
+                NewGeneSet ngs = new NewGeneSet( geneData );
+                ngs.loadClassFile( classFile );
+                ngs.addToMaps( goData );
+            }
+        }
     }
 
     /**
@@ -397,24 +410,30 @@ public class GeneSetScoreFrame extends JFrame {
             geneDataSets = new HashMap();
             geneScoreSets = new HashMap();
 
-            // do the work.
             readDataFilesForStartup();
 
             statusMessenger.setStatus( "Done with setup" );
+
             enableMenusOnStart();
 
             mainPanel.remove( progressPanel );
             mainPanel.add( tabs, BorderLayout.CENTER );
-
-            // mainPanel.add( oPanel, BorderLayout.CENTER );
             statusMessenger.setStatus( "Ready." );
 
-        } catch ( Exception e ) {
-            e.printStackTrace();
+        } catch ( SAXException e ) {
+            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
+                    + "\nIf this problem persists, please contact the software developer. " );
+
+        } catch ( IOException e ) {
+            GuiUtil.error( "File reading or writing error during initialization: " + e.getMessage()
+                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+
+        } catch ( IllegalArgumentException e ) {
+            GuiUtil.error( "Error during initialization: " + e
+                    + "\nTry again.\nIf this problem persists, please contact the software developer. " );
         }
         treePanel.initialize( goData, geneData );
         oPanel.addInitialData( goData );
-        // treePanel.addInitialData( goData ); // this doesn't really do anything useful.
         statusMessenger.setStatus( "Done with initialization." );
     }
 
@@ -584,6 +603,7 @@ public class GeneSetScoreFrame extends JFrame {
 
     public void addedNewGeneSet() {
         oPanel.addedNewGeneSet();
+        treePanel.addedNewGeneSet();
     }
 
     /**

@@ -21,9 +21,8 @@ import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -49,10 +48,10 @@ import corejava.Format;
  * @version $Id$
  */
 public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
+
+    private double fdrThreshold = 0.05;
     private static Log log = LogFactory.getLog( GeneSetTreePanel.class.getName() );
     private JTree goTree = null;
-    private MutableTreeNode userRoot = null;
-
     private GeneSetPvalRun currentResultSet;
     protected String currentlySelectedGeneSet = null;
     protected int currentlySelectedResultSetIndex = -1;
@@ -67,7 +66,6 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      * @see classScore.gui.GeneSetsResultsScrollPane#addedNewGeneSet()
      */
     public void addedNewGeneSet() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -85,17 +83,6 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
 
         currentResultSet = ( GeneSetPvalRun ) results.get( currentlySelectedResultSetIndex );
         updateNodeStyles();
-
-        // for ( Iterator iter = currentResultSet.getResults().keySet().iterator(); iter.hasNext(); ) {
-        // String id = ( String ) iter.next();
-        // GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( id );
-        // if ( result.getPvalue_corr() < 0.05 ) { // FIXME
-        // log.debug( "Coloring " + id );
-        // // this.setBackground( Colors.LIGHTBLUE4 );
-        // TreePath path = goTree.getNextMatch( id, 0, Position.Bias.Forward );
-        //
-        // }
-        // }
         goTree.revalidate();
     }
 
@@ -125,7 +112,6 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         } else {
             this.callingFrame.getStatusMessenger().setStatus( "Showing " + classID );
         }
-
         log.debug( "Expanding to path for " + classID );
         goTree.expandPath( path );
         goTree.setSelectionPath( path );
@@ -155,8 +141,7 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         } else {
             GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
             if ( result == null ) return;
-            if ( result.getPvalue_corr() < 0.05 ) { // FIXME
-                // log.debug( n.getKey() + " is a good node" );
+            if ( result.getPvalue_corr() < fdrThreshold ) {
                 node.setHasGoodChild( true );
             }
         }
@@ -164,7 +149,6 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         GeneSetTreeNode parent = ( GeneSetTreeNode ) node.getParent();
         if ( parent != null ) {
             if ( node.isHasGoodChild() ) {
-                // log.debug( n.getKey() + " has a good child" );
                 parent.setHasGoodChild( true );
                 // recurse
                 if ( parent.getParent() != null ) {
@@ -179,7 +163,7 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      * @return
      */
     public void hasUsableChildren( GeneSetTreeNode node ) {
-        DirectedGraphNode n = ( DirectedGraphNode ) node.getUserObject();
+        // DirectedGraphNode n = ( DirectedGraphNode ) node.getUserObject();
         // if ( n.isVisited() ) return;
         // n.mark();
         for ( int i = 0; i < node.getChildCount(); i++ ) {
@@ -204,30 +188,36 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         assert goData != null : "Go data is still null";
         assert geneData != null : "Gene data is still null";
         this.geneData = geneData;
-        this.goTree = goData.getGraph().treeView( GeneSetTreeNode.class );
         this.goData = goData;
-        addUserNode();
-        setRenderer();
-        goTree.setRootVisible( true );
+        setUpTree( goData );
+
+        this.getViewport().add( goTree );
+        this.goTree.setVisible( true );
+        this.goTree.revalidate();
+    }
+
+    /**
+     * @param goData
+     */
+    private void setUpTree( GONames goData ) {
+        this.goTree = goData.getGraph().treeView( GeneSetTreeNode.class );
+        this.setRenderer();
+        this.goTree.setRootVisible( true );
         ToolTipManager.sharedInstance().registerComponent( goTree );
         MouseListener popupListener = configurePopupMenu();
-        goTree.addMouseListener( popupListener );
-        goTree.addMouseListener( new GeneSetTreePanel_mouseListener( this ) );
-        goTree.addTreeSelectionListener( new TreeSelectionListener() {
+        this.goTree.addMouseListener( popupListener );
+        this.goTree.addMouseListener( new GeneSetTreePanel_mouseListener( this ) );
+        this.goTree.addTreeSelectionListener( new TreeSelectionListener() {
             public void valueChanged( TreeSelectionEvent e ) {
                 TreePath path = e.getPath();
                 GeneSetTreeNode currentNode = ( GeneSetTreeNode ) path.getLastPathComponent();
-                if ( currentNode.getUserObject() instanceof GraphNode ) { // FIXME - what about user node.
+                if ( currentNode.getUserObject() instanceof GraphNode ) {
                     currentlySelectedGeneSet = ( String ) ( ( GraphNode ) ( currentNode ).getUserObject() ).getKey();
                 } else {
                     log.debug( currentNode.getUserObject().getClass().getName() );
                 }
             }
         } );
-        this.getViewport().add( goTree );
-
-        goTree.setVisible( true );
-        goTree.revalidate();
     }
 
     /**
@@ -259,8 +249,7 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      * @see classScore.gui.GeneSetsResultsScrollPane#resetView()
      */
     public void resetView() {
-        // TODO Auto-generated method stub
-
+        updateNodeStyles();
     }
 
     /**
@@ -298,28 +287,19 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
     }
 
     /**
-     * 
+     * @param expand If false, collapses all nodes. If true, expands them all.
      */
-    private void addUserNode() {
-        log.debug( "Adding user node" );
-        userRoot = new GeneSetTreeNode( new DirectedGraphNode( "User-defined", "User-defined", goData.getGraph() ) );
-        DefaultMutableTreeNode root = ( DefaultMutableTreeNode ) goTree.getModel().getRoot();
-        root.add( userRoot );
-        goTree = new JTree( root );
-        goTree.revalidate();
+    protected void expandAll( boolean expand ) {
+        TreeNode root = ( TreeNode ) goTree.getModel().getRoot();
+        expandAll( new TreePath( root ), expand );
+
     }
 
     /**
-     * @param expand If false, collapses all nodes. If true, expands them all.
+     * @param parent
+     * @param expand
      */
-    private void expandAll( boolean expand ) {
-        TreeNode root = ( TreeNode ) goTree.getModel().getRoot();
-
-        // Traverse tree from root
-        expandAll( new TreePath( root ), expand );
-    }
-
-    private void expandAll( TreePath parent, boolean expand ) {
+    protected void expandAll( TreePath parent, boolean expand ) {
         // Traverse children
         TreeNode node = ( TreeNode ) parent.getLastPathComponent();
         if ( node.getChildCount() >= 0 ) {
@@ -454,6 +434,36 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      */
     public void setCurrentResultSet( GeneSetPvalRun resultSet ) {
         this.currentResultSet = resultSet;
+    }
+
+    /**
+     * @return Returns the fdrThreshold.
+     */
+    public double getFdrThreshold() {
+        return this.fdrThreshold;
+    }
+
+    /**
+     * @param fdrThreshold The fdrThreshold to set.
+     */
+    public void setFdrThreshold( double fdrThreshold ) {
+        this.fdrThreshold = fdrThreshold;
+    }
+
+    /**
+     * @param id
+     * @param desc
+     */
+    public void addNode( String id, String desc ) {
+        DirectedGraphNode dgn = new DirectedGraphNode( id, desc, goData.getGraph() );
+        GeneSetTreeNode gstn = new GeneSetTreeNode( dgn );
+        GeneSetTreeNode userNode = getUserNode();
+        ( ( DefaultTreeModel ) this.goTree.getModel() ).insertNodeInto( gstn, userNode, userNode.getChildCount() );
+        goTree.revalidate();
+    }
+
+    private GeneSetTreeNode getUserNode() {
+        return ( GeneSetTreeNode ) this.findByGeneSetId( GONames.USER_DEFINED ).getLastPathComponent();
     }
 
 }
