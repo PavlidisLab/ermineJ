@@ -592,11 +592,9 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
                 double pvalue = result.getPvalue();
                 displayedText = displayedText + " -- p = " + nf.format( pvalue ) + "--" + " effective size = "
                         + result.getEffectiveSize();
-                if ( result.getPvalue_corr() < 0.05 ) {
-                    this.setBackground( Colors.LIGHTRED4 );
-                } else {
-                    this.setBackground( Color.WHITE );
-                }
+                double pvalCorr = result.getPvalue_corr();
+                Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
+                this.setBackground( bgColor );
 
             }
         }

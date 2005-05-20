@@ -209,17 +209,9 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             Map data = result.getResults();
             if ( data.containsKey( classid ) ) {
                 GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                if ( res.getPvalue_corr() < 0.001 ) {
-                    setBackground( Colors.LIGHTRED1 );
-                } else if ( res.getPvalue_corr() < 0.01 ) {
-                    setBackground( Colors.LIGHTRED2 );
-                } else if ( res.getPvalue_corr() < 0.05 ) {
-                    setBackground( Colors.LIGHTRED3 );
-                } else if ( res.getPvalue_corr() < 0.1 ) {
-                    setBackground( Colors.LIGHTRED5 );
-                } else {
-                    setBackground( Color.WHITE );
-                }
+                double pvalCorr = res.getPvalue_corr();
+                Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
+                setBackground( bgColor );
             }
         } else if ( hasFocus ) {
             setBackground( Color.WHITE );
@@ -245,4 +237,5 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
 
         return this;
     }
+
 }
