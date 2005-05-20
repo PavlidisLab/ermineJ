@@ -24,17 +24,15 @@ import classScore.Settings;
  */
 
 public class AnalysisWizardStep4 extends WizardStep {
-    AnalysisWizard wiz;
-    Settings settings;
-    JPanel step4Panel;
-    JTextField jTextFieldMaxClassSize;
-    JTextField jTextFieldMinClassSize;
-    JRadioButton jRadioButtonBestReplicates;
-    JRadioButton jRadioButtonMeanReplicates;
+    private Settings settings;
+    private JTextField jTextFieldMaxClassSize;
+    private JTextField jTextFieldMinClassSize;
+    private JRadioButton jRadioButtonBestReplicates;
+    private JRadioButton jRadioButtonMeanReplicates;
 
     public AnalysisWizardStep4( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
-        this.wiz = wiz;
+        this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
         setValues();
@@ -59,7 +57,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         jRadioButtonBestReplicates = new JRadioButton();
         jRadioButtonMeanReplicates = new JRadioButton();
 
-        step4Panel = new JPanel();
+        JPanel step4Panel = new JPanel();
         step4Panel.setPreferredSize( new Dimension( 550, 280 ) );
         step4LeftPanel.setPreferredSize( new Dimension( 200, 160 ) );
         jPanel17.setBackground( SystemColor.control );

@@ -21,27 +21,27 @@ import classScore.GeneSetPvalRun;
  * @version $Id$
  */
 public class SaveWizardStep1 extends WizardStep {
-    SaveWizard wiz;
-    LinkedList rundata;
-    JPanel runPanel;
-    JComboBox runComboBox;
-    JLabel runLabel;
-    BorderLayout borderLayout;
-    boolean runs_exist;
+    private SaveWizard wiz = null;
+    private LinkedList rundata = null;
+    private JPanel runPanel = null;
+    private JComboBox runComboBox = null;
+    private JLabel runLabel = null;
+
+    boolean runs_exist = false;
 
     public SaveWizardStep1( SaveWizard wiz, LinkedList rundata ) {
         super( wiz );
         this.wiz = wiz;
         this.rundata = rundata;
+        this.jbInit();
         showChoices();
         wiz.clearStatus();
     }
 
     // Component initialization
-    protected void jbInit() throws Exception {
+    protected void jbInit() {
         runPanel = new JPanel();
-        borderLayout = new BorderLayout();
-        runPanel.setLayout( borderLayout );
+        runPanel.setLayout( new BorderLayout() );
         JPanel topPanel = new JPanel();
         runLabel = new JLabel();
         runLabel.setText( "Choose the analysis to save:" );

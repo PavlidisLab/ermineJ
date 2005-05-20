@@ -32,19 +32,16 @@ import classScore.Settings;
  */
 
 public class GeneSetWizardStep1 extends WizardStep {
-    GeneSetWizard wiz;
-    Settings settings;
-    JButton browseButton;
-    JTextField classFile;
-    JFileChooser chooser;
+    private JButton browseButton;
+    private JTextField classFile;
+    private JFileChooser chooser;
     int inputMethod;
 
     public GeneSetWizardStep1( GeneSetWizard wiz, Settings settings ) {
         super( wiz );
-        this.wiz = wiz;
-        this.settings = settings;
+        this.jbInit();
         chooser = new JFileChooser();
-        chooser.setCurrentDirectory( new File( settings.getClassFolder() ) );
+        chooser.setCurrentDirectory( new File( settings.getUserGeneSetDirectory() ) );
         chooser.setDialogTitle( "Choose Gene Set File" );
         wiz.clearStatus();
     }

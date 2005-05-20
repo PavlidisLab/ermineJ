@@ -24,7 +24,7 @@ import javax.swing.table.AbstractTableModel;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
-import classScore.data.NewGeneSet;
+import classScore.data.UserDefinedGeneSetManager;
 
 /**
  * <hr>
@@ -37,22 +37,20 @@ import classScore.data.NewGeneSet;
 
 public class GeneSetWizardStep2 extends WizardStep {
 
-    private GeneSetWizard wiz;
-    private GeneAnnotations geneData;
-    private JLabel countLabel;
-    private JTable probeTable;
-    private JTable newClassTable;
-    private AbstractTableModel ncTableModel;
-    private NewGeneSet newGeneSet;
-    private JTextField searchTextField;
+    private GeneAnnotations geneData = null;
+    private JTable probeTable = null;
+    private JTable newClassTable = null;
+    private AbstractTableModel ncTableModel = null;
+    private UserDefinedGeneSetManager newGeneSet = null;
+    private JTextField searchTextField = null;
 
     private final static int COL0WIDTH = 80;
     private final static int COL1WIDTH = 80;
     private final static int COL2WIDTH = 200;
 
-    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData, NewGeneSet newGeneSet ) {
+    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData, UserDefinedGeneSetManager newGeneSet ) {
         super( wiz );
-        this.wiz = wiz;
+        this.jbInit();
         this.geneData = geneData;
         this.newGeneSet = newGeneSet;
         wiz.clearStatus();

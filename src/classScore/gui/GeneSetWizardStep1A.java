@@ -19,7 +19,7 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
-import classScore.data.NewGeneSet;
+import classScore.data.UserDefinedGeneSetManager;
 
 /**
  * <hr>
@@ -33,18 +33,17 @@ import classScore.data.NewGeneSet;
 
 public class GeneSetWizardStep1A extends WizardStep {
 
-    GeneSetWizard wiz;
-    GeneAnnotations geneData;
-    GONames goData;
-    NewGeneSet newGeneSet;
-    NewGeneSet oldGeneSet;
-    JTable oldClassTable;
-    JTextField searchTextField;
+    private GeneAnnotations geneData = null;;
+    private GONames goData = null;;
+    private UserDefinedGeneSetManager newGeneSet = null;;
+    private UserDefinedGeneSetManager oldGeneSet = null;;
+    private JTable oldClassTable = null;;
+    private JTextField searchTextField = null;;
 
-    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, GONames goData, NewGeneSet newGeneSet,
-            NewGeneSet oldGeneSet ) {
+    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, GONames goData,
+            UserDefinedGeneSetManager newGeneSet, UserDefinedGeneSetManager oldGeneSet ) {
         super( wiz );
-        this.wiz = wiz;
+        this.jbInit();
         this.geneData = geneData;
         this.goData = goData;
         this.newGeneSet = newGeneSet;

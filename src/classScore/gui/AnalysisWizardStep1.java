@@ -23,14 +23,15 @@ import classScore.Settings;
  */
 
 public class AnalysisWizardStep1 extends WizardStep {
-    AnalysisWizard wiz;
-    Settings settings;
-    JRadioButton oraButton;
-    JRadioButton resampButton;
-    JRadioButton corrButton;
+    private AnalysisWizard wiz;
+    private Settings settings;
+    private JRadioButton oraButton;
+    private JRadioButton resampButton;
+    private JRadioButton corrButton;
 
     public AnalysisWizardStep1( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
+        this.jbInit();
         this.wiz = wiz;
         this.settings = settings;
         setValues();

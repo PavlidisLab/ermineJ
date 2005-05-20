@@ -23,7 +23,7 @@ import baseCode.bio.geneset.GONames;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import classScore.Settings;
-import classScore.data.NewGeneSet;
+import classScore.data.UserDefinedGeneSetManager;
 
 /**
  * <p>
@@ -44,28 +44,26 @@ import classScore.data.NewGeneSet;
  */
 
 public class AnalysisWizardStep3 extends WizardStep {
-    AnalysisWizard wiz;
-    Settings settings;
-    GONames goData;
-    AnalysisWizardStep3_CustomClassList customClasses;
-    AbstractTableModel ccTableModel;
-    JTable customClassTable;
-    HashMap ccHash;
-    AnalysisWizardStep3_CustomClassList addedClasses;
-    HashMap acHash;
-    JTable addedClassTable;
-    AbstractTableModel acTableModel;
-    JLabel countLabel;
+
+    private Settings settings;
+
+    private AnalysisWizardStep3_CustomClassList customClasses;
+    private AbstractTableModel ccTableModel;
+    private JTable customClassTable;
+    private Map ccHash;
+    private AnalysisWizardStep3_CustomClassList addedClasses;
+    private Map acHash;
+    private JTable addedClassTable;
+    private AbstractTableModel acTableModel;
+    private JLabel countLabel;
 
     public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings, GONames goData ) {
         super( wiz );
-        this.wiz = wiz;
+        this.jbInit();
         this.settings = settings;
-        this.goData = goData;
         wiz.clearStatus();
         makeLeftTable();
         makeRightTable();
-
     }
 
     // Component initialization
@@ -195,7 +193,7 @@ public class AnalysisWizardStep3 extends WizardStep {
     }
 
     void makeLeftTable() {
-        File dir = new File( settings.getClassFolder() );
+        File dir = new File( settings.getUserGeneSetDirectory() );
         if ( dir.exists() ) {
             String[] classFiles = dir.list( new AnalysisWizardStep3_ClassFileFilter( "-class.txt" ) );
             customClasses = new AnalysisWizardStep3_CustomClassList();
@@ -204,7 +202,7 @@ public class AnalysisWizardStep3 extends WizardStep {
                 File classFile = new File( dir.getPath(), classFiles[i] );
                 Map cfi = null;
                 try {
-                    cfi = NewGeneSet.getClassFileInfo( classFile.getAbsolutePath() );
+                    cfi = UserDefinedGeneSetManager.getGeneSetFileInfo( classFile.getAbsolutePath() );
                 } catch ( IOException e ) {
                     GuiUtil.error( "Error reading class files info." );
                 }

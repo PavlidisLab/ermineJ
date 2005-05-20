@@ -8,7 +8,7 @@ import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
 import classScore.Settings;
-import classScore.data.NewGeneSet;
+import classScore.data.UserDefinedGeneSetManager;
 
 /**
  * <hr>
@@ -30,8 +30,8 @@ public class GeneSetWizard extends Wizard {
     int step;
     boolean makenew;
     boolean nostep1 = false;
-    NewGeneSet newGeneSet;
-    NewGeneSet oldGeneSet;
+    UserDefinedGeneSetManager newGeneSet;
+    UserDefinedGeneSetManager oldGeneSet;
     String cid;
 
     public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData, boolean makenew ) {
@@ -41,8 +41,8 @@ public class GeneSetWizard extends Wizard {
         this.geneData = geneData;
         this.goData = goData;
         this.makenew = makenew;
-        newGeneSet = new NewGeneSet( geneData );
-        oldGeneSet = new NewGeneSet( geneData );
+        newGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
+        oldGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
 
         geneData.resetSelectedProbes();
         step = 1;
@@ -72,8 +72,8 @@ public class GeneSetWizard extends Wizard {
         this.cid = cid;
         makenew = false;
         nostep1 = true;
-        newGeneSet = new NewGeneSet( geneData );
-        oldGeneSet = new NewGeneSet( geneData );
+        newGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
+        oldGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
         this.setTitle( "Modify Gene Set - Step 2 of 3" );
         step = 2;
         backButton.setEnabled( false );
@@ -100,7 +100,7 @@ public class GeneSetWizard extends Wizard {
             if ( makenew || step1A.isReady() ) { // not (case 3 with no class picked)
                 if ( makenew && step1.getInputMethod() == 1 ) { // case 2, load from file
                     try {
-                        newGeneSet.loadClassFile( step1.getLoadFile() );
+                        newGeneSet.loadUserGeneSet( step1.getLoadFile() );
                     } catch ( IOException e1 ) {
                         GuiUtil.error( "Error loading class files info." );
                     }
@@ -193,22 +193,32 @@ public class GeneSetWizard extends Wizard {
         String id = newGeneSet.getId();
         if ( id.compareTo( "" ) == 0 ) {
             showError( "The gene set ID must be specified." );
-        } else if ( geneData.geneSetExists( id ) && makenew ) {
-            showError( "A gene set with the ID " + id + " already exists." );
-        } else {
-            if ( makenew || !newGeneSet.modified() )
-                newGeneSet.addToMaps( goData );
-            else {
-                if ( newGeneSet.compare( oldGeneSet ) != 0 ) newGeneSet.modifyClass( goData );
-            }
-            try {
-                newGeneSet.saveClass( settings.getClassFolder(), 0 );
-            } catch ( IOException e1 ) {
-                GuiUtil.error( "Error writing the new gene set to file:", e1 );
-            }
-            ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
-            ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
-            dispose();
+            return;
         }
+
+        if ( geneData.geneSetExists( id ) && makenew ) {
+            showError( "A gene set with the ID " + id + " already exists." );
+            return;
+        }
+
+        if ( newGeneSet.getDesc() == null || newGeneSet.getDesc().length() == 0 ) {
+            newGeneSet.setDesc( "No description given" );
+        }
+
+        if ( makenew || !newGeneSet.modified() ) {
+            newGeneSet.addToMaps( goData );
+        } else {
+            if ( newGeneSet.compare( oldGeneSet ) != 0 ) newGeneSet.modifyClass( goData );
+        }
+
+        try {
+            newGeneSet.saveGeneSet( 0 );
+        } catch ( IOException e1 ) {
+            GuiUtil.error( "Error writing the new gene set to file:", e1 );
+        }
+        ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
+        ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
+        dispose();
+
     }
 }

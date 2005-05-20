@@ -15,7 +15,7 @@ import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
-import classScore.data.NewGeneSet;
+import classScore.data.UserDefinedGeneSetManager;
 
 /**
  * <hr>
@@ -189,10 +189,10 @@ public class AnalysisWizard extends Wizard {
         Iterator it = step3.getAddedClasses().iterator();
         while ( it.hasNext() ) {
             String id = ( String ) ( ( HashMap ) it.next() ).get( "id" );
-            if ( !goData.newSet( id ) ) {
-                NewGeneSet newGeneSet = new NewGeneSet( geneData );
-                String filename = NewGeneSet.getFileName( settings.getClassFolder(), id );
-                newGeneSet.loadClassFile( filename );
+            if ( !goData.isUserDefined( id ) ) {
+                UserDefinedGeneSetManager newGeneSet = new UserDefinedGeneSetManager( geneData, settings, id );
+                String filename = newGeneSet.getUserGeneSetFileForName( id );
+                newGeneSet.loadUserGeneSet( filename );
                 newGeneSet.addToMaps( goData );
             }
         }

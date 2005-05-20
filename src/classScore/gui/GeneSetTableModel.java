@@ -119,7 +119,7 @@ public class GeneSetTableModel extends AbstractTableModel {
                 case 0: {
                     List cid_vec = new Vector();
                     cid_vec.add( classid );
-                    if ( goData.newSet( classid ) ) cid_vec.add( "M" );
+                    if ( goData.isUserDefined( classid ) ) cid_vec.add( "M" );
                     return cid_vec;
                 }
                 case 1:
@@ -164,11 +164,11 @@ public class GeneSetTableModel extends AbstractTableModel {
  *  
  */
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
-    private Format nf = new Format( "%g" ); // for the gene set p value.
+    private Format nf = new Format( "%.3g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 
-    GONames goData;
-    List results;
+    private GONames goData;
+    private List results;
 
     public OutputPanelTableCellRenderer( GONames goData, List results ) {
         super();
@@ -201,8 +201,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             setOpaque( true );
         else if ( value == null )
             setOpaque( false );
-        else if ( column == 0 && goData.newSet( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
-            setBackground( Colors.PINK );
+        else if ( column == 0 && goData.isUserDefined( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
+            setBackground( Colors.LIGHTYELLOW );
         } else if ( value.getClass().equals( ArrayList.class ) ) {
             String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
             GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
@@ -210,13 +210,13 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             if ( data.containsKey( classid ) ) {
                 GeneSetResult res = ( GeneSetResult ) data.get( classid );
                 if ( res.getPvalue_corr() < 0.001 ) {
-                    setBackground( Colors.LIGHTBLUE1 );
+                    setBackground( Colors.LIGHTRED1 );
                 } else if ( res.getPvalue_corr() < 0.01 ) {
-                    setBackground( Colors.LIGHTBLUE2 );
+                    setBackground( Colors.LIGHTRED2 );
                 } else if ( res.getPvalue_corr() < 0.05 ) {
-                    setBackground( Colors.LIGHTBLUE3 );
+                    setBackground( Colors.LIGHTRED3 );
                 } else if ( res.getPvalue_corr() < 0.1 ) {
-                    setBackground( Colors.LIGHTBLUE5 );
+                    setBackground( Colors.LIGHTRED5 );
                 } else {
                     setBackground( Color.WHITE );
                 }

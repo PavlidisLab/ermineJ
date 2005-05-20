@@ -38,7 +38,7 @@ import classScore.Settings;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
+public class GeneSetTablePanel extends GeneSetPanel {
 
     private final static int GENESET_ID_COLUMN_WIDTH = 80;
     private final static int GENESET_NAME_COLUMN_WIDTH = 350;
@@ -208,23 +208,75 @@ public class GeneSetTablePanel extends GeneSetsResultsScrollPane {
         table.getColumnModel().getColumn( 2 ).setPreferredWidth( NUMPROBES_COLUMN_WIDTH );
         table.getColumnModel().getColumn( 3 ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
         table.setDefaultRenderer( Object.class, new OutputPanelTableCellRenderer( goData, results ) );
+        assert geneData != null;
         classColToolTip = new String( "Total classes shown: " + geneData.selectedSets() );
         table.revalidate();
     }
 
     protected MouseListener configurePopupMenu() {
-        OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
-        JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
+        
+        final OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
+        final JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
         modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
-        JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
+        final JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
         htmlMenuItem.addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
-        JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
+        final JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
         findInTreeMenuItem.addActionListener( new OutputPanel_findInTreeMenuItem_actionAdapter( this ) );
+
+        final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
+        deleteGeneSetMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+                String classID = null;
+                classID = sourcePopup.getSelectedItem();
+                deleteGeneSet( classID );
+            }
+        } );
+
         popup.add( htmlMenuItem );
         popup.add( modMenuItem );
         popup.add( findInTreeMenuItem );
-        MouseListener popupListener = new OutputPanel_PopupListener( popup );
+        popup.add( deleteGeneSetMenuItem );
+        MouseListener popupListener = new MouseAdapter() {
+            public void mousePressed( MouseEvent e ) {
+                maybeShowPopup( e );
+            }
+
+            public void mouseReleased( MouseEvent e ) {
+                maybeShowPopup( e );
+            }
+
+            private void maybeShowPopup( MouseEvent e ) {
+                if ( e.isPopupTrigger() ) {
+                    JTable source = ( JTable ) e.getSource();
+                    assert source != null;
+                    int r = source.rowAtPoint( e.getPoint() );
+                    List id = ( Vector ) source.getValueAt( r, 0 );
+                    if ( id != null ) {
+                        assert popup != null;
+                        if ( popup == null ) throw new NullPointerException( "popup is null" );
+                        int row = source.rowAtPoint( e.getPoint() );
+                        String classID = ( String ) ( ( Vector ) source.getValueAt( row, 0 ) ).get( 0 );
+                        assert goData != null;
+                        if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
+                            deleteGeneSetMenuItem.setEnabled( false );
+                            log.debug( "Won't show." );
+                        } else {
+                            deleteGeneSetMenuItem.setEnabled( true );
+                        }
+                        popup.show( e.getComponent(), e.getX(), e.getY() );
+                        popup.setPoint( e.getPoint() );
+                        popup.setSelectedItem( classID );
+                    }
+                }
+            }
+        };
         return popupListener;
+    }
+
+    protected void deleteGeneSet( String classID ) {
+        super.deleteGeneSet( classID );
+        model.fireTableStructureChanged();
     }
 
     void generateToolTip( int runIndex ) {
@@ -401,12 +453,12 @@ class TableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter 
 }
 
 class OutputPanel_findInTreeMenuItem_actionAdapter implements ActionListener {
-    GeneSetsResultsScrollPane adaptee;
+    GeneSetPanel adaptee;
 
     /**
      * @param adaptee
      */
-    public OutputPanel_findInTreeMenuItem_actionAdapter( GeneSetsResultsScrollPane adaptee ) {
+    public OutputPanel_findInTreeMenuItem_actionAdapter( GeneSetPanel adaptee ) {
         super();
         this.adaptee = adaptee;
     }
@@ -435,36 +487,6 @@ class OutputPanel_mouseAdapter extends java.awt.event.MouseAdapter {
             return;
         }
         adaptee.table_mouseReleased( e );
-    }
-}
-
-class OutputPanel_PopupListener extends MouseAdapter {
-    OutputPanelPopupMenu popup;
-
-    OutputPanel_PopupListener( OutputPanelPopupMenu popupMenu ) {
-        popup = popupMenu;
-    }
-
-    public void mousePressed( MouseEvent e ) {
-        maybeShowPopup( e );
-    }
-
-    public void mouseReleased( MouseEvent e ) {
-        maybeShowPopup( e );
-    }
-
-    private void maybeShowPopup( MouseEvent e ) {
-        if ( e.isPopupTrigger() ) {
-            JTable source = ( JTable ) e.getSource();
-            int r = source.rowAtPoint( e.getPoint() );
-            List id = ( Vector ) source.getValueAt( r, 0 );
-            if ( id != null ) {
-                popup.show( e.getComponent(), e.getX(), e.getY() );
-                popup.setPoint( e.getPoint() );
-                int row = source.rowAtPoint( popup.getPoint() );
-                popup.setSelectedItem( ( String ) ( ( Vector ) source.getValueAt( row, 0 ) ).get( 0 ) );
-            }
-        }
     }
 }
 

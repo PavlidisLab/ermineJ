@@ -42,7 +42,7 @@ import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
-import classScore.data.NewGeneSet;
+import classScore.data.UserDefinedGeneSetManager;
 
 /**
  * <hr>
@@ -348,22 +348,41 @@ public class GeneSetScoreFrame extends JFrame {
 
     }
 
-    public void readDataFilesForStartup() throws SAXException, IOException {
+    public void readDataFilesForStartup() {
 
         updateProgress( 10 );
         statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
-        goData = new GONames( settings.getClassFile() );
+
+        try {
+            goData = new GONames( settings.getClassFile() );
+        } catch ( SAXException e ) {
+            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
+                    + "\nIf this problem persists, please contact the software developer. " );
+        } catch ( IOException e ) {
+            GuiUtil.error( "GO reading error during initialization: " + e.getMessage()
+                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+        }
 
         updateProgress( 70 );
         if ( Thread.currentThread().isInterrupted() ) return;
 
         statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-        geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
+
+        try {
+            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
+        } catch ( IOException e ) {
+            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
+                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+        }
+
+        geneDataSets.put( new Integer( "original".hashCode() ), geneData );
 
         updateProgress( 90 );
         if ( Thread.currentThread().isInterrupted() ) return;
 
-        statusMessenger.setStatus( "Reading user-defined gene sets from directory " + settings.getClassFolder() );
+        statusMessenger.setStatus( "Reading user-defined gene sets from directory "
+                + settings.getUserGeneSetDirectory() );
+
         loadUserGeneSets();
 
         // end slow part.
@@ -378,23 +397,26 @@ public class GeneSetScoreFrame extends JFrame {
                     + "Check that the file format is correct.\n" );
         }
 
-        geneDataSets.put( new Integer( "original".hashCode() ), geneData );
-
     }
 
     /**
      * Load the user-defined gene sets.
      */
-    private void loadUserGeneSets() throws IOException {
-        File dir = new File( settings.getClassFolder() );
+    private void loadUserGeneSets() {
+        File dir = new File( settings.getUserGeneSetDirectory() );
         if ( dir.exists() ) {
             String[] classFiles = dir.list();
             for ( int i = 0; i < classFiles.length; i++ ) {
-                String classFile = dir.getAbsolutePath() + System.getProperty( "file.separator" ) + classFiles[i];
-                log.debug( "Loading " + classFile );
-                NewGeneSet ngs = new NewGeneSet( geneData );
-                ngs.loadClassFile( classFile );
-                ngs.addToMaps( goData );
+                String classFile = classFiles[i];
+                UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, null );
+                try {
+                    classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" ) + classFile;
+                    log.debug( "Loading " + classFile );
+                    ngs.loadUserGeneSet( classFile );
+                    ngs.addToMaps( goData );
+                } catch ( IOException e ) {
+                    statusMessenger.setError( "Could not load user-defined class from " + classFile );
+                }
             }
         }
     }
@@ -419,14 +441,6 @@ public class GeneSetScoreFrame extends JFrame {
             mainPanel.remove( progressPanel );
             mainPanel.add( tabs, BorderLayout.CENTER );
             statusMessenger.setStatus( "Ready." );
-
-        } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
-                    + "\nIf this problem persists, please contact the software developer. " );
-
-        } catch ( IOException e ) {
-            GuiUtil.error( "File reading or writing error during initialization: " + e.getMessage()
-                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
 
         } catch ( IllegalArgumentException e ) {
             GuiUtil.error( "Error during initialization: " + e
@@ -640,6 +654,19 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public GeneSetTreePanel getTreePanel() {
         return this.treePanel;
+    }
+
+    /**
+     * @param classID
+     */
+    public void deleteUserGeneSet( String classID ) {
+        UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, classID );
+        if ( ngs.deleteUserGeneSet( classID ) && this.statusMessenger != null ) {
+            statusMessenger.setStatus( "Permanantly deleted " + classID );
+        } else {
+            GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
+                    + settings.getUserGeneSetDirectory() );
+        }
     }
 }
 

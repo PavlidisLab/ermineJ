@@ -24,38 +24,37 @@ import baseCode.gui.WizardStep;
  */
 
 public class SaveWizardStep2 extends WizardStep {
-    SaveWizard wiz;
-    String folder;
-    JFileChooser chooser;
-    JPanel jPanel11;
-    JLabel jLabel3;
-    JTextField saveFile;
-    JButton saveBrowseButton;
+    private SaveWizard wiz = null;
+    private JFileChooser chooser = null;
+    private JTextField saveFile = null;
+    private final String folder;
 
     public SaveWizardStep2( SaveWizard wiz, String folder ) {
         super( wiz );
-        this.wiz = wiz;
         this.folder = folder;
-        chooser.setCurrentDirectory( new File( folder ) );
-        chooser.setApproveButtonText( "OK" );
-        chooser.setDialogTitle( "Save Analysis As:" );
+        this.jbInit();
+        this.wiz = wiz;
+
         wiz.clearStatus();
     }
 
     // Component initialization
     protected void jbInit() {
-        jPanel11 = new JPanel();
+        JPanel jPanel11 = new JPanel();
         jPanel11.setPreferredSize( new Dimension( 330, 50 ) );
         jPanel11.setBackground( SystemColor.control );
-        jLabel3 = new JLabel();
+        JLabel jLabel3 = new JLabel();
         jLabel3.setText( "Save file:" );
         jLabel3.setPreferredSize( new Dimension( 320, 15 ) );
         saveFile = new JTextField();
         saveFile.setPreferredSize( new Dimension( 230, 19 ) );
-        saveBrowseButton = new JButton();
+        JButton saveBrowseButton = new JButton();
         saveBrowseButton.addActionListener( new SaveWizardStep2_saveBrowseButton_actionAdapter( this ) );
         saveBrowseButton.setText( "Browse..." );
         chooser = new JFileChooser();
+        chooser.setCurrentDirectory( new File( folder ) );
+        chooser.setApproveButtonText( "OK" );
+        chooser.setDialogTitle( "Save Analysis As:" );
         jPanel11.add( jLabel3, null );
         jPanel11.add( saveFile, null );
         jPanel11.add( saveBrowseButton, null );
@@ -72,17 +71,6 @@ public class SaveWizardStep2 extends WizardStep {
         int result = chooser.showOpenDialog( this.wiz );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             File f = new File( chooser.getSelectedFile().toString() );
-
-            // this doesn't work.
-            // if ( !f.canWrite() ) {
-            // JOptionPane
-            // .showMessageDialog(
-            // this,
-            // "That file cannot be written to, possibly because it exists and is open by another application or "
-            // + "has read-only permissions.",
-            // "File is not writable", JOptionPane.OK_OPTION );
-            // saveBrowseButton_actionPerformed( null );
-            // }
 
             if ( f.exists() ) {
                 int k = JOptionPane.showConfirmDialog( this, "That file exists. Overwrite?", "File exists",

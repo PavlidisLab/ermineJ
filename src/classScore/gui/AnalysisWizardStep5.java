@@ -36,28 +36,27 @@ import classScore.Settings;
  */
 
 public class AnalysisWizardStep5 extends WizardStep {
-    AnalysisWizard wiz;
-    Settings settings;
-    JPanel step5Panel;
-    JRadioButton jRadioButtonMedian;
-    JRadioButton jRadioButtonMean;
-    JTextField jTextFieldPValueThreshold;
+    private Settings settings;
+    private JPanel step5Panel;
+    private JRadioButton jRadioButtonMedian;
+    private JRadioButton jRadioButtonMean;
+    private JTextField jTextFieldPValueThreshold;
     // JTextField jTextFieldScoreCol;
-    JTextField jTextFieldIterations;
-    JCheckBox jCheckBoxDoLog;
-    JCheckBox jCheckBoxBigIsBetter;
-    JPanel oraPanel;
-    JPanel resampPanel;
-    JPanel corrPanel;
-    JPanel jPanel13;
-    JPanel jPanel16;
-    JPanel subPanel;
+    private JTextField jTextFieldIterations;
+    private JCheckBox jCheckBoxDoLog;
+    private JCheckBox jCheckBoxBigIsBetter;
+    private JPanel oraPanel;
+    private JPanel resampPanel;
+    private JPanel corrPanel;
+    private JPanel jPanel13;
+    private JPanel jPanel16;
+    private JPanel subPanel;
 
     JCheckBox jCheckBoxUseEmpirical;
 
     public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
-        this.wiz = wiz;
+        this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
         setValues();

@@ -106,7 +106,7 @@ public class Settings {
         goldStandardFile = settings.getGoldStandardFile();
         outputFile = settings.getOutputFile();
         dataDirectory = settings.getDataDirectory();
-        classFolder = settings.getClassFolder();
+        classFolder = settings.getUserGeneSetDirectory();
         scoreFile = settings.getScoreFile();
         maxClassSize = settings.getMaxClassSize();
         minClassSize = settings.getMinClassSize();
@@ -155,7 +155,7 @@ public class Settings {
         // make a new file if it was empty.
         if ( preferencesFileName.compareTo( "" ) == 0 ) {
             preferencesFileName = dataDirectory + System.getProperty( "file.separator" ) + "ermineJ.preferences";
-            log.debug( "Determined preferences file " + preferencesFileName);
+            log.debug( "Determined preferences file " + preferencesFileName );
         }
 
         // read the file if we can.
@@ -183,6 +183,7 @@ public class Settings {
                 throw new IOException( "Could not create the class directory at " + classFolder );
             }
         }
+        log.debug( "Custom gene sets directory is " + classFolder );
     }
 
     public Settings( URL resource ) {
@@ -207,12 +208,9 @@ public class Settings {
      * @return
      */
     public boolean determineDataDirectory() {
-        dataDirectory = System.getProperty( "user.dir" ); // directory from which we are running the software. This is not
-        // platform independent so we fall back on the user home directory.
-
-        dataDirectory = dataDirectory.substring( 0, dataDirectory.lastIndexOf( System.getProperty( "file.separator" ) ) ); // up
-        // one
-        // level.
+        dataDirectory = System.getProperty( "user.dir" );
+        dataDirectory = dataDirectory
+                .substring( 0, dataDirectory.lastIndexOf( System.getProperty( "file.separator" ) ) );
 
         dataDirectory = dataDirectory + System.getProperty( "file.separator" ) + "ermineJ.data";
 
@@ -258,7 +256,7 @@ public class Settings {
         return classFile;
     }
 
-    public String getClassFolder() {
+    public String getUserGeneSetDirectory() {
         return classFolder;
     }
 

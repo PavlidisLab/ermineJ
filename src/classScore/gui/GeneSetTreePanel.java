@@ -2,6 +2,7 @@ package classScore.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -47,7 +49,7 @@ import corejava.Format;
  * @author pavlidis
  * @version $Id$
  */
-public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
+public class GeneSetTreePanel extends GeneSetPanel {
 
     private double fdrThreshold = 0.05;
     private static Log log = LogFactory.getLog( GeneSetTreePanel.class.getName() );
@@ -66,7 +68,6 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      * @see classScore.gui.GeneSetsResultsScrollPane#addedNewGeneSet()
      */
     public void addedNewGeneSet() {
-
     }
 
     /*
@@ -224,13 +225,13 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      * @param e
      */
     public void mousePressed( MouseEvent e ) {
-        // TODO Auto-generated method stub
-        if ( e.getButton() == MouseEvent.BUTTON1 ) {
-            // left button
-        } else if ( e.getButton() == MouseEvent.BUTTON3 ) {
-            // right button
-
-        }
+        // // TODO Auto-generated method stub
+        // if ( e.getButton() == MouseEvent.BUTTON1 ) {
+        // // left button
+        // } else if ( e.getButton() == MouseEvent.BUTTON3 ) {
+        // // right button
+        //
+        // }
     }
 
     /**
@@ -359,28 +360,30 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
      */
     private void setRenderer() {
 
-        // Icon openIcon = new ImageIcon(this.getClass().getResource("resources/goOpenIcon.gif"));
-        // Icon closedIcon = new ImageIcon(this.getClass().getResource("resources/goClosedIcon.gif"));
-        // Icon leafIcon = new ImageIcon(this.getClass().getResource("resources/goLeafIcon.gif"));
-
-        Icon openIcon = new ImageIcon( this.getClass().getResource( "resources/Play16.gif" ) );
-        Icon closedIcon = new ImageIcon( this.getClass().getResource( "resources/Play16.gif" ) );
-        Icon leafIcon = new ImageIcon( this.getClass().getResource( "resources/Play16.gif" ) );
-
         BaseCellRenderer rend = new BaseCellRenderer( goData, geneData, results );
         // DefaultTreeCellRenderer rend = new DefaultTreeCellRenderer();
-        rend.setOpenIcon( openIcon );
-        rend.setLeafIcon( leafIcon );
-        rend.setClosedIcon( closedIcon );
+
         this.goTree.setCellRenderer( rend );
     }
 
     protected MouseListener configurePopupMenu() {
+        assert goData != null;
         OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
         JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
         modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
         JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
         htmlMenuItem.addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
+
+        JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
+        deleteGeneSetMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+                String classID = null;
+                classID = sourcePopup.getSelectedItem();
+                deleteGeneSet( classID );
+            }
+        } );
+
         JMenuItem collapseNodeMenuItem = new JMenuItem( "Collapse All" );
         collapseNodeMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -450,6 +453,16 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         this.fdrThreshold = fdrThreshold;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
+     */
+    protected void deleteGeneSet( String classID ) {
+        super.deleteGeneSet( classID );
+        this.removeNode( classID );
+    }
+
     /**
      * @param id
      * @param desc
@@ -462,6 +475,20 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
         goTree.revalidate();
     }
 
+    public void deleteNode( String id ) {
+        GeneSetTreeNode node = ( GeneSetTreeNode ) this.findByGeneSetId( id ).getLastPathComponent();
+        if ( node.getChildCount() != 0 ) {
+            throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
+        }
+        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( node );
+    }
+
+    public void removeNode( String id ) {
+        GeneSetTreeNode gstn = ( GeneSetTreeNode ) this.findByGeneSetId( id ).getLastPathComponent();
+        if ( gstn == null ) return;
+        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( gstn );
+    }
+
     private GeneSetTreeNode getUserNode() {
         return ( GeneSetTreeNode ) this.findByGeneSetId( GONames.USER_DEFINED ).getLastPathComponent();
     }
@@ -470,17 +497,25 @@ public class GeneSetTreePanel extends GeneSetsResultsScrollPane {
 
 class BaseCellRenderer extends DefaultTreeCellRenderer {
 
+    /**
+     * 
+     */
+    private static final String GOOD_CHILD_ICON = "resources/littleDiamond.gif";
+    /**
+     * 
+     */
+    private static final String REGULAR_ICON = "resources/littleSquare.gif";
     private static Log log = LogFactory.getLog( BaseCellRenderer.class.getName() );
     private int currentlySelectedResultSet = -1;
     private GeneAnnotations geneData;
     private final GONames goData;
     private Icon goodChildIcon;
+    private Icon regularIcon;
     private Font italic = new Font( "SansSerif", Font.ITALIC, 11 );
-    private Format nf = new Format( "%g" ); // for the gene set p value.
+    private Format nf = new Format( "%.3g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
     private Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
 
-    private Icon regularIcon;
     private final List results;
     private boolean selected;
 
@@ -490,16 +525,17 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         this.goData = goData;
         this.geneData = geneData;
         nff.setMaximumFractionDigits( 4 );
-        regularIcon = new ImageIcon( this.getClass().getResource( "resources/Play16.gif" ) );
-        goodChildIcon = new ImageIcon( this.getClass().getResource( "resources/Play16-green.gif" ) );
+        this.regularIcon = new ImageIcon( this.getClass().getResource( REGULAR_ICON ) );
+        this.goodChildIcon = new ImageIcon( this.getClass().getResource( GOOD_CHILD_ICON ) );
+        this.setOpenIcon( regularIcon );
+        this.setLeafIcon( regularIcon );
+        this.setClosedIcon( regularIcon );
     }
 
     /**
      * TODO
      * <ul>
      * <li>Make non-searched-for nodes greyed out
-     * <li>Make customized nodes pink.(text color?)
-     * <li>Add the pvalue to each node
      * <li>Tool tip for node.
      * <li>Color node by pvalue.(background color?)
      * <li>Nodes at higher levels that are not significant, but which have significant classes under them, should be
@@ -538,7 +574,6 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         }
 
         displayedText = name;
-
         displayedText = addGeneSetSizeInformation( name, id, displayedText, node );
 
         if ( node.isHasGoodChild() ) {
@@ -558,7 +593,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
                 displayedText = displayedText + " -- p = " + nf.format( pvalue ) + "--" + " effective size = "
                         + result.getEffectiveSize();
                 if ( result.getPvalue_corr() < 0.05 ) {
-                    this.setBackground( Colors.LIGHTBLUE5 );
+                    this.setBackground( Colors.LIGHTRED4 );
                 } else {
                     this.setBackground( Color.WHITE );
                 }

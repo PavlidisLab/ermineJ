@@ -29,16 +29,17 @@ import classScore.Settings;
  */
 public class AnalysisWizardStep2 extends WizardStep {
 
-    AnalysisWizard wiz;
-    Settings settings;
-    JFileChooser chooser = new JFileChooser();
-    JTextField rawFile;
-    JTextField scoreFile;
+    private AnalysisWizard wiz;
+    private Settings settings;
+    private JFileChooser chooser = new JFileChooser();
+    private JTextField rawFile;
+    private JTextField scoreFile;
 
     private JTextField jTextFieldScoreCol;
 
     public AnalysisWizardStep2( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
+        this.jbInit();
         this.wiz = wiz;
         this.settings = settings;
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
