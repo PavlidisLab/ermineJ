@@ -193,9 +193,7 @@
 				<directory>${basedir}/src</directory>
 				<includes>
 					<include>**/*.properties</include>
-					<include>**/logo1small.gif</include>
-					<include>**/Play16.gif</include>
-					<include>**/Play16-green.gif</include>
+					<include>**/*.gif</include>
 				</includes>
 				<excludes>
 					<exclude>**/*.jar</exclude>
