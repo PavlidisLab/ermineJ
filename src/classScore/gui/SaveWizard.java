@@ -4,6 +4,7 @@ import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.gui.GuiUtil;
@@ -23,13 +24,13 @@ public class SaveWizard extends Wizard {
     int step = 1;
     int selected_run;
     GeneSetScoreFrame callingframe;
-    LinkedList rundata;
+    List rundata;
     GONames goData;
     String saveFolder;
     SaveWizardStep1 step1;
     SaveWizardStep2 step2;
 
-    public SaveWizard( GeneSetScoreFrame callingframe, LinkedList rundata, GONames goData ) {
+    public SaveWizard( GeneSetScoreFrame callingframe, List rundata, GONames goData ) {
         super( callingframe, 400, 200 );
         enableEvents( AWTEvent.WINDOW_EVENT_MASK );
         this.callingframe = callingframe;

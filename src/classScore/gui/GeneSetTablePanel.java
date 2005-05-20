@@ -54,7 +54,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     private TableSorter sorter;
     protected JTable table = null;
 
-    public GeneSetTablePanel( GeneSetScoreFrame callingFrame, LinkedList results, Settings settings ) {
+    public GeneSetTablePanel( GeneSetScoreFrame callingFrame, List results, Settings settings ) {
         super( settings, results, callingFrame );
         model = new GeneSetTableModel( results );
         setUpTable();
@@ -131,6 +131,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         col.setIdentifier( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
         ( ( GeneSetPvalRun ) results.get( runIndex ) ).setName( newName );
         model.fireTableStructureChanged();
+        this.callingFrame.updateRunViewMenu();
     }
 
     public void addedNewGeneSet() {
@@ -214,7 +215,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     protected MouseListener configurePopupMenu() {
-        
+
         final OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
         final JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
         modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );

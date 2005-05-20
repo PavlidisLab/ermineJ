@@ -11,11 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,6 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
@@ -83,6 +87,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
     private JMenuItem loadAnalysisMenuItem = new JMenuItem();
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
+    private JMenu runViewMenu = new JMenu();
     private JMenu helpMenu = new JMenu();
     private JMenuItem helpMenuItem = new JMenuItem();
     private JMenuItem aboutMenuItem = new JMenuItem();
@@ -100,7 +105,7 @@ public class GeneSetScoreFrame extends JFrame {
     private StatusViewer statusMessenger;
     private GONames goData;
     private GeneAnnotations geneData = null;
-    private LinkedList results = new LinkedList();
+    private List results = new LinkedList();
 
     private Map geneDataSets;
     private Map rawDataSets;
@@ -114,7 +119,6 @@ public class GeneSetScoreFrame extends JFrame {
     private GeneSetTreePanel treePanel;
 
     private HelpHelper hh;
-    private JMenu resultsSetMenu;
 
     public GeneSetScoreFrame() throws IOException {
         settings = new Settings();
@@ -239,6 +243,16 @@ public class GeneSetScoreFrame extends JFrame {
         findGeneMenuItem.setMnemonic( 'G' );
         findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
 
+        this.runViewMenu.setText( "Results" );
+        runViewMenu.setMnemonic( 'R' );
+        runViewMenu.setEnabled( false );
+        // runViewMenu.addActionListener( new ActionListener() {
+        // public void actionPerformed( ActionEvent e ) {
+        // log.debug( "runViewMenu touched" );
+        // updateRunViewMenu();
+        // }
+        // } );
+
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
         classMenu.add( findClassMenuItem );
@@ -286,14 +300,38 @@ public class GeneSetScoreFrame extends JFrame {
         jMenuBar1.add( fileMenu );
         jMenuBar1.add( classMenu );
         jMenuBar1.add( analysisMenu );
-        // jMenuBar1.add(resultsSetMenu);
+        jMenuBar1.add( runViewMenu );
         jMenuBar1.add( helpMenu );
+    }
+
+    /**
+     * 
+     */
+    protected void updateRunViewMenu() {
+        log.debug( "Updating runViewMenu" );
+        runViewMenu.removeAll();
+        for ( Iterator iter = this.results.iterator(); iter.hasNext(); ) {
+            GeneSetPvalRun resultSet = ( GeneSetPvalRun ) iter.next();
+            String name = resultSet.getName();
+            log.debug( "Adding " + name );
+            JMenuItem newSet = new JMenuItem();
+            newSet.setIcon( new ImageIcon( this.getClass().getResource( "resources/noCheckBox.gif" ) ) );
+            newSet.addActionListener( new RunSet_Choose_ActionAdapter( this ) );
+            newSet.setText( name );
+            this.runViewMenu.add( newSet );
+        }
+        if ( runViewMenu.getItemCount() > 0 ) {
+            runViewMenu.getItem( runViewMenu.getItemCount() - 1 ).setIcon(
+                    new ImageIcon( this.getClass().getResource( "resources/checkBox.gif" ) ) );
+        }
+        runViewMenu.revalidate();
     }
 
     private void enableMenusOnStart() {
         fileMenu.setEnabled( true );
         classMenu.setEnabled( true );
         analysisMenu.setEnabled( true );
+        runViewMenu.setEnabled( false );
         helpMenu.setEnabled( true );
     }
 
@@ -321,8 +359,8 @@ public class GeneSetScoreFrame extends JFrame {
 
         if ( results.size() > 0 ) {
             saveAnalysisMenuItem.setEnabled( true );
+            runViewMenu.setEnabled( true );
         }
-
         cancelAnalysisMenuItem.setEnabled( false );
     }
 
@@ -538,6 +576,7 @@ public class GeneSetScoreFrame extends JFrame {
         if ( result == null || result.getResults().size() == 0 ) return;
         result.setName( "Run " + ( results.size() + 1 ) );
         results.add( result );
+        this.updateRunViewMenu();
         oPanel.addRun();
         treePanel.addRun();
         athread = null;
@@ -667,6 +706,21 @@ public class GeneSetScoreFrame extends JFrame {
                     + settings.getUserGeneSetDirectory() );
         }
     }
+
+    /**
+     * @param resultSetName
+     */
+    public void chooseResultSetToShow( String resultSetName ) {
+        log.debug( "Chose " + resultSetName );
+        this.treePanel.setCurrentlySelectedGeneSet( resultSetName );
+    }
+
+    /**
+     * @return
+     */
+    public JMenu getRunViewMenu() {
+        return this.runViewMenu;
+    }
 }
 
 // //////////////////////////////////////////////////////////////////////////////
@@ -778,6 +832,44 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements java.awt.e
 
     public void actionPerformed( ActionEvent e ) {
         adaptee.saveAnalysisMenuItem_actionPerformed();
+    }
+}
+
+class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
+    private static Log log = LogFactory.getLog( RunSet_Choose_ActionAdapter.class.getName() );
+    GeneSetScoreFrame adaptee;
+
+    /**
+     * @param adaptee
+     */
+    public RunSet_Choose_ActionAdapter( GeneSetScoreFrame adaptee ) {
+        super();
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        JMenuItem source = ( JMenuItem ) e.getSource();
+        source.setIcon( new ImageIcon( this.getClass().getResource( "resources/checkBox.gif" ) ) );
+        source.setSelected( true );
+        String resultSetName = source.getText();
+        clearOtherMenuItems( source, resultSetName );
+        adaptee.chooseResultSetToShow( resultSetName );
+    }
+
+    /**
+     * clear icon for other menu items.
+     * 
+     * @param source
+     * @param resultSetName
+     */
+    private void clearOtherMenuItems( JMenuItem source, String resultSetName ) {
+        JMenu rvm = adaptee.getRunViewMenu();
+        for ( int i = 0; i < rvm.getItemCount(); i++ ) {
+            JMenuItem jmi = rvm.getItem( i );
+            if ( !jmi.getText().equals( resultSetName ) ) {
+                jmi.setIcon( new ImageIcon( this.getClass().getResource( "resources/noCheckBox.gif" ) ) );
+            }
+        }
     }
 }
 

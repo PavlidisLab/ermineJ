@@ -14,7 +14,7 @@ import baseCode.dataStructure.graph.DirectedGraphNode;
  */
 public class GeneSetTreeNode extends DefaultMutableTreeNode {
     private boolean hasGoodChild = false;
-    private boolean hasUsableChild = true;
+    private boolean hasUsableChild = false;
 
     public GeneSetTreeNode( DirectedGraphNode root ) {
         super( root );
@@ -23,7 +23,7 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
     /**
      * @return Returns the hasGoodChild.
      */
-    public boolean isHasGoodChild() {
+    public boolean hasGoodChild() {
         return this.hasGoodChild;
     }
 
@@ -37,7 +37,7 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
     /**
      * @return Returns the hasUsableChild.
      */
-    public boolean isHasUsableChild() {
+    public boolean hasUsableChild() {
         return this.hasUsableChild;
     }
 

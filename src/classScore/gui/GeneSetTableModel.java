@@ -44,7 +44,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     private GONames goData;
     private List results;
 
-    public GeneSetTableModel( LinkedList results ) {
+    public GeneSetTableModel( List results ) {
         this.results = results;
         columnNames.add( "Name" );
         columnNames.add( "Description" );

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -22,14 +23,14 @@ import classScore.GeneSetPvalRun;
  */
 public class SaveWizardStep1 extends WizardStep {
     private SaveWizard wiz = null;
-    private LinkedList rundata = null;
+    private List rundata = null;
     private JPanel runPanel = null;
     private JComboBox runComboBox = null;
     private JLabel runLabel = null;
 
     boolean runs_exist = false;
 
-    public SaveWizardStep1( SaveWizard wiz, LinkedList rundata ) {
+    public SaveWizardStep1( SaveWizard wiz, List rundata ) {
         super( wiz );
         this.wiz = wiz;
         this.rundata = rundata;
