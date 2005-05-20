@@ -125,8 +125,8 @@ public abstract class GeneSetPanel extends JScrollPane {
         if ( classID == null ) return;
         if ( !goData.isUserDefined( classID ) ) return;
 
-        int yesno = JOptionPane.showConfirmDialog( this,
-                "Are you sure you want to permanently delete " + classID + "?", "Confirm", JOptionPane.YES_NO_OPTION );
+        int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to permanently delete \"" + classID
+                + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
 
         if ( yesno == JOptionPane.NO_OPTION ) return;
         geneData.removeClassFromMaps( classID );
