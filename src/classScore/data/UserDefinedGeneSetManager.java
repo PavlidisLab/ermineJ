@@ -19,9 +19,13 @@ import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.FileTools;
+import classScore.Settings;
 
 /**
  * <hr>
@@ -29,21 +33,28 @@ import baseCode.util.FileTools;
  * Copyright (c) 2004 Columbia University
  * 
  * @author Homin K Lee
+ * @author Paul Pavlidis
  * @version $Id$
  */
-public class NewGeneSet {
+public class UserDefinedGeneSetManager {
+
+    private static Log log = LogFactory.getLog( UserDefinedGeneSetManager.class.getName() );
     protected GeneAnnotations geneData;
     private String id = "";
     private String desc = "";
     List probes;
     private boolean modifiedGS = false;
+    private Settings settings;
+    private static final String USERGENESET_SUFFIX = "-class.txt";
 
-    public NewGeneSet( GeneAnnotations geneData ) {
+    public UserDefinedGeneSetManager( GeneAnnotations geneData, Settings settings, String geneSetId ) {
         this.geneData = geneData;
+        this.settings = settings;
+        this.id = geneSetId;
         probes = new ArrayList();
     }
 
-    public int compare( NewGeneSet comparee ) {
+    public int compare( UserDefinedGeneSetManager comparee ) {
         int idcomp = comparee.getId().compareTo( id );
         if ( idcomp != 0 ) return idcomp;
         int desccomp = comparee.getDesc().compareTo( desc );
@@ -138,10 +149,10 @@ public class NewGeneSet {
      * @param file which stores the probes or genes.
      * @throws IOException
      */
-    public void loadClassFile( String file ) throws IOException {
+    public void loadUserGeneSet( String fileName ) throws IOException {
         clear();
-        FileTools.checkPathIsReadableFile( file );
-        FileInputStream fis = new FileInputStream( file );
+        FileTools.checkPathIsReadableFile( fileName );
+        FileInputStream fis = new FileInputStream( fileName );
         BufferedInputStream bis = new BufferedInputStream( fis );
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         String row;
@@ -179,25 +190,41 @@ public class NewGeneSet {
 
     }
 
-    public static String getFileName( String folder, String id ) {
-        return new String( folder + File.separatorChar + id + "-class.txt" );
-    }
-
-    public void saveClass( String folder, int type ) throws IOException {
-        String fileid = id.replace( ':', '-' );
-        String filedesc = desc.replace( '\n', ' ' );
+    /**
+     * Write a gene set to disk, in the directory set in the preferences.
+     * 
+     * @param type
+     * @throws IOException
+     */
+    public void saveGeneSet( int type ) throws IOException {
+        String cleanedId = cleanGeneSetName();
+        String cleanedDescription = desc.replace( '\n', ' ' );
         String filetype = ( type == 0 ) ? "probe" : "gene";
-        BufferedWriter out = new BufferedWriter( new FileWriter( getFileName( folder, fileid ), false ) );
+        BufferedWriter out = new BufferedWriter( new FileWriter( getUserGeneSetFileForName( cleanedId ), false ) );
         out.write( filetype + "\n" );
         out.write( id + "\n" );
-        out.write( filedesc + "\n" );
+        out.write( cleanedDescription + "\n" );
         for ( Iterator it = probes.iterator(); it.hasNext(); ) {
             out.write( ( String ) it.next() + "\n" );
         }
         out.close();
     }
 
-    public static Map getClassFileInfo( String file ) throws IOException {
+    /**
+     * @return
+     */
+    private String cleanGeneSetName() {
+        String fileid = id.replaceAll( ":", "-" );
+        fileid = fileid.replaceAll( "\\s+", "_" );
+        return fileid;
+    }
+
+    /**
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public static Map getGeneSetFileInfo( String file ) throws IOException {
         Map cinfo = new HashMap();
         FileTools.checkPathIsReadableFile( file );
         FileInputStream fis = new FileInputStream( file );
@@ -260,4 +287,40 @@ public class NewGeneSet {
         return probes;
     }
 
+    /**
+     * @param dir
+     * @param className
+     * @return
+     */
+    public String getUserGeneSetFileForName( String className ) {
+        String classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" )
+                + this.cleanGeneSetName() + USERGENESET_SUFFIX;
+        return classFile;
+    }
+
+    /**
+     * Delete a user-defined gene set from disk.
+     * <p>
+     * FIXME this doesn't handle removing it from the maps.
+     * 
+     * @param ngs
+     */
+    public boolean deleteUserGeneSet( String classID ) {
+        String classFile = this.getUserGeneSetFileForName( classID );
+        File file = new File( classFile );
+        log.debug( "Deleting " + file.getAbsolutePath() );
+        if ( !file.exists() ) {
+            log.error( file.getAbsoluteFile() + " does not exist" );
+        }
+        if ( !file.canWrite() ) {
+            log.error( "Cannot delete " + file.getAbsoluteFile() );
+        }
+        try {
+            return file.delete();
+        } catch ( Exception e ) {
+            log.error( e, e );
+            return false;
+        }
+
+    }
 }
