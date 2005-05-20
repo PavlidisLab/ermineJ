@@ -583,25 +583,31 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         }
 
         if ( currentlySelectedResultSet >= 0 && results.size() >= currentlySelectedResultSet + 1 ) {
-            GeneSetPvalRun res = ( GeneSetPvalRun ) results.get( currentlySelectedResultSet );
-            assert res != null;
-            assert res.getResults() != null;
-            if ( res.getResults().get( id ) != null
-                    && ( ( GeneSetResult ) res.getResults().get( id ) ).getPvalue() < 1.0 ) {
-                GeneSetResult result = ( GeneSetResult ) res.getResults().get( id );
-                double pvalue = result.getPvalue();
-                displayedText = displayedText + " -- p = " + nf.format( pvalue ) + "--" + " effective size = "
-                        + result.getEffectiveSize();
-                double pvalCorr = result.getPvalue_corr();
-                Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
-                this.setBackground( bgColor );
-
-            }
+            displayedText = addResultsFlags( id, displayedText );
         }
-
         this.setText( displayedText );
         return this;
+    }
 
+    /**
+     * @param id
+     * @param displayedText
+     * @return
+     */
+    private String addResultsFlags( String id, String displayedText ) {
+        GeneSetPvalRun res = ( GeneSetPvalRun ) results.get( currentlySelectedResultSet );
+        assert res != null;
+        assert res.getResults() != null;
+        if ( res.getResults().get( id ) != null && ( ( GeneSetResult ) res.getResults().get( id ) ).getPvalue() < 1.0 ) {
+            GeneSetResult result = ( GeneSetResult ) res.getResults().get( id );
+            double pvalue = result.getPvalue();
+            displayedText = displayedText + " -- p = " + nf.format( pvalue ) + "--" + " effective size = "
+                    + result.getEffectiveSize();
+            double pvalCorr = result.getPvalue_corr();
+            Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
+            this.setBackground( bgColor );
+        }
+        return displayedText;
     }
 
     /**
