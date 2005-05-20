@@ -540,12 +540,11 @@ public class GeneSetScoreFrame extends JFrame {
         results.add( result );
         oPanel.addRun();
         treePanel.addRun();
+        athread = null;
     }
 
     public void startAnalysis( Settings runSettings ) {
         disableMenusForAnalysis();
-
-        assert athread == null : "Analysis running already!     ";
         this.athread = new AnalysisThread( runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
                 geneScoreSets );
         log.debug( "Starting analysis thread" );

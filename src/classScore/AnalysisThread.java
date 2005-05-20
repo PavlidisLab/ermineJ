@@ -175,7 +175,6 @@ public class AnalysisThread extends Thread {
                 log.debug( "Cancelled" );
             }
             messenger.setStatus( "Ready" );
-            return;
         } catch ( Exception e ) {
             stop = true;
             showError( e );
