@@ -46,7 +46,7 @@ public class AboutBox extends JDialog implements ActionListener {
     private static final int PREFERRED_WIDTH = 450;
     // todo: make this version number a resource.
     // / InputStream is = this.getClass().getResourceAsStream("resources/version");
-    private final static String VERSION = "2.0.5";
+    private final static String VERSION = "2.1RC2";
     private final static String COPYRIGHT = "Copyright (c) 2002-2005 Columbia University";
     private static final String SOFTWARENAME = "ermineJ";
 
