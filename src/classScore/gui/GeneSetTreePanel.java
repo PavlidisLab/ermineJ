@@ -14,11 +14,13 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
 
 import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
@@ -382,7 +384,41 @@ public class GeneSetTreePanel extends GeneSetPanel {
         popup.add( deleteGeneSetMenuItem );
         popup.add( collapseNodeMenuItem );
         popup.add( expandNodeMenuItem );
-        MouseListener popupListener = new GeneSetTree_PopupListener( popup );
+        MouseListener popupListener = new GeneSetTree_PopupListener( popup );//////////
+//MouseListener popupListener = new MouseAdapter() {
+//            public void mousePressed( MouseEvent e ) {
+//                maybeShowPopup( e );
+//            }
+//
+//            public void mouseReleased( MouseEvent e ) {
+//                maybeShowPopup( e );
+//            }
+//
+//            private void maybeShowPopup( MouseEvent e ) {
+//                if ( e.isPopupTrigger() ) {
+//                    JTable source = ( JTable ) e.getSource();
+//                    assert source != null;
+//                    int r = source.rowAtPoint( e.getPoint() );
+//                    List id = ( Vector ) source.getValueAt( r, 0 );
+//                    if ( id != null ) {
+//                        assert popup != null;
+//                        if ( popup == null ) throw new NullPointerException( "popup is null" );
+//                        int row = source.rowAtPoint( e.getPoint() );
+//                        String classID = ( String ) ( ( Vector ) source.getValueAt( row, 0 ) ).get( 0 );
+//                        assert goData != null;
+//                        if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
+//                            deleteGeneSetMenuItem.setEnabled( false );
+//                            log.debug( "Won't show." );
+//                        } else {
+//                            deleteGeneSetMenuItem.setEnabled( true );
+//                        }
+//                        popup.show( e.getComponent(), e.getX(), e.getY() );
+//                        popup.setPoint( e.getPoint() );
+//                        popup.setSelectedItem( classID );
+//                    }
+//                }
+//            }
+//        };
         return popupListener;
     }
 
@@ -427,9 +463,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
      */
-    protected void deleteGeneSet( String classID ) {
-        super.deleteGeneSet( classID );
-        this.removeNode( classID );
+    protected boolean deleteGeneSet( String classID ) {
+        if ( super.deleteGeneSet( classID ) ) {
+            this.removeNode( classID );
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -449,6 +488,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     public void deleteNode( String id ) {
+        assert id != null;
         GeneSetTreeNode node = ( GeneSetTreeNode ) this.findByGeneSetId( id ).getLastPathComponent();
         if ( node.getChildCount() != 0 ) {
             throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
@@ -457,6 +497,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     public void removeNode( String id ) {
+        assert id != null;
         log.debug( "Removing tree node " + id );
         TreePath path = this.findByGeneSetId( id );
         if ( path == null ) return;

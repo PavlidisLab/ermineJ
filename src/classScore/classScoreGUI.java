@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
@@ -41,8 +42,12 @@ public class classScoreGUI {
         frame.disableMenusForLoad();
         frame.setVisible( true );
         frame.showStatus( "Waiting for startup dialog box" );
+        frame.setIconImage( new ImageIcon( this.getClass().getResource( "gui/resources/logoIcon64.gif" ) ).getImage() );
         StartupDialog sdlog = new StartupDialog( frame );
+        sdlog.setModal( true );
+        sdlog.setResizable( true );
         sdlog.showDialog();
+
         frame.showStatus( "Starting up..." );
     }
 

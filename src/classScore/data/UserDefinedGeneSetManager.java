@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -144,35 +145,98 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Add a new gene set to the GeneData
+     * Read in a list of genes from a file. The list of genes is unadorned, one per row.
      * 
-     * @param file which stores the probes or genes.
+     * @param fileName
      * @throws IOException
      */
-    public void loadUserGeneSet( String fileName ) throws IOException {
+    public void loadPlainGeneList( String fileName ) throws IOException {
+        BufferedReader dis = setUpToLoad( fileName );
+        String row;
+        Collection genes = new ArrayList();
+        while ( ( row = dis.readLine() ) != null ) {
+            if ( row.length() == 0 ) continue;
+            genes.add( row );
+        }
+        dis.close();
+        int ignored = 0;
+        fillInProbes( genes, ignored );
+    }
+
+    /**
+     * @param fileName
+     * @return
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    private BufferedReader setUpToLoad( String fileName ) throws IOException, FileNotFoundException {
         clear();
         FileTools.checkPathIsReadableFile( fileName );
         FileInputStream fis = new FileInputStream( fileName );
         BufferedInputStream bis = new BufferedInputStream( fis );
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
-        String row;
+        return dis;
+    }
+
+    /**
+     * @param genes
+     * @param ignored
+     * @return
+     */
+    private void fillInProbes( Collection genes, int ignored ) {
+        Set probeSet = new HashSet();
+        for ( Iterator it = genes.iterator(); it.hasNext(); ) {
+            String gene = ( ( String ) it.next() ).toUpperCase();
+            if ( geneData.getGeneProbeList( gene ) != null ) {
+                probeSet.addAll( geneData.getGeneProbeList( gene ) );
+            } else {
+                log.info( "Gene " + gene + " not found in the array design" );
+                ignored++;
+            }
+        }
+        probes = new ArrayList( probeSet );
+        if ( ignored > 0 ) {
+            log.info( ignored + " items skipped because they are not in the array design." );
+        }
+    }
+
+    /**
+     * Add a user-defined gene set to the GeneData. The format is:
+     * <ol>
+     * <li>The type of gene set {gene|probe}
+     * <li>The identifier for the gene set, e.g, "My gene set"
+     * <li>The description for the gene set, e.g, "Genes I like"
+     * <li>Any number of rows containing gene or probe identifiers.
+     * </ol>
+     * 
+     * @param file which stores the probes or genes.
+     * @throws IOException
+     */
+    public void loadUserGeneSet( String fileName ) throws IOException {
+        BufferedReader dis = setUpToLoad( fileName );
         Collection genes = new ArrayList();
-        String type = new String( "" );
+        String type = "";
+
         boolean isGenes = true;
+        String row;
         while ( ( row = dis.readLine() ) != null ) {
-            if ( type.compareTo( "" ) == 0 ) {
+            if ( type.length() == 0 ) {
                 type = row;
-                if ( type.compareTo( "probe" ) == 0 ) {
+                if ( type.equalsIgnoreCase( "probe" ) ) {
                     isGenes = false;
-                } else if ( type.compareTo( "gene" ) == 0 ) {
+                } else if ( type.equalsIgnoreCase( "gene" ) ) {
                     isGenes = true;
+                } else {
+                    throw new IOException( "Unknown data type. File must start with 'probe' or 'gene'" );
                 }
-            } else if ( id.compareTo( "" ) == 0 ) {
+            } else if ( id.length() == 0 ) {
                 id = row;
-            } else if ( desc.compareTo( "" ) == 0 ) {
+            } else if ( desc.length() == 0 ) {
                 desc = row;
             } else {
                 if ( !isGenes ) {
+                    if ( geneData.getProbeGeneName( row ) != null )
+                        log.info( "Probe " + row + " not found in array design" );
                     probes.add( row );
                 } else {
                     genes.add( row );
@@ -180,12 +244,9 @@ public class UserDefinedGeneSetManager {
             }
         }
         dis.close();
+        int ignored = 0;
         if ( isGenes ) {
-            Set probeSet = new HashSet();
-            for ( Iterator it = genes.iterator(); it.hasNext(); ) {
-                probeSet.addAll( geneData.getGeneProbeList( ( String ) it.next() ) );
-            }
-            probes = new ArrayList( probeSet );
+            fillInProbes( genes, ignored );
         }
 
     }

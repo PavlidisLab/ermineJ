@@ -276,13 +276,17 @@ public class GeneSetTablePanel extends GeneSetPanel {
         return popupListener;
     }
 
-    protected void deleteGeneSet( String classID ) {
+    protected boolean deleteGeneSet( String classID ) {
         log.debug( "Deleting gene set from table" );
-        super.deleteGeneSet( classID );
-        // model.fireTableStructureChanged();
-        sorter.cancelSorting();
-        sorter.setSortingStatus( 0, TableSorter.ASCENDING );
-        table.revalidate();
+        if ( super.deleteGeneSet( classID ) ) {
+            // model.fireTableStructureChanged();
+            sorter.cancelSorting();
+            sorter.setSortingStatus( 0, TableSorter.ASCENDING );
+            table.revalidate();
+            return true;
+        }
+        return false;
+
     }
 
     void generateToolTip( int runIndex ) {

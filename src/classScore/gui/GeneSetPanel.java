@@ -121,17 +121,18 @@ public abstract class GeneSetPanel extends JScrollPane {
         }
     }
 
-    protected void deleteGeneSet( String classID ) {
-        if ( classID == null ) return;
-        if ( !goData.isUserDefined( classID ) ) return;
+    protected boolean deleteGeneSet( String classID ) {
+        if ( classID == null ) return false;
+        if ( !goData.isUserDefined( classID ) ) return false;
 
         int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to permanently delete \"" + classID
                 + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
 
-        if ( yesno == JOptionPane.NO_OPTION ) return;
+        if ( yesno == JOptionPane.NO_OPTION ) return false;
         geneData.removeClassFromMaps( classID );
         goData.deleteGeneSet( classID );
         callingFrame.deleteUserGeneSet( classID );
+        return true;
     }
 }
 

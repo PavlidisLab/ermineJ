@@ -100,28 +100,29 @@ public class GeneSetWizard extends Wizard {
             if ( makenew || step1A.isReady() ) { // not (case 3 with no class picked)
                 if ( makenew && step1.getInputMethod() == 1 ) { // case 2, load from file
                     try {
-                        newGeneSet.loadUserGeneSet( step1.getLoadFile() );
+                        // newGeneSet.loadUserGeneSet( step1.getLoadFile() );
+                        newGeneSet.loadPlainGeneList( step1.getLoadFile() );
                     } catch ( IOException e1 ) {
-                        GuiUtil.error( "Error loading class files info." );
+                        GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
+                                + " the file is readable." );
                     }
                 }
-                if ( !( makenew && step1.getInputMethod() == 1 && // all cases (except case 2 and bad file)
-                newGeneSet.getId().compareTo( "" ) == 0 ) ) {
-                    if ( makenew ) { // cases 1 & 2
-                        this.getContentPane().remove( step1 );
-                        this.setTitle( "Define New Gene Set - Step 2 of 3" );
-                    } else { // case 3
-                        this.getContentPane().remove( step1A );
-                        this.setTitle( "Modify Gene Set - Step 2 of 3" );
-                    }
-                    step = 2;
-                    backButton.setEnabled( true );
-                    finishButton.setEnabled( false );
-                    this.getContentPane().add( step2 );
-                    step2.revalidate();
-                    step2.updateCountLabel();
-                    this.repaint();
+
+                if ( makenew ) { // cases 1 & 2
+                    this.getContentPane().remove( step1 );
+                    this.setTitle( "Define New Gene Set - Step 2 of 3" );
+                } else { // case 3
+                    this.getContentPane().remove( step1A );
+                    this.setTitle( "Modify Gene Set - Step 2 of 3" );
                 }
+                step = 2;
+                backButton.setEnabled( true );
+                finishButton.setEnabled( false );
+                this.getContentPane().add( step2 );
+                step2.revalidate();
+                step2.updateCountLabel();
+                this.repaint();
+
             }
         } else if ( step == 2 ) {
             if ( newGeneSet.getProbes().size() == 0 ) {

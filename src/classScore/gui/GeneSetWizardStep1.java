@@ -49,23 +49,22 @@ public class GeneSetWizardStep1 extends WizardStep {
     // Component initialization
     protected void jbInit() {
         JPanel step1Panel = new JPanel();
-        BorderLayout borderLayout1 = new BorderLayout();
-        step1Panel.setLayout( borderLayout1 );
+        step1Panel.setLayout( new BorderLayout() );
 
         // top
         JPanel jPanel1 = new JPanel();
         JPanel jPanel7 = new JPanel(); // outer method choice
-        GridBagLayout gridBagLayout4 = new GridBagLayout();
-        jPanel7.setLayout( gridBagLayout4 );
+   
+        jPanel7.setLayout(  new GridBagLayout() );
         JLabel jLabel8 = new JLabel(); // 'choose method'
         jLabel8.setText( "Choose the method of data entry:" );
         jLabel8.setMaximumSize( new Dimension( 999, 15 ) );
         jLabel8.setMinimumSize( new Dimension( 259, 15 ) );
         jLabel8.setPreferredSize( new Dimension( 259, 15 ) );
-        GridBagLayout gridBagLayout1 = new GridBagLayout();
+       
         JPanel jPanel4 = new JPanel(); // holds radio buttons
         jPanel4.setBorder( BorderFactory.createEtchedBorder() );
-        jPanel4.setLayout( gridBagLayout1 );
+        jPanel4.setLayout( new GridBagLayout() );
         JRadioButton fileInputButton = new JRadioButton();
         fileInputButton.setBackground( SystemColor.control );
         fileInputButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
@@ -102,14 +101,14 @@ public class GeneSetWizardStep1 extends WizardStep {
         JPanel jPanel2 = new JPanel(); // holds file chooser
         jPanel2.setPreferredSize( new Dimension( 354, 100 ) );
         browseButton = new JButton();
-        browseButton.setText( "Browse...." );
+        browseButton.setText( "Browse..." );
         browseButton.addActionListener( new GeneSetWizardStep1_browseButton_actionAdapter( this ) );
         browseButton.setEnabled( false );
         classFile = new JTextField();
         classFile.setEditable( false );
         classFile.setPreferredSize( new Dimension( 230, 19 ) );
-        classFile.setToolTipText( "File containing class members" );
-        classFile.setText( "File containing class members" );
+        classFile.setToolTipText( "File containing gene set members" );
+        classFile.setText( "File containing gene set members" );
         jPanel2.add( browseButton, null );
         jPanel2.add( classFile, null );
 
