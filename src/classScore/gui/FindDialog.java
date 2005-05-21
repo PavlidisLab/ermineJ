@@ -115,8 +115,16 @@ public class FindDialog extends JDialog {
 
     void cancelButton_actionPerformed( ActionEvent e ) {
         geneData.resetSelectedSets();
-        callingframe.getOPanel().resetView();
+        resetViews();
         dispose();
+    }
+
+    /**
+     * 
+     */
+    protected void resetViews() {
+        callingframe.getOPanel().resetView();
+        callingframe.getTreePanel().resetView();
     }
 
     void findActionPerformed() {
@@ -130,8 +138,7 @@ public class FindDialog extends JDialog {
         }
 
         statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
-
-        callingframe.getOPanel().resetView();
+        resetViews();
 
     }
 
@@ -141,7 +148,7 @@ public class FindDialog extends JDialog {
 
         statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
 
-        callingframe.getOPanel().resetView();
+        resetViews();
     }
 
 }

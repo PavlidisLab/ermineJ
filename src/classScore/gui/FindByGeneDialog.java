@@ -4,10 +4,10 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 
 /**
- * 
- *
  * <hr>
- * <p>Copyright (c) 2004-2005 Columbia University
+ * <p>
+ * Copyright (c) 2004-2005 Columbia University
+ * 
  * @author pavlidis
  * @version $Id$
  */
@@ -22,7 +22,7 @@ public class FindByGeneDialog extends FindDialog {
         super( callingframe, geneData, goData );
         this.setTitle( "Find Gene Set using a gene or probe symbol" );
     }
-    
+
     void findActionPerformed() {
         String searchOn = searchTextField.getText();
         statusMessenger.setStatus( "Searching '" + searchOn + "'" );
@@ -34,8 +34,7 @@ public class FindByGeneDialog extends FindDialog {
         }
 
         statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
-
-        callingframe.getOPanel().resetView();
+        resetViews();
 
     }
 

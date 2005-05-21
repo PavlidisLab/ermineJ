@@ -129,10 +129,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     public void hasGoodChild( GeneSetTreeNode node ) {
         DirectedGraphNode n = ( DirectedGraphNode ) node.getUserObject();
+        GeneSetResult result = null;
         if ( currentResultSet == null ) {
             node.setHasGoodChild( false );
+        } else {
+            result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
         }
-        GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
         GeneSetTreeNode parent = ( GeneSetTreeNode ) node.getParent();
         if ( parent != null && ( ( result != null && result.getPvalue_corr() < fdrThreshold ) || node.hasGoodChild() ) ) {
             parent.setHasGoodChild( true );
@@ -231,6 +233,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     public void resetView() {
         updateNodeStyles();
+        goTree.revalidate();
+        goTree.repaint();
     }
 
     /**
@@ -399,9 +403,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
             this.currentResultSet = ( GeneSetPvalRun ) results.get( this.currentlySelectedResultSetIndex );
             log.debug( "Fire change to " + callingFrame.getCurrentResultSet() + " run" );
         }
-        updateNodeStyles();
-        goTree.revalidate();
-        goTree.repaint();
+        resetView();
     }
 
     /**
@@ -557,6 +559,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             this.setIcon( regularIcon );
         }
 
+        this.setBackground( Color.WHITE );
         if ( currentlySelectedResultSet >= 0 && results.size() >= currentlySelectedResultSet + 1 ) {
             displayedText = addResultsFlags( node, id, displayedText );
         }
