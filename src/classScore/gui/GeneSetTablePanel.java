@@ -277,6 +277,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     protected void deleteGeneSet( String classID ) {
+        log.debug( "Deleting gene set from table" );
         super.deleteGeneSet( classID );
         model.fireTableStructureChanged();
     }

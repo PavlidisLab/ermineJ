@@ -193,6 +193,7 @@ public class GeneSetWizardStep2 extends WizardStep {
     void addGene( String gene ) {
         Collection probelist = geneData.getGeneProbeList( gene );
         if ( probelist != null ) {
+            log.debug( "Got " + probelist.size() + " new probes to add" );
             newGeneSet.getProbes().addAll( probelist );
             ncTableModel.fireTableDataChanged();
             updateCountLabel();

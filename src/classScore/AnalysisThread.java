@@ -137,7 +137,7 @@ public class AnalysisThread extends Thread {
     public synchronized GeneSetPvalRun getLatestResults() {
         log.debug( "Status: " + latestResults );
         while ( !stop && this.latestResults == null ) {
-            log.debug( "Still waiting for results..." );
+         //   log.debug( "Still waiting for results..." );
             try {
                 wait( 100 );
             } catch ( InterruptedException e ) {

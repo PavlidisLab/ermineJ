@@ -12,6 +12,7 @@ import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -158,6 +159,15 @@ public class GeneSetTableModel extends AbstractTableModel {
         this.geneData = origGeneData;
         this.goData = origGoData;
     }
+
+//    /**
+//     * @param classID
+//     */
+//    public void removeGeneSet( String classID ) {
+//        this.geneData.removeClassFromMaps( classID );
+//        this.goData.deleteGeneSet( classID );
+//        this.fireTableDataChanged();
+//    }
 }
 
 /**
