@@ -146,7 +146,7 @@ public class GeneSetScoreFrame extends JFrame {
         this.setJMenuBar( jMenuBar1 );
         this.setSize( new Dimension( 886, 450 ) );
         this.setTitle( "ErmineJ" );
-        this.setIconImage( new ImageIcon( this.getClass().getResource( "resources/logoIcon12.gif" ) ).getImage() );
+        this.setIconImage( new ImageIcon( this.getClass().getResource( "resources/logoIcon64.gif" ) ).getImage() );
         mainPanel.setLayout( new BorderLayout() );
         mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
         mainPanel.setInputVerifier( null );
