@@ -31,6 +31,7 @@ import javax.swing.tree.TreePath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import baseCode.bio.GOEntry;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.graph.DirectedGraphNode;
@@ -431,14 +432,18 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
+     * Add a new node to the graph under the user-defined group.
+     * 
      * @param id
      * @param desc
      */
     public void addNode( String id, String desc ) {
-        DirectedGraphNode dgn = new DirectedGraphNode( id, desc, goData.getGraph() );
-        GeneSetTreeNode gstn = new GeneSetTreeNode( dgn );
+        DirectedGraphNode newNode = new DirectedGraphNode( id, new GOEntry( id, desc, desc, "No aspect defined" ),
+                goData.getGraph() );
+        GeneSetTreeNode newTreeNode = new GeneSetTreeNode( newNode );
         GeneSetTreeNode userNode = getUserNode();
-        ( ( DefaultTreeModel ) this.goTree.getModel() ).insertNodeInto( gstn, userNode, userNode.getChildCount() );
+        ( ( DefaultTreeModel ) this.goTree.getModel() )
+                .insertNodeInto( newTreeNode, userNode, userNode.getChildCount() );
         goTree.revalidate();
     }
 
