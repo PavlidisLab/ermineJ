@@ -40,7 +40,6 @@ public class classScoreGUI {
         GuiUtil.centerFrame( frame );
         frame.disableMenusForLoad();
         frame.setVisible( true );
-
         frame.showStatus( "Waiting for startup dialog box" );
         StartupDialog sdlog = new StartupDialog( frame );
         sdlog.showDialog();

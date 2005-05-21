@@ -12,7 +12,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import baseCode.bio.geneset.GeneAnnotations;
@@ -63,7 +62,6 @@ public class StartupDialog extends AppDialog {
     private void jbInit() {
 
         chooser = new JFileChooser( settings.getDataDirectory() );
-
         this.addWindowListener( new StartupDialog_this_windowAdapter( this ) );
 
         annotFileFormatLabel.setText( "Annotation file format" );
@@ -126,22 +124,6 @@ public class StartupDialog extends AppDialog {
     }
 
     private void saveValues() {
-
-        // // if we don't have the data folder, use the location of these files.
-        // if ( settings.getDataFolder() == null ) {
-        // settings.setDataFolder( classFile.getText().substring(
-        // 0,
-        // classFile.getText().lastIndexOf(
-        // System.getProperty( "file.separator" ) ) ) );
-        // }
-        //      
-        // if ( settings.getClassFolder() == null ) {
-        // settings.setClassFolder( classFile.getText().substring(
-        // 0,
-        // classFile.getText().lastIndexOf(
-        // System.getProperty( "file.separator" ) ) ) + System.getProperty("file.separator" + "geneSets"));
-        // }
-
         settings.setClassFile( classFile.getText() );
         settings.setAnnotFile( annotFile.getText() );
         settings.setAnnotFormat( ( String ) annotFormat.getSelectedItem() );
