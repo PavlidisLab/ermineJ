@@ -379,6 +379,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         } );
         popup.add( htmlMenuItem );
         popup.add( modMenuItem );
+        popup.add( deleteGeneSetMenuItem );
         popup.add( collapseNodeMenuItem );
         popup.add( expandNodeMenuItem );
         MouseListener popupListener = new GeneSetTree_PopupListener( popup );
@@ -456,7 +457,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     public void removeNode( String id ) {
-        GeneSetTreeNode gstn = ( GeneSetTreeNode ) this.findByGeneSetId( id ).getLastPathComponent();
+        log.debug( "Removing tree node " + id );
+        TreePath path = this.findByGeneSetId( id );
+        if ( path == null ) return;
+        GeneSetTreeNode gstn = ( GeneSetTreeNode ) path.getLastPathComponent();
         if ( gstn == null ) return;
         ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( gstn );
     }

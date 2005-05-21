@@ -728,7 +728,7 @@ public class GeneSetScoreFrame extends JFrame {
             GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
                     + settings.getUserGeneSetDirectory() );
         }
-        treePanel.removeNode( classID );
+        treePanel.removeNode( classID ); // fixme - this results in a duplicate call.
     }
 
     /**
