@@ -279,7 +279,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
     protected void deleteGeneSet( String classID ) {
         log.debug( "Deleting gene set from table" );
         super.deleteGeneSet( classID );
-        model.fireTableStructureChanged();
+        // model.fireTableStructureChanged();
+        sorter.cancelSorting();
+        sorter.setSortingStatus( 0, TableSorter.ASCENDING );
+        table.revalidate();
     }
 
     void generateToolTip( int runIndex ) {

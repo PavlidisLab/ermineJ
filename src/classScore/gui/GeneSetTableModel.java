@@ -159,15 +159,6 @@ public class GeneSetTableModel extends AbstractTableModel {
         this.geneData = origGeneData;
         this.goData = origGoData;
     }
-
-//    /**
-//     * @param classID
-//     */
-//    public void removeGeneSet( String classID ) {
-//        this.geneData.removeClassFromMaps( classID );
-//        this.goData.deleteGeneSet( classID );
-//        this.fireTableDataChanged();
-//    }
 }
 
 /**
