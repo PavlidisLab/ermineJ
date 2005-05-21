@@ -7,6 +7,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -114,11 +116,11 @@ public class GeneSetScoreFrame extends JFrame {
     private JLabel logoLabel;
 
     private AnalysisThread athread;
-    JPanel loadingPanel = new JPanel();
-    FlowLayout flowLayout1 = new FlowLayout();
+    private JPanel loadingPanel = new JPanel();
     private GeneSetTreePanel treePanel;
 
     private HelpHelper hh;
+    private int currentResultSet;
 
     public GeneSetScoreFrame() throws IOException {
         settings = new Settings();
@@ -144,8 +146,7 @@ public class GeneSetScoreFrame extends JFrame {
         this.setJMenuBar( jMenuBar1 );
         this.setSize( new Dimension( 886, 450 ) );
         this.setTitle( "ErmineJ" );
-        BorderLayout borderLayout1 = new BorderLayout();
-        mainPanel.setLayout( borderLayout1 );
+        mainPanel.setLayout( new BorderLayout() );
         mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
         mainPanel.setInputVerifier( null );
         progInPanel.setBackground( Color.white );
@@ -161,7 +162,7 @@ public class GeneSetScoreFrame extends JFrame {
         logoLabel.setIcon( new ImageIcon( GeneSetScoreFrame.class.getResource( "resources/logo1small.gif" ) ) );
 
         progressPanel = new JPanel();
-        progressPanel.setLayout( flowLayout1 );
+        progressPanel.setLayout( new FlowLayout() );
 
         JLabel label = new JLabel( "Please wait while the files are loaded in." );
         label.setPreferredSize( new Dimension( 500, 30 ) );
@@ -187,6 +188,24 @@ public class GeneSetScoreFrame extends JFrame {
         treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
         tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
+        tabs.addMouseListener( new MouseListener() {
+
+            public void mouseClicked( MouseEvent e ) {
+            }
+
+            public void mouseEntered( MouseEvent e ) {
+            }
+
+            public void mouseExited( MouseEvent e ) {
+            }
+
+            public void mousePressed( MouseEvent e ) {
+            }
+
+            public void mouseReleased( MouseEvent e ) {
+                maybeEnableRunViewMenu();
+            }
+        } );
         tabs.addTab( "Table", oPanel );
         tabs.addTab( "Tree", treePanel );
 
@@ -246,12 +265,6 @@ public class GeneSetScoreFrame extends JFrame {
         this.runViewMenu.setText( "Results" );
         runViewMenu.setMnemonic( 'R' );
         runViewMenu.setEnabled( false );
-        // runViewMenu.addActionListener( new ActionListener() {
-        // public void actionPerformed( ActionEvent e ) {
-        // log.debug( "runViewMenu touched" );
-        // updateRunViewMenu();
-        // }
-        // } );
 
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
@@ -356,12 +369,20 @@ public class GeneSetScoreFrame extends JFrame {
         modClassMenuItem.setEnabled( true );
         runAnalysisMenuItem.setEnabled( true );
         loadAnalysisMenuItem.setEnabled( true );
-
-        if ( results.size() > 0 ) {
-            saveAnalysisMenuItem.setEnabled( true );
-            runViewMenu.setEnabled( true );
-        }
+        maybeEnableRunViewMenu();
+        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
         cancelAnalysisMenuItem.setEnabled( false );
+    }
+
+    /**
+     * 
+     */
+    private void maybeEnableRunViewMenu() {
+        if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
+            runViewMenu.setEnabled( true );
+        } else {
+            runViewMenu.setEnabled( false );
+        }
     }
 
     public void updateProgress( int val ) {
@@ -676,7 +697,7 @@ public class GeneSetScoreFrame extends JFrame {
      * @return
      */
     public int getCurrentResultSet() {
-        return this.getOPanel().getCurrentResultSet();
+        return this.currentResultSet;
     }
 
     /**
@@ -710,9 +731,13 @@ public class GeneSetScoreFrame extends JFrame {
     /**
      * @param resultSetName
      */
-    public void chooseResultSetToShow( String resultSetName ) {
-        log.debug( "Chose " + resultSetName );
-        this.treePanel.setCurrentlySelectedGeneSet( resultSetName );
+    public void setCurrentResultSet( String resultSetName ) {
+        for ( int i = 0; i < results.size(); i++ ) {
+            GeneSetPvalRun element = ( GeneSetPvalRun ) results.get( i );
+            if ( element.getName().equals( resultSetName ) ) {
+                this.setCurrentResultSet( i );
+            }
+        }
     }
 
     /**
@@ -720,6 +745,14 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public JMenu getRunViewMenu() {
         return this.runViewMenu;
+    }
+
+    /**
+     * @param runIndex
+     */
+    public void setCurrentResultSet( int runIndex ) {
+        this.currentResultSet = runIndex;
+        treePanel.fireResultsChanged();
     }
 }
 
@@ -852,8 +885,8 @@ class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
         source.setIcon( new ImageIcon( this.getClass().getResource( "resources/checkBox.gif" ) ) );
         source.setSelected( true );
         String resultSetName = source.getText();
-        clearOtherMenuItems( source, resultSetName );
-        adaptee.chooseResultSetToShow( resultSetName );
+        clearOtherMenuItems( resultSetName );
+        adaptee.setCurrentResultSet( resultSetName );
     }
 
     /**
@@ -862,7 +895,7 @@ class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
      * @param source
      * @param resultSetName
      */
-    private void clearOtherMenuItems( JMenuItem source, String resultSetName ) {
+    private void clearOtherMenuItems( String resultSetName ) {
         JMenu rvm = adaptee.getRunViewMenu();
         for ( int i = 0; i < rvm.getItemCount(); i++ ) {
             JMenuItem jmi = rvm.getItem( i );

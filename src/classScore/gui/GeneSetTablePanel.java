@@ -163,6 +163,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         sorter.setSortingStatus( c, TableSorter.ASCENDING );
         if ( results.size() > 3 ) table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
         currentResultSetIndex = results.size() - 1;
+        this.callingFrame.setCurrentResultSet( currentResultSetIndex );
         table.revalidate();
     }
 
@@ -348,28 +349,14 @@ public class GeneSetTablePanel extends GeneSetPanel {
         if ( yesno == JOptionPane.YES_OPTION ) {
             log.debug( "remove popup for col: " + currentColumnIndex );
             int runIndex = model.getRunIndex( currentColumnIndex );
+            assert runIndex >= 0;
             table.removeColumn( col );
             model.removeRunData( currentColumnIndex );
             model.fireTableStructureChanged();
-
-            if ( runIndex < 0 )
-                throw new IllegalStateException( "Runindex was not found for column " + currentColumnIndex );
+            callingFrame.setCurrentResultSet( runIndex );
 
             // FIXME deletion of corresponding GeneAnnotations when remove is used, if there is a copy made.
-            results.remove( runIndex );
-
-            int treeRunSelected = callingFrame.getTreePanel().getCurrentlySelectedResultSetIndex();
-            if ( treeRunSelected >= 1 && results.size() > 0 ) {
-                log.debug( "Setting tree to show results " + ( treeRunSelected - 1 ) );
-                callingFrame.getTreePanel().setCurrentlySelectedResultSetIndex( treeRunSelected - 1 );
-                callingFrame.getTreePanel().setCurrentResultSet( ( GeneSetPvalRun ) results.get( treeRunSelected - 1 ) );
-            } else {
-                log.debug( "No results, resetting tree" );
-                callingFrame.getTreePanel().setCurrentlySelectedResultSetIndex( -1 );
-                callingFrame.getTreePanel().setCurrentResultSet( null );
-            }
-            callingFrame.getTreePanel().updateNodeStyles();
-
+            results.remove( runIndex ); // This should be done by the parent.
             resultToolTips.remove( runIndex );
             table.revalidate();
         }

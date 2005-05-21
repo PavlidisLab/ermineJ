@@ -58,6 +58,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     protected String currentlySelectedGeneSet = null;
     protected int currentlySelectedResultSetIndex = -1;
     private BaseCellRenderer rend;
+    private String currentlySelectedResultSet;
 
     public GeneSetTreePanel( GeneSetScoreFrame callingFrame, List results, Settings settings ) {
         super( settings, results, callingFrame );
@@ -87,7 +88,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         log.debug( "Updating nodes" );
         try {
             goData.getGraph().unmarkAll();
-            visitAllNodes( goTree, this.getClass().getMethod( "hasGoodPValue", new Class[] { GeneSetTreeNode.class } ) );
+            visitAllNodes( goTree, this.getClass().getMethod( "hasGoodChild", new Class[] { GeneSetTreeNode.class } ) );
             goData.getGraph().unmarkAll();
             visitAllNodes( goTree, this.getClass().getMethod( "hasUsableChildren",
                     new Class[] { GeneSetTreeNode.class } ) );
@@ -126,34 +127,23 @@ public class GeneSetTreePanel extends GeneSetPanel {
     /**
      * @param id
      */
-    public void hasGoodPValue( GeneSetTreeNode node ) {
+    public void hasGoodChild( GeneSetTreeNode node ) {
         DirectedGraphNode n = ( DirectedGraphNode ) node.getUserObject();
-        // if ( n.isVisited() ) return;
-        // n.mark();
         if ( currentResultSet == null ) {
             node.setHasGoodChild( false );
-        } else {
-            GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
-            if ( result != null && result.getPvalue_corr() < fdrThreshold ) {
-                node.setHasGoodChild( true );
-            }
         }
-
+        GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
         GeneSetTreeNode parent = ( GeneSetTreeNode ) node.getParent();
-        if ( parent != null && node.hasGoodChild() ) {
+        if ( parent != null && ( ( result != null && result.getPvalue_corr() < fdrThreshold ) || node.hasGoodChild() ) ) {
             parent.setHasGoodChild( true );
-            hasGoodPValue( parent );
+            hasGoodChild( parent );
         }
-
     }
 
     /**
      * @return
      */
     public void hasUsableChildren( GeneSetTreeNode node ) {
-        // DirectedGraphNode n = ( DirectedGraphNode ) node.getUserObject();
-        // if ( n.isVisited() ) return;
-        // n.mark();
         for ( int i = 0; i < node.getChildCount(); i++ ) {
             GeneSetTreeNode child = ( GeneSetTreeNode ) node.getChildAt( i );
             String id = ( String ) ( ( DirectedGraphNode ) child.getUserObject() ).getKey();
@@ -225,6 +215,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     public void mouseReleased( MouseEvent e ) {
         if ( e.getClickCount() < 2 ) {
+            return;
+        }
+
+        if ( !( e.getSource() instanceof GeneSetTreeNode ) ) {
             return;
         }
         showDetailsForGeneSet( -1, this.currentlySelectedGeneSet );
@@ -394,26 +388,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * @param currentlySelectedGeneSet The currentlySelectedGeneSet to set.
-     */
-    public void setCurrentlySelectedGeneSet( String currentlySelectedGeneSet ) {
-        log.debug( "Switching to " + currentlySelectedGeneSet );
-        this.currentlySelectedGeneSet = currentlySelectedGeneSet;
-        for ( int i = 0; i < results.size(); i++ ) {
-            GeneSetPvalRun r = ( GeneSetPvalRun ) results.get( i );
-            if ( r.getName().equals( currentlySelectedGeneSet ) ) {
-                this.currentlySelectedResultSetIndex = i;
-                this.updateNodeStyles();
-                return;
-            }
-        }
-        fireResultsChanged();
-    }
-
-    /**
      * 
      */
-    private void fireResultsChanged() {
+    public void fireResultsChanged() {
         log.debug( "Changing results" );
         if ( callingFrame != null && this.goTree != null ) {
             currentlySelectedResultSetIndex = callingFrame.getCurrentResultSet();
@@ -424,30 +401,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
         updateNodeStyles();
         goTree.revalidate();
-    }
-
-    /**
-     * @return Returns the currentlySelectedResultSetIndex.
-     */
-    public int getCurrentlySelectedResultSetIndex() {
-        return this.currentlySelectedResultSetIndex;
-    }
-
-    /**
-     * @param currentlySelectedResultSetIndex The currentlySelectedResultSetIndex to set.
-     */
-    public void setCurrentlySelectedResultSetIndex( int currentlySelectedResultSetIndex ) {
-        this.currentlySelectedResultSetIndex = currentlySelectedResultSetIndex;
-        this.currentlySelectedGeneSet = ( ( GeneSetPvalRun ) results.get( currentlySelectedResultSetIndex ) ).getName();
-
-    }
-
-    /**
-     * @param resultSet
-     */
-    public void setCurrentResultSet( GeneSetPvalRun resultSet ) {
-        this.currentResultSet = resultSet;
-        fireResultsChanged();
+        goTree.repaint();
     }
 
     /**
@@ -512,16 +466,30 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      * 
      */
     private static final String GOOD_CHILD_ICON = "resources/littleDiamond.gif";
+
     /**
      * 
      */
     private static final String REGULAR_ICON = "resources/littleSquare.gif";
+
+    /**
+     * 
+     */
+    private static final String GOODPVAL_ICON = "resources/goldCircle.gif";
+
+    /**
+     * 
+     */
+    private static final String GOODPVAL_GOODCHILD_ICON = "resources/goldCirclePurpleDot.gif";
+
     private static Log log = LogFactory.getLog( BaseCellRenderer.class.getName() );
     private int currentlySelectedResultSet = -1;
     private GeneAnnotations geneData;
     private final GONames goData;
     private Icon goodChildIcon;
     private Icon regularIcon;
+    private Icon goodPvalueIcon;
+    private Icon goodPvalueGoodChildIcon;
     private Font italic = new Font( "SansSerif", Font.ITALIC, 11 );
     private Format nf = new Format( "%.3g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
@@ -538,6 +506,8 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         nff.setMaximumFractionDigits( 4 );
         this.regularIcon = new ImageIcon( this.getClass().getResource( REGULAR_ICON ) );
         this.goodChildIcon = new ImageIcon( this.getClass().getResource( GOOD_CHILD_ICON ) );
+        this.goodPvalueIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_ICON ) );
+        goodPvalueGoodChildIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_GOODCHILD_ICON ) );
         this.setOpenIcon( regularIcon );
         this.setLeafIcon( regularIcon );
         this.setClosedIcon( regularIcon );
@@ -588,7 +558,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         }
 
         if ( currentlySelectedResultSet >= 0 && results.size() >= currentlySelectedResultSet + 1 ) {
-            displayedText = addResultsFlags( id, displayedText );
+            displayedText = addResultsFlags( node, id, displayedText );
         }
         this.setText( displayedText );
 
@@ -604,7 +574,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      * @param displayedText
      * @return
      */
-    private String addResultsFlags( String id, String displayedText ) {
+    private String addResultsFlags( GeneSetTreeNode node, String id, String displayedText ) {
         GeneSetPvalRun res = ( GeneSetPvalRun ) results.get( currentlySelectedResultSet );
         assert res != null;
         assert res.getResults() != null;
@@ -616,6 +586,13 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             double pvalCorr = result.getPvalue_corr();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             this.setBackground( bgColor );
+            if ( pvalCorr < 0.1 ) {
+                if ( node.hasGoodChild() ) {
+                    this.setIcon( this.goodPvalueGoodChildIcon );
+                } else {
+                    this.setIcon( goodPvalueIcon );
+                }
+            }
         } else {
             this.setBackground( Color.WHITE );
         }
@@ -628,7 +605,9 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     public void setCurrentResultSet( int currentlySelectedResultSet ) {
         log.debug( "Setting results to " + currentlySelectedResultSet );
         this.currentlySelectedResultSet = currentlySelectedResultSet;
+        this.validate();
         this.revalidate();
+        this.repaint();
     }
 
     /**
