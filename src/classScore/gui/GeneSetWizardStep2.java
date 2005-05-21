@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -147,7 +148,9 @@ public class GeneSetWizardStep2 extends WizardStep {
         int n = newClassTable.getSelectedRowCount();
         int[] rows = newClassTable.getSelectedRows();
         for ( int i = 0; i < n; i++ ) {
-            newGeneSet.getProbes().remove( newClassTable.getValueAt( rows[i] - i, 0 ) );
+            Object probe = newClassTable.getValueAt( rows[i] - i, 0 );
+            log.debug( "Removing " + probe );
+            newGeneSet.getProbes().remove( probe );
         }
         ncTableModel.fireTableDataChanged();
         updateCountLabel();
@@ -157,14 +160,15 @@ public class GeneSetWizardStep2 extends WizardStep {
         int n = probeTable.getSelectedRowCount();
         int[] rows = probeTable.getSelectedRows();
         for ( int i = 0; i < n; i++ ) {
-            // newGeneSet.probes.add(probeTable.getValueAt(rows[i], 0)); (for just
-            // deleting probes)
+            String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
+            log.debug( "Got probe: " + probe );
             String newGene;
-            if ( ( newGene = geneData.getProbeGeneName( ( String ) probeTable.getValueAt( rows[i], 0 ) ) ) != null ) {
+            if ( ( newGene = geneData.getProbeGeneName( probe ) ) != null ) {
+                log.debug( "Adding " + newGene );
                 addGene( newGene );
             }
         }
-        HashSet noDupes = new HashSet( newGeneSet.getProbes() );
+        Set noDupes = new HashSet( newGeneSet.getProbes() );
         newGeneSet.getProbes().clear();
         newGeneSet.getProbes().addAll( noDupes );
         ncTableModel.fireTableDataChanged();

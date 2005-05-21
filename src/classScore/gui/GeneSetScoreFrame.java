@@ -213,12 +213,13 @@ public class GeneSetScoreFrame extends JFrame {
         // controls
 
         // status bar
+        jPanelStatus.setLayout( new BorderLayout() );
         jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
         jPanelStatus.setPreferredSize( new Dimension( STARTING_OVERALL_WIDTH, 33 ) );
         jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
         jLabelStatus.setPreferredSize( new Dimension( 800, 19 ) );
         jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
-        jPanelStatus.add( jLabelStatus, null );
+        jPanelStatus.add( jLabelStatus, BorderLayout.WEST );
         showStatus( "This window is not usable until you confirm the startup settings in the dialog box." );
         statusMessenger = new StatusJlabel( jLabelStatus );
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
