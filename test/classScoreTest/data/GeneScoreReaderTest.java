@@ -9,7 +9,7 @@ import junit.framework.TestCase;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.RegressionTesting;
 import classScore.Settings;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 
 /**
  * <hr>
@@ -23,7 +23,7 @@ import classScore.data.GeneScoreReader;
 public class GeneScoreReaderTest extends TestCase {
     InputStream is = null;
     InputStream ism = null;
-    GeneScoreReader test = null;
+    GeneScores test = null;
 
     /*
      * @see TestCase#setUp()
@@ -39,7 +39,7 @@ public class GeneScoreReaderTest extends TestCase {
         Map gpm = g.getGeneSetToProbeMap();
         Map pgm = g.getProbeToGeneMap();
 
-        test = new GeneScoreReader( is, s, null, gpm, pgm );
+        test = new GeneScores( is, s, null, gpm, pgm );
         super.setUp();
     }
 
