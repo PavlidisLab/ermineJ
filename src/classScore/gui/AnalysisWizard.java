@@ -13,7 +13,6 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.Wizard;
-import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.UserDefinedGeneSetManager;
 
@@ -55,7 +54,7 @@ public class AnalysisWizard extends Wizard {
         this.addStep( 1, step1 );
         step2 = new AnalysisWizardStep2( this, settings );
         this.addStep( 2, step2 );
-        step3 = new AnalysisWizardStep3( this, settings, goData );
+        step3 = new AnalysisWizardStep3( this, settings );
         this.addStep( 3, step3 );
         step4 = new AnalysisWizardStep4( this, settings );
         this.addStep( 4, step4 );

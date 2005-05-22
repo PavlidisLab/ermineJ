@@ -19,7 +19,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import baseCode.bio.geneset.GONames;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import classScore.Settings;
@@ -57,7 +56,7 @@ public class AnalysisWizardStep3 extends WizardStep {
     private AbstractTableModel acTableModel;
     private JLabel countLabel;
 
-    public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings, GONames goData ) {
+    public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
         this.jbInit();
         this.settings = settings;
