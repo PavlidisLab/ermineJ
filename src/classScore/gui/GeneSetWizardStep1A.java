@@ -28,9 +28,7 @@ import classScore.data.UserDefinedGeneSetManager;
  * 
  * @author Homin Lee
  * @version $Id$
- * @todo 3.0 old table click shows class in status bar, number of probes?
  */
-
 public class GeneSetWizardStep1A extends WizardStep {
 
     private GeneAnnotations geneData = null;;
@@ -54,9 +52,7 @@ public class GeneSetWizardStep1A extends WizardStep {
 
     // Component initialization
     protected void jbInit() {
-
-        BorderLayout borderLayout1 = new BorderLayout();
-        this.setLayout( borderLayout1 );
+        this.setLayout( new BorderLayout() );
 
         JPanel step1MPanel = new JPanel();
         step1MPanel.setLayout( new BorderLayout() );
@@ -81,9 +77,6 @@ public class GeneSetWizardStep1A extends WizardStep {
 
         searchTextField = new JTextField();
         searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
-        // searchTextField
-        // .addKeyListener( new GeneSetWizardStep1A_searchText_keyAdapter(
-        // this ) );
 
         searchPanel.add( searchTextField );
 

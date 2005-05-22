@@ -61,8 +61,7 @@ public class GeneSetWizardStep2 extends WizardStep {
 
     // Component initialization
     protected void jbInit() {
-        BorderLayout borderLayout2 = new BorderLayout();
-        this.setLayout( borderLayout2 );
+        this.setLayout( new BorderLayout() );
         JPanel step2Panel;
 
         JPanel topPanel = new JPanel();
@@ -79,12 +78,10 @@ public class GeneSetWizardStep2 extends WizardStep {
         topPanel.add( jLabel2, null );
 
         step2Panel = new JPanel();
-        BorderLayout borderLayout1 = new BorderLayout();
-        step2Panel.setLayout( borderLayout1 );
+        step2Panel.setLayout( new BorderLayout() );
 
         JPanel centerPanel = new JPanel();
-        GridLayout gridLayout1 = new GridLayout();
-        centerPanel.setLayout( gridLayout1 );
+        centerPanel.setLayout( new GridLayout() );
         JScrollPane probeScrollPane;
         JScrollPane newClassScrollPane;
         probeTable = new JTable();
@@ -216,7 +213,9 @@ public class GeneSetWizardStep2 extends WizardStep {
         probeTable.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
 
         ncTableModel = newGeneSet.toTableModel( false );
-        newClassTable.setModel( ncTableModel );
+        TableSorter anotherSorter = new TableSorter( ncTableModel );
+        newClassTable.setModel( anotherSorter );
+        anotherSorter.setTableHeader( newClassTable.getTableHeader() );
         newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
         newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
 

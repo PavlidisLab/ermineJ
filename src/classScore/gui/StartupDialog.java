@@ -88,7 +88,7 @@ public class StartupDialog extends AppDialog {
         annotPanel.add( annotLabel, null );
         annotPanel.add( annotFile, null );
         annotPanel.add( annotBrowseButton, null );
-        annotPanel.add( annotFileFormatLabel, null ); // /////////////////
+        annotPanel.add( annotFileFormatLabel, null );
         annotPanel.add( annotFormat, null );
         classPanel.setPreferredSize( new java.awt.Dimension( 400, 70 ) );
         classLabel.setPreferredSize( new Dimension( 390, 15 ) );
@@ -104,12 +104,13 @@ public class StartupDialog extends AppDialog {
         setActionButtonText( "Start" );
         setCancelButtonText( "Quit" );
         setHelpButtonText( "Help" );
-        addHelp( "<html><b>Starting up the program</b><br>Please confirm "
-                + "the settings below are correct; they cannot be changed during "
-                + "analysis.<p>The probe annotation file you select "
-                + "must match the microarray design you are using. "
-                + "For updated annotation files, visit "
-                + "<a href=\"http://microarray.cpmc.columbia.edu/annots/\">http://microarray.cpmc.columbia.edu/annots</a></html>" );
+        this
+                .addHelp( "<html><head><style type=\"text/css\"> body { font-family:sanserif; font-size:10px} </style></head><b >Starting up the program</b><br>Please confirm "
+                        + "the settings below are correct; they cannot be changed during "
+                        + "analysis.<p>The probe annotation file you select "
+                        + "must match the microarray design you are using. "
+                        + "For updated annotation files, visit "
+                        + "<a href=\"http://microarray.cpmc.columbia.edu/annots/\">http://microarray.cpmc.columbia.edu/annots</a></html>" );
         addMain( centerPanel );
         this.setTitle( "ErmineJ startup" );
 
