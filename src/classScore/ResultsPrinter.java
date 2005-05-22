@@ -5,11 +5,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
@@ -17,46 +21,35 @@ import baseCode.bio.geneset.GeneSetMapTools;
 import classScore.data.GeneSetResult;
 
 /**
- * 
- * 
- *
  * <hr>
- * <p>Copyright (c) 2004-2005 Columbia University
+ * <p>
+ * Copyright (c) 2004-2005 Columbia University
+ * 
  * @author pavlidis
  * @version $Id$
  */
 public class ResultsPrinter {
-
+    private static Log log = LogFactory.getLog( ResultsPrinter.class.getName() );
     protected String destFile;
     protected Vector sortedclasses;
     protected Map results;
     protected GONames goName;
     protected GeneAnnotations geneData;
-
-    /**
-     * @param destFile
-     * @param sortedclasses
-     * @param results
-     * @param goName
-     */
-    public ResultsPrinter( String destFile, Vector sortedclasses, Map results, GONames goName ) {
-        this.destFile = destFile;
-        this.sortedclasses = sortedclasses;
-        this.results = results;
-        this.goName = goName;
-    }
+    private final boolean saveAllGeneNames;
 
     /**
      * @param destFile
      * @param run
      * @param goName
      */
-    public ResultsPrinter( String destFile, GeneSetPvalRun run, GONames goName ) {
+    public ResultsPrinter( String destFile, GeneSetPvalRun run, GONames goName, boolean saveAllGeneNames ) {
         this.destFile = destFile;
+        this.saveAllGeneNames = saveAllGeneNames;
         this.sortedclasses = run.getSortedClasses();
         this.results = run.getResults();
         this.geneData = run.getGeneData();
         this.goName = goName;
+        if ( saveAllGeneNames ) log.debug( "Will save all genes" );
     }
 
     /**
@@ -101,10 +94,11 @@ public class ResultsPrinter {
                 res = ( GeneSetResult ) results.get( it.next() );
                 if ( first ) {
                     first = false;
-                    res.print_headings( out, "\tSame as:\tSimilar to:" );
+                    res.printHeadings( out, "\tSame as\tSimilar to\tGenes" );
                 }
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-                res.print( out, format_redundant_and_similar( res.getClassId() ) );
+                res.print( out, formatRedundantAndSimilar( res.getClassId() )
+                        + ( this.saveAllGeneNames ? formatGeneNames( res.getClassId() ) : "" ) );
             }
         } else {
             // output them in natural order. This is useful for testing.
@@ -114,9 +108,10 @@ public class ResultsPrinter {
                 res = ( GeneSetResult ) results.get( it.next() );
                 if ( first ) {
                     first = false;
-                    res.print_headings( out, "\tSame as:\tSimilar to:" );
+                    res.printHeadings( out, "\tSame as:\tSimilar to:" );
                 }
-                res.print( out, format_redundant_and_similar( res.getClassId() ) );
+                res.print( out, formatRedundantAndSimilar( res.getClassId() )
+                        + ( this.saveAllGeneNames ? formatGeneNames( res.getClassId() ) : "" ) );
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
             }
         }
@@ -125,12 +120,28 @@ public class ResultsPrinter {
     }
 
     /**
+     * @param className
+     * @return
+     */
+    private String formatGeneNames( String className ) {
+        if ( className == null ) return "";
+        Collection genes = ( Collection ) this.geneData.getGeneSetToGeneMap().get( className );
+        if ( genes == null || genes.size() == 0 ) return "";
+        StringBuffer buf = new StringBuffer();
+        for ( Iterator iter = genes.iterator(); iter.hasNext(); ) {
+            String gene = ( String ) iter.next();
+            buf.append( gene + "|" );
+        }
+        return buf.toString();
+    }
+
+    /**
      * Set up the string the way I want it.
      * 
      * @param classid String
      * @return String
      */
-    private String format_redundant_and_similar( String classid ) {
+    private String formatRedundantAndSimilar( String classid ) {
         List redund = GeneSetMapTools.getRedundancies( classid, geneData.geneSetToRedundantMap() );
         String return_value = "";
         if ( redund != null ) {

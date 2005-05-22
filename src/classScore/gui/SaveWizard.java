@@ -94,7 +94,7 @@ public class SaveWizard extends Wizard {
         String saveFileName = step2.getSaveFileName();
         try {
             saveSettings.writePrefs( saveFileName ); // first we stream the prefs to the file.
-            ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, goData ); // then we pile on the results.
+            ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, goData, step2.getShouldSaveGeneNames() ); // then we pile on the results.
             rp.printResults( true );
         } catch ( IOException ioe ) {
             GuiUtil.error( "Could not write results to the file. " + ioe );

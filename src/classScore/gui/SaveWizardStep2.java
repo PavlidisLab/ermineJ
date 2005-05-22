@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -28,6 +29,7 @@ public class SaveWizardStep2 extends WizardStep {
     private JFileChooser chooser = null;
     private JTextField saveFile = null;
     private final String folder;
+    private JCheckBox saveAllGenes = null;
 
     public SaveWizardStep2( SaveWizard wiz, String folder ) {
         super( wiz );
@@ -59,12 +61,25 @@ public class SaveWizardStep2 extends WizardStep {
         jPanel11.add( saveFile, null );
         jPanel11.add( saveBrowseButton, null );
 
+        saveAllGenes = new JCheckBox();
+        saveAllGenes.setSelected( false );
+        JLabel saveAllGenesLabel = new JLabel();
+        saveAllGenesLabel.setText( "Include all genes in output" );
+        saveAllGenesLabel.setLabelFor( saveAllGenes );
+
+        jPanel11.add( saveAllGenesLabel );
+        jPanel11.add( saveAllGenes );
+
         this.addHelp( "<html><b>Choose the file to save the analysis in</b><br>" + "" );
         this.addMain( jPanel11 );
     }
 
     public boolean isReady() {
         return true;
+    }
+
+    public boolean getShouldSaveGeneNames() {
+        return this.saveAllGenes.isSelected();
     }
 
     void saveBrowseButton_actionPerformed( ActionEvent e ) {

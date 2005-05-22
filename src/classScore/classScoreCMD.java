@@ -59,7 +59,7 @@ public class classScoreCMD {
             initialize();
             try {
                 GeneSetPvalRun result = analyze();
-                ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData );
+                ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, false );
                 rp.printResults( true );
             } catch ( Exception e ) {
                 statusMessenger.setStatus( "Error During analysis" + e );
