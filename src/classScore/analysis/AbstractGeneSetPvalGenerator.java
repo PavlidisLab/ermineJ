@@ -72,20 +72,25 @@ public abstract class AbstractGeneSetPvalGenerator {
         String aspect = this.goName.getAspectForId( geneSetName );
 
         if ( aspect == null ) {
-    //        log.warn( "Null aspect for " + geneSetName );
-            return true;
+            log.debug( "Null aspect for " + geneSetName + ", skipping" );
+            return false;
         }
 
-        if ( aspect.equalsIgnoreCase( "biological_process" ) && this.settings.getUseBiologicalProcess() ) {
+        if ( ( aspect.equalsIgnoreCase( "biological_process" ) || aspect
+                .equalsIgnoreCase( "obsolete_biological_process" ) )
+                && this.settings.getUseBiologicalProcess() ) {
             return true;
-        } else if ( aspect.equalsIgnoreCase( "cellular_component" ) && this.settings.getUseCellularComponent() ) {
+        } else if ( ( aspect.equalsIgnoreCase( "cellular_component" ) || aspect
+                .equalsIgnoreCase( "obsolete_cellular_component" ) )
+                && this.settings.getUseCellularComponent() ) {
             return true;
-        } else if ( aspect.equalsIgnoreCase( "molecular_function" ) && this.settings.getUseMolecularFunction() ) {
+        } else if ( ( aspect.equalsIgnoreCase( "molecular_function" ) || aspect
+                .equalsIgnoreCase( "obsolete_molecular_function" ) )
+                && this.settings.getUseMolecularFunction() ) {
             return true;
         } else if ( aspect.equalsIgnoreCase( GONames.NO_ASPECT_AVAILABLE ) ) {
             return true; // user-defined - always use.
         }
-        // log.debug( "Skipping " + geneSetName + " from " + aspect );
         return false;
     }
 
