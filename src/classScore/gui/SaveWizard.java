@@ -90,16 +90,16 @@ public class SaveWizard extends Wizard {
 
     protected void finishButton_actionPerformed( ActionEvent e ) {
         GeneSetPvalRun runToSave = ( GeneSetPvalRun ) rundata.get( step1.getSelectedRunNum() );
-        Settings saveSettings = runToSave.getSettings();
+        Settings saveSettings = runToSave.getSettings(); // FIXME
         String saveFileName = step2.getSaveFileName();
         try {
-            saveSettings.writePrefs( saveFileName ); // first we stream the prefs to the file.
+            saveSettings.writeAnalysisSettings( saveFileName ); // first we stream the prefs to the file.
             ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, goData, step2.getShouldSaveGeneNames() ); // then
-                                                                                                                        // we
-                                                                                                                        // pile
-                                                                                                                        // on
-                                                                                                                        // the
-                                                                                                                        // results.
+            // we
+            // pile
+            // on
+            // the
+            // results.
             rp.printResults( true );
         } catch ( IOException ioe ) {
             GuiUtil.error( "Could not write results to the file. " + ioe );

@@ -7,6 +7,10 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.StringTokenizer;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.util.RegressionTesting;
 import classScore.GeneSetPvalRun;
 import classScore.ResultsPrinter;
@@ -22,7 +26,7 @@ import classScore.classScoreCMD;
  * @version $Id$
  */
 public class classScoreTester extends classScoreCMD {
-
+    private static Log log = LogFactory.getLog( classScoreTester.class.getName() );
     private static final double TOLERANCE = 0.001;
 
     // find settings in the data directory; read each one, run analyses on them.
@@ -39,17 +43,17 @@ public class classScoreTester extends classScoreCMD {
 
                 if ( configFileName.startsWith( "#" ) ) continue;
                 settings = new Settings( classScoreTester.class.getResource( configFileName ) );
-                System.err.println( "Running: " + configFileName );
+                log.info( "Running: " + configFileName );
 
                 String saveFileName = File.createTempFile( "ermineJ.tmp", ".txt" ).getAbsolutePath();
-                System.err.println( "Results will be written to " + saveFileName );
+                log.info( "Results will be written to " + saveFileName );
 
                 String goldStandardFileName = settings.getGoldStandardFile();
                 if ( !new File( goldStandardFileName ).canRead() ) {
                     saveFileName = goldStandardFileName;
                     doTest = false;
-                    System.err.println( "Could not read from " + goldStandardFileName );
-                    System.err.println( "Creating test output" );
+                    log.error( "Could not read from " + goldStandardFileName );
+                    log.info( "Creating test output" );
                 }
 
                 initialize();
@@ -71,17 +75,20 @@ public class classScoreTester extends classScoreCMD {
                     // System.err.println( te );
 
                     if ( compareResults( gs, te ) ) {
-                        System.err.println( "Passed test" );
+                        log.info( "Passed test" );
                     } else {
-                        System.err.println( "Failed test" );
+                        log.error( "Failed test" );
                     }
                 } else {
-                    System.err.println( "Skipping test, output instead" );
+                    log.info( "Skipping test, output instead" );
                 }
 
             }
             dis.close();
         } catch ( IOException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch ( ConfigurationException e ) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import baseCode.bio.geneset.GeneAnnotations;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 
 /**
  * Class for computing the actual and effective sizes of gene sets.
@@ -25,10 +25,10 @@ public class GeneSetSizeComputer {
     protected Map classToProbe;
     protected boolean weight_on = true;
     protected Map probeGroups;
-    protected GeneScoreReader geneScores;
+    protected GeneScores geneScores;
     protected Set activeProbes;
 
-    public GeneSetSizeComputer( Set activeProbes, GeneAnnotations geneData, GeneScoreReader geneScores, boolean w ) {
+    public GeneSetSizeComputer( Set activeProbes, GeneAnnotations geneData, GeneScores geneScores, boolean w ) {
         this.weight_on = w;
         this.activeProbes = activeProbes;
         this.classToProbe = geneData.getGeneSetToProbeMap();

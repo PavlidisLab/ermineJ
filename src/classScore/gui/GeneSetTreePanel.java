@@ -91,9 +91,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     public void updateNodeStyles() {
         log.debug( "Updating nodes" );
         try {
-            goData.getGraph().unmarkAll();
             visitAllNodes( goTree, this.getClass().getMethod( "hasGoodChild", new Class[] { GeneSetTreeNode.class } ) );
-            goData.getGraph().unmarkAll();
             visitAllNodes( goTree, this.getClass().getMethod( "hasUsableChildren",
                     new Class[] { GeneSetTreeNode.class } ) );
         } catch ( Exception e ) {
@@ -183,6 +181,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param goData
      */
     private void setUpTree( GONames goData ) {
+        assert ( goData.getGraph() != null ) : "GO Graph cannot be null to use tree panel";
         this.goTree = goData.getGraph().treeView( GeneSetTreeNode.class );
         this.setRenderer();
         this.goTree.setRootVisible( true );

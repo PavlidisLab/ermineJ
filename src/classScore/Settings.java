@@ -1,14 +1,19 @@
 package classScore;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Properties;
 
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -19,11 +24,12 @@ import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.FileTools;
 
 /**
+ * Basically a wrapper around a Commons Configuration object.
  * <hr>
- * FIXME use commons configuration throughout (or as much as possible).
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
+ * @author Paul Pavlidis (total rewrite)
  * @author Kiran Keshav
  * @author Homin Lee
  * @author Will Braynen
@@ -31,16 +37,12 @@ import baseCode.util.FileTools;
  */
 
 public class Settings {
+    private static final Log log = LogFactory.getLog( Settings.class );
 
-    /*
-     * Multiple test correction methods
-     */
-    public static final int WESTFALLYOUNG = 1;
     public static final int BENJAMINIHOCHBERG = 2;
-    public static final int BONFERONNI = 0;
-
-    public static final int CORR = 2;
     public static final int BEST_PVAL = 1;
+    public static final int BONFERONNI = 0;
+    public static final int CORR = 2;
     public static final String GENE_URL_BASE = "gene.url.base";
     public static final int KS = 5;
     public static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
@@ -51,159 +53,98 @@ public class Settings {
     public static final int RESAMP = 1;
     public static final int ROC = 3;
     public static final int TTEST = 4;
+    public static final int WESTFALLYOUNG = 1;
+    private static final String ALWAYS_USE_EMPIRICAL = "alwaysUseEmpirical";
+    private static final String ANNOT_FILE = "annotFile";
+    private static final String ANNOT_FORMAT = "annotFormat";
+    private static final String BIG_IS_BETTER = "bigIsBetter";
+    private static final String CLASS_FILE = "classFile";
+    private static final String CLASS_SCORE_METHOD = "classScoreMethod";
+    private static final String DATA_DIRECTORY = "dataDirectory";
+    private static final String DO_LOG = "doLog";
+    private static final String GENE_REP_TREATMENT = "geneRepTreatment";
+    private static final String GOLD_STANDARD_FILE = "goldStandardFile";
+    private static final String IS_TESTER = "isTester";
+    private static final String ITERATIONS = "iterations";
+    private static final String MAX_CLASS_SIZE = "maxClassSize";
+    private static final String MIN_CLASS_SIZE = "minClassSize";
+    private static final String MTC = "mtc";
+    private static final String OUTPUT_FILE = "outputFile";
+    private static final String P_VAL_THRESHOLD = "pValThreshold";
+    private static final String PREFERENCES_FILE_NAME = "preferencesFileName";
+    private static final String QUANTILE = "quantile";
+    private static final String RAW_FILE = "rawFile";
+    private static final String RAW_SCORE_METHOD = "rawScoreMethod";
+    private static final String SCORE_COL = "scoreCol";
+    private static final String SCORE_FILE = "scoreFile";
 
     /**
-     * 
+     * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
      */
-
-    private static final Log log = LogFactory.getLog( Settings.class );
     private static final String USERGUI_DEFAULT_PROPERTIES = "ermineJdefault.properties";
+
+    /**
+     * Filename for settings.
+     */
     private static final String USERGUI_PROPERTIES = "ermineJ.properties";
-    private boolean alwaysUseEmpirical = false;
-    private int analysisMethod = RESAMP;
-    private String annotFile = "";
-    private int annotFormat = GeneAnnotations.DEFAULT;
-    private boolean bigIsBetter = false;
-    private String classFile = "";
-    private String classFolder = "";
+
+    /**
+     * where everything is kept.
+     */
     private PropertiesConfiguration config;
-    private String dataDirectory = null;
-    private boolean doLog = true;
-    private int geneRepTreatment = BEST_PVAL;
-
-    private String goldStandardFile = ""; // for testing;
-    private boolean isTester = false; // set to true if this is running in the test framework.
-
-    private int iterations = 10000;
-    private int maxClassSize = 100;
-    private int minClassSize = 8;
-
-    private int mtc = BENJAMINIHOCHBERG; // multiple test correction
-    private String outputFile = "";
-    private String preferencesFileName = "";
-    private Properties properties;
-    private double pValThreshold = 0.001;
-    private int quantile = 50;
-    private String rawFile = "";
-    private int rawScoreMethod = MEAN_METHOD;
-    private int scorecol = 2;
-    private String scoreFile = "";
-
-    private boolean useBiologicalProcess = true;
-    private boolean useCellularComponent = true;
-    private boolean useMolecularFunction = true;
-
-    public Settings() throws IOException {
-        this( "" );
-    }
 
     /**
-     * Creates settings object
-     * 
-     * @param settings - settings object to copy
+     * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
+     * etc.)
      */
-    public Settings( Settings settings ) {
-        initConfig();
-        classFile = settings.getClassFile();
-        annotFile = settings.getAnnotFile();
-        rawFile = settings.getRawFile();
-        goldStandardFile = settings.getGoldStandardFile();
-        outputFile = settings.getOutputFile();
-        dataDirectory = settings.getDataDirectory();
-        classFolder = settings.getUserGeneSetDirectory();
-        scoreFile = settings.getScoreFile();
-        maxClassSize = settings.getMaxClassSize();
-        minClassSize = settings.getMinClassSize();
-        iterations = settings.getIterations();
-        scorecol = settings.getScorecol();
-        geneRepTreatment = settings.getGeneRepTreatment();
-        rawScoreMethod = settings.getRawScoreMethod();
-        analysisMethod = settings.getAnalysisMethod();
-        quantile = settings.getQuantile();
-        doLog = settings.getDoLog();
-        pValThreshold = settings.getPValThreshold();
-        alwaysUseEmpirical = settings.getAlwaysUseEmpirical();
-        preferencesFileName = settings.getPrefFile();
-        mtc = settings.getMtc();
-        bigIsBetter = settings.getBigIsBetter();
-        isTester = settings.isTester();
-        annotFormat = settings.getAnnotFormat();
-        properties = new Properties();
-
-    }
+    private static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
+            MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
+            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FORMAT, CLASS_SCORE_METHOD };
 
     /**
-     * @return
-     */
-    public int getAnnotFormat() {
-        return this.annotFormat;
-    }
-
-    /**
-     * Creates settings object
+     * Create the settings, reading them from a file to be determined by the constructor.
      * 
-     * @param filename name of preferences file to read
      * @throws IOException
      */
-    public Settings( String filename ) throws IOException {
+    public Settings() throws IOException {
         initConfig();
-        properties = new Properties();
-        if ( dataDirectory == null && !this.determineDataDirectory() ) {
+        if ( this.getDataDirectory() == null && !this.determineDataDirectory() ) {
             log.info( "Can't find data directory, using default settings" );
             return;
         }
-
-        preferencesFileName = filename;
         createCustomGeneSetDirectory();
+    }
 
-        // make a new file if it was empty.
-        if ( preferencesFileName.compareTo( "" ) == 0 ) {
-            preferencesFileName = dataDirectory + System.getProperty( "file.separator" ) + "ermineJ.preferences";
-            log.debug( "Determined preferences file " + preferencesFileName );
+    /**
+     * Creates settings object from a copy. Note that in this situation, autoSave is FALSE.
+     * 
+     * @param settings - settings object to copy
+     */
+    public Settings( Settings settingsToCopy ) {
+        this.config = new PropertiesConfiguration();
+        PropertiesConfiguration oldConfig = settingsToCopy.getConfig();
+        for ( Iterator iter = oldConfig.getKeys(); iter.hasNext(); ) {
+            String key = ( String ) iter.next();
+            Object value = oldConfig.getProperty( key );
+            this.config.setProperty( key, value );
         }
+    }
 
-        // read the file if we can.
-        File fi = new File( preferencesFileName );
-        if ( fi.canRead() ) {
-            try {
-                log.info( "Reading settings from " + preferencesFileName );
-                InputStream f = new FileInputStream( preferencesFileName );
-                read( f );
-            } catch ( IOException e ) {
-                log.error( "Couldn't read from the file " + preferencesFileName );
-            }
-        }
+    /**
+     * Create a Settings object from the header of a results file.
+     * 
+     * @param resultsFile
+     */
+    public Settings( String resultsFile ) throws ConfigurationException {
+        this.config = new PropertiesConfiguration( resultsFile );
 
     }
 
     /**
-     * @throws IOException
+     * @param resource
      */
-    private void createCustomGeneSetDirectory() throws IOException {
-        classFolder = new String( dataDirectory + System.getProperty( "file.separator" ) + "genesets" );
-        if ( !FileTools.testDir( classFolder ) ) {
-            log.info( "Creating custom class folder at " + classFolder );
-            if ( !new File( classFolder ).mkdir() ) {
-                throw new IOException( "Could not create the class directory at " + classFolder );
-            }
-        }
-        log.debug( "Custom gene sets directory is " + classFolder );
-    }
-
-    public Settings( URL resource ) {
-        properties = new Properties();
-        initConfig();
-        File fi = new File( resource.getFile() );
-        preferencesFileName = fi.getAbsolutePath();
-
-        if ( fi.canRead() ) {
-            try {
-                InputStream f = new FileInputStream( preferencesFileName );
-                read( f );
-            } catch ( IOException e ) {
-                log.error( "Couldn't read from the file " + preferencesFileName );
-            }
-        }
+    public Settings( URL resource ) throws ConfigurationException {
+        this.config = new PropertiesConfiguration( resource );
     }
 
     /**
@@ -212,22 +153,22 @@ public class Settings {
      * @return
      */
     public boolean determineDataDirectory() {
-        dataDirectory = System.getProperty( "user.dir" );
-        dataDirectory = dataDirectory
-                .substring( 0, dataDirectory.lastIndexOf( System.getProperty( "file.separator" ) ) );
+        String dataDirectoryName = System.getProperty( "user.dir" );
+        dataDirectoryName = dataDirectoryName.substring( 0, dataDirectoryName.lastIndexOf( System
+                .getProperty( "file.separator" ) ) );
 
-        dataDirectory = dataDirectory + System.getProperty( "file.separator" ) + "ermineJ.data";
+        dataDirectoryName = dataDirectoryName + System.getProperty( "file.separator" ) + "ermineJ.data";
 
-        if ( !FileTools.testDir( dataDirectory ) ) {
-            dataDirectory = System.getProperty( "user.home" ) + System.getProperty( "file.separator" ) + "ermineJ.data";
+        if ( !FileTools.testDir( dataDirectoryName ) ) {
+            this.setDataDirectory( dataDirectoryName );
 
-            if ( !FileTools.testDir( dataDirectory ) ) {
-                log.info( "Creating data directory " + dataDirectory );
-                // try to make it in the user's home directory.
-                return ( new File( dataDirectory ) ).mkdir();
+            if ( !FileTools.testDir( dataDirectoryName ) ) {
+                log.info( "Creating data directory " + dataDirectoryName );
+                return ( new File( dataDirectoryName ) ).mkdir();
             }
         }
-        log.info( "Data directory is " + dataDirectory );
+        log.info( "Data directory is " + dataDirectoryName );
+        this.setDataDirectory( dataDirectoryName );
         return true;
     }
 
@@ -235,47 +176,46 @@ public class Settings {
      * @return
      */
     public boolean getAlwaysUseEmpirical() {
-        return alwaysUseEmpirical;
-    }
+        return config.getBoolean( ALWAYS_USE_EMPIRICAL, new Boolean( false ) ).booleanValue();
 
-    public int getAnalysisMethod() {
-        return analysisMethod;
     }
 
     public String getAnnotFile() {
-        return annotFile;
+        return config.getString( ANNOT_FILE );
+    }
+
+    /**
+     * @return
+     */
+    public int getAnnotFormat() {
+        return config.getInteger( ANNOT_FORMAT, new Integer( GeneAnnotations.DEFAULT ) ).intValue();
     }
 
     /**
      * @return
      */
     public boolean getBigIsBetter() {
-        return bigIsBetter;
+        return config.getBoolean( BIG_IS_BETTER, new Boolean( true ) ).booleanValue();
     }
 
     /**
      * Returns setting values.
      */
     public String getClassFile() {
-        return classFile;
-    }
+        return config.getString( CLASS_FILE );
 
-    public String getUserGeneSetDirectory() {
-        return classFolder;
     }
 
     public int getClassScoreMethod() {
-        return rawScoreMethod;
-
+        return config.getInteger( CLASS_SCORE_METHOD, new Integer( ORA ) ).intValue();
     }
 
     public String getClassScoreMethodString() {
-        if ( rawScoreMethod == MEAN_METHOD ) {
+        if ( this.getClassScoreMethod() == MEAN_METHOD ) {
             return "Mean";
         }
         return "Quantile"; // note that quantile is hard-coded to be 50 for the
         // gui.
-
     }
 
     /**
@@ -290,15 +230,16 @@ public class Settings {
     }
 
     public String getDataDirectory() {
-        return dataDirectory;
+        return config.getString( DATA_DIRECTORY );
+
     }
 
     public boolean getDoLog() {
-        return doLog;
+        return config.getBoolean( DO_LOG, new Boolean( true ) ).booleanValue();
     }
 
     public int getGeneRepTreatment() {
-        return geneRepTreatment;
+        return config.getInteger( GENE_REP_TREATMENT, new Integer( BEST_PVAL ) ).intValue();
     }
 
     /**
@@ -307,39 +248,35 @@ public class Settings {
      * @return
      */
     public String getGoldStandardFile() {
-        return goldStandardFile;
-    }
-
-    public int getGroupMethod() {
-        return geneRepTreatment;
+        return config.getString( GOLD_STANDARD_FILE );
     }
 
     public String getGroupMethodString() {
-        if ( geneRepTreatment == MEAN_PVAL )
+        if ( this.getGeneRepTreatment() == MEAN_PVAL )
             return "MEAN_PVAL";
-        else if ( geneRepTreatment == BEST_PVAL )
+        else if ( this.getGeneRepTreatment() == BEST_PVAL )
             return "BEST_PVAL";
         else
             return "MEAN_PVAL"; // dummy. It won't be used.
     }
 
     public int getIterations() {
-        return iterations;
+        return config.getInteger( ITERATIONS, new Integer( 10000 ) ).intValue();
     }
 
     public int getMaxClassSize() {
-        return maxClassSize;
+        return config.getInteger( MAX_CLASS_SIZE, new Integer( 100 ) ).intValue();
     }
 
     public int getMinClassSize() {
-        return minClassSize;
+        return config.getInteger( MIN_CLASS_SIZE, new Integer( 5 ) ).intValue();
     }
 
     /**
      * @return Returns the mtc.
      */
     public int getMtc() {
-        return mtc;
+        return config.getInteger( MTC, new Integer( BENJAMINIHOCHBERG ) ).intValue();
     }
 
     /**
@@ -348,67 +285,93 @@ public class Settings {
      * @return
      */
     public String getOutputFile() {
-        return outputFile;
+        return config.getString( OUTPUT_FILE );
+
     }
 
     public String getPrefFile() {
-        return preferencesFileName;
+        return config.getString( PREFERENCES_FILE_NAME );
+
     }
 
     public double getPValThreshold() {
-        return pValThreshold;
+        return config.getDouble( P_VAL_THRESHOLD, new Double( 0.001 ) ).doubleValue();
     }
 
     public int getQuantile() {
-        return quantile;
+        return config.getInteger( QUANTILE, new Integer( 50 ) ).intValue();
     }
 
     public String getRawFile() {
-        return rawFile;
+        return config.getString( RAW_FILE );
     }
 
     public int getRawScoreMethod() {
-        return rawScoreMethod;
+        return config.getInteger( RAW_SCORE_METHOD, new Integer( MEAN_METHOD ) ).intValue();
     }
 
-    public int getScorecol() {
-        return scorecol;
+    public int getScoreCol() {
+        return config.getInteger( SCORE_COL, new Integer( 2 ) ).intValue();
     }
 
     public String getScoreFile() {
-        return scoreFile;
+        return config.getString( SCORE_FILE );
+    }
+
+    /**
+     * @return Returns the useBiologicalProcess.
+     */
+    public boolean getUseBiologicalProcess() {
+        return config.getBoolean( "useBiologicalProcess", new Boolean( true ) ).booleanValue();
+
+    }
+
+    /**
+     * @return Returns the useCellularComponent.
+     */
+    public boolean getUseCellularComponent() {
+        return config.getBoolean( "useCellularComponent", new Boolean( true ) ).booleanValue();
+
     }
 
     /**
      * @return
      */
     public boolean getUseLog() {
-        return doLog;
+        return config.getBoolean( DO_LOG, new Boolean( true ) ).booleanValue();
+    }
+
+    /**
+     * @return Returns the useMolecularFunction.
+     */
+    public boolean getUseMolecularFunction() {
+        return config.getBoolean( "useMolecularFunction", new Boolean( true ) ).booleanValue();
+
+    }
+
+    public String getUserGeneSetDirectory() {
+        return config.getString( "classFolder" );
+
     }
 
     public boolean getUseWeights() {
-        if ( geneRepTreatment == MEAN_PVAL || geneRepTreatment == BEST_PVAL ) return true;
-
+        if ( this.getGeneRepTreatment() == MEAN_PVAL || this.getGeneRepTreatment() == BEST_PVAL ) return true;
         return false;
     }
 
     public boolean isTester() {
-        return isTester;
+        return config.getBoolean( IS_TESTER, new Boolean( false ) ).booleanValue();
     }
 
     /**
      * @param b
      */
     public void setAlwaysUseEmpirical( boolean b ) {
-        alwaysUseEmpirical = b;
-    }
-
-    public void setAnalysisMethod( int val ) {
-        analysisMethod = val;
+        this.config.setProperty( ALWAYS_USE_EMPIRICAL, new Boolean( b ) );
     }
 
     public void setAnnotFile( String val ) {
-        annotFile = val;
+        this.config.setProperty( ANNOT_FILE, val );
     }
 
     /**
@@ -416,10 +379,9 @@ public class Settings {
      */
     public void setAnnotFormat( String arg ) {
         if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) { // fixme, this is hard to
-            // maintain.
-            this.annotFormat = GeneAnnotations.AFFYCSV;
+            this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.AFFYCSV ) );
         } else {
-            this.annotFormat = GeneAnnotations.DEFAULT;
+            this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.DEFAULT ) );
         }
 
     }
@@ -428,30 +390,34 @@ public class Settings {
      * @param b
      */
     public void setBigIsBetter( boolean b ) {
-        bigIsBetter = b;
+        this.config.setProperty( BIG_IS_BETTER, new Boolean( b ) );
     }
 
     /**
      * Sets setting values.
      */
     public void setClassFile( String val ) {
-        classFile = val;
+        this.config.setProperty( CLASS_FILE, val );
     }
 
-    public void setClassFolder( String val ) {
-        classFolder = val;
+    public void setClassScoreMethod( int val ) {
+        this.config.setProperty( CLASS_SCORE_METHOD, new Integer( val ) );
+    }
+
+    public void setCustomGeneSetDirectory( String val ) {
+        this.config.setProperty( "classFolder", val );
     }
 
     public void setDataDirectory( String val ) {
-        dataDirectory = val;
+        this.config.setProperty( DATA_DIRECTORY, val );
     }
 
     public void setDoLog( boolean val ) {
-        doLog = val;
+        this.config.setProperty( DO_LOG, new Boolean( val ) );
     }
 
     public void setGeneRepTreatment( int val ) {
-        geneRepTreatment = val;
+        this.config.setProperty( GENE_REP_TREATMENT, new Integer( val ) );
     }
 
     /**
@@ -460,26 +426,26 @@ public class Settings {
      * @param goldStandardFile
      */
     public void setGoldStandardFile( String goldStandardFile ) {
-        this.goldStandardFile = goldStandardFile;
+        this.config.setProperty( GOLD_STANDARD_FILE, goldStandardFile );
     }
 
     public void setIterations( int val ) {
-        iterations = val;
+        this.config.setProperty( ITERATIONS, new Integer( val ) );
     }
 
     public void setMaxClassSize( int val ) {
-        maxClassSize = val;
+        this.config.setProperty( MAX_CLASS_SIZE, new Integer( val ) );
     }
 
     public void setMinClassSize( int val ) {
-        minClassSize = val;
+        this.config.setProperty( MIN_CLASS_SIZE, new Integer( val ) );
     }
 
     /**
      * @param mtc The mtc to set.
      */
     public void setMtc( int mtc ) {
-        this.mtc = mtc;
+        this.config.setProperty( MTC, new Integer( mtc ) );
     }
 
     /**
@@ -488,43 +454,65 @@ public class Settings {
      * @param outputFile
      */
     public void setOutputFile( String outputFile ) {
-        this.outputFile = outputFile;
+        this.config.setProperty( OUTPUT_FILE, outputFile );
     }
 
     public void setPrefFile( String val ) {
-        preferencesFileName = val;
+        this.config.setProperty( PREFERENCES_FILE_NAME, val );
     }
 
     public void setPValThreshold( double val ) {
-        pValThreshold = val;
+        log.debug( "pvalue threshold set to " + val );
+        this.config.setProperty( P_VAL_THRESHOLD, new Double( val ) );
     }
 
     public void setQuantile( int val ) {
-        quantile = val;
+        this.config.setProperty( QUANTILE, new Integer( val ) );
     }
 
     public void setRawFile( String val ) {
-        rawFile = val;
+        this.config.setProperty( RAW_FILE, val );
     }
 
     public void setRawScoreMethod( int val ) {
-        rawScoreMethod = val;
+        this.config.setProperty( RAW_SCORE_METHOD, new Integer( val ) );
     }
 
-    public void setScorecol( int val ) {
-        scorecol = val;
+    public void setScoreCol( int val ) {
+        this.config.setProperty( SCORE_COL, new Integer( val ) );
     }
 
     public void setScoreFile( String val ) {
-        scoreFile = val;
+        this.config.setProperty( SCORE_FILE, val );
     }
 
     public void setTester( boolean isTester ) {
-        this.isTester = isTester;
+        this.config.setProperty( IS_TESTER, new Boolean( isTester ) );
+    }
+
+    /**
+     * @param useBiologicalProcess The useBiologicalProcess to set.
+     */
+    public void setUseBiologicalProcess( boolean useBiologicalProcess ) {
+        this.config.setProperty( "useBiologicalProcess", new Boolean( useBiologicalProcess ) );
+    }
+
+    /**
+     * @param useCellularComponent The useCellularComponent to set.
+     */
+    public void setUseCellularComponent( boolean useCellularComponent ) {
+        this.config.setProperty( "useCellularComponent", new Boolean( useCellularComponent ) );
+    }
+
+    /**
+     * @param useMolecularFunction The useMolecularFunction to set.
+     */
+    public void setUseMolecularFunction( boolean useMolecularFunction ) {
+        this.config.setProperty( "useMolecularFunction", new Boolean( useMolecularFunction ) );
     }
 
     public String toString() {
-        return properties.toString();
+        return this.config.toString();
     }
 
     /**
@@ -536,51 +524,52 @@ public class Settings {
      * @return true if we are using the "upper tail" of our distributions.
      */
     public boolean upperTail() {
-        return ( doLog && !bigIsBetter ) || ( !doLog && bigIsBetter );
-    }
-
-    public void writePrefs() throws IOException {
-        this.writePrefs( preferencesFileName );
+        return ( this.getDoLog() && !this.getBigIsBetter() ) || ( !this.getDoLog() && this.getBigIsBetter() );
     }
 
     /**
-     * Writes setting values to file.
+     * Intended to be used for saving results to the header of an output file.
+     * 
+     * @param fileName
+     * @throws IOException
      */
-    public void writePrefs( String fileName ) throws IOException {
-        // try {
-        // this.config.save();
-        // } catch ( ConfigurationException e ) {
-        // e.printStackTrace();
-        // }
-        if ( fileName == null || fileName.length() == 0 ) {
-            return;
+    public void writeAnalysisSettings( String fileName ) throws IOException {
+        log.debug( "Saving configuration to " + fileName );
+        BufferedWriter out = new BufferedWriter( new FileWriter( fileName ) );
+        for ( int i = 0; i < ANALYSIS_SETTINGS.length; i++ ) {
+            String propertyName = ANALYSIS_SETTINGS[i];
+            out.write( propertyName + " = " );
+            out.write( config.getProperty( propertyName ).toString() );
+            out.write( "\n" );
+            log.debug( "Writing " + propertyName + "=" + config.getProperty( propertyName ).toString() );
         }
-        properties.setProperty( "scoreFile", scoreFile );
-        properties.setProperty( "classFile", classFile );
-        properties.setProperty( "annotFile", annotFile );
-        properties.setProperty( "rawFile", rawFile );
-        properties.setProperty( "goldStandardFile", goldStandardFile );
-        properties.setProperty( "outputFile", outputFile );
-        properties.setProperty( "dataFolder", dataDirectory );
-        properties.setProperty( "classFolder", classFolder );
-        properties.setProperty( "maxClassSize", String.valueOf( maxClassSize ) );
-        properties.setProperty( "minClassSize", String.valueOf( minClassSize ) );
-        properties.setProperty( "iterations", String.valueOf( iterations ) );
-        properties.setProperty( "scorecol", String.valueOf( scorecol ) );
-        properties.setProperty( "geneRepTreatment", String.valueOf( geneRepTreatment ) );
-        properties.setProperty( "rawScoreMethod", String.valueOf( rawScoreMethod ) );
-        properties.setProperty( "mtc", String.valueOf( mtc ) );
-        properties.setProperty( "analysisMethod", String.valueOf( analysisMethod ) );
-        properties.setProperty( "quantile", String.valueOf( quantile ) );
-        properties.setProperty( "doLog", String.valueOf( doLog ) );
-        properties.setProperty( "bigIsBetter", String.valueOf( bigIsBetter ) );
-        properties.setProperty( "pValThreshold", String.valueOf( pValThreshold ) );
-        properties.setProperty( "useEmpirical", String.valueOf( alwaysUseEmpirical ) );
-        properties.setProperty( "isTester", String.valueOf( isTester ) );
-        properties.setProperty( "annotFormat", String.valueOf( annotFormat ) );
-        OutputStream f = new FileOutputStream( fileName );
-        properties.store( f, "" );
-        f.close();
+        out.close();
+    }
+
+    public void writePrefs() throws IOException {
+        try {
+            log.debug( "Saving configuration" ); // shouldn't need to - autosave is set.
+            config.save();
+        } catch ( ConfigurationException e ) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @throws IOException
+     */
+    private void createCustomGeneSetDirectory() throws IOException {
+        String customGeneSetDirectoryName = new String( this.getDataDirectory() + System.getProperty( "file.separator" )
+                + "genesets" );
+        if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
+            log.info( "Creating custom class folder at " + customGeneSetDirectoryName );
+            if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
+                throw new IOException( "Could not create the class directory at " + customGeneSetDirectoryName );
+            }
+        }
+        log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
+        this.setCustomGeneSetDirectory( customGeneSetDirectoryName );
     }
 
     /**
@@ -592,10 +581,8 @@ public class Settings {
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
 
             this.config = new PropertiesConfiguration( configFileLocation );
-            this.config.setAutoSave( true );
-            log.debug( "Got configuration " + ConfigurationUtils.toString( this.config ) );
+            log.info( "Got configuration " + configFileLocation );
         } catch ( ConfigurationException e ) {
-
             try {
                 log.info( "User properties file doesn't exist, creating new one from defaults" );
                 URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
@@ -604,8 +591,10 @@ public class Settings {
                     throw new ConfigurationException( "Defaults not found either!" );
 
                 log.info( "Found defaults at " + defaultConfigFileLocation );
-                config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
-                config.save( USERGUI_PROPERTIES ); // copy over to where they should be.
+                this.config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
+                File newConfigFile = new File( System.getProperty( "user.home" )
+                        + System.getProperty( "file.separator" ) + USERGUI_PROPERTIES );
+                this.config.save( newConfigFile ); // copy over to where they should be.
                 URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
                 log.info( "Saved the new configuration in " + configFileLocation );
 
@@ -613,159 +602,7 @@ public class Settings {
                 e1.printStackTrace();
             }
         }
-    }
-
-    private void read( InputStream s ) {
-
-        try {
-            properties.load( s );
-            s.close();
-
-            if ( properties.containsKey( "isTester" ) )
-                this.isTester = Boolean.valueOf( properties.getProperty( "isTester" ) ).booleanValue();
-
-            if ( properties.containsKey( "scoreFile" ) ) {
-                if ( isTester ) {
-                    this.scoreFile = Settings.class.getResource( properties.getProperty( "scoreFile" ) ).getFile();
-                } else {
-                    this.scoreFile = properties.getProperty( "scoreFile" );
-                }
-            }
-
-            if ( properties.containsKey( "classFile" ) ) {
-                if ( isTester ) {
-                    this.classFile = Settings.class.getResource( properties.getProperty( "classFile" ) ).getFile();
-                } else {
-                    this.classFile = properties.getProperty( "classFile" );
-                }
-            }
-
-            if ( properties.containsKey( "annotFile" ) ) {
-                if ( isTester ) {
-                    this.annotFile = Settings.class.getResource( properties.getProperty( "annotFile" ) ).getFile();
-                } else {
-                    this.annotFile = properties.getProperty( "annotFile" );
-                }
-            }
-
-            if ( properties.containsKey( "rawFile" ) ) {
-                if ( isTester ) {
-                    this.rawFile = Settings.class.getResource( properties.getProperty( "rawFile" ) ).getFile();
-                } else {
-                    this.rawFile = properties.getProperty( "rawFile" );
-                }
-            }
-
-            if ( properties.containsKey( "goldStandardFile" ) ) {
-                if ( isTester ) {
-                    String goldStandardFileName = properties.getProperty( "goldStandardFile" );
-
-                    String path = Settings.class.getResource( properties.getProperty( "rawFile" ) ).getPath();
-
-                    path = path.substring( 0, path.lastIndexOf( "/data" ) );
-
-                    this.goldStandardFile = path + goldStandardFileName;
-                    System.err.println( "Gold standard is or will be in " + goldStandardFile );
-                } else {
-                    this.goldStandardFile = properties.getProperty( "goldStandardFile" );
-                }
-            }
-
-            if ( properties.containsKey( "dataFolder" ) ) this.dataDirectory = properties.getProperty( "dataFolder" );
-
-            if ( properties.containsKey( "classFolder" ) ) this.classFolder = properties.getProperty( "classFolder" );
-
-            if ( properties.containsKey( "maxClassSize" ) )
-                this.maxClassSize = Integer.valueOf( properties.getProperty( "maxClassSize" ) ).intValue();
-
-            if ( properties.containsKey( "minClassSize" ) )
-                this.minClassSize = Integer.valueOf( properties.getProperty( "minClassSize" ) ).intValue();
-
-            if ( properties.containsKey( "iterations" ) )
-                this.iterations = Integer.valueOf( properties.getProperty( "iterations" ) ).intValue();
-
-            if ( properties.containsKey( "scorecol" ) )
-                this.scorecol = Integer.valueOf( properties.getProperty( "scorecol" ) ).intValue();
-
-            if ( properties.containsKey( "geneRepTreatment" ) )
-                this.geneRepTreatment = Integer.valueOf( properties.getProperty( "geneRepTreatment" ) ).intValue();
-
-            if ( properties.containsKey( "rawScoreMethod" ) )
-                this.rawScoreMethod = Integer.valueOf( properties.getProperty( "rawScoreMethod" ) ).intValue();
-
-            if ( properties.containsKey( "analysisMethod" ) )
-                this.analysisMethod = Integer.valueOf( properties.getProperty( "analysisMethod" ) ).intValue();
-
-            if ( properties.containsKey( "quantile" ) )
-                this.quantile = Integer.valueOf( properties.getProperty( "quantile" ) ).intValue();
-
-            if ( properties.containsKey( "doLog" ) )
-                this.doLog = Boolean.valueOf( properties.getProperty( "doLog" ) ).booleanValue();
-
-            if ( properties.containsKey( "pValThreshold" ) )
-                this.pValThreshold = Double.valueOf( properties.getProperty( "pValThreshold" ) ).doubleValue();
-
-            if ( properties.containsKey( "useEmpirical" ) )
-                this.alwaysUseEmpirical = Boolean.valueOf( properties.getProperty( "useEmpirical" ) ).booleanValue();
-
-            if ( properties.containsKey( "mtc" ) )
-                this.mtc = Integer.valueOf( properties.getProperty( "mtc" ) ).intValue();
-
-            if ( properties.containsKey( "bigIsBetter" ) )
-                this.bigIsBetter = Boolean.valueOf( properties.getProperty( "bigIsBetter" ) ).booleanValue();
-
-            if ( properties.containsKey( "annotFormat" ) )
-                this.annotFormat = Integer.valueOf( properties.getProperty( "annotFormat" ) ).intValue();
-
-            // System.err.println(this);
-        } catch ( IOException ex ) {
-            System.err.println( "Could not find preferences file. Will probably attempt to create a new one." );
-        }
-    }
-
-    /**
-     * @return Returns the useBiologicalProcess.
-     */
-    public boolean getUseBiologicalProcess() {
-        return this.useBiologicalProcess;
-    }
-
-    /**
-     * @param useBiologicalProcess The useBiologicalProcess to set.
-     */
-    public void setUseBiologicalProcess( boolean useBiologicalProcess ) {
-        this.config.setProperty( "useBiologicalProcess", new Boolean( useBiologicalProcess ) );
-        this.useBiologicalProcess = useBiologicalProcess;
-    }
-
-    /**
-     * @return Returns the useCellularComponent.
-     */
-    public boolean getUseCellularComponent() {
-        return this.useCellularComponent;
-    }
-
-    /**
-     * @param useCellularComponent The useCellularComponent to set.
-     */
-    public void setUseCellularComponent( boolean useCellularComponent ) {
-        this.config.setProperty( "useCellularComponent", new Boolean( useCellularComponent ) );
-        this.useCellularComponent = useCellularComponent;
-    }
-
-    /**
-     * @return Returns the useMolecularFunction.
-     */
-    public boolean getUseMolecularFunction() {
-        return this.useMolecularFunction;
-    }
-
-    /**
-     * @param useMolecularFunction The useMolecularFunction to set.
-     */
-    public void setUseMolecularFunction( boolean useMolecularFunction ) {
-        this.config.setProperty( "useMolecularFunction", new Boolean( useMolecularFunction ) );
-        this.useMolecularFunction = useMolecularFunction;
+        this.config.setAutoSave( true );
     }
 
 }

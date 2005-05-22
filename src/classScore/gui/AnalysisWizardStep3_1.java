@@ -50,12 +50,9 @@ public class AnalysisWizardStep3_1 extends WizardStep {
      * 
      */
     private void setValues() {
-        if ( settings.getUseBiologicalProcess() )
-            this.biologicalProcessButton.setSelected( true );
-        else if ( settings.getUseMolecularFunction() )
-            this.molecularFunctionButton.setSelected( true );
-        else if ( settings.getUseCellularComponent() ) this.cellularComponentButton.setSelected( true );
-
+        this.biologicalProcessButton.setSelected( settings.getUseBiologicalProcess() );
+        this.molecularFunctionButton.setSelected( settings.getUseMolecularFunction() );
+        this.cellularComponentButton.setSelected( settings.getUseCellularComponent() );
     }
 
     /**

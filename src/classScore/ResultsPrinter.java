@@ -84,7 +84,7 @@ public class ResultsPrinter {
         if ( destFile == null ) {
             out = new BufferedWriter( new PrintWriter( System.out ) );
         } else {
-            out = new BufferedWriter( new FileWriter( destFile, true ) );
+            out = new BufferedWriter( new FileWriter( destFile, true ) ); // APPENDING
         }
         boolean first = true;
         GeneSetResult res = null;

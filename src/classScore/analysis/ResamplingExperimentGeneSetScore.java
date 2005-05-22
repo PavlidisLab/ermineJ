@@ -16,7 +16,7 @@ import baseCode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
 import classScore.Settings;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 import classScore.data.Histogram;
 
 /**
@@ -159,7 +159,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @param settings
      * @param geneScores
      */
-    public ResamplingExperimentGeneSetScore( Settings settings, GeneScoreReader geneScores ) {
+    public ResamplingExperimentGeneSetScore( Settings settings, GeneScores geneScores ) {
         this.settings = settings;
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();

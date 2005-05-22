@@ -113,20 +113,20 @@ public class AnalysisWizardStep1 extends WizardStep {
     }
 
     public void setValues() {
-        if ( settings.getAnalysisMethod() == Settings.ORA )
+        if ( settings.getClassScoreMethod() == Settings.ORA )
             oraButton.setSelected( true );
-        else if ( settings.getAnalysisMethod() == Settings.RESAMP )
+        else if ( settings.getClassScoreMethod() == Settings.RESAMP )
             resampButton.setSelected( true );
-        else if ( settings.getAnalysisMethod() == Settings.CORR ) corrButton.setSelected( true );
+        else if ( settings.getClassScoreMethod() == Settings.CORR ) corrButton.setSelected( true );
     }
 
     public void saveValues() {
         if ( oraButton.isSelected() ) {
-            settings.setAnalysisMethod( Settings.ORA );
+            settings.setClassScoreMethod( Settings.ORA );
         } else if ( resampButton.isSelected() ) {
-            settings.setAnalysisMethod( Settings.RESAMP );
+            settings.setClassScoreMethod( Settings.RESAMP );
         } else if ( corrButton.isSelected() ) {
-            settings.setAnalysisMethod( Settings.CORR );
+            settings.setClassScoreMethod( Settings.CORR );
         }
     }
 }

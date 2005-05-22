@@ -13,7 +13,7 @@ import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
 import classScore.Settings;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
 
@@ -35,12 +35,12 @@ public class MultipleTestCorrector {
     private GeneAnnotations geneData;
     private GeneSetSizeComputer csc;
     private NumberFormat nf = NumberFormat.getInstance();
-    private GeneScoreReader geneScores;
+    private GeneScores geneScores;
     private Settings settings;
     private StatusViewer messenger;
 
     public MultipleTestCorrector( Settings set, Vector sc, Histogram h, GeneAnnotations geneData,
-            GeneSetSizeComputer csc, GeneScoreReader geneScores, Map results, StatusViewer messenger ) {
+            GeneSetSizeComputer csc, GeneScores geneScores, Map results, StatusViewer messenger ) {
         this.settings = set;
         this.sortedclasses = sc;
         this.results = results;

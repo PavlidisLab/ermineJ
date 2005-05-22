@@ -85,13 +85,9 @@ public class LoadDialog extends AppDialog {
 
     protected void actionButton_actionPerformed( ActionEvent e ) {
         if ( FileTools.testFile( loadFile.getText() ) ) {
-            try {
-                ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile.getText() );
-                ( ( GeneSetScoreFrame ) callingframe ).setSettings( settings );
-                ( ( GeneSetScoreFrame ) callingframe ).enableMenusForAnalysis();
-            } catch ( IOException e1 ) {
-               GuiUtil.error("There was a problem: " + e1.getMessage());
-            }
+            ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile.getText() );
+            ( ( GeneSetScoreFrame ) callingframe ).setSettings( settings );
+            ( ( GeneSetScoreFrame ) callingframe ).enableMenusForAnalysis();
             dispose();
         } else {
             GuiUtil.error( "File is not readable." );

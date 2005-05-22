@@ -187,13 +187,13 @@ public class AnalysisWizardStep2 extends WizardStep {
     }
 
     void setValues() {
-        jTextFieldScoreCol.setText( String.valueOf( settings.getScorecol() ) );
+        jTextFieldScoreCol.setText( String.valueOf( settings.getScoreCol() ) );
         scoreFile.setText( settings.getScoreFile() );
         rawFile.setText( settings.getRawFile() );
     }
 
     public void saveValues() {
-        settings.setScorecol( Integer.valueOf( jTextFieldScoreCol.getText() ).intValue() );
+        settings.setScoreCol( Integer.valueOf( jTextFieldScoreCol.getText() ).intValue() );
 
         settings.setScoreFile( scoreFile.getText() );
         settings.setRawFile( rawFile.getText() );

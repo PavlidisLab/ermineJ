@@ -35,6 +35,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
@@ -413,7 +414,7 @@ public class GeneSetScoreFrame extends JFrame {
 
         updateProgress( 10 );
         statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
-
+        assert settings.getClassFile() != null;
         try {
             goData = new GONames( settings.getClassFile() );
         } catch ( SAXException e ) {
@@ -617,9 +618,15 @@ public class GeneSetScoreFrame extends JFrame {
         enableMenusForAnalysis();
     }
 
-    public void loadAnalysis( String loadFile ) throws IOException {
+    public void loadAnalysis( String loadFile ) {
         disableMenusForAnalysis();
-        Settings loadSettings = new Settings( loadFile );
+        Settings loadSettings;
+        try {
+            loadSettings = new Settings( loadFile );
+        } catch ( ConfigurationException e ) {
+            GuiUtil.error( "There was a problem loading the settings from the results file: " + e.getMessage() );
+            return;
+        }
         if ( !checkValid( loadSettings ) ) {
             GuiUtil.error( "Loading of the analysis cannot proceed without the file information." );
             return;

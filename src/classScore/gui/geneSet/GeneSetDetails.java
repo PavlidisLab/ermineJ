@@ -12,7 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import classScore.Settings;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 import classScore.data.GeneSetResult;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
@@ -52,7 +52,7 @@ public class GeneSetDetails {
         this.className = goData.getNameForId( classID );
     }
 
-    public void show( String runName, GeneSetResult res, GeneScoreReader geneScores ) {
+    public void show( String runName, GeneSetResult res, GeneScores geneScores ) {
 
         Map classToProbe = null;
         Collection probeIDs = null;
@@ -72,7 +72,9 @@ public class GeneSetDetails {
             geneScores = tryToGetGeneScores( geneScores );
         }
 
-        getGeneScoresForGeneSet( geneScores, probeIDs, pvals );
+        if ( geneScores != null ) {
+            getGeneScoresForGeneSet( geneScores, probeIDs, pvals );
+        }
 
         if ( probeIDs == null ) {
             log.warn( "Class data retrieval error for " + className + "( no probes )" );
@@ -92,7 +94,7 @@ public class GeneSetDetails {
      * @param probeIDs
      * @param pvals
      */
-    private void getGeneScoresForGeneSet( GeneScoreReader geneScores, Collection probeIDs, Map pvals ) {
+    private void getGeneScoresForGeneSet( GeneScores geneScores, Collection probeIDs, Map pvals ) {
         if ( probeIDs == null ) return;
         for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
             String probeID = ( String ) iter.next();
@@ -121,17 +123,18 @@ public class GeneSetDetails {
      * @param geneScores
      * @return
      */
-    private GeneScoreReader tryToGetGeneScores( GeneScoreReader geneScores ) {
+    private GeneScores tryToGetGeneScores( GeneScores geneScores ) {
         assert settings != null : "Null settings.";
         String scoreFile = settings.getScoreFile();
         if ( scoreFile != null ) {
             try {
-                GeneScoreReader localReader = new GeneScoreReader( scoreFile, settings, null, geneData
-                        .getGeneToProbeList(), geneData.getProbeToGeneMap() );
+                GeneScores localReader = new GeneScores( scoreFile, settings, null, geneData.getGeneToProbeList(),
+                        geneData.getProbeToGeneMap() );
                 geneScores = localReader;
                 log.debug( "Getting gene scores from " + scoreFile );
             } catch ( IOException e ) {
                 log.error( e, e );
+                return null;
             }
         }
         return geneScores;

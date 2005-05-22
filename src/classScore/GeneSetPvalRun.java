@@ -21,7 +21,7 @@ import classScore.analysis.NullDistributionGenerator;
 import classScore.analysis.OraGeneSetPvalSeriesGenerator;
 import classScore.analysis.ResamplingCorrelationGeneSetScore;
 import classScore.analysis.ResamplingExperimentGeneSetScore;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
 
@@ -41,7 +41,7 @@ public class GeneSetPvalRun {
      */
     private static final int NUM_WY_SAMPLES = 10000;
     private GeneAnnotations geneData;
-    private GeneScoreReader geneScores;
+    private GeneScores geneScores;
     private GONames goData; // shared by all
     private Histogram hist;
     private Map results = null;
@@ -69,7 +69,7 @@ public class GeneSetPvalRun {
      * @param name Name of the run
      */
     public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData,
-            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
+            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
             Map results, String name ) {
         this.settings = settings;
         this.geneData = geneData;
@@ -116,8 +116,7 @@ public class GeneSetPvalRun {
      * @param name Name of the run
      */
     public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData,
-            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScoreReader geneScores, StatusViewer messenger,
-            String name ) {
+            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger, String name ) {
         this.settings = settings;
         this.geneData = geneData;
         this.goData = goData;
@@ -131,7 +130,7 @@ public class GeneSetPvalRun {
         // get the class sizes.
         GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
 
-        switch ( settings.getAnalysisMethod() ) {
+        switch ( settings.getClassScoreMethod() ) {
             case Settings.RESAMP: {
                 NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings, geneScores );
 
@@ -175,6 +174,8 @@ public class GeneSetPvalRun {
                 break;
             }
             case Settings.CORR: {
+                if ( rawData == null )
+                    throw new IllegalArgumentException( "Raw data cannot be null for Correlation analysis" );
                 messenger.setStatus( "Starting correlation resampling" );
                 NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings, rawData );
 
@@ -258,7 +259,7 @@ public class GeneSetPvalRun {
         } else if ( multipleTestCorrMethod == Settings.BENJAMINIHOCHBERG ) {
             mt.benjaminihochberg( 0.05 );
         } else if ( multipleTestCorrMethod == Settings.WESTFALLYOUNG ) {
-            if ( settings.getAnalysisMethod() != Settings.RESAMP )
+            if ( settings.getClassScoreMethod() != Settings.RESAMP )
                 throw new UnsupportedOperationException(
                         "Westfall-Young correction is not supported for this analysis method" );
             mt.westfallyoung( NUM_WY_SAMPLES );
@@ -334,7 +335,7 @@ public class GeneSetPvalRun {
     /**
      * @return Returns the geneScores.
      */
-    public GeneScoreReader getGeneScores() {
+    public GeneScores getGeneScores() {
         return this.geneScores;
     }
 }

@@ -9,7 +9,7 @@ import baseCode.bio.geneset.GeneAnnotations;
 import classScore.Settings;
 import classScore.analysis.GeneSetSizeComputer;
 import classScore.analysis.OraPvalGenerator;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 
 /**
  * <hr>
@@ -22,7 +22,7 @@ import classScore.data.GeneScoreReader;
 abstract class AbstractPvalGeneratorTest extends TestCase {
     protected OraPvalGenerator test = null;
     protected GeneAnnotations g = null;
-    protected GeneScoreReader gsr = null;
+    protected GeneScores gsr = null;
     protected InputStream is = null;
     protected InputStream ism = null;
     protected InputStream isi = null;
@@ -45,7 +45,7 @@ abstract class AbstractPvalGeneratorTest extends TestCase {
         Map gpm = g.getGeneToProbeList();
         Map pgm = g.getProbeToGeneMap();
 
-        gsr = new GeneScoreReader( is, s, null, gpm, pgm );
+        gsr = new GeneScores( is, s, null, gpm, pgm );
         gon = new GONames( isi );
         csc = new GeneSetSizeComputer( gsr.getProbeToPvalMap().keySet(), g, gsr, true );
 

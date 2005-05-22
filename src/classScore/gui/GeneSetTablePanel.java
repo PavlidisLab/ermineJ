@@ -297,14 +297,14 @@ public class GeneSetTablePanel extends GeneSetPanel {
         String tooltip = new String( "<html>" );
         String coda = new String();
 
-        if ( runSettings.getAnalysisMethod() == Settings.ORA ) {
+        if ( runSettings.getClassScoreMethod() == Settings.ORA ) {
             tooltip += "ORA Analysis<br>";
             coda += "P value threshold: " + runSettings.getPValThreshold();
-        } else if ( runSettings.getAnalysisMethod() == Settings.RESAMP ) {
+        } else if ( runSettings.getClassScoreMethod() == Settings.RESAMP ) {
             tooltip += "Resampling Analysis<br>";
             coda += runSettings.getIterations() + " iterations<br>";
-            coda += "Using score column: " + runSettings.getScorecol();
-        } else if ( runSettings.getAnalysisMethod() == Settings.CORR ) {
+            coda += "Using score column: " + runSettings.getScoreCol();
+        } else if ( runSettings.getClassScoreMethod() == Settings.CORR ) {
             tooltip += "Correlation Analysis<br>";
             coda += runSettings.getIterations() + " iterations";
         }
@@ -317,7 +317,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
             tooltip += "Gene Rep Treatment: Mean <br>";
         else if ( runSettings.getGeneRepTreatment() == Settings.BEST_PVAL ) tooltip += "Gene Rep Treatment: Best <br>";
 
-        if ( runSettings.getAnalysisMethod() == Settings.RESAMP || runSettings.getAnalysisMethod() == Settings.ORA ) {
+        if ( runSettings.getClassScoreMethod() == Settings.RESAMP || runSettings.getClassScoreMethod() == Settings.ORA ) {
             if ( runSettings.getRawScoreMethod() == Settings.MEAN_METHOD )
                 tooltip += "Class Raw Score Method: Mean <br>";
             else if ( runSettings.getRawScoreMethod() == Settings.QUANTILE_METHOD )

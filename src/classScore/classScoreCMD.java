@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.swing.UIManager;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.xml.sax.SAXException;
 
 import baseCode.bio.geneset.GONames;
@@ -21,7 +22,7 @@ import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
 import baseCode.util.StatusStderr;
 import baseCode.util.StatusViewer;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 
 /**
  * Main for command line
@@ -137,7 +138,7 @@ public class classScoreCMD {
                     try {
                         intarg = Integer.parseInt( arg );
                         if ( intarg >= 0 )
-                            settings.setScorecol( intarg );
+                            settings.setScoreCol( intarg );
                         else {
                             System.err.println( "Invalid score column (-e)" );
                             showHelp();
@@ -150,7 +151,7 @@ public class classScoreCMD {
                 case 'f': // classfolder
                     arg = g.getOptarg();
                     if ( FileTools.testDir( arg ) )
-                        settings.setClassFolder( arg );
+                        settings.setCustomGeneSetDirectory( arg );
                     else {
                         System.err.println( "Invalid path for class folder (-f)" );
                         showHelp();
@@ -161,7 +162,7 @@ public class classScoreCMD {
                     try {
                         intarg = Integer.parseInt( arg );
                         if ( intarg == 1 || intarg == 2 )
-                            settings.setScorecol( intarg );
+                            settings.setScoreCol( intarg );
                         else {
                             System.err.println( "Gene rep treatment must be either "
                                     + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
@@ -224,7 +225,7 @@ public class classScoreCMD {
                     try {
                         intarg = Integer.parseInt( arg );
                         if ( intarg == 0 || intarg == 1 || intarg == 2 )
-                            settings.setAnalysisMethod( intarg );
+                            settings.setClassScoreMethod( intarg );
                         else {
                             System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
                                     + "2 (CORR), or 3 (ROC) (-n)" );
@@ -326,7 +327,7 @@ public class classScoreCMD {
                         if ( FileTools.testFile( arg ) ) {
                             try {
                                 settings = new Settings( arg );
-                            } catch ( IOException e ) {
+                            } catch ( ConfigurationException e ) {
                                 e.printStackTrace();
                             }
                             options( args, true );
@@ -435,7 +436,7 @@ public class classScoreCMD {
      */
     protected GeneSetPvalRun analyze() throws IOException {
         DenseDoubleMatrix2DNamed rawData = null;
-        if ( settings.getAnalysisMethod() == Settings.CORR ) {
+        if ( settings.getClassScoreMethod() == Settings.CORR ) {
             if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
                 statusMessenger.setStatus( "Raw data are in memory" );
                 rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawFile() );
@@ -447,13 +448,13 @@ public class classScoreCMD {
             }
         }
 
-        GeneScoreReader geneScores;
+        GeneScores geneScores;
         if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
             statusMessenger.setStatus( "Gene Scores are in memory" );
-            geneScores = ( GeneScoreReader ) geneScoreSets.get( settings.getScoreFile() );
+            geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
         } else {
             statusMessenger.setStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScoreReader( settings.getScoreFile(), settings, statusMessenger, geneData
+            geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData
                     .getGeneToProbeList(), geneData.getProbeToGeneMap() );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }

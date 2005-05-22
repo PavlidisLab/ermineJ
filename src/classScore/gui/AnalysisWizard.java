@@ -47,7 +47,8 @@ public class AnalysisWizard extends Wizard {
         super( callingframe, 550, 350 );
         // enableEvents(AWTEvent.WINDOW_EVENT_MASK);
         this.callingframe = callingframe;
-        this.settings = new Settings( callingframe.getSettings() ); // own copy of settings
+        // this.settings = new Settings( callingframe.getSettings() ); // own copy of settings, for output file.
+        this.settings = callingframe.getSettings();
         this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) );
         this.goData = goData;
 
@@ -86,7 +87,7 @@ public class AnalysisWizard extends Wizard {
             setFinishEnabled();
             this.repaint();
             nextButton.grabFocus();
-            this.analysisType = settings.getAnalysisMethod();
+            this.analysisType = settings.getClassScoreMethod();
         } else if ( step == 2 && step2.isReady() ) {
             step = 3;
             this.getContentPane().remove( step2 );
@@ -179,7 +180,8 @@ public class AnalysisWizard extends Wizard {
 
             new Thread() {
                 public void run() {
-                    ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( settings );
+                    Settings copyOfSettings = new Settings( settings );
+                    ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( copyOfSettings );
                 }
             }.start();
             this.dispose();
@@ -193,12 +195,12 @@ public class AnalysisWizard extends Wizard {
         step31.saveValue();
         step4.saveValues();
         step5.saveValues();
-        try {
-            settings.writePrefs();
-        } catch ( IOException e ) {
-            GuiUtil.error( "Could not save preferences: " + e + "\n"
-                    + "If this problem persists, please contact the software vendor. " );
-        }
+        // try {
+        // settings.writePrefs();
+        // } catch ( IOException e ) {
+        // GuiUtil.error( "Could not save preferences: " + e + "\n"
+        // + "If this problem persists, please contact the software vendor. " );
+        // }
     }
 
     void loadAddedClasses() throws IOException {

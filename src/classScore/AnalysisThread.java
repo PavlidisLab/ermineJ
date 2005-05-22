@@ -17,7 +17,7 @@ import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
-import classScore.data.GeneScoreReader;
+import classScore.data.GeneScores;
 
 /**
  * <hr>
@@ -184,14 +184,14 @@ public class AnalysisThread extends Thread {
      * @return
      * @throws IOException
      */
-    private synchronized GeneScoreReader addGeneScores() throws IOException {
-        GeneScoreReader geneScores = null;
+    private synchronized GeneScores addGeneScores() throws IOException {
+        GeneScores geneScores = null;
         if ( !geneScoreSettingsDirty() && geneScoreSets.containsKey( settings.getScoreFile() ) ) {
             messenger.setStatus( "Gene Scores are in memory" );
-            geneScores = ( GeneScoreReader ) geneScoreSets.get( settings.getScoreFile() );
+            geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
         } else {
             messenger.setStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScoreReader( settings.getScoreFile(), settings, messenger, geneData
+            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData
                     .getGeneToProbeList(), geneData.getProbeToGeneMap() );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
@@ -228,10 +228,10 @@ public class AnalysisThread extends Thread {
     private synchronized GeneSetPvalRun doAnalysis( Map results ) throws IOException {
         log.debug( "Entering doAnalysis" );
         DenseDoubleMatrix2DNamed rawData = null;
-        if ( settings.getAnalysisMethod() == Settings.CORR ) {
+        if ( settings.getClassScoreMethod() == Settings.CORR ) {
             rawData = addRawData();
         }
-        GeneScoreReader geneScores = addGeneScores();
+        GeneScores geneScores = addGeneScores();
         if ( this.stop ) return null;
 
         Set activeProbes = getActiveProbes( rawData, geneScores );
@@ -262,7 +262,7 @@ public class AnalysisThread extends Thread {
         }
 
         if ( this.stop ) return null;
-        settings.writePrefs();
+     //   settings.writePrefs();
         oldSettings = settings;
         return newResults;
     }
@@ -271,7 +271,7 @@ public class AnalysisThread extends Thread {
     private synchronized boolean geneScoreSettingsDirty() {
         if ( oldSettings == null ) return true;
         return ( settings.getDoLog() != oldSettings.getDoLog() )
-                || ( settings.getScorecol() != oldSettings.getScorecol() );
+                || ( settings.getScoreCol() != oldSettings.getScoreCol() );
     }
 
     /**
@@ -280,7 +280,7 @@ public class AnalysisThread extends Thread {
      * @param activeProbes
      * @return
      */
-    private synchronized Set getActiveProbes( DenseDoubleMatrix2DNamed rawData, GeneScoreReader geneScores ) {
+    private synchronized Set getActiveProbes( DenseDoubleMatrix2DNamed rawData, GeneScores geneScores ) {
         Set activeProbes = null;
         if ( rawData != null && geneScores != null ) { // favor the geneScores list.
             activeProbes = geneScores.getProbeToPvalMap().keySet();
