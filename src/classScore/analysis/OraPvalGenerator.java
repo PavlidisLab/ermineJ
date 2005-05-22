@@ -51,7 +51,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * permutations of the data.
      */
     public GeneSetResult classPval( String class_name, Map groupToPvalMap, Map probesToPvals ) {
-
+        
+        if ( !super.checkAspect( class_name ) ) return null;
         // inputs for hypergeometric distribution
         int successes = 0;
         int failures = 0;
@@ -86,7 +87,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                     // group
                     if ( !record.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) {
                         record.put( geneAnnots.getProbeToGeneMap().get( probe ), null );
-                        groupPvalArr[v_size] = grouppval.doubleValue(); //npe here
+                        groupPvalArr[v_size] = grouppval.doubleValue(); // npe here
                         double geneScore = groupPvalArr[v_size];
                         if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
                             successes++;

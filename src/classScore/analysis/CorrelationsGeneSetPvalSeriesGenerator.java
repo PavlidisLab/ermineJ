@@ -93,6 +93,9 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
             Map.Entry e = ( Map.Entry ) it.next();
             Collection probesInSet = ( Collection ) e.getValue();
             String geneSetName = ( String ) e.getKey();
+
+            if ( !super.checkAspect( geneSetName ) ) continue;
+
             int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
 
             if ( effSize < probeCorrelData.getMinGeneSetSize() ) {
@@ -125,7 +128,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
                     Thread.sleep( 5 );
                 } catch ( InterruptedException ex ) {
                     log.debug( "Interrupted" );
-                    throw new CancellationException( );
+                    throw new CancellationException();
                 }
             }
 

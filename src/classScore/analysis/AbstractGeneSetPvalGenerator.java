@@ -37,9 +37,7 @@ public abstract class AbstractGeneSetPvalGenerator {
         this.effectiveSizes = csc.getEffectiveSizes();
         this.actualSizes = csc.getActualSizes();
         this.csc = csc;
-        if ( gon != null ) {
-            this.goName = gon;
-        }
+        this.goName = gon;
     }
 
     /**
@@ -67,6 +65,28 @@ public abstract class AbstractGeneSetPvalGenerator {
      */
     public int getMinGeneSetSize() {
         return minGeneSetSize;
+    }
+
+    protected boolean checkAspect( String geneSetName ) {
+        assert goName != null;
+        String aspect = this.goName.getAspectForId( geneSetName );
+
+        if ( aspect == null ) {
+    //        log.warn( "Null aspect for " + geneSetName );
+            return true;
+        }
+
+        if ( aspect.equalsIgnoreCase( "biological_process" ) && this.settings.getUseBiologicalProcess() ) {
+            return true;
+        } else if ( aspect.equalsIgnoreCase( "cellular_component" ) && this.settings.getUseCellularComponent() ) {
+            return true;
+        } else if ( aspect.equalsIgnoreCase( "molecular_function" ) && this.settings.getUseMolecularFunction() ) {
+            return true;
+        } else if ( aspect.equalsIgnoreCase( GONames.NO_ASPECT_AVAILABLE ) ) {
+            return true; // user-defined - always use.
+        }
+        // log.debug( "Skipping " + geneSetName + " from " + aspect );
+        return false;
     }
 
     /**

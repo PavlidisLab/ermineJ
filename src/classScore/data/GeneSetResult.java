@@ -49,7 +49,7 @@ public class GeneSetResult implements Comparable {
     }
 
     public void print( BufferedWriter out ) throws IOException {
-        this.print( out, "" );
+        this.print( out, ""  );
     }
 
     public void print( BufferedWriter out, String extracolumns ) throws IOException {
@@ -60,10 +60,10 @@ public class GeneSetResult implements Comparable {
     }
 
     public void print_headings( BufferedWriter out ) throws IOException {
-        this.print_headings( out, "" );
+        this.printHeadings( out, "" );
     }
 
-    public void print_headings( BufferedWriter out, String extracolumns ) throws IOException {
+    public void printHeadings( BufferedWriter out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
         out.write( "\tClass Name" + "\tClass ID" + "\tsize" + "\teffective_size" + "\traw score" + "\tpval" +
         // "\tN over pval cut\tORA pval+"

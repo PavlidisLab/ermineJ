@@ -43,19 +43,19 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      * Get results for one class, based on class id. The other arguments are things that are not constant under
      * permutations of the data.
      * 
-     * @param class_name a <code>String</code> value
+     * @param geneSetName a <code>String</code> value
      * @param groupToPvalMap a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
      * @return a <code>classresult</code> value
      */
-    public GeneSetResult classPval( String classId, Map geneToPvalMap, Map probesToPvals ) {
-
-        int effSize = ( ( Integer ) effectiveSizes.get( classId ) ).intValue();
+    public GeneSetResult classPval( String geneSetName, Map geneToPvalMap, Map probesToPvals ) {
+        if ( !super.checkAspect( geneSetName ) ) return null;
+        int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
             return null;
         }
 
-        Collection values = ( Collection ) geneAnnots.getGeneSetToProbeMap().get( classId );
+        Collection values = ( Collection ) geneAnnots.getGeneSetToProbeMap().get( geneSetName );
         Iterator classit = values.iterator();
         double[] groupPvalArr = new double[effSize]; // store pvalues for items in
         // the class.
@@ -104,12 +104,12 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
         if ( pval < 0.0 ) {
             throw new IllegalStateException( "A raw score (" + rawscore + ") yielded an invalid pvalue: Classname: "
-                    + classId );
+                    + geneSetName );
         }
 
         // set up the return object.
-        GeneSetResult res = new GeneSetResult( classId, goName.getNameForId( classId ), ( ( Integer ) actualSizes
-                .get( classId ) ).intValue(), effSize );
+        GeneSetResult res = new GeneSetResult( geneSetName, goName.getNameForId( geneSetName ),
+                ( ( Integer ) actualSizes.get( geneSetName ) ).intValue(), effSize );
         res.setScore( rawscore );
         res.setPValue( pval );
         return res;

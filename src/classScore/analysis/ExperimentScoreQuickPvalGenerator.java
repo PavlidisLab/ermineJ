@@ -36,14 +36,16 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
      * @throws IllegalStateException
      * @return double
      */
-    public double classPvalue( String class_name, Map group_pval_map, Map probesToPvals ) throws IllegalStateException {
+    public double classPvalue( String geneSetName, Map genePvalueMap, Map probePvalMap ) {
 
         double pval = 0.0;
         double rawscore = 0.0;
-        Collection values = ( Collection ) geneAnnots.getGeneSetToProbeMap().get( class_name );
+        Collection values = ( Collection ) geneAnnots.getGeneSetToProbeMap().get( geneSetName );
         Iterator classit = values.iterator();
 
-        int in_size = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue(); // effective size of this class.
+        if ( !super.checkAspect( geneSetName ) ) return -1.0;
+
+        int in_size = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue(); // effective size of this class.
         if ( in_size < settings.getMinClassSize() || in_size > settings.getMaxClassSize() ) {
             return -1.0;
         }
@@ -58,14 +60,14 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
         while ( classit.hasNext() ) {
             String probe = ( String ) classit.next(); // probe id
 
-            if ( probesToPvals.containsKey( probe ) ) { // if it is in the data
+            if ( probePvalMap.containsKey( probe ) ) { // if it is in the data
                 // set. This is invariant
                 // under permutations.
 
                 if ( settings.getUseWeights() ) {
-                    Double grouppval = ( Double ) group_pval_map.get( geneAnnots.getProbeToGeneMap().get( probe ) ); // probe
-                                                                                                                        // ->
-                                                                                                                        // group
+                    Double grouppval = ( Double ) genePvalueMap.get( geneAnnots.getProbeToGeneMap().get( probe ) ); // probe
+                    // ->
+                    // group
                     if ( !record.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) { // if we
                         // haven't
                         // done
@@ -91,7 +93,7 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
         pval = scoreToPval( in_size, rawscore );
 
         if ( pval < 0 ) {
-            throw new IllegalStateException( "Warning, a rawscore yielded an invalid pvalue: Classname: " + class_name );
+            throw new IllegalStateException( "Warning, a rawscore yielded an invalid pvalue: Classname: " + geneSetName );
         }
         return pval;
     }
