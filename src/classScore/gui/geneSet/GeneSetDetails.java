@@ -52,7 +52,7 @@ public class GeneSetDetails {
         this.className = goData.getNameForId( classID );
     }
 
-    public void show( GeneSetResult res, GeneScoreReader geneScores ) {
+    public void show( String runName, GeneSetResult res, GeneScoreReader geneScores ) {
 
         Map classToProbe = null;
         Collection probeIDs = null;
@@ -81,7 +81,7 @@ public class GeneSetDetails {
         // create the details frame
         JGeneSetFrame f = new JGeneSetFrame( new ArrayList( probeIDs ), pvals, geneData, settings );
 
-        String title = getTitle( res, probeIDs );
+        String title = getTitle( runName, res, probeIDs );
         f.setTitle( title );
         f.show();
 
@@ -143,17 +143,21 @@ public class GeneSetDetails {
      * @param probeIDs
      * @return
      */
-    private String getTitle( GeneSetResult res, Collection probeIDs ) {
+    private String getTitle( String runName, GeneSetResult res, Collection probeIDs ) {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits( 8 );
-        String title = className + " (" + probeIDs.size() + " items  ";
-        if ( res != null ) title = title + "p = " + nf.format( res.getPvalue() );
+        String title = className + " (" + probeIDs.size() + " items ";
+        if ( runName != null ) title = title + runName + " ";
+        if ( res != null ) title = title + " p = " + nf.format( res.getPvalue() );
         title = title + ")";
         return title;
     }
 
+    /**
+     * Show when there is no run information available.
+     */
     public void show() {
-        this.show( null, null );
+        this.show( null, null, null );
     }
 
 }
