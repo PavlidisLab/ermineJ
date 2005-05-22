@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<title>Using the ermineJ API</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+<H1>Using the ermineJ Application Programming Interface</H1>
+<P>ErmineJ consists of two jar files: ermineJ.jar and baseCode.jar. The
+latter contains code that is common to other projects, while ermineJ
+contains classes that are specific to the gene set scoring task. ErmineJ
+has dependencies on a number of other third party libraries including
+Commons Configuration. Use of the ermineJ API is covered by the Lesser
+Gnu Public License.</P>
+
+<P>While the internal use of the ermineJ API is fairly complex, most of
+that complexity is not needed for use by third parties. The minimal
+requirements for an analysis are:</P>
+
+<ul>
+	<li>A java.util.List of probe ids. This should contain all the probes
+	on the microarray design (or at least, not just the ones that met some
+	selection criterion)</li>
+	<li>A List of gene symbols (in the same order as the probe ids)</li>
+	<li>A List of Collections of GO terms for the gene symbols (keyed by
+	the probe ids, in the same order as the probes)</li>
+	<li>A List of scores for the probe ids. Typically these are p-values,
+	but they can be any value you like, inluding a dummy variable
+	indicating cluster membership etc.</li>
+	<li>A List of GO ids (this and the next item can be replaced by the GO
+	rdf-xml file)</li>
+	<li>A List of GO terms corresponding to the IDs</li>
+</ul>
+
+<p>The last two items can probably made optional, but for now they are
+required.</p>
+
+<p>The use of java.util.Lists was intended to make it very easy for
+third parties to create data structures that ermineJ can handle. It is
+the programmers responsibility to make sure the Lists are in the correct
+order. While ermineJ will detect some types of problems with the input
+data structures, it cannot tell that you put the probe IDs in a
+different order than the gene symbols.</p>
+
+<p>Once the above are assembled, the analysis proceeds in three phases:</p>
+
+<ol>
+	<li>Configure a Settings object with all the parameters the analysis
+	needs</li>
+	<li>Create the GeneAnnotations, GOData and GeneScore objects that are
+	the inputs to the analysis (along with the Settings)</li>
+	<li>Run the analysis by building a GeneSetPvalRun object.</li>
+</ol>
+
+<p>The results can then be obtained from the GeneSetPvalRun with a few
+simple method calls.</p>
+
+<p>The following code snippets demonstrate how to implement these steps.</p>
+
+<div class="java"><pre>
+        List probes = null; // List of identifiers to be analyzed
+        List genes = null; // List of genes corresponding to the probes. Indicates the Many-to-one mapping of probes to genes.
+        List goAssociations = null; // List of Collections of go terms for the probes.
+        List geneScores = null; // List of Doubles 
+        List goIds = null; // list of all GO Ids, e.g., "GO:0000001"
+        List goTerms = null; // List of all GO terms, e.g., "ribosome" (java.lang.String)
+
+        /* ... code to initialize these data structures goes here ... */
+
+        Settings settings = null;
+        try {
+            settings = new Settings( false );
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+
+        settings.setBigIsBetter( false ); // in our raw data, smaller values are better (like pvalues, unlike fold
+                                            // change)
+        settings.setMaxClassSize( 100 ); // set range of sizes of gene sets to consider.
+        settings.setMinClassSize( 5 );
+        settings.setPValThreshold( 0.001 ); // use this pvalue threshold for selecting genes. (before taking logs)
+        settings.setClassScoreMethod( Settings.ORA ); // use over-representation analysis.
+        /* ... etc. Reasonable defaults (?) are set for all parameters if you don't set them. */
+
+        GeneAnnotations geneData = new GeneAnnotations( probes, genes, null, goAssociations );
+        GeneScores scores = new GeneScores( probes, geneScores, geneData.getGeneToProbeList(), geneData
+                .getProbeToGeneMap(), settings );
+        GONames goData = new GONames( goIds, goTerms );
+        GeneSetPvalRun run = new GeneSetPvalRun( settings, geneData, goData, scores );
+
+        /*
+         * Now we can get the results for any given gene set. Typically we just iterate over the results.
+         */
+        double pvalue = ( ( GeneSetResult ) run.getResults().get( "GO:0000032" ) ).getPvalue();
+</pre></div>
+
+
+
+</body>
+</html>
