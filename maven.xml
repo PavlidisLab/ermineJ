@@ -56,8 +56,8 @@
 	<arg path="ermineJ-help/JavaHelpSearch" />
 	<arg value="-c" />
 	<arg path="ermineJ-help/help.config" />
-	<arg value="ermineJ-help/html/tutorial" />
-	<arg value="ermineJ-help/html/formats" />
+	<arg value="${basedir}/ermineJ-help/classScore/html/tutorial" />
+	<arg value="${basedir}/ermineJ-help/classScore/html/formats" />
 	</ant:exec>
 	<ant:echo>Making help jar file...</ant:echo>
 	<ant:jar destfile="${basedir}/ermineJ-help.jar" update="false" excludes="**/CVS/*" basedir="${basedir}/ermineJ-help" />
