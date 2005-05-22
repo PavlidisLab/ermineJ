@@ -37,8 +37,8 @@ import classScore.Settings;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class GeneScoreReader {
-    protected static final Log log = LogFactory.getLog( GeneScoreReader.class );
+public class GeneScores {
+    protected static final Log log = LogFactory.getLog( GeneScores.class );
     private static final double SMALL = 10e-16;
     double[] groupPvalues;
     private List probeIDs = null;
@@ -51,6 +51,89 @@ public class GeneScoreReader {
     private Settings settings;
 
     /**
+     * Constructor designed for use when input is not a file.
+     * 
+     * @param probes List of Strings.
+     * @param scores List of java.lang.Doubles containing the scores for each probe.
+     * @param geneToProbeMap, usually obtained from a GeneAnnotation object (a Map of String keys with Collection
+     *        values)
+     * @param probeToGeneMap, usually obtained from a GeneAnnotation object (a Map of String keys with Collection
+     *        values)
+     * @param settings
+     */
+    public GeneScores( List probes, List scores, Map geneToProbeMap, Map probeToGeneMap, Settings settings ) {
+        if ( probes.size() != scores.size() ) {
+            throw new IllegalArgumentException( "Probe and scores must be equal in number" );
+        }
+        if ( probes.size() == 0 ) {
+            throw new IllegalArgumentException( "No probes" );
+        }
+
+        if ( !( probes.get( 0 ) instanceof String ) ) {
+            throw new IllegalArgumentException( "Probes must be a list of Strings" );
+        }
+        if ( !( scores.get( 0 ) instanceof Double ) ) {
+            throw new IllegalArgumentException( "Scores must be a list of Doubles" );
+        }
+        if ( geneToProbeMap == null || geneToProbeMap.size() == 0 ) {
+            throw new IllegalStateException( "groupToProbeMap was not set." );
+        }
+
+        if ( probeToPvalMap == null ) {
+            throw new IllegalStateException( "probeToPvalMap was not set." );
+        }
+
+        if ( geneToProbeMap.size() == 0 ) {
+            throw new IllegalStateException( "Group to probe map was empty" );
+        }
+
+        this.settings = settings;
+        this.init();
+        boolean invalidLog = false;
+        boolean unknownProbe = false;
+        boolean invalidNumber = false;
+        String badNumberString = "";
+        int numProbesKept = 0;
+        for ( int i = 0; i < probes.size(); i++ ) {
+            String probe = ( String ) probes.get( i );
+            Double value = ( Double ) scores.get( i );
+
+            // only keep probes that are in our array platform.
+            if ( !probeToGeneMap.containsKey( probe ) ) {
+                unknownProbe = true;
+                continue;
+            }
+
+            if ( probe.matches( "AFFX.*" ) ) { // FIXME: put this rule somewhere else // todo use a filter.
+
+                continue;
+            }
+
+            double pValue = value.doubleValue();
+
+            // Fudge when pvalues are zero.
+            if ( settings.getDoLog() && pValue <= 0.0 ) {
+                invalidLog = true;
+                pValue = SMALL;
+            }
+
+            if ( settings.getDoLog() ) {
+                pValue = -Arithmetic.log10( pValue );
+            }
+
+            /* we're done... */
+            numProbesKept++;
+            probeIDs.add( probe );
+            probePvalues.add( new Double( pValue ) );
+            probeToPvalMap.put( probe, new Double( pValue ) );
+
+        }
+        setUpRawArrays();
+        reportProblems( null, invalidLog, unknownProbe, invalidNumber, badNumberString, numProbesKept );
+        setUpGeneToPvalMap( settings, geneToProbeMap, null );
+    }
+
+    /**
      * @throws IOException
      * @param filename
      * @param settings
@@ -58,7 +141,7 @@ public class GeneScoreReader {
      * @param geneToProbeMap
      * @param probeToGeneMap
      */
-    public GeneScoreReader( String filename, Settings settings, StatusViewer messenger, Map geneToProbeMap,
+    public GeneScores( String filename, Settings settings, StatusViewer messenger, Map geneToProbeMap,
             Map probeToGeneMap ) throws IOException {
         this.settings = settings;
         this.init();
@@ -76,8 +159,8 @@ public class GeneScoreReader {
      * @param probeToGeneMap
      * @throws IOException
      */
-    public GeneScoreReader( InputStream is, Settings settings, StatusViewer messenger, Map geneToProbeMap,
-            Map probeToGeneMap ) throws IOException {
+    public GeneScores( InputStream is, Settings settings, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
+            throws IOException {
         this.init();
         this.settings = settings;
         read( is, messenger, geneToProbeMap, probeToGeneMap );
@@ -92,14 +175,13 @@ public class GeneScoreReader {
 
     private void read( InputStream is, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
             throws IOException {
-
-        if ( settings.getScorecol() < 2 ) {
-            throw new IllegalArgumentException( "Illegal column number " + settings.getScorecol()
-                    + ", must be greater than 1" );
+        int scoreCol = settings.getScoreCol();
+        if ( scoreCol < 2 ) {
+            throw new IllegalArgumentException( "Illegal column number " + scoreCol + ", must be greater than 1" );
         }
 
         if ( messenger != null ) {
-            messenger.setStatus( "Reading gene scores from column " + settings.getScorecol() );
+            messenger.setStatus( "Reading gene scores from column " + scoreCol );
         }
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( is ) ) );
@@ -108,14 +190,14 @@ public class GeneScoreReader {
         boolean unknownProbe = false;
         boolean invalidNumber = false;
         String badNumberString = "";
-        int scoreColumnIndex = settings.getScorecol() - 1;
+        int scoreColumnIndex = scoreCol - 1;
         int numProbesKept = 0;
 
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
 
             // ignore rows that have insufficient columns.
-            if ( fields.length < settings.getScorecol() ) {
+            if ( fields.length < scoreCol ) {
                 continue;
             }
 
@@ -176,11 +258,8 @@ public class GeneScoreReader {
         reportProblems( messenger, invalidLog, unknownProbe, invalidNumber, badNumberString, numProbesKept );
         setUpGeneToPvalMap( settings, geneToProbeMap, messenger );
 
-    } // 
+    }
 
-    /**
-     * 
-     */
     private void setUpRawArrays() {
         probePvaluesArray = new double[numPvals];
         probeIDsArray = new String[numPvals];
@@ -239,7 +318,7 @@ public class GeneScoreReader {
         try {
             Thread.sleep( 2000 );
         } catch ( InterruptedException e ) {
-            throw new CancellationException( );
+            throw new CancellationException();
         }
     }
 
@@ -252,7 +331,7 @@ public class GeneScoreReader {
      */
     private void setUpGeneToPvalMap( Settings settings, Map geneToProbeMap, StatusViewer messenger ) {
 
-        int gp_method = settings.getGroupMethod();
+        int gp_method = settings.getGeneRepTreatment();
 
         if ( geneToProbeMap == null || geneToProbeMap.size() == 0 ) {
             throw new IllegalStateException( "groupToProbeMap was not set." );
@@ -275,12 +354,12 @@ public class GeneScoreReader {
                 return;
             }
 
-            String group = ( String ) groupMapItr.next();
+            String geneSymbol = ( String ) groupMapItr.next();
 
-            Collection probes = ( Collection ) geneToProbeMap.get( group ); /*
-                                                                             * probes in this group according to the
-                                                                             * array platform.
-                                                                             */
+            Collection probes = ( Collection ) geneToProbeMap.get( geneSymbol ); /*
+                                                                                     * probes in this group according to
+                                                                                     * the array platform.
+                                                                                     */
             int in_size = 0;
 
             // Analyze all probes in this 'group' (pointing to the same gene)
@@ -320,7 +399,7 @@ public class GeneScoreReader {
                     groupPvalTemp[counter] /= in_size; // take the mean
                 }
                 Double dbb = new Double( groupPvalTemp[counter] );
-                geneToPvalMap.put( group, dbb );
+                geneToPvalMap.put( geneSymbol, dbb );
                 counter++;
             }
         } // end of while
