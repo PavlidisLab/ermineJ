@@ -34,6 +34,15 @@ public class GeneSetWizard extends Wizard {
     UserDefinedGeneSetManager oldGeneSet;
     String cid;
 
+    /**
+     * Use this constructor to let the user choose which gene set to look at or to make a new one.
+     * 
+     * @param callingframe
+     * @param geneData
+     * @param goData
+     * @param makenew if true, the user is asked to create a new gene set. If false, they are asked to choose from a
+     *        list of existing gene sets.
+     */
     public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData, boolean makenew ) {
         super( callingframe, 550, 350 );
         this.callingframe = callingframe;
@@ -49,27 +58,35 @@ public class GeneSetWizard extends Wizard {
         if ( makenew ) {
             this.setTitle( "Define New Gene Set - Step 1 of 3" );
             step1 = new GeneSetWizardStep1( this, settings );
-            this.addStep( 1, step1 );
+            this.addStep( step1, true );
         } else {
             this.setTitle( "Modify Gene Set - Step 1 of 3" );
             step1A = new GeneSetWizardStep1A( this, geneData, goData, newGeneSet, oldGeneSet );
-            this.addStep( 1, step1A );
+            this.addStep( step1A, true );
         }
         step2 = new GeneSetWizardStep2( this, geneData, newGeneSet );
-        this.addStep( 2, step2 );
+        this.addStep( step2 );
         step3 = new GeneSetWizardStep3( this, settings, geneData, newGeneSet, makenew );
-        this.addStep( 3, step3 );
+        this.addStep( step3 );
 
         finishButton.setEnabled( false );
     }
 
-    public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData, String cid ) {
+    /**
+     * Use this constructor when you know the gene set to be looked at.
+     * 
+     * @param callingframe
+     * @param geneData
+     * @param goData
+     * @param geneSetId
+     */
+    public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData, String geneSetId ) {
         super( callingframe, 550, 350 );
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
         this.geneData = geneData;
         this.goData = goData;
-        this.cid = cid;
+        this.cid = geneSetId;
         makenew = false;
         nostep1 = true;
         newGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
@@ -77,21 +94,23 @@ public class GeneSetWizard extends Wizard {
         this.setTitle( "Modify Gene Set - Step 2 of 3" );
         step = 2;
         backButton.setEnabled( false );
-        newGeneSet.setId( cid );
-        newGeneSet.setDesc( goData.getNameForId( cid ) );
+        newGeneSet.setId( geneSetId );
+        newGeneSet.setDesc( goData.getNameForId( geneSetId ) );
         newGeneSet.setModified( true );
-        if ( geneData.geneSetExists( cid ) ) newGeneSet.getProbes().addAll( geneData.getClassToProbes( cid ) );
-        oldGeneSet.setId( cid );
-        oldGeneSet.setDesc( goData.getNameForId( cid ) );
+        if ( geneData.geneSetExists( geneSetId ) )
+            newGeneSet.getProbes().addAll( geneData.getClassToProbes( geneSetId ) );
+        oldGeneSet.setId( geneSetId );
+        oldGeneSet.setDesc( goData.getNameForId( geneSetId ) );
         oldGeneSet.setModified( true );
-        if ( geneData.geneSetExists( cid ) ) oldGeneSet.getProbes().addAll( geneData.getClassToProbes( cid ) );
+        if ( geneData.geneSetExists( geneSetId ) )
+            oldGeneSet.getProbes().addAll( geneData.getClassToProbes( geneSetId ) );
         this.repaint();
         step2 = new GeneSetWizardStep2( this, geneData, newGeneSet );
-        this.addStep( 1, step2 ); // hack for starting at step 2
-        this.addStep( 2, step2 );
+        this.addStep( step2, true ); // hack for starting at step 2
+        this.addStep( step2 );
         step2.updateCountLabel();
         step3 = new GeneSetWizardStep3( this, settings, geneData, newGeneSet, makenew );
-        this.addStep( 3, step3 );
+        this.addStep( step3 );
     }
 
     protected void nextButton_actionPerformed( ActionEvent e ) {

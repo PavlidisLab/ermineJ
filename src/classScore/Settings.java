@@ -89,6 +89,10 @@ public class Settings {
     private int scorecol = 2;
     private String scoreFile = "";
 
+    private boolean useBiologicalProcess = true;
+    private boolean useCellularComponent = true;
+    private boolean useMolecularFunction = true;
+
     public Settings() throws IOException {
         this( "" );
     }
@@ -717,6 +721,51 @@ public class Settings {
         } catch ( IOException ex ) {
             System.err.println( "Could not find preferences file. Will probably attempt to create a new one." );
         }
+    }
+
+    /**
+     * @return Returns the useBiologicalProcess.
+     */
+    public boolean getUseBiologicalProcess() {
+        return this.useBiologicalProcess;
+    }
+
+    /**
+     * @param useBiologicalProcess The useBiologicalProcess to set.
+     */
+    public void setUseBiologicalProcess( boolean useBiologicalProcess ) {
+        this.config.setProperty( "useBiologicalProcess", new Boolean( useBiologicalProcess ) );
+        this.useBiologicalProcess = useBiologicalProcess;
+    }
+
+    /**
+     * @return Returns the useCellularComponent.
+     */
+    public boolean getUseCellularComponent() {
+        return this.useCellularComponent;
+    }
+
+    /**
+     * @param useCellularComponent The useCellularComponent to set.
+     */
+    public void setUseCellularComponent( boolean useCellularComponent ) {
+        this.config.setProperty( "useCellularComponent", new Boolean( useCellularComponent ) );
+        this.useCellularComponent = useCellularComponent;
+    }
+
+    /**
+     * @return Returns the useMolecularFunction.
+     */
+    public boolean getUseMolecularFunction() {
+        return this.useMolecularFunction;
+    }
+
+    /**
+     * @param useMolecularFunction The useMolecularFunction to set.
+     */
+    public void setUseMolecularFunction( boolean useMolecularFunction ) {
+        this.config.setProperty( "useMolecularFunction", new Boolean( useMolecularFunction ) );
+        this.useMolecularFunction = useMolecularFunction;
     }
 
 }

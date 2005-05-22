@@ -38,9 +38,9 @@ public class SaveWizard extends Wizard {
         this.goData = goData;
 
         step1 = new SaveWizardStep1( this, rundata );
-        this.addStep( 1, step1 );
+        this.addStep( step1, true );
         step2 = new SaveWizardStep2( this, callingframe.getSettings().getDataDirectory() );
-        this.addStep( 2, step2 );
+        this.addStep( step2 );
         this.setTitle( "Save Analysis - Step 1 of 2" );
         finishButton.setEnabled( false );
     }
@@ -94,7 +94,12 @@ public class SaveWizard extends Wizard {
         String saveFileName = step2.getSaveFileName();
         try {
             saveSettings.writePrefs( saveFileName ); // first we stream the prefs to the file.
-            ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, goData, step2.getShouldSaveGeneNames() ); // then we pile on the results.
+            ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, goData, step2.getShouldSaveGeneNames() ); // then
+                                                                                                                        // we
+                                                                                                                        // pile
+                                                                                                                        // on
+                                                                                                                        // the
+                                                                                                                        // results.
             rp.printResults( true );
         } catch ( IOException ioe ) {
             GuiUtil.error( "Could not write results to the file. " + ioe );

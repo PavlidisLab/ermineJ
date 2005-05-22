@@ -240,15 +240,11 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             } else if ( column == 1 || column == 0 ) {
                 String aspect = goData.getAspectForId( classid );
                 String definition = goData.getDefinitionForId( classid );
-                setToolTipText( "<html>Aspect: "
-                        + aspect
-                        + "<br>Definition: "
-                        + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50,
-                                "<br>" ) );
+                setToolTipText( "<html>Aspect: " + aspect + "<br>Definition: "
+                        + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br>" ) );
             }
 
         } else {
-            log.debug( "No tooltip" );
             setToolTipText( null );
         }
 
