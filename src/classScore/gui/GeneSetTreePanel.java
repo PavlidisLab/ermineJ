@@ -38,6 +38,7 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.graph.DirectedGraphNode;
 import baseCode.dataStructure.graph.GraphNode;
+import baseCode.util.StringUtil;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
@@ -380,41 +381,41 @@ public class GeneSetTreePanel extends GeneSetPanel {
         popup.add( deleteGeneSetMenuItem );
         popup.add( collapseNodeMenuItem );
         popup.add( expandNodeMenuItem );
-        MouseListener popupListener = new GeneSetTree_PopupListener( popup );//////////
-//MouseListener popupListener = new MouseAdapter() {
-//            public void mousePressed( MouseEvent e ) {
-//                maybeShowPopup( e );
-//            }
-//
-//            public void mouseReleased( MouseEvent e ) {
-//                maybeShowPopup( e );
-//            }
-//
-//            private void maybeShowPopup( MouseEvent e ) {
-//                if ( e.isPopupTrigger() ) {
-//                    JTable source = ( JTable ) e.getSource();
-//                    assert source != null;
-//                    int r = source.rowAtPoint( e.getPoint() );
-//                    List id = ( Vector ) source.getValueAt( r, 0 );
-//                    if ( id != null ) {
-//                        assert popup != null;
-//                        if ( popup == null ) throw new NullPointerException( "popup is null" );
-//                        int row = source.rowAtPoint( e.getPoint() );
-//                        String classID = ( String ) ( ( Vector ) source.getValueAt( row, 0 ) ).get( 0 );
-//                        assert goData != null;
-//                        if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
-//                            deleteGeneSetMenuItem.setEnabled( false );
-//                            log.debug( "Won't show." );
-//                        } else {
-//                            deleteGeneSetMenuItem.setEnabled( true );
-//                        }
-//                        popup.show( e.getComponent(), e.getX(), e.getY() );
-//                        popup.setPoint( e.getPoint() );
-//                        popup.setSelectedItem( classID );
-//                    }
-//                }
-//            }
-//        };
+        MouseListener popupListener = new GeneSetTree_PopupListener( popup );// ////////
+        // MouseListener popupListener = new MouseAdapter() {
+        // public void mousePressed( MouseEvent e ) {
+        // maybeShowPopup( e );
+        // }
+        //
+        // public void mouseReleased( MouseEvent e ) {
+        // maybeShowPopup( e );
+        // }
+        //
+        // private void maybeShowPopup( MouseEvent e ) {
+        // if ( e.isPopupTrigger() ) {
+        // JTable source = ( JTable ) e.getSource();
+        // assert source != null;
+        // int r = source.rowAtPoint( e.getPoint() );
+        // List id = ( Vector ) source.getValueAt( r, 0 );
+        // if ( id != null ) {
+        // assert popup != null;
+        // if ( popup == null ) throw new NullPointerException( "popup is null" );
+        // int row = source.rowAtPoint( e.getPoint() );
+        // String classID = ( String ) ( ( Vector ) source.getValueAt( row, 0 ) ).get( 0 );
+        // assert goData != null;
+        // if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
+        // deleteGeneSetMenuItem.setEnabled( false );
+        // log.debug( "Won't show." );
+        // } else {
+        // deleteGeneSetMenuItem.setEnabled( true );
+        // }
+        // popup.show( e.getComponent(), e.getX(), e.getY() );
+        // popup.setPoint( e.getPoint() );
+        // popup.setSelectedItem( classID );
+        // }
+        // }
+        // }
+        // };
         return popupListener;
     }
 
@@ -596,6 +597,8 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             name = nodeObj.toString();
         }
 
+        setupToolTip( id );
+
         displayedText = name;
         displayedText = addGeneSetSizeInformation( name, id, displayedText, node );
 
@@ -616,6 +619,17 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         }
 
         return this;
+    }
+
+    /**
+     * @param id
+     */
+    private void setupToolTip( String id ) {
+        // code also in the tree renderer
+        String aspect = goData.getAspectForId( id );
+        String definition = goData.getDefinitionForId( id );
+        setToolTipText( "<html>Aspect: " + aspect + "<br>Definition: "
+                + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br>" ) );
     }
 
     /**

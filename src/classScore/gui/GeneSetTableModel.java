@@ -16,9 +16,11 @@ import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.omg.CORBA.INITIALIZE;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
+import baseCode.util.StringUtil;
 import classScore.GeneSetPvalRun;
 import classScore.data.GeneSetResult;
 import corejava.Format;
@@ -165,6 +167,7 @@ public class GeneSetTableModel extends AbstractTableModel {
  *  
  */
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
+    private static Log log = LogFactory.getLog( OutputPanelTableCellRenderer.class.getName() );
     private Format nf = new Format( "%.3g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 
@@ -222,21 +225,33 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         }
 
         // set tool tips
-        if ( value != null && value.getClass().equals( ArrayList.class ) ) {
+        if ( value != null ) {
             String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
             // String classid = ( String ) table.getValueAt( row, 0 );
-            GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
-            Map data = result.getResults();
-            if ( data.containsKey( classid ) ) {
-                GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
-                        + "<br>Genes: " + res.getEffectiveSize() + "<br>Probes: " + res.getSize() );
+
+            if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
+                GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
+                Map data = result.getResults();
+                if ( data.containsKey( classid ) ) {
+                    GeneSetResult res = ( GeneSetResult ) data.get( classid );
+                    setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
+                            + "<br>Genes: " + res.getEffectiveSize() + "<br>Probes: " + res.getSize() );
+                }
+            } else if ( column == 1 || column == 0 ) {
+                String aspect = goData.getAspectForId( classid );
+                String definition = goData.getDefinitionForId( classid );
+                setToolTipText( "<html>Aspect: "
+                        + aspect
+                        + "<br>Definition: "
+                        + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50,
+                                "<br>" ) );
             }
+
         } else {
+            log.debug( "No tooltip" );
             setToolTipText( null );
         }
 
         return this;
     }
-
 }
