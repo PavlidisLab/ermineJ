@@ -68,8 +68,8 @@ public class AnalysisWizardStep3 extends WizardStep {
 
     // Component initialization
     protected void jbInit() {
-        BorderLayout borderLayout = new BorderLayout();
-        this.setLayout( borderLayout );
+
+        this.setLayout( new BorderLayout() );
         JPanel step3Panel;
         JPanel jPanel10 = new JPanel();
         JScrollPane customClassScrollPane;
@@ -78,10 +78,9 @@ public class AnalysisWizardStep3 extends WizardStep {
         JButton addButton = new JButton();
         JButton deleteButton = new JButton();
         countLabel = new JLabel();
-        BorderLayout borderLayout1 = new BorderLayout();
 
         step3Panel = new JPanel();
-        step3Panel.setLayout( borderLayout1 );
+        step3Panel.setLayout( new BorderLayout() );
         countLabel.setForeground( Color.black );
         countLabel.setPreferredSize( new Dimension( 500, 15 ) );
         countLabel.setText( "Number of Classes: 0" );
@@ -106,8 +105,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         addedClassTable.setPreferredScrollableViewportSize( new Dimension( 250, 150 ) );
         addedClassScrollPane = new JScrollPane( addedClassTable );
         addedClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
-        GridLayout gridLayout1 = new GridLayout();
-        jPanel10.setLayout( gridLayout1 );
+        jPanel10.setLayout( new GridLayout() );
         JButton addAllButton = new JButton();
         addAllButton.setText( "Add All >" );
         addAllButton.addActionListener( new AnalysisWizardStep3_addAllButton_actionAdapter( this ) );
@@ -146,7 +144,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         for ( int i = 0; i < n; i++ ) {
             String id = ( String ) customClassTable.getValueAt( rows[i], 0 );
             if ( id != null ) {
-                HashMap cfi = ( HashMap ) ccHash.get( id );
+                Map cfi = ( Map ) ccHash.get( id );
                 if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
                     addedClasses.add( cfi );
                     acHash.put( cfi.get( "id" ), cfi );
@@ -161,7 +159,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         for ( int i = 0; i < ccTableModel.getRowCount(); i++ ) {
             String id = ( String ) customClassTable.getValueAt( i, 0 );
             if ( id != null ) {
-                HashMap cfi = ( HashMap ) ccHash.get( id );
+                Map cfi = ( Map ) ccHash.get( id );
                 if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
                     addedClasses.add( cfi );
                     acHash.put( cfi.get( "id" ), cfi );
@@ -207,9 +205,7 @@ public class AnalysisWizardStep3 extends WizardStep {
                     GuiUtil.error( "Error reading class files info." );
                 }
 
-                if ( cfi == null ) {
-                    throw new IllegalStateException( "Null pointer" );
-                }
+                assert cfi != null;
 
                 customClasses.add( cfi );
                 ccHash.put( cfi.get( "id" ), cfi );
@@ -217,7 +213,7 @@ public class AnalysisWizardStep3 extends WizardStep {
             ccTableModel = customClasses.toTableModel();
             customClassTable.setModel( ccTableModel );
         } else {
-            // @todo it should make the folder.
+            // TODO it should make the folder.
             GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
         }
     }
