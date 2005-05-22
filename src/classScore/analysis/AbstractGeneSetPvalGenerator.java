@@ -88,7 +88,7 @@ public abstract class AbstractGeneSetPvalGenerator {
                 .equalsIgnoreCase( "obsolete_molecular_function" ) )
                 && this.settings.getUseMolecularFunction() ) {
             return true;
-        } else if ( aspect.equalsIgnoreCase( GONames.NO_ASPECT_AVAILABLE ) ) {
+        } else if ( aspect.equalsIgnoreCase( GONames.USER_DEFINED ) ) {
             return true; // user-defined - always use.
         }
         return false;
