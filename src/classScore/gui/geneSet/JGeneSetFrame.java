@@ -63,15 +63,13 @@ import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
-import classScore.data.GeneSetResult;
-import classScore.gui.JHistViewer;
 
 /**
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
- * @author pavlidis
+ * @author Paul Pavlidis
  * @author Kiran Keshav
  * @author Will Braynen
  * @version $Id$
@@ -167,7 +165,7 @@ public class JGeneSetFrame extends JFrame {
                 this.settings = settings;
             }
 
-            readPrefs();
+            this.readPrefs();
             String filename = settings.getRawFile();
             this.probeIDs = probeIDs;
             this.pvalues = pvalues;
@@ -189,8 +187,6 @@ public class JGeneSetFrame extends JFrame {
     }
 
     /**
-     * 
-     * 
      * @param probeIDs
      * @param pvalues
      * @param geneData
@@ -513,7 +509,6 @@ public class JGeneSetFrame extends JFrame {
         fileMenu.setText( "File" );
         fileMenu.add( saveImageMenuItem );
         fileMenu.add( saveDataMenuItem );
-       
 
         greenredColormapMenuItem.setSelected( false );
         greenredColormapMenuItem.setText( "Green-Red" );
@@ -549,7 +544,7 @@ public class JGeneSetFrame extends JFrame {
 
         optionsMenu.add( setGeneUrlBaseMenuItem );
         optionsMenu.add( switchDataFileMenuItem );
-        
+
         analysisMenu.setText( "Analysis" );
         m_viewHistMenuItem.setActionCommand( "View Distribution" );
         m_viewHistMenuItem.setText( "View distribution" );
@@ -585,7 +580,7 @@ public class JGeneSetFrame extends JFrame {
         JFileChooser fc = new JFileChooser( settings.getDataDirectory() );
         if ( fc.showDialog( this, "Choose new data file to show" ) == JFileChooser.APPROVE_OPTION ) {
             settings.setRawFile( fc.getSelectedFile().getAbsolutePath() );
-            createDetailsTable(settings.getRawFile());
+            createDetailsTable( settings.getRawFile() );
             table.revalidate();
         }
     }
@@ -647,15 +642,12 @@ public class JGeneSetFrame extends JFrame {
      *
      */
     private void readPathPrefs() {
-
         if ( settings == null ) return;
-
         if ( settings.getConfig().containsKey( SAVESTARTPATH ) && m_matrixDisplay != null ) {
             if ( fileChooser == null || imageChooser == null ) initChoosers();
             this.fileChooser.setCurrentDirectory( new File( settings.getConfig().getString( SAVESTARTPATH ) ) );
             this.imageChooser.setCurrentDirectory( new File( settings.getConfig().getString( SAVESTARTPATH ) ) );
         }
-
     }
 
     /**
@@ -722,7 +714,7 @@ public class JGeneSetFrame extends JFrame {
     }
 
     /**
-     * Ridiculously simple to remove anchor tag.
+     * Ridiculously simple to remove tags.
      * 
      * @param s
      * @return
@@ -746,7 +738,6 @@ public class JGeneSetFrame extends JFrame {
         settings.getConfig().setProperty( WINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
         if ( imageChooser != null )
             settings.getConfig().setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
-
         try {
             settings.getConfig().save();
         } catch ( ConfigurationException e ) {

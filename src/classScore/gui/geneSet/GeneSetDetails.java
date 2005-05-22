@@ -43,7 +43,6 @@ public class GeneSetDetails {
                 settings = new Settings();
                 if ( settings == null ) throw new NullPointerException( "No settings!" );
             } catch ( IOException e ) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         } else {

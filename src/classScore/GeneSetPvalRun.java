@@ -48,7 +48,6 @@ public class GeneSetPvalRun {
     private Vector sortedclasses = null; // this holds the results.
     private NumberFormat nf = NumberFormat.getInstance();
     private boolean useUniform = false; // assume input values come from uniform
-    private Set activeProbes;
     private Settings settings;
 
     private long randomSeed = -1;
@@ -75,7 +74,6 @@ public class GeneSetPvalRun {
         this.geneData = geneData;
         this.goData = goData;
         this.geneScores = geneScores;
-        this.activeProbes = activeProbes;
         this.results = results;
         this.name = name;
 
@@ -103,6 +101,20 @@ public class GeneSetPvalRun {
         messenger.setStatus( "Done!" );
     }
 
+    // /**
+    // * Do a new analysis, starting from the bare essentials.
+    // */
+
+    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GONames goData, GeneScores geneScores ) {
+        this.settings = settings;
+        this.geneData = geneData;
+        this.goData = goData;
+        this.geneScores = geneScores;
+        nf.setMaximumFractionDigits( 8 );
+        results = new LinkedHashMap();
+        runAnalysis( geneData.getProbeToGeneMap().keySet(), settings, geneData, null, goData, geneScores, null );
+    }
+
     /**
      * Do a new analysis.
      * 
@@ -121,12 +133,25 @@ public class GeneSetPvalRun {
         this.geneData = geneData;
         this.goData = goData;
         this.geneScores = geneScores;
-        this.activeProbes = activeProbes;
         this.name = name;
 
         nf.setMaximumFractionDigits( 8 );
         results = new LinkedHashMap();
 
+        runAnalysis( activeProbes, settings, geneData, rawData, goData, geneScores, messenger );
+    }
+
+    /**
+     * @param activeProbes
+     * @param settings
+     * @param geneData
+     * @param rawData
+     * @param goData
+     * @param geneScores
+     * @param messenger
+     */
+    private void runAnalysis( Set activeProbes, Settings settings, GeneAnnotations geneData,
+            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger ) {
         // get the class sizes.
         GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
 
@@ -134,14 +159,14 @@ public class GeneSetPvalRun {
             case Settings.RESAMP: {
                 NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings, geneScores );
 
-                messenger.setStatus( "Starting resampling" );
+                if ( messenger != null ) messenger.setStatus( "Starting resampling" );
 
                 if ( randomSeed >= 0 ) {
                     probePvalMapper.setRandomSeed( randomSeed );
                 }
                 hist = probePvalMapper.generateNullDistribution( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                messenger.setStatus( "Finished resampling" );
+                if ( messenger != null ) messenger.setStatus( "Finished resampling" );
 
                 GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, goData );
                 if ( Thread.currentThread().isInterrupted() ) return;
@@ -156,27 +181,29 @@ public class GeneSetPvalRun {
 
                 Collection inp_entries = geneScores.getProbeToPvalMap().entrySet();
 
-                messenger.setStatus( "Starting ORA analysis" );
+                if ( messenger != null ) messenger.setStatus( "Starting ORA analysis" );
 
                 OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator( settings, geneData, csc, goData,
                         inputSize );
                 int numOver = pvg.hgSizes( inp_entries );
 
                 if ( numOver == 0 ) {
-                    messenger.setError( "No genes selected at that threshold!" );
+                    if ( messenger != null ) messenger.setError( "No genes selected at that threshold!" );
                     break;
                 }
 
                 pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToPvalMap() );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 results = pvg.getResults();
-                messenger.setStatus( "Finished with ORA computations: " + numOver + " probes passed your threshold." );
+                if ( messenger != null )
+                    messenger.setStatus( "Finished with ORA computations: " + numOver
+                            + " probes passed your threshold." );
                 break;
             }
             case Settings.CORR: {
                 if ( rawData == null )
                     throw new IllegalArgumentException( "Raw data cannot be null for Correlation analysis" );
-                messenger.setStatus( "Starting correlation resampling" );
+                if ( messenger != null ) messenger.setStatus( "Starting correlation resampling" );
                 NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings, rawData );
 
                 if ( randomSeed >= 0 ) {
@@ -187,10 +214,10 @@ public class GeneSetPvalRun {
                 if ( Thread.currentThread().isInterrupted() ) return;
                 CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings,
                         geneData, csc, goData, rawData, hist );
-                messenger.setStatus( "Finished resampling, computing for gene sets" );
+                if ( messenger != null ) messenger.setStatus( "Finished resampling, computing for gene sets" );
                 pvg.geneSetCorrelationGenerator( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                messenger.setStatus( "Finished computing scores" );
+                if ( messenger != null ) messenger.setStatus( "Finished computing scores" );
                 results = pvg.getResults();
 
                 break;
@@ -229,7 +256,7 @@ public class GeneSetPvalRun {
         multipleTestCorrect( messenger, csc );
 
         setGeneSetRanks();
-        messenger.setStatus( "Done!" );
+        if ( messenger != null ) messenger.setStatus( "Done!" );
     }
 
     /**

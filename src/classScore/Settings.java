@@ -107,12 +107,20 @@ public class Settings {
      * @throws IOException
      */
     public Settings() throws IOException {
-        initConfig();
-        if ( this.getDataDirectory() == null && !this.determineDataDirectory() ) {
-            log.info( "Can't find data directory, using default settings" );
-            return;
+        this( true );
+    }
+
+    public Settings( boolean readFromFile ) throws IOException {
+        if ( readFromFile ) {
+            initConfig();
+            if ( this.getDataDirectory() == null && !this.determineDataDirectory() ) {
+                log.info( "Can't find data directory, using default settings" );
+                return;
+            }
+            createCustomGeneSetDirectory();
+        } else {
+            this.config = new PropertiesConfiguration();
         }
-        createCustomGeneSetDirectory();
     }
 
     /**
