@@ -222,11 +222,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( e.getClickCount() < 2 ) {
             return;
         }
-
-        if ( !( e.getSource() instanceof GeneSetTreeNode ) ) {
-            return;
-        }
-        showDetailsForGeneSet( -1, this.currentlySelectedGeneSet );
+        showDetailsForGeneSet( this.currentlySelectedResultSetIndex, this.currentlySelectedGeneSet );
     }
 
     /*

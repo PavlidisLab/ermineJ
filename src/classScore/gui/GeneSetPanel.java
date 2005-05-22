@@ -117,7 +117,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         } else {
             GeneSetPvalRun run = ( GeneSetPvalRun ) results.get( runnum );
             GeneSetResult res = ( GeneSetResult ) run.getResults().get( id );
-            details.show( res, run.getGeneScores() );
+            details.show(run.getName(), res, run.getGeneScores() );
         }
     }
 
