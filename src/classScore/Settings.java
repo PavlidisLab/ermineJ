@@ -17,6 +17,7 @@ import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -547,7 +548,7 @@ public class Settings {
         for ( int i = 0; i < ANALYSIS_SETTINGS.length; i++ ) {
             String propertyName = ANALYSIS_SETTINGS[i];
             out.write( propertyName + " = " );
-            out.write( config.getProperty( propertyName ).toString() );
+            out.write( StringEscapeUtils.escapeJava( config.getProperty( propertyName ).toString() ) );
             out.write( "\n" );
             log.debug( "Writing " + propertyName + "=" + config.getProperty( propertyName ).toString() );
         }
