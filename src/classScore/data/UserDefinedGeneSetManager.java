@@ -92,7 +92,6 @@ public class UserDefinedGeneSetManager {
         final boolean finalized = editable;
 
         return new AbstractTableModel() {
-
             private String[] columnNames = { "Probe", "Gene", "Description" };
 
             public String getColumnName( int i ) {
@@ -139,7 +138,6 @@ public class UserDefinedGeneSetManager {
                     return true;
                 }
                 return false;
-
             }
         };
     }
@@ -235,7 +233,7 @@ public class UserDefinedGeneSetManager {
                 desc = row;
             } else {
                 if ( !isGenes ) {
-                    if ( geneData.getProbeGeneName( row ) != null )
+                    if ( geneData.getProbeGeneName( row ) == null )
                         log.info( "Probe " + row + " not found in array design" );
                     probes.add( row );
                 } else {
@@ -313,7 +311,7 @@ public class UserDefinedGeneSetManager {
     public void addToMaps( GONames goData ) {
         geneData.addClass( id, this.getProbes() );
         goData.addClass( id, desc );
-        geneData.sortGeneSets();
+        // geneData.sortGeneSets();
     }
 
     /**
