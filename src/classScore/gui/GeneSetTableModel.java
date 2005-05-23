@@ -48,6 +48,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     private List results;
 
     public GeneSetTableModel( List results ) {
+        super();
         this.results = results;
         columnNames.add( "Name" );
         columnNames.add( "Description" );
@@ -90,6 +91,9 @@ public class GeneSetTableModel extends AbstractTableModel {
     }
 
     public int getRowCount() {
+        if ( geneData == null ) {
+            return 0;
+        }
         return geneData.selectedSets();
     }
 
@@ -136,6 +140,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         } else {
             List vals = new ArrayList();
             int runIndex = getRunIndex( j );
+            assert runIndex >= 0;
             Map data = ( ( GeneSetPvalRun ) results.get( runIndex ) ).getResults();
             if ( data.containsKey( classid ) ) {
                 GeneSetResult res = ( GeneSetResult ) data.get( classid );
@@ -168,7 +173,7 @@ public class GeneSetTableModel extends AbstractTableModel {
  */
 class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
     private static Log log = LogFactory.getLog( OutputPanelTableCellRenderer.class.getName() );
-    private Format nf = new Format( "%.3g" ); // for the gene set p value.
+    private Format nf = new Format( "%.4g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 
     private GONames goData;
