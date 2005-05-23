@@ -49,7 +49,7 @@ public class SaveWizardStep2 extends WizardStep {
         jLabel3.setText( "Save file:" );
         jLabel3.setPreferredSize( new Dimension( 320, 15 ) );
         saveFile = new JTextField();
-        saveFile.setPreferredSize( new Dimension( 230, 19 ) );
+        saveFile.setPreferredSize( new Dimension( 280, 19 ) );
         JButton saveBrowseButton = new JButton();
         saveBrowseButton.addActionListener( new SaveWizardStep2_saveBrowseButton_actionAdapter( this ) );
         saveBrowseButton.setText( "Browse..." );
