@@ -60,7 +60,7 @@ public class GeneSetWizardStep3 extends WizardStep {
 
         // classIDTF.addKeyListener( new classIDlistener( this ) );
         classIDTF = new JTextField();
-        classIDTF.setPreferredSize( new Dimension( 100, 19 ) );
+        classIDTF.setPreferredSize( new Dimension( 120, 19 ) );
         classIDTF.setBorder( BorderFactory.createLoweredBevelBorder() );
         classIDTF.setToolTipText( "New Gene Set ID" );
 
@@ -105,7 +105,7 @@ public class GeneSetWizardStep3 extends WizardStep {
 
         this.addHelp( "<html><b>Choose a new gene set identifier and description.</b><br>"
                 + "The custom gene set will automatically be saved to your hard drive"
-                + "to be used again in future analyses." );
+                + " to be used again in future analyses." );
         this.addMain( step3Panel );
     }
 
