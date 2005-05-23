@@ -43,6 +43,8 @@
       	</tocitem>
     </tocitem>
     
+    <tocitem text="The ermineJ API" targets="api" expand="true" />
+    
     <tocitem text="Frequently Asked Questions" target="faq"/>
     <tocitem text="License information" target="license"/>
      </tocitem>
