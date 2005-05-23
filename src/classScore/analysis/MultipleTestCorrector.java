@@ -171,22 +171,12 @@ public class MultipleTestCorrector {
             String nextclass = "";
 
             // successive minima of step 2, pg 66. Also does step 3.
-            for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) { // going
-                // in
-                // the
-                // correct
-                // order
-                // for
-                // the
-                // 'real'
-                // data,
-                // starting
-                // from
-                // the
-                // worst
-                // class.
+            for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+                /*
+                 * going in the correct order for the 'real' data, starting from the worst class.
+                 */
                 if ( Thread.currentThread().isInterrupted() ) {
-                    throw new CancellationException( );
+                    throw new CancellationException();
                 }
                 nextclass = ( String ) it.next();
 
@@ -196,23 +186,13 @@ public class MultipleTestCorrector {
                 m = ( Double ) permscores.get( nextclass );
                 permp = m.doubleValue(); // randomized pvalue for this class.
 
-                q = Math.min( qprev, permp ); // The best values for
-                // permp for this trial
-                // bubbles up. The way
-                // this works is that if
-                // two classes are highly
-                // correlated, their
-                // permuted pvalues will
-                // tend to be the
-                // same. Then, whatever
-                // decision is made here
-                // will tend to be the
-                // same decision made for
-                // the next (correlated
-                // class). That is how the
-                // resulting corrected p
-                // values for correlated
-                // classes are correlated.
+                /*
+                 * The best values for permp for this trial bubbles up. The way this works is that if two classes are
+                 * highly correlated, their permuted pvalues will tend to be the same. Then, whatever decision is made
+                 * here will tend to be the same decision made for the next (correlated class). That is how the
+                 * resulting corrected p values for correlated classes are correlated.
+                 */
+                q = Math.min( qprev, permp );
 
                 /* step 3 */
                 if ( q <= actual_p ) { // for bad classes, this will often be true.
@@ -229,9 +209,10 @@ public class MultipleTestCorrector {
                  * if (nextclass.equals("GO:0006958")) { System.err.print("\tGO:0006958\t" + nf.format(permp)); }
                  */
 
-                if ( log.isDebugEnabled() && j == sortedclasses.size() - 1 ) { // monitor what
-                    // happens to the
-                    // best class.
+                if ( log.isDebugEnabled() && j == sortedclasses.size() - 1 ) {
+                    /*
+                     * monitor what happens to the best class.
+                     */
                     System.err.println( "Sim " + i + " class# " + j + " " + nextclass + " size="
                             + res.getEffectiveSize() + " q=" + nf.format( q ) + " qprev=" + nf.format( qprev )
                             + " pperm=" + nf.format( permp ) + " actp=" + nf.format( actual_p ) + " countj="
@@ -247,7 +228,7 @@ public class MultipleTestCorrector {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
                     log.debug( "Interrupted" );
-                    throw new RuntimeException( "Interrupted" );
+                    throw new CancellationException();
                 }
             }
 
@@ -258,23 +239,25 @@ public class MultipleTestCorrector {
 
         }
 
-        Collections.reverse( sortedclasses ); // now the best class is first.
+        // now the best class is first.
+        Collections.reverse( sortedclasses );
 
-        int j = sortedclasses.size() - 1; // index of the best class (last one
+        // index of the best class (last one
         // tested above).
-        double corrected_p = counts[sortedclasses.size() - 1] / trials; // pvalue
-        // for the
-        // best
-        // class.
+        int j = sortedclasses.size() - 1;
+
+        /*
+         * pvalue for the best class.
+         */
+        double corrected_p = counts[sortedclasses.size() - 1] / trials;
+
         double previous_p = corrected_p;
 
-        // Step 4 and enforce monotonicity, pg 67 (step 5)
-        for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) { // starting
-            // from
-            // the
-            // best
-            // class.
-            if ( Thread.currentThread().isInterrupted() ) break;
+        /*
+         * Step 4 and enforce monotonicity, pg 67 (step 5) starting from the best class.
+         */
+        for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+            if ( Thread.currentThread().isInterrupted() ) throw new CancellationException();
             GeneSetResult res = ( GeneSetResult ) results.get( it.next() );
             corrected_p = Math.max( ( double ) counts[j] / ( double ) trials, previous_p ); // first iteration, these
             // are the same.

@@ -18,7 +18,7 @@ public abstract class AbstractResamplingGeneSetScore implements NullDistribution
     protected static final Log log = LogFactory.getLog( AbstractResamplingGeneSetScore.class );
 
     /**
-     * The squared deviation change in fit to a normal before we stop iterating.
+     * Used to control interations.
      */
     protected static final double TOLERANCE = 1e-5;
 

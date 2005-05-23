@@ -67,8 +67,15 @@ public abstract class AbstractGeneSetPvalGenerator {
         return minGeneSetSize;
     }
 
+    /**
+     * If GO data isn't initialized, this returns true.
+     * 
+     * @param geneSetName
+     * @return
+     */
     protected boolean checkAspect( String geneSetName ) {
-        assert goName != null;
+        if ( goName == null ) return true;
+
         String aspect = this.goName.getAspectForId( geneSetName );
 
         if ( aspect == null ) {

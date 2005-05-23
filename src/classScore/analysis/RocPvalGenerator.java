@@ -27,7 +27,6 @@ import classScore.data.Histogram;
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     protected int inputSize;
-    /** @todo where is this set? */
     protected ResamplingExperimentGeneSetScore probePvalMapper;
     protected Histogram histogram;
 

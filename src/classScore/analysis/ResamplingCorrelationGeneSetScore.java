@@ -21,10 +21,8 @@ import classScore.data.Histogram;
 public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSetScore {
 
     private DenseDoubleMatrix2DNamed data = null;
-    private Settings settings;
-    private boolean weights;
-    private double[][] dataAsRawMatrix;
 
+    private double[][] dataAsRawMatrix;
     private double[][] selfSquaredMatrix;
     private static final int MIN_SET_SIZE_FOR_ESTIMATION = 10;
     private static final int MIN_ITERATIONS_FOR_ESTIMATION = 1000;
@@ -33,8 +31,6 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      * @param dataMatrix
      */
     public ResamplingCorrelationGeneSetScore( Settings settings, DenseDoubleMatrix2DNamed dataMatrix ) {
-        this.settings = settings;
-        this.weights = settings.getUseWeights();
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();
@@ -95,7 +91,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
                 if ( Thread.currentThread().isInterrupted() ) {
                     log.debug( "Got cancel" );
-                    throw new CancellationException( );
+                    throw new CancellationException();
                 }
 
                 RandomChooser.chooserandom( randomnums, deck, data.rows(), geneSetSize );
@@ -108,16 +104,13 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
                     double mean = Descriptive.mean( values );
                     double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
                             .sumOfSquares( values ) );
-                    // double nd = normalDeviation( mean, variance, geneSetSize );
 
-                    // if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
                     if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
                         hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
                         log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + j
                                 + " iterations." );
                         break; // stop simulation of this class size.
                     }
-                    // oldnd = nd;
                     oldmean = mean;
                     oldvar = variance;
                 }
@@ -148,8 +141,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         try {
             Thread.sleep( 10 );
         } catch ( InterruptedException e ) {
-            log.debug( "Interrupted" );
-            throw new CancellationException( );
+            throw new CancellationException();
         }
     }
 

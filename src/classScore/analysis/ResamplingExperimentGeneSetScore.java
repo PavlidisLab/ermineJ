@@ -35,9 +35,12 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     private static int quantile = 50;
     private static double quantfract = 0.5;
     private int method;
-    private Settings settings;
     private static final int MIN_SET_SIZE_FOR_ESTIMATION = 30; // after this size, switch to doing it by normal
     // approximation.
+
+    /**
+     * Minimum mumber of interations to perform when using approximation methods.
+     */
     private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
 
     /**
@@ -87,7 +90,6 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
             deck[i] = i;
         }
 
-        // double oldnd = Double.MAX_VALUE;
         double oldmean = Double.MAX_VALUE;
         double oldvar = Double.MAX_VALUE;
 
@@ -100,7 +102,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
                 if ( Thread.currentThread().isInterrupted() ) {
                     log.debug( "Got cancel" );
-                    throw new CancellationException( );
+                    throw new CancellationException();
                 }
 
                 RandomChooser.chooserandom( random_class, in_pval, deck, num_genes, geneSetSize );
@@ -114,19 +116,14 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
                     double mean = Descriptive.mean( values );
                     double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
                             .sumOfSquares( values ) );
-                    // double nd = normalDeviation( mean, variance, geneSetSize );
-
-                    // if ( Math.abs( oldnd - nd ) <= TOLERANCE ) {
                     if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
                         hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
                         log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + k
                                 + " iterations." );
-                        break; // stop simulation of this class size.
+                        break;
                     }
                     oldmean = mean;
                     oldvar = variance;
-                    // oldnd = nd;
-
                 }
                 if ( k % 1000 == 0 ) {
                     try {
@@ -160,7 +157,6 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @param geneScores
      */
     public ResamplingExperimentGeneSetScore( Settings settings, GeneScores geneScores ) {
-        this.settings = settings;
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();
