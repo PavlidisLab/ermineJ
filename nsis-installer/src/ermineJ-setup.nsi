@@ -8,8 +8,10 @@
 ; The name of the installer
 Name "ermineJ"
 
+!include version.nsi
+
 ; The file to write
-OutFile "..\..\target\ermineJ-2.1RC2-setup.exe"
+OutFile "..\..\target\ermineJ-${VERSION}-setup.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
@@ -51,18 +53,7 @@ Section "ermineJ (required)"
 
   ; Jars (ours and third-party)
   SetOutPath "$INSTDIR\lib"
-  File "..\..\target\nsis-build\lib\baseCode.jar"
-  File "..\..\target\nsis-build\lib\colt.jar"
-  File "..\..\target\nsis-build\lib\commons-logging.jar"
-  File "..\..\target\nsis-build\lib\ermineJ.jar"
-  File "..\..\target\nsis-build\lib\ermineJ-help.jar"
-  File "..\..\target\nsis-build\lib\jhelp.jar"
-  File "..\..\target\nsis-build\lib\xercesImpl.jar"
-  File "..\..\target\nsis-build\lib\commons-lang.jar"
-  File "..\..\target\nsis-build\lib\commons-configuration.jar"
-  File "..\..\target\nsis-build\lib\commons-logging.jar"
-  File "..\..\target\nsis-build\lib\ostermillerutils.jar"
-  File "..\..\target\nsis-build\lib\commons-collections.jar"
+  !include includes.deps.nsi
 
   ; .bat file
   SetOutPath "$INSTDIR\bin"
@@ -79,9 +70,7 @@ Section "ermineJ (required)"
 
     YesOverwrite:
     SetOutPath "$INSTDIR\ermineJ.data"
-   File "..\..\target\nsis-build\data\go_daily-termdb.rdf-xml.gz"
-    File "..\..\target\nsis-build\data\HG-U133_Plus_2.an.zip"
-    File "..\..\target\nsis-build\data\Mouse430_2.an.zip"
+    !include includes.data.nsi
     CreateDirectory "$INSTDIR\ermineJ.data\genesets"
 
   NoOverwrite:
