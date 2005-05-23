@@ -18,48 +18,56 @@ public class GeneSetResult implements Comparable {
     private int size = 0;
     private int effective_size = 0;
     private double pvalue_corr = 0.0;
-
-    private DecimalFormat nf;
     private int rank;
 
     public GeneSetResult() {
         this( null, null, 0, 0, 0.0, 1.0 );
     }
 
-    public GeneSetResult( String id, String class_name, int size, int effsize ) {
+    /**
+     * @param id
+     * @param name
+     * @param size
+     * @param effectiveSize
+     */
+    public GeneSetResult( String id, String name, int size, int effectiveSize ) {
         this();
-        this.setnames( id, class_name );
-        this.setsizes( size, effsize );
+        this.setNames( id, name );
+        this.setSizes( size, effectiveSize );
     }
 
-    public GeneSetResult( String id, String class_name, int size, int effective_size, double score, double pvalue ) {
+    /**
+     * @param id
+     * @param name
+     * @param size
+     * @param effectiveSize
+     * @param score
+     * @param pvalue
+     */
+    public GeneSetResult( String id, String name, int size, int effectiveSize, double score, double pvalue ) {
         this.class_id = id;
-        this.class_name = class_name;
+        this.class_name = name;
         this.pvalue = pvalue;
         this.score = score;
-        // this.hyperpval = hyperpval;
-        // this.rocpval = rocpval;
-        // this.aroc = aroc;
         this.size = size;
-        this.effective_size = effective_size;
+        this.effective_size = effectiveSize;
 
-        nf = new DecimalFormat();
-        nf.setMaximumFractionDigits( 8 );
-        nf.setMinimumFractionDigits( 3 );
     }
 
     public void print( BufferedWriter out ) throws IOException {
-        this.print( out, ""  );
+        this.print( out, "" );
     }
 
     public void print( BufferedWriter out, String extracolumns ) throws IOException {
-
+        DecimalFormat nf = new DecimalFormat();
+        nf.setMaximumFractionDigits( 8 );
+        nf.setMinimumFractionDigits( 3 );
         out.write( "!\t" + class_name + "\t" + class_id + "\t" + size + "\t" + effective_size + "\t"
                 + nf.format( score ) + "\t" + nf.format( pvalue ) + "\t" + nf.format( pvalue_corr ) + "\t"
                 + extracolumns + "\n" );
     }
 
-    public void print_headings( BufferedWriter out ) throws IOException {
+    public void printHeadings( BufferedWriter out ) throws IOException {
         this.printHeadings( out, "" );
     }
 
@@ -71,12 +79,12 @@ public class GeneSetResult implements Comparable {
                 "\tCorrected_pvalue" + extracolumns + "\n" );
     }
 
-    public void setnames( String id, String name ) {
+    public void setNames( String id, String name ) {
         this.class_id = id;
         this.class_name = name;
     }
 
-    public void setsizes( int size, int effsize ) {
+    public void setSizes( int size, int effsize ) {
         this.size = size;
         this.effective_size = effsize;
     }
@@ -93,15 +101,11 @@ public class GeneSetResult implements Comparable {
         pvalue_corr = a;
     }
 
-    public String toString() {
-        return "I'm a classresult";
-    }
-
-    public String getClassId() {
+    public String getGeneSetId() {
         return class_id;
     }
 
-    public String getClassName() {
+    public String getGeneSetName() {
         return this.class_name;
     }
 
@@ -125,7 +129,7 @@ public class GeneSetResult implements Comparable {
         rank = n;
     }
 
-    public double getPvalue_corr() {
+    public double getCorrectedPvalue() {
         return pvalue_corr;
     }
 

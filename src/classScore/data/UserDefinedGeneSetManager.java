@@ -360,7 +360,7 @@ public class UserDefinedGeneSetManager {
     /**
      * Delete a user-defined gene set from disk.
      * <p>
-     * FIXME this doesn't handle removing it from the maps.
+     * FIXME this doesn't handle removing it from the maps. The caller has to do that.
      * 
      * @param ngs
      */

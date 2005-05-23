@@ -97,8 +97,8 @@ public class ResultsPrinter {
                     res.printHeadings( out, "\tSame as\tSimilar to\tGenes" );
                 }
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-                res.print( out, formatRedundantAndSimilar( res.getClassId() )
-                        + ( this.saveAllGeneNames ? formatGeneNames( res.getClassId() ) : "" ) );
+                res.print( out, formatRedundantAndSimilar( res.getGeneSetId() )
+                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) );
             }
         } else {
             // output them in natural order. This is useful for testing.
@@ -110,8 +110,8 @@ public class ResultsPrinter {
                     first = false;
                     res.printHeadings( out, "\tSame as:\tSimilar to:" );
                 }
-                res.print( out, formatRedundantAndSimilar( res.getClassId() )
-                        + ( this.saveAllGeneNames ? formatGeneNames( res.getClassId() ) : "" ) );
+                res.print( out, formatRedundantAndSimilar( res.getGeneSetId() )
+                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) );
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
             }
         }

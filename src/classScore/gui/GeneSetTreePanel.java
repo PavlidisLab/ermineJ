@@ -138,7 +138,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
             result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
         }
         GeneSetTreeNode parent = ( GeneSetTreeNode ) node.getParent();
-        if ( parent != null && ( ( result != null && result.getPvalue_corr() < fdrThreshold ) || node.hasGoodChild() ) ) {
+        if ( parent != null && ( ( result != null && result.getCorrectedPvalue() < fdrThreshold ) || node.hasGoodChild() ) ) {
             parent.setHasGoodChild( true );
             hasGoodChild( parent );
         }
@@ -206,7 +206,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param e
      */
     public void mousePressed( MouseEvent e ) {
-        // // TODO Auto-generated method stub
+     
         // if ( e.getButton() == MouseEvent.BUTTON1 ) {
         // // left button
         // } else if ( e.getButton() == MouseEvent.BUTTON3 ) {
@@ -562,15 +562,6 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * TODO
-     * <ul>
-     * <li>Make non-searched-for nodes greyed out
-     * <li>Tool tip for node.
-     * <li>Color node by pvalue.(background color?)
-     * <li>Nodes at higher levels that are not significant, but which have significant classes under them, should be
-     * shown in contrasting color, or something.
-     * </ul>
-     * 
      * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean,
      *      boolean, boolean, int, boolean)
      */
@@ -645,7 +636,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             double pvalue = result.getPvalue();
             displayedText = displayedText + " -- p = " + nf.format( pvalue ) + " -- effective size = "
                     + result.getEffectiveSize();
-            double pvalCorr = result.getPvalue_corr();
+            double pvalCorr = result.getCorrectedPvalue();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             this.setBackground( bgColor );
             if ( pvalCorr < 0.1 ) {

@@ -85,22 +85,25 @@ public class LoadDialog extends AppDialog {
 
     protected void actionButton_actionPerformed( ActionEvent e ) {
         if ( FileTools.testFile( loadFile.getText() ) ) {
-            ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile.getText() );
-            ( ( GeneSetScoreFrame ) callingframe ).setSettings( settings );
-            ( ( GeneSetScoreFrame ) callingframe ).enableMenusForAnalysis();
+            new Thread() {
+                public void run() {
+                    ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile.getText() );
+                    ( ( GeneSetScoreFrame ) callingframe ).setSettings( settings );
+                    ( ( GeneSetScoreFrame ) callingframe ).enableMenusForAnalysis();
+                }
+            }.start();
             dispose();
         } else {
             GuiUtil.error( "File is not readable." );
         }
-    }
+    } /*
+         * (non-Javadoc)
+         * 
+         * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
+         */
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
-     */
     protected void helpButton_actionPerformed( ActionEvent e ) {
-        // TODO Auto-generated method stub
+        //
     }
 
 }

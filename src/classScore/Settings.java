@@ -387,7 +387,7 @@ public class Settings {
      * @param arg
      */
     public void setAnnotFormat( String arg ) {
-        if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) { // fixme, this is hard to
+        if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) {
             this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.AFFYCSV ) );
         } else {
             this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.DEFAULT ) );

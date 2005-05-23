@@ -16,8 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -215,9 +213,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
-    public void mouseClicked( MouseEvent e ) {
-        // TODO Auto-generated method stub
-
+    public void mouseClicked( MouseEvent e ) { 
     }
 
     /*
@@ -225,9 +221,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
      */
-    public void mouseEntered( MouseEvent e ) {
-        // TODO Auto-generated method stub
-
+    public void mouseEntered( MouseEvent e ) { 
     }
 
     /*
@@ -235,8 +229,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
      */
-    public void mouseExited( MouseEvent e ) {
-        // TODO Auto-generated method stub
+    public void mouseExited( MouseEvent e ) { 
 
     }
 
@@ -245,8 +238,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
-    public void mousePressed( MouseEvent e ) {
-        // TODO Auto-generated method stub
+    public void mousePressed( MouseEvent e ) { 
 
     }
 

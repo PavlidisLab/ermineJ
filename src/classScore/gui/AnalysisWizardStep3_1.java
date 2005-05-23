@@ -136,7 +136,6 @@ public class AnalysisWizardStep3_1 extends WizardStep {
      * @see baseCode.gui.WizardStep#isReady()
      */
     public boolean isReady() {
-        // TODO Auto-generated method stub
         return false;
     }
 

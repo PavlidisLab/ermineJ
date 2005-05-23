@@ -42,7 +42,7 @@ public class GeneSetPvalRun {
     private static final int NUM_WY_SAMPLES = 10000;
     private GeneAnnotations geneData;
     private GeneScores geneScores;
-    private GONames goData; // shared by all
+
     private Histogram hist;
     private Map results = null;
     private Vector sortedclasses = null; // this holds the results.
@@ -72,7 +72,7 @@ public class GeneSetPvalRun {
             Map results, String name ) {
         this.settings = settings;
         this.geneData = geneData;
-        this.goData = goData;
+
         this.geneScores = geneScores;
         this.results = results;
         this.name = name;
@@ -108,7 +108,6 @@ public class GeneSetPvalRun {
     public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GONames goData, GeneScores geneScores ) {
         this.settings = settings;
         this.geneData = geneData;
-        this.goData = goData;
         this.geneScores = geneScores;
         nf.setMaximumFractionDigits( 8 );
         results = new LinkedHashMap();
@@ -131,7 +130,6 @@ public class GeneSetPvalRun {
             DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger, String name ) {
         this.settings = settings;
         this.geneData = geneData;
-        this.goData = goData;
         this.geneScores = geneScores;
         this.name = name;
 
@@ -340,7 +338,7 @@ public class GeneSetPvalRun {
         l.addAll( k );
         Collections.sort( l );
         for ( Iterator it = l.iterator(); it.hasNext(); ) {
-            sortedclasses.add( ( ( GeneSetResult ) it.next() ).getClassId() );
+            sortedclasses.add( ( ( GeneSetResult ) it.next() ).getGeneSetId() );
         }
     }
 

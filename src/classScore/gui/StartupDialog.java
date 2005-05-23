@@ -44,10 +44,6 @@ public class StartupDialog extends AppDialog {
     JTextField annotFile = new JTextField();
     JComboBox annotFormat = new JComboBox();
 
-    // @todo we need to use these.
-    JLabel askAgainLabel = new JLabel();
-    JCheckBox askAgain = new JCheckBox();
-
     Settings settings;
     JButton classBrowseButton = new JButton();
 

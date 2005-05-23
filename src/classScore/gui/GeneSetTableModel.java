@@ -218,7 +218,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             Map data = result.getResults();
             if ( data.containsKey( classid ) ) {
                 GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                double pvalCorr = res.getPvalue_corr();
+                double pvalCorr = res.getCorrectedPvalue();
                 Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
                 setBackground( bgColor );
             }
