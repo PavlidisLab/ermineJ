@@ -210,8 +210,8 @@ public class AnalysisWizard extends Wizard {
             if ( !goData.isUserDefined( id ) ) {
                 UserDefinedGeneSetManager newGeneSet = new UserDefinedGeneSetManager( geneData, settings, id );
                 String filename = newGeneSet.getUserGeneSetFileForName( id );
-                newGeneSet.loadUserGeneSet( filename );
-                newGeneSet.addToMaps( goData );
+                boolean gotSomeProbes = newGeneSet.loadUserGeneSet( filename );
+                if ( gotSomeProbes ) newGeneSet.addToMaps( goData );
             }
         }
     }

@@ -148,7 +148,8 @@ public class GeneSetTableModel extends AbstractTableModel {
             case 3:
                 if ( m_geneData == null ) return "No data available";
                 String gene_name = m_geneData.getProbeGeneName( probeID );
-                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene_name );
+                String url = "";
+                if ( gene_name != null ) url = urlbase.replaceFirst( URL_REPLACE_TAG, gene_name );
                 return m_geneData == null ? null : new JLinkLabel( gene_name, url );
             case 4:
                 // description

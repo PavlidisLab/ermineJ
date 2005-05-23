@@ -504,8 +504,10 @@ public class GeneSetScoreFrame extends JFrame {
                 try {
                     classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" ) + classFile;
                     log.debug( "Loading " + classFile );
-                    ngs.loadUserGeneSet( classFile );
-                    ngs.addToMaps( goData );
+                    boolean gotSomeProbes = ngs.loadUserGeneSet( classFile );
+                    if ( gotSomeProbes ) {
+                        ngs.addToMaps( goData );
+                    }
                 } catch ( IOException e ) {
                     statusMessenger.setError( "Could not load user-defined class from " + classFile );
                 }

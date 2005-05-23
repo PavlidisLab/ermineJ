@@ -208,13 +208,14 @@ public class UserDefinedGeneSetManager {
      * </ol>
      * 
      * @param file which stores the probes or genes.
+     * @returns true if some probes were read in which are on the current array design.
      * @throws IOException
      */
-    public void loadUserGeneSet( String fileName ) throws IOException {
+    public boolean loadUserGeneSet( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
         Collection genes = new ArrayList();
         String type = "";
-
+        boolean hasUnknownProbes = false;
         boolean isGenes = true;
         String row;
         while ( ( row = dis.readLine() ) != null ) {
@@ -233,9 +234,11 @@ public class UserDefinedGeneSetManager {
                 desc = row;
             } else {
                 if ( !isGenes ) {
-                    if ( geneData.getProbeGeneName( row ) == null )
-                        log.info( "Probe " + row + " not found in array design" );
-                    probes.add( row );
+                    if ( geneData.getProbeGeneName( row ) == null ) {
+                        hasUnknownProbes = true;
+                    } else {
+                        probes.add( row );
+                    }
                 } else {
                     genes.add( row );
                 }
@@ -246,7 +249,14 @@ public class UserDefinedGeneSetManager {
         if ( isGenes ) {
             fillInProbes( genes, ignored );
         }
-
+        if ( hasUnknownProbes ) {
+            log.info( "Some probes not found in array design" );
+        }
+        if ( probes.size() == 0 ) {
+            log.info( "No probes in " + fileName + " match current array design" );
+            return false;
+        }
+        return true;
     }
 
     /**
