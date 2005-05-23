@@ -9,7 +9,13 @@
 </head>
 
 <body>
-<h1>Using the software</h1>
+
+<h1>Using ermineJ for the first time</h1>
+
+<p>This page introduces what you will see when you first run ermineJ.
+Details on how to <a href="analysis.html">run an analysis</a>, <a
+	href="visualize.html">view the details of a gene set</a> and other
+tasks are detailed elsewhere.</p>
 
 <p>Before you begin you will need to get some files the software uses.
 First, you need a file that describes what gene sets are available.
@@ -35,21 +41,43 @@ the format of the annotation file from the pull-down menu. If you got
 the file from our web site, the format is "ErmineJ". The click on
 "Start".</p>
 
-<p><IMG alt="" src="../images/init_screen.gif" border="0"></p>
+<a name="link0"></a>
+<map name="frame0map">
+</map>
+<img border=0 src="startingUp_files\startingUp0.png" usemap="#frame0map">
+<br>
+<br>
+
 
 <p>Then you will have a brief wait while the data files are loaded.
 These data are used for the remaining analysis and will only have to be
 loaded once. Here is what the loading screen looks like:</p>
 
-<p><IMG alt="" src="../images/loading_screen.gif" border="0"></p>
+<a name="link1"></a>
+<map name="frame1map">
+</map>
+<img border=0 src="startingUp_files\startingUp1.png" usemap="#frame1map">
+<br>
+<br>
 
 <p>Once loading is finished (~15-30 seconds) the following window is
-shown. The two key parts of this window are the "output panel' listing
-all the available gene sets, and the menu bar, which is used to perform
-analyses and other functions. There is also a "status bar" at the bottom
-of the window that is used to display pertinent information.</p>
+shown.</p>
 
-<p><IMG alt="" src="../images/output_panel_start_screen.gif" border="0"></p>
+<p>The three key parts of this window are the "output panel' listing all
+the available gene sets either in a table or in a tree (see below), the
+menu bar, which is used to perform analyses and other functions, and a
+"status bar" at the bottom of the window that is used to display
+pertinent information.</p>
+
+
+
+<a name="link2"></a>
+<map name="frame2map">
+</map>
+<img border=0 src="startingUp_files\startingUp2.png" usemap="#frame2map">
+<br>
+<br>
+
 
 <p>The Output panel always shows the four columns (and others, once you
 have done some analysis); clicking on a column header will re-sort the
@@ -63,20 +91,20 @@ table according to the selected column.</p>
 	<li>
 	<div><STRONG>Description</STRONG> - the description of the gene set</div>
 	<li>
-	<div><STRONG># of Probes</STRONG> - how many probes on the array are in
-	the gene set (We use the term "probe" to mean a "probe set" on
-	Affymetrix arrays). This value is always the number of probes on the
-	array design, even if your data set (which has not been entered yet)
-	has filtered out some of the results.&nbsp; See this <a
-		href="numitems.html">note</a> .</div>
+	<div><STRONG>Probes</STRONG> - how many probes on the array are in the
+	gene set (We use the term "probe" to mean a "probe set" on Affymetrix
+	arrays). This value is always the number of probes on the array design,
+	even if your data set (which has not been entered yet) has filtered out
+	some of the results.&nbsp; See this <a href="numitems.html">note</a>
+	.FIXME</div>
 	<li>
-	<div><STRONG># of Genes</STRONG> - how many genes are in the gene set.
-	This value is always less than or equal to the number of probes,
-	because some genes are represented by more than one probe on the
+	<div><STRONG>Genes</STRONG> - how many genes are in the gene set. This
+	value is always less than or equal to the number of probes, because
+	some genes are represented by more than one probe on the
 	array.&nbsp;This value is always the number of genes represented in the
 	array design, even if your&nbsp;data set (which has not been entered
 	yet) has filtered out some of the results. See this <a
-		href="numitems.html">note</a> .</div>
+		href="numitems.html">note</a> .FIXME</div>
 	</li>
 </ul>
 
@@ -90,11 +118,17 @@ this table. These are explained elsewhere.</p>
 	<div><STRONG>File</STRONG> - currently only used to quit the program.</div>
 	<li>
 	<div><STRONG>Gene sets</STRONG> - used to <A href="classes.html">modify
-	or create new gene sets</A>.</div>
+	or create new gene sets</A> as well as <a href="findGeneSet.html">search
+	for gene sets</a>.</div>
 	<li>
 	<div><STRONG>Analysis</STRONG> - used to <A href="analysis.html">run
 	analyses</A>, <a href="loadsave.html">load or save</a>. Also to cancel
 	an analysis while it is running.</div>
+	<li>
+	<div><STRONG>Results</STRONG> - Used to switch the results set shown in
+	the tree view. It will be inactive if you are viewing the table view or
+	have done fewer than 2 analyses.</div>
+	</li>
 	<li>
 	<div><STRONG>Help</STRONG> - used to reach these pages and view
 	credits.</div>
@@ -102,9 +136,36 @@ this table. These are explained elsewhere.</p>
 </ul>
 
 <p>There are shortcut keys for many of the menu items.</p>
+
+<p>The "tree" tab switches you to a view of the gene sets in a
+hierarchy. This view is linked to the table view in many ways. You can
+use either or both views, depending on what you are doing and which you
+prefer.</p>
+
+<a name="link3"></a>
+<map name="frame3map">
+</map>
+<img border=0 src="startingUp_files\startingUp3.png" usemap="#frame3map">
+<br>
 <br>
 
-<hr>
+<h2>Additional functionality of the main panel</h2>
+
+<p>In addition to the obvious features shown above, there are other
+functionalities of the main panel:</p>
+
+<ul>
+	<li>Double-clicking on a gene set in either the table or tree brings up
+	the <a href="visualize">details view</a> for that gene set.</li>
+	<li>On both the tree and table view, there is a context-specific menu
+	(right-click on windows, option-click on Mac) for gene sets that makes
+	it easier to use common functions and search the Gene Ontology web site</li>
+	<li>Clicking on the table headers resorts the table.</li>
+	<li>On both the tree and table views, hovering over a gene set ID or
+	name brings up a "tooltip" that shows the GO aspect and definition (if
+	any).</li>
+</ul>
+<hr />
 
 <div class="tidy">Copyright 2004-2005 (c) Columbia University</div>
 </body>

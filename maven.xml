@@ -123,12 +123,14 @@
 	<ant:mkdir dir="${maven.build.dir}/${maven.nsis.build.dir}/data" />
 	<ant:mkdir dir="${maven.build.dir}/${maven.nsis.build.dir}/bin" />
 	
+	<ant:echo file="${basedir}/nsis-installer/src/version.nsi"  append="false" >!define VERSION "${pom.currentVersion}"</ant:echo>
+	
 	<ant:copy todir="${maven.build.dir}/${maven.nsis.build.dir}/data" >
 		<fileset dir="${basedir}/data" >
 			 <include name="**/genesets" />
-			 <include name="go_200502-termdb.rdf-xml" />
-			 <include name="HG-U95Av2.an.txt" />
-			  <include name="GUI.prefs" />
+			 <include name="**/*.rdf-xml.gz" />
+			 <include name="**/*.an.zip" />
+			 <include name="**/*.an.txt.zip" />
 			 <exclude name="**/fake*" />
 			 <exclude name="ClassScore.preferences" />
 			 <exclude name="melanoma_and_sarcomaMAS5.txt" />
