@@ -135,8 +135,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     public void addedNewGeneSet() {
-        sorter.cancelSorting();
-        sorter.setSortingStatus( 0, TableSorter.ASCENDING );
+        // sorter.cancelSorting();
+        // sorter.setSortingStatus( 0, TableSorter.ASCENDING );
         table.revalidate();
     }
 
@@ -160,7 +160,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
         generateToolTip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
         sorter.cancelSorting();
-        sorter.setSortingStatus( c, TableSorter.ASCENDING );
+        sorter.setSortingStatus( c, TableSorter.ASCENDING ); // resort by the new results.
         if ( results.size() > 3 ) table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
         currentResultSetIndex = results.size() - 1;
         this.callingFrame.setCurrentResultSet( currentResultSetIndex );

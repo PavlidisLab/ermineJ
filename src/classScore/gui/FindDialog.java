@@ -145,9 +145,7 @@ public class FindDialog extends JDialog {
     public void resetButton_actionPerformed( ActionEvent e ) {
         searchTextField.setText( "" );
         geneData.resetSelectedSets();
-
         statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
-
         resetViews();
     }
 

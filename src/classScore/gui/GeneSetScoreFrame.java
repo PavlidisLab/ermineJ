@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -85,6 +86,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenuItem modClassMenuItem = new JMenuItem();
     private JMenuItem findClassMenuItem = new JMenuItem();
     private JMenuItem findGeneMenuItem = new JMenuItem();
+    private JMenuItem showUsersMenuItem = new JMenuItem();
     private JMenu analysisMenu = new JMenu();
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
@@ -265,6 +267,15 @@ public class GeneSetScoreFrame extends JFrame {
         findGeneMenuItem.setMnemonic( 'G' );
         findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
 
+        showUsersMenuItem.setText( "Show user-defined gene sets" );
+        showUsersMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                showUserMenuItemActionPerformed();
+            }
+        } );
+        showUsersMenuItem.setMnemonic( 'U' );
+        showUsersMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.CTRL_MASK ) );
+
         this.runViewMenu.setText( "Results" );
         runViewMenu.setMnemonic( 'R' );
         runViewMenu.setEnabled( false );
@@ -273,6 +284,7 @@ public class GeneSetScoreFrame extends JFrame {
         classMenu.add( modClassMenuItem );
         classMenu.add( findClassMenuItem );
         classMenu.add( findGeneMenuItem );
+        classMenu.add( showUsersMenuItem );
 
         analysisMenu.setText( "Analysis" );
         analysisMenu.setMnemonic( 'A' );
@@ -318,6 +330,24 @@ public class GeneSetScoreFrame extends JFrame {
         jMenuBar1.add( analysisMenu );
         jMenuBar1.add( runViewMenu );
         jMenuBar1.add( helpMenu );
+    }
+
+    /**
+     * 
+     */
+    private boolean showingUserGeneSets = false;
+
+    protected void showUserMenuItemActionPerformed() {
+        if ( showingUserGeneSets ) {
+            geneData.resetSelectedSets();
+            showingUserGeneSets = false;
+        } else {
+            geneData.setSelectedSets( goData.getUserDefinedGeneSets() );
+            showingUserGeneSets = true;
+        }
+        this.oPanel.resetView();
+        this.treePanel.resetView();
+        statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
     }
 
     /**
