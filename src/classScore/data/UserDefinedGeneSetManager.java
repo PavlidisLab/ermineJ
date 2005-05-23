@@ -206,9 +206,13 @@ public class UserDefinedGeneSetManager {
      * <li>The description for the gene set, e.g, "Genes I like"
      * <li>Any number of rows containing gene or probe identifiers.
      * </ol>
+     * <p>
+     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
+     * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
+     * that this behavior is not desirable.
      * 
      * @param file which stores the probes or genes.
-     * @returns true if some probes were read in which are on the current array design.
+     * @return true if some probes were read in which are on the current array design.
      * @throws IOException
      */
     public boolean loadUserGeneSet( String fileName ) throws IOException {
