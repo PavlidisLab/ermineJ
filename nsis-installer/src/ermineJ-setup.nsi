@@ -9,7 +9,7 @@
 Name "ermineJ"
 
 ; The file to write
-OutFile "..\..\target\ermineJ-setup.exe"
+OutFile "..\..\target\ermineJ-2.1RC2-setup.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
@@ -58,6 +58,11 @@ Section "ermineJ (required)"
   File "..\..\target\nsis-build\lib\ermineJ-help.jar"
   File "..\..\target\nsis-build\lib\jhelp.jar"
   File "..\..\target\nsis-build\lib\xercesImpl.jar"
+  File "..\..\target\nsis-build\lib\commons-lang.jar"
+  File "..\..\target\nsis-build\lib\commons-configuration.jar"
+  File "..\..\target\nsis-build\lib\commons-logging.jar"
+  File "..\..\target\nsis-build\lib\ostermillerutils.jar"
+  File "..\..\target\nsis-build\lib\commons-collections.jar"
 
   ; .bat file
   SetOutPath "$INSTDIR\bin"
@@ -74,12 +79,9 @@ Section "ermineJ (required)"
 
     YesOverwrite:
     SetOutPath "$INSTDIR\ermineJ.data"
-    File "..\..\target\nsis-build\data\go_200406-termdb.xml"
-  ;  File "..\..\target\nsis-build\data\HG-U133A.an.txt"
-    File "..\..\target\nsis-build\data\HG-U95A.an.txt"
-    File "..\..\target\nsis-build\data\GUI.prefs"
-  ;  File "..\..\target\nsis-build\data\RG-U34A.an.txt"
-  ;  File "..\..\target\nsis-build\data\RN-U34.an.txt"
+   File "..\..\target\nsis-build\data\go_daily-termdb.rdf-xml.gz"
+    File "..\..\target\nsis-build\data\HG-U133_Plus_2.an.zip"
+    File "..\..\target\nsis-build\data\Mouse430_2.an.zip"
     CreateDirectory "$INSTDIR\ermineJ.data\genesets"
 
   NoOverwrite:
