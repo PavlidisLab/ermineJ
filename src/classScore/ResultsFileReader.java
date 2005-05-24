@@ -40,7 +40,6 @@ public class ResultsFileReader {
 
         messenger.setStatus( "Loading analysis..." );
         String line;
-        // line = dis.readLine(); // ditch the header.
         while ( ( line = dis.readLine() ) != null ) {
             StringTokenizer st = new StringTokenizer( line, "\t" );
             String firstword = st.nextToken();
