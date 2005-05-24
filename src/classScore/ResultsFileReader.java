@@ -18,6 +18,7 @@ import classScore.data.GeneSetResult;
  * <p>
  * Copyright (c) 2004-2005 Columbia University
  * 
+ * @author Paul Pavlidis
  * @author Homin Lee
  * @version $Id$
  */

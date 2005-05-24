@@ -108,7 +108,7 @@ public class ResultsPrinter {
                 res = ( GeneSetResult ) results.get( it.next() );
                 if ( first ) {
                     first = false;
-                    res.printHeadings( out, "\tSame as:\tSimilar to:" );
+                    res.printHeadings( out, "\tSame as:\tSimilar to:\tGenes" );
                 }
                 res.print( out, formatRedundantAndSimilar( res.getGeneSetId() )
                         + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) );
