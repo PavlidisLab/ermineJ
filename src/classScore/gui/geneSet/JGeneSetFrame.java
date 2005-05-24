@@ -736,8 +736,6 @@ public class JGeneSetFrame extends JFrame {
         settings.getConfig().setProperty( INCLUDEEVERYTHING, String.valueOf( this.includeEverything ) );
         settings.getConfig().setProperty( WINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
         settings.getConfig().setProperty( WINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
-        if ( imageChooser != null )
-            settings.getConfig().setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
         try {
             settings.getConfig().save();
         } catch ( ConfigurationException e ) {
@@ -844,6 +842,7 @@ public class JGeneSetFrame extends JFrame {
         }
 
         // clean up
+
         m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
         m_matrixDisplay.resetRowKeys();
 
@@ -944,6 +943,8 @@ public class JGeneSetFrame extends JFrame {
             } catch ( IOException ex ) {
                 GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
+            settings.getConfig().setProperty( SAVESTARTPATH, fileChooser.getCurrentDirectory().getAbsolutePath() );
+
         }
         // else canceled by user
     }
@@ -977,6 +978,7 @@ public class JGeneSetFrame extends JFrame {
             } catch ( IOException ex ) {
                 GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
+            settings.getConfig().setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
         }
         // else canceled by user
     }
