@@ -1,29 +1,51 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-  <head>
-    <meta name="generator" content="HTML Tidy, see www.w3.org">
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
 
-    <title>Saving and loading analyses</title>
-    <link rel="stylesheet" type="text/css" href="../style.css">
-  </head>
+<title>Saving and loading analyses</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
 
-  <body>
-    <h1>Saving and loading analyses</h1>
+<body>
+<h1>Saving and loading analyses</h1>
 
-    <p>You can save an analysis you did and load it again later.</p>
+<p>You can save an analysis you did and load it again later.</p>
 
-    <p>These capabilities are accessed in the main window using the
-    "Analysis" menu.</p>
+<p>These capabilities are accessed in the main window using the
+"Analysis" menu.</p>
 
-    <p>Saving:</p>
+<h2>Saving:</h2>
 
-    <p><img alt="" src="../images/save_analysis.gif" border="0"></p>
+<p><img alt="" src="../images/save_analysis.gif" border="0"></p>
 
-    <p>Once you have saved an analysis, you can load it back in:</p>
+<p>You can also optionally check a box to "include all genes" in the
+output. If you select that, each line in the output file will include a
+list of genes which are in the gene set.</p>
 
-    <p><img alt="" src="../images/loadanalysis.gif" border="0"></p>
+<p>The output format is described <a href="../formats/saved-data.html">here</a></p>
 
-    <p>&nbsp;</p>
-  </body>
+<h2>Loading an analysis</h2>
+
+<p>Once you have saved an analysis, you can load it back in using the
+"Analysis -> load analysis" item:</p>
+
+<p><img alt="" src="../images/loadanalysis.gif" border="0"></p>
+
+<p><strong>Note:</strong> The locations of files (on your hard drive)
+used during the analysis are stored in header of the results file. If
+you move those files (such as the gene score file), reading the analysis
+back in might not work. In some cases you will be prompted to enter the
+new locations of the files but to be safe, leave the files where they
+were when you did the analysis and you won't have this problem. Another
+option is to edit the header of the results file to reflect the new
+location, but this is not recommended.</p>
+
+<p>If you delete the files referred to in the header, you will
+definitely have problems loading the analysis back in! (though the
+results file is still usable in other software such as excel).</p>
+
+<p>&nbsp;</p>
+</body>
 </html>
