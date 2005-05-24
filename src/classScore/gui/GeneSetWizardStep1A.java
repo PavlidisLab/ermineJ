@@ -77,6 +77,11 @@ public class GeneSetWizardStep1A extends WizardStep {
 
         searchTextField = new JTextField();
         searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
+        searchTextField.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                find( e );
+            }
+        } );
 
         searchPanel.add( searchTextField );
 
@@ -125,7 +130,7 @@ public class GeneSetWizardStep1A extends WizardStep {
         showStatus( "Available sets: " + geneData.selectedSets() );
     }
 
-    public void searchButton_actionPerformed_adapter( ActionEvent e ) {
+    public void find( ActionEvent e ) {
         String searchOn = searchTextField.getText();
 
         if ( searchOn.equals( "" ) ) {
@@ -194,7 +199,7 @@ class GeneSetWizardStep1A_searchButton_actionAdapter implements ActionListener {
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.searchButton_actionPerformed_adapter( e );
+        adaptee.find( e );
 
     }
 

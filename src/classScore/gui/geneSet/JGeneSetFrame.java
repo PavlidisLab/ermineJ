@@ -934,11 +934,15 @@ public class JGeneSetFrame extends JFrame {
             if ( !FileTools.hasDataExtension( filename ) ) {
                 filename = FileTools.addDataExtension( filename );
             }
+
+            File dataFile = new File( filename );
+            if ( !checkFileIsWritableGui( filename, dataFile ) ) return;
+
             // Save the values
             try {
                 saveData( filename, true, includeEverything, normalize );
             } catch ( IOException ex ) {
-                System.err.println( "IOException error saving data to " + filename );
+                GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
         }
         // else canceled by user
@@ -961,6 +965,9 @@ public class JGeneSetFrame extends JFrame {
 
             // Make sure the filename has an image extension
             String filename = file.getPath();
+            File dataFile = new File( filename );
+            if ( !checkFileIsWritableGui( filename, dataFile ) ) return;
+
             if ( !FileTools.hasImageExtension( filename ) ) {
                 filename = FileTools.addImageExtension( filename );
             }
@@ -968,10 +975,30 @@ public class JGeneSetFrame extends JFrame {
             try {
                 saveImage( filename, includeLabels, normalize );
             } catch ( IOException ex ) {
-                System.err.println( "IOException error saving png to " + filename );
+                GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
         }
         // else canceled by user
+    }
+
+    /**
+     * @param filename
+     * @param dataFile
+     */
+    private boolean checkFileIsWritableGui( String filename, File dataFile ) {
+        if ( !dataFile.exists() ) {
+            int okay = JOptionPane.showConfirmDialog( this, "File exists. Overwrite?", "File exists",
+                    JOptionPane.YES_NO_OPTION );
+            if ( okay == JOptionPane.NO_OPTION ) {
+                return false;
+            }
+        }
+
+        if ( !dataFile.canWrite() ) {
+            GuiUtil.error( filename + " cannot be written. Make sure the file has write permissions set." );
+            return false;
+        }
+        return true;
     }
 
     /**
