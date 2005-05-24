@@ -14,13 +14,11 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
 
 import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
-import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;

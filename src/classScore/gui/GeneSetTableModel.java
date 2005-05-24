@@ -12,11 +12,9 @@ import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.omg.CORBA.INITIALIZE;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
@@ -240,7 +238,8 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
                 if ( data.containsKey( classid ) ) {
                     GeneSetResult res = ( GeneSetResult ) data.get( classid );
                     setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
-                            + "<br>Genes: " + res.getEffectiveSize() + "<br>Probes: " + res.getSize() );
+                            + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
+                            + res.getEffectiveSize() + "<br>Probes used: " + res.getSize() );
                 }
             } else if ( column == 1 || column == 0 ) {
                 String aspect = goData.getAspectForId( classid );
