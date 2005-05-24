@@ -29,19 +29,21 @@ import classScore.Settings;
  */
 
 public class LoadDialog extends AppDialog {
-    JFileChooser chooser = new JFileChooser();
-    JPanel centerPanel = new JPanel();
-    JButton loadBrowseButton = new JButton();
-    JLabel annotLabel = new JLabel();
-    JPanel loadPanel = new JPanel();
-    JTextField loadFile = new JTextField();
+    private JFileChooser chooser = new JFileChooser();
+    private JPanel centerPanel = new JPanel();
+    private JButton loadBrowseButton = new JButton();
+    private JLabel annotLabel = new JLabel();
+    private JPanel loadPanel = new JPanel();
+    private JTextField loadFile = new JTextField();
 
-    Settings settings;
+    protected Settings settings;
+    private static final String RESULTS_LOAD_LOCATION = "resultsLoadPath";
 
     public LoadDialog( GeneSetScoreFrame callingframe ) {
         super( callingframe, 550, 250 );
         this.settings = callingframe.getSettings();
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        chooser.setCurrentDirectory( new File( settings.getConfig().getString( RESULTS_LOAD_LOCATION,
+                settings.getDataDirectory() ) ) );
         chooser.setDialogTitle( "Open Saved Analysis" );
         jbInit();
     }
@@ -76,6 +78,7 @@ public class LoadDialog extends AppDialog {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             loadFile.setText( chooser.getSelectedFile().toString() );
+            settings.getConfig().setProperty( RESULTS_LOAD_LOCATION, chooser.getSelectedFile().getAbsolutePath() );
         }
     }
 
