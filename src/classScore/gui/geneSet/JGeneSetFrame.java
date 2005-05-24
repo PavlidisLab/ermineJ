@@ -944,7 +944,6 @@ public class JGeneSetFrame extends JFrame {
                 GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
             settings.getConfig().setProperty( SAVESTARTPATH, fileChooser.getCurrentDirectory().getAbsolutePath() );
-
         }
         // else canceled by user
     }
