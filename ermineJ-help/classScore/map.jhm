@@ -23,6 +23,8 @@
 	<mapID target="genescores.format" url="html/formats/genescores.html" />
 	<mapID target="annotations.format" url="html/formats/annotations.html" />
 	<mapID target="microarray.format" url="html/formats/microarray.html" />
+	<mapID target="output.format" url="html/formats/saved-data.html" />
+	<mapID target="geneset.format" url="html/formats/geneset.html" />
 	<mapID target="excel-astext" url="html/formats/excel-astext.html" />
 	<mapID target="approx" url="html/tutorial/approximations.html" />
 	<mapID target="license" url="html/license.html" />
