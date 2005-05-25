@@ -143,15 +143,15 @@ public class JGeneSetFrame extends JFrame {
     JMenu viewMenu = new JMenu();
     private JPanel jPanelStatus = new JPanel();
     private JLabel jLabelStatus = new JLabel();
-    private StatusJlabel statusMessenger;
-    private Collection probesInGeneSet;
-    private int matrixColumnCount;
-    private JMatrixCellRenderer matrixCellRenderer;
-    private JVerticalHeaderRenderer verticalHeaderRenderer;
-    private List probeIDs;
-    private Map pvalues;
-    private GeneAnnotations geneData;
-    private final StatusViewer callerStatusViewer;
+    private StatusJlabel statusMessenger = null;
+    private Collection probesInGeneSet = null;
+    private int matrixColumnCount = 0;
+    private JMatrixCellRenderer matrixCellRenderer = null;
+    private JVerticalHeaderRenderer verticalHeaderRenderer = null;
+    private List probeIDs = null;
+    private Map pvalues = null;
+    private GeneAnnotations geneData = null;
+ //   private StatusViewer callerStatusViewer = null;
 
     /**
      * @param probeIDs an array of probe ID's that has some order; the actual order is arbitrary, as long as it is some
@@ -163,7 +163,7 @@ public class JGeneSetFrame extends JFrame {
      */
     public JGeneSetFrame( StatusViewer callerStatusViewer, List probeIDs, Map pvalues, GeneAnnotations geneData,
             Settings settings ) {
-        this.callerStatusViewer = callerStatusViewer;
+     //   this.callerStatusViewer = callerStatusViewer;
         try {
             if ( settings == null ) {
                 log.warn( "Loading new settings..." );
@@ -284,25 +284,21 @@ public class JGeneSetFrame extends JFrame {
                 } else {
                     m_matrixDisplay = new JMatrixDisplay( matrix );
                     m_matrixDisplay.setStandardizedEnabled( true );
+                    // Make the columns in the matrix display not too wide (cell-size)
+                    // and set a custom cell renderer
+                    matrixCellRenderer = new JMatrixCellRenderer( m_matrixDisplay ); // create one instance
+                    // that will be used to
+                    // draw each cell
                 }
             } else {
                 GuiUtil.error( "The data file " + filename + " was not readable." + "\n"
                         + "Please make sure this file exists and the filename and directory path are correct,\n"
                         + "and that it is a valid raw data file (tab-delimited).\n" );
             }
+        } else {
+            m_matrixDisplay = null;
         }
-        //
-        // Set up the matrix display part of the table
-        //
-
-        // Make the columns in the matrix display not too wide (cell-size)
-        // and set a custom cell renderer
-        matrixCellRenderer = new JMatrixCellRenderer( m_matrixDisplay ); // create one instance
-        // that will be used to
-        // draw each cell
-
         verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
-
         matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
         return matrix;
