@@ -215,16 +215,18 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.revalidate();
     }
 
-    protected boolean deleteOrResetGeneSet( String classID ) {
+    protected String deleteOrResetGeneSet( String classID ) {
         log.debug( "Deleting gene set from table" );
-        if ( super.deleteOrResetGeneSet( classID ) ) {
+        String action = super.deleteOrResetGeneSet( classID );
+        if ( action.equals( GeneSetPanel.DELETED ) ) {
             // model.fireTableStructureChanged();
             sorter.cancelSorting();
             sorter.setSortingStatus( 0, TableSorter.ASCENDING );
             table.revalidate();
-            return true;
+        } else if ( action.equals( GeneSetPanel.RESTORED ) ) {
+            table.revalidate();
         }
-        return false;
+        return action;
 
     }
 

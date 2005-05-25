@@ -830,7 +830,7 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public void deleteUserGeneSet( String classID ) {
         UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, classID );
-        if ( ngs.deleteUserGeneSet( classID ) && this.statusMessenger != null ) {
+        if ( ngs.deleteUserGeneSet() && this.statusMessenger != null ) {
             statusMessenger.showStatus( "Permanantly deleted " + classID );
         } else {
             GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
@@ -872,6 +872,15 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public void addUserOverwritten( String id ) {
         this.userOverwrittenGeneSets.add( id );
+    }
+
+    /**
+     * @param classID
+     */
+    public void restoreUserGeneSet( String classID ) {
+        userOverwrittenGeneSets.remove( classID );
+        oPanel.addedNewGeneSet();
+        treePanel.addedNewGeneSet();
     }
 }
 

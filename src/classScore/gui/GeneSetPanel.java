@@ -49,6 +49,9 @@ public abstract class GeneSetPanel extends JScrollPane {
     protected int selectedRun;
     protected Settings settings;
     protected OutputPanelPopupMenu popup;
+    public static final String NOACTION = "NOACTION";
+    public static final String RESTORED = "RESTORED";
+    public static final String DELETED = "DELETED";
 
     public GeneSetPanel( Settings settings, List results, GeneSetScoreFrame callingFrame ) {
         this.settings = settings;
@@ -134,26 +137,27 @@ public abstract class GeneSetPanel extends JScrollPane {
      * @param classID
      * @return
      */
-    protected boolean deleteOrResetGeneSet( String classID ) {
-        if ( classID == null ) return false;
-        if ( !goData.isUserDefined( classID ) ) return false;
+    protected String deleteOrResetGeneSet( String classID ) {
+        if ( classID == null ) return NOACTION;
+        if ( !goData.isUserDefined( classID ) ) return NOACTION;
 
         if ( callingFrame.userOverWrote( classID ) ) {
             int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to restore the original \""
                     + classID + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
-            if ( yesno == JOptionPane.NO_OPTION ) return false;
+            if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
             geneData.restoreGeneSet( classID );
-            return true;
+            callingFrame.restoreUserGeneSet( classID );
+            return RESTORED;
         }
         // else
-        int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to permanently delete \"" + classID
-                + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
+        int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to delete \"" + classID + "\"?",
+                "Confirm", JOptionPane.YES_NO_OPTION );
 
-        if ( yesno == JOptionPane.NO_OPTION ) return false;
+        if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
         geneData.removeClassFromMaps( classID );
         goData.deleteGeneSet( classID );
         callingFrame.deleteUserGeneSet( classID );
-        return true;
+        return DELETED;
     }
 
     protected MouseListener configurePopupMenu() {

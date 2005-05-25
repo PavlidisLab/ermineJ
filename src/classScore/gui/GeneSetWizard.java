@@ -3,6 +3,9 @@ package classScore.gui;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
@@ -15,10 +18,13 @@ import classScore.data.UserDefinedGeneSetManager;
  * <p>
  * Copyright (c) 2004 Columbia University
  * 
- * @author Homin K Lee @ $Id$
+ * @author Homin K Lee
+ * @author Paul Pavlidis
+ * @version $Id$
  */
 
 public class GeneSetWizard extends Wizard {
+    private static Log log = LogFactory.getLog( GeneSetWizard.class.getName() );
     Settings settings;
     GeneAnnotations geneData;
     GONames goData;
@@ -217,6 +223,10 @@ public class GeneSetWizard extends Wizard {
     }
 
     protected void finishButton_actionPerformed( ActionEvent e ) {
+        if ( step == 2 ) {
+            // pass the name and description onto step 3.
+            step3.update();
+        }
         step3.nameNewGeneSet();
         String id = null;
         if ( makenew ) {
@@ -224,6 +234,8 @@ public class GeneSetWizard extends Wizard {
         } else {
             id = oldGeneSet.getId();
         }
+
+        log.debug( "Got modified or new gene set: " + id );
         if ( id == null || id.length() == 0 ) {
             showError( "The gene set ID must be specified." );
             return;

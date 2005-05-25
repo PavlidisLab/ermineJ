@@ -431,12 +431,14 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
      */
-    protected boolean deleteOrResetGeneSet( String classID ) {
-        if ( super.deleteOrResetGeneSet( classID ) ) {
+    protected String deleteOrResetGeneSet( String classID ) {
+        String action = super.deleteOrResetGeneSet( classID );
+        if ( action == GeneSetPanel.DELETED ) {
             this.removeNode( classID );
-            return true;
+        } else if ( action.equals( GeneSetPanel.RESTORED ) ) {
+            goTree.revalidate();
         }
-        return false;
+        return action;
     }
 
     /**
