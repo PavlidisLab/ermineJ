@@ -14,13 +14,11 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
 
 import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
-import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
@@ -62,7 +60,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
     protected String currentlySelectedGeneSet = null;
     protected int currentlySelectedResultSetIndex = -1;
     private BaseCellRenderer rend;
-    private String currentlySelectedResultSet;
 
     public GeneSetTreePanel( GeneSetScoreFrame callingFrame, List results, Settings settings ) {
         super( settings, results, callingFrame );
@@ -186,6 +183,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
         this.goTree = goData.getGraph().treeView( GeneSetTreeNode.class );
         this.setRenderer();
         this.goTree.setRootVisible( true );
+
+        // effectively disable the double-click
+        this.goTree.setToggleClickCount( 10 );
+
         ToolTipManager.sharedInstance().registerComponent( goTree );
         MouseListener popupListener = configurePopupMenu();
         this.goTree.addMouseListener( popupListener );
@@ -298,6 +299,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( expand ) {
             goTree.expandPath( parent );
         } else {
+            // do not collapse the root, as we have disabled double-clicks to open it.
+            if ( parent.getParentPath() == null ) return;
             goTree.collapsePath( parent );
         }
     }
@@ -364,13 +367,13 @@ public class GeneSetTreePanel extends GeneSetPanel {
             }
         } );
 
-        JMenuItem collapseNodeMenuItem = new JMenuItem( "Collapse All" );
+        JMenuItem collapseNodeMenuItem = new JMenuItem( "Collapse All (slow)" );
         collapseNodeMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 expandAll( false );
             }
         } );
-        JMenuItem expandNodeMenuItem = new JMenuItem( "Expand All (warning: slow)" );
+        JMenuItem expandNodeMenuItem = new JMenuItem( "Expand All (slow)" );
         expandNodeMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 expandAll( true );
