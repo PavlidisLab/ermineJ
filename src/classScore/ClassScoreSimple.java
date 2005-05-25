@@ -52,9 +52,6 @@ public class ClassScoreSimple {
     // genes.
     private List genes = null;
 
-    // List of Doubles
-    private List geneScores = null;
-
     // List of Collections of go terms for the probes.
     private List goAssociations = null;
 
@@ -102,7 +99,7 @@ public class ClassScoreSimple {
     /**
      * Run an analysis using the current configuration.
      */
-    public void run() {
+    public void run( List geneScores ) {
         GeneAnnotations geneData = new GeneAnnotations( probes, genes, null, goAssociations );
         GeneScores scores = new GeneScores( probes, geneScores, geneData.getGeneToProbeList(), geneData
                 .getProbeToGeneMap(), settings );
