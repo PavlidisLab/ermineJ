@@ -120,8 +120,7 @@ public class GeneSetTableModel extends AbstractTableModel {
             case 1:
                 // p value
                 try {
-                    if ( m_pvalues == null ) return new Double( Double.NaN );
-
+                    if ( m_pvalues == null || !m_pvalues.containsKey( probeID ) ) return new Double( Double.NaN );
                     return new Double( m_nf.format( m_pvalues.get( probeID ) ) );
 
                 } catch ( NumberFormatException e ) {
