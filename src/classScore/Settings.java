@@ -107,6 +107,11 @@ public class Settings {
     private File logFile;
 
     /**
+     * Indicates whether the user needs to be prompted for a data file.
+     */
+    private boolean userSetRawDataFile = true;
+
+    /**
      * Create the settings, reading them from a file to be determined by the constructor.
      * 
      * @throws IOException
@@ -315,7 +320,7 @@ public class Settings {
         return config.getInteger( QUANTILE, new Integer( 50 ) ).intValue();
     }
 
-    public String getRawFile() {
+    public String getRawDataFileName() {
         return config.getString( RAW_FILE );
     }
 
@@ -635,6 +640,20 @@ public class Settings {
             return logFile;
         }
         return logFile;
+    }
+
+    /**
+     * @param setRawFile Set to false to indicate that the user wants to proceed without a data file.
+     */
+    public void userSetRawFile( boolean setRawFile ) {
+        this.userSetRawDataFile = setRawFile;
+    }
+
+    /**
+     * @return
+     */
+    public boolean getUserSetRawFile() {
+        return this.userSetRawDataFile;
     }
 
 }

@@ -189,7 +189,7 @@ public class AnalysisWizardStep2 extends WizardStep {
     void setValues() {
         jTextFieldScoreCol.setText( String.valueOf( settings.getScoreCol() ) );
         scoreFile.setText( settings.getScoreFile() );
-        rawFile.setText( settings.getRawFile() );
+        rawFile.setText( settings.getRawDataFileName() );
     }
 
     public void saveValues() {
@@ -197,6 +197,9 @@ public class AnalysisWizardStep2 extends WizardStep {
 
         settings.setScoreFile( scoreFile.getText() );
         settings.setRawFile( rawFile.getText() );
+        if ( rawFile.getText() != null || rawFile.getText().length() > 0 ) {
+            settings.userSetRawFile( true );
+        }
         settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
     }
 

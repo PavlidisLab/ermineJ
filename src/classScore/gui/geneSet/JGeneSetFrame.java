@@ -40,6 +40,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -160,21 +161,22 @@ public class JGeneSetFrame extends JFrame {
     public JGeneSetFrame( List probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings ) {
         try {
             if ( settings == null ) {
+                log.warn( "Loading new settings..." );
                 this.settings = new Settings();
             } else {
                 this.settings = settings;
             }
 
             this.readPrefs();
-            String filename = settings.getRawFile();
+
             this.probeIDs = probeIDs;
             this.pvalues = pvalues;
             this.geneData = geneData;
-            createDetailsTable( filename );
+            createDetailsTable();
             initChoosers();
             jbInit();
         } catch ( Exception e ) {
-            throw new RuntimeException( e );
+            GuiUtil.error( "There was an error setting up the details view: " + e.getMessage() );
         }
     }
 
@@ -192,7 +194,7 @@ public class JGeneSetFrame extends JFrame {
      * @param geneData
      * @param filename
      */
-    private void createDetailsTable( String filename ) {
+    private void createDetailsTable() {
 
         // create a probe set from probeIDs
         probesInGeneSet = new HashSet();
@@ -200,7 +202,7 @@ public class JGeneSetFrame extends JFrame {
             probesInGeneSet.add( probeIDs.get( i ) );
         }
 
-        DenseDoubleMatrix2DNamed matrix = setUpMatrixData( filename );
+        DenseDoubleMatrix2DNamed matrix = setUpMatrixData();
 
         //
         // Create the rest of the table
@@ -244,30 +246,42 @@ public class JGeneSetFrame extends JFrame {
      * @param probesInGeneSet
      * @return
      */
-    private DenseDoubleMatrix2DNamed setUpMatrixData( String filename ) {
+    private DenseDoubleMatrix2DNamed setUpMatrixData() {
         // Read the matrix data
         DoubleMatrixReader matrixReader = new DoubleMatrixReader();
         DenseDoubleMatrix2DNamed matrix = null;
-        if ( filename != null && filename.length() > 0 ) {
-            try {
-                matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesInGeneSet );
-            } catch ( IOException e ) {
-                GuiUtil.error( "Unable to load raw microarray data from file " + filename + "\n"
+
+        if ( ( settings.getRawDataFileName() == null || settings.getRawDataFileName().length() == 0 )
+                && settings.getUserSetRawFile() ) {
+            this.switchRawDataFile();
+        }
+
+        /* I apologize for the convoluted logic here */
+        if ( settings.getUserSetRawFile()
+                || ( settings.getRawDataFileName() != null || settings.getRawDataFileName().length() >= 0 ) ) {
+            String filename = settings.getRawDataFileName();
+            if ( ( new File( filename ) ).canRead() ) {
+                try {
+                    matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesInGeneSet );
+                } catch ( IOException e ) {
+                    GuiUtil.error( "Error loading raw microarray data from file " + filename + "\n"
+                            + "Please make sure this file exists and the filename and directory path are correct,\n"
+                            + "and that it is a valid raw data file (tab-delimited).\n" );
+                }
+
+                if ( matrix == null ) {
+                    if ( statusMessenger != null )
+                        statusMessenger.setError( "None of the probes in this gene set were in the data file." );
+                } else {
+                    m_matrixDisplay = new JMatrixDisplay( matrix );
+                    m_matrixDisplay.setStandardizedEnabled( true );
+                }
+            } else {
+                GuiUtil.error( "The data file " + filename + " was not readable." + "\n"
                         + "Please make sure this file exists and the filename and directory path are correct,\n"
                         + "and that it is a valid raw data file (tab-delimited).\n" );
             }
-        } else {
-            log.info( "No data filename provided" );
         }
-        if ( matrix == null ) {
-            statusMessenger.setError( "Not all the probes in this gene set were in the data file." );
-        }
-        // create the matrix display
-        if ( matrix != null ) {
-            m_matrixDisplay = new JMatrixDisplay( matrix );
-            m_matrixDisplay.setStandardizedEnabled( true );
-        }
-
         //
         // Set up the matrix display part of the table
         //
@@ -559,7 +573,9 @@ public class JGeneSetFrame extends JFrame {
         switchDataFileMenuItem.setText( "Change Dataset..." );
         switchDataFileMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                switchDataFileAction();
+                switchRawDataFile();
+                createDetailsTable();
+                table.revalidate();
             }
         } );
 
@@ -576,12 +592,17 @@ public class JGeneSetFrame extends JFrame {
     /**
      * 
      */
-    protected void switchDataFileAction() {
+    protected void switchRawDataFile() {
         JFileChooser fc = new JFileChooser( settings.getDataDirectory() );
-        if ( fc.showDialog( this, "Choose new data file to show" ) == JFileChooser.APPROVE_OPTION ) {
+        fc.setDialogTitle( "Choose a new expression data file to view,"
+                + " or proceed without changing the current setting." );
+        int yesno = fc.showDialog( this, "New data file." );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setRawFile( fc.getSelectedFile().getAbsolutePath() );
-            createDetailsTable( settings.getRawFile() );
-            table.revalidate();
+            settings.userSetRawFile( true );
+        } else {
+            settings.userSetRawFile( false );
         }
     }
 

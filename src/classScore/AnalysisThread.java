@@ -207,14 +207,14 @@ public class AnalysisThread extends Thread {
      */
     private synchronized DenseDoubleMatrix2DNamed addRawData() throws IOException {
         DenseDoubleMatrix2DNamed rawData;
-        if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
+        if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
             messenger.setStatus( "Raw data are in memory" );
-            rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawFile() );
+            rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawDataFileName() );
         } else {
-            messenger.setStatus( "Reading raw data from file " + settings.getRawFile() );
+            messenger.setStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
-            rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawFile() );
-            rawDataSets.put( settings.getRawFile(), rawData );
+            rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawDataFileName() );
+            rawDataSets.put( settings.getRawDataFileName(), rawData );
         }
         return rawData;
     }

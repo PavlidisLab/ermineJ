@@ -437,14 +437,14 @@ public class classScoreCMD {
     protected GeneSetPvalRun analyze() throws IOException {
         DenseDoubleMatrix2DNamed rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
-            if ( rawDataSets.containsKey( settings.getRawFile() ) ) {
+            if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
                 statusMessenger.setStatus( "Raw data are in memory" );
-                rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawFile() );
+                rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawDataFileName() );
             } else {
-                statusMessenger.setStatus( "Reading raw data from file " + settings.getRawFile() );
+                statusMessenger.setStatus( "Reading raw data from file " + settings.getRawDataFileName() );
                 DoubleMatrixReader r = new DoubleMatrixReader();
-                rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawFile() );
-                rawDataSets.put( settings.getRawFile(), rawData );
+                rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawDataFileName() );
+                rawDataSets.put( settings.getRawDataFileName(), rawData );
             }
         }
 
