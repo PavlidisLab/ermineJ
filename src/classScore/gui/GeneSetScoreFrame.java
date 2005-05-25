@@ -57,7 +57,6 @@ import baseCode.gui.GuiUtil;
 import baseCode.gui.ScrollingTextAreaDialog;
 import baseCode.gui.StatusJlabel;
 import baseCode.util.FileTools;
-import baseCode.util.StatusFileLogger;
 import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
 import classScore.GeneSetPvalRun;
