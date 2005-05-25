@@ -9,6 +9,7 @@ import classScore.ClassScoreSimple;
 import classScore.Settings;
 
 /**
+ * Demonstrates how to use the ClassScoreSimple API.
  * <hr>
  * <p>
  * Copyright (c) 2004-2005 Columbia University
