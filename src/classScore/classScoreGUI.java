@@ -38,7 +38,7 @@ public class classScoreGUI {
         } else {
             frame.validate();
         }
-        GuiUtil.centerFrame( frame );
+        GuiUtil.centerContainer( frame );
         frame.disableMenusForLoad();
         frame.setVisible( true );
         frame.showStatus( "Waiting for startup dialog box" );

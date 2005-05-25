@@ -10,8 +10,13 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,16 +27,21 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -44,8 +54,10 @@ import org.xml.sax.SAXException;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
+import baseCode.gui.ScrollingTextAreaDialog;
 import baseCode.gui.StatusJlabel;
 import baseCode.util.FileTools;
+import baseCode.util.StatusFileLogger;
 import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
 import classScore.GeneSetPvalRun;
@@ -95,6 +107,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenu runViewMenu = new JMenu();
     private JMenu helpMenu = new JMenu();
     private JMenuItem helpMenuItem = new JMenuItem();
+    private JMenuItem logMenuItem = new JMenuItem();
     private JMenuItem aboutMenuItem = new JMenuItem();
     private final JFileChooser fc = new JFileChooser();
     private JTabbedPane tabs = new JTabbedPane();
@@ -125,6 +138,9 @@ public class GeneSetScoreFrame extends JFrame {
     private HelpHelper hh;
     private int currentResultSet;
 
+    /**
+     * @throws IOException
+     */
     public GeneSetScoreFrame() throws IOException {
         settings = new Settings();
         jbInit();
@@ -216,15 +232,20 @@ public class GeneSetScoreFrame extends JFrame {
         // controls
 
         // status bar
+        // File logFile = settings.getLogFile();
         jPanelStatus.setLayout( new BorderLayout() );
         jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
         jPanelStatus.setPreferredSize( new Dimension( STARTING_OVERALL_WIDTH, 33 ) );
         jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
+        jLabelStatus.setBorder( BorderFactory.createEmptyBorder( 5, 5, 10, 10 ) );
         jLabelStatus.setPreferredSize( new Dimension( 800, 19 ) );
         jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
+
         jPanelStatus.add( jLabelStatus, BorderLayout.WEST );
         showStatus( "This window is not usable until you confirm the startup settings in the dialog box." );
-        statusMessenger = new StatusJlabel( jLabelStatus );
+        // StatusViewer s = new StatusJlabel( jLabelStatus );
+        // this.statusMessenger = new StatusFileLogger( logFile.getAbsolutePath(), s );
+        this.statusMessenger = new StatusJlabel( jLabelStatus );
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
         oPanel.setMessenger( this.statusMessenger );
     }
@@ -320,16 +341,54 @@ public class GeneSetScoreFrame extends JFrame {
         helpMenu.setMnemonic( 'H' );
         helpMenuItem.setText( "Help Topics" );
         helpMenuItem.setMnemonic( 'T' );
+
+        logMenuItem.setMnemonic( 'L' );
+        logMenuItem.setText( "View log" );
+        logMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                showLogs();
+            }
+        } );
+
         aboutMenuItem.setText( "About ErmineJ" );
         aboutMenuItem.setMnemonic( 'A' );
         aboutMenuItem.addActionListener( new GeneSetScoreFrame_aboutMenuItem_actionAdapter( this ) );
         helpMenu.add( helpMenuItem );
         helpMenu.add( aboutMenuItem );
+        helpMenu.add( logMenuItem );
         jMenuBar1.add( fileMenu );
         jMenuBar1.add( classMenu );
         jMenuBar1.add( analysisMenu );
         jMenuBar1.add( runViewMenu );
         jMenuBar1.add( helpMenu );
+    }
+
+    /**
+     * 
+     */
+    protected void showLogs() {
+        StringBuffer bif = new StringBuffer();
+        try {
+            BufferedReader fis = new BufferedReader( new FileReader( settings.getLogFile() ) );
+            String line;
+            while ( ( line = fis.readLine() ) != null ) {
+                bif.append( line );
+                bif.append( "\n" );
+            }
+            fis.close();
+            ScrollingTextAreaDialog b = new ScrollingTextAreaDialog( this, "ErmineJ Log", true );
+            b.setText( bif.toString() );
+            b.setSize( new Dimension( 350, 500 ) );
+            b.setResizable( true );
+            b.setLocation( GuiUtil.chooseChildLocation( b, this ) );
+            b.pack();
+            b.validate();
+            b.setVisible( true );
+        } catch ( FileNotFoundException e ) {
+            GuiUtil.error( "The log file could not be found" );
+        } catch ( IOException e ) {
+            GuiUtil.error( "There was an error reading the log file" );
+        }
     }
 
     /**
@@ -553,16 +612,10 @@ public class GeneSetScoreFrame extends JFrame {
     }
 
     /**
-     *
-     */
-    private void clearStatus() {
-        jLabelStatus.setText( "" );
-    }
-
-    /**
      * @param e ActionEvent
      */
     void quitMenuItem_actionPerformed( ActionEvent e ) {
+        statusMessenger.clear();
         System.exit( 0 );
     }
 

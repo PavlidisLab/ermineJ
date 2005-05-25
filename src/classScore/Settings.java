@@ -10,6 +10,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -101,6 +103,8 @@ public class Settings {
     private static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
             MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
             BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FORMAT, CLASS_SCORE_METHOD };
+
+    private File logFile;
 
     /**
      * Create the settings, reading them from a file to be determined by the constructor.
@@ -612,6 +616,25 @@ public class Settings {
             }
         }
         this.config.setAutoSave( true );
+    }
+
+    /**
+     * Determine where to put the log file.
+     * 
+     * @return
+     */
+    public File getLogFile() {
+        if ( logFile == null ) {
+            // Calendar c = Calendar.getInstance();
+            // this.logFile = new File( this.getDataDirectory() + System.getProperty( "file.separator" ) + "log."
+            // + c.get( Calendar.YEAR ) + c.get( Calendar.MONTH ) + c.get( Calendar.DATE ) + c.get( Calendar.HOUR )
+            // + c.get( Calendar.MINUTE ) + c.get( Calendar.SECOND ) );
+            // log.info( "Creating log file: " + logFile.getAbsolutePath() );
+            logFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                    + "ermineJ.log" );
+            return logFile;
+        }
+        return logFile;
     }
 
 }
