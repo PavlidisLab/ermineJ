@@ -2,7 +2,6 @@ package classScore.gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -344,29 +343,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
     /**
      * 
      */
-    private void setRenderer() {
-        rend = new BaseCellRenderer( goData, geneData, results );
-        this.goTree.setCellRenderer( rend );
-    }
-
     protected MouseListener configurePopupMenu() {
-        assert goData != null;
-        final OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
-        JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
-        modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
-        final JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
-        htmlMenuItem.addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
-
-        final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
-        deleteGeneSetMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-                String classID = null;
-                classID = sourcePopup.getSelectedItem();
-                deleteGeneSet( classID );
-            }
-        } );
-
+        MouseListener m = super.configurePopupMenu();
         JMenuItem collapseNodeMenuItem = new JMenuItem( "Collapse All (slow)" );
         collapseNodeMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -379,49 +357,17 @@ public class GeneSetTreePanel extends GeneSetPanel {
                 expandAll( true );
             }
         } );
-        popup.add( htmlMenuItem );
-        popup.add( modMenuItem );
-        popup.add( deleteGeneSetMenuItem );
         popup.add( collapseNodeMenuItem );
         popup.add( expandNodeMenuItem );
-        MouseListener popupListener = new MouseAdapter() {
+        return m;
+    }
 
-            public void mousePressed( MouseEvent e ) {
-                maybeShowPopup( e );
-            }
-
-            public void mouseReleased( MouseEvent e ) {
-                maybeShowPopup( e );
-            }
-
-            private void maybeShowPopup( MouseEvent e ) {
-                if ( e.isPopupTrigger() ) {
-                    JTree source = ( JTree ) e.getSource();
-                    int x = e.getX();
-                    int y = e.getY();
-                    TreePath path = source.getPathForLocation( x, y );
-                    if ( path == null ) return;
-
-                    source.setSelectionPath( path );
-                    source.scrollPathToVisible( path );
-
-                    GeneSetTreeNode selectedNode = ( GeneSetTreeNode ) path.getLastPathComponent();
-                    String classID = ( String ) ( ( GraphNode ) selectedNode.getUserObject() ).getKey();
-                    if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
-                        deleteGeneSetMenuItem.setEnabled( false );
-                    } else {
-                        deleteGeneSetMenuItem.setEnabled( true );
-                    }
-
-                    popup.show( e.getComponent(), e.getX(), e.getY() );
-                    popup.setSelectedItem( classID );
-
-                }
-            }
-
-        };
-
-        return popupListener;
+    /**
+     * 
+     */
+    private void setRenderer() {
+        rend = new BaseCellRenderer( goData, geneData, results );
+        this.goTree.setCellRenderer( rend );
     }
 
     /**
@@ -429,6 +375,26 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     public String getCurrentlySelectedGeneSet() {
         return this.currentlySelectedGeneSet;
+    }
+
+    /**
+     * @param e
+     * @return
+     */
+    protected String popupRespondAndGetGeneSet( MouseEvent e ) {
+        JTree source = ( JTree ) e.getSource();
+        int x = e.getX();
+        int y = e.getY();
+        TreePath path = source.getPathForLocation( x, y );
+        if ( path == null )
+        ;
+
+        source.setSelectionPath( path );
+        source.scrollPathToVisible( path );
+
+        GeneSetTreeNode selectedNode = ( GeneSetTreeNode ) path.getLastPathComponent();
+        String classID = ( String ) ( ( GraphNode ) selectedNode.getUserObject() ).getKey();
+        return classID;
     }
 
     /**
@@ -465,8 +431,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
      */
-    protected boolean deleteGeneSet( String classID ) {
-        if ( super.deleteGeneSet( classID ) ) {
+    protected boolean deleteOrResetGeneSet( String classID ) {
+        if ( super.deleteOrResetGeneSet( classID ) ) {
             this.removeNode( classID );
             return true;
         }

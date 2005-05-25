@@ -3,9 +3,14 @@ package classScore.gui;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -43,6 +48,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     protected List results;
     protected int selectedRun;
     protected Settings settings;
+    protected OutputPanelPopupMenu popup;
 
     public GeneSetPanel( Settings settings, List results, GeneSetScoreFrame callingFrame ) {
         this.settings = settings;
@@ -51,6 +57,8 @@ public abstract class GeneSetPanel extends JScrollPane {
     }
 
     public abstract void addedNewGeneSet();
+
+    protected abstract String popupRespondAndGetGeneSet( MouseEvent e );
 
     public void addInitialData( GONames goData ) {
         assert callingFrame.getOriginalGeneData() != null : "Gene data is still null";
@@ -122,10 +130,22 @@ public abstract class GeneSetPanel extends JScrollPane {
         }
     }
 
-    protected boolean deleteGeneSet( String classID ) {
+    /**
+     * @param classID
+     * @return
+     */
+    protected boolean deleteOrResetGeneSet( String classID ) {
         if ( classID == null ) return false;
         if ( !goData.isUserDefined( classID ) ) return false;
 
+        if ( callingFrame.userOverWrote( classID ) ) {
+            int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to restore the original \""
+                    + classID + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
+            if ( yesno == JOptionPane.NO_OPTION ) return false;
+            geneData.restoreGeneSet( classID );
+            return true;
+        }
+        // else
         int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to permanently delete \"" + classID
                 + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
 
@@ -134,6 +154,61 @@ public abstract class GeneSetPanel extends JScrollPane {
         goData.deleteGeneSet( classID );
         callingFrame.deleteUserGeneSet( classID );
         return true;
+    }
+
+    protected MouseListener configurePopupMenu() {
+        popup = new OutputPanelPopupMenu();
+        JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
+        modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
+        final JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
+        htmlMenuItem.addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
+
+        final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
+        deleteGeneSetMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+                String classID = null;
+                classID = sourcePopup.getSelectedItem();
+                deleteOrResetGeneSet( classID );
+            }
+        } );
+
+        popup.add( htmlMenuItem );
+        popup.add( modMenuItem );
+        popup.add( deleteGeneSetMenuItem );
+
+        MouseListener popupListener = new MouseAdapter() {
+            public void mousePressed( MouseEvent e ) {
+                maybeShowPopup( e );
+            }
+
+            public void mouseReleased( MouseEvent e ) {
+                maybeShowPopup( e );
+            }
+
+            private void maybeShowPopup( MouseEvent e ) {
+                if ( e.isPopupTrigger() ) {
+                    String classID = popupRespondAndGetGeneSet( e );
+                    if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
+                        deleteGeneSetMenuItem.setEnabled( false );
+                    } else {
+                        deleteGeneSetMenuItem.setEnabled( true );
+                    }
+
+                    if ( callingFrame.userOverWrote( classID ) ) {
+                        deleteGeneSetMenuItem.setText( "Reset this gene set" );
+                    } else {
+                        deleteGeneSetMenuItem.setText( "Delete this gene set" );
+                    }
+
+                    popup.show( e.getComponent(), e.getX(), e.getY() );
+                    popup.setSelectedItem( classID );
+
+                }
+            }
+        };
+
+        return popupListener;
     }
 }
 

@@ -32,7 +32,7 @@ public class GeneSetWizard extends Wizard {
     boolean nostep1 = false;
     UserDefinedGeneSetManager newGeneSet;
     UserDefinedGeneSetManager oldGeneSet;
-    String cid;
+    String geneSetId;
 
     /**
      * Use this constructor to let the user choose which gene set to look at or to make a new one.
@@ -86,7 +86,7 @@ public class GeneSetWizard extends Wizard {
         this.settings = callingframe.getSettings();
         this.geneData = geneData;
         this.goData = goData;
-        this.cid = geneSetId;
+        this.geneSetId = geneSetId;
         makenew = false;
         nostep1 = true;
         newGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
@@ -158,7 +158,12 @@ public class GeneSetWizard extends Wizard {
             }
             backButton.setEnabled( true );
             nextButton.setEnabled( false );
-            finishButton.setEnabled( true );
+
+            if ( makenew )
+                finishButton.setEnabled( false );
+            else
+                finishButton.setEnabled( true );
+
             step3.update();
             this.getContentPane().add( step3 );
             step3.revalidate();
@@ -195,7 +200,10 @@ public class GeneSetWizard extends Wizard {
                 if ( nostep1 ) backButton.setEnabled( false );
             }
             nextButton.setEnabled( true );
-            finishButton.setEnabled( false );
+            if ( makenew )
+                finishButton.setEnabled( false );
+            else
+                finishButton.setEnabled( true );
             this.getContentPane().add( step2 );
             step2.revalidate();
             this.repaint();
@@ -210,8 +218,13 @@ public class GeneSetWizard extends Wizard {
 
     protected void finishButton_actionPerformed( ActionEvent e ) {
         step3.nameNewGeneSet();
-        String id = newGeneSet.getId();
-        if ( id.compareTo( "" ) == 0 ) {
+        String id = null;
+        if ( makenew ) {
+            id = newGeneSet.getId();
+        } else {
+            id = oldGeneSet.getId();
+        }
+        if ( id == null || id.length() == 0 ) {
             showError( "The gene set ID must be specified." );
             return;
         }
@@ -238,6 +251,9 @@ public class GeneSetWizard extends Wizard {
         }
         ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
         ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
+        if ( newGeneSet.modified() ) {
+            ( ( GeneSetScoreFrame ) callingframe ).addUserOverwritten( id );
+        }
         dispose();
 
     }

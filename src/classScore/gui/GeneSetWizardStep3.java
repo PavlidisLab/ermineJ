@@ -35,12 +35,14 @@ public class GeneSetWizardStep3 extends WizardStep {
     private JTable finalTable = null;
 
     String origID = "";
+    private final boolean makenew;
 
     public GeneSetWizardStep3( GeneSetWizard wiz, Settings settings, GeneAnnotations geneData,
             UserDefinedGeneSetManager newGeneSet, boolean makenew ) {
         super( wiz );
-        this.jbInit();
+        this.makenew = makenew;
         this.newGeneSet = newGeneSet;
+        this.jbInit();
         AbstractTableModel finalTableModel = newGeneSet.toTableModel( true );
         assert finalTableModel != null;
         assert finalTable != null;
@@ -72,11 +74,20 @@ public class GeneSetWizardStep3 extends WizardStep {
         JPanel ncDescPanel = new JPanel();
         ncDescPanel.setPreferredSize( new Dimension( 165, 180 ) );
         JLabel classDescL = new JLabel( "New gene set ID: " );
+
         classDescL.setRequestFocusEnabled( true );
         classDescL.setText( "New gene set Description: " );
         classDescTA = new JTextArea();
+        if ( !makenew ) {
+            classDescTA.setText( newGeneSet.getId() );
+        }
         classDescTA.setToolTipText( "New gene set description" );
-        classDescTA.setText( "Enter description" );
+
+        if ( makenew ) {
+            classDescTA.setText( "Enter description" );
+        } else {
+            classDescTA.setText( newGeneSet.getDesc() );
+        }
         classDescTA.setLineWrap( true );
         JScrollPane classDTAScroll = new JScrollPane( classDescTA );
         classDTAScroll.setBorder( BorderFactory.createLoweredBevelBorder() );

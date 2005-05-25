@@ -215,69 +215,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.revalidate();
     }
 
-    protected MouseListener configurePopupMenu() {
-
-        final OutputPanelPopupMenu popup = new OutputPanelPopupMenu();
-        final JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
-        modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
-        final JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
-        htmlMenuItem.addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
-        final JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
-        findInTreeMenuItem.addActionListener( new OutputPanel_findInTreeMenuItem_actionAdapter( this ) );
-
-        final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
-        deleteGeneSetMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-                String classID = null;
-                classID = sourcePopup.getSelectedItem();
-                deleteGeneSet( classID );
-            }
-        } );
-
-        popup.add( htmlMenuItem );
-        popup.add( modMenuItem );
-        popup.add( findInTreeMenuItem );
-        popup.add( deleteGeneSetMenuItem );
-        MouseListener popupListener = new MouseAdapter() {
-            public void mousePressed( MouseEvent e ) {
-                maybeShowPopup( e );
-            }
-
-            public void mouseReleased( MouseEvent e ) {
-                maybeShowPopup( e );
-            }
-
-            private void maybeShowPopup( MouseEvent e ) {
-                if ( e.isPopupTrigger() ) {
-                    JTable source = ( JTable ) e.getSource();
-                    assert source != null;
-                    int r = source.rowAtPoint( e.getPoint() );
-                    List id = ( Vector ) source.getValueAt( r, 0 );
-                    if ( id != null ) {
-                        assert popup != null;
-                        if ( popup == null ) throw new NullPointerException( "popup is null" );
-                        int row = source.rowAtPoint( e.getPoint() );
-                        String classID = ( String ) ( ( Vector ) source.getValueAt( row, 0 ) ).get( 0 );
-                        assert goData != null;
-                        if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
-                            deleteGeneSetMenuItem.setEnabled( false );
-                        } else {
-                            deleteGeneSetMenuItem.setEnabled( true );
-                        }
-                        popup.show( e.getComponent(), e.getX(), e.getY() );
-                        popup.setPoint( e.getPoint() );
-                        popup.setSelectedItem( classID );
-                    }
-                }
-            }
-        };
-        return popupListener;
-    }
-
-    protected boolean deleteGeneSet( String classID ) {
+    protected boolean deleteOrResetGeneSet( String classID ) {
         log.debug( "Deleting gene set from table" );
-        if ( super.deleteGeneSet( classID ) ) {
+        if ( super.deleteOrResetGeneSet( classID ) ) {
             // model.fireTableStructureChanged();
             sorter.cancelSorting();
             sorter.setSortingStatus( 0, TableSorter.ASCENDING );
@@ -288,7 +228,22 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     }
 
-    void generateToolTip( int runIndex ) {
+    /**
+     * @param e
+     * @return
+     */
+    protected String popupRespondAndGetGeneSet( MouseEvent e ) {
+        JTable source = ( JTable ) e.getSource();
+        assert source != null;
+        int r = source.rowAtPoint( e.getPoint() );
+        List id = ( Vector ) source.getValueAt( r, 0 );
+        if ( id == null ) return null;
+        int row = source.rowAtPoint( e.getPoint() );
+        String classID = ( String ) id.get( 0 );
+        return classID;
+    }
+
+    protected void generateToolTip( int runIndex ) {
         assert results != null : "Null results";
         assert results.get( runIndex ) != null : "No results with index " + runIndex;
         log.debug( "Generating tooltip for run #" + runIndex );

@@ -16,7 +16,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -385,6 +387,7 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     private boolean showingUserGeneSets = false;
+    private Collection userOverwrittenGeneSets;
 
     protected void showUserMenuItemActionPerformed() {
         if ( showingUserGeneSets ) {
@@ -544,6 +547,7 @@ public class GeneSetScoreFrame extends JFrame {
      * Load the user-defined gene sets.
      */
     private void loadUserGeneSets() {
+        if ( userOverwrittenGeneSets == null ) userOverwrittenGeneSets = new HashSet();
         File dir = new File( settings.getUserGeneSetDirectory() );
         if ( dir.exists() ) {
             String[] classFiles = dir.list();
@@ -556,12 +560,26 @@ public class GeneSetScoreFrame extends JFrame {
                     boolean gotSomeProbes = ngs.loadUserGeneSet( classFile );
                     if ( gotSomeProbes ) {
                         ngs.addToMaps( goData );
+
+                        if ( geneData.getGeneSetToProbeMap().containsKey( ngs.getId() ) ) {
+                            this.userOverwrittenGeneSets.add( ngs.getId() );
+                        }
                     }
                 } catch ( IOException e ) {
                     statusMessenger.showError( "Could not load user-defined class from " + classFile );
                 }
             }
         }
+    }
+
+    /**
+     * Determine if a gene set was overwritten by the user-define gene sets on startup.
+     * 
+     * @param geneSetId
+     * @return
+     */
+    protected boolean userOverWrote( String geneSetId ) {
+        return userOverwrittenGeneSets != null && userOverwrittenGeneSets.contains( geneSetId );
     }
 
     /**
@@ -602,7 +620,6 @@ public class GeneSetScoreFrame extends JFrame {
     }
 
     /**
-     * 
      * @param message
      * @param e Throwable
      */
@@ -819,7 +836,8 @@ public class GeneSetScoreFrame extends JFrame {
             GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
                     + settings.getUserGeneSetDirectory() );
         }
-        treePanel.removeNode( classID ); // fixme - this results in a duplicate call.
+        treePanel.removeNode( classID );
+        this.userOverwrittenGeneSets.remove( classID );
     }
 
     /**
@@ -847,6 +865,13 @@ public class GeneSetScoreFrame extends JFrame {
     public void setCurrentResultSet( int runIndex ) {
         this.currentResultSet = runIndex;
         treePanel.fireResultsChanged();
+    }
+
+    /**
+     * @param id
+     */
+    public void addUserOverwritten( String id ) {
+        this.userOverwrittenGeneSets.add( id );
     }
 }
 
