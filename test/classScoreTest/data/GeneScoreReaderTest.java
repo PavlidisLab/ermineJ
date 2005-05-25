@@ -17,7 +17,6 @@ import classScore.data.GeneScores;
  * Copyright (c) 2004 Columbia University
  * 
  * @author pavlidis
- * @todo add more tests
  * @version $Id$
  */
 public class GeneScoreReaderTest extends TestCase {
