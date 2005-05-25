@@ -55,7 +55,8 @@ F<?xml version='1.0' encoding='ISO-8859-1'  ?>
 		</tocitem>
 
 		<tocitem text="The ermineJ API" targets="api" expand="true" />
-
+		<tocitem text="The ermineJ command line tool" target="cli"
+			expand="true" />
 		<tocitem text="Frequently Asked Questions" target="faq" />
 		<tocitem text="License information" target="license" />
 	</tocitem>
