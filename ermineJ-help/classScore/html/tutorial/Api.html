@@ -59,30 +59,30 @@ different order than the gene symbols.</p>
         List goAssociations = null; // List of Collections of go terms for the probes.
         List geneScores = null; // List of Doubles 
       
-        /* ... code to initialize these data structures goes here ... */
+      	/* code to initialize data structures omitted */
+      
+         ClassScoreSimple css = new ClassScoreSimple( probes, genes, goAssociations );
 
-        ClassScoreSimple css = new ClassScoreSimple(probes, genes, goAssociations, geneScores);
-        
         // in our raw data, smaller values are better (like pvalues, unlike fold
         // change)
-        settings.setBigGeneScoreIsBetter( false ); 
-                                            
-         // set range of sizes of gene sets to consider.
-        settings.setMaxClassSize( 100 ); 
-        settings.setMinClassSize( 5 );
-        
-         // use this pvalue threshold for selecting genes. (before taking logs)
-        settings.setGeneScoreThreshold( 0.001 );
-        
-         // use over-representation analysis.
-        settings.setClassScoreMethod( Settings.ORA );
+        css.setBigGeneScoreIsBetter( false );
+
+        // set range of sizes of gene sets to consider.
+        css.setMaxGeneSetSize( 100 );
+        css.setMinGeneSetSize( 5 );
+
+        // use this pvalue threshold for selecting genes. (before taking logs)
+        css.setGeneScoreThreshold( 0.001 );
+
+        // use over-representation analysis.
+        css.setClassScoreMethod( Settings.ORA );
         /* ... etc. Reasonable defaults (?) are set for all parameters if you don't set them. */
- 
-        css.run(); // might want to run in a separate thread.
- 		
- 		// You should iterate over your tested gene sets.
-        double aPvalue = css.getGeneSetPvalue("GO:0000243");
- 
+
+        css.run( geneScores ); // might want to run in a separate thread.
+
+        // You should iterate over your tested gene sets.
+        double fooPvalue = css.getGeneSetPvalue( "foo" );
+        double barPvalue = css.getGeneSetPvalue( "bar" );
  
 </pre></div>
 
