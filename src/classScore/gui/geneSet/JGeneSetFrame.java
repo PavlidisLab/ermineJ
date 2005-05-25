@@ -151,7 +151,8 @@ public class JGeneSetFrame extends JFrame {
     private List probeIDs = null;
     private Map pvalues = null;
     private GeneAnnotations geneData = null;
- //   private StatusViewer callerStatusViewer = null;
+
+    // private StatusViewer callerStatusViewer = null;
 
     /**
      * @param probeIDs an array of probe ID's that has some order; the actual order is arbitrary, as long as it is some
@@ -163,7 +164,7 @@ public class JGeneSetFrame extends JFrame {
      */
     public JGeneSetFrame( StatusViewer callerStatusViewer, List probeIDs, Map pvalues, GeneAnnotations geneData,
             Settings settings ) {
-     //   this.callerStatusViewer = callerStatusViewer;
+        // this.callerStatusViewer = callerStatusViewer;
         try {
             if ( settings == null ) {
                 log.warn( "Loading new settings..." );
@@ -265,9 +266,12 @@ public class JGeneSetFrame extends JFrame {
             this.switchRawDataFile();
         }
 
+        log.debug( "User set the raw data file? " + settings.getUserSetRawFile() );
+        log.debug( "Raw data file is " + settings.getRawDataFileName() );
+
         /* I apologize for the convoluted logic here */
         if ( settings.getUserSetRawFile()
-                || ( settings.getRawDataFileName() != null && settings.getRawDataFileName().length() >= 0 ) ) {
+                || ( settings.getRawDataFileName() != null && settings.getRawDataFileName().length() > 0 ) ) {
             String filename = settings.getRawDataFileName();
             if ( ( new File( filename ) ).canRead() ) {
                 try {
@@ -291,7 +295,7 @@ public class JGeneSetFrame extends JFrame {
                     // draw each cell
                 }
             } else {
-                GuiUtil.error( "The data file " + filename + " was not readable." + "\n"
+                GuiUtil.error( "The data file \"" + filename + "\" was not readable." + "\n"
                         + "Please make sure this file exists and the filename and directory path are correct,\n"
                         + "and that it is a valid raw data file (tab-delimited).\n" );
             }
