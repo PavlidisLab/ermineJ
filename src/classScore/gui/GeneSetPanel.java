@@ -108,16 +108,17 @@ public abstract class GeneSetPanel extends JScrollPane {
         }
         log.debug( "Request for details of gene set: " + id );
         if ( !geneData.getGeneSetToProbeMap().containsKey( id ) ) {
-            callingFrame.getStatusMessenger().setError( id + " is not available for viewing in your data." );
+            callingFrame.getStatusMessenger().showError( id + " is not available for viewing in your data." );
             return;
         }
-        GeneSetDetails details = new GeneSetDetails( goData, geneData, settings, id );
+        GeneSetDetails details = new GeneSetDetails( this.callingFrame.getStatusMessenger(), goData, geneData,
+                settings, id );
         if ( runnum < 0 ) {
             details.show();
         } else {
             GeneSetPvalRun run = ( GeneSetPvalRun ) results.get( runnum );
             GeneSetResult res = ( GeneSetResult ) run.getResults().get( id );
-            details.show(run.getName(), res, run.getGeneScores() );
+            details.show( run.getName(), res, run.getGeneScores() );
         }
     }
 

@@ -142,17 +142,17 @@ public class GeneUrlDialog extends JFrame {
         String candidateUrlBase = urlTextField.getText().trim();
 
         if ( candidateUrlBase.length() == 0 ) {
-            statusMessenger.setError( "URL must not be blank." );
+            statusMessenger.showError( "URL must not be blank." );
             return;
         }
 
         if ( candidateUrlBase.indexOf( "@@" ) < 0 ) {
-            statusMessenger.setError( "URL must contain the string '@@' for substitution with the gene name" );
+            statusMessenger.showError( "URL must contain the string '@@' for substitution with the gene name" );
             return;
         }
 
         if ( candidateUrlBase.indexOf( " " ) >= 0 ) {
-            statusMessenger.setError( "URL should not contain spaces" );
+            statusMessenger.showError( "URL should not contain spaces" );
             return;
         }
 

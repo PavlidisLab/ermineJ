@@ -396,7 +396,7 @@ public class GeneSetScoreFrame extends JFrame {
         }
         this.oPanel.resetView();
         this.treePanel.resetView();
-        statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
+        statusMessenger.showStatus( geneData.selectedSets() + " matching gene sets found." );
     }
 
     /**
@@ -492,7 +492,7 @@ public class GeneSetScoreFrame extends JFrame {
     public void readDataFilesForStartup() {
 
         updateProgress( 10 );
-        statusMessenger.setStatus( "Reading GO descriptions " + settings.getClassFile() );
+        statusMessenger.showStatus( "Reading GO descriptions " + settings.getClassFile() );
         assert settings.getClassFile() != null;
         try {
             goData = new GONames( settings.getClassFile() );
@@ -507,7 +507,7 @@ public class GeneSetScoreFrame extends JFrame {
         updateProgress( 70 );
         if ( Thread.currentThread().isInterrupted() ) return;
 
-        statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
+        statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
 
         try {
             geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
@@ -521,7 +521,7 @@ public class GeneSetScoreFrame extends JFrame {
         updateProgress( 90 );
         if ( Thread.currentThread().isInterrupted() ) return;
 
-        statusMessenger.setStatus( "Reading user-defined gene sets from directory "
+        statusMessenger.showStatus( "Reading user-defined gene sets from directory "
                 + settings.getUserGeneSetDirectory() );
 
         loadUserGeneSets();
@@ -558,7 +558,7 @@ public class GeneSetScoreFrame extends JFrame {
                         ngs.addToMaps( goData );
                     }
                 } catch ( IOException e ) {
-                    statusMessenger.setError( "Could not load user-defined class from " + classFile );
+                    statusMessenger.showError( "Could not load user-defined class from " + classFile );
                 }
             }
         }
@@ -577,13 +577,13 @@ public class GeneSetScoreFrame extends JFrame {
 
             readDataFilesForStartup();
 
-            statusMessenger.setStatus( "Done with setup" );
+            statusMessenger.showStatus( "Done with setup" );
 
             enableMenusOnStart();
 
             mainPanel.remove( progressPanel );
             mainPanel.add( tabs, BorderLayout.CENTER );
-            statusMessenger.setStatus( "Ready." );
+            statusMessenger.showStatus( "Ready." );
 
         } catch ( IllegalArgumentException e ) {
             GuiUtil.error( "Error during initialization: " + e
@@ -591,7 +591,7 @@ public class GeneSetScoreFrame extends JFrame {
         }
         treePanel.initialize( goData, geneData );
         oPanel.addInitialData( goData );
-        statusMessenger.setStatus( "Done with initialization." );
+        statusMessenger.showStatus( "Done with initialization." );
     }
 
     /**
@@ -599,6 +599,15 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public void showStatus( String a ) {
         jLabelStatus.setText( a );
+    }
+
+    /**
+     * 
+     * @param message
+     * @param e Throwable
+     */
+    public void showError( String message, Throwable e ) {
+        statusMessenger.showError( message, e );
     }
 
     /**
@@ -648,7 +657,7 @@ public class GeneSetScoreFrame extends JFrame {
 
     void saveAnalysisMenuItem_actionPerformed() {
         if ( results.size() == 0 ) {
-            statusMessenger.setError( "There are no runs to save" );
+            statusMessenger.showError( "There are no runs to save" );
             return;
         }
         SaveWizard swiz = new SaveWizard( this, results, goData );
@@ -805,7 +814,7 @@ public class GeneSetScoreFrame extends JFrame {
     public void deleteUserGeneSet( String classID ) {
         UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, classID );
         if ( ngs.deleteUserGeneSet( classID ) && this.statusMessenger != null ) {
-            statusMessenger.setStatus( "Permanantly deleted " + classID );
+            statusMessenger.showStatus( "Permanantly deleted " + classID );
         } else {
             GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
                     + settings.getUserGeneSetDirectory() );

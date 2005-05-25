@@ -82,7 +82,7 @@ public class GeneSetPvalRun {
 
         GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
 
-        messenger.setStatus( "Multiple test correction..." );
+        messenger.showStatus( "Multiple test correction..." );
         MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
                 results, null );
         String mtc_method = "bh";
@@ -98,7 +98,7 @@ public class GeneSetPvalRun {
         for ( int i = 0; i < sortedclasses.size(); i++ ) {
             ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) ).setRank( i + 1 );
         }
-        messenger.setStatus( "Done!" );
+        messenger.showStatus( "Done!" );
     }
 
     // /**
@@ -157,14 +157,14 @@ public class GeneSetPvalRun {
             case Settings.RESAMP: {
                 NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings, geneScores );
 
-                if ( messenger != null ) messenger.setStatus( "Starting resampling" );
+                if ( messenger != null ) messenger.showStatus( "Starting resampling" );
 
                 if ( randomSeed >= 0 ) {
                     probePvalMapper.setRandomSeed( randomSeed );
                 }
                 hist = probePvalMapper.generateNullDistribution( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                if ( messenger != null ) messenger.setStatus( "Finished resampling" );
+                if ( messenger != null ) messenger.showStatus( "Finished resampling" );
 
                 GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, goData );
                 if ( Thread.currentThread().isInterrupted() ) return;
@@ -179,14 +179,14 @@ public class GeneSetPvalRun {
 
                 Collection inp_entries = geneScores.getProbeToPvalMap().entrySet();
 
-                if ( messenger != null ) messenger.setStatus( "Starting ORA analysis" );
+                if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
 
                 OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator( settings, geneData, csc, goData,
                         inputSize );
                 int numOver = pvg.hgSizes( inp_entries );
 
                 if ( numOver == 0 ) {
-                    if ( messenger != null ) messenger.setError( "No genes selected at that threshold!" );
+                    if ( messenger != null ) messenger.showError( "No genes selected at that threshold!" );
                     break;
                 }
 
@@ -194,14 +194,14 @@ public class GeneSetPvalRun {
                 if ( Thread.currentThread().isInterrupted() ) return;
                 results = pvg.getResults();
                 if ( messenger != null )
-                    messenger.setStatus( "Finished with ORA computations: " + numOver
+                    messenger.showStatus( "Finished with ORA computations: " + numOver
                             + " probes passed your threshold." );
                 break;
             }
             case Settings.CORR: {
                 if ( rawData == null )
                     throw new IllegalArgumentException( "Raw data cannot be null for Correlation analysis" );
-                if ( messenger != null ) messenger.setStatus( "Starting correlation resampling" );
+                if ( messenger != null ) messenger.showStatus( "Starting correlation resampling" );
                 NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings, rawData );
 
                 if ( randomSeed >= 0 ) {
@@ -212,10 +212,10 @@ public class GeneSetPvalRun {
                 if ( Thread.currentThread().isInterrupted() ) return;
                 CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings,
                         geneData, csc, goData, rawData, hist );
-                if ( messenger != null ) messenger.setStatus( "Finished resampling, computing for gene sets" );
+                if ( messenger != null ) messenger.showStatus( "Finished resampling, computing for gene sets" );
                 pvg.geneSetCorrelationGenerator( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                if ( messenger != null ) messenger.setStatus( "Finished computing scores" );
+                if ( messenger != null ) messenger.showStatus( "Finished computing scores" );
                 results = pvg.getResults();
 
                 break;
@@ -254,7 +254,7 @@ public class GeneSetPvalRun {
         multipleTestCorrect( messenger, csc );
 
         setGeneSetRanks();
-        if ( messenger != null ) messenger.setStatus( "Done!" );
+        if ( messenger != null ) messenger.showStatus( "Done!" );
     }
 
     /**
@@ -275,7 +275,7 @@ public class GeneSetPvalRun {
      * @param csc
      */
     private void multipleTestCorrect( StatusViewer messenger, GeneSetSizeComputer csc ) {
-        messenger.setStatus( "Multiple test correction..." );
+        messenger.showStatus( "Multiple test correction..." );
         MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
                 results, messenger );
         int multipleTestCorrMethod = settings.getMtc();

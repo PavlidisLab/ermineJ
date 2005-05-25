@@ -123,7 +123,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
             }
 
             if ( count % 10 == 0 ) {
-                messenger.setStatus( "Classes analyzed: " + count );
+                messenger.showStatus( "Classes analyzed: " + count );
                 try {
                     Thread.sleep( 5 );
                 } catch ( InterruptedException ex ) {

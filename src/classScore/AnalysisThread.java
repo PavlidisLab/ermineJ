@@ -173,7 +173,7 @@ public class AnalysisThread extends Thread {
             } else {
                 log.debug( "Cancelled" );
             }
-            messenger.setStatus( "Ready" );
+            messenger.showStatus( "Ready" );
         } catch ( Exception e ) {
             stop = true;
             showError( e );
@@ -187,16 +187,16 @@ public class AnalysisThread extends Thread {
     private synchronized GeneScores addGeneScores() throws IOException {
         GeneScores geneScores = null;
         if ( !geneScoreSettingsDirty() && geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-            messenger.setStatus( "Gene Scores are in memory" );
+            messenger.showStatus( "Gene Scores are in memory" );
             geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
         } else {
-            messenger.setStatus( "Reading gene scores from file " + settings.getScoreFile() );
+            messenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
             geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData.getGeneToProbeList(),
                     geneData.getProbeToGeneMap() );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
         if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
-            messenger.setStatus( "Didn't get geneScores" );
+            messenger.showStatus( "Didn't get geneScores" );
         }
         return geneScores;
     }
@@ -208,10 +208,10 @@ public class AnalysisThread extends Thread {
     private synchronized DenseDoubleMatrix2DNamed addRawData() throws IOException {
         DenseDoubleMatrix2DNamed rawData;
         if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
-            messenger.setStatus( "Raw data are in memory" );
+            messenger.showStatus( "Raw data are in memory" );
             rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawDataFileName() );
         } else {
-            messenger.setStatus( "Reading raw data from file " + settings.getRawDataFileName() );
+            messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
             rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawDataFileName() );
             rawDataSets.put( settings.getRawDataFileName(), rawData );
@@ -250,7 +250,7 @@ public class AnalysisThread extends Thread {
         if ( this.stop ) return null;
 
         /* do work */
-        messenger.setStatus( "Starting analysis..." );
+        messenger.showStatus( "Starting analysis..." );
         GeneSetPvalRun newResults = null;
         if ( results != null ) { // read from a file.
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
@@ -329,7 +329,7 @@ public class AnalysisThread extends Thread {
      */
     private void showError( Throwable e ) {
         log.error( e, e );
-        messenger.setError( e );
+        messenger.showError( e );
     }
 
 }

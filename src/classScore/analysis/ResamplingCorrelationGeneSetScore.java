@@ -79,7 +79,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             int[] randomnums = new int[geneSetSize];
 
             if ( messenger != null ) {
-                messenger.setStatus( "Currently running class size " + geneSetSize );
+                messenger.showStatus( "Currently running class size " + geneSetSize );
             }
 
             // double oldnd = Double.MAX_VALUE;

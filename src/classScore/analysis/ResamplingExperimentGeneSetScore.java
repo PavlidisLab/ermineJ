@@ -136,7 +136,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
             }
 
             if ( m != null ) {
-                m.setStatus( "Currently running class size " + geneSetSize );
+                m.showStatus( "Currently running class size " + geneSetSize );
             }
 
             /*

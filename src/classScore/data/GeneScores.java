@@ -181,7 +181,7 @@ public class GeneScores {
         }
 
         if ( messenger != null ) {
-            messenger.setStatus( "Reading gene scores from column " + scoreCol );
+            messenger.showStatus( "Reading gene scores from column " + scoreCol );
         }
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( is ) ) );
@@ -211,7 +211,7 @@ public class GeneScores {
 
             if ( probeId.matches( "AFFX.*" ) ) { // FIXME: put this rule somewhere else // todo use a filter.
                 if ( messenger != null ) {
-                    messenger.setStatus( "Skipping probe in pval file: " + probeId );
+                    messenger.showStatus( "Skipping probe in pval file: " + probeId );
                 }
                 continue;
             }
@@ -281,19 +281,19 @@ public class GeneScores {
             boolean invalidNumber, String badNumberString, int numProbesKept ) {
         if ( invalidNumber && messenger != null ) {
 
-            messenger.setError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
+            messenger.showError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
                     + " found for input file. These are set to an initial value of zero." );
             letUserReadMessage();
         }
         if ( invalidLog && messenger != null ) {
             messenger
-                    .setError( "Warning: There were attempts to take the log of non-positive values. These are set to "
+                    .showError( "Warning: There were attempts to take the log of non-positive values. These are set to "
                             + SMALL );
             letUserReadMessage();
         }
         if ( messenger != null && unknownProbe ) {
             messenger
-                    .setError( "Warning: Some probes in your gene score file don't match the ones in the annotation file." );
+                    .showError( "Warning: Some probes in your gene score file don't match the ones in the annotation file." );
             letUserReadMessage();
         }
         if ( numProbesKept == 0 ) {
@@ -306,7 +306,7 @@ public class GeneScores {
                     + " corresponds to the microarray annotation (\".an\") file you selected." );
         }
         if ( messenger != null ) {
-            messenger.setStatus( "Found " + numPvals + " pvals in the file" );
+            messenger.showStatus( "Found " + numPvals + " pvals in the file" );
         }
     }
 
@@ -408,7 +408,7 @@ public class GeneScores {
             throw new IllegalStateException( "No gene to pvalue mappings were found." );
         }
 
-        if ( messenger != null ) messenger.setStatus( counter + " distinct genes found in the annotations." );
+        if ( messenger != null ) messenger.showStatus( counter + " distinct genes found in the annotations." );
 
         groupPvalues = new double[counter];
         for ( int i = 0; i < counter; i++ ) {

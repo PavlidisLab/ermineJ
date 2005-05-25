@@ -405,7 +405,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         final String id = _id;
         final int runIndex = _runnum;
         log.debug( "Showing details for " + id );
-        if ( messenger != null ) messenger.setStatus( "Viewing data for " + id + "..." );
+        if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
         new Thread() {
             public void run() {
                 showDetailsForGeneSet( runIndex, id );

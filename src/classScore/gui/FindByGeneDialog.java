@@ -25,7 +25,7 @@ public class FindByGeneDialog extends FindDialog {
 
     void findActionPerformed() {
         String searchOn = searchTextField.getText();
-        statusMessenger.setStatus( "Searching '" + searchOn + "'" );
+        statusMessenger.showStatus( "Searching '" + searchOn + "'" );
 
         if ( searchOn.equals( "" ) ) {
             geneData.resetSelectedSets();
@@ -33,7 +33,7 @@ public class FindByGeneDialog extends FindDialog {
             geneData.selectSetsByGene( searchOn );
         }
 
-        statusMessenger.setStatus( geneData.selectedSets() + " matching gene sets found." );
+        statusMessenger.showStatus( geneData.selectedSets() + " matching gene sets found." );
         resetViews();
 
     }

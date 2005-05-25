@@ -14,8 +14,10 @@ import org.apache.commons.logging.LogFactory;
 import classScore.Settings;
 import classScore.data.GeneScores;
 import classScore.data.GeneSetResult;
+import classScore.gui.GeneSetScoreFrame;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
+import baseCode.util.StatusViewer;
 
 /**
  * <hr>
@@ -32,8 +34,11 @@ public class GeneSetDetails {
     private GONames goData;
     private GeneAnnotations geneData;
     private Settings settings;
+    private final StatusViewer callerStatusViewer;
 
-    public GeneSetDetails( GONames goData, GeneAnnotations geneData, Settings settings, String classID ) {
+    public GeneSetDetails( StatusViewer callerStatusViewer, GONames goData, GeneAnnotations geneData,
+            Settings settings, String classID ) {
+        this.callerStatusViewer = callerStatusViewer;
         this.classID = classID;
         this.goData = goData;
         this.geneData = geneData;
@@ -58,7 +63,7 @@ public class GeneSetDetails {
         Map pvals = new HashMap();
 
         if ( geneData == null ) {
-            // FIXME what we should do: prompt the user to enter some; if they don't have any, they can just skip it.
+            // user will be prompted.
             log.warn( "No gene data found" );
         } else {
             classToProbe = geneData.getGeneSetToProbeMap();
@@ -80,7 +85,7 @@ public class GeneSetDetails {
         }
 
         // create the details frame
-        JGeneSetFrame f = new JGeneSetFrame( new ArrayList( probeIDs ), pvals, geneData, settings );
+        JGeneSetFrame f = new JGeneSetFrame( callerStatusViewer, new ArrayList( probeIDs ), pvals, geneData, settings );
 
         String title = getTitle( runName, res, probeIDs );
         f.setTitle( title );

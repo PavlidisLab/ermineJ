@@ -62,8 +62,10 @@ import baseCode.gui.table.JVerticalHeaderRenderer;
 import baseCode.gui.table.TableSorter;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
+import baseCode.util.StatusViewer;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
+import classScore.gui.GeneSetScoreFrame;
 
 /**
  * <hr>
@@ -149,6 +151,7 @@ public class JGeneSetFrame extends JFrame {
     private List probeIDs;
     private Map pvalues;
     private GeneAnnotations geneData;
+    private final StatusViewer callerStatusViewer;
 
     /**
      * @param probeIDs an array of probe ID's that has some order; the actual order is arbitrary, as long as it is some
@@ -158,7 +161,9 @@ public class JGeneSetFrame extends JFrame {
      * @param settings <code>getRawFile()</code> should return the microarray file which contains the microarray data
      *        for the probe ID's contained in <code>probeIDs</code>.
      */
-    public JGeneSetFrame( List probeIDs, Map pvalues, GeneAnnotations geneData, Settings settings ) {
+    public JGeneSetFrame( StatusViewer callerStatusViewer, List probeIDs, Map pvalues, GeneAnnotations geneData,
+            Settings settings ) {
+        this.callerStatusViewer = callerStatusViewer;
         try {
             if ( settings == null ) {
                 log.warn( "Loading new settings..." );
@@ -176,7 +181,11 @@ public class JGeneSetFrame extends JFrame {
             initChoosers();
             jbInit();
         } catch ( Exception e ) {
-            GuiUtil.error( "There was an error setting up the details view: " + e.getMessage() );
+            if ( callerStatusViewer != null )
+                callerStatusViewer.showError(
+                        "There was an error while setting up the details view. Check the logs for details", e );
+            GuiUtil.error( "There was an error setting up the details view: " + e.getMessage() == null ? "(no message)"
+                    : e.getMessage() );
         }
     }
 
@@ -271,7 +280,7 @@ public class JGeneSetFrame extends JFrame {
 
                 if ( matrix == null ) {
                     if ( statusMessenger != null )
-                        statusMessenger.setError( "None of the probes in this gene set were in the data file." );
+                        statusMessenger.showError( "None of the probes in this gene set were in the data file." );
                 } else {
                     m_matrixDisplay = new JMatrixDisplay( matrix );
                     m_matrixDisplay.setStandardizedEnabled( true );
@@ -437,7 +446,8 @@ public class JGeneSetFrame extends JFrame {
         // anyway,
         // so it's okay to be lazy here
         tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
-        statusMessenger.setError( "You may need to scroll horizontally or adjust the column width to see all the data" );
+        statusMessenger
+                .showError( "You may need to scroll horizontally or adjust the column width to see all the data" );
     }
 
     /**
@@ -595,7 +605,7 @@ public class JGeneSetFrame extends JFrame {
     protected void switchRawDataFile() {
         JFileChooser fc = new JFileChooser( settings.getDataDirectory() );
         fc.setDialogTitle( "Choose a new expression data file to view," + " or cancel to keep the current setting." );
-        int yesno = fc.showDialog( this, "New data file." );
+        int yesno = fc.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setRawFile( fc.getSelectedFile().getAbsolutePath() );

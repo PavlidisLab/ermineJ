@@ -234,7 +234,7 @@ public class MultipleTestCorrector {
 
             if ( 0 == i % 100 ) {
                 if ( messenger != null )
-                    messenger.setStatus( i + " Westfall-Young trials, " + ( trials - i ) + " to go." );
+                    messenger.showStatus( i + " Westfall-Young trials, " + ( trials - i ) + " to go." );
             }
 
         }

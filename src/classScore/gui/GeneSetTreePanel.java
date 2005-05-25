@@ -106,9 +106,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
         TreePath path = this.findByGeneSetId( classID );
 
         if ( path == null ) {
-            this.callingFrame.getStatusMessenger().setError( "Could not find " + classID );
+            this.callingFrame.getStatusMessenger().showError( "Could not find " + classID );
         } else {
-            this.callingFrame.getStatusMessenger().setStatus( "Showing " + classID );
+            this.callingFrame.getStatusMessenger().showStatus( "Showing " + classID );
         }
         log.debug( "Expanding to path for " + classID );
         goTree.expandPath( path );

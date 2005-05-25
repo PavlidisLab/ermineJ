@@ -38,7 +38,7 @@ public class ResultsFileReader {
         BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( new FileInputStream(
                 filename ) ) ) );
 
-        messenger.setStatus( "Loading analysis..." );
+        messenger.showStatus( "Loading analysis..." );
         String line;
         while ( ( line = dis.readLine() ) != null ) {
             StringTokenizer st = new StringTokenizer( line, "\t" );
@@ -55,7 +55,7 @@ public class ResultsFileReader {
             }
         }
         dis.close();
-        messenger.setStatus( results.size() + " class results read from file" );
+        messenger.showStatus( results.size() + " class results read from file" );
     }
 
     public Map getResults() {

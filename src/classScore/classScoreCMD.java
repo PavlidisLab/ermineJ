@@ -63,7 +63,7 @@ public class classScoreCMD {
                 ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, false );
                 rp.printResults( true );
             } catch ( Exception e ) {
-                statusMessenger.setStatus( "Error During analysis" + e );
+                statusMessenger.showStatus( "Error During analysis" + e );
             }
         } else {
             try {
@@ -406,27 +406,27 @@ public class classScoreCMD {
     protected void initialize() {
         try {
             statusMessenger = new StatusStderr();
-            statusMessenger.setStatus( "Reading GO descriptions from " + settings.getClassFile() );
+            statusMessenger.showStatus( "Reading GO descriptions from " + settings.getClassFile() );
 
             goData = new GONames( settings.getClassFile() );
 
-            statusMessenger.setStatus( "Reading gene annotations from " + settings.getAnnotFile() );
+            statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
             geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
-            statusMessenger.setStatus( "Initializing gene class mapping" );
+            statusMessenger.showStatus( "Initializing gene class mapping" );
             geneDataSets.put( new Integer( "original".hashCode() ), geneData );
-            statusMessenger.setStatus( "Done with setup" );
-            statusMessenger.setStatus( "Ready." );
+            statusMessenger.showStatus( "Done with setup" );
+            statusMessenger.showStatus( "Ready." );
         } catch ( IOException e ) {
-            statusMessenger.setStatus( "File reading or writing error during initialization: " + e.getMessage()
+            statusMessenger.showStatus( "File reading or writing error during initialization: " + e.getMessage()
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
         } catch ( SAXException e ) {
-            statusMessenger.setStatus( "Gene Ontology file format is incorrect. "
+            statusMessenger.showStatus( "Gene Ontology file format is incorrect. "
                     + "\nPlease check that it is a valid XML file. "
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
         }
-        statusMessenger.setStatus( "Done with initialization." );
+        statusMessenger.showStatus( "Done with initialization." );
     }
 
     /**
@@ -438,10 +438,10 @@ public class classScoreCMD {
         DenseDoubleMatrix2DNamed rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
-                statusMessenger.setStatus( "Raw data are in memory" );
+                statusMessenger.showStatus( "Raw data are in memory" );
                 rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawDataFileName() );
             } else {
-                statusMessenger.setStatus( "Reading raw data from file " + settings.getRawDataFileName() );
+                statusMessenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
                 DoubleMatrixReader r = new DoubleMatrixReader();
                 rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawDataFileName() );
                 rawDataSets.put( settings.getRawDataFileName(), rawData );
@@ -450,17 +450,17 @@ public class classScoreCMD {
 
         GeneScores geneScores;
         if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-            statusMessenger.setStatus( "Gene Scores are in memory" );
+            statusMessenger.showStatus( "Gene Scores are in memory" );
             geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
         } else {
-            statusMessenger.setStatus( "Reading gene scores from file " + settings.getScoreFile() );
+            statusMessenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
             geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData
                     .getGeneToProbeList(), geneData.getProbeToGeneMap() );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
 
         if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
-            statusMessenger.setStatus( "Didn't get geneScores" );
+            statusMessenger.showStatus( "Didn't get geneScores" );
         }
 
         // todo need logic to choose which source of probes to use.
@@ -492,7 +492,7 @@ public class classScoreCMD {
         }
 
         /* do work */
-        statusMessenger.setStatus( "Starting analysis..." );
+        statusMessenger.showStatus( "Starting analysis..." );
         GeneSetPvalRun runResult = new GeneSetPvalRun( activeProbes, settings, geneData, rawData, goData, geneScores,
                 statusMessenger, "command" );
         return runResult;
