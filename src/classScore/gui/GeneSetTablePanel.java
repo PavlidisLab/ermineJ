@@ -262,7 +262,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
                         assert goData != null;
                         if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
                             deleteGeneSetMenuItem.setEnabled( false );
-                            log.debug( "Won't show." );
                         } else {
                             deleteGeneSetMenuItem.setEnabled( true );
                         }
