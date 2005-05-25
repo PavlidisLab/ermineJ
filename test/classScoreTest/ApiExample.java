@@ -1,15 +1,12 @@
 package classScoreTest;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
-import classScore.GeneSetPvalRun;
+import classScore.ClassScoreSimple;
 import classScore.Settings;
-import classScore.data.GeneScores;
-import classScore.data.GeneSetResult;
-
-import baseCode.bio.geneset.GONames;
-import baseCode.bio.geneset.GeneAnnotations;
 
 /**
  * <hr>
@@ -23,42 +20,73 @@ public class ApiExample {
 
     public static void main( String[] args ) {
 
-        List probes = null; // List of identifiers to be analyzed
-        List genes = null; // List of genes corresponding to the probes. Indicates the Many-to-one mapping of probes to genes.
-        List goAssociations = null; // List of Collections of go terms for the probes.
-        List geneScores = null; // List of Doubles 
-        List goIds = null; // list of all GO Ids, e.g., "GO:0000001"
-        List goTerms = null; // List of all GO terms, e.g., "ribosome" (java.lang.String)
+        // List of identifiers to be analyzed
+        List probes = new ArrayList();
+        probes.add( "a" );
+        probes.add( "b" );
+        probes.add( "c" );
+        probes.add( "c_1" );
+
+        // List of genes corresponding to the probes. Indicates the Many-to-one mapping
+        // of probes to genes
+        List genes = new ArrayList();
+        genes.add( "aGene" );
+        genes.add( "bGene" );
+        genes.add( "cGene" );
+        genes.add( "cGene" ); // two probes with the same gene.
+
+        // List of Collections of go terms for the probes.
+        List goAssociations = new ArrayList();
+        Collection gotermsA = new HashSet();
+        gotermsA.add( "foo" );
+        gotermsA.add( "bar" );
+        Collection gotermsB = new HashSet();
+        gotermsB.add( "foo" );
+        Collection gotermsC = new HashSet();
+        gotermsC.add( "foo" );
+        Collection gotermsC1 = new HashSet();
+        gotermsC1.add( "foo" );
+
+        goAssociations.add( gotermsA );
+        goAssociations.add( gotermsB );
+        goAssociations.add( gotermsC );
+        goAssociations.add( gotermsC1 );
+
+        // List of Doubles
+        List geneScores = new ArrayList();
+        geneScores.add( new Double( "0.1" ) );
+        geneScores.add( new Double( "0.1" ) );
+        geneScores.add( new Double( "0.01" ) );
+        geneScores.add( new Double( "0.01" ) );
 
         /* ... code to initialize these data structures goes here ... */
 
-        Settings settings = null;
-        try {
-            settings = new Settings( false );
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
+        ClassScoreSimple css = new ClassScoreSimple( probes, genes, goAssociations );
 
-        settings.setBigIsBetter( false ); // in our raw data, smaller values are better (like pvalues, unlike fold
-                                            // change)
-        settings.setDoLog( true ); // take the -log of the gene scores.
-        settings.setMaxClassSize( 100 );
-        settings.setMinClassSize( 5 );
-        settings.setPValThreshold( 0.001 ); // use this pvalue threshold for selecting genes.
-        settings.setClassScoreMethod( Settings.ORA ); // use over-representation analysis.
-        /* ... etc. Reasonable defaults (?) are set for all parameters. */
+        // in our raw data, smaller values are better (like pvalues, unlike fold
+        // change)
+        css.setBigGeneScoreIsBetter( false );
 
-        GeneAnnotations geneData = new GeneAnnotations( probes, genes, null, goAssociations );
-        GeneScores scores = new GeneScores( probes, geneScores, geneData.getGeneToProbeList(), geneData
-                .getProbeToGeneMap(), settings );
-        GONames goData = new GONames( goIds, goTerms );
-        GeneSetPvalRun run = new GeneSetPvalRun( settings, geneData, goData, scores );
+        // set range of sizes of gene sets to consider.
+        css.setMaxGeneSetSize( 100 );
+        css.setMinGeneSetSize( 5 );
 
-        /*
-         * Now we can get the results for any given gene set. Typically we just iterate over the results.
-         */
-        double pvalue = ( ( GeneSetResult ) run.getResults().get( "GO:0000032" ) ).getPvalue();
+        // use this pvalue threshold for selecting genes. (before taking logs)
+        css.setGeneScoreThreshold( 0.15 );
 
+        // use over-representation analysis.
+        css.setClassScoreMethod( Settings.ORA );
+        /* ... etc. Reasonable defaults (?) are set for all parameters if you don't set them. */
+
+        css.run( geneScores ); // might want to run in a separate thread.
+
+        // You should iterate over your tested gene sets.
+        double fooPvalue = css.getGeneSetPvalue( "foo" );
+        double barPvalue = css.getGeneSetPvalue( "bar" );
+
+        // The results are nonsensical because there are too few genes...
+        System.err.println( "Foo got " + fooPvalue );
+        System.err.println( "Bar got " + barPvalue );
     }
 
 }

@@ -79,7 +79,7 @@ public class GeneScores {
             throw new IllegalStateException( "groupToProbeMap was not set." );
         }
 
-        if ( probeToPvalMap == null ) {
+        if ( probeToGeneMap == null ) {
             throw new IllegalStateException( "probeToPvalMap was not set." );
         }
 
@@ -126,7 +126,7 @@ public class GeneScores {
             probeIDs.add( probe );
             probePvalues.add( new Double( pValue ) );
             probeToPvalMap.put( probe, new Double( pValue ) );
-
+            numPvals++;
         }
         setUpRawArrays();
         reportProblems( null, invalidLog, unknownProbe, invalidNumber, badNumberString, numProbesKept );
@@ -301,7 +301,7 @@ public class GeneScores {
                     + "annotation (\".an\") file you selected." );
         }
         if ( numPvals == 0 ) {
-            throw new IllegalStateException( "No pvalues found in the gene score file! Please check the file has"
+            throw new IllegalStateException( "No probe scores found! Please check the file has"
                     + " the correct plain text format and"
                     + " corresponds to the microarray annotation (\".an\") file you selected." );
         }

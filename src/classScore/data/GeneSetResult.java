@@ -73,10 +73,10 @@ public class GeneSetResult implements Comparable {
 
     public void printHeadings( BufferedWriter out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
-        out.write( "\tClass Name" + "\tClass ID" + "\tsize" + "\teffective_size" + "\traw score" + "\tpval" +
+        out.write( "\tName" + "\tID" + "\tProbes" + "\tGenes" + "\tRawScore" + "\tPval" +
         // "\tN over pval cut\tORA pval+"
                 /* + "\tAROC" + "\tAROCpval" */
-                "\tCorrected_pvalue" + extracolumns + "\n" );
+                "\tCorrectedPvalue" + extracolumns + "\n" );
     }
 
     public void setNames( String id, String name ) {
