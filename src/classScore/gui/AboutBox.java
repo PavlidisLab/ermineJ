@@ -37,7 +37,6 @@ import baseCode.gui.JLinkLabel;
  * @author Paul Pavlidis
  * @version $Id$
  */
-
 public class AboutBox extends JDialog implements ActionListener {
 
     /**
@@ -48,8 +47,6 @@ public class AboutBox extends JDialog implements ActionListener {
      * 
      */
     private static final int PREFERRED_WIDTH = 450;
-    // todo: make this version number a resource.
-    // / InputStream is = this.getClass().getResourceAsStream("resources/version");
     private String VERSION = "2.1RC2";
     private final static String COPYRIGHT = "Copyright (c) 2002-2005 Columbia University";
     private static final String SOFTWARENAME = "ermineJ";
@@ -123,7 +120,7 @@ public class AboutBox extends JDialog implements ActionListener {
         labelAuthors.setPreferredSize( new Dimension( PREFERRED_WIDTH, 60 ) );
         labelAuthors.setHorizontalAlignment( SwingConstants.CENTER );
         labelAuthors.setHorizontalTextPosition( SwingConstants.CENTER );
-        labelAuthors.setText( "Authors: Paul Pavlidis, Homin Lee, Will Braynen, and Kiran Keshav." );
+        labelAuthors.setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, and Kiran Keshav." );
 
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
         labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
