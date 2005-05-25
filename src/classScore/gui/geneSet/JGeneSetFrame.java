@@ -267,7 +267,7 @@ public class JGeneSetFrame extends JFrame {
 
         /* I apologize for the convoluted logic here */
         if ( settings.getUserSetRawFile()
-                || ( settings.getRawDataFileName() != null || settings.getRawDataFileName().length() >= 0 ) ) {
+                || ( settings.getRawDataFileName() != null && settings.getRawDataFileName().length() >= 0 ) ) {
             String filename = settings.getRawDataFileName();
             if ( ( new File( filename ) ).canRead() ) {
                 try {
