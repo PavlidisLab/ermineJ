@@ -194,7 +194,7 @@ public class JGeneSetFrame extends JFrame {
      * @param geneData
      * @param filename
      */
-    private void createDetailsTable() {
+    protected void createDetailsTable() {
 
         // create a probe set from probeIDs
         probesInGeneSet = new HashSet();
@@ -1106,6 +1106,7 @@ public class JGeneSetFrame extends JFrame {
      * @return
      */
     private boolean onGeneSymbolCell( int i, int j ) {
+        if ( i < 0 || j < 0 ) return false;
         return table.getValueAt( i, j ) != null && j == table.getColumnCount() - 2;
     }
 
