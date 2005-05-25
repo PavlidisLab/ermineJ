@@ -11,6 +11,10 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -46,7 +50,7 @@ public class AboutBox extends JDialog implements ActionListener {
     private static final int PREFERRED_WIDTH = 450;
     // todo: make this version number a resource.
     // / InputStream is = this.getClass().getResourceAsStream("resources/version");
-    private final static String VERSION = "2.1RC2";
+    private String VERSION = "2.1RC2";
     private final static String COPYRIGHT = "Copyright (c) 2002-2005 Columbia University";
     private static final String SOFTWARENAME = "ermineJ";
 
@@ -88,6 +92,8 @@ public class AboutBox extends JDialog implements ActionListener {
         this.getContentPane().setBackground( Color.white );
         this.setResizable( false );
         this.setTitle( "About " + SOFTWARENAME );
+
+        getVersion();
 
         mainPanel.setLayout( new BorderLayout() );
         mainPanel.setBackground( Color.white );
@@ -164,6 +170,14 @@ public class AboutBox extends JDialog implements ActionListener {
 
         this.getContentPane().add( mainPanel, BorderLayout.CENTER );
 
+    }
+
+    /**
+     * @throws IOException
+     */
+    private void getVersion() throws IOException {
+        VERSION = ( new BufferedReader( new InputStreamReader( new BufferedInputStream( this.getClass()
+                .getResourceAsStream( "resources/version" ) ) ) ) ).readLine();
     }
 
     // Overridden so we can exit when window is closed

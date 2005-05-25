@@ -3,38 +3,38 @@
   PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN"
          "http://java.sun.com/products/javahelp/map_2_0.dtd">
 <map version="2.0">
-	<mapID target="toplevelfolder" url="images/toplevel.gif" />
-	<mapID target="top" url="html/about.html" />
-
-	<mapID target="overview" url="html/about.html" />
-
-	<mapID target="tutorial" url="html/tutorial/index.html" />
-	<mapID target="ora" url="html/tutorial/ora.html" />
-	
-	<mapID target="analysis" url="html/tutorial/analysis.html" />
-   <mapID target="resampling" url="html/tutorial/resampling.html" />
-	<mapID target="correlation" url="html/tutorial/correlation.html" />
-	<mapID target="classes" url="html/tutorial/classes.html" />
-   <mapID target="starting" url="html/tutorial/starting.html" />
-	<mapID target="mtc" url="html/tutorial/mtc.html" />
-	<mapID target="reps" url="html/tutorial/genereps.html" />
-	<mapID target="format" url="html/formats/index.html" />
-	<mapID target="go.format" url="html/formats/go.html" />
-	<mapID target="genescores.format" url="html/formats/genescores.html" />
-	<mapID target="annotations.format" url="html/formats/annotations.html" />
-	<mapID target="microarray.format" url="html/formats/microarray.html" />
-	<mapID target="output.format" url="html/formats/saved-data.html" />
-	<mapID target="geneset.format" url="html/formats/geneset.html" />
-	<mapID target="excel-astext" url="html/formats/excel-astext.html" />
-	<mapID target="approx" url="html/tutorial/approximations.html" />
-	<mapID target="license" url="html/license.html" />
-	<mapID target="loadsave" url="html/tutorial/loadsave.html" />
-	<mapID target="visualize" url="html/tutorial/visualize.html" />
-	<mapID target="faq" url="html/faq.html" />
-	<mapID target="install" url="html/tutorial/install.html" />
-	<mapID target="numitems" url="html/tutorial/numitems.html" />
-	<mapID target="findgenesets" url="html/tutorial/findgenesets.html" />
-	<mapID target="setgeneurl" url="html/tutorial/setgeneurl.html" />
-	<mapID target="api" url="html/tutorial/Api.html" />
+    <mapID target="toplevelfolder" url="images/toplevel.gif"/>
+    <mapID target="top" url="html/about.html"/>
+    
+    <mapID target="overview" url="html/about.html"/>
+    
+    <mapID target="tutorial" url="html/tutorial/index.html"/>
+    <mapID target="ora" url="html/tutorial/ora.html"/>
+    
+    <mapID target="analysis" url="html/tutorial/analysis.html"/>
+    <mapID target="resampling" url="html/tutorial/resampling.html"/>
+    <mapID target="correlation" url="html/tutorial/correlation.html"/>
+    <mapID target="classes" url="html/tutorial/classes.html"/>
+    <mapID target="starting" url="html/tutorial/starting.html"/>
+    <mapID target="mtc" url="html/tutorial/mtc.html"/>
+    <mapID target="reps" url="html/tutorial/genereps.html"/>
+    <mapID target="format" url="html/formats/index.html"/>
+    <mapID target="go.format" url="html/formats/go.html"/>
+    <mapID target="genescores.format" url="html/formats/genescores.html"/>
+    <mapID target="annotations.format" url="html/formats/annotations.html"/>
+    <mapID target="microarray.format" url="html/formats/microarray.html"/>
+    <mapID target="output.format" url="html/formats/saved-data.html"/>
+    <mapID target="geneset.format" url="html/formats/geneset.html"/>
+    <mapID target="excel-astext" url="html/formats/excel-astext.html"/>
+    <mapID target="approx" url="html/tutorial/approximations.html"/>
+    <mapID target="license" url="html/license.html"/>
+    <mapID target="loadsave" url="html/tutorial/loadsave.html"/>
+    <mapID target="visualize" url="html/tutorial/visualize.html"/>
+    <mapID target="faq" url="html/faq.html"/>
+    <mapID target="install" url="html/tutorial/install.html"/>
+    <mapID target="numitems" url="html/tutorial/numitems.html"/>
+    <mapID target="findgenesets" url="html/tutorial/findgenesets.html"/>
+    <mapID target="setgeneurl" url="html/tutorial/setgeneurl.html"/>
+    <mapID target="api" url="html/tutorial/Api.html"/>
 </map>
 

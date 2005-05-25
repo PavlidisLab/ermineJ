@@ -178,5 +178,13 @@
 </goal>
 
 
+<preGoal name="jar">
+<attainGoal name="write-version" />
+</preGoal>
+
+<goal name="write-version" description="Set up resource with version number">
+<ant:echo  message="$pom.currentVersion" file="${basedir}/src/classScore/gui/resources/version" append="false" />
+</goal>
+
 </project>
 
