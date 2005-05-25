@@ -594,8 +594,7 @@ public class JGeneSetFrame extends JFrame {
      */
     protected void switchRawDataFile() {
         JFileChooser fc = new JFileChooser( settings.getDataDirectory() );
-        fc.setDialogTitle( "Choose a new expression data file to view,"
-                + " or proceed without changing the current setting." );
+        fc.setDialogTitle( "Choose a new expression data file to view," + " or cancel to keep the current setting." );
         int yesno = fc.showDialog( this, "New data file." );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
