@@ -187,15 +187,6 @@
 				<jnlp.jar>true</jnlp.jar>
 			</properties>
 		</dependency>
-		<dependency>
-			<groupId>ermineJ-help</groupId>
-			<artifactId>ermineJ-help</artifactId>
-			<jar>ermineJ-help.jar</jar>
-			<type>jar</type>
-			<properties>
-				<jnlp.jar>true</jnlp.jar>
-			</properties>
-		</dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
