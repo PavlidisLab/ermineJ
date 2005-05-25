@@ -116,31 +116,31 @@ public class JGeneSetFrame extends JFrame {
     protected JTable table = new JTable();
     protected JScrollPane tableScrollPane = new JScrollPane();
     protected JToolBar toolBar = new JToolBar();
-    JMenu analysisMenu = new JMenu();
-    JRadioButtonMenuItem blackbodyColormapMenuItem = new JRadioButtonMenuItem();
-    JDataFileChooser fileChooser = null;
-    JMenu fileMenu = new JMenu();
+    private JMenu analysisMenu = new JMenu();
+    private JRadioButtonMenuItem blackbodyColormapMenuItem = new JRadioButtonMenuItem();
+    private JDataFileChooser fileChooser = null;
+    private JMenu fileMenu = new JMenu();
 
-    JRadioButtonMenuItem greenredColormapMenuItem = new JRadioButtonMenuItem();
-    JImageFileChooser imageChooser = null;
-    JLabel m_cellWidthLabel = new JLabel();
-    JSlider m_cellWidthSlider = new JSlider();
-    JLabel m_colorRangeLabel = new JLabel();
-    JSlider m_colorRangeSlider = new JSlider();
-    JGradientBar m_gradientBar = new JGradientBar();
-    DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
-    JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
-    HashMap m_pvaluesOrdinalPosition = new HashMap();
-    JMenuItem saveDataMenuItem = new JMenuItem();
-    JLabel m_spacerLabel = new JLabel();
-    JMenuItem m_viewHistMenuItem = new JMenuItem();
+    private JRadioButtonMenuItem greenredColormapMenuItem = new JRadioButtonMenuItem();
+    private JImageFileChooser imageChooser = null;
+    private JLabel m_cellWidthLabel = new JLabel();
+    private JSlider m_cellWidthSlider = new JSlider();
+    private JLabel m_colorRangeLabel = new JLabel();
+    private JSlider m_colorRangeSlider = new JSlider();
+    private JGradientBar m_gradientBar = new JGradientBar();
+    private DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
+    private JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
+    private Map m_pvaluesOrdinalPosition = new HashMap();
+    private JMenuItem saveDataMenuItem = new JMenuItem();
+    private JLabel m_spacerLabel = new JLabel();
+    private JMenuItem m_viewHistMenuItem = new JMenuItem();
     /** controls the width of the cells in the matrix display */
-    JMenuBar menuBar = new JMenuBar();
-    JMenu optionsMenu = new JMenu();
-    JMenuItem saveImageMenuItem = new JMenuItem();
-    JMenuItem setGeneUrlBaseMenuItem = new JMenuItem();
-    JMenuItem switchDataFileMenuItem = new JMenuItem();
-    JMenu viewMenu = new JMenu();
+    private JMenuBar menuBar = new JMenuBar();
+    private JMenu optionsMenu = new JMenu();
+    private JMenuItem saveImageMenuItem = new JMenuItem();
+    private JMenuItem setGeneUrlBaseMenuItem = new JMenuItem();
+    private JMenuItem switchDataFileMenuItem = new JMenuItem();
+    private JMenu viewMenu = new JMenu();
     private JPanel jPanelStatus = new JPanel();
     private JLabel jLabelStatus = new JLabel();
     private StatusJlabel statusMessenger = null;
@@ -207,16 +207,8 @@ public class JGeneSetFrame extends JFrame {
     protected void createDetailsTable() {
 
         // create a probe set from probeIDs
-        probesInGeneSet = new HashSet();
-        for ( int i = 0; i < probeIDs.size(); i++ ) {
-            probesInGeneSet.add( probeIDs.get( i ) );
-        }
-
+        probesInGeneSet = new HashSet( probeIDs );
         DenseDoubleMatrix2DNamed matrix = setUpMatrixData();
-
-        //
-        // Create the rest of the table
-        //
 
         tableModel = new GeneSetTableModel( m_matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData,
                 m_nf, settings );
