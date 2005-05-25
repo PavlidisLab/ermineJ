@@ -10,22 +10,27 @@
 
 <body>
 <img src="../images/logo1small.gif" />
-<h2>Installation notes</h2>
+<h1>Installation notes</h1>
 
-<h3>WebStart</h3>
+<h2>WebStart</h2>
 
 <p>The simplest way to use ermineJ might be to use the <a
 	href="http://microarray.cu-genome.org/ermineJ/webstart">webstart</a>.
 This allows you to run ermineJ without running an installer.</p>
 
-<h3>Windows</h3>
+<h2>Windows</h2>
 
-<p>The only additional general information&nbsp; you should need is how
-the data directory is organized.</p>
+<p>Download the installer (ermineJ-XXXXX.exe), and double-click on it.
+The installation wizard will take you through the steps to install the
+software. After installation, ermineJ can be started by double-clicking
+on the desktop icon.</p>
+
+<p>The only additional general information you should need is how the
+data directory is organized.</p>
 
 <p>By default, ermineJ expects a data directory (folder)&nbsp;called
 ermineJ.data to be present in the installation directory (e.g.,
-C:\program files\ermineJ\ermineJ.data). This directory is used to store
+C:\Program Files\ermineJ\ermineJ.data). This directory is used to store
 information needed by ermineJ during analysis. This directory should be
 created during installation.</p>
 
@@ -33,10 +38,30 @@ created during installation.</p>
 ermineJ/ermineJ.data/genesets folder. These are most easily created from
 within the ermineJ software, but you can add ones created externally by
 dropping them in ermineJ/ermineJ.data/genesets, or loading them from
-ermineJ.</p>
+within ermineJ.</p>
 
 <h3>Other platforms</h3>
 
-<p>Coming soon</p>
+<p>For other platforms, we provide a "generic bundle" that can be used
+to run ermineJ without an installer.</p>
+
+<ol>
+	<li>Unpack the distribution. You should end up with a directory called
+	'ermineJ-2.1' or something like that.</li>
+	<li>Set the enviroment variable ERMINEJ_HOME to this directory.</li>
+	<li>Add $ERMINEJ_HOME/bin to your path, if you want to make it easier
+	to execute.</li>
+	<li>You can now execute ermineJ by running the script ermineJ.sh (Unix,
+	should also work on Mac OSX) or ermineJ.bat (Windows) in the bin
+	directory.</li>
+</ol>
+
+<p>By default, executing the script will simply print usage
+instructions. To fire up the gui, use <code>ermineJ.sh -G</code>.</p>
+
+<p>By using the other options, you can cause ermineJ to run an analysis
+non-interactively. The command line interface is described <a
+	href="cli.html">here</a></p>
+
 </body>
 </html>
