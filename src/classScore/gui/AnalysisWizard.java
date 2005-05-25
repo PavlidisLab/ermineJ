@@ -67,7 +67,9 @@ public class AnalysisWizard extends Wizard {
         this.setTitle( "Create New Analysis - Step 1 of 5" );
 
         // determine if the "finish" button should be disabled or not
-        if ( settings.getRawDataFileName().length() == 0 && settings.getScoreFile().length() == 0 ) {
+        if ( ( settings.getRawDataFileName() == null || ( settings.getRawDataFileName() == null || settings
+                .getRawDataFileName().length() == 0 )
+                && settings.getScoreFile().length() == 0 ) ) {
             setFinishDisabled();
         } else {
             setFinishEnabled();
