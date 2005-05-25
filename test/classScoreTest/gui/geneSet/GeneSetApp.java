@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -26,7 +27,7 @@ import classScore.gui.geneSet.JGeneSetFrame;
 public class GeneSetApp {
 
     /**
-     * @throws IOException 
+     * @throws IOException
      * @param filename the raw data file which contains the data for the probe ID's
      */
     public GeneSetApp( String filename ) throws IOException {
@@ -35,7 +36,7 @@ public class GeneSetApp {
         settings.setRawFile( filename );
 
         final String[] PROBES = { "31946_s_at", "31947_r_at", "31948_at", "31949_at", "31950_at" };
-        HashMap pvalues = new HashMap();
+        Map pvalues = new HashMap();
 
         List probeIDs = new ArrayList();
         for ( int i = 0; i < PROBES.length; i++ ) {
@@ -43,7 +44,7 @@ public class GeneSetApp {
             pvalues.put( PROBES[i], new Double( 0.5 - 0.02 * i ) ); // fake p values.
         }
 
-        JGeneSetFrame frame = new JGeneSetFrame( probeIDs, pvalues, null, settings );
+        JGeneSetFrame frame = new JGeneSetFrame( null, probeIDs, pvalues, null, settings );
         frame.setSize( new Dimension( 800, 600 ) );
         frame.show();
     }

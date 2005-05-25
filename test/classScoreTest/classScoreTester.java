@@ -63,7 +63,7 @@ public class classScoreTester extends classScoreCMD {
                     ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, false );
                     rp.printResults( false ); // don't sort.
                 } catch ( Exception e ) {
-                    statusMessenger.setStatus( "Error During analysis: " + e );
+                    statusMessenger.showStatus( "Error During analysis: " + e );
                     e.printStackTrace();
                 }
 
