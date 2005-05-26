@@ -1,21 +1,12 @@
 package classScore;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.Properties;
 
-import org.apache.commons.configuration.ConfigurationConverter;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -40,9 +31,8 @@ import baseCode.util.FileTools;
  */
 
 public class Settings {
-    private static final Log log = LogFactory.getLog( Settings.class );
-
     public static final int BENJAMINIHOCHBERG = 2;
+
     public static final int BEST_PVAL = 1;
     public static final int BONFERONNI = 0;
     public static final int CORR = 2;
@@ -69,6 +59,7 @@ public class Settings {
     private static final String GOLD_STANDARD_FILE = "goldStandardFile";
     private static final String IS_TESTER = "isTester";
     private static final String ITERATIONS = "iterations";
+    private static final Log log = LogFactory.getLog( Settings.class );
     private static final String MAX_CLASS_SIZE = "maxClassSize";
     private static final String MIN_CLASS_SIZE = "minClassSize";
     private static final String MTC = "mtc";
@@ -79,6 +70,7 @@ public class Settings {
     private static final String RAW_FILE = "rawFile";
     private static final String RAW_SCORE_METHOD = "rawScoreMethod";
     private static final String SCORE_COL = "scoreCol";
+
     private static final String SCORE_FILE = "scoreFile";
 
     /**
@@ -96,20 +88,20 @@ public class Settings {
      */
     private PropertiesConfiguration config;
 
-    /**
-     * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
-     * etc.)
-     */
-    private static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
-            MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
-            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FORMAT, CLASS_SCORE_METHOD };
-
     private File logFile;
 
     /**
      * Indicates whether the user needs to be prompted for a data file.
      */
     private boolean userSetRawDataFile = true;
+
+    /**
+     * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
+     * etc.)
+     */
+    protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
+            MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
+            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FORMAT, CLASS_SCORE_METHOD };
 
     /**
      * Create the settings, reading them from a file to be determined by the constructor.
@@ -282,6 +274,25 @@ public class Settings {
         return config.getInteger( ITERATIONS, new Integer( 10000 ) ).intValue();
     }
 
+    /**
+     * Determine where to put the log file.
+     * 
+     * @return
+     */
+    public File getLogFile() {
+        if ( logFile == null ) {
+            // Calendar c = Calendar.getInstance();
+            // this.logFile = new File( this.getDataDirectory() + System.getProperty( "file.separator" ) + "log."
+            // + c.get( Calendar.YEAR ) + c.get( Calendar.MONTH ) + c.get( Calendar.DATE ) + c.get( Calendar.HOUR )
+            // + c.get( Calendar.MINUTE ) + c.get( Calendar.SECOND ) );
+            // log.info( "Creating log file: " + logFile.getAbsolutePath() );
+            logFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                    + "ermineJ.log" );
+            return logFile;
+        }
+        return logFile;
+    }
+
     public int getMaxClassSize() {
         return config.getInteger( MAX_CLASS_SIZE, new Integer( 100 ) ).intValue();
     }
@@ -370,6 +381,13 @@ public class Settings {
     public String getUserGeneSetDirectory() {
         return config.getString( "classFolder" );
 
+    }
+
+    /**
+     * @return
+     */
+    public boolean getUserSetRawFile() {
+        return this.userSetRawDataFile;
     }
 
     public boolean getUseWeights() {
@@ -546,6 +564,13 @@ public class Settings {
     }
 
     /**
+     * @param setRawFile Set to false to indicate that the user wants to proceed without a data file.
+     */
+    public void userSetRawFile( boolean setRawFile ) {
+        this.userSetRawDataFile = setRawFile;
+    }
+
+    /**
      * Intended to be used for saving results to the header of an output file.
      * 
      * @param fileName
@@ -578,8 +603,19 @@ public class Settings {
      * @throws IOException
      */
     private void createCustomGeneSetDirectory() throws IOException {
+
+        if ( this.getDataDirectory() == null || this.getDataDirectory().length() == 0 ) {
+            String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                    + "ermineJ.data";
+            if ( !new File( dataDirName ).mkdir() ) {
+                throw new IOException( "Could not create a data directory at " + dataDirName );
+            }
+            this.setDataDirectory( dataDirName );
+        }
+
         String customGeneSetDirectoryName = new String( this.getDataDirectory() + System.getProperty( "file.separator" )
                 + "genesets" );
+
         if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
             log.info( "Creating custom class folder at " + customGeneSetDirectoryName );
             if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
@@ -621,39 +657,6 @@ public class Settings {
             }
         }
         this.config.setAutoSave( true );
-    }
-
-    /**
-     * Determine where to put the log file.
-     * 
-     * @return
-     */
-    public File getLogFile() {
-        if ( logFile == null ) {
-            // Calendar c = Calendar.getInstance();
-            // this.logFile = new File( this.getDataDirectory() + System.getProperty( "file.separator" ) + "log."
-            // + c.get( Calendar.YEAR ) + c.get( Calendar.MONTH ) + c.get( Calendar.DATE ) + c.get( Calendar.HOUR )
-            // + c.get( Calendar.MINUTE ) + c.get( Calendar.SECOND ) );
-            // log.info( "Creating log file: " + logFile.getAbsolutePath() );
-            logFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                    + "ermineJ.log" );
-            return logFile;
-        }
-        return logFile;
-    }
-
-    /**
-     * @param setRawFile Set to false to indicate that the user wants to proceed without a data file.
-     */
-    public void userSetRawFile( boolean setRawFile ) {
-        this.userSetRawDataFile = setRawFile;
-    }
-
-    /**
-     * @return
-     */
-    public boolean getUserSetRawFile() {
-        return this.userSetRawDataFile;
     }
 
 }
