@@ -605,10 +605,16 @@ public class Settings {
     private void createCustomGeneSetDirectory() throws IOException {
 
         if ( this.getDataDirectory() == null || this.getDataDirectory().length() == 0 ) {
+            log.info( "Determining data directory" );
             String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
                     + "ermineJ.data";
-            if ( !new File( dataDirName ).mkdir() ) {
-                throw new IOException( "Could not create a data directory at " + dataDirName );
+            File dataDirFile = new File( dataDirName );
+
+            if ( !dataDirFile.exists() ) {
+                log.info( "Creating " + dataDirName );
+                if ( !new File( dataDirName ).mkdir() ) {
+                    throw new IOException( "Could not create a data directory at " + dataDirName );
+                }
             }
             this.setDataDirectory( dataDirName );
         }
@@ -617,9 +623,10 @@ public class Settings {
                 + "genesets" );
 
         if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
-            log.info( "Creating custom class folder at " + customGeneSetDirectoryName );
+            log.info( "Creating custom gene set directory at " + customGeneSetDirectoryName );
             if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
-                throw new IOException( "Could not create the class directory at " + customGeneSetDirectoryName );
+                throw new IOException( "Could not create the custom gene set directory at "
+                        + customGeneSetDirectoryName );
             }
         }
         log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
