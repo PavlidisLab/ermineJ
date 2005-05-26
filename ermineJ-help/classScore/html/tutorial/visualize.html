@@ -14,9 +14,10 @@
 
 <p>From the Output Panel (table or tree), you can double-click on a gene
 set row to pop up a new window showing the details for the gene set. If
-you have done multiple analyses, click on the p-value for the specific
-gene set you wish to view. If you have not done any analysis, you will
-still see the window. After double-clicking, you will see a new window.</p>
+you have done multiple analyses, <strong>click on the p-value for the
+specific gene set you wish to view</strong>. If you have not done any
+analysis, you will still see the window. After double-clicking, you will
+see a new window.</p>
 
 <p>A typical window will look like this</p>
 
@@ -32,7 +33,9 @@ still see the window. After double-clicking, you will see a new window.</p>
 	<li>If you have done an analysis, then the relevant gene score file
 	will be defined, and the probe scores for the probes in the gene set
 	will be displayed. If you have no current analyses, then the last gene
-	score file you used will be selected for showing probe scores.</li>
+	score file you used will be selected for showing probe scores. If you
+	have not selected a gene score file, no gene scores will be displayed
+	(you will see "NaN" for "not a number" instead).</li>
 
 	<li>If you have previously loaded your raw expression data, the window
 	will include a visualization of the data. If you have not, you will be
@@ -40,7 +43,7 @@ still see the window. After double-clicking, you will see a new window.</p>
 		href="../formats/microarray.html">described here</a>. If you choose
 	not to load a data file at this time, you will not be asked again
 	during this session. If you want to see raw data, you can <a
-		href="#setdataset">set the data set</a>.</li>
+		href="#setdataset">set the data set from a menu option</a>.</li>
 
 	<li>You can open as many visualization windows as you like, including
 	multiple windows for the same gene set.</li>
@@ -49,6 +52,8 @@ still see the window. After double-clicking, you will see a new window.</p>
 	setting is remembered across sessions. If you set a raw data file in
 	the <a href="ora.html">Analysis wizard</a>, that setting will be used.</li>
 
+	<li>The title of the window shows the gene set name, size and the
+	p-value, if there is one</li>
 
 </ul>
 

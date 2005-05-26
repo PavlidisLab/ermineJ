@@ -29,17 +29,12 @@ microarray.</p>
 	href="../formats/go.html">Gene Ontology&nbsp;XML</A>" topic and the "<A
 	href="../formats/annotations.html">Gene Annotation</A>" topic.</P>
 
-<p>After you have obtained and unzipped the files, you can return to
-this page.</p>
+<p>After you have obtained the files (unzipping them is not necessary),
+you can return to this page.</p>
 
 <p>When you first start up the software, you will be presented with the
-following dialog box (most of the screen shots in this manual have been
-shrunk).
-<p>Enter the GO XML file you are using, and the microarray annotation
-file, using the "Browse" buttons to locate them on your computer. Select
-the format of the annotation file from the pull-down menu. If you got
-the file from our web site, the format is "ErmineJ". The click on
-"Start".</p>
+following dialog box (Note that most of the screen shots in this manual
+have been scaled down to save space).</p>
 
 <a name="link0"></a>
 <map name="frame0map">
@@ -48,6 +43,11 @@ the file from our web site, the format is "ErmineJ". The click on
 <br>
 <br>
 
+<p>Enter the GO XML file you are using, and the microarray annotation
+file, using the "Browse" buttons to locate them on your computer. Select
+the format of the annotation file from the pull-down menu. If you got
+the file from our web site, the format is "ErmineJ". The click on
+"Start".</p>
 
 <p>Then you will have a brief wait while the data files are loaded.
 These data are used for the remaining analysis and will only have to be
@@ -63,13 +63,6 @@ loaded once. Here is what the loading screen looks like:</p>
 <p>Once loading is finished (~15-30 seconds) the following window is
 shown.</p>
 
-<p>The three key parts of this window are the "output panel' listing all
-the available gene sets either in a table or in a tree (see below), the
-menu bar, which is used to perform analyses and other functions, and a
-"status bar" at the bottom of the window that is used to display
-pertinent information.</p>
-
-
 
 <a name="link2"></a>
 <map name="frame2map">
@@ -77,6 +70,18 @@ pertinent information.</p>
 <img border=0 src="startingUp_files/startingUp2.png" usemap="#frame2map">
 <br>
 <br>
+
+<p>The three key parts of this window are:</p>
+<ul>
+	<li>The "output panel" listing all the available gene sets either in a
+	table or in a tree (see below)</li>
+	<li>The menu bar, which is used to access analyses and other functions</li>
+	<li>The "status bar" at the bottom of the window that is used to
+	display pertinent information.</li>
+</ul>
+
+<p>There are some additional features of the interface described <a
+	href="#addfeats">below</a>.</p>
 
 
 <p>The Output panel always shows the four columns (and others, once you
@@ -95,8 +100,7 @@ table according to the selected column.</p>
 	gene set (We use the term "probe" to mean a "probe set" on Affymetrix
 	arrays). This value is always the number of probes on the array design,
 	even if your data set (which has not been entered yet) has filtered out
-	some of the results.&nbsp; See this <a href="numitems.html">note</a>
-	.</div>
+	some of the results.&nbsp; See this <a href="numitems.html">note</a> .</div>
 	<li>
 	<div><STRONG>Genes</STRONG> - how many genes are in the gene set. This
 	value is always less than or equal to the number of probes, because
@@ -149,21 +153,44 @@ prefer.</p>
 <br>
 <br>
 
+<a name="addfeat"></a>
 <h2>Additional functionality of the main panel</h2>
 
 <p>In addition to the obvious features shown above, there are other
 functionalities of the main panel:</p>
 
+<h3>Mouse button actions</h3>
+
 <ul>
 	<li>Double-clicking on a gene set in either the table or tree brings up
 	the <a href="visualize">details view</a> for that gene set.</li>
-	<li>On both the tree and table view, there is a context-specific menu
-	(right-click on windows, option-click on Mac) for gene sets that makes
-	it easier to use common functions and search the Gene Ontology web site</li>
+	<li>On both the tree and table view, there is a "popup" or
+	"context-specific" menu (right-click on windows, option-click on Mac)
+	for gene sets that makes it easier to use common functions and search
+	the Gene Ontology web site. There is a different popup menu for
+	different parts of the table and some functions are only available from
+	the tree view or the table view.</li>
 	<li>Clicking on the table headers resorts the table.</li>
+</ul>
+
+<h3>Tooltips</h3>
+
+<p>There are <strong>"tooltips"</strong> that are used to display extra
+information that would otherwise clutter up the interface. Hover the
+mouse over a field in the table or a line in the tree to see this.
+Specifically:</p>
+
+<ul>
 	<li>On both the tree and table views, hovering over a gene set ID or
-	name brings up a "tooltip" that shows the GO aspect and definition (if
+	name brings up a tooltip that shows the GO aspect and definition (if
 	any).</li>
+	<li>In the table view, hovering over a result p-value shows detailed
+	statistics (when you first start the software there are no results
+	columns, so this will make more sense once <a href="ora.html">you do</a>).</li>
+	<li>In the table view, hovering over the header of a results column
+	shows a summary of the settings that were used</li>
+</ul>
+
 </ul>
 <hr />
 
