@@ -618,6 +618,7 @@ public class Settings {
             }
             this.setDataDirectory( dataDirName );
         }
+        log.info( "Data directory is " + this.getDataDirectory() );
 
         String customGeneSetDirectoryName = new String( this.getDataDirectory() + System.getProperty( "file.separator" )
                 + "genesets" );
@@ -625,8 +626,7 @@ public class Settings {
         if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
             log.info( "Creating custom gene set directory at " + customGeneSetDirectoryName );
             if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
-                throw new IOException( "Could not create the custom gene set directory at "
-                        + customGeneSetDirectoryName );
+                log.error( "Could not create the custom gene set directory at " + customGeneSetDirectoryName );
             }
         }
         log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
