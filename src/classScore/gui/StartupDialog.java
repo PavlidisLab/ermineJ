@@ -159,7 +159,12 @@ public class StartupDialog extends AppDialog {
     protected void actionButton_actionPerformed( ActionEvent e ) {
         String file = annotFile.getText();
         File infile = new File( file );
-        if ( !infile.exists() || !infile.canRead() ) {
+
+        if ( file.length() == 0 ) {
+            GuiUtil.error( "You must enter the Gene Ontology XML file location" );
+        } else if ( infile.length() == 0 ) {
+            GuiUtil.error( "You must enter the annotation file location for your microarray design" );
+        } else if ( !infile.exists() || !infile.canRead() ) {
             GuiUtil.error( "Could not find file: " + file );
         } else {
             saveValues();
