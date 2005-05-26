@@ -165,10 +165,7 @@ public class GeneSetWizard extends Wizard {
             backButton.setEnabled( true );
             nextButton.setEnabled( false );
 
-            if ( makenew )
-                finishButton.setEnabled( false );
-            else
-                finishButton.setEnabled( true );
+            finishButton.setEnabled( true );
 
             step3.update();
             this.getContentPane().add( step3 );
