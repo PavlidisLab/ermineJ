@@ -4,7 +4,7 @@
 	<name>ermineJ</name>
 	<groupId>ermineJ</groupId>
 	<id>ermineJ</id>
-	<currentVersion>2.1RC3</currentVersion>
+	<currentVersion>2.1</currentVersion>
 	<organization>
 		<name>Columbia University</name>
 		<url>http://www.columbia.edu</url>
@@ -203,6 +203,7 @@
 				<includes>
 					<include>**/*.properties</include>
 					<include>**/*.gif</include>
+					<include>**/version</include>
 				</includes>
 				<excludes>
 					<exclude>**/*.jar</exclude>
