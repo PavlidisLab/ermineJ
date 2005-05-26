@@ -115,10 +115,7 @@ public class Settings {
     public Settings( boolean readFromFile ) throws IOException {
         if ( readFromFile ) {
             initConfig();
-            if ( this.getDataDirectory() == null && !this.determineDataDirectory() ) {
-                log.info( "Can't find data directory, using default settings" );
-                return;
-            }
+            createDataDirectory();
             createCustomGeneSetDirectory();
         } else {
             this.config = new PropertiesConfiguration();
@@ -604,6 +601,23 @@ public class Settings {
      */
     private void createCustomGeneSetDirectory() throws IOException {
 
+        String customGeneSetDirectoryName = new String( this.getDataDirectory() + System.getProperty( "file.separator" )
+                + "genesets" );
+
+        if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
+            log.info( "Creating custom gene set directory at " + customGeneSetDirectoryName );
+            if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
+                log.error( "Could not create the custom gene set directory at " + customGeneSetDirectoryName );
+            }
+        }
+        log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
+        this.setCustomGeneSetDirectory( customGeneSetDirectoryName );
+    }
+
+    /**
+     * @throws IOException
+     */
+    private void createDataDirectory() throws IOException {
         if ( this.getDataDirectory() == null || this.getDataDirectory().length() == 0 ) {
             log.info( "Determining data directory" );
             String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
@@ -619,18 +633,6 @@ public class Settings {
             this.setDataDirectory( dataDirName );
         }
         log.info( "Data directory is " + this.getDataDirectory() );
-
-        String customGeneSetDirectoryName = new String( this.getDataDirectory() + System.getProperty( "file.separator" )
-                + "genesets" );
-
-        if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
-            log.info( "Creating custom gene set directory at " + customGeneSetDirectoryName );
-            if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
-                log.error( "Could not create the custom gene set directory at " + customGeneSetDirectoryName );
-            }
-        }
-        log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
-        this.setCustomGeneSetDirectory( customGeneSetDirectoryName );
     }
 
     /**
