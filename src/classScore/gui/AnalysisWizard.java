@@ -211,7 +211,7 @@ public class AnalysisWizard extends Wizard {
             String id = ( String ) ( ( HashMap ) it.next() ).get( "id" );
             if ( !goData.isUserDefined( id ) ) {
                 UserDefinedGeneSetManager newGeneSet = new UserDefinedGeneSetManager( geneData, settings, id );
-                String filename = newGeneSet.getUserGeneSetFileForName( id );
+                String filename = newGeneSet.getUserGeneSetFileForName();
                 boolean gotSomeProbes = newGeneSet.loadUserGeneSet( filename );
                 if ( gotSomeProbes ) newGeneSet.addToMaps( goData );
             }

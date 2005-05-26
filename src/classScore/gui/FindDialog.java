@@ -60,7 +60,6 @@ public class FindDialog extends JDialog {
             setLocation( ( screenSize.width - dlgSize.width ) / 2, ( screenSize.height - dlgSize.height ) / 2 );
             pack();
             searchTextField.requestFocusInWindow();
-            show();
         } catch ( Exception e ) {
             e.printStackTrace();
         }
@@ -148,7 +147,6 @@ public class FindDialog extends JDialog {
         statusMessenger.showStatus( geneData.selectedSets() + " matching gene sets found." );
         resetViews();
     }
-
 }
 
 class FindFieldActionAdapter implements KeyListener {

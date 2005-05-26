@@ -270,10 +270,9 @@ public class UserDefinedGeneSetManager {
      * @throws IOException
      */
     public void saveGeneSet( int type ) throws IOException {
-        String cleanedId = cleanGeneSetName();
         String cleanedDescription = desc.replace( '\n', ' ' );
         String filetype = ( type == 0 ) ? "probe" : "gene";
-        BufferedWriter out = new BufferedWriter( new FileWriter( getUserGeneSetFileForName( cleanedId ), false ) );
+        BufferedWriter out = new BufferedWriter( new FileWriter( getUserGeneSetFileForName(), false ) );
         out.write( filetype + "\n" );
         out.write( id + "\n" );
         out.write( cleanedDescription + "\n" );
@@ -332,6 +331,7 @@ public class UserDefinedGeneSetManager {
      * Redefine a class. The "real" version of the class is modified to look like this one.
      */
     public void modifyClass( GONames goData ) {
+        log.debug( "Modifying " + id );
         geneData.modifyClass( id, probes );
         goData.modifyClass( id, desc );
     }
@@ -365,7 +365,7 @@ public class UserDefinedGeneSetManager {
      * @param className
      * @return
      */
-    public String getUserGeneSetFileForName( String className ) {
+    public String getUserGeneSetFileForName() {
         String classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" )
                 + this.cleanGeneSetName() + USERGENESET_SUFFIX;
         return classFile;
@@ -378,8 +378,8 @@ public class UserDefinedGeneSetManager {
      * 
      * @param ngs
      */
-    public boolean deleteUserGeneSet( String classID ) {
-        String classFile = this.getUserGeneSetFileForName( classID );
+    public boolean deleteUserGeneSet() {
+        String classFile = this.getUserGeneSetFileForName();
         File file = new File( classFile );
         log.debug( "Deleting " + file.getAbsolutePath() );
         if ( !file.exists() ) {

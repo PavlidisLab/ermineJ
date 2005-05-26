@@ -8,8 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -81,54 +85,54 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     private static final int STARTING_OVERALL_WIDTH = 830;
-    private JPanel mainPanel = ( JPanel ) this.getContentPane();
-    private JMenuBar jMenuBar1 = new JMenuBar();
-    private JMenu fileMenu = new JMenu();
-    private JMenuItem quitMenuItem = new JMenuItem();
-    private JMenu classMenu = new JMenu();
-    private JMenuItem defineClassMenuItem = new JMenuItem();
-    private JMenuItem modClassMenuItem = new JMenuItem();
-    private JMenuItem findClassMenuItem = new JMenuItem();
-    private JMenuItem findGeneMenuItem = new JMenuItem();
-    private JMenuItem showUsersMenuItem = new JMenuItem();
+
+    private JMenuItem aboutMenuItem = new JMenuItem();
     private JMenu analysisMenu = new JMenu();
-    private JMenuItem runAnalysisMenuItem = new JMenuItem();
+    private AnalysisThread athread;
     private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
-    private JMenuItem loadAnalysisMenuItem = new JMenuItem();
-    private JMenuItem saveAnalysisMenuItem = new JMenuItem();
-    private JMenu runViewMenu = new JMenu();
+    private JMenu classMenu = new JMenu();
+    private int currentResultSet;
+    private JMenuItem defineClassMenuItem = new JMenuItem();
+    private final JFileChooser fc = new JFileChooser();
+    private JMenu fileMenu = new JMenu();
+    private JMenuItem findClassMenuItem = new JMenuItem();
+    private FindDialog findByGeneDialog = null;
+    private FindDialog findByNameDialog = null;
+    private JMenuItem findGeneMenuItem = new JMenuItem();
+    private GeneAnnotations geneData = null;
+    private Map geneDataSets;
+    private Map geneScoreSets;
+    private GONames goData;
     private JMenu helpMenu = new JMenu();
     private JMenuItem helpMenuItem = new JMenuItem();
-    private JMenuItem logMenuItem = new JMenuItem();
-    private JMenuItem aboutMenuItem = new JMenuItem();
-    private final JFileChooser fc = new JFileChooser();
-    private JTabbedPane tabs = new JTabbedPane();
-    private JPanel progressPanel;
-    private JPanel progInPanel = new JPanel();
-    JProgressBar progressBar = new JProgressBar();
-    private GeneSetTablePanel oPanel;
-
-    private JLabel jLabelStatus = new JLabel();
-    private JPanel jPanelStatus = new JPanel();
-
-    private Settings settings;
-    private StatusViewer statusMessenger;
-    private GONames goData;
-    private GeneAnnotations geneData = null;
-    private List results = new LinkedList();
-
-    private Map geneDataSets;
-    private Map rawDataSets;
-    private Map geneScoreSets;
-
-    private JLabel logoLabel;
-
-    private AnalysisThread athread;
-    private JPanel loadingPanel = new JPanel();
-    private GeneSetTreePanel treePanel;
-
     private HelpHelper hh;
-    private int currentResultSet;
+    private JLabel jLabelStatus = new JLabel();
+    private JMenuBar jMenuBar1 = new JMenuBar();
+    private JPanel jPanelStatus = new JPanel();
+    private JMenuItem loadAnalysisMenuItem = new JMenuItem();
+    private JPanel loadingPanel = new JPanel();
+    private JMenuItem logMenuItem = new JMenuItem();
+    private JLabel logoLabel;
+    private JPanel mainPanel = ( JPanel ) this.getContentPane();
+    private JMenuItem modClassMenuItem = new JMenuItem();
+    private GeneSetTablePanel oPanel;
+    private JPanel progInPanel = new JPanel();
+    private JPanel progressPanel;
+    private JMenuItem quitMenuItem = new JMenuItem();
+    private Map rawDataSets;
+    private List results = new LinkedList();
+    private JMenuItem runAnalysisMenuItem = new JMenuItem();
+    private JMenu runViewMenu = new JMenu();
+    private JMenuItem saveAnalysisMenuItem = new JMenuItem();
+    private Settings settings;
+    private boolean showingUserGeneSets = false;
+    private JMenuItem showUsersMenuItem = new JMenuItem();
+    private StatusViewer statusMessenger;
+    private JTabbedPane tabs = new JTabbedPane();
+    private GeneSetTreePanel treePanel;
+    private Collection userOverwrittenGeneSets;
+    JProgressBar progressBar = new JProgressBar();
+    private boolean showingFindDialog = false;
 
     /**
      * @throws IOException
@@ -140,6 +144,98 @@ public class GeneSetScoreFrame extends JFrame {
         hh.initHelp( helpMenuItem );
     }
 
+    public void addedNewGeneSet() {
+        oPanel.addedNewGeneSet();
+        treePanel.addedNewGeneSet();
+    }
+
+    public void addResult( GeneSetPvalRun result ) {
+        if ( result == null || result.getResults().size() == 0 ) return;
+        result.setName( "Run " + ( results.size() + 1 ) );
+        results.add( result );
+        this.updateRunViewMenu();
+        oPanel.addRun();
+        treePanel.addRun();
+        athread = null;
+    }
+
+    /**
+     * @param id
+     */
+    public void addUserOverwritten( String id ) {
+        this.userOverwrittenGeneSets.add( id );
+    }
+
+    /**
+     * @param classID
+     */
+    public void deleteUserGeneSet( String classID ) {
+        UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, classID );
+        if ( ngs.deleteUserGeneSet() && this.statusMessenger != null ) {
+            statusMessenger.showStatus( "Permanantly deleted " + classID );
+        } else {
+            GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
+                    + settings.getUserGeneSetDirectory() );
+        }
+        treePanel.removeNode( classID );
+        this.userOverwrittenGeneSets.remove( classID );
+    }
+
+    public void disableMenusForAnalysis() {
+        defineClassMenuItem.setEnabled( false );
+        modClassMenuItem.setEnabled( false );
+        runAnalysisMenuItem.setEnabled( false );
+        loadAnalysisMenuItem.setEnabled( false );
+        saveAnalysisMenuItem.setEnabled( false );
+        cancelAnalysisMenuItem.setEnabled( true );
+    }
+
+    public void disableMenusForLoad() {
+        fileMenu.setEnabled( false );
+        classMenu.setEnabled( false );
+        analysisMenu.setEnabled( false );
+        helpMenu.setEnabled( false );
+    }
+
+    public void enableMenusForAnalysis() {
+        defineClassMenuItem.setEnabled( true );
+        modClassMenuItem.setEnabled( true );
+        runAnalysisMenuItem.setEnabled( true );
+        loadAnalysisMenuItem.setEnabled( true );
+        maybeEnableRunViewMenu();
+        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
+        cancelAnalysisMenuItem.setEnabled( false );
+    }
+
+    /**
+     * @param classID
+     */
+    public void findGeneSetInTree( String classID ) {
+        this.tabs.setSelectedIndex( 1 );
+        treePanel.expandToGeneSet( classID );
+    }
+
+    /**
+     * @return
+     */
+    public int getCurrentResultSet() {
+        return this.currentResultSet;
+    }
+
+    /**
+     * @return Returns the geneDataSets.
+     */
+    public Map getGeneDataSets() {
+        return geneDataSets;
+    }
+
+    /**
+     * @return Returns the oPanel.
+     */
+    public GeneSetTablePanel getOPanel() {
+        return oPanel;
+    }
+
     /**
      * Get the original, "fresh" gene annotation data.
      * 
@@ -147,6 +243,263 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public GeneAnnotations getOriginalGeneData() {
         return ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) );
+    }
+
+    /**
+     * @return
+     */
+    public JMenu getRunViewMenu() {
+        return this.runViewMenu;
+    }
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public StatusViewer getStatusMessenger() {
+        return statusMessenger;
+    }
+
+    /**
+     * @return Returns the treePanel.
+     */
+    public GeneSetTreePanel getTreePanel() {
+        return this.treePanel;
+    }
+
+    /**
+     * Called by the startupDialog.
+     */
+    public void initialize() {
+        try {
+            mainPanel.add( progressPanel, BorderLayout.CENTER );
+
+            rawDataSets = new HashMap();
+            geneDataSets = new HashMap();
+            geneScoreSets = new HashMap();
+
+            readDataFilesForStartup();
+
+            statusMessenger.showStatus( "Done with setup" );
+
+            enableMenusOnStart();
+
+            mainPanel.remove( progressPanel );
+            mainPanel.add( tabs, BorderLayout.CENTER );
+            statusMessenger.showStatus( "Ready." );
+
+        } catch ( IllegalArgumentException e ) {
+            GuiUtil.error( "Error during initialization: " + e
+                    + "\nTry again.\nIf this problem persists, please contact the software developer. " );
+        }
+        treePanel.initialize( goData, geneData );
+        oPanel.addInitialData( goData );
+        statusMessenger.showStatus( "Done with initialization." );
+    }
+
+    public void loadAnalysis( String loadFile ) {
+        disableMenusForAnalysis();
+        Settings loadSettings;
+        try {
+            loadSettings = new Settings( loadFile );
+        } catch ( ConfigurationException e ) {
+            GuiUtil.error( "There was a problem loading the settings from the results file: " + e.getMessage() );
+            return;
+        }
+        if ( !checkValid( loadSettings ) ) {
+            GuiUtil.error( "Loading of the analysis cannot proceed without the file information." );
+            return;
+        }
+
+        this.athread = new AnalysisThread( loadSettings, statusMessenger, goData, geneDataSets, rawDataSets,
+                geneScoreSets, loadFile );
+        athread.run();
+        log.debug( "Waiting" );
+        addResult( athread.getLatestResults() );
+        log.debug( "done" );
+        enableMenusForAnalysis();
+    }
+
+    public void readDataFilesForStartup() {
+
+        updateProgress( 10 );
+        statusMessenger.showStatus( "Reading GO descriptions " + settings.getClassFile() );
+        assert settings.getClassFile() != null;
+        try {
+            goData = new GONames( settings.getClassFile() );
+        } catch ( SAXException e ) {
+            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
+                    + "\nIf this problem persists, please contact the software developer. " );
+        } catch ( IOException e ) {
+            GuiUtil.error( "GO reading error during initialization: " + e.getMessage()
+                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+        }
+
+        updateProgress( 70 );
+        if ( Thread.currentThread().isInterrupted() ) return;
+
+        statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
+
+        try {
+            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
+        } catch ( IOException e ) {
+            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
+                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+        }
+
+        geneDataSets.put( new Integer( "original".hashCode() ), geneData );
+
+        updateProgress( 90 );
+        if ( Thread.currentThread().isInterrupted() ) return;
+
+        statusMessenger.showStatus( "Reading user-defined gene sets from directory "
+                + settings.getUserGeneSetDirectory() );
+
+        loadUserGeneSets();
+
+        // end slow part.
+
+        if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
+            throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
+                    + "Check that the file format is correct.\n" );
+        }
+
+        if ( geneData.getGeneToProbeList().size() == 0 ) {
+            throw new IllegalArgumentException( "The gene annotation file contains no probes. "
+                    + "Check that the file format is correct.\n" );
+        }
+    }
+
+    /**
+     * @param classID
+     */
+    public void restoreUserGeneSet( String classID ) {
+        userOverwrittenGeneSets.remove( classID );
+        oPanel.addedNewGeneSet();
+        treePanel.addedNewGeneSet();
+    }
+
+    /**
+     * @param runIndex
+     */
+    public void setCurrentResultSet( int runIndex ) {
+        this.currentResultSet = runIndex;
+        treePanel.fireResultsChanged();
+    }
+
+    /**
+     * @param resultSetName
+     */
+    public void setCurrentResultSet( String resultSetName ) {
+        for ( int i = 0; i < results.size(); i++ ) {
+            GeneSetPvalRun element = ( GeneSetPvalRun ) results.get( i );
+            if ( element.getName().equals( resultSetName ) ) {
+                this.setCurrentResultSet( i );
+            }
+        }
+    }
+
+    public void setSettings( Settings settings ) {
+        this.settings = settings;
+    }
+
+    /**
+     * @param message
+     * @param e Throwable
+     */
+    public void showError( String message, Throwable e ) {
+        statusMessenger.showError( message, e );
+    }
+
+    /**
+     * @param a String
+     */
+    public void showStatus( String a ) {
+        jLabelStatus.setText( a );
+    }
+
+    public void startAnalysis( Settings runSettings ) {
+        disableMenusForAnalysis();
+        this.athread = new AnalysisThread( runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
+                geneScoreSets );
+        log.debug( "Starting analysis thread" );
+        athread.run();
+        log.debug( "Waiting..." );
+        addResult( athread.getLatestResults() );
+        log.debug( "done" );
+        enableMenusForAnalysis();
+    }
+
+    public void updateProgress( int val ) {
+        final int value = val;
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            progressBar.setValue( value );
+        } else {
+
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    public void run() {
+                        progressBar.setValue( value );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
+     * Check whether a file exists, and if not, prompt the user to enter one. The path is returned.
+     * 
+     * @param file
+     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
+     */
+    private String checkFile( String file ) {
+        if ( !FileTools.testFile( file ) ) {
+            GuiUtil.error( "A file referred to in the results\n(" + file
+                    + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
+                    + " enter the location." );
+            fc.setDialogTitle( "Please locate " + file );
+            fc.setDialogType( JFileChooser.OPEN_DIALOG );
+            fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
+            int result = fc.showOpenDialog( this );
+            if ( result == JFileChooser.APPROVE_OPTION ) {
+                File f = fc.getSelectedFile();
+                return f.getAbsolutePath();
+            }
+            return null;
+        }
+        return file;
+    }
+
+    /**
+     * @param loadSettings
+     */
+    private boolean checkValid( Settings loadSettings ) {
+
+        String file;
+
+        file = checkFile( loadSettings.getRawDataFileName() );
+        if ( file == null ) return false;
+        loadSettings.setRawFile( file );
+
+        file = checkFile( loadSettings.getScoreFile() );
+        if ( file == null ) return false;
+        loadSettings.setScoreFile( file );
+
+        return true;
+    }
+
+    private void enableMenusOnStart() {
+        fileMenu.setEnabled( true );
+        classMenu.setEnabled( true );
+        analysisMenu.setEnabled( true );
+        runViewMenu.setEnabled( false );
+        helpMenu.setEnabled( true );
     }
 
     /**
@@ -200,20 +553,7 @@ public class GeneSetScoreFrame extends JFrame {
         treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
         tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-        tabs.addMouseListener( new MouseListener() {
-
-            public void mouseClicked( MouseEvent e ) {
-            }
-
-            public void mouseEntered( MouseEvent e ) {
-            }
-
-            public void mouseExited( MouseEvent e ) {
-            }
-
-            public void mousePressed( MouseEvent e ) {
-            }
-
+        tabs.addMouseListener( new MouseAdapter() {
             public void mouseReleased( MouseEvent e ) {
                 maybeEnableRunViewMenu();
             }
@@ -240,6 +580,45 @@ public class GeneSetScoreFrame extends JFrame {
         this.statusMessenger = new StatusJlabel( jLabelStatus );
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
         oPanel.setMessenger( this.statusMessenger );
+    }
+
+    /**
+     * Load the user-defined gene sets.
+     */
+    private void loadUserGeneSets() {
+        if ( userOverwrittenGeneSets == null ) userOverwrittenGeneSets = new HashSet();
+        File dir = new File( settings.getUserGeneSetDirectory() );
+        if ( dir.exists() ) {
+            String[] classFiles = dir.list();
+            for ( int i = 0; i < classFiles.length; i++ ) {
+                String classFile = classFiles[i];
+                UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, null );
+                try {
+                    classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" ) + classFile;
+                    log.debug( "Loading " + classFile );
+                    boolean gotSomeProbes = ngs.loadUserGeneSet( classFile );
+                    if ( gotSomeProbes ) {
+                        ngs.addToMaps( goData );
+                        if ( geneData.getGeneSetToProbeMap().containsKey( ngs.getId() ) ) {
+                            this.userOverwrittenGeneSets.add( ngs.getId() );
+                        }
+                    }
+                } catch ( IOException e ) {
+                    statusMessenger.showError( "Could not load user-defined class from " + classFile );
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    private void maybeEnableRunViewMenu() {
+        if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
+            runViewMenu.setEnabled( true );
+        } else {
+            runViewMenu.setEnabled( false );
+        }
     }
 
     /**
@@ -325,10 +704,6 @@ public class GeneSetScoreFrame extends JFrame {
         analysisMenu.add( loadAnalysisMenuItem );
         analysisMenu.add( saveAnalysisMenuItem );
 
-        // resultsSetMenu = new JMenu();
-        // resultsSetMenu.setMnemonic('R');
-        // resultsSetMenu.setEnabled(false);
-
         helpMenu.setText( "Help" );
         helpMenu.setMnemonic( 'H' );
         helpMenuItem.setText( "Help Topics" );
@@ -383,12 +758,6 @@ public class GeneSetScoreFrame extends JFrame {
         }
     }
 
-    /**
-     * 
-     */
-    private boolean showingUserGeneSets = false;
-    private Collection userOverwrittenGeneSets;
-
     protected void showUserMenuItemActionPerformed() {
         if ( showingUserGeneSets ) {
             geneData.resetSelectedSets();
@@ -425,153 +794,6 @@ public class GeneSetScoreFrame extends JFrame {
         runViewMenu.revalidate();
     }
 
-    private void enableMenusOnStart() {
-        fileMenu.setEnabled( true );
-        classMenu.setEnabled( true );
-        analysisMenu.setEnabled( true );
-        runViewMenu.setEnabled( false );
-        helpMenu.setEnabled( true );
-    }
-
-    public void disableMenusForLoad() {
-        fileMenu.setEnabled( false );
-        classMenu.setEnabled( false );
-        analysisMenu.setEnabled( false );
-        helpMenu.setEnabled( false );
-    }
-
-    public void disableMenusForAnalysis() {
-        defineClassMenuItem.setEnabled( false );
-        modClassMenuItem.setEnabled( false );
-        runAnalysisMenuItem.setEnabled( false );
-        loadAnalysisMenuItem.setEnabled( false );
-        saveAnalysisMenuItem.setEnabled( false );
-        cancelAnalysisMenuItem.setEnabled( true );
-    }
-
-    public void enableMenusForAnalysis() {
-        defineClassMenuItem.setEnabled( true );
-        modClassMenuItem.setEnabled( true );
-        runAnalysisMenuItem.setEnabled( true );
-        loadAnalysisMenuItem.setEnabled( true );
-        maybeEnableRunViewMenu();
-        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
-        cancelAnalysisMenuItem.setEnabled( false );
-    }
-
-    /**
-     * 
-     */
-    private void maybeEnableRunViewMenu() {
-        if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
-            runViewMenu.setEnabled( true );
-        } else {
-            runViewMenu.setEnabled( false );
-        }
-    }
-
-    public void updateProgress( int val ) {
-        final int value = val;
-
-        if ( SwingUtilities.isEventDispatchThread() ) {
-            progressBar.setValue( value );
-        } else {
-
-            try {
-                SwingUtilities.invokeAndWait( new Runnable() {
-                    public void run() {
-                        progressBar.setValue( value );
-                    }
-                } );
-            } catch ( InterruptedException e ) {
-                e.printStackTrace();
-            } catch ( InvocationTargetException e ) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    public void readDataFilesForStartup() {
-
-        updateProgress( 10 );
-        statusMessenger.showStatus( "Reading GO descriptions " + settings.getClassFile() );
-        assert settings.getClassFile() != null;
-        try {
-            goData = new GONames( settings.getClassFile() );
-        } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
-                    + "\nIf this problem persists, please contact the software developer. " );
-        } catch ( IOException e ) {
-            GuiUtil.error( "GO reading error during initialization: " + e.getMessage()
-                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
-        }
-
-        updateProgress( 70 );
-        if ( Thread.currentThread().isInterrupted() ) return;
-
-        statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-
-        try {
-            geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, settings.getAnnotFormat() );
-        } catch ( IOException e ) {
-            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
-                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
-        }
-
-        geneDataSets.put( new Integer( "original".hashCode() ), geneData );
-
-        updateProgress( 90 );
-        if ( Thread.currentThread().isInterrupted() ) return;
-
-        statusMessenger.showStatus( "Reading user-defined gene sets from directory "
-                + settings.getUserGeneSetDirectory() );
-
-        loadUserGeneSets();
-
-        // end slow part.
-
-        if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
-            throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
-                    + "Check that the file format is correct.\n" );
-        }
-
-        if ( geneData.getGeneToProbeList().size() == 0 ) {
-            throw new IllegalArgumentException( "The gene annotation file contains no probes. "
-                    + "Check that the file format is correct.\n" );
-        }
-
-    }
-
-    /**
-     * Load the user-defined gene sets.
-     */
-    private void loadUserGeneSets() {
-        if ( userOverwrittenGeneSets == null ) userOverwrittenGeneSets = new HashSet();
-        File dir = new File( settings.getUserGeneSetDirectory() );
-        if ( dir.exists() ) {
-            String[] classFiles = dir.list();
-            for ( int i = 0; i < classFiles.length; i++ ) {
-                String classFile = classFiles[i];
-                UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, null );
-                try {
-                    classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" ) + classFile;
-                    log.debug( "Loading " + classFile );
-                    boolean gotSomeProbes = ngs.loadUserGeneSet( classFile );
-                    if ( gotSomeProbes ) {
-                        ngs.addToMaps( goData );
-
-                        if ( geneData.getGeneSetToProbeMap().containsKey( ngs.getId() ) ) {
-                            this.userOverwrittenGeneSets.add( ngs.getId() );
-                        }
-                    }
-                } catch ( IOException e ) {
-                    statusMessenger.showError( "Could not load user-defined class from " + classFile );
-                }
-            }
-        }
-    }
-
     /**
      * Determine if a gene set was overwritten by the user-define gene sets on startup.
      * 
@@ -582,80 +804,13 @@ public class GeneSetScoreFrame extends JFrame {
         return userOverwrittenGeneSets != null && userOverwrittenGeneSets.contains( geneSetId );
     }
 
-    /**
-     * Called by the startupDialog.
-     */
-    public void initialize() {
-        try {
-            mainPanel.add( progressPanel, BorderLayout.CENTER );
-
-            rawDataSets = new HashMap();
-            geneDataSets = new HashMap();
-            geneScoreSets = new HashMap();
-
-            readDataFilesForStartup();
-
-            statusMessenger.showStatus( "Done with setup" );
-
-            enableMenusOnStart();
-
-            mainPanel.remove( progressPanel );
-            mainPanel.add( tabs, BorderLayout.CENTER );
-            statusMessenger.showStatus( "Ready." );
-
-        } catch ( IllegalArgumentException e ) {
-            GuiUtil.error( "Error during initialization: " + e
-                    + "\nTry again.\nIf this problem persists, please contact the software developer. " );
-        }
-        treePanel.initialize( goData, geneData );
-        oPanel.addInitialData( goData );
-        statusMessenger.showStatus( "Done with initialization." );
-    }
-
-    /**
-     * @param a String
-     */
-    public void showStatus( String a ) {
-        jLabelStatus.setText( a );
-    }
-
-    /**
-     * @param message
-     * @param e Throwable
-     */
-    public void showError( String message, Throwable e ) {
-        statusMessenger.showError( message, e );
-    }
-
-    /**
-     * @param e ActionEvent
-     */
-    void quitMenuItem_actionPerformed( ActionEvent e ) {
-        statusMessenger.clear();
-        System.exit( 0 );
+    void aboutMenuItem_actionPerformed() {
+        new AboutBox( this );
     }
 
     void defineClassMenuItem_actionPerformed() {
         GeneSetWizard cwiz = new GeneSetWizard( this, geneData, goData, true );
         cwiz.showWizard();
-    }
-
-    void modClassMenuItem_actionPerformed() {
-        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, goData, false );
-        cwiz.showWizard();
-    }
-
-    void findClassMenuItem_actionPerformed() {
-        new FindDialog( this, geneData, goData );
-    }
-
-    void findGeneMenuItem_actionPerformed() {
-        new FindByGeneDialog( this, geneData, goData );
-    }
-
-    void runAnalysisMenuItem_actionPerformed() {
-        AnalysisWizard awiz = new AnalysisWizard( this, geneDataSets, goData );
-        awiz.showWizard();
     }
 
     void doCancel() {
@@ -667,9 +822,37 @@ public class GeneSetScoreFrame extends JFrame {
         showStatus( "Ready" );
     }
 
+    void findClassMenuItem_actionPerformed() {
+        if ( findByNameDialog == null ) findByNameDialog = new FindDialog( this, geneData, goData );
+        findByNameDialog.show();
+    }
+
+    void findGeneMenuItem_actionPerformed() {
+        if ( findByGeneDialog == null ) findByGeneDialog = new FindByGeneDialog( this, geneData, goData );
+        findByGeneDialog.show();
+    }
+
     void loadAnalysisMenuItem_actionPerformed() {
         LoadDialog lgsd = new LoadDialog( this );
         lgsd.showDialog();
+    }
+
+    void modClassMenuItem_actionPerformed() {
+        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, goData, false );
+        cwiz.showWizard();
+    }
+
+    /**
+     * @param e ActionEvent
+     */
+    void quitMenuItem_actionPerformed( ActionEvent e ) {
+        statusMessenger.clear();
+        System.exit( 0 );
+    }
+
+    void runAnalysisMenuItem_actionPerformed() {
+        AnalysisWizard awiz = new AnalysisWizard( this, geneDataSets, goData );
+        awiz.showWizard();
     }
 
     void saveAnalysisMenuItem_actionPerformed() {
@@ -681,221 +864,32 @@ public class GeneSetScoreFrame extends JFrame {
         swiz.showWizard();
     }
 
-    void aboutMenuItem_actionPerformed() {
-        new AboutBox( this );
-    }
-
-    public Settings getSettings() {
-        return settings;
-    }
-
-    public void setSettings( Settings settings ) {
-        this.settings = settings;
-    }
-
-    public StatusViewer getStatusMessenger() {
-        return statusMessenger;
-    }
-
-    public void addResult( GeneSetPvalRun result ) {
-        if ( result == null || result.getResults().size() == 0 ) return;
-        result.setName( "Run " + ( results.size() + 1 ) );
-        results.add( result );
-        this.updateRunViewMenu();
-        oPanel.addRun();
-        treePanel.addRun();
-        athread = null;
-    }
-
-    public void startAnalysis( Settings runSettings ) {
-        disableMenusForAnalysis();
-        this.athread = new AnalysisThread( runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
-                geneScoreSets );
-        log.debug( "Starting analysis thread" );
-        athread.run();
-        log.debug( "Waiting..." );
-        addResult( athread.getLatestResults() );
-        log.debug( "done" );
-        enableMenusForAnalysis();
-    }
-
-    public void loadAnalysis( String loadFile ) {
-        disableMenusForAnalysis();
-        Settings loadSettings;
-        try {
-            loadSettings = new Settings( loadFile );
-        } catch ( ConfigurationException e ) {
-            GuiUtil.error( "There was a problem loading the settings from the results file: " + e.getMessage() );
-            return;
-        }
-        if ( !checkValid( loadSettings ) ) {
-            GuiUtil.error( "Loading of the analysis cannot proceed without the file information." );
-            return;
-        }
-
-        this.athread = new AnalysisThread( loadSettings, statusMessenger, goData, geneDataSets, rawDataSets,
-                geneScoreSets, loadFile );
-        athread.run();
-        log.debug( "Waiting" );
-        addResult( athread.getLatestResults() );
-        log.debug( "done" );
-        enableMenusForAnalysis();
-    }
-
-    /**
-     * @param loadSettings
-     */
-    private boolean checkValid( Settings loadSettings ) {
-
-        String file;
-
-        file = checkFile( loadSettings.getRawDataFileName() );
-        if ( file == null ) return false;
-        loadSettings.setRawFile( file );
-
-        file = checkFile( loadSettings.getScoreFile() );
-        if ( file == null ) return false;
-        loadSettings.setScoreFile( file );
-
-        return true;
-    }
-
-    /**
-     * Check whether a file exists, and if not, prompt the user to enter one. The path is returned.
-     * 
-     * @param file
-     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
-     */
-    private String checkFile( String file ) {
-        if ( !FileTools.testFile( file ) ) {
-            GuiUtil.error( "A file referred to in the results\n(" + file
-                    + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
-                    + " enter the location." );
-            fc.setDialogTitle( "Please locate " + file );
-            fc.setDialogType( JFileChooser.OPEN_DIALOG );
-            fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
-            int result = fc.showOpenDialog( this );
-            if ( result == JFileChooser.APPROVE_OPTION ) {
-                File f = fc.getSelectedFile();
-                return f.getAbsolutePath();
-            }
-            return null;
-        }
-        return file;
-    }
-
-    public void addedNewGeneSet() {
-        oPanel.addedNewGeneSet();
-        treePanel.addedNewGeneSet();
-    }
-
-    /**
-     * @return Returns the oPanel.
-     */
-    public GeneSetTablePanel getOPanel() {
-        return oPanel;
-    }
-
-    /**
-     * @return Returns the geneDataSets.
-     */
-    public Map getGeneDataSets() {
-        return geneDataSets;
-    }
-
-    /**
-     * @return
-     */
-    public int getCurrentResultSet() {
-        return this.currentResultSet;
-    }
-
-    /**
-     * @param classID
-     */
-    public void findGeneSetInTree( String classID ) {
-        this.tabs.setSelectedIndex( 1 );
-        treePanel.expandToGeneSet( classID );
-    }
-
-    /**
-     * @return Returns the treePanel.
-     */
-    public GeneSetTreePanel getTreePanel() {
-        return this.treePanel;
-    }
-
-    /**
-     * @param classID
-     */
-    public void deleteUserGeneSet( String classID ) {
-        UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, classID );
-        if ( ngs.deleteUserGeneSet() && this.statusMessenger != null ) {
-            statusMessenger.showStatus( "Permanantly deleted " + classID );
-        } else {
-            GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
-                    + settings.getUserGeneSetDirectory() );
-        }
-        treePanel.removeNode( classID );
-        this.userOverwrittenGeneSets.remove( classID );
-    }
-
-    /**
-     * @param resultSetName
-     */
-    public void setCurrentResultSet( String resultSetName ) {
-        for ( int i = 0; i < results.size(); i++ ) {
-            GeneSetPvalRun element = ( GeneSetPvalRun ) results.get( i );
-            if ( element.getName().equals( resultSetName ) ) {
-                this.setCurrentResultSet( i );
-            }
-        }
-    }
-
-    /**
-     * @return
-     */
-    public JMenu getRunViewMenu() {
-        return this.runViewMenu;
-    }
-
-    /**
-     * @param runIndex
-     */
-    public void setCurrentResultSet( int runIndex ) {
-        this.currentResultSet = runIndex;
-        treePanel.fireResultsChanged();
-    }
-
-    /**
-     * @param id
-     */
-    public void addUserOverwritten( String id ) {
-        this.userOverwrittenGeneSets.add( id );
-    }
-
-    /**
-     * @param classID
-     */
-    public void restoreUserGeneSet( String classID ) {
-        userOverwrittenGeneSets.remove( classID );
-        oPanel.addedNewGeneSet();
-        treePanel.addedNewGeneSet();
-    }
 }
 
 // //////////////////////////////////////////////////////////////////////////////
 /* end class */
 
-class GeneSetScoreFrame_quitMenuItem_actionAdapter implements java.awt.event.ActionListener {
+class GeneSetScoreFrame_aboutMenuItem_actionAdapter implements java.awt.event.ActionListener {
     GeneSetScoreFrame adaptee;
 
-    GeneSetScoreFrame_quitMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+    GeneSetScoreFrame_aboutMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.quitMenuItem_actionPerformed( e );
+        adaptee.aboutMenuItem_actionPerformed();
+    }
+}
+
+class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetScoreFrame adaptee;
+
+    GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.doCancel();
     }
 }
 
@@ -908,18 +902,6 @@ class GeneSetScoreFrame_defineClassMenuItem_actionAdapter implements java.awt.ev
 
     public void actionPerformed( ActionEvent e ) {
         adaptee.defineClassMenuItem_actionPerformed();
-    }
-}
-
-class GeneSetScoreFrame_modClassMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetScoreFrame adaptee;
-
-    GeneSetScoreFrame_modClassMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.modClassMenuItem_actionPerformed();
     }
 }
 
@@ -947,6 +929,42 @@ class GeneSetScoreFrame_findGeneMenuItem_actionAdapter implements java.awt.event
     }
 }
 
+class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetScoreFrame adaptee;
+
+    GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.loadAnalysisMenuItem_actionPerformed();
+    }
+}
+
+class GeneSetScoreFrame_modClassMenuItem_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetScoreFrame adaptee;
+
+    GeneSetScoreFrame_modClassMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.modClassMenuItem_actionPerformed();
+    }
+}
+
+class GeneSetScoreFrame_quitMenuItem_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetScoreFrame adaptee;
+
+    GeneSetScoreFrame_quitMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.quitMenuItem_actionPerformed( e );
+    }
+}
+
 class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
     GeneSetScoreFrame adaptee;
 
@@ -958,30 +976,6 @@ class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter implements java.awt.ev
         adaptee.runAnalysisMenuItem_actionPerformed();
     }
 
-}
-
-class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetScoreFrame adaptee;
-
-    GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.doCancel();
-    }
-}
-
-class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetScoreFrame adaptee;
-
-    GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.loadAnalysisMenuItem_actionPerformed();
-    }
 }
 
 class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements java.awt.event.ActionListener {
@@ -1031,17 +1025,5 @@ class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
                 jmi.setIcon( new ImageIcon( this.getClass().getResource( "resources/noCheckBox.gif" ) ) );
             }
         }
-    }
-}
-
-class GeneSetScoreFrame_aboutMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetScoreFrame adaptee;
-
-    GeneSetScoreFrame_aboutMenuItem_actionAdapter( GeneSetScoreFrame adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.aboutMenuItem_actionPerformed();
     }
 }

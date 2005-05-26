@@ -77,8 +77,7 @@ public abstract class GeneSetPanel extends JScrollPane {
      */
     public void findInTreeMenuItem_actionAdapter( ActionEvent e ) {
         OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        String classID = null;
-        classID = sourcePopup.getSelectedItem();
+        String classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
         callingFrame.findGeneSetInTree( classID );
     }
@@ -146,6 +145,7 @@ public abstract class GeneSetPanel extends JScrollPane {
                     + classID + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
             if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
             geneData.restoreGeneSet( classID );
+            goData.resetGeneSet( classID );
             callingFrame.restoreUserGeneSet( classID );
             return RESTORED;
         }

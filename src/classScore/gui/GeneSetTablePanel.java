@@ -135,7 +135,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     public void addedNewGeneSet() {
-        // sorter.cancelSorting();
+        sorter.cancelSorting();
         // sorter.setSortingStatus( 0, TableSorter.ASCENDING );
         table.revalidate();
     }
@@ -283,7 +283,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         resultToolTips.add( runIndex, tooltip );
     }
 
-    String getHeaderToolTip( int index ) {
+    protected String getHeaderToolTip( int index ) {
         if ( index == 0 ) {
             return this.classColToolTip;
         } else if ( index >= GeneSetTableModel.INIT_COLUMNS ) {
@@ -294,10 +294,18 @@ public class GeneSetTablePanel extends GeneSetPanel {
         return null;
     }
 
-    void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
+    protected void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
         EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         int currentColumnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
         removeRun( currentColumnIndex );
+    }
+
+    protected MouseListener configurePopupMenu() {
+        MouseListener m = super.configurePopupMenu();
+        final JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
+        findInTreeMenuItem.addActionListener( new OutputPanel_findInTreeMenuItem_actionAdapter( this ) );
+        popup.add( findInTreeMenuItem );
+        return m;
     }
 
     /**
