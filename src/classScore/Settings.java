@@ -618,8 +618,9 @@ public class Settings {
      * @throws IOException
      */
     private void createDataDirectory() throws IOException {
-        if ( this.getDataDirectory() == null || this.getDataDirectory().length() == 0 ) {
-            log.info( "Determining data directory" );
+        if ( !FileTools.testDir( this.getDataDirectory() ) || this.getDataDirectory() == null
+                || this.getDataDirectory().length() == 0 ) {
+            log.info( "Re-determiming data directory" );
             String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
                     + "ermineJ.data";
             File dataDirFile = new File( dataDirName );
