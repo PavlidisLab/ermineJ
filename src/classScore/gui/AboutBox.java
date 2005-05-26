@@ -25,6 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.gui.JLinkLabel;
 
 /**
@@ -38,7 +41,7 @@ import baseCode.gui.JLinkLabel;
  * @version $Id$
  */
 public class AboutBox extends JDialog implements ActionListener {
-
+    private static Log log = LogFactory.getLog( AboutBox.class.getName() );
     /**
      * 
      */
@@ -47,7 +50,7 @@ public class AboutBox extends JDialog implements ActionListener {
      * 
      */
     private static final int PREFERRED_WIDTH = 450;
-    private String VERSION = "2.1RC2";
+    private String VERSION = "2.1";
     private final static String COPYRIGHT = "Copyright (c) 2002-2005 Columbia University";
     private static final String SOFTWARENAME = "ermineJ";
 
@@ -173,8 +176,12 @@ public class AboutBox extends JDialog implements ActionListener {
      * @throws IOException
      */
     private void getVersion() throws IOException {
-        VERSION = ( new BufferedReader( new InputStreamReader( new BufferedInputStream( this.getClass()
-                .getResourceAsStream( "resources/version" ) ) ) ) ).readLine();
+        try {
+            VERSION = ( new BufferedReader( new InputStreamReader( new BufferedInputStream( this.getClass()
+                    .getResourceAsStream( "resources/version" ) ) ) ) ).readLine();
+        } catch ( Exception e ) {
+            log.error( "Could not determine version number" );
+        }
     }
 
     // Overridden so we can exit when window is closed
