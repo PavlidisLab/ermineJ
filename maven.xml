@@ -157,6 +157,10 @@
 	<arg path="${basedir}/nsis-installer/src/ermineJ-setup.nsi" />
 	</ant:exec>
 	
+	<ant:exec executable="${nsis.exe}">
+	<arg path="${basedir}/nsis-installer/src/ermineJ-lite-setup.nsi" />
+	</ant:exec>
+	
 </goal>
 
 
