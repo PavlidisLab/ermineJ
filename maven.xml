@@ -88,6 +88,7 @@
 	<ant:copy todir="${jnlpDir}" file="${maven.repo.local}/javahelp/jars/jh.jar" overwrite="true" />
 
 	<ant:copy todir="${jnlpTmpDir}" file="${basedir}/ermineJ-help.jar" overwrite="true" />
+
 	
 	<ant:available file="${maven.jnlp.signjar.store}" property="maven.jnlp.store.exists"/>
 	<j:if test="${maven.jnlp.store.exists}"><echo>Found a keystore, will sign ermineJ-help.jar</echo></j:if>
@@ -99,6 +100,8 @@
     alias="${maven.jnlp.signjar.alias}"
     storepass="${maven.jnlp.signjar.storepass}"
     keystore="${maven.jnlp.signjar.store}" />
+
+    <ant:copy todir="${jnlpDir}" file="${jnlpTmpDir}/ermineJ-help.jar" />
 </goal>
 
 
@@ -182,12 +185,13 @@
 </goal>
 
 
-<preGoal name="jar">
+<preGoal name="jar:jar">
 <attainGoal name="write-version" />
 </preGoal>
 
 <goal name="write-version" description="Set up resource with version number">
-<ant:echo  message="$pom.currentVersion" file="${basedir}/src/classScore/gui/resources/version" append="false" />
+<ant:echo message="Version: ${pom.currentVersion}" />
+<ant:echo  message="${pom.currentVersion}" file="${basedir}/src/classScore/gui/resources/version" append="false" />
 </goal>
 
 </project>
