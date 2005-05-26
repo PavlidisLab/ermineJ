@@ -4,7 +4,7 @@
 <head>
 <meta name="generator" content="HTML Tidy, see www.w3.org">
 
-<title>Class Scoring</title>
+<title>ErmineJ</title>
 <link type="text/css" rel="stylesheet" href="css/default.css">
 </head>
 
@@ -69,9 +69,9 @@
 		<p><A href="ermineJ-help/html/license.html">License information</A> -
 		ermineJ is free software.</p>
 
-		<p>There are some <a href="screenshots.html">screen shots</a> available,
-		and more information is available in the <a href="ermineJ-help/html">manual</a>.
-		
+		<p>There are some <a href="screenshots.html">screen shots</a>
+		available, and more information is available in the <a
+			href="ermineJ-help/html">manual</a>.
 		<h2>News</h2>
 
 		<p>Version 2.1 has been released. Many new improvements and changes.
@@ -79,33 +79,41 @@
 
 		<p><A href="versions.html">Full version history</A></p>
 
-		<h2>Run it now</h2>
+		<h2><a href="webstart/ermineJ.jnlp">Run it now</a></h2>
 
 		<p>You can <A href="webstart">run ermineJ</A> from any operating
 		system that supports Java (in theory) without running the installer by
-		using java webstart. If you have Webstart installed, you <a
-			href="webstart/ermineJ.jnlp">run ermineJ right now</a>.</p>
+		using java webstart.</p>
+		<p>If you have Webstart installed, you <a href="webstart/ermineJ.jnlp">run
+		ermineJ right now</a>.</p>
 
 		<p>This a good way to get the latest version, as we will keep the link
-		updated with the most recent development build. On the other hand,
-		this version should be considered less stable than the other releases.</p>
+		updated with the most recent development build, including rapid
+		release of bug fixes. On the other hand, this version should be
+		considered less stable than the other releases.</p>
 
 		<h2>Documentation</h2>
 
 		<p>The software comes with on-line help. The manual is also <a
 			href="ermineJ-help/html">available online</a> (webstart users will
-		have to use this option for now). If you are having problems with the
-		software please read the <a href="ermineJ-help/html/faq.html">FAQ</a>.
-		If your question isn't answered in the FAQ or in the manual, feel free
-		to <a href="mailto:pavlidis@dbmi.columbia.edu">contact us</a></p>
+		have to use this option for now) or as a <a
+			href="ermineJ-help/ermineJ-2.1-manual.pdf">PDF</a>. If you are having
+		problems with the software please read the <a
+			href="ermineJ-help/html/faq.html">FAQ</a>. If your question isn't
+		answered in the FAQ or in the manual, feel free to <a
+			href="contact.html">contact us</a></p>
+
+		<p>For more details about ermineJ and how it is used, see the <a
+			href="publications.html">publications list</a>.</p>
+
 		<hr>
 
 		<h2>Download and installation</h2>
 
 		<h4>Requirements</h4>
 
-		<p>ermineJ requires a Java 2 Runtime Environment (JRE) 1.4.2 or newer to
-		run. You can download the platform-specific packages from SUN's
+		<p>ermineJ requires a Java 2 Runtime Environment (JRE) 1.4.2 or newer
+		to run. You can download the platform-specific packages from SUN's
 		website (<a href="http://java.sun.com/j2se/">http://java.sun.com/j2se/</a>
 		). Users of MS Windows NT/2000/XP can alternatively download the
 		Windows installer with bundled JRE package below. On machines with
@@ -113,7 +121,11 @@
 
 		<h4>Software Files</h4>
 
-		<p>Download the appropriate file for your platform:</p>
+		<p>For windows, there are three different bundles. The standard bundle
+		(ermineJ-XX-setup.exe) includes a GO XML file and two microarrray
+		annotation files for mouse and human Affymetrix microarrays. See the
+		"Annotation files" for information on how to get other annotation
+		files.</p>
 
 		<table width="100%" border="0" cellspacing="1" cellpadding="3"
 			bgcolor="#aaaaaa">
@@ -126,19 +138,30 @@
 			</tr>
 
 			<tr>
-				<td bgcolor="#ffffff">Windows installer with bundled JRE</td>
+				<td bgcolor="#ffffff">Windows installer with bundled Java</td>
 
-				<td bgcolor="#ffffff"><a href="distributions/ermineJ-setup-jre.exe">ermineJ-setup-jre.exe</a></td>
+				<td bgcolor="#ffffff"><a
+					href="distributions/ermineJ-2.1-setup-jre.exe">ermineJ-2.1-setup-jre.exe</a></td>
 
-				<td bgcolor="#ffffff">~30 MB</td>
+				<td bgcolor="#ffffff">~38 MB</td>
 			</tr>
 
 			<tr>
-				<td bgcolor="#ffffff">Windows installer without JRE</td>
+				<td bgcolor="#ffffff">Windows installer without Java</td>
 
-				<td bgcolor="#ffffff"><a href="distributions/ermineJ-setup.exe">ermineJ-setup.exe</a></td>
+				<td bgcolor="#ffffff"><a href="distributions/ermineJ-2.1-setup.exe">ermineJ-2.1-setup.exe</a></td>
 
-				<td bgcolor="#ffffff">~7 MB</td>
+				<td bgcolor="#ffffff">~17 MB</td>
+			</tr>
+
+			<tr>
+				<td bgcolor="#ffffff">Windows installer without Java and without
+				data files</td>
+
+				<td bgcolor="#ffffff"><a
+					href="distributions/ermineJ-2.1-lite-setup.exe">ermineJ-2.1-lite-setup.exe</a></td>
+
+				<td bgcolor="#ffffff">~8 MB</td>
 			</tr>
 
 			<tr>
@@ -191,44 +214,10 @@
 		<p>For other platforms, you should be able to use the "Generic
 		bundle". There is a README file included that gives some instructions.</p>
 
+		<p>For more help with installation see <a
+			href="ermineJ-help/html/tutorial/instal.html">this page</a>.</p>
 
 
-		<h3>Contact</h3>
-
-		<p>Contact <A href="mailto:pavlidis@dbmi.columbia.edu">Paul Pavlidis</A>
-		or <A href="mailto:keshav@cu-genome.org">Kiran Keshav</A> with bug
-		reports, feature requests, and questions.</p>
-
-		<h3>Publications using the software or methods</h3>
-
-		<ul>
-			<li><!--StartFragment -->Sibille, E., Arango, V., Galfalvy, H.C.,
-			Pavlidis, P., Ellis, S.P. and Mann, J.J. (2004) Genomic analysis of
-			depression and suicide in human prefrontal cortex.
-			Neuropsychopharmacology 29:351-361 .
-			<li><!--StartFragment -->&nbsp;Pavlidis P., Qin J, Arango V, Mann J,
-			Sibille E. (2004) Using the Gene Ontology for microarray data mining:
-			A comparison of methods and application to age effects in human
-			prefrontal cortex. Neurochemical Research, 29(6) 1213-1222&nbsp;.
-			<li>Pavlidis, P., Qin, J and Sibille E (2003) Statistical analysis of
-			Gene Ontology classes as tools for understanding gene expression
-			changes in the brain. Society for neuroscience Annual Meeting
-			Abstract 758.12. (<a href="neurosci2003.ppt"><font color="#0000ff">download
-			the powerpoint version of the poster</font></a> )
-			<li>Pavlidis, Lewis and Noble, Proceedings of the Pacific Symposium
-			on Biocomputing 7. pp 474-485, 2002. (<a
-				href="/pavlidis/doc/reprints/pavlidis-psb2002.pdf"><font
-				color="#0000ff">Download a reprint</font></a> .</li>
-		</ul>
-
-		<h3>Credits</h3>
-
-		<p>The software was written by Paul Pavlidis, Homin Lee, William
-		Braynen, and Kiran Keshav. Some code is based on an earlier version of
-		the software written by Shahmil Merchant and Edward Chen, based in
-		turn on a Perl implementation by Paul Pavlidis. Our Gene Ontology
-		annotations were obtained through the <a
-			href="http://www.geneontology.org/">Gene Ontology Consortium web site</a>.</p>
 		</td>
 	</tr>
 </table>
