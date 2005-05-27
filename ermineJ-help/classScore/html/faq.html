@@ -53,16 +53,17 @@ would have to be dealt with on a case-by-case basis using considerations
 other that statistical significance.</p>
 
 <p>For a gene set to be considered statistically significant outside the
-context of your data set, a reasonable null hypothesis would yield a
-distribution of p-values in the gene set that is uniform. A uniform
-distribution of p-values is displayed in the<A
-	href="tutorial/visualize.html"> details view</A> of each class. When
-the blue line (your p-values) is far to the right of the expected
-distribution under the null (grey line), you can have higher confidence
-in the importance of that gene set. The reason we do not use this method
-exclusively is that in data sets where many genes have changed, every
-gene set will appear significant. Reasonable interpretation of the
-results requires consideration of both types of analyses.</p>
+context of your data set, one reasonable null hypothesis would yield a
+distribution of p-values in the gene set that is uniform (though this
+assumes the genes are independent). A uniform distribution of p-values
+is displayed in the<A href="tutorial/visualize.html"> details view</A>
+of each class. When the blue line (your p-values) is far to the right of
+the expected distribution under the null (grey line), you can have
+higher confidence in the importance of that gene set. The reason we do
+not use this method exclusively is that in data sets where many genes
+have changed, every gene set will appear significant. Reasonable
+interpretation of the results requires consideration of both types of
+analyses.</p>
 
 <p><strong>Do I input the list of gene scores for the significantly
 changed genes, or all the genes?</strong> All of them. The resampling
