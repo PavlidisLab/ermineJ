@@ -36,12 +36,12 @@ public class StartupDialog extends AppDialog {
     JPanel centerPanel = new JPanel();
     JPanel classPanel = new JPanel();
     JLabel classLabel = new JLabel();
-    JTextField classFile = new JTextField();
+    JTextField classFileTextField = new JTextField();
     JLabel annotFileFormatLabel = new JLabel();
     JButton annotBrowseButton = new JButton();
     JLabel annotLabel = new JLabel();
     JPanel annotPanel = new JPanel();
-    JTextField annotFile = new JTextField();
+    JTextField annotFileTextField = new JTextField();
     JComboBox annotFormat = new JComboBox();
 
     Settings settings;
@@ -78,20 +78,20 @@ public class StartupDialog extends AppDialog {
         annotLabel.setRequestFocusEnabled( true );
         annotLabel.setText( "Probe annotation file:" );
         annotPanel.setPreferredSize( new java.awt.Dimension( 400, 70 ) );
-        annotFile.setPreferredSize( new Dimension( 300, 19 ) );
+        annotFileTextField.setPreferredSize( new Dimension( 300, 19 ) );
         classBrowseButton.addActionListener( new StartupDialog_classBrowseButton_actionAdapter( this ) );
         classBrowseButton.setText( "Browse..." );
         annotPanel.add( annotLabel, null );
-        annotPanel.add( annotFile, null );
+        annotPanel.add( annotFileTextField, null );
         annotPanel.add( annotBrowseButton, null );
         annotPanel.add( annotFileFormatLabel, null );
         annotPanel.add( annotFormat, null );
         classPanel.setPreferredSize( new java.awt.Dimension( 400, 70 ) );
         classLabel.setPreferredSize( new Dimension( 390, 15 ) );
         classLabel.setText( "GO XML file:" );
-        classFile.setPreferredSize( new Dimension( 300, 19 ) );
+        classFileTextField.setPreferredSize( new Dimension( 300, 19 ) );
         classPanel.add( classLabel, null );
-        classPanel.add( classFile, null );
+        classPanel.add( classFileTextField, null );
         classPanel.add( classBrowseButton, null );
         centerPanel.add( classPanel, null );
         centerPanel.setPreferredSize( new java.awt.Dimension( 500, 300 ) );
@@ -115,14 +115,14 @@ public class StartupDialog extends AppDialog {
     }
 
     private void setValues() {
-        classFile.setText( settings.getClassFile() );
-        annotFile.setText( settings.getAnnotFile() );
+        classFileTextField.setText( settings.getClassFile() );
+        annotFileTextField.setText( settings.getAnnotFile() );
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
     }
 
     private void saveValues() {
-        settings.setClassFile( classFile.getText() );
-        settings.setAnnotFile( annotFile.getText() );
+        settings.setClassFile( classFileTextField.getText() );
+        settings.setAnnotFile( annotFileTextField.getText() );
         settings.setAnnotFormat( ( String ) annotFormat.getSelectedItem() );
         try {
             settings.writePrefs();
@@ -137,7 +137,7 @@ public class StartupDialog extends AppDialog {
         chooser.setFileFilter( fileFilter ); // JFileChooser method
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
-            annotFile.setText( chooser.getSelectedFile().toString() );
+            annotFileTextField.setText( chooser.getSelectedFile().toString() );
         }
     }
 
@@ -148,7 +148,7 @@ public class StartupDialog extends AppDialog {
         chooser.setAcceptAllFileFilterUsed( false );
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
-            classFile.setText( chooser.getSelectedFile().toString() );
+            classFileTextField.setText( chooser.getSelectedFile().toString() );
         }
     }
 
@@ -157,15 +157,20 @@ public class StartupDialog extends AppDialog {
     }
 
     protected void actionButton_actionPerformed( ActionEvent e ) {
-        String file = annotFile.getText();
-        File infile = new File( file );
+        String annotFileName = annotFileTextField.getText();
+        String goFileName = classFileTextField.getText();
 
-        if ( file.length() == 0 ) {
+        File annotFile = new File( annotFileName );
+        File goFile = new File( goFileName );
+
+        if ( goFileName.length() == 0 ) {
             GuiUtil.error( "You must enter the Gene Ontology XML file location" );
-        } else if ( infile.length() == 0 ) {
+        } else if ( annotFileName.length() == 0 ) {
             GuiUtil.error( "You must enter the annotation file location for your microarray design" );
-        } else if ( !infile.exists() || !infile.canRead() ) {
-            GuiUtil.error( "Could not find file: " + file );
+        } else if ( !annotFile.exists() || !annotFile.canRead() ) {
+            GuiUtil.error( "Could not read file: " + annotFileName );
+        } else if ( !goFile.exists() || !goFile.canRead() ) {
+            GuiUtil.error( "Could not read file: " + goFileName );
         } else {
             saveValues();
             class runthread extends Thread {
