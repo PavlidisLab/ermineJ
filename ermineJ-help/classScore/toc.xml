@@ -30,6 +30,7 @@ F<?xml version='1.0' encoding='ISO-8859-1'  ?>
 		</tocitem>
 
 		<tocitem text="More information about analysis" expand="true">
+			<tocitem text="Interpreting gene set scores" target="scores" />
 			<tocitem text="Multiple Test Correction" target="mtc" />
 			<tocitem text="How repeated genes are handled"
 				target="reps" />

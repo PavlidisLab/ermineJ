@@ -13,9 +13,14 @@
 <img src="images/logo1small.gif" />
 <h1>Frequently asked questions</h1>
 
-<p><strong>How do I know if a gene set p value is 'significant'</strong></p>
+<p><strong>What is the meaning of the "score" for each gene set?</strong>
+During analysis, each gene set is given a score which, along with the
+size of the gene set, is used to determine the statistical significance
+of the gene set. The meaning of this score depends on the type of
+analysis and is explained <a href="scores.html">here</a>.</p>
 
-<p>One has to consider the problem of multiple testing, but because the
+<p><strong>How do I know if a gene set p value is 'significant'?</strong>
+One has to consider the problem of multiple testing, but because the
 gene sets (Gene Onotology group) overlap, simple methods will be too
 conservative. For this reason we don't recommend using a Bonferroni
 correction, though if a Bonferonni correction yields 'significant'
@@ -35,19 +40,17 @@ threshold of 0.05 (which would not otherwise be reasonable).</p>
 
 <p><STRONG>My data set has no "significant" genes, but when I run
 ermineJ with resampling I get significant gene sets. How do I interpret
-these results?</STRONG></p>
-
-<p>Carefully. ErmineJ's resampling methods are based on analyzing your
-gene expression data in isolation, without reference to any theoretical
-background model (other methods may be added in future versions of
-ermineJ that allow this). It is capable of identifying the most
-interesting gene sets in your data, but this does not necessarily mean
-those gene sets are interesting in general. We recommend using such
-findings as an exploratory method for helping identify potential genes
-of interest, but because no gene is statistically significant on its
-own, the results for any given gene would have to be dealt with on a
-case-by-case basis using considerations other that statistical
-significance.</p>
+these results?</STRONG> Carefully. ErmineJ's resampling methods are
+based on analyzing your gene expression data in isolation, without
+reference to any theoretical background model (other methods may be
+added in future versions of ermineJ that allow this). It is capable of
+identifying the most interesting gene sets in your data, but this does
+not necessarily mean those gene sets are interesting in general. We
+recommend using such findings as an exploratory method for helping
+identify potential genes of interest, but because no gene is
+statistically significant on its own, the results for any given gene
+would have to be dealt with on a case-by-case basis using considerations
+other that statistical significance.</p>
 
 <p>For a gene set to be considered statistically significant outside the
 context of your data set, a reasonable null hypothesis would yield a
@@ -62,82 +65,70 @@ gene set will appear significant. Reasonable interpretation of the
 results requires consideration of both types of analyses.</p>
 
 <p><strong>Do I input the list of gene scores for the significantly
-changed genes, or all the genes?</strong></p>
-
-<p>All of them. The resampling method uses the gene scores for all the
-genes. The built-in overrepresentation analysis will use the threshold
-you set in the gene score threshold parameter to select genes. Note that
-we find that removing unexpressed genes can help the analysis, but it
-isn't required. Note that if your data have been filtered, the output
-panel does not list the actual number of probes or genes in your gene
-sets. See <A href="tutorial/numitems.html">this page</A> &nbsp;for a
-clarification.</p>
+changed genes, or all the genes?</strong> All of them. The resampling
+method uses the gene scores for all the genes. The built-in
+overrepresentation analysis will use the threshold you set in the gene
+score threshold parameter to select genes. Note that we find that
+removing unexpressed genes can help the analysis, but it isn't required.
+Note that if your data have been filtered, the output panel does not
+list the actual number of probes or genes in your gene sets. See <A
+	href="tutorial/numitems.html">this page</A> &nbsp;for a clarification.</p>
 
 <p><strong>How do I find out which genes are in a gene set without doing
-an analysis?</strong></p>
-
-<p>You can use the "View/Modify Gene set" tools, available from the main
-'analysis' menu, or the context-specific pop-up menu on the gene set
-list. See <a href="tutorial/classes.html#viewgeneset">this page</a></p>
+an analysis?</strong> You can use the "View/Modify Gene set" tools,
+available from the main 'analysis' menu, or the context-specific pop-up
+menu on the gene set list. See <a
+	href="tutorial/classes.html#viewgeneset">this page</a></p>
 
 <p><strong>When I open the output file in Notepad it looks like a mess
-of letters and numbers.</strong></p>
-
-<p>The output will not look right when viewed in a text editor or a web
-browser. It will look correct in Excel if you open it as a tab delimited
-file.</p>
+of letters and numbers. How do I view this file?</strong> The output
+will not look right when viewed in a text editor or a web browser. It
+will look correct in Excel if you open it as a tab delimited file.</p>
 
 <p><strong>My excel spreadsheet with my gene scores isn't being accepted
-as input.</strong></p>
-
-<p>You cannot input Excel spreadsheets; you have to save them as text
-first. See <A href="excel-astext.html">this page</A> for details.</p>
+as input.</strong> You cannot input Excel spreadsheets; you have to save
+them as text first. See <A href="excel-astext.html">this page</A> for
+details.</p>
 
 <p><strong>I don't see an annotation file for my microarray. What should
-I do?</strong></p>
-
-<p>Unfortunately we cannot generally create annotations for microarrays
-that are not commonly used. If we identify a commonly used platform, we
-will add it. This means that 'home made' spotted microarrays are not
-supported in most cases. Feel free to let us know if you have a
-microarray design that needs annotations for class scoring. In the
-meantime, you could try to use one of the "Generic" annotation files we
-provide, possibly with the help of your local friendly bioinformatician.</p>
+I do?</strong> Unfortunately we cannot generally create annotations for
+microarrays that are not commonly used. If we identify a commonly used
+platform, we will add it. This means that 'home made' spotted
+microarrays are not supported in most cases. Feel free to let us know if
+you have a microarray design that needs annotations for class scoring.
+In the meantime, you could try to use one of the "Generic" annotation
+files we provide, possibly with the help of your local friendly
+bioinformatician.</p>
 
 <p><strong>When doing an analysis, why did I see a warning "Attempt to
-take the log of a non-positive value"?</strong></p>
-
-<p>If your gene score file contains negative or zero values, and you
-check the "negative log-transform gene scores" box, you will see this
-error. If this concerns you, you should clean up your gene score file.
-If not, ermineJ sets these values to a small number (10<sup>-15</sup> ).</p>
+take the log of a non-positive value"?</strong> If your gene score file
+contains negative or zero values, and you check the "negative
+log-transform gene scores" box, you will see this error. If this
+concerns you, you should clean up your gene score file. If not, ermineJ
+sets these values to a small number (10<sup>-15</sup> ).</p>
 
 <p><strong>When doing an analysis, why did I see a warning "<font
 	color="#2a00ff" size="1"><font color="#000000" size="4">"Some probes in
 your gene score file don't match the ones in the annotation file"</font></font>
-"?</strong></p>
-
-<p>This happens if your gene annotation file isn't the right one for the
-microarray you used (in which case your analysis will not work well),
-but can also happen if your file format isn't quite right. The analysis
-still proceeds when this happens.</p>
+"?</strong> This happens if your gene annotation file isn't the right
+one for the microarray you used (in which case your analysis will not
+work well), but can also happen if your file format isn't quite right.
+The analysis still proceeds when this happens.</p>
 
 <p><strong>When doing an analysis, why did I see a warning"<font
 	color="#2a00ff" size="1"><font color="#000000" size="4">"Non-numeric
 gene scores(s) ( '#NUM!' ) found for input file. These are set to an
-initial value of zero."</font></font> ", or something similar?</strong></p>
-
-<p>This warning appears if the column you selected for your gene score
-file contains non-numeric data. This can happen if you have missing or
+initial value of zero."</font></font> ", or something similar?</strong>
+This warning appears if the column you selected for your gene score file
+contains non-numeric data. This can happen if you have missing or
 invalid values (sometimes appearing as '#NUM!' in Microsoft Excel), but
 can also happen if you have chosen the wrong column in your data.
 Because such values are interpeted as zeros, you should be careful that
 your file contains the data you want. If you want to avoid problems you
 should remove those rows from your file entirely.</p>
 
-<p><strong>The resampling is taking too long, any suggestions?</strong></p>
-
-<p>This problem primarily affects the correlation score analysis in
+<p><strong>The resampling is taking too long, any suggestions?</strong>
+This problem primarily affects the correlation score analysis in
 particular, which is very computationally intensive.</p>
 
 <p>There are few ways to speed things up. One is to <strong>uncheck</strong>
@@ -157,33 +148,30 @@ temporarily setting this to 10000 while you experiment with the other
 settings, and then, once you find a setting you like, you can crank up
 the iterations for the "final" run (for example to 200000, which still
 should not take very long for the gene-score based resampling).</p>
-<P><STRONG>Why do my resampling results vary slightly from run to run?</STRONG></P>
-<P>This happens either when too few iterations are run, or sometimes
-when using the approximation methods. To ensure the highest accuracy,
-set the number of iterations to a larger value (say, 200,000 for gene
-score resampling) and <STRONG>check</STRONG> the <EM>Always use full
+
+
+<P><STRONG>Why do my resampling results vary slightly from run to run?</STRONG>
+This happens either when too few iterations are run, or sometimes when
+using the approximation methods. To ensure the highest accuracy, set the
+number of iterations to a larger value (say, 200,000 for gene score
+resampling) and <STRONG>check</STRONG> the <EM>Always use full
 resampling</EM><FONT size="4">" </FONT><FONT size="3">checkbox in the
 analysis setup wizard.</FONT></P>
 
-<p><strong>What happens to probes that don't have any GO annotations?</strong></p>
-
-<p>They are ignored.</p>
+<p><strong>What happens to probes that don't have any GO annotations?</strong>
+They are ignored.</p>
 
 <p><strong>For resampling analysis of gene scores, how is the gene score
-threshold determined?</strong></p>
+threshold determined?</strong> This is a trick question. There is no
+threshold used. Instead, all genes in a set contribute to the score for
+the gene set. For more details on how this works, see <A
+	href="tutorial/resampling.html">this page</A> .</p>
 
-<p>This is a trick question. There is no threshold used. Instead, all
-genes in a set contribute to the score for the gene set. For more
-details on how this works, see <A href="tutorial/resampling.html">this
-page</A> .</p>
-
-<p><strong>What happens if there are two probes for&nbsp;one gene?</strong></p>
-
-<p>See <A href="tutorial/genereps.html">this page</A> .</p>
+<p><strong>What happens if there are two probes for&nbsp;one gene?</strong>
+See <A href="tutorial/genereps.html">this page</A> .</p>
 
 <p><strong>Why are the number of gene and probes shown in the output
-panel incorrect when my data set has been filtered?</strong></p>
-
-<p>See <A href="tutorial/numitems.html">this page</A>.</p>
+panel incorrect when my data set has been filtered?</strong> See <A
+	href="tutorial/numitems.html">this page</A>.</p>
 </body>
 </html>
