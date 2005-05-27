@@ -68,14 +68,14 @@ Section "ermineJ (required)"
   File /r "$%JAVA_HOME%\jre"
 
   ; If upgrading, might not want to overwrite the old data folder
-  IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
+  IfFileExists "$PROFILE\ermineJ.data" 0 YesOverwrite
 
     MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "You already have an ermineJ data folder. Would you like to overwrite it?" IDNO NoOverwrite
 
     YesOverwrite:
-    SetOutPath "$INSTDIR\ermineJ.data"
+    SetOutPath "$PROFILE\ermineJ.data"
  !include includes.data.nsi
-    CreateDirectory "$INSTDIR\ermineJ.data\genesets"
+    CreateDirectory "$PROFILE\ermineJ.data\genesets"
 
   NoOverwrite:
   
@@ -132,7 +132,9 @@ Section "Uninstall"
   IfFileExists "$INSTDIR\ermineJ.data" 0 YesRemoveDataFolder
   MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "Do you want to remove your ermineJ data folder now too?" IDNO NoRemoveDataFolder
   YesRemoveDataFolder:
-    RMDir /r "$INSTDIR"  ; the data folder is a subdirectory of INSTDIR
+    RMDir /r "$PROFILE\ermineJ.data"
+    Delete "$PROFILE\ermineJ.properties"
+    Delete "$PROFILE\ermineJ.log"
   NoRemoveDataFolder:
   RMDir "$SMPROGRAMS\ermineJ"
 

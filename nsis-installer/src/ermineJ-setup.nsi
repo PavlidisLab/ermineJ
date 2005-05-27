@@ -1,6 +1,6 @@
 ; ermineJ Windows Installer
-; Written by Will Braynen, Paul Pavlidis
-; Copyright (c) 2004  Columbia University
+; Written by Will Braynen, Paul Pavlidis, Kiran Keshav
+; Copyright (c) 2005  Columbia University
 
 
 ;--------------------------------
@@ -64,14 +64,14 @@ Section "ermineJ (required)"
   File "..\..\target\nsis-build\bin\ermineJ.ico"
 
   ; If upgrading, might not want to overwrite the old data folder
-  IfFileExists "$INSTDIR\ermineJ.data" 0 YesOverwrite
+  IfFileExists "$PROFILE\ermineJ.data" 0 YesOverwrite
 
     MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "You already have an ermineJ data folder. Would you like to overwrite it?" IDNO NoOverwrite
 
     YesOverwrite:
-    SetOutPath "$INSTDIR\ermineJ.data"
+	SetOutPath "$PROFILE\ermineJ.data"
     !include includes.data.nsi
-    CreateDirectory "$INSTDIR\ermineJ.data\genesets"
+    CreateDirectory "$PROFILE\ermineJ.data\genesets"
 
   NoOverwrite:
   
@@ -125,10 +125,13 @@ Section "Uninstall"
   RMDir /r "$INSTDIR\jre" ; jre wasn't distributed with this version, but just in case it's left over from another
  
   ; Remove data folder
-  IfFileExists "$INSTDIR\ermineJ.data" 0 YesRemoveDataFolder
+  ;IfFileExists "$INSTDIR\ermineJ.data" 0 YesRemoveDataFolder
+  IfFileExists "$PROFILE\ermineJ.data" 0 YesRemoveDataFolder
   MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 "Do you want to remove your ermineJ data folder now too?" IDNO NoRemoveDataFolder
   YesRemoveDataFolder:
-    RMDir /r "$INSTDIR"  ; the data folder is a subdirectory of INSTDIR
+    RMDir /r "$PROFILE\ermineJ.data"
+    Delete "$PROFILE\ermineJ.properties"
+    Delete "$PROFILE\ermineJ.log"
   NoRemoveDataFolder:
   RMDir "$SMPROGRAMS\ermineJ"
 
