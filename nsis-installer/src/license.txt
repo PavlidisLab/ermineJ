@@ -1,7 +1,7 @@
-Copyright (C) 2004  Columbia University
+Copyright (C) 2005  Columbia University
 microarray.cu-genome.org/ermineJ
 
-Written by Paul Pavlidis, Homin Lee and Will Braynen
+Written by Paul Pavlidis, Homin Lee, Will Braynen, and Kiran Keshav
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2of the License, or (at your option) any later version.
 
