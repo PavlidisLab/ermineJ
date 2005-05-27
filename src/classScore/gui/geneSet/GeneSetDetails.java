@@ -11,13 +11,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import classScore.Settings;
-import classScore.data.GeneScores;
-import classScore.data.GeneSetResult;
-import classScore.gui.GeneSetScoreFrame;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.StatusViewer;
+import classScore.Settings;
+import classScore.data.GeneScores;
+import classScore.data.GeneSetResult;
 
 /**
  * <hr>

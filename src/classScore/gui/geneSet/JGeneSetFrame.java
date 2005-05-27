@@ -40,7 +40,6 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -65,7 +64,6 @@ import baseCode.util.FileTools;
 import baseCode.util.StatusViewer;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
-import classScore.gui.GeneSetScoreFrame;
 
 /**
  * <hr>
@@ -255,7 +253,7 @@ public class JGeneSetFrame extends JFrame {
 
         if ( ( settings.getRawDataFileName() == null || settings.getRawDataFileName().length() == 0 )
                 && settings.getUserSetRawFile() ) {
-            this.switchRawDataFile();
+            this.switchRawDataFile( true );
         }
 
         log.debug( "User set the raw data file? " + settings.getUserSetRawFile() );
@@ -591,12 +589,29 @@ public class JGeneSetFrame extends JFrame {
         menuBar.add( analysisMenu );
     }
 
+    protected void switchRawDataFile() {
+        this.switchRawDataFile( false );
+    }
+
     /**
      * 
      */
-    protected void switchRawDataFile() {
+    protected void switchRawDataFile( boolean showHelp ) {
+
+        if ( showHelp ) {
+            JOptionPane
+                    .showMessageDialog(
+                            this,
+                            "You have requested to view the details of a gene set without first"
+                                    + " setting an expression data file to display.\n After you close this window, you will be prompted to"
+                                    + " choose one if you want, or proceed without selecting one.\n"
+                                    + " You can select or change the data file used"
+                                    + " from the 'Options' menu of the details view.\n", "Selecting a data file",
+                            JOptionPane.INFORMATION_MESSAGE );
+        }
+
         JFileChooser fc = new JFileChooser( settings.getDataDirectory() );
-        fc.setDialogTitle( "Choose a new expression data file to view," + " or cancel to keep the current setting." );
+        fc.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fc.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
