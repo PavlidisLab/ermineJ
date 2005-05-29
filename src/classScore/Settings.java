@@ -13,6 +13,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.PropertyConfigurator;
 
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.FileTools;
@@ -209,6 +210,7 @@ public class Settings {
      * Returns setting values.
      */
     public String getClassFile() {
+        log.debug( "Configured gene set file is " + config.getString( CLASS_FILE ) );
         return config.getString( CLASS_FILE );
 
     }
@@ -586,20 +588,15 @@ public class Settings {
         out.close();
     }
 
-    public void writePrefs() throws IOException {
-        try {
-            log.debug( "Saving configuration" ); // shouldn't need to - autosave is set.
-            config.save();
-        } catch ( ConfigurationException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void writePrefs() throws ConfigurationException {
+        // log.debug( "Saving configuration" );
+        // config.save(); // shouldn't need to - autosave is set.
     }
 
     /**
      * @throws IOException
      */
-    private void createCustomGeneSetDirectory() throws IOException {
+    private void createCustomGeneSetDirectory() {
 
         String customGeneSetDirectoryName = new String( this.getDataDirectory() + System.getProperty( "file.separator" )
                 + "genesets" );
@@ -656,14 +653,27 @@ public class Settings {
 
                 log.info( "Found defaults at " + defaultConfigFileLocation );
                 this.config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
+                File tempLocation = new File( config.getPath() );
+                this.config.save(); // make sure the temporary file exists.
                 File newConfigFile = new File( System.getProperty( "user.home" )
                         + System.getProperty( "file.separator" ) + USERGUI_PROPERTIES );
-                this.config.save( newConfigFile ); // copy over to where they should be.
-                URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
-                log.info( "Saved the new configuration in " + configFileLocation );
+
+                this.config = new PropertiesConfiguration( tempLocation );
+                this.config.setPath( newConfigFile.getAbsolutePath() );
+                // this.config.save( newConfigFile ); // copy over to where they should be.
+                // URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
+                log.info( "Saved the new configuration in " + config.getPath() );
+                if ( !tempLocation.delete() ) {
+                    log.error( "Could not delete temporary configuration file from " + tempLocation.getAbsolutePath()
+                            + ", please delete it manually" );
+                    log.error( tempLocation.getAbsoluteFile() + ": Exists=" + tempLocation.exists() );
+                    log.error( tempLocation.getAbsoluteFile() + ": Can write=" + tempLocation.canWrite() );
+                } else {
+                    log.debug( "Deleted temporary config file from " + tempLocation.getAbsolutePath() );
+                }
 
             } catch ( ConfigurationException e1 ) {
-                e1.printStackTrace();
+                log.error( e1, e1 );
             }
         }
         this.config.setAutoSave( true );

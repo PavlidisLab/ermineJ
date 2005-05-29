@@ -14,6 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.AppDialog;
 import baseCode.gui.GuiUtil;
@@ -32,6 +35,7 @@ import classScore.Settings;
  */
 
 public class StartupDialog extends AppDialog {
+    private static Log log = LogFactory.getLog( StartupDialog.class.getName() );
     JFileChooser chooser;
     JPanel centerPanel = new JPanel();
     JPanel classPanel = new JPanel();
@@ -124,11 +128,11 @@ public class StartupDialog extends AppDialog {
         settings.setClassFile( classFileTextField.getText() );
         settings.setAnnotFile( annotFileTextField.getText() );
         settings.setAnnotFormat( ( String ) annotFormat.getSelectedItem() );
-        try {
-            settings.writePrefs();
-        } catch ( IOException ex ) {
-            GuiUtil.error( "Could not write preferences to a file." );
-        }
+//        try {
+//            settings.writePrefs();
+//        } catch ( org.apache.commons.configuration.ConfigurationException e ) {
+//            GuiUtil.error( "Could not write preferences to a file:" + e );
+//        }
     }
 
     void annotBrowseButton_actionPerformed( ActionEvent e ) {
@@ -172,6 +176,7 @@ public class StartupDialog extends AppDialog {
         } else if ( !goFile.exists() || !goFile.canRead() ) {
             GuiUtil.error( "Could not read file: " + goFileName );
         } else {
+            log.debug( "Saving configuration" );
             saveValues();
             class runthread extends Thread {
                 public void run() {

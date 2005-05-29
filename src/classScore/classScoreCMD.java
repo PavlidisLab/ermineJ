@@ -362,11 +362,11 @@ public class classScoreCMD {
                     showHelp();
             }
         }
-        try {
-            settings.writePrefs();
-        } catch ( IOException ex ) {
-            System.err.print( "Could not write preferences to a file." );
-        }
+        // try {
+        // settings.writePrefs();
+        // } catch ( ConfigurationException ex ) {
+        // System.err.print( "Could not write preferences to a file." );
+        //        }
     }
 
     private void showHelp() {
