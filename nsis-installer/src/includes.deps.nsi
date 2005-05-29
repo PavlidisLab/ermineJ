@@ -11,4 +11,5 @@
   File "..\..\target\nsis-build\lib\commons-logging.jar"
   File "..\..\target\nsis-build\lib\ostermillerutils.jar"
   File "..\..\target\nsis-build\lib\commons-collections.jar"
+  File "..\..\target\nsis-build\lib\log4j.jar"
   
