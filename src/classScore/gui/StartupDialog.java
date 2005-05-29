@@ -119,6 +119,15 @@ public class StartupDialog extends AppDialog {
     }
 
     private void setValues() {
+        if ( settings.getClassFile() == null ) {
+            // see if there is a file available.
+            String testPath = settings.getDataDirectory() + System.getProperty( "file.separator" )
+                    + "go_daily-termdb.rdf-xml.gz"; // FIXME - move this.
+            File testFile = new File( testPath );
+            if ( testFile.exists() && testFile.canRead() && testFile.isFile() && testFile.length() > 0 ) {
+                settings.setClassFile( testPath );
+            }
+        }
         classFileTextField.setText( settings.getClassFile() );
         annotFileTextField.setText( settings.getAnnotFile() );
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
@@ -128,11 +137,11 @@ public class StartupDialog extends AppDialog {
         settings.setClassFile( classFileTextField.getText() );
         settings.setAnnotFile( annotFileTextField.getText() );
         settings.setAnnotFormat( ( String ) annotFormat.getSelectedItem() );
-//        try {
-//            settings.writePrefs();
-//        } catch ( org.apache.commons.configuration.ConfigurationException e ) {
-//            GuiUtil.error( "Could not write preferences to a file:" + e );
-//        }
+        // try {
+        // settings.writePrefs();
+        // } catch ( org.apache.commons.configuration.ConfigurationException e ) {
+        // GuiUtil.error( "Could not write preferences to a file:" + e );
+        // }
     }
 
     void annotBrowseButton_actionPerformed( ActionEvent e ) {
