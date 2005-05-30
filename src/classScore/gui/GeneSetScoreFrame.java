@@ -10,10 +10,6 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -132,7 +128,6 @@ public class GeneSetScoreFrame extends JFrame {
     private GeneSetTreePanel treePanel;
     private Collection userOverwrittenGeneSets;
     JProgressBar progressBar = new JProgressBar();
-    private boolean showingFindDialog = false;
 
     /**
      * @throws IOException
