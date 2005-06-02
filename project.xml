@@ -4,7 +4,7 @@
 	<name>ermineJ</name>
 	<groupId>ermineJ</groupId>
 	<id>ermineJ</id>
-	<currentVersion>2.1</currentVersion>
+	<currentVersion>2.1.1</currentVersion>
 	<organization>
 		<name>Columbia University</name>
 		<url>http://www.columbia.edu</url>
@@ -104,7 +104,7 @@
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>0.2.8</version>
+			<version>0.2.9</version>
 			<type>jar</type>
 			<properties>
 				<jnlp.jar>true</jnlp.jar>
