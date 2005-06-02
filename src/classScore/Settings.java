@@ -598,8 +598,8 @@ public class Settings {
      */
     private void createCustomGeneSetDirectory() {
 
-        String customGeneSetDirectoryName = new String( this.getDataDirectory() + System.getProperty( "file.separator" )
-                + "genesets" );
+        String customGeneSetDirectoryName = new String( this.userHomeDataDirectoryName()
+                + System.getProperty( "file.separator" ) + "genesets" );
 
         if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
             log.info( "Creating custom gene set directory at " + customGeneSetDirectoryName );
@@ -615,15 +615,13 @@ public class Settings {
      * @throws IOException
      */
     private void createDataDirectory() throws IOException {
-        if ( !FileTools.testDir( this.getDataDirectory() ) || this.getDataDirectory() == null
-                || this.getDataDirectory().length() == 0 ) {
-            log.info( "Re-determiming data directory" );
-            String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                    + "ermineJ.data";
+        String dataDirName = userHomeDataDirectoryName();
+        if ( !FileTools.testDir( dataDirName ) ) {
+            log.info( "Creating " + dataDirName );
+
             File dataDirFile = new File( dataDirName );
 
             if ( !dataDirFile.exists() ) {
-                log.info( "Creating " + dataDirName );
                 if ( !new File( dataDirName ).mkdir() ) {
                     throw new IOException( "Could not create a data directory at " + dataDirName );
                 }
@@ -631,6 +629,15 @@ public class Settings {
             this.setDataDirectory( dataDirName );
         }
         log.info( "Data directory is " + this.getDataDirectory() );
+    }
+
+    /**
+     * @return
+     */
+    private String userHomeDataDirectoryName() {
+        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                + "ermineJ.data";
+        return dataDirName;
     }
 
     /**
