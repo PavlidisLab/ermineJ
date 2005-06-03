@@ -54,6 +54,7 @@ import baseCode.util.StatusViewer;
 import classScore.AnalysisThread;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
+import classScore.data.GeneSetResult;
 import classScore.data.UserDefinedGeneSetManager;
 
 /**
@@ -420,9 +421,35 @@ public class GeneSetScoreFrame extends JFrame {
         log.debug( "Starting analysis thread" );
         athread.run();
         log.debug( "Waiting..." );
-        addResult( athread.getLatestResults() );
+        GeneSetPvalRun latestResult = athread.getLatestResults();
+        addResult( latestResult );
         log.debug( "done" );
+        checkForReasonableResults( latestResult );
         enableMenusForAnalysis();
+    }
+
+    /**
+     * 
+     */
+    private void checkForReasonableResults( GeneSetPvalRun results ) {
+        int numZeroPvalues = 0;
+        int numPvalues = results.getResults().size();
+        int numUnityPvalue = 0;
+        for ( Iterator itr = results.getResults().values().iterator(); itr.hasNext(); ) {
+            GeneSetResult result = ( GeneSetResult ) itr.next();
+            double p = result.getPvalue();
+            if ( p == 0 ) {
+                numZeroPvalues++;
+            } else if ( p == 1.0 ) {
+                numUnityPvalue++;
+            }
+        }
+
+        if ( numZeroPvalues == numPvalues || numUnityPvalue == numPvalues ) {
+            GuiUtil.error( "The results indicate that you may need to adjust your\nanalysis settings.\n"
+                    + "For example, make sure your setting for 'larger scores are better' is correct." );
+        }
+
     }
 
     public void updateProgress( int val ) {
