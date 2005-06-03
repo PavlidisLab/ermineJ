@@ -13,7 +13,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.PropertyConfigurator;
 
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.FileTools;
@@ -203,7 +202,7 @@ public class Settings {
      * @return
      */
     public boolean getBigIsBetter() {
-        return config.getBoolean( BIG_IS_BETTER, new Boolean( true ) ).booleanValue();
+        return config.getBoolean( BIG_IS_BETTER, new Boolean( false ) ).booleanValue();
     }
 
     /**
