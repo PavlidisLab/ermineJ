@@ -181,7 +181,7 @@ public class AnalysisThread extends Thread {
                 showError( e.getCause() );
             } else {
                 log.debug( "Cancelled" );
-            }
+            } 
             messenger.showStatus( "Ready" );
             throw new IllegalStateException( e.getCause() );
         } catch ( Exception e ) {
