@@ -35,6 +35,10 @@ public class ResultsFileReader {
             throw new IOException( "Could not read " + filename );
         }
 
+        if ( infile.length() == 0 ) {
+            throw new IOException( "File has zero length" );
+        }
+
         BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( new FileInputStream(
                 filename ) ) ) );
 
