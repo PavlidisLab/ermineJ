@@ -42,6 +42,12 @@ public class ClassScoreSimple {
      * Over-representation analysis.
      */
     public static final int ORA = Settings.ORA;
+
+    /**
+     * Receiver operator characteristic analysis
+     */
+    public static final int ROC = Settings.ROC;
+
     /**
      * Gene score resampling
      */
@@ -122,7 +128,7 @@ public class ClassScoreSimple {
      * @param val either ClassScoreSimple.ORA or ClassScoreSimple.RESAMPLING
      */
     public void setClassScoreMethod( int val ) {
-        if ( val != ORA && val != RESAMPLING )
+        if ( val != ORA && val != RESAMPLING && val != ROC )
             throw new IllegalArgumentException(
                     "Value must be one of ClassScoreSimple.ORA or ClassScoreSimple.RESAMPLING" );
         this.settings.setClassScoreMethod( val );

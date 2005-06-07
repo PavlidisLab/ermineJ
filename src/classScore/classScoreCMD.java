@@ -366,7 +366,7 @@ public class classScoreCMD {
         // settings.writePrefs();
         // } catch ( ConfigurationException ex ) {
         // System.err.print( "Could not write preferences to a file." );
-        //        }
+        // }
     }
 
     private void showHelp() {
@@ -387,10 +387,9 @@ public class classScoreCMD {
                 + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
                 + " (mean above quantile).\n\n" + "\t-n int ...\n" + "\t\tSets the analysis method:  " + Settings.ORA
                 + " (ORA),  " + Settings.RESAMP + " (resampling of gene scores),  " + Settings.CORR
-                + " (profile correlation),  " + Settings.ROC + " (ROC), " + Settings.TTEST + " (T-test), "
-                + Settings.KS + " (Kolmogorov-Smirnov test)" + "[not all methods may be implemented]\n\n"
-                + "\t-o file ...\n" + "\t\tSets the output file.\n\n" + "\t-q int ...\n" + "\t\tSets the quantile.\n\n"
-                + "\t-r file ...\n" + "\t\tSets the raw file to be used.\n\n" + "\t-s file ...\n"
+                + " (profile correlation),  " + Settings.ROC + " (ROC)\n\n" + "\t-o file ...\n"
+                + "\t\tSets the output file.\n\n" + "\t-q int ...\n" + "\t\tSets the quantile.\n\n" + "\t-r file ...\n"
+                + "\t\tSets the raw file to be used.\n\n" + "\t-s file ...\n"
                 + "\t\tSets the score file to be used.\n\n" + "\t-t double ...\n"
                 + "\t\tSets the pvalue threshold.\n\n" + "\t-x maximum class size ...\n"
                 + "\t\tSets the maximum class size.\n\n" + "\t-y minimum class size ...\n"
