@@ -189,11 +189,9 @@ public class AnalysisWizard extends Wizard {
      * 
      */
     private void checkNumSteps() {
-        if ( this.analysisType == Settings.ROC ) {
-            maxSteps = 5;
-        } else {
-            maxSteps = 6;
-        }
+
+        maxSteps = 6;
+
         if ( step == 1 ) {
             this.setTitle( "Create New Analysis - Step 1 of " + maxSteps );
             step1.revalidate();
