@@ -63,10 +63,8 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
         super( settings, geneAnnots, csc, gon );
 
         this.probeToGeneMap = geneAnnots.getProbeToGeneMap();
-        this.probeCorrelData = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData ); // main data
-        // file
+        this.probeCorrelData = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );
         this.geneAnnots = geneAnnots;
-        // this.probeToGeneSetMap = geneAnnots.getProbeToClassMap();
         this.geneSetToProbeMap = geneAnnots.getGeneSetToProbeMap();
 
         this.hist = hist;
@@ -202,8 +200,6 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
             result.setScore( geneSetMeanCorrel );
             result.setPValue( hist.getValue( classSize, geneSetMeanCorrel, true ) ); // always upper tail.
             results.put( geneSetName, result );
-            // log.debug(geneSetName + " " + hist.getValue( classSize, geneSetMeanCorrel ) + " " + classSize +
-            // " " + geneSetMeanCorrel);
             count++;
         }
     }

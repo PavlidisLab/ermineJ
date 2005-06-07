@@ -7,6 +7,7 @@ import java.util.Map;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
+import baseCode.util.StatusViewer;
 import cern.jet.math.Arithmetic;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
@@ -45,7 +46,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
      */
-    public void classPvalGenerator( Map geneToGeneScoreMap, Map probesToPvals ) {
+    public void classPvalGenerator( Map geneToGeneScoreMap, Map probesToPvals, StatusViewer messenger ) {
         Collection entries = geneAnnots.getGeneSetToProbeMap().entrySet(); // go ->
 
         Iterator it = entries.iterator(); // the classes.
@@ -53,13 +54,17 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
         OraPvalGenerator cpv = new OraPvalGenerator( settings, geneAnnots, csc, numOverThreshold, numUnderThreshold,
                 goName, inputSize );
 
-        // For each class.
+        int count = 0;
         while ( it.hasNext() && !isInterrupted() ) {
             Map.Entry e = ( Map.Entry ) it.next();
             String geneSetName = ( String ) e.getKey();
             GeneSetResult res = cpv.classPval( geneSetName, geneToGeneScoreMap, probesToPvals );
             if ( res != null ) {
                 results.put( geneSetName, res );
+            }
+            count++;
+            if ( messenger != null && count % 300 == 0 ) {
+                messenger.showStatus( count + " gene sets analyzed" );
             }
         }
     }

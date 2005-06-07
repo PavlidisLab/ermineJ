@@ -1,15 +1,17 @@
 package classScore.analysis;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.math.ROC;
-import baseCode.math.Rank;
+import baseCode.util.StatusViewer;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
 
@@ -22,7 +24,6 @@ import classScore.data.GeneSetResult;
  * @author Paul Pavlidis
  * @version $Id$
  */
-
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private Map results;
@@ -38,8 +39,8 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
      */
-    public void classPvalGenerator( Map genePvalueMap, Map rankMap ) {
-
+    public void classPvalGenerator( Map genePvalueMap, Map rankMap, StatusViewer messenger ) {
+        int count = 0;
         for ( Iterator iter = geneAnnots.getGeneSetToProbeMap().keySet().iterator(); iter.hasNext(); ) {
             if ( isInterrupted() ) {
                 break;
@@ -49,17 +50,20 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             if ( res != null ) {
                 results.put( className, res );
             }
+            count++;
+            if ( messenger != null && count % 200 == 0 ) {
+                messenger.showStatus( count + " gene sets analyzed" );
+            }
         }
     }
 
     /**
-     * Get results for one class, based on class id. The other arguments are things that are not constant under
-     * permutations of the data.
+     * Get results for one class, based on class id.
      * 
-     * @param class_name a <code>String</code> value
-     * @param probesToPvals a <code>Map</code> value
-     * @param input_rank_map a <code>Map</code> value
-     * @return a <code>classresult</code> value
+     * @param geneSet name of the gene set to be tested.
+     * @param probesToPvals (or genesToPvals, if using weights)
+     * @param rankMap Ranks of all genes (if using weights) or probes.
+     * @return a GeneSetResult
      */
     public GeneSetResult classPval( String geneSet, Map probesToPvals, Map rankMap ) {
 
@@ -71,7 +75,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         // variables for outputs
-        Collection targetRanks = new HashSet();
+        List targetRanks = new ArrayList();
 
         int effSize = ( ( Integer ) effectiveSizes.get( geneSet ) ).intValue(); // effective size of this class.
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
@@ -87,33 +91,33 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         Iterator classit = values.iterator();
-        Object ranking = null;
 
-        // foreach item in the class.
+        boolean invert = settings.getDoLog() && !settings.getBigIsBetter();
+
         while ( classit.hasNext() && !isInterrupted() ) {
 
-            String probe = ( String ) classit.next(); // probe id
+            String probe = ( String ) classit.next(); // probe id OR gene.
 
             if ( probesToPvals.containsKey( probe ) ) {
+                Integer ranking = ( Integer ) rankMap.get( probe );
+                if ( ranking == null ) continue;
 
-                // if ( settings.getUseWeights() ) {
-                // ranking = rankMap.get( geneAnnots.getProbeToGeneMap().get( probe ) );
-                // if ( ranking != null ) {
-                // targetRanks.add( ranking );
-                // }
-                //
-                // } else { // no weights
-                ranking = rankMap.get( probe );
-                if ( ranking != null ) {
-                    targetRanks.add( ranking );
+                int rank = ranking.intValue();
+
+                /* if the values are log-transformed, and bigger is not better, we need to invert the rank */
+                if ( invert ) {
+                    rank = totalSize - rank;
+                    assert rank >= 0;
                 }
-                // }
+
+                targetRanks.add( new Integer( rank + 1 ) ); // make ranks 1-based.
             }
+
         }
 
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );
         double roc_pval = ROC.rocpval( totalSize, targetRanks );
-        // set up the return object.
+
         GeneSetResult res = new GeneSetResult( geneSet, goName.getNameForId( geneSet ), ( ( Integer ) actualSizes
                 .get( geneSet ) ).intValue(), effSize );
         res.setScore( areaUnderROC );

@@ -48,7 +48,6 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
         ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc, goName, hist );
 
-        // For each class.
         for ( Iterator iter = geneAnnots.getGeneSetToProbeMap().keySet().iterator(); iter.hasNext(); ) {
             if ( isInterrupted() ) {
                 break;
@@ -61,8 +60,6 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         }
     }
 
-    /* class_pval_generator */
-
     /**
      * Same thing as class_pval_generator, but returns a collection of scores (pvalues) (see below) instead of adding
      * them to the results object. This is used to get class pvalues for permutation analysis.
@@ -72,7 +69,6 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, csc,
                 goName, hist );
 
-        // For each class.
         for ( Iterator iter = geneAnnots.getGeneSetToProbeMap().keySet().iterator(); iter.hasNext(); ) {
             String className = ( String ) iter.next();
             double pval = cpv.classPvalue( className, group_pval_map, probesToPvals );

@@ -192,7 +192,7 @@ public class GeneSetPvalRun {
                     break;
                 }
 
-                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToPvalMap() );
+                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToPvalMap(), messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 results = pvg.getResults();
                 if ( messenger != null )
@@ -225,12 +225,15 @@ public class GeneSetPvalRun {
             case Settings.ROC: {
                 RocPvalGenerator rpg = new RocPvalGenerator( settings, geneData, csc, goData );
                 Map geneRanksMap;
+                if ( messenger != null ) messenger.showStatus( "Rank transforming" );
                 if ( settings.getUseWeights() ) {
                     geneRanksMap = Rank.rankTransform( geneScores.getGeneToPvalMap() );
-                    rpg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneRanksMap );
+                    if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
+                    rpg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneRanksMap, messenger );
                 } else {
                     geneRanksMap = Rank.rankTransform( geneScores.getProbeToPvalMap() );
-                    rpg.classPvalGenerator( geneScores.getProbeToPvalMap(), geneRanksMap );
+                    if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
+                    rpg.classPvalGenerator( geneScores.getProbeToPvalMap(), geneRanksMap, messenger );
                 }
                 results = rpg.getResults();
                 break;
