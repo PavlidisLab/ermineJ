@@ -586,6 +586,12 @@ public class Settings {
         BufferedWriter out = new BufferedWriter( new FileWriter( fileName ) );
         for ( int i = 0; i < ANALYSIS_SETTINGS.length; i++ ) {
             String propertyName = ANALYSIS_SETTINGS[i];
+
+            if ( config.getProperty( propertyName ) == null ) {
+                log.debug( "No property " + propertyName + ", skipping" );
+                continue;
+            }
+
             out.write( propertyName + " = " );
             out.write( StringEscapeUtils.escapeJava( config.getProperty( propertyName ).toString() ) );
             out.write( "\n" );
