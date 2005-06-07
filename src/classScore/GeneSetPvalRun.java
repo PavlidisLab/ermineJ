@@ -12,6 +12,7 @@ import java.util.Vector;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.math.Rank;
 import baseCode.util.StatusViewer;
 import classScore.analysis.CorrelationsGeneSetPvalSeriesGenerator;
 import classScore.analysis.GeneSetPvalSeriesGenerator;
@@ -21,6 +22,7 @@ import classScore.analysis.NullDistributionGenerator;
 import classScore.analysis.OraGeneSetPvalSeriesGenerator;
 import classScore.analysis.ResamplingCorrelationGeneSetScore;
 import classScore.analysis.ResamplingExperimentGeneSetScore;
+import classScore.analysis.RocPvalGenerator;
 import classScore.data.GeneScores;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
@@ -220,16 +222,18 @@ public class GeneSetPvalRun {
 
                 break;
             }
-            case Settings.ROC: { // todo implement this.
-                // Map input_rank_map;
-                // if ( settings.getUseWeights() ) {
-                // input_rank_map = Rank.rankTransform( geneScores
-                // .getGroupToPvalMap() );
-                // } else {
-                // input_rank_map = Rank.rankTransform( geneScores
-                // .getProbeToPvalMap() );
-                // }
-                // fall through. - unsupported.
+            case Settings.ROC: {
+                RocPvalGenerator rpg = new RocPvalGenerator( settings, geneData, csc, goData );
+                Map geneRanksMap;
+                if ( settings.getUseWeights() ) {
+                    geneRanksMap = Rank.rankTransform( geneScores.getGeneToPvalMap() );
+                    rpg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneRanksMap );
+                } else {
+                    geneRanksMap = Rank.rankTransform( geneScores.getProbeToPvalMap() );
+                    rpg.classPvalGenerator( geneScores.getProbeToPvalMap(), geneRanksMap );
+                }
+                results = rpg.getResults();
+                break;
             }
 
             case Settings.TTEST: { // todo implement this

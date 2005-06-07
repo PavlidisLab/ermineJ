@@ -43,6 +43,14 @@ public class AnalysisThread extends Thread {
     private volatile Method runningMethod;
     private Settings settings;
     private volatile boolean stop = false;
+    private boolean wasError = false;
+
+    /**
+     * @return Returns the wasError.
+     */
+    public boolean isWasError() {
+        return this.wasError;
+    }
 
     /**
      * @return
@@ -134,7 +142,7 @@ public class AnalysisThread extends Thread {
         return doAnalysis( null );
     }
 
-    public synchronized GeneSetPvalRun getLatestResults() {
+    public synchronized GeneSetPvalRun getLatestResults() throws IllegalStateException {
         log.debug( "Status: " + latestResults );
         while ( !stop && this.latestResults == null ) {
             try {
@@ -161,6 +169,7 @@ public class AnalysisThread extends Thread {
 
     public void run() {
         try {
+            this.wasError = false;
             log.debug( "Invoking runner" );
             assert runningMethod != null : "No running method assigned";
             log.debug( "Running method is " + runningMethod.getName() );
@@ -174,9 +183,11 @@ public class AnalysisThread extends Thread {
                 log.debug( "Cancelled" );
             }
             messenger.showStatus( "Ready" );
+            throw new IllegalStateException( e.getCause() );
         } catch ( Exception e ) {
             stop = true;
             showError( e );
+            throw new IllegalStateException( e.getCause() );
         }
     }
 
@@ -327,8 +338,9 @@ public class AnalysisThread extends Thread {
     /**
      * @param e
      */
-    private void showError( Throwable e ) {
+    private synchronized void showError( Throwable e ) {
         log.error( e, e );
+        wasError = true;
         messenger.showError( e );
     }
 

@@ -419,9 +419,22 @@ public class GeneSetScoreFrame extends JFrame {
         this.athread = new AnalysisThread( runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
                 geneScoreSets );
         log.debug( "Starting analysis thread" );
-        athread.run();
+        try {
+            athread.run();
+        } catch ( Exception e ) {
+            GuiUtil
+                    .error( "There was an unexpected error during analysis.\nSee the log file for details.\nThe summary message was:\n"
+                            + e.getMessage() );
+            enableMenusForAnalysis();
+        }
         log.debug( "Waiting..." );
-        GeneSetPvalRun latestResult = athread.getLatestResults();
+        GeneSetPvalRun latestResult = null;
+        // try {
+        latestResult = athread.getLatestResults();
+        // } catch ( Exception e ) {
+        // GuiUtil.error( "There was an unexpected error during analysis. Please view the log file for assistance." );
+        // enableMenusForAnalysis();
+        // }
         addResult( latestResult );
         log.debug( "done" );
         checkForReasonableResults( latestResult );
@@ -431,11 +444,14 @@ public class GeneSetScoreFrame extends JFrame {
     /**
      * 
      */
-    private void checkForReasonableResults( GeneSetPvalRun results ) {
+    private void checkForReasonableResults( GeneSetPvalRun results1 ) {
         int numZeroPvalues = 0;
-        int numPvalues = results.getResults().size();
+        if ( results1 == null || results1.getResults() == null ) {
+            GuiUtil.error( "There was an error during analysis. Please check the logs." );
+        }
+        int numPvalues = results1.getResults().size();
         int numUnityPvalue = 0;
-        for ( Iterator itr = results.getResults().values().iterator(); itr.hasNext(); ) {
+        for ( Iterator itr = results1.getResults().values().iterator(); itr.hasNext(); ) {
             GeneSetResult result = ( GeneSetResult ) itr.next();
             double p = result.getPvalue();
             if ( p == 0 ) {

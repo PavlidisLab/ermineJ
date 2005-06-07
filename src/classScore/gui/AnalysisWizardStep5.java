@@ -47,12 +47,15 @@ public class AnalysisWizardStep5 extends WizardStep {
     private JCheckBox jCheckBoxBigIsBetter;
     private JPanel oraPanel;
     private JPanel resampPanel;
+    private JPanel rocPanel;
     private JPanel corrPanel;
     private JPanel jPanel13;
     private JPanel jPanel16;
     private JPanel subPanel;
 
     JCheckBox jCheckBoxUseEmpirical;
+    private String help;
+    private String extraHelp;
 
     public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
@@ -101,15 +104,19 @@ public class AnalysisWizardStep5 extends WizardStep {
         jCheckBoxDoLog.setSelected( true );
         jCheckBoxDoLog.setText( "Take the negative log of the gene scores" );
 
-        jCheckBoxBigIsBetter.setToolTipText( "If you are loading raw p values, you should not check this box." );
+        jCheckBoxBigIsBetter.setToolTipText( "If you are loading raw p values, you should UNcheck this box." );
         jCheckBoxBigIsBetter.setSelected( false );
         jCheckBoxBigIsBetter.setText( "Larger scores in your gene score file are better." );
+
+        // roc pane
+        rocPanel = new JPanel();
+        rocPanel.setPreferredSize( new Dimension( 335, 150 ) );
+        rocPanel.setBorder( new TitledBorder( "ROC" ) );
 
         // oraPanel stuff//////////////////////////////////////////////////////////
         oraPanel.setPreferredSize( new Dimension( 335, 150 ) );
         oraTitledBorder = new TitledBorder( "ORA" );
         oraPanel.setBorder( oraTitledBorder );
-        jPanelAnalysisFrameMethods.setBackground( SystemColor.control );
         jPanelAnalysisFrameMethods.setBorder( null );
         jPanelAnalysisFrameMethods.setMinimumSize( new Dimension( 150, 37 ) );
         jPanelAnalysisFrameMethods.setPreferredSize( new Dimension( 150, 45 ) );
@@ -133,7 +140,8 @@ public class AnalysisWizardStep5 extends WizardStep {
         jPanelAnalysisFrameMethods.add( jRadioButtonMedian, null );
         step5Panel.add( step4TopPanel, null );
         jPanel15.setMinimumSize( new Dimension( 180, 29 ) );
-        jPanel15.setBackground( SystemColor.control );
+
+        // stuff to set pvalue threshold.
         jLabel6.setLabelFor( jTextFieldPValueThreshold );
         jLabel6.setText( "Gene score threshold" );
         jTextFieldPValueThreshold.setEditable( true );
@@ -209,8 +217,14 @@ public class AnalysisWizardStep5 extends WizardStep {
         corrMetricPanel.add( corrRadioButton1, null );
         corrMetricPanel.add( corrRadioButton2, null );
         // corrPanel.add(corrMetricPanel, null); // @todo disabled because there is no choice of metric.
+        this.addHelp( help );
+        help = "<html><b>Adjust settings specific for your analysis method.</b><br>";
 
-        this.addHelp( "<html><b>Adjust settings specific for your analysis method.</b><br>" + " " );
+        extraHelp = help
+                + "Take special care to ensure the"
+                + " log transformation and 'larger scores are better' settings are correct. 'larger scores are better' refers to your "
+                + " original input file, and should be unchecked if your input is raw p-values.";
+
         this.addMain( step5Panel );
     }
 
@@ -219,15 +233,21 @@ public class AnalysisWizardStep5 extends WizardStep {
             oraPanel.add( jCheckBoxDoLog, null );
             oraPanel.add( jCheckBoxBigIsBetter, null );
             step5Panel.add( oraPanel, null );
+            this.addHelp( extraHelp );
         } else if ( analysisType == Settings.RESAMP ) {
             resampPanel.add( jCheckBoxDoLog, null );
             resampPanel.add( jCheckBoxBigIsBetter, null );
             resampPanel.add( subPanel, null );
-
+            this.addHelp( extraHelp );
             step5Panel.add( resampPanel, null );
+        } else if ( analysisType == Settings.ROC ) {
+            rocPanel.add( jCheckBoxDoLog, null );
+            rocPanel.add( jCheckBoxBigIsBetter, null );
+            this.addHelp( extraHelp );
+            step5Panel.add( rocPanel, null );
         } else if ( analysisType == Settings.CORR ) {
             corrPanel.add( subPanel, null );
-
+            this.addHelp( help );
             step5Panel.add( corrPanel, null );
         }
     }
@@ -241,6 +261,8 @@ public class AnalysisWizardStep5 extends WizardStep {
         } else if ( analysisType == Settings.CORR ) {
             corrPanel.remove( subPanel );
             step5Panel.remove( corrPanel );
+        } else if ( analysisType == Settings.ROC ) {
+            step5Panel.remove( rocPanel );
         }
     }
 

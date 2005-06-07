@@ -90,7 +90,7 @@ public class MultipleTestCorrector {
 
             // double thresh = fdr * n / numclasses;
 
-            double thisFDR = actual_p * numclasses / n;
+            double thisFDR = Math.min( actual_p * numclasses / n, 1.0 );
 
             // the actual fdr at this threshold is n / (actual_p * numclasses).
             res.setCorrectedPvalue( thisFDR ); // todo this is slightly broken when there are tied pvals.

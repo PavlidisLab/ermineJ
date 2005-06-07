@@ -166,7 +166,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
         this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
         if ( classMaxSize < classMinSize ) {
-            throw new IllegalArgumentException( "Error:The maximum class size is smaller than the minimum." );
+            throw new IllegalArgumentException( "The maximum class size is smaller than the minimum." );
         }
 
         this.numClasses = classMaxSize - classMinSize + 1;
@@ -294,7 +294,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
         if ( histogramMax <= histogramMin ) {
             throw new IllegalStateException( "Histogram has no range (max " + histogramMax + " <= min " + histogramMin
-                    + ")" );
+                    + ")\nMake sure 'larger scores are better' is set correctly." );
         }
     }
 

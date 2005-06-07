@@ -9,7 +9,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -61,6 +64,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
+        acHash = new HashMap();
         makeLeftTable();
         makeRightTable();
     }
@@ -142,28 +146,29 @@ public class AnalysisWizardStep3 extends WizardStep {
         int[] rows = customClassTable.getSelectedRows();
         for ( int i = 0; i < n; i++ ) {
             String id = ( String ) customClassTable.getValueAt( rows[i], 0 );
-            if ( id != null ) {
-                Map cfi = ( Map ) ccHash.get( id );
-                if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
-                    addedClasses.add( cfi );
-                    acHash.put( cfi.get( "id" ), cfi );
-                }
-            }
+            addClasstoSelected( id );
         }
         acTableModel.fireTableDataChanged();
         updateCountLabel();
     }
 
+    /**
+     * @param id
+     */
+    private void addClasstoSelected( String id ) {
+        if ( id != null ) {
+            Map cfi = ( Map ) ccHash.get( id );
+            if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
+                addedClasses.add( cfi );
+                acHash.put( cfi.get( "id" ), cfi );
+            }
+        }
+    }
+
     void addAllButton_actionPerformed( ActionEvent e ) {
         for ( int i = 0; i < ccTableModel.getRowCount(); i++ ) {
             String id = ( String ) customClassTable.getValueAt( i, 0 );
-            if ( id != null ) {
-                Map cfi = ( Map ) ccHash.get( id );
-                if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
-                    addedClasses.add( cfi );
-                    acHash.put( cfi.get( "id" ), cfi );
-                }
-            }
+            addClasstoSelected( id );
         }
         acTableModel.fireTableDataChanged();
         updateCountLabel();
@@ -174,7 +179,6 @@ public class AnalysisWizardStep3 extends WizardStep {
         int[] rows = addedClassTable.getSelectedRows();
         for ( int i = 0; i < n; i++ ) {
             String id = ( String ) addedClassTable.getValueAt( rows[i] - i, 0 );
-            System.err.println( id );
             if ( id != null ) {
                 HashMap cfi = ( HashMap ) ccHash.get( id );
                 acHash.remove( cfi.get( "id" ) );
@@ -212,7 +216,6 @@ public class AnalysisWizardStep3 extends WizardStep {
             ccTableModel = customClasses.toTableModel();
             customClassTable.setModel( ccTableModel );
         } else {
-            // TODO it should make the folder.
             GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
         }
     }
@@ -221,12 +224,35 @@ public class AnalysisWizardStep3 extends WizardStep {
         addedClasses = new AnalysisWizardStep3_CustomClassList();
         acTableModel = addedClasses.toTableModel();
         addedClassTable.setModel( acTableModel );
-        acHash = new HashMap();
+        setValues();
     }
 
     public ArrayList getAddedClasses() {
         return addedClasses;
     }
+
+    /**
+     * 
+     */
+    private void setValues() {
+        if ( settings.getSelectedCustomGeneSets() != null && settings.getSelectedCustomGeneSets().size() > 0 ) {
+            Collection selectedCustomClasses = settings.getSelectedCustomGeneSets();
+            for ( Iterator iter = selectedCustomClasses.iterator(); iter.hasNext(); ) {
+                String geneSet = ( String ) iter.next();
+                log.debug( "Adding " + geneSet );
+                this.addClasstoSelected( geneSet );
+
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    public void saveValues() {
+        settings.setSelectedCustomGeneSets( acHash.keySet() );
+    }
+
 }
 
 class AnalysisWizardStep3_delete_actionPerformed_actionAdapter implements java.awt.event.ActionListener {

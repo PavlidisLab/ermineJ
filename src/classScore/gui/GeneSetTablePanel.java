@@ -263,6 +263,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
         } else if ( runSettings.getClassScoreMethod() == Settings.CORR ) {
             tooltip += "Correlation Analysis<br>";
             coda += runSettings.getIterations() + " iterations";
+        } else if ( runSettings.getClassScoreMethod() == Settings.ROC ) {
+            tooltip += "ROC Analysis<br>";
         }
 
         tooltip += new String( "Max set size: " + runSettings.getMaxClassSize() + "<br>" + "Min set size: "

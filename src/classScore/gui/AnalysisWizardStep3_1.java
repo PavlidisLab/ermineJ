@@ -36,12 +36,7 @@ public class AnalysisWizardStep3_1 extends WizardStep {
     public AnalysisWizardStep3_1( AnalysisWizard wizard, Settings settings ) {
         super( wizard );
         this.settings = settings;
-        try {
-            this.jbInit();
-        } catch ( Exception e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        this.jbInit();
         wizard.clearStatus();
         setValues();
     }
@@ -58,7 +53,7 @@ public class AnalysisWizardStep3_1 extends WizardStep {
     /**
      * 
      */
-    public void saveValue() {
+    public void saveValues() {
         settings.setUseBiologicalProcess( this.biologicalProcessButton.isSelected() );
         settings.setUseCellularComponent( this.cellularComponentButton.isSelected() );
         settings.setUseMolecularFunction( this.molecularFunctionButton.isSelected() );
@@ -69,7 +64,7 @@ public class AnalysisWizardStep3_1 extends WizardStep {
      * 
      * @see baseCode.gui.WizardStep#jbInit()
      */
-    protected void jbInit() throws Exception {
+    protected void jbInit() {
         JPanel step1Panel = new JPanel();
         JPanel jPanel4 = new JPanel();
         JLabel jLabel8 = new JLabel();
@@ -92,34 +87,25 @@ public class AnalysisWizardStep3_1 extends WizardStep {
         biologicalProcessButton.setText( "Biological Process" );
         biologicalProcessButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
         biologicalProcessButton.setPreferredSize( new Dimension( 140, 17 ) );
-        // biologicalProcessButton
-        // .addActionListener( new AnalysisWizardStep31_biologicalProcessButton_actionAdapter( this ) );
-        // buttonGroup1.add( biologicalProcessButton );
+
         jPanel5.add( biologicalProcessButton, null );
         molecularFunctionButton.setText( "Molecular Function" );
         molecularFunctionButton.setSelected( true );
         molecularFunctionButton.setPreferredSize( new Dimension( 140, 17 ) );
         molecularFunctionButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
-        // molecularFunctionButton
-        // .addActionListener( new AnalysisWizardStep1_molecularFunctionButton_actionAdapter( this ) );
-        // buttonGroup1.add( molecularFunctionButton );
+
         jPanel5.add( molecularFunctionButton, null );
         cellularComponentButton.setText( "Cellular Component" );
         cellularComponentButton.setPreferredSize( new Dimension( 140, 17 ) );
         cellularComponentButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
-        // cellularComponentButton
-        // .addActionListener( new AnalysisWizardStep1_cellularComponentButton_actionAdapter( this ) );
-        // buttonGroup1.add( cellularComponentButton );
+
         jPanel5.add( cellularComponentButton, null );
         jPanel4.add( jPanel5, null );
         jPanel12.setPreferredSize( new Dimension( 210, 80 ) );
-        // jLabel9.setText( " Biological Process" );
         jLabel9.setPreferredSize( new Dimension( 200, 17 ) );
         jPanel12.add( jLabel9, null );
-        // jLabel4.setText( " Molecular Function" );
         jLabel4.setPreferredSize( new Dimension( 200, 17 ) );
         jPanel12.add( jLabel4, null );
-        // jLabel5.setText( " Cellular Component" );
         jLabel5.setPreferredSize( new Dimension( 200, 17 ) );
         jPanel12.add( jLabel5, null );
         jPanel4.add( jPanel12, null );

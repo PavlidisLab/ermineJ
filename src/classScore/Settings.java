@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
@@ -70,9 +72,8 @@ public class Settings {
     private static final String RAW_FILE = "rawFile";
     private static final String RAW_SCORE_METHOD = "rawScoreMethod";
     private static final String SCORE_COL = "scoreCol";
-
     private static final String SCORE_FILE = "scoreFile";
-
+    private static final String SELECTED_CUSTOM_GENESETS = "selectedCustomGeneSets";
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
      */
@@ -209,9 +210,7 @@ public class Settings {
      * Returns setting values.
      */
     public String getClassFile() {
-        log.debug( "Configured gene set file is " + config.getString( CLASS_FILE ) );
         return config.getString( CLASS_FILE );
-
     }
 
     public int getClassScoreMethod() {
@@ -351,6 +350,10 @@ public class Settings {
     public boolean getUseBiologicalProcess() {
         return config.getBoolean( "useBiologicalProcess", new Boolean( true ) ).booleanValue();
 
+    }
+
+    public Collection getSelectedCustomGeneSets() {
+        return config.getList( SELECTED_CUSTOM_GENESETS, null );
     }
 
     /**
@@ -524,6 +527,10 @@ public class Settings {
         this.config.setProperty( IS_TESTER, new Boolean( isTester ) );
     }
 
+    public void setSelectedCustomGeneSets( Collection selectedSets ) {
+        this.config.setProperty( SELECTED_CUSTOM_GENESETS, selectedSets );
+    }
+
     /**
      * @param useBiologicalProcess The useBiologicalProcess to set.
      */
@@ -625,8 +632,8 @@ public class Settings {
                     throw new IOException( "Could not create a data directory at " + dataDirName );
                 }
             }
-            this.setDataDirectory( dataDirName );
         }
+        this.setDataDirectory( dataDirName );
         log.info( "Data directory is " + this.getDataDirectory() );
     }
 
