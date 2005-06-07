@@ -13,17 +13,22 @@
 
 <p>Version 2.1.2. Changes include:
 <ul>
-	<li>Issue 204: default for "Larger scores are better" should be
+	<li>New Feature: Receiver operator characteristic (ROC) method now
+	available from all interfaces.</li>
+	<li>Fixed Issue 210: Failure to save results files for some situations.
+	
+	<li>Fixed Issue 204: default for "Larger scores are better" should be
 	'false'.</li>
 	<li>After an analysis, the results are checked for "reasonableness". If
 	they are not, the user is advised to check the validity of the analysis
-	settings. Unreasonable results means p-values that are all zero, for
+	settings. Unreasonable results would be p-values that are all zero, for
 	example.</li>
+	<li>Inconsistent behavior of "next" and "back" buttons in Analysis
+	Wizard fixed.</li>
+	<li>Errors during analysis now result in less silent death.</li>
+	<li>Some other minor issues resolved.</li>
 </ul>
 </p>
-
-<h3>Older versions</h3>
-
 
 <p>Version 2.1.1. Fixes bugs which caused incorrect parsing of gene
 descriptions and resulted in multiple custom gene set directories. All
