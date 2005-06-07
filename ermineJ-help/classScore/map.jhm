@@ -38,5 +38,6 @@
     <mapID target="api" url="html/tutorial/Api.html"/>
     <mapID target="cli" url="html/tutorial/cli.html"/>
     <mapID target="scores" url="html/tutorial/scores.html"/>
+    <mapID target="roc" url="html/tutorial/roc.html" />
 </map>
 

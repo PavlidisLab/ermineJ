@@ -13,9 +13,11 @@ F<?xml version='1.0' encoding='ISO-8859-1'  ?>
 			<tocitem text="Analysis" target="analysis" />
 
 			<tocitem text="Analysis methods" expand="true">
-				<tocitem text="ORA" target="ora" />
+				<tocitem text="ORA (over-representation)" target="ora" />
 				<tocitem text="Gene score resampling"
 					target="resampling" />
+				<tocitem text="ROC (receiver operator characteristic)"
+					target="roc" />
 				<tocitem text="Correlation" target="correlation" />
 
 			</tocitem>
@@ -30,7 +32,8 @@ F<?xml version='1.0' encoding='ISO-8859-1'  ?>
 		</tocitem>
 
 		<tocitem text="More information about analysis" expand="true">
-			<tocitem text="Interpreting gene set scores" target="scores" />
+			<tocitem text="Interpreting gene set scores"
+				target="scores" />
 			<tocitem text="Multiple Test Correction" target="mtc" />
 			<tocitem text="How repeated genes are handled"
 				target="reps" />
