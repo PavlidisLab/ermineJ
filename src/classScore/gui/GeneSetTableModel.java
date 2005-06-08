@@ -124,10 +124,12 @@ public class GeneSetTableModel extends AbstractTableModel {
                 case 0: {
                     List cid_vec = new Vector();
                     cid_vec.add( classid );
+                    assert goData != null;
                     if ( goData.isUserDefined( classid ) ) cid_vec.add( "M" );
                     return cid_vec;
                 }
                 case 1:
+                    assert goData != null;
                     return goData.getNameForId( classid );
                 case 2:
                     return new Integer( geneData.numProbesInGeneSet( classid ) );
@@ -177,7 +179,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
     /**
      * 
      */
-    private static final int MAX_DEFINITION_LENGTH = 200;
+
     private static Log log = LogFactory.getLog( OutputPanelTableCellRenderer.class.getName() );
     private Format nf = new Format( "%.4g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
@@ -238,7 +240,6 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         // set tool tips
         if ( value != null ) {
             String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
-            // String classid = ( String ) table.getValueAt( row, 0 );
 
             if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
                 GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
@@ -252,10 +253,12 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             } else if ( column == 1 || column == 0 ) {
                 String aspect = goData.getAspectForId( classid );
                 String definition = goData.getDefinitionForId( classid );
-                setToolTipText( "<html>Aspect: " + aspect + "<br>Definition: "
+                setToolTipText( "<html>Aspect: "
+                        + aspect
+                        + "<br>Definition: "
                         + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(),
-                                MAX_DEFINITION_LENGTH ) ), TOOLTIP_LINELEN, "<br>" )
-                        + ( definition.length() > MAX_DEFINITION_LENGTH ? "..." : "" ) );
+                                GeneSetPanel.MAX_DEFINITION_LENGTH ) ), TOOLTIP_LINELEN, "<br>" )
+                        + ( definition.length() > GeneSetPanel.MAX_DEFINITION_LENGTH ? "..." : "" ) );
             }
 
         } else {

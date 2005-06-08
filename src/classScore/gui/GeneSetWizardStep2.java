@@ -1,12 +1,15 @@
 package classScore.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +31,7 @@ import baseCode.gui.table.TableSorter;
 import classScore.data.UserDefinedGeneSetManager;
 
 /**
+ * Step to add/remove probes/genes from a gene set.
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University
@@ -62,8 +66,6 @@ public class GeneSetWizardStep2 extends WizardStep {
     // Component initialization
     protected void jbInit() {
         this.setLayout( new BorderLayout() );
-        JPanel step2Panel;
-
         JPanel topPanel = new JPanel();
         // countLabel = new JLabel();
         JLabel jLabel1 = new JLabel();
@@ -73,25 +75,43 @@ public class GeneSetWizardStep2 extends WizardStep {
         jLabel2.setPreferredSize( new Dimension( 250, 15 ) );
         jLabel2.setText( "Gene set members" );
         showStatus( "Number of Probes selected: 0" );
-        // topPanel.add( countLabel );
         topPanel.add( jLabel1, null );
         topPanel.add( jLabel2, null );
 
-        step2Panel = new JPanel();
+        final JPanel step2Panel = new JPanel();
         step2Panel.setLayout( new BorderLayout() );
 
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout( new GridLayout() );
-        JScrollPane probeScrollPane;
-        JScrollPane newClassScrollPane;
+
         probeTable = new JTable();
         probeTable.getTableHeader().setReorderingAllowed( false );
-        probeScrollPane = new JScrollPane( probeTable );
+        probeTable.getTableHeader().addMouseListener( new MouseAdapter() {
+            public void mouseEntered( MouseEvent e ) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+            }
+
+            public void mouseExited( MouseEvent e ) {
+                setCursor( Cursor.getDefaultCursor() );
+            }
+        } );
+        JScrollPane probeScrollPane = new JScrollPane( probeTable );
         probeScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
+
         newClassTable = new JTable();
         newClassTable.getTableHeader().setReorderingAllowed( false );
-        newClassScrollPane = new JScrollPane( newClassTable );
+        newClassTable.getTableHeader().addMouseListener( new MouseAdapter() {
+            public void mouseEntered( MouseEvent e ) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+            }
+
+            public void mouseExited( MouseEvent e ) {
+                setCursor( Cursor.getDefaultCursor() );
+            }
+        } );
+        JScrollPane newClassScrollPane = new JScrollPane( newClassTable );
         newClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
+
         centerPanel.add( probeScrollPane, null );
         centerPanel.add( newClassScrollPane, null );
 
@@ -116,7 +136,6 @@ public class GeneSetWizardStep2 extends WizardStep {
         deleteButton.addActionListener( new GeneSetWizardStep2_delete_actionPerformed_actionAdapter( this ) );
 
         bottomPanel.add( searchButton );
-        // bottomPanel.add(searchLabel, null);
         bottomPanel.add( searchTextField );
         bottomPanel.add( addButton, null );
         bottomPanel.add( deleteButton, null );
@@ -142,9 +161,8 @@ public class GeneSetWizardStep2 extends WizardStep {
     }
 
     void delete_actionPerformed( ActionEvent e ) {
-        int n = newClassTable.getSelectedRowCount();
         int[] rows = newClassTable.getSelectedRows();
-        for ( int i = 0; i < n; i++ ) {
+        for ( int i = 0; i < rows.length; i++ ) {
             Object probe = newClassTable.getValueAt( rows[i] - i, 0 );
             log.debug( "Removing " + probe );
             newGeneSet.getProbes().remove( probe );
@@ -154,15 +172,14 @@ public class GeneSetWizardStep2 extends WizardStep {
     }
 
     void addButton_actionPerformed( ActionEvent e ) {
-        int n = probeTable.getSelectedRowCount();
         int[] rows = probeTable.getSelectedRows();
-        for ( int i = 0; i < n; i++ ) {
+        for ( int i = 0; i < rows.length; i++ ) {
             String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
             log.debug( "Got probe: " + probe );
             String newGene;
             if ( ( newGene = geneData.getProbeGeneName( probe ) ) != null ) {
                 log.debug( "Adding " + newGene );
-                addGene( newGene );
+                this.addGene( newGene );
             }
         }
         Set noDupes = new HashSet( newGeneSet.getProbes() );
@@ -176,7 +193,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         String newProbe = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
         String newGene;
         if ( ( newGene = geneData.getProbeGeneName( newProbe ) ) != null ) {
-            addGene( newGene );
+            this.addGene( newGene );
         } else {
             showError( "Probe " + newProbe + " does not exist." );
         }
@@ -184,19 +201,28 @@ public class GeneSetWizardStep2 extends WizardStep {
 
     void editorGene_actionPerformed( ChangeEvent e ) {
         String newGene = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
-        addGene( newGene );
+        this.addGene( newGene );
     }
 
+    /**
+     * @param gene
+     */
     void addGene( String gene ) {
         Collection probelist = geneData.getGeneProbeList( gene );
-        if ( probelist != null ) {
-            log.debug( "Got " + probelist.size() + " new probes to add" );
-            newGeneSet.getProbes().addAll( probelist );
-            ncTableModel.fireTableDataChanged();
-            updateCountLabel();
-        } else {
+        if ( probelist == null ) {
             showError( "Gene " + gene + " does not exist." );
+            return;
         }
+
+        if ( probelist.size() == 0 ) {
+            showError( "No probes for gene " + gene );
+            return;
+        }
+
+        log.debug( "Got " + probelist.size() + " new probes to add" );
+        newGeneSet.getProbes().addAll( probelist );
+        ncTableModel.fireTableDataChanged();
+        updateCountLabel();
     }
 
     public void updateCountLabel() {
@@ -211,6 +237,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         probeTable.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
         probeTable.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
         probeTable.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
+        probeTable.revalidate();
 
         ncTableModel = newGeneSet.toTableModel( false );
         TableSorter anotherSorter = new TableSorter( ncTableModel );
@@ -218,7 +245,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         anotherSorter.setTableHeader( newClassTable.getTableHeader() );
         newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
         newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
-
+        newClassTable.revalidate();
         showStatus( "Available probes: " + geneData.selectedProbes() );
     }
 

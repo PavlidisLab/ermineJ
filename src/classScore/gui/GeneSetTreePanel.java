@@ -70,6 +70,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @see classScore.gui.GeneSetsResultsScrollPane#addedNewGeneSet()
      */
     public void addedNewGeneSet() {
+        log.debug( "no-op" );
     }
 
     /*
@@ -431,8 +432,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
      */
-    protected String deleteOrResetGeneSet( String classID ) {
-        String action = super.deleteOrResetGeneSet( classID );
+    protected String deleteAndResetGeneSet( String classID ) {
+        String action = super.deleteAndResetGeneSet( classID );
         if ( action == GeneSetPanel.DELETED ) {
             this.removeNode( classID );
         } else if ( action.equals( GeneSetPanel.RESTORED ) ) {
@@ -448,6 +449,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param desc
      */
     public void addNode( String id, String desc ) {
+
+        /* already exists, don't add it */
+        if ( this.findByGeneSetId( id ) != null ) {
+            return;
+        }
+
         DirectedGraphNode newNode = new DirectedGraphNode( id, new GOEntry( id, desc, desc, "No aspect defined" ),
                 goData.getGraph() );
         GeneSetTreeNode newTreeNode = new GeneSetTreeNode( newNode );
@@ -457,23 +464,19 @@ public class GeneSetTreePanel extends GeneSetPanel {
         goTree.revalidate();
     }
 
-    public void deleteNode( String id ) {
-        assert id != null;
-        GeneSetTreeNode node = ( GeneSetTreeNode ) this.findByGeneSetId( id ).getLastPathComponent();
-        if ( node.getChildCount() != 0 ) {
-            throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
-        }
-        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( node );
-    }
-
     public void removeNode( String id ) {
         assert id != null;
         log.debug( "Removing tree node " + id );
         TreePath path = this.findByGeneSetId( id );
-        if ( path == null ) return;
-        GeneSetTreeNode gstn = ( GeneSetTreeNode ) path.getLastPathComponent();
-        if ( gstn == null ) return;
-        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( gstn );
+        if ( path == null ) {
+            log.debug( "No node for " + id );
+            return;
+        }
+        GeneSetTreeNode node = ( GeneSetTreeNode ) path.getLastPathComponent();
+        if ( node.getChildCount() != 0 ) {
+            throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
+        }
+        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( node );
     }
 
     private GeneSetTreeNode getUserNode() {
@@ -508,10 +511,10 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     private int currentlySelectedResultSet = -1;
     private GeneAnnotations geneData;
     private final GONames goData;
-    private Icon goodChildIcon;
-    private Icon regularIcon;
-    private Icon goodPvalueIcon;
-    private Icon goodPvalueGoodChildIcon;
+    private final Icon goodChildIcon = new ImageIcon( this.getClass().getResource( GOOD_CHILD_ICON ) );
+    private final Icon regularIcon = new ImageIcon( this.getClass().getResource( REGULAR_ICON ) );
+    private final Icon goodPvalueIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_ICON ) );
+    private final Icon goodPvalueGoodChildIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_GOODCHILD_ICON ) );
     private Font italic = new Font( "SansSerif", Font.ITALIC, 11 );
     private Format nf = new Format( "%.3g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
@@ -526,10 +529,6 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         this.goData = goData;
         this.geneData = geneData;
         nff.setMaximumFractionDigits( 4 );
-        this.regularIcon = new ImageIcon( this.getClass().getResource( REGULAR_ICON ) );
-        this.goodChildIcon = new ImageIcon( this.getClass().getResource( GOOD_CHILD_ICON ) );
-        this.goodPvalueIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_ICON ) );
-        goodPvalueGoodChildIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_GOODCHILD_ICON ) );
         this.setOpenIcon( regularIcon );
         this.setLeafIcon( regularIcon );
         this.setClosedIcon( regularIcon );
@@ -593,7 +592,8 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         String aspect = goData.getAspectForId( id );
         String definition = goData.getDefinitionForId( id );
         setToolTipText( "<html>Aspect: " + aspect + "<br>Definition: "
-                + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br>" ) );
+                + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br>" )
+                + ( definition.length() > GeneSetPanel.MAX_DEFINITION_LENGTH ? "..." : "" ) );
     }
 
     /**

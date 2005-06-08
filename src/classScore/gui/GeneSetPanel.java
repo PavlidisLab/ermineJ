@@ -52,6 +52,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     public static final String NOACTION = "NOACTION";
     public static final String RESTORED = "RESTORED";
     public static final String DELETED = "DELETED";
+    public static final int MAX_DEFINITION_LENGTH = 200;
 
     public GeneSetPanel( Settings settings, List results, GeneSetScoreFrame callingFrame ) {
         this.settings = settings;
@@ -136,28 +137,40 @@ public abstract class GeneSetPanel extends JScrollPane {
      * @param classID
      * @return
      */
-    protected String deleteOrResetGeneSet( String classID ) {
+    protected String deleteAndResetGeneSet( String classID ) {
         if ( classID == null ) return NOACTION;
         if ( !goData.isUserDefined( classID ) ) return NOACTION;
 
         if ( callingFrame.userOverWrote( classID ) ) {
             int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to restore the original \""
-                    + classID + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
+                    + classID + "\" and delete the file?", "Confirm", JOptionPane.YES_NO_OPTION );
             if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
             geneData.restoreGeneSet( classID );
             goData.resetGeneSet( classID );
             callingFrame.restoreUserGeneSet( classID );
-            return RESTORED;
+            callingFrame.deleteUserGeneSetFile( classID );
+            return DELETED;
         }
         // else
         int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to delete \"" + classID + "\"?",
                 "Confirm", JOptionPane.YES_NO_OPTION );
-
         if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
         geneData.removeClassFromMaps( classID );
         goData.deleteGeneSet( classID );
         callingFrame.deleteUserGeneSet( classID );
         return DELETED;
+    }
+
+    protected String resetGeneSet( String classID ) {
+        if ( classID == null ) return NOACTION;
+        if ( !goData.isUserDefined( classID ) ) return NOACTION;
+        int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to restore the original \"" + classID
+                + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
+        if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
+        geneData.restoreGeneSet( classID );
+        goData.resetGeneSet( classID );
+        callingFrame.restoreUserGeneSet( classID );
+        return RESTORED;
     }
 
     protected MouseListener configurePopupMenu() {
@@ -167,19 +180,31 @@ public abstract class GeneSetPanel extends JScrollPane {
         final JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
         htmlMenuItem.addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
 
-        final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
+        final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" ); // reset and always delete
+        // user version.
         deleteGeneSetMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
                 String classID = null;
                 classID = sourcePopup.getSelectedItem();
-                deleteOrResetGeneSet( classID );
+                deleteAndResetGeneSet( classID );
+            }
+        } );
+
+        final JMenuItem restoreGeneSetMenuItem = new JMenuItem( "Reset this gene set" ); // reset without deleting.
+        restoreGeneSetMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+                String classID = null;
+                classID = sourcePopup.getSelectedItem();
+                resetGeneSet( classID );
             }
         } );
 
         popup.add( htmlMenuItem );
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
+        popup.add( restoreGeneSetMenuItem );
 
         MouseListener popupListener = new MouseAdapter() {
             public void mousePressed( MouseEvent e ) {
@@ -200,9 +225,11 @@ public abstract class GeneSetPanel extends JScrollPane {
                     }
 
                     if ( callingFrame.userOverWrote( classID ) ) {
-                        deleteGeneSetMenuItem.setText( "Reset this gene set" );
+                        deleteGeneSetMenuItem.setText( "Reset and delete customized version" );
+                        restoreGeneSetMenuItem.setEnabled( true );
                     } else {
                         deleteGeneSetMenuItem.setText( "Delete this gene set" );
+                        restoreGeneSetMenuItem.setEnabled( false );
                     }
 
                     popup.show( e.getComponent(), e.getX(), e.getY() );

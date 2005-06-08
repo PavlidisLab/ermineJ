@@ -129,6 +129,7 @@ public class GeneSetScoreFrame extends JFrame {
     private GeneSetTreePanel treePanel;
     private Collection userOverwrittenGeneSets;
     JProgressBar progressBar = new JProgressBar();
+    private JMenuItem reloadGeneSetsMenuItem = new JMenuItem();
 
     /**
      * @throws IOException
@@ -138,11 +139,13 @@ public class GeneSetScoreFrame extends JFrame {
         jbInit();
         hh = new HelpHelper();
         hh.initHelp( helpMenuItem );
+        this.userOverwrittenGeneSets = new HashSet();
     }
 
     public void addedNewGeneSet() {
         oPanel.addedNewGeneSet();
         treePanel.addedNewGeneSet();
+        refreshShowUserGeneSetState();
     }
 
     public void addResult( GeneSetPvalRun result ) {
@@ -156,6 +159,8 @@ public class GeneSetScoreFrame extends JFrame {
     }
 
     /**
+     * Designate a gene set as altered by the user. This is used for GO gene sets that are modified.
+     * 
      * @param id
      */
     public void addUserOverwritten( String id ) {
@@ -166,6 +171,13 @@ public class GeneSetScoreFrame extends JFrame {
      * @param classID
      */
     public void deleteUserGeneSet( String classID ) {
+        deleteUserGeneSetFile( classID );
+        treePanel.removeNode( classID );
+        this.userOverwrittenGeneSets.remove( classID );
+        refreshShowUserGeneSetState();
+    }
+
+    protected void deleteUserGeneSetFile( String classID ) {
         UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, classID );
         if ( ngs.deleteUserGeneSet() && this.statusMessenger != null ) {
             statusMessenger.showStatus( "Permanantly deleted " + classID );
@@ -173,8 +185,17 @@ public class GeneSetScoreFrame extends JFrame {
             GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
                     + settings.getUserGeneSetDirectory() );
         }
-        treePanel.removeNode( classID );
-        this.userOverwrittenGeneSets.remove( classID );
+    }
+
+    /**
+     * 
+     */
+    private void refreshShowUserGeneSetState() {
+        if ( this.showingUserGeneSets ) {
+            geneData.setSelectedSets( goData.getUserDefinedGeneSets() );
+        } else {
+            geneData.resetSelectedSets();
+        }
     }
 
     public void disableMenusForAnalysis() {
@@ -303,7 +324,8 @@ public class GeneSetScoreFrame extends JFrame {
             return;
         }
         if ( !checkValid( loadSettings ) ) {
-            GuiUtil.error( "Loading of the analysis cannot proceed without the file information." );
+            GuiUtil
+                    .error( "There was a problem loading the analysis.\nFiles referred to in the analysis may have been moved or deleted." );
             return;
         }
 
@@ -351,9 +373,8 @@ public class GeneSetScoreFrame extends JFrame {
         statusMessenger.showStatus( "Reading user-defined gene sets from directory "
                 + settings.getUserGeneSetDirectory() );
 
-        loadUserGeneSets();
-
         // end slow part.
+        loadUserGeneSets();
 
         if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
             throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
@@ -367,12 +388,25 @@ public class GeneSetScoreFrame extends JFrame {
     }
 
     /**
+     * 
+     */
+    protected void loadUserGeneSets() {
+        UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
+        this.userOverwrittenGeneSets = loader.loadUserGeneSets( this.goData, this.statusMessenger );
+        for ( Iterator iter = this.userOverwrittenGeneSets.iterator(); iter.hasNext(); ) {
+            String id = ( String ) iter.next();
+            // this.treePanel.add
+        }
+    }
+
+    /**
      * @param classID
      */
     public void restoreUserGeneSet( String classID ) {
         userOverwrittenGeneSets.remove( classID );
         oPanel.addedNewGeneSet();
         treePanel.addedNewGeneSet();
+        refreshShowUserGeneSetState();
     }
 
     /**
@@ -497,6 +531,7 @@ public class GeneSetScoreFrame extends JFrame {
      * @return If the user doesn't locate the file, return null, otherwise the path to the file.
      */
     private String checkFile( String file ) {
+        if ( file == null ) return null;
         if ( !FileTools.testFile( file ) ) {
             GuiUtil.error( "A file referred to in the results\n(" + file
                     + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
@@ -621,34 +656,6 @@ public class GeneSetScoreFrame extends JFrame {
     }
 
     /**
-     * Load the user-defined gene sets.
-     */
-    private void loadUserGeneSets() {
-        if ( userOverwrittenGeneSets == null ) userOverwrittenGeneSets = new HashSet();
-        File dir = new File( settings.getUserGeneSetDirectory() );
-        if ( dir.exists() ) {
-            String[] classFiles = dir.list();
-            for ( int i = 0; i < classFiles.length; i++ ) {
-                String classFile = classFiles[i];
-                UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, null );
-                try {
-                    classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" ) + classFile;
-                    log.debug( "Loading " + classFile );
-                    boolean gotSomeProbes = ngs.loadUserGeneSet( classFile );
-                    if ( gotSomeProbes ) {
-                        ngs.addToMaps( goData );
-                        if ( geneData.getGeneSetToProbeMap().containsKey( ngs.getId() ) ) {
-                            this.userOverwrittenGeneSets.add( ngs.getId() );
-                        }
-                    }
-                } catch ( IOException e ) {
-                    statusMessenger.showError( "Could not load user-defined class from " + classFile );
-                }
-            }
-        }
-    }
-
-    /**
      * 
      */
     private void maybeEnableRunViewMenu() {
@@ -670,7 +677,6 @@ public class GeneSetScoreFrame extends JFrame {
         quitMenuItem.addActionListener( new GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
         quitMenuItem.setMnemonic( 'Q' );
         quitMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Q, InputEvent.CTRL_MASK ) );
-        ;
 
         fileMenu.add( quitMenuItem );
 
@@ -697,6 +703,16 @@ public class GeneSetScoreFrame extends JFrame {
         findGeneMenuItem.setMnemonic( 'G' );
         findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
 
+        reloadGeneSetsMenuItem.setText( "Reload user-defined gene sets" );
+        reloadGeneSetsMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                loadUserGeneSets();
+                addedNewGeneSet();
+            }
+        } );
+        reloadGeneSetsMenuItem.setMnemonic( 'E' );
+        reloadGeneSetsMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, InputEvent.CTRL_MASK ) );
+
         showUsersMenuItem.setText( "Show user-defined gene sets" );
         showUsersMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -706,15 +722,16 @@ public class GeneSetScoreFrame extends JFrame {
         showUsersMenuItem.setMnemonic( 'U' );
         showUsersMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.CTRL_MASK ) );
 
-        this.runViewMenu.setText( "Results" );
-        runViewMenu.setMnemonic( 'R' );
-        runViewMenu.setEnabled( false );
-
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
         classMenu.add( findClassMenuItem );
         classMenu.add( findGeneMenuItem );
+        classMenu.add( reloadGeneSetsMenuItem );
         classMenu.add( showUsersMenuItem );
+
+        this.runViewMenu.setText( "Results" );
+        runViewMenu.setMnemonic( 'R' );
+        runViewMenu.setEnabled( false );
 
         analysisMenu.setText( "Analysis" );
         analysisMenu.setMnemonic( 'A' );

@@ -80,7 +80,15 @@ public class GeneSetTablePanel extends GeneSetPanel {
         };
         table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
         table.getTableHeader().setReorderingAllowed( false );
-        table.getTableHeader().addMouseListener( new TableHeader_mouseAdapterCursorChanger( this ) );
+        table.getTableHeader().addMouseListener( new MouseAdapter() {
+            public void mouseEntered( MouseEvent e ) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+            }
+
+            public void mouseExited( MouseEvent e ) {
+                setCursor( Cursor.getDefaultCursor() );
+            }
+        } );
     }
 
     /**
@@ -143,11 +151,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
     // called when we first set up the table.
     public void addInitialData( GONames initialGoData ) {
         super.addInitialData( initialGoData );
-        model.addInitialData( geneData, initialGoData );
+        model.addInitialData( geneData, goData );
         setTableAttributes();
         sorter.cancelSorting();
         sorter.setSortingStatus( 1, TableSorter.ASCENDING );
-        table.revalidate();
     }
 
     public void addRun() {
@@ -167,26 +174,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.revalidate();
     }
 
-    /**
-     * @return
-     */
-    public int getCurrentResultSet() {
-        return this.currentResultSetIndex;
-    }
-
-    /**
-     * @return classScore.data.GONames
-     */
-    public GONames getGoData() {
-        return goData;
-    }
-
     // called if 'cancel', 'find' or 'reset' have been hit.
     public void resetView() {
         this.geneData = callingFrame.getOriginalGeneData();
         model.setInitialData( geneData, goData );
         setTableAttributes();
-        table.revalidate();
     }
 
     /**
@@ -215,9 +207,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.revalidate();
     }
 
-    protected String deleteOrResetGeneSet( String classID ) {
+    protected String deleteAndResetGeneSet( String classID ) {
         log.debug( "Deleting gene set from table" );
-        String action = super.deleteOrResetGeneSet( classID );
+        String action = super.deleteAndResetGeneSet( classID );
         if ( action.equals( GeneSetPanel.DELETED ) ) {
             // model.fireTableStructureChanged();
             sorter.cancelSorting();
@@ -240,7 +232,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
         int r = source.rowAtPoint( e.getPoint() );
         List id = ( Vector ) source.getValueAt( r, 0 );
         if ( id == null ) return null;
-        int row = source.rowAtPoint( e.getPoint() );
         String classID = ( String ) id.get( 0 );
         return classID;
     }
@@ -349,24 +340,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
             _runnum = model.getRunIndex( j );
         } else if ( table.getValueAt( i, j ) != null && j < GeneSetTableModel.INIT_COLUMNS ) {
             _runnum = -1;
-        } else {
-            log.debug( "Seeking column to show" ); // this code is never reached?
-            // for ( int k = model.getColumnCount() - 1; k >= 0; k-- ) {
-            // if ( table.getValueAt( i, k ) != null && k >= OutputTableModel.INIT_COLUMNS ) {
-            // String message;
-            // String shownRunName = model.getColumnName( k );
-            // shownRunName = shownRunName.substring( 0, shownRunName.length() - 5 );
-            // if ( j >= OutputTableModel.INIT_COLUMNS ) {
-            // message = model.getColumnName( j );
-            // message = message.substring( 0, message.length() - 5 );
-            // message = message + " doesn't include the class " + _id + ". Showing " + shownRunName
-            // + " instead.";
-            // JOptionPane.showMessageDialog( this, message, "FYI", JOptionPane.PLAIN_MESSAGE );
-            // }
-            // _runnum = model.getRunNum( k );
-            // break;
-            // }
-            // }
         }
         this.currentResultSetIndex = _runnum;
         final String id = _id;
@@ -393,25 +366,6 @@ class EditRunPopupMenu extends JPopupMenu {
     public void setPoint( Point point ) {
         popupPoint = point;
     }
-}
-
-class TableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter {
-    GeneSetTablePanel adaptee;
-
-    TableHeader_mouseAdapterCursorChanger( GeneSetTablePanel adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void mouseEntered( MouseEvent e ) {
-        Container c = adaptee.getParent();
-        c.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-    }
-
-    public void mouseExited( MouseEvent e ) {
-        Container c = adaptee.getParent();
-        c.setCursor( Cursor.getDefaultCursor() );
-    }
-
 }
 
 class OutputPanel_findInTreeMenuItem_actionAdapter implements ActionListener {

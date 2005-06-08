@@ -34,11 +34,11 @@ public class GeneSetWizardStep3 extends WizardStep {
     private JTextArea classDescTA = null;
     private JTable finalTable = null;
 
-    String origID = "";
+    String origID = null;
+    String origDesc = null;
     private final boolean makenew;
 
-    public GeneSetWizardStep3( GeneSetWizard wiz, Settings settings, GeneAnnotations geneData,
-            UserDefinedGeneSetManager newGeneSet, boolean makenew ) {
+    public GeneSetWizardStep3( GeneSetWizard wiz, UserDefinedGeneSetManager newGeneSet, boolean makenew ) {
         super( wiz );
         this.makenew = makenew;
         this.newGeneSet = newGeneSet;
@@ -129,11 +129,11 @@ public class GeneSetWizardStep3 extends WizardStep {
         newGeneSet.setId( classIDTF.getText() );
         newGeneSet.setDesc( classDescTA.getText() );
 
-        assert origID != null;
-
-        if ( newGeneSet.modified() && origID.compareTo( newGeneSet.getId() ) != 0 ) {
-            newGeneSet.setModified( false );
-        }
+        // assert origID != null;
+        //
+        // if ( !newGeneSet.modified() && origID.equals( newGeneSet.getId() ) ) {
+        // newGeneSet.setModified( false );
+        // }
     }
 
     public void update() {
@@ -144,7 +144,14 @@ public class GeneSetWizardStep3 extends WizardStep {
             classIDFinal.setText( newGeneSet.getId() );
         }
         assert newGeneSet.getId() != null;
-        if ( newGeneSet.modified() ) origID = newGeneSet.getId();
+        if ( newGeneSet.isModified() ) origID = newGeneSet.getId();
+    }
+
+    public void setIdFieldEnabled( boolean b ) {
+        this.classIDTF.setEnabled( b );
+        this.classIDTF.setEditable( b );
+        this.classDescTA.setEditable( b );
+        this.classDescTA.setEnabled( b );
     }
 
 }

@@ -55,7 +55,7 @@ public class AnalysisWizard extends Wizard {
         this.addStep( step1, true );
         step2 = new AnalysisWizardStep2( this, settings );
         this.addStep( step2 );
-        step3 = new AnalysisWizardStep3( this, settings );
+        step3 = new AnalysisWizardStep3( this, goData, geneData, settings );
         this.addStep( step3 );
         step31 = new AnalysisWizardStep3_1( this, settings );
         this.addStep( step31 );
@@ -189,7 +189,6 @@ public class AnalysisWizard extends Wizard {
      * 
      */
     private void checkNumSteps() {
-
         maxSteps = 6;
 
         if ( step == 1 ) {
@@ -253,7 +252,7 @@ public class AnalysisWizard extends Wizard {
                 UserDefinedGeneSetManager newGeneSet = new UserDefinedGeneSetManager( geneData, settings, id );
                 String filename = newGeneSet.getUserGeneSetFileForName();
                 boolean gotSomeProbes = newGeneSet.loadUserGeneSet( filename );
-                if ( gotSomeProbes ) newGeneSet.addToMaps( goData );
+                if ( gotSomeProbes ) newGeneSet.addClass( goData );
             }
         }
     }

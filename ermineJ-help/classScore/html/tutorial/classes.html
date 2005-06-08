@@ -50,8 +50,8 @@ set.</p>
 
 <h2>Creating a new gene set from scratch</h2>
 
-<p>Select "create new gene set" from the "gene set"&nbsp;menu. This gets
-you to the new gene set wizard.</p>
+<p>Select "create new gene set" from the "gene set" menu. This gets you
+to the new gene set wizard.</p>
 
 <p>You can import a file describing a gene set, or you can create one
 manually from the list of genes on the array you are using. You choose
@@ -190,13 +190,13 @@ Use "ctrl-U" to make them show up on their own, or look in the
 <h2>I don't like my gene set, how do I get rid of it?</h2>
 
 <p>You can delete user-defined gene sets using the popup menu in the
-table or tree view. If you delete a class that is part of the gene
-ontology (only possible if you modified it), it will disappear for this
-session, but will be reloaded from the GO XML file next time you start
-up ermineJ.</p>
+table or tree view. You cannot delete gene sets that were loaded as part
+of the Gene Ontology. In the case where you have modified a gene set but
+not changed its identifier, you can "reset" it to its previous state.</p>
 
-<p>Alternatively, find the place where ermineJ stores gene sets and
-delete the files by hand.</p>
+<p>Gene sets can also be deleted maually by finding the place where
+ermineJ stores gene sets (in your home directory, under
+ermineJ.data/genesets) and delete the files by hand.</p>
 
 </body>
 </html>

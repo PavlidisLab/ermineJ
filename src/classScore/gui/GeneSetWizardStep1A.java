@@ -22,6 +22,7 @@ import baseCode.gui.table.TableSorter;
 import classScore.data.UserDefinedGeneSetManager;
 
 /**
+ * Step to choose a gene set to modify.
  * <hr>
  * <p>
  * Copyright (c) 2004 Columbia University

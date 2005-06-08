@@ -187,14 +187,11 @@ public class StartupDialog extends AppDialog {
         } else {
             log.debug( "Saving configuration" );
             saveValues();
-            class runthread extends Thread {
+            new Thread() {
                 public void run() {
                     ( ( GeneSetScoreFrame ) callingframe ).initialize();
                 }
-            }
-            ;
-            Thread aFrameRunner = new runthread();
-            aFrameRunner.start();
+            }.start();
             dispose();
         }
     }

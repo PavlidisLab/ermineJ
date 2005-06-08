@@ -54,14 +54,14 @@ public class GeneSetWizardStep1 extends WizardStep {
         // top
         JPanel jPanel1 = new JPanel();
         JPanel jPanel7 = new JPanel(); // outer method choice
-   
-        jPanel7.setLayout(  new GridBagLayout() );
+
+        jPanel7.setLayout( new GridBagLayout() );
         JLabel jLabel8 = new JLabel(); // 'choose method'
         jLabel8.setText( "Choose the method of data entry:" );
         jLabel8.setMaximumSize( new Dimension( 999, 15 ) );
         jLabel8.setMinimumSize( new Dimension( 259, 15 ) );
         jLabel8.setPreferredSize( new Dimension( 259, 15 ) );
-       
+
         JPanel jPanel4 = new JPanel(); // holds radio buttons
         jPanel4.setBorder( BorderFactory.createEtchedBorder() );
         jPanel4.setLayout( new GridBagLayout() );
@@ -80,7 +80,7 @@ public class GeneSetWizardStep1 extends WizardStep {
         buttonGroup1.add( fileInputButton );
         buttonGroup1.add( manInputButton );
         JLabel jLabel4 = new JLabel();
-        jLabel4.setText( "- File with gene symbols or probe ids" );
+        jLabel4.setText( "- File with gene symbols" );
         JLabel jLabel5 = new JLabel();
         jLabel5.setText( "- Enter using lists" );
         jPanel4.add( jLabel5, new GridBagConstraints( 1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,

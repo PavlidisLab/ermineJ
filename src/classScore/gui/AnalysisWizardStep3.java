@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,29 +23,23 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import baseCode.bio.geneset.GONames;
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import classScore.Settings;
 import classScore.data.UserDefinedGeneSetManager;
 
 /**
+ * Step to handle adding custom gene sets to the analysis.
+ * <hr>
  * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Company:
- * </p>
+ * Copyright (c) 2004-2005 Columbia University
  * 
+ * @author pavlidis
  * @author Homin Lee
  * @version $Id$
  */
-
 public class AnalysisWizardStep3 extends WizardStep {
 
     private Settings settings;
@@ -59,8 +54,14 @@ public class AnalysisWizardStep3 extends WizardStep {
     private AbstractTableModel acTableModel;
     private JLabel countLabel;
 
-    public AnalysisWizardStep3( AnalysisWizard wiz, Settings settings ) {
+    private GONames goData;
+
+    private final GeneAnnotations geneData;
+
+    public AnalysisWizardStep3( AnalysisWizard wiz, GONames goData, GeneAnnotations geneData, Settings settings ) {
         super( wiz );
+        this.goData = goData;
+        this.geneData = geneData;
         this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
@@ -158,6 +159,10 @@ public class AnalysisWizardStep3 extends WizardStep {
     private void addClasstoSelected( String id ) {
         if ( id != null ) {
             Map cfi = ( Map ) ccHash.get( id );
+            if ( cfi == null ) {
+                log.debug( "Null map" );
+                return;
+            }
             if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
                 addedClasses.add( cfi );
                 acHash.put( cfi.get( "id" ), cfi );
@@ -194,30 +199,24 @@ public class AnalysisWizardStep3 extends WizardStep {
     }
 
     void makeLeftTable() {
-        File dir = new File( settings.getUserGeneSetDirectory() );
-        if ( dir.exists() ) {
-            String[] classFiles = dir.list( new AnalysisWizardStep3_ClassFileFilter( "-class.txt" ) );
-            customClasses = new AnalysisWizardStep3_CustomClassList();
-            ccHash = new HashMap();
-            for ( int i = 0; i < classFiles.length; i++ ) {
-                File classFile = new File( dir.getPath(), classFiles[i] );
-                Map cfi = null;
-                try {
-                    cfi = UserDefinedGeneSetManager.getGeneSetFileInfo( classFile.getAbsolutePath() );
-                } catch ( IOException e ) {
-                    GuiUtil.error( "Error reading class files info." );
-                }
 
-                assert cfi != null;
+        Set userDefinedGeneSets = goData.getUserDefinedGeneSets();
+        if ( userDefinedGeneSets == null || userDefinedGeneSets.size() == 0 ) return;
 
-                customClasses.add( cfi );
-                ccHash.put( cfi.get( "id" ), cfi );
-            }
-            ccTableModel = customClasses.toTableModel();
-            customClassTable.setModel( ccTableModel );
-        } else {
-            GuiUtil.error( "There is no 'genesets' folder in the 'data' directory" );
+        UserDefinedGeneSetManager helper = new UserDefinedGeneSetManager( geneData, settings, "" );
+
+        customClasses = new AnalysisWizardStep3_CustomClassList();
+        ccHash = new HashMap();
+        for ( Iterator iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
+            String id = ( String ) iter.next();
+            log.debug( "Adding " + id + " to the table" );
+            Map cfi = helper.getGeneSetInfo( id, goData );
+            customClasses.add( cfi );
+            ccHash.put( id, cfi );
         }
+        ccTableModel = customClasses.toTableModel();
+        customClassTable.setModel( ccTableModel );
+
     }
 
     void makeRightTable() {
@@ -335,7 +334,7 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
                             return cinfo.get( "desc" );
                         case 2: {
                             String type = ( String ) cinfo.get( "type" );
-                            ArrayList members = ( ArrayList ) cinfo.get( "members" );
+                            List members = ( List ) cinfo.get( "members" );
                             return ( Integer.toString( members.size() ) + " " + type + "s" );
                         }
                         default:

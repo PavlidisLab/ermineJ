@@ -7,16 +7,45 @@
 </head>
 
 <body>
-<h1>ErmineJ version history</h1>
+<IMG height="112" alt="ermineJ logo" src="images/logo1small.gif"
+	width="266" border="0">
+<h1>Version history</h1>
 
 <h2>Current version</h2>
+<p>Version 2.1.3. Changes include:
+<ul>
+	<li>A number of bugs in the display of user-modified or user-defined
+	gene sets have been fixed.</li>
+	<li>New options in gene set popup menus to manage custom gene sets.</li>
+	<li>When <em>modifying</em> a GO gene set, you are no longer allowed to
+	change the name or description. You can still change the members of the
+	gene set.</li>
+	<li>Add Gene Set menu item to reload the user-defined gene sets from
+	disk (keyboard Ctrl-E).</li>
+	<li>Additional minor bug fixes (214, 215).</li>
+</ul>
+
+<p>Known issues:</p>
+
+<ul>
+	<li>The command to show user-defined gene sets can sometimes be
+	"confused". The work-around is to just hit "Ctrl-U" twice.</li>
+	<li>In tables shown in "wizards", the table columns are resizable, but
+	this is not indicated by the cursor. (bug 212)</li>
+	<li>Tree view: Switching runs does not change icons (diamonds) (bug 208)</li>
+
+</ul>
+
+</p>
+
+<h2>Older versions</h2>
+
 
 <p>Version 2.1.2. Changes include:
 <ul>
 	<li>New Feature: Receiver operator characteristic (ROC) method now
 	available from all interfaces.</li>
-	<li>Fixed Issue 210: Failure to save results files for some situations.
-	
+	<li>Fixed Issue 210: Failure to save results files for some situations.</li>
 	<li>Fixed Issue 204: default for "Larger scores are better" should be
 	'false'.</li>
 	<li>After an analysis, the results are checked for "reasonableness". If
@@ -28,6 +57,7 @@
 	<li>Errors during analysis now result in less silent death.</li>
 	<li>Some other minor issues resolved.</li>
 </ul>
+
 </p>
 
 <p>Version 2.1.1. Fixes bugs which caused incorrect parsing of gene
