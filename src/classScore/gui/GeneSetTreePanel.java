@@ -151,6 +151,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
     }
 
+    /**
+     * @param node
+     */
     public void clearNode( GeneSetTreeNode node ) {
         node.setHasGoodChild( false );
         node.setHasUsableChild( false );
@@ -170,7 +173,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
                 return;
             }
         }
-        node.setHasUsableChild( false );
     }
 
     /**
@@ -652,7 +654,11 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
                     this.setIcon( goodPvalueIcon );
                 }
             } else {
-                this.setIcon( regularIcon );
+                if ( node.hasGoodChild() ) {
+                    this.setIcon( goodChildIcon );
+                } else {
+                    this.setIcon( regularIcon );
+                }
             }
         } else {
             this.setBackground( Color.WHITE );
@@ -687,15 +693,16 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      * @return
      */
     private String addGeneSetSizeInformation( String name, String id, String displayedText, GeneSetTreeNode node ) {
-        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) || !geneData.getSelectedSets().contains( id ) ) {
-            this.setFont( italic );
+        if ( node.hasUsableChild() ) {
+            // this.setFont( plain );
+            this.setForeground( Color.BLACK );
+        } else {
+            // this.setFont( italic );
             this.setForeground( Color.GRAY );
-            if ( !node.hasUsableChild() ) {
-                // can do something else here.
-                displayedText = name;
-            } else {
-                displayedText = name;
-            }
+        }
+        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) || !geneData.getSelectedSets().contains( id ) ) {
+            // this.setFont( italic );
+            this.setForeground( Color.GRAY );
         } else {
             displayedText = name + " -- " + ( ( Collection ) geneData.getGeneSetToProbeMap().get( id ) ).size()
                     + " probes, " + ( ( Collection ) geneData.getGeneSetToGeneMap().get( id ) ).size() + " genes";
