@@ -385,7 +385,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      */
     private void setRenderer() {
-        rend = new BaseCellRenderer( goData, geneData, results );
+        rend = new BaseCellRenderer( goData, geneData, this, results );
         this.goTree.setCellRenderer( rend );
     }
 
@@ -541,6 +541,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     private static Log log = LogFactory.getLog( BaseCellRenderer.class.getName() );
     private int currentlySelectedResultSet = -1;
     private GeneAnnotations geneData;
+    private GeneSetTreePanel panel;
     private final GONames goData;
     private final Icon goodChildIcon = new ImageIcon( this.getClass().getResource( GOOD_CHILD_ICON ) );
     private final Icon regularIcon = new ImageIcon( this.getClass().getResource( REGULAR_ICON ) );
@@ -554,9 +555,10 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     private final List results;
     private boolean selected;
 
-    public BaseCellRenderer( GONames goData, GeneAnnotations geneData, List results ) {
+    public BaseCellRenderer( GONames goData, GeneAnnotations geneData, GeneSetTreePanel panel, List results ) {
         super();
         this.results = results;
+        this.panel = panel;
         this.goData = goData;
         this.geneData = geneData;
         nff.setMaximumFractionDigits( 4 );
@@ -647,7 +649,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             double pvalCorr = result.getCorrectedPvalue();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             this.setBackground( bgColor );
-            if ( pvalCorr < 0.1 ) {
+            if ( pvalCorr < this.panel.getFdrThreshold() ) {
                 if ( node.hasGoodChild() ) {
                     this.setIcon( this.goodPvalueGoodChildIcon );
                 } else {
