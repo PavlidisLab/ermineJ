@@ -169,6 +169,7 @@ public class GeneSetWizard extends Wizard {
                 step3.setIdFieldEnabled( true );
             } else {
                 this.setTitle( "Modify Gene Set - Step 3 of 3" );
+                // if ( ( ( GeneSetScoreFrame ) callingframe ).userOverWrote( geneSetId ) )
                 step3.setIdFieldEnabled( false );
             }
             backButton.setEnabled( true );
@@ -258,7 +259,7 @@ public class GeneSetWizard extends Wizard {
 
         if ( makingNewGeneSet ) {
             log.debug( "Adding new or modified gene set to maps" );
-            newGeneSet.addClass( goData );
+            newGeneSet.addGeneSet( goData );
             ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
 

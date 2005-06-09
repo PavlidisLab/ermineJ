@@ -78,7 +78,7 @@ public class UserDefinedGeneSetManager {
         probes = new ArrayList();
     }
 
-    public void addClass( GONames goData ) {
+    public void addGeneSet( GONames goData ) {
         geneData.addClass( id, this.getProbes() );
         goData.addGeneSet( id, desc );
         // geneData.sortGeneSets();
@@ -299,7 +299,7 @@ public class UserDefinedGeneSetManager {
                             modifyGeneSet( goData );
                             userOverwrittenGeneSets.add( getId() );
                         } else {
-                            addClass( goData );
+                            addGeneSet( goData );
                         }
                     }
                 } catch ( IOException e ) {

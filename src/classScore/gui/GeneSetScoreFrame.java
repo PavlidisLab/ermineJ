@@ -228,8 +228,9 @@ public class GeneSetScoreFrame extends JFrame {
      * @param classID
      */
     public void findGeneSetInTree( String classID ) {
+        if ( !treePanel.expandToGeneSet( classID ) ) return;
         this.tabs.setSelectedIndex( 1 );
-        treePanel.expandToGeneSet( classID );
+        this.maybeEnableRunViewMenu();
     }
 
     /**
@@ -310,6 +311,8 @@ public class GeneSetScoreFrame extends JFrame {
                     + "\nTry again.\nIf this problem persists, please contact the software developer. " );
         }
         treePanel.initialize( goData, geneData );
+        loadUserGeneSets();
+
         oPanel.addInitialData( goData );
         statusMessenger.showStatus( "Done with initialization." );
     }
@@ -374,7 +377,6 @@ public class GeneSetScoreFrame extends JFrame {
                 + settings.getUserGeneSetDirectory() );
 
         // end slow part.
-        loadUserGeneSets();
 
         if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
             throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
@@ -393,9 +395,9 @@ public class GeneSetScoreFrame extends JFrame {
     protected void loadUserGeneSets() {
         UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
         this.userOverwrittenGeneSets = loader.loadUserGeneSets( this.goData, this.statusMessenger );
-        for ( Iterator iter = this.userOverwrittenGeneSets.iterator(); iter.hasNext(); ) {
+        for ( Iterator iter = goData.getUserDefinedGeneSets().iterator(); iter.hasNext(); ) {
             String id = ( String ) iter.next();
-            // this.treePanel.add
+            treePanel.addNode( id, goData.getNameForId( id ) );
         }
     }
 
@@ -404,6 +406,7 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public void restoreUserGeneSet( String classID ) {
         userOverwrittenGeneSets.remove( classID );
+        treePanel.removeUserDefinedNode( classID );
         oPanel.addedNewGeneSet();
         treePanel.addedNewGeneSet();
         refreshShowUserGeneSetState();
@@ -855,7 +858,7 @@ public class GeneSetScoreFrame extends JFrame {
      * @param geneSetId
      * @return
      */
-    protected boolean userOverWrote( String geneSetId ) {
+    public boolean userOverWrote( String geneSetId ) {
         return userOverwrittenGeneSets != null && userOverwrittenGeneSets.contains( geneSetId );
     }
 

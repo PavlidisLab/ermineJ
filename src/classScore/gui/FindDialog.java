@@ -6,6 +6,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -69,6 +71,11 @@ public class FindDialog extends JDialog {
     private void jbInit() throws Exception {
         setResizable( true );
         mainPanel = ( JPanel ) this.getContentPane();
+        this.addWindowListener( new WindowAdapter() {
+            public void windowClosing( WindowEvent evt ) {
+                cancelButton_actionPerformed();
+            }
+        } );
         mainPanel.setPreferredSize( new Dimension( MAINWIDTH, 150 ) );
         mainPanel.setLayout( new BorderLayout() );
 
@@ -112,7 +119,7 @@ public class FindDialog extends JDialog {
         this.setTitle( "Find Gene Set" );
     }
 
-    void cancelButton_actionPerformed( ActionEvent e ) {
+    void cancelButton_actionPerformed() {
         geneData.resetSelectedSets();
         resetViews();
         dispose();
@@ -191,7 +198,7 @@ class FindDialog_cancelButton_actionAdapter implements java.awt.event.ActionList
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.cancelButton_actionPerformed( e );
+        adaptee.cancelButton_actionPerformed();
     }
 }
 

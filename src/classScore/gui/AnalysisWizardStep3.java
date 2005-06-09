@@ -58,8 +58,12 @@ public class AnalysisWizardStep3 extends WizardStep {
 
     private final GeneAnnotations geneData;
 
-    public AnalysisWizardStep3( AnalysisWizard wiz, GONames goData, GeneAnnotations geneData, Settings settings ) {
+    private final GeneSetScoreFrame callingframe;
+
+    public AnalysisWizardStep3( AnalysisWizard wiz, GeneSetScoreFrame callingframe, GONames goData,
+            GeneAnnotations geneData, Settings settings ) {
         super( wiz );
+        this.callingframe = callingframe;
         this.goData = goData;
         this.geneData = geneData;
         this.jbInit();
@@ -209,6 +213,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         ccHash = new HashMap();
         for ( Iterator iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
             String id = ( String ) iter.next();
+            if ( callingframe.userOverWrote( id ) ) continue;
             log.debug( "Adding " + id + " to the table" );
             Map cfi = helper.getGeneSetInfo( id, goData );
             customClasses.add( cfi );
@@ -326,7 +331,7 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
 
             public Object getValueAt( int i, int j ) {
                 if ( i < size() ) {
-                    HashMap cinfo = ( HashMap ) get( i );
+                    Map cinfo = ( HashMap ) get( i );
                     switch ( j ) {
                         case 0:
                             return cinfo.get( "id" );
@@ -334,7 +339,7 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
                             return cinfo.get( "desc" );
                         case 2: {
                             String type = ( String ) cinfo.get( "type" );
-                            List members = ( List ) cinfo.get( "members" );
+                            Collection members = ( Collection ) cinfo.get( "members" );
                             return ( Integer.toString( members.size() ) + " " + type + "s" );
                         }
                         default:
