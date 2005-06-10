@@ -86,29 +86,13 @@ public class GeneSetWizardStep2 extends WizardStep {
 
         probeTable = new JTable();
         probeTable.getTableHeader().setReorderingAllowed( false );
-        probeTable.getTableHeader().addMouseListener( new MouseAdapter() {
-            public void mouseEntered( MouseEvent e ) {
-                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-            }
 
-            public void mouseExited( MouseEvent e ) {
-                setCursor( Cursor.getDefaultCursor() );
-            }
-        } );
         JScrollPane probeScrollPane = new JScrollPane( probeTable );
         probeScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
 
         newClassTable = new JTable();
         newClassTable.getTableHeader().setReorderingAllowed( false );
-        newClassTable.getTableHeader().addMouseListener( new MouseAdapter() {
-            public void mouseEntered( MouseEvent e ) {
-                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-            }
 
-            public void mouseExited( MouseEvent e ) {
-                setCursor( Cursor.getDefaultCursor() );
-            }
-        } );
         JScrollPane newClassScrollPane = new JScrollPane( newClassTable );
         newClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
 
@@ -237,12 +221,32 @@ public class GeneSetWizardStep2 extends WizardStep {
         probeTable.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
         probeTable.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
         probeTable.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
+
+        sorter.getTableHeader().addMouseListener( new MouseAdapter() {
+            public void mouseEntered( MouseEvent e ) {
+                getParent().setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+            }
+
+            public void mouseExited( MouseEvent e ) {
+                getParent().setCursor( Cursor.getDefaultCursor() );
+            }
+        } );
+
         probeTable.revalidate();
 
         ncTableModel = newGeneSet.toTableModel( false );
         TableSorter anotherSorter = new TableSorter( ncTableModel );
         newClassTable.setModel( anotherSorter );
         anotherSorter.setTableHeader( newClassTable.getTableHeader() );
+        anotherSorter.getTableHeader().addMouseListener( new MouseAdapter() {
+            public void mouseEntered( MouseEvent e ) {
+                getParent().setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+            }
+
+            public void mouseExited( MouseEvent e ) {
+                getParent().setCursor( Cursor.getDefaultCursor() );
+            }
+        } );
         newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
         newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
         newClassTable.revalidate();

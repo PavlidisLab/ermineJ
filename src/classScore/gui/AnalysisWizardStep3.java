@@ -2,9 +2,12 @@ package classScore.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -22,11 +25,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
+import baseCode.gui.table.TableSorter;
 import classScore.Settings;
 import classScore.data.UserDefinedGeneSetManager;
 
@@ -80,8 +85,8 @@ public class AnalysisWizardStep3 extends WizardStep {
         this.setLayout( new BorderLayout() );
         JPanel step3Panel;
         JPanel jPanel10 = new JPanel();
-        JScrollPane customClassScrollPane;
-        JScrollPane addedClassScrollPane;
+        final JScrollPane customClassScrollPane;
+        final JScrollPane addedClassScrollPane;
         JPanel jPanel9 = new JPanel();
         JButton addButton = new JButton();
         JButton deleteButton = new JButton();
@@ -106,10 +111,23 @@ public class AnalysisWizardStep3 extends WizardStep {
         jPanel1.setPreferredSize( new Dimension( 634, 50 ) );
 
         customClassTable = new JTable();
+        customClassTable.getTableHeader().setReorderingAllowed( false );
         customClassTable.setPreferredScrollableViewportSize( new Dimension( 250, 150 ) );
+
         customClassScrollPane = new JScrollPane( customClassTable );
+        customClassTable.getTableHeader().addMouseListener( new MouseAdapter() {
+            public void mouseEntered( MouseEvent e ) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+                // log.debug( "should this work? " + ( isEnabled() && isDisplayable() && isVisible() ) );
+            }
+
+            public void mouseExited( MouseEvent e ) {
+                setCursor( Cursor.getDefaultCursor() );
+            }
+        } );
         customClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
         addedClassTable = new JTable();
+        addedClassTable.getTableHeader().setReorderingAllowed( false );
         addedClassTable.setPreferredScrollableViewportSize( new Dimension( 250, 150 ) );
         addedClassScrollPane = new JScrollPane( addedClassTable );
         addedClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
@@ -222,12 +240,20 @@ public class AnalysisWizardStep3 extends WizardStep {
         ccTableModel = customClasses.toTableModel();
         customClassTable.setModel( ccTableModel );
 
+        TableSorter sorter = new TableSorter( customClassTable.getModel() );
+        customClassTable.setModel( sorter );
+        sorter.setTableHeader( customClassTable.getTableHeader() );
+
     }
 
     void makeRightTable() {
         addedClasses = new AnalysisWizardStep3_CustomClassList();
         acTableModel = addedClasses.toTableModel();
         addedClassTable.setModel( acTableModel );
+        addedClassTable.setModel( ccTableModel );
+        TableSorter sorter = new TableSorter( addedClassTable.getModel() );
+        addedClassTable.setModel( sorter );
+        sorter.setTableHeader( addedClassTable.getTableHeader() );
         setValues();
     }
 
