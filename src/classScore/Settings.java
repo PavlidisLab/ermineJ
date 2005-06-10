@@ -600,9 +600,14 @@ public class Settings {
         out.close();
     }
 
-    public void writePrefs() throws ConfigurationException {
-        // log.debug( "Saving configuration" );
-        // config.save(); // shouldn't need to - autosave is set.
+    public void writePrefs() {
+        if ( config.isAutoSave() ) return;
+        try {
+            log.debug( "Saving configuration" );
+            config.save();
+        } catch ( ConfigurationException e ) {
+            log.error( e, e );
+        }
     }
 
     /**
@@ -696,6 +701,17 @@ public class Settings {
             }
         }
         this.config.setAutoSave( true );
+    }
+
+    /**
+     * Set an arbitrary property. Handy for 'ad hoc' configuration parameters only used by specific classes.
+     * 
+     * @param key
+     * @param value
+     */
+    public void setProperty( String key, Object value ) {
+        log.debug( "Setting property: " + key + " = " + value );
+        this.getConfig().setProperty( key, value );
     }
 
 }

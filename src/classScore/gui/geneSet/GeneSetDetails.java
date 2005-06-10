@@ -30,7 +30,6 @@ public class GeneSetDetails {
     protected static final Log log = LogFactory.getLog( GeneSetDetails.class );
     private String classID;
     private String className;
-    private GONames goData;
     private GeneAnnotations geneData;
     private Settings settings;
     private final StatusViewer callerStatusViewer;
@@ -39,7 +38,7 @@ public class GeneSetDetails {
             Settings settings, String classID ) {
         this.callerStatusViewer = callerStatusViewer;
         this.classID = classID;
-        this.goData = goData;
+
         this.geneData = geneData;
         if ( settings == null ) {
             try {
@@ -89,7 +88,7 @@ public class GeneSetDetails {
 
         String title = getTitle( runName, res, probeIDs );
         f.setTitle( title );
-        f.show();
+        f.setVisible( true );
 
     }
 

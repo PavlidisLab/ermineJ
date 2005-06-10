@@ -658,6 +658,7 @@ public class GeneSetScoreFrame extends JFrame {
         this.statusMessenger = new StatusJlabel( jLabelStatus );
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
         oPanel.setMessenger( this.statusMessenger );
+        treePanel.setMessenger( this.statusMessenger );
     }
 
     /**

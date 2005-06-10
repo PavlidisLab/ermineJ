@@ -82,6 +82,8 @@ public class JGeneSetFrame extends JFrame {
 
     private static final String INCLUDEEVERYTHING = "detailsview.savedata.includeEverything";
     private static final String INCLUDELABELS = "detailsview.saveimage.includeImageLabels";
+    private static final String NORMALIZE_SAVED_IMAGE = "detailsview.saveimage.normalize";
+    private static final String NORMALIZE_SAVED_DATA = "detailsview.savedata.normalize";
     private static final String MATRIXCOLUMNWIDTH = "detailsview.ColumnWidth";
     private static final String WINDOWHEIGHT = "detailsview.WindowHeight";
     private static final String WINDOWWIDTH = "detailsview.WindowWidth";
@@ -163,7 +165,6 @@ public class JGeneSetFrame extends JFrame {
      */
     public JGeneSetFrame( StatusViewer callerStatusViewer, List probeIDs, Map pvalues, GeneAnnotations geneData,
             Settings settings ) {
-        // this.callerStatusViewer = callerStatusViewer;
         try {
             if ( settings == null ) {
                 log.warn( "Loading new settings..." );
@@ -354,8 +355,10 @@ public class JGeneSetFrame extends JFrame {
     private void initChoosers() {
         if ( m_matrixDisplay == null ) return;
 
-        imageChooser = new JImageFileChooser( this.includeLabels, m_matrixDisplay.getStandardizedEnabled() );
-        fileChooser = new JDataFileChooser( this.includeEverything, m_matrixDisplay.getStandardizedEnabled() );
+        imageChooser = new JImageFileChooser( settings.getConfig().getBoolean( INCLUDELABELS, true ), settings
+                .getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ) );
+        fileChooser = new JDataFileChooser( settings.getConfig().getBoolean( INCLUDEEVERYTHING, true ), settings
+                .getConfig().getBoolean( NORMALIZE_SAVED_DATA, false ) );
         readPathPrefs();
     }
 
@@ -749,6 +752,7 @@ public class JGeneSetFrame extends JFrame {
             this.includeEverything = Boolean.getBoolean( settings.getConfig().getString( INCLUDEEVERYTHING ) );
             log.debug( "Got: " + includeEverything );
         }
+
     }
 
     private void setDisplayMatrixGUIEnabled( boolean enabled ) {
@@ -877,7 +881,6 @@ public class JGeneSetFrame extends JFrame {
 
             if ( includeMatrixValues ) {
                 printMatrixValueForRow( out, nf, probeID );
-                m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
             }
             out.write( NEWLINE );
         }
@@ -977,6 +980,7 @@ public class JGeneSetFrame extends JFrame {
     }
 
     void m_saveDataMenuItem_actionPerformed( ActionEvent e ) {
+        initChoosers();
         int returnVal = fileChooser.showSaveDialog( this );
         if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -989,12 +993,11 @@ public class JGeneSetFrame extends JFrame {
 
             includeEverything = fileChooser.includeEverything();
             boolean normalize = fileChooser.normalized();
+            settings.setProperty( INCLUDEEVERYTHING, new Boolean( includeEverything ) );
+            settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( normalize ) );
+            settings.writePrefs();
 
-            // Make sure the filename has a data extension
             String filename = file.getPath();
-            if ( !FileTools.hasDataExtension( filename ) ) {
-                filename = FileTools.addDataExtension( filename );
-            }
 
             // Save the values
             try {
@@ -1008,7 +1011,7 @@ public class JGeneSetFrame extends JFrame {
     }
 
     void m_saveImageMenuItem_actionPerformed( ActionEvent e ) {
-
+        initChoosers();
         int returnVal = imageChooser.showSaveDialog( this );
         if ( returnVal == JFileChooser.APPROVE_OPTION ) {
 
@@ -1021,7 +1024,10 @@ public class JGeneSetFrame extends JFrame {
 
             includeLabels = imageChooser.includeLabels();
             boolean normalize = imageChooser.normalized();
-
+            settings.setProperty( INCLUDELABELS, new Boolean( includeLabels ) );
+            settings.setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( normalize ) );
+            settings.writePrefs();
+            
             // Make sure the filename has an image extension
             String filename = file.getPath();
 

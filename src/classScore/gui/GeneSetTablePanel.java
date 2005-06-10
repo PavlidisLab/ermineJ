@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import baseCode.bio.geneset.GONames;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
-import baseCode.util.StatusViewer;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
 
@@ -180,13 +179,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
         this.geneData = callingFrame.getOriginalGeneData();
         model.setInitialData( geneData, goData );
         setTableAttributes();
-    }
-
-    /**
-     * @param messenger The messenger to set.
-     */
-    public void setMessenger( StatusViewer messenger ) {
-        this.messenger = messenger;
     }
 
     /**
@@ -348,19 +340,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         log.debug( "Showing details for " + id );
         if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
 
-        new Thread() {
-            public void run() {
-                try {
-                    showDetailsForGeneSet( runIndex, id );
-                } catch ( Exception ex ) {
-                    GuiUtil
-                            .error( "There was an error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
-                                    + ex.getMessage() );
-                    log.error( ex, ex );
-                    messenger.clear();
-                }
-            }
-        }.start();
+        showDetailsForGeneSet( runIndex, id );
 
     }
 

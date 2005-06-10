@@ -112,25 +112,40 @@ public abstract class GeneSetPanel extends JScrollPane {
         cwiz.showWizard();
     }
 
-    protected void showDetailsForGeneSet( int runnum, String id ) throws IOException, IllegalStateException {
-        if ( id == null ) {
-            log.debug( "Got null geneset id" );
-            return;
-        }
-        log.debug( "Request for details of gene set: " + id );
-        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) ) {
-            callingFrame.getStatusMessenger().showError( id + " is not available for viewing in your data." );
-            return;
-        }
-        GeneSetDetails details = new GeneSetDetails( this.callingFrame.getStatusMessenger(), goData, geneData,
-                settings, id );
-        if ( runnum < 0 ) {
-            details.show();
-        } else {
-            GeneSetPvalRun run = ( GeneSetPvalRun ) results.get( runnum );
-            GeneSetResult res = ( GeneSetResult ) run.getResults().get( id );
-            details.show( run.getName(), res, run.getGeneScores() );
-        }
+    protected void showDetailsForGeneSet( final int runnum, final String id ) throws IllegalStateException {
+        if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
+
+        new Thread() {
+            public void run() {
+                try {
+                    if ( id == null ) {
+                        log.debug( "Got null geneset id" );
+                        return;
+                    }
+                    log.debug( "Request for details of gene set: " + id );
+                    if ( !geneData.getGeneSetToProbeMap().containsKey( id ) ) {
+                        callingFrame.getStatusMessenger()
+                                .showError( id + " is not available for viewing in your data." );
+                        return;
+                    }
+                    GeneSetDetails details = new GeneSetDetails( messenger, goData, geneData, settings, id );
+                    if ( runnum < 0 ) {
+                        details.show();
+                    } else {
+                        GeneSetPvalRun run = ( GeneSetPvalRun ) results.get( runnum );
+                        GeneSetResult res = ( GeneSetResult ) run.getResults().get( id );
+                        details.show( run.getName(), res, run.getGeneScores() );
+                    }
+                    if ( messenger != null ) messenger.clear();
+                } catch ( Exception ex ) {
+                    GuiUtil
+                            .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
+                                    + ex.getMessage() );
+                    log.error( ex, ex );
+                    if ( messenger != null ) messenger.clear();
+                }
+            }
+        }.start();
     }
 
     /**
@@ -240,6 +255,13 @@ public abstract class GeneSetPanel extends JScrollPane {
         };
 
         return popupListener;
+    }
+
+    /**
+     * @param messenger
+     */
+    public void setMessenger( StatusViewer messenger ) {
+        this.messenger = messenger;
     }
 }
 

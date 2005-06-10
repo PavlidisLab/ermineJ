@@ -244,21 +244,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( e.getClickCount() < 2 ) {
             return;
         }
-
-        new Thread() {
-            public void run() {
-                try {
-                    showDetailsForGeneSet( currentlySelectedResultSetIndex, currentlySelectedGeneSet );
-                } catch ( Exception ex ) {
-                    GuiUtil
-                            .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
-                                    + ex.getMessage() );
-                    log.error( ex, ex );
-                    messenger.clear();
-                }
-            }
-        }.start();
-
+        showDetailsForGeneSet( currentlySelectedResultSetIndex, currentlySelectedGeneSet );
     }
 
     /*
