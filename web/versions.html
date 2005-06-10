@@ -16,13 +16,16 @@
 <ul>
 	<li>A number of bugs in the display of user-modified or user-defined
 	gene sets have been fixed.</li>
-	<li>New options in gene set popup menus to manage custom gene sets.</li>
 	<li>When <em>modifying</em> a GO gene set, you are no longer allowed to
 	change the name or description. You can still change the members of the
 	gene set.</li>
+	<li>New options in gene set popup menus to manage custom gene sets.</li>
 	<li>Add Gene Set menu item to reload the user-defined gene sets from
 	disk (keyboard Ctrl-E).</li>
-	<li>Additional minor bug fixes (214, 215).</li>
+	<li>Both the data file used and the gene score file can be changed from
+	menu items as well as from the analysis wizard.</li>
+	<li>Additional bug and feature fixes (including issues 170, 208, 214,
+	215, 218, 219, 220, 222, 223).</li>
 </ul>
 
 <p>Known issues:</p>
@@ -30,10 +33,11 @@
 <ul>
 	<li>The command to show user-defined gene sets can sometimes be
 	"confused". The work-around is to just hit "Ctrl-U" twice.</li>
-	<li>In tables shown in "wizards", the table columns are resizable, but
-	this is not indicated by the cursor. (bug 212)</li>
-	<li>Tree view: Switching runs does not change icons (diamonds) (bug 208)</li>
-
+	<li>In tables shown in wizards, the table columns are resizable and
+	sortable, but this is not indicated by the cursor. (bug 212)</li>
+	<li>The id and name of user-defined gene sets cannot be changed. This
+	limitation should be restricted to GO gene sets (bug 224). The
+	work-around is to edit the file and then reload the gene sets.</li>
 </ul>
 
 </p>
