@@ -167,6 +167,7 @@ public class AnalysisWizardStep2 extends WizardStep {
     }
 
     void rawBrowseButton_actionPerformed( ActionEvent e ) {
+        chooser.setCurrentDirectory( new File( settings.getRawDataFileDirectory() ) );
         chooser.setDialogTitle( "Choose Raw Data File" );
         wiz.clearStatus();
         int result = chooser.showOpenDialog( this );
@@ -177,6 +178,7 @@ public class AnalysisWizardStep2 extends WizardStep {
     }
 
     void scoreBrowseButton_actionPerformed( ActionEvent e ) {
+        chooser.setCurrentDirectory( new File( settings.getGeneScoreFileDirectory() ) );
         chooser.setDialogTitle( "Choose Gene Score File" );
         wiz.clearStatus();
         int result = chooser.showOpenDialog( this );

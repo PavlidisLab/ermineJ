@@ -714,4 +714,26 @@ public class Settings {
         this.getConfig().setProperty( key, value );
     }
 
+    /**
+     * @return
+     */
+    public String getRawDataFileDirectory() {
+        String rdf = this.getRawDataFileName();
+        if ( rdf == null ) return getDataDirectory();
+
+        File rdfFile = new File( rdf );
+        return rdfFile.getParent() == null ? getDataDirectory() : rdfFile.getParent();
+    }
+
+    /**
+     * @return
+     */
+    public String getGeneScoreFileDirectory() {
+        String gsf = this.getScoreFile();
+        if ( gsf == null ) return getDataDirectory();
+
+        File gsfFile = new File( gsf );
+        return gsfFile.getParent() == null ? getDataDirectory() : gsfFile.getParent();
+    }
+
 }

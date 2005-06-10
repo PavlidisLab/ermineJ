@@ -814,7 +814,7 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     protected void switchGeneScoreFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getDataDirectory() );
+        JFileChooser fchooser = new JFileChooser(  settings.getGeneScoreFileDirectory() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
@@ -827,7 +827,7 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     protected void switchRawDataFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getDataDirectory() );
+        JFileChooser fchooser = new JFileChooser(  settings.getRawDataFileDirectory() );
         fchooser.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 

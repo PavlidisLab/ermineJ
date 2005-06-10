@@ -608,7 +608,7 @@ public class JGeneSetFrame extends JFrame {
      * 
      */
     protected void switchGeneScoreFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getDataDirectory() );
+        JFileChooser fchooser = new JFileChooser( settings.getGeneScoreFileDirectory() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
@@ -638,7 +638,7 @@ public class JGeneSetFrame extends JFrame {
                             JOptionPane.INFORMATION_MESSAGE );
         }
 
-        JFileChooser fc = new JFileChooser( settings.getDataDirectory() );
+        JFileChooser fc = new JFileChooser( settings.getRawDataFileDirectory() );
         fc.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fc.showDialog( this, "Open" );
 
@@ -798,15 +798,9 @@ public class JGeneSetFrame extends JFrame {
         settings.getConfig().setProperty( WINDOWWIDTH, String.valueOf( this.getWidth() ) );
         settings.getConfig().setProperty( WINDOWHEIGHT, String.valueOf( this.getHeight() ) );
         settings.getConfig().setProperty( MATRIXCOLUMNWIDTH, String.valueOf( this.matrixColumnWidth ) );
-        settings.getConfig().setProperty( INCLUDELABELS, String.valueOf( this.includeLabels ) );
-        settings.getConfig().setProperty( INCLUDEEVERYTHING, String.valueOf( this.includeEverything ) );
         settings.getConfig().setProperty( WINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
         settings.getConfig().setProperty( WINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
-        try {
-            settings.getConfig().save();
-        } catch ( ConfigurationException e ) {
-            e.printStackTrace();
-        }
+        settings.writePrefs();
     }
 
     /**
@@ -993,8 +987,8 @@ public class JGeneSetFrame extends JFrame {
 
             includeEverything = fileChooser.includeEverything();
             boolean normalize = fileChooser.normalized();
-            settings.setProperty( INCLUDEEVERYTHING, new Boolean( includeEverything ) );
-            settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( normalize ) );
+            settings.setProperty( INCLUDEEVERYTHING, new Boolean( fileChooser.includeEverything() ) );
+            settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( fileChooser.normalized() ) );
             settings.writePrefs();
 
             String filename = file.getPath();
@@ -1024,10 +1018,10 @@ public class JGeneSetFrame extends JFrame {
 
             includeLabels = imageChooser.includeLabels();
             boolean normalize = imageChooser.normalized();
-            settings.setProperty( INCLUDELABELS, new Boolean( includeLabels ) );
-            settings.setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( normalize ) );
+            settings.setProperty( INCLUDELABELS, new Boolean( imageChooser.includeLabels() ) );
+            settings.setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( imageChooser.normalized() ) );
             settings.writePrefs();
-            
+
             // Make sure the filename has an image extension
             String filename = file.getPath();
 

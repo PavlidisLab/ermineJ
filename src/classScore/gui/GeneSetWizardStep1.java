@@ -36,10 +36,12 @@ public class GeneSetWizardStep1 extends WizardStep {
     private JTextField classFile;
     private JFileChooser chooser;
     int inputMethod;
+    private Settings settings;
 
     public GeneSetWizardStep1( GeneSetWizard wiz, Settings settings ) {
         super( wiz );
         this.jbInit();
+        this.settings = settings;
         chooser = new JFileChooser();
         chooser.setCurrentDirectory( new File( settings.getUserGeneSetDirectory() ) );
         chooser.setDialogTitle( "Choose Gene Set File" );
