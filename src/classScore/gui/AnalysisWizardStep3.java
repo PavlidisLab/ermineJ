@@ -10,12 +10,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,11 +23,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
-import baseCode.gui.GuiUtil;
 import baseCode.gui.WizardStep;
 import baseCode.gui.table.TableSorter;
 import classScore.Settings;
@@ -233,8 +229,9 @@ public class AnalysisWizardStep3 extends WizardStep {
         for ( Iterator iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
             String id = ( String ) iter.next();
             if ( callingframe.userOverWrote( id ) ) continue;
-            log.debug( "Adding " + id + " to the table" );
             Map cfi = helper.getGeneSetInfo( id, goData );
+            if ( ( ( Collection ) cfi.get( "members" ) ).size() == 0 ) continue;
+            log.debug( "Adding " + id + " to the table" );
             customClasses.add( cfi );
             ccHash.put( id, cfi );
         }
@@ -269,6 +266,7 @@ public class AnalysisWizardStep3 extends WizardStep {
             Collection selectedCustomClasses = settings.getSelectedCustomGeneSets();
             for ( Iterator iter = selectedCustomClasses.iterator(); iter.hasNext(); ) {
                 String geneSet = ( String ) iter.next();
+                if ( !ccHash.containsKey( geneSet ) ) continue;
                 log.debug( "Adding " + geneSet );
                 this.addClasstoSelected( geneSet );
 
