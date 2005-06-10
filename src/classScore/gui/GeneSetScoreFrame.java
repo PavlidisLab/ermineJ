@@ -4,12 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -82,6 +87,11 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     private static final int STARTING_OVERALL_WIDTH = 830;
+
+    private static final String MAINWINDOWHEIGHT = "mainview.WindowHeight";
+    private static final String MAINWINDOWWIDTH = "mainview.WindowWidth";
+    private static final String MAINWINDOWPOSITIONX = "mainview.WindowXPosition";
+    private static final String MAINWINDOWPOSITIONY = "mainview.WindowYPosition";
 
     private JMenuItem aboutMenuItem = new JMenuItem();
     private JMenu analysisMenu = new JMenu();
@@ -587,6 +597,9 @@ public class GeneSetScoreFrame extends JFrame {
         this.setDefaultCloseOperation( EXIT_ON_CLOSE );
         this.setJMenuBar( jMenuBar1 );
         this.setSize( new Dimension( 886, 450 ) );
+
+        this.readPrefs();
+
         this.setTitle( "ErmineJ" );
         this.setIconImage( new ImageIcon( this.getClass().getResource( "resources/logoIcon64.gif" ) ).getImage() );
         mainPanel.setLayout( new BorderLayout() );
@@ -639,6 +652,12 @@ public class GeneSetScoreFrame extends JFrame {
         tabs.addTab( "Table", oPanel );
         tabs.addTab( "Tree", treePanel );
 
+        this.addWindowListener( new WindowAdapter() {
+            public void windowClosing( WindowEvent e ) {
+                writePrefs();
+            }
+        } );
+
         // controls
 
         // status bar
@@ -659,6 +678,51 @@ public class GeneSetScoreFrame extends JFrame {
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
         oPanel.setMessenger( this.statusMessenger );
         treePanel.setMessenger( this.statusMessenger );
+    }
+
+    /**
+     * 
+     */
+    private void readPrefs() {
+        int width = STARTING_OVERALL_WIDTH;
+        int height = START_HEIGHT;
+        if ( settings == null ) {
+            this.setSize( width, height );
+            return;
+        }
+
+        if ( settings.getConfig() == null ) return;
+
+        if ( settings.getConfig().containsKey( MAINWINDOWWIDTH ) ) {
+            width = Integer.parseInt( settings.getConfig().getString( MAINWINDOWWIDTH ) );
+            log.debug( "Got: " + width );
+        }
+
+        if ( settings.getConfig().containsKey( MAINWINDOWHEIGHT ) ) {
+            height = Integer.parseInt( settings.getConfig().getString( MAINWINDOWHEIGHT ) );
+            log.debug( "Got: " + height );
+        }
+
+        try {
+            int startX = ( int ) settings.getConfig().getDouble( MAINWINDOWPOSITIONX );
+            int startY = ( int ) settings.getConfig().getDouble( MAINWINDOWPOSITIONY );
+            this.setLocation( new Point( startX, startY ) );
+        } catch ( NoSuchElementException e ) {
+            GuiUtil.centerContainer( this );
+        }
+
+        this.setSize( width, height );
+
+    }
+
+    /**
+     * 
+     */
+    protected void writePrefs() {
+        settings.getConfig().setProperty( MAINWINDOWWIDTH, String.valueOf( this.getWidth() ) );
+        settings.getConfig().setProperty( MAINWINDOWHEIGHT, String.valueOf( this.getHeight() ) );
+        settings.getConfig().setProperty( MAINWINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
+        settings.getConfig().setProperty( MAINWINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
     }
 
     /**
@@ -814,7 +878,7 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     protected void switchGeneScoreFile() {
-        JFileChooser fchooser = new JFileChooser(  settings.getGeneScoreFileDirectory() );
+        JFileChooser fchooser = new JFileChooser( settings.getGeneScoreFileDirectory() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
@@ -827,7 +891,7 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     protected void switchRawDataFile() {
-        JFileChooser fchooser = new JFileChooser(  settings.getRawDataFileDirectory() );
+        JFileChooser fchooser = new JFileChooser( settings.getRawDataFileDirectory() );
         fchooser.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
