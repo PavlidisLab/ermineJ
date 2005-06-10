@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GONames;
+import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
 import baseCode.util.StatusViewer;
 import classScore.GeneSetPvalRun;
@@ -346,11 +347,21 @@ public class GeneSetTablePanel extends GeneSetPanel {
         final int runIndex = _runnum;
         log.debug( "Showing details for " + id );
         if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
+
         new Thread() {
             public void run() {
-                showDetailsForGeneSet( runIndex, id );
+                try {
+                    showDetailsForGeneSet( runIndex, id );
+                } catch ( Exception ex ) {
+                    GuiUtil
+                            .error( "There was an error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
+                                    + ex.getMessage() );
+                    log.error( ex, ex );
+                    messenger.clear();
+                }
             }
         }.start();
+
     }
 
 }

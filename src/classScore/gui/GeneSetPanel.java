@@ -112,7 +112,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         cwiz.showWizard();
     }
 
-    protected void showDetailsForGeneSet( int runnum, String id ) {
+    protected void showDetailsForGeneSet( int runnum, String id ) throws IOException, IllegalStateException {
         if ( id == null ) {
             log.debug( "Got null geneset id" );
             return;

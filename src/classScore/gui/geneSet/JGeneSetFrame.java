@@ -138,6 +138,7 @@ public class JGeneSetFrame extends JFrame {
     private JMenuItem saveImageMenuItem = new JMenuItem();
     private JMenuItem setGeneUrlBaseMenuItem = new JMenuItem();
     private JMenuItem switchDataFileMenuItem = new JMenuItem();
+    private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
     private JMenu viewMenu = new JMenu();
     private JPanel jPanelStatus = new JPanel();
     private JLabel jLabelStatus = new JLabel();
@@ -558,6 +559,7 @@ public class JGeneSetFrame extends JFrame {
 
         optionsMenu.add( setGeneUrlBaseMenuItem );
         optionsMenu.add( switchDataFileMenuItem );
+        optionsMenu.add( switchGeneScoreFileMenuItem );
 
         analysisMenu.setText( "Analysis" );
         m_viewHistMenuItem.setActionCommand( "View Distribution" );
@@ -579,6 +581,16 @@ public class JGeneSetFrame extends JFrame {
             }
         } );
 
+        switchGeneScoreFileMenuItem.setActionCommand( "Change gene score file" );
+        switchGeneScoreFileMenuItem.setText( "Change gene score file..." );
+        switchGeneScoreFileMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                switchGeneScoreFile();
+                createDetailsTable();
+                table.revalidate();
+            }
+        } );
+
         if ( analysisResults == null || analysisResults.getHist() == null ) {
             analysisMenu.setEnabled( false );
         }
@@ -587,6 +599,19 @@ public class JGeneSetFrame extends JFrame {
         menuBar.add( viewMenu );
         menuBar.add( optionsMenu );
         menuBar.add( analysisMenu );
+    }
+
+    /**
+     * 
+     */
+    protected void switchGeneScoreFile() {
+        JFileChooser fchooser = new JFileChooser( settings.getDataDirectory() );
+        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION )
+            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+
     }
 
     protected void switchRawDataFile() {
@@ -971,9 +996,6 @@ public class JGeneSetFrame extends JFrame {
                 filename = FileTools.addDataExtension( filename );
             }
 
-            File dataFile = new File( filename );
-            if ( !checkFileIsWritableGui( filename, dataFile ) ) return;
-
             // Save the values
             try {
                 saveData( filename, true, includeEverything, normalize );
@@ -1002,8 +1024,6 @@ public class JGeneSetFrame extends JFrame {
 
             // Make sure the filename has an image extension
             String filename = file.getPath();
-            File dataFile = new File( filename );
-            if ( !checkFileIsWritableGui( filename, dataFile ) ) return;
 
             if ( !FileTools.hasImageExtension( filename ) ) {
                 filename = FileTools.addImageExtension( filename );
@@ -1017,26 +1037,6 @@ public class JGeneSetFrame extends JFrame {
             settings.getConfig().setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
         }
         // else canceled by user
-    }
-
-    /**
-     * @param filename
-     * @param dataFile
-     */
-    private boolean checkFileIsWritableGui( String filename, File dataFile ) {
-        if ( !dataFile.exists() ) {
-            int okay = JOptionPane.showConfirmDialog( this, "File exists. Overwrite?", "File exists",
-                    JOptionPane.YES_NO_OPTION );
-            if ( okay == JOptionPane.NO_OPTION ) {
-                return false;
-            }
-        }
-
-        if ( !dataFile.canWrite() ) {
-            GuiUtil.error( filename + " cannot be written. Make sure the file has write permissions set." );
-            return false;
-        }
-        return true;
     }
 
     /**

@@ -180,6 +180,7 @@ public class AnalysisWizardStep3 extends WizardStep {
      */
     private void addClasstoSelected( String id ) {
         if ( id != null ) {
+            if ( ccHash == null || !ccHash.containsKey( id ) ) return;
             Map cfi = ( Map ) ccHash.get( id );
             if ( cfi == null ) {
                 log.debug( "Null map" );
@@ -250,7 +251,6 @@ public class AnalysisWizardStep3 extends WizardStep {
         addedClasses = new AnalysisWizardStep3_CustomClassList();
         acTableModel = addedClasses.toTableModel();
         addedClassTable.setModel( acTableModel );
-        addedClassTable.setModel( ccTableModel );
         TableSorter sorter = new TableSorter( addedClassTable.getModel() );
         addedClassTable.setModel( sorter );
         sorter.setTableHeader( addedClassTable.getTableHeader() );

@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Collection;
@@ -35,6 +36,7 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.graph.DirectedGraphNode;
 import baseCode.dataStructure.graph.GraphNode;
+import baseCode.gui.GuiUtil;
 import baseCode.util.StringUtil;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
@@ -242,7 +244,21 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( e.getClickCount() < 2 ) {
             return;
         }
-        showDetailsForGeneSet( this.currentlySelectedResultSetIndex, this.currentlySelectedGeneSet );
+
+        new Thread() {
+            public void run() {
+                try {
+                    showDetailsForGeneSet( currentlySelectedResultSetIndex, currentlySelectedGeneSet );
+                } catch ( Exception ex ) {
+                    GuiUtil
+                            .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
+                                    + ex.getMessage() );
+                    log.error( ex, ex );
+                    messenger.clear();
+                }
+            }
+        }.start();
+
     }
 
     /*

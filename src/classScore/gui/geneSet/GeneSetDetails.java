@@ -55,7 +55,8 @@ public class GeneSetDetails {
         this.className = goData.getNameForId( classID );
     }
 
-    public void show( String runName, GeneSetResult res, GeneScores geneScores ) {
+    public void show( String runName, GeneSetResult res, GeneScores geneScores ) throws IOException,
+            IllegalStateException {
 
         Map classToProbe = null;
         Collection probeIDs = null;
@@ -126,19 +127,15 @@ public class GeneSetDetails {
      * @param geneScores
      * @return
      */
-    private GeneScores tryToGetGeneScores( GeneScores geneScores ) {
+    private GeneScores tryToGetGeneScores( GeneScores geneScores ) throws IOException, IllegalStateException {
         assert settings != null : "Null settings.";
         String scoreFile = settings.getScoreFile();
         if ( scoreFile != null ) {
-            try {
-                GeneScores localReader = new GeneScores( scoreFile, settings, null, geneData.getGeneToProbeList(),
-                        geneData.getProbeToGeneMap() );
-                geneScores = localReader;
-                log.debug( "Getting gene scores from " + scoreFile );
-            } catch ( IOException e ) {
-                log.error( e, e );
-                return null;
-            }
+            GeneScores localReader = new GeneScores( scoreFile, settings, null, geneData.getGeneToProbeList(), geneData
+                    .getProbeToGeneMap() );
+            geneScores = localReader;
+            log.debug( "Getting gene scores from " + scoreFile );
+
         }
         return geneScores;
     }
@@ -162,7 +159,7 @@ public class GeneSetDetails {
     /**
      * Show when there is no run information available.
      */
-    public void show() {
+    public void show() throws IOException, IllegalStateException {
         this.show( null, null, null );
     }
 

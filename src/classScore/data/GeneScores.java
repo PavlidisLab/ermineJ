@@ -162,7 +162,7 @@ public class GeneScores {
      * @param probeToGeneMap
      */
     public GeneScores( String filename, Settings settings, StatusViewer messenger, Map geneToProbeMap,
-            Map probeToGeneMap ) throws IOException {
+            Map probeToGeneMap ) throws IOException, IllegalStateException {
         this.settings = settings;
         this.init();
         FileTools.checkPathIsReadableFile( filename );
@@ -194,7 +194,7 @@ public class GeneScores {
     }
 
     private void read( InputStream is, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
-            throws IOException {
+            throws IOException, IllegalStateException {
         int scoreCol = settings.getScoreCol();
         if ( scoreCol < 2 ) {
             throw new IllegalArgumentException( "Illegal column number " + scoreCol + ", must be greater than 1" );

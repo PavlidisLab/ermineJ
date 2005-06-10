@@ -269,8 +269,7 @@ public class UserDefinedGeneSetManager {
         }
         if ( hasUnknownProbes ) {
             log.info( "Some probes not found in array design" );
-        }
-        if ( this.probes.size() == 0 ) {
+        } else if ( this.probes.size() == 0 ) {
             log.info( "No probes in " + fileName + " match current array design" );
             return false;
         }
@@ -285,6 +284,7 @@ public class UserDefinedGeneSetManager {
         File dir = new File( settings.getUserGeneSetDirectory() );
         if ( dir.exists() ) {
             String[] classFiles = dir.list();
+            int numLoaded = 0;
             for ( int i = 0; i < classFiles.length; i++ ) {
                 String classFile = classFiles[i];
 
@@ -293,6 +293,8 @@ public class UserDefinedGeneSetManager {
                     log.debug( "Loading " + classFile );
                     boolean gotSomeProbes = loadUserGeneSet( classFile );
                     if ( gotSomeProbes ) {
+
+                        numLoaded++;
                         log.debug( "Read " + this.probes.size() + " probes for " + getId() + " (" + getDesc() + ")" );
                         if ( isExistingGeneSet( getId() ) ) {
                             log.debug( "User-defined gene set overriding " + getId() );
@@ -308,7 +310,7 @@ public class UserDefinedGeneSetManager {
                 }
             }
             if ( statusMessenger != null )
-                statusMessenger.showStatus( "Loaded " + classFiles.length + " customized gene sets." );
+                statusMessenger.showStatus( "Successfully loaded " + numLoaded + " customized gene sets." );
         }
         return userOverwrittenGeneSets;
     }

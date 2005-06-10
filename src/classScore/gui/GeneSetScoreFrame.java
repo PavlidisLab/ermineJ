@@ -130,6 +130,8 @@ public class GeneSetScoreFrame extends JFrame {
     private Collection userOverwrittenGeneSets;
     JProgressBar progressBar = new JProgressBar();
     private JMenuItem reloadGeneSetsMenuItem = new JMenuItem();
+    private JMenuItem switchDataFileMenuItem = new JMenuItem();
+    private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
 
     /**
      * @throws IOException
@@ -757,10 +759,29 @@ public class GeneSetScoreFrame extends JFrame {
         saveAnalysisMenuItem.setMnemonic( 'S' );
         saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_MASK ) );
         saveAnalysisMenuItem.setEnabled( false ); // no runs to begin with.
+
+        switchDataFileMenuItem.setActionCommand( "Set raw data file" );
+        switchDataFileMenuItem.setText( "Set raw data file..." );
+        switchDataFileMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                switchRawDataFile();
+            }
+        } );
+
+        switchGeneScoreFileMenuItem.setActionCommand( "Set gene score file" );
+        switchGeneScoreFileMenuItem.setText( "Set gene score file..." );
+        switchGeneScoreFileMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                switchGeneScoreFile();
+            }
+        } );
+
         analysisMenu.add( runAnalysisMenuItem );
         analysisMenu.add( cancelAnalysisMenuItem );
         analysisMenu.add( loadAnalysisMenuItem );
         analysisMenu.add( saveAnalysisMenuItem );
+        analysisMenu.add( switchDataFileMenuItem );
+        analysisMenu.add( switchGeneScoreFileMenuItem );
 
         helpMenu.setText( "Help" );
         helpMenu.setMnemonic( 'H' );
@@ -786,6 +807,35 @@ public class GeneSetScoreFrame extends JFrame {
         jMenuBar1.add( analysisMenu );
         jMenuBar1.add( runViewMenu );
         jMenuBar1.add( helpMenu );
+    }
+
+    /**
+     * 
+     */
+    protected void switchGeneScoreFile() {
+        JFileChooser fchooser = new JFileChooser( settings.getDataDirectory() );
+        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION )
+            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+
+    }
+
+    /**
+     * 
+     */
+    protected void switchRawDataFile() {
+        JFileChooser fchooser = new JFileChooser( settings.getDataDirectory() );
+        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.userSetRawFile( true );
+        } else {
+            settings.userSetRawFile( false );
+        }
     }
 
     /**
