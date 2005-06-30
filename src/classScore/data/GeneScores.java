@@ -63,7 +63,7 @@ public class GeneScores {
     double[] groupPvalues;
     private List probeIDs = null;
     private List probePvalues = null;
-    private int numPvals;
+    private int numScores;
     private Map probeToPvalMap;
     private Map geneToPvalMap;
     private String[] probeIDsArray;
@@ -110,17 +110,17 @@ public class GeneScores {
         this.settings = settings;
         this.init();
         boolean invalidLog = false;
-        boolean unknownProbe = false;
         boolean invalidNumber = false;
         String badNumberString = "";
         int numProbesKept = 0;
+        int numUnknownProbes = 0;
         for ( int i = 0; i < probes.size(); i++ ) {
             String probe = ( String ) probes.get( i );
             Double value = ( Double ) scores.get( i );
 
             // only keep probes that are in our array platform.
             if ( !probeToGeneMap.containsKey( probe ) ) {
-                unknownProbe = true;
+                numUnknownProbes++;
                 continue;
             }
 
@@ -146,10 +146,10 @@ public class GeneScores {
             probeIDs.add( probe );
             probePvalues.add( new Double( pValue ) );
             probeToPvalMap.put( probe, new Double( pValue ) );
-            numPvals++;
+            numScores++;
         }
         setUpRawArrays();
-        reportProblems( null, invalidLog, unknownProbe, invalidNumber, badNumberString, numProbesKept );
+        reportProblems( null, invalidLog, numUnknownProbes, invalidNumber, badNumberString, numProbesKept );
         setUpGeneToPvalMap( settings, geneToProbeMap, null );
     }
 
@@ -207,12 +207,12 @@ public class GeneScores {
         BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( is ) ) );
         String row;
         boolean invalidLog = false;
-        boolean unknownProbe = false;
         boolean invalidNumber = false;
         String badNumberString = "";
         int scoreColumnIndex = scoreCol - 1;
         int numProbesKept = 0;
-
+        int numUnknownProbes = 0;
+        dis.readLine(); // skip header.
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
 
@@ -225,7 +225,8 @@ public class GeneScores {
 
             // only keep probes that are in our array platform.
             if ( !probeToGeneMap.containsKey( probeId ) ) {
-                unknownProbe = true;
+                log.debug( "\"" + probeId + "\" not in the annotations, ignoring" );
+                numUnknownProbes++;
                 continue;
             }
 
@@ -271,19 +272,19 @@ public class GeneScores {
 
         }
         dis.close();
-        numPvals = probePvalues.size();
-        assert numPvals == probeIDs.size();
+        numScores = probePvalues.size();
+        assert numScores == probeIDs.size();
 
         setUpRawArrays();
-        reportProblems( messenger, invalidLog, unknownProbe, invalidNumber, badNumberString, numProbesKept );
+        reportProblems( messenger, invalidLog, numUnknownProbes, invalidNumber, badNumberString, numProbesKept );
         setUpGeneToPvalMap( settings, geneToProbeMap, messenger );
 
     }
 
     private void setUpRawArrays() {
-        probePvaluesArray = new double[numPvals];
-        probeIDsArray = new String[numPvals];
-        for ( int i = 0; i < numPvals; i++ ) {
+        probePvaluesArray = new double[numScores];
+        probeIDsArray = new String[numScores];
+        for ( int i = 0; i < numScores; i++ ) {
             probePvaluesArray[i] = ( ( Double ) probePvalues.get( i ) ).doubleValue();
             probeIDsArray[i] = ( String ) probeIDs.get( i );
         }
@@ -297,7 +298,7 @@ public class GeneScores {
      * @param badNumberString
      * @param numProbesKept
      */
-    private void reportProblems( StatusViewer messenger, boolean invalidLog, boolean unknownProbe,
+    private void reportProblems( StatusViewer messenger, boolean invalidLog, int numUnknownProbes,
             boolean invalidNumber, String badNumberString, int numProbesKept ) {
         if ( invalidNumber && messenger != null ) {
 
@@ -311,22 +312,22 @@ public class GeneScores {
                             + SMALL );
             letUserReadMessage();
         }
-        if ( messenger != null && unknownProbe ) {
-            messenger
-                    .showError( "Warning: Some probes in your gene score file don't match the ones in the annotation file." );
+        if ( messenger != null && numUnknownProbes > 0 ) {
+            messenger.showError( "Warning: " + numUnknownProbes
+                    + " probes in your gene score file don't match the ones in the annotation file." );
             letUserReadMessage();
         }
         if ( numProbesKept == 0 ) {
             throw new IllegalStateException( "None of the probes in the gene score file correspond to probes in the "
                     + "annotation (\".an\") file you selected." );
         }
-        if ( numPvals == 0 ) {
+        if ( numScores == 0 ) {
             throw new IllegalStateException( "No probe scores found! Please check the file has"
                     + " the correct plain text format and"
                     + " corresponds to the microarray annotation (\".an\") file you selected." );
         }
         if ( messenger != null ) {
-            messenger.showStatus( "Found " + numPvals + " pvals in the file" );
+            messenger.showStatus( "Found " + numScores + " scores in the file" );
         }
     }
 
@@ -456,7 +457,7 @@ public class GeneScores {
     /**
      */
     public int getNumGeneScores() {
-        return numPvals;
+        return numScores;
     }
 
     /**
