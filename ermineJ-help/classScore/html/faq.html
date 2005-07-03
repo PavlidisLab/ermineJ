@@ -14,6 +14,17 @@
 
 <h1>Frequently asked questions</h1>
 
+<p><strong>Which gene scoring method should I use?</strong> If you are
+looking at differential expression (the usual case), we recommend using
+the <a href="tutorial/resampling">gene score resampling</a> or the <a
+	href="tutorial/roc.html">ROC</a> methods. <a href="tutorial/ora.html">ORA</a>
+is most appropriate when you have a natural threshold for gene
+selection, such as "on chromosome 2". Otherwise, changing the threshold
+can alter the results, sometimes dramatically. If you are interested in
+clustering genes, the <a href="tutorial/correlation.html">correlation</a>
+method might be appropriate. There is more information on choosing
+methods on the help pages for each method.</p>
+
 <p><STRONG>The messages at the bottom of the window go by too fast to
 read. </STRONG>You can read all messages (and other information) in the
 log file. You can view the log file from within ermineJ by selecting the
@@ -86,7 +97,12 @@ this ability. In the meantime, when you have weak or no clear
 differential expression effect on the genes in a gene set, and the genes
 are highly correlated, you should view the results carefully. Typically
 this affects gene sets like the ribosomal proteins, histones&nbsp;or
-proteasome, whose members are always highly correlated.</p>
+proteasome, whose members are always highly correlated. You can test for
+gene sets like this using <a href="tutorial/correlation.html">correlation
+scoring</a>, though this seems likely to give helpful results only if
+the differential expression effects in your experiment are weak.
+Otherwise, gene sets which have strong "interesting" differential
+expression will also appear strongly correlated (as they should be).</p>
 
 <p><strong>Do I input the list of gene scores for the significantly
 changed genes, or all the genes?</strong> All of them. The resampling

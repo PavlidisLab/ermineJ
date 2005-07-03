@@ -46,6 +46,15 @@ activity" had a raw score of about 2.2. This yields a p value of about
 0.00019 (the height of the red graph at that point). If the gene set had
 a score of 1.5, the p value would be poor (about 0.4).</p>
 
+<h2>When to use GSR</h2>
+
+<p>GSR is appropriate when you are analyzing differential expression and
+have reasonably good trust in the values of your gene scores, as opposed
+to the ranking. Its key advantage over <a href="ora.html">ORA</a> is
+that you do not have to set a threshold gene score. If you trust the
+ranking of gene scores more, the <a href="roc.html">roc</a> method might
+be useful. In practice we often try GSR and ROC and compare the results.</p>
+
 <h2>Walk-through</h2>
 
 <p>The steps for the resampling analysis are the same as for <a

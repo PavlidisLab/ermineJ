@@ -29,6 +29,23 @@ their scores, and set the threshold.</p>
 <p>The probabilities produced by ermineJ ORA are computed using the
 binomal approximation to the hypergeometric distribution.</p>
 
+<h2>When to use ORA</h2>
+
+<p>Because ORA requires that you set a distinction between "good" and
+"bad" genes, ORA is most appropriate when you are very confident about
+the threshold. This is because changing the threshold can change the
+results, sometimes dramatically. If you are examining genes which
+naturally fall into two categories ("on chromosome 2" and "not on
+chromosome 2"), then ORA is the logical choice. Otherwise, in our
+opinion the the <a href="tutorial/resampling">gene score resampling</a>
+or the <a href="tutorial/roc.html">ROC</a> methods are a better choice.</p>
+
+<p>We are sometimes asked about looking at functional enrichment in gene
+clusters. ORA might seem like a natural choice because for each cluster
+you divide the genes into "in the cluster" and "not in the cluster". ORA
+is appropriate in that case, but ermineJ also offers an alternative, <a
+	href="tutorial/correlation.html">correlation scoring</a>.</p>
+
 <h2>Walkthrough</h2>
 
 <p><strong>Step 1</strong> is to choose the type of analysis. We select

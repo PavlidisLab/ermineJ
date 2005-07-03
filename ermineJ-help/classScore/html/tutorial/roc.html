@@ -38,15 +38,22 @@ the gene scores. That is, all it cares about is the ordering of items
 obtained by your gene scores (e.g., t-test or fold-change), but doesn't
 use the information about the relative values of the scores.</p>
 
-<p>Like other non-parametric techniques,&nbsp;using ranks costs some
-power, but also makes fewer assumptions. Specifically, if you think the
-ordering of items in your data is more accurate than the actual p-values
-themselves, the ROC might be appropriate.</p>
 
 <p>P-values for this analysis are computed using algorithms described in
 Breslin et al., 2004*. For more information on the ROC, you could do
 worse than reading the Wikipedia page (<a
 	href="http://en.wikipedia.org/wiki/Receiver_operator_characteristic">http://en.wikipedia.org/wiki/Receiver_operator_characteristic</a>).</p>
+
+
+<h2>When to use ROC scoring</h2>
+
+<p>Like other non-parametric techniques, using ranks costs some
+statistical power, but also makes fewer assumptions. Specifically, if
+you think the ordering of items in your data is more accurate than the
+actual p-values themselves, the ROC might be appropriate. A nice thing
+about ROC compared to <a href="resampling">gene score resampling</a> is
+that the p-values are more precise, wherease gene score resampling
+p-value precision is limited by the number of random samples used.</p>
 
 <h2>Walkthrough</h2>
 
