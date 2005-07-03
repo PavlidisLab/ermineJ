@@ -16,17 +16,25 @@
 <p>Version 2.1.4. Changes include:</p>
 
 <ul>
-	<li>The first line of a loaded gene score file is now ignored (e.g., it
-	is treated as a header), as documented in the help. This was causing
-	spurious warnings about mismatched names (bug 229). The warnings given
-	are also more informative.</li>
+
 
 	<li>Fixed bug which caused problems after loading two or more gene
 	score files that had only partial gene lists with respect to the
 	annotation file.(Bug 230)</li>
 
-	<li>Bug which caused unnecessary slowdown of correlation analysis
-	fixed. It's still slow, but usable.</li>
+	<li>(File format) The first line of a loaded gene score file is now
+	ignored (e.g., it is treated as a header), as documented in the help.
+	This was causing spurious warnings about mismatched names (bug 229).
+	The warnings given are also more informative.</li>
+
+	<li>(Performance) Bug which caused unnecessary slowdown of correlation
+	analysis fixed. It's still slow, but usable.</li>
+
+	<li>(Performance) Sorting of details view when sorting by gene symbol
+	is now as fast as for the other columns (bug 195).</li>
+
+	<li>(Documentation) New FAQs and more guidance on setting parameters
+	and choosing methods.</li>
 
 </ul>
 
@@ -37,11 +45,14 @@
 <ul>
 	<li>The command to show user-defined gene sets can sometimes be
 	"confused". The work-around is to just hit "Ctrl-U" twice.</li>
-	<li>In tables shown in wizards, the table columns are resizable and
-	sortable, but this is not indicated by the cursor. (bug 212)</li>
+
 	<li>The id and name of user-defined gene sets cannot be changed. This
 	limitation should be restricted to GO gene sets (bug 224). The
 	work-around is to edit the file and then reload the gene sets.</li>
+
+	<li>(Minor GUI) In tables shown in wizards, the table columns are
+	resizable and sortable, but this is not indicated by the cursor. (bug
+	212)</li>
 </ul>
 
 <hr />
