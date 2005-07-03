@@ -1,72 +1,75 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-  <head>
-    <meta name="generator" content="HTML Tidy, see www.w3.org">
-    <link rel="stylesheet" type="text/css" href="../style.css">
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
+<link rel="stylesheet" type="text/css" href="../style.css">
 
-    <title>Handling of repeated genes</title>
-    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-    <meta http-equiv="description" content="this is my page">
-    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
-  </head>
+<title>Handling of repeated genes</title>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+</head>
 
-  <body>
-  <img src="../images/logo1small.gif" />
-    <h1>Handling repeated genes</h1>
+<body>
+<img src="../images/logo1small.gif" />
+<h1>Handling repeated genes</h1>
 
-    <p>Any given gene can occur more than once in a microarray data
-    set. This is due to the occurrence of two or more probes (or probe
-    sets) that target the same gene. On most microarray designs we have
-    looked at, somewhere in the neighborhood of 30 percent of the
-    probes are "repeats", though this depends on the design. We refer
-    to these as "gene replicates", because they provide replicate
-    measures of the same gene. However, these "replicates" may not be
-    equivalent: they may target different splice forms, or have
-    different sensitivity or specificity. In some cases a probe set may
-    not work at all and give very poor signals, while another probe for
-    the same gene gives a robust signal.</p>
+<p>Any given gene can occur more than once in a microarray data set.
+This is due to the occurrence of two or more probes (or probe sets) that
+target the same gene. On most microarray designs we have looked at,
+somewhere in the neighborhood of 30 percent of the probes are "repeats",
+though this depends on the design. We refer to these as "gene
+replicates", because they provide replicate measures of the same gene.
+However, these "replicates" may not be equivalent: they may target
+different splice forms, or have different sensitivity or specificity. In
+some cases a probe set may not work at all and give very poor signals,
+while another probe for the same gene gives a robust signal.</p>
 
-    <p>In a gene set score analysis, it does not make sense to count
-    each of these "replicates" independently when determining the size
-    of a gene set: a gene set that consists of five replicates of the
-    same gene should not be considered five genes in the statistical
-    analysis. Thus in ermineJ a gene is only counted once. For the
-    correlation analysis, each pair of genes is only counted once. This
-    means that even if there are five occurrences of a gene on the
-    array, it will only be counted once.</p>
+<p>In a gene set score analysis, it does not make sense to count each of
+these "replicates" independently when determining the size of a gene
+set: a gene set that consists of five replicates of the same gene should
+not be considered five genes in the statistical analysis. Thus in
+ermineJ a gene is only counted once. For the correlation analysis, each
+pair of genes is only counted once. This means that even if there are
+five occurrences of a gene on the array, it will only be counted once.</p>
 
-    <p>What remains to determine is how to summarize the results for
-    the replicates: the five replicates in our example have to be
-    distilled down to a single value.</p>
+<p>What remains to determine is how to summarize the results for the
+replicates: the five replicates in our example have to be distilled down
+to a single value.</p>
 
-    <p>ErmineJ offers two ways of dealing with this situation, one
-    which is conservative and one which, while less conservative, might
-    be sensible when there is uncertainty as to the reliability of
-    individual replicates.</p>
+<p>ErmineJ offers two ways of dealing with this situation, one which is
+conservative and one which, while less conservative, might be sensible
+when there is uncertainty as to the reliability of individual
+replicates.</p>
 
-    <p>The conservative choice is referred to as
-    "<strong>Mean</strong>": the different occurrences of the gene are
-    each given equal weight. For correlation analysis, the same rule
-    applies but at the level of pairs of genes. Thus if there are two
-    replicates of gene A and two replicates of gene B, a total of 4
-    comparisons is possible. The final contribution of the A-B
-    comparison is 1/4 of the correlations measured between all the
-    replicates.</p>
+<p>The conservative choice is referred to as "<strong>Mean</strong>":
+the different occurrences of the gene are each given equal weight. For
+correlation analysis, the same rule applies but at the level of pairs of
+genes. Thus if there are two replicates of gene A and two replicates of
+gene B, a total of 4 comparisons is possible. The final contribution of
+the A-B comparison is 1/4 of the correlations measured between all the
+replicates. <strong>This method makes the most sense to use if your
+replicates are usually actual spot replicates, that is, the same
+sequence occuring multiple times on the array.</strong></p>
 
-    <p>The less conservative choice is referred to as
-    "<strong>Best</strong>": the only score counted for a gene is the
-    best one. Thus if a gene has two replicates with scores 3 and 4 (-
-    log p values), then only the 4 is counted; with the mean method the
-    final value would be 3.5. For correlation analysis, the best
-    pairwise correlation is stored. In the A-B example give above, this
-    means that the best of the four comparisons is kept.</p>
+<p>The less conservative choice is referred to as "<strong>Best</strong>":
+the only score counted for a gene is the best one. Thus if a gene has
+two replicates with scores 3 and 4 (- log p values), then only the 4 is
+counted; with the mean method the final value would be 3.5. For
+correlation analysis, the best pairwise correlation is stored. In the
+A-B example give above, this means that the best of the four comparisons
+is kept. <strong>This method might make more sense if your "replicates"
+tend to target different transcripts or sets of transcripts</strong>
+</p>
 
-    <p>The choice of which method to use depends on how conservative
-    you want to be, combined with knowledge you have about the
-    microarray design. If you consider gene "replicates" not to really
-    be replicates, then using the "best" option might make sense. If
-    your microarray design just has exact replicate spots of the same
-    sequence, then using "Mean" might be sensible.</p>
-  </body>
+<h2>Which method should you use?</h2>
+
+<p>The choice of which method to use depends on how conservative you
+want to be, combined with knowledge you have about the microarray
+design. If you consider gene "replicates" not to really be replicates,
+then using the "best" option might make sense. If your microarray design
+just has exact replicate spots of the same sequence, then using "Mean"
+might be sensible.</p>
+</body>
 </html>

@@ -5,19 +5,26 @@
 <meta name="generator" content="HTML Tidy, see www.w3.org">
 
 <title>Frequently asked questions</title>
-
 <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
-<img src="images/logo1small.gif" />
+<IMG src="images/logo1small.gif" alt="">
+
+
 <h1>Frequently asked questions</h1>
 
-<p><strong>All my gene set p-values are coming out as zero. What is
-wrong?</strong> This can happen if you have not set the parameters for
+<p><STRONG>The messages at the bottom of the window go by too fast to
+read. </STRONG>You can read all messages (and other information) in the
+log file. You can view the log file from within ermineJ by selecting the
+"help" menu, choose "view log". The log file for the current or last run
+of ermineJ&nbsp;is stored on your hard drive in a file called
+ermineJ.log, it should be in your home directory.</p>
+<P><STRONG>All my gene set p-values are coming out as zero. What is
+wrong?</STRONG> This can happen if you have not set the parameters for
 the analysis correctly. In particular, if your input file contains raw
 p-values, make sure the "larger scores are better" box is <strong>unchecked</strong>
-in the last analysis wizard step.</p>
+in the last analysis wizard step.</P>
 
 <p><strong>What is the meaning of the "score" for each gene set?</strong>
 During analysis, each gene set is given a score which, along with the
@@ -44,9 +51,9 @@ Bonferroni-corrected p values, multiply your gene set p values by the
 number of gene sets analyzed (maximum of 1). Then you can use a
 threshold of 0.05 (which would not otherwise be reasonable).</p>
 
-<p><STRONG>My data set has no "significant" genes, but when I run
+<p><strong>My data set has no "significant" genes, but when I run
 ermineJ with resampling I get significant gene sets. How do I interpret
-these results?</STRONG> Carefully. ErmineJ's resampling methods are
+these results?</strong> Carefully. ErmineJ's resampling methods are
 based on analyzing your gene expression data in isolation, without
 reference to any theoretical background model (other methods may be
 added in future versions of ermineJ that allow this). It is capable of
@@ -62,7 +69,7 @@ other that statistical significance.</p>
 context of your data set, one reasonable null hypothesis would yield a
 distribution of p-values in the gene set that is uniform (though this
 assumes the genes are independent). A uniform distribution of p-values
-is displayed in the<A href="tutorial/visualize.html"> details view</A>
+is displayed in the <a href="tutorial/visualize.html">details view</a>
 of each class. When the blue line (your p-values) is far to the right of
 the expected distribution under the null (grey line), you can have
 higher confidence in the importance of that gene set. The reason we do
@@ -70,6 +77,16 @@ not use this method exclusively is that in data sets where many genes
 have changed, every gene set will appear significant. Reasonable
 interpretation of the results requires consideration of both types of
 analyses.</p>
+
+<p>A related issue is that gene sets whose members have correlated
+transcription in all conditions (that is, not relevant to your study)
+can sometimes yield incorrect results. The remedy to this problem is to
+do resampling over the samples, but ermineJ currently does not support
+this ability. In the meantime, when you have weak or no clear
+differential expression effect on the genes in a gene set, and the genes
+are highly correlated, you should view the results carefully. Typically
+this affects gene sets like the ribosomal proteins, histones&nbsp;or
+proteasome, whose members are always highly correlated.</p>
 
 <p><strong>Do I input the list of gene scores for the significantly
 changed genes, or all the genes?</strong> All of them. The resampling
@@ -84,8 +101,8 @@ list the actual number of probes or genes in your gene sets. See <A
 <p><strong>How do I find out which genes are in a gene set without doing
 an analysis?</strong> You can use the "View/Modify Gene set" tools,
 available from the main 'analysis' menu, or the context-specific pop-up
-menu on the gene set list. See <a
-	href="tutorial/classes.html#viewgeneset">this page</a></p>
+menu on the gene set list. See <A
+	href="tutorial/classes.html#viewgeneset">this page</A></p>
 
 <p><strong>When I open the output file in Notepad it looks like a mess
 of letters and numbers. How do I view this file?</strong> The output
@@ -156,14 +173,13 @@ settings, and then, once you find a setting you like, you can crank up
 the iterations for the "final" run (for example to 200000, which still
 should not take very long for the gene-score based resampling).</p>
 
-
-<P><STRONG>Why do my resampling results vary slightly from run to run?</STRONG>
+<p><strong>Why do my resampling results vary slightly from run to run?</strong>
 This happens either when too few iterations are run, or sometimes when
 using the approximation methods. To ensure the highest accuracy, set the
 number of iterations to a larger value (say, 200,000 for gene score
-resampling) and <STRONG>check</STRONG> the <EM>Always use full
-resampling</EM><FONT size="4">" </FONT><FONT size="3">checkbox in the
-analysis setup wizard.</FONT></P>
+resampling) and <strong>check</strong> the <em>Always use full
+resampling</em><font size="4">"</font> <font size="3">checkbox in the
+analysis setup wizard.</font></p>
 
 <p><strong>What happens to probes that don't have any GO annotations?</strong>
 They are ignored.</p>
@@ -178,18 +194,16 @@ the gene set. For more details on how this works, see <A
 See <A href="tutorial/genereps.html">this page</A> .</p>
 
 <p><strong>Why are the number of gene and probes shown in the output
-panel incorrect when my data set has been filtered?</strong> See <A
-	href="tutorial/numitems.html">this page</A>.</p>
+panel incorrect when my data set has been filtered?</strong> See <a
+	href="tutorial/numitems.html">this page</a>.</p>
 
 <p><strong>What do the different icons mean in the tree view?</strong>
 The icons are used to indicate where to look to find "significant" gene
-sets. The specific icons are explained <a
-	href="tutorial/analysis.html#treepanel">here</a></p>
+sets. The specific icons are explained <A
+	href="tutorial/analysis.html#treepanel">here</A></p>
 
 <p><strong>What do the different colors mean in the table and tree
 views?</strong> The colors indicate different levels of statistical
-significance, as explained <a href="tutorial/mtc.html">here</a></p>
-
-
+significance, as explained <A href="tutorial/mtc.html">here</A></p>
 </body>
 </html>

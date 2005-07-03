@@ -12,7 +12,43 @@
 <h1>Version history</h1>
 
 <h2>Current version</h2>
-<p>Version 2.1.3. Changes include:
+
+<p>Version 2.1.4. Changes include:</p>
+
+<ul>
+	<li>The first line of a loaded gene score file is now ignored (e.g., it
+	is treated as a header), as documented in the help. This was causing
+	spurious warnings about mismatched names (bug 229). The warnings given
+	are also more informative.</li>
+
+	<li>Fixed bug which caused problems after loading two or more gene
+	score files that had only partial gene lists with respect to the
+	annotation file.(Bug 230)</li>
+
+	<li>Bug which caused unnecessary slowdown of correlation analysis
+	fixed. It's still slow, but usable.</li>
+
+</ul>
+
+<p>Known issues:</p>
+
+
+
+<ul>
+	<li>The command to show user-defined gene sets can sometimes be
+	"confused". The work-around is to just hit "Ctrl-U" twice.</li>
+	<li>In tables shown in wizards, the table columns are resizable and
+	sortable, but this is not indicated by the cursor. (bug 212)</li>
+	<li>The id and name of user-defined gene sets cannot be changed. This
+	limitation should be restricted to GO gene sets (bug 224). The
+	work-around is to edit the file and then reload the gene sets.</li>
+</ul>
+
+<hr />
+
+<h2>Older versions</h2>
+
+<p>Version 2.1.3. Changes include:</p>
 <ul>
 	<li>A number of bugs in the display of user-modified or user-defined
 	gene sets have been fixed.</li>
@@ -27,22 +63,6 @@
 	<li>Additional bug and feature fixes (including issues 170, 208, 214,
 	215, 218, 219, 220, 222, 223).</li>
 </ul>
-
-<p>Known issues:</p>
-
-<ul>
-	<li>The command to show user-defined gene sets can sometimes be
-	"confused". The work-around is to just hit "Ctrl-U" twice.</li>
-	<li>In tables shown in wizards, the table columns are resizable and
-	sortable, but this is not indicated by the cursor. (bug 212)</li>
-	<li>The id and name of user-defined gene sets cannot be changed. This
-	limitation should be restricted to GO gene sets (bug 224). The
-	work-around is to edit the file and then reload the gene sets.</li>
-</ul>
-
-</p>
-
-<h2>Older versions</h2>
 
 
 <p>Version 2.1.2. Changes include:
