@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Collection;
@@ -36,7 +35,6 @@ import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.graph.DirectedGraphNode;
 import baseCode.dataStructure.graph.GraphNode;
-import baseCode.gui.GuiUtil;
 import baseCode.util.StringUtil;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;
@@ -711,8 +709,8 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             // this.setFont( italic );
             this.setForeground( Color.GRAY );
         } else {
-            displayedText = name + " -- " + geneData.numActiveProbesInGeneSet( id ) + " probes, "
-                    + geneData.numActiveGenesInGeneSet( id ) + " genes";
+            displayedText = name + " -- " + geneData.numProbesInGeneSet( id ) + " probes, "
+                    + geneData.numGenesInGeneSet( id ) + " genes";
             this.setFont( plain );
             this.setForeground( Color.BLACK );
         }
