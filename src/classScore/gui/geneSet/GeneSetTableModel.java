@@ -3,6 +3,8 @@ package classScore.gui.geneSet;
 import java.awt.Point;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,12 +35,13 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     private static final String URL_REPLACE_TAG = "@@";
     private JMatrixDisplay m_matrixDisplay;
-    private List m_probeIDs;
+    private List probeIDs;
     private Map m_pvalues;
     private Map m_pvaluesOrdinalPosition;
-    private GeneAnnotations m_geneData;
+    private GeneAnnotations geneData;
     private DecimalFormat m_nf;
     private Settings settings;
+    private Map linkLabels;
     private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name" };
     private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
     protected static final Log log = LogFactory.getLog( GeneSetTableModel.class );
@@ -55,13 +58,31 @@ public class GeneSetTableModel extends AbstractTableModel {
             GeneAnnotations geneData, DecimalFormat nf, Settings settings ) {
 
         m_matrixDisplay = matrixDisplay;
-        m_probeIDs = probeIDs;
+        this.probeIDs = probeIDs;
         m_pvalues = pvalues;
         this.settings = settings;
         m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
-        m_geneData = geneData;
+        this.geneData = geneData;
         m_nf = nf;
         configure();
+        createLinkLabels();
+    }
+
+    /**
+     * 
+     */
+    private void createLinkLabels() {
+        assert probeIDs != null;
+        this.linkLabels = new HashMap();
+        for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
+            String probe = ( String ) iter.next();
+            String gene = geneData.getProbeGeneName( probe );
+            if ( gene != null ) {
+                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene );
+                linkLabels.put( gene, new JLinkLabel( gene, url ) );
+            }
+        }
+
     }
 
     /**
@@ -91,7 +112,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     } // end getColumnName
 
     public int getRowCount() {
-        return m_probeIDs.size();
+        return probeIDs.size();
     }
 
     public int getColumnCount() {
@@ -105,7 +126,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
         // get the probeID for the current row
-        String probeID = ( String ) m_probeIDs.get( row );
+        String probeID = ( String ) probeIDs.get( row );
 
         // If this is part of the matrix display
         if ( column < offset ) {
@@ -151,14 +172,14 @@ public class GeneSetTableModel extends AbstractTableModel {
                 }
                 return values;
             case 3:
-                if ( m_geneData == null ) return "No data available";
-                String gene_name = m_geneData.getProbeGeneName( probeID );
-                String url = "";
-                if ( gene_name != null ) url = urlbase.replaceFirst( URL_REPLACE_TAG, gene_name );
-                return m_geneData == null ? null : new JLinkLabel( gene_name, url );
+                // gene symbol.
+                if ( geneData == null ) return "No data available";
+                String gene_name = geneData.getProbeGeneName( probeID );
+
+                return geneData == null ? null : linkLabels.get( gene_name );
             case 4:
                 // description
-                return m_geneData == null ? "" : m_geneData.getProbeDescription( probeID );
+                return geneData == null ? "" : geneData.getProbeDescription( probeID );
             default:
                 return "";
         }
