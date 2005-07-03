@@ -22,17 +22,17 @@ import classScore.data.GeneScores;
 public class GeneSetSizeComputer {
     protected Map effectiveSizes = null;
     protected Map actualSizes = null;
-    protected Map classToProbe;
     protected boolean weight_on = true;
-    protected Map probeGroups;
-    protected GeneScores geneScores;
-    protected Set activeProbes;
 
-    public GeneSetSizeComputer( Set activeProbes, GeneAnnotations geneData, GeneScores geneScores, boolean w ) {
+    protected GeneScores geneScores;
+    protected Collection activeProbes;
+    private GeneAnnotations geneData;
+
+    public GeneSetSizeComputer( Collection activeProbes, GeneAnnotations geneData, GeneScores geneScores, boolean w ) {
         this.weight_on = w;
         this.activeProbes = activeProbes;
-        this.classToProbe = geneData.getGeneSetToProbeMap();
-        this.probeGroups = geneData.getProbeToGeneMap();
+        this.geneData = geneData;
+
         this.geneScores = geneScores;
         effectiveSizes = new HashMap();
         actualSizes = new HashMap();
@@ -43,10 +43,6 @@ public class GeneSetSizeComputer {
      * Calculate class sizes for all classes - both effective and actual size
      */
     private void getClassSizes() {
-        Collection entries = classToProbe.entrySet(); // go -> probe map. Entries
-        // are the class names.
-        Iterator it = entries.iterator();
-
         Map record = new HashMap();
         int size;
         int v_size;
@@ -58,11 +54,11 @@ public class GeneSetSizeComputer {
 
         boolean gotAtLeastOneNonZero = false;
 
-        while ( it.hasNext() ) {
-            Map.Entry e = ( Map.Entry ) it.next(); // next class.
-            String className = ( String ) e.getKey(); // id of the class
+        for ( Iterator iter = geneData.getGeneSets().iterator(); iter.hasNext(); ) {
+
+            String className = ( String ) iter.next(); // id of the class
             // (GO:XXXXXX)
-            Collection values = ( Collection ) e.getValue(); // items in the class.
+            Collection values = geneData.getGeneSetProbes( className );
             Iterator I = values.iterator();
 
             record.clear();
@@ -71,7 +67,7 @@ public class GeneSetSizeComputer {
 
             while ( I.hasNext() ) { // foreach item in the class.
                 String probe = ( String ) I.next();
-
+                String gene = geneData.probeToGene( probe );
                 if ( probe != null ) {
                     if ( activeProbes.contains( probe ) ) { // if it is in the data
                         // set
@@ -79,17 +75,17 @@ public class GeneSetSizeComputer {
 
                         if ( weight_on ) { // routine for weights
                             // compute pval for every replicate group
-                            if ( geneScores.getGeneToPvalMap().containsKey( probeGroups.get( probe ) )
+                            if ( geneScores.getGeneToPvalMap().containsKey( gene )
 
                             /*
                              * if we haven't done this probe already.
                              */
-                            && !record.containsKey( probeGroups.get( probe ) ) ) {
+                            && !record.containsKey( gene ) ) {
 
                                 /*
                                  * mark it as done for this class.
                                  */
-                                record.put( probeGroups.get( probe ), null );
+                                record.put( gene, null );
                                 v_size++; // this is used in any case.
                             }
                         }

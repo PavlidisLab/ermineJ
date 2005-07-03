@@ -148,7 +148,7 @@ public class MultipleTestCorrector {
             // set). If we are not using weights, it only affects the
             // hypergeometric pvalues. (todo: add correction for those
             // values) So we don't even bother shuffling it.
-            Map scprobepvalmap = geneScores.getProbeToPvalMap();
+            Map scprobepvalmap = geneScores.getProbeToScoreMap();
 
             // Just for AROC:
             /*

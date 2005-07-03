@@ -46,9 +46,17 @@ import classScore.data.GeneSetResult;
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private Map results;
+    private int totalSize = 0;
 
     public RocPvalGenerator( Settings set, GeneAnnotations an, GeneSetSizeComputer csc, GONames gon ) {
         super( set, an, csc, gon );
+        totalSize = 0;
+        if ( settings.getUseWeights() ) {
+            totalSize = geneAnnots.numGenes();
+        } else {
+            totalSize = geneAnnots.numProbes();
+        }
+        log.debug( totalSize + " elements in total" );
         results = new HashMap();
     }
 
@@ -59,8 +67,10 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param probesToPvals a <code>Map</code> value
      */
     public void classPvalGenerator( Map genePvalueMap, Map rankMap, StatusViewer messenger ) {
+
         int count = 0;
-        for ( Iterator iter = geneAnnots.getGeneSetToProbeMap().keySet().iterator(); iter.hasNext(); ) {
+
+        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             if ( isInterrupted() ) {
                 break;
             }
@@ -86,13 +96,6 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      */
     public GeneSetResult classPval( String geneSet, Map probesToPvals, Map rankMap ) {
 
-        int totalSize = 0;
-        if ( settings.getUseWeights() ) {
-            totalSize = geneAnnots.getGeneToGeneSetMap().size();
-        } else {
-            totalSize = geneAnnots.getProbeToGeneMap().size();
-        }
-
         // variables for outputs
         List targetRanks = new ArrayList();
 
@@ -104,9 +107,9 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         Collection values = null;
 
         if ( settings.getUseWeights() ) {
-            values = ( Collection ) geneAnnots.getGeneSetToGeneMap().get( geneSet );
+            values = geneAnnots.getActiveGeneSetGenes( geneSet );
         } else {
-            values = ( Collection ) geneAnnots.getGeneSetToProbeMap().get( geneSet );
+            values = geneAnnots.getGeneSetProbes( geneSet );
         }
 
         Iterator classit = values.iterator();

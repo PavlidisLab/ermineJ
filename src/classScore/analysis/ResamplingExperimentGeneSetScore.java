@@ -171,8 +171,8 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
         this.numClasses = classMaxSize - classMinSize + 1;
         pvals = geneScores.getPvalues(); // array of pvalues.
-        groupPvals = geneScores.getGroupPvalues();
-        probePvalMap = geneScores.getProbeToPvalMap(); // reference to the probe -> pval map.
+        groupPvals = geneScores.getGeneScores();
+        probePvalMap = geneScores.getProbeToScoreMap(); // reference to the probe -> pval map.
 
         this.setHistogramRange();
         this.hist = new Histogram( numClasses, classMinSize, numRuns, histogramMax, histogramMin );

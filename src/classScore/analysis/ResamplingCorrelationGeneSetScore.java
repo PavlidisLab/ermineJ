@@ -118,7 +118,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
                 if ( j % 500 == 0 ) {
                     takeABreak();
                 }
-                takeABreak();
+         
             }
 
             /*
@@ -128,7 +128,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             if ( useSpeedUp && geneSetSize >= SPEEDUPSIZECUT ) {
                 geneSetSize += Math.floor( SPEDUPSIZEEXTRASTEP * geneSetSize );
             }
-
+            takeABreak();
         }
         hist.tocdf();
         return hist;

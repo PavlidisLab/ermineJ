@@ -453,8 +453,7 @@ public class classScoreCMD {
             geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
         } else {
             statusMessenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData
-                    .getGeneToProbeList(), geneData.getProbeToGeneMap() );
+            geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
 
@@ -466,9 +465,9 @@ public class classScoreCMD {
         Set activeProbes = null;
         if ( rawData != null && geneScores != null ) { // favor the geneScores
             // list.
-            activeProbes = geneScores.getProbeToPvalMap().keySet();
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
         } else if ( rawData == null && geneScores != null ) {
-            activeProbes = geneScores.getProbeToPvalMap().keySet();
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
         } else if ( rawData != null && geneScores == null ) {
             activeProbes = new HashSet( rawData.getRowNames() );
         }

@@ -40,7 +40,7 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
 
         double pval = 0.0;
         double rawscore = 0.0;
-        Collection values = ( Collection ) geneAnnots.getGeneSetToProbeMap().get( geneSetName );
+        Collection values = geneAnnots.getGeneSetProbes( geneSetName );
         Iterator classit = values.iterator();
 
         if ( !super.checkAspect( geneSetName ) ) return -1.0;

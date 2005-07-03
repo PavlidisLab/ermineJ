@@ -57,7 +57,6 @@ public class GeneSetDetails {
     public void show( String runName, GeneSetResult res, GeneScores geneScores ) throws IOException,
             IllegalStateException {
 
-        Map classToProbe = null;
         Collection probeIDs = null;
         Map pvals = new HashMap();
 
@@ -65,10 +64,10 @@ public class GeneSetDetails {
             // user will be prompted.
             log.warn( "No gene data found" );
         } else {
-            classToProbe = geneData.getGeneSetToProbeMap();
-            if ( !classToProbe.containsKey( classID ) )
+            probeIDs = geneData.getGeneSetProbes(classID);
+            if (probeIDs == null || probeIDs.size() == 0) {
                 log.info( "Information about gene set " + classID + " is not available" );
-            probeIDs = ( Collection ) classToProbe.get( classID );
+            }
         }
 
         if ( geneScores == null ) {
@@ -102,7 +101,7 @@ public class GeneSetDetails {
         for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
             String probeID = ( String ) iter.next();
 
-            if ( !geneScores.getProbeToPvalMap().containsKey( probeID ) ) {
+            if ( !geneScores.getProbeToScoreMap().containsKey( probeID ) ) {
                 pvals.put( probeID, new Double( Double.NaN ) );
                 continue;
             }
@@ -112,10 +111,10 @@ public class GeneSetDetails {
                 pvalue = new Double( Double.NaN );
             } else {
                 if ( settings.getDoLog() == true ) {
-                    double negLogPval = ( ( Double ) geneScores.getProbeToPvalMap().get( probeID ) ).doubleValue();
+                    double negLogPval = ( ( Double ) geneScores.getProbeToScoreMap().get( probeID ) ).doubleValue();
                     pvalue = new Double( Math.pow( 10.0, -negLogPval ) );
                 } else {
-                    pvalue = ( Double ) geneScores.getProbeToPvalMap().get( probeID );
+                    pvalue = ( Double ) geneScores.getProbeToScoreMap().get( probeID );
                 }
             }
             pvals.put( probeID, pvalue );
@@ -130,11 +129,9 @@ public class GeneSetDetails {
         assert settings != null : "Null settings.";
         String scoreFile = settings.getScoreFile();
         if ( scoreFile != null ) {
-            GeneScores localReader = new GeneScores( scoreFile, settings, null, geneData.getGeneToProbeList(), geneData
-                    .getProbeToGeneMap() );
+            GeneScores localReader = new GeneScores( scoreFile, settings, null, this.geneData );
             geneScores = localReader;
             log.debug( "Getting gene scores from " + scoreFile );
-
         }
         return geneScores;
     }

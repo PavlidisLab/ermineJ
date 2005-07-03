@@ -181,7 +181,7 @@ public class AnalysisThread extends Thread {
                 showError( e.getCause() );
             } else {
                 log.debug( "Cancelled" );
-            } 
+            }
             messenger.showStatus( "Ready" );
             throw new IllegalStateException( e.getCause() );
         } catch ( Exception e ) {
@@ -202,8 +202,7 @@ public class AnalysisThread extends Thread {
             geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
         } else {
             messenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData.getGeneToProbeList(),
-                    geneData.getProbeToGeneMap() );
+            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
         if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
@@ -248,15 +247,18 @@ public class AnalysisThread extends Thread {
         Set activeProbes = getActiveProbes( rawData, geneScores );
         if ( activeProbes == null || Thread.currentThread().isInterrupted() ) return latestResults;
 
-        boolean needToMakeNewGeneData = needNewGeneData( activeProbes );
+        // boolean needToMakeNewGeneData = needNewGeneData( activeProbes );
         GeneAnnotations useTheseAnnots = geneData;
-        if ( needToMakeNewGeneData ) {
-            useTheseAnnots = new GeneAnnotations( geneData, activeProbes ); // / don't redo the parent adding.
-            /*
-             * todo I don't like this way of keeping track of the different geneData sets....though it works.
-             */
-            geneDataSets.put( new Integer( useTheseAnnots.hashCode() ), useTheseAnnots );
-        }
+        // if ( needToMakeNewGeneData ) {
+        // log.debug( "Making new gene data from existing" );
+        // useTheseAnnots = new GeneAnnotations( geneData, activeProbes ); // / don't redo the parent adding.
+        // /*
+        // * todo I don't like this way of keeping track of the different geneData sets....though it works.
+        // */
+        // geneDataSets.put( new Integer( useTheseAnnots.hashCode() ), useTheseAnnots );
+        // } else {
+        // log.debug( "No need to make new gene data, reusing existing." );
+        // }
 
         if ( this.stop ) return null;
 
@@ -293,12 +295,13 @@ public class AnalysisThread extends Thread {
     private synchronized Set getActiveProbes( DenseDoubleMatrix2DNamed rawData, GeneScores geneScores ) {
         Set activeProbes = null;
         if ( rawData != null && geneScores != null ) { // favor the geneScores list.
-            activeProbes = geneScores.getProbeToPvalMap().keySet();
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
         } else if ( rawData == null && geneScores != null ) {
-            activeProbes = geneScores.getProbeToPvalMap().keySet();
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
         } else if ( rawData != null && geneScores == null ) {
             activeProbes = new HashSet( rawData.getRowNames() );
         }
+        log.debug( activeProbes.size() + " active probes" );
         return activeProbes;
     }
 

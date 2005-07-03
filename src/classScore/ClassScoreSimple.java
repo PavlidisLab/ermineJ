@@ -107,7 +107,7 @@ public class ClassScoreSimple {
      */
     public void run( List geneScores ) {
         GeneAnnotations geneData = new GeneAnnotations( probes, genes, null, goAssociations );
-        GeneScores scores = new GeneScores( probes, geneScores, geneData.getGeneToProbeList(), geneData
+        GeneScores scores = new GeneScores( probes, geneScores, geneData.getGeneToProbeMap(), geneData
                 .getProbeToGeneMap(), settings );
         results = new GeneSetPvalRun( settings, geneData, null, scores );
     }

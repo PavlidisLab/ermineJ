@@ -61,6 +61,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     protected String currentlySelectedGeneSet = null;
     protected int currentlySelectedResultSetIndex = -1;
     private BaseCellRenderer rend;
+    private Collection geneSets;
 
     public GeneSetTreePanel( GeneSetScoreFrame callingFrame, List results, Settings settings ) {
         super( settings, results, callingFrame );
@@ -90,6 +91,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     public void updateNodeStyles() {
         log.debug( "Updating nodes" );
         try {
+            this.geneSets = null;
             visitAllNodes( goTree, this.getClass().getMethod( "clearNode", new Class[] { GeneSetTreeNode.class } ) );
             visitAllNodes( goTree, this.getClass().getMethod( "hasGoodChild", new Class[] { GeneSetTreeNode.class } ) );
             visitAllNodes( goTree, this.getClass().getMethod( "hasUsableChildren",
@@ -167,10 +169,11 @@ public class GeneSetTreePanel extends GeneSetPanel {
     public void hasUsableChildren( GeneSetTreeNode node ) {
         Enumeration e = node.breadthFirstEnumeration();
         e.nextElement(); // the first node is this node.
+        if ( geneSets == null ) geneSets = geneData.getGeneSets();
         while ( e.hasMoreElements() ) {
             GeneSetTreeNode childNode = ( GeneSetTreeNode ) e.nextElement();
             String id = ( String ) ( ( DirectedGraphNode ) childNode.getUserObject() ).getKey();
-            if ( geneData.getGeneSetToProbeMap().containsKey( id ) ) {
+            if ( geneSets.contains( id ) ) {
                 node.setHasUsableChild( true );
                 return;
             }
@@ -704,18 +707,17 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             // this.setFont( italic );
             this.setForeground( Color.GRAY );
         }
-        if ( !geneData.getGeneSetToProbeMap().containsKey( id ) || !geneData.getSelectedSets().contains( id ) ) {
+        if ( !geneData.getGeneSets().contains( id ) || !geneData.getSelectedSets().contains( id ) ) {
             // this.setFont( italic );
             this.setForeground( Color.GRAY );
         } else {
-            displayedText = name + " -- " + ( ( Collection ) geneData.getGeneSetToProbeMap().get( id ) ).size()
-                    + " probes, " + ( ( Collection ) geneData.getGeneSetToGeneMap().get( id ) ).size() + " genes";
+            displayedText = name + " -- " + geneData.numActiveProbesInGeneSet( id ) + " probes, "
+                    + geneData.numActiveGenesInGeneSet( id ) + " genes";
             this.setFont( plain );
             this.setForeground( Color.BLACK );
         }
         return displayedText;
     }
-
 }
 
 class GeneSetTreePanel_mouseListener extends MouseAdapter {

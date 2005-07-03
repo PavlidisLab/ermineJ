@@ -38,7 +38,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
     private Histogram hist;
     private CorrelationPvalGenerator probeCorrelData;
     // private Map probeToGeneSetMap; // stores probe->go Hashtable
-    private Map geneSetToProbeMap; // stores go->probe Hashtable
+
     private Map results;
     private DenseDoubleMatrix2DNamed rawData;
     private Map probeToGeneMap;
@@ -65,7 +65,6 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
         this.probeToGeneMap = geneAnnots.getProbeToGeneMap();
         this.probeCorrelData = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );
         this.geneAnnots = geneAnnots;
-        this.geneSetToProbeMap = geneAnnots.getGeneSetToProbeMap();
 
         this.hist = hist;
         this.rawData = rawData;
@@ -83,42 +82,42 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
         int count = 0;
         int setting = settings.getGeneRepTreatment();
 
-        for ( Iterator it = geneSetToProbeMap.entrySet().iterator(); it.hasNext(); ) {
+        for ( Iterator it = geneAnnots.getGeneSets().iterator(); it.hasNext(); ) {
             if ( isInterrupted() ) {
-                log.debug( "Canceling" );
+                log.debug( "Cancelling" );
                 break;
             }
-            Map.Entry e = ( Map.Entry ) it.next();
-            Collection probesInSet = ( Collection ) e.getValue();
-            String geneSetName = ( String ) e.getKey();
+            String geneSetName = ( String ) it.next();
+            Collection probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
 
             if ( !super.checkAspect( geneSetName ) ) continue;
 
             int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
 
-            if ( effSize < probeCorrelData.getMinGeneSetSize() ) {
-                continue; // then there is no hope.
+            if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
+                continue;
             }
+            // log.debug( "Analyzing " + geneSetName + ", size=" + effSize );
 
             // this calculation is done just in case the hashtable has no value
             // for an element...hence we keep track of the number of elements
             // with values and then create a Matrix to be used for correlation
             // based on that
-            int classSize = 0;
-            for ( Iterator mit = probesInSet.iterator(); mit.hasNext(); ) {
-                String element = ( String ) mit.next();
-                if ( probeCorrelData.containsRow( element ) ) {
-                    classSize++;
-                }
-                if ( classSize > probeCorrelData.getMaxClassSize() ) {
-                    break;
-                }
-            }
+            // int classSize = 0;
+            // for ( Iterator mit = probesInSet.iterator(); mit.hasNext(); ) {
+            // String element = ( String ) mit.next();
+            // if ( probeCorrelData.containsRow( element ) ) {
+            // classSize++;
+            // }
+            // if ( classSize > probeCorrelData.getMaxClassSize() ) {
+            // break;
+            // }
+            // }
 
-            // to check if class size is ok.
-            if ( classSize < probeCorrelData.getMinGeneSetSize() || classSize > probeCorrelData.getMaxClassSize() ) {
-                continue;
-            }
+            // // to check if class size is ok.
+            // if ( classSize < probeCorrelData.getMinGeneSetSize() || classSize > probeCorrelData.getMaxClassSize() ) {
+            // continue;
+            // }
 
             if ( count % 10 == 0 ) {
                 messenger.showStatus( "Classes analyzed: " + count );
@@ -198,7 +197,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
             GeneSetResult result = new GeneSetResult( geneSetName, goName.getNameForId( geneSetName ),
                     ( ( Integer ) actualSizes.get( geneSetName ) ).intValue(), effSize );
             result.setScore( geneSetMeanCorrel );
-            result.setPValue( hist.getValue( classSize, geneSetMeanCorrel, true ) ); // always upper tail.
+            result.setPValue( hist.getValue( effSize, geneSetMeanCorrel, true ) ); // always upper tail.
             results.put( geneSetName, result );
             count++;
         }

@@ -67,17 +67,17 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
      * @param probesToPvals a <code>Map</code> value
      */
     public void classPvalGenerator( Map geneToGeneScoreMap, Map probesToPvals, StatusViewer messenger ) {
-        Collection entries = geneAnnots.getGeneSetToProbeMap().entrySet(); // go ->
+        Collection geneSets = geneAnnots.getGeneSets(); // go ->
 
-        Iterator it = entries.iterator(); // the classes.
+        Iterator it = geneSets.iterator(); // the classes.
 
         OraPvalGenerator cpv = new OraPvalGenerator( settings, geneAnnots, csc, numOverThreshold, numUnderThreshold,
                 goName, inputSize );
 
         int count = 0;
         while ( it.hasNext() && !isInterrupted() ) {
-            Map.Entry e = ( Map.Entry ) it.next();
-            String geneSetName = ( String ) e.getKey();
+
+            String geneSetName = ( String ) it.next();
             GeneSetResult res = cpv.classPval( geneSetName, geneToGeneScoreMap, probesToPvals );
             if ( res != null ) {
                 results.put( geneSetName, res );

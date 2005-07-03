@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -390,12 +389,12 @@ public class GeneSetScoreFrame extends JFrame {
 
         // end slow part.
 
-        if ( geneData.getGeneSetToProbeMap().size() == 0 ) {
+        if ( geneData.getGeneSets().size() == 0 ) {
             throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
                     + "Check that the file format is correct.\n" );
         }
 
-        if ( geneData.getGeneToProbeList().size() == 0 ) {
+        if ( geneData.getGenes().size() == 0 ) {
             throw new IllegalArgumentException( "The gene annotation file contains no probes. "
                     + "Check that the file format is correct.\n" );
         }
@@ -882,8 +881,10 @@ public class GeneSetScoreFrame extends JFrame {
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
-        if ( yesno == JFileChooser.APPROVE_OPTION )
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            geneData.resetSelectedProbes();
+        }
 
     }
 

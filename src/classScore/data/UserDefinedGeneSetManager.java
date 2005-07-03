@@ -465,7 +465,7 @@ public class UserDefinedGeneSetManager {
      * @return
      */
     private boolean isExistingGeneSet( String id ) {
-        return geneData.getGeneSetToProbeMap().containsKey( id );
+        return geneData.hasGeneSet( id );
     }
 
     /**

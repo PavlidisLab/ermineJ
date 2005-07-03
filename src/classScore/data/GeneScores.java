@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.util.CancellationException;
 import baseCode.util.FileTools;
 import baseCode.util.StatusViewer;
@@ -58,17 +60,33 @@ import classScore.Settings;
  * @version $Id$
  */
 public class GeneScores {
-    protected static final Log log = LogFactory.getLog( GeneScores.class );
     private static final double SMALL = 10e-16;
-    double[] groupPvalues;
-    private List probeIDs = null;
-    private List probePvalues = null;
-    private int numScores;
-    private Map probeToPvalMap;
+    protected static final Log log = LogFactory.getLog( GeneScores.class );
     private Map geneToPvalMap;
+    private int numScores;
+    private List probeIDs = null;
     private String[] probeIDsArray;
+    private List probePvalues = null;
     private double[] probePvaluesArray;
+    private Map probeToScoreMap;
     private Settings settings;
+    double[] geneScores;
+    private GeneAnnotations geneAnnots;
+
+    /**
+     * @param is - input stream
+     * @param settings
+     * @param messenger
+     * @param geneAnnotations
+     * @throws IOException
+     */
+    public GeneScores( InputStream is, Settings settings, StatusViewer messenger, GeneAnnotations geneAnnotations )
+            throws IOException {
+        this.geneAnnots = geneAnnotations;
+        this.init();
+        this.settings = settings;
+        read( is, messenger );
+    }
 
     /**
      * Constructor designed for use when input is not a file.
@@ -113,19 +131,18 @@ public class GeneScores {
         boolean invalidNumber = false;
         String badNumberString = "";
         int numProbesKept = 0;
-        int numUnknownProbes = 0;
+        Collection unknownProbes = new HashSet();
         for ( int i = 0; i < probes.size(); i++ ) {
             String probe = ( String ) probes.get( i );
             Double value = ( Double ) scores.get( i );
 
             // only keep probes that are in our array platform.
             if ( !probeToGeneMap.containsKey( probe ) ) {
-                numUnknownProbes++;
+                unknownProbes.add( probe );
                 continue;
             }
 
             if ( probe.matches( "AFFX.*" ) ) { // FIXME: put this rule somewhere else // todo use a filter.
-
                 continue;
             }
 
@@ -145,12 +162,12 @@ public class GeneScores {
             numProbesKept++;
             probeIDs.add( probe );
             probePvalues.add( new Double( pValue ) );
-            probeToPvalMap.put( probe, new Double( pValue ) );
+            probeToScoreMap.put( probe, new Double( pValue ) );
             numScores++;
         }
         setUpRawArrays();
-        reportProblems( null, invalidLog, numUnknownProbes, invalidNumber, badNumberString, numProbesKept );
-        setUpGeneToPvalMap( settings, geneToProbeMap, null );
+        reportProblems( null, invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept );
+        setUpGeneToScoreMap( settings, geneToProbeMap, null );
     }
 
     /**
@@ -161,40 +178,132 @@ public class GeneScores {
      * @param geneToProbeMap
      * @param probeToGeneMap
      */
-    public GeneScores( String filename, Settings settings, StatusViewer messenger, Map geneToProbeMap,
-            Map probeToGeneMap ) throws IOException, IllegalStateException {
+    public GeneScores( String filename, Settings settings, StatusViewer messenger, GeneAnnotations geneAnnots )
+            throws IOException, IllegalStateException {
+        this.geneAnnots = geneAnnots;
         this.settings = settings;
         this.init();
         FileTools.checkPathIsReadableFile( filename );
         InputStream is = new FileInputStream( filename );
-        read( is, messenger, geneToProbeMap, probeToGeneMap );
+        read( is, messenger );
         is.close();
     }
 
+    public double[] getGeneScores() {
+        return this.geneScores;
+    }
+
     /**
-     * @param is - input stream
-     * @param settings
-     * @param messenger
-     * @param groupToProbeMap
-     * @param probeToGeneMap
-     * @throws IOException
+     * @return
      */
-    public GeneScores( InputStream is, Settings settings, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
-            throws IOException {
-        this.init();
-        this.settings = settings;
-        read( is, messenger, geneToProbeMap, probeToGeneMap );
+    public Map getGeneToPvalMap() {
+        return geneToPvalMap;
+    }
+
+    /**
+     * @param shuffle Whether the map should be scrambled first. If so, then groups are randomly associated with scores,
+     *        but the actual values are the same. This is used for resampling multiple test correction.
+     * @return Map of groups of genes to pvalues.
+     */
+    public Map getGeneToPvalMap( boolean shuffle ) {
+        if ( shuffle ) {
+            Map scrambled_map = new LinkedHashMap();
+            Set keys = geneToPvalMap.keySet();
+            Iterator it = keys.iterator();
+
+            Collection values = geneToPvalMap.values();
+            List valvec = new Vector( values );
+            Collections.shuffle( valvec );
+
+            // randomly associate keys and values
+            int i = 0;
+            while ( it.hasNext() ) {
+                scrambled_map.put( it.next(), valvec.get( i ) );
+                i++;
+            }
+            return scrambled_map;
+
+        }
+        return geneToPvalMap;
+
+    }
+
+    /**
+     */
+    public int getNumGeneScores() {
+        return numScores;
+    }
+
+    /**
+     */
+    public String[] getProbeIds() {
+        return probeIDsArray;
+    }
+
+    /**
+     */
+    public Map getProbeToScoreMap() {
+        return probeToScoreMap;
+    }
+
+    /**
+     */
+    public double[] getPvalues() {
+        return probePvaluesArray;
+    }
+
+    /**
+     * @return Returns the settings.
+     */
+    public Settings getSettings() {
+        return this.settings;
+    }
+
+    /**
+     * @param probe_id
+     * @return
+     */
+    public double getValueMap( String probe_id ) {
+        double value = 0.0;
+
+        if ( probeToScoreMap.get( probe_id ) != null ) {
+            value = Double.parseDouble( ( probeToScoreMap.get( probe_id ) ).toString() );
+        }
+
+        return value;
+    }
+
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
+            String probe = ( String ) iter.next();
+            double score = ( ( Double ) probeToScoreMap.get( probe ) ).doubleValue();
+            buf.append( probe + "\t" + score + "\n" );
+        }
+        return buf.toString();
     }
 
     private void init() {
-        this.geneToPvalMap = new HashMap();
-        this.probeToPvalMap = new LinkedHashMap();
-        this.probePvalues = new ArrayList();
-        this.probeIDs = new ArrayList();
+        this.geneToPvalMap = new HashMap( 1000 );
+        this.probeToScoreMap = new HashMap( 1000 );
+        this.probePvalues = new ArrayList( 1000 );
+        this.probeIDs = new ArrayList( 1000 );
     }
 
-    private void read( InputStream is, StatusViewer messenger, Map geneToProbeMap, Map probeToGeneMap )
-            throws IOException, IllegalStateException {
+    /**
+     * 
+     *
+     */
+    private void letUserReadMessage() {
+        try {
+            Thread.sleep( 2000 );
+        } catch ( InterruptedException e ) {
+            throw new CancellationException();
+        }
+    }
+
+    private void read( InputStream is, StatusViewer messenger ) throws IOException, IllegalStateException {
+        assert geneAnnots != null;
         int scoreCol = settings.getScoreCol();
         if ( scoreCol < 2 ) {
             throw new IllegalArgumentException( "Illegal column number " + scoreCol + ", must be greater than 1" );
@@ -212,6 +321,7 @@ public class GeneScores {
         int scoreColumnIndex = scoreCol - 1;
         int numProbesKept = 0;
         int numUnknownProbes = 0;
+        Collection unknownProbes = new HashSet();
         dis.readLine(); // skip header.
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
@@ -224,8 +334,9 @@ public class GeneScores {
             String probeId = fields[0];
 
             // only keep probes that are in our array platform.
-            if ( !probeToGeneMap.containsKey( probeId ) ) {
+            if ( !geneAnnots.hasProbe( probeId ) ) {
                 log.debug( "\"" + probeId + "\" not in the annotations, ignoring" );
+                unknownProbes.add( probeId );
                 numUnknownProbes++;
                 continue;
             }
@@ -263,7 +374,7 @@ public class GeneScores {
             numProbesKept++;
             probeIDs.add( probeId );
             probePvalues.add( new Double( pValue ) );
-            probeToPvalMap.put( probeId, new Double( pValue ) );
+            probeToScoreMap.put( probeId, new Double( pValue ) );
 
             if ( Thread.currentThread().isInterrupted() ) {
                 dis.close();
@@ -276,18 +387,10 @@ public class GeneScores {
         assert numScores == probeIDs.size();
 
         setUpRawArrays();
-        reportProblems( messenger, invalidLog, numUnknownProbes, invalidNumber, badNumberString, numProbesKept );
-        setUpGeneToPvalMap( settings, geneToProbeMap, messenger );
+        reportProblems( messenger, invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept );
+        geneAnnots.setActiveProbes( probeToScoreMap.keySet() );
+        setUpGeneToScoreMap( settings, null, messenger );
 
-    }
-
-    private void setUpRawArrays() {
-        probePvaluesArray = new double[numScores];
-        probeIDsArray = new String[numScores];
-        for ( int i = 0; i < numScores; i++ ) {
-            probePvaluesArray[i] = ( ( Double ) probePvalues.get( i ) ).doubleValue();
-            probeIDsArray[i] = ( String ) probeIDs.get( i );
-        }
     }
 
     /**
@@ -298,7 +401,7 @@ public class GeneScores {
      * @param badNumberString
      * @param numProbesKept
      */
-    private void reportProblems( StatusViewer messenger, boolean invalidLog, int numUnknownProbes,
+    private void reportProblems( StatusViewer messenger, boolean invalidLog, Collection unknownProbes,
             boolean invalidNumber, String badNumberString, int numProbesKept ) {
         if ( invalidNumber && messenger != null ) {
 
@@ -312,10 +415,21 @@ public class GeneScores {
                             + SMALL );
             letUserReadMessage();
         }
-        if ( messenger != null && numUnknownProbes > 0 ) {
-            messenger.showError( "Warning: " + numUnknownProbes
+        if ( messenger != null && unknownProbes.size() > 0 ) {
+            messenger.showError( "Warning: " + unknownProbes.size()
                     + " probes in your gene score file don't match the ones in the annotation file." );
             letUserReadMessage();
+
+            if ( unknownProbes.size() <= 5 ) {
+                StringBuffer buf = new StringBuffer();
+                for ( Iterator iter = unknownProbes.iterator(); iter.hasNext(); ) {
+                    String probe = ( String ) iter.next();
+                    buf.append( probe + "," );
+                }
+                messenger.showError( "Unknown probes are: " + buf );
+                letUserReadMessage();
+            }
+
         }
         if ( numProbesKept == 0 ) {
             throw new IllegalStateException( "None of the probes in the gene score file correspond to probes in the "
@@ -332,78 +446,69 @@ public class GeneScores {
     }
 
     /**
-     * 
-     *
-     */
-    private void letUserReadMessage() {
-        try {
-            Thread.sleep( 2000 );
-        } catch ( InterruptedException e ) {
-            throw new CancellationException();
-        }
-    }
-
-    /**
      * Each pvalue is adjusted to the mean (or best) of all the values in the 'replicate group' to yield a "group to
      * pvalue map".
      * 
-     * @param gp_method gp_method Which method we use to calculate scores for genes that occur more than once in the
-     *        data set.
+     * @param settings
+     * @param geneToProbeMap - this should be generated from the annotation file.
+     * @param messenger
      */
-    private void setUpGeneToPvalMap( Settings settings, Map geneToProbeMap, StatusViewer messenger ) {
+    private void setUpGeneToScoreMap( Settings settings, Map geneToProbeMap, StatusViewer messenger ) {
 
         int gp_method = settings.getGeneRepTreatment();
 
-        if ( geneToProbeMap == null || geneToProbeMap.size() == 0 ) {
-            throw new IllegalStateException( "groupToProbeMap was not set." );
+        Collection genes = null;
+        if ( geneToProbeMap != null ) {
+            genes = geneToProbeMap.keySet();
+        } else {
+            genes = geneAnnots.getGenes();
         }
 
-        if ( probeToPvalMap == null ) {
-            throw new IllegalStateException( "probeToPvalMap was not set." );
-        }
-
-        if ( geneToProbeMap.size() == 0 ) {
-            throw new IllegalStateException( "Group to probe map was empty" );
-        }
-
-        double[] groupPvalTemp = new double[geneToProbeMap.size()];
+        double[] geneScoreTemp = new double[genes.size()];
         int counter = 0;
 
-        for ( Iterator groupMapItr = geneToProbeMap.keySet().iterator(); groupMapItr.hasNext(); ) {
+        for ( Iterator groupMapItr = genes.iterator(); groupMapItr.hasNext(); ) {
 
             if ( Thread.currentThread().isInterrupted() ) {
                 return;
             }
 
             String geneSymbol = ( String ) groupMapItr.next();
+            /*
+             * probes in this group according to the array platform.
+             */
+            Collection probes;
 
-            Collection probes = ( Collection ) geneToProbeMap.get( geneSymbol ); /*
-                                                                                     * probes in this group according to
-                                                                                     * the array platform.
-                                                                                     */
+            if ( geneToProbeMap != null ) {
+                probes = ( Collection ) geneToProbeMap.get( geneSymbol );
+            } else {
+                probes = geneAnnots.getGeneProbes( geneSymbol );
+            }
             int in_size = 0;
+
+            if ( probes == null ) continue;
 
             // Analyze all probes in this 'group' (pointing to the same gene)
             for ( Iterator pbItr = probes.iterator(); pbItr.hasNext(); ) {
                 String probe = ( String ) pbItr.next();
 
-                if ( !probeToPvalMap.containsKey( probe ) ) {
+                if ( !probeToScoreMap.containsKey( probe ) ) {
                     continue;
                 }
 
                 // these values are already log transformed if the user selected that option.
-                double pbPval = ( ( Double ) probeToPvalMap.get( probe ) ).doubleValue();
+                double pbPval = ( ( Double ) probeToScoreMap.get( probe ) ).doubleValue();
 
                 switch ( gp_method ) {
                     case Settings.MEAN_PVAL: {
-                        groupPvalTemp[counter] += pbPval;
+                        geneScoreTemp[counter] += pbPval;
                         break;
                     }
                     case Settings.BEST_PVAL: {
                         if ( settings.upperTail() ) {
-                            groupPvalTemp[counter] = Math.max( pbPval, groupPvalTemp[counter] );
+                            geneScoreTemp[counter] = Math.max( pbPval, geneScoreTemp[counter] );
                         } else {
-                            groupPvalTemp[counter] = Math.min( pbPval, groupPvalTemp[counter] );
+                            geneScoreTemp[counter] = Math.min( pbPval, geneScoreTemp[counter] );
                         }
                         break;
                     }
@@ -417,109 +522,34 @@ public class GeneScores {
 
             if ( in_size > 0 ) {
                 if ( gp_method == Settings.MEAN_PVAL ) {
-                    groupPvalTemp[counter] /= in_size; // take the mean
+                    geneScoreTemp[counter] /= in_size; // take the mean
                 }
-                Double dbb = new Double( groupPvalTemp[counter] );
+                Double dbb = new Double( geneScoreTemp[counter] );
                 geneToPvalMap.put( geneSymbol, dbb );
                 counter++;
             }
         } // end of while
 
         if ( counter == 0 ) {
-            throw new IllegalStateException( "No gene to pvalue mappings were found." );
+            throw new IllegalStateException( "No gene to score mappings were found." );
         }
 
         if ( messenger != null ) messenger.showStatus( counter + " distinct genes found in the annotations." );
 
-        groupPvalues = new double[counter];
+        geneScores = new double[counter];
         for ( int i = 0; i < counter; i++ ) {
-            groupPvalues[i] = groupPvalTemp[i];
+            geneScores[i] = geneScoreTemp[i];
         }
 
     }
 
-    /**
-     */
-    public String[] getProbeIds() {
-        return probeIDsArray;
-    }
-
-    /**
-     */
-    public double[] getPvalues() {
-        return probePvaluesArray;
-    }
-
-    public double[] getGroupPvalues() {
-        return this.groupPvalues;
-    }
-
-    /**
-     */
-    public int getNumGeneScores() {
-        return numScores;
-    }
-
-    /**
-     */
-    public Map getProbeToPvalMap() {
-        return probeToPvalMap;
-    }
-
-    /**
-     * @param shuffle Whether the map should be scrambled first. If so, then groups are randomly associated with scores,
-     *        but the actual values are the same. This is used for resampling multiple test correction.
-     * @return Map of groups of genes to pvalues.
-     */
-    public Map getGeneToPvalMap( boolean shuffle ) {
-        if ( shuffle ) {
-            Map scrambled_map = new LinkedHashMap();
-            Set keys = geneToPvalMap.keySet();
-            Iterator it = keys.iterator();
-
-            Collection values = geneToPvalMap.values();
-            Vector valvec = new Vector( values );
-            Collections.shuffle( valvec );
-
-            // randomly associate keys and values
-            int i = 0;
-            while ( it.hasNext() ) {
-                scrambled_map.put( it.next(), valvec.get( i ) );
-                i++;
-            }
-            return scrambled_map;
-
+    private void setUpRawArrays() {
+        probePvaluesArray = new double[numScores];
+        probeIDsArray = new String[numScores];
+        for ( int i = 0; i < numScores; i++ ) {
+            probePvaluesArray[i] = ( ( Double ) probePvalues.get( i ) ).doubleValue();
+            probeIDsArray[i] = ( String ) probeIDs.get( i );
         }
-        return geneToPvalMap;
-
-    }
-
-    /**
-     * @return
-     */
-    public Map getGeneToPvalMap() {
-        return geneToPvalMap;
-    }
-
-    /**
-     * @param probe_id
-     * @return
-     */
-    public double getValueMap( String probe_id ) {
-        double value = 0.0;
-
-        if ( probeToPvalMap.get( probe_id ) != null ) {
-            value = Double.parseDouble( ( probeToPvalMap.get( probe_id ) ).toString() );
-        }
-
-        return value;
-    }
-
-    /**
-     * @return Returns the settings.
-     */
-    public Settings getSettings() {
-        return this.settings;
     }
 
 } // end of class

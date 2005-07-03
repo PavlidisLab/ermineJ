@@ -113,7 +113,7 @@ public class GeneSetPvalRun {
         this.geneScores = geneScores;
         nf.setMaximumFractionDigits( 8 );
         results = new LinkedHashMap();
-        runAnalysis( geneData.getProbeToGeneMap().keySet(), settings, geneData, null, goData, geneScores, null );
+        runAnalysis( geneData.getActiveProbes(), settings, geneData, null, goData, geneScores, null );
     }
 
     /**
@@ -150,7 +150,7 @@ public class GeneSetPvalRun {
      * @param geneScores
      * @param messenger
      */
-    private void runAnalysis( Set activeProbes, Settings settings, GeneAnnotations geneData,
+    private void runAnalysis( Collection activeProbes, Settings settings, GeneAnnotations geneData,
             DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger ) {
         // get the class sizes.
         GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
@@ -171,7 +171,7 @@ public class GeneSetPvalRun {
                 GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, goData );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 // calculate the actual class scores and correct sorting.
-                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToPvalMap() );
+                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToScoreMap() );
                 results = pvg.getResults();
                 break;
             }
@@ -179,7 +179,7 @@ public class GeneSetPvalRun {
 
                 int inputSize = activeProbes.size();
 
-                Collection inp_entries = geneScores.getProbeToPvalMap().entrySet();
+                Collection inp_entries = geneScores.getProbeToScoreMap().entrySet();
 
                 if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
 
@@ -192,7 +192,7 @@ public class GeneSetPvalRun {
                     break;
                 }
 
-                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToPvalMap(), messenger );
+                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToScoreMap(), messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 results = pvg.getResults();
                 if ( messenger != null )
@@ -231,9 +231,9 @@ public class GeneSetPvalRun {
                     if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
                     rpg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneRanksMap, messenger );
                 } else {
-                    geneRanksMap = Rank.rankTransform( geneScores.getProbeToPvalMap() );
+                    geneRanksMap = Rank.rankTransform( geneScores.getProbeToScoreMap() );
                     if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
-                    rpg.classPvalGenerator( geneScores.getProbeToPvalMap(), geneRanksMap, messenger );
+                    rpg.classPvalGenerator( geneScores.getProbeToScoreMap(), geneRanksMap, messenger );
                 }
                 results = rpg.getResults();
                 break;

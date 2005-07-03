@@ -122,8 +122,8 @@ public abstract class GeneSetPanel extends JScrollPane {
                         log.debug( "Got null geneset id" );
                         return;
                     }
-                    log.debug( "Request for details of gene set: " + id );
-                    if ( !geneData.getGeneSetToProbeMap().containsKey( id ) ) {
+                    log.debug( "Request for details of gene set: " + id + ", run number " + runnum );
+                    if ( !geneData.hasGeneSet( id ) ) {
                         callingFrame.getStatusMessenger()
                                 .showError( id + " is not available for viewing in your data." );
                         return;

@@ -250,7 +250,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
         newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
         newClassTable.revalidate();
-        showStatus( "Available probes: " + geneData.selectedProbes() );
+        showStatus( "Available probes: " + geneData.numSelectedProbes() );
     }
 
     /**
@@ -270,7 +270,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         if ( searchOn.equals( "" ) ) {
             geneData.resetSelectedProbes();
         } else {
-            geneData.selectProbes( searchOn );
+            geneData.selectProbesBySearch( searchOn );
         }
         populateTables();
     }

@@ -125,7 +125,7 @@ public class ResultsPrinter {
      */
     private String formatGeneNames( String className ) {
         if ( className == null ) return "";
-        Collection genes = ( Collection ) this.geneData.getGeneSetToGeneMap().get( className );
+        Collection genes = this.geneData.getActiveGeneSetGenes( className );
         if ( genes == null || genes.size() == 0 ) return "";
         StringBuffer buf = new StringBuffer();
         for ( Iterator iter = genes.iterator(); iter.hasNext(); ) {

@@ -44,16 +44,16 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
      */
-    public void classPvalGenerator( Map group_pval_map, Map probesToPvals ) {
+    public void classPvalGenerator( Map geneToScoreMap, Map probeToScoreMap ) {
 
         ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc, goName, hist );
 
-        for ( Iterator iter = geneAnnots.getGeneSetToProbeMap().keySet().iterator(); iter.hasNext(); ) {
+        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             if ( isInterrupted() ) {
                 break;
             }
             String className = ( String ) iter.next();
-            GeneSetResult res = cpv.classPval( className, group_pval_map, probesToPvals );
+            GeneSetResult res = cpv.classPval( className, geneToScoreMap, probeToScoreMap );
             if ( res != null ) {
                 results.put( className, res );
             }
@@ -69,7 +69,7 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, csc,
                 goName, hist );
 
-        for ( Iterator iter = geneAnnots.getGeneSetToProbeMap().keySet().iterator(); iter.hasNext(); ) {
+        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             String className = ( String ) iter.next();
             double pval = cpv.classPvalue( className, group_pval_map, probesToPvals );
 
