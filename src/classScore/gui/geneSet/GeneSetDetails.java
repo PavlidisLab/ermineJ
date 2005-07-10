@@ -83,7 +83,7 @@ public class GeneSetDetails {
         }
 
         // create the details frame
-        JGeneSetFrame f = new JGeneSetFrame( callerStatusViewer, new ArrayList( probeIDs ), pvals, geneData, settings );
+        JGeneSetFrame f = new JGeneSetFrame(className, callerStatusViewer, new ArrayList( probeIDs ), pvals, geneData, settings );
 
         String title = getTitle( runName, res, probeIDs );
         f.setTitle( title );

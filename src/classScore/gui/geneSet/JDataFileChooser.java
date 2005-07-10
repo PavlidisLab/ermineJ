@@ -5,6 +5,7 @@ package classScore.gui.geneSet;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.io.File;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -27,7 +28,7 @@ public class JDataFileChooser extends JFileChooser {
     // fields
     JDataFileChooserOptions m_options;
 
-    public JDataFileChooser( boolean includeEverything, boolean normalize ) {
+    public JDataFileChooser( boolean includeEverything, boolean normalize, String initialFileName ) {
 
         super();
 
@@ -35,6 +36,7 @@ public class JDataFileChooser extends JFileChooser {
         DataFileFilter dataFileFilter = new DataFileFilter();
         super.setFileFilter( dataFileFilter );
         super.setAcceptAllFileFilterUsed( false );
+        if ( initialFileName != null ) super.setSelectedFile( new File( initialFileName ) );
 
         // Create other save options (e.g. include row and column labels in image)
         m_options = new JDataFileChooserOptions( includeEverything, normalize );
@@ -57,13 +59,13 @@ public class JDataFileChooser extends JFileChooser {
      */
     private class JDataFileChooserOptions extends JComponent {
 
-        JCheckBox m_includeEverything = new JCheckBox( "Include annotations and scores" );
+        private JCheckBox m_includeEverything = new JCheckBox( "Include annotations and scores" );
 
-        JCheckBox m_normalize = new JCheckBox( "Normalize" );
+        private JCheckBox m_normalize = new JCheckBox( "Normalize" );
 
-        GridLayout gridLayout1 = new GridLayout( 12, 2 );
-        JLabel m_titleLabel = new JLabel();
-        JLabel m_spacerLabel = new JLabel();
+        private GridLayout gridLayout1 = new GridLayout( 12, 2 );
+        private JLabel m_titleLabel = new JLabel();
+        private JLabel m_spacerLabel = new JLabel();
 
         public JDataFileChooserOptions( boolean includeEverything, boolean normalize ) throws HeadlessException {
             try {
@@ -79,6 +81,7 @@ public class JDataFileChooser extends JFileChooser {
             setLayout( gridLayout1 );
             m_includeEverything
                     .setToolTipText( "Leave this box unchecked if you just want the expression value matrix" );
+            m_normalize.setToolTipText( "Check this box to normalize the rows of the data matrix." );
             this.setMaximumSize( new Dimension( 264, 63 ) );
             this.setMinimumSize( new Dimension( 264, 63 ) );
             m_titleLabel.setHorizontalAlignment( SwingConstants.CENTER );

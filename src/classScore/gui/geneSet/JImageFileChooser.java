@@ -5,6 +5,7 @@ package classScore.gui.geneSet;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.io.File;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -28,15 +29,14 @@ public class JImageFileChooser extends JFileChooser {
     JDetailsFileChooserOptions m_options;
 
     /** Creates a new instance of JDetailsFileChooser */
-    public JImageFileChooser( boolean includeLabels, boolean normalize ) {
+    public JImageFileChooser( boolean includeLabels, boolean normalize, String initialFileName ) {
 
         super();
-
         // Create a file filter for the file chooser
         ImageFileFilter imageFileFilter = new ImageFileFilter();
         super.setFileFilter( imageFileFilter );
         super.setAcceptAllFileFilterUsed( false );
-
+        if ( initialFileName != null ) this.setSelectedFile( new File( initialFileName ) );
         // Create other save options (e.g. include row and column labels in image)
         m_options = new JDetailsFileChooserOptions( includeLabels, normalize );
         super.setAccessory( m_options );
@@ -79,6 +79,10 @@ public class JImageFileChooser extends JFileChooser {
             setLayout( gridLayout1 );
             this.setMaximumSize( new Dimension( 264, 63 ) );
             this.setMinimumSize( new Dimension( 264, 63 ) );
+            m_includeLabels
+                    .setToolTipText( "Leave this box unchecked if you just want the expression value matrix without labels" );
+            m_normalize
+                    .setToolTipText( "Check this box to normalize the rows of the data matrix before creating the image." );
             m_titleLabel.setHorizontalAlignment( SwingConstants.CENTER );
             m_titleLabel.setText( "Save Options:" );
             m_spacerLabel.setText( "" );

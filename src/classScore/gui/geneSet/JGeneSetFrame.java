@@ -152,6 +152,9 @@ public class JGeneSetFrame extends JFrame {
     private List probeIDs = null;
     private Map pvalues = null;
     private GeneAnnotations geneData = null;
+    private String className = "";
+    private boolean normalizeSavedData = false;
+    private boolean normalizeSavedImage = true;
 
     // private StatusViewer callerStatusViewer = null;
 
@@ -163,8 +166,9 @@ public class JGeneSetFrame extends JFrame {
      * @param settings <code>getRawFile()</code> should return the microarray file which contains the microarray data
      *        for the probe ID's contained in <code>probeIDs</code>.
      */
-    public JGeneSetFrame( StatusViewer callerStatusViewer, List probeIDs, Map pvalues, GeneAnnotations geneData,
-            Settings settings ) {
+    public JGeneSetFrame( String className, StatusViewer callerStatusViewer, List probeIDs, Map pvalues,
+            GeneAnnotations geneData, Settings settings ) {
+
         try {
             if ( settings == null ) {
                 log.warn( "Loading new settings..." );
@@ -174,7 +178,7 @@ public class JGeneSetFrame extends JFrame {
             }
 
             this.readPrefs();
-
+            this.className = className;
             this.probeIDs = probeIDs;
             this.pvalues = pvalues;
             this.geneData = geneData;
@@ -356,9 +360,9 @@ public class JGeneSetFrame extends JFrame {
         if ( m_matrixDisplay == null ) return;
 
         imageChooser = new JImageFileChooser( settings.getConfig().getBoolean( INCLUDELABELS, true ), settings
-                .getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ) );
+                .getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ), this.className + ".png" );
         fileChooser = new JDataFileChooser( settings.getConfig().getBoolean( INCLUDEEVERYTHING, true ), settings
-                .getConfig().getBoolean( NORMALIZE_SAVED_DATA, false ) );
+                .getConfig().getBoolean( NORMALIZE_SAVED_DATA, false ), this.className + ".txt" );
         readPathPrefs();
     }
 
@@ -732,25 +736,34 @@ public class JGeneSetFrame extends JFrame {
         if ( settings.getConfig() == null ) return;
 
         if ( settings.getConfig().containsKey( WINDOWWIDTH ) ) {
-            this.width = Integer.parseInt( settings.getConfig().getString( WINDOWWIDTH ) );
-            log.debug( "Got: " + width );
+            this.width = settings.getConfig().getInt( WINDOWWIDTH );
+            log.debug( "width: " + width );
         }
 
         if ( settings.getConfig().containsKey( WINDOWHEIGHT ) ) {
-            this.height = Integer.parseInt( settings.getConfig().getString( WINDOWHEIGHT ) );
-            log.debug( "Got: " + height );
+            this.height = settings.getConfig().getInt( WINDOWHEIGHT );
+            log.debug( "height: " + height );
         }
         if ( settings.getConfig().containsKey( MATRIXCOLUMNWIDTH ) ) {
-            this.matrixColumnWidth = Integer.parseInt( settings.getConfig().getString( MATRIXCOLUMNWIDTH ) );
-            log.debug( "Got: " + matrixColumnWidth );
+            this.matrixColumnWidth = settings.getConfig().getInt( MATRIXCOLUMNWIDTH );
+            log.debug( "matrixColumnWidth: " + matrixColumnWidth );
         }
         if ( settings.getConfig().containsKey( INCLUDELABELS ) ) {
-            this.includeLabels = Boolean.getBoolean( settings.getConfig().getString( INCLUDELABELS ) );
-            log.debug( "Got: " + includeLabels );
+            this.includeLabels = settings.getConfig().getBoolean( INCLUDELABELS );
+            log.debug( "includeLabels: " + includeLabels );
         }
         if ( settings.getConfig().containsKey( INCLUDEEVERYTHING ) ) {
-            this.includeEverything = Boolean.getBoolean( settings.getConfig().getString( INCLUDEEVERYTHING ) );
-            log.debug( "Got: " + includeEverything );
+            this.includeEverything = settings.getConfig().getBoolean( INCLUDEEVERYTHING );
+            log.debug( "includeEverything: " + includeEverything );
+        }
+        if ( settings.getConfig().containsKey( NORMALIZE_SAVED_IMAGE ) ) {
+            this.normalizeSavedImage = settings.getConfig().getBoolean( NORMALIZE_SAVED_IMAGE );
+            log.debug( "normalizeSavedImage " + normalizeSavedImage );
+        }
+
+        if ( settings.getConfig().containsKey( NORMALIZE_SAVED_DATA ) ) {
+            this.normalizeSavedData = settings.getConfig().getBoolean( NORMALIZE_SAVED_DATA );
+            log.debug( "normalizeSavedData " + normalizeSavedData );
         }
 
     }
@@ -800,6 +813,10 @@ public class JGeneSetFrame extends JFrame {
         settings.getConfig().setProperty( MATRIXCOLUMNWIDTH, String.valueOf( this.matrixColumnWidth ) );
         settings.getConfig().setProperty( WINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
         settings.getConfig().setProperty( WINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
+        settings.getConfig().setProperty( NORMALIZE_SAVED_DATA, new Boolean( this.normalizeSavedData ) );
+        settings.getConfig().setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( this.normalizeSavedImage ) );
+        settings.getConfig().setProperty( INCLUDEEVERYTHING, new Boolean( this.includeEverything ) );
+        settings.getConfig().setProperty( INCLUDELABELS, new Boolean( this.includeLabels ) );
         settings.writePrefs();
     }
 
@@ -985,17 +1002,17 @@ public class JGeneSetFrame extends JFrame {
                 if ( returnVal != JOptionPane.OK_OPTION ) return;
             }
 
-            includeEverything = fileChooser.includeEverything();
-            boolean normalize = fileChooser.normalized();
-            settings.setProperty( INCLUDEEVERYTHING, new Boolean( fileChooser.includeEverything() ) );
-            settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( fileChooser.normalized() ) );
+            this.includeEverything = fileChooser.includeEverything();
+            this.normalizeSavedData = fileChooser.normalized();
+            settings.setProperty( INCLUDEEVERYTHING, new Boolean( includeEverything ) );
+            settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( normalizeSavedData ) );
             settings.writePrefs();
 
             String filename = file.getPath();
 
             // Save the values
             try {
-                saveData( filename, true, includeEverything, normalize );
+                saveData( filename, true, includeEverything, normalizeSavedData );
             } catch ( IOException ex ) {
                 GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
@@ -1016,10 +1033,10 @@ public class JGeneSetFrame extends JFrame {
                 if ( returnVal != JOptionPane.OK_OPTION ) return;
             }
 
-            includeLabels = imageChooser.includeLabels();
-            boolean normalize = imageChooser.normalized();
-            settings.setProperty( INCLUDELABELS, new Boolean( imageChooser.includeLabels() ) );
-            settings.setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( imageChooser.normalized() ) );
+            this.includeLabels = imageChooser.includeLabels();
+            this.normalizeSavedImage = imageChooser.normalized();
+            settings.setProperty( INCLUDELABELS, new Boolean( includeLabels ) );
+            settings.setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( normalizeSavedImage ) );
             settings.writePrefs();
 
             // Make sure the filename has an image extension
@@ -1030,7 +1047,7 @@ public class JGeneSetFrame extends JFrame {
             }
             // Save the color matrix image
             try {
-                saveImage( filename, includeLabels, normalize );
+                saveImage( filename, includeLabels, normalizeSavedImage );
             } catch ( IOException ex ) {
                 GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
