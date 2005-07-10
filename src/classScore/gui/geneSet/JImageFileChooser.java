@@ -34,6 +34,7 @@ public class JImageFileChooser extends JFileChooser {
         super();
         // Create a file filter for the file chooser
         ImageFileFilter imageFileFilter = new ImageFileFilter();
+        imageFileFilter.setDescription("PNG files");
         super.setFileFilter( imageFileFilter );
         super.setAcceptAllFileFilterUsed( false );
         if ( initialFileName != null ) this.setSelectedFile( new File( initialFileName ) );
