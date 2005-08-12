@@ -1,7 +1,6 @@
 package classScoreTest.analysis;
 
 import java.io.InputStream;
-import java.util.Map;
 
 import junit.framework.TestCase;
 import baseCode.bio.geneset.GONames;
@@ -42,12 +41,11 @@ abstract class AbstractPvalGeneratorTest extends TestCase {
         s.setDoLog( true );
 
         g = new GeneAnnotations( ism, null, null, null );
-        Map gpm = g.getGeneToProbeList();
-        Map pgm = g.getProbeToGeneMap();
+       
 
-        gsr = new GeneScores( is, s, null, gpm, pgm );
+        gsr = new GeneScores( is, s, null, g );
         gon = new GONames( isi );
-        csc = new GeneSetSizeComputer( gsr.getProbeToPvalMap().keySet(), g, gsr, true );
+        csc = new GeneSetSizeComputer( gsr.getProbeToScoreMap().keySet(), g, gsr, true );
 
         super.setUp();
     }

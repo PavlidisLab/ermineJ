@@ -3,7 +3,6 @@ package classScore.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JComboBox;

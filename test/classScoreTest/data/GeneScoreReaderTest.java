@@ -2,7 +2,6 @@ package classScoreTest.data;
 
 import java.io.InputStream;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -35,10 +34,8 @@ public class GeneScoreReaderTest extends TestCase {
         is = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.scores.txt" );
 
         GeneAnnotations g = new GeneAnnotations( ism, null, null, null );
-        Map gpm = g.getGeneSetToProbeMap();
-        Map pgm = g.getProbeToGeneMap();
 
-        test = new GeneScores( is, s, null, gpm, pgm );
+        test = new GeneScores( is, s, null, g );
         super.setUp();
     }
 

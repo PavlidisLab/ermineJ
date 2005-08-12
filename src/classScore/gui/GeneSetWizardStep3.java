@@ -12,9 +12,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
-import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.gui.WizardStep;
-import classScore.Settings;
 import classScore.data.UserDefinedGeneSetManager;
 
 /**

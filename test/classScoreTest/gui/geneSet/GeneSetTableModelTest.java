@@ -1,7 +1,7 @@
 package classScoreTest.gui.geneSet;
 
-import classScore.gui.geneSet.GeneSetTableModel;
 import junit.framework.TestCase;
+import classScore.gui.geneSet.GeneSetTableModel;
 
 /**
  * 

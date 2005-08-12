@@ -1,8 +1,5 @@
 package classScore.analysis;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

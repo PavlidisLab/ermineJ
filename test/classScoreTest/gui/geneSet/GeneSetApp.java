@@ -44,7 +44,7 @@ public class GeneSetApp {
             pvalues.put( PROBES[i], new Double( 0.5 - 0.02 * i ) ); // fake p values.
         }
 
-        JGeneSetFrame frame = new JGeneSetFrame( null, probeIDs, pvalues, null, settings );
+        JGeneSetFrame frame = new JGeneSetFrame( "foo", null, probeIDs, pvalues, null, settings );
         frame.setSize( new Dimension( 800, 600 ) );
         frame.show();
     }

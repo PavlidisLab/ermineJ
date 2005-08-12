@@ -3,7 +3,6 @@ package classScore.gui;
 import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 import baseCode.bio.geneset.GONames;

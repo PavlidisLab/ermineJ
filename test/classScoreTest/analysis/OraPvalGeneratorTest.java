@@ -35,7 +35,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval2() {
         double expectedReturn = 0.1071429;
 
-        GeneSetResult r = test.classPval( "GO:2", gsr.getGeneToPvalMap(), gsr.getProbeToPvalMap() );
+        GeneSetResult r = test.classPval( "GO:2", gsr.getGeneToPvalMap(), gsr.getProbeToScoreMap() );
 
         if ( r == null ) {
             assertTrue( false );
@@ -49,7 +49,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval1() {
         double expectedReturn = 0.0;
 
-        GeneSetResult r = test.classPval( "GO:1", gsr.getGeneToPvalMap(), gsr.getProbeToPvalMap() );
+        GeneSetResult r = test.classPval( "GO:1", gsr.getGeneToPvalMap(), gsr.getProbeToScoreMap() );
 
         if ( r == null ) {
             assertTrue( false );
@@ -63,7 +63,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval3() {
         double expectedReturn = 0.4642857;
 
-        GeneSetResult r = test.classPval( "GO:3", gsr.getGeneToPvalMap(), gsr.getProbeToPvalMap() );
+        GeneSetResult r = test.classPval( "GO:3", gsr.getGeneToPvalMap(), gsr.getProbeToScoreMap() );
 
         if ( r == null ) {
             assertTrue( false );

@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GONames;
-import baseCode.gui.GuiUtil;
 import baseCode.gui.table.TableSorter;
 import classScore.GeneSetPvalRun;
 import classScore.Settings;

@@ -1,10 +1,7 @@
 package classScore.analysis;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -13,10 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
-import baseCode.math.DescriptiveWithMissing;
-import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
-import cern.colt.list.DoubleArrayList;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
