@@ -49,9 +49,7 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc, goName, hist );
 
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
-            if ( isInterrupted() ) {
-                break;
-            }
+            ifInterruptedStop();
             String className = ( String ) iter.next();
             GeneSetResult res = cpv.classPval( className, geneToScoreMap, probeToScoreMap );
             if ( res != null ) {

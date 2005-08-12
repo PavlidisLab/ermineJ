@@ -1,5 +1,7 @@
 package classScore.analysis;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -19,7 +21,7 @@ import classScore.Settings;
  * @version $Id$
  */
 
-public abstract class AbstractGeneSetPvalGenerator {
+public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( AbstractGeneSetPvalGenerator.class );
     protected Map effectiveSizes = null;
     protected Map actualSizes = null;
@@ -113,12 +115,6 @@ public abstract class AbstractGeneSetPvalGenerator {
                 || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
     }
 
-    /**
-     * @return Returns the isInterrupted.
-     */
-    public boolean isInterrupted() {
-        // log.debug( Thread.currentThread().getName() + " " + Thread.currentThread().isInterrupted() );
-        return Thread.currentThread().isInterrupted();
-    }
+   
 
 }

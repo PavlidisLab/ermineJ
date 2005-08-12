@@ -69,8 +69,8 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         int v_size = 0;
 
         // foreach item in the class.
-        while ( classit.hasNext() && !isInterrupted() ) {
-
+        while ( classit.hasNext() ) {
+           ifInterruptedStop();
             String probe = ( String ) classit.next(); // probe id
 
             if ( probesToPvals.containsKey( probe ) ) { // if it is in the data

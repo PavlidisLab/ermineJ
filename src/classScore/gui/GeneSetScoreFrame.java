@@ -141,6 +141,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenuItem reloadGeneSetsMenuItem = new JMenuItem();
     private JMenuItem switchDataFileMenuItem = new JMenuItem();
     private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
+    private boolean cancelled = false;
 
     /**
      * @throws IOException
@@ -464,11 +465,12 @@ public class GeneSetScoreFrame extends JFrame {
 
     public void startAnalysis( Settings runSettings ) {
         disableMenusForAnalysis();
+        this.cancelled = false;
         this.athread = new AnalysisThread( runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
                 geneScoreSets );
         log.debug( "Starting analysis thread" );
         try {
-            athread.run();
+            athread.start();
         } catch ( Exception e ) {
             GuiUtil
                     .error( "There was an unexpected error during analysis.\nSee the log file for details.\nThe summary message was:\n"
@@ -476,16 +478,11 @@ public class GeneSetScoreFrame extends JFrame {
             enableMenusForAnalysis();
         }
         log.debug( "Waiting..." );
-        GeneSetPvalRun latestResult = null;
-        // try {
-        latestResult = athread.getLatestResults();
-        // } catch ( Exception e ) {
-        // GuiUtil.error( "There was an unexpected error during analysis. Please view the log file for assistance." );
-        // enableMenusForAnalysis();
-        // }
-        addResult( latestResult );
-        log.debug( "done" );
+
+        GeneSetPvalRun latestResult = athread.getLatestResults();
         checkForReasonableResults( latestResult );
+        if ( latestResult != null ) addResult( latestResult );
+        
         enableMenusForAnalysis();
     }
 
@@ -493,9 +490,10 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     private void checkForReasonableResults( GeneSetPvalRun results1 ) {
+        if ( !athread.isFinishedNormally() ) return;
         int numZeroPvalues = 0;
         if ( results1 == null || results1.getResults() == null ) {
-            GuiUtil.error( "There was an error during analysis. Please check the logs." );
+            GuiUtil.error( "There was an error during analysis - there were no valid results. Please check the logs." );
         }
         int numPvalues = results1.getResults().size();
         int numUnityPvalue = 0;
@@ -627,7 +625,7 @@ public class GeneSetScoreFrame extends JFrame {
         label.setHorizontalAlignment( SwingConstants.CENTER );
 
         progressBar.setPreferredSize( new Dimension( 300, 16 ) );
-        progressBar.setIndeterminate( false );
+        progressBar.setIndeterminate( true );
         progressPanel.setBackground( Color.white );
 
         progressPanel.add( logoLabel );
@@ -727,7 +725,7 @@ public class GeneSetScoreFrame extends JFrame {
     /**
      * 
      */
-    private void maybeEnableRunViewMenu() {
+    protected void maybeEnableRunViewMenu() {
         if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
             runViewMenu.setEnabled( true );
         } else {
@@ -987,13 +985,25 @@ public class GeneSetScoreFrame extends JFrame {
         cwiz.showWizard();
     }
 
+    /**
+     * Cancel the currently running analysis task.
+     */
     void doCancel() {
-        log.debug( "Got cancel" );
+        log.debug( "Got cancel in thread " + Thread.currentThread().getName() );
+
         assert athread != null : "Attempt to cancel a null analysis thread";
         athread.interrupt();
-        athread.setStop( true );
+
+        try {
+            Thread.sleep( 100 );
+        } catch ( InterruptedException e ) {
+        }
+
+        athread.stopRunning( true );
         enableMenusForAnalysis();
+        this.cancelled = true;
         showStatus( "Ready" );
+
     }
 
     void findClassMenuItem_actionPerformed() {

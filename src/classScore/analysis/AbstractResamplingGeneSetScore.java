@@ -1,5 +1,8 @@
 package classScore.analysis;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -13,7 +16,7 @@ import classScore.data.Histogram;
  * @author pavlidis
  * @version $Id$
  */
-public abstract class AbstractResamplingGeneSetScore implements NullDistributionGenerator {
+public abstract class AbstractResamplingGeneSetScore extends AbstractLongTask implements NullDistributionGenerator {
 
     protected static final Log log = LogFactory.getLog( AbstractResamplingGeneSetScore.class );
 
@@ -135,13 +138,5 @@ public abstract class AbstractResamplingGeneSetScore implements NullDistribution
      * 
      * @see classScore.analysis.NullDistributionGenerator#isInterrupted()
      */
-
-    /**
-     * Test whether this job has been canceled.
-     */
-    public boolean isInterrupted() {
-        // log.debug( Thread.currentThread().getName() + " " + Thread.currentThread().isInterrupted() );
-        return Thread.currentThread().isInterrupted();
-    }
 
 }

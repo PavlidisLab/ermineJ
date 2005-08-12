@@ -1,7 +1,6 @@
 package classScore.analysis;
 
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
-import baseCode.dataStructure.matrix.SparseDoubleMatrix2DNamed;
 import baseCode.math.RandomChooser;
 import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
@@ -42,7 +41,8 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     }
 
     /**
-     * @throws InterruptedException Generate a null distribution, using a selected random seed.
+     * Generate a null distribution, using a selected random seed.
+     * 
      * @param m
      * @param randomSeed
      * @return
@@ -58,8 +58,6 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      * @return histogram containing the random distributions of correlations.
      */
     public Histogram generateNullDistribution( StatusViewer messenger ) {
-
-        SparseDoubleMatrix2DNamed correls = new SparseDoubleMatrix2DNamed( data.rows(), data.rows() );
 
         int[] deck = new int[data.rows()];
 
@@ -78,24 +76,20 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
             int[] randomnums = new int[geneSetSize];
 
+            ifInterruptedStop();
+
             if ( messenger != null ) {
                 messenger.showStatus( "Currently running class size " + geneSetSize );
             }
 
-            // double oldnd = Double.MAX_VALUE;
             double oldmean = Double.MAX_VALUE;
             double oldvar = Double.MAX_VALUE;
 
             DoubleArrayList values = new DoubleArrayList();
             for ( int j = 0; j < numRuns; j++ ) {
 
-                if ( Thread.currentThread().isInterrupted() ) {
-                    log.debug( "Got cancel" );
-                    throw new CancellationException();
-                }
-
                 RandomChooser.chooserandom( randomnums, deck, data.rows(), geneSetSize );
-                double avecorrel = geneSetMeanCorrel( randomnums, correls );
+                double avecorrel = geneSetMeanCorrel( randomnums );
                 values.add( avecorrel );
                 hist.update( geneSetSize, avecorrel );
 
@@ -118,7 +112,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
                 if ( j % 500 == 0 ) {
                     takeABreak();
                 }
-         
+
             }
 
             /*
@@ -138,6 +132,8 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      * 
      */
     private void takeABreak() {
+        ifInterruptedStop();
+
         try {
             Thread.sleep( 10 );
         } catch ( InterruptedException e ) {
@@ -154,7 +150,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      *        saver. NOT used because it still uses too much memory.
      * @return mean correlation within the matrix.
      */
-    public double geneSetMeanCorrel( int[] indicesToSelect, SparseDoubleMatrix2DNamed correls ) {
+    public double geneSetMeanCorrel( int[] indicesToSelect ) {
 
         int size = indicesToSelect.length;
         double avecorrel = 0.0;

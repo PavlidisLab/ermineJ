@@ -203,7 +203,8 @@ public class GeneSetPvalRun {
             case Settings.CORR: {
                 if ( rawData == null )
                     throw new IllegalArgumentException( "Raw data cannot be null for Correlation analysis" );
-                if ( messenger != null ) messenger.showStatus( "Starting correlation resampling" );
+                if ( messenger != null )
+                    messenger.showStatus( "Starting correlation resampling in " + Thread.currentThread().getName() );
                 NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings, rawData );
 
                 if ( randomSeed >= 0 ) {
@@ -215,7 +216,7 @@ public class GeneSetPvalRun {
                 CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings,
                         geneData, csc, goData, rawData, hist );
                 if ( messenger != null ) messenger.showStatus( "Finished resampling, computing for gene sets" );
-                pvg.geneSetCorrelationGenerator( messenger );
+                pvg.classPvalGenerator( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 if ( messenger != null ) messenger.showStatus( "Finished computing scores" );
                 results = pvg.getResults();

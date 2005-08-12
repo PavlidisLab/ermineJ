@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,19 +32,20 @@ import classScore.data.GeneScores;
 public class AnalysisThread extends Thread {
     protected static final Log log = LogFactory.getLog( AnalysisThread.class );
     private GeneAnnotations geneData = null;
-    private Map geneDataSets;
+    private Map geneDataSets = null;
     private Map geneScoreSets;
     private GONames goData;
     private volatile GeneSetPvalRun latestResults;
     private String loadFile;
     private StatusViewer messenger;
-    private int numRuns = 0;
+    // private int numRuns = 0;
     private Settings oldSettings = null;
     private Map rawDataSets;
     private volatile Method runningMethod;
     private Settings settings;
     private volatile boolean stop = false;
     private boolean wasError = false;
+    private boolean finishedNormally;
 
     /**
      * @return Returns the wasError.
@@ -56,14 +58,17 @@ public class AnalysisThread extends Thread {
      * @return
      */
     public boolean isStop() {
+        if ( stop == false ) this.finishedNormally = false;
         return stop;
+
     }
 
     /**
      * @param stop
      */
-    public void setStop( boolean stop ) {
-        this.stop = stop;
+    public void stopRunning( boolean s ) {
+        this.stop = s;
+        log.debug( "Stop set to : " + s );
     }
 
     /**
@@ -153,7 +158,7 @@ public class AnalysisThread extends Thread {
         notifyAll();
         GeneSetPvalRun lastResults = latestResults;
         this.latestResults = null;
-        log.debug( "Got results!" );
+        if ( lastResults != null ) log.debug( "Got results!" );
         return lastResults;
     }
 
@@ -170,12 +175,13 @@ public class AnalysisThread extends Thread {
     public void run() {
         try {
             this.wasError = false;
-            log.debug( "Invoking runner" );
             assert runningMethod != null : "No running method assigned";
+            log.debug( "Invoking runner in " + Thread.currentThread().getName() );
             log.debug( "Running method is " + runningMethod.getName() );
             GeneSetPvalRun results = ( GeneSetPvalRun ) runningMethod.invoke( this, null );
             log.debug( "Runner returned" );
             this.setLatestResults( results );
+            this.finishedNormally = true;
         } catch ( InvocationTargetException e ) {
             if ( !( e.getCause() instanceof CancellationException ) ) {
                 showError( e.getCause() );
@@ -183,7 +189,6 @@ public class AnalysisThread extends Thread {
                 log.debug( "Cancelled" );
             }
             messenger.showStatus( "Ready" );
-            throw new IllegalStateException( e.getCause() );
         } catch ( Exception e ) {
             stop = true;
             showError( e );
@@ -236,7 +241,7 @@ public class AnalysisThread extends Thread {
      * @throws IOException
      */
     private synchronized GeneSetPvalRun doAnalysis( Map results ) throws IOException {
-        log.debug( "Entering doAnalysis" );
+        log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
         DenseDoubleMatrix2DNamed rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             rawData = addRawData();
@@ -305,22 +310,22 @@ public class AnalysisThread extends Thread {
         return activeProbes;
     }
 
-    /**
-     * @param activeProbes
-     * @param needToMakeNewGeneData
-     * @return
-     */
-    private synchronized boolean needNewGeneData( Set activeProbes ) {
-        log.debug( "Entering needNewGeneData" );
-        for ( Iterator it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
-            GeneAnnotations test = ( GeneAnnotations ) geneDataSets.get( it.next() );
-            if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
-                geneData = test;
-                return false;
-            }
-        }
-        return true;
-    }
+    // /**
+    // * @param activeProbes
+    // * @param needToMakeNewGeneData
+    // * @return
+    // */
+    // private synchronized boolean needNewGeneData( Set activeProbes ) {
+    // log.debug( "Entering needNewGeneData" );
+    // for ( Iterator it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
+    // GeneAnnotations test = ( GeneAnnotations ) geneDataSets.get( it.next() );
+    // if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
+    // geneData = test;
+    // return false;
+    // }
+    // }
+    // return true;
+    // }
 
     /**
      * @param newResults
@@ -345,6 +350,13 @@ public class AnalysisThread extends Thread {
         log.error( e, e );
         wasError = true;
         messenger.showError( e );
+    }
+
+    /**
+     * @return Returns the finishedNormally.
+     */
+    public boolean isFinishedNormally() {
+        return this.finishedNormally;
     }
 
 }

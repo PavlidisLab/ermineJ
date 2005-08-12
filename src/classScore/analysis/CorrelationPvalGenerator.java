@@ -1,9 +1,21 @@
 package classScore.analysis;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.math.DescriptiveWithMissing;
+import baseCode.util.CancellationException;
+import cern.colt.list.DoubleArrayList;
 import classScore.Settings;
+import classScore.data.GeneSetResult;
+import classScore.data.Histogram;
 
 /**
  * @author Shahmil Merchant
@@ -14,11 +26,103 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private double histRange = 0;
     private DenseDoubleMatrix2DNamed data = null;
+    private Histogram hist;
+    private Map probeToGeneMap;
+    private int geneRepTreatment;
+    private Map cache;
 
     public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, GONames gon,
             DenseDoubleMatrix2DNamed data ) {
         super( settings, a, csc, gon );
         this.data = data;
+        cache = new HashMap();
+    }
+
+    public GeneSetResult classPval( String geneSetName ) {
+        if ( !super.checkAspect( geneSetName ) ) return null;
+        int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
+        if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
+            return null;
+        }
+
+        Collection probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
+
+        /*
+         * Iterate over the probes to get pairwise correlations.; we do this in a list so we can do each comparison just
+         * once.
+         */
+        double avecorrel = 0.0;
+        double nummeas = 0;
+        Map values = new HashMap();
+        int b = 0;
+        List probeList = new ArrayList( probesInSet );
+
+        for ( int i = probeList.size() - 1; i >= 0; i-- ) {
+            String probei = ( String ) probeList.get( i );
+            String genei = ( String ) probeToGeneMap.get( probei );
+            DoubleArrayList irow = new DoubleArrayList( data.getRowByName( probei ) );
+            int numProbesForGene = geneAnnots.getGeneProbeList( genei ).size();
+
+            for ( int j = i - 1; j >= 0; j-- ) {
+                String probej = ( String ) probeList.get( j );
+                String genej = ( String ) probeToGeneMap.get( probej );
+
+                if ( genei.equals( genej ) ) {
+                    continue; // always ignore self-comparisons.
+                }
+                Long probeKey = new Long( probei.hashCode() + ( probej.hashCode() << 32 ) );
+                Double cachedValue = ( Double ) cache.get( probeKey );
+                double corr;
+                if ( cachedValue != null ) {
+                    corr = cachedValue.doubleValue();
+                } else {
+                    DoubleArrayList jrow = new DoubleArrayList( data.getRowByName( probej ) );
+                    corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow ) );
+                    cache.put( probeKey, new Double( corr ) );
+                }
+
+                if ( geneRepTreatment == Settings.BEST_PVAL ) {
+                    Long key = new Long( genei.hashCode() + ( genej.hashCode() << 32 ) );
+                    if ( !values.containsKey( key ) || ( ( Double ) values.get( key ) ).doubleValue() < corr ) {
+                        values.put( ( key ), new Double( corr ) );
+                    }
+                } else if ( geneRepTreatment == Settings.MEAN_PVAL ) {
+                    double weight = weight = 1.0 / ( geneAnnots.getGeneProbeList( genej ).size() * numProbesForGene );
+                    corr *= weight;
+                    avecorrel += corr;
+                    nummeas += weight;
+                } else {
+                    throw new IllegalStateException( "Unknown method." );
+                }
+                b++;
+                if ( b % 100 == 0 ) {
+                    ifInterruptedStop();
+                    try {
+                        Thread.sleep( 5 );
+                    } catch ( InterruptedException ex ) {
+                        log.debug( "Interrupted" );
+                        throw new CancellationException( "Interrupted" );
+                    }
+                }
+            }
+        }
+
+        if ( geneRepTreatment == Settings.BEST_PVAL ) {
+            avecorrel = 0.0;
+            nummeas = 0;
+            for ( Iterator iter = values.values().iterator(); iter.hasNext(); ) {
+                avecorrel += ( ( Double ) iter.next() ).doubleValue();
+                nummeas++;
+            }
+        }
+
+        double geneSetMeanCorrel = avecorrel / nummeas;
+
+        GeneSetResult result = new GeneSetResult( geneSetName, goName.getNameForId( geneSetName ),
+                ( ( Integer ) actualSizes.get( geneSetName ) ).intValue(), effSize );
+        result.setScore( geneSetMeanCorrel );
+        result.setPValue( hist.getValue( effSize, geneSetMeanCorrel, true ) ); // always upper tail.
+        return result;
     }
 
     /**
@@ -66,6 +170,27 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      */
     public double get_range() {
         return histRange;
+    }
+
+    /**
+     * @param hist
+     */
+    public void setHistogram( Histogram hist ) {
+        this.hist = hist;
+    }
+
+    /**
+     * @param probeToGeneMap
+     */
+    public void setProbeToGeneMap( Map probeToGeneMap ) {
+        this.probeToGeneMap = probeToGeneMap;
+    }
+
+    /**
+     * @param geneRepTreatment
+     */
+    public void setGeneRepTreatment( int geneRepTreatment ) {
+        this.geneRepTreatment = geneRepTreatment;
     }
 
 }

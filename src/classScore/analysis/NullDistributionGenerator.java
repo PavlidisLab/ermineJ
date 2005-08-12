@@ -20,6 +20,4 @@ public interface NullDistributionGenerator {
      */
     public void setRandomSeed( long randomSeed );
 
-    public boolean isInterrupted();
-
 }

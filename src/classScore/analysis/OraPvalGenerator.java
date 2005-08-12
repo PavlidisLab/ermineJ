@@ -75,8 +75,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         Map record = new HashMap();
         int v_size = 0;
 
-        while ( classit.hasNext() && !isInterrupted() ) {
-
+        while ( classit.hasNext() ) {
+            ifInterruptedStop();
             String probe = ( String ) classit.next(); // probe id
 
             if ( probesToScores.containsKey( probe ) ) {

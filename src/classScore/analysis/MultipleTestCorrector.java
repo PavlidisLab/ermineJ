@@ -27,7 +27,7 @@ import classScore.data.Histogram;
  * @version $Id$
  */
 
-public class MultipleTestCorrector {
+public class MultipleTestCorrector extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
     private Vector sortedclasses;
     private Map results;
@@ -172,6 +172,9 @@ public class MultipleTestCorrector {
 
             // successive minima of step 2, pg 66. Also does step 3.
             for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+
+                ifInterruptedStop();
+
                 /*
                  * going in the correct order for the 'real' data, starting from the worst class.
                  */
@@ -224,6 +227,7 @@ public class MultipleTestCorrector {
             }
 
             if ( i % 100 == 0 ) {
+                ifInterruptedStop();
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {

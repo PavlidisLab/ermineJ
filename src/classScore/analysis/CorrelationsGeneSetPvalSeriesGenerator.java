@@ -35,13 +35,8 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
 
     protected static final Log log = LogFactory.getLog( CorrelationsGeneSetPvalSeriesGenerator.class );
 
-    private Histogram hist;
-    private CorrelationPvalGenerator probeCorrelData;
-    // private Map probeToGeneSetMap; // stores probe->go Hashtable
-
+    private CorrelationPvalGenerator classScoreGenerator;
     private Map results;
-    private DenseDoubleMatrix2DNamed rawData;
-    private Map probeToGeneMap;
 
     /**
      * @return
@@ -62,144 +57,37 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
             GeneSetSizeComputer csc, GONames gon, DenseDoubleMatrix2DNamed rawData, Histogram hist ) {
         super( settings, geneAnnots, csc, gon );
 
-        this.probeToGeneMap = geneAnnots.getProbeToGeneMap();
-        this.probeCorrelData = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );
+        this.classScoreGenerator = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );
         this.geneAnnots = geneAnnots;
 
-        this.hist = hist;
-        this.rawData = rawData;
-        probeCorrelData.set_class_max_size( settings.getMaxClassSize() );
-        probeCorrelData.set_class_min_size( settings.getMinClassSize() );
+        classScoreGenerator.setProbeToGeneMap(geneAnnots.getProbeToGeneMap());
+        classScoreGenerator.setHistogram(hist);
+        classScoreGenerator.setGeneRepTreatment(settings.getGeneRepTreatment());
+        classScoreGenerator.set_class_max_size( settings.getMaxClassSize() );
+        classScoreGenerator.set_class_min_size( settings.getMinClassSize() );
         results = new HashMap();
     }
 
     /**
      * @param messenger
-     * @todo make this faster. cache values?
      */
-    public void geneSetCorrelationGenerator( StatusViewer messenger ) {
-        // iterate over each class
+    public void classPvalGenerator( StatusViewer messenger ) {
         int count = 0;
-        int setting = settings.getGeneRepTreatment();
+        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+            ifInterruptedStop();
 
-        for ( Iterator it = geneAnnots.getGeneSets().iterator(); it.hasNext(); ) {
-            if ( isInterrupted() ) {
-                log.debug( "Cancelling" );
-                break;
+            String geneSetName = ( String ) iter.next();
+            GeneSetResult res = classScoreGenerator.classPval( geneSetName );
+            if ( res != null ) {
+                results.put( geneSetName, res );
             }
-            String geneSetName = ( String ) it.next();
-            Collection probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
-
-            if ( !super.checkAspect( geneSetName ) ) continue;
-
-            int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
-
-            if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
-                continue;
-            }
-            // log.debug( "Analyzing " + geneSetName + ", size=" + effSize );
-
-            // this calculation is done just in case the hashtable has no value
-            // for an element...hence we keep track of the number of elements
-            // with values and then create a Matrix to be used for correlation
-            // based on that
-            // int classSize = 0;
-            // for ( Iterator mit = probesInSet.iterator(); mit.hasNext(); ) {
-            // String element = ( String ) mit.next();
-            // if ( probeCorrelData.containsRow( element ) ) {
-            // classSize++;
-            // }
-            // if ( classSize > probeCorrelData.getMaxClassSize() ) {
-            // break;
-            // }
-            // }
-
-            // // to check if class size is ok.
-            // if ( classSize < probeCorrelData.getMinGeneSetSize() || classSize > probeCorrelData.getMaxClassSize() ) {
-            // continue;
-            // }
-
-            if ( count % 10 == 0 ) {
-                messenger.showStatus( "Classes analyzed: " + count );
-                try {
-                    Thread.sleep( 5 );
-                } catch ( InterruptedException ex ) {
-                    log.debug( "Interrupted" );
-                    throw new CancellationException();
-                }
-            }
-
-            /*
-             * Iterate over the probes to get pairwise correlations.; we do this in a list so we can do each comparison
-             * just once.
-             */
-            double avecorrel = 0.0;
-            double nummeas = 0;
-            Map values = new HashMap();
-            int b = 0;
-            List probeList = new ArrayList( probesInSet );
-
-            for ( int i = probeList.size() - 1; i >= 0; i-- ) {
-
-                String probei = ( String ) probeList.get( i );
-                String genei = ( String ) probeToGeneMap.get( probei );
-                DoubleArrayList irow = new DoubleArrayList( rawData.getRowByName( probei ) );
-                int numProbesForGene = geneAnnots.getGeneProbeList( genei ).size();
-
-                for ( int j = i - 1; j >= 0; j-- ) {
-                    String probej = ( String ) probeList.get( j );
-                    String genej = ( String ) probeToGeneMap.get( probej );
-
-                    if ( genei.equals( genej ) ) {
-                        continue; // always ignore self-comparisons.
-                    }
-
-                    DoubleArrayList jrow = new DoubleArrayList( rawData.getRowByName( probej ) );
-
-                    double corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow ) );
-
-                    if ( setting == Settings.BEST_PVAL ) {
-                        String key = genei + "___" + genej;
-                        if ( !values.containsKey( key ) || ( ( Double ) values.get( key ) ).doubleValue() < corr ) {
-                            values.put( ( key ), new Double( corr ) );
-                        }
-                    } else if ( setting == Settings.MEAN_PVAL ) {
-                        double weight = weight = 1.0 / ( geneAnnots.getGeneProbeList( genej ).size() * numProbesForGene );
-                        corr *= weight;
-                        avecorrel += corr;
-                        nummeas += weight;
-                    } else {
-                        throw new IllegalStateException( "Unknown method." );
-                    }
-                    b++;
-                    if ( b % 500 == 0 ) {
-                        try {
-                            Thread.sleep( 5 );
-                        } catch ( InterruptedException ex ) {
-                            log.debug( "Interrupted" );
-                            throw new RuntimeException( "Interrupted" );
-                        }
-                    }
-                }
-            }
-
-            if ( setting == Settings.BEST_PVAL ) {
-                avecorrel = 0.0;
-                nummeas = 0;
-                for ( Iterator iter = values.values().iterator(); iter.hasNext(); ) {
-                    avecorrel += ( ( Double ) iter.next() ).doubleValue();
-                    nummeas++;
-                }
-            }
-
-            double geneSetMeanCorrel = avecorrel / nummeas;
-
-            GeneSetResult result = new GeneSetResult( geneSetName, goName.getNameForId( geneSetName ),
-                    ( ( Integer ) actualSizes.get( geneSetName ) ).intValue(), effSize );
-            result.setScore( geneSetMeanCorrel );
-            result.setPValue( hist.getValue( effSize, geneSetMeanCorrel, true ) ); // always upper tail.
-            results.put( geneSetName, result );
             count++;
+            if ( messenger != null && count % 10 == 0 ) {
+                messenger.showStatus( count + " gene sets analyzed" );
+            }
         }
+        
     }
+
+    
 }

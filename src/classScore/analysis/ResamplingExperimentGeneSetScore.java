@@ -100,10 +100,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
             DoubleArrayList values = new DoubleArrayList();
             for ( int k = 0; k < numRuns; k++ ) {
 
-                if ( Thread.currentThread().isInterrupted() ) {
-                    log.debug( "Got cancel" );
-                    throw new CancellationException();
-                }
+                ifInterruptedStop();
 
                 RandomChooser.chooserandom( random_class, in_pval, deck, num_genes, geneSetSize );
                 rawscore = computeRawScore( random_class, geneSetSize, method );
@@ -129,8 +126,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
                     try {
                         Thread.sleep( 10 );
                     } catch ( InterruptedException e ) {
-                        log.debug( "Interrupted" );
-                        throw new RuntimeException( "Interrupted" );
+                        throw new CancellationException();
                     }
                 }
             }

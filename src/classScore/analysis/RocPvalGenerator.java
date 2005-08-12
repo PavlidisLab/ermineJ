@@ -71,9 +71,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         int count = 0;
 
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
-            if ( isInterrupted() ) {
-                break;
-            }
+            ifInterruptedStop();
             String className = ( String ) iter.next();
             GeneSetResult res = this.classPval( className, genePvalueMap, rankMap );
             if ( res != null ) {
@@ -116,8 +114,8 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         boolean invert = settings.getDoLog() && !settings.getBigIsBetter();
 
-        while ( classit.hasNext() && !isInterrupted() ) {
-
+        while ( classit.hasNext() ) {
+            ifInterruptedStop();
             String probe = ( String ) classit.next(); // probe id OR gene.
 
             if ( probesToPvals.containsKey( probe ) ) {
