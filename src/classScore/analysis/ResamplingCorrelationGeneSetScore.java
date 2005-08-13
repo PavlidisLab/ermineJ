@@ -23,7 +23,15 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
     private double[][] dataAsRawMatrix;
     private double[][] selfSquaredMatrix;
+
+    /**
+     * Never start estimating distributions for gene sets sizes smaller than this.
+     */
     private static final int MIN_SET_SIZE_FOR_ESTIMATION = 10;
+
+    /**
+     * Never estimate distribution with fewer than this many iterations.
+     */
     private static final int MIN_ITERATIONS_FOR_ESTIMATION = 1000;
 
     /**
@@ -53,8 +61,9 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     }
 
     /**
-     * @throws InterruptedException Build background distributions of within-gene set mean correlations. This requires
-     *         computing a lot of correlations.
+     * Build background distributions of within-gene set mean correlations. This requires computing a lot of
+     * correlations.
+     * 
      * @return histogram containing the random distributions of correlations.
      */
     public Histogram generateNullDistribution( StatusViewer messenger ) {
@@ -169,8 +178,9 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         return avecorrel / nummeas;
     }
 
-    // special optimized version of correlation computation for this.
-
+    /**
+     * special optimized version of correlation computation for this.
+     */
     private static double correlation( double[] x, double[] y, double[][] selfSquaredMatrix, int a, int b ) {
         double syy, sxy, sxx, sx, sy, xj, yj, ay, ax;
         int numused = 0;
@@ -191,8 +201,6 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             sx += xj;
             sy += yj;
             sxy += xj * yj;
-            // sxx += xj * xj;
-            // syy += yj * yj;
             sxx += selfSquaredMatrix[a][j];
             syy += selfSquaredMatrix[b][j];
             numused++;
@@ -206,6 +214,11 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         return Double.NaN; // signifies that it could not be calculated.
     }
 
+    /**
+     * 
+     * @param input raw double 2-d matrix
+     * @return the element-by-element product (not matrix product) of the matrix.
+     */
     private static double[][] selfSquaredMatrix( double[][] input ) {
         double[][] returnValue = new double[input.length][];
         for ( int i = 0; i < returnValue.length; i++ ) {

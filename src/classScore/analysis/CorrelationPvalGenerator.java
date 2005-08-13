@@ -30,6 +30,36 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     private Map probeToGeneMap;
     private int geneRepTreatment;
     private Map cache;
+    private int usedCache = 0;
+    private int tests = 0;
+
+    /**
+     * @return Returns the tests.
+     */
+    public int getTests() {
+        return this.tests;
+    }
+
+    /**
+     * @param tests The tests to set.
+     */
+    public void setTests( int tests ) {
+        this.tests = tests;
+    }
+
+    /**
+     * @return Returns the usedCache.
+     */
+    public int getUsedCache() {
+        return this.usedCache;
+    }
+
+    /**
+     * @param usedCache The usedCache to set.
+     */
+    public void setUsedCache( int usedCache ) {
+        this.usedCache = usedCache;
+    }
 
     public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, GONames gon,
             DenseDoubleMatrix2DNamed data ) {
@@ -74,12 +104,14 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                 Double cachedValue = ( Double ) cache.get( probeKey );
                 double corr;
                 if ( cachedValue != null ) {
+                    usedCache++;
                     corr = cachedValue.doubleValue();
                 } else {
                     DoubleArrayList jrow = new DoubleArrayList( data.getRowByName( probej ) );
                     corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow ) );
                     cache.put( probeKey, new Double( corr ) );
                 }
+                tests++;
 
                 if ( geneRepTreatment == Settings.BEST_PVAL ) {
                     Long key = new Long( genei.hashCode() + ( genej.hashCode() << 32 ) );

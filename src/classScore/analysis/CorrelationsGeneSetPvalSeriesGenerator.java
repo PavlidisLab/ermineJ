@@ -54,9 +54,9 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
         this.classScoreGenerator = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );
         this.geneAnnots = geneAnnots;
 
-        classScoreGenerator.setProbeToGeneMap(geneAnnots.getProbeToGeneMap());
-        classScoreGenerator.setHistogram(hist);
-        classScoreGenerator.setGeneRepTreatment(settings.getGeneRepTreatment());
+        classScoreGenerator.setProbeToGeneMap( geneAnnots.getProbeToGeneMap() );
+        classScoreGenerator.setHistogram( hist );
+        classScoreGenerator.setGeneRepTreatment( settings.getGeneRepTreatment() );
         classScoreGenerator.set_class_max_size( settings.getMaxClassSize() );
         classScoreGenerator.set_class_min_size( settings.getMinClassSize() );
         results = new HashMap();
@@ -67,6 +67,9 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
      */
     public void classPvalGenerator( StatusViewer messenger ) {
         int count = 0;
+        classScoreGenerator.setTests( 0 );
+        classScoreGenerator.setUsedCache( 0 );
+
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
 
@@ -76,12 +79,14 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
                 results.put( geneSetName, res );
             }
             count++;
-            if ( messenger != null && count % 10 == 0 ) {
+            if ( messenger != null && count % 20 == 0 ) {
                 messenger.showStatus( count + " gene sets analyzed" );
             }
         }
-        
+
+        log.debug( "Tests: " + classScoreGenerator.getTests() );
+        log.debug( "Cache hits: " + classScoreGenerator.getUsedCache() );
+
     }
 
-    
 }
