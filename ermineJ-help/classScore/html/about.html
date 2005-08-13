@@ -19,49 +19,43 @@
 microarray data</b>. A typical goal is to determine whether particular
 biological pathways are "doing something interesting" in the data. The
 software is designed to be used by biologists with little or no
-informatics background.</p>
+informatics background. A command-line interface is available for users
+who wish to script the use of ermineJ.</p>
 
-<p>Key features include:</p>
+<p>Major features include:</p>
 
 <ul>
-	<li>Implementation of several methods for gene set analysis:
+	<li>Implementation of multiple methods for gene set analysis:
 
 	<ul>
-		<li><a href="tutorial/ora.html">Over-representation analysis</a></li>
-
-		<li><a href="tutorial/resampling.html">A resampling-based method that
-		uses gene scores</a></li>
-
+		<li><A href="tutorial/ora.html">Over-representation analysis</A>
+		<li><A href="tutorial/resampling.html">A resampling-based method that
+		uses gene scores</A>
+		<li><a href="tutorial/roc.html">A rank-based method that uses gene
+		scores</a></li>
 		<li>A resampling-based method that uses <a
 			href="tutorial/correlation.html">correlation between gene expression
-		profiles</a> .</li>
+		profiles</a> (a type of "cluster-enrichment" analysis).</li>
 	</ul>
-	</li>
-
-	<li>Gene sets receive statistical scores (p-values), and <a href="tutorial/mtc.html">multiple test
-	correction</a> is supported.</li>
-
-	<li>Support of the Gene Ontology terminology</li>
-
-	<li>User files use <a href="formats/index.html">simple text formats</a>.</li>
-
-	<li>Users can <a href="tutorial/classes.html">modify gene sets or
-	create new ones</a>.</li>
-
+	<li>Gene sets receive statistical scores (p-values), and <a
+		href="tutorial/mtc.html">multiple test correction</a> is supported.</li>
+	<li>Support of the Gene Ontology terminology; users can choose which
+	aspects to analyze.</li>
+	<li>User files use <A href="formats/go.html">simple text formats</A>.
+	<li>Users can <A href="tutorial/classes.html">modify gene sets or
+	create new ones</A>.
 	<li>The results can be <a href="tutorial/visualize.html">visualized
-	within the software</a> and gene sets browsed as a <a
-		href="tutorial/afterAnalysis.html">tree or a table</a>.</li>
-
+	within the software</a>.
 	<li>It is simple to compare multiple analyses of the same data set with
 	different settings.</li>
-
-	<li><a href="tutorial/visualize.html">User-definable hyperlinks</a> are
-	provided to external sites to allow more efficient browsing of the
+	<li><a href="tutorial/setgeneurl.html">User-definable hyperlinks</a>
+	are provided to external sites to allow more efficient browsing of the
 	results.</li>
-
-	<li>For programmers, there is a <a href="tutorial/Api.html">simple
+	<li>For programmers, there is a <a href="tutorial/cli.html">command
+	line interface</a> as well as a <a href="tutorial/Api.html">simple
 	application programming interface</a> that can be used to plug ermineJ
 	functionality into your own code</li>
+</ul>
 </ul>
 
 <p><a href="license.html">License information</a></p>
