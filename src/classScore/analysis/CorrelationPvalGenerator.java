@@ -100,21 +100,13 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                 if ( genei.equals( genej ) ) {
                     continue; // always ignore self-comparisons.
                 }
-                Long probeKey = new Long( probei.hashCode() + ( probej.hashCode() << 32 ) );
-                Double cachedValue = ( Double ) cache.get( probeKey );
-                double corr;
-                if ( cachedValue != null ) {
-                    usedCache++;
-                    corr = cachedValue.doubleValue();
-                } else {
-                    DoubleArrayList jrow = new DoubleArrayList( data.getRowByName( probej ) );
-                    corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow ) );
-                    cache.put( probeKey, new Double( corr ) );
-                }
+
+                DoubleArrayList jrow = new DoubleArrayList( data.getRowByName( probej ) );
+                double corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow ) );
                 tests++;
 
                 if ( geneRepTreatment == Settings.BEST_PVAL ) {
-                    Long key = new Long( genei.hashCode() + ( genej.hashCode() << 32 ) );
+                    String key = genei + "____" + genej;
                     if ( !values.containsKey( key ) || ( ( Double ) values.get( key ) ).doubleValue() < corr ) {
                         values.put( ( key ), new Double( corr ) );
                     }
@@ -124,7 +116,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                     avecorrel += corr;
                     nummeas += weight;
                 } else {
-                    throw new IllegalStateException( "Unknown method." );
+                    throw new UnsupportedOperationException( "Unsupported replicate treatment method "
+                            + geneRepTreatment );
                 }
                 b++;
                 if ( b % 100 == 0 ) {
