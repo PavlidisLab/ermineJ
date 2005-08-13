@@ -388,7 +388,17 @@ public class GeneScores {
 
         setUpRawArrays();
         reportProblems( messenger, invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept );
-        geneAnnots.setActiveProbes( probeToScoreMap.keySet() );
+
+        // check if active probes and probes in the platform are the same.
+        for ( Iterator iter = geneAnnots.getProbeToGeneMap().keySet().iterator(); iter.hasNext(); ) {
+            String probe = ( String ) iter.next();
+            if ( !probeToScoreMap.keySet().contains( probe ) ) {
+                log.debug( "Activeprobes must be set - data doesn't contain " + probe );
+                geneAnnots.setActiveProbes( probeToScoreMap.keySet() );
+                break;
+            }
+        }
+
         setUpGeneToScoreMap( settings, null, messenger );
 
     }
