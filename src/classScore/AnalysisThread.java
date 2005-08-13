@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -186,7 +187,7 @@ public class AnalysisThread extends Thread {
             } else {
                 log.debug( "Cancelled" );
             }
-            messenger.showStatus( "Ready" );
+            if ( messenger != null ) messenger.showStatus( "Ready" );
         } catch ( Exception e ) {
             stop = true;
             showError( e );
@@ -201,15 +202,16 @@ public class AnalysisThread extends Thread {
     private synchronized GeneScores addGeneScores() throws IOException {
         GeneScores geneScores = null;
         if ( !geneScoreSettingsDirty() && geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-            messenger.showStatus( "Gene Scores are in memory" );
+            if ( messenger != null ) messenger.showStatus( "Gene Scores are in memory" );
             geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
         } else {
-            messenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
+            if ( messenger != null )
+                messenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
             geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
         if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
-            messenger.showStatus( "Didn't get geneScores" );
+            if ( messenger != null ) messenger.showStatus( "Didn't get geneScores" );
         }
         return geneScores;
     }
@@ -221,10 +223,11 @@ public class AnalysisThread extends Thread {
     private synchronized DenseDoubleMatrix2DNamed addRawData() throws IOException {
         DenseDoubleMatrix2DNamed rawData;
         if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
-            messenger.showStatus( "Raw data are in memory" );
+            if ( messenger != null ) messenger.showStatus( "Raw data are in memory" );
             rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawDataFileName() );
         } else {
-            messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
+            if ( messenger != null )
+                messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
             rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawDataFileName() );
             rawDataSets.put( settings.getRawDataFileName(), rawData );
@@ -240,6 +243,10 @@ public class AnalysisThread extends Thread {
      */
     private synchronized GeneSetPvalRun doAnalysis( Map results ) throws IOException {
         log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
         DenseDoubleMatrix2DNamed rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             rawData = addRawData();
@@ -266,7 +273,7 @@ public class AnalysisThread extends Thread {
         if ( this.stop ) return null;
 
         /* do work */
-        messenger.showStatus( "Starting analysis..." );
+        if ( messenger != null ) messenger.showStatus( "Starting analysis..." );
         GeneSetPvalRun newResults = null;
         if ( results != null ) { // read from a file.
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
@@ -275,6 +282,9 @@ public class AnalysisThread extends Thread {
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
                     messenger, "NewRun" );
         }
+
+        timer.stop();
+        if ( messenger != null ) messenger.showStatus( timer.getTime() / 1000 + " seconds elapsed" );
 
         if ( this.stop ) return null;
         // settings.writePrefs();
@@ -347,7 +357,7 @@ public class AnalysisThread extends Thread {
     private synchronized void showError( Throwable e ) {
         log.error( e, e );
         wasError = true;
-        messenger.showError( e );
+        if ( messenger != null ) messenger.showError( e );
     }
 
     /**
