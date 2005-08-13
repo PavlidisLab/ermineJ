@@ -191,7 +191,7 @@ public class AnalysisThread extends Thread {
         } catch ( Exception e ) {
             stop = true;
             showError( e );
-            throw new IllegalStateException( e.getCause() );
+            throw new RuntimeException( e.getCause() );
         }
     }
 
