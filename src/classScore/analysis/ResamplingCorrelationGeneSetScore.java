@@ -21,6 +21,11 @@ import classScore.data.Histogram;
  */
 public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSetScore {
 
+    /**
+     * 
+     */
+    private static final int MIN_STABLE_CHECKS = 3;
+
     private DenseDoubleMatrix2DNamed data = null;
 
     private double[][] dataAsRawMatrix;
@@ -35,7 +40,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     /**
      * Never estimate distribution with fewer than this many iterations.
      */
-    private static final int MIN_ITERATIONS_FOR_ESTIMATION = 1000;
+    private static final int MIN_ITERATIONS_FOR_ESTIMATION = 2000;
 
     /**
      * @param dataMatrix
@@ -83,6 +88,8 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         selfSquaredMatrix = MatrixStats.selfSquaredMatrix( dataAsRawMatrix );
         nanStatusMatrix = MatrixStats.nanStatusMatrix( dataAsRawMatrix );
 
+        int stableChecks = 0;
+
         for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
 
             int[] randomnums = new int[geneSetSize];
@@ -110,12 +117,19 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
                     double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
                             .sumOfSquares( values ) );
 
-                    if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
+                    if ( isConverged( oldmean, oldvar, mean, variance ) ) {
+                        stableChecks++; // this is necessary because we are not guaranteed to decrease the error.
+                    } else {
+                        stableChecks = 0;
+                    }
+
+                    if ( stableChecks >= MIN_STABLE_CHECKS ) {
                         hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
                         log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + j
                                 + " iterations." );
                         break; // stop simulation of this class size.
                     }
+
                     oldmean = mean;
                     oldvar = variance;
                 }
@@ -143,6 +157,17 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     }
 
     /**
+     * @param oldmean
+     * @param oldvar
+     * @param mean
+     * @param variance
+     * @return
+     */
+    private boolean isConverged( double oldmean, double oldvar, double mean, double variance ) {
+        return Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE;
+    }
+
+    /**
      * 
      */
     private void takeABreak() {
@@ -164,7 +189,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     public double geneSetMeanCorrel( int[] indicesToSelect ) {
 
         int size = indicesToSelect.length;
-        double avecorrel = 0.0;
+        double sumCorrelation = 0.0;
         int nummeas = 0;
 
         for ( int i = 0; i < size; i++ ) {
@@ -175,12 +200,11 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
                 double[] jrow = dataAsRawMatrix[jRowIndex];
                 double corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow, selfSquaredMatrix[iRowIndex],
                         selfSquaredMatrix[jRowIndex], nanStatusMatrix[iRowIndex], nanStatusMatrix[jRowIndex] ) );
-                // assert corr >= 0.0 && corr <= 1.0;
-                avecorrel += corr;
+                sumCorrelation += corr;
                 nummeas++;
             }
         }
-        return avecorrel / nummeas;
+        return sumCorrelation / nummeas;
     }
 
     /*
