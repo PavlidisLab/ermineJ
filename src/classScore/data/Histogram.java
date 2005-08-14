@@ -111,7 +111,7 @@ public class Histogram {
 
         if ( thebin > numBins - 1 ) { // this shouldn't happen since we
             // make sure there are enough bins.
-            log.debug( "Last bin exceeded!" );
+            log.debug( "Last bin exceeded! " + value );
             thebin = numBins - 1;
         }
         DenseDoubleMatrix1D histRow = ( ( DenseDoubleMatrix1D ) empiricalDistributions.get( classSize ) );

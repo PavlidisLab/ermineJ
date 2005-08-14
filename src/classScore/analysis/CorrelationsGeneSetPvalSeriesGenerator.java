@@ -68,7 +68,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
     public void classPvalGenerator( StatusViewer messenger ) {
         int count = 0;
         classScoreGenerator.setTests( 0 );
-        classScoreGenerator.setUsedCache( 0 );
+        classScoreGenerator.setCacheHits( 0 );
 
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
@@ -79,13 +79,13 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
                 results.put( geneSetName, res );
             }
             count++;
-            if ( messenger != null && count % 20 == 0 ) {
+            if ( messenger != null && count % 100 == 0 ) {
                 messenger.showStatus( count + " gene sets analyzed" );
             }
         }
 
         log.debug( "Tests: " + classScoreGenerator.getTests() );
-        log.debug( "Cache hits: " + classScoreGenerator.getUsedCache() );
+        log.debug( "Cache hits: " + classScoreGenerator.getCacheHits() );
 
     }
 

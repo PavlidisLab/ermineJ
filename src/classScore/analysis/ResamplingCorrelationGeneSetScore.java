@@ -1,6 +1,8 @@
 package classScore.analysis;
 
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.math.DescriptiveWithMissing;
+import baseCode.math.MatrixStats;
 import baseCode.math.RandomChooser;
 import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
@@ -23,6 +25,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
     private double[][] dataAsRawMatrix;
     private double[][] selfSquaredMatrix;
+    private boolean[][] nanStatusMatrix;
 
     /**
      * Never start estimating distributions for gene sets sizes smaller than this.
@@ -70,16 +73,15 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
         int[] deck = new int[data.rows()];
 
-        dataAsRawMatrix = new double[data.rows()][]; // we use this so we don't call getQuick() too much. Probably
-        // doesn't
-        // matter.
-
+        dataAsRawMatrix = new double[data.rows()][];
         for ( int j = 0; j < data.rows(); j++ ) {
             double[] rowValues = data.getRow( j );
             dataAsRawMatrix[j] = rowValues;
+
             deck[j] = j;
         }
-        selfSquaredMatrix = selfSquaredMatrix( dataAsRawMatrix );
+        selfSquaredMatrix = MatrixStats.selfSquaredMatrix( dataAsRawMatrix );
+        nanStatusMatrix = MatrixStats.nanStatusMatrix( dataAsRawMatrix );
 
         for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
 
@@ -134,6 +136,9 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             takeABreak();
         }
         hist.tocdf();
+        nanStatusMatrix = null;
+        selfSquaredMatrix = null;
+        dataAsRawMatrix = null;
         return hist;
     }
 
@@ -153,10 +158,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     /**
      * Compute the average correlation for a set of vectors.
      * 
-     * @param indicesToSelect
-     * @param correls the correlation matrix for the data. This can be passed in without having filled it in yet. This
-     *        means that only values that are visited during resampling are actually computed - this is a big memory
-     *        saver. NOT used because it still uses too much memory.
+     * @param indicesToSelect - rows of the matrix that will get compared.
      * @return mean correlation within the matrix.
      */
     public double geneSetMeanCorrel( int[] indicesToSelect ) {
@@ -166,70 +168,19 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         int nummeas = 0;
 
         for ( int i = 0; i < size; i++ ) {
-            double[] irow = dataAsRawMatrix[indicesToSelect[i]];
+            int iRowIndex = indicesToSelect[i];
+            double[] irow = dataAsRawMatrix[iRowIndex];
             for ( int j = i + 1; j < size; j++ ) {
-                double[] jrow = dataAsRawMatrix[indicesToSelect[j]];
-                double corr = Math.abs( correlation( irow, jrow, selfSquaredMatrix, indicesToSelect[i],
-                        indicesToSelect[j] ) );
+                int jRowIndex = indicesToSelect[j];
+                double[] jrow = dataAsRawMatrix[jRowIndex];
+                double corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow, selfSquaredMatrix[iRowIndex],
+                        selfSquaredMatrix[jRowIndex], nanStatusMatrix[iRowIndex], nanStatusMatrix[jRowIndex] ) );
+                // assert corr >= 0.0 && corr <= 1.0;
                 avecorrel += corr;
                 nummeas++;
             }
         }
         return avecorrel / nummeas;
-    }
-
-    /**
-     * special optimized version of correlation computation for this.
-     */
-    private static double correlation( double[] x, double[] y, double[][] selfSquaredMatrix, int a, int b ) {
-        double syy, sxy, sxx, sx, sy, xj, yj, ay, ax;
-        int numused = 0;
-        syy = 0.0;
-        sxy = 0.0;
-        sxx = 0.0;
-        sx = 0.0;
-        sy = 0.0;
-
-        int length = x.length;
-        for ( int j = 0; j < length; j++ ) {
-            xj = x[j];
-            yj = y[j];
-
-            if ( Double.isNaN( xj ) || Double.isNaN( yj ) ) {
-                continue;
-            }
-            sx += xj;
-            sy += yj;
-            sxy += xj * yj;
-            sxx += selfSquaredMatrix[a][j];
-            syy += selfSquaredMatrix[b][j];
-            numused++;
-        }
-
-        if ( numused > 0 ) {
-            ay = sy / numused;
-            ax = sx / numused;
-            return ( sxy - sx * ay ) / Math.sqrt( ( sxx - sx * ax ) * ( syy - sy * ay ) );
-        }
-        return Double.NaN; // signifies that it could not be calculated.
-    }
-
-    /**
-     * 
-     * @param input raw double 2-d matrix
-     * @return the element-by-element product (not matrix product) of the matrix.
-     */
-    private static double[][] selfSquaredMatrix( double[][] input ) {
-        double[][] returnValue = new double[input.length][];
-        for ( int i = 0; i < returnValue.length; i++ ) {
-            returnValue[i] = new double[input[i].length];
-
-            for ( int j = 0; j < returnValue[i].length; j++ ) {
-                returnValue[i][j] = input[i][j] * input[i][j];
-            }
-
-        }
-        return returnValue;
     }
 
     /*
