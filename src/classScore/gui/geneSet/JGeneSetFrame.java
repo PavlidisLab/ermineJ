@@ -875,10 +875,11 @@ public class JGeneSetFrame extends JFrame {
 
         printHeader( includeMatrixValues, includeAnnotations, out, matrixColumnCount );
 
-        DecimalFormat nf;
-        nf = new DecimalFormat();
+        DecimalFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits( 8 );
         nf.setMinimumFractionDigits( 3 );
+        nf.setGroupingUsed(false);
+        
         // write out the table, one row at a time
         for ( int r = 0; r < totalRowCount; r++ ) {
 

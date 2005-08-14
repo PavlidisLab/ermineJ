@@ -125,7 +125,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                     if ( geneRepTreatment == Settings.BEST_PVAL ) {
                         Object key = StringUtil.twoStringHashKey( genei, genej );
                         if ( !values.containsKey( key ) || ( ( Double ) values.get( key ) ).doubleValue() < corr ) {
-                            values.put( ( key ), new Double( corr ) );
+                            values.put( key, new Double( corr ) );
                         }
                     } else if ( geneRepTreatment == Settings.MEAN_PVAL ) {
                         double weight = 1.0 / ( ( double ) numProbesForGeneJ * ( double ) numProbesForGeneI );
@@ -138,6 +138,11 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                     }
                 } else {
                     sumCorrel += corr;
+                    nummeas++;
+                    if ( geneRepTreatment == Settings.BEST_PVAL ) {
+                        Object key = StringUtil.twoStringHashKey( genei, genej );
+                        values.put( key, new Double( corr ) );
+                    }
                 }
             }
         }
