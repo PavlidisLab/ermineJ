@@ -100,16 +100,12 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
             DoubleArrayList values = new DoubleArrayList();
             for ( int k = 0; k < numRuns; k++ ) {
 
-                ifInterruptedStop();
-
                 RandomChooser.chooserandom( random_class, in_pval, deck, num_genes, geneSetSize );
                 rawscore = computeRawScore( random_class, geneSetSize, method );
                 values.add( rawscore );
                 hist.update( geneSetSize, rawscore );
                 if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
                         && k > 0 && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
-                    Thread.yield();
-
                     double mean = Descriptive.mean( values );
                     double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
                             .sumOfSquares( values ) );
@@ -124,6 +120,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
                 }
                 if ( k % 1000 == 0 ) {
                     try {
+                        ifInterruptedStop();
                         Thread.sleep( 10 );
                     } catch ( InterruptedException e ) {
                         throw new CancellationException();
