@@ -78,7 +78,7 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
         String aspect = this.goName.getAspectForId( geneSetName );
 
-        if ( aspect == null ) {
+        if ( aspect == null && !this.goName.isUserDefined( geneSetName ) ) {
             log.debug( "Null aspect for " + geneSetName + ", skipping" );
             return false;
         }
@@ -96,6 +96,7 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
                 && this.settings.getUseMolecularFunction() ) {
             return true;
         } else if ( aspect.equalsIgnoreCase( GONames.USER_DEFINED ) ) {
+            log.debug( "Found user-defined gene set " + geneSetName + " for analysis" );
             return true; // user-defined - always use.
         }
         return false;
@@ -112,7 +113,5 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
         return ( settings.upperTail() && geneScore >= geneScoreThreshold )
                 || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
     }
-
-   
 
 }

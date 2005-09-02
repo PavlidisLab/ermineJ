@@ -43,6 +43,10 @@ import classScore.data.GeneSetResult;
  */
 public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
+    /**
+     * 
+     */
+    private static final int ALERT_UPDATE_FREQUENCY = 300;
     private Map results;
     private int numOverThreshold;
     private int numUnderThreshold;
@@ -76,12 +80,13 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
             ifInterruptedStop();
 
             String geneSetName = ( String ) iter.next();
+            // log.debug( "Analyzing " + geneSetName );
             GeneSetResult res = cpv.classPval( geneSetName, geneToGeneScoreMap, probesToPvals );
             if ( res != null ) {
                 results.put( geneSetName, res );
             }
             count++;
-            if ( messenger != null && count % 300 == 0 ) {
+            if ( messenger != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
                 messenger.showStatus( count + " gene sets analyzed" );
             }
         }

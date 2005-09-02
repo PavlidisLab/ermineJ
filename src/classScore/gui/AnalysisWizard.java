@@ -247,7 +247,8 @@ public class AnalysisWizard extends Wizard {
     void loadAddedClasses() throws IOException {
         Iterator it = step3.getAddedClasses().iterator();
         while ( it.hasNext() ) {
-            String id = ( String ) ( ( HashMap ) it.next() ).get( "id" );
+            String id = ( String ) ( ( Map ) it.next() ).get( "id" );
+            log.debug( "Adding " + id + " to genedata for analysis" );
             if ( !goData.isUserDefined( id ) ) {
                 UserDefinedGeneSetManager newGeneSet = new UserDefinedGeneSetManager( geneData, settings, id );
                 String filename = newGeneSet.getUserGeneSetFileForName();

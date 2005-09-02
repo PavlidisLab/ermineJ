@@ -217,11 +217,18 @@ public class AnalysisWizardStep3 extends WizardStep {
         countLabel.setText( "Number of Classes: " + addedClasses.size() );
     }
 
+    /**
+     * Create the left-hand table for the wizard, which contains the set of user-defined gene sets available.
+     */
     void makeLeftTable() {
 
         Set userDefinedGeneSets = goData.getUserDefinedGeneSets();
-        if ( userDefinedGeneSets == null || userDefinedGeneSets.size() == 0 ) return;
 
+        if ( userDefinedGeneSets == null || userDefinedGeneSets.size() == 0 ) {
+            log.debug( "Null or no user-defined gene sets" );
+            return;
+        }
+        log.debug( userDefinedGeneSets.size() + " user-defined gene sets available" );
         UserDefinedGeneSetManager helper = new UserDefinedGeneSetManager( geneData, settings, "" );
 
         customClasses = new AnalysisWizardStep3_CustomClassList();
@@ -244,6 +251,9 @@ public class AnalysisWizardStep3 extends WizardStep {
 
     }
 
+    /**
+     * Table where the selected gene sets will be displayed.
+     */
     void makeRightTable() {
         addedClasses = new AnalysisWizardStep3_CustomClassList();
         acTableModel = addedClasses.toTableModel();

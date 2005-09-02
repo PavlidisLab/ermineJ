@@ -157,6 +157,7 @@ public class GeneSetWizardStep2 extends WizardStep {
 
     void addButton_actionPerformed( ActionEvent e ) {
         int[] rows = probeTable.getSelectedRows();
+        log.debug( rows.length + " rows selected" );
         for ( int i = 0; i < rows.length; i++ ) {
             String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
             log.debug( "Got probe: " + probe );

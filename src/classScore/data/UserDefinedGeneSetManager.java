@@ -78,8 +78,11 @@ public class UserDefinedGeneSetManager {
         probes = new ArrayList();
     }
 
+    /**
+     * @param goData
+     */
     public void addGeneSet( GONames goData ) {
-        geneData.addClass( id, this.getProbes() );
+        geneData.addGeneSet( id, this.getProbes() );
         goData.addGeneSet( id, desc );
         // geneData.sortGeneSets();
     }
@@ -96,9 +99,9 @@ public class UserDefinedGeneSetManager {
 
         if ( !comparee.getDesc().equals( desc ) ) return false;
 
-        if ( !comparee.getDefinition().equals( definition ) ) return false;
+        if ( comparee.getDefinition() != null && !comparee.getDefinition().equals( definition ) ) return false;
 
-        if ( !comparee.getAspect().equals( aspect ) ) return false;
+        if ( comparee.getAspect() != null && !comparee.getAspect().equals( aspect ) ) return false;
 
         Collection probesInSet = comparee.getProbes();
         if ( probesInSet.size() != probesInSet.size() ) return false;

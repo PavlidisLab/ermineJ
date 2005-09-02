@@ -38,7 +38,7 @@ import classScore.gui.geneSet.GeneSetDetails;
  * @version $Id$
  */
 public abstract class GeneSetPanel extends JScrollPane {
-    private static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
+    static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
     static final String AMIGO_URL_BASE = "http://www.godatabase.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
     protected GeneSetScoreFrame callingFrame;
@@ -64,11 +64,11 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     protected abstract String popupRespondAndGetGeneSet( MouseEvent e );
 
-    public void addInitialData( GONames goData ) {
+    public void addInitialData( GONames initialGoData ) {
         assert callingFrame.getOriginalGeneData() != null : "Gene data is still null";
-        assert goData != null : "GO data is still null";
+        assert initialGoData != null : "GO data is still null";
         this.geneData = callingFrame.getOriginalGeneData();
-        this.goData = goData;
+        this.goData = initialGoData;
     }
 
     public abstract void addRun();
