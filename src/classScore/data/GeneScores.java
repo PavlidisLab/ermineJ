@@ -394,6 +394,7 @@ public class GeneScores {
             String probe = ( String ) iter.next();
             if ( !probeToScoreMap.keySet().contains( probe ) ) {
                 log.debug( "Activeprobes must be set - data doesn't contain " + probe );
+                assert geneAnnots != null;
                 geneAnnots.setActiveProbes( probeToScoreMap.keySet() );
                 break;
             }
