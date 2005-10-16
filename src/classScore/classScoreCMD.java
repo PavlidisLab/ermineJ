@@ -1,3 +1,23 @@
+/*
+ * The ermineJ project
+ * 
+ * Copyright (c) 2005 Columbia University
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
 package classScore;
 
 import gnu.getopt.Getopt;
@@ -45,6 +65,7 @@ public class classScoreCMD {
     protected Map geneScoreSets;
     private String saveFileName = null;// "C:\\Documents and Settings\\hkl7\\ermineJ.data\\outout.txt";
     private boolean commandline = true;
+    private boolean saveAllGenes = false;
 
     public classScoreCMD() throws IOException {
         settings = new Settings();
@@ -60,7 +81,7 @@ public class classScoreCMD {
             initialize();
             try {
                 GeneSetPvalRun result = analyze();
-                ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, false );
+                ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, saveAllGenes );
                 rp.printResults( true );
             } catch ( Exception e ) {
                 statusMessenger.showStatus( "Error During analysis" + e );
@@ -96,7 +117,7 @@ public class classScoreCMD {
         longopts[3] = new LongOpt( "save", LongOpt.NO_ARGUMENT, null, 'S' );
         longopts[4] = new LongOpt( "mtc", LongOpt.REQUIRED_ARGUMENT, null, 'M' );
         longopts[5] = new LongOpt( "format", LongOpt.REQUIRED_ARGUMENT, null, 'F' );
-        Getopt g = new Getopt( "classScoreCMD", args, "a:bc:d:e:f:g:hi:l:m:n:o:q:r:s:t:x:y:CGS:M:F:", longopts );
+        Getopt g = new Getopt( "classScoreCMD", args, "a:bc:d:e:f:g:hi:jl:m:n:o:q:r:s:t:x:y:CGS:M:F:", longopts );
         int c;
         String arg;
         int intarg;
@@ -191,6 +212,9 @@ public class classScoreCMD {
                         System.err.println( "Iterations must be greater than 0 (-i)" );
                         showHelp();
                     }
+                    break;
+                case 'j': // save all genes
+                    this.saveAllGenes = true;
                     break;
                 case 'l': // dolog
                     arg = g.getOptarg();
@@ -370,35 +394,37 @@ public class classScoreCMD {
     }
 
     private void showHelp() {
-        System.out.print( "OPTIONS\n" + "\tThe following options are supported:\n\n" + "\t-a file ...\n"
-                + "\t\tSets the annotation file to be used.\n\n" + "\t-F format (--format)"
-                + "\t\tSet format (default is our own; 'affy' is other valid value)" + "\t-c file ...\n"
-                + "\t\tSets the class file to be used.\n\n" + "\t-d dir ...\n"
-                + "\t\tSets the data folder to be used.\n\n" + "\t-e int ...\n"
-                + "\t\tSets the column in the score file to be used for scores.\n\n" + "\t-f die ...\n"
-                + "\t\tSets the class folder to be used.\n\n" + "\t-g int ...\n"
-                + "\t\tSets the gene replicant treatment:  " + Settings.BEST_PVAL + " (best gene score used) or  "
-                + Settings.MEAN_PVAL + " (mean gene score used).\n\n"
+        System.out.print( "OPTIONS\n" + "\tThe following options are supported:\n\n"
+                + "\t-a file ...\n\t\tSets the annotation file to be used.\n\n"
+                + "\t-F format (--format)\t\tSet format (default is our own; 'affy' is other valid value)"
+                + "\t-c file ...\n\t\tSets the class file to be used.\n\n"
+                + "\t-d dir ...\n\t\tSets the data folder to be used.\n\n"
+                + "\t-e int ...\n\t\tSets the column in the score file to be used for scores.\n\n" + "\t-f die ...\n"
+                + "\t\tSets the class folder to be used.\n\n"
+                + "\t-g int ...\n\t\tSets the gene replicant treatment:  " + Settings.BEST_PVAL
+                + " (best gene score used) or  " + Settings.MEAN_PVAL + " (mean gene score used).\n\n"
                 + "\t-b Sets 'big is better' option for gene scores (default is " + settings.getBigIsBetter()
-                + ").\n\n" + "\t-h or --help\n" + "\t\tShows help.\n\n" + "\t-i int ...\n"
-                + "\t\tSets the number of iterations.\n\n" + "\t-l {0/1} ...\n"
-                + "\t\tSets whether or not to take logs (default is " + settings.getDoLog() + ").\n\n"
-                + "\t-m int ...\n" + "\t\tSets the raw score method:  " + Settings.MEAN_METHOD + " (mean),  "
-                + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
+                + ").\n\n" + "\t-h or --help\n\t\tShows help.\n\n"
+                + "\t-i int ...\n\t\tSets the number of iterations.\n\n"
+                + "\t-j\n\t\tOutput should include gene symbols for all gene sets (default=don't include symbols).\n\n"
+                + "\t-l {0/1} ...\n" + "\t\tSets whether or not to take logs (default is " + settings.getDoLog()
+                + ").\n\n" + "\t-m int ...\n" + "\t\tSets the raw score method:  " + Settings.MEAN_METHOD
+                + " (mean),  " + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
                 + " (mean above quantile).\n\n" + "\t-n int ...\n" + "\t\tSets the analysis method:  " + Settings.ORA
                 + " (ORA),  " + Settings.RESAMP + " (resampling of gene scores),  " + Settings.CORR
-                + " (profile correlation),  " + Settings.ROC + " (ROC)\n\n" + "\t-o file ...\n"
-                + "\t\tSets the output file.\n\n" + "\t-q int ...\n" + "\t\tSets the quantile.\n\n" + "\t-r file ...\n"
-                + "\t\tSets the raw file to be used.\n\n" + "\t-s file ...\n"
-                + "\t\tSets the score file to be used.\n\n" + "\t-t double ...\n"
-                + "\t\tSets the pvalue threshold.\n\n" + "\t-x maximum class size ...\n"
-                + "\t\tSets the maximum class size.\n\n" + "\t-y minimum class size ...\n"
-                + "\t\tSets the minimum class size.\n\n" + "\t-M method or --mtc method\n"
-                + "\t\tSets the multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni,  "
-                + Settings.WESTFALLYOUNG + " = Westfall-Young (slow),  " + Settings.BENJAMINIHOCHBERG
-                + " =  Benjamini-Hochberg (default)\n\n" + "\t-C file ... or --config file ...\n"
-                + "\t\tSets the configuration file to be used.\n\n" + "\t-G or --gui\n" + "\t\tLaunch the GUI.\n\n"
-                + "\t-S file ... or --save file ...\n" + "\t\tSave preferences in the specified file.\n\n" );
+                + " (profile correlation),  " + Settings.ROC + " (ROC)\n\n"
+                + "\t-o file ...\n\t\tSets the output file.\n\n" + "\t-q int ...\n\t\tSets the quantile.\n\n"
+                + "\t-r file ...\n\t\tSets the raw file to be used.\n\n"
+                + "\t-s file ...\n\t\tSets the score file to be used.\n\n"
+                + "\t-t double ...\n\t\tSets the pvalue threshold.\n\n"
+                + "\t-x maximum class size ...\n\t\tSets the maximum class size.\n\n"
+                + "\t-y minimum class size ...\n\t\tSets the minimum class size.\n\n"
+                + "\t-M method or --mtc method\n\t\tSets the multiple test correction method: " + Settings.BONFERONNI
+                + " = Bonferonni,  " + Settings.WESTFALLYOUNG + " = Westfall-Young (slow),  "
+                + Settings.BENJAMINIHOCHBERG + " =  Benjamini-Hochberg (default)\n\n"
+                + "\t-C file ... or --config file ...\n\t\tSets the configuration file to be used.\n\n"
+                + "\t-G or --gui\n" + "\t\tLaunch the GUI.\n\n"
+                + "\t-S file ... or --save file ...\n\t\tSave preferences in the specified file.\n\n" );
         System.exit( 0 );
     }
 

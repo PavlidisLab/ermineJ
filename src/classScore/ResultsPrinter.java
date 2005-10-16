@@ -1,3 +1,23 @@
+/*
+ * The ermineJ project
+ * 
+ * Copyright (c) 2005 Columbia University
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
 package classScore;
 
 import java.io.BufferedWriter;
@@ -38,9 +58,10 @@ public class ResultsPrinter {
     private final boolean saveAllGeneNames;
 
     /**
-     * @param destFile
-     * @param run
-     * @param goName
+     * @param destFile output file name
+     * @param run Analysis run to be saved
+     * @param goName GO information
+     * @param saveAllGeneNames Whether the output should include all the genes
      */
     public ResultsPrinter( String destFile, GeneSetPvalRun run, GONames goName, boolean saveAllGeneNames ) {
         this.destFile = destFile;
