@@ -169,14 +169,16 @@ public class GeneSetPvalRun {
      * @param geneScores
      * @param messenger
      */
-    private void runAnalysis( Collection activeProbes, Settings settings, GeneAnnotations geneData,
-            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger ) {
+    private void runAnalysis( Collection activeProbes, Settings settings1, GeneAnnotations geneData1,
+            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores1, StatusViewer messenger ) {
         // get the class sizes.
-        GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
+        GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData1, geneScores1, settings1
+                .getUseWeights() );
 
-        switch ( settings.getClassScoreMethod() ) {
+        switch ( settings1.getClassScoreMethod() ) {
             case Settings.RESAMP: {
-                NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings, geneScores );
+                NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings1,
+                        geneScores1 );
 
                 if ( messenger != null ) messenger.showStatus( "Starting resampling" );
 
@@ -187,10 +189,11 @@ public class GeneSetPvalRun {
                 if ( Thread.currentThread().isInterrupted() ) return;
                 if ( messenger != null ) messenger.showStatus( "Finished resampling" );
 
-                GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, goData );
+                GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings1, geneData1, hist, csc,
+                        goData );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 // calculate the actual class scores and correct sorting.
-                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToScoreMap() );
+                pvg.classPvalGenerator( geneScores1.getGeneToPvalMap(), geneScores1.getProbeToScoreMap() );
                 results = pvg.getResults();
                 break;
             }
@@ -198,12 +201,12 @@ public class GeneSetPvalRun {
 
                 int inputSize = activeProbes.size();
 
-                Collection inp_entries = geneScores.getProbeToScoreMap().entrySet();
+                Collection inp_entries = geneScores1.getProbeToScoreMap().entrySet();
 
                 if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
 
-                OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator( settings, geneData, csc, goData,
-                        inputSize );
+                OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator( settings1, geneData1, csc,
+                        goData, inputSize );
                 int numOver = pvg.hgSizes( inp_entries );
 
                 if ( numOver == 0 ) {
@@ -211,7 +214,7 @@ public class GeneSetPvalRun {
                     break;
                 }
 
-                pvg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneScores.getProbeToScoreMap(), messenger );
+                pvg.classPvalGenerator( geneScores1.getGeneToPvalMap(), geneScores1.getProbeToScoreMap(), messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 results = pvg.getResults();
                 if ( messenger != null )
@@ -224,7 +227,7 @@ public class GeneSetPvalRun {
                     throw new IllegalArgumentException( "Raw data cannot be null for Correlation analysis" );
                 if ( messenger != null )
                     messenger.showStatus( "Starting correlation resampling in " + Thread.currentThread().getName() );
-                NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings, rawData );
+                NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings1, rawData );
 
                 if ( randomSeed >= 0 ) {
                     probePvalMapper.setRandomSeed( randomSeed );
@@ -232,8 +235,8 @@ public class GeneSetPvalRun {
 
                 hist = probePvalMapper.generateNullDistribution( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings,
-                        geneData, csc, goData, rawData, hist );
+                CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings1,
+                        geneData1, csc, goData, rawData, hist );
                 if ( messenger != null ) messenger.showStatus( "Finished resampling, computing for gene sets" );
                 pvg.classPvalGenerator( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
@@ -243,28 +246,20 @@ public class GeneSetPvalRun {
                 break;
             }
             case Settings.ROC: {
-                RocPvalGenerator rpg = new RocPvalGenerator( settings, geneData, csc, goData );
+                RocPvalGenerator rpg = new RocPvalGenerator( settings1, geneData1, csc, goData );
                 Map geneRanksMap;
                 if ( messenger != null ) messenger.showStatus( "Rank transforming" );
-                if ( settings.getUseWeights() ) {
-                    geneRanksMap = Rank.rankTransform( geneScores.getGeneToPvalMap() );
+                if ( settings1.getUseWeights() ) {
+                    geneRanksMap = Rank.rankTransform( geneScores1.getGeneToPvalMap() );
                     if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
-                    rpg.classPvalGenerator( geneScores.getGeneToPvalMap(), geneRanksMap, messenger );
+                    rpg.classPvalGenerator( geneScores1.getGeneToPvalMap(), geneRanksMap, messenger );
                 } else {
-                    geneRanksMap = Rank.rankTransform( geneScores.getProbeToScoreMap() );
+                    geneRanksMap = Rank.rankTransform( geneScores1.getProbeToScoreMap() );
                     if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
-                    rpg.classPvalGenerator( geneScores.getProbeToScoreMap(), geneRanksMap, messenger );
+                    rpg.classPvalGenerator( geneScores1.getProbeToScoreMap(), geneRanksMap, messenger );
                 }
                 results = rpg.getResults();
                 break;
-            }
-
-            case Settings.TTEST: { // todo implement this
-                // fall through. - unsupported.
-            }
-
-            case Settings.KS: { // todo implement this
-                // fall through. - unsupported.
             }
 
             default: {

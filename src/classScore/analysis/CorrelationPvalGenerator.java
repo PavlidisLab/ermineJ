@@ -1,3 +1,23 @@
+/*
+ * The ermineJ project
+ * 
+ * Copyright (c) 2005 Columbia University
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
 package classScore.analysis;
 
 import java.util.ArrayList;
@@ -12,9 +32,7 @@ import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.MatrixStats;
-import baseCode.util.CancellationException;
 import baseCode.util.StringUtil;
-import cern.colt.list.DoubleArrayList;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
 import classScore.data.Histogram;
@@ -31,7 +49,6 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     private Histogram hist;
     private Map probeToGeneMap;
     private int geneRepTreatment;
-    private Map cache;
     private int cacheHits = 0;
     private int tests = 0;
     private double[][] dataAsRawMatrix;
@@ -70,7 +87,6 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
             DenseDoubleMatrix2DNamed data ) {
         super( settings, a, csc, gon );
         this.data = data;
-        cache = new HashMap();
 
         dataAsRawMatrix = new double[data.rows()][];
         for ( int j = 0; j < data.rows(); j++ ) {

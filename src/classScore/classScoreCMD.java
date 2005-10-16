@@ -84,7 +84,7 @@ public class classScoreCMD {
                 ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, saveAllGenes );
                 rp.printResults( true );
             } catch ( Exception e ) {
-                statusMessenger.showStatus( "Error During analysis: \n" + e );
+                statusMessenger.showStatus( "Error During analysis:" + e );
                 e.printStackTrace();
             }
         } else {

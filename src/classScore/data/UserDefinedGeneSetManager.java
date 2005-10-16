@@ -158,14 +158,14 @@ public class UserDefinedGeneSetManager {
         return desc;
     }
 
-    public Map getGeneSetInfo( String id, GONames goData ) {
+     public Map getGeneSetInfo( String id1, GONames goData ) {
         Map cinfo = new HashMap();
         cinfo.put( "type", "probe" );
-        cinfo.put( "id", id );
-        cinfo.put( "desc", goData.getNameForId( id ) );
-        cinfo.put( "aspect", goData.getAspectForId( id ) );
-        cinfo.put( "definition", goData.getDefinitionForId( id ) );
-        Collection members = geneData.getClassToProbes( id );
+        cinfo.put( "id", id1 );
+        cinfo.put( "desc", goData.getNameForId( id1 ) );
+        cinfo.put( "aspect", goData.getAspectForId( id1 ) );
+        cinfo.put( "definition", goData.getDefinitionForId( id1 ) );
+        Collection members = geneData.getClassToProbes( id1 );
         cinfo.put( "members", members );
         return cinfo;
     }

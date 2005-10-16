@@ -51,7 +51,6 @@ import classScore.data.GeneScores;
 public class AnalysisThread extends Thread {
     protected static final Log log = LogFactory.getLog( AnalysisThread.class );
     private GeneAnnotations geneData = null;
-    private Map geneDataSets = null;
     private Map geneScoreSets;
     private GONames goData;
     private volatile GeneSetPvalRun latestResults;
@@ -107,8 +106,6 @@ public class AnalysisThread extends Thread {
         this.goData = goData;
         this.rawDataSets = rawDataSets;
         this.geneScoreSets = geneScoreSets;
-        this.geneDataSets = geneDataSets;
-
         this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) ); // this is the
         // default
         // geneData
@@ -141,8 +138,6 @@ public class AnalysisThread extends Thread {
         this.loadFile = loadFile;
         this.rawDataSets = rawDataSets;
         this.geneScoreSets = geneScoreSets;
-        this.geneDataSets = geneDataSets;
-
         // this is the
         // default
         // geneData
