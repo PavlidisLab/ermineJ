@@ -395,9 +395,9 @@ public class classScoreCMD {
 
     private void showHelp() {
         System.out.print( "OPTIONS\n" + "\tThe following options are supported:\n\n"
-                + "\t-a file ...\n\t\tSets the annotation file to be used.\n\n"
-                + "\t-F format (--format)\t\tSet format (default is our own; 'affy' is other valid value)"
-                + "\t-c file ...\n\t\tSets the class file to be used.\n\n"
+                + "\t-a file ...\n\t\tSets the annotation file to be used [required].\n\n"
+                + "\t-F format (--format)\t\tSet format (default is our own; 'affy' is other valid value\n\n"
+                + "\t-c file ...\n\t\tSets the class file to be used (e.g., go_200406-termdb.xml) [required] \n\n"
                 + "\t-d dir ...\n\t\tSets the data folder to be used.\n\n"
                 + "\t-e int ...\n\t\tSets the column in the score file to be used for scores.\n\n" + "\t-f die ...\n"
                 + "\t\tSets the class folder to be used.\n\n"
@@ -414,8 +414,8 @@ public class classScoreCMD {
                 + " (ORA),  " + Settings.RESAMP + " (resampling of gene scores),  " + Settings.CORR
                 + " (profile correlation),  " + Settings.ROC + " (ROC)\n\n"
                 + "\t-o file ...\n\t\tSets the output file.\n\n" + "\t-q int ...\n\t\tSets the quantile.\n\n"
-                + "\t-r file ...\n\t\tSets the raw file to be used.\n\n"
-                + "\t-s file ...\n\t\tSets the score file to be used.\n\n"
+                + "\t-r file ...\n\t\tSets the raw file to be used.[required for correlation method]\n\n"
+                + "\t-s file ...\n\t\tSets the score file to be used.[required for gene score-based methods]\n\n"
                 + "\t-t double ...\n\t\tSets the pvalue threshold.\n\n"
                 + "\t-x maximum class size ...\n\t\tSets the maximum class size.\n\n"
                 + "\t-y minimum class size ...\n\t\tSets the minimum class size.\n\n"
