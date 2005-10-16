@@ -248,7 +248,7 @@ public class classScoreCMD {
                     arg = g.getOptarg();
                     try {
                         intarg = Integer.parseInt( arg );
-                        if ( intarg == 0 || intarg == 1 || intarg == 2 )
+                        if ( intarg == 0 || intarg == 1 || intarg == 2 || intarg == 3 )
                             settings.setClassScoreMethod( intarg );
                         else {
                             System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
@@ -487,7 +487,6 @@ public class classScoreCMD {
             statusMessenger.showStatus( "Didn't get geneScores" );
         }
 
-        // todo need logic to choose which source of probes to use.
         Set activeProbes = null;
         if ( rawData != null && geneScores != null ) { // favor the geneScores
             // list.
