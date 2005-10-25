@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.util.StatusViewer;
 import classScore.Settings;
 import classScore.data.GeneSetResult;
@@ -48,7 +49,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
      * @param hist
      */
     public CorrelationsGeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneAnnots,
-            GeneSetSizeComputer csc, GONames gon, DenseDoubleMatrix2DNamed rawData, Histogram hist ) {
+            GeneSetSizeComputer csc, GONames gon, DoubleMatrixNamed rawData, Histogram hist ) {
         super( settings, geneAnnots, csc, gon );
 
         this.classScoreGenerator = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );

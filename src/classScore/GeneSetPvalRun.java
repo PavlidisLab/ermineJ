@@ -32,6 +32,7 @@ import java.util.Vector;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.math.Rank;
 import baseCode.util.StatusViewer;
 import classScore.analysis.CorrelationsGeneSetPvalSeriesGenerator;
@@ -88,9 +89,8 @@ public class GeneSetPvalRun {
      * @param results
      * @param name Name of the run
      */
-    public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData,
-            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
-            Map results, String name ) {
+    public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData, DoubleMatrixNamed rawData,
+            GONames goData, GeneScores geneScores, StatusViewer messenger, Map results, String name ) {
         this.settings = settings;
         this.geneData = geneData;
 
@@ -147,8 +147,8 @@ public class GeneSetPvalRun {
      * @param messenger
      * @param name Name of the run
      */
-    public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData,
-            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores, StatusViewer messenger, String name ) {
+    public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData, DoubleMatrixNamed rawData,
+            GONames goData, GeneScores geneScores, StatusViewer messenger, String name ) {
         this.settings = settings;
         this.geneData = geneData;
         this.geneScores = geneScores;
@@ -170,7 +170,7 @@ public class GeneSetPvalRun {
      * @param messenger
      */
     private void runAnalysis( Collection activeProbes, Settings settings1, GeneAnnotations geneData1,
-            DenseDoubleMatrix2DNamed rawData, GONames goData, GeneScores geneScores1, StatusViewer messenger ) {
+            DoubleMatrixNamed rawData, GONames goData, GeneScores geneScores1, StatusViewer messenger ) {
         // get the class sizes.
         GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData1, geneScores1, settings1
                 .getUseWeights() );

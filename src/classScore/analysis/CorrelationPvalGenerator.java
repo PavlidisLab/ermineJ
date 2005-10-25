@@ -30,6 +30,7 @@ import java.util.Map;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.MatrixStats;
 import baseCode.util.StringUtil;
@@ -45,7 +46,7 @@ import classScore.data.Histogram;
 public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private double histRange = 0;
-    private DenseDoubleMatrix2DNamed data = null;
+    private DoubleMatrixNamed data = null;
     private Histogram hist;
     private Map probeToGeneMap;
     private int geneRepTreatment;
@@ -84,7 +85,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, GONames gon,
-            DenseDoubleMatrix2DNamed data ) {
+            DoubleMatrixNamed data ) {
         super( settings, a, csc, gon );
         this.data = data;
 
@@ -192,7 +193,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @return
      */
-    public DenseDoubleMatrix2DNamed getData() {
+    public DoubleMatrixNamed getData() {
         return data;
     }
 

@@ -1,6 +1,7 @@
 package classScore.analysis;
 
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.math.DescriptiveWithMissing;
 import baseCode.math.MatrixStats;
 import baseCode.math.RandomChooser;
@@ -26,7 +27,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      */
     private static final int MIN_STABLE_CHECKS = 3;
 
-    private DenseDoubleMatrix2DNamed data = null;
+    private DoubleMatrixNamed data = null;
 
     private double[][] dataAsRawMatrix;
     private double[][] selfSquaredMatrix;
@@ -45,7 +46,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     /**
      * @param dataMatrix
      */
-    public ResamplingCorrelationGeneSetScore( Settings settings, DenseDoubleMatrix2DNamed dataMatrix ) {
+    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrixNamed dataMatrix ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();

@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
 import baseCode.util.StatusStderr;
@@ -461,15 +462,15 @@ public class classScoreCMD {
      * @throws IOException
      */
     protected GeneSetPvalRun analyze() throws IOException {
-        DenseDoubleMatrix2DNamed rawData = null;
+       DoubleMatrixNamed rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
                 statusMessenger.showStatus( "Raw data are in memory" );
-                rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawDataFileName() );
+                rawData = ( DoubleMatrixNamed ) rawDataSets.get( settings.getRawDataFileName() );
             } else {
                 statusMessenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
                 DoubleMatrixReader r = new DoubleMatrixReader();
-                rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawDataFileName() );
+                rawData = (  DoubleMatrixNamed ) r.read( settings.getRawDataFileName() );
                 rawDataSets.put( settings.getRawDataFileName(), rawData );
             }
         }
