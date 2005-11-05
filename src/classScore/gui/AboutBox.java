@@ -13,7 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import javax.swing.BorderFactory;
@@ -83,7 +82,7 @@ public class AboutBox extends JDialog implements ActionListener {
         Dimension dlgSize = getPreferredSize();
         setLocation( ( screenSize.width - dlgSize.width ) / 2, ( screenSize.height - dlgSize.height ) / 2 );
         pack();
-        show();
+        this.setVisible( true );
     }
 
     // Component initialization
@@ -151,10 +150,14 @@ public class AboutBox extends JDialog implements ActionListener {
         licensePanel.setContentType( "text/html" );
         licensePanel
                 .setText( "<p>ErmineJ is licensed under the Gnu Public License.</p><p>Direct questions about ermineJ to Paul "
-                        + "Pavlidis: pavlidis@dbmi.columbia.edu.</p><p>If you use this software for your work, please cite: Pavlidis, P., "
-                        + "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data"
-                        + " with class scores. Proceedings of the Pacific Symposium on Biocomputing"
-                        + " 7. pp 474-485.</p></html>" );
+                        + "Pavlidis: pavlidis@dbmi.columbia.edu.</p><p>If you use this software for your work, please cite:"
+                        // + " Pavlidis, P., "
+                        // + "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data"
+                        // + " with class scores. Proceedings of the Pacific Symposium on Biocomputing"
+                        // + " 7. pp 474-485." +
+                        + "Lee H., Braynen W., Keshav K. and Pavlidis P. (2005)"
+                        + " ErmineJ: Tool for functional analysis of gene expression data sets. BMC Bioinformatics in press"
+                        + "</p></html>" );
 
         centerPanel.add( blurbsPanel, BorderLayout.NORTH );
         centerPanel.add( licensePanel, BorderLayout.CENTER );
@@ -175,7 +178,7 @@ public class AboutBox extends JDialog implements ActionListener {
     /**
      * @throws IOException
      */
-    private void getVersion() throws IOException {
+    private void getVersion() {
         try {
             VERSION = ( new BufferedReader( new InputStreamReader( new BufferedInputStream( this.getClass()
                     .getResourceAsStream( "resources/version" ) ) ) ) ).readLine();

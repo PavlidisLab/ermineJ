@@ -467,8 +467,8 @@ public class UserDefinedGeneSetManager {
      * @param ngs
      * @return
      */
-    private boolean isExistingGeneSet( String id ) {
-        return geneData.hasGeneSet( id );
+     private boolean isExistingGeneSet( String id1 ) {
+        return geneData.hasGeneSet( id1 );
     }
 
     /**

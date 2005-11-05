@@ -37,7 +37,6 @@ import org.xml.sax.SAXException;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
-import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
 import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.FileTools;
@@ -131,7 +130,7 @@ public class classScoreCMD {
                     if ( FileTools.testFile( arg ) )
                         settings.setAnnotFile( arg );
                     else {
-                        System.err.println( "Invalid annotation file name (-a)" );
+                        System.err.println( "Invalid annotation file name (-a " + arg + ")" );
                         showHelp();
                     }
                     break;
@@ -143,7 +142,7 @@ public class classScoreCMD {
                     if ( FileTools.testFile( arg ) )
                         settings.setClassFile( arg );
                     else {
-                        System.err.println( "Invalid class file name (-c)" );
+                        System.err.println( "Invalid class file name (-c " + arg + ")" );
                         showHelp();
                     }
                     break;
@@ -152,7 +151,7 @@ public class classScoreCMD {
                     if ( FileTools.testDir( arg ) )
                         settings.setDataDirectory( arg );
                     else {
-                        System.err.println( "Invalid path for data folder (-d)" );
+                        System.err.println( "Invalid path for data folder (-d " + arg + ")" );
                         showHelp();
                     }
                     break;
@@ -163,11 +162,11 @@ public class classScoreCMD {
                         if ( intarg >= 0 )
                             settings.setScoreCol( intarg );
                         else {
-                            System.err.println( "Invalid score column (-e)" );
+                            System.err.println( "Invalid score column (-e " + intarg + ")" );
                             showHelp();
                         }
                     } catch ( NumberFormatException e ) {
-                        System.err.println( "Invalid score column (-e)" );
+                        System.err.println( "Invalid score column (-e " + arg + ")" );
                         showHelp();
                     }
                     break;
@@ -176,7 +175,7 @@ public class classScoreCMD {
                     if ( FileTools.testDir( arg ) )
                         settings.setCustomGeneSetDirectory( arg );
                     else {
-                        System.err.println( "Invalid path for class folder (-f)" );
+                        System.err.println( "Invalid path for class folder (-f " + arg + ")" );
                         showHelp();
                     }
                     break;
@@ -289,7 +288,7 @@ public class classScoreCMD {
                     if ( FileTools.testFile( arg ) )
                         settings.setRawFile( arg );
                     else {
-                        System.err.println( "Invalid raw file name (-r)" );
+                        System.err.println( "Invalid raw file name (-r " + arg + ")" );
                         showHelp();
                     }
                     break;
@@ -298,7 +297,7 @@ public class classScoreCMD {
                     if ( FileTools.testFile( arg ) )
                         settings.setScoreFile( arg );
                     else {
-                        System.err.println( "Invalid score file name (-s)" );
+                        System.err.println( "Invalid score file name (-s " + arg + ")" );
                         showHelp();
                     }
                     break;
@@ -360,7 +359,7 @@ public class classScoreCMD {
                             break;
                         }
 
-                        System.err.println( "Invalid config file name (-C)" );
+                        System.err.println( "Invalid config file name (-C " + arg + ")" );
                         showHelp();
 
                     }
@@ -462,7 +461,7 @@ public class classScoreCMD {
      * @throws IOException
      */
     protected GeneSetPvalRun analyze() throws IOException {
-       DoubleMatrixNamed rawData = null;
+        DoubleMatrixNamed rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
                 statusMessenger.showStatus( "Raw data are in memory" );
@@ -470,7 +469,7 @@ public class classScoreCMD {
             } else {
                 statusMessenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
                 DoubleMatrixReader r = new DoubleMatrixReader();
-                rawData = (  DoubleMatrixNamed ) r.read( settings.getRawDataFileName() );
+                rawData = ( DoubleMatrixNamed ) r.read( settings.getRawDataFileName() );
                 rawDataSets.put( settings.getRawDataFileName(), rawData );
             }
         }
