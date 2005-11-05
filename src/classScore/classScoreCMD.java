@@ -81,6 +81,7 @@ public class classScoreCMD {
             initialize();
             try {
                 GeneSetPvalRun result = analyze();
+                settings.writeAnalysisSettings( saveFileName );
                 ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, saveAllGenes );
                 rp.printResults( true );
             } catch ( Exception e ) {
