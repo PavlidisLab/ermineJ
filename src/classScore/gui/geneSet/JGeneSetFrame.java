@@ -48,6 +48,7 @@ import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GeneAnnotations;
 import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.gui.ColorMap;
 import baseCode.gui.GuiUtil;
 import baseCode.gui.JGradientBar;
@@ -211,7 +212,7 @@ public class JGeneSetFrame extends JFrame {
 
         // create a probe set from probeIDs
         probesInGeneSet = new HashSet( probeIDs );
-        DenseDoubleMatrix2DNamed matrix = setUpMatrixData();
+        DoubleMatrixNamed matrix = setUpMatrixData();
 
         tableModel = new GeneSetTableModel( m_matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData,
                 m_nf, settings );
@@ -251,10 +252,10 @@ public class JGeneSetFrame extends JFrame {
      * @param probesInGeneSet
      * @return
      */
-    private DenseDoubleMatrix2DNamed setUpMatrixData() {
+    private DoubleMatrixNamed setUpMatrixData() {
         // Read the matrix data
         DoubleMatrixReader matrixReader = new DoubleMatrixReader();
-        DenseDoubleMatrix2DNamed matrix = null;
+        DoubleMatrixNamed matrix = null;
 
         if ( ( settings.getRawDataFileName() == null || settings.getRawDataFileName().length() == 0 )
                 && settings.getUserSetRawFile() ) {
@@ -270,7 +271,7 @@ public class JGeneSetFrame extends JFrame {
             String filename = settings.getRawDataFileName();
             if ( ( new File( filename ) ).canRead() ) {
                 try {
-                    matrix = ( DenseDoubleMatrix2DNamed ) matrixReader.read( filename, probesInGeneSet );
+                    matrix = ( DoubleMatrixNamed ) matrixReader.read( filename, probesInGeneSet );
                 } catch ( IOException e ) {
                     GuiUtil.error( "Error loading raw microarray data from file " + filename + "\n"
                             + "Please make sure this file exists and the filename and directory path are correct,\n"
@@ -878,8 +879,8 @@ public class JGeneSetFrame extends JFrame {
         DecimalFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits( 8 );
         nf.setMinimumFractionDigits( 3 );
-        nf.setGroupingUsed(false);
-        
+        nf.setGroupingUsed( false );
+
         // write out the table, one row at a time
         for ( int r = 0; r < totalRowCount; r++ ) {
 
