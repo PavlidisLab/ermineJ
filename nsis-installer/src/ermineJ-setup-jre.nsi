@@ -9,6 +9,7 @@
 Name "ermineJ"
 
 !include version.nsi
+!define JAVA_HOME "C:\java\j2sdk1.4.2_08"
 
 ; The file to write
 OutFile "..\..\target\ermineJ-${VERSION}-setup-jre.exe"
@@ -63,9 +64,9 @@ Section "ermineJ (required)"
   File "..\..\target\nsis-build\bin\ermineJ.ico"
 
   ; JRE (Java Runtime Environment)
-  !echo  $%JAVA_HOME%
+  !echo  $JAVA_HOME
   SetOutPath "$INSTDIR"
-  File /r "$%JAVA_HOME%\jre"
+  File /r "${JAVA_HOME}\jre"
 
   ; If upgrading, might not want to overwrite the old data folder
   IfFileExists "$PROFILE\ermineJ.data" 0 YesOverwrite
