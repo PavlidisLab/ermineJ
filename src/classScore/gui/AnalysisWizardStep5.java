@@ -1,3 +1,23 @@
+/*
+ * The ermineJ project
+ * 
+ * Copyright (c) 2006 University of British Columbia
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
 package classScore.gui;
 
 import java.awt.BorderLayout;
@@ -18,23 +38,11 @@ import baseCode.gui.WizardStep;
 import classScore.Settings;
 
 /**
- * <p>
- * Title:
- * </p>
- * <p>
- * Description:
- * </p>
- * <p>
- * Copyright: Copyright (c) 2004
- * </p>
- * <p>
- * Company:
- * </p>
+ * The last step of the analysis wizard -- actually step 6 usually.
  * 
  * @author Homin Lee
  * @version $Id$
  */
-
 public class AnalysisWizardStep5 extends WizardStep {
     private Settings settings;
     private JPanel step5Panel;
@@ -147,7 +155,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         jTextFieldPValueThreshold.setEditable( true );
         jTextFieldPValueThreshold.setPreferredSize( new Dimension( 50, 19 ) );
         jTextFieldPValueThreshold.setToolTipText( "Score Threshold used for Over-Representation analysis" );
-        jTextFieldPValueThreshold.setText( "0.001" );
+        jTextFieldPValueThreshold.setText( "0.001" ); // default.
         jTextFieldPValueThreshold.setHorizontalAlignment( SwingConstants.RIGHT );
         jPanel15.add( jLabel6, null );
         jPanel15.add( jTextFieldPValueThreshold, null );
@@ -155,12 +163,12 @@ public class AnalysisWizardStep5 extends WizardStep {
         oraPanel.add( jPanel15, null );
 
         // resampPanel stuff///////////////////////////////////////////////////////
-        resampPanel.setPreferredSize( new Dimension( 380, 200 ) );
+       resampPanel.setPreferredSize( new Dimension( 380, 250 ) );
         resampTitledBorder = new TitledBorder( "Resampling" );
         resampPanel.setBorder( resampTitledBorder );
 
         subPanel = new JPanel();
-        subPanel.setLayout( new FlowLayout() );
+        subPanel.setLayout( new FlowLayout() ); // FIXME change layout. and make size of resampPanel flexible.
 
         jPanel13.setBorder( null );
         jLabel13.setMaximumSize( new Dimension( 100, 15 ) );
@@ -217,6 +225,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         corrMetricPanel.add( corrRadioButton1, null );
         corrMetricPanel.add( corrRadioButton2, null );
         // corrPanel.add(corrMetricPanel, null); // @todo disabled because there is no choice of metric.
+
         this.addHelp( help );
         help = "<html><b>Adjust settings specific for your analysis method.</b><br>";
 
@@ -228,6 +237,9 @@ public class AnalysisWizardStep5 extends WizardStep {
         this.addMain( step5Panel );
     }
 
+    /**
+     * @param analysisType
+     */
     public void addVarPanel( int analysisType ) {
         if ( analysisType == Settings.ORA ) {
             oraPanel.add( jCheckBoxDoLog, null );
@@ -252,6 +264,9 @@ public class AnalysisWizardStep5 extends WizardStep {
         }
     }
 
+    /**
+     * @param analysisType
+     */
     public void removeVarPanel( int analysisType ) {
         if ( analysisType == Settings.ORA ) {
             step5Panel.remove( oraPanel );
@@ -266,6 +281,10 @@ public class AnalysisWizardStep5 extends WizardStep {
         }
     }
 
+    /**
+     * 
+     *
+     */
     private void setValues() {
         jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
 
@@ -281,6 +300,10 @@ public class AnalysisWizardStep5 extends WizardStep {
         jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
     }
 
+    /**
+     * 
+     *
+     */
     public void saveValues() {
         settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
 

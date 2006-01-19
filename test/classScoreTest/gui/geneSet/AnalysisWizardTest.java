@@ -20,33 +20,51 @@
  */
 package classScoreTest.gui.geneSet;
 
+import java.awt.Dimension;
+import java.io.IOException;
+
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import classScore.gui.AboutBox;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import classScore.gui.AnalysisWizard;
+import classScore.gui.GeneSetScoreFrame;
 
 /**
+ * Test the analysis wizard.
+ * 
  * @author pavlidis
  * @version $Id$
  */
-public class AboutBoxTestApp {
+public class AnalysisWizardTest {
 
+    private static Log log = LogFactory.getLog( AnalysisWizardTest.class.getName() );
+
+    /**
+     * @param args
+     */
     public static void main( String[] args ) {
+
+        GeneSetScoreFrame gssf;
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            AboutBox ab = new AboutBox( null );
-            ab.setVisible( true );
+            gssf = new GeneSetScoreFrame();
+            gssf.setSize( new Dimension( 500, 500 ) );
+            AnalysisWizard aw = new AnalysisWizard( gssf, null, null );
+            aw.setSize( new Dimension( 500, 500 ) );
+            log.info( "Created wizard" );
+            aw.setVisible( true );
+        } catch ( IOException e ) {
+            e.printStackTrace();
         } catch ( ClassNotFoundException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch ( InstantiationException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch ( IllegalAccessException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch ( UnsupportedLookAndFeelException e ) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
