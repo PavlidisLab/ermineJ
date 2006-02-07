@@ -25,7 +25,7 @@ import classScore.Settings;
 /**
  * <hr>
  * <p>
- * Copyright (c) 2004 Columbia University
+ * Copyright (c) 2006 University of British Columbia
  * 
  * @author Homin Lee
  * @author Paul Pavlidis

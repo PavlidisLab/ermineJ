@@ -106,6 +106,7 @@ public class AnalysisThread extends Thread {
         this.goData = goData;
         this.rawDataSets = rawDataSets;
         this.geneScoreSets = geneScoreSets;
+        if ( geneDataSets == null ) throw new IllegalArgumentException();
         this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) ); // this is the
         // default
         // geneData

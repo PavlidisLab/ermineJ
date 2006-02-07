@@ -8,7 +8,7 @@ import classScore.Settings;
  * Use the Kolmogorov-Smirnov test to evaluate the ranking of the probes.
  * <hr>
  * <p>
- * Copyright (c) 2004 Columbia University
+ * Copyright (c) 2006 University of British Columbia
  * 
  * @author pavlidis
  * @version $Id$

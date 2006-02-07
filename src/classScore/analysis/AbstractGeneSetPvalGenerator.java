@@ -12,7 +12,7 @@ import classScore.Settings;
 /**
  * Base implementation of pvalue generator
  * <p>
- * Copyright (c) 2004-2005 Columbia University
+ * Copyright (c) 2004-2006 University of British Columbia
  * </p>
  * 
  * @author Paul Pavlidis

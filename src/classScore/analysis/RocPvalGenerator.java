@@ -93,7 +93,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @return a GeneSetResult
      */
     public GeneSetResult classPval( String geneSet, Map probesToPvals, Map rankMap ) {
-
+        if ( !super.checkAspect( geneSet ) ) return null;
         // variables for outputs
         List targetRanks = new ArrayList();
 

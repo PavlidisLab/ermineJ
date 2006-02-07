@@ -41,6 +41,16 @@ import classScore.data.UserDefinedGeneSetManager;
  */
 public class AnalysisWizard extends Wizard {
 
+    /**
+     * 
+     */
+    private static final int WIZARD_PREFERRED_HEIGHT = 350;
+
+    /**
+     * 
+     */
+    private static final int WIZARD_PREFERRED_WIDTH = 550;
+
     private static Log log = LogFactory.getLog( AnalysisWizard.class.getName() );
 
     // logic
@@ -59,7 +69,7 @@ public class AnalysisWizard extends Wizard {
     int maxSteps = 6;
 
     public AnalysisWizard( GeneSetScoreFrame callingframe, Map geneDataSets, GONames goData ) {
-        super( callingframe, 550, 350 );
+        super( callingframe, WIZARD_PREFERRED_WIDTH, WIZARD_PREFERRED_HEIGHT );
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
 

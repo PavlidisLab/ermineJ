@@ -22,7 +22,6 @@ package classScore.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.SystemColor;
 
 import javax.swing.ButtonGroup;
@@ -57,8 +56,8 @@ public class AnalysisWizardStep5 extends WizardStep {
     private JPanel resampPanel;
     private JPanel rocPanel;
     private JPanel corrPanel;
-    private JPanel jPanel13;
-    private JPanel jPanel16;
+    private JPanel numIterationsPanel;
+    private JPanel useResamplingPanel;
     private JPanel subPanel;
 
     JCheckBox jCheckBoxUseEmpirical;
@@ -90,8 +89,8 @@ public class AnalysisWizardStep5 extends WizardStep {
         resampPanel = new JPanel();
         TitledBorder resampTitledBorder;
 
-        jPanel13 = new JPanel();
-        JLabel jLabel13 = new JLabel();
+        numIterationsPanel = new JPanel();
+        JLabel numIterationsLabel = new JLabel();
         jTextFieldIterations = new JTextField();
         corrPanel = new JPanel();
         TitledBorder corrTitledBorder;
@@ -163,40 +162,40 @@ public class AnalysisWizardStep5 extends WizardStep {
         oraPanel.add( jPanel15, null );
 
         // resampPanel stuff///////////////////////////////////////////////////////
-       resampPanel.setPreferredSize( new Dimension( 380, 250 ) );
+        resampPanel.setPreferredSize( new Dimension( 380, 250 ) );
         resampTitledBorder = new TitledBorder( "Resampling" );
         resampPanel.setBorder( resampTitledBorder );
 
         subPanel = new JPanel();
-        subPanel.setLayout( new FlowLayout() ); // FIXME change layout. and make size of resampPanel flexible.
+        subPanel.setLayout( new BorderLayout() );
 
-        jPanel13.setBorder( null );
-        jLabel13.setMaximumSize( new Dimension( 100, 15 ) );
-        jLabel13.setLabelFor( jTextFieldIterations );
-        jLabel13.setText( "Maximum iterations to run" );
+        numIterationsPanel.setBorder( null );
+        numIterationsLabel.setMaximumSize( new Dimension( 100, 15 ) );
+        numIterationsLabel.setLabelFor( jTextFieldIterations );
+        numIterationsLabel.setText( "Maximum iterations to run" );
         jTextFieldIterations.setHorizontalAlignment( SwingConstants.RIGHT );
         jTextFieldIterations.setText( "10000" );
         jTextFieldIterations.setToolTipText( "Maximum number of iterations run per gene set size." );
         jTextFieldIterations.setPreferredSize( new Dimension( 70, 19 ) );
         jTextFieldIterations.setEditable( true );
-        jPanel13.add( jLabel13, null );
-        jPanel13.add( jTextFieldIterations, null );
+        numIterationsPanel.add( numIterationsLabel, null );
+        numIterationsPanel.add( jTextFieldIterations, null );
 
-        jPanel16 = new JPanel();
+        useResamplingPanel = new JPanel();
         jCheckBoxUseEmpirical = new JCheckBox();
-        JLabel jLabel14 = new JLabel();
-        jLabel14.setLabelFor( jCheckBoxUseEmpirical );
+        JLabel useResamplingLabel = new JLabel();
+        useResamplingLabel.setLabelFor( jCheckBoxUseEmpirical );
         jCheckBoxUseEmpirical.setSelected( false );
         jCheckBoxUseEmpirical.setHorizontalAlignment( SwingConstants.RIGHT );
-        jLabel14.setText( "Always use full resampling (slower)" );
+        useResamplingLabel.setText( "Always use full resampling (slower)" );
         jCheckBoxUseEmpirical.setToolTipText( "If this box is unchecked, " + "some approximations are used which can"
                 + " dramatically speed up the resampling," + " at a possible risk of reduced accuracy" );
-        jPanel16.add( jLabel14, null );
-        jPanel16.add( jCheckBoxUseEmpirical, null );
-        subPanel.setPreferredSize( new java.awt.Dimension( 340, 80 ) );
+        useResamplingPanel.add( useResamplingLabel, null );
+        useResamplingPanel.add( jCheckBoxUseEmpirical, null );
+        // subPanel.setPreferredSize( new java.awt.Dimension( 340, 80 ) );
 
-        subPanel.add( jPanel13, BorderLayout.WEST );
-        subPanel.add( jPanel16, BorderLayout.EAST );
+        subPanel.add( numIterationsPanel, BorderLayout.NORTH );
+        subPanel.add( useResamplingPanel, BorderLayout.SOUTH );
 
         // corrPanel stuff/////////////////////////////////////////////////////////
         corrPanel.setPreferredSize( new java.awt.Dimension( 380, 150 ) );
@@ -217,8 +216,8 @@ public class AnalysisWizardStep5 extends WizardStep {
         corrRadioButton1.setBackground( SystemColor.control );
         corrRadioButton1.setToolTipText( "metric 1 tool tip" );
         corrRadioButton2.setText( "Metric 2" );
-        jPanel16.setPreferredSize( new java.awt.Dimension( 330, 30 ) );
-        jPanel13.setPreferredSize( new java.awt.Dimension( 234, 30 ) );
+        useResamplingPanel.setPreferredSize( new java.awt.Dimension( 330, 30 ) );
+        numIterationsPanel.setPreferredSize( new java.awt.Dimension( 234, 30 ) );
         corrButtonGroup.add( corrRadioButton1 );
         corrButtonGroup.add( corrRadioButton2 );
         corrMetricPanel.add( corrMetricLabel, null );
