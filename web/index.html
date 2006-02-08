@@ -19,7 +19,7 @@
             src="images/banner.jpg" border="0"></a>
 
         <h1>Gene Ontology analysis for&nbsp;microarray data</h1>
-        <P><STRONG>Version 2.1.8</STRONG></P>
+        <P><STRONG>Version 2.1.9</STRONG></P>
         </td>
     </tr>
     <tr>
@@ -122,31 +122,17 @@
 
         <h2>News</h2>
 
-        <p>December 20 2005: <strong>Version 2.1.8 released</strong>: 
-        This is a fix for the "null" or "baseCode.dataStructure.matrix.FastRowAccessDoubleMatrix2DNamed" 
-        error messages that have been reported by some users. This does not affect the analysis results. 
-        All users should upgrade.</p>
-        
+        <p>Version 2.1.9 - (Feb 7 2006) This is a bugfix release, the most serious of which was a bug causing 
+        the software to ignore the choice of GO aspect when running ROC analysis (all GO aspects were always used). Other changes include:</p>
+<ul>
+<li>Command line interface: -F (--format) option (which took an argument) changed to -A. Using the -A option indicates 
+that the annotation file is in "Affymetrix" format.</li>
+<li>The format of the Annotation files has been made more flexible. The GO term field can be delimited with characters
+other than '|' such as commas or spaces.</li>
+<li>The format of the annotation files has been documented (see <a href="ermineJ-help/classScore/html/formats/annotations.html">this page</a>) (issue 287).</li>
+<li>Minor GUI tweaks to improve portability.</li>
+</ul>
 
-        <p>November 9 2005: <strong>Multiple news items:</strong></P>
-        <ul>
-
-            <li><strong>ermineJ mailing list</strong>: We have created a
-            new mailing list for ermineJ users. We ask that all users of
-            ermineJ <a
-                href="http://perutz.cmmt.ubc.ca/mailman/bioinformatics.ubc.ca/listinfo/ermineJ-announce">subscribe</a>
-            to this list to ensure they get update information, and to
-            help us get a better idea of how many people use ermineJ.</li>
-            <li><strong>Our paper describing ermineJ has been published</strong>.
-            Download a <a target="_blank" href="/pavlidis/reprints/ermineJ.pdf">PDF</a> or view the <a
-                target="_blank" href="http://www.biomedcentral.com/1471-2105/6/269/abstract">abstract</a>.</li>
-            <li><strong>Version 2.1.7 is available</strong>. This is a
-            maintenance release that fixes some issues with the command
-            line interface and further improves the performance of the
-            correlation analysis.</li>
-            <li><strong>Web site update</strong> - The ermineJ web site
-            has been reorganized and is hopefully easier to navigate.</li>
-        </ul>
         <p>For details of changes, see the <A href="versions.html">full
         version history</A></p>
 

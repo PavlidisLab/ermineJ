@@ -55,6 +55,39 @@ Ontology (or other gene set descriptor) annotations available.</p>
 to create a new annotation file by pulling information out of our
 existing files using a simple Perl script.</p>
 
+<h3>Description of the format</h3>
+
+<ul>
+<li>The file is tab-delimited text. Comma-delimited files or Excel spreadsheets (for example) are not supported.</li>
+<li>There is a one-line header included in the file for readability.</li>
+<li>The first column contains the probe identifier. The probe IDs must exactly match the ones you provide in your Gene
+    score file. Any probes not having an entry will be ignored.</li>
+  <li>The second column contains a gene symbol. This should not be blank. If the gene name is not known, 
+  a sequence identifier or arbitrary code can be used instead.</li>
+  <li>The third column contains the gene name (or description). This can be blank.</li>
+  <li>The fourth column contains a delimited list of GO identifiers. These include the "GO:" prefix. Thus they
+  read "GO:00494494" and not "494494". The ids within this field can be delimited by spaces, commas, or pipe ('|') symbols.</li>
+</ul>
+
+<H2>Using files you create</H2>
+<P>Annotation files that you created can be used so long as they adhere
+to one of the accepted formats. There are a few things to consider:</P>
+<UL>
+    <LI>The probe IDs must exactly match the ones you provide in your Gene
+    score file. Any probes not having an entry will be ignored.</LI>
+    <LI>The gene symbols are used internally by the software to decide
+    which genes are present on the array more than once. Therefore, if two
+    probes refer to the same gene, make sure the symbol you use is the same
+    for both probes. (It doesn't matter what the symbol is).</LI>
+    <LI>The gene names or descriptions are optional, and blank values will
+    just show up as "No description" or something similar.</LI>
+    <LI>In the ermineJ format, the GO ids must be in "long" format (with
+    the GO: prefix). The GO terms themselves should be omitted. The parents
+    of all terms listed are automatically included in the analysis (subject
+    to other constraints such as the maximum Gene Set size you set in the
+    analysis), so there is no need to list these explicitly.</LI>
+</UL>
+
 <h2>Using files from the Affymetrix web site</h2>
 
 <p>Obviously this only helps you if you are using an <a
@@ -70,24 +103,7 @@ with ermineJ.</p>
 <p>To use this, select the "Affy CSV" option on the <a
 	href="starting.html">startup dialog</a>.</p>
 
-<H2>Using files you create</H2>
-<P>Annotation files that you created can be used so long as they adhere
-to one of the accepted formats. There are a few things to consider:</P>
-<UL>
-	<LI>The probe IDs must exactly match the ones you provide in your Gene
-	score file. Any probes not having an entry will be ignored.</LI>
-	<LI>The gene symbols are used internally by the software to decide
-	which genes are present on the array more than once. Therefore, if two
-	probes refer to the same gene, make sure the symbol you use is the same
-	for both probes. (It doesn't matter what the symbol is).</LI>
-	<LI>The gene names or descriptions are optional, and blank values will
-	just show up as "No description" or something similar.</LI>
-	<LI>In the ermineJ format, the GO ids must be in "long" format (with
-	the GO: prefix). The GO terms themselves should be omitted. The parents
-	of all terms listed are automatically included in the analysis (subject
-	to other constraints such as the maximum Gene Set size you set in the
-	analysis), so there is no need to list these explicitly.</LI>
-</UL>
+
 <hr>
 
 <div class="tidy">Copyright 2004-2005 &copy; Columbia University</div>

@@ -30,13 +30,16 @@
 
 <h2>Current version</h2>
 
-
-<p>Version 2.1.8 - (December 20 2005) Changes include:</p>
-
+<p>Version 2.1.9 - (Feb 7 2006) Changes include:</p>
 <ul>
-   <li>Bug fixed that caused "null" error in viewing gene set data under some conditions.</li>
+<li>Selecting only some of GO aspects wasn't working for ROC analysis (fixes bug 285)</li>
+<li>Command line interface: -F (--format) option (which took an argument) changed to -A. Using the -A option indicates 
+that the annotation file is in "Affymetrix" format. Fixes bug 272.</li>
+<li>The format of the Annotation files has been made more flexible. The GO term field can be delimited with characters
+other than '|' such as commas or spaces (issue 286).</li>
+<li>The format of the annotation files has been documented (see <a href="ermineJ-help/classScore/html/formats/annotations.html">this page</a>) (issue 287).</li>
+<li>Minor GUI tweaks to improve portability (bug 269).</li>
 </ul>
-
 
 <p>Known issues:</p>
 
@@ -57,6 +60,14 @@
 <hr />
 
 <h2>Older versions</h2>
+
+
+<p>Version 2.1.8 - (December 20 2005) Changes include:</p>
+
+<ul>
+   <li>Bug fixed that caused "null" error in viewing gene set data under some conditions.</li>
+</ul>
+
 
 
 <p>Version 2.1.7 - (November 9 2005) Changes include:</p>
