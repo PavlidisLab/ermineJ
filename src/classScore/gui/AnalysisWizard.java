@@ -44,7 +44,7 @@ public class AnalysisWizard extends Wizard {
     /**
      * 
      */
-    private static final int WIZARD_PREFERRED_HEIGHT = 350;
+    private static final int WIZARD_PREFERRED_HEIGHT = 380;
 
     /**
      * 

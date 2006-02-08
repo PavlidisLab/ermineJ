@@ -158,11 +158,11 @@ public class AnalysisWizardStep5 extends WizardStep {
         jTextFieldPValueThreshold.setHorizontalAlignment( SwingConstants.RIGHT );
         jPanel15.add( jLabel6, null );
         jPanel15.add( jTextFieldPValueThreshold, null );
-        resampPanel.add( jPanelAnalysisFrameMethods, null );
         oraPanel.add( jPanel15, null );
 
         // resampPanel stuff///////////////////////////////////////////////////////
         resampPanel.setPreferredSize( new Dimension( 380, 250 ) );
+        resampPanel.add( jPanelAnalysisFrameMethods, null );
         resampTitledBorder = new TitledBorder( "Resampling" );
         resampPanel.setBorder( resampTitledBorder );
 
