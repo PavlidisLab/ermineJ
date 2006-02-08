@@ -62,9 +62,12 @@ public class GeneSetResult implements Comparable {
         DecimalFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits( 8 );
         nf.setMinimumFractionDigits( 3 );
+
+        DecimalFormat exp = new DecimalFormat( "0.###E00" );
         out.write( "!\t" + class_name + "\t" + class_id + "\t" + size + "\t" + effective_size + "\t"
-                + nf.format( score ) + "\t" + nf.format( pvalue ) + "\t" + nf.format( pvalue_corr ) + "\t"
-                + extracolumns + "\n" );
+                + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
+                + ( pvalue_corr < 10e-3 ? exp.format( pvalue_corr ) : nf.format( pvalue_corr ) ) + "\t" + extracolumns
+                + "\n" );
     }
 
     public void printHeadings( BufferedWriter out ) throws IOException {

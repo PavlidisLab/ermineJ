@@ -63,8 +63,8 @@ public class JDataFileChooser extends JFileChooser {
         return m_options.normalized();
     }
 
-    public boolean includeEverything() {
-        return m_options.includeEverything();
+    public boolean includeAnnotations() {
+        return m_options.includeAnnotations();
     }
 
     /**
@@ -75,7 +75,7 @@ public class JDataFileChooser extends JFileChooser {
      */
     private class JDataFileChooserOptions extends JComponent {
 
-        private JCheckBox m_includeEverything = new JCheckBox( "Include annotations and scores" );
+        private JCheckBox includeMatrixValuesCheckBox = new JCheckBox( "Include annotations and scores" );
 
         private JCheckBox m_normalize = new JCheckBox( "Normalize" );
 
@@ -85,7 +85,7 @@ public class JDataFileChooser extends JFileChooser {
 
         public JDataFileChooserOptions( boolean includeEverything, boolean normalize ) throws HeadlessException {
             try {
-                m_includeEverything.setSelected( includeEverything );
+                includeMatrixValuesCheckBox.setSelected( includeEverything );
                 m_normalize.setSelected( normalize );
                 jbInit();
             } catch ( Exception e ) {
@@ -95,7 +95,7 @@ public class JDataFileChooser extends JFileChooser {
 
         private void jbInit() throws Exception {
             setLayout( gridLayout1 );
-            m_includeEverything
+            includeMatrixValuesCheckBox
                     .setToolTipText( "Leave this box unchecked if you just want the expression value matrix" );
             m_normalize.setToolTipText( "Check this box to normalize the rows of the data matrix." );
             this.setMaximumSize( new Dimension( 264, 63 ) );
@@ -109,7 +109,7 @@ public class JDataFileChooser extends JFileChooser {
             gridLayout1.setVgap( 5 );
             this.add( m_spacerLabel, null );
             this.add( m_titleLabel, null );
-            this.add( m_includeEverything, null );
+            this.add( includeMatrixValuesCheckBox, null );
             this.add( m_normalize, null );
         }
 
@@ -117,8 +117,8 @@ public class JDataFileChooser extends JFileChooser {
             return m_normalize.isSelected();
         }
 
-        public boolean includeEverything() {
-            return m_includeEverything.isSelected();
+        public boolean includeAnnotations() {
+            return includeMatrixValuesCheckBox.isSelected();
         }
 
     } // end private class JDataFileChooserOptions

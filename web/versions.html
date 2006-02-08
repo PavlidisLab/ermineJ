@@ -30,9 +30,13 @@
 
 <h2>Current version</h2>
 
-<p>Version 2.1.9 - (Feb 7 2006) Changes include:</p>
+<p>Version 2.1.9 - (Feb 8 2006) Changes include:</p>
 <ul>
-<li>Selecting only some of GO aspects wasn't working for ROC analysis (fixes bug 285)</li>
+<li>Restricting analysis to specific GO aspects wasn't working for ROC analysis (fixes bug 285).</li>
+<li>Loading an analysis from disk failed if the raw data file was not set (bug 291).</li>
+<li>You can now save the gene set information in the details view even without loading the raw data (bug 290).</li>
+<li>Small p-values were rounded to zero in the output file (bug 289).</li>
+<li>The path to the annotation file is stored in the output file. This currently isn't used by the software but is good for user records.</li>
 <li>Command line interface: -F (--format) option (which took an argument) changed to -A. Using the -A option indicates 
 that the annotation file is in "Affymetrix" format. Fixes bug 272.</li>
 <li>The format of the Annotation files has been made more flexible. The GO term field can be delimited with characters

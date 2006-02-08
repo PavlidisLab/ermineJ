@@ -1,3 +1,23 @@
+/*
+ * The ermineJ project
+ * 
+ * Copyright (c) 2006 University of British Columbia
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
 package classScore.gui;
 
 import java.awt.BorderLayout;
@@ -44,6 +64,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
@@ -62,10 +83,6 @@ import classScore.data.GeneSetResult;
 import classScore.data.UserDefinedGeneSetManager;
 
 /**
- * <hr>
- * <p>
- * Copyright (c) 2004 Columbia University
- * 
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @author Will Braynen
@@ -482,7 +499,7 @@ public class GeneSetScoreFrame extends JFrame {
         GeneSetPvalRun latestResult = athread.getLatestResults();
         checkForReasonableResults( latestResult );
         if ( latestResult != null ) addResult( latestResult );
-        
+
         enableMenusForAnalysis();
     }
 
@@ -543,7 +560,8 @@ public class GeneSetScoreFrame extends JFrame {
      * @return If the user doesn't locate the file, return null, otherwise the path to the file.
      */
     private String checkFile( String file ) {
-        if ( file == null ) return null;
+        if ( StringUtils.isBlank( file ) ) return null;
+        log.info( "Seeking file '" + file + "'" );
         if ( !FileTools.testFile( file ) ) {
             GuiUtil.error( "A file referred to in the results\n(" + file
                     + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
@@ -569,11 +587,15 @@ public class GeneSetScoreFrame extends JFrame {
         String file;
 
         file = checkFile( loadSettings.getRawDataFileName() );
-        if ( file == null ) return false;
+        // if ( file == null ) {
+        // return false;
+        // }
         loadSettings.setRawFile( file );
 
         file = checkFile( loadSettings.getScoreFile() );
-        if ( file == null ) return false;
+        // if ( file == null ) {
+        // return false;
+        // }
         loadSettings.setScoreFile( file );
 
         return true;

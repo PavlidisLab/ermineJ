@@ -121,7 +121,7 @@ public class Settings {
      */
     protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
             MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
-            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FORMAT, CLASS_SCORE_METHOD };
+            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD };
 
     /**
      * Create the settings, reading them from a file to be determined by the constructor.

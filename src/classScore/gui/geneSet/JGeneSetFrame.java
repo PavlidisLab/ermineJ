@@ -117,11 +117,11 @@ public class JGeneSetFrame extends JFrame {
     private static final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
     private static final String SAVESTARTPATH = "detailsview.startPath";
 
-    public JMatrixDisplay m_matrixDisplay = null;
+    public JMatrixDisplay matrixDisplay = null;
     private GeneSetPvalRun analysisResults;
     private int width;
     private int height;
-    private boolean includeEverything = true;
+    private boolean includeAnnotations = true;
 
     private boolean includeLabels = true; // whether when saving data we include the row/column labels.
     private int matrixColumnWidth; // how wide the color image columns are.
@@ -229,9 +229,9 @@ public class JGeneSetFrame extends JFrame {
         probesInGeneSet = new HashSet( probeIDs );
         DoubleMatrixNamed matrix = setUpMatrixData();
 
-        tableModel = new GeneSetTableModel( m_matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData,
-                m_nf, settings );
-        TableSorter sorter = new TableSorter( tableModel, m_matrixDisplay );
+        tableModel = new GeneSetTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf,
+                settings );
+        TableSorter sorter = new TableSorter( tableModel, matrixDisplay );
         table.setModel( sorter );
         sorter.setTableHeader( table.getTableHeader() );
 
@@ -297,11 +297,11 @@ public class JGeneSetFrame extends JFrame {
                     if ( statusMessenger != null )
                         statusMessenger.showError( "None of the probes in this gene set were in the data file." );
                 } else {
-                    m_matrixDisplay = new JMatrixDisplay( matrix );
-                    m_matrixDisplay.setStandardizedEnabled( true );
+                    matrixDisplay = new JMatrixDisplay( matrix );
+                    matrixDisplay.setStandardizedEnabled( true );
                     // Make the columns in the matrix display not too wide (cell-size)
                     // and set a custom cell renderer
-                    matrixCellRenderer = new JMatrixCellRenderer( m_matrixDisplay ); // create one instance
+                    matrixCellRenderer = new JMatrixCellRenderer( matrixDisplay ); // create one instance
                     // that will be used to
                     // draw each cell
                 }
@@ -311,10 +311,10 @@ public class JGeneSetFrame extends JFrame {
                         + "and that it is a valid raw data file (tab-delimited).\n" );
             }
         } else {
-            m_matrixDisplay = null;
+            matrixDisplay = null;
         }
         verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
-        matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+        matrixColumnCount = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
 
         return matrix;
     }
@@ -364,7 +364,7 @@ public class JGeneSetFrame extends JFrame {
     }
 
     private String getProbeID( int row ) {
-        int offset = m_matrixDisplay.getColumnCount(); // matrix display ends
+        int offset = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount(); // matrix display ends
         return ( String ) table.getValueAt( row, offset + 0 );
     }
 
@@ -372,8 +372,6 @@ public class JGeneSetFrame extends JFrame {
      * 
      */
     private void initChoosers() {
-        if ( m_matrixDisplay == null ) return;
-
         imageChooser = new JImageFileChooser( settings.getConfig().getBoolean( INCLUDELABELS, true ), settings
                 .getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ), this.className + ".png" );
         fileChooser = new JDataFileChooser( settings.getConfig().getBoolean( INCLUDEEVERYTHING, true ), settings
@@ -388,18 +386,18 @@ public class JGeneSetFrame extends JFrame {
         m_colorRangeSlider.setMaximum( COLOR_RANGE_SLIDER_RESOLUTION );
 
         double rangeMax;
-        boolean normalized = m_matrixDisplay.getStandardizedEnabled();
+        boolean normalized = matrixDisplay.getStandardizedEnabled();
         if ( normalized ) {
             rangeMax = NORMALIZED_COLOR_RANGE_MAX;
         } else {
-            rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
+            rangeMax = matrixDisplay.getMax() - matrixDisplay.getMin();
         }
         double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
-        m_colorRangeSlider.setValue( ( int ) ( m_matrixDisplay.getDisplayRange() * zoomFactor ) );
+        m_colorRangeSlider.setValue( ( int ) ( matrixDisplay.getDisplayRange() * zoomFactor ) );
 
         // init gradient bar
-        double min = m_matrixDisplay.getDisplayMin();
-        double max = m_matrixDisplay.getDisplayMax();
+        double min = matrixDisplay.getDisplayMin();
+        double max = matrixDisplay.getDisplayMax();
         m_gradientBar.setLabels( min, max );
     }
 
@@ -420,11 +418,14 @@ public class JGeneSetFrame extends JFrame {
         this.getContentPane().add( jPanelStatus, BorderLayout.SOUTH );
 
         m_nf.setMaximumFractionDigits( 3 );
-        if ( m_matrixDisplay != null ) {
-            boolean isNormalized = m_matrixDisplay.getStandardizedEnabled();
+        if ( matrixDisplay != null ) {
+            boolean isNormalized = matrixDisplay.getStandardizedEnabled();
+            saveImageMenuItem.setEnabled( true );
             m_normalizeMenuItem.setSelected( isNormalized );
+            setDisplayMatrixGUIEnabled( true );
         } else {
             // matrixDisplay is null! Disable the menu
+            saveImageMenuItem.setEnabled( false ); // no image to save.
             setDisplayMatrixGUIEnabled( false );
         }
     }
@@ -522,8 +523,8 @@ public class JGeneSetFrame extends JFrame {
         m_colorRangeLabel.setText( "Color Range:" );
         m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
         m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
-        if ( m_matrixDisplay != null ) {
-            m_gradientBar.setColorMap( m_matrixDisplay.getColorMap() );
+        if ( matrixDisplay != null ) {
+            m_gradientBar.setColorMap( matrixDisplay.getColorMap() );
             initColorRangeWidget();
         }
         m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
@@ -701,7 +702,7 @@ public class JGeneSetFrame extends JFrame {
         // write out column names
         if ( includeMatrixValues ) {
             for ( int c = 0; c < matrixColumnCount; c++ ) {
-                String columnName = m_matrixDisplay.getColumnName( c );
+                String columnName = matrixDisplay.getColumnName( c );
                 out.write( "\t" + columnName );
             }
         }
@@ -715,7 +716,8 @@ public class JGeneSetFrame extends JFrame {
      * @throws IOException
      */
     private void printMatrixValueForRow( BufferedWriter out, DecimalFormat nf, String probeID ) throws IOException {
-        double[] row = m_matrixDisplay.getRowByName( probeID );
+        assert this.matrixDisplay != null;
+        double[] row = matrixDisplay.getRowByName( probeID );
         for ( int c = 0; c < row.length; c++ ) {
             out.write( "\t" + nf.format( row[c] ) );
         }
@@ -727,7 +729,7 @@ public class JGeneSetFrame extends JFrame {
      */
     private void readPathPrefs() {
         if ( settings == null ) return;
-        if ( settings.getConfig().containsKey( SAVESTARTPATH ) && m_matrixDisplay != null ) {
+        if ( settings.getConfig().containsKey( SAVESTARTPATH ) && matrixDisplay != null ) {
             if ( fileChooser == null || imageChooser == null ) initChoosers();
             this.fileChooser.setCurrentDirectory( new File( settings.getConfig().getString( SAVESTARTPATH ) ) );
             this.imageChooser.setCurrentDirectory( new File( settings.getConfig().getString( SAVESTARTPATH ) ) );
@@ -768,8 +770,8 @@ public class JGeneSetFrame extends JFrame {
             log.debug( "includeLabels: " + includeLabels );
         }
         if ( settings.getConfig().containsKey( INCLUDEEVERYTHING ) ) {
-            this.includeEverything = settings.getConfig().getBoolean( INCLUDEEVERYTHING );
-            log.debug( "includeEverything: " + includeEverything );
+            this.includeAnnotations = settings.getConfig().getBoolean( INCLUDEEVERYTHING );
+            log.debug( "includeEverything: " + includeAnnotations );
         }
         if ( settings.getConfig().containsKey( NORMALIZE_SAVED_IMAGE ) ) {
             this.normalizeSavedImage = settings.getConfig().getBoolean( NORMALIZE_SAVED_IMAGE );
@@ -787,7 +789,7 @@ public class JGeneSetFrame extends JFrame {
         if ( settings == null ) return;
         // the menu
         menuBar.setEnabled( enabled );
-        fileMenu.setEnabled( enabled );
+        // fileMenu.setEnabled( enabled ); /; show it, just don't allow image saves.
         viewMenu.setEnabled( enabled );
         optionsMenu.setEnabled( true );
         if ( settings.getClassScoreMethod() == Settings.ORA ) {
@@ -830,7 +832,7 @@ public class JGeneSetFrame extends JFrame {
         settings.getConfig().setProperty( WINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
         settings.getConfig().setProperty( NORMALIZE_SAVED_DATA, new Boolean( this.normalizeSavedData ) );
         settings.getConfig().setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( this.normalizeSavedImage ) );
-        settings.getConfig().setProperty( INCLUDEEVERYTHING, new Boolean( this.includeEverything ) );
+        settings.getConfig().setProperty( INCLUDEEVERYTHING, new Boolean( this.includeAnnotations ) );
         settings.getConfig().setProperty( INCLUDELABELS, new Boolean( this.includeLabels ) );
         settings.writePrefs();
     }
@@ -851,14 +853,14 @@ public class JGeneSetFrame extends JFrame {
      */
     protected int[] getCurrentMatrixDisplayRowOrder() {
 
-        int matrixRowCount = m_matrixDisplay.getRowCount();
+        int matrixRowCount = matrixDisplay.getRowCount();
         int[] rowKeys = new int[matrixRowCount];
 
         // write out the table, one row at a time
         for ( int r = 0; r < matrixRowCount; r++ ) {
             // for this row: write out matrix values
             String probeID = getProbeID( r );
-            rowKeys[r] = m_matrixDisplay.getRowIndexByName( probeID );
+            rowKeys[r] = matrixDisplay.getRowIndexByName( probeID );
         }
 
         return rowKeys;
@@ -874,8 +876,8 @@ public class JGeneSetFrame extends JFrame {
      * @param normalized
      * @throws IOException
      */
-    protected void saveData( String filename, boolean includeMatrixValues, boolean includeAnnotations,
-            boolean normalized ) throws IOException {
+    protected void saveData( String filename, boolean includeMatrix, boolean includeAnnotations, boolean normalized )
+            throws IOException {
 
         final String NEWLINE = System.getProperty( "line.separator" );
 
@@ -883,13 +885,15 @@ public class JGeneSetFrame extends JFrame {
 
         BufferedWriter out = new BufferedWriter( new FileWriter( outputFile ) );
 
-        boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
-        m_matrixDisplay.setStandardizedEnabled( normalized );
+        boolean isStandardized = matrixDisplay != null && matrixDisplay.getStandardizedEnabled();
+        if ( matrixDisplay != null ) {
+            matrixDisplay.setStandardizedEnabled( normalized );
+        }
 
         int totalRowCount = table.getRowCount();
-        int matrixColumnCount = m_matrixDisplay.getColumnCount();
+        matrixColumnCount = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount();
 
-        printHeader( includeMatrixValues, includeAnnotations, out, matrixColumnCount );
+        printHeader( includeMatrix, includeAnnotations, out, matrixColumnCount );
 
         DecimalFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits( 8 );
@@ -906,13 +910,14 @@ public class JGeneSetFrame extends JFrame {
                 printAnnotationsForRow( out, matrixColumnCount, r );
             }
 
-            if ( includeMatrixValues ) {
+            if ( includeMatrix ) {
                 printMatrixValueForRow( out, nf, probeID );
             }
             out.write( NEWLINE );
         }
 
-        m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+        if ( matrixDisplay != null ) matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous
+        // state
 
         // close the file
         out.close();
@@ -920,23 +925,23 @@ public class JGeneSetFrame extends JFrame {
     } // end saveData
 
     protected void saveImage( String filename, boolean includeLabels, boolean normalized ) throws IOException {
-
-        boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
-        m_matrixDisplay.setStandardizedEnabled( normalized );
-        m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
+        if ( matrixDisplay == null ) return;
+        boolean isStandardized = matrixDisplay.getStandardizedEnabled();
+        matrixDisplay.setStandardizedEnabled( normalized );
+        matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
         try {
-            m_matrixDisplay.saveImage( filename, includeLabels, normalized );
+            matrixDisplay.saveImage( filename, includeLabels, normalized );
         } catch ( IOException e ) {
             // clean up
-            m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
-            m_matrixDisplay.resetRowKeys();
+            matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+            matrixDisplay.resetRowKeys();
             throw e;
         }
 
         // clean up
 
-        m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
-        m_matrixDisplay.resetRowKeys();
+        matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+        matrixDisplay.resetRowKeys();
 
     } // end saveImage
 
@@ -944,7 +949,7 @@ public class JGeneSetFrame extends JFrame {
 
         try {
             Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
-            m_matrixDisplay.setColorMap( colorMap );
+            matrixDisplay.setColorMap( colorMap );
             m_gradientBar.setColorMap( colorMap );
             table.repaint();
         } catch ( Exception ex ) {
@@ -964,7 +969,7 @@ public class JGeneSetFrame extends JFrame {
         double value = source.getValue();
 
         double displayMin, displayMax;
-        boolean normalized = m_matrixDisplay.getStandardizedEnabled();
+        boolean normalized = matrixDisplay.getStandardizedEnabled();
         if ( normalized ) {
             double rangeMax = NORMALIZED_COLOR_RANGE_MAX;
             double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
@@ -972,16 +977,16 @@ public class JGeneSetFrame extends JFrame {
             displayMin = -( range / 2 );
             displayMax = +( range / 2 );
         } else {
-            double rangeMax = m_matrixDisplay.getMax() - m_matrixDisplay.getMin();
+            double rangeMax = matrixDisplay.getMax() - matrixDisplay.getMin();
             double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
             double range = value / zoomFactor;
-            double midpoint = m_matrixDisplay.getMax() - ( rangeMax / 2 );
+            double midpoint = matrixDisplay.getMax() - ( rangeMax / 2 );
             displayMin = midpoint - ( range / 2 );
             displayMax = midpoint + ( range / 2 );
         }
 
         m_gradientBar.setLabels( displayMin, displayMax );
-        m_matrixDisplay.setDisplayRange( displayMin, displayMax );
+        matrixDisplay.setDisplayRange( displayMin, displayMax );
         table.repaint();
     }
 
@@ -989,7 +994,7 @@ public class JGeneSetFrame extends JFrame {
 
         try {
             Color[] colorMap = ColorMap.GREENRED_COLORMAP;
-            m_matrixDisplay.setColorMap( colorMap );
+            matrixDisplay.setColorMap( colorMap );
             m_gradientBar.setColorMap( colorMap );
             table.repaint();
         } catch ( Exception ex ) {
@@ -1000,7 +1005,7 @@ public class JGeneSetFrame extends JFrame {
     void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
 
         boolean normalize = m_normalizeMenuItem.isSelected();
-        m_matrixDisplay.setStandardizedEnabled( normalize );
+        matrixDisplay.setStandardizedEnabled( normalize );
 
         initColorRangeWidget();
         table.repaint();
@@ -1018,9 +1023,10 @@ public class JGeneSetFrame extends JFrame {
                 if ( returnVal != JOptionPane.OK_OPTION ) return;
             }
 
-            this.includeEverything = fileChooser.includeEverything();
+            this.includeAnnotations = fileChooser.includeAnnotations() || matrixDisplay == null;// always save
+                                                                                                // _something_
             this.normalizeSavedData = fileChooser.normalized();
-            settings.setProperty( INCLUDEEVERYTHING, new Boolean( includeEverything ) );
+            settings.setProperty( INCLUDEEVERYTHING, new Boolean( includeAnnotations ) );
             settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( normalizeSavedData ) );
             settings.writePrefs();
 
@@ -1028,7 +1034,7 @@ public class JGeneSetFrame extends JFrame {
 
             // Save the values
             try {
-                saveData( filename, true, includeEverything, normalizeSavedData );
+                saveData( filename, matrixDisplay != null, includeAnnotations, normalizeSavedData );
             } catch ( IOException ex ) {
                 GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
@@ -1038,6 +1044,7 @@ public class JGeneSetFrame extends JFrame {
     }
 
     void m_saveImageMenuItem_actionPerformed( ActionEvent e ) {
+        if ( matrixDisplay == null ) return;
         initChoosers();
         int returnVal = imageChooser.showSaveDialog( this );
         if ( returnVal == JFileChooser.APPROVE_OPTION ) {
@@ -1091,12 +1098,13 @@ public class JGeneSetFrame extends JFrame {
      * @param desiredCellWidth
      */
     void resizeMatrixColumns( int desiredCellWidth ) {
+        if ( matrixDisplay == null ) return;
         if ( desiredCellWidth >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && desiredCellWidth <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
 
             table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
-            int matrixColumnCount = m_matrixDisplay.getColumnCount();
-            for ( int i = 0; i < matrixColumnCount; i++ ) {
+            int numColumns = matrixDisplay.getColumnCount();
+            for ( int i = 0; i < numColumns; i++ ) {
                 TableColumn col = table.getColumnModel().getColumn( i );
                 col.setResizable( false );
                 col.setPreferredWidth( desiredCellWidth );
