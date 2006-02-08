@@ -1,3 +1,23 @@
+/*
+ * The ermineJ project
+ * 
+ * Copyright (c) 2006 University of British Columbia
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
 package classScore.gui.geneSet;
 
 import java.awt.BorderLayout;
@@ -25,9 +45,6 @@ import classScore.Settings;
 
 /**
  * FIXME this should extend jDialog, implement actionlistener, and be modal.
- * <hr>
- * <p>
- * Copyright (c) 2004-2006 University of British Columbia
  * 
  * @author pavlidis
  * @version $Id$
@@ -79,7 +96,7 @@ public class GeneUrlDialog extends JFrame {
         mainPanel.setLayout( new BorderLayout() );
 
         centerPanel.setPreferredSize( new Dimension( 200, 50 ) );
-        
+
         urlTextField = new JTextField();
         initializeFieldText();
         urlTextField.setPreferredSize( new Dimension( 500, 19 ) );
@@ -118,15 +135,15 @@ public class GeneUrlDialog extends JFrame {
      * 
      */
     private void initializeFieldText() {
-       if (this.settings == null ) {
-           try {
-            this.settings = new Settings();
-        } catch ( IOException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if ( this.settings == null ) {
+            try {
+                this.settings = new Settings();
+            } catch ( IOException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-       }
-        if (  this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
+        if ( this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
             String oldUrlBase = this.settings.getConfig().getString( Settings.GENE_URL_BASE );
             log.debug( "Found url base " + oldUrlBase );
             urlTextField.setText( oldUrlBase );
@@ -213,7 +230,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
-    public void mouseClicked( MouseEvent e ) { 
+    public void mouseClicked( MouseEvent e ) {
     }
 
     /*
@@ -221,7 +238,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
      */
-    public void mouseEntered( MouseEvent e ) { 
+    public void mouseEntered( MouseEvent e ) {
     }
 
     /*
@@ -229,7 +246,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
      */
-    public void mouseExited( MouseEvent e ) { 
+    public void mouseExited( MouseEvent e ) {
 
     }
 
@@ -238,7 +255,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
-    public void mousePressed( MouseEvent e ) { 
+    public void mousePressed( MouseEvent e ) {
 
     }
 
