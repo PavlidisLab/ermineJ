@@ -33,17 +33,16 @@ import org.apache.commons.logging.LogFactory;
 
 import baseCode.bio.geneset.GONames;
 import baseCode.bio.geneset.GeneAnnotations;
-import baseCode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
+import baseCode.dataStructure.matrix.DoubleMatrixNamed;
 import baseCode.io.reader.DoubleMatrixReader;
 import baseCode.util.CancellationException;
 import baseCode.util.StatusViewer;
 import classScore.data.GeneScores;
 
 /**
- * @author not attributable
+ * @author pavlidis
  * @version $Id$
  */
-
 public class AnalysisThread extends Thread {
     protected static final Log log = LogFactory.getLog( AnalysisThread.class );
     private GeneAnnotations geneData = null;
@@ -232,16 +231,16 @@ public class AnalysisThread extends Thread {
      * @return
      * @throws IOException
      */
-    private synchronized DenseDoubleMatrix2DNamed addRawData() throws IOException {
-        DenseDoubleMatrix2DNamed rawData;
+    private synchronized DoubleMatrixNamed addRawData() throws IOException {
+        DoubleMatrixNamed rawData;
         if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
             if ( messenger != null ) messenger.showStatus( "Raw data are in memory" );
-            rawData = ( DenseDoubleMatrix2DNamed ) rawDataSets.get( settings.getRawDataFileName() );
+            rawData = ( DoubleMatrixNamed ) rawDataSets.get( settings.getRawDataFileName() );
         } else {
             if ( messenger != null )
                 messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
-            rawData = ( DenseDoubleMatrix2DNamed ) r.read( settings.getRawDataFileName() );
+            rawData = ( DoubleMatrixNamed ) r.read( settings.getRawDataFileName() );
             rawDataSets.put( settings.getRawDataFileName(), rawData );
         }
         return rawData;
@@ -259,7 +258,7 @@ public class AnalysisThread extends Thread {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        DenseDoubleMatrix2DNamed rawData = null;
+        DoubleMatrixNamed rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             rawData = addRawData();
         }
@@ -317,7 +316,7 @@ public class AnalysisThread extends Thread {
      * @param activeProbes
      * @return
      */
-    private synchronized Set getActiveProbes( DenseDoubleMatrix2DNamed rawData, GeneScores geneScores ) {
+    private synchronized Set getActiveProbes( DoubleMatrixNamed rawData, GeneScores geneScores ) {
         Set activeProbes = null;
         if ( rawData != null && geneScores != null ) { // favor the geneScores list.
             activeProbes = geneScores.getProbeToScoreMap().keySet();
