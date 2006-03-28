@@ -18,6 +18,7 @@ target
 velocity.log
 ClassScore.prefs
 classScore.jar
+.classpath
 .project
 ermineJ.jpx
 ermineJ.library
@@ -27,3 +28,4 @@ xdoclet-build.xml
 tmp
 
 ermineJ-help.jar
+approx-tests

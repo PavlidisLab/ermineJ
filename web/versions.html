@@ -30,21 +30,17 @@
 
 <h2>Current version</h2>
 
-<p>Version 2.1.9 - (Feb 8 2006) Changes include:</p>
+<p>Version 2.1.10 - (XXXX 2006) Changes include:</p>
 <ul>
-<li>Restricting analysis to specific GO aspects wasn't working for ROC analysis (fixes bug 285).</li>
-<li>Loading an analysis from disk failed if the raw data file was not set (bug 291).</li>
-<li>You can now save the gene set information in the details view even without loading the raw data (bug 290).</li>
-<li>Small p-values were rounded to zero in the output file (bug 289).</li>
-<li>The path to the annotation file is stored in the output file. This currently isn't used by the software but is good for user records.</li>
-<li>Command line interface: -F (--format) option (which took an argument) changed to -A. Using the -A option indicates 
-that the annotation file is in "Affymetrix" format. Fixes bug 272.</li>
-<li>The format of the Annotation files has been made more flexible. The GO term field can be delimited with characters
-other than '|' such as commas or spaces (issue 286).</li>
-<li>The format of the annotation files has been documented (see <a href="ermineJ-help/classScore/html/formats/annotations.html">this page</a>) (issue 287).</li>
-<li>Minor GUI tweaks to improve portability (bug 269).</li>
+<li>ErmineJ is now licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a> license.</li>
+<li>(Dev) Code has been restructured. This will only affect developers using ermineJ code.</li>
+<li>Fixed bug: If you tried to run a correlation analysis without a gene score file set (which is supposed 
+to be irrelevant), the analysis would fail.</li>
+<li>Fixed bug: It was still possible to get errors when loading raw data files for analysis, this has finally been fixed.</li>
+<li>(Docs) Documention of custom gene sets fixed to reflect correct location of ermineJ.data (in your home directory,
+not the ermineJ installation directory).
+</li>
 </ul>
-
 <p>Known issues:</p>
 
 <ul>
@@ -60,10 +56,25 @@ other than '|' such as commas or spaces (issue 286).</li>
     (bug 212)</li>
 
 </ul>
-
 <hr />
 
 <h2>Older versions</h2>
+
+<p>Version 2.1.9 - (Feb 8 2006) Changes include:</p>
+<ul>
+<li>Restricting analysis to specific GO aspects wasn't working for ROC analysis (fixes bug 285).</li>
+<li>Loading an analysis from disk failed if the raw data file was not set (bug 291).</li>
+<li>You can now save the gene set information in the details view even without loading the raw data (bug 290).</li>
+<li>Small p-values were rounded to zero in the output file (bug 289).</li>
+<li>The path to the annotation file is stored in the output file. This currently isn't used by the software but is good for user records.</li>
+<li>Command line interface: -F (--format) option (which took an argument) changed to -A. Using the -A option indicates 
+that the annotation file is in "Affymetrix" format. Fixes bug 272.</li>
+<li>The format of the Annotation files has been made more flexible. The GO term field can be delimited with characters
+other than '|' such as commas or spaces (issue 286).</li>
+<li>The format of the annotation files has been documented (see <a href="ermineJ-help/classScore/html/formats/annotations.html">this page</a>) (issue 287).</li>
+<li>Minor GUI tweaks to improve portability (bug 269).</li>
+</ul>
+
 
 
 <p>Version 2.1.8 - (December 20 2005) Changes include:</p>
