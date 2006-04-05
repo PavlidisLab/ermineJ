@@ -58,9 +58,10 @@ public class GeneScoreReaderTest extends TestCase {
     }
 
     public void testGetPvalues() {
-        double[] expectedReturn = new double[] { 0.01, 0.01, 0.02, 0.1, 0.1, 0.1, 0.1, 0.1 };
+        double[] expectedReturn = new double[] { -Math.log10( 0.01 ), -Math.log10( 0.01 ), -Math.log10( 0.02 ),
+                -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ) };
         double[] actualReturn = test.getPvalues();
-        assertTrue( RegressionTesting.containsSame( expectedReturn, actualReturn ) );
+        assertTrue( RegressionTesting.closeEnough( expectedReturn, actualReturn, 0.00001 ) );
     }
 
     public void testGet_numpvals() {

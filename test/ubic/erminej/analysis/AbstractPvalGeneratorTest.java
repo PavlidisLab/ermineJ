@@ -18,6 +18,7 @@
  */
 package ubic.erminej.analysis;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
@@ -46,13 +47,17 @@ abstract class AbstractPvalGeneratorTest extends TestCase {
     protected void setUp() throws Exception {
         ism = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.an.txt" );
         is = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.scores.txt" );
-
         isi = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/go_test_termdb.xml" );
+
+        if ( ism == null || is == null || isi == null ) throw new IOException();
 
         s = new Settings();
         s.setPValThreshold( 0.015 );
         s.setMinClassSize( 2 );
         s.setDoLog( true );
+        s.setUseBiologicalProcess( true );
+        s.setUseCellularComponent( true );
+        s.setUseMolecularFunction( true );
 
         g = new GeneAnnotations( ism, null, null, null );
 

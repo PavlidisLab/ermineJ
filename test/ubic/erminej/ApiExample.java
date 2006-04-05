@@ -23,6 +23,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import ubic.erminej.ClassScoreSimple;
 import ubic.erminej.Settings;
 
@@ -31,6 +34,8 @@ import ubic.erminej.Settings;
  * @version $Id$
  */
 public class ApiExample {
+
+    private static Log log = LogFactory.getLog( ApiExample.class.getName() );
 
     public static void main( String[] args ) {
 
@@ -99,8 +104,8 @@ public class ApiExample {
         double barPvalue = css.getGeneSetPvalue( "bar" );
 
         // The results are nonsensical because there are too few genes...
-        System.err.println( "Foo got " + fooPvalue );
-        System.err.println( "Bar got " + barPvalue );
+        log.info( "Foo got " + fooPvalue );
+        log.info( "Bar got " + barPvalue );
     }
 
 }

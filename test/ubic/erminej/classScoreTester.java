@@ -101,11 +101,9 @@ public class classScoreTester extends classScoreCMD {
             }
             dis.close();
         } catch ( IOException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.fatal( e, e );
         } catch ( ConfigurationException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.fatal( e, e );
         }
 
     }
@@ -114,7 +112,7 @@ public class classScoreTester extends classScoreCMD {
         try {
             new classScoreTester();
         } catch ( IOException e ) {
-            e.printStackTrace();
+            log.fatal( e, e );
         }
     }
 
@@ -150,11 +148,11 @@ public class classScoreTester extends classScoreCMD {
                         double db = Double.parseDouble( sb );
 
                         if ( Math.abs( da - db ) > TOLERANCE )
-                            System.err.println( "Diff (numeric): " + da + " != " + db + " at line " + lineNum );
+                            log.error( "Diff (numeric): " + da + " != " + db + " at line " + lineNum );
                         return false;
 
                     } catch ( Exception e ) {
-                        System.err.println( "Diff: " + sa + " != " + sb + " at line " + lineNum + ", token " + tokNum );
+                        log.error( "Diff: " + sa + " != " + sb + " at line " + lineNum + ", token " + tokNum );
                         return false;
                     }
 

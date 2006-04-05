@@ -43,7 +43,7 @@ public class GeneSetTableModelTest extends TestCase {
 
     // exercise the configuration.
     public void testGeneSetTableModel() {
-        GeneSetTableModel foo = new GeneSetTableModel( null, null, null, null, null, null, null );
+        new GeneSetTableModel( null, null, null, null, null, null, null );
     }
 
 }

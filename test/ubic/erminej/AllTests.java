@@ -20,6 +20,8 @@ package ubic.erminej;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import ubic.erminej.analysis.OraPvalGeneratorTest;
+import ubic.erminej.data.GeneScoreReaderTest;
 
 /**
  * @author pavlidis
@@ -29,9 +31,8 @@ public class AllTests {
 
     public static Test suite() {
         TestSuite suite = new TestSuite( "Test for classScoreTest" );
-        // $JUnit-BEGIN$
-
-        // $JUnit-END$
+        suite.addTestSuite( OraPvalGeneratorTest.class );
+        suite.addTestSuite( GeneScoreReaderTest.class );
         return suite;
     }
 
