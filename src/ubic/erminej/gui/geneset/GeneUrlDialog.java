@@ -50,7 +50,6 @@ import ubic.erminej.Settings;
  */
 public class GeneUrlDialog extends JFrame {
     private static final Log log = LogFactory.getLog( GeneUrlDialog.class );
-    private JFrame callingframe;
     private static final int MAINWIDTH = 550;
     private JPanel mainPanel;
     private Dimension dlgSize = new Dimension( MAINWIDTH, 100 );
@@ -71,7 +70,6 @@ public class GeneUrlDialog extends JFrame {
     public GeneUrlDialog( JFrame parent, Settings settings, GeneSetTableModel model ) {
         this.settings = settings;
         this.tableModel = model;
-        this.callingframe = parent;
         // this.setModal( true );
         try {
             jbInit();
@@ -138,8 +136,7 @@ public class GeneUrlDialog extends JFrame {
             try {
                 this.settings = new Settings();
             } catch ( IOException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw new RuntimeException( e );
             }
         }
         if ( this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
@@ -220,7 +217,6 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
      */
     public SetTextMouseButton_actionAdapter( GeneUrlDialog adaptee ) {
         super();
-        // TODO Auto-generated constructor stub
         this.adaptee = adaptee;
     }
 
