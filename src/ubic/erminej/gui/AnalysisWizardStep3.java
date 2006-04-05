@@ -63,9 +63,9 @@ public class AnalysisWizardStep3 extends WizardStep {
     private AnalysisWizardStep3_CustomClassList customClasses;
     private AbstractTableModel ccTableModel;
     private JTable customClassTable;
-    private Map ccHash;
+    private Map ccHash = new HashMap();
     private AnalysisWizardStep3_CustomClassList addedClasses;
-    private Map acHash;
+    private Map acHash = new HashMap();
     private JTable addedClassTable;
     private AbstractTableModel acTableModel;
     private JLabel countLabel;
@@ -292,12 +292,12 @@ public class AnalysisWizardStep3 extends WizardStep {
     private void setValues() {
         if ( settings.getSelectedCustomGeneSets() != null && settings.getSelectedCustomGeneSets().size() > 0 ) {
             Collection selectedCustomClasses = settings.getSelectedCustomGeneSets();
+            if ( selectedCustomClasses == null ) return;
             for ( Iterator iter = selectedCustomClasses.iterator(); iter.hasNext(); ) {
                 String geneSet = ( String ) iter.next();
                 if ( !ccHash.containsKey( geneSet ) ) continue;
                 log.debug( "Adding " + geneSet );
                 this.addClasstoSelected( geneSet );
-
             }
         }
     }
