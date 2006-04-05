@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -144,7 +145,7 @@ public class GeneSetDetails {
     private GeneScores tryToGetGeneScores( GeneScores geneScores ) throws IOException, IllegalStateException {
         assert settings != null : "Null settings.";
         String scoreFile = settings.getScoreFile();
-        if ( scoreFile != null ) {
+        if ( StringUtils.isNotBlank( scoreFile ) ) {
             GeneScores localReader = new GeneScores( scoreFile, settings, null, this.geneData );
             geneScores = localReader;
             log.debug( "Getting gene scores from " + scoreFile );

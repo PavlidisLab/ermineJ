@@ -44,6 +44,7 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     protected GeneSetSizeComputer csc;
     private int maxGeneSetSize;
     private int minGeneSetSize;
+    private boolean globalMissingAspectTreatedAsUsable = false;
 
     public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots, GeneSetSizeComputer csc, GONames gon ) {
 
@@ -83,19 +84,35 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     }
 
     /**
-     * If GO data isn't initialized, this returns true.
+     * If GO data isn't initialized, this returns true. If there is no aspect associated with the gene set, return
+     * false.
      * 
      * @param geneSetName
      * @return
      */
     protected boolean checkAspect( String geneSetName ) {
+        return this.checkAspect( geneSetName, false );
+    }
+
+    /**
+     * If GO data isn't initialized, this returns true.
+     * 
+     * @param geneSetName
+     * @param missingAspectTreatedAsUsable Whether gene sets missing an aspect should be treated as usable or not. This
+     *        parameter is provided partly for testing. Global setting can override this if set to true.
+     * @return
+     */
+    protected boolean checkAspect( String geneSetName, boolean missingAspectTreatedAsUsable ) {
         if ( goName == null ) return true;
 
         String aspect = this.goName.getAspectForId( geneSetName );
 
+        /*
+         * If there is no aspect, we don't use it, unless
+         */
         if ( aspect == null && !this.goName.isUserDefined( geneSetName ) ) {
-            log.debug( "Null aspect for " + geneSetName + ", skipping" );
-            return false;
+            log.debug( "Null aspect for " + geneSetName );
+            return missingAspectTreatedAsUsable || this.globalMissingAspectTreatedAsUsable;
         }
 
         if ( ( aspect.equalsIgnoreCase( "biological_process" ) || aspect
@@ -127,6 +144,13 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     protected boolean scorePassesThreshold( double geneScore, double geneScoreThreshold ) {
         return ( settings.upperTail() && geneScore >= geneScoreThreshold )
                 || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
+    }
+
+    /**
+     * @param globalMissingAspectTreatedAsUsable The globalMissingAspectTreatedAsUsable to set.
+     */
+    public void setGlobalMissingAspectTreatedAsUsable( boolean globalMissingAspectTreatedAsUsable ) {
+        this.globalMissingAspectTreatedAsUsable = globalMissingAspectTreatedAsUsable;
     }
 
 }

@@ -64,9 +64,12 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * Get results for one class, based on class id. The other arguments are things that are not constant under
      * permutations of the data.
      */
-    public GeneSetResult classPval( String class_name, Map geneToScoreMap, Map probesToScores ) {
+    public GeneSetResult classPval( String className, Map geneToScoreMap, Map probesToScores ) {
 
-        if ( !super.checkAspect( class_name ) ) return null;
+        if ( !super.checkAspect( className ) ) {
+            if ( log.isDebugEnabled() ) log.debug( className + " is not in a selected aspect" );
+            return null;
+        }
         // inputs for hypergeometric distribution
         int successes = 0;
         int failures = 0;
@@ -74,16 +77,18 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         // variables for outputs
         double oraPval = -1.0;
 
-        if ( !effectiveSizes.containsKey( class_name ) ) {
+        if ( !effectiveSizes.containsKey( className ) ) {
+            log.warn( "No size information available for " + className + ", skipping" );
             return null;
         }
 
-        int effectiveGeneSetSize = ( ( Integer ) effectiveSizes.get( class_name ) ).intValue();
+        int effectiveGeneSetSize = ( ( Integer ) effectiveSizes.get( className ) ).intValue();
         if ( effectiveGeneSetSize < settings.getMinClassSize() || effectiveGeneSetSize > settings.getMaxClassSize() ) {
+            if ( log.isDebugEnabled() ) log.debug( "Class " + className + " is outside of selected size range" );
             return null;
         }
 
-        Collection probes = geneAnnots.getGeneSetProbes( class_name );
+        Collection probes = geneAnnots.getGeneSetProbes( className );
         Iterator classit = probes.iterator();
 
         // store pvalues for items in the class.
@@ -176,12 +181,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         // set up the return object.
-        GeneSetResult res = new GeneSetResult( class_name, goName.getNameForId( class_name ), ( ( Integer ) actualSizes
-                .get( class_name ) ).intValue(), effectiveGeneSetSize );
+        GeneSetResult res = new GeneSetResult( className, goName.getNameForId( className ), ( ( Integer ) actualSizes
+                .get( className ) ).intValue(), effectiveGeneSetSize );
         res.setScore( successes );
         res.setPValue( oraPval );
         return res;
 
     }
-
 }

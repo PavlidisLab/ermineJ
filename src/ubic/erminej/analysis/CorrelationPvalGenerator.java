@@ -117,6 +117,11 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         for ( int i = probeList.size() - 1; i >= 0; i-- ) {
             String probei = ( String ) probeList.get( i );
+
+            if ( !data.containsRowName( probei ) ) {
+                continue;
+            }
+
             int iIndex = data.getRowIndexByName( probei );
             String genei = ( String ) probeToGeneMap.get( probei );
             double[] irow = dataAsRawMatrix[iIndex];
@@ -124,7 +129,13 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
             boolean multipleProbesI = numProbesForGeneI > 1;
 
             for ( int j = i - 1; j >= 0; j-- ) {
+
                 String probej = ( String ) probeList.get( j );
+
+                if ( !data.containsRowName( probej ) ) {
+                    continue;
+                }
+
                 int jIndex = data.getRowIndexByName( probej );
                 String genej = ( String ) probeToGeneMap.get( probej );
 
