@@ -4,7 +4,7 @@
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
     <id>ermineJ</id>
-    <currentVersion>2.1.10RC2</currentVersion>
+    <currentVersion>2.1.10</currentVersion>
     <organization>
         <name>UBC Bioinformatics Centre</name>
         <url>http://bioinformatics.ubc.ca</url>
@@ -90,6 +90,15 @@
             <groupId>baseCode</groupId>
             <artifactId>baseCode</artifactId>
             <version>0.2.2</version>
+            <type>jar</type>
+            <properties>
+                <jnlp.jar>true</jnlp.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>1.3</version>
             <type>jar</type>
             <properties>
                 <jnlp.jar>true</jnlp.jar>

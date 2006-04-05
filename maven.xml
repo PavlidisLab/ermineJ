@@ -191,7 +191,7 @@
 
 <goal name="write-version" description="Set up resource with version number">
 <ant:echo message="Version: ${pom.currentVersion}" />
-<ant:echo  message="${pom.currentVersion}" file="${basedir}/src/classScore/gui/resources/version" append="false" />
+<ant:echo  message="${pom.currentVersion}" file="${basedir}/src/ubic/erminej/gui/resources/version" append="false" />
 </goal>
 
 </project>
