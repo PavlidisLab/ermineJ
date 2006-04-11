@@ -1,236 +1,163 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
-    <head>
-        <meta name="generator" content="HTML Tidy, see www.w3.org">
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
 
-        <title>ErmineJ</title>
-        <link type="text/css" rel="stylesheet" href="css/default.css">
-    </head>
+<title>ErmineJ</title>
+<link type="text/css" rel="stylesheet" href="css/default.css">
+</head>
 
-    <body bgcolor="#ffffff" link="#800000" text="#000000">
-        <table border="0" cellpadding="2" cellspacing="3" width="776">
+<body bgcolor="#ffffff" link="#800000" text="#000000">
+<table border="0" cellpadding="2" cellspacing="3" width="776">
+    <tr>
+        <td width="2"><!-- Logo space --></td>
+
+        <td width="687"><!-- Header space --> 
+        
+        <a href="/ermineJ"><IMG
+            src="images/banner.jpg" border="0"></a>
+
+        <h1>Gene Ontology analysis for&nbsp;microarray data</h1>
+        <P><STRONG>Version 2.1.9</STRONG></P>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><!--  navigation -->
+        <table>
             <tr>
-                <td width="2">
-                    <!-- Logo space -->
-                </td>
-
-                <td width="687">
-                    <!-- Header space -->
-
-                    <a href="/ermineJ"><IMG src="images/banner.jpg" border="0"></a>
-
-                    <h1>
-                        Gene Ontology analysis for&nbsp;microarray data
-                    </h1>
-                    <P>
-                        <STRONG>Version 2.1.10</STRONG>
-                    </P>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    <!--  navigation -->
-                    <table>
-                        <tr>
-                            <td>
-                                <a href="index.html">Home</a>
-                            </td>
-                            <td>
-                                &nbsp;&nbsp;
-                            </td>
-                            <td>
-                                <a href="downloadInstall.html">Download</a>
-                            </td>
-                            <td>
-                                &nbsp;&nbsp;
-                            </td>
-                            <td>
-                                <a href="ermineJ-help/classScore/html/">Help</a>
-                            </td>
-                            <td>
-                                &nbsp;&nbsp;
-                            </td>
-                            <td>
-                                <a href="publications.html">Pubs</a>
-                            </td>
-                            <td>
-                                &nbsp;&nbsp;
-                            </td>
-                            <td>
-                                <a href="screenshots.html">Screens</a>
-                            </td>
-                            <td>
-                                &nbsp;&nbsp;
-                            </td>
-                            <td>
-                                <a href="versions.html">Versions</a>
-                            </td>
-                            <td>
-                                &nbsp;&nbsp;
-                            </td>
-                            <td>
-                                <a href="contact.html">Contact</a>
-                            </td>
-                        </tr>
-                    </table>
-
-                </td>
-            </tr>
-            <tr>
-                <td width="72">
-                    <!-- Left gutter space -->
-                    <img height="1" alt="" src="/images/shim.gif" width="30" border="0">
-                </td>
-
-                <td valign="top" width="687">
-
-                    <h2>
-                        Overview
-                    </h2>
-
-                    <p>
-                        ErmineJ performs analyses of <b>gene sets</b> in <b>expression microarray data</b>. A typical
-                        goal is to determine whether particular biological pathways are "doing something interesting" in
-                        the data. The software is designed to be used by biologists with little or no informatics
-                        background. A command-line interface is available for users who wish to script the use of
-                        ermineJ.
-                    </p>
-
-                    <p>
-                        ErmineJ can be <strong><a href="downloadInstall.html">downloaded here</a></strong>.
-                    </p>
-
-                    <p>
-                        Major features include:
-                    </p>
-
-                    <ul>
-                        <li>
-                            Implementation of multiple methods for gene set analysis:
-
-                            <ul>
-                                <li>
-                                    <A href="ermineJ-help/classScore/html/tutorial/ora.html">Over-representation
-                                        analysis</A>
-                                <li>
-                                    <A href="ermineJ-help/classScore/html/tutorial/resampling.html">A resampling-based
-                                        method that uses gene scores</A>
-                                <li>
-                                    <a href="ermineJ-help/classScore/html/tutorial/roc.html">A rank-based method that
-                                        uses gene scores</a>
-                                </li>
-                                <li>
-                                    A resampling-based method that uses <a
-                                        href="ermineJ-help/classScore/html/tutorial/correlation.html">correlation
-                                        between gene expression profiles</a> (a type of "cluster-enrichment" analysis).
-                                </li>
-                            </ul>
-                        <li>
-                            Gene sets receive statistical scores (p-values), and <a
-                                href="ermineJ-help/classScore/html/tutorial/mtc.html">multiple test correction</a> is
-                            supported.
-                        </li>
-                        <li>
-                            Support of the Gene Ontology terminology; users can choose which aspects to analyze.
-                        </li>
-                        <li>
-                            User files use <A href="ermineJ-help/classScore/html/formats/go.html">simple text formats</A>.
-
-
-
-                        
-                        <li>
-                            Users can <A href="ermineJ-help/classScore/html/tutorial/classes.html">modify gene sets or
-                                create new ones</A>.
-                        <li>
-                            The results can be <a href="ermineJ-help/classScore/html/tutorial/visualize.html">visualized
-                                within the software</a>.
-                        <li>
-                            It is simple to compare multiple analyses of the same data set with different settings.
-                        </li>
-                        <li>
-                            <a href="ermineJ-help/classScore/html/tutorial/setgeneurl.html">User-definable hyperlinks</a>
-                            are provided to external sites to allow more efficient browsing of the results.
-                        </li>
-                        <li>
-                            For programmers, there is a <a href="ermineJ-help/classScore/html/tutorial/cli.html">command
-                                line interface</a> as well as a <a href="ermineJ-help/classScore/html/tutorial/Api.html">simple
-                                application programming interface</a> that can be used to plug ermineJ functionality
-                            into your own code
-                        </li>
-                    </ul>
-
-                    <p>
-                        <A href="ermineJ-help/classScore/html/license.html">License information</A> - ermineJ is free
-                        software.
-                    </p>
-
-                    <p>
-                        There are some <A href="screenshots.html">screen shots</A> available, and more information is
-                        available in the <a href="ermineJ-help/classScore/html">manual</a>.
-                    </p>
-
-                    <h2>
-                        News
-                    </h2>
-
-                    <p>
-                        Version 2.1.10 - (April 6 2006) This is a bugfix release but also introduces some "behind the
-                        scenes" changes, and a change in ermineJ licensing:
-                    <ul>
-                        <li>
-                            ErmineJ is now licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache
-                                2</a> license.
-                        </li>
-                        <li>
-                            A number of bugs have been fixed, which caused errors for some users. All users should upgrade.
-                        </li>
-                       </ul>
-                        </p>
-
-
-                        <p>
-                            For details of changes, see the <A href="versions.html">full version history</A>
-                        </p>
-
-                        <p>
-                            <a href="oldnews.html">Old news</a>
-                        </p>
-
-                        <h2>
-                            Documentation
-                        </h2>
-
-                        <p>
-                            The software comes with on-line help. The manual is also <a
-                                href="ermineJ-help/classScore/html">available online</a> (webstart users will have to
-                            use this option for now) or as a <A href="ermineJ-help/classScore/ermineJ-2.1.1-manual.pdf">PDF</A>.
-                            If you are having problems with the software please read the <a
-                                href="ermineJ-help/classScore/html/faq.html">FAQ</a>. If your question isn't answered in
-                            the FAQ or in the manual, feel free to <A href="contact.html">contact us</A>
-                        </p>
-
-                        <p>
-                            For more details about ermineJ and how it is used, see the <a href="publications.html">publications
-                                list</a>.
-                        </p>
-
-                        <h2>
-                            Mailing list
-                        </h2>
-                        <p>
-                            If you use ermineJ, we urge you to subscribe to the <a
-                                href="http://perutz.cmmt.ubc.ca/mailman/bioinformatics.ubc.ca/listinfo/ermineJ-announce">ermineJ
-                                users mailing list</a>. This serves two purposes. First, it will allow you to
-                            automatically receive information on updates to ermineJ. Second, it helps us track how many
-                            people use ermineJ. This is especially important when we try to obtain support for ermineJ
-                            development.
-                        </p>
-                        <hr>
-                </td>
+                <td><a href="index.html">Home</a></td>
+                <td>&nbsp;&nbsp;</td>
+                <td><a href="downloadInstall.html">Download</a></td>
+                <td>&nbsp;&nbsp;</td>
+                <td><a href="ermineJ-help/classScore/html/">Help</a></td>
+                <td>&nbsp;&nbsp;</td>
+                <td><a href="publications.html">Pubs</a></td>
+                <td>&nbsp;&nbsp;</td>
+                <td><a href="screenshots.html">Screens</a></td>
+                <td>&nbsp;&nbsp;</td>
+                <td><a href="versions.html">Versions</a></td>
+                <td>&nbsp;&nbsp;</td>
+                <td><a href="contact.html">Contact</a></td>
             </tr>
         </table>
-    </body>
+
+        </td>
+    </tr>
+    <tr>
+        <td width="72"><!-- Left gutter space --><img height="1" alt=""
+            src="/images/shim.gif" width="30" border="0"></td>
+
+        <td valign="top" width="687">
+
+        <h2>Overview</h2>
+
+        <p>ErmineJ performs analyses of <b>gene sets</b> in <b>expression
+        microarray data</b>. A typical goal is to determine whether
+        particular biological pathways are "doing something interesting"
+        in the data. The software is designed to be used by biologists
+        with little or no informatics background. A command-line
+        interface is available for users who wish to script the use of
+        ermineJ.</p>
+
+        <p>ErmineJ can be <strong><a href="downloadInstall.html">downloaded
+        here</a></strong>.</p>
+
+        <p>Major features include:</p>
+
+        <ul>
+            <li>Implementation of multiple methods for gene set
+            analysis:
+
+            <ul>
+                <li><A
+                    href="ermineJ-help/classScore/html/tutorial/ora.html">Over-representation
+                analysis</A>
+                <li><A
+                    href="ermineJ-help/classScore/html/tutorial/resampling.html">A
+                resampling-based method that uses gene scores</A>
+                <li><a
+                    href="ermineJ-help/classScore/html/tutorial/roc.html">A
+                rank-based method that uses gene scores</a></li>
+                <li>A resampling-based method that uses <a
+                    href="ermineJ-help/classScore/html/tutorial/correlation.html">correlation
+                between gene expression profiles</a> (a type of
+                "cluster-enrichment" analysis).</li>
+            </ul>
+            <li>Gene sets receive statistical scores (p-values), and <a
+                href="ermineJ-help/classScore/html/tutorial/mtc.html">multiple
+            test correction</a> is supported.</li>
+            <li>Support of the Gene Ontology terminology; users can
+            choose which aspects to analyze.</li>
+            <li>User files use <A
+                href="ermineJ-help/classScore/html/formats/go.html">simple
+            text formats</A>.
+            <li>Users can <A
+                href="ermineJ-help/classScore/html/tutorial/classes.html">modify
+            gene sets or create new ones</A>.
+            <li>The results can be <a
+                href="ermineJ-help/classScore/html/tutorial/visualize.html">visualized
+            within the software</a>.
+            <li>It is simple to compare multiple analyses of the same
+            data set with different settings.</li>
+            <li><a
+                href="ermineJ-help/classScore/html/tutorial/setgeneurl.html">User-definable
+            hyperlinks</a> are provided to external sites to allow more
+            efficient browsing of the results.</li>
+            <li>For programmers, there is a <a
+                href="ermineJ-help/classScore/html/tutorial/cli.html">command
+            line interface</a> as well as a <a
+                href="ermineJ-help/classScore/html/tutorial/Api.html">simple
+            application programming interface</a> that can be used to
+            plug ermineJ functionality into your own code</li>
+        </ul>
+
+        <p><A href="ermineJ-help/classScore/html/license.html">License
+        information</A> - ermineJ is free software.</p>
+
+        <p>There are some <A href="screenshots.html">screen shots</A>
+        available, and more information is available in the <a
+            href="ermineJ-help/classScore/html">manual</a>.</p>
+
+        <h2>News</h2>
+
+        <p>Version 2.1.9 - (Feb 7 2006) This is a bugfix release, the most serious of which were bugs causing 
+        the software to ignore the choice of GO aspect when running ROC analysis (all GO aspects were always used), 
+        and problems loading analyses from disk when the raw data file was not set. We recommend all users upgrade.</p>
+
+        <p>For details of changes, see the <A href="versions.html">full
+        version history</A></p>
+        
+        <p><a href="oldnews.html">Old news</a></p>
+
+        <h2>Documentation</h2>
+
+        <p>The software comes with on-line help. The manual is also <a
+            href="ermineJ-help/classScore/html">available online</a>
+        (webstart users will have to use this option for now) or as a <A
+            href="ermineJ-help/ermineJ-2.1-manual.pdf">PDF</A>.
+        If you are having problems with the software please read the <a
+            href="ermineJ-help/classScore/html/faq.html">FAQ</a>. If
+        your question isn't answered in the FAQ or in the manual, feel
+        free to <A href="contact.html">contact us</A></p>
+
+        <p>For more details about ermineJ and how it is used, see the <a
+            href="publications.html">publications list</a>.</p>
+
+        <h2>Mailing list</h2>
+        <p>If you use ermineJ, we urge you to subscribe to the <a
+            href="http://perutz.cmmt.ubc.ca/mailman/bioinformatics.ubc.ca/listinfo/ermineJ-announce">ermineJ
+        users mailing list</a>. This serves two purposes. First, it will
+        allow you to automatically receive information on updates to
+        ermineJ. Second, it helps us track how many people use ermineJ.
+        This is especially important when we try to obtain support for
+        ermineJ development.</p>
+        <hr>
+
+
+        </td>
+    </tr>
+</table>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">_uacct = "UA-255601-1";urchinTracker();</script></body>
 </html>
