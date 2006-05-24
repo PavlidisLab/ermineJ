@@ -1,111 +1,165 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-<head>
-<meta name="generator" content="HTML Tidy, see www.w3.org">
+    <head>
+        <meta name="generator" content="HTML Tidy, see www.w3.org">
 
-<title>Annotation file format</title>
-<link href="../style.css" rel="stylesheet" type="text/css" media="all">
-</head>
+        <title>Annotation file format</title>
+        <link href="../style.css" rel="stylesheet" type="text/css" media="all">
+    </head>
 
-<body bgcolor="#ffffff">
-<img height="112" alt="ermineJ logo" src="../images/logo1small.gif"
-	width="266" border="0">
-<h1>File information: gene annotations</h1>
+    <body bgcolor="#ffffff">
+        <img height="112" alt="ermineJ logo" src="../images/logo1small.gif" width="266" border="0">
+        <h1>
+            File information: gene annotations
+        </h1>
 
-<p>You can use two types of annotation files, ones we provide on our web
-site, or ones provided by Affymetrix for their microarray platforms.
-Requests for support of other formats will gladly be entertained. You
-can also use files you have created, so long as they follow one of the
-accepted formats.</p>
+        <p>
+            You can use two types of annotation files, ones we provide on our web site, or ones provided by Affymetrix
+            or <a href="http://www.chem.agilent.com/scripts/generic.asp?lpage=5175&amp;indcol=N&amp;prodcol=Y">Agilent</a>
+            for their microarray platforms. Requests for support of other formats will gladly be entertained. You can
+            also use files you have created, so long as they follow one of the accepted formats.
+        </p>
 
-<p>You inform ermineJ of which format you are using with the pull-down
-menu used at startup.</p>
+        <p>
+            You inform ermineJ of which format you are using with the pull-down menu used at startup.
+        </p>
 
-<p>As of version 2.1, the files can be gzipped or zipped. There is no
-need to unpack them.</p>
+        <p>
+            As of version 2.1, the files can be gzipped or zipped. There is no need to unpack them.
+        </p>
 
-<h2>Using files we provide</h2>
+        <h2>
+            Using files we provide
+        </h2>
 
-<p>In ermineJ, we refer to these as "ermineJ format", but the files are
-very simple and useful in other contexts</p>
+        <p>
+            In ermineJ, we refer to these as "ermineJ format", but the files are very simple and useful in other
+            contexts
+        </p>
 
-<p>You can <a href="http://microarray.genomecenter.columbia.edu/annots/">download
-annotation files here</a> (http://microarray.cpmc.columbia.edu/annots/).
-<strong>Note:</strong> For ermineJ, we recommend using the annotation
-files that have "No parents" (parent terms are not listed explicitly in
-the file). This is because ermineJ rapidly computes parents for each
-term when you load the file. Using the "No parents" versions will result
-in faster startup times for ermineJ.</p>
+        <p>
+            You can <a href="http://microarray.genomecenter.columbia.edu/annots/">download annotation files here</a>
+            (http://microarray.cpmc.columbia.edu/annots/). <strong>Note:</strong> For ermineJ, we recommend using the
+            annotation files that have "No parents" (parent terms are not listed explicitly in the file). This is
+            because ermineJ rapidly computes parents for each term when you load the file. Using the "No parents"
+            versions will result in faster startup times for ermineJ.
+        </p>
 
-<p>We provide annotation files for some popular (and some
-not-so-popular) array formats. These files contain the probe (or probe
-set)&nbsp;identifiers, the gene symbols and names, and gene set
-membership information. For our current annotations, this means that a
-list of the Gene Ontology terms associated with a gene are listed. For
-each term, the 'parent' terms are also listed, so that genes associated
-with very specific terms are also included in the less specific
-categories.</p>
+        <p>
+            We provide annotation files for some popular (and some not-so-popular) array formats. These files contain
+            the probe (or probe set)&nbsp;identifiers, the gene symbols and names, and gene set membership information.
+            For our current annotations, this means that a list of the Gene Ontology terms associated with a gene are
+            listed. For each term, the 'parent' terms are also listed, so that genes associated with very specific terms
+            are also included in the less specific categories.
+        </p>
 
-<p>For species or platforms we don't support, ask us for assistance or
-set it up yourself. The files are not hard to prepare if you have Gene
-Ontology (or other gene set descriptor) annotations available.</p>
+        <p>
+            For species or platforms we don't support, ask us for assistance or set it up yourself. The files are not
+            hard to prepare if you have Gene Ontology (or other gene set descriptor) annotations available.
+        </p>
 
-<p>For species we support, but for new platforms, often you will be able
-to create a new annotation file by pulling information out of our
-existing files using a simple Perl script.</p>
+        <p>
+            For species we support, but for new platforms, often you will be able to create a new annotation file by
+            pulling information out of our existing files using a simple Perl script.
+        </p>
 
-<h3>Description of the format</h3>
+        <h3>
+            Description of the format
+        </h3>
 
-<ul>
-<li>The file is tab-delimited text. Comma-delimited files or Excel spreadsheets (for example) are not supported.</li>
-<li>There is a one-line header included in the file for readability.</li>
-<li>The first column contains the probe identifier. The probe IDs must exactly match the ones you provide in your Gene
-    score file. Any probes not having an entry will be ignored.</li>
-  <li>The second column contains a gene symbol. This should not be blank. If the gene name is not known, 
-  a sequence identifier or arbitrary code can be used instead.</li>
-  <li>The third column contains the gene name (or description). This can be blank.</li>
-  <li>The fourth column contains a delimited list of GO identifiers. These include the "GO:" prefix. Thus they
-  read "GO:00494494" and not "494494". The ids within this field can be delimited by spaces, commas, or pipe ('|') symbols.</li>
-</ul>
+        <ul>
+            <li>
+                The file is tab-delimited text. Comma-delimited files or Excel spreadsheets (for example) are not
+                supported.
+            </li>
+            <li>
+                There is a one-line header included in the file for readability.
+            </li>
+            <li>
+                The first column contains the probe identifier. The probe IDs must exactly match the ones you provide in
+                your Gene score file. Any probes not having an entry will be ignored.
+            </li>
+            <li>
+                The second column contains a gene symbol. This should not be blank. If the gene name is not known, a
+                sequence identifier or arbitrary code can be used instead.
+            </li>
+            <li>
+                The third column contains the gene name (or description). This can be blank.
+            </li>
+            <li>
+                The fourth column contains a delimited list of GO identifiers. These include the "GO:" prefix. Thus they
+                read "GO:00494494" and not "494494". The ids within this field can be delimited by spaces, commas, or
+                pipe ('|') symbols.
+            </li>
+        </ul>
 
-<H2>Using files you create</H2>
-<P>Annotation files that you created can be used so long as they adhere
-to one of the accepted formats. There are a few things to consider:</P>
-<UL>
-    <LI>The probe IDs must exactly match the ones you provide in your Gene
-    score file. Any probes not having an entry will be ignored.</LI>
-    <LI>The gene symbols are used internally by the software to decide
-    which genes are present on the array more than once. Therefore, if two
-    probes refer to the same gene, make sure the symbol you use is the same
-    for both probes. (It doesn't matter what the symbol is).</LI>
-    <LI>The gene names or descriptions are optional, and blank values will
-    just show up as "No description" or something similar.</LI>
-    <LI>In the ermineJ format, the GO ids must be in "long" format (with
-    the GO: prefix). The GO terms themselves should be omitted. The parents
-    of all terms listed are automatically included in the analysis (subject
-    to other constraints such as the maximum Gene Set size you set in the
-    analysis), so there is no need to list these explicitly.</LI>
-</UL>
+        <H2>
+            Using files you create
+        </H2>
+        <P>
+            Annotation files that you created can be used so long as they adhere to one of the accepted formats. There
+            are a few things to consider:
+        </P>
+        <UL>
+            <LI>
+                The probe IDs must exactly match the ones you provide in your Gene score file. Any probes not having an
+                entry will be ignored.
+            </LI>
+            <LI>
+                The gene symbols are used internally by the software to decide which genes are present on the array more
+                than once. Therefore, if two probes refer to the same gene, make sure the symbol you use is the same for
+                both probes. (It doesn't matter what the symbol is).
+            </LI>
+            <LI>
+                The gene names or descriptions are optional, and blank values will just show up as "No description" or
+                something similar.
+            </LI>
+            <LI>
+                In the ermineJ format, the GO ids must be in "long" format (with the GO: prefix). The GO terms
+                themselves should be omitted. The parents of all terms listed are automatically included in the analysis
+                (subject to other constraints such as the maximum Gene Set size you set in the analysis), so there is no
+                need to list these explicitly.
+            </LI>
+        </UL>
 
-<h2>Using files from the Affymetrix web site</h2>
+        <h2>
+            Using files from the Affymetrix web site
+        </h2>
 
-<p>Obviously this only helps you if you are using an <a
-	href="http://www.affymetrix.com">Affymetrix GeneChip</a>. (The writers
-of ermineJ are not affiliated with Affymetrix in any way).</p>
+        <p>
+            Obviously this only helps you if you are using an <a href="http://www.affymetrix.com">Affymetrix GeneChip</a>.
+            (The writers of ermineJ are not affiliated with Affymetrix in any way).
+        </p>
 
-<p>The files we tested our software on were obtained from the Affymetrix
-site and are in CSV (comma-separated value) format. As of May 2005
-ermineJ worked with these files, but if Affymetrix changes the format
-(they have in the past) it is possible that they will no longer work
-with ermineJ.</p>
+        <p>
+            The files we tested our software on were obtained from the Affymetrix site and are in CSV (comma-separated
+            value) format. As of May 2005 ermineJ worked with these files, but if Affymetrix changes the format (they
+            have in the past) it is possible that they will no longer work with ermineJ.
+        </p>
 
-<p>To use this, select the "Affy CSV" option on the <a
-	href="../tutorial/starting.html">startup dialog</a>.</p>
+        <p>
+            To use this, select the "Affy CSV" option on the <a href="starting.html">startup dialog</a>.
+        </p>
+
+        <h2>
+            Using file from the Agilent web site
+        </h2>
+        <p>
+            Similar to the Affymetrix files, ermineJ supports the use of annotation files from Agilent. These must be
+            the text-formatted files downloaded from <a
+                href="http://www.chem.agilent.com/scripts/generic.asp?lpage=5175&amp;indcol=N&amp;prodcol=Y">http://www.chem.agilent.com/scripts/generic.asp?lpage=5175&amp;indcol=N&amp;prodcol=Y</a>,
+            which at this writing is titled "DNA Oligo Microarray Gene List and Annotations". If you have trouble
+            locating the file for your microarray contact your Agilent technical support representative as we have no
+            control over the availability of these files.
+        </p>
 
 
-<hr>
+        <hr>
 
-<div class="tidy">Copyright 2004-2005 &copy; Columbia University</div>
-<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">_uacct = "UA-255601-1";urchinTracker();</script></body>
+        <div class="tidy">
+            Copyright 2004-2005 &copy; University of British Columbia
+        </div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">_uacct = "UA-255601-1";urchinTracker();</script>
+ </body>
 </html>

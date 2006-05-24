@@ -39,9 +39,6 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
 
 /**
  * Basically a wrapper around a Commons Configuration object.
- * <hr>
- * <p>
- * Copyright (c) 2004 Columbia University
  * 
  * @author Paul Pavlidis (total rewrite)
  * @author Kiran Keshav
@@ -436,6 +433,8 @@ public class Settings {
     public void setAnnotFormat( String arg ) {
         if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) {
             this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.AFFYCSV ) );
+        } else if ( arg.equalsIgnoreCase( "agilent" ) ) {
+            this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.AGILENT ) );
         } else {
             this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.DEFAULT ) );
         }

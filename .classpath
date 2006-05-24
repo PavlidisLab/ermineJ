@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
+	<classpathentry output="testclasses" kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry sourcepath="/MAVEN_REPO/commons-configuration/commons-configuration-1.1/src/java" kind="var" path="MAVEN_REPO/commons-configuration/jars/commons-configuration-1.1.jar">
 		<attributes>
@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="ermineJ-help.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/log4j/jars/log4j-1.2.8.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/commons-collections/commons-collections-3.1/commons-collections-3.1.jar"/>
-	<classpathentry kind="var" path="MAVEN_REPO/commons-lang/commons-lang-2.0/commons-lang-2.0.jar"/>
+	<classpathentry kind="var" path="MAVEN_REPO/commons-lang/jars/commons-lang-2.1.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/junit/jars/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/jfreechart/jars/jfreechart-0.9.20.jar"/>
 	<classpathentry kind="var" path="MAVEN_REPO/jgraph/jars/jgraph-3.1-java1.4.jar"/>

@@ -81,9 +81,12 @@ public class StartupDialog extends AppDialog {
         annotFormat.setEditable( false );
         annotFormat.addItem( "ErmineJ" );
         annotFormat.addItem( "Affy CSV" );
+        annotFormat.addItem( "Agilent" );
 
         if ( settings.getAnnotFormat() == GeneAnnotations.AFFYCSV ) {
             annotFormat.setSelectedItem( "Affy CSV" );
+        } else if ( settings.getAnnotFormat() == GeneAnnotations.AGILENT ) {
+            annotFormat.setSelectedItem( "Agilent" );
         } else {
             annotFormat.setSelectedItem( "ErmineJ" );
         }

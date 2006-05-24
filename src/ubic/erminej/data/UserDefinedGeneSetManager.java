@@ -49,9 +49,6 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
 
 /**
- * <hr>
- * <p>
- * Copyright (c) 2006 University of British Columbia
  * 
  * @author Homin K Lee
  * @author Paul Pavlidis
@@ -212,13 +209,14 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Add a user-defined gene set to the GeneData. The format is:
+     * Add user-defined gene set(s) to the GeneData. The format is:
      * <ol>
      * <li>The type of gene set {gene|probe}
      * <li>The identifier for the gene set, e.g, "My gene set"
      * <li>The description for the gene set, e.g, "Genes I like"
      * <li>Any number of rows containing gene or probe identifiers.
      * </ol>
+     * 
      * <p>
      * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
      * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
