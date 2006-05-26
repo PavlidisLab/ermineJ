@@ -25,6 +25,7 @@ import gnu.getopt.LongOpt;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.UserDefinedGeneSetManager;
 
 /**
  * Main for command line
@@ -454,6 +456,11 @@ public class classScoreCMD {
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
         }
+
+        // need to load user-defined sets.
+        UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
+        Collection userOverwrittenGeneSets = loader.loadUserGeneSets( this.goData, this.statusMessenger );
+
         statusMessenger.showStatus( "Done with initialization." );
     }
 
