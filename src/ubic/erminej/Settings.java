@@ -132,11 +132,17 @@ public class Settings {
     public Settings( boolean readFromFile ) throws IOException {
         if ( readFromFile ) {
             initConfig();
-            createDataDirectory();
-            createCustomGeneSetDirectory();
+            //createDataDirectory();
+            //createCustomGeneSetDirectory();
         } else {
             this.config = new PropertiesConfiguration();
         }
+    }
+    
+    
+    public void setDirectories() throws IOException{
+        createDataDirectory();
+        createCustomGeneSetDirectory();
     }
 
     /**
@@ -463,6 +469,10 @@ public class Settings {
         this.config.setProperty( "classFolder", val );
     }
 
+    public String getCustomGeneSetDirectory() {
+        return ( String ) this.config.getProperty( "classFolder" );
+    }
+
     public void setDataDirectory( String val ) {
         this.config.setProperty( DATA_DIRECTORY, val );
     }
@@ -600,6 +610,7 @@ public class Settings {
      * @throws IOException
      */
     public void writeAnalysisSettings( String fileName ) throws IOException {
+        log.debug( "output " + fileName );
         log.debug( "Saving configuration to " + fileName );
         BufferedWriter out = new BufferedWriter( new FileWriter( fileName ) );
         for ( int i = 0; i < ANALYSIS_SETTINGS.length; i++ ) {
@@ -631,19 +642,30 @@ public class Settings {
     /**
      * @throws IOException
      */
-    private void createCustomGeneSetDirectory() {
+    private void createCustomGeneSetDirectory() throws IOException {
 
-        String customGeneSetDirectoryName = new String( this.userHomeDataDirectoryName()
-                + System.getProperty( "file.separator" ) + "genesets" );
+        String customGeneSetDirectoryName = null;
+        if ( getCustomGeneSetDirectory() != null )
+            customGeneSetDirectoryName = getCustomGeneSetDirectory();
+        else
+            customGeneSetDirectoryName = new String( this.userHomeDataDirectoryName() + File.separator + "genesets" );
 
-        if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
-            log.info( "Creating custom gene set directory at " + customGeneSetDirectoryName );
-            if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
-                log.error( "Could not create the custom gene set directory at " + customGeneSetDirectoryName );
-            }
-        }
-        log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
+        // if ( !FileTools.testDir( customGeneSetDirectoryName ) ) {
+        // log.info( "Creating " + customGeneSetDirectoryName );
+        //
+        // File customGeneSetDirectoryFile = new File( customGeneSetDirectoryName );
+        //
+        // if ( !customGeneSetDirectoryFile.exists() ) {
+        // log.debug( "does not exist" );
+        // if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
+        // throw new IOException( "Could not create a data directory at " + customGeneSetDirectoryName );
+        //                }
+        //            }
+        //        }
+
         this.setCustomGeneSetDirectory( customGeneSetDirectoryName );
+        log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
+
     }
 
     /**

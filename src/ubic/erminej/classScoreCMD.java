@@ -23,6 +23,7 @@ package ubic.erminej;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,16 +34,17 @@ import java.util.Set;
 import javax.swing.UIManager;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
-
-import ubic.basecode.util.FileTools;
-import ubic.basecode.util.StatusStderr;
-import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
 import ubic.basecode.io.reader.DoubleMatrixReader;
+import ubic.basecode.util.FileTools;
+import ubic.basecode.util.StatusStderr;
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.data.GeneScores;
 
 /**
@@ -56,6 +58,7 @@ import ubic.erminej.data.GeneScores;
  */
 
 public class classScoreCMD {
+    private static Log log = LogFactory.getLog( classScoreCMD.class );
 
     protected Settings settings;
     protected StatusViewer statusMessenger;
@@ -78,6 +81,7 @@ public class classScoreCMD {
     public classScoreCMD( String[] args ) throws IOException {
         this();
         options( args );
+        settings.setDirectories();
         if ( commandline ) {
             initialize();
             try {
@@ -176,12 +180,10 @@ public class classScoreCMD {
                     break;
                 case 'f': // classfolder
                     arg = g.getOptarg();
-                    if ( FileTools.testDir( arg ) )
-                        settings.setCustomGeneSetDirectory( arg );
-                    else {
-                        System.err.println( "Invalid path for class folder (-f " + arg + ")" );
-                        showHelp();
-                    }
+                    if ( !FileTools.testDir( arg ) ) new File( arg ).mkdir();
+
+                    settings.setCustomGeneSetDirectory( arg );
+                    log.debug( settings.getCustomGeneSetDirectory() );
                     break;
                 case 'g': // gene rep treatment
                     arg = g.getOptarg();
