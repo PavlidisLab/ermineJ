@@ -1,8 +1,8 @@
 NOTE:
 On your pc you need to install the following with the following directories.
-nsis and javahelp.  install javahelp in ${JAVA_HOME}
+nsis and javahelp.  install javahelp
 define the following in your ${HOME}/build.properties:
-java.javahelp.jhindexer="${JAVA_HOME}/jh2.0/javahelp/bin/jhindexer.bat"
+java.javahelp.jhindexer="${JAVAHELP_HOME}/bin/jhindexer.bat"
 nsis.exe="${NSIS_HOME}/makensis.exe"
 
 NOTE:
@@ -25,7 +25,7 @@ maven nsis-jre
 
 // scp the above files, which will be target/ermineJ-setup.exe and target/ermineJ-setup-jre.exe onto microarray in /proj/projectpages/ermineJ/distributions
 
-LINUX (on host where you have maven -- ie. pavlidis2):
+LINUX (on host where you have maven -- ie. benzer):
 
 (in baseCode)
 cvs update
@@ -35,7 +35,7 @@ maven jar:install
 cvs update
 maven jar
 // To make the help jar:
-maven help
+maven help (This will fail if you have not generated the keystore.  See maven jnlp:generate-keystore below)
 
 // to make generic distribution for installation
 maven build-install
@@ -59,7 +59,6 @@ scp target/jnlp/*.jar benzer:/disk2/WWW/proj/projectpages/ermineJ/webstart
 scp target/distributions/* benzer:/disk2/WWW/proj/projectpages/ermineJ/distributions
 
 scp -r web/* benzer:/disk2/WWW/proj/projectpages/ermineJ
-
 
 // to set up the distribution use build-install and then
 
