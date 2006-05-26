@@ -1,0 +1,7 @@
+probe
+GO:0000146
+microfilament motor activity
+32933_r_at
+33816_at
+41187_at
+33197_at
