@@ -100,6 +100,11 @@ public class ResultsPrinter {
             return;
         }
 
+        if ( sortedclasses == null ) {
+            log.warn( "No genes sets" );
+            return;
+        }
+
         BufferedWriter out;
         if ( destFile == null ) {
             out = new BufferedWriter( new PrintWriter( System.out ) );

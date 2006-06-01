@@ -51,14 +51,10 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
 
 /**
  * Main for command line
- * <p>
- * Copyright (c) 2003 Columbia University
- * </p>
  * 
  * @author Paul Pavlidis
  * @version $Id$
  */
-
 public class classScoreCMD {
     private static Log log = LogFactory.getLog( classScoreCMD.class );
 

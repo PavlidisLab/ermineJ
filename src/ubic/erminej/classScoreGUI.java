@@ -36,7 +36,6 @@ import ubic.erminej.gui.StartupDialog;
  * @author Paul Pavlidis
  * @version $Id$
  */
-
 public class classScoreGUI {
     private static Log log = LogFactory.getLog( classScoreGUI.class.getName() );
     boolean packFrame = false;

@@ -46,7 +46,6 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
  * @author Will Braynen
  * @version $Id$
  */
-
 public class Settings {
     public static final int BENJAMINIHOCHBERG = 2;
 
