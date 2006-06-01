@@ -116,7 +116,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         double oldmean = Double.MAX_VALUE;
         double oldvar = Double.MAX_VALUE;
 
-        for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
+        for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize && geneSetSize <= numGenes; geneSetSize++ ) {
 
             double[] randomClass = new double[geneSetSize]; // holds data for random class.
             double rawscore = 0.0;
