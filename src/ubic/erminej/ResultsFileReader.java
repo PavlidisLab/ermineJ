@@ -37,7 +37,6 @@ import ubic.erminej.data.GeneSetResult;
  * @author Homin Lee
  * @version $Id$
  */
-
 public class ResultsFileReader {
 
     private Map results;

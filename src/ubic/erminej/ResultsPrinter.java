@@ -39,10 +39,6 @@ import ubic.basecode.bio.geneset.GeneSetMapTools;
 import ubic.erminej.data.GeneSetResult;
 
 /**
- * <hr>
- * <p>
- * Copyright (c) 2004-2005 Columbia University
- * 
  * @author pavlidis
  * @version $Id$
  */
@@ -98,6 +94,11 @@ public class ResultsPrinter {
      * @param sort Sort the results so the best class (by score pvalue) is listed first.
      */
     public void printResults( boolean sort ) throws IOException {
+
+        if ( results == null ) {
+            log.warn( "No results to print" );
+            return;
+        }
 
         BufferedWriter out;
         if ( destFile == null ) {
