@@ -401,8 +401,20 @@ public class Settings {
     }
 
     public String getUserGeneSetDirectory() {
-        return config.getString( "classFolder" );
-
+        String dir = config.getString( "classFolder" );
+        if ( dir == null ) {
+            dir = System.getProperty( "user.dir" );
+            if ( dir == null ) {
+                dir = System.getProperty( "user.home" );
+                if ( dir == null ) {
+                    throw new IllegalStateException( "Could not locate a user-defined gene set directory" );
+                }
+                this.setUserGeneSetDirectory( dir );
+            } else {
+                this.setUserGeneSetDirectory( dir );
+            }
+        }
+        return dir;
     }
 
     /**
@@ -577,6 +589,13 @@ public class Settings {
      */
     public void setUseMolecularFunction( boolean useMolecularFunction ) {
         this.config.setProperty( "useMolecularFunction", new Boolean( useMolecularFunction ) );
+    }
+
+    /**
+     * @param dir The dir to set.
+     */
+    public void setUserGeneSetDirectory( String dir ) {
+        this.config.setProperty( "userGeneSetDirectory", dir );
     }
 
     public String toString() {

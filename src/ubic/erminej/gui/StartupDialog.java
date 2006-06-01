@@ -47,6 +47,8 @@ import ubic.erminej.Settings;
  */
 
 public class StartupDialog extends AppDialog {
+
+    private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
     private static Log log = LogFactory.getLog( StartupDialog.class.getName() );
     JFileChooser chooser;
     JPanel centerPanel = new JPanel();
@@ -137,7 +139,7 @@ public class StartupDialog extends AppDialog {
         if ( settings.getClassFile() == null ) {
             // see if there is a file available.
             String testPath = settings.getDataDirectory() + System.getProperty( "file.separator" )
-                    + "go_daily-termdb.rdf-xml.gz"; // FIXME - move this.
+                    + DEFAULT_GO_TERM_FILE_NAME;
             File testFile = new File( testPath );
             if ( testFile.exists() && testFile.canRead() && testFile.isFile() && testFile.length() > 0 ) {
                 settings.setClassFile( testPath );
@@ -145,7 +147,13 @@ public class StartupDialog extends AppDialog {
         }
         classFileTextField.setText( settings.getClassFile() );
         annotFileTextField.setText( settings.getAnnotFile() );
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        String dataDirectory = settings.getDataDirectory();
+        if ( dataDirectory == null ) {
+            settings.setDataDirectory( System.getProperty( "user.dir" ) );
+            chooser.setCurrentDirectory( new File( System.getProperty( "user.dir" ) ) );
+        } else {
+            chooser.setCurrentDirectory( new File( dataDirectory ) );
+        }
     }
 
     private void saveValues() {

@@ -23,6 +23,9 @@ import java.io.IOException;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import ubic.basecode.gui.GuiUtil;
 import ubic.erminej.gui.GeneSetScoreFrame;
 import ubic.erminej.gui.StartupDialog;
@@ -35,6 +38,7 @@ import ubic.erminej.gui.StartupDialog;
  */
 
 public class classScoreGUI {
+    private static Log log = LogFactory.getLog( classScoreGUI.class.getName() );
     boolean packFrame = false;
 
     public classScoreGUI() throws IOException {
@@ -57,8 +61,8 @@ public class classScoreGUI {
         StartupDialog sdlog = new StartupDialog( frame );
         sdlog.setModal( true );
         sdlog.setResizable( true );
+        log.debug( "Showing startup dialog" );
         sdlog.showDialog();
-
         frame.showStatus( "Starting up..." );
     }
 

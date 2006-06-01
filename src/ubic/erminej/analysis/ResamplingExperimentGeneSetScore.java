@@ -83,7 +83,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      */
     public Histogram generateNullDistribution( StatusViewer m ) {
 
-        int num_genes;
+        int numGenes;
         double[] in_pval;
 
         if ( hist == null ) {
@@ -92,20 +92,24 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
         // do the right thing if we are using weights.
         if ( useWeights ) {
-            num_genes = groupPvals.length;
+            numGenes = groupPvals.length;
             in_pval = groupPvals;
         } else {
-            num_genes = pvals.length;
+            numGenes = pvals.length;
             in_pval = pvals;
         }
 
-        if ( num_genes == 0 ) {
+        if ( numGenes == 0 ) {
             throw new IllegalStateException( "No pvalues!" );
         }
 
+        if ( numGenes < classMinSize ) {
+            throw new IllegalStateException( "Not enough genes to analyze classes of size " + classMinSize );
+        }
+
         // we use this throughout.
-        int[] deck = new int[num_genes];
-        for ( int i = 0; i < num_genes; i++ ) {
+        int[] deck = new int[numGenes];
+        for ( int i = 0; i < numGenes; i++ ) {
             deck[i] = i;
         }
 
@@ -114,13 +118,13 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
         for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
 
-            double[] random_class = new double[geneSetSize]; // holds data for random class.
+            double[] randomClass = new double[geneSetSize]; // holds data for random class.
             double rawscore = 0.0;
             DoubleArrayList values = new DoubleArrayList();
             for ( int k = 0; k < numRuns; k++ ) {
 
-                RandomChooser.chooserandom( random_class, in_pval, deck, num_genes, geneSetSize );
-                rawscore = computeRawScore( random_class, geneSetSize, method );
+                RandomChooser.chooserandom( randomClass, in_pval, deck, numGenes, geneSetSize );
+                rawscore = computeRawScore( randomClass, geneSetSize, method );
                 values.add( rawscore );
                 hist.update( geneSetSize, rawscore );
                 if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
