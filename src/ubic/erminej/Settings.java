@@ -132,15 +132,14 @@ public class Settings {
     public Settings( boolean readFromFile ) throws IOException {
         if ( readFromFile ) {
             initConfig();
-            //createDataDirectory();
-            //createCustomGeneSetDirectory();
+            // createDataDirectory();
+            // createCustomGeneSetDirectory();
         } else {
             this.config = new PropertiesConfiguration();
         }
     }
-    
-    
-    public void setDirectories() throws IOException{
+
+    public void setDirectories() throws IOException {
         createDataDirectory();
         createCustomGeneSetDirectory();
     }
@@ -659,9 +658,9 @@ public class Settings {
         // log.debug( "does not exist" );
         // if ( !new File( customGeneSetDirectoryName ).mkdir() ) {
         // throw new IOException( "Could not create a data directory at " + customGeneSetDirectoryName );
-        //                }
-        //            }
-        //        }
+        // }
+        // }
+        // }
 
         this.setCustomGeneSetDirectory( customGeneSetDirectoryName );
         log.debug( "Custom gene sets directory is " + customGeneSetDirectoryName );
@@ -701,6 +700,9 @@ public class Settings {
      * 
      */
     private void initConfig() {
+
+        logLocale();
+
         try {
             URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
@@ -741,6 +743,21 @@ public class Settings {
             }
         }
         this.config.setAutoSave( true );
+    }
+
+    /**
+     * 
+     */
+    private void logLocale() {
+        log.info( "System information:" );
+        log.info( "    User country: " + System.getProperty( "user.country" ) );
+        log.info( "    User language: " + System.getProperty( "user.language" ) );
+        log.info( "    User home directory: " + System.getProperty( "user.home" ) );
+        log.info( "    User working directory: " + System.getProperty( "user.dir" ) );
+        log.info( "    Java version: " + System.getProperty( "java.runtime.version" ) );
+        log.info( "    OS arch: " + System.getProperty( "os.arch" ) );
+        log.info( "    OS version: " + System.getProperty( "os.name" ) );
+        log.info( "    File encoding: " + System.getProperty( "file.encoding" ) );
     }
 
     /**
