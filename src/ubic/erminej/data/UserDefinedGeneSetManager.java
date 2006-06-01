@@ -295,11 +295,12 @@ public class UserDefinedGeneSetManager {
             if ( StringUtils.isEmpty( classFile ) ) {
                 continue;
             }
-
+            
+            String classFilePath = null;
             try {
-                classFile = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
-                log.debug( "Loading " + classFile );
-                boolean gotSomeProbes = loadUserGeneSet( classFile );
+                classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
+                log.debug( "Loading " + classFilePath );
+                boolean gotSomeProbes = loadUserGeneSet( classFilePath );
                 if ( gotSomeProbes ) {
                     numLoaded++;
                     log.debug( "Read " + this.probes.size() + " probes for " + getId() + " (" + getDesc() + ")" );
@@ -314,7 +315,7 @@ public class UserDefinedGeneSetManager {
             } catch ( IOException e ) {
                 if ( statusMessenger != null ) {
                     // This error will be shown if there are files that don't fit the format.
-                    statusMessenger.showError( "Could not load user-defined class from " + classFile );
+                    statusMessenger.showError( "Could not load user-defined class from " + classFilePath );
                 }
             }
         }
