@@ -38,6 +38,7 @@ import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,7 +50,6 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
 
 /**
- * 
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @version $Id$
@@ -216,7 +216,6 @@ public class UserDefinedGeneSetManager {
      * <li>The description for the gene set, e.g, "Genes I like"
      * <li>Any number of rows containing gene or probe identifiers.
      * </ol>
-     * 
      * <p>
      * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
      * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
@@ -281,37 +280,47 @@ public class UserDefinedGeneSetManager {
      */
     public Collection loadUserGeneSets( GONames goData, StatusViewer statusMessenger ) {
         Collection userOverwrittenGeneSets = new HashSet();
-        File dir = new File( settings.getUserGeneSetDirectory() );
-        if ( dir.exists() ) {
-            String[] classFiles = dir.list();
-            int numLoaded = 0;
-            for ( int i = 0; i < classFiles.length; i++ ) {
-                String classFile = classFiles[i];
 
-                try {
-                    classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" ) + classFile;
-                    log.debug( "Loading " + classFile );
-                    boolean gotSomeProbes = loadUserGeneSet( classFile );
-                    if ( gotSomeProbes ) {
+        File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
+        if ( userGeneSetDir == null || !userGeneSetDir.exists() ) {
+            statusMessenger.showError( "No user-define gene set directory found, none will be loaded" );
+            return userOverwrittenGeneSets;
+        }
 
-                        numLoaded++;
-                        log.debug( "Read " + this.probes.size() + " probes for " + getId() + " (" + getDesc() + ")" );
-                        if ( isExistingGeneSet( getId() ) ) {
-                            log.debug( "User-defined gene set overriding " + getId() );
-                            modifyGeneSet( goData );
-                            userOverwrittenGeneSets.add( getId() );
-                        } else {
-                            addGeneSet( goData );
-                        }
+        String[] classFiles = userGeneSetDir.list();
+        int numLoaded = 0;
+        for ( int i = 0; i < classFiles.length; i++ ) {
+
+            String classFile = classFiles[i];
+            if ( StringUtils.isEmpty( classFile ) ) {
+                continue;
+            }
+
+            try {
+                classFile = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
+                log.debug( "Loading " + classFile );
+                boolean gotSomeProbes = loadUserGeneSet( classFile );
+                if ( gotSomeProbes ) {
+                    numLoaded++;
+                    log.debug( "Read " + this.probes.size() + " probes for " + getId() + " (" + getDesc() + ")" );
+                    if ( isExistingGeneSet( getId() ) ) {
+                        log.debug( "User-defined gene set overriding " + getId() );
+                        modifyGeneSet( goData );
+                        userOverwrittenGeneSets.add( getId() );
+                    } else {
+                        addGeneSet( goData );
                     }
-                } catch ( IOException e ) {
-                    if ( statusMessenger != null )
-                        statusMessenger.showError( "Could not load user-defined class from " + classFile );
+                }
+            } catch ( IOException e ) {
+                if ( statusMessenger != null ) {
+                    // This error will be shown if there are files that don't fit the format.
+                    statusMessenger.showError( "Could not load user-defined class from " + classFile );
                 }
             }
-            if ( statusMessenger != null )
-                statusMessenger.showStatus( "Successfully loaded " + numLoaded + " customized gene sets." );
         }
+        if ( statusMessenger != null && numLoaded > 0 )
+            statusMessenger.showStatus( "Successfully loaded " + numLoaded + " customized gene sets." );
+
         return userOverwrittenGeneSets;
     }
 
