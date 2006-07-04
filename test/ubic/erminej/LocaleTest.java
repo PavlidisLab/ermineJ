@@ -19,8 +19,6 @@
 package ubic.erminej;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,8 +38,15 @@ import org.apache.commons.logging.LogFactory;
 public class LocaleTest extends TestCase {
     Log log = LogFactory.getLog( this.getClass() );
 
-    public void readFile( InputStream is ) throws IOException, ParseException {
+    /**
+     * @param is
+     * @throws IOException
+     * @throws ParseException
+     */
+    private void readFile( InputStream is ) throws IOException, ParseException {
         NumberFormat numberFormat = NumberFormat.getInstance( Locale.FRANCE );
+
+        log.info( "locale: " + ( Locale.FRANCE        ) );
 
         BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
         br.readLine();// discard header
@@ -53,6 +58,10 @@ public class LocaleTest extends TestCase {
         }
     }
 
+    /**
+     * 
+     *
+     */
     public void testLocale() {
         double num = 100.01;
         Locale locale_us = new Locale( "US" );
@@ -68,16 +77,24 @@ public class LocaleTest extends TestCase {
         log.debug( "Germany: " + fNum_ge );
     }
 
+    /**
+     * A quick test to verify that european formatted numbers are parsed correctly provided the correct Locale is set.
+     * The locale can be determined at runtime by getDefault(), which is determined by the Virtual Machine on startup
+     * based on the host operating system and the user preferences established on that system
+     */
     public void testLocaleParse() {
-        String filename = "c:/java/apps/eclipse_workspace/ermineJ/test/data/test.scores.euro.txt";
-        InputStream is;
+        InputStream is = this.getClass().getResourceAsStream( "/data/test.data.euro.txt" );
+        boolean fail = false;
         try {
-            is = new FileInputStream(
-                    new File( filename ) );
-
             readFile( is );
-        } catch ( Exception e ) {
+        } catch ( IOException e ) {
+            fail = true;
             e.printStackTrace();
+        } catch ( ParseException e ) {
+            fail = true;
+            e.printStackTrace();
+        } finally {
+            assertFalse( fail );
         }
     }
 
