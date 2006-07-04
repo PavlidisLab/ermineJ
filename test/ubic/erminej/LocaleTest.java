@@ -46,7 +46,7 @@ public class LocaleTest extends TestCase {
     private void readFile( InputStream is ) throws IOException, ParseException {
         NumberFormat numberFormat = NumberFormat.getInstance( Locale.FRANCE );
 
-        log.info( "locale: " + ( Locale.FRANCE        ) );
+        log.info( "locale: " + ( Locale.FRANCE           ) );
 
         BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
         br.readLine();// discard header
@@ -75,6 +75,8 @@ public class LocaleTest extends TestCase {
         Locale locale_ge = new Locale( "DE" );
         String fNum_ge = NumberFormat.getNumberInstance( locale_ge ).format( num );
         log.debug( "Germany: " + fNum_ge );
+
+        assertTrue( 1 == 1 );// Nothing to test ... really just to see the different number formats
     }
 
     /**
