@@ -46,7 +46,7 @@ public class LocaleTest extends TestCase {
     private void readFile( InputStream is ) throws IOException, ParseException {
         NumberFormat numberFormat = NumberFormat.getInstance( Locale.FRANCE );
 
-        log.info( "locale: " + ( Locale.FRANCE           ) );
+        log.info( "locale: " + ( Locale.FRANCE             ) );
 
         BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
         br.readLine();// discard header
@@ -63,6 +63,7 @@ public class LocaleTest extends TestCase {
      *
      */
     public void testLocale() {
+        log.debug( "testLocale" );
         double num = 100.01;
         Locale locale_us = new Locale( "US" );
         String fNum_us = NumberFormat.getNumberInstance( locale_us ).format( num );
@@ -85,6 +86,7 @@ public class LocaleTest extends TestCase {
      * based on the host operating system and the user preferences established on that system
      */
     public void testLocaleParse() {
+        log.debug( "testLocaleParse" );
         InputStream is = this.getClass().getResourceAsStream( "/data/test.data.euro.txt" );
         boolean fail = false;
         try {
