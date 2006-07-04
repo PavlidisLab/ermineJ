@@ -83,6 +83,8 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             String className = ( String ) iter.next();
             double pval = cpv.classPvalue( className, group_pval_map, probesToPvals );
+            
+            log.debug("pval: " + pval);
 
             if ( pval >= 0.0 ) {
                 results.put( className, new Double( pval ) );
