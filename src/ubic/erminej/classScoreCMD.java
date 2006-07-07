@@ -110,7 +110,7 @@ public class classScoreCMD {
     }
 
     private void options( String[] args, boolean configged ) {
-        if ( args.length == 0 ) showHelp();
+        if ( args.length == 0 ) showHelpAndExit();
         LongOpt[] longopts = new LongOpt[5];
         longopts[0] = new LongOpt( "help", LongOpt.NO_ARGUMENT, null, 'h' );
         longopts[1] = new LongOpt( "config", LongOpt.REQUIRED_ARGUMENT, null, 'C' );
@@ -130,7 +130,7 @@ public class classScoreCMD {
                         settings.setAnnotFile( arg );
                     else {
                         System.err.println( "Invalid annotation file name (-a " + arg + ")" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'A': // affymetrix format
@@ -145,7 +145,7 @@ public class classScoreCMD {
                         settings.setClassFile( arg );
                     else {
                         System.err.println( "Invalid class file name (-c " + arg + ")" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'd': // datafolder
@@ -154,22 +154,23 @@ public class classScoreCMD {
                         settings.setDataDirectory( arg );
                     else {
                         System.err.println( "Invalid path for data folder (-d " + arg + ")" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'e': // scorecol
                     arg = g.getOptarg();
                     try {
                         intarg = Integer.parseInt( arg );
-                        if ( intarg >= 0 )
+                        if ( intarg >= 2 ) {
                             settings.setScoreCol( intarg );
-                        else {
-                            System.err.println( "Invalid score column (-e " + intarg + ")" );
-                            showHelp();
+                        } else {
+                            System.err
+                                    .println( "Invalid score column (-e " + intarg + "), must be a value 2 or higher" );
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
-                        System.err.println( "Invalid score column (-e " + arg + ")" );
-                        showHelp();
+                        System.err.println( "Invalid score column (-e " + arg + "), must be an integer" );
+                        showHelpAndExit();
                     }
                     break;
                 case 'f': // classfolder
@@ -188,16 +189,16 @@ public class classScoreCMD {
                         else {
                             System.err.println( "Gene rep treatment must be either "
                                     + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "Gene rep treatment must be either "
                                 + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'h': // iterations
-                    showHelp();
+                    showHelpAndExit();
                     break;
                 case 'i': // iterations
                     arg = g.getOptarg();
@@ -207,11 +208,11 @@ public class classScoreCMD {
                             settings.setIterations( intarg );
                         else {
                             System.err.println( "Iterations must be greater than 0 (-i)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "Iterations must be greater than 0 (-i)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'j': // save all genes
@@ -227,11 +228,11 @@ public class classScoreCMD {
                             settings.setDoLog( true );
                         else {
                             System.err.println( "Do Log must be set to 0 (false) or 1 (true) (-l)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "Do Log must be set to 0 (false) or 1 (true) (-l)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'm': // rawscoremethod
@@ -242,7 +243,7 @@ public class classScoreCMD {
                     else {
                         System.err.println( "Raw score method must be set to 0 (MEAN_METHOD), "
                                 + "1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD) (-m)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'n': // analysis method
@@ -254,12 +255,12 @@ public class classScoreCMD {
                         else {
                             System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
                                     + "2 (CORR), or 3 (ROC) (-n)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
                                 + "2 (CORR), or 3 (ROC) (-n)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
 
                     break;
@@ -275,11 +276,11 @@ public class classScoreCMD {
                             settings.setQuantile( intarg );
                         else {
                             System.err.println( "Quantile must be between 0 and 100 (-q)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "Quantile must be between 0 and 100 (-q)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
 
                     break;
@@ -289,7 +290,7 @@ public class classScoreCMD {
                         settings.setRawFile( arg );
                     else {
                         System.err.println( "Invalid raw file name (-r " + arg + ")" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 's': // scorefile
@@ -298,7 +299,7 @@ public class classScoreCMD {
                         settings.setScoreFile( arg );
                     else {
                         System.err.println( "Invalid score file name (-s " + arg + ")" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 't': // pval threshold
@@ -309,11 +310,11 @@ public class classScoreCMD {
                             settings.setPValThreshold( doublearg );
                         else {
                             System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'x': // max class size
@@ -324,11 +325,11 @@ public class classScoreCMD {
                             settings.setMaxClassSize( intarg );
                         else {
                             System.err.println( "The maximum class size must be greater than 1 (-x)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "The maximum class size must be greater than 1 (-x)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'y': // min class size
@@ -339,11 +340,11 @@ public class classScoreCMD {
                             settings.setMinClassSize( intarg );
                         else {
                             System.err.println( "The minimum class size must be greater than 0 (-y)" );
-                            showHelp();
+                            showHelpAndExit();
                         }
                     } catch ( NumberFormatException e ) {
                         System.err.println( "The minimum class size must be greater than 0 (-y)" );
-                        showHelp();
+                        showHelpAndExit();
                     }
                     break;
                 case 'C': // configfile
@@ -360,7 +361,7 @@ public class classScoreCMD {
                         }
 
                         System.err.println( "Invalid config file name (-C " + arg + ")" );
-                        showHelp();
+                        showHelpAndExit();
 
                     }
                     break;
@@ -378,9 +379,9 @@ public class classScoreCMD {
                     settings.setPrefFile( arg );
                     break;
                 case '?':
-                    showHelp();
+                    showHelpAndExit();
                 default:
-                    showHelp();
+                    showHelpAndExit();
             }
         }
         // try {
@@ -390,14 +391,14 @@ public class classScoreCMD {
         // }
     }
 
-    private void showHelp() {
+    private void showHelpAndExit() {
         System.out.print( "OPTIONS\n" + "\tThe following options are supported:\n\n"
                 + "\t-a file ...\n\t\tSets the annotation file to be used [required].\n\n"
                 + "\t-A ...\n\t\tAnnotation file is in Affymetrix format.\n\n"
                 + "\t-c file ...\n\t\tSets the class file to be used (e.g., go_200406-termdb.xml) [required] \n\n"
                 + "\t-d dir ...\n\t\tSets the data folder to be used.\n\n"
-                + "\t-e int ...\n\t\tSets the column in the score file to be used for scores.\n\n" + "\t-f die ...\n"
-                + "\t\tSets the class folder to be used.\n\n"
+                + "\t-e int ...\n\t\tSets the column in the score file to be used for scores (default = 2).\n\n"
+                + "\t-f die ...\n" + "\t\tSets the class folder to be used.\n\n"
                 + "\t-g int ...\n\t\tSets the gene replicant treatment:  " + Settings.BEST_PVAL
                 + " (best gene score used) or  " + Settings.MEAN_PVAL + " (mean gene score used).\n\n"
                 + "\t-b Sets 'big is better' option for gene scores (default is " + settings.getBigIsBetter()

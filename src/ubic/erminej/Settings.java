@@ -554,6 +554,7 @@ public class Settings {
     }
 
     public void setScoreCol( int val ) {
+        log.debug( "Setting score columns to " + val );
         this.config.setProperty( SCORE_COL, new Integer( val ) );
     }
 
