@@ -48,8 +48,9 @@ import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 
 /**
- * @uathor Paul Pavlidis
+ * @author Paul Pavlidis
  * @author keshav
+ * @version $Id$
  */
 public class classScoreCMD {
     private static Log log = LogFactory.getLog( classScoreCMD.class );
