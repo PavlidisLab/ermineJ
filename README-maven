@@ -55,13 +55,13 @@ version current.
 
 // deploy the builds to the web site (must be able to ssh to the site)
 
-scp target/jnlp/*.jar benzer:/disk2/WWW/proj/projectpages/ermineJ/webstart
-scp target/distributions/* benzer:/disk2/WWW/proj/projectpages/ermineJ/distributions
+scp target/jnlp/*.jar benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/webstart
+scp target/distributions/* benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/distributions
 
 scp -r web/* benzer:/disk2/WWW/proj/projectpages/ermineJ
 
 // to set up the distribution use build-install and then
 
-scp target/*.tar.gz benzer:/disk2/WWW/proj/projectpages/ermineJ/distributions
-scp target/*.zip benzer:/disk2/WWW/proj/projectpages/ermineJ/distributions
+scp target/*.tar.gz benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/distributions
+scp target/*.zip benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/distributions
 
