@@ -119,11 +119,11 @@ public class ResultsPrinter {
                 res = ( GeneSetResult ) results.get( it.next() );
                 if ( first ) {
                     first = false;
-                    res.printHeadings( out, "\tSame as\tSimilar to\tGenes" );
+                    res.printHeadings( out, "\tSame as" + "\tGeneMembers" );
                 }
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-                res.print( out, formatRedundantAndSimilar( res.getGeneSetId() )
-                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) );
+                res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t" +
+                        ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t");
             }
         } else {
             // output them in natural order. This is useful for testing.
@@ -133,10 +133,10 @@ public class ResultsPrinter {
                 res = ( GeneSetResult ) results.get( it.next() );
                 if ( first ) {
                     first = false;
-                    res.printHeadings( out, "\tSame as:\tSimilar to:\tGenes" );
+                    res.printHeadings( out, "\tSame as" + "\tGenesMembers" );
                 }
-                res.print( out, formatRedundantAndSimilar( res.getGeneSetId() )
-                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) );
+                res.print( out,  "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
+                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
             }
         }
@@ -176,7 +176,7 @@ public class ResultsPrinter {
                 return_value = return_value + nextid + "|" + goName.getNameForId( nextid ) + ", ";
             }
         }
-        return_value = return_value + "\t";
+       
         return return_value;
 
     }

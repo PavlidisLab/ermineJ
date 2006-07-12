@@ -84,7 +84,7 @@ public class GeneSetResult implements Comparable {
         DecimalFormat exp = new DecimalFormat( "0.###E00" );
         out.write( "!\t" + class_name + "\t" + class_id + "\t" + size + "\t" + effective_size + "\t"
                 + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
-                + ( pvalue_corr < 10e-3 ? exp.format( pvalue_corr ) : nf.format( pvalue_corr ) ) + "\t" + extracolumns
+                + ( pvalue_corr < 10e-3 ? exp.format( pvalue_corr ) : nf.format( pvalue_corr ) ) + extracolumns
                 + "\n" );
     }
 
@@ -94,7 +94,7 @@ public class GeneSetResult implements Comparable {
 
     public void printHeadings( BufferedWriter out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
-        out.write( "\tName" + "\tID" + "\tProbes" + "\tGenes" + "\tRawScore" + "\tPval" +
+        out.write( "\tName" + "\tID" + "\tProbes" + "\tNumGenes" + "\tRawScore" + "\tPval" +
         // "\tN over pval cut\tORA pval+"
                 /* + "\tAROC" + "\tAROCpval" */
                 "\tCorrectedPvalue" + extracolumns + "\n" );
