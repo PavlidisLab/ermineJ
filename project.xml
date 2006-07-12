@@ -4,7 +4,7 @@
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
     <id>ermineJ</id>
-    <currentVersion>2.1.11-RC2</currentVersion>
+    <currentVersion>2.1.11</currentVersion>
     <organization>
         <name>UBC Bioinformatics Centre</name>
         <url>http://bioinformatics.ubc.ca</url>
@@ -51,6 +51,12 @@
             <id>keshav</id>
             <email>keshav@cu-genome.org</email>
             <organization>Columbia University</organization>
+        </developer>
+        <developer>
+        	<name>Kelsey Hamer</name>
+        	<id>kelsey</id>
+        	<email>krazyklc@gmail.com</email>
+        	<organization>University of British Columbia</organization>
         </developer>
     </developers>
     <licenses>
