@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <pomVersion>3</pomVersion>
+    <artifactId>ermineJ</artifactId>
     <name>ermineJ</name>
     <groupId>ermineJ</groupId>
     <id>ermineJ</id>
-    <currentVersion>2.1.11</currentVersion>
+    <currentVersion>2.1.12</currentVersion>
     <organization>
         <name>UBC Bioinformatics Centre</name>
         <url>http://bioinformatics.ubc.ca</url>
@@ -12,14 +13,12 @@
     </organization>
     <inceptionYear>2004</inceptionYear>
     <logo>src/ubic/ermineJ/gui/resources/logo1small.gif</logo>
-    <description>
-        ErmineJ performs analyses of gene sets in expression microarray data. A typical goal is to
+    <description>ErmineJ performs analyses of gene sets in expression microarray data. A typical goal is to
         determine whether particular biological pathways are "doing something interesting" in the
         data. The software is designed to be used by biologists with little or no informatics
-        background.
-    </description>
-    <shortDescription>Software for gene set analysis.</shortDescription>
-    <url>http://benzer.ubic.ca/ermineJ</url>
+        background.</description>
+    <shortDescription>Software for gene set analysis</shortDescription>
+    <url>http://www.bioinformatics.ubc.ca/ermineJ/</url>
     <siteAddress>benzer</siteAddress>
     <siteDirectory>/disk2/WWW/proj/pavlidis/projectpages/ermineJ</siteDirectory>
     <distributionSite>benzer</distributionSite>
@@ -53,10 +52,10 @@
             <organization>Columbia University</organization>
         </developer>
         <developer>
-        	<name>Kelsey Hamer</name>
-        	<id>kelsey</id>
-        	<email>krazyklc@gmail.com</email>
-        	<organization>University of British Columbia</organization>
+            <name>Kelsey Hamer</name>
+            <id>kelsey</id>
+            <email>krazyklc@gmail.com</email>
+            <organization>University of British Columbia</organization>
         </developer>
     </developers>
     <licenses>
