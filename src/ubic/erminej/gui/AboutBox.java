@@ -55,6 +55,10 @@ import ubic.basecode.gui.JLinkLabel;
  * @version $Id$
  */
 public class AboutBox extends JDialog implements ActionListener {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3482331365640848322L;
     private static Log log = LogFactory.getLog( AboutBox.class.getName() );
     /**
      * 
@@ -164,8 +168,8 @@ public class AboutBox extends JDialog implements ActionListener {
         licensePanel.setMargin( new Insets( 10, 10, 10, 10 ) );
         licensePanel.setContentType( "text/html" );
         licensePanel
-                .setText( "<p>ErmineJ is licensed under the Gnu Public License.</p><p>Direct questions about ermineJ to Paul "
-                        + "Pavlidis: pavlidis@dbmi.columbia.edu.</p><p>If you use this software for your work, please cite: "
+                .setText( "<p>ErmineJ is licensed under the Apache Public License.</p><p>Direct questions about ermineJ to Paul "
+                        + "Kelsey: kelsey@bioinformatics.ubc.ca</p><p>If you use this software for your work, please cite: "
                         // + " Pavlidis, P., "
                         // + "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data"
                         // + " with class scores. Proceedings of the Pacific Symposium on Biocomputing"
