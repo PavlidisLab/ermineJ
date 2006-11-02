@@ -121,7 +121,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
         if ( column < offset ) {
-            return m_matrixDisplay.getColumnName( column );
+            return m_matrixDisplay.getColumnName( column ).toString();
         }
         return m_columnNames[column - offset];
 

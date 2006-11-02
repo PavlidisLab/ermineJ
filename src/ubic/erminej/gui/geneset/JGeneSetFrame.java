@@ -701,7 +701,7 @@ public class JGeneSetFrame extends JFrame {
         // write out column names
         if ( includeMatrixValues ) {
             for ( int c = 0; c < matrixColumnCount; c++ ) {
-                String columnName = matrixDisplay.getColumnName( c );
+                String columnName = matrixDisplay.getColumnName( c ).toString();
                 out.write( "\t" + columnName );
             }
         }

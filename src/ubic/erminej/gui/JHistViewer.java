@@ -65,7 +65,7 @@ public class JHistViewer extends JFrame {
         this.setName( "Histogram viewer" );
         this.setSize( 300, 200 );
         this.makePlot();
-        this.show();
+        this.setVisible( true );
     }
 
     /**
