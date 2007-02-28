@@ -131,6 +131,7 @@ public class GeneScores {
         boolean invalidNumber = false;
         String badNumberString = "";
         int numProbesKept = 0;
+        int numRepeatedProbes = 0;
         Collection unknownProbes = new HashSet();
         for ( int i = 0; i < probes.size(); i++ ) {
             String probe = ( String ) probes.get( i );
@@ -162,11 +163,17 @@ public class GeneScores {
             numProbesKept++;
             probeIDs.add( probe );
             probePvalues.add( new Double( pValue ) );
-            probeToScoreMap.put( probe, new Double( pValue ) );
+            if ( probeToScoreMap.containsKey( probe ) ) {
+                log.warn( "Repeated identifier: " + probe + ", keeping original value." );
+                numRepeatedProbes++;
+            } else {
+                probeToScoreMap.put( probe, new Double( pValue ) );
+            }
             numScores++;
         }
         setUpRawArrays();
-        reportProblems( null, invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept );
+        reportProblems( null, invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept,
+                numRepeatedProbes );
         setUpGeneToScoreMap( settings, geneToProbeMap, null );
     }
 
@@ -180,8 +187,8 @@ public class GeneScores {
      */
     public GeneScores( String filename, Settings settings, StatusViewer messenger, GeneAnnotations geneAnnots )
             throws IOException, IllegalStateException {
-        if (StringUtils.isBlank(filename)) {
-            throw new IllegalArgumentException("Filename for gene scores can't be blank");
+        if ( StringUtils.isBlank( filename ) ) {
+            throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
         }
         this.geneAnnots = geneAnnots;
         this.settings = settings;
@@ -324,6 +331,7 @@ public class GeneScores {
         int scoreColumnIndex = scoreCol - 1;
         int numProbesKept = 0;
         int numUnknownProbes = 0;
+        int numRepeatedProbes = 0;
         Collection unknownProbes = new HashSet();
         dis.readLine(); // skip header.
         while ( ( row = dis.readLine() ) != null ) {
@@ -377,7 +385,13 @@ public class GeneScores {
             numProbesKept++;
             probeIDs.add( probeId );
             probePvalues.add( new Double( pValue ) );
-            probeToScoreMap.put( probeId, new Double( pValue ) );
+
+            if ( probeToScoreMap.containsKey( probeId ) ) {
+                log.warn( "Repeated identifier: " + probeId + ", keeping original value." );
+                numRepeatedProbes++;
+            } else {
+                probeToScoreMap.put( probeId, new Double( pValue ) );
+            }
 
             if ( Thread.currentThread().isInterrupted() ) {
                 dis.close();
@@ -390,7 +404,8 @@ public class GeneScores {
         assert numScores == probeIDs.size();
 
         setUpRawArrays();
-        reportProblems( messenger, invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept );
+        reportProblems( messenger, invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept,
+                numRepeatedProbes );
 
         // check if active probes and probes in the platform are the same.
         for ( Iterator iter = geneAnnots.getProbeToGeneMap().keySet().iterator(); iter.hasNext(); ) {
@@ -416,7 +431,7 @@ public class GeneScores {
      * @param numProbesKept
      */
     private void reportProblems( StatusViewer messenger, boolean invalidLog, Collection unknownProbes,
-            boolean invalidNumber, String badNumberString, int numProbesKept ) {
+            boolean invalidNumber, String badNumberString, int numProbesKept, int numRepeatedProbes ) {
         if ( invalidNumber && messenger != null ) {
 
             messenger.showError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
@@ -445,6 +460,14 @@ public class GeneScores {
             }
 
         }
+        if ( messenger != null && numRepeatedProbes > 0 ) {
+            messenger
+                    .showError( "Warning: "
+                            + unknownProbes.size()
+                            + " identifiers in your gene score file were repeats. Only the first occurrence encountered was kept in each case." );
+            letUserReadMessage();
+        }
+
         if ( numProbesKept == 0 ) {
             throw new IllegalStateException( "None of the probes in the gene score file correspond to probes in the "
                     + "annotation (\".an\") file you selected." );
