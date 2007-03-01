@@ -405,6 +405,11 @@ public class GeneSetScoreFrame extends JFrame {
 
         // end slow part.
 
+        if ( geneData == null || geneData.getGeneSets() == null ) {
+            throw new IllegalArgumentException( "The gene annotation file was not valid. "
+                    + "Check that you have selected the correct format.\n" );
+        }
+
         if ( geneData.getGeneSets().size() == 0 ) {
             throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
                     + "Check that the file format is correct.\n" );

@@ -12,4 +12,5 @@
   File "..\..\target\nsis-build\lib\opencsv.jar"
   File "..\..\target\nsis-build\lib\commons-collections.jar"
   File "..\..\target\nsis-build\lib\log4j.jar"
+  File "..\..\target\nsis-build\lib\commons-cli.jar"
   

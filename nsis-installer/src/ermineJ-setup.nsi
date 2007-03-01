@@ -21,7 +21,7 @@ InstallDir "$PROGRAMFILES\ermineJ"
 InstallDirRegKey HKEY_LOCAL_MACHINE "Software\ermineJ" "Install_Dir"
 
 LicenseText "You must agree to this license before installing."
-LicenseData "license.txt"
+LicenseData "LICENSE.txt"
 
 ;--------------------------------
 

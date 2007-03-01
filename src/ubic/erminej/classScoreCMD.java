@@ -18,12 +18,8 @@
  */
 package ubic.erminej;
 
-import gnu.getopt.Getopt;
-import gnu.getopt.LongOpt;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,6 +28,16 @@ import java.util.Set;
 
 import javax.swing.UIManager;
 
+import org.apache.commons.cli.AlreadySelectedException;
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,11 +54,17 @@ import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 
 /**
+ * Run ermineJ from the command line (or fire up the GUI).
+ * 
  * @author Paul Pavlidis
  * @author keshav
  * @version $Id$
  */
 public class classScoreCMD {
+
+    private static final String HEADER = "Options:";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2007 University of British Columbia.";
+
     private static Log log = LogFactory.getLog( classScoreCMD.class );
 
     protected Settings settings;
@@ -62,369 +74,432 @@ public class classScoreCMD {
     protected Map geneDataSets;
     protected Map rawDataSets;
     protected Map geneScoreSets;
-    private String saveFileName = null;// "C:\\Documents and Settings\\hkl7\\ermineJ.data\\outout.txt";
-    private boolean commandline = true;
+    private String saveFileName = null;
+    private boolean useCommandLineInterface = true;
     private boolean saveAllGenes = false;
+
+    /**
+     * @param command The name of the command as used at the command line.
+     */
+    protected void printHelp( String command ) {
+        HelpFormatter h = new HelpFormatter();
+        h.printHelp( command + " [options]", HEADER, options, FOOTER );
+    }
+
+    protected final void processCommandLine( String commandName, String[] args ) {
+        /* COMMAND LINE PARSER STAGE */
+        BasicParser parser = new BasicParser();
+
+        if ( args == null ) {
+            printHelp( commandName );
+            System.exit( 0 );
+        }
+
+        try {
+            commandLine = parser.parse( options, args );
+        } catch ( ParseException e ) {
+            if ( e instanceof MissingOptionException ) {
+                System.out.println( "Required option(s) were not supplied: " + e.getMessage() );
+            } else if ( e instanceof AlreadySelectedException ) {
+                System.out.println( "The option(s) " + e.getMessage() + " were already selected" );
+            } else if ( e instanceof MissingArgumentException ) {
+                System.out.println( "Missing argument: " + e.getMessage() );
+            } else if ( e instanceof UnrecognizedOptionException ) {
+                System.out.println( "Unrecognized option: " + e.getMessage() );
+            } else {
+                e.printStackTrace();
+            }
+
+            printHelp( commandName );
+
+            System.exit( 0 );
+        }
+
+        /* INTERROGATION STAGE */
+        if ( commandLine.hasOption( 'h' ) ) {
+            printHelp( commandName );
+            System.exit( 0 );
+        }
+
+        processOptions();
+
+    }
 
     public classScoreCMD() throws IOException {
         settings = new Settings();
         rawDataSets = new HashMap();
         geneDataSets = new HashMap();
         geneScoreSets = new HashMap();
-    }
-
-    public classScoreCMD( String[] args ) throws IOException {
-        this();
-        options( args );
-        settings.setDirectories();
-        if ( commandline ) {
-            initialize();
-            try {
-                GeneSetPvalRun result = analyze();
-                settings.writeAnalysisSettings( saveFileName );
-                ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, saveAllGenes );
-                rp.printResults( true );
-            } catch ( Exception e ) {
-                statusMessenger.showStatus( "Error During analysis:" + e );
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            } catch ( Exception e ) {
-                e.printStackTrace();
-            }
-            new classScoreGUI();
-        }
+        this.buildOptions();
     }
 
     public static void main( String[] args ) {
         try {
-            new classScoreCMD( args );
+            classScoreCMD cmd = new classScoreCMD();
+            cmd.processCommandLine( "ermineJ", args );
+            // options( args );
+            cmd.getSettings().setDirectories();
+            if ( cmd.isUseCommandLineInterface() ) {
+                cmd.initialize();
+                try {
+                    GeneSetPvalRun result = cmd.analyze();
+                    cmd.getSettings().writeAnalysisSettings( cmd.getSaveFileName() );
+                    ResultsPrinter rp = new ResultsPrinter( cmd.getSaveFileName(), result, cmd.getGoData(), cmd
+                            .isSaveAllGenes() );
+                    rp.printResults( true );
+                } catch ( Exception e ) {
+                    cmd.getStatusMessenger().showStatus( "Error During analysis:" + e );
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+                }
+                new classScoreGUI();
+            }
         } catch ( IOException e ) {
             e.printStackTrace();
         }
     }
 
-    private void options( String[] args ) {
-        options( args, false );
-    }
+    private Options options = new Options();
 
-    private void options( String[] args, boolean configged ) {
-        if ( args.length == 0 ) showHelpAndExit();
-        LongOpt[] longopts = new LongOpt[5];
-        longopts[0] = new LongOpt( "help", LongOpt.NO_ARGUMENT, null, 'h' );
-        longopts[1] = new LongOpt( "config", LongOpt.REQUIRED_ARGUMENT, null, 'C' );
-        longopts[2] = new LongOpt( "gui", LongOpt.NO_ARGUMENT, null, 'G' );
-        longopts[3] = new LongOpt( "save", LongOpt.NO_ARGUMENT, null, 'S' );
-        longopts[4] = new LongOpt( "mtc", LongOpt.REQUIRED_ARGUMENT, null, 'M' );
-        Getopt g = new Getopt( "classScoreCMD", args, "Aa:bc:d:e:f:g:hi:jl:m:n:o:q:r:s:t:x:y:CGS:M:", longopts );
-        int c;
-        String arg;
-        int intarg;
-        double doublearg;
-        while ( ( c = g.getopt() ) != -1 ) {
-            switch ( c ) {
-                case 'a': // annotfile
-                    arg = g.getOptarg();
-                    if ( FileTools.testFile( arg ) )
-                        settings.setAnnotFile( arg );
-                    else {
-                        System.err.println( "Invalid annotation file name (-a " + arg + ")" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'A': // affymetrix format
-                    settings.setAnnotFormat( "Affy CSV" );
-                    break;
-                case 'b': // bigger is better
-                    settings.setBigIsBetter( true );
-                    break;
-                case 'c': // classfile
-                    arg = g.getOptarg();
-                    if ( FileTools.testFile( arg ) )
-                        settings.setClassFile( arg );
-                    else {
-                        System.err.println( "Invalid class file name (-c " + arg + ")" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'd': // datafolder
-                    arg = g.getOptarg();
-                    if ( FileTools.testDir( arg ) )
-                        settings.setDataDirectory( arg );
-                    else {
-                        System.err.println( "Invalid path for data folder (-d " + arg + ")" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'e': // scorecol
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg >= 2 ) {
-                            settings.setScoreCol( intarg );
-                        } else {
-                            System.err
-                                    .println( "Invalid score column (-e " + intarg + "), must be a value 2 or higher" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "Invalid score column (-e " + arg + "), must be an integer" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'f': // classfolder
-                    arg = g.getOptarg();
-                    if ( !FileTools.testDir( arg ) ) new File( arg ).mkdir();
-
-                    settings.setCustomGeneSetDirectory( arg );
-                    log.debug( settings.getCustomGeneSetDirectory() );
-                    break;
-                case 'g': // gene rep treatment
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg == 1 || intarg == 2 )
-                            settings.setScoreCol( intarg );
-                        else {
-                            System.err.println( "Gene rep treatment must be either "
-                                    + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "Gene rep treatment must be either "
-                                + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'h': // iterations
-                    showHelpAndExit();
-                    break;
-                case 'i': // iterations
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg > 0 )
-                            settings.setIterations( intarg );
-                        else {
-                            System.err.println( "Iterations must be greater than 0 (-i)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "Iterations must be greater than 0 (-i)" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'j': // save all genes
-                    this.saveAllGenes = true;
-                    break;
-                case 'l': // dolog
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg == 0 )
-                            settings.setDoLog( false );
-                        else if ( intarg == 1 )
-                            settings.setDoLog( true );
-                        else {
-                            System.err.println( "Do Log must be set to 0 (false) or 1 (true) (-l)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "Do Log must be set to 0 (false) or 1 (true) (-l)" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'm': // rawscoremethod
-                    arg = g.getOptarg();
-                    intarg = Integer.parseInt( arg );
-                    if ( intarg == 0 || intarg == 1 || intarg == 2 )
-                        settings.setRawScoreMethod( intarg );
-                    else {
-                        System.err.println( "Raw score method must be set to 0 (MEAN_METHOD), "
-                                + "1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD) (-m)" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'n': // analysis method
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg == 0 || intarg == 1 || intarg == 2 || intarg == 3 )
-                            settings.setClassScoreMethod( intarg );
-                        else {
-                            System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
-                                    + "2 (CORR), or 3 (ROC) (-n)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
-                                + "2 (CORR), or 3 (ROC) (-n)" );
-                        showHelpAndExit();
-                    }
-
-                    break;
-                case 'o': // output file
-                    arg = g.getOptarg();
-                    saveFileName = arg;
-                    break;
-                case 'q': // quantile
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg >= 0 && intarg <= 100 )
-                            settings.setQuantile( intarg );
-                        else {
-                            System.err.println( "Quantile must be between 0 and 100 (-q)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "Quantile must be between 0 and 100 (-q)" );
-                        showHelpAndExit();
-                    }
-
-                    break;
-                case 'r': // rawfile
-                    arg = g.getOptarg();
-                    if ( FileTools.testFile( arg ) )
-                        settings.setRawFile( arg );
-                    else {
-                        System.err.println( "Invalid raw file name (-r " + arg + ")" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 's': // scorefile
-                    arg = g.getOptarg();
-                    if ( FileTools.testFile( arg ) )
-                        settings.setScoreFile( arg );
-                    else {
-                        System.err.println( "Invalid score file name (-s " + arg + ")" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 't': // pval threshold
-                    arg = g.getOptarg();
-                    try {
-                        doublearg = Double.parseDouble( arg );
-                        if ( doublearg >= 0 && doublearg <= 1 )
-                            settings.setPValThreshold( doublearg );
-                        else {
-                            System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'x': // max class size
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg > 1 )
-                            settings.setMaxClassSize( intarg );
-                        else {
-                            System.err.println( "The maximum class size must be greater than 1 (-x)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "The maximum class size must be greater than 1 (-x)" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'y': // min class size
-                    arg = g.getOptarg();
-                    try {
-                        intarg = Integer.parseInt( arg );
-                        if ( intarg > 0 )
-                            settings.setMinClassSize( intarg );
-                        else {
-                            System.err.println( "The minimum class size must be greater than 0 (-y)" );
-                            showHelpAndExit();
-                        }
-                    } catch ( NumberFormatException e ) {
-                        System.err.println( "The minimum class size must be greater than 0 (-y)" );
-                        showHelpAndExit();
-                    }
-                    break;
-                case 'C': // configfile
-                    if ( !configged ) {
-                        arg = g.getOptarg();
-                        if ( FileTools.testFile( arg ) ) {
-                            try {
-                                settings = new Settings( arg );
-                            } catch ( ConfigurationException e ) {
-                                e.printStackTrace();
-                            }
-                            options( args, true );
-                            break;
-                        }
-
-                        System.err.println( "Invalid config file name (-C " + arg + ")" );
-                        showHelpAndExit();
-
-                    }
-                    break;
-                case 'M': // multiple test correction
-                    arg = g.getOptarg();
-                    int mtc = Integer.parseInt( arg );
-                    settings.setMtc( mtc );
-                    System.err.println( "Got " + mtc );
-                    break;
-                case 'G': // GUI
-                    commandline = false;
-                    break;
-                case 'S': // save pref file
-                    arg = g.getOptarg();
-                    settings.setPrefFile( arg );
-                    break;
-                case '?':
-                    showHelpAndExit();
-                default:
-                    showHelpAndExit();
-            }
-        }
-        // try {
-        // settings.writePrefs();
-        // } catch ( ConfigurationException ex ) {
-        // System.err.print( "Could not write preferences to a file." );
-        // }
-    }
+    private CommandLine commandLine;
 
     private void showHelpAndExit() {
-        System.out.print( "OPTIONS\n" + "\tThe following options are supported:\n\n"
-                + "\t-a file ...\n\t\tSets the annotation file to be used [required].\n\n"
-                + "\t-A ...\n\t\tAnnotation file is in Affymetrix format.\n\n"
-                + "\t-c file ...\n\t\tSets the class file to be used (e.g., go_200406-termdb.xml) [required] \n\n"
-                + "\t-d dir ...\n\t\tSets the data folder to be used.\n\n"
-                + "\t-e int ...\n\t\tSets the column in the score file to be used for scores (default = 2).\n\n"
-                + "\t-f die ...\n" + "\t\tSets the class folder to be used.\n\n"
-                + "\t-g int ...\n\t\tSets the gene replicant treatment:  " + Settings.BEST_PVAL
-                + " (best gene score used) or  " + Settings.MEAN_PVAL + " (mean gene score used).\n\n"
-                + "\t-b Sets 'big is better' option for gene scores (default is " + settings.getBigIsBetter()
-                + ").\n\n" + "\t-h or --help\n\t\tShows help.\n\n"
-                + "\t-i int ...\n\t\tSets the number of iterations.\n\n"
-                + "\t-j\n\t\tOutput should include gene symbols for all gene sets (default=don't include symbols).\n\n"
-                + "\t-l {0/1} ...\n" + "\t\tSets whether or not to take logs (default is " + settings.getDoLog()
-                + ").\n\n" + "\t-m int ...\n" + "\t\tSets the raw score method:  " + Settings.MEAN_METHOD
-                + " (mean),  " + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
-                + " (mean above quantile).\n\n" + "\t-n int ...\n" + "\t\tSets the analysis method:  " + Settings.ORA
-                + " (ORA),  " + Settings.RESAMP + " (resampling of gene scores),  " + Settings.CORR
-                + " (profile correlation),  " + Settings.ROC + " (ROC)\n\n"
-                + "\t-o file ...\n\t\tSets the output file.\n\n" + "\t-q int ...\n\t\tSets the quantile.\n\n"
-                + "\t-r file ...\n\t\tSets the raw file to be used.[required for correlation method]\n\n"
-                + "\t-s file ...\n\t\tSets the score file to be used.[required for gene score-based methods]\n\n"
-                + "\t-t double ...\n\t\tSets the pvalue threshold.\n\n"
-                + "\t-x maximum class size ...\n\t\tSets the maximum class size.\n\n"
-                + "\t-y minimum class size ...\n\t\tSets the minimum class size.\n\n"
-                + "\t-M method or --mtc method\n\t\tSets the multiple test correction method: " + Settings.BONFERONNI
-                + " = Bonferonni,  " + Settings.WESTFALLYOUNG + " = Westfall-Young (slow),  "
-                + Settings.BENJAMINIHOCHBERG + " =  Benjamini-Hochberg (default)\n\n"
-                + "\t-C file ... or --config file ...\n\t\tSets the configuration file to be used.\n\n"
-                + "\t-G or --gui\n" + "\t\tLaunch the GUI.\n\n"
-                + "\t-S file ... or --save file ...\n\t\tSave preferences in the specified file.\n\n" );
+        printHelp( "ermineJ" );
         System.exit( 0 );
+    }
+
+    private void buildOptions() {
+
+        options.addOption( OptionBuilder.withLongOpt( "help" ).create( "h" ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "config" ).hasArg().withDescription( "Configuration file to use" )
+                .create( 'C' ) );
+
+        options.addOption( OptionBuilder.withDescription( "Launch the GUI." ).withLongOpt( "gui" ).create( 'G' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "save" ).create( 'S' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni,  " + Settings.WESTFALLYOUNG
+                        + " = Westfall-Young (slow),  " ).withLongOpt( "mtc" ).create( 'M' ) );
+
+        options.addOption( OptionBuilder.isRequired().hasArg().withDescription( "Sets the annotation file to be used" )
+                .withLongOpt( "annots" ).create( 'a' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Affymetrix annotation file format" )
+                .create( 'A' ) );
+
+        options.addOption( OptionBuilder.withDescription(
+                "Sets 'big is better' option for gene scores (default is " + settings.getBigIsBetter() ).create( 'b' ) );
+
+        options.addOption( OptionBuilder.isRequired().hasArg().withLongOpt( "classFile" ).withDescription(
+                "Class file, e.g. GO XML file" ).create( 'c' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Column for scores in input file" ).withLongOpt(
+                "scoreCol" ).create( 'e' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Data directory" ).create( 'd' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Class directory" ).create( 'f' ) );
+
+        options.addOption( OptionBuilder.withDescription( "Replica treatment method" ).create( 'g' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" ).withDescription(
+                "Number of iterations (for iterative methods only" ).create( 'i' ) );
+
+        options.addOption( OptionBuilder.withDescription(
+                "Output should include gene symbols for all gene sets (default=don't include symbols)" ).withLongOpt(
+                "genesOut" ).hasArg().create( 'j' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "logTrans" ).withDescription(
+                "Log transform the scores [recommended for p-values]" ).create( 'l' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "How to compute raw scores for classes: " + Settings.MEAN_METHOD + " (mean),  "
+                        + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
+                        + " (mean above quantile)." ).create( 'm' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Analysis method:  " + Settings.ORA + " (ORA),  " + Settings.RESAMP + " (resampling of gene scores),  "
+                        + Settings.CORR + " (profile correlation),  " + Settings.ROC + " (ROC)" ).create( 'n' ) );
+
+        options.addOption( OptionBuilder.isRequired().hasArg().withDescription( "Output file" ).withLongOpt( "output" )
+                .create( 'o' ) );
+
+        options.addOption( OptionBuilder.withDescription( "quantile to use" ).withLongOpt( "quantile" ).hasArg()
+                .create( 'q' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "rawData" ).withDescription( "Raw data file" ).create(
+                'r' ) );
+
+        options.addOption( OptionBuilder.hasArg().isRequired().withLongOpt( "scoreFile" )
+                .withDescription( "Score file" ).create( 's' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "threshold" ).withDescription( "Score threshold" )
+                .create( 't' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the minimum class size" ).withLongOpt(
+                "minClassSize" ).create( 'y' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the maximum class size" ).withLongOpt(
+                "maxClassSize" ).create( 'x' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" ).withDescription(
+                "Save preferences in the specified file" ).create( 'S' ) );
+
+    }
+
+    private void processOptions() {
+
+        if ( commandLine.hasOption( 'h' ) ) {
+            showHelpAndExit();
+        }
+
+        String arg;
+        if ( commandLine.hasOption( 'C' ) ) {
+            arg = commandLine.getOptionValue( 'C' );
+            if ( FileTools.testFile( arg ) ) {
+                try {
+                    settings = new Settings( arg );
+                    System.err.println( "Initializing configuration from " + arg );
+                } catch ( ConfigurationException e ) {
+                    System.err.println( "Invalid config file name (-C " + arg + ")" );
+                    showHelpAndExit();
+                }
+            }
+
+        }
+
+        if ( commandLine.hasOption( 'A' ) ) {
+            settings.setAnnotFormat( "Affy CSV" );
+        }
+        if ( commandLine.hasOption( 'a' ) ) {
+            arg = commandLine.getOptionValue( 'a' );
+            if ( FileTools.testFile( arg ) )
+                settings.setAnnotFile( arg );
+            else {
+                System.err.println( "Invalid annotation file name (-a " + arg + ")" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'b' ) ) {
+            arg = commandLine.getOptionValue( 'b' );
+        }
+        if ( commandLine.hasOption( 'c' ) ) {
+            arg = commandLine.getOptionValue( 'c' );
+            if ( FileTools.testFile( arg ) )
+                settings.setClassFile( arg );
+            else {
+                System.err.println( "Invalid class file name (-c " + arg + ")" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'd' ) ) {
+            arg = commandLine.getOptionValue( 'd' );
+            if ( FileTools.testDir( arg ) )
+                settings.setDataDirectory( arg );
+            else {
+                System.err.println( "Invalid path for data folder (-d " + arg + ")" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'e' ) ) {
+            arg = commandLine.getOptionValue( 'e' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg >= 2 ) {
+                    settings.setScoreCol( intarg );
+                } else {
+                    System.err.println( "Invalid score column (-e " + intarg + "), must be a value 2 or higher" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Invalid score column (-e " + arg + "), must be an integer" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'f' ) ) {
+            arg = commandLine.getOptionValue( 'f' );
+            if ( !FileTools.testDir( arg ) ) new File( arg ).mkdir();
+
+            settings.setCustomGeneSetDirectory( arg );
+            log.debug( settings.getCustomGeneSetDirectory() );
+        }
+        if ( commandLine.hasOption( 'g' ) ) {
+            arg = commandLine.getOptionValue( 'g' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg == 1 || intarg == 2 )
+                    settings.setScoreCol( intarg );
+                else {
+                    System.err.println( "Gene rep treatment must be either " + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Gene rep treatment must be either " + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'i' ) ) {
+            arg = commandLine.getOptionValue( 'i' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg > 0 )
+                    settings.setIterations( intarg );
+                else {
+                    System.err.println( "Iterations must be greater than 0 (-i)" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Iterations must be greater than 0 (-i)" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'j' ) ) {
+            this.saveAllGenes = true;
+
+        }
+        if ( commandLine.hasOption( 'k' ) ) {
+            arg = commandLine.getOptionValue( 'k' );
+        }
+
+        if ( commandLine.hasOption( 'l' ) ) {
+            settings.setDoLog( true );
+        } else {
+            settings.setDoLog( false );
+        }
+
+        if ( commandLine.hasOption( 'm' ) ) {
+            arg = commandLine.getOptionValue( 'm' );
+            int intarg = Integer.parseInt( arg );
+            if ( intarg == 0 || intarg == 1 || intarg == 2 )
+                settings.setRawScoreMethod( intarg );
+            else {
+                System.err.println( "Raw score method must be set to 0 (MEAN_METHOD), "
+                        + "1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD) (-m)" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'M' ) ) {
+            arg = commandLine.getOptionValue( 'M' );
+            int mtc = Integer.parseInt( arg );
+            settings.setMtc( mtc );
+        }
+        if ( commandLine.hasOption( 'n' ) ) {
+            arg = commandLine.getOptionValue( 'n' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg == 0 || intarg == 1 || intarg == 2 || intarg == 3 )
+                    settings.setClassScoreMethod( intarg );
+                else {
+                    System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
+                            + "2 (CORR), or 3 (ROC) (-n)" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
+                        + "2 (CORR), or 3 (ROC) (-n)" );
+                showHelpAndExit();
+            }
+        }
+
+        if ( commandLine.hasOption( 'o' ) ) {
+            arg = commandLine.getOptionValue( 'o' );
+            saveFileName = arg;
+        }
+        if ( commandLine.hasOption( 'q' ) ) {
+            arg = commandLine.getOptionValue( 'q' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg >= 0 && intarg <= 100 )
+                    settings.setQuantile( intarg );
+                else {
+                    System.err.println( "Quantile must be between 0 and 100 (-q)" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Quantile must be between 0 and 100 (-q)" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'r' ) ) {
+            arg = commandLine.getOptionValue( 'r' );
+            if ( FileTools.testFile( arg ) )
+                settings.setRawFile( arg );
+            else {
+                System.err.println( "Invalid raw file name (-r " + arg + ")" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 's' ) ) {
+            arg = commandLine.getOptionValue( 's' );
+            if ( FileTools.testFile( arg ) )
+                settings.setScoreFile( arg );
+            else {
+                System.err.println( "Invalid score file name (-s " + arg + ")" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 't' ) ) {
+            arg = commandLine.getOptionValue( 't' );
+            try {
+                double doublearg = Double.parseDouble( arg );
+                if ( doublearg >= 0 && doublearg <= 1 )
+                    settings.setPValThreshold( doublearg );
+                else {
+                    System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'u' ) ) {
+            arg = commandLine.getOptionValue( 'u' );
+        }
+        if ( commandLine.hasOption( 'v' ) ) {
+            arg = commandLine.getOptionValue( 'v' );
+        }
+        if ( commandLine.hasOption( 'x' ) ) {
+            arg = commandLine.getOptionValue( 'x' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg > 1 )
+                    settings.setMaxClassSize( intarg );
+                else {
+                    System.err.println( "The maximum class size must be greater than 1 (-x)" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "The maximum class size must be greater than 1 (-x)" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'y' ) ) {
+            arg = commandLine.getOptionValue( 'y' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg > 0 )
+                    settings.setMinClassSize( intarg );
+                else {
+                    System.err.println( "The minimum class size must be greater than 0 (-y)" );
+                    showHelpAndExit();
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "The minimum class size must be greater than 0 (-y)" );
+                showHelpAndExit();
+            }
+        }
+        if ( commandLine.hasOption( 'G' ) ) {
+            useCommandLineInterface = false;
+        }
+
     }
 
     protected void initialize() {
@@ -459,7 +534,7 @@ public class classScoreCMD {
 
         // need to load user-defined sets.
         UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
-        Collection userOverwrittenGeneSets = loader.loadUserGeneSets( this.goData, this.statusMessenger );
+        loader.loadUserGeneSets( this.goData, this.statusMessenger );
 
         statusMessenger.showStatus( "Done with initialization." );
     }
@@ -529,5 +604,29 @@ public class classScoreCMD {
         GeneSetPvalRun runResult = new GeneSetPvalRun( activeProbes, settings, geneData, rawData, goData, geneScores,
                 statusMessenger, "command" );
         return runResult;
+    }
+
+    public boolean isSaveAllGenes() {
+        return saveAllGenes;
+    }
+
+    public String getSaveFileName() {
+        return saveFileName;
+    }
+
+    public GONames getGoData() {
+        return goData;
+    }
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public StatusViewer getStatusMessenger() {
+        return statusMessenger;
+    }
+
+    public boolean isUseCommandLineInterface() {
+        return useCommandLineInterface;
     }
 }
