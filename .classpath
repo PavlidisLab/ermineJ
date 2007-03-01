@@ -25,5 +25,6 @@
 	<classpathentry kind="var" path="MAVEN1_REPO/jfreechart/jars/jfreechart-0.9.20.jar"/>
 	<classpathentry kind="var" path="MAVEN1_REPO/jcommon/jars/jcommon-0.9.5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/baseCode"/>
+	<classpathentry kind="var" path="MAVEN1_REPO/commons-cli/jars/commons-cli-1.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
