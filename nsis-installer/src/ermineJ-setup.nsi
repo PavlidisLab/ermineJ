@@ -48,8 +48,7 @@ Section "ermineJ (required)"
   ; Put file there
 
   ; License Agreements
-  File "license.txt"
-  File "GNU_General_Public_License.txt"
+  File "LICENSE.txt" 
 
   ; Jars (ours and third-party)
   SetOutPath "$INSTDIR\lib"
