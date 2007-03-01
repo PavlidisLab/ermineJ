@@ -537,22 +537,26 @@ public class GeneScores {
                 }
 
                 // these values are already log transformed if the user selected that option.
-                double pbPval = ( ( Double ) probeToScoreMap.get( probe ) ).doubleValue();
+                double score = ( ( Double ) probeToScoreMap.get( probe ) ).doubleValue();
 
                 switch ( gp_method ) {
                     case Settings.MEAN_PVAL: {
-                        geneScoreTemp[counter] += pbPval;
+                        geneScoreTemp[counter] += score;
                         break;
                     }
                     case Settings.BEST_PVAL: {
-                        if ( settings.upperTail() ) {
-                            geneScoreTemp[counter] = Math.max( pbPval, geneScoreTemp[counter] );
+                        if ( in_size == 0 ) {
+                            // fix suggested by Hubert Rehrauer, to initialize values to first score, not zero.
+                            geneScoreTemp[counter] = score;
                         } else {
-                            geneScoreTemp[counter] = Math.min( pbPval, geneScoreTemp[counter] );
+                            if ( settings.upperTail() ) {
+                                geneScoreTemp[counter] = Math.max( score, geneScoreTemp[counter] );
+                            } else {
+                                geneScoreTemp[counter] = Math.min( score, geneScoreTemp[counter] );
+                            }
                         }
                         break;
                     }
-
                     default: {
                         throw new IllegalArgumentException( "Illegal selection for groups score method." );
                     }
