@@ -25,7 +25,7 @@
 						Gene Ontology analysis for&nbsp;microarray data
 					</h1>
 					<P>
-						<STRONG>Version 2.1.12</STRONG>
+						<STRONG>Version 2.1.13</STRONG>
 					</P>
 				</td>
 			</tr>
@@ -105,8 +105,7 @@
 					<p>
 						ErmineJ can be
 						<strong><a href="downloadInstall.html">downloaded
-								here</a>
-						</strong>.
+								here</a> </strong>.
 					</p>
 
 					<p>
@@ -193,17 +192,27 @@
 					</h2>
 
 					<p>
-						Version 2.1.12 - (August 8 2006) This is a bugfix release.
+						Version 2.1.13 - (March 2007) This is a bugfix release.
 					</p>
 					<ul>
 						<li>
-							Improved internationalization support, for European number
-							formats.
+							We fixed two bugs that can affect the analysis. First, it was
+							possible for some implicit GO term associations to be missed.
+							This primarily affected large GO categories that most users tend
+							to remove from consideration, but may affect analyses. Second,
+							there was a problem using input scores containing negative values
+							and the "best score" option to handle multiple occurrence of
+							genes on array designs. Users who always use positive values
+							would not be affected by this problem. We thank the users who
+							identified reported these problems!
 						</li>
 
 						<li>
-							Several problems with the command client and output file format
-							were fixed.
+							The command line interface has been largely rewritten and should be
+							more robust, easier to use, and easier to understand.
+						</li>
+						<li>
+							A variety of cosmetic and GUI bugs have been fixed, especially affecting Linux and Macintosh users.
 						</li>
 					</ul>
 
@@ -225,12 +234,12 @@
 					<p>
 						The software comes with on-line help. The manual is also
 						<a href="ermineJ-help/classScore/html">available online</a>
-						(webstart users will have to use this option for now) or as a
-						<A href="ermineJ-help/classScore/ermineJ-2.1.1-manual.pdf">PDF</A>.
+						(webstart users will have to use this option for now) or as a slightly out-dated 
+						<a href="ermineJ-help/classScore/ermineJ-2.1.1-manual.pdf">PDF</a>.
 						If you are having problems with the software please read the
 						<a href="ermineJ-help/classScore/html/faq.html">FAQ</a>. If your
 						question isn't answered in the FAQ or in the manual, feel free to
-						<A href="contact.html">contact us</A>
+						<a href="contact.html">contact us</A>
 					</p>
 
 					<p>
