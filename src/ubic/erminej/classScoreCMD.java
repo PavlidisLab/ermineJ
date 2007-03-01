@@ -177,40 +177,57 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.withLongOpt( "help" ).create( "h" ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "config" ).hasArg().withDescription( "Configuration file to use" )
-                .create( 'C' ) );
+        options
+                .addOption( OptionBuilder
+                        .withLongOpt( "config" )
+                        .hasArg()
+                        .withDescription(
+                                "Configuration file to use (saves typing); additional options given on the command line override those in the file." )
+                        .create( 'C' ) );
 
         options.addOption( OptionBuilder.withDescription( "Launch the GUI." ).withLongOpt( "gui" ).create( 'G' ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "save" ).create( 'S' ) );
+        options.addOption( OptionBuilder.withLongOpt( "save" ).withDescription( "Save settings to the selected file" )
+                .withArgName( "file" ).create( 'S' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
-                "Multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni,  " + Settings.WESTFALLYOUNG
-                        + " = Westfall-Young (slow),  " ).withLongOpt( "mtc" ).create( 'M' ) );
+                "Multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni FWE, "
+                        + Settings.WESTFALLYOUNG + " = Westfall-Young (slow), " + Settings.BENJAMINIHOCHBERG
+                        + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" ).create(
+                'M' ) );
 
         options.addOption( OptionBuilder.isRequired().hasArg().withDescription( "Sets the annotation file to be used" )
-                .withLongOpt( "annots" ).create( 'a' ) );
+                .withLongOpt( "annots" ).withArgName( "file" ).create( 'a' ) );
 
         options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Affymetrix annotation file format" )
                 .create( 'A' ) );
 
         options.addOption( OptionBuilder.withDescription(
-                "Sets 'big is better' option for gene scores (default is " + settings.getBigIsBetter() ).create( 'b' ) );
+                "Sets 'big is better' option for gene scores to true [default =" + settings.getBigIsBetter() + "]" )
+                .create( 'b' ) );
 
         options.addOption( OptionBuilder.isRequired().hasArg().withLongOpt( "classFile" ).withDescription(
-                "Class file, e.g. GO XML file" ).create( 'c' ) );
+                "Class file, e.g. GO XML file" ).withArgName( "file" ).create( 'c' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription( "Column for scores in input file" ).withLongOpt(
-                "scoreCol" ).create( 'e' ) );
+                "scoreCol" ).withArgName( "integer" ).create( 'e' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Data directory" ).create( 'd' ) );
+        options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription( "Data directory" )
+                .create( 'd' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Class directory" ).create( 'f' ) );
+        options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription(
+                "Class directory where custom classes are located" ).create( 'f' ) );
 
-        options.addOption( OptionBuilder.withDescription( "Replica treatment method" ).create( 'g' ) );
+        options
+                .addOption( OptionBuilder
+                        .withArgName( "value" )
+                        .withLongOpt( "reps" )
+                        .withDescription(
+                                "What to do when genes have multiple scores in input file (due to multiple probes per gene): 1 = best of replicates; 2 = mean of replicates; " )
+                        .create( 'g' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" ).withDescription(
-                "Number of iterations (for iterative methods only" ).create( 'i' ) );
+                "Number of iterations (for iterative methods only" ).withArgName( "integer" ).create( 'i' ) );
 
         options.addOption( OptionBuilder.withDescription(
                 "Output should include gene symbols for all gene sets (default=don't include symbols)" ).withLongOpt(
@@ -220,37 +237,38 @@ public class classScoreCMD {
                 "Log transform the scores [recommended for p-values]" ).create( 'l' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
-                "How to compute raw scores for classes: " + Settings.MEAN_METHOD + " (mean),  "
+                "Method for computing raw class statistics: " + Settings.MEAN_METHOD + " (mean),  "
                         + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
-                        + " (mean above quantile)." ).create( 'm' ) );
+                        + " (mean above quantile)." ).withLongOpt( "stats" ).withArgName( "value" ).create( 'm' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
-                "Analysis method:  " + Settings.ORA + " (ORA),  " + Settings.RESAMP + " (resampling of gene scores),  "
-                        + Settings.CORR + " (profile correlation),  " + Settings.ROC + " (ROC)" ).create( 'n' ) );
+                "Method for computing class significance:  " + Settings.ORA + " (ORA),  " + Settings.RESAMP
+                        + " (resampling of gene scores),  " + Settings.CORR + " (profile correlation),  "
+                        + Settings.ROC + " (ROC)" ).withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
 
-        options.addOption( OptionBuilder.isRequired().hasArg().withDescription( "Output file" ).withLongOpt( "output" )
-                .create( 'o' ) );
+        options.addOption( OptionBuilder.isRequired().hasArg().withDescription( "Output file name" ).withArgName(
+                "file" ).withLongOpt( "output" ).create( 'o' ) );
 
-        options.addOption( OptionBuilder.withDescription( "quantile to use" ).withLongOpt( "quantile" ).hasArg()
-                .create( 'q' ) );
+        options.addOption( OptionBuilder.withDescription( "quantile to use" ).withArgName( "integer" ).withLongOpt(
+                "quantile" ).hasArg().create( 'q' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "rawData" ).withDescription( "Raw data file" ).create(
-                'r' ) );
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "rawData" ).withDescription(
+                "Raw data file, only needed for profile correlation analysis." ).withArgName( "file" ).create( 'r' ) );
 
-        options.addOption( OptionBuilder.hasArg().isRequired().withLongOpt( "scoreFile" )
-                .withDescription( "Score file" ).create( 's' ) );
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "scoreFile" ).withDescription(
+                "Score file, required for all but profile correlation method" ).withArgName( "file" ).create( 's' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "threshold" ).withDescription( "Score threshold" )
-                .create( 't' ) );
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "threshold" ).withDescription(
+                "Score threshold, only used for ORA" ).withArgName( "value" ).create( 't' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the minimum class size" ).withLongOpt(
-                "minClassSize" ).create( 'y' ) );
+        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the minimum class size" ).withArgName(
+                "integer" ).withLongOpt( "minClassSize" ).create( 'y' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the maximum class size" ).withLongOpt(
-                "maxClassSize" ).create( 'x' ) );
+        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the maximum class size" ).withArgName(
+                "integer" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" ).withDescription(
-                "Save preferences in the specified file" ).create( 'S' ) );
+                "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
 
     }
 
