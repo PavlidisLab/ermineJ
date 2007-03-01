@@ -468,14 +468,17 @@ public class GeneScores {
             letUserReadMessage();
         }
 
-        if ( numProbesKept == 0 ) {
-            throw new IllegalStateException( "None of the probes in the gene score file correspond to probes in the "
-                    + "annotation (\".an\") file you selected." );
+        if ( numProbesKept == 0 && messenger != null ) {
+            messenger.showError( "None of the probes in the gene score file correspond to probes in the "
+                    + "annotation file you selected. None of your data will be displayed." );
+            letUserReadMessage();
         }
-        if ( numScores == 0 ) {
-            throw new IllegalStateException( "No probe scores found! Please check the file has"
+
+        if ( numScores == 0 && messenger != null ) {
+            messenger.showError( "No probe scores found! Please check the file has"
                     + " the correct plain text format and"
                     + " corresponds to the microarray annotation (\".an\") file you selected." );
+            letUserReadMessage();
         }
         if ( messenger != null ) {
             messenger.showStatus( "Found " + numScores + " scores in the file" );
@@ -568,7 +571,9 @@ public class GeneScores {
         } // end of while
 
         if ( counter == 0 ) {
-            throw new IllegalStateException( "No gene to score mappings were found." );
+            // this is okay, if we're trying to show the class despite there being no results.
+            log.warn( "No gene to score mappings were found." );
+            return;
         }
 
         if ( messenger != null ) messenger.showStatus( counter + " distinct genes found in the annotations." );
