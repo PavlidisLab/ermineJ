@@ -196,8 +196,9 @@ public class classScoreCMD {
                         + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" ).create(
                 'M' ) );
 
-        options.addOption( OptionBuilder.isRequired().hasArg().withDescription( "Sets the annotation file to be used" )
-                .withLongOpt( "annots" ).withArgName( "file" ).create( 'a' ) );
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Annotation file to be used [required unless using GUI]" ).withLongOpt( "annots" ).withArgName( "file" )
+                .create( 'a' ) );
 
         options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Affymetrix annotation file format" )
                 .create( 'A' ) );
@@ -206,8 +207,9 @@ public class classScoreCMD {
                 "Sets 'big is better' option for gene scores to true [default =" + settings.getBigIsBetter() + "]" )
                 .create( 'b' ) );
 
-        options.addOption( OptionBuilder.isRequired().hasArg().withLongOpt( "classFile" ).withDescription(
-                "Class file, e.g. GO XML file" ).withArgName( "file" ).create( 'c' ) );
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" ).withDescription(
+                "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" ).withArgName( "file" ).create(
+                'c' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription( "Column for scores in input file" ).withLongOpt(
                 "scoreCol" ).withArgName( "integer" ).create( 'e' ) );
@@ -216,7 +218,7 @@ public class classScoreCMD {
                 .create( 'd' ) );
 
         options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription(
-                "Class directory where custom classes are located" ).create( 'f' ) );
+                "Directory where custom gene set are located" ).create( 'f' ) );
 
         options
                 .addOption( OptionBuilder
@@ -242,12 +244,13 @@ public class classScoreCMD {
                         + " (mean above quantile)." ).withLongOpt( "stats" ).withArgName( "value" ).create( 'm' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
-                "Method for computing class significance:  " + Settings.ORA + " (ORA),  " + Settings.RESAMP
+                "Method for computing gene set significance:  " + Settings.ORA + " (ORA),  " + Settings.RESAMP
                         + " (resampling of gene scores),  " + Settings.CORR + " (profile correlation),  "
                         + Settings.ROC + " (ROC)" ).withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
 
-        options.addOption( OptionBuilder.isRequired().hasArg().withDescription( "Output file name" ).withArgName(
-                "file" ).withLongOpt( "output" ).create( 'o' ) );
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Output file name; if omitted, results are written to standard out" ).withArgName( "file" )
+                .withLongOpt( "output" ).create( 'o' ) );
 
         options.addOption( OptionBuilder.withDescription( "quantile to use" ).withArgName( "integer" ).withLongOpt(
                 "quantile" ).hasArg().create( 'q' ) );
@@ -304,7 +307,11 @@ public class classScoreCMD {
                 System.err.println( "Invalid annotation file name (-a " + arg + ")" );
                 showHelpAndExit();
             }
+        } else if ( !commandLine.hasOption( 'G' ) ) { // using GUI?
+            System.err.println( "Annotation file name (-a) is required" );
+            showHelpAndExit();
         }
+
         if ( commandLine.hasOption( 'b' ) ) {
             arg = commandLine.getOptionValue( 'b' );
         }
@@ -313,10 +320,14 @@ public class classScoreCMD {
             if ( FileTools.testFile( arg ) )
                 settings.setClassFile( arg );
             else {
-                System.err.println( "Invalid class file name (-c " + arg + ")" );
+                System.err.println( "Invalid gene set definition file name (-c " + arg + ")" );
                 showHelpAndExit();
             }
+        } else if ( !commandLine.hasOption( 'G' ) ) { // using GUI?
+            System.err.println( "Gene set definition file (-c) is required" );
+            showHelpAndExit();
         }
+
         if ( commandLine.hasOption( 'd' ) ) {
             arg = commandLine.getOptionValue( 'd' );
             if ( FileTools.testDir( arg ) )
@@ -429,7 +440,10 @@ public class classScoreCMD {
         if ( commandLine.hasOption( 'o' ) ) {
             arg = commandLine.getOptionValue( 'o' );
             saveFileName = arg;
+        } else {
+            saveFileName = null;
         }
+
         if ( commandLine.hasOption( 'q' ) ) {
             arg = commandLine.getOptionValue( 'q' );
             try {
