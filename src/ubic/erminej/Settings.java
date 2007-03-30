@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
@@ -630,7 +631,14 @@ public class Settings {
     public void writeAnalysisSettings( String fileName ) throws IOException {
         log.debug( "output " + fileName );
         log.debug( "Saving configuration to " + fileName );
-        BufferedWriter out = new BufferedWriter( new FileWriter( fileName ) );
+
+        BufferedWriter out;
+        if ( fileName == null ) {
+            out = new BufferedWriter( new PrintWriter( System.out ) );
+        } else {
+            out = new BufferedWriter( new FileWriter( fileName ) );
+        }
+
         for ( int i = 0; i < ANALYSIS_SETTINGS.length; i++ ) {
             String propertyName = ANALYSIS_SETTINGS[i];
 
