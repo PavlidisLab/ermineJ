@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <jnlp 
   spec="1.0+" 
-  codebase="http://benzer.ubic.ca/ermineJ/webstart/"
+  codebase="http://www.bioinformatics.ubc.ca/ermineJ/webstart/"
   href="ermineJ.jnlp">
   
   <information> 
