@@ -74,7 +74,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         step4Panel.setPreferredSize( new Dimension( 550, 280 ) );
         step4LeftPanel.setPreferredSize( new Dimension( 200, 160 ) );
         jPanel17.setBackground( SystemColor.control );
-        jPanel17.setPreferredSize( new Dimension( 185, 60 ) );
+        jPanel17.setPreferredSize( new Dimension( 185, 90 ) );
         jLabel11.setText( "Maximum gene set size" );
         jLabel11.setLabelFor( jTextFieldMaxClassSize );
         jTextFieldMaxClassSize.setEditable( true );
@@ -84,7 +84,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         jTextFieldMaxClassSize.setHorizontalAlignment( SwingConstants.RIGHT );
         jPanel17.add( jLabel11, null );
         jPanel17.add( jTextFieldMaxClassSize, null );
-        jPanel16.setPreferredSize( new Dimension( 180, 60 ) );
+        jPanel16.setPreferredSize( new Dimension( 180, 90 ) );
         jPanel16.setBackground( SystemColor.control );
         jLabel12.setLabelFor( jTextFieldMinClassSize );
         jLabel12.setText( "Minimum gene set size" );
