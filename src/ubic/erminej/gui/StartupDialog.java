@@ -127,7 +127,7 @@ public class StartupDialog extends AppDialog {
                         + "analysis.<p>The probe annotation file you select "
                         + "must match the microarray design you are using. "
                         + "For updated annotation files, visit "
-                        + "<a href=\"http://bioinformatics.ubc.ca/ermineJ/annots/\">http://bioinformatics.ubc.ca/ermineJ/annots</a></html>" );
+                        + "<a href=\"http://bioinformatics.ubc.ca/microannots/\">http://bioinformatics.ubc.ca/microannots</a></html>" );
         addMain( centerPanel );
         this.setTitle( "ErmineJ startup" );
 
