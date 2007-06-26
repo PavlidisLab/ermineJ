@@ -192,27 +192,17 @@
 					</h2>
 
 					<p>
-						Version 2.1.13 - (March 2007) This is primarily a bugfix release with some minor enchancements.
+						Version 2.1.14 - (July 2007) This is a bugfix release.
 					</p>
 					<ul>
 						<li>
-							We fixed two bugs that can affect the analysis. First, it was
-							possible for some implicit GO term associations to be missed.
-							This primarily affected large GO categories that most users tend
-							to remove from consideration, but may affect analyses. Second,
-							there was a problem using input scores containing negative values
-							and the "best score" option to handle multiple occurrence of
-							genes on array designs. Users who always use positive values
-							would not be affected by this problem. We thank the users who
-							identified reported these problems!
-						</li>
+ 							Probes with no annotations are now loaded into the ErmineJ. 
+ 							This was causing an annoying error message about missing probes. 
+ 							This does have a minor effect on the analysis. 
+ 						</li>
 
 						<li>
-							The command line interface has been largely rewritten and should be
-							more robust, easier to use, and easier to understand.
-						</li>
-						<li>
-							A variety of cosmetic and GUI bugs have been fixed, especially affecting Linux and Macintosh users.
+							A variety of cosmetic and GUI bugs have been fixed, especially affecting fedora core users.
 						</li>
 					</ul>
 
