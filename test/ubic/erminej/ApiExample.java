@@ -88,7 +88,7 @@ public class ApiExample {
 
         // set range of sizes of gene sets to consider.
         css.setMaxGeneSetSize( 100 );
-        css.setMinGeneSetSize( 5 );
+        css.setMinGeneSetSize( 2 );
 
         // use this pvalue threshold for selecting genes. (before taking logs)
         css.setGeneScoreThreshold( 0.15 );

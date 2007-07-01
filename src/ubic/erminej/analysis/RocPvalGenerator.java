@@ -134,8 +134,12 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );
         double roc_pval = ROC.rocpval( totalSize, targetRanks );
 
-        GeneSetResult res = new GeneSetResult( geneSet, goName.getNameForId( geneSet ), ( ( Integer ) actualSizes
-                .get( geneSet ) ).intValue(), effSize );
+        String nameForId = geneSet;
+        if ( goName != null ) {
+            nameForId = goName.getNameForId( geneSet );
+        }
+        GeneSetResult res = new GeneSetResult( geneSet, nameForId, ( ( Integer ) actualSizes.get( geneSet ) )
+                .intValue(), effSize );
         res.setScore( areaUnderROC );
         res.setPValue( roc_pval );
         return res;

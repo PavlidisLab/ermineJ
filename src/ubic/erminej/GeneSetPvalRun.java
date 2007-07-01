@@ -292,7 +292,7 @@ public class GeneSetPvalRun {
      * @param csc
      */
     private void multipleTestCorrect( StatusViewer messenger, GeneSetSizeComputer csc ) {
-        messenger.showStatus( "Multiple test correction..." );
+        if ( messenger != null ) messenger.showStatus( "Multiple test correction..." );
         MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
                 results, messenger );
         int multipleTestCorrMethod = settings.getMtc();

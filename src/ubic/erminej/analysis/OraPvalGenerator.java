@@ -181,8 +181,13 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         // set up the return object.
-        GeneSetResult res = new GeneSetResult( className, goName.getNameForId( className ), ( ( Integer ) actualSizes
-                .get( className ) ).intValue(), effectiveGeneSetSize );
+
+        String nameForId = className;
+        if ( goName != null ) {
+            nameForId = goName.getNameForId( className );
+        }
+        GeneSetResult res = new GeneSetResult( className, nameForId, ( ( Integer ) actualSizes.get( className ) )
+                .intValue(), effectiveGeneSetSize );
         res.setScore( successes );
         res.setPValue( oraPval );
         return res;

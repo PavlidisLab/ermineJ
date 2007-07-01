@@ -185,8 +185,12 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         double geneSetMeanCorrel = sumCorrel / nummeas;
 
-        GeneSetResult result = new GeneSetResult( geneSetName, goName.getNameForId( geneSetName ),
-                ( ( Integer ) actualSizes.get( geneSetName ) ).intValue(), effSize );
+        String nameForId = geneSetName;
+        if ( goName != null ) {
+            nameForId = goName.getNameForId( geneSetName );
+        }
+        GeneSetResult result = new GeneSetResult( geneSetName, nameForId, ( ( Integer ) actualSizes.get( geneSetName ) )
+                .intValue(), effSize );
         result.setScore( geneSetMeanCorrel );
         result.setPValue( hist.getValue( effSize, geneSetMeanCorrel, true ) ); // always upper tail.
         return result;

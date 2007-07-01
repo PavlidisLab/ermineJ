@@ -123,8 +123,12 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         // set up the return object.
-        GeneSetResult res = new GeneSetResult( geneSetName, goName.getNameForId( geneSetName ),
-                ( ( Integer ) actualSizes.get( geneSetName ) ).intValue(), effSize );
+        String nameForId = geneSetName;
+        if ( goName != null ) {
+            nameForId = goName.getNameForId( geneSetName );
+        }
+        GeneSetResult res = new GeneSetResult( geneSetName, nameForId, ( ( Integer ) actualSizes.get( geneSetName ) )
+                .intValue(), effSize );
         res.setScore( rawscore );
         res.setPValue( pval );
         return res;
