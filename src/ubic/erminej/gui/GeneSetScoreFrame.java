@@ -368,6 +368,9 @@ public class GeneSetScoreFrame extends JFrame {
         enableMenusForAnalysis();
     }
 
+    /**
+     * Input the GO and annotation files.
+     */
     public void readDataFilesForStartup() {
 
         updateProgress( 10 );

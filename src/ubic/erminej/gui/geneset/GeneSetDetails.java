@@ -39,6 +39,8 @@ import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 
 /**
+ * The display of the detailed visualization of a gene set.
+ * 
  * @author pavlidis
  * @version $Id$
  */
@@ -50,6 +52,13 @@ public class GeneSetDetails {
     private Settings settings;
     private final StatusViewer callerStatusViewer;
 
+    /**
+     * @param callerStatusViewer
+     * @param goData
+     * @param geneData
+     * @param settings
+     * @param classID
+     */
     public GeneSetDetails( StatusViewer callerStatusViewer, GONames goData, GeneAnnotations geneData,
             Settings settings, String classID ) {
         this.callerStatusViewer = callerStatusViewer;
@@ -70,6 +79,13 @@ public class GeneSetDetails {
         this.className = goData.getNameForId( classID );
     }
 
+    /**
+     * @param runName
+     * @param res
+     * @param geneScores
+     * @throws IOException
+     * @throws IllegalStateException
+     */
     public void show( String runName, GeneSetResult res, GeneScores geneScores ) throws IOException,
             IllegalStateException {
 

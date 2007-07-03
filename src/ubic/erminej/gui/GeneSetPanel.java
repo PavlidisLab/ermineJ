@@ -128,6 +128,13 @@ public abstract class GeneSetPanel extends JScrollPane {
         cwiz.showWizard();
     }
 
+    /**
+     * Create the popup window with the visualization for a specific gene set.
+     * 
+     * @param runnum
+     * @param id
+     * @throws IllegalStateException
+     */
     protected void showDetailsForGeneSet( final int runnum, final String id ) throws IllegalStateException {
         if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
 

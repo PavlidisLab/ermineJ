@@ -18,8 +18,8 @@
  */
 package ubic.erminej.data;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.DecimalFormat;
 
 /**
@@ -29,13 +29,13 @@ import java.text.DecimalFormat;
  * @version $Id$
  */
 public class GeneSetResult implements Comparable {
-    private String class_id = null;
-    private String class_name = null;
+    private String classId = null;
+    private String clasName = null;
     private double pvalue = 1.0;
     private double score = 0.0;
     private int size = 0;
-    private int effective_size = 0;
-    private double pvalue_corr = 0.0;
+    private int effectiveSize = 0;
+    private double correctedPvalue = 0.0;
     private int rank;
 
     public GeneSetResult() {
@@ -63,36 +63,35 @@ public class GeneSetResult implements Comparable {
      * @param pvalue
      */
     public GeneSetResult( String id, String name, int size, int effectiveSize, double score, double pvalue ) {
-        this.class_id = id;
-        this.class_name = name;
+        this.classId = id;
+        this.clasName = name;
         this.pvalue = pvalue;
         this.score = score;
         this.size = size;
-        this.effective_size = effectiveSize;
+        this.effectiveSize = effectiveSize;
 
     }
 
-    public void print( BufferedWriter out ) throws IOException {
+    public void print( Writer out ) throws IOException {
         this.print( out, "" );
     }
 
-    public void print( BufferedWriter out, String extracolumns ) throws IOException {
+    public void print( Writer out, String extracolumns ) throws IOException {
         DecimalFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits( 8 );
         nf.setMinimumFractionDigits( 3 );
 
         DecimalFormat exp = new DecimalFormat( "0.###E00" );
-        out.write( "!\t" + class_name + "\t" + class_id + "\t" + size + "\t" + effective_size + "\t"
+        out.write( "!\t" + clasName + "\t" + classId + "\t" + size + "\t" + effectiveSize + "\t"
                 + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
-                + ( pvalue_corr < 10e-3 ? exp.format( pvalue_corr ) : nf.format( pvalue_corr ) ) + extracolumns
-                + "\n" );
+                + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) ) + extracolumns + "\n" );
     }
 
-    public void printHeadings( BufferedWriter out ) throws IOException {
+    public void printHeadings( Writer out ) throws IOException {
         this.printHeadings( out, "" );
     }
 
-    public void printHeadings( BufferedWriter out, String extracolumns ) throws IOException {
+    public void printHeadings( Writer out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
         out.write( "\tName" + "\tID" + "\tProbes" + "\tNumGenes" + "\tRawScore" + "\tPval" +
         // "\tN over pval cut\tORA pval+"
@@ -101,13 +100,13 @@ public class GeneSetResult implements Comparable {
     }
 
     public void setNames( String id, String name ) {
-        this.class_id = id;
-        this.class_name = name;
+        this.classId = id;
+        this.clasName = name;
     }
 
     public void setSizes( int size, int effsize ) {
         this.size = size;
-        this.effective_size = effsize;
+        this.effectiveSize = effsize;
     }
 
     public void setScore( double ascore ) {
@@ -119,15 +118,15 @@ public class GeneSetResult implements Comparable {
     }
 
     public void setCorrectedPvalue( double a ) {
-        pvalue_corr = a;
+        correctedPvalue = a;
     }
 
     public String getGeneSetId() {
-        return class_id;
+        return classId;
     }
 
     public String getGeneSetName() {
-        return this.class_name;
+        return this.clasName;
     }
 
     public double getPvalue() {
@@ -139,7 +138,7 @@ public class GeneSetResult implements Comparable {
     }
 
     public int getEffectiveSize() {
-        return effective_size;
+        return effectiveSize;
     }
 
     public int getRank() {
@@ -151,7 +150,7 @@ public class GeneSetResult implements Comparable {
     }
 
     public double getCorrectedPvalue() {
-        return pvalue_corr;
+        return correctedPvalue;
     }
 
     /**

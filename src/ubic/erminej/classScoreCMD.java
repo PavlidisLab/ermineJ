@@ -233,7 +233,7 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.withDescription(
                 "Output should include gene symbols for all gene sets (default=don't include symbols)" ).withLongOpt(
-                "genesOut" ).hasArg().create( 'j' ) );
+                "genesOut" ).create( 'j' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "logTrans" ).withDescription(
                 "Log transform the scores [recommended for p-values]" ).create( 'l' ) );
@@ -307,8 +307,8 @@ public class classScoreCMD {
                 System.err.println( "Invalid annotation file name (-a " + arg + ")" );
                 showHelpAndExit();
             }
-        } else if ( !commandLine.hasOption( 'G' ) ) { // using GUI?
-            System.err.println( "Annotation file name (-a) is required" );
+        } else if ( !commandLine.hasOption( 'G' ) && !commandLine.hasOption( 'C' ) ) { // using GUI or config file?
+            System.err.println( "Annotation file name (-a) is required or must be supplied in config file" );
             showHelpAndExit();
         }
 
@@ -323,7 +323,7 @@ public class classScoreCMD {
                 System.err.println( "Invalid gene set definition file name (-c " + arg + ")" );
                 showHelpAndExit();
             }
-        } else if ( !commandLine.hasOption( 'G' ) ) { // using GUI?
+        } else if ( !commandLine.hasOption( 'G' ) && !commandLine.hasOption( 'C' ) ) { // using GUI config file?
             System.err.println( "Gene set definition file (-c) is required" );
             showHelpAndExit();
         }
@@ -390,6 +390,7 @@ public class classScoreCMD {
             }
         }
         if ( commandLine.hasOption( 'j' ) ) {
+            log.info( "Gene symbols for each term will be output" );
             this.saveAllGenes = true;
 
         }
@@ -531,9 +532,11 @@ public class classScoreCMD {
         if ( commandLine.hasOption( 'G' ) ) {
             useCommandLineInterface = false;
         }
-
     }
 
+    /**
+     * @see ubic.erminej.gui.GeneSetScoreFrame.readDataFilesForStartup
+     */
     protected void initialize() {
         try {
             statusMessenger = new StatusStderr();
@@ -542,12 +545,13 @@ public class classScoreCMD {
             goData = new GONames( settings.getClassFile() );
 
             statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-            if ( settings.getAnnotFormat() == 1 )
+            if ( settings.getAnnotFormat() == 1 ) {
                 geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData,
                         GeneAnnotations.AFFYCSV );
-            else
+            } else {
                 geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
-            // TODO add agilent support ... can we tell the type of file by the suffix?
+                // TODO add agilent support ... can we tell the type of file by the suffix?
+            }
 
             statusMessenger.showStatus( "Initializing gene class mapping" );
             geneDataSets.put( new Integer( "original".hashCode() ), geneData );

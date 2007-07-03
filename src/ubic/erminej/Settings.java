@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
@@ -629,13 +630,14 @@ public class Settings {
      * @throws IOException
      */
     public void writeAnalysisSettings( String fileName ) throws IOException {
-        log.debug( "output " + fileName );
-        log.debug( "Saving configuration to " + fileName );
 
-        BufferedWriter out;
+        Writer out;
         if ( fileName == null ) {
+            log.debug( "Output to STDOUT" );
             out = new BufferedWriter( new PrintWriter( System.out ) );
         } else {
+            log.debug( "output " + fileName );
+            log.debug( "Saving configuration to " + fileName );
             out = new BufferedWriter( new FileWriter( fileName ) );
         }
 
