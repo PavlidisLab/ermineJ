@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -105,10 +106,12 @@ public class ResultsPrinter {
             return;
         }
 
-        BufferedWriter out;
+        Writer out;
         if ( destFile == null ) {
+            log.debug( "Writing results to STDOUT" );
             out = new BufferedWriter( new PrintWriter( System.out ) );
         } else {
+            log.info( "Writing results to " + destFile );
             out = new BufferedWriter( new FileWriter( destFile, true ) ); // APPENDING
         }
         boolean first = true;
@@ -122,8 +125,8 @@ public class ResultsPrinter {
                     res.printHeadings( out, "\tSame as" + "\tGeneMembers" );
                 }
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-                res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t" +
-                        ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t");
+                res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
+                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
             }
         } else {
             // output them in natural order. This is useful for testing.
@@ -135,7 +138,7 @@ public class ResultsPrinter {
                     first = false;
                     res.printHeadings( out, "\tSame as" + "\tGenesMembers" );
                 }
-                res.print( out,  "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
+                res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
                         + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
                 // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
             }
@@ -152,8 +155,10 @@ public class ResultsPrinter {
         if ( className == null ) return "";
         Collection genes = this.geneData.getActiveGeneSetGenes( className );
         if ( genes == null || genes.size() == 0 ) return "";
+        List sortedGenes = new ArrayList( genes );
+        Collections.sort( sortedGenes );
         StringBuffer buf = new StringBuffer();
-        for ( Iterator iter = genes.iterator(); iter.hasNext(); ) {
+        for ( Iterator iter = sortedGenes.iterator(); iter.hasNext(); ) {
             String gene = ( String ) iter.next();
             buf.append( gene + "|" );
         }
@@ -176,7 +181,7 @@ public class ResultsPrinter {
                 return_value = return_value + nextid + "|" + goName.getNameForId( nextid ) + ", ";
             }
         }
-       
+
         return return_value;
 
     }
