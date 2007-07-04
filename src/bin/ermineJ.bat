@@ -21,7 +21,7 @@ echo.
 goto end
 
 :OkJHome
-if exist %JAVA_HOME%\nul goto chkMHome
+if exist "%JAVA_HOME%" goto chkMHome
 
 echo.
 echo ERROR: JAVA_HOME is set to an invalid directory.
@@ -32,7 +32,7 @@ echo.
 goto end
 
 :chkMHome
-if not "%ERMINEJ_HOME%"=="" goto valMHome
+if not "%ERMINEJ_HOME%" == "" goto valMHome
 
 echo.
 echo ERROR: ERMINEJ_HOME not found in your environment.
@@ -84,7 +84,7 @@ goto Win9xApp
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
 if "%ERMINEJ_OPTS%"=="" SET ERMINEJ_OPTS="-Xmx256m"
-SET ERMINEJ_JAVA_EXE="%JAVA_HOME%\bin\javaw.exe"
+SET ERMINEJ_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 SET ERMINEJ_CLASSPATH="%ERMINEJ_HOME%\lib\forehead-1.0-beta-5.jar"
 SET ERMINEJ_MAIN_CLASS="com.werken.forehead.Forehead"
 SET ERMINEJ_ENDORSED="%JAVA_HOME%\lib\endorsed;%ERMINEJ_HOME%\lib"
