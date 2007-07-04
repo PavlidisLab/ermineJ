@@ -141,11 +141,11 @@ public class AboutBox extends JDialog implements ActionListener {
         labelAuthors.setPreferredSize( new Dimension( PREFERRED_WIDTH, 60 ) );
         labelAuthors.setHorizontalAlignment( SwingConstants.CENTER );
         labelAuthors.setHorizontalTextPosition( SwingConstants.CENTER );
-        labelAuthors.setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, and Kiran Keshav." );
+        labelAuthors.setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, Kiran Keshav and Kelsey Hamer." );
 
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
         labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
-        String homepageURL = "http://microarray.cu-genome.org/ermineJ/";
+        String homepageURL = "http://bioinformatics.ubc.ca/ermineJ/";
         labelHomepage.setText( homepageURL );
         // labelHomepage.setURL( homepageURL );
         labelHomepage.setPreferredSize( new Dimension( PREFERRED_WIDTH, 20 ) );
