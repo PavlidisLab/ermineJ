@@ -12,56 +12,56 @@ src/bin/forhead.conf
 
 WINDOWS:
 
-(in baseCode)
+# (in baseCode)
 cvs update
 maven jar:install 
-if you have made changes to baseCode, do a maven jar:deploy to update the repository on 
+# if you have made changes to baseCode, do a maven jar:deploy to update the repository on 
 microarray
 
-(in ermineJ)
+#(in ermineJ)
 cvs update
 maven nsis
 maven nsis-jre
 
-// scp the above files, which will be target/ermineJ-setup.exe and target/ermineJ-setup-jre.exe onto microarray in /proj/projectpages/ermineJ/distributions
+# scp the above files, which will be target/ermineJ-setup.exe and target/ermineJ-setup-jre.exe onto microarray in /proj/projectpages/ermineJ/distributions
 
-LINUX (on host where you have maven -- ie. benzer):
+# LINUX (on host where you have maven -- ie. benzer):
 
-(in baseCode)
+# (in baseCode)
 cvs update
 maven jar:install 
 
-(in ermineJ)
+# (in ermineJ)
 cvs update
 maven jar
-// To make the help jar:
-maven help (This will fail if you have not generated the keystore.  See maven jnlp:generate-keystore below)
+# To make the help jar: (This will fail if you have not generated the keystore.  See maven jnlp:generate-keystore below)
+maven help
 
-// to make generic distribution for installation
+# to make generic distribution for installation
 maven build-install
 
-// to make the source distribution
+# to make the source distribution
 maven dist:build-src
 
-// to make the jnlp setup. Note that we are still using the help.jnlp which was hand-coded. The 1.4 jnlp plugin had to be 
-// modified to include the extension element.
-// maven jnlp:generate-keystore // only needs to be done once. 
+# to make the jnlp setup. Note that we are still using the help.jnlp which was hand-coded. The 1.4 jnlp plugin had to be 
+# modified to include the extension element.
+# maven jnlp:generate-keystore // only needs to be done once. 
 maven jnlp
 
-// DO NOT copy the ermineJ.jnlp file that is generated onto the web
-server. That file has to be fixed by hand to make the ermineJ jar file
-version current.
+# DO NOT copy the ermineJ.jnlp file that is generated onto the web
+# server. That file has to be fixed by hand to make the ermineJ jar file
+# version current.
 
 
-// deploy the builds to the web site (must be able to ssh to the site)
+# deploy the builds to the web site (must be able to ssh to the site)
 
-scp target/jnlp/*.jar benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/webstart
-scp target/distributions/* benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/distributions
+scp target/jnlp/*.jar broca:/www/projects/ermineJ/webstart
+scp target/distributions/* broca:/www/projects/ermineJ/distributions
 
-scp -r web/* benzer:/disk2/WWW/proj/projectpages/ermineJ
+scp -r web/* broca:/www/projects/ermineJ
 
-// to set up the distribution use build-install and then
+# to set up the distribution use build-install and then
 
-scp target/*.tar.gz benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/distributions
-scp target/*.zip benzer:/disk2/WWW/proj/pavlidis/projectpages/ermineJ/distributions
+scp target/*.tar.gz broca:/www/projects/ermineJ/distributions
+scp target/*.zip broca:/www/projects/ermineJ/distributions
 
