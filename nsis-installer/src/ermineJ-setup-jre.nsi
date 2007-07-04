@@ -9,7 +9,7 @@
 Name "ermineJ"
 
 !include version.nsi
-!define JAVA_HOME "C:\java\j2sdk1.4.2_08"
+!define JAVA_HOME "C:\Program Files\Java\jdk1.5.0_09"
 
 ; The file to write
 OutFile "..\..\target\ermineJ-${VERSION}-setup-jre.exe"

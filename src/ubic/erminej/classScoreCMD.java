@@ -115,12 +115,6 @@ public class classScoreCMD {
             System.exit( 0 );
         }
 
-        /* INTERROGATION STAGE */
-        if ( commandLine.hasOption( 'h' ) ) {
-            printHelp( commandName );
-            System.exit( 0 );
-        }
-
         processOptions();
 
     }
@@ -175,7 +169,7 @@ public class classScoreCMD {
 
     private void buildOptions() {
 
-        options.addOption( OptionBuilder.withLongOpt( "help" ).create( "h" ) );
+        options.addOption( OptionBuilder.withLongOpt( "help" ).create( 'h' ) );
 
         options
                 .addOption( OptionBuilder
@@ -183,18 +177,9 @@ public class classScoreCMD {
                         .hasArg()
                         .withDescription(
                                 "Configuration file to use (saves typing); additional options given on the command line override those in the file." )
-                        .create( 'C' ) );
+                        .withArgName( "config file" ).create( 'C' ) );
 
         options.addOption( OptionBuilder.withDescription( "Launch the GUI." ).withLongOpt( "gui" ).create( 'G' ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "save" ).withDescription( "Save settings to the selected file" )
-                .withArgName( "file" ).create( 'S' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription(
-                "Multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni FWE, "
-                        + Settings.WESTFALLYOUNG + " = Westfall-Young (slow), " + Settings.BENJAMINIHOCHBERG
-                        + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" ).create(
-                'M' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
                 "Annotation file to be used [required unless using GUI]" ).withLongOpt( "annots" ).withArgName( "file" )
@@ -272,6 +257,15 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" ).withDescription(
                 "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "save" ).withDescription( "Save settings to the selected file" )
+                .withArgName( "file" ).create( 'S' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni FWE, "
+                        + Settings.WESTFALLYOUNG + " = Westfall-Young (slow), " + Settings.BENJAMINIHOCHBERG
+                        + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" ).create(
+                'M' ) );
 
     }
 
