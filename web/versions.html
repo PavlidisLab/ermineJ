@@ -1,285 +1,624 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-<title>ErmineJ version history</title>
-<link type="text/css" rel="stylesheet" href="css/default.css">
-</head>
-<body>
-<IMG height="112" alt="ermineJ logo" src="images/logo1small.gif" width="266" border="0">
-<h1>Version history</h1>
-<!--  navigation -->
-<table>
-	<tr>
-		<td><a href="index.html">Home</a></td>
-		<td>&nbsp;&nbsp;</td>
-		<td><a href="downloadInstall.html">Download</a></td>
-		<td>&nbsp;&nbsp;</td>
-		<td><a href="ermineJ-help/classScore/html/">Help</a></td>
-		<td>&nbsp;&nbsp;</td>
-		<td><a href="publications.html">Pubs</a></td>
-		<td>&nbsp;&nbsp;</td>
-		<td><a href="screenshots.html">Screens</a></td>
-		<td>&nbsp;&nbsp;</td>
-		<td><a href="versions.html">Versions</a></td>
-		<td>&nbsp;&nbsp;</td>
-		<td><a href="contact.html">Contact</a></td>
-	</tr>
-</table>
-
-<h2>Current version</h2>
-
-<p>Version 2.1.15 - (July 2007) Changes include:</p>
-<ul>
-	<li>An error was made in the two previous distributions: an incorrect jar file was included in the windows installer,
-	so some bugfixes were not correctly included. In particular, an issue with how the GO classes were read in is now consistent
-	between all distributions.</li>
-	<li>Output file improvement: When 'Include all genes in output' is checked, the gene names are sorted.</li>
-	<li>Some bugs in the Command Line Interface were fixed, which caused errors when using some option combinations.</li>
-	<li>A bug in the software API which rendered it pretty much unusable was fixed.</li>
-	<li>There were problems with some command line arguments not being recognized correctly.</li>
-	<li>Minor enhancement: when the gene symbols are included in analysis output files, they are sorted by name.
-</ul>
-
-
-
-<hr />
-
-
-<h2>Older versions</h2>
-<p>Version 2.1.14 - (July 2007) Changes include:</p>
-<ul>
-	<li>Minor bug fix: Probes lacking any annotations are handled a little differently, avoiding an annoying error message.
-	This does have a minor effect on the analysis.</li>
-
-	<li>A variety of cosmetic and GUI bugs have been fixed, primarily affecting Linux Fedora Core users.</li>
-</ul>
-
-<p>Version 2.1.13 - () Changes include:</p>
-<ul>
-	<li>Bug fix: If gene scores were negative, the "use best score" option might not work correctly. Thanks to Hubert
-	Rehrauer for the fix.</li>
-	<li>Bug fix: Some parent terms were not being included in when inferring annotations. Thanks to Salvatore Micciche for
-	reporting this.</li>
-	<li>Command line interface overhauled. This should fix problems some users had with certain option combinations.</li>
-	<li>Enhancement: repeated occurrences of the same identifier in the gene score file results in a warning.</li>
-	<li>Minor enhancement: GO categories can be viewed even when score file doesn't match annotation file.</li>
-	<li>Various minor cosmetic fixes.</li>
-</ul>
-<p>Version 2.1.12 - (August 8 2006) Changes include:</p>
-<ul>
-	<li>Added internationalization support for input files (addresses bugs 302, 321).</li>
-	<li>Output file format had misaligned columns. Duplicate column names were fixed and an unused column was removed (bug
-	322).</li>
-	<li>Affymetrix annotation files properly parsed in the command line interface (bug 323).</li>
-</ul>
-
-<p>Version 2.1.11 - (July 12 2006) Internal release</p>
-
-<p>Version 2.1.10 - (May 24 2006) Changes include:</p>
-<ul>
-	<li>ErmineJ is now licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a> license.</li>
-	<li>(Input files) Annotation files from <a
-		href="http://www.chem.agilent.com/scripts/generic.asp?lpage=5175&indcol=N&prodcol=Y">Agilent</a> are supported directly.</li>
-	<li>(Dev) Code has been restructured. This will only affect developers using ermineJ code.</li>
-	<li>Fixed bug: If you tried to run a correlation analysis without a gene score file set (which is supposed to be
-	irrelevant), the analysis would fail.</li>
-	<li>Fixed bug: "Null pointer exceptions" when custom gene score files are missing.</li>
-	<li>Fixed bug: It was still possible to get errors when loading raw data files for analysis, this has finally been
-	fixed.</li>
-	<li>(Docs) Documention of custom gene sets fixed to reflect correct location of ermineJ.data (in your home directory,
-	not the ermineJ installation directory).</li>
-</ul>
-<p>Known issues:</p>
-
-<ul>
-	<li>The command to show user-defined gene sets can sometimes be "confused". The work-around is to just hit "Ctrl-U"
-	twice.</li>
-
-	<li>The id and name of user-defined gene sets cannot be changed. This limitation should be restricted to GO gene sets
-	(bug 224). The work-around is to edit the file and then reload the gene sets.</li>
-
-	<li>(Minor GUI) In tables shown in wizards, the table columns are resizable and sortable, but this is not indicated by
-	the cursor. (bug 212)</li>
-
-</ul>
-
-
-<p>Version 2.1.9 - (Feb 8 2006) Changes include:</p>
-<ul>
-	<li>Restricting analysis to specific GO aspects wasn't working for ROC analysis (fixes bug 285).</li>
-	<li>Loading an analysis from disk failed if the raw data file was not set (bug 291).</li>
-	<li>You can now save the gene set information in the details view even without loading the raw data (bug 290).</li>
-	<li>Small p-values were rounded to zero in the output file (bug 289).</li>
-	<li>The path to the annotation file is stored in the output file. This currently isn't used by the software but is good
-	for user records.</li>
-	<li>Command line interface: -F (--format) option (which took an argument) changed to -A. Using the -A option indicates
-	that the annotation file is in "Affymetrix" format. Fixes bug 272.</li>
-	<li>The format of the Annotation files has been made more flexible. The GO term field can be delimited with characters
-	other than '|' such as commas or spaces (issue 286).</li>
-	<li>The format of the annotation files has been documented (see <a
-		href="ermineJ-help/classScore/html/formats/annotations.html">this page</a>) (issue 287).</li>
-	<li>Minor GUI tweaks to improve portability (bug 269).</li>
-</ul>
-
-
-<p>Version 2.1.8 - (December 20 2005) Changes include:</p>
-
-<ul>
-	<li>Bug fixed that caused "null" error in viewing gene set data under some conditions.</li>
-</ul>
-
-
-<p>Version 2.1.7 - (November 9 2005) Changes include:</p>
-
-<ul>
-	<li>Command line option to output all genes in each gene set added ("-j").</li>
-	<li>Command line error output is more helpful.</li>
-	<li>Result file contains parameters when using command line.</li>
-	<li>Bug in handling custom annotation files fixed.</li>
-	<li>Correlation score performance improved (again).</li>
-</ul>
-
-
-<p>Version 2.1.6 - September 2, 2005. Changes include:</p>
-
-<ul>
-	<li>User-defined gene sets were not being used for analysis. There were also related problems with editing and viewing
-	gene sets once created (Fixes for bugs 256, 257 and 258).</li>
-</ul>
-
-
-<p>Version 2.1.5 - August 12, 2005. Changes include:</p>
-
-<ul>
-	<li>Bug which caused the "cancel" function to fail fixed.</li>
-	<li>Reading of raw matrix files performance improvements.</li>
-	<li>Correlation analysis dramatically sped up again due to a bug fix. In addition, a number of optimizations have been
-	implemented to futher improve performance of the correlation analysis.</li>
-	<li>Bug which caused poor performance of tree view after analysis fixed.</li>
-	<li>Bug which left grouping separators in numbers for the gene details matrix output files fixed.</li>
-</ul>
-
-
-<p>Version 2.1.4. Changes include:</p>
-
-<ul>
-	<li>Fixed bug which caused problems after loading two or more gene score files that had only partial gene lists with
-	respect to the annotation file.(Bug 230)</li>
-
-	<li>Fixed bug which caused error in reading preferences for the "details" view. The file choosers for saving data have
-	also been improved to suggest a file name.</li>
-
-	<li>(File format) The first line of a loaded gene score file is now ignored (e.g., it is treated as a header), as
-	documented in the help. This was causing spurious warnings about mismatched names (bug 229). The warnings given are also
-	more informative.</li>
-
-	<li>(Performance) Bug which caused unnecessary slowdown of correlation analysis fixed. It's still slow, but usable.</li>
-
-	<li>(Performance) Sorting of details view when sorting by gene symbol is now as fast as for the other columns (bug
-	195).</li>
-
-	<li>(Documentation) New FAQs and more guidance on setting parameters and choosing methods.</li>
-
-</ul>
-
-
-<p>Version 2.1.3. Changes include:</p>
-<ul>
-	<li>A number of bugs in the display of user-modified or user-defined gene sets have been fixed.</li>
-	<li>When <em>modifying</em> a GO gene set, you are no longer allowed to change the name or description. You can still
-	change the members of the gene set.</li>
-	<li>New options in gene set popup menus to manage custom gene sets.</li>
-	<li>Add Gene Set menu item to reload the user-defined gene sets from disk (keyboard Ctrl-E).</li>
-	<li>Both the data file used and the gene score file can be changed from menu items as well as from the analysis wizard.</li>
-	<li>Additional bug and feature fixes (including issues 170, 208, 214, 215, 218, 219, 220, 222, 223).</li>
-</ul>
-
-
-<p>Version 2.1.2. Changes include:</p>
-<ul>
-	<li>New Feature: Receiver operator characteristic (ROC) method now available from all interfaces.</li>
-	<li>Fixed Issue 210: Failure to save results files for some situations.</li>
-	<li>Fixed Issue 204: default for "Larger scores are better" should be 'false'.</li>
-	<li>After an analysis, the results are checked for "reasonableness". If they are not, the user is advised to check the
-	validity of the analysis settings. Unreasonable results would be p-values that are all zero, for example.</li>
-	<li>Inconsistent behavior of "next" and "back" buttons in Analysis Wizard fixed.</li>
-	<li>Errors during analysis now result in less silent death.</li>
-	<li>Some other minor issues resolved.</li>
-</ul>
-
-
-<p>Version 2.1.1. Fixes bugs which caused incorrect parsing of gene descriptions and resulted in multiple custom gene set
-directories. All users should upgrade. (issues 198,199)</p>
-
-
-<p>Version 2.1. Changes include:</p>
-<ul>
-	<li>Gene sets and their results are now available in a new tree diagram.</li>
-	<li>URLs for gene links in the details view are now modifiable.</li>
-	<li>You can change the data set you are viewing in the details view.</li>
-	<li>Result sets ('runs') can be renamed by using the context menu in the table view.</li>
-	<li>A feature has been added to find gene sets by genes, in addition to by gene set name.</li>
-	<li>The saved output files can optionally contain the names of the genes in each gene set.</li>
-	<li>The GO aspect(s) to be analyzed can be controlled.</li>
-	<li>New tooltips have been added, to display the aspect and definition of a gene set</li>
-	<li>GO and gene annotation files can be ZIP or GZIP compressed.</li>
-	<li>Logfile is saved for all interactive runs of ermineJ, and is viewable from the "help" menu.</li>
-	<li>For programmers, a simplified API is available to help integrate ermineJ functionality into your code.</li>
-	<li>Further improvements and updates to the documentation.</li>
-	<li>Program startup time has been improved, fixing slowdown introduced in 2.0.4</li>
-	<li>Assorted minor bug fixes and improvements, too many to list.</li>
-</ul>
-
-
-<p>(not released): Version 2.0.5. Annotation files can be Affymetrix CSV files. Documentation has been improved. A number
-of other minor fixes and improvements, primarily affecting the GUI.</p>
-
-
-<p>April 27 2005: Version 2.0.4 released. Annotation files no longer need to contain lists of all parent terms, these are
-added b the software. This means initializing the software is a little slower but makes it much easier to use third-party
-annotation files. A number of other minor issues and bugs were also fixed.</p>
-
-
-<p>April 7 2005: Version 2.0.3 released. This fixes a few GUI bugs and increases the usability of the 'load analysis'
-feature</p>
-
-
-<P>January 4 2005: Version 2.0.2 released. This release addresses several minor bugs relating to software usability. The
-software now handles gene scores that are not p values more gracefully.</P>
-
-
-<p>December 23 2004: Version 2.0.1 released. This maintenance release addresses a number of bugs, the most serious of
-which was a bug in the "ORA" analysis that could lead to inaccurate findings in some cases. In addition, the handling of gene
-scores that are not raw p-values has been made more flexible. Most of the remaining bugs are minor and relate to the
-usability of the software, but all users should update to this version. There are also many improvements to the
-documentation.</p>
-
-
-<p>October 13 2004 Version 2.0 released. This fixes several GUI bugs that affected use under Linux and Mac, as well as
-some other minor bugs and documentation improvements.</p>
-
-
-<p>September 28 2004 Version 2.0b7. This further improves documentation and fixes bugs, including one that caused gene
-set probe numbers to be displayed incorrectly when data had been filtered.</p>
-
-
-<p>September 22 2004 Version 2.0b6 released. This fixes some major bugs in the visualization component of the software,
-and includes some improvements to the documentation and error messages. New feature: some methods for speeding up the
-resampling-based analysis have been implemented. These are particularly helpful for the correlation-analysis. The new methods
-use some approximations that are documented <A href="ermineJ-help/html/tutorial/approximations.html">here</A>.</p>
-
-
-<p>August 18 2004 - Version 2.0b5 released. This introduces some minor new features and fixes several bugs, one of which
-are serious affecting the correlation analysis. In addition, the advertised command line tool is now operational.</p>
-
-
-<p>August 12 2004 - Version 2.0b4 released. This is a maintenance release that fixes a number of bugs and issues, some of
-which are serious. All users should update to this version.</p>
-
-
-<p>July 20 2004 - Version 2.0b3 released. This is an extensive rewrite of the user interface, with numerous new features,
-including the ability to define your own gene sets and visualize the analysis results. This is a late-beta release as we iron
-out bugs and performance issues.</p>
-</body>
+	<head>
+		<title>ErmineJ version history</title>
+		<link type="text/css" rel="stylesheet" href="css/default.css">
+	</head>
+	<body>
+		<IMG height="112" alt="ermineJ logo" src="images/logo1small.gif"
+			width="266" border="0">
+		<h1>
+			Version history
+		</h1>
+		<!--  navigation -->
+		<table>
+			<tr>
+				<td>
+					<a href="index.html">Home</a>
+				</td>
+				<td>
+					&nbsp;&nbsp;
+				</td>
+				<td>
+					<a href="downloadInstall.html">Download</a>
+				</td>
+				<td>
+					&nbsp;&nbsp;
+				</td>
+				<td>
+					<a href="ermineJ-help/classScore/html/">Help</a>
+				</td>
+				<td>
+					&nbsp;&nbsp;
+				</td>
+				<td>
+					<a href="publications.html">Pubs</a>
+				</td>
+				<td>
+					&nbsp;&nbsp;
+				</td>
+				<td>
+					<a href="screenshots.html">Screens</a>
+				</td>
+				<td>
+					&nbsp;&nbsp;
+				</td>
+				<td>
+					<a href="versions.html">Versions</a>
+				</td>
+				<td>
+					&nbsp;&nbsp;
+				</td>
+				<td>
+					<a href="contact.html">Contact</a>
+				</td>
+			</tr>
+		</table>
+
+		<h2>
+			Current version
+		</h2>
+
+		<p>
+			Version 2.1.16 - ( ) Changes include:
+		</p>
+		<ul>
+			<li>Fix 'generic' ermineJ.bat script to use java.exe instead of javax.exe, and fix stray "\nul".
+			</li>
+		</ul>
+
+
+
+		<hr />
+
+
+		<h2>
+			Older versions
+		</h2>
+
+
+		<p>
+			Version 2.1.15 - (July 2007) Changes include:
+		</p>
+		<ul>
+			<li>
+				An error was made in the two previous distributions: an incorrect
+				jar file was included in the windows installer, so some bugfixes
+				were not correctly included. In particular, an issue with how the GO
+				classes were read in is now consistent between all distributions.
+			</li>
+			<li>
+				Output file improvement: When 'Include all genes in output' is
+				checked, the gene names are sorted.
+			</li>
+			<li>
+				Some bugs in the Command Line Interface were fixed, which caused
+				errors when using some option combinations.
+			</li>
+			<li>
+				A bug in the software API which rendered it pretty much unusable was
+				fixed.
+			</li>
+			<li>
+				There were problems with some command line arguments not being
+				recognized correctly.
+			</li>
+			<li>
+				Minor enhancement: when the gene symbols are included in analysis
+				output files, they are sorted by name.
+		</ul>
+
+
+
+
+		<p>
+			Version 2.1.14 - (July 2007) Changes include:
+		</p>
+		<ul>
+			<li>
+				Minor bug fix: Probes lacking any annotations are handled a little
+				differently, avoiding an annoying error message. This does have a
+				minor effect on the analysis.
+			</li>
+
+			<li>
+				A variety of cosmetic and GUI bugs have been fixed, primarily
+				affecting Linux Fedora Core users.
+			</li>
+		</ul>
+
+		<p>
+			Version 2.1.13 - () Changes include:
+		</p>
+		<ul>
+			<li>
+				Bug fix: If gene scores were negative, the "use best score" option
+				might not work correctly. Thanks to Hubert Rehrauer for the fix.
+			</li>
+			<li>
+				Bug fix: Some parent terms were not being included in when inferring
+				annotations. Thanks to Salvatore Micciche for reporting this.
+			</li>
+			<li>
+				Command line interface overhauled. This should fix problems some
+				users had with certain option combinations.
+			</li>
+			<li>
+				Enhancement: repeated occurrences of the same identifier in the gene
+				score file results in a warning.
+			</li>
+			<li>
+				Minor enhancement: GO categories can be viewed even when score file
+				doesn't match annotation file.
+			</li>
+			<li>
+				Various minor cosmetic fixes.
+			</li>
+		</ul>
+		<p>
+			Version 2.1.12 - (August 8 2006) Changes include:
+		</p>
+		<ul>
+			<li>
+				Added internationalization support for input files (addresses bugs
+				302, 321).
+			</li>
+			<li>
+				Output file format had misaligned columns. Duplicate column names
+				were fixed and an unused column was removed (bug 322).
+			</li>
+			<li>
+				Affymetrix annotation files properly parsed in the command line
+				interface (bug 323).
+			</li>
+		</ul>
+
+		<p>
+			Version 2.1.11 - (July 12 2006) Internal release
+		</p>
+
+		<p>
+			Version 2.1.10 - (May 24 2006) Changes include:
+		</p>
+		<ul>
+			<li>
+				ErmineJ is now licensed under the
+				<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>
+				license.
+			</li>
+			<li>
+				(Input files) Annotation files from
+				<a
+					href="http://www.chem.agilent.com/scripts/generic.asp?lpage=5175&indcol=N&prodcol=Y">Agilent</a>
+				are supported directly.
+			</li>
+			<li>
+				(Dev) Code has been restructured. This will only affect developers
+				using ermineJ code.
+			</li>
+			<li>
+				Fixed bug: If you tried to run a correlation analysis without a gene
+				score file set (which is supposed to be irrelevant), the analysis
+				would fail.
+			</li>
+			<li>
+				Fixed bug: "Null pointer exceptions" when custom gene score files
+				are missing.
+			</li>
+			<li>
+				Fixed bug: It was still possible to get errors when loading raw data
+				files for analysis, this has finally been fixed.
+			</li>
+			<li>
+				(Docs) Documention of custom gene sets fixed to reflect correct
+				location of ermineJ.data (in your home directory, not the ermineJ
+				installation directory).
+			</li>
+		</ul>
+		<p>
+			Known issues:
+		</p>
+
+		<ul>
+			<li>
+				The command to show user-defined gene sets can sometimes be
+				"confused". The work-around is to just hit "Ctrl-U" twice.
+			</li>
+
+			<li>
+				The id and name of user-defined gene sets cannot be changed. This
+				limitation should be restricted to GO gene sets (bug 224). The
+				work-around is to edit the file and then reload the gene sets.
+			</li>
+
+			<li>
+				(Minor GUI) In tables shown in wizards, the table columns are
+				resizable and sortable, but this is not indicated by the cursor.
+				(bug 212)
+			</li>
+
+		</ul>
+
+
+		<p>
+			Version 2.1.9 - (Feb 8 2006) Changes include:
+		</p>
+		<ul>
+			<li>
+				Restricting analysis to specific GO aspects wasn't working for ROC
+				analysis (fixes bug 285).
+			</li>
+			<li>
+				Loading an analysis from disk failed if the raw data file was not
+				set (bug 291).
+			</li>
+			<li>
+				You can now save the gene set information in the details view even
+				without loading the raw data (bug 290).
+			</li>
+			<li>
+				Small p-values were rounded to zero in the output file (bug 289).
+			</li>
+			<li>
+				The path to the annotation file is stored in the output file. This
+				currently isn't used by the software but is good for user records.
+			</li>
+			<li>
+				Command line interface: -F (--format) option (which took an
+				argument) changed to -A. Using the -A option indicates that the
+				annotation file is in "Affymetrix" format. Fixes bug 272.
+			</li>
+			<li>
+				The format of the Annotation files has been made more flexible. The
+				GO term field can be delimited with characters other than '|' such
+				as commas or spaces (issue 286).
+			</li>
+			<li>
+				The format of the annotation files has been documented (see
+				<a href="ermineJ-help/classScore/html/formats/annotations.html">this
+					page</a>) (issue 287).
+			</li>
+			<li>
+				Minor GUI tweaks to improve portability (bug 269).
+			</li>
+		</ul>
+
+
+		<p>
+			Version 2.1.8 - (December 20 2005) Changes include:
+		</p>
+
+		<ul>
+			<li>
+				Bug fixed that caused "null" error in viewing gene set data under
+				some conditions.
+			</li>
+		</ul>
+
+
+		<p>
+			Version 2.1.7 - (November 9 2005) Changes include:
+		</p>
+
+		<ul>
+			<li>
+				Command line option to output all genes in each gene set added
+				("-j").
+			</li>
+			<li>
+				Command line error output is more helpful.
+			</li>
+			<li>
+				Result file contains parameters when using command line.
+			</li>
+			<li>
+				Bug in handling custom annotation files fixed.
+			</li>
+			<li>
+				Correlation score performance improved (again).
+			</li>
+		</ul>
+
+
+		<p>
+			Version 2.1.6 - September 2, 2005. Changes include:
+		</p>
+
+		<ul>
+			<li>
+				User-defined gene sets were not being used for analysis. There were
+				also related problems with editing and viewing gene sets once
+				created (Fixes for bugs 256, 257 and 258).
+			</li>
+		</ul>
+
+
+		<p>
+			Version 2.1.5 - August 12, 2005. Changes include:
+		</p>
+
+		<ul>
+			<li>
+				Bug which caused the "cancel" function to fail fixed.
+			</li>
+			<li>
+				Reading of raw matrix files performance improvements.
+			</li>
+			<li>
+				Correlation analysis dramatically sped up again due to a bug fix. In
+				addition, a number of optimizations have been implemented to futher
+				improve performance of the correlation analysis.
+			</li>
+			<li>
+				Bug which caused poor performance of tree view after analysis fixed.
+			</li>
+			<li>
+				Bug which left grouping separators in numbers for the gene details
+				matrix output files fixed.
+			</li>
+		</ul>
+
+
+		<p>
+			Version 2.1.4. Changes include:
+		</p>
+
+		<ul>
+			<li>
+				Fixed bug which caused problems after loading two or more gene score
+				files that had only partial gene lists with respect to the
+				annotation file.(Bug 230)
+			</li>
+
+			<li>
+				Fixed bug which caused error in reading preferences for the
+				"details" view. The file choosers for saving data have also been
+				improved to suggest a file name.
+			</li>
+
+			<li>
+				(File format) The first line of a loaded gene score file is now
+				ignored (e.g., it is treated as a header), as documented in the
+				help. This was causing spurious warnings about mismatched names (bug
+				229). The warnings given are also more informative.
+			</li>
+
+			<li>
+				(Performance) Bug which caused unnecessary slowdown of correlation
+				analysis fixed. It's still slow, but usable.
+			</li>
+
+			<li>
+				(Performance) Sorting of details view when sorting by gene symbol is
+				now as fast as for the other columns (bug 195).
+			</li>
+
+			<li>
+				(Documentation) New FAQs and more guidance on setting parameters and
+				choosing methods.
+			</li>
+
+		</ul>
+
+
+		<p>
+			Version 2.1.3. Changes include:
+		</p>
+		<ul>
+			<li>
+				A number of bugs in the display of user-modified or user-defined
+				gene sets have been fixed.
+			</li>
+			<li>
+				When
+				<em>modifying</em> a GO gene set, you are no longer allowed to
+				change the name or description. You can still change the members of
+				the gene set.
+			</li>
+			<li>
+				New options in gene set popup menus to manage custom gene sets.
+			</li>
+			<li>
+				Add Gene Set menu item to reload the user-defined gene sets from
+				disk (keyboard Ctrl-E).
+			</li>
+			<li>
+				Both the data file used and the gene score file can be changed from
+				menu items as well as from the analysis wizard.
+			</li>
+			<li>
+				Additional bug and feature fixes (including issues 170, 208, 214,
+				215, 218, 219, 220, 222, 223).
+			</li>
+		</ul>
+
+
+		<p>
+			Version 2.1.2. Changes include:
+		</p>
+		<ul>
+			<li>
+				New Feature: Receiver operator characteristic (ROC) method now
+				available from all interfaces.
+			</li>
+			<li>
+				Fixed Issue 210: Failure to save results files for some situations.
+			</li>
+			<li>
+				Fixed Issue 204: default for "Larger scores are better" should be
+				'false'.
+			</li>
+			<li>
+				After an analysis, the results are checked for "reasonableness". If
+				they are not, the user is advised to check the validity of the
+				analysis settings. Unreasonable results would be p-values that are
+				all zero, for example.
+			</li>
+			<li>
+				Inconsistent behavior of "next" and "back" buttons in Analysis
+				Wizard fixed.
+			</li>
+			<li>
+				Errors during analysis now result in less silent death.
+			</li>
+			<li>
+				Some other minor issues resolved.
+			</li>
+		</ul>
+
+
+		<p>
+			Version 2.1.1. Fixes bugs which caused incorrect parsing of gene
+			descriptions and resulted in multiple custom gene set directories.
+			All users should upgrade. (issues 198,199)
+		</p>
+
+
+		<p>
+			Version 2.1. Changes include:
+		</p>
+		<ul>
+			<li>
+				Gene sets and their results are now available in a new tree diagram.
+			</li>
+			<li>
+				URLs for gene links in the details view are now modifiable.
+			</li>
+			<li>
+				You can change the data set you are viewing in the details view.
+			</li>
+			<li>
+				Result sets ('runs') can be renamed by using the context menu in the
+				table view.
+			</li>
+			<li>
+				A feature has been added to find gene sets by genes, in addition to
+				by gene set name.
+			</li>
+			<li>
+				The saved output files can optionally contain the names of the genes
+				in each gene set.
+			</li>
+			<li>
+				The GO aspect(s) to be analyzed can be controlled.
+			</li>
+			<li>
+				New tooltips have been added, to display the aspect and definition
+				of a gene set
+			</li>
+			<li>
+				GO and gene annotation files can be ZIP or GZIP compressed.
+			</li>
+			<li>
+				Logfile is saved for all interactive runs of ermineJ, and is
+				viewable from the "help" menu.
+			</li>
+			<li>
+				For programmers, a simplified API is available to help integrate
+				ermineJ functionality into your code.
+			</li>
+			<li>
+				Further improvements and updates to the documentation.
+			</li>
+			<li>
+				Program startup time has been improved, fixing slowdown introduced
+				in 2.0.4
+			</li>
+			<li>
+				Assorted minor bug fixes and improvements, too many to list.
+			</li>
+		</ul>
+
+
+		<p>
+			(not released): Version 2.0.5. Annotation files can be Affymetrix CSV
+			files. Documentation has been improved. A number of other minor fixes
+			and improvements, primarily affecting the GUI.
+		</p>
+
+
+		<p>
+			April 27 2005: Version 2.0.4 released. Annotation files no longer
+			need to contain lists of all parent terms, these are added b the
+			software. This means initializing the software is a little slower but
+			makes it much easier to use third-party annotation files. A number of
+			other minor issues and bugs were also fixed.
+		</p>
+
+
+		<p>
+			April 7 2005: Version 2.0.3 released. This fixes a few GUI bugs and
+			increases the usability of the 'load analysis' feature
+		</p>
+
+
+		<P>
+			January 4 2005: Version 2.0.2 released. This release addresses
+			several minor bugs relating to software usability. The software now
+			handles gene scores that are not p values more gracefully.
+		</P>
+
+
+		<p>
+			December 23 2004: Version 2.0.1 released. This maintenance release
+			addresses a number of bugs, the most serious of which was a bug in
+			the "ORA" analysis that could lead to inaccurate findings in some
+			cases. In addition, the handling of gene scores that are not raw
+			p-values has been made more flexible. Most of the remaining bugs are
+			minor and relate to the usability of the software, but all users
+			should update to this version. There are also many improvements to
+			the documentation.
+		</p>
+
+
+		<p>
+			October 13 2004 Version 2.0 released. This fixes several GUI bugs
+			that affected use under Linux and Mac, as well as some other minor
+			bugs and documentation improvements.
+		</p>
+
+
+		<p>
+			September 28 2004 Version 2.0b7. This further improves documentation
+			and fixes bugs, including one that caused gene set probe numbers to
+			be displayed incorrectly when data had been filtered.
+		</p>
+
+
+		<p>
+			September 22 2004 Version 2.0b6 released. This fixes some major bugs
+			in the visualization component of the software, and includes some
+			improvements to the documentation and error messages. New feature:
+			some methods for speeding up the resampling-based analysis have been
+			implemented. These are particularly helpful for the
+			correlation-analysis. The new methods use some approximations that
+			are documented
+			<A href="ermineJ-help/html/tutorial/approximations.html">here</A>.
+		</p>
+
+
+		<p>
+			August 18 2004 - Version 2.0b5 released. This introduces some minor
+			new features and fixes several bugs, one of which are serious
+			affecting the correlation analysis. In addition, the advertised
+			command line tool is now operational.
+		</p>
+
+
+		<p>
+			August 12 2004 - Version 2.0b4 released. This is a maintenance
+			release that fixes a number of bugs and issues, some of which are
+			serious. All users should update to this version.
+		</p>
+
+
+		<p>
+			July 20 2004 - Version 2.0b3 released. This is an extensive rewrite
+			of the user interface, with numerous new features, including the
+			ability to define your own gene sets and visualize the analysis
+			results. This is a late-beta release as we iron out bugs and
+			performance issues.
+		</p>
+	</body>
 </html>
