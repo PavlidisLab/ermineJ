@@ -929,7 +929,7 @@ public class JGeneSetFrame extends JFrame {
         matrixDisplay.setStandardizedEnabled( normalized );
         matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
         try {
-            matrixDisplay.saveImage( filename, includeLabels, normalized );
+            matrixDisplay.saveImage( matrixDisplay.getColorMatrix(), filename, includeLabels, normalized );
         } catch ( IOException e ) {
             // clean up
             matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
