@@ -45,7 +45,7 @@ import ubic.erminej.data.Histogram;
 public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private double histRange = 0;
-    private DoubleMatrixNamed data = null;
+    private DoubleMatrixNamed<String, String> data = null;
     private Histogram hist;
     private Map probeToGeneMap;
     private int geneRepTreatment;
@@ -84,7 +84,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, GONames gon,
-            DoubleMatrixNamed data ) {
+            DoubleMatrixNamed<String, String> data ) {
         super( settings, a, csc, gon );
         this.data = data;
 

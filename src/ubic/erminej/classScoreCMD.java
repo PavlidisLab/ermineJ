@@ -72,7 +72,7 @@ public class classScoreCMD {
     protected GONames goData;
     protected GeneAnnotations geneData;
     protected Map geneDataSets;
-    protected Map rawDataSets;
+    protected Map<String, DoubleMatrixNamed<String, String>> rawDataSets;
     protected Map geneScoreSets;
     private String saveFileName = null;
     private boolean useCommandLineInterface = true;
@@ -121,7 +121,7 @@ public class classScoreCMD {
 
     public classScoreCMD() throws IOException {
         settings = new Settings();
-        rawDataSets = new HashMap();
+        rawDataSets = new HashMap<String, DoubleMatrixNamed<String, String>>();
         geneDataSets = new HashMap();
         geneScoreSets = new HashMap();
         this.buildOptions();
@@ -575,7 +575,7 @@ public class classScoreCMD {
      * @throws IOException
      */
     protected GeneSetPvalRun analyze() throws IOException {
-        DoubleMatrixNamed rawData = null;
+        DoubleMatrixNamed<String, String> rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
                 statusMessenger.showStatus( "Raw data are in memory" );

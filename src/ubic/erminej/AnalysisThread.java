@@ -53,7 +53,7 @@ public class AnalysisThread extends Thread {
     private StatusViewer messenger;
     // private int numRuns = 0;
     private Settings oldSettings = null;
-    private Map rawDataSets;
+    private Map<String, DoubleMatrixNamed<String, String>> rawDataSets;
     private volatile Method runningMethod;
     private Settings settings;
     private volatile boolean stop = false;
@@ -236,16 +236,16 @@ public class AnalysisThread extends Thread {
      * @return
      * @throws IOException
      */
-    private synchronized DoubleMatrixNamed addRawData() throws IOException {
-        DoubleMatrixNamed rawData;
+    private synchronized DoubleMatrixNamed<String, String> addRawData() throws IOException {
+        DoubleMatrixNamed<String, String> rawData;
         if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
             if ( messenger != null ) messenger.showStatus( "Raw data are in memory" );
-            rawData = ( DoubleMatrixNamed ) rawDataSets.get( settings.getRawDataFileName() );
+            rawData = ( DoubleMatrixNamed<String, String> ) rawDataSets.get( settings.getRawDataFileName() );
         } else {
             if ( messenger != null )
                 messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
-            rawData = ( DoubleMatrixNamed ) r.read( settings.getRawDataFileName() );
+            rawData = ( DoubleMatrixNamed<String, String> ) r.read( settings.getRawDataFileName() );
             rawDataSets.put( settings.getRawDataFileName(), rawData );
         }
         return rawData;
