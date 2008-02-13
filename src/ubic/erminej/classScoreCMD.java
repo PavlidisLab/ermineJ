@@ -67,16 +67,192 @@ public class classScoreCMD {
 
     private static Log log = LogFactory.getLog( classScoreCMD.class );
 
+    public static void main( String[] args ) {
+        try {
+            classScoreCMD cmd = new classScoreCMD();
+            cmd.processCommandLine( "ermineJ", args );
+            // options( args );
+            cmd.getSettings().setDirectories();
+            if ( cmd.isUseCommandLineInterface() ) {
+                cmd.initialize();
+                try {
+                    GeneSetPvalRun result = cmd.analyze();
+                    cmd.getSettings().writeAnalysisSettings( cmd.getSaveFileName() );
+                    ResultsPrinter rp = new ResultsPrinter( cmd.getSaveFileName(), result, cmd.getGoData(), cmd
+                            .isSaveAllGenes() );
+                    rp.printResults( true );
+                } catch ( Exception e ) {
+                    cmd.getStatusMessenger().showStatus( "Error During analysis:" + e );
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+                }
+                new classScoreGUI();
+            }
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
+
     protected Settings settings;
     protected StatusViewer statusMessenger;
     protected GONames goData;
     protected GeneAnnotations geneData;
-    protected Map geneDataSets;
+    protected Map<Integer, GeneAnnotations> geneDataSets;
     protected Map<String, DoubleMatrixNamed<String, String>> rawDataSets;
-    protected Map geneScoreSets;
+    protected Map<String, GeneScores> geneScoreSets;
     private String saveFileName = null;
     private boolean useCommandLineInterface = true;
+
     private boolean saveAllGenes = false;
+
+    private Options options = new Options();
+
+    private CommandLine commandLine;
+
+    public classScoreCMD() throws IOException {
+        settings = new Settings();
+        rawDataSets = new HashMap<String, DoubleMatrixNamed<String, String>>();
+        geneDataSets = new HashMap<Integer, GeneAnnotations>();
+        geneScoreSets = new HashMap<String, GeneScores>();
+        this.buildOptions();
+    }
+
+    public GONames getGoData() {
+        return goData;
+    }
+
+    public String getSaveFileName() {
+        return saveFileName;
+    }
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public StatusViewer getStatusMessenger() {
+        return statusMessenger;
+    }
+
+    public boolean isSaveAllGenes() {
+        return saveAllGenes;
+    }
+
+    public boolean isUseCommandLineInterface() {
+        return useCommandLineInterface;
+    }
+
+    /**
+     * @throws IllegalArgumentException
+     * @return
+     * @throws IOException
+     */
+    protected GeneSetPvalRun analyze() throws IOException {
+        DoubleMatrixNamed<String, String> rawData = null;
+        if ( settings.getClassScoreMethod() == Settings.CORR ) {
+            if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
+                statusMessenger.showStatus( "Raw data are in memory" );
+                rawData = rawDataSets.get( settings.getRawDataFileName() );
+            } else {
+                statusMessenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
+                DoubleMatrixReader r = new DoubleMatrixReader();
+                rawData = r.read( settings.getRawDataFileName() );
+                rawDataSets.put( settings.getRawDataFileName(), rawData );
+            }
+        }
+
+        GeneScores geneScores;
+        if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
+            statusMessenger.showStatus( "Gene Scores are in memory" );
+            geneScores = geneScoreSets.get( settings.getScoreFile() );
+        } else {
+            statusMessenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
+            geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData );
+            geneScoreSets.put( settings.getScoreFile(), geneScores );
+        }
+
+        if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
+            statusMessenger.showStatus( "Didn't get geneScores" );
+        }
+
+        Set<String> activeProbes = null;
+        if ( rawData != null && geneScores != null ) { // favor the geneScores
+            // list.
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
+        } else if ( rawData == null && geneScores != null ) {
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
+        } else if ( rawData != null && geneScores == null ) {
+            activeProbes = new HashSet<String>( rawData.getRowNames() );
+        }
+
+        boolean needToMakeNewGeneData = true;
+        for ( Iterator<Integer> it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
+            GeneAnnotations test = geneDataSets.get( it.next() );
+
+            if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
+                geneData = test;
+                needToMakeNewGeneData = false;
+                break;
+            }
+
+        }
+
+        if ( needToMakeNewGeneData ) {
+            geneData = new GeneAnnotations( geneData, activeProbes );
+            geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
+        }
+
+        /* do work */
+        statusMessenger.showStatus( "Starting analysis..." );
+        GeneSetPvalRun runResult = new GeneSetPvalRun( activeProbes, settings, geneData, rawData, goData, geneScores,
+                statusMessenger, "command" );
+        return runResult;
+    }
+
+    /**
+     * @see ubic.erminej.gui.GeneSetScoreFrame.readDataFilesForStartup
+     */
+    protected void initialize() {
+        try {
+            statusMessenger = new StatusStderr();
+            statusMessenger.showStatus( "Reading GO descriptions from " + settings.getClassFile() );
+
+            goData = new GONames( settings.getClassFile() );
+
+            statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
+            if ( settings.getAnnotFormat() == 1 ) {
+                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData,
+                        GeneAnnotations.AFFYCSV );
+            } else {
+                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
+                // TODO add agilent support ... can we tell the type of file by the suffix?
+            }
+
+            statusMessenger.showStatus( "Initializing gene class mapping" );
+            geneDataSets.put( new Integer( "original".hashCode() ), geneData );
+            statusMessenger.showStatus( "Done with setup" );
+            statusMessenger.showStatus( "Ready." );
+        } catch ( IOException e ) {
+            statusMessenger.showStatus( "File reading or writing error during initialization: " + e.getMessage()
+                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
+            System.exit( 1 );
+        } catch ( SAXException e ) {
+            statusMessenger.showStatus( "Gene Ontology file format is incorrect. "
+                    + "\nPlease check that it is a valid XML file. "
+                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
+            System.exit( 1 );
+        }
+
+        // need to load user-defined sets.
+        UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
+        loader.loadUserGeneSets( this.goData, this.statusMessenger );
+
+        statusMessenger.showStatus( "Done with initialization." );
+    }
 
     /**
      * @param command The name of the command as used at the command line.
@@ -117,54 +293,6 @@ public class classScoreCMD {
 
         processOptions();
 
-    }
-
-    public classScoreCMD() throws IOException {
-        settings = new Settings();
-        rawDataSets = new HashMap<String, DoubleMatrixNamed<String, String>>();
-        geneDataSets = new HashMap();
-        geneScoreSets = new HashMap();
-        this.buildOptions();
-    }
-
-    public static void main( String[] args ) {
-        try {
-            classScoreCMD cmd = new classScoreCMD();
-            cmd.processCommandLine( "ermineJ", args );
-            // options( args );
-            cmd.getSettings().setDirectories();
-            if ( cmd.isUseCommandLineInterface() ) {
-                cmd.initialize();
-                try {
-                    GeneSetPvalRun result = cmd.analyze();
-                    cmd.getSettings().writeAnalysisSettings( cmd.getSaveFileName() );
-                    ResultsPrinter rp = new ResultsPrinter( cmd.getSaveFileName(), result, cmd.getGoData(), cmd
-                            .isSaveAllGenes() );
-                    rp.printResults( true );
-                } catch ( Exception e ) {
-                    cmd.getStatusMessenger().showStatus( "Error During analysis:" + e );
-                    e.printStackTrace();
-                }
-            } else {
-                try {
-                    UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-                } catch ( Exception e ) {
-                    e.printStackTrace();
-                }
-                new classScoreGUI();
-            }
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
-    }
-
-    private Options options = new Options();
-
-    private CommandLine commandLine;
-
-    private void showHelpAndExit() {
-        printHelp( "ermineJ" );
-        System.exit( 0 );
     }
 
     private void buildOptions() {
@@ -528,135 +656,8 @@ public class classScoreCMD {
         }
     }
 
-    /**
-     * @see ubic.erminej.gui.GeneSetScoreFrame.readDataFilesForStartup
-     */
-    protected void initialize() {
-        try {
-            statusMessenger = new StatusStderr();
-            statusMessenger.showStatus( "Reading GO descriptions from " + settings.getClassFile() );
-
-            goData = new GONames( settings.getClassFile() );
-
-            statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-            if ( settings.getAnnotFormat() == 1 ) {
-                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData,
-                        GeneAnnotations.AFFYCSV );
-            } else {
-                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
-                // TODO add agilent support ... can we tell the type of file by the suffix?
-            }
-
-            statusMessenger.showStatus( "Initializing gene class mapping" );
-            geneDataSets.put( new Integer( "original".hashCode() ), geneData );
-            statusMessenger.showStatus( "Done with setup" );
-            statusMessenger.showStatus( "Ready." );
-        } catch ( IOException e ) {
-            statusMessenger.showStatus( "File reading or writing error during initialization: " + e.getMessage()
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 );
-        } catch ( SAXException e ) {
-            statusMessenger.showStatus( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid XML file. "
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 );
-        }
-
-        // need to load user-defined sets.
-        UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
-        loader.loadUserGeneSets( this.goData, this.statusMessenger );
-
-        statusMessenger.showStatus( "Done with initialization." );
-    }
-
-    /**
-     * @throws IllegalArgumentException
-     * @return
-     * @throws IOException
-     */
-    protected GeneSetPvalRun analyze() throws IOException {
-        DoubleMatrixNamed<String, String> rawData = null;
-        if ( settings.getClassScoreMethod() == Settings.CORR ) {
-            if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
-                statusMessenger.showStatus( "Raw data are in memory" );
-                rawData = ( DoubleMatrixNamed ) rawDataSets.get( settings.getRawDataFileName() );
-            } else {
-                statusMessenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
-                DoubleMatrixReader r = new DoubleMatrixReader();
-                rawData = ( DoubleMatrixNamed ) r.read( settings.getRawDataFileName() );
-                rawDataSets.put( settings.getRawDataFileName(), rawData );
-            }
-        }
-
-        GeneScores geneScores;
-        if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-            statusMessenger.showStatus( "Gene Scores are in memory" );
-            geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
-        } else {
-            statusMessenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData );
-            geneScoreSets.put( settings.getScoreFile(), geneScores );
-        }
-
-        if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
-            statusMessenger.showStatus( "Didn't get geneScores" );
-        }
-
-        Set activeProbes = null;
-        if ( rawData != null && geneScores != null ) { // favor the geneScores
-            // list.
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData == null && geneScores != null ) {
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData != null && geneScores == null ) {
-            activeProbes = new HashSet( rawData.getRowNames() );
-        }
-
-        boolean needToMakeNewGeneData = true;
-        for ( Iterator it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
-            GeneAnnotations test = ( GeneAnnotations ) geneDataSets.get( it.next() );
-
-            if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
-                geneData = test;
-                needToMakeNewGeneData = false;
-                break;
-            }
-
-        }
-
-        if ( needToMakeNewGeneData ) {
-            geneData = new GeneAnnotations( geneData, activeProbes );
-            geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
-        }
-
-        /* do work */
-        statusMessenger.showStatus( "Starting analysis..." );
-        GeneSetPvalRun runResult = new GeneSetPvalRun( activeProbes, settings, geneData, rawData, goData, geneScores,
-                statusMessenger, "command" );
-        return runResult;
-    }
-
-    public boolean isSaveAllGenes() {
-        return saveAllGenes;
-    }
-
-    public String getSaveFileName() {
-        return saveFileName;
-    }
-
-    public GONames getGoData() {
-        return goData;
-    }
-
-    public Settings getSettings() {
-        return settings;
-    }
-
-    public StatusViewer getStatusMessenger() {
-        return statusMessenger;
-    }
-
-    public boolean isUseCommandLineInterface() {
-        return useCommandLineInterface;
+    private void showHelpAndExit() {
+        printHelp( "ermineJ" );
+        System.exit( 0 );
     }
 }

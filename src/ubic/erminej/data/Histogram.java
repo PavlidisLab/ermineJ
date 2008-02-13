@@ -369,7 +369,7 @@ public class Histogram {
      * @param variance
      */
     public void addExactNormalProbabilityComputer( int i, double mean, double variance ) {
-        analyticDistributions.put( new Integer( i ), new NormalProbabilityComputer( variance, mean ) );
+        analyticDistributions.put( new Integer( i ), new NormalProbabilityComputer( mean, variance ) );
     }
 
 }

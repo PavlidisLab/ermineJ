@@ -40,7 +40,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      */
     private static final int MIN_STABLE_CHECKS = 3;
 
-    private DoubleMatrixNamed data = null;
+    private DoubleMatrixNamed<String, String> data = null;
 
     private double[][] dataAsRawMatrix;
     private double[][] selfSquaredMatrix;
@@ -59,7 +59,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     /**
      * @param dataMatrix
      */
-    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrixNamed dataMatrix ) {
+    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrixNamed<String, String> dataMatrix ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();

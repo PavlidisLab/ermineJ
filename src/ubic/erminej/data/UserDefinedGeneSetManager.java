@@ -65,13 +65,13 @@ public class UserDefinedGeneSetManager {
     private boolean modifiedGS = false;
     private Settings settings;
     protected GeneAnnotations geneData;
-    List probes;
+    List<String> probes;
 
     public UserDefinedGeneSetManager( GeneAnnotations geneData, Settings settings, String geneSetId ) {
         this.geneData = geneData;
         this.settings = settings;
         this.id = geneSetId;
-        probes = new ArrayList();
+        probes = new ArrayList<String>();
     }
 
     /**
@@ -154,8 +154,8 @@ public class UserDefinedGeneSetManager {
         return desc;
     }
 
-    public Map getGeneSetInfo( String id1, GONames goData ) {
-        Map cinfo = new HashMap();
+    public Map<String, Object> getGeneSetInfo( String id1, GONames goData ) {
+        Map<String, Object> cinfo = new HashMap<String, Object>();
         cinfo.put( "type", "probe" );
         cinfo.put( "id", id1 );
         cinfo.put( "desc", goData.getNameForId( id1 ) );
@@ -170,7 +170,7 @@ public class UserDefinedGeneSetManager {
         return id;
     }
 
-    public List getProbes() {
+    public List<String> getProbes() {
         return probes;
     }
 
@@ -198,7 +198,7 @@ public class UserDefinedGeneSetManager {
     public void loadPlainGeneList( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
         String row;
-        Collection genes = new ArrayList();
+        Collection<String> genes = new ArrayList<String>();
         while ( ( row = dis.readLine() ) != null ) {
             if ( row.length() == 0 ) continue;
             genes.add( row );
@@ -229,12 +229,12 @@ public class UserDefinedGeneSetManager {
      */
     public boolean loadUserGeneSet( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
-        Collection genes = new ArrayList();
+        Collection<String> genes = new ArrayList<String>();
         String type = "";
         boolean hasUnknownProbes = false;
         boolean isGenes = true;
         String row;
-        this.probes = new ArrayList();
+        this.probes = new ArrayList<String>();
         while ( ( row = dis.readLine() ) != null ) {
             if ( type.length() == 0 ) {
                 type = row;
@@ -278,8 +278,8 @@ public class UserDefinedGeneSetManager {
     /**
      * Load the user-defined gene sets.
      */
-    public Collection loadUserGeneSets( GONames goData, StatusViewer statusMessenger ) {
-        Collection userOverwrittenGeneSets = new HashSet();
+    public Collection<String> loadUserGeneSets( GONames goData, StatusViewer statusMessenger ) {
+        Collection<String> userOverwrittenGeneSets = new HashSet<String>();
 
         File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
         if ( userGeneSetDir == null || !userGeneSetDir.exists() ) {
@@ -295,7 +295,7 @@ public class UserDefinedGeneSetManager {
             if ( StringUtils.isEmpty( classFile ) ) {
                 continue;
             }
-            
+
             String classFilePath = null;
             try {
                 classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
@@ -381,7 +381,7 @@ public class UserDefinedGeneSetManager {
         modifiedGS = val;
     }
 
-    public void setProbes( List val ) {
+    public void setProbes( List<String> val ) {
         probes = val;
     }
 
@@ -389,6 +389,10 @@ public class UserDefinedGeneSetManager {
         final boolean finalized = editable;
 
         return new AbstractTableModel() {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = -1738460714695777126L;
             private String[] columnNames = { "Probe", "Gene", "Description" };
 
             public int getColumnCount() {
@@ -453,10 +457,10 @@ public class UserDefinedGeneSetManager {
      * @param ignored
      * @return
      */
-    private void fillInProbes( Collection genes, int ignored ) {
-        Set probeSet = new HashSet();
-        for ( Iterator it = genes.iterator(); it.hasNext(); ) {
-            String gene = ( ( String ) it.next() ).toUpperCase();
+    private void fillInProbes( Collection<String> genes, int ignored ) {
+        Set<String> probeSet = new HashSet<String>();
+        for ( Iterator<String> it = genes.iterator(); it.hasNext(); ) {
+            String gene = it.next().toUpperCase();
             if ( geneData.getGeneProbeList( gene ) != null ) {
                 probeSet.addAll( geneData.getGeneProbeList( gene ) );
             } else {
@@ -464,7 +468,7 @@ public class UserDefinedGeneSetManager {
                 ignored++;
             }
         }
-        probes = new ArrayList( probeSet );
+        probes = new ArrayList<String>( probeSet );
         if ( ignored > 0 ) {
             log.info( ignored + " items skipped because they are not in the array design." );
         }
@@ -499,13 +503,13 @@ public class UserDefinedGeneSetManager {
      * @throws IOException
      */
     public static Map getGeneSetFileInfo( String file ) throws IOException {
-        Map cinfo = new HashMap();
+        Map<String, Object> cinfo = new HashMap<String, Object>();
         FileTools.checkPathIsReadableFile( file );
         FileInputStream fis = new FileInputStream( file );
         BufferedInputStream bis = new BufferedInputStream( fis );
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         String row;
-        Collection members = new ArrayList();
+        Collection<String> members = new ArrayList<String>();
         while ( ( row = dis.readLine() ) != null ) {
             if ( !cinfo.containsKey( "type" ) ) {
                 cinfo.put( "type", row );

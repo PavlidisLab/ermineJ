@@ -76,13 +76,6 @@ public class ResultsPrinter {
     }
 
     /**
-     * @param destFile
-     */
-    public void setDestFile( String destFile ) {
-        this.destFile = destFile;
-    }
-
-    /**
      * @throws IOException Print the results
      */
     public void printResults() throws IOException {
@@ -145,6 +138,13 @@ public class ResultsPrinter {
         }
         out.close();
 
+    }
+
+    /**
+     * @param destFile
+     */
+    public void setDestFile( String destFile ) {
+        this.destFile = destFile;
     }
 
     /**

@@ -38,6 +38,16 @@ import ubic.erminej.gui.StartupDialog;
  */
 public class classScoreGUI {
     private static Log log = LogFactory.getLog( classScoreGUI.class.getName() );
+
+    public static void main( String[] args ) {
+        try {
+            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+            new classScoreGUI();
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+    }
+
     boolean packFrame = false;
 
     public classScoreGUI() throws IOException {
@@ -63,15 +73,6 @@ public class classScoreGUI {
         log.debug( "Showing startup dialog" );
         sdlog.showDialog();
         frame.showStatus( "Starting up..." );
-    }
-
-    public static void main( String[] args ) {
-        try {
-            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            new classScoreGUI();
-        } catch ( Exception e ) {
-            e.printStackTrace();
-        }
     }
 
 }

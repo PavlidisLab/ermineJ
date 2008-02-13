@@ -61,30 +61,6 @@ public class AnalysisThread extends Thread {
     private boolean finishedNormally;
 
     /**
-     * @return Returns the wasError.
-     */
-    public boolean isWasError() {
-        return this.wasError;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isStop() {
-        if ( stop == false ) this.finishedNormally = false;
-        return stop;
-
-    }
-
-    /**
-     * @param stop
-     */
-    public void stopRunning( boolean s ) {
-        this.stop = s;
-        log.debug( "Stop set to : " + s );
-    }
-
-    /**
      * @param csframe
      * @param settings
      * @param messenger
@@ -173,6 +149,29 @@ public class AnalysisThread extends Thread {
     }
 
     /**
+     * @return Returns the finishedNormally.
+     */
+    public boolean isFinishedNormally() {
+        return this.finishedNormally;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isStop() {
+        if ( stop == false ) this.finishedNormally = false;
+        return stop;
+
+    }
+
+    /**
+     * @return Returns the wasError.
+     */
+    public boolean isWasError() {
+        return this.wasError;
+    }
+
+    /**
      * @return
      * @throws IOException
      */
@@ -182,6 +181,7 @@ public class AnalysisThread extends Thread {
         return doAnalysis( results );
     }
 
+    @Override
     public void run() {
         try {
             this.wasError = false;
@@ -204,6 +204,14 @@ public class AnalysisThread extends Thread {
             showError( e );
             throw new RuntimeException( e.getCause() );
         }
+    }
+
+    /**
+     * @param stop
+     */
+    public void stopRunning( boolean s ) {
+        this.stop = s;
+        log.debug( "Stop set to : " + s );
     }
 
     /**
@@ -240,7 +248,7 @@ public class AnalysisThread extends Thread {
         DoubleMatrixNamed<String, String> rawData;
         if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
             if ( messenger != null ) messenger.showStatus( "Raw data are in memory" );
-            rawData = ( DoubleMatrixNamed<String, String> ) rawDataSets.get( settings.getRawDataFileName() );
+            rawData = rawDataSets.get( settings.getRawDataFileName() );
         } else {
             if ( messenger != null )
                 messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
@@ -263,7 +271,7 @@ public class AnalysisThread extends Thread {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        DoubleMatrixNamed rawData = null;
+        DoubleMatrixNamed<String, String> rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             rawData = addRawData();
         }
@@ -311,27 +319,7 @@ public class AnalysisThread extends Thread {
     // see if we have to read the gene scores or if we can just use the old ones
     private synchronized boolean geneScoreSettingsDirty() {
         if ( oldSettings == null ) return true;
-        return ( settings.getDoLog() != oldSettings.getDoLog() )
-                || ( settings.getScoreCol() != oldSettings.getScoreCol() );
-    }
-
-    /**
-     * @param rawData
-     * @param geneScores
-     * @param activeProbes
-     * @return
-     */
-    private synchronized Set getActiveProbes( DoubleMatrixNamed rawData, GeneScores geneScores ) {
-        Set activeProbes = null;
-        if ( rawData != null && geneScores != null ) { // favor the geneScores list.
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData == null && geneScores != null ) {
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData != null && geneScores == null ) {
-            activeProbes = new HashSet( rawData.getRowNames() );
-        }
-        log.debug( activeProbes.size() + " active probes" );
-        return activeProbes;
+        return settings.getDoLog() != oldSettings.getDoLog() || settings.getScoreCol() != oldSettings.getScoreCol();
     }
 
     // /**
@@ -350,6 +338,25 @@ public class AnalysisThread extends Thread {
     // }
     // return true;
     // }
+
+    /**
+     * @param rawData
+     * @param geneScores
+     * @param activeProbes
+     * @return
+     */
+    private synchronized Set getActiveProbes( DoubleMatrixNamed<String, String> rawData, GeneScores geneScores ) {
+        Set activeProbes = null;
+        if ( rawData != null && geneScores != null ) { // favor the geneScores list.
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
+        } else if ( rawData == null && geneScores != null ) {
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
+        } else if ( rawData != null && geneScores == null ) {
+            activeProbes = new HashSet<String>( rawData.getRowNames() );
+        }
+        log.debug( activeProbes.size() + " active probes" );
+        return activeProbes;
+    }
 
     /**
      * @param newResults
@@ -374,13 +381,6 @@ public class AnalysisThread extends Thread {
         log.error( e, e );
         wasError = true;
         if ( messenger != null ) messenger.showError( e );
-    }
-
-    /**
-     * @return Returns the finishedNormally.
-     */
-    public boolean isFinishedNormally() {
-        return this.finishedNormally;
     }
 
 }

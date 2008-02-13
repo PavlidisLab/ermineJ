@@ -88,6 +88,10 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  * @version $Id$
  */
 public class GeneSetScoreFrame extends JFrame {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3322987593565580107L;
     private static Log log = LogFactory.getLog( GeneSetScoreFrame.class.getName() );
     /**
      * 
@@ -121,7 +125,7 @@ public class GeneSetScoreFrame extends JFrame {
     private FindDialog findByNameDialog = null;
     private JMenuItem findGeneMenuItem = new JMenuItem();
     private GeneAnnotations geneData = null;
-    private Map geneDataSets;
+    private Map<Integer, GeneAnnotations> geneDataSets;
     private Map geneScoreSets;
     private GONames goData;
     private JMenu helpMenu = new JMenu();
@@ -141,7 +145,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JPanel progressPanel;
     private JMenuItem quitMenuItem = new JMenuItem();
     private Map rawDataSets;
-    private List results = new LinkedList();
+    private List<GeneSetPvalRun> results = new LinkedList<GeneSetPvalRun>();
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenu runViewMenu = new JMenu();
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
@@ -151,12 +155,11 @@ public class GeneSetScoreFrame extends JFrame {
     private StatusViewer statusMessenger;
     private JTabbedPane tabs = new JTabbedPane();
     private GeneSetTreePanel treePanel;
-    private Collection userOverwrittenGeneSets;
+    private Collection<String> userOverwrittenGeneSets;
     JProgressBar progressBar = new JProgressBar();
     private JMenuItem reloadGeneSetsMenuItem = new JMenuItem();
     private JMenuItem switchDataFileMenuItem = new JMenuItem();
     private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
-    private boolean cancelled = false;
 
     /**
      * @throws IOException
@@ -488,7 +491,6 @@ public class GeneSetScoreFrame extends JFrame {
 
     public void startAnalysis( Settings runSettings ) {
         disableMenusForAnalysis();
-        this.cancelled = false;
         this.athread = new AnalysisThread( runSettings, statusMessenger, goData, geneDataSets, rawDataSets,
                 geneScoreSets );
         log.debug( "Starting analysis thread" );
@@ -1029,7 +1031,6 @@ public class GeneSetScoreFrame extends JFrame {
 
         athread.stopRunning( true );
         enableMenusForAnalysis();
-        this.cancelled = true;
         showStatus( "Ready" );
 
     }

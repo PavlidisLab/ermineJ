@@ -121,15 +121,6 @@ public class GeneSetPvalRun {
     // * Do a new analysis, starting from the bare essentials.
     // */
 
-    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GONames goData, GeneScores geneScores ) {
-        this.settings = settings;
-        this.geneData = geneData;
-        this.geneScores = geneScores;
-        nf.setMaximumFractionDigits( 8 );
-        results = new LinkedHashMap();
-        runAnalysis( geneData.getActiveProbes(), settings, geneData, null, goData, geneScores, null );
-    }
-
     /**
      * Do a new analysis.
      * 
@@ -153,6 +144,98 @@ public class GeneSetPvalRun {
         results = new LinkedHashMap();
 
         runAnalysis( activeProbes, settings, geneData, rawData, goData, geneScores, messenger );
+    }
+
+    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GONames goData, GeneScores geneScores ) {
+        this.settings = settings;
+        this.geneData = geneData;
+        this.geneScores = geneScores;
+        nf.setMaximumFractionDigits( 8 );
+        results = new LinkedHashMap();
+        runAnalysis( geneData.getActiveProbes(), settings, geneData, null, goData, geneScores, null );
+    }
+
+    public GeneAnnotations getGeneData() {
+        return geneData;
+    }
+
+    /**
+     * @return Returns the geneScores.
+     */
+    public GeneScores getGeneScores() {
+        return this.geneScores;
+    }
+
+    public Histogram getHist() {
+        return hist;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return Map the results
+     */
+    public Map getResults() {
+        return results;
+    }
+
+    /**
+     * @return Settings
+     */
+    public Settings getSettings() {
+        return settings;
+    }
+
+    /**
+     * @return Map the results
+     */
+    public Vector getSortedClasses() {
+        return sortedclasses;
+    }
+
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    /**
+     * Set a specific random seed for use in all resampling-based runs. If not set, the seed is chosen by the software.
+     * <p>
+     * 
+     * @param randomSeed A positive value. Negative values are ignored.
+     */
+    public void setRandomSeed( long randomSeed ) {
+        if ( randomSeed < 0 ) return;
+        this.randomSeed = randomSeed;
+    }
+
+    /* private methods */
+
+    /**
+     * @param settings
+     * @param geneData
+     * @param geneScores
+     * @param messenger
+     * @param csc
+     */
+    private void multipleTestCorrect( StatusViewer messenger, GeneSetSizeComputer csc ) {
+        if ( messenger != null ) messenger.showStatus( "Multiple test correction..." );
+        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
+                results, messenger );
+        int multipleTestCorrMethod = settings.getMtc();
+        if ( multipleTestCorrMethod == Settings.BONFERONNI ) {
+            mt.bonferroni();
+        } else if ( multipleTestCorrMethod == Settings.BENJAMINIHOCHBERG ) {
+            mt.benjaminihochberg( 0.05 );
+        } else if ( multipleTestCorrMethod == Settings.WESTFALLYOUNG ) {
+            if ( settings.getClassScoreMethod() != Settings.RESAMP )
+                throw new UnsupportedOperationException(
+                        "Westfall-Young correction is not supported for this analysis method" );
+            mt.westfallyoung( NUM_WY_SAMPLES );
+        } else {
+            throw new IllegalArgumentException( "Unknown multiple test correction method: " + multipleTestCorrMethod );
+        }
     }
 
     /**
@@ -285,67 +368,6 @@ public class GeneSetPvalRun {
     }
 
     /**
-     * @param settings
-     * @param geneData
-     * @param geneScores
-     * @param messenger
-     * @param csc
-     */
-    private void multipleTestCorrect( StatusViewer messenger, GeneSetSizeComputer csc ) {
-        if ( messenger != null ) messenger.showStatus( "Multiple test correction..." );
-        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
-                results, messenger );
-        int multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod == Settings.BONFERONNI ) {
-            mt.bonferroni();
-        } else if ( multipleTestCorrMethod == Settings.BENJAMINIHOCHBERG ) {
-            mt.benjaminihochberg( 0.05 );
-        } else if ( multipleTestCorrMethod == Settings.WESTFALLYOUNG ) {
-            if ( settings.getClassScoreMethod() != Settings.RESAMP )
-                throw new UnsupportedOperationException(
-                        "Westfall-Young correction is not supported for this analysis method" );
-            mt.westfallyoung( NUM_WY_SAMPLES );
-        } else {
-            throw new IllegalArgumentException( "Unknown multiple test correction method: " + multipleTestCorrMethod );
-        }
-    }
-
-    /**
-     * @return Map the results
-     */
-    public Map getResults() {
-        return results;
-    }
-
-    /**
-     * @return Map the results
-     */
-    public Vector getSortedClasses() {
-        return sortedclasses;
-    }
-
-    public GeneAnnotations getGeneData() {
-        return geneData;
-    }
-
-    /**
-     * @return Settings
-     */
-    public Settings getSettings() {
-        return settings;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName( String name ) {
-        this.name = name;
-    }
-
-    /* private methods */
-
-    /**
      * Sorted order of the class results - all this has to hold is the class names.
      */
     private void sortResults() {
@@ -357,27 +379,5 @@ public class GeneSetPvalRun {
         for ( Iterator it = l.iterator(); it.hasNext(); ) {
             sortedclasses.add( ( ( GeneSetResult ) it.next() ).getGeneSetId() );
         }
-    }
-
-    public Histogram getHist() {
-        return hist;
-    }
-
-    /**
-     * Set a specific random seed for use in all resampling-based runs. If not set, the seed is chosen by the software.
-     * <p>
-     * 
-     * @param randomSeed A positive value. Negative values are ignored.
-     */
-    public void setRandomSeed( long randomSeed ) {
-        if ( randomSeed < 0 ) return;
-        this.randomSeed = randomSeed;
-    }
-
-    /**
-     * @return Returns the geneScores.
-     */
-    public GeneScores getGeneScores() {
-        return this.geneScores;
     }
 }

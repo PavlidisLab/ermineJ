@@ -313,6 +313,10 @@ class OutputPanel_modMenuItem_actionAdapter implements java.awt.event.ActionList
 }
 
 class OutputPanelPopupMenu extends JPopupMenu {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8600729411722169908L;
     Point popupPoint;
     String selectedItem = null;
     GONames goData = null;

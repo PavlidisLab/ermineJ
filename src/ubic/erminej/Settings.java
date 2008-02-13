@@ -65,6 +65,7 @@ public class Settings {
     public static final int ROC = 3;
     public static final int TTEST = 4;
     public static final int WESTFALLYOUNG = 1;
+
     private static final String ALWAYS_USE_EMPIRICAL = "alwaysUseEmpirical";
     private static final String ANNOT_FILE = "annotFile";
     private static final String ANNOT_FORMAT = "annotFormat";
@@ -90,6 +91,16 @@ public class Settings {
     private static final String SCORE_COL = "scoreCol";
     private static final String SCORE_FILE = "scoreFile";
     private static final String SELECTED_CUSTOM_GENESETS = "selectedCustomGeneSets";
+
+    /**
+     * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
+     * etc.)
+     */
+    protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
+            MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
+            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT,
+            CLASS_SCORE_METHOD };
+    
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
      */
@@ -113,15 +124,6 @@ public class Settings {
     private boolean userSetRawDataFile = true;
 
     /**
-     * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
-     * etc.)
-     */
-    protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
-            MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
-            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT,
-            CLASS_SCORE_METHOD };
-
-    /**
      * Create the settings, reading them from a file to be determined by the constructor.
      * 
      * @throws IOException
@@ -138,11 +140,6 @@ public class Settings {
         } else {
             this.config = new PropertiesConfiguration();
         }
-    }
-
-    public void setDirectories() throws IOException {
-        createDataDirectory();
-        createCustomGeneSetDirectory();
     }
 
     /**
@@ -258,6 +255,10 @@ public class Settings {
         return config;
     }
 
+    public String getCustomGeneSetDirectory() {
+        return ( String ) this.config.getProperty( "classFolder" );
+    }
+
     public String getDataDirectory() {
         return config.getString( DATA_DIRECTORY );
 
@@ -269,6 +270,17 @@ public class Settings {
 
     public int getGeneRepTreatment() {
         return config.getInteger( GENE_REP_TREATMENT, new Integer( BEST_PVAL ) ).intValue();
+    }
+
+    /**
+     * @return
+     */
+    public String getGeneScoreFileDirectory() {
+        String gsf = this.getScoreFile();
+        if ( gsf == null ) return getDataDirectory();
+
+        File gsfFile = new File( gsf );
+        return gsfFile.getParent() == null ? getDataDirectory() : gsfFile.getParent();
     }
 
     /**
@@ -350,6 +362,17 @@ public class Settings {
         return config.getInteger( QUANTILE, new Integer( 50 ) ).intValue();
     }
 
+    /**
+     * @return
+     */
+    public String getRawDataFileDirectory() {
+        String rdf = this.getRawDataFileName();
+        if ( rdf == null ) return getDataDirectory();
+
+        File rdfFile = new File( rdf );
+        return rdfFile.getParent() == null ? getDataDirectory() : rdfFile.getParent();
+    }
+
     public String getRawDataFileName() {
         return config.getString( RAW_FILE );
     }
@@ -366,16 +389,16 @@ public class Settings {
         return config.getString( SCORE_FILE );
     }
 
+    public Collection getSelectedCustomGeneSets() {
+        return config.getList( SELECTED_CUSTOM_GENESETS, null );
+    }
+
     /**
      * @return Returns the useBiologicalProcess.
      */
     public boolean getUseBiologicalProcess() {
         return config.getBoolean( "useBiologicalProcess", new Boolean( true ) ).booleanValue();
 
-    }
-
-    public Collection getSelectedCustomGeneSets() {
-        return config.getList( SELECTED_CUSTOM_GENESETS, null );
     }
 
     /**
@@ -481,12 +504,13 @@ public class Settings {
         this.config.setProperty( "classFolder", val );
     }
 
-    public String getCustomGeneSetDirectory() {
-        return ( String ) this.config.getProperty( "classFolder" );
-    }
-
     public void setDataDirectory( String val ) {
         this.config.setProperty( DATA_DIRECTORY, val );
+    }
+
+    public void setDirectories() throws IOException {
+        createDataDirectory();
+        createCustomGeneSetDirectory();
     }
 
     public void setDoLog( boolean val ) {
@@ -538,6 +562,17 @@ public class Settings {
         this.config.setProperty( PREFERENCES_FILE_NAME, val );
     }
 
+    /**
+     * Set an arbitrary property. Handy for 'ad hoc' configuration parameters only used by specific classes.
+     * 
+     * @param key
+     * @param value
+     */
+    public void setProperty( String key, Object value ) {
+        log.debug( "Setting property: " + key + " = " + value );
+        this.getConfig().setProperty( key, value );
+    }
+
     public void setPValThreshold( double val ) {
         log.debug( "pvalue threshold set to " + val );
         this.config.setProperty( P_VAL_THRESHOLD, new Double( val ) );
@@ -564,12 +599,12 @@ public class Settings {
         this.config.setProperty( SCORE_FILE, val );
     }
 
-    public void setTester( boolean isTester ) {
-        this.config.setProperty( IS_TESTER, new Boolean( isTester ) );
-    }
-
     public void setSelectedCustomGeneSets( Collection selectedSets ) {
         this.config.setProperty( SELECTED_CUSTOM_GENESETS, selectedSets );
+    }
+
+    public void setTester( boolean isTester ) {
+        this.config.setProperty( IS_TESTER, new Boolean( isTester ) );
     }
 
     /**
@@ -613,7 +648,7 @@ public class Settings {
      * @return true if we are using the "upper tail" of our distributions.
      */
     public boolean upperTail() {
-        return ( this.getDoLog() && !this.getBigIsBetter() ) || ( !this.getDoLog() && this.getBigIsBetter() );
+        return this.getDoLog() && !this.getBigIsBetter() || !this.getDoLog() && this.getBigIsBetter();
     }
 
     /**
@@ -641,9 +676,7 @@ public class Settings {
             out = new BufferedWriter( new FileWriter( fileName ) );
         }
 
-        for ( int i = 0; i < ANALYSIS_SETTINGS.length; i++ ) {
-            String propertyName = ANALYSIS_SETTINGS[i];
-
+        for ( String propertyName : ANALYSIS_SETTINGS ) {
             if ( config.getProperty( propertyName ) == null ) {
                 log.debug( "No property " + propertyName + ", skipping" );
                 continue;
@@ -717,15 +750,6 @@ public class Settings {
     }
 
     /**
-     * @return
-     */
-    private String userHomeDataDirectoryName() {
-        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                + "ermineJ.data";
-        return dataDirName;
-    }
-
-    /**
      * 
      */
     private void initConfig() {
@@ -790,36 +814,12 @@ public class Settings {
     }
 
     /**
-     * Set an arbitrary property. Handy for 'ad hoc' configuration parameters only used by specific classes.
-     * 
-     * @param key
-     * @param value
-     */
-    public void setProperty( String key, Object value ) {
-        log.debug( "Setting property: " + key + " = " + value );
-        this.getConfig().setProperty( key, value );
-    }
-
-    /**
      * @return
      */
-    public String getRawDataFileDirectory() {
-        String rdf = this.getRawDataFileName();
-        if ( rdf == null ) return getDataDirectory();
-
-        File rdfFile = new File( rdf );
-        return rdfFile.getParent() == null ? getDataDirectory() : rdfFile.getParent();
-    }
-
-    /**
-     * @return
-     */
-    public String getGeneScoreFileDirectory() {
-        String gsf = this.getScoreFile();
-        if ( gsf == null ) return getDataDirectory();
-
-        File gsfFile = new File( gsf );
-        return gsfFile.getParent() == null ? getDataDirectory() : gsfFile.getParent();
+    private String userHomeDataDirectoryName() {
+        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                + "ermineJ.data";
+        return dataDirName;
     }
 
 }

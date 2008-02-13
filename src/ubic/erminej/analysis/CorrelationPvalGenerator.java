@@ -104,7 +104,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
             return null;
         }
 
-        Collection probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
+        Collection<String> probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
 
         /*
          * Iterate over the probes to get pairwise correlations.; we do this in a list so we can do each comparison just
@@ -112,8 +112,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
          */
         double sumCorrel = 0.0;
         double nummeas = 0;
-        Map values = new HashMap();
-        List probeList = new ArrayList( probesInSet );
+        Map<Object, Double> values = new HashMap<Object, Double>();
+        List<String> probeList = new ArrayList<String>( probesInSet );
 
         for ( int i = probeList.size() - 1; i >= 0; i-- ) {
             String probei = ( String ) probeList.get( i );
@@ -224,7 +224,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
         int nummeas = 0;
         for ( int i = 0; i < classSize; i++ ) {
             for ( int j = i + 1; j < classSize; j++ ) {
-                avecorrel += Math.abs( correls.getQuick( i, j ) );
+                avecorrel += Math.abs( correls.get( i, j ) );
                 nummeas++;
             }
         }

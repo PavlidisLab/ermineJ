@@ -62,13 +62,13 @@ import ubic.erminej.Settings;
 public class GeneScores {
     private static final double SMALL = 10e-16;
     protected static final Log log = LogFactory.getLog( GeneScores.class );
-    private Map geneToPvalMap;
+    private Map<String, Double> geneToPvalMap;
     private int numScores;
-    private List probeIDs = null;
+    private List<String> probeIDs = null;
     private String[] probeIDsArray;
-    private List probePvalues = null;
+    private List<Double> probePvalues = null;
     private double[] probePvaluesArray;
-    private Map probeToScoreMap;
+    private Map<String, Double> probeToScoreMap;
     private Settings settings;
     double[] geneScores;
     private GeneAnnotations geneAnnots;
@@ -132,7 +132,7 @@ public class GeneScores {
         String badNumberString = "";
         int numProbesKept = 0;
         int numRepeatedProbes = 0;
-        Collection unknownProbes = new HashSet();
+        Collection<String> unknownProbes = new HashSet<String>();
         for ( int i = 0; i < probes.size(); i++ ) {
             String probe = ( String ) probes.get( i );
             Double value = ( Double ) scores.get( i );
@@ -206,7 +206,7 @@ public class GeneScores {
     /**
      * @return
      */
-    public Map getGeneToPvalMap() {
+    public Map<String, Double> getGeneToPvalMap() {
         return geneToPvalMap;
     }
 
@@ -215,14 +215,14 @@ public class GeneScores {
      *        but the actual values are the same. This is used for resampling multiple test correction.
      * @return Map of groups of genes to pvalues.
      */
-    public Map getGeneToPvalMap( boolean shuffle ) {
+    public Map<String, Double> getGeneToPvalMap( boolean shuffle ) {
         if ( shuffle ) {
-            Map scrambled_map = new LinkedHashMap();
-            Set keys = geneToPvalMap.keySet();
-            Iterator it = keys.iterator();
+            Map<String, Double> scrambled_map = new LinkedHashMap<String, Double>();
+            Set<String> keys = geneToPvalMap.keySet();
+            Iterator<String> it = keys.iterator();
 
-            Collection values = geneToPvalMap.values();
-            List valvec = new Vector( values );
+            Collection<Double> values = geneToPvalMap.values();
+            List<Double> valvec = new Vector<Double>( values );
             Collections.shuffle( valvec );
 
             // randomly associate keys and values
@@ -252,7 +252,7 @@ public class GeneScores {
 
     /**
      */
-    public Map getProbeToScoreMap() {
+    public Map<String, Double> getProbeToScoreMap() {
         return probeToScoreMap;
     }
 
@@ -285,19 +285,19 @@ public class GeneScores {
 
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
-            String probe = ( String ) iter.next();
-            double score = ( ( Double ) probeToScoreMap.get( probe ) ).doubleValue();
+        for ( Iterator<String> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            String probe = iter.next();
+            double score = probeToScoreMap.get( probe ).doubleValue();
             buf.append( probe + "\t" + score + "\n" );
         }
         return buf.toString();
     }
 
     private void init() {
-        this.geneToPvalMap = new HashMap( 1000 );
-        this.probeToScoreMap = new HashMap( 1000 );
-        this.probePvalues = new ArrayList( 1000 );
-        this.probeIDs = new ArrayList( 1000 );
+        this.geneToPvalMap = new HashMap<String, Double>( 1000 );
+        this.probeToScoreMap = new HashMap<String, Double>( 1000 );
+        this.probePvalues = new ArrayList<Double>( 1000 );
+        this.probeIDs = new ArrayList<String>( 1000 );
     }
 
     /**
@@ -332,7 +332,7 @@ public class GeneScores {
         int numProbesKept = 0;
         int numUnknownProbes = 0;
         int numRepeatedProbes = 0;
-        Collection unknownProbes = new HashSet();
+        Collection<String> unknownProbes = new HashSet<String>();
         dis.readLine(); // skip header.
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
@@ -430,7 +430,7 @@ public class GeneScores {
      * @param badNumberString
      * @param numProbesKept
      */
-    private void reportProblems( StatusViewer messenger, boolean invalidLog, Collection unknownProbes,
+    private void reportProblems( StatusViewer messenger, boolean invalidLog, Collection<String> unknownProbes,
             boolean invalidNumber, String badNumberString, int numProbesKept, int numRepeatedProbes ) {
         if ( invalidNumber && messenger != null ) {
 
@@ -451,8 +451,8 @@ public class GeneScores {
 
             if ( unknownProbes.size() <= 5 ) {
                 StringBuffer buf = new StringBuffer();
-                for ( Iterator iter = unknownProbes.iterator(); iter.hasNext(); ) {
-                    String probe = ( String ) iter.next();
+                for ( Iterator<String> iter = unknownProbes.iterator(); iter.hasNext(); ) {
+                    String probe = iter.next();
                     buf.append( probe + "," );
                 }
                 messenger.showError( "Unknown probes are: " + buf );
@@ -537,7 +537,7 @@ public class GeneScores {
                 }
 
                 // these values are already log transformed if the user selected that option.
-                double score = ( ( Double ) probeToScoreMap.get( probe ) ).doubleValue();
+                double score = probeToScoreMap.get( probe ).doubleValue();
 
                 switch ( gp_method ) {
                     case Settings.MEAN_PVAL: {
@@ -593,8 +593,8 @@ public class GeneScores {
         probePvaluesArray = new double[numScores];
         probeIDsArray = new String[numScores];
         for ( int i = 0; i < numScores; i++ ) {
-            probePvaluesArray[i] = ( ( Double ) probePvalues.get( i ) ).doubleValue();
-            probeIDsArray[i] = ( String ) probeIDs.get( i );
+            probePvaluesArray[i] = probePvalues.get( i ).doubleValue();
+            probeIDsArray[i] = probeIDs.get( i );
         }
     }
 

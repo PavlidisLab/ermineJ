@@ -68,6 +68,10 @@ import corejava.Format;
  */
 public class GeneSetTreePanel extends GeneSetPanel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 0L;
     private double fdrThreshold = 0.1;
     private static Log log = LogFactory.getLog( GeneSetTreePanel.class.getName() );
     private JTree goTree = null;
@@ -492,9 +496,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
             return;
         }
         GeneSetTreeNode userNode = getUserNode();
-        DirectedGraphNode newNode = new DirectedGraphNode( id, new GOEntry( id, desc, desc, "No aspect defined" ),
-                goData.getGraph() );
-        GeneSetTreeNode newTreeNode = new GeneSetTreeNode( newNode );
+        DirectedGraphNode<String, GOEntry> newNode = new DirectedGraphNode<String, GOEntry>( id, new GOEntry( id, desc,
+                desc, "No aspect defined" ), goData.getGraph() );
+        GeneSetTreeNode newTreeNode = new GeneSetTreeNode<String, GOEntry>( newNode );
 
         ( ( DefaultTreeModel ) this.goTree.getModel() )
                 .insertNodeInto( newTreeNode, userNode, userNode.getChildCount() );
@@ -540,6 +544,11 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     /**
      * 
      */
+    private static final long serialVersionUID = -2038921719858424598L;
+
+    /**
+     * 
+     */
     private static final String GOOD_CHILD_ICON = "resources/littleDiamond.gif";
 
     /**
@@ -566,7 +575,6 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     private final Icon regularIcon = new ImageIcon( this.getClass().getResource( REGULAR_ICON ) );
     private final Icon goodPvalueIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_ICON ) );
     private final Icon goodPvalueGoodChildIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_GOODCHILD_ICON ) );
-    private Font italic = new Font( "SansSerif", Font.ITALIC, 11 );
     private Format nf = new Format( "%.3g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
     private Font plain = new Font( "SansSerif", Font.PLAIN, 11 );

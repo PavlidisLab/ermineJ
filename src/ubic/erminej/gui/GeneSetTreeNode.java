@@ -26,11 +26,15 @@ import ubic.basecode.dataStructure.graph.DirectedGraphNode;
  * @author pavlidis
  * @version $Id$
  */
-public class GeneSetTreeNode extends DefaultMutableTreeNode {
+public class GeneSetTreeNode<K,V> extends DefaultMutableTreeNode {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7725460771978972950L;
     private boolean hasGoodChild = false;
     private boolean hasUsableChild = false;
 
-    public GeneSetTreeNode( DirectedGraphNode root ) {
+    public GeneSetTreeNode( DirectedGraphNode<K,V> root ) {
         super( root );
     }
 

@@ -144,7 +144,7 @@ public class JGeneSetFrame extends JFrame {
     private JGradientBar m_gradientBar = new JGradientBar();
     private DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
     private JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
-    private Map m_pvaluesOrdinalPosition = new HashMap();
+    private Map<String, Integer> m_pvaluesOrdinalPosition = new HashMap<String, Integer>();
     private JMenuItem saveDataMenuItem = new JMenuItem();
     private JLabel m_spacerLabel = new JLabel();
     private JMenuItem m_viewHistMenuItem = new JMenuItem();
@@ -159,11 +159,11 @@ public class JGeneSetFrame extends JFrame {
     private JPanel jPanelStatus = new JPanel();
     private JLabel jLabelStatus = new JLabel();
     private StatusJlabel statusMessenger = null;
-    private Collection probesInGeneSet = null;
+    private Collection<String> probesInGeneSet = null;
     private int matrixColumnCount = 0;
     private JMatrixCellRenderer matrixCellRenderer = null;
     private JVerticalHeaderRenderer verticalHeaderRenderer = null;
-    private List probeIDs = null;
+    private List<String> probeIDs = null;
     private Map pvalues = null;
     private GeneAnnotations geneData = null;
     private String className = "";
@@ -225,7 +225,7 @@ public class JGeneSetFrame extends JFrame {
     protected void createDetailsTable() {
 
         // create a probe set from probeIDs
-        probesInGeneSet = new HashSet( probeIDs );
+        probesInGeneSet = new HashSet<String>( probeIDs );
         DoubleMatrixNamed matrix = setUpMatrixData();
 
         tableModel = new GeneSetTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf,
@@ -266,10 +266,10 @@ public class JGeneSetFrame extends JFrame {
      * @param probesInGeneSet
      * @return
      */
-    private DoubleMatrixNamed setUpMatrixData() {
+    private DoubleMatrixNamed<String, String> setUpMatrixData() {
         // Read the matrix data
         DoubleMatrixReader matrixReader = new DoubleMatrixReader();
-        DoubleMatrixNamed matrix = null;
+        DoubleMatrixNamed<String, String> matrix = null;
 
         if ( ( settings.getRawDataFileName() == null || settings.getRawDataFileName().length() == 0 )
                 && settings.getUserSetRawFile() ) {
@@ -285,7 +285,7 @@ public class JGeneSetFrame extends JFrame {
             String filename = settings.getRawDataFileName();
             if ( ( new File( filename ) ).canRead() ) {
                 try {
-                    matrix = ( DoubleMatrixNamed ) matrixReader.read( filename, probesInGeneSet );
+                    matrix = matrixReader.read( filename, probesInGeneSet );
                 } catch ( IOException e ) {
                     GuiUtil.error( "Error loading raw microarray data from file " + filename + "\n"
                             + "Please make sure this file exists and the filename and directory path are correct,\n"
