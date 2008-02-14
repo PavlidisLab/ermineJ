@@ -19,9 +19,10 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import ubic.basecode.math.SpecFunc;
 
@@ -93,7 +94,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         // store pvalues for items in the class.
         double[] groupPvalArr = new double[effectiveGeneSetSize];
-        Map record = new HashMap();
+        Set<String> record = new HashSet<String>();
         int v_size = 0;
 
         while ( classit.hasNext() ) {
@@ -103,8 +104,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             if ( probesToScores.containsKey( probe ) ) {
                 if ( settings.getUseWeights() ) {
 
-                    if ( !record.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) {
-                        record.put( geneAnnots.getProbeToGeneMap().get( probe ), null );
+                    if ( !record.contains( geneAnnots.getProbeToGeneMap().get( probe ) ) ) {
+                        record.add( geneAnnots.getProbeToGeneMap().get( probe ) );
 
                         if ( !geneToScoreMap.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) {
                             throw new NullPointerException( "No gene score for " + probe );

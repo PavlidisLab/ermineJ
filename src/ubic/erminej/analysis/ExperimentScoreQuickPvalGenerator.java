@@ -19,9 +19,10 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
@@ -66,7 +67,7 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
 
         double[] groupPvalArr = new double[in_size]; // store pvalues for items in
         // the class.
-        Map record = new HashMap();
+        Set<String> record = new HashSet<String>();
 
         int v_size = 0;
 
@@ -82,13 +83,13 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
                     Double grouppval = ( Double ) genePvalueMap.get( geneAnnots.getProbeToGeneMap().get( probe ) ); // probe
                     // ->
                     // group
-                    if ( !record.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) { // if we
+                    if ( !record.contains( geneAnnots.getProbeToGeneMap().get( probe ) ) ) { // if we
                         // haven't
                         // done
                         // this
                         // probe
                         // already.
-                        record.put( geneAnnots.getProbeToGeneMap().get( probe ), null ); // mark it as
+                        record.add( geneAnnots.getProbeToGeneMap().get( probe ) ); // mark it as
                         // done.
                         groupPvalArr[v_size] = grouppval.doubleValue();
                         v_size++;

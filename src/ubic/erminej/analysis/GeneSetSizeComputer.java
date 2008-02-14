@@ -20,8 +20,10 @@ package ubic.erminej.analysis;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -33,8 +35,8 @@ import ubic.erminej.data.GeneScores;
  * @version $Id$
  */
 public class GeneSetSizeComputer {
-    protected Map effectiveSizes = null;
-    protected Map actualSizes = null;
+    protected Map<String, Integer> effectiveSizes = null;
+    protected Map<String, Integer> actualSizes = null;
     protected boolean weight_on = true;
 
     protected GeneScores geneScores;
@@ -47,8 +49,8 @@ public class GeneSetSizeComputer {
         this.geneData = geneData;
 
         this.geneScores = geneScores;
-        effectiveSizes = new HashMap();
-        actualSizes = new HashMap();
+        effectiveSizes = new HashMap<String, Integer>();
+        actualSizes = new HashMap<String, Integer>();
         getClassSizes();
     }
 
@@ -56,7 +58,7 @@ public class GeneSetSizeComputer {
      * Calculate class sizes for all classes - both effective and actual size
      */
     private void getClassSizes() {
-        Map record = new HashMap();
+        Set<String> record = new HashSet<String>();
         int size;
         int v_size;
 
@@ -89,24 +91,24 @@ public class GeneSetSizeComputer {
                         if ( weight_on ) { // routine for weights
                             // compute pval for every replicate group
                             if ( ( geneScores == null || geneScores.getGeneToPvalMap().containsKey( gene ) ) // FIXME,
-                                                                                                                // this
-                                                                                                                // doesn't
-                                                                                                                // work
-                                                                                                                // right
-                                                                                                                // if
-                                                                                                                // geneScores
-                                                                                                                // is
-                                                                                                                // null.F
+                                    // this
+                                    // doesn't
+                                    // work
+                                    // right
+                                    // if
+                                    // geneScores
+                                    // is
+                                    // null.F
 
                                     /*
                                      * if we haven't done this probe already.
                                      */
-                                    && !record.containsKey( gene ) ) {
+                                    && !record.contains( gene ) ) {
 
                                 /*
                                  * mark it as done for this class.
                                  */
-                                record.put( gene, null );
+                                record.add( gene );
                                 v_size++; // this is used in any case.
                             }
                         }

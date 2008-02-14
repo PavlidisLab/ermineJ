@@ -41,6 +41,10 @@ import ubic.erminej.Settings;
  * @version $Id$
  */
 public class AnalysisWizardStep5 extends WizardStep {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2682780215238903138L;
     private Settings settings;
     private JPanel step5Panel;
     private JRadioButton jRadioButtonMedian;
@@ -71,6 +75,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         JPanel step4TopPanel = new JPanel();
         JPanel jPanelAnalysisFrameMethods = new JPanel();
@@ -316,6 +321,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }

@@ -47,6 +47,10 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  */
 public class GeneSetWizardStep1A extends WizardStep {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4291212433845259049L;
     private GeneAnnotations geneData = null;;
     private GONames goData = null;;
     private UserDefinedGeneSetManager newGeneSet = null;;
@@ -67,6 +71,7 @@ public class GeneSetWizardStep1A extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         this.setLayout( new BorderLayout() );
 
@@ -108,6 +113,7 @@ public class GeneSetWizardStep1A extends WizardStep {
         this.addMain( step1MPanel );
     }
 
+    @Override
     public boolean isReady() {
         int n = oldClassTable.getSelectedRowCount();
         if ( n < 1 ) {
@@ -160,6 +166,10 @@ public class GeneSetWizardStep1A extends WizardStep {
 }
 
 class ModClassTableModel extends AbstractTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6796737347744570727L;
     GeneAnnotations geneData;
     GONames goData;
     Vector columnNames = new Vector();
@@ -175,6 +185,7 @@ class ModClassTableModel extends AbstractTableModel {
         columnNames.add( "# of Genes" );
     }
 
+    @Override
     public String getColumnName( int i ) {
         return ( String ) columnNames.get( i );
     }
@@ -189,7 +200,7 @@ class ModClassTableModel extends AbstractTableModel {
 
     public Object getValueAt( int i, int j ) {
 
-        String classid = ( String ) geneData.getSelectedSets().get( i );
+        String classid = geneData.getSelectedSets().get( i );
 
         switch ( j ) {
             case 0:

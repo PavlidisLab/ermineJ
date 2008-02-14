@@ -43,7 +43,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
      * 
      */
     private static final int ALERT_UPDATE_FREQUENCY = 300;
-    private Map results;
+
     private int numOverThreshold;
     private int numUnderThreshold;
     private int inputSize;
@@ -52,11 +52,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
             GONames gon, int inputSize ) {
         super( settings, geneData, csc, gon );
         this.inputSize = inputSize;
-        results = new HashMap();
-    }
 
-    public Map getResults() {
-        return results;
     }
 
     /**
@@ -66,8 +62,9 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
      */
-    public void classPvalGenerator( Map geneToGeneScoreMap, Map probesToPvals, StatusViewer messenger ) {
-
+    public Map<String, GeneSetResult> classPvalGenerator( Map<String, Double> geneToGeneScoreMap,
+            Map<String, Double> probesToPvals, StatusViewer messenger ) {
+        Map<String, GeneSetResult> results = new HashMap<String, GeneSetResult>();
         OraPvalGenerator cpv = new OraPvalGenerator( settings, geneAnnots, csc, numOverThreshold, numUnderThreshold,
                 goName, inputSize );
 
@@ -86,6 +83,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
                 messenger.showStatus( count + " gene sets analyzed" );
             }
         }
+        return results;
     }
 
     /**

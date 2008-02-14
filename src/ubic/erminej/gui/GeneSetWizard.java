@@ -38,6 +38,10 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  */
 
 public class GeneSetWizard extends Wizard {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7175277380197599151L;
     private static Log log = LogFactory.getLog( GeneSetWizard.class.getName() );
     Settings settings;
     GeneAnnotations geneData;
@@ -140,6 +144,7 @@ public class GeneSetWizard extends Wizard {
         this.addStep( step3 );
     }
 
+    @Override
     protected void nextButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 1 ) {
@@ -197,6 +202,7 @@ public class GeneSetWizard extends Wizard {
         }
     }
 
+    @Override
     protected void backButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 2 ) {
@@ -236,12 +242,14 @@ public class GeneSetWizard extends Wizard {
         }
     }
 
+    @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         geneData.resetSelectedProbes();
         geneData.resetSelectedSets();
         dispose();
     }
 
+    @Override
     protected void finishButton_actionPerformed( ActionEvent e ) {
         if ( step == 2 ) {
             // pass the name and description onto step 3.

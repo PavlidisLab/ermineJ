@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -49,7 +50,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     private double[] groupPvals = null; // pvalues for groups.
     private double[] pvals = null; // pvalues for probes.
 
-    private Map probePvalMap; // probes -> pval
+    private Map<String, Double> probePvalMap; // probes -> pval
     private boolean useWeights;
     private static int quantile = 50;
     private static double quantfract = 0.5;
@@ -227,23 +228,21 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @param shuffle boolean
      * @return Map
      */
-    public Map get_map( boolean shuffle ) {
+    public Map<String, Double> get_map( boolean shuffle ) {
 
         if ( shuffle ) {
-            Map scrambled_probe_pval_map = new LinkedHashMap();
+            Map<String, Double> scrambled_probe_pval_map = new LinkedHashMap<String, Double>();
 
-            Set keys = probePvalMap.keySet();
-            Iterator it = keys.iterator();
-
-            Collection values = probePvalMap.values();
-            Vector valvec = new Vector( values );
+            Collection<Double> values = probePvalMap.values();
+            List<Double> valvec = new Vector<Double>( values );
             Collections.shuffle( valvec );
 
             // randomly associate keys and values
             int i = 0;
+            Set<String> keys = probePvalMap.keySet();
+            Iterator<String> it = keys.iterator();
             while ( it.hasNext() ) {
                 scrambled_probe_pval_map.put( it.next(), valvec.get( i ) );
-                // System.err.println(it.next() + " " + valvec.get(i));
                 i++;
             }
             return scrambled_probe_pval_map;

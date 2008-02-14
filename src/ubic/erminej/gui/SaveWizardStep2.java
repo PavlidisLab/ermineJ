@@ -42,6 +42,10 @@ import ubic.basecode.gui.WizardStep;
  */
 
 public class SaveWizardStep2 extends WizardStep {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1285414341936039972L;
     private SaveWizard wiz = null;
     private JFileChooser chooser = null;
     private JTextField saveFile = null;
@@ -58,6 +62,7 @@ public class SaveWizardStep2 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         JPanel jPanel11 = new JPanel();
         jPanel11.setPreferredSize( new Dimension( 330, 50 ) );
@@ -91,6 +96,7 @@ public class SaveWizardStep2 extends WizardStep {
         this.addMain( jPanel11 );
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }

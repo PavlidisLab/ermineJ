@@ -44,6 +44,10 @@ import ubic.erminej.Settings;
  */
 public class AnalysisWizardStep2 extends WizardStep {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5801771381392975913L;
     private AnalysisWizard wiz;
     private Settings settings;
     private JFileChooser chooser = new JFileChooser();
@@ -62,6 +66,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         wiz.clearStatus();
     }
 
+    @Override
     protected void jbInit() {
         // initialization
         JPanel step2Panel = new JPanel();
@@ -148,6 +153,7 @@ public class AnalysisWizardStep2 extends WizardStep {
 
     }
 
+    @Override
     public boolean isReady() {
 
         if ( wiz.getAnalysisType() == Settings.CORR && rawFile.getText().compareTo( "" ) == 0 ) {

@@ -49,6 +49,10 @@ import ubic.basecode.gui.StatusJlabel;
  * @version $Id$
  */
 public class FindDialog extends JDialog {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8991412162421697305L;
     private static final int MAINWIDTH = 550;
     private JPanel mainPanel;
     private Dimension dlgSize = new Dimension( MAINWIDTH, 100 );
@@ -88,6 +92,7 @@ public class FindDialog extends JDialog {
         setResizable( true );
         mainPanel = ( JPanel ) this.getContentPane();
         this.addWindowListener( new WindowAdapter() {
+            @Override
             public void windowClosing( WindowEvent evt ) {
                 cancelButton_actionPerformed();
             }

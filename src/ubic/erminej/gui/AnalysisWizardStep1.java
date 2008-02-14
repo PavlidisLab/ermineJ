@@ -38,6 +38,10 @@ import ubic.erminej.Settings;
  * @version $Id$
  */
 public class AnalysisWizardStep1 extends WizardStep {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8558401501649026545L;
     private AnalysisWizard wiz;
     private Settings settings;
     private JRadioButton oraButton;
@@ -55,6 +59,7 @@ public class AnalysisWizardStep1 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         JPanel step1Panel = new JPanel();
         JPanel jPanel4 = new JPanel();
@@ -136,6 +141,7 @@ public class AnalysisWizardStep1 extends WizardStep {
         this.addMain( step1Panel );
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }

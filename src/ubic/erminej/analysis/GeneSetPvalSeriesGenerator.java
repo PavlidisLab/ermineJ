@@ -36,7 +36,6 @@ import ubic.erminej.data.Histogram;
  */
 public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
-    private Map results;
     private Histogram hist;
 
     public GeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneData, Histogram hi,
@@ -44,11 +43,6 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         super( settings, geneData, csc, gon );
         this.hist = hi;
 
-        results = new HashMap();
-    }
-
-    public Map getResults() {
-        return results;
     }
 
     /**
@@ -56,9 +50,12 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
      * 
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
+     * @return
      */
-    public void classPvalGenerator( Map geneToScoreMap, Map probeToScoreMap ) {
-
+    public Map<String, GeneSetResult> classPvalGenerator( Map<String, Double> geneToScoreMap,
+            Map<String, Double> probeToScoreMap ) {
+        Map<String, GeneSetResult> results;
+        results = new HashMap<String, GeneSetResult>();
         ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc, goName, hist );
 
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
@@ -69,25 +66,28 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
                 results.put( className, res );
             }
         }
+        return results;
     }
 
     /**
      * Same thing as class_pval_generator, but returns a collection of scores (pvalues) (see below) instead of adding
      * them to the results object. This is used to get class pvalues for permutation analysis.
      */
-    public Map class_v_pval_generator( Map group_pval_map, Map probesToPvals ) {
-
+    public Map<String, Double> class_v_pval_generator( Map<String, Double> group_pval_map,
+            Map<String, Double> probesToPvals ) {
+        Map<String, Double> results;
+        results = new HashMap<String, Double>();
         ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, csc,
                 goName, hist );
 
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             String className = ( String ) iter.next();
             double pval = cpv.classPvalue( className, group_pval_map, probesToPvals );
-            
-            log.debug("pval: " + pval);
+
+            log.debug( "pval: " + pval );
 
             if ( pval >= 0.0 ) {
-                results.put( className, new Double( pval ) );
+                results.put( className, pval );
             }
         }
         return results;

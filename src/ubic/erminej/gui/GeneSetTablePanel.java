@@ -54,6 +54,10 @@ import ubic.erminej.Settings;
  */
 public class GeneSetTablePanel extends GeneSetPanel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8651390176011748967L;
     private final static int GENESET_ID_COLUMN_WIDTH = 80;
     private final static int GENESET_NAME_COLUMN_WIDTH = 350;
     private final static int NUMPROBES_COLUMN_WIDTH = 40;
@@ -80,9 +84,21 @@ public class GeneSetTablePanel extends GeneSetPanel {
      */
     private void setUpTable() {
         table = new JTable() {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = 2088153030493337744L;
+
             // Implement table header tool tips.
+            @Override
             protected JTableHeader createDefaultTableHeader() {
                 return new JTableHeader( columnModel ) {
+                    /**
+                     * 
+                     */
+                    private static final long serialVersionUID = -9036922711562160720L;
+
+                    @Override
                     public String getToolTipText( MouseEvent e ) {
                         java.awt.Point p = e.getPoint();
                         int index = columnModel.getColumnIndexAtX( p.x );
@@ -95,10 +111,12 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
         table.getTableHeader().setReorderingAllowed( false );
         table.getTableHeader().addMouseListener( new MouseAdapter() {
+            @Override
             public void mouseEntered( MouseEvent e ) {
                 setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
             }
 
+            @Override
             public void mouseExited( MouseEvent e ) {
                 setCursor( Cursor.getDefaultCursor() );
             }
@@ -156,6 +174,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         this.callingFrame.updateRunViewMenu();
     }
 
+    @Override
     public void addedNewGeneSet() {
         sorter.cancelSorting();
         // sorter.setSortingStatus( 0, TableSorter.ASCENDING );
@@ -163,6 +182,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     // called when we first set up the table.
+    @Override
     public void addInitialData( GONames initialGoData ) {
         super.addInitialData( initialGoData );
         model.addInitialData( geneData, goData );
@@ -171,6 +191,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         sorter.setSortingStatus( 1, TableSorter.ASCENDING );
     }
 
+    @Override
     public void addRun() {
         model.addRun();
         int c = model.getColumnCount() - 1;
@@ -189,6 +210,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     // called if 'cancel', 'find' or 'reset' have been hit.
+    @Override
     public void resetView() {
         this.geneData = callingFrame.getOriginalGeneData();
         model.setInitialData( geneData, goData );
@@ -214,6 +236,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.revalidate();
     }
 
+    @Override
     protected String deleteAndResetGeneSet( String classID ) {
         log.debug( "Deleting gene set from table" );
         String action = super.deleteAndResetGeneSet( classID );
@@ -233,6 +256,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @param e
      * @return
      */
+    @Override
     protected String popupRespondAndGetGeneSet( MouseEvent e ) {
         JTable source = ( JTable ) e.getSource();
         assert source != null;
@@ -300,6 +324,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         removeRun( currentColumnIndex );
     }
 
+    @Override
     protected MouseListener configurePopupMenu() {
         MouseListener m = super.configurePopupMenu();
         final JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
@@ -362,6 +387,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
 // //////////////////////////////////////////////////////////////////////////////
 class EditRunPopupMenu extends JPopupMenu {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6328435511579332465L;
     Point popupPoint;
 
     public Point getPoint() {
@@ -403,6 +432,7 @@ class OutputPanel_mouseAdapter extends java.awt.event.MouseAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void mouseReleased( MouseEvent e ) {
         if ( e.getClickCount() < 2 ) {
             return;
@@ -418,10 +448,12 @@ class EditRunPopupListener extends MouseAdapter {
         popup = popupMenu;
     }
 
+    @Override
     public void mousePressed( MouseEvent e ) {
         maybeShowPopup( e );
     }
 
+    @Override
     public void mouseReleased( MouseEvent e ) {
         maybeShowPopup( e );
     }

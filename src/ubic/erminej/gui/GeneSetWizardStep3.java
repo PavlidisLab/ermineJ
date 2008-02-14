@@ -39,6 +39,10 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  */
 public class GeneSetWizardStep3 extends WizardStep {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7269554461600183571L;
     private UserDefinedGeneSetManager newGeneSet = null;
     private JLabel classIDFinal = null;
     private JTextField classIDTF = null;
@@ -62,6 +66,7 @@ public class GeneSetWizardStep3 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         this.setLayout( new BorderLayout() );
         JPanel step3Panel = new JPanel();
@@ -131,6 +136,7 @@ public class GeneSetWizardStep3 extends WizardStep {
         this.addMain( step3Panel );
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }

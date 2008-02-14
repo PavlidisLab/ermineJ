@@ -36,6 +36,10 @@ import ubic.erminej.Settings;
  * @version $Id$
  */
 public class SaveWizard extends Wizard {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1308261612895233801L;
     // logic
     int step = 1;
     int selected_run;
@@ -65,6 +69,7 @@ public class SaveWizard extends Wizard {
         selected_run = i;
     }
 
+    @Override
     protected void nextButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 1 ) {
@@ -85,6 +90,7 @@ public class SaveWizard extends Wizard {
         }
     }
 
+    @Override
     protected void backButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 2 ) {
@@ -100,10 +106,12 @@ public class SaveWizard extends Wizard {
         }
     }
 
+    @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         dispose();
     }
 
+    @Override
     protected void finishButton_actionPerformed( ActionEvent e ) {
         GeneSetPvalRun runToSave = ( GeneSetPvalRun ) rundata.get( step1.getSelectedRunNum() );
         Settings saveSettings = runToSave.getSettings();

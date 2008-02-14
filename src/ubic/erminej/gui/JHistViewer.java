@@ -36,6 +36,11 @@ import ubic.erminej.data.Histogram;
  */
 public class JHistViewer extends JFrame {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8747183839731697937L;
+
     Histogram hist;
 
     private ChartPanel jChartPanel = null;

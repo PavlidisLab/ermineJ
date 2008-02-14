@@ -58,6 +58,11 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  */
 public class AnalysisWizardStep3 extends WizardStep {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7777686534611702796L;
+
     private Settings settings;
 
     private AnalysisWizardStep3_CustomClassList customClasses;
@@ -91,6 +96,7 @@ public class AnalysisWizardStep3 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
 
         this.setLayout( new BorderLayout() );
@@ -127,11 +133,13 @@ public class AnalysisWizardStep3 extends WizardStep {
 
         customClassScrollPane = new JScrollPane( customClassTable );
         customClassTable.getTableHeader().addMouseListener( new MouseAdapter() {
+            @Override
             public void mouseEntered( MouseEvent e ) {
                 setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
                 // log.debug( "should this work? " + ( isEnabled() && isDisplayable() && isVisible() ) );
             }
 
+            @Override
             public void mouseExited( MouseEvent e ) {
                 setCursor( Cursor.getDefaultCursor() );
             }
@@ -171,6 +179,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         this.addMain( step3Panel );
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }
@@ -360,10 +369,20 @@ class AnalysisWizardStep3_ClassFileFilter implements FilenameFilter {
 }
 
 class AnalysisWizardStep3_CustomClassList extends ArrayList {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6273798227862995265L;
+
     public AbstractTableModel toTableModel() {
         return new AbstractTableModel() {
+            /**
+             * 
+             */
+            private static final long serialVersionUID = -7948657716603757137L;
             private String[] columnNames = { "ID", "Description", "Members" };
 
+            @Override
             public String getColumnName( int i ) {
                 return columnNames[i];
             }

@@ -57,6 +57,10 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
 
 public class GeneSetWizardStep2 extends WizardStep {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4023050874708943617L;
     private GeneAnnotations geneData = null;
     private JTable probeTable = null;
     private JTable newClassTable = null;
@@ -79,6 +83,7 @@ public class GeneSetWizardStep2 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         this.setLayout( new BorderLayout() );
         JPanel topPanel = new JPanel();
@@ -151,6 +156,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         this.addMain( step2Panel );
     }
 
+    @Override
     public boolean isReady() {
         if ( newGeneSet.getProbes().size() == 0 ) {
             return false;
@@ -239,10 +245,12 @@ public class GeneSetWizardStep2 extends WizardStep {
         probeTable.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
 
         sorter.getTableHeader().addMouseListener( new MouseAdapter() {
+            @Override
             public void mouseEntered( MouseEvent e ) {
                 getParent().setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
             }
 
+            @Override
             public void mouseExited( MouseEvent e ) {
                 getParent().setCursor( Cursor.getDefaultCursor() );
             }
@@ -255,10 +263,12 @@ public class GeneSetWizardStep2 extends WizardStep {
         newClassTable.setModel( anotherSorter );
         anotherSorter.setTableHeader( newClassTable.getTableHeader() );
         anotherSorter.getTableHeader().addMouseListener( new MouseAdapter() {
+            @Override
             public void mouseEntered( MouseEvent e ) {
                 getParent().setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
             }
 
+            @Override
             public void mouseExited( MouseEvent e ) {
                 getParent().setCursor( Cursor.getDefaultCursor() );
             }
@@ -384,6 +394,10 @@ class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 }
 
 class ProbeTableModel extends AbstractTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4672326703011127415L;
     GeneAnnotations geneData;
     private String[] columnNames = { "Probe", "Gene", "Description" };
 
@@ -391,6 +405,7 @@ class ProbeTableModel extends AbstractTableModel {
         this.geneData = geneData;
     }
 
+    @Override
     public String getColumnName( int i ) {
         return columnNames[i];
     }

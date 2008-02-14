@@ -37,6 +37,10 @@ import ubic.erminej.GeneSetPvalRun;
  * @version $Id$
  */
 public class SaveWizardStep1 extends WizardStep {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8622689726831187005L;
     private SaveWizard wiz = null;
     private List rundata = null;
     private JPanel runPanel = null;
@@ -55,6 +59,7 @@ public class SaveWizardStep1 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         runPanel = new JPanel();
         runPanel.setLayout( new BorderLayout() );
@@ -76,6 +81,7 @@ public class SaveWizardStep1 extends WizardStep {
         this.addMain( runPanel );
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }

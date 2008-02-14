@@ -35,6 +35,10 @@ import ubic.erminej.Settings;
  */
 public class AnalysisWizardStep3_1 extends WizardStep {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 9064542224892172L;
     private final Settings settings;
     private JCheckBox biologicalProcessButton;
     private JCheckBox molecularFunctionButton;
@@ -75,6 +79,7 @@ public class AnalysisWizardStep3_1 extends WizardStep {
      * 
      * @see baseCode.gui.WizardStep#jbInit()
      */
+    @Override
     protected void jbInit() {
         JPanel step1Panel = new JPanel();
         JPanel jPanel4 = new JPanel();
@@ -132,6 +137,7 @@ public class AnalysisWizardStep3_1 extends WizardStep {
      * 
      * @see baseCode.gui.WizardStep#isReady()
      */
+    @Override
     public boolean isReady() {
         return false;
     }

@@ -46,6 +46,10 @@ import ubic.erminej.Settings;
  */
 
 public class GeneSetWizardStep1 extends WizardStep {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2352380414699946183L;
     private JButton browseButton;
     private JTextField classFile;
     private JFileChooser chooser;
@@ -63,6 +67,7 @@ public class GeneSetWizardStep1 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         JPanel step1Panel = new JPanel();
         step1Panel.setLayout( new BorderLayout() );
@@ -136,6 +141,7 @@ public class GeneSetWizardStep1 extends WizardStep {
         this.addMain( step1Panel );
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }

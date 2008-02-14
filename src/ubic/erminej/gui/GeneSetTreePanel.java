@@ -90,6 +90,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#addedNewGeneSet()
      */
+    @Override
     public void addedNewGeneSet() {
         log.debug( "no-op" );
     }
@@ -99,6 +100,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#addRun()
      */
+    @Override
     public void addRun() {
         fireResultsChanged();
     }
@@ -273,6 +275,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#resetView()
      */
+    @Override
     public void resetView() {
         updateNodeStyles();
         goTree.revalidate();
@@ -385,6 +388,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     /**
      * 
      */
+    @Override
     protected MouseListener configurePopupMenu() {
         MouseListener m = super.configurePopupMenu();
         JMenuItem collapseNodeMenuItem = new JMenuItem( "Collapse All (slow)" );
@@ -423,6 +427,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param e
      * @return
      */
+    @Override
     protected String popupRespondAndGetGeneSet( MouseEvent e ) {
         JTree source = ( JTree ) e.getSource();
         int x = e.getX();
@@ -473,6 +478,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
      */
+    @Override
     protected String deleteAndResetGeneSet( String classID ) {
         String action = super.deleteAndResetGeneSet( classID );
         if ( action == GeneSetPanel.DELETED ) {
@@ -598,6 +604,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean,
      *      boolean, boolean, int, boolean)
      */
+    @Override
     public Component getTreeCellRendererComponent( JTree tree, Object value, boolean selected, boolean expanded,
             boolean leaf, int row, boolean hasFocus ) {
         super.getTreeCellRendererComponent( tree, value, selected, expanded, leaf, row, hasFocus );
@@ -749,10 +756,12 @@ class GeneSetTreePanel_mouseListener extends MouseAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void mousePressed( MouseEvent e ) {
         adaptee.mousePressed( e );
     }
 
+    @Override
     public void mouseReleased( MouseEvent e ) {
         adaptee.mouseReleased( e );
     }

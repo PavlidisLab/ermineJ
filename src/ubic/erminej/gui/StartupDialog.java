@@ -48,6 +48,10 @@ import ubic.erminej.Settings;
 
 public class StartupDialog extends AppDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -376725612513363691L;
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
     private static Log log = LogFactory.getLog( StartupDialog.class.getName() );
     JFileChooser chooser;
@@ -188,10 +192,12 @@ public class StartupDialog extends AppDialog {
         }
     }
 
+    @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         System.exit( 0 );
     }
 
+    @Override
     protected void actionButton_actionPerformed( ActionEvent e ) {
         String annotFileName = annotFileTextField.getText();
         String goFileName = classFileTextField.getText();
@@ -211,6 +217,7 @@ public class StartupDialog extends AppDialog {
             log.debug( "Saving configuration" );
             saveValues();
             new Thread() {
+                @Override
                 public void run() {
                     ( ( GeneSetScoreFrame ) callingframe ).initialize();
                 }
@@ -219,6 +226,7 @@ public class StartupDialog extends AppDialog {
         }
     }
 
+    @Override
     protected void helpButton_actionPerformed( ActionEvent e ) {
 
     }
@@ -248,6 +256,7 @@ class StartupDialog_this_windowAdapter extends java.awt.event.WindowAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void windowClosing( WindowEvent e ) {
         adaptee.this_windowClosed( e );
     }

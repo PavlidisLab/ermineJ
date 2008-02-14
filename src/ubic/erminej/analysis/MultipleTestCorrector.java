@@ -147,7 +147,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
         for ( int i = 0; i < trials; i++ ) {
             // System.err.println("Trial: " + i );
 
-            Map scgroup_pval_map = geneScores.getGeneToPvalMap( true ); // shuffle
+            Map<String, Double> scgroup_pval_map = geneScores.getGeneToPvalMap( true ); // shuffle
             // the
             // association
             // of
@@ -162,7 +162,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
             // set). If we are not using weights, it only affects the
             // hypergeometric pvalues. (todo: add correction for those
             // values) So we don't even bother shuffling it.
-            Map scprobepvalmap = geneScores.getProbeToScoreMap();
+            Map<String, Double> scprobepvalmap = geneScores.getProbeToScoreMap();
 
             // Just for AROC:
             /*

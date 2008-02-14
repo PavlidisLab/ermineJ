@@ -38,6 +38,10 @@ import ubic.erminej.Settings;
  */
 public class DataDirectoryDialog extends AppDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 745890257151041233L;
     JFileChooser chooser = new JFileChooser();
     JButton loadBrowseButton = new JButton();
     Settings settings;
@@ -99,6 +103,7 @@ public class DataDirectoryDialog extends AppDialog {
      * 
      * @see baseCode.gui.AppDialog#cancelButton_actionPerformed(java.awt.event.ActionEvent)
      */
+    @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         dispose();
     }
@@ -108,6 +113,7 @@ public class DataDirectoryDialog extends AppDialog {
      * 
      * @see baseCode.gui.AppDialog#actionButton_actionPerformed(java.awt.event.ActionEvent)
      */
+    @Override
     protected void actionButton_actionPerformed( ActionEvent e ) {
         if ( GuiUtil.testDir( dataDir.getText() ) ) {
             settings.setDataDirectory( dataDir.getText() );
@@ -120,6 +126,7 @@ public class DataDirectoryDialog extends AppDialog {
      * 
      * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
      */
+    @Override
     protected void helpButton_actionPerformed( ActionEvent e ) {
 
     }

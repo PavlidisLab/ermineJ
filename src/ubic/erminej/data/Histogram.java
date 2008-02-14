@@ -54,7 +54,7 @@ public class Histogram {
     private int numBins = 0;
     private int numItemsPerHistogram = 0;
     private double minPval; // the smallest possible pvalue: used when a requested score is out of the top of the range.
-    private Map analyticDistributions;
+    private Map<Integer, NormalProbabilityComputer> analyticDistributions;
 
     private OpenIntObjectHashMap empiricalDistributions;
     private boolean isCDF = false;
@@ -82,7 +82,7 @@ public class Histogram {
         this.minimumGeneSetSize = minGeneSetSize;
         setNumRuns( numRuns );
         calcNumOfBins();
-        analyticDistributions = new HashMap();
+        analyticDistributions = new HashMap<Integer, NormalProbabilityComputer>();
         empiricalDistributions = new OpenIntObjectHashMap();
 
         for ( int i = 0; i < numGeneSetSizes; i++ ) {

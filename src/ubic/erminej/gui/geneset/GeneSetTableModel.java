@@ -49,6 +49,10 @@ import ubic.erminej.Settings;
 
 public class GeneSetTableModel extends AbstractTableModel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8155800933946966811L;
     private static final String URL_REPLACE_TAG = "@@";
     private JMatrixDisplay m_matrixDisplay;
     private List probeIDs;
@@ -57,7 +61,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     private GeneAnnotations geneData;
     private DecimalFormat m_nf;
     private Settings settings;
-    private Map linkLabels;
+    private Map<String, JLinkLabel> linkLabels;
     private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name" };
     private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
     protected static final Log log = LogFactory.getLog( GeneSetTableModel.class );
@@ -89,7 +93,7 @@ public class GeneSetTableModel extends AbstractTableModel {
      */
     private void createLinkLabels() {
         assert probeIDs != null;
-        this.linkLabels = new HashMap();
+        this.linkLabels = new HashMap<String, JLinkLabel>();
         for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
             String probe = ( String ) iter.next();
             String gene = geneData.getProbeGeneName( probe );
@@ -165,7 +169,7 @@ public class GeneSetTableModel extends AbstractTableModel {
                 }
             case 2:
                 // p value bar
-                ArrayList values = new ArrayList();
+                List<Double> values = new ArrayList<Double>();
                 if ( !settings.getDoLog() || m_pvalues == null ) { // kludgy way to figure out if we have pvalues.
                     values.add( 0, new Double( Double.NaN ) );
                     values.add( 1, new Double( Double.NaN ) );

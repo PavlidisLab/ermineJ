@@ -28,6 +28,11 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
 public class FindByGeneDialog extends FindDialog {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 5573937842473360863L;
+
+    /**
      * @param callingframe
      * @param geneData
      * @param goData
@@ -37,6 +42,7 @@ public class FindByGeneDialog extends FindDialog {
         this.setTitle( "Find Gene Set using a gene or probe symbol" );
     }
 
+    @Override
     void findActionPerformed() {
         String searchOn = searchTextField.getText();
         statusMessenger.showStatus( "Searching '" + searchOn + "'" );

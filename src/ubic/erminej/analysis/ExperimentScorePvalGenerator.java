@@ -19,7 +19,6 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -58,12 +57,13 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      * Get results for one class, based on class id. The other arguments are things that are not constant under
      * permutations of the data.
      * 
-     * @param geneSetName a <code>String</code> value
-     * @param groupToPvalMap a <code>Map</code> value
-     * @param probesToPvals a <code>Map</code> value
-     * @return a <code>classresult</code> value
+     * @param geneSetName
+     * @param groupToPvalMap
+     * @param probesToPvals
+     * @return
      */
-    public GeneSetResult classPval( String geneSetName, Map geneToPvalMap, Map probesToPvals ) {
+    public GeneSetResult classPval( String geneSetName, Map<String, Double> geneToPvalMap,
+            Map<String, Double> probesToPvals ) {
         if ( !super.checkAspect( geneSetName ) ) return null;
         int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
@@ -75,11 +75,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         double[] groupPvalArr = new double[effSize]; // store pvalues for items in
         // the class.
 
-        Map target_ranks = new HashMap();
-        Set record = new HashSet();
-
-        record.clear();
-        target_ranks.clear();
+        Set<String> record = new HashSet<String>();
 
         int v_size = 0;
 

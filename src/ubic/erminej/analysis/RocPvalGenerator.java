@@ -41,7 +41,6 @@ import ubic.erminej.data.GeneSetResult;
  */
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-    private Map results;
     private int totalSize = 0;
 
     public RocPvalGenerator( Settings set, GeneAnnotations an, GeneSetSizeComputer csc, GONames gon ) {
@@ -53,7 +52,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             totalSize = geneAnnots.numProbes();
         }
         log.debug( totalSize + " elements in total" );
-        results = new HashMap();
+
     }
 
     /**
@@ -62,8 +61,8 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
      */
-    public void classPvalGenerator( Map genePvalueMap, Map rankMap, StatusViewer messenger ) {
-
+    public Map<String, GeneSetResult> classPvalGenerator( Map genePvalueMap, Map rankMap, StatusViewer messenger ) {
+        Map<String, GeneSetResult> results = new HashMap<String, GeneSetResult>();
         int count = 0;
 
         for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
@@ -78,6 +77,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
                 messenger.showStatus( count + " gene sets analyzed" );
             }
         }
+        return results;
     }
 
     /**
@@ -91,7 +91,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     public GeneSetResult classPval( String geneSet, Map probesToPvals, Map rankMap ) {
         if ( !super.checkAspect( geneSet ) ) return null;
         // variables for outputs
-        List targetRanks = new ArrayList();
+        List<Integer> targetRanks = new ArrayList<Integer>();
 
         int effSize = ( ( Integer ) effectiveSizes.get( geneSet ) ).intValue(); // effective size of this class.
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
@@ -144,13 +144,6 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         res.setPValue( roc_pval );
         return res;
 
-    }
-
-    /**
-     * @return Map the results
-     */
-    public Map getResults() {
-        return results;
     }
 
 }

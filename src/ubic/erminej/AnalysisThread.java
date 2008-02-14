@@ -103,7 +103,7 @@ public class AnalysisThread extends Thread {
      * @param loadFile
      */
     public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData, Map geneDataSets,
-            Map rawDataSets, Map geneScoreSets, String loadFile ) {
+            Map<String, DoubleMatrixNamed<String, String>> rawDataSets, Map geneScoreSets, String loadFile ) {
         this.settings = settings;
         this.messenger = messenger;
         this.goData = goData;
@@ -278,7 +278,7 @@ public class AnalysisThread extends Thread {
         GeneScores geneScores = addGeneScores();
         if ( this.stop ) return null;
 
-        Set activeProbes = getActiveProbes( rawData, geneScores );
+        Set<String> activeProbes = getActiveProbes( rawData, geneScores );
         if ( activeProbes == null || Thread.currentThread().isInterrupted() ) return latestResults;
 
         // boolean needToMakeNewGeneData = needNewGeneData( activeProbes );
@@ -345,8 +345,8 @@ public class AnalysisThread extends Thread {
      * @param activeProbes
      * @return
      */
-    private synchronized Set getActiveProbes( DoubleMatrixNamed<String, String> rawData, GeneScores geneScores ) {
-        Set activeProbes = null;
+    private synchronized Set<String> getActiveProbes( DoubleMatrixNamed<String, String> rawData, GeneScores geneScores ) {
+        Set<String> activeProbes = null;
         if ( rawData != null && geneScores != null ) { // favor the geneScores list.
             activeProbes = geneScores.getProbeToScoreMap().keySet();
         } else if ( rawData == null && geneScores != null ) {

@@ -139,6 +139,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
 
         new Thread() {
+            @Override
             public void run() {
                 try {
                     if ( id == null ) {
@@ -245,10 +246,12 @@ public abstract class GeneSetPanel extends JScrollPane {
         popup.add( restoreGeneSetMenuItem );
 
         MouseListener popupListener = new MouseAdapter() {
+            @Override
             public void mousePressed( MouseEvent e ) {
                 maybeShowPopup( e );
             }
 
+            @Override
             public void mouseReleased( MouseEvent e ) {
                 maybeShowPopup( e );
             }

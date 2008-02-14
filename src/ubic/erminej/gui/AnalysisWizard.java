@@ -42,6 +42,11 @@ public class AnalysisWizard extends Wizard {
     /**
      * 
      */
+    private static final long serialVersionUID = 1045387572443464499L;
+
+    /**
+     * 
+     */
     private static final int WIZARD_PREFERRED_HEIGHT = 380;
 
     /**
@@ -100,6 +105,7 @@ public class AnalysisWizard extends Wizard {
         }
     }
 
+    @Override
     protected void nextButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 1 && step1.isReady() ) {
@@ -156,6 +162,7 @@ public class AnalysisWizard extends Wizard {
         }
     }
 
+    @Override
     protected void backButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 2 ) {
@@ -234,10 +241,12 @@ public class AnalysisWizard extends Wizard {
         }
     }
 
+    @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         dispose();
     }
 
+    @Override
     protected void finishButton_actionPerformed( ActionEvent e ) {
         if ( step2.isReady() ) {
             try {
@@ -250,6 +259,7 @@ public class AnalysisWizard extends Wizard {
             log.info( "Starting analysis" );
 
             new Thread() {
+                @Override
                 public void run() {
                     Settings copyOfSettings = new Settings( settings );
                     ( ( GeneSetScoreFrame ) callingframe ).startAnalysis( copyOfSettings );

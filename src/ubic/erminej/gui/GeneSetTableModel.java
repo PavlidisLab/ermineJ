@@ -48,6 +48,11 @@ import corejava.Format;
  */
 public class GeneSetTableModel extends AbstractTableModel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4190174776749215486L;
+
     private static Log log = LogFactory.getLog( GeneSetTableModel.class.getName() );
 
     /**
@@ -98,6 +103,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         return columnNames.size();
     }
 
+    @Override
     public String getColumnName( int columnNumber ) {
         if ( columnNumber > this.getColumnCount() - 1 || columnNumber < 0 ) return null;
         return ( String ) columnNames.get( columnNumber );
@@ -132,7 +138,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     public Object getValueAt( int i, int j ) {
 
-        String classid = ( String ) geneData.getSelectedSets().get( i );
+        String classid = geneData.getSelectedSets().get( i );
 
         if ( j < INIT_COLUMNS ) {
             switch ( j ) {
@@ -190,6 +196,10 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
     /**
      * 
      */
+    private static final long serialVersionUID = -139908543874278309L;
+    /**
+     * 
+     */
     private static final int TOOLTIP_LINELEN = 50;
     /**
      * 
@@ -210,6 +220,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         nff.setMaximumFractionDigits( 4 );
     }
 
+    @Override
     public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column ) {
         super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );

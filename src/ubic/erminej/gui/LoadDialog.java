@@ -42,6 +42,10 @@ import ubic.erminej.Settings;
  * @version $Id$
  */
 public class LoadDialog extends AppDialog {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5573931795878079049L;
     private JFileChooser chooser = new JFileChooser();
     private JPanel centerPanel = new JPanel();
     private JButton loadBrowseButton = new JButton();
@@ -95,13 +99,16 @@ public class LoadDialog extends AppDialog {
         }
     }
 
+    @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         dispose();
     }
 
+    @Override
     protected void actionButton_actionPerformed( ActionEvent e ) {
         if ( FileTools.testFile( loadFile.getText() ) ) {
             new Thread() {
+                @Override
                 public void run() {
                     ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile.getText() );
                     ( ( GeneSetScoreFrame ) callingframe ).setSettings( settings );
@@ -118,6 +125,7 @@ public class LoadDialog extends AppDialog {
          * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
          */
 
+    @Override
     protected void helpButton_actionPerformed( ActionEvent e ) {
         //
     }

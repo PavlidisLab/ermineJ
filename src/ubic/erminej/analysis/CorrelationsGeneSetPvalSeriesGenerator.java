@@ -46,14 +46,6 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
     protected static final Log log = LogFactory.getLog( CorrelationsGeneSetPvalSeriesGenerator.class );
 
     private CorrelationPvalGenerator classScoreGenerator;
-    private Map results;
-
-    /**
-     * @return
-     */
-    public Map getResults() {
-        return results;
-    }
 
     /**
      * @param settings
@@ -64,7 +56,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
      * @param hist
      */
     public CorrelationsGeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneAnnots,
-            GeneSetSizeComputer csc, GONames gon, DoubleMatrixNamed rawData, Histogram hist ) {
+            GeneSetSizeComputer csc, GONames gon, DoubleMatrixNamed<String, String> rawData, Histogram hist ) {
         super( settings, geneAnnots, csc, gon );
 
         this.classScoreGenerator = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );
@@ -75,13 +67,15 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
         classScoreGenerator.setGeneRepTreatment( settings.getGeneRepTreatment() );
         classScoreGenerator.set_class_max_size( settings.getMaxClassSize() );
         classScoreGenerator.set_class_min_size( settings.getMinClassSize() );
-        results = new HashMap();
+
     }
 
     /**
      * @param messenger
      */
-    public void classPvalGenerator( StatusViewer messenger ) {
+    public Map<String, GeneSetResult> classPvalGenerator( StatusViewer messenger ) {
+        Map<String, GeneSetResult> results = new HashMap<String, GeneSetResult>();
+        ;
         int count = 0;
         classScoreGenerator.setTests( 0 );
         classScoreGenerator.setCacheHits( 0 );
@@ -102,7 +96,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
 
         log.debug( "Tests: " + classScoreGenerator.getTests() );
         log.debug( "Cache hits: " + classScoreGenerator.getCacheHits() );
-
+        return results;
     }
 
 }

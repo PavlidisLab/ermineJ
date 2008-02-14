@@ -37,6 +37,10 @@ import ubic.erminej.Settings;
  * @version $Id$
  */
 public class AnalysisWizardStep4 extends WizardStep {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5916400713486392185L;
     private Settings settings;
     private JTextField jTextFieldMaxClassSize;
     private JTextField jTextFieldMinClassSize;
@@ -52,6 +56,7 @@ public class AnalysisWizardStep4 extends WizardStep {
     }
 
     // Component initialization
+    @Override
     protected void jbInit() {
         JPanel step4TopPanel = new JPanel();
         JPanel step4LeftPanel = new JPanel();
@@ -167,6 +172,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         }
     }
 
+    @Override
     public boolean isReady() {
         return true;
     }
