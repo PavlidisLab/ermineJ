@@ -28,7 +28,7 @@ import java.text.DecimalFormat;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class GeneSetResult implements Comparable {
+public class GeneSetResult implements Comparable<GeneSetResult> {
     private String classId = null;
     private String clasName = null;
     private double pvalue = 1.0;
@@ -82,9 +82,10 @@ public class GeneSetResult implements Comparable {
         nf.setMinimumFractionDigits( 3 );
 
         DecimalFormat exp = new DecimalFormat( "0.###E00" );
-        out.write( "!\t" + clasName + "\t" + classId + "\t" + size + "\t" + effectiveSize + "\t"
-                + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
-                + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) ) + extracolumns + "\n" );
+        out.write( "!\t" + clasName + "\t" + classId + "\t" + size + "\t" + effectiveSize + "\t" + nf.format( score )
+                + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
+                + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
+                + extracolumns + "\n" );
     }
 
     public void printHeadings( Writer out ) throws IOException {
@@ -166,8 +167,7 @@ public class GeneSetResult implements Comparable {
      * @param ob Object
      * @return int
      */
-    public int compareTo( Object ob ) {
-        GeneSetResult other = ( GeneSetResult ) ob;
+    public int compareTo( GeneSetResult other ) {
         if ( this.pvalue > other.pvalue ) {
             return 1;
         } else if ( this.pvalue < other.pvalue ) {

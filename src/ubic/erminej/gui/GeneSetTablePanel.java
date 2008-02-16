@@ -72,7 +72,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     private TableSorter sorter;
     protected JTable table = null;
 
-    public GeneSetTablePanel( GeneSetScoreFrame callingFrame, List results, Settings settings ) {
+    public GeneSetTablePanel( GeneSetScoreFrame callingFrame, List<GeneSetPvalRun> results, Settings settings ) {
         super( settings, results, callingFrame );
         model = new GeneSetTableModel( results );
         setUpTable();

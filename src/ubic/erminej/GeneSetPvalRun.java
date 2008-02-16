@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -62,8 +63,8 @@ public class GeneSetPvalRun {
     private GeneScores geneScores;
 
     private Histogram hist;
-    private Map results = null;
-    private Vector sortedclasses = null; // this holds the results.
+    private Map<String, GeneSetResult> results = null;
+    private List<String> sortedclasses = null; // this holds the results.
     private NumberFormat nf = NumberFormat.getInstance();
     private Settings settings;
 
@@ -85,7 +86,8 @@ public class GeneSetPvalRun {
      * @param name Name of the run
      */
     public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData, DoubleMatrixNamed rawData,
-            GONames goData, GeneScores geneScores, StatusViewer messenger, Map results, String name ) {
+            GONames goData, GeneScores geneScores, StatusViewer messenger, Map<String, GeneSetResult> results,
+            String name ) {
         this.settings = settings;
         this.geneData = geneData;
 
@@ -142,7 +144,7 @@ public class GeneSetPvalRun {
         this.name = name;
 
         nf.setMaximumFractionDigits( 8 );
-        results = new LinkedHashMap();
+        results = new LinkedHashMap<String, GeneSetResult>();
 
         runAnalysis( activeProbes, settings, geneData, rawData, goData, geneScores, messenger );
     }
@@ -152,7 +154,7 @@ public class GeneSetPvalRun {
         this.geneData = geneData;
         this.geneScores = geneScores;
         nf.setMaximumFractionDigits( 8 );
-        results = new LinkedHashMap();
+        results = new LinkedHashMap<String, GeneSetResult>();
         runAnalysis( geneData.getActiveProbes(), settings, geneData, null, goData, geneScores, null );
     }
 
@@ -178,7 +180,7 @@ public class GeneSetPvalRun {
     /**
      * @return Map the results
      */
-    public Map getResults() {
+    public Map<String, GeneSetResult> getResults() {
         return results;
     }
 
@@ -192,7 +194,7 @@ public class GeneSetPvalRun {
     /**
      * @return Map the results
      */
-    public Vector getSortedClasses() {
+    public List getSortedClasses() {
         return sortedclasses;
     }
 
@@ -371,13 +373,12 @@ public class GeneSetPvalRun {
      * Sorted order of the class results - all this has to hold is the class names.
      */
     private void sortResults() {
-        sortedclasses = new Vector( results.entrySet().size() );
-        Collection k = results.values();
-        Vector l = new Vector();
-        l.addAll( k );
+        sortedclasses = new Vector<String>( results.entrySet().size() );
+        Collection<GeneSetResult> k = results.values();
+        List<GeneSetResult> l = new Vector<GeneSetResult>( k );
         Collections.sort( l );
-        for ( Iterator it = l.iterator(); it.hasNext(); ) {
-            sortedclasses.add( ( ( GeneSetResult ) it.next() ).getGeneSetId() );
+        for ( Iterator<GeneSetResult> it = l.iterator(); it.hasNext(); ) {
+            sortedclasses.add( it.next().getGeneSetId() );
         }
     }
 }

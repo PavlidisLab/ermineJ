@@ -60,12 +60,12 @@ public class GeneSetTableModel extends AbstractTableModel {
      */
     public static final int INIT_COLUMNS = 4;
 
-    private List columnNames = new LinkedList();
+    private List<String> columnNames = new LinkedList<String>();
     private GeneAnnotations geneData;
     private GONames goData;
-    private List results;
+    private List<GeneSetPvalRun> results;
 
-    public GeneSetTableModel( List results ) {
+    public GeneSetTableModel( List<GeneSetPvalRun> results ) {
         super();
         this.results = results;
         columnNames.add( "Name" );
@@ -143,7 +143,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         if ( j < INIT_COLUMNS ) {
             switch ( j ) {
                 case 0: {
-                    List cid_vec = new Vector();
+                    List<String> cid_vec = new Vector<String>();
                     cid_vec.add( classid );
                     assert goData != null;
                     if ( goData.isUserDefined( classid ) ) cid_vec.add( "M" );
@@ -159,7 +159,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
             }
         } else {
-            List vals = new ArrayList();
+            List<Double> vals = new ArrayList<Double>();
             int runIndex = getRunIndex( j );
             assert runIndex >= 0;
             Map data = ( ( GeneSetPvalRun ) results.get( runIndex ) ).getResults();
@@ -205,7 +205,6 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
      * 
      */
 
-    private static Log log = LogFactory.getLog( OutputPanelTableCellRenderer.class.getName() );
     private Format nf = new Format( "%.4g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 

@@ -19,6 +19,7 @@
 package ubic.erminej;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
@@ -71,13 +72,13 @@ public class ClassScoreSimple {
     // List of genes corresponding to the probes. Indicates the Many-to-one mapping of
     // probes to
     // genes.
-    private List genes = null;
+    private List<String> genes = null;
 
     // List of Collections of go terms for the probes.
-    private List goAssociations = null;
+    private List<Collection<String>> goAssociations = null;
 
     // List of identifiers to be analyzed
-    private List probes = null;
+    private List<String> probes = null;
 
     private GeneSetPvalRun results;
 
@@ -90,7 +91,7 @@ public class ClassScoreSimple {
      * @param genes List of genes corresponding to the probes. Indicates the Many-to-one mapping of probes to genes.
      * @param goAssociations List of Collections of go terms for the probes.
      */
-    public ClassScoreSimple( List probes, List genes, List goAssociations ) {
+    public ClassScoreSimple( List<String> probes, List<String> genes, List<Collection<String>> goAssociations ) {
         this.probes = probes;
         this.genes = genes;
         this.goAssociations = goAssociations;
@@ -120,7 +121,7 @@ public class ClassScoreSimple {
     /**
      * Run an analysis using the current configuration.
      */
-    public void run( List geneScores ) {
+    public void run( List<Double> geneScores ) {
         GeneAnnotations geneData = new GeneAnnotations( probes, genes, null, goAssociations );
         GeneScores scores = new GeneScores( probes, geneScores, geneData.getGeneToProbeMap(), geneData
                 .getProbeToGeneMap(), settings );

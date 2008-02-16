@@ -72,6 +72,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
 import ubic.basecode.gui.GuiUtil;
 import ubic.basecode.gui.ScrollingTextAreaDialog;
 import ubic.basecode.gui.StatusJlabel;
@@ -144,7 +145,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JPanel progInPanel = new JPanel();
     private JPanel progressPanel;
     private JMenuItem quitMenuItem = new JMenuItem();
-    private Map rawDataSets;
+    private Map<String, DoubleMatrixNamed<String, String>> rawDataSets;
     private List<GeneSetPvalRun> results = new LinkedList<GeneSetPvalRun>();
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenu runViewMenu = new JMenu();
@@ -169,7 +170,7 @@ public class GeneSetScoreFrame extends JFrame {
         jbInit();
         hh = new HelpHelper();
         hh.initHelp( helpMenuItem );
-        this.userOverwrittenGeneSets = new HashSet();
+        this.userOverwrittenGeneSets = new HashSet<String>();
     }
 
     public void addedNewGeneSet() {
@@ -322,8 +323,8 @@ public class GeneSetScoreFrame extends JFrame {
         try {
             mainPanel.add( progressPanel, BorderLayout.CENTER );
 
-            rawDataSets = new HashMap();
-            geneDataSets = new HashMap();
+            rawDataSets = new HashMap<String, DoubleMatrixNamed<String, String>>();
+            geneDataSets = new HashMap<Integer, GeneAnnotations>();
             geneScoreSets = new HashMap();
 
             readDataFilesForStartup();
@@ -1204,7 +1205,6 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements java.awt.e
 }
 
 class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
-    private static Log log = LogFactory.getLog( RunSet_Choose_ActionAdapter.class.getName() );
     GeneSetScoreFrame adaptee;
 
     /**

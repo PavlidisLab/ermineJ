@@ -21,8 +21,8 @@ package ubic.erminej.analysis;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +44,7 @@ import ubic.erminej.data.Histogram;
  */
 public class MultipleTestCorrector extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
-    private Vector sortedclasses;
+    private List sortedclasses;
     private Map results;
     private Histogram hist;
     private GeneAnnotations geneData;
@@ -54,8 +54,8 @@ public class MultipleTestCorrector extends AbstractLongTask {
     private Settings settings;
     private StatusViewer messenger;
 
-    public MultipleTestCorrector( Settings set, Vector sc, Histogram h, GeneAnnotations geneData,
-            GeneSetSizeComputer csc, GeneScores geneScores, Map results, StatusViewer messenger ) {
+    public MultipleTestCorrector( Settings set, List sc, Histogram h, GeneAnnotations geneData,
+            GeneSetSizeComputer csc, GeneScores geneScores, Map<String, GeneSetResult> results, StatusViewer messenger ) {
         this.settings = set;
         this.sortedclasses = sc;
         this.results = results;

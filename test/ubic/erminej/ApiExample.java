@@ -40,7 +40,7 @@ public class ApiExample {
     public static void main( String[] args ) {
 
         // List of identifiers to be analyzed
-        List probes = new ArrayList();
+        List<String> probes = new ArrayList<String>();
         probes.add( "a" );
         probes.add( "b" );
         probes.add( "c" );
@@ -48,22 +48,22 @@ public class ApiExample {
 
         // List of genes corresponding to the probes. Indicates the Many-to-one mapping
         // of probes to genes
-        List genes = new ArrayList();
+        List<String> genes = new ArrayList<String>();
         genes.add( "aGene" );
         genes.add( "bGene" );
         genes.add( "cGene" );
         genes.add( "cGene" ); // two probes with the same gene.
 
         // List of Collections of go terms for the probes.
-        List goAssociations = new ArrayList();
-        Collection gotermsA = new HashSet();
+        List<Collection<String>> goAssociations = new ArrayList<Collection<String>>();
+        Collection<String> gotermsA = new HashSet<String>();
         gotermsA.add( "foo" );
         gotermsA.add( "bar" );
-        Collection gotermsB = new HashSet();
+        Collection<String> gotermsB = new HashSet<String>();
         gotermsB.add( "foo" );
-        Collection gotermsC = new HashSet();
+        Collection<String> gotermsC = new HashSet<String>();
         gotermsC.add( "foo" );
-        Collection gotermsC1 = new HashSet();
+        Collection<String> gotermsC1 = new HashSet<String>();
         gotermsC1.add( "foo" );
 
         goAssociations.add( gotermsA );
@@ -72,7 +72,7 @@ public class ApiExample {
         goAssociations.add( gotermsC1 );
 
         // List of Doubles
-        List geneScores = new ArrayList();
+        List<Double> geneScores = new ArrayList<Double>();
         geneScores.add( new Double( "0.1" ) );
         geneScores.add( new Double( "0.1" ) );
         geneScores.add( new Double( "0.01" ) );
@@ -107,5 +107,4 @@ public class ApiExample {
         log.info( "Foo got " + fooPvalue );
         log.info( "Bar got " + barPvalue );
     }
-
 }

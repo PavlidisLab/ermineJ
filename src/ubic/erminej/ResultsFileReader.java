@@ -39,10 +39,10 @@ import ubic.erminej.data.GeneSetResult;
  */
 public class ResultsFileReader {
 
-    private Map results;
+    private Map<String, GeneSetResult> results;
 
     public ResultsFileReader( String filename, StatusViewer messenger ) throws NumberFormatException, IOException {
-        results = new LinkedHashMap();
+        results = new LinkedHashMap<String, GeneSetResult>();
 
         File infile = new File( filename );
         if ( !infile.exists() || !infile.canRead() ) {
@@ -76,7 +76,7 @@ public class ResultsFileReader {
         messenger.showStatus( results.size() + " class results read from file" );
     }
 
-    public Map getResults() {
+    public Map<String, GeneSetResult> getResults() {
         return results;
     }
 

@@ -38,6 +38,7 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSetResult;
 
 /**
  * @author pavlidis
@@ -177,7 +178,7 @@ public class AnalysisThread extends Thread {
      */
     public synchronized GeneSetPvalRun loadAnalysis() throws IOException {
         ResultsFileReader rfr = new ResultsFileReader( loadFile, messenger );
-        Map results = rfr.getResults();
+        Map<String, GeneSetResult> results = rfr.getResults();
         return doAnalysis( results );
     }
 
@@ -265,7 +266,7 @@ public class AnalysisThread extends Thread {
      * @param results
      * @throws IOException
      */
-    private synchronized GeneSetPvalRun doAnalysis( Map results ) throws IOException {
+    private synchronized GeneSetPvalRun doAnalysis( Map<String, GeneSetResult> results ) throws IOException {
         log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
 
         StopWatch timer = new StopWatch();

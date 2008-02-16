@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,8 +45,8 @@ import ubic.erminej.data.GeneSetResult;
 public class ResultsPrinter {
     private static Log log = LogFactory.getLog( ResultsPrinter.class.getName() );
     protected String destFile;
-    protected Vector sortedclasses;
-    protected Map results;
+    protected List sortedclasses;
+    protected Map<String, GeneSetResult> results;
     protected GONames goName;
     protected GeneAnnotations geneData;
     private final boolean saveAllGeneNames;
@@ -123,9 +122,9 @@ public class ResultsPrinter {
             }
         } else {
             // output them in natural order. This is useful for testing.
-            List c = new ArrayList( results.keySet() );
+            List<String> c = new ArrayList<String>( results.keySet() );
             Collections.sort( c );
-            for ( Iterator it = c.iterator(); it.hasNext(); ) {
+            for ( Iterator<String> it = c.iterator(); it.hasNext(); ) {
                 res = ( GeneSetResult ) results.get( it.next() );
                 if ( first ) {
                     first = false;
@@ -153,9 +152,9 @@ public class ResultsPrinter {
      */
     private String formatGeneNames( String className ) {
         if ( className == null ) return "";
-        Collection genes = this.geneData.getActiveGeneSetGenes( className );
+        Collection<String> genes = this.geneData.getActiveGeneSetGenes( className );
         if ( genes == null || genes.size() == 0 ) return "";
-        List sortedGenes = new ArrayList( genes );
+        List<String> sortedGenes = new ArrayList<String>( genes );
         Collections.sort( sortedGenes );
         StringBuffer buf = new StringBuffer();
         for ( Iterator iter = sortedGenes.iterator(); iter.hasNext(); ) {
