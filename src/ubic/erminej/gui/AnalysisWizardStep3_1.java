@@ -26,7 +26,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import ubic.basecode.gui.WizardStep;
 import ubic.erminej.Settings;
 
 /**

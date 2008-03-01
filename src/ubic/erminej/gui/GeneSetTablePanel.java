@@ -41,9 +41,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.gui.table.TableSorter;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
+import ubic.erminej.gui.table.TableSorter;
 
 /**
  * A table that lists the Gene Sets with their scores, and allows user interaction.

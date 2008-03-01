@@ -39,7 +39,6 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.StatusJlabel;
 
 /**
  * FIXME this nominally extends JDialog but it isn't set up right.

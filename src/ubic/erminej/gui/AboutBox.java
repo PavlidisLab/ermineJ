@@ -45,7 +45,6 @@ import javax.swing.SwingConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.gui.JLinkLabel;
 
 /**
  * Displays 'about' information for the software.

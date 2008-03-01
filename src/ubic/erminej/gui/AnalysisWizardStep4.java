@@ -29,7 +29,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import ubic.basecode.gui.WizardStep;
 import ubic.erminej.Settings;
 
 /**

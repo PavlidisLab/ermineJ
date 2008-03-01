@@ -35,9 +35,8 @@ import javax.swing.table.AbstractTableModel;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.WizardStep;
-import ubic.basecode.gui.table.TableSorter;
 import ubic.erminej.data.UserDefinedGeneSetManager;
+import ubic.erminej.gui.table.TableSorter;
 
 /**
  * Step to choose a gene set to modify.

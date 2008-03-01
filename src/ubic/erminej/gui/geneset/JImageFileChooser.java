@@ -29,7 +29,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import ubic.basecode.gui.file.ImageFileFilter;
+import ubic.erminej.gui.file.ImageFileFilter;
 
 /**
  * @author Will Braynen

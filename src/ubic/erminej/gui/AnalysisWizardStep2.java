@@ -33,7 +33,6 @@ import javax.swing.SwingConstants;
 
 import ubic.basecode.util.FileTools;
 
-import ubic.basecode.gui.WizardStep;
 import ubic.erminej.Settings;
 
 /**

@@ -69,19 +69,19 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
-import ubic.basecode.gui.ColorMap;
-import ubic.basecode.gui.GuiUtil;
-import ubic.basecode.gui.JGradientBar;
-import ubic.basecode.gui.JLinkLabel;
-import ubic.basecode.gui.JMatrixDisplay;
-import ubic.basecode.gui.StatusJlabel;
-import ubic.basecode.gui.table.JBarGraphCellRenderer;
-import ubic.basecode.gui.table.JMatrixCellRenderer;
-import ubic.basecode.gui.table.JVerticalHeaderRenderer;
-import ubic.basecode.gui.table.TableSorter;
+import ubic.basecode.graphics.ColorMap;
+import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
+import ubic.erminej.gui.GuiUtil;
+import ubic.erminej.gui.JGradientBar;
+import ubic.erminej.gui.JLinkLabel;
+import ubic.erminej.gui.StatusJlabel;
+import ubic.erminej.gui.table.JBarGraphCellRenderer;
+import ubic.erminej.gui.table.JMatrixCellRenderer;
+import ubic.erminej.gui.table.JVerticalHeaderRenderer;
+import ubic.erminej.gui.table.TableSorter;
 
 /**
  * @author Paul Pavlidis
@@ -116,7 +116,7 @@ public class JGeneSetFrame extends JFrame {
     private static final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
     private static final String SAVESTARTPATH = "detailsview.startPath";
 
-    public JMatrixDisplay matrixDisplay = null;
+    public MatrixDisplay matrixDisplay = null;
     private GeneSetPvalRun analysisResults;
     private int width;
     private int height;
@@ -296,7 +296,7 @@ public class JGeneSetFrame extends JFrame {
                     if ( statusMessenger != null )
                         statusMessenger.showError( "None of the probes in this gene set were in the data file." );
                 } else {
-                    matrixDisplay = new JMatrixDisplay( matrix );
+                    matrixDisplay = new MatrixDisplay( matrix );
                     matrixDisplay.setStandardizedEnabled( true );
                     // Make the columns in the matrix display not too wide (cell-size)
                     // and set a custom cell renderer

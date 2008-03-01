@@ -31,7 +31,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import ubic.basecode.gui.WizardStep;
 
 /**
  * Choose the file name to save the results in.

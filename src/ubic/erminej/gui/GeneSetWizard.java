@@ -26,8 +26,6 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.GuiUtil;
-import ubic.basecode.gui.Wizard;
 import ubic.erminej.Settings;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 

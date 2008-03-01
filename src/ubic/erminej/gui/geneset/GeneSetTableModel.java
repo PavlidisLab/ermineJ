@@ -32,9 +32,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.JLinkLabel;
-import ubic.basecode.gui.JMatrixDisplay;
+import ubic.basecode.graphics.MatrixDisplay;
 import ubic.erminej.Settings;
+import ubic.erminej.gui.JLinkLabel;
 
 /**
  * Our table model.
@@ -54,7 +54,7 @@ public class GeneSetTableModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = -8155800933946966811L;
     private static final String URL_REPLACE_TAG = "@@";
-    private JMatrixDisplay m_matrixDisplay;
+    private MatrixDisplay m_matrixDisplay;
     private List probeIDs;
     private Map m_pvalues;
     private Map m_pvaluesOrdinalPosition;
@@ -74,7 +74,7 @@ public class GeneSetTableModel extends AbstractTableModel {
      * @param geneData
      * @param nf
      */
-    public GeneSetTableModel( JMatrixDisplay matrixDisplay, List probeIDs, Map pvalues, Map pvaluesOrdinalPosition,
+    public GeneSetTableModel( MatrixDisplay matrixDisplay, List probeIDs, Map pvalues, Map pvaluesOrdinalPosition,
             GeneAnnotations geneData, DecimalFormat nf, Settings settings ) {
 
         m_matrixDisplay = matrixDisplay;

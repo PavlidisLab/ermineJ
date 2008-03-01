@@ -34,11 +34,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.AppDialog;
-import ubic.basecode.gui.GuiUtil;
-import ubic.basecode.gui.file.DataFileFilter;
-import ubic.basecode.gui.file.XMLFileFilter;
 import ubic.erminej.Settings;
+import ubic.erminej.gui.file.DataFileFilter;
+import ubic.erminej.gui.file.XMLFileFilter;
 
 /**
  * @author Homin Lee

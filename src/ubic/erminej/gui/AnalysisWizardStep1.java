@@ -30,7 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import ubic.basecode.gui.WizardStep;
 import ubic.erminej.Settings;
 
 /**

@@ -26,8 +26,8 @@ import javax.swing.UIManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.gui.GuiUtil;
 import ubic.erminej.gui.GeneSetScoreFrame;
+import ubic.erminej.gui.GuiUtil;
 import ubic.erminej.gui.StartupDialog;
 
 /**

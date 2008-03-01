@@ -39,8 +39,8 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.gui.StatusJlabel;
 import ubic.erminej.Settings;
+import ubic.erminej.gui.StatusJlabel;
 
 /**
  * FIXME this should extend jDialog, implement actionlistener, and be modal.

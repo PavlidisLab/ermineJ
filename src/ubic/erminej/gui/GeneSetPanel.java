@@ -41,7 +41,6 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.GuiUtil;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneSetResult;

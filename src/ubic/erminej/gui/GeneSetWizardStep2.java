@@ -44,9 +44,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.WizardStep;
-import ubic.basecode.gui.table.TableSorter;
 import ubic.erminej.data.UserDefinedGeneSetManager;
+import ubic.erminej.gui.table.TableSorter;
 
 /**
  * Step to add/remove probes/genes from a gene set.

@@ -32,8 +32,6 @@ import javax.swing.JTextField;
 
 import ubic.basecode.util.FileTools;
 
-import ubic.basecode.gui.AppDialog;
-import ubic.basecode.gui.GuiUtil;
 import ubic.erminej.Settings;
 
 /**

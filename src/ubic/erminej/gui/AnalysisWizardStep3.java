@@ -44,10 +44,9 @@ import javax.swing.table.AbstractTableModel;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.gui.WizardStep;
-import ubic.basecode.gui.table.TableSorter;
 import ubic.erminej.Settings;
 import ubic.erminej.data.UserDefinedGeneSetManager;
+import ubic.erminej.gui.table.TableSorter;
 
 /**
  * Step to handle adding custom gene sets to the analysis.

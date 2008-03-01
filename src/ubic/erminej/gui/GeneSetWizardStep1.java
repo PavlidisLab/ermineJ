@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import ubic.basecode.gui.WizardStep;
 import ubic.erminej.Settings;
 
 /**

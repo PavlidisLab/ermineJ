@@ -28,8 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import ubic.basecode.gui.AppDialog;
-import ubic.basecode.gui.GuiUtil;
 import ubic.erminej.Settings;
 
 /**

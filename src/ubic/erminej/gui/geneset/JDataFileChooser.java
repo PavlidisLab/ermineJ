@@ -31,7 +31,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import ubic.basecode.gui.file.DataFileFilter;
+import ubic.erminej.gui.file.DataFileFilter;
 
 /**
  * @author Will Braynen

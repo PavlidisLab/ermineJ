@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.util.List;
 
 import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.gui.GuiUtil;
-import ubic.basecode.gui.Wizard;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
