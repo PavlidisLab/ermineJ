@@ -342,7 +342,7 @@ public class GeneScores {
                 continue;
             }
 
-            String probeId = fields[0];
+            String probeId = StringUtils.strip( fields[0] );
 
             // only keep probes that are in our array platform.
             if ( !geneAnnots.hasProbe( probeId ) ) {
@@ -449,21 +449,22 @@ public class GeneScores {
                     + " probes in your gene score file don't match the ones in the annotation file." );
             letUserReadMessage();
 
-            if ( unknownProbes.size() <= 5 ) {
-                StringBuffer buf = new StringBuffer();
-                for ( Iterator<String> iter = unknownProbes.iterator(); iter.hasNext(); ) {
-                    String probe = iter.next();
-                    buf.append( probe + "," );
-                }
-                messenger.showError( "Unknown probes are: " + buf );
-                letUserReadMessage();
+            int count = 0;
+            StringBuffer buf = new StringBuffer();
+            for ( Iterator<String> iter = unknownProbes.iterator(); iter.hasNext(); ) {
+                if ( count >= 10 ) break;
+                String probe = iter.next();
+                buf.append( probe + "," );
+                count++;
             }
+            messenger.showError( "Unmatched probes are (up to 10 shown): " + buf );
+            letUserReadMessage();
 
         }
         if ( messenger != null && numRepeatedProbes > 0 ) {
             messenger
                     .showError( "Warning: "
-                            + unknownProbes.size()
+                            + numRepeatedProbes
                             + " identifiers in your gene score file were repeats. Only the first occurrence encountered was kept in each case." );
             letUserReadMessage();
         }

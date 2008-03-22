@@ -68,6 +68,10 @@ public class UserDefinedGeneSetManager {
     List<String> probes;
 
     public UserDefinedGeneSetManager( GeneAnnotations geneData, Settings settings, String geneSetId ) {
+        if ( geneData == null ) {
+            throw new IllegalArgumentException( "GeneData (annotations) was null" );
+        }
+
         this.geneData = geneData;
         this.settings = settings;
         this.id = geneSetId;

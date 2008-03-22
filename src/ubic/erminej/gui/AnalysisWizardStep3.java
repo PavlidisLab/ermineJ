@@ -262,8 +262,9 @@ public class AnalysisWizardStep3 extends WizardStep {
         for ( Iterator iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
             String id = ( String ) iter.next();
             if ( callingframe.userOverWrote( id ) ) continue;
-            Map cfi = helper.getGeneSetInfo( id, goData );
-            if ( ( ( Collection ) cfi.get( "members" ) ).size() == 0 ) continue;
+            Map<String, Object> cfi = helper.getGeneSetInfo( id, goData );
+            if ( cfi == null || cfi.get( "members" ) == null || ( ( Collection ) cfi.get( "members" ) ).size() == 0 )
+                continue;
             log.debug( "Adding " + id + " to the table" );
             customClasses.add( cfi );
             ccHash.put( id, cfi );
