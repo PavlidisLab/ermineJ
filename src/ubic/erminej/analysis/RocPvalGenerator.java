@@ -108,7 +108,8 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         Iterator classit = values.iterator();
 
-        boolean invert = settings.getDoLog() && !settings.getBigIsBetter();
+        boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
+                || ( settings.getBigIsBetter() && !settings.getDoLog() );
 
         while ( classit.hasNext() ) {
             ifInterruptedStop();
@@ -120,7 +121,10 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
                 int rank = ranking.intValue();
 
-                /* if the values are log-transformed, and bigger is not better, we need to invert the rank */
+                /*
+                 * if the values are log-transformed and bigger is not better; or big is better and values not
+                 * log-transformed, we need to invert the rank
+                 */
                 if ( invert ) {
                     rank = totalSize - rank;
                     assert rank >= 0;
