@@ -348,7 +348,7 @@ public class classScoreCMD {
                 "Output should include gene symbols for all gene sets (default=don't include symbols)" ).withLongOpt(
                 "genesOut" ).create( 'j' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "logTrans" ).withDescription(
+        options.addOption( OptionBuilder.withLongOpt( "logTrans" ).withDescription(
                 "Log transform the scores [recommended for p-values]" ).create( 'l' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
