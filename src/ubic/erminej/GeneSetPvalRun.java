@@ -33,7 +33,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.analysis.CorrelationsGeneSetPvalSeriesGenerator;
 import ubic.erminej.analysis.GeneSetPvalSeriesGenerator;
 import ubic.erminej.analysis.GeneSetSizeComputer;
@@ -85,7 +85,7 @@ public class GeneSetPvalRun {
      * @param results
      * @param name Name of the run
      */
-    public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData, DoubleMatrixNamed rawData,
+    public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData, DoubleMatrix rawData,
             GONames goData, GeneScores geneScores, StatusViewer messenger, Map<String, GeneSetResult> results,
             String name ) {
         this.settings = settings;
@@ -136,7 +136,7 @@ public class GeneSetPvalRun {
      * @param name Name of the run
      */
     public GeneSetPvalRun( Set<String> activeProbes, Settings settings, GeneAnnotations geneData,
-            DoubleMatrixNamed<String, String> rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
+            DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
             String name ) {
         this.settings = settings;
         this.geneData = geneData;
@@ -251,7 +251,7 @@ public class GeneSetPvalRun {
      * @param messenger
      */
     private void runAnalysis( Collection<String> activeProbes, Settings settings1, GeneAnnotations geneData1,
-            DoubleMatrixNamed<String, String> rawData, GONames goData, GeneScores geneScores1, StatusViewer messenger ) {
+            DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores1, StatusViewer messenger ) {
         // get the class sizes.
         GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData1, geneScores1, settings1
                 .getUseWeights() );

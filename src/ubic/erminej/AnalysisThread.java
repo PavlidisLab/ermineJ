@@ -35,7 +35,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
@@ -54,7 +54,7 @@ public class AnalysisThread extends Thread {
     private StatusViewer messenger;
     // private int numRuns = 0;
     private Settings oldSettings = null;
-    private Map<String, DoubleMatrixNamed<String, String>> rawDataSets;
+    private Map<String, DoubleMatrix<String, String>> rawDataSets;
     private volatile Method runningMethod;
     private Settings settings;
     private volatile boolean stop = false;
@@ -104,7 +104,7 @@ public class AnalysisThread extends Thread {
      * @param loadFile
      */
     public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData, Map geneDataSets,
-            Map<String, DoubleMatrixNamed<String, String>> rawDataSets, Map geneScoreSets, String loadFile ) {
+            Map<String, DoubleMatrix<String, String>> rawDataSets, Map geneScoreSets, String loadFile ) {
         this.settings = settings;
         this.messenger = messenger;
         this.goData = goData;
@@ -245,8 +245,8 @@ public class AnalysisThread extends Thread {
      * @return
      * @throws IOException
      */
-    private synchronized DoubleMatrixNamed<String, String> addRawData() throws IOException {
-        DoubleMatrixNamed<String, String> rawData;
+    private synchronized DoubleMatrix<String, String> addRawData() throws IOException {
+        DoubleMatrix<String, String> rawData;
         if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
             if ( messenger != null ) messenger.showStatus( "Raw data are in memory" );
             rawData = rawDataSets.get( settings.getRawDataFileName() );
@@ -254,7 +254,7 @@ public class AnalysisThread extends Thread {
             if ( messenger != null )
                 messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
-            rawData = ( DoubleMatrixNamed<String, String> ) r.read( settings.getRawDataFileName() );
+            rawData = ( DoubleMatrix<String, String> ) r.read( settings.getRawDataFileName() );
             rawDataSets.put( settings.getRawDataFileName(), rawData );
         }
         return rawData;
@@ -272,7 +272,7 @@ public class AnalysisThread extends Thread {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        DoubleMatrixNamed<String, String> rawData = null;
+        DoubleMatrix<String, String> rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             rawData = addRawData();
         }
@@ -346,7 +346,7 @@ public class AnalysisThread extends Thread {
      * @param activeProbes
      * @return
      */
-    private synchronized Set<String> getActiveProbes( DoubleMatrixNamed<String, String> rawData, GeneScores geneScores ) {
+    private synchronized Set<String> getActiveProbes( DoubleMatrix<String, String> rawData, GeneScores geneScores ) {
         Set<String> activeProbes = null;
         if ( rawData != null && geneScores != null ) { // favor the geneScores list.
             activeProbes = geneScores.getProbeToScoreMap().keySet();

@@ -68,7 +68,7 @@ import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.graphics.ColorMap;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.io.reader.DoubleMatrixReader;
@@ -226,7 +226,7 @@ public class JGeneSetFrame extends JFrame {
 
         // create a probe set from probeIDs
         probesInGeneSet = new HashSet<String>( probeIDs );
-        DoubleMatrixNamed matrix = setUpMatrixData();
+        DoubleMatrix matrix = setUpMatrixData();
 
         tableModel = new GeneSetTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf,
                 settings );
@@ -266,10 +266,10 @@ public class JGeneSetFrame extends JFrame {
      * @param probesInGeneSet
      * @return
      */
-    private DoubleMatrixNamed<String, String> setUpMatrixData() {
+    private DoubleMatrix<String, String> setUpMatrixData() {
         // Read the matrix data
         DoubleMatrixReader matrixReader = new DoubleMatrixReader();
-        DoubleMatrixNamed<String, String> matrix = null;
+        DoubleMatrix<String, String> matrix = null;
 
         if ( ( settings.getRawDataFileName() == null || settings.getRawDataFileName().length() == 0 )
                 && settings.getUserSetRawFile() ) {

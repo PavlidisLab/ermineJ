@@ -23,7 +23,7 @@ import ubic.basecode.math.MatrixStats;
 import ubic.basecode.math.RandomChooser;
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
 import ubic.erminej.Settings;
@@ -40,7 +40,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      */
     private static final int MIN_STABLE_CHECKS = 3;
 
-    private DoubleMatrixNamed<String, String> data = null;
+    private DoubleMatrix<String, String> data = null;
 
     private double[][] dataAsRawMatrix;
     private double[][] selfSquaredMatrix;
@@ -59,7 +59,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     /**
      * @param dataMatrix
      */
-    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrixNamed<String, String> dataMatrix ) {
+    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrix<String, String> dataMatrix ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();

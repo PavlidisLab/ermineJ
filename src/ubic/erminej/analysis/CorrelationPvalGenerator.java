@@ -31,8 +31,8 @@ import ubic.basecode.util.StringUtil;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.dataStructure.matrix.DenseDoubleMatrix2DNamed;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DenseDoubleMatrix;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.Histogram;
@@ -45,7 +45,7 @@ import ubic.erminej.data.Histogram;
 public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private double histRange = 0;
-    private DoubleMatrixNamed<String, String> data = null;
+    private DoubleMatrix<String, String> data = null;
     private Histogram hist;
     private Map probeToGeneMap;
     private int geneRepTreatment;
@@ -84,7 +84,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, GONames gon,
-            DoubleMatrixNamed<String, String> data ) {
+            DoubleMatrix<String, String> data ) {
         super( settings, a, csc, gon );
         this.data = data;
 
@@ -207,7 +207,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @return
      */
-    public DoubleMatrixNamed getData() {
+    public DoubleMatrix getData() {
         return data;
     }
 
@@ -217,7 +217,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param correls
      * @return
      */
-    public double geneSetMeanCorrel( DenseDoubleMatrix2DNamed correls ) {
+    public double geneSetMeanCorrel( DenseDoubleMatrix correls ) {
         int classSize = correls.rows();
 
         double avecorrel = 0.0;

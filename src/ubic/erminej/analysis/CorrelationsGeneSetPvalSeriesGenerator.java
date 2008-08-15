@@ -29,7 +29,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.Histogram;
@@ -56,7 +56,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
      * @param hist
      */
     public CorrelationsGeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneAnnots,
-            GeneSetSizeComputer csc, GONames gon, DoubleMatrixNamed<String, String> rawData, Histogram hist ) {
+            GeneSetSizeComputer csc, GONames gon, DoubleMatrix<String, String> rawData, Histogram hist ) {
         super( settings, geneAnnots, csc, gon );
 
         this.classScoreGenerator = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );

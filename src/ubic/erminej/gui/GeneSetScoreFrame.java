@@ -72,7 +72,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.AnalysisThread;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
@@ -142,7 +142,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JPanel progInPanel = new JPanel();
     private JPanel progressPanel;
     private JMenuItem quitMenuItem = new JMenuItem();
-    private Map<String, DoubleMatrixNamed<String, String>> rawDataSets;
+    private Map<String, DoubleMatrix<String, String>> rawDataSets;
     private List<GeneSetPvalRun> results = new LinkedList<GeneSetPvalRun>();
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenu runViewMenu = new JMenu();
@@ -320,7 +320,7 @@ public class GeneSetScoreFrame extends JFrame {
         try {
             mainPanel.add( progressPanel, BorderLayout.CENTER );
 
-            rawDataSets = new HashMap<String, DoubleMatrixNamed<String, String>>();
+            rawDataSets = new HashMap<String, DoubleMatrix<String, String>>();
             geneDataSets = new HashMap<Integer, GeneAnnotations>();
             geneScoreSets = new HashMap();
 

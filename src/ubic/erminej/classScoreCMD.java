@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.dataStructure.matrix.DoubleMatrixNamed;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
@@ -103,7 +103,7 @@ public class classScoreCMD {
     protected GONames goData;
     protected GeneAnnotations geneData;
     protected Map<Integer, GeneAnnotations> geneDataSets;
-    protected Map<String, DoubleMatrixNamed<String, String>> rawDataSets;
+    protected Map<String, DoubleMatrix<String, String>> rawDataSets;
     protected Map<String, GeneScores> geneScoreSets;
     private String saveFileName = null;
     private boolean useCommandLineInterface = true;
@@ -116,7 +116,7 @@ public class classScoreCMD {
 
     public classScoreCMD() throws IOException {
         settings = new Settings();
-        rawDataSets = new HashMap<String, DoubleMatrixNamed<String, String>>();
+        rawDataSets = new HashMap<String, DoubleMatrix<String, String>>();
         geneDataSets = new HashMap<Integer, GeneAnnotations>();
         geneScoreSets = new HashMap<String, GeneScores>();
         this.buildOptions();
@@ -152,7 +152,7 @@ public class classScoreCMD {
      * @throws IOException
      */
     protected GeneSetPvalRun analyze() throws IOException {
-        DoubleMatrixNamed<String, String> rawData = null;
+        DoubleMatrix<String, String> rawData = null;
         if ( settings.getClassScoreMethod() == Settings.CORR ) {
             if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
                 statusMessenger.showStatus( "Raw data are in memory" );

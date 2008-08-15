@@ -5,29 +5,52 @@
 	<artifactId>ermineJ</artifactId>
 	<name>ermineJ</name>
 	<groupId>ermineJ</groupId>
-	<id>ermineJ</id>
-	<currentVersion>2.1.16</currentVersion>
+	<version>2.1.16</version>
 	<organization>
-		<name>UBC Bioinformatics Centre</name>
+		<name>UBC Centre for High-Throughput Biology</name>
 		<url>http://bioinformatics.ubc.ca</url>
-		<logo>src/ermineJ/gui/resources/logo1small.gif</logo>
 	</organization>
 	<inceptionYear>2004</inceptionYear>
-	<logo>src/ubic/ermineJ/gui/resources/logo1small.gif</logo>
 	<description>
 		ErmineJ performs analyses of gene sets in expression microarray data. A typical goal is to determine whether
 		particular biological pathways are "doing something interesting" in the data. The software is designed to be
 		used by biologists with little or no informatics background.
 	</description>
-	<shortDescription>Software for gene set analysis</shortDescription>
-	<url>http://www.bioinformatics.ubc.ca/ermineJ/</url>
-	<siteAddress>benzer</siteAddress>
-	<siteDirectory>/disk2/WWW/proj/pavlidis/projectpages/ermineJ</siteDirectory>
-	<distributionSite>benzer</distributionSite>
-	<distributionDirectory>/proj/projectpages/ermineJ</distributionDirectory>
-	<repository>
-		<connection>scm:cvs:ext:paul@broca.ubic.ca:/cvs:ermineJ</connection>
-	</repository>
+	<packaging>pom</packaging>
+	<scm>
+		<connection>scm:cvs:ext:@broca.ubic.ca:local:/cvs:ermineJ</connection>
+		<developerConnection>scm:cvs:ext:@broca.ubic.ca:/cvs:ermineJ</developerConnection>
+		<url>http://broca.ubic.ca:8081/viewrep/pavlab/ermineJ</url>
+	</scm>
+	<issueManagement>
+		<system>Bugzilla</system>
+		<url>
+			http://www.bioinformatics.ubc.ca/pavlidis/lab/bugzilla/buglist.cgi?product=ermineJ&amp;bug_status=__open__
+		</url>
+	</issueManagement>
+	<ciManagement>
+		<system>continuum</system>
+		<url>http://broca.ubic.ca/continuum/</url>
+		<notifiers>
+			<notifier>
+				<type>mail</type>
+				<sendOnError>true</sendOnError>
+				<sendOnFailure>true</sendOnFailure>
+				<sendOnSuccess>true</sendOnSuccess>
+				<sendOnWarning>true</sendOnWarning>
+				<configuration>
+					<address>paul@bioinformatics.ubc.ca</address>
+				</configuration>
+			</notifier>
+		</notifiers>
+	</ciManagement>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 	<developers>
 		<developer>
 			<name>Paul Pavlidis</name>
@@ -60,13 +83,6 @@
 			<organization>Columbia University</organization>
 		</developer>
 	</developers>
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
 	<dependencies>
 		<dependency>
 			<groupId>colt</groupId>
@@ -98,7 +114,7 @@
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>1.0</version>
+			<version>1.0.2-SNAPSHOT</version>
 			<type>jar</type>
 			<properties>
 				<jnlp.jar>true</jnlp.jar>
