@@ -317,7 +317,7 @@ public class classScoreCMD {
                 .create( 'A' ) );
 
         options.addOption( OptionBuilder.withDescription(
-                "Sets 'big is better' option for gene scores to true [default =" + settings.getBigIsBetter() + "]" )
+                "Sets 'big is better' option for gene scores to true [default = false]" )
                 .create( 'b' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" ).withDescription(
@@ -434,9 +434,8 @@ public class classScoreCMD {
             showHelpAndExit();
         }
 
-        if ( commandLine.hasOption( 'b' ) ) {
-            arg = commandLine.getOptionValue( 'b' );
-        }
+        settings.setBigIsBetter( commandLine.hasOption( 'b' ) );
+        
         if ( commandLine.hasOption( 'c' ) ) {
             arg = commandLine.getOptionValue( 'c' );
             if ( FileTools.testFile( arg ) )
