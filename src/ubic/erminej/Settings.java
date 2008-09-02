@@ -91,6 +91,7 @@ public class Settings {
     private static final String SCORE_COL = "scoreCol";
     private static final String SCORE_FILE = "scoreFile";
     private static final String SELECTED_CUSTOM_GENESETS = "selectedCustomGeneSets";
+    private static final String FILTER_NONSPECIFIC = "filterNonSpecific";
 
     /**
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
@@ -99,7 +100,7 @@ public class Settings {
     protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
             MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
             BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT,
-            CLASS_SCORE_METHOD };
+            CLASS_SCORE_METHOD, FILTER_NONSPECIFIC };
     
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
@@ -384,6 +385,10 @@ public class Settings {
     public int getScoreCol() {
         return config.getInteger( SCORE_COL, new Integer( 2 ) ).intValue();
     }
+    
+    public boolean getFilterNonSpecific() {
+        return config.getBoolean( FILTER_NONSPECIFIC );
+    }
 
     public String getScoreFile() {
         return config.getString( SCORE_FILE );
@@ -515,6 +520,10 @@ public class Settings {
 
     public void setDoLog( boolean val ) {
         this.config.setProperty( DO_LOG, new Boolean( val ) );
+    }
+    
+    public void setFilterNonSpecific(boolean val) {
+        this.config.setProperty( FILTER_NONSPECIFIC, new Boolean(val) );
     }
 
     public void setGeneRepTreatment( int val ) {

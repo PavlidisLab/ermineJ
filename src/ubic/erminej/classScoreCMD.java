@@ -228,7 +228,8 @@ public class classScoreCMD {
                 geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData,
                         GeneAnnotations.AFFYCSV );
             } else {
-                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData );
+                boolean filterNonSpecific = settings.getFilterNonSpecific();
+                geneData = new GeneAnnotations(settings.getAnnotFile(), statusMessenger, goData, filterNonSpecific);
                 // TODO add agilent support ... can we tell the type of file by the suffix?
             }
 
@@ -332,6 +333,8 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription(
                 "Directory where custom gene set are located" ).create( 'f' ) );
+        
+        options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" ).withDescription("Filter out non-specific probes").create('F'));
 
         options
                 .addOption( OptionBuilder
@@ -536,6 +539,9 @@ public class classScoreCMD {
                 showHelpAndExit();
             }
         }
+        
+        settings.setFilterNonSpecific( commandLine.hasOption('F') );
+        
         if ( commandLine.hasOption( 'M' ) ) {
             arg = commandLine.getOptionValue( 'M' );
             int mtc = Integer.parseInt( arg );
