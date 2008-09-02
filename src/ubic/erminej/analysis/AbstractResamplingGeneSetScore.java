@@ -34,7 +34,7 @@ public abstract class AbstractResamplingGeneSetScore extends AbstractLongTask im
     /**
      * Used to control interations.
      */
-    protected static final double TOLERANCE = 1e-5;
+    protected static final double TOLERANCE = 1e-4;
 
     /**
      * Check for fit to a normal distribution every n trials. This sets n.
