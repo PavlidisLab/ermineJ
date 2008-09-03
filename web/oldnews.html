@@ -1,108 +1,166 @@
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-<meta name="generator" content="HTML Tidy, see www.w3.org">
+	<head>
+		<meta name="generator" content="HTML Tidy, see www.w3.org">
 
-<title>ErmineJ - old news</title>
-<link type="text/css" rel="stylesheet" href="css/default.css">
-</head>
+		<title>ErmineJ - old news</title>
+		<link type="text/css" rel="stylesheet" href="css/default.css">
+	</head>
 
-<body bgcolor="#ffffff" link="#800000" text="#000000"><table border="0" cellpadding="2" cellspacing="3" width="776">
-    <tr>
-        <td width="2"><!-- Logo space --></td>
+	<body bgcolor="#ffffff" link="#800000" text="#000000">
+		<table border="0" cellpadding="2" cellspacing="3" width="776">
+			<tr>
+				<td width="2">
+					<!-- Logo space -->
+				</td>
 
-        <td width="687"><a href="/ermineJ"><IMG height="112" alt="ermineJ logo" src="images/logo1small.gif"
-    width="266" border="0"></a>
+				<td width="687">
+					<a href="/ermineJ"><IMG height="112" alt="ermineJ logo" src="images/logo1small.gif" width="266" border="0">
+					</a>
 
-     
-        </td>
-    </tr>
-    <tr>
-        <td></td>
-        <td><!--  navigation -->
-        <table>
-            <tr>
-                <td><a href="index.html">Home</a></td>
-                <td>&nbsp;&nbsp;</td>
-                <td><a href="downloadInstall.html">Download</a></td>
-                <td>&nbsp;&nbsp;</td>
-                <td><a href="ermineJ-help/classScore/html/">Help</a></td>
-                <td>&nbsp;&nbsp;</td>
-                <td><a href="publications.html">Pubs</a></td>
-                <td>&nbsp;&nbsp;</td>
-                <td><a href="screenshots.html">Screens</a></td>
-                <td>&nbsp;&nbsp;</td>
-                <td><a href="versions.html">Versions</a></td>
-                <td>&nbsp;&nbsp;</td>
-                <td><a href="contact.html">Contact</a></td>
-            </tr>
-        </table>
 
-        </td>
-    </tr>
-    <tr>
-        <td width="72"><!-- Left gutter space --><img height="1" alt=""
-            src="/images/shim.gif" width="30" border="0"></td>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<!--  navigation -->
+					<table>
+						<tr>
+							<td>
+								<a href="index.html">Home</a>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+							</td>
+							<td>
+								<a href="downloadInstall.html">Download</a>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+							</td>
+							<td>
+								<a href="ermineJ-help/classScore/html/">Help</a>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+							</td>
+							<td>
+								<a href="publications.html">Pubs</a>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+							</td>
+							<td>
+								<a href="screenshots.html">Screens</a>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+							</td>
+							<td>
+								<a href="versions.html">Versions</a>
+							</td>
+							<td>
+								&nbsp;&nbsp;
+							</td>
+							<td>
+								<a href="contact.html">Contact</a>
+							</td>
+						</tr>
+					</table>
 
-        <td valign="top" width="687">
-    <h1>Old ermineJ news</h1>
-   
-   		<p>April 2007
-   		<li> 
-					   		We fixed two bugs that can affect the analysis. First, it was
-							possible for some implicit GO term associations to be missed.
-							This primarily affected large GO categories that most users tend
-							to remove from consideration, but may affect analyses. Second,
-							there was a problem using input scores containing negative values
-							and the "best score" option to handle multiple occurrence of
-							genes on array designs. Users who always use positive values
-							would not be affected by this problem. We thank the users who
-							identified reported these problems!
-						</li>
+				</td>
+			</tr>
+			<tr>
+				<td width="72">
+					<!-- Left gutter space -->
+					<img height="1" alt="" src="/images/shim.gif" width="30" border="0">
+				</td>
 
+				<td valign="top" width="687">
+					<h1>
+						Old ermineJ news
+					</h1>
+					<p>
+						Version 2.1.15 - (July 2007) This is primarily a bugfix release. The most significant changes are:
+					</p>
+
+					<ul>
 						<li>
-							The command line interface has been largely rewritten and should be
-							more robust, easier to use, and easier to understand.
+							An error was made in the two previous distributions: an incorrect jar file was included in the windows installer,
+							so some bugfixes were not correctly included. In particular, an issue with how the GO classes were read in is now
+							consistent between all distributions. Thanks to Oliver Homann for bringing this to our attention.
 						</li>
 						<li>
-							A variety of cosmetic and GUI bugs have been fixed, especially affecting Linux and Macintosh users.
+							There were problems with some command line arguments not being recognized correctly.
 						</li>
-		</p>		
-        <p>September 2 2005: <strong>Version 2.1.6</strong> - Maintanance
-        release to fix bugs in reading and utilization of user-defined
-        gene sets introduced since 2.1.3.</p>
-   
-      <p>August 16 2005:<strong> Version 2.1.5</strong> - Maintenance
-        release, primarily fixing performance issues. Most importantly,
-        a bug causing slow responses in the tree view after an analysis
-        has been fixed, and the performance of the correlation analysis
-        has been drastically improved.</p>
+					</ul>
+					<p>
+						April 2007
+					<li>
+						We fixed two bugs that can affect the analysis. First, it was possible for some implicit GO term associations to
+						be missed. This primarily affected large GO categories that most users tend to remove from consideration, but may
+						affect analyses. Second, there was a problem using input scores containing negative values and the "best score"
+						option to handle multiple occurrence of genes on array designs. Users who always use positive values would not be
+						affected by this problem. We thank the users who identified reported these problems!
+					</li>
 
-        <p>July 11 2005:<strong> Version 2.1.4</strong> - Maintenance
-        release to fix a number of recently discovered issues affecting
-        the user interface, performance, and reading of data files.</p>
+					<li>
+						The command line interface has been largely rewritten and should be more robust, easier to use, and easier to
+						understand.
+					</li>
+					<li>
+						A variety of cosmetic and GUI bugs have been fixed, especially affecting Linux and Macintosh users.
+					</li>
+					</p>
+					<p>
+						September 2 2005:
+						<strong>Version 2.1.6</strong> - Maintanance release to fix bugs in reading and utilization of user-defined gene
+						sets introduced since 2.1.3.
+					</p>
 
-        <p>June 10 2005:<strong >Version 2.1.3</strong> - Maintenance
-        release to fix a variety of bugs, and introduces a few minor new
-        features.</p>
+					<p>
+						August 16 2005:
+						<strong> Version 2.1.5</strong> - Maintenance release, primarily fixing performance issues. Most importantly, a
+						bug causing slow responses in the tree view after an analysis has been fixed, and the performance of the
+						correlation analysis has been drastically improved.
+					</p>
 
-        <p>June 7 2005:<strong> Version 2.1.2</strong> - New feature:
-        Receiver operator characteristic (<a
-            href="ermineJ-help/classScore/html/tutorial/roc.html">ROC</a>)
-        analysis. Also fixes a number of bugs, all users should upgrade.</p>
+					<p>
+						July 11 2005:
+						<strong> Version 2.1.4</strong> - Maintenance release to fix a number of recently discovered issues affecting the
+						user interface, performance, and reading of data files.
+					</p>
 
-        <p>June 2 2005:<strong> Version 2.1.1</strong> - Fixes bugs which
-        caused incorrect parsing of gene descriptions and resulted in
-        multiple custom gene set directories. All users should upgrade.</p>
+					<p>
+						June 10 2005:
+						<strong>Version 2.1.3</strong> - Maintenance release to fix a variety of bugs, and introduces a few minor new
+						features.
+					</p>
 
-        <p>June 1 2005:<STRONG> Version 2.1 has been released</STRONG> .
-        Many new improvements and changes.</p>
-   
+					<p>
+						June 7 2005:
+						<strong> Version 2.1.2</strong> - New feature: Receiver operator characteristic (
+						<a href="ermineJ-help/classScore/html/tutorial/roc.html">ROC</a>) analysis. Also fixes a number of bugs, all users
+						should upgrade.
+					</p>
+
+					<p>
+						June 2 2005:
+						<strong> Version 2.1.1</strong> - Fixes bugs which caused incorrect parsing of gene descriptions and resulted in
+						multiple custom gene set directories. All users should upgrade.
+					</p>
+
+					<p>
+						June 1 2005:
+						<STRONG> Version 2.1 has been released</STRONG> . Many new improvements and changes.
+					</p>
 
 
-        </td>
-    </tr>
-</table>
-</body>
+
+				</td>
+			</tr>
+		</table>
+	</body>
 </html>
