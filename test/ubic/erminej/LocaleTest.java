@@ -46,11 +46,9 @@ public class LocaleTest extends TestCase {
     private void readFile( InputStream is ) throws IOException, ParseException {
         NumberFormat numberFormat = NumberFormat.getInstance( Locale.FRANCE );
 
-        log.info( "locale: " + ( Locale.FRANCE             ) );
-
         BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
-        br.readLine();// discard header
         String row;
+        br.readLine();
         while ( ( row = br.readLine() ) != null ) {
             String[] vals = row.split( "\t" );
             Number num = numberFormat.parse( vals[1] );
@@ -62,7 +60,7 @@ public class LocaleTest extends TestCase {
      * 
      *
      */
-    public void testLocale() {
+    public void testLocale() throws Exception {
         log.debug( "testLocale" );
         double num = 100.01;
         Locale locale_us = new Locale( "US" );
@@ -77,7 +75,7 @@ public class LocaleTest extends TestCase {
         String fNum_ge = NumberFormat.getNumberInstance( locale_ge ).format( num );
         log.debug( "Germany: " + fNum_ge );
 
-        assertTrue( 1 == 1 );// Nothing to test ... really just to see the different number formats
+        assertTrue( true );// Nothing to test ... really just to see the different number formats
     }
 
     /**
@@ -85,21 +83,13 @@ public class LocaleTest extends TestCase {
      * The locale can be determined at runtime by getDefault(), which is determined by the Virtual Machine on startup
      * based on the host operating system and the user preferences established on that system
      */
-    public void testLocaleParse() {
+    public void testLocaleParse() throws Exception {
         log.debug( "testLocaleParse" );
         InputStream is = this.getClass().getResourceAsStream( "/data/test.data.euro.txt" );
-        boolean fail = false;
-        try {
-            readFile( is );
-        } catch ( IOException e ) {
-            fail = true;
-            e.printStackTrace();
-        } catch ( ParseException e ) {
-            fail = true;
-            e.printStackTrace();
-        } finally {
-            assertFalse( fail );
-        }
+        assertNotNull( is );
+
+        readFile( is );
+
     }
 
 }

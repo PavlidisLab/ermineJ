@@ -8,10 +8,10 @@
 ; The name of the installer
 Name "ermineJ"
 
-!include version.nsi
+!include ..\..\target\project.nsh
 
 ; The file to write
-OutFile "..\..\target\ermineJ-${VERSION}-setup.exe"
+OutFile "..\..\target\ermineJ-${PROJECT_VERSION}-setup.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\ermineJ"
@@ -56,11 +56,11 @@ Section "ermineJ (required)"
 
   ; .bat file
   SetOutPath "$INSTDIR\bin"
-  File "..\..\target\nsis-build\bin\ermineJ.bat"
+  File "${PROJECT_BASEDIR}\nsis-installer\files\bin\ermineJ.bat"
 
   ; images
   SetOutPath "$INSTDIR\bin"
-  File "..\..\target\nsis-build\bin\ermineJ.ico"
+  File "${PROJECT_BASEDIR}\nsis-installer\files\bin\ermineJ.ico"
 
   ; If upgrading, might not want to overwrite the old data folder
   IfFileExists "$PROFILE\ermineJ.data" 0 YesOverwrite
