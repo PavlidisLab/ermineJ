@@ -1,0 +1,26 @@
+probe
+GO:0008013
+beta-catenin binding
+36182_at
+483_g_at
+632_at
+173_at
+482_at
+2073_s_at
+35433_s_at
+34619_at
+34184_at
+39416_at
+2082_s_at
+37629_at
+31376_at
+1253_at
+35115_at
+33217_at
+36605_at
+40575_at
+594_s_at
+977_s_at
+40645_at
+40777_at
+1912_s_at

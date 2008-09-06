@@ -1,9 +1,0 @@
-probe Id	score
-ProbeA	0,01
-ProbeB	0,01
-ProbeC	0,02
-ProbeD	0,1
-ProbeE	0,1
-ProbeF	0,1
-ProbeG	0,1
-ProbeH	0,1

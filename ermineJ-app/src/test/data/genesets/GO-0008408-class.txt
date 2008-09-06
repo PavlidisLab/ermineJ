@@ -1,0 +1,12 @@
+probe
+GO:0008408
+3'-5' exonuclease activity
+41838_at
+38198_at
+32870_g_at
+34801_at
+1533_at
+38838_at
+38310_at
+32999_at
+36865_at

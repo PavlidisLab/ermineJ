@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
+
+<title>Gene sets</title>
+<link href="../style.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body>
+    <img height="112" alt="ermineJ logo" src="../images/logo1small.gif"
+	width="266" border="0">
+<h1>Gene set files</h1>
+
+<p>User-defined gene sets can be created from within ermineJ, or
+imported using two different format. This page has instructions on how
+to import your own files. You can either use the <A href="#option1">ermineJ-native
+format</A>, or <a href="#option2">import a simple list of genes</a> .</p>
+
+<h2><a name="option1"></a>Option 1: Use ermineJ-native format and put
+the files in the genesets directory</h2>
+
+<p>This method might be useful if you have a lot of gene sets to load,
+have lists in terms of probes (not genes), or are moving an ermineJ
+installation from one machine to another and are copying the custom gene
+sets over.</p>
+
+<p>Gene sets created in ermineJ are saved in, and loaded from, a simple
+text file format. Knowledge of the format gives you the ability to
+define gene sets outside of ermineJ. When ermineJ starts up, it looks
+for these files in a predefined location (see below) and loads them.</p>
+
+<p>Here is a sample:</p>
+<pre>
+probe
+MyGeneSet
+Genes I Like
+36495_at
+271_s_at
+37983_at
+34071_at
+128_at
+129_g_at
+206_at
+38466_at
+32017_at
+346_s_at
+32018_at
+</pre>
+
+<p>(or <A href="../samples/geneset.txt">download the sample</A> as a
+file)</p>
+
+<p>Gene set files created by ermineJ are saved in the directory <code>ermineJ.data/genesets</code>.
+(e.g., C:/<code>Documents and Settings/[your user name]/ermineJ.data/genesets</code>).
+You should place your own "handmade" gene set files in this location so
+they are automatically visible to the software.</p>
+
+<p><strong>Note!</strong> If you create a gene set when using one microarray design, and then
+    switch to another next time you run ermineJ, ermineJ will try to load your old gene sets. If
+    any probes on the previous design match the identifiers on the current one, the gene set
+    will be loaded to the extent it can. We may change this in a future version of ermineJ.</p>
+
+    
+<p>The full description of the format is:</p>
+
+<ul>
+	<li>Each file describes just one gene set.
+	<li>The file is plain text (ASCII)
+	<li>The first line describes the type of identifier in the file and is
+	either "probe" or "gene".
+	<li>The second line is the name of the gene set.
+	<li>The second line is a description of the gene set. There is no limit
+	to the length of this description but in practice it should be just a
+	few words.
+	<li>The third and subsequent lines are the identifiers (probe ids or
+	official gene names).</li>
+</ul>
+
+<h2><a name="option2"></a>Option 2: Import files containing lists of
+genes using the "Define new gene set" menu item</h2>
+
+<p>This method has the benefit of requiring a very simple format, but
+you must load the files one at a time using ermineJ. (If this is a pain,
+a simple Perl or Python script can convert the lists into the other
+format.)</p>
+
+<p>The file in this case is just a list of genes, with one on each line.
+The names must be the gene symbols that are used in your gene annotation
+file. Other symbols will be ignored. Here's an example with just three
+genes:</p>
+<pre>
+alox12b
+ALOX15
+alox12
+</pre>
+
+<p>A full description of the file format is:</p>
+
+<ul>
+	<li>Each file describes just one gene set.
+	<li>The file is plain text (ASCII)
+	<li>Each line contains the official symbol of one gene
+	<li>Capitalization is ignored
+	<li>Blank lines and symbols not found in the current array design are
+	ignored</li>
+</ul>
+
+<p>On loading in, the list of genes is converted to a list of probes.
+You will be given the chance to edit the gene list and give it a name
+before finalizing it</p>
+</body>
+</html>

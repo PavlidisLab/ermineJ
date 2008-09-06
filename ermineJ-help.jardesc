@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jardesc>
-    <jar path="ermineJ/ermineJ-help.jar"/>
-    <options overwrite="true" compress="true" exportErrors="true" exportWarnings="true" saveDescription="true" descriptionLocation="/ermineJ/ermineJ-help.jardesc" useSourceFolders="false" buildIfNeeded="true"/>
-    <selectedElements exportClassFiles="true" exportOutputFolder="false" exportJavaFiles="false">
-        <javaElement handleIdentifier="=ermineJ/ermineJ-help"/>
-    </selectedElements>
-</jardesc>

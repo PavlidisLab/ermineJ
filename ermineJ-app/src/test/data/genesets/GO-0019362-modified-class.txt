@@ -1,0 +1,21 @@
+probe
+GO:0019362-modified
+pyridine nucleotide metabolism
+37978_at
+40672_at
+38493_at
+40671_g_at
+34066_at
+36963_at
+34924_at
+38789_at
+34003_at
+40670_at
+33849_at
+38492_at
+32090_at
+560_s_at
+40159_r_at
+32973_s_at
+41038_at
+38036_at

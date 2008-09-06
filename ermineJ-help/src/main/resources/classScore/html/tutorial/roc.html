@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
+
+<title>Receiver Operator Characteristic scoring</title>
+<link href="../style.css" rel="stylesheet" type="text/css" media="all">
+</head>
+
+<body bgcolor="#ffffff">
+<IMG alt="" src="../images/logo1small.gif">
+
+<h1>Tutorial: Receiver Operator Characteristic scoring</h1>
+
+<h2>Method Overview</h2>
+
+<p>The receiver operator characteristic (ROC) method is a&nbsp;fast,
+non-parametric&nbsp;alternative to the ORA and resampling methods for
+generating gene set scores from gene scores.</p>
+<P>The ROC is a well-known method for evaluating rankings of items, in
+this case genes. The ranking in this case comes from the gene scores. A
+gene set will get a good ROC if many genes in the gene set are near the
+top of the list.</P>
+
+<p>The score measured for each gene set is the area under the ROC curve,
+a value between 0 and 1. If the genes in the gene set are randomly
+distributed in the ranking, you would expect a value near 0.5. Values
+near 1 indicate the genes in the gene set are near the top of the list,
+while&nbsp; values near 0 indicate the genes in the gene set are near
+the bottom of the list. In principle both values near 0 and near 1 are
+statistically significant, but p-values reported by ermineJ are based on
+the assumption that only the top of the list is of interest (e.g., we're
+not&nbsp;&nbsp;considering "under-representation analysis").</p>
+
+<p>Unlike the other methods in ermineJ, the ROC uses only the ranks of
+the gene scores. That is, all it cares about is the ordering of items
+obtained by your gene scores (e.g., t-test or fold-change), but doesn't
+use the information about the relative values of the scores.</p>
+
+
+<p>P-values for this analysis are computed using algorithms described in
+Breslin et al., 2004*. For more information on the ROC, you could do
+worse than reading the Wikipedia page (<a
+	href="http://en.wikipedia.org/wiki/Receiver_operator_characteristic">http://en.wikipedia.org/wiki/Receiver_operator_characteristic</a>).</p>
+
+
+<h2>When to use ROC scoring</h2>
+
+<p>Like other non-parametric techniques, using ranks costs some
+statistical power, but also makes fewer assumptions. Specifically, if
+you think the ordering of items in your data is more accurate than the
+actual p-values themselves, the ROC might be appropriate. A nice thing
+about ROC compared to <a href="resampling">gene score resampling</a> is
+that the p-values are more precise, wherease gene score resampling
+p-value precision is limited by the number of random samples used.</p>
+
+<h2>Walkthrough</h2>
+
+<p>If you have read the <A href="ora.html">ORA</A> page (please do), you
+will recognize the first 5 steps of the wizard. The only different one
+is the last step, where the only difference is no p-value threshold is
+needed.</p>
+
+<p>There is another explanation of gene scores <A href="scores.html">here</A>.</p>
+
+<p>&nbsp;</p>
+
+<p>*<font size="2">Breslin, T, Ede P, Krogh M. Comparing functional
+annotation analyses with Catmap. BMC Bioinformatics 2004:5:193</font>.</p>
+
+<p>&nbsp;</p>
+<hr>
+<br>
+<br>
+<br>
+<br>
+
+
+<div class="tidy">Copyright 2004 &copy; University of British Columbia</div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script><script type="text/javascript">_uacct = "UA-255601-1";urchinTracker();</script></body>
+</body>
+</html>

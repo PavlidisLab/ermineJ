@@ -1,0 +1,21 @@
+probe
+GO:0003777
+microtubule motor activity
+40318_at
+37005_at
+34924_at
+348_at
+349_g_at
+35676_at
+34732_at
+37171_at
+40266_at
+35778_at
+40319_at
+35787_at
+36158_at
+37081_at
+356_at
+34763_at
+40779_at
+33292_at

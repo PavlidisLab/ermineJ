@@ -1,9 +1,0 @@
-probe
-anotherOne
-Read in from file
-32318_s_at
-AFFX-HSAC07/X00351_3_st
-AFFX-HSAC07/X00351_5_st
-AFFX-HSAC07/X00351_M_st
-37134_f_at
-37135_f_at

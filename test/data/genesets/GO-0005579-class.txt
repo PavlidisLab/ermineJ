@@ -1,4 +1,0 @@
-probe
-GO:0005579
-membrane attack complex
-37394_at

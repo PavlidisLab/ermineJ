@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<title>Changing the Gene links</title>
+<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+<meta http-equiv="description" content="this is my page">
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+<img src="../images/logo1small.gif" />
+<h1>Changing the links in the gene set details view</h1>
+
+<p>This task applies to the Gene set details view. In the details table,
+the gene symbols appear as hyperlinks. By default these are links to
+NCBI's Gene database, but you can change them to point to another web
+site.</p>
+
+<p>Access this option by&nbsp;selecting the menu "Options" and choosing
+the "Change gene name url..." option.</p>
+
+<p><IMG alt="" src="../images/gene-url-dialog.gif" border=0></p>
+
+<p>The "@@" symbols are where the gene symbol gets put in. For example,
+if your gene is TRPA, then the link will end in TRPA; for the example
+above, this will cause a search to be executed on the NCBI web site for
+genes named "TRPA".</p>
+
+<p>For other data sources, you have to know how the links (URLs) look to
+know what to put in this box. But here are a few examples to show the
+idea:</p>
+
+<ul>
+	<li><STRONG>TAIR:</STRONG>&nbsp;&nbsp;<!--StartFragment --><FONT
+		face="Courier New" size=2> <A href="http://www.arabidopsis.org/">http://www.arabidopsis.org/</A>servlets/TairObject?type=gene&amp;name=@@</FONT>
+	<li><STRONG>Google:</STRONG>&nbsp;<FONT face="Courier New" size=2><A
+		href="http://www.google.com/">http://www.google.com/</A>search?as_q=Gene+@@</FONT>&nbsp;&nbsp;<EM>
+	(The added search term "Gene" is just a suggestion) </EM>
+	<li><STRONG>MGI:</STRONG>&nbsp;&nbsp;<FONT face="Courier New" size=2> <A
+		href="http://www.informatics.jax.org/">http://www.informatics.jax.org/</A>javawi2/servlet/WIFetch?page=searchTool&amp;query=@@&amp;selectedQuery=Genes+and+Markers</FONT>&nbsp;
+	<EM>(Yes, it's long - get it all one one line of course!)</EM>
+	<li><STRONG>Pubmed:</STRONG>&nbsp;&nbsp;<FONT face="Courier New" size=2><A
+		href="http://www.ncbi.nlm.nih.gov/">http://www.ncbi.nlm.nih.gov/</A>entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=@@</FONT></li>
+</ul>
+</body>
+</html>
