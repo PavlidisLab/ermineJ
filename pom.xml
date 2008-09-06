@@ -166,4 +166,16 @@
 			</build>
 		</profile>
 	</profiles>
+	<distributionManagement>
+		<repository>
+			<id>broca</id>
+			<name>broca</name>
+			<url>scp://broca.ubic.ca:/www/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>broca</id>
+			<name>broca</name>
+			<url>scp://broca.ubic.ca:/www/maven2</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
