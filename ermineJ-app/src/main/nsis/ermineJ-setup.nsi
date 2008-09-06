@@ -1,6 +1,6 @@
 ; ermineJ Windows Installer
 ; Written by Will Braynen, Paul Pavlidis, Kiran Keshav
-; Copyright (c) 2005  Columbia University
+; Copyright (c) 2008  University of British Columbia
 
 
 ;--------------------------------

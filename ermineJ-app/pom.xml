@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>ermineJ</artifactId>
 		<groupId>ermineJ</groupId>
@@ -168,8 +169,10 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<configuration>
 					<tasks>
-						<echo message="Unpacking bundle ${project.build.directory}/${artifactId}-${version}-generic-bundle.zip" />
-						<unzip src="${project.build.directory}/${artifactId}-${version}-generic-bundle.zip" dest="${project.build.directory}" />
+						<echo
+							message="Unpacking bundle ${project.build.directory}/${artifactId}-${version}-generic-bundle.zip" />
+						<unzip src="${project.build.directory}/${artifactId}-${version}-generic-bundle.zip"
+							dest="${project.build.directory}" />
 					</tasks>
 				</configuration>
 			</plugin>
@@ -187,17 +190,30 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.2-beta-2</version>
 				<inherited>false</inherited>
-				<configuration>
-					<descriptors>
-						<descriptor>bin-assembly.xml</descriptor>
-					</descriptors>
-				</configuration>
 				<executions>
 					<execution>
 						<id>bin-assemble</id>
+						<phase>package</phase>
 						<goals>
 							<goal>assembly</goal>
 						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/bin-assembly.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+					<execution>
+						<id>src-assemble</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assembly</goal>
+						</goals>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>src</descriptorRef>
+							</descriptorRefs>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
