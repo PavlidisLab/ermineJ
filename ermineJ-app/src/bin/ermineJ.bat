@@ -85,7 +85,7 @@ goto Win9xApp
 :endInit
 if "%ERMINEJ_OPTS%"=="" SET ERMINEJ_OPTS="-Xmx256m"
 SET ERMINEJ_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
-SET ERMINEJ_CLASSPATH="%ERMINEJ_HOME%\lib\forehead-1.0-beta-5.jar"
+SET ERMINEJ_CLASSPATH="%ERMINEJ_HOME%\lib\forehead.jar"
 SET ERMINEJ_MAIN_CLASS="com.werken.forehead.Forehead"
 SET ERMINEJ_ENDORSED="%JAVA_HOME%\lib\endorsed;%ERMINEJ_HOME%\lib"
 if not "%ERMINEJ_HOME_LOCAL%" == "" goto StartMHL

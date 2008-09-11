@@ -1,5 +1,4 @@
 #!/bin/sh
-FOREHEAD_VERSION=1.0-beta-5
 ERMINEJ_OPTS="-Xmx256m"
 
 # OS specific support.  $var _must_ be set to either true or false.
@@ -110,7 +109,7 @@ MAIN_CLASS=com.werken.forehead.Forehead
 "$JAVACMD" \
   $ERMINEJ_OPTS \
   -Djavax.xml.parsers.SAXParserFactory=org.apache.xerces.jaxp.SAXParserFactoryImpl \
-  -classpath "${ERMINEJ_HOME}/lib/forehead-${FOREHEAD_VERSION}.jar" \
+  -classpath "${ERMINEJ_HOME}/lib/forehead.jar" \
   "-Dforehead.conf.file=${ERMINEJ_HOME}/bin/forehead.conf"  \
   "-DermineJ.home=${ERMINEJ_HOME}" \
   $MAIN_CLASS "$@"
