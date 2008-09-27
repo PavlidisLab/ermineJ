@@ -5,26 +5,26 @@
 	<classpathentry kind="src" path="ermineJ-app/src/main/resources"/>
 	<classpathentry kind="src" path="ermineJ-app/src/test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/commons-configuration/jars/commons-configuration-1.1.jar">
+	<classpathentry kind="var" path="M2_REPO/commons-configuration/commons-configuration/1.1/commons-configuration-1.1.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/C:/java/.maven/repository/commons-configuration/commons-configuration-1.1/docs/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="MAVEN1_REPO/commons-logging/jars/commons-logging-1.0.3.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/colt/jars/colt-1.2.0.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/javahelp/jars/jh.jar">
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/colt/colt/1.2.0/colt-1.2.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javahelp/jh/2.0/jh-2.0.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/C:/java/j2sdk1.4.2_08/jh2.0/doc/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="MAVEN1_REPO/xerces/jars/xercesImpl-2.6.2.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/log4j/jars/log4j-1.2.8.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/commons-collections/jars/commons-collections-3.1.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/commons-lang/jars/commons-lang-2.1.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/junit/jars/junit-3.8.1.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/jfreechart/jars/jfreechart-0.9.20.jar"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/jcommon/jars/jcommon-0.9.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.6.2/xercesImpl-2.6.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.9/log4j-1.2.9.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2/commons-collections-3.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.3/commons-lang-2.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.2/junit-3.8.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jfreechart/jfreechart/0.9.20/jfreechart-0.9.20.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jcommon/jcommon/0.9.5/jcommon-0.9.5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/baseCode"/>
-	<classpathentry kind="var" path="MAVEN1_REPO/commons-cli/jars/commons-cli-1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.1/commons-cli-1.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
