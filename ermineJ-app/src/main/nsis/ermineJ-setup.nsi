@@ -121,8 +121,7 @@ Section "Uninstall"
   ; Remove other directories used
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\jre" ; jre wasn't distributed with this version, but just in case it's left over from another
- 
+
   ; Remove data folder
   ;IfFileExists "$INSTDIR\ermineJ.data" 0 YesRemoveDataFolder
   IfFileExists "$PROFILE\ermineJ.data" 0 YesRemoveDataFolder
