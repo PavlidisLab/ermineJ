@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>ermineJ</artifactId>
 		<groupId>ermineJ</groupId>
@@ -33,8 +34,8 @@
 						<configuration>
 							<tasks>
 								<echo message="Creating search index" />
-								<!--  must have indexer in your path, TODO make configurable -->
-								<exec executable="jhindexer" dir="${basedir}/src/main/resources/classScore">
+								<!--  If jhindexer is in your path, to run from command line, use -Djhindexer=jhindexer; otherwise provide path. -->
+								<exec executable="${jhindexer}" dir="${basedir}/src/main/resources/classScore">
 									<arg value="-verbose" />
 									<arg value="-db" />
 									<arg path="${basedir}/target/ermineJ-help/classScore/JavaHelpSearch" />
