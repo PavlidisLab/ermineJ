@@ -34,8 +34,8 @@
 						<configuration>
 							<tasks>
 								<echo message="Creating search index" />
-								<!--  If jhindexer is in your path, to run from command line, use -Djhindexer=jhindexer; otherwise provide path. -->
-								<exec executable="${jhindexer}" dir="${basedir}/src/main/resources/classScore">
+								<!--  jhindexer must be in your path. -->
+								<exec executable="jhindexer" dir="${basedir}/src/main/resources/classScore">
 									<arg value="-verbose" />
 									<arg value="-db" />
 									<arg path="${basedir}/target/ermineJ-help/classScore/JavaHelpSearch" />
