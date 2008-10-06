@@ -47,7 +47,7 @@ import ubic.erminej.data.GeneSetResult;
 public class AnalysisThread extends Thread {
     protected static final Log log = LogFactory.getLog( AnalysisThread.class );
     private GeneAnnotations geneData = null;
-    private Map geneScoreSets;
+    private Map<String, GeneScores> geneScoreSets;
     private GONames goData;
     private volatile GeneSetPvalRun latestResults;
     private String loadFile;
@@ -72,7 +72,7 @@ public class AnalysisThread extends Thread {
      * @throws IllegalStateException
      */
     public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData, Map geneDataSets,
-            Map rawDataSets, Map geneScoreSets ) throws IllegalStateException {
+            Map rawDataSets, Map<String, GeneScores> geneScoreSets ) throws IllegalStateException {
         this.settings = settings;
         this.messenger = messenger;
         this.goData = goData;
@@ -354,6 +354,8 @@ public class AnalysisThread extends Thread {
             activeProbes = geneScores.getProbeToScoreMap().keySet();
         } else if ( rawData != null && geneScores == null ) {
             activeProbes = new HashSet<String>( rawData.getRowNames() );
+        } else {
+            throw new IllegalStateException( "No active probes" );
         }
         log.debug( activeProbes.size() + " active probes" );
         return activeProbes;
