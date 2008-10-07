@@ -151,8 +151,8 @@ public class Settings {
     public Settings( Settings settingsToCopy ) {
         this.config = new PropertiesConfiguration();
         PropertiesConfiguration oldConfig = settingsToCopy.getConfig();
-        for ( Iterator iter = oldConfig.getKeys(); iter.hasNext(); ) {
-            String key = ( String ) iter.next();
+        for ( Iterator<String> iter = oldConfig.getKeys(); iter.hasNext(); ) {
+            String key = iter.next();
             Object value = oldConfig.getProperty( key );
             this.config.setProperty( key, value );
         }
@@ -644,6 +644,7 @@ public class Settings {
         this.config.setProperty( "userGeneSetDirectory", dir );
     }
 
+    @Override
     public String toString() {
         return this.config.toString();
     }
