@@ -32,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -44,7 +45,6 @@ import javax.swing.SwingConstants;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 
 /**
  * Displays 'about' information for the software.
@@ -123,8 +123,11 @@ public class AboutBox extends JDialog implements ActionListener {
         imageLabel.setDebugGraphicsOptions( 0 );
         imageLabel.setHorizontalAlignment( SwingConstants.CENTER );
         imageLabel.setHorizontalTextPosition( SwingConstants.CENTER );
-        imageLabel.setIcon( new ImageIcon( GeneSetScoreFrame.class.getResource( "resources/logo1small.gif" ) ) );
-        imageLabel.setIconTextGap( 0 );
+        URL icon = GeneSetScoreFrame.class.getResource( "/ubic/erminej/logo1small.gif" );
+        if ( icon != null ) {
+            imageLabel.setIcon( new ImageIcon( icon ) );
+            imageLabel.setIconTextGap( 0 );
+        }
 
         versionLabel.setBackground( Color.white );
         versionLabel.setFont( new java.awt.Font( "Dialog", 1, 11 ) );
