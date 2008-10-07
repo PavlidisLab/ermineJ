@@ -3,13 +3,13 @@
 	<parent>
 		<artifactId>ermineJ</artifactId>
 		<groupId>ermineJ</groupId>
-		<version>2.1.17-SNAPSHOT</version>
+		<version>2.1.17</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ-help</artifactId>
 	<name>ermineJ-help</name>
-	<version>2.1.17-SNAPSHOT</version>
+	<version>2.1.17</version>
 	<description>Help file for ermineJ</description>
 	<packaging>jar</packaging>
 	<build>
