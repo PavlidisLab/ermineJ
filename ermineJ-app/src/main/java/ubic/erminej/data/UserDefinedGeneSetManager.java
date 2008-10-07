@@ -103,11 +103,11 @@ public class UserDefinedGeneSetManager {
 
         if ( comparee.getAspect() != null && !comparee.getAspect().equals( aspect ) ) return false;
 
-        Collection probesInSet = comparee.getProbes();
+        Collection<String> probesInSet = comparee.getProbes();
         if ( probesInSet.size() != probesInSet.size() ) return false;
 
-        for ( Iterator it = probesInSet.iterator(); it.hasNext(); ) {
-            String probe = ( String ) it.next();
+        for ( Iterator<String> it = probesInSet.iterator(); it.hasNext(); ) {
+            String probe = it.next();
             if ( !probesInSet.contains( probe ) ) return false;
         }
 
@@ -165,7 +165,7 @@ public class UserDefinedGeneSetManager {
         cinfo.put( "desc", goData.getNameForId( id1 ) );
         cinfo.put( "aspect", goData.getAspectForId( id1 ) );
         cinfo.put( "definition", goData.getDefinitionForId( id1 ) );
-        Collection members = geneData.getClassToProbes( id1 );
+        Collection<String> members = geneData.getClassToProbes( id1 );
         cinfo.put( "members", members );
         return cinfo;
     }
@@ -351,8 +351,8 @@ public class UserDefinedGeneSetManager {
         out.write( filetype + "\n" );
         out.write( id + "\n" );
         out.write( cleanedDescription + "\n" );
-        for ( Iterator it = probes.iterator(); it.hasNext(); ) {
-            out.write( ( String ) it.next() + "\n" );
+        for ( Iterator<String> it = probes.iterator(); it.hasNext(); ) {
+            out.write( it.next() + "\n" );
         }
         out.close();
     }
@@ -403,6 +403,7 @@ public class UserDefinedGeneSetManager {
                 return 3;
             }
 
+            @Override
             public String getColumnName( int i ) {
                 return columnNames[i];
             }
@@ -438,6 +439,8 @@ public class UserDefinedGeneSetManager {
                 return null;
             }
 
+            @Override
+            @SuppressWarnings("unused")
             public boolean isCellEditable( int r, int c ) {
                 if ( !finalized && ( c == 0 || c == 1 ) ) {
                     return true;
@@ -506,7 +509,7 @@ public class UserDefinedGeneSetManager {
      * @return
      * @throws IOException
      */
-    public static Map getGeneSetFileInfo( String file ) throws IOException {
+    public static Map<String, Object> getGeneSetFileInfo( String file ) throws IOException {
         Map<String, Object> cinfo = new HashMap<String, Object>();
         FileTools.checkPathIsReadableFile( file );
         FileInputStream fis = new FileInputStream( file );

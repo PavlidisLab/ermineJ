@@ -340,6 +340,7 @@ public class GeneSetScoreFrame extends JFrame {
         } catch ( IllegalArgumentException e ) {
             GuiUtil.error( "Error during initialization: " + e
                     + "\nTry again.\nIf this problem persists, please contact the software developer. " );
+            log.error( e, e );
         }
         treePanel.initialize( goData, geneData );
         loadUserGeneSets();
@@ -385,9 +386,13 @@ public class GeneSetScoreFrame extends JFrame {
         } catch ( SAXException e ) {
             GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
                     + "\nIf this problem persists, please contact the software developer. " );
+            log.error( e, e );
+            return;
         } catch ( IOException e ) {
             GuiUtil.error( "GO reading error during initialization: " + e.getMessage()
                     + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+            log.error( e, e );
+            return;
         }
 
         updateProgress( 70 );
@@ -400,6 +405,14 @@ public class GeneSetScoreFrame extends JFrame {
         } catch ( IOException e ) {
             GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
                     + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+            log.error( e, e );
+            return;
+
+        } catch ( Exception e ) {
+            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
+                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+            log.error( e, e );
+            return;
         }
 
         geneDataSets.put( new Integer( "original".hashCode() ), geneData );
@@ -520,11 +533,12 @@ public class GeneSetScoreFrame extends JFrame {
         int numZeroPvalues = 0;
         if ( results1 == null || results1.getResults() == null ) {
             GuiUtil.error( "There was an error during analysis - there were no valid results. Please check the logs." );
+            return;
         }
         int numPvalues = results1.getResults().size();
         int numUnityPvalue = 0;
-        for ( Iterator itr = results1.getResults().values().iterator(); itr.hasNext(); ) {
-            GeneSetResult result = ( GeneSetResult ) itr.next();
+        for ( Iterator<GeneSetResult> itr = results1.getResults().values().iterator(); itr.hasNext(); ) {
+            GeneSetResult result = itr.next();
             double p = result.getPvalue();
             if ( p == 0 ) {
                 numZeroPvalues++;
@@ -675,6 +689,7 @@ public class GeneSetScoreFrame extends JFrame {
 
         tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
         tabs.addMouseListener( new MouseAdapter() {
+            @Override
             public void mouseReleased( MouseEvent e ) {
                 maybeEnableRunViewMenu();
             }
@@ -683,6 +698,7 @@ public class GeneSetScoreFrame extends JFrame {
         tabs.addTab( "Tree", treePanel );
 
         this.addWindowListener( new WindowAdapter() {
+            @Override
             public void windowClosing( WindowEvent e ) {
                 writePrefs();
             }
@@ -958,8 +974,10 @@ public class GeneSetScoreFrame extends JFrame {
             b.setVisible( true );
         } catch ( FileNotFoundException e ) {
             GuiUtil.error( "The log file could not be found" );
+            log.error( e );
         } catch ( IOException e ) {
             GuiUtil.error( "There was an error reading the log file" );
+            log.error( e );
         }
     }
 
@@ -1040,12 +1058,12 @@ public class GeneSetScoreFrame extends JFrame {
 
     void findClassMenuItem_actionPerformed() {
         if ( findByNameDialog == null ) findByNameDialog = new FindDialog( this, geneData, goData );
-        findByNameDialog.show();
+        findByNameDialog.setVisible( true );
     }
 
     void findGeneMenuItem_actionPerformed() {
         if ( findByGeneDialog == null ) findByGeneDialog = new FindByGeneDialog( this, geneData, goData );
-        findByGeneDialog.show();
+        findByGeneDialog.setVisible( true );
     }
 
     void loadAnalysisMenuItem_actionPerformed() {
