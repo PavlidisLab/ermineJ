@@ -20,15 +20,14 @@
 	</modules>
 	<packaging>pom</packaging>
 	<scm>
-		<connection>scm:cvs:ext:@broca.ubic.ca:local:/cvs:ermineJ</connection>
-		<developerConnection>scm:cvs:ext:@broca.ubic.ca:/cvs:ermineJ</developerConnection>
-		<url>http://broca.ubic.ca:8081/viewrep/pavlab/ermineJ</url>
-    <tag>ermineJ-2_1_17</tag>
-  </scm>
+		<connection>scm:cvs:ext:@krusty.chibi.ubc.ca:/space/cvs:ermineJ</connection>
+		<developerConnection>scm:cvs:ext:@krusty.chibi.ubc.ca:/space/cvs:ermineJ</developerConnection>
+		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
+	</scm>
 	<issueManagement>
 		<system>Bugzilla</system>
 		<url>
-			http://www.bioinformatics.ubc.ca/pavlidis/lab/bugzilla/buglist.cgi?product=ermineJ&amp;bug_status=__open__
+			http://chibi.ubc.ca/faculty/pavlidis/lab/bugs/buglist.cgi?product=ermineJ&amp;bug_status=__open__
 		</url>
 	</issueManagement>
 	<ciManagement>
@@ -42,7 +41,7 @@
 				<sendOnSuccess>true</sendOnSuccess>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<address>paul@bioinformatics.ubc.ca</address>
+					<address>paul@chibi.ubc.ca</address>
 				</configuration>
 			</notifier>
 		</notifiers>
@@ -58,7 +57,7 @@
 		<developer>
 			<name>Paul Pavlidis</name>
 			<id>pavlidis</id>
-			<email>paul@bioinformatics.ubc.ca</email>
+			<email>paul@chibi.ubc.ca</email>
 			<organization>University of British Columbia</organization>
 		</developer>
 		<developer>
@@ -167,14 +166,14 @@
 	</profiles>
 	<distributionManagement>
 		<repository>
-			<id>broca</id>
-			<name>broca</name>
-			<url>scp://broca.ubic.ca:/www/maven2</url>
+			<id>repo</id>
+			<name>Pavlab</name>
+			<url>scp://krusty.chibi.ubc.ca:/space/maven2</url>
 		</repository>
 		<snapshotRepository>
-			<id>broca</id>
-			<name>broca</name>
-			<url>scp://broca.ubic.ca:/www/maven2</url>
+			<id>repo</id>
+			<name>Pavlab</name>
+			<url>scp://krusty.chibi.ubc.ca:/space/maven2</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>
