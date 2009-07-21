@@ -10,10 +10,6 @@
 	<name>ermineJ-app</name>
 	<groupId>ermineJ</groupId>
 	<version>2.1.18-SNAPSHOT</version>
-	<organization>
-		<name>UBC Centre for High-Throughput Biology</name>
-		<url>http://bioinformatics.ubc.ca</url>
-	</organization>
 	<description>application jar file for ermineJ</description>
 	<packaging>jar</packaging>
 	<dependencies>
