@@ -229,7 +229,7 @@ public class classScoreCMD {
                         GeneAnnotations.AFFYCSV );
             } else {
                 boolean filterNonSpecific = settings.getFilterNonSpecific();
-                geneData = new GeneAnnotations(settings.getAnnotFile(), statusMessenger, goData, filterNonSpecific);
+                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, filterNonSpecific );
                 // TODO add agilent support ... can we tell the type of file by the suffix?
             }
 
@@ -296,6 +296,7 @@ public class classScoreCMD {
 
     }
 
+    @SuppressWarnings("static-access")
     private void buildOptions() {
 
         options.addOption( OptionBuilder.withLongOpt( "help" ).create( 'h' ) );
@@ -318,8 +319,7 @@ public class classScoreCMD {
                 .create( 'A' ) );
 
         options.addOption( OptionBuilder.withDescription(
-                "Sets 'big is better' option for gene scores to true [default = false]" )
-                .create( 'b' ) );
+                "Sets 'big is better' option for gene scores to true [default = false]" ).create( 'b' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" ).withDescription(
                 "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" ).withArgName( "file" ).create(
@@ -333,11 +333,13 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription(
                 "Directory where custom gene set are located" ).create( 'f' ) );
-        
-        options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" ).withDescription("Filter out non-specific probes").create('F'));
+
+        options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" ).withDescription(
+                "Filter out non-specific probes" ).create( 'F' ) );
 
         options
                 .addOption( OptionBuilder
+                        .hasArg()
                         .withArgName( "value" )
                         .withLongOpt( "reps" )
                         .withDescription(
@@ -438,7 +440,7 @@ public class classScoreCMD {
         }
 
         settings.setBigIsBetter( commandLine.hasOption( 'b' ) );
-        
+
         if ( commandLine.hasOption( 'c' ) ) {
             arg = commandLine.getOptionValue( 'c' );
             if ( FileTools.testFile( arg ) )
@@ -490,11 +492,13 @@ public class classScoreCMD {
                 if ( intarg == 1 || intarg == 2 )
                     settings.setScoreCol( intarg );
                 else {
-                    System.err.println( "Gene rep treatment must be either " + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
+                    System.err.println( "Gene rep treatment must be either "
+                            + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g), you provided '" + intarg + "'" );
                     showHelpAndExit();
                 }
             } catch ( NumberFormatException e ) {
-                System.err.println( "Gene rep treatment must be either " + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g)" );
+                System.err.println( "Gene rep treatment must be either "
+                        + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g), you provided a non-number value: " + arg );
                 showHelpAndExit();
             }
         }
@@ -539,9 +543,9 @@ public class classScoreCMD {
                 showHelpAndExit();
             }
         }
-        
-        settings.setFilterNonSpecific( commandLine.hasOption('F') );
-        
+
+        settings.setFilterNonSpecific( commandLine.hasOption( 'F' ) );
+
         if ( commandLine.hasOption( 'M' ) ) {
             arg = commandLine.getOptionValue( 'M' );
             int mtc = Integer.parseInt( arg );
