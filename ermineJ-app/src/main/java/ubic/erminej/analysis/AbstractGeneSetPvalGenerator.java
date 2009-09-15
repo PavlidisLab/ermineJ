@@ -111,25 +111,26 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
          * If there is no aspect, we don't use it, unless
          */
         if ( aspect == null && !this.goName.isUserDefined( geneSetName ) ) {
-            log.debug( "Null aspect for " + geneSetName );
             return missingAspectTreatedAsUsable || this.globalMissingAspectTreatedAsUsable;
         }
 
-        if ( ( aspect.equalsIgnoreCase( "biological_process" ) || aspect
-                .equalsIgnoreCase( "obsolete_biological_process" ) )
-                && this.settings.getUseBiologicalProcess() ) {
-            return true;
-        } else if ( ( aspect.equalsIgnoreCase( "cellular_component" ) || aspect
-                .equalsIgnoreCase( "obsolete_cellular_component" ) )
-                && this.settings.getUseCellularComponent() ) {
-            return true;
-        } else if ( ( aspect.equalsIgnoreCase( "molecular_function" ) || aspect
-                .equalsIgnoreCase( "obsolete_molecular_function" ) )
-                && this.settings.getUseMolecularFunction() ) {
-            return true;
-        } else if ( aspect.equalsIgnoreCase( GONames.USER_DEFINED ) ) {
-            log.debug( "Found user-defined gene set " + geneSetName + " for analysis" );
-            return true; // user-defined - always use.
+        if ( aspect != null ) {
+            if ( ( aspect.equalsIgnoreCase( "biological_process" ) || aspect
+                    .equalsIgnoreCase( "obsolete_biological_process" ) )
+                    && this.settings.getUseBiologicalProcess() ) {
+                return true;
+            } else if ( ( aspect.equalsIgnoreCase( "cellular_component" ) || aspect
+                    .equalsIgnoreCase( "obsolete_cellular_component" ) )
+                    && this.settings.getUseCellularComponent() ) {
+                return true;
+            } else if ( ( aspect.equalsIgnoreCase( "molecular_function" ) || aspect
+                    .equalsIgnoreCase( "obsolete_molecular_function" ) )
+                    && this.settings.getUseMolecularFunction() ) {
+                return true;
+            } else if ( aspect.equalsIgnoreCase( GONames.USER_DEFINED ) ) {
+                log.debug( "Found user-defined gene set " + geneSetName + " for analysis" );
+                return true; // user-defined - always use.
+            }
         }
         return false;
     }

@@ -106,7 +106,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     @Override
     public String getColumnName( int columnNumber ) {
         if ( columnNumber > this.getColumnCount() - 1 || columnNumber < 0 ) return null;
-        return ( String ) columnNames.get( columnNumber );
+        return columnNames.get( columnNumber );
     }
 
     public int getRowCount() {
