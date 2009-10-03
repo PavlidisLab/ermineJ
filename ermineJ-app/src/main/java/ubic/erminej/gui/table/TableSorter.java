@@ -388,11 +388,11 @@ public class TableSorter extends AbstractTableModel {
                             o2 = new Double( m_matrixDisplay.getValue( p2.x, p2.y ) );
                         }
                     } else if ( o1.getClass().equals( ArrayList.class ) ) {
-                        if ( ( ( ArrayList ) o1 ).get( 0 ).getClass().equals( Double.class ) ) {
+                        if ( ( ( List ) o1 ).get( 0 ).getClass().equals( Double.class ) ) {
                             comparator = getComparator( Double.class );
                             // only comparing the first member of the list
-                            Double a = ( Double ) ( ( ArrayList ) o1 ).get( 0 );
-                            Double b = ( Double ) ( ( ArrayList ) o2 ).get( 0 );
+                            Double a = ( Double ) ( (  List ) o1 ).get( 0 );
+                            Double b = ( Double ) ( (  List ) o2 ).get( 0 );
 
                             // yes, we did get an array list, but we want to
                             // compare the Double values the array lists contain,
