@@ -1,3 +1,21 @@
+/*
+ * The Gemma project
+ * 
+ * Copyright (c) 2006 University of British Columbia
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package ubic.erminej.data;
 
 import java.io.InputStream;
@@ -12,10 +30,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.data.GeneScores;
 
 /**
- * <hr>
- * <p>
- * Copyright (c) 2006 University of British Columbia
- * 
+ 
  * @author pavlidis
  * @version $Id$
  */
@@ -27,6 +42,7 @@ public class GeneScoreReaderTest extends TestCase {
     /*
      * @see TestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
         Settings s = new Settings();
 
@@ -43,6 +59,7 @@ public class GeneScoreReaderTest extends TestCase {
     /*
      * @see TestCase#tearDown()
      */
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         ism.close();
@@ -74,16 +91,14 @@ public class GeneScoreReaderTest extends TestCase {
      * Class under test for Map getGeneToPvalMap()
      */
     public void testGetGeneToPvalMap() {
-        Set expectedReturn = new HashSet();
+        Set<String> expectedReturn = new HashSet<String>();
         expectedReturn.add( "GeneA" );
         expectedReturn.add( "GeneB" );
         expectedReturn.add( "GeneC" );
         expectedReturn.add( "GeneD" );
         expectedReturn.add( "GeneE" ); // not really a good test...
 
-        Set actualReturn = test.getGeneToPvalMap().keySet();
-
-        System.err.println( actualReturn );
+        Set<String> actualReturn = test.getGeneToPvalMap().keySet();
 
         assertTrue( RegressionTesting.containsSame( expectedReturn, actualReturn ) );
     }
