@@ -189,7 +189,7 @@ public class AnalysisThread extends Thread {
             assert runningMethod != null : "No running method assigned";
             log.debug( "Invoking runner in " + Thread.currentThread().getName() );
             log.debug( "Running method is " + runningMethod.getName() );
-            GeneSetPvalRun results = ( GeneSetPvalRun ) runningMethod.invoke( this, null );
+            GeneSetPvalRun results = ( GeneSetPvalRun ) runningMethod.invoke( this, ( Object[] ) null );
             log.debug( "Runner returned" );
             this.setLatestResults( results );
             this.finishedNormally = true;
