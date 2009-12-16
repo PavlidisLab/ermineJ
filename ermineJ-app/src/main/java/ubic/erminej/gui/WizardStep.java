@@ -33,6 +33,9 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id$
  */
 public abstract class WizardStep extends JPanel {
+
+    private static final long serialVersionUID = 1L;
+
     protected static Log log = LogFactory.getLog( WizardStep.class.getName() );
     Wizard owner;
 

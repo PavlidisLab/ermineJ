@@ -40,10 +40,11 @@ public class GeneSetSizeComputer {
     protected boolean weight_on = true;
 
     protected GeneScores geneScores;
-    protected Collection activeProbes;
+    protected Collection<String> activeProbes;
     private GeneAnnotations geneData;
 
-    public GeneSetSizeComputer( Collection activeProbes, GeneAnnotations geneData, GeneScores geneScores, boolean w ) {
+    public GeneSetSizeComputer( Collection<String> activeProbes, GeneAnnotations geneData, GeneScores geneScores,
+            boolean w ) {
         this.weight_on = w;
         this.activeProbes = activeProbes;
         this.geneData = geneData;
@@ -69,19 +70,19 @@ public class GeneSetSizeComputer {
 
         boolean gotAtLeastOneNonZero = false;
 
-        for ( Iterator iter = geneData.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<String> iter = geneData.getGeneSets().iterator(); iter.hasNext(); ) {
 
-            String className = ( String ) iter.next(); // id of the class
+            String className = iter.next(); // id of the class
             // (GO:XXXXXX)
-            Collection values = geneData.getGeneSetProbes( className );
-            Iterator I = values.iterator();
+            Collection<String> values = geneData.getGeneSetProbes( className );
+            Iterator<String> I = values.iterator();
 
             record.clear();
             size = 0;
             v_size = 0;
 
             while ( I.hasNext() ) { // foreach item in the class.
-                String probe = ( String ) I.next();
+                String probe = I.next();
                 String gene = geneData.probeToGene( probe );
                 if ( probe != null ) {
                     if ( activeProbes.contains( probe ) ) { // if it is in the data
@@ -133,14 +134,14 @@ public class GeneSetSizeComputer {
     /**
      * @return Map
      */
-    public Map getEffectiveSizes() {
+    public Map<String, Integer> getEffectiveSizes() {
         return effectiveSizes;
     }
 
     /**
      * @return Map
      */
-    public Map getActualSizes() {
+    public Map<String, Integer> getActualSizes() {
         return actualSizes;
     }
 

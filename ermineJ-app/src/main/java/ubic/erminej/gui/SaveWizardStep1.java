@@ -41,14 +41,14 @@ public class SaveWizardStep1 extends WizardStep {
      */
     private static final long serialVersionUID = -8622689726831187005L;
     private SaveWizard wiz = null;
-    private List rundata = null;
+    private List<GeneSetPvalRun> rundata = null;
     private JPanel runPanel = null;
     private JComboBox runComboBox = null;
     private JLabel runLabel = null;
 
     boolean runs_exist = false;
 
-    public SaveWizardStep1( SaveWizard wiz, List rundata ) {
+    public SaveWizardStep1( SaveWizard wiz, List<GeneSetPvalRun> rundata ) {
         super( wiz );
         this.wiz = wiz;
         this.rundata = rundata;
@@ -92,7 +92,7 @@ public class SaveWizardStep1 extends WizardStep {
         } else {
             runs_exist = true;
             for ( int i = 0; i < rundata.size(); i++ ) {
-                runComboBox.insertItemAt( ( ( GeneSetPvalRun ) rundata.get( i ) ).getName(), i );
+                runComboBox.insertItemAt( rundata.get( i ).getName(), i );
             }
             runComboBox.setSelectedIndex( 0 );
         }
@@ -106,7 +106,7 @@ public class SaveWizardStep1 extends WizardStep {
         return runs_exist;
     }
 
-    void runComboBox_actionPerformed( ActionEvent e ) {
+    void runComboBox_actionPerformed() {
         wiz.selectRun( runComboBox.getSelectedIndex() );
     }
 
@@ -121,6 +121,6 @@ class SaveWizardStep1_runComboBox_actionAdapter implements java.awt.event.Action
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.runComboBox_actionPerformed( e );
+        adaptee.runComboBox_actionPerformed();
     }
 }

@@ -58,9 +58,9 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         results = new HashMap<String, GeneSetResult>();
         ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc, goName, hist );
 
-        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<String> iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
-            String className = ( String ) iter.next();
+            String className = iter.next();
             GeneSetResult res = cpv.classPval( className, geneToScoreMap, probeToScoreMap );
             if ( res != null ) {
                 results.put( className, res );
@@ -80,8 +80,8 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
         ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, csc,
                 goName, hist );
 
-        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
-            String className = ( String ) iter.next();
+        for ( Iterator<String> iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+            String className = iter.next();
             double pval = cpv.classPvalue( className, group_pval_map, probesToPvals );
 
             log.debug( "pval: " + pval );

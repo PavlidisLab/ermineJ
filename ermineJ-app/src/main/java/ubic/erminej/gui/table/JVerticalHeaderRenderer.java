@@ -35,14 +35,17 @@ import ubic.basecode.graphics.text.Util;
  */
 public class JVerticalHeaderRenderer extends JTableHeader implements TableCellRenderer {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -236801351350339640L;
     String m_columnName;
     final int PREFERRED_HEIGHT = 80;
     final int MAX_TEXT_LENGTH = 12;
 
     // This method is called each time a column header
     // using this renderer needs to be rendered.
-    @SuppressWarnings("unused")
-    public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
+    public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected, boolean hasFocus,
             int rowIndex, int vColIndex ) {
         // 'value' is column header value of column 'vColIndex'
         // rowIndex is always -1
@@ -90,12 +93,10 @@ public class JVerticalHeaderRenderer extends JTableHeader implements TableCellRe
     }
 
     @Override
-    @SuppressWarnings("unused")
     protected void firePropertyChange( String propertyName, Object oldValue, Object newValue ) {
     }
 
     @Override
-    @SuppressWarnings("unused")
     public void firePropertyChange( String propertyName, boolean oldValue, boolean newValue ) {
     }
 }

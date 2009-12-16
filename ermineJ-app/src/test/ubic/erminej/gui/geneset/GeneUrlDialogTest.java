@@ -18,7 +18,6 @@
  */
 package ubic.erminej.gui.geneset;
 
-import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -42,11 +41,9 @@ public class GeneUrlDialogTest {
         } catch ( UnsupportedLookAndFeelException e ) {
             e.printStackTrace();
         }
-        JFrame foo = new JFrame();
 
-        GeneUrlDialog app = new GeneUrlDialog( foo, null, null );
+        new GeneUrlDialog( null, null );
 
-        // app.show();
     }
 
 }

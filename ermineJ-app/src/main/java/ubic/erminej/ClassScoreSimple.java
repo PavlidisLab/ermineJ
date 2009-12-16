@@ -95,13 +95,11 @@ public class ClassScoreSimple {
         this.probes = probes;
         this.genes = genes;
         this.goAssociations = goAssociations;
-        try {
-            settings = new Settings( false );
-            settings.setQuantile( 50 );
-            settings.setMtc( Settings.BENJAMINIHOCHBERG );
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        }
+
+        settings = new Settings( false );
+        settings.setQuantile( 50 );
+        settings.setMtc( Settings.BENJAMINIHOCHBERG );
+
     }
 
     /**
@@ -115,7 +113,7 @@ public class ClassScoreSimple {
 
         if ( !results.getResults().containsKey( id ) ) return -1;
 
-        return ( ( GeneSetResult ) results.getResults().get( id ) ).getPvalue();
+        return results.getResults().get( id ).getPvalue();
     }
 
     /**

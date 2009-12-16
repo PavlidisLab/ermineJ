@@ -164,7 +164,7 @@ public class JGeneSetFrame extends JFrame {
     private JMatrixCellRenderer matrixCellRenderer = null;
     private JVerticalHeaderRenderer verticalHeaderRenderer = null;
     private List<String> probeIDs = null;
-    private Map pvalues = null;
+    private Map<String, Double> pvalues = null;
     private GeneAnnotations geneData = null;
     private String className = "";
     private boolean normalizeSavedData = false;
@@ -180,8 +180,8 @@ public class JGeneSetFrame extends JFrame {
      * @param settings <code>getRawFile()</code> should return the microarray file which contains the microarray data
      *        for the probe ID's contained in <code>probeIDs</code>.
      */
-    public JGeneSetFrame( String className, StatusViewer callerStatusViewer, List probeIDs, Map pvalues,
-            GeneAnnotations geneData, Settings settings ) {
+    public JGeneSetFrame( String className, StatusViewer callerStatusViewer, List<String> probeIDs,
+            Map<String, Double> pvalues, GeneAnnotations geneData, Settings settings ) {
 
         try {
             if ( settings == null ) {
@@ -226,7 +226,7 @@ public class JGeneSetFrame extends JFrame {
 
         // create a probe set from probeIDs
         probesInGeneSet = new HashSet<String>( probeIDs );
-        DoubleMatrix matrix = setUpMatrixData();
+        DoubleMatrix<String, String> matrix = setUpMatrixData();
 
         tableModel = new GeneSetTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf,
                 settings );
@@ -671,12 +671,12 @@ public class JGeneSetFrame extends JFrame {
 
     /**
      * @param out
-     * @param matrixColumnCount
+     * @param c
      * @param r
      * @throws IOException
      */
-    private void printAnnotationsForRow( BufferedWriter out, int matrixColumnCount, int r ) throws IOException {
-        int interestingStuffStartsAt = matrixColumnCount;
+    private void printAnnotationsForRow( BufferedWriter out, int c, int r ) throws IOException {
+        int interestingStuffStartsAt = c;
         int scoreColumn = interestingStuffStartsAt + 1;
         int symbolColumn = interestingStuffStartsAt + 3;
         int nameColumn = interestingStuffStartsAt + 4;
@@ -687,20 +687,20 @@ public class JGeneSetFrame extends JFrame {
 
     /**
      * @param includeMatrixValues
-     * @param includeAnnotations
+     * @param includeAnnots
      * @param out
-     * @param matrixColumnCount
+     * @param colCount
      * @throws IOException
      */
-    private void printHeader( boolean includeMatrixValues, boolean includeAnnotations, BufferedWriter out,
-            int matrixColumnCount ) throws IOException {
+    private void printHeader( boolean includeMatrixValues, boolean includeAnnots, BufferedWriter out, int colCount )
+            throws IOException {
         out.write( "Probe" );
-        if ( includeAnnotations ) {// FIXME - this is not maintainable!
+        if ( includeAnnots ) {// FIXME - this is not maintainable!
             out.write( "\tScore\tSymbol\tName" );
         }
         // write out column names
         if ( includeMatrixValues ) {
-            for ( int c = 0; c < matrixColumnCount; c++ ) {
+            for ( int c = 0; c < colCount; c++ ) {
                 String columnName = matrixDisplay.getColumnName( c ).toString();
                 out.write( "\t" + columnName );
             }
@@ -875,7 +875,7 @@ public class JGeneSetFrame extends JFrame {
      * @param normalized
      * @throws IOException
      */
-    protected void saveData( String filename, boolean includeMatrix, boolean includeAnnotations, boolean normalized )
+    protected void saveData( String filename, boolean includeMatrix, boolean addAnnots, boolean normalized )
             throws IOException {
 
         final String NEWLINE = System.getProperty( "line.separator" );
@@ -892,7 +892,7 @@ public class JGeneSetFrame extends JFrame {
         int totalRowCount = table.getRowCount();
         matrixColumnCount = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount();
 
-        printHeader( includeMatrix, includeAnnotations, out, matrixColumnCount );
+        printHeader( includeMatrix, addAnnots, out, matrixColumnCount );
 
         DecimalFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits( 8 );
@@ -905,7 +905,7 @@ public class JGeneSetFrame extends JFrame {
             String probeID = getProbeID( r );
             out.write( probeID );
 
-            if ( includeAnnotations ) {
+            if ( addAnnots ) {
                 printAnnotationsForRow( out, matrixColumnCount, r );
             }
 
@@ -923,7 +923,7 @@ public class JGeneSetFrame extends JFrame {
 
     } // end saveData
 
-    protected void saveImage( String filename, boolean includeLabels, boolean normalized ) throws IOException {
+    protected void saveImage( String filename, boolean normalized ) throws IOException {
         if ( matrixDisplay == null ) return;
         boolean isStandardized = matrixDisplay.getStandardizedEnabled();
         matrixDisplay.setStandardizedEnabled( normalized );
@@ -944,7 +944,7 @@ public class JGeneSetFrame extends JFrame {
 
     } // end saveImage
 
-    void m_blackbodyColormapMenuItem_actionPerformed( ActionEvent e ) {
+    void m_blackbodyColormapMenuItem_actionPerformed() {
 
         try {
             Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
@@ -989,7 +989,7 @@ public class JGeneSetFrame extends JFrame {
         table.repaint();
     }
 
-    void m_greenredColormapMenuItem_actionPerformed( ActionEvent e ) {
+    void m_greenredColormapMenuItem_actionPerformed( @SuppressWarnings("unused") ActionEvent e ) {
 
         try {
             Color[] colorMap = ColorMap.GREENRED_COLORMAP;
@@ -1001,7 +1001,7 @@ public class JGeneSetFrame extends JFrame {
 
     }
 
-    void m_normalizeMenuItem_actionPerformed( ActionEvent e ) {
+    void m_normalizeMenuItem_actionPerformed() {
 
         boolean normalize = m_normalizeMenuItem.isSelected();
         matrixDisplay.setStandardizedEnabled( normalize );
@@ -1010,7 +1010,7 @@ public class JGeneSetFrame extends JFrame {
         table.repaint();
     }
 
-    void m_saveDataMenuItem_actionPerformed( ActionEvent e ) {
+    void m_saveDataMenuItem_actionPerformed() {
         initChoosers();
         int returnVal = fileChooser.showSaveDialog( this );
         if ( returnVal == JFileChooser.APPROVE_OPTION ) {
@@ -1042,7 +1042,7 @@ public class JGeneSetFrame extends JFrame {
         // else canceled by user
     }
 
-    void m_saveImageMenuItem_actionPerformed( ActionEvent e ) {
+    void m_saveImageMenuItem_actionPerformed() {
         if ( matrixDisplay == null ) return;
         initChoosers();
         int returnVal = imageChooser.showSaveDialog( this );
@@ -1069,7 +1069,7 @@ public class JGeneSetFrame extends JFrame {
             }
             // Save the color matrix image
             try {
-                saveImage( filename, includeLabels, normalizeSavedImage );
+                saveImage( filename, normalizeSavedImage );
             } catch ( IOException ex ) {
                 GuiUtil.error( "There was an error saving the data to " + filename + "." );
             }
@@ -1081,7 +1081,7 @@ public class JGeneSetFrame extends JFrame {
     /**
      * @param e
      */
-    void m_viewHistMenuItem_actionPerformed( ActionEvent e ) {
+    void m_viewHistMenuItem_actionPerformed() {
         // if ( analysisResults != null ) {
         // JHistViewer f = new JHistViewer( analysisResults.getHist(), classResults.getEffectiveSize(), classResults
         // .getScore() );
@@ -1112,7 +1112,7 @@ public class JGeneSetFrame extends JFrame {
         }
     }
 
-    void table_mouseExited( MouseEvent e ) {
+    void table_mouseExited() {
         resetUrl();
     }
 
@@ -1169,8 +1169,8 @@ public class JGeneSetFrame extends JFrame {
     /**
      * @param e
      */
-    void viewGeneUrlDialogMenuItem_actionPerformed( ActionEvent e ) {
-        GeneUrlDialog d = new GeneUrlDialog( this, settings, this.tableModel );
+    void viewGeneUrlDialogMenuItem_actionPerformed() {
+        GeneUrlDialog d = new GeneUrlDialog( settings, this.tableModel );
         d.setVisible( true );
     }
 
@@ -1184,7 +1184,7 @@ class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter implements java.aw
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.m_blackbodyColormapMenuItem_actionPerformed( e );
+        adaptee.m_blackbodyColormapMenuItem_actionPerformed();
     }
 }
 
@@ -1231,14 +1231,17 @@ class JGeneSetFrame_m_mouseAdapter extends java.awt.event.MouseAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void mouseEntered( MouseEvent e ) {
         // adaptee.table_mouseEntered(e);
     }
 
+    @Override
     public void mouseExited( MouseEvent e ) {
-        adaptee.table_mouseExited( e );
+        adaptee.table_mouseExited();
     }
 
+    @Override
     public void mouseReleased( MouseEvent e ) {
         adaptee.table_mouseReleased( e );
     }
@@ -1268,7 +1271,7 @@ class JGeneSetFrame_m_normalizeMenuItem_actionAdapter implements java.awt.event.
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.m_normalizeMenuItem_actionPerformed( e );
+        adaptee.m_normalizeMenuItem_actionPerformed();
     }
 }
 
@@ -1280,7 +1283,7 @@ class JGeneSetFrame_m_saveDataMenuItem_actionAdapter implements java.awt.event.A
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.m_saveDataMenuItem_actionPerformed( e );
+        adaptee.m_saveDataMenuItem_actionPerformed();
     }
 }
 
@@ -1292,7 +1295,7 @@ class JGeneSetFrame_m_saveImageMenuItem_actionAdapter implements java.awt.event.
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.m_saveImageMenuItem_actionPerformed( e );
+        adaptee.m_saveImageMenuItem_actionPerformed();
     }
 }
 
@@ -1304,7 +1307,7 @@ class JGeneSetFrame_m_viewHistMenuItem_actionAdapter implements java.awt.event.A
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.m_viewHistMenuItem_actionPerformed( e );
+        adaptee.m_viewHistMenuItem_actionPerformed();
     }
 }
 
@@ -1320,7 +1323,7 @@ class JGeneSetFrame_viewGeneUrlDialog_actionAdapter implements java.awt.event.Ac
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.viewGeneUrlDialogMenuItem_actionPerformed( e );
+        adaptee.viewGeneUrlDialogMenuItem_actionPerformed();
     }
 }
 
@@ -1331,6 +1334,7 @@ class JGeneSetFrame_windowListenerAdapter extends java.awt.event.WindowAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void windowClosing( WindowEvent e ) {
         adaptee.closeWindow_actionPerformed( e );
     }
@@ -1343,10 +1347,12 @@ class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends java.awt.event.
         this.adaptee = adaptee;
     }
 
+    @Override
     public void mouseEntered( MouseEvent e ) {
         adaptee.setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
     }
 
+    @Override
     public void mouseExited( MouseEvent e ) {
         adaptee.setCursor( Cursor.getDefaultCursor() );
     }

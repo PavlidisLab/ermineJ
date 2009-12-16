@@ -99,7 +99,7 @@ public class GeneSetWizardStep1A extends WizardStep {
         searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
         searchTextField.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                find( e );
+                find();
             }
         } );
 
@@ -151,7 +151,7 @@ public class GeneSetWizardStep1A extends WizardStep {
         showStatus( "Available sets: " + geneData.selectedSets() );
     }
 
-    public void find( ActionEvent e ) {
+    public void find() {
         String searchOn = searchTextField.getText();
 
         if ( searchOn.equals( "" ) ) {
@@ -171,7 +171,7 @@ class ModClassTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 6796737347744570727L;
     GeneAnnotations geneData;
     GONames goData;
-    Vector columnNames = new Vector();
+    Vector<String> columnNames = new Vector<String>();
     private NumberFormat nf = NumberFormat.getInstance();
 
     public ModClassTableModel( GeneAnnotations geneData, GONames goData ) {
@@ -186,7 +186,7 @@ class ModClassTableModel extends AbstractTableModel {
 
     @Override
     public String getColumnName( int i ) {
-        return ( String ) columnNames.get( i );
+        return columnNames.get( i );
     }
 
     public int getColumnCount() {
@@ -225,7 +225,7 @@ class GeneSetWizardStep1A_searchButton_actionAdapter implements ActionListener {
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.find( e );
+        adaptee.find();
 
     }
 

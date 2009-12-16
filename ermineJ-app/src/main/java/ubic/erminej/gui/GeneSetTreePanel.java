@@ -45,9 +45,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ubic.basecode.util.StringUtil;
 
 import ubic.basecode.bio.GOEntry;
@@ -73,21 +70,19 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     private static final long serialVersionUID = 0L;
     private double fdrThreshold = 0.1;
-    private static Log log = LogFactory.getLog( GeneSetTreePanel.class.getName() );
     private JTree goTree = null;
     private GeneSetPvalRun currentResultSet;
     protected String currentlySelectedGeneSet = null;
     protected int currentlySelectedResultSetIndex = -1;
     private BaseCellRenderer rend;
-    private Collection geneSets;
+    private Collection<String> geneSets;
 
-    public GeneSetTreePanel( GeneSetScoreFrame callingFrame, List results, Settings settings ) {
+    public GeneSetTreePanel( GeneSetScoreFrame callingFrame, List<GeneSetPvalRun> results, Settings settings ) {
         super( settings, results, callingFrame );
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#addedNewGeneSet()
      */
     @Override
@@ -97,7 +92,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
-     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#addRun()
      */
     @Override
@@ -206,12 +200,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param goData
      * @param geneData
      */
-    public void initialize( GONames goData, GeneAnnotations geneData ) {
+    public void initialize( GONames go, GeneAnnotations gd ) {
         // assert goData != null : "Go data is still null";
         // assert geneData != null : "Gene data is still null";
-        this.geneData = geneData;
-        this.goData = goData;
-        setUpTree( goData );
+        this.geneData = gd;
+        this.goData = go;
+        setUpTree( go );
 
         this.getViewport().add( goTree );
         this.goTree.setVisible( true );
@@ -272,7 +266,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
-     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#resetView()
      */
     @Override
@@ -475,7 +468,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
-     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
      */
     @Override
@@ -574,7 +566,6 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      */
     private static final String GOODPVAL_GOODCHILD_ICON = RESOURCE_LOCATION + "goldCirclePurpleDot.gif";
 
-    private static Log log = LogFactory.getLog( BaseCellRenderer.class.getName() );
     private int currentlySelectedResultSet = -1;
     private GeneAnnotations geneData;
     private GeneSetTreePanel panel;
@@ -587,10 +578,11 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
     private Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
 
-    private final List results;
+    private final List<GeneSetPvalRun> results;
     private boolean selected;
 
-    public BaseCellRenderer( GONames goData, GeneAnnotations geneData, GeneSetTreePanel panel, List results ) {
+    public BaseCellRenderer( GONames goData, GeneAnnotations geneData, GeneSetTreePanel panel,
+            List<GeneSetPvalRun> results ) {
         super();
         this.results = results;
         this.panel = panel;
@@ -679,7 +671,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         assert res != null;
         assert res.getResults() != null;
         if ( hasResults( id, res ) ) {
-            GeneSetResult result = ( GeneSetResult ) res.getResults().get( id );
+            GeneSetResult result = res.getResults().get( id );
             double pvalue = result.getPvalue();
             displayedText = displayedText + " -- p = " + nf.format( pvalue );
             double pvalCorr = result.getCorrectedPvalue();
@@ -710,14 +702,13 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      * @return
      */
     private boolean hasResults( String id, GeneSetPvalRun res ) {
-        return res.getResults().get( id ) != null && ( ( GeneSetResult ) res.getResults().get( id ) ).getPvalue() < 1.0;
+        return res.getResults().get( id ) != null && res.getResults().get( id ).getPvalue() < 1.0;
     }
 
     /**
      * @param currentlySelectedResultSet
      */
     public void setCurrentResultSet( int currentlySelectedResultSet ) {
-        log.debug( "Setting results to " + currentlySelectedResultSet );
         this.currentlySelectedResultSet = currentlySelectedResultSet;
         this.validate();
         this.repaint();

@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -60,7 +59,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     protected GeneAnnotations geneData;
     protected GONames goData;
     protected StatusViewer messenger;
-    protected List results;
+    protected List<GeneSetPvalRun> results;
     protected int selectedRun;
     protected Settings settings;
     protected OutputPanelPopupMenu popup;
@@ -69,7 +68,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     public static final String DELETED = "DELETED";
     public static final int MAX_DEFINITION_LENGTH = 200;
 
-    public GeneSetPanel( Settings settings, List results, GeneSetScoreFrame callingFrame ) {
+    public GeneSetPanel( Settings settings, List<GeneSetPvalRun> results, GeneSetScoreFrame callingFrame ) {
         this.settings = settings;
         this.results = results;
         this.callingFrame = callingFrame;
@@ -111,10 +110,9 @@ public abstract class GeneSetPanel extends JScrollPane {
         if ( classID == null ) return;
         // create the URL and show it
         try {
-            // new JWebBrowser( URL );
             BrowserLauncher.openURL( AMIGO_URL_BASE + classID );
-        } catch ( IOException e1 ) {
-            GuiUtil.error( "Could not open a web browser window." );
+        } catch ( Exception e1 ) {
+            GuiUtil.error( "Could not open a web browser window" );
         }
     }
 
@@ -155,8 +153,8 @@ public abstract class GeneSetPanel extends JScrollPane {
                     if ( runnum < 0 ) {
                         details.show();
                     } else {
-                        GeneSetPvalRun run = ( GeneSetPvalRun ) results.get( runnum );
-                        GeneSetResult res = ( GeneSetResult ) run.getResults().get( id );
+                        GeneSetPvalRun run = results.get( runnum );
+                        GeneSetResult res = run.getResults().get( id );
                         details.show( run.getName(), res, run.getGeneScores() );
                     }
                     if ( messenger != null ) messenger.clear();

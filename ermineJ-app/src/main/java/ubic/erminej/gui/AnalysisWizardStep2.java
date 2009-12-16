@@ -186,7 +186,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         return true;
     }
 
-    void rawBrowseButton_actionPerformed( ActionEvent e ) {
+    void rawBrowseButton_actionPerformed() {
         chooser.setCurrentDirectory( new File( settings.getRawDataFileDirectory() ) );
         chooser.setDialogTitle( "Choose Raw Data File" );
         wiz.clearStatus();
@@ -197,7 +197,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         }
     }
 
-    void scoreBrowseButton_actionPerformed( ActionEvent e ) {
+    void scoreBrowseButton_actionPerformed() {
         chooser.setCurrentDirectory( new File( settings.getGeneScoreFileDirectory() ) );
         chooser.setDialogTitle( "Choose Gene Score File" );
         wiz.clearStatus();
@@ -235,7 +235,7 @@ class AnalysisWizardStep2_rawBrowseButton_actionAdapter implements java.awt.even
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.rawBrowseButton_actionPerformed( e );
+        adaptee.rawBrowseButton_actionPerformed();
     }
 }
 
@@ -247,6 +247,6 @@ class AnalysisWizardStep2_scoreBrowseButton_actionAdapter implements java.awt.ev
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.scoreBrowseButton_actionPerformed( e );
+        adaptee.scoreBrowseButton_actionPerformed();
     }
 }

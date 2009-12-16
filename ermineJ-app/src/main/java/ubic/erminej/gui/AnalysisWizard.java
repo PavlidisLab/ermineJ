@@ -69,13 +69,12 @@ public class AnalysisWizard extends Wizard {
     AnalysisWizardStep5 step5;
     int maxSteps = 6;
 
-    public AnalysisWizard( GeneSetScoreFrame callingframe, Map geneDataSets, GONames goData ) {
+    public AnalysisWizard( GeneSetScoreFrame callingframe, Map<Integer, GeneAnnotations> geneDataSets, GONames goData ) {
         super( callingframe, WIZARD_PREFERRED_WIDTH, WIZARD_PREFERRED_HEIGHT );
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
 
-        if ( geneDataSets != null )
-            this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) );
+        if ( geneDataSets != null ) this.geneData = geneDataSets.get( new Integer( "original".hashCode() ) );
 
         this.goData = goData;
 
@@ -278,9 +277,9 @@ public class AnalysisWizard extends Wizard {
     }
 
     void loadAddedClasses() throws IOException {
-        Iterator it = step3.getAddedClasses().iterator();
+        Iterator<Map> it = step3.getAddedClasses().iterator();
         while ( it.hasNext() ) {
-            String id = ( String ) ( ( Map ) it.next() ).get( "id" );
+            String id = ( String ) ( ( Map<String, String> ) it.next() ).get( "id" );
             log.debug( "Adding " + id + " to genedata for analysis" );
             if ( !goData.isUserDefined( id ) ) {
                 UserDefinedGeneSetManager newGeneSet = new UserDefinedGeneSetManager( geneData, settings, id );

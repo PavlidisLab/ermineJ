@@ -65,7 +65,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * Get results for one class, based on class id. The other arguments are things that are not constant under
      * permutations of the data.
      */
-    public GeneSetResult classPval( String className, Map geneToScoreMap, Map probesToScores ) {
+    public GeneSetResult classPval( String className, Map<String, Double> geneToScoreMap,
+            Map<String, Double> probesToScores ) {
 
         if ( !super.checkAspect( className ) ) {
             if ( log.isDebugEnabled() ) log.debug( className + " is not in a selected aspect" );
@@ -83,14 +84,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             return null;
         }
 
-        int effectiveGeneSetSize = ( ( Integer ) effectiveSizes.get( className ) ).intValue();
+        int effectiveGeneSetSize = effectiveSizes.get( className );
         if ( effectiveGeneSetSize < settings.getMinClassSize() || effectiveGeneSetSize > settings.getMaxClassSize() ) {
             if ( log.isDebugEnabled() ) log.debug( "Class " + className + " is outside of selected size range" );
             return null;
         }
 
-        Collection probes = geneAnnots.getGeneSetProbes( className );
-        Iterator classit = probes.iterator();
+        Collection<String> probes = geneAnnots.getGeneSetProbes( className );
+        Iterator<String> classit = probes.iterator();
 
         // store pvalues for items in the class.
         double[] groupPvalArr = new double[effectiveGeneSetSize];
@@ -99,7 +100,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         while ( classit.hasNext() ) {
             ifInterruptedStop();
-            String probe = ( String ) classit.next(); // probe id
+            String probe = classit.next(); // probe id
 
             if ( probesToScores.containsKey( probe ) ) {
                 if ( settings.getUseWeights() ) {
@@ -111,7 +112,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                             throw new NullPointerException( "No gene score for " + probe );
                         }
 
-                        Double geneScore = ( Double ) geneToScoreMap.get( geneAnnots.getProbeToGeneMap().get( probe ) );
+                        Double geneScore = geneToScoreMap.get( geneAnnots.getProbeToGeneMap().get( probe ) );
 
                         if ( geneScore == null ) {
                             throw new NullPointerException( "Null gene score for " + probe );
@@ -133,7 +134,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                      * pvalue for this probe. This will not be null if things have been done correctly so far. This is
                      * the only place we need the raw pvalue for a probe.
                      */
-                    Double pbpval = ( Double ) probesToScores.get( probe );
+                    Double pbpval = probesToScores.get( probe );
 
                     double score = pbpval.doubleValue();
 
@@ -187,7 +188,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( goName != null ) {
             nameForId = goName.getNameForId( className );
         }
-        GeneSetResult res = new GeneSetResult( className, nameForId, ( ( Integer ) actualSizes.get( className ) )
+        GeneSetResult res = new GeneSetResult( className, nameForId, actualSizes.get( className )
                 .intValue(), effectiveGeneSetSize );
         res.setScore( successes );
         res.setPValue( oraPval );

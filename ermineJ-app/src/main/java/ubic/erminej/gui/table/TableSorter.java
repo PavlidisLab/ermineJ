@@ -53,8 +53,7 @@ import ubic.basecode.graphics.MatrixDisplay;
  * not store or copy the data in its TableModel; instead it maintains a map from the row indexes of the view to the row
  * indexes of the model. As requests are made of the sorter (like getValueAt(row, col)) they are passed to the
  * underlying model after the row numbers have been translated via the internal mapping array. This way, the TableSorter
- * appears to hold another copy of the table with the rows in a different order.
- * </p>
+ * appears to hold another copy of the table with the rows in a different order. </p>
  * <p>
  * TableSorter registers itself as a listener to the underlying model, just as the JTable itself would. Events recieved
  * from the model are examined, sometimes manipulated (typically widened), and then passed on to the TableSorter's
@@ -391,8 +390,8 @@ public class TableSorter extends AbstractTableModel {
                         if ( ( ( List ) o1 ).get( 0 ).getClass().equals( Double.class ) ) {
                             comparator = getComparator( Double.class );
                             // only comparing the first member of the list
-                            Double a = ( Double ) ( (  List ) o1 ).get( 0 );
-                            Double b = ( Double ) ( (  List ) o2 ).get( 0 );
+                            Double a = ( Double ) ( ( List ) o1 ).get( 0 );
+                            Double b = ( Double ) ( ( List ) o2 ).get( 0 );
 
                             // yes, we did get an array list, but we want to
                             // compare the Double values the array lists contain,

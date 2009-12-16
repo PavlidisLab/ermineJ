@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusViewer;
@@ -85,9 +86,9 @@ public class GeneSetPvalRun {
      * @param results
      * @param name Name of the run
      */
-    public GeneSetPvalRun( Set activeProbes, Settings settings, GeneAnnotations geneData, DoubleMatrix rawData,
-            GONames goData, GeneScores geneScores, StatusViewer messenger, Map<String, GeneSetResult> results,
-            String name ) {
+    public GeneSetPvalRun( Set<String> activeProbes, Settings settings, GeneAnnotations geneData,
+            DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
+            Map<String, GeneSetResult> results, String name ) {
         this.settings = settings;
         this.geneData = geneData;
 
@@ -114,7 +115,7 @@ public class GeneSetPvalRun {
 
         // For table output
         for ( int i = 0; i < sortedclasses.size(); i++ ) {
-            ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) ).setRank( i + 1 );
+            results.get( sortedclasses.get( i ) ).setRank( i + 1 );
         }
         messenger.showStatus( "Done!" );
     }
@@ -194,7 +195,7 @@ public class GeneSetPvalRun {
     /**
      * @return Map the results
      */
-    public List getSortedClasses() {
+    public List<String> getSortedClasses() {
         return sortedclasses;
     }
 
@@ -282,7 +283,7 @@ public class GeneSetPvalRun {
 
                 int inputSize = activeProbes.size();
 
-                Collection inp_entries = geneScores1.getProbeToScoreMap().entrySet();
+                Collection<Entry<String, Double>> inp_entries = geneScores1.getProbeToScoreMap().entrySet();
 
                 if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
 
@@ -327,7 +328,7 @@ public class GeneSetPvalRun {
             }
             case Settings.ROC: {
                 RocPvalGenerator rpg = new RocPvalGenerator( settings1, geneData1, csc, goData );
-                Map geneRanksMap;
+                Map<String, Integer> geneRanksMap;
                 if ( messenger != null ) messenger.showStatus( "Rank transforming" );
                 if ( settings1.getUseWeights() ) {
                     geneRanksMap = Rank.rankTransform( geneScores1.getGeneToPvalMap() );
@@ -365,7 +366,7 @@ public class GeneSetPvalRun {
     private void setGeneSetRanks() {
         // For table output
         for ( int i = 0; i < sortedclasses.size(); i++ ) {
-            ( ( GeneSetResult ) results.get( sortedclasses.get( i ) ) ).setRank( i + 1 );
+            results.get( sortedclasses.get( i ) ).setRank( i + 1 );
         }
     }
 

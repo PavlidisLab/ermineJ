@@ -53,12 +53,10 @@ public class GeneSetWizardStep1 extends WizardStep {
     private JTextField classFile;
     private JFileChooser chooser;
     int inputMethod;
-    private Settings settings;
 
     public GeneSetWizardStep1( GeneSetWizard wiz, Settings settings ) {
         super( wiz );
         this.jbInit();
-        this.settings = settings;
         chooser = new JFileChooser();
         chooser.setCurrentDirectory( new File( settings.getUserGeneSetDirectory() ) );
         chooser.setDialogTitle( "Choose Gene Set File" );
@@ -145,21 +143,21 @@ public class GeneSetWizardStep1 extends WizardStep {
         return true;
     }
 
-    void manInputButton_actionPerformed( ActionEvent e ) {
+    void manInputButton_actionPerformed() {
         classFile.setEditable( false );
         classFile.setEnabled( false );
         browseButton.setEnabled( false );
         inputMethod = 0;
     }
 
-    void fileInputButton_actionPerformed( ActionEvent e ) {
+    void fileInputButton_actionPerformed() {
         classFile.setEditable( true );
         classFile.setEnabled( true );
         browseButton.setEnabled( true );
         inputMethod = 1;
     }
 
-    void browseButton_actionPerformed( ActionEvent e ) {
+    void browseButton_actionPerformed() {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             classFile.setText( chooser.getSelectedFile().toString() );
@@ -183,7 +181,7 @@ class GeneSetWizardStep1_manInputButton_actionAdapter implements java.awt.event.
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.manInputButton_actionPerformed( e );
+        adaptee.manInputButton_actionPerformed();
     }
 }
 
@@ -195,7 +193,7 @@ class GeneSetWizardStep1_fileInputButton_actionAdapter implements java.awt.event
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.fileInputButton_actionPerformed( e );
+        adaptee.fileInputButton_actionPerformed();
     }
 }
 
@@ -207,6 +205,6 @@ class GeneSetWizardStep1_browseButton_actionAdapter implements java.awt.event.Ac
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.browseButton_actionPerformed( e );
+        adaptee.browseButton_actionPerformed();
     }
 }

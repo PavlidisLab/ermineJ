@@ -65,13 +65,13 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
     public GeneSetResult classPval( String geneSetName, Map<String, Double> geneToPvalMap,
             Map<String, Double> probesToPvals ) {
         if ( !super.checkAspect( geneSetName ) ) return null;
-        int effSize = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue();
+        int effSize = effectiveSizes.get( geneSetName );
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
             return null;
         }
 
-        Collection values = geneAnnots.getGeneSetProbes( geneSetName );
-        Iterator classit = values.iterator();
+        Collection<String> values = geneAnnots.getGeneSetProbes( geneSetName );
+        Iterator<String> classit = values.iterator();
         double[] groupPvalArr = new double[effSize]; // store pvalues for items in
         // the class.
 
@@ -82,7 +82,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         // foreach item in the class.
         while ( classit.hasNext() ) {
             ifInterruptedStop();
-            String probe = ( String ) classit.next(); // probe id
+            String probe = classit.next(); // probe id
 
             if ( probesToPvals.containsKey( probe ) ) { // if it is in the data
                 // set. This is invariant
@@ -90,18 +90,18 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
                 if ( settings.getUseWeights() ) {
 
-                    String gene = ( String ) geneAnnots.getProbeToGeneMap().get( probe );
+                    String gene = geneAnnots.getProbeToGeneMap().get( probe );
 
                     if ( !record.contains( gene ) ) { // only count it once.
 
                         record.add( gene ); // mark
-                        groupPvalArr[v_size] = ( ( Double ) geneToPvalMap.get( gene ) ).doubleValue();
+                        groupPvalArr[v_size] = geneToPvalMap.get( gene );
                         v_size++;
                     }
 
                 } else { // no weights - use raw p values for each probe
 
-                    Double pbpval = ( Double ) probesToPvals.get( probe );
+                    Double pbpval = probesToPvals.get( probe );
                     groupPvalArr[v_size] = pbpval.doubleValue();
                     v_size++;
                 }
@@ -123,8 +123,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( goName != null ) {
             nameForId = goName.getNameForId( geneSetName );
         }
-        GeneSetResult res = new GeneSetResult( geneSetName, nameForId, ( ( Integer ) actualSizes.get( geneSetName ) )
-                .intValue(), effSize );
+        GeneSetResult res = new GeneSetResult( geneSetName, nameForId, actualSizes.get( geneSetName ), effSize );
         res.setScore( rawscore );
         res.setPValue( pval );
         return res;

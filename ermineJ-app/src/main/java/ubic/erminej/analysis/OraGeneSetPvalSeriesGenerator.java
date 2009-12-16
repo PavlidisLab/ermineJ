@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import ubic.basecode.util.StatusViewer;
 
@@ -69,10 +70,10 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
                 goName, inputSize );
 
         int count = 0;
-        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<String> iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
 
-            String geneSetName = ( String ) iter.next();
+            String geneSetName = iter.next();
             // log.debug( "Analyzing " + geneSetName );
             GeneSetResult res = cpv.classPval( geneSetName, geneToGeneScoreMap, probesToPvals );
             if ( res != null ) {
@@ -94,7 +95,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
      * @return number of entries that meet the user-set threshold.
      * @todo make this private and called by OraPvalGenerator.
      */
-    public int hgSizes( Collection inp_entries ) {
+    public int hgSizes( Collection<Entry<String, Double>> inp_entries ) {
 
         double geneScoreThreshold = settings.getPValThreshold();
 
@@ -102,11 +103,11 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
             geneScoreThreshold = -Arithmetic.log10( geneScoreThreshold );
         }
 
-        Iterator itr = inp_entries.iterator();
+        Iterator<Entry<String, Double>> itr = inp_entries.iterator();
         while ( itr.hasNext() ) {
             ifInterruptedStop();
-            Map.Entry m = ( Map.Entry ) itr.next();
-            double geneScore = ( ( Double ) m.getValue() ).doubleValue();
+            Entry<String, Double> m = itr.next();
+            double geneScore = m.getValue();
 
             if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
                 numOverThreshold++;

@@ -45,7 +45,7 @@ import ubic.erminej.data.GeneSetResult;
 public class ResultsPrinter {
     private static Log log = LogFactory.getLog( ResultsPrinter.class.getName() );
     protected String destFile;
-    protected List sortedclasses;
+    protected List<String> sortedclasses;
     protected Map<String, GeneSetResult> results;
     protected GONames goName;
     protected GeneAnnotations geneData;
@@ -110,8 +110,8 @@ public class ResultsPrinter {
         GeneSetResult res = null;
         if ( sort ) {
             // in order of best score.
-            for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
-                res = ( GeneSetResult ) results.get( it.next() );
+            for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
+                res = results.get( it.next() );
                 if ( first ) {
                     first = false;
                     res.printHeadings( out, "\tSame as" + "\tGeneMembers" );
@@ -125,7 +125,7 @@ public class ResultsPrinter {
             List<String> c = new ArrayList<String>( results.keySet() );
             Collections.sort( c );
             for ( Iterator<String> it = c.iterator(); it.hasNext(); ) {
-                res = ( GeneSetResult ) results.get( it.next() );
+                res = results.get( it.next() );
                 if ( first ) {
                     first = false;
                     res.printHeadings( out, "\tSame as" + "\tGenesMembers" );
@@ -157,8 +157,8 @@ public class ResultsPrinter {
         List<String> sortedGenes = new ArrayList<String>( genes );
         Collections.sort( sortedGenes );
         StringBuffer buf = new StringBuffer();
-        for ( Iterator iter = sortedGenes.iterator(); iter.hasNext(); ) {
-            String gene = ( String ) iter.next();
+        for ( Iterator<String> iter = sortedGenes.iterator(); iter.hasNext(); ) {
+            String gene = iter.next();
             buf.append( gene + "|" );
         }
         return buf.toString();
@@ -171,12 +171,12 @@ public class ResultsPrinter {
      * @return String
      */
     private String formatRedundantAndSimilar( String classid ) {
-        List redund = GeneSetMapTools.getRedundancies( classid, geneData.geneSetToRedundantMap() );
+        Collection<String> redund = GeneSetMapTools.getRedundancies( classid, geneData.geneSetToRedundantMap() );
         String return_value = "";
         if ( redund != null ) {
-            Iterator it = redund.iterator();
+            Iterator<String> it = redund.iterator();
             while ( it.hasNext() ) {
-                String nextid = ( String ) it.next();
+                String nextid = it.next();
                 return_value = return_value + nextid + "|" + goName.getNameForId( nextid ) + ", ";
             }
         }

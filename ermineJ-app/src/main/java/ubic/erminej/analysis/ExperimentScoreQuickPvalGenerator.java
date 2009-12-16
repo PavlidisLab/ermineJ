@@ -51,16 +51,16 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
      * @throws IllegalStateException
      * @return double
      */
-    public double classPvalue( String geneSetName, Map genePvalueMap, Map probePvalMap ) {
+    public double classPvalue( String geneSetName, Map<String, Double> genePvalueMap, Map<String, Double> probePvalMap ) {
 
         double pval = 0.0;
         double rawscore = 0.0;
-        Collection values = geneAnnots.getGeneSetProbes( geneSetName );
-        Iterator classit = values.iterator();
+        Collection<String> values = geneAnnots.getGeneSetProbes( geneSetName );
+        Iterator<String> classit = values.iterator();
 
         if ( !super.checkAspect( geneSetName ) ) return -1.0;
 
-        int in_size = ( ( Integer ) effectiveSizes.get( geneSetName ) ).intValue(); // effective size of this class.
+        int in_size = effectiveSizes.get( geneSetName ); // effective size of this class.
         if ( in_size < settings.getMinClassSize() || in_size > settings.getMaxClassSize() ) {
             return -1.0;
         }
@@ -73,14 +73,14 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
 
         // foreach item in the class.
         while ( classit.hasNext() ) {
-            String probe = ( String ) classit.next(); // probe id
+            String probe = classit.next(); // probe id
 
             if ( probePvalMap.containsKey( probe ) ) { // if it is in the data
                 // set. This is invariant
                 // under permutations.
 
                 if ( settings.getUseWeights() ) {
-                    Double grouppval = ( Double ) genePvalueMap.get( geneAnnots.getProbeToGeneMap().get( probe ) ); // probe
+                    Double grouppval = genePvalueMap.get( geneAnnots.getProbeToGeneMap().get( probe ) ); // probe
                     // ->
                     // group
                     if ( !record.contains( geneAnnots.getProbeToGeneMap().get( probe ) ) ) { // if we

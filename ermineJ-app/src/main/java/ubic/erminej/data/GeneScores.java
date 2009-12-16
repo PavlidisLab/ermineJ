@@ -99,20 +99,15 @@ public class GeneScores {
      *        values)
      * @param settings
      */
-    public GeneScores( List probes, List scores, Map geneToProbeMap, Map probeToGeneMap, Settings settings ) {
+    public GeneScores( List<String> probes, List<Double> scores, Map<String, Collection<String>> geneToProbeMap,
+            Map<String, String> probeToGeneMap, Settings settings ) {
         if ( probes.size() != scores.size() ) {
             throw new IllegalArgumentException( "Probe and scores must be equal in number" );
         }
         if ( probes.size() == 0 ) {
             throw new IllegalArgumentException( "No probes" );
         }
-
-        if ( !( probes.get( 0 ) instanceof String ) ) {
-            throw new IllegalArgumentException( "Probes must be a list of Strings" );
-        }
-        if ( !( scores.get( 0 ) instanceof Double ) ) {
-            throw new IllegalArgumentException( "Scores must be a list of Doubles" );
-        }
+ 
         if ( geneToProbeMap == null || geneToProbeMap.size() == 0 ) {
             throw new IllegalStateException( "groupToProbeMap was not set." );
         }
@@ -134,8 +129,8 @@ public class GeneScores {
         int numRepeatedProbes = 0;
         Collection<String> unknownProbes = new HashSet<String>();
         for ( int i = 0; i < probes.size(); i++ ) {
-            String probe = ( String ) probes.get( i );
-            Double value = ( Double ) scores.get( i );
+            String probe = probes.get( i );
+            Double value = scores.get( i );
 
             // only keep probes that are in our array platform.
             if ( !probeToGeneMap.containsKey( probe ) ) {
@@ -283,6 +278,7 @@ public class GeneScores {
         return value;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
         for ( Iterator<String> iter = probeIDs.iterator(); iter.hasNext(); ) {
@@ -408,8 +404,8 @@ public class GeneScores {
                 numRepeatedProbes );
 
         // check if active probes and probes in the platform are the same.
-        for ( Iterator iter = geneAnnots.getProbeToGeneMap().keySet().iterator(); iter.hasNext(); ) {
-            String probe = ( String ) iter.next();
+        for ( Iterator<String> iter = geneAnnots.getProbeToGeneMap().keySet().iterator(); iter.hasNext(); ) {
+            String probe = iter.next();
             if ( !probeToScoreMap.keySet().contains( probe ) ) {
                 log.debug( "Activeprobes must be set - data doesn't contain " + probe );
                 assert geneAnnots != null;
@@ -494,11 +490,12 @@ public class GeneScores {
      * @param geneToProbeMap - this should be generated from the annotation file.
      * @param messenger
      */
-    private void setUpGeneToScoreMap( Settings settings, Map geneToProbeMap, StatusViewer messenger ) {
+    private void setUpGeneToScoreMap( Settings settings, Map<String, Collection<String>> geneToProbeMap,
+            StatusViewer messenger ) {
 
         int gp_method = settings.getGeneRepTreatment();
 
-        Collection genes = null;
+        Collection<String> genes = null;
         if ( geneToProbeMap != null ) {
             genes = geneToProbeMap.keySet();
         } else {
@@ -508,20 +505,20 @@ public class GeneScores {
         double[] geneScoreTemp = new double[genes.size()];
         int counter = 0;
 
-        for ( Iterator groupMapItr = genes.iterator(); groupMapItr.hasNext(); ) {
+        for ( Iterator<String> groupMapItr = genes.iterator(); groupMapItr.hasNext(); ) {
 
             if ( Thread.currentThread().isInterrupted() ) {
                 return;
             }
 
-            String geneSymbol = ( String ) groupMapItr.next();
+            String geneSymbol = groupMapItr.next();
             /*
              * probes in this group according to the array platform.
              */
-            Collection probes;
+            Collection<String> probes;
 
             if ( geneToProbeMap != null ) {
-                probes = ( Collection ) geneToProbeMap.get( geneSymbol );
+                probes = geneToProbeMap.get( geneSymbol );
             } else {
                 probes = geneAnnots.getGeneProbes( geneSymbol );
             }
@@ -530,8 +527,8 @@ public class GeneScores {
             if ( probes == null ) continue;
 
             // Analyze all probes in this 'group' (pointing to the same gene)
-            for ( Iterator pbItr = probes.iterator(); pbItr.hasNext(); ) {
-                String probe = ( String ) pbItr.next();
+            for ( Iterator<String> pbItr = probes.iterator(); pbItr.hasNext(); ) {
+                String probe = pbItr.next();
 
                 if ( !probeToScoreMap.containsKey( probe ) ) {
                     continue;

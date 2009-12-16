@@ -20,7 +20,6 @@ package ubic.erminej.gui;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 
 import javax.swing.JLabel;
 
@@ -65,31 +64,27 @@ public class JLinkLabel extends JLabel implements MouseListener {
         return m_url;
     }
 
-    @SuppressWarnings("unused")
     public void mouseClicked( MouseEvent e ) {
         if ( m_url != null ) {
             try {
                 BrowserLauncher.openURL( m_url );
-            } catch ( IOException ex ) {
+            } catch ( Exception ex ) {
                 GuiUtil.error( "Could not open a web browser window." );
             }
         }
     }
 
-    @SuppressWarnings("unused")
     public void mouseEntered( MouseEvent e ) {
     }
 
-    @SuppressWarnings("unused")
     public void mouseExited( MouseEvent e ) {
     }
 
-    @SuppressWarnings("unused")
     public void mousePressed( MouseEvent e ) {
     }
 
-    @SuppressWarnings("unused")
     public void mouseReleased( MouseEvent e ) {
+
     }
 
     @Override

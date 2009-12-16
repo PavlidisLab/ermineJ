@@ -101,7 +101,7 @@ public class Settings {
             MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
             BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT,
             CLASS_SCORE_METHOD, FILTER_NONSPECIFIC };
-    
+
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
      */
@@ -133,7 +133,7 @@ public class Settings {
         this( true );
     }
 
-    public Settings( boolean readFromFile ) throws IOException {
+    public Settings( boolean readFromFile ) {
         if ( readFromFile ) {
             initConfig();
             // createDataDirectory();
@@ -148,6 +148,7 @@ public class Settings {
      * 
      * @param settings - settings object to copy
      */
+    @SuppressWarnings("unchecked")
     public Settings( Settings settingsToCopy ) {
         this.config = new PropertiesConfiguration();
         PropertiesConfiguration oldConfig = settingsToCopy.getConfig();
@@ -385,7 +386,7 @@ public class Settings {
     public int getScoreCol() {
         return config.getInteger( SCORE_COL, new Integer( 2 ) ).intValue();
     }
-    
+
     public boolean getFilterNonSpecific() {
         return config.getBoolean( FILTER_NONSPECIFIC );
     }
@@ -394,7 +395,8 @@ public class Settings {
         return config.getString( SCORE_FILE );
     }
 
-    public Collection getSelectedCustomGeneSets() {
+    @SuppressWarnings("unchecked")
+    public Collection<String> getSelectedCustomGeneSets() {
         return config.getList( SELECTED_CUSTOM_GENESETS, null );
     }
 
@@ -521,9 +523,9 @@ public class Settings {
     public void setDoLog( boolean val ) {
         this.config.setProperty( DO_LOG, new Boolean( val ) );
     }
-    
-    public void setFilterNonSpecific(boolean val) {
-        this.config.setProperty( FILTER_NONSPECIFIC, new Boolean(val) );
+
+    public void setFilterNonSpecific( boolean val ) {
+        this.config.setProperty( FILTER_NONSPECIFIC, new Boolean( val ) );
     }
 
     public void setGeneRepTreatment( int val ) {
@@ -608,7 +610,7 @@ public class Settings {
         this.config.setProperty( SCORE_FILE, val );
     }
 
-    public void setSelectedCustomGeneSets( Collection selectedSets ) {
+    public void setSelectedCustomGeneSets( Collection<String> selectedSets ) {
         this.config.setProperty( SELECTED_CUSTOM_GENESETS, selectedSets );
     }
 

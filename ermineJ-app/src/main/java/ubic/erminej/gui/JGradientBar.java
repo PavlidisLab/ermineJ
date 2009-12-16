@@ -85,8 +85,8 @@ public class JGradientBar extends JPanel {
 class JGradientLabel extends JLabel {
 
     // fields
-    protected static final int WIDTH = 100;
-    protected static final int HEIGHT = 20;
+    protected static final int w = 100;
+    protected static final int h = 20;
     /**
      * 
      */
@@ -117,7 +117,7 @@ class JGradientLabel extends JLabel {
 
         m_colorMap = colorMap;
 
-        Dimension d = new Dimension( WIDTH, HEIGHT );
+        Dimension d = new Dimension( w, h );
         setSize( d );
         setPreferredSize( d );
     } // end constructor
@@ -158,7 +158,7 @@ class JNumberLabel extends JLabel {
     protected static final DecimalFormat m_scientificNotation = new DecimalFormat( "0.##E0" );
     protected static final DecimalFormat m_regular = new DecimalFormat();
     protected static final int MINIMUM_WIDTH = 100;
-    protected static final int WIDTH = 40;
+    protected static final int w = 40;
     /**
      * 
      */
@@ -192,7 +192,7 @@ class JNumberLabel extends JLabel {
     protected void init() {
         // setOpaque( true );
         // setBackground( Color.lightGray );
-        Dimension d = new Dimension( WIDTH, JGradientLabel.HEIGHT );
+        Dimension d = new Dimension( w, JGradientLabel.h );
         setSize( d );
         setPreferredSize( d );
     }

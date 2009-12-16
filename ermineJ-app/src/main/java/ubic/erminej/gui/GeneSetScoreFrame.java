@@ -76,6 +76,7 @@ import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.AnalysisThread;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 
@@ -127,7 +128,7 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenuItem findGeneMenuItem = new JMenuItem();
     private GeneAnnotations geneData = null;
     private Map<Integer, GeneAnnotations> geneDataSets;
-    private Map geneScoreSets;
+    private Map<String, GeneScores> geneScoreSets;
     private GONames goData;
     private JMenu helpMenu = new JMenu();
     private JMenuItem helpMenuItem = new JMenuItem();
@@ -274,7 +275,7 @@ public class GeneSetScoreFrame extends JFrame {
     /**
      * @return Returns the geneDataSets.
      */
-    public Map getGeneDataSets() {
+    public Map<Integer, GeneAnnotations> getGeneDataSets() {
         return geneDataSets;
     }
 
@@ -291,7 +292,7 @@ public class GeneSetScoreFrame extends JFrame {
      * @return
      */
     public GeneAnnotations getOriginalGeneData() {
-        return ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) );
+        return geneDataSets.get( new Integer( "original".hashCode() ) );
     }
 
     /**
@@ -325,7 +326,7 @@ public class GeneSetScoreFrame extends JFrame {
 
             rawDataSets = new HashMap<String, DoubleMatrix<String, String>>();
             geneDataSets = new HashMap<Integer, GeneAnnotations>();
-            geneScoreSets = new HashMap();
+            geneScoreSets = new HashMap<String, GeneScores>();
 
             readDataFilesForStartup();
 
@@ -447,8 +448,8 @@ public class GeneSetScoreFrame extends JFrame {
     protected void loadUserGeneSets() {
         UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
         this.userOverwrittenGeneSets = loader.loadUserGeneSets( this.goData, this.statusMessenger );
-        for ( Iterator iter = goData.getUserDefinedGeneSets().iterator(); iter.hasNext(); ) {
-            String id = ( String ) iter.next();
+        for ( Iterator<String> iter = goData.getUserDefinedGeneSets().iterator(); iter.hasNext(); ) {
+            String id = iter.next();
             treePanel.addNode( id, goData.getNameForId( id ) );
         }
     }
@@ -477,7 +478,7 @@ public class GeneSetScoreFrame extends JFrame {
      */
     public void setCurrentResultSet( String resultSetName ) {
         for ( int i = 0; i < results.size(); i++ ) {
-            GeneSetPvalRun element = ( GeneSetPvalRun ) results.get( i );
+            GeneSetPvalRun element = results.get( i );
             if ( element.getName().equals( resultSetName ) ) {
                 this.setCurrentResultSet( i );
             }
@@ -1000,8 +1001,8 @@ public class GeneSetScoreFrame extends JFrame {
     protected void updateRunViewMenu() {
         log.debug( "Updating runViewMenu" );
         runViewMenu.removeAll();
-        for ( Iterator iter = this.results.iterator(); iter.hasNext(); ) {
-            GeneSetPvalRun resultSet = ( GeneSetPvalRun ) iter.next();
+        for ( Iterator<GeneSetPvalRun> iter = this.results.iterator(); iter.hasNext(); ) {
+            GeneSetPvalRun resultSet = iter.next();
             String name = resultSet.getName();
             log.debug( "Adding " + name );
             JMenuItem newSet = new JMenuItem();

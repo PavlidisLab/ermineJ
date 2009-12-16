@@ -145,15 +145,15 @@ public class AnalysisWizardStep1 extends WizardStep {
         return true;
     }
 
-    void corrButton_actionPerformed( ActionEvent e ) {
+    void corrButton_actionPerformed() {
         wiz.setAnalysisType( Settings.CORR );
     }
 
-    void resampButton_actionPerformed( ActionEvent e ) {
+    void resampButton_actionPerformed() {
         wiz.setAnalysisType( Settings.RESAMP );
     }
 
-    void oraButton_actionPerformed( ActionEvent e ) {
+    void oraButton_actionPerformed() {
         wiz.setAnalysisType( Settings.ORA );
     }
 
@@ -189,7 +189,7 @@ class AnalysisWizardStep1_oraButton_actionAdapter implements java.awt.event.Acti
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.oraButton_actionPerformed( e );
+        adaptee.oraButton_actionPerformed();
     }
 }
 
@@ -201,7 +201,7 @@ class AnalysisWizardStep1_corrButton_actionAdapter implements java.awt.event.Act
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.corrButton_actionPerformed( e );
+        adaptee.corrButton_actionPerformed();
     }
 }
 
@@ -213,6 +213,6 @@ class AnalysisWizardStep1_resampButton_actionAdapter implements java.awt.event.A
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.resampButton_actionPerformed( e );
+        adaptee.resampButton_actionPerformed();
     }
 }

@@ -55,9 +55,9 @@ public class GeneSetTableModel extends AbstractTableModel {
     private static final long serialVersionUID = -8155800933946966811L;
     private static final String URL_REPLACE_TAG = "@@";
     private MatrixDisplay m_matrixDisplay;
-    private List probeIDs;
-    private Map m_pvalues;
-    private Map m_pvaluesOrdinalPosition;
+    private List<String> probeIDs;
+    private Map<String, Double> m_pvalues;
+    private Map<String, Integer> m_pvaluesOrdinalPosition;
     private GeneAnnotations geneData;
     private DecimalFormat m_nf;
     private Settings settings;
@@ -74,8 +74,8 @@ public class GeneSetTableModel extends AbstractTableModel {
      * @param geneData
      * @param nf
      */
-    public GeneSetTableModel( MatrixDisplay matrixDisplay, List probeIDs, Map pvalues, Map pvaluesOrdinalPosition,
-            GeneAnnotations geneData, DecimalFormat nf, Settings settings ) {
+    public GeneSetTableModel( MatrixDisplay matrixDisplay, List<String> probeIDs, Map<String, Double> pvalues,
+            Map<String, Integer> pvaluesOrdinalPosition, GeneAnnotations geneData, DecimalFormat nf, Settings settings ) {
 
         m_matrixDisplay = matrixDisplay;
         this.probeIDs = probeIDs;
@@ -94,8 +94,8 @@ public class GeneSetTableModel extends AbstractTableModel {
     private void createLinkLabels() {
         assert probeIDs != null;
         this.linkLabels = new HashMap<String, JLinkLabel>();
-        for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
-            String probe = ( String ) iter.next();
+        for ( Iterator<String> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            String probe = iter.next();
             String gene = geneData.getProbeGeneName( probe );
             if ( gene != null ) {
                 String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene );
@@ -119,6 +119,11 @@ public class GeneSetTableModel extends AbstractTableModel {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+     */
+    @Override
     public String getColumnName( int column ) {
 
         // matrix display ends
@@ -131,22 +136,34 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     } // end getColumnName
 
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.table.TableModel#getRowCount()
+     */
     public int getRowCount() {
         return probeIDs.size();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.table.TableModel#getColumnCount()
+     */
     public int getColumnCount() {
         int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
         return m_columnNames.length + matrixColumnCount;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.table.TableModel#getValueAt(int, int)
+     */
     public Object getValueAt( int row, int column ) {
 
         // matrix display ends
         int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
         // get the probeID for the current row
-        String probeID = ( String ) probeIDs.get( row );
+        String probeID = probeIDs.get( row );
 
         // If this is part of the matrix display
         if ( column < offset ) {
@@ -180,11 +197,11 @@ public class GeneSetTableModel extends AbstractTableModel {
                         values.add( 1, new Double( 1.0 ) );
                     } else {
                         // actual p value
-                        Double actualValue = ( Double ) m_pvalues.get( probeID );
+                        Double actualValue = m_pvalues.get( probeID );
                         values.add( 0, actualValue );
                         // expected p value, but only if we had an actual pvalue
                         if ( !Double.isNaN( actualValue.doubleValue() ) ) {
-                            int position = ( ( Integer ) m_pvaluesOrdinalPosition.get( probeID ) ).intValue();
+                            int position = m_pvaluesOrdinalPosition.get( probeID );
                             Double expectedValue = new Double( 1.0f / getRowCount() * ( position + 1 ) );
                             values.add( 1, expectedValue );
                         }

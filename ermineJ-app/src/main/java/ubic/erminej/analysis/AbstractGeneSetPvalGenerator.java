@@ -36,8 +36,8 @@ import ubic.erminej.Settings;
 
 public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( AbstractGeneSetPvalGenerator.class );
-    protected Map effectiveSizes = null;
-    protected Map actualSizes = null;
+    protected Map<String, Integer> effectiveSizes = null;
+    protected Map<String, Integer> actualSizes = null;
     protected GONames goName;
     protected Settings settings;
     protected GeneAnnotations geneAnnots;

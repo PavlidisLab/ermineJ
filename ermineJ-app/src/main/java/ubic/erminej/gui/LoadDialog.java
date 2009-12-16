@@ -89,7 +89,7 @@ public class LoadDialog extends AppDialog {
         hh.initHelp( helpButton );
     }
 
-    void loadBrowseButton_actionPerformed( ActionEvent e ) {
+    void loadBrowseButton_actionPerformed() {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             loadFile.setText( chooser.getSelectedFile().toString() );
@@ -118,10 +118,9 @@ public class LoadDialog extends AppDialog {
             GuiUtil.error( "File is not readable." );
         }
     } /*
-         * (non-Javadoc)
-         * 
-         * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
-         */
+       * (non-Javadoc)
+       * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
+       */
 
     @Override
     protected void helpButton_actionPerformed( ActionEvent e ) {
@@ -138,7 +137,7 @@ class LoadDialog_loadBrowseButton_actionAdapter implements java.awt.event.Action
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.loadBrowseButton_actionPerformed( e );
+        adaptee.loadBrowseButton_actionPerformed();
     }
 }
 

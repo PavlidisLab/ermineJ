@@ -169,7 +169,7 @@ public class StartupDialog extends AppDialog {
         // }
     }
 
-    void annotBrowseButton_actionPerformed( ActionEvent e ) {
+    void annotBrowseButton_actionPerformed() {
         chooser.setDialogTitle( "Choose the annotation file:" );
         DataFileFilter fileFilter = new DataFileFilter();
         chooser.setFileFilter( fileFilter ); // JFileChooser method
@@ -179,7 +179,7 @@ public class StartupDialog extends AppDialog {
         }
     }
 
-    void classBrowseButton_actionPerformed( ActionEvent e ) {
+    void classBrowseButton_actionPerformed() {
         chooser.setDialogTitle( "Choose the GO XML file:" );
         XMLFileFilter fileFilter = new XMLFileFilter();
         chooser.setFileFilter( fileFilter ); // JFileChooser method
@@ -229,7 +229,7 @@ public class StartupDialog extends AppDialog {
 
     }
 
-    void this_windowClosed( WindowEvent e ) {
+    void this_windowClosed() {
         System.exit( 0 );
     }
 
@@ -243,7 +243,7 @@ class StartupDialog_annotBrowseButton_actionAdapter implements java.awt.event.Ac
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.annotBrowseButton_actionPerformed( e );
+        adaptee.annotBrowseButton_actionPerformed();
     }
 }
 
@@ -256,7 +256,7 @@ class StartupDialog_this_windowAdapter extends java.awt.event.WindowAdapter {
 
     @Override
     public void windowClosing( WindowEvent e ) {
-        adaptee.this_windowClosed( e );
+        adaptee.this_windowClosed();
     }
 }
 
@@ -268,6 +268,6 @@ class StartupDialog_classBrowseButton_actionAdapter implements java.awt.event.Ac
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.classBrowseButton_actionPerformed( e );
+        adaptee.classBrowseButton_actionPerformed();
     }
 }

@@ -164,7 +164,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         return true;
     }
 
-    void delete_actionPerformed( ActionEvent e ) {
+    void delete_actionPerformed() {
         int[] rows = newClassTable.getSelectedRows();
         for ( int i = 0; i < rows.length; i++ ) {
             Object probe = newClassTable.getValueAt( rows[i] - i, 0 );
@@ -175,7 +175,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         updateCountLabel();
     }
 
-    void addButton_actionPerformed( ActionEvent e ) {
+    void addButton_actionPerformed() {
         int[] rows = probeTable.getSelectedRows();
         log.debug( rows.length + " rows selected" );
         for ( int i = 0; i < rows.length; i++ ) {
@@ -187,7 +187,7 @@ public class GeneSetWizardStep2 extends WizardStep {
                 this.addGene( newGene );
             }
         }
-        Set noDupes = new HashSet( newGeneSet.getProbes() );
+        Set<String> noDupes = new HashSet<String>( newGeneSet.getProbes() );
         newGeneSet.getProbes().clear();
         newGeneSet.getProbes().addAll( noDupes );
         ncTableModel.fireTableDataChanged();
@@ -213,7 +213,7 @@ public class GeneSetWizardStep2 extends WizardStep {
      * @param gene
      */
     void addGene( String gene ) {
-        Collection probelist = geneData.getGeneProbeList( gene );
+        Collection<String> probelist = geneData.getGeneProbeList( gene );
         if ( probelist == null ) {
             showError( "Gene " + gene + " does not exist." );
             return;
@@ -281,11 +281,11 @@ public class GeneSetWizardStep2 extends WizardStep {
     /**
      * do a search.
      */
-    public void searchButton_actionPerformed_adapter( ActionEvent e ) {
+    public void searchButton_actionPerformed_adapter() {
         find();
     }
 
-    void searchTextField_actionPerformed( ActionEvent e ) {
+    void searchTextField_actionPerformed() {
         find();
     }
 
@@ -309,7 +309,7 @@ class GeneSetWizardStep2_delete_actionPerformed_actionAdapter implements java.aw
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.delete_actionPerformed( e );
+        adaptee.delete_actionPerformed();
     }
 }
 
@@ -321,7 +321,7 @@ class GeneSetWizardStep2_addButton_actionAdapter implements java.awt.event.Actio
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.addButton_actionPerformed( e );
+        adaptee.addButton_actionPerformed();
     }
 }
 
@@ -367,7 +367,7 @@ class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.searchButton_actionPerformed_adapter( e );
+        adaptee.searchButton_actionPerformed_adapter();
     }
 }
 
@@ -419,7 +419,7 @@ class ProbeTableModel extends AbstractTableModel {
 
     public Object getValueAt( int i, int j ) {
 
-        String probeid = ( String ) geneData.getSelectedProbes().get( i );
+        String probeid = geneData.getSelectedProbes().get( i );
         switch ( j ) {
             case 0:
                 return probeid;
@@ -443,7 +443,7 @@ class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.searchButton_actionPerformed_adapter( e );
+        adaptee.searchButton_actionPerformed_adapter();
     }
 
 }
@@ -456,6 +456,6 @@ class GeneSetWizardStep2_searchTextField_actionAdapter implements java.awt.event
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.searchTextField_actionPerformed( e );
+        adaptee.searchTextField_actionPerformed();
     }
 }

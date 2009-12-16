@@ -168,7 +168,7 @@ public class FindDialog extends JDialog {
 
     }
 
-    public void resetButton_actionPerformed( ActionEvent e ) {
+    public void resetButton_actionPerformed() {
         searchTextField.setText( "" );
         geneData.resetSelectedSets();
         statusMessenger.showStatus( geneData.selectedSets() + " matching gene sets found." );
@@ -185,7 +185,6 @@ class FindFieldActionAdapter implements KeyListener {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed( KeyEvent e ) {
@@ -193,7 +192,6 @@ class FindFieldActionAdapter implements KeyListener {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
      */
     public void keyReleased( KeyEvent e ) {
@@ -203,7 +201,6 @@ class FindFieldActionAdapter implements KeyListener {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
      */
     public void keyTyped( KeyEvent e ) {
@@ -230,7 +227,7 @@ class FindDialog_resetButton_actionAdapter implements java.awt.event.ActionListe
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.resetButton_actionPerformed( e );
+        adaptee.resetButton_actionPerformed();
     }
 }
 

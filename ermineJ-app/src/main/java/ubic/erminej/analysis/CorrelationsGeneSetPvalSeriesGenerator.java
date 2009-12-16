@@ -21,10 +21,6 @@ package ubic.erminej.analysis;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
@@ -42,8 +38,6 @@ import ubic.erminej.data.Histogram;
  * @version $Id$
  */
 public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
-
-    protected static final Log log = LogFactory.getLog( CorrelationsGeneSetPvalSeriesGenerator.class );
 
     private CorrelationPvalGenerator classScoreGenerator;
 
@@ -80,10 +74,10 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
         classScoreGenerator.setTests( 0 );
         classScoreGenerator.setCacheHits( 0 );
 
-        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<String> iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
 
-            String geneSetName = ( String ) iter.next();
+            String geneSetName = iter.next();
             GeneSetResult res = classScoreGenerator.classPval( geneSetName );
             if ( res != null ) {
                 results.put( geneSetName, res );

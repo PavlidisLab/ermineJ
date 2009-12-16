@@ -27,7 +27,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -70,7 +69,6 @@ public abstract class AppDialog extends JDialog {
      * @param e
      */
     public void mouseButton_actionPerformed( MouseEvent e ) {
-        // TODO Auto-generated method stub
     }
 
     public void showDialog() {
@@ -176,14 +174,13 @@ public abstract class AppDialog extends JDialog {
 
         /*
          * (non-Javadoc)
-         * 
          * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
          */
         public void hyperlinkUpdate( HyperlinkEvent e ) {
             if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
                 try {
                     BrowserLauncher.openURL( e.getURL().toExternalForm() );
-                } catch ( IOException e1 ) {
+                } catch ( Exception e1 ) {
                     GuiUtil.error( "Could not open link" );
                 }
             }
@@ -241,47 +238,37 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
-    @SuppressWarnings("unused")
     public void mouseClicked( MouseEvent e ) {
         adaptee.mouseButton_actionPerformed( e );
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
      */
-    @SuppressWarnings("unused")
     public void mouseEntered( MouseEvent e ) {
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
      */
-    @SuppressWarnings("unused")
     public void mouseExited( MouseEvent e ) {
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
-    @SuppressWarnings("unused")
     public void mousePressed( MouseEvent e ) {
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
      */
-    @SuppressWarnings("unused")
     public void mouseReleased( MouseEvent e ) {
     }
 

@@ -61,13 +61,14 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value
      */
-    public Map<String, GeneSetResult> classPvalGenerator( Map genePvalueMap, Map rankMap, StatusViewer messenger ) {
+    public Map<String, GeneSetResult> classPvalGenerator( Map<String, Double> genePvalueMap,
+            Map<String, Integer> rankMap, StatusViewer messenger ) {
         Map<String, GeneSetResult> results = new HashMap<String, GeneSetResult>();
         int count = 0;
 
-        for ( Iterator iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<String> iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
-            String className = ( String ) iter.next();
+            String className = iter.next();
             GeneSetResult res = this.classPval( className, genePvalueMap, rankMap );
             if ( res != null ) {
                 results.put( className, res );
@@ -88,17 +89,17 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param rankMap Ranks of all genes (if using weights) or probes.
      * @return a GeneSetResult
      */
-    public GeneSetResult classPval( String geneSet, Map probesToPvals, Map rankMap ) {
+    public GeneSetResult classPval( String geneSet, Map<String, Double> probesToPvals, Map<String, Integer> rankMap ) {
         if ( !super.checkAspect( geneSet ) ) return null;
         // variables for outputs
         List<Integer> targetRanks = new ArrayList<Integer>();
 
-        int effSize = ( ( Integer ) effectiveSizes.get( geneSet ) ).intValue(); // effective size of this class.
+        int effSize = effectiveSizes.get( geneSet ); // effective size of this class.
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
             return null;
         }
 
-        Collection values = null;
+        Collection<String> values = null;
 
         if ( settings.getUseWeights() ) {
             values = geneAnnots.getActiveGeneSetGenes( geneSet );
@@ -106,17 +107,17 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             values = geneAnnots.getGeneSetProbes( geneSet );
         }
 
-        Iterator classit = values.iterator();
+        Iterator<String> classit = values.iterator();
 
         boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
                 || ( !settings.getDoLog() && settings.getBigIsBetter() );
 
         while ( classit.hasNext() ) {
             ifInterruptedStop();
-            String probe = ( String ) classit.next(); // probe id OR gene.
+            String probe = classit.next(); // probe id OR gene.
 
             if ( probesToPvals.containsKey( probe ) ) {
-                Integer ranking = ( Integer ) rankMap.get( probe );
+                Integer ranking = rankMap.get( probe );
                 if ( ranking == null ) continue;
 
                 int rank = ranking.intValue();
@@ -139,8 +140,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( goName != null ) {
             nameForId = goName.getNameForId( geneSet );
         }
-        GeneSetResult res = new GeneSetResult( geneSet, nameForId, ( ( Integer ) actualSizes.get( geneSet ) )
-                .intValue(), effSize );
+        GeneSetResult res = new GeneSetResult( geneSet, nameForId, actualSizes.get( geneSet ).intValue(), effSize );
         res.setScore( areaUnderROC );
         res.setPValue( roc_pval );
         return res;

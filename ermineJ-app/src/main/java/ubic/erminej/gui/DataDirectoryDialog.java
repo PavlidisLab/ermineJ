@@ -89,7 +89,7 @@ public class DataDirectoryDialog extends AppDialog {
         hh.initHelp( helpButton );
     }
 
-    void dataDirBrowseButton_actionPerformed( ActionEvent e ) {
+    void dataDirBrowseButton_actionPerformed(  ) {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             dataDir.setText( chooser.getSelectedFile().toString() );
@@ -139,7 +139,7 @@ class DataDirectoryDialog_dataDirBrowseButton_actionAdapter implements java.awt.
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.dataDirBrowseButton_actionPerformed( e );
+        adaptee.dataDirBrowseButton_actionPerformed(  );
     }
 }
 

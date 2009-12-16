@@ -88,7 +88,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     }
 
     public void addRun() {
-        columnNames.add( ( ( GeneSetPvalRun ) results.get( results.size() - 1 ) ).getName() + " Pval" );
+        columnNames.add( results.get( results.size() - 1 ).getName() + " Pval" );
     }
 
     public void renameColumn( int columnNum, String newName ) {
@@ -162,9 +162,9 @@ public class GeneSetTableModel extends AbstractTableModel {
             List<Double> vals = new ArrayList<Double>();
             int runIndex = getRunIndex( j );
             assert runIndex >= 0;
-            Map data = ( ( GeneSetPvalRun ) results.get( runIndex ) ).getResults();
+            Map<String, GeneSetResult> data = results.get( runIndex ).getResults();
             if ( data.containsKey( classid ) ) {
-                GeneSetResult res = ( GeneSetResult ) data.get( classid );
+                GeneSetResult res = data.get( classid );
                 vals.add( new Double( res.getRank() ) );
                 vals.add( new Double( res.getPvalue() ) );
                 return vals;
@@ -209,9 +209,9 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
 
     private GONames goData;
-    private List results;
+    private List<GeneSetPvalRun> results;
 
-    public OutputPanelTableCellRenderer( GONames goData, List results ) {
+    public OutputPanelTableCellRenderer( GONames goData, List<GeneSetPvalRun> results ) {
         super();
         this.goData = goData;
         this.results = results;
@@ -219,6 +219,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         nff.setMaximumFractionDigits( 4 );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column ) {
@@ -227,9 +228,9 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         // set cell text
         if ( value != null ) {
             if ( value.getClass().equals( ArrayList.class ) ) // pvalues and ranks.
-                setText( nf.format( ( ( Double ) ( ( ArrayList ) value ).get( 1 ) ).doubleValue() ) );
+                setText( nf.format( ( ( ArrayList<Double> ) value ).get( 1 ) ) );
             else if ( value.getClass().equals( Vector.class ) ) // class ids.
-                setText( ( String ) ( ( Vector ) value ).get( 0 ) );
+                setText( ( ( Vector<String> ) value ).get( 0 ) );
             else
                 setText( value.toString() );
         } else {
@@ -247,7 +248,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             setBackground( Colors.LIGHTYELLOW );
         } else if ( value.getClass().equals( ArrayList.class ) ) {
             String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
-            GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
+            GeneSetPvalRun result = results.get( runcol );
             Map data = result.getResults();
             if ( data.containsKey( classid ) ) {
                 GeneSetResult res = ( GeneSetResult ) data.get( classid );
@@ -267,7 +268,7 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
 
             if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
-                GeneSetPvalRun result = ( GeneSetPvalRun ) results.get( runcol );
+                GeneSetPvalRun result = results.get( runcol );
                 Map data = result.getResults();
                 if ( data.containsKey( classid ) ) {
                     GeneSetResult res = ( GeneSetResult ) data.get( classid );

@@ -89,6 +89,7 @@ public class AboutBox extends JDialog implements ActionListener {
     public AboutBox( Frame parent ) {
         super( parent );
         enableEvents( AWTEvent.WINDOW_EVENT_MASK );
+        enableEvents( AWTEvent.MOUSE_EVENT_MASK );
         try {
             jbInit();
         } catch ( Exception e ) {
@@ -147,9 +148,8 @@ public class AboutBox extends JDialog implements ActionListener {
 
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
         labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
-        String homepageURL = "http://bioinformatics.ubc.ca/ermineJ/";
+        String homepageURL = "http://www.chibi.ubc.ca/ermineJ/";
         labelHomepage.setText( homepageURL );
-        // labelHomepage.setURL( homepageURL );
         labelHomepage.setPreferredSize( new Dimension( PREFERRED_WIDTH, 20 ) );
 
         blurbsPanel.setLayout( new FlowLayout() );
@@ -208,7 +208,10 @@ public class AboutBox extends JDialog implements ActionListener {
         }
     }
 
-    // Overridden so we can exit when window is closed
+    /*
+     * (non-Javadoc)
+     * @see javax.swing.JDialog#processWindowEvent(java.awt.event.WindowEvent)
+     */
     @Override
     protected void processWindowEvent( WindowEvent e ) {
         if ( e.getID() == WindowEvent.WINDOW_CLOSING ) {
@@ -222,7 +225,10 @@ public class AboutBox extends JDialog implements ActionListener {
         dispose();
     }
 
-    // Close the dialog on a button event
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     public void actionPerformed( ActionEvent e ) {
         if ( e.getSource() == button1 ) {
             cancel();

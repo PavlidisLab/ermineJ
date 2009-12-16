@@ -220,7 +220,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     /**
      * @return Map
      */
-    public Map get_map() {
+    public Map<String, Double> get_map() {
         return probePvalMap;
     }
 
@@ -315,7 +315,6 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
     /*
      * (non-Javadoc)
-     * 
      * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
      */
     public void setRandomSeed( long randomSeed ) {

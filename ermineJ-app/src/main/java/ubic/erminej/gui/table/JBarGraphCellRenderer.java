@@ -38,6 +38,8 @@ import javax.swing.table.TableCellRenderer;
  */
 public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
 
+    private static final long serialVersionUID = 3914501898335944322L;
+
     protected Object m_values = null;
     protected final static int LINE_WIDTH = 2;
     protected final static Color[] COLORS = { Color.BLUE, Color.GRAY, Color.RED, Color.GREEN, Color.CYAN,
@@ -121,14 +123,14 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
         final int height = getHeight();
         final int y = 0;
 
-        ArrayList values = ( ArrayList ) m_values;
+        ArrayList<Double> values = ( ArrayList<Double> ) m_values;
 
         double maxPval = 10.0;
 
         for ( int i = 0; i < values.size(); i++ ) {
 
             // @todo only use log if doLog is requested. probably log should be in genesettablemodel
-            double val = ( ( Double ) values.get( i ) ).doubleValue();
+            double val = values.get( i );
 
             if ( Double.isNaN( val ) ) {
                 continue;

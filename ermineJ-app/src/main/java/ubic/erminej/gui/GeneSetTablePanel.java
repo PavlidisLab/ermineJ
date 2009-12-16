@@ -37,9 +37,6 @@ import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ubic.basecode.bio.geneset.GONames;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
@@ -63,12 +60,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
     private final static int NUMPROBES_COLUMN_WIDTH = 40;
     private final static int NUMGENES_COLUMN_WIDTH = 40;
     private final static int RUN_COLUMN_START_WIDTH = 80;
-    static Log log = LogFactory.getLog( GeneSetTablePanel.class.getName() );
 
     private String classColToolTip;
     private int currentResultSetIndex = -1;
     protected GeneSetTableModel model = null;
-    protected List resultToolTips = new LinkedList();
+    protected List<String> resultToolTips = new LinkedList<String>();
     private TableSorter sorter;
     protected JTable table = null;
 
@@ -158,7 +154,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @return
      */
     protected String getRunName( int runIndex ) {
-        return ( ( GeneSetPvalRun ) results.get( runIndex ) ).getName();
+        return results.get( runIndex ).getName();
     }
 
     /**
@@ -169,7 +165,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         TableColumn col = table.getColumn( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
         model.renameRun( runIndex, newName );
         col.setIdentifier( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
-        ( ( GeneSetPvalRun ) results.get( runIndex ) ).setName( newName );
+        results.get( runIndex ).setName( newName );
         model.fireTableStructureChanged();
         this.callingFrame.updateRunViewMenu();
     }
@@ -256,6 +252,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @param e
      * @return
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected String popupRespondAndGetGeneSet( MouseEvent e ) {
         JTable source = ( JTable ) e.getSource();
@@ -271,7 +268,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         assert results != null : "Null results";
         assert results.get( runIndex ) != null : "No results with index " + runIndex;
         log.debug( "Generating tooltip for run #" + runIndex );
-        Settings runSettings = ( ( GeneSetPvalRun ) results.get( runIndex ) ).getSettings();
+        Settings runSettings = results.get( runIndex ).getSettings();
         String tooltip = new String( "<html>" );
         String coda = new String();
 
@@ -313,7 +310,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         } else if ( index >= GeneSetTableModel.INIT_COLUMNS ) {
             // int runIndex=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
             int runIndex = model.getRunIndex( index );
-            return ( String ) resultToolTips.get( runIndex );
+            return resultToolTips.get( runIndex );
         }
         return null;
     }
@@ -362,6 +359,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     /**
      * @param e MouseEvent
      */
+    @SuppressWarnings("unchecked")
     void table_mouseReleased( MouseEvent e ) {
         int i = table.getSelectedRow();
         int j = table.getSelectedColumn();
@@ -415,7 +413,6 @@ class OutputPanel_findInTreeMenuItem_actionAdapter implements ActionListener {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed( ActionEvent e ) {

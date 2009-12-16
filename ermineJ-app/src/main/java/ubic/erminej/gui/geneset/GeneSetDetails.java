@@ -89,8 +89,8 @@ public class GeneSetDetails {
     public void show( String runName, GeneSetResult res, GeneScores geneScores ) throws IOException,
             IllegalStateException {
 
-        Collection probeIDs = null;
-        Map pvals = new HashMap();
+        Collection<String> probeIDs = null;
+        Map<String, Double> pvals = new HashMap<String, Double>();
 
         if ( geneData == null ) {
             // user will be prompted.
@@ -115,8 +115,8 @@ public class GeneSetDetails {
         }
 
         // create the details frame
-        JGeneSetFrame f = new JGeneSetFrame( className, callerStatusViewer, new ArrayList( probeIDs ), pvals, geneData,
-                settings );
+        JGeneSetFrame f = new JGeneSetFrame( className, callerStatusViewer, new ArrayList<String>( probeIDs ), pvals,
+                geneData, settings );
 
         String title = getTitle( runName, res, probeIDs );
         f.setTitle( title );
@@ -129,12 +129,12 @@ public class GeneSetDetails {
      * @param probeIDs
      * @param pvals
      */
-    private void getGeneScoresForGeneSet( GeneScores geneScores, Collection probeIDs, Map pvals ) {
+    private void getGeneScoresForGeneSet( GeneScores geneScores, Collection<String> probeIDs, Map<String, Double> pvals ) {
         if ( probeIDs == null ) return;
-        for ( Iterator iter = probeIDs.iterator(); iter.hasNext(); ) {
-            String probeID = ( String ) iter.next();
+        for ( Iterator<String> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            String probeID = iter.next();
 
-            if ( !geneScores.getProbeToScoreMap().containsKey( probeID ) ) {
+            if ( geneScores == null || !geneScores.getProbeToScoreMap().containsKey( probeID ) ) {
                 pvals.put( probeID, new Double( Double.NaN ) );
                 continue;
             }
@@ -144,10 +144,10 @@ public class GeneSetDetails {
                 pvalue = new Double( Double.NaN );
             } else {
                 if ( settings.getDoLog() == true ) {
-                    double negLogPval = ( ( Double ) geneScores.getProbeToScoreMap().get( probeID ) ).doubleValue();
+                    double negLogPval = geneScores.getProbeToScoreMap().get( probeID );
                     pvalue = new Double( Math.pow( 10.0, -negLogPval ) );
                 } else {
-                    pvalue = ( Double ) geneScores.getProbeToScoreMap().get( probeID );
+                    pvalue = geneScores.getProbeToScoreMap().get( probeID );
                 }
             }
             pvals.put( probeID, pvalue );
@@ -158,13 +158,18 @@ public class GeneSetDetails {
      * @param geneScores
      * @return
      */
-    private GeneScores tryToGetGeneScores( GeneScores geneScores ) throws IOException, IllegalStateException {
+    private GeneScores tryToGetGeneScores( GeneScores geneScores ) throws IllegalStateException {
         assert settings != null : "Null settings.";
         String scoreFile = settings.getScoreFile();
         if ( StringUtils.isNotBlank( scoreFile ) ) {
-            GeneScores localReader = new GeneScores( scoreFile, settings, null, this.geneData );
-            geneScores = localReader;
-            log.debug( "Getting gene scores from " + scoreFile );
+            try {
+                GeneScores localReader = new GeneScores( scoreFile, settings, null, this.geneData );
+                geneScores = localReader;
+                log.debug( "Getting gene scores from " + scoreFile );
+            } catch ( Exception e ) {
+                log.warn( "Old file: " + scoreFile + " is no longer available" );
+            }
+
         }
         return geneScores;
     }
@@ -175,7 +180,7 @@ public class GeneSetDetails {
      * @param probeIDs
      * @return
      */
-    private String getTitle( String runName, GeneSetResult res, Collection probeIDs ) {
+    private String getTitle( String runName, GeneSetResult res, Collection<String> probeIDs ) {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits( 8 );
         String title = className + " (" + probeIDs.size() + " items ";

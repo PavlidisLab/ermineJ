@@ -41,14 +41,14 @@ public class SaveWizard extends Wizard {
     // logic
     int step = 1;
     int selected_run;
-    GeneSetScoreFrame callingframe;
-    List rundata;
+
+    List<GeneSetPvalRun> rundata;
     GONames goData;
     String saveFolder;
     SaveWizardStep1 step1;
     SaveWizardStep2 step2;
 
-    public SaveWizard( GeneSetScoreFrame callingframe, List rundata, GONames goData ) {
+    public SaveWizard( GeneSetScoreFrame callingframe, List<GeneSetPvalRun> rundata, GONames goData ) {
         super( callingframe, 400, 200 );
         enableEvents( AWTEvent.WINDOW_EVENT_MASK );
         this.callingframe = callingframe;
@@ -111,7 +111,7 @@ public class SaveWizard extends Wizard {
 
     @Override
     protected void finishButton_actionPerformed( ActionEvent e ) {
-        GeneSetPvalRun runToSave = ( GeneSetPvalRun ) rundata.get( step1.getSelectedRunNum() );
+        GeneSetPvalRun runToSave = rundata.get( step1.getSelectedRunNum() );
         Settings saveSettings = runToSave.getSettings();
         String saveFileName = step2.getSaveFileName();
         try {

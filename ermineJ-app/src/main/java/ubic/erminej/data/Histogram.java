@@ -205,6 +205,7 @@ public class Histogram {
         return minimumGeneSetSize;
     }
 
+    @Override
     public String toString() {
         return "There are " + numBins + " bins in the histogram. The maximum possible value is " + maximum
                 + ", the minimum is " + minimum + "." + " Min class is " + minimumGeneSetSize + ".";
@@ -274,7 +275,7 @@ public class Histogram {
      * @return
      */
     private double getExactProbability( int geneSetSize, double rawScore, boolean upperTail ) {
-        ProbabilityComputer p = ( ProbabilityComputer ) analyticDistributions.get( new Integer( geneSetSize ) );
+        ProbabilityComputer p = analyticDistributions.get( new Integer( geneSetSize ) );
         if ( p == null ) {
             throw new IllegalStateException( "Gene set size " + geneSetSize
                     + " is not associated with an exact probability density." );

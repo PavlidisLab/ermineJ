@@ -39,7 +39,8 @@ import ubic.erminej.gui.file.DataFileFilter;
  */
 public class JDataFileChooser extends JFileChooser {
 
-    // fields
+    private static final long serialVersionUID = -4213033434706180241L;
+
     JDataFileChooserOptions m_options;
 
     public JDataFileChooser( boolean includeEverything, boolean normalize, String initialFileName ) {

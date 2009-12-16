@@ -44,8 +44,8 @@ import ubic.erminej.data.Histogram;
  */
 public class MultipleTestCorrector extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
-    private List sortedclasses;
-    private Map results;
+    private List<String> sortedclasses;
+    private Map<String, GeneSetResult> results;
     private Histogram hist;
     private GeneAnnotations geneData;
     private GeneSetSizeComputer csc;
@@ -54,7 +54,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
     private Settings settings;
     private StatusViewer messenger;
 
-    public MultipleTestCorrector( Settings set, List sc, Histogram h, GeneAnnotations geneData,
+    public MultipleTestCorrector( Settings set, List<String> sc, Histogram h, GeneAnnotations geneData,
             GeneSetSizeComputer csc, GeneScores geneScores, Map<String, GeneSetResult> results, StatusViewer messenger ) {
         this.settings = set;
         this.sortedclasses = sc;
@@ -72,10 +72,10 @@ public class MultipleTestCorrector extends AbstractLongTask {
     public void bonferroni() {
         int numclasses = sortedclasses.size();
         double corrected_p;
-        for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) break;
-            String nextclass = ( String ) it.next();
-            GeneSetResult res = ( GeneSetResult ) results.get( nextclass );
+            String nextclass = it.next();
+            GeneSetResult res = results.get( nextclass );
             double actual_p = res.getPvalue();
             corrected_p = actual_p * numclasses;
             if ( corrected_p > 1.0 ) {
@@ -96,10 +96,10 @@ public class MultipleTestCorrector extends AbstractLongTask {
         int n = numclasses;
 
         Collections.reverse( sortedclasses ); // start from the worst class.
-        for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) break;
-            String nextclass = ( String ) it.next();
-            GeneSetResult res = ( GeneSetResult ) results.get( nextclass );
+            String nextclass = it.next();
+            GeneSetResult res = results.get( nextclass );
             double actual_p = res.getPvalue();
 
             // double thresh = fdr * n / numclasses;
@@ -118,7 +118,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
      * <ol>
      * <li>Sort the pvalues for the real data (assume worst pvalue is first)
      * <li>Make an array of count variables, one for each class, intialize to zero. loop: (n=10,000).
-     * <li> Generate class pvalues for randomized values (see above); 3. Iterate over this in the same order as the
+     * <li>Generate class pvalues for randomized values (see above); 3. Iterate over this in the same order as the
      * actual order.
      * <li>Define successive minima: (q is the trial; p is real, already ranked)
      * <ol>
@@ -140,7 +140,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
         }
 
         Collections.reverse( sortedclasses ); // start from the worst class.
-        Map permscores;
+        Map<String, Double> permscores;
 
         GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, null );
 
@@ -185,7 +185,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
             String nextclass = "";
 
             // successive minima of step 2, pg 66. Also does step 3.
-            for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+            for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
 
                 ifInterruptedStop();
 
@@ -195,12 +195,12 @@ public class MultipleTestCorrector extends AbstractLongTask {
                 if ( Thread.currentThread().isInterrupted() ) {
                     throw new CancellationException();
                 }
-                nextclass = ( String ) it.next();
+                nextclass = it.next();
 
-                GeneSetResult res = ( GeneSetResult ) results.get( nextclass );
+                GeneSetResult res = results.get( nextclass );
                 actual_p = res.getPvalue(); // pvalue for this class on real data.
 
-                m = ( Double ) permscores.get( nextclass );
+                m = permscores.get( nextclass );
                 permp = m.doubleValue(); // randomized pvalue for this class.
 
                 /*
@@ -274,9 +274,9 @@ public class MultipleTestCorrector extends AbstractLongTask {
         /*
          * Step 4 and enforce monotonicity, pg 67 (step 5) starting from the best class.
          */
-        for ( Iterator it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) throw new CancellationException();
-            GeneSetResult res = ( GeneSetResult ) results.get( it.next() );
+            GeneSetResult res = results.get( it.next() );
             corrected_p = Math.max( ( double ) counts[j] / ( double ) trials, previous_p ); // first iteration, these
             // are the same.
 

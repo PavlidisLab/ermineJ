@@ -424,7 +424,7 @@ public class UserDefinedGeneSetManager {
 
             public Object getValueAt( int r, int c ) {
                 if ( r < probes.size() ) {
-                    String probeid = ( String ) probes.get( r );
+                    String probeid = probes.get( r );
                     switch ( c ) {
                         case 0:
                             return probeid;
@@ -440,7 +440,6 @@ public class UserDefinedGeneSetManager {
             }
 
             @Override
-            @SuppressWarnings("unused")
             public boolean isCellEditable( int r, int c ) {
                 if ( !finalized && ( c == 0 || c == 1 ) ) {
                     return true;

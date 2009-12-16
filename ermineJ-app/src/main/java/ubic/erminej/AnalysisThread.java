@@ -71,15 +71,16 @@ public class AnalysisThread extends Thread {
      * @param geneScoreSets
      * @throws IllegalStateException
      */
-    public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData, Map geneDataSets,
-            Map rawDataSets, Map<String, GeneScores> geneScoreSets ) throws IllegalStateException {
+    public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData,
+            Map<Integer, GeneAnnotations> geneDataSets, Map<String, DoubleMatrix<String, String>> rawDataSets,
+            Map<String, GeneScores> geneScoreSets ) throws IllegalStateException {
         this.settings = settings;
         this.messenger = messenger;
         this.goData = goData;
         this.rawDataSets = rawDataSets;
         this.geneScoreSets = geneScoreSets;
         if ( geneDataSets == null ) throw new IllegalArgumentException();
-        this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) ); // this is the
+        this.geneData = geneDataSets.get( new Integer( "original".hashCode() ) ); // this is the
         // default
         // geneData
 
@@ -103,8 +104,9 @@ public class AnalysisThread extends Thread {
      * @param geneScoreSets
      * @param loadFile
      */
-    public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData, Map geneDataSets,
-            Map<String, DoubleMatrix<String, String>> rawDataSets, Map geneScoreSets, String loadFile ) {
+    public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData,
+            Map<Integer, GeneAnnotations> geneDataSets, Map<String, DoubleMatrix<String, String>> rawDataSets,
+            Map<String, GeneScores> geneScoreSets, String loadFile ) {
         this.settings = settings;
         this.messenger = messenger;
         this.goData = goData;
@@ -114,7 +116,7 @@ public class AnalysisThread extends Thread {
         // this is the
         // default
         // geneData
-        this.geneData = ( GeneAnnotations ) geneDataSets.get( new Integer( "original".hashCode() ) );
+        this.geneData = geneDataSets.get( new Integer( "original".hashCode() ) );
 
         try {
             this.runningMethod = AnalysisThread.class.getMethod( "loadAnalysis", new Class[] {} );
@@ -228,7 +230,7 @@ public class AnalysisThread extends Thread {
         GeneScores geneScores = null;
         if ( !geneScoreSettingsDirty() && geneScoreSets.containsKey( settings.getScoreFile() ) ) {
             if ( messenger != null ) messenger.showStatus( "Gene Scores are in memory" );
-            geneScores = ( GeneScores ) geneScoreSets.get( settings.getScoreFile() );
+            geneScores = geneScoreSets.get( settings.getScoreFile() );
         } else {
             if ( messenger != null )
                 messenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
@@ -254,7 +256,7 @@ public class AnalysisThread extends Thread {
             if ( messenger != null )
                 messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
-            rawData = ( DoubleMatrix<String, String> ) r.read( settings.getRawDataFileName() );
+            rawData = r.read( settings.getRawDataFileName() );
             rawDataSets.put( settings.getRawDataFileName(), rawData );
         }
         return rawData;

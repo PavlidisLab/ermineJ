@@ -31,7 +31,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-
 /**
  * Choose the file name to save the results in.
  * 
@@ -104,7 +103,7 @@ public class SaveWizardStep2 extends WizardStep {
         return this.saveAllGenes.isSelected();
     }
 
-    void saveBrowseButton_actionPerformed( ActionEvent e ) {
+    void saveBrowseButton_actionPerformed() {
         int result = chooser.showOpenDialog( this.wiz );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             File f = new File( chooser.getSelectedFile().toString() );
@@ -115,7 +114,7 @@ public class SaveWizardStep2 extends WizardStep {
                 if ( k == JOptionPane.YES_OPTION ) {
                     saveFile.setText( chooser.getSelectedFile().toString() );
                 } else if ( k == JOptionPane.NO_OPTION ) { // go back to the chooser for another try.
-                    saveBrowseButton_actionPerformed( null );
+                    saveBrowseButton_actionPerformed();
                 } // otherwise, bail.
             } else {
                 saveFile.setText( chooser.getSelectedFile().toString() );
@@ -137,6 +136,6 @@ class SaveWizardStep2_saveBrowseButton_actionAdapter implements java.awt.event.A
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.saveBrowseButton_actionPerformed( e );
+        adaptee.saveBrowseButton_actionPerformed();
     }
 }
