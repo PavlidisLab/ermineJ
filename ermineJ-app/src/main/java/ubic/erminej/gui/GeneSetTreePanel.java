@@ -161,7 +161,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         while ( e.hasMoreElements() ) {
             GeneSetTreeNode childNode = ( GeneSetTreeNode ) e.nextElement();
             DirectedGraphNode n = ( DirectedGraphNode ) childNode.getUserObject();
-            GeneSetResult result = ( GeneSetResult ) currentResultSet.getResults().get( n.getKey() );
+            GeneSetResult result = currentResultSet.getResults().get( n.getKey() );
             if ( result != null && result.getCorrectedPvalue() <= fdrThreshold ) {
                 node.setHasGoodChild( true );
                 return;
@@ -446,7 +446,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
             currentlySelectedResultSetIndex = callingFrame.getCurrentResultSet();
             ( ( BaseCellRenderer ) this.goTree.getCellRenderer() )
                     .setCurrentResultSet( currentlySelectedResultSetIndex );
-            this.currentResultSet = ( GeneSetPvalRun ) results.get( this.currentlySelectedResultSetIndex );
+            this.currentResultSet = results.get( this.currentlySelectedResultSetIndex );
             log.debug( "Fire change to " + callingFrame.getCurrentResultSet() + " run" );
         }
         resetView();
@@ -667,7 +667,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      * @return
      */
     private String addResultsFlags( GeneSetTreeNode node, String id, String displayedText ) {
-        GeneSetPvalRun res = ( GeneSetPvalRun ) results.get( currentlySelectedResultSet );
+        GeneSetPvalRun res = results.get( currentlySelectedResultSet );
         assert res != null;
         assert res.getResults() != null;
         if ( hasResults( id, res ) ) {

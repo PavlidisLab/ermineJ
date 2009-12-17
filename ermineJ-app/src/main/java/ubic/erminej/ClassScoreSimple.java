@@ -18,13 +18,11 @@
  */
 package ubic.erminej;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
-import ubic.erminej.data.GeneSetResult;
 
 /**
  * Simple API to run ermineJ analyses.

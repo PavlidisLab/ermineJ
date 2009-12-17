@@ -44,6 +44,7 @@ abstract class AbstractPvalGeneratorTest extends TestCase {
     protected GONames gon = null;
     protected GeneSetSizeComputer csc = null;
 
+    @Override
     protected void setUp() throws Exception {
         ism = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.an.txt" );
         is = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.scores.txt" );
@@ -68,6 +69,7 @@ abstract class AbstractPvalGeneratorTest extends TestCase {
         super.setUp();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         isi.close();
         ism.close();

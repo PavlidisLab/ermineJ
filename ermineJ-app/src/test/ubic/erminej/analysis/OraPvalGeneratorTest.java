@@ -30,6 +30,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     /*
      * @see TestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception {
 
         super.setUp();
@@ -42,6 +43,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     /*
      * @see TestCase#tearDown()
      */
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         test = null;

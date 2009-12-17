@@ -169,13 +169,11 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
     public void revalidate() {
     }
 
-    @Override
-    @SuppressWarnings("unused")
+    @Override 
     public void repaint( long tm, int x, int y, int width, int height ) {
     }
 
-    @Override
-    @SuppressWarnings("unused")
+    @Override 
     public void repaint( Rectangle r ) {
     }
 
