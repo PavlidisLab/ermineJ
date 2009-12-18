@@ -7,8 +7,10 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.graphics.ColorMap;
 import ubic.basecode.graphics.MatrixDisplay;
+import ubic.basecode.io.reader.DoubleMatrixReader;
 
 /**
  * This is an example of how you'd display a microarray.
@@ -45,9 +47,11 @@ public class MatrixDisplayApp {
         // Here is an example of how you'd display a matrix of doubles
         // visually with colors
         //
-        MatrixDisplay matrixDisplay = null;
+        MatrixDisplay<String, String> matrixDisplay = null;
         try {
-            matrixDisplay = new MatrixDisplay( inDataFilename );
+            DoubleMatrixReader m_matrixReader = new DoubleMatrixReader();
+            DoubleMatrix<String, String> matrix = m_matrixReader.read( inDataFilename );
+            matrixDisplay = new MatrixDisplay<String, String>( matrix );
         } catch ( java.io.IOException e ) {
             System.err.println( "Unable to open file " + inDataFilename );
             return;
