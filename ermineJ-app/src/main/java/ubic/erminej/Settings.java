@@ -126,18 +126,14 @@ public class Settings {
 
     /**
      * Create the settings, reading them from a file to be determined by the constructor.
-     * 
-     * @throws IOException
      */
-    public Settings() throws IOException {
+    public Settings() {
         this( true );
     }
 
     public Settings( boolean readFromFile ) {
         if ( readFromFile ) {
             initConfig();
-            // createDataDirectory();
-            // createCustomGeneSetDirectory();
         } else {
             this.config = new PropertiesConfiguration();
         }
@@ -160,16 +156,17 @@ public class Settings {
     }
 
     /**
-     * Create a Settings object from the header of a results file.
+     * Create a Settings object from the header of a results file - autosave will not be set!
      * 
      * @param resultsFile
      */
     public Settings( String resultsFile ) throws ConfigurationException {
         this.config = new PropertiesConfiguration( resultsFile );
-
     }
 
     /**
+     * Autosave will not be set.
+     * 
      * @param resource
      */
     public Settings( URL resource ) throws ConfigurationException {

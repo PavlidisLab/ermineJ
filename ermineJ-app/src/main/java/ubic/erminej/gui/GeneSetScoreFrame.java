@@ -163,6 +163,14 @@ public class GeneSetScoreFrame extends JFrame {
     private JMenuItem switchDataFileMenuItem = new JMenuItem();
     private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
 
+    public GeneSetScoreFrame( Settings settings ) {
+        this.settings = settings;
+        jbInit();
+        hh = new HelpHelper();
+        hh.initHelp( helpMenuItem );
+        this.userOverwrittenGeneSets = new HashSet<String>();
+    }
+
     /**
      * @throws IOException
      */

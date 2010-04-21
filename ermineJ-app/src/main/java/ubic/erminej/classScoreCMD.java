@@ -91,7 +91,7 @@ public class classScoreCMD {
                 } catch ( Exception e ) {
                     e.printStackTrace();
                 }
-                new classScoreGUI();
+                new classScoreGUI( cmd.settings );
             }
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -114,8 +114,8 @@ public class classScoreCMD {
 
     private CommandLine commandLine;
 
-    public classScoreCMD() throws IOException {
-        settings = new Settings();
+    public classScoreCMD() {
+        settings = new Settings( false );
         rawDataSets = new HashMap<String, DoubleMatrix<String, String>>();
         geneDataSets = new HashMap<Integer, GeneAnnotations>();
         geneScoreSets = new HashMap<String, GeneScores>();
@@ -301,13 +301,10 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.withLongOpt( "help" ).create( 'h' ) );
 
-        options
-                .addOption( OptionBuilder
-                        .withLongOpt( "config" )
-                        .hasArg()
-                        .withDescription(
-                                "Configuration file to use (saves typing); additional options given on the command line override those in the file." )
-                        .withArgName( "config file" ).create( 'C' ) );
+        options.addOption( OptionBuilder.withLongOpt( "config" ).hasArg().withDescription(
+                "Configuration file to use (saves typing); additional options given on the command line override those in the file."
+                        + " If you don't use this option, no configuration file will be used." ).withArgName(
+                "config file" ).create( 'C' ) );
 
         options.addOption( OptionBuilder.withDescription( "Launch the GUI." ).withLongOpt( "gui" ).create( 'G' ) );
 
@@ -408,7 +405,16 @@ public class classScoreCMD {
             showHelpAndExit();
         }
 
+        if ( commandLine.hasOption( 'G' ) ) {
+            useCommandLineInterface = false;
+        }
+
         String arg;
+
+        /*
+         * We only read the config file if 1) it is specified by the user or 2) the user is starting the GUI. In either
+         * case, command line options can override.
+         */
         if ( commandLine.hasOption( 'C' ) ) {
             arg = commandLine.getOptionValue( 'C' );
             if ( FileTools.testFile( arg ) ) {
@@ -416,11 +422,18 @@ public class classScoreCMD {
                     settings = new Settings( arg );
                     System.err.println( "Initializing configuration from " + arg );
                 } catch ( ConfigurationException e ) {
-                    System.err.println( "Invalid config file name (-C " + arg + ")" );
+                    System.err.println( "Invalid config file name (" + arg + ")" );
                     showHelpAndExit();
                 }
+            } else {
+                System.err.println( "Could not open configuration file: " + arg );
+                showHelpAndExit();
             }
-
+        } else if ( !useCommandLineInterface ) {
+            /*
+             * GUI: Read the default configuration file for the user.
+             */
+            settings = new Settings();
         }
 
         if ( commandLine.hasOption( 'A' ) ) {
@@ -660,9 +673,7 @@ public class classScoreCMD {
                 showHelpAndExit();
             }
         }
-        if ( commandLine.hasOption( 'G' ) ) {
-            useCommandLineInterface = false;
-        }
+
     }
 
     private void showHelpAndExit() {

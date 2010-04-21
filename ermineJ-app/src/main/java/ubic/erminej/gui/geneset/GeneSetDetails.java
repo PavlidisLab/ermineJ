@@ -65,14 +65,11 @@ public class GeneSetDetails {
         this.classID = classID;
 
         this.geneData = geneData;
-        if ( settings == null ) {
-            try {
+        if ( settings == null ) { 
                 log.debug( "No settings, reading them in" );
                 settings = new Settings();
                 if ( settings == null ) throw new NullPointerException( "No settings!" );
-            } catch ( IOException e ) {
-                e.printStackTrace();
-            }
+         
         } else {
             this.settings = settings;
         }

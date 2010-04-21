@@ -24,7 +24,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -133,11 +132,7 @@ public class GeneUrlDialog extends JFrame {
      */
     private void initializeFieldText() {
         if ( this.settings == null ) {
-            try {
-                this.settings = new Settings();
-            } catch ( IOException e ) {
-                throw new RuntimeException( e );
-            }
+            this.settings = new Settings();
         }
         if ( this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
             String oldUrlBase = this.settings.getConfig().getString( Settings.GENE_URL_BASE );
@@ -222,6 +217,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
     public void mouseClicked( MouseEvent e ) {
@@ -229,6 +225,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
      */
     public void mouseEntered( MouseEvent e ) {
@@ -236,6 +233,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
      */
     public void mouseExited( MouseEvent e ) {
@@ -244,6 +242,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
     public void mousePressed( MouseEvent e ) {
@@ -252,6 +251,7 @@ class SetTextMouseButton_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
      */
     public void mouseReleased( MouseEvent e ) {

@@ -50,10 +50,18 @@ public class classScoreGUI {
 
     boolean packFrame = false;
 
+    public classScoreGUI( Settings settings ) {
+        GeneSetScoreFrame frame = new GeneSetScoreFrame( settings );
+        this.init( frame );
+    }
+
     public classScoreGUI() throws IOException {
-        // mainFrame frame = new mainFrame();
         GeneSetScoreFrame frame = new GeneSetScoreFrame();
 
+        init( frame );
+    }
+
+    private void init( GeneSetScoreFrame frame ) {
         // Validate frames that have preset sizes
         // Pack frames that have useful preferred size info, e.g. from their
         // layout
