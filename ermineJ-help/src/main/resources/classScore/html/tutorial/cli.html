@@ -1,27 +1,25 @@
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-<meta name="generator" content="HTML Tidy, see www.w3.org">
-
-<title>The ermineJ command line interface</title>
-
-<link rel="stylesheet" type="text/css" href="../style.css">
-</head>
-
-<body>
-<img src="../images/logo1small.gif" />
-
-<p>ErmineJ has a simple command line interface (CLI). In addition to
-providing a scriptable interface to the software, it provides access to
-some features that are not accessible through the graphical user
-interface (GUI). The CLI can also be used to start the GUI.</p>
-
-<p>To access the CLI, you need to have installed the generic bundle. See <a href="install.html">the instructions</a>.</p>
-
-<p>Once you have set up the package, you should be able to access ermineJ by running ermineJ.bat or ermineJ.sh.</p>
-
-<pre>
+    <head>
+        <meta name="generator" content="HTML Tidy, see www.w3.org">
+        <title>The ermineJ command line interface</title>
+        <link rel="stylesheet" type="text/css" href="../style.css">
+    </head>
+    <body>
+        <img src="../images/logo1small.gif" />
+        <p>
+            ErmineJ has a simple command line interface (CLI). In addition to
+            providing a scriptable interface to the software, it provides access to
+            some features that are not accessible through the graphical user
+            interface (GUI). The CLI can also be used to start the GUI.
+        </p>
+        <p>
+            To access the CLI, you need to have installed the generic bundle. See <a href="install.html">the instructions</a>.
+        </p>
+        <p>
+            Once you have set up the package, you should be able to access ermineJ by running ermineJ.bat or ermineJ.sh.
+        </p>
+        <pre>
 OPTIONS
 	The following options are supported:
 
@@ -93,5 +91,26 @@ OPTIONS
 	-S file ... or --save file ...
 		Save preferences in the specified file.
 </pre>
-</body>
+        <h2>Configuration files and the command line</h2>
+        <p>
+            Note that this behavior has changed in recent versions of ermineJ. Please note that when running ermineJ from Webstart or the Windows installed version, changes in the gui (graphical user interface) are immediately reflected in the default configuration file stored in your home directory.
+        </p>
+        <ul>
+            <li>
+                If you don't specify a configuration file, all the options must be supplied on the command line. In previous versions, the configuration file would be read in by default.
+            </li>
+            <li>
+                If you do specify a configuration file, options can be overridden on the command line, but they will not be written into the config file.
+            </li>
+            <li>
+                If you don't specify  a configuration file and use -G to start the gui, the default configuration file will be written and used as usual: it will be modified by other options you pass in or change in the gui.
+            </li>
+            <li>
+                If you do specify  a configuration file and use -G to start the gui, the specified config file will NOT be modified. 
+            </li>
+        </ul>
+        <p>
+            This allows a consistent reuse of the customized config files, if so desired.
+        </p>
+    </body>
 </html>
