@@ -241,8 +241,15 @@ public class Histogram {
      */
     public double getValue( int geneSetSize, double rawscore, boolean upperTail ) {
         if ( rawscore > maximum || rawscore < minimum ) { // sanity check.
-            throw new IllegalStateException( "Warning, a rawscore yielded a bin number which was out of the range: "
-                    + rawscore );
+            log.warn( "A rawscore yielded a bin number which was out of range, probably due to roundoff: " + rawscore
+                    + "; allowed minimum=" + minimum + "; maximum=" + maximum );
+
+            if ( rawscore < minimum ) {
+                rawscore = minimum;
+            } else {
+                rawscore = maximum;
+            }
+
         }
 
         if ( !isCDF ) {
