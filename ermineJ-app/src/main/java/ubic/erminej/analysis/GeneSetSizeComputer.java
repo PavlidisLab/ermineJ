@@ -91,20 +91,14 @@ public class GeneSetSizeComputer {
 
                         if ( weight_on ) { // routine for weights
                             // compute pval for every replicate group
-                            if ( ( geneScores == null || geneScores.getGeneToPvalMap().containsKey( gene ) ) // FIXME,
-                                    // this
-                                    // doesn't
-                                    // work
-                                    // right
-                                    // if
-                                    // geneScores
-                                    // is
-                                    // null.F
 
-                                    /*
-                                     * if we haven't done this probe already.
-                                     */
-                                    && !record.contains( gene ) ) {
+                            // FIXME, doesn't work if geneScores is null.
+                            if ( ( geneScores == null || geneScores.getGeneToPvalMap().containsKey( gene ) )
+
+                            /*
+                             * if we haven't done this probe already.
+                             */
+                            && !record.contains( gene ) ) {
 
                                 /*
                                  * mark it as done for this class.

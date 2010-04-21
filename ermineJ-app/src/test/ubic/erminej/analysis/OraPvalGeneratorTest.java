@@ -35,7 +35,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         super.setUp();
 
-        test = new OraPvalGenerator( s, g, csc, 2, 6, gon, 8 );
+        test = new OraPvalGenerator( s, annotations, sizeComputer, 2, 18, gon, 20 );
         test.setGlobalMissingAspectTreatedAsUsable( true );
 
     }
@@ -50,36 +50,38 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     }
 
     public void testClassPval2() {
-        double expectedReturn = 0.1071429;
+        // phyper(lower.tail=F, 1,4,16,2) + dhyper(1, 4, 16, 2);
 
-        GeneSetResult r = test.classPval( "GO:2", gsr.getGeneToPvalMap(), gsr.getProbeToScoreMap() );
+        double expectedReturn = 0.36842;
 
-
+        GeneSetResult r = test.classPval( "GO:2", scores.getGeneToPvalMap(), scores.getProbeToScoreMap() );
+        assertNotNull( r );
         double actualReturn = r.getPvalue();
 
-        assertEquals( "return value", expectedReturn, actualReturn, 0.0001 );
+        assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
 
     public void testClassPval1() {
         double expectedReturn = 0.0;
 
-        GeneSetResult r = test.classPval( "GO:1", gsr.getGeneToPvalMap(), gsr.getProbeToScoreMap() );
+        GeneSetResult r = test.classPval( "GO:1", scores.getGeneToPvalMap(), scores.getProbeToScoreMap() );
 
-
+        assertNotNull( r );
         double actualReturn = r.getPvalue();
 
-        assertEquals( "return value", expectedReturn, actualReturn, 0.0001 );
+        assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
 
     public void testClassPval3() {
-        double expectedReturn = 0.4642857;
+        double expectedReturn = 0.7631579;
 
-        GeneSetResult r = test.classPval( "GO:3", gsr.getGeneToPvalMap(), gsr.getProbeToScoreMap() );
-
-
+        GeneSetResult r = test.classPval( "GO:3", scores.getGeneToPvalMap(), scores.getProbeToScoreMap() );
+        assertNotNull( r );
         double actualReturn = r.getPvalue();
 
-        assertEquals( "return value", expectedReturn, actualReturn, 0.0001 );
+        // phyper(lower.tail=F, 1,10,10,2) + dhyper(1, 10,10, 2)
+
+        assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
 
 }

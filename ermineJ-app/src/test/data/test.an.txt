@@ -1,9 +1,22 @@
-probe Id	Gene	Description	GO terms
-ProbeA	GeneA	genea	GO:1|GO:2
+probe Id	Gene	Description	GOterms
+ProbeA	GeneA	genea	GO:1|GO:2|GO:3
 ProbeB	GeneB	geneb appears thrice	GO:1
 ProbeC	GeneB	geneb appears thrice	GO:1
-ProbeD	GeneC	genec	GO:2|GO:3
+ProbeD	GeneC	genec	GO:2
 ProbeE	GeneD	gened appears twice	GO:3
 ProbeF	GeneD	gened appears twice	GO:3
-ProbeG	GeneE	genee	GO:2|GO:1
-ProbeH	GeneB	geneb appears thrice	GO:1
+ProbeG	GeneE	genee	GO:2|GO:1|GO:3
+ProbeH	GeneH	geneh	GO:2|GO:1|GO:3
+ProbeI	GeneI	genei	GO:1|GO:3
+ProbeJ	GeneJ	genej	GO:1|GO:3
+ProbeK	GeneK	genek	GO:11|GO:31
+ProbeL	GeneL	genel	GO:11|GO:3
+ProbeM	GeneM	genem	GO:11|GO:3
+ProbeN	GeneN	genen	GO:11|GO:3
+ProbeO	GeneO	geneo	GO:11|GO:3
+ProbeP	GeneP	genep	GO:11|GO:31
+ProbeQ	GeneQ	geneq	GO:1|GO:31
+ProbeR	GeneR	gener	GO:1|GO:31
+ProbeS	GeneS	genes	GO:1|GO:31
+ProbeT	GeneT	genet	GO:1|GO:31
+ProbeU	GeneU	geneu	GO:1|GO:31

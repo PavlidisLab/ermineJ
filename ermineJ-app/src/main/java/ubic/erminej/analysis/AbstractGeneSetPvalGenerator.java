@@ -36,14 +36,28 @@ import ubic.erminej.Settings;
 
 public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( AbstractGeneSetPvalGenerator.class );
+
+    /**
+     * How many genes are in each set (conditioned on the current data available)
+     */
     protected Map<String, Integer> effectiveSizes = null;
+
+    /**
+     * How many probes are in each set (conditioned on the current data available)
+     */
     protected Map<String, Integer> actualSizes = null;
+
     protected GONames goName;
+
     protected Settings settings;
+
     protected GeneAnnotations geneAnnots;
+
     protected GeneSetSizeComputer csc;
+
     private int maxGeneSetSize;
     private int minGeneSetSize;
+
     private boolean globalMissingAspectTreatedAsUsable = false;
 
     public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots, GeneSetSizeComputer csc, GONames gon ) {

@@ -16,6 +16,16 @@
             <go:accession>GO:3</go:accession>
             <go:name>Test term 3</go:name>
         </go:term>
+		
+<go:term rdf:about="http://www.geneontology.org/go#GO:31" n_associations="0">
+            <go:accession>GO:31</go:accession>
+            <go:name>Test term 31</go:name>
+        </go:term>
+		
+<go:term rdf:about="http://www.geneontology.org/go#GO:11" n_associations="0">
+            <go:accession>GO:11</go:accession>
+            <go:name>Test term 11</go:name>
+        </go:term>
 
             </rdf:RDF>
 </go:go>

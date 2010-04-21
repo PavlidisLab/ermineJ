@@ -40,13 +40,13 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
      */
     private static final long serialVersionUID = 120496422792943100L;
 
-    MatrixDisplay m_matrixDisplay;
+    MatrixDisplay<String,String> m_matrixDisplay;
 
     // to format tooltips
     DecimalFormat m_scientificNotation = new DecimalFormat( "0.##E0" );
     DecimalFormat m_regular = new DecimalFormat();
 
-    public JMatrixCellRenderer( MatrixDisplay matrixDisplay ) {
+    public JMatrixCellRenderer( MatrixDisplay<String,String> matrixDisplay ) {
 
         m_matrixDisplay = matrixDisplay;
         setOpaque( true );

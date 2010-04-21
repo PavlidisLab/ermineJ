@@ -22,8 +22,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.text.DecimalFormat; 
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -40,7 +40,7 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
 
     private static final long serialVersionUID = 3914501898335944322L;
 
-    protected Object m_values = null;
+    protected List<Double> m_values = null;
     protected final static int LINE_WIDTH = 2;
     protected final static Color[] COLORS = { Color.BLUE, Color.GRAY, Color.RED, Color.GREEN, Color.CYAN,
             Color.MAGENTA, Color.ORANGE };
@@ -67,10 +67,9 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
      * @param column the column of the cell to render
      * @return the default table cell renderer
      */
+    @SuppressWarnings("unchecked")
     public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column ) {
-
-        m_values = value;
 
         // set background
         m_isSelected = isSelected;
@@ -88,11 +87,11 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
         }
 
         m_isBarGraph = false;
-        if ( value.getClass().equals( ArrayList.class ) ) {
-            // bar graph
+        if ( value instanceof List ) {
+            // bar graphF
             m_isBarGraph = true;
-            m_values = value;
-        } else if ( value.getClass().equals( Double.class ) ) {
+            m_values = ( List<Double> ) value;
+        } else if ( value instanceof Double ) {
             // just double value, no bar graph
             setText( value.toString() );
             setFont( table.getFont() );
@@ -123,14 +122,12 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
         final int height = getHeight();
         final int y = 0;
 
-        ArrayList<Double> values = ( ArrayList<Double> ) m_values;
-
         double maxPval = 10.0;
 
-        for ( int i = 0; i < values.size(); i++ ) {
+        for ( int i = 0; i < m_values.size(); i++ ) {
 
             // @todo only use log if doLog is requested. probably log should be in genesettablemodel
-            double val = values.get( i );
+            double val = m_values.get( i );
 
             if ( Double.isNaN( val ) ) {
                 continue;
@@ -169,11 +166,11 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
     public void revalidate() {
     }
 
-    @Override 
+    @Override
     public void repaint( long tm, int x, int y, int width, int height ) {
     }
 
-    @Override 
+    @Override
     public void repaint( Rectangle r ) {
     }
 

@@ -35,14 +35,14 @@ import ubic.erminej.data.GeneScores;
  */
 abstract class AbstractPvalGeneratorTest extends TestCase {
     protected OraPvalGenerator test = null;
-    protected GeneAnnotations g = null;
-    protected GeneScores gsr = null;
+    protected GeneAnnotations annotations = null;
+    protected GeneScores scores = null;
     protected InputStream is = null;
     protected InputStream ism = null;
     protected InputStream isi = null;
     protected Settings s = null;
     protected GONames gon = null;
-    protected GeneSetSizeComputer csc = null;
+    protected GeneSetSizeComputer sizeComputer = null;
 
     @Override
     protected void setUp() throws Exception {
@@ -55,16 +55,25 @@ abstract class AbstractPvalGeneratorTest extends TestCase {
         s = new Settings();
         s.setPValThreshold( 0.015 );
         s.setMinClassSize( 2 );
+        s.setScoreCol( 2 );
         s.setDoLog( true );
+        s.setBigIsBetter( false );
         s.setUseBiologicalProcess( true );
         s.setUseCellularComponent( true );
         s.setUseMolecularFunction( true );
 
-        g = new GeneAnnotations( ism, null, null, null );
+        annotations = new GeneAnnotations( ism, null, null, null );
 
-        gsr = new GeneScores( is, s, null, g );
+        assertTrue( annotations.getGenes().size() > 0 );
+        assertTrue( annotations.getGeneSets().size() > 0 );
+
+        scores = new GeneScores( is, s, null, annotations );
+
+        assertNotNull( scores.getGeneScores() );
+        assertNotNull( scores.getProbeToScoreMap() );
+
         gon = new GONames( isi );
-        csc = new GeneSetSizeComputer( gsr.getProbeToScoreMap().keySet(), g, gsr, true );
+        sizeComputer = new GeneSetSizeComputer( scores.getProbeToScoreMap().keySet(), annotations, scores, true );
 
         super.setUp();
     }

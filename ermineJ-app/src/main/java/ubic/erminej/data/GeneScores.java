@@ -71,7 +71,7 @@ public class GeneScores {
     private Map<String, Double> probeToScoreMap;
     private Settings settings;
     double[] geneScores;
-    private GeneAnnotations geneAnnots;
+    final private GeneAnnotations geneAnnots;
 
     /**
      * @param is - input stream
@@ -82,6 +82,10 @@ public class GeneScores {
      */
     public GeneScores( InputStream is, Settings settings, StatusViewer messenger, GeneAnnotations geneAnnotations )
             throws IOException {
+
+        if ( geneAnnotations == null ) {
+            throw new IllegalArgumentException( "Annotations cannot be null" );
+        }
         this.geneAnnots = geneAnnotations;
         this.init();
         this.settings = settings;
@@ -101,13 +105,16 @@ public class GeneScores {
      */
     public GeneScores( List<String> probes, List<Double> scores, Map<String, Collection<String>> geneToProbeMap,
             Map<String, String> probeToGeneMap, Settings settings ) {
+
+        geneAnnots = null;
+
         if ( probes.size() != scores.size() ) {
             throw new IllegalArgumentException( "Probe and scores must be equal in number" );
         }
         if ( probes.size() == 0 ) {
             throw new IllegalArgumentException( "No probes" );
         }
- 
+
         if ( geneToProbeMap == null || geneToProbeMap.size() == 0 ) {
             throw new IllegalStateException( "groupToProbeMap was not set." );
         }
@@ -174,7 +181,7 @@ public class GeneScores {
 
     /**
      * @throws IOException
-     * @param filename
+     * @param filename file with the scores
      * @param settings
      * @param StatusViewer messenger
      * @param geneToProbeMap
@@ -308,6 +315,12 @@ public class GeneScores {
         }
     }
 
+    /**
+     * @param is
+     * @param messenger
+     * @throws IOException
+     * @throws IllegalStateException
+     */
     private void read( InputStream is, StatusViewer messenger ) throws IOException, IllegalStateException {
         assert geneAnnots != null;
         int scoreCol = settings.getScoreCol();
@@ -330,6 +343,7 @@ public class GeneScores {
         int numRepeatedProbes = 0;
         Collection<String> unknownProbes = new HashSet<String>();
         dis.readLine(); // skip header.
+
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
 
@@ -414,7 +428,7 @@ public class GeneScores {
             }
         }
 
-        setUpGeneToScoreMap( settings, null, messenger );
+        setUpGeneToScoreMap( settings, geneAnnots.getGeneToProbeMap(), messenger );
 
     }
 
@@ -502,16 +516,19 @@ public class GeneScores {
             genes = geneAnnots.getGenes();
         }
 
+        if ( genes.size() == 0 ) {
+            throw new IllegalStateException( "Genes must be set" );
+        }
+
         double[] geneScoreTemp = new double[genes.size()];
         int counter = 0;
 
-        for ( Iterator<String> groupMapItr = genes.iterator(); groupMapItr.hasNext(); ) {
+        for ( String geneSymbol : genes ) {
 
             if ( Thread.currentThread().isInterrupted() ) {
                 return;
             }
 
-            String geneSymbol = groupMapItr.next();
             /*
              * probes in this group according to the array platform.
              */
@@ -522,13 +539,13 @@ public class GeneScores {
             } else {
                 probes = geneAnnots.getGeneProbes( geneSymbol );
             }
-            int in_size = 0;
 
             if ( probes == null ) continue;
 
             // Analyze all probes in this 'group' (pointing to the same gene)
-            for ( Iterator<String> pbItr = probes.iterator(); pbItr.hasNext(); ) {
-                String probe = pbItr.next();
+
+            int in_size = 0;
+            for ( String probe : probes ) {
 
                 if ( !probeToScoreMap.containsKey( probe ) ) {
                     continue;

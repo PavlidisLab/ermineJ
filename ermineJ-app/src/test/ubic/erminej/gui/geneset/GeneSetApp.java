@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.UIManager; 
 
 import ubic.erminej.Settings;
 import ubic.erminej.gui.geneset.JGeneSetFrame;
@@ -47,9 +46,9 @@ public class GeneSetApp {
         settings.setRawFile( filename );
 
         final String[] PROBES = { "31946_s_at", "31947_r_at", "31948_at", "31949_at", "31950_at" };
-        Map pvalues = new HashMap();
+        Map<String, Double> pvalues = new HashMap<String, Double>();
 
-        List probeIDs = new ArrayList();
+        List<String> probeIDs = new ArrayList<String>();
         for ( int i = 0; i < PROBES.length; i++ ) {
             probeIDs.add( i, PROBES[i] );
             pvalues.put( PROBES[i], new Double( 0.5 - 0.02 * i ) ); // fake p values.
@@ -57,38 +56,22 @@ public class GeneSetApp {
 
         JGeneSetFrame frame = new JGeneSetFrame( "foo", null, probeIDs, pvalues, null, settings );
         frame.setSize( new Dimension( 800, 600 ) );
-        frame.show();
+        frame.setVisible( true );
     }
 
     /**
      * @param args[0] the name of the raw data file, as an absolute path, where we look up the microarray data for each
      *        gene in the current gene set.
      */
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws Exception {
 
         // Make sure the filename was passed in
         if ( args.length < 1 ) {
             System.err.println( "Please specify the name of the data file as a program argument" );
             return;
         }
-        try {
-            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            GeneSetApp app = new GeneSetApp( args[0] );
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        } catch ( ClassNotFoundException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch ( InstantiationException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch ( IllegalAccessException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch ( UnsupportedLookAndFeelException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+        new GeneSetApp( args[0] );
 
     } // end main
 } // end class

@@ -455,6 +455,11 @@ public class Settings {
         return this.userSetRawDataFile;
     }
 
+    /**
+     * @return true if multiple values for a gene should be combined, or whether each probe should be treated
+     *         independently regardless
+     * @see getGeneRepTreatment for setting of how the combination occurs.
+     */
     public boolean getUseWeights() {
         if ( this.getGeneRepTreatment() == MEAN_PVAL || this.getGeneRepTreatment() == BEST_PVAL ) return true;
         return false;

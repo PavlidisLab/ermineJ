@@ -19,19 +19,15 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-
-import ubic.basecode.math.SpecFunc;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import cern.jet.math.Arithmetic;
-import cern.jet.stat.Probability;
+import ubic.basecode.math.SpecFunc;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneSetResult;
+import cern.jet.math.Arithmetic;
+import cern.jet.stat.Probability;
 
 /**
  * Compute gene set scores based on over-representation analysis (ORA).
@@ -46,6 +42,15 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     protected int numOverThreshold = 0;
     protected int numUnderThreshold = 0;
 
+    /**
+     * @param settings
+     * @param a
+     * @param csc
+     * @param not
+     * @param nut
+     * @param gon
+     * @param inputSize
+     */
     public OraPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, int not, int nut,
             GONames gon, int inputSize ) {
 
@@ -85,68 +90,61 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         int effectiveGeneSetSize = effectiveSizes.get( className );
-        if ( effectiveGeneSetSize < settings.getMinClassSize() || effectiveGeneSetSize > settings.getMaxClassSize() ) {
+        if ( effectiveGeneSetSize == 0 || effectiveGeneSetSize < settings.getMinClassSize()
+                || effectiveGeneSetSize > settings.getMaxClassSize() ) {
             if ( log.isDebugEnabled() ) log.debug( "Class " + className + " is outside of selected size range" );
             return null;
         }
 
         Collection<String> probes = geneAnnots.getGeneSetProbes( className );
-        Iterator<String> classit = probes.iterator();
 
-        // store pvalues for items in the class.
-        double[] groupPvalArr = new double[effectiveGeneSetSize];
-        Set<String> record = new HashSet<String>();
         int v_size = 0;
 
-        while ( classit.hasNext() ) {
+        for ( String probe : probes ) {
             ifInterruptedStop();
-            String probe = classit.next(); // probe id
 
-            if ( probesToScores.containsKey( probe ) ) {
-                if ( settings.getUseWeights() ) {
+            if ( !probesToScores.containsKey( probe ) ) {
+                continue;
+            }
 
-                    if ( !record.contains( geneAnnots.getProbeToGeneMap().get( probe ) ) ) {
-                        record.add( geneAnnots.getProbeToGeneMap().get( probe ) );
+            if ( settings.getUseWeights() ) {
 
-                        if ( !geneToScoreMap.containsKey( geneAnnots.getProbeToGeneMap().get( probe ) ) ) {
-                            throw new NullPointerException( "No gene score for " + probe );
-                        }
+                String geneName = geneAnnots.getProbeToGeneMap().get( probe );
 
-                        Double geneScore = geneToScoreMap.get( geneAnnots.getProbeToGeneMap().get( probe ) );
-
-                        if ( geneScore == null ) {
-                            throw new NullPointerException( "Null gene score for " + probe );
-                        }
-
-                        groupPvalArr[v_size] = geneScore.doubleValue();
-                        double rawGeneScore = groupPvalArr[v_size];
-                        if ( scorePassesThreshold( rawGeneScore, geneScoreThreshold ) ) {
-                            successes++;
-                        } else {
-                            failures++;
-                        }
-                        v_size++;
-                    }
-
-                } else { // no weights
-
-                    /*
-                     * pvalue for this probe. This will not be null if things have been done correctly so far. This is
-                     * the only place we need the raw pvalue for a probe.
-                     */
-                    Double pbpval = probesToScores.get( probe );
-
-                    double score = pbpval.doubleValue();
-
-                    // hypergeometric pval info.
-                    if ( scorePassesThreshold( score, geneScoreThreshold ) ) {
-                        successes++;
-                    } else {
-                        failures++;
-                    }
-
+                if ( !geneToScoreMap.containsKey( geneName ) ) {
+                    continue;
                 }
-            } // if in data set
+
+                Double geneScore = geneToScoreMap.get( geneName );
+
+                if ( geneScore == null ) {
+                    log.warn( "Null gene score for " + probe );
+                    continue;
+                }
+
+                if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
+                    if ( log.isDebugEnabled() ) log.debug( probe + " " + geneScore + " beats " + geneScoreThreshold );
+                    successes++;
+                } else {
+                    failures++;
+                }
+                v_size++;
+            } else { // no weights
+
+                /*
+                 * pvalue for this probe. This will not be null if things have been done correctly so far. This is the
+                 * only place we need the raw pvalue for a probe.
+                 */
+                Double score = probesToScores.get( probe );
+
+                if ( scorePassesThreshold( score, geneScoreThreshold ) ) {
+                    if ( log.isDebugEnabled() ) log.debug( probe + " " + score + " beats " + geneScoreThreshold );
+                    successes++;
+                } else {
+                    failures++;
+                }
+
+            }
         } // end of while over items in the class.
 
         // Hypergeometric p value calculation (or binomial approximation)
@@ -154,32 +152,24 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         // (successes); numOverThreshold= number of genes which
         // meet criteria (trials); pos_prob: fractional size of
         // class wrt data size.
-        double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
-        double expected = numOverThreshold * pos_prob;
 
-        // System.err.println( successes + ", " + effectiveGeneSetSize + ", "
-        // + ( inputSize - effectiveGeneSetSize ) + ", "
-        // + numOverThreshold );
+        if ( log.isDebugEnabled() ) {
+            log.debug( className + " ingroupoverthresh=" + successes + " setsize=" + effectiveGeneSetSize
+                    + " totalinputsize=" + inputSize + " totaloverthresh=" + numOverThreshold + " oraP=" + oraPval );
+        }
 
-        if ( successes < expected || pos_prob == 0.0 ) { // fewer than expected,
-            // still do upper tail - to be consistent with other methods.
+        /*
+         * We use these two terms to include the probability that success = measured value, as well as greater than
+         * (which is what phyper delivers)
+         */
+        oraPval = SpecFunc.dhyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold )
+                + SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold,
+                        false );
 
-            // successes, positives, negatives, trials
-            oraPval = SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize,
-                    numOverThreshold, false );
-
-            if ( Double.isNaN( oraPval ) ) {
-                oraPval = Probability.binomialComplemented( successes, numOverThreshold, pos_prob );
-            }
-
-        } else {
-
-            oraPval = SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize,
-                    numOverThreshold, false );
-
-            if ( Double.isNaN( oraPval ) ) {
-                oraPval = Probability.binomialComplemented( successes, numOverThreshold, pos_prob );
-            }
+        if ( Double.isNaN( oraPval ) ) {
+            double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
+            oraPval = SpecFunc.dbinom( successes, numOverThreshold, pos_prob )
+                    + Probability.binomialComplemented( successes, numOverThreshold, pos_prob );
         }
 
         // set up the return object.
@@ -188,8 +178,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( goName != null ) {
             nameForId = goName.getNameForId( className );
         }
-        GeneSetResult res = new GeneSetResult( className, nameForId, actualSizes.get( className )
-                .intValue(), effectiveGeneSetSize );
+        GeneSetResult res = new GeneSetResult( className, nameForId, actualSizes.get( className ).intValue(),
+                effectiveGeneSetSize );
         res.setScore( successes );
         res.setPValue( oraPval );
         return res;

@@ -7,3 +7,16 @@ ProbeE	0.1
 ProbeF	0.1
 ProbeG	0.1
 ProbeH	0.1
+ProbeI	0.2
+ProbeJ	0.2
+ProbeK	0.2
+ProbeL	0.2
+ProbeM	0.2
+ProbeN	0.25
+ProbeO	0.3
+ProbeP	0.4
+ProbeQ	0.5
+ProbeR	0.6
+ProbeS	0.7
+ProbeT	0.8
+ProbeU	0.9
