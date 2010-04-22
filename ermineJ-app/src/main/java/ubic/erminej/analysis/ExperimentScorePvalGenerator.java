@@ -152,7 +152,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         if ( Double.isNaN( pval ) ) {
-            throw new IllegalStateException( "Warning, a pvalue was not a number: raw score = " + rawscore );
+            throw new IllegalStateException( "A pvalue was not a number: raw score = " + rawscore );
         }
         return pval;
     }
