@@ -82,7 +82,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         int failures = 0;
 
         // variables for outputs
-        double oraPval = -1.0;
+        double oraPval = Double.NaN;
 
         if ( !effectiveSizes.containsKey( className ) ) {
             log.warn( "No size information available for " + className + ", skipping" );
@@ -153,23 +153,29 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         // meet criteria (trials); pos_prob: fractional size of
         // class wrt data size.
 
-        if ( log.isDebugEnabled() ) {
-            log.debug( className + " ingroupoverthresh=" + successes + " setsize=" + effectiveGeneSetSize
-                    + " totalinputsize=" + inputSize + " totaloverthresh=" + numOverThreshold + " oraP=" + oraPval );
+        oraPval = 0.0;
+        for ( int i = successes; i <= Math.min( numOverThreshold, effectiveGeneSetSize ); i++ ) {
+            oraPval += SpecFunc.dhyper( i, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold );
         }
 
-        /*
-         * We use these two terms to include the probability that success = measured value, as well as greater than
-         * (which is what phyper delivers)
-         */
-        oraPval = SpecFunc.dhyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold )
-                + SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold,
-                        false );
+        // oraPval = SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize,
+        // numOverThreshold,
+        // false );
+
+        // if ( log.isDebugEnabled() ) {
+        log.info( className + " ingroupoverthresh=" + successes + " setsize=" + effectiveGeneSetSize
+                + " totalinputsize=" + inputSize + " totaloverthresh=" + numOverThreshold + " oraP="
+                + String.format( "%.2g", oraPval ) );
+        // }
 
         if ( Double.isNaN( oraPval ) ) {
             double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
-            oraPval = SpecFunc.dbinom( successes, numOverThreshold, pos_prob )
-                    + Probability.binomialComplemented( successes, numOverThreshold, pos_prob );
+
+            oraPval = 0.0;
+            for ( int i = successes; i <= Math.min( numOverThreshold, effectiveGeneSetSize ); i++ ) {
+                oraPval += SpecFunc.dbinom( i, numOverThreshold, pos_prob );
+            }
+            // oraPval = Probability.binomialComplemented( successes, numOverThreshold, pos_prob );
         }
 
         // set up the return object.
