@@ -36,25 +36,22 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  */
 
 public class GeneSetWizard extends Wizard {
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 7175277380197599151L;
     private static Log log = LogFactory.getLog( GeneSetWizard.class.getName() );
-    Settings settings;
-    GeneAnnotations geneData;
-    GONames goData;
-    GeneSetWizardStep1 step1; // case 1 (manual creating) and case 2 (new from file)
-    GeneSetWizardStep1A step1A; // case 3 (modifying existing)
-    GeneSetWizardStep2 step2; // step 2 for cases 1-3 and step 1 for case 4
-    GeneSetWizardStep3 step3;
+    private Settings settings;
+    private GeneAnnotations geneData;
+    private GONames goData;
+    private GeneSetWizardStep1 step1; // case 1 (manual creating) and case 2 (new from file)
+    private GeneSetWizardStep1A step1A; // case 3 (modifying existing)
+    private GeneSetWizardStep2 step2; // step 2 for cases 1-3 and step 1 for case 4
+    private GeneSetWizardStep3 step3;
 
-    int step;
+    private int step;
     boolean makingNewGeneSet;
     boolean nostep1 = false;
-    UserDefinedGeneSetManager newGeneSet;
-    UserDefinedGeneSetManager oldGeneSet;
-    String geneSetId;
+    private UserDefinedGeneSetManager newGeneSet;
+    private UserDefinedGeneSetManager oldGeneSet;
 
     /**
      * Use this constructor to let the user choose which gene set to look at or to make a new one.
@@ -108,7 +105,6 @@ public class GeneSetWizard extends Wizard {
         this.settings = callingframe.getSettings();
         this.geneData = geneData;
         this.goData = goData;
-        this.geneSetId = geneSetId;
         this.makingNewGeneSet = false;
 
         newGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );

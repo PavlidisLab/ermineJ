@@ -43,11 +43,8 @@ import ubic.erminej.Settings;
  * @author Homin Lee
  * @version $Id$
  */
-
 public class GeneSetWizardStep1 extends WizardStep {
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = -2352380414699946183L;
     private JButton browseButton;
     private JTextField classFile;
@@ -98,9 +95,9 @@ public class GeneSetWizardStep1 extends WizardStep {
         buttonGroup1.add( fileInputButton );
         buttonGroup1.add( manInputButton );
         JLabel jLabel4 = new JLabel();
-        jLabel4.setText( "- File with gene symbols" );
+        jLabel4.setText( "- File with gene or probe symbols" );
         JLabel jLabel5 = new JLabel();
-        jLabel5.setText( "- Enter using lists" );
+        jLabel5.setText( "- Enter manually in the next step" );
         jPanel4.add( jLabel5, new GridBagConstraints( 1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
                 GridBagConstraints.NONE, new Insets( 0, 16, 8, 10 ), 125, 10 ) );
         jPanel4.add( jLabel4, new GridBagConstraints( 1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
@@ -119,7 +116,7 @@ public class GeneSetWizardStep1 extends WizardStep {
         JPanel jPanel2 = new JPanel(); // holds file chooser
         jPanel2.setPreferredSize( new Dimension( 354, 100 ) );
         browseButton = new JButton();
-        browseButton.setText( "Browse..." );
+        browseButton.setText( "Browse ..." );
         browseButton.addActionListener( new GeneSetWizardStep1_browseButton_actionAdapter( this ) );
         browseButton.setEnabled( false );
         classFile = new JTextField();

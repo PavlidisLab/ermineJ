@@ -19,6 +19,7 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 import ubic.basecode.bio.geneset.GONames;
@@ -27,7 +28,6 @@ import ubic.basecode.math.SpecFunc;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneSetResult;
 import cern.jet.math.Arithmetic;
-import cern.jet.stat.Probability;
 
 /**
  * Compute gene set scores based on over-representation analysis (ORA).
@@ -98,7 +98,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         Collection<String> probes = geneAnnots.getGeneSetProbes( className );
 
-        int v_size = 0;
+        /*
+         * Only count genes once!
+         */
+        Collection<String> seenGenes = new HashSet<String>();
 
         for ( String probe : probes ) {
             ifInterruptedStop();
@@ -115,6 +118,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                     continue;
                 }
 
+                if ( seenGenes.contains( geneName ) ) {
+                    continue;
+                }
+
                 Double geneScore = geneToScoreMap.get( geneName );
 
                 if ( geneScore == null ) {
@@ -123,13 +130,15 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 }
 
                 if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
-                    if ( log.isDebugEnabled() ) log.debug( probe + " " + geneScore + " beats " + geneScoreThreshold );
+                    if ( log.isInfoEnabled() )
+                        log.info( className + " " + probe + " " + geneScore + " beats " + geneScoreThreshold );
                     successes++;
                 } else {
                     failures++;
                 }
-                v_size++;
-            } else { // no weights
+
+                seenGenes.add( geneName );
+            } else {
 
                 /*
                  * pvalue for this probe. This will not be null if things have been done correctly so far. This is the
@@ -158,15 +167,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             oraPval += SpecFunc.dhyper( i, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold );
         }
 
-        // oraPval = SpecFunc.phyper( successes, effectiveGeneSetSize, inputSize - effectiveGeneSetSize,
-        // numOverThreshold,
-        // false );
-
-        // if ( log.isDebugEnabled() ) {
-        log.info( className + " ingroupoverthresh=" + successes + " setsize=" + effectiveGeneSetSize
+        log.debug( className + " ingroupoverthresh=" + successes + " setsize=" + effectiveGeneSetSize
                 + " totalinputsize=" + inputSize + " totaloverthresh=" + numOverThreshold + " oraP="
                 + String.format( "%.2g", oraPval ) );
-        // }
 
         if ( Double.isNaN( oraPval ) ) {
             double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
@@ -175,7 +178,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             for ( int i = successes; i <= Math.min( numOverThreshold, effectiveGeneSetSize ); i++ ) {
                 oraPval += SpecFunc.dbinom( i, numOverThreshold, pos_prob );
             }
-            // oraPval = Probability.binomialComplemented( successes, numOverThreshold, pos_prob );
         }
 
         // set up the return object.

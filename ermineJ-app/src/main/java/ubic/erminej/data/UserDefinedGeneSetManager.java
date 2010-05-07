@@ -194,7 +194,7 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Read in a list of genes from a file. The list of genes is unadorned, one per row.
+     * Read in a list of genes or probe ids from a file. The list of genes is unadorned, one per row.
      * 
      * @param fileName
      * @throws IOException
@@ -202,14 +202,14 @@ public class UserDefinedGeneSetManager {
     public void loadPlainGeneList( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
         String row;
-        Collection<String> genes = new ArrayList<String>();
+        Collection<String> genesOrProbes = new ArrayList<String>();
         while ( ( row = dis.readLine() ) != null ) {
             if ( row.length() == 0 ) continue;
-            genes.add( row );
+            genesOrProbes.add( row );
         }
         dis.close();
         int ignored = 0;
-        fillInProbes( genes, ignored );
+        fillInProbes( genesOrProbes, ignored );
     }
 
     /**
@@ -459,18 +459,21 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * @param genes
+     * @param genesOrProbeNames OR probe ids.
      * @param ignored
      * @return
      */
-    private void fillInProbes( Collection<String> genes, int ignored ) {
+    private void fillInProbes( Collection<String> genesOrProbeNames, int ignored ) {
         Set<String> probeSet = new HashSet<String>();
-        for ( Iterator<String> it = genes.iterator(); it.hasNext(); ) {
-            String gene = it.next().toUpperCase();
-            if ( geneData.getGeneProbeList( gene ) != null ) {
-                probeSet.addAll( geneData.getGeneProbeList( gene ) );
+        for ( String identifier : genesOrProbeNames ) {
+            if ( geneData.getGeneProbeList( identifier ) != null ) {
+                probeSet.addAll( geneData.getGeneProbeList( identifier ) );
+                log.info( "Gene " + identifier + " recognized." );
+            } else if ( geneData.getProbeGeneName( identifier ) != null ) {
+                log.info( "Probe " + identifier + " recognized" );
+                probeSet.add( identifier ); // it's actually a probe
             } else {
-                log.info( "Gene " + gene + " not found in the array design" );
+                log.info( "Gene or probe " + identifier + " not found in the array design" );
                 ignored++;
             }
         }
