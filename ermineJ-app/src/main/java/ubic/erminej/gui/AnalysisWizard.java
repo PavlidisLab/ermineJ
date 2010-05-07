@@ -50,7 +50,7 @@ public class AnalysisWizard extends Wizard {
     /**
      * 
      */
-    private static final int WIZARD_PREFERRED_WIDTH = 550;
+    private static final int WIZARD_PREFERRED_WIDTH = 570;
 
     private static Log log = LogFactory.getLog( AnalysisWizard.class.getName() );
 

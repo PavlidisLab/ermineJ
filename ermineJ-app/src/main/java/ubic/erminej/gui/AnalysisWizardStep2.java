@@ -19,20 +19,44 @@
 package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JWindow;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import org.apache.commons.lang.StringUtils;
 
 import ubic.basecode.util.FileTools;
-
 import ubic.erminej.Settings;
 
 /**
@@ -90,7 +114,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         // panel 3
         JPanel scoreColumnPanel = new JPanel();
         JLabel jLabel3 = new JLabel();
-        jLabel3.setText( "Score column:" );
+        jLabel3.setText( "Column:" );
         jTextFieldScoreCol = new JTextField();
         jTextFieldScoreCol.setPreferredSize( new Dimension( 30, 19 ) );
         jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.RIGHT ); // moves textbox text to the right
@@ -100,6 +124,12 @@ public class AnalysisWizardStep2 extends WizardStep {
         jTextFieldScoreCol.setEditable( true );
         scoreColumnPanel.add( jLabel3, null );
         scoreColumnPanel.add( jTextFieldScoreCol, null );
+
+        JButton previewButton = new JButton( "Preview" );
+        previewButton.setToolTipText( "Preview the scores to be imported" );
+        previewButton.addActionListener( new PreviewButtonAdapter( this ) );
+
+        scoreColumnPanel.add( previewButton, null );
 
         // panel 4
         JPanel rawDataPanel = new JPanel();
@@ -225,6 +255,112 @@ public class AnalysisWizardStep2 extends WizardStep {
         settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
     }
 
+    /**
+     * Show a preview of the dat
+     */
+    public void previewScoresActionPerformed() {
+
+        if ( scoreFile.getText().length() != 0 && !FileTools.testFile( scoreFile.getText() ) ) {
+            wiz.showError( "You must choose a valid file to preview" );
+            return;
+        }
+
+        if ( StringUtils.isBlank( jTextFieldScoreCol.getText() ) ) {
+            wiz.showError( "You must valid column" );
+            return;
+        }
+
+        int column = Integer.valueOf( jTextFieldScoreCol.getText() ).intValue();
+
+        try {
+            FileInputStream fis = new FileInputStream( scoreFile.getText() );
+            BufferedInputStream bis = new BufferedInputStream( fis );
+            BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
+
+            String line = null;
+
+            int lineNum = 0;
+
+            List<Object[]> table = new ArrayList<Object[]>();
+
+            while ( ( line = dis.readLine() ) != null ) {
+                if ( line.length() == 0 ) continue;
+
+                String[] toks = StringUtils.splitPreserveAllTokens( line, '\t' );
+
+                if ( toks.length < column ) {
+                    wiz.showError( "The file does not have enough fields at line " + lineNum );
+                    break;
+                }
+
+                String[] toUseToks = new String[2];
+                toUseToks[0] = toks[0];
+                toUseToks[1] = toks[column - 1];
+
+                table.add( toUseToks );
+
+                lineNum++;
+
+                if ( lineNum > 100 ) break;
+            }
+
+            dis.close();
+
+            Object[][] tab = new Object[table.size()][];
+            for ( int i = 0; i < tab.length; i++ ) {
+                tab[i] = table.get( i );
+            }
+
+            TableModel tableModel = new DefaultTableModel( tab, new Object[] { "Identifier", "Score" } );
+
+            final JDialog previewPanel = new JDialog( wiz );
+
+            Container content = previewPanel.getContentPane();
+
+            previewPanel.setTitle( "Preview of scores" );
+            previewPanel.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
+            previewPanel.setFocusable( true );
+
+            JTable tableView = new JTable( tableModel );
+            JScrollPane scrollPane = new JScrollPane( tableView );
+            content.add( scrollPane, BorderLayout.CENTER );
+
+            JButton closeButton = new JButton( "Close" );
+
+            closeButton.addActionListener( new ActionListener() {
+
+                @Override
+                public void actionPerformed( ActionEvent e ) {
+                    previewPanel.dispose();
+
+                }
+            } );
+
+            JPanel p2 = new JPanel();
+
+            p2.add( closeButton );
+            content.add( p2, BorderLayout.SOUTH );
+
+            previewPanel.pack();
+            previewPanel.setSize( 400, 300 );
+
+            Toolkit tk = Toolkit.getDefaultToolkit();
+            Dimension screenSize = tk.getScreenSize();
+            int screenHeight = screenSize.height;
+            int screenWidth = screenSize.width;
+
+            previewPanel.setLocation( screenWidth / 2, screenHeight / 2 );
+
+            previewPanel.setVisible( true );
+            previewPanel.requestFocus();
+
+        } catch ( IOException e ) {
+            wiz.showError( "The file could not be previewed: " + e.getMessage() );
+            return;
+        }
+
+    }
+
 }
 
 class AnalysisWizardStep2_rawBrowseButton_actionAdapter implements java.awt.event.ActionListener {
@@ -249,4 +385,23 @@ class AnalysisWizardStep2_scoreBrowseButton_actionAdapter implements java.awt.ev
     public void actionPerformed( ActionEvent e ) {
         adaptee.scoreBrowseButton_actionPerformed();
     }
+}
+
+class PreviewButtonAdapter implements ActionListener {
+    AnalysisWizardStep2 adaptee;
+
+    PreviewButtonAdapter( AnalysisWizardStep2 adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.previewScoresActionPerformed();
+    }
+
 }
