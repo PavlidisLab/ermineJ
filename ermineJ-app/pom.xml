@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>1.0.8</version>
+			<version>1.0.10</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
