@@ -22,8 +22,7 @@
 	<scm>
 		<connection>scm:cvs:ext:@katz.pavlab.chibi.ubc.ca:/space/cvs:ermineJ</connection>
 		<developerConnection>scm:cvs:ext:@katz.pavlab.chibi.ubc.ca:/space/cvs:ermineJ</developerConnection>
-		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
-    <tag>ermineJ-2_1_19</tag>
+		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url> 
   </scm>
 	<issueManagement>
 		<system>Bugzilla</system>
