@@ -165,27 +165,31 @@ public class classScoreCMD {
             }
         }
 
-        GeneScores geneScores;
-        if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-            statusMessenger.showStatus( "Gene Scores are in memory" );
-            geneScores = geneScoreSets.get( settings.getScoreFile() );
-        } else {
-            statusMessenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData );
-            geneScoreSets.put( settings.getScoreFile(), geneScores );
-        }
+        GeneScores geneScores = null;
+        if ( settings.getClassScoreMethod() != Settings.CORR /* except correlation scoring, no gene scores required */) {
+            if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
+                statusMessenger.showStatus( "Gene Scores are in memory" );
+                geneScores = geneScoreSets.get( settings.getScoreFile() );
+            } else {
+                assert settings.getScoreFile() != null;
+                statusMessenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
+                geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData );
+                geneScoreSets.put( settings.getScoreFile(), geneScores );
+            }
 
-        if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
-            statusMessenger.showStatus( "Didn't get geneScores" );
+            if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
+                statusMessenger.showStatus( "Didn't get geneScores" );
+            }
         }
 
         Set<String> activeProbes = null;
-        if ( rawData != null && geneScores != null ) { // favor the geneScores
-            // list.
+        if ( rawData != null && geneScores != null ) {
+            // favor the geneScores list.
             activeProbes = geneScores.getProbeToScoreMap().keySet();
         } else if ( rawData == null && geneScores != null ) {
             activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData != null && geneScores == null ) {
+        } else if ( settings.getClassScoreMethod() == Settings.CORR ) {
+            assert rawData != null;
             activeProbes = new HashSet<String>( rawData.getRowNames() );
         }
 
@@ -673,7 +677,16 @@ public class classScoreCMD {
                 showHelpAndExit();
             }
         }
-
+        
+        if (settings.getClassScoreMethod() == Settings.CORR && settings.getRawDataFileName() == null) {
+            System.err.println("You must supply a raw data file if you are using the correlation method");
+            showHelpAndExit();
+        }
+        
+        if (settings.getClassScoreMethod() != Settings.CORR && settings.getScoreFile() == null) {
+            System.err.println("You must supply a gene score file if you are using the correlation method");
+            showHelpAndExit();
+        }
     }
 
     private void showHelpAndExit() {
