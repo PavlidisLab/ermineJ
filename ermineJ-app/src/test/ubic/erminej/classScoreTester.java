@@ -37,6 +37,8 @@ import ubic.erminej.Settings;
 import ubic.erminej.classScoreCMD;
 
 /**
+ * Not complete! Non functional as it stands.
+ * 
  * @author pavlidis
  * @version $Id$
  */
@@ -45,7 +47,7 @@ public class classScoreTester extends classScoreCMD {
     private static final double TOLERANCE = 0.001;
 
     // find settings in the data directory; read each one, run analyses on them.
-    public classScoreTester() throws IOException {
+    public classScoreTester() {
         super();
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( classScoreTester.class
@@ -109,11 +111,7 @@ public class classScoreTester extends classScoreCMD {
     }
 
     public static void main( String[] args ) {
-        try {
-            new classScoreTester();
-        } catch ( IOException e ) {
-            log.fatal( e, e );
-        }
+        new classScoreTester();
     }
 
     private boolean compareResults( String a, String b ) throws IOException {

@@ -14,7 +14,13 @@
  */
 package ubic.erminej;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.nio.CharBuffer;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -32,10 +38,12 @@ public class CliTest extends TestCase {
 
     private String basePath = "";
 
+    private String output = "";
+
     private String gofile;
 
     @Override
-    public final void setUp() {
+    public final void setUp() throws Exception {
         ermineJHome = System.getenv( "ERMINEJ_DEV_HOME" );
         if ( StringUtils.isBlank( ermineJHome ) ) {
             throw new IllegalStateException( "Please set ERMINEJ_DEV_HOME" );
@@ -53,6 +61,8 @@ public class CliTest extends TestCase {
         if ( !( new File( gofile ) ).canRead() ) {
             throw new IllegalStateException( "Could not locate GO file" );
         }
+
+        output = File.createTempFile( "ermineJtest", "tmp" ).getAbsolutePath();
 
     }
 
@@ -91,8 +101,23 @@ public class CliTest extends TestCase {
     public final void testCliD() throws Exception {
         classScoreCMD cmd = new classScoreCMD();
         boolean okay = cmd.run( new String[] { "-a", basePath + File.separator + "HG-U95A.an.txt", "-n", "1", "-c",
-                gofile, "-s", basePath + File.separator + "one-way-anova-parsed.txt", "-x", "10" } );
+                gofile, "-s", basePath + File.separator + "one-way-anova-parsed.txt", "-x", "10", "-o", output } );
         assertTrue( okay );
+
+        BufferedReader f = new BufferedReader( new FileReader( new File( output ) ) );
+
+        String line = "";
+        boolean found = false;
+        // TODO do better test of output.
+        while ( ( line = f.readLine() ) != null ) {
+            // System.err.println( line );
+            if ( line.contains( "GO:0008061" ) ) {
+                assertTrue( line.contains( "0.3039054" ) );
+                found = true;
+            }
+        }
+        assertTrue( found );
+
     }
 
     /**

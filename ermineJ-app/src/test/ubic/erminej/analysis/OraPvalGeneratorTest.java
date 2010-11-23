@@ -62,7 +62,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     }
 
     public void testClassPval1() {
-        double expectedReturn = 0.0;
+        double expectedReturn = 0.28947;
 
         GeneSetResult r = test.classPval( "GO:1", scores.getGeneToPvalMap(), scores.getProbeToScoreMap() );
 
