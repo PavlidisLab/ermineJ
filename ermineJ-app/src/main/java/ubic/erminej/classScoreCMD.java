@@ -63,39 +63,55 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
 public class classScoreCMD {
 
     private static final String HEADER = "Options:";
-    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2007 University of British Columbia.";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2010 University of British Columbia.";
 
     private static Log log = LogFactory.getLog( classScoreCMD.class );
 
     public static void main( String[] args ) {
+        classScoreCMD cmd = new classScoreCMD();
         try {
-            classScoreCMD cmd = new classScoreCMD();
-            cmd.processCommandLine( "ermineJ", args );
-            // options( args );
-            cmd.getSettings().setDirectories();
-            if ( cmd.isUseCommandLineInterface() ) {
-                cmd.initialize();
-                try {
-                    GeneSetPvalRun result = cmd.analyze();
-                    cmd.getSettings().writeAnalysisSettings( cmd.getSaveFileName() );
-                    ResultsPrinter rp = new ResultsPrinter( cmd.getSaveFileName(), result, cmd.getGoData(), cmd
-                            .isSaveAllGenes() );
-                    rp.printResults( true );
-                } catch ( Exception e ) {
-                    cmd.getStatusMessenger().showStatus( "Error During analysis:" + e );
-                    e.printStackTrace();
-                }
-            } else {
-                try {
-                    UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-                } catch ( Exception e ) {
-                    e.printStackTrace();
-                }
-                new classScoreGUI( cmd.settings );
-            }
+            cmd.run( args );
         } catch ( IOException e ) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @param args
+     * @throws IOException
+     */
+    protected boolean run( String[] args ) throws IOException {
+
+        boolean okay = processCommandLine( "ermineJ", args );
+
+        if ( !okay ) {
+            return false;
+        }
+
+        // options( args );
+        getSettings().setDirectories();
+        if ( isUseCommandLineInterface() ) {
+            initialize();
+            try {
+                GeneSetPvalRun result = analyze();
+                getSettings().writeAnalysisSettings( getSaveFileName() );
+                ResultsPrinter rp = new ResultsPrinter( getSaveFileName(), result, getGoData(), isSaveAllGenes() );
+                rp.printResults( true );
+            } catch ( Exception e ) {
+                getStatusMessenger().showStatus( "Error During analysis:" + e );
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            try {
+                UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+            } catch ( Exception e ) {
+                e.printStackTrace();
+                return false;
+            }
+            new classScoreGUI( settings );
+        }
+        return true;
     }
 
     protected Settings settings;
@@ -144,6 +160,433 @@ public class classScoreCMD {
 
     public boolean isUseCommandLineInterface() {
         return useCommandLineInterface;
+    }
+
+    @SuppressWarnings("static-access")
+    private void buildOptions() {
+
+        options.addOption( OptionBuilder.withLongOpt( "help" ).create( 'h' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "config" ).hasArg().withDescription(
+                "Configuration file to use (saves typing); additional options given on the command line override those in the file."
+                        + " If you don't use this option, no configuration file will be used." ).withArgName(
+                "config file" ).create( 'C' ) );
+
+        options.addOption( OptionBuilder.withDescription( "Launch the GUI." ).withLongOpt( "gui" ).create( 'G' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Annotation file to be used [required unless using GUI]" ).withLongOpt( "annots" ).withArgName( "file" )
+                .create( 'a' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Affymetrix annotation file format" )
+                .create( 'A' ) );
+
+        options.addOption( OptionBuilder.withDescription(
+                "Sets 'big is better' option for gene scores to true [default = false]" ).create( 'b' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" ).withDescription(
+                "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" ).withArgName( "file" ).create(
+                'c' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Column for scores in input file" ).withLongOpt(
+                "scoreCol" ).withArgName( "integer" ).create( 'e' ) );
+
+        options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription( "Data directory" )
+                .create( 'd' ) );
+
+        options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription(
+                "Directory where custom gene set are located" ).create( 'f' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" ).withDescription(
+                "Filter out non-specific probes" ).create( 'F' ) );
+
+        options
+                .addOption( OptionBuilder
+                        .hasArg()
+                        .withArgName( "value" )
+                        .withLongOpt( "reps" )
+                        .withDescription(
+                                "What to do when genes have multiple scores in input file (due to multiple probes per gene): 1 = best of replicates; 2 = mean of replicates; " )
+                        .create( 'g' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" ).withDescription(
+                "Number of iterations (for iterative methods only" ).withArgName( "integer" ).create( 'i' ) );
+
+        options.addOption( OptionBuilder.withDescription(
+                "Output should include gene symbols for all gene sets (default=don't include symbols)" ).withLongOpt(
+                "genesOut" ).create( 'j' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "logTrans" ).withDescription(
+                "Log transform the scores [recommended for p-values]" ).create( 'l' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Method for computing raw class statistics: " + Settings.MEAN_METHOD + " (mean),  "
+                        + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
+                        + " (mean above quantile)." ).withLongOpt( "stats" ).withArgName( "value" ).create( 'm' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Method for computing gene set significance:  " + Settings.ORA + " (ORA),  " + Settings.RESAMP
+                        + " (resampling of gene scores),  " + Settings.CORR + " (profile correlation),  "
+                        + Settings.ROC + " (ROC)" ).withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Output file name; if omitted, results are written to standard out" ).withArgName( "file" )
+                .withLongOpt( "output" ).create( 'o' ) );
+
+        options.addOption( OptionBuilder.withDescription( "quantile to use" ).withArgName( "integer" ).withLongOpt(
+                "quantile" ).hasArg().create( 'q' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "rawData" ).withDescription(
+                "Raw data file, only needed for profile correlation analysis." ).withArgName( "file" ).create( 'r' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "scoreFile" ).withDescription(
+                "Score file, required for all but profile correlation method" ).withArgName( "file" ).create( 's' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "threshold" ).withDescription(
+                "Score threshold, only used for ORA" ).withArgName( "value" ).create( 't' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the minimum class size" ).withArgName(
+                "integer" ).withLongOpt( "minClassSize" ).create( 'y' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the maximum class size" ).withArgName(
+                "integer" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
+
+        options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" ).withDescription(
+                "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
+
+        options.addOption( OptionBuilder.withLongOpt( "save" ).withDescription( "Save settings to the selected file" )
+                .withArgName( "file" ).create( 'S' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription(
+                "Multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni FWE, "
+                        + Settings.WESTFALLYOUNG + " = Westfall-Young (slow), " + Settings.BENJAMINIHOCHBERG
+                        + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" ).create(
+                'M' ) );
+
+    }
+
+    /**
+     * @return true if everything is okay
+     */
+    private boolean processOptions() {
+
+        if ( commandLine.hasOption( 'h' ) ) {
+            showHelp();
+            return false;
+        }
+
+        if ( commandLine.hasOption( 'G' ) ) {
+            useCommandLineInterface = false;
+        }
+
+        String arg;
+
+        /*
+         * We only read the config file if 1) it is specified by the user or 2) the user is starting the GUI. In either
+         * case, command line options can override.
+         */
+        if ( commandLine.hasOption( 'C' ) ) {
+            arg = commandLine.getOptionValue( 'C' );
+            if ( FileTools.testFile( arg ) ) {
+                try {
+                    settings = new Settings( arg );
+                    System.err.println( "Initializing configuration from " + arg );
+                } catch ( ConfigurationException e ) {
+                    System.err.println( "Invalid config file name (" + arg + ")" );
+                    showHelp();
+                    return false;
+                }
+            } else {
+                System.err.println( "Could not open configuration file: " + arg );
+                showHelp();
+                return false;
+            }
+        } else if ( !useCommandLineInterface ) {
+            /*
+             * GUI: Read the default configuration file for the user.
+             */
+            settings = new Settings();
+        }
+
+        if ( commandLine.hasOption( 'A' ) ) {
+            settings.setAnnotFormat( "Affy CSV" );
+        }
+        if ( commandLine.hasOption( 'a' ) ) {
+            arg = commandLine.getOptionValue( 'a' );
+            if ( FileTools.testFile( arg ) )
+                settings.setAnnotFile( arg );
+            else {
+                System.err.println( "Invalid annotation file name (-a " + arg + ")" );
+                showHelp();
+                return false;
+            }
+        } else if ( !commandLine.hasOption( 'G' ) && !commandLine.hasOption( 'C' ) ) { // using GUI or config file?
+            System.err.println( "Annotation file name (-a) is required or must be supplied in config file" );
+            showHelp();
+            return false;
+        }
+
+        settings.setBigIsBetter( commandLine.hasOption( 'b' ) );
+
+        if ( commandLine.hasOption( 'c' ) ) {
+            arg = commandLine.getOptionValue( 'c' );
+            if ( FileTools.testFile( arg ) )
+                settings.setClassFile( arg );
+            else {
+                System.err.println( "Invalid gene set definition file name (-c " + arg + ")" );
+                showHelp();
+                return false;
+            }
+        } else if ( !commandLine.hasOption( 'G' ) && !commandLine.hasOption( 'C' ) ) { // using GUI config file?
+            System.err.println( "Gene set definition file (-c) is required" );
+            showHelp();
+            return false;
+        }
+
+        if ( commandLine.hasOption( 'd' ) ) {
+            arg = commandLine.getOptionValue( 'd' );
+            if ( FileTools.testDir( arg ) )
+                settings.setDataDirectory( arg );
+            else {
+                System.err.println( "Invalid path for data folder (-d " + arg + ")" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 'e' ) ) {
+            arg = commandLine.getOptionValue( 'e' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg >= 2 ) {
+                    settings.setScoreCol( intarg );
+                } else {
+                    System.err.println( "Invalid score column (-e " + intarg + "), must be a value 2 or higher" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Invalid score column (-e " + arg + "), must be an integer" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 'f' ) ) {
+            arg = commandLine.getOptionValue( 'f' );
+            if ( !FileTools.testDir( arg ) ) new File( arg ).mkdir();
+
+            settings.setCustomGeneSetDirectory( arg );
+            log.debug( settings.getCustomGeneSetDirectory() );
+        }
+        if ( commandLine.hasOption( 'g' ) ) {
+            arg = commandLine.getOptionValue( 'g' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg == 1 || intarg == 2 )
+                    settings.setScoreCol( intarg );
+                else {
+                    System.err.println( "Gene rep treatment must be either "
+                            + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g), you provided '" + intarg + "'" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Gene rep treatment must be either "
+                        + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g), you provided a non-number value: " + arg );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 'i' ) ) {
+            arg = commandLine.getOptionValue( 'i' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg > 0 )
+                    settings.setIterations( intarg );
+                else {
+                    System.err.println( "Iterations must be greater than 0 (-i)" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Iterations must be greater than 0 (-i)" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 'j' ) ) {
+            log.info( "Gene symbols for each term will be output" );
+            this.saveAllGenes = true;
+
+        }
+        if ( commandLine.hasOption( 'k' ) ) {
+            arg = commandLine.getOptionValue( 'k' );
+        }
+
+        if ( commandLine.hasOption( 'l' ) ) {
+            settings.setDoLog( true );
+        } else {
+            settings.setDoLog( false );
+        }
+
+        if ( commandLine.hasOption( 'm' ) ) {
+            arg = commandLine.getOptionValue( 'm' );
+            int intarg = Integer.parseInt( arg );
+            if ( intarg == 0 || intarg == 1 || intarg == 2 )
+                settings.setRawScoreMethod( intarg );
+            else {
+                System.err.println( "Raw score method must be set to 0 (MEAN_METHOD), "
+                        + "1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD) (-m)" );
+                showHelp();
+                return false;
+            }
+        }
+
+        settings.setFilterNonSpecific( commandLine.hasOption( 'F' ) );
+
+        if ( commandLine.hasOption( 'M' ) ) {
+            arg = commandLine.getOptionValue( 'M' );
+            int mtc = Integer.parseInt( arg );
+            settings.setMtc( mtc );
+        }
+        if ( commandLine.hasOption( 'n' ) ) {
+            arg = commandLine.getOptionValue( 'n' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg == 0 || intarg == 1 || intarg == 2 || intarg == 3 )
+                    settings.setClassScoreMethod( intarg );
+                else {
+                    System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
+                            + "2 (CORR), or 3 (ROC) (-n)" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
+                        + "2 (CORR), or 3 (ROC) (-n)" );
+                showHelp();
+                return false;
+            }
+        }
+
+        if ( commandLine.hasOption( 'o' ) ) {
+            arg = commandLine.getOptionValue( 'o' );
+            saveFileName = arg;
+        } else {
+            saveFileName = null;
+        }
+
+        if ( commandLine.hasOption( 'q' ) ) {
+            arg = commandLine.getOptionValue( 'q' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg >= 0 && intarg <= 100 )
+                    settings.setQuantile( intarg );
+                else {
+                    System.err.println( "Quantile must be between 0 and 100 (-q)" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "Quantile must be between 0 and 100 (-q)" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 'r' ) ) {
+            arg = commandLine.getOptionValue( 'r' );
+            if ( FileTools.testFile( arg ) )
+                settings.setRawFile( arg );
+            else {
+                System.err.println( "Invalid raw file name (-r " + arg + ")" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 's' ) ) {
+            arg = commandLine.getOptionValue( 's' );
+            if ( FileTools.testFile( arg ) )
+                settings.setScoreFile( arg );
+            else {
+                System.err.println( "Invalid score file name (-s " + arg + ")" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 't' ) ) {
+            arg = commandLine.getOptionValue( 't' );
+            try {
+                double doublearg = Double.parseDouble( arg );
+                if ( doublearg >= 0 && doublearg <= 1 )
+                    settings.setPValThreshold( doublearg );
+                else {
+                    System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 'u' ) ) {
+            arg = commandLine.getOptionValue( 'u' );
+        }
+        if ( commandLine.hasOption( 'v' ) ) {
+            arg = commandLine.getOptionValue( 'v' );
+        }
+        if ( commandLine.hasOption( 'x' ) ) {
+            arg = commandLine.getOptionValue( 'x' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg > 1 )
+                    settings.setMaxClassSize( intarg );
+                else {
+                    System.err.println( "The maximum class size must be greater than 1 (-x)" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "The maximum class size must be greater than 1 (-x)" );
+                showHelp();
+                return false;
+            }
+        }
+        if ( commandLine.hasOption( 'y' ) ) {
+            arg = commandLine.getOptionValue( 'y' );
+            try {
+                int intarg = Integer.parseInt( arg );
+                if ( intarg > 0 )
+                    settings.setMinClassSize( intarg );
+                else {
+                    System.err.println( "The minimum class size must be greater than 0 (-y)" );
+                    showHelp();
+                    return false;
+                }
+            } catch ( NumberFormatException e ) {
+                System.err.println( "The minimum class size must be greater than 0 (-y)" );
+                showHelp();
+                return false;
+            }
+        }
+
+        if ( settings.getClassScoreMethod() == Settings.CORR && settings.getRawDataFileName() == null ) {
+            System.err.println( "You must supply a raw data file if you are using the correlation method" );
+            showHelp();
+            return false;
+        }
+
+        if ( settings.getClassScoreMethod() != Settings.CORR && settings.getScoreFile() == null ) {
+            System.err.println( "You must supply a gene score file if you are using the correlation method" );
+            showHelp();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showHelp() {
+        printHelp( "ermineJ" );
     }
 
     /**
@@ -267,13 +710,13 @@ public class classScoreCMD {
         h.printHelp( command + " [options]", HEADER, options, FOOTER );
     }
 
-    protected final void processCommandLine( String commandName, String[] args ) {
+    protected final boolean processCommandLine( String commandName, String[] args ) {
         /* COMMAND LINE PARSER STAGE */
         BasicParser parser = new BasicParser();
 
         if ( args == null ) {
             printHelp( commandName );
-            System.exit( 0 );
+            return false;
         }
 
         try {
@@ -293,404 +736,9 @@ public class classScoreCMD {
 
             printHelp( commandName );
 
-            System.exit( 0 );
+            return false;
         }
 
-        processOptions();
-
-    }
-
-    @SuppressWarnings("static-access")
-    private void buildOptions() {
-
-        options.addOption( OptionBuilder.withLongOpt( "help" ).create( 'h' ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "config" ).hasArg().withDescription(
-                "Configuration file to use (saves typing); additional options given on the command line override those in the file."
-                        + " If you don't use this option, no configuration file will be used." ).withArgName(
-                "config file" ).create( 'C' ) );
-
-        options.addOption( OptionBuilder.withDescription( "Launch the GUI." ).withLongOpt( "gui" ).create( 'G' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription(
-                "Annotation file to be used [required unless using GUI]" ).withLongOpt( "annots" ).withArgName( "file" )
-                .create( 'a' ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Affymetrix annotation file format" )
-                .create( 'A' ) );
-
-        options.addOption( OptionBuilder.withDescription(
-                "Sets 'big is better' option for gene scores to true [default = false]" ).create( 'b' ) );
-
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" ).withDescription(
-                "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" ).withArgName( "file" ).create(
-                'c' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription( "Column for scores in input file" ).withLongOpt(
-                "scoreCol" ).withArgName( "integer" ).create( 'e' ) );
-
-        options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription( "Data directory" )
-                .create( 'd' ) );
-
-        options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription(
-                "Directory where custom gene set are located" ).create( 'f' ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" ).withDescription(
-                "Filter out non-specific probes" ).create( 'F' ) );
-
-        options
-                .addOption( OptionBuilder
-                        .hasArg()
-                        .withArgName( "value" )
-                        .withLongOpt( "reps" )
-                        .withDescription(
-                                "What to do when genes have multiple scores in input file (due to multiple probes per gene): 1 = best of replicates; 2 = mean of replicates; " )
-                        .create( 'g' ) );
-
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" ).withDescription(
-                "Number of iterations (for iterative methods only" ).withArgName( "integer" ).create( 'i' ) );
-
-        options.addOption( OptionBuilder.withDescription(
-                "Output should include gene symbols for all gene sets (default=don't include symbols)" ).withLongOpt(
-                "genesOut" ).create( 'j' ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "logTrans" ).withDescription(
-                "Log transform the scores [recommended for p-values]" ).create( 'l' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription(
-                "Method for computing raw class statistics: " + Settings.MEAN_METHOD + " (mean),  "
-                        + Settings.QUANTILE_METHOD + " (quantile), or  " + Settings.MEAN_ABOVE_QUANTILE_METHOD
-                        + " (mean above quantile)." ).withLongOpt( "stats" ).withArgName( "value" ).create( 'm' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription(
-                "Method for computing gene set significance:  " + Settings.ORA + " (ORA),  " + Settings.RESAMP
-                        + " (resampling of gene scores),  " + Settings.CORR + " (profile correlation),  "
-                        + Settings.ROC + " (ROC)" ).withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription(
-                "Output file name; if omitted, results are written to standard out" ).withArgName( "file" )
-                .withLongOpt( "output" ).create( 'o' ) );
-
-        options.addOption( OptionBuilder.withDescription( "quantile to use" ).withArgName( "integer" ).withLongOpt(
-                "quantile" ).hasArg().create( 'q' ) );
-
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "rawData" ).withDescription(
-                "Raw data file, only needed for profile correlation analysis." ).withArgName( "file" ).create( 'r' ) );
-
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "scoreFile" ).withDescription(
-                "Score file, required for all but profile correlation method" ).withArgName( "file" ).create( 's' ) );
-
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "threshold" ).withDescription(
-                "Score threshold, only used for ORA" ).withArgName( "value" ).create( 't' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the minimum class size" ).withArgName(
-                "integer" ).withLongOpt( "minClassSize" ).create( 'y' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the maximum class size" ).withArgName(
-                "integer" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
-
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" ).withDescription(
-                "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "save" ).withDescription( "Save settings to the selected file" )
-                .withArgName( "file" ).create( 'S' ) );
-
-        options.addOption( OptionBuilder.hasArg().withDescription(
-                "Multiple test correction method: " + Settings.BONFERONNI + " = Bonferonni FWE, "
-                        + Settings.WESTFALLYOUNG + " = Westfall-Young (slow), " + Settings.BENJAMINIHOCHBERG
-                        + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" ).create(
-                'M' ) );
-
-    }
-
-    private void processOptions() {
-
-        if ( commandLine.hasOption( 'h' ) ) {
-            showHelpAndExit();
-        }
-
-        if ( commandLine.hasOption( 'G' ) ) {
-            useCommandLineInterface = false;
-        }
-
-        String arg;
-
-        /*
-         * We only read the config file if 1) it is specified by the user or 2) the user is starting the GUI. In either
-         * case, command line options can override.
-         */
-        if ( commandLine.hasOption( 'C' ) ) {
-            arg = commandLine.getOptionValue( 'C' );
-            if ( FileTools.testFile( arg ) ) {
-                try {
-                    settings = new Settings( arg );
-                    System.err.println( "Initializing configuration from " + arg );
-                } catch ( ConfigurationException e ) {
-                    System.err.println( "Invalid config file name (" + arg + ")" );
-                    showHelpAndExit();
-                }
-            } else {
-                System.err.println( "Could not open configuration file: " + arg );
-                showHelpAndExit();
-            }
-        } else if ( !useCommandLineInterface ) {
-            /*
-             * GUI: Read the default configuration file for the user.
-             */
-            settings = new Settings();
-        }
-
-        if ( commandLine.hasOption( 'A' ) ) {
-            settings.setAnnotFormat( "Affy CSV" );
-        }
-        if ( commandLine.hasOption( 'a' ) ) {
-            arg = commandLine.getOptionValue( 'a' );
-            if ( FileTools.testFile( arg ) )
-                settings.setAnnotFile( arg );
-            else {
-                System.err.println( "Invalid annotation file name (-a " + arg + ")" );
-                showHelpAndExit();
-            }
-        } else if ( !commandLine.hasOption( 'G' ) && !commandLine.hasOption( 'C' ) ) { // using GUI or config file?
-            System.err.println( "Annotation file name (-a) is required or must be supplied in config file" );
-            showHelpAndExit();
-        }
-
-        settings.setBigIsBetter( commandLine.hasOption( 'b' ) );
-
-        if ( commandLine.hasOption( 'c' ) ) {
-            arg = commandLine.getOptionValue( 'c' );
-            if ( FileTools.testFile( arg ) )
-                settings.setClassFile( arg );
-            else {
-                System.err.println( "Invalid gene set definition file name (-c " + arg + ")" );
-                showHelpAndExit();
-            }
-        } else if ( !commandLine.hasOption( 'G' ) && !commandLine.hasOption( 'C' ) ) { // using GUI config file?
-            System.err.println( "Gene set definition file (-c) is required" );
-            showHelpAndExit();
-        }
-
-        if ( commandLine.hasOption( 'd' ) ) {
-            arg = commandLine.getOptionValue( 'd' );
-            if ( FileTools.testDir( arg ) )
-                settings.setDataDirectory( arg );
-            else {
-                System.err.println( "Invalid path for data folder (-d " + arg + ")" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 'e' ) ) {
-            arg = commandLine.getOptionValue( 'e' );
-            try {
-                int intarg = Integer.parseInt( arg );
-                if ( intarg >= 2 ) {
-                    settings.setScoreCol( intarg );
-                } else {
-                    System.err.println( "Invalid score column (-e " + intarg + "), must be a value 2 or higher" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "Invalid score column (-e " + arg + "), must be an integer" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 'f' ) ) {
-            arg = commandLine.getOptionValue( 'f' );
-            if ( !FileTools.testDir( arg ) ) new File( arg ).mkdir();
-
-            settings.setCustomGeneSetDirectory( arg );
-            log.debug( settings.getCustomGeneSetDirectory() );
-        }
-        if ( commandLine.hasOption( 'g' ) ) {
-            arg = commandLine.getOptionValue( 'g' );
-            try {
-                int intarg = Integer.parseInt( arg );
-                if ( intarg == 1 || intarg == 2 )
-                    settings.setScoreCol( intarg );
-                else {
-                    System.err.println( "Gene rep treatment must be either "
-                            + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g), you provided '" + intarg + "'" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "Gene rep treatment must be either "
-                        + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g), you provided a non-number value: " + arg );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 'i' ) ) {
-            arg = commandLine.getOptionValue( 'i' );
-            try {
-                int intarg = Integer.parseInt( arg );
-                if ( intarg > 0 )
-                    settings.setIterations( intarg );
-                else {
-                    System.err.println( "Iterations must be greater than 0 (-i)" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "Iterations must be greater than 0 (-i)" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 'j' ) ) {
-            log.info( "Gene symbols for each term will be output" );
-            this.saveAllGenes = true;
-
-        }
-        if ( commandLine.hasOption( 'k' ) ) {
-            arg = commandLine.getOptionValue( 'k' );
-        }
-
-        if ( commandLine.hasOption( 'l' ) ) {
-            settings.setDoLog( true );
-        } else {
-            settings.setDoLog( false );
-        }
-
-        if ( commandLine.hasOption( 'm' ) ) {
-            arg = commandLine.getOptionValue( 'm' );
-            int intarg = Integer.parseInt( arg );
-            if ( intarg == 0 || intarg == 1 || intarg == 2 )
-                settings.setRawScoreMethod( intarg );
-            else {
-                System.err.println( "Raw score method must be set to 0 (MEAN_METHOD), "
-                        + "1 (QUANTILE_METHOD), or 2 (MEAN_ABOVE_QUANTILE_METHOD) (-m)" );
-                showHelpAndExit();
-            }
-        }
-
-        settings.setFilterNonSpecific( commandLine.hasOption( 'F' ) );
-
-        if ( commandLine.hasOption( 'M' ) ) {
-            arg = commandLine.getOptionValue( 'M' );
-            int mtc = Integer.parseInt( arg );
-            settings.setMtc( mtc );
-        }
-        if ( commandLine.hasOption( 'n' ) ) {
-            arg = commandLine.getOptionValue( 'n' );
-            try {
-                int intarg = Integer.parseInt( arg );
-                if ( intarg == 0 || intarg == 1 || intarg == 2 || intarg == 3 )
-                    settings.setClassScoreMethod( intarg );
-                else {
-                    System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
-                            + "2 (CORR), or 3 (ROC) (-n)" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "Analysis method must be set to 0 (ORA), 1 (RESAMP), "
-                        + "2 (CORR), or 3 (ROC) (-n)" );
-                showHelpAndExit();
-            }
-        }
-
-        if ( commandLine.hasOption( 'o' ) ) {
-            arg = commandLine.getOptionValue( 'o' );
-            saveFileName = arg;
-        } else {
-            saveFileName = null;
-        }
-
-        if ( commandLine.hasOption( 'q' ) ) {
-            arg = commandLine.getOptionValue( 'q' );
-            try {
-                int intarg = Integer.parseInt( arg );
-                if ( intarg >= 0 && intarg <= 100 )
-                    settings.setQuantile( intarg );
-                else {
-                    System.err.println( "Quantile must be between 0 and 100 (-q)" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "Quantile must be between 0 and 100 (-q)" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 'r' ) ) {
-            arg = commandLine.getOptionValue( 'r' );
-            if ( FileTools.testFile( arg ) )
-                settings.setRawFile( arg );
-            else {
-                System.err.println( "Invalid raw file name (-r " + arg + ")" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 's' ) ) {
-            arg = commandLine.getOptionValue( 's' );
-            if ( FileTools.testFile( arg ) )
-                settings.setScoreFile( arg );
-            else {
-                System.err.println( "Invalid score file name (-s " + arg + ")" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 't' ) ) {
-            arg = commandLine.getOptionValue( 't' );
-            try {
-                double doublearg = Double.parseDouble( arg );
-                if ( doublearg >= 0 && doublearg <= 1 )
-                    settings.setPValThreshold( doublearg );
-                else {
-                    System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 'u' ) ) {
-            arg = commandLine.getOptionValue( 'u' );
-        }
-        if ( commandLine.hasOption( 'v' ) ) {
-            arg = commandLine.getOptionValue( 'v' );
-        }
-        if ( commandLine.hasOption( 'x' ) ) {
-            arg = commandLine.getOptionValue( 'x' );
-            try {
-                int intarg = Integer.parseInt( arg );
-                if ( intarg > 1 )
-                    settings.setMaxClassSize( intarg );
-                else {
-                    System.err.println( "The maximum class size must be greater than 1 (-x)" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "The maximum class size must be greater than 1 (-x)" );
-                showHelpAndExit();
-            }
-        }
-        if ( commandLine.hasOption( 'y' ) ) {
-            arg = commandLine.getOptionValue( 'y' );
-            try {
-                int intarg = Integer.parseInt( arg );
-                if ( intarg > 0 )
-                    settings.setMinClassSize( intarg );
-                else {
-                    System.err.println( "The minimum class size must be greater than 0 (-y)" );
-                    showHelpAndExit();
-                }
-            } catch ( NumberFormatException e ) {
-                System.err.println( "The minimum class size must be greater than 0 (-y)" );
-                showHelpAndExit();
-            }
-        }
-        
-        if (settings.getClassScoreMethod() == Settings.CORR && settings.getRawDataFileName() == null) {
-            System.err.println("You must supply a raw data file if you are using the correlation method");
-            showHelpAndExit();
-        }
-        
-        if (settings.getClassScoreMethod() != Settings.CORR && settings.getScoreFile() == null) {
-            System.err.println("You must supply a gene score file if you are using the correlation method");
-            showHelpAndExit();
-        }
-    }
-
-    private void showHelpAndExit() {
-        printHelp( "ermineJ" );
-        System.exit( 0 );
+        return processOptions();
     }
 }
