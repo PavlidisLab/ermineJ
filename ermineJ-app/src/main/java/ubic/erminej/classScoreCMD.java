@@ -382,7 +382,7 @@ public class classScoreCMD {
             try {
                 int intarg = Integer.parseInt( arg );
                 if ( intarg == 1 || intarg == 2 )
-                    settings.setScoreCol( intarg );
+                    settings.setRawScoreMethod( intarg );
                 else {
                     System.err.println( "Gene rep treatment must be either "
                             + "1 (BEST_PVAL) or 2 (MEAN_PVAL) (-g), you provided '" + intarg + "'" );
