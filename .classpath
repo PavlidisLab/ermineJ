@@ -26,8 +26,8 @@
 	<classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2/commons-collections-3.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.3/commons-lang-2.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/jfreechart/jfreechart/0.9.20/jfreechart-0.9.20.jar"/>
-	<classpathentry kind="var" path="M2_REPO/jcommon/jcommon/0.9.5/jcommon-0.9.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jfree/jfreechart/1.0.13/jfreechart-1.0.13.jar"/>
+	<classpathentry kind="var" path="M2_REPO/jfree/jcommon/1.0.16/jcommon-1.0.16.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/baseCode"/>
 	<classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.1/commons-cli-1.1.jar"/>
 	<classpathentry kind="output" path="classes"/>
