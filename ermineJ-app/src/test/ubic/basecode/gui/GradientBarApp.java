@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import ubic.basecode.graphics.ColorMap;
-import ubic.erminej.gui.JGradientBar;
+import ubic.basecode.graphics.JGradientBar;
 
 /**
  * @author Will Braynen

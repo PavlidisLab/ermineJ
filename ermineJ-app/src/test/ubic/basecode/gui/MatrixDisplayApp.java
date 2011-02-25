@@ -41,7 +41,7 @@ public class MatrixDisplayApp {
         JFrame frame = new JFrame();
         frame.getContentPane().setLayout( new BorderLayout() );
         frame.setSize( new Dimension( 600, 550 ) );
-        frame.setTitle( "Eisen Plot" );
+        frame.setTitle( "Heat map" );
 
         //
         // Here is an example of how you'd display a matrix of doubles
@@ -58,11 +58,10 @@ public class MatrixDisplayApp {
         }
 
         matrixDisplay.setLabelsVisible( true );
+        matrixDisplay.setScaleBarVisible( true );
 
         try {
-            boolean showLabels = true;
-
-            matrixDisplay.saveImage( outPngFilename, showLabels );
+            matrixDisplay.saveImage( outPngFilename, true, true );
         } catch ( java.io.IOException e ) {
             System.err.println( "Unable to save screenshot to file " + outPngFilename );
             return;
