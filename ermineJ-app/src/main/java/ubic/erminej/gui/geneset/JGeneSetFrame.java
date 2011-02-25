@@ -70,12 +70,12 @@ import ubic.basecode.util.StatusViewer;
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.graphics.ColorMap;
+import ubic.basecode.graphics.JGradientBar;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
 import ubic.erminej.gui.GuiUtil;
-import ubic.erminej.gui.JGradientBar;
 import ubic.erminej.gui.JLinkLabel;
 import ubic.erminej.gui.StatusJlabel;
 import ubic.erminej.gui.table.JBarGraphCellRenderer;
@@ -123,6 +123,7 @@ public class JGeneSetFrame extends JFrame {
     private boolean includeAnnotations = true;
 
     private boolean includeLabels = true; // whether when saving data we include the row/column labels.
+    private boolean includeScalebar = false;
     private int matrixColumnWidth; // how wide the color image columns are.
     private Settings settings;
     private GeneSetTableModel tableModel;
@@ -929,7 +930,8 @@ public class JGeneSetFrame extends JFrame {
         matrixDisplay.setStandardizedEnabled( normalized );
         matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
         try {
-            matrixDisplay.saveImage( matrixDisplay.getColorMatrix(), filename, includeLabels, normalized );
+            matrixDisplay.saveImage( matrixDisplay.getColorMatrix(), filename, includeLabels, includeScalebar,
+                    normalized );
         } catch ( IOException e ) {
             // clean up
             matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
