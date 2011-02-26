@@ -65,11 +65,9 @@ public class GeneSetDetails {
         this.classID = classID;
 
         this.geneData = geneData;
-        if ( settings == null ) { 
-                log.debug( "No settings, reading them in" );
-                settings = new Settings();
-                if ( settings == null ) throw new NullPointerException( "No settings!" );
-         
+        if ( settings == null ) {
+            log.debug( "No settings, reading them in" );
+            this.settings = new Settings();
         } else {
             this.settings = settings;
         }
@@ -128,25 +126,24 @@ public class GeneSetDetails {
      */
     private void getGeneScoresForGeneSet( GeneScores geneScores, Collection<String> probeIDs, Map<String, Double> pvals ) {
         if ( probeIDs == null ) return;
+        assert geneScores != null;
         for ( Iterator<String> iter = probeIDs.iterator(); iter.hasNext(); ) {
             String probeID = iter.next();
 
-            if ( geneScores == null || !geneScores.getProbeToScoreMap().containsKey( probeID ) ) {
+            if ( !geneScores.getProbeToScoreMap().containsKey( probeID ) ) {
                 pvals.put( probeID, new Double( Double.NaN ) );
                 continue;
             }
 
             Double pvalue;
-            if ( geneScores == null ) {
-                pvalue = new Double( Double.NaN );
+
+            if ( settings.getDoLog() == true ) {
+                double negLogPval = geneScores.getProbeToScoreMap().get( probeID );
+                pvalue = new Double( Math.pow( 10.0, -negLogPval ) );
             } else {
-                if ( settings.getDoLog() == true ) {
-                    double negLogPval = geneScores.getProbeToScoreMap().get( probeID );
-                    pvalue = new Double( Math.pow( 10.0, -negLogPval ) );
-                } else {
-                    pvalue = geneScores.getProbeToScoreMap().get( probeID );
-                }
+                pvalue = geneScores.getProbeToScoreMap().get( probeID );
             }
+
             pvals.put( probeID, pvalue );
         }
     }

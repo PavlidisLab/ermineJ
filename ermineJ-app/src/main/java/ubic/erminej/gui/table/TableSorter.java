@@ -88,6 +88,10 @@ import ubic.basecode.graphics.MatrixDisplay;
  */
 
 public class TableSorter extends AbstractTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected TableModel tableModel;
     MatrixDisplay m_matrixDisplay; // get rid of this!
 
@@ -431,6 +435,11 @@ public class TableSorter extends AbstractTableModel {
                     } else {
                         comparator = getComparator( column );
                     }
+                    
+                    if (comparator == null) {
+                        return 0;
+                    }
+                    
                     if ( favor != true ) { // we're not favoring anyone
                         comparison = comparator.compare( o1, o2 );
                     }

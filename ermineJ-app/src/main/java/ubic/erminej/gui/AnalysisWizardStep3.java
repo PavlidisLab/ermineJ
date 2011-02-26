@@ -67,9 +67,9 @@ public class AnalysisWizardStep3 extends WizardStep {
     private AnalysisWizardStep3_CustomClassList customClasses;
     private AbstractTableModel ccTableModel;
     private JTable customClassTable;
-    private Map ccHash = new HashMap();
+    private Map<String, Map> ccHash = new HashMap<String, Map>();
     private AnalysisWizardStep3_CustomClassList addedClasses;
-    private Map acHash = new HashMap();
+    private Map<String, Object> acHash = new HashMap<String, Object>();
     private JTable addedClassTable;
     private AbstractTableModel acTableModel;
     private JLabel countLabel;
@@ -200,18 +200,19 @@ public class AnalysisWizardStep3 extends WizardStep {
     private void addClasstoSelected( String id ) {
         if ( id != null ) {
             if ( ccHash == null || !ccHash.containsKey( id ) ) return;
-            Map cfi = ( Map ) ccHash.get( id );
+            Map<String, Object> cfi = ccHash.get( id );
             if ( cfi == null ) {
                 log.debug( "Null map" );
                 return;
             }
             if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
                 addedClasses.add( cfi );
-                acHash.put( cfi.get( "id" ), cfi );
+                acHash.put( ( String ) cfi.get( "id" ), cfi );
             }
         }
     }
 
+    @SuppressWarnings("unused")
     void addAllButton_actionPerformed( ActionEvent e ) {
         for ( int i = 0; i < ccTableModel.getRowCount(); i++ ) {
             String id = ( String ) customClassTable.getValueAt( i, 0 );
@@ -221,6 +222,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         updateCountLabel();
     }
 
+    @SuppressWarnings("unused")
     void delete_actionPerformed( ActionEvent e ) {
         int n = addedClassTable.getSelectedRowCount();
         int[] rows = addedClassTable.getSelectedRows();
@@ -300,10 +302,10 @@ public class AnalysisWizardStep3 extends WizardStep {
      */
     private void setValues() {
         if ( settings.getSelectedCustomGeneSets() != null && settings.getSelectedCustomGeneSets().size() > 0 ) {
-            Collection selectedCustomClasses = settings.getSelectedCustomGeneSets();
+            Collection<String> selectedCustomClasses = settings.getSelectedCustomGeneSets();
             if ( selectedCustomClasses == null ) return;
-            for ( Iterator iter = selectedCustomClasses.iterator(); iter.hasNext(); ) {
-                String geneSet = ( String ) iter.next();
+            for ( Iterator<String> iter = selectedCustomClasses.iterator(); iter.hasNext(); ) {
+                String geneSet = iter.next();
                 if ( !ccHash.containsKey( geneSet ) ) continue;
                 log.debug( "Adding " + geneSet );
                 this.addClasstoSelected( geneSet );
@@ -368,7 +370,7 @@ class AnalysisWizardStep3_ClassFileFilter implements FilenameFilter {
     }
 }
 
-class AnalysisWizardStep3_CustomClassList extends ArrayList {
+class AnalysisWizardStep3_CustomClassList extends ArrayList<Map<String, Object>> {
     /**
      * 
      */
@@ -400,9 +402,10 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
                 return size() + extra;
             }
 
+            @SuppressWarnings("unchecked")
             public Object getValueAt( int i, int j ) {
                 if ( i < size() ) {
-                    Map cinfo = ( HashMap ) get( i );
+                    Map<String, Object> cinfo = get( i );
                     switch ( j ) {
                         case 0:
                             return cinfo.get( "id" );
@@ -410,7 +413,7 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
                             return cinfo.get( "desc" );
                         case 2: {
                             String type = ( String ) cinfo.get( "type" );
-                            Collection members = ( Collection ) cinfo.get( "members" );
+                            Collection<String> members = ( Collection<String> ) cinfo.get( "members" );
                             return ( Integer.toString( members.size() ) + " " + type + "s" );
                         }
                         default:
@@ -421,5 +424,5 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList {
 
             }
         };
-    };
+    }
 }

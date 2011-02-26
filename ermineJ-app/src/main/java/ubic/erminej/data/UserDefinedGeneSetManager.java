@@ -286,7 +286,7 @@ public class UserDefinedGeneSetManager {
         Collection<String> userOverwrittenGeneSets = new HashSet<String>();
 
         File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
-        if ( userGeneSetDir == null || !userGeneSetDir.exists() ) {
+        if ( !userGeneSetDir.exists() ) {
             statusMessenger.showError( "No user-define gene set directory found, none will be loaded" );
             return userOverwrittenGeneSets;
         }

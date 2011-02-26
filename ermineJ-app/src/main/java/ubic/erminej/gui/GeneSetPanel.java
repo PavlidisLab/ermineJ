@@ -52,6 +52,10 @@ import ubic.erminej.gui.geneset.GeneSetDetails;
  * @version $Id$
  */
 public abstract class GeneSetPanel extends JScrollPane {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
     static final String AMIGO_URL_BASE = "http://amigo.geneontology.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";

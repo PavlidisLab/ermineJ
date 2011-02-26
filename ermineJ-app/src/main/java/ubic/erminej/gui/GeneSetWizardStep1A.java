@@ -50,12 +50,12 @@ public class GeneSetWizardStep1A extends WizardStep {
      * 
      */
     private static final long serialVersionUID = -4291212433845259049L;
-    private GeneAnnotations geneData = null;;
-    private GONames goData = null;;
-    private UserDefinedGeneSetManager newGeneSet = null;;
-    private UserDefinedGeneSetManager oldGeneSet = null;;
-    private JTable oldClassTable = null;;
-    private JTextField searchTextField = null;;
+    private GeneAnnotations geneData = null;
+    private GONames goData = null;
+    private UserDefinedGeneSetManager newGeneSet = null;
+    private UserDefinedGeneSetManager oldGeneSet = null;
+    private JTable oldClassTable = null;
+    private JTextField searchTextField = null;
 
     public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, GONames goData,
             UserDefinedGeneSetManager newGeneSet, UserDefinedGeneSetManager oldGeneSet ) {

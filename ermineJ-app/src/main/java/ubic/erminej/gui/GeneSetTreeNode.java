@@ -18,15 +18,18 @@
  */
 package ubic.erminej.gui;
 
+import java.util.Enumeration;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import ubic.basecode.bio.GOEntry;
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 
 /**
  * @author pavlidis
  * @version $Id$
  */
-public class GeneSetTreeNode<K,V> extends DefaultMutableTreeNode {
+public class GeneSetTreeNode extends DefaultMutableTreeNode {
     /**
      * 
      */
@@ -34,8 +37,14 @@ public class GeneSetTreeNode<K,V> extends DefaultMutableTreeNode {
     private boolean hasGoodChild = false;
     private boolean hasUsableChild = false;
 
-    public GeneSetTreeNode( DirectedGraphNode<K,V> root ) {
+    public GeneSetTreeNode( DirectedGraphNode<String, GOEntry> root ) {
         super( root );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Enumeration<GeneSetTreeNode> breadthFirstEnumeration() {
+        return super.breadthFirstEnumeration();
     }
 
     /**
@@ -43,6 +52,12 @@ public class GeneSetTreeNode<K,V> extends DefaultMutableTreeNode {
      */
     public boolean hasGoodChild() {
         return this.hasGoodChild;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public DirectedGraphNode<String, GOEntry> getUserObject() {
+        return ( DirectedGraphNode<String, GOEntry> ) super.getUserObject();
     }
 
     /**

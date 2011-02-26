@@ -45,6 +45,10 @@ import ubic.basecode.util.BrowserLauncher;
  */
 public abstract class AppDialog extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected JButton actionButton = new JButton();
     protected JButton cancelButton = new JButton();
     protected JButton helpButton = new JButton();

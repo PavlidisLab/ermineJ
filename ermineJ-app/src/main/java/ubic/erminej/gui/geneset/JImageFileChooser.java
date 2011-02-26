@@ -72,6 +72,10 @@ public class JImageFileChooser extends JFileChooser {
      */
     class JDetailsFileChooserOptions extends JComponent {
 
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
         JCheckBox m_includeLabels = new JCheckBox( "Include row and column labels" );
         JCheckBox m_normalize = new JCheckBox( "Normalize" );
 

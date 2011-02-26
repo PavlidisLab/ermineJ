@@ -90,6 +90,10 @@ import ubic.erminej.gui.table.TableSorter;
  * @version $Id$
  */
 public class JGeneSetFrame extends JFrame {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected static final Log log = LogFactory.getLog( JGeneSetFrame.class );
     private static final int COLOR_RANGE_SLIDER_MIN = 1;
     private static final int COLOR_RANGE_SLIDER_RESOLUTION = 12;

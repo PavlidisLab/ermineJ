@@ -69,7 +69,7 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
      */
     public Map<String, GeneSetResult> classPvalGenerator( StatusViewer messenger ) {
         Map<String, GeneSetResult> results = new HashMap<String, GeneSetResult>();
-        ;
+        
         int count = 0;
         classScoreGenerator.setTests( 0 );
         classScoreGenerator.setCacheHits( 0 );

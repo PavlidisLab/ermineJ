@@ -44,6 +44,10 @@ import ubic.basecode.util.StatusViewer;
  * @version $Id$
  */
 public abstract class Wizard extends JDialog {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected JPanel mainPanel;
     protected JPanel BottomPanel = new JPanel();
     protected JPanel BottomPanelWrap = new JPanel();

@@ -74,6 +74,11 @@ public class JDataFileChooser extends JFileChooser {
      */
     private class JDataFileChooserOptions extends JComponent {
 
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
         private JCheckBox includeMatrixValuesCheckBox = new JCheckBox( "Include annotations and scores" );
 
         private JCheckBox m_normalize = new JCheckBox( "Normalize" );

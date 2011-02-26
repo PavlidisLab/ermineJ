@@ -48,6 +48,10 @@ import ubic.erminej.gui.StatusJlabel;
  * @version $Id$
  */
 public class GeneUrlDialog extends JFrame {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog( GeneUrlDialog.class );
     private static final int MAINWIDTH = 550;
     private JPanel mainPanel;

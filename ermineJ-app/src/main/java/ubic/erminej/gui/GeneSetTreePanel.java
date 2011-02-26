@@ -51,11 +51,9 @@ import ubic.basecode.bio.GOEntry;
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
-import ubic.basecode.dataStructure.graph.GraphNode;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneSetResult;
-import corejava.Format;
 
 /**
  * A Tree display that shows Gene Sets and their scores, and allows uer interaction.
@@ -83,6 +81,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#addedNewGeneSet()
      */
     @Override
@@ -92,6 +91,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#addRun()
      */
     @Override
@@ -156,11 +156,11 @@ public class GeneSetTreePanel extends GeneSetPanel {
             node.setHasGoodChild( false );
             return;
         }
-        Enumeration e = node.breadthFirstEnumeration();
+        Enumeration<GeneSetTreeNode> e = node.breadthFirstEnumeration();
         e.nextElement(); // the first node is this node.
         while ( e.hasMoreElements() ) {
-            GeneSetTreeNode childNode = ( GeneSetTreeNode ) e.nextElement();
-            DirectedGraphNode n = ( DirectedGraphNode ) childNode.getUserObject();
+            GeneSetTreeNode childNode = e.nextElement();
+            DirectedGraphNode<String, GOEntry> n = childNode.getUserObject();
             GeneSetResult result = currentResultSet.getResults().get( n.getKey() );
             if ( result != null && result.getCorrectedPvalue() <= fdrThreshold ) {
                 node.setHasGoodChild( true );
@@ -181,12 +181,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @return
      */
     public void hasUsableChildren( GeneSetTreeNode node ) {
-        Enumeration e = node.breadthFirstEnumeration();
+        Enumeration<GeneSetTreeNode> e = node.breadthFirstEnumeration();
         e.nextElement(); // the first node is this node.
         if ( geneSets == null ) geneSets = geneData.getGeneSets();
         while ( e.hasMoreElements() ) {
-            GeneSetTreeNode childNode = ( GeneSetTreeNode ) e.nextElement();
-            String id = ( String ) ( ( DirectedGraphNode ) childNode.getUserObject() ).getKey();
+            GeneSetTreeNode childNode = e.nextElement();
+            String id = childNode.getUserObject().getKey();
             if ( geneSets.contains( id ) ) {
                 node.setHasUsableChild( true );
                 return;
@@ -232,11 +232,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
             public void valueChanged( TreeSelectionEvent e ) {
                 TreePath path = e.getPath();
                 GeneSetTreeNode currentNode = ( GeneSetTreeNode ) path.getLastPathComponent();
-                if ( currentNode.getUserObject() instanceof GraphNode ) {
-                    currentlySelectedGeneSet = ( String ) ( ( GraphNode ) ( currentNode ).getUserObject() ).getKey();
-                } else {
-                    log.debug( currentNode.getUserObject().getClass().getName() );
-                }
+                currentlySelectedGeneSet = currentNode.getUserObject().getKey();
+
             }
         } );
     }
@@ -266,6 +263,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#resetView()
      */
     @Override
@@ -291,6 +289,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param node
      * @param process
      */
+    @SuppressWarnings("unchecked")
     public void visitAllNodes( TreeNode node, Method process ) {
         if ( process != null ) {
             try {
@@ -301,8 +300,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
 
         if ( node.getChildCount() >= 0 ) {
-            for ( Enumeration e = node.children(); e.hasMoreElements(); ) {
-                TreeNode n = ( TreeNode ) e.nextElement();
+            for ( Enumeration<GeneSetTreeNode> e = node.children(); e.hasMoreElements(); ) {
+                TreeNode n = e.nextElement();
                 visitAllNodes( n, process );
             }
         }
@@ -321,12 +320,13 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param parent
      * @param expand
      */
+    @SuppressWarnings("unchecked")
     protected void expandAll( TreePath parent, boolean expand ) {
         // Traverse children
         TreeNode node = ( TreeNode ) parent.getLastPathComponent();
         if ( node.getChildCount() >= 0 ) {
-            for ( Enumeration e = node.children(); e.hasMoreElements(); ) {
-                TreeNode n = ( TreeNode ) e.nextElement();
+            for ( Enumeration<GeneSetTreeNode> e = node.children(); e.hasMoreElements(); ) {
+                TreeNode n = e.nextElement();
                 TreePath path = parent.pathByAddingChild( n );
                 expandAll( path, expand );
             }
@@ -352,9 +352,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param byName
      * @return
      */
+    @SuppressWarnings("unchecked")
     private TreePath find( TreePath parent, String id, int depth ) {
         GeneSetTreeNode node = ( GeneSetTreeNode ) parent.getLastPathComponent();
-        String o = ( String ) ( ( DirectedGraphNode ) node.getUserObject() ).getKey();
+        String o = node.getUserObject().getKey();
 
         // If equal, go down the branch
         if ( o.equals( id ) ) {
@@ -363,8 +364,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         // Traverse children
         if ( node.getChildCount() >= 0 ) {
-            for ( Enumeration e = node.children(); e.hasMoreElements(); ) {
-                TreeNode n = ( TreeNode ) e.nextElement();
+            for ( Enumeration<GeneSetTreeNode> e = node.children(); e.hasMoreElements(); ) {
+                TreeNode n = e.nextElement();
                 TreePath path = parent.pathByAddingChild( n );
                 TreePath result = find( path, id, depth + 1 );
                 // Found a match
@@ -426,14 +427,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
         int x = e.getX();
         int y = e.getY();
         TreePath path = source.getPathForLocation( x, y );
-        if ( path == null )
-        ;
 
         source.setSelectionPath( path );
         source.scrollPathToVisible( path );
 
         GeneSetTreeNode selectedNode = ( GeneSetTreeNode ) path.getLastPathComponent();
-        String classID = ( String ) ( ( GraphNode ) selectedNode.getUserObject() ).getKey();
+        String classID = selectedNode.getUserObject().getKey();
         return classID;
     }
 
@@ -468,6 +467,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see classScore.gui.GeneSetsResultsScrollPane#deleteGeneSet(java.lang.String)
      */
     @Override
@@ -496,13 +496,16 @@ public class GeneSetTreePanel extends GeneSetPanel {
         GeneSetTreeNode userNode = getUserNode();
         DirectedGraphNode<String, GOEntry> newNode = new DirectedGraphNode<String, GOEntry>( id, new GOEntry( id, desc,
                 desc, "No aspect defined" ), goData.getGraph() );
-        GeneSetTreeNode newTreeNode = new GeneSetTreeNode<String, GOEntry>( newNode );
+        GeneSetTreeNode newTreeNode = new GeneSetTreeNode( newNode );
 
         ( ( DefaultTreeModel ) this.goTree.getModel() )
                 .insertNodeInto( newTreeNode, userNode, userNode.getChildCount() );
         goTree.revalidate();
     }
 
+    /**
+     * @param id
+     */
     public void removeNode( String id ) {
         assert id != null;
         log.debug( "Removing tree node " + id );
@@ -574,7 +577,6 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     private final Icon regularIcon = new ImageIcon( this.getClass().getResource( REGULAR_ICON ) );
     private final Icon goodPvalueIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_ICON ) );
     private final Icon goodPvalueGoodChildIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_GOODCHILD_ICON ) );
-    private Format nf = new Format( "%.3g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
     private Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
 
@@ -599,11 +601,11 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
      *      boolean, boolean, int, boolean)
      */
     @Override
-    public Component getTreeCellRendererComponent( JTree tree, Object value, boolean selected, boolean expanded,
-            boolean leaf, int row, boolean hasFocus ) {
-        super.getTreeCellRendererComponent( tree, value, selected, expanded, leaf, row, hasFocus );
-        this.selected = selected;
-        this.hasFocus = hasFocus;
+    public Component getTreeCellRendererComponent( JTree tree, Object value, boolean s, boolean expanded, boolean leaf,
+            int row, boolean f ) {
+        super.getTreeCellRendererComponent( tree, value, s, expanded, leaf, row, hasFocus );
+        this.selected = s;
+        this.hasFocus = f;
         setOpaque( true );
 
         String name;
@@ -611,15 +613,9 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         String displayedText = "";
         GeneSetTreeNode node = ( GeneSetTreeNode ) value;
 
-        if ( node.getUserObject() instanceof DirectedGraphNode ) {
-            DirectedGraphNode nodeObj = ( DirectedGraphNode ) node.getUserObject();
-            id = ( String ) nodeObj.getKey();
-            name = nodeObj.toString();
-        } else {
-            Object nodeObj = node.getUserObject();
-            if ( nodeObj == null ) return this;
-            name = nodeObj.toString();
-        }
+        DirectedGraphNode<String, GOEntry> nodeObj = node.getUserObject();
+        id = nodeObj.getKey();
+        name = nodeObj.toString();
 
         setupToolTip( id );
 
@@ -673,7 +669,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         if ( hasResults( id, res ) ) {
             GeneSetResult result = res.getResults().get( id );
             double pvalue = result.getPvalue();
-            displayedText = displayedText + " -- p = " + nf.format( pvalue );
+            displayedText = displayedText + " -- p = " + String.format( "%.3g", pvalue );
             double pvalCorr = result.getCorrectedPvalue();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             this.setBackground( bgColor );
