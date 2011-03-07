@@ -67,7 +67,7 @@ public class AnalysisWizardStep3 extends WizardStep {
     private AnalysisWizardStep3_CustomClassList customClasses;
     private AbstractTableModel ccTableModel;
     private JTable customClassTable;
-    private Map<String, Map> ccHash = new HashMap<String, Map>();
+    private Map<String, Map<String, Object>> ccHash = new HashMap<String, Map<String, Object>>();
     private AnalysisWizardStep3_CustomClassList addedClasses;
     private Map<String, Object> acHash = new HashMap<String, Object>();
     private JTable addedClassTable;
@@ -89,7 +89,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
-        acHash = new HashMap();
+        acHash = new HashMap<String, Object>();
         makeLeftTable();
         makeRightTable();
     }
@@ -183,7 +183,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         return true;
     }
 
-    void addButton_actionPerformed( ActionEvent e ) {
+    void addButton_actionPerformed( @SuppressWarnings("unused") ActionEvent e ) {
         int n = customClassTable.getSelectedRowCount();
         int[] rows = customClassTable.getSelectedRows();
         for ( int i = 0; i < n; i++ ) {
@@ -229,7 +229,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         for ( int i = 0; i < n; i++ ) {
             String id = ( String ) addedClassTable.getValueAt( rows[i] - i, 0 );
             if ( id != null ) {
-                HashMap cfi = ( HashMap ) ccHash.get( id );
+                Map cfi = ccHash.get( id );
                 acHash.remove( cfi.get( "id" ) );
                 addedClasses.remove( cfi );
             }
@@ -247,7 +247,7 @@ public class AnalysisWizardStep3 extends WizardStep {
      */
     void makeLeftTable() {
 
-        Set userDefinedGeneSets = null;
+        Set<String> userDefinedGeneSets = null;
         if ( goData != null ) {
             userDefinedGeneSets = goData.getUserDefinedGeneSets();
         }
@@ -260,13 +260,13 @@ public class AnalysisWizardStep3 extends WizardStep {
         UserDefinedGeneSetManager helper = new UserDefinedGeneSetManager( geneData, settings, "" );
 
         customClasses = new AnalysisWizardStep3_CustomClassList();
-        ccHash = new HashMap();
-        for ( Iterator iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
-            String id = ( String ) iter.next();
+        ccHash = new HashMap<String, Map<String, Object>>();
+        for ( Iterator<String> iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
+            String id = iter.next();
             if ( callingframe.userOverWrote( id ) ) continue;
             Map<String, Object> cfi = helper.getGeneSetInfo( id, goData );
-            if ( cfi == null || cfi.get( "members" ) == null || ( ( Collection ) cfi.get( "members" ) ).size() == 0 )
-                continue;
+            if ( cfi == null || cfi.get( "members" ) == null
+                    || ( ( Collection<Object> ) cfi.get( "members" ) ).size() == 0 ) continue;
             log.debug( "Adding " + id + " to the table" );
             customClasses.add( cfi );
             ccHash.put( id, cfi );
@@ -293,7 +293,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         setValues();
     }
 
-    public ArrayList getAddedClasses() {
+    public AnalysisWizardStep3_CustomClassList getAddedClasses() {
         return addedClasses;
     }
 
