@@ -119,6 +119,7 @@ public class JGeneSetFrame extends JFrame {
     private static final int PREFERRED_WIDTH_PVALUE_COLUMN = 75;
     private static final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
     private static final String SAVESTARTPATH = "detailsview.startPath";
+    private static final int PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN = 75;
 
     public MatrixDisplay matrixDisplay = null;
     private GeneSetPvalRun analysisResults;
@@ -258,7 +259,8 @@ public class JGeneSetFrame extends JFrame {
 
         // Save the dimensions of the table just in case
         int totalWidth = matrixColumnCount * matrixColumnWidth + PREFERRED_WIDTH_PROBEID_COLUMN
-                + PREFERRED_WIDTH_PVALUE_COLUMN + PREFERRED_WIDTH_GENENAME_COLUMN + PREFERRED_WIDTH_DESCRIPTION_COLUMN;
+                + PREFERRED_WIDTH_PVALUE_COLUMN + PREFERRED_WIDTH_GENENAME_COLUMN + PREFERRED_WIDTH_DESCRIPTION_COLUMN
+                + PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN;
         int totalheight = table.getPreferredScrollableViewportSize().height;
 
         Dimension d = new Dimension( totalWidth, totalheight );
@@ -365,6 +367,9 @@ public class JGeneSetFrame extends JFrame {
         // description
         col = table.getColumnModel().getColumn( matrixColumnCount + 4 );
         col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
+
+        col = table.getColumnModel().getColumn( matrixColumnCount + 5 );
+        col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN );
     }
 
     private String getProbeID( int row ) {
@@ -1158,6 +1163,8 @@ public class JGeneSetFrame extends JFrame {
                 } else {
                     statusMessenger.setStatus( table.getValueAt( i, j ).toString(), false );
                 }
+            } else if ( onMultifunctionalityCell( i, j ) ) {
+                // possibly update status bar.
             }
         }
     }
@@ -1169,7 +1176,12 @@ public class JGeneSetFrame extends JFrame {
      */
     private boolean onGeneSymbolCell( int i, int j ) {
         if ( i < 0 || j < 0 ) return false;
-        return table.getValueAt( i, j ) != null && j == table.getColumnCount() - 2;
+        return table.getValueAt( i, j ) != null && j == table.getColumnCount() - 3;
+    }
+
+    private boolean onMultifunctionalityCell( int i, int j ) {
+        if ( i < 0 || j < 0 ) return false;
+        return table.getValueAt( i, j ) != null && j == table.getColumnCount() - 1;
     }
 
     /**

@@ -32,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.erminej.Settings;
 import ubic.erminej.gui.JLinkLabel;
@@ -62,8 +63,9 @@ public class GeneSetTableModel extends AbstractTableModel {
     private DecimalFormat m_nf;
     private Settings settings;
     private Map<String, JLinkLabel> linkLabels;
-    private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name" };
+    private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name", "Multifunc" };
     private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
+    private Multifunctionality multifunctionality;
     protected static final Log log = LogFactory.getLog( GeneSetTableModel.class );
 
     /**
@@ -83,6 +85,9 @@ public class GeneSetTableModel extends AbstractTableModel {
         this.settings = settings;
         m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
         this.geneData = geneData;
+
+        this.multifunctionality = new Multifunctionality( geneData );
+
         m_nf = nf;
         configure();
         createLinkLabels();
@@ -121,6 +126,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see javax.swing.table.AbstractTableModel#getColumnName(int)
      */
     @Override
@@ -138,6 +144,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see javax.swing.table.TableModel#getRowCount()
      */
     public int getRowCount() {
@@ -146,6 +153,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see javax.swing.table.TableModel#getColumnCount()
      */
     public int getColumnCount() {
@@ -155,6 +163,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
+     * 
      * @see javax.swing.table.TableModel#getValueAt(int, int)
      */
     public Object getValueAt( int row, int column ) {
@@ -217,6 +226,11 @@ public class GeneSetTableModel extends AbstractTableModel {
             case 4:
                 // description
                 return geneData == null ? "" : geneData.getProbeDescription( probeID );
+            case 5:
+                if ( geneData == null ) return "";
+                gene_name = geneData.getProbeGeneName( probeID );
+                return String.format( "%.2f (%d)", Math.max( 0.0, 1.0 - multifunctionality
+                        .getMultifunctionalityRank( gene_name ) ), multifunctionality.getNumGoTerms( gene_name ) );
             default:
                 return "";
         }
