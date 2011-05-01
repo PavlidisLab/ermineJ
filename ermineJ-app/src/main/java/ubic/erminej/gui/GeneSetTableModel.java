@@ -38,6 +38,7 @@ import ubic.basecode.util.StringUtil;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.data.GeneSetResult;
 import corejava.Format;
@@ -58,12 +59,14 @@ public class GeneSetTableModel extends AbstractTableModel {
     /**
      * The number of columns that are always there, before runs are listed.
      */
-    public static final int INIT_COLUMNS = 4;
+    public static final int INIT_COLUMNS = 5;
 
     private List<String> columnNames = new LinkedList<String>();
     private GeneAnnotations geneData;
     private GONames goData;
     private List<GeneSetPvalRun> results;
+
+    private Multifunctionality multifunctionality;
 
     public GeneSetTableModel( List<GeneSetPvalRun> results ) {
         super();
@@ -72,6 +75,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         columnNames.add( "Description" );
         columnNames.add( "Probes" );
         columnNames.add( "Genes" );
+        columnNames.add( "Multifunc" );
     }
 
     /**
@@ -156,6 +160,8 @@ public class GeneSetTableModel extends AbstractTableModel {
                     return new Integer( geneData.numProbesInGeneSet( classid ) );
                 case 3:
                     return new Integer( geneData.numGenesInGeneSet( classid ) );
+                case 4:
+                    return String.format( "%.3f", 1.0 - multifunctionality.getGOTermMultifunctionalityRank( classid ) );
 
             }
         } else {
@@ -186,6 +192,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     public void setInitialData( GeneAnnotations origGeneData, GONames origGoData ) {
         this.geneData = origGeneData;
         this.goData = origGoData;
+        this.multifunctionality = new Multifunctionality( geneData );
     }
 }
 

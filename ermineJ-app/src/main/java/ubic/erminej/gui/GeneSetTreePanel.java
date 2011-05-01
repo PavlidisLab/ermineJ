@@ -50,6 +50,7 @@ import ubic.basecode.util.StringUtil;
 import ubic.basecode.bio.GOEntry;
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
@@ -583,6 +584,8 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
     private final List<GeneSetPvalRun> results;
     private boolean selected;
 
+    private Multifunctionality multifunctionality;
+
     public BaseCellRenderer( GONames goData, GeneAnnotations geneData, GeneSetTreePanel panel,
             List<GeneSetPvalRun> results ) {
         super();
@@ -590,6 +593,7 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         this.panel = panel;
         this.goData = goData;
         this.geneData = geneData;
+        this.multifunctionality = new Multifunctionality( geneData );
         nff.setMaximumFractionDigits( 4 );
         this.setOpenIcon( regularIcon );
         this.setLeafIcon( regularIcon );
@@ -652,8 +656,8 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
         // code also in the tree renderer
         String aspect = goData.getAspectForId( id );
         String definition = goData.getDefinitionForId( id );
-        setToolTipText( "<html>Aspect: " + aspect + "<br>Definition: "
-                + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br>" )
+        setToolTipText( "<html>Aspect: " + aspect + "<br>"
+                + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br/>" )
                 + ( definition.length() > GeneSetPanel.MAX_DEFINITION_LENGTH ? "..." : "" ) );
     }
 
@@ -730,7 +734,8 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             this.setForeground( Color.GRAY );
         } else {
             displayedText = name + " -- " + geneData.numProbesInGeneSet( id ) + " probes, "
-                    + geneData.numGenesInGeneSet( id ) + " genes";
+                    + geneData.numGenesInGeneSet( id ) + " genes, multifunc. "
+                    + String.format( "%.3f", 1.0 - this.multifunctionality.getGOTermMultifunctionalityRank( id ) );
             this.setFont( plain );
             this.setForeground( Color.BLACK );
         }

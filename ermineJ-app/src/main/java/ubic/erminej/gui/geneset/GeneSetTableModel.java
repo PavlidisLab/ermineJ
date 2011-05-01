@@ -229,7 +229,7 @@ public class GeneSetTableModel extends AbstractTableModel {
             case 5:
                 if ( geneData == null ) return "";
                 gene_name = geneData.getProbeGeneName( probeID );
-                return String.format( "%.2f (%d)", Math.max( 0.0, 1.0 - multifunctionality
+                return String.format( "%.3f (%d)", Math.max( 0.0, 1.0 - multifunctionality
                         .getMultifunctionalityRank( gene_name ) ), multifunctionality.getNumGoTerms( gene_name ) );
             default:
                 return "";
