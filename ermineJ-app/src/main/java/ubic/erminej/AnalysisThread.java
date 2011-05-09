@@ -35,6 +35,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.erminej.data.GeneScores;
@@ -284,18 +285,10 @@ public class AnalysisThread extends Thread {
         Set<String> activeProbes = getActiveProbes( rawData, geneScores );
         if ( activeProbes == null || Thread.currentThread().isInterrupted() ) return latestResults;
 
-        // boolean needToMakeNewGeneData = needNewGeneData( activeProbes );
         GeneAnnotations useTheseAnnots = geneData;
-        // if ( needToMakeNewGeneData ) {
-        // log.debug( "Making new gene data from existing" );
-        // useTheseAnnots = new GeneAnnotations( geneData, activeProbes ); // / don't redo the parent adding.
-        // /*
-        // * todo I don't like this way of keeping track of the different geneData sets....though it works.
-        // */
-        // geneDataSets.put( new Integer( useTheseAnnots.hashCode() ), useTheseAnnots );
-        // } else {
-        // log.debug( "No need to make new gene data, reusing existing." );
-        // }
+
+        Multifunctionality mf = new Multifunctionality( useTheseAnnots );
+        double multifunctionalityCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
 
         if ( this.stop ) return null;
 
@@ -304,7 +297,7 @@ public class AnalysisThread extends Thread {
         GeneSetPvalRun newResults = null;
         if ( results != null ) { // read from a file.
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
-                    messenger, results, "LoadedRun" );
+                    messenger, results, "LoadedRun", multifunctionalityCorrelation );
         } else {
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
                     messenger, "NewRun" );

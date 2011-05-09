@@ -83,7 +83,7 @@ public class GeneScoreReaderTest extends TestCase {
                 -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ),
                 -Math.log10( 0.25 ), -Math.log10( 0.3 ), -Math.log10( 0.4 ), -Math.log10( 0.5 ), -Math.log10( 0.6 ),
                 -Math.log10( 0.7 ), -Math.log10( 0.8 ), -Math.log10( 0.9 ) };
-        double[] actualReturn = test.getPvalues();
+        double[] actualReturn = test.getScores();
 
         assertEquals( expectedReturn.length, actualReturn.length );
 
@@ -121,7 +121,7 @@ public class GeneScoreReaderTest extends TestCase {
         expectedReturn.add( "GeneT" );
         expectedReturn.add( "GeneU" );
 
-        Set<String> actualReturn = test.getGeneToPvalMap().keySet();
+        Set<String> actualReturn = test.getGeneToScoreMap().keySet();
 
         assertTrue( RegressionTesting.containsSame( expectedReturn, actualReturn ) );
     }

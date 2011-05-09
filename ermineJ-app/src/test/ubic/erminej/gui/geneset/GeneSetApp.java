@@ -28,7 +28,7 @@ import java.util.Map;
 import javax.swing.UIManager; 
 
 import ubic.erminej.Settings;
-import ubic.erminej.gui.geneset.JGeneSetFrame;
+import ubic.erminej.gui.geneset.GeneSetDetailsFrame;
 
 /**
  * @author Will Braynen
@@ -54,7 +54,7 @@ public class GeneSetApp {
             pvalues.put( PROBES[i], new Double( 0.5 - 0.02 * i ) ); // fake p values.
         }
 
-        JGeneSetFrame frame = new JGeneSetFrame( "foo", null, probeIDs, pvalues, null, settings );
+        GeneSetDetailsFrame frame = new GeneSetDetailsFrame( "foo", null, probeIDs, pvalues, null, settings );
         frame.setSize( new Dimension( 800, 600 ) );
         frame.setVisible( true );
     }

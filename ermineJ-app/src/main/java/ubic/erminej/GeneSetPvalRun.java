@@ -34,6 +34,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.analysis.CorrelationsGeneSetPvalSeriesGenerator;
 import ubic.erminej.analysis.GeneSetPvalSeriesGenerator;
@@ -69,6 +70,8 @@ public class GeneSetPvalRun {
     private NumberFormat nf = NumberFormat.getInstance();
     private Settings settings;
 
+    private double multifunctionalityCorrelation;
+
     private long randomSeed = -1;
 
     private String name; // name of this run.
@@ -84,17 +87,19 @@ public class GeneSetPvalRun {
      * @param geneScores
      * @param messenger
      * @param results
+     * @param multifunctionalityCorrelation
      * @param name Name of the run
      */
     public GeneSetPvalRun( Set<String> activeProbes, Settings settings, GeneAnnotations geneData,
             DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
-            Map<String, GeneSetResult> results, String name ) {
+            Map<String, GeneSetResult> results, String name, double multifunctionalityCorrelation ) {
         this.settings = settings;
         this.geneData = geneData;
 
         this.geneScores = geneScores;
         this.results = results;
         this.name = name;
+        this.multifunctionalityCorrelation = multifunctionalityCorrelation;
 
         sortResults();
         // get the class sizes.
@@ -119,10 +124,6 @@ public class GeneSetPvalRun {
         }
         messenger.showStatus( "Done!" );
     }
-
-    // /**
-    // * Do a new analysis, starting from the bare essentials.
-    // */
 
     /**
      * Do a new analysis.
@@ -150,6 +151,10 @@ public class GeneSetPvalRun {
         runAnalysis( activeProbes, settings, geneData, rawData, goData, geneScores, messenger );
     }
 
+    // /**
+    // * Do a new analysis, starting from the bare essentials.
+    // */
+
     public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GONames goData, GeneScores geneScores ) {
         this.settings = settings;
         this.geneData = geneData;
@@ -172,6 +177,10 @@ public class GeneSetPvalRun {
 
     public Histogram getHist() {
         return hist;
+    }
+
+    public double getMultifunctionalityCorrelation() {
+        return multifunctionalityCorrelation;
     }
 
     public String getName() {
@@ -275,7 +284,7 @@ public class GeneSetPvalRun {
                         goData );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 // calculate the actual class scores and correct sorting.
-                results = pvg.classPvalGenerator( geneScores1.getGeneToPvalMap(), geneScores1.getProbeToScoreMap() );
+                results = pvg.classPvalGenerator( geneScores1.getGeneToScoreMap(), geneScores1.getProbeToScoreMap() );
 
                 break;
             }
@@ -296,7 +305,7 @@ public class GeneSetPvalRun {
                     break;
                 }
 
-                results = pvg.classPvalGenerator( geneScores1.getGeneToPvalMap(), geneScores1.getProbeToScoreMap(),
+                results = pvg.classPvalGenerator( geneScores1.getGeneToScoreMap(), geneScores1.getProbeToScoreMap(),
                         messenger );
 
                 if ( messenger != null )
@@ -331,9 +340,9 @@ public class GeneSetPvalRun {
                 Map<String, Integer> geneRanksMap;
                 if ( messenger != null ) messenger.showStatus( "Rank transforming" );
                 if ( settings1.getUseWeights() ) {
-                    geneRanksMap = Rank.rankTransform( geneScores1.getGeneToPvalMap() );
+                    geneRanksMap = Rank.rankTransform( geneScores1.getGeneToScoreMap() );
                     if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
-                    results = rpg.classPvalGenerator( geneScores1.getGeneToPvalMap(), geneRanksMap, messenger );
+                    results = rpg.classPvalGenerator( geneScores1.getGeneToScoreMap(), geneRanksMap, messenger );
                 } else {
                     geneRanksMap = Rank.rankTransform( geneScores1.getProbeToScoreMap() );
                     if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
@@ -357,7 +366,22 @@ public class GeneSetPvalRun {
         multipleTestCorrect( messenger, csc );
 
         setGeneSetRanks();
+
+        setMultifuncationalities();
+
         if ( messenger != null ) messenger.showStatus( "Done!" );
+    }
+
+    /**
+     * 
+     */
+    private void setMultifuncationalities() {
+        Multifunctionality mf = new Multifunctionality( geneData );
+        for ( GeneSetResult gsr : this.results.values() ) {
+            double auc = mf.getGOTermMultifunctionality( gsr.getGeneSetId() );
+            gsr.setMultifunctionality( auc );
+        }
+
     }
 
     /**

@@ -130,8 +130,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 }
 
                 if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
-                    if ( log.isInfoEnabled() )
-                        log.info( className + " " + probe + " " + geneScore + " beats " + geneScoreThreshold );
+                    /*
+                     * if ( log.isDebugEnabled() ) { log.debug( className + " " + probe + " " + geneScore + " beats " +
+                     * geneScoreThreshold ); }
+                     */
                     successes++;
                 } else {
                     failures++;
@@ -147,7 +149,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 Double score = probesToScores.get( probe );
 
                 if ( scorePassesThreshold( score, geneScoreThreshold ) ) {
-                    if ( log.isDebugEnabled() ) log.debug( probe + " " + score + " beats " + geneScoreThreshold );
+                    // if ( log.isDebugEnabled() ) log.debug( probe + " " + score + " beats " + geneScoreThreshold );
                     successes++;
                 } else {
                     failures++;

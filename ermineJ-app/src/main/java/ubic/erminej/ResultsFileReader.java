@@ -33,6 +33,8 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.data.GeneSetResult;
 
 /**
+ * Load results from a flat file on disk.
+ * 
  * @author Paul Pavlidis
  * @author Homin Lee
  * @version $Id$
@@ -41,6 +43,12 @@ public class ResultsFileReader {
 
     private Map<String, GeneSetResult> results;
 
+    /**
+     * @param filename
+     * @param messenger
+     * @throws NumberFormatException
+     * @throws IOException
+     */
     public ResultsFileReader( String filename, StatusViewer messenger ) throws NumberFormatException, IOException {
         results = new LinkedHashMap<String, GeneSetResult>();
 
@@ -70,6 +78,7 @@ public class ResultsFileReader {
                 double pval = Double.parseDouble( st.nextToken() );
                 GeneSetResult c = new GeneSetResult( classId, className, size, effsize, score, pval );
                 results.put( classId, c );
+                // fixme: multifunctionality should be computed?
             }
         }
         dis.close();

@@ -67,10 +67,10 @@ public class GeneUrlDialog extends JFrame {
     private StatusViewer statusMessenger;
     private boolean hasOld = false;
     private Settings settings;
-    private final GeneSetTableModel tableModel;
+    private final GeneSetDetailsTableModel tableModel;
     private boolean firstTime = true;
 
-    public GeneUrlDialog( Settings settings, GeneSetTableModel model ) {
+    public GeneUrlDialog( Settings settings, GeneSetDetailsTableModel model ) {
         this.settings = settings;
         this.tableModel = model;
         // this.setModal( true );

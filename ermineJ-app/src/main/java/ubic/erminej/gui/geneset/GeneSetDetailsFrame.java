@@ -89,12 +89,12 @@ import ubic.erminej.gui.table.TableSorter;
  * @author Will Braynen
  * @version $Id$
  */
-public class JGeneSetFrame extends JFrame {
+public class GeneSetDetailsFrame extends JFrame {
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    protected static final Log log = LogFactory.getLog( JGeneSetFrame.class );
+    protected static final Log log = LogFactory.getLog( GeneSetDetailsFrame.class );
     private static final int COLOR_RANGE_SLIDER_MIN = 1;
     private static final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
 
@@ -131,7 +131,7 @@ public class JGeneSetFrame extends JFrame {
     private boolean includeScalebar = false;
     private int matrixColumnWidth; // how wide the color image columns are.
     private Settings settings;
-    private GeneSetTableModel tableModel;
+    private GeneSetDetailsTableModel tableModel;
 
     protected JTable table = new JTable();
     protected JScrollPane tableScrollPane = new JScrollPane();
@@ -186,7 +186,7 @@ public class JGeneSetFrame extends JFrame {
      * @param settings <code>getRawFile()</code> should return the microarray file which contains the microarray data
      *        for the probe ID's contained in <code>probeIDs</code>.
      */
-    public JGeneSetFrame( String className, StatusViewer callerStatusViewer, List<String> probeIDs,
+    public GeneSetDetailsFrame( String className, StatusViewer callerStatusViewer, List<String> probeIDs,
             Map<String, Double> pvalues, GeneAnnotations geneData, Settings settings ) {
 
         try {
@@ -234,7 +234,7 @@ public class JGeneSetFrame extends JFrame {
         probesInGeneSet = new HashSet<String>( probeIDs );
         DoubleMatrix<String, String> matrix = setUpMatrixData();
 
-        tableModel = new GeneSetTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf,
+        tableModel = new GeneSetDetailsTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf,
                 settings );
         TableSorter sorter = new TableSorter( tableModel, matrixDisplay );
         table.setModel( sorter );
@@ -1195,9 +1195,9 @@ public class JGeneSetFrame extends JFrame {
 } // end class JGeneSetFrame
 
 class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1207,9 +1207,9 @@ class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter implements java.aw
 }
 
 class JGeneSetFrame_m_cellWidthSlider_changeAdapter implements javax.swing.event.ChangeListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_cellWidthSlider_changeAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_cellWidthSlider_changeAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1219,9 +1219,9 @@ class JGeneSetFrame_m_cellWidthSlider_changeAdapter implements javax.swing.event
 }
 
 class JGeneSetFrame_m_colorRangeSlider_changeAdapter implements javax.swing.event.ChangeListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_colorRangeSlider_changeAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_colorRangeSlider_changeAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1231,9 +1231,9 @@ class JGeneSetFrame_m_colorRangeSlider_changeAdapter implements javax.swing.even
 }
 
 class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1243,9 +1243,9 @@ class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter implements java.awt
 }
 
 class JGeneSetFrame_m_mouseAdapter extends java.awt.event.MouseAdapter {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_mouseAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_mouseAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1267,9 +1267,9 @@ class JGeneSetFrame_m_mouseAdapter extends java.awt.event.MouseAdapter {
 }
 
 class JGeneSetFrame_m_mouseMotionListener implements java.awt.event.MouseMotionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_mouseMotionListener( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_mouseMotionListener( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1282,9 +1282,9 @@ class JGeneSetFrame_m_mouseMotionListener implements java.awt.event.MouseMotionL
 }
 
 class JGeneSetFrame_m_normalizeMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_normalizeMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_normalizeMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1294,9 +1294,9 @@ class JGeneSetFrame_m_normalizeMenuItem_actionAdapter implements java.awt.event.
 }
 
 class JGeneSetFrame_m_saveDataMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_saveDataMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_saveDataMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1306,9 +1306,9 @@ class JGeneSetFrame_m_saveDataMenuItem_actionAdapter implements java.awt.event.A
 }
 
 class JGeneSetFrame_m_saveImageMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_saveImageMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_saveImageMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1318,9 +1318,9 @@ class JGeneSetFrame_m_saveImageMenuItem_actionAdapter implements java.awt.event.
 }
 
 class JGeneSetFrame_m_viewHistMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_m_viewHistMenuItem_actionAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_m_viewHistMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1330,12 +1330,12 @@ class JGeneSetFrame_m_viewHistMenuItem_actionAdapter implements java.awt.event.A
 }
 
 class JGeneSetFrame_viewGeneUrlDialog_actionAdapter implements java.awt.event.ActionListener {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
     /**
      * @param adaptee
      */
-    public JGeneSetFrame_viewGeneUrlDialog_actionAdapter( JGeneSetFrame adaptee ) {
+    public JGeneSetFrame_viewGeneUrlDialog_actionAdapter( GeneSetDetailsFrame adaptee ) {
         super();
         this.adaptee = adaptee;
     }
@@ -1346,9 +1346,9 @@ class JGeneSetFrame_viewGeneUrlDialog_actionAdapter implements java.awt.event.Ac
 }
 
 class JGeneSetFrame_windowListenerAdapter extends java.awt.event.WindowAdapter {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrame_windowListenerAdapter( JGeneSetFrame adaptee ) {
+    JGeneSetFrame_windowListenerAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -1359,9 +1359,9 @@ class JGeneSetFrame_windowListenerAdapter extends java.awt.event.WindowAdapter {
 }
 
 class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter {
-    JGeneSetFrame adaptee;
+    GeneSetDetailsFrame adaptee;
 
-    JGeneSetFrameTableHeader_mouseAdapterCursorChanger( JGeneSetFrame adaptee ) {
+    JGeneSetFrameTableHeader_mouseAdapterCursorChanger( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
     }
 

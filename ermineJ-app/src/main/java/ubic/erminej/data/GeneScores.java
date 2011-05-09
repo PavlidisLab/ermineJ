@@ -40,6 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.basecode.math.Rank;
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
@@ -208,7 +209,7 @@ public class GeneScores {
     /**
      * @return
      */
-    public Map<String, Double> getGeneToPvalMap() {
+    public Map<String, Double> getGeneToScoreMap() {
         return geneToPvalMap;
     }
 
@@ -259,8 +260,28 @@ public class GeneScores {
     }
 
     /**
+     * @return list of genes in order of their scores, where the first probe is the 'best'. If 'big is better', large
+     *         scores will be given first.
      */
-    public double[] getPvalues() {
+    public List<String> getRankedGenes() {
+        Map<String, Integer> ranked = Rank.rankTransform( getGeneToScoreMap(), settings.getBigIsBetter() );
+
+        List<String> rankedGenes = new ArrayList<String>();
+        for ( int i = 0; i < ranked.size(); i++ ) {
+            rankedGenes.add( null );
+        }
+
+        for ( String g : ranked.keySet() ) {
+            Integer r = ranked.get( g );
+            rankedGenes.set( r, g );
+        }
+
+        return rankedGenes;
+    }
+
+    /**
+     */
+    public double[] getScores() {
         return probePvaluesArray;
     }
 

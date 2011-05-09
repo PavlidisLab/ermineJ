@@ -47,8 +47,7 @@ import ubic.erminej.gui.JLinkLabel;
  * @author Will Braynen
  * @version $Id$
  */
-
-public class GeneSetTableModel extends AbstractTableModel {
+public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     /**
      * 
@@ -66,7 +65,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name", "Multifunc" };
     private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
     private Multifunctionality multifunctionality;
-    protected static final Log log = LogFactory.getLog( GeneSetTableModel.class );
+    protected static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
 
     /**
      * @param matrixDisplay
@@ -76,7 +75,7 @@ public class GeneSetTableModel extends AbstractTableModel {
      * @param geneData
      * @param nf
      */
-    public GeneSetTableModel( MatrixDisplay matrixDisplay, List<String> probeIDs, Map<String, Double> pvalues,
+    public GeneSetDetailsTableModel( MatrixDisplay matrixDisplay, List<String> probeIDs, Map<String, Double> pvalues,
             Map<String, Integer> pvaluesOrdinalPosition, GeneAnnotations geneData, DecimalFormat nf, Settings settings ) {
 
         m_matrixDisplay = matrixDisplay;
@@ -229,7 +228,7 @@ public class GeneSetTableModel extends AbstractTableModel {
             case 5:
                 if ( geneData == null ) return "";
                 gene_name = geneData.getProbeGeneName( probeID );
-                return String.format( "%.3f (%d)", Math.max( 0.0, 1.0 - multifunctionality
+                return String.format( "%.3f (%d)", Math.max( 0.0, multifunctionality
                         .getMultifunctionalityRank( gene_name ) ), multifunctionality.getNumGoTerms( gene_name ) );
             default:
                 return "";

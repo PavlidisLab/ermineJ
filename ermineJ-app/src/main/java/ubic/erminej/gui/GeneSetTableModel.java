@@ -140,6 +140,11 @@ public class GeneSetTableModel extends AbstractTableModel {
         return INIT_COLUMNS + runIndex;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.TableModel#getValueAt(int, int)
+     */
     public Object getValueAt( int i, int j ) {
 
         String classid = geneData.getSelectedSets().get( i );
@@ -161,7 +166,7 @@ public class GeneSetTableModel extends AbstractTableModel {
                 case 3:
                     return new Integer( geneData.numGenesInGeneSet( classid ) );
                 case 4:
-                    return String.format( "%.3f", 1.0 - multifunctionality.getGOTermMultifunctionalityRank( classid ) );
+                    return String.format( "%.2f", this.multifunctionality.getGOTermMultifunctionality( classid ) );
 
             }
         } else {
@@ -247,13 +252,30 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         // set cell background
         int runcol = column - GeneSetTableModel.INIT_COLUMNS;
         setOpaque( true );
-        if ( isSelected )
+        if ( isSelected ) {
             setOpaque( true );
-        else if ( value == null )
+        } else if ( value == null ) {
             setOpaque( false );
-        else if ( column == 0 && goData.isUserDefined( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
+        } else if ( column == GeneSetTablePanel.MULTIFUNC_COLUMN_INDEX ) {
+            // visual indication of multifuncationality.
+            try {
+                double auc = Double.parseDouble( ( String ) value );
+                if ( auc > 0.95 ) {
+                    setBackground( Colors.LIGHTRED1 );
+                } else if ( auc > 0.9 ) {
+                    setBackground( Colors.LIGHTRED2 );
+                } else if ( auc > 0.8 ) {
+                    setBackground( Colors.LIGHTRED3 );
+                } else {
+                    setBackground( Color.WHITE );
+                }
+            } catch ( NumberFormatException e ) {
+                //
+            }
+        } else if ( column == 0 && goData.isUserDefined( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
             setBackground( Colors.LIGHTYELLOW );
-        } else if ( value.getClass().equals( ArrayList.class ) ) {
+        } else if ( value.getClass().equals( ArrayList.class ) ) { // then it's a result. FIXME figure this out in a
+            // more robust way.
             String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
             GeneSetPvalRun result = results.get( runcol );
             Map data = result.getResults();

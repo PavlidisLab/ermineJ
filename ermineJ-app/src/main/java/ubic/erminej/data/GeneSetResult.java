@@ -36,6 +36,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     private int size = 0;
     private int effectiveSize = 0;
     private double correctedPvalue = 0.0;
+    private double multifunctionality = 0.5;
     private int rank;
 
     public GeneSetResult() {
@@ -69,13 +70,24 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         this.score = score;
         this.size = size;
         this.effectiveSize = effectiveSize;
+    }
 
+    /**
+     * @param auc
+     */
+    public void setMultifunctionality( double auc ) {
+        this.multifunctionality = auc;
     }
 
     public void print( Writer out ) throws IOException {
         this.print( out, "" );
     }
 
+    /**
+     * @param out
+     * @param extracolumns
+     * @throws IOException
+     */
     public void print( Writer out, String extracolumns ) throws IOException {
         DecimalFormat nf = new DecimalFormat();
         nf.setMaximumFractionDigits( 8 );
@@ -85,19 +97,22 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         out.write( "!\t" + clasName + "\t" + classId + "\t" + size + "\t" + effectiveSize + "\t" + nf.format( score )
                 + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
                 + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
-                + extracolumns + "\n" );
+                + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
     }
 
     public void printHeadings( Writer out ) throws IOException {
         this.printHeadings( out, "" );
     }
 
+    /**
+     * @param out
+     * @param extracolumns
+     * @throws IOException
+     */
     public void printHeadings( Writer out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
-        out.write( "\tName" + "\tID" + "\tProbes" + "\tNumGenes" + "\tRawScore" + "\tPval" +
-        // "\tN over pval cut\tORA pval+"
-                /* + "\tAROC" + "\tAROCpval" */
-                "\tCorrectedPvalue" + extracolumns + "\n" );
+        out.write( "\tName\tID\tProbes\tNumGenes\tRawScore\tPval" + "\tCorrectedPvalue\tMultifuncBias" + extracolumns
+                + "\n" );
     }
 
     public void setNames( String id, String name ) {

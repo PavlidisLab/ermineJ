@@ -93,7 +93,7 @@ public class GeneSetSizeComputer {
                             // compute pval for every replicate group
 
                             // FIXME, doesn't work if geneScores is null.
-                            if ( ( geneScores == null || geneScores.getGeneToPvalMap().containsKey( gene ) )
+                            if ( ( geneScores == null || geneScores.getGeneToScoreMap().containsKey( gene ) )
 
                             /*
                              * if we haven't done this probe already.

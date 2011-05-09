@@ -733,9 +733,14 @@ class BaseCellRenderer extends DefaultTreeCellRenderer {
             // this.setFont( italic );
             this.setForeground( Color.GRAY );
         } else {
-            displayedText = name + " -- " + geneData.numProbesInGeneSet( id ) + " probes, "
-                    + geneData.numGenesInGeneSet( id ) + " genes, multifunc. "
-                    + String.format( "%.3f", 1.0 - this.multifunctionality.getGOTermMultifunctionalityRank( id ) );
+            displayedText = name
+                    + " -- "
+                    + geneData.numProbesInGeneSet( id )
+                    + " probes, "
+                    + geneData.numGenesInGeneSet( id )
+                    + " genes, multifunc. "
+                    + String.format( "%.3f [%.2f]", this.multifunctionality.getGOTermMultifunctionalityRank( id ),
+                            this.multifunctionality.getGOTermMultifunctionality( id ) );
             this.setFont( plain );
             this.setForeground( Color.BLACK );
         }

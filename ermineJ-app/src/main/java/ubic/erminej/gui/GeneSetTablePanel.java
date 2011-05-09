@@ -60,6 +60,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
     private final static int NUMPROBES_COLUMN_WIDTH = 40;
     private final static int NUMGENES_COLUMN_WIDTH = 40;
     private final static int RUN_COLUMN_START_WIDTH = 80;
+    public static final int PROBE_COUNT_COLUMN_INDEX = 2;
+    public static final int GENE_COUNT_COLUMN_INDEX = 3;
+    public static final int MULTIFUNC_COLUMN_INDEX = 4;
 
     private String classColToolTip;
     private int currentResultSetIndex = -1;
@@ -224,8 +227,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
         this.getViewport().add( table, null );
         table.getColumnModel().getColumn( 0 ).setPreferredWidth( GENESET_ID_COLUMN_WIDTH );
         table.getColumnModel().getColumn( 1 ).setPreferredWidth( GENESET_NAME_COLUMN_WIDTH );
-        table.getColumnModel().getColumn( 2 ).setPreferredWidth( NUMPROBES_COLUMN_WIDTH );
-        table.getColumnModel().getColumn( 3 ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
+        table.getColumnModel().getColumn( PROBE_COUNT_COLUMN_INDEX ).setPreferredWidth( NUMPROBES_COLUMN_WIDTH );
+        table.getColumnModel().getColumn( GENE_COUNT_COLUMN_INDEX ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
+        table.getColumnModel().getColumn( MULTIFUNC_COLUMN_INDEX ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
         table.setDefaultRenderer( Object.class, new OutputPanelTableCellRenderer( goData, results ) );
         assert geneData != null;
         classColToolTip = new String( "Total classes shown: " + geneData.selectedSets() );
@@ -264,6 +268,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
         return classID;
     }
 
+    /**
+     * Create the text shown when user hovers mouse over the heading of a result column
+     * 
+     * @param runIndex
+     */
     protected void generateToolTip( int runIndex ) {
         assert results != null : "Null results";
         assert results.get( runIndex ) != null : "No results with index " + runIndex;
@@ -286,6 +295,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
             tooltip += "ROC Analysis<br>";
         }
 
+        tooltip += String.format( "Multifunct. bias: %.2f<br>", results.get( runIndex )
+                .getMultifunctionalityCorrelation() );
+
         tooltip += new String( "Max set size: " + runSettings.getMaxClassSize() + "<br>" + "Min set size: "
                 + runSettings.getMinClassSize() + "<br>" );
         if ( runSettings.getDoLog() ) tooltip += "Log normalized<br>";
@@ -300,15 +312,25 @@ public class GeneSetTablePanel extends GeneSetPanel {
             else if ( runSettings.getRawScoreMethod() == Settings.QUANTILE_METHOD )
                 tooltip += "Class Raw Score Method: Median <br>";
         }
+
         tooltip += coda;
         resultToolTips.add( runIndex, tooltip );
     }
 
+    /**
+     * @param index
+     * @return
+     */
     protected String getHeaderToolTip( int index ) {
-        if ( index == 0 ) {
+        if ( index == 0 || index == 1 ) { // descriptions of the category.
             return this.classColToolTip;
+        } else if ( index == PROBE_COUNT_COLUMN_INDEX ) {
+            return "How many probes are in the group (there can be more than one probe per gene)";
+        } else if ( index == GENE_COUNT_COLUMN_INDEX ) {
+            return "How many genes are in the group";
+        } else if ( index == MULTIFUNC_COLUMN_INDEX ) {
+            return "Measurement of how biased the category is towards multifunctional genes";
         } else if ( index >= GeneSetTableModel.INIT_COLUMNS ) {
-            // int runIndex=(int)Math.floor((index - OutputTableModel.init_cols) / OutputTableModel.cols_per_run);
             int runIndex = model.getRunIndex( index );
             return resultToolTips.get( runIndex );
         }
@@ -413,6 +435,7 @@ class OutputPanel_findInTreeMenuItem_actionAdapter implements ActionListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed( ActionEvent e ) {

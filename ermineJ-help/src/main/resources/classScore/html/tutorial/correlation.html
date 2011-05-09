@@ -1,77 +1,111 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-<head>
-<meta name="generator" content="HTML Tidy, see www.w3.org">
+	<head>
+		<meta name="generator" content="HTML Tidy, see www.w3.org">
 
-<title>correlation resampling</title>
-<link href="../style.css" rel="stylesheet" type="text/css" media="all">
-</head>
+		<title>correlation resampling</title>
+		<link href="../style.css" rel="stylesheet" type="text/css" media="all">
+	</head>
 
-<body bgcolor="#ffffff">
-<img src="../images/logo1small.gif" />
-<h1>Tutorial: Correlation resampling</h1>
+	<body bgcolor="#ffffff">
+		<img src="../images/logo1small.gif" />
+		<h1>
+			Tutorial: Correlation resampling
+		</h1>
 
-<h2>Method Overview</h2>
+		<h2>
+			Method Overview
+		</h2>
 
-<p>Unlike ORA and Gene Score Resampling, this method examines the gene
-expression profiles themselves, not the gene scores for each gene. A
-score is computed for a gene set based on how correlated the expression
-profiles are.</p>
+		<p>
+			Unlike ORA and Gene Score Resampling, this method examines the gene
+			expression profiles themselves, not the gene scores for each gene. A
+			score is computed for a gene set based on how correlated the
+			expression profiles are.
+		</p>
 
-<p>This can be thought of as a measure of how well the genes in the set
-cluster together, but they need not all be in the same cluster. Thus a
-gene set that contains two coherent clusters that encompass most of the
-genes in the set will tend to get a good score (though not as good as a
-gene set that is just one big cluster).</p>
-
-
-<h2>When to use correlation scoring</h2>
-
-<p>If you are interested in gene clustering, as opposed to simply
-looking at differntial expression, this method is appropriate. If you
-feel limited by the choice of distance metrics in ermineJ, <a
-	href="ora.html">ORA</a> would be an alternative, but you have to define
-distinct clusters of genes to do that.</p>
-
-<p>One alternative use of correlation scoring is as a control for
-gene-score-based analysis. Correlated gene sets can cause spurious high
-scores, especially if the differential expression in your study is weak.
-To use this approach, you could first use gene-score-based analysis
-(e.g., <a href="resampling.html">gene score resampling</a> and then
-analyze the data using correlation analysis. If any of your gene sets
-have high scores in both analyses, you should look at the data to see if
-the correlation is not associated with the differential expression. This
-is a simple (but ad hoc) alternative to using resampling over the
-samples to do the gene-score-based analysis.</p>
+		<p>
+			This can be thought of as a measure of how well the genes in the set
+			cluster together, but they need not all be in the same cluster. Thus
+			a gene set that contains two coherent clusters that encompass most of
+			the genes in the set will tend to get a good score (though not as
+			good as a gene set that is just one big cluster).
+		</p>
 
 
-<h2>Walkthrough</h2>
+		<h2>
+			When to use correlation scoring
+		</h2>
 
-<p>If you have read the <a href="ora.html">ORA</a> page (please do), you
-will recognize the first 5 steps of the wizard. The only different one
-is the last step:</p>
+		<p>
+			If you are interested in gene clustering, as opposed to simply
+			looking at differntial expression, this method is appropriate. If you
+			feel limited by the choice of distance metrics in ermineJ,
+			<a href="ora.html">ORA</a> would be an alternative, but you have to
+			define distinct clusters of genes to do that.
+		</p>
 
-<p><img alt="" src="../images/correlationstep5.jpg" border="0"></p>
-
-<p><font color="#990000"><strong>Note</strong></font> that the "gene
-replicate treatment" choice in step 5 does not apply to correlation
-analysis at this time. All correlation analyses use the "mean" method of
-weighting multiple comparisons among genes. Comparisons of a gene to
-itself are always skipped. That is, if there are two probes for a gene,
-they are not compared.</p>
-
-<p>Correlation resampling is the most computationally intensive method
-implemented by ermineJ. For this reason we recommend setting the number
-of iterations lower, perhaps only 10,000. In addition, running larger
-class sizes takes longer than smaller ones, a consideration you might
-use when setting the parameters.</p>
-
-<hr>
-<br>
-<br>
+		<p>
+			One alternative use of correlation scoring is as a control for
+			gene-score-based analysis. Correlated gene sets can cause spurious
+			high scores, especially if the differential expression in your study
+			is weak. To use this approach, you could first use gene-score-based
+			analysis (e.g.,
+			<a href="resampling.html">gene score resampling</a> and then analyze
+			the data using correlation analysis. If any of your gene sets have
+			high scores in both analyses, you should look at the data to see if
+			the correlation is not associated with the differential expression.
+			This is a simple (but ad hoc) alternative to using resampling over
+			the samples to do the gene-score-based analysis.
+		</p>
 
 
-<div class="tidy">Copyright 2004 &copy; University of British Columbia</div>
-</body>
+		<h2>
+			Walkthrough
+		</h2>
+
+		<p>
+			If you have read the
+			<a href="ora.html">ORA</a> page (please do), you will recognize the
+			first 5 steps of the wizard. The only different one is the last step:
+		</p>
+
+		<p>
+			<img alt="" src="../images/correlationstep5.jpg" border="0">
+		</p>
+
+		<p>
+			<font color="#990000"><strong>Note</strong> </font> that the "gene
+			replicate treatment" choice in step 5 does not apply to correlation
+			analysis at this time. All correlation analyses use the "mean" method
+			of weighting multiple comparisons among genes. Comparisons of a gene
+			to itself are always skipped. That is, if there are two probes for a
+			gene, they are not compared.
+		</p>
+
+		<p>
+			Correlation resampling is the most computationally intensive method
+			implemented by ermineJ. For this reason we recommend setting the
+			number of iterations lower, perhaps only 10,000. In addition, running
+			larger class sizes takes longer than smaller ones, a consideration
+			you might use when setting the parameters.
+		</p>
+
+
+
+		<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
+		: "http://www.");
+document
+		.write(unescape("%3Cscript src='"
+				+ gaJsHost
+				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+		<script type="text/javascript">
+var pageTracker = _gat._getTracker('UA-4826357-1');
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+	</body>
 </html>

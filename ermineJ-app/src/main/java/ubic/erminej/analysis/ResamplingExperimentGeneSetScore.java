@@ -187,7 +187,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         }
 
         this.numClasses = classMaxSize - classMinSize + 1;
-        pvals = geneScores.getPvalues(); // array of pvalues.
+        pvals = geneScores.getScores(); // array of pvalues.
         groupPvals = geneScores.getGeneScores();
         probePvalMap = geneScores.getProbeToScoreMap(); // reference to the probe -> pval map.
 
