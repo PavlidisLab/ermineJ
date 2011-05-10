@@ -70,7 +70,7 @@ public class GeneSetPvalRun {
     private NumberFormat nf = NumberFormat.getInstance();
     private Settings settings;
 
-    private double multifunctionalityCorrelation;
+    private double multifunctionalityCorrelation = -1;
 
     private long randomSeed = -1;
 
@@ -139,11 +139,12 @@ public class GeneSetPvalRun {
      */
     public GeneSetPvalRun( Set<String> activeProbes, Settings settings, GeneAnnotations geneData,
             DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
-            String name ) {
+            String name, double multifunctionalityCorrelation ) {
         this.settings = settings;
         this.geneData = geneData;
         this.geneScores = geneScores;
         this.name = name;
+        this.multifunctionalityCorrelation = multifunctionalityCorrelation;
 
         nf.setMaximumFractionDigits( 8 );
         results = new LinkedHashMap<String, GeneSetResult>();

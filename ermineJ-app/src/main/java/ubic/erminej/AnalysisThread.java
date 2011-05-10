@@ -300,7 +300,7 @@ public class AnalysisThread extends Thread {
                     messenger, results, "LoadedRun", multifunctionalityCorrelation );
         } else {
             newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
-                    messenger, "NewRun" );
+                    messenger, "NewRun", multifunctionalityCorrelation );
         }
 
         timer.stop();

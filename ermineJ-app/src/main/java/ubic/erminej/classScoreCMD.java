@@ -45,6 +45,7 @@ import org.xml.sax.SAXException;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.FileTools;
@@ -653,10 +654,13 @@ public class classScoreCMD {
             geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
         }
 
+        Multifunctionality mf = new Multifunctionality( geneData );
+        double multifunctionalCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
+
         /* do work */
         statusMessenger.showStatus( "Starting analysis..." );
         GeneSetPvalRun runResult = new GeneSetPvalRun( activeProbes, settings, geneData, rawData, goData, geneScores,
-                statusMessenger, "command" );
+                statusMessenger, "command", multifunctionalCorrelation );
         return runResult;
     }
 
