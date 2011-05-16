@@ -22,7 +22,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.text.DecimalFormat; 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -33,6 +33,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
 /**
+ * Renders the "pvalue bars" in the details views.
+ * 
  * @author Will Braynen
  * @version $Id$
  */

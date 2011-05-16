@@ -20,6 +20,7 @@ package ubic.erminej.gui.geneset;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -58,6 +59,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
@@ -75,6 +77,7 @@ import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
+import ubic.erminej.gui.Colors;
 import ubic.erminej.gui.GuiUtil;
 import ubic.erminej.gui.JLinkLabel;
 import ubic.erminej.gui.StatusJlabel;
@@ -234,8 +237,8 @@ public class GeneSetDetailsFrame extends JFrame {
         probesInGeneSet = new HashSet<String>( probeIDs );
         DoubleMatrix<String, String> matrix = setUpMatrixData();
 
-        tableModel = new GeneSetDetailsTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition, geneData, m_nf,
-                settings );
+        tableModel = new GeneSetDetailsTableModel( matrixDisplay, probeIDs, pvalues, m_pvaluesOrdinalPosition,
+                geneData, m_nf, settings );
         TableSorter sorter = new TableSorter( tableModel, matrixDisplay );
         table.setModel( sorter );
         sorter.setTableHeader( table.getTableHeader() );
@@ -358,7 +361,7 @@ public class GeneSetDetailsFrame extends JFrame {
         col = table.getColumnModel().getColumn( matrixColumnCount + 1 );
         col.setPreferredWidth( PREFERRED_WIDTH_PVALUE_COLUMN );
         // p value bar
-        col = table.getColumnModel().getColumn( matrixColumnCount + 2 );
+        col = table.getColumnModel().getColumn( matrixColumnCount + 2 ); // P Value Bars.
         col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
         col.setCellRenderer( new JBarGraphCellRenderer() );
         // name
@@ -370,6 +373,32 @@ public class GeneSetDetailsFrame extends JFrame {
 
         col = table.getColumnModel().getColumn( matrixColumnCount + 5 );
         col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN );
+        col.setCellRenderer( new DefaultTableCellRenderer() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column ) {
+                super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
+                String sv = ( String ) value;
+                String ds = sv.split( " " )[0];
+
+                double v = Double.parseDouble( ds );
+                if ( v >= 0.99 ) {
+                    setBackground( Colors.LIGHTRED1 );
+                } else if ( v >= 0.95 ) {
+                    setBackground( Colors.LIGHTRED2 );
+                } else if ( v >= 0.9 ) {
+                    setBackground( Colors.LIGHTRED3 );
+                } else if ( v >= 0.8 ) {
+                    setBackground( Colors.LIGHTRED4 );
+                } else {
+                    setBackground( Color.WHITE );
+                }
+
+                return this;
+            }
+        } );
     }
 
     private String getProbeID( int row ) {

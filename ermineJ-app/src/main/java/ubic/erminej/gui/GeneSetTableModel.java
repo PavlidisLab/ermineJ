@@ -231,6 +231,12 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
         nff.setMaximumFractionDigits( 4 );
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
+     * java.lang.Object, boolean, boolean, int, int)
+     */
     @SuppressWarnings("unchecked")
     @Override
     public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
@@ -260,12 +266,14 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
             // visual indication of multifuncationality.
             try {
                 double auc = Double.parseDouble( ( String ) value );
-                if ( auc > 0.95 ) {
+                if ( auc >= 0.95 ) {
                     setBackground( Colors.LIGHTRED1 );
-                } else if ( auc > 0.9 ) {
+                } else if ( auc >= 0.9 ) {
                     setBackground( Colors.LIGHTRED2 );
-                } else if ( auc > 0.8 ) {
+                } else if ( auc >= 0.8 ) {
                     setBackground( Colors.LIGHTRED3 );
+                } else if ( auc >= 0.7 ) {
+                    setBackground( Colors.LIGHTRED4 );
                 } else {
                     setBackground( Color.WHITE );
                 }
