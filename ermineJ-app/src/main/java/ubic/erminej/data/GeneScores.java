@@ -270,7 +270,7 @@ public class GeneScores {
 
         for ( String g : ranked.keySet() ) {
             Integer r = ranked.get( g );
-            rankedGenes.set( r - 1, g );
+            rankedGenes.set( r, g );
         }
 
         return rankedGenes;
