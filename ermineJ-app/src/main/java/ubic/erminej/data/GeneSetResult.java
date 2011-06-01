@@ -96,7 +96,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         DecimalFormat exp = new DecimalFormat( "0.###E00" );
         out.write( "!\t" + clasName + "\t" + classId + "\t" + size + "\t" + effectiveSize + "\t" + nf.format( score )
                 + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
-                + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
+                + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) ) + "\t"
                 + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
     }
 
