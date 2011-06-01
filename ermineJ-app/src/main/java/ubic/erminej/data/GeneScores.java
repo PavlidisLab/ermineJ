@@ -266,14 +266,11 @@ public class GeneScores {
     public List<String> getRankedGenes() {
         Map<String, Integer> ranked = Rank.rankTransform( getGeneToScoreMap(), settings.getBigIsBetter() );
 
-        List<String> rankedGenes = new ArrayList<String>();
-        for ( int i = 0; i < ranked.size(); i++ ) {
-            rankedGenes.add( null );
-        }
+        List<String> rankedGenes = new ArrayList<String>( ranked.keySet() );
 
         for ( String g : ranked.keySet() ) {
             Integer r = ranked.get( g );
-            rankedGenes.set( r, g );
+            rankedGenes.set( r - 1, g );
         }
 
         return rankedGenes;
