@@ -27,7 +27,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.ClassScoreSimple;
-import ubic.erminej.Settings;
 
 /**
  * @author pavlidis
@@ -94,7 +93,7 @@ public class ApiExample {
         css.setGeneScoreThreshold( 0.15 );
 
         // use over-representation analysis.
-        css.setClassScoreMethod( Settings.ORA );
+        css.setClassScoreMethod( 0 );
         /* ... etc. Reasonable defaults (?) are set for all parameters if you don't set them. */
 
         css.run( geneScores ); // might want to run in a separate thread.

@@ -32,6 +32,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import ubic.erminej.Settings;
+import ubic.erminej.Settings.Method;
 
 /**
  * The last step of the analysis wizard -- actually step 6 usually.
@@ -241,24 +242,24 @@ public class AnalysisWizardStep5 extends WizardStep {
     /**
      * @param analysisType
      */
-    public void addVarPanel( int analysisType ) {
-        if ( analysisType == Settings.ORA ) {
+    public void addVarPanel( Method analysisType ) {
+        if ( analysisType.equals( Method.ORA ) ) {
             oraPanel.add( jCheckBoxDoLog, null );
             oraPanel.add( jCheckBoxBigIsBetter, null );
             step5Panel.add( oraPanel, null );
             this.addHelp( extraHelp );
-        } else if ( analysisType == Settings.RESAMP ) {
+        } else if ( analysisType.equals( Method.GSR ) ) {
             resampPanel.add( jCheckBoxDoLog, null );
             resampPanel.add( jCheckBoxBigIsBetter, null );
             resampPanel.add( subPanel, null );
             this.addHelp( extraHelp );
             step5Panel.add( resampPanel, null );
-        } else if ( analysisType == Settings.ROC ) {
+        } else if ( analysisType.equals( Method.ROC ) ) {
             rocPanel.add( jCheckBoxDoLog, null );
             rocPanel.add( jCheckBoxBigIsBetter, null );
             this.addHelp( extraHelp );
             step5Panel.add( rocPanel, null );
-        } else if ( analysisType == Settings.CORR ) {
+        } else if ( analysisType.equals( Method.CORR ) ) {
             corrPanel.add( subPanel, null );
             this.addHelp( help );
             step5Panel.add( corrPanel, null );
@@ -268,16 +269,16 @@ public class AnalysisWizardStep5 extends WizardStep {
     /**
      * @param analysisType
      */
-    public void removeVarPanel( int analysisType ) {
-        if ( analysisType == Settings.ORA ) {
+    public void removeVarPanel( Settings.Method analysisType ) {
+        if ( analysisType.equals( Settings.Method.ORA ) ) {
             step5Panel.remove( oraPanel );
-        } else if ( analysisType == Settings.RESAMP ) {
+        } else if ( analysisType.equals( Settings.Method.GSR ) ) {
             resampPanel.remove( subPanel );
             step5Panel.remove( resampPanel );
-        } else if ( analysisType == Settings.CORR ) {
+        } else if ( analysisType.equals( Settings.Method.CORR ) ) {
             corrPanel.remove( subPanel );
             step5Panel.remove( corrPanel );
-        } else if ( analysisType == Settings.ROC ) {
+        } else if ( analysisType.equals( Settings.Method.ROC ) ) {
             step5Panel.remove( rocPanel );
         }
     }
@@ -289,7 +290,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     private void setValues() {
         jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
 
-        if ( settings.getRawScoreMethod() == Settings.MEAN_METHOD ) {
+        if ( settings.getRawScoreMethod().equals( Settings.MultiProbeHandling.MEAN ) ) {
             jRadioButtonMean.setSelected( true );
         } else {
             jRadioButtonMedian.setSelected( true );
@@ -309,9 +310,9 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
 
         if ( jRadioButtonMean.isSelected() ) {
-            settings.setRawScoreMethod( Settings.MEAN_METHOD );
+            settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN );
         } else {
-            settings.setRawScoreMethod( Settings.QUANTILE_METHOD );
+            settings.setRawScoreMethod( Settings.GeneScoreMethod.QUANTILE );
         }
 
         settings.setPValThreshold( Double.valueOf( jTextFieldPValueThreshold.getText() ).doubleValue() );

@@ -35,6 +35,7 @@ import javax.swing.table.AbstractTableModel;
 
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.erminej.data.UserDefinedGeneSet;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.table.TableSorter;
 
@@ -52,13 +53,13 @@ public class GeneSetWizardStep1A extends WizardStep {
     private static final long serialVersionUID = -4291212433845259049L;
     private GeneAnnotations geneData = null;
     private GONames goData = null;
-    private UserDefinedGeneSetManager newGeneSet = null;
-    private UserDefinedGeneSetManager oldGeneSet = null;
+    private UserDefinedGeneSet newGeneSet = null;
+    private UserDefinedGeneSet oldGeneSet = null;
     private JTable oldClassTable = null;
     private JTextField searchTextField = null;
 
     public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, GONames goData,
-            UserDefinedGeneSetManager newGeneSet, UserDefinedGeneSetManager oldGeneSet ) {
+            UserDefinedGeneSet newGeneSet, UserDefinedGeneSet oldGeneSet ) {
         super( wiz );
         this.jbInit();
         this.geneData = geneData;

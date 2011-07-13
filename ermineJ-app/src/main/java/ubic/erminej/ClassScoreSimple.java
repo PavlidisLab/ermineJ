@@ -32,41 +32,6 @@ import ubic.erminej.data.GeneScores;
  */
 public class ClassScoreSimple {
 
-    /**
-     * When more than one probe is found for the same gene, use the best score to represent the gene.
-     */
-    public static final int BEST_GENE_SCORE = Settings.BEST_PVAL;
-
-    /**
-     * When summarizing a gene set during resampling, use the mean gene score
-     */
-    public static final int MEAN = Settings.MEAN_METHOD;
-
-    /**
-     * When more than one probe is found for the same gene, use the mean score to represent the gene
-     */
-    public static final int MEAN_GENE_SCORE = Settings.MEAN_PVAL;
-
-    /**
-     * When sumarizing a gene set during resampling, use the median gene score
-     */
-    public static final int MEDIAN = Settings.QUANTILE_METHOD;
-
-    /**
-     * Over-representation analysis.
-     */
-    public static final int ORA = Settings.ORA;
-
-    /**
-     * Receiver operator characteristic analysis
-     */
-    public static final int ROC = Settings.ROC;
-
-    /**
-     * Gene score resampling
-     */
-    public static final int RESAMPLING = Settings.RESAMP;
-
     // List of genes corresponding to the probes. Indicates the Many-to-one mapping of
     // probes to
     // genes.
@@ -96,7 +61,7 @@ public class ClassScoreSimple {
 
         settings = new Settings( false );
         settings.setQuantile( 50 );
-        settings.setMtc( Settings.BENJAMINIHOCHBERG );
+        settings.setMtc( Settings.MultiTestCorrMethod.BENJAMINIHOCHBERG );
 
     }
 
@@ -137,13 +102,25 @@ public class ClassScoreSimple {
     /**
      * Set the type of anlaysis to run. ORA is over-representation analysis.
      * 
-     * @param val either ClassScoreSimple.ORA or ClassScoreSimple.RESAMPLING
+     * @param val either ClassScoreSimple.ORA or ClassScoreSimple.RESAMPLING or ROC
      */
     public void setClassScoreMethod( int val ) {
-        if ( val != ORA && val != RESAMPLING && val != ROC )
-            throw new IllegalArgumentException(
-                    "Value must be one of ClassScoreSimple.ORA or ClassScoreSimple.RESAMPLING" );
-        this.settings.setClassScoreMethod( val );
+        switch ( val ) {
+            case 0:
+                settings.setClassScoreMethod( Settings.Method.ORA );
+                break;
+            case 1:
+                settings.setClassScoreMethod( Settings.Method.GSR );
+                break;
+            case 2:
+                settings.setClassScoreMethod( Settings.Method.CORR );
+                break;
+            case 3:
+                settings.setClassScoreMethod( Settings.Method.ROC );
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**
@@ -152,9 +129,19 @@ public class ClassScoreSimple {
      * @param val either BEST_GENE_SCORE or MEAN_GENE_SCORE
      */
     public void setGeneReplicateTreatment( int val ) {
-        if ( val != BEST_GENE_SCORE && val != MEAN_GENE_SCORE )
-            throw new IllegalArgumentException( "Value must be either  BEST_GENE_SCORE or MEAN_GENE_SCORE" );
-        this.settings.setGeneRepTreatment( val );
+        switch ( val ) {
+            case 1:
+                settings.setGeneRepTreatment( Settings.MultiProbeHandling.BEST );
+
+                break;
+            case 2:
+                settings.setGeneRepTreatment( Settings.MultiProbeHandling.MEAN );
+
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
     }
 
     /**
@@ -163,9 +150,19 @@ public class ClassScoreSimple {
      * @param val Either ClassScoreSimple.MEAN or ClassScoreSimple.MEDIAN.
      */
     public void setGeneScoreSummaryMethod( int val ) {
-        if ( val != MEAN && val != MEDIAN )
-            throw new IllegalArgumentException( "Summary method must be either MEAN or MEDIAN" );
-        this.settings.setRawScoreMethod( val );
+        switch ( val ) {
+            case 0:
+                settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN );
+                break;
+            case 1:
+                settings.setRawScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                break;
+            case 2:
+                settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     /**

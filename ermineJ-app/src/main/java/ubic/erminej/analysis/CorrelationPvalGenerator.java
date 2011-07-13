@@ -48,7 +48,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     private DoubleMatrix<String, String> data = null;
     private Histogram hist;
     private Map<String, String> probeToGeneMap;
-    private int geneRepTreatment;
+    private Settings.MultiProbeHandling geneRepTreatment = Settings.MultiProbeHandling.BEST;
     private int cacheHits = 0;
     private int tests = 0;
     private double[][] dataAsRawMatrix;
@@ -149,12 +149,12 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                 tests++;
 
                 if ( multipleProbesI || numProbesForGeneJ > 1 ) { // do we even need to bother?
-                    if ( geneRepTreatment == Settings.BEST_PVAL ) {
+                    if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
                         Object key = StringUtil.twoStringHashKey( genei, genej );
                         if ( !values.containsKey( key ) || values.get( key ) < corr ) {
                             values.put( key, new Double( corr ) );
                         }
-                    } else if ( geneRepTreatment == Settings.MEAN_PVAL ) {
+                    } else if ( geneRepTreatment.equals( Settings.MultiProbeHandling.MEAN ) ) {
                         double weight = 1.0 / ( ( double ) numProbesForGeneJ * ( double ) numProbesForGeneI );
                         corr *= weight;
                         sumCorrel += corr;
@@ -166,7 +166,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                 } else {
                     sumCorrel += corr;
                     nummeas++;
-                    if ( geneRepTreatment == Settings.BEST_PVAL ) {
+                    if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
                         Object key = StringUtil.twoStringHashKey( genei, genej );
                         values.put( key, new Double( corr ) );
                     }
@@ -174,7 +174,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
             }
         }
 
-        if ( geneRepTreatment == Settings.BEST_PVAL ) {
+        if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
             sumCorrel = 0.0;
             nummeas = 0;
             for ( Iterator<Double> iter = values.values().iterator(); iter.hasNext(); ) {
@@ -260,7 +260,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @param geneRepTreatment
      */
-    public void setGeneRepTreatment( int geneRepTreatment ) {
+    public void setGeneRepTreatment( Settings.MultiProbeHandling geneRepTreatment ) {
         this.geneRepTreatment = geneRepTreatment;
     }
 

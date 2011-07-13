@@ -31,12 +31,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -58,79 +54,43 @@ public class UserDefinedGeneSetManager {
 
     private static Log log = LogFactory.getLog( UserDefinedGeneSetManager.class.getName() );
     private static final String USERGENESET_SUFFIX = "-class.txt";
-    private String aspect;
-    private String definition;
-    private String desc = "";
-    private String id = "";
-    private boolean modifiedGS = false;
-    private Settings settings;
-    protected GeneAnnotations geneData;
-    List<String> probes;
 
-    public UserDefinedGeneSetManager( GeneAnnotations geneData, Settings settings, String geneSetId ) {
-        if ( geneData == null ) {
-            throw new IllegalArgumentException( "GeneData (annotations) was null" );
-        }
+    private static Settings settings;
+    public static GeneAnnotations geneData;
 
-        this.geneData = geneData;
-        this.settings = settings;
-        this.id = geneSetId;
-        probes = new ArrayList<String>();
-    }
+    private static Map<String, UserDefinedGeneSet> userGeneSets = new HashMap<String, UserDefinedGeneSet>();
+
+    private static GONames goData;
 
     /**
      * @param goData
      */
-    public void addGeneSet( GONames goData ) {
-        geneData.addGeneSet( id, this.getProbes() );
-        goData.addGeneSet( id, desc );
-        // geneData.sortGeneSets();
-    }
-
-    public void clear() {
-        id = "";
-        desc = "";
-        probes.clear();
-    }
-
-    public boolean compare( UserDefinedGeneSetManager comparee ) {
-
-        if ( !comparee.getId().equals( id ) ) return false;
-
-        if ( !comparee.getDesc().equals( desc ) ) return false;
-
-        if ( comparee.getDefinition() != null && !comparee.getDefinition().equals( definition ) ) return false;
-
-        if ( comparee.getAspect() != null && !comparee.getAspect().equals( aspect ) ) return false;
-
-        Collection<String> probesInSet = comparee.getProbes();
-        if ( probesInSet.size() != probesInSet.size() ) return false;
-
-        for ( Iterator<String> it = probesInSet.iterator(); it.hasNext(); ) {
-            String probe = it.next();
-            if ( !probesInSet.contains( probe ) ) return false;
-        }
-
-        return true;
+    public static void addGeneSet( UserDefinedGeneSet set ) {
+        String id = set.getId();
+        userGeneSets.put( id, set );
+        geneData.addGeneSet( id, set.getProbes() );
+        goData.addGeneSet( id, set.getDesc() );
     }
 
     /**
-     * Delete a user-defined gene set from disk.
+     * Delete a user-defined gene set from disk. Note: this doesn't work if there are multiple gene groups in the file.
      * <p>
      * This doesn't handle removing it from the maps. The caller has to do that.
      * 
      * @param ngs
      */
-    public boolean deleteUserGeneSet() {
-        String classFile = this.getUserGeneSetFileForName();
+    public static boolean deleteUserGeneSet( String id ) {
+        String classFile = getUserGeneSetFileForName( id );
         File file = new File( classFile );
-        log.debug( "Deleting " + file.getAbsolutePath() );
+
         if ( !file.exists() ) {
             log.error( file.getAbsoluteFile() + " does not exist" );
         }
         if ( !file.canWrite() ) {
             log.error( "Cannot delete " + file.getAbsoluteFile() );
         }
+
+        log.debug( "Deleting " + file.getAbsolutePath() );
         try {
             return file.delete();
         } catch ( Exception e ) {
@@ -138,372 +98,6 @@ public class UserDefinedGeneSetManager {
             return false;
         }
 
-    }
-
-    /**
-     * @return Returns the aspect.
-     */
-    public String getAspect() {
-        return this.aspect;
-    }
-
-    /**
-     * @return Returns the definition.
-     */
-    public String getDefinition() {
-        return this.definition;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public Map<String, Object> getGeneSetInfo( String id1, GONames goData ) {
-        Map<String, Object> cinfo = new HashMap<String, Object>();
-        cinfo.put( "type", "probe" );
-        cinfo.put( "id", id1 );
-        cinfo.put( "desc", goData.getNameForId( id1 ) );
-        cinfo.put( "aspect", goData.getAspectForId( id1 ) );
-        cinfo.put( "definition", goData.getDefinitionForId( id1 ) );
-        Collection<String> members = geneData.getClassToProbes( id1 );
-        cinfo.put( "members", members );
-        return cinfo;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public List<String> getProbes() {
-        return probes;
-    }
-
-    /**
-     * @param dir
-     * @param className
-     * @return
-     */
-    public String getUserGeneSetFileForName() {
-        String classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" )
-                + this.cleanGeneSetName() + USERGENESET_SUFFIX;
-        return classFile;
-    }
-
-    public boolean isModified() {
-        return modifiedGS;
-    }
-
-    /**
-     * Read in a list of genes or probe ids from a file. The list of genes is unadorned, one per row.
-     * 
-     * @param fileName
-     * @throws IOException
-     */
-    public void loadPlainGeneList( String fileName ) throws IOException {
-        BufferedReader dis = setUpToLoad( fileName );
-        String row;
-        Collection<String> genesOrProbes = new ArrayList<String>();
-        while ( ( row = dis.readLine() ) != null ) {
-            if ( row.length() == 0 ) continue;
-            genesOrProbes.add( row );
-        }
-        dis.close();
-        int ignored = 0;
-        fillInProbes( genesOrProbes, ignored );
-    }
-
-    /**
-     * Add user-defined gene set(s) to the GeneData. The format is:
-     * <ol>
-     * <li>The type of gene set {gene|probe}
-     * <li>The identifier for the gene set, e.g, "My gene set"
-     * <li>The description for the gene set, e.g, "Genes I like"
-     * <li>Any number of rows containing gene or probe identifiers.
-     * </ol>
-     * <p>
-     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
-     * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
-     * that this behavior is not desirable.
-     * <p>
-     * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
-     * 
-     * @param file which stores the probes or genes.
-     * @return true if some probes were read in which are on the current array design.
-     * @throws IOException
-     */
-    public boolean loadUserGeneSet( String fileName ) throws IOException {
-        BufferedReader dis = setUpToLoad( fileName );
-        Collection<String> genes = new ArrayList<String>();
-        String type = "";
-        boolean hasUnknownProbes = false;
-        boolean isGenes = true;
-        String row;
-        this.probes = new ArrayList<String>();
-        while ( ( row = dis.readLine() ) != null ) {
-            if ( type.length() == 0 ) {
-                type = row;
-                if ( type.equalsIgnoreCase( "probe" ) ) {
-                    isGenes = false;
-                } else if ( type.equalsIgnoreCase( "gene" ) ) {
-                    isGenes = true;
-                } else {
-                    throw new IOException( "Unknown data type. File must start with 'probe' or 'gene'" );
-                }
-            } else if ( id.length() == 0 ) {
-                this.id = row;
-            } else if ( desc.length() == 0 ) {
-                this.desc = row;
-            } else {
-                if ( !isGenes ) {
-                    if ( geneData.getProbeGeneName( row ) == null ) {
-                        hasUnknownProbes = true;
-                    } else {
-                        this.probes.add( row );
-                    }
-                } else {
-                    genes.add( row );
-                }
-            }
-        }
-        dis.close();
-        int ignored = 0;
-        if ( isGenes ) {
-            fillInProbes( genes, ignored );
-        }
-        if ( hasUnknownProbes ) {
-            log.info( "Some probes not found in array design" );
-        } else if ( this.probes.size() == 0 ) {
-            log.info( "No probes in " + fileName + " match current array design" );
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Load the user-defined gene sets.
-     */
-    public Collection<String> loadUserGeneSets( GONames goData, StatusViewer statusMessenger ) {
-        Collection<String> userOverwrittenGeneSets = new HashSet<String>();
-
-        File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
-        if ( !userGeneSetDir.exists() ) {
-            statusMessenger.showError( "No user-define gene set directory found, none will be loaded" );
-            return userOverwrittenGeneSets;
-        }
-
-        String[] classFiles = userGeneSetDir.list();
-        int numLoaded = 0;
-        for ( int i = 0; i < classFiles.length; i++ ) {
-
-            String classFile = classFiles[i];
-            if ( StringUtils.isEmpty( classFile ) ) {
-                continue;
-            }
-
-            String classFilePath = null;
-            try {
-                classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
-                log.debug( "Loading " + classFilePath );
-                boolean gotSomeProbes = loadUserGeneSet( classFilePath );
-                if ( gotSomeProbes ) {
-                    numLoaded++;
-                    log.debug( "Read " + this.probes.size() + " probes for " + getId() + " (" + getDesc() + ")" );
-                    if ( isExistingGeneSet( getId() ) ) {
-                        log.debug( "User-defined gene set overriding " + getId() );
-                        modifyGeneSet( goData );
-                        userOverwrittenGeneSets.add( getId() );
-                    } else {
-                        addGeneSet( goData );
-                    }
-                }
-            } catch ( IOException e ) {
-                if ( statusMessenger != null ) {
-                    // This error will be shown if there are files that don't fit the format.
-                    statusMessenger.showError( "Could not load user-defined class from " + classFilePath );
-                }
-            }
-        }
-        if ( statusMessenger != null && numLoaded > 0 )
-            statusMessenger.showStatus( "Successfully loaded " + numLoaded + " customized gene sets." );
-
-        return userOverwrittenGeneSets;
-    }
-
-    /**
-     * Redefine a class. The "real" version of the class is modified to look like this one.
-     */
-    public void modifyGeneSet( GONames goData ) {
-        log.debug( "Modifying " + id );
-        geneData.modifyGeneSet( id, probes );
-        goData.modifyGeneSet( id, desc );
-    }
-
-    /**
-     * Write a gene set to disk, in the directory set in the preferences.
-     * 
-     * @param type
-     * @throws IOException
-     */
-    public void saveGeneSet( int type ) throws IOException {
-        String cleanedDescription = desc.replace( '\n', ' ' );
-        String filetype = ( type == 0 ) ? "probe" : "gene";
-        BufferedWriter out = new BufferedWriter( new FileWriter( getUserGeneSetFileForName(), false ) );
-        out.write( filetype + "\n" );
-        out.write( id + "\n" );
-        out.write( cleanedDescription + "\n" );
-        for ( Iterator<String> it = probes.iterator(); it.hasNext(); ) {
-            out.write( it.next() + "\n" );
-        }
-        out.close();
-    }
-
-    /**
-     * @param aspectForId
-     */
-    public void setAspect( String aspectForId ) {
-        this.aspect = aspectForId;
-
-    }
-
-    /**
-     * @param definitionForId
-     */
-    public void setDefinition( String definitionForId ) {
-        this.definition = definitionForId;
-
-    }
-
-    public void setDesc( String val ) {
-        desc = val;
-    }
-
-    public void setId( String val ) {
-        id = val;
-    }
-
-    public void setModified( boolean val ) {
-        modifiedGS = val;
-    }
-
-    public void setProbes( List<String> val ) {
-        probes = val;
-    }
-
-    public AbstractTableModel toTableModel( boolean editable ) {
-        final boolean finalized = editable;
-
-        return new AbstractTableModel() {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = -1738460714695777126L;
-            private String[] columnNames = { "Probe", "Gene", "Description" };
-
-            public int getColumnCount() {
-                return 3;
-            }
-
-            @Override
-            public String getColumnName( int i ) {
-                return columnNames[i];
-            }
-
-            public int getRowCount() {
-                int windowrows;
-                if ( finalized ) {
-                    windowrows = 16;
-                } else {
-                    windowrows = 13;
-                }
-                int extra = 1;
-                if ( probes.size() < windowrows ) {
-                    extra = windowrows - probes.size();
-                }
-                return probes.size() + extra;
-            }
-
-            public Object getValueAt( int r, int c ) {
-                if ( r < probes.size() ) {
-                    String probeid = probes.get( r );
-                    switch ( c ) {
-                        case 0:
-                            return probeid;
-                        case 1:
-                            return geneData.getProbeGeneName( probeid );
-                        case 2:
-                            return geneData.getProbeDescription( probeid );
-                        default:
-                            return null;
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            public boolean isCellEditable( int r, int c ) {
-                if ( !finalized && ( c == 0 || c == 1 ) ) {
-                    return true;
-                }
-                return false;
-            }
-        };
-    }
-
-    /**
-     * @return
-     */
-    private String cleanGeneSetName() {
-        String fileid = id.replaceAll( ":", "-" );
-        fileid = fileid.replaceAll( "\\s+", "_" );
-        return fileid;
-    }
-
-    /**
-     * @param genesOrProbeNames OR probe ids.
-     * @param ignored
-     * @return
-     */
-    private void fillInProbes( Collection<String> genesOrProbeNames, int ignored ) {
-        Set<String> probeSet = new HashSet<String>();
-        for ( String identifier : genesOrProbeNames ) {
-            if ( geneData.getGeneProbeList( identifier ) != null ) {
-                probeSet.addAll( geneData.getGeneProbeList( identifier ) );
-                log.info( "Gene " + identifier + " recognized." );
-            } else if ( geneData.getProbeGeneName( identifier ) != null ) {
-                log.info( "Probe " + identifier + " recognized" );
-                probeSet.add( identifier ); // it's actually a probe
-            } else {
-                log.info( "Gene or probe " + identifier + " not found in the array design" );
-                ignored++;
-            }
-        }
-        probes = new ArrayList<String>( probeSet );
-        if ( ignored > 0 ) {
-            log.info( ignored + " items skipped because they are not in the array design." );
-        }
-    }
-
-    /**
-     * @param ngs
-     * @return
-     */
-    private boolean isExistingGeneSet( String id1 ) {
-        return geneData.hasGeneSet( id1 );
-    }
-
-    /**
-     * @param fileName
-     * @return
-     * @throws IOException
-     * @throws FileNotFoundException
-     */
-    private BufferedReader setUpToLoad( String fileName ) throws IOException, FileNotFoundException {
-        clear();
-        FileTools.checkPathIsReadableFile( fileName );
-        FileInputStream fis = new FileInputStream( fileName );
-        BufferedInputStream bis = new BufferedInputStream( fis );
-        BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
-        return dis;
     }
 
     /**
@@ -534,5 +128,353 @@ public class UserDefinedGeneSetManager {
         dis.close();
 
         return cinfo;
+    }
+
+    /**
+     * @param dir
+     * @param className
+     * @return
+     */
+    public static String getUserGeneSetFileForName( String id ) {
+        String classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" )
+                + cleanGeneSetName( id ) + USERGENESET_SUFFIX;
+        return classFile;
+    }
+
+    /**
+     * Read in a list of genes or probe ids from a file. The list of genes is unadorned, one per row.
+     * 
+     * @param fileName
+     * @return FIXME This does not have an ID stored!!
+     * @throws IOException
+     */
+    public static UserDefinedGeneSet loadPlainGeneList( String fileName ) throws IOException {
+        BufferedReader dis = setUpToLoad( fileName );
+        String row;
+        Collection<String> genesOrProbes = new ArrayList<String>();
+        while ( ( row = dis.readLine() ) != null ) {
+            if ( row.length() == 0 ) continue;
+            genesOrProbes.add( row );
+        }
+        dis.close();
+
+        List<String> probes = convertToProbes( genesOrProbes );
+        UserDefinedGeneSet result = new UserDefinedGeneSet();
+        result.setProbes( probes );
+        return result;
+    }
+
+    /**
+     * Add user-defined gene set(s) to the GeneData. The format is:
+     * <ol>
+     * <li>Rows starting with "#" are ignored as comments.
+     * <li>The type of gene set {gene|probe}
+     * <li>The identifier for the gene set, e.g, "My gene set"
+     * <li>The description for the gene set, e.g, "Genes I like"
+     * <li>Any number of rows containing gene or probe identifiers.
+     * <li>A row starting with "===" delimits multiple gene sets in one file.
+     * </ol>
+     * <p>
+     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
+     * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
+     * that this behavior is not desirable.
+     * <p>
+     * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
+     * 
+     * @param file which stores the probes or genes.
+     * @return true if some probes were read in which are on the current array design.
+     * @throws IOException
+     */
+    public static Collection<UserDefinedGeneSet> loadUserGeneSet( String fileName ) throws IOException {
+        BufferedReader dis = setUpToLoad( fileName );
+
+        Collection<UserDefinedGeneSet> result = new HashSet<UserDefinedGeneSet>();
+
+        while ( dis.ready() ) {
+            UserDefinedGeneSet newSet = readOneSet( dis );
+            result.add( newSet );
+        }
+        dis.close();
+
+        return result;
+    }
+
+    /**
+     * Load the user-defined gene sets.
+     */
+    public static Collection<String> loadUserGeneSets( StatusViewer statusMessenger ) {
+        Collection<String> userOverwrittenGeneSets = new HashSet<String>();
+
+        File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
+        if ( !userGeneSetDir.exists() ) {
+            statusMessenger.showError( "No user-define gene set directory found, none will be loaded" );
+            return userOverwrittenGeneSets;
+        }
+
+        String[] classFiles = userGeneSetDir.list();
+        int numLoaded = 0;
+        for ( int i = 0; i < classFiles.length; i++ ) {
+
+            String classFile = classFiles[i];
+            if ( StringUtils.isEmpty( classFile ) ) {
+                continue;
+            }
+
+            String classFilePath = null;
+            try {
+                classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
+                log.debug( "Loading " + classFilePath );
+                Collection<UserDefinedGeneSet> loadedSets = loadUserGeneSet( classFilePath );
+
+                numLoaded += loadedSets.size();
+                for ( UserDefinedGeneSet set : loadedSets ) {
+                    String id = set.getId();
+                    if ( isExistingGeneSet( id ) ) {
+                        log.debug( "User-defined gene set overriding " + id );
+                        modifyGeneSet( set );
+                        userOverwrittenGeneSets.add( id );
+                    } else {
+                        userGeneSets.put( id, set );
+                        geneData.addGeneSet( id, set.getProbes() );
+                        goData.addGeneSet( id, set.getDesc() );
+                    }
+                }
+
+            } catch ( IOException e ) {
+                if ( statusMessenger != null ) {
+                    // This error will be shown if there are files that don't fit the format.
+                    statusMessenger.showError( "Could not load user-defined class from " + classFilePath );
+                }
+            }
+
+        }
+        if ( statusMessenger != null && numLoaded > 0 )
+            statusMessenger.showStatus( "Loaded " + numLoaded + " customized gene sets from " + classFiles.length
+                    + " files." );
+        return userOverwrittenGeneSets;
+    }
+
+    /**
+     * Redefine a class. The "real" version of the class is modified to look like this one.
+     * 
+     * @param set
+     */
+    public static void modifyGeneSet( UserDefinedGeneSet set ) {
+        log.debug( "Modifying " + set.getId() );
+        geneData.modifyGeneSet( set.getId(), set.getProbes() );
+        goData.modifyGeneSet( set.getId(), set.getDesc() );
+    }
+
+    /**
+     * Write a gene set to disk, in the directory set in the preferences.
+     * 
+     * @param type
+     * @throws IOException
+     */
+    public static void saveGeneSet( UserDefinedGeneSet set ) throws IOException {
+        String cleanedDescription = set.getDesc().replace( '\n', ' ' );
+        String filetype = ( set.isGenes() ) ? "probe" : "gene";
+        BufferedWriter out = new BufferedWriter( new FileWriter( getUserGeneSetFileForName( set.getId() ), false ) );
+        out.write( filetype + "\n" );
+        out.write( set.getId() + "\n" );
+        out.write( cleanedDescription + "\n" );
+        if ( set.isGenes() ) {
+            for ( String g : set.getGenes() ) {
+                out.write( g + "\n" );
+            }
+        } else {
+            for ( String p : set.getProbes() ) {
+                out.write( p + "\n" );
+            }
+        }
+        out.close();
+    }
+
+    /**
+     * @return
+     */
+    private static String cleanGeneSetName( String id ) {
+        String fileid = id.replaceAll( ":", "-" );
+        fileid = fileid.replaceAll( "\\s+", "_" );
+        return fileid;
+    }
+
+    /**
+     * @param genesOrProbeNames OR probe ids.
+     * @return
+     */
+    private static List<String> convertToProbes( Collection<String> genesOrProbeNames ) {
+        List<String> probeSet = new ArrayList<String>();
+        int ignored = 0;
+        for ( String identifier : genesOrProbeNames ) {
+            if ( geneData.getGeneProbeList( identifier ) != null ) {
+                probeSet.addAll( geneData.getGeneProbeList( identifier ) );
+                log.debug( "Gene " + identifier + " recognized." );
+            } else if ( geneData.getProbeGeneName( identifier ) != null ) {
+                log.debug( "Probe " + identifier + " recognized" );
+                probeSet.add( identifier ); // it's actually a probe
+            } else {
+                log.debug( "Gene or probe " + identifier + " not found in the array design" );
+                ignored++;
+            }
+        }
+        if ( ignored > 0 ) {
+            log.info( ignored + " items skipped because they are not in the current platform." );
+        }
+        return probeSet;
+    }
+
+    /**
+     * @param ngs
+     * @return
+     */
+    private static boolean isExistingGeneSet( String id1 ) {
+        return geneData.hasGeneSet( id1 );
+    }
+
+    /**
+     * @param dis
+     * @return
+     * @throws IOException
+     */
+    private static UserDefinedGeneSet readOneSet( BufferedReader dis ) throws IOException {
+        String type = "";
+        boolean hasUnknownProbes = false;
+        boolean isGenes = true;
+        String row = null;
+        Collection<String> genes = new ArrayList<String>();
+        UserDefinedGeneSet newSet = new UserDefinedGeneSet();
+        while ( ( row = dis.readLine() ) != null ) {
+
+            if ( row.startsWith( "#" ) ) {
+                continue; // comment line, always ignored.
+            }
+
+            if ( row.startsWith( "===" ) ) {
+                break;
+            }
+
+            if ( StringUtils.isBlank( type ) ) {
+                type = row;
+                if ( type.equalsIgnoreCase( "probe" ) ) {
+                    isGenes = false;
+                } else if ( type.equalsIgnoreCase( "gene" ) ) {
+                    isGenes = true;
+                } else {
+                    throw new IOException( "Unknown data type. Each set must start with 'probe' or 'gene'" );
+                }
+                newSet.setIsGenes( isGenes );
+                continue;
+            }
+
+            if ( StringUtils.isBlank( newSet.getId() ) ) {
+                newSet.setId( row );
+                continue;
+            }
+
+            if ( StringUtils.isBlank( newSet.getDesc() ) ) {
+                newSet.setDesc( row );
+                continue;
+            }
+
+            if ( isGenes ) {
+                genes.add( row );
+            } else {
+                if ( geneData.getProbeGeneName( row ) == null ) {
+                    hasUnknownProbes = true;
+                } else {
+                    newSet.getProbes().add( row );
+                }
+            }
+        }
+        assert newSet.getId() != null;
+
+        if ( isGenes ) {
+            newSet.setGenes( genes );
+            List<String> probes = convertToProbes( genes );
+            newSet.setProbes( probes );
+        }
+        if ( hasUnknownProbes ) {
+            log.info( "Some probes not found in array design" );
+        } else if ( newSet.getProbes().isEmpty() ) {
+            log.info( "No probes for " + newSet.getId() + " match current platform" );
+        }
+        return newSet;
+    }
+
+    /**
+     * @param fileName
+     * @return
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    private static BufferedReader setUpToLoad( String fileName ) throws IOException, FileNotFoundException {
+        FileTools.checkPathIsReadableFile( fileName );
+        FileInputStream fis = new FileInputStream( fileName );
+        BufferedInputStream bis = new BufferedInputStream( fis );
+        BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
+        return dis;
+    }
+
+    protected UserDefinedGeneSetManager() {
+
+    }
+
+    public static void init( GeneAnnotations gd, GONames goD, Settings set ) {
+        if ( goData != null ) {
+            throw new IllegalStateException( "You should only call init once" );
+        }
+        goData = goD;
+        geneData = gd;
+        settings = set;
+    }
+
+    public UserDefinedGeneSet get( String id ) {
+        return userGeneSets.get( id );
+    }
+
+    public String getAspect( String id ) {
+        if ( !userGeneSets.containsKey( id ) ) {
+            throw new IllegalArgumentException( "No such group defined" );
+        }
+        return userGeneSets.get( id ).getAspect();
+    }
+
+    public String getDefinition( String id ) {
+        if ( !userGeneSets.containsKey( id ) ) {
+            throw new IllegalArgumentException( "No such group defined" );
+        }
+        return userGeneSets.get( id ).getDefinition();
+    }
+
+    public String getDescription( String id ) {
+        if ( !userGeneSets.containsKey( id ) ) {
+            throw new IllegalArgumentException( "No such group defined" );
+        }
+        return userGeneSets.get( id ).getDesc();
+    }
+
+    /**
+     * @param id1
+     * @param goData
+     * @return
+     */
+    public static Map<String, Object> getGeneSetInfo( String id1 ) {
+        Map<String, Object> cinfo = new HashMap<String, Object>();
+        cinfo.put( "type", "probe" );
+        cinfo.put( "id", id1 );
+        cinfo.put( "desc", goData.getNameForId( id1 ) );
+        cinfo.put( "aspect", goData.getAspectForId( id1 ) );
+        cinfo.put( "definition", goData.getDefinitionForId( id1 ) );
+        Collection<String> members = geneData.getClassToProbes( id1 );
+        cinfo.put( "members", members );
+        return cinfo;
+    }
+
+    public Collection<String> getProbes( String id ) {
+        if ( !userGeneSets.containsKey( id ) ) {
+            throw new IllegalArgumentException( "No such group defined" );
+        }
+        return userGeneSets.get( id ).getProbes();
     }
 }

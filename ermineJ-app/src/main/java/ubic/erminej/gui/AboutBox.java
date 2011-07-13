@@ -67,7 +67,7 @@ public class AboutBox extends JDialog implements ActionListener {
      * 
      */
     private static final int PREFERRED_WIDTH = 450;
-    private String VERSION = "2.1";
+    private String VERSION = "2.2";
     private final static String COPYRIGHT = "Copyright (c) University of British Columbia";
     private static final String SOFTWARENAME = "ermineJ";
 
@@ -144,7 +144,7 @@ public class AboutBox extends JDialog implements ActionListener {
         labelAuthors.setPreferredSize( new Dimension( PREFERRED_WIDTH, 60 ) );
         labelAuthors.setHorizontalAlignment( SwingConstants.CENTER );
         labelAuthors.setHorizontalTextPosition( SwingConstants.CENTER );
-        labelAuthors.setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, Kiran Keshav and Kelsey Hamer." );
+        labelAuthors.setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, Kiran Keshav, Kelsey Hamer and others" );
 
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
         labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
@@ -171,13 +171,10 @@ public class AboutBox extends JDialog implements ActionListener {
         licensePanel.setContentType( "text/html" );
         licensePanel
                 .setText( "<p>ErmineJ is licensed under the Apache Public License.</p><p>Direct questions about ermineJ to "
-                        + "Kelsey Hamer: kelsey@bioinformatics.ubc.ca</p><p>If you use this software for your work, please cite: "
-                        // + " Pavlidis, P., "
-                        // + "Lewis, D.P., and Noble, W.S. (2002) Exploring gene expression data"
-                        // + " with class scores. Proceedings of the Pacific Symposium on Biocomputing"
-                        // + " 7. pp 474-485." +
-                        + "Lee HK., Braynen W., Keshav K. and Pavlidis P. (2005)"
-                        + " ErmineJ: Tool for functional analysis of gene expression data sets. BMC Bioinformatics 6:269"
+                        + "erminej@chibi.ubc.ca</p><p>If you use this software for your work, please cite: "
+
+                        + "Gillis J, Mistry M, Pavlidis P. (2010)"
+                        + " Gene function analysis in complex data sets using ErmineJ. Nature Protocols 5:1148-59"
                         + "</p></html>" );
 
         centerPanel.add( blurbsPanel, BorderLayout.NORTH );
@@ -210,6 +207,7 @@ public class AboutBox extends JDialog implements ActionListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see javax.swing.JDialog#processWindowEvent(java.awt.event.WindowEvent)
      */
     @Override
@@ -227,6 +225,7 @@ public class AboutBox extends JDialog implements ActionListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed( ActionEvent e ) {

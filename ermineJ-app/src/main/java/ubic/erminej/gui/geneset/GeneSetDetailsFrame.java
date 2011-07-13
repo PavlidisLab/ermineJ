@@ -830,7 +830,7 @@ public class GeneSetDetailsFrame extends JFrame {
         // fileMenu.setEnabled( enabled ); /; show it, just don't allow image saves.
         viewMenu.setEnabled( enabled );
         optionsMenu.setEnabled( true );
-        if ( settings.getClassScoreMethod() == Settings.ORA ) {
+        if ( settings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
             analysisMenu.setEnabled( false );
         } else {
             analysisMenu.setEnabled( true );

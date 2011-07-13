@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.UserDefinedGeneSet;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 
 /**
@@ -50,8 +51,8 @@ public class GeneSetWizard extends Wizard {
     private int step;
     boolean makingNewGeneSet;
     boolean nostep1 = false;
-    private UserDefinedGeneSetManager newGeneSet;
-    private UserDefinedGeneSetManager oldGeneSet;
+    private UserDefinedGeneSet newGeneSet;
+    private UserDefinedGeneSet oldGeneSet;
 
     /**
      * Use this constructor to let the user choose which gene set to look at or to make a new one.
@@ -69,8 +70,8 @@ public class GeneSetWizard extends Wizard {
         this.geneData = geneData;
         this.goData = goData;
         this.makingNewGeneSet = makingNew;
-        newGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
-        oldGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
+        newGeneSet = new UserDefinedGeneSet();
+        oldGeneSet = new UserDefinedGeneSet();
 
         geneData.resetSelectedProbes();
         step = 1;
@@ -107,8 +108,8 @@ public class GeneSetWizard extends Wizard {
         this.goData = goData;
         this.makingNewGeneSet = false;
 
-        newGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
-        oldGeneSet = new UserDefinedGeneSetManager( geneData, settings, "" );
+        newGeneSet = new UserDefinedGeneSet();
+        oldGeneSet = new UserDefinedGeneSet();
         this.setTitle( "Modify Gene Set - Step 2 of 3" );
         step = 2;
         backButton.setEnabled( false );
@@ -146,7 +147,12 @@ public class GeneSetWizard extends Wizard {
                 if ( makingNewGeneSet && step1.getInputMethod() == 1 ) { // case 2, load from file
                     try {
                         // newGeneSet.loadUserGeneSet( step1.getLoadFile() );
-                        newGeneSet.loadPlainGeneList( step1.getLoadFile() );
+                        UserDefinedGeneSet loadedSet = UserDefinedGeneSetManager
+                                .loadPlainGeneList( step1.getLoadFile() );
+
+                        /*
+                         * FIXME this set doesn't live anywhere! It needs an id.
+                         */
                     } catch ( IOException e1 ) {
                         GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
                                 + " the file is readable." );
@@ -211,7 +217,6 @@ public class GeneSetWizard extends Wizard {
             } else {
                 this.setTitle( "Modify Gene Set - Step 1 of 3" );
                 this.getContentPane().add( step1A );
-                newGeneSet.clear();
                 step1A.revalidate();
             }
             this.repaint();
@@ -275,25 +280,26 @@ public class GeneSetWizard extends Wizard {
 
         if ( makingNewGeneSet ) {
             log.debug( "Adding new or modified gene set to maps" );
-            newGeneSet.addGeneSet( goData );
+            UserDefinedGeneSetManager.addGeneSet( newGeneSet );
+        
             ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
 
             try {
                 log.debug( "Saving new gene set" );
-                newGeneSet.saveGeneSet( 0 );
+                UserDefinedGeneSetManager.saveGeneSet( newGeneSet );
             } catch ( IOException e1 ) {
                 GuiUtil.error( "Error writing the new gene set to file:", e1 );
             }
 
         } else if ( modifiedTheGeneSet() ) {
             log.debug( "Gene set was changed" );
-            newGeneSet.modifyGeneSet( goData );
+            UserDefinedGeneSetManager.modifyGeneSet(  newGeneSet );
             ( ( GeneSetScoreFrame ) callingframe ).addUserOverwritten( id );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
             try {
                 log.debug( "Saving modified gene set" );
-                newGeneSet.saveGeneSet( 0 );
+                UserDefinedGeneSetManager.saveGeneSet( newGeneSet );
             } catch ( IOException e1 ) {
                 GuiUtil.error( "Error writing the modified gene set to file:", e1 );
             }
@@ -309,15 +315,7 @@ public class GeneSetWizard extends Wizard {
      * @return
      */
     private boolean modifiedTheGeneSet() {
-        return !makingNewGeneSet && isChanged( newGeneSet, oldGeneSet );
+        return !makingNewGeneSet && !newGeneSet.equals( oldGeneSet );
     }
 
-    /**
-     * @param a
-     * @param b
-     * @return
-     */
-    private boolean isChanged( UserDefinedGeneSetManager a, UserDefinedGeneSetManager b ) {
-        return a.compare( b );
-    }
 }

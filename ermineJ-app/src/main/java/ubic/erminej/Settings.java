@@ -32,6 +32,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,23 +50,42 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
  * @version $Id$
  */
 public class Settings {
-    public static final int BENJAMINIHOCHBERG = 2;
 
-    public static final int BEST_PVAL = 1;
-    public static final int BONFERONNI = 0;
-    public static final int CORR = 2;
+    private static final Log log = LogFactory.getLog( Settings.class );
+
+    /**
+     * Which gene set scoring method to use.
+     */
+    public enum Method {
+        ORA, ROC, GSR, CORR
+    }
+
+    /**
+     * What to do when there are multiple values for a gene.
+     */
+    public enum MultiProbeHandling {
+        BEST, MEAN
+    }
+
+    /**
+     * How to correct for multiple tests.
+     */
+    public enum MultiTestCorrMethod {
+        BONFERONNI, WESTFALLYOUNG, BENJAMINIHOCHBERG
+    }
+
+    /**
+     * For the gene set resampling method, how are scores computed for the group?
+     */
+    public enum GeneScoreMethod {
+        MEAN, MEAN_ABOVE_QUANTILE, QUANTILE
+    }
+
     public static final String GENE_URL_BASE = "gene.url.base";
-    public static final int KS = 5;
-    public static final int MEAN_ABOVE_QUANTILE_METHOD = 2;
-    public static final int MEAN_METHOD = 0;
-    public static final int MEAN_PVAL = 2;
-    public static final int ORA = 0;
-    public static final int QUANTILE_METHOD = 1;
-    public static final int RESAMP = 1;
-    public static final int ROC = 3;
-    public static final int TTEST = 4;
-    public static final int WESTFALLYOUNG = 1;
 
+    /*
+     * Strings used in the config file
+     */
     private static final String ALWAYS_USE_EMPIRICAL = "alwaysUseEmpirical";
     private static final String ANNOT_FILE = "annotFile";
     private static final String ANNOT_FORMAT = "annotFormat";
@@ -78,29 +98,32 @@ public class Settings {
     private static final String GOLD_STANDARD_FILE = "goldStandardFile";
     private static final String IS_TESTER = "isTester";
     private static final String ITERATIONS = "iterations";
-    private static final Log log = LogFactory.getLog( Settings.class );
     private static final String MAX_CLASS_SIZE = "maxClassSize";
     private static final String MIN_CLASS_SIZE = "minClassSize";
-    private static final String MTC = "mtc";
+    private static final String MTC_CONFIG_NAME = "mtc";
+    private static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     private static final String OUTPUT_FILE = "outputFile";
     private static final String P_VAL_THRESHOLD = "pValThreshold";
     private static final String PREFERENCES_FILE_NAME = "preferencesFileName";
-    private static final String QUANTILE = "quantile";
-    private static final String RAW_FILE = "rawFile";
+    private static final String QUANTILE_CONFIG_NAME = "quantile";
+    private static final String RAW_FILE_CONFIG_NAME = "rawFile";
     private static final String RAW_SCORE_METHOD = "rawScoreMethod";
     private static final String SCORE_COL = "scoreCol";
     private static final String SCORE_FILE = "scoreFile";
     private static final String SELECTED_CUSTOM_GENESETS = "selectedCustomGeneSets";
     private static final String FILTER_NONSPECIFIC = "filterNonSpecific";
-
+    private static final String USE_BIOL_PROC = "useGOBiologicalProcess";
+    private static final String USE_MOL_FUNC = "useGOMolecularFunction";
+    private static final String USE_CELL_COMP = "useGOCellularComponent";
     /**
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
      * etc.)
      */
-    protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE, RAW_SCORE_METHOD,
-            MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE, SCORE_FILE, SCORE_COL, MTC, ITERATIONS, CLASS_FILE,
-            BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT,
-            CLASS_SCORE_METHOD, FILTER_NONSPECIFIC };
+    protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE_CONFIG_NAME,
+            RAW_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE, SCORE_COL,
+            MTC_CONFIG_NAME, ITERATIONS, CLASS_FILE, BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL,
+            ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD, FILTER_NONSPECIFIC, USE_MULTIFUNCTIONALITY_CORRECTION,
+            USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP };
 
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
@@ -111,6 +134,12 @@ public class Settings {
      * Filename for settings.
      */
     private static final String USERGUI_PROPERTIES = "ermineJ.properties";
+
+    /**
+     * Header for the config file.
+     */
+    private static final String HEADER = "Configuration file for ermineJ."
+            + "Do not delete this file if you want your ermineJ settings to stay across sessions.\nFor more information see http://www.chibi.ubc.ca/ermineJ/";
 
     /**
      * where everything is kept.
@@ -202,7 +231,7 @@ public class Settings {
      * @return
      */
     public boolean getAlwaysUseEmpirical() {
-        return config.getBoolean( ALWAYS_USE_EMPIRICAL, new Boolean( false ) ).booleanValue();
+        return config.getBoolean( ALWAYS_USE_EMPIRICAL, false );
 
     }
 
@@ -214,14 +243,14 @@ public class Settings {
      * @return
      */
     public int getAnnotFormat() {
-        return config.getInteger( ANNOT_FORMAT, new Integer( GeneAnnotations.DEFAULT ) ).intValue();
+        return config.getInteger( ANNOT_FORMAT, GeneAnnotations.DEFAULT );
     }
 
     /**
      * @return
      */
     public boolean getBigIsBetter() {
-        return config.getBoolean( BIG_IS_BETTER, new Boolean( false ) ).booleanValue();
+        return config.getBoolean( BIG_IS_BETTER, false );
     }
 
     /**
@@ -231,16 +260,36 @@ public class Settings {
         return config.getString( CLASS_FILE );
     }
 
-    public int getClassScoreMethod() {
-        return config.getInteger( CLASS_SCORE_METHOD, new Integer( ORA ) ).intValue();
-    }
+    /**
+     * @return
+     */
+    public Settings.Method getClassScoreMethod() {
+        String storedValue = config.getString( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
 
-    public String getClassScoreMethodString() {
-        if ( this.getClassScoreMethod() == MEAN_METHOD ) {
-            return "Mean";
+        // backwards compatibility
+        if ( NumberUtils.isDigits( storedValue ) ) {
+            int oldVal = Integer.parseInt( storedValue );
+            switch ( oldVal ) {
+                case 0:
+                    setClassScoreMethod( Settings.Method.ORA );
+                    break;
+                case 1:
+                    setClassScoreMethod( Settings.Method.GSR );
+                    break;
+                case 2:
+                    setClassScoreMethod( Settings.Method.CORR );
+                    break;
+                case 3:
+                    setClassScoreMethod( Settings.Method.ROC );
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+            storedValue = config.getString( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
+
         }
-        return "Quantile"; // note that quantile is hard-coded to be 50 for the
-        // gui.
+
+        return Settings.Method.valueOf( storedValue );
     }
 
     /**
@@ -263,12 +312,25 @@ public class Settings {
 
     }
 
+    /**
+     * @return
+     */
     public boolean getDoLog() {
-        return config.getBoolean( DO_LOG, new Boolean( true ) ).booleanValue();
+        return config.getBoolean( DO_LOG, true );
     }
 
-    public int getGeneRepTreatment() {
-        return config.getInteger( GENE_REP_TREATMENT, new Integer( BEST_PVAL ) ).intValue();
+    /**
+     * @return
+     */
+    public boolean getFilterNonSpecific() {
+        return config.getBoolean( FILTER_NONSPECIFIC );
+    }
+
+    /**
+     * @return
+     */
+    public MultiProbeHandling getGeneRepTreatment() {
+        return MultiProbeHandling.valueOf( config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() ) );
     }
 
     /**
@@ -291,17 +353,11 @@ public class Settings {
         return config.getString( GOLD_STANDARD_FILE );
     }
 
-    public String getGroupMethodString() {
-        if ( this.getGeneRepTreatment() == MEAN_PVAL )
-            return "MEAN_PVAL";
-        else if ( this.getGeneRepTreatment() == BEST_PVAL )
-            return "BEST_PVAL";
-        else
-            return "MEAN_PVAL"; // dummy. It won't be used.
-    }
-
+    /**
+     * @return
+     */
     public int getIterations() {
-        return config.getInteger( ITERATIONS, new Integer( 10000 ) ).intValue();
+        return config.getInteger( ITERATIONS, 10000 );
     }
 
     /**
@@ -324,18 +380,19 @@ public class Settings {
     }
 
     public int getMaxClassSize() {
-        return config.getInteger( MAX_CLASS_SIZE, new Integer( 100 ) ).intValue();
+        return config.getInteger( MAX_CLASS_SIZE, 100 );
     }
 
     public int getMinClassSize() {
-        return config.getInteger( MIN_CLASS_SIZE, new Integer( 5 ) ).intValue();
+        return config.getInteger( MIN_CLASS_SIZE, 5 );
     }
 
     /**
      * @return Returns the mtc.
      */
-    public int getMtc() {
-        return config.getInteger( MTC, new Integer( BENJAMINIHOCHBERG ) ).intValue();
+    public MultiTestCorrMethod getMtc() {
+        return MultiTestCorrMethod.valueOf( config.getString( MTC_CONFIG_NAME, MultiTestCorrMethod.BENJAMINIHOCHBERG
+                .toString() ) );
     }
 
     /**
@@ -354,11 +411,11 @@ public class Settings {
     }
 
     public double getPValThreshold() {
-        return config.getDouble( P_VAL_THRESHOLD, new Double( 0.001 ) ).doubleValue();
+        return config.getDouble( P_VAL_THRESHOLD, 0.001 );
     }
 
     public int getQuantile() {
-        return config.getInteger( QUANTILE, new Integer( 50 ) ).intValue();
+        return config.getInteger( QUANTILE_CONFIG_NAME, 50 );
     }
 
     /**
@@ -373,19 +430,18 @@ public class Settings {
     }
 
     public String getRawDataFileName() {
-        return config.getString( RAW_FILE );
+        return config.getString( RAW_FILE_CONFIG_NAME );
     }
 
-    public int getRawScoreMethod() {
-        return config.getInteger( RAW_SCORE_METHOD, new Integer( MEAN_METHOD ) ).intValue();
+    /**
+     * @return the method to be used to combine scores. This is only relevant for the gene set resampling method.
+     */
+    public GeneScoreMethod getRawScoreMethod() {
+        return GeneScoreMethod.valueOf( config.getString( RAW_SCORE_METHOD, GeneScoreMethod.MEAN.toString() ) );
     }
 
     public int getScoreCol() {
-        return config.getInteger( SCORE_COL, new Integer( 2 ) ).intValue();
-    }
-
-    public boolean getFilterNonSpecific() {
-        return config.getBoolean( FILTER_NONSPECIFIC );
+        return config.getInteger( SCORE_COL, 2 );
     }
 
     public String getScoreFile() {
@@ -401,7 +457,7 @@ public class Settings {
      * @return Returns the useBiologicalProcess.
      */
     public boolean getUseBiologicalProcess() {
-        return config.getBoolean( "useBiologicalProcess", new Boolean( true ) ).booleanValue();
+        return config.getBoolean( "useBiologicalProcess", true );
 
     }
 
@@ -409,7 +465,7 @@ public class Settings {
      * @return Returns the useCellularComponent.
      */
     public boolean getUseCellularComponent() {
-        return config.getBoolean( "useCellularComponent", new Boolean( true ) ).booleanValue();
+        return config.getBoolean( "useCellularComponent", true );
 
     }
 
@@ -417,14 +473,14 @@ public class Settings {
      * @return
      */
     public boolean getUseLog() {
-        return config.getBoolean( DO_LOG, new Boolean( true ) ).booleanValue();
+        return config.getBoolean( DO_LOG, true );
     }
 
     /**
      * @return Returns the useMolecularFunction.
      */
     public boolean getUseMolecularFunction() {
-        return config.getBoolean( "useMolecularFunction", new Boolean( true ) ).booleanValue();
+        return config.getBoolean( "useMolecularFunction", true );
 
     }
 
@@ -458,19 +514,27 @@ public class Settings {
      * @see getGeneRepTreatment for setting of how the combination occurs.
      */
     public boolean getUseWeights() {
-        if ( this.getGeneRepTreatment() == MEAN_PVAL || this.getGeneRepTreatment() == BEST_PVAL ) return true;
+        if ( this.getGeneRepTreatment().equals( MultiProbeHandling.MEAN )
+                || this.getGeneRepTreatment().equals( MultiProbeHandling.BEST ) ) return true;
         return false;
     }
 
     public boolean isTester() {
-        return config.getBoolean( IS_TESTER, new Boolean( false ) ).booleanValue();
+        return config.getBoolean( IS_TESTER, false );
+    }
+
+    /**
+     * @return true if multifunctionality corrections should be applied, if possible.
+     */
+    public boolean isUseMultifunctionalityCorrection() {
+        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, false );
     }
 
     /**
      * @param b
      */
     public void setAlwaysUseEmpirical( boolean b ) {
-        this.config.setProperty( ALWAYS_USE_EMPIRICAL, new Boolean( b ) );
+        this.config.setProperty( ALWAYS_USE_EMPIRICAL, b );
     }
 
     public void setAnnotFile( String val ) {
@@ -495,7 +559,7 @@ public class Settings {
      * @param b
      */
     public void setBigIsBetter( boolean b ) {
-        this.config.setProperty( BIG_IS_BETTER, new Boolean( b ) );
+        this.config.setProperty( BIG_IS_BETTER, b );
     }
 
     /**
@@ -505,8 +569,8 @@ public class Settings {
         this.config.setProperty( CLASS_FILE, val );
     }
 
-    public void setClassScoreMethod( int val ) {
-        this.config.setProperty( CLASS_SCORE_METHOD, new Integer( val ) );
+    public void setClassScoreMethod( Settings.Method val ) {
+        this.config.setProperty( CLASS_SCORE_METHOD, val.toString() );
     }
 
     public void setCustomGeneSetDirectory( String val ) {
@@ -530,8 +594,8 @@ public class Settings {
         this.config.setProperty( FILTER_NONSPECIFIC, new Boolean( val ) );
     }
 
-    public void setGeneRepTreatment( int val ) {
-        this.config.setProperty( GENE_REP_TREATMENT, new Integer( val ) );
+    public void setGeneRepTreatment( MultiProbeHandling val ) {
+        this.config.setProperty( GENE_REP_TREATMENT, val.toString() );
     }
 
     /**
@@ -544,22 +608,22 @@ public class Settings {
     }
 
     public void setIterations( int val ) {
-        this.config.setProperty( ITERATIONS, new Integer( val ) );
+        this.config.setProperty( ITERATIONS, val );
     }
 
     public void setMaxClassSize( int val ) {
-        this.config.setProperty( MAX_CLASS_SIZE, new Integer( val ) );
+        this.config.setProperty( MAX_CLASS_SIZE, val );
     }
 
     public void setMinClassSize( int val ) {
-        this.config.setProperty( MIN_CLASS_SIZE, new Integer( val ) );
+        this.config.setProperty( MIN_CLASS_SIZE, val );
     }
 
     /**
      * @param mtc The mtc to set.
      */
-    public void setMtc( int mtc ) {
-        this.config.setProperty( MTC, new Integer( mtc ) );
+    public void setMtc( MultiTestCorrMethod mtc ) {
+        this.config.setProperty( MTC_CONFIG_NAME, mtc.toString() );
     }
 
     /**
@@ -588,24 +652,29 @@ public class Settings {
 
     public void setPValThreshold( double val ) {
         log.debug( "pvalue threshold set to " + val );
-        this.config.setProperty( P_VAL_THRESHOLD, new Double( val ) );
+        this.config.setProperty( P_VAL_THRESHOLD, val );
     }
 
     public void setQuantile( int val ) {
-        this.config.setProperty( QUANTILE, new Integer( val ) );
+        this.config.setProperty( QUANTILE_CONFIG_NAME, val );
     }
 
     public void setRawFile( String val ) {
-        this.config.setProperty( RAW_FILE, val );
+        this.config.setProperty( RAW_FILE_CONFIG_NAME, val );
     }
 
-    public void setRawScoreMethod( int val ) {
-        this.config.setProperty( RAW_SCORE_METHOD, new Integer( val ) );
+    /**
+     * Set the method used to compute how values are combined (GSR method only).
+     * 
+     * @param val
+     */
+    public void setRawScoreMethod( Settings.GeneScoreMethod val ) {
+        this.config.setProperty( RAW_SCORE_METHOD, val.toString() );
     }
 
     public void setScoreCol( int val ) {
         log.debug( "Setting score columns to " + val );
-        this.config.setProperty( SCORE_COL, new Integer( val ) );
+        this.config.setProperty( SCORE_COL, val );
     }
 
     public void setScoreFile( String val ) {
@@ -617,28 +686,32 @@ public class Settings {
     }
 
     public void setTester( boolean isTester ) {
-        this.config.setProperty( IS_TESTER, new Boolean( isTester ) );
+        this.config.setProperty( IS_TESTER, isTester );
     }
 
     /**
      * @param useBiologicalProcess The useBiologicalProcess to set.
      */
     public void setUseBiologicalProcess( boolean useBiologicalProcess ) {
-        this.config.setProperty( "useBiologicalProcess", new Boolean( useBiologicalProcess ) );
+        this.config.setProperty( USE_BIOL_PROC, new Boolean( useBiologicalProcess ) );
     }
 
     /**
      * @param useCellularComponent The useCellularComponent to set.
      */
     public void setUseCellularComponent( boolean useCellularComponent ) {
-        this.config.setProperty( "useCellularComponent", new Boolean( useCellularComponent ) );
+        this.config.setProperty( USE_CELL_COMP, useCellularComponent );
     }
 
     /**
      * @param useMolecularFunction The useMolecularFunction to set.
      */
     public void setUseMolecularFunction( boolean useMolecularFunction ) {
-        this.config.setProperty( "useMolecularFunction", new Boolean( useMolecularFunction ) );
+        this.config.setProperty( USE_MOL_FUNC, useMolecularFunction );
+    }
+
+    public void setUseMultifunctionalityCorrection( boolean b ) {
+        this.config.setProperty( USE_MULTIFUNCTIONALITY_CORRECTION, b );
     }
 
     /**
@@ -679,7 +752,6 @@ public class Settings {
      * @throws IOException
      */
     public void writeAnalysisSettings( String fileName ) throws IOException {
-
         Writer out;
         if ( fileName == null ) {
             log.debug( "Output to STDOUT" );
@@ -704,6 +776,9 @@ public class Settings {
         out.close();
     }
 
+    /**
+     * 
+     */
     public void writePrefs() {
         if ( config.isAutoSave() ) return;
         try {
@@ -775,7 +850,7 @@ public class Settings {
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
 
             this.config = new PropertiesConfiguration( configFileLocation );
-            log.info( "Got configuration " + configFileLocation );
+            log.info( "Got configuration from " + configFileLocation );
         } catch ( ConfigurationException e ) {
             try {
                 log.info( "User properties file doesn't exist, creating new one from defaults" );
@@ -786,30 +861,33 @@ public class Settings {
 
                 log.info( "Found defaults at " + defaultConfigFileLocation );
                 this.config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
-                File tempLocation = new File( config.getPath() );
-                this.config.save(); // make sure the temporary file exists.
+                // File tempLocation = new File( config.getPath() ); // why are we doing this?
+                // this.config.save(); // make sure the temporary file exists.
                 File newConfigFile = new File( System.getProperty( "user.home" )
                         + System.getProperty( "file.separator" ) + USERGUI_PROPERTIES );
 
-                this.config = new PropertiesConfiguration( tempLocation );
+                this.config = new PropertiesConfiguration( USERGUI_PROPERTIES );
                 this.config.setPath( newConfigFile.getAbsolutePath() );
                 // this.config.save( newConfigFile ); // copy over to where they should be.
                 // URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
                 log.info( "Saved the new configuration in " + config.getPath() );
-                if ( !tempLocation.delete() ) {
-                    log.error( "Could not delete temporary configuration file from " + tempLocation.getAbsolutePath()
-                            + ", please delete it manually" );
-                    log.error( tempLocation.getAbsoluteFile() + ": Exists=" + tempLocation.exists() );
-                    log.error( tempLocation.getAbsoluteFile() + ": Can write=" + tempLocation.canWrite() );
-                } else {
-                    log.debug( "Deleted temporary config file from " + tempLocation.getAbsolutePath() );
-                }
+                // if ( !tempLocation.delete() ) {
+                // log.error( "Could not delete temporary configuration file from " + tempLocation.getAbsolutePath()
+                // + ", please delete it manually" );
+                // log.error( tempLocation.getAbsoluteFile() + ": Exists=" + tempLocation.exists() );
+                // log.error( tempLocation.getAbsoluteFile() + ": Can write=" + tempLocation.canWrite() );
+                // } else {
+                // log.debug( "Deleted temporary config file from " + tempLocation.getAbsolutePath() );
+                // }
 
             } catch ( ConfigurationException e1 ) {
-                log.error( e1, e1 );
+                log.error( "Filed to initialize the configuration file: " + e1, e1 );
             }
         }
-        this.config.setAutoSave( true );
+
+        if ( this.config != null ) this.config.setHeader( HEADER );
+
+        if ( this.config != null ) this.config.setAutoSave( true );
     }
 
     /**

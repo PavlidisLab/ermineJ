@@ -281,17 +281,17 @@ public class GeneSetTablePanel extends GeneSetPanel {
         String tooltip = new String( "<html>" );
         String coda = new String();
 
-        if ( runSettings.getClassScoreMethod() == Settings.ORA ) {
+        if ( runSettings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
             tooltip += "ORA Analysis<br>";
             coda += "P value threshold: " + runSettings.getPValThreshold();
-        } else if ( runSettings.getClassScoreMethod() == Settings.RESAMP ) {
+        } else if ( runSettings.getClassScoreMethod().equals( Settings.Method.GSR ) ) {
             tooltip += "Resampling Analysis<br>";
             coda += runSettings.getIterations() + " iterations<br>";
             coda += "Using score column: " + runSettings.getScoreCol();
-        } else if ( runSettings.getClassScoreMethod() == Settings.CORR ) {
+        } else if ( runSettings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
             tooltip += "Correlation Analysis<br>";
             coda += runSettings.getIterations() + " iterations";
-        } else if ( runSettings.getClassScoreMethod() == Settings.ROC ) {
+        } else if ( runSettings.getClassScoreMethod().equals( Settings.Method.ROC ) ) {
             tooltip += "ROC Analysis<br>";
         }
 
@@ -302,14 +302,15 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 + runSettings.getMinClassSize() + "<br>" );
         if ( runSettings.getDoLog() ) tooltip += "Log normalized<br>";
 
-        if ( runSettings.getGeneRepTreatment() == Settings.MEAN_PVAL )
+        if ( runSettings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.MEAN ) )
             tooltip += "Gene Rep Treatment: Mean <br>";
-        else if ( runSettings.getGeneRepTreatment() == Settings.BEST_PVAL ) tooltip += "Gene Rep Treatment: Best <br>";
-
-        if ( runSettings.getClassScoreMethod() == Settings.RESAMP || runSettings.getClassScoreMethod() == Settings.ORA ) {
-            if ( runSettings.getRawScoreMethod() == Settings.MEAN_METHOD )
+        else if ( runSettings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.BEST ) )
+            tooltip += "Gene Rep Treatment: Best <br>";
+        if ( runSettings.getClassScoreMethod().equals( Settings.Method.GSR )
+                || runSettings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
+            if ( runSettings.getRawScoreMethod().equals( Settings.GeneScoreMethod.MEAN ) )
                 tooltip += "Class Raw Score Method: Mean <br>";
-            else if ( runSettings.getRawScoreMethod() == Settings.QUANTILE_METHOD )
+            else if ( runSettings.getRawScoreMethod().equals( Settings.GeneScoreMethod.QUANTILE ) )
                 tooltip += "Class Raw Score Method: Median <br>";
         }
 

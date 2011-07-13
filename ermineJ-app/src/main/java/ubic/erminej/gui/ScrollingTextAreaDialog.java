@@ -21,6 +21,7 @@ package ubic.erminej.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 
 import javax.swing.BorderFactory;
@@ -39,6 +40,14 @@ public class ScrollingTextAreaDialog extends JDialog {
      */
     private static final long serialVersionUID = -8888590244789533769L;
     private JTextArea ta;
+
+    public void setEditable( boolean b ) {
+        ta.setEditable( b );
+    }
+
+    public void setCaretPosition( int position ) {
+        ta.setCaretPosition( position );
+    }
 
     public ScrollingTextAreaDialog( Frame owner, String title, boolean modal ) {
         super( owner, title, modal );
@@ -60,8 +69,13 @@ public class ScrollingTextAreaDialog extends JDialog {
         this.getContentPane().add( pan );
         ta = new JTextArea( 60, 80 );
         ta.setBackground( Color.WHITE );
+
+        Font oldFont = ta.getFont();
+        Font newFont = new Font( oldFont.getFontName(), oldFont.getStyle(), 10 /* points */);
+        ta.setFont( newFont );
         JScrollPane sp = new JScrollPane( ta );
         pan.add( sp, BorderLayout.CENTER );
+
         pan.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
         pack();
     }

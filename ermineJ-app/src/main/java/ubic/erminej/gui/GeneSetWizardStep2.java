@@ -44,6 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.erminej.data.UserDefinedGeneSet;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.table.TableSorter;
 
@@ -64,14 +65,14 @@ public class GeneSetWizardStep2 extends WizardStep {
     private JTable probeTable = null;
     private JTable newClassTable = null;
     private AbstractTableModel ncTableModel = null;
-    private UserDefinedGeneSetManager newGeneSet = null;
+    private UserDefinedGeneSet newGeneSet = null;
     private JTextField searchTextField = null;
 
     private final static int COL0WIDTH = 80;
     private final static int COL1WIDTH = 80;
     private final static int COL2WIDTH = 200;
 
-    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData, UserDefinedGeneSetManager newGeneSet ) {
+    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData, UserDefinedGeneSet newGeneSet ) {
         super( wiz );
         this.jbInit();
         this.geneData = geneData;

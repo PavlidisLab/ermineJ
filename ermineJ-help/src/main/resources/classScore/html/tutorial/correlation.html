@@ -19,9 +19,9 @@
 		</h2>
 
 		<p>
-			Unlike ORA and Gene Score Resampling, this method examines the gene
-			expression profiles themselves, not the gene scores for each gene. A
-			score is computed for a gene set based on how correlated the
+			This method examines the gene expression profiles themselves, not the
+			gene scores for each gene (which is how the other methods like ORA
+			work). A score is computed for a gene set based on how correlated the
 			expression profiles are.
 		</p>
 
@@ -60,6 +60,27 @@
 			the samples to do the gene-score-based analysis.
 		</p>
 
+
+		<h2>
+			How your data file is used
+		</h2>
+		<p>
+			Unlike the other methods ErmineJ offers that are based on scores for
+			each gene, the correlation method uses the expression data provided
+			in the "raw" file. No gene score file is needed (and it is not used
+			by this analysis at all).
+		</p>
+
+		<p>
+			The rows of the raw data file are treated as a set of expression
+			profiles, one for each gene (or probe). The method examines the
+			correlations among these profiles. Thus you should make sure your
+			input raw data is scaled/normalized the way you would if you were
+			going to use clustering.
+			<strong>Note:</strong> ErmineJ does not use the sample types in its
+			analysis. The names of the samples in your raw data file (the column
+			headings) are only used for display.
+		</p>
 
 		<h2>
 			Walkthrough

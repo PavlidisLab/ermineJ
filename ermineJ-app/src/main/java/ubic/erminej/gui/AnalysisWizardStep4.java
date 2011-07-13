@@ -149,9 +149,9 @@ public class AnalysisWizardStep4 extends WizardStep {
         jTextFieldMaxClassSize.setText( String.valueOf( settings.getMaxClassSize() ) );
         jTextFieldMinClassSize.setText( String.valueOf( settings.getMinClassSize() ) );
 
-        if ( settings.getGeneRepTreatment() == Settings.BEST_PVAL ) {
+        if ( settings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.BEST ) ) {
             jRadioButtonBestReplicates.setSelected( true );
-        } else if ( settings.getGeneRepTreatment() == Settings.MEAN_PVAL ) {
+        } else if ( settings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.MEAN ) ) {
             jRadioButtonMeanReplicates.setSelected( true );
         } else {
             throw new IllegalStateException( "Invalid gene rep treatment method" );
@@ -163,9 +163,9 @@ public class AnalysisWizardStep4 extends WizardStep {
         settings.setMinClassSize( Integer.valueOf( jTextFieldMinClassSize.getText() ).intValue() );
 
         if ( jRadioButtonBestReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( Settings.BEST_PVAL );
+            settings.setGeneRepTreatment( Settings.MultiProbeHandling.BEST );
         } else if ( jRadioButtonMeanReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( Settings.MEAN_PVAL );
+            settings.setGeneRepTreatment( Settings.MultiProbeHandling.MEAN );
         } else {
             throw new IllegalStateException( "Invalid gene rep treatment method" );
         }

@@ -178,19 +178,19 @@ public class AnalysisWizardStep2 extends WizardStep {
     @Override
     public boolean isReady() {
 
-        if ( wiz.getAnalysisType() == Settings.CORR && rawFile.getText().compareTo( "" ) == 0 ) {
+        if ( wiz.getAnalysisType().equals( Settings.Method.CORR ) && rawFile.getText().compareTo( "" ) == 0 ) {
             wiz.showError( "Correlation analyses require a raw data file." );
             return false;
-        } else if ( ( wiz.getAnalysisType() == Settings.RESAMP || wiz.getAnalysisType() == Settings.ORA )
+        } else if ( ( wiz.getAnalysisType().equals( Settings.Method.GSR ) || wiz.getAnalysisType().equals(
+                Settings.Method.ORA ) )
                 && scoreFile.getText().compareTo( "" ) == 0 ) {
             wiz.showError( "ORA and resampling analyses require a gene score file." );
             return false;
         }
 
-        if ( ( wiz.getAnalysisType() == 0 || wiz.getAnalysisType() == 1 )
+        if ( ( !wiz.getAnalysisType().equals( Settings.Method.CORR ) )
                 && Integer.valueOf( jTextFieldScoreCol.getText() ).intValue() < 2 ) {
             wiz.showError( "The score column must be 2 or higher" );
-            // @todo test that the score column exists.
             return false;
         }
 

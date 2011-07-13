@@ -16,8 +16,8 @@
 			<a
 				href="http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0017258">our
 				lab showed (Gillis and Pavlidis, 2011)</a> how this has a profound
-			effect on the analysis of functional genomics data, including GO
-			analysis.
+			effect on the analysis of functional genomics data. A manuscript
+			describing the effects on enrichment-type analyses is in preparation.
 		</p>
 		<p>
 			ErmineJ has several features designed to make it easier to detect and
@@ -33,10 +33,10 @@
 		<p>
 			For the purposes of ErmineJ, a "function" is defined by the
 			annotations a gene has. For standard uses of ErmineJ, this means gene
-			ontology terms. Whether those annotations are a "true"
-			represenatation of the multifunctionality of a gene is of little
-			consequence for the effects the annotations have on the analysis. For
-			more discussion of this issue see the article linked above.
+			ontology terms. Whether those annotations are a "true" representation
+			of the multifunctionality of a gene is of no consequence for the
+			effects on the analysis. For more discussion of this issue see the
+			article linked above.
 		</p>
 
 		<h2>
@@ -101,13 +101,15 @@
 			input list is "enriched" for multifunctional genes. In our
 			experience, it is not all that common for an input list to be
 			strongly correlated with the multifunctionality ranking, but even
-			weak correlations can have strong effects.
+			very weak correlations can have strong effects.
 		</p>
 		<p>
-			Even if your list is not enriched for multifunctional genes, the
-			presence of a small number of multifunctional genes high in your
+			vewry Even if your list is not enriched for multifunctional genes,
+			the presence of a small number of multifunctional genes high in your
 			input rankings can have profound effects on your GO enrichment
-			results.
+			results. The "multifunctionality filtering" for the
+			<a href="">ORA</a> analysis should be used to reduce the impact of
+			multifunctional genes on your results.
 		</p>
 
 
@@ -127,19 +129,22 @@
 			</li>
 			<li>
 				<strong>Isn't this just a problem with GO?</strong> Not really. We
-				have observed the same phenomenon with KEGG, and it's not specific
-				to the "biological process" part of GO either, for example. The
-				problem is that not every gene has the same number of functions.
-				This is presumably at least partly a biological fact, but it is true
-				that if every gene did have the same number of GO terms, the problem
-				would be much less severe.
+				have observed the same phenomenon with KEGG and other gene
+				groupings, and it's not specific to the "biological process" part of
+				GO either, for example. The problem is that not every gene has the
+				same number of functions. This is presumably at least partly a
+				biological fact, but it is true that if every gene did have the same
+				number of GO terms, the problem would go away.
 			</li>
 			<li>
 				<strong>Can't I just filter out the multifunctional genes?</strong>
-				We don't recommend this. First, there is no clear separation between
+				We don't recommend this as a preprocessing step; instead you should
+				let ErmineJ help you. There is no clear separation between
 				"multifunctional" and "non-multifunctional" genes. Second, highly
 				multifunctional genes are important, so removing them entirely could
-				be counterproductive.
+				be counterproductive. ErmineJ has methods to measure the impact of
+				multifunctionality, and to reduct it by filtering out the most
+				multifunctional genes from analyses in carefully designed ways.
 			</li>
 		</ul>
 

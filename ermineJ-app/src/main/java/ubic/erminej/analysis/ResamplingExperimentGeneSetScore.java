@@ -54,7 +54,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     private boolean useWeights;
     private static int quantile = 50;
     private static double quantfract = 0.5;
-    private int method;
+    private Settings.GeneScoreMethod method;
     private static final int MIN_SET_SIZE_FOR_ESTIMATION = 30; // after this size, switch to doing it by normal
     // approximation.
 
@@ -179,7 +179,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         this.numRuns = settings.getIterations();
         this.setQuantile( settings.getQuantile() );
         this.useWeights = ( Boolean.valueOf( settings.getUseWeights() ) ).booleanValue();
-        this.setMethod( settings.getClassScoreMethod() );
+        this.setMethod( settings.getRawScoreMethod() );
         this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
         this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
         if ( classMaxSize < classMinSize ) {
@@ -273,16 +273,16 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @throws IllegalArgumentException
      * @return double
      */
-    public static double computeRawScore( double[] genevalues, int effsize, int method )
+    public static double computeRawScore( double[] genevalues, int effsize, Settings.GeneScoreMethod method )
             throws IllegalArgumentException {
 
-        if ( method == Settings.MEAN_METHOD ) {
+        if ( method.equals( Settings.GeneScoreMethod.MEAN ) ) {
             return DescriptiveWithMissing.mean( genevalues, effsize );
         }
         int index = ( int ) Math.floor( quantfract * effsize );
-        if ( method == Settings.QUANTILE_METHOD ) {
+        if ( method.equals( Settings.GeneScoreMethod.QUANTILE ) ) {
             return Stats.quantile( index, genevalues, effsize );
-        } else if ( method == Settings.MEAN_ABOVE_QUANTILE_METHOD ) {
+        } else if ( method.equals( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE ) ) {
             return Stats.meanAboveQuantile( index, genevalues, effsize );
         } else {
             throw new IllegalStateException( "Unknown raw score calculation method selected" );
@@ -294,7 +294,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @param meth String
      * @throws IllegalArgumentException
      */
-    private void setMethod( int meth ) {
+    private void setMethod( Settings.GeneScoreMethod meth ) {
         method = meth;
     }
 
@@ -315,6 +315,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
     /*
      * (non-Javadoc)
+     * 
      * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
      */
     public void setRandomSeed( long randomSeed ) {

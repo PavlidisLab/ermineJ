@@ -44,6 +44,25 @@
 		</p>
 
 		<p>
+			<strong>How should I deal with up-regulated vs.
+				down-regulated genes? I want them analyzed separately.</strong> To make your
+			input p-values "aware" of the direction of change, you typically need
+			to use a
+			<a href="http://en.wikipedia.org/wiki/Two-tailed_test">one-tailed
+				test</a> to generate your p-values. ErmineJ doesn't handle that
+			internally, you have to provide your own pvalues. So there would be
+			one list of pvalues for up-regulation and one for down, using one
+			tail and then the other of the distribution from which p-values are
+			determined. Alternatively you can use the fold-changes. However, our
+			recommendation is that you use p-values, especially if that is how
+			you are ranking genes for other parts of your project. But some
+			people use fold change. You have to decide which will best answer
+			your question. If you think fold-change is a better representation of
+			the ranking of genes, then use fold change.
+		</p>
+
+
+		<p>
 			<STRONG>The messages at the bottom of the window go by too
 				fast to read. </STRONG>You can read all messages (and other information) in
 			the log file. You can view the log file from within ermineJ by
@@ -97,6 +116,14 @@
 		</p>
 
 		<p>
+			<strong>What is multifunctionality?</strong> This refers to the fact
+			that some genes have many more GO terms than others. This has a
+			dramatic effect on the type of analysis ErmineJ does. This topic is
+			covered in more detail in the
+			<a href="tutorial/multifunc.html">manual</a>.
+		</p>
+
+		<p>
 			<strong>My data set has no "significant" genes, but when I
 				run ermineJ with resampling I get significant gene sets. How do I
 				interpret these results?</strong> Carefully. ErmineJ's resampling methods are
@@ -144,6 +171,12 @@
 			expression effects in your experiment are weak. Otherwise, gene sets
 			which have strong "interesting" differential expression will also
 			appear strongly correlated (as they should be).
+		</p>
+
+		<p>
+			Data sets where there are weak signals can also be heavily influenced
+			by
+			<a href="tutorial/multifunc.html">multifunctionality</a>.
 		</p>
 
 		<p>
@@ -211,26 +244,24 @@
 			<strong>When doing an analysis, why did I see a warning "<font
 				color="#2a00ff" size="1"><font color="#000000" size="4">"Some
 						probes in your gene score file don't match the ones in the
-						annotation file"</font>
-			</font> "?</strong> This happens if your gene annotation file isn't the right one for
-			the microarray you used (in which case your analysis will not work
-			well), but can also happen if your file format isn't quite right. The
-			analysis still proceeds when this happens.
+						annotation file"</font> </font> "?</strong> This happens if your gene annotation file
+			isn't the right one for the microarray you used (in which case your
+			analysis will not work well), but can also happen if your file format
+			isn't quite right. The analysis still proceeds when this happens.
 		</p>
 
 		<p>
 			<strong>When doing an analysis, why did I see a warning"<font
 				color="#2a00ff" size="1"><font color="#000000" size="4">"Non-numeric
 						gene scores(s) ( '#NUM!' ) found for input file. These are set to
-						an initial value of zero."</font>
-			</font> ", or something similar?</strong> This warning appears if the column you
-			selected for your gene score file contains non-numeric data. This can
-			happen if you have missing or invalid values (sometimes appearing as
-			'#NUM!' in Microsoft Excel), but can also happen if you have chosen
-			the wrong column in your data. Because such values are interpeted as
-			zeros, you should be careful that your file contains the data you
-			want. If you want to avoid problems you should remove those rows from
-			your file entirely.
+						an initial value of zero."</font> </font> ", or something similar?</strong> This warning
+			appears if the column you selected for your gene score file contains
+			non-numeric data. This can happen if you have missing or invalid
+			values (sometimes appearing as '#NUM!' in Microsoft Excel), but can
+			also happen if you have chosen the wrong column in your data. Because
+			such values are interpeted as zeros, you should be careful that your
+			file contains the data you want. If you want to avoid problems you
+			should remove those rows from your file entirely.
 		</p>
 
 		<p>
@@ -244,14 +275,12 @@
 			<strong>uncheck</strong>
 			<font color="#000000">the "</font><font color="#2a00ff" size="1"><font
 				color="#000000" size="4"><font size="3"><em>Always
-							use full resampling</em>
-				</font>" <font size="3">checkbox in the analysis setup wizard. This
-						enables approximations which, while potentially yielding less
-						accurate p-values, greatly increase processing speed. The results
-						you get with this box unchecked will be reasonably similar to what
-						you would get with full resampling.</font>
-			</font>
-			</font>
+							use full resampling</em> </font>" <font size="3">checkbox in the
+						analysis setup wizard. This enables approximations which, while
+						potentially yielding less accurate p-values, greatly increase
+						processing speed. The results you get with this box unchecked will
+						be reasonably similar to what you would get with full resampling.</font>
+			</font> </font>
 		</p>
 
 		<p>

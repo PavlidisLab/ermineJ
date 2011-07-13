@@ -76,16 +76,12 @@ public class AnalysisWizardStep3 extends WizardStep {
 
     private GONames goData;
 
-    private final GeneAnnotations geneData;
-
     private final GeneSetScoreFrame callingframe;
 
-    public AnalysisWizardStep3( AnalysisWizard wiz, GeneSetScoreFrame callingframe, GONames goData,
-            GeneAnnotations geneData, Settings settings ) {
+    public AnalysisWizardStep3( AnalysisWizard wiz, GeneSetScoreFrame callingframe, GONames goData, Settings settings ) {
         super( wiz );
         this.callingframe = callingframe;
         this.goData = goData;
-        this.geneData = geneData;
         this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
@@ -257,14 +253,13 @@ public class AnalysisWizardStep3 extends WizardStep {
             return;
         }
         log.debug( userDefinedGeneSets.size() + " user-defined gene sets available" );
-        UserDefinedGeneSetManager helper = new UserDefinedGeneSetManager( geneData, settings, "" );
 
         customClasses = new AnalysisWizardStep3_CustomClassList();
         ccHash = new HashMap<String, Map<String, Object>>();
         for ( Iterator<String> iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
             String id = iter.next();
             if ( callingframe.userOverWrote( id ) ) continue;
-            Map<String, Object> cfi = helper.getGeneSetInfo( id, goData );
+            Map<String, Object> cfi = UserDefinedGeneSetManager.getGeneSetInfo( id );
             if ( cfi == null || cfi.get( "members" ) == null
                     || ( ( Collection<Object> ) cfi.get( "members" ) ).size() == 0 ) continue;
             log.debug( "Adding " + id + " to the table" );

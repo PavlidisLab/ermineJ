@@ -64,6 +64,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         } else {
             this.geneScoreThreshold = settings.getPValThreshold();
         }
+
     }
 
     /**
@@ -80,6 +81,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         // inputs for hypergeometric distribution
         int successes = 0;
         int failures = 0;
+
+        boolean useMultifunctionalityCorrection = this.settings.isUseMultifunctionalityCorrection();
 
         // variables for outputs
         double oraPval = Double.NaN;

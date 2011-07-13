@@ -237,13 +237,13 @@ public class GeneSetPvalRun {
         if ( messenger != null ) messenger.showStatus( "Multiple test correction..." );
         MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
                 results, messenger );
-        int multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod == Settings.BONFERONNI ) {
+        Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
+        if ( multipleTestCorrMethod == Settings.MultiTestCorrMethod.BONFERONNI ) {
             mt.bonferroni();
-        } else if ( multipleTestCorrMethod == Settings.BENJAMINIHOCHBERG ) {
+        } else if ( multipleTestCorrMethod.equals( Settings.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
             mt.benjaminihochberg( 0.05 );
-        } else if ( multipleTestCorrMethod == Settings.WESTFALLYOUNG ) {
-            if ( settings.getClassScoreMethod() != Settings.RESAMP )
+        } else if ( multipleTestCorrMethod.equals( Settings.MultiTestCorrMethod.WESTFALLYOUNG ) ) {
+            if ( !( settings.getClassScoreMethod().equals( Settings.Method.GSR ) ) )
                 throw new UnsupportedOperationException(
                         "Westfall-Young correction is not supported for this analysis method" );
             mt.westfallyoung( NUM_WY_SAMPLES );
@@ -268,7 +268,7 @@ public class GeneSetPvalRun {
                 .getUseWeights() );
 
         switch ( settings1.getClassScoreMethod() ) {
-            case Settings.RESAMP: {
+            case GSR: {
                 NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings1,
                         geneScores1 );
 
@@ -289,7 +289,7 @@ public class GeneSetPvalRun {
 
                 break;
             }
-            case Settings.ORA: {
+            case ORA: {
 
                 int inputSize = activeProbes.size();
 
@@ -314,7 +314,7 @@ public class GeneSetPvalRun {
                             + " probes passed your threshold." );
                 break;
             }
-            case Settings.CORR: {
+            case CORR: {
                 if ( rawData == null )
                     throw new IllegalArgumentException( "Raw data cannot be null for Correlation analysis" );
                 if ( messenger != null )
@@ -336,7 +336,7 @@ public class GeneSetPvalRun {
 
                 break;
             }
-            case Settings.ROC: {
+            case ROC: {
                 RocPvalGenerator rpg = new RocPvalGenerator( settings1, geneData1, csc, goData );
                 Map<String, Integer> geneRanksMap;
                 if ( messenger != null ) messenger.showStatus( "Rank transforming" );

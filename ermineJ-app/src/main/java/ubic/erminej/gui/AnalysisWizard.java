@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.Settings.Method;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 
 /**
@@ -56,7 +57,7 @@ public class AnalysisWizard extends Wizard {
 
     // logic
     int step = 1;
-    int analysisType = Settings.ORA;
+    Method analysisType = Method.ORA;
 
     Settings settings;
     GeneAnnotations geneData;
@@ -82,7 +83,7 @@ public class AnalysisWizard extends Wizard {
         this.addStep( step1, true );
         step2 = new AnalysisWizardStep2( this, settings );
         this.addStep( step2 );
-        step3 = new AnalysisWizardStep3( this, callingframe, goData, geneData, settings );
+        step3 = new AnalysisWizardStep3( this, callingframe, goData, settings );
         this.addStep( step3 );
         step31 = new AnalysisWizardStep3_1( this, settings );
         this.addStep( step31 );
@@ -276,16 +277,18 @@ public class AnalysisWizard extends Wizard {
         step5.saveValues();
     }
 
+    /**
+     * @throws IOException
+     */
     void loadAddedClasses() throws IOException {
         Iterator<Map<String, Object>> it = step3.getAddedClasses().iterator();
         while ( it.hasNext() ) {
             String id = ( String ) it.next().get( "id" );
             log.debug( "Adding " + id + " to genedata for analysis" );
             if ( !goData.isUserDefined( id ) ) {
-                UserDefinedGeneSetManager newGeneSet = new UserDefinedGeneSetManager( geneData, settings, id );
-                String filename = newGeneSet.getUserGeneSetFileForName();
-                boolean gotSomeProbes = newGeneSet.loadUserGeneSet( filename );
-                if ( gotSomeProbes ) newGeneSet.addGeneSet( goData );
+                // FIXME should be static/
+                String filename = UserDefinedGeneSetManager.getUserGeneSetFileForName( id );
+                UserDefinedGeneSetManager.loadUserGeneSet( filename );
             }
         }
     }
@@ -293,7 +296,7 @@ public class AnalysisWizard extends Wizard {
     /**
      * @param val
      */
-    public void setAnalysisType( int val ) {
+    public void setAnalysisType( Method val ) {
         this.analysisType = val;
         this.checkNumSteps();
     }
@@ -301,7 +304,7 @@ public class AnalysisWizard extends Wizard {
     /**
      * @return
      */
-    public int getAnalysisType() {
+    public Settings.Method getAnalysisType() {
         return this.analysisType;
     }
 

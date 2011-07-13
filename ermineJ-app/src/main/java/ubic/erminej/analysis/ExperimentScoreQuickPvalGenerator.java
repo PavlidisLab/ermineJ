@@ -104,7 +104,7 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
 
         // get raw score and pvalue.
         rawscore = ResamplingExperimentGeneSetScore.computeRawScore( groupPvalArr, in_size, settings
-                .getClassScoreMethod() );
+                .getRawScoreMethod() );
         pval = scoreToPval( in_size, rawscore );
 
         if ( pval < 0 ) {

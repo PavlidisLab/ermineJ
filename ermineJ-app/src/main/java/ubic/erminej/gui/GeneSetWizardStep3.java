@@ -30,7 +30,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
-import ubic.erminej.data.UserDefinedGeneSetManager;
+import ubic.erminej.data.UserDefinedGeneSet;
 
 /**
  * @author Homin K Lee
@@ -42,7 +42,7 @@ public class GeneSetWizardStep3 extends WizardStep {
      * 
      */
     private static final long serialVersionUID = -7269554461600183571L;
-    private UserDefinedGeneSetManager newGeneSet = null;
+    private UserDefinedGeneSet newGeneSet = null;
     private JLabel classIDFinal = null;
     private JTextField classIDTF = null;
     private JTextArea classDescTA = null;
@@ -52,7 +52,7 @@ public class GeneSetWizardStep3 extends WizardStep {
     String origDesc = null;
     private final boolean makenew;
 
-    public GeneSetWizardStep3( GeneSetWizard wiz, UserDefinedGeneSetManager newGeneSet, boolean makenew ) {
+    public GeneSetWizardStep3( GeneSetWizard wiz, UserDefinedGeneSet newGeneSet, boolean makenew ) {
         super( wiz );
         this.makenew = makenew;
         this.newGeneSet = newGeneSet;

@@ -67,12 +67,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
-import ubic.basecode.util.FileTools;
-import ubic.basecode.util.StatusViewer;
-
 import ubic.basecode.bio.geneset.GONames;
 import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
+import ubic.basecode.util.FileTools;
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.AnalysisThread;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
@@ -218,12 +218,11 @@ public class GeneSetScoreFrame extends JFrame {
     }
 
     protected void deleteUserGeneSetFile( String classID ) {
-        UserDefinedGeneSetManager ngs = new UserDefinedGeneSetManager( geneData, settings, classID );
-        if ( ngs.deleteUserGeneSet() && this.statusMessenger != null ) {
+        if ( UserDefinedGeneSetManager.deleteUserGeneSet( classID ) && this.statusMessenger != null ) {
             statusMessenger.showStatus( "Permanantly deleted " + classID );
         } else {
-            GuiUtil.error( "Could not delete file for " + classID + ". Please delete the file manually from "
-                    + settings.getUserGeneSetDirectory() );
+            GuiUtil.error( "Could not delete data on disk for " + classID
+                    + ". Please delete the file (or part of file) manually from " + settings.getUserGeneSetDirectory() );
         }
     }
 
@@ -352,9 +351,12 @@ public class GeneSetScoreFrame extends JFrame {
             log.error( e, e );
         }
         treePanel.initialize( goData, geneData );
+
+        UserDefinedGeneSetManager.init( geneData, goData, settings );
         loadUserGeneSets();
 
         oPanel.addInitialData( goData );
+
         statusMessenger.showStatus( "Done with initialization." );
     }
 
@@ -454,8 +456,7 @@ public class GeneSetScoreFrame extends JFrame {
      * 
      */
     protected void loadUserGeneSets() {
-        UserDefinedGeneSetManager loader = new UserDefinedGeneSetManager( geneData, settings, "" );
-        this.userOverwrittenGeneSets = loader.loadUserGeneSets( this.goData, this.statusMessenger );
+        this.userOverwrittenGeneSets = UserDefinedGeneSetManager.loadUserGeneSets( this.statusMessenger );
         for ( Iterator<String> iter = goData.getUserDefinedGeneSets().iterator(); iter.hasNext(); ) {
             String id = iter.next();
             treePanel.addNode( id, goData.getNameForId( id ) );
@@ -974,10 +975,14 @@ public class GeneSetScoreFrame extends JFrame {
             }
             fis.close();
             ScrollingTextAreaDialog b = new ScrollingTextAreaDialog( this, "ErmineJ Log", true );
-            b.setText( bif.toString() );
+            b
+                    .setText( "The log file is located at:\n" + settings.getLogFile() + "\n\nLog contents:\n"
+                            + bif.toString() );
+            b.setEditable( false );
             b.setSize( new Dimension( 350, 500 ) );
             b.setResizable( true );
             b.setLocation( GuiUtil.chooseChildLocation( b, this ) );
+            b.setCaretPosition( 0 );
             b.pack();
             b.validate();
             b.setVisible( true );

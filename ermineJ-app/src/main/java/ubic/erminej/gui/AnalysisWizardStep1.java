@@ -110,7 +110,7 @@ public class AnalysisWizardStep1 extends WizardStep {
         rocButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
         rocButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                wiz.setAnalysisType( Settings.ROC );
+                wiz.setAnalysisType( Settings.Method.ROC );
             }
         } );
         buttonGroup1.add( rocButton );
@@ -146,37 +146,37 @@ public class AnalysisWizardStep1 extends WizardStep {
     }
 
     void corrButton_actionPerformed() {
-        wiz.setAnalysisType( Settings.CORR );
+        wiz.setAnalysisType( Settings.Method.CORR );
     }
 
     void resampButton_actionPerformed() {
-        wiz.setAnalysisType( Settings.RESAMP );
+        wiz.setAnalysisType( Settings.Method.GSR );
     }
 
     void oraButton_actionPerformed() {
-        wiz.setAnalysisType( Settings.ORA );
+        wiz.setAnalysisType( Settings.Method.ORA );
     }
 
     public void setValues() {
-        if ( settings.getClassScoreMethod() == Settings.ORA )
+        if ( settings.getClassScoreMethod().equals( Settings.Method.ORA ) )
             oraButton.setSelected( true );
-        else if ( settings.getClassScoreMethod() == Settings.RESAMP )
+        else if ( settings.getClassScoreMethod().equals( Settings.Method.GSR ) )
             resampButton.setSelected( true );
-        else if ( settings.getClassScoreMethod() == Settings.CORR )
+        else if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) )
             corrButton.setSelected( true );
 
-        else if ( settings.getClassScoreMethod() == Settings.ROC ) rocButton.setSelected( true );
+        else if ( settings.getClassScoreMethod().equals( Settings.Method.ROC ) ) rocButton.setSelected( true );
     }
 
     public void saveValues() {
         if ( oraButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.ORA );
+            settings.setClassScoreMethod( Settings.Method.ORA );
         } else if ( resampButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.RESAMP );
+            settings.setClassScoreMethod( Settings.Method.GSR );
         } else if ( corrButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.CORR );
+            settings.setClassScoreMethod( Settings.Method.CORR );
         } else if ( rocButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.ROC );
+            settings.setClassScoreMethod( Settings.Method.ROC );
         }
     }
 }

@@ -525,7 +525,7 @@ public class GeneScores {
     private void setUpGeneToScoreMap( Settings settings, Map<String, Collection<String>> geneToProbeMap,
             StatusViewer messenger ) {
 
-        int gp_method = settings.getGeneRepTreatment();
+        Settings.MultiProbeHandling gp_method = settings.getGeneRepTreatment();
 
         Collection<String> genes = null;
         if ( geneToProbeMap != null ) {
@@ -573,11 +573,11 @@ public class GeneScores {
                 double score = probeToScoreMap.get( probe ).doubleValue();
 
                 switch ( gp_method ) {
-                    case Settings.MEAN_PVAL: {
+                    case MEAN: {
                         geneScoreTemp[counter] += score;
                         break;
                     }
-                    case Settings.BEST_PVAL: {
+                    case BEST: {
                         if ( in_size == 0 ) {
                             // fix suggested by Hubert Rehrauer, to initialize values to first score, not zero.
                             geneScoreTemp[counter] = score;
@@ -598,7 +598,7 @@ public class GeneScores {
             }
 
             if ( in_size > 0 ) {
-                if ( gp_method == Settings.MEAN_PVAL ) {
+                if ( gp_method.equals( Settings.MultiProbeHandling.MEAN ) ) {
                     geneScoreTemp[counter] /= in_size; // take the mean
                 }
                 Double dbb = new Double( geneScoreTemp[counter] );

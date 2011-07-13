@@ -276,7 +276,7 @@ public class AnalysisThread extends Thread {
         timer.start();
 
         DoubleMatrix<String, String> rawData = null;
-        if ( settings.getClassScoreMethod() == Settings.CORR ) {
+        if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
             rawData = addRawData();
         }
         GeneScores geneScores = addGeneScores();
