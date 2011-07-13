@@ -34,6 +34,7 @@ public class UserDefinedGeneSet {
     private List<String> probes = new ArrayList<String>();
     private Collection<String> genes = new HashSet<String>();
     private boolean isGenes; // how was it originally represented.
+    private String sourceFile;
 
     // public UserDefinedGeneSet( String id, String aspect, String definition, String description, boolean modified,
     // Collection<String> probes ) {
@@ -106,6 +107,10 @@ public class UserDefinedGeneSet {
         return probes;
     }
 
+    public String getSourceFile() {
+        return sourceFile;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -160,6 +165,10 @@ public class UserDefinedGeneSet {
 
     public void setProbes( List<String> probes ) {
         this.probes = probes;
+    }
+
+    public void setSourceFile( String fileName ) {
+        this.sourceFile = fileName;
     }
 
     public AbstractTableModel toTableModel( boolean editable ) {

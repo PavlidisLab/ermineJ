@@ -330,7 +330,25 @@ public class Settings {
      * @return
      */
     public MultiProbeHandling getGeneRepTreatment() {
-        return MultiProbeHandling.valueOf( config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() ) );
+        String storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() );
+
+        // backwards compatibility
+        if ( NumberUtils.isDigits( storedValue ) ) {
+            int oldVal = Integer.parseInt( storedValue );
+            switch ( oldVal ) {
+                case 1:
+                    setGeneRepTreatment( Settings.MultiProbeHandling.BEST );
+                    break;
+                case 2:
+                    setGeneRepTreatment( Settings.MultiProbeHandling.MEAN );
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+            storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() );
+        }
+
+        return Settings.MultiProbeHandling.valueOf( storedValue );
     }
 
     /**
@@ -437,7 +455,29 @@ public class Settings {
      * @return the method to be used to combine scores. This is only relevant for the gene set resampling method.
      */
     public GeneScoreMethod getRawScoreMethod() {
-        return GeneScoreMethod.valueOf( config.getString( RAW_SCORE_METHOD, GeneScoreMethod.MEAN.toString() ) );
+        String storedValue = config.getString( RAW_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
+
+        // backwards compatibility
+        if ( NumberUtils.isDigits( storedValue ) ) {
+            int oldVal = Integer.parseInt( storedValue );
+
+            switch ( oldVal ) {
+                case 0:
+                    setRawScoreMethod( Settings.GeneScoreMethod.MEAN );
+                    break;
+                case 1:
+                    setRawScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                    break;
+                case 2:
+                    setRawScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+            storedValue = config.getString( RAW_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
+        }
+
+        return Settings.GeneScoreMethod.valueOf( storedValue );
     }
 
     public int getScoreCol() {

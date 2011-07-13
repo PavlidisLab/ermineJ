@@ -21,7 +21,7 @@
 					</a>
 
 					<h1>
-						Gene Ontology analysis for&nbsp;high-throughput data
+						Gene set analysis for&nbsp;high-throughput data
 					</h1>
 					<P>
 						<STRONG>Version 2.2</STRONG>
@@ -93,13 +93,13 @@
 					<p>
 						ErmineJ performs analyses of
 						<b>gene sets</b> in
-						<b>expression microarray data</b> or other genome-wide data that
-						results in rankings of genes. A typical goal is to determine
-						whether particular biological pathways are "doing something
-						interesting" in the data. The software is designed to be used by
-						biologists with little or no informatics background. A
-						command-line interface is available for users who wish to script
-						the use of ermineJ.
+						<b>high-throughput genomics data</b> such as gene expression
+						profiling studies. A typical goal is to determine whether
+						particular biological pathways are "doing something interesting"
+						in an experiment that generates long lists of candidates. The
+						software is designed to be used by biologists with little or no
+						informatics background. A command-line interface is available for
+						users who wish to script the use of ermineJ.
 					</p>
 					<p>
 						A description of ermineJ was published as: Lee H.K., Braynen W.,
@@ -134,74 +134,77 @@
 					</p>
 
 					<ul>
+
 						<li>
 							Implementation of multiple methods for gene set analysis:
 
 							<ul>
 								<li>
-									<A href="ermineJ-help/classScore/html/tutorial/ora.html">Over-representation
-										analysis</A>
-									<li>
-										<A
-											href="ermineJ-help/classScore/html/tutorial/resampling.html">A
-											resampling-based method that uses gene scores</A>
-										<li>
-											<a href="ermineJ-help/classScore/html/tutorial/roc.html">A
-												rank-based method that uses gene scores</a>
-										</li>
-										<li>
-											A resampling-based method that uses
-											<a
-												href="ermineJ-help/classScore/html/tutorial/correlation.html">correlation
-												between gene expression profiles</a> (a type of
-											"cluster-enrichment" analysis).
-										</li>
-							</ul>
-							<li>
-								Consideration of
-								<a href="ermineJ-help/classScore/html/tutorial/multifunc.html">gene
-									multifunctionality</a> that improve the interpretability
-								of your results.
-							</li>
-							<li>
-								Gene sets receive statistical scores (p-values), and
-								<a href="ermineJ-help/classScore/html/tutorial/mtc.html">multiple
-									test correction</a> is supported.
-							</li>
-							<li>
-								Support of the Gene Ontology terminology; users can choose which
-								aspects to analyze.
-							</li>
-							<li>
-								User files use
-								<A href="ermineJ-help/classScore/html/formats/">simple text
-									formats</A>.
+									<a href="ermineJ-help/classScore/html/tutorial/ora.html">Over-representation
+										analysis</a>
+								</li>
 								<li>
-									Users can
-									<A href="ermineJ-help/classScore/html/tutorial/classes.html">modify
-										gene sets or create new ones</A>.
-									<li>
-										The results can be
-										<a href="ermineJ-help/classScore/html/tutorial/visualize.html">visualized
-											within the software</a>.
-										<li>
-											It is simple to compare multiple analyses of the same data
-											set with different settings.
-										</li>
-										<li>
-											<a
-												href="ermineJ-help/classScore/html/tutorial/setgeneurl.html">User-definable
-												hyperlinks</a> are provided to external sites to allow more
-											efficient browsing of the results.
-										</li>
-										<li>
-											For programmers, there is a
-											<a href="ermineJ-help/classScore/html/tutorial/cli.html">command
-												line interface</a> as well as a
-											<a href="ermineJ-help/classScore/html/tutorial/Api.html">simple
-												application programming interface</a> that can be used to plug
-											ermineJ functionality into your own code
-										</li>
+									<a href="ermineJ-help/classScore/html/tutorial/resampling.html">A
+										resampling-based method that uses gene scores</a>
+								</li>
+								<li>
+									<a href="ermineJ-help/classScore/html/tutorial/roc.html">A
+										rank-based method that uses gene scores</a>
+								</li>
+								<li>
+									A resampling-based method that uses
+									<a href="tutorial/correlation.html">correlation between
+										gene expression profiles</a> (a type of "cluster-enrichment"
+									analysis).
+								</li>
+							</ul>
+						</li>
+						<li>
+							Gene sets receive statistical scores (p-values), and
+							<a href="ermineJ-help/classScore/html/tutorial/mtc.html">multiple
+								test correction</a> is supported.
+						</li>
+						<li>
+							Support of the
+							<a href="http://www.geneontology.org">Gene Ontology</a>
+							terminology; users can choose which aspects to analyze.
+						</li>
+						<li>
+							Users can
+							<A href="ermineJ-help/classScore/html/tutorial/classes.html">modify
+								gene sets or create new ones</a>, allowing the use of arbitrary
+							non-GO schemes such as
+							<a href="http://www.genome.jp/kegg">KEGG</a> or
+							<a href="http://www.reactome.org">Reactome</a>.
+						</li>
+						<li>
+							Provides information on
+							<a href="ermineJ-help/classScore/html/tutorial/multfiunc.html">gene
+								multifunctionality</a>, which has and important impact on the
+							interpretation of results.
+						</li>
+						<li>
+							The results can be
+							<a href="ermineJ-help/classScore/html/tutorial/visualize.html">visualized
+								within the software</a>.
+						</li>
+						<li>
+							User files use
+							<A href="ermineJ-help/classScore/html/formats/go.html">simple
+								text formats</A>.
+						</li>
+						<li>
+							It is simple to compare multiple analyses of the same data set
+							with different settings.
+						</li>
+						<li>
+							For programmers, there is a
+							<a href="ermineJ-help/classScore/html/tutorial/cli.html">command
+								line interface</a> as well as a
+							<a href="ermineJ-help/classScore/html/tutorial/Api.html">simple
+								application programming interface</a> that can be used to plug
+							ermineJ functionality into your own code
+						</li>
 					</ul>
 
 					<p>
@@ -223,7 +226,7 @@
 
 
 					<p>
-						Version 2.2 - (May 2011)
+						Version 2.2 - (August 2011)
 					</p>
 					<p>
 						Introduction of "gene multifunctionality" features, a major new

@@ -288,7 +288,7 @@ public class AnalysisWizard extends Wizard {
             if ( !goData.isUserDefined( id ) ) {
                 // FIXME should be static/
                 String filename = UserDefinedGeneSetManager.getUserGeneSetFileForName( id );
-                UserDefinedGeneSetManager.loadUserGeneSet( filename );
+                UserDefinedGeneSetManager.loadUserGeneSetFile( filename );
             }
         }
     }

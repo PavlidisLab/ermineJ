@@ -22,12 +22,13 @@
 		<p>
 			ErmineJ performs analyses of
 			<b>gene sets</b> in
-			<b>expression microarray data</b>. A typical goal is to determine
-			whether particular biological pathways are "doing something
-			interesting" in the data. The software is designed to be used by
-			biologists with little or no informatics background. A command-line
-			interface is available for users who wish to script the use of
-			ermineJ.
+			<b>high-throughput genomics data</b> such as gene expression
+			profiling studies. A typical goal is to determine whether particular
+			biological pathways are "doing something interesting" in an
+			experiment that generates long lists of candidates. The software is
+			designed to be used by biologists with little or no informatics
+			background. A command-line interface is available for users who wish
+			to script the use of ermineJ.
 		</p>
 
 		<p>
@@ -40,42 +41,48 @@
 
 				<ul>
 					<li>
-						<A href="tutorial/ora.html">Over-representation analysis</A>
-						<li>
-							<A href="tutorial/resampling.html">A resampling-based method
-								that uses gene scores</A>
-							<li>
-								<a href="tutorial/roc.html">A rank-based method that uses
-									gene scores</a>
-							</li>
-							<li>
-								A resampling-based method that uses
-								<a href="tutorial/correlation.html">correlation between gene
-									expression profiles</a> (a type of "cluster-enrichment" analysis).
-							</li>
+						<a href="tutorial/ora.html">Over-representation analysis</a>
+					</li>
+					<li>
+						<a href="tutorial/resampling.html">A resampling-based method
+							that uses gene scores</a>
+					</li>
+					<li>
+						<a href="tutorial/roc.html">A rank-based method that uses gene
+							scores</a>
+					</li>
+					<li>
+						A resampling-based method that uses
+						<a href="tutorial/correlation.html">correlation between gene
+							expression profiles</a> (a type of "cluster-enrichment" analysis).
+					</li>
 				</ul>
-				<li>
-					Gene sets receive statistical scores (p-values), and
-					<a href="tutorial/mtc.html">multiple test correction</a> is
-					supported.
-				</li>
-				<li>
-					Support of the Gene Ontology terminology; users can choose which
-					aspects to analyze.
-				</li>
-				<li>
-					Provides information on
-					<a href="tutorial/multfiunc.html">gene multifunctionality</a>,
-					which has and important impact on the interpretation of results.
-				</li>
-				<li>
-					User files use
-					<A href="formats/go.html">simple text formats</A>.
-				</li>
+			</li>
+			<li>
+				Gene sets receive statistical scores (p-values), and
+				<a href="tutorial/mtc.html">multiple test correction</a> is
+				supported.
+			</li>
+			<li>
+				Support of the
+				<a href="http://www.geneontology.org">Gene Ontology</a> terminology;
+				users can choose which aspects to analyze.
+			</li>
+			<li>
+				Provides information on
+				<a href="tutorial/multfiunc.html">gene multifunctionality</a>, which
+				has and important impact on the interpretation of results.
+			</li>
+			<li>
+				User files use
+				<A href="formats/go.html">simple text formats</A>.
+			</li>
 			<li>
 				Users can
 				<A href="tutorial/classes.html">modify gene sets or create new
-					ones</A>.
+					ones</a>, allowing the use of arbitrary non-GO schemes such as
+				<a href="http://www.genome.jp/kegg">KEGG</a> or
+				<a href="http://www.reactome.org">Reactome</a>.
 			</li>
 			<li>
 				The results can be
@@ -102,12 +109,21 @@
 		<p>
 			<a href="license.html">License information</a>
 		</p>
-		<hr>
-		<br>
 
 
-		<div class="tidy">
-			Copyright 2006 &copy; University of British Columbia
-		</div>
+
+		<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
+		: "http://www.");
+document
+		.write(unescape("%3Cscript src='"
+				+ gaJsHost
+				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+		<script type="text/javascript">
+var pageTracker = _gat._getTracker('UA-4826357-1');
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 	</body>
 </html>

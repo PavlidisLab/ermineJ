@@ -46,6 +46,8 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
 
 /**
+ * This is designed to work as a singleton in the scope of a running ErmineJ instance.
+ * 
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @version $Id$
@@ -67,6 +69,9 @@ public class UserDefinedGeneSetManager {
      */
     public static void addGeneSet( UserDefinedGeneSet set ) {
         String id = set.getId();
+        if ( StringUtils.isBlank( id ) ) {
+            throw new IllegalArgumentException( "Set must be given a name" );
+        }
         userGeneSets.put( id, set );
         geneData.addGeneSet( id, set.getProbes() );
         goData.addGeneSet( id, set.getDesc() );
@@ -145,7 +150,7 @@ public class UserDefinedGeneSetManager {
      * Read in a list of genes or probe ids from a file. The list of genes is unadorned, one per row.
      * 
      * @param fileName
-     * @return FIXME This does not have an ID stored!!
+     * @return incomplete gene set. The caller has to arrange for this to be finished.
      * @throws IOException
      */
     public static UserDefinedGeneSet loadPlainGeneList( String fileName ) throws IOException {
@@ -161,18 +166,32 @@ public class UserDefinedGeneSetManager {
         List<String> probes = convertToProbes( genesOrProbes );
         UserDefinedGeneSet result = new UserDefinedGeneSet();
         result.setProbes( probes );
+        result.setSourceFile( fileName );
         return result;
     }
 
     /**
      * Add user-defined gene set(s) to the GeneData. The format is:
      * <ol>
-     * <li>Rows starting with "#" are ignored as comments.
-     * <li>The type of gene set {gene|probe}
-     * <li>The identifier for the gene set, e.g, "My gene set"
-     * <li>The description for the gene set, e.g, "Genes I like"
-     * <li>Any number of rows containing gene or probe identifiers.
-     * <li>A row starting with "===" delimits multiple gene sets in one file.
+     * <li>Rows starting with "#" are ignored as comments.</li>
+     * </ol>
+     * <ol>
+     * <li>Rows starting with "#" are ignored as comments.</li>
+     * <li>The type of gene set {gene|probe}</li>
+     * <li>The identifier for the gene set, e.g, "My gene set"; tab characters should be avoided in this line to avoid
+     * confusion with the other supported format</li>
+     * <li>The description for the gene set, e.g, "Genes I like"; tab characters should be avoided in this line to avoid
+     * confusion with the other format</li>
+     * <li>Any number of rows containing gene or probe identifiers.</li>
+     * <li>A row starting with "===" delimits multiple gene sets in one file.</li>
+     * </ol>
+     * Alternatively, a tab-delimited file can be provided with one group per row, with the following format:
+     * <ol>
+     * <li>A name for the group (e.g., KEGG identifier)</li>
+     * <li>A description for the group</li>
+     * <li>The remaining fields are interpreted as gene symbols</li>
+     * <li>Lines starting with "#" are ignored as comments.</li>
+     * <li>Lines starting with "===" are ignored.</li>
      * </ol>
      * <p>
      * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
@@ -185,7 +204,7 @@ public class UserDefinedGeneSetManager {
      * @return true if some probes were read in which are on the current array design.
      * @throws IOException
      */
-    public static Collection<UserDefinedGeneSet> loadUserGeneSet( String fileName ) throws IOException {
+    public static Collection<UserDefinedGeneSet> loadUserGeneSetFile( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
 
         Collection<UserDefinedGeneSet> result = new HashSet<UserDefinedGeneSet>();
@@ -195,6 +214,10 @@ public class UserDefinedGeneSetManager {
             result.add( newSet );
         }
         dis.close();
+
+        for ( UserDefinedGeneSet set : result ) {
+            set.setSourceFile( fileName );
+        }
 
         return result;
     }
@@ -224,7 +247,7 @@ public class UserDefinedGeneSetManager {
             try {
                 classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
                 log.debug( "Loading " + classFilePath );
-                Collection<UserDefinedGeneSet> loadedSets = loadUserGeneSet( classFilePath );
+                Collection<UserDefinedGeneSet> loadedSets = loadUserGeneSetFile( classFilePath );
 
                 numLoaded += loadedSets.size();
                 for ( UserDefinedGeneSet set : loadedSets ) {
@@ -271,10 +294,34 @@ public class UserDefinedGeneSetManager {
      * @param type
      * @throws IOException
      */
-    public static void saveGeneSet( UserDefinedGeneSet set ) throws IOException {
+    public static void saveGeneSet( UserDefinedGeneSet setToSave ) throws IOException {
+
+        String fileName = null;
+        if ( StringUtils.isNotBlank( setToSave.getSourceFile() ) ) {
+            fileName = setToSave.getSourceFile();
+        } else {
+            fileName = getUserGeneSetFileForName( setToSave.getId() );
+        }
+
+        /*
+         * Handle case of multiple groups per file. We re-write it, clobber the file.
+         */
+        Collection<UserDefinedGeneSet> sets = loadUserGeneSetFile( fileName );
+
+        BufferedWriter out = new BufferedWriter( new FileWriter( fileName, false ) );
+        for ( UserDefinedGeneSet s : sets ) {
+            if ( s.getId().equals( setToSave.getId() ) ) {
+                writeSet( setToSave, out );
+            } else {
+                writeSet( s, out );
+            }
+        }
+        out.close();
+    }
+
+    private static void writeSet( UserDefinedGeneSet set, BufferedWriter out ) throws IOException {
         String cleanedDescription = set.getDesc().replace( '\n', ' ' );
         String filetype = ( set.isGenes() ) ? "probe" : "gene";
-        BufferedWriter out = new BufferedWriter( new FileWriter( getUserGeneSetFileForName( set.getId() ), false ) );
         out.write( filetype + "\n" );
         out.write( set.getId() + "\n" );
         out.write( cleanedDescription + "\n" );
@@ -287,7 +334,6 @@ public class UserDefinedGeneSetManager {
                 out.write( p + "\n" );
             }
         }
-        out.close();
     }
 
     /**
@@ -309,12 +355,12 @@ public class UserDefinedGeneSetManager {
         for ( String identifier : genesOrProbeNames ) {
             if ( geneData.getGeneProbeList( identifier ) != null ) {
                 probeSet.addAll( geneData.getGeneProbeList( identifier ) );
-                log.debug( "Gene " + identifier + " recognized." );
+                // log.debug( "Gene " + identifier + " recognized." );
             } else if ( geneData.getProbeGeneName( identifier ) != null ) {
-                log.debug( "Probe " + identifier + " recognized" );
+                // log.debug( "Probe " + identifier + " recognized" );
                 probeSet.add( identifier ); // it's actually a probe
             } else {
-                log.debug( "Gene or probe " + identifier + " not found in the array design" );
+                // log.debug( "Gene or probe " + identifier + " not found in the array design" );
                 ignored++;
             }
         }
@@ -351,6 +397,25 @@ public class UserDefinedGeneSetManager {
             }
 
             if ( row.startsWith( "===" ) ) {
+                break;
+            }
+
+            String[] fields = StringUtils.split( row, '\t' );
+            if ( fields.length == 0 ) {
+                continue;
+            }
+
+            if ( fields.length > 2 ) {
+                /*
+                 * We assume there is one record per row.
+                 */
+                newSet.setIsGenes( true );
+
+                newSet.setId( fields[0] );
+                newSet.setDesc( fields[1] );
+                for ( int i = 2; i < fields.length; i++ ) {
+                    genes.add( fields[i] );
+                }
                 break;
             }
 
@@ -421,9 +486,7 @@ public class UserDefinedGeneSetManager {
     }
 
     public static void init( GeneAnnotations gd, GONames goD, Settings set ) {
-        if ( goData != null ) {
-            throw new IllegalStateException( "You should only call init once" );
-        }
+        assert goData == null : "You should only call init once";
         goData = goD;
         geneData = gd;
         settings = set;

@@ -42,7 +42,6 @@ public class GeneSetWizard extends Wizard {
     private static Log log = LogFactory.getLog( GeneSetWizard.class.getName() );
     private Settings settings;
     private GeneAnnotations geneData;
-    private GONames goData;
     private GeneSetWizardStep1 step1; // case 1 (manual creating) and case 2 (new from file)
     private GeneSetWizardStep1A step1A; // case 3 (modifying existing)
     private GeneSetWizardStep2 step2; // step 2 for cases 1-3 and step 1 for case 4
@@ -68,7 +67,6 @@ public class GeneSetWizard extends Wizard {
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
         this.geneData = geneData;
-        this.goData = goData;
         this.makingNewGeneSet = makingNew;
         newGeneSet = new UserDefinedGeneSet();
         oldGeneSet = new UserDefinedGeneSet();
@@ -105,7 +103,7 @@ public class GeneSetWizard extends Wizard {
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
         this.geneData = geneData;
-        this.goData = goData;
+
         this.makingNewGeneSet = false;
 
         newGeneSet = new UserDefinedGeneSet();
@@ -146,13 +144,7 @@ public class GeneSetWizard extends Wizard {
             if ( makingNewGeneSet || step1A.isReady() ) { // not (case 3 with no class picked)
                 if ( makingNewGeneSet && step1.getInputMethod() == 1 ) { // case 2, load from file
                     try {
-                        // newGeneSet.loadUserGeneSet( step1.getLoadFile() );
-                        UserDefinedGeneSet loadedSet = UserDefinedGeneSetManager
-                                .loadPlainGeneList( step1.getLoadFile() );
-
-                        /*
-                         * FIXME this set doesn't live anywhere! It needs an id.
-                         */
+                        newGeneSet = UserDefinedGeneSetManager.loadPlainGeneList( step1.getLoadFile() );
                     } catch ( IOException e1 ) {
                         GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
                                 + " the file is readable." );
@@ -274,6 +266,7 @@ public class GeneSetWizard extends Wizard {
             return;
         }
 
+        newGeneSet.setSourceFile( oldGeneSet.getSourceFile() );
         if ( newGeneSet.getDesc() == null || newGeneSet.getDesc().length() == 0 ) {
             newGeneSet.setDesc( "No description given" );
         }
@@ -281,7 +274,7 @@ public class GeneSetWizard extends Wizard {
         if ( makingNewGeneSet ) {
             log.debug( "Adding new or modified gene set to maps" );
             UserDefinedGeneSetManager.addGeneSet( newGeneSet );
-        
+
             ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
 
@@ -294,7 +287,7 @@ public class GeneSetWizard extends Wizard {
 
         } else if ( modifiedTheGeneSet() ) {
             log.debug( "Gene set was changed" );
-            UserDefinedGeneSetManager.modifyGeneSet(  newGeneSet );
+            UserDefinedGeneSetManager.modifyGeneSet( newGeneSet );
             ( ( GeneSetScoreFrame ) callingframe ).addUserOverwritten( id );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
             try {
