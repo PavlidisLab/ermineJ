@@ -115,7 +115,7 @@
 		<outputDirectory>target/classes</outputDirectory>
 		<finalName>${artifactId}-${version}</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
-		<testSourceDirectory>src/main/test</testSourceDirectory>
+		<testSourceDirectory>src/test</testSourceDirectory>
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<resources>
 			<resource>
@@ -123,7 +123,7 @@
 				<filtering>false</filtering>
 			</resource>
 			<resource>
-				<directory>${basedir}/src/test</directory>
+				<directory>${basedir}/src/test/data</directory>
 				<excludes>
 					<exclude>**/*</exclude>
 				</excludes>
