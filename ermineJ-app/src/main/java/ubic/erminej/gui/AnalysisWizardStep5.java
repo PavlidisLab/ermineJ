@@ -49,7 +49,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     private JPanel step5Panel;
     private JRadioButton jRadioButtonMedian;
     private JRadioButton jRadioButtonMean;
-    private JTextField jTextFieldPValueThreshold;
+    private JTextField geneScoreThresholdTextField;
     // JTextField jTextFieldScoreCol;
     private JTextField jTextFieldIterations;
     private JCheckBox jCheckBoxDoLog;
@@ -88,7 +88,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         TitledBorder oraTitledBorder;
         JPanel jPanel15 = new JPanel();
         JLabel jLabel6 = new JLabel();
-        jTextFieldPValueThreshold = new JTextField();
+        geneScoreThresholdTextField = new JTextField();
         resampPanel = new JPanel();
         TitledBorder resampTitledBorder;
 
@@ -133,7 +133,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         jLabelAnalysisFrameMethod.setMaximumSize( new Dimension( 167, 18 ) );
         jLabelAnalysisFrameMethod.setMinimumSize( new Dimension( 167, 18 ) );
         jLabelAnalysisFrameMethod.setToolTipText( "Determines how the gene scores are combined to make a class score." );
-        jLabelAnalysisFrameMethod.setText( "Class Raw Score Method" );
+        jLabelAnalysisFrameMethod.setText( "Class Scoring Method" );
         jRadioButtonMedian.setText( "Median" );
         jRadioButtonMedian.setToolTipText( "The score for a class is the median of the score of genes in the "
                 + "class." );
@@ -151,16 +151,16 @@ public class AnalysisWizardStep5 extends WizardStep {
         step5Panel.add( step4TopPanel, null );
         jPanel15.setMinimumSize( new Dimension( 180, 29 ) );
 
-        // stuff to set pvalue threshold.
-        jLabel6.setLabelFor( jTextFieldPValueThreshold );
+        // stuff to set gene score threshold.
+        jLabel6.setLabelFor( geneScoreThresholdTextField );
         jLabel6.setText( "Gene score threshold" );
-        jTextFieldPValueThreshold.setEditable( true );
-        jTextFieldPValueThreshold.setPreferredSize( new Dimension( 50, 19 ) );
-        jTextFieldPValueThreshold.setToolTipText( "Score Threshold used for Over-Representation analysis" );
-        jTextFieldPValueThreshold.setText( "0.001" ); // default.
-        jTextFieldPValueThreshold.setHorizontalAlignment( SwingConstants.RIGHT );
+        geneScoreThresholdTextField.setEditable( true );
+        geneScoreThresholdTextField.setPreferredSize( new Dimension( 50, 19 ) );
+        geneScoreThresholdTextField.setToolTipText( "Score Threshold used for Over-Representation analysis" );
+        geneScoreThresholdTextField.setText( "0.001" ); // default (assume it's p-value like).
+        geneScoreThresholdTextField.setHorizontalAlignment( SwingConstants.RIGHT );
         jPanel15.add( jLabel6, null );
-        jPanel15.add( jTextFieldPValueThreshold, null );
+        jPanel15.add( geneScoreThresholdTextField, null );
         oraPanel.add( jPanel15, null );
 
         // resampPanel stuff///////////////////////////////////////////////////////
@@ -290,13 +290,13 @@ public class AnalysisWizardStep5 extends WizardStep {
     private void setValues() {
         jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
 
-        if ( settings.getRawScoreMethod().equals( Settings.MultiProbeHandling.MEAN ) ) {
+        if ( settings.getGeneSetResamplingScoreMethod().equals( Settings.GeneScoreMethod.MEAN ) ) {
             jRadioButtonMean.setSelected( true );
         } else {
             jRadioButtonMedian.setSelected( true );
         }
 
-        jTextFieldPValueThreshold.setText( String.valueOf( settings.getPValThreshold() ) );
+        geneScoreThresholdTextField.setText( String.valueOf( settings.getGeneScoreThreshold() ) );
         jCheckBoxDoLog.setSelected( settings.getDoLog() );
         jCheckBoxBigIsBetter.setSelected( settings.getBigIsBetter() );
         jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
@@ -310,12 +310,12 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
 
         if ( jRadioButtonMean.isSelected() ) {
-            settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN );
+            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
         } else {
-            settings.setRawScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
         }
 
-        settings.setPValThreshold( Double.valueOf( jTextFieldPValueThreshold.getText() ).doubleValue() );
+        settings.setGeneScoreThreshold( Double.valueOf( geneScoreThresholdTextField.getText() ).doubleValue() );
         settings.setDoLog( jCheckBoxDoLog.isSelected() );
         settings.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
         settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );

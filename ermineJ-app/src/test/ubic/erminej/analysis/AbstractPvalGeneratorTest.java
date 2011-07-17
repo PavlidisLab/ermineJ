@@ -33,7 +33,7 @@ import ubic.erminej.data.GeneScores;
  * @author pavlidis
  * @version $Id$
  */
-abstract class AbstractPvalGeneratorTest extends TestCase {
+public abstract class AbstractPvalGeneratorTest extends TestCase {
     protected OraPvalGenerator test = null;
     protected GeneAnnotations annotations = null;
     protected GeneScores scores = null;
@@ -53,7 +53,7 @@ abstract class AbstractPvalGeneratorTest extends TestCase {
         if ( ism == null || is == null || isi == null ) throw new IOException();
 
         s = new Settings();
-        s.setPValThreshold( 0.015 );
+        s.setGeneScoreThreshold( 0.015 );
         s.setMinClassSize( 2 );
         s.setScoreCol( 2 );
         s.setDoLog( true );

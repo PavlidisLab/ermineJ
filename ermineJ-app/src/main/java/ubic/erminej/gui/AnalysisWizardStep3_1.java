@@ -29,6 +29,8 @@ import javax.swing.JPanel;
 import ubic.erminej.Settings;
 
 /**
+ * Choose the GO aspects to use.
+ * 
  * @author pavlidis
  * @version $Id$
  */

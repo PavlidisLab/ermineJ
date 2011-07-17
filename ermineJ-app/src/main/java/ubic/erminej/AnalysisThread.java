@@ -318,23 +318,6 @@ public class AnalysisThread extends Thread {
         return settings.getDoLog() != oldSettings.getDoLog() || settings.getScoreCol() != oldSettings.getScoreCol();
     }
 
-    // /**
-    // * @param activeProbes
-    // * @param needToMakeNewGeneData
-    // * @return
-    // */
-    // private synchronized boolean needNewGeneData( Set activeProbes ) {
-    // log.debug( "Entering needNewGeneData" );
-    // for ( Iterator it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
-    // GeneAnnotations test = ( GeneAnnotations ) geneDataSets.get( it.next() );
-    // if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
-    // geneData = test;
-    // return false;
-    // }
-    // }
-    // return true;
-    // }
-
     /**
      * @param rawData
      * @param geneScores

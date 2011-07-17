@@ -56,11 +56,7 @@ import ubic.erminej.data.Histogram;
  * @version $Id$
  */
 public class GeneSetPvalRun {
-
-    /**
-     * 
-     */
-    private static final int NUM_WY_SAMPLES = 10000;
+ 
     private GeneAnnotations geneData;
     private GeneScores geneScores;
 
@@ -77,7 +73,7 @@ public class GeneSetPvalRun {
     private String name; // name of this run.
 
     /**
-     * Use this when we are loading in existing results.
+     * Use this when we are loading in existing results from a file.
      * 
      * @param activeProbes
      * @param settings
@@ -102,22 +98,6 @@ public class GeneSetPvalRun {
         this.multifunctionalityCorrelation = multifunctionalityCorrelation;
 
         sortResults();
-        // get the class sizes.
-
-        GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData, geneScores, settings.getUseWeights() );
-
-        messenger.showStatus( "Multiple test correction..." );
-        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
-                results, null );
-        String mtc_method = "bh";
-        if ( mtc_method.equals( "bon" ) ) {
-            mt.bonferroni();
-        } else if ( mtc_method.equals( "bh" ) ) {
-            mt.benjaminihochberg( 0.05 );
-        } else if ( mtc_method.equals( "wy" ) ) {
-            mt.westfallyoung( 10000 );
-        }
-
         // For table output
         for ( int i = 0; i < sortedclasses.size(); i++ ) {
             results.get( sortedclasses.get( i ) ).setRank( i + 1 );
@@ -152,10 +132,9 @@ public class GeneSetPvalRun {
         runAnalysis( activeProbes, settings, geneData, rawData, goData, geneScores, messenger );
     }
 
-    // /**
-    // * Do a new analysis, starting from the bare essentials.
-    // */
-
+    /**
+     * Do a new analysis, starting from the bare essentials.
+     */
     public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GONames goData, GeneScores geneScores ) {
         this.settings = settings;
         this.geneData = geneData;
@@ -241,12 +220,12 @@ public class GeneSetPvalRun {
         if ( multipleTestCorrMethod == Settings.MultiTestCorrMethod.BONFERONNI ) {
             mt.bonferroni();
         } else if ( multipleTestCorrMethod.equals( Settings.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
-            mt.benjaminihochberg( 0.05 );
+            mt.benjaminihochberg();
         } else if ( multipleTestCorrMethod.equals( Settings.MultiTestCorrMethod.WESTFALLYOUNG ) ) {
             if ( !( settings.getClassScoreMethod().equals( Settings.Method.GSR ) ) )
                 throw new UnsupportedOperationException(
                         "Westfall-Young correction is not supported for this analysis method" );
-            mt.westfallyoung( NUM_WY_SAMPLES );
+            mt.westfallyoung(   );
         } else {
             throw new IllegalArgumentException( "Unknown multiple test correction method: " + multipleTestCorrMethod );
         }

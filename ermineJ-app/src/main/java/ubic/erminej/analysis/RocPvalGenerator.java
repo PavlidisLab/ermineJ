@@ -56,7 +56,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * Generate a complete set of class results. The arguments are not constant under pemutations.
+     * Generate a complete set of class results. 
      * 
      * @param group_pval_map a <code>Map</code> value
      * @param probesToPvals a <code>Map</code> value

@@ -179,7 +179,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         this.numRuns = settings.getIterations();
         this.setQuantile( settings.getQuantile() );
         this.useWeights = ( Boolean.valueOf( settings.getUseWeights() ) ).booleanValue();
-        this.setMethod( settings.getRawScoreMethod() );
+        this.setMethod( settings.getGeneSetResamplingScoreMethod() );
         this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
         this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
         if ( classMaxSize < classMinSize ) {

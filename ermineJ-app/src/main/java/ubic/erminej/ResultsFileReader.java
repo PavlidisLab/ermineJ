@@ -33,7 +33,7 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.data.GeneSetResult;
 
 /**
- * Load results from a flat file on disk.
+ * Load results from a file
  * 
  * @author Paul Pavlidis
  * @author Homin Lee
@@ -76,9 +76,9 @@ public class ResultsFileReader {
                 int effsize = Integer.parseInt( st.nextToken() );
                 double score = Double.parseDouble( st.nextToken() );
                 double pval = Double.parseDouble( st.nextToken() );
-                GeneSetResult c = new GeneSetResult( classId, className, size, effsize, score, pval );
+                double correctedPval = Double.parseDouble( st.nextToken() );
+                GeneSetResult c = new GeneSetResult( classId, className, size, effsize, score, pval, correctedPval );
                 results.put( classId, c );
-                // fixme: multifunctionality should be computed?
             }
         }
         dis.close();

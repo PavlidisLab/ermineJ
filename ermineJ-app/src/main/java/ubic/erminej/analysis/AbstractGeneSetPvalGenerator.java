@@ -150,18 +150,6 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     }
 
     /**
-     * Test whether a score meets a threshold. This might not really belong here.
-     * 
-     * @param geneScore
-     * @param geneScoreThreshold
-     * @return
-     */
-    protected boolean scorePassesThreshold( double geneScore, double geneScoreThreshold ) {
-        return ( settings.upperTail() && geneScore >= geneScoreThreshold )
-                || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
-    }
-
-    /**
      * @param globalMissingAspectTreatedAsUsable The globalMissingAspectTreatedAsUsable to set.
      */
     public void setGlobalMissingAspectTreatedAsUsable( boolean globalMissingAspectTreatedAsUsable ) {

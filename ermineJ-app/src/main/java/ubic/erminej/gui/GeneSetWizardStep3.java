@@ -130,7 +130,7 @@ public class GeneSetWizardStep3 extends WizardStep {
         step3Panel.add( ncInfo2Panel, BorderLayout.CENTER );
 
         this.addHelp( "<html><b>Choose a new gene set identifier and description.</b><br>"
-                + "The custom gene set will automatically be saved to your hard drive"
+                + "The custom gene set will automatically be saved on your system"
                 + " to be used again in future analyses." );
         this.addMain( step3Panel );
     }

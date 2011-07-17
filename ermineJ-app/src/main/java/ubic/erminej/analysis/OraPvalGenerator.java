@@ -60,9 +60,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         this.inputSize = inputSize;
 
         if ( settings.getUseLog() ) {
-            this.geneScoreThreshold = -Arithmetic.log10( settings.getPValThreshold() );
+            this.geneScoreThreshold = -Arithmetic.log10( settings.getGeneScoreThreshold() );
         } else {
-            this.geneScoreThreshold = settings.getPValThreshold();
+            this.geneScoreThreshold = settings.getGeneScoreThreshold();
         }
 
     }
@@ -132,7 +132,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                     continue;
                 }
 
-                if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
+                if ( scorePassesThreshold( geneScore ) ) {
                     /*
                      * if ( log.isDebugEnabled() ) { log.debug( className + " " + probe + " " + geneScore + " beats " +
                      * geneScoreThreshold ); }
@@ -151,7 +151,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                  */
                 Double score = probesToScores.get( probe );
 
-                if ( scorePassesThreshold( score, geneScoreThreshold ) ) {
+                if ( scorePassesThreshold( score ) ) {
                     // if ( log.isDebugEnabled() ) log.debug( probe + " " + score + " beats " + geneScoreThreshold );
                     successes++;
                 } else {
@@ -197,5 +197,17 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         res.setPValue( oraPval );
         return res;
 
+    }
+
+    /**
+     * Test whether a score meets a threshold.
+     * 
+     * @param geneScore
+     * @param geneScoreThreshold
+     * @return
+     */
+    private boolean scorePassesThreshold( double geneScore ) {
+        return ( settings.upperTail() && geneScore >= geneScoreThreshold )
+                || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
     }
 }

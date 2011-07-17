@@ -40,7 +40,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     private int rank;
 
     public GeneSetResult() {
-        this( null, null, 0, 0, 0.0, 1.0 );
+        this( null, null, 0, 0, 0.0, 1.0, 1.0 );
     }
 
     /**
@@ -63,13 +63,15 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @param score
      * @param pvalue
      */
-    public GeneSetResult( String id, String name, int size, int effectiveSize, double score, double pvalue ) {
+    public GeneSetResult( String id, String name, int size, int effectiveSize, double score, double pvalue,
+            double correctedPvalue ) {
         this.classId = id;
         this.clasName = name;
         this.pvalue = pvalue;
         this.score = score;
         this.size = size;
         this.effectiveSize = effectiveSize;
+        this.correctedPvalue = correctedPvalue;
     }
 
     /**

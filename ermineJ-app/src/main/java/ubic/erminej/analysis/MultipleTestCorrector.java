@@ -43,6 +43,7 @@ import ubic.erminej.data.Histogram;
  * @version $Id$
  */
 public class MultipleTestCorrector extends AbstractLongTask {
+    private static final int DEFAULT_WY_TRIALS = 10000;
     protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
     private List<String> sortedclasses;
     private Map<String, GeneSetResult> results;
@@ -67,6 +68,33 @@ public class MultipleTestCorrector extends AbstractLongTask {
     }
 
     /**
+     * Benjamini-Hochberg correction of pvalues.
+     * 
+     * @param fdr double desired false discovery rate.
+     */
+    public void benjaminihochberg() {
+        int numclasses = sortedclasses.size();
+        int n = numclasses;
+
+        Collections.reverse( sortedclasses ); // start from the worst class.
+        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
+            if ( Thread.currentThread().isInterrupted() ) break;
+            String nextclass = it.next();
+            GeneSetResult res = results.get( nextclass );
+            double actual_p = res.getPvalue();
+
+            // double thresh = fdr * n / numclasses;
+
+            double thisFDR = Math.min( actual_p * numclasses / n, 1.0 );
+
+            // the actual fdr at this threshold is n / (actual_p * numclasses).
+            res.setCorrectedPvalue( thisFDR ); // todo this is slightly broken when there are tied pvals.
+            n--;
+        }
+        Collections.reverse( sortedclasses ); // put it back.
+    }
+
+    /**
      * Bonferroni correction of class pvalues.
      */
     public void bonferroni() {
@@ -87,30 +115,12 @@ public class MultipleTestCorrector extends AbstractLongTask {
     }
 
     /**
-     * Benjamini-Hochberg correction of pvalues.
+     * Run WY with a default number of trials.
      * 
-     * @param fdr double desired false discovery rate.
+     * @see westfallyoung(numtrials)
      */
-    public void benjaminihochberg( double fdr ) {
-        int numclasses = sortedclasses.size();
-        int n = numclasses;
-
-        Collections.reverse( sortedclasses ); // start from the worst class.
-        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
-            if ( Thread.currentThread().isInterrupted() ) break;
-            String nextclass = it.next();
-            GeneSetResult res = results.get( nextclass );
-            double actual_p = res.getPvalue();
-
-            // double thresh = fdr * n / numclasses;
-
-            double thisFDR = Math.min( actual_p * numclasses / n, 1.0 );
-
-            // the actual fdr at this threshold is n / (actual_p * numclasses).
-            res.setCorrectedPvalue( thisFDR ); // todo this is slightly broken when there are tied pvals.
-            n--;
-        }
-        Collections.reverse( sortedclasses ); // put it back.
+    public void westfallyoung() {
+        westfallyoung( DEFAULT_WY_TRIALS ); // default number of trials.
     }
 
     /**

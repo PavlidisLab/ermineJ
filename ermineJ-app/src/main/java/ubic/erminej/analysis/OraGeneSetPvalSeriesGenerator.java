@@ -40,9 +40,6 @@ import ubic.erminej.data.GeneSetResult;
  */
 public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
-    /**
-     * 
-     */
     private static final int ALERT_UPDATE_FREQUENCY = 300;
 
     private int numOverThreshold;
@@ -57,11 +54,10 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     }
 
     /**
-     * Generate a complete set of class results. The arguments are not constant under permutations. The second is only
-     * needed for the aroc method. This is to be used only for the 'real' data since it modifies 'results',
+     * Generate a complete set of class results.
      * 
-     * @param group_pval_map a <code>Map</code> value
-     * @param probesToPvals a <code>Map</code> value
+     * @param geneToGeneScoreMap
+     * @param probesToPvals
      */
     public Map<String, GeneSetResult> classPvalGenerator( Map<String, Double> geneToGeneScoreMap,
             Map<String, Double> probesToPvals, StatusViewer messenger ) {
@@ -88,25 +84,21 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     }
 
     /**
-     * Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution. This is a constant under
-     * permutations, but depends on weights.
+     * Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution.
      * 
-     * @param inp_entries The pvalues for the probes (no weights) or groups (weights)
+     * @param geneScores The pvalues for the probes (no weights) or groups (weights)
      * @return number of entries that meet the user-set threshold.
      * @todo make this private and called by OraPvalGenerator.
      */
-    public int hgSizes( Collection<Entry<String, Double>> inp_entries ) {
+    public int hgSizes( Collection<Entry<String, Double>> geneScores ) {
 
-        double geneScoreThreshold = settings.getPValThreshold();
+        double geneScoreThreshold = settings.getGeneScoreThreshold();
 
         if ( settings.getDoLog() ) {
             geneScoreThreshold = -Arithmetic.log10( geneScoreThreshold );
         }
 
-        Iterator<Entry<String, Double>> itr = inp_entries.iterator();
-        while ( itr.hasNext() ) {
-            ifInterruptedStop();
-            Entry<String, Double> m = itr.next();
+        for ( Entry<String, Double> m : geneScores ) {
             double geneScore = m.getValue();
 
             if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {
@@ -117,6 +109,18 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
 
         }
         return numOverThreshold;
+    }
+
+    /**
+     * Test whether a score meets a threshold.
+     * 
+     * @param geneScore
+     * @param geneScoreThreshold
+     * @return
+     */
+    private boolean scorePassesThreshold( double geneScore, double geneScoreThreshold ) {
+        return ( settings.upperTail() && geneScore >= geneScoreThreshold )
+                || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
     }
 
 }

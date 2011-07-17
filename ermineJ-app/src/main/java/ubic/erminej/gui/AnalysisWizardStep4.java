@@ -32,13 +32,12 @@ import javax.swing.SwingConstants;
 import ubic.erminej.Settings;
 
 /**
+ * Generic settings common to all methods (range of gene set sizes, replicate probe handling)
+ * 
  * @author Homin K Lee
  * @version $Id$
  */
 public class AnalysisWizardStep4 extends WizardStep {
-    /**
-     * 
-     */
     private static final long serialVersionUID = -5916400713486392185L;
     private Settings settings;
     private JTextField jTextFieldMaxClassSize;

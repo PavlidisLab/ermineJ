@@ -283,7 +283,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         if ( runSettings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
             tooltip += "ORA Analysis<br>";
-            coda += "P value threshold: " + runSettings.getPValThreshold();
+            coda += "P value threshold: " + runSettings.getGeneScoreThreshold();
         } else if ( runSettings.getClassScoreMethod().equals( Settings.Method.GSR ) ) {
             tooltip += "Resampling Analysis<br>";
             coda += runSettings.getIterations() + " iterations<br>";
@@ -308,9 +308,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
             tooltip += "Gene Rep Treatment: Best <br>";
         if ( runSettings.getClassScoreMethod().equals( Settings.Method.GSR )
                 || runSettings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
-            if ( runSettings.getRawScoreMethod().equals( Settings.GeneScoreMethod.MEAN ) )
+            if ( runSettings.getGeneSetResamplingScoreMethod().equals( Settings.GeneScoreMethod.MEAN ) )
                 tooltip += "Class Raw Score Method: Mean <br>";
-            else if ( runSettings.getRawScoreMethod().equals( Settings.GeneScoreMethod.QUANTILE ) )
+            else if ( runSettings.getGeneSetResamplingScoreMethod().equals( Settings.GeneScoreMethod.QUANTILE ) )
                 tooltip += "Class Raw Score Method: Median <br>";
         }
 

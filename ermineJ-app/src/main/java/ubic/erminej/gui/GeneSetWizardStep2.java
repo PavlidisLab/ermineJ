@@ -44,8 +44,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.AbstractTableModel;
 
 import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.erminej.data.UserDefinedGeneSet;
-import ubic.erminej.data.UserDefinedGeneSetManager;
+import ubic.erminej.data.UserDefinedGeneSet; 
 import ubic.erminej.gui.table.TableSorter;
 
 /**

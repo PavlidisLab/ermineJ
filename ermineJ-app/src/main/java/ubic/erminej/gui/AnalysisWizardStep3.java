@@ -43,7 +43,6 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.table.TableSorter;
@@ -56,10 +55,6 @@ import ubic.erminej.gui.table.TableSorter;
  * @version $Id$
  */
 public class AnalysisWizardStep3 extends WizardStep {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -7777686534611702796L;
 
     private Settings settings;

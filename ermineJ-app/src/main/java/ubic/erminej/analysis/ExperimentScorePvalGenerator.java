@@ -31,7 +31,7 @@ import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.Histogram;
 
 /**
- * Generates gene set p values using the resamplin-based 'experiment score' method of Pavlidis et al.
+ * Generates gene set p values using the resampling-based 'experiment score' method of Pavlidis et al.
  * 
  * @author Paul Pavlidis
  * @version $Id$
@@ -110,7 +110,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
         // get raw score and pvalue.
         double rawscore = ResamplingExperimentGeneSetScore.computeRawScore( groupPvalArr, effSize, settings
-                .getRawScoreMethod() );
+                .getGeneSetResamplingScoreMethod() );
         double pval = scoreToPval( effSize, rawscore );
 
         if ( pval < 0.0 ) {

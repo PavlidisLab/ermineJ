@@ -1,7 +1,7 @@
 /*
  * The ermineJ project
  * 
- * Copyright (c) 2006 University of British Columbia
+ * Copyright (c) 2006-2011 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -171,24 +172,24 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Add user-defined gene set(s) to the GeneData. The format is:
-     * <ol>
+     * Add user-defined gene set(s) to the GeneData.
+     * <ul>
      * <li>Rows starting with "#" are ignored as comments.</li>
-     * </ol>
-     * <ol>
-     * <li>Rows starting with "#" are ignored as comments.</li>
-     * <li>The type of gene set {gene|probe}</li>
-     * <li>The identifier for the gene set, e.g, "My gene set"; tab characters should be avoided in this line to avoid
-     * confusion with the other supported format</li>
-     * <li>The description for the gene set, e.g, "Genes I like"; tab characters should be avoided in this line to avoid
-     * confusion with the other format</li>
-     * <li>Any number of rows containing gene or probe identifiers.</li>
      * <li>A row starting with "===" delimits multiple gene sets in one file.</li>
+     * </ul>
+     * The format of a group is:
+     * <ol>
+     * <li>The first line in a group: The type of gene set {gene|probe}</li>
+     * <li>Second line: The identifier for the gene set, e.g, "My gene set"; tab characters should be avoided in this
+     * line to avoid confusion with the other supported format</li>
+     * <li>Third line: The description for the gene set, e.g, "Genes I like"; tab characters should be avoided in this
+     * line to avoid confusion with the other format</li>
+     * <li>Any number of rows containing gene or probe identifiers.</li>
      * </ol>
      * Alternatively, a tab-delimited file can be provided with one group per row, with the following format:
      * <ol>
      * <li>A name for the group (e.g., KEGG identifier)</li>
-     * <li>A description for the group</li>
+     * <li>A description for the group (can be blank but must present)</li>
      * <li>The remaining fields are interpreted as gene symbols</li>
      * <li>Lines starting with "#" are ignored as comments.</li>
      * <li>Lines starting with "===" are ignored.</li>
@@ -219,6 +220,25 @@ public class UserDefinedGeneSetManager {
             set.setSourceFile( fileName );
         }
 
+        return result;
+    }
+
+    /**
+     * For testing only -- does NOT set the file name since we don't know it.
+     * 
+     * @param is
+     * @return
+     * @throws IOException
+     */
+    protected static Collection<UserDefinedGeneSet> loadUserGeneSetFile( InputStream is ) throws IOException {
+        BufferedReader dis = new BufferedReader( new InputStreamReader( is ) );
+        Collection<UserDefinedGeneSet> result = new HashSet<UserDefinedGeneSet>();
+
+        while ( dis.ready() ) {
+            UserDefinedGeneSet newSet = readOneSet( dis );
+            result.add( newSet );
+        }
+        dis.close();
         return result;
     }
 
@@ -304,21 +324,42 @@ public class UserDefinedGeneSetManager {
         }
 
         /*
+         * FIXME we need to determine a clearer policy for what happens if you modify a set.
+         */
+
+        /*
+         * FIXME this assume the set cam in the ermineJ native format!!
+         */
+
+        /*
          * Handle case of multiple groups per file. We re-write it, clobber the file.
          */
-        Collection<UserDefinedGeneSet> sets = loadUserGeneSetFile( fileName );
+        if ( ( new File( fileName ) ).canRead() ) {
+            Collection<UserDefinedGeneSet> sets = loadUserGeneSetFile( fileName );
 
-        BufferedWriter out = new BufferedWriter( new FileWriter( fileName, false ) );
-        for ( UserDefinedGeneSet s : sets ) {
-            if ( s.getId().equals( setToSave.getId() ) ) {
-                writeSet( setToSave, out );
-            } else {
-                writeSet( s, out );
+            BufferedWriter out = new BufferedWriter( new FileWriter( fileName, false ) );
+            for ( UserDefinedGeneSet s : sets ) {
+                if ( s.getId().equals( setToSave.getId() ) ) {
+                    writeSet( setToSave, out );
+                } else {
+                    writeSet( s, out );
+                }
             }
+            out.close();
+        } else {
+            BufferedWriter out = new BufferedWriter( new FileWriter( fileName, false ) );
+            writeSet( setToSave, out );
+            out.close();
         }
-        out.close();
     }
 
+    /**
+     * Write a set using "ermineJ native" format (not the tab-delimited one)
+     * 
+     * @param set
+     * @param out
+     * @throws IOException
+     */
     private static void writeSet( UserDefinedGeneSet set, BufferedWriter out ) throws IOException {
         String cleanedDescription = set.getDesc().replace( '\n', ' ' );
         String filetype = ( set.isGenes() ) ? "probe" : "gene";
@@ -365,7 +406,8 @@ public class UserDefinedGeneSetManager {
             }
         }
         if ( ignored > 0 ) {
-            log.info( ignored + " items skipped because they are not in the current platform." );
+            log.info( ignored
+                    + " probes/genes skipped from user-defined group because they are not in the current platform." );
         }
         return probeSet;
     }

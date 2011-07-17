@@ -152,13 +152,13 @@ public class ClassScoreSimple {
     public void setGeneScoreSummaryMethod( int val ) {
         switch ( val ) {
             case 0:
-                settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN );
+                settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
                 break;
             case 1:
-                settings.setRawScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
                 break;
             case 2:
-                settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -171,7 +171,7 @@ public class ClassScoreSimple {
      * @param val
      */
     public void setGeneScoreThreshold( double val ) {
-        this.settings.setPValThreshold( val );
+        this.settings.setGeneScoreThreshold( val );
     }
 
     /**

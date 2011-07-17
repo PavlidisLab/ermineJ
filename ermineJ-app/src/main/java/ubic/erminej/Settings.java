@@ -103,11 +103,11 @@ public class Settings {
     private static final String MTC_CONFIG_NAME = "mtc";
     private static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     private static final String OUTPUT_FILE = "outputFile";
-    private static final String P_VAL_THRESHOLD = "pValThreshold";
+    private static final String GENE_SCORE_THRESHOLD = "pValThreshold"; // TODO deprecate this string
     private static final String PREFERENCES_FILE_NAME = "preferencesFileName";
     private static final String QUANTILE_CONFIG_NAME = "quantile";
     private static final String RAW_FILE_CONFIG_NAME = "rawFile";
-    private static final String RAW_SCORE_METHOD = "rawScoreMethod";
+    private static final String GENE_SET_RESAMPLING_SCORE_METHOD = "rawScoreMethod";
     private static final String SCORE_COL = "scoreCol";
     private static final String SCORE_FILE = "scoreFile";
     private static final String SELECTED_CUSTOM_GENESETS = "selectedCustomGeneSets";
@@ -119,8 +119,8 @@ public class Settings {
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
      * etc.)
      */
-    protected static final String[] ANALYSIS_SETTINGS = new String[] { P_VAL_THRESHOLD, QUANTILE_CONFIG_NAME,
-            RAW_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE, SCORE_COL,
+    protected static final String[] ANALYSIS_SETTINGS = new String[] { GENE_SCORE_THRESHOLD, QUANTILE_CONFIG_NAME,
+            GENE_SET_RESAMPLING_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE, SCORE_COL,
             MTC_CONFIG_NAME, ITERATIONS, CLASS_FILE, BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL,
             ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD, FILTER_NONSPECIFIC, USE_MULTIFUNCTIONALITY_CORRECTION,
             USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP };
@@ -428,8 +428,13 @@ public class Settings {
 
     }
 
-    public double getPValThreshold() {
-        return config.getDouble( P_VAL_THRESHOLD, 0.001 );
+    /**
+     * Value used for ORA
+     * 
+     * @return
+     */
+    public double getGeneScoreThreshold() {
+        return config.getDouble( GENE_SCORE_THRESHOLD, 0.001 );
     }
 
     public int getQuantile() {
@@ -454,8 +459,8 @@ public class Settings {
     /**
      * @return the method to be used to combine scores. This is only relevant for the gene set resampling method.
      */
-    public GeneScoreMethod getRawScoreMethod() {
-        String storedValue = config.getString( RAW_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
+    public GeneScoreMethod getGeneSetResamplingScoreMethod() {
+        String storedValue = config.getString( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
 
         // backwards compatibility
         if ( NumberUtils.isDigits( storedValue ) ) {
@@ -463,18 +468,18 @@ public class Settings {
 
             switch ( oldVal ) {
                 case 0:
-                    setRawScoreMethod( Settings.GeneScoreMethod.MEAN );
+                    setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
                     break;
                 case 1:
-                    setRawScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                    setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
                     break;
                 case 2:
-                    setRawScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                    setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
-            storedValue = config.getString( RAW_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
+            storedValue = config.getString( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
         }
 
         return Settings.GeneScoreMethod.valueOf( storedValue );
@@ -690,9 +695,14 @@ public class Settings {
         this.getConfig().setProperty( key, value );
     }
 
-    public void setPValThreshold( double val ) {
-        log.debug( "pvalue threshold set to " + val );
-        this.config.setProperty( P_VAL_THRESHOLD, val );
+    /**
+     * Only applies to ORA
+     * 
+     * @param val
+     */
+    public void setGeneScoreThreshold( double val ) {
+        log.debug( "gene score threshold set to " + val );
+        this.config.setProperty( GENE_SCORE_THRESHOLD, val );
     }
 
     public void setQuantile( int val ) {
@@ -708,8 +718,8 @@ public class Settings {
      * 
      * @param val
      */
-    public void setRawScoreMethod( Settings.GeneScoreMethod val ) {
-        this.config.setProperty( RAW_SCORE_METHOD, val.toString() );
+    public void setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod val ) {
+        this.config.setProperty( GENE_SET_RESAMPLING_SCORE_METHOD, val.toString() );
     }
 
     public void setScoreCol( int val ) {

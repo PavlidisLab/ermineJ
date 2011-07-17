@@ -33,13 +33,12 @@ import javax.swing.JRadioButton;
 import ubic.erminej.Settings;
 
 /**
- * @author not attributable
+ * Choose the method for the analysis.
+ * 
+ * @author homin
  * @version $Id$
  */
 public class AnalysisWizardStep1 extends WizardStep {
-    /**
-     * 
-     */
     private static final long serialVersionUID = -8558401501649026545L;
     private AnalysisWizard wiz;
     private Settings settings;

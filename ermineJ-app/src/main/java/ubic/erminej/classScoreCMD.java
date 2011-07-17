@@ -464,13 +464,13 @@ public class classScoreCMD {
 
                     switch ( intarg ) {
                         case 0:
-                            settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN );
+                            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
                             break;
                         case 1:
-                            settings.setRawScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
                             break;
                         case 2:
-                            settings.setRawScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
                             break;
                         default:
                             throw new IllegalArgumentException();
@@ -482,7 +482,7 @@ public class classScoreCMD {
                 }
             } catch ( NumberFormatException e ) {
                 GeneScoreMethod opt = Settings.GeneScoreMethod.valueOf( arg );
-                settings.setRawScoreMethod( opt );
+                settings.setGeneSetResamplingScoreMethod( opt );
             } catch ( Exception e ) {
                 System.err.println( "Raw score method must be set to MEAN, QUANTILE or MEAN_ABOVE_QUANTILE" );
                 showHelp();
@@ -616,15 +616,9 @@ public class classScoreCMD {
             arg = commandLine.getOptionValue( 't' );
             try {
                 double doublearg = Double.parseDouble( arg );
-                if ( doublearg >= 0 && doublearg <= 1 )
-                    settings.setPValThreshold( doublearg );
-                else {
-                    System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
-                    showHelp();
-                    return false;
-                }
+                settings.setGeneScoreThreshold( doublearg );
             } catch ( NumberFormatException e ) {
-                System.err.println( "The p value threshold must be between 0 and 1 (-x)" );
+                System.err.println( "The threshold must be a number" );
                 showHelp();
                 return false;
             }
