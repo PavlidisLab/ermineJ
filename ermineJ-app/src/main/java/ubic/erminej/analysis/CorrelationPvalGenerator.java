@@ -29,13 +29,15 @@ import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.MatrixStats;
 import ubic.basecode.util.StringUtil;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.dataStructure.matrix.DenseDoubleMatrix;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm; 
 import ubic.erminej.data.Histogram;
+import ubic.erminej.data.Probe;
 
 /**
  * @author Shahmil Merchant
@@ -45,9 +47,8 @@ import ubic.erminej.data.Histogram;
 public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private double histRange = 0;
-    private DoubleMatrix<String, String> data = null;
+    private DoubleMatrix<Probe, String> data = null;
     private Histogram hist;
-    private Map<String, String> probeToGeneMap;
     private Settings.MultiProbeHandling geneRepTreatment = Settings.MultiProbeHandling.BEST;
     private int cacheHits = 0;
     private int tests = 0;
@@ -83,9 +84,9 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
         this.cacheHits = usedCache;
     }
 
-    public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, GONames gon,
-            DoubleMatrix<String, String> data ) {
-        super( settings, a, csc, gon );
+    public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc,
+            DoubleMatrix<Probe, String> data ) {
+        super( settings, a, csc );
         this.data = data;
 
         dataAsRawMatrix = new double[data.rows()][];
@@ -97,14 +98,14 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
         nanStatusMatrix = MatrixStats.nanStatusMatrix( dataAsRawMatrix );
     }
 
-    public GeneSetResult classPval( String geneSetName ) {
-        if ( !super.checkAspect( geneSetName ) ) return null;
+    public GeneSetResult classPval( GeneSetTerm geneSetName ) {
+        if ( !super.checkAspectAndRedundancy( geneSetName ) ) return null;
         int effSize = effectiveSizes.get( geneSetName );
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
             return null;
         }
 
-        Collection<String> probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
+        Collection<Probe> probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
 
         /*
          * Iterate over the probes to get pairwise correlations.; we do this in a list so we can do each comparison just
@@ -112,32 +113,32 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
          */
         double sumCorrel = 0.0;
         double nummeas = 0;
-        Map<Object, Double> values = new HashMap<Object, Double>();
-        List<String> probeList = new ArrayList<String>( probesInSet );
+        Map<Long, Double> values = new HashMap<Long, Double>();
+        List<Probe> probeList = new ArrayList<Probe>( probesInSet );
 
         for ( int i = probeList.size() - 1; i >= 0; i-- ) {
-            String probei = probeList.get( i );
+            Probe probei = probeList.get( i );
 
             if ( !data.containsRowName( probei ) ) {
                 continue;
             }
 
             int iIndex = data.getRowIndexByName( probei );
-            String genei = probeToGeneMap.get( probei );
+            Gene genei = probei.getGene();
             double[] irow = dataAsRawMatrix[iIndex];
             int numProbesForGeneI = geneAnnots.numProbesForGene( genei );
             boolean multipleProbesI = numProbesForGeneI > 1;
 
             for ( int j = i - 1; j >= 0; j-- ) {
 
-                String probej = probeList.get( j );
+                Probe probej = probeList.get( j );
 
                 if ( !data.containsRowName( probej ) ) {
                     continue;
                 }
 
                 int jIndex = data.getRowIndexByName( probej );
-                String genej = probeToGeneMap.get( probej );
+                Gene genej = probej.getGene();
 
                 if ( genei.equals( genej ) ) {
                     continue; // always ignore self-comparisons.
@@ -150,7 +151,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
                 if ( multipleProbesI || numProbesForGeneJ > 1 ) { // do we even need to bother?
                     if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
-                        Object key = StringUtil.twoStringHashKey( genei, genej );
+                        Long key = StringUtil.twoStringHashKey( genei.getSymbol(), genej.getSymbol() );
                         if ( !values.containsKey( key ) || values.get( key ) < corr ) {
                             values.put( key, new Double( corr ) );
                         }
@@ -167,7 +168,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                     sumCorrel += corr;
                     nummeas++;
                     if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
-                        Object key = StringUtil.twoStringHashKey( genei, genej );
+                        Long key = StringUtil.twoStringHashKey( genei.getSymbol(), genej.getSymbol() );
                         values.put( key, new Double( corr ) );
                     }
                 }
@@ -185,12 +186,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         double geneSetMeanCorrel = sumCorrel / nummeas;
 
-        String nameForId = geneSetName;
-        if ( goName != null ) {
-            nameForId = goName.getNameForId( geneSetName );
-        }
-        GeneSetResult result = new GeneSetResult( geneSetName, nameForId, actualSizes.get( geneSetName ).intValue(),
-                effSize );
+        GeneSetResult result = new GeneSetResult( geneSetName, actualSizes.get( geneSetName ).intValue(), effSize );
         result.setScore( geneSetMeanCorrel );
         result.setPValue( hist.getValue( effSize, geneSetMeanCorrel, true ) ); // always upper tail.
         return result;
@@ -200,14 +196,14 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param name
      * @return
      */
-    public boolean containsRow( String name ) {
+    public boolean containsRow( Probe name ) {
         return data.containsRowName( name );
     }
 
     /**
      * @return
      */
-    public DoubleMatrix<String, String> getData() {
+    public DoubleMatrix<Probe, String> getData() {
         return data;
     }
 
@@ -248,13 +244,6 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      */
     public void setHistogram( Histogram hist ) {
         this.hist = hist;
-    }
-
-    /**
-     * @param probeToGeneMap
-     */
-    public void setProbeToGeneMap( Map<String, String> probeToGeneMap ) {
-        this.probeToGeneMap = probeToGeneMap;
     }
 
     /**

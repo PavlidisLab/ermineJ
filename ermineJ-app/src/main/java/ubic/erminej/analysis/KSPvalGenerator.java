@@ -18,9 +18,8 @@
  */
 package ubic.erminej.analysis;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneAnnotations;
 
 /**
  * Use the Kolmogorov-Smirnov test to evaluate the ranking of the probes.
@@ -30,8 +29,8 @@ import ubic.erminej.Settings;
  */
 public class KSPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-    public KSPvalGenerator( Settings set, GeneAnnotations an, GeneSetSizeComputer csc, GONames gon ) {
-        super( set, an, csc, gon );
+    public KSPvalGenerator( Settings set, GeneAnnotations an, GeneSetSizeComputer csc ) {
+        super( set, an, csc );
         throw new UnsupportedOperationException();
     }
 }

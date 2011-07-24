@@ -25,8 +25,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.Probe;
 
 /**
  * Class for computing the actual and effective sizes of gene sets.
@@ -35,23 +38,20 @@ import ubic.erminej.data.GeneScores;
  * @version $Id$
  */
 public class GeneSetSizeComputer {
-    protected Map<String, Integer> effectiveSizes = null;
-    protected Map<String, Integer> actualSizes = null;
+    protected Map<GeneSetTerm, Integer> effectiveSizes = null;
+    protected Map<GeneSetTerm, Integer> actualSizes = null;
     protected boolean weight_on = true;
 
     protected GeneScores geneScores;
-    protected Collection<String> activeProbes;
+
     private GeneAnnotations geneData;
 
-    public GeneSetSizeComputer( Collection<String> activeProbes, GeneAnnotations geneData, GeneScores geneScores,
-            boolean w ) {
+    public GeneSetSizeComputer( GeneAnnotations geneData, GeneScores geneScores, boolean w ) {
         this.weight_on = w;
-        this.activeProbes = activeProbes;
         this.geneData = geneData;
-
         this.geneScores = geneScores;
-        effectiveSizes = new HashMap<String, Integer>();
-        actualSizes = new HashMap<String, Integer>();
+        effectiveSizes = new HashMap<GeneSetTerm, Integer>();
+        actualSizes = new HashMap<GeneSetTerm, Integer>();
         getClassSizes();
     }
 
@@ -59,7 +59,7 @@ public class GeneSetSizeComputer {
      * Calculate class sizes for all classes - both effective and actual size
      */
     private void getClassSizes() {
-        Set<String> record = new HashSet<String>();
+        Set<Gene> record = new HashSet<Gene>();
         int size;
         int v_size;
 
@@ -70,46 +70,41 @@ public class GeneSetSizeComputer {
 
         boolean gotAtLeastOneNonZero = false;
 
-        for ( Iterator<String> iter = geneData.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneData.getActiveGeneSets().iterator(); iter.hasNext(); ) {
 
-            String className = iter.next(); // id of the class
+            GeneSetTerm className = iter.next(); // id of the class
             // (GO:XXXXXX)
-            Collection<String> values = geneData.getGeneSetProbes( className );
-            Iterator<String> I = values.iterator();
+            Collection<Probe> values = geneData.getGeneSetProbes( className );
 
             record.clear();
             size = 0;
             v_size = 0;
 
-            while ( I.hasNext() ) { // foreach item in the class.
-                String probe = I.next();
-                String gene = geneData.probeToGene( probe );
-                if ( probe != null ) {
-                    if ( activeProbes.contains( probe ) ) { // if it is in the data
-                        // set
-                        size++;
+            for ( Probe probe : values ) {
+                Gene gene = probe.getGene();
 
-                        if ( weight_on ) { // routine for weights
-                            // compute pval for every replicate group
+                size++;
 
-                            // FIXME, doesn't work if geneScores is null.
-                            if ( ( geneScores == null || geneScores.getGeneToScoreMap().containsKey( gene ) )
+                if ( weight_on ) { // routine for weights
+                    // compute pval for every replicate group
 
-                            /*
-                             * if we haven't done this probe already.
-                             */
-                            && !record.contains( gene ) ) {
+                    // FIXME, doesn't work if geneScores is null.
+                    if ( ( geneScores == null || geneScores.getGeneToScoreMap().containsKey( gene ) )
 
-                                /*
-                                 * mark it as done for this class.
-                                 */
-                                record.add( gene );
-                                v_size++; // this is used in any case.
-                            }
-                        }
+                    /*
+                     * if we haven't done this probe already.
+                     */
+                    && !record.contains( gene ) ) {
+
+                        /*
+                         * mark it as done for this class.
+                         */
+                        record.add( gene );
+                        v_size++; // this is used in any case.
                     }
-                } // end of null check
-            } // end of while over items in the class.
+                }
+
+            }
 
             if ( !weight_on ) {
                 v_size = size;
@@ -128,14 +123,14 @@ public class GeneSetSizeComputer {
     /**
      * @return Map
      */
-    public Map<String, Integer> getEffectiveSizes() {
+    public Map<GeneSetTerm, Integer> getEffectiveSizes() {
         return effectiveSizes;
     }
 
     /**
      * @return Map
      */
-    public Map<String, Integer> getActualSizes() {
+    public Map<GeneSetTerm, Integer> getActualSizes() {
         return actualSizes;
     }
 

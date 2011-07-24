@@ -24,11 +24,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Histogram;
+import ubic.erminej.data.Probe;
 
 /**
  * Generates gene set p values using the resampling-based 'experiment score' method of Pavlidis et al.
@@ -44,12 +47,10 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param settings
      * @param a
      * @param csc
-     * @param gon
      * @param hi
      */
-    public ExperimentScorePvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, GONames gon,
-            Histogram hi ) {
-        super( settings, a, csc, gon );
+    public ExperimentScorePvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, Histogram hi ) {
+        super( settings, a, csc );
         this.hist = hi;
     }
 
@@ -62,35 +63,34 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param probesToPvals
      * @return
      */
-    public GeneSetResult classPval( String geneSetName, Map<String, Double> geneToPvalMap,
-            Map<String, Double> probesToPvals ) {
-        if ( !super.checkAspect( geneSetName ) ) return null;
+    public GeneSetResult classPval( GeneSetTerm geneSetName, Map<Gene, Double> geneToPvalMap,
+            Map<Probe, Double> probesToPvals ) {
+        if ( !super.checkAspectAndRedundancy( geneSetName ) ) return null;
         int effSize = effectiveSizes.get( geneSetName );
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
             return null;
         }
 
-        Collection<String> values = geneAnnots.getGeneSetProbes( geneSetName );
-        Iterator<String> classit = values.iterator();
+        Collection<Probe> values = geneAnnots.getGeneSetProbes( geneSetName );
+
         double[] groupPvalArr = new double[effSize]; // store pvalues for items in
         // the class.
 
-        Set<String> record = new HashSet<String>();
+        Set<Gene> record = new HashSet<Gene>();
 
         int v_size = 0;
 
         // foreach item in the class.
-        while ( classit.hasNext() ) {
+        for ( Probe p : values ) {
             ifInterruptedStop();
-            String probe = classit.next(); // probe id
 
-            if ( probesToPvals.containsKey( probe ) ) { // if it is in the data
+            if ( probesToPvals.containsKey( p ) ) { // if it is in the data
                 // set. This is invariant
                 // under permutations.
 
                 if ( settings.getUseWeights() ) {
 
-                    String gene = geneAnnots.getProbeToGeneMap().get( probe );
+                    Gene gene = p.getGene();
 
                     if ( !record.contains( gene ) ) { // only count it once.
 
@@ -101,7 +101,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
                 } else { // no weights - use raw p values for each probe
 
-                    Double pbpval = probesToPvals.get( probe );
+                    Double pbpval = probesToPvals.get( p );
                     groupPvalArr[v_size] = pbpval.doubleValue();
                     v_size++;
                 }
@@ -119,11 +119,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         // set up the return object.
-        String nameForId = geneSetName;
-        if ( goName != null ) {
-            nameForId = goName.getNameForId( geneSetName );
-        }
-        GeneSetResult res = new GeneSetResult( geneSetName, nameForId, actualSizes.get( geneSetName ), effSize );
+        GeneSetResult res = new GeneSetResult( geneSetName, actualSizes.get( geneSetName ), effSize );
         res.setScore( rawscore );
         res.setPValue( pval );
         return res;

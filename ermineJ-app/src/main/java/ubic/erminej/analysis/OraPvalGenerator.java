@@ -22,11 +22,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.math.SpecFunc;
 import ubic.erminej.Settings;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.Probe;
 import cern.jet.math.Arithmetic;
 
 /**
@@ -48,13 +50,12 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param csc
      * @param not
      * @param nut
-     * @param gon
      * @param inputSize
      */
     public OraPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, int not, int nut,
-            GONames gon, int inputSize ) {
+            int inputSize ) {
 
-        super( settings, a, csc, gon );
+        super( settings, a, csc );
         this.numOverThreshold = not;
         this.numUnderThreshold = nut;
         this.inputSize = inputSize;
@@ -71,11 +72,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * Get results for one class, based on class id. The other arguments are things that are not constant under
      * permutations of the data.
      */
-    public GeneSetResult classPval( String className, Map<String, Double> geneToScoreMap,
-            Map<String, Double> probesToScores ) {
+    public GeneSetResult classPval( GeneSetTerm className, Map<Gene, Double> geneToScoreMap,
+            Map<Probe, Double> probesToScores ) {
 
-        if ( !super.checkAspect( className ) ) {
-            if ( log.isDebugEnabled() ) log.debug( className + " is not in a selected aspect" );
+        if ( !super.checkAspectAndRedundancy( className ) ) {
+            // if ( log.isDebugEnabled() ) log.debug( className + " is not in a selected aspect" );
             return null;
         }
         // inputs for hypergeometric distribution
@@ -99,14 +100,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             return null;
         }
 
-        Collection<String> probes = geneAnnots.getGeneSetProbes( className );
+        Collection<Probe> probes = geneAnnots.getGeneSetProbes( className );
 
         /*
          * Only count genes once!
          */
-        Collection<String> seenGenes = new HashSet<String>();
+        Collection<Gene> seenGenes = new HashSet<Gene>();
 
-        for ( String probe : probes ) {
+        for ( Probe probe : probes ) {
             ifInterruptedStop();
 
             if ( !probesToScores.containsKey( probe ) ) {
@@ -115,7 +116,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
             if ( settings.getUseWeights() ) {
 
-                String geneName = geneAnnots.getProbeToGeneMap().get( probe );
+                Gene geneName = probe.getGene();
 
                 if ( !geneToScoreMap.containsKey( geneName ) ) {
                     continue;
@@ -185,14 +186,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             }
         }
 
-        // set up the return object.
-
-        String nameForId = className;
-        if ( goName != null ) {
-            nameForId = goName.getNameForId( className );
-        }
-        GeneSetResult res = new GeneSetResult( className, nameForId, actualSizes.get( className ).intValue(),
-                effectiveGeneSetSize );
+        GeneSetResult res = new GeneSetResult( className, actualSizes.get( className ).intValue(), effectiveGeneSetSize );
         res.setScore( successes );
         res.setPValue( oraPval );
         return res;

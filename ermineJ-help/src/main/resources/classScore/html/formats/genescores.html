@@ -1,146 +1,210 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-<head>
-<meta name="generator" content="HTML Tidy, see www.w3.org">
-<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+	<head>
+		<meta name="generator" content="HTML Tidy, see www.w3.org">
+		<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
 
-<title>Input file formats: gene scores</title>
-<link href="../style.css" rel="stylesheet" type="text/css" media="all">
-</head>
+		<title>Input file formats: gene scores</title>
+		<link href="../style.css" rel="stylesheet" type="text/css" media="all">
+	</head>
 
-<body bgcolor="#ffffff">
-<img height="112" alt="ermineJ logo" src="../images/logo1small.gif"
-	width="266" border="0">
-<h1>Input file formats:&nbsp;gene scores</h1>
+	<body bgcolor="#ffffff">
+		<img height="112" alt="ermineJ logo" src="../images/logo1small.gif"
+			width="266" border="0">
+		<h1>
+			Input file formats:&nbsp;gene scores
+		</h1>
 
-<p>A "gene score"&nbsp;is any value that is applied to genes in a
-microarray experiment and which represents some measure of
-"quality"&nbsp;or "interest". Examples might be a t-test p value or fold
-change. These scores must be computed separately and then supplied to
-the ermineJ software for analysis.</p>
+		<p>
+			A "gene score"&nbsp;is any value that is applied to genes in an
+			experiment and which represents some measure of "quality"&nbsp;or
+			"interest". Examples might be a t-test p value or fold change. These
+			scores must be computed separately and then supplied to the ermineJ
+			software for analysis.
+		</p>
 
-<h2><font color="#cc0033">!</font> Make sure your gene scores are on a
-sensible scale</h2>
+		<h2>
+			<font color="#cc0033">!</font> Make sure your gene scores are on a
+			sensible scale
+		</h2>
 
-<ul>
-	<li>
-	<div><strong>If your gene score are raw p-values (most common case)</strong>,
-	then you should be sure to either -log transform your values, or use
-	the -log options in the ermineJ software.</div>
-	</li>
+		<ul>
+			<li>
+				<div>
+					<strong>If your gene score are raw p-values (most common
+						case)</strong>, then you should be sure to either -log transform your
+					values, or use the -log options in the ermineJ software.
+				</div>
+			</li>
 
-	<li>
-	<div><strong>If your gene scores are "fold-change",</strong> &nbsp;you
-	might want to use the absolute value of log(fold change).</div>
-	</li>
+			<li>
+				<div>
+					<strong>If your gene scores are "fold-change",</strong> &nbsp;you
+					might want to use the absolute value of log(fold change).
+				</div>
+			</li>
 
-	<li>
-	<div><strong>If your gene scores are NOT raw p-values,</strong> then
-	make sure you select the right combination of settings to get your data
-	interpreted correctly.</div>
-	</li>
-</ul>
+			<li>
+				<div>
+					<strong>If your gene scores are NOT raw p-values,</strong> then
+					make sure you select the right combination of settings to get your
+					data interpreted correctly.
+				</div>
+			</li>
+		</ul>
 
-<h2><font color="#cc0033">!</font> You need a complete set of gene
-scores, not just the "selected gene list"</h2>
+		<h2>
+			<font color="#cc0033">!</font> You need a complete set of gene
+			scores, not just the "selected gene list"
+		</h2>
 
-<p>Unlike some software packages, ermineJ requires a complete set of
-gene scores, rather than just those for the "selected genes". Thus, if
-your microarray has 12,000 probe sets on it, you will provide 12,000
-gene scores. A&nbsp;caveat to this is that if you have filtered your
-data to exclude "unexpressed"&nbsp;genes (for example), you might only
-have gene scores for some probes. This is perfectly fine and the
-analysis will be based only on the probes for which you provide data.
-However, the analysis is really only valid if you include all the probes
-that you performed your gene selection analysis on.</p>
+		<p>
+			Unlike some software packages, ermineJ requires a complete set of
+			gene scores, rather than just those for the "selected genes". Thus,
+			if your assay has 12,000 genes (or probes), you will provide 12,000
+			gene scores. A&nbsp;caveat to this is that if you have filtered your
+			data to exclude "unexpressed"&nbsp;genes (for example), you might
+			only have gene scores for some genes/probes. This is perfectly fine
+			and the analysis will be based only on the probes for which you
+			provide data. However, the analysis is really only valid if you
+			include all the probes that you performed your gene selection
+			analysis on.
+		</p>
 
-<p>The resampling-based analysis requires the gene scores, while for
-other analyses it is not required.</p>
+		<p>
+			The resampling-based analysis requires the gene scores, while for
+			other analyses it is not required.
+		</p>
 
-<h2><font color="#cc0000">!</font> Make sure your gene scores are on the
-right format</h2>
+		<h2>
+			<font color="#cc0000">!</font> Make sure your gene scores are on the
+			right format
+		</h2>
 
-<p>The gene score file is a <strong>simple tab-delimited text file</strong>
-, minimally having just two columns (like <a
-	href="../samples/geneScoresSample.txt">this example</a> , which is from
-the HG-U95A microarray design). For a simple case please use the
-following rules:</p>
+		<p>
+			The gene score file is a
+			<strong>simple tab-delimited text file</strong> , minimally having
+			just two columns (like
+			<a href="../samples/geneScoresSample.txt">this example</a> , which is
+			from the HG-U95A microarray design). For a simple case please use the
+			following rules:
+		</p>
 
-<ul>
+		<ul>
 
-	<li>
-	<div><strong>A one-line header is expected</strong> (if you don't
-	include the header, the first line of data will be skipped). It doesn't
-	matter what the header says, it can even be a blank line.</div>
-	</li>
+			<li>
+				<div>
+					<strong>A one-line header is expected</strong> (if you don't
+					include the header, the first line of data will be skipped). It
+					doesn't matter what the header says, it can even be a blank line.
+				</div>
+			</li>
 
-	<li>
-	<div>The first column contains the probe identifiers</div>
-	</li>
+			<li>
+				<div>
+					The first column contains the probe identifiers
+				</div>
+			</li>
 
-	<li>
-	<div>The second column contains the scores. <b>Non-numeric values such
-	as "NaN" or "#NUM!" are interpreted to equal zero.</b> If you want to
-	avoid this you should remove those rows from your file entirely.</div>
-	</li>
-
-
-	<li>
-	<div>Files with more than two columns are also fine.</div>
-	</li>
-
-	<li>
-	<div>The file <strong>CANNOT be an Excel spreadsheet</strong>. Use
-	"Save as... &nbsp;text" in Excel. For instructions on doing, see <a
-		href="excel-astext.html">this page</a> .</div>
-	</li>
-</ul>
-
-<p>The table below shows the basic idea. Remember that the header can contain anything, it doesn't have to follow this example.</p>
-
-<table cellspacing="1" cellpadding="1" width="200" border="1">
-	<tr>
-		<td>
-		<p><font size="1">Probes</font></p>
-		</td>
-
-		<td>
-		<p><font size="1">ProbeScore</font></p>
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-		<p><font size="1">117_at</font></p>
-		</td>
-
-		<td>
-		<p><font size="1">0.593537874</font></p>
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-		<p><font size="1">1007_s_at</font></p>
-		</td>
-
-		<td>
-		<p><font size="1">0.0643101</font></p>
-		</td>
-	</tr>
-
-	<tr>
-		<td>...</td>
-
-		<td>... (etc.)</td>
-	</tr>
-</table>
-<hr>
-<br>
-<br>
+			<li>
+				<div>
+					The second column contains the scores.
+					<b>Non-numeric values such as "NaN" or "#NUM!" are interpreted
+						to equal zero.</b> If you want to avoid this you should remove those
+					rows from your file entirely.
+				</div>
+			</li>
 
 
-<div class="tidy">Copyright 2006 &copy; University of British Columbia</div>
-</body>
+			<li>
+				<div>
+					Files with more than two columns are also fine.
+				</div>
+			</li>
+
+			<li>
+				<div>
+					The file
+					<strong>CANNOT be an Excel spreadsheet</strong>. Use "Save as...
+					&nbsp;text" in Excel. For instructions on doing, see
+					<a href="excel-astext.html">this page</a> .
+				</div>
+			</li>
+		</ul>
+
+		<p>
+			The table below shows the basic idea. Remember that the header can
+			contain anything, it doesn't have to follow this example.
+		</p>
+
+		<table cellspacing="1" cellpadding="1" width="200" border="1">
+			<tr>
+				<td>
+					<p>
+						<font size="1">Probes</font>
+					</p>
+				</td>
+
+				<td>
+					<p>
+						<font size="1">ProbeScore</font>
+					</p>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<p>
+						<font size="1">117_at</font>
+					</p>
+				</td>
+
+				<td>
+					<p>
+						<font size="1">0.593537874</font>
+					</p>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<p>
+						<font size="1">1007_s_at</font>
+					</p>
+				</td>
+
+				<td>
+					<p>
+						<font size="1">0.0643101</font>
+					</p>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					...
+				</td>
+
+				<td>
+					... (etc.)
+				</td>
+			</tr>
+		</table>
+
+		<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
+		: "http://www.");
+document
+		.write(unescape("%3Cscript src='"
+				+ gaJsHost
+				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+		<script type="text/javascript">
+var pageTracker = _gat._getTracker('UA-4826357-1');
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+
+	</body>
 </html>

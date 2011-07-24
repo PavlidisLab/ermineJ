@@ -30,11 +30,14 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
+import ubic.erminej.data.Probe;
 
 /**
  * Perform multiple test correction on class scores.
@@ -45,8 +48,8 @@ import ubic.erminej.data.Histogram;
 public class MultipleTestCorrector extends AbstractLongTask {
     private static final int DEFAULT_WY_TRIALS = 10000;
     protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
-    private List<String> sortedclasses;
-    private Map<String, GeneSetResult> results;
+    private List<GeneSetTerm> sortedclasses;
+    private Map<GeneSetTerm, GeneSetResult> results;
     private Histogram hist;
     private GeneAnnotations geneData;
     private GeneSetSizeComputer csc;
@@ -55,8 +58,9 @@ public class MultipleTestCorrector extends AbstractLongTask {
     private Settings settings;
     private StatusViewer messenger;
 
-    public MultipleTestCorrector( Settings set, List<String> sc, Histogram h, GeneAnnotations geneData,
-            GeneSetSizeComputer csc, GeneScores geneScores, Map<String, GeneSetResult> results, StatusViewer messenger ) {
+    public MultipleTestCorrector( Settings set, List<GeneSetTerm> sc, Histogram h, GeneAnnotations geneData,
+            GeneSetSizeComputer csc, GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results,
+            StatusViewer messenger ) {
         this.settings = set;
         this.sortedclasses = sc;
         this.results = results;
@@ -77,9 +81,9 @@ public class MultipleTestCorrector extends AbstractLongTask {
         int n = numclasses;
 
         Collections.reverse( sortedclasses ); // start from the worst class.
-        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) break;
-            String nextclass = it.next();
+            GeneSetTerm nextclass = it.next();
             GeneSetResult res = results.get( nextclass );
             double actual_p = res.getPvalue();
 
@@ -100,9 +104,9 @@ public class MultipleTestCorrector extends AbstractLongTask {
     public void bonferroni() {
         int numclasses = sortedclasses.size();
         double corrected_p;
-        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) break;
-            String nextclass = it.next();
+            GeneSetTerm nextclass = it.next();
             GeneSetResult res = results.get( nextclass );
             double actual_p = res.getPvalue();
             corrected_p = actual_p * numclasses;
@@ -150,14 +154,14 @@ public class MultipleTestCorrector extends AbstractLongTask {
         }
 
         Collections.reverse( sortedclasses ); // start from the worst class.
-        Map<String, Double> permscores;
+        Map<GeneSetTerm, Double> permscores;
 
-        GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc, null );
+        GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc );
 
         for ( int i = 0; i < trials; i++ ) {
             // System.err.println("Trial: " + i );
 
-            Map<String, Double> scgroup_pval_map = geneScores.getGeneToPvalMap( true ); // shuffle
+            Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToPvalMap( true ); // shuffle
             // the
             // association
             // of
@@ -172,7 +176,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
             // set). If we are not using weights, it only affects the
             // hypergeometric pvalues. (todo: add correction for those
             // values) So we don't even bother shuffling it.
-            Map<String, Double> scprobepvalmap = geneScores.getProbeToScoreMap();
+            Map<Probe, Double> scprobepvalmap = geneScores.getProbeToScoreMap();
 
             // Just for AROC:
             /*
@@ -192,10 +196,10 @@ public class MultipleTestCorrector extends AbstractLongTask {
             // initialized here.
             double qprev = q;
             double actual_p = 0.0;
-            String nextclass = "";
+            GeneSetTerm nextclass = null;
 
             // successive minima of step 2, pg 66. Also does step 3.
-            for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
+            for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
 
                 ifInterruptedStop();
 
@@ -284,7 +288,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
         /*
          * Step 4 and enforce monotonicity, pg 67 (step 5) starting from the best class.
          */
-        for ( Iterator<String> it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) throw new CancellationException();
             GeneSetResult res = results.get( it.next() );
             corrected_p = Math.max( ( double ) counts[j] / ( double ) trials, previous_p ); // first iteration, these

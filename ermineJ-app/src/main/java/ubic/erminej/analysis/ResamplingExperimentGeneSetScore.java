@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.RandomChooser;
 import ubic.basecode.math.Stats;
@@ -38,6 +40,7 @@ import cern.jet.stat.Descriptive;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Histogram;
+import ubic.erminej.data.Probe;
 
 /**
  * Calculates a background distribution for class sscores derived from randomly selected individual gene scores...and
@@ -47,10 +50,10 @@ import ubic.erminej.data.Histogram;
  * @version $Id$
  */
 public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetScore {
-    private double[] groupPvals = null; // pvalues for groups.
-    private double[] pvals = null; // pvalues for probes.
+    private Double[] groupPvals = null; // pvalues for groups.
+    private Double[] pvals = null; // pvalues for probes.
 
-    private Map<String, Double> probePvalMap; // probes -> pval
+    private Map<Probe, Double> probePvalMap; // probes -> pval
     private boolean useWeights;
     private static int quantile = 50;
     private static double quantfract = 0.5;
@@ -85,7 +88,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     public Histogram generateNullDistribution( StatusViewer m ) {
 
         int numGenes;
-        double[] in_pval;
+        Double[] in_pval;
 
         if ( hist == null ) {
             throw new IllegalStateException( "Histogram object was null." );
@@ -198,7 +201,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     /**
      * @return double[]
      */
-    public double[] get_in_pvals() {
+    public Double[] get_in_pvals() {
         return useWeights ? groupPvals : pvals;
     }
 
@@ -220,7 +223,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
     /**
      * @return Map
      */
-    public Map<String, Double> get_map() {
+    public Map<Probe, Double> get_map() {
         return probePvalMap;
     }
 
@@ -228,10 +231,10 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @param shuffle boolean
      * @return Map
      */
-    public Map<String, Double> get_map( boolean shuffle ) {
+    public Map<Probe, Double> get_map( boolean shuffle ) {
 
         if ( shuffle ) {
-            Map<String, Double> scrambled_probe_pval_map = new LinkedHashMap<String, Double>();
+            Map<Probe, Double> scrambled_probe_pval_map = new LinkedHashMap<Probe, Double>();
 
             Collection<Double> values = probePvalMap.values();
             List<Double> valvec = new Vector<Double>( values );
@@ -239,8 +242,8 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
             // randomly associate keys and values
             int i = 0;
-            Set<String> keys = probePvalMap.keySet();
-            Iterator<String> it = keys.iterator();
+            Set<Probe> keys = probePvalMap.keySet();
+            Iterator<Probe> it = keys.iterator();
             while ( it.hasNext() ) {
                 scrambled_probe_pval_map.put( it.next(), valvec.get( i ) );
                 i++;
@@ -304,8 +307,11 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
             throw new IllegalStateException( "Null gene score arrays for histogram range setting" );
         }
 
-        histogramMax = Descriptive.max( new DoubleArrayList( useWeights ? groupPvals : pvals ) );
-        histogramMin = Descriptive.min( new DoubleArrayList( useWeights ? groupPvals : pvals ) );
+        double[] ppvals = ArrayUtils.toPrimitive( pvals );
+        double[] pgpvals = ArrayUtils.toPrimitive( groupPvals );
+
+        histogramMax = Descriptive.max( new DoubleArrayList( useWeights ? pgpvals : ppvals ) );
+        histogramMin = Descriptive.min( new DoubleArrayList( useWeights ? pgpvals : ppvals ) );
 
         if ( histogramMax <= histogramMin ) {
             throw new IllegalStateException( "Histogram has no range (max " + histogramMax + " <= min " + histogramMin

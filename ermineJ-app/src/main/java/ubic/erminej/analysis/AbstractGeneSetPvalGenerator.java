@@ -23,9 +23,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
 
 /**
  * Base implementation of pvalue generator
@@ -40,14 +41,12 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     /**
      * How many genes are in each set (conditioned on the current data available)
      */
-    protected Map<String, Integer> effectiveSizes = null;
+    protected Map<GeneSetTerm, Integer> effectiveSizes = null;
 
     /**
      * How many probes are in each set (conditioned on the current data available)
      */
-    protected Map<String, Integer> actualSizes = null;
-
-    protected GONames goName;
+    protected Map<GeneSetTerm, Integer> actualSizes = null;
 
     protected Settings settings;
 
@@ -60,14 +59,13 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
     private boolean globalMissingAspectTreatedAsUsable = false;
 
-    public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots, GeneSetSizeComputer csc, GONames gon ) {
+    public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots, GeneSetSizeComputer csc ) {
 
         this.settings = set;
         this.geneAnnots = annots;
         this.effectiveSizes = csc.getEffectiveSizes();
         this.actualSizes = csc.getActualSizes();
         this.csc = csc;
-        this.goName = gon;
     }
 
     /**
@@ -104,46 +102,40 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
      * @param geneSetName
      * @return
      */
-    protected boolean checkAspect( String geneSetName ) {
-        return this.checkAspect( geneSetName, false );
+    protected boolean checkAspectAndRedundancy( GeneSetTerm geneSetName ) {
+        return this.checkAspectAndRedundancy( geneSetName, false );
     }
 
     /**
-     * If GO data isn't initialized, this returns true.
-     * 
      * @param geneSetName
      * @param missingAspectTreatedAsUsable Whether gene sets missing an aspect should be treated as usable or not. This
      *        parameter is provided partly for testing. Global setting can override this if set to true.
-     * @return
+     * @return true if the set should be retained (in the correct aspect and not considered redundant with another set)
      */
-    protected boolean checkAspect( String geneSetName, boolean missingAspectTreatedAsUsable ) {
-        if ( goName == null ) return true;
+    protected boolean checkAspectAndRedundancy( GeneSetTerm geneSetName, boolean missingAspectTreatedAsUsable ) {
 
-        String aspect = this.goName.getAspectForId( geneSetName );
+        if ( geneAnnots.skipDueToRedundancy( geneSetName ) ) {
+            return false;
+        }
+
+        String aspect = geneSetName.getAspect();
 
         /*
-         * If there is no aspect, we don't use it, unless
+         * If there is no aspect, we don't use it, unless it's user-defined (though that should have an aspect ....)
          */
-        if ( aspect == null && !this.goName.isUserDefined( geneSetName ) ) {
+        if ( aspect == null && !geneSetName.isUserDefined() ) {
             return missingAspectTreatedAsUsable || this.globalMissingAspectTreatedAsUsable;
         }
 
         if ( aspect != null ) {
-            if ( ( aspect.equalsIgnoreCase( "biological_process" ) || aspect
-                    .equalsIgnoreCase( "obsolete_biological_process" ) )
-                    && this.settings.getUseBiologicalProcess() ) {
+            if ( aspect.equalsIgnoreCase( "biological_process" ) && this.settings.getUseBiologicalProcess() ) {
                 return true;
-            } else if ( ( aspect.equalsIgnoreCase( "cellular_component" ) || aspect
-                    .equalsIgnoreCase( "obsolete_cellular_component" ) )
-                    && this.settings.getUseCellularComponent() ) {
+            } else if ( aspect.equalsIgnoreCase( "cellular_component" ) && this.settings.getUseCellularComponent() ) {
                 return true;
-            } else if ( ( aspect.equalsIgnoreCase( "molecular_function" ) || aspect
-                    .equalsIgnoreCase( "obsolete_molecular_function" ) )
-                    && this.settings.getUseMolecularFunction() ) {
+            } else if ( aspect.equalsIgnoreCase( "molecular_function" ) && this.settings.getUseMolecularFunction() ) {
                 return true;
-            } else if ( aspect.equalsIgnoreCase( GONames.USER_DEFINED ) ) {
-                log.debug( "Found user-defined gene set " + geneSetName + " for analysis" );
-                return true; // user-defined - always use.
+            } else if ( aspect.equalsIgnoreCase( GeneSetTerms.USER_DEFINED ) && this.settings.getUseUserDefined() ) {
+                return true;
             }
         }
         return false;

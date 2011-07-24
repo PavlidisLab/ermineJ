@@ -85,6 +85,11 @@
 				Table view enhancements: You can hide rows in the table to remove clutter due to redundant or empty gene sets.
 			</li>
 			<li>
+				Improvement: A major cleanup of the way ErmineJ handles gene annotations. A number of lurking problems were flushed out. 
+				Perhaps the most serious was that it is not clear whether redundant gene sets were being excluded from analyses (as they should).
+				It is now much easier to find out how many gene sets there are, how many have genes, and how many are redundant.
+			</li>
+			<li>
 				Bug fix: Command line tool didn't correctly deal with correlation
 				method when no score file was supplied.
 			</li>

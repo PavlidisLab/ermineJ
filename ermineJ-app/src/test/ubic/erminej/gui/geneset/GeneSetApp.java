@@ -25,9 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.UIManager; 
+import javax.swing.UIManager;
 
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.Probe;
 import ubic.erminej.gui.geneset.GeneSetDetailsFrame;
 
 /**
@@ -46,15 +49,16 @@ public class GeneSetApp {
         settings.setRawFile( filename );
 
         final String[] PROBES = { "31946_s_at", "31947_r_at", "31948_at", "31949_at", "31950_at" };
-        Map<String, Double> pvalues = new HashMap<String, Double>();
+        Map<Probe, Double> pvalues = new HashMap<Probe, Double>();
 
-        List<String> probeIDs = new ArrayList<String>();
+        List<Probe> probeIDs = new ArrayList<Probe>();
         for ( int i = 0; i < PROBES.length; i++ ) {
-            probeIDs.add( i, PROBES[i] );
-            pvalues.put( PROBES[i], new Double( 0.5 - 0.02 * i ) ); // fake p values.
+            probeIDs.add( new Probe( PROBES[i] ) );
+            pvalues.put( new Probe( PROBES[i] ), 0.5 - 0.02 * i ); // fake p values.
         }
 
-        GeneSetDetailsFrame frame = new GeneSetDetailsFrame( "foo", null, probeIDs, pvalues, null, settings );
+        GeneSetResult result = new GeneSetResult( new GeneSetTerm( "foo" ), 0, 0 );
+        GeneSetDetailsFrame frame = new GeneSetDetailsFrame( result, null, probeIDs, pvalues, null, settings );
         frame.setSize( new Dimension( 800, 600 ) );
         frame.setVisible( true );
     }

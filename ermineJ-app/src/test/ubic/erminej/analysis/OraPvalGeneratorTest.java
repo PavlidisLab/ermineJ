@@ -20,6 +20,7 @@ package ubic.erminej.analysis;
 
 import ubic.erminej.analysis.OraPvalGenerator;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * @author pavlidis
@@ -35,7 +36,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         super.setUp();
 
-        test = new OraPvalGenerator( s, annotations, sizeComputer, 2, 18, gon, 20 );
+        test = new OraPvalGenerator( s, annotations, sizeComputer, 2, 18, 20 );
         test.setGlobalMissingAspectTreatedAsUsable( true );
 
     }
@@ -54,7 +55,8 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         double expectedReturn = 0.36842;
 
-        GeneSetResult r = test.classPval( "GO:2", scores.getGeneToScoreMap(), scores.getProbeToScoreMap() );
+        GeneSetResult r = test.classPval( new GeneSetTerm( "GO:2" ), scores.getGeneToScoreMap(), scores
+                .getProbeToScoreMap() );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
 
@@ -64,7 +66,8 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval1() {
         double expectedReturn = 0.28947;
 
-        GeneSetResult r = test.classPval( "GO:1", scores.getGeneToScoreMap(), scores.getProbeToScoreMap() );
+        GeneSetResult r = test.classPval( new GeneSetTerm( "GO:1" ), scores.getGeneToScoreMap(), scores
+                .getProbeToScoreMap() );
 
         assertNotNull( r );
         double actualReturn = r.getPvalue();
@@ -75,7 +78,8 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval3() {
         double expectedReturn = 0.7631579;
 
-        GeneSetResult r = test.classPval( "GO:3", scores.getGeneToScoreMap(), scores.getProbeToScoreMap() );
+        GeneSetResult r = test.classPval( new GeneSetTerm( "GO:3" ), scores.getGeneToScoreMap(), scores
+                .getProbeToScoreMap() );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
 

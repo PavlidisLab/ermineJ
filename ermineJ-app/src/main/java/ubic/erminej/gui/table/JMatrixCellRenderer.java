@@ -28,25 +28,25 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import ubic.basecode.graphics.MatrixDisplay;
+import ubic.erminej.data.Probe;
 
 /**
+ * For rendering heatmaps in tables.
+ * 
  * @author Will Braynen
  * @version $Id$
  */
 public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 120496422792943100L;
 
-    MatrixDisplay<String,String> m_matrixDisplay;
+    MatrixDisplay<Probe, String> m_matrixDisplay;
 
     // to format tooltips
     DecimalFormat m_scientificNotation = new DecimalFormat( "0.##E0" );
     DecimalFormat m_regular = new DecimalFormat();
 
-    public JMatrixCellRenderer( MatrixDisplay<String,String> matrixDisplay ) {
+    public JMatrixCellRenderer( MatrixDisplay<Probe, String> matrixDisplay ) {
 
         m_matrixDisplay = matrixDisplay;
         setOpaque( true );

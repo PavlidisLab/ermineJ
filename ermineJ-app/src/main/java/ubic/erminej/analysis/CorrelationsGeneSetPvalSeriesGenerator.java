@@ -23,12 +23,14 @@ import java.util.Iterator;
 import java.util.Map;
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Histogram;
+import ubic.erminej.data.Probe;
 
 /**
  * Calculates the raw average class correlations using a background distribution.
@@ -50,13 +52,12 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
      * @param hist
      */
     public CorrelationsGeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneAnnots,
-            GeneSetSizeComputer csc, GONames gon, DoubleMatrix<String, String> rawData, Histogram hist ) {
-        super( settings, geneAnnots, csc, gon );
+            GeneSetSizeComputer csc, DoubleMatrix<Probe, String> rawData, Histogram hist ) {
+        super( settings, geneAnnots, csc );
 
-        this.classScoreGenerator = new CorrelationPvalGenerator( settings, geneAnnots, csc, gon, rawData );
+        this.classScoreGenerator = new CorrelationPvalGenerator( settings, geneAnnots, csc, rawData );
         this.geneAnnots = geneAnnots;
 
-        classScoreGenerator.setProbeToGeneMap( geneAnnots.getProbeToGeneMap() );
         classScoreGenerator.setHistogram( hist );
         classScoreGenerator.setGeneRepTreatment( settings.getGeneRepTreatment() );
         classScoreGenerator.set_class_max_size( settings.getMaxClassSize() );
@@ -67,17 +68,17 @@ public class CorrelationsGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalG
     /**
      * @param messenger
      */
-    public Map<String, GeneSetResult> classPvalGenerator( StatusViewer messenger ) {
-        Map<String, GeneSetResult> results = new HashMap<String, GeneSetResult>();
-        
+    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( StatusViewer messenger ) {
+        Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
+
         int count = 0;
         classScoreGenerator.setTests( 0 );
         classScoreGenerator.setCacheHits( 0 );
 
-        for ( Iterator<String> iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getActiveGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
 
-            String geneSetName = iter.next();
+            GeneSetTerm geneSetName = iter.next();
             GeneSetResult res = classScoreGenerator.classPval( geneSetName );
             if ( res != null ) {
                 results.put( geneSetName, res );

@@ -22,12 +22,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetSizeComputer;
 import ubic.erminej.analysis.OraPvalGenerator;
+import ubic.erminej.data.GeneAnnotationParser;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
  * @author pavlidis
@@ -41,7 +43,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
     protected InputStream ism = null;
     protected InputStream isi = null;
     protected Settings s = null;
-    protected GONames gon = null;
+    protected GeneSetTerms gon = null;
     protected GeneSetSizeComputer sizeComputer = null;
 
     @Override
@@ -62,18 +64,19 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         s.setUseCellularComponent( true );
         s.setUseMolecularFunction( true );
 
-        annotations = new GeneAnnotations( ism, null, null, null );
+        GeneAnnotationParser p = new GeneAnnotationParser( gon );
+        annotations = p.read( ism, Format.DEFAULT );
 
         assertTrue( annotations.getGenes().size() > 0 );
-        assertTrue( annotations.getGeneSets().size() > 0 );
+        assertTrue( annotations.getActiveGeneSets().size() > 0 );
 
         scores = new GeneScores( is, s, null, annotations );
 
         assertNotNull( scores.getGeneScores() );
         assertNotNull( scores.getProbeToScoreMap() );
 
-        gon = new GONames( isi );
-        sizeComputer = new GeneSetSizeComputer( scores.getProbeToScoreMap().keySet(), annotations, scores, true );
+        gon = new GeneSetTerms( isi );
+        sizeComputer = new GeneSetSizeComputer( annotations, scores, true );
 
         super.setUp();
     }

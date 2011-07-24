@@ -26,11 +26,14 @@ import java.util.Map.Entry;
 
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import cern.jet.math.Arithmetic;
 import ubic.erminej.Settings;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.Probe;
 
 /**
  * Generate Overrepresentation p values for gene sets.
@@ -47,8 +50,8 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     private int inputSize;
 
     public OraGeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneData, GeneSetSizeComputer csc,
-            GONames gon, int inputSize ) {
-        super( settings, geneData, csc, gon );
+             int inputSize ) {
+        super( settings, geneData, csc  );
         this.inputSize = inputSize;
 
     }
@@ -59,17 +62,17 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
      * @param geneToGeneScoreMap
      * @param probesToPvals
      */
-    public Map<String, GeneSetResult> classPvalGenerator( Map<String, Double> geneToGeneScoreMap,
-            Map<String, Double> probesToPvals, StatusViewer messenger ) {
-        Map<String, GeneSetResult> results = new HashMap<String, GeneSetResult>();
+    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( Map<Gene, Double> geneToGeneScoreMap,
+            Map<Probe, Double> probesToPvals, StatusViewer messenger ) {
+        Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         OraPvalGenerator cpv = new OraPvalGenerator( settings, geneAnnots, csc, numOverThreshold, numUnderThreshold,
-                goName, inputSize );
+                 inputSize );
 
         int count = 0;
-        for ( Iterator<String> iter = geneAnnots.getGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getActiveGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
 
-            String geneSetName = iter.next();
+            GeneSetTerm geneSetName = iter.next();
             // log.debug( "Analyzing " + geneSetName );
             GeneSetResult res = cpv.classPval( geneSetName, geneToGeneScoreMap, probesToPvals );
             if ( res != null ) {
@@ -90,7 +93,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
      * @return number of entries that meet the user-set threshold.
      * @todo make this private and called by OraPvalGenerator.
      */
-    public int hgSizes( Collection<Entry<String, Double>> geneScores ) {
+    public int hgSizes( Collection<Entry<Probe, Double>> geneScores ) {
 
         double geneScoreThreshold = settings.getGeneScoreThreshold();
 
@@ -98,7 +101,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
             geneScoreThreshold = -Arithmetic.log10( geneScoreThreshold );
         }
 
-        for ( Entry<String, Double> m : geneScores ) {
+        for ( Entry<Probe, Double> m : geneScores ) {
             double geneScore = m.getValue();
 
             if ( scorePassesThreshold( geneScore, geneScoreThreshold ) ) {

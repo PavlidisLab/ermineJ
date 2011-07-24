@@ -28,6 +28,7 @@ import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
 import ubic.erminej.Settings;
 import ubic.erminej.data.Histogram;
+import ubic.erminej.data.Probe;
 
 /**
  * @author pavlidis
@@ -40,7 +41,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      */
     private static final int MIN_STABLE_CHECKS = 3;
 
-    private DoubleMatrix<String, String> data = null;
+    private DoubleMatrix<Probe, String> data = null;
 
     private double[][] dataAsRawMatrix;
     private double[][] selfSquaredMatrix;
@@ -59,7 +60,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     /**
      * @param dataMatrix
      */
-    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrix<String, String> dataMatrix ) {
+    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrix<Probe, String> dataMatrix ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();

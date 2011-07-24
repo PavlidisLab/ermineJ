@@ -17,9 +17,8 @@ package ubic.erminej.data;
 import java.io.InputStream;
 import java.util.Collection;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneAnnotationParser.Format;
 
 import junit.framework.TestCase;
 
@@ -35,40 +34,55 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
     public void setUp() throws Exception {
         if ( needInit ) {
             InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
+            InputStream is = this.getClass().getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
 
-            GeneAnnotations g = new GeneAnnotations( ism, null, null, null );
-
-            InputStream is = this.getClass().getResourceAsStream( "/data/go_test_termdb.xml" );
-
-            GONames gonames = new GONames( is );
+            GeneSetTerms gonames = new GeneSetTerms( is );
+            GeneAnnotationParser p = new GeneAnnotationParser( gonames );
+            GeneAnnotations g = p.read( ism, Format.DEFAULT );
 
             Settings settings = new Settings();
 
-            UserDefinedGeneSetManager.init( g, gonames, settings );
+            UserDefinedGeneSetManager.init( g, settings );
             needInit = false;
         }
     }
 
     public final void testKegg() throws Exception {
-        Collection<UserDefinedGeneSet> keggsets = UserDefinedGeneSetManager.loadUserGeneSetFile( this.getClass()
+        Collection<GeneSet> keggsets = UserDefinedGeneSetManager.loadUserGeneSetFile( this.getClass()
                 .getResourceAsStream( "/data/genesets/kegg.txt" ) );
         assertEquals( 186, keggsets.size() );
     }
 
     public final void testMulti() throws Exception {
-
+        Collection<GeneSet> sets = UserDefinedGeneSetManager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
+                "/data/genesets/my.test-classes.txt" ) );
+        assertEquals( 3, sets.size() );
+        for ( GeneSet geneSet : sets ) {
+            assertTrue( geneSet.getId().contains( "my" ) );
+            assertTrue( geneSet.getName().contains( "test" ) );
+            for ( Probe p : geneSet.getProbes() ) {
+                assertTrue( p.getName().endsWith( "_at" ) );
+            }
+        }
     }
 
     public final void testSingle() throws Exception {
-
+        Collection<GeneSet> sets = UserDefinedGeneSetManager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
+                "/data/genesets/GO-0004994-class.txt" ) );
+        assertEquals( 1, sets.size() );
+        GeneSet s = sets.iterator().next();
+        assertEquals( "GO:0004994", s.getId() );
+        assertEquals( "somatostatin receptor activity", s.getName() );
+        assertEquals( 7, s.getProbes().size() ); // six lines but we pull in another via the gene symbol.
+        assertEquals( 6, s.getGenes().size() );
     }
 
-    public final void testNoGO() throws Exception {
-
-    }
-
-    public final void testUpdateCustom() throws Exception {
-
-    }
+    // public final void testNoGO() throws Exception {
+    //
+    // }
+    //
+    // public final void testUpdateCustom() throws Exception {
+    //
+    // }
 
 }

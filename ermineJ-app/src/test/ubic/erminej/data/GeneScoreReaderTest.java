@@ -19,13 +19,15 @@
 package ubic.erminej.data;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.lang.ArrayUtils;
 
 import ubic.basecode.util.RegressionTesting;
 
 import junit.framework.TestCase;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneScores;
 
@@ -49,7 +51,10 @@ public class GeneScoreReaderTest extends TestCase {
 
         is = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.scores.txt" );
 
-        GeneAnnotations g = new GeneAnnotations( ism, null, null, null );
+        GeneSetTerms geneSetTerms = new GeneSetTerms( GeneScoreReaderTest.class
+                .getResourceAsStream( "/data/go-termdb-test.xml" ) );
+        GeneAnnotationParser p = new GeneAnnotationParser( geneSetTerms );
+        GeneAnnotations g = p.readDefault( ism, null );
 
         test = new GeneScores( is, s, null, g );
         super.setUp();
@@ -65,34 +70,44 @@ public class GeneScoreReaderTest extends TestCase {
         is.close();
     }
 
+    /**
+     * 
+     */
     public void testGet_probe_ids() {
         String[] expectedReturn = new String[] { "ProbeA", "ProbeB", "ProbeC", "ProbeD", "ProbeE", "ProbeF", "ProbeG",
                 "ProbeH", "ProbeI", "ProbeJ", "ProbeK", "ProbeL", "ProbeM", "ProbeN", "ProbeO", "ProbeP", "ProbeQ",
                 "ProbeR", "ProbeS", "ProbeT", "ProbeU" };
 
-        String[] actualReturn = test.getProbeIds();
+        Collection<Probe> actualReturn = test.getProbeToScoreMap().keySet();
 
-        assertEquals( expectedReturn.length, actualReturn.length );
+        assertEquals( expectedReturn.length, actualReturn.size() );
 
-        assertTrue( RegressionTesting.containsSame( expectedReturn, actualReturn ) );
+        for ( String e : expectedReturn ) {
+            assertTrue( "Did not contain " + e, actualReturn.contains( new Probe( e ) ) );
+        }
     }
 
+    /**
+     * 
+     */
     public void testGetPvalues() {
         double[] expectedReturn = new double[] { -Math.log10( 0.01 ), -Math.log10( 0.01 ), -Math.log10( 0.02 ),
                 -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ),
                 -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ),
                 -Math.log10( 0.25 ), -Math.log10( 0.3 ), -Math.log10( 0.4 ), -Math.log10( 0.5 ), -Math.log10( 0.6 ),
                 -Math.log10( 0.7 ), -Math.log10( 0.8 ), -Math.log10( 0.9 ) };
-        double[] actualReturn = test.getScores();
+        Double[] actualReturn = test.getProbeScores();
 
         assertEquals( expectedReturn.length, actualReturn.length );
 
-        assertTrue( RegressionTesting.closeEnough( expectedReturn, actualReturn, 0.001 ) );
+        assertEquals( 19, test.getGeneScores().length );
+
+        assertTrue( RegressionTesting.closeEnough( expectedReturn, ArrayUtils.toPrimitive( actualReturn ), 0.001 ) );
     }
 
     public void testGet_numpvals() {
         int expectedReturn = 21;
-        int actualReturn = test.getNumGeneScores();
+        int actualReturn = test.getNumScores();
         assertEquals( "return value", expectedReturn, actualReturn );
     }
 
@@ -100,28 +115,28 @@ public class GeneScoreReaderTest extends TestCase {
      * Class under test for Map getGeneToPvalMap()
      */
     public void testGetGeneToPvalMap() {
-        Set<String> expectedReturn = new HashSet<String>();
-        expectedReturn.add( "GeneA" );
-        expectedReturn.add( "GeneB" );
-        expectedReturn.add( "GeneC" );
-        expectedReturn.add( "GeneD" );
-        expectedReturn.add( "GeneE" );
-        expectedReturn.add( "GeneH" );
-        expectedReturn.add( "GeneI" );
-        expectedReturn.add( "GeneJ" );
-        expectedReturn.add( "GeneK" );
-        expectedReturn.add( "GeneL" );
-        expectedReturn.add( "GeneM" );
-        expectedReturn.add( "GeneN" );
-        expectedReturn.add( "GeneO" );
-        expectedReturn.add( "GeneP" );
-        expectedReturn.add( "GeneQ" );
-        expectedReturn.add( "GeneR" );
-        expectedReturn.add( "GeneS" );
-        expectedReturn.add( "GeneT" );
-        expectedReturn.add( "GeneU" );
+        Set<Gene> expectedReturn = new HashSet<Gene>();
+        expectedReturn.add( new Gene( "GeneA" ) );
+        expectedReturn.add( new Gene( "GeneB" ) );
+        expectedReturn.add( new Gene( "GeneC" ) );
+        expectedReturn.add( new Gene( "GeneD" ) );
+        expectedReturn.add( new Gene( "GeneE" ) );
+        expectedReturn.add( new Gene( "GeneH" ) );
+        expectedReturn.add( new Gene( "GeneI" ) );
+        expectedReturn.add( new Gene( "GeneJ" ) );
+        expectedReturn.add( new Gene( "GeneK" ) );
+        expectedReturn.add( new Gene( "GeneL" ) );
+        expectedReturn.add( new Gene( "GeneM" ) );
+        expectedReturn.add( new Gene( "GeneN" ) );
+        expectedReturn.add( new Gene( "GeneO" ) );
+        expectedReturn.add( new Gene( "GeneP" ) );
+        expectedReturn.add( new Gene( "GeneQ" ) );
+        expectedReturn.add( new Gene( "GeneR" ) );
+        expectedReturn.add( new Gene( "GeneS" ) );
+        expectedReturn.add( new Gene( "GeneT" ) );
+        expectedReturn.add( new Gene( "GeneU" ) );
 
-        Set<String> actualReturn = test.getGeneToScoreMap().keySet();
+        Set<Gene> actualReturn = test.getGeneToScoreMap().keySet();
 
         assertTrue( RegressionTesting.containsSame( expectedReturn, actualReturn ) );
     }
