@@ -19,7 +19,6 @@
 package ubic.erminej.gui.geneset;
 
 import java.awt.Point;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,9 +35,9 @@ import ubic.basecode.graphics.MatrixDisplay;
 import ubic.erminej.Settings;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.Multifunctionality;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.JLinkLabel;
+import ubic.erminej.gui.table.MatrixPoint;
 
 /**
  * Our table model fo rone gene set.
@@ -49,19 +48,21 @@ import ubic.erminej.gui.JLinkLabel;
  */
 public class GeneSetDetailsTableModel extends AbstractTableModel {
 
-    private static final long serialVersionUID = -8155800933946966811L;
+    private static final long serialVersionUID = -1L;
     private static final String URL_REPLACE_TAG = "@@";
     private MatrixDisplay<Probe, String> m_matrixDisplay;
     private List<Probe> probeIDs;
     private Map<Probe, Double> m_pvalues;
     private Map<Probe, Integer> m_pvaluesOrdinalPosition;
     private GeneAnnotations geneData;
-    private DecimalFormat m_nf;
     private Settings settings;
     private Map<Gene, JLinkLabel> linkLabels;
     private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name", "Multifunc" };
-    private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
-    private Multifunctionality multifunctionality;
+    public static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term="
+            + URL_REPLACE_TAG;
+
+    private String urlbase = DEFAULT_GENE_URL_BASE;
+
     protected static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
 
     @Override
@@ -78,7 +79,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         } else if ( columnIndex - offset == 2 ) {
             return Object.class; // actually a List, which is not comparable.
         } else if ( columnIndex - offset == 3 ) {
-            return String.class; // symbol
+            return JLinkLabel.class; // symbol
         } else if ( columnIndex - offset == 4 ) {
             return String.class; // description
         }
@@ -96,7 +97,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      */
     public GeneSetDetailsTableModel( MatrixDisplay<Probe, String> matrixDisplay, Collection<Probe> probeIDs,
             Map<Probe, Double> pvalues, Map<Probe, Integer> pvaluesOrdinalPosition, GeneAnnotations geneData,
-            DecimalFormat nf, Settings settings ) {
+            Settings settings ) {
 
         m_matrixDisplay = matrixDisplay;
         this.probeIDs = new ArrayList<Probe>( probeIDs );
@@ -105,9 +106,6 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
         this.geneData = geneData;
 
-        this.multifunctionality = new Multifunctionality( geneData );
-
-        m_nf = nf;
         configure();
         createLinkLabels();
     }
@@ -195,7 +193,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
         // If this is part of the matrix display
         if ( column < offset ) {
-            return new Point( m_matrixDisplay.getRowIndexByName( probeID ), column ); // coords into JMatrixDisplay
+            return new MatrixPoint( m_matrixDisplay.getRowIndexByName( probeID ), column, m_matrixDisplay.getValue(
+                    m_matrixDisplay.getRowIndexByName( probeID ), column ) ); // coords into JMatrixDisplay
         }
         column -= offset;
 
@@ -247,8 +246,9 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 // multifunctionality.
                 if ( geneData == null ) return "";
                 gene_name = probeID.getGene();
-                return String.format( "%.3f (%d)", Math.max( 0.0, multifunctionality
-                        .getMultifunctionalityRank( gene_name ) ), multifunctionality.getNumGoTerms( gene_name ) );
+                return String.format( "%.3f (%d)", Math.max( 0.0, geneData.getMultifunctionality()
+                        .getMultifunctionalityRank( gene_name ) ), geneData.getMultifunctionality().getNumGoTerms(
+                        gene_name ) );
             default:
                 return "";
         }

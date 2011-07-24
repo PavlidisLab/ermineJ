@@ -248,10 +248,7 @@ public class Settings {
     /**
      * @return
      */
-    public Format getAnnotFormat() {
-        /*
-         * FIXME need backwards compatibility?
-         */
+    public Format getAnnotFormat() { 
         String storedValue = config.getString( ANNOT_FORMAT, Format.DEFAULT.toString() );
 
         if ( NumberUtils.isDigits( storedValue ) ) {

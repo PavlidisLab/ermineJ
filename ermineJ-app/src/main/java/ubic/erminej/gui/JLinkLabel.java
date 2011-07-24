@@ -19,7 +19,7 @@
 package ubic.erminej.gui;
 
 import java.awt.Color;
-import java.awt.Cursor; 
+import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.font.TextAttribute;
@@ -35,7 +35,7 @@ import ubic.basecode.util.BrowserLauncher;
  * @author Will Braynen
  * @version $Id$
  */
-public class JLinkLabel extends JTextField {
+public class JLinkLabel extends JTextField implements Comparable<JLinkLabel> {
 
     private static final long serialVersionUID = -1L;
 
@@ -94,11 +94,26 @@ public class JLinkLabel extends JTextField {
         } );
     }
 
+    @Override
+    public int compareTo( JLinkLabel o ) {
+        return this.m_text.compareTo( o.m_text );
+    }
+
     /**
      * @return
      */
     public String getURL() {
         return m_url;
+    }
+
+    public void openUrl() {
+        if ( m_url != null ) {
+            try {
+                BrowserLauncher.openURL( m_url );
+            } catch ( Exception ex ) {
+                GuiUtil.error( "Could not open a web browser window." );
+            }
+        }
     }
 
     @Override
@@ -127,16 +142,6 @@ public class JLinkLabel extends JTextField {
     @Override
     public String toString() {
         return "<html><a href=\"" + m_url + "\">" + m_text + "</a></html>";
-    }
-
-    public void openUrl() {
-        if ( m_url != null ) {
-            try {
-                BrowserLauncher.openURL( m_url );
-            } catch ( Exception ex ) {
-                GuiUtil.error( "Could not open a web browser window." );
-            }
-        }
     }
 
 }

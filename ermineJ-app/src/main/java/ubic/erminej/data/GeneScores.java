@@ -42,6 +42,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.math.Rank;
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.FileTools;
+import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 
 import cern.jet.math.Arithmetic;
@@ -66,7 +67,30 @@ public class GeneScores {
     private Map<Probe, Double> probeToScoreMap;
     private Settings settings;
     final private GeneAnnotations geneAnnots;
-    private StatusViewer messenger;
+    private StatusViewer messenger = new StatusStderr();
+
+    /**
+     * Create a copy of source that contains only the probes given.
+     * 
+     * @param source
+     * @param probes
+     */
+    public GeneScores( GeneScores source, Collection<Probe> probes ) {
+        this.geneAnnots = source.geneAnnots;
+        this.settings = source.settings;
+        this.messenger = source.messenger;
+        this.init();
+
+        for ( Probe p : probes ) {
+            Double s = source.getProbeToScoreMap().get( p );
+            if ( s == null ) {
+                throw new IllegalArgumentException( "Probe given that wasn't in the source: " + p );
+            }
+            this.probeToScoreMap.put( p, s );
+        }
+
+        setUpGeneToScoreMap();
+    }
 
     /**
      * @param is - input stream
@@ -75,7 +99,7 @@ public class GeneScores {
      * @param geneAnnotations
      * @throws IOException
      */
-    public GeneScores( InputStream is, Settings settings, StatusViewer messenger, GeneAnnotations geneAnnotations )
+    public GeneScores( InputStream is, Settings settings, StatusViewer m, GeneAnnotations geneAnnotations )
             throws IOException {
 
         if ( geneAnnotations == null ) {
@@ -84,7 +108,7 @@ public class GeneScores {
         this.geneAnnots = geneAnnotations;
         this.init();
         this.settings = settings;
-        this.messenger = messenger;
+        if ( m != null ) this.messenger = m;
         read( is );
     }
 
@@ -182,13 +206,6 @@ public class GeneScores {
     }
 
     /**
-     * @return
-     */
-    public Map<Gene, Double> getGeneToScoreMap() {
-        return geneToScoreMap;
-    }
-
-    /**
      * @param shuffle Whether the map should be scrambled first. If so, then groups are randomly associated with scores,
      *        but the actual values are the same. This is used for resampling multiple test correction.
      * @return Map of groups of genes to pvalues.
@@ -217,9 +234,20 @@ public class GeneScores {
     }
 
     /**
+     * @return
+     */
+    public Map<Gene, Double> getGeneToScoreMap() {
+        return geneToScoreMap;
+    }
+
+    /**
      */
     public int getNumScores() {
         return probeToScoreMap.size();
+    }
+
+    public Double[] getProbeScores() {
+        return this.probeToScoreMap.values().toArray( new Double[] {} );
     }
 
     /**
@@ -520,10 +548,6 @@ public class GeneScores {
 
         if ( messenger != null ) messenger.showStatus( counter + " distinct genes found in the gene scores." );
 
-    }
-
-    public Double[] getProbeScores() {
-        return this.probeToScoreMap.values().toArray( new Double[] {} );
     }
 
 } // end of class

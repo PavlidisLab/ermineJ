@@ -55,6 +55,9 @@ public class Probe {
         }
     }
 
+    /**
+     * @param geneSet
+     */
     public void addToGeneSet( GeneSetTerm geneSet ) {
         this.geneSets.add( geneSet );
     }

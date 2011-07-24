@@ -30,21 +30,22 @@ import javax.swing.table.TableCellRenderer;
 import ubic.basecode.graphics.text.Util;
 
 /**
+ * Create text going up vertically for the headings.
+ * 
  * @author Will Braynen
  * @version $Id$
  */
 public class JVerticalHeaderRenderer extends JTableHeader implements TableCellRenderer {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -236801351350339640L;
     String m_columnName;
     final int PREFERRED_HEIGHT = 80;
     final int MAX_TEXT_LENGTH = 12;
 
-    // This method is called each time a column header
-    // using this renderer needs to be rendered.
+    /**
+     * This method is called each time a column header using this renderer needs to be rendered.
+     */
+    @Override
     public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected, boolean hasFocus,
             int rowIndex, int vColIndex ) {
         // 'value' is column header value of column 'vColIndex'

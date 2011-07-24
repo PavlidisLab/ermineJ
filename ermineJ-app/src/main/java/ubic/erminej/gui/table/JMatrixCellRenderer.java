@@ -20,7 +20,6 @@ package ubic.erminej.gui.table;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Point;
 import java.text.DecimalFormat;
 
 import javax.swing.JLabel;
@@ -70,7 +69,7 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
             // this cell is the anchor and the table has the focus
         }
 
-        Point coords = ( Point ) tableCellValue;
+        MatrixPoint coords = ( MatrixPoint ) tableCellValue;
         int row = coords.x;
         int column = coords.y;
 

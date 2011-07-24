@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,12 +34,11 @@ import ubic.erminej.ClassScoreSimple;
  * @author pavlidis
  * @version $Id$
  */
-public class ApiExample {
+public class ApiTest extends TestCase {
 
-    private static Log log = LogFactory.getLog( ApiExample.class.getName() );
+    private static Log log = LogFactory.getLog( ApiTest.class.getName() );
 
-    public static void main( String[] args ) {
-
+    public final void test() {
         // List of identifiers to be analyzed
         List<String> probes = new ArrayList<String>();
         probes.add( "a" );

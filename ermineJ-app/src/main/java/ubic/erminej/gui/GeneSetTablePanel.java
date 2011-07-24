@@ -424,7 +424,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
             int newSortIndex = 0;
             if ( results.size() > 0 ) {
-                newSortIndex = currentColumnIndex; // it will have shifted over.
+                newSortIndex = GeneSetTableModel.INIT_COLUMNS;
             }
             sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
             sorter.setSortKeys( sortKeys );

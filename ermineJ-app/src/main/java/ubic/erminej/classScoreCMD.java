@@ -20,9 +20,7 @@ package ubic.erminej;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.UIManager;
@@ -126,7 +124,6 @@ public class classScoreCMD {
     protected StatusViewer statusMessenger;
     protected GeneSetTerms goData;
     protected GeneAnnotations geneData;
-    protected Map<Integer, GeneAnnotations> geneDataSets;
     protected Map<String, DoubleMatrix<Probe, String>> rawDataSets;
     protected Map<String, GeneScores> geneScoreSets;
     private String saveFileName = null;
@@ -141,7 +138,6 @@ public class classScoreCMD {
     public classScoreCMD() {
         settings = new Settings( false );
         rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
-        geneDataSets = new HashMap<Integer, GeneAnnotations>();
         geneScoreSets = new HashMap<String, GeneScores>();
         this.buildOptions();
     }
@@ -705,6 +701,15 @@ public class classScoreCMD {
 
                 rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
                 rawData.setColumnNames( omatrix.getColNames() );
+                for ( int i = 0; i < omatrix.rows(); i++ ) {
+                    String n = omatrix.getRowName( i );
+                    Probe p = geneData.findProbe( n );
+                    if ( p == null ) {
+                        throw new IllegalArgumentException(
+                                "Some probes in the data don't match those in the annotations" );
+                    }
+                    rawData.setRowName( p, i );
+                }
 
                 rawDataSets.put( settings.getRawDataFileName(), rawData );
             }
@@ -730,36 +735,9 @@ public class classScoreCMD {
             }
         }
 
-        Collection<Probe> probesToUseInAnalysis = null;
-        if ( geneScores != null ) {
-            probesToUseInAnalysis = geneScores.getProbeToScoreMap().keySet();
-        } else if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
-            assert rawData != null;
-            probesToUseInAnalysis = rawData.getRowNames();
-        } else {
-            throw new IllegalStateException( "No active probes" );
-        }
-
-        boolean needToMakeNewGeneData = true;
-        for ( Iterator<Integer> it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
-            GeneAnnotations test = geneDataSets.get( it.next() );
-
-            if ( test.getProbes().size() == probesToUseInAnalysis.size()
-                    && test.getProbes().containsAll( probesToUseInAnalysis ) ) {
-                geneData = test;
-                needToMakeNewGeneData = false;
-                break;
-            }
-
-        }
-
-        if ( needToMakeNewGeneData ) {
-            geneData = new GeneAnnotations( geneData, probesToUseInAnalysis );
-            geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
-        }
         double multifunctionalCorrelation = 0.0;
         if ( geneScores != null ) {
-            Multifunctionality mf = new Multifunctionality( geneData );
+            Multifunctionality mf = geneData.getMultifunctionality();
             multifunctionalCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
         }
 
@@ -786,12 +764,12 @@ public class classScoreCMD {
                 geneData = parser.read( settings.getAnnotFile(), Format.AFFYCSV );
             } else {
                 boolean filterNonSpecific = settings.getFilterNonSpecific(); // FIXME!!!
+                parser.setFilterNonSpecific( filterNonSpecific );
                 geneData = parser.read( settings.getAnnotFile(), Format.DEFAULT );
                 // TODO add agilent support ... can we tell the type of file by the suffix?
             }
 
             statusMessenger.showStatus( "Initializing gene class mapping" );
-            geneDataSets.put( new Integer( "original".hashCode() ), geneData );
             statusMessenger.showStatus( "Done with setup" );
             statusMessenger.showStatus( "Ready." );
         } catch ( IOException e ) {

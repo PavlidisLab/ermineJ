@@ -76,6 +76,11 @@
 				of tools including visualization and correction.
 			</li>
 			<li>
+				Algorithm change: Gene that are not in any group are removed from analysis. This should help ameliorate the effects
+				of multifunctionality, since genes that are completely unannotated are less likely to be "discovered" in a assay,
+				and don't contribute to the analysis in any positive way. This affects the computation of null distributions.
+			</li>
+			<li>
 				Tree view enhancements: You can now hide nodes in the GO hierarchy
 				based on significance, making it easier to browser your results. See
 				<a href="ermineJ-help/classScore/html/tutorial/treeview.html">the
@@ -88,6 +93,9 @@
 				Improvement: A major cleanup of the way ErmineJ handles gene annotations. A number of lurking problems were flushed out. 
 				Perhaps the most serious was that it is not clear whether redundant gene sets were being excluded from analyses (as they should).
 				It is now much easier to find out how many gene sets there are, how many have genes, and how many are redundant.
+			</li>
+			<li>
+				Bug fix: Error handling is somewhat improved, so mysterious stoppages of analyses should be easier to diagnose.
 			</li>
 			<li>
 				Bug fix: Command line tool didn't correctly deal with correlation

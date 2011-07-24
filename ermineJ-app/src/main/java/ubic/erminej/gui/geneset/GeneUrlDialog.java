@@ -42,8 +42,6 @@ import ubic.erminej.Settings;
 import ubic.erminej.gui.StatusJlabel;
 
 /**
- * FIXME
- * 
  * @author pavlidis
  * @version $Id$
  */

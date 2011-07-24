@@ -83,7 +83,7 @@ public class ClassScoreSimple {
      * Run an analysis using the current configuration.
      */
     public void run( List<Double> geneScores ) {
-        GeneAnnotations geneData = new GeneAnnotations( genes, goAssociations );
+        GeneAnnotations geneData = new GeneAnnotations(probes, genes, goAssociations );
         GeneScores scores = new GeneScores( probes, geneScores, geneData, settings );
         results = new GeneSetPvalRun( settings, geneData, scores );
     }

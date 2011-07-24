@@ -159,7 +159,6 @@ public class GeneSetDetailsFrame extends JFrame {
     private JLabel m_colorRangeLabel = new JLabel();
     private JSlider m_colorRangeSlider = new JSlider();
     private JGradientBar m_gradientBar = new JGradientBar();
-    private DecimalFormat m_nf = new DecimalFormat( "0.##E0" );
     private JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
     private Map<Probe, Integer> m_pvaluesOrdinalPosition = new HashMap<Probe, Integer>();
     private JMenuItem saveDataMenuItem = new JMenuItem();
@@ -286,7 +285,7 @@ public class GeneSetDetailsFrame extends JFrame {
          */
 
         tableModel = new GeneSetDetailsTableModel( matrixDisplay, probes, pvalues, m_pvaluesOrdinalPosition, geneData,
-                m_nf, settings );
+                settings );
         table.setModel( tableModel );
         // table.setAutoCreateRowSorter( true );
         TableRowSorter<GeneSetDetailsTableModel> sorter = new TableRowSorter<GeneSetDetailsTableModel>(
@@ -554,6 +553,9 @@ public class GeneSetDetailsFrame extends JFrame {
         m_gradientBar.setLabels( min, max );
     }
 
+    /**
+     * @throws Exception
+     */
     private void jbInit() throws Exception {
 
         // Listener for window closing events.
@@ -570,7 +572,6 @@ public class GeneSetDetailsFrame extends JFrame {
         this.getContentPane().add( toolBar, BorderLayout.NORTH );
         this.getContentPane().add( jPanelStatus, BorderLayout.SOUTH );
 
-        m_nf.setMaximumFractionDigits( 3 );
         if ( matrixDisplay != null ) {
             boolean isNormalized = matrixDisplay.getStandardizedEnabled();
             saveImageMenuItem.setEnabled( true );
@@ -725,7 +726,7 @@ public class GeneSetDetailsFrame extends JFrame {
         m_normalizeMenuItem.addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter( this ) );
         optionsMenu.setText( "Options" );
         setGeneUrlBaseMenuItem.setActionCommand( "Change gene name URL" );
-        setGeneUrlBaseMenuItem.setText( "Change gene name URL..." );
+        setGeneUrlBaseMenuItem.setText( "Change gene name URL ..." );
         setGeneUrlBaseMenuItem.addActionListener( new JGeneSetFrame_viewGeneUrlDialog_actionAdapter( this ) );
 
         viewMenu.add( m_normalizeMenuItem );
@@ -744,11 +745,11 @@ public class GeneSetDetailsFrame extends JFrame {
         analysisMenu.add( m_viewHistMenuItem );
 
         saveDataMenuItem.setActionCommand( "SaveData" );
-        saveDataMenuItem.setText( "Save Data..." );
+        saveDataMenuItem.setText( "Save Data ..." );
         saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
 
         switchDataFileMenuItem.setActionCommand( "Switch Data Shown" );
-        switchDataFileMenuItem.setText( "Change Dataset..." );
+        switchDataFileMenuItem.setText( "Change Dataset ..." );
         switchDataFileMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 switchRawDataFile();
@@ -758,7 +759,7 @@ public class GeneSetDetailsFrame extends JFrame {
         } );
 
         switchGeneScoreFileMenuItem.setActionCommand( "Change gene score file" );
-        switchGeneScoreFileMenuItem.setText( "Change gene score file..." );
+        switchGeneScoreFileMenuItem.setText( "Change gene score file ..." );
         switchGeneScoreFileMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 switchGeneScoreFile();
@@ -776,7 +777,7 @@ public class GeneSetDetailsFrame extends JFrame {
         menuBar.add( fileMenu );
         menuBar.add( viewMenu );
         menuBar.add( optionsMenu );
-        menuBar.add( analysisMenu );
+        // menuBar.add( analysisMenu ); // until it has functionality...
     }
 
     /**
@@ -851,7 +852,7 @@ public class GeneSetDetailsFrame extends JFrame {
     private void printHeader( boolean includeMatrixValues, boolean includeAnnots, BufferedWriter out, int colCount )
             throws IOException {
         out.write( "Probe" );
-        if ( includeAnnots ) {// FIXME - this is not maintainable!
+        if ( includeAnnots ) {
             out.write( "\tScore\tSymbol\tName" );
         }
         // write out column names
@@ -940,6 +941,9 @@ public class GeneSetDetailsFrame extends JFrame {
 
     }
 
+    /**
+     * @param enabled
+     */
     private void setDisplayMatrixGUIEnabled( boolean enabled ) {
         if ( settings == null ) return;
         // the menu

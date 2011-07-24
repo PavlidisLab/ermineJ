@@ -37,7 +37,6 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
 
 /**
@@ -57,7 +56,7 @@ public class AnalysisThread extends Thread {
     private Settings settings;
     private volatile boolean stop = false;
     private boolean wasError = false;
-    private boolean finishedNormally;
+    private boolean finishedNormally = false;
 
     /**
      * @param csframe
@@ -115,10 +114,14 @@ public class AnalysisThread extends Thread {
 
     /**
      * @return
-     * @throws IOException
      */
-    public synchronized GeneSetPvalRun doAnalysis() throws IOException {
-        return doAnalysis( null );
+    public synchronized GeneSetPvalRun doAnalysis() {
+        try {
+            return doAnalysis( null );
+        } catch ( Exception e ) {
+            this.messenger.showError( e );
+            return null;
+        }
     }
 
     public synchronized GeneSetPvalRun getLatestResults() throws IllegalStateException {
@@ -178,8 +181,14 @@ public class AnalysisThread extends Thread {
             log.debug( "Running method is " + runningMethod.getName() );
             GeneSetPvalRun results = ( GeneSetPvalRun ) runningMethod.invoke( this, ( Object[] ) null );
             log.debug( "Runner returned" );
-            this.setLatestResults( results );
-            this.finishedNormally = true;
+
+            if ( results == null ) {
+                stop = true;
+                this.finishedNormally = false;
+            } else {
+                this.setLatestResults( results );
+                this.finishedNormally = true;
+            }
         } catch ( InvocationTargetException e ) {
             if ( !( e.getCause() instanceof CancellationException ) ) {
                 showError( e.getCause() );
@@ -246,6 +255,14 @@ public class AnalysisThread extends Thread {
 
             rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
             rawData.setColumnNames( omatrix.getColNames() );
+            for ( int i = 0; i < omatrix.rows(); i++ ) {
+                String n = omatrix.getRowName( i );
+                Probe p = geneAnnots.findProbe( n );
+                if ( p == null ) {
+                    throw new IllegalArgumentException( "Some probes in the data don't match those in the annotations" );
+                }
+                rawData.setRowName( p, i );
+            }
 
             rawDataSets.put( settings.getRawDataFileName(), rawData );
         }

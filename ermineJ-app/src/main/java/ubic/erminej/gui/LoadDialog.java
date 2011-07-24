@@ -81,8 +81,9 @@ public class LoadDialog extends AppDialog {
         setActionButtonText( "Load" );
         setCancelButtonText( "Cancel" );
         setHelpButtonText( "Help" );
-        addHelp( "<html><b>Load a previous analysis into the system.</b>"
-                + "The file selected must be an analysis file saved from this " + "software.<br></html>" );
+        addHelp( "<html><b>Load a previous analysis</b> "
+                + "The file selected must be an analysis file saved from this software, "
+                + "using the current annotationsS.<br></html>" );
         addMain( centerPanel );
         this.setTitle( "Load Results from File" );
         HelpHelper hh = new HelpHelper();
@@ -119,6 +120,7 @@ public class LoadDialog extends AppDialog {
         }
     } /*
        * (non-Javadoc)
+       * 
        * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
        */
 

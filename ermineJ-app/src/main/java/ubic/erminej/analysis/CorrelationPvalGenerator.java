@@ -35,7 +35,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm; 
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
 
@@ -52,9 +52,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     private Settings.MultiProbeHandling geneRepTreatment = Settings.MultiProbeHandling.BEST;
     private int cacheHits = 0;
     private int tests = 0;
-    private double[][] dataAsRawMatrix;
-    private double[][] selfSquaredMatrix;
     private boolean[][] nanStatusMatrix;
+    private double[][] selfSquaredMatrix;
 
     /**
      * @return Returns the tests.
@@ -89,15 +88,14 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
         super( settings, a, csc );
         this.data = data;
 
-        dataAsRawMatrix = new double[data.rows()][];
-        for ( int j = 0; j < data.rows(); j++ ) {
-            double[] rowValues = data.getRow( j );
-            dataAsRawMatrix[j] = rowValues;
-        }
-        selfSquaredMatrix = MatrixStats.selfSquaredMatrix( dataAsRawMatrix );
-        nanStatusMatrix = MatrixStats.nanStatusMatrix( dataAsRawMatrix );
+        nanStatusMatrix = MatrixStats.nanStatusMatrix( data.asArray() );
+        selfSquaredMatrix = MatrixStats.selfSquaredMatrix( data.asArray() );
     }
 
+    /**
+     * @param geneSetName
+     * @return
+     */
     public GeneSetResult classPval( GeneSetTerm geneSetName ) {
         if ( !super.checkAspectAndRedundancy( geneSetName ) ) return null;
         int effSize = effectiveSizes.get( geneSetName );
@@ -125,7 +123,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
             int iIndex = data.getRowIndexByName( probei );
             Gene genei = probei.getGene();
-            double[] irow = dataAsRawMatrix[iIndex];
+            double[] irow = data.getRow( iIndex );
             int numProbesForGeneI = geneAnnots.numProbesForGene( genei );
             boolean multipleProbesI = numProbesForGeneI > 1;
 
@@ -144,7 +142,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                     continue; // always ignore self-comparisons.
                 }
                 int numProbesForGeneJ = geneAnnots.numProbesForGene( genej );
-                double[] jrow = dataAsRawMatrix[jIndex];
+                double[] jrow = data.getRow( jIndex );
                 double corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow, selfSquaredMatrix[iIndex],
                         selfSquaredMatrix[jIndex], nanStatusMatrix[iIndex], nanStatusMatrix[jIndex] ) );
                 tests++;

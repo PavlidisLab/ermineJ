@@ -44,9 +44,9 @@ import ubic.erminej.data.GeneSetTerm;
 public class ResultsFileReader {
 
     private Map<GeneSetTerm, GeneSetResult> results;
-    private GeneAnnotations geneAnnots;
 
     /**
+     * @param geneAnnots
      * @param filename
      * @param messenger
      * @throws NumberFormatException
@@ -55,7 +55,7 @@ public class ResultsFileReader {
     public ResultsFileReader( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
             throws NumberFormatException, IOException {
         results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
-        this.geneAnnots = geneAnnots;
+
         File infile = new File( filename );
         if ( !infile.exists() || !infile.canRead() ) {
             throw new IOException( "Could not read " + filename );
@@ -75,6 +75,7 @@ public class ResultsFileReader {
             StringTokenizer st = new StringTokenizer( line, "\t" );
             String firstword = st.nextToken();
             if ( firstword.compareTo( "!" ) == 0 ) {
+                st.nextToken(); // / class name, ignored.
                 String classId = st.nextToken();
                 GeneSetTerm term = geneAnnots.findTerm( classId );
                 if ( term == null && !warned ) {
@@ -83,10 +84,13 @@ public class ResultsFileReader {
                     continue;
                 }
 
+                // we could recompute this, but better not.
                 int size = Integer.parseInt( st.nextToken() );
                 int effsize = Integer.parseInt( st.nextToken() );
                 double score = Double.parseDouble( st.nextToken() );
                 double pval = Double.parseDouble( st.nextToken() );
+
+                // we could recompute this, but better not.
                 double correctedPval = Double.parseDouble( st.nextToken() );
 
                 GeneSetResult c = new GeneSetResult( term, size, effsize, score, pval, correctedPval );

@@ -245,7 +245,7 @@ public class GeneSetMapTools {
     public static void removeAspect( GeneAnnotations ga, GeneSetTerms gon, StatusViewer messenger, String aspect ) {
         if ( !( aspect.equals( "molecular_function" ) || aspect.equals( "biological_process" )
                 || aspect.equals( "cellular_component" ) || aspect.equals( GeneSetTerms.USER_DEFINED ) ) ) {
-            throw new IllegalArgumentException( "Unknown aspect requested" ); // FIXME use enum.
+            throw new IllegalArgumentException( "Unknown aspect requested" );  
         }
 
         Collection<GeneSetTerm> geneSets = ga.getActiveGeneSets();

@@ -542,6 +542,10 @@ public class GeneAnnotationParser {
 
         return result;
     }
+
+    public void setFilterNonSpecific( boolean b ) {
+        this.filterNonSpecific = b;
+    }
 }
 
 class ParserHelper {

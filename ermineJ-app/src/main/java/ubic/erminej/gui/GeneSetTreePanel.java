@@ -131,11 +131,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     /**
      * @param classID a node somewhere in the tree; we expand the path
      */
-    public boolean expandToGeneSet( GeneSetTerm classID ) {
-
-        /*
-         * FIXME: if the term is currently hidden, reverse the filtering.
-         */
+    public boolean expandToGeneSet( GeneSetTerm classID ) { 
 
         TreePath path = this.findByGeneSetId( classID );
         boolean foundIt = false;
