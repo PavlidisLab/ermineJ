@@ -47,21 +47,9 @@ public class TestGeneAnnotations extends TestCase {
     List<String> probes;
     List<Gene> geneIds;
     List<Collection<GeneSetTerm>> goIds;
-    static GeneSetTerms goNames;
+    GeneSetTerms goNames;
 
     GeneAnnotations ga;
-
-    static {
-        try {
-            ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
-                    .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
-            z.getNextEntry();
-            goNames = new GeneSetTerms( z );
-
-        } catch ( Exception e ) {
-            throw new RuntimeException( e );
-        }
-    }
 
     public void testAddGeneSet() throws Exception {
         List<Gene> newGeneSet = new ArrayList<Gene>();
@@ -85,7 +73,7 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotations pruned = new GeneAnnotations( ga, keepers );
         assertEquals( 4, pruned.numGenes() );
         assertEquals( 4, pruned.numProbes() );
-        assertEquals( 7, pruned.numGeneSets() );
+        assertEquals( 30, pruned.numGeneSets() ); // not checked by hand.
     }
 
     public void testGeneAnnotationsApiA() throws Exception {
@@ -112,7 +100,9 @@ public class TestGeneAnnotations extends TestCase {
 
     public void testGoNames() throws Exception {
         // http://amigo.geneontology.org/cgi-bin/amigo/term_details?term=GO:0005739 - "mitochondrion"
-        assertEquals( "cellular_component", goNames.get( "GO:0005739" ).getAspect() );
+        GeneSetTerm cellComp = goNames.get( "GO:0005739" );
+        assertNotNull( cellComp );
+        assertEquals( "cellular_component", cellComp.getAspect() );
         GeneSetTerm term = new GeneSetTerm( "GO:0005739" );
         Set<GeneSetTerm> children = goNames.getChildren( term );
         assertEquals( 3, children.size() );
@@ -128,8 +118,8 @@ public class TestGeneAnnotations extends TestCase {
         assertTrue( parents.contains( new GeneSetTerm( "GO:0043231" ) ) );
         assertEquals( "A semiautonomous, self replicating organelle that occurs"
                 + " in varying numbers, shapes, and sizes in the cytoplasm"
-                + " of virtually all eukaryotic cells. It is notably the site of tissue respiration.", goNames.get(
-                "GO:0005739" ).getDefinition() );
+                + " of virtually all eukaryotic cells. It is notably the site of tissue respiration.", cellComp
+                .getDefinition() );
     }
 
     public void testMeanGenesPerSet() throws Exception {
@@ -184,9 +174,8 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readAgilent( ia, null );
         int actualValue = g.findProbe( "A_52_P311491" ).getGeneSets().size();
-        int expectedValue = 12; // it's a lot, but they are redundant? Not checked by hand.
         assertEquals( 18, g.getRedundant().size() ); // not checked by hand.
-        assertEquals( expectedValue, actualValue );
+        assertEquals( 9, actualValue ); // not checked by hand.
     }
 
     public void testReadCommaDelimited() throws Exception {
@@ -196,7 +185,7 @@ public class TestGeneAnnotations extends TestCase {
         Probe probe = g.findProbe( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
-        int expectedValue = 113; // not checked by hand.
+        int expectedValue = 64; // not checked by hand.
         int actualValue = probe.getGeneSets().size();
         assertEquals( expectedValue, actualValue );
     }
@@ -259,6 +248,12 @@ public class TestGeneAnnotations extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+
+        ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
+                .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
+        z.getNextEntry();
+        goNames = new GeneSetTerms( z );
+
         probes = new ArrayList<String>();
         probes.add( "a" );
         probes.add( "b" );
