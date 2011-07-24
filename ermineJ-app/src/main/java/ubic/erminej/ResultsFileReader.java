@@ -30,7 +30,9 @@ import java.util.StringTokenizer;
 
 import ubic.basecode.util.StatusViewer;
 
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * Load results from a file
@@ -41,7 +43,8 @@ import ubic.erminej.data.GeneSetResult;
  */
 public class ResultsFileReader {
 
-    private Map<String, GeneSetResult> results;
+    private Map<GeneSetTerm, GeneSetResult> results;
+    private GeneAnnotations geneAnnots;
 
     /**
      * @param filename
@@ -49,9 +52,10 @@ public class ResultsFileReader {
      * @throws NumberFormatException
      * @throws IOException
      */
-    public ResultsFileReader( String filename, StatusViewer messenger ) throws NumberFormatException, IOException {
-        results = new LinkedHashMap<String, GeneSetResult>();
-
+    public ResultsFileReader( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
+            throws NumberFormatException, IOException {
+        results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
+        this.geneAnnots = geneAnnots;
         File infile = new File( filename );
         if ( !infile.exists() || !infile.canRead() ) {
             throw new IOException( "Could not read " + filename );
@@ -64,28 +68,36 @@ public class ResultsFileReader {
         BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( new FileInputStream(
                 filename ) ) ) );
 
+        boolean warned = false;
         messenger.showStatus( "Loading analysis..." );
         String line;
         while ( ( line = dis.readLine() ) != null ) {
             StringTokenizer st = new StringTokenizer( line, "\t" );
             String firstword = st.nextToken();
             if ( firstword.compareTo( "!" ) == 0 ) {
-                String className = st.nextToken();
                 String classId = st.nextToken();
+                GeneSetTerm term = geneAnnots.findTerm( classId );
+                if ( term == null && !warned ) {
+                    messenger.showError( "Term " + classId + " not recognized, skipping (further warnings skipped)" );
+                    warned = true;
+                    continue;
+                }
+
                 int size = Integer.parseInt( st.nextToken() );
                 int effsize = Integer.parseInt( st.nextToken() );
                 double score = Double.parseDouble( st.nextToken() );
                 double pval = Double.parseDouble( st.nextToken() );
                 double correctedPval = Double.parseDouble( st.nextToken() );
-                GeneSetResult c = new GeneSetResult( classId, className, size, effsize, score, pval, correctedPval );
-                results.put( classId, c );
+
+                GeneSetResult c = new GeneSetResult( term, size, effsize, score, pval, correctedPval );
+                results.put( term, c );
             }
         }
         dis.close();
         messenger.showStatus( results.size() + " class results read from file" );
     }
 
-    public Map<String, GeneSetResult> getResults() {
+    public Map<GeneSetTerm, GeneSetResult> getResults() {
         return results;
     }
 

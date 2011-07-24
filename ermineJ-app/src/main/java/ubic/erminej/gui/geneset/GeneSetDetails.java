@@ -32,11 +32,13 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.Probe;
 
 /**
  * The display of the detailed visualization of a gene set.
@@ -46,8 +48,7 @@ import ubic.erminej.data.GeneSetResult;
  */
 public class GeneSetDetails {
     protected static final Log log = LogFactory.getLog( GeneSetDetails.class );
-    private String classID;
-    private String className;
+    private GeneSetTerm classID;
     private GeneAnnotations geneData;
     private Settings settings;
     private final StatusViewer callerStatusViewer;
@@ -59,8 +60,8 @@ public class GeneSetDetails {
      * @param settings
      * @param classID
      */
-    public GeneSetDetails( StatusViewer callerStatusViewer, GONames goData, GeneAnnotations geneData,
-            Settings settings, String classID ) {
+    public GeneSetDetails( StatusViewer callerStatusViewer, GeneSetTerms goData, GeneAnnotations geneData,
+            Settings settings, GeneSetTerm classID ) {
         this.callerStatusViewer = callerStatusViewer;
         this.classID = classID;
 
@@ -71,7 +72,6 @@ public class GeneSetDetails {
         } else {
             this.settings = settings;
         }
-        this.className = goData.getNameForId( classID );
     }
 
     /**
@@ -84,8 +84,8 @@ public class GeneSetDetails {
     public void show( String runName, GeneSetResult res, GeneScores geneScores ) throws IOException,
             IllegalStateException {
 
-        Collection<String> probeIDs = null;
-        Map<String, Double> pvals = new HashMap<String, Double>();
+        Collection<Probe> probeIDs = null;
+        Map<Probe, Double> pvals = new HashMap<Probe, Double>();
 
         if ( geneData == null ) {
             // user will be prompted.
@@ -106,12 +106,12 @@ public class GeneSetDetails {
         }
 
         if ( probeIDs == null ) {
-            log.warn( "Class data retrieval error for " + className + "( no probes )" );
+            log.warn( "Class data retrieval error for " + this.classID.getName() + "( no probes )" );
         }
 
         // create the details frame
-        GeneSetDetailsFrame f = new GeneSetDetailsFrame( className, callerStatusViewer, new ArrayList<String>( probeIDs ), pvals,
-                geneData, settings );
+        GeneSetDetailsFrame f = new GeneSetDetailsFrame( res, callerStatusViewer, new ArrayList<Probe>( probeIDs ),
+                pvals, geneData, settings );
 
         String title = getTitle( runName, res, probeIDs );
         f.setTitle( title );
@@ -124,11 +124,11 @@ public class GeneSetDetails {
      * @param probeIDs
      * @param pvals
      */
-    private void getGeneScoresForGeneSet( GeneScores geneScores, Collection<String> probeIDs, Map<String, Double> pvals ) {
+    private void getGeneScoresForGeneSet( GeneScores geneScores, Collection<Probe> probeIDs, Map<Probe, Double> pvals ) {
         if ( probeIDs == null ) return;
         assert geneScores != null;
-        for ( Iterator<String> iter = probeIDs.iterator(); iter.hasNext(); ) {
-            String probeID = iter.next();
+        for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            Probe probeID = iter.next();
 
             if ( !geneScores.getProbeToScoreMap().containsKey( probeID ) ) {
                 pvals.put( probeID, new Double( Double.NaN ) );
@@ -174,10 +174,11 @@ public class GeneSetDetails {
      * @param probeIDs
      * @return
      */
-    private String getTitle( String runName, GeneSetResult res, Collection<String> probeIDs ) {
+    private String getTitle( String runName, GeneSetResult res, Collection<Probe> probeIDs ) {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits( 8 );
-        String title = className + " (" + probeIDs.size() + " items ";
+        String title = this.classID.getId() + " - " + StringUtils.abbreviate( this.classID.getName(), 50 ) + " ("
+                + probeIDs.size() + " items ";
         if ( runName != null ) title = title + runName + " ";
         if ( res != null ) title = title + " p = " + nf.format( res.getPvalue() );
         title = title + ")";
@@ -187,8 +188,11 @@ public class GeneSetDetails {
     /**
      * Show when there is no run information available.
      */
-    public void show() throws IOException, IllegalStateException {
-        this.show( null, null, null );
-    }
+    public void show() {
+        GeneSetDetailsFrame f = new GeneSetDetailsFrame( this.classID, callerStatusViewer, geneData, settings );
 
+        String title = classID.getId() + " - " + StringUtils.abbreviate( this.classID.getName(), 50 );
+        f.setTitle( title );
+        f.setVisible( true );
+    }
 }

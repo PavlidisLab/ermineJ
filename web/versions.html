@@ -58,7 +58,8 @@
 			Current version
 		</h2>
 		<p>
-			Version 2.2 - (August 2011) Changes include:
+			Version 2.2 - (August 2011) Changes include both major new features,
+			minor bug fixes, and major code rewrites:
 		</p>
 		<ul>
 			<li>
@@ -71,7 +72,17 @@
 				Introduction of "gene multifunctionality" features, a major new
 				feature of ErmineJ. See
 				<a href="ermineJ-help/classScore/html/tutorial/multifunc.html">the
-					documentation</a> for details.
+					documentation</a> for details. We are working on a more extensive set
+				of tools including visualization and correction.
+			</li>
+			<li>
+				Tree view enhancements: You can now hide nodes in the GO hierarchy
+				based on significance, making it easier to browser your results. See
+				<a href="ermineJ-help/classScore/html/tutorial/treeview.html">the
+					documentation</a> for details. You can also hide terms that are redundant or empty.
+			</li>
+			<li>
+				Table view enhancements: You can hide rows in the table to remove clutter due to redundant or empty gene sets.
 			</li>
 			<li>
 				Bug fix: Command line tool didn't correctly deal with correlation
@@ -82,7 +93,13 @@
 				when validating the "threshold" option.
 			</li>
 			<li>
-				"Obsolete" GO terms no longer displayed.
+				Bug fix: Replacing gene URL patterns in Gene Set Details was broken.
+			</li>
+			<li>
+				Bug fix: Switching gene score files was probably broken.
+			</li>
+			<li>
+				Bug fix: "Obsolete" GO terms no longer displayed in tree or table.
 			</li>
 			<li>
 				Bug fix: Affymetrix CSV files work again (NetAffx format changed)
@@ -90,7 +107,12 @@
 			<li>
 				Added documentation of how to deal with "down-regulated" vs.
 				"up-regulated" genes (
-				<a href="ermineJ-help/classScore/html/faq.html">FAQ</a>)
+				<a href="ermineJ-help/classScore/html/faq.html">FAQ</a>). There are quite a few updates to the manual.
+			</li>
+			<li>
+				(Behind the scenes) Large parts of ErmineJ's code has been rewritten
+				to improve future maintainability and modularity. A wide range of other
+				minor bugs have been fixed. And probably some bugs have been introduced.
 			</li>
 		</ul>
 		<hr />

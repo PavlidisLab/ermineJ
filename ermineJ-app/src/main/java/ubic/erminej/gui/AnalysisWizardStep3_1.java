@@ -22,28 +22,26 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox; 
 import javax.swing.JPanel;
 
 import ubic.erminej.Settings;
 
 /**
- * Choose the GO aspects to use.
+ * Choose the aspects to use.
  * 
  * @author pavlidis
  * @version $Id$
  */
 public class AnalysisWizardStep3_1 extends WizardStep {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 9064542224892172L;
     private final Settings settings;
     private JCheckBox biologicalProcessButton;
     private JCheckBox molecularFunctionButton;
     private JCheckBox cellularComponentButton;
+    private JCheckBox userDefinedButton;
 
     /**
      * @param wizard
@@ -64,6 +62,7 @@ public class AnalysisWizardStep3_1 extends WizardStep {
         this.biologicalProcessButton.setSelected( settings.getUseBiologicalProcess() );
         this.molecularFunctionButton.setSelected( settings.getUseMolecularFunction() );
         this.cellularComponentButton.setSelected( settings.getUseCellularComponent() );
+        this.userDefinedButton.setSelected( settings.getUseUserDefined() );
     }
 
     /**
@@ -73,6 +72,7 @@ public class AnalysisWizardStep3_1 extends WizardStep {
         settings.setUseBiologicalProcess( this.biologicalProcessButton.isSelected() );
         settings.setUseCellularComponent( this.cellularComponentButton.isSelected() );
         settings.setUseMolecularFunction( this.molecularFunctionButton.isSelected() );
+        settings.setUseUserDefined( this.userDefinedButton.isSelected() );
     }
 
     /*
@@ -82,54 +82,42 @@ public class AnalysisWizardStep3_1 extends WizardStep {
      */
     @Override
     protected void jbInit() {
-        JPanel step1Panel = new JPanel();
-        JPanel jPanel4 = new JPanel();
-        JLabel jLabel8 = new JLabel();
-        JPanel jPanel5 = new JPanel();
-        // ButtonGroup buttonGroup1 = new ButtonGroup();
+        JPanel buttonPanel = new JPanel();
+
+        buttonPanel.setLayout( new BoxLayout( buttonPanel, BoxLayout.Y_AXIS ) );
+
+        buttonPanel.setPreferredSize( new Dimension( 550, 140 ) );
+
         biologicalProcessButton = new JCheckBox();
         molecularFunctionButton = new JCheckBox();
         cellularComponentButton = new JCheckBox();
-        JPanel jPanel12 = new JPanel();
-        JLabel jLabel4 = new JLabel();
-        JLabel jLabel5 = new JLabel();
-        JLabel jLabel9 = new JLabel();
-        step1Panel.setPreferredSize( new Dimension( 550, 120 ) );
-        jPanel4.setBorder( BorderFactory.createEtchedBorder() );
-        jPanel4.setPreferredSize( new Dimension( 400, 94 ) );
-        jLabel8.setText( "" );
-        jLabel8.setPreferredSize( new Dimension( 274, 17 ) );
-        step1Panel.add( jLabel8, null );
-        jPanel5.setPreferredSize( new Dimension( 150, 80 ) );
+        userDefinedButton = new JCheckBox();
+
         biologicalProcessButton.setText( "Biological Process" );
         biologicalProcessButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
         biologicalProcessButton.setPreferredSize( new Dimension( 140, 17 ) );
+        buttonPanel.add( biologicalProcessButton, null );
 
-        jPanel5.add( biologicalProcessButton, null );
         molecularFunctionButton.setText( "Molecular Function" );
         molecularFunctionButton.setSelected( true );
         molecularFunctionButton.setPreferredSize( new Dimension( 140, 17 ) );
         molecularFunctionButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        buttonPanel.add( molecularFunctionButton, null );
 
-        jPanel5.add( molecularFunctionButton, null );
         cellularComponentButton.setText( "Cellular Component" );
         cellularComponentButton.setPreferredSize( new Dimension( 140, 17 ) );
         cellularComponentButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        buttonPanel.add( cellularComponentButton, null );
 
-        jPanel5.add( cellularComponentButton, null );
-        jPanel4.add( jPanel5, null );
-        jPanel12.setPreferredSize( new Dimension( 210, 80 ) );
-        jLabel9.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel9, null );
-        jLabel4.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel4, null );
-        jLabel5.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel5, null );
-        jPanel4.add( jPanel12, null );
-        step1Panel.add( jPanel4, null );
+        userDefinedButton.setText( "Your custom groups" );
+        userDefinedButton.setPreferredSize( new Dimension( 140, 17 ) );
+        userDefinedButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        buttonPanel.add( userDefinedButton, null );
 
-        this.addHelp( "<html><b>Select the Gene Ontology aspects to include in the analysis.</b><br>" + "</html>" );
-        this.addMain( step1Panel );
+        buttonPanel.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
+
+        this.addHelp( "<html><b>Select the aspects to include in the analysis.</b><br>" + "</html>" );
+        this.addMain( buttonPanel );
 
     }
 

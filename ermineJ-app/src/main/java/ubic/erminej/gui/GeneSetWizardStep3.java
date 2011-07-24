@@ -20,17 +20,19 @@ package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.table.AbstractTableModel;
 
-import ubic.erminej.data.UserDefinedGeneSet;
+import org.apache.commons.lang.StringUtils;
+
+import ubic.erminej.data.GeneSet;
+import ubic.erminej.data.Probe;
 
 /**
  * @author Homin K Lee
@@ -38,29 +40,16 @@ import ubic.erminej.data.UserDefinedGeneSet;
  */
 public class GeneSetWizardStep3 extends WizardStep {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -7269554461600183571L;
-    private UserDefinedGeneSet newGeneSet = null;
-    private JLabel classIDFinal = null;
+    private GeneSet newGeneSet = null;
     private JTextField classIDTF = null;
     private JTextArea classDescTA = null;
-    private JTable finalTable = null;
 
-    String origID = null;
-    String origDesc = null;
-    private final boolean makenew;
-
-    public GeneSetWizardStep3( GeneSetWizard wiz, UserDefinedGeneSet newGeneSet, boolean makenew ) {
+    public GeneSetWizardStep3( GeneSetWizard wiz ) {
         super( wiz );
-        this.makenew = makenew;
-        this.newGeneSet = newGeneSet;
+        newGeneSet = wiz.getNewGeneSet();
         this.jbInit();
-        AbstractTableModel finalTableModel = newGeneSet.toTableModel( true );
-        assert finalTableModel != null;
-        assert finalTable != null;
-        finalTable.setModel( finalTableModel );
+
         wiz.clearStatus();
     }
 
@@ -71,65 +60,37 @@ public class GeneSetWizardStep3 extends WizardStep {
         JPanel step3Panel = new JPanel();
         step3Panel.setLayout( new BorderLayout() );
 
-        JPanel ncIDPanel = new JPanel();
-        ncIDPanel.setPreferredSize( new Dimension( 128, 51 ) );
-        JLabel classIDL = new JLabel( "New Gene Set ID: " );
+        JPanel idPanel = new JPanel();
+        idPanel.setPreferredSize( new Dimension( 500, 51 ) );
 
-        // classIDTF.addKeyListener( new classIDlistener( this ) );
+        JLabel classIDL = new JLabel( "Gene Set name: " );
         classIDTF = new JTextField();
-        classIDTF.setPreferredSize( new Dimension( 120, 19 ) );
+        classIDTF.setPreferredSize( new Dimension( 240, 19 ) );
         classIDTF.setBorder( BorderFactory.createLoweredBevelBorder() );
-        classIDTF.setToolTipText( "New Gene Set ID" );
 
-        ncIDPanel.add( classIDL );
-        ncIDPanel.add( classIDTF );
+        idPanel.add( classIDL );
+        idPanel.add( classIDTF );
 
-        JPanel ncInfo1Panel = new JPanel();
-        ncInfo1Panel.setPreferredSize( new Dimension( 165, 240 ) );
-        JPanel ncDescPanel = new JPanel();
-        ncDescPanel.setPreferredSize( new Dimension( 165, 180 ) );
-        JLabel classDescL = new JLabel( "New gene set ID: " );
-
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setPreferredSize( new Dimension( 500, 180 ) );
+        JLabel classDescL = new JLabel( "Description: " );
         classDescL.setRequestFocusEnabled( true );
-        classDescL.setText( "New gene set Description: " );
+
         classDescTA = new JTextArea();
-        if ( !makenew ) {
-            classDescTA.setText( newGeneSet.getId() );
-        }
-        classDescTA.setToolTipText( "New gene set description" );
-
-        if ( makenew ) {
-            classDescTA.setText( "Enter description" );
-        } else {
-            classDescTA.setText( newGeneSet.getDesc() );
-        }
         classDescTA.setLineWrap( true );
-        JScrollPane classDTAScroll = new JScrollPane( classDescTA );
-        classDTAScroll.setBorder( BorderFactory.createLoweredBevelBorder() );
-        classDTAScroll.setPreferredSize( new Dimension( 160, 140 ) );
-        ncDescPanel.add( classDescL );
-        ncDescPanel.add( classDTAScroll, null );
-        ncInfo1Panel.add( ncIDPanel, null );
-        ncInfo1Panel.add( ncDescPanel, null );
+        classDescTA.setBorder( BorderFactory.createLoweredBevelBorder() );
+        classDescTA.setPreferredSize( new Dimension( 500, 180 ) );
+        Font oldFont = classDescTA.getFont();
+        Font newFont = new Font( oldFont.getFontName(), oldFont.getStyle(), 11 /* points */);
+        classDescTA.setFont( newFont );
 
-        JPanel ncInfo2Panel = new JPanel();
-        ncInfo2Panel.setLayout( new BorderLayout() );
-        ncInfo2Panel.setPreferredSize( new Dimension( 220, 240 ) );
-        classIDFinal = new JLabel( "New Gene set ID: " );
-        classIDFinal.setText( "No Gene set Name" );
-        classIDFinal.setRequestFocusEnabled( true );
+        descriptionPanel.add( classDescL );
+        descriptionPanel.add( classDescTA );
 
-        finalTable = new JTable();
-        finalTable.getTableHeader().setReorderingAllowed( false );
-        JScrollPane finalScrollPane = new JScrollPane( finalTable );
-        finalScrollPane.setPreferredSize( new Dimension( 200, 200 ) );
-        ncInfo2Panel.add( classIDFinal, BorderLayout.NORTH );
-        ncInfo2Panel.add( finalScrollPane, BorderLayout.CENTER );
+        step3Panel.add( idPanel, BorderLayout.NORTH );
+        step3Panel.add( descriptionPanel, BorderLayout.SOUTH );
 
-        step3Panel.add( ncInfo1Panel, BorderLayout.WEST );
-        step3Panel.add( ncInfo2Panel, BorderLayout.CENTER );
-
-        this.addHelp( "<html><b>Choose a new gene set identifier and description.</b><br>"
+        this.addHelp( "<html><b>Choose or edit the gene set identifier and description.</b><br>"
                 + "The custom gene set will automatically be saved on your system"
                 + " to be used again in future analyses." );
         this.addMain( step3Panel );
@@ -137,32 +98,39 @@ public class GeneSetWizardStep3 extends WizardStep {
 
     @Override
     public boolean isReady() {
-        return true;
+
+        /*
+         * If this is a user-defined group they are modifying, let them do what they want. Otherwise, if it's a GO
+         * group, they have to change the id.
+         */
+
+        return StringUtils.isNotBlank( classIDTF.getText() );
     }
 
-    public void nameNewGeneSet() {
-        assert newGeneSet != null;
-        newGeneSet.setId( classIDTF.getText() );
-        newGeneSet.setDesc( classDescTA.getText() );
-
-        // assert origID != null;
-        //
-        // if ( !newGeneSet.modified() && origID.equals( newGeneSet.getId() ) ) {
-        // newGeneSet.setModified( false );
-        // }
+    public String getGeneSetId() {
+        return classIDTF.getText();
     }
 
-    public void update() {
-        assert newGeneSet != null;
-        classIDTF.setText( newGeneSet.getId() );
-        classDescTA.setText( newGeneSet.getDesc() );
-        if ( newGeneSet.getId().compareTo( "" ) != 0 ) {
-            classIDFinal.setText( newGeneSet.getId() );
+    public String getGeneSetName() {
+        return classDescTA.getText();
+    }
+
+    /**
+     * 
+     */
+    public void update( Collection<Probe> probesToUse ) {
+
+        newGeneSet = ( ( GeneSetWizard ) owner ).getNewGeneSet();
+        if ( newGeneSet != null ) {
+            classIDTF.setText( newGeneSet.getId() );
+            classDescTA.setText( newGeneSet.getName() );
         }
-        assert newGeneSet.getId() != null;
-        if ( newGeneSet.isModified() ) origID = newGeneSet.getId();
+
     }
 
+    /**
+     * @param b
+     */
     public void setIdFieldEnabled( boolean b ) {
         this.classIDTF.setEnabled( b );
         this.classIDTF.setEditable( b );

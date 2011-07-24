@@ -18,7 +18,6 @@
  */
 package ubic.erminej.gui;
 
-import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -54,18 +53,12 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id$
  */
 public class AboutBox extends JDialog implements ActionListener {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3482331365640848322L;
+
+    private static final long serialVersionUID = 1L;
     private static Log log = LogFactory.getLog( AboutBox.class.getName() );
-    /**
-     * 
-     */
+
     private static final int TOTAL_HEIGHT = 550;
-    /**
-     * 
-     */
+
     private static final int PREFERRED_WIDTH = 450;
     private String VERSION = "2.2";
     private final static String COPYRIGHT = "Copyright (c) University of British Columbia";
@@ -77,7 +70,8 @@ public class AboutBox extends JDialog implements ActionListener {
     JPanel blurbsPanel = new JPanel();
     JButton button1 = new JButton();
     JLabel labelAuthors = new JLabel();
-    JLinkLabel labelHomepage = new JLinkLabel();
+    String homepageURL = "http://www.chibi.ubc.ca/ermineJ/";
+    JLinkLabel labelHomepage = new JLinkLabel( homepageURL, homepageURL );
     JLabel imageLabel = new JLabel();
     JLabel label1 = new JLabel();
     JLabel versionLabel = new JLabel();
@@ -88,8 +82,8 @@ public class AboutBox extends JDialog implements ActionListener {
 
     public AboutBox( Frame parent ) {
         super( parent );
-        enableEvents( AWTEvent.WINDOW_EVENT_MASK );
-        enableEvents( AWTEvent.MOUSE_EVENT_MASK );
+        // enableEvents( AWTEvent.WINDOW_EVENT_MASK );
+        // enableEvents( AWTEvent.MOUSE_EVENT_MASK );
         try {
             jbInit();
         } catch ( Exception e ) {
@@ -147,10 +141,8 @@ public class AboutBox extends JDialog implements ActionListener {
         labelAuthors.setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, Kiran Keshav, Kelsey Hamer and others" );
 
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
-        labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
-        String homepageURL = "http://www.chibi.ubc.ca/ermineJ/";
-        labelHomepage.setText( homepageURL );
-        labelHomepage.setPreferredSize( new Dimension( PREFERRED_WIDTH, 20 ) );
+        // labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
+        labelHomepage.setPreferredSize( new Dimension( 200, 20 ) );
 
         blurbsPanel.setLayout( new FlowLayout() );
         blurbsPanel.setBackground( Color.white );
@@ -169,13 +161,12 @@ public class AboutBox extends JDialog implements ActionListener {
         licensePanel.setEditable( false );
         licensePanel.setMargin( new Insets( 10, 10, 10, 10 ) );
         licensePanel.setContentType( "text/html" );
-        licensePanel
-                .setText( "<p>ErmineJ is licensed under the Apache Public License.</p><p>Direct questions about ermineJ to "
-                        + "erminej@chibi.ubc.ca</p><p>If you use this software for your work, please cite: "
+        licensePanel.setText( "<p>ErmineJ is licensed under the Apache 2 Public License.</p><p>Direct questions to "
+                + "erminej@chibi.ubc.ca</p><p>If you use this software for your work, please cite:<br/> "
 
-                        + "Gillis J, Mistry M, Pavlidis P. (2010)"
-                        + " Gene function analysis in complex data sets using ErmineJ. Nature Protocols 5:1148-59"
-                        + "</p></html>" );
+                + "Gillis J, Mistry M, Pavlidis P. (2010)"
+                + " Gene function analysis in complex data sets using ErmineJ. Nature Protocols 5:1148-59"
+                + "</p></html>" );
 
         centerPanel.add( blurbsPanel, BorderLayout.NORTH );
         centerPanel.add( licensePanel, BorderLayout.CENTER );

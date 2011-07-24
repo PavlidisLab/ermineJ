@@ -1,4 +1,4 @@
-package ubic.basecode.gui;
+package ubic.erminej.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;

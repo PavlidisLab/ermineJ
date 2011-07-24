@@ -26,21 +26,28 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
-import ubic.basecode.bio.geneset.GONames;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
-import ubic.erminej.gui.table.TableSorter;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * A table that lists the Gene Sets with their scores, and allows user interaction.
@@ -51,10 +58,7 @@ import ubic.erminej.gui.table.TableSorter;
  */
 public class GeneSetTablePanel extends GeneSetPanel {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -8651390176011748967L;
+    private static final long serialVersionUID = -1L;
     private final static int GENESET_ID_COLUMN_WIDTH = 80;
     private final static int GENESET_NAME_COLUMN_WIDTH = 350;
     private final static int NUMPROBES_COLUMN_WIDTH = 40;
@@ -68,14 +72,15 @@ public class GeneSetTablePanel extends GeneSetPanel {
     private int currentResultSetIndex = -1;
     protected GeneSetTableModel model = null;
     protected List<String> resultToolTips = new LinkedList<String>();
-    private TableSorter sorter;
+
     protected JTable table = null;
+
+    public int getRowCount() {
+        return this.table.getRowCount();
+    }
 
     public GeneSetTablePanel( GeneSetScoreFrame callingFrame, List<GeneSetPvalRun> results, Settings settings ) {
         super( settings, results, callingFrame );
-        model = new GeneSetTableModel( results );
-        setUpTable();
-        setUpPopupMenus();
     }
 
     /**
@@ -83,19 +88,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
      */
     private void setUpTable() {
         table = new JTable() {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 2088153030493337744L;
+            private static final long serialVersionUID = 1L;
 
             // Implement table header tool tips.
             @Override
             protected JTableHeader createDefaultTableHeader() {
                 return new JTableHeader( columnModel ) {
-                    /**
-                     * 
-                     */
-                    private static final long serialVersionUID = -9036922711562160720L;
+                    private static final long serialVersionUID = -1L;
 
                     @Override
                     public String getToolTipText( MouseEvent e ) {
@@ -107,6 +106,14 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 };
             }
         };
+
+        assert geneData != null;
+        model = new GeneSetTableModel( geneData, results );
+        table.setModel( model );
+
+        sorter = new TableRowSorter<GeneSetTableModel>( ( GeneSetTableModel ) table.getModel() );
+
+        table.setRowSorter( sorter );
         table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
         table.getTableHeader().setReorderingAllowed( false );
         table.getTableHeader().addMouseListener( new MouseAdapter() {
@@ -122,8 +129,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
         } );
     }
 
+    private TableRowSorter<GeneSetTableModel> sorter;
+
     /**
-     * 
+     * for the table heading
      */
     private void setUpPopupMenus() {
 
@@ -131,9 +140,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.addMouseListener( popupListener );
 
         EditRunPopupMenu removeRunPopup = new EditRunPopupMenu();
+
         JMenuItem removeRunMenuItem = new JMenuItem( "Remove this run..." );
         removeRunMenuItem.addActionListener( new RemoveRunPopupMenu_actionAdapter( this ) );
         removeRunPopup.add( removeRunMenuItem );
+
         JMenuItem renameRunMenuItem = new JMenuItem( "Rename this run..." );
         renameRunMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -175,19 +186,18 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     @Override
     public void addedNewGeneSet() {
-        sorter.cancelSorting();
-        // sorter.setSortingStatus( 0, TableSorter.ASCENDING );
         table.revalidate();
     }
 
     // called when we first set up the table.
-    @Override
-    public void addInitialData( GONames initialGoData ) {
-        super.addInitialData( initialGoData );
-        model.addInitialData( geneData, goData );
+    public void initialize( GeneAnnotations initialGoData ) {
+        this.geneData = initialGoData;
+        setUpTable();
+        setUpPopupMenus();
         setTableAttributes();
-        sorter.cancelSorting();
-        sorter.setSortingStatus( 1, TableSorter.ASCENDING );
+        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
+        sorter.setSortKeys( sortKeys );
     }
 
     @Override
@@ -200,50 +210,54 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.addColumn( col );
         table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
         generateToolTip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
-        sorter.cancelSorting();
-        sorter.setSortingStatus( c, TableSorter.ASCENDING ); // resort by the new results.
+
         if ( results.size() > 3 ) table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
         currentResultSetIndex = results.size() - 1;
         this.callingFrame.setCurrentResultSet( currentResultSetIndex );
         table.revalidate();
+
+        this.model.filter();
+
+        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );
+        sorter.setSortKeys( sortKeys );
     }
 
     // called if 'cancel', 'find' or 'reset' have been hit.
     @Override
     public void resetView() {
         this.geneData = callingFrame.getOriginalGeneData();
-        model.setInitialData( geneData, goData );
         setTableAttributes();
+        clearRowFilter();
     }
 
     /**
      * 
      */
     private void setTableAttributes() {
-        sorter = new TableSorter( model );
-        table.setModel( sorter );
-
-        sorter.setTableHeader( table.getTableHeader() );
+        table.setModel( model );
         this.getViewport().add( table, null );
         table.getColumnModel().getColumn( 0 ).setPreferredWidth( GENESET_ID_COLUMN_WIDTH );
         table.getColumnModel().getColumn( 1 ).setPreferredWidth( GENESET_NAME_COLUMN_WIDTH );
         table.getColumnModel().getColumn( PROBE_COUNT_COLUMN_INDEX ).setPreferredWidth( NUMPROBES_COLUMN_WIDTH );
         table.getColumnModel().getColumn( GENE_COUNT_COLUMN_INDEX ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
         table.getColumnModel().getColumn( MULTIFUNC_COLUMN_INDEX ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
-        table.setDefaultRenderer( Object.class, new OutputPanelTableCellRenderer( goData, results ) );
+
+        table.setDefaultRenderer( String.class, new GeneSetTableCellRenderer( this.geneData ) );
+        table.setDefaultRenderer( Double.class, new GeneSetTableCellRenderer( this.geneData ) );
+        table.setDefaultRenderer( Integer.class, new GeneSetTableCellRenderer( this.geneData ) );
+        table.setDefaultRenderer( GeneSetTerm.class, new GeneSetTableCellRenderer( this.geneData ) );
+        table.setDefaultRenderer( GeneSetResult.class, new GeneSetTableCellRenderer( this.geneData ) );
+
         assert geneData != null;
-        classColToolTip = new String( "Total classes shown: " + geneData.selectedSets() );
+        classColToolTip = new String( "Total classes shown: " + table.getRowCount() );
         table.revalidate();
     }
 
-    @Override
-    protected String deleteAndResetGeneSet( String classID ) {
+    protected String deleteAndResetGeneSet( GeneSetTerm classID ) {
         log.debug( "Deleting gene set from table" );
         String action = super.deleteAndResetGeneSet( classID );
         if ( action.equals( GeneSetPanel.DELETED ) ) {
-            // model.fireTableStructureChanged();
-            sorter.cancelSorting();
-            sorter.setSortingStatus( 0, TableSorter.ASCENDING );
             table.revalidate();
         } else if ( action.equals( GeneSetPanel.RESTORED ) ) {
             table.revalidate();
@@ -256,16 +270,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @param e
      * @return
      */
-    @SuppressWarnings("unchecked")
     @Override
-    protected String popupRespondAndGetGeneSet( MouseEvent e ) {
+    protected GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e ) {
         JTable source = ( JTable ) e.getSource();
         assert source != null;
         int r = source.rowAtPoint( e.getPoint() );
-        List id = ( Vector ) source.getValueAt( r, 0 );
-        if ( id == null ) return null;
-        String classID = ( String ) id.get( 0 );
-        return classID;
+        GeneSetTerm id = ( GeneSetTerm ) source.getValueAt( r, 0 );
+        return id;
     }
 
     /**
@@ -347,6 +358,36 @@ public class GeneSetTablePanel extends GeneSetPanel {
     @Override
     protected MouseListener configurePopupMenu() {
         MouseListener m = super.configurePopupMenu();
+
+        final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", true );
+        hideRedund.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                filterRedundant( hideRedund.getState() );
+            }
+        } );
+
+        // / this is a bit redundant as it seems they are filtered out earlier.
+        final JCheckBoxMenuItem hideEmpty = new JCheckBoxMenuItem( "Hide empty sets", true );
+        hideEmpty.setToolTipText( "Hide sets lacking members" );
+        hideEmpty.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                filterEmpty( hideEmpty.getState() );
+            }
+        } );
+
+        final JCheckBoxMenuItem hideNonResults = new JCheckBoxMenuItem( "Hide non-results", true );
+        hideNonResults.setToolTipText( "Hide rows lacking any results" );
+        hideNonResults.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                filterNonResults( hideNonResults.getState() );
+            }
+
+        } );
+
+        popup.add( hideRedund );
+        popup.add( hideEmpty );
+        popup.add( hideNonResults );
+
         final JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
         findInTreeMenuItem.addActionListener( new OutputPanel_findInTreeMenuItem_actionAdapter( this ) );
         popup.add( findInTreeMenuItem );
@@ -369,41 +410,120 @@ public class GeneSetTablePanel extends GeneSetPanel {
             assert runIndex >= 0;
             table.removeColumn( col );
             model.removeRunData( currentColumnIndex );
+
             model.fireTableStructureChanged();
             callingFrame.setCurrentResultSet( runIndex );
 
-            // FIXME deletion of corresponding GeneAnnotations when remove is used, if there is a copy made.
             results.remove( runIndex ); // This should be done by the parent.
             resultToolTips.remove( runIndex );
+
             table.revalidate();
+
+            // bug 159! pretty sure this is working .. trying to get the table to resort by a remaining run, after
+            // removing a run.
+            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+            int newSortIndex = 0;
+            if ( results.size() > 0 ) {
+                newSortIndex = currentColumnIndex; // it will have shifted over.
+            }
+            sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
+            sorter.setSortKeys( sortKeys );
         }
     }
 
     /**
      * @param e MouseEvent
      */
-    @SuppressWarnings("unchecked")
     void table_mouseReleased( MouseEvent e ) {
         int i = table.getSelectedRow();
         int j = table.getSelectedColumn();
 
         int _runnum = -1;
-        String _id = ( String ) ( ( Vector ) table.getValueAt( i, 0 ) ).get( 0 );
+        GeneSetPvalRun run = null;
+        GeneSetTerm term = ( GeneSetTerm ) table.getValueAt( i, 0 );
         if ( table.getValueAt( i, j ) != null && j >= GeneSetTableModel.INIT_COLUMNS ) {
             _runnum = model.getRunIndex( j );
-        } else if ( table.getValueAt( i, j ) != null && j < GeneSetTableModel.INIT_COLUMNS ) {
-            _runnum = -1;
+            run = this.results.get( _runnum );
+            this.currentResultSetIndex = _runnum;
         }
-        this.currentResultSetIndex = _runnum;
-        final String id = _id;
-        final int runIndex = _runnum;
-        log.debug( "Showing details for " + id );
-        if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
 
-        showDetailsForGeneSet( runIndex, id );
+        log.debug( "Showing details for " + term );
+        messenger.showStatus( "Viewing details for " + term + "..." );
+
+        showDetailsForGeneSet( run, term );
 
     }
 
+    public void filterByUserGeneSets( boolean b ) {
+        if ( b ) {
+            RowFilter<GeneSetTableModel, Object> rf = new RowFilter<GeneSetTableModel, Object>() {
+
+                @Override
+                public boolean include( RowFilter.Entry<? extends GeneSetTableModel, ? extends Object> entry ) {
+
+                    GeneSetTerm term = ( GeneSetTerm ) entry.getValue( 0 );
+                    return term.isUserDefined();
+                }
+            };
+            this.sorter.setRowFilter( rf );
+
+        } else {
+            this.sorter.setRowFilter( null );
+
+        }
+        resortByCurrentResults();
+    }
+
+    public void clearRowFilter() {
+        this.sorter.setRowFilter( null );
+        resortByCurrentResults();
+    }
+
+    public void filter( final Collection<GeneSetTerm> selectedTerms ) {
+        RowFilter<GeneSetTableModel, Object> rf = new RowFilter<GeneSetTableModel, Object>() {
+            @Override
+            public boolean include( RowFilter.Entry<? extends GeneSetTableModel, ? extends Object> entry ) {
+                GeneSetTerm term = ( GeneSetTerm ) entry.getValue( 0 );
+                return selectedTerms.contains( term );
+            }
+        };
+        this.sorter.setRowFilter( rf );
+        resortByCurrentResults();
+    }
+
+    public void filterRedundant( boolean b ) {
+        this.model.setFilterRedundant( b );
+        table.revalidate();
+        resortByCurrentResults();
+    }
+
+    public void filterEmpty( boolean b ) {
+        this.model.setFilterEmpty( b );
+        table.revalidate();
+        resortByCurrentResults();
+    }
+
+    private void filterNonResults( boolean b ) {
+        if ( currentResultSetIndex < 0 ) return;
+        this.model.setFilterEmptyResults( b );
+        table.revalidate();
+
+        resortByCurrentResults();
+    }
+
+    /**
+     * 
+     */
+    private void resortByCurrentResults() {
+        int sortColumn = 0;
+        if ( currentResultSetIndex > 0 ) {
+            sortColumn = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
+        }
+        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+
+        sortKeys.add( new RowSorter.SortKey( sortColumn, SortOrder.ASCENDING ) );
+        sorter.setSortKeys( sortKeys );
+    }
 }
 
 // //////////////////////////////////////////////////////////////////////////////

@@ -50,7 +50,7 @@ public class AnalysisWizardTest {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
             gssf = new GeneSetScoreFrame();
             gssf.setSize( new Dimension( 500, 500 ) );
-            AnalysisWizard aw = new AnalysisWizard( gssf, null, null );
+            AnalysisWizard aw = new AnalysisWizard( gssf, null );
             aw.setSize( new Dimension( 500, 500 ) );
             log.info( "Created wizard" );
             aw.setVisible( true );

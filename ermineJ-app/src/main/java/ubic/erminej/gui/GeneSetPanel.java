@@ -25,8 +25,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -36,35 +36,36 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.BrowserLauncher;
+import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.gui.geneset.GeneSetDetails;
 
 /**
- * A generic class to support the display of Gene Set results. Could be made even more generic.
+ * A generic class to support the display of lists or trees Gene Sets and analysis results. Could be made even more
+ * generic.
  * 
  * @author pavlidis
  * @version $Id$
  */
 public abstract class GeneSetPanel extends JScrollPane {
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 1L;
     static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
     static final String AMIGO_URL_BASE = "http://amigo.geneontology.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
     protected GeneSetScoreFrame callingFrame;
     protected GeneAnnotations geneData;
-    protected GONames goData;
-    protected StatusViewer messenger;
-    protected List<GeneSetPvalRun> results;
-    protected int selectedRun;
+    protected GeneSetTerms goData;
+    protected StatusViewer messenger = new StatusStderr();
+    protected List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
+
     protected Settings settings;
     protected OutputPanelPopupMenu popup;
     public static final String NOACTION = "NOACTION";
@@ -80,9 +81,9 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     public abstract void addedNewGeneSet();
 
-    protected abstract String popupRespondAndGetGeneSet( MouseEvent e );
+    protected abstract GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e );
 
-    public void addInitialData( GONames initialGoData ) {
+    public void addInitialData( GeneSetTerms initialGoData ) {
         assert callingFrame.getOriginalGeneData() != null : "Gene data is still null";
         assert initialGoData != null : "GO data is still null";
         this.geneData = callingFrame.getOriginalGeneData();
@@ -91,38 +92,46 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     public abstract void addRun();
 
+    public GeneSetPvalRun getCurrentResultSet() {
+        int i = callingFrame.getCurrentResultSet();
+        if ( i < 0 ) return null;
+        return this.results.get( i );
+    }
+
     /**
      * @param e
      */
     public void findInTreeMenuItem_actionAdapter( ActionEvent e ) {
         OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        String classID = sourcePopup.getSelectedItem();
+        GeneSetTerm classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
         callingFrame.findGeneSetInTree( classID );
     }
 
+    /**
+     * Put the view back to the original state, removing filters.
+     */
     public abstract void resetView();
-
-    public void setSelectedRun( int selectedRun ) {
-        this.selectedRun = selectedRun;
-    }
 
     protected void htmlMenuItem_actionPerformed( ActionEvent e ) {
         OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        String classID = null;
-        classID = sourcePopup.getSelectedItem();
+        GeneSetTerm classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
         // create the URL and show it
+
+        String clID = classID.getId();
+
         try {
-            BrowserLauncher.openURL( AMIGO_URL_BASE + classID );
+            BrowserLauncher.openURL( AMIGO_URL_BASE + clID );
         } catch ( Exception e1 ) {
+            log.error( e1, e1 );
             GuiUtil.error( "Could not open a web browser window" );
         }
     }
 
     protected void modMenuItem_actionPerformed( ActionEvent e ) {
         OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        String classID = null;
+        GeneSetTerm classID = null;
         classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
         GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, goData, classID );
@@ -136,8 +145,8 @@ public abstract class GeneSetPanel extends JScrollPane {
      * @param id
      * @throws IllegalStateException
      */
-    protected void showDetailsForGeneSet( final int runnum, final String id ) throws IllegalStateException {
-        if ( messenger != null ) messenger.showStatus( "Viewing data for " + id + "..." );
+    protected void showDetailsForGeneSet( final GeneSetPvalRun run, final GeneSetTerm id ) throws IllegalStateException {
+        messenger.showStatus( "Viewing data for " + id + "..." );
 
         new Thread() {
             @Override
@@ -147,27 +156,26 @@ public abstract class GeneSetPanel extends JScrollPane {
                         log.debug( "Got null geneset id" );
                         return;
                     }
-                    log.debug( "Request for details of gene set: " + id + ", run number " + runnum );
+                    log.debug( "Request for details of gene set: " + id + ", run: " + run );
                     if ( !geneData.hasGeneSet( id ) ) {
                         callingFrame.getStatusMessenger()
                                 .showError( id + " is not available for viewing in your data." );
                         return;
                     }
                     GeneSetDetails details = new GeneSetDetails( messenger, goData, geneData, settings, id );
-                    if ( runnum < 0 ) {
+                    if ( run == null ) {
                         details.show();
                     } else {
-                        GeneSetPvalRun run = results.get( runnum );
                         GeneSetResult res = run.getResults().get( id );
                         details.show( run.getName(), res, run.getGeneScores() );
                     }
-                    if ( messenger != null ) messenger.clear();
+                    messenger.clear();
                 } catch ( Exception ex ) {
                     GuiUtil
                             .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
                                     + ex.getMessage() );
                     log.error( ex, ex );
-                    if ( messenger != null ) messenger.clear();
+                    messenger.clear();
                 }
             }
         }.start();
@@ -177,16 +185,15 @@ public abstract class GeneSetPanel extends JScrollPane {
      * @param classID
      * @return
      */
-    protected String deleteAndResetGeneSet( String classID ) {
+    protected String deleteAndResetGeneSet( GeneSetTerm classID ) {
         if ( classID == null ) return NOACTION;
-        if ( !goData.isUserDefined( classID ) ) return NOACTION;
+        if ( !classID.isUserDefined() ) return NOACTION;
 
         if ( callingFrame.userOverWrote( classID ) ) {
             int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to restore the original \""
                     + classID + "\" and delete the file?", "Confirm", JOptionPane.YES_NO_OPTION );
             if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
             geneData.restoreGeneSet( classID );
-            goData.resetGeneSet( classID );
             callingFrame.restoreUserGeneSet( classID );
             callingFrame.deleteUserGeneSetFile( classID );
             return DELETED;
@@ -195,25 +202,24 @@ public abstract class GeneSetPanel extends JScrollPane {
         int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to delete \"" + classID + "\"?",
                 "Confirm", JOptionPane.YES_NO_OPTION );
         if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
-        geneData.removeClassFromMaps( classID );
-        goData.deleteGeneSet( classID );
+        geneData.deleteGeneSet( classID );
         callingFrame.deleteUserGeneSet( classID );
         return DELETED;
     }
 
-    protected String resetGeneSet( String classID ) {
+    protected String resetGeneSet( GeneSetTerm classID ) {
         if ( classID == null ) return NOACTION;
-        if ( !goData.isUserDefined( classID ) ) return NOACTION;
+        if ( !classID.isUserDefined() ) return NOACTION;
         int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to restore the original \"" + classID
                 + "\"?", "Confirm", JOptionPane.YES_NO_OPTION );
         if ( yesno == JOptionPane.NO_OPTION ) return NOACTION;
         geneData.restoreGeneSet( classID );
-        goData.resetGeneSet( classID );
         callingFrame.restoreUserGeneSet( classID );
         return RESTORED;
     }
 
     protected MouseListener configurePopupMenu() {
+        // fixme, it would be better to create this on demand, so we can make it more 'customized'.
         popup = new OutputPanelPopupMenu();
         JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
         modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
@@ -225,7 +231,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         deleteGeneSetMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-                String classID = null;
+                GeneSetTerm classID = null;
                 classID = sourcePopup.getSelectedItem();
                 deleteAndResetGeneSet( classID );
             }
@@ -235,7 +241,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         restoreGeneSetMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 OutputPanelPopupMenu sourcePopup = ( OutputPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-                String classID = null;
+                GeneSetTerm classID = null;
                 classID = sourcePopup.getSelectedItem();
                 resetGeneSet( classID );
             }
@@ -259,8 +265,9 @@ public abstract class GeneSetPanel extends JScrollPane {
 
             private void maybeShowPopup( MouseEvent e ) {
                 if ( e.isPopupTrigger() ) {
-                    String classID = popupRespondAndGetGeneSet( e );
-                    if ( !goData.getUserDefinedGeneSets().contains( classID ) ) {
+                    GeneSetTerm classID = popupRespondAndGetGeneSet( e );
+                    if ( classID == null ) return;
+                    if ( !geneData.getUserDefined().contains( classID ) ) {
                         deleteGeneSetMenuItem.setEnabled( false );
                     } else {
                         deleteGeneSetMenuItem.setEnabled( true );
@@ -288,6 +295,7 @@ public abstract class GeneSetPanel extends JScrollPane {
      * @param messenger
      */
     public void setMessenger( StatusViewer messenger ) {
+        if ( messenger == null ) return;
         this.messenger = messenger;
     }
 }
@@ -317,13 +325,10 @@ class OutputPanel_modMenuItem_actionAdapter implements java.awt.event.ActionList
 }
 
 class OutputPanelPopupMenu extends JPopupMenu {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 8600729411722169908L;
     Point popupPoint;
-    String selectedItem = null;
-    GONames goData = null;
+    GeneSetTerm selectedItem = null;
+    GeneSetTerms goData = null;
 
     public Point getPoint() {
         return popupPoint;
@@ -332,7 +337,7 @@ class OutputPanelPopupMenu extends JPopupMenu {
     /**
      * @return Returns the selectedItem.
      */
-    public String getSelectedItem() {
+    public GeneSetTerm getSelectedItem() {
         return this.selectedItem;
     }
 
@@ -343,14 +348,14 @@ class OutputPanelPopupMenu extends JPopupMenu {
     /**
      * @param selectedItem The selectedItem to set.
      */
-    public void setSelectedItem( String selectedItem ) {
+    public void setSelectedItem( GeneSetTerm selectedItem ) {
         this.selectedItem = selectedItem;
     }
 
     /**
      * @return Returns the goData.
      */
-    public GONames getGoData() {
+    public GeneSetTerms getGoData() {
         return this.goData;
     }
 }

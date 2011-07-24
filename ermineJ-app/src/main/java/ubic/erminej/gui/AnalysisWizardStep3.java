@@ -22,30 +22,24 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.erminej.Settings;
-import ubic.erminej.data.UserDefinedGeneSetManager;
-import ubic.erminej.gui.table.TableSorter;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSet;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * Step to handle adding custom gene sets to the analysis.
@@ -57,32 +51,23 @@ import ubic.erminej.gui.table.TableSorter;
 public class AnalysisWizardStep3 extends WizardStep {
     private static final long serialVersionUID = -7777686534611702796L;
 
-    private Settings settings;
-
     private AnalysisWizardStep3_CustomClassList customClasses;
     private AbstractTableModel ccTableModel;
     private JTable customClassTable;
-    private Map<String, Map<String, Object>> ccHash = new HashMap<String, Map<String, Object>>();
-    private AnalysisWizardStep3_CustomClassList addedClasses;
-    private Map<String, Object> acHash = new HashMap<String, Object>();
-    private JTable addedClassTable;
-    private AbstractTableModel acTableModel;
-    private JLabel countLabel;
 
-    private GONames goData;
+    private JLabel countLabel;
 
     private final GeneSetScoreFrame callingframe;
 
-    public AnalysisWizardStep3( AnalysisWizard wiz, GeneSetScoreFrame callingframe, GONames goData, Settings settings ) {
+    private GeneAnnotations geneAnnots = null;
+
+    public AnalysisWizardStep3( AnalysisWizard wiz, GeneSetScoreFrame callingframe, GeneAnnotations geneAnnots ) {
         super( wiz );
         this.callingframe = callingframe;
-        this.goData = goData;
         this.jbInit();
-        this.settings = settings;
+        this.geneAnnots = geneAnnots;
         wiz.clearStatus();
-        acHash = new HashMap<String, Object>();
         makeLeftTable();
-        makeRightTable();
     }
 
     // Component initialization
@@ -92,41 +77,23 @@ public class AnalysisWizardStep3 extends WizardStep {
         this.setLayout( new BorderLayout() );
         JPanel step3Panel;
         JPanel jPanel10 = new JPanel();
-        final JScrollPane customClassScrollPane;
-        final JScrollPane addedClassScrollPane;
-        JPanel jPanel9 = new JPanel();
-        JButton addButton = new JButton();
-        JButton deleteButton = new JButton();
-        countLabel = new JLabel();
 
         step3Panel = new JPanel();
         step3Panel.setLayout( new BorderLayout() );
+
+        countLabel = new JLabel();
         countLabel.setForeground( Color.black );
         countLabel.setPreferredSize( new Dimension( 500, 15 ) );
         countLabel.setText( "Number of Classes: 0" );
 
-        JPanel jPanel1 = new JPanel();
-        JLabel jLabel2 = new JLabel();
-        JPanel topPanel = new JPanel();
-        JLabel jLabel1 = new JLabel();
-        jLabel2.setPreferredSize( new Dimension( 250, 15 ) );
-        jLabel2.setText( "Selected Classes" );
-        jLabel1.setPreferredSize( new Dimension( 250, 15 ) );
-        jLabel1.setText( "Available Classes" );
-        topPanel.setPreferredSize( new Dimension( 515, 25 ) );
-        jPanel1.setOpaque( true );
-        jPanel1.setPreferredSize( new Dimension( 634, 50 ) );
-
         customClassTable = new JTable();
         customClassTable.getTableHeader().setReorderingAllowed( false );
-        customClassTable.setPreferredScrollableViewportSize( new Dimension( 250, 150 ) );
-
-        customClassScrollPane = new JScrollPane( customClassTable );
+        customClassTable.setPreferredScrollableViewportSize( new Dimension( 500, 150 ) );
+        customClassTable.setAutoCreateRowSorter( true );
         customClassTable.getTableHeader().addMouseListener( new MouseAdapter() {
             @Override
             public void mouseEntered( MouseEvent e ) {
                 setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-                // log.debug( "should this work? " + ( isEnabled() && isDisplayable() && isVisible() ) );
             }
 
             @Override
@@ -134,38 +101,17 @@ public class AnalysisWizardStep3 extends WizardStep {
                 setCursor( Cursor.getDefaultCursor() );
             }
         } );
-        customClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
-        addedClassTable = new JTable();
-        addedClassTable.getTableHeader().setReorderingAllowed( false );
-        addedClassTable.setPreferredScrollableViewportSize( new Dimension( 250, 150 ) );
-        addedClassScrollPane = new JScrollPane( addedClassTable );
-        addedClassScrollPane.setPreferredSize( new Dimension( 250, 150 ) );
-        jPanel10.setLayout( new GridLayout() );
-        JButton addAllButton = new JButton();
-        addAllButton.setText( "Add All >" );
-        addAllButton.addActionListener( new AnalysisWizardStep3_addAllButton_actionAdapter( this ) );
-        jPanel10.add( customClassScrollPane, null );
-        jPanel10.add( addedClassScrollPane, null );
-        jPanel9.setPreferredSize( new Dimension( 200, 50 ) );
-        addButton.setSelected( false );
-        addButton.setText( "Add >" );
-        addButton.addActionListener( new AnalysisWizardStep3_addButton_actionAdapter( this ) );
-        deleteButton.setSelected( false );
-        deleteButton.setText( "Delete" );
-        deleteButton.addActionListener( new AnalysisWizardStep3_delete_actionPerformed_actionAdapter( this ) );
-        jPanel9.add( addButton, null );
-        jPanel9.add( addAllButton, null );
-        jPanel9.add( deleteButton, null );
-        step3Panel.add( jPanel1, BorderLayout.NORTH );
-        topPanel.add( jLabel1, null );
-        topPanel.add( jLabel2, null );
-        jPanel1.add( countLabel, null );
-        jPanel1.add( topPanel, null );
-        step3Panel.add( jPanel10, BorderLayout.CENTER );
-        step3Panel.add( jPanel9, BorderLayout.SOUTH );
 
-        this.addHelp( "<html><b>Select custom gene sets to include in the analysis</b><br>"
-                + "If you have not defined any custom gene sets, the left-hand panel will be blank. " );
+        final JScrollPane customClassScrollPane;
+        customClassScrollPane = new JScrollPane( customClassTable );
+        // customClassScrollPane.setPreferredSize( new Dimension( 500, 250 ) );
+
+        jPanel10.add( customClassScrollPane, null );
+        step3Panel.add( jPanel10, BorderLayout.NORTH );
+        step3Panel.add( countLabel, BorderLayout.SOUTH );
+
+        this.addHelp( "<html><b>Custom gene sets</b><br>" + "These are the added groups available for analysis. "
+                + "If you have not defined any custom gene sets, the table will be blank. " );
         this.addMain( step3Panel );
     }
 
@@ -174,74 +120,12 @@ public class AnalysisWizardStep3 extends WizardStep {
         return true;
     }
 
-    void addButton_actionPerformed( @SuppressWarnings("unused") ActionEvent e ) {
-        int n = customClassTable.getSelectedRowCount();
-        int[] rows = customClassTable.getSelectedRows();
-        for ( int i = 0; i < n; i++ ) {
-            String id = ( String ) customClassTable.getValueAt( rows[i], 0 );
-            addClasstoSelected( id );
-        }
-        acTableModel.fireTableDataChanged();
-        updateCountLabel();
-    }
-
-    /**
-     * @param id
-     */
-    private void addClasstoSelected( String id ) {
-        if ( id != null ) {
-            if ( ccHash == null || !ccHash.containsKey( id ) ) return;
-            Map<String, Object> cfi = ccHash.get( id );
-            if ( cfi == null ) {
-                log.debug( "Null map" );
-                return;
-            }
-            if ( !acHash.containsKey( cfi.get( "id" ) ) ) {
-                addedClasses.add( cfi );
-                acHash.put( ( String ) cfi.get( "id" ), cfi );
-            }
-        }
-    }
-
-    @SuppressWarnings("unused")
-    void addAllButton_actionPerformed( ActionEvent e ) {
-        for ( int i = 0; i < ccTableModel.getRowCount(); i++ ) {
-            String id = ( String ) customClassTable.getValueAt( i, 0 );
-            addClasstoSelected( id );
-        }
-        acTableModel.fireTableDataChanged();
-        updateCountLabel();
-    }
-
-    @SuppressWarnings("unused")
-    void delete_actionPerformed( ActionEvent e ) {
-        int n = addedClassTable.getSelectedRowCount();
-        int[] rows = addedClassTable.getSelectedRows();
-        for ( int i = 0; i < n; i++ ) {
-            String id = ( String ) addedClassTable.getValueAt( rows[i] - i, 0 );
-            if ( id != null ) {
-                Map cfi = ccHash.get( id );
-                acHash.remove( cfi.get( "id" ) );
-                addedClasses.remove( cfi );
-            }
-        }
-        acTableModel.fireTableDataChanged();
-        updateCountLabel();
-    }
-
-    void updateCountLabel() {
-        countLabel.setText( "Number of Classes: " + addedClasses.size() );
-    }
-
     /**
      * Create the left-hand table for the wizard, which contains the set of user-defined gene sets available.
      */
     void makeLeftTable() {
 
-        Set<String> userDefinedGeneSets = null;
-        if ( goData != null ) {
-            userDefinedGeneSets = goData.getUserDefinedGeneSets();
-        }
+        Set<GeneSetTerm> userDefinedGeneSets = geneAnnots.getUserDefined();
 
         if ( userDefinedGeneSets == null || userDefinedGeneSets.size() == 0 ) {
             log.debug( "Null or no user-defined gene sets" );
@@ -249,103 +133,19 @@ public class AnalysisWizardStep3 extends WizardStep {
         }
         log.debug( userDefinedGeneSets.size() + " user-defined gene sets available" );
 
-        customClasses = new AnalysisWizardStep3_CustomClassList();
-        ccHash = new HashMap<String, Map<String, Object>>();
-        for ( Iterator<String> iter = userDefinedGeneSets.iterator(); iter.hasNext(); ) {
-            String id = iter.next();
+        customClasses = new AnalysisWizardStep3_CustomClassList(); // I really don't think we need this extra class.
+        for ( GeneSetTerm id : userDefinedGeneSets ) {
             if ( callingframe.userOverWrote( id ) ) continue;
-            Map<String, Object> cfi = UserDefinedGeneSetManager.getGeneSetInfo( id );
-            if ( cfi == null || cfi.get( "members" ) == null
-                    || ( ( Collection<Object> ) cfi.get( "members" ) ).size() == 0 ) continue;
-            log.debug( "Adding " + id + " to the table" );
-            customClasses.add( cfi );
-            ccHash.put( id, cfi );
+            GeneSet geneSet = this.geneAnnots.getGeneSet( id );
+            customClasses.add( geneSet );
         }
         ccTableModel = customClasses.toTableModel();
         customClassTable.setModel( ccTableModel );
-
-        TableSorter sorter = new TableSorter( customClassTable.getModel() );
-        customClassTable.setModel( sorter );
-        sorter.setTableHeader( customClassTable.getTableHeader() );
+        customClassTable.setAutoCreateRowSorter( true );
+        countLabel.setText( "Number of Classes: " + customClassTable.getRowCount() );
 
     }
 
-    /**
-     * Table where the selected gene sets will be displayed.
-     */
-    void makeRightTable() {
-        addedClasses = new AnalysisWizardStep3_CustomClassList();
-        acTableModel = addedClasses.toTableModel();
-        addedClassTable.setModel( acTableModel );
-        TableSorter sorter = new TableSorter( addedClassTable.getModel() );
-        addedClassTable.setModel( sorter );
-        sorter.setTableHeader( addedClassTable.getTableHeader() );
-        setValues();
-    }
-
-    public AnalysisWizardStep3_CustomClassList getAddedClasses() {
-        return addedClasses;
-    }
-
-    /**
-     * 
-     */
-    private void setValues() {
-        if ( settings.getSelectedCustomGeneSets() != null && settings.getSelectedCustomGeneSets().size() > 0 ) {
-            Collection<String> selectedCustomClasses = settings.getSelectedCustomGeneSets();
-            if ( selectedCustomClasses == null ) return;
-            for ( Iterator<String> iter = selectedCustomClasses.iterator(); iter.hasNext(); ) {
-                String geneSet = iter.next();
-                if ( !ccHash.containsKey( geneSet ) ) continue;
-                log.debug( "Adding " + geneSet );
-                this.addClasstoSelected( geneSet );
-            }
-        }
-    }
-
-    /**
-     * 
-     */
-    public void saveValues() {
-        settings.setSelectedCustomGeneSets( acHash.keySet() );
-    }
-
-}
-
-class AnalysisWizardStep3_delete_actionPerformed_actionAdapter implements java.awt.event.ActionListener {
-    AnalysisWizardStep3 adaptee;
-
-    AnalysisWizardStep3_delete_actionPerformed_actionAdapter( AnalysisWizardStep3 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.delete_actionPerformed( e );
-    }
-}
-
-class AnalysisWizardStep3_addButton_actionAdapter implements java.awt.event.ActionListener {
-    AnalysisWizardStep3 adaptee;
-
-    AnalysisWizardStep3_addButton_actionAdapter( AnalysisWizardStep3 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.addButton_actionPerformed( e );
-    }
-}
-
-class AnalysisWizardStep3_addAllButton_actionAdapter implements java.awt.event.ActionListener {
-    AnalysisWizardStep3 adaptee;
-
-    AnalysisWizardStep3_addAllButton_actionAdapter( AnalysisWizardStep3 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.addAllButton_actionPerformed( e );
-    }
 }
 
 class AnalysisWizardStep3_ClassFileFilter implements FilenameFilter {
@@ -360,10 +160,8 @@ class AnalysisWizardStep3_ClassFileFilter implements FilenameFilter {
     }
 }
 
-class AnalysisWizardStep3_CustomClassList extends ArrayList<Map<String, Object>> {
-    /**
-     * 
-     */
+class AnalysisWizardStep3_CustomClassList extends ArrayList<GeneSet> {
+
     private static final long serialVersionUID = 6273798227862995265L;
 
     public AbstractTableModel toTableModel() {
@@ -392,19 +190,17 @@ class AnalysisWizardStep3_CustomClassList extends ArrayList<Map<String, Object>>
                 return size() + extra;
             }
 
-            @SuppressWarnings("unchecked")
             public Object getValueAt( int i, int j ) {
                 if ( i < size() ) {
-                    Map<String, Object> cinfo = get( i );
+                    GeneSet cinfo = get( i );
                     switch ( j ) {
                         case 0:
-                            return cinfo.get( "id" );
+                            return cinfo.getId();
                         case 1:
-                            return cinfo.get( "desc" );
+                            return cinfo.getTerm().getName();
                         case 2: {
-                            String type = ( String ) cinfo.get( "type" );
-                            Collection<String> members = ( Collection<String> ) cinfo.get( "members" );
-                            return ( Integer.toString( members.size() ) + " " + type + "s" );
+                            Collection<Gene> members = cinfo.getGenes();
+                            return ( Integer.toString( members.size() ) + " " + ( cinfo.isGenes() ? "genes" : "probes" ) );
                         }
                         default:
                             return null;

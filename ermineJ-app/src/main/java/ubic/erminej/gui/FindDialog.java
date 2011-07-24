@@ -26,6 +26,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -37,8 +38,8 @@ import javax.swing.SwingConstants;
 
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * FIXME this nominally extends JDialog but it isn't set up right.
@@ -48,9 +49,7 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
  * @version $Id$
  */
 public class FindDialog extends JDialog {
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 8991412162421697305L;
     private static final int MAINWIDTH = 550;
     private JPanel mainPanel;
@@ -67,13 +66,11 @@ public class FindDialog extends JDialog {
     protected GeneAnnotations geneData;
     protected StatusViewer statusMessenger;
     private JButton resetButton;
-    protected GONames goData;
 
-    public FindDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData ) {
+    public FindDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData ) {
         setModal( false );
         this.callingframe = callingframe;
         this.geneData = geneData;
-        this.goData = goData;
 
         try {
             jbInit();
@@ -129,7 +126,7 @@ public class FindDialog extends JDialog {
         jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
         jPanelStatus.add( jLabelStatus, null );
         statusMessenger = new StatusJlabel( jLabelStatus );
-        statusMessenger.showStatus( geneData.selectedSets() + " sets listed." );
+        statusMessenger.showStatus( geneData.getActiveGeneSets().size() + " sets listed." );
         BottomPanelWrap.setLayout( new BorderLayout() );
         BottomPanelWrap.add( bottomPanel, BorderLayout.NORTH );
         BottomPanelWrap.add( jPanelStatus, BorderLayout.SOUTH );
@@ -140,9 +137,16 @@ public class FindDialog extends JDialog {
     }
 
     void cancelButton_actionPerformed() {
-        geneData.resetSelectedSets();
         resetViews();
         dispose();
+    }
+
+    /**
+     * @param selectedGeneSets
+     */
+    protected void filterViews( Collection<GeneSetTerm> selectedGeneSets ) {
+        callingframe.getOPanel().filter( selectedGeneSets );
+        callingframe.getTreePanel().filter( selectedGeneSets );
     }
 
     /**
@@ -153,29 +157,33 @@ public class FindDialog extends JDialog {
         callingframe.getTreePanel().resetView();
     }
 
-    void findActionPerformed() {
+    public void findActionPerformed() {
         String searchOn = searchTextField.getText();
         statusMessenger.showStatus( "Searching '" + searchOn + "'" );
 
+        Collection<GeneSetTerm> geneSets;
         if ( searchOn.equals( "" ) ) {
-            geneData.resetSelectedSets();
+            geneSets = geneData.getActiveGeneSets();
         } else {
-            geneData.selectSets( searchOn, goData );
+            geneSets = geneData.findSetsByName( searchOn );
         }
 
-        statusMessenger.showStatus( geneData.selectedSets() + " matching gene sets found." );
-        resetViews();
+        statusMessenger.showStatus( geneSets.size() + " matching gene sets found." );
+        filterViews( geneSets );
 
     }
 
     public void resetButton_actionPerformed() {
         searchTextField.setText( "" );
-        geneData.resetSelectedSets();
-        statusMessenger.showStatus( geneData.selectedSets() + " matching gene sets found." );
+        statusMessenger.showStatus( geneData.getActiveGeneSets().size() + " matching gene sets found." );
         resetViews();
     }
 }
 
+/**
+ * @author paul
+ * @version $Id$
+ */
 class FindFieldActionAdapter implements KeyListener {
     FindDialog adaptee;
 
@@ -185,6 +193,7 @@ class FindFieldActionAdapter implements KeyListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed( KeyEvent e ) {
@@ -192,6 +201,7 @@ class FindFieldActionAdapter implements KeyListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
      */
     public void keyReleased( KeyEvent e ) {
@@ -201,6 +211,7 @@ class FindFieldActionAdapter implements KeyListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
      */
     public void keyTyped( KeyEvent e ) {

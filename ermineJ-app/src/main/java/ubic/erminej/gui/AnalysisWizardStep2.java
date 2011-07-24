@@ -53,6 +53,8 @@ import ubic.basecode.util.FileTools;
 import ubic.erminej.Settings;
 
 /**
+ * Set the inputs for the analysis - score file, raw data file.
+ * 
  * @author Kiran Keshav
  * @author Homin Lee
  * @author Paul Pavlidis
@@ -60,10 +62,7 @@ import ubic.erminej.Settings;
  */
 public class AnalysisWizardStep2 extends WizardStep {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5801771381392975913L;
+    private static final long serialVersionUID = -1L;
     private AnalysisWizard wiz;
     private Settings settings;
     private JFileChooser chooser = new JFileChooser();

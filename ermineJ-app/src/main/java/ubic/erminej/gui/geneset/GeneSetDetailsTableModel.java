@@ -21,6 +21,7 @@ package ubic.erminej.gui.geneset;
 import java.awt.Point;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,41 +32,59 @@ import javax.swing.table.AbstractTableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.erminej.Settings;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.Multifunctionality;
+import ubic.erminej.data.Probe;
 import ubic.erminej.gui.JLinkLabel;
 
 /**
- * Our table model.
- * <p>
- * The general picture is as follows: <br>
- * GUI -> Sort Filter -> Table Model
- * <hr>
+ * Our table model fo rone gene set.
  * 
  * @author Will Braynen
  * @version $Id$
+ * @see GeneSetDetailsFrame
  */
 public class GeneSetDetailsTableModel extends AbstractTableModel {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -8155800933946966811L;
     private static final String URL_REPLACE_TAG = "@@";
-    private MatrixDisplay m_matrixDisplay;
-    private List<String> probeIDs;
-    private Map<String, Double> m_pvalues;
-    private Map<String, Integer> m_pvaluesOrdinalPosition;
+    private MatrixDisplay<Probe, String> m_matrixDisplay;
+    private List<Probe> probeIDs;
+    private Map<Probe, Double> m_pvalues;
+    private Map<Probe, Integer> m_pvaluesOrdinalPosition;
     private GeneAnnotations geneData;
     private DecimalFormat m_nf;
     private Settings settings;
-    private Map<String, JLinkLabel> linkLabels;
+    private Map<Gene, JLinkLabel> linkLabels;
     private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name", "Multifunc" };
     private String urlbase = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=" + URL_REPLACE_TAG;
     private Multifunctionality multifunctionality;
     protected static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
+
+    @Override
+    public Class<?> getColumnClass( int columnIndex ) {
+
+        int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+
+        if ( columnIndex < offset ) {
+            return Double.class; // matrix, or pvals.
+        } else if ( columnIndex - offset == 0 ) {
+            return String.class; // probe
+        } else if ( columnIndex - offset == 1 ) {
+            return Double.class; // score
+        } else if ( columnIndex - offset == 2 ) {
+            return Object.class; // actually a List, which is not comparable.
+        } else if ( columnIndex - offset == 3 ) {
+            return String.class; // symbol
+        } else if ( columnIndex - offset == 4 ) {
+            return String.class; // description
+        }
+
+        return String.class; // mf.
+    }
 
     /**
      * @param matrixDisplay
@@ -75,11 +94,12 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * @param geneData
      * @param nf
      */
-    public GeneSetDetailsTableModel( MatrixDisplay matrixDisplay, List<String> probeIDs, Map<String, Double> pvalues,
-            Map<String, Integer> pvaluesOrdinalPosition, GeneAnnotations geneData, DecimalFormat nf, Settings settings ) {
+    public GeneSetDetailsTableModel( MatrixDisplay<Probe, String> matrixDisplay, Collection<Probe> probeIDs,
+            Map<Probe, Double> pvalues, Map<Probe, Integer> pvaluesOrdinalPosition, GeneAnnotations geneData,
+            DecimalFormat nf, Settings settings ) {
 
         m_matrixDisplay = matrixDisplay;
-        this.probeIDs = probeIDs;
+        this.probeIDs = new ArrayList<Probe>( probeIDs );
         m_pvalues = pvalues;
         this.settings = settings;
         m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
@@ -95,18 +115,18 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     /**
      * 
      */
-    private void createLinkLabels() {
+    void createLinkLabels() {
         assert probeIDs != null;
-        this.linkLabels = new HashMap<String, JLinkLabel>();
-        for ( Iterator<String> iter = probeIDs.iterator(); iter.hasNext(); ) {
-            String probe = iter.next();
-            String gene = geneData.getProbeGeneName( probe );
+        this.linkLabels = new HashMap<Gene, JLinkLabel>();
+        for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            Probe probe = iter.next();
+            Gene gene = probe.getGene();
             if ( gene != null ) {
-                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene );
-                linkLabels.put( gene, new JLinkLabel( gene, url ) );
+                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene.getSymbol() );
+                linkLabels.put( gene, new JLinkLabel( gene.getSymbol(), url ) );
             }
         }
-
+        this.fireTableDataChanged();
     }
 
     /**
@@ -171,7 +191,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
 
         // get the probeID for the current row
-        String probeID = probeIDs.get( row );
+        Probe probeID = probeIDs.get( row );
 
         // If this is part of the matrix display
         if ( column < offset ) {
@@ -182,16 +202,14 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         switch ( column ) { // after it's been offset
             case 0:
                 // probe ID
-                return probeID;
+                return probeID.getName();
             case 1:
                 // p value
-                try {
-                    if ( m_pvalues == null || !m_pvalues.containsKey( probeID ) ) return new Double( Double.NaN );
-                    return new Double( m_nf.format( m_pvalues.get( probeID ) ) );
 
-                } catch ( NumberFormatException e ) {
-                    return new Double( Double.NaN );
-                }
+                if ( m_pvalues == null || !m_pvalues.containsKey( probeID ) ) return new Double( Double.NaN );
+
+                return m_pvalues.get( probeID );
+
             case 2:
                 // p value bar
                 List<Double> values = new ArrayList<Double>();
@@ -219,15 +237,16 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
             case 3:
                 // gene symbol.
                 if ( geneData == null ) return "No data available";
-                String gene_name = geneData.getProbeGeneName( probeID );
+                Gene gene_name = probeID.getGene();
 
                 return geneData == null ? null : linkLabels.get( gene_name );
             case 4:
                 // description
-                return geneData == null ? "" : geneData.getProbeDescription( probeID );
+                return geneData == null ? "" : probeID.getDescription();
             case 5:
+                // multifunctionality.
                 if ( geneData == null ) return "";
-                gene_name = geneData.getProbeGeneName( probeID );
+                gene_name = probeID.getGene();
                 return String.format( "%.3f (%d)", Math.max( 0.0, multifunctionality
                         .getMultifunctionalityRank( gene_name ) ), multifunctionality.getNumGoTerms( gene_name ) );
             default:

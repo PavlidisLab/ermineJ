@@ -22,8 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.util.Vector;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -31,42 +30,39 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.AbstractTableModel;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.erminej.data.UserDefinedGeneSet; 
-import ubic.erminej.gui.table.TableSorter;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSet;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.gui.geneset.SimpleGeneSetListTableModel;
 
 /**
- * Step to choose a gene set to modify.
+ * Step to choose a gene set to modify from the full list.
  * 
  * @author Homin Lee
  * @version $Id$
  */
 public class GeneSetWizardStep1A extends WizardStep {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4291212433845259049L;
+    private static final long serialVersionUID = -1L;
     private GeneAnnotations geneData = null;
-    private GONames goData = null;
-    private UserDefinedGeneSet newGeneSet = null;
-    private UserDefinedGeneSet oldGeneSet = null;
     private JTable oldClassTable = null;
     private JTextField searchTextField = null;
 
-    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, GONames goData,
-            UserDefinedGeneSet newGeneSet, UserDefinedGeneSet oldGeneSet ) {
+    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, Collection<GeneSet> geneSets ) {
         super( wiz );
         this.jbInit();
         this.geneData = geneData;
-        this.goData = goData;
-        this.newGeneSet = newGeneSet;
-        this.oldGeneSet = oldGeneSet;
         wiz.clearStatus();
-        populateTables();
+        populateTables( geneSets );
+    }
+
+    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData ) {
+        super( wiz );
+        this.jbInit();
+        this.geneData = geneData;
+        wiz.clearStatus();
+        populateTables( null );
     }
 
     // Component initialization
@@ -121,100 +117,75 @@ public class GeneSetWizardStep1A extends WizardStep {
         }
         int row = oldClassTable.getSelectedRow();
         String id = ( String ) oldClassTable.getValueAt( row, 0 );
-        String desc = ( String ) oldClassTable.getValueAt( row, 1 );
-        newGeneSet.setId( id );
-        newGeneSet.setDesc( desc );
-        newGeneSet.setModified( true );
-        if ( geneData.geneSetExists( id ) ) {
-            newGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
-        }
-        oldGeneSet.setId( id );
-        oldGeneSet.setDesc( desc );
-        oldGeneSet.setModified( true );
-        if ( geneData.geneSetExists( id ) ) {
-            oldGeneSet.getProbes().addAll( geneData.getClassToProbes( id ) );
-        }
+
+        GeneSet geneSet = geneData.findGeneSet( id );
+
+        assert geneSet != null;
+
+        ( ( GeneSetWizard ) this.owner ).setOldGeneSet( geneSet );
+
+        /*
+         * Clone the old gene set.
+         */
+        GeneSetTerm oldGeneSetTerm = geneSet.getTerm();
+
+        // if ( !oldGeneSetTerm.isUserDefined() ) {
+        // throw new IllegalArgumentException( "You can only modify your own gene sets" ); // for now
+        // }
+
+        // clone the set.
+        GeneSetTerm updatedGeneSetTerm = new GeneSetTerm( oldGeneSetTerm.getId(), oldGeneSetTerm.getName(),
+                oldGeneSetTerm.getDefinition() );
+        updatedGeneSetTerm.setAspect( oldGeneSetTerm.getAspect() );
+        GeneSet updatedGeneSet = new GeneSet( updatedGeneSetTerm );
+        updatedGeneSet.addGenes( geneSet.getGenes() );
+
+        ( ( GeneSetWizard ) this.owner ).setNewGeneSet( updatedGeneSet );
+
+        log.info( "Editing a copy of  " + updatedGeneSet );
+
+        /*
+         * Now we're ready to edit the copy.
+         */
+
         return true;
 
     }
 
-    private void populateTables() {
-        ModClassTableModel model = new ModClassTableModel( geneData, goData );
-        TableSorter sorter = new TableSorter( model );
-        oldClassTable.setModel( sorter );
-        sorter.setTableHeader( oldClassTable.getTableHeader() );
+    private void populateTables( Collection<GeneSet> geneSets ) {
+        SimpleGeneSetListTableModel model;
+        if ( geneSets == null || geneSets.isEmpty() ) {
+            model = new SimpleGeneSetListTableModel( geneData );
+        } else {
+            model = new SimpleGeneSetListTableModel( geneSets );
+        }
+
+        oldClassTable.setAutoCreateRowSorter( true );
+        oldClassTable.setModel( model );
         oldClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 30 );
         oldClassTable.getColumnModel().getColumn( 2 ).setPreferredWidth( 30 );
         oldClassTable.getColumnModel().getColumn( 3 ).setPreferredWidth( 30 );
         oldClassTable.revalidate();
 
-        showStatus( "Available sets: " + geneData.selectedSets() );
+        showStatus( "Available sets: " + geneData.numGeneSets() );
     }
 
     public void find() {
         String searchOn = searchTextField.getText();
-
+        Collection<GeneSetTerm> terms;
         if ( searchOn.equals( "" ) ) {
-            geneData.resetSelectedSets();
+            terms = geneData.getActiveGeneSets();
         } else {
-            geneData.selectSets( searchOn, goData );
+            terms = geneData.findSetsByName( searchOn );
         }
-        populateTables();
+        populateTables( geneData.getGeneSets( terms ) );
     }
-
 }
 
-class ModClassTableModel extends AbstractTableModel {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6796737347744570727L;
-    GeneAnnotations geneData;
-    GONames goData;
-    Vector<String> columnNames = new Vector<String>();
-    private NumberFormat nf = NumberFormat.getInstance();
-
-    public ModClassTableModel( GeneAnnotations geneData, GONames goData ) {
-        this.geneData = geneData;
-        this.goData = goData;
-        nf.setMaximumFractionDigits( 8 );
-        columnNames.add( "Name" );
-        columnNames.add( "Description" );
-        columnNames.add( "# of Probes" );
-        columnNames.add( "# of Genes" );
-    }
-
-    @Override
-    public String getColumnName( int i ) {
-        return columnNames.get( i );
-    }
-
-    public int getColumnCount() {
-        return columnNames.size();
-    }
-
-    public int getRowCount() {
-        return geneData.getSelectedSets().size();
-    }
-
-    public Object getValueAt( int i, int j ) {
-
-        String classid = geneData.getSelectedSets().get( i );
-
-        switch ( j ) {
-            case 0:
-                return classid;
-            case 1:
-                return goData.getNameForId( classid );
-            case 2:
-                return new Integer( geneData.numProbesInGeneSet( classid ) );
-            case 3:
-                return new Integer( geneData.numGenesInGeneSet( classid ) );
-            default:
-                return "";
-        }
-    }
-}
+/**
+ * @author paul
+ * @version $Id$
+ */
 
 class GeneSetWizardStep1A_searchButton_actionAdapter implements ActionListener {
 

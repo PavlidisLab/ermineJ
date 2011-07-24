@@ -19,18 +19,13 @@
 package ubic.erminej.gui;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
 import ubic.erminej.Settings.Method;
-import ubic.erminej.data.UserDefinedGeneSetManager;
+import ubic.erminej.data.GeneAnnotations;
 
 /**
  * @author Homin Lee
@@ -38,19 +33,10 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  */
 public class AnalysisWizard extends Wizard {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1045387572443464499L;
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * 
-     */
     private static final int WIZARD_PREFERRED_HEIGHT = 380;
 
-    /**
-     * 
-     */
     private static final int WIZARD_PREFERRED_WIDTH = 570;
 
     private static Log log = LogFactory.getLog( AnalysisWizard.class.getName() );
@@ -60,8 +46,7 @@ public class AnalysisWizard extends Wizard {
     Method analysisType = Method.ORA;
 
     Settings settings;
-    GeneAnnotations geneData;
-    GONames goData;
+    GeneAnnotations geneAnnots;
     AnalysisWizardStep1 step1;
     AnalysisWizardStep2 step2;
     AnalysisWizardStep3 step3;
@@ -70,20 +55,18 @@ public class AnalysisWizard extends Wizard {
     AnalysisWizardStep5 step5;
     int maxSteps = 6;
 
-    public AnalysisWizard( GeneSetScoreFrame callingframe, Map<Integer, GeneAnnotations> geneDataSets, GONames goData ) {
+    public AnalysisWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneAnnots ) {
         super( callingframe, WIZARD_PREFERRED_WIDTH, WIZARD_PREFERRED_HEIGHT );
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
 
-        if ( geneDataSets != null ) this.geneData = geneDataSets.get( new Integer( "original".hashCode() ) );
-
-        this.goData = goData;
+        this.geneAnnots = geneAnnots;
 
         step1 = new AnalysisWizardStep1( this, settings );
         this.addStep( step1, true );
         step2 = new AnalysisWizardStep2( this, settings );
         this.addStep( step2 );
-        step3 = new AnalysisWizardStep3( this, callingframe, goData, settings );
+        step3 = new AnalysisWizardStep3( this, callingframe, geneAnnots );
         this.addStep( step3 );
         step31 = new AnalysisWizardStep3_1( this, settings );
         this.addStep( step31 );
@@ -245,14 +228,9 @@ public class AnalysisWizard extends Wizard {
     }
 
     @Override
-    protected void finishButton_actionPerformed( ActionEvent e ) {
+    protected void finishEditing( ActionEvent e ) {
         if ( step2.isReady() ) {
-            try {
-                loadAddedClasses();
-            } catch ( IOException e1 ) {
-                GuiUtil.error( "Could not load the custom classes: " + e + "\n"
-                        + "If this problem persists, please contact the software vendor. " );
-            }
+
             saveValues();
             log.info( "Starting analysis" );
 
@@ -271,25 +249,10 @@ public class AnalysisWizard extends Wizard {
     void saveValues() {
         step1.saveValues();
         step2.saveValues();
-        step3.saveValues();
+        // step3.saveValues();
         step31.saveValues();
         step4.saveValues();
         step5.saveValues();
-    }
-
-    /**
-     * @throws IOException
-     */
-    void loadAddedClasses() throws IOException {
-        Iterator<Map<String, Object>> it = step3.getAddedClasses().iterator();
-        while ( it.hasNext() ) {
-            String id = ( String ) it.next().get( "id" );
-            log.debug( "Adding " + id + " to genedata for analysis" );
-            if ( !goData.isUserDefined( id ) ) {
-                String filename = UserDefinedGeneSetManager.getUserGeneSetFileForName( id );
-                UserDefinedGeneSetManager.loadUserGeneSetFile( filename );
-            }
-        }
     }
 
     /**

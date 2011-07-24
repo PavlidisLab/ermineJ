@@ -37,17 +37,15 @@ import javax.swing.event.HyperlinkListener;
 
 /**
  * @author Will Braynen;
+ * @deprecated
  */
 public class JWebBrowser extends JFrame implements HyperlinkListener, ActionListener {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 6725319231884948542L;
 
     public static void main( String[] args ) {
         if ( args.length == 0 )
-            new JWebBrowser( "http://microarray.genomecenter.columbia.edu/ermineJ" );
+            new JWebBrowser( "http://www.chibi.ubc.ca/ermineJ" );
         else
             new JWebBrowser( args[0] );
     }

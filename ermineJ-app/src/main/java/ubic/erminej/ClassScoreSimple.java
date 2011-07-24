@@ -21,11 +21,11 @@ package ubic.erminej;
 import java.util.Collection;
 import java.util.List;
 
-import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 
 /**
- * Simple API to run ermineJ analyses.
+ * Simple API to run ermineJ analyses, using Strings as the initial representations.
  * 
  * @author Paul Pavlidis
  * @version $Id$
@@ -83,10 +83,9 @@ public class ClassScoreSimple {
      * Run an analysis using the current configuration.
      */
     public void run( List<Double> geneScores ) {
-        GeneAnnotations geneData = new GeneAnnotations( probes, genes, null, goAssociations );
-        GeneScores scores = new GeneScores( probes, geneScores, geneData.getGeneToProbeMap(), geneData
-                .getProbeToGeneMap(), settings );
-        results = new GeneSetPvalRun( settings, geneData, null, scores );
+        GeneAnnotations geneData = new GeneAnnotations( genes, goAssociations );
+        GeneScores scores = new GeneScores( probes, geneScores, geneData, settings );
+        results = new GeneSetPvalRun( settings, geneData, scores );
     }
 
     /**

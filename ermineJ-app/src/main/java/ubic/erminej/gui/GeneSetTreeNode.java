@@ -18,67 +18,47 @@
  */
 package ubic.erminej.gui;
 
-import java.util.Enumeration;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import ubic.basecode.bio.GOEntry;
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * @author pavlidis
  * @version $Id$
  */
 public class GeneSetTreeNode extends DefaultMutableTreeNode {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 7725460771978972950L;
-    private boolean hasGoodChild = false;
-    private boolean hasUsableChild = false;
 
-    public GeneSetTreeNode( DirectedGraphNode<String, GOEntry> root ) {
+    private static final long serialVersionUID = 1L;
+
+    private boolean hasSignificantChild = false;
+
+    public GeneSetTreeNode( DirectedGraphNode<String, GeneSetTerm> root ) {
         super( root );
     }
 
+    /**
+     * @return
+     */
     @SuppressWarnings("unchecked")
+    public GeneSetTerm getTerm() {
+        return ( ( DirectedGraphNode<String, GeneSetTerm> ) super.getUserObject() ).getItem();
+    }
+
+    /**
+     * @return true if one ore more children of this node should be displayed as 'significant'.
+     */
+    public boolean hasSignificantChild() {
+        return this.hasSignificantChild;
+    }
+
+    public void setHasSignificantChild( boolean b ) {
+        this.hasSignificantChild = b;
+    }
+
     @Override
-    public Enumeration<GeneSetTreeNode> breadthFirstEnumeration() {
-        return super.breadthFirstEnumeration();
-    }
-
-    /**
-     * @return Returns the hasGoodChild.
-     */
-    public boolean hasGoodChild() {
-        return this.hasGoodChild;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public DirectedGraphNode<String, GOEntry> getUserObject() {
-        return ( DirectedGraphNode<String, GOEntry> ) super.getUserObject();
-    }
-
-    /**
-     * @param hasGoodChild The hasGoodChild to set.
-     */
-    public void setHasGoodChild( boolean hasGoodChild ) {
-        this.hasGoodChild = hasGoodChild;
-    }
-
-    /**
-     * @return Returns the hasUsableChild.
-     */
-    public boolean hasUsableChild() {
-        return this.hasUsableChild;
-    }
-
-    /**
-     * @param hasUsableChild The hasUsableChild to set.
-     */
-    public void setHasUsableChild( boolean hasUsableChild ) {
-        this.hasUsableChild = hasUsableChild;
+    public String toString() {
+        return this.getTerm().toString();
     }
 
 }

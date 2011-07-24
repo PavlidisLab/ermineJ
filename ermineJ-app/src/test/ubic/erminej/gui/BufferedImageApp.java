@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.basecode.gui;
+package ubic.erminej.gui;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;

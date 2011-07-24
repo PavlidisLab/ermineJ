@@ -27,7 +27,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -42,15 +42,12 @@ import ubic.erminej.Settings;
 import ubic.erminej.gui.StatusJlabel;
 
 /**
- * FIXME this should extend jDialog, implement actionlistener, and be modal.
+ * FIXME
  * 
  * @author pavlidis
  * @version $Id$
  */
-public class GeneUrlDialog extends JFrame {
-    /**
-     * 
-     */
+public class GeneUrlDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog( GeneUrlDialog.class );
     private static final int MAINWIDTH = 550;
@@ -73,7 +70,7 @@ public class GeneUrlDialog extends JFrame {
     public GeneUrlDialog( Settings settings, GeneSetDetailsTableModel model ) {
         this.settings = settings;
         this.tableModel = model;
-        // this.setModal( true );
+        this.setModal( true );
         try {
             jbInit();
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -150,7 +147,10 @@ public class GeneUrlDialog extends JFrame {
         dispose();
     }
 
-    void setActionPerformed() {
+    /**
+     * This is the business
+     */
+    protected void setActionPerformed() {
         String candidateUrlBase = urlTextField.getText().trim();
 
         if ( candidateUrlBase.length() == 0 ) {
@@ -168,8 +168,10 @@ public class GeneUrlDialog extends JFrame {
             return;
         }
 
+        // this really should just pass the information back ... too much work being done here.
         settings.getConfig().setProperty( Settings.GENE_URL_BASE, candidateUrlBase );
         tableModel.configure();
+        tableModel.createLinkLabels();
         dispose();
     }
 

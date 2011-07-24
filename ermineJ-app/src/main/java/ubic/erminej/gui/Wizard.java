@@ -73,7 +73,7 @@ public abstract class Wizard extends JDialog {
      * Make the status bar empty.
      */
     public void clearStatus() {
-        statusMessenger.showStatus( "" );
+        statusMessenger.clear();
     }
 
     /**
@@ -146,7 +146,7 @@ public abstract class Wizard extends JDialog {
      * 
      * @param e
      */
-    protected abstract void finishButton_actionPerformed( ActionEvent e );
+    protected abstract void finishEditing( ActionEvent e );
 
     /**
      * Define what happens when the 'next' button is pressed
@@ -234,7 +234,7 @@ class Wizard_finishButton_actionAdapter implements java.awt.event.ActionListener
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.finishButton_actionPerformed( e );
+        adaptee.finishEditing( e );
     }
 }
 

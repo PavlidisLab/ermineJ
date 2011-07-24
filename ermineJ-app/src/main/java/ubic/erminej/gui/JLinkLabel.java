@@ -18,10 +18,14 @@
  */
 package ubic.erminej.gui;
 
+import java.awt.Color;
+import java.awt.Cursor; 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.font.TextAttribute;
+import java.util.Map;
 
-import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 import ubic.basecode.util.BrowserLauncher;
 
@@ -31,20 +35,25 @@ import ubic.basecode.util.BrowserLauncher;
  * @author Will Braynen
  * @version $Id$
  */
-public class JLinkLabel extends JLabel implements MouseListener {
+public class JLinkLabel extends JTextField {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -7916376574174272599L;
+    private static final long serialVersionUID = -1L;
 
     protected String m_url = null;
 
     protected String m_text = "";
 
     /** Creates a new instance of JLinkLabel */
+    @SuppressWarnings("unchecked")
     public JLinkLabel() {
         super();
+        this.setBackground( Color.WHITE );
+        this.setForeground( Color.BLUE );
+        this.setBorder( null );
+        this.setEditable( false );
+        Map attrs = this.getFont().getAttributes();
+        attrs.put( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL );
+        this.setFont( this.getFont().deriveFont( attrs ) );
     }
 
     public JLinkLabel( String text ) {
@@ -55,6 +64,34 @@ public class JLinkLabel extends JLabel implements MouseListener {
     public JLinkLabel( String text, String url ) {
         this();
         setText( text, url );
+        this.addMouseListener( new MouseListener() {
+
+            @Override
+            public void mouseClicked( MouseEvent e ) {
+                openUrl();
+            }
+
+            @Override
+            public void mouseEntered( MouseEvent e ) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+
+            }
+
+            @Override
+            public void mouseExited( MouseEvent e ) {
+                setCursor( Cursor.getDefaultCursor() );
+
+            }
+
+            @Override
+            public void mousePressed( MouseEvent e ) {
+            }
+
+            @Override
+            public void mouseReleased( MouseEvent e ) {
+
+            }
+        } );
     }
 
     /**
@@ -62,29 +99,6 @@ public class JLinkLabel extends JLabel implements MouseListener {
      */
     public String getURL() {
         return m_url;
-    }
-
-    public void mouseClicked( MouseEvent e ) {
-        if ( m_url != null ) {
-            try {
-                BrowserLauncher.openURL( m_url );
-            } catch ( Exception ex ) {
-                GuiUtil.error( "Could not open a web browser window." );
-            }
-        }
-    }
-
-    public void mouseEntered( MouseEvent e ) {
-    }
-
-    public void mouseExited( MouseEvent e ) {
-    }
-
-    public void mousePressed( MouseEvent e ) {
-    }
-
-    public void mouseReleased( MouseEvent e ) {
-
     }
 
     @Override
@@ -99,7 +113,8 @@ public class JLinkLabel extends JLabel implements MouseListener {
     public void setText( String text, String url ) {
         m_text = text;
         m_url = url;
-        super.setText( "<html><a href=\"" + url + "\">" + text + "</a></html>" );
+        // super.setText( "<a href=\"" + m_url + "\">" + text + "</a>" );
+        super.setText( text );
     }
 
     /**
@@ -112,6 +127,16 @@ public class JLinkLabel extends JLabel implements MouseListener {
     @Override
     public String toString() {
         return "<html><a href=\"" + m_url + "\">" + m_text + "</a></html>";
+    }
+
+    public void openUrl() {
+        if ( m_url != null ) {
+            try {
+                BrowserLauncher.openURL( m_url );
+            } catch ( Exception ex ) {
+                GuiUtil.error( "Could not open a web browser window." );
+            }
+        }
     }
 
 }

@@ -23,10 +23,10 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
 
-import ubic.basecode.bio.geneset.GONames;
 import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneSetTerms;
 
 /**
  * @author Homin Lee
@@ -43,12 +43,12 @@ public class SaveWizard extends Wizard {
     int selected_run;
 
     List<GeneSetPvalRun> rundata;
-    GONames goData;
+    GeneSetTerms goData;
     String saveFolder;
     SaveWizardStep1 step1;
     SaveWizardStep2 step2;
 
-    public SaveWizard( GeneSetScoreFrame callingframe, List<GeneSetPvalRun> rundata, GONames goData ) {
+    public SaveWizard( GeneSetScoreFrame callingframe, List<GeneSetPvalRun> rundata, GeneSetTerms goData ) {
         super( callingframe, 400, 200 );
         enableEvents( AWTEvent.WINDOW_EVENT_MASK );
         this.callingframe = callingframe;
@@ -110,7 +110,7 @@ public class SaveWizard extends Wizard {
     }
 
     @Override
-    protected void finishButton_actionPerformed( ActionEvent e ) {
+    protected void finishEditing( ActionEvent e ) {
         GeneSetPvalRun runToSave = rundata.get( step1.getSelectedRunNum() );
         Settings saveSettings = runToSave.getSettings();
         String saveFileName = step2.getSaveFileName();

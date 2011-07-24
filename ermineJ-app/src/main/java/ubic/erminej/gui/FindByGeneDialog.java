@@ -18,8 +18,10 @@
  */
 package ubic.erminej.gui;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
+import java.util.Collection;
+
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * @author pavlidis
@@ -27,9 +29,6 @@ import ubic.basecode.bio.geneset.GeneAnnotations;
  */
 public class FindByGeneDialog extends FindDialog {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 5573937842473360863L;
 
     /**
@@ -37,24 +36,24 @@ public class FindByGeneDialog extends FindDialog {
      * @param geneData
      * @param goData
      */
-    public FindByGeneDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData ) {
-        super( callingframe, geneData, goData );
+    public FindByGeneDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData ) {
+        super( callingframe, geneData );
         this.setTitle( "Find Gene Set using a gene or probe symbol" );
     }
 
     @Override
-    void findActionPerformed() {
+    public void findActionPerformed() {
         String searchOn = searchTextField.getText();
         statusMessenger.showStatus( "Searching '" + searchOn + "'" );
-
+        Collection<GeneSetTerm> geneSets;
         if ( searchOn.equals( "" ) ) {
-            geneData.resetSelectedSets();
+            geneSets = geneData.getAllTerms();
         } else {
-            geneData.selectSetsByGene( searchOn );
+            geneSets = geneData.findSetsByGene( searchOn );
         }
 
-        statusMessenger.showStatus( geneData.selectedSets() + " matching gene sets found." );
-        resetViews();
+        statusMessenger.showStatus( geneSets.size() + " matching gene sets found." );
+        filterViews( geneSets );
 
     }
 

@@ -21,6 +21,7 @@ package ubic.erminej;
 import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,12 +30,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusViewer;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.analysis.CorrelationsGeneSetPvalSeriesGenerator;
 import ubic.erminej.analysis.GeneSetPvalSeriesGenerator;
@@ -45,9 +42,13 @@ import ubic.erminej.analysis.OraGeneSetPvalSeriesGenerator;
 import ubic.erminej.analysis.ResamplingCorrelationGeneSetScore;
 import ubic.erminej.analysis.ResamplingExperimentGeneSetScore;
 import ubic.erminej.analysis.RocPvalGenerator;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
+import ubic.erminej.data.Multifunctionality;
+import ubic.erminej.data.Probe;
 
 /**
  * Class that does all the work in doing gene set scoring. Holds the results as well.
@@ -56,13 +57,13 @@ import ubic.erminej.data.Histogram;
  * @version $Id$
  */
 public class GeneSetPvalRun {
- 
-    private GeneAnnotations geneData;
+
+    private GeneAnnotations geneData; // ones used in the analysis
     private GeneScores geneScores;
 
     private Histogram hist;
-    private Map<String, GeneSetResult> results = null;
-    private List<String> sortedclasses = null; // this holds the results.
+    private Map<GeneSetTerm, GeneSetResult> results = null;
+    private List<GeneSetTerm> sortedclasses = null; // this holds the results.
     private NumberFormat nf = NumberFormat.getInstance();
     private Settings settings;
 
@@ -73,29 +74,91 @@ public class GeneSetPvalRun {
     private String name; // name of this run.
 
     /**
+     * @param activeProbes
+     * @param geneDataSets
+     * @return
+     */
+    public synchronized GeneAnnotations getPrunedAnnotations( Collection<Probe> activeProbes, GeneAnnotations original ) {
+        GeneAnnotations result = null;
+
+        if ( original.getProbes().size() == activeProbes.size() && original.getProbes().containsAll( activeProbes ) ) {
+            result = original;
+        } else {
+            result = new GeneAnnotations( original, activeProbes );
+        }
+
+        return result;
+    }
+
+    /**
+     * @param rawData
+     * @param scores
+     * @return
+     */
+    private synchronized Set<Probe> getActiveProbes( DoubleMatrix<Probe, String> rawData, GeneScores scores ) {
+
+        Set<Probe> activeProbes = null;
+        if ( scores != null ) { // favor the geneScores list.
+            activeProbes = scores.getProbeToScoreMap().keySet();
+        } else if ( rawData != null ) {
+            activeProbes = new HashSet<Probe>( rawData.getRowNames() );
+        } else {
+            throw new IllegalStateException( "No active probes" );
+        }
+        return activeProbes;
+    }
+
+    /**
+     * Do a new analysis.
+     * 
+     * @param settings
+     * @param originalAnnots - original!!! Will be pruned as necessary.
+     * @param rawData
+     * @param geneScores
+     * @param messenger
+     * @param name Name of the run
+     */
+    public GeneSetPvalRun( Settings settings, GeneAnnotations originalAnnots, DoubleMatrix<Probe, String> rawData,
+            GeneScores geneScores, StatusViewer messenger, double multifunctionalityCorrelation, String name ) {
+        this.settings = settings;
+
+        this.geneScores = geneScores;
+        this.name = name;
+        this.multifunctionalityCorrelation = multifunctionalityCorrelation;
+
+        nf.setMaximumFractionDigits( 8 );
+        results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
+
+        Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
+        this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
+
+        runAnalysis( settings, this.geneData, rawData, geneScores, messenger );
+    }
+
+    /**
      * Use this when we are loading in existing results from a file.
      * 
-     * @param activeProbes
      * @param settings
      * @param geneData
      * @param rawData
-     * @param goData
      * @param geneScores
      * @param messenger
      * @param results
      * @param multifunctionalityCorrelation
      * @param name Name of the run
      */
-    public GeneSetPvalRun( Set<String> activeProbes, Settings settings, GeneAnnotations geneData,
-            DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
-            Map<String, GeneSetResult> results, String name, double multifunctionalityCorrelation ) {
+    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, DoubleMatrix<Probe, String> rawData,
+            GeneScores geneScores, StatusViewer messenger, Map<GeneSetTerm, GeneSetResult> results,
+            double multifunctionalityCorrelation, String name ) {
         this.settings = settings;
-        this.geneData = geneData;
 
         this.geneScores = geneScores;
         this.results = results;
         this.name = name;
         this.multifunctionalityCorrelation = multifunctionalityCorrelation;
+
+        Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
+        this.geneData = getPrunedAnnotations( activeProbes, geneData );
 
         sortResults();
         // For table output
@@ -106,42 +169,19 @@ public class GeneSetPvalRun {
     }
 
     /**
-     * Do a new analysis.
-     * 
-     * @param activeProbes
-     * @param settings
-     * @param geneData
-     * @param rawData
-     * @param goData
-     * @param geneScores
-     * @param messenger
-     * @param name Name of the run
-     */
-    public GeneSetPvalRun( Set<String> activeProbes, Settings settings, GeneAnnotations geneData,
-            DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores, StatusViewer messenger,
-            String name, double multifunctionalityCorrelation ) {
-        this.settings = settings;
-        this.geneData = geneData;
-        this.geneScores = geneScores;
-        this.name = name;
-        this.multifunctionalityCorrelation = multifunctionalityCorrelation;
-
-        nf.setMaximumFractionDigits( 8 );
-        results = new LinkedHashMap<String, GeneSetResult>();
-
-        runAnalysis( activeProbes, settings, geneData, rawData, goData, geneScores, messenger );
-    }
-
-    /**
      * Do a new analysis, starting from the bare essentials.
      */
-    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GONames goData, GeneScores geneScores ) {
+    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GeneScores geneScores ) {
         this.settings = settings;
-        this.geneData = geneData;
+
         this.geneScores = geneScores;
         nf.setMaximumFractionDigits( 8 );
-        results = new LinkedHashMap<String, GeneSetResult>();
-        runAnalysis( geneData.getActiveProbes(), settings, geneData, null, goData, geneScores, null );
+        results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
+
+        Set<Probe> activeProbes = getActiveProbes( null, geneScores );
+        this.geneData = getPrunedAnnotations( activeProbes, geneData );
+
+        runAnalysis( settings, geneData, null, geneScores, null );
     }
 
     public GeneAnnotations getGeneData() {
@@ -170,7 +210,7 @@ public class GeneSetPvalRun {
     /**
      * @return Map the results
      */
-    public Map<String, GeneSetResult> getResults() {
+    public Map<GeneSetTerm, GeneSetResult> getResults() {
         return results;
     }
 
@@ -184,7 +224,7 @@ public class GeneSetPvalRun {
     /**
      * @return Map the results
      */
-    public List<String> getSortedClasses() {
+    public List<GeneSetTerm> getSortedClasses() {
         return sortedclasses;
     }
 
@@ -201,6 +241,11 @@ public class GeneSetPvalRun {
     public void setRandomSeed( long randomSeed ) {
         if ( randomSeed < 0 ) return;
         this.randomSeed = randomSeed;
+    }
+
+    @Override
+    public String toString() {
+        return "GeneSetPvalRun [name=" + name + "]";
     }
 
     /* private methods */
@@ -225,7 +270,7 @@ public class GeneSetPvalRun {
             if ( !( settings.getClassScoreMethod().equals( Settings.Method.GSR ) ) )
                 throw new UnsupportedOperationException(
                         "Westfall-Young correction is not supported for this analysis method" );
-            mt.westfallyoung(   );
+            mt.westfallyoung();
         } else {
             throw new IllegalArgumentException( "Unknown multiple test correction method: " + multipleTestCorrMethod );
         }
@@ -240,11 +285,10 @@ public class GeneSetPvalRun {
      * @param geneScores
      * @param messenger
      */
-    private void runAnalysis( Collection<String> activeProbes, Settings settings1, GeneAnnotations geneData1,
-            DoubleMatrix<String, String> rawData, GONames goData, GeneScores geneScores1, StatusViewer messenger ) {
+    private void runAnalysis( Settings settings1, GeneAnnotations geneData1, DoubleMatrix<Probe, String> rawData,
+            GeneScores geneScores1, StatusViewer messenger ) {
         // get the class sizes.
-        GeneSetSizeComputer csc = new GeneSetSizeComputer( activeProbes, geneData1, geneScores1, settings1
-                .getUseWeights() );
+        GeneSetSizeComputer csc = new GeneSetSizeComputer( geneData1, geneScores1, settings1.getUseWeights() );
 
         switch ( settings1.getClassScoreMethod() ) {
             case GSR: {
@@ -260,8 +304,7 @@ public class GeneSetPvalRun {
                 if ( Thread.currentThread().isInterrupted() ) return;
                 if ( messenger != null ) messenger.showStatus( "Finished resampling" );
 
-                GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings1, geneData1, hist, csc,
-                        goData );
+                GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings1, geneData1, hist, csc );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 // calculate the actual class scores and correct sorting.
                 results = pvg.classPvalGenerator( geneScores1.getGeneToScoreMap(), geneScores1.getProbeToScoreMap() );
@@ -270,14 +313,14 @@ public class GeneSetPvalRun {
             }
             case ORA: {
 
-                int inputSize = activeProbes.size();
+                int inputSize = geneData1.getProbes().size();
 
-                Collection<Entry<String, Double>> inp_entries = geneScores1.getProbeToScoreMap().entrySet();
+                Collection<Entry<Probe, Double>> inp_entries = geneScores1.getProbeToScoreMap().entrySet();
 
                 if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
 
                 OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator( settings1, geneData1, csc,
-                        goData, inputSize );
+                        inputSize );
                 int numOver = pvg.hgSizes( inp_entries );
 
                 if ( numOver == 0 ) {
@@ -307,7 +350,7 @@ public class GeneSetPvalRun {
                 hist = probePvalMapper.generateNullDistribution( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings1,
-                        geneData1, csc, goData, rawData, hist );
+                        geneData1, csc, rawData, hist );
                 if ( messenger != null ) messenger.showStatus( "Finished resampling, computing for gene sets" );
                 results = pvg.classPvalGenerator( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
@@ -316,18 +359,9 @@ public class GeneSetPvalRun {
                 break;
             }
             case ROC: {
-                RocPvalGenerator rpg = new RocPvalGenerator( settings1, geneData1, csc, goData );
-                Map<String, Integer> geneRanksMap;
-                if ( messenger != null ) messenger.showStatus( "Rank transforming" );
-                if ( settings1.getUseWeights() ) {
-                    geneRanksMap = Rank.rankTransform( geneScores1.getGeneToScoreMap() );
-                    if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
-                    results = rpg.classPvalGenerator( geneScores1.getGeneToScoreMap(), geneRanksMap, messenger );
-                } else {
-                    geneRanksMap = Rank.rankTransform( geneScores1.getProbeToScoreMap() );
-                    if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
-                    results = rpg.classPvalGenerator( geneScores1.getProbeToScoreMap(), geneRanksMap, messenger );
-                }
+                RocPvalGenerator rpg = new RocPvalGenerator( settings1, geneData1, csc, messenger );
+                if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
+                results = rpg.classPvalGenerator( geneScores1 );
 
                 break;
             }
@@ -355,6 +389,16 @@ public class GeneSetPvalRun {
     /**
      * 
      */
+    private void setGeneSetRanks() {
+        // For table output
+        for ( int i = 0; i < sortedclasses.size(); i++ ) {
+            results.get( sortedclasses.get( i ) ).setRank( i + 1 );
+        }
+    }
+
+    /**
+     * 
+     */
     private void setMultifuncationalities() {
         Multifunctionality mf = new Multifunctionality( geneData );
         for ( GeneSetResult gsr : this.results.values() ) {
@@ -365,20 +409,10 @@ public class GeneSetPvalRun {
     }
 
     /**
-     * 
-     */
-    private void setGeneSetRanks() {
-        // For table output
-        for ( int i = 0; i < sortedclasses.size(); i++ ) {
-            results.get( sortedclasses.get( i ) ).setRank( i + 1 );
-        }
-    }
-
-    /**
      * Sorted order of the class results - all this has to hold is the class names.
      */
     private void sortResults() {
-        sortedclasses = new Vector<String>( results.entrySet().size() );
+        sortedclasses = new Vector<GeneSetTerm>( results.entrySet().size() );
         Collection<GeneSetResult> k = results.values();
         List<GeneSetResult> l = new Vector<GeneSetResult>( k );
         Collections.sort( l );

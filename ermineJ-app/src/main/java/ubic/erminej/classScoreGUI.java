@@ -75,6 +75,7 @@ public class classScoreGUI {
         frame.setVisible( true );
         frame.showStatus( "Waiting for startup dialog box" );
         frame.setIconImage( new ImageIcon( this.getClass().getResource( "/ubic/erminej/logoIcon64.gif" ) ).getImage() );
+        
         StartupDialog sdlog = new StartupDialog( frame );
         sdlog.setModal( true );
         sdlog.setResizable( true );

@@ -20,11 +20,10 @@ package ubic.erminej;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.UIManager;
 
@@ -43,10 +42,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
+import ubic.basecode.dataStructure.matrix.FastRowAccessDoubleMatrix;
 import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
@@ -55,8 +52,14 @@ import ubic.erminej.Settings.GeneScoreMethod;
 import ubic.erminej.Settings.Method;
 import ubic.erminej.Settings.MultiProbeHandling;
 import ubic.erminej.Settings.MultiTestCorrMethod;
+import ubic.erminej.data.GeneAnnotationParser;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.Multifunctionality;
+import ubic.erminej.data.Probe;
 import ubic.erminej.data.UserDefinedGeneSetManager;
+import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
  * Run ermineJ from the command line (or fire up the GUI).
@@ -121,10 +124,10 @@ public class classScoreCMD {
 
     protected Settings settings;
     protected StatusViewer statusMessenger;
-    protected GONames goData;
+    protected GeneSetTerms goData;
     protected GeneAnnotations geneData;
     protected Map<Integer, GeneAnnotations> geneDataSets;
-    protected Map<String, DoubleMatrix<String, String>> rawDataSets;
+    protected Map<String, DoubleMatrix<Probe, String>> rawDataSets;
     protected Map<String, GeneScores> geneScoreSets;
     private String saveFileName = null;
     private boolean useCommandLineInterface = true;
@@ -137,13 +140,13 @@ public class classScoreCMD {
 
     public classScoreCMD() {
         settings = new Settings( false );
-        rawDataSets = new HashMap<String, DoubleMatrix<String, String>>();
+        rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
         geneDataSets = new HashMap<Integer, GeneAnnotations>();
         geneScoreSets = new HashMap<String, GeneScores>();
         this.buildOptions();
     }
 
-    public GONames getGoData() {
+    public GeneSetTerms getGoData() {
         return goData;
     }
 
@@ -321,7 +324,7 @@ public class classScoreCMD {
         }
 
         if ( commandLine.hasOption( 'A' ) ) {
-            settings.setAnnotFormat( "Affy CSV" );
+            settings.setAnnotFormat( Format.AFFYCSV );
         }
         if ( commandLine.hasOption( 'a' ) ) {
             arg = commandLine.getOptionValue( 'a' );
@@ -689,7 +692,7 @@ public class classScoreCMD {
      * @throws IOException
      */
     protected GeneSetPvalRun analyze() throws IOException {
-        DoubleMatrix<String, String> rawData = null;
+        DoubleMatrix<Probe, String> rawData = null;
         if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
             if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
                 statusMessenger.showStatus( "Raw data are in memory" );
@@ -697,7 +700,12 @@ public class classScoreCMD {
             } else {
                 statusMessenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
                 DoubleMatrixReader r = new DoubleMatrixReader();
-                rawData = r.read( settings.getRawDataFileName() );
+
+                DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName() );
+
+                rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
+                rawData.setColumnNames( omatrix.getColNames() );
+
                 rawDataSets.put( settings.getRawDataFileName(), rawData );
             }
         }
@@ -722,22 +730,22 @@ public class classScoreCMD {
             }
         }
 
-        Set<String> activeProbes = null;
-        if ( rawData != null && geneScores != null ) {
-            // favor the geneScores list.
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData == null && geneScores != null ) {
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
+        Collection<Probe> probesToUseInAnalysis = null;
+        if ( geneScores != null ) {
+            probesToUseInAnalysis = geneScores.getProbeToScoreMap().keySet();
         } else if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
             assert rawData != null;
-            activeProbes = new HashSet<String>( rawData.getRowNames() );
+            probesToUseInAnalysis = rawData.getRowNames();
+        } else {
+            throw new IllegalStateException( "No active probes" );
         }
 
         boolean needToMakeNewGeneData = true;
         for ( Iterator<Integer> it = geneDataSets.keySet().iterator(); it.hasNext(); ) {
             GeneAnnotations test = geneDataSets.get( it.next() );
 
-            if ( test.getProbeToGeneMap().keySet().equals( activeProbes ) ) {
+            if ( test.getProbes().size() == probesToUseInAnalysis.size()
+                    && test.getProbes().containsAll( probesToUseInAnalysis ) ) {
                 geneData = test;
                 needToMakeNewGeneData = false;
                 break;
@@ -746,7 +754,7 @@ public class classScoreCMD {
         }
 
         if ( needToMakeNewGeneData ) {
-            geneData = new GeneAnnotations( geneData, activeProbes );
+            geneData = new GeneAnnotations( geneData, probesToUseInAnalysis );
             geneDataSets.put( new Integer( geneData.hashCode() ), geneData );
         }
         double multifunctionalCorrelation = 0.0;
@@ -757,8 +765,8 @@ public class classScoreCMD {
 
         /* do work */
         statusMessenger.showStatus( "Starting analysis..." );
-        GeneSetPvalRun runResult = new GeneSetPvalRun( activeProbes, settings, geneData, rawData, goData, geneScores,
-                statusMessenger, "command", multifunctionalCorrelation );
+        GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, rawData, geneScores, statusMessenger,
+                multifunctionalCorrelation, "command" );
         return runResult;
     }
 
@@ -770,15 +778,15 @@ public class classScoreCMD {
             statusMessenger = new StatusStderr();
             statusMessenger.showStatus( "Reading GO descriptions from " + settings.getClassFile() );
 
-            goData = new GONames( settings.getClassFile() );
+            goData = new GeneSetTerms( settings.getClassFile() );
+            GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
 
             statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-            if ( settings.getAnnotFormat() == 1 ) {
-                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData,
-                        GeneAnnotations.AFFYCSV );
+            if ( settings.getAnnotFormat().equals( Format.AFFYCSV ) ) {
+                geneData = parser.read( settings.getAnnotFile(), Format.AFFYCSV );
             } else {
-                boolean filterNonSpecific = settings.getFilterNonSpecific();
-                geneData = new GeneAnnotations( settings.getAnnotFile(), statusMessenger, goData, filterNonSpecific );
+                boolean filterNonSpecific = settings.getFilterNonSpecific(); // FIXME!!!
+                geneData = parser.read( settings.getAnnotFile(), Format.DEFAULT );
                 // TODO add agilent support ... can we tell the type of file by the suffix?
             }
 
@@ -796,7 +804,7 @@ public class classScoreCMD {
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
         }
-        UserDefinedGeneSetManager.init( geneData, goData, settings );
+        UserDefinedGeneSetManager.init( geneData, settings );
         UserDefinedGeneSetManager.loadUserGeneSets( this.statusMessenger );
 
         statusMessenger.showStatus( "Done with initialization." );

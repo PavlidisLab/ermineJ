@@ -22,7 +22,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -35,99 +36,128 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.StringUtil;
-
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.bio.geneset.Multifunctionality;
 import ubic.erminej.GeneSetPvalRun;
+import ubic.erminej.data.EmptyGeneSetResult;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
 import corejava.Format;
 
 /**
+ * Model for displaying lists of gene sets.
+ * 
  * @author pavlidis
  * @version $Id$
+ * @see GeneSetDetailsTableModel for model used for displaying the genes in a single gene set.
  */
 public class GeneSetTableModel extends AbstractTableModel {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 4190174776749215486L;
 
     private static Log log = LogFactory.getLog( GeneSetTableModel.class.getName() );
+
+    @Override
+    public Class<?> getColumnClass( int columnIndex ) {
+        if ( columnIndex == 0 ) {
+            return GeneSetTerm.class;
+        } else if ( columnIndex == 1 ) {
+            return String.class;
+        } else if ( columnIndex == 2 ) {
+            return Integer.class;
+        } else if ( columnIndex == 3 ) {
+            return Integer.class;
+        } else if ( columnIndex == 4 ) {
+            return Double.class;
+        } else {
+            return GeneSetResult.class;
+        }
+    }
 
     /**
      * The number of columns that are always there, before runs are listed.
      */
     public static final int INIT_COLUMNS = 5;
 
-    private List<String> columnNames = new LinkedList<String>();
     private GeneAnnotations geneData;
-    private GONames goData;
-    private List<GeneSetPvalRun> results;
+    private List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
 
-    private Multifunctionality multifunctionality;
+    private List<String> columnIdentifiers = new Vector<String>();
+    private List<GeneSetTerm> gsl;
 
-    public GeneSetTableModel( List<GeneSetPvalRun> results ) {
+    private boolean filterRedundant = true;
+
+    private boolean filterEmpty = true;
+
+    private boolean filterEmptyResults = true;
+
+    public GeneSetTableModel( GeneAnnotations geneData, List<GeneSetPvalRun> results ) {
         super();
         this.results = results;
-        columnNames.add( "Name" );
-        columnNames.add( "Description" );
-        columnNames.add( "Probes" );
-        columnNames.add( "Genes" );
-        columnNames.add( "Multifunc" );
-    }
-
-    /**
-     * @param runIndex
-     * @param newName
-     */
-    public void renameRun( int runIndex, String newName ) {
-        log.debug( "Renaming run " + runIndex + " to " + newName );
-        this.renameColumn( this.getColumnIndexForRun( runIndex ), newName );
-    }
-
-    public void addInitialData( GeneAnnotations origGeneData, GONames origGoData ) {
-        this.setInitialData( origGeneData, origGoData );
+        this.geneData = geneData;
+        addColumn( "Name" );
+        addColumn( "Description" );
+        addColumn( "Probes" );
+        addColumn( "Genes" );
+        addColumn( "Multifunc" );
+        assert INIT_COLUMNS == this.getColumnCount();
+        gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
+        filter();
     }
 
     public void addRun() {
-        columnNames.add( results.get( results.size() - 1 ).getName() + " Pval" );
+        addColumn( results.get( results.size() - 1 ).getName() + " Pval" );
     }
 
-    public void renameColumn( int columnNum, String newName ) {
-        if ( newName == null || newName.length() == 0 ) return;
-        if ( columnNum < 0 || columnNum > this.getColumnCount() - 1 )
-            throw new IllegalArgumentException( "Invalid column " + columnNum );
-        log.debug( "Renaming column " + columnNum + " to " + newName );
-        columnNames.set( columnNum, newName );
+    public void setFilterEmpty( boolean b ) {
+        this.filterEmpty = b;
+        filter();
     }
 
-    public int getColumnCount() {
-        return columnNames.size();
+    public void setFilterRedundant( boolean b ) {
+        this.filterRedundant = b;
+        filter();
+    }
+
+    public void setFilterEmptyResults( boolean b ) {
+        this.filterEmptyResults = b;
+        filter();
+    }
+
+    public void filter() {
+
+        // reset.
+        gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
+        int beforeCount = gsl.size();
+
+        if ( filterRedundant || filterEmpty || filterEmptyResults ) {
+
+            for ( Iterator<GeneSetTerm> it = gsl.iterator(); it.hasNext(); ) {
+                GeneSetTerm t = it.next();
+                if ( filterRedundant && geneData.skipDueToRedundancy( t ) ) {
+                    it.remove();
+                } else if ( filterEmpty && geneData.getGeneSetGenes( t ).isEmpty() ) {
+                    it.remove();
+                } else if ( filterEmptyResults && !this.results.isEmpty() ) {
+                    boolean keep = false;
+                    for ( GeneSetPvalRun r : results ) {
+                        if ( r.getResults().containsKey( t ) ) {
+                            keep = true;
+                            break;
+                        }
+                    }
+                    if ( !keep ) it.remove();
+                }
+            }
+            super.fireTableStructureChanged();
+        }
+
+        log.info( gsl.size() + " gene sets (out of " + beforeCount + ")" );
     }
 
     @Override
-    public String getColumnName( int columnNumber ) {
-        if ( columnNumber > this.getColumnCount() - 1 || columnNumber < 0 ) return null;
-        return columnNames.get( columnNumber );
-    }
-
-    public int getRowCount() {
-        if ( geneData == null ) {
-            return 0;
-        }
-        return geneData.selectedSets();
-    }
-
-    /**
-     * @param columnNumber
-     * @return the index of the run in that column. -1 if the column does not contain a run.
-     */
-    public int getRunIndex( int columnNumber ) {
-        if ( columnNumber < INIT_COLUMNS - 1 ) return -1;
-        if ( columnNumber > this.getColumnCount() - 1 ) return -1;
-        return columnNumber - INIT_COLUMNS;
+    public int getColumnCount() {
+        return columnIdentifiers.size();
     }
 
     /**
@@ -140,93 +170,106 @@ public class GeneSetTableModel extends AbstractTableModel {
         return INIT_COLUMNS + runIndex;
     }
 
+    @Override
+    public String getColumnName( int column ) {
+        return columnIdentifiers.get( column );
+    }
+
+    @Override
+    public int getRowCount() {
+        if ( gsl == null ) return this.geneData.numGeneSets();
+        return gsl.size();
+    }
+
+    /**
+     * @param columnNumber
+     * @return the index of the run in that column. -1 if the column does not contain a run.
+     */
+    public int getRunIndex( int columnNumber ) {
+        if ( columnNumber < INIT_COLUMNS - 1 ) return -1;
+        if ( columnNumber > this.getColumnCount() - 1 ) return -1;
+        return columnNumber - INIT_COLUMNS;
+    }
+
     /*
      * (non-Javadoc)
      * 
      * @see javax.swing.table.TableModel#getValueAt(int, int)
      */
-    public Object getValueAt( int i, int j ) {
+    @Override
+    public Object getValueAt( int rowIndex, int colIndex ) {
 
-        String classid = geneData.getSelectedSets().get( i );
+        GeneSetTerm classid = gsl.get( rowIndex );
 
-        if ( j < INIT_COLUMNS ) {
-            switch ( j ) {
-                case 0: {
-                    List<String> cid_vec = new Vector<String>();
-                    cid_vec.add( classid );
-                    assert goData != null;
-                    if ( goData.isUserDefined( classid ) ) cid_vec.add( "M" );
-                    return cid_vec;
-                }
+        if ( colIndex < INIT_COLUMNS ) {
+            switch ( colIndex ) {
+                case 0:
+                    return classid;
                 case 1:
-                    assert goData != null;
-                    return goData.getNameForId( classid );
+                    return classid.getName();
                 case 2:
                     return new Integer( geneData.numProbesInGeneSet( classid ) );
                 case 3:
                     return new Integer( geneData.numGenesInGeneSet( classid ) );
                 case 4:
-                    return String.format( "%.2f", this.multifunctionality.getGOTermMultifunctionality( classid ) );
+                    return geneData.getMultifunctionality().getGOTermMultifunctionality( classid );
 
             }
-        } else {
-            List<Double> vals = new ArrayList<Double>();
-            int runIndex = getRunIndex( j );
+        } else { // results
+            int runIndex = getRunIndex( colIndex );
             assert runIndex >= 0;
-            Map<String, GeneSetResult> data = results.get( runIndex ).getResults();
-            if ( data.containsKey( classid ) ) {
-                GeneSetResult res = data.get( classid );
-                vals.add( new Double( res.getRank() ) );
-                vals.add( new Double( res.getPvalue() ) );
-                return vals;
+            Map<GeneSetTerm, GeneSetResult> data = results.get( runIndex ).getResults();
+
+            if ( !data.containsKey( classid ) ) {
+                return new EmptyGeneSetResult( classid );
             }
-            return null;
+
+            return data.get( classid );
         }
         return null;
     }
 
     public void removeRunData( int runIndex ) {
-        columnNames.remove( runIndex );
-        log.debug( "number of cols: " + columnNames.size() );
+        columnIdentifiers.remove( runIndex ); // CHECK
+        log.debug( "number of cols: " + columnIdentifiers.size() );
     }
 
     /**
-     * @param geneData GeneAnnotations
-     * @param goData GONames
+     * @param runIndex
+     * @param newName
      */
-    public void setInitialData( GeneAnnotations origGeneData, GONames origGoData ) {
-        this.geneData = origGeneData;
-        this.goData = origGoData;
-        this.multifunctionality = new Multifunctionality( geneData );
+    public void renameRun( int runIndex, String newName ) {
+        log.debug( "Renaming run " + runIndex + " to " + newName );
+        this.renameColumn( this.getColumnIndexForRun( runIndex ), newName );
+    }
+
+    private void addColumn( String string ) {
+        columnIdentifiers.add( string );
+    }
+
+    private void renameColumn( int columnNum, String newName ) {
+        if ( newName == null || newName.length() == 0 ) return;
+        if ( columnNum < 0 || columnNum > this.getColumnCount() - 1 )
+            throw new IllegalArgumentException( "Invalid column " + columnNum );
+        log.debug( "Renaming column " + columnNum + " to " + newName );
+        columnIdentifiers.set( columnNum, newName );
     }
 }
 
 /**
  *  
  */
-class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -139908543874278309L;
-    /**
-     * 
-     */
-    private static final int TOOLTIP_LINELEN = 50;
-    /**
-     * 
-     */
+class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
+
+    private static final long serialVersionUID = -1L;
 
     private Format nf = new Format( "%.4g" ); // for the gene set p value.
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
+    private GeneAnnotations geneData;
 
-    private GONames goData;
-    private List<GeneSetPvalRun> results;
-
-    public OutputPanelTableCellRenderer( GONames goData, List<GeneSetPvalRun> results ) {
+    public GeneSetTableCellRenderer( GeneAnnotations goData ) {
         super();
-        this.goData = goData;
-        this.results = results;
+        this.geneData = goData;
 
         nff.setMaximumFractionDigits( 4 );
     }
@@ -237,91 +280,75 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
      * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
      * java.lang.Object, boolean, boolean, int, int)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column ) {
         super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
 
         // set cell text
-        if ( value != null ) {
-            if ( value.getClass().equals( ArrayList.class ) ) // pvalues and ranks.
-                setText( nf.format( ( ( ArrayList<Double> ) value ).get( 1 ) ) );
-            else if ( value.getClass().equals( Vector.class ) ) // class ids.
-                setText( ( ( Vector<String> ) value ).get( 0 ) );
-            else
-                setText( value.toString() );
+
+        if ( value == null ) {
+            setText( "" );
+        } else if ( column == 0 ) {
+            setText( ( ( GeneSetTerm ) value ).getId() );
+        } else if ( column == 1 ) {
+            setText( ( String ) value );
+        } else if ( value instanceof EmptyGeneSetResult ) {
+            setText( "[not run]" );
+        } else if ( value instanceof GeneSetResult ) {
+            setText( nf.format( ( ( GeneSetResult ) value ).getPvalue() ) );
+        } else if ( value instanceof Double ) {
+            setText( String.format( "%.2f", ( Double ) value ) );
         } else {
-            setText( null );
+            setText( value.toString() ); // integers, whatever.
         }
 
-        // set cell background
-        int runcol = column - GeneSetTableModel.INIT_COLUMNS;
-        setOpaque( true );
-        if ( isSelected ) {
-            setOpaque( true );
-        } else if ( value == null ) {
-            setOpaque( false );
-        } else if ( column == GeneSetTablePanel.MULTIFUNC_COLUMN_INDEX ) {
-            // visual indication of multifuncationality.
-            try {
-                double auc = Double.parseDouble( ( String ) value );
-                if ( auc >= 0.95 ) {
-                    setBackground( Colors.LIGHTRED1 );
-                } else if ( auc >= 0.9 ) {
-                    setBackground( Colors.LIGHTRED2 );
-                } else if ( auc >= 0.8 ) {
-                    setBackground( Colors.LIGHTRED3 );
-                } else if ( auc >= 0.7 ) {
-                    setBackground( Colors.LIGHTRED4 );
-                } else {
-                    setBackground( Color.WHITE );
-                }
-            } catch ( NumberFormatException e ) {
-                //
-            }
-        } else if ( column == 0 && goData.isUserDefined( ( String ) ( ( Vector ) value ).get( 0 ) ) ) {
-            setBackground( Colors.LIGHTYELLOW );
-        } else if ( value.getClass().equals( ArrayList.class ) ) { // then it's a result. FIXME figure this out in a
-            // more robust way.
-            String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
-            GeneSetPvalRun result = results.get( runcol );
-            Map data = result.getResults();
-            if ( data.containsKey( classid ) ) {
-                GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                double pvalCorr = res.getCorrectedPvalue();
-                Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
-                setBackground( bgColor );
-            }
-        } else if ( hasFocus ) {
-            setBackground( Color.WHITE );
-            setOpaque( true );
-        } else {
-            setOpaque( false );
-        }
+        setCellBackgroundColor( value, isSelected, hasFocus, column );
 
-        // set tool tips
+        // set tool tips etc.
         if ( value != null ) {
-            String classid = ( String ) ( ( Vector ) table.getValueAt( row, 0 ) ).get( 0 );
+
+            Object o = table.getValueAt( row, 0 );
+
+            if ( !( o instanceof GeneSetTerm ) ) {
+                System.err.println( "Got: " + o );
+                return this;
+            }
+
+            GeneSetTerm term = ( GeneSetTerm ) o;
+
+            boolean redundant = geneData.skipDueToRedundancy( term );
+
+            if ( redundant ) {
+                setForeground( Color.GRAY );
+            } else {
+                setForeground( Color.BLACK );
+            }
 
             if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
-                GeneSetPvalRun result = results.get( runcol );
-                Map data = result.getResults();
-                if ( data.containsKey( classid ) ) {
-                    GeneSetResult res = ( GeneSetResult ) data.get( classid );
-                    setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
-                            + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
-                            + res.getEffectiveSize() + "<br>Probes used: " + res.getSize() );
-                }
-            } else if ( column == 1 || column == 0 ) {
-                String aspect = goData.getAspectForId( classid );
-                String definition = goData.getDefinitionForId( classid );
-                setToolTipText( "<html>Aspect: "
+                GeneSetResult res = ( GeneSetResult ) value;
+                setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
+                        + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
+                        + res.getEffectiveSize() + "<br>Probes used: " + res.getSize() );
+            } else {
+
+                String aspect = term.getAspect();
+                String definition = term.getDefinition();
+
+                String redund = this.getToolTipTextForRedundancy( term );
+                setToolTipText( "<html>"
+                        + term.getName()
+                        + " ("
+                        + term.getId()
+                        + ")<br/>"
+                        + "Aspect: "
                         + aspect
-                        + "<br>Definition: "
-                        + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(),
-                                GeneSetPanel.MAX_DEFINITION_LENGTH ) ), TOOLTIP_LINELEN, "<br>" )
+                        + "<br/>"
+                        + redund
+                        + StringUtil
+                                .wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br/>" )
                         + ( definition.length() > GeneSetPanel.MAX_DEFINITION_LENGTH ? "..." : "" ) );
+
             }
 
         } else {
@@ -330,4 +357,57 @@ class OutputPanelTableCellRenderer extends DefaultTableCellRenderer {
 
         return this;
     }
+
+    private void chooseMultifunctionalityIndicatorColor( double auc ) {
+        if ( auc >= 0.99 ) {
+            setBackground( Colors.LIGHTRED1 );
+        } else if ( auc >= 0.95 ) {
+            setBackground( Colors.LIGHTRED2 );
+        } else if ( auc >= 0.9 ) {
+            setBackground( Colors.LIGHTRED3 );
+        } else if ( auc >= 0.85 ) {
+            setBackground( Colors.LIGHTRED4 );
+        } else if ( auc >= 0.8 ) {
+            setBackground( Colors.LIGHTRED5 );
+        } else {
+            setBackground( Color.WHITE );
+        }
+
+    }
+
+    private void setCellBackgroundColor( Object value, boolean isSelected, boolean hasFocus, int column ) {
+        setBackground( Color.WHITE );
+        // set cell background
+        setOpaque( true );
+        if ( isSelected || hasFocus ) {
+            setOpaque( true );
+            setBackground( Color.LIGHT_GRAY );
+        }
+
+        if ( column == GeneSetTablePanel.MULTIFUNC_COLUMN_INDEX ) {
+            chooseMultifunctionalityIndicatorColor( ( Double ) value );
+        } else if ( column == 0 && ( ( GeneSetTerm ) value ).isUserDefined() ) {
+            setBackground( Colors.LIGHTYELLOW );
+        } else if ( value instanceof GeneSetResult ) {
+            double pvalCorr = ( ( GeneSetResult ) value ).getCorrectedPvalue();
+            Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
+            setBackground( bgColor );
+        }
+    }
+
+    protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
+        boolean redundant = geneData.skipDueToRedundancy( id );
+
+        String redund = "";
+        if ( redundant ) {
+            redund = "<strong>Redundant</strong> with:<br/>";
+            Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();
+            for ( GeneSet geneSet : redundantGroups ) {
+                redund += geneSet + "<br/>";
+            }
+            redund += "<br/>";
+        }
+        return redund;
+    }
+
 }

@@ -29,8 +29,9 @@ import java.text.DecimalFormat;
  * @version $Id$
  */
 public class GeneSetResult implements Comparable<GeneSetResult> {
-    private String classId = null;
-    private String clasName = null;
+
+    GeneSetTerm geneSetTerm;
+
     private double pvalue = 1.0;
     private double score = 0.0;
     private int size = 0;
@@ -40,7 +41,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     private int rank;
 
     public GeneSetResult() {
-        this( null, null, 0, 0, 0.0, 1.0, 1.0 );
+        this( null, 0, 0, 0.0, 1.0, 1.0 );
     }
 
     /**
@@ -49,9 +50,9 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @param size
      * @param effectiveSize
      */
-    public GeneSetResult( String id, String name, int size, int effectiveSize ) {
+    public GeneSetResult( GeneSetTerm id, int size, int effectiveSize ) {
         this();
-        this.setNames( id, name );
+        this.geneSetTerm = id;
         this.setSizes( size, effectiveSize );
     }
 
@@ -63,10 +64,9 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @param score
      * @param pvalue
      */
-    public GeneSetResult( String id, String name, int size, int effectiveSize, double score, double pvalue,
+    public GeneSetResult( GeneSetTerm id, int size, int effectiveSize, double score, double pvalue,
             double correctedPvalue ) {
-        this.classId = id;
-        this.clasName = name;
+        this.geneSetTerm = id;
         this.pvalue = pvalue;
         this.score = score;
         this.size = size;
@@ -96,10 +96,10 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         nf.setMinimumFractionDigits( 3 );
 
         DecimalFormat exp = new DecimalFormat( "0.###E00" );
-        out.write( "!\t" + clasName + "\t" + classId + "\t" + size + "\t" + effectiveSize + "\t" + nf.format( score )
-                + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) ) + "\t"
-                + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) ) + "\t"
-                + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
+        out.write( "!\t" + geneSetTerm.getName() + "\t" + geneSetTerm.getId() + "\t" + size + "\t" + effectiveSize
+                + "\t" + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) )
+                + "\t" + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
+                + "\t" + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
     }
 
     public void printHeadings( Writer out ) throws IOException {
@@ -115,11 +115,6 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         out.write( "#\n#!" );
         out.write( "\tName\tID\tProbes\tNumGenes\tRawScore\tPval" + "\tCorrectedPvalue\tMultifuncBias" + extracolumns
                 + "\n" );
-    }
-
-    public void setNames( String id, String name ) {
-        this.classId = id;
-        this.clasName = name;
     }
 
     public void setSizes( int size, int effsize ) {
@@ -139,12 +134,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         correctedPvalue = a;
     }
 
-    public String getGeneSetId() {
-        return classId;
-    }
-
-    public String getGeneSetName() {
-        return this.clasName;
+    public GeneSetTerm getGeneSetId() {
+        return this.geneSetTerm;
     }
 
     public double getPvalue() {
@@ -185,6 +176,9 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @return int
      */
     public int compareTo( GeneSetResult other ) {
+
+        if ( other == null ) return 1;
+
         if ( this.pvalue > other.pvalue ) {
             return 1;
         } else if ( this.pvalue < other.pvalue ) {

@@ -90,6 +90,16 @@ public class StatusJlabel extends StatusDebugLogger {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.basecode.util.StatusDebugLogger#showStatus(java.lang.String, int)
+     */
+    @Override
+    public void showStatus( String s, int sleepSeconds ) {
+        super.showStatus( s, sleepSeconds );
+    }
+
     @Override
     public void showError( String s ) {
 
@@ -102,6 +112,7 @@ public class StatusJlabel extends StatusDebugLogger {
                 SwingUtilities.invokeAndWait( new Runnable() {
                     public void run() {
                         setLabel( m, errorIcon );
+                        letUserReadMessage( MESSAGE_DELAY );
                     }
                 } );
             } catch ( InterruptedException e ) {
@@ -111,6 +122,7 @@ public class StatusJlabel extends StatusDebugLogger {
             }
         }
         super.showError( s );
+
     }
 
     /*
@@ -161,5 +173,17 @@ public class StatusJlabel extends StatusDebugLogger {
         jlabel.setText( m );
         jlabel.setIcon( icon );
         jlabel.repaint();
+    }
+
+    private static final int MESSAGE_DELAY = 2000; // milliseconds
+
+    /** 
+     */
+    private void letUserReadMessage( int mswait ) {
+        try {
+            Thread.sleep( mswait );
+        } catch ( InterruptedException e ) {
+            return;
+        }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * The ermineJ project
  * 
- * Copyright (c) 2006 University of British Columbia
+ * Copyright (c) 2006-2011 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -41,11 +40,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.table.AbstractTableModel;
 
-import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.erminej.data.UserDefinedGeneSet; 
-import ubic.erminej.gui.table.TableSorter;
+import ubic.erminej.data.Gene;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.Probe;
+import ubic.erminej.gui.geneset.ProbeTableModel;
 
 /**
  * Step to add/remove probes/genes from a gene set.
@@ -53,32 +52,44 @@ import ubic.erminej.gui.table.TableSorter;
  * @author Homin K Lee
  * @version $Id$
  */
-
 public class GeneSetWizardStep2 extends WizardStep {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 4023050874708943617L;
+    private static final long serialVersionUID = 1L;
     private GeneAnnotations geneData = null;
     private JTable probeTable = null;
     private JTable newClassTable = null;
-    private AbstractTableModel ncTableModel = null;
-    private UserDefinedGeneSet newGeneSet = null;
+    private ProbeTableModel ncTableModel = null;
     private JTextField searchTextField = null;
-
+    ProbeTableModel sourceProbeModel;
     private final static int COL0WIDTH = 80;
     private final static int COL1WIDTH = 80;
     private final static int COL2WIDTH = 200;
 
-    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData, UserDefinedGeneSet newGeneSet ) {
+    Collection<Probe> probesToUse = new HashSet<Probe>();
+
+    public Collection<Probe> getProbesToUse() {
+        return probesToUse;
+    }
+
+    public void setProbesToUse( Collection<Probe> probesToUse ) {
+        this.probesToUse = probesToUse;
+        populateTables();
+    }
+
+    /**
+     * @param wiz
+     * @param geneData
+     */
+    public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData ) {
         super( wiz );
         this.jbInit();
         this.geneData = geneData;
-        this.newGeneSet = newGeneSet;
         wiz.clearStatus();
-        geneData.resetSelectedProbes();
-        populateTables();
+        sourceProbeModel = new ProbeTableModel( geneData );
+        if ( wiz.getNewGeneSet() != null ) {
+            this.probesToUse.addAll( wiz.getNewGeneSet().getProbes() );
+        }
+
     }
 
     // Component initialization
@@ -157,67 +168,67 @@ public class GeneSetWizardStep2 extends WizardStep {
 
     @Override
     public boolean isReady() {
-        if ( newGeneSet.getProbes().size() == 0 ) {
+        if ( probesToUse.size() == 0 ) {
             return false;
         }
 
         return true;
     }
 
-    void delete_actionPerformed() {
+    void deleteProbesFromRightTable() {
         int[] rows = newClassTable.getSelectedRows();
         for ( int i = 0; i < rows.length; i++ ) {
-            Object probe = newClassTable.getValueAt( rows[i] - i, 0 );
+            String probe = ( String ) newClassTable.getValueAt( rows[i] - i, 0 );
             log.debug( "Removing " + probe );
-            newGeneSet.getProbes().remove( probe );
+            Probe p = geneData.findProbe( probe );
+            assert p != null;
+            probesToUse.remove( p );
         }
-        ncTableModel.fireTableDataChanged();
+        ncTableModel.setProbes( probesToUse );
         updateCountLabel();
     }
 
-    void addButton_actionPerformed() {
+    void addProbesFromLeftTableToRight() {
         int[] rows = probeTable.getSelectedRows();
         log.debug( rows.length + " rows selected" );
         for ( int i = 0; i < rows.length; i++ ) {
             String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
             log.debug( "Got probe: " + probe );
-            String newGene;
-            if ( ( newGene = geneData.getProbeGeneName( probe ) ) != null ) {
-                log.debug( "Adding " + newGene );
-                this.addGene( newGene );
-            }
+            Probe p = geneData.findProbe( probe );
+            this.addGene( p.getGene() );
         }
-        Set<String> noDupes = new HashSet<String>( newGeneSet.getProbes() );
-        newGeneSet.getProbes().clear();
-        newGeneSet.getProbes().addAll( noDupes );
-        ncTableModel.fireTableDataChanged();
-        updateCountLabel();
     }
 
     void editorProbe_actionPerformed( ChangeEvent e ) {
         String newProbe = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
-        String newGene;
-        if ( ( newGene = geneData.getProbeGeneName( newProbe ) ) != null ) {
-            this.addGene( newGene );
-        } else {
+
+        Probe p = geneData.findProbe( newProbe );
+        if ( p == null ) {
             showError( "Probe " + newProbe + " does not exist." );
+            return;
         }
+        Gene g = p.getGene();
+        this.addGene( g );
+
     }
 
     void editorGene_actionPerformed( ChangeEvent e ) {
         String newGene = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
-        this.addGene( newGene );
+
+        Gene g = geneData.findGene( newGene );
+        if ( g == null ) {
+            showError( "Gene " + newGene + " does not exist." );
+            return;
+        }
+
+        this.addGene( g );
     }
 
     /**
      * @param gene
      */
-    void addGene( String gene ) {
-        Collection<String> probelist = geneData.getGeneProbeList( gene );
-        if ( probelist == null ) {
-            showError( "Gene " + gene + " does not exist." );
-            return;
-        }
+    void addGene( Gene gene ) {
+        Collection<Probe> probelist = gene.getProbes();
 
         if ( probelist.size() == 0 ) {
             showError( "No probes for gene " + gene );
@@ -225,25 +236,27 @@ public class GeneSetWizardStep2 extends WizardStep {
         }
 
         log.debug( "Got " + probelist.size() + " new probes to add" );
-        newGeneSet.getProbes().addAll( probelist );
-        ncTableModel.fireTableDataChanged();
+        probesToUse.addAll( probelist );
+        ncTableModel.setProbes( this.probesToUse );
         updateCountLabel();
     }
 
     public void updateCountLabel() {
-        showStatus( "Number of Probes selected: " + newGeneSet.getProbes().size() );
+        showStatus( "Number of Probes selected: " + probesToUse.size() );
     }
 
+    /**
+     * 
+     */
     private void populateTables() {
-        ProbeTableModel model = new ProbeTableModel( geneData );
-        TableSorter sorter = new TableSorter( model );
-        probeTable.setModel( sorter );
-        sorter.setTableHeader( probeTable.getTableHeader() );
+
+        probeTable.setModel( sourceProbeModel );
+        probeTable.setAutoCreateRowSorter( true );
         probeTable.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
         probeTable.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
         probeTable.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
 
-        sorter.getTableHeader().addMouseListener( new MouseAdapter() {
+        probeTable.getTableHeader().addMouseListener( new MouseAdapter() {
             @Override
             public void mouseEntered( MouseEvent e ) {
                 getParent().setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
@@ -257,11 +270,10 @@ public class GeneSetWizardStep2 extends WizardStep {
 
         probeTable.revalidate();
 
-        ncTableModel = newGeneSet.toTableModel( false );
-        TableSorter anotherSorter = new TableSorter( ncTableModel );
-        newClassTable.setModel( anotherSorter );
-        anotherSorter.setTableHeader( newClassTable.getTableHeader() );
-        anotherSorter.getTableHeader().addMouseListener( new MouseAdapter() {
+        ncTableModel = new ProbeTableModel( this.probesToUse );
+        newClassTable.setModel( ncTableModel );
+        newClassTable.setAutoCreateRowSorter( true );
+        newClassTable.getTableHeader().addMouseListener( new MouseAdapter() {
             @Override
             public void mouseEntered( MouseEvent e ) {
                 getParent().setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
@@ -275,7 +287,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
         newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
         newClassTable.revalidate();
-        showStatus( "Available probes: " + geneData.numSelectedProbes() );
+        showStatus( "Available probes: " + geneData.numProbes() );
     }
 
     /**
@@ -292,12 +304,22 @@ public class GeneSetWizardStep2 extends WizardStep {
     void find() {
         String searchOn = searchTextField.getText();
 
+        Collection<Probe> leftHandProbes = new HashSet<Probe>();
         if ( searchOn.equals( "" ) ) {
-            geneData.resetSelectedProbes();
+            leftHandProbes = geneData.getProbes();
         } else {
-            geneData.selectProbesBySearch( searchOn );
+            leftHandProbes = geneData.findProbes( searchOn );
         }
-        populateTables();
+        sourceProbeModel.setProbes( leftHandProbes );
+    }
+
+    /**
+     * Get the results of the user's picking.
+     * 
+     * @return
+     */
+    public Collection<Probe> getProbes() {
+        return this.probesToUse;
     }
 }
 
@@ -309,7 +331,7 @@ class GeneSetWizardStep2_delete_actionPerformed_actionAdapter implements java.aw
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.delete_actionPerformed();
+        adaptee.deleteProbesFromRightTable();
     }
 }
 
@@ -321,7 +343,7 @@ class GeneSetWizardStep2_addButton_actionAdapter implements java.awt.event.Actio
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.addButton_actionPerformed();
+        adaptee.addProbesFromLeftTableToRight();
     }
 }
 
@@ -390,47 +412,6 @@ class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
     public void keyTyped( KeyEvent e ) {
     }
 
-}
-
-class ProbeTableModel extends AbstractTableModel {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4672326703011127415L;
-    GeneAnnotations geneData;
-    private String[] columnNames = { "Probe", "Gene", "Description" };
-
-    public ProbeTableModel( GeneAnnotations geneData ) {
-        this.geneData = geneData;
-    }
-
-    @Override
-    public String getColumnName( int i ) {
-        return columnNames[i];
-    }
-
-    public int getColumnCount() {
-        return 3;
-    }
-
-    public int getRowCount() {
-        return geneData.getSelectedProbes().size();
-    }
-
-    public Object getValueAt( int i, int j ) {
-
-        String probeid = geneData.getSelectedProbes().get( i );
-        switch ( j ) {
-            case 0:
-                return probeid;
-            case 1:
-                return geneData.getProbeGeneName( probeid );
-            case 2:
-                return geneData.getProbeDescription( probeid );
-            default:
-                return null;
-        }
-    }
 }
 
 // respond to search request.

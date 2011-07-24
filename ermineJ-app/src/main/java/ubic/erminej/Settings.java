@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -38,7 +40,8 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.FileTools;
 
-import ubic.basecode.bio.geneset.GeneAnnotations;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
  * Basically a wrapper around a Commons Configuration object.
@@ -103,7 +106,8 @@ public class Settings {
     private static final String MTC_CONFIG_NAME = "mtc";
     private static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     private static final String OUTPUT_FILE = "outputFile";
-    private static final String GENE_SCORE_THRESHOLD = "pValThreshold"; // TODO deprecate this string
+    private static final String GENE_SCORE_THRESHOLD = "pValThreshold"; // TODO deprecate this string, use
+                                                                        // 'scoreThreshold' instead.
     private static final String PREFERENCES_FILE_NAME = "preferencesFileName";
     private static final String QUANTILE_CONFIG_NAME = "quantile";
     private static final String RAW_FILE_CONFIG_NAME = "rawFile";
@@ -115,15 +119,17 @@ public class Settings {
     private static final String USE_BIOL_PROC = "useGOBiologicalProcess";
     private static final String USE_MOL_FUNC = "useGOMolecularFunction";
     private static final String USE_CELL_COMP = "useGOCellularComponent";
+    private static final String USE_USER_DEFINED_GROUPS = "useUserDefinedGroups";
+
     /**
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
      * etc.)
      */
     protected static final String[] ANALYSIS_SETTINGS = new String[] { GENE_SCORE_THRESHOLD, QUANTILE_CONFIG_NAME,
-            GENE_SET_RESAMPLING_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE, SCORE_COL,
-            MTC_CONFIG_NAME, ITERATIONS, CLASS_FILE, BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT, ALWAYS_USE_EMPIRICAL,
-            ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD, FILTER_NONSPECIFIC, USE_MULTIFUNCTIONALITY_CORRECTION,
-            USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP };
+            GENE_SET_RESAMPLING_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE,
+            SCORE_COL, MTC_CONFIG_NAME, ITERATIONS, CLASS_FILE, BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT,
+            ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD, FILTER_NONSPECIFIC,
+            USE_MULTIFUNCTIONALITY_CORRECTION, USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP, USE_USER_DEFINED_GROUPS };
 
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
@@ -242,8 +248,31 @@ public class Settings {
     /**
      * @return
      */
-    public int getAnnotFormat() {
-        return config.getInteger( ANNOT_FORMAT, GeneAnnotations.DEFAULT );
+    public Format getAnnotFormat() {
+        /*
+         * FIXME need backwards compatibility?
+         */
+        String storedValue = config.getString( ANNOT_FORMAT, Format.DEFAULT.toString() );
+
+        if ( NumberUtils.isDigits( storedValue ) ) {
+            int oldVal = Integer.parseInt( storedValue );
+            switch ( oldVal ) {
+                case 0:
+                    setAnnotFormat( Format.DEFAULT );
+                    break;
+                case 1:
+                    setAnnotFormat( Format.AFFYCSV );
+                    break;
+                case 2:
+                    setAnnotFormat( Format.AGILENT );
+                    break;
+                default:
+                    throw new IllegalStateException();
+            }
+            storedValue = config.getString( ANNOT_FORMAT, Format.DEFAULT.toString() );
+        }
+
+        return Format.valueOf( storedValue );
     }
 
     /**
@@ -495,7 +524,7 @@ public class Settings {
 
     @SuppressWarnings("unchecked")
     public Collection<String> getSelectedCustomGeneSets() {
-        return config.getList( SELECTED_CUSTOM_GENESETS, null );
+        return config.getList( SELECTED_CUSTOM_GENESETS, new ArrayList<String>() );
     }
 
     /**
@@ -525,8 +554,16 @@ public class Settings {
      * @return Returns the useMolecularFunction.
      */
     public boolean getUseMolecularFunction() {
-        return config.getBoolean( "useMolecularFunction", true );
+        return config.getBoolean( USE_MOL_FUNC, true );
 
+    }
+
+    public void setUseUserDefined( boolean b ) {
+        this.config.setProperty( USE_USER_DEFINED_GROUPS, b );
+    }
+
+    public boolean getUseUserDefined() {
+        return config.getBoolean( USE_USER_DEFINED_GROUPS, true );
     }
 
     public String getUserGeneSetDirectory() {
@@ -589,15 +626,8 @@ public class Settings {
     /**
      * @param arg
      */
-    public void setAnnotFormat( String arg ) {
-        if ( arg.equalsIgnoreCase( "affy" ) || arg.equalsIgnoreCase( "Affy CSV" ) ) {
-            this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.AFFYCSV ) );
-        } else if ( arg.equalsIgnoreCase( "agilent" ) ) {
-            this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.AGILENT ) );
-        } else {
-            this.config.setProperty( ANNOT_FORMAT, new Integer( GeneAnnotations.DEFAULT ) );
-        }
-
+    public void setAnnotFormat( Format arg ) {
+        this.config.setProperty( ANNOT_FORMAT, arg.toString() );
     }
 
     /**
@@ -731,8 +761,11 @@ public class Settings {
         this.config.setProperty( SCORE_FILE, val );
     }
 
-    public void setSelectedCustomGeneSets( Collection<String> selectedSets ) {
-        this.config.setProperty( SELECTED_CUSTOM_GENESETS, selectedSets );
+    public void setSelectedCustomGeneSets( Collection<GeneSetTerm> addedClasses ) {
+        Collection<String> addedClassesIds = new HashSet<String>();
+        for ( GeneSetTerm t : addedClasses )
+            addedClassesIds.add( t.getId() );
+        this.config.setProperty( SELECTED_CUSTOM_GENESETS, addedClassesIds );
     }
 
     public void setTester( boolean isTester ) {

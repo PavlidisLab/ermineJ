@@ -20,22 +20,27 @@ package ubic.erminej.gui;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
-import ubic.erminej.data.UserDefinedGeneSet;
+import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.GeneSet;
+import ubic.erminej.data.Probe;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 
 /**
+ * For creating or editing gene sets.
+ * 
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @version $Id$
  */
-
 public class GeneSetWizard extends Wizard {
 
     private static final long serialVersionUID = 7175277380197599151L;
@@ -50,28 +55,33 @@ public class GeneSetWizard extends Wizard {
     private int step;
     boolean makingNewGeneSet;
     boolean nostep1 = false;
-    private UserDefinedGeneSet newGeneSet;
-    private UserDefinedGeneSet oldGeneSet;
+
+    public GeneSet getNewGeneSet() {
+        return newGeneSet;
+    }
+
+    public GeneSet getOldGeneSet() {
+        return oldGeneSet;
+    }
+
+    private GeneSet newGeneSet;
+    private GeneSet oldGeneSet;
 
     /**
      * Use this constructor to let the user choose which gene set to look at or to make a new one.
      * 
      * @param callingframe
      * @param geneData
-     * @param goData
      * @param makenew if true, the user is asked to create a new gene set. If false, they are asked to choose from a
      *        list of existing gene sets.
      */
-    public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData, boolean makingNew ) {
+    public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, boolean makingNew ) {
         super( callingframe, 550, 350 );
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
         this.geneData = geneData;
         this.makingNewGeneSet = makingNew;
-        newGeneSet = new UserDefinedGeneSet();
-        oldGeneSet = new UserDefinedGeneSet();
 
-        geneData.resetSelectedProbes();
         step = 1;
         if ( makingNew ) {
             this.setTitle( "Define New Gene Set - Step 1 of 3" );
@@ -79,26 +89,36 @@ public class GeneSetWizard extends Wizard {
             this.addStep( step1, true );
         } else {
             this.setTitle( "Modify Gene Set - Step 1 of 3" );
-            step1A = new GeneSetWizardStep1A( this, geneData, goData, newGeneSet, oldGeneSet );
+            step1A = new GeneSetWizardStep1A( this, geneData );
             this.addStep( step1A, true );
         }
-        step2 = new GeneSetWizardStep2( this, geneData, newGeneSet );
+        step2 = new GeneSetWizardStep2( this, geneData );
         this.addStep( step2 );
-        step3 = new GeneSetWizardStep3( this, newGeneSet, makingNew );
+        step3 = new GeneSetWizardStep3( this );
         this.addStep( step3 );
 
         finishButton.setEnabled( false );
     }
 
+    public void setNewGeneSet( GeneSet newGeneSet ) {
+        this.newGeneSet = newGeneSet;
+    }
+
+    public void setOldGeneSet( GeneSet oldGeneSet ) {
+        this.oldGeneSet = oldGeneSet;
+    }
+
     /**
-     * Use this constructor when you know the gene set to be looked at. (modify a gene set)
+     * Use this constructor when you know the gene set to be looked at. (modify a gene set). We basically go right to
+     * step 2.
      * 
      * @param callingframe
      * @param geneData
      * @param goData
      * @param geneSetId
      */
-    public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GONames goData, String geneSetId ) {
+    public GeneSetWizard( GeneSetScoreFrame callingframe, GeneAnnotations geneData, GeneSetTerms goData,
+            GeneSetTerm geneSetId ) {
         super( callingframe, 550, 350 );
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();
@@ -106,35 +126,37 @@ public class GeneSetWizard extends Wizard {
 
         this.makingNewGeneSet = false;
 
-        newGeneSet = new UserDefinedGeneSet();
-        oldGeneSet = new UserDefinedGeneSet();
+        initializeAndClone( geneSetId );
+
         this.setTitle( "Modify Gene Set - Step 2 of 3" );
         step = 2;
         backButton.setEnabled( false );
-
-        newGeneSet.setId( geneSetId );
-        newGeneSet.setDesc( goData.getNameForId( geneSetId ) );
-        newGeneSet.setAspect( goData.getAspectForId( geneSetId ) );
-        newGeneSet.setDefinition( goData.getDefinitionForId( geneSetId ) );
-        newGeneSet.setModified( false );
-        if ( geneData.geneSetExists( geneSetId ) )
-            newGeneSet.getProbes().addAll( geneData.getClassToProbes( geneSetId ) );
-
-        oldGeneSet.setId( geneSetId );
-        oldGeneSet.setDesc( goData.getNameForId( geneSetId ) );
-        oldGeneSet.setAspect( goData.getAspectForId( geneSetId ) );
-        oldGeneSet.setDefinition( goData.getDefinitionForId( geneSetId ) );
-        oldGeneSet.setModified( false );
-        if ( geneData.geneSetExists( geneSetId ) )
-            oldGeneSet.getProbes().addAll( geneData.getClassToProbes( geneSetId ) );
-
-        this.repaint();
-        step2 = new GeneSetWizardStep2( this, geneData, newGeneSet );
+        step2 = new GeneSetWizardStep2( this, geneData );
         this.addStep( step2, true ); // hack for starting at step 2
         this.addStep( step2 );
         step2.updateCountLabel();
-        step3 = new GeneSetWizardStep3( this, newGeneSet, makingNewGeneSet );
+        step3 = new GeneSetWizardStep3( this );
         this.addStep( step3 );
+
+        this.repaint();
+    }
+
+    private void initializeAndClone( GeneSetTerm geneSetId ) {
+        newGeneSet = new GeneSet( geneSetId );
+        oldGeneSet = new GeneSet( geneSetId );
+        newGeneSet.setTerm( geneSetId );
+        newGeneSet.setModified( false );
+        if ( geneData.hasGeneSet( geneSetId ) ) {
+            newGeneSet.getProbes().addAll( geneData.getGeneSetProbes( geneSetId ) );
+        }
+
+        newGeneSet.setIsGenes( oldGeneSet.isGenes() );
+
+        oldGeneSet.setTerm( geneSetId );
+        oldGeneSet.setModified( false );
+        if ( geneData.hasGeneSet( geneSetId ) ) {
+            oldGeneSet.getProbes().addAll( geneData.getGeneSetProbes( geneSetId ) );
+        }
     }
 
     @Override
@@ -145,6 +167,7 @@ public class GeneSetWizard extends Wizard {
                 if ( makingNewGeneSet && step1.getInputMethod() == 1 ) { // case 2, load from file
                     try {
                         newGeneSet = UserDefinedGeneSetManager.loadPlainGeneList( step1.getLoadFile() );
+                        this.step2.setProbesToUse( this.newGeneSet.getProbes() );
                     } catch ( IOException e1 ) {
                         GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
                                 + " the file is readable." );
@@ -152,9 +175,13 @@ public class GeneSetWizard extends Wizard {
                 }
 
                 if ( makingNewGeneSet ) { // cases 1 & 2
+                    // at this point we don't have any information except the method they will use
                     this.getContentPane().remove( step1 );
                     this.setTitle( "Define New Gene Set - Step 2 of 3" );
-                } else { // case 3
+                } else { // case 3 - editing an existing set.
+                    assert this.newGeneSet != null;
+                    assert this.oldGeneSet != null;
+                    this.step2.setProbesToUse( this.newGeneSet.getProbes() );
                     this.getContentPane().remove( step1A );
                     this.setTitle( "Modify Gene Set - Step 2 of 3" );
                 }
@@ -168,7 +195,7 @@ public class GeneSetWizard extends Wizard {
 
             }
         } else if ( step == 2 ) {
-            if ( newGeneSet.getProbes().size() == 0 ) {
+            if ( step2.getProbes().isEmpty() ) {
                 showError( "You have not selected any genes/probes." );
                 return;
             }
@@ -181,13 +208,13 @@ public class GeneSetWizard extends Wizard {
             } else {
                 this.setTitle( "Modify Gene Set - Step 3 of 3" );
                 // if ( ( ( GeneSetScoreFrame ) callingframe ).userOverWrote( geneSetId ) )
-                step3.setIdFieldEnabled( false );
+                step3.setIdFieldEnabled( true );
             }
             backButton.setEnabled( true );
             nextButton.setEnabled( false );
             finishButton.setEnabled( true );
 
-            step3.update();
+            step3.update( step2.getProbes() );
             this.getContentPane().add( step3 );
             step3.revalidate();
             this.repaint();
@@ -208,6 +235,7 @@ public class GeneSetWizard extends Wizard {
                 step1.revalidate();
             } else {
                 this.setTitle( "Modify Gene Set - Step 1 of 3" );
+                assert step1A != null;
                 this.getContentPane().add( step1A );
                 step1A.revalidate();
             }
@@ -235,69 +263,88 @@ public class GeneSetWizard extends Wizard {
 
     @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
-        geneData.resetSelectedProbes();
-        geneData.resetSelectedSets();
+
+        /*
+         * FIXME Reset the tables
+         */
+
         dispose();
     }
 
     @Override
-    protected void finishButton_actionPerformed( ActionEvent e ) {
-        if ( step == 2 ) {
-            // pass the name and description onto step 3.
-            step3.update();
-        }
+    protected void finishEditing( ActionEvent e ) {
+        Collection<Probe> probes = step2.getProbes();
 
-        step3.nameNewGeneSet();
-        String id = null;
-        if ( makingNewGeneSet ) {
-            id = newGeneSet.getId();
-        } else {
-            id = oldGeneSet.getId();
-        }
+        String id = step3.getGeneSetId();
+        String desc = step3.getGeneSetName();
 
         log.debug( "Got modified or new gene set: " + id );
-        if ( id == null || id.length() == 0 ) {
+        if ( StringUtils.isBlank( id ) ) {
             showError( "The gene set ID must be specified." );
             return;
         }
 
         if ( geneData.geneSetExists( id ) && makingNewGeneSet ) {
-            showError( "A gene set with the ID " + id + " already exists." );
+            showError( "A gene set with the ID '" + id + "' already exists." );
             return;
         }
 
-        newGeneSet.setSourceFile( oldGeneSet.getSourceFile() );
-        if ( newGeneSet.getDesc() == null || newGeneSet.getDesc().length() == 0 ) {
-            newGeneSet.setDesc( "No description given" );
+        if ( !newGeneSet.isUserDefined() && oldGeneSet.getId().equals( id ) ) {
+            showError( "You must change the ID of built-in set in order to save a copy of it." );
+            return;
         }
 
-        if ( makingNewGeneSet ) {
-            log.debug( "Adding new or modified gene set to maps" );
+        if ( !geneData.geneSetExists( id ) && !makingNewGeneSet ) {
+            showError( "Note that changing the ID of an existing gene set will result in creation of a new one." );
+        }
+
+        GeneSetTerm t = new GeneSetTerm( id, desc );
+        if ( newGeneSet == null ) {
+            newGeneSet = new GeneSet( t );
+        }
+
+        newGeneSet.clearGenes();
+        for ( Probe probe : probes ) {
+            newGeneSet.addGene( probe.getGene() );
+        }
+
+        // so we can save the updated version. Maybe.
+        if ( oldGeneSet != null ) newGeneSet.setSourceFile( oldGeneSet.getSourceFile() );
+
+        if ( StringUtils.isBlank( newGeneSet.getTerm().getName() ) ) {
+            newGeneSet.getTerm().setName( "[No description given]" );
+        }
+
+        if ( makingNewGeneSet || !newGeneSet.getId().equals( oldGeneSet.getId() ) ) {
+            showStatus( "Saving new gene set" );
             UserDefinedGeneSetManager.addGeneSet( newGeneSet );
 
-            ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( id, newGeneSet.getDesc() );
+            ( ( GeneSetScoreFrame ) callingframe ).getTreePanel().addNode( newGeneSet.getTerm() );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
 
             try {
-                log.debug( "Saving new gene set" );
+
                 UserDefinedGeneSetManager.saveGeneSet( newGeneSet );
             } catch ( IOException e1 ) {
                 GuiUtil.error( "Error writing the new gene set to file:", e1 );
             }
 
         } else if ( modifiedTheGeneSet() ) {
-            log.debug( "Gene set was changed" );
+
+            showStatus( "Saving modified gene set" );
             UserDefinedGeneSetManager.modifyGeneSet( newGeneSet );
-            ( ( GeneSetScoreFrame ) callingframe ).addUserOverwritten( id );
+            ( ( GeneSetScoreFrame ) callingframe ).addUserOverwritten( newGeneSet.getTerm() );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
+
             try {
-                log.debug( "Saving modified gene set" );
+
                 UserDefinedGeneSetManager.saveGeneSet( newGeneSet );
             } catch ( IOException e1 ) {
                 GuiUtil.error( "Error writing the modified gene set to file:", e1 );
             }
+
         } else {
-            log.debug( "Gene set was not created or changed, nothing to do." );
+            showStatus( "Gene set was not created or changed, nothing to do." );
         }
 
         dispose();
@@ -305,10 +352,23 @@ public class GeneSetWizard extends Wizard {
     }
 
     /**
+     * Might be buggy
+     * 
      * @return
      */
     private boolean modifiedTheGeneSet() {
-        return !makingNewGeneSet && !newGeneSet.equals( oldGeneSet );
+
+        if ( !makingNewGeneSet ) return false;
+
+        assert oldGeneSet != null;
+
+        return !newGeneSet.equals( oldGeneSet ) || newGeneSet.getGenes().size() != oldGeneSet.getGenes().size()
+                || !newGeneSet.getGenes().containsAll( oldGeneSet.getGenes() )
+                || !newGeneSet.getName().equals( oldGeneSet.getName() );
+    }
+
+    public boolean getMakingNew() {
+        return makingNewGeneSet;
     }
 
 }

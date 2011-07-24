@@ -33,8 +33,8 @@ import javax.swing.JTextField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.bio.geneset.GeneAnnotations;
 import ubic.erminej.Settings;
+import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.file.XMLFileFilter;
 
@@ -43,29 +43,25 @@ import ubic.erminej.gui.file.XMLFileFilter;
  * @author Paul Pavlidis
  * @version $Id$
  */
-
 public class StartupDialog extends AppDialog {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -376725612513363691L;
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
     private static Log log = LogFactory.getLog( StartupDialog.class.getName() );
-    JFileChooser chooser;
-    JPanel centerPanel = new JPanel();
-    JPanel classPanel = new JPanel();
-    JLabel classLabel = new JLabel();
-    JTextField classFileTextField = new JTextField();
-    JLabel annotFileFormatLabel = new JLabel();
-    JButton annotBrowseButton = new JButton();
-    JLabel annotLabel = new JLabel();
-    JPanel annotPanel = new JPanel();
-    JTextField annotFileTextField = new JTextField();
-    JComboBox annotFormat = new JComboBox();
+    private JFileChooser chooser;
+    private JPanel centerPanel = new JPanel();
+    private JPanel classPanel = new JPanel();
+    private JLabel classLabel = new JLabel();
+    private JTextField classFileTextField = new JTextField();
+    private JLabel annotFileFormatLabel = new JLabel();
+    private JButton annotBrowseButton = new JButton();
+    private JLabel annotLabel = new JLabel();
+    private JPanel annotPanel = new JPanel();
+    private JTextField annotFileTextField = new JTextField();
+    private JComboBox annotFormat = new JComboBox();
 
-    Settings settings;
-    JButton classBrowseButton = new JButton();
+    private Settings settings;
+    private JButton classBrowseButton = new JButton();
 
     public StartupDialog( GeneSetScoreFrame callingframe ) {
         super( callingframe, 550, 350 );
@@ -87,9 +83,9 @@ public class StartupDialog extends AppDialog {
         annotFormat.addItem( "Affy CSV" );
         annotFormat.addItem( "Agilent" );
 
-        if ( settings.getAnnotFormat() == GeneAnnotations.AFFYCSV ) {
+        if ( settings.getAnnotFormat() == Format.AFFYCSV ) {
             annotFormat.setSelectedItem( "Affy CSV" );
-        } else if ( settings.getAnnotFormat() == GeneAnnotations.AGILENT ) {
+        } else if ( settings.getAnnotFormat() == Format.AGILENT ) {
             annotFormat.setSelectedItem( "Agilent" );
         } else {
             annotFormat.setSelectedItem( "ErmineJ" );
@@ -126,10 +122,10 @@ public class StartupDialog extends AppDialog {
         this
                 .addHelp( "<html><head><style type=\"text/css\"> body { font-family:sanserif; font-size:10px} </style></head><b >Starting up the program</b><br>Please confirm "
                         + "the settings below are correct; they cannot be changed during "
-                        + "analysis.<p>The probe annotation file you select "
-                        + "must match the microarray design you are using. "
+                        + "analysis.<p>The annotation file you select "
+                        + "must match the experimental data you are using. "
                         + "For updated annotation files, visit "
-                        + "<a href=\"http://bioinformatics.ubc.ca/microannots/\">http://bioinformatics.ubc.ca/microannots</a></html>" );
+                        + "<a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots</a></html>" );
         addMain( centerPanel );
         this.setTitle( "ErmineJ startup" );
 
@@ -161,12 +157,15 @@ public class StartupDialog extends AppDialog {
     private void saveValues() {
         settings.setClassFile( classFileTextField.getText() );
         settings.setAnnotFile( annotFileTextField.getText() );
-        settings.setAnnotFormat( ( String ) annotFormat.getSelectedItem() );
-        // try {
-        // settings.writePrefs();
-        // } catch ( org.apache.commons.configuration.ConfigurationException e ) {
-        // GuiUtil.error( "Could not write preferences to a file:" + e );
-        // }
+        String formatS = ( String ) annotFormat.getSelectedItem();
+
+        if ( formatS.equals( "ErmineJ" ) ) {
+            settings.setAnnotFormat( Format.DEFAULT );
+        } else if ( formatS.equals( "Affy CSV" ) ) {
+            settings.setAnnotFormat( Format.AFFYCSV );
+        } else {
+            settings.setAnnotFormat( Format.AGILENT );
+        }
     }
 
     void annotBrowseButton_actionPerformed() {
@@ -206,7 +205,7 @@ public class StartupDialog extends AppDialog {
         if ( goFileName.length() == 0 ) {
             GuiUtil.error( "You must enter the Gene Ontology XML file location" );
         } else if ( annotFileName.length() == 0 ) {
-            GuiUtil.error( "You must enter the annotation file location for your microarray design" );
+            GuiUtil.error( "You must enter the annotation file location for your experiment" );
         } else if ( !annotFile.exists() || !annotFile.canRead() ) {
             GuiUtil.error( "Could not read file: " + annotFileName );
         } else if ( !goFile.exists() || !goFile.canRead() ) {

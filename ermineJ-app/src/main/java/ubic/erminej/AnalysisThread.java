@@ -21,25 +21,24 @@ package ubic.erminej;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
+import ubic.basecode.dataStructure.matrix.FastRowAccessDoubleMatrix;
+import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
-
-import ubic.basecode.bio.geneset.GONames;
-import ubic.basecode.bio.geneset.GeneAnnotations;
-import ubic.basecode.bio.geneset.Multifunctionality;
-import ubic.basecode.dataStructure.matrix.DoubleMatrix;
-import ubic.basecode.io.reader.DoubleMatrixReader;
+import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
+import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.Probe;
 
 /**
  * @author pavlidis
@@ -47,15 +46,13 @@ import ubic.erminej.data.GeneSetResult;
  */
 public class AnalysisThread extends Thread {
     protected static final Log log = LogFactory.getLog( AnalysisThread.class );
-    private GeneAnnotations geneData = null;
     private Map<String, GeneScores> geneScoreSets;
-    private GONames goData;
     private volatile GeneSetPvalRun latestResults;
     private String loadFile;
     private StatusViewer messenger;
-    // private int numRuns = 0;
+    private GeneAnnotations geneAnnots;
     private Settings oldSettings = null;
-    private Map<String, DoubleMatrix<String, String>> rawDataSets;
+    private Map<String, DoubleMatrix<Probe, String>> rawDataSets;
     private volatile Method runningMethod;
     private Settings settings;
     private volatile boolean stop = false;
@@ -66,24 +63,17 @@ public class AnalysisThread extends Thread {
      * @param csframe
      * @param settings
      * @param messenger
-     * @param goData
-     * @param geneDataSets
+     * @param geneAnnots
      * @param rawDataSets
      * @param geneScoreSets
-     * @throws IllegalStateException
      */
-    public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData,
-            Map<Integer, GeneAnnotations> geneDataSets, Map<String, DoubleMatrix<String, String>> rawDataSets,
-            Map<String, GeneScores> geneScoreSets ) throws IllegalStateException {
+    public AnalysisThread( Settings settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
+            Map<String, DoubleMatrix<Probe, String>> rawDataSets, Map<String, GeneScores> geneScoreSets ) {
         this.settings = settings;
         this.messenger = messenger;
-        this.goData = goData;
         this.rawDataSets = rawDataSets;
         this.geneScoreSets = geneScoreSets;
-        if ( geneDataSets == null ) throw new IllegalArgumentException();
-        this.geneData = geneDataSets.get( new Integer( "original".hashCode() ) ); // this is the
-        // default
-        // geneData
+        this.geneAnnots = geneAnnots;
 
         try {
             this.runningMethod = AnalysisThread.class.getMethod( "doAnalysis", new Class[] {} );
@@ -99,25 +89,19 @@ public class AnalysisThread extends Thread {
      * @param csframe
      * @param settings
      * @param messenger
-     * @param goData
-     * @param geneDataSets
+     * @param geneAnnots
      * @param rawDataSets
      * @param geneScoreSets
      * @param loadFile
      */
-    public AnalysisThread( Settings settings, final StatusViewer messenger, GONames goData,
-            Map<Integer, GeneAnnotations> geneDataSets, Map<String, DoubleMatrix<String, String>> rawDataSets,
-            Map<String, GeneScores> geneScoreSets, String loadFile ) {
+    public AnalysisThread( Settings settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
+            Map<String, DoubleMatrix<Probe, String>> rawDataSets, Map<String, GeneScores> geneScoreSets, String loadFile ) {
         this.settings = settings;
         this.messenger = messenger;
-        this.goData = goData;
         this.loadFile = loadFile;
         this.rawDataSets = rawDataSets;
         this.geneScoreSets = geneScoreSets;
-        // this is the
-        // default
-        // geneData
-        this.geneData = geneDataSets.get( new Integer( "original".hashCode() ) );
+        this.geneAnnots = geneAnnots;
 
         try {
             this.runningMethod = AnalysisThread.class.getMethod( "loadAnalysis", new Class[] {} );
@@ -180,8 +164,8 @@ public class AnalysisThread extends Thread {
      * @throws IOException
      */
     public synchronized GeneSetPvalRun loadAnalysis() throws IOException {
-        ResultsFileReader rfr = new ResultsFileReader( loadFile, messenger );
-        Map<String, GeneSetResult> results = rfr.getResults();
+        ResultsFileReader rfr = new ResultsFileReader( geneAnnots, loadFile, messenger );
+        Map<GeneSetTerm, GeneSetResult> results = rfr.getResults();
         return doAnalysis( results );
     }
 
@@ -235,7 +219,7 @@ public class AnalysisThread extends Thread {
         } else {
             if ( messenger != null )
                 messenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData );
+            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneAnnots );
             geneScoreSets.put( settings.getScoreFile(), geneScores );
         }
         if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
@@ -248,8 +232,8 @@ public class AnalysisThread extends Thread {
      * @return
      * @throws IOException
      */
-    private synchronized DoubleMatrix<String, String> addRawData() throws IOException {
-        DoubleMatrix<String, String> rawData;
+    private synchronized DoubleMatrix<Probe, String> addRawData() throws IOException {
+        DoubleMatrix<Probe, String> rawData;
         if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
             if ( messenger != null ) messenger.showStatus( "Raw data are in memory" );
             rawData = rawDataSets.get( settings.getRawDataFileName() );
@@ -257,7 +241,12 @@ public class AnalysisThread extends Thread {
             if ( messenger != null )
                 messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
             DoubleMatrixReader r = new DoubleMatrixReader();
-            rawData = r.read( settings.getRawDataFileName() );
+
+            DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName() );
+
+            rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
+            rawData.setColumnNames( omatrix.getColNames() );
+
             rawDataSets.put( settings.getRawDataFileName(), rawData );
         }
         return rawData;
@@ -269,26 +258,21 @@ public class AnalysisThread extends Thread {
      * @param results
      * @throws IOException
      */
-    private synchronized GeneSetPvalRun doAnalysis( Map<String, GeneSetResult> results ) throws IOException {
+    private synchronized GeneSetPvalRun doAnalysis( Map<GeneSetTerm, GeneSetResult> results ) throws IOException {
         log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
 
         StopWatch timer = new StopWatch();
         timer.start();
 
-        DoubleMatrix<String, String> rawData = null;
+        DoubleMatrix<Probe, String> rawData = null;
         if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
             rawData = addRawData();
         }
         GeneScores geneScores = addGeneScores();
         if ( this.stop ) return null;
 
-        Set<String> activeProbes = getActiveProbes( rawData, geneScores );
-        if ( activeProbes == null || Thread.currentThread().isInterrupted() ) return latestResults;
-
-        GeneAnnotations useTheseAnnots = geneData;
-
-        Multifunctionality mf = new Multifunctionality( useTheseAnnots );
-        double multifunctionalityCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
+        double multifunctionalityCorrelation = geneAnnots.getMultifunctionality()
+                .correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
 
         if ( this.stop ) return null;
 
@@ -296,11 +280,11 @@ public class AnalysisThread extends Thread {
         if ( messenger != null ) messenger.showStatus( "Starting analysis..." );
         GeneSetPvalRun newResults = null;
         if ( results != null ) { // read from a file.
-            newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
-                    messenger, results, "LoadedRun", multifunctionalityCorrelation );
+            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, results,
+                    multifunctionalityCorrelation, "LoadedRun" );
         } else {
-            newResults = new GeneSetPvalRun( activeProbes, settings, useTheseAnnots, rawData, goData, geneScores,
-                    messenger, "NewRun", multifunctionalityCorrelation );
+            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger,
+                    multifunctionalityCorrelation, "NewRun" );
         }
 
         timer.stop();
@@ -316,27 +300,6 @@ public class AnalysisThread extends Thread {
     private synchronized boolean geneScoreSettingsDirty() {
         if ( oldSettings == null ) return true;
         return settings.getDoLog() != oldSettings.getDoLog() || settings.getScoreCol() != oldSettings.getScoreCol();
-    }
-
-    /**
-     * @param rawData
-     * @param geneScores
-     * @param activeProbes
-     * @return
-     */
-    private synchronized Set<String> getActiveProbes( DoubleMatrix<String, String> rawData, GeneScores geneScores ) {
-        Set<String> activeProbes = null;
-        if ( rawData != null && geneScores != null ) { // favor the geneScores list.
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData == null && geneScores != null ) {
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        } else if ( rawData != null && geneScores == null ) {
-            activeProbes = new HashSet<String>( rawData.getRowNames() );
-        } else {
-            throw new IllegalStateException( "No active probes" );
-        }
-        log.debug( activeProbes.size() + " active probes" );
-        return activeProbes;
     }
 
     /**
