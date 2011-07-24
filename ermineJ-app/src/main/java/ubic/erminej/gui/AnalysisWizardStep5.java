@@ -232,9 +232,9 @@ public class AnalysisWizardStep5 extends WizardStep {
         help = "<html><b>Adjust settings specific for your analysis method.</b><br>";
 
         extraHelp = help
-                + "Take special care to ensure the"
+                + "<p>Take special care to ensure the"
                 + " log transformation and 'larger scores are better' settings are correct. 'larger scores are better' refers to your "
-                + " original input file, and should be unchecked if your input is raw p-values.";
+                + " original input file, and should be unchecked if your input is raw p-values.</p>";
 
         this.addMain( step5Panel );
     }

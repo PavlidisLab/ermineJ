@@ -50,7 +50,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
     protected void setUp() throws Exception {
         ism = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.an.txt" );
         is = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.scores.txt" );
-        isi = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/go_test_termdb.xml" );
+        isi = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/go-termdb-test.xml" );
 
         if ( ism == null || is == null || isi == null ) throw new IOException();
 
@@ -63,7 +63,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         s.setUseBiologicalProcess( true );
         s.setUseCellularComponent( true );
         s.setUseMolecularFunction( true );
-
+        gon = new GeneSetTerms( isi );
         GeneAnnotationParser p = new GeneAnnotationParser( gon );
         annotations = p.read( ism, Format.DEFAULT );
 
@@ -75,7 +75,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         assertNotNull( scores.getGeneScores() );
         assertNotNull( scores.getProbeToScoreMap() );
 
-        gon = new GeneSetTerms( isi );
+      
         sizeComputer = new GeneSetSizeComputer( annotations, scores, true );
 
         super.setUp();

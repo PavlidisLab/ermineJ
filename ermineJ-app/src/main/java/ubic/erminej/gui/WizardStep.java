@@ -21,6 +21,7 @@ package ubic.erminej.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -78,19 +79,11 @@ public abstract class WizardStep extends JPanel {
      */
     protected void addHelp( String text ) {
         JLabel label = new JLabel( text );
-        JLabel jLabel1 = new JLabel( "      " );
-        JLabel jLabel2 = new JLabel( " " );
-        JLabel jLabel3 = new JLabel( " " );
-        JLabel jLabel4 = new JLabel( "      " );
-        JPanel labelPanel = new JPanel();
-        labelPanel.setBackground( Color.WHITE );
-        labelPanel.setLayout( new BorderLayout() );
-        labelPanel.add( label, BorderLayout.CENTER );
-        labelPanel.add( jLabel1, BorderLayout.WEST );
-        labelPanel.add( jLabel2, BorderLayout.NORTH );
-        labelPanel.add( jLabel3, BorderLayout.SOUTH );
-        labelPanel.add( jLabel4, BorderLayout.EAST );
-        this.add( labelPanel, BorderLayout.NORTH );
+        label.setOpaque( true );
+        label.setBackground( Color.WHITE );
+        label.setBorder( BorderFactory.createEmptyBorder( 15, 34, 23, 15 ) );
+
+        this.add( label, BorderLayout.NORTH );
     }
 
     protected void addMain( JPanel panel ) {
