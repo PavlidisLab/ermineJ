@@ -17,7 +17,7 @@ package ubic.erminej;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import org.apache.commons.lang.StringUtils;
+import java.net.URL;
 
 import junit.framework.TestCase;
 
@@ -29,8 +29,6 @@ import junit.framework.TestCase;
  */
 public class CliTest extends TestCase {
 
-    private String ermineJHome = "";
-
     private String basePath = "";
 
     private String output = "";
@@ -39,25 +37,17 @@ public class CliTest extends TestCase {
 
     @Override
     public final void setUp() throws Exception {
-        ermineJHome = System.getenv( "ERMINEJ_DEV_HOME" );
-        if ( StringUtils.isBlank( ermineJHome ) ) {
-            throw new IllegalStateException( "Please set ERMINEJ_DEV_HOME" );
-        }
 
-        String[] path = new String[] { "ermineJ-app", "src", "test", "data" };
-
-        gofile = ermineJHome
-                + File.separator
-                + StringUtils.join( new String[] { "ermineJ-app", "data", "go_daily-termdb.rdf-xml.zip" },
-                        File.separator );
-
-        basePath = ermineJHome + File.separator + StringUtils.join( path, File.separator );
+        URL go = this.getClass().getResource( "/data/go_daily-termdb.rdf-xml.zip" );
+        File f = new File( go.toURI() );
+        gofile = f.getAbsolutePath();
+        basePath = f.getParentFile().getAbsolutePath();
 
         if ( !( new File( gofile ) ).canRead() ) {
             throw new IllegalStateException( "Could not locate GO file" );
         }
 
-        output = File.createTempFile( "ermineJtest", "tmp" ).getAbsolutePath();
+        output = File.createTempFile( "ermineJtest.", ".tmp" ).getAbsolutePath();
 
     }
 
@@ -99,7 +89,9 @@ public class CliTest extends TestCase {
                 gofile, "-s", basePath + File.separator + "one-way-anova-parsed.txt", "-x", "10", "-o", output } );
         assertTrue( okay );
 
-        BufferedReader f = new BufferedReader( new FileReader( new File( output ) ) );
+        File file = new File( output );
+
+        BufferedReader f = new BufferedReader( new FileReader( file ) );
 
         String line = "";
         boolean found = false;

@@ -132,7 +132,7 @@ public class UserDefinedGeneSetManager {
     }
 
     public static void init( GeneAnnotations gd, Settings set ) {
-        assert geneData == null : "You should only call init once";
+        // assert geneData == null : "You should only call init once";
         geneData = gd;
         settings = set;
     }
