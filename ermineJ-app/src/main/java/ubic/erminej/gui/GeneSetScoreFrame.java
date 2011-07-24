@@ -91,25 +91,15 @@ import ubic.erminej.data.UserDefinedGeneSetManager;
  * @version $Id$
  */
 public class GeneSetScoreFrame extends JFrame {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -3322987593565580107L;
 
-    private final static String RESOURCE_LOCATION = "/ubic/erminej/";
+    public final static String RESOURCE_LOCATION = "/ubic/erminej/";
 
     private static Log log = LogFactory.getLog( GeneSetScoreFrame.class.getName() );
-    /**
-     * 
-     */
+
     private static final int START_HEIGHT = 330;
-    /**
-     * 
-     */
+
     private static final int START_WIDTH = 830;
-    /**
-     * 
-     */
+
     private static final int STARTING_OVERALL_WIDTH = 830;
 
     private static final String MAINWINDOWHEIGHT = "mainview.WindowHeight";
@@ -1005,8 +995,21 @@ public class GeneSetScoreFrame extends JFrame {
      */
     protected void showLogs() {
         StringBuffer bif = new StringBuffer();
+        File logFile = settings.getLogFile();
+
+        if ( logFile == null ) {
+            GuiUtil.error( "Cannot locate log file" );
+            return;
+        }
+
+        if ( !logFile.canRead() ) {
+            GuiUtil.error( "Cannot read log file from " + logFile );
+            return;
+        }
+
         try {
-            BufferedReader fis = new BufferedReader( new FileReader( settings.getLogFile() ) );
+
+            BufferedReader fis = new BufferedReader( new FileReader( logFile ) );
             String line;
             while ( ( line = fis.readLine() ) != null ) {
                 bif.append( line );
@@ -1014,9 +1017,7 @@ public class GeneSetScoreFrame extends JFrame {
             }
             fis.close();
             ScrollingTextAreaDialog b = new ScrollingTextAreaDialog( this, "ErmineJ Log", true );
-            b
-                    .setText( "The log file is located at:\n" + settings.getLogFile() + "\n\nLog contents:\n"
-                            + bif.toString() );
+            b.setText( "The log file is located at:\n" + logFile + "\n\nLog contents:\n" + bif.toString() );
             b.setEditable( false );
             b.setSize( new Dimension( 350, 500 ) );
             b.setResizable( true );
@@ -1026,10 +1027,10 @@ public class GeneSetScoreFrame extends JFrame {
             b.validate();
             b.setVisible( true );
         } catch ( FileNotFoundException e ) {
-            GuiUtil.error( "The log file could not be found" );
+            GuiUtil.error( "The log file could not be found: was looking in " + logFile );
             log.error( e );
         } catch ( IOException e ) {
-            GuiUtil.error( "There was an error reading the log file" );
+            GuiUtil.error( "There was an error reading the log file from " + logFile );
             log.error( e );
         }
     }

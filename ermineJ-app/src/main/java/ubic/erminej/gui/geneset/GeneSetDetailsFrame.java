@@ -43,6 +43,7 @@ import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -88,6 +89,7 @@ import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.Colors;
+import ubic.erminej.gui.GeneSetScoreFrame;
 import ubic.erminej.gui.GuiUtil;
 import ubic.erminej.gui.JHistViewer;
 import ubic.erminej.gui.JLinkLabel;
@@ -316,11 +318,13 @@ public class GeneSetDetailsFrame extends JFrame {
                 + PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN;
         int totalheight = table.getPreferredScrollableViewportSize().height;
 
+        // table.setAutoResizeMode( JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS );
+
         Dimension d = new Dimension( totalWidth, totalheight );
         table.setSize( d );
 
         /*
-         * FIXME: hide the score columns if we don't have them, reshow after loading scores
+         * FIXME: hide the score columns if we don't have them, reshow after loading scores?
          */
 
     } // end createDetailsTable
@@ -566,6 +570,9 @@ public class GeneSetDetailsFrame extends JFrame {
         setupToolBar();
         setUpStatusBar();
         setupWindow();
+
+        tableScrollPane.getViewport().add( table, null );
+
         repositionViewport();
 
         this.getContentPane().add( tableScrollPane, BorderLayout.CENTER );
@@ -588,8 +595,10 @@ public class GeneSetDetailsFrame extends JFrame {
      * 
      */
     private void setupTable() {
-        // Enable the horizontal scroll bar
-        table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+        // table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+
+        table.setAutoResizeMode( JTable.AUTO_RESIZE_ALL_COLUMNS );
+
         // Prevent user from moving columns around
         table.getTableHeader().setReorderingAllowed( false );
         // For html links on gene names
@@ -607,15 +616,15 @@ public class GeneSetDetailsFrame extends JFrame {
      * 
      */
     private void repositionViewport() {
-        tableScrollPane.getViewport().add( table, null );
         // Reposition the table inside the scrollpane
         int x = table.getSize().width;
         // should probably subtract the size of the viewport, but it gets trimmed
         // anyway,
         // so it's okay to be lazy here
+        // tableScrollPane.setSize( table.getSize() );
         tableScrollPane.getViewport().setViewPosition( new Point( x, 0 ) );
-        statusMessenger
-                .showError( "You may need to scroll horizontally or adjust the column width to see all the data" );
+        // statusMessenger
+        // .showError( "You may need to scroll horizontally or adjust the column width to see all the data" );
     }
 
     /**
@@ -637,6 +646,9 @@ public class GeneSetDetailsFrame extends JFrame {
         this.getContentPane().setLayout( new BorderLayout() );
         this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
         this.setTitle( "Gene set details" );
+
+        this.setIconImage( new ImageIcon( this.getClass().getResource(
+                GeneSetScoreFrame.RESOURCE_LOCATION + "logoIcon64.gif" ) ).getImage() );
     }
 
     /**
@@ -1269,7 +1281,7 @@ public class GeneSetDetailsFrame extends JFrame {
         if ( matrixDisplay == null ) return;
         if ( desiredCellWidth >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && desiredCellWidth <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
 
-            table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+            // table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 
             int numColumns = matrixDisplay.getColumnCount();
             for ( int i = 0; i < numColumns; i++ ) {

@@ -18,7 +18,6 @@
  */
 package ubic.erminej.gui.geneset;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,7 +39,7 @@ import ubic.erminej.gui.JLinkLabel;
 import ubic.erminej.gui.table.MatrixPoint;
 
 /**
- * Our table model fo rone gene set.
+ * Our table model for one gene set.
  * 
  * @author Will Braynen
  * @version $Id$
