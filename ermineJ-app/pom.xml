@@ -138,6 +138,8 @@
 					<include>**/*.csv</include>
 					<include>**/*.zip</include>
 					<include>**/*.gz</include>
+					<include>**/*.settings</include>
+					<include>**/*.gold</include>
 					<include>**/*.properties</include>
 					<include>**/*.R</include>
 				</includes>
