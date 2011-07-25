@@ -32,11 +32,15 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
 public class TestMultifunctionality extends TestCase {
 
     public void testMf1() throws Exception {
-        InputStream is = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U133_Plus_2_annot_sample.csv" );
-        ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
+        InputStream is = TestMultifunctionality.class.getResourceAsStream( "/data/HG-U133_Plus_2_annot_sample.csv" );
+        ZipInputStream z = new ZipInputStream( TestMultifunctionality.class
                 .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
         z.getNextEntry();
         GeneSetTerms geneSets = new GeneSetTerms( z );
+
+        assertEquals( 32508, geneSets.getGeneSets().size() );
+
+        assertNotNull( geneSets.getGraph().getRoot() );
 
         GeneAnnotationParser p = new GeneAnnotationParser( geneSets );
 

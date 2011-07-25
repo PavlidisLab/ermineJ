@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,9 +152,8 @@ public class GeneSetScoreFrame extends JFrame {
     private StatusViewer statusMessenger;
     private JTabbedPane tabs = new JTabbedPane();
     private GeneSetTreePanel treePanel;
-    private Collection<GeneSetTerm> userOverwrittenGeneSets;
     JProgressBar progressBar = new JProgressBar();
-    private JMenuItem reloadGeneSetsMenuItem = new JMenuItem();
+    // private JMenuItem reloadGeneSetsMenuItem = new JMenuItem();
     private JMenuItem switchDataFileMenuItem = new JMenuItem();
     private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
 
@@ -164,7 +162,6 @@ public class GeneSetScoreFrame extends JFrame {
         jbInit();
         hh = new HelpHelper();
         hh.initHelp( helpMenuItem );
-        this.userOverwrittenGeneSets = new HashSet<GeneSetTerm>();
     }
 
     /**
@@ -175,7 +172,6 @@ public class GeneSetScoreFrame extends JFrame {
         jbInit();
         hh = new HelpHelper();
         hh.initHelp( helpMenuItem );
-        this.userOverwrittenGeneSets = new HashSet<GeneSetTerm>();
     }
 
     public void addedNewGeneSet() {
@@ -192,34 +188,6 @@ public class GeneSetScoreFrame extends JFrame {
         tablePanel.addRun();
         treePanel.addRun();
         athread = null;
-    }
-
-    /**
-     * Designate a gene set as altered by the user. This is used for GO gene sets that are modified.
-     * 
-     * @param id
-     */
-    public void addUserOverwritten( GeneSetTerm id ) {
-        this.userOverwrittenGeneSets.add( id );
-    }
-
-    /**
-     * @param classID
-     */
-    public void deleteUserGeneSet( GeneSetTerm classID ) {
-        deleteUserGeneSetFile( classID );
-        treePanel.removeNode( classID );
-        this.userOverwrittenGeneSets.remove( classID );
-        Collection<GeneSetTerm> refreshShowUserGeneSetState = refreshShowUserGeneSetState(); // FIXME
-    }
-
-    protected void deleteUserGeneSetFile( GeneSetTerm classID ) {
-        if ( UserDefinedGeneSetManager.deleteUserGeneSet( classID ) && this.statusMessenger != null ) {
-            statusMessenger.showStatus( "Permanantly deleted " + classID );
-        } else {
-            GuiUtil.error( "Could not delete data on disk for " + classID
-                    + ". Please delete the file (or part of file) manually from " + settings.getUserGeneSetDirectory() );
-        }
     }
 
     /**
@@ -341,8 +309,9 @@ public class GeneSetScoreFrame extends JFrame {
             log.error( e, e );
         }
 
+        assert geneData != null;
         UserDefinedGeneSetManager.init( geneData, settings );
-        loadUserGeneSets();
+        UserDefinedGeneSetManager.loadUserGeneSets( statusMessenger );
 
         treePanel.initialize( goData, geneData );
         tablePanel.initialize( geneData );
@@ -380,23 +349,23 @@ public class GeneSetScoreFrame extends JFrame {
     public void readDataFilesForStartup() {
 
         updateProgress( 10 );
-        statusMessenger.showStatus( "Reading GO descriptions " + settings.getClassFile() );
+        statusMessenger.showStatus( "Reading GO tree from: " + settings.getClassFile() );
         assert settings.getClassFile() != null;
         try {
             goData = new GeneSetTerms( settings.getClassFile() );
+
         } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. " + "\nPlease check that it is a valid XML file. "
-                    + "\nIf this problem persists, please contact the software developer. " );
+            GuiUtil.error( "Gene Ontology file format is incorrect. "
+                    + "\nPlease check that it is a valid GO XML file." );
             log.error( e, e );
             return;
         } catch ( IOException e ) {
-            GuiUtil.error( "GO reading error during initialization: " + e.getMessage()
-                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+            GuiUtil.error( "Error during GO initialization: " + e.getMessage() );
             log.error( e, e );
             return;
         }
 
-        updateProgress( 70 );
+        updateProgress( 30 );
         if ( Thread.currentThread().isInterrupted() ) return;
 
         statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
@@ -405,26 +374,27 @@ public class GeneSetScoreFrame extends JFrame {
             GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
 
             geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat() );
+
         } catch ( IOException e ) {
             GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
-                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+                    + "\nCheck the file format." );
             log.error( e, e );
             return;
 
         } catch ( Exception e ) {
             GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
-                    + "\nCheck the file format.\nIf this problem persists, please contact the software developer. " );
+                    + "\nCheck the file format." );
             log.error( e, e );
             return;
         }
 
-        updateProgress( 90 );
+        updateProgress( 60 );
         if ( Thread.currentThread().isInterrupted() ) return;
 
         statusMessenger.showStatus( "Reading user-defined gene sets from directory "
                 + settings.getUserGeneSetDirectory() );
 
-        // end slow part.
+        // end slow(ish) part.
 
         if ( geneData == null || geneData.getActiveGeneSets() == null ) {
             throw new IllegalArgumentException( "The gene annotation file was not valid. "
@@ -440,27 +410,6 @@ public class GeneSetScoreFrame extends JFrame {
             throw new IllegalArgumentException( "The gene annotation file contains no probes. "
                     + "Check that the file format is correct.\n" );
         }
-    }
-
-    /**
-     * 
-     */
-    protected void loadUserGeneSets() {
-        this.userOverwrittenGeneSets = UserDefinedGeneSetManager.loadUserGeneSets( this.statusMessenger );
-        for ( GeneSetTerm set : userOverwrittenGeneSets ) {
-            treePanel.addNode( set );
-        }
-    }
-
-    /**
-     * @param classID
-     */
-    public void restoreUserGeneSet( GeneSetTerm classID ) {
-        userOverwrittenGeneSets.remove( classID );
-        treePanel.removeUserDefinedNode( classID );
-        tablePanel.addedNewGeneSet();
-        treePanel.addedNewGeneSet();
-        refreshShowUserGeneSetState();
     }
 
     /**
@@ -509,9 +458,8 @@ public class GeneSetScoreFrame extends JFrame {
         try {
             athread.start();
         } catch ( Exception e ) {
-            GuiUtil
-                    .error( "There was an unexpected error during analysis.\nSee the log file for details.\nThe summary message was:\n"
-                            + e.getMessage() );
+            GuiUtil.error( "There was an unexpected error during analysis.\n"
+                    + "See the log file for details.\nThe summary message was:\n" + e.getMessage() );
             enableMenusForAnalysis();
         }
         log.debug( "Waiting..." );
@@ -825,15 +773,15 @@ public class GeneSetScoreFrame extends JFrame {
         findGeneMenuItem.setMnemonic( 'G' );
         findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
 
-        reloadGeneSetsMenuItem.setText( "Reload user-defined gene sets" );
-        reloadGeneSetsMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
-                loadUserGeneSets();
-                addedNewGeneSet();
-            }
-        } );
-        reloadGeneSetsMenuItem.setMnemonic( 'E' );
-        reloadGeneSetsMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, InputEvent.CTRL_MASK ) );
+        // reloadGeneSetsMenuItem.setText( "Reload user-defined gene sets" );
+        // reloadGeneSetsMenuItem.addActionListener( new ActionListener() {
+        // public void actionPerformed( ActionEvent e ) {
+        // loadUserGeneSets();
+        // addedNewGeneSet();
+        // }
+        // } );
+        // reloadGeneSetsMenuItem.setMnemonic( 'E' );
+        // reloadGeneSetsMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, InputEvent.CTRL_MASK ) );
 
         showUsersMenuItem.setText( "Show user-defined gene sets" );
         showUsersMenuItem.addActionListener( new ActionListener() {
@@ -848,7 +796,7 @@ public class GeneSetScoreFrame extends JFrame {
         classMenu.add( modClassMenuItem );
         classMenu.add( findClassMenuItem );
         classMenu.add( findGeneMenuItem );
-        classMenu.add( reloadGeneSetsMenuItem );
+        // classMenu.add( reloadGeneSetsMenuItem );
         classMenu.add( showUsersMenuItem );
 
         this.runViewMenu.setText( "Results" );
@@ -966,10 +914,6 @@ public class GeneSetScoreFrame extends JFrame {
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
-            // geneData.resetSelectedProbes();
-            /*
-             * FIXME Reset the tables? What do we do? Make a new GeneAnnotations(this.geneData, scores)? Maybe nothing?
-             */
         }
 
     }
@@ -1082,16 +1026,6 @@ public class GeneSetScoreFrame extends JFrame {
                     new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "checkBox.gif" ) ) );
         }
         runViewMenu.revalidate();
-    }
-
-    /**
-     * Determine if a gene set was overwritten by the user-define gene sets on startup.
-     * 
-     * @param geneSetId
-     * @return
-     */
-    public boolean userOverWrote( GeneSetTerm geneSetId ) {
-        return userOverwrittenGeneSets != null && userOverwrittenGeneSets.contains( geneSetId );
     }
 
     void aboutMenuItem_actionPerformed() {

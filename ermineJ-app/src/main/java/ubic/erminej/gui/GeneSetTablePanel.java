@@ -111,6 +111,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
         model = new GeneSetTableModel( geneData, results );
         table.setModel( model );
 
+        MouseListener m = super.configurePopupListener();
+        table.addMouseListener( m );
+
         sorter = new TableRowSorter<GeneSetTableModel>( ( GeneSetTableModel ) table.getModel() );
 
         table.setRowSorter( sorter );
@@ -134,10 +137,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     /**
      * for the table heading
      */
-    private void setUpPopupMenus() {
-
-        MouseListener popupListener = configurePopupMenu();
-        table.addMouseListener( popupListener );
+    protected void setUpHeaderPopupMenus() {
 
         EditRunPopupMenu removeRunPopup = new EditRunPopupMenu();
 
@@ -193,7 +193,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     public void initialize( GeneAnnotations initialGoData ) {
         this.geneData = initialGoData;
         setUpTable();
-        setUpPopupMenus();
+        setUpHeaderPopupMenus();
         setTableAttributes();
         List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
@@ -254,15 +254,14 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.revalidate();
     }
 
-    protected String deleteAndResetGeneSet( GeneSetTerm classID ) {
-        log.debug( "Deleting gene set from table" );
-        String action = super.deleteAndResetGeneSet( classID );
-        if ( action.equals( GeneSetPanel.DELETED ) ) {
-            table.revalidate();
-        } else if ( action.equals( GeneSetPanel.RESTORED ) ) {
-            table.revalidate();
-        }
-        return action;
+    @Override
+    protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
+        boolean deleted = super.deleteUserGeneSet( classID );
+        /*
+         * Since the table model is backed by the geneAnnots, this should work?
+         */
+        table.revalidate();
+        return deleted;
 
     }
 
@@ -356,12 +355,15 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     @Override
-    protected MouseListener configurePopupMenu() {
-        MouseListener m = super.configurePopupMenu();
+    public void showPopupMenu( final MouseEvent e ) {
+
+        GeneSetPanelPopupMenu popup = super.configurePopup( e );
+
+        if ( popup == null ) return;
 
         final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", true );
         hideRedund.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
+            public void actionPerformed( ActionEvent e1 ) {
                 filterRedundant( hideRedund.getState() );
             }
         } );
@@ -370,7 +372,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         final JCheckBoxMenuItem hideEmpty = new JCheckBoxMenuItem( "Hide empty sets", true );
         hideEmpty.setToolTipText( "Hide sets lacking members" );
         hideEmpty.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
+            public void actionPerformed( ActionEvent e1 ) {
                 filterEmpty( hideEmpty.getState() );
             }
         } );
@@ -378,7 +380,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         final JCheckBoxMenuItem hideNonResults = new JCheckBoxMenuItem( "Hide non-results", true );
         hideNonResults.setToolTipText( "Hide rows lacking any results" );
         hideNonResults.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e ) {
+            public void actionPerformed( ActionEvent e1 ) {
                 filterNonResults( hideNonResults.getState() );
             }
 
@@ -389,9 +391,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
         popup.add( hideNonResults );
 
         final JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
-        findInTreeMenuItem.addActionListener( new OutputPanel_findInTreeMenuItem_actionAdapter( this ) );
+        findInTreeMenuItem.addActionListener( new FindInTreeListener( this ) );
         popup.add( findInTreeMenuItem );
-        return m;
+        popup.show( e.getComponent(), e.getX(), e.getY() );
     }
 
     /**
@@ -447,7 +449,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
             this.currentResultSetIndex = _runnum;
         }
 
-        log.debug( "Showing details for " + term );
         messenger.showStatus( "Viewing details for " + term + "..." );
 
         showDetailsForGeneSet( run, term );
@@ -543,13 +544,13 @@ class EditRunPopupMenu extends JPopupMenu {
     }
 }
 
-class OutputPanel_findInTreeMenuItem_actionAdapter implements ActionListener {
+class FindInTreeListener implements ActionListener {
     GeneSetPanel adaptee;
 
     /**
      * @param adaptee
      */
-    public OutputPanel_findInTreeMenuItem_actionAdapter( GeneSetPanel adaptee ) {
+    public FindInTreeListener( GeneSetPanel adaptee ) {
         super();
         this.adaptee = adaptee;
     }

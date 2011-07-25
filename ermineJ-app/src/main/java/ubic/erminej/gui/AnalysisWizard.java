@@ -66,7 +66,7 @@ public class AnalysisWizard extends Wizard {
         this.addStep( step1, true );
         step2 = new AnalysisWizardStep2( this, settings );
         this.addStep( step2 );
-        step3 = new AnalysisWizardStep3( this, callingframe, geneAnnots );
+        step3 = new AnalysisWizardStep3( this, geneAnnots );
         this.addStep( step3 );
         step31 = new AnalysisWizardStep3_1( this, settings );
         this.addStep( step31 );

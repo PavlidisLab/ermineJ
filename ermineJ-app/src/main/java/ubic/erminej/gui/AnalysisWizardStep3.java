@@ -57,13 +57,10 @@ public class AnalysisWizardStep3 extends WizardStep {
 
     private JLabel countLabel;
 
-    private final GeneSetScoreFrame callingframe;
-
     private GeneAnnotations geneAnnots = null;
 
-    public AnalysisWizardStep3( AnalysisWizard wiz, GeneSetScoreFrame callingframe, GeneAnnotations geneAnnots ) {
+    public AnalysisWizardStep3( AnalysisWizard wiz, GeneAnnotations geneAnnots ) {
         super( wiz );
-        this.callingframe = callingframe;
         this.jbInit();
         this.geneAnnots = geneAnnots;
         wiz.clearStatus();
@@ -135,7 +132,7 @@ public class AnalysisWizardStep3 extends WizardStep {
 
         customClasses = new AnalysisWizardStep3_CustomClassList(); // I really don't think we need this extra class.
         for ( GeneSetTerm id : userDefinedGeneSets ) {
-            if ( callingframe.userOverWrote( id ) ) continue;
+            // if ( callingframe.userOverWrote( id ) ) continue;
             GeneSet geneSet = this.geneAnnots.getGeneSet( id );
             customClasses.add( geneSet );
         }

@@ -21,9 +21,7 @@ package ubic.erminej.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.tree.DefaultTreeModel;
@@ -46,6 +44,7 @@ import ubic.basecode.util.FileTools;
  * @see GeneAnnotations
  * @see GeneSet which represents the actual annotations (and Gene and Probes also keep track of their own)
  * @see GeneSets which provides convenient methods to work with the sets themselves.
+ * @see UserDefinedGeneSetManager which helps deal with ones the user has stored separately from GO
  */
 public class GeneSetTerms {
 
@@ -73,6 +72,7 @@ public class GeneSetTerms {
             throw new IOException( "Input stream was null" );
         }
         this.initialize( inputStream );
+        inputStream.close();
     }
 
     /**
@@ -88,6 +88,7 @@ public class GeneSetTerms {
 
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
         this.initialize( i );
+        i.close();
     }
 
     /**
@@ -109,24 +110,17 @@ public class GeneSetTerms {
         this.getGraph().addChildTo( root.getKey(), USER_DEFINED, newChild );
 
         for ( GeneSetTerm t : terms ) {
-            this.addTerm( t );
+            this.addUserDefinedTerm( t );
         }
     }
 
     /**
-     * @param id String
-     * @param name String
+     * @param id
      */
-    protected void addTerm( GeneSetTerm id ) {
-        addClassToUserDefined( id );
-    }
-
-    /**
-     * @param classID (has to be user-defined one)
-     */
-    public void deleteGeneSet( String classID ) {
-        if ( this.getGraph() == null ) return;
-        this.getGraph().deleteChildFrom( USER_DEFINED, classID );
+    protected void removeUserDefined( GeneSetTerm id ) {
+        if ( id.isUserDefined() ) {
+            this.graph.deleteLeaf( id.getId() );
+        }
     }
 
     /**
@@ -150,7 +144,11 @@ public class GeneSetTerms {
     public Set<GeneSetTerm> getChildren( GeneSetTerm id ) {
         if ( getGraph() == null ) return null;
         Set<GeneSetTerm> returnVal = new HashSet<GeneSetTerm>();
-        Set<DirectedGraphNode<String, GeneSetTerm>> children = getGraph().get( id.getId() ).getChildNodes();
+        DirectedGraphNode<String, GeneSetTerm> node = getGraph().get( id.getId() );
+
+        assert node != null;
+
+        Set<DirectedGraphNode<String, GeneSetTerm>> children = node.getChildNodes();
         for ( DirectedGraphNode<String, GeneSetTerm> child : children ) {
             GeneSetTerm childKey = child.getItem();
             returnVal.add( childKey );
@@ -246,7 +244,8 @@ public class GeneSetTerms {
      * @param id
      * @param name
      */
-    private void addClassToUserDefined( GeneSetTerm id ) {
+    void addUserDefinedTerm( GeneSetTerm id ) {
+        assert id.isUserDefined();
         if ( getGraph() == null ) return;
         assert this.getGraph().get( USER_DEFINED ) != null;
 
@@ -286,17 +285,29 @@ public class GeneSetTerms {
     }
 
     /**
-     * 
+     * @param inputStream
+     * @throws IOException
+     * @throws SAXException
      */
     private void initialize( InputStream inputStream ) throws IOException, SAXException {
         GOParser parser = new GOParser( inputStream );
-        graph = parser.getGraph();
-        if ( this.getGraph() == null ) return;
+        this.graph = parser.getGraph();
+
+        assert graph != null;
+
+        /*
+         * Add the 'user-defined' node.
+         */
         DirectedGraphNode<String, GeneSetTerm> root = this.getGraph().getRoot();
+        assert root != null;
+
         GeneSetTerm newChild = new GeneSetTerm( USER_DEFINED, "", "Gene sets modified or created by the user" );
         newChild.setAspect( USER_DEFINED );
         this.getGraph().addChildTo( root.getKey(), USER_DEFINED, newChild );
 
+        /*
+         * Populate the aspects for all nodes.
+         */
         for ( GeneSetTerm geneSet : this.getGraph().getValues() ) {
             if ( geneSet.getAspect() == null ) {
                 geneSet.setAspect( this.getAspect( geneSet ) );

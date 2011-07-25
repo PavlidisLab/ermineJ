@@ -99,6 +99,8 @@ public class GOParser {
 
         populateAspect();
 
+        i.close();
+
     }
 
     private void populateAspect() {

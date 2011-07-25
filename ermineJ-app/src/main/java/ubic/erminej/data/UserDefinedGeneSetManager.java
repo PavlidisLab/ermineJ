@@ -61,14 +61,13 @@ public class UserDefinedGeneSetManager {
     private static Map<GeneSetTerm, GeneSet> userGeneSets = new HashMap<GeneSetTerm, GeneSet>();
 
     /**
-     * Delete a user-defined gene set from disk. Note: this doesn't work if there are multiple gene groups in the file.
+     * Delete a user-defined gene set from disk and from the annotations in memory.
      * <p>
-     * This doesn't handle removing it from the maps. The caller has to do that.
      * 
      * @param ngs
      */
-    public static boolean deleteUserGeneSet( GeneSetTerm id ) {
-        String classFile = getUserGeneSetFileForName( id.getId() );
+    public static boolean deleteUserGeneSet( GeneSetTerm termToDelete ) {
+        String classFile = getUserGeneSetFileForName( termToDelete.getId() );
         File file = new File( classFile );
 
         if ( !file.exists() ) {
@@ -80,9 +79,34 @@ public class UserDefinedGeneSetManager {
             return false;
         }
 
-        log.debug( "Deleting " + file.getAbsolutePath() );
         try {
-            return file.delete();
+
+            Collection<GeneSet> sets = loadUserGeneSetFile( classFile );
+            boolean success = false;
+            if ( sets.size() > 1 ) {
+
+                // have to rewrite the file, omitting this set.
+                BufferedWriter out = new BufferedWriter( new FileWriter( classFile, false ) );
+                for ( GeneSet s : sets ) {
+                    if ( !s.getId().equals( termToDelete.getId() ) ) {
+                        writeSet( s, out );
+                    }
+                }
+                out.close();
+                success = true;
+            } else {
+
+                log.debug( "Deleting " + file.getAbsolutePath() );
+                success = file.delete();
+            }
+
+            if ( success ) {
+                userGeneSets.remove( termToDelete );
+                geneData.deleteGeneSet( termToDelete );
+            }
+
+            return success;
+
         } catch ( Exception e ) {
             log.error( e, e );
             return false;
@@ -233,6 +257,7 @@ public class UserDefinedGeneSetManager {
      * Load the user-defined gene sets.
      */
     public static Collection<GeneSetTerm> loadUserGeneSets( StatusViewer statusMessenger ) {
+
         Collection<GeneSetTerm> userOverwrittenGeneSets = new HashSet<GeneSetTerm>();
 
         File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
@@ -253,16 +278,15 @@ public class UserDefinedGeneSetManager {
             String classFilePath = null;
             try {
                 classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
-                log.debug( "Loading " + classFilePath );
+                statusMessenger.showStatus( "Loading " + classFilePath );
                 Collection<GeneSet> loadedSets = loadUserGeneSetFile( classFilePath );
 
                 numLoaded += loadedSets.size();
                 for ( GeneSet set : loadedSets ) {
                     GeneSetTerm id = set.getTerm();
                     if ( isExistingGeneSet( id ) ) {
-                        log.debug( "User-defined gene set overriding " + id );
-                        modifyGeneSet( set );
-                        userOverwrittenGeneSets.add( id );
+                        // we disallow this.
+                        statusMessenger.showStatus( "Cannot overwrite gene set, please rename it " + id );
                     } else {
                         userGeneSets.put( id, set );
                         geneData.addGeneSet( id, set.getGenes() );
@@ -270,11 +294,9 @@ public class UserDefinedGeneSetManager {
                 }
 
             } catch ( IOException e ) {
-                if ( statusMessenger != null ) {
-                    // This error will be shown if there are files that don't fit the format.
-                    statusMessenger
-                            .showError( "Could not load gene sets from " + classFilePath + ": " + e.getMessage() );
-                }
+                // This error will be shown if there are files that don't fit the format.
+                statusMessenger.showError( "Could not load gene sets from " + classFilePath + ": " + e.getMessage() );
+
             }
 
         }
@@ -289,9 +311,13 @@ public class UserDefinedGeneSetManager {
      * 
      * @param set
      */
-    public static void modifyGeneSet( GeneSet set ) {
+    public static void addOrModifyGeneSet( GeneSet set ) {
         log.debug( "Modifying or adding " + set.getId() );
-        geneData.modifyGeneSet( set.getTerm(), set.getProbes() );
+        if ( geneData.hasGeneSet( set.getTerm() ) ) {
+            geneData.modifyGeneSet( set.getTerm(), set.getProbes() );
+        } else {
+            geneData.addGeneSet( set );
+        }
     }
 
     /**

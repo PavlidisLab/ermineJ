@@ -332,8 +332,7 @@ public class GeneSetWizard extends Wizard {
         } else if ( modifiedTheGeneSet() ) {
 
             showStatus( "Saving modified gene set" );
-            UserDefinedGeneSetManager.modifyGeneSet( newGeneSet );
-            ( ( GeneSetScoreFrame ) callingframe ).addUserOverwritten( newGeneSet.getTerm() );
+            UserDefinedGeneSetManager.addOrModifyGeneSet( newGeneSet );
             ( ( GeneSetScoreFrame ) callingframe ).addedNewGeneSet();
 
             try {

@@ -306,7 +306,7 @@ public class GeneAnnotations {
         }
 
         geneSetId.setUserDefined( true );
-        this.geneSetTerms.addTerm( geneSetId );
+        this.geneSetTerms.addUserDefinedTerm( geneSetId );
 
         GeneSet newSet = new GeneSet( geneSetId, gs );
         newSet.setUserDefined( true );
@@ -355,11 +355,13 @@ public class GeneAnnotations {
 
     /**
      * Remove a gene set (class) from all the maps that reference it. This basically completely removes the class, and
-     * it cannot be restored unless there is a backup.
+     * it cannot be restored unless there is a backup. If it is user-defined it is deleted entirely from the
+     * GeneSetTerms tree.
      * 
      * @param id
      */
     public void deleteGeneSet( GeneSetTerm id ) {
+
         assert allowModification;
 
         // deals with probes.
@@ -368,6 +370,10 @@ public class GeneAnnotations {
         }
 
         geneSets.remove( id );
+
+        if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
+
+        oldGeneSets.remove( id );
         skipDueToRedundancy.remove( id );
 
     }
@@ -658,12 +664,11 @@ public class GeneAnnotations {
             return;
         }
 
-        // FIXME have the gene set save this internally?
-        log.debug( "Saving backup version of " + classId + ", replacing with new version that has "
-                + probesForNew.size() + " probes." );
-        oldGeneSets.put( classId, geneSets.get( classId ) );
-        deleteGeneSet( classId );
-        addSet( classId, probesForNew );
+        // // FIXME have the gene set save this internally?
+        // log.debug( "Saving backup version of " + classId + ", replacing with new version that has "
+        // + probesForNew.size() + " probes." );
+        // oldGeneSets.put( classId, geneSets.get( classId ) );
+        // addSet( classId, probesForNew );
     }
 
     /**
@@ -945,7 +950,7 @@ public class GeneAnnotations {
     }
 
     /**
-     * Remove classes that have too few members, or which are obsolete.
+     * Remove classes that have too few members, or which are obsolete. These are not removed from the GO tree
      * 
      * @param lowThreshold
      * @param highThreshold
@@ -1003,7 +1008,7 @@ public class GeneAnnotations {
     private void redundancyCheck() {
 
         messenger.showStatus( "There are " + numGeneSets()
-                + " classes represented on the chip (of any size). Checking for redundancy ..." );
+                + " gene sets in the annotations (of any size). Checking for redundancy ..." );
 
         Collection<GeneSet> checked = new HashSet<GeneSet>();
         int i = 0;

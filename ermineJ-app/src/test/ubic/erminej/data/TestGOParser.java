@@ -19,6 +19,7 @@
 package ubic.erminej.data;
 
 import java.io.InputStream;
+import java.util.zip.ZipInputStream;
 
 import junit.framework.TestCase;
 import ubic.basecode.util.RegressionTesting;
@@ -39,7 +40,7 @@ public class TestGOParser extends TestCase {
      */
     public void testGOParser() throws Exception {
 
-        InputStream i = GOParser.class.getResourceAsStream( "/data/go-termdb-sample.xml" );
+        InputStream i = TestGOParser.class.getResourceAsStream( "/data/go-termdb-sample.xml" );
 
         if ( i == null ) {
             throw new Exception( "Couldn't read the sample file" );
@@ -63,7 +64,7 @@ public class TestGOParser extends TestCase {
      */
     public void testGOParserB() throws Exception {
 
-        InputStream i = GOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
+        InputStream i = TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
 
         if ( i == null ) {
             throw new Exception( "Couldn't read the sample file" );
@@ -77,5 +78,17 @@ public class TestGOParser extends TestCase {
 
         assertTrue( gOParser.getGraph().getRoot().toString().startsWith( "all" ) );
 
+        assertNotNull( gOParser.getGraph().getRoot() );
     }
+
+    public void testGOParserCBig() throws Exception {
+        ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
+                .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
+        z.getNextEntry();
+        gOParser = new GOParser( z );
+
+        assertNotNull( gOParser.getGraph().getRoot() );
+
+    }
+
 }
