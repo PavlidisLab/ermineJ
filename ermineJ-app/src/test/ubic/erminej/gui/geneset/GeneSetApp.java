@@ -31,7 +31,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Probe;
-import ubic.erminej.gui.geneset.GeneSetDetailsFrame;
+import ubic.erminej.gui.geneset.details.GeneSetDetailsFrame;
 
 /**
  * @author Will Braynen

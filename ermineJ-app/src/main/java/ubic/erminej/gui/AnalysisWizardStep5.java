@@ -33,6 +33,8 @@ import javax.swing.border.TitledBorder;
 
 import ubic.erminej.Settings;
 import ubic.erminej.Settings.Method;
+import ubic.erminej.gui.analysis.AnalysisWizard;
+import ubic.erminej.gui.util.WizardStep;
 
 /**
  * The last step of the analysis wizard -- actually step 6 usually.

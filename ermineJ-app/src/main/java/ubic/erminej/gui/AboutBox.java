@@ -45,6 +45,8 @@ import javax.swing.SwingConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.erminej.gui.util.JLinkLabel;
+
 /**
  * Displays 'about' information for the software.
  * 
@@ -118,7 +120,7 @@ public class AboutBox extends JDialog implements ActionListener {
         imageLabel.setDebugGraphicsOptions( 0 );
         imageLabel.setHorizontalAlignment( SwingConstants.CENTER );
         imageLabel.setHorizontalTextPosition( SwingConstants.CENTER );
-        URL icon = GeneSetScoreFrame.class.getResource( "/ubic/erminej/logo1small.gif" );
+        URL icon = MainFrame.class.getResource( "/ubic/erminej/logo1small.gif" );
         if ( icon != null ) {
             imageLabel.setIcon( new ImageIcon( icon ) );
             imageLabel.setIconTextGap( 0 );

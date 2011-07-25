@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 import ubic.basecode.util.FileTools;
 
 import ubic.erminej.Settings;
+import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * @author Kiran Keshav
@@ -54,7 +55,7 @@ public class LoadDialog extends AppDialog {
     protected Settings settings;
     private static final String RESULTS_LOAD_LOCATION = "resultsLoadPath";
 
-    public LoadDialog( GeneSetScoreFrame callingframe ) {
+    public LoadDialog( MainFrame callingframe ) {
         super( callingframe, 550, 250 );
         this.settings = callingframe.getSettings();
         chooser.setCurrentDirectory( new File( settings.getConfig().getString( RESULTS_LOAD_LOCATION,
@@ -109,9 +110,9 @@ public class LoadDialog extends AppDialog {
             new Thread() {
                 @Override
                 public void run() {
-                    ( ( GeneSetScoreFrame ) callingframe ).loadAnalysis( loadFile.getText() );
-                    ( ( GeneSetScoreFrame ) callingframe ).setSettings( settings );
-                    ( ( GeneSetScoreFrame ) callingframe ).enableMenusForAnalysis();
+                    ( ( MainFrame ) callingframe ).loadAnalysis( loadFile.getText() );
+                    ( ( MainFrame ) callingframe ).setSettings( settings );
+                    ( ( MainFrame ) callingframe ).enableMenusForAnalysis();
                 }
             }.start();
             dispose();

@@ -37,6 +37,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.file.XMLFileFilter;
+import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * @author Homin Lee
@@ -63,7 +64,7 @@ public class StartupDialog extends AppDialog {
     private Settings settings;
     private JButton classBrowseButton = new JButton();
 
-    public StartupDialog( GeneSetScoreFrame callingframe ) {
+    public StartupDialog( MainFrame callingframe ) {
         super( callingframe, 550, 350 );
         this.settings = callingframe.getSettings();
         jbInit();
@@ -216,7 +217,7 @@ public class StartupDialog extends AppDialog {
             new Thread() {
                 @Override
                 public void run() {
-                    ( ( GeneSetScoreFrame ) callingframe ).initialize();
+                    ( ( MainFrame ) callingframe ).initialize();
                 }
             }.start();
             dispose();

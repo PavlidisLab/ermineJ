@@ -31,6 +31,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import ubic.erminej.gui.util.WizardStep;
+
 /**
  * Choose the file name to save the results in.
  * 

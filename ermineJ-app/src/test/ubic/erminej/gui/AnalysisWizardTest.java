@@ -27,8 +27,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.erminej.gui.AnalysisWizard;
-import ubic.erminej.gui.GeneSetScoreFrame;
+import ubic.erminej.gui.MainFrame;
+import ubic.erminej.gui.analysis.AnalysisWizard;
 
 /**
  * Test the analysis wizard.
@@ -45,10 +45,10 @@ public class AnalysisWizardTest {
      */
     public static void main( String[] args ) {
 
-        GeneSetScoreFrame gssf;
+        MainFrame gssf;
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            gssf = new GeneSetScoreFrame();
+            gssf = new MainFrame();
             gssf.setSize( new Dimension( 500, 500 ) );
             AnalysisWizard aw = new AnalysisWizard( gssf, null );
             aw.setSize( new Dimension( 500, 500 ) );

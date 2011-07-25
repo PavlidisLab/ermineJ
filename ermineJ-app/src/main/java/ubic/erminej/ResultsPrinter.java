@@ -33,12 +33,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.GeneSetTerms;
 
 /**
  * @author pavlidis
@@ -47,11 +47,9 @@ import ubic.erminej.data.GeneSetTerms;
 public class ResultsPrinter {
     private static Log log = LogFactory.getLog( ResultsPrinter.class.getName() );
     protected String destFile;
-    protected List<GeneSetTerm> sortedclasses;
-    protected Map<GeneSetTerm, GeneSetResult> results;
-    protected GeneSetTerms goName;
-    protected GeneAnnotations geneData;
     private final boolean saveAllGeneNames;
+    private GeneSetPvalRun resultRun;
+    private GeneAnnotations geneData;
 
     /**
      * @param destFile output file name
@@ -59,13 +57,12 @@ public class ResultsPrinter {
      * @param goName GO information
      * @param saveAllGeneNames Whether the output should include all the genes
      */
-    public ResultsPrinter( String destFile, GeneSetPvalRun run, GeneSetTerms goName, boolean saveAllGeneNames ) {
+    public ResultsPrinter( String destFile, GeneSetPvalRun run, boolean saveAllGeneNames ) {
         this.destFile = destFile;
         this.saveAllGeneNames = saveAllGeneNames;
-        this.sortedclasses = run.getSortedClasses();
-        this.results = run.getResults();
-        this.geneData = run.getGeneData();
-        this.goName = goName;
+        this.resultRun = run;
+        this.geneData = resultRun.getGeneData();
+
         if ( saveAllGeneNames ) log.debug( "Will save all genes" );
     }
 
@@ -90,16 +87,52 @@ public class ResultsPrinter {
      */
     public void printResults( boolean sort ) throws IOException {
 
-        if ( results == null ) {
+        if ( resultRun == null ) {
             log.warn( "No results to print" );
             return;
         }
 
-        if ( sortedclasses == null ) {
-            log.warn( "No genes sets" );
-            return;
-        }
+        Map<GeneSetTerm, GeneSetResult> results = this.resultRun.getResults();
 
+        Writer out = getDesintation();
+
+        boolean first = true;
+        if ( sort ) {
+
+            List<GeneSetResult> sortedResults = new ArrayList<GeneSetResult>( results.values() );
+            Collections.sort( sortedResults );
+
+            for ( GeneSetResult res : sortedResults ) {
+                if ( first ) {
+                    first = false;
+                    res.printHeadings( out, "\tSame as" + "\tGeneMembers" );
+                }
+                print( out, res );
+            }
+        } else {
+            // output them in alphabetical order. This is useful for testing.
+            List<GeneSetTerm> c = new ArrayList<GeneSetTerm>( results.keySet() );
+            Collections.sort( c );
+
+            for ( GeneSetTerm t : c ) {
+                GeneSetResult res = results.get( t );
+                if ( first ) {
+                    first = false;
+                    res.printHeadings( out, "\tSame as" + "\tGenesMembers" );
+                }
+                print( out, res );
+            }
+        }
+        out.close();
+
+    }
+
+    private void print( Writer out, GeneSetResult res ) throws IOException {
+        res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
+                + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
+    }
+
+    private Writer getDesintation() throws IOException {
         Writer out;
         if ( destFile == null ) {
             log.debug( "Writing results to STDOUT" );
@@ -108,37 +141,7 @@ public class ResultsPrinter {
             log.info( "Writing results to " + destFile );
             out = new BufferedWriter( new FileWriter( destFile, true ) ); // APPENDING
         }
-        boolean first = true;
-        GeneSetResult res = null;
-        if ( sort ) {
-            // in order of best score.
-            for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
-                res = results.get( it.next() );
-                if ( first ) {
-                    first = false;
-                    res.printHeadings( out, "\tSame as" + "\tGeneMembers" );
-                }
-                // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-                res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
-                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
-            }
-        } else {
-            // output them in natural order. This is useful for testing.
-            List<GeneSetTerm> c = new ArrayList<GeneSetTerm>( results.keySet() );
-            Collections.sort( c );
-            for ( Iterator<GeneSetTerm> it = c.iterator(); it.hasNext(); ) {
-                res = results.get( it.next() );
-                if ( first ) {
-                    first = false;
-                    res.printHeadings( out, "\tSame as" + "\tGenesMembers" );
-                }
-                res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
-                        + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
-                // res.print(out, "\t" + probe_class.getRedundanciesString(res.get_class_id()));
-            }
-        }
-        out.close();
-
+        return out;
     }
 
     /**

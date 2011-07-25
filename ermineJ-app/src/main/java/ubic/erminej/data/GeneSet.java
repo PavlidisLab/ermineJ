@@ -19,6 +19,8 @@ import java.util.HashSet;
 
 import org.apache.commons.lang.StringUtils;
 
+import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
+
 /**
  * @author paul
  * @version $Id$
@@ -45,6 +47,8 @@ public class GeneSet {
     private String sourceFile;
 
     private Collection<Probe> probes = new HashSet<Probe>();
+
+    private GeneSetFileFormat format = GeneSetFileFormat.DEFAULT;
 
     public GeneSet() {
     }
@@ -154,6 +158,13 @@ public class GeneSet {
         return term;
     }
 
+    /**
+     * @return the file format that this group came in (only applies for User-defined groups)
+     */
+    public GeneSetFileFormat getFormat() {
+        return format;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -231,52 +242,6 @@ public class GeneSet {
                 + " genes)";
     }
 
-    // /**
-    // * Used while viewing/editing.
-    // *
-    // * @param editable
-    // * @return
-    // */
-    // public ProbeTableModel toTableModel( boolean editable ) {
-    // final boolean finalized = editable;
-    //
-    // final List<Probe> gpL = new ArrayList<Probe>( getProbes() );
-    //
-    // return new ProbeTableModel( gpL ) {
-    //
-    // private static final long serialVersionUID = -1L;
-    // private String[] columnNames = { "Probe", "Gene", "Description" };
-    //
-    // @Override
-    // public String getColumnName( int i ) {
-    // return columnNames[i];
-    // }
-    //
-    // @Override
-    // public int getRowCount() {
-    // int windowrows;
-    // if ( finalized ) {
-    // windowrows = 16;
-    // } else {
-    // windowrows = 13; // why? so it fits?
-    // }
-    // int extra = 1;
-    // if ( getProbes().size() < windowrows ) {
-    // extra = windowrows - getProbes().size();
-    // }
-    // return getProbes().size() + extra;
-    // }
-    //
-    // @Override
-    // public boolean isCellEditable( int r, int c ) {
-    // if ( !finalized && ( c == 0 || c == 1 ) ) {
-    // return true;
-    // }
-    // return false;
-    // }
-    // };
-    // }
-
     public void addGenes( Collection<Gene> gs ) {
         for ( Gene g : gs ) {
             this.addGene( g );
@@ -287,5 +252,10 @@ public class GeneSet {
         genes = new HashSet<Gene>();
         probes = new HashSet<Probe>();
         assert this.redundantGroups.isEmpty(); // for now...
+    }
+
+    public void setFormat( GeneSetFileFormat f ) {
+        this.format = f;
+
     }
 }

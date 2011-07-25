@@ -31,10 +31,10 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.RegressionTesting;
 
-import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
 import ubic.erminej.classScoreCMD;
+import ubic.erminej.analysis.GeneSetPvalRun;
 
 /**
  * Not complete! Non functional as it stands.
@@ -77,7 +77,7 @@ public class classScoreTester extends classScoreCMD {
 
                 try {
                     GeneSetPvalRun result = analyze();
-                    ResultsPrinter rp = new ResultsPrinter( saveFileName, result, goData, false );
+                    ResultsPrinter rp = new ResultsPrinter( saveFileName, result, false );
                     rp.printResults( false ); // don't sort.
                 } catch ( Exception e ) {
                     statusMessenger.showStatus( "Error During analysis: " + e );

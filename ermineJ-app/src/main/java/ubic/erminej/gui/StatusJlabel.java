@@ -32,12 +32,12 @@ import ubic.basecode.util.StatusDebugLogger;
  * @version $Id$
  */
 public class StatusJlabel extends StatusDebugLogger {
+
     protected JLabel jlabel;
 
-    Icon errorIcon = null;
+    private static Icon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
 
     public StatusJlabel( JLabel l ) {
-        errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
         this.jlabel = l;
     }
 
@@ -65,6 +65,10 @@ public class StatusJlabel extends StatusDebugLogger {
         }
     }
 
+    /**
+     * @param s
+     * @param callSuper
+     */
     public void setStatus( String s, boolean callSuper ) {
         final String m = s;
 

@@ -23,10 +23,12 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
 
-import ubic.erminej.GeneSetPvalRun;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
+import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.gui.util.GuiUtil;
+import ubic.erminej.gui.util.Wizard;
 
 /**
  * @author Homin Lee
@@ -34,21 +36,17 @@ import ubic.erminej.data.GeneSetTerms;
  * @version $Id$
  */
 public class SaveWizard extends Wizard {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -1308261612895233801L;
-    // logic
-    int step = 1;
-    int selected_run;
 
-    List<GeneSetPvalRun> rundata;
-    GeneSetTerms goData;
-    String saveFolder;
-    SaveWizardStep1 step1;
-    SaveWizardStep2 step2;
+    private static final long serialVersionUID = -1L;
 
-    public SaveWizard( GeneSetScoreFrame callingframe, List<GeneSetPvalRun> rundata, GeneSetTerms goData ) {
+    private int step = 1;
+
+    private List<GeneSetPvalRun> rundata;
+    private GeneSetTerms goData;
+    private SaveWizardStep1 step1;
+    private SaveWizardStep2 step2;
+
+    public SaveWizard( MainFrame callingframe, List<GeneSetPvalRun> rundata, GeneSetTerms goData ) {
         super( callingframe, 400, 200 );
         enableEvents( AWTEvent.WINDOW_EVENT_MASK );
         this.callingframe = callingframe;
@@ -61,10 +59,6 @@ public class SaveWizard extends Wizard {
         this.addStep( step2 );
         this.setTitle( "Save Analysis - Step 1 of 2" );
         finishButton.setEnabled( false );
-    }
-
-    void selectRun( int i ) {
-        selected_run = i;
     }
 
     @Override
@@ -120,7 +114,7 @@ public class SaveWizard extends Wizard {
             saveSettings.writeAnalysisSettings( saveFileName );
 
             /* then we pile on the results. */
-            ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, goData, step2.getShouldSaveGeneNames() );
+            ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, step2.getShouldSaveGeneNames() );
             rp.printResults( true );
         } catch ( IOException ioe ) {
             GuiUtil.error( "Could not write results to the file. " + ioe );

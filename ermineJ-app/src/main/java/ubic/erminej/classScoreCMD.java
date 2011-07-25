@@ -50,6 +50,7 @@ import ubic.erminej.Settings.GeneScoreMethod;
 import ubic.erminej.Settings.Method;
 import ubic.erminej.Settings.MultiProbeHandling;
 import ubic.erminej.Settings.MultiTestCorrMethod;
+import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -101,7 +102,7 @@ public class classScoreCMD {
             try {
                 GeneSetPvalRun result = analyze();
                 getSettings().writeAnalysisSettings( getSaveFileName() );
-                ResultsPrinter rp = new ResultsPrinter( getSaveFileName(), result, getGoData(), isSaveAllGenes() );
+                ResultsPrinter rp = new ResultsPrinter( getSaveFileName(), result, isSaveAllGenes() );
                 rp.printResults( true );
             } catch ( Exception e ) {
                 getStatusMessenger().showStatus( "Error During analysis:" + e );
@@ -749,7 +750,7 @@ public class classScoreCMD {
     }
 
     /**
-     * @see ubic.erminej.gui.GeneSetScoreFrame.readDataFilesForStartup
+     * @see ubic.erminej.gui.MainFrame.readDataFilesForStartup
      */
     protected void initialize() {
         try {

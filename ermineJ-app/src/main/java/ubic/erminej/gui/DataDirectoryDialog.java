@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import ubic.erminej.Settings;
+import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * @author pavlidis
@@ -55,7 +56,7 @@ public class DataDirectoryDialog extends AppDialog {
         jbInit();
     }
 
-    public DataDirectoryDialog( GeneSetScoreFrame callingframe ) {
+    public DataDirectoryDialog( MainFrame callingframe ) {
         super( callingframe, 400, 200 );
         this.settings = callingframe.getSettings();
         // chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );

@@ -26,9 +26,9 @@ import javax.swing.UIManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.erminej.gui.GeneSetScoreFrame;
-import ubic.erminej.gui.GuiUtil;
+import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.StartupDialog;
+import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * Main for GUI
@@ -51,17 +51,17 @@ public class classScoreGUI {
     boolean packFrame = false;
 
     public classScoreGUI( Settings settings ) {
-        GeneSetScoreFrame frame = new GeneSetScoreFrame( settings );
+        MainFrame frame = new MainFrame( settings );
         this.init( frame );
     }
 
     public classScoreGUI() throws IOException {
-        GeneSetScoreFrame frame = new GeneSetScoreFrame();
+        MainFrame frame = new MainFrame();
 
         init( frame );
     }
 
-    private void init( GeneSetScoreFrame frame ) {
+    private void init( MainFrame frame ) {
         // Validate frames that have preset sizes
         // Pack frames that have useful preferred size info, e.g. from their
         // layout

@@ -20,14 +20,14 @@ package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import ubic.erminej.GeneSetPvalRun;
+import ubic.erminej.analysis.GeneSetPvalRun;
+import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Pick the analysis results set to save.
@@ -36,11 +36,8 @@ import ubic.erminej.GeneSetPvalRun;
  * @version $Id$
  */
 public class SaveWizardStep1 extends WizardStep {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -8622689726831187005L;
-    private SaveWizard wiz = null;
+
+    private static final long serialVersionUID = -1L;
     private List<GeneSetPvalRun> rundata = null;
     private JPanel runPanel = null;
     private JComboBox runComboBox = null;
@@ -50,7 +47,6 @@ public class SaveWizardStep1 extends WizardStep {
 
     public SaveWizardStep1( SaveWizard wiz, List<GeneSetPvalRun> rundata ) {
         super( wiz );
-        this.wiz = wiz;
         this.rundata = rundata;
         this.jbInit();
         showChoices();
@@ -69,7 +65,6 @@ public class SaveWizardStep1 extends WizardStep {
         JPanel centerPanel = new JPanel();
         runComboBox = new JComboBox();
         runComboBox.setPreferredSize( new Dimension( 150, 15 ) );
-        runComboBox.addActionListener( new SaveWizardStep1_runComboBox_actionAdapter( this ) );
         centerPanel.add( runComboBox );
         runPanel.add( topPanel, BorderLayout.NORTH );
         runPanel.add( centerPanel, BorderLayout.CENTER );
@@ -104,23 +99,6 @@ public class SaveWizardStep1 extends WizardStep {
 
     public boolean runsExist() {
         return runs_exist;
-    }
 
-    void runComboBox_actionPerformed() {
-        wiz.selectRun( runComboBox.getSelectedIndex() );
-    }
-
-}
-
-// /
-class SaveWizardStep1_runComboBox_actionAdapter implements java.awt.event.ActionListener {
-    SaveWizardStep1 adaptee;
-
-    SaveWizardStep1_runComboBox_actionAdapter( SaveWizardStep1 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.runComboBox_actionPerformed();
     }
 }

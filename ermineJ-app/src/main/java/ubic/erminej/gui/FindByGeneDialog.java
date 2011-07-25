@@ -36,7 +36,7 @@ public class FindByGeneDialog extends FindDialog {
      * @param geneData
      * @param goData
      */
-    public FindByGeneDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData ) {
+    public FindByGeneDialog( MainFrame callingframe, GeneAnnotations geneData ) {
         super( callingframe, geneData );
         this.setTitle( "Find Gene Set using a gene or probe symbol" );
     }

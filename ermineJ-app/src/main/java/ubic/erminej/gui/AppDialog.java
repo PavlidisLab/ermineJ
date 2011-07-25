@@ -38,6 +38,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import ubic.basecode.util.BrowserLauncher;
+import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * @author Homin Lee

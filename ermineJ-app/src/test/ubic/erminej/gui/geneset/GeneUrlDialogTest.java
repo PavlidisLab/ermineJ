@@ -21,7 +21,7 @@ package ubic.erminej.gui.geneset;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import ubic.erminej.gui.geneset.GeneUrlDialog;
+import ubic.erminej.gui.geneset.details.GeneUrlDialog;
 
 /**
  * @author pavlidis

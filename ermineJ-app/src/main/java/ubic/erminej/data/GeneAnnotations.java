@@ -651,27 +651,6 @@ public class GeneAnnotations {
     }
 
     /**
-     * Redefine a class.
-     * 
-     * @param classId String class to be modified
-     * @param probesForNew Collection current user-defined list of members. The gene set is recreated to look like this
-     *        one.
-     */
-    public void modifyGeneSet( GeneSetTerm classId, Collection<Probe> probesForNew ) {
-        assert allowModification;
-        if ( !geneSets.containsKey( classId ) ) {
-            log.warn( "No such class to modify: " + classId );
-            return;
-        }
-
-        // // FIXME have the gene set save this internally?
-        // log.debug( "Saving backup version of " + classId + ", replacing with new version that has "
-        // + probesForNew.size() + " probes." );
-        // oldGeneSets.put( classId, geneSets.get( classId ) );
-        // addSet( classId, probesForNew );
-    }
-
-    /**
      * Compute how many genes have Gene set annotations.
      * 
      * @return
@@ -814,9 +793,10 @@ public class GeneAnnotations {
 
     /**
      * @return
-     * @deprecated
      */
     public TableModel toTableModel() {
+
+        // this is not actually used except for a test .. but it could be used.
         final List<Probe> pL = new ArrayList<Probe>( probes );
         return new AbstractTableModel() {
             private static final long serialVersionUID = 1L;

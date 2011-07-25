@@ -14,11 +14,14 @@
  */
 package ubic.erminej.data;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
 
+import ubic.basecode.util.StatusStderr;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneAnnotationParser.Format;
+import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
 
 import junit.framework.TestCase;
 
@@ -32,25 +35,30 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        if ( needInit ) {
-            InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
-            InputStream is = this.getClass().getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
 
-            GeneSetTerms gonames = new GeneSetTerms( is );
-            GeneAnnotationParser p = new GeneAnnotationParser( gonames );
-            GeneAnnotations g = p.read( ism, Format.DEFAULT );
+        InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
+        InputStream is = this.getClass().getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
 
-            Settings settings = new Settings();
+        GeneSetTerms gonames = new GeneSetTerms( is );
+        GeneAnnotationParser p = new GeneAnnotationParser( gonames );
+        GeneAnnotations g = p.read( ism, Format.DEFAULT );
 
-            UserDefinedGeneSetManager.init( g, settings );
-            needInit = false;
-        }
+        Settings settings = new Settings();
+
+        UserDefinedGeneSetManager.init( g, settings );
+
     }
 
     public final void testKegg() throws Exception {
-        Collection<GeneSet> keggsets = UserDefinedGeneSetManager.loadUserGeneSetFile( this.getClass()
-                .getResourceAsStream( "/data/genesets/kegg.txt" ) );
+
+        String filePath = new File( this.getClass().getResource( "/data/genesets/kegg.txt" ).toURI() )
+                .getAbsolutePath();
+        Collection<GeneSet> keggsets = UserDefinedGeneSetManager.loadUserGeneSetFile( filePath, new StatusStderr() );
         assertEquals( 186, keggsets.size() );
+        for ( GeneSet geneSet : keggsets ) {
+            assertEquals( filePath, geneSet.getSourceFile() );
+            assertEquals( GeneSetFileFormat.LINE_BASED, geneSet.getFormat() );
+        }
     }
 
     public final void testMulti() throws Exception {
@@ -58,6 +66,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
                 "/data/genesets/my.test-classes.txt" ) );
         assertEquals( 3, sets.size() );
         for ( GeneSet geneSet : sets ) {
+            assertEquals( GeneSetFileFormat.DEFAULT, geneSet.getFormat() );
             assertTrue( geneSet.getId().contains( "my" ) );
             assertTrue( geneSet.getName().contains( "test" ) );
             for ( Probe p : geneSet.getProbes() ) {
@@ -76,13 +85,5 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
         assertEquals( 7, s.getProbes().size() ); // six lines but we pull in another via the gene symbol.
         assertEquals( 6, s.getGenes().size() );
     }
-
-    // public final void testNoGO() throws Exception {
-    //
-    // }
-    //
-    // public final void testUpdateCustom() throws Exception {
-    //
-    // }
 
 }

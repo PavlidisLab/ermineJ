@@ -62,12 +62,12 @@ public class FindDialog extends JDialog {
     private JLabel jLabelStatus = new JLabel();
     private JPanel jPanelStatus = new JPanel();
     private JPanel BottomPanelWrap = new JPanel();
-    protected GeneSetScoreFrame callingframe;
+    protected MainFrame callingframe;
     protected GeneAnnotations geneData;
     protected StatusViewer statusMessenger;
     private JButton resetButton;
 
-    public FindDialog( GeneSetScoreFrame callingframe, GeneAnnotations geneData ) {
+    public FindDialog( MainFrame callingframe, GeneAnnotations geneData ) {
         setModal( false );
         this.callingframe = callingframe;
         this.geneData = geneData;
@@ -145,6 +145,8 @@ public class FindDialog extends JDialog {
      * @param selectedGeneSets
      */
     protected void filterViews( Collection<GeneSetTerm> selectedGeneSets ) {
+
+        // FIXME do this with an event.
         callingframe.getOPanel().filter( selectedGeneSets );
         callingframe.getTreePanel().filter( selectedGeneSets );
     }

@@ -38,6 +38,10 @@ public class ProbeTableModel extends AbstractTableModel {
         pl = new ArrayList<Probe>( geneData.getProbes() );
     }
 
+    public List<Probe> getProbes() {
+        return pl;
+    }
+
     public void setProbes( Collection<Probe> probesToUse ) {
         pl = new ArrayList<Probe>( probesToUse );
         this.fireTableDataChanged();

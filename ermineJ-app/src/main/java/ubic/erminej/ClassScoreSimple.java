@@ -21,6 +21,7 @@ package ubic.erminej;
 import java.util.Collection;
 import java.util.List;
 
+import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 
