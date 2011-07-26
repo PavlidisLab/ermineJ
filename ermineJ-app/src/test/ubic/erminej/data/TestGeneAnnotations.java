@@ -18,6 +18,7 @@
  */
 package ubic.erminej.data;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
 import javax.swing.table.TableModel;
+
+import org.xml.sax.SAXException;
 
 import ubic.basecode.util.StatusStderr;
 import ubic.erminej.data.Gene;
@@ -47,9 +50,25 @@ public class TestGeneAnnotations extends TestCase {
     List<String> probes;
     List<Gene> geneIds;
     List<Collection<GeneSetTerm>> goIds;
-    GeneSetTerms goNames;
+    static GeneSetTerms goNames;
 
     GeneAnnotations ga;
+
+    static {
+
+        try {
+            ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
+                    .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
+            z.getNextEntry();
+            goNames = new GeneSetTerms( z );
+            z.close();
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        } catch ( SAXException e ) {
+            e.printStackTrace();
+        }
+
+    }
 
     public void testAddGeneSet() throws Exception {
         List<Gene> newGeneSet = new ArrayList<Gene>();
@@ -98,6 +117,18 @@ public class TestGeneAnnotations extends TestCase {
         assertEquals( expectedValue, actualValue );
     }
 
+    public void testGetParents() throws Exception {
+        GeneSetTerm t = ga.findTerm( "GO:0042246" );
+        GeneSetTerm p = ga.findTerm( "GO:0048589" );
+
+        assertNotNull( t );
+        assertNotNull( p );
+
+        Collection<GeneSetTerm> pa = goNames.getAllParents( t );
+
+        assertTrue( pa.contains( p ) );
+    }
+
     public void testGoNames() throws Exception {
         // http://amigo.geneontology.org/cgi-bin/amigo/term_details?term=GO:0005739 - "mitochondrion"
         GeneSetTerm cellComp = goNames.get( "GO:0005739" );
@@ -123,7 +154,7 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testMeanGenesPerSet() throws Exception {
-        assertEquals( 5.12, GeneSetMapTools.meanGeneSetSize( ga, false ), 0.01 ); // not hand checked
+        assertEquals( 4.26, GeneSetMapTools.meanGeneSetSize( ga, false ), 0.01 ); // not hand checked
     }
 
     public void testMeanSetsPerGenes() throws Exception {
@@ -174,7 +205,7 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readAgilent( ia, null );
         int actualValue = g.findProbe( "A_52_P311491" ).getGeneSets().size();
-        assertEquals( 18, g.getRedundant().size() ); // not checked by hand.
+        assertEquals( 10, g.getRedundant().size() ); // not checked by hand.
         assertEquals( 12, actualValue ); // not checked by hand.
     }
 
@@ -208,9 +239,9 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testRemoveBySize() throws Exception {
-        assertEquals( 103, ga.getActiveGeneSets().size() ); // not checked by hand.
+        assertEquals( 185, ga.getActiveGeneSets().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
-        assertEquals( 72, ga.getActiveGeneSets().size() ); // not checked by hand
+        assertEquals( 144, ga.getActiveGeneSets().size() ); // not checked by hand
     }
 
     public void testSelectSetsByGene() throws Exception {
@@ -230,29 +261,12 @@ public class TestGeneAnnotations extends TestCase {
         assertEquals( 3, actualValue.getColumnCount() );
     }
 
-    public void testGetParents() throws Exception {
-        GeneSetTerm t = ga.findTerm( "GO:0042246" );
-        GeneSetTerm p = ga.findTerm( "GO:0048589" );
-
-        assertNotNull( t );
-        assertNotNull( p );
-
-        Collection<GeneSetTerm> pa = goNames.getAllParents( t );
-
-        assertTrue( pa.contains( p ) );
-    }
-
     /*
      * @see TestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
-        ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
-                .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
-        z.getNextEntry();
-        goNames = new GeneSetTerms( z );
 
         probes = new ArrayList<String>();
         probes.add( "a" );
