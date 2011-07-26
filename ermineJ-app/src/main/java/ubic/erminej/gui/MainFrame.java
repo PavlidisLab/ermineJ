@@ -19,9 +19,9 @@
 package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
@@ -60,6 +61,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
@@ -101,6 +103,12 @@ import ubic.erminej.gui.util.ScrollingTextAreaDialog;
  */
 public class MainFrame extends JFrame {
 
+    private static final String START_CARD = "START";
+
+    private static final String TABS_CARD = "TABS";
+
+    private static final String PROGRESS_CARD = "PROGRESS";
+
     public final static String RESOURCE_LOCATION = "/ubic/erminej/";
 
     private static Log log = LogFactory.getLog( MainFrame.class.getName() );
@@ -116,55 +124,41 @@ public class MainFrame extends JFrame {
     private static final String MAINWINDOWPOSITIONX = "mainview.WindowXPosition";
     private static final String MAINWINDOWPOSITIONY = "mainview.WindowYPosition";
 
-    private JMenuItem aboutMenuItem = new JMenuItem();
-    private JMenu analysisMenu = new JMenu();
-    private JMenu diagnosticsMenu = new JMenu();
-    private AnalysisThread athread;
-    private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
-    private JMenu classMenu = new JMenu();
-    private int currentResultSet = -1;
-    private JMenuItem defineClassMenuItem = new JMenuItem();
-    private final JFileChooser fc = new JFileChooser();
-    private JMenu fileMenu = new JMenu();
+    private GeneAnnotations geneData = null; // original.
+    private Map<String, GeneScores> geneScoreSets = new HashMap<String, GeneScores>();
 
-    private JMenuItem findClassMenuItem = new JMenuItem();
+    private Map<String, DoubleMatrix<Probe, String>> rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
+    private List<GeneSetPvalRun> results = new LinkedList<GeneSetPvalRun>();
+    private Settings settings;
+
+    private int currentResultSet = -1;
+    private AnalysisThread athread;
+
+    private StatusViewer statusMessenger;
+    private GeneSetTablePanel tablePanel;
+    private GeneSetTreePanel treePanel;
+
     private FindDialog findByGeneDialog = null;
     private FindDialog findByNameDialog = null;
-    private JMenuItem findGeneMenuItem = new JMenuItem();
-    private GeneAnnotations geneData = null; // original.
-    private Map<String, GeneScores> geneScoreSets;
-    private GeneSetTerms goData;
+
+    private JMenu analysisMenu = new JMenu();
+    private JMenu diagnosticsMenu = new JMenu();
+    private JMenu classMenu = new JMenu();
+    private final JFileChooser fc = new JFileChooser();
+    private JMenu fileMenu = new JMenu();
     private JMenu helpMenu = new JMenu();
-    private JMenuItem helpMenuItem = new JMenuItem();
-    private HelpHelper hh;
-    private JLabel jLabelStatus = new JLabel();
-    private JMenuBar jMenuBar1 = new JMenuBar();
-    private JPanel jPanelStatus = new JPanel();
-    private JMenuItem loadAnalysisMenuItem = new JMenuItem();
-    private JPanel loadingPanel = new JPanel();
-    private JMenuItem logMenuItem = new JMenuItem();
-    private JMenuItem geneAnnotsWebLinkMenuItem = new JMenuItem();
-    private JLabel logoLabel;
-    private JPanel mainPanel = ( JPanel ) this.getContentPane();
-    private JMenuItem modClassMenuItem = new JMenuItem();
-    private GeneSetTablePanel tablePanel;
-    private JPanel progInPanel = new JPanel();
-    private JPanel progressPanel;
-    private JMenuItem quitMenuItem = new JMenuItem();
-    private Map<String, DoubleMatrix<Probe, String>> rawDataSets;
-    private List<GeneSetPvalRun> results = new LinkedList<GeneSetPvalRun>();
-    private JMenuItem runAnalysisMenuItem = new JMenuItem();
+
     private JMenu runViewMenu = new JMenu();
-    private JMenuItem saveAnalysisMenuItem = new JMenuItem();
-    private Settings settings;
-    private JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined gene sets", false );
-    private StatusViewer statusMessenger;
+
     private JTabbedPane tabs = new JTabbedPane();
-    private GeneSetTreePanel treePanel;
-    JProgressBar progressBar = new JProgressBar();
-    // private JMenuItem reloadGeneSetsMenuItem = new JMenuItem();
-    private JMenuItem switchDataFileMenuItem = new JMenuItem();
-    private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
+    private JProgressBar progressBar = new JProgressBar();
+
+    private JMenuItem defineClassMenuItem = new JMenuItem();
+    private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
+    private JMenuItem loadAnalysisMenuItem = new JMenuItem();
+    private JMenuItem modClassMenuItem = new JMenuItem();
+    private JMenuItem runAnalysisMenuItem = new JMenuItem();
+    private JMenuItem saveAnalysisMenuItem = new JMenuItem();
 
     /**
      * @throws IOException
@@ -172,39 +166,17 @@ public class MainFrame extends JFrame {
     public MainFrame() throws IOException {
         settings = new Settings();
         jbInit();
-        hh = new HelpHelper();
-        hh.initHelp( helpMenuItem );
+
     }
 
     public MainFrame( Settings settings ) {
         this.settings = settings;
         jbInit();
-        hh = new HelpHelper();
-        hh.initHelp( helpMenuItem );
     }
 
     public void addedNewGeneSet( GeneSet newGeneSet ) {
         tablePanel.addedGeneSet( newGeneSet.getTerm() );
         treePanel.addedGeneSet( newGeneSet.getTerm() );
-    }
-
-    public void addResult( GeneSetPvalRun result ) {
-        if ( result == null || result.getResults().size() == 0 ) return;
-        result.setName( "Run " + ( results.size() + 1 ) );
-        results.add( result );
-        this.updateRunViewMenu();
-        tablePanel.addRun();
-        treePanel.addRun();
-        athread = null;
-    }
-
-    public void disableMenusForAnalysis() {
-        defineClassMenuItem.setEnabled( false );
-        modClassMenuItem.setEnabled( false );
-        runAnalysisMenuItem.setEnabled( false );
-        loadAnalysisMenuItem.setEnabled( false );
-        saveAnalysisMenuItem.setEnabled( false );
-        cancelAnalysisMenuItem.setEnabled( true );
     }
 
     public void disableMenusForLoad() {
@@ -214,22 +186,12 @@ public class MainFrame extends JFrame {
         helpMenu.setEnabled( false );
     }
 
-    public void enableMenusForAnalysis() {
-        defineClassMenuItem.setEnabled( true );
-        modClassMenuItem.setEnabled( true );
-        runAnalysisMenuItem.setEnabled( true );
-        loadAnalysisMenuItem.setEnabled( true );
-        maybeEnableSomeMenus();
-        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
-        cancelAnalysisMenuItem.setEnabled( false );
-    }
-
     /**
      * @param selectedTerms
      */
     public void filter( Collection<GeneSetTerm> selectedTerms ) {
         this.tablePanel.filter( selectedTerms );
-   //     this.treePanel.filter( selectedTerms );
+        // this.treePanel.filter( selectedTerms );
     }
 
     /**
@@ -286,47 +248,6 @@ public class MainFrame extends JFrame {
         return this.treePanel;
     }
 
-    /**
-     * Called by the startupDialog.
-     */
-    public void initialize() {
-        try {
-            /*
-             * mainpanel remove startup dialog.
-             */
-
-            mainPanel.add( progressPanel, BorderLayout.CENTER );
-            mainPanel.validate();
-
-            rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
-            geneScoreSets = new HashMap<String, GeneScores>();
-
-            readDataFilesForStartup();
-
-            statusMessenger.showStatus( "Done with setup" );
-
-            enableMenusOnStart();
-
-            mainPanel.remove( progressPanel );
-            mainPanel.add( tabs, BorderLayout.CENTER );
-            statusMessenger.showStatus( "Ready." );
-
-        } catch ( IllegalArgumentException e ) {
-            GuiUtil.error( "Error during initialization: " + e
-                    + "\nTry again.\nIf this problem persists, please contact the software developer. " );
-            log.error( e, e );
-        }
-
-        assert geneData != null;
-        UserDefinedGeneSetManager.init( geneData, settings );
-        UserDefinedGeneSetManager.loadUserGeneSets( statusMessenger );
-
-        treePanel.initialize( goData, geneData );
-        tablePanel.initialize( geneData );
-
-        statusMessenger.showStatus( "Done with initialization." );
-    }
-
     public void loadAnalysis( String loadFile ) {
         disableMenusForAnalysis();
         Settings loadSettings;
@@ -349,75 +270,6 @@ public class MainFrame extends JFrame {
         addResult( athread.getLatestResults() );
         log.debug( "done" );
         enableMenusForAnalysis();
-    }
-
-    /**
-     * Input the GO and annotation files.
-     */
-    public void readDataFilesForStartup() {
-
-        updateProgress( 10 );
-        statusMessenger.showStatus( "Reading GO tree from: " + settings.getClassFile() );
-        assert settings.getClassFile() != null;
-        try {
-            goData = new GeneSetTerms( settings.getClassFile() );
-
-        } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid GO XML file." );
-            log.error( e, e );
-            return;
-        } catch ( IOException e ) {
-            GuiUtil.error( "Error during GO initialization: " + e.getMessage() );
-            log.error( e, e );
-            return;
-        }
-
-        updateProgress( 30 );
-        if ( Thread.currentThread().isInterrupted() ) return;
-
-        statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-
-        try {
-            GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
-
-            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat() );
-
-        } catch ( IOException e ) {
-            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
-                    + "\nCheck the file format." );
-            log.error( e, e );
-            return;
-
-        } catch ( Exception e ) {
-            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
-                    + "\nCheck the file format." );
-            log.error( e, e );
-            return;
-        }
-
-        updateProgress( 60 );
-        if ( Thread.currentThread().isInterrupted() ) return;
-
-        statusMessenger.showStatus( "Reading user-defined gene sets from directory "
-                + settings.getUserGeneSetDirectory() );
-
-        // end slow(ish) part.
-
-        if ( geneData == null || geneData.getActiveGeneSets() == null ) {
-            throw new IllegalArgumentException( "The gene annotation file was not valid. "
-                    + "Check that you have selected the correct format.\n" );
-        }
-
-        if ( geneData.getActiveGeneSets().size() == 0 ) {
-            throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
-                    + "Check that the file format is correct.\n" );
-        }
-
-        if ( geneData.getGenes().size() == 0 ) {
-            throw new IllegalArgumentException( "The gene annotation file contains no probes. "
-                    + "Check that the file format is correct.\n" );
-        }
     }
 
     /**
@@ -452,13 +304,6 @@ public class MainFrame extends JFrame {
         statusMessenger.showError( message, e );
     }
 
-    /**
-     * @param a String
-     */
-    public void showStatus( String a ) {
-        jLabelStatus.setText( a );
-    }
-
     public void startAnalysis( Settings runSettings ) {
         disableMenusForAnalysis();
         this.athread = new AnalysisThread( runSettings, statusMessenger, geneData, rawDataSets, geneScoreSets );
@@ -477,28 +322,6 @@ public class MainFrame extends JFrame {
         if ( latestResult != null ) addResult( latestResult );
 
         enableMenusForAnalysis();
-    }
-
-    public void updateProgress( int val ) {
-        final int value = val;
-
-        if ( SwingUtilities.isEventDispatchThread() ) {
-            progressBar.setValue( value );
-        } else {
-
-            try {
-                SwingUtilities.invokeAndWait( new Runnable() {
-                    public void run() {
-                        progressBar.setValue( value );
-                    }
-                } );
-            } catch ( InterruptedException e ) {
-                e.printStackTrace();
-            } catch ( InvocationTargetException e ) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     /**
@@ -522,6 +345,16 @@ public class MainFrame extends JFrame {
                     new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "checkBox.gif" ) ) );
         }
         runViewMenu.revalidate();
+    }
+
+    private void addResult( GeneSetPvalRun result ) {
+        if ( result == null || result.getResults().size() == 0 ) return;
+        result.setName( "Run " + ( results.size() + 1 ) );
+        results.add( result );
+        this.updateRunViewMenu();
+        tablePanel.addRun();
+        treePanel.addRun();
+        athread = null;
     }
 
     /**
@@ -601,6 +434,15 @@ public class MainFrame extends JFrame {
         return true;
     }
 
+    private void disableMenusForAnalysis() {
+        defineClassMenuItem.setEnabled( false );
+        modClassMenuItem.setEnabled( false );
+        runAnalysisMenuItem.setEnabled( false );
+        loadAnalysisMenuItem.setEnabled( false );
+        saveAnalysisMenuItem.setEnabled( false );
+        cancelAnalysisMenuItem.setEnabled( true );
+    }
+
     private void enableMenusOnStart() {
         fileMenu.setEnabled( true );
         classMenu.setEnabled( true );
@@ -610,71 +452,40 @@ public class MainFrame extends JFrame {
         helpMenu.setEnabled( true );
     }
 
+    private void initialize( final JPanel cards ) {
+        ( ( CardLayout ) cards.getLayout() ).show( cards, PROGRESS_CARD );
+
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                try {
+                    readDataFilesForStartup();
+                    treePanel.initialize( geneData );
+                    tablePanel.initialize( geneData );
+                    ( ( CardLayout ) cards.getLayout() ).show( cards, TABS_CARD );
+                    statusMessenger.showStatus( "Ready." );
+                    enableMenusOnStart();
+                    statusMessenger.showStatus( "Done with initialization." );
+                } catch ( Exception e ) {
+                    GuiUtil.error( "Error during initialization: " + e.getMessage() );
+                    log.error( e, e );
+                }
+                return null;
+            }
+
+        };
+
+        r.execute();
+
+    }
+
     /**
-     * Called by the constructor .
+     *  
      */
     private void jbInit() {
-        this.setDefaultCloseOperation( EXIT_ON_CLOSE );
-        this.setJMenuBar( jMenuBar1 );
-        this.setSize( new Dimension( 886, 450 ) );
 
-        this.readPrefs();
-
-        this.setTitle( "ErmineJ" );
-        this.setIconImage( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "logoIcon64.gif" ) )
-                .getImage() );
-        mainPanel.setLayout( new BorderLayout() );
-        mainPanel.setPreferredSize( new Dimension( 1000, 600 ) );
-        mainPanel.setInputVerifier( null );
-        progInPanel.setBackground( Color.white );
-        progInPanel.setPreferredSize( new Dimension( 800, 26 ) );
-        loadingPanel.setBackground( Color.white );
-        loadingPanel.setForeground( Color.black );
-        loadingPanel.setPreferredSize( new Dimension( 800, 200 ) );
-
-        setupMenus();
-
-        // initialization panel (replaced by main panel when done)
-        logoLabel = new JLabel();
-        logoLabel.setIcon( new ImageIcon( MainFrame.class.getResource( RESOURCE_LOCATION + "logo1small.gif" ) ) );
-
-        progressPanel = new JPanel();
-        progressPanel.setLayout( new FlowLayout() );
-
-        JLabel label = new JLabel( "Please wait while the files are loaded in." );
-        label.setPreferredSize( new Dimension( 500, 30 ) );
-        label.setHorizontalTextPosition( SwingConstants.CENTER );
-        label.setLabelFor( progressBar );
-        label.setAlignmentX( ( float ) 0.0 );
-        label.setHorizontalAlignment( SwingConstants.CENTER );
-
-        progressBar.setPreferredSize( new Dimension( 300, 16 ) );
-        progressBar.setIndeterminate( true );
-        progressPanel.setBackground( Color.white );
-
-        progressPanel.add( logoLabel );
-        progressPanel.add( loadingPanel, null );
-        loadingPanel.add( label, null );
-        loadingPanel.add( progInPanel, null );
-        progInPanel.add( progressBar, null );
-
-        // main panel
-        tablePanel = new GeneSetTablePanel( this, results, settings );
-        tablePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-        treePanel = new GeneSetTreePanel( this, results, settings );
-        treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-
-        tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-        tabs.addMouseListener( new MouseAdapter() {
-            @Override
-            public void mouseReleased( MouseEvent e ) {
-                maybeEnableSomeMenus();
-                // ( ( GeneSetPanel ) ( ( JTabbedPane ) e.getSource() ).getComponent( 0 ) ).filter();
-            }
-        } );
-        tabs.addTab( "Table", tablePanel );
-        tabs.addTab( "Tree", treePanel );
-
+        // contained within this.contentPane().
         this.addWindowListener( new WindowAdapter() {
             @Override
             public void windowClosing( WindowEvent e ) {
@@ -682,31 +493,132 @@ public class MainFrame extends JFrame {
             }
         } );
 
-        // controls
+        this.setDefaultCloseOperation( EXIT_ON_CLOSE );
 
-        // status bar
-        // File logFile = settings.getLogFile();
-        jPanelStatus.setLayout( new BorderLayout() );
-        jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
-        jPanelStatus.setPreferredSize( new Dimension( STARTING_OVERALL_WIDTH, 33 ) );
-        jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
-        jLabelStatus.setBorder( BorderFactory.createEmptyBorder( 5, 5, 10, 10 ) );
-        jLabelStatus.setPreferredSize( new Dimension( 800, 19 ) );
-        jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
+        this.setSize( new Dimension( 886, 450 ) );
 
-        jPanelStatus.add( jLabelStatus, BorderLayout.WEST );
-        showStatus( "This window is not usable until you confirm the startup settings in the dialog box." );
-        // StatusViewer s = new StatusJlabel( jLabelStatus );
-        // this.statusMessenger = new StatusFileLogger( logFile.getAbsolutePath(), s );
-        this.statusMessenger = new StatusJlabel( jLabelStatus );
-        mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
-        tablePanel.setMessenger( this.statusMessenger );
-        treePanel.setMessenger( this.statusMessenger );
+        this.readPrefs();
+
+        this.setTitle( "ErmineJ" );
+        this.setIconImage( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "logoIcon64.gif" ) )
+                .getImage() );
+        this.getContentPane().setLayout( new BorderLayout() );
+        this.getContentPane().setPreferredSize( new Dimension( 1000, 600 ) );
+        // this.getContentPane().setInputVerifier( null );
+
+        setupMenus();
+
+        disableMenusForLoad();
+
+        final JPanel cards = new JPanel( new CardLayout() );
+        this.getContentPane().add( cards, BorderLayout.CENTER );
+
+        final StartupPanel startupPanel = new StartupPanel( settings );
+        cards.add( startupPanel, START_CARD );
+
+        JPanel progressPanel = setupProgressPanel();
+        cards.add( progressPanel, PROGRESS_CARD );
+
+        setupMainPanels();
+        cards.add( tabs, TABS_CARD );
+
+        setupStatusBar();// have to do afeter the main panels are setup.
+
+        final ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                initialize( cards );
+            }
+        };
+
+        startupPanel.addActionListener( actionListener );
+
+        ( ( CardLayout ) cards.getLayout() ).show( cards, START_CARD );
+
+        setIconImage( new ImageIcon( this.getClass().getResource( "/ubic/erminej/logoIcon64.gif" ) ).getImage() );
+
+        this.statusMessenger.showStatus( "Waiting for input" );
     }
 
+    /**
+     * 
+     */
     private void multifunctionalityDiagnostics() {
         MultiFuncDiagWindow mf = new MultiFuncDiagWindow( this );
         mf.setVisible( true );
+    }
+
+    /**
+     * Input the GO and annotation files.
+     */
+    private void readDataFilesForStartup() {
+
+        updateProgress( 10 );
+
+        statusMessenger.showStatus( "Reading GO tree from: " + settings.getClassFile() );
+        assert settings.getClassFile() != null;
+        GeneSetTerms goData = null;
+        try {
+            goData = new GeneSetTerms( settings.getClassFile() );
+        } catch ( SAXException e ) {
+            GuiUtil.error( "Gene Ontology file format is incorrect. "
+                    + "\nPlease check that it is a valid GO XML file." );
+            log.error( e, e );
+            return;
+        } catch ( IOException e ) {
+            GuiUtil.error( "Error during GO initialization: " + e.getMessage() );
+            log.error( e, e );
+            return;
+        }
+
+        updateProgress( 30 );
+
+        statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
+
+        try {
+            GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
+
+            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat() );
+
+        } catch ( IOException e ) {
+            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
+                    + "\nCheck the file format." );
+            log.error( e, e );
+            return;
+
+        } catch ( Exception e ) {
+            GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
+                    + "\nCheck the file format." );
+            log.error( e, e );
+            return;
+        }
+
+        updateProgress( 60 );
+
+        statusMessenger.showStatus( "Reading user-defined gene sets from directory "
+                + settings.getUserGeneSetDirectory() );
+
+        // end slow(ish) part.
+
+        if ( geneData == null || geneData.getActiveGeneSets() == null ) {
+            throw new IllegalArgumentException( "The gene annotation file was not valid. "
+                    + "Check that you have selected the correct format.\n" );
+        }
+
+        if ( geneData.getActiveGeneSets().size() == 0 ) {
+            throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
+                    + "Check that the file format is correct.\n" );
+        }
+
+        if ( geneData.getGenes().size() == 0 ) {
+            throw new IllegalArgumentException( "The gene annotation file contains no probes. "
+                    + "Check that the file format is correct.\n" );
+        }
+
+        assert geneData != null;
+        UserDefinedGeneSetManager.init( geneData, settings );
+        UserDefinedGeneSetManager.loadUserGeneSets( statusMessenger );
+        updateProgress( 90 );
     }
 
     /**
@@ -745,9 +657,39 @@ public class MainFrame extends JFrame {
     }
 
     /**
+     * Tabs that have our table and tree.
+     */
+    private void setupMainPanels() {
+        tablePanel = new GeneSetTablePanel( this, results, settings );
+        tablePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
+        treePanel = new GeneSetTreePanel( this, results, settings );
+        treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
+
+        tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
+        tabs.addMouseListener( new MouseAdapter() {
+            @Override
+            public void mouseReleased( MouseEvent e ) {
+                maybeEnableSomeMenus();
+            }
+        } );
+        tabs.addTab( "Table", tablePanel );
+        tabs.addTab( "Tree", treePanel );
+    }
+
+    /**
      * 
      */
     private void setupMenus() {
+        JMenuBar jMenuBar1 = new JMenuBar();
+        this.setJMenuBar( jMenuBar1 );
+        final JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined gene sets", false );
+        JMenuItem quitMenuItem = new JMenuItem();
+        JMenuItem logMenuItem = new JMenuItem();
+        JMenuItem geneAnnotsWebLinkMenuItem = new JMenuItem();
+
+        JMenuItem findClassMenuItem = new JMenuItem();
+        JMenuItem findGeneMenuItem = new JMenuItem();
+        JMenuItem aboutMenuItem = new JMenuItem();
 
         fileMenu.setText( "File" );
         fileMenu.setMnemonic( 'F' );
@@ -821,6 +763,9 @@ public class MainFrame extends JFrame {
         saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_MASK ) );
         saveAnalysisMenuItem.setEnabled( false ); // no runs to begin with.
 
+        JMenuItem switchDataFileMenuItem = new JMenuItem();
+        JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
+
         switchDataFileMenuItem.setActionCommand( "Set raw data file" );
         switchDataFileMenuItem.setText( "Set raw data file..." );
         switchDataFileMenuItem.addActionListener( new ActionListener() {
@@ -843,11 +788,6 @@ public class MainFrame extends JFrame {
         analysisMenu.add( saveAnalysisMenuItem );
         analysisMenu.add( switchDataFileMenuItem );
         analysisMenu.add( switchGeneScoreFileMenuItem );
-
-        helpMenu.setText( "Help" );
-        helpMenu.setMnemonic( 'H' );
-        helpMenuItem.setText( "Help Topics" );
-        helpMenuItem.setMnemonic( 'T' );
 
         logMenuItem.setMnemonic( 'L' );
         logMenuItem.setText( "View log" );
@@ -873,8 +813,19 @@ public class MainFrame extends JFrame {
         aboutMenuItem.setText( "About ErmineJ" );
         aboutMenuItem.setMnemonic( 'A' );
         aboutMenuItem.addActionListener( new GeneSetScoreFrame_aboutMenuItem_actionAdapter( this ) );
+
+        JMenuItem helpMenuItem = new JMenuItem();
+
+        helpMenu.setText( "Help" );
+        helpMenu.setMnemonic( 'H' );
+        helpMenuItem.setText( "Help Topics" );
+        helpMenuItem.setMnemonic( 'T' );
+
+        HelpHelper hh = new HelpHelper();
+        hh.initHelp( helpMenuItem );
+
         helpMenu.add( helpMenuItem );
-        helpMenu.add( this.geneAnnotsWebLinkMenuItem );
+        helpMenu.add( geneAnnotsWebLinkMenuItem );
         helpMenu.add( aboutMenuItem );
         helpMenu.add( logMenuItem );
 
@@ -897,6 +848,80 @@ public class MainFrame extends JFrame {
         jMenuBar1.add( diagnosticsMenu );
         jMenuBar1.add( runViewMenu );
         jMenuBar1.add( helpMenu );
+
+    }
+
+    /**
+     * The panel that show up while the initial inputs are loaded.
+     * 
+     * @return
+     */
+    private JPanel setupProgressPanel() {
+        JLabel logoLabel = new JLabel();
+        logoLabel.setIcon( new ImageIcon( MainFrame.class.getResource( RESOURCE_LOCATION + "logo1small.gif" ) ) );
+
+        JPanel progressPanel = new JPanel( new BorderLayout() );
+        progressPanel.setBackground( Color.white );
+        progressPanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
+
+        JLabel label = new JLabel( "Please wait while the files are loaded in." );
+        label.setPreferredSize( new Dimension( 500, 30 ) );
+        label.setHorizontalTextPosition( SwingConstants.CENTER );
+        label.setLabelFor( progressBar );
+        label.setHorizontalAlignment( SwingConstants.CENTER );
+
+        JPanel progressBarContainer = new JPanel();
+        progressBarContainer.setLayout( new BoxLayout( progressBarContainer, BoxLayout.PAGE_AXIS ) );
+        progressBarContainer.setPreferredSize( new Dimension( 300, 36 ) );
+
+        progressBarContainer.add( label );
+        progressBarContainer.add( progressBar );
+        progressBar.setIndeterminate( true );
+
+        progressPanel.add( logoLabel, BorderLayout.NORTH );
+        progressPanel.add( progressBarContainer, BorderLayout.CENTER );
+
+        return progressPanel;
+    }
+
+    private void setupStatusBar() {
+        JLabel jLabelStatus = new JLabel();
+        JPanel jPanelStatus = new JPanel();
+
+        jPanelStatus.setLayout( new BorderLayout() );
+        jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
+        jPanelStatus.setPreferredSize( new Dimension( STARTING_OVERALL_WIDTH, 33 ) );
+        jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
+        jLabelStatus.setBorder( BorderFactory.createEmptyBorder( 5, 5, 10, 10 ) );
+        jLabelStatus.setPreferredSize( new Dimension( 800, 19 ) );
+        jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
+        jPanelStatus.add( jLabelStatus, BorderLayout.WEST );
+        this.statusMessenger = new StatusJlabel( jLabelStatus );
+        this.getContentPane().add( jPanelStatus, BorderLayout.SOUTH );
+
+        tablePanel.setMessenger( this.statusMessenger );
+        treePanel.setMessenger( this.statusMessenger );
+    }
+
+    private void updateProgress( int val ) {
+        final int value = val;
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            progressBar.setValue( value );
+        } else {
+
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    public void run() {
+                        progressBar.setValue( value );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -1035,8 +1060,18 @@ public class MainFrame extends JFrame {
 
         athread.stopRunning( true );
         enableMenusForAnalysis();
-        showStatus( "Ready" );
+        this.statusMessenger.showStatus( "Ready" );
 
+    }
+
+    void enableMenusForAnalysis() {
+        defineClassMenuItem.setEnabled( true );
+        modClassMenuItem.setEnabled( true );
+        runAnalysisMenuItem.setEnabled( true );
+        loadAnalysisMenuItem.setEnabled( true );
+        maybeEnableSomeMenus();
+        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
+        cancelAnalysisMenuItem.setEnabled( false );
     }
 
     void findClassMenuItem_actionPerformed() {
@@ -1077,7 +1112,7 @@ public class MainFrame extends JFrame {
             statusMessenger.showError( "There are no runs to save" );
             return;
         }
-        SaveWizard swiz = new SaveWizard( this, results, goData );
+        SaveWizard swiz = new SaveWizard( this, results );
         swiz.showWizard();
     }
 

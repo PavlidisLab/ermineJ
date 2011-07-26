@@ -108,7 +108,7 @@ public class GeneSetWizard extends Wizard {
      * @param goData
      * @param geneSetId
      */
-    public GeneSetWizard( MainFrame callingframe, GeneAnnotations geneData, GeneSetTerms goData, GeneSetTerm geneSetId ) {
+    public GeneSetWizard( MainFrame callingframe, GeneAnnotations geneData, GeneSetTerm geneSetId ) {
         super( callingframe, 550, 350 );
         this.callingframe = callingframe;
         this.settings = callingframe.getSettings();

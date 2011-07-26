@@ -37,11 +37,11 @@ public class DataFileFilter extends FileFilter {
 
         return true;
 
-    } // end accept
+    }
 
     @Override
     public String getDescription() {
 
-        return "TXT data files";
+        return "Plain or compressed text files";
     }
 }

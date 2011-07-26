@@ -43,7 +43,7 @@ import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.geneset.GeneSetPanel;
-import ubic.erminej.gui.geneset.tree.GeneSetTreePanel;
+import ubic.erminej.gui.geneset.details.GeneSetDetailsTableModel;
 import ubic.erminej.gui.util.Colors;
 import corejava.Format;
 
@@ -196,7 +196,6 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        if ( gsl == null ) return this.geneData.numGeneSets();
         return gsl.size();
     }
 
@@ -319,7 +318,11 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         } else if ( column == 4 && ( Double ) value < 0 ) {
             setText( "" );
         } else if ( value instanceof Double ) {
-            setText( String.format( "%.2f", ( Double ) value ) );
+            if ( ( ( Double ) value ).isNaN() ) {
+                setText( "" );
+            } else {
+                setText( String.format( "%.2f", ( Double ) value ) );
+            }
         } else {
             setText( value.toString() ); // integers, whatever.
         }

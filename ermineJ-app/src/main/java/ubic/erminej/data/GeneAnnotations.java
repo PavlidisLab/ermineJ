@@ -36,6 +36,7 @@ import javax.swing.table.TableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.basecode.dataStructure.graph.DirectedGraph;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 
@@ -1125,6 +1126,13 @@ public class GeneAnnotations {
         redundancyCheck( start );
 
         this.multifunctionality = new Multifunctionality( this );
+    }
+
+    /**
+     * @return
+     */
+    public DirectedGraph<String, GeneSetTerm> getGeneSetGraph() {
+        return this.geneSetTerms.getGraph();
     }
 
 }

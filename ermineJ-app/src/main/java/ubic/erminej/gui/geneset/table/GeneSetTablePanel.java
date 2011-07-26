@@ -214,7 +214,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
         // sorter.setSortKeys( sortKeys );
         this.model.filter();
         table.revalidate();
-        this.messenger.clear();
+        this.messenger.showStatus( table.getRowCount() + " sets shown" );
+        classColToolTip = table.getRowCount() + " sets shown";
     }
 
     /*
@@ -286,7 +287,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.setDefaultRenderer( GeneSetResult.class, new GeneSetTableCellRenderer( this.geneData ) );
 
         assert geneData != null;
-        classColToolTip = new String( "Total classes shown: " + table.getRowCount() );
+        classColToolTip = "Total classes shown: " + table.getRowCount();
         table.revalidate();
     }
 
@@ -459,30 +460,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     }
 
-    // /**
-    // * @param b
-    // */
     public void filterByUserGeneSets( boolean b ) {
         this.model.setFilterNonUsers( b );
         filter( false );
-        // if ( b ) {
-        // RowFilter<GeneSetTableModel, Object> rf = new RowFilter<GeneSetTableModel, Object>() {
-        //
-        // @Override
-        // public boolean include( RowFilter.Entry<? extends GeneSetTableModel, ? extends Object> entry ) {
-        //
-        // GeneSetTerm term = ( GeneSetTerm ) entry.getValue( 0 );
-        // return term.isUserDefined();
-        // }
-        // };
-        // this.sorter.setRowFilter( rf );
-        //
-        // } else {
-        // this.sorter.setRowFilter( null );
-        // }
-        // filter( false ); // reapply, since the above messes it up.
-        // resortByCurrentResults();
-        // this.model.fireTableDataChanged();
     }
 
     /**
@@ -519,7 +499,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         if ( propagate ) this.callingFrame.getTreePanel().filter( false );
 
-        // resortByCurrentResults();
     }
 
     /**

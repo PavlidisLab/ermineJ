@@ -37,7 +37,6 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
 
 /**
@@ -60,8 +59,8 @@ public class GeneSetDetails {
      * @param settings
      * @param classID
      */
-    public GeneSetDetails( StatusViewer callerStatusViewer, GeneSetTerms goData, GeneAnnotations geneData,
-            Settings settings, GeneSetTerm classID ) {
+    public GeneSetDetails( StatusViewer callerStatusViewer, GeneAnnotations geneData, Settings settings,
+            GeneSetTerm classID ) {
         this.callerStatusViewer = callerStatusViewer;
         this.classID = classID;
 

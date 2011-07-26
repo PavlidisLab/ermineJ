@@ -453,7 +453,7 @@ public class GeneSetDetailsFrame extends JFrame {
         col = table.getColumnModel().getColumn( matrixColumnCount + 0 );
         col.setPreferredWidth( PREFERRED_WIDTH_PROBEID_COLUMN );
 
-        // p value
+        // probe score (p-value etc)
         col = table.getColumnModel().getColumn( matrixColumnCount + 1 );
         col.setPreferredWidth( PREFERRED_WIDTH_PVALUE_COLUMN );
         col.setCellRenderer( new DefaultTableCellRenderer() {
@@ -461,13 +461,18 @@ public class GeneSetDetailsFrame extends JFrame {
             public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column ) {
                 super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
-                setText( String.format( "%.3g", ( Double ) value ) );
+
+                if ( ( ( Double ) value ).isNaN() ) {
+                    setText( "" );
+                } else {
+                    setText( String.format( "%.3g", ( Double ) value ) );
+                }
                 return this;
             }
         } );
 
         // p value bar
-        col = table.getColumnModel().getColumn( matrixColumnCount + 2 ); // P Value Bars.
+        col = table.getColumnModel().getColumn( matrixColumnCount + 2 );
         col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
         col.setCellRenderer( new JBarGraphCellRenderer() );
 
@@ -647,8 +652,9 @@ public class GeneSetDetailsFrame extends JFrame {
         this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
         this.setTitle( "Gene set details" );
 
-        this.setIconImage( new ImageIcon( this.getClass().getResource(
-                MainFrame.RESOURCE_LOCATION + "logoIcon64.gif" ) ).getImage() );
+        this
+                .setIconImage( new ImageIcon( this.getClass().getResource(
+                        MainFrame.RESOURCE_LOCATION + "logoIcon64.gif" ) ).getImage() );
     }
 
     /**

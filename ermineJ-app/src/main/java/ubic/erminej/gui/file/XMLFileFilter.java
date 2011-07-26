@@ -39,11 +39,10 @@ public class XMLFileFilter extends FileFilter {
 
         return FileTools.hasXMLExtension( f.getName() );
 
-    } // end accept
+    }
 
     @Override
     public String getDescription() {
-
         return "XML data files";
     }
 }

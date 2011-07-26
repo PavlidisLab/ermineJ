@@ -14,9 +14,7 @@
  */
 package ubic.erminej.gui.geneset.tree;
 
-import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashSet;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;

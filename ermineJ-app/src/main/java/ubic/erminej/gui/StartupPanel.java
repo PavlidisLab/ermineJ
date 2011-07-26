@@ -20,8 +20,6 @@
 package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -60,53 +58,46 @@ public class StartupPanel extends JPanel {
 
     private static Log log = LogFactory.getLog( StartupPanel.class );
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
-    private final Container callingframe;
-    protected JButton actionButton = new JButton();
-    protected JButton cancelButton = new JButton();
-    protected JButton helpButton = new JButton();
 
-    JPanel bottomPanel = new JPanel();
-
-    public StartupPanel( Container callingframe, Settings settings ) {
-        this.callingframe = callingframe;
+    public StartupPanel( Settings settings ) {
         this.settings = settings;
-        jbInit( 550, 350 );
+        jbInit();
         setValues();
     }
 
-    private JFileChooser chooser;
-    private JPanel centerPanel = new JPanel();
-    private JPanel classPanel = new JPanel();
-    private JLabel classLabel = new JLabel();
+    private JButton actionButton;
     private JTextField classFileTextField = new JTextField();
-    private JLabel annotFileFormatLabel = new JLabel();
-    private JButton annotBrowseButton = new JButton();
-    private JLabel annotLabel = new JLabel();
-    private JPanel annotPanel = new JPanel();
+    // private
+
     private JTextField annotFileTextField = new JTextField();
     private JComboBox annotFormat = new JComboBox();
 
     private Settings settings;
-    private JButton classBrowseButton = new JButton();
 
-    private void jbInit( int width, int height ) {
+    private void jbInit() {
 
-        bottomPanel.setPreferredSize( new Dimension( width, 40 ) );
+        JPanel bottomPanel = new JPanel();
+        actionButton = new JButton();
+        JButton cancelButton = new JButton();
+        JButton helpButton = new JButton();
+
         cancelButton.setText( "Cancel" );
         cancelButton.setMnemonic( 'c' );
-        cancelButton.addActionListener( new StartupPanel_cancelButton_actionAdapter( this ) );
+        cancelButton.addActionListener( new StartupPanel_cancelButton_actionAdapter() );
         actionButton.addActionListener( new StartupPanel_actionButton_actionAdapter( this ) );
 
+        actionButton.setText( "Start" );
+        cancelButton.setText( "Quit" );
         helpButton.setText( "Help" );
-
+        HelpHelper hh = new HelpHelper();
+        hh.initHelp( helpButton );
         bottomPanel.add( helpButton, null );
         bottomPanel.add( cancelButton, null );
         bottomPanel.add( actionButton, null );
 
         // ////////////////
 
-        chooser = new JFileChooser( settings.getDataDirectory() );
-
+        JLabel annotFileFormatLabel = new JLabel();
         annotFileFormatLabel.setText( "Annotation file format" );
         annotFileFormatLabel.setLabelFor( annotFormat );
         annotFormat.setEditable( false );
@@ -121,53 +112,69 @@ public class StartupPanel extends JPanel {
         } else {
             annotFormat.setSelectedItem( "ErmineJ" );
         }
-
+        JButton annotBrowseButton = new JButton();
         annotBrowseButton.setText( "Browse..." );
         annotBrowseButton.addActionListener( new StartupPanel_annotBrowseButton_actionAdapter( this ) );
+        JLabel annotLabel = new JLabel();
+
         annotLabel.setPreferredSize( new Dimension( 390, 15 ) );
         annotLabel.setRequestFocusEnabled( true );
-        annotLabel.setText( "Probe annotation file:" );
-        annotPanel.setPreferredSize( new java.awt.Dimension( 400, 80 ) );
+        annotLabel.setText( "Gene annotation file:" );
+
         annotFileTextField.setPreferredSize( new Dimension( 300, 19 ) );
-
-        classBrowseButton.addActionListener( new StartupPanel_classBrowseButton_actionAdapter( this ) );
-        classBrowseButton.setText( "Browse..." );
-
+        JPanel annotPanel = new JPanel();
+        annotPanel.setPreferredSize( new java.awt.Dimension( 400, 80 ) );
         annotPanel.add( annotLabel, null );
         annotPanel.add( annotFileTextField, null );
         annotPanel.add( annotBrowseButton, null );
         annotPanel.add( annotFileFormatLabel, null );
         annotPanel.add( annotFormat, null );
 
+        JPanel centerPanel = new JPanel();
+        JPanel classPanel = new JPanel();
         classPanel.setPreferredSize( new java.awt.Dimension( 400, 70 ) );
+        JLabel classLabel = new JLabel();
         classLabel.setPreferredSize( new Dimension( 390, 15 ) );
         classLabel.setText( "GO XML file:" );
         classFileTextField.setPreferredSize( new Dimension( 300, 19 ) );
 
         classPanel.add( classLabel, null );
         classPanel.add( classFileTextField, null );
+        JButton classBrowseButton = new JButton();
         classPanel.add( classBrowseButton, null );
+        classBrowseButton.addActionListener( new StartupPanel_classBrowseButton_actionAdapter( this ) );
+        classBrowseButton.setText( "Browse..." );
 
-        centerPanel.add( classPanel, null );
-        centerPanel.setPreferredSize( new java.awt.Dimension( 500, 350 ) );
-        centerPanel.add( annotPanel, null );
+        centerPanel.setLayout( new BorderLayout() );
+        centerPanel.add( classPanel, BorderLayout.NORTH );
+        centerPanel.add( annotPanel, BorderLayout.SOUTH );
 
-        this.actionButton.setText( "Start" );
-        this.cancelButton.setText( "Quit" );
-        this.helpButton.setText( "Help" );
-        this
-                .addHelp( "<html><head><style type=\"text/css\"> body { font-family:sanserif; font-size:10px} </style></head><b >Starting up the program</b><br>Please confirm "
-                        + "the settings below are correct; they cannot be changed during "
-                        + "analysis.<p>The annotation file you select "
-                        + "must match the experimental data you are using. "
-                        + "For updated annotation files, visit "
-                        + "<a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots</a></html>" );
+        JEditorPane h = new JEditorPane();
+        h.setEditable( false );
+        h.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
+        h.setContentType( "text/html" );
+        h.addHyperlinkListener( new HyperlinkListener() {
 
-        this.add( centerPanel, BorderLayout.NORTH );
+            public void hyperlinkUpdate( HyperlinkEvent e ) {
+                if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
+                    try {
+                        BrowserLauncher.openURL( e.getURL().toExternalForm() );
+                    } catch ( Exception e1 ) {
+                        GuiUtil.error( "Could not open link" );
+                    }
+                }
+            }
+        } );
+        h.setText( "<html> <strong>Starting up the program</strong><br>Please confirm "
+                + "the settings below are correct; they cannot be changed during "
+                + "analysis.<p>The annotation file you select " + "must match the experimental data you are using. "
+                + "For updated annotation files, visit "
+                + "<a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots</a></html>" );
+
+        this.setLayout( new BorderLayout() );
+        this.add( h, BorderLayout.NORTH );
+        this.add( centerPanel, BorderLayout.CENTER );
         this.add( bottomPanel, BorderLayout.SOUTH );
-
-        HelpHelper hh = new HelpHelper();
-        hh.initHelp( helpButton );
 
     }
 
@@ -180,8 +187,7 @@ public class StartupPanel extends JPanel {
         }
         JFrame f = new JFrame();
         f.setSize( new Dimension( 400, 400 ) );
-        StartupPanel p = new StartupPanel( f, new Settings() );
-        p.setSize( new Dimension( 200, 200 ) );
+        StartupPanel p = new StartupPanel( new Settings() );
         f.add( p );
         f.pack();
         GuiUtil.centerContainer( f );
@@ -204,13 +210,10 @@ public class StartupPanel extends JPanel {
         String dataDirectory = settings.getDataDirectory();
         if ( dataDirectory == null ) {
             settings.setDataDirectory( System.getProperty( "user.dir" ) );
-            chooser.setCurrentDirectory( new File( System.getProperty( "user.dir" ) ) );
-        } else {
-            chooser.setCurrentDirectory( new File( dataDirectory ) );
         }
     }
 
-    private void saveValues() {
+    private void saveSettings() {
         settings.setClassFile( classFileTextField.getText() );
         settings.setAnnotFile( annotFileTextField.getText() );
         String formatS = ( String ) annotFormat.getSelectedItem();
@@ -225,16 +228,21 @@ public class StartupPanel extends JPanel {
     }
 
     void annotBrowseButton_actionPerformed() {
+        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         chooser.setDialogTitle( "Choose the annotation file:" );
         DataFileFilter fileFilter = new DataFileFilter();
         chooser.setFileFilter( fileFilter ); // JFileChooser method
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             annotFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
         }
     }
 
     void classBrowseButton_actionPerformed() {
+        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         chooser.setDialogTitle( "Choose the GO XML file:" );
         XMLFileFilter fileFilter = new XMLFileFilter();
         chooser.setFileFilter( fileFilter ); // JFileChooser method
@@ -242,11 +250,16 @@ public class StartupPanel extends JPanel {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             classFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
         }
     }
 
-    protected void cancelButton_actionPerformed( ActionEvent e ) {
-        System.exit( 0 );
+    public void addActionListener( ActionListener listener ) {
+        listenerList.add( ActionListener.class, listener );
+    }
+
+    public void removeActionListener( ActionListener listener ) {
+        listenerList.remove( ActionListener.class, listener );
     }
 
     protected void actionButton_actionPerformed( ActionEvent e ) {
@@ -266,72 +279,15 @@ public class StartupPanel extends JPanel {
             GuiUtil.error( "Could not read file: " + goFileName );
         } else {
             log.debug( "Saving configuration" );
-            saveValues();
-            new Thread() {
-                @Override
-                public void run() {
-                    ( ( MainFrame ) callingframe ).initialize();
-                }
-            }.start();
-        }
-    }
+            saveSettings();
 
-    // Slightly specialized editor pane.
-    class HelpEditorPane extends JEditorPane {
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -5734511581620275891L;
-
-        HelpEditorPane( String text ) {
-            super();
-            this.setEditable( false );
-            this.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
-            this.setContentType( "text/html" );
-            this.setText( text );
-            this.addHyperlinkListener( new LinkFollower() );
-        }
-    }
-
-    // helper to respond to links.
-    class LinkFollower implements HyperlinkListener {
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
-         */
-        public void hyperlinkUpdate( HyperlinkEvent e ) {
-            if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
-                try {
-                    BrowserLauncher.openURL( e.getURL().toExternalForm() );
-                } catch ( Exception e1 ) {
-                    GuiUtil.error( "Could not open link" );
+            Object[] listeners = listenerList.getListenerList();
+            for ( int i = 0; i < listeners.length; i += 2 ) {
+                if ( listeners[i] == ActionListener.class ) {
+                    ( ( ActionListener ) listeners[i + 1] ).actionPerformed( e );
                 }
             }
         }
-    }
-
-    protected void addHelp( String text ) {
-
-        HelpEditorPane helpArea = null;
-
-        helpArea = new HelpEditorPane( text );
-        JLabel jLabel1 = new JLabel( "      " );
-        JLabel jLabel2 = new JLabel( " " );
-        JLabel jLabel3 = new JLabel( " " );
-        JLabel jLabel4 = new JLabel( "      " );
-        BorderLayout borderLayout2 = new BorderLayout();
-        JPanel labelPanel = new JPanel();
-        labelPanel.setBackground( Color.WHITE );
-        labelPanel.setLayout( borderLayout2 );
-        labelPanel.add( helpArea, BorderLayout.CENTER );
-        labelPanel.add( jLabel1, BorderLayout.WEST );
-        labelPanel.add( jLabel2, BorderLayout.NORTH );
-        labelPanel.add( jLabel3, BorderLayout.SOUTH );
-        labelPanel.add( jLabel4, BorderLayout.EAST );
-        centerPanel.add( labelPanel, BorderLayout.NORTH );
-
     }
 
 }
@@ -349,14 +305,9 @@ class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionLi
 }
 
 class StartupPanel_cancelButton_actionAdapter implements java.awt.event.ActionListener {
-    StartupPanel adaptee;
-
-    StartupPanel_cancelButton_actionAdapter( StartupPanel adaptee ) {
-        this.adaptee = adaptee;
-    }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.cancelButton_actionPerformed( e );
+        System.exit( 0 );
     }
 }
 

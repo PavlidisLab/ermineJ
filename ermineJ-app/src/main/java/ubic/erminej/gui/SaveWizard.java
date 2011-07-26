@@ -25,8 +25,7 @@ import java.util.List;
 
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
-import ubic.erminej.analysis.GeneSetPvalRun;
-import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.analysis.GeneSetPvalRun; 
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.Wizard;
 
@@ -42,16 +41,14 @@ public class SaveWizard extends Wizard {
     private int step = 1;
 
     private List<GeneSetPvalRun> rundata;
-    private GeneSetTerms goData;
-    private SaveWizardStep1 step1;
+     private SaveWizardStep1 step1;
     private SaveWizardStep2 step2;
 
-    public SaveWizard( MainFrame callingframe, List<GeneSetPvalRun> rundata, GeneSetTerms goData ) {
+    public SaveWizard( MainFrame callingframe, List<GeneSetPvalRun> rundata  ) {
         super( callingframe, 400, 200 );
         enableEvents( AWTEvent.WINDOW_EVENT_MASK );
         this.callingframe = callingframe;
-        this.rundata = rundata;
-        this.goData = goData;
+        this.rundata = rundata; 
 
         step1 = new SaveWizardStep1( this, rundata );
         this.addStep( step1, true );

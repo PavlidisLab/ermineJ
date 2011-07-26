@@ -18,16 +18,9 @@
  */
 package ubic.erminej;
 
-import java.io.IOException;
-
-import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ubic.erminej.gui.MainFrame;
-import ubic.erminej.gui.StartupDialog;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**
@@ -37,51 +30,26 @@ import ubic.erminej.gui.util.GuiUtil;
  * @version $Id$
  */
 public class classScoreGUI {
-    private static Log log = LogFactory.getLog( classScoreGUI.class.getName() );
-
     public static void main( String[] args ) {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            new classScoreGUI();
+            new classScoreGUI( new Settings() );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
     }
 
-    boolean packFrame = false;
-
-    public classScoreGUI( Settings settings ) {
+    public classScoreGUI( final Settings settings ) {
         MainFrame frame = new MainFrame( settings );
-        this.init( frame );
-    }
-
-    public classScoreGUI() throws IOException {
-        MainFrame frame = new MainFrame();
-
         init( frame );
     }
 
     private void init( MainFrame frame ) {
-        // Validate frames that have preset sizes
-        // Pack frames that have useful preferred size info, e.g. from their
-        // layout
-        if ( packFrame ) {
-            frame.pack();
-        } else {
-            frame.validate();
-        }
+
         GuiUtil.centerContainer( frame );
-        frame.disableMenusForLoad();
+
         frame.setVisible( true );
-        frame.showStatus( "Waiting for startup dialog box" );
-        frame.setIconImage( new ImageIcon( this.getClass().getResource( "/ubic/erminej/logoIcon64.gif" ) ).getImage() );
-        
-        StartupDialog sdlog = new StartupDialog( frame );
-        sdlog.setModal( true );
-        sdlog.setResizable( true );
-        log.debug( "Showing startup dialog" );
-        sdlog.showDialog();
-        frame.showStatus( "Starting up..." );
+
     }
 
 }

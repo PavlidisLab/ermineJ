@@ -29,7 +29,7 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Collection;
-import java.util.Enumeration; 
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.help.UnsupportedOperationException;
@@ -111,7 +111,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         GeneSetTreeNode userNode = getUserNode();
         assert userNode != null;
 
-        DirectedGraphNode<String, GeneSetTerm> nodeThatWasAdded = goData.getGraph().get( id.getId() );
+        DirectedGraphNode<String, GeneSetTerm> nodeThatWasAdded = this.geneData.getGeneSetGraph().get( id.getId() );
 
         if ( nodeThatWasAdded == null ) {
             log.warn( "THE NODE IS NOT IN THE TREE!! " + id );
@@ -234,10 +234,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param goData
      * @param geneData
      */
-    public void initialize( GeneSetTerms go, GeneAnnotations gd ) {
+    public void initialize( GeneAnnotations gd ) {
 
         this.geneData = gd;
-        this.goData = go;
         setUpTree();
 
         filter( false );
@@ -288,7 +287,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
             return parent;
         }
 
-        DefaultTreeModel treeModel = this.goData.getTreeModel();
+        DefaultTreeModel treeModel = this.geneData.getGeneSetGraph().getTreeModel();
         for ( int i = 0; i < treeModel.getChildCount( node ); i++ ) {
             TreeNode n = ( GeneSetTreeNode ) treeModel.getChild( node, i );
             TreePath path = parent.pathByAddingChild( n );
@@ -337,8 +336,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param goData
      */
     private void setUpTree() {
-
-        this.goTree = this.goData.getGraph().treeView( GeneSetTreeNode.class );
+        assert this.geneData != null;
+        this.goTree = this.geneData.getGeneSetGraph().treeView( GeneSetTreeNode.class );
         geneSetTreeModel = goTree.getModel();
         filteredTreeModel = new FilteredGeneSetTreeModel( this.geneData, geneSetTreeModel );
 

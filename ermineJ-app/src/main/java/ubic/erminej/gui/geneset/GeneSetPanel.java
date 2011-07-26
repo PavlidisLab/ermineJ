@@ -68,7 +68,6 @@ public abstract class GeneSetPanel extends JScrollPane {
             + "view=details&search_constraint=terms&depth=0&query=";
     protected MainFrame callingFrame;
     protected GeneAnnotations geneData;
-    protected GeneSetTerms goData;
     protected StatusViewer messenger = new StatusStderr();
     protected List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
 
@@ -287,7 +286,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         GeneSetTerm classID = null;
         classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
-        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, goData, classID );
+        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, classID );
         cwiz.showWizard();
     }
 
@@ -324,7 +323,7 @@ public abstract class GeneSetPanel extends JScrollPane {
                                 .showError( id + " is not available for viewing in your data." );
                         return;
                     }
-                    GeneSetDetails details = new GeneSetDetails( messenger, goData, geneData, settings, id );
+                    GeneSetDetails details = new GeneSetDetails( messenger, geneData, settings, id );
                     if ( run == null ) {
                         details.show();
                     } else {
