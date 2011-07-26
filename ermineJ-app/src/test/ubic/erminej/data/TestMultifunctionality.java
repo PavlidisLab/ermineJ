@@ -49,7 +49,7 @@ public class TestMultifunctionality extends TestCase {
         Multifunctionality mf = ga.getMultifunctionality();
 
         double actual = mf.getMultifunctionalityScore( new Gene( "PAX8" ) );
-        assertEquals( 0.083, actual, 0.001 ); // not checked by hand.
+        assertEquals( 0.3507, actual, 0.001 ); // not checked by hand.
 
         int actualNumG = mf.getNumGoTerms( new Gene( "PAX8" ) );
         assertEquals( 80, actualNumG );// not checked by hand.
