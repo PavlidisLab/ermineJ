@@ -46,9 +46,6 @@ import ubic.erminej.gui.util.GuiUtil;
  */
 public abstract class AppDialog extends JDialog {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
     protected JButton actionButton = new JButton();
     protected JButton cancelButton = new JButton();
@@ -179,6 +176,7 @@ public abstract class AppDialog extends JDialog {
 
         /*
          * (non-Javadoc)
+         * 
          * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
          */
         public void hyperlinkUpdate( HyperlinkEvent e ) {
@@ -243,6 +241,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
     public void mouseClicked( MouseEvent e ) {
@@ -251,6 +250,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
      */
     public void mouseEntered( MouseEvent e ) {
@@ -258,6 +258,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
      */
     public void mouseExited( MouseEvent e ) {
@@ -265,6 +266,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
     public void mousePressed( MouseEvent e ) {
@@ -272,6 +274,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
      */
     public void mouseReleased( MouseEvent e ) {

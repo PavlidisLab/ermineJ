@@ -147,15 +147,15 @@ public class FindDialog extends JDialog {
     protected void filterViews( Collection<GeneSetTerm> selectedGeneSets ) {
 
         // FIXME do this with an event.
-        callingframe.getOPanel().filter( selectedGeneSets );
-        callingframe.getTreePanel().filter( selectedGeneSets );
+        callingframe.getTablePanel().filter( selectedGeneSets );
+      //  callingframe.getTreePanel().filter( selectedGeneSets );
     }
 
     /**
      * 
      */
     protected void resetViews() {
-        callingframe.getOPanel().resetView();
+        callingframe.getTablePanel().resetView();
         callingframe.getTreePanel().resetView();
     }
 

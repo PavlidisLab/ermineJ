@@ -26,6 +26,7 @@ import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.gui.geneset.GeneSetPanel;
 
 /**
  * Deals with showing filtered views of the gene set tree.
@@ -92,7 +93,7 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
                 GeneSetResult geneSetResult = results.getResults().get( term );
                 //
                 if ( geneSetResult != null ) {
-                    if ( geneSetResult.getCorrectedPvalue() >= GeneSetTreePanel.FDR_THRESHOLD_FOR_TREE ) {
+                    if ( geneSetResult.getCorrectedPvalue() >= GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
                         continue;
                     }
                 } else if ( !node.hasSignificantChild() ) {
@@ -128,7 +129,7 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
                 GeneSetResult geneSetResult = results.getResults().get( term );
 
                 if ( geneSetResult != null ) {
-                    if ( geneSetResult.getCorrectedPvalue() >= GeneSetTreePanel.FDR_THRESHOLD_FOR_TREE ) {
+                    if ( geneSetResult.getCorrectedPvalue() >= GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
                         continue;
                     }
                 } else if ( !node.hasSignificantChild() ) {
@@ -142,11 +143,6 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
             if ( filterByRedundancy && annots.skipDueToRedundancy( term ) ) {
                 continue;
             }
-
-            if ( !selectedTerms.isEmpty() && !selectedTerms.contains( term ) ) {
-                continue;
-            }
-
             i++;
         }
         return i;
@@ -154,20 +150,9 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
 
     private GeneAnnotations annots;
 
-    private Collection<GeneSetTerm> selectedTerms = new HashSet<GeneSetTerm>();
-
     public FilteredGeneSetTreeModel( GeneAnnotations annots, TreeModel toWrap ) {
         super( ( TreeNode ) toWrap.getRoot() );
         this.annots = annots;
-    }
-
-    /**
-     * Pass a non-empty collection to filter.
-     * 
-     * @param selectedTerms
-     */
-    public void setFilterSelectedTerms( Collection<GeneSetTerm> selectedTerms ) {
-        this.selectedTerms = selectedTerms;
     }
 
 }

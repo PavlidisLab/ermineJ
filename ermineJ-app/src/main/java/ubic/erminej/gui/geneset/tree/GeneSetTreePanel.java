@@ -29,14 +29,12 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.Enumeration; 
 import java.util.List;
 
 import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
@@ -76,7 +74,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
     private static Log log = LogFactory.getLog( GeneSetTreePanel.class );
 
     private static final long serialVersionUID = 0L;
-    protected static final double FDR_THRESHOLD_FOR_TREE = 0.1;
     private JTree goTree = null;
     protected GeneSetTerm currentlySelectedGeneSet = null;
 
@@ -87,10 +84,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
     private FilteredGeneSetTreeModel filteredTreeModel;
 
     private TreePath currentlySelectedTreePath = null;
-
-    private boolean hideEmpty = true;
-    private boolean hideInsignificant = false;
-    private boolean hideRedundant = true;
 
     public GeneSetTreePanel( MainFrame callingFrame, List<GeneSetPvalRun> results, Settings settings ) {
         super( settings, results, callingFrame );
@@ -148,6 +141,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     public boolean expandToGeneSet( GeneSetTerm classID ) {
 
+        if ( classID == null ) return false;
+
         TreePath path = this.find( classID );
         boolean foundIt = false;
         if ( path == null ) {
@@ -160,6 +155,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
         if ( foundIt ) {
             log.debug( "Expanding to path for " + classID );
+
             goTree.expandPath( path );
             goTree.setSelectionPath( path );
             goTree.scrollPathToVisible( path );
@@ -168,32 +164,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * @param hideEmpty
-     * @param hideInsignificant
-     * @param hideRedundant
-     */
-    public void filter( boolean he, boolean hi, boolean hr ) {
-
-        this.hideEmpty = he;
-        this.hideInsignificant = hi;
-        this.hideRedundant = hr;
-
-        filteredTreeModel = new FilteredGeneSetTreeModel( this.geneData, geneSetTreeModel );
-        this.goTree.setModel( filteredTreeModel );
-
-        filteredTreeModel.setFilterBySize( hideEmpty );
-        filteredTreeModel.setFilterByRedundancy( hideRedundant );
-        filteredTreeModel.setResults( getCurrentResultSet() );
-        filteredTreeModel.setFilterBySignificance( hideInsignificant );
-
-        refreshView();
-    }
-
-    /**
      * @param selectedTerms
      */
     public void filter( Collection<GeneSetTerm> selectedTerms ) {
-        filteredTreeModel.setFilterSelectedTerms( selectedTerms );
+        // filteredTreeModel.setFilterSelectedTerms( selectedTerms );
         refreshView();
     }
 
@@ -203,12 +177,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @return
      */
     public TreePath find( GeneSetTerm id ) {
-        this.hideEmpty = false;
-        this.hideInsignificant = false;
-        this.hideRedundant = false;
-        filter( false, false, false ); // needed in case it's buried under a redundant or non-sig node. There may be
-        // ways
-        // around this, but it doesn't work right now unless you show everything
+        if ( id == null ) return null;
         TreeNode root = ( TreeNode ) goTree.getModel().getRoot();
         return find( new TreePath( root ), id, 0 );
     }
@@ -251,7 +220,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
             GeneSetTreeNode childNode = e.nextElement();
             GeneSetTerm t = childNode.getTerm();
             GeneSetResult result = getCurrentResultSet().getResults().get( t );
-            if ( result != null && result.getCorrectedPvalue() <= GeneSetTreePanel.FDR_THRESHOLD_FOR_TREE ) {
+            if ( result != null && result.getCorrectedPvalue() <= GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
                 node.setHasSignificantChild( true );
                 return;
             }
@@ -271,23 +240,17 @@ public class GeneSetTreePanel extends GeneSetPanel {
         this.goData = go;
         setUpTree();
 
-        filter( true, false, true );
+        filter( false );
         this.getViewport().add( goTree );
         this.goTree.setVisible( true );
         this.goTree.revalidate();
-    }
 
-    /**
-     * @param e
-     */
-    public void mousePressed( MouseEvent e ) {
-
-        // if ( e.getButton() == MouseEvent.BUTTON1 ) {
-        // // left button
-        // } else if ( e.getButton() == MouseEvent.BUTTON3 ) {
-        // // right button
-        //
-        // }
+        /*
+         * open up the first couple of nodes? (can't do more than one at the moment as filter recollapses everything.
+         */
+        this.expandToGeneSet( this.geneData.findTerm( "GO:0008150" ) );
+        // this.expandToGeneSet( this.geneData.findTerm( "GO:0005575" ) );
+        // this.expandToGeneSet( this.geneData.findTerm( "GO:0003674" ) );
     }
 
     /**
@@ -300,45 +263,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
         showDetailsForGeneSet( getCurrentResultSet(), currentlySelectedGeneSet );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ubic.erminej.gui.GeneSetPanel#removedGeneSet(ubic.erminej.data.GeneSetTerm)
-     */
-    @Override
-    protected void removedGeneSet( GeneSetTerm id ) {
-        assert id.isUserDefined();
-
-        // find it in the tree
-        GeneSetTreeNode node = ( GeneSetTreeNode ) find( id ).getLastPathComponent();
-
-        if ( node == null ) {
-            log.warn( "Node to delete wasn't found" );
-            return;
-        }
-
-        if ( node.getChildCount() != 0 ) {
-            throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
-        }
-
-        // remove it from the model.
-        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( node );
-
-    }
-
     @Override
     public void resetView() {
         // anyting else we need to do?
-        filter( new HashSet<GeneSetTerm>() );
-    }
-
-    /**
-     * Force to repaint etc.
-     */
-    private void refreshView() {
-        updateNodeStyles();
-        goTree.revalidate();
-        goTree.repaint();
+        // filter( new HashSet<GeneSetTerm>() );
     }
 
     /**
@@ -385,6 +313,19 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
+     * Force to repaint, reapply filters.
+     */
+    @Override
+    public void refreshView() {
+        this.messenger.showStatus( "Updating view" );
+        filter( false );
+        updateNodeStyles();
+        goTree.revalidate();
+        goTree.repaint();
+        this.messenger.clear();
+    }
+
+    /**
      * 
      */
     private void setRenderer() {
@@ -403,10 +344,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         this.setRenderer();
         this.goTree.setRootVisible( true );
-
-        /*
-         * TODO open up the first couple of nodes
-         */
 
         // effectively disable the double-click
         this.goTree.setToggleClickCount( 10 );
@@ -474,84 +411,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
     }
 
-    /**
-     * 
-     */
-    @Override
-    protected void showPopupMenu( MouseEvent e ) {
-
-        GeneSetPanelPopupMenu popup = super.configurePopup( e );
-
-        if ( popup == null ) return;
-
-        JMenuItem collapseNodeMenuItem = new JMenuItem( "Collapse this node" );
-        collapseNodeMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                expandNode( currentlySelectedTreePath, false );
-            }
-        } );
-
-        JMenuItem expandNodeMenuItem = new JMenuItem( "Expand this node" );
-        expandNodeMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                expandNode( currentlySelectedTreePath, true );
-            }
-        } );
-
-        JMenuItem collapseAllMenuItem = new JMenuItem( "Collapse All (slow)" );
-        collapseAllMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                expandAll( false );
-            }
-        } );
-
-        JMenuItem expandAllMenuItem = new JMenuItem( "Expand All (slow)" );
-        expandAllMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                expandAll( true );
-            }
-        } );
-
-        final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty );
-        final JCheckBoxMenuItem hideInsig = new JCheckBoxMenuItem( "Hide non-significant", hideInsignificant );
-        final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", hideRedundant );
-
-        hideEmptyMenuItem.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                filter( hideEmptyMenuItem.getState(), hideInsig.getState(), hideRedund.getState() );
-            }
-
-        } );
-
-        hideInsig.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                filter( hideEmptyMenuItem.getState(), hideInsig.getState(), hideRedund.getState() );
-
-            }
-
-        } );
-
-        hideRedund.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                filter( hideEmptyMenuItem.getState(), hideInsig.getState(), hideRedund.getState() );
-            }
-
-        } );
-
-        popup.add( collapseNodeMenuItem );
-        // popup.add( collapseAllMenuItem );
-        popup.add( expandNodeMenuItem );
-        // popup.add( expandAllMenuItem );
-        popup.add( hideEmptyMenuItem );
-        popup.add( hideRedund );
-        popup.add( hideInsig );
-        popup.show( e.getComponent(), e.getX(), e.getY() );
-    }
-
     @Override
     protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
         boolean deleted = super.deleteUserGeneSet( classID );
-        if ( deleted ) this.removedGeneSet( classID );
+        // if ( deleted ) this.removedGeneSet( classID );
         return deleted;
     }
 
@@ -590,6 +453,19 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
     }
 
+    @Override
+    public void filter( boolean propagate ) {
+
+        filteredTreeModel = new FilteredGeneSetTreeModel( this.geneData, geneSetTreeModel );
+        this.goTree.setModel( filteredTreeModel );
+
+        filteredTreeModel.setFilterBySize( hideEmpty );
+        filteredTreeModel.setFilterByRedundancy( hideRedundant );
+        filteredTreeModel.setResults( getCurrentResultSet() );
+        filteredTreeModel.setFilterBySignificance( hideInsignificant );
+        if ( propagate ) this.callingFrame.getTablePanel().filter( false );
+    }
+
     /**
      * @param e
      * @return
@@ -610,6 +486,69 @@ public class GeneSetTreePanel extends GeneSetPanel {
         return selectedNode.getTerm();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.erminej.gui.GeneSetPanel#removedGeneSet(ubic.erminej.data.GeneSetTerm)
+     */
+    @Override
+    protected void removedGeneSet( GeneSetTerm id ) {
+        assert id.isUserDefined();
+
+        // find it in the tree
+        TreePath p = find( id );
+
+        if ( p == null ) {
+            log.warn( "Path to set wasn't found. Already gone?" );
+            return;
+        }
+
+        GeneSetTreeNode node = ( GeneSetTreeNode ) p.getLastPathComponent();
+
+        if ( node == null ) {
+            log.warn( "Node to delete wasn't found" );
+            return;
+        }
+
+        if ( node.getChildCount() != 0 ) {
+            throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
+        }
+
+        // remove it from the model.
+        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( node );
+
+    }
+
+    /**
+     * 
+     */
+    @Override
+    protected void showPopupMenu( MouseEvent e ) {
+
+        GeneSetPanelPopupMenu popup = super.configurePopup( e );
+
+        if ( popup == null ) return;
+
+        JMenuItem collapseNodeMenuItem = new JMenuItem( "Collapse this node" );
+        collapseNodeMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e1 ) {
+                expandNode( currentlySelectedTreePath, false );
+            }
+        } );
+
+        JMenuItem expandNodeMenuItem = new JMenuItem( "Expand this node" );
+        expandNodeMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e1 ) {
+                expandNode( currentlySelectedTreePath, true );
+            }
+        } );
+
+        popup.add( collapseNodeMenuItem );
+        popup.add( expandNodeMenuItem );
+
+        popup.show( e.getComponent(), e.getX(), e.getY() );
+    }
+
 }
 
 /**
@@ -617,6 +556,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
  * @version $Id$
  */
 class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
+
+    private static final Color USER_NODE_COLOR = Color.decode( "#FAFABB" );
+
+    private static final Color USER_NODE_TEXT_COLOR = Color.BLACK;
 
     private static final String RESOURCE_LOCATION = "/ubic/erminej/";
 
@@ -703,7 +646,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         this.setText( displayedText );
 
         if ( id.isUserDefined() ) {
-            this.setBackground( Colors.LIGHTYELLOW );
+            this.setBackground( USER_NODE_COLOR );
         }
 
         if ( this.selected ) {
@@ -753,7 +696,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             this.setForeground( Color.BLACK );
         }
         if ( id.isUserDefined() ) {
-            this.setForeground( Color.DARK_GRAY );
+            this.setForeground( USER_NODE_TEXT_COLOR );
         }
         return textToDisplay;
     }
@@ -778,7 +721,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             this.setBackground( bgColor );
 
-            if ( pvalCorr < GeneSetTreePanel.FDR_THRESHOLD_FOR_TREE ) {
+            if ( pvalCorr < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
                 if ( node.hasSignificantChild() ) {
                     this.setIcon( goodPvalueGoodChildIcon );
                 } else {
@@ -844,7 +787,7 @@ class GeneSetTreePanel_mouseListener extends MouseAdapter {
 
     @Override
     public void mousePressed( MouseEvent e ) {
-        adaptee.mousePressed( e );
+
     }
 
     @Override

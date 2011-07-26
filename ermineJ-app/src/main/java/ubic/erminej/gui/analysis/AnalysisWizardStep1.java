@@ -20,15 +20,20 @@ package ubic.erminej.gui.analysis;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.border.EmptyBorder;
 
 import ubic.erminej.Settings;
 import ubic.erminej.gui.util.WizardStep;
@@ -61,81 +66,99 @@ public class AnalysisWizardStep1 extends WizardStep {
     @Override
     protected void jbInit() {
         JPanel step1Panel = new JPanel();
-        JPanel jPanel4 = new JPanel();
-        JLabel jLabel8 = new JLabel();
-        JPanel jPanel5 = new JPanel();
+
+        BoxLayout boxLayout = new BoxLayout( step1Panel, BoxLayout.Y_AXIS );
+        step1Panel.setLayout( boxLayout );
+
         ButtonGroup buttonGroup1 = new ButtonGroup();
         oraButton = new JRadioButton();
         resampButton = new JRadioButton();
         corrButton = new JRadioButton();
         rocButton = new JRadioButton();
 
-        JPanel jPanel12 = new JPanel();
-        JLabel jLabel4 = new JLabel();
-        JLabel jLabel5 = new JLabel();
-        JLabel jLabel9 = new JLabel();
-        step1Panel.setPreferredSize( new Dimension( 550, 120 ) );
-        jPanel4.setBorder( BorderFactory.createEtchedBorder() );
-        jPanel4.setLayout( new BorderLayout() );
-        jPanel4.setPreferredSize( new Dimension( 400, 180 ) );
-        jLabel8.setText( "" );
-        jLabel8.setPreferredSize( new Dimension( 274, 17 ) );
-        step1Panel.add( jLabel8, null );
-        jPanel5.setPreferredSize( new Dimension( 150, 180 ) );
-
+        JPanel oraPanel = new JPanel();
+        oraPanel.setLayout( new BoxLayout( oraPanel, BoxLayout.X_AXIS ) );
+        oraPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
+        oraPanel.setPreferredSize( new Dimension( 400, 19 ) );
         oraButton.setText( "ORA" );
-        oraButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
-        oraButton.setPreferredSize( new Dimension( 140, 17 ) );
+        oraButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         oraButton.addActionListener( new AnalysisWizardStep1_oraButton_actionAdapter( this ) );
         buttonGroup1.add( oraButton );
-        jPanel5.add( oraButton, null );
+        oraPanel.add( oraButton );
 
+        JPanel gsrPanel = new JPanel();
+        gsrPanel.setLayout( new BoxLayout( gsrPanel, BoxLayout.X_AXIS ) );
+        gsrPanel.setPreferredSize( new Dimension( 400, 19 ) );
+        gsrPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
         resampButton.setText( "Gene score resampling" );
         resampButton.setSelected( true );
-        resampButton.setPreferredSize( new Dimension( 140, 17 ) );
-        resampButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        resampButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         resampButton.addActionListener( new AnalysisWizardStep1_resampButton_actionAdapter( this ) );
         buttonGroup1.add( resampButton );
-        jPanel5.add( resampButton, null );
+        gsrPanel.add( resampButton );
 
+        JPanel rocPanel = new JPanel();
+        rocPanel.setLayout( new BoxLayout( rocPanel, BoxLayout.X_AXIS ) );
+        rocPanel.setPreferredSize( new Dimension( 400, 19 ) );
+        rocPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
         rocButton.setText( "ROC" );
-        rocButton.setPreferredSize( new Dimension( 140, 17 ) );
-        rocButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        rocButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         rocButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 wiz.setAnalysisType( Settings.Method.ROC );
             }
         } );
         buttonGroup1.add( rocButton );
-        jPanel5.add( rocButton, null );
+        rocPanel.add( rocButton );
 
+        JPanel corrPanel = new JPanel();
+        corrPanel.setLayout( new BoxLayout( corrPanel, BoxLayout.X_AXIS ) );
+        corrPanel.setPreferredSize( new Dimension( 400, 19 ) );
+        corrPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
         corrButton.setText( "Correlation" );
-        corrButton.setPreferredSize( new Dimension( 140, 17 ) );
-        corrButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        corrButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         corrButton.addActionListener( new AnalysisWizardStep1_corrButton_actionAdapter( this ) );
         buttonGroup1.add( corrButton );
-        jPanel5.add( corrButton, null );
+        corrPanel.add( corrButton );
 
-        jPanel4.add( jPanel5, BorderLayout.WEST );
-        jPanel12.setPreferredSize( new Dimension( 210, 80 ) );
-        jLabel9.setText( " Over-representation analysis" );
-        jLabel9.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel9, null );
-        jLabel4.setText( " Examines distribution of gene scores" );
-        jLabel4.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel4, null );
+        JLabel gsrLabel = new JLabel();
+        JLabel corrLabel = new JLabel();
+        JLabel oraLabel = new JLabel();
+        JLabel rocLabel = new JLabel();
 
-        JLabel jLabel6 = new JLabel();
-        jLabel6.setText( " Uses ranks of gene scores" );
-        jLabel6.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel6, null );
+        oraLabel.setText( "Over-representation analysis" );
+        oraLabel.setPreferredSize( new Dimension( 200, 17 ) );
+        oraLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
+        // oraLabel.setLabelFor( oraButton );
+        oraPanel.add( oraLabel );
 
-        jLabel5.setText( " Uses correlation of expression profiles" );
-        jLabel5.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel5, null );
+        gsrLabel.setText( "Examines distribution of gene scores" );
+        gsrLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
+        gsrLabel.setPreferredSize( new Dimension( 200, 17 ) );
+        // gsrLabel.setLabelFor( resampButton );
+        gsrPanel.add( gsrLabel );
 
-        jPanel4.add( jPanel12, null );
-        step1Panel.add( jPanel4, BorderLayout.EAST );
+        rocLabel.setText( "Uses ranks of gene scores" );
+        rocLabel.setPreferredSize( new Dimension( 200, 17 ) );
+        rocLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
+        // rocLabel.setLabelFor( rocButton );
+        rocPanel.add( rocLabel );
+
+        corrLabel.setText( "Uses correlation of expression profiles" );
+        corrLabel.setPreferredSize( new Dimension( 200, 17 ) );
+        corrLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
+        // corrLabel.setLabelFor( corrButton );
+        corrPanel.add( corrLabel );
+
+        step1Panel.setBorder( new EmptyBorder( 20, 20, 20, 20 ) );
+        step1Panel.add( oraPanel );
+        step1Panel.add( Box.createVerticalStrut( 10 ) );
+        step1Panel.add( gsrPanel );
+        step1Panel.add( Box.createVerticalStrut( 10 ) );
+        step1Panel.add( rocPanel );
+        step1Panel.add( Box.createVerticalStrut( 10 ) );
+
+        step1Panel.add( corrPanel );
 
         this.addHelp( "<html><b>Select the method to " + "use for scoring gene sets.</b><br>" + "</html>" );
         this.addMain( step1Panel );

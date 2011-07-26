@@ -56,7 +56,7 @@ public class GeneSetTerms {
     /**
      * Name for root of tree representing user-defined gene sets.
      */
-    public static final String USER_DEFINED = "User-defined or modified";
+    public static final String USER_DEFINED = "User-defined";
 
     protected static final Log log = LogFactory.getLog( GeneSetTerms.class );
 
@@ -302,7 +302,7 @@ public class GeneSetTerms {
         DirectedGraphNode<String, GeneSetTerm> root = this.getGraph().getRoot();
         assert root != null;
 
-        GeneSetTerm newChild = new GeneSetTerm( USER_DEFINED, "", "Gene sets modified or created by the user" );
+        GeneSetTerm newChild = new GeneSetTerm( USER_DEFINED, "Custom", "Gene sets created by the user" );
         newChild.setAspect( USER_DEFINED );
         this.getGraph().addChildTo( root.getKey(), USER_DEFINED, newChild );
 

@@ -31,8 +31,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -206,13 +204,17 @@ public class GeneSetTablePanel extends GeneSetPanel {
     /**
      * Revalidate, refilter and resort the table.
      */
-    private void refreshView() {
-        table.revalidate();
-        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
-        sorter.setSortKeys( sortKeys );
+    @Override
+    public void refreshView() {
+
+        this.messenger.showStatus( "Updating view" );
+        //       
+        // List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        // sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
+        // sorter.setSortKeys( sortKeys );
         this.model.filter();
-        model.fireTableDataChanged();
+        table.revalidate();
+        this.messenger.clear();
     }
 
     /*
@@ -291,9 +293,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
     @Override
     protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
         boolean deleted = super.deleteUserGeneSet( classID );
-        /*
-         * Since the table model is backed by the geneAnnots, this should work?
-         */
         table.revalidate();
         return deleted;
 
@@ -395,35 +394,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         if ( popup == null ) return;
 
-        final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", true );
-        hideRedund.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                filterRedundant( hideRedund.getState() );
-            }
-        } );
-
-        // / this is a bit redundant as it seems they are filtered out earlier.
-        final JCheckBoxMenuItem hideEmpty = new JCheckBoxMenuItem( "Hide empty sets", true );
-        hideEmpty.setToolTipText( "Hide sets lacking members" );
-        hideEmpty.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                filterEmpty( hideEmpty.getState() );
-            }
-        } );
-
-        final JCheckBoxMenuItem hideNonResults = new JCheckBoxMenuItem( "Hide non-results", true );
-        hideNonResults.setToolTipText( "Hide rows lacking any results" );
-        hideNonResults.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                filterNonResults( hideNonResults.getState() );
-            }
-
-        } );
-
-        popup.add( hideRedund );
-        popup.add( hideEmpty );
-        popup.add( hideNonResults );
-
         final JMenuItem findInTreeMenuItem = new JMenuItem( "Find this set in the tree panel" );
         findInTreeMenuItem.addActionListener( new FindInTreeListener( this ) );
         popup.add( findInTreeMenuItem );
@@ -489,27 +459,30 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     }
 
-    /**
-     * @param b
-     */
+    // /**
+    // * @param b
+    // */
     public void filterByUserGeneSets( boolean b ) {
-        if ( b ) {
-            RowFilter<GeneSetTableModel, Object> rf = new RowFilter<GeneSetTableModel, Object>() {
-
-                @Override
-                public boolean include( RowFilter.Entry<? extends GeneSetTableModel, ? extends Object> entry ) {
-
-                    GeneSetTerm term = ( GeneSetTerm ) entry.getValue( 0 );
-                    return term.isUserDefined();
-                }
-            };
-            this.sorter.setRowFilter( rf );
-
-        } else {
-            this.sorter.setRowFilter( null );
-        }
-        resortByCurrentResults();
-        this.model.fireTableDataChanged();
+        this.model.setFilterNonUsers( b );
+        filter( false );
+        // if ( b ) {
+        // RowFilter<GeneSetTableModel, Object> rf = new RowFilter<GeneSetTableModel, Object>() {
+        //
+        // @Override
+        // public boolean include( RowFilter.Entry<? extends GeneSetTableModel, ? extends Object> entry ) {
+        //
+        // GeneSetTerm term = ( GeneSetTerm ) entry.getValue( 0 );
+        // return term.isUserDefined();
+        // }
+        // };
+        // this.sorter.setRowFilter( rf );
+        //
+        // } else {
+        // this.sorter.setRowFilter( null );
+        // }
+        // filter( false ); // reapply, since the above messes it up.
+        // resortByCurrentResults();
+        // this.model.fireTableDataChanged();
     }
 
     /**
@@ -538,38 +511,28 @@ public class GeneSetTablePanel extends GeneSetPanel {
         resortByCurrentResults();
     }
 
-    protected void filterRedundant( boolean b ) {
-        this.model.setFilterRedundant( b );
-        table.revalidate();
-        resortByCurrentResults();
-    }
+    @Override
+    public void filter( boolean propagate ) {
+        this.model.setFilterRedundant( hideRedundant );
+        this.model.setFilterEmpty( hideEmpty );
+        this.model.setFilterEmptyResults( hideInsignificant );
 
-    protected void filterEmpty( boolean b ) {
-        this.model.setFilterEmpty( b );
-        table.revalidate();
-        resortByCurrentResults();
-    }
+        if ( propagate ) this.callingFrame.getTreePanel().filter( false );
 
-    protected void filterNonResults( boolean b ) {
-        if ( currentResultSetIndex < 0 ) return;
-        this.model.setFilterEmptyResults( b );
-        table.revalidate();
-
-        resortByCurrentResults();
+        // resortByCurrentResults();
     }
 
     /**
-     * 
+     * Resort by the current result set, if there is one. Otherwise leave it alone.
      */
     private void resortByCurrentResults() {
         int sortColumn = 0;
         if ( currentResultSetIndex > 0 ) {
             sortColumn = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
+            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+            sortKeys.add( new RowSorter.SortKey( sortColumn, SortOrder.ASCENDING ) );
+            sorter.setSortKeys( sortKeys );
         }
-        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-
-        sortKeys.add( new RowSorter.SortKey( sortColumn, SortOrder.ASCENDING ) );
-        sorter.setSortKeys( sortKeys );
     }
 
 }

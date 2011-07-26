@@ -72,7 +72,7 @@ public class GeneAnnotations {
     /**
      * The maximum size of gene sets ever considered.
      */
-    private static final int PRACTICAL_MAXIMUM_GENESET_SIZE = 5000;
+    private static final int PRACTICAL_MAXIMUM_GENESET_SIZE = 50000;
 
     private Multifunctionality multifunctionality;
 
@@ -80,11 +80,6 @@ public class GeneAnnotations {
      * This includes all gene set terms, including ones which are redundant.
      */
     private Map<GeneSetTerm, GeneSet> geneSets = new HashMap<GeneSetTerm, GeneSet>();
-
-    /**
-     * A backup
-     */
-    private Map<GeneSetTerm, GeneSet> oldGeneSets = new HashMap<GeneSetTerm, GeneSet>();
 
     private Collection<Probe> probes = new HashSet<Probe>();
 
@@ -102,6 +97,11 @@ public class GeneAnnotations {
      * Gene sets taht are redundant and (semi-arbitrarily) will be ignored.
      */
     private Collection<GeneSetTerm> skipDueToRedundancy = new HashSet<GeneSetTerm>();
+
+    /**
+     * Used to protect instances
+     */
+    private boolean allowModification = true;
 
     /**
      * @param genes
@@ -138,8 +138,6 @@ public class GeneAnnotations {
     public GeneAnnotations( GeneAnnotations start, Collection<Probe> probes ) {
         this( start, probes, false );
     }
-
-    boolean allowModification = true;
 
     /**
      * Create a new annotation set based on an existing one, for selected probes, optionally removing unannotated
@@ -290,7 +288,15 @@ public class GeneAnnotations {
         this.addGeneSet( set.getTerm(), set.getGenes() );
     }
 
-    public void addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs, String sourceFile ) {
+    /**
+     * @param geneSetId
+     * @param gs
+     */
+    public void addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs ) {
+        this.addGeneSet( geneSetId, gs, null );
+    }
+
+    public GeneSet addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs, String sourceFile ) {
         assert allowModification;
         for ( Gene g : gs ) {
             if ( !this.hasGene( g ) ) {
@@ -315,14 +321,8 @@ public class GeneAnnotations {
         this.multifunctionality.setStale( true );
 
         log.debug( "Added new gene set: " + gs.size() + " genes in gene set " + geneSetId );
-    }
 
-    /**
-     * @param geneSetId
-     * @param gs
-     */
-    public void addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs ) {
-        this.addGeneSet( geneSetId, gs, null );
+        return newSet;
     }
 
     /**
@@ -378,7 +378,6 @@ public class GeneAnnotations {
 
         if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
 
-        oldGeneSets.remove( id );
         skipDueToRedundancy.remove( id );
 
     }
@@ -754,18 +753,6 @@ public class GeneAnnotations {
     }
 
     /**
-     * Restore the previous version of a gene set. If no previous version is found, then nothing is done.
-     * 
-     * @param id
-     */
-    public void restoreGeneSet( GeneSetTerm id ) {
-        if ( !oldGeneSets.containsKey( id ) ) return;
-        log.info( "Restoring " + id );
-        deleteGeneSet( id );
-        addGeneSet( id, oldGeneSets.get( id ).getGenes() );
-    }
-
-    /**
      * Make the selection the user-defined sets only.
      */
     public Collection<GeneSetTerm> selectUserDefined() {
@@ -937,8 +924,9 @@ public class GeneAnnotations {
     /**
      * Remove classes that have too few members, or which are obsolete. These are not removed from the GO tree
      * 
-     * @param lowThreshold
-     * @param highThreshold
+     * @param lowThreshold - in practice, 2
+     * @param highThreshold - FIXME setting this 'low' can cause problems (orphaned child terms), so in practice don't
+     *        use it.
      */
     private void prune( int lowThreshold, int highThreshold ) {
 
@@ -968,6 +956,10 @@ public class GeneAnnotations {
             }
         }
 
+        /*
+         * FIXME -- perhaps don't prune if we have any children? This can be a problem if the maximum is too small.
+         */
+
         if ( !removeUs.isEmpty() ) {
             this.messenger.showStatus( removeUs.size() + " removed: obsolete (" + obsoleteRemoved + "), too small ("
                     + tooSmallRemoved + ") or too big (" + tooBigRemoved + ") terms pruned." );
@@ -984,30 +976,6 @@ public class GeneAnnotations {
                             + ". Your annotation file may contain too few GO terms." );
         }
 
-    }
-
-    /**
-     * Check whether the given gene set is redundant with any others (excluding itself, but including any that were
-     * already considered to be redundant)
-     * 
-     * @param s
-     */
-    private boolean redundancyCheck( GeneSet s ) {
-        Collection<Gene> genes2 = s.getGenes();
-        for ( GeneSet gs1 : this.geneSets.values() ) {
-            if ( gs1.equals( s ) ) continue;
-
-            Collection<Gene> genes1 = gs1.getGenes();
-
-            if ( genes1.size() != genes2.size() ) continue; // not identical.
-
-            for ( Gene g1 : genes1 ) {
-                if ( !genes2.contains( g1 ) ) continue; // not redundant.
-            }
-
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -1043,14 +1011,14 @@ public class GeneAnnotations {
                 }
 
                 /*
-                 * Choose one to mark as skippable; favor keeping the child term.
+                 * Choose one to mark as skippable; favor keeping the parent term to avoid having stranded children.
                  */
                 if ( this.geneSetTerms.isParent( gs1.getTerm(), gs2.getTerm() ) ) {
                     gs1.setSkipDueToRedundancy( true );
-                    this.skipDueToRedundancy.add( gs1.getTerm() );
+                    this.skipDueToRedundancy.add( gs2.getTerm() );
                 } else {
                     gs2.setSkipDueToRedundancy( true );
-                    this.skipDueToRedundancy.add( gs2.getTerm() );
+                    this.skipDueToRedundancy.add( gs1.getTerm() );
                 }
                 numToSkip++;
 

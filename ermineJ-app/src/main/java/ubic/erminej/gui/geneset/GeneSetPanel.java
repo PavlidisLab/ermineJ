@@ -19,17 +19,19 @@
 package ubic.erminej.gui.geneset;
 
 import java.awt.Container;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
 import org.apache.commons.logging.Log;
@@ -52,14 +54,14 @@ import ubic.erminej.gui.geneset.wiz.GeneSetWizard;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**
- * A generic class to support the display of lists or trees Gene Sets and analysis results. Could be made even more
- * generic.
+ * A generic class to support the display of lists or trees Gene Sets and analysis results.
  * 
  * @author pavlidis
  * @version $Id$
  */
 public abstract class GeneSetPanel extends JScrollPane {
 
+    public static final double FDR_THRESHOLD_FOR_FILTER = 0.1;
     private static final long serialVersionUID = 1L;
     static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
     static final String AMIGO_URL_BASE = "http://amigo.geneontology.org/cgi-bin/amigo/go.cgi?"
@@ -76,33 +78,25 @@ public abstract class GeneSetPanel extends JScrollPane {
     public static final String DELETED = "DELETED";
     public static final int MAX_DEFINITION_LENGTH = 200;
 
+    protected static boolean hideEmpty = true;
+    protected static boolean hideInsignificant = false;
+    protected static boolean hideRedundant = true;
+    protected static boolean hideNonCustom = false;
+
+    private Collection<GeneSetPanel> dependentPanels = new HashSet<GeneSetPanel>();
+
     public GeneSetPanel( Settings settings, List<GeneSetPvalRun> results, MainFrame callingFrame ) {
         this.settings = settings;
         this.results = results;
         this.callingFrame = callingFrame;
     }
 
-    /**
-     * @param addedTerm
-     */
-    protected abstract void addedGeneSet( GeneSetTerm addedTerm );
-
-    /**
-     * Update the view to reflect changes
-     * 
-     * @param addedTerm
-     */
-    protected abstract void removedGeneSet( GeneSetTerm addedTerm );
-
-    protected abstract GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e );
+    public void addDependentPanel( GeneSetPanel panel ) {
+        if ( panel == this ) return;
+        this.dependentPanels.add( panel );
+    }
 
     public abstract void addRun();
-
-    public GeneSetPvalRun getCurrentResultSet() {
-        int i = callingFrame.getCurrentResultSet();
-        if ( i < 0 ) return null;
-        return this.results.get( i );
-    }
 
     /**
      * @param e
@@ -114,101 +108,34 @@ public abstract class GeneSetPanel extends JScrollPane {
         callingFrame.findGeneSetInTree( classID );
     }
 
+    public GeneSetPvalRun getCurrentResultSet() {
+        int i = callingFrame.getCurrentResultSet();
+        if ( i < 0 ) return null;
+        return this.results.get( i );
+    }
+
     /**
-     * Put the view back to the original state, removing filters.
+     * Restore view
      */
     public abstract void resetView();
 
-    protected void htmlMenuItem_actionPerformed( ActionEvent e ) {
-        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        GeneSetTerm classID = sourcePopup.getSelectedItem();
-        if ( classID == null ) return;
-        // create the URL and show it
+    /**
+     * Updating, reapplying filters
+     */
+    public abstract void refreshView();
 
-        String clID = classID.getId();
-
-        try {
-            BrowserLauncher.openURL( AMIGO_URL_BASE + clID );
-        } catch ( Exception e1 ) {
-            log.error( e1, e1 );
-            GuiUtil.error( "Could not open a web browser window" );
-        }
-    }
-
-    protected void modMenuItem_actionPerformed( ActionEvent e ) {
-        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        GeneSetTerm classID = null;
-        classID = sourcePopup.getSelectedItem();
-        if ( classID == null ) return;
-        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, goData, classID );
-        cwiz.showWizard();
+    /**
+     * @param messenger
+     */
+    public void setMessenger( StatusViewer messenger ) {
+        if ( messenger == null ) return;
+        this.messenger = messenger;
     }
 
     /**
-     * Create the popup window with the visualization for a specific gene set.
-     * 
-     * @param runnum
-     * @param id
-     * @throws IllegalStateException
+     * @param addedTerm
      */
-    protected void showDetailsForGeneSet( final GeneSetPvalRun run, final GeneSetTerm id ) throws IllegalStateException {
-        messenger.showStatus( "Viewing data for " + id + "..." );
-
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    if ( id == null ) {
-                        log.debug( "Got null geneset id" );
-                        return;
-                    }
-                    log.debug( "Request for details of gene set: " + id + ", run: " + run );
-                    if ( !geneData.hasGeneSet( id ) ) {
-                        callingFrame.getStatusMessenger()
-                                .showError( id + " is not available for viewing in your data." );
-                        return;
-                    }
-                    GeneSetDetails details = new GeneSetDetails( messenger, goData, geneData, settings, id );
-                    if ( run == null ) {
-                        details.show();
-                    } else {
-                        GeneSetResult res = run.getResults().get( id );
-                        details.show( run.getName(), res, run.getGeneScores() );
-                    }
-                    messenger.clear();
-                } catch ( Exception ex ) {
-                    GuiUtil
-                            .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
-                                    + ex.getMessage() );
-                    log.error( ex, ex );
-                    messenger.clear();
-                }
-            }
-        }.start();
-    }
-
-    /**
-     * @param classID
-     * @return
-     */
-    protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
-        if ( classID == null ) return false;
-        if ( !classID.isUserDefined() ) return false;
-
-        int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to delete \"" + classID + "\"?",
-                "Confirm", JOptionPane.YES_NO_OPTION );
-        if ( yesno == JOptionPane.NO_OPTION ) return false;
-
-        if ( UserDefinedGeneSetManager.deleteUserGeneSet( classID, messenger ) ) {
-            messenger.showStatus( "Permanantly deleted " + classID );
-            this.removedGeneSet( classID );
-            return true;
-        }
-        GuiUtil.error( "Could not delete data on disk for " + classID
-                + ". Please delete the file (or part of file) manually from " + settings.getUserGeneSetDirectory() );
-        return false;
-
-    }
+    protected abstract void addedGeneSet( GeneSetTerm addedTerm );
 
     /**
      * Configure the base popup common to any compoment showing gene sets.
@@ -236,9 +163,40 @@ public abstract class GeneSetPanel extends JScrollPane {
             }
         } );
 
+        final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty );
+        final JCheckBoxMenuItem hideInsig = new JCheckBoxMenuItem( "Hide non-significant", hideInsignificant );
+        final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", hideRedundant );
+
+        hideEmptyMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e1 ) {
+                hideEmpty = hideEmptyMenuItem.getState();
+                filter( true );
+            }
+
+        } );
+
+        hideInsig.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e1 ) {
+                hideInsignificant = hideInsig.getState();
+                filter( true );
+            }
+
+        } );
+
+        hideRedund.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e1 ) {
+                hideRedundant = hideRedund.getState();
+                filter( true );
+            }
+
+        } );
+
         popup.add( htmlMenuItem );
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
+        popup.add( hideEmptyMenuItem );
+        popup.add( hideRedund );
+        popup.add( hideInsig );
 
         if ( classID == null ) return null;
         if ( geneData.getUserDefined().contains( classID ) ) {
@@ -283,15 +241,109 @@ public abstract class GeneSetPanel extends JScrollPane {
         return popupListener;
     }
 
-    protected abstract void showPopupMenu( MouseEvent e );
+    /**
+     * @param classID
+     * @return
+     */
+    protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
+        if ( classID == null ) return false;
+        if ( !classID.isUserDefined() ) return false;
+
+        int yesno = JOptionPane.showConfirmDialog( this, "Are you sure you want to delete \"" + classID + "\"?",
+                "Confirm", JOptionPane.YES_NO_OPTION );
+        if ( yesno == JOptionPane.NO_OPTION ) return false;
+
+        if ( UserDefinedGeneSetManager.deleteUserGeneSet( classID, messenger ) ) {
+            messenger.showStatus( "Permanantly deleted " + classID );
+            this.removedGeneSet( classID );
+            return true;
+        }
+        GuiUtil.error( "Could not delete data on disk for " + classID
+                + ". Please delete the file (or part of file) manually from " + settings.getUserGeneSetDirectory() );
+        return false;
+
+    }
+
+    public abstract void filter( boolean propagate );
+
+    protected void htmlMenuItem_actionPerformed( ActionEvent e ) {
+        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        GeneSetTerm classID = sourcePopup.getSelectedItem();
+        if ( classID == null ) return;
+        // create the URL and show it
+
+        String clID = classID.getId();
+
+        try {
+            BrowserLauncher.openURL( AMIGO_URL_BASE + clID );
+        } catch ( Exception e1 ) {
+            log.error( e1, e1 );
+            GuiUtil.error( "Could not open a web browser window" );
+        }
+    }
+
+    protected void modMenuItem_actionPerformed( ActionEvent e ) {
+        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        GeneSetTerm classID = null;
+        classID = sourcePopup.getSelectedItem();
+        if ( classID == null ) return;
+        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, goData, classID );
+        cwiz.showWizard();
+    }
+
+    protected abstract GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e );
 
     /**
-     * @param messenger
+     * Update the view to reflect changes
+     * 
+     * @param addedTerm
      */
-    public void setMessenger( StatusViewer messenger ) {
-        if ( messenger == null ) return;
-        this.messenger = messenger;
+    protected abstract void removedGeneSet( GeneSetTerm addedTerm );
+
+    /**
+     * Create the popup window with the visualization for a specific gene set.
+     * 
+     * @param runnum
+     * @param id
+     * @throws IllegalStateException
+     */
+    protected void showDetailsForGeneSet( final GeneSetPvalRun run, final GeneSetTerm id ) throws IllegalStateException {
+        messenger.showStatus( "Viewing data for " + id + "..." );
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    if ( id == null ) {
+                        log.debug( "Got null geneset id" );
+                        return;
+                    }
+                    log.debug( "Request for details of gene set: " + id + ", run: " + run );
+                    if ( !geneData.hasGeneSet( id ) ) {
+                        callingFrame.getStatusMessenger()
+                                .showError( id + " is not available for viewing in your data." );
+                        return;
+                    }
+                    GeneSetDetails details = new GeneSetDetails( messenger, goData, geneData, settings, id );
+                    if ( run == null ) {
+                        details.show();
+                    } else {
+                        GeneSetResult res = run.getResults().get( id );
+                        details.show( run.getName(), res, run.getGeneScores() );
+                    }
+                    messenger.clear();
+                } catch ( Exception ex ) {
+                    GuiUtil
+                            .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
+                                    + ex.getMessage() );
+                    log.error( ex, ex );
+                    messenger.clear();
+                }
+            }
+        }.start();
     }
+
+    protected abstract void showPopupMenu( MouseEvent e );
 }
 
 class OutputPanel_htmlMenuItem_actionAdapter implements java.awt.event.ActionListener {
@@ -317,4 +369,3 @@ class OutputPanel_modMenuItem_actionAdapter implements java.awt.event.ActionList
         adaptee.modMenuItem_actionPerformed( e );
     }
 }
-

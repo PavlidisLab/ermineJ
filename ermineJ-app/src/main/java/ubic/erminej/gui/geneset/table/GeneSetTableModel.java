@@ -43,6 +43,7 @@ import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.geneset.GeneSetPanel;
+import ubic.erminej.gui.geneset.tree.GeneSetTreePanel;
 import ubic.erminej.gui.util.Colors;
 import corejava.Format;
 
@@ -97,7 +98,13 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     private boolean filterEmpty = true;
 
-    private boolean filterEmptyResults = true;
+    private boolean filterInsignificant = true;
+
+    private boolean filterNonUsers;
+
+    public void setFilterNonUsers( boolean filterNonUsers ) {
+        this.filterNonUsers = filterNonUsers;
+    }
 
     public GeneSetTableModel( GeneAnnotations geneData, List<GeneSetPvalRun> results ) {
         super();
@@ -128,7 +135,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     }
 
     public void setFilterEmptyResults( boolean b ) {
-        this.filterEmptyResults = b;
+        this.filterInsignificant = b;
         filter();
     }
 
@@ -138,7 +145,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
         int beforeCount = gsl.size();
 
-        if ( filterRedundant || filterEmpty || filterEmptyResults ) {
+        if ( filterRedundant || filterEmpty || filterInsignificant ) {
 
             for ( Iterator<GeneSetTerm> it = gsl.iterator(); it.hasNext(); ) {
                 GeneSetTerm t = it.next();
@@ -146,15 +153,19 @@ public class GeneSetTableModel extends AbstractTableModel {
                     it.remove();
                 } else if ( filterEmpty && geneData.getGeneSetGenes( t ).isEmpty() ) {
                     it.remove();
-                } else if ( filterEmptyResults && !this.results.isEmpty() ) {
+                } else if ( filterInsignificant && !this.results.isEmpty() ) {
+                    // keep if there is at least one significant result.
                     boolean keep = false;
                     for ( GeneSetPvalRun r : results ) {
-                        if ( r.getResults().containsKey( t ) ) {
+                        GeneSetResult res = r.getResults().get( t );
+                        if ( res != null && res.getCorrectedPvalue() < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
                             keep = true;
                             break;
                         }
                     }
                     if ( !keep ) it.remove();
+                } else if ( filterNonUsers && !t.isUserDefined() ) {
+                    it.remove();
                 }
             }
             super.fireTableStructureChanged();
@@ -305,6 +316,8 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             setText( "[not run]" );
         } else if ( value instanceof GeneSetResult ) {
             setText( nf.format( ( ( GeneSetResult ) value ).getPvalue() ) );
+        } else if ( column == 4 && ( Double ) value < 0 ) {
+            setText( "" );
         } else if ( value instanceof Double ) {
             setText( String.format( "%.2f", ( Double ) value ) );
         } else {
@@ -327,7 +340,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
             boolean redundant = geneData.skipDueToRedundancy( term );
 
-            if ( redundant ) {
+            if ( redundant || geneData.numGenesInGeneSet( term ) == 0 ) {
                 setForeground( Color.GRAY );
             } else {
                 setForeground( Color.BLACK );

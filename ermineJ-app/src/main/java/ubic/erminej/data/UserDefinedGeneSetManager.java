@@ -31,8 +31,8 @@ import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.Date; 
+import java.util.HashSet; 
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -216,8 +216,10 @@ public class UserDefinedGeneSetManager {
             statusMessenger.showStatus( "No gene sets found in " + settings.getUserGeneSetDirectory() );
             return;
         }
-
+        int timesWarned = 0;
+        int maxWarnings = 3;
         int numLoaded = 0;
+        Collection<GeneSet> newSets = new HashSet<GeneSet>();
         for ( int i = 0; i < classFiles.length; i++ ) {
 
             String classFile = classFiles[i];
@@ -237,7 +239,7 @@ public class UserDefinedGeneSetManager {
                     if ( isExistingGeneSet( id ) ) {
                         statusMessenger.showError( "Cannot overwrite gene set, please rename it " + id );
                     } else {
-                        geneData.addGeneSet( id, set.getGenes(), classFilePath );
+                        newSets.add( set );
                     }
                 }
 
@@ -247,10 +249,63 @@ public class UserDefinedGeneSetManager {
 
             }
 
+            /*
+             * Warn the user if any of their sets are redundant FIXME we don't store this in the 'redundant sets'
+             */
+            redundancyCheck( newSets );
+
+            for ( GeneSet s : newSets ) {
+
+                Collection<GeneSet> redundantGroups = s.getRedundantGroups();
+
+                if ( !redundantGroups.isEmpty() && timesWarned < maxWarnings ) {
+                    statusMessenger.showError( s.getId() + " is redundant with " + redundantGroups.size()
+                            + " other sets (but it will be kept)" );
+                    timesWarned++;
+                    if ( timesWarned == maxWarnings ) {
+                        statusMessenger.showError( "Further warnings about redundancy skipped" );
+                    }
+                }
+            }
+
+            // we can finally add them!
+            for ( GeneSet s : newSets ) {
+                geneData.addGeneSet( s.getTerm(), s.getGenes(), classFilePath );
+            }
+
+            statusMessenger.clear();
+
         }
+
         if ( statusMessenger != null && numLoaded > 0 )
             statusMessenger.showStatus( "Loaded " + numLoaded + " customized gene sets from " + classFiles.length
                     + " files." );
+    }
+
+    /**
+     * Check whether the given gene set is redundant with any others (excluding itself, but including any that were
+     * already considered to be redundant)
+     * 
+     * @param s
+     */
+    private static void redundancyCheck( Collection<GeneSet> sets ) {
+        for ( GeneSet s : sets ) {
+            Collection<Gene> genes2 = s.getGenes();
+
+            for ( GeneSet gs1 : geneData.getAllGeneSets() ) {
+                Collection<Gene> genes1 = gs1.getGenes();
+
+                if ( gs1.equals( s ) ) continue; // doesn't count ... but this would be a mistake since we haven't added
+                // it yet
+
+                if ( genes1.size() != genes2.size() ) continue; // not identical.
+
+                for ( Gene g1 : genes1 ) {
+                    if ( !genes2.contains( g1 ) ) continue; // not redundant.
+                }
+                s.getRedundantGroups().add( s );
+            }
+        }
     }
 
     /**

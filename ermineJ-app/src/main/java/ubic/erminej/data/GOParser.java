@@ -47,31 +47,6 @@ public class GOParser {
     private DirectedGraph<String, GeneSetTerm> termGraph;
 
     /**
-     * Get the graph that was created.
-     * 
-     * @return a DirectedGraph. Nodes contain OntologyEntry instances.
-     */
-    public DirectedGraph<String, GeneSetTerm> getGraph() {
-        return termGraph;
-    }
-
-    /**
-     * Get a simple Map that contains keys that are the GO ids, values are the names. This can replace the functionality
-     * of the GONameReader in classScore.
-     * 
-     * @return Map
-     */
-    public Map<String, GeneSetTerm> getGONameMap() {
-        Map<String, DirectedGraphNode<String, GeneSetTerm>> nodes = termGraph.getItems();
-        Map<String, GeneSetTerm> result = new HashMap<String, GeneSetTerm>();
-        for ( DirectedGraphNode<String, GeneSetTerm> node : nodes.values() ) {
-            GeneSetTerm e = node.getItem();
-            result.put( e.getId(), e );
-        }
-        return result;
-    }
-
-    /**
      * @param i
      * @throws IOException
      * @throws SAXException
@@ -101,6 +76,31 @@ public class GOParser {
 
         i.close();
 
+    }
+
+    /**
+     * Get a simple Map that contains keys that are the GO ids, values are the names. This can replace the functionality
+     * of the GONameReader in classScore.
+     * 
+     * @return Map
+     */
+    public Map<String, GeneSetTerm> getGONameMap() {
+        Map<String, DirectedGraphNode<String, GeneSetTerm>> nodes = termGraph.getItems();
+        Map<String, GeneSetTerm> result = new HashMap<String, GeneSetTerm>();
+        for ( DirectedGraphNode<String, GeneSetTerm> node : nodes.values() ) {
+            GeneSetTerm e = node.getItem();
+            result.put( e.getId(), e );
+        }
+        return result;
+    }
+
+    /**
+     * Get the graph that was created.
+     * 
+     * @return a DirectedGraph. Nodes contain OntologyEntry instances.
+     */
+    public DirectedGraph<String, GeneSetTerm> getGraph() {
+        return termGraph;
     }
 
     private void populateAspect() {
@@ -134,9 +134,18 @@ public class GOParser {
 class GOHandler extends DefaultHandler {
     private DirectedGraph<String, GeneSetTerm> termGraph;
 
-    public DirectedGraph<String, GeneSetTerm> getResults() {
-        return termGraph;
-    }
+    private Collection<String> forbiddenParents = new HashSet<String>();
+
+    private boolean inTerm = false;
+
+    private boolean inDef = false;
+    private boolean inAcc = false;
+    private boolean inName = false;
+    // private String currentAspect;
+    private StringBuffer nameBuf;
+    private StringBuffer accBuf;
+
+    private StringBuffer defBuf;
 
     public GOHandler() {
         super();
@@ -154,16 +163,58 @@ class GOHandler extends DefaultHandler {
 
     }
 
-    private Collection<String> forbiddenParents = new HashSet<String>();
-    private boolean inTerm = false;
-    private boolean inDef = false;
-    private boolean inAcc = false;
-    private boolean inName = false;
+    @Override
+    public void characters( char ch[], int start, int length ) {
 
-    // private String currentAspect;
-    private StringBuffer nameBuf;
-    private StringBuffer accBuf;
-    private StringBuffer defBuf;
+        if ( inTerm ) {
+            if ( inAcc ) {
+                accBuf.append( ch, start, length );
+            } else if ( inDef ) {
+                defBuf.append( ch, start, length );
+            } else if ( inName ) {
+                nameBuf.append( ch, start, length );
+            }
+        }
+    }
+
+    @Override
+    public void endElement( String uri, String name, String qName ) {
+        if ( name.equals( "term" ) ) {
+            inTerm = false;
+        } else if ( name.equals( "accession" ) ) {
+            inAcc = false;
+            String currentTerm = accBuf.toString();
+            initializeNewNode( currentTerm );
+        } else if ( name.equals( "definition" ) ) {
+            String currentTerm = accBuf.toString();
+            termGraph.getNodeContents( currentTerm ).setDefinition( defBuf.toString() );
+            inDef = false;
+        } else if ( name.equals( "is_a" ) ) {
+
+        } else if ( name.equals( "part_of" ) ) {
+
+        } else if ( name.equals( "synonym" ) ) {
+
+        } else if ( name.equals( "negatively_regulates" ) ) {
+
+        } else if ( name.equals( "positively_regulates" ) ) {
+
+        } else if ( name.equals( "regulates" ) ) {
+
+        } else if ( name.equals( "name" ) ) {
+            inName = false;
+            String currentTerm = accBuf.toString();
+
+            String currentName = nameBuf.toString();
+
+            GeneSetTerm term = termGraph.getNodeContents( currentTerm );
+            term.setName( currentName );
+        }
+    }
+
+    public DirectedGraph<String, GeneSetTerm> getResults() {
+        return termGraph;
+    }
 
     @Override
     public void startElement( String uri, String name, String qName, Attributes atts ) {
@@ -204,55 +255,6 @@ class GOHandler extends DefaultHandler {
     private void initializeNewNode( String id ) {
         GeneSetTerm item = new GeneSetTerm( id, "[No name provided]", "[No definition]" );
         termGraph.addNode( id, item );
-    }
-
-    @Override
-    public void endElement( String uri, String name, String qName ) {
-        if ( name.equals( "term" ) ) {
-            inTerm = false;
-        } else if ( name.equals( "accession" ) ) {
-            inAcc = false;
-            String currentTerm = accBuf.toString();
-            initializeNewNode( currentTerm );
-        } else if ( name.equals( "definition" ) ) {
-            String currentTerm = accBuf.toString();
-            termGraph.getNodeContents( currentTerm ).setDefinition( defBuf.toString() );
-            inDef = false;
-        } else if ( name.equals( "is_a" ) ) {
-
-        } else if ( name.equals( "part_of" ) ) {
-
-        } else if ( name.equals( "synonym" ) ) {
-
-        } else if ( name.equals( "negatively_regulates" ) ) {
-
-        } else if ( name.equals( "positively_regulates" ) ) {
-
-        } else if ( name.equals( "regulates" ) ) {
-
-        } else if ( name.equals( "name" ) ) {
-            inName = false;
-            String currentTerm = accBuf.toString();
-
-            String currentName = nameBuf.toString();
-
-            GeneSetTerm term = termGraph.getNodeContents( currentTerm );
-            term.setName( currentName );
-        }
-    }
-
-    @Override
-    public void characters( char ch[], int start, int length ) {
-
-        if ( inTerm ) {
-            if ( inAcc ) {
-                accBuf.append( ch, start, length );
-            } else if ( inDef ) {
-                defBuf.append( ch, start, length );
-            } else if ( inName ) {
-                nameBuf.append( ch, start, length );
-            }
-        }
     }
 
 }

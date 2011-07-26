@@ -37,6 +37,11 @@ public class StatusJlabel extends StatusDebugLogger {
 
     private static Icon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
 
+    /*
+     * How long we display error messages for by default
+     */
+    private static final int MESSAGE_DELAY = 1600; // milliseconds
+
     public StatusJlabel( JLabel l ) {
         this.jlabel = l;
     }
@@ -92,16 +97,6 @@ public class StatusJlabel extends StatusDebugLogger {
         if ( callSuper ) {
             super.showStatus( s );
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ubic.basecode.util.StatusDebugLogger#showStatus(java.lang.String, int)
-     */
-    @Override
-    public void showStatus( String s, int sleepSeconds ) {
-        super.showStatus( s, sleepSeconds );
     }
 
     @Override
@@ -170,16 +165,15 @@ public class StatusJlabel extends StatusDebugLogger {
         this.setStatus( s, true );
     }
 
-    /**
-     * @param m
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.basecode.util.StatusDebugLogger#showStatus(java.lang.String, int)
      */
-    protected void setLabel( final String m, final Icon icon ) {
-        jlabel.setText( m );
-        jlabel.setIcon( icon );
-        jlabel.repaint();
+    @Override
+    public void showStatus( String s, int sleepSeconds ) {
+        super.showStatus( s, sleepSeconds );
     }
-
-    private static final int MESSAGE_DELAY = 2000; // milliseconds
 
     /** 
      */
@@ -189,5 +183,14 @@ public class StatusJlabel extends StatusDebugLogger {
         } catch ( InterruptedException e ) {
             return;
         }
+    }
+
+    /**
+     * @param m
+     */
+    protected void setLabel( final String m, final Icon icon ) {
+        jlabel.setText( m );
+        jlabel.setIcon( icon );
+        jlabel.repaint();
     }
 }

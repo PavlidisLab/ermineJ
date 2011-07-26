@@ -47,6 +47,7 @@ import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -91,6 +92,8 @@ import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.ScrollingTextAreaDialog;
 
 /**
+ * The main ErmineJ application GUI Sframe.
+ * 
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @author Will Braynen
@@ -154,8 +157,7 @@ public class MainFrame extends JFrame {
     private JMenu runViewMenu = new JMenu();
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
     private Settings settings;
-    private boolean showingUserGeneSets = false;
-    private JMenuItem showUsersMenuItem = new JMenuItem();
+    private JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined gene sets", false );
     private StatusViewer statusMessenger;
     private JTabbedPane tabs = new JTabbedPane();
     private GeneSetTreePanel treePanel;
@@ -164,18 +166,18 @@ public class MainFrame extends JFrame {
     private JMenuItem switchDataFileMenuItem = new JMenuItem();
     private JMenuItem switchGeneScoreFileMenuItem = new JMenuItem();
 
-    public MainFrame( Settings settings ) {
-        this.settings = settings;
-        jbInit();
-        hh = new HelpHelper();
-        hh.initHelp( helpMenuItem );
-    }
-
     /**
      * @throws IOException
      */
     public MainFrame() throws IOException {
         settings = new Settings();
+        jbInit();
+        hh = new HelpHelper();
+        hh.initHelp( helpMenuItem );
+    }
+
+    public MainFrame( Settings settings ) {
+        this.settings = settings;
         jbInit();
         hh = new HelpHelper();
         hh.initHelp( helpMenuItem );
@@ -223,6 +225,14 @@ public class MainFrame extends JFrame {
     }
 
     /**
+     * @param selectedTerms
+     */
+    public void filter( Collection<GeneSetTerm> selectedTerms ) {
+        this.tablePanel.filter( selectedTerms );
+   //     this.treePanel.filter( selectedTerms );
+    }
+
+    /**
      * @param classID
      */
     public void findGeneSetInTree( GeneSetTerm classID ) {
@@ -236,13 +246,6 @@ public class MainFrame extends JFrame {
      */
     public int getCurrentResultSet() {
         return this.currentResultSet;
-    }
-
-    /**
-     * @return Returns the oPanel.
-     */
-    public GeneSetTablePanel getOPanel() {
-        return tablePanel;
     }
 
     /**
@@ -270,6 +273,13 @@ public class MainFrame extends JFrame {
     }
 
     /**
+     * @return Returns the tablePanel.
+     */
+    public GeneSetTablePanel getTablePanel() {
+        return tablePanel;
+    }
+
+    /**
      * @return Returns the treePanel.
      */
     public GeneSetTreePanel getTreePanel() {
@@ -281,7 +291,12 @@ public class MainFrame extends JFrame {
      */
     public void initialize() {
         try {
+            /*
+             * mainpanel remove startup dialog.
+             */
+
             mainPanel.add( progressPanel, BorderLayout.CENTER );
+            mainPanel.validate();
 
             rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
             geneScoreSets = new HashMap<String, GeneScores>();
@@ -464,6 +479,77 @@ public class MainFrame extends JFrame {
         enableMenusForAnalysis();
     }
 
+    public void updateProgress( int val ) {
+        final int value = val;
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            progressBar.setValue( value );
+        } else {
+
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    public void run() {
+                        progressBar.setValue( value );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
+     * 
+     */
+    public void updateRunViewMenu() {
+        log.debug( "Updating runViewMenu" );
+        runViewMenu.removeAll();
+        for ( Iterator<GeneSetPvalRun> iter = this.results.iterator(); iter.hasNext(); ) {
+            GeneSetPvalRun resultSet = iter.next();
+            String name = resultSet.getName();
+            log.debug( "Adding " + name );
+            JMenuItem newSet = new JMenuItem();
+            newSet.setIcon( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "noCheckBox.gif" ) ) );
+            newSet.addActionListener( new RunSet_Choose_ActionAdapter( this ) );
+            newSet.setText( name );
+            this.runViewMenu.add( newSet );
+        }
+        if ( runViewMenu.getItemCount() > 0 ) {
+            runViewMenu.getItem( runViewMenu.getItemCount() - 1 ).setIcon(
+                    new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "checkBox.gif" ) ) );
+        }
+        runViewMenu.revalidate();
+    }
+
+    /**
+     * Check whether a file exists, and if not, prompt the user to enter one. The path is returned.
+     * 
+     * @param file
+     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
+     */
+    private String checkFile( String file ) {
+        if ( StringUtils.isBlank( file ) ) return null;
+        log.info( "Seeking file '" + file + "'" );
+        if ( !FileTools.testFile( file ) ) {
+            GuiUtil.error( "A file referred to in the results\n(" + file
+                    + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
+                    + " enter the location." );
+            fc.setDialogTitle( "Please locate " + file );
+            fc.setDialogType( JFileChooser.OPEN_DIALOG );
+            fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
+            int result = fc.showOpenDialog( this );
+            if ( result == JFileChooser.APPROVE_OPTION ) {
+                File f = fc.getSelectedFile();
+                return f.getAbsolutePath();
+            }
+            return null;
+        }
+        return file;
+    }
+
     /**
      * 
      */
@@ -491,54 +577,6 @@ public class MainFrame extends JFrame {
                     + "For example, make sure your setting for 'larger scores are better' is correct." );
         }
 
-    }
-
-    public void updateProgress( int val ) {
-        final int value = val;
-
-        if ( SwingUtilities.isEventDispatchThread() ) {
-            progressBar.setValue( value );
-        } else {
-
-            try {
-                SwingUtilities.invokeAndWait( new Runnable() {
-                    public void run() {
-                        progressBar.setValue( value );
-                    }
-                } );
-            } catch ( InterruptedException e ) {
-                e.printStackTrace();
-            } catch ( InvocationTargetException e ) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    /**
-     * Check whether a file exists, and if not, prompt the user to enter one. The path is returned.
-     * 
-     * @param file
-     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
-     */
-    private String checkFile( String file ) {
-        if ( StringUtils.isBlank( file ) ) return null;
-        log.info( "Seeking file '" + file + "'" );
-        if ( !FileTools.testFile( file ) ) {
-            GuiUtil.error( "A file referred to in the results\n(" + file
-                    + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
-                    + " enter the location." );
-            fc.setDialogTitle( "Please locate " + file );
-            fc.setDialogType( JFileChooser.OPEN_DIALOG );
-            fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
-            int result = fc.showOpenDialog( this );
-            if ( result == JFileChooser.APPROVE_OPTION ) {
-                File f = fc.getSelectedFile();
-                return f.getAbsolutePath();
-            }
-            return null;
-        }
-        return file;
     }
 
     /**
@@ -598,8 +636,7 @@ public class MainFrame extends JFrame {
 
         // initialization panel (replaced by main panel when done)
         logoLabel = new JLabel();
-        logoLabel
-                .setIcon( new ImageIcon( MainFrame.class.getResource( RESOURCE_LOCATION + "logo1small.gif" ) ) );
+        logoLabel.setIcon( new ImageIcon( MainFrame.class.getResource( RESOURCE_LOCATION + "logo1small.gif" ) ) );
 
         progressPanel = new JPanel();
         progressPanel.setLayout( new FlowLayout() );
@@ -632,6 +669,7 @@ public class MainFrame extends JFrame {
             @Override
             public void mouseReleased( MouseEvent e ) {
                 maybeEnableSomeMenus();
+                // ( ( GeneSetPanel ) ( ( JTabbedPane ) e.getSource() ).getComponent( 0 ) ).filter();
             }
         } );
         tabs.addTab( "Table", tablePanel );
@@ -664,6 +702,11 @@ public class MainFrame extends JFrame {
         mainPanel.add( jPanelStatus, BorderLayout.SOUTH );
         tablePanel.setMessenger( this.statusMessenger );
         treePanel.setMessenger( this.statusMessenger );
+    }
+
+    private void multifunctionalityDiagnostics() {
+        MultiFuncDiagWindow mf = new MultiFuncDiagWindow( this );
+        mf.setVisible( true );
     }
 
     /**
@@ -704,34 +747,6 @@ public class MainFrame extends JFrame {
     /**
      * 
      */
-    protected void writePrefs() {
-        settings.getConfig().setProperty( MAINWINDOWWIDTH, String.valueOf( this.getWidth() ) );
-        settings.getConfig().setProperty( MAINWINDOWHEIGHT, String.valueOf( this.getHeight() ) );
-        settings.getConfig().setProperty( MAINWINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
-        settings.getConfig().setProperty( MAINWINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
-    }
-
-    protected void maybeEnableSomeMenus() {
-
-        if ( results.size() > 0 ) {
-            diagnosticsMenu.setEnabled( true );
-        }
-
-        if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
-            runViewMenu.setEnabled( true );
-        } else {
-            runViewMenu.setEnabled( false );
-        }
-    }
-
-    private void multifunctionalityDiagnostics() {
-        MultiFuncDiagWindow mf = new MultiFuncDiagWindow( this );
-        mf.setVisible( true );
-    }
-
-    /**
-     * 
-     */
     private void setupMenus() {
 
         fileMenu.setText( "File" );
@@ -766,20 +781,9 @@ public class MainFrame extends JFrame {
         findGeneMenuItem.setMnemonic( 'G' );
         findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
 
-        // reloadGeneSetsMenuItem.setText( "Reload user-defined gene sets" );
-        // reloadGeneSetsMenuItem.addActionListener( new ActionListener() {
-        // public void actionPerformed( ActionEvent e ) {
-        // loadUserGeneSets();
-        // addedNewGeneSet();
-        // }
-        // } );
-        // reloadGeneSetsMenuItem.setMnemonic( 'E' );
-        // reloadGeneSetsMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, InputEvent.CTRL_MASK ) );
-
-        showUsersMenuItem.setText( "Show user-defined gene sets" );
         showUsersMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                showUserMenuItemActionPerformed();
+                showUserMenuItemActionPerformed( showUsersMenuItem.getState() );
             }
         } );
         showUsersMenuItem.setMnemonic( 'U' );
@@ -789,7 +793,6 @@ public class MainFrame extends JFrame {
         classMenu.add( modClassMenuItem );
         classMenu.add( findClassMenuItem );
         classMenu.add( findGeneMenuItem );
-        // classMenu.add( reloadGeneSetsMenuItem );
         classMenu.add( showUsersMenuItem );
 
         this.runViewMenu.setText( "Results" );
@@ -897,33 +900,16 @@ public class MainFrame extends JFrame {
 
     }
 
-    /**
-     * 
-     */
-    protected void switchGeneScoreFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getGeneScoreFileDirectory() );
-        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
-        int yesno = fchooser.showDialog( this, "Open" );
+    protected void maybeEnableSomeMenus() {
 
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+        if ( results.size() > 0 ) {
+            diagnosticsMenu.setEnabled( true );
         }
 
-    }
-
-    /**
-     * 
-     */
-    protected void switchRawDataFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getRawDataFileDirectory() );
-        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
-        int yesno = fchooser.showDialog( this, "Open" );
-
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
-            settings.userSetRawFile( true );
+        if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
+            runViewMenu.setEnabled( true );
         } else {
-            settings.userSetRawFile( false );
+            runViewMenu.setEnabled( false );
         }
     }
 
@@ -973,53 +959,55 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     * @param b
      */
-    protected void showUserMenuItemActionPerformed() {
+    protected void showUserMenuItemActionPerformed( boolean b ) {
         /*
          * I deem this filtering unnecessary for the tree, but it could be done.
          */
+        this.tablePanel.filterByUserGeneSets( b );
 
-        // toggle state
-        if ( showingUserGeneSets ) {
-            this.tablePanel.filterByUserGeneSets( false );
-            showingUserGeneSets = false;
-        } else {
-            this.tablePanel.filterByUserGeneSets( true );
-            showingUserGeneSets = true;
-        }
-        statusMessenger.showStatus( this.tablePanel.getRowCount() + " matching gene sets found." );
-    }
-
-    /**
-     * @param selectedTerms
-     */
-    public void filter( Collection<GeneSetTerm> selectedTerms ) {
-        this.tablePanel.filter( selectedTerms );
-        this.treePanel.filter( selectedTerms );
+        statusMessenger.showStatus( this.tablePanel.getRowCount() + " custom gene sets shown" );
     }
 
     /**
      * 
      */
-    public void updateRunViewMenu() {
-        log.debug( "Updating runViewMenu" );
-        runViewMenu.removeAll();
-        for ( Iterator<GeneSetPvalRun> iter = this.results.iterator(); iter.hasNext(); ) {
-            GeneSetPvalRun resultSet = iter.next();
-            String name = resultSet.getName();
-            log.debug( "Adding " + name );
-            JMenuItem newSet = new JMenuItem();
-            newSet.setIcon( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "noCheckBox.gif" ) ) );
-            newSet.addActionListener( new RunSet_Choose_ActionAdapter( this ) );
-            newSet.setText( name );
-            this.runViewMenu.add( newSet );
+    protected void switchGeneScoreFile() {
+        JFileChooser fchooser = new JFileChooser( settings.getGeneScoreFileDirectory() );
+        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
         }
-        if ( runViewMenu.getItemCount() > 0 ) {
-            runViewMenu.getItem( runViewMenu.getItemCount() - 1 ).setIcon(
-                    new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "checkBox.gif" ) ) );
+
+    }
+
+    /**
+     * 
+     */
+    protected void switchRawDataFile() {
+        JFileChooser fchooser = new JFileChooser( settings.getRawDataFileDirectory() );
+        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.userSetRawFile( true );
+        } else {
+            settings.userSetRawFile( false );
         }
-        runViewMenu.revalidate();
+    }
+
+    /**
+     * 
+     */
+    protected void writePrefs() {
+        settings.getConfig().setProperty( MAINWINDOWWIDTH, String.valueOf( this.getWidth() ) );
+        settings.getConfig().setProperty( MAINWINDOWHEIGHT, String.valueOf( this.getHeight() ) );
+        settings.getConfig().setProperty( MAINWINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
+        settings.getConfig().setProperty( MAINWINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
     }
 
     void aboutMenuItem_actionPerformed() {
