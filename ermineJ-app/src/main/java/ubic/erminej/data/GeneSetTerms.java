@@ -110,6 +110,7 @@ public class GeneSetTerms {
         this.getGraph().addChildTo( root.getKey(), USER_DEFINED, newChild );
 
         for ( GeneSetTerm t : terms ) {
+            t.setUserDefined( true );
             this.addUserDefinedTerm( t );
         }
     }

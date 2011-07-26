@@ -175,7 +175,7 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotations g = p.readAgilent( ia, null );
         int actualValue = g.findProbe( "A_52_P311491" ).getGeneSets().size();
         assertEquals( 18, g.getRedundant().size() ); // not checked by hand.
-        assertEquals( 9, actualValue ); // not checked by hand.
+        assertEquals( 12, actualValue ); // not checked by hand.
     }
 
     public void testReadCommaDelimited() throws Exception {
@@ -185,7 +185,7 @@ public class TestGeneAnnotations extends TestCase {
         Probe probe = g.findProbe( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
-        int expectedValue = 64; // not checked by hand.
+        int expectedValue = 113; // not checked by hand.
         int actualValue = probe.getGeneSets().size();
         assertEquals( expectedValue, actualValue );
     }
