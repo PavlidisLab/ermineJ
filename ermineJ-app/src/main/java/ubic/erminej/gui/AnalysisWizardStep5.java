@@ -130,10 +130,10 @@ public class AnalysisWizardStep5 extends WizardStep {
         oraTitledBorder = new TitledBorder( "ORA" );
         oraPanel.setBorder( oraTitledBorder );
         jPanelAnalysisFrameMethods.setBorder( null );
-        jPanelAnalysisFrameMethods.setMinimumSize( new Dimension( 150, 37 ) );
-        jPanelAnalysisFrameMethods.setPreferredSize( new Dimension( 150, 45 ) );
-        jLabelAnalysisFrameMethod.setMaximumSize( new Dimension( 167, 18 ) );
-        jLabelAnalysisFrameMethod.setMinimumSize( new Dimension( 167, 18 ) );
+        jPanelAnalysisFrameMethods.setMinimumSize( new Dimension( 250, 37 ) );
+        jPanelAnalysisFrameMethods.setPreferredSize( new Dimension( 250, 45 ) );
+        jLabelAnalysisFrameMethod.setMaximumSize( new Dimension( 267, 18 ) );
+        jLabelAnalysisFrameMethod.setMinimumSize( new Dimension( 267, 18 ) );
         jLabelAnalysisFrameMethod.setToolTipText( "Determines how the gene scores are combined to make a class score." );
         jLabelAnalysisFrameMethod.setText( "Class Scoring Method" );
         jRadioButtonMedian.setText( "Median" );
@@ -157,7 +157,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         jLabel6.setLabelFor( geneScoreThresholdTextField );
         jLabel6.setText( "Gene score threshold" );
         geneScoreThresholdTextField.setEditable( true );
-        geneScoreThresholdTextField.setPreferredSize( new Dimension( 50, 19 ) );
+        geneScoreThresholdTextField.setPreferredSize( new Dimension( 150, 19 ) );
         geneScoreThresholdTextField.setToolTipText( "Score Threshold used for Over-Representation analysis" );
         geneScoreThresholdTextField.setText( "0.001" ); // default (assume it's p-value like).
         geneScoreThresholdTextField.setHorizontalAlignment( SwingConstants.RIGHT );
@@ -181,7 +181,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         jTextFieldIterations.setHorizontalAlignment( SwingConstants.RIGHT );
         jTextFieldIterations.setText( "10000" );
         jTextFieldIterations.setToolTipText( "Maximum number of iterations run per gene set size." );
-        jTextFieldIterations.setPreferredSize( new Dimension( 70, 19 ) );
+        jTextFieldIterations.setPreferredSize( new Dimension( 100, 19 ) );
         jTextFieldIterations.setEditable( true );
         numIterationsPanel.add( numIterationsLabel, null );
         numIterationsPanel.add( jTextFieldIterations, null );

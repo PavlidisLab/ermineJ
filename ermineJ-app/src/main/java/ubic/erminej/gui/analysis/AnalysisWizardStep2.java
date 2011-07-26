@@ -25,6 +25,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +36,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -44,6 +48,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -61,14 +66,14 @@ import ubic.erminej.gui.util.WizardStep;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class AnalysisWizardStep2 extends WizardStep {
+public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     private static final long serialVersionUID = -1L;
     private AnalysisWizard wiz;
     private Settings settings;
     private JFileChooser chooser = new JFileChooser();
-    private JTextField rawFile;
-    private JTextField scoreFile;
+    private JTextField rawFileTextField;
+    private JTextField scoreFileTextField;
 
     private JTextField jTextFieldScoreCol;
 
@@ -86,90 +91,95 @@ public class AnalysisWizardStep2 extends WizardStep {
     protected void jbInit() {
         // initialization
         JPanel step2Panel = new JPanel();
-        step2Panel.setLayout( new GridLayout( 5, 1 ) );
-        // panel 1
-        JPanel jPanel1 = new JPanel();
-        JLabel jLabel1 = new JLabel();
-        jLabel1.setText( "Gene score file (optional for correlation score):" );
-        jPanel1.add( jLabel1, null );
+        step2Panel.setLayout( new GridLayout( 2, 1 ) );
 
         // panel 2
-        JPanel scoreFileBrowsePanel = new JPanel();
-        JButton jButton1 = new JButton();
-        jButton1.setEnabled( true );
-        jButton1.setText( "Browse" );
-        jButton1.addActionListener( new AnalysisWizardStep2_scoreBrowseButton_actionAdapter( this ) );
-        scoreFile = new JTextField();
-        scoreFile.setPreferredSize( new Dimension( 325, 19 ) );
-        scoreFileBrowsePanel.add( scoreFile, null );
-        scoreFileBrowsePanel.add( jButton1, null );
 
-        // panel 3
+        JPanel scoreFilePanel = new JPanel();
+        scoreFilePanel.setLayout( new GridLayout( 2, 1 ) );
+
+        TitledBorder geneScoreFileTitleBorder = BorderFactory
+                .createTitledBorder( "Gene score file (optional for correlation score):" );
+
+        scoreFilePanel.setBorder( geneScoreFileTitleBorder );
+        JButton scoreFileBrowseButton = new JButton();
+        scoreFileBrowseButton.setEnabled( true );
+        scoreFileBrowseButton.setText( "Browse" );
+        scoreFileBrowseButton.addActionListener( new ScoreFileBrowse( this ) );
+        scoreFileTextField = new JTextField();
+        scoreFileTextField.setMaximumSize( new Dimension( 500, 19 ) );
+        scoreFileTextField.setPreferredSize( new Dimension( 225, 19 ) );
+
+        JPanel scoreFileBrowsePanel = new JPanel();
+        scoreFileBrowsePanel.setLayout( new BoxLayout( scoreFileBrowsePanel, BoxLayout.X_AXIS ) );
+        scoreFileBrowsePanel.add( scoreFileTextField, null );
+        scoreFileBrowsePanel.add( scoreFileBrowseButton, null );
+
+        /*
+         * Column choice. Label, field, button in a row.
+         */
         JPanel scoreColumnPanel = new JPanel();
+        scoreColumnPanel.setPreferredSize( new Dimension( 120, 40 ) );
         JLabel jLabel3 = new JLabel();
         jLabel3.setText( "Column:" );
+        jLabel3.setLabelFor( scoreColumnPanel );
+
         jTextFieldScoreCol = new JTextField();
-        jTextFieldScoreCol.setPreferredSize( new Dimension( 30, 19 ) );
-        jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.RIGHT ); // moves textbox text to the right
+        jTextFieldScoreCol.setPreferredSize( new Dimension( 50, 19 ) );
+        jTextFieldScoreCol.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
         jTextFieldScoreCol.setText( "2" );
         jTextFieldScoreCol
                 .setToolTipText( "Column of the gene score file containing the scores. This must be a value of 2 or higher." );
         jTextFieldScoreCol.setEditable( true );
-        scoreColumnPanel.add( jLabel3, null );
-        scoreColumnPanel.add( jTextFieldScoreCol, null );
 
+        jTextFieldScoreCol.addKeyListener( this );
+        scoreColumnPanel.add( jLabel3, null );
+        scoreColumnPanel.add( jTextFieldScoreCol, BorderLayout.WEST );
         JButton previewButton = new JButton( "Preview" );
         previewButton.setToolTipText( "Preview the scores to be imported" );
         previewButton.addActionListener( new PreviewButtonAdapter( this ) );
+        scoreColumnPanel.add( previewButton, BorderLayout.EAST );
 
-        scoreColumnPanel.add( previewButton, null );
+        // -----
+
+        // The top panel.
+        scoreFilePanel.add( scoreFileBrowsePanel );
+        scoreFilePanel.add( scoreColumnPanel );
+
+        // -----------------------------------------------------
 
         // panel 4
         JPanel rawDataPanel = new JPanel();
-        JLabel jLabel4 = new JLabel();
-        jLabel4.setText( "Raw data file (optional for ORA or resampling):" );
-        rawDataPanel.add( jLabel4, null );
 
-        // panel 5
+        TitledBorder rawDataFileTitleBorder = BorderFactory
+                .createTitledBorder( "Data profiles file (optional for ORA or resampling):" );
+        rawDataPanel.setBorder( rawDataFileTitleBorder );
+        rawDataPanel.setLayout( new GridLayout( 1, 1 ) );
+        // file browser
         JPanel rawDataBrowsePanel = new JPanel();
-        JButton jButton4 = new JButton();
-        jButton4.setEnabled( true );
-        jButton4.setText( "Browse" );
-        jButton4.addActionListener( new AnalysisWizardStep2_rawBrowseButton_actionAdapter( this ) );
-        rawFile = new JTextField();
-        rawFile.setPreferredSize( new Dimension( 325, 19 ) );
-        rawDataBrowsePanel.add( rawFile, null );
-        rawDataBrowsePanel.add( jButton4, null );
+        JButton rawFileBrowseButton = new JButton();
+        rawFileBrowseButton.setEnabled( true );
+        rawFileBrowseButton.setText( "Browse" );
+        rawFileBrowseButton.addActionListener( new RawFileBrowse( this ) );
+        rawFileTextField = new JTextField();
+        rawFileTextField.setPreferredSize( new Dimension( 325, 19 ) );
+        rawFileTextField.setMaximumSize( new Dimension( 500, 19 ) );
 
-        // Now create border layouts for each of the rows to get them aligned.
-        JPanel jPanelA = new JPanel();
-        jPanelA.setLayout( new BorderLayout() );
-        jPanelA.add( jPanel1, BorderLayout.WEST );
+        rawDataBrowsePanel.setLayout( new BoxLayout( rawDataBrowsePanel, BoxLayout.X_AXIS ) );
+        rawDataBrowsePanel.add( rawFileTextField );
+        rawDataBrowsePanel.add( rawFileBrowseButton );
 
-        JPanel jPanelB = new JPanel();
-        jPanelB.setLayout( new BorderLayout() );
-        jPanelB.add( scoreFileBrowsePanel, BorderLayout.WEST );
-        jPanelB.add( scoreColumnPanel, BorderLayout.EAST );
-
-        JPanel jPanelC = new JPanel();
-        jPanelC.setLayout( new BorderLayout() );
-        jPanelC.add( rawDataPanel, BorderLayout.WEST );
-
-        JPanel jPanelD = new JPanel();
-        jPanelD.setLayout( new BorderLayout() );
-        jPanelD.add( rawDataBrowsePanel, BorderLayout.WEST );
+        rawDataPanel.add( rawDataBrowsePanel );
 
         // MAIN PANEL = GridLayout(BorderLayouts); GridLayout is (1,6)
-        step2Panel.add( jPanelA, null );
-        step2Panel.add( jPanelB, null );
-        step2Panel.add( jPanelC, null );
-        step2Panel.add( jPanelD, null );
 
+        step2Panel.add( scoreFilePanel, null );
+        step2Panel.add( rawDataPanel, null );
         this.addHelp( "<html><b>Choose the data files to use</b><br>"
                 + "&quot;Gene scores&quot; refer to a score or p value "
                 + " associated with each gene in your data set. This "
-                + "file can have as few as two columns. &quot;Raw data&quot;"
-                + " refers to the expression profile data, usually a large matrix. "
+                + "file can have as few as two columns. &quot;Data profiles&quot;"
+                + " refers to the expression or similar profile data, usually a large matrix. "
                 + "Files must be tab-delimited text. For details, see the user manual." );
         this.addMain( step2Panel );
 
@@ -178,12 +188,12 @@ public class AnalysisWizardStep2 extends WizardStep {
     @Override
     public boolean isReady() {
 
-        if ( wiz.getAnalysisType().equals( Settings.Method.CORR ) && rawFile.getText().compareTo( "" ) == 0 ) {
+        if ( wiz.getAnalysisType().equals( Settings.Method.CORR ) && rawFileTextField.getText().compareTo( "" ) == 0 ) {
             wiz.showError( "Correlation analyses require a raw data file." );
             return false;
         } else if ( ( wiz.getAnalysisType().equals( Settings.Method.GSR ) || wiz.getAnalysisType().equals(
                 Settings.Method.ORA ) )
-                && scoreFile.getText().compareTo( "" ) == 0 ) {
+                && scoreFileTextField.getText().compareTo( "" ) == 0 ) {
             wiz.showError( "ORA and resampling analyses require a gene score file." );
             return false;
         }
@@ -195,12 +205,12 @@ public class AnalysisWizardStep2 extends WizardStep {
         }
 
         // make sure we got at least one file that's readable.
-        if ( rawFile.getText().length() != 0 && !FileTools.testFile( rawFile.getText() ) ) {
+        if ( rawFileTextField.getText().length() != 0 && !FileTools.testFile( rawFileTextField.getText() ) ) {
             wiz.showError( "The raw data file is not valid." );
             return false;
         }
 
-        if ( scoreFile.getText().length() != 0 && !FileTools.testFile( scoreFile.getText() ) ) {
+        if ( scoreFileTextField.getText().length() != 0 && !FileTools.testFile( scoreFileTextField.getText() ) ) {
             wiz.showError( "The gene score file is not valid." );
             return false;
         }
@@ -215,7 +225,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         wiz.clearStatus();
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
-            rawFile.setText( chooser.getSelectedFile().toString() );
+            rawFileTextField.setText( chooser.getSelectedFile().toString() );
             settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
         }
     }
@@ -226,23 +236,23 @@ public class AnalysisWizardStep2 extends WizardStep {
         wiz.clearStatus();
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
-            scoreFile.setText( chooser.getSelectedFile().toString() );
+            scoreFileTextField.setText( chooser.getSelectedFile().toString() );
             settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
         }
     }
 
     void setValues() {
         jTextFieldScoreCol.setText( String.valueOf( settings.getScoreCol() ) );
-        scoreFile.setText( settings.getScoreFile() );
-        rawFile.setText( settings.getRawDataFileName() );
+        scoreFileTextField.setText( settings.getScoreFile() );
+        rawFileTextField.setText( settings.getRawDataFileName() );
     }
 
     public void saveValues() {
         settings.setScoreCol( Integer.valueOf( jTextFieldScoreCol.getText() ).intValue() );
 
-        settings.setScoreFile( scoreFile.getText() );
-        settings.setRawFile( rawFile.getText() );
-        if ( rawFile.getText() != null || rawFile.getText().length() > 0 ) {
+        settings.setScoreFile( scoreFileTextField.getText() );
+        settings.setRawFile( rawFileTextField.getText() );
+        if ( rawFileTextField.getText() != null || rawFileTextField.getText().length() > 0 ) {
             settings.userSetRawFile( true );
         }
         settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
@@ -253,7 +263,7 @@ public class AnalysisWizardStep2 extends WizardStep {
      */
     public void previewScoresActionPerformed() {
 
-        if ( scoreFile.getText().length() != 0 && !FileTools.testFile( scoreFile.getText() ) ) {
+        if ( scoreFileTextField.getText().length() != 0 && !FileTools.testFile( scoreFileTextField.getText() ) ) {
             wiz.showError( "You must choose a valid file to preview" );
             return;
         }
@@ -266,7 +276,7 @@ public class AnalysisWizardStep2 extends WizardStep {
         int column = Integer.valueOf( jTextFieldScoreCol.getText() ).intValue();
 
         try {
-            FileInputStream fis = new FileInputStream( scoreFile.getText() );
+            FileInputStream fis = new FileInputStream( scoreFileTextField.getText() );
             BufferedInputStream bis = new BufferedInputStream( fis );
             BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
 
@@ -325,6 +335,7 @@ public class AnalysisWizardStep2 extends WizardStep {
                 @Override
                 public void actionPerformed( ActionEvent e ) {
                     previewPanel.dispose();
+                    wiz.clearStatus();
 
                 }
             } );
@@ -354,12 +365,25 @@ public class AnalysisWizardStep2 extends WizardStep {
 
     }
 
+    @Override
+    public void keyPressed( KeyEvent e ) {
+    }
+
+    @Override
+    public void keyReleased( KeyEvent e ) {
+    }
+
+    @Override
+    public void keyTyped( KeyEvent e ) {
+        wiz.clearStatus();
+    }
+
 }
 
-class AnalysisWizardStep2_rawBrowseButton_actionAdapter implements java.awt.event.ActionListener {
+class RawFileBrowse implements java.awt.event.ActionListener {
     AnalysisWizardStep2 adaptee;
 
-    AnalysisWizardStep2_rawBrowseButton_actionAdapter( AnalysisWizardStep2 adaptee ) {
+    RawFileBrowse( AnalysisWizardStep2 adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -368,10 +392,10 @@ class AnalysisWizardStep2_rawBrowseButton_actionAdapter implements java.awt.even
     }
 }
 
-class AnalysisWizardStep2_scoreBrowseButton_actionAdapter implements java.awt.event.ActionListener {
+class ScoreFileBrowse implements java.awt.event.ActionListener {
     AnalysisWizardStep2 adaptee;
 
-    AnalysisWizardStep2_scoreBrowseButton_actionAdapter( AnalysisWizardStep2 adaptee ) {
+    ScoreFileBrowse( AnalysisWizardStep2 adaptee ) {
         this.adaptee = adaptee;
     }
 

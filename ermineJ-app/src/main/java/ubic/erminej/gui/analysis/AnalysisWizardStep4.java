@@ -82,7 +82,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         jLabel11.setText( "Maximum gene set size" );
         jLabel11.setLabelFor( jTextFieldMaxClassSize );
         jTextFieldMaxClassSize.setEditable( true );
-        jTextFieldMaxClassSize.setPreferredSize( new Dimension( 31, 19 ) );
+        jTextFieldMaxClassSize.setPreferredSize( new Dimension( 131, 19 ) );
         jTextFieldMaxClassSize.setToolTipText( "Largest gene set size to be considered" );
         jTextFieldMaxClassSize.setText( "150" );
         jTextFieldMaxClassSize.setHorizontalAlignment( SwingConstants.RIGHT );
@@ -93,7 +93,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         jLabel12.setLabelFor( jTextFieldMinClassSize );
         jLabel12.setText( "Minimum gene set size" );
         jTextFieldMinClassSize.setEditable( true );
-        jTextFieldMinClassSize.setPreferredSize( new Dimension( 31, 19 ) );
+        jTextFieldMinClassSize.setPreferredSize( new Dimension( 131, 19 ) );
         jTextFieldMinClassSize.setToolTipText( "Smallest gene set size to be considered" );
         jTextFieldMinClassSize.setText( "8" );
         jTextFieldMinClassSize.setHorizontalAlignment( SwingConstants.RIGHT );

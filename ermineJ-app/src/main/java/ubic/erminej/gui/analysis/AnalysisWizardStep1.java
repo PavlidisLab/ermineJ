@@ -98,13 +98,6 @@ public class AnalysisWizardStep1 extends WizardStep {
         buttonGroup1.add( resampButton );
         jPanel5.add( resampButton, null );
 
-        corrButton.setText( "Correlation" );
-        corrButton.setPreferredSize( new Dimension( 140, 17 ) );
-        corrButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
-        corrButton.addActionListener( new AnalysisWizardStep1_corrButton_actionAdapter( this ) );
-        buttonGroup1.add( corrButton );
-        jPanel5.add( corrButton, null );
-
         rocButton.setText( "ROC" );
         rocButton.setPreferredSize( new Dimension( 140, 17 ) );
         rocButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
@@ -116,6 +109,13 @@ public class AnalysisWizardStep1 extends WizardStep {
         buttonGroup1.add( rocButton );
         jPanel5.add( rocButton, null );
 
+        corrButton.setText( "Correlation" );
+        corrButton.setPreferredSize( new Dimension( 140, 17 ) );
+        corrButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        corrButton.addActionListener( new AnalysisWizardStep1_corrButton_actionAdapter( this ) );
+        buttonGroup1.add( corrButton );
+        jPanel5.add( corrButton, null );
+
         jPanel4.add( jPanel5, BorderLayout.WEST );
         jPanel12.setPreferredSize( new Dimension( 210, 80 ) );
         jLabel9.setText( " Over-representation analysis" );
@@ -124,14 +124,15 @@ public class AnalysisWizardStep1 extends WizardStep {
         jLabel4.setText( " Examines distribution of gene scores" );
         jLabel4.setPreferredSize( new Dimension( 200, 17 ) );
         jPanel12.add( jLabel4, null );
-        jLabel5.setText( " Uses correlation of expression profiles" );
-        jLabel5.setPreferredSize( new Dimension( 200, 17 ) );
-        jPanel12.add( jLabel5, null );
 
         JLabel jLabel6 = new JLabel();
         jLabel6.setText( " Uses ranks of gene scores" );
         jLabel6.setPreferredSize( new Dimension( 200, 17 ) );
         jPanel12.add( jLabel6, null );
+
+        jLabel5.setText( " Uses correlation of expression profiles" );
+        jLabel5.setPreferredSize( new Dimension( 200, 17 ) );
+        jPanel12.add( jLabel5, null );
 
         jPanel4.add( jPanel12, null );
         step1Panel.add( jPanel4, BorderLayout.EAST );

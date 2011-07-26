@@ -28,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -51,12 +52,13 @@ import ubic.erminej.Settings;
  */
 public class UserDefinedGeneSetManager {
 
-    private static Log log = LogFactory.getLog( UserDefinedGeneSetManager.class.getName() );
-    private static final String USERGENESET_SUFFIX = "-class.txt";
-
     public enum GeneSetFileFormat {
         LINE_BASED, DEFAULT
     }
+
+    private static Log log = LogFactory.getLog( UserDefinedGeneSetManager.class.getName() );
+
+    private static final String USERGENESET_SUFFIX = "-class.txt";
 
     private static Settings settings;
     private static GeneAnnotations geneData;
@@ -100,7 +102,8 @@ public class UserDefinedGeneSetManager {
             if ( sets.size() > 1 ) {
 
                 // have to rewrite the file, omitting this set.
-                BufferedWriter out = new BufferedWriter( new FileWriter( classFile, false ) );
+
+                Writer out = initOutputFile( classFile );
                 for ( GeneSet s : sets ) {
                     if ( !s.getId().equals( termToDelete.getId() ) ) {
                         writeSet( s, out );
@@ -130,17 +133,6 @@ public class UserDefinedGeneSetManager {
             }
         }
 
-    }
-
-    /**
-     * @param dir
-     * @param className
-     * @return
-     */
-    private static String getUserGeneSetFileForName( String id ) {
-        String classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" )
-                + cleanGeneSetName( id ) + USERGENESET_SUFFIX;
-        return classFile;
     }
 
     /**
@@ -207,60 +199,6 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Add user-defined gene set(s) to the GeneData.
-     * <ul>
-     * <li>Rows starting with "#" are ignored as comments.</li>
-     * <li>A row starting with "===" delimits multiple gene sets in one file.</li>
-     * </ul>
-     * The format of a group is:
-     * <ol>
-     * <li>The first line in a group: The type of gene set {gene|probe}</li>
-     * <li>Second line: The identifier for the gene set, e.g, "My gene set"; tab characters should be avoided in this
-     * line to avoid confusion with the other supported format</li>
-     * <li>Third line: The description for the gene set, e.g, "Genes I like"; tab characters should be avoided in this
-     * line to avoid confusion with the other format</li>
-     * <li>Any number of rows containing gene or probe identifiers.</li>
-     * </ol>
-     * Alternatively, a tab-delimited file can be provided with one group per row, with the following format:
-     * <ol>
-     * <li>A name for the group (e.g., KEGG identifier)</li>
-     * <li>A description for the group (can be blank but must present)</li>
-     * <li>The remaining fields are interpreted as gene symbols</li>
-     * <li>Lines starting with "#" are ignored as comments.</li>
-     * <li>Lines starting with "===" are ignored.</li>
-     * </ol>
-     * <p>
-     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
-     * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
-     * that this behavior is not desirable.
-     * <p>
-     * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
-     * 
-     * @param file which stores the probes or genes.
-     * @return true if some probes were read in which are on the current array design.
-     * @throws IOException
-     */
-    static Collection<GeneSet> loadUserGeneSetFile( String fileName, StatusViewer m ) throws IOException {
-        BufferedReader dis = setUpToLoad( fileName );
-
-        Collection<GeneSet> result = new HashSet<GeneSet>();
-
-        while ( dis.ready() ) {
-            GeneSet newSet = readOneSet( dis, m );
-
-            if ( newSet == null ) {
-                m.showError( "Set was not read from " + fileName );
-                continue;
-            }
-            newSet.setSourceFile( fileName );
-            result.add( newSet );
-        }
-        dis.close();
-
-        return result;
-    }
-
-    /**
      * Load the user-defined gene sets.
      */
     public static void loadUserGeneSets( StatusViewer statusMessenger ) {
@@ -299,7 +237,7 @@ public class UserDefinedGeneSetManager {
                     if ( isExistingGeneSet( id ) ) {
                         statusMessenger.showError( "Cannot overwrite gene set, please rename it " + id );
                     } else {
-                        geneData.addGeneSet( id, set.getGenes() );
+                        geneData.addGeneSet( id, set.getGenes(), classFilePath );
                     }
                 }
 
@@ -355,7 +293,7 @@ public class UserDefinedGeneSetManager {
             try {
                 backup = saveBackup( sets );
 
-                BufferedWriter out = new BufferedWriter( new FileWriter( fileName, false ) );
+                Writer out = initOutputFile( fileName );
                 for ( GeneSet s : sets ) {
                     if ( s.getId().equals( setToSave.getId() ) ) {
                         writeSet( setToSave, out );
@@ -378,24 +316,10 @@ public class UserDefinedGeneSetManager {
 
             // make a new one in a file by itself.
 
-            BufferedWriter out = new BufferedWriter( new FileWriter( fileName, false ) );
+            Writer out = initOutputFile( fileName );
             writeSet( setToSave, out );
             out.close();
         }
-    }
-
-    private static boolean restoreBackup( File originalFile, File backup ) {
-        return backup.renameTo( originalFile );
-    }
-
-    private static File saveBackup( Collection<GeneSet> sets ) throws IOException {
-        File backup = File.createTempFile( "ermineJ.set.backup.", ".txt" );
-        BufferedWriter out = new BufferedWriter( new FileWriter( backup, false ) );
-        for ( GeneSet s : sets ) {
-            writeSet( s, out );
-        }
-        out.close();
-        return backup;
     }
 
     /**
@@ -405,6 +329,30 @@ public class UserDefinedGeneSetManager {
         String fileid = id.replaceAll( ":", "-" );
         fileid = fileid.replaceAll( "\\s+", "_" );
         return fileid;
+    }
+
+    /**
+     * @param dir
+     * @param className
+     * @return
+     */
+    private static String getUserGeneSetFileForName( String id ) {
+        String classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" )
+                + cleanGeneSetName( id ) + USERGENESET_SUFFIX;
+        return classFile;
+    }
+
+    /**
+     * Open file for writing, add header.
+     * 
+     * @param classFile
+     * @return
+     * @throws IOException
+     */
+    private static Writer initOutputFile( String classFile ) throws IOException {
+        Writer out = new BufferedWriter( new FileWriter( classFile, false ) );
+        out.write( "# Saved by ErmineJ " + new Date() + " \n" );
+        return out;
     }
 
     /**
@@ -537,6 +485,20 @@ public class UserDefinedGeneSetManager {
         return newSet;
     }
 
+    private static boolean restoreBackup( File originalFile, File backup ) {
+        return backup.renameTo( originalFile );
+    }
+
+    private static File saveBackup( Collection<GeneSet> sets ) throws IOException {
+        File backup = File.createTempFile( "ermineJ.set.backup.", ".txt" );
+        Writer out = initOutputFile( backup.getAbsolutePath() );
+        for ( GeneSet s : sets ) {
+            writeSet( s, out );
+        }
+        out.close();
+        return backup;
+    }
+
     /**
      * @param fileName
      * @return
@@ -558,15 +520,12 @@ public class UserDefinedGeneSetManager {
      * @param out
      * @throws IOException
      */
-    private static void writeSet( GeneSet set, BufferedWriter out ) throws IOException {
+    private static void writeSet( GeneSet set, Writer out ) throws IOException {
         String cleanedDescription = set.getTerm().getName().replaceAll( "[\n\t]+", " " );
         String filetype = ( set.isGenes() ) ? "gene" : "probe";
 
-        out.write( "# Saved by ErmineJ " + new Date() + " \n" );
-        out.write( "# " + set + "\n" );
-
         if ( set.getFormat() == GeneSetFileFormat.DEFAULT ) {
-
+            out.write( "# " + set + "\n" );
             out.write( filetype + "\n" );
             out.write( set.getId() + "\n" );
             out.write( cleanedDescription + "\n" );
@@ -609,6 +568,60 @@ public class UserDefinedGeneSetManager {
             result.add( newSet );
         }
         dis.close();
+        return result;
+    }
+
+    /**
+     * Add user-defined gene set(s) to the GeneData.
+     * <ul>
+     * <li>Rows starting with "#" are ignored as comments.</li>
+     * <li>A row starting with "===" delimits multiple gene sets in one file.</li>
+     * </ul>
+     * The format of a group is:
+     * <ol>
+     * <li>The first line in a group: The type of gene set {gene|probe}</li>
+     * <li>Second line: The identifier for the gene set, e.g, "My gene set"; tab characters should be avoided in this
+     * line to avoid confusion with the other supported format</li>
+     * <li>Third line: The description for the gene set, e.g, "Genes I like"; tab characters should be avoided in this
+     * line to avoid confusion with the other format</li>
+     * <li>Any number of rows containing gene or probe identifiers.</li>
+     * </ol>
+     * Alternatively, a tab-delimited file can be provided with one group per row, with the following format:
+     * <ol>
+     * <li>A name for the group (e.g., KEGG identifier)</li>
+     * <li>A description for the group (can be blank but must present)</li>
+     * <li>The remaining fields are interpreted as gene symbols</li>
+     * <li>Lines starting with "#" are ignored as comments.</li>
+     * <li>Lines starting with "===" are ignored.</li>
+     * </ol>
+     * <p>
+     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
+     * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
+     * that this behavior is not desirable.
+     * <p>
+     * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
+     * 
+     * @param file which stores the probes or genes.
+     * @return true if some probes were read in which are on the current array design.
+     * @throws IOException
+     */
+    static Collection<GeneSet> loadUserGeneSetFile( String fileName, StatusViewer m ) throws IOException {
+        BufferedReader dis = setUpToLoad( fileName );
+
+        Collection<GeneSet> result = new HashSet<GeneSet>();
+
+        while ( dis.ready() ) {
+            GeneSet newSet = readOneSet( dis, m );
+
+            if ( newSet == null ) {
+                m.showError( "Set was not read from " + fileName );
+                continue;
+            }
+            newSet.setSourceFile( fileName );
+            result.add( newSet );
+        }
+        dis.close();
+
         return result;
     }
 

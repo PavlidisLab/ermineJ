@@ -290,11 +290,7 @@ public class GeneAnnotations {
         this.addGeneSet( set.getTerm(), set.getGenes() );
     }
 
-    /**
-     * @param geneSetId
-     * @param gs
-     */
-    public void addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs ) {
+    public void addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs, String sourceFile ) {
         assert allowModification;
         for ( Gene g : gs ) {
             if ( !this.hasGene( g ) ) {
@@ -309,6 +305,7 @@ public class GeneAnnotations {
         this.geneSetTerms.addUserDefinedTerm( geneSetId );
 
         GeneSet newSet = new GeneSet( geneSetId, gs );
+        newSet.setSourceFile( sourceFile );
         newSet.setUserDefined( true );
 
         geneSets.put( geneSetId, newSet );
@@ -318,6 +315,14 @@ public class GeneAnnotations {
         this.multifunctionality.setStale( true );
 
         log.debug( "Added new gene set: " + gs.size() + " genes in gene set " + geneSetId );
+    }
+
+    /**
+     * @param geneSetId
+     * @param gs
+     */
+    public void addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs ) {
+        this.addGeneSet( geneSetId, gs, null );
     }
 
     /**
@@ -979,6 +984,30 @@ public class GeneAnnotations {
                             + ". Your annotation file may contain too few GO terms." );
         }
 
+    }
+
+    /**
+     * Check whether the given gene set is redundant with any others (excluding itself, but including any that were
+     * already considered to be redundant)
+     * 
+     * @param s
+     */
+    private boolean redundancyCheck( GeneSet s ) {
+        Collection<Gene> genes2 = s.getGenes();
+        for ( GeneSet gs1 : this.geneSets.values() ) {
+            if ( gs1.equals( s ) ) continue;
+
+            Collection<Gene> genes1 = gs1.getGenes();
+
+            if ( genes1.size() != genes2.size() ) continue; // not identical.
+
+            for ( Gene g1 : genes1 ) {
+                if ( !genes2.contains( g1 ) ) continue; // not redundant.
+            }
+
+            return true;
+        }
+        return false;
     }
 
     /**
