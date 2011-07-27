@@ -121,7 +121,7 @@ public class MainFrame extends JFrame {
 
     private static Log log = LogFactory.getLog( MainFrame.class.getName() );
 
-    private static final int START_HEIGHT = 330;
+    private static final int START_HEIGHT = 630;
 
     private static final int START_WIDTH = 830;
 
