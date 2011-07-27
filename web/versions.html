@@ -58,12 +58,12 @@
 			Current version
 		</h2>
 		<p>
-			Version 2.2 - (August 2011) Changes include both major new features,
-			minor bug fixes, and major code rewrites:
+			Version 3.0 - (August 2011) Many major and minor new features,
+			numerous bug fixes, and major code rewrites:
 		</p>
 		<ul>
 			<li>
-				Major improvements to management of user-defined (non-GO) gene
+				Overhaul of management of user-defined (non-GO) gene
 				groups. This simplifies the use of schemes such as KEGG. See the
 				<a href="/ermineJ-help/classScore/html/formats/geneset.html">help
 					pages</a> for more information. We removed some rarely used (and confusing)
@@ -73,8 +73,7 @@
 				Introduction of "gene multifunctionality" features, a major new
 				feature of ErmineJ. See
 				<a href="ermineJ-help/classScore/html/tutorial/multifunc.html">the
-					documentation</a> for details. We are working on a more extensive set
-				of tools including visualization and correction.
+					documentation</a> for details.
 			</li>
 			<li>
 				Algorithm change: Gene that are not in any group are removed from analysis. This should help ameliorate the effects
@@ -96,7 +95,7 @@
 				It is now much easier to find out how many gene sets there are, how many have genes, and how many are redundant.
 			</li>
 			<li>
-				Bug fix: Error handling is somewhat improved, so mysterious stoppages of analyses should be easier to diagnose.
+				Bug fix: Error handling is improved, so mysterious stoppages of analyses should be easier to diagnose.
 			</li>
 			<li>
 				Bug fix: Command line tool didn't correctly deal with correlation
@@ -119,10 +118,17 @@
 				Bug fix: Affymetrix CSV files work again (NetAffx format changed)
 			</li>
 			<li>
-				Bug fix: Webstart startup dialog was not working consistently.
+				Bug fix: Webstart startup dialog was not working consistently. 
+				This was fixed for good by making the startup dialog part of the main application window.
 			</li>
 			<li>
-				Added documentation of how to deal with "down-regulated" vs.
+				Bug fix: Problems with hangs and (related to this) missing log files should be fixed for Windows users.
+			</li>
+			<li>
+				Bug fix: MacOSX and Linux graphical interface problems have been ameliorated.
+			</li>
+			<li>
+				Numerous documentation updates. Added documentation of how to deal with "down-regulated" vs.
 				"up-regulated" genes (
 				<a href="ermineJ-help/classScore/html/faq.html">FAQ</a>). There are quite a few updates to the manual.
 			</li>

@@ -10,8 +10,10 @@
 		<tocitem text="Walk-throughs" target="tutorial" expand="true">
 			<tocitem text="Installing the software" target="install" />
 			<tocitem text="Software basics" target="starting" />
+			<tocitem text="Frequently Asked Questions" target="faq" />
 			<tocitem text="Analysis" target="analysis" />
-
+			<tocitem text="Diagnostics and multifunctionality" target="multifunc.html" />
+			
 			<tocitem text="Analysis methods" expand="true">
 				<tocitem text="ORA (over-representation)" target="ora" />
 				<tocitem text="Gene score resampling"
@@ -19,8 +21,8 @@
 				<tocitem text="ROC (receiver operator characteristic)"
 					target="roc" />
 				<tocitem text="Correlation" target="correlation" />
-
 			</tocitem>
+		 
 
 			<tocitem text="Viewing gene set details" target="visualize" />
 			<tocitem text="Loading and saving analysis"
@@ -61,7 +63,7 @@
 		<tocitem text="The ermineJ API" targets="api" expand="true" />
 		<tocitem text="The ermineJ command line tool" target="cli"
 			expand="true" />
-		<tocitem text="Frequently Asked Questions" target="faq" />
+		
 		<tocitem text="License information" target="license" />
 	</tocitem>
 
