@@ -284,6 +284,18 @@ public class classScoreCMD {
 
         if ( commandLine.hasOption( 'G' ) ) {
             useCommandLineInterface = false;
+
+            /*
+             * GUI: Read the default configuration file for the user.
+             */
+            settings = new Settings();
+
+            /*
+             * Don't process any more options, start the gui
+             */
+            System.err.println( "Ignoring further command line options and starting the GUI" );
+            return true;
+
         }
 
         String arg;
@@ -308,13 +320,7 @@ public class classScoreCMD {
                 showHelp();
                 return false;
             }
-        } else if ( !useCommandLineInterface ) {
-            /*
-             * GUI: Read the default configuration file for the user.
-             */
-            settings = new Settings();
         }
-
         if ( commandLine.hasOption( 'A' ) ) {
             settings.setAnnotFormat( Format.AFFYCSV );
         }
