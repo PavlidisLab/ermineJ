@@ -288,9 +288,7 @@ public class AnalysisThread extends Thread {
         }
         GeneScores geneScores = addGeneScores();
         if ( this.stop ) return null;
-
-        double multifunctionalityCorrelation = geneAnnots.getMultifunctionality()
-                .correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
+ 
 
         if ( this.stop ) return null;
 
@@ -299,10 +297,10 @@ public class AnalysisThread extends Thread {
         GeneSetPvalRun newResults = null;
         if ( results != null ) { // read from a file.
             newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, results,
-                    multifunctionalityCorrelation, "LoadedRun" );
+                     "LoadedRun" );
         } else {
             newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger,
-                    multifunctionalityCorrelation, "NewRun" );
+                     "NewRun" );
         }
 
         timer.stop();

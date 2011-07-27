@@ -27,8 +27,7 @@ import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.GeneSetTerm; 
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
 

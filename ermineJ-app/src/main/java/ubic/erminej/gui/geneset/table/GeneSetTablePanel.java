@@ -48,6 +48,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.MainFrame;
@@ -319,11 +320,15 @@ public class GeneSetTablePanel extends GeneSetPanel {
      */
     protected void generateToolTip( int runIndex ) {
         assert results != null : "Null results";
-        assert results.get( runIndex ) != null : "No results with index " + runIndex;
+        GeneSetPvalRun geneSetPvalRun = results.get( runIndex );
+        assert geneSetPvalRun != null : "No results with index " + runIndex;
         log.debug( "Generating tooltip for run #" + runIndex );
-        Settings runSettings = results.get( runIndex ).getSettings();
+        Settings runSettings = geneSetPvalRun.getSettings();
+        GeneScores gs = geneSetPvalRun.getGeneScores();
         String tooltip = new String( "<html>" );
         String coda = new String();
+
+        int numscores = gs.getNumScores();
 
         if ( runSettings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
             tooltip += "ORA Analysis<br>";
@@ -339,12 +344,12 @@ public class GeneSetTablePanel extends GeneSetPanel {
             tooltip += "ROC Analysis<br>";
         }
 
-        tooltip += String.format( "Multifunct. bias: %.2f<br>", results.get( runIndex )
-                .getMultifunctionalityCorrelation() );
+        tooltip += String.format( "Multifunct. bias: %.2f, %d values<br>", geneSetPvalRun
+                .getMultifunctionalityCorrelation(), numscores );
 
         tooltip += new String( "Max set size: " + runSettings.getMaxClassSize() + "<br>" + "Min set size: "
                 + runSettings.getMinClassSize() + "<br>" );
-        if ( runSettings.getDoLog() ) tooltip += "Log normalized<br>";
+        if ( runSettings.getDoLog() ) tooltip += "Negative log transformed<br>";
 
         if ( runSettings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.MEAN ) )
             tooltip += "Gene Rep Treatment: Mean <br>";

@@ -19,8 +19,7 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.HashSet; 
 import java.util.Map;
 import java.util.Set;
 
@@ -28,8 +27,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.GeneSetTerm; 
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
 

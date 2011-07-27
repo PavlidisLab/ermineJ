@@ -152,7 +152,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         JPanel rawDataPanel = new JPanel();
 
         TitledBorder rawDataFileTitleBorder = BorderFactory
-                .createTitledBorder( "Data profiles file (optional for ORA or resampling):" );
+                .createTitledBorder( "Data profiles file (optional for ROC, ORA or GSR):" );
         rawDataPanel.setBorder( rawDataFileTitleBorder );
         rawDataPanel.setLayout( new GridLayout( 1, 1 ) );
         // file browser

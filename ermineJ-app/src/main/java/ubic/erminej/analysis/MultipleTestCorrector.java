@@ -161,7 +161,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
         for ( int i = 0; i < trials; i++ ) {
             // System.err.println("Trial: " + i );
 
-            Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToPvalMap( true ); // shuffle
+            Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToScoreMap( true ); // shuffle
             // the
             // association
             // of

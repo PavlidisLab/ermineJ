@@ -61,9 +61,9 @@ public class Multifunctionality {
 
     /**
      * Construct Multifunctionality information based on the state of the GO annotations -- this accounts only for the
-     * 'active' (used) probes in the annotations. Genes with no GO terms are completely ignored.
+     * probes in the annotations. Genes with no GO terms are completely ignored.
      * 
-     * @param go
+     * @param go These annotations should already be pruned down to those used in analysis.
      */
     public Multifunctionality( GeneAnnotations go ) {
         this.geneAnnotations = go;
@@ -84,7 +84,14 @@ public class Multifunctionality {
             rawVals.add( mf );
         }
 
-        return -Distance.spearmanRankCorrelation( rawVals );
+        /*
+         * Note that the multifunctionality scores are "bigger is better". Thus, because we are iterating over the genes
+         * in "bigger to smaller" sort order, we are expecting a positive correlation if there is bias. Thus we have to
+         * take the negative.
+         */
+
+        double r = -Distance.spearmanRankCorrelation( rawVals );
+        return r;
     }
 
     /**

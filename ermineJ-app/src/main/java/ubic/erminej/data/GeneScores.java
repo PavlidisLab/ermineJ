@@ -65,9 +65,20 @@ public class GeneScores {
     protected static final Log log = LogFactory.getLog( GeneScores.class );
     private Map<Gene, Double> geneToScoreMap;
     private Map<Probe, Double> probeToScoreMap;
-    private Settings settings;
     final private GeneAnnotations geneAnnots;
     private StatusViewer messenger = new StatusStderr();
+
+    /**
+     * Refers to the _original_ scores.
+     */
+    private boolean biggerIsBetter = false;
+
+    /**
+     * Refers to what was done to the original scores. The scores stored here are negative-logged if this is true.
+     */
+    private boolean logTransform = true;
+
+    private Settings.MultiProbeHandling gpMethod = Settings.MultiProbeHandling.BEST;
 
     /**
      * Create a copy of source that contains only the probes given.
@@ -77,8 +88,12 @@ public class GeneScores {
      */
     public GeneScores( GeneScores source, Collection<Probe> probes ) {
         this.geneAnnots = source.geneAnnots;
-        this.settings = source.settings;
         this.messenger = source.messenger;
+
+        this.biggerIsBetter = source.biggerIsBetter;
+        this.logTransform = source.logTransform;
+        this.gpMethod = source.gpMethod;
+
         this.init();
 
         for ( Probe p : probes ) {
@@ -106,10 +121,9 @@ public class GeneScores {
             throw new IllegalArgumentException( "Annotations cannot be null" );
         }
         this.geneAnnots = geneAnnotations;
-        this.init();
-        this.settings = settings;
+        this.init( settings );
         if ( m != null ) this.messenger = m;
-        read( is );
+        read( is, settings.getScoreCol() );
     }
 
     /**
@@ -131,8 +145,7 @@ public class GeneScores {
             throw new IllegalArgumentException( "No probes" );
         }
 
-        this.settings = settings;
-        this.init();
+        this.init( settings );
         boolean invalidLog = false;
         boolean invalidNumber = false;
         String badNumberString = "";
@@ -193,14 +206,18 @@ public class GeneScores {
         }
         this.geneAnnots = geneAnnots;
         this.messenger = messenger;
-        this.settings = settings;
-        this.init();
+        this.init( settings );
         FileTools.checkPathIsReadableFile( filename );
         InputStream is = new FileInputStream( filename );
-        read( is );
+        read( is, settings.getScoreCol() );
         is.close();
     }
 
+    /**
+     * Note that these will already be log-transformed, if that was requested by the user.
+     * 
+     * @return
+     */
     public Double[] getGeneScores() {
         return this.geneToScoreMap.values().toArray( new Double[] {} );
     }
@@ -208,9 +225,9 @@ public class GeneScores {
     /**
      * @param shuffle Whether the map should be scrambled first. If so, then groups are randomly associated with scores,
      *        but the actual values are the same. This is used for resampling multiple test correction.
-     * @return Map of groups of genes to pvalues.
+     * @return Map of groups of genes to scores (which will have been -log-transformed already, if requested)
      */
-    public Map<Gene, Double> getGeneToPvalMap( boolean shuffle ) {
+    public Map<Gene, Double> getGeneToScoreMap( boolean shuffle ) {
         if ( shuffle ) {
             Map<Gene, Double> scrambled_map = new LinkedHashMap<Gene, Double>();
             Set<Gene> keys = geneToScoreMap.keySet();
@@ -234,6 +251,8 @@ public class GeneScores {
     }
 
     /**
+     * Note that these values will already be log tranformed if that was requested.
+     * 
      * @return
      */
     public Map<Gene, Double> getGeneToScoreMap() {
@@ -246,22 +265,30 @@ public class GeneScores {
         return probeToScoreMap.size();
     }
 
+    /**
+     * Note that these values will already be log-transformed if that was requested.
+     * 
+     * @return
+     */
     public Double[] getProbeScores() {
         return this.probeToScoreMap.values().toArray( new Double[] {} );
     }
 
     /**
+     * Note that these values will already be log-transformed if that was requested
      */
     public Map<Probe, Double> getProbeToScoreMap() {
         return probeToScoreMap;
     }
 
     /**
-     * @return list of genes in order of their scores, where the first probe is the 'best'. If 'big is better', large
-     *         scores will be given first.
+     * @return list of genes in order of their scores, where the <em>first</em> gene is the 'best'. If 'big is better',
+     *         genes with large scores will be given first. If smaller is better (pvalues) and the data are -log
+     *         transformed (usual), then the gene that had the smallest pvalue will be first.
      */
     public List<Gene> getRankedGenes() {
-        Map<Gene, Integer> ranked = Rank.rankTransform( getGeneToScoreMap(), settings.getBigIsBetter() );
+
+        Map<Gene, Integer> ranked = Rank.rankTransform( getGeneToScoreMap(), this.rankLargeScoresBest() );
 
         List<Gene> rankedGenes = new ArrayList<Gene>( ranked.keySet() );
 
@@ -274,6 +301,7 @@ public class GeneScores {
     }
 
     /**
+     * Note that these values will already be log-transformed if that was requested.
      */
     public Double[] getScores() {
         return this.probeToScoreMap.values().toArray( new Double[] {} );
@@ -308,14 +336,22 @@ public class GeneScores {
         this.probeToScoreMap = new LinkedHashMap<Probe, Double>( 1000 );
     }
 
+    private void init( Settings settings ) {
+        init();
+
+        this.biggerIsBetter = settings.getBigIsBetter();
+        this.logTransform = settings.getDoLog();
+        this.gpMethod = settings.getGeneRepTreatment();
+
+    }
+
     /**
      * @param is
      * @throws IOException
      * @throws IllegalStateException
      */
-    private void read( InputStream is ) throws IOException, IllegalStateException {
+    private void read( InputStream is, int scoreCol ) throws IOException, IllegalStateException {
         assert geneAnnots != null;
-        int scoreCol = settings.getScoreCol();
         if ( scoreCol < 2 ) {
             throw new IllegalArgumentException( "Illegal column number " + scoreCol + ", must be greater than 1" );
         }
@@ -376,13 +412,13 @@ public class GeneScores {
             }
 
             // Fudge when pvalues are zero.
-            if ( settings.getDoLog() && score <= 0.0 ) {
+            if ( logTransform && score <= 0.0 ) {
                 invalidLog = true;
                 score = SMALL;
 
             }
 
-            if ( settings.getDoLog() ) {
+            if ( logTransform ) {
                 score = -Arithmetic.log10( score );
             }
 
@@ -475,8 +511,6 @@ public class GeneScores {
      */
     private void setUpGeneToScoreMap() {
 
-        Settings.MultiProbeHandling gp_method = settings.getGeneRepTreatment();
-
         Collection<Gene> genes = geneAnnots.getGenes();
 
         assert genes.size() > 0;
@@ -505,17 +539,17 @@ public class GeneScores {
                 // these values are already log transformed if the user selected that option.
                 double score = probeToScoreMap.get( probe );
 
-                switch ( gp_method ) {
+                switch ( gpMethod ) {
                     case MEAN: {
                         geneScoreTemp[counter] += score;
                         break;
                     }
                     case BEST: {
                         if ( in_size == 0 ) {
-                            // fix suggested by Hubert Rehrauer, to initialize values to first score, not zero.
                             geneScoreTemp[counter] = score;
                         } else {
-                            if ( settings.upperTail() ) {
+
+                            if ( rankLargeScoresBest() ) {
                                 geneScoreTemp[counter] = Math.max( score, geneScoreTemp[counter] );
                             } else {
                                 geneScoreTemp[counter] = Math.min( score, geneScoreTemp[counter] );
@@ -531,7 +565,7 @@ public class GeneScores {
             }
 
             if ( in_size > 0 ) {
-                if ( gp_method.equals( Settings.MultiProbeHandling.MEAN ) ) {
+                if ( gpMethod.equals( Settings.MultiProbeHandling.MEAN ) ) {
                     geneScoreTemp[counter] /= in_size; // take the mean
                 }
                 Double dbb = new Double( geneScoreTemp[counter] );
@@ -550,4 +584,18 @@ public class GeneScores {
 
     }
 
+    /**
+     * @see also Settings.upperTail(), which does the same thing.
+     * @return true if the values returned by methods such as getGeneToScoreMap are returning values which should be
+     *         treated as "big better". This will be true in the following (common) cases based on the settings the user
+     *         made:
+     *         <ul>
+     *         <li>The scores were -log transformed, and small values are better (e.g., input probabilities)
+     *         <li>The scores were not -log transformed, and big values were better in the original input.
+     *         </ul>
+     */
+    public boolean rankLargeScoresBest() {
+        // The first case is the common one, if input is pvalues.
+        return ( logTransform && !biggerIsBetter ) || ( !logTransform && biggerIsBetter );
+    }
 } // end of class

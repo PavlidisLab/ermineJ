@@ -32,7 +32,6 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
 
 /**
@@ -50,8 +49,8 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
     private int inputSize;
 
     public OraGeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneData, GeneSetSizeComputer csc,
-             int inputSize ) {
-        super( settings, geneData, csc  );
+            int inputSize ) {
+        super( settings, geneData, csc );
         this.inputSize = inputSize;
 
     }
@@ -66,7 +65,7 @@ public class OraGeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator 
             Map<Probe, Double> probesToPvals, StatusViewer messenger ) {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         OraPvalGenerator cpv = new OraPvalGenerator( settings, geneAnnots, csc, numOverThreshold, numUnderThreshold,
-                 inputSize );
+                inputSize );
 
         int count = 0;
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getActiveGeneSets().iterator(); iter.hasNext(); ) {

@@ -55,7 +55,6 @@ import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetTerms;
-import ubic.erminej.data.Multifunctionality;
 import ubic.erminej.data.Probe;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.data.GeneAnnotationParser.Format;
@@ -203,7 +202,7 @@ public class classScoreCMD {
                 "Directory where custom gene set are located" ).create( 'f' ) );
 
         options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" ).withDescription(
-                "Filter out non-specific probes" ).create( 'F' ) );
+                "Filter out non-specific probes (default annotation format only)" ).create( 'F' ) );
 
         options
                 .addOption( OptionBuilder
@@ -736,16 +735,10 @@ public class classScoreCMD {
             }
         }
 
-        double multifunctionalCorrelation = 0.0;
-        if ( geneScores != null ) {
-            Multifunctionality mf = geneData.getMultifunctionality();
-            multifunctionalCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
-        }
-
         /* do work */
         statusMessenger.showStatus( "Starting analysis..." );
         GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, rawData, geneScores, statusMessenger,
-                multifunctionalCorrelation, "command" );
+                "command" );
         return runResult;
     }
 
@@ -761,14 +754,11 @@ public class classScoreCMD {
             GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
 
             statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
-            if ( settings.getAnnotFormat().equals( Format.AFFYCSV ) ) {
-                geneData = parser.read( settings.getAnnotFile(), Format.AFFYCSV );
-            } else {
-                boolean filterNonSpecific = settings.getFilterNonSpecific(); // FIXME!!!
+            if ( settings.getAnnotFormat().equals( Format.DEFAULT ) ) {
+                boolean filterNonSpecific = settings.getFilterNonSpecific();
                 parser.setFilterNonSpecific( filterNonSpecific );
-                geneData = parser.read( settings.getAnnotFile(), Format.DEFAULT );
-                // TODO add agilent support ... can we tell the type of file by the suffix?
             }
+            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat() );
 
             statusMessenger.showStatus( "Initializing gene class mapping" );
             statusMessenger.showStatus( "Done with setup" );

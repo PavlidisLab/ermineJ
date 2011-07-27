@@ -117,7 +117,7 @@ public class GeneSetPvalRun {
      * @param name Name of the run
      */
     public GeneSetPvalRun( Settings settings, GeneAnnotations originalAnnots, DoubleMatrix<Probe, String> rawData,
-            GeneScores geneScores, StatusViewer messenger, double multifunctionalityCorrelation, String name ) {
+            GeneScores geneScores, StatusViewer messenger, String name ) {
         this.settings = settings;
 
         this.geneScores = geneScores;
@@ -125,7 +125,6 @@ public class GeneSetPvalRun {
         this.name = name;
         if ( messenger != null ) this.messenger = messenger;
         this.settings = new Settings( settings ); // clone it
-        this.multifunctionalityCorrelation = multifunctionalityCorrelation;
 
         nf.setMaximumFractionDigits( 8 );
         results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
@@ -136,6 +135,7 @@ public class GeneSetPvalRun {
         pruneData();
 
         runAnalysis();
+
     }
 
     /**
@@ -147,12 +147,10 @@ public class GeneSetPvalRun {
      * @param geneScores
      * @param messenger
      * @param results
-     * @param multifunctionalityCorrelation
      * @param name Name of the run
      */
     public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, DoubleMatrix<Probe, String> rawData,
-            GeneScores geneScores, StatusViewer messenger, Map<GeneSetTerm, GeneSetResult> results,
-            double multifunctionalityCorrelation, String name ) {
+            GeneScores geneScores, StatusViewer messenger, Map<GeneSetTerm, GeneSetResult> results, String name ) {
 
         this.geneScores = geneScores;
         this.results = results;
@@ -160,11 +158,11 @@ public class GeneSetPvalRun {
         this.settings = new Settings( settings );
         if ( messenger != null ) this.messenger = messenger;
         this.name = name;
-        this.multifunctionalityCorrelation = multifunctionalityCorrelation;
 
         Set<Probe> activeProbes = getActiveProbes();
         this.geneData = getPrunedAnnotations( activeProbes, geneData );
 
+        setMultifuncationalities();
         sortResults();
         for ( int i = 0; i < sortedclasses.size(); i++ ) {
             results.get( sortedclasses.get( i ) ).setRank( i + 1 );
@@ -414,7 +412,13 @@ public class GeneSetPvalRun {
      * 
      */
     private void setMultifuncationalities() {
-        Multifunctionality mf = new Multifunctionality( geneData );
+
+        Multifunctionality mf = geneData.getMultifunctionality();
+        multifunctionalityCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
+
+        messenger.showStatus( String.format( "Multifunctionality correlation is %.2f for %d values",
+                multifunctionalityCorrelation, geneScores.getRankedGenes().size() ) );
+
         for ( GeneSetResult gsr : this.results.values() ) {
             double auc = mf.getGOTermMultifunctionality( gsr.getGeneSetId() );
             gsr.setMultifunctionality( auc );

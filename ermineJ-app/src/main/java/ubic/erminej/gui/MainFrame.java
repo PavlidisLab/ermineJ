@@ -86,7 +86,6 @@ import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.analysis.AnalysisWizard;
-import ubic.erminej.gui.analysis.GoGroupSizeDistributionWindow;
 import ubic.erminej.gui.analysis.MultiFuncDiagWindow;
 import ubic.erminej.gui.geneset.table.GeneSetTablePanel;
 import ubic.erminej.gui.geneset.tree.GeneSetTreePanel;
@@ -545,13 +544,21 @@ public class MainFrame extends JFrame {
      * 
      */
     private void multifunctionalityDiagnostics() {
-        MultiFuncDiagWindow mf = new MultiFuncDiagWindow( this );
-        mf.setVisible( true );
-    }
+        /*
+         * Should allow user to pick?
+         */
+        GeneAnnotations ga = this.geneData;
+        GeneScores gs = null;
 
-    private void groupSizeDistributionDiagnostics() {
-        GoGroupSizeDistributionWindow ggsw = new GoGroupSizeDistributionWindow( this );
-        ggsw.setVisible( true );
+        if ( this.getCurrentResultSet() >= 0 ) {
+            ga = this.results.get( this.getCurrentResultSet() ).getGeneData();
+            gs = this.results.get(this.getCurrentResultSet()).getGeneScores();
+        }
+
+        MultiFuncDiagWindow w = new MultiFuncDiagWindow( ga, gs  );
+        w.setSize( new Dimension( 500, 500 ) );
+        GuiUtil.centerContainer( w );
+        w.setVisible( true );
     }
 
     /**
@@ -788,10 +795,20 @@ public class MainFrame extends JFrame {
             }
         } );
 
+        JMenuItem multifuncMenuItem = new JMenuItem( "Multifunctionality" );
+        multifuncMenuItem.setToolTipText( "View diagnostics about gene multifunctionality." );
+        multifuncMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                multifunctionalityDiagnostics();
+            }
+        } );
+
         analysisMenu.add( runAnalysisMenuItem );
         analysisMenu.add( cancelAnalysisMenuItem );
         analysisMenu.add( loadAnalysisMenuItem );
         analysisMenu.add( saveAnalysisMenuItem );
+        analysisMenu.add( multifuncMenuItem );
         analysisMenu.add( switchDataFileMenuItem );
         analysisMenu.add( switchGeneScoreFileMenuItem );
 
@@ -835,32 +852,9 @@ public class MainFrame extends JFrame {
         helpMenu.add( aboutMenuItem );
         helpMenu.add( logMenuItem );
 
-        diagnosticsMenu.setText( "Diagnostics" );
-        diagnosticsMenu.setEnabled( false );
-        JMenuItem mulitfuncMenuItem = new JMenuItem( "Multifunctionality" );
-        JMenuItem groupSizeDist = new JMenuItem( "Group size distribution" );
-
-        mulitfuncMenuItem.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                multifunctionalityDiagnostics();
-            }
-        } );
-
-        groupSizeDist.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                groupSizeDistributionDiagnostics();
-            }
-
-        } );
-
-        diagnosticsMenu.add( mulitfuncMenuItem );
-
         jMenuBar1.add( fileMenu );
         jMenuBar1.add( classMenu );
         jMenuBar1.add( analysisMenu );
-        jMenuBar1.add( diagnosticsMenu );
         jMenuBar1.add( runViewMenu );
         jMenuBar1.add( helpMenu );
 

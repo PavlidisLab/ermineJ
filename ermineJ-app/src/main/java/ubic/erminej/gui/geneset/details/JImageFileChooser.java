@@ -37,11 +37,13 @@ import ubic.erminej.gui.file.ImageFileFilter;
  */
 public class JImageFileChooser extends JFileChooser {
 
-    private static final long serialVersionUID = -7650886071179907730L;
+    private static final long serialVersionUID = -1L;
 
     JDetailsFileChooserOptions m_options;
 
-    /** Creates a new instance of JDetailsFileChooser */
+    /**
+     * Creates a new instance of JDetailsFileChooser
+     */
     public JImageFileChooser( boolean includeLabels, boolean normalize, String initialFileName ) {
 
         super();
