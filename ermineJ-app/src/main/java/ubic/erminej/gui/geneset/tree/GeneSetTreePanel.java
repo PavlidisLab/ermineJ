@@ -672,24 +672,29 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
      * @return
      */
     private String addGeneSetSizeInformation( GeneSetTerm id, GeneSetTreeNode node ) {
-        String textToDisplay = id.getName() + " [" + id.getId() + "]";
+
+        boolean redund = geneData.hasRedundancy( id );
+
+        String textToDisplay = "<html>" + id.getName() + " [ " + id.getId() + ( redund ? "&nbsp;&bull;" : "" ) + " ]";
 
         this.setFont( this.getFont().deriveFont( Font.ITALIC ) );
         this.setForeground( Color.GRAY );
         int numGenesInGeneSet = geneData.numGenesInGeneSet( id );
+
         if ( id.isAspect() || id.getId().equals( "all" ) ) {
             this.setIcon( emptySetIcon );
             this.setFont( this.getFont().deriveFont( Font.BOLD ) );
             this.setForeground( Color.DARK_GRAY );
-        } else if ( geneData.skipDueToRedundancy( id ) ) {
-            this.setIcon( redundantIcon );
-            textToDisplay += " (Redundant)";
+            // } else if ( geneData.skipDueToRedundancy( id ) ) {
+            // this.setIcon( redundantIcon );
+            // textToDisplay += " (Redundant)";
+            // } else if ( geneData.hasRedundancy( id ) ) {
+            // textToDisplay += " (Redundant)";
         } else if ( !geneData.getActiveGeneSets().contains( id ) || numGenesInGeneSet == 0 ) {
             this.setIcon( emptySetIcon );
             textToDisplay += " (No genes in your data)";
         } else {
-            textToDisplay += " -- " + geneData.numProbesInGeneSet( id ) + " probes, " + numGenesInGeneSet
-                    + " genes, multifunc. "
+            textToDisplay += " &mdash; " + numGenesInGeneSet + " genes, multifunc. "
                     + String.format( "%.2f", this.geneData.getMultifunctionality().getGOTermMultifunctionality( id ) );
             this.setFont( plain );
             this.setIcon( regularIcon );
@@ -698,7 +703,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         if ( id.isUserDefined() ) {
             this.setForeground( USER_NODE_TEXT_COLOR );
         }
-        return textToDisplay;
+        return textToDisplay + "</html>";
     }
 
     /**
@@ -751,9 +756,12 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
     private void setupToolTip( GeneSetTerm id ) {
         String aspect = id.getAspect();
         String definition = id.getDefinition();
+        String size = geneData.getGeneSet( id ) == null ? "?" : "" + geneData.getGeneSet( id ).size();
+        String probeSize = geneData.getGeneSet( id ) == null ? "?" : "" + geneData.getGeneSet( id ).getProbes().size();
         String redund = getToolTipTextForRedundancy( id );
 
-        setToolTipText( "<html>" + id.getName() + " (" + id.getId() + ")<br/>" + "Aspect: " + aspect + "<br/>" + redund
+        setToolTipText( "<html>" + id.getName() + " (" + id.getId() + ")<br/>" + "Aspect: " + aspect + "<br/>" + size
+                + " Genes, " + probeSize + " probes.<br />" + redund
                 + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br/>" )
                 + ( definition.length() > GeneSetPanel.MAX_DEFINITION_LENGTH ? "..." : "" ) );
     }
@@ -763,12 +771,23 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
      * @return
      */
     protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
-        boolean redundant = geneData.skipDueToRedundancy( id );
+
+        if ( id.isAspect() || id.getId().equals( "all" ) ) return "";
+
+        // boolean redundant = geneData.skipDueToRedundancy( id );
+        GeneSet qGeneSet = geneData.getGeneSet( id );
+
+        if ( qGeneSet == null ) {
+            System.err.println( "No set " + id );
+            return "";
+        }
+
+        Collection<GeneSet> redundantGroups = qGeneSet.getRedundantGroups();
 
         String redund = "";
-        if ( redundant ) {
+        if ( !redundantGroups.isEmpty() ) {
             redund = "<strong>Redundant</strong> with:<br/>";
-            Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();
+
             for ( GeneSet geneSet : redundantGroups ) {
                 redund += geneSet + "<br/>";
             }

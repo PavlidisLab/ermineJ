@@ -84,7 +84,13 @@
 				Tree view enhancements: You can now hide nodes in the GO hierarchy
 				based on significance, making it easier to browser your results. See
 				<a href="ermineJ-help/classScore/html/tutorial/treeview.html">the
-					documentation</a> for details. You can also hide terms that are redundant or empty.
+					documentation</a> for details. You can also hide terms that are empty.
+			</li>
+			<li>
+				Algorithm improvement: In previous versions of ErmineJ, groups that were completely redundant with others
+				(containing the same genes) were identified but not handled particularly
+				well. Now redundant groups are exhaustively identified. While these groups are included in the analysis (to avoid confusion and other problems),
+				they are considered as one in multiple testing correction.
 			</li>
 			<li>
 				Table view enhancements: You can hide rows in the table to remove clutter due to redundant or empty gene sets.

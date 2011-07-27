@@ -289,35 +289,37 @@ public class UserDefinedGeneSetManager {
 
         int timesWarned = 0;
         int maxWarnings = 3;
-        for ( String fileName : setmap.keySet() )
+
+        for ( String fileName : setmap.keySet() ) {
             for ( GeneSet newSet : setmap.get( fileName ) ) {
-                Collection<Gene> genes2 = newSet.getGenes();
 
-                for ( GeneSet gs1 : geneData.getAllGeneSets() ) {
-                    if ( gs1.equals( newSet ) ) continue; // doesn't count as redundant ... but shouldn't happen!
+                boolean hasRedund = false;
+                Collection<Gene> newSetGenes = newSet.getGenes();
 
-                    Collection<Gene> genes1 = gs1.getGenes();
+                for ( GeneSet oldSet : geneData.getAllGeneSets() ) {
+                    if ( oldSet.equals( newSet ) ) continue; // doesn't count as redundant ... but shouldn't happen!
 
-                    if ( genes1.size() != genes2.size() ) continue; // not identical.
+                    Collection<Gene> oldSetGenes = oldSet.getGenes();
 
-                    for ( Gene g1 : genes1 ) {
-                        if ( !genes2.contains( g1 ) ) continue; // not redundant.
-                    }
+                    if ( oldSetGenes.size() != newSetGenes.size() ) continue; // not redundant.
 
-                    newSet.addRedundantGroup( gs1 );
-                    gs1.addRedundantGroup( newSet );
+                    if ( !newSetGenes.containsAll( oldSetGenes ) ) continue; // not redundant.
 
-                    if ( timesWarned < maxWarnings ) {
-                        statusMessenger.showError( newSet.getId()
-                                + " is redundant with other sets (but it will be kept)" );
-                        timesWarned++;
-                        if ( timesWarned == maxWarnings ) {
-                            statusMessenger.showError( "Further warnings about redundancy skipped" );
-                        }
-                    }
+                    newSet.addRedundantGroup( oldSet );
+                    oldSet.addRedundantGroup( newSet );
+                    hasRedund = true;
 
                 }
+
+                if ( hasRedund && timesWarned < maxWarnings ) {
+                    statusMessenger.showError( newSet.getId() + " is redundant with other sets" );
+                    timesWarned++;
+                    if ( timesWarned == maxWarnings ) {
+                        statusMessenger.showError( "Further warnings about redundancy skipped" );
+                    }
+                }
             }
+        }
     }
 
     /**

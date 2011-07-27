@@ -19,10 +19,15 @@
 package ubic.erminej.analysis;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,13 +39,15 @@ import ubic.erminej.Settings;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
 
 /**
- * Perform multiple test correction on class scores.
+ * Perform multiple test correction on class scores. Multiple test correction is based on the non-redundant set of gene
+ * sets, to avoid overcorrecting.
  * 
  * @author Paul Pavlidis
  * @version $Id$
@@ -57,6 +64,8 @@ public class MultipleTestCorrector extends AbstractLongTask {
     private GeneScores geneScores;
     private Settings settings;
     private StatusViewer messenger;
+    List<GeneSetTerm> toUseForMTC;
+    Map<GeneSetTerm, Collection<GeneSetTerm>> usedToSkipped = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
 
     public MultipleTestCorrector( Settings set, List<GeneSetTerm> sc, Histogram h, GeneAnnotations geneData,
             GeneSetSizeComputer csc, GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results,
@@ -69,42 +78,78 @@ public class MultipleTestCorrector extends AbstractLongTask {
         this.csc = csc;
         this.geneScores = geneScores;
         this.messenger = messenger;
+
+        /*
+         * Deal with redundancy. Make it so we can find the redundant ones at the end to put their corrected pvalues in.
+         */
+        toUseForMTC = new ArrayList<GeneSetTerm>(); // same order as sorted.
+
+        Set<GeneSetTerm> skip = new HashSet<GeneSetTerm>(); // need this for fast lookup.
+        for ( GeneSetTerm t : sortedclasses ) {
+
+            assert t != null;
+
+            if ( skip.contains( t ) ) continue;
+
+            Collection<GeneSet> redundantGroups = geneData.getGeneSet( t ).getRedundantGroups();
+
+            if ( !redundantGroups.isEmpty() ) {
+                if ( !usedToSkipped.containsKey( t ) ) {
+                    usedToSkipped.put( t, new HashSet<GeneSetTerm>() );
+                }
+                for ( GeneSet r : redundantGroups ) {
+                    usedToSkipped.get( t ).add( r.getTerm() );
+                    skip.add( r.getTerm() );
+                }
+            }
+
+            toUseForMTC.add( t );
+        }
+
+        messenger.showStatus( toUseForMTC.size() + " sets will be used for multiple test correction; " + skip.size()
+                + " redundant ones grouped in." );
+
     }
 
     /**
-     * Benjamini-Hochberg correction of pvalues.
+     * Benjamini-Hochberg correction of pvalues. Default method, used for GUI
      * 
      * @param fdr double desired false discovery rate.
      */
     public void benjaminihochberg() {
-        int numclasses = sortedclasses.size();
+        int numclasses = toUseForMTC.size();
         int n = numclasses;
 
-        Collections.reverse( sortedclasses ); // start from the worst class.
-        for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
-            if ( Thread.currentThread().isInterrupted() ) break;
-            GeneSetTerm nextclass = it.next();
+        Collections.reverse( toUseForMTC ); // start from the worst class.
+
+        for ( GeneSetTerm nextclass : toUseForMTC ) {
             GeneSetResult res = results.get( nextclass );
             double actual_p = res.getPvalue();
 
-            // double thresh = fdr * n / numclasses;
-
             double thisFDR = Math.min( actual_p * numclasses / n, 1.0 );
 
-            // the actual fdr at this threshold is n / (actual_p * numclasses).
-            res.setCorrectedPvalue( thisFDR ); // todo this is slightly broken when there are tied pvals.
+            res.setCorrectedPvalue( thisFDR ); // this is slightly broken when there are tied pvals.
+
+            // fill in
+            if ( usedToSkipped.containsKey( nextclass ) ) {
+                for ( GeneSetTerm redund : usedToSkipped.get( nextclass ) ) {
+                    res = results.get( redund );
+                    res.setCorrectedPvalue( thisFDR );
+                }
+            }
+
             n--;
         }
-        Collections.reverse( sortedclasses ); // put it back.
+        Collections.reverse( toUseForMTC ); // put it back
     }
 
     /**
      * Bonferroni correction of class pvalues.
      */
     public void bonferroni() {
-        int numclasses = sortedclasses.size();
+        int numclasses = toUseForMTC.size();
         double corrected_p;
-        for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> it = toUseForMTC.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) break;
             GeneSetTerm nextclass = it.next();
             GeneSetResult res = results.get( nextclass );
@@ -115,6 +160,12 @@ public class MultipleTestCorrector extends AbstractLongTask {
             }
 
             res.setCorrectedPvalue( corrected_p );
+
+            // fill in
+            for ( GeneSetTerm redund : usedToSkipped.get( nextclass ) ) {
+                res = results.get( redund );
+                res.setCorrectedPvalue( corrected_p );
+            }
         }
     }
 
@@ -148,12 +199,12 @@ public class MultipleTestCorrector extends AbstractLongTask {
      */
     public void westfallyoung( int trials ) {
 
-        int[] counts = new int[sortedclasses.size()];
-        for ( int i = 0; i < sortedclasses.size(); i++ ) {
+        int[] counts = new int[toUseForMTC.size()];
+        for ( int i = 0; i < toUseForMTC.size(); i++ ) {
             counts[i] = 0;
         }
 
-        Collections.reverse( sortedclasses ); // start from the worst class.
+        Collections.reverse( toUseForMTC ); // start from the worst class.
         Map<GeneSetTerm, Double> permscores;
 
         GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc );
@@ -199,7 +250,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
             GeneSetTerm nextclass = null;
 
             // successive minima of step 2, pg 66. Also does step 3.
-            for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
+            for ( Iterator<GeneSetTerm> it = toUseForMTC.iterator(); it.hasNext(); ) {
 
                 ifInterruptedStop();
 
@@ -240,7 +291,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
                  * if (nextclass.equals("GO:0006958")) { System.err.print("\tGO:0006958\t" + nf.format(permp)); }
                  */
 
-                if ( log.isDebugEnabled() && j == sortedclasses.size() - 1 ) {
+                if ( log.isDebugEnabled() && j == toUseForMTC.size() - 1 ) {
                     /*
                      * monitor what happens to the best class.
                      */
@@ -272,23 +323,23 @@ public class MultipleTestCorrector extends AbstractLongTask {
         }
 
         // now the best class is first.
-        Collections.reverse( sortedclasses );
+        Collections.reverse( toUseForMTC );
 
         // index of the best class (last one
         // tested above).
-        int j = sortedclasses.size() - 1;
+        int j = toUseForMTC.size() - 1;
 
         /*
          * pvalue for the best class.
          */
-        double corrected_p = counts[sortedclasses.size() - 1] / trials;
+        double corrected_p = counts[toUseForMTC.size() - 1] / trials;
 
         double previous_p = corrected_p;
 
         /*
          * Step 4 and enforce monotonicity, pg 67 (step 5) starting from the best class.
          */
-        for ( Iterator<GeneSetTerm> it = sortedclasses.iterator(); it.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> it = toUseForMTC.iterator(); it.hasNext(); ) {
             if ( Thread.currentThread().isInterrupted() ) throw new CancellationException();
             GeneSetResult res = results.get( it.next() );
             corrected_p = Math.max( ( double ) counts[j] / ( double ) trials, previous_p ); // first iteration, these
@@ -297,6 +348,13 @@ public class MultipleTestCorrector extends AbstractLongTask {
             if ( log.isDebugEnabled() ) log.debug( j + " " + counts[j] + " " + trials + " " + corrected_p );
 
             res.setCorrectedPvalue( corrected_p );
+
+            // fill in the redundant ones.
+            for ( GeneSetTerm redund : usedToSkipped.get( res.getGeneSetId() ) ) {
+                res = results.get( redund );
+                res.setCorrectedPvalue( corrected_p );
+            }
+
             previous_p = corrected_p;
             j--;
         }

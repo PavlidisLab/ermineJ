@@ -308,11 +308,17 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         if ( value == null ) {
             setText( "" );
         } else if ( column == 0 ) {
-            setText( ( ( GeneSetTerm ) value ).getId() );
+            boolean redundant = geneData.hasRedundancy( ( GeneSetTerm ) value );
+            if ( redundant ) {
+                setText( "<html>" + ( ( GeneSetTerm ) value ).getId() + "&nbsp;&nbsp;&bull;</html>" );
+            } else {
+                setText( ( ( GeneSetTerm ) value ).getId() );
+            }
         } else if ( column == 1 ) {
             setText( ( String ) value );
         } else if ( value instanceof EmptyGeneSetResult ) {
             setText( "[not run]" );
+            setBackground( Color.LIGHT_GRAY );
         } else if ( value instanceof GeneSetResult ) {
             setText( nf.format( ( ( GeneSetResult ) value ).getPvalue() ) );
         } else if ( column == 4 && ( Double ) value < 0 ) {
@@ -341,9 +347,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
             GeneSetTerm term = ( GeneSetTerm ) o;
 
-            boolean redundant = geneData.skipDueToRedundancy( term );
+            // boolean redundant = geneData.skipDueToRedundancy( term );
 
-            if ( redundant || geneData.numGenesInGeneSet( term ) == 0 ) {
+            if ( /* redundant || */geneData.numGenesInGeneSet( term ) == 0 ) {
                 setForeground( Color.GRAY );
             } else {
                 setForeground( Color.BLACK );
@@ -423,12 +429,16 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
     }
 
     protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
-        boolean redundant = geneData.skipDueToRedundancy( id );
+
+        if ( id.isAspect() || id.getId().equals( "all" ) ) return "";
+
+        // boolean redundant = geneData.skipDueToRedundancy( id );
+        Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();
 
         String redund = "";
-        if ( redundant ) {
+        if ( !redundantGroups.isEmpty() ) {
             redund = "<strong>Redundant</strong> with:<br/>";
-            Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();
+
             for ( GeneSet geneSet : redundantGroups ) {
                 redund += geneSet + "<br/>";
             }

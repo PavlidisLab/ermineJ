@@ -122,6 +122,7 @@ public class GeneSetDetailsFrame extends JFrame {
     private static final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
     private static final String SAVESTARTPATH = "detailsview.startPath";
     private static final int PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN = 75;
+    public static final int MAX_GENES_FOR_DETAIL_VIEWING = 1000;
 
     private int width;
     private int height;

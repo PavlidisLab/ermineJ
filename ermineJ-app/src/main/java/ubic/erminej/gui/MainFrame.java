@@ -962,6 +962,15 @@ public class MainFrame extends JFrame {
             public boolean dispatchKeyEvent( KeyEvent e ) {
                 if ( e.getID() == KeyEvent.KEY_RELEASED
                         && e.getKeyCode() == KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ).getKeyCode() ) {
+                    /*
+                     * Remove find filter
+                     */
+                    if ( StringUtils.isNotBlank( queryTextField.getText() ) ) {
+                        queryTextField.setText( "" );
+                        statusMessenger.clear();
+                        Collection<GeneSetTerm> geneSets = geneData.getAllTerms();
+                        filter( geneSets );
+                    }
                     queryTextField.requestFocusInWindow();
                 }
                 return false;

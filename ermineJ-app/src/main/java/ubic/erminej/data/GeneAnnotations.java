@@ -480,7 +480,8 @@ public class GeneAnnotations {
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
             String candidateN = term.getName().toUpperCase();
-            if ( candidateN.toUpperCase().contains( searchOnUp ) || term.getId().equals( searchOn ) ) {
+            String candidateI = term.getId().toUpperCase();
+            if ( candidateN.contains( searchOnUp ) || candidateI.startsWith( searchOnUp ) ) {
                 result.add( term );
             }
         }
@@ -801,6 +802,18 @@ public class GeneAnnotations {
     }
 
     /**
+     * Check if a group has any redundancies.
+     * 
+     * @param id
+     * @return
+     */
+    public boolean hasRedundancy( GeneSetTerm id ) {
+        GeneSet geneSet = this.getGeneSet( id );
+        if ( geneSet == null ) return false;
+        return !geneSet.getRedundantGroups().isEmpty();
+    }
+
+    /**
      * @return
      */
     public TableModel toTableModel() {
@@ -1006,7 +1019,7 @@ public class GeneAnnotations {
 
         Collection<GeneSet> checked = new HashSet<GeneSet>();
         int i = 0;
-        int numToSkip = 0;
+        int numRedundant = 0;
         for ( GeneSet gs1 : this.geneSets.values() ) {
             gs: for ( GeneSet gs2 : this.geneSets.values() ) {
                 if ( gs1.equals( gs2 ) || checked.contains( gs2 ) ) continue;
@@ -1023,32 +1036,32 @@ public class GeneAnnotations {
                 gs1.addRedundantGroup( gs2 );
                 gs2.addRedundantGroup( gs1 );
 
-                if ( gs1.isSkipDueToRedundancy() || gs2.isSkipDueToRedundancy() ) {
-                    continue;
-                }
+                // if ( gs1.isSkipDueToRedundancy() || gs2.isSkipDueToRedundancy() ) {
+                // continue;
+                // }
 
                 /*
                  * Choose one to mark as skippable; favor keeping the parent term to avoid having stranded children.
                  */
-                if ( this.geneSetTerms.isParent( gs1.getTerm(), gs2.getTerm() ) ) {
-                    gs1.setSkipDueToRedundancy( true );
-                    this.skipDueToRedundancy.add( gs2.getTerm() );
-                } else {
-                    gs2.setSkipDueToRedundancy( true );
-                    this.skipDueToRedundancy.add( gs1.getTerm() );
-                }
-                numToSkip++;
+                // if ( this.geneSetTerms.isParent( gs1.getTerm(), gs2.getTerm() ) ) {
+                // gs1.setSkipDueToRedundancy( true );
+                // this.skipDueToRedundancy.add( gs2.getTerm() );
+                // } else {
+                // gs2.setSkipDueToRedundancy( true );
+                // this.skipDueToRedundancy.add( gs1.getTerm() );
+                // }
+                numRedundant++;
 
             }
             checked.add( gs1 );
 
             if ( ++i % 500 == 0 ) {
-                messenger.showStatus( checked.size() + " sets checked for redundancy, " + numToSkip + " found ..." );
+                messenger.showStatus( checked.size() + " sets checked for redundancy, " + numRedundant + " found ..." );
             }
 
         }
 
-        messenger.showStatus( numToSkip + " gene sets will be ignored in analysis due to redundancy" );
+        messenger.showStatus( numRedundant + " gene sets are redundant with at least one other." );
 
     }
 
@@ -1063,20 +1076,20 @@ public class GeneAnnotations {
         for ( GeneSet gs1 : this.geneSets.values() ) {
             GeneSet originalGeneSet = start.getGeneSet( gs1.getTerm() );
 
-            // we can't have _more_ gene sets, but sometimes something funn can happen - GO:0001775
+            // we can't have _more_ gene sets, but sometimes something funny can happen - GO:0001775
             if ( originalGeneSet == null ) {
                 log.warn( gs1.getTerm() + " missing from source" );
                 continue;
             }
 
-            if ( originalGeneSet.isSkipDueToRedundancy() ) {
-                gs1.setSkipDueToRedundancy( true );
-                this.skipDueToRedundancy.add( gs1.getTerm() );
-            }
+            // if ( originalGeneSet.isSkipDueToRedundancy() ) {
+            // gs1.setSkipDueToRedundancy( true );
+            // // this.skipDueToRedundancy.add( gs1.getTerm() );
+            // }
 
             for ( GeneSet redund : originalGeneSet.getRedundantGroups() ) {
                 gs1.addRedundantGroup( this.getGeneSet( redund.getTerm() ) );
-                // do I have to do it the other way around as well?
+                // I do not have to do it the other way around, since I'm iterating over all of them
             }
 
         }

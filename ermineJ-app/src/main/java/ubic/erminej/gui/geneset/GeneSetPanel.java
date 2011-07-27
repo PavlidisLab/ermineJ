@@ -34,6 +34,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -79,7 +80,7 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     protected static boolean hideEmpty = true;
     protected static boolean hideInsignificant = false;
-    protected static boolean hideRedundant = true;
+    protected static boolean hideRedundant = false;
     protected static boolean hideNonCustom = false;
 
     private Collection<GeneSetPanel> dependentPanels = new HashSet<GeneSetPanel>();
@@ -164,7 +165,7 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty );
         final JCheckBoxMenuItem hideInsig = new JCheckBoxMenuItem( "Hide non-significant", hideInsignificant );
-        final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", hideRedundant );
+        // final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", hideRedundant );
 
         hideEmptyMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e1 ) {
@@ -182,19 +183,19 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         } );
 
-        hideRedund.addActionListener( new ActionListener() {
-            public void actionPerformed( ActionEvent e1 ) {
-                hideRedundant = hideRedund.getState();
-                filter( true );
-            }
-
-        } );
+        // hideRedund.addActionListener( new ActionListener() {
+        // public void actionPerformed( ActionEvent e1 ) {
+        // hideRedundant = hideRedund.getState();
+        // filter( true );
+        // }
+        //
+        // } );
 
         popup.add( htmlMenuItem );
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
         popup.add( hideEmptyMenuItem );
-        popup.add( hideRedund );
+        // popup.add( hideRedund );
         popup.add( hideInsig );
 
         if ( classID == null ) return null;
@@ -306,6 +307,14 @@ public abstract class GeneSetPanel extends JScrollPane {
      * @param run can be null
      */
     protected void showDetailsForGeneSet( final GeneSetTerm id, final GeneSetPvalRun run ) {
+
+        int numGenes = this.geneData.getGeneSet( id ).getGenes().size();
+        if ( numGenes > GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING ) {
+            messenger.showError( StringUtils.abbreviate( id.getId(), 30 ) + " has too many genes to display ("
+                    + numGenes + ", max is set to " + GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING + ")" );
+            return;
+        }
+
         messenger.showStatus( "Viewing details of data for " + id + " ..." );
 
         new Thread() {

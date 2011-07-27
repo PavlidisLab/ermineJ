@@ -41,7 +41,7 @@ public class GeneSet {
     // How was it originally represented. This affects how things are stored on disk. Genes is better.
     private boolean isGenes = true;
 
-    private boolean skipDueToRedundancy = false;
+    // private boolean skipDueToRedundancy = false;
 
     private boolean isUserDefined = false;
 
@@ -148,6 +148,10 @@ public class GeneSet {
         this.redundantGroups.add( redundant );
     }
 
+    public boolean hasRedundancy() {
+        return !redundantGroups.isEmpty();
+    }
+
     /**
      * Can not modify this collection directly; use addRedundantGroup instead.
      * 
@@ -191,9 +195,9 @@ public class GeneSet {
         return modified;
     }
 
-    public boolean isSkipDueToRedundancy() {
-        return skipDueToRedundancy;
-    }
+    // public boolean isSkipDueToRedundancy() {
+    // return skipDueToRedundancy;
+    // }
 
     public boolean isUserDefined() {
         return isUserDefined;
@@ -222,9 +226,9 @@ public class GeneSet {
         this.redundantGroups = redundantGroups;
     }
 
-    public void setSkipDueToRedundancy( boolean skipDueToRedundancy ) {
-        this.skipDueToRedundancy = skipDueToRedundancy;
-    }
+    // public void setSkipDueToRedundancy( boolean skipDueToRedundancy ) {
+    // this.skipDueToRedundancy = skipDueToRedundancy;
+    // }
 
     public void setSourceFile( String fileName ) {
         this.sourceFile = fileName;
@@ -242,6 +246,9 @@ public class GeneSet {
         this.term.setUserDefined( isUserDefined );
     }
 
+    /**
+     * @return how many genes there are.
+     */
     public int size() {
         return genes.size();
     }
