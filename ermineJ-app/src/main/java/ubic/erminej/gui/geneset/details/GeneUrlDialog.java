@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -108,6 +109,18 @@ public class GeneUrlDialog extends JDialog {
         bottomPanel.add( setButton, null );
 
         bottomPanel.add( cancelButton, null );
+
+        JButton resetToDefaultbutton = new JButton( "Restore default" );
+        resetToDefaultbutton.addActionListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                // FIXME read this from ermineJdefault.properties.
+                urlTextField.setText( "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@" );
+            }
+        } );
+
+        bottomPanel.add( resetToDefaultbutton );
 
         // status bar
         jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );

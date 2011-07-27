@@ -98,7 +98,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     private boolean filterEmpty = true;
 
-    private boolean filterInsignificant = true;
+    private boolean filterInsignificant = false;
 
     private boolean filterNonUsers;
 

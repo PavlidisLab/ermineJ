@@ -248,9 +248,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
         /*
          * open up the first couple of nodes? (can't do more than one at the moment as filter recollapses everything.
          */
-        this.expandToGeneSet( this.geneData.findTerm( "GO:0008150" ) );
-        // this.expandToGeneSet( this.geneData.findTerm( "GO:0005575" ) );
-        // this.expandToGeneSet( this.geneData.findTerm( "GO:0003674" ) );
+        this.expandToGeneSet( this.geneData.findTerm( "GO:0008150" ) ); // bio proc
+        // this.expandToGeneSet( this.geneData.findTerm( "GO:0005575" ) ); //
+        // this.expandToGeneSet( this.geneData.findTerm( "GO:0003674" ) ); //
     }
 
     /**
@@ -260,7 +260,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( e.getClickCount() < 2 ) {
             return;
         }
-        showDetailsForGeneSet( getCurrentResultSet(), currentlySelectedGeneSet );
+        showDetailsForGeneSet( currentlySelectedGeneSet, getCurrentResultSet() );
     }
 
     @Override

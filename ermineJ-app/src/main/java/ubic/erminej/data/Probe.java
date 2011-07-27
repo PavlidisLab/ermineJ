@@ -20,6 +20,7 @@
 package ubic.erminej.data;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 /**
@@ -55,6 +56,11 @@ public class Probe {
         }
     }
 
+    protected void addGene( Gene g ) {
+        // a little bit dangerous
+        this.genes.add( g );
+    }
+
     /**
      * @param geneSet
      */
@@ -84,11 +90,11 @@ public class Probe {
     }
 
     public Collection<Gene> getGenes() {
-        return genes;
+        return Collections.unmodifiableCollection( genes );
     }
 
     public Collection<GeneSetTerm> getGeneSets() {
-        return geneSets;
+        return Collections.unmodifiableCollection( geneSets );
     }
 
     public String getName() {
@@ -124,6 +130,10 @@ public class Probe {
     @Override
     public String toString() {
         return "Probe [name=" + name + ", " + getGene() + "]";
+    }
+
+    protected void removeGeneSet( GeneSetTerm t ) {
+        this.geneSets.remove( t );
     }
 
 }

@@ -19,7 +19,6 @@
 package ubic.erminej.gui.geneset.details;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.graphics.MatrixDisplay;
+import ubic.basecode.math.Rank;
 import ubic.erminej.Settings;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
@@ -49,14 +49,14 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = -1L;
     private static final String URL_REPLACE_TAG = "@@";
-    private MatrixDisplay<Probe, String> m_matrixDisplay;
+    private MatrixDisplay<Probe, String> matrixDisplay;
     private List<Probe> probeIDs;
-    private Map<Probe, Double> m_pvalues;
-    private Map<Probe, Integer> m_pvaluesOrdinalPosition;
+    private Map<Probe, Double> probeScores;
+    private Map<Probe, Integer> scoreRanks;
     private GeneAnnotations geneData;
     private Settings settings;
     private Map<Gene, JLinkLabel> linkLabels;
-    private String[] m_columnNames = { "Probe", "Score", "Score", "Symbol", "Name", "Multifunc" };
+    private String[] tableColumnNames = { "Probe", "Score", "Vis. score", "Symbol", "Name", "Multifunc" };
     public static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term="
             + URL_REPLACE_TAG;
 
@@ -67,7 +67,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass( int columnIndex ) {
 
-        int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+        int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
 
         if ( columnIndex < offset ) {
             return Double.class; // matrix, or pvals.
@@ -90,20 +90,22 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * @param matrixDisplay
      * @param probeIDs
      * @param pvalues
-     * @param pvaluesOrdinalPosition
      * @param geneData
      * @param nf
      */
-    public GeneSetDetailsTableModel( MatrixDisplay<Probe, String> matrixDisplay, Collection<Probe> probeIDs,
-            Map<Probe, Double> pvalues, Map<Probe, Integer> pvaluesOrdinalPosition, GeneAnnotations geneData,
+    public GeneSetDetailsTableModel( MatrixDisplay<Probe, String> matrixDisplay, GeneSetDetails geneSetDetails,
             Settings settings ) {
 
-        m_matrixDisplay = matrixDisplay;
-        this.probeIDs = new ArrayList<Probe>( probeIDs );
-        m_pvalues = pvalues;
+        this.matrixDisplay = matrixDisplay;
+        this.probeIDs = new ArrayList<Probe>( geneSetDetails.getProbes() );
+
+        probeScores = geneSetDetails.getProbeScores();
         this.settings = settings;
-        m_pvaluesOrdinalPosition = pvaluesOrdinalPosition;
-        this.geneData = geneData;
+
+        if ( probeScores != null && !probeScores.isEmpty() ) {
+            scoreRanks = Rank.rankTransform( probeScores, settings.getBigIsBetter() );
+        }
+        this.geneData = geneSetDetails.getGeneData();
 
         configure();
         createLinkLabels();
@@ -149,12 +151,12 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     public String getColumnName( int column ) {
 
         // matrix display ends
-        int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+        int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
 
         if ( column < offset ) {
-            return m_matrixDisplay.getColumnName( column ).toString();
+            return matrixDisplay.getColumnName( column ).toString();
         }
-        return m_columnNames[column - offset];
+        return tableColumnNames[column - offset];
 
     } // end getColumnName
 
@@ -173,8 +175,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * @see javax.swing.table.TableModel#getColumnCount()
      */
     public int getColumnCount() {
-        int matrixColumnCount = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
-        return m_columnNames.length + matrixColumnCount;
+        int matrixColumnCount = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
+        return tableColumnNames.length + matrixColumnCount;
     }
 
     /*
@@ -185,15 +187,15 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     public Object getValueAt( int row, int column ) {
 
         // matrix display ends
-        int offset = ( m_matrixDisplay != null ) ? m_matrixDisplay.getColumnCount() : 0;
+        int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
 
         // get the probeID for the current row
         Probe probeID = probeIDs.get( row );
 
         // If this is part of the matrix display
-        if ( column < offset ) {
-            return new MatrixPoint( m_matrixDisplay.getRowIndexByName( probeID ), column, m_matrixDisplay.getValue(
-                    m_matrixDisplay.getRowIndexByName( probeID ), column ) ); // coords into JMatrixDisplay
+        if ( matrixDisplay != null && column < offset ) {
+            return new MatrixPoint( matrixDisplay.getRowIndexByName( probeID ), column, matrixDisplay.getValue(
+                    matrixDisplay.getRowIndexByName( probeID ), column ) ); // coords into JMatrixDisplay
         }
         column -= offset;
 
@@ -202,30 +204,28 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 // probe ID
                 return probeID.getName();
             case 1:
-                // p value
-
-                if ( m_pvalues == null || !m_pvalues.containsKey( probeID ) ) return new Double( Double.NaN );
-
-                return m_pvalues.get( probeID );
-
+                // scores
+                if ( probeScores == null || !probeScores.containsKey( probeID ) ) return new Double( Double.NaN );
+                return probeScores.get( probeID );
             case 2:
-                // p value bar
+                // p value bar - only displayed if we have pvalues.
                 List<Double> values = new ArrayList<Double>();
-                if ( !settings.getDoLog() || m_pvalues == null ) { // kludgy way to figure out if we have pvalues.
+                if ( !settings.getDoLog() || probeScores == null ) { // kludgy way to figure out if we have pvalues.
                     values.add( 0, new Double( Double.NaN ) );
                     values.add( 1, new Double( Double.NaN ) );
                 } else {
 
-                    if ( !m_pvalues.containsKey( probeID ) ) {
+                    if ( probeScores == null || !probeScores.containsKey( probeID ) ) {
                         values.add( 0, new Double( 1.0 ) );
                         values.add( 1, new Double( 1.0 ) );
                     } else {
                         // actual p value
-                        Double actualValue = m_pvalues.get( probeID );
+                        Double actualValue = probeScores.get( probeID );
                         values.add( 0, actualValue );
                         // expected p value, but only if we had an actual pvalue
-                        if ( !Double.isNaN( actualValue.doubleValue() ) ) {
-                            int position = m_pvaluesOrdinalPosition.get( probeID );
+                        if ( !Double.isNaN( actualValue.doubleValue() ) && scoreRanks != null
+                                && scoreRanks.containsKey( probeID ) ) {
+                            int position = scoreRanks.get( probeID );
                             Double expectedValue = new Double( 1.0f / getRowCount() * ( position + 1 ) );
                             values.add( 1, expectedValue );
                         }

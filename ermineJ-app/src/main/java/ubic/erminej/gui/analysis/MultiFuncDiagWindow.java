@@ -18,8 +18,7 @@
  */
 package ubic.erminej.gui.analysis;
 
-import java.awt.Color;
-import java.awt.Frame;
+import java.awt.Color; 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.Map;
@@ -54,7 +53,7 @@ import cern.colt.matrix.DoubleMatrix1D;
 import cern.jet.math.Functions;
 
 /**
- * TODO Document Me
+ * Visualizations of multifunctionality statistics. TODO refactor non-visualization code.
  * 
  * @author paul
  * @version $Id$
@@ -115,8 +114,8 @@ public class MultiFuncDiagWindow extends JFrame {
         DefaultXYDataset ds = new DefaultXYDataset();
         ds.addSeries( "Raw", ser.toArray() );
 
-        double pointsToAverage = 0.05;
-        double skip = 0.0001;
+        double pointsToAverage = 0.1; // like LOWESS we might use. Even 0.2?
+        double skip = 0.001;
         XYSeries ma = MovingAverage.createMovingAverage( ds, 0, " Smoothed", pointsToAverage, skip );
 
         // ds.addSeries( "Smoothed", smoothed.toArray() );

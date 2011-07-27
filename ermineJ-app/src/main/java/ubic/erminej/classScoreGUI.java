@@ -49,7 +49,7 @@ public class classScoreGUI {
         GuiUtil.centerContainer( frame );
 
         frame.setVisible( true );
-
+        frame.requestFocusInWindow();
     }
 
 }

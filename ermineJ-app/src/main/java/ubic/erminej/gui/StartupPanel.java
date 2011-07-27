@@ -170,6 +170,7 @@ public class StartupPanel extends JPanel {
         instructions.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
         instructions.setContentType( "text/html" );
         instructions.setMaximumSize( new Dimension( 500, 200 ) );
+        instructions.setBorder( BorderFactory.createEmptyBorder( 0, 20, 20, 20 ) );
         instructions.addHyperlinkListener( new HyperlinkListener() {
             public void hyperlinkUpdate( HyperlinkEvent e ) {
                 if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
@@ -196,8 +197,8 @@ public class StartupPanel extends JPanel {
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( classPanel ).addComponent( annotPanel ) );
 
         JPanel centerPanel = new JPanel();
-        centerPanel.setLayout( new BorderLayout() );
-        // centerPanel.setLayout( new BoxLayout( centerPanel, BoxLayout.PAGE_AXIS ) );
+       
+        centerPanel.setLayout( new BorderLayout() ); 
 
         centerPanel.add( instructions, BorderLayout.NORTH );
         centerPanel.add( formPanel, BorderLayout.CENTER );

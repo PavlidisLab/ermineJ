@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -440,7 +441,7 @@ public class GeneAnnotations {
             for ( Probe candidate : p ) {
                 if ( candidate.getName().toUpperCase().startsWith( searchOnUp ) ) {
                     found = true;
-                    log.debug( "Found " + candidate + " in " + candidateGeneSet );
+                    // log.debug( "Found " + candidate + " in " + candidateGeneSet );
                     break;
                 }
             }
@@ -452,7 +453,8 @@ public class GeneAnnotations {
 
             Collection<Gene> g = this.getGeneSetGenes( candidateGeneSet );
             for ( Gene candidate : g ) {
-                if ( candidate.getSymbol().toUpperCase().startsWith( searchOnUp ) ) {
+                if ( candidate.getSymbol().toUpperCase().startsWith( searchOnUp )
+                        || candidate.getName().toUpperCase().contains( searchOnUp ) ) {
                     found = true;
                     log.debug( "Found " + candidate + " in " + candidateGeneSet );
                     break;
@@ -478,7 +480,7 @@ public class GeneAnnotations {
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
             String candidateN = term.getName().toUpperCase();
-            if ( candidateN.toUpperCase().startsWith( searchOnUp ) || term.getId().equals( searchOn ) ) {
+            if ( candidateN.toUpperCase().contains( searchOnUp ) || term.getId().equals( searchOn ) ) {
                 result.add( term );
             }
         }
@@ -583,8 +585,8 @@ public class GeneAnnotations {
      */
     public Collection<Probe> getGeneSetProbes( GeneSetTerm geneSetId ) {
         GeneSet geneSet = this.geneSets.get( geneSetId );
-        if ( geneSet == null ) return new HashSet<Probe>();
-        return geneSet.getProbes();
+        if ( geneSet == null ) return Collections.unmodifiableCollection( new HashSet<Probe>() );
+        return Collections.unmodifiableCollection( geneSet.getProbes() );
     }
 
     /**
@@ -1018,8 +1020,8 @@ public class GeneAnnotations {
                     if ( !genes2.contains( g1 ) ) continue gs; // not redundant.
                 }
 
-                gs1.getRedundantGroups().add( gs2 );
-                gs2.getRedundantGroups().add( gs1 );
+                gs1.addRedundantGroup( gs2 );
+                gs2.addRedundantGroup( gs1 );
 
                 if ( gs1.isSkipDueToRedundancy() || gs2.isSkipDueToRedundancy() ) {
                     continue;
@@ -1073,7 +1075,8 @@ public class GeneAnnotations {
             }
 
             for ( GeneSet redund : originalGeneSet.getRedundantGroups() ) {
-                gs1.getRedundantGroups().add( this.getGeneSet( redund.getTerm() ) );
+                gs1.addRedundantGroup( this.getGeneSet( redund.getTerm() ) );
+                // do I have to do it the other way around as well?
             }
 
         }

@@ -140,7 +140,8 @@ public class AboutBox extends JDialog implements ActionListener {
         labelAuthors.setPreferredSize( new Dimension( PREFERRED_WIDTH, 60 ) );
         labelAuthors.setHorizontalAlignment( SwingConstants.CENTER );
         labelAuthors.setHorizontalTextPosition( SwingConstants.CENTER );
-        labelAuthors.setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, Kiran Keshav, Kelsey Hamer and others" );
+        labelAuthors
+                .setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, Shahmil Merchant, Kiran Keshav, Kelsey Hamer and others" );
 
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
         // labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );

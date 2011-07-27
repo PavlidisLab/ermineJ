@@ -45,10 +45,11 @@ import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm; 
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.geneset.details.GeneSetDetails;
+import ubic.erminej.gui.geneset.details.GeneSetDetailsFrame;
 import ubic.erminej.gui.geneset.wiz.GeneSetWizard;
 import ubic.erminej.gui.util.GuiUtil;
 
@@ -299,14 +300,13 @@ public abstract class GeneSetPanel extends JScrollPane {
     protected abstract void removedGeneSet( GeneSetTerm addedTerm );
 
     /**
-     * Create the popup window with the visualization for a specific gene set.
+     * Create the popup window with the visualization for a specific gene set and results.
      * 
-     * @param runnum
      * @param id
-     * @throws IllegalStateException
+     * @param run can be null
      */
-    protected void showDetailsForGeneSet( final GeneSetPvalRun run, final GeneSetTerm id ) throws IllegalStateException {
-        messenger.showStatus( "Viewing data for " + id + "..." );
+    protected void showDetailsForGeneSet( final GeneSetTerm id, final GeneSetPvalRun run ) {
+        messenger.showStatus( "Viewing details of data for " + id + " ..." );
 
         new Thread() {
             @Override
@@ -322,20 +322,24 @@ public abstract class GeneSetPanel extends JScrollPane {
                                 .showError( id + " is not available for viewing in your data." );
                         return;
                     }
-                    GeneSetDetails details = new GeneSetDetails( messenger, geneData, settings, id );
-                    if ( run == null ) {
-                        details.show();
-                    } else {
-                        GeneSetResult res = run.getResults().get( id );
-                        details.show( run.getName(), res, run.getGeneScores() );
+
+                    GeneSetResult r = null;
+                    if ( run != null ) {
+                        r = run.getResults().get( id );
                     }
+                    GeneSetDetails details = new GeneSetDetails( id, r, geneData, settings, null, messenger );
+
+                    GeneSetDetailsFrame detailsFrame = new GeneSetDetailsFrame( details, messenger );
+                    detailsFrame.setVisible( true );
                     messenger.clear();
                 } catch ( Exception ex ) {
                     GuiUtil
                             .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
                                     + ex.getMessage() );
                     log.error( ex, ex );
-                    messenger.clear();
+                    messenger
+                            .showError( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
+                                    + ex.getMessage() );
                 }
             }
         }.start();

@@ -49,11 +49,8 @@ import cern.jet.math.Arithmetic;
 import ubic.erminej.Settings;
 
 /**
- * Parse and store probe->pvalue associations.
- * <p>
- * The values are stored in a Map probeToPvalMap. This is used to see what probes are int the data set, as well as the
- * score for each probe.
- * </p>
+ * Parse and store probe->score associations. The values are stored in a Map probeToPvalMap. This is used to see what
+ * probes are int the data set, as well as the score for each probe.
  * 
  * @author Shahmil Merchant
  * @author Paul Pavlidis
@@ -63,6 +60,14 @@ public class GeneScores {
 
     private static final double SMALL = 10e-16;
     protected static final Log log = LogFactory.getLog( GeneScores.class );
+
+    /**
+     * @return true if these scores were transformed via -log_10(x) when they were read in (according to the settings)
+     */
+    public boolean isNegativeLog10Transformed() {
+        return logTransform;
+    }
+
     private Map<Gene, Double> geneToScoreMap;
     private Map<Probe, Double> probeToScoreMap;
     final private GeneAnnotations geneAnnots;
@@ -124,6 +129,13 @@ public class GeneScores {
         this.init( settings );
         if ( m != null ) this.messenger = m;
         read( is, settings.getScoreCol() );
+    }
+
+    /**
+     * @return The annotation set that was used to set this up. 
+     */
+    public GeneAnnotations getGeneAnnots() {
+        return geneAnnots;
     }
 
     /**

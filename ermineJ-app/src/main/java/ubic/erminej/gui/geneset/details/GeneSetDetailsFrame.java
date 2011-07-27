@@ -34,11 +34,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
@@ -73,23 +69,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
-import ubic.basecode.dataStructure.matrix.FastRowAccessDoubleMatrix;
 import ubic.basecode.graphics.ColorMap;
 import ubic.basecode.graphics.JGradientBar;
 import ubic.basecode.graphics.MatrixDisplay;
-import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.FileTools;
-import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
-import ubic.erminej.analysis.GeneSetPvalRun;
-import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.MainFrame;
-import ubic.erminej.gui.JHistViewer;
 import ubic.erminej.gui.StatusJlabel;
 import ubic.erminej.gui.table.JBarGraphCellRenderer;
 import ubic.erminej.gui.table.JMatrixCellRenderer;
@@ -134,22 +123,17 @@ public class GeneSetDetailsFrame extends JFrame {
     private static final String SAVESTARTPATH = "detailsview.startPath";
     private static final int PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN = 75;
 
-    public MatrixDisplay<Probe, String> matrixDisplay = null;
-    private GeneSetPvalRun analysisResults;
     private int width;
     private int height;
     private boolean includeAnnotations = true;
-
     private boolean includeLabels = true; // whether when saving data we include the row/column labels.
     private boolean includeScalebar = false;
     private int matrixColumnWidth; // how wide the color image columns are.
-    private Settings settings;
-    private GeneSetDetailsTableModel tableModel;
 
     protected JTable table = new JTable();
     protected JScrollPane tableScrollPane = new JScrollPane();
     protected JToolBar toolBar = new JToolBar();
-    private JMenu analysisMenu = new JMenu();
+
     private JRadioButtonMenuItem blackbodyColormapMenuItem = new JRadioButtonMenuItem();
     private JDataFileChooser fileChooser = null;
     private JMenu fileMenu = new JMenu();
@@ -162,11 +146,8 @@ public class GeneSetDetailsFrame extends JFrame {
     private JSlider m_colorRangeSlider = new JSlider();
     private JGradientBar m_gradientBar = new JGradientBar();
     private JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
-    private Map<Probe, Integer> m_pvaluesOrdinalPosition = new HashMap<Probe, Integer>();
     private JMenuItem saveDataMenuItem = new JMenuItem();
-    private JLabel m_spacerLabel = new JLabel();
-    private JMenuItem m_viewHistMenuItem = new JMenuItem();
-    /** controls the width of the cells in the matrix display */
+
     private JMenuBar menuBar = new JMenuBar();
     private JMenu optionsMenu = new JMenu();
     private JMenuItem saveImageMenuItem = new JMenuItem();
@@ -176,88 +157,37 @@ public class GeneSetDetailsFrame extends JFrame {
     private JMenu viewMenu = new JMenu();
     private JPanel jPanelStatus = new JPanel();
     private JLabel jLabelStatus = new JLabel();
-    private StatusJlabel statusMessenger = null;
-    private int matrixColumnCount = 0;
+    private StatusViewer statusMessenger = null;
     private JMatrixCellRenderer matrixCellRenderer = null;
     private JVerticalHeaderRenderer verticalHeaderRenderer = null;
-    private Map<Probe, Double> pvalues = null;
-    private GeneAnnotations geneData = null;
-    private GeneSetTerm className = null;
+
+    private Settings settings;
+    private GeneSetDetails geneSetDetails;
+    private int matrixColumnCount = 0;
+    public MatrixDisplay<Probe, String> matrixDisplay = null;
     private boolean normalizeSavedData = false;
     private boolean normalizeSavedImage = true;
     private GeneSetResult result;
+    private GeneSetDetailsTableModel tableModel;
 
     // private StatusViewer callerStatusViewer = null;
 
-    /**
-     * @param probeIDs an array of probe ID's that has some order; the actual order is arbitrary, as long as it is some
-     *        order.
-     * @param pvalues a map of probeID's to p values.
-     * @param geneData holds gene names and descriptions which can be retrieved by probe ID.
-     * @param settings <code>getRawFile()</code> should return the file which contains the raw data for the probe ID's
-     *        contained in <code>probeIDs</code>.
-     */
-    public GeneSetDetailsFrame( GeneSetResult result, StatusViewer callerStatusViewer, List<Probe> probeIDs,
-            Map<Probe, Double> pvalues, GeneAnnotations geneData, Settings settings ) {
+    public GeneSetDetailsFrame( GeneSetDetails geneSetDetails, StatusViewer messenger ) {
+        this.geneSetDetails = geneSetDetails;
+        this.statusMessenger = messenger;
 
-        try {
-            if ( settings == null ) {
-                log.warn( "Loading new settings..." );
-                this.settings = new Settings();
-            } else {
-                this.settings = settings;
-            }
-
-            this.readPrefs();
-            this.result = result;
-            this.className = result.getGeneSetId();
-
-            this.pvalues = pvalues;
-            this.geneData = geneData;
-            createDetailsTable( probeIDs );
-            initChoosers();
-            jbInit();
-        } catch ( Exception e ) {
-            if ( callerStatusViewer != null )
-                callerStatusViewer.showError(
-                        "There was an error while setting up the details view. Check the logs for details", e );
-            GuiUtil.error( "There was an error setting up the details view: " + e.getMessage() == null ? "(no message)"
-                    : e.getMessage() );
+        if ( geneSetDetails.getSettings() == null ) {
+            log.warn( "Loading new settings..." );
+            this.settings = new Settings();
+        } else {
+            this.settings = geneSetDetails.getSettings();
         }
-    }
+        this.readPrefs();
 
-    /**
-     * For viewing without results.
-     * 
-     * @param classID
-     * @param callerStatusViewer
-     * @param geneData
-     * @param settings
-     */
-    public GeneSetDetailsFrame( GeneSetTerm classID, StatusViewer callerStatusViewer, GeneAnnotations geneData,
-            Settings settings ) {
-        try {
-            if ( settings == null ) {
-                log.warn( "Loading new settings..." );
-                this.settings = new Settings();
-            } else {
-                this.settings = settings;
-            }
-
-            this.readPrefs();
-            this.className = classID;
-            this.geneData = geneData;
-            List<Probe> probeIDs = new ArrayList<Probe>( geneData.getGeneSetProbes( className ) );
-            createDetailsTable( probeIDs );
-            initChoosers();
-            jbInit();
-        } catch ( Exception e ) {
-            if ( callerStatusViewer != null )
-                callerStatusViewer.showError(
-                        "There was an error while setting up the details view. Check the logs for details", e );
-            GuiUtil.error( "There was an error setting up the details view: " + e.getMessage() == null ? "(no message)"
-                    : e.getMessage() );
-        }
+        readPrefs();
+        createDetailsTable();
+        initChoosers();
+        jbInit();
     }
 
     /**
@@ -275,28 +205,22 @@ public class GeneSetDetailsFrame extends JFrame {
      * @param geneData
      * @param filename
      */
-    protected void createDetailsTable( Collection<Probe> probes ) {
+    protected void createDetailsTable() {
 
-        /*
-         * Load from file, etc.
-         */
-        DoubleMatrix<Probe, String> matrix = setUpMatrixData( probes );
+        setUpMatrixView();
 
-        /*
-         * Problem: pvalues might not be populated yet.
-         */
-
-        tableModel = new GeneSetDetailsTableModel( matrixDisplay, probes, pvalues, m_pvaluesOrdinalPosition, geneData,
-                settings );
+        tableModel = new GeneSetDetailsTableModel( matrixDisplay, geneSetDetails, settings );
         table.setModel( tableModel );
+
         // table.setAutoCreateRowSorter( true );
         TableRowSorter<GeneSetDetailsTableModel> sorter = new TableRowSorter<GeneSetDetailsTableModel>(
                 ( GeneSetDetailsTableModel ) table.getModel() );
         table.setRowSorter( sorter );
 
-        setColumnWidths( matrixColumnCount, matrixCellRenderer, matrix, verticalHeaderRenderer );
+        setupColumns( matrixColumnCount, matrixCellRenderer, verticalHeaderRenderer );
 
-        // Sort initially by the pvalue column
+        // Sort initially by the score column, based on the user's original input (so we don't use -log-transformed
+        // values)
         List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         if ( settings.getBigIsBetter() ) {
             sortKeys.add( new RowSorter.SortKey( matrixColumnCount + 1, SortOrder.DESCENDING ) );
@@ -304,13 +228,6 @@ public class GeneSetDetailsFrame extends JFrame {
             sortKeys.add( new RowSorter.SortKey( matrixColumnCount + 1, SortOrder.ASCENDING ) );
         }
         table.getRowSorter().setSortKeys( sortKeys );
-        // For the pvalue bar graph we need to know the ordinal position of each
-        // pvalue in our list of pvalues, and now is the perfect time because
-        // the table is sorted by pvalues
-        for ( int i = 0; i < table.getRowCount(); i++ ) {
-            String probeID = ( String ) table.getValueAt( i, matrixColumnCount );
-            m_pvaluesOrdinalPosition.put( geneData.findProbe( probeID ), new Integer( i ) );
-        }
 
         // Save the dimensions of the table just in case
         int totalWidth = matrixColumnCount * matrixColumnWidth + PREFERRED_WIDTH_PROBEID_COLUMN
@@ -329,97 +246,30 @@ public class GeneSetDetailsFrame extends JFrame {
 
     } // end createDetailsTable
 
-    private Collection<Probe> setUpProbes() {
-        String scoreFile = settings.getScoreFile();
-        if ( StringUtils.isEmpty( scoreFile ) ) {
-            return new ArrayList<Probe>();
-        }
-
-        try {
-            GeneScores sc = new GeneScores( scoreFile, this.settings, new StatusStderr(), this.geneData );
-
-            Collection<Probe> r = new HashSet<Probe>();
-            for ( Probe p : geneData.getGeneSetProbes( this.className ) ) {
-                if ( sc.getProbeToScoreMap().keySet().contains( p ) ) r.add( p );
-            }
-
-            return r;
-
-        } catch ( IOException e ) {
-            GuiUtil.error( "Failed to load gene scores from file" );
-            return new ArrayList<Probe>();
-        }
-
-    }
-
     /**
      * @param filename
      * @param probesInGeneSet
      * @return
      */
-    private DoubleMatrix<Probe, String> setUpMatrixData( Collection<Probe> probes ) {
-        // Read the matrix data
-        DoubleMatrixReader matrixReader = new DoubleMatrixReader();
-        DoubleMatrix<Probe, String> matrix = null;
+    private void setUpMatrixView() {
 
-        if ( ( settings.getRawDataFileName() == null || settings.getRawDataFileName().length() == 0 )
-                && settings.getUserSetRawFile() ) {
-            this.switchRawDataFile( true );
-        }
+        DoubleMatrix<Probe, String> matrix = this.geneSetDetails.getDataMatrix();
 
-        log.debug( "User set the raw data file? " + settings.getUserSetRawFile() );
-        log.debug( "Raw data file is " + settings.getRawDataFileName() );
-
-        /* I apologize for the convoluted logic here */
-        if ( settings.getUserSetRawFile()
-                || ( settings.getRawDataFileName() != null && settings.getRawDataFileName().length() > 0 ) ) {
-            String filename = settings.getRawDataFileName();
-            if ( ( new File( filename ) ).canRead() ) {
-                try {
-                    Map<String, Probe> probeNames = new HashMap<String, Probe>();
-                    for ( Probe p : probes ) {
-                        probeNames.put( p.getName(), p );
-                    }
-                    DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet() );
-
-                    matrix = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
-                    matrix.setColumnNames( omatrix.getColNames() );
-                    int i = 0;
-                    for ( String r : omatrix.getRowNames() ) {
-                        matrix.setRowName( probeNames.get( r ), i );
-                        i++;
-                    }
-
-                } catch ( IOException e ) {
-                    GuiUtil.error( "Error loading data from file " + filename + "\n"
-                            + "Please make sure this file exists and the filename and directory path are correct,\n"
-                            + "and that it is a valid raw data file (tab-delimited).\n" );
-                }
-
-                if ( matrix == null ) {
-                    if ( statusMessenger != null )
-                        statusMessenger.showError( "None of the probes in this gene set were in the data file." );
-                } else {
-                    matrixDisplay = new MatrixDisplay<Probe, String>( matrix );
-                    matrixDisplay.setStandardizedEnabled( true );
-                    // Make the columns in the matrix display not too wide (cell-size)
-                    // and set a custom cell renderer
-                    matrixCellRenderer = new JMatrixCellRenderer( matrixDisplay ); // create one instance
-                    // that will be used to
-                    // draw each cell
-                }
-            } else {
-                GuiUtil.error( "The data file \"" + filename + "\" was not readable." + "\n"
-                        + "Please make sure this file exists and the filename and directory path are correct,\n"
-                        + "and that it is a valid raw data file (tab-delimited).\n" );
-            }
+        if ( matrix == null || matrix.rows() == 0 ) {
+            statusMessenger.showError( "None of the probes in this gene set were in the data file." );
         } else {
-            matrixDisplay = null;
+            matrixDisplay = new MatrixDisplay<Probe, String>( matrix );
+            matrixDisplay.setStandardizedEnabled( true );
+            // Make the columns in the matrix display not too wide (cell-size)
+            // and set a custom cell renderer
+            matrixCellRenderer = new JMatrixCellRenderer( matrixDisplay ); // create one instance
+            // that will be used to
+            // draw each cell
         }
+
         verticalHeaderRenderer = new JVerticalHeaderRenderer(); // create only one instance
         matrixColumnCount = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
 
-        return matrix;
     }
 
     /**
@@ -428,7 +278,7 @@ public class GeneSetDetailsFrame extends JFrame {
      * @param matrixCellRenderer
      * @param matrixColumnCount
      */
-    private void setColumnWidths( int matrixColumnCount, TableCellRenderer matrixCellRenderer, Object matrix,
+    private void setupColumns( int matrixColumnCount, TableCellRenderer matrixCellRenderer,
             TableCellRenderer verticalHeaderRenderer ) {
 
         // Set each column width and renderer.
@@ -441,8 +291,7 @@ public class GeneSetDetailsFrame extends JFrame {
             col.setPreferredWidth( PREFERRED__WIDTH_MATRIXDISPLAY_COLUMN );
         }
 
-        if ( matrix != null ) // keshav added if (but not the guts)
-            resizeMatrixColumns( matrixColumnWidth );
+        resizeMatrixColumns( matrixColumnWidth );
 
         //
         // Set up the rest of the table
@@ -499,7 +348,12 @@ public class GeneSetDetailsFrame extends JFrame {
                 if ( isSelected || hasFocus ) return this;
 
                 String sv = ( String ) value;
+
                 String ds = sv.split( " " )[0]; // kludgy. But it works.
+
+                if ( StringUtils.isBlank( ds ) ) {
+                    return this;
+                }
 
                 double v = Double.parseDouble( ds );
                 // log.info( "" + v );
@@ -535,7 +389,8 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     private void initChoosers() {
         // clean up the class id so it can be used to form file names (this is not foolproof)
-        String fileNameBase = this.className.getId().replaceAll( "[:\\s\\(\\)\\*&^%$#@\\!\\`\\'\\\"]+", "_" );
+        String fileNameBase = this.geneSetDetails.getClassID().getId().replaceAll(
+                "[:\\s\\(\\)\\*&^%$#@\\!\\`\\'\\\"]+", "_" );
         imageChooser = new JImageFileChooser( settings.getConfig().getBoolean( INCLUDELABELS, true ), settings
                 .getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ), fileNameBase + ".png" );
         fileChooser = new JDataFileChooser( settings.getConfig().getBoolean( INCLUDEEVERYTHING, true ), settings
@@ -571,7 +426,7 @@ public class GeneSetDetailsFrame extends JFrame {
     /**
      * @throws Exception
      */
-    private void jbInit() throws Exception {
+    private void jbInit() {
 
         // Listener for window closing events.
         this.addWindowListener( new JGeneSetFrame_windowListenerAdapter( this ) );
@@ -697,8 +552,9 @@ public class GeneSetDetailsFrame extends JFrame {
         m_cellWidthSlider.addChangeListener( new JGeneSetFrame_m_cellWidthSlider_changeAdapter( this ) );
         this.setResizable( true );
         m_cellWidthLabel.setText( "Cell Width:" );
-        m_spacerLabel.setText( "    " );
+
         m_colorRangeLabel.setText( "Color Range:" );
+        m_colorRangeLabel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 0 ) );
         m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
         m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
         if ( matrixDisplay != null ) {
@@ -710,7 +566,6 @@ public class GeneSetDetailsFrame extends JFrame {
         m_colorRangeSlider.addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter( this ) );
         toolBar.add( m_cellWidthLabel, null );
         toolBar.add( m_cellWidthSlider, null );
-        toolBar.add( m_spacerLabel, null );
         toolBar.add( m_colorRangeLabel, null );
         toolBar.add( m_colorRangeSlider, null );
         toolBar.add( m_gradientBar, null );
@@ -749,8 +604,7 @@ public class GeneSetDetailsFrame extends JFrame {
         m_normalizeMenuItem.setText( "Normalize" );
         m_normalizeMenuItem.addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter( this ) );
         optionsMenu.setText( "Options" );
-        setGeneUrlBaseMenuItem.setActionCommand( "Change gene name URL" );
-        setGeneUrlBaseMenuItem.setText( "Change gene name URL ..." );
+        setGeneUrlBaseMenuItem.setText( "Change gene name URL pattern ..." );
         setGeneUrlBaseMenuItem.addActionListener( new JGeneSetFrame_viewGeneUrlDialog_actionAdapter( this ) );
 
         viewMenu.add( m_normalizeMenuItem );
@@ -762,58 +616,64 @@ public class GeneSetDetailsFrame extends JFrame {
         optionsMenu.add( switchDataFileMenuItem );
         optionsMenu.add( switchGeneScoreFileMenuItem );
 
-        analysisMenu.setText( "Analysis" );
-        m_viewHistMenuItem.setActionCommand( "View Distribution" );
-        m_viewHistMenuItem.setText( "View distribution" );
-        m_viewHistMenuItem.addActionListener( new JGeneSetFrame_m_viewHistMenuItem_actionAdapter( this ) );
-        analysisMenu.add( m_viewHistMenuItem );
+        // JMenu analysisMenu = new JMenu();
+        // analysisMenu.setText( "Analysis" );
 
-        saveDataMenuItem.setActionCommand( "SaveData" );
         saveDataMenuItem.setText( "Save Data ..." );
         saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
 
-        switchDataFileMenuItem.setActionCommand( "Switch Data Shown" );
-        switchDataFileMenuItem.setText( "Change Dataset ..." );
+        switchDataFileMenuItem.setText( "Set Dataset ..." );
+        switchDataFileMenuItem.setToolTipText( "Set or change the source of the data used for the heatmap" );
         switchDataFileMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 switchRawDataFile();
-                createDetailsTable( setUpProbes() );
+                createDetailsTable();
                 table.revalidate();
             }
         } );
 
-        switchGeneScoreFileMenuItem.setActionCommand( "Change gene score file" );
-        switchGeneScoreFileMenuItem.setText( "Change gene score file ..." );
+        switchGeneScoreFileMenuItem.setText( "Set gene score file ..." );
+        switchGeneScoreFileMenuItem
+                .setToolTipText( "Set or change the source of the data used for the 'score' columns" );
         switchGeneScoreFileMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 switchGeneScoreFile();
-                createDetailsTable( setUpProbes() );
+                createDetailsTable();
                 table.revalidate();
             }
         } );
-
-        // this only applies to gene set scores. We should make it work for ROC at the very least. Possibly for
-        // correlation as well.
-        if ( analysisResults == null || analysisResults.getHist() == null ) {
-            analysisMenu.setEnabled( false );
-        }
 
         menuBar.add( fileMenu );
         menuBar.add( viewMenu );
         menuBar.add( optionsMenu );
-        // menuBar.add( analysisMenu ); // until it has functionality...
     }
 
     /**
-     * 
+     * Keep the same gene set, but change the scores.
      */
     protected void switchGeneScoreFile() {
         JFileChooser fchooser = new JFileChooser( settings.getGeneScoreFileDirectory() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
-        if ( yesno == JFileChooser.APPROVE_OPTION )
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile()
+                    + ", reading values from column " + settings.getScoreCol() );
+
+            try {
+                GeneScores scores = new GeneScores( settings.getScoreFile(), settings, statusMessenger,
+                        this.geneSetDetails.getGeneData() );
+
+                this.geneSetDetails.setGeneScores( scores );
+
+            } catch ( IOException e ) {
+                statusMessenger
+                        .showError( "Error during loading of " + settings.getScoreFile() + ": " + e.getMessage() );
+
+            }
+
+        }
 
     }
 
@@ -897,7 +757,7 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     private void printMatrixValueForRow( BufferedWriter out, DecimalFormat nf, String probeID ) throws IOException {
         assert this.matrixDisplay != null;
-        double[] row = matrixDisplay.getRowByName( geneData.findProbe( probeID ) );
+        double[] row = matrixDisplay.getRowByName( this.geneSetDetails.getGeneData().findProbe( probeID ) );
         for ( int c = 0; c < row.length; c++ ) {
             out.write( "\t" + nf.format( row[c] ) );
         }
@@ -975,11 +835,6 @@ public class GeneSetDetailsFrame extends JFrame {
         // fileMenu.setEnabled( enabled ); /; show it, just don't allow image saves.
         viewMenu.setEnabled( enabled );
         optionsMenu.setEnabled( true );
-        if ( settings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
-            analysisMenu.setEnabled( false );
-        } else {
-            analysisMenu.setEnabled( true );
-        }
 
         // the toolbar
         toolBar.setEnabled( enabled );
@@ -1043,7 +898,7 @@ public class GeneSetDetailsFrame extends JFrame {
         for ( int r = 0; r < matrixRowCount; r++ ) {
             // for this row: write out matrix values
             String probeID = getProbeID( r );
-            Probe probe = geneData.findProbe( probeID );
+            Probe probe = this.geneSetDetails.getGeneData().findProbe( probeID );
             assert probe != null;
             rowKeys[r] = matrixDisplay.getRowIndexByName( probe );
         }
@@ -1271,20 +1126,6 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * @param e
-     */
-    void m_viewHistMenuItem_actionPerformed() {
-        if ( analysisResults != null && result != null ) {
-            JHistViewer f = new JHistViewer( analysisResults.getHist(), result.getEffectiveSize(), result.getScore() );
-            f.setTitle( this.getTitle() + " histogram" );
-            f.pack();
-            f.setVisible( true );
-        } else {
-            this.statusMessenger.showStatus( "Could not display histogram, you must have results" );
-        }
-    }
-
-    /**
      * Adjust the width of every matrix display column
      * 
      * @param desiredCellWidth
@@ -1322,11 +1163,13 @@ public class GeneSetDetailsFrame extends JFrame {
         int j = table.columnAtPoint( e.getPoint() );
         if ( onGeneSymbolCell( i, j ) ) {
             setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-            if ( table.getValueAt( i, j ) instanceof JLinkLabel ) {
-                JLinkLabel geneLink = ( JLinkLabel ) table.getValueAt( i, j );
-                if ( geneLink.getURL() != null ) statusMessenger.setStatus( geneLink.getURL(), false );
+            Object values = table.getValueAt( i, j );
+            if ( values instanceof JLinkLabel ) {
+                JLinkLabel geneLink = ( JLinkLabel ) values;
+                String url = geneLink.getURL();
+                if ( StringUtils.isNotBlank( url ) ) statusMessenger.showStatus( url, false );
             } else {
-                statusMessenger.setStatus( table.getValueAt( i, j ).toString(), false );
+                statusMessenger.showStatus( values.toString(), false );
             }
 
         } else {
@@ -1344,7 +1187,8 @@ public class GeneSetDetailsFrame extends JFrame {
                     // for some reason the event is not getting to the linklabel; it works in the AboutBox, though.S
                     if ( geneLink != null ) geneLink.openUrl();
                 } else {
-                    statusMessenger.setStatus( table.getValueAt( i, j ).toString(), false );
+                    // show the link.
+                    statusMessenger.showStatus( table.getValueAt( i, j ).toString(), false );
                 }
             } else if ( onMultifunctionalityCell( i, j ) ) {
                 // possibly update status bar.
@@ -1496,18 +1340,6 @@ class JGeneSetFrame_m_saveImageMenuItem_actionAdapter implements java.awt.event.
 
     public void actionPerformed( ActionEvent e ) {
         adaptee.m_saveImageMenuItem_actionPerformed();
-    }
-}
-
-class JGeneSetFrame_m_viewHistMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetDetailsFrame adaptee;
-
-    JGeneSetFrame_m_viewHistMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.m_viewHistMenuItem_actionPerformed();
     }
 }
 

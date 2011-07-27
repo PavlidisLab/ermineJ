@@ -1,7 +1,7 @@
 /*
  * The ermineJ project
  * 
- * Copyright (c) 2006 University of British Columbia
+ * Copyright (c) 2006-2011 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,13 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -39,6 +42,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +51,9 @@ import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -58,10 +64,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
@@ -74,8 +82,8 @@ import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.AnalysisThread;
-import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.Settings;
+import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -160,6 +168,8 @@ public class MainFrame extends JFrame {
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
 
+    private JPanel statusBarPanel;
+
     /**
      * @throws IOException
      */
@@ -184,6 +194,7 @@ public class MainFrame extends JFrame {
         classMenu.setEnabled( false );
         analysisMenu.setEnabled( false );
         helpMenu.setEnabled( false );
+        // searchPanel.setEnabled( false );
     }
 
     /**
@@ -450,6 +461,32 @@ public class MainFrame extends JFrame {
         diagnosticsMenu.setEnabled( true );
         runViewMenu.setEnabled( false );
         helpMenu.setEnabled( true );
+        // searchPanel.setEnabled( true );
+    }
+
+    private void find( String searchOn, boolean searchGenes ) {
+        Collection<GeneSetTerm> geneSets = new HashSet<GeneSetTerm>();
+
+        if ( StringUtils.isBlank( searchOn ) ) {
+            statusMessenger.clear();
+            geneSets = geneData.getAllTerms();
+            filter( geneSets );
+            return;
+        }
+
+        statusMessenger.showStatus( "Searching '" + searchOn + "'" );
+
+        if ( searchGenes ) {
+            geneSets = geneData.findSetsByGene( searchOn );
+        } else {
+            geneSets = geneData.findSetsByName( searchOn );
+        }
+
+        statusMessenger.showStatus( geneSets.size() + " matching gene sets found." );
+
+        if ( geneSets.size() > 0 ) {
+            filter( geneSets );
+        }
     }
 
     private void initialize( final JPanel cards ) {
@@ -460,7 +497,9 @@ public class MainFrame extends JFrame {
             @Override
             protected Object doInBackground() throws Exception {
                 try {
+                    setupStatusBar();
                     readDataFilesForStartup();
+
                     treePanel.initialize( geneData );
                     tablePanel.initialize( geneData );
                     ( ( CardLayout ) cards.getLayout() ).show( cards, TABS_CARD );
@@ -504,7 +543,6 @@ public class MainFrame extends JFrame {
                 .getImage() );
         this.getContentPane().setLayout( new BorderLayout() );
         this.getContentPane().setPreferredSize( new Dimension( 1000, 600 ) );
-        // this.getContentPane().setInputVerifier( null );
 
         setupMenus();
 
@@ -522,8 +560,6 @@ public class MainFrame extends JFrame {
         setupMainPanels();
         cards.add( tabs, TABS_CARD );
 
-        setupStatusBar();// have to do afeter the main panels are setup.
-
         final ActionListener actionListener = new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
@@ -537,7 +573,6 @@ public class MainFrame extends JFrame {
 
         setIconImage( new ImageIcon( this.getClass().getResource( "/ubic/erminej/logoIcon64.gif" ) ).getImage() );
 
-        this.statusMessenger.showStatus( "Waiting for input" );
     }
 
     /**
@@ -552,10 +587,10 @@ public class MainFrame extends JFrame {
 
         if ( this.getCurrentResultSet() >= 0 ) {
             ga = this.results.get( this.getCurrentResultSet() ).getGeneData();
-            gs = this.results.get(this.getCurrentResultSet()).getGeneScores();
+            gs = this.results.get( this.getCurrentResultSet() ).getGeneScores();
         }
 
-        MultiFuncDiagWindow w = new MultiFuncDiagWindow( ga, gs  );
+        MultiFuncDiagWindow w = new MultiFuncDiagWindow( ga, gs );
         w.setSize( new Dimension( 500, 500 ) );
         GuiUtil.centerContainer( w );
         w.setVisible( true );
@@ -700,8 +735,8 @@ public class MainFrame extends JFrame {
         JMenuItem logMenuItem = new JMenuItem();
         JMenuItem geneAnnotsWebLinkMenuItem = new JMenuItem();
 
-        JMenuItem findClassMenuItem = new JMenuItem();
-        JMenuItem findGeneMenuItem = new JMenuItem();
+        // JMenuItem findClassMenuItem = new JMenuItem();
+        // JMenuItem findGeneMenuItem = new JMenuItem();
         JMenuItem aboutMenuItem = new JMenuItem();
 
         fileMenu.setText( "File" );
@@ -726,15 +761,15 @@ public class MainFrame extends JFrame {
         modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
         modClassMenuItem.setMnemonic( 'M' );
 
-        findClassMenuItem.setText( "Find Gene Set" );
-        findClassMenuItem.addActionListener( new GeneSetScoreFrame_findClassMenuItem_actionAdapter( this ) );
-        findClassMenuItem.setMnemonic( 'F' );
-        findClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ) );
-
-        findGeneMenuItem.setText( "Find Gene sets by gene" );
-        findGeneMenuItem.addActionListener( new GeneSetScoreFrame_findGeneMenuItem_actionAdapter( this ) );
-        findGeneMenuItem.setMnemonic( 'G' );
-        findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
+        // findClassMenuItem.setText( "Find Gene Set" );
+        // findClassMenuItem.addActionListener( new GeneSetScoreFrame_findClassMenuItem_actionAdapter( this ) );
+        // findClassMenuItem.setMnemonic( 'F' );
+        // findClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ) );
+        //
+        // findGeneMenuItem.setText( "Find Gene sets by gene" );
+        // findGeneMenuItem.addActionListener( new GeneSetScoreFrame_findGeneMenuItem_actionAdapter( this ) );
+        // findGeneMenuItem.setMnemonic( 'G' );
+        // findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
 
         showUsersMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
@@ -746,8 +781,8 @@ public class MainFrame extends JFrame {
 
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
-        classMenu.add( findClassMenuItem );
-        classMenu.add( findGeneMenuItem );
+        // classMenu.add( findClassMenuItem );
+        // classMenu.add( findGeneMenuItem );
         classMenu.add( showUsersMenuItem );
 
         this.runViewMenu.setText( "Results" );
@@ -899,18 +934,49 @@ public class MainFrame extends JFrame {
 
     private void setupStatusBar() {
         JLabel jLabelStatus = new JLabel();
-        JPanel jPanelStatus = new JPanel();
+        jLabelStatus.setPreferredSize( new Dimension( 800, 25 ) );
 
-        jPanelStatus.setLayout( new BorderLayout() );
-        jPanelStatus.setBorder( BorderFactory.createEtchedBorder() );
-        jPanelStatus.setPreferredSize( new Dimension( STARTING_OVERALL_WIDTH, 33 ) );
-        jLabelStatus.setFont( new java.awt.Font( "Dialog", 0, 11 ) );
-        jLabelStatus.setBorder( BorderFactory.createEmptyBorder( 5, 5, 10, 10 ) );
-        jLabelStatus.setPreferredSize( new Dimension( 800, 19 ) );
-        jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
-        jPanelStatus.add( jLabelStatus, BorderLayout.WEST );
+        statusBarPanel = new JPanel();
+        GroupLayout gl = new GroupLayout( statusBarPanel );
+        statusBarPanel.setLayout( gl );
+        statusBarPanel.setBorder( BorderFactory.createEtchedBorder() );
+
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+
+        final JTextField queryTextField = new JTextField();
+        queryTextField.setMaximumSize( new Dimension( 140, 20 ) );
+        final JCheckBox searchGenesChx = new JCheckBox( "Search genes" );
+
+        queryTextField.addKeyListener( new KeyAdapter() {
+            @Override
+            public void keyReleased( KeyEvent e ) {
+                if ( e.getKeyCode() == KeyEvent.VK_ENTER )
+                    find( ( ( JTextField ) e.getComponent() ).getText(), searchGenesChx.isSelected() );
+            }
+        } );
+
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher( new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent( KeyEvent e ) {
+                if ( e.getID() == KeyEvent.KEY_RELEASED
+                        && e.getKeyCode() == KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ).getKeyCode() ) {
+                    queryTextField.requestFocusInWindow();
+                }
+                return false;
+            }
+        } );
+
+        // JSeparator j = new JSeparator( SwingConstants.VERTICAL );
+
+        gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( queryTextField ).addComponent( searchGenesChx )
+                .addPreferredGap( ComponentPlacement.UNRELATED, 20, 20 ).addComponent( jLabelStatus ) );
+        gl.setVerticalGroup( gl.createParallelGroup( Alignment.BASELINE ).addComponent( queryTextField ).addComponent(
+                searchGenesChx ).addComponent( jLabelStatus ) );
+
         this.statusMessenger = new StatusJlabel( jLabelStatus );
-        this.getContentPane().add( jPanelStatus, BorderLayout.SOUTH );
+        this.getContentPane().add( statusBarPanel, BorderLayout.SOUTH );
 
         tablePanel.setMessenger( this.statusMessenger );
         treePanel.setMessenger( this.statusMessenger );
@@ -1019,6 +1085,7 @@ public class MainFrame extends JFrame {
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile() );
         }
 
     }
@@ -1028,12 +1095,13 @@ public class MainFrame extends JFrame {
      */
     protected void switchRawDataFile() {
         JFileChooser fchooser = new JFileChooser( settings.getRawDataFileDirectory() );
-        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
+        fchooser.setDialogTitle( "Choose the profile data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
             settings.userSetRawFile( true );
+            statusMessenger.showStatus( "Data file set to " + settings.getScoreFile() );
         } else {
             settings.userSetRawFile( false );
         }
@@ -1168,30 +1236,6 @@ class GeneSetScoreFrame_defineClassMenuItem_actionAdapter implements java.awt.ev
 
     public void actionPerformed( ActionEvent e ) {
         adaptee.defineClassMenuItem_actionPerformed();
-    }
-}
-
-class GeneSetScoreFrame_findClassMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    MainFrame adaptee;
-
-    GeneSetScoreFrame_findClassMenuItem_actionAdapter( MainFrame adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.findClassMenuItem_actionPerformed();
-    }
-}
-
-class GeneSetScoreFrame_findGeneMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    MainFrame adaptee;
-
-    GeneSetScoreFrame_findGeneMenuItem_actionAdapter( MainFrame adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.findGeneMenuItem_actionPerformed();
     }
 }
 

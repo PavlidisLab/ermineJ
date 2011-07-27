@@ -21,6 +21,7 @@ package ubic.erminej.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -161,7 +162,7 @@ public class GeneSetTerms {
      * @return all the geneset terms.
      */
     public Collection<GeneSetTerm> getGeneSets() {
-        return this.getGraph().getValues();
+        return Collections.unmodifiableCollection( this.getGraph().getValues() );
     }
 
     /**
@@ -228,7 +229,7 @@ public class GeneSetTerms {
      * @return
      */
     public Collection<GeneSetTerm> getTerms() {
-        return getGraph().getValues();
+        return Collections.unmodifiableCollection( getGraph().getValues() );
     }
 
     /*

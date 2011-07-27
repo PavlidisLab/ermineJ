@@ -15,6 +15,7 @@
 package ubic.erminej.data;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 /**
@@ -57,10 +58,15 @@ public class Gene implements Comparable<Gene> {
         }
     }
 
-    public void addProbe( Probe probe ) {
+    /**
+     * @param probe
+     */
+    protected void addProbe( Probe probe ) {
         this.probes.add( probe );
-        probe.getGenes().add( this ); // this could be a little tricky...
-        probe.getGeneSets().addAll( this.geneSets );
+        probe.addGene( this ); // have to be careful here not to cause stack overflow
+        for ( GeneSetTerm gs : this.geneSets ) {
+            probe.addToGeneSet( gs );
+        }
     }
 
     @Override
@@ -81,11 +87,11 @@ public class Gene implements Comparable<Gene> {
     }
 
     public Collection<Probe> getActiveProbes() {
-        return activeProbes;
+        return Collections.unmodifiableCollection( activeProbes );
     }
 
     public Collection<GeneSetTerm> getGeneSets() {
-        return geneSets;
+        return Collections.unmodifiableCollection( geneSets );
     }
 
     public String getName() {
@@ -93,7 +99,7 @@ public class Gene implements Comparable<Gene> {
     }
 
     public Collection<Probe> getProbes() {
-        return probes;
+        return Collections.unmodifiableCollection( probes );
     }
 
     public String getSymbol() {
@@ -115,7 +121,7 @@ public class Gene implements Comparable<Gene> {
     public boolean removeGeneSet( GeneSetTerm t ) {
         assert t != null;
         for ( Probe p : this.probes ) {
-            p.getGeneSets().remove( t );
+            p.removeGeneSet( t );
         }
         return this.geneSets.remove( t );
     }

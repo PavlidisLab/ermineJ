@@ -262,7 +262,7 @@ public class UserDefinedGeneSetManager {
          */
         redundancyCheck( newSets, statusMessenger );
 
-        // we can finally add them!
+        // we can finally add them to our annotation set.
         for ( String classFilePath : newSets.keySet() ) {
             Collection<GeneSet> sets = newSets.get( classFilePath );
             for ( GeneSet s : sets )
@@ -278,31 +278,38 @@ public class UserDefinedGeneSetManager {
      * Check whether the given gene set is redundant with any others (excluding itself, but including any that were
      * already considered to be redundant). Avoid calling this repeatedly, it takes a couple of seconds (which is an
      * eternity when you are waiting for the gui to load)
+     * <p>
+     * Redundant groups are only flagged, not removed; in contrast to the GO groups. The assumption is that users load
+     * their own groups in for a reason.
      * 
      * @param s
+     * @see GeneAnnotations.redundancyCheck for a similar method that operates on the GO / preloaded groups.
      */
     private static void redundancyCheck( Map<String, Collection<GeneSet>> setmap, StatusViewer statusMessenger ) {
 
         int timesWarned = 0;
         int maxWarnings = 3;
         for ( String fileName : setmap.keySet() )
-            for ( GeneSet s : setmap.get( fileName ) ) {
-                Collection<Gene> genes2 = s.getGenes();
+            for ( GeneSet newSet : setmap.get( fileName ) ) {
+                Collection<Gene> genes2 = newSet.getGenes();
 
                 for ( GeneSet gs1 : geneData.getAllGeneSets() ) {
-                    Collection<Gene> genes1 = gs1.getGenes();
+                    if ( gs1.equals( newSet ) ) continue; // doesn't count as redundant ... but shouldn't happen!
 
-                    if ( gs1.equals( s ) ) continue; // doesn't count ... but shouldn't happen!
+                    Collection<Gene> genes1 = gs1.getGenes();
 
                     if ( genes1.size() != genes2.size() ) continue; // not identical.
 
                     for ( Gene g1 : genes1 ) {
                         if ( !genes2.contains( g1 ) ) continue; // not redundant.
                     }
-                    s.getRedundantGroups().add( s );
+
+                    newSet.addRedundantGroup( gs1 );
+                    gs1.addRedundantGroup( newSet );
 
                     if ( timesWarned < maxWarnings ) {
-                        statusMessenger.showError( s.getId() + " is redundant with other sets (but it will be kept)" );
+                        statusMessenger.showError( newSet.getId()
+                                + " is redundant with other sets (but it will be kept)" );
                         timesWarned++;
                         if ( timesWarned == maxWarnings ) {
                             statusMessenger.showError( "Further warnings about redundancy skipped" );

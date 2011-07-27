@@ -461,7 +461,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         messenger.showStatus( "Viewing details for " + term + "..." );
 
-        showDetailsForGeneSet( run, term );
+        showDetailsForGeneSet( term, run );
 
     }
 

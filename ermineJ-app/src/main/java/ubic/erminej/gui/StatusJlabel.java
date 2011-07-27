@@ -74,7 +74,8 @@ public class StatusJlabel extends StatusDebugLogger {
      * @param s
      * @param callSuper
      */
-    public void setStatus( String s, boolean callSuper ) {
+    @Override
+    public void showStatus( String s, boolean callSuper ) {
         final String m = s;
 
         if ( SwingUtilities.isEventDispatchThread() ) {
@@ -162,7 +163,7 @@ public class StatusJlabel extends StatusDebugLogger {
 
     @Override
     public void showStatus( String s ) {
-        this.setStatus( s, true );
+        this.showStatus( s, true );
     }
 
     /*

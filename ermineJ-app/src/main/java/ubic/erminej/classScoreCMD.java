@@ -142,10 +142,6 @@ public class classScoreCMD {
         this.buildOptions();
     }
 
-    public GeneSetTerms getGoData() {
-        return goData;
-    }
-
     public String getSaveFileName() {
         return saveFileName;
     }

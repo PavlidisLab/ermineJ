@@ -15,6 +15,7 @@
 package ubic.erminej.data;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -111,7 +112,7 @@ public class GeneSet {
      * @return
      */
     public Collection<Gene> getGenes() {
-        return genes;
+        return Collections.unmodifiableCollection( genes );
     }
 
     /**
@@ -137,14 +138,23 @@ public class GeneSet {
                 probes.addAll( g.getProbes() );
             }
         }
-        return this.probes;
+        return Collections.unmodifiableCollection( this.probes );
+    }
+
+    public void addRedundantGroup( GeneSet redundant ) {
+        if ( this.equals( redundant ) ) {
+            return;
+        }
+        this.redundantGroups.add( redundant );
     }
 
     /**
+     * Can not modify this collection directly; use addRedundantGroup instead.
+     * 
      * @return
      */
     public Collection<GeneSet> getRedundantGroups() {
-        return redundantGroups;
+        return Collections.unmodifiableCollection( redundantGroups );
     }
 
     public String getSourceFile() {
