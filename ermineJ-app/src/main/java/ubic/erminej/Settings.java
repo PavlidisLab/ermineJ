@@ -107,7 +107,7 @@ public class Settings {
     private static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     private static final String OUTPUT_FILE = "outputFile";
     private static final String GENE_SCORE_THRESHOLD = "pValThreshold"; // TODO deprecate this string, use
-                                                                        // 'scoreThreshold' instead.
+    // 'scoreThreshold' instead.
     private static final String PREFERENCES_FILE_NAME = "preferencesFileName";
     private static final String QUANTILE_CONFIG_NAME = "quantile";
     private static final String RAW_FILE_CONFIG_NAME = "rawFile";
@@ -248,7 +248,7 @@ public class Settings {
     /**
      * @return
      */
-    public Format getAnnotFormat() { 
+    public Format getAnnotFormat() {
         String storedValue = config.getString( ANNOT_FORMAT, Format.DEFAULT.toString() );
 
         if ( NumberUtils.isDigits( storedValue ) ) {
@@ -941,24 +941,14 @@ public class Settings {
 
                 log.info( "Found defaults at " + defaultConfigFileLocation );
                 this.config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
-                // File tempLocation = new File( config.getPath() ); // why are we doing this?
-                // this.config.save(); // make sure the temporary file exists.
+
                 File newConfigFile = new File( System.getProperty( "user.home" )
                         + System.getProperty( "file.separator" ) + USERGUI_PROPERTIES );
 
-                this.config = new PropertiesConfiguration( USERGUI_PROPERTIES );
+                this.config = new PropertiesConfiguration( newConfigFile );
                 this.config.setPath( newConfigFile.getAbsolutePath() );
-                // this.config.save( newConfigFile ); // copy over to where they should be.
-                // URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
+
                 log.info( "Saved the new configuration in " + config.getPath() );
-                // if ( !tempLocation.delete() ) {
-                // log.error( "Could not delete temporary configuration file from " + tempLocation.getAbsolutePath()
-                // + ", please delete it manually" );
-                // log.error( tempLocation.getAbsoluteFile() + ": Exists=" + tempLocation.exists() );
-                // log.error( tempLocation.getAbsoluteFile() + ": Can write=" + tempLocation.canWrite() );
-                // } else {
-                // log.debug( "Deleted temporary config file from " + tempLocation.getAbsolutePath() );
-                // }
 
             } catch ( ConfigurationException e1 ) {
                 log.error( "Filed to initialize the configuration file: " + e1, e1 );
