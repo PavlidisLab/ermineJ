@@ -123,7 +123,7 @@ public class AnalysisWizardStep3 extends WizardStep {
      */
     void makeLeftTable() {
 
-        Set<GeneSetTerm> userDefinedGeneSets = geneAnnots.getUserDefined();
+        Set<GeneSetTerm> userDefinedGeneSets = geneAnnots.getUserDefinedTerms();
 
         if ( userDefinedGeneSets == null || userDefinedGeneSets.size() == 0 ) {
             log.debug( "Null or no user-defined gene sets" );

@@ -43,6 +43,7 @@ import javax.swing.event.ChangeEvent;
 
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.geneset.ProbeTableModel;
 import ubic.erminej.gui.util.WizardStep;
@@ -66,6 +67,13 @@ public class GeneSetWizardStep2 extends WizardStep {
     private final static int COL1WIDTH = 80;
     private final static int COL2WIDTH = 200;
 
+    protected void setStartingSet( GeneSet original ) {
+        assert jLabel2 != null;
+        jLabel2.setText( original.toString() );
+        this.ncTableModel.setProbes( original.getProbes() );
+        this.ncTableModel.fireTableDataChanged();
+    }
+
     /**
      * @param wiz
      * @param geneData
@@ -78,6 +86,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         populateTables();
 
         if ( wiz.getOriginalGeneSet() != null ) {
+            // it will be null at construction time, so this is pretty useless.
             assert jLabel2 != null;
             jLabel2.setText( wiz.getOriginalGeneSet().toString() );
             this.ncTableModel.setProbes( wiz.getOriginalGeneSet().getProbes() );

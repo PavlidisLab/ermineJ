@@ -22,8 +22,14 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +44,41 @@ import ubic.basecode.util.FileTools;
 public class GuiUtil {
 
     protected static final Log log = LogFactory.getLog( GuiUtil.class );
+
+    /**
+     * Build a standardized file browse field+button.
+     * 
+     * @param container
+     * @param h actionListener that should be wired to a file browser.
+     * @return field that will contain the file name.
+     */
+    public static JTextField fileBrowsePanel( Container container, ActionListener h ) {
+        JPanel panel = new JPanel();
+        JTextField textField = new JTextField();
+
+        /*
+         * TODO this really should return a JPanel subclass that has a getFileName method.
+         */
+
+        GroupLayout gl = new GroupLayout( panel );
+        panel.setLayout( gl );
+        JButton button = new JButton();
+        button.setText( "Browse..." );
+        button.addActionListener( h );
+        textField.setPreferredSize( new Dimension( 400, 19 ) );
+        textField.setMaximumSize( new Dimension( 800, 19 ) );
+
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( textField ).addComponent( button ) );
+        gl.setVerticalGroup( gl.createParallelGroup().addComponent( textField ).addComponent( button ) );
+
+        panel.setBorder( BorderFactory.createEmptyBorder( 8, 8, 6, 6 ) );
+
+        if ( container != null ) container.add( panel );
+
+        return textField;
+    }
 
     /**
      * Center a frame on the screen.

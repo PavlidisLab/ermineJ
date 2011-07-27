@@ -198,7 +198,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         popup.add( hideInsig );
 
         if ( classID == null ) return null;
-        if ( geneData.getUserDefined().contains( classID ) ) {
+        if ( geneData.getUserDefinedTerms().contains( classID ) ) {
             // user-defineda
             assert classID.isUserDefined();
             modMenuItem.setEnabled( true );

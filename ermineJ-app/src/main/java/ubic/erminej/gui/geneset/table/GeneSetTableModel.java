@@ -400,6 +400,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
     }
 
     private void setCellBackgroundColor( Object value, boolean isSelected, boolean hasFocus, int column ) {
+
+        if ( isSelected ) return;
+
         setBackground( Color.WHITE );
         // set cell background
         setOpaque( true );

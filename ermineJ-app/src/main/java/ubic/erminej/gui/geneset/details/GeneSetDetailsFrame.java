@@ -493,7 +493,11 @@ public class GeneSetDetailsFrame extends JFrame {
             @Override
             public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column ) {
+
                 super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
+
+                if ( isSelected || hasFocus ) return this;
+
                 String sv = ( String ) value;
                 String ds = sv.split( " " )[0]; // kludgy. But it works.
 
@@ -513,6 +517,8 @@ public class GeneSetDetailsFrame extends JFrame {
                     setBackground( Color.WHITE );
                     // setOpaque( true );
                 }
+
+                setForeground( Color.BLACK );
 
                 return this;
             }

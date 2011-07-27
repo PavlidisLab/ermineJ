@@ -20,12 +20,19 @@
 package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
@@ -35,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
@@ -76,27 +84,55 @@ public class StartupPanel extends JPanel {
 
     private void jbInit() {
 
-        JPanel bottomPanel = new JPanel();
+        // decoration
+        JLabel logoLabel = new JLabel();
+        logoLabel
+                .setIcon( new ImageIcon( MainFrame.class.getResource( MainFrame.RESOURCE_LOCATION + "logo1small.gif" ) ) );
+        JPanel logoPanel = new JPanel();
+        logoPanel.setBackground( Color.WHITE );
+        logoPanel.add( logoLabel );
+
+        // buttons at the bottom.
+
         actionButton = new JButton();
         JButton cancelButton = new JButton();
         JButton helpButton = new JButton();
-
         cancelButton.setText( "Cancel" );
         cancelButton.setMnemonic( 'c' );
         cancelButton.addActionListener( new StartupPanel_cancelButton_actionAdapter() );
         actionButton.addActionListener( new StartupPanel_actionButton_actionAdapter( this ) );
-
         actionButton.setText( "Start" );
         cancelButton.setText( "Quit" );
         helpButton.setText( "Help" );
         HelpHelper hh = new HelpHelper();
         hh.initHelp( helpButton );
-        bottomPanel.add( helpButton, null );
-        bottomPanel.add( cancelButton, null );
-        bottomPanel.add( actionButton, null );
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add( helpButton );
+        buttonPanel.add( cancelButton );
+        buttonPanel.add( actionButton );
 
         // ////////////////
 
+        // /// panel to hold GO file browse
+        JPanel classPanel = new JPanel();
+        TitledBorder classPanelBorder = BorderFactory.createTitledBorder( "Gene Ontology XML file" );
+        classPanel.setBorder( classPanelBorder );
+        this.classFileTextField = GuiUtil.fileBrowsePanel( classPanel, new GOFilePickListener( this ) );
+        GroupLayout cpL = new GroupLayout( classPanel );
+        classPanel.setLayout( cpL );
+        cpL.setHorizontalGroup( cpL.createParallelGroup().addComponent( classFileTextField.getParent() ) );
+        cpL.setVerticalGroup( cpL.createSequentialGroup().addComponent( classFileTextField.getParent() ) );
+        cpL.setAutoCreateContainerGaps( true );
+        cpL.setAutoCreateGaps( true );
+
+        // /// panel to hold the annotation file 'browse' and format setting
+        JPanel annotPanel = new JPanel();
+        TitledBorder annotPanelBorder = BorderFactory.createTitledBorder( "Gene annotation file" );
+        annotPanel.setBorder( annotPanelBorder );
+        this.annotFileTextField = GuiUtil.fileBrowsePanel( annotPanel, new AnnotFilePickListener( this ) );
+
+        // / configure drop-down for picking the annotation file format.
         JLabel annotFileFormatLabel = new JLabel();
         annotFileFormatLabel.setText( "Annotation file format" );
         annotFileFormatLabel.setLabelFor( annotFormat );
@@ -104,7 +140,7 @@ public class StartupPanel extends JPanel {
         annotFormat.addItem( "ErmineJ" );
         annotFormat.addItem( "Affy CSV" );
         annotFormat.addItem( "Agilent" );
-
+        annotFormat.setMaximumSize( new Dimension( 200, 25 ) );
         if ( settings.getAnnotFormat() == Format.AFFYCSV ) {
             annotFormat.setSelectedItem( "Affy CSV" );
         } else if ( settings.getAnnotFormat() == Format.AGILENT ) {
@@ -112,49 +148,32 @@ public class StartupPanel extends JPanel {
         } else {
             annotFormat.setSelectedItem( "ErmineJ" );
         }
-        JButton annotBrowseButton = new JButton();
-        annotBrowseButton.setText( "Browse..." );
-        annotBrowseButton.addActionListener( new StartupPanel_annotBrowseButton_actionAdapter( this ) );
-        JLabel annotLabel = new JLabel();
 
-        annotLabel.setPreferredSize( new Dimension( 390, 15 ) );
-        annotLabel.setRequestFocusEnabled( true );
-        annotLabel.setText( "Gene annotation file:" );
+        JPanel formatPanel = new JPanel();
+        GroupLayout fpL = new GroupLayout( formatPanel );
+        formatPanel.setLayout( fpL );
+        fpL.setAutoCreateContainerGaps( true );
+        fpL.setAutoCreateGaps( true );
+        fpL.setHorizontalGroup( fpL.createSequentialGroup().addComponent( annotFileFormatLabel ).addComponent(
+                annotFormat ) );
+        fpL.setVerticalGroup( fpL.createParallelGroup( GroupLayout.Alignment.BASELINE ).addComponent(
+                annotFileFormatLabel ).addComponent( annotFormat ) );
 
-        annotFileTextField.setPreferredSize( new Dimension( 300, 19 ) );
-        JPanel annotPanel = new JPanel();
-        annotPanel.setPreferredSize( new java.awt.Dimension( 400, 80 ) );
-        annotPanel.add( annotLabel, null );
-        annotPanel.add( annotFileTextField, null );
-        annotPanel.add( annotBrowseButton, null );
-        annotPanel.add( annotFileFormatLabel, null );
-        annotPanel.add( annotFormat, null );
+        GroupLayout apL = new GroupLayout( annotPanel );
+        annotPanel.setLayout( apL );
+        apL.setAutoCreateContainerGaps( true );
+        apL.setAutoCreateGaps( true );
+        apL.setHorizontalGroup( apL.createParallelGroup( GroupLayout.Alignment.LEADING ).addComponent(
+                annotFileTextField.getParent() ).addComponent( formatPanel ) );
+        apL.setVerticalGroup( apL.createSequentialGroup().addComponent( annotFileTextField.getParent() ).addComponent(
+                formatPanel ) );
 
-        JPanel centerPanel = new JPanel();
-        JPanel classPanel = new JPanel();
-        classPanel.setPreferredSize( new java.awt.Dimension( 400, 70 ) );
-        JLabel classLabel = new JLabel();
-        classLabel.setPreferredSize( new Dimension( 390, 15 ) );
-        classLabel.setText( "GO XML file:" );
-        classFileTextField.setPreferredSize( new Dimension( 300, 19 ) );
-
-        classPanel.add( classLabel, null );
-        classPanel.add( classFileTextField, null );
-        JButton classBrowseButton = new JButton();
-        classPanel.add( classBrowseButton, null );
-        classBrowseButton.addActionListener( new StartupPanel_classBrowseButton_actionAdapter( this ) );
-        classBrowseButton.setText( "Browse..." );
-
-        centerPanel.setLayout( new BorderLayout() );
-        centerPanel.add( classPanel, BorderLayout.NORTH );
-        centerPanel.add( annotPanel, BorderLayout.SOUTH );
-
-        JEditorPane h = new JEditorPane();
-        h.setEditable( false );
-        h.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
-        h.setContentType( "text/html" );
-        h.addHyperlinkListener( new HyperlinkListener() {
-
+        JEditorPane instructions = new JEditorPane();
+        instructions.setEditable( false );
+        instructions.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
+        instructions.setContentType( "text/html" );
+        instructions.setMaximumSize( new Dimension( 500, 200 ) );
+        instructions.addHyperlinkListener( new HyperlinkListener() {
             public void hyperlinkUpdate( HyperlinkEvent e ) {
                 if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
                     try {
@@ -165,17 +184,31 @@ public class StartupPanel extends JPanel {
                 }
             }
         } );
-        h.setText( "<html> <strong>Starting up the program</strong><br>Please confirm "
+        instructions.setText( "<html> <strong>Starting up the program</strong><br>Please confirm "
                 + "the settings below are correct; they cannot be changed during "
                 + "analysis.<p>The annotation file you select " + "must match the experimental data you are using. "
                 + "For updated annotation files, visit "
                 + "<a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots</a></html>" );
 
-        this.setLayout( new BorderLayout() );
-        this.add( h, BorderLayout.NORTH );
-        this.add( centerPanel, BorderLayout.CENTER );
-        this.add( bottomPanel, BorderLayout.SOUTH );
+        JPanel formPanel = new JPanel();
+        GroupLayout gl = new GroupLayout( formPanel );
+        formPanel.setLayout( gl );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( classPanel ).addComponent( annotPanel ) );
+        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( classPanel ).addComponent( annotPanel ) );
 
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout( new BorderLayout() );
+        // centerPanel.setLayout( new BoxLayout( centerPanel, BoxLayout.PAGE_AXIS ) );
+
+        centerPanel.add( instructions, BorderLayout.NORTH );
+        centerPanel.add( formPanel, BorderLayout.CENTER );
+
+        this.setLayout( new BorderLayout() );
+        this.add( logoPanel, BorderLayout.NORTH );
+        this.add( centerPanel, BorderLayout.CENTER );
+        this.add( buttonPanel, BorderLayout.SOUTH );
     }
 
     // for testing.
@@ -311,10 +344,10 @@ class StartupPanel_cancelButton_actionAdapter implements java.awt.event.ActionLi
     }
 }
 
-class StartupPanel_annotBrowseButton_actionAdapter implements ActionListener {
+class AnnotFilePickListener implements ActionListener {
     StartupPanel adaptee;
 
-    StartupPanel_annotBrowseButton_actionAdapter( StartupPanel adaptee ) {
+    AnnotFilePickListener( StartupPanel adaptee ) {
         this.adaptee = adaptee;
     }
 
@@ -323,10 +356,10 @@ class StartupPanel_annotBrowseButton_actionAdapter implements ActionListener {
     }
 }
 
-class StartupPanel_classBrowseButton_actionAdapter implements ActionListener {
+class GOFilePickListener implements ActionListener {
     StartupPanel adaptee;
 
-    StartupPanel_classBrowseButton_actionAdapter( StartupPanel adaptee ) {
+    GOFilePickListener( StartupPanel adaptee ) {
         this.adaptee = adaptee;
     }
 

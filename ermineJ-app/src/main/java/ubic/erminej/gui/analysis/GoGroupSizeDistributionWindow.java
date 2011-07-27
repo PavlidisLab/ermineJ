@@ -16,7 +16,8 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.analysis;
+
+package ubic.erminej.gui.analysis;
 
 import java.awt.Frame;
 
@@ -28,28 +29,13 @@ import javax.swing.JFrame;
  * @author paul
  * @version $Id$
  */
-public class MultiFuncDiagWindow extends JFrame {
+public class GoGroupSizeDistributionWindow extends JFrame {
 
-    private static final long serialVersionUID = 1L;
-
-    public MultiFuncDiagWindow( Frame owner ) {
-        super( "Multifunctionality analysis" );
-        // TODO Auto-generated constructor stub
+    public GoGroupSizeDistributionWindow( Frame owner ) {
+        super( "GO group size analysis" );
 
         /*
-         * Put in the middle, make a nice size.
-         */
-
-        /*
-         * Add a menu to select which resultset to use
-         */
-
-        /*
-         * Plot the distribution of gene scores vs. multifunctionality - jfree
-         */
-
-        /*
-         * Allow option to view ranks or actual values.
+         * Show histogram of GO group sizes; allow filtering for user-defined, or by aspect?
          */
 
     }

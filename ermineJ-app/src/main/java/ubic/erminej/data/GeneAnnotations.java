@@ -620,11 +620,25 @@ public class GeneAnnotations {
     }
 
     /**
+     * @return
+     */
+    public Set<GeneSet> getUserDefinedGeneSets() {
+        Set<GeneSet> result = new HashSet<GeneSet>();
+        for ( GeneSetTerm term : geneSets.keySet() ) {
+            GeneSet gs = geneSets.get( term );
+            if ( gs.isUserDefined() ) {
+                result.add( gs );
+            }
+        }
+        return result;
+    }
+
+    /**
      * Get the gene sets that are user-defined.
      * 
      * @return
      */
-    public Set<GeneSetTerm> getUserDefined() {
+    public Set<GeneSetTerm> getUserDefinedTerms() {
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
             GeneSet gs = geneSets.get( term );

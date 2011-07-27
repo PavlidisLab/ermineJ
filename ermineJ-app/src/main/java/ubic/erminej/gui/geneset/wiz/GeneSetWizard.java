@@ -116,7 +116,7 @@ public class GeneSetWizard extends Wizard {
 
         this.makingNewGeneSet = false;
 
-        oldGeneSet = geneData.getGeneSet( geneSetId );
+        this.oldGeneSet = geneData.getGeneSet( geneSetId );
         assert oldGeneSet != null;
 
         this.setTitle( "Modify Gene Set - Step 2 of 3" );
@@ -152,6 +152,7 @@ public class GeneSetWizard extends Wizard {
                     this.setTitle( "Define New Gene Set - Step 2 of 3" );
                 } else { // case 3 - editing an existing set.
                     assert this.oldGeneSet != null;
+                    step2.setStartingSet( this.oldGeneSet );
                     this.getContentPane().remove( step1A );
                     this.setTitle( "Modify Gene Set - Step 2 of 3" );
                 }

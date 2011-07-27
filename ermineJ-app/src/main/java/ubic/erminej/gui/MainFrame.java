@@ -75,7 +75,6 @@ import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.AnalysisThread;
 import ubic.erminej.analysis.GeneSetPvalRun;
-import ubic.erminej.analysis.MultiFuncDiagWindow;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
@@ -87,6 +86,8 @@ import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
 import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.analysis.AnalysisWizard;
+import ubic.erminej.gui.analysis.GoGroupSizeDistributionWindow;
+import ubic.erminej.gui.analysis.MultiFuncDiagWindow;
 import ubic.erminej.gui.geneset.table.GeneSetTablePanel;
 import ubic.erminej.gui.geneset.tree.GeneSetTreePanel;
 import ubic.erminej.gui.geneset.wiz.GeneSetWizard;
@@ -447,7 +448,7 @@ public class MainFrame extends JFrame {
         fileMenu.setEnabled( true );
         classMenu.setEnabled( true );
         analysisMenu.setEnabled( true );
-        diagnosticsMenu.setEnabled( false );
+        diagnosticsMenu.setEnabled( true );
         runViewMenu.setEnabled( false );
         helpMenu.setEnabled( true );
     }
@@ -546,6 +547,11 @@ public class MainFrame extends JFrame {
     private void multifunctionalityDiagnostics() {
         MultiFuncDiagWindow mf = new MultiFuncDiagWindow( this );
         mf.setVisible( true );
+    }
+
+    private void groupSizeDistributionDiagnostics() {
+        GoGroupSizeDistributionWindow ggsw = new GoGroupSizeDistributionWindow( this );
+        ggsw.setVisible( true );
     }
 
     /**
@@ -832,12 +838,21 @@ public class MainFrame extends JFrame {
         diagnosticsMenu.setText( "Diagnostics" );
         diagnosticsMenu.setEnabled( false );
         JMenuItem mulitfuncMenuItem = new JMenuItem( "Multifunctionality" );
+        JMenuItem groupSizeDist = new JMenuItem( "Group size distribution" );
 
         mulitfuncMenuItem.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 multifunctionalityDiagnostics();
             }
+        } );
+
+        groupSizeDist.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                groupSizeDistributionDiagnostics();
+            }
+
         } );
 
         diagnosticsMenu.add( mulitfuncMenuItem );
@@ -860,25 +875,29 @@ public class MainFrame extends JFrame {
         JLabel logoLabel = new JLabel();
         logoLabel.setIcon( new ImageIcon( MainFrame.class.getResource( RESOURCE_LOCATION + "logo1small.gif" ) ) );
 
+        JPanel logoPanel = new JPanel();
+        logoPanel.setBackground( Color.WHITE );
+        logoPanel.add( logoLabel );
+
+        // big
         JPanel progressPanel = new JPanel( new BorderLayout() );
         progressPanel.setBackground( Color.white );
         progressPanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
         JLabel label = new JLabel( "Please wait while the files are loaded in." );
-        label.setPreferredSize( new Dimension( 500, 30 ) );
-        label.setHorizontalTextPosition( SwingConstants.CENTER );
+        label.setMaximumSize( new Dimension( 500, 30 ) );
         label.setLabelFor( progressBar );
-        label.setHorizontalAlignment( SwingConstants.CENTER );
 
         JPanel progressBarContainer = new JPanel();
-        progressBarContainer.setLayout( new BoxLayout( progressBarContainer, BoxLayout.PAGE_AXIS ) );
+        progressBarContainer.setLayout( new BoxLayout( progressBarContainer, BoxLayout.Y_AXIS ) );
         progressBarContainer.setPreferredSize( new Dimension( 300, 36 ) );
-
         progressBarContainer.add( label );
         progressBarContainer.add( progressBar );
+        progressBarContainer.setBorder( BorderFactory.createEmptyBorder( 20, 20, 20, 20 ) );
         progressBar.setIndeterminate( true );
+        progressBar.setMaximumSize( new Dimension( 500, 25 ) );
 
-        progressPanel.add( logoLabel, BorderLayout.NORTH );
+        progressPanel.add( logoPanel, BorderLayout.NORTH );
         progressPanel.add( progressBarContainer, BorderLayout.CENTER );
 
         return progressPanel;
@@ -926,10 +945,6 @@ public class MainFrame extends JFrame {
     }
 
     protected void maybeEnableSomeMenus() {
-
-        if ( results.size() > 0 ) {
-            diagnosticsMenu.setEnabled( true );
-        }
 
         if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
             runViewMenu.setEnabled( true );
@@ -992,7 +1007,12 @@ public class MainFrame extends JFrame {
          */
         this.tablePanel.filterByUserGeneSets( b );
 
-        statusMessenger.showStatus( this.tablePanel.getRowCount() + " custom gene sets shown" );
+        if ( b ) {
+            statusMessenger.showStatus( this.tablePanel.getRowCount() + " custom gene sets shown" );
+        } else {
+            statusMessenger.showStatus( this.tablePanel.getRowCount() + " gene sets shown" );
+
+        }
     }
 
     /**

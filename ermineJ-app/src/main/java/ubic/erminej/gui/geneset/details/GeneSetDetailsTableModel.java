@@ -43,7 +43,7 @@ import ubic.erminej.gui.util.JLinkLabel;
  * 
  * @author Will Braynen
  * @version $Id$
- * @see GeneSetDetailsFrame
+ * @see GeneSetDetailsFrame for the renderer
  */
 public class GeneSetDetailsTableModel extends AbstractTableModel {
 
@@ -236,6 +236,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 // gene symbol.
                 if ( geneData == null ) return "No data available";
                 Gene gene_name = probeID.getGene();
+
+                // bug 1332: allow for multiple genes here?
 
                 return geneData == null ? null : linkLabels.get( gene_name );
             case 4:

@@ -173,8 +173,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
         // MAIN PANEL = GridLayout(BorderLayouts); GridLayout is (1,6)
 
-        step2Panel.add( scoreFilePanel, null );
-        step2Panel.add( rawDataPanel, null );
+        step2Panel.add( scoreFilePanel );
+        step2Panel.add( rawDataPanel );
         this.addHelp( "<html><b>Choose the data files to use</b><br>"
                 + "&quot;Gene scores&quot; refer to a score or p value "
                 + " associated with each gene in your data set. This "

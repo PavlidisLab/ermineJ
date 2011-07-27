@@ -102,12 +102,13 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         goTree.revalidate();
 
-        GeneSetTreeNode node = ( GeneSetTreeNode ) find( id ).getLastPathComponent();
+        TreePath existing = find( id );
 
-        if ( node != null ) {
+        if ( existing != null ) {
             log.warn( "Node was already there: " + id );
             return;
         }
+
         GeneSetTreeNode userNode = getUserNode();
         assert userNode != null;
 

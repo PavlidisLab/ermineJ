@@ -41,7 +41,7 @@ import ubic.erminej.gui.geneset.SimpleGeneSetListTableModel;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
- * Step to choose a gene set to modify from the full list.
+ * Step to choose a gene set to modify from the a list.
  * 
  * @author Homin Lee
  * @version $Id$
@@ -61,6 +61,12 @@ public class GeneSetWizardStep1A extends WizardStep {
         populateTables( geneSets );
     }
 
+    /**
+     * Only show the user's sets
+     * 
+     * @param wiz
+     * @param geneData
+     */
     public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData ) {
         super( wiz );
         this.jbInit();
@@ -142,10 +148,13 @@ public class GeneSetWizardStep1A extends WizardStep {
 
     }
 
+    /**
+     * @param geneSets
+     */
     private void populateTables( Collection<GeneSet> geneSets ) {
         SimpleGeneSetListTableModel model;
         if ( geneSets == null || geneSets.isEmpty() ) {
-            model = new SimpleGeneSetListTableModel( geneData );
+            model = new SimpleGeneSetListTableModel( geneData.getUserDefinedGeneSets() );
         } else {
             model = new SimpleGeneSetListTableModel( geneSets );
         }
@@ -164,9 +173,10 @@ public class GeneSetWizardStep1A extends WizardStep {
         String searchOn = searchTextField.getText();
         Collection<GeneSetTerm> terms;
         if ( searchOn.equals( "" ) ) {
-            terms = geneData.getActiveGeneSets();
+            terms = geneData.getUserDefinedTerms();
         } else {
             terms = geneData.findSetsByName( searchOn );
+            terms.retainAll( geneData.getUserDefinedTerms() );
         }
         populateTables( geneData.getGeneSets( terms ) );
     }
