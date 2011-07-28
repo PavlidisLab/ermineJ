@@ -44,9 +44,7 @@ import ubic.erminej.gui.util.WizardStep;
  * @version $Id$
  */
 public class AnalysisWizardStep5 extends WizardStep {
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 2682780215238903138L;
     private Settings settings;
     private JPanel step5Panel;
@@ -57,6 +55,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     private JTextField jTextFieldIterations;
     private JCheckBox jCheckBoxDoLog;
     private JCheckBox jCheckBoxBigIsBetter;
+    private JCheckBox jCheckBoxDoMultiFuncCorr;
     private JPanel oraPanel;
     private JPanel resampPanel;
     private JPanel rocPanel;
@@ -120,6 +119,10 @@ public class AnalysisWizardStep5 extends WizardStep {
         jCheckBoxBigIsBetter.setToolTipText( "If you are loading raw p values, you should UNcheck this box." );
         jCheckBoxBigIsBetter.setSelected( false );
         jCheckBoxBigIsBetter.setText( "Larger scores in your gene score file are better." );
+
+        jCheckBoxDoMultiFuncCorr = new JCheckBox();
+        jCheckBoxDoMultiFuncCorr.setSelected( true );
+        jCheckBoxDoMultiFuncCorr.setText( "Reduce the effect of multifunctional genes" );
 
         // roc pane
         rocPanel = new JPanel();
@@ -247,14 +250,15 @@ public class AnalysisWizardStep5 extends WizardStep {
      */
     public void addVarPanel( Method analysisType ) {
         if ( analysisType.equals( Method.ORA ) ) {
-            oraPanel.add( jCheckBoxDoLog, null );
-            oraPanel.add( jCheckBoxBigIsBetter, null );
-            step5Panel.add( oraPanel, null );
+            oraPanel.add( jCheckBoxDoLog );
+            oraPanel.add( jCheckBoxBigIsBetter );
+            oraPanel.add( jCheckBoxDoMultiFuncCorr );
+            step5Panel.add( oraPanel );
             this.addHelp( extraHelp );
         } else if ( analysisType.equals( Method.GSR ) ) {
             resampPanel.add( jCheckBoxDoLog, null );
-            resampPanel.add( jCheckBoxBigIsBetter, null );
-            resampPanel.add( subPanel, null );
+            resampPanel.add( jCheckBoxBigIsBetter );
+            resampPanel.add( subPanel );
             this.addHelp( extraHelp );
             step5Panel.add( resampPanel, null );
         } else if ( analysisType.equals( Method.ROC ) ) {
@@ -322,6 +326,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setDoLog( jCheckBoxDoLog.isSelected() );
         settings.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
         settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );
+        settings.setUseMultifunctionalityCorrection( jCheckBoxDoMultiFuncCorr.isSelected() );
     }
 
     @Override

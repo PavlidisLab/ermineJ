@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import ubic.basecode.math.SpecFunc;
-import ubic.basecode.util.StatusViewer; 
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
@@ -49,6 +49,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private int numOverThreshold = 0;
     private int numUnderThreshold = 0;
+    private GeneScores geneScores;
+
+    private Collection<Probe> probesAboveThreshold = new HashSet<Probe>();
+    private Collection<Gene> genesAboveThreshold = new HashSet<Gene>();
 
     /**
      * @param settings
@@ -63,13 +67,15 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         super( settings, a, csc );
 
+        this.geneScores = geneScores;
+
         if ( settings.getUseLog() ) {
             this.geneScoreThreshold = -Arithmetic.log10( settings.getGeneScoreThreshold() );
         } else {
             this.geneScoreThreshold = settings.getGeneScoreThreshold();
         }
 
-        computeCounts( geneScores );
+        computeCounts();
 
     }
 
@@ -98,16 +104,17 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         int count = 0;
 
         for ( GeneSetTerm geneSetName : geneAnnots.getNonEmptyGeneSets() ) {
-            ifInterruptedStop();
 
-            GeneSetResult res = classPval( geneSetName, geneToGeneScoreMap, probesToPvals );
+            GeneSetResult res = classPval( geneSetName );
             if ( res != null ) {
                 results.put( geneSetName, res );
+
+                if ( ++count % 100 == 0 ) ifInterruptedStop();
+                if ( messenger != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
+                    messenger.showStatus( count + " gene sets analyzed" );
+                }
             }
-            count++;
-            if ( messenger != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
-                messenger.showStatus( count + " gene sets analyzed" );
-            }
+
         }
         return results;
     }
@@ -131,7 +138,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @return number of entries that meet the user-set threshold.
      * @todo make this private and called by OraPvalGenerator.
      */
-    public void computeCounts( GeneScores geneScores ) {
+    public void computeCounts() {
 
         Map<Probe, Double> probeScores = geneScores.getProbeToScoreMap();
 
@@ -139,6 +146,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             double geneScore = probeScores.get( p );
 
             if ( scorePassesThreshold( geneScore ) ) {
+                probesAboveThreshold.add( p );
+                genesAboveThreshold.add( p.getGene() );
                 numOverThreshold++;
             } else {
                 numUnderThreshold++;
@@ -147,27 +156,19 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             inputSize++;
 
         }
+
+        assert inputSize == numOverThreshold + numUnderThreshold;
     }
 
     /**
      * Get results for one class, based on class id. The other arguments are things that are not constant under
      * permutations of the data.
      */
-    public GeneSetResult classPval( GeneSetTerm className, Map<Gene, Double> geneToScoreMap,
-            Map<Probe, Double> probesToScores ) {
+    public GeneSetResult classPval( GeneSetTerm className ) {
 
         if ( !super.checkAspectAndRedundancy( className ) ) {
-            // if ( log.isDebugEnabled() ) log.debug( className + " is not in a selected aspect" );
             return null;
         }
-        // inputs for hypergeometric distribution
-        int successes = 0;
-        int failures = 0;
-
-        boolean useMultifunctionalityCorrection = this.settings.isUseMultifunctionalityCorrection();
-
-        // variables for outputs
-        double oraPval = Double.NaN;
 
         if ( !effectiveSizes.containsKey( className ) ) {
             log.warn( "No size information available for " + className + ", skipping" );
@@ -181,137 +182,93 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             return null;
         }
 
-        Collection<Probe> probesInGeneSet = geneAnnots.getGeneSetProbes( className );
         Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( className );
 
-        /*
-         * I'm going to turn this around. First we identify the probes which beat the threshold.
-         */
-        Collection<Probe> probesAboveThreshold = new HashSet<Probe>();
-        Collection<Gene> genesAboveThreshold = new HashSet<Gene>();
+        Collection<Gene> seenGenes = new HashSet<Gene>();
         int geneSuccesses = 0;
         int probeSuccesses = 0;
-        for ( Probe p : probesToScores.keySet() ) {
-            double score = probesToScores.get( p );
-            if ( scorePassesThreshold( score ) ) {
-                probesAboveThreshold.add( p );
-                genesAboveThreshold.add( p.getGene() );
+        for ( Gene g : geneSetGenes ) {
 
-                /*
-                 * I could count the ones in the set here too ...
-                 */
-                if ( geneSetGenes.contains( p.getGene() ) ) {
-                    // be careful, we'll count genes twice
-                    geneSuccesses++;
-                    probeSuccesses++;
+            if ( !seenGenes.contains( g ) && genesAboveThreshold.contains( g ) ) {
+                geneSuccesses++;
+                for ( Probe p : g.getProbes() ) {
+                    if ( probesAboveThreshold.contains( p ) ) {
+                        probeSuccesses++;
+                    }
                 }
             }
+            seenGenes.add( g );
         }
-
-        /*
-         * Obviously if there have to be at least 2 genes above the threshold.
-         */
 
         /*
          * 
          * Now I determine which of those gene above threshold is the most multifunctional
          */
-        Gene mostMultifunctional = geneAnnots.getMultifunctionality().getMostMultifunctional( genesAboveThreshold );
+        Collection<Gene> filteredGenes = new HashSet<Gene>();
+        filteredGenes.addAll( genesAboveThreshold );
+        boolean useMultifunctionalityCorrection = this.settings.isUseMultifunctionalityCorrection();
+        int amountOfCorrection = 2;
+        for ( int i = 0; i < amountOfCorrection; i++ ) {
+            // shortcut/kludge to get multiple mf hits -- should just work with the ranked one.
+            Gene mostMultifunctional = geneAnnots.getMultifunctionality().getMostMultifunctional( filteredGenes );
+            filteredGenes.remove( mostMultifunctional );
 
-        if ( genesAboveThreshold.contains( mostMultifunctional ) ) {
-            geneSuccesses--;
-            probeSuccesses -= mostMultifunctional.getProbes().size();
-        }
-
-        /*
-         * Only count genes once!
-         */
-        Collection<Gene> seenGenes = new HashSet<Gene>();
-
-        for ( Probe geneSetProbe : probesInGeneSet ) {
-            ifInterruptedStop();
-
-            if ( !probesToScores.containsKey( geneSetProbe ) ) {
-                continue;
+            // Remove just one.
+            if ( useMultifunctionalityCorrection && genesAboveThreshold.contains( mostMultifunctional ) ) {
+                geneSuccesses--;
+                probeSuccesses -= mostMultifunctional.getProbes().size();
             }
 
-            if ( settings.getUseWeights() ) {
-
-                Gene gene = geneSetProbe.getGene();
-
-                if ( !geneToScoreMap.containsKey( gene ) ) {
-                    continue;
-                }
-
-                if ( seenGenes.contains( gene ) ) {
-                    continue;
-                }
-
-                Double geneScore = geneToScoreMap.get( gene );
-
-                if ( geneScore == null ) {
-                    log.warn( "Null gene score for " + geneSetProbe );
-                    continue;
-                }
-
-                if ( scorePassesThreshold( geneScore ) ) {
-                    /*
-                     * if ( log.isDebugEnabled() ) { log.debug( className + " " + probe + " " + geneScore + " beats " +
-                     * geneScoreThreshold ); }
-                     */
-                    successes++;
-                } else {
-                    failures++;
-                }
-
-                seenGenes.add( gene );
-            } else {
-
-                /*
-                 * pvalue for this probe. This will not be null if things have been done correctly so far. This is the
-                 * only place we need the raw pvalue for a probe.
-                 */
-                Double score = probesToScores.get( geneSetProbe );
-
-                if ( scorePassesThreshold( score ) ) {
-                    // if ( log.isDebugEnabled() ) log.debug( probe + " " + score + " beats " + geneScoreThreshold );
-                    successes++;
-                } else {
-                    failures++;
-                }
-
+            if ( geneSuccesses == 0 ) {
+                break;
             }
-        } // end of while over items in the class.
-
-        // Hypergeometric p value calculation (or binomial approximation)
-        // successes=number of genes in class which meet criteria
-        // (successes); numOverThreshold= number of genes which
-        // meet criteria (trials); pos_prob: fractional size of
-        // class wrt data size.
-
-        oraPval = 0.0;
-        for ( int i = successes; i <= Math.min( numOverThreshold, effectiveGeneSetSize ); i++ ) {
-            oraPval += SpecFunc.dhyper( i, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold );
         }
 
-        log.debug( className + " ingroupoverthresh=" + successes + " setsize=" + effectiveGeneSetSize
-                + " totalinputsize=" + inputSize + " totaloverthresh=" + numOverThreshold + " oraP="
-                + String.format( "%.2g", oraPval ) );
+        int successes = settings.getUseWeights() ? geneSuccesses : probeSuccesses;
 
-        if ( Double.isNaN( oraPval ) ) {
-            double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
+        return computeResult( className, effectiveGeneSetSize, successes );
 
+    }
+
+    /**
+     * Hypergeometric p value calculation (or binomial approximation) successes=number of genes in class which meet
+     * criteria (successes)
+     * 
+     * @param
+     * @param
+     * @param
+     */
+    private GeneSetResult computeResult( GeneSetTerm className, int effectiveGeneSetSize, int successes ) {
+
+        double oraPval = Double.NaN;
+
+        if ( successes > 0 ) {
             oraPval = 0.0;
+
             for ( int i = successes; i <= Math.min( numOverThreshold, effectiveGeneSetSize ); i++ ) {
-                oraPval += SpecFunc.dbinom( i, numOverThreshold, pos_prob );
+                oraPval += SpecFunc
+                        .dhyper( i, effectiveGeneSetSize, inputSize - effectiveGeneSetSize, numOverThreshold );
             }
+
+            log.debug( className + " ingroupoverthresh=" + successes + " setsize=" + effectiveGeneSetSize
+                    + " totalinputsize=" + inputSize + " totaloverthresh=" + numOverThreshold + " oraP="
+                    + String.format( "%.2g", oraPval ) );
+
+            if ( Double.isNaN( oraPval ) ) {
+                double pos_prob = ( double ) effectiveGeneSetSize / ( double ) inputSize;
+
+                oraPval = 0.0;
+                for ( int i = successes; i <= Math.min( numOverThreshold, effectiveGeneSetSize ); i++ ) {
+                    oraPval += SpecFunc.dbinom( i, numOverThreshold, pos_prob );
+                }
+            }
+        } else {
+            oraPval = 1.0;
         }
 
         GeneSetResult res = new GeneSetResult( className, actualSizes.get( className ).intValue(), effectiveGeneSetSize );
         res.setScore( successes );
         res.setPValue( oraPval );
         return res;
-
     }
-
 }
