@@ -18,7 +18,7 @@
  */
 package ubic.erminej.gui.analysis;
 
-import java.awt.Color; 
+import java.awt.Color;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.Map;
@@ -36,13 +36,13 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
-import org.jfree.data.time.MovingAverage;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.Rank;
+import ubic.basecode.math.Smooth;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -50,6 +50,7 @@ import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.Multifunctionality;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.math.Functions;
 
 /**
@@ -114,12 +115,18 @@ public class MultiFuncDiagWindow extends JFrame {
         DefaultXYDataset ds = new DefaultXYDataset();
         ds.addSeries( "Raw", ser.toArray() );
 
-        double pointsToAverage = 0.1; // like LOWESS we might use. Even 0.2?
-        double skip = 0.001;
-        XYSeries ma = MovingAverage.createMovingAverage( ds, 0, " Smoothed", pointsToAverage, skip );
+        DoubleMatrix1D movingAverage = Smooth.movingAverage( new DenseDoubleMatrix1D( ser.toArray()[1] ), scoreRanks
+                .size() / 10 );
 
-        // ds.addSeries( "Smoothed", smoothed.toArray() );
-        ds.addSeries( "Smoothed", ma.toArray() );
+        XYSeries smoothed = new XYSeries( ser.getKey() + " - Smoothed" );
+
+        for ( int i = 0; i < array[1].length; i++ ) {
+            array[1][i] = scoreRanks.getQuick( i ) / array[1].length; // relative ranks.
+            ser.add( array[0][i], array[1][i] );
+            smoothed.add( array[0][i], movingAverage.get( i ) );
+        }
+
+        ds.addSeries( "Smoothed", smoothed.toArray() );
 
         JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality bias", "Multifunctionality rank",
                 "Score rank", ds, PlotOrientation.VERTICAL, false, false, false );
