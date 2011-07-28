@@ -49,7 +49,7 @@ public class TestMultifunctionality extends TestCase {
         Multifunctionality mf = ga.getMultifunctionality();
 
         double actual = mf.getMultifunctionalityScore( new Gene( "PAX8" ) );
-        assertEquals( 0.3507, actual, 0.001 ); // not checked by hand.
+        assertEquals( 0.4065, actual, 0.001 ); // not checked by hand.
 
         int actualNumG = mf.getNumGoTerms( new Gene( "PAX8" ) );
         assertEquals( 80, actualNumG );// not checked by hand.
@@ -58,7 +58,7 @@ public class TestMultifunctionality extends TestCase {
         assertEquals( 0.96, actualR, 0.01 );// not checked by hand.
 
         double actualGoMF = mf.getGOTermMultifunctionalityRank( new GeneSetTerm( "GO:0005634" ) );
-        assertEquals( 0.43478, actualGoMF, 0.001 );// not checked by hand.
+        assertEquals( 0.4171, actualGoMF, 0.001 );// not checked by hand.
 
         List<Gene> li = new ArrayList<Gene>();
         li.add( new Gene( "EYA3" ) );
@@ -82,7 +82,7 @@ public class TestMultifunctionality extends TestCase {
         li.add( new Gene( "C6orf199" ) );
         li.add( new Gene( "foonotagene" ) );
         double cgm = mf.correlationWithGeneMultifunctionality( li );
-        assertEquals( 0.749, cgm, 0.001 );
+        assertEquals( 0.7070, cgm, 0.001 ); // not checked by hand.
     }
 
 }

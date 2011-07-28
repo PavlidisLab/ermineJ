@@ -92,7 +92,7 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotations pruned = new GeneAnnotations( ga, keepers );
         assertEquals( 4, pruned.numGenes() );
         assertEquals( 4, pruned.numProbes() );
-        assertEquals( 30, pruned.numGeneSets() ); // not checked by hand.
+        assertEquals( 59, pruned.numGeneSets() ); // not checked by hand.
     }
 
     public void testGeneAnnotationsApiA() throws Exception {
@@ -154,7 +154,7 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testMeanGenesPerSet() throws Exception {
-        assertEquals( 4.26, GeneSetMapTools.meanGeneSetSize( ga, false ), 0.01 ); // not hand checked
+        assertEquals( 4.451, GeneSetMapTools.meanGeneSetSize( ga, false ), 0.01 ); // not hand checked
     }
 
     public void testMeanSetsPerGenes() throws Exception {
@@ -205,7 +205,7 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readAgilent( ia, null );
         int actualValue = g.findProbe( "A_52_P311491" ).getGeneSets().size();
-        assertEquals( 10, g.getRedundant().size() ); // not checked by hand.
+        assertEquals( 0, g.getRedundant().size() ); // not checked by hand.
         assertEquals( 12, actualValue ); // not checked by hand.
     }
 
@@ -239,9 +239,9 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testRemoveBySize() throws Exception {
-        assertEquals( 185, ga.getActiveGeneSets().size() ); // not checked by hand.
+        assertEquals( 255, ga.getActiveGeneSets().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
-        assertEquals( 144, ga.getActiveGeneSets().size() ); // not checked by hand
+        assertEquals( 192, ga.getActiveGeneSets().size() ); // not checked by hand
     }
 
     public void testSelectSetsByGene() throws Exception {
