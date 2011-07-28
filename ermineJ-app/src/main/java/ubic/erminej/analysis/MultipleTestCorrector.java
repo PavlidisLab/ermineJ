@@ -107,7 +107,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
         }
 
         messenger.showStatus( toUseForMTC.size() + " sets will be used for multiple test correction; " + skip.size()
-                + " redundant ones grouped in." );
+                + " redundant ones are lumped in." );
 
     }
 

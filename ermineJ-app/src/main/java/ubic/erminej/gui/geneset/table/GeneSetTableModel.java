@@ -430,7 +430,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
     protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
 
-        if ( id.isAspect() || id.getId().equals( "all" ) ) return "";
+        if ( id.isAspect() || id.getId().equals( "all" ) || geneData.getGeneSet( id ) == null ) return "";
 
         // boolean redundant = geneData.skipDueToRedundancy( id );
         Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();

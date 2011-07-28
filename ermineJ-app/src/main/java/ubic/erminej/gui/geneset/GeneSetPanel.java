@@ -63,10 +63,14 @@ import ubic.erminej.gui.util.GuiUtil;
 public abstract class GeneSetPanel extends JScrollPane {
 
     public static final double FDR_THRESHOLD_FOR_FILTER = 0.1;
+
     private static final long serialVersionUID = 1L;
+
     static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
+
     static final String AMIGO_URL_BASE = "http://amigo.geneontology.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
+
     protected MainFrame callingFrame;
     protected GeneAnnotations geneData;
     protected StatusViewer messenger = new StatusStderr();
@@ -76,7 +80,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     public static final String NOACTION = "NOACTION";
     public static final String RESTORED = "RESTORED";
     public static final String DELETED = "DELETED";
-    public static final int MAX_DEFINITION_LENGTH = 200;
+    public static final int MAX_DEFINITION_LENGTH = 300;
 
     protected static boolean hideEmpty = true;
     protected static boolean hideInsignificant = false;
@@ -165,7 +169,6 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty );
         final JCheckBoxMenuItem hideInsig = new JCheckBoxMenuItem( "Hide non-significant", hideInsignificant );
-        // final JCheckBoxMenuItem hideRedund = new JCheckBoxMenuItem( "Hide redundant", hideRedundant );
 
         hideEmptyMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e1 ) {
@@ -182,14 +185,6 @@ public abstract class GeneSetPanel extends JScrollPane {
             }
 
         } );
-
-        // hideRedund.addActionListener( new ActionListener() {
-        // public void actionPerformed( ActionEvent e1 ) {
-        // hideRedundant = hideRedund.getState();
-        // filter( true );
-        // }
-        //
-        // } );
 
         popup.add( htmlMenuItem );
         popup.add( modMenuItem );

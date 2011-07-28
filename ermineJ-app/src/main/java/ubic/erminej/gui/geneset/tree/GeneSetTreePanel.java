@@ -46,6 +46,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -573,8 +574,6 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
     private static final String GOODPVAL_GOODCHILD_ICON = RESOURCE_LOCATION + "goldCirclePurpleDot.gif";
 
-    private static final String REDUNDANT_ICON = RESOURCE_LOCATION + "littleGreySquare.gif";
-
     private static final String EMPTYSET_ICON = RESOURCE_LOCATION + "littleLighterGreySquare.gif";
 
     private GeneSetPvalRun currentResultSet = null;
@@ -595,8 +594,6 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
      * Represents a node that is statistically significant but which lacks any significant children.
      */
     private final Icon goodPvalueIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_ICON ) );
-
-    private final Icon redundantIcon = new ImageIcon( this.getClass().getResource( REDUNDANT_ICON ) );
 
     private final Icon emptySetIcon = new ImageIcon( this.getClass().getResource( EMPTYSET_ICON ) );
 
@@ -685,11 +682,6 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             this.setIcon( emptySetIcon );
             this.setFont( this.getFont().deriveFont( Font.BOLD ) );
             this.setForeground( Color.DARK_GRAY );
-            // } else if ( geneData.skipDueToRedundancy( id ) ) {
-            // this.setIcon( redundantIcon );
-            // textToDisplay += " (Redundant)";
-            // } else if ( geneData.hasRedundancy( id ) ) {
-            // textToDisplay += " (Redundant)";
         } else if ( !geneData.getActiveGeneSets().contains( id ) || numGenesInGeneSet == 0 ) {
             this.setIcon( emptySetIcon );
             textToDisplay += " (No genes in your data)";
@@ -760,10 +752,21 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         String probeSize = geneData.getGeneSet( id ) == null ? "?" : "" + geneData.getGeneSet( id ).getProbes().size();
         String redund = getToolTipTextForRedundancy( id );
 
-        setToolTipText( "<html>" + id.getName() + " (" + id.getId() + ")<br/>" + "Aspect: " + aspect + "<br/>" + size
-                + " Genes, " + probeSize + " probes.<br />" + redund
-                + StringUtil.wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br/>" )
-                + ( definition.length() > GeneSetPanel.MAX_DEFINITION_LENGTH ? "..." : "" ) );
+        setToolTipText( "<html>"
+                + id.getName()
+                + " ("
+                + id.getId()
+                + ")<br/>"
+                + "Aspect: "
+                + aspect
+                + "<br/>"
+                + size
+                + " Genes, "
+                + probeSize
+                + " probes.<br />"
+                + redund
+                + StringUtil.wrap( StringUtils.abbreviate( definition, GeneSetPanel.MAX_DEFINITION_LENGTH ), 50,
+                        "<br/>" ) );
     }
 
     /**

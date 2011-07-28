@@ -53,7 +53,7 @@ public class Multifunctionality {
 
     private Map<Gene, Double> multifunctionalityRank = new HashMap<Gene, Double>();
 
-    private GeneAnnotations geneAnnotations;
+    private GeneAnnotations geneAnnots;
 
     private Collection<Gene> genesWithGoTerms;
 
@@ -66,7 +66,7 @@ public class Multifunctionality {
      * @param go These annotations should already be pruned down to those used in analysis.
      */
     public Multifunctionality( GeneAnnotations go ) {
-        this.geneAnnotations = go;
+        this.geneAnnots = go;
         init();
     }
 
@@ -127,7 +127,8 @@ public class Multifunctionality {
     /**
      * @param goId
      * @return the relative rank of the GO group in multifunctionality, where 1 is the highest multifunctionality, 0 is
-     *         lowest
+     *         lowest. WARNING, this does not correct for the presence of multiple GO groups with the same genes
+     *         (redundancy)
      */
     public double getGOTermMultifunctionalityRank( GeneSetTerm goId ) {
         if ( stale.get() ) init();
@@ -219,12 +220,12 @@ public class Multifunctionality {
      */
     private void computeGoTermMultifunctionalityRanks( Map<Gene, Integer> rawGeneMultifunctionalityRanks ) {
         int numGenes = genesWithGoTerms.size();
-        int numGoGroups = geneAnnotations.getActiveGeneSets().size();
+        int numGoGroups = geneAnnots.getActiveGeneSets().size();
         /*
          * For each go term, compute it's AUC w.r.t. the multifunctionality ranking.. We work with the
          * multifunctionality ranks, rawGeneMultifunctionalityRanks
          */
-        for ( GeneSetTerm goset : geneAnnotations.getActiveGeneSets() ) {
+        for ( GeneSetTerm goset : geneAnnots.getActiveGeneSets() ) {
 
             if ( !goGroupSizes.containsKey( goset ) ) {
                 log.debug( "No size recorded for: " + goset );
@@ -246,7 +247,7 @@ public class Multifunctionality {
              * Extract the ranks of the genes in the goset, where highest ranking is the best.
              */
             double sumOfRanks = 0.0;
-            for ( Gene gene : geneAnnotations.getGeneSetGenes( goset ) ) {
+            for ( Gene gene : geneAnnots.getGeneSetGenes( goset ) ) {
                 int rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
                 sumOfRanks += rank;
             }
@@ -268,7 +269,7 @@ public class Multifunctionality {
     }
 
     /**
-     * @param geneAnnotations
+     * @param geneAnnots
      */
     private synchronized void init() {
 
@@ -279,9 +280,13 @@ public class Multifunctionality {
 
             timer.start();
 
+            /*
+             * FIXME only use non-redundant groups to compute the ranks of gene sets.
+             */
+
             genesWithGoTerms = new HashSet<Gene>();
-            for ( GeneSetTerm goset : geneAnnotations.getActiveGeneSets() ) {
-                Collection<Gene> geneSetGenes = geneAnnotations.getGeneSetGenes( goset );
+            for ( GeneSetTerm goset : geneAnnots.getActiveGeneSets() ) {
+                Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( goset );
                 if ( geneSetGenes.isEmpty() ) continue;
                 genesWithGoTerms.addAll( geneSetGenes );
                 goGroupSizes.put( goset, geneSetGenes.size() );
@@ -289,7 +294,7 @@ public class Multifunctionality {
 
             int numGenes = genesWithGoTerms.size();
 
-            for ( Gene gene : geneAnnotations.getGenes() ) {
+            for ( Gene gene : geneAnnots.getGenes() ) {
                 if ( !genesWithGoTerms.contains( gene ) ) continue;
 
                 double mf = 0.0;
@@ -304,8 +309,6 @@ public class Multifunctionality {
                     int outGroup = numGenes - inGroup;
 
                     if ( outGroup == 0 ) {
-                        // log.debug( "GO group '" + goset
-                        // + "' that all genes belong to detected, skipping in multifunctionality computation" );
                         continue;
                     }
 
