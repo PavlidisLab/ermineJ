@@ -63,7 +63,7 @@ public class AboutBox extends JDialog implements ActionListener {
 
     private static final int PREFERRED_WIDTH = 450;
     private String VERSION = "2.2";
-    private final static String COPYRIGHT = "Copyright (c) University of British Columbia";
+    private final static String COPYRIGHT = "<html>Copyright &copy; University of British Columbia</html>";
     private static final String SOFTWARENAME = "ermineJ";
 
     JPanel mainPanel = new JPanel();

@@ -69,7 +69,7 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
 public class classScoreCMD {
 
     private static final String HEADER = "Options:";
-    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2010 University of British Columbia.";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2011 University of British Columbia.";
 
     private static Log log = LogFactory.getLog( classScoreCMD.class );
 
