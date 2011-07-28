@@ -32,7 +32,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import ubic.erminej.Settings;
-import ubic.erminej.Settings.Method;
+import ubic.erminej.SettingsHolder;
+import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.gui.analysis.AnalysisWizard;
 import ubic.erminej.gui.util.WizardStep;
 
@@ -272,15 +273,15 @@ public class AnalysisWizardStep5 extends WizardStep {
      * @param analysisType
      */
     public void removeVarPanel( Settings.Method analysisType ) {
-        if ( analysisType.equals( Settings.Method.ORA ) ) {
+        if ( analysisType.equals( SettingsHolder.Method.ORA ) ) {
             step5Panel.remove( oraPanel );
-        } else if ( analysisType.equals( Settings.Method.GSR ) ) {
+        } else if ( analysisType.equals( SettingsHolder.Method.GSR ) ) {
             resampPanel.remove( subPanel );
             step5Panel.remove( resampPanel );
-        } else if ( analysisType.equals( Settings.Method.CORR ) ) {
+        } else if ( analysisType.equals( SettingsHolder.Method.CORR ) ) {
             corrPanel.remove( subPanel );
             step5Panel.remove( corrPanel );
-        } else if ( analysisType.equals( Settings.Method.ROC ) ) {
+        } else if ( analysisType.equals( SettingsHolder.Method.ROC ) ) {
             step5Panel.remove( rocPanel );
         }
     }
@@ -292,7 +293,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     private void setValues() {
         jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
 
-        if ( settings.getGeneSetResamplingScoreMethod().equals( Settings.GeneScoreMethod.MEAN ) ) {
+        if ( settings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) ) {
             jRadioButtonMean.setSelected( true );
         } else {
             jRadioButtonMedian.setSelected( true );
@@ -312,9 +313,9 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
 
         if ( jRadioButtonMean.isSelected() ) {
-            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
+            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
         } else {
-            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
         }
 
         settings.setGeneScoreThreshold( Double.valueOf( geneScoreThresholdTextField.getText() ).doubleValue() );

@@ -46,6 +46,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -251,7 +252,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
         generateToolTip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
 
-        if ( results.size() > 3 ) table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
         currentResultSetIndex = results.size() - 1;
         this.callingFrame.setCurrentResultSet( currentResultSetIndex );
         table.revalidate();
@@ -323,24 +323,24 @@ public class GeneSetTablePanel extends GeneSetPanel {
         GeneSetPvalRun geneSetPvalRun = results.get( runIndex );
         assert geneSetPvalRun != null : "No results with index " + runIndex;
         log.debug( "Generating tooltip for run #" + runIndex );
-        Settings runSettings = geneSetPvalRun.getSettings();
+        SettingsHolder runSettings = geneSetPvalRun.getSettings();
         GeneScores gs = geneSetPvalRun.getGeneScores();
         String tooltip = new String( "<html>" );
         String coda = new String();
 
         int numscores = gs.getNumScores();
 
-        if ( runSettings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
+        if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
             tooltip += "ORA Analysis<br>";
             coda += "P value threshold: " + runSettings.getGeneScoreThreshold();
-        } else if ( runSettings.getClassScoreMethod().equals( Settings.Method.GSR ) ) {
+        } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
             tooltip += "Resampling Analysis<br>";
             coda += runSettings.getIterations() + " iterations<br>";
             coda += "Using score column: " + runSettings.getScoreCol();
-        } else if ( runSettings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
+        } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
             tooltip += "Correlation Analysis<br>";
             coda += runSettings.getIterations() + " iterations";
-        } else if ( runSettings.getClassScoreMethod().equals( Settings.Method.ROC ) ) {
+        } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ROC ) ) {
             tooltip += "ROC Analysis<br>";
         }
 
@@ -351,15 +351,15 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 + runSettings.getMinClassSize() + "<br>" );
         if ( runSettings.getDoLog() ) tooltip += "Negative log transformed<br>";
 
-        if ( runSettings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.MEAN ) )
+        if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) )
             tooltip += "Gene Rep Treatment: Mean <br>";
-        else if ( runSettings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.BEST ) )
+        else if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) )
             tooltip += "Gene Rep Treatment: Best <br>";
-        if ( runSettings.getClassScoreMethod().equals( Settings.Method.GSR )
-                || runSettings.getClassScoreMethod().equals( Settings.Method.ORA ) ) {
-            if ( runSettings.getGeneSetResamplingScoreMethod().equals( Settings.GeneScoreMethod.MEAN ) )
+        if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR )
+                || runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
+            if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) )
                 tooltip += "Class Raw Score Method: Mean <br>";
-            else if ( runSettings.getGeneSetResamplingScoreMethod().equals( Settings.GeneScoreMethod.QUANTILE ) )
+            else if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.QUANTILE ) )
                 tooltip += "Class Raw Score Method: Median <br>";
         }
 
@@ -498,9 +498,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     @Override
     public void filter( boolean propagate ) {
-        this.model.setFilterRedundant( hideRedundant );
         this.model.setFilterEmpty( hideEmpty );
         this.model.setFilterEmptyResults( hideInsignificant );
+        this.model.filter();
 
         if ( propagate ) this.callingFrame.getTreePanel().filter( false );
 

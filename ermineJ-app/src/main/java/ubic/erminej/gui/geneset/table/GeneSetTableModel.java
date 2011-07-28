@@ -94,8 +94,6 @@ public class GeneSetTableModel extends AbstractTableModel {
         super.fireTableDataChanged();
     }
 
-    private boolean filterRedundant = true;
-
     private boolean filterEmpty = true;
 
     private boolean filterInsignificant = false;
@@ -126,17 +124,10 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     public void setFilterEmpty( boolean b ) {
         this.filterEmpty = b;
-        filter();
-    }
-
-    public void setFilterRedundant( boolean b ) {
-        this.filterRedundant = b;
-        filter();
     }
 
     public void setFilterEmptyResults( boolean b ) {
         this.filterInsignificant = b;
-        filter();
     }
 
     public void filter() {
@@ -145,13 +136,12 @@ public class GeneSetTableModel extends AbstractTableModel {
         gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
         int beforeCount = gsl.size();
 
-        if ( filterRedundant || filterEmpty || filterInsignificant ) {
+        if ( filterEmpty || filterInsignificant ) {
 
             for ( Iterator<GeneSetTerm> it = gsl.iterator(); it.hasNext(); ) {
                 GeneSetTerm t = it.next();
-                if ( filterRedundant && geneData.skipDueToRedundancy( t ) ) {
-                    it.remove();
-                } else if ( filterEmpty && geneData.getGeneSetGenes( t ).isEmpty() ) {
+
+                if ( filterEmpty && geneData.getGeneSetGenes( t ).isEmpty() ) {
                     it.remove();
                 } else if ( filterInsignificant && !this.results.isEmpty() ) {
                     // keep if there is at least one significant result.

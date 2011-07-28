@@ -21,12 +21,12 @@ package ubic.erminej.analysis;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import ubic.erminej.Settings;
+ 
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm; 
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
 
@@ -40,9 +40,9 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
     private Histogram hist;
 
-    public GeneSetPvalSeriesGenerator( Settings settings, GeneAnnotations geneData, Histogram hi,
-            GeneSetSizeComputer csc  ) {
-        super( settings, geneData, csc  );
+    public GeneSetPvalSeriesGenerator( SettingsHolder settings, GeneAnnotations geneData, Histogram hi,
+            GeneSetSizesForAnalysis csc ) {
+        super( settings, geneData, csc );
         this.hist = hi;
 
     }
@@ -58,9 +58,9 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
             Map<Probe, Double> probeToScoreMap ) {
         Map<GeneSetTerm, GeneSetResult> results;
         results = new HashMap<GeneSetTerm, GeneSetResult>();
-        ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc,  hist );
+        ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc, hist );
 
-        for ( Iterator<GeneSetTerm> iter = geneAnnots.getActiveGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
             GeneSetTerm className = iter.next();
             GeneSetResult res = cpv.classPval( className, geneToScoreMap, probeToScoreMap );
@@ -79,10 +79,9 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
             Map<Probe, Double> probesToPvals ) {
         Map<GeneSetTerm, Double> results;
         results = new HashMap<GeneSetTerm, Double>();
-        ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, csc,
-                  hist );
+        ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, csc, hist );
 
-        for ( Iterator<GeneSetTerm> iter = geneAnnots.getActiveGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             GeneSetTerm className = iter.next();
             double pval = cpv.classPvalue( className, group_pval_map, probesToPvals );
 

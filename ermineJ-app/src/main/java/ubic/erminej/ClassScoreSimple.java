@@ -18,6 +18,7 @@
  */
 package ubic.erminej;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -60,9 +61,13 @@ public class ClassScoreSimple {
         this.genes = genes;
         this.goAssociations = goAssociations;
 
-        settings = new Settings( false );
+        try {
+            settings = new Settings( false );
+        } catch ( IOException e ) {
+            throw new RuntimeException( e );
+        }
         settings.setQuantile( 50 );
-        settings.setMtc( Settings.MultiTestCorrMethod.BENJAMINIHOCHBERG );
+        settings.setMtc( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG );
 
     }
 
@@ -84,7 +89,7 @@ public class ClassScoreSimple {
      * Run an analysis using the current configuration.
      */
     public void run( List<Double> geneScores ) {
-        GeneAnnotations geneData = new GeneAnnotations(probes, genes, goAssociations );
+        GeneAnnotations geneData = new GeneAnnotations( probes, genes, goAssociations );
         GeneScores scores = new GeneScores( probes, geneScores, geneData, settings );
         results = new GeneSetPvalRun( settings, geneData, scores );
     }
@@ -107,16 +112,16 @@ public class ClassScoreSimple {
     public void setClassScoreMethod( int val ) {
         switch ( val ) {
             case 0:
-                settings.setClassScoreMethod( Settings.Method.ORA );
+                settings.setClassScoreMethod( SettingsHolder.Method.ORA );
                 break;
             case 1:
-                settings.setClassScoreMethod( Settings.Method.GSR );
+                settings.setClassScoreMethod( SettingsHolder.Method.GSR );
                 break;
             case 2:
-                settings.setClassScoreMethod( Settings.Method.CORR );
+                settings.setClassScoreMethod( SettingsHolder.Method.CORR );
                 break;
             case 3:
-                settings.setClassScoreMethod( Settings.Method.ROC );
+                settings.setClassScoreMethod( SettingsHolder.Method.ROC );
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -131,11 +136,11 @@ public class ClassScoreSimple {
     public void setGeneReplicateTreatment( int val ) {
         switch ( val ) {
             case 1:
-                settings.setGeneRepTreatment( Settings.MultiProbeHandling.BEST );
+                settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
 
                 break;
             case 2:
-                settings.setGeneRepTreatment( Settings.MultiProbeHandling.MEAN );
+                settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
 
                 break;
             default:
@@ -152,13 +157,13 @@ public class ClassScoreSimple {
     public void setGeneScoreSummaryMethod( int val ) {
         switch ( val ) {
             case 0:
-                settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
+                settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
                 break;
             case 1:
-                settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
                 break;
             case 2:
-                settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
                 break;
             default:
                 throw new IllegalArgumentException();

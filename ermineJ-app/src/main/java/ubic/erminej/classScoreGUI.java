@@ -33,7 +33,7 @@ public class classScoreGUI {
     public static void main( String[] args ) {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            new classScoreGUI( new Settings() );
+            new classScoreGUI( new Settings( true ) );
         } catch ( Exception e ) {
             e.printStackTrace();
         }

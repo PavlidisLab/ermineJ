@@ -29,7 +29,7 @@ import ubic.erminej.gui.geneset.details.GeneUrlDialog;
  */
 public class GeneUrlDialogTest {
 
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws Exception {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
         } catch ( ClassNotFoundException e ) {
@@ -42,7 +42,7 @@ public class GeneUrlDialogTest {
             e.printStackTrace();
         }
 
-        new GeneUrlDialog( null, null );
+        new GeneUrlDialog( null );
 
     }
 

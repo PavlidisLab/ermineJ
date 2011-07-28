@@ -32,6 +32,7 @@ import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
 
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
@@ -101,7 +102,7 @@ public class AnalysisWizardStep1 extends WizardStep {
         rocButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         rocButton.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
-                wiz.setAnalysisType( Settings.Method.ROC );
+                wiz.setAnalysisType( SettingsHolder.Method.ROC );
             }
         } );
         buttonGroup1.add( rocButton );
@@ -166,37 +167,37 @@ public class AnalysisWizardStep1 extends WizardStep {
     }
 
     void corrButton_actionPerformed() {
-        wiz.setAnalysisType( Settings.Method.CORR );
+        wiz.setAnalysisType( SettingsHolder.Method.CORR );
     }
 
     void resampButton_actionPerformed() {
-        wiz.setAnalysisType( Settings.Method.GSR );
+        wiz.setAnalysisType( SettingsHolder.Method.GSR );
     }
 
     void oraButton_actionPerformed() {
-        wiz.setAnalysisType( Settings.Method.ORA );
+        wiz.setAnalysisType( SettingsHolder.Method.ORA );
     }
 
     public void setValues() {
-        if ( settings.getClassScoreMethod().equals( Settings.Method.ORA ) )
+        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) )
             oraButton.setSelected( true );
-        else if ( settings.getClassScoreMethod().equals( Settings.Method.GSR ) )
+        else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) )
             resampButton.setSelected( true );
-        else if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) )
+        else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) )
             corrButton.setSelected( true );
 
-        else if ( settings.getClassScoreMethod().equals( Settings.Method.ROC ) ) rocButton.setSelected( true );
+        else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ROC ) ) rocButton.setSelected( true );
     }
 
     public void saveValues() {
         if ( oraButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.Method.ORA );
+            settings.setClassScoreMethod( SettingsHolder.Method.ORA );
         } else if ( resampButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.Method.GSR );
+            settings.setClassScoreMethod( SettingsHolder.Method.GSR );
         } else if ( corrButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.Method.CORR );
+            settings.setClassScoreMethod( SettingsHolder.Method.CORR );
         } else if ( rocButton.isSelected() ) {
-            settings.setClassScoreMethod( Settings.Method.ROC );
+            settings.setClassScoreMethod( SettingsHolder.Method.ROC );
         }
     }
 }

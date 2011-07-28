@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.math.Rank;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.Probe;
@@ -132,7 +133,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * 
      */
     protected void configure() {
-        String candidateUrlBase = settings.getConfig().getString( Settings.GENE_URL_BASE );
+        String candidateUrlBase = settings.getConfig().getString( SettingsHolder.GENE_URL_BASE );
         if ( candidateUrlBase != null && candidateUrlBase.indexOf( URL_REPLACE_TAG ) >= 0 ) {
             this.urlbase = candidateUrlBase;
             log.debug( "Setting urlbase to " + urlbase );

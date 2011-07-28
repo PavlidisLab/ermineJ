@@ -51,10 +51,10 @@ public class AnalysisThread extends Thread {
     private String loadFile;
     private StatusViewer messenger;
     private GeneAnnotations geneAnnots;
-    private Settings oldSettings = null;
+    private SettingsHolder oldSettings = null;
     private Map<String, DoubleMatrix<Probe, String>> rawDataSets;
     private volatile Method runningMethod;
-    private Settings settings;
+    private SettingsHolder settings;
     private volatile boolean stop = false;
     private boolean wasError = false;
     private boolean finishedNormally = false;
@@ -67,7 +67,7 @@ public class AnalysisThread extends Thread {
      * @param rawDataSets
      * @param geneScoreSets
      */
-    public AnalysisThread( Settings settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
+    public AnalysisThread( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
             Map<String, DoubleMatrix<Probe, String>> rawDataSets, Map<String, GeneScores> geneScoreSets ) {
         this.settings = settings;
         this.messenger = messenger;
@@ -94,7 +94,7 @@ public class AnalysisThread extends Thread {
      * @param geneScoreSets
      * @param loadFile
      */
-    public AnalysisThread( Settings settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
+    public AnalysisThread( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
             Map<String, DoubleMatrix<Probe, String>> rawDataSets, Map<String, GeneScores> geneScoreSets, String loadFile ) {
         this.settings = settings;
         this.messenger = messenger;
@@ -283,12 +283,11 @@ public class AnalysisThread extends Thread {
         timer.start();
 
         DoubleMatrix<Probe, String> rawData = null;
-        if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
+        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
             rawData = addRawData();
         }
         GeneScores geneScores = addGeneScores();
         if ( this.stop ) return null;
- 
 
         if ( this.stop ) return null;
 
@@ -296,11 +295,9 @@ public class AnalysisThread extends Thread {
         if ( messenger != null ) messenger.showStatus( "Starting analysis..." );
         GeneSetPvalRun newResults = null;
         if ( results != null ) { // read from a file.
-            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, results,
-                     "LoadedRun" );
+            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, results, "LoadedRun" );
         } else {
-            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger,
-                     "NewRun" );
+            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, "NewRun" );
         }
 
         timer.stop();

@@ -21,10 +21,10 @@ package ubic.erminej.analysis;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -37,7 +37,7 @@ import ubic.erminej.data.Probe;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class GeneSetSizeComputer {
+public class GeneSetSizesForAnalysis {
     protected Map<GeneSetTerm, Integer> effectiveSizes = null;
     protected Map<GeneSetTerm, Integer> actualSizes = null;
     protected boolean weight_on = true;
@@ -46,13 +46,20 @@ public class GeneSetSizeComputer {
 
     private GeneAnnotations geneData;
 
-    public GeneSetSizeComputer( GeneAnnotations geneData, GeneScores geneScores, boolean w ) {
-        this.weight_on = w;
+    /**
+     * @param geneData
+     * @param geneScores
+     * @param w
+     */
+    public GeneSetSizesForAnalysis( GeneAnnotations geneData, GeneScores geneScores, SettingsHolder settings ) {
         this.geneData = geneData;
         this.geneScores = geneScores;
         effectiveSizes = new HashMap<GeneSetTerm, Integer>();
         actualSizes = new HashMap<GeneSetTerm, Integer>();
+
+        this.weight_on = settings.getUseWeights();
         getClassSizes();
+
     }
 
     /**
@@ -63,17 +70,10 @@ public class GeneSetSizeComputer {
         int size;
         int v_size;
 
-        // assert !( activeProbes == null || activeProbes.size() == 0 ) : "ActiveProbes was not initialized or was
-        // empty";
-        // assert !( geneScores == null ) : "GeneScores was not initialized";
-        // assert !( geneScores.getGeneToPvalMap() == null ) : "getGroupToPvalMap was not initialized";
-
         boolean gotAtLeastOneNonZero = false;
 
-        for ( Iterator<GeneSetTerm> iter = geneData.getActiveGeneSets().iterator(); iter.hasNext(); ) {
+        for ( GeneSetTerm className : geneData.getNonEmptyGeneSets() ) {
 
-            GeneSetTerm className = iter.next(); // id of the class
-            // (GO:XXXXXX)
             Collection<Probe> values = geneData.getGeneSetProbes( className );
 
             record.clear();
@@ -88,7 +88,7 @@ public class GeneSetSizeComputer {
                 if ( weight_on ) { // routine for weights
                     // compute pval for every replicate group
 
-                    // FIXME, doesn't work if geneScores is null.
+                    // really we shouldn't have to check geneScores. The annotations provide should be trimmed down.
                     if ( ( geneScores == null || geneScores.getGeneToScoreMap().containsKey( gene ) )
 
                     /*

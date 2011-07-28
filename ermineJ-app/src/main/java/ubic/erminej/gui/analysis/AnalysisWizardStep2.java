@@ -56,6 +56,7 @@ import org.apache.commons.lang.StringUtils;
 
 import ubic.basecode.util.FileTools;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
@@ -188,17 +189,18 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     @Override
     public boolean isReady() {
 
-        if ( wiz.getAnalysisType().equals( Settings.Method.CORR ) && rawFileTextField.getText().compareTo( "" ) == 0 ) {
+        if ( wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
+                && rawFileTextField.getText().compareTo( "" ) == 0 ) {
             wiz.showError( "Correlation analyses require a raw data file." );
             return false;
-        } else if ( ( wiz.getAnalysisType().equals( Settings.Method.GSR ) || wiz.getAnalysisType().equals(
-                Settings.Method.ORA ) )
+        } else if ( ( wiz.getAnalysisType().equals( SettingsHolder.Method.GSR ) || wiz.getAnalysisType().equals(
+                SettingsHolder.Method.ORA ) )
                 && scoreFileTextField.getText().compareTo( "" ) == 0 ) {
             wiz.showError( "ORA and resampling analyses require a gene score file." );
             return false;
         }
 
-        if ( ( !wiz.getAnalysisType().equals( Settings.Method.CORR ) )
+        if ( ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR ) )
                 && Integer.valueOf( jTextFieldScoreCol.getText() ).intValue() < 2 ) {
             wiz.showError( "The score column must be 2 or higher" );
             return false;
@@ -252,9 +254,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
         settings.setScoreFile( scoreFileTextField.getText() );
         settings.setRawFile( rawFileTextField.getText() );
-        if ( rawFileTextField.getText() != null || rawFileTextField.getText().length() > 0 ) {
-            settings.userSetRawFile( true );
-        }
+
         settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
     }
 

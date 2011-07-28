@@ -19,13 +19,16 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
 import ubic.basecode.math.SpecFunc;
-import ubic.erminej.Settings;
+import ubic.basecode.util.StatusViewer; 
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Probe;
@@ -41,8 +44,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     protected double geneScoreThreshold;
     protected int inputSize;
-    protected int numOverThreshold = 0;
-    protected int numUnderThreshold = 0;
+
+    private static final int ALERT_UPDATE_FREQUENCY = 300;
+
+    private int numOverThreshold = 0;
+    private int numUnderThreshold = 0;
 
     /**
      * @param settings
@@ -52,13 +58,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param nut
      * @param inputSize
      */
-    public OraPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc, int not, int nut,
-            int inputSize ) {
+    public OraPvalGenerator( SettingsHolder settings, GeneScores geneScores, GeneAnnotations a,
+            GeneSetSizesForAnalysis csc ) {
 
         super( settings, a, csc );
-        this.numOverThreshold = not;
-        this.numUnderThreshold = nut;
-        this.inputSize = inputSize;
 
         if ( settings.getUseLog() ) {
             this.geneScoreThreshold = -Arithmetic.log10( settings.getGeneScoreThreshold() );
@@ -66,6 +69,84 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             this.geneScoreThreshold = settings.getGeneScoreThreshold();
         }
 
+        computeCounts( geneScores );
+
+    }
+
+    public double getGeneScoreThreshold() {
+        return geneScoreThreshold;
+    }
+
+    public int getNumOverThreshold() {
+        return numOverThreshold;
+    }
+
+    public int getNumUnderThreshold() {
+        return numUnderThreshold;
+    }
+
+    /**
+     * Generate a complete set of class results.
+     * 
+     * @param geneToGeneScoreMap
+     * @param probesToPvals
+     */
+    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( Map<Gene, Double> geneToGeneScoreMap,
+            Map<Probe, Double> probesToPvals, StatusViewer messenger ) {
+        Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
+
+        int count = 0;
+
+        for ( GeneSetTerm geneSetName : geneAnnots.getNonEmptyGeneSets() ) {
+            ifInterruptedStop();
+
+            GeneSetResult res = classPval( geneSetName, geneToGeneScoreMap, probesToPvals );
+            if ( res != null ) {
+                results.put( geneSetName, res );
+            }
+            count++;
+            if ( messenger != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
+                messenger.showStatus( count + " gene sets analyzed" );
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Test whether a score meets a threshold.
+     * 
+     * @param geneScore
+     * @param geneScoreThreshold
+     * @return
+     */
+    private boolean scorePassesThreshold( double geneScore ) {
+        return ( settings.upperTail() && geneScore >= geneScoreThreshold )
+                || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
+    }
+
+    /**
+     * Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution.
+     * 
+     * @param geneScores The pvalues for the probes (no weights) or groups (weights)
+     * @return number of entries that meet the user-set threshold.
+     * @todo make this private and called by OraPvalGenerator.
+     */
+    public void computeCounts( GeneScores geneScores ) {
+
+        Map<Probe, Double> probeScores = geneScores.getProbeToScoreMap();
+
+        for ( Probe p : probeScores.keySet() ) {
+            double geneScore = probeScores.get( p );
+
+            if ( scorePassesThreshold( geneScore ) ) {
+                numOverThreshold++;
+            } else {
+                numUnderThreshold++;
+            }
+
+            inputSize++;
+
+        }
     }
 
     /**
@@ -100,36 +181,76 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             return null;
         }
 
-        Collection<Probe> probes = geneAnnots.getGeneSetProbes( className );
+        Collection<Probe> probesInGeneSet = geneAnnots.getGeneSetProbes( className );
+        Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( className );
+
+        /*
+         * I'm going to turn this around. First we identify the probes which beat the threshold.
+         */
+        Collection<Probe> probesAboveThreshold = new HashSet<Probe>();
+        Collection<Gene> genesAboveThreshold = new HashSet<Gene>();
+        int geneSuccesses = 0;
+        int probeSuccesses = 0;
+        for ( Probe p : probesToScores.keySet() ) {
+            double score = probesToScores.get( p );
+            if ( scorePassesThreshold( score ) ) {
+                probesAboveThreshold.add( p );
+                genesAboveThreshold.add( p.getGene() );
+
+                /*
+                 * I could count the ones in the set here too ...
+                 */
+                if ( geneSetGenes.contains( p.getGene() ) ) {
+                    // be careful, we'll count genes twice
+                    geneSuccesses++;
+                    probeSuccesses++;
+                }
+            }
+        }
+
+        /*
+         * Obviously if there have to be at least 2 genes above the threshold.
+         */
+
+        /*
+         * 
+         * Now I determine which of those gene above threshold is the most multifunctional
+         */
+        Gene mostMultifunctional = geneAnnots.getMultifunctionality().getMostMultifunctional( genesAboveThreshold );
+
+        if ( genesAboveThreshold.contains( mostMultifunctional ) ) {
+            geneSuccesses--;
+            probeSuccesses -= mostMultifunctional.getProbes().size();
+        }
 
         /*
          * Only count genes once!
          */
         Collection<Gene> seenGenes = new HashSet<Gene>();
 
-        for ( Probe probe : probes ) {
+        for ( Probe geneSetProbe : probesInGeneSet ) {
             ifInterruptedStop();
 
-            if ( !probesToScores.containsKey( probe ) ) {
+            if ( !probesToScores.containsKey( geneSetProbe ) ) {
                 continue;
             }
 
             if ( settings.getUseWeights() ) {
 
-                Gene geneName = probe.getGene();
+                Gene gene = geneSetProbe.getGene();
 
-                if ( !geneToScoreMap.containsKey( geneName ) ) {
+                if ( !geneToScoreMap.containsKey( gene ) ) {
                     continue;
                 }
 
-                if ( seenGenes.contains( geneName ) ) {
+                if ( seenGenes.contains( gene ) ) {
                     continue;
                 }
 
-                Double geneScore = geneToScoreMap.get( geneName );
+                Double geneScore = geneToScoreMap.get( gene );
 
                 if ( geneScore == null ) {
-                    log.warn( "Null gene score for " + probe );
+                    log.warn( "Null gene score for " + geneSetProbe );
                     continue;
                 }
 
@@ -143,14 +264,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                     failures++;
                 }
 
-                seenGenes.add( geneName );
+                seenGenes.add( gene );
             } else {
 
                 /*
                  * pvalue for this probe. This will not be null if things have been done correctly so far. This is the
                  * only place we need the raw pvalue for a probe.
                  */
-                Double score = probesToScores.get( probe );
+                Double score = probesToScores.get( geneSetProbe );
 
                 if ( scorePassesThreshold( score ) ) {
                     // if ( log.isDebugEnabled() ) log.debug( probe + " " + score + " beats " + geneScoreThreshold );
@@ -193,15 +314,4 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     }
 
-    /**
-     * Test whether a score meets a threshold.
-     * 
-     * @param geneScore
-     * @param geneScoreThreshold
-     * @return
-     */
-    private boolean scorePassesThreshold( double geneScore ) {
-        return ( settings.upperTail() && geneScore >= geneScoreThreshold )
-                || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
-    }
 }

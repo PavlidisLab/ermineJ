@@ -55,7 +55,7 @@ public class GeneSetMapTools {
     public static IHistogram1D geneSetSizeDistribution( GeneAnnotations ga, int numBins, int minSize, int maxSize ) {
         Histogram1D hist = new Histogram1D( "Distribution of gene set sizes", numBins, minSize, maxSize );
 
-        Collection<GeneSetTerm> geneSets = ga.getActiveGeneSets();
+        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
         for ( Iterator<GeneSetTerm> iter = geneSets.iterator(); iter.hasNext(); ) {
             GeneSetTerm geneSet = iter.next();
 
@@ -116,7 +116,7 @@ public class GeneSetMapTools {
 
         // iterate over all the classes, starting from the smallest one.
         // List sortedList = ga.sortGeneSetsBySize();
-        List<GeneSetTerm> sortedList = new ArrayList<GeneSetTerm>( ga.getActiveGeneSets() );
+        List<GeneSetTerm> sortedList = new ArrayList<GeneSetTerm>( ga.getNonEmptyGeneSets() );
         Collections.shuffle( sortedList );
 
         // OUTER - compare all classes to each other.
@@ -190,7 +190,7 @@ public class GeneSetMapTools {
         double sum = 0.0;
         int n = 0;
 
-        Collection<GeneSetTerm> geneSets = ga.getActiveGeneSets();
+        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
 
         for ( GeneSetTerm geneSet : geneSets ) {
 
@@ -248,7 +248,7 @@ public class GeneSetMapTools {
             throw new IllegalArgumentException( "Unknown aspect requested" );  
         }
 
-        Collection<GeneSetTerm> geneSets = ga.getActiveGeneSets();
+        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
 
         Collection<GeneSetTerm> removeUs = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm geneSet : geneSets ) {
@@ -281,7 +281,7 @@ public class GeneSetMapTools {
      */
     public static void removeBySize( GeneAnnotations ga, StatusViewer messenger, int minClassSize, int maxClassSize ) {
 
-        Collection<GeneSetTerm> geneSets = ga.getActiveGeneSets();
+        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
 
         Collection<GeneSetTerm> removeUs = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm geneSet : geneSets ) {

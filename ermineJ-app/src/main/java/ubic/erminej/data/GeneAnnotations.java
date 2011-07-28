@@ -95,10 +95,10 @@ public class GeneAnnotations {
 
     private Map<String, Gene> geneSymbolMap = new HashMap<String, Gene>();
 
-    /**
-     * Gene sets taht are redundant and (semi-arbitrarily) will be ignored.
-     */
-    private Collection<GeneSetTerm> skipDueToRedundancy = new HashSet<GeneSetTerm>();
+    // /**
+    // * Gene sets taht are redundant and (semi-arbitrarily) will be ignored.
+    // */
+    // private Collection<GeneSetTerm> skipDueToRedundancy = new HashSet<GeneSetTerm>();
 
     /**
      * Used to protect instances
@@ -142,9 +142,9 @@ public class GeneAnnotations {
     }
 
     /**
-     * Create a new annotation set based on an existing one, for selected probes, optionally removing unannotated
-     * probes. This involves making new GeneSets, but the GeneSetTerms, Genes and Probes themselves are 'reused'.
-     * Multifunctionality is recomputed based on the restricted set.
+     * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected probes, optionally
+     * removing unannotated probes. This involves making new GeneSets, but the GeneSetTerms, Genes and Probes themselves
+     * are 'reused'. Multifunctionality is recomputed based on the restricted set.
      * 
      * @param start
      * @param probes which must be a subset of those in start (others will be ignored)
@@ -184,7 +184,18 @@ public class GeneAnnotations {
 
         setUp( start );
 
-        this.allowModification = pruneUnannotated;
+        this.allowModification = false;
+    }
+
+    /**
+     * Test whether this was constructed 'subcloning' style. This should usually be true in the context of analyses,
+     * which focus on analyzed subsets of the annotated genes. I recommend testing this in your code to make sure you
+     * aren't forgetting to do that step.
+     * 
+     * @return
+     */
+    public boolean isReadOnly() {
+        return !this.allowModification;
     }
 
     /**
@@ -286,7 +297,7 @@ public class GeneAnnotations {
      * @param set
      */
     public void addGeneSet( GeneSet set ) {
-        assert allowModification;
+        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
         this.addGeneSet( set.getTerm(), set.getGenes() );
     }
 
@@ -299,7 +310,7 @@ public class GeneAnnotations {
     }
 
     public GeneSet addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs, String sourceFile ) {
-        assert allowModification;
+        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
         for ( Gene g : gs ) {
             if ( !this.hasGene( g ) ) {
                 log.warn( "Adding previously unseen gene " + g ); // which is somewhat useless.
@@ -335,7 +346,7 @@ public class GeneAnnotations {
      */
     public void addSet( GeneSetTerm geneSetId, Collection<Probe> probesForNew ) {
 
-        assert allowModification;
+        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
 
         if ( probesForNew.isEmpty() ) {
             log.debug( "No probes to add for " + geneSetId );
@@ -369,7 +380,7 @@ public class GeneAnnotations {
      */
     public void deleteGeneSet( GeneSetTerm id ) {
 
-        assert allowModification;
+        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
 
         // deals with probes.
         for ( Gene g : getGeneSetGenes( id ) ) {
@@ -380,7 +391,7 @@ public class GeneAnnotations {
 
         if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
 
-        skipDueToRedundancy.remove( id );
+        // skipDueToRedundancy.remove( id );
 
     }
 
@@ -507,27 +518,26 @@ public class GeneAnnotations {
     }
 
     /**
-     * Get a collection of all (active) gene sets -- ones which have at least one probe and which are not marked as
-     * redundant. Use for analysis.
+     * Get a collection of all (active) gene sets -- ones which have at least one probe. Use for analysis. Of course,
+     * further filtering of these will typically be done later (FIXME this might not be needed?)
      * 
      * @return
      */
-    public Collection<GeneSetTerm> getActiveGeneSets() {
+    public Collection<GeneSetTerm> getNonEmptyGeneSets() {
         Collection<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm gst : this.geneSets.keySet() ) {
             if ( this.getGeneSetProbes( gst ).size() > 1 ) result.add( gst );
         }
-        removeRedundant( result );
-        return result;
+        return Collections.unmodifiableCollection( result );
     }
 
     /**
-     * @return
+     * @return view of all gene sets, including empty ones (?)
      */
     public Collection<GeneSet> getAllGeneSets() {
         Collection<GeneSet> res = new HashSet<GeneSet>();
         res.addAll( this.geneSets.values() );
-        return res;
+        return Collections.unmodifiableCollection( res );
     }
 
     /**
@@ -537,7 +547,7 @@ public class GeneAnnotations {
      * @return
      */
     public Collection<GeneSetTerm> getAllTerms() {
-        return this.geneSetTerms.getGeneSets();
+        return Collections.unmodifiableCollection( this.geneSetTerms.getGeneSets() );
     }
 
     /**
@@ -558,7 +568,7 @@ public class GeneAnnotations {
         for ( Probe p : probes ) {
             finalList.addAll( p.getGenes() );
         }
-        return finalList;
+        return Collections.unmodifiableCollection( finalList );
     }
 
     public GeneSet getGeneSet( GeneSetTerm classid ) {
@@ -573,11 +583,12 @@ public class GeneAnnotations {
         GeneSet geneSet = this.geneSets.get( goset );
         if ( geneSet == null ) {
             /*
-             * This is a little bit misleading
+             * This is a little bit misleading/confusing -- asking for a non-existing geneSet could be an error (but
+             * it's not at the moment!)
              */
-            return new HashSet<Gene>();
+            return Collections.unmodifiableCollection( new HashSet<Gene>() );
         }
-        return geneSet.getGenes();
+        return Collections.unmodifiableCollection( geneSet.getGenes() );
     }
 
     /**
@@ -601,7 +612,7 @@ public class GeneAnnotations {
                 res.add( geneSets.get( t ) );
             }
         }
-        return res;
+        return Collections.unmodifiableCollection( res );
     }
 
     public Multifunctionality getMultifunctionality() {
@@ -612,15 +623,15 @@ public class GeneAnnotations {
      * @return the list of probes.
      */
     public Collection<Probe> getProbes() {
-        return this.probes;
+        return Collections.unmodifiableCollection( this.probes );
     }
 
-    /**
-     * @return the set of gene set terms which are skipped due to redundancy.
-     */
-    public Collection<GeneSetTerm> getRedundant() {
-        return skipDueToRedundancy;
-    }
+    // /**
+    // * @return the set of gene set terms which are skipped due to redundancy.
+    // */
+    // public Collection<GeneSetTerm> getRedundant() {
+    // return skipDueToRedundancy;
+    // }
 
     /**
      * @return
@@ -649,7 +660,7 @@ public class GeneAnnotations {
                 result.add( term );
             }
         }
-        return result;
+        return Collections.unmodifiableSet( result );
     }
 
     public boolean hasGene( Gene g ) {
@@ -701,7 +712,7 @@ public class GeneAnnotations {
      * @return
      */
     public int numGeneSets() {
-        return this.getActiveGeneSets().size();
+        return this.getNonEmptyGeneSets().size();
     }
 
     /**
@@ -794,14 +805,6 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param id
-     * @return true if this set is redundant with another set; it should not be used in analysis.
-     */
-    public boolean skipDueToRedundancy( GeneSetTerm id ) {
-        return this.skipDueToRedundancy.contains( id );
-    }
-
-    /**
      * Check if a group has any redundancies.
      * 
      * @param id
@@ -852,18 +855,6 @@ public class GeneAnnotations {
             }
 
         };
-    }
-
-    /**
-     * Recompute all the things that depend on how many active probes or genes there are.
-     */
-    public void updateActiveItems() {
-
-        // when a probe is made active, that automatically propagates to the genes. But gene sets need to be updated.
-        for ( GeneSetTerm gs : this.getActiveGeneSets() ) {
-            gs.reset();
-        }
-
     }
 
     /**
@@ -1035,21 +1026,6 @@ public class GeneAnnotations {
 
                 gs1.addRedundantGroup( gs2 );
                 gs2.addRedundantGroup( gs1 );
-
-                // if ( gs1.isSkipDueToRedundancy() || gs2.isSkipDueToRedundancy() ) {
-                // continue;
-                // }
-
-                /*
-                 * Choose one to mark as skippable; favor keeping the parent term to avoid having stranded children.
-                 */
-                // if ( this.geneSetTerms.isParent( gs1.getTerm(), gs2.getTerm() ) ) {
-                // gs1.setSkipDueToRedundancy( true );
-                // this.skipDueToRedundancy.add( gs2.getTerm() );
-                // } else {
-                // gs2.setSkipDueToRedundancy( true );
-                // this.skipDueToRedundancy.add( gs1.getTerm() );
-                // }
                 numRedundant++;
 
             }
@@ -1082,27 +1058,12 @@ public class GeneAnnotations {
                 continue;
             }
 
-            // if ( originalGeneSet.isSkipDueToRedundancy() ) {
-            // gs1.setSkipDueToRedundancy( true );
-            // // this.skipDueToRedundancy.add( gs1.getTerm() );
-            // }
-
             for ( GeneSet redund : originalGeneSet.getRedundantGroups() ) {
                 gs1.addRedundantGroup( this.getGeneSet( redund.getTerm() ) );
                 // I do not have to do it the other way around, since I'm iterating over all of them
             }
 
         }
-    }
-
-    /**
-     * Modify a collection of terms so there are none flagged as "skip due to redundancy"
-     * 
-     * @param terms
-     * @return true if any terms were removed.
-     */
-    private boolean removeRedundant( Collection<GeneSetTerm> terms ) {
-        return terms.removeAll( skipDueToRedundancy );
     }
 
     /**
@@ -1190,5 +1151,3 @@ class ClassSizeComparator implements Comparator<GeneSet>, Serializable {
         return 0;
     }
 }
-
-// used for the comparator.

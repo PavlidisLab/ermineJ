@@ -66,6 +66,11 @@ public class StartupPanel extends JPanel {
 
     public StartupPanel( Settings settings ) {
         this.settings = settings;
+
+        /*
+         * Make sure the setup is valid.
+         */
+
         jbInit();
         setValues();
     }
@@ -197,8 +202,8 @@ public class StartupPanel extends JPanel {
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( classPanel ).addComponent( annotPanel ) );
 
         JPanel centerPanel = new JPanel();
-       
-        centerPanel.setLayout( new BorderLayout() ); 
+
+        centerPanel.setLayout( new BorderLayout() );
 
         centerPanel.add( instructions, BorderLayout.NORTH );
         centerPanel.add( formPanel, BorderLayout.CENTER );
@@ -210,7 +215,7 @@ public class StartupPanel extends JPanel {
     }
 
     // for testing.
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws Exception {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
         } catch ( Exception e ) {

@@ -164,7 +164,7 @@ public class TestGeneAnnotations extends TestCase {
     public final void testReadAffyCsv() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( is, null );
-        Collection<GeneSetTerm> geneSets = g.getActiveGeneSets();
+        Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
         assertTrue( geneSets.size() > 0 );
     }
 
@@ -179,7 +179,7 @@ public class TestGeneAnnotations extends TestCase {
                 .getResourceAsStream( "/data/MoGene-1_0-st-v1.na31.mm9.transcript.sample.txt.gz" ) );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( isa, null );
-        Collection<GeneSetTerm> geneSets = g.getActiveGeneSets();
+        Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
         assertTrue( geneSets.size() > 0 );
     }
 
@@ -188,7 +188,7 @@ public class TestGeneAnnotations extends TestCase {
         InputStream isa = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U95A.affy.2011format.sample.csv" );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( isa, null );
-        Collection<GeneSetTerm> geneSets = g.getActiveGeneSets();
+        Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
         assertTrue( geneSets.size() > 0 );
 
         // note that many terms in the file get pruned or collapsed.
@@ -205,7 +205,6 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readAgilent( ia, null );
         int actualValue = g.findProbe( "A_52_P311491" ).getGeneSets().size();
-        assertEquals( 0, g.getRedundant().size() ); // not checked by hand.
         assertEquals( 12, actualValue ); // not checked by hand.
     }
 
@@ -239,9 +238,9 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testRemoveBySize() throws Exception {
-        assertEquals( 255, ga.getActiveGeneSets().size() ); // not checked by hand.
+        assertEquals( 255, ga.getNonEmptyGeneSets().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
-        assertEquals( 192, ga.getActiveGeneSets().size() ); // not checked by hand
+        assertEquals( 192, ga.getNonEmptyGeneSets().size() ); // not checked by hand
     }
 
     public void testSelectSetsByGene() throws Exception {

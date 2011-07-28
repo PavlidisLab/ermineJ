@@ -25,8 +25,8 @@ import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive;
-import ubic.erminej.Settings;
+import cern.jet.stat.Descriptive; 
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
 
@@ -36,9 +36,6 @@ import ubic.erminej.data.Probe;
  */
 public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSetScore {
 
-    /**
-     * 
-     */
     private static final int MIN_STABLE_CHECKS = 3;
 
     private DoubleMatrix<Probe, String> data = null;
@@ -60,7 +57,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     /**
      * @param dataMatrix
      */
-    public ResamplingCorrelationGeneSetScore( Settings settings, DoubleMatrix<Probe, String> dataMatrix ) {
+    public ResamplingCorrelationGeneSetScore( SettingsHolder settings, DoubleMatrix<Probe, String> dataMatrix ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();

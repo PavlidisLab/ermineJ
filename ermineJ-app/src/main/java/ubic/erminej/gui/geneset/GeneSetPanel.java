@@ -84,7 +84,6 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     protected static boolean hideEmpty = true;
     protected static boolean hideInsignificant = false;
-    protected static boolean hideRedundant = false;
     protected static boolean hideNonCustom = false;
 
     private Collection<GeneSetPanel> dependentPanels = new HashSet<GeneSetPanel>();
@@ -254,7 +253,8 @@ public abstract class GeneSetPanel extends JScrollPane {
             return true;
         }
         GuiUtil.error( "Could not delete data on disk for " + classID
-                + ". Please delete the file (or part of file) manually from " + settings.getUserGeneSetDirectory() );
+                + ". Please delete the file (or part of file) manually (look in " + settings.getUserGeneSetDirectory()
+                + ")" );
         return false;
 
     }

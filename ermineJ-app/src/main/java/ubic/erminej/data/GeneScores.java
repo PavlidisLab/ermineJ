@@ -47,6 +47,7 @@ import ubic.basecode.util.StatusViewer;
 
 import cern.jet.math.Arithmetic;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 
 /**
  * Parse and store probe->score associations. The values are stored in a Map probeToPvalMap. This is used to see what
@@ -83,7 +84,7 @@ public class GeneScores {
      */
     private boolean logTransform = true;
 
-    private Settings.MultiProbeHandling gpMethod = Settings.MultiProbeHandling.BEST;
+    private Settings.MultiProbeHandling gpMethod = SettingsHolder.MultiProbeHandling.BEST;
 
     /**
      * Create a copy of source that contains only the probes given.
@@ -119,7 +120,7 @@ public class GeneScores {
      * @param geneAnnotations
      * @throws IOException
      */
-    public GeneScores( InputStream is, Settings settings, StatusViewer m, GeneAnnotations geneAnnotations )
+    public GeneScores( InputStream is, SettingsHolder settings, StatusViewer m, GeneAnnotations geneAnnotations )
             throws IOException {
 
         if ( geneAnnotations == null ) {
@@ -146,7 +147,7 @@ public class GeneScores {
      * @param geneAnnots
      * @param settings
      */
-    public GeneScores( List<String> probes, List<Double> scores, GeneAnnotations geneAnnots, Settings settings ) {
+    public GeneScores( List<String> probes, List<Double> scores, GeneAnnotations geneAnnots, SettingsHolder settings ) {
 
         this.geneAnnots = geneAnnots;
 
@@ -211,7 +212,7 @@ public class GeneScores {
      * @param geneAnnots
      * @throws IOException
      */
-    public GeneScores( String filename, Settings settings, StatusViewer messenger, GeneAnnotations geneAnnots )
+    public GeneScores( String filename, SettingsHolder settings, StatusViewer messenger, GeneAnnotations geneAnnots )
             throws IOException {
         if ( StringUtils.isBlank( filename ) ) {
             throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
@@ -348,7 +349,7 @@ public class GeneScores {
         this.probeToScoreMap = new LinkedHashMap<Probe, Double>( 1000 );
     }
 
-    private void init( Settings settings ) {
+    private void init( SettingsHolder settings ) {
         init();
 
         this.biggerIsBetter = settings.getBigIsBetter();
@@ -577,7 +578,7 @@ public class GeneScores {
             }
 
             if ( in_size > 0 ) {
-                if ( gpMethod.equals( Settings.MultiProbeHandling.MEAN ) ) {
+                if ( gpMethod.equals( SettingsHolder.MultiProbeHandling.MEAN ) ) {
                     geneScoreTemp[counter] /= in_size; // take the mean
                 }
                 Double dbb = new Double( geneScoreTemp[counter] );

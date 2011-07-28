@@ -126,7 +126,7 @@ public class FindDialog extends JDialog {
         jLabelStatus.setHorizontalAlignment( SwingConstants.LEFT );
         jPanelStatus.add( jLabelStatus, null );
         statusMessenger = new StatusJlabel( jLabelStatus );
-        statusMessenger.showStatus( geneData.getActiveGeneSets().size() + " sets listed." );
+        statusMessenger.showStatus( geneData.getNonEmptyGeneSets().size() + " sets listed." );
         BottomPanelWrap.setLayout( new BorderLayout() );
         BottomPanelWrap.add( bottomPanel, BorderLayout.NORTH );
         BottomPanelWrap.add( jPanelStatus, BorderLayout.SOUTH );
@@ -165,7 +165,7 @@ public class FindDialog extends JDialog {
 
         Collection<GeneSetTerm> geneSets;
         if ( searchOn.equals( "" ) ) {
-            geneSets = geneData.getActiveGeneSets();
+            geneSets = geneData.getNonEmptyGeneSets();
         } else {
             geneSets = geneData.findSetsByName( searchOn );
         }
@@ -177,7 +177,7 @@ public class FindDialog extends JDialog {
 
     public void resetButton_actionPerformed() {
         searchTextField.setText( "" );
-        statusMessenger.showStatus( geneData.getActiveGeneSets().size() + " matching gene sets found." );
+        statusMessenger.showStatus( geneData.getNonEmptyGeneSets().size() + " matching gene sets found." );
         resetViews();
     }
 }

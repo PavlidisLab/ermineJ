@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -110,9 +111,13 @@ public class LoadDialog extends AppDialog {
             new Thread() {
                 @Override
                 public void run() {
-                    ( ( MainFrame ) callingframe ).loadAnalysis( loadFile.getText() );
-                    ( ( MainFrame ) callingframe ).setSettings( settings );
-                    ( ( MainFrame ) callingframe ).enableMenusForAnalysis();
+                    try {
+                        ( ( MainFrame ) callingframe ).loadAnalysis( loadFile.getText() );
+                        ( ( MainFrame ) callingframe ).setSettings( settings );
+                        ( ( MainFrame ) callingframe ).enableMenusForAnalysis();
+                    } catch ( IOException e ) {
+                        GuiUtil.error( "There was an error: " + e.getMessage() );
+                    }
                 }
             }.start();
             dispose();

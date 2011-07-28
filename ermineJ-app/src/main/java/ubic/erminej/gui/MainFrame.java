@@ -174,7 +174,7 @@ public class MainFrame extends JFrame {
      * @throws IOException
      */
     public MainFrame() throws IOException {
-        settings = new Settings();
+        settings = new Settings( true );
         jbInit();
 
     }
@@ -259,7 +259,7 @@ public class MainFrame extends JFrame {
         return this.treePanel;
     }
 
-    public void loadAnalysis( String loadFile ) {
+    public void loadAnalysis( String loadFile ) throws IOException {
         disableMenusForAnalysis();
         Settings loadSettings;
         try {
@@ -489,6 +489,11 @@ public class MainFrame extends JFrame {
         }
     }
 
+    /**
+     * aFter the user has clicked "okay" for their initial setup.
+     * 
+     * @param
+     */
     private void initialize( final JPanel cards ) {
         ( ( CardLayout ) cards.getLayout() ).show( cards, PROGRESS_CARD );
 
@@ -600,7 +605,6 @@ public class MainFrame extends JFrame {
      * Input the GO and annotation files.
      */
     private void readDataFilesForStartup() {
-
         updateProgress( 10 );
 
         statusMessenger.showStatus( "Reading GO tree from: " + settings.getClassFile() );
@@ -648,12 +652,12 @@ public class MainFrame extends JFrame {
 
         // end slow(ish) part.
 
-        if ( geneData == null || geneData.getActiveGeneSets() == null ) {
+        if ( geneData == null || geneData.getNonEmptyGeneSets() == null ) {
             throw new IllegalArgumentException( "The gene annotation file was not valid. "
                     + "Check that you have selected the correct format.\n" );
         }
 
-        if ( geneData.getActiveGeneSets().size() == 0 ) {
+        if ( geneData.getNonEmptyGeneSets().size() == 0 ) {
             throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
                     + "Check that the file format is correct.\n" );
         }
@@ -1099,9 +1103,6 @@ public class MainFrame extends JFrame {
 
     }
 
-    /**
-     * 
-     */
     protected void switchRawDataFile() {
         JFileChooser fchooser = new JFileChooser( settings.getRawDataFileDirectory() );
         fchooser.setDialogTitle( "Choose the profile data file or cancel." );
@@ -1109,10 +1110,7 @@ public class MainFrame extends JFrame {
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
-            settings.userSetRawFile( true );
             statusMessenger.showStatus( "Data file set to " + settings.getScoreFile() );
-        } else {
-            settings.userSetRawFile( false );
         }
     }
 

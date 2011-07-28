@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
-import ubic.erminej.Settings.Method;
+import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.gui.AnalysisWizardStep5;
 import ubic.erminej.gui.MainFrame;

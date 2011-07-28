@@ -19,14 +19,14 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashSet; 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import ubic.erminej.Settings;
+ 
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneSetTerm; 
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
 
@@ -38,9 +38,9 @@ import ubic.erminej.data.Probe;
  */
 public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenerator {
 
-    public ExperimentScoreQuickPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc,
+    public ExperimentScoreQuickPvalGenerator( SettingsHolder settings, GeneAnnotations a, GeneSetSizesForAnalysis csc,
             Histogram hi ) {
-        super( settings, a, csc,   hi );
+        super( settings, a, csc, hi );
     }
 
     /**

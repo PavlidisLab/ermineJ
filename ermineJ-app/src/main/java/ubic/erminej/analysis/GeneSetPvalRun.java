@@ -29,13 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
@@ -62,7 +62,7 @@ public class GeneSetPvalRun {
     private Map<GeneSetTerm, GeneSetResult> results = null;
     private List<GeneSetTerm> sortedclasses = null; // this holds the results.
     private NumberFormat nf = NumberFormat.getInstance();
-    private Settings settings;
+    private SettingsHolder settings;
 
     private StatusViewer messenger = new StatusStderr();
 
@@ -116,15 +116,15 @@ public class GeneSetPvalRun {
      * @param messenger
      * @param name Name of the run
      */
-    public GeneSetPvalRun( Settings settings, GeneAnnotations originalAnnots, DoubleMatrix<Probe, String> rawData,
-            GeneScores geneScores, StatusViewer messenger, String name ) {
+    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations originalAnnots,
+            DoubleMatrix<Probe, String> rawData, GeneScores geneScores, StatusViewer messenger, String name ) {
         this.settings = settings;
 
         this.geneScores = geneScores;
         this.rawData = rawData;
         this.name = name;
         if ( messenger != null ) this.messenger = messenger;
-        this.settings = new Settings( settings ); // clone it
+        this.settings = settings;
 
         nf.setMaximumFractionDigits( 8 );
         results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
@@ -149,20 +149,22 @@ public class GeneSetPvalRun {
      * @param results
      * @param name Name of the run
      */
-    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, DoubleMatrix<Probe, String> rawData,
+    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations geneData, DoubleMatrix<Probe, String> rawData,
             GeneScores geneScores, StatusViewer messenger, Map<GeneSetTerm, GeneSetResult> results, String name ) {
 
         this.geneScores = geneScores;
         this.results = results;
         this.rawData = rawData;
-        this.settings = new Settings( settings );
+        this.settings = settings;
         if ( messenger != null ) this.messenger = messenger;
         this.name = name;
 
         Set<Probe> activeProbes = getActiveProbes();
         this.geneData = getPrunedAnnotations( activeProbes, geneData );
 
-        setMultifuncationalities();
+        assert this.geneData.isReadOnly();
+
+        setMultifunctionalities();
         sortResults();
         for ( int i = 0; i < sortedclasses.size(); i++ ) {
             results.get( sortedclasses.get( i ) ).setRank( i + 1 );
@@ -172,8 +174,8 @@ public class GeneSetPvalRun {
     /**
      * Do a new analysis, starting from the bare essentials (correlation method not available)
      */
-    public GeneSetPvalRun( Settings settings, GeneAnnotations geneData, GeneScores geneScores ) {
-        this.settings = new Settings( settings );
+    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations geneData, GeneScores geneScores ) {
+        this.settings = settings;
 
         this.geneScores = geneScores;
         this.geneData = geneData;
@@ -235,7 +237,7 @@ public class GeneSetPvalRun {
     /**
      * @return Settings
      */
-    public Settings getSettings() {
+    public SettingsHolder getSettings() {
         return settings;
     }
 
@@ -271,17 +273,17 @@ public class GeneSetPvalRun {
     /**
      * @param csc
      */
-    private void multipleTestCorrect( GeneSetSizeComputer csc ) {
+    private void multipleTestCorrect( GeneSetSizesForAnalysis csc ) {
         if ( messenger != null ) messenger.showStatus( "Multiple test correction..." );
         MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
                 results, messenger );
         Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod == Settings.MultiTestCorrMethod.BONFERONNI ) {
+        if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.BONFERONNI ) {
             mt.bonferroni();
-        } else if ( multipleTestCorrMethod.equals( Settings.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
+        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
             mt.benjaminihochberg();
-        } else if ( multipleTestCorrMethod.equals( Settings.MultiTestCorrMethod.WESTFALLYOUNG ) ) {
-            if ( !( settings.getClassScoreMethod().equals( Settings.Method.GSR ) ) )
+        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG ) ) {
+            if ( !( settings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) )
                 throw new UnsupportedOperationException(
                         "Westfall-Young correction is not supported for this analysis method" );
             mt.westfallyoung();
@@ -301,7 +303,7 @@ public class GeneSetPvalRun {
      */
     private void runAnalysis() {
         // get the class sizes.
-        GeneSetSizeComputer csc = new GeneSetSizeComputer( geneData, geneScores, settings.getUseWeights() );
+        GeneSetSizesForAnalysis csc = new GeneSetSizesForAnalysis( geneData, geneScores, settings );
 
         switch ( settings.getClassScoreMethod() ) {
             case GSR: {
@@ -325,15 +327,11 @@ public class GeneSetPvalRun {
             }
             case ORA: {
 
-                int inputSize = geneData.getProbes().size();
-
-                Collection<Entry<Probe, Double>> inp_entries = geneScores.getProbeToScoreMap().entrySet();
-
                 if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
 
-                OraGeneSetPvalSeriesGenerator pvg = new OraGeneSetPvalSeriesGenerator( settings, geneData, csc,
-                        inputSize );
-                int numOver = pvg.hgSizes( inp_entries );
+                OraPvalGenerator pvg = new OraPvalGenerator( settings, geneScores, geneData, csc );
+
+                int numOver = pvg.getNumOverThreshold();
 
                 if ( numOver == 0 ) {
                     if ( messenger != null ) messenger.showError( "No genes selected at that threshold!" );
@@ -361,8 +359,7 @@ public class GeneSetPvalRun {
 
                 hist = probePvalMapper.generateNullDistribution( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                CorrelationsGeneSetPvalSeriesGenerator pvg = new CorrelationsGeneSetPvalSeriesGenerator( settings,
-                        geneData, csc, rawData, hist );
+                CorrelationPvalGenerator pvg = new CorrelationPvalGenerator( settings, geneData, csc, rawData, hist );
                 if ( messenger != null ) messenger.showStatus( "Finished resampling, computing for gene sets" );
                 results = pvg.classPvalGenerator( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
@@ -393,7 +390,7 @@ public class GeneSetPvalRun {
 
         setGeneSetRanks();
 
-        setMultifuncationalities();
+        setMultifunctionalities();
 
         if ( messenger != null ) messenger.showStatus( "Done!" );
     }
@@ -411,7 +408,7 @@ public class GeneSetPvalRun {
     /**
      * 
      */
-    private void setMultifuncationalities() {
+    private void setMultifunctionalities() {
 
         Multifunctionality mf = geneData.getMultifunctionality();
         multifunctionalityCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );

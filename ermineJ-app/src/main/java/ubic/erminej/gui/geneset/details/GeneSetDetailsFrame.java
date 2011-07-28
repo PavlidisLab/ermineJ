@@ -76,7 +76,6 @@ import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneScores;
-import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.StatusJlabel;
@@ -168,7 +167,6 @@ public class GeneSetDetailsFrame extends JFrame {
     public MatrixDisplay<Probe, String> matrixDisplay = null;
     private boolean normalizeSavedData = false;
     private boolean normalizeSavedImage = true;
-    private GeneSetResult result;
     private GeneSetDetailsTableModel tableModel;
 
     // private StatusViewer callerStatusViewer = null;
@@ -179,7 +177,13 @@ public class GeneSetDetailsFrame extends JFrame {
 
         if ( geneSetDetails.getSettings() == null ) {
             log.warn( "Loading new settings..." );
-            this.settings = new Settings();
+            try {
+                this.settings = new Settings( true );
+            } catch ( IOException e ) {
+                log.fatal( "Failed to get settings: " + e.getMessage() );
+                log.debug( e, e );
+                return;
+            }
         } else {
             this.settings = geneSetDetails.getSettings();
         }
@@ -620,9 +624,6 @@ public class GeneSetDetailsFrame extends JFrame {
         optionsMenu.add( switchDataFileMenuItem );
         optionsMenu.add( switchGeneScoreFileMenuItem );
 
-        // JMenu analysisMenu = new JMenu();
-        // analysisMenu.setText( "Analysis" );
-
         saveDataMenuItem.setText( "Save Data ..." );
         saveDataMenuItem.addActionListener( new JGeneSetFrame_m_saveDataMenuItem_actionAdapter( this ) );
 
@@ -706,12 +707,12 @@ public class GeneSetDetailsFrame extends JFrame {
         fc.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fc.showDialog( this, "Open" );
 
+        String rawdataFile = fc.getSelectedFile().getAbsolutePath();
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            settings.setRawFile( fc.getSelectedFile().getAbsolutePath() );
-            settings.userSetRawFile( true );
-        } else {
-            settings.userSetRawFile( false );
+            settings.setRawFile( rawdataFile );
         }
+
+        this.geneSetDetails.loadDataMatrix( rawdataFile );
     }
 
     /**
@@ -1219,7 +1220,11 @@ public class GeneSetDetailsFrame extends JFrame {
      * @param e
      */
     void viewGeneUrlDialogMenuItem_actionPerformed() {
-        new GeneUrlDialog( settings, this.tableModel );
+        GeneUrlDialog geneUrlDialog = new GeneUrlDialog( settings );
+        String url = geneUrlDialog.getUrl();
+        settings.setGeneUrlBase( url );
+        tableModel.configure();
+        tableModel.createLinkLabels();
     }
 
 } // end class JGeneSetFrame

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -80,12 +79,12 @@ public class GeneSetDetails {
     }
 
     /**
-     * The data matrix will be read in based on the settings, or can be changgd later.
+     * The data matrix will be read in based on the settings, or can be changed later.
      * 
      * @param classID
      * @param result - optional
      * @param geneData
-     * @param settings - optinal, if not supplied will be read in
+     * @param settings - optional, if not supplied will be read in
      * @param geneScores - optional, if not supplied will be read in based on settings.
      * @param statusViewer
      */
@@ -96,7 +95,12 @@ public class GeneSetDetails {
 
         if ( settings == null ) {
             log.debug( "No settings, reading them in" );
-            this.settings = new Settings();
+            try {
+                this.settings = new Settings();
+            } catch ( IOException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         } else {
             this.settings = settings;
         }
@@ -242,7 +246,6 @@ public class GeneSetDetails {
 
     private void initMatrix() {
 
-        log.debug( "User set the raw data file? " + settings.getUserSetRawFile() );
         log.debug( "Raw data file is " + settings.getRawDataFileName() );
 
         String filename = settings.getRawDataFileName();

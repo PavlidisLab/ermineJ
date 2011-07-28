@@ -30,6 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
@@ -149,9 +150,9 @@ public class AnalysisWizardStep4 extends WizardStep {
         jTextFieldMaxClassSize.setText( String.valueOf( settings.getMaxClassSize() ) );
         jTextFieldMinClassSize.setText( String.valueOf( settings.getMinClassSize() ) );
 
-        if ( settings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.BEST ) ) {
+        if ( settings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) ) {
             jRadioButtonBestReplicates.setSelected( true );
-        } else if ( settings.getGeneRepTreatment().equals( Settings.MultiProbeHandling.MEAN ) ) {
+        } else if ( settings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) ) {
             jRadioButtonMeanReplicates.setSelected( true );
         } else {
             throw new IllegalStateException( "Invalid gene rep treatment method" );
@@ -163,9 +164,9 @@ public class AnalysisWizardStep4 extends WizardStep {
         settings.setMinClassSize( Integer.valueOf( jTextFieldMinClassSize.getText() ).intValue() );
 
         if ( jRadioButtonBestReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( Settings.MultiProbeHandling.BEST );
+            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
         } else if ( jRadioButtonMeanReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( Settings.MultiProbeHandling.MEAN );
+            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
         } else {
             throw new IllegalStateException( "Invalid gene rep treatment method" );
         }

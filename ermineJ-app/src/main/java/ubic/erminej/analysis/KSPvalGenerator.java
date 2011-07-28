@@ -17,8 +17,8 @@
  *
  */
 package ubic.erminej.analysis;
-
-import ubic.erminej.Settings;
+ 
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotations;
 
 /**
@@ -29,7 +29,7 @@ import ubic.erminej.data.GeneAnnotations;
  */
 public class KSPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-    public KSPvalGenerator( Settings set, GeneAnnotations an, GeneSetSizeComputer csc ) {
+    public KSPvalGenerator( SettingsHolder set, GeneAnnotations an, GeneSetSizesForAnalysis csc ) {
         super( set, an, csc );
         throw new UnsupportedOperationException();
     }

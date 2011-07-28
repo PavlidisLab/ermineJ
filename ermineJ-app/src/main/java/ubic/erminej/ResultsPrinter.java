@@ -94,7 +94,7 @@ public class ResultsPrinter {
 
         Map<GeneSetTerm, GeneSetResult> results = this.resultRun.getResults();
 
-        Writer out = getDesintation();
+        Writer out = getDestination();
 
         boolean first = true;
         if ( sort ) {
@@ -132,7 +132,7 @@ public class ResultsPrinter {
                 + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
     }
 
-    private Writer getDesintation() throws IOException {
+    private Writer getDestination() throws IOException {
         Writer out;
         if ( destFile == null ) {
             log.debug( "Writing results to STDOUT" );

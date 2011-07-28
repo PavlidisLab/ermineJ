@@ -46,10 +46,10 @@ import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
-import ubic.erminej.Settings.GeneScoreMethod;
-import ubic.erminej.Settings.Method;
-import ubic.erminej.Settings.MultiProbeHandling;
-import ubic.erminej.Settings.MultiTestCorrMethod;
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
+import ubic.erminej.SettingsHolder.Method;
+import ubic.erminej.SettingsHolder.MultiProbeHandling;
+import ubic.erminej.SettingsHolder.MultiTestCorrMethod;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
@@ -73,7 +73,7 @@ public class classScoreCMD {
 
     private static Log log = LogFactory.getLog( classScoreCMD.class );
 
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws Exception {
         classScoreCMD cmd = new classScoreCMD();
         try {
             cmd.run( args );
@@ -86,7 +86,7 @@ public class classScoreCMD {
      * @param args
      * @throws IOException
      */
-    protected boolean run( String[] args ) throws IOException {
+    protected boolean run( String[] args ) throws Exception {
 
         boolean okay = processCommandLine( "ermineJ", args );
 
@@ -94,8 +94,6 @@ public class classScoreCMD {
             return false;
         }
 
-        // options( args );
-        getSettings().setDirectories();
         if ( isUseCommandLineInterface() ) {
             initialize();
             try {
@@ -136,7 +134,13 @@ public class classScoreCMD {
     private CommandLine commandLine;
 
     public classScoreCMD() {
-        settings = new Settings( false );
+        try {
+            settings = new Settings( false );
+        } catch ( IOException e ) {
+            log.debug( e, e );
+            log.fatal( "There was an error with the configuration: " + e );
+            System.exit( 1 );
+        }
         rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
         geneScoreSets = new HashMap<String, GeneScores>();
         this.buildOptions();
@@ -221,14 +225,14 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.hasArg().withDescription(
                 "Method for computing raw class statistics (used for GSR/resampling only): "
-                        + Settings.GeneScoreMethod.MEAN + " (mean),  " + Settings.GeneScoreMethod.QUANTILE
-                        + " (quantile), or  " + Settings.GeneScoreMethod.MEAN + " (mean above quantile)." )
+                        + SettingsHolder.GeneScoreMethod.MEAN + " (mean),  " + SettingsHolder.GeneScoreMethod.QUANTILE
+                        + " (quantile), or  " + SettingsHolder.GeneScoreMethod.MEAN + " (mean above quantile)." )
                 .withLongOpt( "stats" ).withArgName( "value" ).create( 'm' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
-                "Method for computing gene set significance:  " + Settings.Method.ORA + " (ORA),  "
-                        + Settings.Method.GSR + " (resampling of gene scores),  " + Settings.Method.CORR
-                        + " (profile correlation),  " + Settings.Method.ROC + " (ROC)" ).withLongOpt( "test" )
+                "Method for computing gene set significance:  " + SettingsHolder.Method.ORA + " (ORA),  "
+                        + SettingsHolder.Method.GSR + " (resampling of gene scores),  " + SettingsHolder.Method.CORR
+                        + " (profile correlation),  " + SettingsHolder.Method.ROC + " (ROC)" ).withLongOpt( "test" )
                 .withArgName( "value" ).create( 'n' ) );
 
         options
@@ -265,17 +269,18 @@ public class classScoreCMD {
                 .withArgName( "file" ).create( 'S' ) );
 
         options.addOption( OptionBuilder.hasArg().withDescription(
-                "Multiple test correction method: " + Settings.MultiTestCorrMethod.BONFERONNI + " = Bonferonni FWE, "
-                        + Settings.MultiTestCorrMethod.WESTFALLYOUNG + " = Westfall-Young (slow), "
-                        + Settings.MultiTestCorrMethod.BENJAMINIHOCHBERG + " = Benjamini-Hochberg FDR [default]" )
-                .withLongOpt( "mtc" ).withArgName( "value" ).create( 'M' ) );
+                "Multiple test correction method: " + SettingsHolder.MultiTestCorrMethod.BONFERONNI
+                        + " = Bonferonni FWE, " + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
+                        + " = Westfall-Young (slow), " + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
+                        + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" ).create(
+                'M' ) );
 
     }
 
     /**
      * @return true if everything is okay
      */
-    private boolean processOptions() {
+    private boolean processOptions() throws IOException {
 
         if ( commandLine.hasOption( 'h' ) ) {
             showHelp();
@@ -399,11 +404,11 @@ public class classScoreCMD {
 
                     switch ( intarg ) {
                         case 1:
-                            settings.setGeneRepTreatment( Settings.MultiProbeHandling.BEST );
+                            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
 
                             break;
                         case 2:
-                            settings.setGeneRepTreatment( Settings.MultiProbeHandling.MEAN );
+                            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
 
                             break;
                         default:
@@ -416,7 +421,7 @@ public class classScoreCMD {
                     throw new IllegalArgumentException();
                 }
             } catch ( NumberFormatException e ) {
-                MultiProbeHandling val = Settings.MultiProbeHandling.valueOf( arg );
+                MultiProbeHandling val = SettingsHolder.MultiProbeHandling.valueOf( arg );
                 settings.setGeneRepTreatment( val );
             } catch ( Exception e ) {
                 System.err.println( "Gene rep treatment must be either BEST or MEAN (-g)" );
@@ -465,13 +470,14 @@ public class classScoreCMD {
 
                     switch ( intarg ) {
                         case 0:
-                            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
+                            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
                             break;
                         case 1:
-                            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
                             break;
                         case 2:
-                            settings.setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                            settings
+                                    .setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
                             break;
                         default:
                             throw new IllegalArgumentException();
@@ -482,7 +488,7 @@ public class classScoreCMD {
                     throw new IllegalArgumentException();
                 }
             } catch ( NumberFormatException e ) {
-                GeneScoreMethod opt = Settings.GeneScoreMethod.valueOf( arg );
+                GeneScoreMethod opt = SettingsHolder.GeneScoreMethod.valueOf( arg );
                 settings.setGeneSetResamplingScoreMethod( opt );
             } catch ( Exception e ) {
                 System.err.println( "Raw score method must be set to MEAN, QUANTILE or MEAN_ABOVE_QUANTILE" );
@@ -500,13 +506,13 @@ public class classScoreCMD {
                 if ( mtc == 0 || mtc == 1 || mtc == 2 ) {
                     switch ( mtc ) {
                         case 0:
-                            settings.setMtc( Settings.MultiTestCorrMethod.BONFERONNI );
+                            settings.setMtc( SettingsHolder.MultiTestCorrMethod.BONFERONNI );
                             break;
                         case 1:
-                            settings.setMtc( Settings.MultiTestCorrMethod.WESTFALLYOUNG );
+                            settings.setMtc( SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG );
                             break;
                         case 2:
-                            settings.setMtc( Settings.MultiTestCorrMethod.BENJAMINIHOCHBERG );
+                            settings.setMtc( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG );
                             break;
                         default:
                             throw new IllegalArgumentException();
@@ -518,7 +524,7 @@ public class classScoreCMD {
                     throw new IllegalArgumentException();
                 }
             } catch ( NumberFormatException e ) {
-                MultiTestCorrMethod mtcmethod = Settings.MultiTestCorrMethod.valueOf( arg );
+                MultiTestCorrMethod mtcmethod = SettingsHolder.MultiTestCorrMethod.valueOf( arg );
                 settings.setMtc( mtcmethod );
             } catch ( Exception e ) {
                 System.err.println( "Multiple test correction must be  BONFERONNI, WESTFALLYOUNG or BENJAMINIHOCHBERG" );
@@ -533,16 +539,16 @@ public class classScoreCMD {
                     // backwards compatibility
                     switch ( intarg ) {
                         case 0:
-                            settings.setClassScoreMethod( Settings.Method.ORA );
+                            settings.setClassScoreMethod( SettingsHolder.Method.ORA );
                             break;
                         case 1:
-                            settings.setClassScoreMethod( Settings.Method.GSR );
+                            settings.setClassScoreMethod( SettingsHolder.Method.GSR );
                             break;
                         case 2:
-                            settings.setClassScoreMethod( Settings.Method.CORR );
+                            settings.setClassScoreMethod( SettingsHolder.Method.CORR );
                             break;
                         case 3:
-                            settings.setClassScoreMethod( Settings.Method.ROC );
+                            settings.setClassScoreMethod( SettingsHolder.Method.ROC );
                             break;
                         default:
                             throw new IllegalArgumentException();
@@ -554,7 +560,7 @@ public class classScoreCMD {
                     throw new IllegalArgumentException();
                 }
             } catch ( NumberFormatException e ) {
-                Method method = Settings.Method.valueOf( arg );
+                Method method = SettingsHolder.Method.valueOf( arg );
                 settings.setClassScoreMethod( method );
             } catch ( Exception e ) {
                 System.err.println( "Analysis method must be set to ORA, GSR, ROC or CORR" );
@@ -562,7 +568,7 @@ public class classScoreCMD {
                 return false;
             }
 
-            if ( settings.getClassScoreMethod().equals( Settings.Method.ORA ) && commandLine.hasOption( "mf" ) ) {
+            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) && commandLine.hasOption( "mf" ) ) {
                 settings.setUseMultifunctionalityCorrection( true );
             } else {
                 settings.setUseMultifunctionalityCorrection( false );
@@ -665,13 +671,15 @@ public class classScoreCMD {
             }
         }
 
-        if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) && settings.getRawDataFileName() == null ) {
+        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR )
+                && settings.getRawDataFileName() == null ) {
             System.err.println( "You must supply a raw data file if you are using the correlation method" );
             showHelp();
             return false;
         }
 
-        if ( !( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) && settings.getScoreFile() == null ) {
+        if ( !( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) )
+                && settings.getScoreFile() == null ) {
             System.err.println( "You must supply a gene score file if you are not using the correlation method" );
             showHelp();
             return false;
@@ -691,7 +699,7 @@ public class classScoreCMD {
      */
     protected GeneSetPvalRun analyze() throws IOException {
         DoubleMatrix<Probe, String> rawData = null;
-        if ( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) {
+        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
             if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
                 statusMessenger.showStatus( "Raw data are in memory" );
                 rawData = rawDataSets.get( settings.getRawDataFileName() );
@@ -718,10 +726,10 @@ public class classScoreCMD {
         }
 
         GeneScores geneScores = null;
-        if ( !( settings.getClassScoreMethod().equals( Settings.Method.CORR ) ) /*
-                                                                                 * except correlation scoring, no gene
-                                                                                 * scores required
-                                                                                 */) {
+        if ( !( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) /*
+                                                                                       * except correlation scoring, no
+                                                                                       * gene scores required
+                                                                                       */) {
             if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
                 statusMessenger.showStatus( "Gene Scores are in memory" );
                 geneScores = geneScoreSets.get( settings.getScoreFile() );
@@ -789,7 +797,7 @@ public class classScoreCMD {
         h.printHelp( command + " [options]", HEADER, options, FOOTER );
     }
 
-    protected final boolean processCommandLine( String commandName, String[] args ) {
+    protected final boolean processCommandLine( String commandName, String[] args ) throws Exception {
         /* COMMAND LINE PARSER STAGE */
         BasicParser parser = new BasicParser();
 

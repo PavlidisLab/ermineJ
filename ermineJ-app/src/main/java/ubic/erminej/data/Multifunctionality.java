@@ -220,12 +220,12 @@ public class Multifunctionality {
      */
     private void computeGoTermMultifunctionalityRanks( Map<Gene, Integer> rawGeneMultifunctionalityRanks ) {
         int numGenes = genesWithGoTerms.size();
-        int numGoGroups = geneAnnots.getActiveGeneSets().size();
+        int numGoGroups = geneAnnots.getNonEmptyGeneSets().size();
         /*
          * For each go term, compute it's AUC w.r.t. the multifunctionality ranking.. We work with the
          * multifunctionality ranks, rawGeneMultifunctionalityRanks
          */
-        for ( GeneSetTerm goset : geneAnnots.getActiveGeneSets() ) {
+        for ( GeneSetTerm goset : geneAnnots.getNonEmptyGeneSets() ) {
 
             if ( !goGroupSizes.containsKey( goset ) ) {
                 log.debug( "No size recorded for: " + goset );
@@ -285,7 +285,7 @@ public class Multifunctionality {
              */
 
             genesWithGoTerms = new HashSet<Gene>();
-            for ( GeneSetTerm goset : geneAnnots.getActiveGeneSets() ) {
+            for ( GeneSetTerm goset : geneAnnots.getNonEmptyGeneSets() ) {
                 Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( goset );
                 if ( geneSetGenes.isEmpty() ) continue;
                 genesWithGoTerms.addAll( geneSetGenes );

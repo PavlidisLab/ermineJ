@@ -23,7 +23,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSetTerms;
@@ -48,24 +48,29 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
      */
     protected Map<GeneSetTerm, Integer> actualSizes = null;
 
-    protected Settings settings;
+    protected SettingsHolder settings;
 
     protected GeneAnnotations geneAnnots;
 
-    protected GeneSetSizeComputer csc;
+    protected GeneSetSizesForAnalysis csc;
 
     private int maxGeneSetSize;
     private int minGeneSetSize;
 
     private boolean globalMissingAspectTreatedAsUsable = false;
 
-    public AbstractGeneSetPvalGenerator( Settings set, GeneAnnotations annots, GeneSetSizeComputer csc ) {
+    public AbstractGeneSetPvalGenerator( SettingsHolder set, GeneAnnotations annots, GeneSetSizesForAnalysis csc ) {
 
         this.settings = set;
         this.geneAnnots = annots;
         this.effectiveSizes = csc.getEffectiveSizes();
         this.actualSizes = csc.getActualSizes();
         this.csc = csc;
+
+        assert this.geneAnnots.isReadOnly();
+        if ( !this.geneAnnots.isReadOnly() ) {
+            throw new IllegalStateException( "Inappropriate use of the raw annotations during analysis." );
+        }
     }
 
     /**
@@ -110,18 +115,14 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
      * @param geneSetName
      * @param missingAspectTreatedAsUsable Whether gene sets missing an aspect should be treated as usable or not. This
      *        parameter is provided partly for testing. Global setting can override this if set to true.
-     * @return true if the set should be retained (in the correct aspect and not considered redundant with another set)
+     * @return true if the set should be retained (e.g. it is in the correct aspect )
      */
     protected boolean checkAspectAndRedundancy( GeneSetTerm geneSetName, boolean missingAspectTreatedAsUsable ) {
-
-        if ( geneAnnots.skipDueToRedundancy( geneSetName ) ) {
-            return false;
-        }
 
         String aspect = geneSetName.getAspect();
 
         /*
-         * If there is no aspect, we don't use it, unless it's user-defined (though that should have an aspect ....)
+         * If there is no aspect, we don't use it, unless it's user-defined (though that should have an aspect ... )
          */
         if ( aspect == null && !geneSetName.isUserDefined() ) {
             return missingAspectTreatedAsUsable || this.globalMissingAspectTreatedAsUsable;
@@ -142,6 +143,9 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     }
 
     /**
+     * Thisis to deal with the possibility of genesets that lack an aspect -- but this should not happen (any more). It
+     * was a problem for obsolete GO Terms, but we ignore those anyway.
+     * 
      * @param globalMissingAspectTreatedAsUsable The globalMissingAspectTreatedAsUsable to set.
      */
     public void setGlobalMissingAspectTreatedAsUsable( boolean globalMissingAspectTreatedAsUsable ) {

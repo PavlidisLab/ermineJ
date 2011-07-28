@@ -37,7 +37,7 @@ public class CliTest extends TestCase {
 
     @Override
     public final void setUp() throws Exception {
-
+        super.setUp();
         URL go = this.getClass().getResource( "/data/go_daily-termdb.rdf-xml.zip" );
         File f = new File( go.toURI() );
         gofile = f.getAbsolutePath();
@@ -48,6 +48,17 @@ public class CliTest extends TestCase {
         }
 
         output = File.createTempFile( "ermineJtest.", ".tmp" ).getAbsolutePath();
+
+    }
+
+    @Override
+    public final void tearDown() throws Exception {
+        super.tearDown();
+        try {
+            new File( output ).delete();
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
 
     }
 

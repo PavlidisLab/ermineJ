@@ -207,7 +207,7 @@ public class UserDefinedGeneSetManager {
 
         File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
         if ( !userGeneSetDir.exists() ) {
-            statusMessenger.showError( "No cusotm gene set directory found, none will be loaded - looked for "
+            statusMessenger.showError( "No custom gene set directory found, none will be loaded - looked for "
                     + settings.getUserGeneSetDirectory() );
             return;
         }
@@ -345,10 +345,6 @@ public class UserDefinedGeneSetManager {
             // make a new file
             fileName = getUserGeneSetFileForName( setToSave.getId() );
         }
-
-        /*
-         * FIXME this assume the set came in the ermineJ native format!!
-         */
 
         /*
          * Handle case of multiple groups per file. We re-write it, clobber the file.
@@ -583,34 +579,34 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Write a set using "ermineJ native" format (not the tab-delimited one)
+     * The set will be written in the format set (geneSet.getFormat())
      * 
-     * @param set
+     * @param geneeSet
      * @param out
      * @throws IOException
      */
-    private static void writeSet( GeneSet set, Writer out ) throws IOException {
-        String cleanedDescription = set.getTerm().getName().replaceAll( "[\n\t]+", " " );
-        String filetype = ( set.isGenes() ) ? "gene" : "probe";
+    private static void writeSet( GeneSet geneeSet, Writer out ) throws IOException {
+        String cleanedDescription = geneeSet.getTerm().getName().replaceAll( "[\r\n\t]+", " " );
+        String filetype = ( geneeSet.isGenes() ) ? "gene" : "probe";
 
-        if ( set.getFormat() == GeneSetFileFormat.DEFAULT ) {
-            out.write( "# " + set + "\n" );
+        if ( geneeSet.getFormat() == GeneSetFileFormat.DEFAULT ) {
+            out.write( "# " + geneeSet + "\n" );
             out.write( filetype + "\n" );
-            out.write( set.getId() + "\n" );
+            out.write( geneeSet.getId() + "\n" );
             out.write( cleanedDescription + "\n" );
-            if ( set.isGenes() ) {
-                for ( Gene g : set.getGenes() ) {
+            if ( geneeSet.isGenes() ) {
+                for ( Gene g : geneeSet.getGenes() ) {
                     out.write( g.getSymbol() + "\n" );
                 }
             } else {
-                for ( Probe p : set.getProbes() ) {
+                for ( Probe p : geneeSet.getProbes() ) {
                     out.write( p.getName() + "\n" );
                 }
             }
             out.write( "====\n" );
         } else {
-            out.write( set.getId() + "\t" + set.getName() );
-            for ( Gene g : set.getGenes() ) {
+            out.write( geneeSet.getId() + "\t" + geneeSet.getName() );
+            for ( Gene g : geneeSet.getGenes() ) {
                 out.write( "\t" + g.getSymbol() );
             }
             out.write( "\n" );

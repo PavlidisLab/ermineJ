@@ -23,8 +23,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,8 +37,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.StatusViewer;
-
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.gui.StatusJlabel;
 
 /**
@@ -61,14 +60,29 @@ public class GeneUrlDialog extends JDialog {
     private JPanel jPanelStatus = new JPanel();
     private JPanel BottomPanelWrap = new JPanel();
     private StatusViewer statusMessenger;
-    private boolean hasOld = false;
-    private Settings settings;
-    private final GeneSetDetailsTableModel tableModel;
-    private boolean firstTime = true;
+    private SettingsHolder settings;
 
-    public GeneUrlDialog( Settings settings, GeneSetDetailsTableModel model ) {
+    /**
+     * Get the url that was set.
+     * 
+     * @return
+     */
+    public String getUrl() {
+        return this.urlTextField.getText();
+    }
+
+    /**
+     * @param settings
+     */
+    public GeneUrlDialog( SettingsHolder settings ) {
         this.settings = settings;
-        this.tableModel = model;
+
+        if ( this.settings == null ) try {
+            this.settings = new Settings( true ).getSettingsHolder();
+        } catch ( IOException e1 ) {
+            throw new RuntimeException( e1 );
+        }
+
         this.setModal( true );
         try {
             jbInit();
@@ -96,7 +110,6 @@ public class GeneUrlDialog extends JDialog {
         urlTextField = new JTextField();
         initializeFieldText();
         urlTextField.setPreferredSize( new Dimension( 500, 19 ) );
-        urlTextField.addMouseListener( new SetTextMouseButton_actionAdapter( this ) );
         centerPanel.add( urlTextField, null );
 
         bottomPanel.setPreferredSize( new Dimension( 200, 40 ) );
@@ -115,8 +128,7 @@ public class GeneUrlDialog extends JDialog {
 
             @Override
             public void actionPerformed( ActionEvent e ) {
-                // FIXME read this from ermineJdefault.properties.
-                urlTextField.setText( "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@" );
+                urlTextField.setText( settings.getDefaultGeneUrl() );
             }
         } );
 
@@ -139,19 +151,11 @@ public class GeneUrlDialog extends JDialog {
 
     }
 
-    /**
-     * 
-     */
     private void initializeFieldText() {
-        if ( this.settings == null ) {
-            this.settings = new Settings();
-        }
-        if ( this.settings.getConfig().containsKey( Settings.GENE_URL_BASE ) ) {
-            String oldUrlBase = this.settings.getConfig().getString( Settings.GENE_URL_BASE );
-            log.debug( "Found url base " + oldUrlBase );
-            urlTextField.setText( oldUrlBase );
-            hasOld = true;
-        }
+        assert settings != null;
+        String oldUrlBase = this.settings.getGeneUrlBase();
+        log.debug( "Found url base " + oldUrlBase );
+        urlTextField.setText( oldUrlBase );
     }
 
     void cancelButton_actionPerformed() {
@@ -179,19 +183,7 @@ public class GeneUrlDialog extends JDialog {
             return;
         }
 
-        // this really should just pass the information back ... too much work being done here.
-        settings.getConfig().setProperty( Settings.GENE_URL_BASE, candidateUrlBase );
-        tableModel.configure();
-        tableModel.createLinkLabels();
         dispose();
-    }
-
-    /**
-     * 
-     */
-    public void urlMouseActionAdapter() {
-        if ( !hasOld && firstTime ) this.urlTextField.setText( "" );
-        firstTime = false;
     }
 
 }
@@ -218,61 +210,4 @@ class CancelButton_actionAdapter implements java.awt.event.ActionListener {
     public void actionPerformed( ActionEvent e ) {
         adaptee.cancelButton_actionPerformed();
     }
-}
-
-class SetTextMouseButton_actionAdapter implements MouseListener {
-
-    GeneUrlDialog adaptee;
-
-    /**
-     * @param adaptee
-     */
-    public SetTextMouseButton_actionAdapter( GeneUrlDialog adaptee ) {
-        super();
-        this.adaptee = adaptee;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-     */
-    public void mouseClicked( MouseEvent e ) {
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-     */
-    public void mouseEntered( MouseEvent e ) {
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-     */
-    public void mouseExited( MouseEvent e ) {
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-     */
-    public void mousePressed( MouseEvent e ) {
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-     */
-    public void mouseReleased( MouseEvent e ) {
-        adaptee.urlMouseActionAdapter();
-    }
-
 }

@@ -27,11 +27,13 @@ import java.util.Map;
 
 import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.MatrixStats;
+import ubic.basecode.util.StatusViewer;
 import ubic.basecode.util.StringUtil;
 
 import ubic.basecode.dataStructure.matrix.DenseDoubleMatrix;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
@@ -56,40 +58,28 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     private double[][] selfSquaredMatrix;
 
     /**
-     * @return Returns the tests.
+     * @param settings
+     * @param geneAnnots
+     * @param csc
+     * @param gon
+     * @param rawData
+     * @param hist
      */
-    public int getTests() {
-        return this.tests;
-    }
+    public CorrelationPvalGenerator( SettingsHolder settings, GeneAnnotations geneAnnots, GeneSetSizesForAnalysis csc,
+            DoubleMatrix<Probe, String> rawData, Histogram hist ) {
+        super( settings, geneAnnots, csc );
 
-    /**
-     * @param tests The tests to set.
-     */
-    public void setTests( int tests ) {
-        this.tests = tests;
-    }
-
-    /**
-     * @return Returns the usedCache.
-     */
-    public int getCacheHits() {
-        return this.cacheHits;
-    }
-
-    /**
-     * @param usedCache The usedCache to set.
-     */
-    public void setCacheHits( int usedCache ) {
-        this.cacheHits = usedCache;
-    }
-
-    public CorrelationPvalGenerator( Settings settings, GeneAnnotations a, GeneSetSizeComputer csc,
-            DoubleMatrix<Probe, String> data ) {
-        super( settings, a, csc );
-        this.data = data;
+        this.geneAnnots = geneAnnots;
+        this.data = rawData;
 
         nanStatusMatrix = MatrixStats.nanStatusMatrix( data.asArray() );
         selfSquaredMatrix = MatrixStats.selfSquaredMatrix( data.asArray() );
+
+        setHistogram( hist );
+        setGeneRepTreatment( settings.getGeneRepTreatment() );
+        set_class_max_size( settings.getMaxClassSize() );
+        set_class_min_size( settings.getMinClassSize() );
+
     }
 
     /**
@@ -191,18 +181,40 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
+     * @param messenger
+     */
+    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( StatusViewer messenger ) {
+        Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
+
+        int count = 0;
+        setTests( 0 );
+        setCacheHits( 0 );
+
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
+            ifInterruptedStop();
+
+            GeneSetTerm geneSetName = iter.next();
+            GeneSetResult res = classPval( geneSetName );
+            if ( res != null ) {
+                results.put( geneSetName, res );
+            }
+            count++;
+            if ( messenger != null && count % 100 == 0 ) {
+                messenger.showStatus( count + " gene sets analyzed" );
+            }
+        }
+
+        log.debug( "Tests: " + getTests() );
+        log.debug( "Cache hits: " + getCacheHits() );
+        return results;
+    }
+
+    /**
      * @param name
      * @return
      */
     public boolean containsRow( Probe name ) {
         return data.containsRowName( name );
-    }
-
-    /**
-     * @return
-     */
-    public DoubleMatrix<Probe, String> getData() {
-        return data;
     }
 
     /**
@@ -227,14 +239,49 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      */
+    public double get_range() {
+        return histRange;
+    }
+
+    /**
+     * @return Returns the usedCache.
+     */
+    public int getCacheHits() {
+        return this.cacheHits;
+    }
+
+    /**
+     * @return
+     */
+    public DoubleMatrix<Probe, String> getData() {
+        return data;
+    }
+
+    /**
+     * @return Returns the tests.
+     */
+    public int getTests() {
+        return this.tests;
+    }
+
+    /**
+     */
     public void set_range( double range ) {
         histRange = range;
     }
 
     /**
+     * @param usedCache The usedCache to set.
      */
-    public double get_range() {
-        return histRange;
+    public void setCacheHits( int usedCache ) {
+        this.cacheHits = usedCache;
+    }
+
+    /**
+     * @param geneRepTreatment
+     */
+    public void setGeneRepTreatment( Settings.MultiProbeHandling geneRepTreatment ) {
+        this.geneRepTreatment = geneRepTreatment;
     }
 
     /**
@@ -245,10 +292,10 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * @param geneRepTreatment
+     * @param tests The tests to set.
      */
-    public void setGeneRepTreatment( Settings.MultiProbeHandling geneRepTreatment ) {
-        this.geneRepTreatment = geneRepTreatment;
+    public void setTests( int tests ) {
+        this.tests = tests;
     }
 
 }

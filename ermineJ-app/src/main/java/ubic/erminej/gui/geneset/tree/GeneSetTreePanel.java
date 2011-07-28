@@ -461,9 +461,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
         this.goTree.setModel( filteredTreeModel );
 
         filteredTreeModel.setFilterBySize( hideEmpty );
-        filteredTreeModel.setFilterByRedundancy( hideRedundant );
         filteredTreeModel.setResults( getCurrentResultSet() );
         filteredTreeModel.setFilterBySignificance( hideInsignificant );
+
         if ( propagate ) this.callingFrame.getTablePanel().filter( false );
     }
 
@@ -682,7 +682,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             this.setIcon( emptySetIcon );
             this.setFont( this.getFont().deriveFont( Font.BOLD ) );
             this.setForeground( Color.DARK_GRAY );
-        } else if ( !geneData.getActiveGeneSets().contains( id ) || numGenesInGeneSet == 0 ) {
+        } else if ( !geneData.getNonEmptyGeneSets().contains( id ) || numGenesInGeneSet == 0 ) {
             this.setIcon( emptySetIcon );
             textToDisplay += " (No genes in your data)";
         } else {

@@ -30,7 +30,7 @@ import ubic.basecode.math.ROC;
 import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusViewer;
 
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -54,7 +54,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     Map<Probe, Integer> probeRanks;
 
-    public RocPvalGenerator( Settings set, GeneAnnotations an, GeneSetSizeComputer csc, StatusViewer messenger ) {
+    public RocPvalGenerator( SettingsHolder set, GeneAnnotations an, GeneSetSizesForAnalysis csc, StatusViewer messenger ) {
         super( set, an, csc );
         this.messenger = messenger;
     }
@@ -76,7 +76,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             totalSize = probeRanks.size();
         }
 
-        for ( Iterator<GeneSetTerm> iter = geneAnnots.getActiveGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
             GeneSetTerm className = iter.next();
             GeneSetResult res = this.classPval( className );

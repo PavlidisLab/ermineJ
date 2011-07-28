@@ -29,6 +29,7 @@ import javax.swing.UIManager;
 
 import ubic.basecode.util.StatusStderr;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Probe;
@@ -49,7 +50,7 @@ public class GeneSetApp {
      */
     public GeneSetApp() throws IOException {
 
-        Settings settings = new Settings();
+        SettingsHolder settings = new Settings();
 
         final String[] PROBES = { "31946_s_at", "31947_r_at", "31948_at", "31949_at", "31950_at" };
         Map<Probe, Double> pvalues = new HashMap<Probe, Double>();

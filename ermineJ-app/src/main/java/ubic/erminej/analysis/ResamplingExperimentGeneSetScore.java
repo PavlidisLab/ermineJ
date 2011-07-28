@@ -38,6 +38,7 @@ import ubic.basecode.util.StatusViewer;
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;
@@ -176,7 +177,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @param settings
      * @param geneScores
      */
-    public ResamplingExperimentGeneSetScore( Settings settings, GeneScores geneScores ) {
+    public ResamplingExperimentGeneSetScore( SettingsHolder settings, GeneScores geneScores ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();

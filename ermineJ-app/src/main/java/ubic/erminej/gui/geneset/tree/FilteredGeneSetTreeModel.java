@@ -101,9 +101,10 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
             }
             if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
                 continue;
-            } else if ( filterByRedundancy && annots.skipDueToRedundancy( term ) ) {
-                continue;
             }
+//            else if ( filterByRedundancy && annots.skipDueToRedundancy( term ) ) {
+//                continue;
+//            }
 
             if ( i == index ) {
                 return node;
@@ -138,9 +139,9 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
             if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
                 continue;
             }
-            if ( filterByRedundancy && annots.skipDueToRedundancy( term ) ) {
-                continue;
-            }
+            // if ( filterByRedundancy && annots.skipDueToRedundancy( term ) ) {
+            // continue;
+            // }
             i++;
         }
         return i;

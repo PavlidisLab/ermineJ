@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
 
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -59,16 +59,16 @@ public class MultipleTestCorrector extends AbstractLongTask {
     private Map<GeneSetTerm, GeneSetResult> results;
     private Histogram hist;
     private GeneAnnotations geneData;
-    private GeneSetSizeComputer csc;
+    private GeneSetSizesForAnalysis csc;
     private NumberFormat nf = NumberFormat.getInstance();
     private GeneScores geneScores;
-    private Settings settings;
+    private SettingsHolder settings;
     private StatusViewer messenger;
     List<GeneSetTerm> toUseForMTC;
     Map<GeneSetTerm, Collection<GeneSetTerm>> usedToSkipped = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
 
-    public MultipleTestCorrector( Settings set, List<GeneSetTerm> sc, Histogram h, GeneAnnotations geneData,
-            GeneSetSizeComputer csc, GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results,
+    public MultipleTestCorrector( SettingsHolder set, List<GeneSetTerm> sc, Histogram h, GeneAnnotations geneData,
+            GeneSetSizesForAnalysis csc, GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results,
             StatusViewer messenger ) {
         this.settings = set;
         this.sortedclasses = sc;
