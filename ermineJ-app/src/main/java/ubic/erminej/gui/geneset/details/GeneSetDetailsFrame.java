@@ -512,7 +512,10 @@ public class GeneSetDetailsFrame extends JFrame {
         }
         this.getContentPane().setLayout( new BorderLayout() );
         this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
-        this.setTitle( "Gene set details" );
+        this.setTitle( StringUtils.abbreviate( this.geneSetDetails.getClassID().getName(), 50 ) + " [ "
+                + this.geneSetDetails.getClassID().getId() + " ] - "
+                + this.geneSetDetails.getGeneData().getGeneSetGenes( this.geneSetDetails.getClassID() ).size()
+                + " genes" );
 
         this
                 .setIconImage( new ImageIcon( this.getClass().getResource(
