@@ -1,2 +1,2 @@
-File "${PROJECT_BASEDIR}\data\go_daily-termdb.rdf-xml.gz"
+; File "${PROJECT_BASEDIR}\data\go_daily-termdb.rdf-xml.gz"
 
