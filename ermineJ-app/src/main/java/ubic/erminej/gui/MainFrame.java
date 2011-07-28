@@ -913,7 +913,8 @@ public class MainFrame extends JFrame {
         logoPanel.add( logoLabel );
 
         // big
-        JPanel progressPanel = new JPanel( new BorderLayout() );
+        JPanel progressPanel = new JPanel();
+        progressPanel.setLayout( new BoxLayout( progressPanel, BoxLayout.Y_AXIS ) );
         progressPanel.setBackground( Color.white );
         progressPanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
@@ -923,15 +924,18 @@ public class MainFrame extends JFrame {
 
         JPanel progressBarContainer = new JPanel();
         progressBarContainer.setLayout( new BoxLayout( progressBarContainer, BoxLayout.Y_AXIS ) );
-        progressBarContainer.setPreferredSize( new Dimension( 300, 36 ) );
+        progressBarContainer.setPreferredSize( new Dimension( 500, 300 ) );
+        //
+        progressBarContainer.setBackground( Color.WHITE );
+
+        progressBar.setIndeterminate( true );
+        progressBar.setMaximumSize( new Dimension( 500, 20 ) );
+
         progressBarContainer.add( label );
         progressBarContainer.add( progressBar );
-        progressBarContainer.setBorder( BorderFactory.createEmptyBorder( 20, 20, 20, 20 ) );
-        progressBar.setIndeterminate( true );
-        progressBar.setMaximumSize( new Dimension( 500, 25 ) );
 
-        progressPanel.add( logoPanel, BorderLayout.NORTH );
-        progressPanel.add( progressBarContainer, BorderLayout.CENTER );
+        progressPanel.add( logoPanel );
+        progressPanel.add( progressBarContainer );
 
         return progressPanel;
     }

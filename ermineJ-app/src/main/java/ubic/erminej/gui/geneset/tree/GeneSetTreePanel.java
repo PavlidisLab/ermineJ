@@ -752,6 +752,10 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         String probeSize = geneData.getGeneSet( id ) == null ? "?" : "" + geneData.getGeneSet( id ).getProbes().size();
         String redund = getToolTipTextForRedundancy( id );
 
+        /*
+         * FIXME add information on the result.
+         */
+
         setToolTipText( "<html>"
                 + id.getName()
                 + " ("

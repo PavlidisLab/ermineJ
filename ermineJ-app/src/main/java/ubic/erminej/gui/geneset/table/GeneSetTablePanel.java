@@ -126,7 +126,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         sorter = new TableRowSorter<GeneSetTableModel>( ( GeneSetTableModel ) table.getModel() );
 
         table.setRowSorter( sorter );
-        table.addMouseListener( new OutputPanel_mouseAdapter( this ) );
+        table.addMouseListener( new GeneSetTableMouseAdapter( this ) );
         table.getTableHeader().setReorderingAllowed( false );
         table.getTableHeader().addMouseListener( new MouseAdapter() {
             @Override
@@ -250,7 +250,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         table.addColumn( col );
         table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
-        generateToolTip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
+        generateResultColumnHeadingTooltip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
 
         currentResultSetIndex = results.size() - 1;
         this.callingFrame.setCurrentResultSet( currentResultSetIndex );
@@ -318,7 +318,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * 
      * @param runIndex
      */
-    protected void generateToolTip( int runIndex ) {
+    protected void generateResultColumnHeadingTooltip( int runIndex ) {
         assert results != null : "Null results";
         GeneSetPvalRun geneSetPvalRun = results.get( runIndex );
         assert geneSetPvalRun != null : "No results with index " + runIndex;
@@ -350,6 +350,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
         tooltip += new String( "Max set size: " + runSettings.getMaxClassSize() + "<br>" + "Min set size: "
                 + runSettings.getMinClassSize() + "<br>" );
         if ( runSettings.getDoLog() ) tooltip += "Negative log transformed<br>";
+
+        if ( runSettings.isUseMultifunctionalityCorrection() ) {
+            tooltip += "Multifunctionality corrected<br>";
+        }
 
         if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) )
             tooltip += "Gene Rep Treatment: Mean <br>";
@@ -523,10 +527,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
 // //////////////////////////////////////////////////////////////////////////////
 class EditRunPopupMenu extends JPopupMenu {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -6328435511579332465L;
+
     Point popupPoint;
 
     public Point getPoint() {
@@ -561,10 +562,10 @@ class FindInTreeListener implements ActionListener {
 
 }
 
-class OutputPanel_mouseAdapter extends java.awt.event.MouseAdapter {
+class GeneSetTableMouseAdapter extends java.awt.event.MouseAdapter {
     GeneSetTablePanel adaptee;
 
-    OutputPanel_mouseAdapter( GeneSetTablePanel adaptee ) {
+    GeneSetTableMouseAdapter( GeneSetTablePanel adaptee ) {
         this.adaptee = adaptee;
     }
 

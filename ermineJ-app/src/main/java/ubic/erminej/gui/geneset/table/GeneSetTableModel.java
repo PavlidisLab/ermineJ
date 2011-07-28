@@ -262,6 +262,7 @@ public class GeneSetTableModel extends AbstractTableModel {
         log.debug( "Renaming column " + columnNum + " to " + newName );
         columnIdentifiers.set( columnNum, newName );
     }
+
 }
 
 /**
@@ -307,8 +308,8 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         } else if ( column == 1 ) {
             setText( ( String ) value );
         } else if ( value instanceof EmptyGeneSetResult ) {
-            setText( "[not run]" );
-            setBackground( Color.LIGHT_GRAY );
+            setText( "not run" );
+            setForeground( Color.LIGHT_GRAY );
         } else if ( value instanceof GeneSetResult ) {
             setText( nf.format( ( ( GeneSetResult ) value ).getPvalue() ) );
         } else if ( column == 4 && ( Double ) value < 0 ) {
@@ -339,7 +340,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
             // boolean redundant = geneData.skipDueToRedundancy( term );
 
-            if ( /* redundant || */geneData.numGenesInGeneSet( term ) == 0 ) {
+            if ( /* redundant || */geneData.numGenesInGeneSet( term ) == 0 || value instanceof EmptyGeneSetResult ) {
                 setForeground( Color.GRAY );
             } else {
                 setForeground( Color.BLACK );

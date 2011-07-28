@@ -45,6 +45,7 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.UserDefinedGeneSetManager;
@@ -81,6 +82,9 @@ public abstract class GeneSetPanel extends JScrollPane {
     public static final String RESTORED = "RESTORED";
     public static final String DELETED = "DELETED";
     public static final int MAX_DEFINITION_LENGTH = 300;
+
+    // FIXME: todo
+    private static final String GEMMA_URL_BASE = "http://www.chibi.ubc.ca/Gemma/(GO TO GO GROUP)";
 
     protected static boolean hideEmpty = true;
     protected static boolean hideInsignificant = false;
@@ -155,9 +159,11 @@ public abstract class GeneSetPanel extends JScrollPane {
         JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
         modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
 
-        final JMenuItem htmlMenuItem = new JMenuItem( "Go to GO web site" );
+        final JMenuItem visitAmigoMenuItem = new JMenuItem( "Go to GO web site" );
+        visitAmigoMenuItem.addActionListener( new UrlActionAdapter( this, AMIGO_URL_BASE ) );
 
-        htmlMenuItem.addActionListener( new OutputPanel_htmlMenuItem_actionAdapter( this ) );
+        final JMenuItem gemmaMenuItem = new JMenuItem( "Examine in Gemma" );
+        gemmaMenuItem.addActionListener( new UrlActionAdapter( this, GEMMA_URL_BASE ) );
 
         final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
         deleteGeneSetMenuItem.addActionListener( new ActionListener() {
@@ -185,7 +191,8 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         } );
 
-        popup.add( htmlMenuItem );
+        popup.add( visitAmigoMenuItem );
+        // popup.add(gemmaMenuItem);
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
         popup.add( hideEmptyMenuItem );
@@ -198,11 +205,11 @@ public abstract class GeneSetPanel extends JScrollPane {
             assert classID.isUserDefined();
             modMenuItem.setEnabled( true );
             deleteGeneSetMenuItem.setEnabled( true );
-            htmlMenuItem.setEnabled( false ); // won't be a GO term.
+            visitAmigoMenuItem.setEnabled( false ); // won't be a GO term.
         } else {
             modMenuItem.setEnabled( false );
             deleteGeneSetMenuItem.setEnabled( false );
-            htmlMenuItem.setEnabled( true );
+            visitAmigoMenuItem.setEnabled( true );
         }
 
         return popup;
@@ -261,16 +268,18 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     public abstract void filter( boolean propagate );
 
-    protected void htmlMenuItem_actionPerformed( ActionEvent e ) {
-        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        GeneSetTerm classID = sourcePopup.getSelectedItem();
-        if ( classID == null ) return;
-        // create the URL and show it
+    /**
+     * Forms a url like url + term.getId().
+     * 
+     * @param url
+     * @param term
+     */
+    protected void openUrlForGeneSet( String url, GeneSetTerm term ) {
 
-        String clID = classID.getId();
+        String clID = term.getId();
 
         try {
-            BrowserLauncher.openURL( AMIGO_URL_BASE + clID );
+            BrowserLauncher.openURL( url + clID );
         } catch ( Exception e1 ) {
             log.error( e1, e1 );
             GuiUtil.error( "Could not open a web browser window" );
@@ -303,7 +312,11 @@ public abstract class GeneSetPanel extends JScrollPane {
      */
     protected void showDetailsForGeneSet( final GeneSetTerm id, final GeneSetPvalRun run ) {
 
-        int numGenes = this.geneData.getGeneSet( id ).getGenes().size();
+        GeneSet geneSet = this.geneData.getGeneSet( id );
+
+        if ( geneSet == null ) return; // aspect etc.
+
+        int numGenes = geneSet.getGenes().size();
         if ( numGenes > GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING ) {
             messenger.showError( StringUtils.abbreviate( id.getId(), 30 ) + " has too many genes to display ("
                     + numGenes + ", max is set to " + GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING + ")" );
@@ -352,15 +365,19 @@ public abstract class GeneSetPanel extends JScrollPane {
     protected abstract void showPopupMenu( MouseEvent e );
 }
 
-class OutputPanel_htmlMenuItem_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetPanel adaptee;
+class UrlActionAdapter implements java.awt.event.ActionListener {
+    private GeneSetPanel adaptee;
+    private String urlBase;
 
-    OutputPanel_htmlMenuItem_actionAdapter( GeneSetPanel adaptee ) {
+    UrlActionAdapter( GeneSetPanel adaptee, String urlBase ) {
         this.adaptee = adaptee;
+        this.urlBase = urlBase;
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.htmlMenuItem_actionPerformed( e );
+        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        GeneSetTerm classID = sourcePopup.getSelectedItem();
+        adaptee.openUrlForGeneSet( urlBase, classID );
     }
 }
 

@@ -25,7 +25,9 @@ import java.awt.event.MouseListener;
 import java.awt.font.TextAttribute;
 import java.util.Map;
 
-import javax.swing.JTextField;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import ubic.basecode.util.BrowserLauncher;
 
@@ -35,7 +37,7 @@ import ubic.basecode.util.BrowserLauncher;
  * @author Will Braynen
  * @version $Id$
  */
-public class JLinkLabel extends JTextField implements Comparable<JLinkLabel> {
+public class JLinkLabel extends DefaultTableCellRenderer implements Comparable<JLinkLabel> {
 
     private static final long serialVersionUID = -1L;
 
@@ -44,54 +46,23 @@ public class JLinkLabel extends JTextField implements Comparable<JLinkLabel> {
     protected String m_text = "";
 
     /** Creates a new instance of JLinkLabel */
-    @SuppressWarnings("unchecked")
     public JLinkLabel() {
         super();
-        this.setBackground( Color.WHITE );
-        this.setForeground( Color.BLUE );
-        this.setBorder( null );
-        this.setEditable( false );
-        Map attrs = this.getFont().getAttributes();
-        attrs.put( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL );
-        this.setFont( this.getFont().deriveFont( attrs ) );
+        configure();
     }
 
-    public JLinkLabel( String text ) {
-        this();
-        setText( text );
+    public JLinkLabel( Icon icon, String url ) {
+        super();
+        this.setIcon( icon );
+        setURL( url );
+        configure();
     }
 
     public JLinkLabel( String text, String url ) {
-        this();
-        setText( text, url );
-        this.addMouseListener( new MouseListener() {
-
-            @Override
-            public void mouseClicked( MouseEvent e ) {
-                openUrl();
-            }
-
-            @Override
-            public void mouseEntered( MouseEvent e ) {
-                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-
-            }
-
-            @Override
-            public void mouseExited( MouseEvent e ) {
-                setCursor( Cursor.getDefaultCursor() );
-
-            }
-
-            @Override
-            public void mousePressed( MouseEvent e ) {
-            }
-
-            @Override
-            public void mouseReleased( MouseEvent e ) {
-
-            }
-        } );
+        super();
+        this.setText( text );
+        setURL( url );
+        configure();
     }
 
     @Override
@@ -142,6 +113,46 @@ public class JLinkLabel extends JTextField implements Comparable<JLinkLabel> {
     @Override
     public String toString() {
         return "<html><a href=\"" + m_url + "\">" + m_text + "</a></html>";
+    }
+
+    @SuppressWarnings("unchecked")
+    private void configure() {
+        this.setBackground( Color.WHITE );
+        this.setForeground( Color.BLUE );
+        this.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 5 ) );
+        this.setOpaque( true );
+        Map attrs = this.getFont().getAttributes();
+        attrs.put( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL );
+        this.setFont( this.getFont().deriveFont( attrs ) );
+
+        this.addMouseListener( new MouseListener() {
+
+            @Override
+            public void mouseClicked( MouseEvent e ) {
+                openUrl();
+            }
+
+            @Override
+            public void mouseEntered( MouseEvent e ) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+
+            }
+
+            @Override
+            public void mouseExited( MouseEvent e ) {
+                setCursor( Cursor.getDefaultCursor() );
+
+            }
+
+            @Override
+            public void mousePressed( MouseEvent e ) {
+            }
+
+            @Override
+            public void mouseReleased( MouseEvent e ) {
+
+            }
+        } );
     }
 
 }

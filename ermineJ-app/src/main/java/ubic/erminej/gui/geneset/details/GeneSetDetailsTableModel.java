@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.logging.Log;
@@ -65,27 +67,9 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     protected static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
 
-    @Override
-    public Class<?> getColumnClass( int columnIndex ) {
+    private static final String RESOURCE_LOCATION = "/ubic/erminej/";
 
-        int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
-
-        if ( columnIndex < offset ) {
-            return Double.class; // matrix, or pvals.
-        } else if ( columnIndex - offset == 0 ) {
-            return String.class; // probe
-        } else if ( columnIndex - offset == 1 ) {
-            return Double.class; // score
-        } else if ( columnIndex - offset == 2 ) {
-            return Object.class; // actually a List, which is not comparable.
-        } else if ( columnIndex - offset == 3 ) {
-            return JLinkLabel.class; // symbol
-        } else if ( columnIndex - offset == 4 ) {
-            return String.class; // description
-        }
-
-        return String.class; // mf.
-    }
+    private final Icon gemmaIcon = new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "/gemmaTiny.gif" ) );
 
     /**
      * @param matrixDisplay
@@ -112,35 +96,36 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         createLinkLabels();
     }
 
-    /**
-     * 
-     */
-    void createLinkLabels() {
-        assert probeIDs != null;
-        this.linkLabels = new HashMap<Gene, JLinkLabel>();
-        for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
-            Probe probe = iter.next();
-            Gene gene = probe.getGene();
-            if ( gene != null ) {
-                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene.getSymbol() );
-                linkLabels.put( gene, new JLinkLabel( gene.getSymbol(), url ) );
-            }
+    @Override
+    public Class<?> getColumnClass( int columnIndex ) {
+
+        int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
+
+        if ( columnIndex < offset ) {
+            return Double.class; // matrix, or pvals.
+        } else if ( columnIndex - offset == 0 ) {
+            return Probe.class; // probe
+        } else if ( columnIndex - offset == 1 ) {
+            return Double.class; // score
+        } else if ( columnIndex - offset == 2 ) {
+            return Object.class; // actually a List, which is not comparable.
+        } else if ( columnIndex - offset == 3 ) {
+            return JLinkLabel.class; // symbol
+        } else if ( columnIndex - offset == 4 ) {
+            return String.class; // description
         }
-        this.fireTableDataChanged();
+
+        return String.class; // mf.
     }
 
-    /**
+    /*
+     * (non-Javadoc)
      * 
+     * @see javax.swing.table.TableModel#getColumnCount()
      */
-    protected void configure() {
-        String candidateUrlBase = settings.getConfig().getString( SettingsHolder.GENE_URL_BASE );
-        if ( candidateUrlBase != null && candidateUrlBase.indexOf( URL_REPLACE_TAG ) >= 0 ) {
-            this.urlbase = candidateUrlBase;
-            log.debug( "Setting urlbase to " + urlbase );
-        } else {
-            this.urlbase = "no setting found";
-            log.warn( "No gene tag in user's url base" );
-        }
+    public int getColumnCount() {
+        int matrixColumnCount = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
+        return tableColumnNames.length + matrixColumnCount;
     }
 
     /*
@@ -161,6 +146,12 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     } // end getColumnName
 
+    public Probe getProbeAtRow( int r ) {
+        log.info( "clicked on row " + r );
+        int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
+        return ( Probe ) getValueAt( r, offset );
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -168,16 +159,6 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      */
     public int getRowCount() {
         return probeIDs.size();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.table.TableModel#getColumnCount()
-     */
-    public int getColumnCount() {
-        int matrixColumnCount = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
-        return tableColumnNames.length + matrixColumnCount;
     }
 
     /*
@@ -199,11 +180,11 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                     matrixDisplay.getRowIndexByName( probeID ), column ) ); // coords into JMatrixDisplay
         }
         column -= offset;
-
+        Gene gene_name = probeID.getGene();
         switch ( column ) { // after it's been offset
             case 0:
                 // probe ID
-                return probeID.getName();
+                return probeID;
             case 1:
                 // scores
                 if ( probeScores == null || !probeScores.containsKey( probeID ) ) return new Double( Double.NaN );
@@ -234,13 +215,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 }
                 return values;
             case 3:
-                // gene symbol.
-                if ( geneData == null ) return "No data available";
-                Gene gene_name = probeID.getGene();
-
-                // bug 1332: allow for multiple genes here?
-
-                return geneData == null ? null : linkLabels.get( gene_name );
+                // gene symbols displayed nicely
+                return linkLabels.get( gene_name );
             case 4:
                 // description
                 return geneData == null ? "" : probeID.getDescription();
@@ -255,4 +231,50 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 return "";
         }
     } // end getValueAt
+
+    private void createLinkLabels() {
+        assert probeIDs != null;
+
+        /*
+         * Each is a little panel that has multiple labels in a
+         */
+
+        this.linkLabels = new HashMap<Gene, JLinkLabel>();
+        for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            final Probe probe = iter.next();
+            Gene gene = probe.getGene();
+            if ( gene != null ) {
+                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene.getSymbol() );
+
+                // JPanel p = new JPanel();
+                // p.setName( "Panel for " + probe );
+                // p.setBackground( Color.WHITE );
+                // p.setLayout( new BoxLayout( p, BoxLayout.LINE_AXIS ) );
+                // p.setAlignmentY( Component.BOTTOM_ALIGNMENT );
+                // p.setOpaque( false );
+
+                JLinkLabel baseLink = new JLinkLabel( gene.getSymbol(), url );
+                // p.add( );
+                // p.add( new JLinkLabel( gemmaIcon, "" ) );
+
+                linkLabels.put( gene, baseLink );
+            }
+        }
+        this.fireTableDataChanged();
+    }
+
+    /**
+     * 
+     */
+    protected void configure() {
+        String candidateUrlBase = settings.getConfig().getString( SettingsHolder.GENE_URL_BASE );
+        if ( candidateUrlBase != null && candidateUrlBase.indexOf( URL_REPLACE_TAG ) >= 0 ) {
+            this.urlbase = candidateUrlBase;
+            log.debug( "Setting urlbase to " + urlbase );
+        } else {
+            this.urlbase = "no setting found";
+            log.warn( "No gene tag in user's url base" );
+        }
+        this.createLinkLabels();
+    }
 } // end class DetailsTableModel
