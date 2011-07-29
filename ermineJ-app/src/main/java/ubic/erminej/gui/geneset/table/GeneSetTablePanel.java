@@ -432,6 +432,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
             results.remove( runIndex ); // This should be done by the parent.
             resultToolTips.remove( runIndex );
+            currentResultSetIndex = results.size() - 1;
 
             table.revalidate();
 
@@ -517,8 +518,12 @@ public class GeneSetTablePanel extends GeneSetPanel {
         int sortColumn = 0;
         if ( currentResultSetIndex > 0 ) {
             sortColumn = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
+
+            assert sortColumn < this.table.getColumnCount();
+
             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
             sortKeys.add( new RowSorter.SortKey( sortColumn, SortOrder.ASCENDING ) );
+
             sorter.setSortKeys( sortKeys );
         }
     }
