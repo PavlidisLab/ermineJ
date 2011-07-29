@@ -209,7 +209,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         /*
          * 
-         * Now I determine which of those gene above threshold is the most multifunctional
+         * Determine which of those gene above threshold is the most multifunctional
          */
         boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection();
         if ( useMultifunctionalityCorrection ) {
@@ -248,11 +248,12 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Hypergeometric p value calculation (or binomial approximation) successes=number of genes in class which meet
-     * criteria (successes)
+     * criteria
      * 
-     * @param (or probes)
-     * @param
-     * @param
+     * @param clasName
+     * @param total number of genes (or probes)
+     * @param number of genes in the set (or the number of probes)
+     * @param how many passed the threshold
      */
     private GeneSetResult computeResult( GeneSetTerm className, int numGenes, int effectiveGeneSetSize, int successes,
             int numOverThreshold ) {
@@ -262,6 +263,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( successes > 0 ) {
             oraPval = 0.0;
 
+            // sum probs of N or more successes up to max possible.
             for ( int i = successes; i <= Math.min( numOverThreshold, effectiveGeneSetSize ); i++ ) {
                 oraPval += SpecFunc.dhyper( i, effectiveGeneSetSize, numGenes - effectiveGeneSetSize, numOverThreshold );
             }

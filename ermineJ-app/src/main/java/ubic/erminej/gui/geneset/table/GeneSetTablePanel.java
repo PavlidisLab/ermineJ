@@ -328,11 +328,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
         String tooltip = new String( "<html>" );
         String coda = new String();
 
-        int numscores = gs.getNumScores();
+        // int numProbes = gs.getNumProbesUsed();
+        int numGenes = gs.getNumGenesUsed();
 
         if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
             tooltip += "ORA Analysis<br>";
-            coda += "P value threshold: " + runSettings.getGeneScoreThreshold();
+            coda += "Score threshold: " + runSettings.getGeneScoreThreshold();
+            coda += ", Genes meeting: " + gs.numGenesAboveThreshold( runSettings.getGeneScoreThreshold() ) + "<br/>";
         } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
             tooltip += "Resampling Analysis<br>";
             coda += runSettings.getIterations() + " iterations<br>";
@@ -344,8 +346,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
             tooltip += "ROC Analysis<br>";
         }
 
-        tooltip += String.format( "Multifunct. bias: %.2f, %d values<br>", geneSetPvalRun
-                .getMultifunctionalityCorrelation(), numscores );
+        tooltip += String.format( "Multifunct. bias: %.2f, %d genes<br>", geneSetPvalRun
+                .getMultifunctionalityCorrelation(), numGenes );
 
         tooltip += new String( "Max set size: " + runSettings.getMaxClassSize() + "<br>" + "Min set size: "
                 + runSettings.getMinClassSize() + "<br>" );
@@ -359,8 +361,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
             tooltip += "Gene Rep Treatment: Mean <br>";
         else if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) )
             tooltip += "Gene Rep Treatment: Best <br>";
-        if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR )
-                || runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
+
+        if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
             if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) )
                 tooltip += "Class Raw Score Method: Mean <br>";
             else if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.QUANTILE ) )

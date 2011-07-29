@@ -21,3 +21,7 @@ ProbeR	GeneR	gener	GO:1|GO:31
 ProbeS	GeneS	genes	GO:1|GO:31
 ProbeT	GeneT	genet	GO:1|GO:31
 ProbeU	GeneU	geneu	GO:1|GO:31
+ProbeV	GeneV	genev
+ProbeW	GeneW	genew
+ProbeX	GeneX	genex
+ProbeY	GeneY	geney

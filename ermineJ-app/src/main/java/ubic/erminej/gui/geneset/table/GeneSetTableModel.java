@@ -299,12 +299,19 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         if ( value == null ) {
             setText( "" );
         } else if ( column == 0 ) {
-            boolean redundant = geneData.hasRedundancy( ( GeneSetTerm ) value );
-            if ( redundant ) {
-                setText( "<html>" + ( ( GeneSetTerm ) value ).getId() + "&nbsp;&nbsp;&bull;</html>" );
-            } else {
-                setText( ( ( GeneSetTerm ) value ).getId() );
+
+            if ( value instanceof GeneSetTerm ) {
+                boolean redundant = geneData.hasRedundancy( ( GeneSetTerm ) value );
+                if ( redundant ) {
+                    setText( "<html>" + ( ( GeneSetTerm ) value ).getId() + "&nbsp;&nbsp;&bull;</html>" );
+                } else {
+                    setText( ( ( GeneSetTerm ) value ).getId() );
+                }
             }
+
+            // note: sometimes we end up here when the table is being modified; this is some kind of bug
+            // with adding columns and sorting/repainting at the same time?
+
         } else if ( column == 1 ) {
             setText( ( String ) value );
         } else if ( value instanceof EmptyGeneSetResult ) {
@@ -410,6 +417,8 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
         if ( column == GeneSetTablePanel.MULTIFUNC_COLUMN_INDEX ) {
             chooseMultifunctionalityIndicatorColor( ( Double ) value );
+        } else if ( value instanceof EmptyGeneSetResult || value instanceof String ) {
+            // nothing to do. This is weird that this happens, only when we are adding result sets
         } else if ( column == 0 && ( ( GeneSetTerm ) value ).isUserDefined() ) {
             setBackground( Colors.LIGHTYELLOW );
         } else if ( value instanceof GeneSetResult ) {

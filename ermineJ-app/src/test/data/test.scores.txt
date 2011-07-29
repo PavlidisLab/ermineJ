@@ -20,3 +20,8 @@ ProbeR	0.6
 ProbeS	0.7
 ProbeT	0.8
 ProbeU	0.9
+ProbeV	0.001
+ProbeW	0.001
+ProbeX	0.2
+ProbeY	0.05
+ProbeZ	0.01

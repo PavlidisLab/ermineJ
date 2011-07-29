@@ -108,7 +108,7 @@ public class GeneScoreReaderTest extends TestCase {
 
     public void testGet_numpvals() {
         int expectedReturn = 21;
-        int actualReturn = test.getNumScores();
+        int actualReturn = test.getNumProbesUsed();
         assertEquals( "return value", expectedReturn, actualReturn );
     }
 

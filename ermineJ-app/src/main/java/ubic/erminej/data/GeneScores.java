@@ -123,6 +123,7 @@ public class GeneScores {
     public GeneScores( InputStream is, SettingsHolder settings, StatusViewer m, GeneAnnotations geneAnnotations )
             throws IOException {
 
+        // used only in tests.
         if ( geneAnnotations == null ) {
             throw new IllegalArgumentException( "Annotations cannot be null" );
         }
@@ -130,6 +131,7 @@ public class GeneScores {
         this.init( settings );
         if ( m != null ) this.messenger = m;
         read( is, settings.getScoreCol() );
+
     }
 
     /**
@@ -165,6 +167,8 @@ public class GeneScores {
         int numProbesKept = 0;
         int numRepeatedProbes = 0;
         Collection<String> unknownProbes = new HashSet<String>();
+        Collection<String> unannotatedProbes = new HashSet<String>();
+
         for ( int i = 0; i < probes.size(); i++ ) {
             String ps = probes.get( i );
             Double value = scores.get( i );
@@ -173,6 +177,14 @@ public class GeneScores {
             Probe probe = geneAnnots.findProbe( ps );
             if ( probe == null ) {
                 unknownProbes.add( ps );
+                continue;
+            }
+
+            if ( probe.getGeneSets().isEmpty() ) {
+                /*
+                 * Important. We're ignoring probes that don't have any terms.
+                 */
+                unannotatedProbes.add( ps );
                 continue;
             }
 
@@ -201,8 +213,33 @@ public class GeneScores {
                 probeToScoreMap.put( probe, new Double( pValue ) );
             }
         }
-        reportProblems( invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept, numRepeatedProbes );
+        reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
+                numRepeatedProbes );
         setUpGeneToScoreMap();
+    }
+
+    public int numGenesAboveThreshold( double geneScoreThreshold ) {
+        int count = 0;
+
+        double t = geneScoreThreshold;
+        if ( isNegativeLog10Transformed() ) {
+            t = -Arithmetic.log10( geneScoreThreshold );
+        }
+
+        for ( Gene g : this.geneToScoreMap.keySet() ) {
+
+            if ( rankLargeScoresBest() ) {
+                if ( this.geneToScoreMap.get( g ) > t ) {
+                    count++;
+                }
+            } else {
+                if ( this.geneToScoreMap.get( g ) < t ) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
     }
 
     /**
@@ -272,10 +309,12 @@ public class GeneScores {
         return geneToScoreMap;
     }
 
-    /**
-     */
-    public int getNumScores() {
+    public int getNumProbesUsed() {
         return probeToScoreMap.size();
+    }
+
+    public int getNumGenesUsed() {
+        return geneToScoreMap.size();
     }
 
     /**
@@ -384,6 +423,7 @@ public class GeneScores {
         int numRepeatedProbes = 0;
         Collection<String> unknownProbes = new HashSet<String>();
         dis.readLine(); // skip header.
+        Collection<String> unannotatedProbes = new HashSet<String>();
 
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
@@ -410,6 +450,11 @@ public class GeneScores {
                 log.debug( "\"" + probeId + "\" not in the annotations, ignoring" );
                 unknownProbes.add( probeId );
                 numUnknownProbes++;
+                continue;
+            }
+
+            if ( p.getGeneSets().isEmpty() ) {
+                unannotatedProbes.add( probeId );
                 continue;
             }
 
@@ -454,7 +499,8 @@ public class GeneScores {
         }
         dis.close();
 
-        reportProblems( invalidLog, unknownProbes, invalidNumber, badNumberString, numProbesKept, numRepeatedProbes );
+        reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
+                numRepeatedProbes );
 
         setUpGeneToScoreMap();
 
@@ -462,13 +508,15 @@ public class GeneScores {
 
     /**
      * @param invalidLog
+     * @param unannotatedProbes
      * @param unknownProbe
      * @param invalidNumber
      * @param badNumberString
      * @param numProbesKept
      */
-    private void reportProblems( boolean invalidLog, Collection<String> unknownProbes, boolean invalidNumber,
-            String badNumberString, int numProbesKept, int numRepeatedProbes ) {
+    private void reportProblems( boolean invalidLog, Collection<String> unknownProbes,
+            Collection<String> unannotatedProbes, boolean invalidNumber, String badNumberString, int numProbesKept,
+            int numRepeatedProbes ) {
         if ( invalidNumber && messenger != null ) {
 
             messenger.showError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
@@ -493,6 +541,12 @@ public class GeneScores {
             }
             messenger.showError( "Unmatched probes are (up to 10 shown): " + buf );
         }
+
+        if ( messenger != null && !unannotatedProbes.isEmpty() ) {
+            messenger.showError( unannotatedProbes.size()
+                    + " probes in your gene score file had no gene annotations and were ignored." );
+        }
+
         if ( messenger != null && numRepeatedProbes > 0 ) {
             messenger
                     .showError( "Warning: "
@@ -611,4 +665,5 @@ public class GeneScores {
         // The first case is the common one, if input is pvalues.
         return ( logTransform && !biggerIsBetter ) || ( !logTransform && biggerIsBetter );
     }
+
 } // end of class

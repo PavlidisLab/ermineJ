@@ -591,8 +591,15 @@ public class MainFrame extends JFrame {
         GeneScores gs = null;
 
         if ( this.getCurrentResultSet() >= 0 ) {
-            ga = this.results.get( this.getCurrentResultSet() ).getGeneData();
             gs = this.results.get( this.getCurrentResultSet() ).getGeneScores();
+            ga = gs.getGeneAnnots();
+        } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
+            try {
+                gs = new GeneScores( settings.getScoreFile(), settings, statusMessenger, this.geneData );
+                ga = gs.getGeneAnnots();
+            } catch ( IOException e ) {
+                // nothing to do;
+            }
         }
 
         MultiFuncDiagWindow w = new MultiFuncDiagWindow( ga, gs );

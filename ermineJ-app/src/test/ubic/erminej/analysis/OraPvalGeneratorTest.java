@@ -55,11 +55,11 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         // there are 19 genes; GO:2 has 4 members, so it should be 15 not in the group
 
-        // / dhyper(1, 4, 15,2) + dhyper(2, 4, 15,2)
-        // incredibly, phyper(1, 4, 15, 2) gives the wrong answer of zero.
+        // 
+        // strange, phyper(1, 4, 15, 2) gives the wrong answer of zero.
         // there is a 0.2 prob of a hit per trial; total should be just shy of 0.4
 
-        double expectedReturn = 0.38596;
+        double expectedReturn = 0.38596; // checked / dhyper(1, 4, 15,2) + dhyper(2, 4, 15,2)
 
         double t = test.getGeneScoreThreshold();
         assertEquals( -Arithmetic.log10( 0.015 ), t, 0.001 );
@@ -75,12 +75,9 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     }
 
     public void testClassPval1() {
-        double expectedReturn = 0.3216374;
+        double expectedReturn = 0.3216374; // checked // dhyper(2, 11, 8, 2)
 
         assertEquals( 11, scores.getGeneAnnots().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
-
-        // two hits
-        // dhyper(2, 11, 8, 2)
 
         GeneSetResult r = test.classPval( new GeneSetTerm( "GO:1" ) );
 
@@ -91,13 +88,11 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     }
 
     public void testClassPval3() {
-        double expectedReturn = 0.7894737;
+        double expectedReturn = 0.7894737; // checked // dhyper(1, 10,9, 2) + dhyper(2, 10,9, 2)
 
         GeneSetResult r = test.classPval( new GeneSetTerm( "GO:3" ) );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
-
-        // dhyper(1, 10,9, 2) + dhyper(2, 10,9, 2)
 
         assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
