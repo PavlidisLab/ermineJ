@@ -35,6 +35,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -885,6 +886,15 @@ public class GeneSetDetailsFrame extends JFrame {
             sortKeys.add( new RowSorter.SortKey( matrixColumnCount + 1, SortOrder.ASCENDING ) );
         }
         table.getRowSorter().setSortKeys( sortKeys );
+
+        // sorter for the 'pvalue bar' column
+        sorter.setComparator( matrixColumnCount + 2, new Comparator<List<Double>>() {
+            @Override
+            public int compare( List<Double> o1, List<Double> o2 ) {
+                if ( settings.getBigIsBetter() ) return -o1.get( 1 ).compareTo( o2.get( 1 ) );
+                return o1.get( 1 ).compareTo( o2.get( 1 ) );
+            }
+        } );
 
         // Save the dimensions of the table just in case
         int totalWidth = matrixColumnCount * matrixColumnWidth + PREFERRED_WIDTH_PROBEID_COLUMN

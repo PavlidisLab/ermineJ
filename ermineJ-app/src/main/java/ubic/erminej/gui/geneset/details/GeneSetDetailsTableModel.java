@@ -147,7 +147,6 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     } // end getColumnName
 
     public Probe getProbeAtRow( int r ) {
-        log.info( "clicked on row " + r );
         int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
         return ( Probe ) getValueAt( r, offset );
     }
