@@ -52,8 +52,7 @@ public class SettingsHolder {
      * What to do when there are multiple values for a gene.
      */
     public enum MultiProbeHandling {
-        BEST, MEAN, NONE
-        /* NONE: not used now */
+        BEST, MEAN
     }
 
     /**

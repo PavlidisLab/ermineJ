@@ -667,7 +667,7 @@ public class Settings extends SettingsHolder {
 
                 this.config = new PropertiesConfiguration( newConfigFile );
                 this.config.setPath( newConfigFile.getAbsolutePath() );
-                Iterator keys = defaultConfig.getKeys();
+                Iterator<?> keys = defaultConfig.getKeys();
                 for ( ; keys.hasNext(); ) {
                     String k = ( String ) keys.next();
                     this.config.addProperty( k, defaultConfig.getProperty( k ) );

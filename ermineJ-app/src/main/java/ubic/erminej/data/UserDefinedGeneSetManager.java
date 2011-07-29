@@ -461,7 +461,7 @@ public class UserDefinedGeneSetManager {
 
             if ( fields.length > 2 ) {
                 /*
-                 * We assume there is one record per row.
+                 * We assume there is one record per row; includes MolSigDB (which includes KEGG) gene symbol files.
                  */
                 newSet = new GeneSet( new GeneSetTerm( fields[0], fields[1] ) );
                 newSet.setIsGenes( true );
@@ -469,6 +469,17 @@ public class UserDefinedGeneSetManager {
                 for ( int i = 2; i < fields.length; i++ ) {
                     String symbol = fields[i];
                     if ( StringUtils.isBlank( symbol ) ) continue;
+
+                    if ( symbol.contains( "///" ) ) {
+                        // MolSigDb format, when they have nonspecific probes? I also see "/"? Let's skip, in agreement
+                        // with GSEA:
+                        // "This symbol indicates ambiguous mapping according to the Affymentrix conventions and serves
+                        // as a field separator when a probe set id corresponds to several gene symbols. /// may
+                        // appear in some gene sets curated form Affymetrix (NetAffx) annotation data. GSEA ignores such
+                        // genes."
+                        continue;
+                    }
+
                     Gene g = geneData.findGene( symbol );
                     if ( g != null ) newSet.addGene( g );
                 }

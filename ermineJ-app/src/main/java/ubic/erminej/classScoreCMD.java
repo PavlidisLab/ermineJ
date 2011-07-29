@@ -414,13 +414,9 @@ public class classScoreCMD {
                     switch ( intarg ) {
                         case 1:
                             settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
-
                             break;
                         case 2:
                             settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
-                            break;
-                        case 3: // not actually used.
-                            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.NONE );
                             break;
                         default:
                             throw new IllegalArgumentException();
