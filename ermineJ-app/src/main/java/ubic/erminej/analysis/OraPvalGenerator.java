@@ -206,7 +206,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
          */
         Collection<Gene> filteredGenes = new HashSet<Gene>();
         filteredGenes.addAll( genesAboveThreshold );
-        boolean useMultifunctionalityCorrection = this.settings.isUseMultifunctionalityCorrection();
+        boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection();
         int amountOfCorrection = 2;
         for ( int i = 0; i < amountOfCorrection; i++ ) {
             // shortcut/kludge to get multiple mf hits -- should just work with the ranked one.

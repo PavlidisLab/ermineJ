@@ -14,6 +14,7 @@
  */
 package ubic.erminej.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,8 +27,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import cern.colt.list.DoubleArrayList;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.jet.math.Functions;
 
+import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
+import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.Rank;
 
 /**
@@ -68,6 +74,44 @@ public class Multifunctionality {
     public Multifunctionality( GeneAnnotations go ) {
         this.geneAnnots = go;
         init();
+    }
+
+    /**
+     * @param geneScores
+     * @return
+     */
+    public Map<Gene, Double> adjustScores( GeneScores geneScores ) {
+        Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
+
+        DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
+        DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
+
+        List<Gene> genesInSomeOrder = new ArrayList<Gene>( geneToScoreMap.keySet() );
+
+        int i = 0;
+        for ( Gene g : genesInSomeOrder ) {
+            Double mf = this.getMultifunctionalityRank( g );
+            Double s = geneToScoreMap.get( g );
+            scores.set( i, s );
+            mfs.set( i, mf ); // <- these are alread ranks.
+            i++;
+        }
+
+        DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
+        scoreRanks.assign( Functions.div( scoreRanks.size() ) );
+
+        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores );
+
+        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+
+        Map<Gene, Double> result = new HashMap<Gene, Double>();
+
+        for ( i = 0; i < residuals.size(); i++ ) {
+            result.put( genesInSomeOrder.get( i ), residuals.get( i ) );
+        }
+
+        return result;
+
     }
 
     /**
@@ -178,7 +222,8 @@ public class Multifunctionality {
 
     /**
      * @param gene
-     * @return multifunctionality score. Note that this score by itself is not all that useful; use the rank instead.
+     * @return multifunctionality score. Note that this score by itself is not all that useful; use the rank instead; or
+     *         for a "human-readable" version use the number of GO terms, which this approximates (in terms of ranks).
      *         Higher values indicate higher multifunctionality
      */
     public double getMultifunctionalityScore( Gene gene ) {

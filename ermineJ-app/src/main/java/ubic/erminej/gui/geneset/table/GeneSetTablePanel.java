@@ -351,7 +351,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 + runSettings.getMinClassSize() + "<br>" );
         if ( runSettings.getDoLog() ) tooltip += "Negative log transformed<br>";
 
-        if ( runSettings.isUseMultifunctionalityCorrection() ) {
+        if ( runSettings.useMultifunctionalityCorrection() ) {
             tooltip += "Multifunctionality corrected<br>";
         }
 

@@ -41,6 +41,7 @@ import org.jfree.data.xy.XYSeries;
 
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
+import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.Rank;
 import ubic.basecode.math.Smooth;
 import ubic.erminej.data.Gene;
@@ -74,9 +75,76 @@ public class MultiFuncDiagWindow extends JFrame {
 
         if ( geneScores != null ) {
             tabs.addTab( "Bias", multifunctionalityBias( geneAnnots, geneScores ) );
+            tabs.addTab( "Correct", regressed( geneAnnots, geneScores ) );
         }
 
         this.add( tabs );
+    }
+
+    /**
+     * @param geneAnnots
+     * @param geneScores
+     * @return
+     */
+    private JPanel regressed( GeneAnnotations geneAnnots, GeneScores geneScores ) {
+        Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
+
+        DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
+        DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
+
+        int i = 0;
+        for ( Gene g : geneToScoreMap.keySet() ) {
+            // Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityScore( g );
+            Double mf = ( double ) geneAnnots.getMultifunctionality().getNumGoTerms( g );
+
+            Double s = geneToScoreMap.get( g );
+            scores.set( i, s );
+            mfs.set( i, mf );
+            i++;
+        }
+
+        // DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
+        // scoreRanks.assign( Functions.div( scoreRanks.size() ) );
+
+        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores );
+
+        // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+
+        DoubleMatrix1D fittedValues = fit.getFitted().viewRow( 0 );
+
+        double[][] rawSeries = new double[2][fittedValues.size()];
+        double[][] fittedSeries = new double[2][fittedValues.size()];
+        for ( i = 0; i < fittedValues.size(); i++ ) {
+
+            // X values are the same.
+            rawSeries[0][i] = mfs.get( i );
+            fittedSeries[0][i] = mfs.get( i );
+
+            // plotting residuals not so useful
+            rawSeries[1][i] = scores.get( i );
+            fittedSeries[1][i] = fittedValues.get( i );
+
+        }
+
+        DefaultXYDataset ds = new DefaultXYDataset();
+        ds.addSeries( "Raw", rawSeries );
+        ds.addSeries( "Fit", fittedSeries );
+
+        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Multifunctionality", "Score", ds,
+                PlotOrientation.VERTICAL, false, false, false );
+        Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
+        c.setTitle( "Regression" );
+        XYPlot plot = c.getXYPlot();
+        plot.setRangeGridlinesVisible( false );
+        plot.getRenderer().setSeriesPaint( 0, Color.GRAY );
+        plot.getRenderer().setSeriesPaint( 1, Color.black );
+        plot.getRenderer().setSeriesShape( 0, circle );
+        plot.getRenderer().setSeriesShape( 1, circle );
+        plot.setDomainGridlinesVisible( false );
+        plot.setBackgroundPaint( Color.white );
+        ChartPanel p = new ChartPanel( c );
+        return p;
+
     }
 
     /**
@@ -110,6 +178,7 @@ public class MultiFuncDiagWindow extends JFrame {
 
         for ( int i = 0; i < array[1].length; i++ ) {
             ser.add( array[0][i], scoreRanks.get( i ) );
+            // ser.add( array[0][i], scores.get( i ) );
         }
 
         DefaultXYDataset ds = new DefaultXYDataset();

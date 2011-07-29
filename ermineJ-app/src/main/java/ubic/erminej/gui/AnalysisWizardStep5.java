@@ -253,17 +253,34 @@ public class AnalysisWizardStep5 extends WizardStep {
             oraPanel.add( jCheckBoxDoLog );
             oraPanel.add( jCheckBoxBigIsBetter );
             oraPanel.add( jCheckBoxDoMultiFuncCorr );
+
+            // temporary - until we have it enabled for GSR.
+            jCheckBoxDoMultiFuncCorr.setEnabled( true );
+            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+
             step5Panel.add( oraPanel );
             this.addHelp( extraHelp );
         } else if ( analysisType.equals( Method.GSR ) ) {
             resampPanel.add( jCheckBoxDoLog, null );
             resampPanel.add( jCheckBoxBigIsBetter );
             resampPanel.add( subPanel );
+            resampPanel.add( jCheckBoxDoMultiFuncCorr );
+
+            // temporary - until we have it enabled for GSR.
+            jCheckBoxDoMultiFuncCorr.setEnabled( false );
+            jCheckBoxDoMultiFuncCorr.setSelected( false );
+
             this.addHelp( extraHelp );
             step5Panel.add( resampPanel, null );
         } else if ( analysisType.equals( Method.ROC ) ) {
             rocPanel.add( jCheckBoxDoLog, null );
             rocPanel.add( jCheckBoxBigIsBetter, null );
+            rocPanel.add( jCheckBoxDoMultiFuncCorr );
+
+            // temporary - until we have it enabled for GSR.
+            jCheckBoxDoMultiFuncCorr.setEnabled( true );
+            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+
             this.addHelp( extraHelp );
             step5Panel.add( rocPanel, null );
         } else if ( analysisType.equals( Method.CORR ) ) {
@@ -307,6 +324,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         jCheckBoxDoLog.setSelected( settings.getDoLog() );
         jCheckBoxBigIsBetter.setSelected( settings.getBigIsBetter() );
         jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
+        jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
     }
 
     /**

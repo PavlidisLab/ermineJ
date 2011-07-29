@@ -66,9 +66,25 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         int count = 0;
 
-        geneRanks = Rank.rankTransform( geneScores1.getGeneToScoreMap() );
+        Map<Gene, Double> geneToScoreMap = geneScores1.getGeneToScoreMap();
+        Map<Probe, Double> probeToScoreMap = geneScores1.getProbeToScoreMap();
 
-        probeRanks = Rank.rankTransform( geneScores1.getProbeToScoreMap() );
+        if ( settings.useMultifunctionalityCorrection() ) {
+            geneToScoreMap = this.geneAnnots.getMultifunctionality().adjustScores( geneScores1 );
+
+            probeToScoreMap = new HashMap<Probe, Double>();
+
+            for ( Gene g : geneToScoreMap.keySet() ) {
+                for ( Probe p : g.getProbes() ) {
+                    probeToScoreMap.put( p, geneToScoreMap.get( g ) );
+                }
+            }
+
+        }
+
+        geneRanks = Rank.rankTransform( geneToScoreMap );
+
+        probeRanks = Rank.rankTransform( probeToScoreMap );
 
         if ( settings.getUseWeights() ) {
             totalSize = geneRanks.size();

@@ -353,7 +353,7 @@ public class SettingsHolder {
     /**
      * @return true if multifunctionality corrections should be applied, if possible.
      */
-    public boolean isUseMultifunctionalityCorrection() {
+    public boolean useMultifunctionalityCorrection() {
         return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, false );
     }
 
