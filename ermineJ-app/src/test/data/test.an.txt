@@ -1,7 +1,8 @@
+# has 19 genes for 22 probes
 probe Id	Gene	Description	GOterms
 ProbeA	GeneA	genea	GO:1|GO:2|GO:3
-ProbeB	GeneB	geneb appears thrice	GO:1
-ProbeC	GeneB	geneb appears thrice	GO:1
+ProbeB	GeneB	geneb appears twice	GO:1
+ProbeC	GeneB	geneb appears twice	GO:1
 ProbeD	GeneC	genec	GO:2
 ProbeE	GeneD	gened appears twice	GO:3
 ProbeF	GeneD	gened appears twice	GO:3

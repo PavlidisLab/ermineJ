@@ -133,7 +133,7 @@ public class GeneScores {
     }
 
     /**
-     * @return The annotation set that was used to set this up. 
+     * @return The annotation set that was used to set this up.
      */
     public GeneAnnotations getGeneAnnots() {
         return geneAnnots;

@@ -18,6 +18,7 @@
  */
 package ubic.erminej.analysis;
 
+import cern.jet.math.Arithmetic;
 import ubic.erminej.analysis.OraPvalGenerator;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
@@ -51,9 +52,20 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     }
 
     public void testClassPval2() {
-        // phyper(lower.tail=F, 1,4,16,2) + dhyper(1, 4, 16, 2);
 
-        double expectedReturn = 0.36842;
+        // there are 19 genes; GO:2 has 4 members, so it should be 15 not in the group
+
+        // / dhyper(1, 4, 15,2) + dhyper(2, 4, 15,2)
+        // incredibly, phyper(1, 4, 15, 2) gives the wrong answer of zero.
+        // there is a 0.2 prob of a hit per trial; total should be just shy of 0.4
+
+        double expectedReturn = 0.38596;
+
+        double t = test.getGeneScoreThreshold();
+        assertEquals( -Arithmetic.log10( 0.015 ), t, 0.001 );
+
+        assertEquals( 2, test.getNumGenesOverThreshold() ); // checked
+        assertEquals( 17, test.getNumGenesUnderThreshold() ); // checked
 
         GeneSetResult r = test.classPval( new GeneSetTerm( "GO:2" ) );
         assertNotNull( r );
@@ -63,7 +75,12 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     }
 
     public void testClassPval1() {
-        double expectedReturn = 0.28947;
+        double expectedReturn = 0.3216374;
+
+        assertEquals( 11, scores.getGeneAnnots().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
+
+        // two hits
+        // dhyper(2, 11, 8, 2)
 
         GeneSetResult r = test.classPval( new GeneSetTerm( "GO:1" ) );
 
@@ -74,13 +91,13 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     }
 
     public void testClassPval3() {
-        double expectedReturn = 0.7631579;
+        double expectedReturn = 0.7894737;
 
         GeneSetResult r = test.classPval( new GeneSetTerm( "GO:3" ) );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
 
-        // phyper(lower.tail=F, 1,10,10,2) + dhyper(1, 10,10, 2)
+        // dhyper(1, 10,9, 2) + dhyper(2, 10,9, 2)
 
         assertEquals( expectedReturn, actualReturn, 0.0001 );
     }

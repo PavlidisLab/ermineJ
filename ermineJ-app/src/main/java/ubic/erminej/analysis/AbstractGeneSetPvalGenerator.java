@@ -67,10 +67,6 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
         this.actualSizes = csc.getActualSizes();
         this.csc = csc;
 
-        assert this.geneAnnots.isReadOnly();
-        if ( !this.geneAnnots.isReadOnly() ) {
-            throw new IllegalStateException( "Inappropriate use of the raw annotations during analysis." );
-        }
     }
 
     /**

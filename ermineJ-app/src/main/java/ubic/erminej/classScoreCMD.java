@@ -186,7 +186,8 @@ public class classScoreCMD {
                 .create( 'A' ) );
 
         options.addOption( OptionBuilder.withDescription(
-                "Sets 'big is better' option for gene scores to true [default = false]" ).create( 'b' ) );
+                "Sets 'big is better' option for gene scores to true [default = "
+                        + settings.getDefaultSettingsValue( Settings.BIG_IS_BETTER ) + "]" ).create( 'b' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" ).withDescription(
                 "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" ).withArgName( "file" ).create(
@@ -254,13 +255,21 @@ public class classScoreCMD {
                 "Score file, required for all but profile correlation method" ).withArgName( "file" ).create( 's' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "threshold" ).withDescription(
-                "Score threshold, only used for ORA" ).withArgName( "value" ).create( 't' ) );
+                "Score threshold, only used for ORA; default = "
+                        + settings.getDefaultSettingsValue( Settings.GENE_SCORE_THRESHOLD ) ).withArgName( "value" )
+                .create( 't' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the minimum class size" ).withArgName(
-                "integer" ).withLongOpt( "minClassSize" ).create( 'y' ) );
+        options.addOption( OptionBuilder.hasArg()
+                .withDescription(
+                        "Sets the minimum class size; default = "
+                                + settings.getDefaultSettingsValue( Settings.MIN_CLASS_SIZE ) ).withArgName( "integer" )
+                .withLongOpt( "minClassSize" ).create( 'y' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Sets the maximum class size" ).withArgName(
-                "integer" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
+        options.addOption( OptionBuilder.hasArg()
+                .withDescription(
+                        "Sets the maximum class size; default = "
+                                + settings.getDefaultSettingsValue( Settings.MAX_CLASS_SIZE ) ).withArgName( "integer" )
+                .withLongOpt( "maxClassSize" ).create( 'x' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" ).withDescription(
                 "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
@@ -409,7 +418,9 @@ public class classScoreCMD {
                             break;
                         case 2:
                             settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
-
+                            break;
+                        case 3: // not actually used.
+                            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.NONE );
                             break;
                         default:
                             throw new IllegalArgumentException();

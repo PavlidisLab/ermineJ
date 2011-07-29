@@ -641,6 +641,9 @@ public class Settings extends SettingsHolder {
 
         logLocale();
 
+        File newConfigFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                + USERGUI_PROPERTIES );
+
         try {
             URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
@@ -650,25 +653,36 @@ public class Settings extends SettingsHolder {
         } catch ( ConfigurationException e ) {
             try {
                 log.info( "User properties file doesn't exist, creating new one from defaults" );
-                URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
+                URL defaultConfigFileLocation = this.getClass().getResource(
+                        "/ubic/erminej/" + USERGUI_DEFAULT_PROPERTIES );
+
+                // URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
 
                 if ( defaultConfigFileLocation == null ) {
                     throw new ConfigurationException( "Defaults not found either!" );
                 }
 
                 log.info( "Found defaults at " + defaultConfigFileLocation );
-                this.config = new PropertiesConfiguration( USERGUI_DEFAULT_PROPERTIES );
-
-                File newConfigFile = new File( System.getProperty( "user.home" )
-                        + System.getProperty( "file.separator" ) + USERGUI_PROPERTIES );
+                PropertiesConfiguration defaultConfig = new PropertiesConfiguration( defaultConfigFileLocation );
 
                 this.config = new PropertiesConfiguration( newConfigFile );
                 this.config.setPath( newConfigFile.getAbsolutePath() );
+                Iterator keys = defaultConfig.getKeys();
+                for ( ; keys.hasNext(); ) {
+                    String k = ( String ) keys.next();
+                    this.config.addProperty( k, defaultConfig.getProperty( k ) );
+                }
 
                 log.info( "Saved the new configuration in " + config.getPath() );
 
             } catch ( ConfigurationException e1 ) {
-                log.error( "Filed to initialize the configuration file: " + e1, e1 );
+                log.error( "Failed to initialize the configuration file, falling back" );
+                try {
+                    this.config = new PropertiesConfiguration( newConfigFile );
+                } catch ( ConfigurationException e2 ) {
+                    throw new RuntimeException( "Completely failed to get configuration" );
+                }
+                this.config.setPath( newConfigFile.getAbsolutePath() );
             }
         }
 

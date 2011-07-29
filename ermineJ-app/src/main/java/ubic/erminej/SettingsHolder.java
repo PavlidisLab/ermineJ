@@ -17,7 +17,9 @@ package ubic.erminej;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -50,7 +52,8 @@ public class SettingsHolder {
      * What to do when there are multiple values for a gene.
      */
     public enum MultiProbeHandling {
-        BEST, MEAN
+        BEST, MEAN, NONE
+        /* NONE: not used now */
     }
 
     /**
@@ -59,6 +62,8 @@ public class SettingsHolder {
     public enum MultiTestCorrMethod {
         BONFERONNI, WESTFALLYOUNG, BENJAMINIHOCHBERG
     }
+
+    public static Map<String, Object> defaults = new HashMap<String, Object>();
 
     // not this is also listed in erminejdefault.properties.
     private static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@";
@@ -103,7 +108,52 @@ public class SettingsHolder {
     protected static final String DEFAULT_CUSTOM_GENE_SET_DIR_NAME = "genesets";
     protected static final String DEFAULT_USER_DATA_DIR_NAME = "ermineJ.data";
 
+    protected static String getDefaultUserClassesDirPath() {
+        return getDefaultUserDataDirPath() + System.getProperty( "file.separator" ) + DEFAULT_CUSTOM_GENE_SET_DIR_NAME;
+    }
+
+    /**
+     * @return
+     */
+    protected static String getDefaultUserDataDirPath() {
+        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                + DEFAULT_USER_DATA_DIR_NAME;
+        return dataDirName;
+    }
+
     protected PropertiesConfiguration config = null;
+
+    static {
+        defaults.put( QUANTILE_CONFIG_NAME, 50 );
+        defaults.put( MIN_CLASS_SIZE, 5 );
+        defaults.put( MAX_CLASS_SIZE, 50 );
+        defaults.put( ITERATIONS, 100 );
+        defaults.put( GENE_SCORE_THRESHOLD, 0.001 );
+        defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
+        defaults.put( SettingsHolder.GENE_URL_BASE, DEFAULT_GENE_URL_BASE );
+        defaults.put( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
+        defaults.put( FILTER_NONSPECIFIC, false );
+        defaults.put( DO_LOG, true );
+        defaults.put( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
+        defaults.put( DATA_DIRECTORY, getDefaultUserDataDirPath() );
+        defaults.put( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, getDefaultUserClassesDirPath() );
+        defaults.put( ANNOT_FORMAT, Format.DEFAULT.toString() );
+        defaults.put( BIG_IS_BETTER, false );
+        defaults.put( USE_USER_DEFINED_GROUPS, true );
+        defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, false );
+
+        defaults.put( USE_MOL_FUNC, true );
+        defaults.put( DO_LOG, true );
+        defaults.put( USE_CELL_COMP, 50 );
+        defaults.put( USE_BIOL_PROC, true );
+        defaults.put( SCORE_COL, 2 );
+        defaults.put( QUANTILE_CONFIG_NAME, 50 );
+        defaults.put( QUANTILE_CONFIG_NAME, 50 );
+        defaults.put( QUANTILE_CONFIG_NAME, 50 );
+        defaults.put( QUANTILE_CONFIG_NAME, 50 );
+        defaults.put( QUANTILE_CONFIG_NAME, 50 );
+
+    }
 
     /**
      * @param oldConfig
@@ -180,6 +230,10 @@ public class SettingsHolder {
         return DEFAULT_GENE_URL_BASE;
     }
 
+    public Object getDefaultSettingsValue( String propertyName ) {
+        return defaults.get( propertyName );
+    }
+
     /**
      * @return
      */
@@ -191,15 +245,14 @@ public class SettingsHolder {
      * @return
      */
     public boolean getFilterNonSpecific() {
-        return config.getBoolean( FILTER_NONSPECIFIC );
+        return config.getBoolean( FILTER_NONSPECIFIC, false );
     }
 
     /**
      * @return
      */
     public MultiProbeHandling getGeneRepTreatment() {
-        String storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() );
-
+        String storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
         return Settings.MultiProbeHandling.valueOf( storedValue );
     }
 
@@ -337,7 +390,7 @@ public class SettingsHolder {
 
     /**
      * @return true if multiple values for a gene should be combined, or whether each probe should be treated
-     *         independently regardless
+     *         independently regardless; basically this is always going to be true.
      * @see getGeneRepTreatment for setting of how the combination occurs.
      */
     public boolean getUseWeights() {
@@ -348,13 +401,6 @@ public class SettingsHolder {
 
     public boolean isTester() {
         return config.getBoolean( IS_TESTER, false );
-    }
-
-    /**
-     * @return true if multifunctionality corrections should be applied, if possible.
-     */
-    public boolean useMultifunctionalityCorrection() {
-        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, false );
     }
 
     public void setUseUserDefined( boolean b ) {
@@ -373,21 +419,15 @@ public class SettingsHolder {
         return this.getDoLog() && !this.getBigIsBetter() || !this.getDoLog() && this.getBigIsBetter();
     }
 
+    /**
+     * @return true if multifunctionality corrections should be applied, if possible.
+     */
+    public boolean useMultifunctionalityCorrection() {
+        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, false );
+    }
+
     protected PropertiesConfiguration getConfig() {
         return config;
-    }
-
-    protected String getDefaultUserClassesDirPath() {
-        return getDefaultUserDataDirPath() + System.getProperty( "file.separator" ) + DEFAULT_CUSTOM_GENE_SET_DIR_NAME;
-    }
-
-    /**
-     * @return
-     */
-    protected String getDefaultUserDataDirPath() {
-        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                + DEFAULT_USER_DATA_DIR_NAME;
-        return dataDirName;
     }
 
     protected Object getProperty( String propertyName ) {

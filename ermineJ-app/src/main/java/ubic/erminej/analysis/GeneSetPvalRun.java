@@ -331,7 +331,7 @@ public class GeneSetPvalRun {
 
                 OraPvalGenerator pvg = new OraPvalGenerator( settings, geneScores, geneData, csc );
 
-                int numOver = pvg.getNumOverThreshold();
+                int numOver = pvg.getNumGenesOverThreshold();
 
                 if ( numOver == 0 ) {
                     if ( messenger != null ) messenger.showError( "No genes selected at that threshold!" );

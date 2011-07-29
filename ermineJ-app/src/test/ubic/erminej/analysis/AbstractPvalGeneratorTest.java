@@ -23,6 +23,7 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder.MultiProbeHandling;
 import ubic.erminej.analysis.GeneSetSizesForAnalysis;
 import ubic.erminej.analysis.OraPvalGenerator;
 import ubic.erminej.data.GeneAnnotationParser;
@@ -58,11 +59,14 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         s.setGeneScoreThreshold( 0.015 );
         s.setMinClassSize( 2 );
         s.setScoreCol( 2 );
+        s.setUseMultifunctionalityCorrection( false );
         s.setDoLog( true );
         s.setBigIsBetter( false );
         s.setUseBiologicalProcess( true );
         s.setUseCellularComponent( true );
         s.setUseMolecularFunction( true );
+        s.setGeneRepTreatment( MultiProbeHandling.MEAN );
+
         gon = new GeneSetTerms( isi );
         GeneAnnotationParser p = new GeneAnnotationParser( gon );
         annotations = p.read( ism, Format.DEFAULT );
