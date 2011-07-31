@@ -21,6 +21,8 @@ package ubic.erminej;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -256,22 +258,37 @@ public class AnalysisThread extends Thread {
         } else {
             if ( messenger != null )
                 messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
-            DoubleMatrixReader r = new DoubleMatrixReader();
-
-            DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName() );
-
-            rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
-            rawData.setColumnNames( omatrix.getColNames() );
-            for ( int i = 0; i < omatrix.rows(); i++ ) {
-                String n = omatrix.getRowName( i );
-                Probe p = geneAnnots.findProbe( n );
-                if ( p == null ) {
-                    throw new IllegalArgumentException( "Some probes in the data don't match those in the annotations" );
-                }
-                rawData.setRowName( p, i );
-            }
+            rawData = readDataMatrixForAnalysis();
 
             rawDataSets.put( settings.getRawDataFileName(), rawData );
+        }
+        return rawData;
+    }
+
+    private DoubleMatrix<Probe, String> readDataMatrixForAnalysis() throws IOException {
+        DoubleMatrix<Probe, String> rawData;
+        DoubleMatrixReader r = new DoubleMatrixReader();
+
+        Collection<String> usableRowNames = new HashSet<String>();
+        for ( Probe p : geneAnnots.getProbes() ) {
+            usableRowNames.add( p.getName() );
+        }
+
+        DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName(), usableRowNames, settings
+                .getDataCol() );
+
+        if ( omatrix.rows() == 0 ) {
+            throw new IllegalArgumentException(
+                    "No rows were read from the file for the probes in the annotations." );
+        }
+
+        rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
+        rawData.setColumnNames( omatrix.getColNames() );
+        for ( int i = 0; i < omatrix.rows(); i++ ) {
+            String n = omatrix.getRowName( i );
+            Probe p = geneAnnots.findProbe( n );
+            assert p != null;
+            rawData.setRowName( p, i );
         }
         return rawData;
     }

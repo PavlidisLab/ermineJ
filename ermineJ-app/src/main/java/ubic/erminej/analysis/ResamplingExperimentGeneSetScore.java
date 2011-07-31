@@ -18,15 +18,6 @@
  */
 package ubic.erminej.analysis;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
 import org.apache.commons.lang.ArrayUtils;
 
 import ubic.basecode.math.DescriptiveWithMissing;
@@ -34,14 +25,12 @@ import ubic.basecode.math.RandomChooser;
 import ubic.basecode.math.Stats;
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
-
-import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Histogram;
-import ubic.erminej.data.Probe;
+import cern.colt.list.DoubleArrayList;
+import cern.jet.stat.Descriptive;
 
 /**
  * Calculates a background distribution for class sscores derived from randomly selected individual gene scores...and
@@ -52,10 +41,7 @@ import ubic.erminej.data.Probe;
  */
 public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetScore {
     private Double[] groupPvals = null; // pvalues for groups.
-    private Double[] pvals = null; // pvalues for probes.
 
-    private Map<Probe, Double> probePvalMap; // probes -> pval
-    private boolean useWeights;
     private static int quantile = 50;
     private static double quantfract = 0.5;
     private Settings.GeneScoreMethod method;
@@ -96,13 +82,8 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         }
 
         // do the right thing if we are using weights.
-        if ( useWeights ) {
-            numGenes = groupPvals.length;
-            in_pval = groupPvals;
-        } else {
-            numGenes = pvals.length;
-            in_pval = pvals;
-        }
+        numGenes = groupPvals.length;
+        in_pval = groupPvals;
 
         if ( numGenes == 0 ) {
             throw new IllegalStateException( "No pvalues!" );
@@ -182,7 +163,6 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();
         this.setQuantile( settings.getQuantile() );
-        this.useWeights = ( Boolean.valueOf( settings.getUseWeights() ) ).booleanValue();
         this.setMethod( settings.getGeneSetResamplingScoreMethod() );
         this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
         this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
@@ -191,9 +171,8 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         }
 
         this.numClasses = classMaxSize - classMinSize + 1;
-        pvals = geneScores.getScores(); // array of pvalues.
+
         groupPvals = geneScores.getGeneScores();
-        probePvalMap = geneScores.getProbeToScoreMap(); // reference to the probe -> pval map.
 
         this.setHistogramRange();
         this.hist = new Histogram( numClasses, classMinSize, numRuns, histogramMax, histogramMin );
@@ -203,7 +182,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @return double[]
      */
     public Double[] get_in_pvals() {
-        return useWeights ? groupPvals : pvals;
+        return groupPvals;
     }
 
     /**
@@ -219,53 +198,6 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      */
     public int get_quantile() {
         return quantile;
-    }
-
-    /**
-     * @return Map
-     */
-    public Map<Probe, Double> get_map() {
-        return probePvalMap;
-    }
-
-    /**
-     * @param shuffle boolean
-     * @return Map
-     */
-    public Map<Probe, Double> get_map( boolean shuffle ) {
-
-        if ( shuffle ) {
-            Map<Probe, Double> scrambled_probe_pval_map = new LinkedHashMap<Probe, Double>();
-
-            Collection<Double> values = probePvalMap.values();
-            List<Double> valvec = new Vector<Double>( values );
-            Collections.shuffle( valvec );
-
-            // randomly associate keys and values
-            int i = 0;
-            Set<Probe> keys = probePvalMap.keySet();
-            Iterator<Probe> it = keys.iterator();
-            while ( it.hasNext() ) {
-                scrambled_probe_pval_map.put( it.next(), valvec.get( i ) );
-                i++;
-            }
-            return scrambled_probe_pval_map;
-
-        }
-        return probePvalMap;
-
-    }
-
-    /**
-     * @param probe_id String
-     * @return double
-     */
-    public double get_value_map( String probe_id ) {
-        double value = 0.0;
-        if ( probePvalMap.get( probe_id ) != null ) {
-            value = Double.parseDouble( ( probePvalMap.get( probe_id ) ).toString() );
-        }
-        return value;
     }
 
     /**
@@ -304,15 +236,14 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
     /**  */
     public void setHistogramRange() {
-        if ( groupPvals == null || pvals == null ) {
+        if ( groupPvals == null ) {
             throw new IllegalStateException( "Null gene score arrays for histogram range setting" );
         }
 
-        double[] ppvals = ArrayUtils.toPrimitive( pvals );
         double[] pgpvals = ArrayUtils.toPrimitive( groupPvals );
 
-        histogramMax = Descriptive.max( new DoubleArrayList( useWeights ? pgpvals : ppvals ) );
-        histogramMin = Descriptive.min( new DoubleArrayList( useWeights ? pgpvals : ppvals ) );
+        histogramMax = Descriptive.max( new DoubleArrayList( pgpvals ) );
+        histogramMin = Descriptive.min( new DoubleArrayList( pgpvals ) );
 
         if ( histogramMax <= histogramMin ) {
             throw new IllegalStateException( "Histogram has no range (max " + histogramMax + " <= min " + histogramMin

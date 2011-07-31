@@ -23,8 +23,7 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 import ubic.erminej.Settings;
-import ubic.erminej.SettingsHolder.MultiProbeHandling;
-import ubic.erminej.analysis.GeneSetSizesForAnalysis;
+import ubic.erminej.SettingsHolder.MultiProbeHandling; 
 import ubic.erminej.analysis.OraPvalGenerator;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
@@ -44,8 +43,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
     protected InputStream ism = null;
     protected InputStream isi = null;
     protected Settings s = null;
-    protected GeneSetTerms gon = null;
-    protected GeneSetSizesForAnalysis sizeComputer = null;
+    protected GeneSetTerms gon = null; 
 
     @Override
     protected void setUp() throws Exception {
@@ -78,8 +76,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
 
         assertNotNull( scores.getGeneScores() );
         assertNotNull( scores.getProbeToScoreMap() );
-
-        sizeComputer = new GeneSetSizesForAnalysis( annotations, scores, s.getSettingsHolder() );
+ 
 
         super.setUp();
     }

@@ -28,8 +28,7 @@ import org.apache.commons.lang.ArrayUtils;
 import ubic.basecode.util.RegressionTesting;
 
 import junit.framework.TestCase;
-import ubic.erminej.Settings;
-import ubic.erminej.SettingsHolder;
+import ubic.erminej.Settings; 
 import ubic.erminej.data.GeneScores;
 
 /**

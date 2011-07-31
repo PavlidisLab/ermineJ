@@ -43,7 +43,6 @@ import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
-import ubic.erminej.data.Probe;
 
 /**
  * Perform multiple test correction on class scores. Multiple test correction is based on the non-redundant set of gene
@@ -59,7 +58,6 @@ public class MultipleTestCorrector extends AbstractLongTask {
     private Map<GeneSetTerm, GeneSetResult> results;
     private Histogram hist;
     private GeneAnnotations geneData;
-    private GeneSetSizesForAnalysis csc;
     private NumberFormat nf = NumberFormat.getInstance();
     private GeneScores geneScores;
     private SettingsHolder settings;
@@ -68,14 +66,12 @@ public class MultipleTestCorrector extends AbstractLongTask {
     Map<GeneSetTerm, Collection<GeneSetTerm>> usedToSkipped = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
 
     public MultipleTestCorrector( SettingsHolder set, List<GeneSetTerm> sc, Histogram h, GeneAnnotations geneData,
-            GeneSetSizesForAnalysis csc, GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results,
-            StatusViewer messenger ) {
+            GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results, StatusViewer messenger ) {
         this.settings = set;
         this.sortedclasses = sc;
         this.results = results;
         this.hist = h;
         this.geneData = geneData;
-        this.csc = csc;
         this.geneScores = geneScores;
         this.messenger = messenger;
 
@@ -211,7 +207,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
         Collections.reverse( toUseForMTC ); // start from the worst class.
         Map<GeneSetTerm, Double> permscores;
 
-        GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc );
+        GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist );
 
         for ( int i = 0; i < trials; i++ ) {
             // System.err.println("Trial: " + i );
@@ -224,15 +220,6 @@ public class MultipleTestCorrector extends AbstractLongTask {
             // to
             // genes.
 
-            // shuffle. Stupidity: this is a different permutation
-            // than the group one. If we are using weights, it DOES
-            // NOT MATTER - it doesn't even have to be shuffled (it is
-            // used only to check for presence of a probe in the data
-            // set). If we are not using weights, it only affects the
-            // hypergeometric pvalues. (todo: add correction for those
-            // values) So we don't even bother shuffling it.
-            Map<Probe, Double> scprobepvalmap = geneScores.getProbeToScoreMap();
-
             // Just for AROC:
             /*
              * doesn't seem to get used??? (homin 7/25) Map scinput_rank_map; if (weight_on) { scinput_rank_map =
@@ -240,7 +227,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
              */
 
             // / permscores contains a list of the p values for the shuffled data.
-            permscores = cver.class_v_pval_generator( scgroup_pval_map, scprobepvalmap ); // end of step 1.
+            permscores = cver.class_v_pval_generator( scgroup_pval_map ); // end of step 1.
 
             int j = 0;
             double permp = 0.0;
@@ -300,7 +287,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
                      * monitor what happens to the best class.
                      */
                     System.err.println( "Sim " + i + " class# " + j + " " + nextclass + " size="
-                            + res.getEffectiveSize() + " q=" + nf.format( q ) + " qprev=" + nf.format( qprev )
+                            + res.getNumGenes() + " q=" + nf.format( q ) + " qprev=" + nf.format( qprev )
                             + " pperm=" + nf.format( permp ) + " actp=" + nf.format( actual_p ) + " countj="
                             + counts[j] + " currentp=" + ( double ) counts[j] / ( i + 1 ) );
 

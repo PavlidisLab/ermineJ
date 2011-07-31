@@ -37,7 +37,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         super.setUp();
 
-        test = new OraPvalGenerator( s, super.scores, annotations, sizeComputer );
+        test = new OraPvalGenerator( s, super.scores, annotations );
         test.setGlobalMissingAspectTreatedAsUsable( true );
 
     }

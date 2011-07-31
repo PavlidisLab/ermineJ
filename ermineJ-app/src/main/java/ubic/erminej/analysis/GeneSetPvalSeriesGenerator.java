@@ -21,14 +21,13 @@ package ubic.erminej.analysis;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
- 
+
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
-import ubic.erminej.data.Probe;
 
 /**
  * Generate gene set p values for a bunch of gene sets.
@@ -40,9 +39,8 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
     private Histogram hist;
 
-    public GeneSetPvalSeriesGenerator( SettingsHolder settings, GeneAnnotations geneData, Histogram hi,
-            GeneSetSizesForAnalysis csc ) {
-        super( settings, geneData, csc );
+    public GeneSetPvalSeriesGenerator( SettingsHolder settings, GeneAnnotations geneData, Histogram hi ) {
+        super( settings, geneData );
         this.hist = hi;
 
     }
@@ -51,19 +49,17 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
      * Generate a complete set of class results. The arguments are not constant under pemutations.
      * 
      * @param group_pval_map a <code>Map</code> value
-     * @param probesToPvals a <code>Map</code> value
      * @return
      */
-    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( Map<Gene, Double> geneToScoreMap,
-            Map<Probe, Double> probeToScoreMap ) {
+    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( Map<Gene, Double> geneToScoreMap ) {
         Map<GeneSetTerm, GeneSetResult> results;
         results = new HashMap<GeneSetTerm, GeneSetResult>();
-        ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, csc, hist );
+        ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots,   hist );
 
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
             GeneSetTerm className = iter.next();
-            GeneSetResult res = cpv.classPval( className, geneToScoreMap, probeToScoreMap );
+            GeneSetResult res = cpv.classPval( className, geneToScoreMap );
             if ( res != null ) {
                 results.put( className, res );
             }
@@ -75,15 +71,14 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
      * Same thing as class_pval_generator, but returns a collection of scores (pvalues) (see below) instead of adding
      * them to the results object. This is used to get class pvalues for permutation analysis.
      */
-    public Map<GeneSetTerm, Double> class_v_pval_generator( Map<Gene, Double> group_pval_map,
-            Map<Probe, Double> probesToPvals ) {
+    public Map<GeneSetTerm, Double> class_v_pval_generator( Map<Gene, Double> group_pval_map ) {
         Map<GeneSetTerm, Double> results;
         results = new HashMap<GeneSetTerm, Double>();
-        ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, csc, hist );
+        ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots,  hist );
 
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             GeneSetTerm className = iter.next();
-            double pval = cpv.classPvalue( className, group_pval_map, probesToPvals );
+            double pval = cpv.classPvalue( className, group_pval_map );
 
             log.debug( "pval: " + pval );
 

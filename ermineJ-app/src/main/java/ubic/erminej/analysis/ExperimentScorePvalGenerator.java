@@ -23,14 +23,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
-import ubic.erminej.data.Probe;
 
 /**
  * Generates gene set p values using the resampling-based 'experiment score' method of Pavlidis et al.
@@ -48,8 +46,8 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param csc
      * @param hi
      */
-    public ExperimentScorePvalGenerator( SettingsHolder settings, GeneAnnotations a, GeneSetSizesForAnalysis csc, Histogram hi ) {
-        super( settings, a, csc );
+    public ExperimentScorePvalGenerator( SettingsHolder settings, GeneAnnotations a, Histogram hi ) {
+        super( settings, a );
         this.hist = hi;
     }
 
@@ -62,15 +60,14 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param probesToPvals
      * @return
      */
-    public GeneSetResult classPval( GeneSetTerm geneSetName, Map<Gene, Double> geneToPvalMap,
-            Map<Probe, Double> probesToPvals ) {
+    public GeneSetResult classPval( GeneSetTerm geneSetName, Map<Gene, Double> geneToPvalMap ) {
         if ( !super.checkAspectAndRedundancy( geneSetName ) ) return null;
-        int effSize = effectiveSizes.get( geneSetName );
+        int effSize = numGenesInSet( geneSetName );
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
             return null;
         }
 
-        Collection<Probe> values = geneAnnots.getGeneSetProbes( geneSetName );
+        Collection<Gene> values = geneAnnots.getGeneSetGenes( geneSetName );
 
         double[] groupPvalArr = new double[effSize]; // store pvalues for items in
         // the class.
@@ -80,30 +77,20 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         int v_size = 0;
 
         // foreach item in the class.
-        for ( Probe p : values ) {
+        for ( Gene gene : values ) {
             ifInterruptedStop();
 
-            if ( probesToPvals.containsKey( p ) ) { // if it is in the data
+            if ( geneToPvalMap.containsKey( gene ) ) { // if it is in the data
                 // set. This is invariant
                 // under permutations.
 
-                if ( settings.getUseWeights() ) {
+                if ( !record.contains( gene ) ) { // only count it once.
 
-                    Gene gene = p.getGene();
-
-                    if ( !record.contains( gene ) ) { // only count it once.
-
-                        record.add( gene ); // mark
-                        groupPvalArr[v_size] = geneToPvalMap.get( gene );
-                        v_size++;
-                    }
-
-                } else { // no weights - use raw p values for each probe
-
-                    Double pbpval = probesToPvals.get( p );
-                    groupPvalArr[v_size] = pbpval.doubleValue();
+                    record.add( gene ); // mark
+                    groupPvalArr[v_size] = geneToPvalMap.get( gene );
                     v_size++;
                 }
+
             } // if in data set
         } // end of while over items in the class.
 
@@ -118,7 +105,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         // set up the return object.
-        GeneSetResult res = new GeneSetResult( geneSetName, actualSizes.get( geneSetName ), effSize );
+        GeneSetResult res = new GeneSetResult( geneSetName, numProbesInSet( geneSetName ), numGenesInSet( geneSetName ) );
         res.setScore( rawscore );
         res.setPValue( pval );
         return res;

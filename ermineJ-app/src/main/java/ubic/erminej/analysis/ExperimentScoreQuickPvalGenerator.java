@@ -18,17 +18,15 @@
  */
 package ubic.erminej.analysis;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
- 
+
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
-import ubic.erminej.data.Probe;
 
 /**
  * Does the same thing as {@link ExperimentScorePvalGenerator}but is stripped-down for using during resampling.
@@ -38,9 +36,8 @@ import ubic.erminej.data.Probe;
  */
 public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenerator {
 
-    public ExperimentScoreQuickPvalGenerator( SettingsHolder settings, GeneAnnotations a, GeneSetSizesForAnalysis csc,
-            Histogram hi ) {
-        super( settings, a, csc, hi );
+    public ExperimentScoreQuickPvalGenerator( SettingsHolder settings, GeneAnnotations a, Histogram hi ) {
+        super( settings, a, hi );
     }
 
     /**
@@ -52,47 +49,37 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
      * @throws IllegalStateException
      * @return double
      */
-    public double classPvalue( GeneSetTerm geneSetName, Map<Gene, Double> genePvalueMap, Map<Probe, Double> probePvalMap ) {
+    public double classPvalue( GeneSetTerm geneSetName, Map<Gene, Double> genePvalueMap ) {
 
         double pval = 0.0;
         double rawscore = 0.0;
-        Collection<Probe> values = geneAnnots.getGeneSetProbes( geneSetName );
 
         if ( !super.checkAspectAndRedundancy( geneSetName ) ) return -1.0;
 
-        int in_size = effectiveSizes.get( geneSetName ); // effective size of this class.
-        if ( in_size < settings.getMinClassSize() || in_size > settings.getMaxClassSize() ) {
+        int numGenesInSet = numGenesInSet( geneSetName );
+        if ( numGenesInSet < settings.getMinClassSize() || numGenesInSet > settings.getMaxClassSize() ) {
             return -1.0;
         }
 
-        double[] groupPvalArr = new double[in_size]; // store pvalues for items in
+        double[] groupPvalArr = new double[numGenesInSet]; // store pvalues for items in
         // the class.
         Set<Gene> record = new HashSet<Gene>();
 
         int v_size = 0;
 
-        for ( Probe p : values ) {
+        for ( Gene gene : this.geneAnnots.getGeneSetGenes( geneSetName ) ) {
 
-            if ( probePvalMap.containsKey( p ) ) {
-
-                if ( settings.getUseWeights() ) {
-                    Double grouppval = genePvalueMap.get( p.getGene() );
-                    if ( !record.contains( p.getGene() ) ) {
-                        record.add( p.getGene() );
-                        groupPvalArr[v_size] = grouppval.doubleValue();
-                        v_size++;
-                    }
-
-                } else {
-                    throw new IllegalStateException( "Sorry, you can't use this without weights" );
-
-                }
+            Double grouppval = genePvalueMap.get( gene );
+            if ( !record.contains( gene ) ) {
+                record.add( gene );
+                groupPvalArr[v_size] = grouppval.doubleValue();
+                v_size++;
             }
         }
 
-        rawscore = ResamplingExperimentGeneSetScore.computeRawScore( groupPvalArr, in_size, settings
+        rawscore = ResamplingExperimentGeneSetScore.computeRawScore( groupPvalArr, numGenesInSet, settings
                 .getGeneSetResamplingScoreMethod() );
-        pval = scoreToPval( in_size, rawscore );
+        pval = scoreToPval( numGenesInSet, rawscore );
 
         if ( pval < 0 ) {
             throw new IllegalStateException( "Warning, a rawscore yielded an invalid pvalue: Classname: " + geneSetName );

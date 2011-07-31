@@ -357,7 +357,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                 GeneSetResult res = ( GeneSetResult ) value;
                 setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
                         + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
-                        + res.getEffectiveSize() + "<br>Probes used: " + res.getSize() );
+                        + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
             } else {
 
                 String aspect = term.getAspect();

@@ -34,11 +34,12 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
 
     private double pvalue = 1.0;
     private double score = 0.0;
-    private int size = 0;
-    private int effectiveSize = 0;
+    private int numGenes = 0;
     private double correctedPvalue = 0.0;
     private double multifunctionality = 0.5;
     private int rank;
+
+    private int numProbes;
 
     public GeneSetResult() {
         this( null, 0, 0, 0.0, 1.0, 1.0 );
@@ -46,31 +47,30 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
 
     /**
      * @param id
-     * @param name
-     * @param size
-     * @param effectiveSize
+     * @param numProbes (in set)
+     * @param numGenes (in set)
      */
-    public GeneSetResult( GeneSetTerm id, int size, int effectiveSize ) {
+    public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes ) {
         this();
         this.geneSetTerm = id;
-        this.setSizes( size, effectiveSize );
+        this.setSizes( numProbes, numGenes );
     }
 
     /**
      * @param id
      * @param name
-     * @param size
-     * @param effectiveSize
+     * @param numProbes
+     * @param numGenes
      * @param score
      * @param pvalue
      */
-    public GeneSetResult( GeneSetTerm id, int size, int effectiveSize, double score, double pvalue,
+    public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes, double score, double pvalue,
             double correctedPvalue ) {
         this.geneSetTerm = id;
         this.pvalue = pvalue;
         this.score = score;
-        this.size = size;
-        this.effectiveSize = effectiveSize;
+        this.numProbes = numProbes;
+        this.numGenes = numGenes;
         this.correctedPvalue = correctedPvalue;
     }
 
@@ -96,7 +96,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         nf.setMinimumFractionDigits( 3 );
 
         DecimalFormat exp = new DecimalFormat( "0.###E00" );
-        out.write( "!\t" + geneSetTerm.getName() + "\t" + geneSetTerm.getId() + "\t" + size + "\t" + effectiveSize
+        out.write( "!\t" + geneSetTerm.getName() + "\t" + geneSetTerm.getId() + "\t" + numProbes + "\t" + numGenes
                 + "\t" + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) )
                 + "\t" + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
                 + "\t" + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
@@ -118,8 +118,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     }
 
     public void setSizes( int size, int effsize ) {
-        this.size = size;
-        this.effectiveSize = effsize;
+        this.numProbes = size;
+        this.numGenes = effsize;
     }
 
     public void setScore( double ascore ) {
@@ -146,8 +146,13 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         return score;
     }
 
-    public int getEffectiveSize() {
-        return effectiveSize;
+    /**
+     * FIXME this is just the number of genes.
+     * 
+     * @return
+     */
+    public int getNumGenes() {
+        return numGenes;
     }
 
     public int getRank() {
@@ -165,8 +170,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     /**
      * @return int
      */
-    public int getSize() {
-        return size;
+    public int getNumProbes() {
+        return numProbes;
     }
 
     /**

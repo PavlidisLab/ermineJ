@@ -65,9 +65,9 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param rawData
      * @param hist
      */
-    public CorrelationPvalGenerator( SettingsHolder settings, GeneAnnotations geneAnnots, GeneSetSizesForAnalysis csc,
+    public CorrelationPvalGenerator( SettingsHolder settings, GeneAnnotations geneAnnots,
             DoubleMatrix<Probe, String> rawData, Histogram hist ) {
-        super( settings, geneAnnots, csc );
+        super( settings, geneAnnots );
 
         this.geneAnnots = geneAnnots;
         this.data = rawData;
@@ -88,7 +88,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      */
     public GeneSetResult classPval( GeneSetTerm geneSetName ) {
         if ( !super.checkAspectAndRedundancy( geneSetName ) ) return null;
-        int effSize = effectiveSizes.get( geneSetName );
+        int effSize = numGenesInSet( geneSetName );
         if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
             return null;
         }
@@ -174,7 +174,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         double geneSetMeanCorrel = sumCorrel / nummeas;
 
-        GeneSetResult result = new GeneSetResult( geneSetName, actualSizes.get( geneSetName ).intValue(), effSize );
+        GeneSetResult result = new GeneSetResult( geneSetName, numProbesInSet( geneSetName ),
+                numGenesInSet( geneSetName ) );
         result.setScore( geneSetMeanCorrel );
         result.setPValue( hist.getValue( effSize, geneSetMeanCorrel, true ) ); // always upper tail.
         return result;

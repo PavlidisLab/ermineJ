@@ -18,8 +18,6 @@
  */
 package ubic.erminej.analysis;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,35 +36,26 @@ import ubic.erminej.data.GeneSetTerms;
 public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( AbstractGeneSetPvalGenerator.class );
 
-    /**
-     * How many genes are in each set (conditioned on the current data available)
-     */
-    protected Map<GeneSetTerm, Integer> effectiveSizes = null;
-
-    /**
-     * How many probes are in each set (conditioned on the current data available)
-     */
-    protected Map<GeneSetTerm, Integer> actualSizes = null;
-
     protected SettingsHolder settings;
 
     protected GeneAnnotations geneAnnots;
 
-    protected GeneSetSizesForAnalysis csc;
+    public int numGenesInSet( GeneSetTerm t ) {
+        return geneAnnots.getGeneSetGenes( t ).size();
+    }
+
+    public int numProbesInSet( GeneSetTerm t ) {
+        return geneAnnots.getGeneSetProbes( t ).size();
+    }
 
     private int maxGeneSetSize;
     private int minGeneSetSize;
 
     private boolean globalMissingAspectTreatedAsUsable = false;
 
-    public AbstractGeneSetPvalGenerator( SettingsHolder set, GeneAnnotations annots, GeneSetSizesForAnalysis csc ) {
-
+    public AbstractGeneSetPvalGenerator( SettingsHolder set, GeneAnnotations annots ) {
         this.settings = set;
         this.geneAnnots = annots;
-        this.effectiveSizes = csc.getEffectiveSizes();
-        this.actualSizes = csc.getActualSizes();
-        this.csc = csc;
-
     }
 
     /**

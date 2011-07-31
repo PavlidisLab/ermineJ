@@ -52,10 +52,8 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     Map<Gene, Integer> geneRanks;
 
-    Map<Probe, Integer> probeRanks;
-
-    public RocPvalGenerator( SettingsHolder set, GeneAnnotations an, GeneSetSizesForAnalysis csc, StatusViewer messenger ) {
-        super( set, an, csc );
+    public RocPvalGenerator( SettingsHolder set, GeneAnnotations an, StatusViewer messenger ) {
+        super( set, an );
         this.messenger = messenger;
     }
 
@@ -67,30 +65,15 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         int count = 0;
 
         Map<Gene, Double> geneToScoreMap = geneScores1.getGeneToScoreMap();
-        Map<Probe, Double> probeToScoreMap = geneScores1.getProbeToScoreMap();
 
         if ( settings.useMultifunctionalityCorrection() ) {
             geneToScoreMap = this.geneAnnots.getMultifunctionality().adjustScores( geneScores1 );
-
-            probeToScoreMap = new HashMap<Probe, Double>();
-
-            for ( Gene g : geneToScoreMap.keySet() ) {
-                for ( Probe p : g.getProbes() ) {
-                    probeToScoreMap.put( p, geneToScoreMap.get( g ) );
-                }
-            }
 
         }
 
         geneRanks = Rank.rankTransform( geneToScoreMap );
 
-        probeRanks = Rank.rankTransform( probeToScoreMap );
-
-        if ( settings.getUseWeights() ) {
-            totalSize = geneRanks.size();
-        } else {
-            totalSize = probeRanks.size();
-        }
+        totalSize = geneRanks.size();
 
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
@@ -120,8 +103,8 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         // variables for outputs
         List<Integer> targetRanks = new ArrayList<Integer>();
 
-        int effSize = effectiveSizes.get( geneSet ); // effective size of this class.
-        if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
+        int numGenesInSet = numGenesInSet( geneSet );
+        if ( numGenesInSet < settings.getMinClassSize() || numGenesInSet > settings.getMaxClassSize() ) {
             return null;
         }
 
@@ -134,14 +117,9 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         for ( Probe p : values ) {
 
             Integer rank;
-            if ( settings.getUseWeights() ) {
-                Gene g = p.getGene();
-                if ( seenGenes.contains( g ) ) continue;
-                rank = geneRanks.get( g );
-
-            } else {
-                rank = probeRanks.get( p );
-            }
+            Gene g = p.getGene();
+            if ( seenGenes.contains( g ) ) continue;
+            rank = geneRanks.get( g );
 
             if ( rank == null ) continue;
 
@@ -158,7 +136,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );
         double roc_pval = ROC.rocpval( totalSize, targetRanks );
 
-        GeneSetResult res = new GeneSetResult( geneSet, actualSizes.get( geneSet ).intValue(), effSize );
+        GeneSetResult res = new GeneSetResult( geneSet, numProbesInSet( geneSet ), numGenesInSet );
         res.setScore( areaUnderROC );
         res.setPValue( roc_pval );
         return res;

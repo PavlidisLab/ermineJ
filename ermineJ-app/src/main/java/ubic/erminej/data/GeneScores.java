@@ -355,13 +355,7 @@ public class GeneScores {
 
         return rankedGenes;
     }
-
-    /**
-     * Note that these values will already be log-transformed if that was requested.
-     */
-    public Double[] getScores() {
-        return this.probeToScoreMap.values().toArray( new Double[] {} );
-    }
+ 
 
     /**
      * @param probe_id

@@ -274,9 +274,9 @@ public class GeneSetPvalRun {
     /**
      * @param csc
      */
-    private void multipleTestCorrect( GeneSetSizesForAnalysis csc ) {
+    private void multipleTestCorrect() {
         if ( messenger != null ) messenger.showStatus( "Multiple test correction..." );
-        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, csc, geneScores,
+        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedclasses, hist, geneData, geneScores,
                 results, messenger );
         Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
         if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.BONFERONNI ) {
@@ -303,8 +303,6 @@ public class GeneSetPvalRun {
      * @param messenger
      */
     private void runAnalysis() {
-        // get the class sizes.
-        GeneSetSizesForAnalysis csc = new GeneSetSizesForAnalysis( geneData, geneScores, settings );
 
         switch ( settings.getClassScoreMethod() ) {
             case GSR: {
@@ -319,10 +317,10 @@ public class GeneSetPvalRun {
                 if ( Thread.currentThread().isInterrupted() ) return;
                 if ( messenger != null ) messenger.showStatus( "Finished resampling" );
 
-                GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist, csc );
+                GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist );
                 if ( Thread.currentThread().isInterrupted() ) return;
                 // calculate the actual class scores and correct sorting.
-                results = pvg.classPvalGenerator( geneScores.getGeneToScoreMap(), geneScores.getProbeToScoreMap() );
+                results = pvg.classPvalGenerator( geneScores.getGeneToScoreMap() );
 
                 break;
             }
@@ -330,7 +328,7 @@ public class GeneSetPvalRun {
 
                 if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
 
-                OraPvalGenerator pvg = new OraPvalGenerator( settings, geneScores, geneData, csc );
+                OraPvalGenerator pvg = new OraPvalGenerator( settings, geneScores, geneData );
 
                 int numOver = pvg.getNumGenesOverThreshold();
 
@@ -339,8 +337,7 @@ public class GeneSetPvalRun {
                     break;
                 }
 
-                results = pvg.classPvalGenerator( geneScores.getGeneToScoreMap(), geneScores.getProbeToScoreMap(),
-                        messenger );
+                results = pvg.classPvalGenerator( geneScores.getGeneToScoreMap(), messenger );
 
                 if ( messenger != null )
                     messenger.showStatus( "Finished with ORA computations: " + numOver
@@ -360,7 +357,7 @@ public class GeneSetPvalRun {
 
                 hist = probePvalMapper.generateNullDistribution( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                CorrelationPvalGenerator pvg = new CorrelationPvalGenerator( settings, geneData, csc, rawData, hist );
+                CorrelationPvalGenerator pvg = new CorrelationPvalGenerator( settings, geneData, rawData, hist );
                 if ( messenger != null ) messenger.showStatus( "Finished resampling, computing for gene sets" );
                 results = pvg.classPvalGenerator( messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
@@ -369,7 +366,7 @@ public class GeneSetPvalRun {
                 break;
             }
             case ROC: {
-                RocPvalGenerator rpg = new RocPvalGenerator( settings, geneData, csc, messenger );
+                RocPvalGenerator rpg = new RocPvalGenerator( settings, geneData, messenger );
                 if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
                 results = rpg.classPvalGenerator( geneScores );
 
@@ -387,7 +384,7 @@ public class GeneSetPvalRun {
 
         sortResults();
         if ( Thread.currentThread().isInterrupted() ) return;
-        multipleTestCorrect( csc );
+        multipleTestCorrect();
 
         setGeneSetRanks();
 
