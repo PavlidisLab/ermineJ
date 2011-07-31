@@ -64,21 +64,32 @@ import ubic.erminej.gui.util.WizardStep;
 public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     private static final long serialVersionUID = -1L;
+    // test method
+    public static void main( String[] args ) throws Exception {
+
+        try {
+            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+        } catch ( Exception e ) {
+
+        }
+        JFrame f = new JFrame();
+        f.setSize( new Dimension( 400, 400 ) );
+
+        AnalysisWizardStep2 s = new AnalysisWizardStep2( null, new Settings() );
+        s.setSize( new Dimension( 400, 400 ) );
+        f.add( s );
+        f.pack();
+        GuiUtil.centerContainer( f );
+        f.setVisible( true );
+    }
     private AnalysisWizard wiz;
     private Settings settings;
     private JFileChooser chooser = new JFileChooser();
     private JTextField rawFileTextField;
     private JTextField scoreFileTextField;
     private JTextField scoreColTextField;
+
     private JTextField dataColTextField;
-
-    public String getDataFileName() {
-        return rawFileTextField.getText();
-    }
-
-    public Integer getDataStartColumn() {
-        return Integer.valueOf( this.dataColTextField.getText() );
-    }
 
     public AnalysisWizardStep2( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
@@ -89,6 +100,189 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         setValues();
 
         if ( wiz != null ) wiz.clearStatus();
+    }
+
+    public void dataPreviewScoresActionPerformed() {
+        String filename = rawFileTextField.getText();
+        if ( filename.length() != 0 && !FileTools.testFile( filename ) ) {
+            wiz.showError( "You must choose a valid file to preview" );
+            return;
+        }
+
+        String colText = dataColTextField.getText();
+        if ( StringUtils.isBlank( colText ) ) {
+            wiz.showError( "You must choose a valid column" );
+            return;
+        }
+
+        Integer startCol = Integer.valueOf( colText );
+
+        try {
+            MatrixPreviewer.previewMatrix( wiz, rawFileTextField.getText(), startCol );
+        } catch ( IOException e ) {
+            GuiUtil.error( "Error previewing data: " + e.getMessage(), e );
+        }
+
+    }
+
+    public String getDataFileName() {
+        return rawFileTextField.getText();
+    }
+
+    public Integer getDataStartColumn() {
+        return Integer.valueOf( this.dataColTextField.getText() );
+    }
+
+    @Override
+    public boolean isReady() {
+
+        if ( wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
+                && rawFileTextField.getText().compareTo( "" ) == 0 ) {
+            wiz.showError( "Correlation analyses require a raw data file." );
+            return false;
+        } else if ( ( wiz.getAnalysisType().equals( SettingsHolder.Method.GSR ) || wiz.getAnalysisType().equals(
+                SettingsHolder.Method.ORA ) )
+                && scoreFileTextField.getText().compareTo( "" ) == 0 ) {
+            wiz.showError( "ORA and resampling analyses require a gene score file." );
+            return false;
+        }
+
+        if ( ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR ) )
+                && Integer.valueOf( scoreColTextField.getText() ).intValue() < 2 ) {
+            wiz.showError( "The score column must be 2 or higher" );
+            return false;
+        }
+
+        // make sure we got at least one file that's readable.
+        if ( rawFileTextField.getText().length() != 0 && !FileTools.testFile( rawFileTextField.getText() ) ) {
+            wiz.showError( "The raw data file is not valid." );
+            return false;
+        }
+
+        if ( scoreFileTextField.getText().length() != 0 && !FileTools.testFile( scoreFileTextField.getText() ) ) {
+            wiz.showError( "The gene score file is not valid." );
+            return false;
+        }
+
+        wiz.clearStatus();
+        return true;
+    }
+
+    @Override
+    public void keyPressed( KeyEvent e ) {
+    }
+
+    @Override
+    public void keyReleased( KeyEvent e ) {
+    }
+
+    @Override
+    public void keyTyped( KeyEvent e ) {
+        wiz.clearStatus();
+    }
+
+    /**
+     * Show a preview of the dat
+     */
+    public void previewScoresActionPerformed() {
+
+        String filename = scoreFileTextField.getText();
+        if ( filename.length() != 0 && !FileTools.testFile( filename ) ) {
+            wiz.showError( "You must choose a valid file to preview" );
+            return;
+        }
+
+        if ( StringUtils.isBlank( scoreColTextField.getText() ) ) {
+            wiz.showError( "You must choose a valid column" );
+            return;
+        }
+
+        int column = Integer.valueOf( scoreColTextField.getText() ).intValue();
+        settings.setScoreCol( column );
+
+        GeneScores test;
+        try {
+            test = new GeneScores( filename, settings, wiz.getStatusField(), wiz.getGeneAnnots(), 100 );
+        } catch ( IOException e1 ) {
+            wiz.showError( "The file could not be previewed: " + e1.getMessage() );
+            return;
+        }
+
+        List<Object[]> table = new ArrayList<Object[]>();
+
+        for ( Probe p : test.getProbeToScoreMap().keySet() ) {
+            table.add( new Object[] { p.getName(), test.getProbeToScoreMap().get( p ) } );
+        }
+
+        MatrixPreviewer.previewMatrix( wiz, table, new Object[] { "ID", "Score" } );
+
+    }
+
+    public void saveValues() {
+        settings.setScoreCol( Integer.valueOf( scoreColTextField.getText() ) );
+        settings.setScoreFile( scoreFileTextField.getText() );
+        settings.setRawFile( rawFileTextField.getText() );
+        settings.setDataCol( Integer.valueOf( dataColTextField.getText() ) );
+        settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
+    }
+
+    /**
+     * @return
+     */
+    private JPanel setUpDataColumnField() {
+        JPanel dataColumnPanel = new JPanel();
+        dataColumnPanel.setPreferredSize( new Dimension( 120, 40 ) );
+        JLabel jLabel4 = new JLabel();
+        jLabel4.setText( "First data column:" );
+        jLabel4.setLabelFor( dataColumnPanel );
+
+        dataColTextField = new JTextField();
+        dataColTextField.setPreferredSize( new Dimension( 50, 19 ) );
+        dataColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
+        dataColTextField.setText( "2" );
+        dataColTextField
+                .setToolTipText( "Column of the data file where the data starts. This must be a value of 2 or higher." );
+        dataColTextField.setEditable( true );
+
+        dataColTextField.addKeyListener( this );
+        dataColumnPanel.add( jLabel4 );
+        dataColumnPanel.add( dataColTextField, BorderLayout.WEST );
+        JButton dataPreviewButton = new JButton( "Preview" );
+        dataPreviewButton.setToolTipText( "Preview the data to be imported; limited to first few rows and columns" );
+        dataPreviewButton.addActionListener( new DataPreviewButtonAdapter( this ) );
+        dataColumnPanel.add( dataPreviewButton, BorderLayout.EAST );
+        return dataColumnPanel;
+    }
+
+    private JPanel setupDataMatrixFileChooser() {
+        // panel 4
+        JPanel rawDataPanel = new JPanel();
+
+        TitledBorder rawDataFileTitleBorder = BorderFactory
+                .createTitledBorder( "Data profiles file (optional for ROC, ORA or GSR, but used for visualization):" );
+        rawDataPanel.setBorder( rawDataFileTitleBorder );
+        rawDataPanel.setLayout( new GridLayout( 2, 1 ) );
+        // file browser
+        JPanel rawDataBrowsePanel = new JPanel();
+        JButton rawFileBrowseButton = new JButton();
+        rawFileBrowseButton.setEnabled( true );
+        rawFileBrowseButton.setText( "Browse" );
+        rawFileBrowseButton.addActionListener( new RawFileBrowse( this ) );
+        rawFileTextField = new JTextField();
+        rawFileTextField.setPreferredSize( new Dimension( 325, 19 ) );
+        rawFileTextField.setMaximumSize( new Dimension( 500, 19 ) );
+
+        rawDataBrowsePanel.setLayout( new BoxLayout( rawDataBrowsePanel, BoxLayout.X_AXIS ) );
+        rawDataBrowsePanel.add( rawFileTextField );
+        rawDataBrowsePanel.add( rawFileBrowseButton );
+
+        // / --------------------------------------------
+
+        JPanel dataColumnPanel = setUpDataColumnField();
+
+        rawDataPanel.add( rawDataBrowsePanel );
+        rawDataPanel.add( dataColumnPanel );
+        return rawDataPanel;
     }
 
     @Override
@@ -167,119 +361,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     }
 
-    private JPanel setupDataMatrixFileChooser() {
-        // panel 4
-        JPanel rawDataPanel = new JPanel();
-
-        TitledBorder rawDataFileTitleBorder = BorderFactory
-                .createTitledBorder( "Data profiles file (optional for ROC, ORA or GSR, but used for visualization):" );
-        rawDataPanel.setBorder( rawDataFileTitleBorder );
-        rawDataPanel.setLayout( new GridLayout( 2, 1 ) );
-        // file browser
-        JPanel rawDataBrowsePanel = new JPanel();
-        JButton rawFileBrowseButton = new JButton();
-        rawFileBrowseButton.setEnabled( true );
-        rawFileBrowseButton.setText( "Browse" );
-        rawFileBrowseButton.addActionListener( new RawFileBrowse( this ) );
-        rawFileTextField = new JTextField();
-        rawFileTextField.setPreferredSize( new Dimension( 325, 19 ) );
-        rawFileTextField.setMaximumSize( new Dimension( 500, 19 ) );
-
-        rawDataBrowsePanel.setLayout( new BoxLayout( rawDataBrowsePanel, BoxLayout.X_AXIS ) );
-        rawDataBrowsePanel.add( rawFileTextField );
-        rawDataBrowsePanel.add( rawFileBrowseButton );
-
-        // / --------------------------------------------
-
-        JPanel dataColumnPanel = setUpDataColumnField();
-
-        rawDataPanel.add( rawDataBrowsePanel );
-        rawDataPanel.add( dataColumnPanel );
-        return rawDataPanel;
-    }
-
-    /**
-     * @return
-     */
-    private JPanel setUpDataColumnField() {
-        JPanel dataColumnPanel = new JPanel();
-        dataColumnPanel.setPreferredSize( new Dimension( 120, 40 ) );
-        JLabel jLabel4 = new JLabel();
-        jLabel4.setText( "First data column:" );
-        jLabel4.setLabelFor( dataColumnPanel );
-
-        dataColTextField = new JTextField();
-        dataColTextField.setPreferredSize( new Dimension( 50, 19 ) );
-        dataColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
-        dataColTextField.setText( "2" );
-        dataColTextField
-                .setToolTipText( "Column of the data file where the data starts. This must be a value of 2 or higher." );
-        dataColTextField.setEditable( true );
-
-        dataColTextField.addKeyListener( this );
-        dataColumnPanel.add( jLabel4 );
-        dataColumnPanel.add( dataColTextField, BorderLayout.WEST );
-        JButton dataPreviewButton = new JButton( "Preview" );
-        dataPreviewButton.setToolTipText( "Preview the data to be imported; limited to first few rows and columns" );
-        dataPreviewButton.addActionListener( new DataPreviewButtonAdapter( this ) );
-        dataColumnPanel.add( dataPreviewButton, BorderLayout.EAST );
-        return dataColumnPanel;
-    }
-
-    @Override
-    public boolean isReady() {
-
-        if ( wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
-                && rawFileTextField.getText().compareTo( "" ) == 0 ) {
-            wiz.showError( "Correlation analyses require a raw data file." );
-            return false;
-        } else if ( ( wiz.getAnalysisType().equals( SettingsHolder.Method.GSR ) || wiz.getAnalysisType().equals(
-                SettingsHolder.Method.ORA ) )
-                && scoreFileTextField.getText().compareTo( "" ) == 0 ) {
-            wiz.showError( "ORA and resampling analyses require a gene score file." );
-            return false;
-        }
-
-        if ( ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR ) )
-                && Integer.valueOf( scoreColTextField.getText() ).intValue() < 2 ) {
-            wiz.showError( "The score column must be 2 or higher" );
-            return false;
-        }
-
-        // make sure we got at least one file that's readable.
-        if ( rawFileTextField.getText().length() != 0 && !FileTools.testFile( rawFileTextField.getText() ) ) {
-            wiz.showError( "The raw data file is not valid." );
-            return false;
-        }
-
-        if ( scoreFileTextField.getText().length() != 0 && !FileTools.testFile( scoreFileTextField.getText() ) ) {
-            wiz.showError( "The gene score file is not valid." );
-            return false;
-        }
-
-        wiz.clearStatus();
-        return true;
-    }
-
-    // test method
-    public static void main( String[] args ) throws Exception {
-
-        try {
-            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-        } catch ( Exception e ) {
-
-        }
-        JFrame f = new JFrame();
-        f.setSize( new Dimension( 400, 400 ) );
-
-        AnalysisWizardStep2 s = new AnalysisWizardStep2( null, new Settings() );
-        s.setSize( new Dimension( 400, 400 ) );
-        f.add( s );
-        f.pack();
-        GuiUtil.centerContainer( f );
-        f.setVisible( true );
-    }
-
     void rawBrowseButton_actionPerformed() {
         chooser.setCurrentDirectory( new File( settings.getRawDataFileDirectory() ) );
         chooser.setDialogTitle( "Choose Raw Data File" );
@@ -309,111 +390,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         dataColTextField.setText( String.valueOf( settings.getDataCol() ) );
     }
 
-    public void saveValues() {
-        settings.setScoreCol( Integer.valueOf( scoreColTextField.getText() ) );
-        settings.setScoreFile( scoreFileTextField.getText() );
-        settings.setRawFile( rawFileTextField.getText() );
-        settings.setDataCol( Integer.valueOf( dataColTextField.getText() ) );
-        settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
-    }
-
-    public void dataPreviewScoresActionPerformed() {
-        String filename = rawFileTextField.getText();
-        if ( filename.length() != 0 && !FileTools.testFile( filename ) ) {
-            wiz.showError( "You must choose a valid file to preview" );
-            return;
-        }
-
-        String colText = dataColTextField.getText();
-        if ( StringUtils.isBlank( colText ) ) {
-            wiz.showError( "You must choose a valid column" );
-            return;
-        }
-
-        Integer startCol = Integer.valueOf( colText );
-
-        try {
-            MatrixPreviewer.previewMatrix( wiz, rawFileTextField.getText(), startCol );
-        } catch ( IOException e ) {
-            GuiUtil.error( "Error previewing data: " + e.getMessage(), e );
-        }
-
-    }
-
-    /**
-     * Show a preview of the dat
-     */
-    public void previewScoresActionPerformed() {
-
-        String filename = scoreFileTextField.getText();
-        if ( filename.length() != 0 && !FileTools.testFile( filename ) ) {
-            wiz.showError( "You must choose a valid file to preview" );
-            return;
-        }
-
-        if ( StringUtils.isBlank( scoreColTextField.getText() ) ) {
-            wiz.showError( "You must choose a valid column" );
-            return;
-        }
-
-        int column = Integer.valueOf( scoreColTextField.getText() ).intValue();
-        settings.setScoreCol( column );
-
-        GeneScores test;
-        try {
-            test = new GeneScores( filename, settings, wiz.getStatusField(), wiz.getGeneAnnots(), 100 );
-        } catch ( IOException e1 ) {
-            wiz.showError( "The file could not be previewed: " + e1.getMessage() );
-            return;
-        }
-
-        List<Object[]> table = new ArrayList<Object[]>();
-
-        for ( Probe p : test.getProbeToScoreMap().keySet() ) {
-            table.add( new Object[] { p.getName(), test.getProbeToScoreMap().get( p ) } );
-        }
-
-        MatrixPreviewer.previewMatrix( wiz, table, new Object[] { "ID", "Score" } );
-
-    }
-
-    @Override
-    public void keyPressed( KeyEvent e ) {
-    }
-
-    @Override
-    public void keyReleased( KeyEvent e ) {
-    }
-
-    @Override
-    public void keyTyped( KeyEvent e ) {
-        wiz.clearStatus();
-    }
-
-}
-
-class RawFileBrowse implements java.awt.event.ActionListener {
-    AnalysisWizardStep2 adaptee;
-
-    RawFileBrowse( AnalysisWizardStep2 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.rawBrowseButton_actionPerformed();
-    }
-}
-
-class ScoreFileBrowse implements java.awt.event.ActionListener {
-    AnalysisWizardStep2 adaptee;
-
-    ScoreFileBrowse( AnalysisWizardStep2 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.scoreBrowseButton_actionPerformed();
-    }
 }
 
 class DataPreviewButtonAdapter implements ActionListener {
@@ -456,4 +432,28 @@ class PreviewButtonAdapter implements ActionListener {
 
     }
 
+}
+
+class RawFileBrowse implements java.awt.event.ActionListener {
+    AnalysisWizardStep2 adaptee;
+
+    RawFileBrowse( AnalysisWizardStep2 adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.rawBrowseButton_actionPerformed();
+    }
+}
+
+class ScoreFileBrowse implements java.awt.event.ActionListener {
+    AnalysisWizardStep2 adaptee;
+
+    ScoreFileBrowse( AnalysisWizardStep2 adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.scoreBrowseButton_actionPerformed();
+    }
 }

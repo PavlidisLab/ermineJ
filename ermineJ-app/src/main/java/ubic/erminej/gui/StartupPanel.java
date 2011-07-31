@@ -26,6 +26,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -42,7 +43,9 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -61,31 +64,100 @@ import ubic.erminej.gui.util.GuiUtil;
  */
 public class StartupPanel extends JPanel {
 
+    private static final String INSTRUCTIONS = "<html>For annotation files, visit "
+            + "<a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots</a></html>";
+
     private static Log log = LogFactory.getLog( StartupPanel.class );
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
 
+    // for testing.
+    public static void main( String[] args ) throws Exception {
+        try {
+            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+        } catch ( Exception e ) {
+
+        }
+        JFrame f = new JFrame();
+        f.setSize( new Dimension( 400, 600 ) );
+        StartupPanel p = new StartupPanel( new Settings() );
+        f.add( p );
+        f.pack();
+        GuiUtil.centerContainer( f );
+        f.setVisible( true );
+
+    }
+
+    private JButton actionButton;
+
+    private JTextField classFileTextField = new JTextField();
+
+    private JTextField annotFileTextField = new JTextField();
+
+    private JComboBox annotFormat = new JComboBox();
+
+    private JTextField projectFileTextField = new JTextField();
+
+    private Settings settings;
+
     public StartupPanel( Settings settings ) {
         this.settings = settings;
-
-        /*
-         * Make sure the setup is valid.
-         */
-
         jbInit();
         setValues();
     }
 
-    private JButton actionButton;
-    private JTextField classFileTextField = new JTextField();
-    // private
+    public void addActionListener( ActionListener listener ) {
+        listenerList.add( ActionListener.class, listener );
+    }
 
-    private JTextField annotFileTextField = new JTextField();
-    private JComboBox annotFormat = new JComboBox();
-
-    private Settings settings;
+    public void removeActionListener( ActionListener listener ) {
+        listenerList.remove( ActionListener.class, listener );
+    }
 
     private void jbInit() {
 
+        JPanel logoPanel = makeLogoPanel();
+
+        JPanel buttonPanel = makeActionButtons();
+
+        JPanel projectPanel = makeProjectPickerPanel();
+
+        JPanel classPanel = makeGOFilePickerPanel();
+
+        JPanel annotPanel = makeAnnotFilePickerPanel();
+
+        JEditorPane instructions = makeInstructionsPane();
+
+        JPanel twoFilePanel = new JPanel(); // holds the GO and annotations.
+        twoFilePanel.setBorder( BorderFactory.createTitledBorder( "... OR choose the starting files individually." ) );
+        GroupLayout tfp = new GroupLayout( twoFilePanel );
+        tfp.setAutoCreateContainerGaps( true );
+        tfp.setAutoCreateGaps( true );
+        twoFilePanel.setLayout( tfp );
+        tfp.setHorizontalGroup( tfp.createParallelGroup().addComponent( classPanel ).addComponent( annotPanel ) );
+        tfp.setVerticalGroup( tfp.createSequentialGroup().addComponent( classPanel ).addComponent( annotPanel ) );
+
+        // / holds both of the two subform panels.
+        JPanel formPanel = new JPanel();
+        GroupLayout gl = new GroupLayout( formPanel );
+        formPanel.setLayout( gl );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( projectPanel ).addComponent( twoFilePanel ) );
+        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( projectPanel ).addComponent( twoFilePanel ) );
+
+        JPanel centerPanel = new JPanel(); // holds help and the forms
+        centerPanel.setLayout( new BorderLayout() );
+        centerPanel.add( instructions, BorderLayout.NORTH );
+        centerPanel.add( formPanel, BorderLayout.CENTER );
+
+        this.setLayout( new BorderLayout() );
+        this.add( logoPanel, BorderLayout.NORTH );
+        this.add( centerPanel, BorderLayout.CENTER );
+        this.add( buttonPanel, BorderLayout.SOUTH );
+
+    }
+
+    private JPanel makeLogoPanel() {
         // decoration
         JLabel logoLabel = new JLabel();
         logoLabel
@@ -93,9 +165,10 @@ public class StartupPanel extends JPanel {
         JPanel logoPanel = new JPanel();
         logoPanel.setBackground( Color.WHITE );
         logoPanel.add( logoLabel );
+        return logoPanel;
+    }
 
-        // buttons at the bottom.
-
+    private JPanel makeActionButtons() {
         actionButton = new JButton();
         JButton cancelButton = new JButton();
         JButton helpButton = new JButton();
@@ -113,21 +186,10 @@ public class StartupPanel extends JPanel {
         buttonPanel.add( helpButton );
         buttonPanel.add( cancelButton );
         buttonPanel.add( actionButton );
+        return buttonPanel;
+    }
 
-        // ////////////////
-
-        // /// panel to hold GO file browse
-        JPanel classPanel = new JPanel();
-        TitledBorder classPanelBorder = BorderFactory.createTitledBorder( "Gene Ontology XML file" );
-        classPanel.setBorder( classPanelBorder );
-        this.classFileTextField = GuiUtil.fileBrowsePanel( classPanel, new GOFilePickListener( this ) );
-        GroupLayout cpL = new GroupLayout( classPanel );
-        classPanel.setLayout( cpL );
-        cpL.setHorizontalGroup( cpL.createParallelGroup().addComponent( classFileTextField.getParent() ) );
-        cpL.setVerticalGroup( cpL.createSequentialGroup().addComponent( classFileTextField.getParent() ) );
-        cpL.setAutoCreateContainerGaps( true );
-        cpL.setAutoCreateGaps( true );
-
+    private JPanel makeAnnotFilePickerPanel() {
         // /// panel to hold the annotation file 'browse' and format setting
         JPanel annotPanel = new JPanel();
         TitledBorder annotPanelBorder = BorderFactory.createTitledBorder( "Gene annotation file" );
@@ -169,7 +231,25 @@ public class StartupPanel extends JPanel {
                 annotFileTextField.getParent() ).addComponent( formatPanel ) );
         apL.setVerticalGroup( apL.createSequentialGroup().addComponent( annotFileTextField.getParent() ).addComponent(
                 formatPanel ) );
+        return annotPanel;
+    }
 
+    private JPanel makeGOFilePickerPanel() {
+        // /// panel to hold GO file browser
+        JPanel classPanel = new JPanel();
+        TitledBorder classPanelBorder = BorderFactory.createTitledBorder( "Gene Ontology XML file" );
+        classPanel.setBorder( classPanelBorder );
+        this.classFileTextField = GuiUtil.fileBrowsePanel( classPanel, new GOFilePickListener( this ) );
+        GroupLayout cpL = new GroupLayout( classPanel );
+        classPanel.setLayout( cpL );
+        cpL.setHorizontalGroup( cpL.createParallelGroup().addComponent( classFileTextField.getParent() ) );
+        cpL.setVerticalGroup( cpL.createSequentialGroup().addComponent( classFileTextField.getParent() ) );
+        cpL.setAutoCreateContainerGaps( true );
+        cpL.setAutoCreateGaps( true );
+        return classPanel;
+    }
+
+    private JEditorPane makeInstructionsPane() {
         JEditorPane instructions = new JEditorPane();
         instructions.setEditable( false );
         instructions.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
@@ -187,48 +267,44 @@ public class StartupPanel extends JPanel {
                 }
             }
         } );
-        instructions.setText( "<html> <strong>Starting up the program</strong><br>Please confirm "
-                + "the settings below are correct; they cannot be changed during "
-                + "analysis.<p>The annotation file you select " + "must match the experimental data you are using. "
-                + "For updated annotation files, visit "
-                + "<a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots</a></html>" );
-
-        JPanel formPanel = new JPanel();
-        GroupLayout gl = new GroupLayout( formPanel );
-        formPanel.setLayout( gl );
-        gl.setAutoCreateContainerGaps( true );
-        gl.setAutoCreateGaps( true );
-        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( classPanel ).addComponent( annotPanel ) );
-        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( classPanel ).addComponent( annotPanel ) );
-
-        JPanel centerPanel = new JPanel();
-
-        centerPanel.setLayout( new BorderLayout() );
-
-        centerPanel.add( instructions, BorderLayout.NORTH );
-        centerPanel.add( formPanel, BorderLayout.CENTER );
-
-        this.setLayout( new BorderLayout() );
-        this.add( logoPanel, BorderLayout.NORTH );
-        this.add( centerPanel, BorderLayout.CENTER );
-        this.add( buttonPanel, BorderLayout.SOUTH );
+        instructions.setText( INSTRUCTIONS );
+        return instructions;
     }
 
-    // for testing.
-    public static void main( String[] args ) throws Exception {
-        try {
-            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-        } catch ( Exception e ) {
+    private JPanel makeProjectPickerPanel() {
+        // Panel to hold the Project browser.
+        JPanel projectPanel = new JPanel();
+        projectPanel.setBorder( BorderFactory.createTitledBorder( "Select a project file ..." ) );
+        this.projectFileTextField = GuiUtil.fileBrowsePanel( projectPanel, new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                projectChooseActionPerformed();
+            }
+        } );
+        GroupLayout ppL = new GroupLayout( projectPanel );
+        projectPanel.setLayout( ppL );
+        ppL.setHorizontalGroup( ppL.createParallelGroup().addComponent( projectFileTextField.getParent() ) );
+        ppL.setVerticalGroup( ppL.createSequentialGroup().addComponent( projectFileTextField.getParent() ) );
+        ppL.setAutoCreateContainerGaps( true );
+        ppL.setAutoCreateGaps( true );
+        return projectPanel;
+    }
 
+    /**
+     * 
+     */
+    private void saveSettings() {
+        settings.setClassFile( classFileTextField.getText() );
+        settings.setAnnotFile( annotFileTextField.getText() );
+        String formatS = ( String ) annotFormat.getSelectedItem();
+
+        if ( formatS.equals( "ErmineJ" ) ) {
+            settings.setAnnotFormat( Format.DEFAULT );
+        } else if ( formatS.equals( "Affy CSV" ) ) {
+            settings.setAnnotFormat( Format.AFFYCSV );
+        } else {
+            settings.setAnnotFormat( Format.AGILENT );
         }
-        JFrame f = new JFrame();
-        f.setSize( new Dimension( 400, 400 ) );
-        StartupPanel p = new StartupPanel( new Settings() );
-        f.add( p );
-        f.pack();
-        GuiUtil.centerContainer( f );
-        f.setVisible( true );
-
     }
 
     private void setValues() {
@@ -249,58 +325,10 @@ public class StartupPanel extends JPanel {
         }
     }
 
-    private void saveSettings() {
-        settings.setClassFile( classFileTextField.getText() );
-        settings.setAnnotFile( annotFileTextField.getText() );
-        String formatS = ( String ) annotFormat.getSelectedItem();
-
-        if ( formatS.equals( "ErmineJ" ) ) {
-            settings.setAnnotFormat( Format.DEFAULT );
-        } else if ( formatS.equals( "Affy CSV" ) ) {
-            settings.setAnnotFormat( Format.AFFYCSV );
-        } else {
-            settings.setAnnotFormat( Format.AGILENT );
-        }
-    }
-
-    void annotBrowseButton_actionPerformed() {
-        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setDialogTitle( "Choose the annotation file:" );
-        DataFileFilter fileFilter = new DataFileFilter();
-        chooser.setFileFilter( fileFilter ); // JFileChooser method
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            annotFileTextField.setText( chooser.getSelectedFile().toString() );
-            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
-        }
-    }
-
-    void classBrowseButton_actionPerformed() {
-        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setDialogTitle( "Choose the GO XML file:" );
-        XMLFileFilter fileFilter = new XMLFileFilter();
-        chooser.setFileFilter( fileFilter ); // JFileChooser method
-        chooser.setAcceptAllFileFilterUsed( false );
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            classFileTextField.setText( chooser.getSelectedFile().toString() );
-            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
-        }
-    }
-
-    public void addActionListener( ActionListener listener ) {
-        listenerList.add( ActionListener.class, listener );
-    }
-
-    public void removeActionListener( ActionListener listener ) {
-        listenerList.remove( ActionListener.class, listener );
-    }
-
     protected void actionButton_actionPerformed( ActionEvent e ) {
         String annotFileName = annotFileTextField.getText();
         String goFileName = classFileTextField.getText();
+        String projectFile = projectFileTextField.getText();
 
         File annotFile = new File( annotFileName );
         File goFile = new File( goFileName );
@@ -315,7 +343,8 @@ public class StartupPanel extends JPanel {
             GuiUtil.error( "Could not read file: " + goFileName );
         } else {
             log.debug( "Saving configuration" );
-            saveSettings();
+
+            if ( projectFile.isEmpty() ) saveSettings();
 
             Object[] listeners = listenerList.getListenerList();
             for ( int i = 0; i < listeners.length; i += 2 ) {
@@ -326,25 +355,100 @@ public class StartupPanel extends JPanel {
         }
     }
 
-}
-
-class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionListener {
-    StartupPanel adaptee;
-
-    StartupPanel_actionButton_actionAdapter( StartupPanel adaptee ) {
-        this.adaptee = adaptee;
+    void annotBrowseButton_actionPerformed() {
+        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        chooser.setDialogTitle( "Choose the annotation file:" );
+        DataFileFilter fileFilter = new DataFileFilter();
+        chooser.setFileFilter( fileFilter ); // JFileChooser method
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            annotFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
+            projectFileTextField.setText( "" );
+        }
     }
 
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.actionButton_actionPerformed( e );
+    void classBrowseButton_actionPerformed() {
+        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        chooser.setDialogTitle( "Choose the GO XML file:" );
+        XMLFileFilter fileFilter = new XMLFileFilter();
+        chooser.setFileFilter( fileFilter ); // JFileChooser method
+        chooser.setAcceptAllFileFilterUsed( false );
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            classFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
+            projectFileTextField.setText( "" );
+        }
     }
-}
 
-class StartupPanel_cancelButton_actionAdapter implements java.awt.event.ActionListener {
+    void projectChooseActionPerformed() {
 
-    public void actionPerformed( ActionEvent e ) {
-        System.exit( 0 );
+        JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
+        projectPathChooser.setFileFilter( new FileFilter() {
+            @Override
+            public boolean accept( File pathname ) {
+                return pathname.getPath().endsWith( ".project" );
+            }
+
+            @Override
+            public String getDescription() {
+                return "ErmineJ project files (*.project)";
+            }
+        } );
+
+        int yesno = projectPathChooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            File projectFile = projectPathChooser.getSelectedFile();
+
+            if ( !projectFile.canRead() ) {
+                GuiUtil.error( "The project file was invalid:\nCannot read" );
+                enableIndividualFilePickers();
+                return;
+            } else if ( projectFile.length() == 0 ) {
+                GuiUtil.error( "The project file was invalid:\nEmpty file" );
+                enableIndividualFilePickers();
+                return;
+            }
+
+            projectFileTextField.setText( projectFile.toString() );
+            settings.setDataDirectory( projectFile.getParent() );
+
+            /*
+             * Now set the values in the xml and annotation file fields as well ...
+             */
+            Settings projectSettings;
+            try {
+                projectSettings = new Settings( projectFile.getAbsolutePath() );
+                this.settings = projectSettings;
+                this.classFileTextField.setText( settings.getClassFile() );
+                this.annotFileTextField.setText( settings.getAnnotFile() );
+                this.annotFileTextField.setEnabled( false );
+                this.classFileTextField.setEnabled( false ); // FIXME have to disable the entire choose.
+
+            } catch ( ConfigurationException e ) {
+                GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
+                enableIndividualFilePickers();
+            } catch ( IOException e ) {
+                GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
+                enableIndividualFilePickers();
+            }
+
+        }
     }
+
+    private void enableIndividualFilePickers() {
+        this.annotFileTextField.setEnabled( true );
+        this.classFileTextField.setEnabled( true );
+    }
+
+    public String getProjectFileName() {
+        return this.projectFileTextField.getText();
+    }
+
 }
 
 class AnnotFilePickListener implements ActionListener {
@@ -368,5 +472,24 @@ class GOFilePickListener implements ActionListener {
 
     public void actionPerformed( ActionEvent e ) {
         adaptee.classBrowseButton_actionPerformed();
+    }
+}
+
+class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionListener {
+    StartupPanel adaptee;
+
+    StartupPanel_actionButton_actionAdapter( StartupPanel adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.actionButton_actionPerformed( e );
+    }
+}
+
+class StartupPanel_cancelButton_actionAdapter implements java.awt.event.ActionListener {
+
+    public void actionPerformed( ActionEvent e ) {
+        System.exit( 0 );
     }
 }

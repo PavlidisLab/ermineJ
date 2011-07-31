@@ -271,7 +271,7 @@ public class MainFrame extends JFrame {
         try {
             loadSettings = new Settings( loadFile );
         } catch ( ConfigurationException e ) {
-            GuiUtil.error( "There was a problem loading the settings from the results file: " + e.getMessage() );
+            GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n" + e.getMessage() );
             return;
         }
         if ( !checkValid( loadSettings ) ) {
@@ -507,7 +507,7 @@ public class MainFrame extends JFrame {
      * 
      * @param
      */
-    private void initialize( final JPanel cards ) {
+    private void initialize( final JPanel cards, final String projectFile ) {
         ( ( CardLayout ) cards.getLayout() ).show( cards, PROGRESS_CARD );
 
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
@@ -516,8 +516,13 @@ public class MainFrame extends JFrame {
             protected Object doInBackground() throws Exception {
                 try {
                     setupStatusBar();
-
                     initializeAllData();
+
+                    /*
+                     * If we are loading a project;
+                     */
+                    if ( projectFile != null ) loadAnalysis( projectFile ); // fixme make sure this is getting settings
+                                                                            // setup right (autosave?)
 
                     ( ( CardLayout ) cards.getLayout() ).show( cards, TABS_CARD );
                     statusMessenger.showStatus( "Ready." );
@@ -589,7 +594,7 @@ public class MainFrame extends JFrame {
         final ActionListener actionListener = new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                initialize( cards );
+                initialize( cards, startupPanel.getProjectFileName() );
             }
         };
 

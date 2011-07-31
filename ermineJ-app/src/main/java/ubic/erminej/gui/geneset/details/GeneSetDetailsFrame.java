@@ -673,7 +673,7 @@ public class GeneSetDetailsFrame extends JFrame {
         saveImageMenuItem.setText( "Save Image..." );
         saveImageMenuItem.addActionListener( new JGeneSetFrame_m_saveImageMenuItem_actionAdapter( this ) );
 
-        m_normalizeMenuItem.setText( "Normalize" );
+        m_normalizeMenuItem.setText( "Standardize" );
         m_normalizeMenuItem.addActionListener( new JGeneSetFrame_m_normalizeMenuItem_actionAdapter( this ) );
         optionsMenu.setText( "Options" );
         setGeneUrlBaseMenuItem.setText( "Change gene name URL pattern ..." );

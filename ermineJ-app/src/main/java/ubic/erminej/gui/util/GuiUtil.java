@@ -73,8 +73,6 @@ public class GuiUtil {
         gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( textField ).addComponent( button ) );
         gl.setVerticalGroup( gl.createParallelGroup().addComponent( textField ).addComponent( button ) );
 
-        panel.setBorder( BorderFactory.createEmptyBorder( 8, 8, 6, 6 ) );
-
         if ( container != null ) container.add( panel );
 
         return textField;

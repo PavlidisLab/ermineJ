@@ -51,8 +51,7 @@ public abstract class WizardStep extends JPanel {
         super();
         owner = wiz;
         try {
-            // this.setLayout( new BorderLayout() ); should not be needed.
-            // jbInit();
+            this.setLayout( new BorderLayout() ); // needed...
         } catch ( Exception e ) {
             e.printStackTrace();
         }
