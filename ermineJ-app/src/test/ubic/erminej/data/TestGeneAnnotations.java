@@ -54,6 +54,7 @@ public class TestGeneAnnotations extends TestCase {
     static GeneSetTerms goNames;
 
     GeneAnnotations ga;
+    private Settings settings;
 
     static {
 
@@ -164,7 +165,7 @@ public class TestGeneAnnotations extends TestCase {
 
     public final void testReadAffyCsv() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
-        GeneAnnotations g = p.readAffyCsv( is, null, new Settings() );
+        GeneAnnotations g = p.readAffyCsv( is, null, settings );
         Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
         assertTrue( geneSets.size() > 0 );
     }
@@ -179,7 +180,7 @@ public class TestGeneAnnotations extends TestCase {
         GZIPInputStream isa = new GZIPInputStream( TestGeneAnnotations.class
                 .getResourceAsStream( "/data/MoGene-1_0-st-v1.na31.mm9.transcript.sample.txt.gz" ) );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
-        GeneAnnotations g = p.readAffyCsv( isa, null, new Settings() );
+        GeneAnnotations g = p.readAffyCsv( isa, null, settings );
         Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
         assertTrue( geneSets.size() > 0 );
     }
@@ -188,7 +189,7 @@ public class TestGeneAnnotations extends TestCase {
         // second affytest
         InputStream isa = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U95A.affy.2011format.sample.csv" );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
-        GeneAnnotations g = p.readAffyCsv( isa, null, new Settings() );
+        GeneAnnotations g = p.readAffyCsv( isa, null, settings );
         Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
         assertTrue( geneSets.size() > 0 );
 
@@ -204,19 +205,19 @@ public class TestGeneAnnotations extends TestCase {
 
     public void testReadAgilent() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        GeneAnnotations g = p.readAgilent( ia, null, new Settings() );
+        GeneAnnotations g = p.readAgilent( ia, null, settings );
         int actualValue = g.findProbe( "A_52_P311491" ).getGeneSets().size();
         assertEquals( 12, actualValue ); // not checked by hand.
     }
 
     public void testReadCommaDelimited() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        GeneAnnotations g = p.readDefault( imb, null, new Settings() );
+        GeneAnnotations g = p.readDefault( imb, null, settings );
 
         Probe probe = g.findProbe( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
-        int expectedValue = 142; // not checked by hand.
+        int expectedValue = 113; // not checked by hand.
         int actualValue = probe.getGeneSets().size();
         assertEquals( expectedValue, actualValue );
     }
@@ -303,7 +304,7 @@ public class TestGeneAnnotations extends TestCase {
         ia = TestGeneAnnotations.class.getResourceAsStream( "/data/agilentannots.test.txt" );
         InputStream im = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample.txt" );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        Settings settings = new Settings( false );
+        settings = new Settings( false );
         settings.setProperty( "ignore.userdefined", true );
         ga = p.readDefault( im, null, settings );
         ga.setMessenger( new StatusStderr() );
