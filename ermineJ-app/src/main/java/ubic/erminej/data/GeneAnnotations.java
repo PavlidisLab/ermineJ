@@ -1194,7 +1194,8 @@ public class GeneAnnotations {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
+        if ( settings != null && !settings.getConfig().getBoolean( "ignore.userdefined", false ) )
+            userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
 
         addParents(); // <- 1s
 

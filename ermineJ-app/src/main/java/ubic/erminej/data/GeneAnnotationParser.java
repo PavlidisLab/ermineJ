@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.FileTools;
+import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.basecode.util.StringUtil;
 import ubic.erminej.Settings;
@@ -61,7 +62,7 @@ public class GeneAnnotationParser {
 
     private GeneSetTerms geneSetTerms;
 
-    private StatusViewer messenger;
+    private StatusViewer messenger = new StatusStderr();
 
     private static Pattern pipePattern = Pattern.compile( "\\s*[\\s\\|,]\\s*" );
 
@@ -71,7 +72,7 @@ public class GeneAnnotationParser {
 
     public GeneAnnotationParser( GeneSetTerms geneSets, StatusViewer messenger ) {
         this( geneSets );
-        this.messenger = messenger;
+        if ( messenger != null ) this.messenger = messenger;
     }
 
     /**

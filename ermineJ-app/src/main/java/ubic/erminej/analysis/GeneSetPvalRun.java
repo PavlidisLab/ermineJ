@@ -235,7 +235,8 @@ public class GeneSetPvalRun {
     }
 
     /**
-     * @return Settings
+     * @return the settings that were used during the analysis, which may be different than the current application-wide
+     *         settings.
      */
     public SettingsHolder getSettings() {
         return settings;

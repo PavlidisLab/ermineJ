@@ -593,13 +593,13 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * 
+     * Save the preferences to disk, if necessary, to the DEFAULT location (e.g. ermineJ.properties).
      */
     public void writePrefs() {
         if ( config.isAutoSave() ) return;
         try {
-            log.debug( "Saving configuration" );
-            config.save();
+            log.debug( "Saving configuration to default location." );
+            config.save( this.getSettingsFilePath() );
         } catch ( ConfigurationException e ) {
             log.error( e, e );
         }
@@ -659,8 +659,7 @@ public class Settings extends SettingsHolder {
 
         logLocale();
 
-        File newConfigFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                + USERGUI_PROPERTIES );
+        File newConfigFile = getSettingsFilePath();
 
         try {
             URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
@@ -710,6 +709,15 @@ public class Settings extends SettingsHolder {
     }
 
     /**
+     * @return
+     */
+    private File getSettingsFilePath() {
+        File newConfigFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                + USERGUI_PROPERTIES );
+        return newConfigFile;
+    }
+
+    /**
      * 
      */
     private void logLocale() {
@@ -722,6 +730,10 @@ public class Settings extends SettingsHolder {
         log.info( "    OS arch: " + System.getProperty( "os.arch" ) );
         log.info( "    OS version: " + System.getProperty( "os.name" ) );
         log.info( "    File encoding: " + System.getProperty( "file.encoding" ) );
+    }
+
+    public boolean isAutoSaving() {
+        return this.config.isAutoSave();
     }
 
 }

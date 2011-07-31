@@ -216,7 +216,7 @@ public class TestGeneAnnotations extends TestCase {
         Probe probe = g.findProbe( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
-        int expectedValue = 113; // not checked by hand.
+        int expectedValue = 142; // not checked by hand.
         int actualValue = probe.getGeneSets().size();
         assertEquals( expectedValue, actualValue );
     }
@@ -299,12 +299,13 @@ public class TestGeneAnnotations extends TestCase {
         }
 
         is = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U133_Plus_2_annot_sample.csv" );
-
         imb = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample-goidddelimittest.txt" );
         ia = TestGeneAnnotations.class.getResourceAsStream( "/data/agilentannots.test.txt" );
         InputStream im = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample.txt" );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        ga = p.readDefault( im, null, new Settings() );
+        Settings settings = new Settings( false );
+        settings.setProperty( "ignore.userdefined", true );
+        ga = p.readDefault( im, null, settings );
         ga.setMessenger( new StatusStderr() );
 
     }

@@ -76,6 +76,7 @@ public class UserDefinedGeneSetManager {
 
     public UserDefinedGeneSetManager( GeneAnnotations annots, Settings settings, StatusViewer messenger ) {
         if ( messenger != null ) this.statusMessenger = messenger;
+        assert settings != null;
         init( annots, settings );
     }
 

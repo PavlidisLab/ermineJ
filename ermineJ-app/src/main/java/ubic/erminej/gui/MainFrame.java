@@ -270,6 +270,8 @@ public class MainFrame extends JFrame {
         assert loadFile != null;
 
         disableMenusForAnalysis();
+
+        // the settings used for the analysis, not the same as the application settings.
         Settings loadSettings;
         try {
             loadSettings = new Settings( loadFile );
@@ -524,9 +526,7 @@ public class MainFrame extends JFrame {
                     /*
                      * If we are loading a project;
                      */
-                    if ( StringUtils.isNotBlank( projectFile ) ) loadAnalysis( projectFile ); // fixme make sure this
-                                                                                               // is getting settings
-                    // setup right (autosave?)
+                    if ( StringUtils.isNotBlank( projectFile ) ) loadAnalysis( projectFile );
 
                     ( ( CardLayout ) cards.getLayout() ).show( cards, TABS_CARD );
                     statusMessenger.showStatus( "Ready." );
@@ -974,7 +974,7 @@ public class MainFrame extends JFrame {
                 this.settings = projectSettings;
 
                 /*
-                 * FIXME: those settings are not auto-saved.
+                 * Note: those settings are not auto-saved, so the project is not modified.
                  */
 
                 /*
@@ -985,8 +985,8 @@ public class MainFrame extends JFrame {
 
                     @Override
                     protected Object doInBackground() throws Exception {
-                        initializeAllData(); // fixme, skip if the files are the same ...
-                        loadAnalysis( path ); // fixme make sure this is getting settings setup right (autosave?)
+                        initializeAllData(); // Perhaps skip if the files have not changed?
+                        loadAnalysis( path );
                         return null;
                     }
                 };
@@ -1367,6 +1367,13 @@ public class MainFrame extends JFrame {
      */
     void quitMenuItem_actionPerformed( ActionEvent e ) {
         statusMessenger.clear();
+
+        /*
+         * This is appropriate if for example we loaded a project (which we do not change), but we might as well keep
+         * the settings for next time.
+         */
+        settings.writePrefs();
+
         System.exit( 0 );
     }
 
