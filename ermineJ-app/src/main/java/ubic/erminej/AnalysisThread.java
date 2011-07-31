@@ -103,6 +103,10 @@ public class AnalysisThread extends Thread {
         this.geneScoreSets = geneScoreSets;
         this.geneAnnots = geneAnnots;
 
+        if ( StringUtils.isBlank( loadFile ) ) {
+            throw new IllegalArgumentException( "The result file must be provided." );
+        }
+
         try {
             this.runningMethod = AnalysisThread.class.getMethod( "loadAnalysis", new Class[] {} );
             this.setName( "Loading analysis thread" );

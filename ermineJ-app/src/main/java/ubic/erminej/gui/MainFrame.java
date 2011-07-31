@@ -266,6 +266,9 @@ public class MainFrame extends JFrame {
     }
 
     public void loadAnalysis( String loadFile ) throws IOException {
+
+        assert loadFile != null;
+
         disableMenusForAnalysis();
         Settings loadSettings;
         try {
@@ -521,8 +524,9 @@ public class MainFrame extends JFrame {
                     /*
                      * If we are loading a project;
                      */
-                    if ( projectFile != null ) loadAnalysis( projectFile ); // fixme make sure this is getting settings
-                                                                            // setup right (autosave?)
+                    if ( StringUtils.isNotBlank( projectFile ) ) loadAnalysis( projectFile ); // fixme make sure this
+                                                                                               // is getting settings
+                    // setup right (autosave?)
 
                     ( ( CardLayout ) cards.getLayout() ).show( cards, TABS_CARD );
                     statusMessenger.showStatus( "Ready." );

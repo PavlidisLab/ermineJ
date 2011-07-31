@@ -28,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
+
 import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.data.GeneAnnotations;
@@ -54,6 +56,11 @@ public class ResultsFileReader {
      */
     public ResultsFileReader( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
             throws NumberFormatException, IOException {
+
+        if ( StringUtils.isBlank( filename ) ) {
+            throw new IllegalArgumentException( "File name was blank" );
+        }
+
         results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
 
         File infile = new File( filename );
