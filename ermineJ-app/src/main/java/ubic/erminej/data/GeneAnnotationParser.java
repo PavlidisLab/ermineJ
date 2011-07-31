@@ -34,6 +34,7 @@ import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.basecode.util.StringUtil;
+import ubic.erminej.Settings;
 
 /**
  * * Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
@@ -73,7 +74,14 @@ public class GeneAnnotationParser {
         this.messenger = messenger;
     }
 
-    public GeneAnnotations read( InputStream i, Format format ) throws IOException {
+    /**
+     * @param i
+     * @param format
+     * @param settings
+     * @return
+     * @throws IOException
+     */
+    public GeneAnnotations read( InputStream i, Format format, Settings settings ) throws IOException {
         warned = false;
         if ( i == null ) {
             throw new IOException( "Inputstream was null" );
@@ -86,13 +94,13 @@ public class GeneAnnotationParser {
         GeneAnnotations result = null;
         switch ( format ) {
             case DEFAULT:
-                result = this.readDefault( i );
+                result = this.readDefault( i, settings );
                 break;
             case AFFYCSV:
-                result = this.readAffyCsv( i );
+                result = this.readAffyCsv( i, settings );
                 break;
             case AGILENT:
-                result = this.readAgilent( i );
+                result = this.readAgilent( i, settings );
                 break;
             default:
                 throw new IllegalStateException();
@@ -101,9 +109,18 @@ public class GeneAnnotationParser {
         return result;
     }
 
-    public GeneAnnotations read( String fileName, Format format ) throws IOException {
+    /**
+     * Fixme, all this needs is the settings.
+     * 
+     * @param fileName
+     * @param format
+     * @param settings
+     * @return
+     * @throws IOException
+     */
+    public GeneAnnotations read( String fileName, Format format, Settings settings ) throws IOException {
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
-        return this.read( i, format );
+        return this.read( i, format, settings );
     }
 
     /**
@@ -181,16 +198,16 @@ public class GeneAnnotationParser {
     /**
      * @param bis
      */
-    private GeneAnnotations readAffyCsv( InputStream bis ) throws IOException {
-        return this.readAffyCsv( bis, null );
+    private GeneAnnotations readAffyCsv( InputStream bis, Settings settings ) throws IOException {
+        return this.readAffyCsv( bis, null, settings );
     }
 
-    private GeneAnnotations readAgilent( InputStream bis ) throws IOException {
-        return this.readAgilent( bis, null );
+    private GeneAnnotations readAgilent( InputStream bis, Settings settings ) throws IOException {
+        return this.readAgilent( bis, null, settings );
     }
 
-    private GeneAnnotations readDefault( InputStream bis ) throws IOException {
-        return this.readDefault( bis, null );
+    private GeneAnnotations readDefault( InputStream bis, Settings settings ) throws IOException {
+        return this.readDefault( bis, null, settings );
     }
 
     /**
@@ -199,7 +216,8 @@ public class GeneAnnotationParser {
      * @param bis
      * @param object
      */
-    protected GeneAnnotations readAffyCsv( InputStream bis, Set<String> activeGenes ) throws IOException {
+    protected GeneAnnotations readAffyCsv( InputStream bis, Set<String> activeGenes, Settings settings )
+            throws IOException {
         if ( bis == null ) {
             throw new IOException( "Inputstream was null" );
         }
@@ -349,7 +367,7 @@ public class GeneAnnotationParser {
         }
 
         dis.close();
-        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, messenger );
+        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
 
         if ( result.numProbes() == 0 ) {
             throw new IllegalArgumentException(
@@ -361,10 +379,11 @@ public class GeneAnnotationParser {
 
     /**
      * @param bis
-     * @param activeGenes
+     * @param settings
      * @throws IOException
      */
-    protected GeneAnnotations readAgilent( InputStream bis, Set<String> activeGenes ) throws IOException {
+    protected GeneAnnotations readAgilent( InputStream bis, Set<String> activeGenes, Settings settings )
+            throws IOException {
         if ( bis == null ) {
             throw new IOException( "Inputstream was null" );
         }
@@ -445,7 +464,7 @@ public class GeneAnnotationParser {
 
         /* Fill in the genegroupreader and the classmap */
         dis.close();
-        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, messenger );
+        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
 
         if ( result.numProbes() == 0 ) {
             throw new IllegalArgumentException(
@@ -459,10 +478,11 @@ public class GeneAnnotationParser {
      * Main default reading method.
      * 
      * @param bis
-     * @param activeGenes
+     * @param settings
      * @throws IOException
      */
-    protected GeneAnnotations readDefault( InputStream bis, Set<Gene> activeGenes ) throws IOException {
+    protected GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, Settings settings )
+            throws IOException {
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         Map<String, Gene> genes = new HashMap<String, Gene>();
@@ -486,8 +506,20 @@ public class GeneAnnotationParser {
 
             String geneName = tokens[1];
 
-            if ( filterNonSpecific && ( geneName.contains( "|" ) || geneName.contains( "," ) ) ) {
-                continue;
+            // correctly deal with things like Nasp|Nasp or Nasp|Nasp2
+            if ( geneName.matches( ".+?[\\|,].+?" ) ) {
+                String[] multig = geneName.split( "[\\|,]" );
+                Collection<String> multigenes = new HashSet<String>();
+                for ( String g : multig ) {
+                    // log.debug( g + " found in " + geneName );
+                    multigenes.add( g );
+                }
+
+                if ( multigenes.size() > 1 && filterNonSpecific ) {
+                    continue;
+                }
+
+                geneName = multigenes.iterator().next();
             }
 
             /* read gene description */
@@ -538,7 +570,7 @@ public class GeneAnnotationParser {
             }
         }
         dis.close();
-        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, messenger );
+        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
 
         return result;
     }

@@ -20,7 +20,6 @@ package ubic.erminej.data;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -130,7 +129,7 @@ public class GeneScores {
         this.geneAnnots = geneAnnotations;
         this.init( settings );
         if ( m != null ) this.messenger = m;
-        read( is, settings.getScoreCol() );
+        read( is, settings.getScoreCol(), -1 );
 
     }
 
@@ -242,6 +241,20 @@ public class GeneScores {
         return count;
     }
 
+    public GeneScores( String filename, SettingsHolder settings, StatusViewer messenger, GeneAnnotations geneAnnots,
+            int limit ) throws IOException {
+        if ( StringUtils.isBlank( filename ) ) {
+            throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
+        }
+        this.geneAnnots = geneAnnots;
+        this.messenger = messenger;
+        this.init( settings );
+        FileTools.checkPathIsReadableFile( filename );
+        InputStream is = FileTools.getInputStreamFromPlainOrCompressedFile( filename );
+        read( is, settings.getScoreCol(), limit );
+        is.close();
+    }
+
     /**
      * @param filename
      * @param settings
@@ -251,16 +264,7 @@ public class GeneScores {
      */
     public GeneScores( String filename, SettingsHolder settings, StatusViewer messenger, GeneAnnotations geneAnnots )
             throws IOException {
-        if ( StringUtils.isBlank( filename ) ) {
-            throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
-        }
-        this.geneAnnots = geneAnnots;
-        this.messenger = messenger;
-        this.init( settings );
-        FileTools.checkPathIsReadableFile( filename );
-        InputStream is = new FileInputStream( filename );
-        read( is, settings.getScoreCol() );
-        is.close();
+        this( filename, settings, messenger, geneAnnots, -1 );
     }
 
     /**
@@ -399,10 +403,11 @@ public class GeneScores {
 
     /**
      * @param is
+     * @param limit
      * @throws IOException
      * @throws IllegalStateException
      */
-    private void read( InputStream is, int scoreCol ) throws IOException, IllegalStateException {
+    private void read( InputStream is, int scoreCol, int limit ) throws IOException, IllegalStateException {
         assert geneAnnots != null;
         if ( scoreCol < 2 ) {
             throw new IllegalArgumentException( "Illegal column number " + scoreCol + ", must be greater than 1" );
@@ -425,6 +430,7 @@ public class GeneScores {
         dis.readLine(); // skip header.
         Collection<String> unannotatedProbes = new HashSet<String>();
 
+        boolean warned = false;
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
 
@@ -436,8 +442,9 @@ public class GeneScores {
             String probeId = StringUtils.strip( fields[0] );
 
             if ( probeId.matches( "AFFX.*" ) ) { // FIXME: put this rule somewhere else
-                if ( messenger != null ) {
-                    messenger.showStatus( "Skipping probe in pval file: " + probeId );
+                if ( messenger != null && !warned ) {
+                    messenger.showStatus( "Skipping probe in pval file: " + probeId + " (further warnings suppressed)" );
+                    warned = true;
                 }
                 continue;
             }
@@ -447,7 +454,7 @@ public class GeneScores {
             Probe p = geneAnnots.findProbe( probeId );
 
             if ( p == null ) {
-                log.debug( "\"" + probeId + "\" not in the annotations, ignoring" );
+                if ( log.isDebugEnabled() ) log.debug( "\"" + probeId + "\" not in the annotations, ignoring" );
                 unknownProbes.add( probeId );
                 numUnknownProbes++;
                 continue;
@@ -483,18 +490,22 @@ public class GeneScores {
             /* we're done... */
             numProbesKept++;
 
-            // log.info( p + " " + score );
             if ( probeToScoreMap.containsKey( p ) ) {
-                log.warn( "Repeated identifier: " + probeId + ", keeping original value." );
+                if ( !warned ) {
+                    messenger.showStatus( "Repeated identifier: " + probeId + ", keeping original value." );
+                    warned = true;
+                }
                 numRepeatedProbes++;
             } else {
                 probeToScoreMap.put( p, score );
             }
 
-            if ( Thread.currentThread().isInterrupted() ) {
+            if ( numProbesKept % 100 == 0 && Thread.currentThread().isInterrupted() ) {
                 dis.close();
                 throw new CancellationException();
             }
+
+            if ( limit > 0 && numProbesKept == limit ) break;
 
         }
         dis.close();

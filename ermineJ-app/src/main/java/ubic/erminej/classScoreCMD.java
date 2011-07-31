@@ -56,7 +56,6 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
-import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
@@ -775,7 +774,7 @@ public class classScoreCMD {
                 boolean filterNonSpecific = settings.getFilterNonSpecific();
                 parser.setFilterNonSpecific( filterNonSpecific );
             }
-            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat() );
+            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat(), settings );
 
             statusMessenger.showStatus( "Initializing gene class mapping" );
             statusMessenger.showStatus( "Done with setup" );
@@ -790,8 +789,6 @@ public class classScoreCMD {
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
         }
-        UserDefinedGeneSetManager.init( geneData, settings );
-        UserDefinedGeneSetManager.loadUserGeneSets( this.statusMessenger );
 
         statusMessenger.showStatus( "Done with initialization." );
     }

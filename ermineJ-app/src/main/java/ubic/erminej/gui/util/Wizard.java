@@ -34,7 +34,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import ubic.basecode.util.StatusViewer;
-import ubic.erminej.gui.StatusJlabel;
 
 /**
  * Simple "wizard" implementation. To use, call the "addStep" method with a new WizardStep as an argument. Actions must
@@ -126,6 +125,10 @@ public abstract class Wizard extends JDialog {
     protected void addStep( WizardStep panel, boolean first ) {
         this.addStep( panel );
         if ( first ) mainPanel.add( steps.get( 0 ), BorderLayout.CENTER );
+    }
+
+    public StatusViewer getStatusField() {
+        return this.statusMessenger;
     }
 
     /**

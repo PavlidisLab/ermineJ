@@ -71,6 +71,11 @@ public class ResultsFileReader {
         boolean warned = false;
         messenger.showStatus( "Loading analysis..." );
         String line;
+
+        /*
+         * FIXME, handle multi-results version
+         */
+
         while ( ( line = dis.readLine() ) != null ) {
             StringTokenizer st = new StringTokenizer( line, "\t" );
             String firstword = st.nextToken();

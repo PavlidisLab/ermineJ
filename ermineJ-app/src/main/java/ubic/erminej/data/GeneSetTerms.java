@@ -249,14 +249,8 @@ public class GeneSetTerms {
     void addUserDefinedTerm( GeneSetTerm id ) {
         assert id.isUserDefined();
         if ( getGraph() == null ) return;
-        assert this.getGraph().get( USER_DEFINED ) != null;
-
-        // String aspect = id.getAspect() == null ? USER_DEFINED : id.getAspect();
-        // log.debug( "Adding user-defined gene set to graph: " + id
-        // + id.getDefinition().substring( 0, Math.min( id.getDefinition().length(), 30 ) ) + "..., Aspect: "
-        // + aspect );
+        assert this.getGraph().get( USER_DEFINED ) != null; 
         this.getGraph().addChildTo( USER_DEFINED, id.getId(), id );
-
     }
 
     /***

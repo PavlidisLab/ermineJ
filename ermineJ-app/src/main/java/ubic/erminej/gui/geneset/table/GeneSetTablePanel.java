@@ -244,6 +244,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     @Override
     public void addRun() {
         model.addRun();
+
         int c = model.getColumnCount() - 1;
         TableColumn col = new TableColumn( c );
         col.setIdentifier( model.getColumnName( c ) );
@@ -256,7 +257,27 @@ public class GeneSetTablePanel extends GeneSetPanel {
         this.callingFrame.setCurrentResultSet( currentResultSetIndex );
         table.revalidate();
 
+        try {
+            Thread.sleep( 100 );
+        } catch ( InterruptedException e ) {
+            // give the gui a chance to catch up; an attempt (in vain?) to avoid errors in logs like "
+            // java.lang.ClassCastException:
+            // ubic.erminej.data.EmptyGeneSetResult cannot be cast to java.lang.String
+            // at
+            // ubic.erminej.gui.geneset.table.GeneSetTableCellRenderer.getTableCellRendererComponent(GeneSetTableModel.java:316)"
+        }
+
         this.model.filter();
+
+        try {
+            Thread.sleep( 100 );
+        } catch ( InterruptedException e ) {
+            // give the gui a chance to catch up; an attempt (in vain?) to avoid errors in logs like "
+            // java.lang.ClassCastException:
+            // ubic.erminej.data.EmptyGeneSetResult cannot be cast to java.lang.String
+            // at
+            // ubic.erminej.gui.geneset.table.GeneSetTableCellRenderer.getTableCellRendererComponent(GeneSetTableModel.java:316)"
+        }
 
         List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );

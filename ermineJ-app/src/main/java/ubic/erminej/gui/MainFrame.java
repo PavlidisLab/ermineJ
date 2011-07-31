@@ -36,6 +36,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
+import javax.swing.filechooser.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -61,6 +62,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
@@ -73,6 +75,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
@@ -82,6 +85,7 @@ import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.AnalysisThread;
+import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
@@ -92,14 +96,16 @@ import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
-import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.analysis.AnalysisWizard;
 import ubic.erminej.gui.analysis.MultiFuncDiagWindow;
+import ubic.erminej.gui.geneset.details.JGeneScoreFileChooser;
+import ubic.erminej.gui.geneset.details.JRawFileChooser;
 import ubic.erminej.gui.geneset.table.GeneSetTablePanel;
 import ubic.erminej.gui.geneset.tree.GeneSetTreePanel;
 import ubic.erminej.gui.geneset.wiz.GeneSetWizard;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.ScrollingTextAreaDialog;
+import ubic.erminej.gui.util.StatusJlabel;
 
 /**
  * The main ErmineJ application GUI Sframe.
@@ -152,7 +158,7 @@ public class MainFrame extends JFrame {
     private JMenu analysisMenu = new JMenu();
     private JMenu diagnosticsMenu = new JMenu();
     private JMenu classMenu = new JMenu();
-    private final JFileChooser fc = new JFileChooser();
+
     private JMenu fileMenu = new JMenu();
     private JMenu helpMenu = new JMenu();
 
@@ -378,10 +384,14 @@ public class MainFrame extends JFrame {
         if ( StringUtils.isBlank( file ) ) return null;
         log.info( "Seeking file '" + file + "'" );
         if ( !FileTools.testFile( file ) ) {
-            GuiUtil.error( "A file referred to in the results\n(" + file
-                    + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
-                    + " enter the location." );
-            fc.setDialogTitle( "Please locate " + file );
+
+            // try to start them somewhere useful.
+            JFileChooser fc = new JFileChooser( settings.getGeneScoreFileDirectory() );
+            //
+            // GuiUtil.error( "A file referred to in the results file\n(" + file
+            // + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
+            // + " enter the location" );
+            fc.setDialogTitle( "Missing file: please locate " + file );
             fc.setDialogType( JFileChooser.OPEN_DIALOG );
             fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
             int result = fc.showOpenDialog( this );
@@ -427,6 +437,9 @@ public class MainFrame extends JFrame {
      * @param loadSettings
      */
     private boolean checkValid( Settings loadSettings ) {
+        /*
+         * Strict validation is turned off. But I'm not sure we need this at all?
+         */
 
         String file;
 
@@ -503,10 +516,9 @@ public class MainFrame extends JFrame {
             protected Object doInBackground() throws Exception {
                 try {
                     setupStatusBar();
-                    readDataFilesForStartup();
 
-                    treePanel.initialize( geneData );
-                    tablePanel.initialize( geneData );
+                    initializeAllData();
+
                     ( ( CardLayout ) cards.getLayout() ).show( cards, TABS_CARD );
                     statusMessenger.showStatus( "Ready." );
                     enableMenusOnStart();
@@ -522,6 +534,15 @@ public class MainFrame extends JFrame {
 
         r.execute();
 
+    }
+
+    /**
+     * Reinitialize everything
+     */
+    protected void initializeAllData() {
+        readDataFilesForStartup(); // sets up geneData.
+        treePanel.initialize( geneData );
+        tablePanel.initialize( geneData );
     }
 
     /**
@@ -612,10 +633,14 @@ public class MainFrame extends JFrame {
      * Input the GO and annotation files.
      */
     private void readDataFilesForStartup() {
+
+        StopWatch timer = new StopWatch();
+        timer.start();
         updateProgress( 10 );
 
-        statusMessenger.showStatus( "Reading GO tree from: " + settings.getClassFile() );
+        statusMessenger.showStatus( "Reading GO hierarchy from: " + settings.getClassFile() );
         assert settings.getClassFile() != null;
+
         GeneSetTerms goData = null;
         try {
             goData = new GeneSetTerms( settings.getClassFile() );
@@ -630,6 +655,9 @@ public class MainFrame extends JFrame {
             return;
         }
 
+        timer.split();
+        log.info( "Load GO: " + timer.getSplitTime() + " ms" );
+
         updateProgress( 30 );
 
         statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
@@ -637,7 +665,7 @@ public class MainFrame extends JFrame {
         try {
             GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
 
-            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat() );
+            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat(), settings );
 
         } catch ( IOException e ) {
             GuiUtil.error( "Gene annotation reading error during initialization: " + e.getMessage()
@@ -652,10 +680,10 @@ public class MainFrame extends JFrame {
             return;
         }
 
-        updateProgress( 60 );
+        assert geneData != null;
+        log.info( "Setup done: " + timer.getTime() + " ms" );
 
-        statusMessenger.showStatus( "Reading user-defined gene sets from directory "
-                + settings.getUserGeneSetDirectory() );
+        updateProgress( 90 );
 
         // end slow(ish) part.
 
@@ -674,10 +702,6 @@ public class MainFrame extends JFrame {
                     + "Check that the file format is correct.\n" );
         }
 
-        assert geneData != null;
-        UserDefinedGeneSetManager.init( geneData, settings );
-        UserDefinedGeneSetManager.loadUserGeneSets( statusMessenger );
-        updateProgress( 90 );
     }
 
     /**
@@ -745,9 +769,6 @@ public class MainFrame extends JFrame {
         JMenuItem quitMenuItem = new JMenuItem();
         JMenuItem logMenuItem = new JMenuItem();
         JMenuItem geneAnnotsWebLinkMenuItem = new JMenuItem();
-
-        // JMenuItem findClassMenuItem = new JMenuItem();
-        // JMenuItem findGeneMenuItem = new JMenuItem();
         JMenuItem aboutMenuItem = new JMenuItem();
 
         fileMenu.setText( "File" );
@@ -756,8 +777,25 @@ public class MainFrame extends JFrame {
         quitMenuItem.addActionListener( new GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
         quitMenuItem.setMnemonic( 'Q' );
         quitMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Q, InputEvent.CTRL_MASK ) );
-
         fileMenu.add( quitMenuItem );
+
+        JMenuItem saveProjectMenuItem = new JMenuItem( "Save project ..." );
+        JMenuItem loadProjectMenuItem = new JMenuItem( "Load project ..." );
+        saveProjectMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                saveProject();
+            }
+        } );
+        loadProjectMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                loadProject();
+            }
+        } );
+
+        fileMenu.add( saveProjectMenuItem );
+        fileMenu.add( loadProjectMenuItem );
 
         classMenu.setText( "Gene Sets" );
         classMenu.setMnemonic( 'C' );
@@ -772,16 +810,6 @@ public class MainFrame extends JFrame {
         modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
         modClassMenuItem.setMnemonic( 'M' );
 
-        // findClassMenuItem.setText( "Find Gene Set" );
-        // findClassMenuItem.addActionListener( new GeneSetScoreFrame_findClassMenuItem_actionAdapter( this ) );
-        // findClassMenuItem.setMnemonic( 'F' );
-        // findClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ) );
-        //
-        // findGeneMenuItem.setText( "Find Gene sets by gene" );
-        // findGeneMenuItem.addActionListener( new GeneSetScoreFrame_findGeneMenuItem_actionAdapter( this ) );
-        // findGeneMenuItem.setMnemonic( 'G' );
-        // findGeneMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_G, InputEvent.CTRL_MASK ) );
-
         showUsersMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 showUserMenuItemActionPerformed( showUsersMenuItem.getState() );
@@ -792,8 +820,6 @@ public class MainFrame extends JFrame {
 
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
-        // classMenu.add( findClassMenuItem );
-        // classMenu.add( findGeneMenuItem );
         classMenu.add( showUsersMenuItem );
 
         this.runViewMenu.setText( "Results" );
@@ -903,6 +929,134 @@ public class MainFrame extends JFrame {
         jMenuBar1.add( analysisMenu );
         jMenuBar1.add( runViewMenu );
         jMenuBar1.add( helpMenu );
+
+    }
+
+    protected void loadProject() {
+
+        /*
+         * User selects project file
+         */
+        JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
+        projectPathChooser.setFileFilter( new FileFilter() {
+            @Override
+            public boolean accept( File pathname ) {
+                return pathname.getPath().endsWith( ".project" );
+            }
+
+            @Override
+            public String getDescription() {
+                return "ErmineJ project files (*.project)";
+            }
+        } );
+
+        int yesno = projectPathChooser.showDialog( this, "Open" );
+
+        /*
+         * Import it as the current settings - actually use the results import function?
+         */
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+
+            final String path = projectPathChooser.getSelectedFile().getAbsolutePath();
+
+            try {
+                Settings projectSettings = new Settings( path );
+
+                this.settings = projectSettings;
+
+                /*
+                 * FIXME: those settings are not auto-saved.
+                 */
+
+                /*
+                 * Rebuilt the application data structures, pretty much from scratch. Really the results import thing
+                 * should do that normally.
+                 */
+                SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        initializeAllData(); // fixme, skip if the files are the same ...
+                        loadAnalysis( path ); // fixme make sure this is getting settings setup right (autosave?)
+                        return null;
+                    }
+                };
+                r.execute();
+
+            } catch ( IOException e ) {
+                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
+                log.error( e, e );
+                return;
+            } catch ( ConfigurationException e ) {
+                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
+                log.error( e, e );
+                return;
+            }
+        }
+
+    }
+
+    protected void saveProject() {
+
+        /*
+         * Prompt user for file name (and possibly the name of the project)
+         */
+
+        final JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
+
+        projectPathChooser.setFileFilter( new FileFilter() {
+
+            @Override
+            public boolean accept( File pathname ) {
+                return pathname.getPath().endsWith( ".project" );
+            }
+
+            @Override
+            public String getDescription() {
+                return "ErmineJ project files (*.project)";
+            }
+        } );
+
+        int yesno = projectPathChooser.showDialog( this, "Choose project file name" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+
+            File selectedFile = projectPathChooser.getSelectedFile();
+
+            if ( selectedFile.exists() ) {
+                int response = JOptionPane.showConfirmDialog( null, "Overwrite existing file?", "Confirm Overwrite",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+                if ( response == JOptionPane.CANCEL_OPTION ) return;
+            }
+
+            if ( !selectedFile.getName().endsWith( ".project" ) ) {
+                selectedFile = new File( selectedFile.getAbsolutePath() + ".project" );
+            }
+
+            String path = selectedFile.getAbsolutePath();
+
+            /*
+             * FIXME: user files listed over and over.
+             */
+
+            /*
+             * Write the file in ermineJ.data in *.project files. The format will be configurations - we just write a
+             * copy of the settings.
+             * 
+             * What about the current results? Perhaps make a multi-result file format.
+             */
+            try {
+                Settings.writeAnalysisSettings( this.settings, path, this.statusMessenger ); // ??
+                // resultsprinter does not save the settings.
+                if ( !this.results.isEmpty() ) {
+                    ResultsPrinter rp = new ResultsPrinter( path, this.results );
+                    rp.printResults( true );
+                }
+            } catch ( IOException e ) {
+                GuiUtil.error( "Could not save the project: " + e.getMessage() );
+                log.error( e, e );
+            }
+        }
 
     }
 
@@ -1103,24 +1257,29 @@ public class MainFrame extends JFrame {
      * 
      */
     protected void switchGeneScoreFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getGeneScoreFileDirectory() );
+        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( settings.getScoreFile(), settings.getScoreCol() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile()
+                    + ", reading values from column " + settings.getScoreCol() );
+            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.setScoreCol( fchooser.getStartColumn() );
             statusMessenger.showStatus( "Score file set to " + settings.getScoreFile() );
         }
 
     }
 
     protected void switchRawDataFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getRawDataFileDirectory() );
-        fchooser.setDialogTitle( "Choose the profile data file or cancel." );
+        JRawFileChooser fchooser = new JRawFileChooser( settings.getRawDataFileName(), settings.getDataCol() );
+        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.setDataCol( fchooser.getStartColumn() );
             statusMessenger.showStatus( "Data file set to " + settings.getScoreFile() );
         }
     }

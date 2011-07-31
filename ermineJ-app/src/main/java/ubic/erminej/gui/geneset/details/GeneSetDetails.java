@@ -54,7 +54,7 @@ public class GeneSetDetails {
 
     private GeneSetTerm classID;
 
-    private GeneSetResult result;
+    private GeneSetResult result; // TODO show current result in the title.
     private GeneAnnotations geneData;
 
     private Settings settings;
@@ -98,8 +98,10 @@ public class GeneSetDetails {
             try {
                 this.settings = new Settings();
             } catch ( IOException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                GuiUtil.error( "Problem accessing settings for the details view: " + e
+                        + ", see the logs for more details." );
+                log.error( e, e );
+                return;
             }
         } else {
             this.settings = settings;
@@ -189,7 +191,8 @@ public class GeneSetDetails {
 
             DoubleMatrixReader matrixReader = new DoubleMatrixReader();
 
-            DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet() );
+            DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet(), settings
+                    .getDataCol() );
 
             this.dataMatrix = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
             dataMatrix.setColumnNames( omatrix.getColNames() );
@@ -212,8 +215,7 @@ public class GeneSetDetails {
      * @param dm
      */
     public void setDataMatrix( DoubleMatrix<Probe, String> dm ) {
-        /* FIXME check that probes match */
-
+        /* FIXME check that probes match; if they don't not actually any harm, but won't display, no warning */
         this.dataMatrix = dm;
     }
 

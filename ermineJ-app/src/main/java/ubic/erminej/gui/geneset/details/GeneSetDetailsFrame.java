@@ -82,13 +82,13 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.MainFrame;
-import ubic.erminej.gui.StatusJlabel;
 import ubic.erminej.gui.table.JBarGraphCellRenderer;
 import ubic.erminej.gui.table.JMatrixCellRenderer;
 import ubic.erminej.gui.table.JVerticalHeaderRenderer;
 import ubic.erminej.gui.util.Colors;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.JLinkLabel;
+import ubic.erminej.gui.util.StatusJlabel;
 
 /**
  * @author Paul Pavlidis
@@ -140,11 +140,11 @@ public class GeneSetDetailsFrame extends JFrame {
     protected JToolBar toolBar = new JToolBar();
 
     private JRadioButtonMenuItem blackbodyColormapMenuItem = new JRadioButtonMenuItem();
-    private JDataFileChooser fileChooser = null;
+    private DetailsOutputDataFileChooser fileChooser = null;
     private JMenu fileMenu = new JMenu();
 
     private JRadioButtonMenuItem greenredColormapMenuItem = new JRadioButtonMenuItem();
-    private JImageFileChooser imageChooser = null;
+    private DetailsOutputImageFileChooser imageChooser = null;
     private JLabel m_cellWidthLabel = new JLabel();
     private JSlider m_cellWidthSlider = new JSlider();
     private JLabel m_colorRangeLabel = new JLabel();
@@ -192,7 +192,6 @@ public class GeneSetDetailsFrame extends JFrame {
         } else {
             this.settings = geneSetDetails.getSettings();
         }
-        this.readPrefs();
 
         readPrefs();
         createDetailsTable();
@@ -212,10 +211,10 @@ public class GeneSetDetailsFrame extends JFrame {
         // clean up the class id so it can be used to form file names (this is not foolproof)
         String fileNameBase = this.geneSetDetails.getClassID().getId().replaceAll(
                 "[:\\s\\(\\)\\*&^%$#@\\!\\`\\'\\\"]+", "_" );
-        imageChooser = new JImageFileChooser( settings.getConfig().getBoolean( INCLUDELABELS, true ), settings
-                .getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ), fileNameBase + ".png" );
-        fileChooser = new JDataFileChooser( settings.getConfig().getBoolean( INCLUDEEVERYTHING, true ), settings
-                .getConfig().getBoolean( NORMALIZE_SAVED_DATA, false ), fileNameBase + ".txt" );
+        imageChooser = new DetailsOutputImageFileChooser( settings.getConfig().getBoolean( INCLUDELABELS, true ),
+                settings.getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ), fileNameBase + ".png" );
+        fileChooser = new DetailsOutputDataFileChooser( settings.getConfig().getBoolean( INCLUDEEVERYTHING, true ),
+                settings.getConfig().getBoolean( NORMALIZE_SAVED_DATA, false ), fileNameBase + ".txt" );
         readPathPrefs();
     }
 
@@ -865,7 +864,7 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     protected void createDetailsTable() {
 
-        setUpMatrixView();
+        setUpMatrixView(); // sets up matrixDisplay.
 
         tableModel = new GeneSetDetailsTableModel( matrixDisplay, geneSetDetails, settings );
         table.setModel( tableModel );
@@ -928,6 +927,11 @@ public class GeneSetDetailsFrame extends JFrame {
      * their original order (or it might not be displayed correctly inside the table).
      */
     protected int[] getCurrentMatrixDisplayRowOrder() {
+
+        /*
+         * There must be a simpler way to get this from the tablerowsorter? like
+         * table.getRowSorter().convertRowIndexToView( index )?
+         */
 
         int matrixRowCount = matrixDisplay.getRowCount();
         int[] rowKeys = new int[matrixRowCount];
@@ -1030,15 +1034,16 @@ public class GeneSetDetailsFrame extends JFrame {
     } // end saveImage
 
     /**
-     * Keep the same gene set, but change the scores.
+     * Keep the same gene set, but change the scores. FIXME let use choose the start column.
      */
     protected void switchGeneScoreFile() {
-        JFileChooser fchooser = new JFileChooser( settings.getGeneScoreFileDirectory() );
+        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( settings.getScoreFile(), settings.getScoreCol() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.setScoreCol( fchooser.getStartColumn() );
             statusMessenger.showStatus( "Score file set to " + settings.getScoreFile()
                     + ", reading values from column " + settings.getScoreCol() );
 
@@ -1051,7 +1056,6 @@ public class GeneSetDetailsFrame extends JFrame {
             } catch ( IOException e ) {
                 statusMessenger
                         .showError( "Error during loading of " + settings.getScoreFile() + ": " + e.getMessage() );
-
             }
 
         }
@@ -1062,9 +1066,6 @@ public class GeneSetDetailsFrame extends JFrame {
         this.switchRawDataFile( false );
     }
 
-    /**
-     * 
-     */
     protected void switchRawDataFile( boolean showHelp ) {
 
         if ( showHelp ) {
@@ -1079,16 +1080,27 @@ public class GeneSetDetailsFrame extends JFrame {
                             JOptionPane.INFORMATION_MESSAGE );
         }
 
-        JFileChooser fc = new JFileChooser( settings.getRawDataFileDirectory() );
+        JRawFileChooser fc = new JRawFileChooser( settings.getRawDataFileName(), settings.getDataCol() );
         fc.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fc.showDialog( this, "Open" );
 
-        String rawdataFile = fc.getSelectedFile().getAbsolutePath();
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            String rawdataFile = fc.getSelectedFile().getAbsolutePath();
+
             settings.setRawFile( rawdataFile );
+            settings.setDataCol( fc.getStartColumn() );
+
+            this.geneSetDetails.loadDataMatrix( rawdataFile );
+
+            /*
+             * Have to rebuild the entire table.
+             */
+            createDetailsTable();
+            this.validate();
+            this.statusMessenger.showStatus( "Matrix file set to: " + rawdataFile );
+
         }
 
-        this.geneSetDetails.loadDataMatrix( rawdataFile );
     }
 
     void m_blackbodyColormapMenuItem_actionPerformed() {
@@ -1304,7 +1316,7 @@ public class GeneSetDetailsFrame extends JFrame {
             if ( onGeneSymbolCell( i, j ) ) {
                 if ( table.getValueAt( i, j ) instanceof JLinkLabel ) {
                     JLinkLabel geneLink = ( JLinkLabel ) table.getValueAt( i, j );
-                    // for some reason the event is not getting to the linklabel; it works in the AboutBox, though.S
+                    // Events on cells are apparently not propagated to the children.
                     if ( geneLink != null ) geneLink.openUrl();
                 } else {
                     // show the link.

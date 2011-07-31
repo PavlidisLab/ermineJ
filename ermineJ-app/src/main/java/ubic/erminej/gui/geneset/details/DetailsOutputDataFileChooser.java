@@ -18,8 +18,6 @@
  */
 package ubic.erminej.gui.geneset.details;
 
-// for JDetailsFileChooser
-// for JDetailsFileChooserOptions (the file chooser accessory)
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
@@ -34,16 +32,18 @@ import javax.swing.SwingConstants;
 import ubic.erminej.gui.file.DataFileFilter;
 
 /**
+ * Customized file browser.
+ * 
  * @author Will Braynen
  * @version $Id$
  */
-public class JDataFileChooser extends JFileChooser {
+public class DetailsOutputDataFileChooser extends JFileChooser {
 
     private static final long serialVersionUID = -4213033434706180241L;
 
     JDataFileChooserOptions m_options;
 
-    public JDataFileChooser( boolean includeEverything, boolean normalize, String initialFileName ) {
+    public DetailsOutputDataFileChooser( boolean includeEverything, boolean normalize, String initialFileName ) {
 
         super();
 
@@ -73,11 +73,6 @@ public class JDataFileChooser extends JFileChooser {
      * look like with the chosen options.
      */
     private class JDataFileChooserOptions extends JComponent {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 1L;
 
         private JCheckBox includeMatrixValuesCheckBox = new JCheckBox( "Include annotations and scores" );
 

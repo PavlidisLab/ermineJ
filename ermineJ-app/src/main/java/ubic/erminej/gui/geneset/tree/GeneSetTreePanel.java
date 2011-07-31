@@ -236,7 +236,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param goData
      * @param geneData
      */
-    public void initialize( GeneAnnotations gd ) {
+    public void initialize( GeneAnnotations gd ) { 
 
         this.geneData = gd;
         setUpTree();
@@ -558,23 +558,17 @@ public class GeneSetTreePanel extends GeneSetPanel {
  */
 class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
-    private static final Color USER_NODE_COLOR = Color.decode( "#FAFABB" );
-
-    private static final Color USER_NODE_TEXT_COLOR = Color.BLACK;
-
-    private static final String RESOURCE_LOCATION = "/ubic/erminej/";
-
     private static final long serialVersionUID = -1L;
 
-    private static final String GOOD_CHILD_ICON = RESOURCE_LOCATION + "littleDiamond.gif";
+    private static final String GOOD_CHILD_ICON = GeneSetPanel.RESOURCE_LOCATION + "littleDiamond.gif";
 
-    private static final String REGULAR_ICON = RESOURCE_LOCATION + "littleSquare.gif";
+    private static final String REGULAR_ICON = GeneSetPanel.RESOURCE_LOCATION + "littleSquare.gif";
 
-    private static final String GOODPVAL_ICON = RESOURCE_LOCATION + "goldCircle.gif";
+    private static final String GOODPVAL_ICON = GeneSetPanel.RESOURCE_LOCATION + "goldCircle.gif";
 
-    private static final String GOODPVAL_GOODCHILD_ICON = RESOURCE_LOCATION + "goldCirclePurpleDot.gif";
+    private static final String GOODPVAL_GOODCHILD_ICON = GeneSetPanel.RESOURCE_LOCATION + "goldCirclePurpleDot.gif";
 
-    private static final String EMPTYSET_ICON = RESOURCE_LOCATION + "littleLighterGreySquare.gif";
+    private static final String EMPTYSET_ICON = GeneSetPanel.RESOURCE_LOCATION + "littleLighterGreySquare.gif";
 
     private GeneSetPvalRun currentResultSet = null;
 
@@ -643,7 +637,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         this.setText( displayedText );
 
         if ( id.isUserDefined() ) {
-            this.setBackground( USER_NODE_COLOR );
+            this.setBackground( GeneSetPanel.USER_NODE_COLOR );
         }
 
         if ( this.selected ) {
@@ -693,7 +687,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             this.setForeground( Color.BLACK );
         }
         if ( id.isUserDefined() ) {
-            this.setForeground( USER_NODE_TEXT_COLOR );
+            this.setForeground( GeneSetPanel.USER_NODE_TEXT_COLOR );
         }
         return textToDisplay + "</html>";
     }

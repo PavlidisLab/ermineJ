@@ -24,7 +24,7 @@ import java.util.HashSet;
  */
 public class Gene implements Comparable<Gene> {
 
-    private String symbol;
+    private final String symbol;
 
     private String name = "[No Name]";
 
@@ -80,10 +80,7 @@ public class Gene implements Comparable<Gene> {
         if ( obj == null ) return false;
         if ( getClass() != obj.getClass() ) return false;
         Gene other = ( Gene ) obj;
-        if ( symbol == null ) {
-            if ( other.symbol != null ) return false;
-        } else if ( !symbol.equals( other.symbol ) ) return false;
-        return true;
+        return symbol.equals( other.symbol );
     }
 
     public Collection<Probe> getActiveProbes() {
@@ -108,10 +105,7 @@ public class Gene implements Comparable<Gene> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ( ( symbol == null ) ? 0 : symbol.hashCode() );
-        return result;
+        return symbol.hashCode();
     }
 
     /**

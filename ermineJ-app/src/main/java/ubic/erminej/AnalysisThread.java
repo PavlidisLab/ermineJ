@@ -164,6 +164,8 @@ public class AnalysisThread extends Thread {
     }
 
     /**
+     * Load from a file.
+     * 
      * @return
      * @throws IOException
      */
@@ -301,7 +303,8 @@ public class AnalysisThread extends Thread {
         }
 
         timer.stop();
-        if ( messenger != null ) messenger.showStatus( timer.getTime() / 1000 + " seconds elapsed" );
+        if ( messenger != null )
+            messenger.showStatus( String.format( "%d seconds elapsed", Math.round( timer.getTime() / 1000 ) ) );
 
         if ( this.stop ) return null;
         // settings.writePrefs();

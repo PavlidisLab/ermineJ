@@ -47,8 +47,8 @@ import ubic.erminej.data.GeneSetTerm;
 public class ResultsPrinter {
     private static Log log = LogFactory.getLog( ResultsPrinter.class.getName() );
     protected String destFile;
-    private final boolean saveAllGeneNames;
-    private GeneSetPvalRun resultRun;
+    private boolean saveAllGeneNames = false;
+    private List<GeneSetPvalRun> runsToSave = new ArrayList<GeneSetPvalRun>();
     private GeneAnnotations geneData;
 
     /**
@@ -60,10 +60,24 @@ public class ResultsPrinter {
     public ResultsPrinter( String destFile, GeneSetPvalRun run, boolean saveAllGeneNames ) {
         this.destFile = destFile;
         this.saveAllGeneNames = saveAllGeneNames;
-        this.resultRun = run;
-        this.geneData = resultRun.getGeneData();
+        this.runsToSave.add( run );
+
+        this.geneData = run.getGeneData();
 
         if ( saveAllGeneNames ) log.debug( "Will save all genes" );
+    }
+
+    /**
+     * @param path
+     * @param runsToSave
+     */
+    public ResultsPrinter( String path, Collection<GeneSetPvalRun> runsToSave ) {
+        if ( runsToSave.isEmpty() ) {
+            return;
+        }
+        this.runsToSave.addAll( runsToSave );
+        this.geneData = runsToSave.iterator().next().getGeneData();
+        this.destFile = path;
     }
 
     /**
@@ -74,10 +88,23 @@ public class ResultsPrinter {
     }
 
     /**
-     * @throws IOException Print the results
+     * @throws IOException Print the results (without the settings on top)
      */
     public void printResults() throws IOException {
         this.printResults( false );
+    }
+
+    public void printResults( boolean sort ) throws IOException {
+        Writer out = getDestination();
+
+        for ( GeneSetPvalRun run : this.runsToSave ) {
+            printOneResultSet( run, out, sort );
+            out.write( "!# ====\ncurrentRunName=" + run.getName() + "\n" );
+            if ( runsToSave.size() > 1 ) {
+
+            }
+        }
+        out.close();
     }
 
     /**
@@ -85,16 +112,14 @@ public class ResultsPrinter {
      * 
      * @param sort Sort the results so the best class (by score pvalue) is listed first.
      */
-    public void printResults( boolean sort ) throws IOException {
+    public void printOneResultSet( GeneSetPvalRun resultRun, Writer out, boolean sort ) throws IOException {
 
         if ( resultRun == null ) {
             log.warn( "No results to print" );
             return;
         }
 
-        Map<GeneSetTerm, GeneSetResult> results = this.resultRun.getResults();
-
-        Writer out = getDestination();
+        Map<GeneSetTerm, GeneSetResult> results = resultRun.getResults();
 
         boolean first = true;
         if ( sort ) {
@@ -123,10 +148,14 @@ public class ResultsPrinter {
                 print( out, res );
             }
         }
-        out.close();
 
     }
 
+    /**
+     * @param out
+     * @param res
+     * @throws IOException
+     */
     private void print( Writer out, GeneSetResult res ) throws IOException {
         res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
                 + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );

@@ -18,6 +18,7 @@
  */
 package ubic.erminej.gui.geneset;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,7 +49,6 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.geneset.details.GeneSetDetails;
 import ubic.erminej.gui.geneset.details.GeneSetDetailsFrame;
@@ -64,6 +64,12 @@ import ubic.erminej.gui.util.GuiUtil;
 public abstract class GeneSetPanel extends JScrollPane {
 
     public static final double FDR_THRESHOLD_FOR_FILTER = 0.1;
+
+    public static final Color USER_NODE_COLOR = Color.decode( "#FAFABB" );
+
+    public static final Color USER_NODE_TEXT_COLOR = Color.BLACK;
+
+    public static final String RESOURCE_LOCATION = "/ubic/erminej/";
 
     private static final long serialVersionUID = 1L;
 
@@ -83,7 +89,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     public static final String DELETED = "DELETED";
     public static final int MAX_DEFINITION_LENGTH = 300;
 
-    // FIXME: todo
+    // FIXME: TODO
     private static final String GEMMA_URL_BASE = "http://www.chibi.ubc.ca/Gemma/(GO TO GO GROUP)";
 
     protected static boolean hideEmpty = true;
@@ -192,11 +198,10 @@ public abstract class GeneSetPanel extends JScrollPane {
         } );
 
         popup.add( visitAmigoMenuItem );
-        // popup.add(gemmaMenuItem);
+        // popup.add(gemmaMenuItem); TODO
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
         popup.add( hideEmptyMenuItem );
-        // popup.add( hideRedund );
         popup.add( hideInsig );
 
         if ( classID == null ) return null;
@@ -254,7 +259,7 @@ public abstract class GeneSetPanel extends JScrollPane {
                 "Confirm", JOptionPane.YES_NO_OPTION );
         if ( yesno == JOptionPane.NO_OPTION ) return false;
 
-        if ( UserDefinedGeneSetManager.deleteUserGeneSet( classID, messenger ) ) {
+        if ( geneData.deleteUserGeneSet( classID ) ) {
             messenger.showStatus( "Permanantly deleted " + classID );
             this.removedGeneSet( classID );
             return true;
@@ -350,13 +355,13 @@ public abstract class GeneSetPanel extends JScrollPane {
                     detailsFrame.setVisible( true );
                     messenger.clear();
                 } catch ( Exception ex ) {
-                    GuiUtil
-                            .error( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
-                                    + ex.getMessage() );
+                    GuiUtil.error( "There was an unexpected error while trying to display the gene "
+                            + "set details.\nSee the log file for details.\nThe summary message was:\n"
+                            + ex.getMessage() );
                     log.error( ex, ex );
                     messenger
-                            .showError( "There was an unexpected error while trying to display the gene set details.\nSee the log file for details.\nThe summary message was:\n"
-                                    + ex.getMessage() );
+                            .showError( "There was an unexpected error while trying to display the gene set details.\n"
+                                    + "See the log file for details.\nThe summary message was:\n" + ex.getMessage() );
                 }
             }
         }.start();

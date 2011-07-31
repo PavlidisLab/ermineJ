@@ -35,7 +35,7 @@ import ubic.erminej.gui.file.ImageFileFilter;
  * @author Will Braynen
  * @version $Id$
  */
-public class JImageFileChooser extends JFileChooser {
+public class DetailsOutputImageFileChooser extends JFileChooser {
 
     private static final long serialVersionUID = -1L;
 
@@ -44,7 +44,7 @@ public class JImageFileChooser extends JFileChooser {
     /**
      * Creates a new instance of JDetailsFileChooser
      */
-    public JImageFileChooser( boolean includeLabels, boolean normalize, String initialFileName ) {
+    public DetailsOutputImageFileChooser( boolean includeLabels, boolean normalize, String initialFileName ) {
 
         super();
         // Create a file filter for the file chooser

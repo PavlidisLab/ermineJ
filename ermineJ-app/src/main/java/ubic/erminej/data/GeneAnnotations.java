@@ -34,12 +34,14 @@ import java.util.Set;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.dataStructure.graph.DirectedGraph;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
+import ubic.erminej.Settings;
 
 /**
  * Maintains gene annotations. Be clear on the distinction between a GeneSetTerm (just a term) and a GeneSet (the set of
@@ -95,6 +97,8 @@ public class GeneAnnotations {
 
     private Map<String, Gene> geneSymbolMap = new HashMap<String, Gene>();
 
+    UserDefinedGeneSetManager userDefinedGeneSetManager;
+
     // /**
     // * Gene sets taht are redundant and (semi-arbitrarily) will be ignored.
     // */
@@ -105,17 +109,20 @@ public class GeneAnnotations {
      */
     private boolean allowModification = true;
 
+    private Settings settings;
+
     /**
      * @param genes
      * @param geneSetTerms
      * @param messenger
      */
-    public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, StatusViewer messenger ) {
+    public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, Settings settings, StatusViewer messenger ) {
         if ( messenger != null ) this.messenger = messenger;
         this.probes = new HashSet<Probe>();
         assert !genes.isEmpty();
         this.genes.addAll( genes );
         this.geneSetTerms = geneSetTerms;
+        this.settings = settings;
 
         for ( Gene gene : this.genes ) {
             Collection<Probe> geneProbes = gene.getProbes();
@@ -185,17 +192,6 @@ public class GeneAnnotations {
         setUp( start );
 
         this.allowModification = false;
-    }
-
-    /**
-     * Test whether this was constructed 'subcloning' style. This should usually be true in the context of analyses,
-     * which focus on analyzed subsets of the annotated genes. I recommend testing this in your code to make sure you
-     * aren't forgetting to do that step.
-     * 
-     * @return
-     */
-    public boolean isReadOnly() {
-        return !this.allowModification;
     }
 
     /**
@@ -313,10 +309,11 @@ public class GeneAnnotations {
         if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
         for ( Gene g : gs ) {
             if ( !this.hasGene( g ) ) {
-                log.warn( "Adding previously unseen gene " + g ); // which is somewhat useless.
-                this.genes.add( g );
-                this.geneSymbolMap.put( g.getSymbol(), g );
-                this.probes.addAll( g.getProbes() );
+                throw new IllegalArgumentException( "Adding gene sets cannot involved previously un-used genes" );
+                // log.warn( "Adding previously unseen gene " + g ); // which is somewhat useless.
+                // this.genes.add( g );
+                // this.geneSymbolMap.put( g.getSymbol(), g );
+                // this.probes.addAll( g.getProbes() );
             }
         }
 
@@ -329,9 +326,7 @@ public class GeneAnnotations {
 
         geneSets.put( geneSetId, newSet );
 
-        // redundancyCheck(); // Maybe not. Even if the user's set is redundant, they want to see it.
-
-        this.multifunctionality.setStale( true );
+        if ( this.multifunctionality != null ) this.multifunctionality.setStale( true );
 
         log.debug( "Added new gene set: " + gs.size() + " genes in gene set " + geneSetId );
 
@@ -380,7 +375,7 @@ public class GeneAnnotations {
      */
     public void deleteGeneSet( GeneSetTerm id ) {
 
-        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
+        if ( isReadOnly() ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
 
         // deals with probes.
         for ( Gene g : getGeneSetGenes( id ) ) {
@@ -390,9 +385,11 @@ public class GeneAnnotations {
         geneSets.remove( id );
 
         if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
+    }
 
-        // skipDueToRedundancy.remove( id );
-
+    public boolean deleteUserGeneSet( GeneSetTerm classID ) {
+        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
+        return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
     }
 
     public Gene findGene( String symbol ) {
@@ -518,20 +515,6 @@ public class GeneAnnotations {
     }
 
     /**
-     * Get a collection of all (active) gene sets -- ones which have at least one probe. Use for analysis. Of course,
-     * further filtering of these will typically be done later (FIXME this might not be needed?)
-     * 
-     * @return
-     */
-    public Collection<GeneSetTerm> getNonEmptyGeneSets() {
-        Collection<GeneSetTerm> result = new HashSet<GeneSetTerm>();
-        for ( GeneSetTerm gst : this.geneSets.keySet() ) {
-            if ( this.getGeneSetProbes( gst ).size() > 1 ) result.add( gst );
-        }
-        return Collections.unmodifiableCollection( result );
-    }
-
-    /**
      * @return view of all gene sets, including empty ones (?)
      */
     public Collection<GeneSet> getAllGeneSets() {
@@ -592,6 +575,13 @@ public class GeneAnnotations {
     }
 
     /**
+     * @return
+     */
+    public DirectedGraph<String, GeneSetTerm> getGeneSetGraph() {
+        return this.geneSetTerms.getGraph();
+    }
+
+    /**
      * @param geneSetId
      * @return active probes for the given gene set
      */
@@ -615,15 +605,29 @@ public class GeneAnnotations {
         return Collections.unmodifiableCollection( res );
     }
 
+    /**
+     * @return
+     */
+    public GeneSetTerms getGeneSetTerms() {
+        return this.geneSetTerms;
+    }
+
     public Multifunctionality getMultifunctionality() {
         return multifunctionality;
     }
 
     /**
-     * @return the list of probes.
+     * Get a collection of all (active) gene sets -- ones which have at least one probe. Use for analysis. Of course,
+     * further filtering of these will typically be done later (FIXME this might not be needed?)
+     * 
+     * @return
      */
-    public Collection<Probe> getProbes() {
-        return Collections.unmodifiableCollection( this.probes );
+    public Collection<GeneSetTerm> getNonEmptyGeneSets() {
+        Collection<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+        for ( GeneSetTerm gst : this.geneSets.keySet() ) {
+            if ( this.getGeneSetProbes( gst ).size() > 1 ) result.add( gst );
+        }
+        return Collections.unmodifiableCollection( result );
     }
 
     // /**
@@ -632,6 +636,13 @@ public class GeneAnnotations {
     // public Collection<GeneSetTerm> getRedundant() {
     // return skipDueToRedundancy;
     // }
+
+    /**
+     * @return the list of probes.
+     */
+    public Collection<Probe> getProbes() {
+        return Collections.unmodifiableCollection( this.probes );
+    }
 
     /**
      * @return
@@ -681,6 +692,34 @@ public class GeneAnnotations {
      */
     public boolean hasProbe( Probe probeId ) {
         return this.probes.contains( probeId );
+    }
+
+    /**
+     * Check if a group has any redundancies.
+     * 
+     * @param id
+     * @return
+     */
+    public boolean hasRedundancy( GeneSetTerm id ) {
+        GeneSet geneSet = this.getGeneSet( id );
+        if ( geneSet == null ) return false;
+        return !geneSet.getRedundantGroups().isEmpty();
+    }
+
+    /**
+     * Test whether this was constructed 'subcloning' style. This should usually be true in the context of analyses,
+     * which focus on analyzed subsets of the annotated genes. I recommend testing this in your code to make sure you
+     * aren't forgetting to do that step.
+     * 
+     * @return
+     */
+    public boolean isReadOnly() {
+        return !this.allowModification;
+    }
+
+    public GeneSet loadPlainGeneList( String loadFile ) throws IOException {
+        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
+        return this.userDefinedGeneSetManager.loadPlainGeneList( loadFile );
     }
 
     /**
@@ -782,6 +821,20 @@ public class GeneAnnotations {
     }
 
     /**
+     * Save changes to a user-defined gene set.
+     * 
+     * @param toSave
+     * @throws IOException
+     */
+    public void saveGeneSet( GeneSet toSave ) throws IOException {
+        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
+        assert toSave.isUserDefined();
+        this.userDefinedGeneSetManager.saveGeneSet( toSave );
+        if ( this.multifunctionality != null ) this.multifunctionality.setStale( true );
+        refreshRedundancyCheck( toSave );
+    }
+
+    /**
      * Make the selection the user-defined sets only.
      */
     public Collection<GeneSetTerm> selectUserDefined() {
@@ -802,18 +855,6 @@ public class GeneAnnotations {
     public void setMessenger( StatusViewer m ) {
         if ( m == null ) return;
         this.messenger = m;
-    }
-
-    /**
-     * Check if a group has any redundancies.
-     * 
-     * @param id
-     * @return
-     */
-    public boolean hasRedundancy( GeneSetTerm id ) {
-        GeneSet geneSet = this.getGeneSet( id );
-        if ( geneSet == null ) return false;
-        return !geneSet.getRedundantGroups().isEmpty();
     }
 
     /**
@@ -866,7 +907,7 @@ public class GeneAnnotations {
     private void addParents() {
 
         if ( messenger != null ) {
-            messenger.showStatus( "Adding parent terms gene sets " );
+            messenger.showStatus( "Inferring annotations in graph" );
         }
         Map<Gene, Collection<GeneSetTerm>> toBeAdded = new HashMap<Gene, Collection<GeneSetTerm>>();
         Map<GeneSetTerm, Collection<GeneSetTerm>> parentCache = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
@@ -893,17 +934,21 @@ public class GeneAnnotations {
 
             }
 
-            if ( ++count % 1000 == 0 && messenger != null ) {
+            if ( ++count % 3000 == 0 && messenger != null ) {
                 messenger.showStatus( count + " genes examined for term parents ..." );
             }
         }
+
+        int numAnnotsAdded = 0;
         for ( Gene g : toBeAdded.keySet() ) {
             Collection<GeneSetTerm> parents = toBeAdded.get( g );
             addAnnotation( g, parents );
+            numAnnotsAdded += parents.size();
         }
 
         if ( messenger != null ) {
-            messenger.showStatus( "Added parents for all terms " );
+            messenger.showStatus( "Added " + numAnnotsAdded + " inferred annotations (affected " + toBeAdded.size()
+                    + "/" + genes.size() + " genes)" );
         }
     }
 
@@ -943,13 +988,33 @@ public class GeneAnnotations {
     }
 
     /**
+     * @param id
+     * @param subCloning
+     */
+    private void prune( GeneSetTerm id, boolean subCloning ) {
+        if ( isReadOnly() ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
+
+        // deals with probes.
+        for ( Gene g : getGeneSetGenes( id ) ) {
+            g.removeGeneSet( id );
+        }
+
+        geneSets.remove( id );
+
+        // when subcloning do not remove it from the tree, this is not for display purposes.
+        if ( !subCloning && id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
+    }
+
+    /**
      * Remove classes that have too few members, or which are obsolete. These are not removed from the GO tree
      * 
      * @param lowThreshold - in practice, 2
      * @param highThreshold - FIXME setting this 'low' can cause problems (orphaned child terms), so in practice don't
      *        use it.
+     * @param subCloning signals that we're making a copy of another annotation set for the purpose of analysis; ensures
+     *        the original is not pruned.
      */
-    private void prune( int lowThreshold, int highThreshold ) {
+    private void prune( boolean subCloning ) {
 
         if ( this.geneSets.isEmpty() ) {
             throw new IllegalStateException( "There are no gene sets" );
@@ -959,42 +1024,39 @@ public class GeneAnnotations {
         int obsoleteRemoved = 0;
         int tooBigRemoved = 0;
         int tooSmallRemoved = 0;
+        int startCount = geneSets.size();
         for ( GeneSetTerm id : geneSets.keySet() ) {
 
-            if ( id.getAspect() == null || id.getDefinition().startsWith( "OBSOLETE" ) ) {
+            if ( id.getAspect() == null || id.getDefinition().startsWith( "OBSOLETE" ) ) { // special case ...
                 obsoleteRemoved++;
                 removeUs.add( id );
             } else {
                 int numP = numProbesInGeneSet( id );
                 int numG = numGenesInGeneSet( id );
-                if ( numP < lowThreshold || numG < lowThreshold ) {
+                if ( numP < ABSOLUTE_MINIMUM_GENESET_SIZE || numG < ABSOLUTE_MINIMUM_GENESET_SIZE ) {
                     tooSmallRemoved++;
                     removeUs.add( id );
-                } else if ( numP > highThreshold || numG > highThreshold ) {
+                } else if ( numP > PRACTICAL_MAXIMUM_GENESET_SIZE || numG > PRACTICAL_MAXIMUM_GENESET_SIZE ) {
                     tooBigRemoved++;
                     removeUs.add( id );
                 }
             }
         }
 
-        /*
-         * FIXME -- perhaps don't prune if we have any children? This can be a problem if the maximum is too small.
-         */
-
-        if ( !removeUs.isEmpty() ) {
-            this.messenger.showStatus( removeUs.size() + " removed: obsolete (" + obsoleteRemoved + "), too small ("
-                    + tooSmallRemoved + ") or too big (" + tooBigRemoved + ") terms pruned." );
+        for ( GeneSetTerm id : removeUs ) {
+            prune( id, subCloning );
         }
 
-        for ( GeneSetTerm id : removeUs ) {
-            deleteGeneSet( id ); // gone forever.
+        if ( !removeUs.isEmpty() ) {
+            this.messenger.showStatus( "Pruning: " + removeUs.size() + "/" + startCount + " sets removed: obsolete ("
+                    + obsoleteRemoved + "), too small (" + tooSmallRemoved + ") or too big (" + tooBigRemoved
+                    + ") terms pruned." );
         }
 
         if ( this.geneSets.isEmpty() ) {
             throw new IllegalStateException(
-                    "All gene sets were removed due to being too small, too big, or obsolete (" + obsoleteRemoved
-                            + ") size range=" + lowThreshold + " - " + highThreshold
-                            + ". Your annotation file may contain too few GO terms." );
+                    "All gene sets were removed due to being too small, too big, or obsolete; usable size range="
+                            + ABSOLUTE_MINIMUM_GENESET_SIZE + " - " + PRACTICAL_MAXIMUM_GENESET_SIZE );
         }
 
     }
@@ -1005,17 +1067,21 @@ public class GeneAnnotations {
      */
     private void redundancyCheck() {
 
+        StopWatch timer = new StopWatch();
+        timer.start();
         messenger.showStatus( "There are " + numGeneSets()
-                + " gene sets in the annotations (of any size). Checking for redundancy ..." );
+                + " gene sets in the annotations, checking for redundancy ..." );
 
         Collection<GeneSet> checked = new HashSet<GeneSet>();
         int i = 0;
         int numRedundant = 0;
         for ( GeneSet gs1 : this.geneSets.values() ) {
-            gs: for ( GeneSet gs2 : this.geneSets.values() ) {
-                if ( gs1.equals( gs2 ) || checked.contains( gs2 ) ) continue;
+            Collection<Gene> genes1 = gs1.getGenes();
 
-                Collection<Gene> genes1 = gs1.getGenes();
+            gs: for ( GeneSet gs2 : this.geneSets.values() ) {
+
+                if ( checked.contains( gs2 ) || gs1.equals( gs2 ) ) continue;
+
                 Collection<Gene> genes2 = gs2.getGenes();
 
                 if ( genes1.size() != genes2.size() ) continue; // not identical.
@@ -1026,10 +1092,14 @@ public class GeneAnnotations {
 
                 gs1.addRedundantGroup( gs2 );
                 gs2.addRedundantGroup( gs1 );
-                numRedundant++;
 
             }
-            checked.add( gs1 );
+
+            checked.add( gs1 ); // either we found all its redundancies or it has none, so we don't need to look at
+            // it
+            // again.
+
+            if ( gs1.hasRedundancy() ) numRedundant++;
 
             if ( ++i % 500 == 0 ) {
                 messenger.showStatus( checked.size() + " sets checked for redundancy, " + numRedundant + " found ..." );
@@ -1037,8 +1107,10 @@ public class GeneAnnotations {
 
         }
 
-        messenger.showStatus( numRedundant + " gene sets are redundant with at least one other." );
+        messenger.showStatus( numRedundant + "/" + geneSets.size()
+                + " gene sets are redundant with at least one other." );
 
+        log.info( "Redundancy check: " + timer.getTime() + "ms" );
     }
 
     /**
@@ -1067,6 +1139,37 @@ public class GeneAnnotations {
     }
 
     /**
+     * Update the redundancy information for one gene set.
+     * 
+     * @param toSave
+     */
+    private void refreshRedundancyCheck( GeneSet toSave ) {
+        toSave.clearRedundancy();
+        Collection<Gene> genes1 = toSave.getGenes();
+        for ( GeneSet gs2 : this.geneSets.values() ) {
+
+            if ( toSave.equals( gs2 ) ) continue;
+
+            Collection<Gene> genes2 = gs2.getGenes();
+
+            if ( genes1.size() != genes2.size() ) {
+                gs2.clearRedundancy( toSave );
+                continue;
+            }// not identical.
+
+            for ( Gene g1 : genes1 ) {
+                if ( !genes2.contains( g1 ) ) {
+                    gs2.clearRedundancy( toSave );
+                    continue;
+                }// not redundant.
+            }
+
+            toSave.addRedundantGroup( gs2 );
+            gs2.addRedundantGroup( toSave );
+        }
+    }
+
+    /**
      * @param toBeAdded
      * @param gene
      * @param parents
@@ -1088,18 +1191,24 @@ public class GeneAnnotations {
      */
     private void setUp() {
 
-        addParents();
+        StopWatch timer = new StopWatch();
+        timer.start();
 
-        formGeneSets();
+        userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
+
+        addParents(); // <- 1s
+
+        formGeneSets(); // 1s
 
         assert !this.geneSets.isEmpty();
 
-        prune( ABSOLUTE_MINIMUM_GENESET_SIZE, PRACTICAL_MAXIMUM_GENESET_SIZE );
+        prune( false ); // / 100 ms
 
-        redundancyCheck();
+        redundancyCheck(); // <-- slow, 8s for 7700 terms
 
-        this.multifunctionality = new Multifunctionality( this );
+        this.multifunctionality = new Multifunctionality( this ); // < 1 s.
 
+        log.info( "Total annotation setup: " + timer.getTime() + "ms" );
     }
 
     /**
@@ -1112,18 +1221,11 @@ public class GeneAnnotations {
         formGeneSets();
 
         assert !this.geneSets.isEmpty();
-        prune( ABSOLUTE_MINIMUM_GENESET_SIZE, PRACTICAL_MAXIMUM_GENESET_SIZE );
+        prune( true /* subcloning */);
 
         redundancyCheck( start );
 
         this.multifunctionality = new Multifunctionality( this );
-    }
-
-    /**
-     * @return
-     */
-    public DirectedGraph<String, GeneSetTerm> getGeneSetGraph() {
-        return this.geneSetTerms.getGraph();
     }
 
 }

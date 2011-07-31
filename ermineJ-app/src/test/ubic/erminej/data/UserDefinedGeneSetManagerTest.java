@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
 
-import ubic.basecode.util.StatusStderr;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
@@ -31,7 +30,9 @@ import junit.framework.TestCase;
  */
 public class UserDefinedGeneSetManagerTest extends TestCase {
 
-    static boolean needInit = true;
+    GeneAnnotations geneAnnots;
+
+    UserDefinedGeneSetManager manager;
 
     @Override
     public void setUp() throws Exception {
@@ -41,11 +42,11 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
 
         GeneSetTerms gonames = new GeneSetTerms( is );
         GeneAnnotationParser p = new GeneAnnotationParser( gonames );
-        GeneAnnotations g = p.read( ism, Format.DEFAULT );
+        geneAnnots = p.read( ism, Format.DEFAULT, new Settings() );
 
         Settings settings = new Settings();
 
-        UserDefinedGeneSetManager.init( g, settings );
+        manager = new UserDefinedGeneSetManager( geneAnnots, settings, null );
 
     }
 
@@ -53,7 +54,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
 
         String filePath = new File( this.getClass().getResource( "/data/genesets/kegg.txt" ).toURI() )
                 .getAbsolutePath();
-        Collection<GeneSet> keggsets = UserDefinedGeneSetManager.loadUserGeneSetFile( filePath, new StatusStderr() );
+        Collection<GeneSet> keggsets = manager.loadUserGeneSetFile( filePath );
         assertEquals( 186, keggsets.size() );
         for ( GeneSet geneSet : keggsets ) {
             assertEquals( filePath, geneSet.getSourceFile() );
@@ -62,7 +63,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
     }
 
     public final void testMulti() throws Exception {
-        Collection<GeneSet> sets = UserDefinedGeneSetManager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
+        Collection<GeneSet> sets = manager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
                 "/data/genesets/my.test-classes.txt" ) );
         assertEquals( 3, sets.size() );
         for ( GeneSet geneSet : sets ) {
@@ -76,7 +77,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
     }
 
     public final void testSingle() throws Exception {
-        Collection<GeneSet> sets = UserDefinedGeneSetManager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
+        Collection<GeneSet> sets = manager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
                 "/data/genesets/GO-0004994-class.txt" ) );
         assertEquals( 1, sets.size() );
         GeneSet s = sets.iterator().next();

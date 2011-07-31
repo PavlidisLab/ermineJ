@@ -270,6 +270,10 @@ public class Multifunctionality {
          * For each go term, compute it's AUC w.r.t. the multifunctionality ranking.. We work with the
          * multifunctionality ranks, rawGeneMultifunctionalityRanks
          */
+
+        /*
+         * FIXME only use non-redundant groups to compute the ranks of gene sets.
+         */
         for ( GeneSetTerm goset : geneAnnots.getNonEmptyGeneSets() ) {
 
             if ( !goGroupSizes.containsKey( goset ) ) {
@@ -324,10 +328,6 @@ public class Multifunctionality {
             StopWatch timer = new StopWatch();
 
             timer.start();
-
-            /*
-             * FIXME only use non-redundant groups to compute the ranks of gene sets.
-             */
 
             genesWithGoTerms = new HashSet<Gene>();
             for ( GeneSetTerm goset : geneAnnots.getNonEmptyGeneSets() ) {

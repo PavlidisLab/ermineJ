@@ -21,6 +21,7 @@ import java.util.zip.ZipInputStream;
 
 import junit.framework.TestCase;
 
+import ubic.erminej.Settings;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneAnnotationParser.Format;
@@ -44,7 +45,7 @@ public class TestMultifunctionality extends TestCase {
 
         GeneAnnotationParser p = new GeneAnnotationParser( geneSets );
 
-        GeneAnnotations ga = p.read( is, Format.AFFYCSV );
+        GeneAnnotations ga = p.read( is, Format.AFFYCSV, new Settings() );
 
         Multifunctionality mf = ga.getMultifunctionality();
 

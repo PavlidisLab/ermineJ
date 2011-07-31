@@ -82,7 +82,7 @@ public class JLinkLabel extends DefaultTableCellRenderer implements Comparable<J
             try {
                 BrowserLauncher.openURL( m_url );
             } catch ( Exception ex ) {
-                GuiUtil.error( "Could not open a web browser window." );
+                GuiUtil.error( "Could not open a web browser window:\n" + ex.getMessage() );
             }
         }
     }
@@ -98,7 +98,7 @@ public class JLinkLabel extends DefaultTableCellRenderer implements Comparable<J
 
     public void setText( String text, String url ) {
         m_text = text;
-        m_url = url;
+        m_url = url.replaceFirst( "\\|.+", "" ); // multigene.
         // super.setText( "<a href=\"" + m_url + "\">" + text + "</a>" );
         super.setText( text );
     }

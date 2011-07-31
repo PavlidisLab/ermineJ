@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.gui.StatusJlabel;
+import ubic.erminej.gui.util.StatusJlabel;
 
 /**
  * @author pavlidis

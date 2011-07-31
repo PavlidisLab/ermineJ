@@ -95,7 +95,9 @@ public class SettingsHolder {
     protected static final String GENE_SET_RESAMPLING_SCORE_METHOD = "rawScoreMethod";
     protected static final String SCORE_COL = "scoreCol";
     protected static final String SCORE_FILE = "scoreFile";
+    protected static final String DATA_COL = "dataCol"; // in data matrix, where the first data are.
     protected static final String SELECTED_CUSTOM_GENESETS = "selectedCustomGeneSets";
+    protected static final String CUSTOM_GENESET_FILES = "customGeneSetFiles";
     protected static final String FILTER_NONSPECIFIC = "filterNonSpecific";
     protected static final String USE_BIOL_PROC = "useGOBiologicalProcess";
     protected static final String USE_MOL_FUNC = "useGOMolecularFunction";
@@ -142,15 +144,11 @@ public class SettingsHolder {
         defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, false );
 
         defaults.put( USE_MOL_FUNC, true );
-        defaults.put( DO_LOG, true );
-        defaults.put( USE_CELL_COMP, 50 );
+        defaults.put( USE_CELL_COMP, true );
         defaults.put( USE_BIOL_PROC, true );
+        defaults.put( DO_LOG, true );
         defaults.put( SCORE_COL, 2 );
-        defaults.put( QUANTILE_CONFIG_NAME, 50 );
-        defaults.put( QUANTILE_CONFIG_NAME, 50 );
-        defaults.put( QUANTILE_CONFIG_NAME, 50 );
-        defaults.put( QUANTILE_CONFIG_NAME, 50 );
-        defaults.put( QUANTILE_CONFIG_NAME, 50 );
+        defaults.put( DATA_COL, 2 );
 
     }
 
@@ -329,7 +327,11 @@ public class SettingsHolder {
     }
 
     public int getScoreCol() {
-        return config.getInteger( SCORE_COL, 2 );
+        return config.getInteger( SCORE_COL, ( Integer ) getDefaultSettingsValue( SCORE_COL ) );
+    }
+
+    public int getDataCol() {
+        return config.getInteger( DATA_COL, ( Integer ) getDefaultSettingsValue( DATA_COL ) );
     }
 
     public String getScoreFile() {
@@ -341,11 +343,16 @@ public class SettingsHolder {
         return config.getList( SELECTED_CUSTOM_GENESETS, new ArrayList<String>() );
     }
 
+    @SuppressWarnings("unchecked")
+    public Collection<String> getCustomGeneSetFiles() {
+        return config.getList( CUSTOM_GENESET_FILES, new ArrayList<String>() );
+    }
+
     /**
      * @return Returns the useBiologicalProcess.
      */
     public boolean getUseBiologicalProcess() {
-        return config.getBoolean( USE_BIOL_PROC, true );
+        return config.getBoolean( USE_BIOL_PROC, ( Boolean ) getDefaultSettingsValue( USE_BIOL_PROC ) );
 
     }
 
@@ -353,7 +360,7 @@ public class SettingsHolder {
      * @return Returns the useCellularComponent.
      */
     public boolean getUseCellularComponent() {
-        return config.getBoolean( USE_CELL_COMP, true );
+        return config.getBoolean( USE_CELL_COMP, ( Boolean ) getDefaultSettingsValue( USE_CELL_COMP ) );
 
     }
 
@@ -368,7 +375,7 @@ public class SettingsHolder {
      * @return Returns the useMolecularFunction.
      */
     public boolean getUseMolecularFunction() {
-        return config.getBoolean( USE_MOL_FUNC, true );
+        return config.getBoolean( USE_MOL_FUNC, ( Boolean ) getDefaultSettingsValue( USE_MOL_FUNC ) );
 
     }
 
@@ -384,7 +391,8 @@ public class SettingsHolder {
     }
 
     public boolean getUseUserDefined() {
-        return config.getBoolean( USE_USER_DEFINED_GROUPS, true );
+        return config.getBoolean( USE_USER_DEFINED_GROUPS,
+                ( Boolean ) getDefaultSettingsValue( USE_USER_DEFINED_GROUPS ) );
     }
 
     /**

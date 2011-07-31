@@ -30,10 +30,9 @@ import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneSetTerm; 
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.Probe;
-import ubic.erminej.data.UserDefinedGeneSetManager;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.Wizard;
@@ -61,7 +60,7 @@ public class GeneSetWizard extends Wizard {
     boolean nostep1 = false;
 
     private GeneSet oldGeneSet;
-    private StatusViewer messenger;
+    private StatusViewer messenger = new StatusStderr();
 
     /**
      * Use this constructor to let the user choose which gene set to look at or to make a new one.
@@ -138,7 +137,7 @@ public class GeneSetWizard extends Wizard {
             if ( makingNewGeneSet || step1A.isReady() ) { // not (case 3 with no class picked)
                 if ( makingNewGeneSet && step1.getInputMethod() == 1 ) { // case 2, load from file
                     try {
-                        this.oldGeneSet = UserDefinedGeneSetManager.loadPlainGeneList( step1.getLoadFile(), messenger );
+                        this.oldGeneSet = geneData.loadPlainGeneList( step1.getLoadFile() );
                     } catch ( IOException e1 ) {
                         GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
                                 + " the file is readable." );
@@ -301,31 +300,25 @@ public class GeneSetWizard extends Wizard {
         if ( oldGeneSet != null && StringUtils.isNotBlank( oldGeneSet.getSourceFile() ) ) {
             toSave.setSourceFile( oldGeneSet.getSourceFile() );
         }
-
-        if ( makingNewGeneSet || !toSave.getId().equals( oldGeneSet.getId() ) ) {
-            showStatus( "Saving new gene set in its own file" );
-
-            geneData.addGeneSet( toSave );
-            commitChangesToDisk( toSave );
-        } else if ( modifiedTheGeneSet( toSave ) ) {
-            showStatus( "Saving modified gene set " + toSave + "( based on " + oldGeneSet + ")" );
-            commitChangesToDisk( toSave );
-        } else {
-            showStatus( "Gene set was not created or changed, nothing to do." );
-        }
-
-        dispose();
-
-    }
-
-    private void commitChangesToDisk( GeneSet toSave ) {
         try {
-            UserDefinedGeneSetManager.saveGeneSet( toSave, messenger );
+            if ( makingNewGeneSet || !toSave.getId().equals( oldGeneSet.getId() ) ) {
+                showStatus( "Saving new gene set in its own file" );
+
+                geneData.addGeneSet( toSave );
+                geneData.saveGeneSet( toSave );
+            } else if ( modifiedTheGeneSet( toSave ) ) {
+                showStatus( "Saving modified gene set " + toSave + "( based on " + oldGeneSet + ")" );
+ 
+                geneData.saveGeneSet( toSave );
+            } else {
+                showStatus( "Gene set was not created or changed, nothing to do." );
+            }
+            ( ( MainFrame ) callingframe ).addedNewGeneSet( toSave );
+            dispose();
         } catch ( IOException e1 ) {
             GuiUtil.error( "Error writing the new gene set to file:", e1 );
         }
 
-        ( ( MainFrame ) callingframe ).addedNewGeneSet( toSave );
     }
 
     /**

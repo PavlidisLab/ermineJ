@@ -275,4 +275,12 @@ public class GeneSet {
         this.format = f;
 
     }
+
+    public void clearRedundancy() {
+        this.redundantGroups.clear();
+    }
+
+    public void clearRedundancy( GeneSet toclear ) {
+        this.redundantGroups.remove( toclear );
+    }
 }

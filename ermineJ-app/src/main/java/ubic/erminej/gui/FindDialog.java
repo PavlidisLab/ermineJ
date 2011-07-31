@@ -40,6 +40,7 @@ import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.gui.util.StatusJlabel;
 
 /**
  * FIXME this nominally extends JDialog but it isn't set up right.

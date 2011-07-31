@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
 
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
@@ -45,12 +46,15 @@ public class SaveWizard extends Wizard {
     private SaveWizardStep1 step1;
     private SaveWizardStep2 step2;
 
+    private StatusViewer statusMessenger;
+
     public SaveWizard( MainFrame callingframe, List<GeneSetPvalRun> rundata ) {
         super( callingframe, 400, 200 );
         enableEvents( AWTEvent.WINDOW_EVENT_MASK );
         this.callingframe = callingframe;
         this.rundata = rundata;
 
+        this.statusMessenger = callingframe.getStatusMessenger();
         step1 = new SaveWizardStep1( this, rundata );
         this.addStep( step1, true );
         step2 = new SaveWizardStep2( this, callingframe.getSettings().getDataDirectory() );
@@ -109,7 +113,7 @@ public class SaveWizard extends Wizard {
         try {
 
             /* first we stream the prefs to the file. */
-            Settings.writeAnalysisSettings( saveSettings, saveFileName );
+            Settings.writeAnalysisSettings( saveSettings, saveFileName, statusMessenger );
 
             /* then we pile on the results. */
             ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, step2.getShouldSaveGeneNames() );

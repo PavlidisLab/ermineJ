@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.gui;
+package ubic.erminej.gui.file;
 
 import java.awt.Dimension;
 import java.awt.SystemColor;
@@ -29,6 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import ubic.erminej.Settings;
+import ubic.erminej.gui.AppDialog;
+import ubic.erminej.gui.HelpHelper;
+import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**

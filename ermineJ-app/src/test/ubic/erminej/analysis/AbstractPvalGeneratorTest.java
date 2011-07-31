@@ -69,7 +69,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
 
         gon = new GeneSetTerms( isi );
         GeneAnnotationParser p = new GeneAnnotationParser( gon );
-        annotations = p.read( ism, Format.DEFAULT );
+        annotations = p.read( ism, Format.DEFAULT, s );
 
         assertTrue( annotations.getGenes().size() > 0 );
         assertTrue( annotations.getNonEmptyGeneSets().size() > 0 );

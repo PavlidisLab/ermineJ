@@ -242,22 +242,23 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
             final Probe probe = iter.next();
             Gene gene = probe.getGene();
-            if ( gene != null ) {
-                String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene.getSymbol() );
-
-                // JPanel p = new JPanel();
-                // p.setName( "Panel for " + probe );
-                // p.setBackground( Color.WHITE );
-                // p.setLayout( new BoxLayout( p, BoxLayout.LINE_AXIS ) );
-                // p.setAlignmentY( Component.BOTTOM_ALIGNMENT );
-                // p.setOpaque( false );
-
-                JLinkLabel baseLink = new JLinkLabel( gene.getSymbol(), url );
-                // p.add( );
-                // p.add( new JLinkLabel( gemmaIcon, "" ) );
-
-                linkLabels.put( gene, baseLink );
+            if ( gene == null ) {
+                continue;
             }
+            String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene.getSymbol() );
+
+            // JPanel p = new JPanel();
+            // p.setName( "Panel for " + probe );
+            // p.setBackground( Color.WHITE );
+            // p.setLayout( new BoxLayout( p, BoxLayout.LINE_AXIS ) );
+            // p.setAlignmentY( Component.BOTTOM_ALIGNMENT );
+            // p.setOpaque( false );
+
+            JLinkLabel baseLink = new JLinkLabel( gene.getSymbol(), url );
+            // p.add( );
+            // p.add( new JLinkLabel( gemmaIcon, "" ) );
+
+            linkLabels.put( gene, baseLink );
         }
         this.fireTableDataChanged();
     }

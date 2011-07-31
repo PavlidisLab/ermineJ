@@ -38,6 +38,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.FileTools;
+import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneAnnotationParser.Format;
@@ -65,7 +66,8 @@ public class Settings extends SettingsHolder {
             GENE_SET_RESAMPLING_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE,
             SCORE_COL, MTC_CONFIG_NAME, ITERATIONS, CLASS_FILE, BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT,
             ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD, FILTER_NONSPECIFIC,
-            USE_MULTIFUNCTIONALITY_CORRECTION, USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP, USE_USER_DEFINED_GROUPS };
+            USE_MULTIFUNCTIONALITY_CORRECTION, USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP, USE_USER_DEFINED_GROUPS,
+            CUSTOM_GENESET_FILES };
 
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
@@ -90,13 +92,19 @@ public class Settings extends SettingsHolder {
      * @param fileName
      * @throws IOException
      */
-    public static void writeAnalysisSettings( SettingsHolder settings, String fileName ) throws IOException {
+    public static void writeAnalysisSettings( SettingsHolder settings, String fileName, StatusViewer viewer )
+            throws IOException {
         PropertiesConfiguration configToWrite = settings.getConfig();
         Writer out;
         if ( fileName == null ) {
             log.debug( "Output to STDOUT" );
             out = new BufferedWriter( new PrintWriter( System.out ) );
         } else {
+
+            if ( !new File( fileName ).exists() || !new File( fileName ).canWrite() ) {
+                viewer.showError( "Could not write to: " + fileName );
+            }
+
             log.debug( "output " + fileName );
             log.debug( "Saving configuration to " + fileName );
             out = new BufferedWriter( new FileWriter( fileName ) );
@@ -162,13 +170,14 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * Create a Settings object from the header of a results file - autosave will not be set!
+     * Create a Settings object from the header of a results file or from a regular configuration file - autosave will
+     * not be set so they cannot be changed.
      * 
-     * @param resultsFile
+     * @param configurationFile
      * @throws IOException
      */
-    public Settings( String resultsFile ) throws ConfigurationException, IOException {
-        this.config = new PropertiesConfiguration( resultsFile );
+    public Settings( String configurationFile ) throws ConfigurationException, IOException {
+        this.config = new PropertiesConfiguration( configurationFile );
         initUserDirectories();
     }
 
@@ -485,8 +494,13 @@ public class Settings extends SettingsHolder {
     }
 
     public void setScoreCol( int val ) {
-        log.debug( "Setting score columns to " + val );
+        log.debug( "Setting score start column to " + val );
         this.config.setProperty( SCORE_COL, val );
+    }
+
+    public void setDataCol( int val ) {
+        log.debug( "Setting data start column to " + val );
+        this.config.setProperty( DATA_COL, val );
     }
 
     public void setScoreFile( String val ) {
@@ -498,6 +512,10 @@ public class Settings extends SettingsHolder {
         for ( GeneSetTerm t : addedClasses )
             addedClassesIds.add( t.getId() );
         this.config.setProperty( SELECTED_CUSTOM_GENESETS, addedClassesIds );
+    }
+
+    public void setCustomGeneSetFiles( Collection<String> filePaths ) {
+        this.config.setProperty( CUSTOM_GENESET_FILES, filePaths );
     }
 
     public void setTester( boolean isTester ) {

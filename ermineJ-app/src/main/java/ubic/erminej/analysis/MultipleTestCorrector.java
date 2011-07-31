@@ -134,6 +134,10 @@ public class MultipleTestCorrector extends AbstractLongTask {
             if ( usedToSkipped.containsKey( nextclass ) ) {
                 for ( GeneSetTerm redund : usedToSkipped.get( nextclass ) ) {
                     res = results.get( redund );
+                    if ( res == null ) {
+                        log.warn( "No results for: " + redund );
+                        continue;
+                    }
                     res.setCorrectedPvalue( thisFDR );
                 }
             }

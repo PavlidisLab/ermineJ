@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.gui;
+package ubic.erminej.gui.util;
 
 import java.lang.reflect.InvocationTargetException;
 

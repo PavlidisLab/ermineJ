@@ -32,11 +32,10 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -62,8 +61,23 @@ public class UserDefinedGeneSetManager {
 
     private static final String USERGENESET_SUFFIX = "-class.txt";
 
-    private static Settings settings;
-    private static GeneAnnotations geneData;
+    private static final int MAX_WARNINGS = 1;
+
+    private StatusViewer statusMessenger = new StatusStderr();
+
+    private Settings settings;
+
+    private int numTimesWarnedOfProblems = 0;
+
+    /**
+     * The original
+     */
+    private GeneAnnotations geneData;
+
+    public UserDefinedGeneSetManager( GeneAnnotations annots, Settings settings, StatusViewer messenger ) {
+        if ( messenger != null ) this.statusMessenger = messenger;
+        init( annots, settings );
+    }
 
     /**
      * Delete a user-defined gene set from disk and from the annotations in memory.
@@ -71,7 +85,7 @@ public class UserDefinedGeneSetManager {
      * 
      * @param ngs
      */
-    public static boolean deleteUserGeneSet( GeneSetTerm termToDelete, StatusViewer m ) {
+    public boolean deleteUserGeneSet( GeneSetTerm termToDelete ) {
         GeneSet geneSet = geneData.getGeneSet( termToDelete );
 
         String classFile = geneSet.getSourceFile();
@@ -83,11 +97,11 @@ public class UserDefinedGeneSetManager {
         File file = new File( classFile );
 
         if ( !file.exists() ) {
-            m.showError( file.getAbsoluteFile() + " does not exist" );
+            statusMessenger.showError( file.getAbsoluteFile() + " does not exist" );
             return false;
         }
         if ( !file.canWrite() ) {
-            m.showError( "Cannot delete " + file.getAbsoluteFile() + ": file is not editable" );
+            statusMessenger.showError( "Cannot delete " + file.getAbsoluteFile() + ": file is not editable" );
             return false;
         }
 
@@ -96,7 +110,7 @@ public class UserDefinedGeneSetManager {
 
         try {
 
-            Collection<GeneSet> sets = loadUserGeneSetFile( classFile, m );
+            Collection<GeneSet> sets = loadUserGeneSetFile( classFile );
 
             backup = saveBackup( sets );
 
@@ -138,28 +152,13 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Usually this would be called only once per application run. The annotations kept here are the 'canonical' ones.
-     * 
-     * @param gd
-     * @param set
-     */
-    public static void init( GeneAnnotations gd, Settings set ) {
-        if ( geneData != null ) {
-            log.warn( "Replacing old annotations" );
-        }
-
-        geneData = gd;
-        settings = set;
-    }
-
-    /**
      * Read in a list of genes or probe ids from a file. The list of genes is unadorned, one per row.
      * 
      * @param fileName
      * @return incomplete gene set. The caller has to arrange for this to be finished.
      * @throws IOException
      */
-    public static GeneSet loadPlainGeneList( String fileName, StatusViewer m ) throws IOException {
+    public GeneSet loadPlainGeneList( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
         String row;
         Collection<Gene> genes = new ArrayList<Gene>();
@@ -183,13 +182,16 @@ public class UserDefinedGeneSetManager {
         }
         dis.close();
 
-        if ( genes.isEmpty() ) {
-            m.showError( "None of the items in your file matched the current annotations." );
+        if ( genes.isEmpty() && numTimesWarnedOfProblems < MAX_WARNINGS ) {
+            statusMessenger.showError( "None of the items in your file matched the current annotations." );
+            numTimesWarnedOfProblems++;
             return null;
         }
 
-        if ( probesNotFound ) {
-            m.showError( "At least one gene in your set had no matching identifiers in the current annotations." );
+        if ( probesNotFound && numTimesWarnedOfProblems < MAX_WARNINGS ) {
+            statusMessenger
+                    .showError( "At least one gene in your set had no matching identifiers in the current annotations." );
+            numTimesWarnedOfProblems++;
         }
 
         GeneSet result = new GeneSet();
@@ -201,141 +203,19 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * Load the user-defined gene sets.
-     */
-    public static void loadUserGeneSets( StatusViewer statusMessenger ) {
-
-        File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
-        if ( !userGeneSetDir.exists() ) {
-            statusMessenger.showError( "No custom gene set directory found, none will be loaded - looked for "
-                    + settings.getUserGeneSetDirectory() );
-            return;
-        }
-
-        String[] classFiles = userGeneSetDir.list();
-
-        if ( classFiles.length == 0 ) {
-            statusMessenger.showStatus( "No gene sets found in " + settings.getUserGeneSetDirectory() );
-            return;
-        }
-
-        int numLoaded = 0;
-
-        Map<String, Collection<GeneSet>> newSets = new HashMap<String, Collection<GeneSet>>();
-        for ( int i = 0; i < classFiles.length; i++ ) {
-
-            String classFile = classFiles[i];
-            if ( StringUtils.isEmpty( classFile ) ) {
-                continue;
-            }
-
-            String classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
-            statusMessenger.showStatus( "Loading gene sets from: " + classFilePath );
-
-            try {
-
-                Collection<GeneSet> loadedSets = loadUserGeneSetFile( classFilePath, statusMessenger );
-                numLoaded += loadedSets.size();
-                for ( GeneSet set : loadedSets ) {
-                    GeneSetTerm id = set.getTerm();
-                    if ( isExistingGeneSet( id ) ) {
-                        statusMessenger.showError( "Cannot overwrite gene set, please rename it (" + id + ")" );
-                    } else {
-                        if ( !newSets.containsKey( classFile ) ) {
-                            newSets.put( classFile, new HashSet<GeneSet>() );
-                        }
-                        newSets.get( classFile ).add( set );
-                    }
-                }
-
-            } catch ( IOException e ) {
-                // This error will be shown if there are files that don't fit the format.
-                statusMessenger.showError( "Could not load gene sets from " + classFilePath + ": " + e.getMessage() );
-
-            }
-
-            statusMessenger.clear();
-        }
-
-        /*
-         * Warn the user if any of their sets are redundant
-         */
-        redundancyCheck( newSets, statusMessenger );
-
-        // we can finally add them to our annotation set.
-        for ( String classFilePath : newSets.keySet() ) {
-            Collection<GeneSet> sets = newSets.get( classFilePath );
-            for ( GeneSet s : sets )
-                geneData.addGeneSet( s.getTerm(), s.getGenes(), classFilePath );
-        }
-
-        if ( statusMessenger != null && numLoaded > 0 )
-            statusMessenger.showStatus( "Loaded " + numLoaded + " customized gene sets from " + classFiles.length
-                    + " files." );
-    }
-
-    /**
-     * Check whether the given gene set is redundant with any others (excluding itself, but including any that were
-     * already considered to be redundant). Avoid calling this repeatedly, it takes a couple of seconds (which is an
-     * eternity when you are waiting for the gui to load)
-     * <p>
-     * Redundant groups are only flagged, not removed; in contrast to the GO groups. The assumption is that users load
-     * their own groups in for a reason.
-     * 
-     * @param s
-     * @see GeneAnnotations.redundancyCheck for a similar method that operates on the GO / preloaded groups.
-     */
-    private static void redundancyCheck( Map<String, Collection<GeneSet>> setmap, StatusViewer statusMessenger ) {
-
-        int timesWarned = 0;
-        int maxWarnings = 3;
-
-        for ( String fileName : setmap.keySet() ) {
-            for ( GeneSet newSet : setmap.get( fileName ) ) {
-
-                boolean hasRedund = false;
-                Collection<Gene> newSetGenes = newSet.getGenes();
-
-                for ( GeneSet oldSet : geneData.getAllGeneSets() ) {
-                    if ( oldSet.equals( newSet ) ) continue; // doesn't count as redundant ... but shouldn't happen!
-
-                    Collection<Gene> oldSetGenes = oldSet.getGenes();
-
-                    if ( oldSetGenes.size() != newSetGenes.size() ) continue; // not redundant.
-
-                    if ( !newSetGenes.containsAll( oldSetGenes ) ) continue; // not redundant.
-
-                    newSet.addRedundantGroup( oldSet );
-                    oldSet.addRedundantGroup( newSet );
-                    hasRedund = true;
-
-                }
-
-                if ( hasRedund && timesWarned < maxWarnings ) {
-                    statusMessenger.showError( newSet.getId() + " is redundant with other sets" );
-                    timesWarned++;
-                    if ( timesWarned == maxWarnings ) {
-                        statusMessenger.showError( "Further warnings about redundancy skipped" );
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Write a gene set to disk, in the directory set in the preferences.
+     * Write a gene set to disk, in the directory set in the preferences. Use for update or create.
      * 
      * @param type
      * @throws IOException
      */
-    public static void saveGeneSet( GeneSet setToSave, StatusViewer m ) throws IOException {
+    public void saveGeneSet( GeneSet setToSave ) throws IOException {
         if ( !setToSave.isUserDefined() ) {
             throw new IllegalArgumentException( "Only user-defined sets can be saved, attempted to change "
                     + setToSave.getId() );
         }
 
         if ( geneData.hasGeneSet( setToSave.getTerm() ) ) {
-            m.showStatus( "Updating " + setToSave );
+            this.statusMessenger.showStatus( "Updating " + setToSave );
         }
 
         String fileName = null;
@@ -350,7 +230,7 @@ public class UserDefinedGeneSetManager {
          * Handle case of multiple groups per file. We re-write it, clobber the file.
          */
         if ( ( new File( fileName ) ).canRead() ) {
-            Collection<GeneSet> sets = loadUserGeneSetFile( fileName, m );
+            Collection<GeneSet> sets = loadUserGeneSetFile( fileName );
 
             File backup = null;
             boolean okToDeleteBackup = true;
@@ -390,7 +270,7 @@ public class UserDefinedGeneSetManager {
     /**
      * @return
      */
-    private static String cleanGeneSetName( String id ) {
+    private String cleanGeneSetName( String id ) {
         String fileid = id.replaceAll( ":", "-" );
         fileid = fileid.replaceAll( "\\s+", "_" );
         return fileid;
@@ -401,10 +281,22 @@ public class UserDefinedGeneSetManager {
      * @param className
      * @return
      */
-    private static String getUserGeneSetFileForName( String id ) {
+    private String getUserGeneSetFileForName( String id ) {
         String classFile = settings.getUserGeneSetDirectory() + System.getProperty( "file.separator" )
                 + cleanGeneSetName( id ) + USERGENESET_SUFFIX;
         return classFile;
+    }
+
+    /**
+     * Usually this would be called only once per application run. The annotations kept here are the 'canonical' ones.
+     * 
+     * @param gd
+     * @param set
+     */
+    private void init( GeneAnnotations gd, Settings set ) {
+        geneData = gd;
+        settings = set;
+        loadUserGeneSets();
     }
 
     /**
@@ -414,7 +306,7 @@ public class UserDefinedGeneSetManager {
      * @return
      * @throws IOException
      */
-    private static Writer initOutputFile( String classFile ) throws IOException {
+    private Writer initOutputFile( String classFile ) throws IOException {
         Writer out = new BufferedWriter( new FileWriter( classFile, false ) );
         out.write( "# Saved by ErmineJ " + new Date() + " \n" );
         return out;
@@ -424,8 +316,84 @@ public class UserDefinedGeneSetManager {
      * @param ngs
      * @return
      */
-    private static boolean isExistingGeneSet( GeneSetTerm id1 ) {
+    private boolean isExistingGeneSet( GeneSetTerm id1 ) {
         return geneData.hasGeneSet( id1 );
+    }
+
+    /**
+     * Load the user-defined gene sets.
+     */
+    private void loadUserGeneSets() {
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
+        if ( !userGeneSetDir.exists() ) {
+            statusMessenger.showError( "No custom gene set directory found, none will be loaded - looked for "
+                    + settings.getUserGeneSetDirectory() );
+            return;
+        }
+
+        String[] classFiles = userGeneSetDir.list();
+
+        if ( classFiles.length == 0 ) {
+            statusMessenger.showStatus( "No gene sets found in " + settings.getUserGeneSetDirectory() );
+            return;
+        }
+
+        int numLoaded = 0;
+
+        for ( int i = 0; i < classFiles.length; i++ ) {
+
+            String classFile = classFiles[i];
+            if ( StringUtils.isEmpty( classFile ) ) {
+                continue;
+            }
+
+            String classFilePath = userGeneSetDir + System.getProperty( "file.separator" ) + classFile;
+            statusMessenger.showStatus( "Loading gene sets from: " + classFilePath );
+
+            try {
+
+                Collection<GeneSet> loadedSets = loadUserGeneSetFile( classFilePath );
+                numLoaded += loadedSets.size();
+
+                if ( !loadedSets.isEmpty() ) {
+                    Collection<String> customGeneSetFiles = settings.getCustomGeneSetFiles();
+                    customGeneSetFiles.add( classFilePath );
+                    settings.setCustomGeneSetFiles( customGeneSetFiles );
+                }
+
+                for ( GeneSet set : loadedSets ) {
+                    GeneSetTerm id = set.getTerm();
+
+                    if ( set.getGenes().isEmpty() ) {
+                        statusMessenger.showError( "Gene set has no genes matching annotations (" + id + ")" );
+                    } else if ( isExistingGeneSet( id ) ) {
+                        statusMessenger.showError( "Gene set IDs must be unique, please rename it (" + id + ")" );
+                    } else {
+                        geneData.addGeneSet( set.getTerm(), set.getGenes(), classFile );
+                    }
+                }
+
+            } catch ( IOException e ) {
+                // This error will be shown if there are files that don't fit the format.
+                statusMessenger.showError( "Could not load gene sets from " + classFilePath + ": " + e.getMessage() );
+
+            }
+
+            if ( numLoaded > 0 && numLoaded % 100 == 0 ) {
+                statusMessenger.showStatus( "Loading custom sets: " + numLoaded );
+            }
+
+            statusMessenger.clear();
+        }
+
+        if ( statusMessenger != null && numLoaded > 0 )
+            statusMessenger.showStatus( "Loaded " + numLoaded + " customized gene sets from " + classFiles.length
+                    + " files." );
+        log.info( "Load user sets: " + timer.getTime() + "ms" );
     }
 
     /**
@@ -433,7 +401,7 @@ public class UserDefinedGeneSetManager {
      * @return
      * @throws IOException
      */
-    private static GeneSet readOneSet( BufferedReader dis, StatusViewer m ) throws IOException {
+    private GeneSet readOneSet( BufferedReader dis ) throws IOException {
         String type = null;
         boolean hasUnknownProbes = false;
         boolean isGenes = true;
@@ -471,8 +439,7 @@ public class UserDefinedGeneSetManager {
                     if ( StringUtils.isBlank( symbol ) ) continue;
 
                     if ( symbol.contains( "///" ) ) {
-                        // MolSigDb format, when they have nonspecific probes? I also see "/"? Let's skip, in agreement
-                        // with GSEA:
+                        // MolSigDb has this; Let's skip, in agreement with GSEA:
                         // "This symbol indicates ambiguous mapping according to the Affymentrix conventions and serves
                         // as a field separator when a probe set id corresponds to several gene symbols. /// may
                         // appear in some gene sets curated form Affymetrix (NetAffx) annotation data. GSEA ignores such
@@ -497,7 +464,7 @@ public class UserDefinedGeneSetManager {
                 } else if ( type.equalsIgnoreCase( "gene" ) ) {
                     isGenes = true;
                 } else {
-                    m.showError( "Unknown data type '" + type
+                    statusMessenger.showError( "Unknown data type '" + type
                             + "' for group; In this format each group must start with 'probe' or 'gene'" );
                     return null;
                 }
@@ -528,7 +495,7 @@ public class UserDefinedGeneSetManager {
                 Gene gene = geneData.findGene( row );
                 if ( gene == null ) {
                     hasUnknownProbes = true;
-                    log.warn( "Gene " + row + " not recognized" );
+                    log.warn( "Gene " + row + " not recognized, skipping" );
                     continue;
                 }
                 newSet.addGene( gene );
@@ -540,10 +507,10 @@ public class UserDefinedGeneSetManager {
                     newSet.addGene( probe.getGene() );
                 }
             }
-        }
+        } // end of iteration over lines
 
         if ( newSet == null ) {
-            return newSet;
+            return null;
         }
 
         if ( hasUnknownProbes ) {
@@ -551,9 +518,18 @@ public class UserDefinedGeneSetManager {
              * We could add these probes (and genes). This would release users from having to have the annotation file,
              * but I don't think it's that big of a deal.
              */
-            m.showError( "Some genes in the custom sets not recognized" );
-        } else if ( newSet.getProbes().isEmpty() ) {
-            m.showError( "No genes for " + newSet.getId() + " match current annotations" );
+            if ( numTimesWarnedOfProblems < MAX_WARNINGS ) {
+                statusMessenger.showError( "Some genes in the custom sets not recognized; further warnings suppressed" );
+                numTimesWarnedOfProblems++;
+            }
+            // } else if ( newSet != null && newSet.getProbes().isEmpty() ) {
+        } else if ( newSet.getProbes().size() < 2 ) {
+            if ( numTimesWarnedOfProblems < MAX_WARNINGS ) {
+                statusMessenger.showError( "No genes for " + newSet.getId()
+                        + " match current annotations; further warnings suppressed" );
+                numTimesWarnedOfProblems++;
+            }
+            return null;
         }
 
         newSet.getTerm().setAspect( GeneSetTerms.USER_DEFINED );
@@ -561,11 +537,11 @@ public class UserDefinedGeneSetManager {
         return newSet;
     }
 
-    private static boolean restoreBackup( File originalFile, File backup ) {
+    private boolean restoreBackup( File originalFile, File backup ) {
         return backup.renameTo( originalFile );
     }
 
-    private static File saveBackup( Collection<GeneSet> sets ) throws IOException {
+    private File saveBackup( Collection<GeneSet> sets ) throws IOException {
         File backup = File.createTempFile( "ermineJ.set.backup.", ".txt" );
         Writer out = initOutputFile( backup.getAbsolutePath() );
         for ( GeneSet s : sets ) {
@@ -581,7 +557,7 @@ public class UserDefinedGeneSetManager {
      * @throws IOException
      * @throws FileNotFoundException
      */
-    private static BufferedReader setUpToLoad( String fileName ) throws IOException, FileNotFoundException {
+    private BufferedReader setUpToLoad( String fileName ) throws IOException, FileNotFoundException {
         FileTools.checkPathIsReadableFile( fileName );
         FileInputStream fis = new FileInputStream( fileName );
         BufferedInputStream bis = new BufferedInputStream( fis );
@@ -596,7 +572,7 @@ public class UserDefinedGeneSetManager {
      * @param out
      * @throws IOException
      */
-    private static void writeSet( GeneSet geneeSet, Writer out ) throws IOException {
+    private void writeSet( GeneSet geneeSet, Writer out ) throws IOException {
         String cleanedDescription = geneeSet.getTerm().getName().replaceAll( "[\r\n\t]+", " " );
         String filetype = ( geneeSet.isGenes() ) ? "gene" : "probe";
 
@@ -631,12 +607,12 @@ public class UserDefinedGeneSetManager {
      * @return
      * @throws IOException
      */
-    protected static Collection<GeneSet> loadUserGeneSetFile( InputStream is ) throws IOException {
+    protected Collection<GeneSet> loadUserGeneSetFile( InputStream is ) throws IOException {
         BufferedReader dis = new BufferedReader( new InputStreamReader( is ) );
         Collection<GeneSet> result = new HashSet<GeneSet>();
 
         while ( dis.ready() ) {
-            GeneSet newSet = readOneSet( dis, new StatusStderr() );
+            GeneSet newSet = readOneSet( dis );
             if ( newSet == null ) {
                 log.warn( "Set was not read" );
                 continue;
@@ -662,7 +638,8 @@ public class UserDefinedGeneSetManager {
      * line to avoid confusion with the other format</li>
      * <li>Any number of rows containing gene or probe identifiers.</li>
      * </ol>
-     * Alternatively, a tab-delimited file can be provided with one group per row, with the following format:
+     * Alternatively, a tab-delimited file can be provided with one group per row, with the following format (which it
+     * turns out MolSigDB uses):
      * <ol>
      * <li>A name for the group (e.g., KEGG identifier)</li>
      * <li>A description for the group (can be blank but must present)</li>
@@ -681,16 +658,15 @@ public class UserDefinedGeneSetManager {
      * @return true if some probes were read in which are on the current array design.
      * @throws IOException
      */
-    static Collection<GeneSet> loadUserGeneSetFile( String fileName, StatusViewer m ) throws IOException {
+    Collection<GeneSet> loadUserGeneSetFile( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
 
         Collection<GeneSet> result = new HashSet<GeneSet>();
 
         while ( dis.ready() ) {
-            GeneSet newSet = readOneSet( dis, m );
+            GeneSet newSet = readOneSet( dis );
 
             if ( newSet == null ) {
-                m.showError( "Set was not read from " + fileName );
                 continue;
             }
             newSet.setSourceFile( fileName );
@@ -699,10 +675,6 @@ public class UserDefinedGeneSetManager {
         dis.close();
 
         return result;
-    }
-
-    protected UserDefinedGeneSetManager() {
-
     }
 
 }

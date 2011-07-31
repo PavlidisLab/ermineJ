@@ -298,7 +298,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
         if ( value == null ) {
             setText( "" );
-        } else if ( column == 0 ) {
+        } else if ( column == 0 ) { /* ID */
 
             if ( value instanceof GeneSetTerm ) {
                 boolean redundant = geneData.hasRedundancy( ( GeneSetTerm ) value );
@@ -420,7 +420,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         } else if ( value instanceof EmptyGeneSetResult || value instanceof String ) {
             // nothing to do. This is weird that this happens, only when we are adding result sets
         } else if ( column == 0 && ( ( GeneSetTerm ) value ).isUserDefined() ) {
-            setBackground( Colors.LIGHTYELLOW );
+            setBackground( GeneSetPanel.USER_NODE_COLOR );
         } else if ( value instanceof GeneSetResult ) {
             double pvalCorr = ( ( GeneSetResult ) value ).getCorrectedPvalue();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
