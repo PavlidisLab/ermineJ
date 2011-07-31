@@ -7,18 +7,24 @@
 	<body>
 		<img src="../images/logo1small.gif" />
 		<h1>
-			Saving and loading analyses
+			Saving and loading analyses and projects
 		</h1>
+		
 		<p>
-			You can save an analysis you did and load it again later.
+			You can save an analysis you did and load it again later. You can also save the entire state of the
+			program as a project.
 		</p>
+		
+		<h2>Saving or loading analyses</h2>
 		<p>
-			These capabilities are accessed in the main window using the
-			"Analysis" menu.
+			Saving or loading an analysis is done in the main window using the "Analysis" menu. Use "save" when
+			you want to save an analysis file for use in other software or documentation purposes. Use "load" when you
+			want to add an analysis to the current view. Loading an analysis will not work unless
+			you have already loaded the appropriate annotation file. If you want to switch annotation files, use the "Project" commands.
 		</p>
-		<h2>
+		<h3>
 			Saving:
-		</h2>
+		</h3>
 		<p>
 			<img alt="" src="../images/save_analysis.gif" border="0">
 		</p>
@@ -31,9 +37,9 @@
 			The output format is described
 			<a href="../formats/saved-data.html">here</a>
 		</p>
-		<h2>
+		<h3>
 			Loading an analysis
-		</h2>
+		</h3>
 		<p>
 			Once you have saved an analysis, you can load it back in using the
 			"Analysis -> load analysis" item:
@@ -49,6 +55,25 @@
 		<p>
 			&nbsp;
 		</p>
+		
+		<h2>Projects</h2>
+		
+		<p>In contrast to the save/load analysis commands, projects allow you to completely reset the 
+		software to a different annotation file, gene scores, data matrix, and (if present) analysis results.</p>
+		
+		<h3>Saving a project</h3>
+		
+		<p>Simply use the File ... Save project menu item. You will be prompted to save a file for the project. We recommend
+		you save projects in the default location for the software (ermineJ.data in your home directory). The files
+		are given the extension ".project". The resulting file contains the settings for the session, as well as the 
+		analysis results, if any.</p>
+		
+		<h3>Loading a project</h3>
+		
+		<p>Use the File ... Load project menu item to select a ".project" file. The software will then proceed
+		to go through the same routine as when the sofware is initially started, loading the annotations, and then
+		loading the gene score and data matrix file you used; followed by loading the analysis results stored in the project, if any.</p> 
+		
 		<script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
 		: "http://www.");
