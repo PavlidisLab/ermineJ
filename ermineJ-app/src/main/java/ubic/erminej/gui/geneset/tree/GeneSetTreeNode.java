@@ -37,6 +37,8 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
 
     private boolean hasSignificantChild = false;
 
+    private boolean hasSelectedChild = false;
+
     private static Comparator<GeneSetTreeNode> comparator = new Comparator<GeneSetTreeNode>() {
 
         @Override
@@ -47,6 +49,15 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
 
     public GeneSetTreeNode( DirectedGraphNode<String, GeneSetTerm> root ) {
         super( root );
+    }
+
+    /**
+     * If it's included in a filtered set.
+     * 
+     * @return true if one or more of the children of this node should be displayed in a selection.
+     */
+    public boolean hasSelectedChild() {
+        return hasSelectedChild;
     }
 
     @SuppressWarnings("unchecked")
@@ -80,4 +91,7 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
         return this.getTerm().toString();
     }
 
+    public void setHasSelectedChild( boolean b ) {
+        this.hasSelectedChild = b;
+    }
 }

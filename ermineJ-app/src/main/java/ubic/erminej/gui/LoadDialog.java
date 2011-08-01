@@ -42,10 +42,7 @@ import ubic.erminej.gui.util.GuiUtil;
  * @version $Id$
  */
 public class LoadDialog extends AppDialog {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5573931795878079049L;
+
     private JFileChooser chooser = new JFileChooser();
     private JPanel centerPanel = new JPanel();
     private JButton loadBrowseButton = new JButton();
@@ -115,8 +112,8 @@ public class LoadDialog extends AppDialog {
                         ( ( MainFrame ) callingframe ).loadAnalysis( loadFile.getText() );
                         ( ( MainFrame ) callingframe ).setSettings( settings );
                         ( ( MainFrame ) callingframe ).enableMenusForAnalysis();
-                    } catch ( IOException e ) {
-                        GuiUtil.error( "There was an error: " + e.getMessage() );
+                    } catch ( IOException e1 ) {
+                        GuiUtil.error( "There was an error: " + e1.getMessage() );
                     }
                 }
             }.start();

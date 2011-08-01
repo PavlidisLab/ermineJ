@@ -77,7 +77,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
     public static final int GENE_COUNT_COLUMN_INDEX = 3;
     public static final int MULTIFUNC_COLUMN_INDEX = 4;
 
-    private String classColToolTip;
     private int currentResultSetIndex = -1;
     protected GeneSetTableModel model = null;
     protected List<String> resultToolTips = new LinkedList<String>();
@@ -204,7 +203,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     /**
-     * Revalidate, refilter and resort the table.
+     * Revalidate, refilter and (resort? NO) the table.
      */
     @Override
     public void refreshView() {
@@ -215,9 +214,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
         // sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
         // sorter.setSortKeys( sortKeys );
         this.model.filter();
-        table.revalidate();
         this.messenger.showStatus( table.getRowCount() + " sets shown" );
-        classColToolTip = table.getRowCount() + " sets shown";
+        table.revalidate();
     }
 
     /*
@@ -309,7 +307,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.setDefaultRenderer( GeneSetResult.class, new GeneSetTableCellRenderer( this.geneData ) );
 
         assert geneData != null;
-        classColToolTip = "Total classes shown: " + table.getRowCount();
         table.revalidate();
     }
 
@@ -400,7 +397,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      */
     protected String getHeaderToolTip( int index ) {
         if ( index == 0 || index == 1 ) { // descriptions of the category.
-            return this.classColToolTip;
+            return "Classes shown: " + table.getRowCount();
         } else if ( index == PROBE_COUNT_COLUMN_INDEX ) {
             return "How many probes are in the group (there can be more than one probe per gene)";
         } else if ( index == GENE_COUNT_COLUMN_INDEX ) {

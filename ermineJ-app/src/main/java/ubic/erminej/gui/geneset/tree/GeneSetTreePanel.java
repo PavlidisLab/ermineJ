@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.help.UnsupportedOperationException;
@@ -85,6 +86,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
     private FilteredGeneSetTreeModel filteredTreeModel;
 
     private TreePath currentlySelectedTreePath = null;
+
+    private Collection<GeneSetTerm> currentSelectedSets = new HashSet<GeneSetTerm>();
 
     public GeneSetTreePanel( MainFrame callingFrame, List<GeneSetPvalRun> results, Settings settings ) {
         super( settings, results, callingFrame );
@@ -169,8 +172,26 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param selectedTerms
      */
     public void filter( Collection<GeneSetTerm> selectedTerms ) {
-        // filteredTreeModel.setFilterSelectedTerms( selectedTerms );
+
+        this.currentSelectedSets = selectedTerms;
+        this.rend.setSelectedTerms( selectedTerms );
+
         refreshView();
+
+        if ( !selectedTerms.isEmpty() ) {
+
+            // try to show just the selected terms, within reason.
+            if ( selectedTerms.size() < 200 ) {
+                expandAll( true );
+            } else {
+                // just expand a few... not very nice.
+                int i = 0;
+                for ( GeneSetTerm t : selectedTerms ) {
+                    expandNode( find( t ), true );
+                    if ( ++i > 5 ) break;
+                }
+            }
+        }
     }
 
     /**
@@ -204,7 +225,34 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * Called via reflection == has to be public.
+     * Called via reflection == has to be public. DO NOT REMOVE
+     * 
+     * @param node
+     */
+    @SuppressWarnings("unchecked")
+    public void hasSelectedChild( GeneSetTreeNode node ) {
+        node.setHasSelectedChild( false );
+
+        if ( getCurrentSelectedSets().isEmpty() ) return;
+
+        Enumeration<GeneSetTreeNode> e = node.breadthFirstEnumeration();
+        e.nextElement();
+        while ( e.hasMoreElements() ) {
+            GeneSetTreeNode childNode = e.nextElement();
+            GeneSetTerm t = childNode.getTerm();
+            if ( getCurrentSelectedSets().contains( t ) ) {
+                node.setHasSelectedChild( true );
+                return;
+            }
+        }
+    }
+
+    private Collection<GeneSetTerm> getCurrentSelectedSets() {
+        return this.currentSelectedSets;
+    }
+
+    /**
+     * Called via reflection == has to be public. DO NOT REMOVE
      * 
      * @param node
      */
@@ -226,7 +274,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
                 node.setHasSignificantChild( true );
                 return;
             }
-
         }
     }
 
@@ -236,7 +283,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param goData
      * @param geneData
      */
-    public void initialize( GeneAnnotations gd ) { 
+    public void initialize( GeneAnnotations gd ) {
 
         this.geneData = gd;
         setUpTree();
@@ -318,9 +365,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     @Override
     public void refreshView() {
-        this.messenger.showStatus( "Updating view" );
-        filter( false );
+        this.messenger.showStatus( "Updating view ..." );
+
         updateNodeStyles();
+
+        filter( false );
+
         goTree.revalidate();
         goTree.repaint();
         this.messenger.clear();
@@ -371,8 +421,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
     private void updateNodeStyles() {
         log.debug( "Updating nodes" );
         try {
-            visitAllNodes( goTree, this.getClass().getMethod( "hasSignificantChild",
-                    new Class[] { GeneSetTreeNode.class } ) );
+            visitAllNodes( goTree, new Method[] {
+                    this.getClass().getMethod( "hasSignificantChild", new Class[] { GeneSetTreeNode.class } ),
+                    this.getClass().getMethod( "hasSelectedChild", new Class[] { GeneSetTreeNode.class } ) } );
+
         } catch ( Exception e ) {
             log.error( e, e );
         }
@@ -383,9 +435,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      * @param tree
      */
-    private void visitAllNodes( JTree tree, Method process ) {
+    private void visitAllNodes( JTree tree, Method[] methods ) {
         TreeNode root = ( TreeNode ) tree.getModel().getRoot();
-        visitAllNodes( root, process );
+        visitAllNodes( root, methods );
     }
 
     /**
@@ -395,10 +447,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param process
      */
     @SuppressWarnings("unchecked")
-    private void visitAllNodes( TreeNode node, Method process ) {
-        if ( process != null ) {
+    private void visitAllNodes( TreeNode node, Method[] methods ) {
+        if ( methods.length != 0 ) {
             try {
-                process.invoke( this, new Object[] { node } );
+                for ( int i = 0; i < methods.length; i++ ) {
+                    methods[i].invoke( this, new Object[] { node } );
+                }
             } catch ( Exception e ) {
                 log.error( e, e );
             }
@@ -407,7 +461,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( node.getChildCount() >= 0 ) {
             for ( Enumeration<GeneSetTreeNode> e = node.children(); e.hasMoreElements(); ) {
                 TreeNode n = e.nextElement();
-                visitAllNodes( n, process );
+                visitAllNodes( n, methods );
             }
         }
     }
@@ -448,10 +502,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
         // expand from leaves up.
         if ( expand ) {
             goTree.expandPath( parent );
+            goTree.scrollPathToVisible( parent );
         } else {
             if ( parent.getParentPath() == null ) return;
             goTree.collapsePath( parent );
         }
+
     }
 
     @Override
@@ -463,6 +519,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         filteredTreeModel.setFilterBySize( hideEmpty );
         filteredTreeModel.setResults( getCurrentResultSet() );
         filteredTreeModel.setFilterBySignificance( hideInsignificant );
+        filteredTreeModel.setFilterSelectedTerms( this.currentSelectedSets );
 
         if ( propagate ) this.callingFrame.getTablePanel().filter( false );
     }
@@ -601,6 +658,8 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
     private boolean selected;
 
+    private Collection<GeneSetTerm> selectedTerms = new HashSet<GeneSetTerm>();
+
     public GeneSetTreeNodeRenderer( GeneAnnotations geneData ) {
         super();
         this.geneData = geneData;
@@ -608,6 +667,10 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         this.setOpenIcon( regularIcon );
         this.setLeafIcon( regularIcon );
         this.setClosedIcon( regularIcon );
+    }
+
+    public void setSelectedTerms( Collection<GeneSetTerm> selectedTerms ) {
+        this.selectedTerms = selectedTerms;
     }
 
     /**
@@ -618,6 +681,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
     public Component getTreeCellRendererComponent( JTree tree, Object value, boolean s, boolean expanded, boolean leaf,
             int row, boolean f ) {
         super.getTreeCellRendererComponent( tree, value, s, expanded, leaf, row, hasFocus );
+
         this.selected = s;
         this.hasFocus = f;
         setOpaque( true );
@@ -642,6 +706,10 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
         if ( this.selected ) {
             this.setBackground( Color.LIGHT_GRAY );
+        }
+
+        if ( !this.selectedTerms.isEmpty() && !selectedTerms.contains( id ) ) {
+            this.setForeground( Color.LIGHT_GRAY ); // leaves should also be hidden.
         }
 
         return this;

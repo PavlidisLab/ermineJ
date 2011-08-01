@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.gui;
+package ubic.erminej.gui.analysis;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -34,11 +34,10 @@ import javax.swing.border.TitledBorder;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.Method;
-import ubic.erminej.gui.analysis.AnalysisWizard;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
- * The last step of the analysis wizard -- actually step 6 usually.
+ * The last step of the analysis wizard, picking method-specific settings.
  * 
  * @author Homin Lee
  * @version $Id$

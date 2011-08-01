@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.gui.AnalysisWizardStep5;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.Wizard;
 
@@ -54,11 +53,12 @@ public class AnalysisWizard extends Wizard {
 
     AnalysisWizardStep1 step1;
     AnalysisWizardStep2 step2;
+    // AnalysisWizardStep3 step3;
     AnalysisWizardStep3 step3;
-    AnalysisWizardStep3_1 step31;
     AnalysisWizardStep4 step4;
     AnalysisWizardStep5 step5;
-    int maxSteps = 6;
+    int maxSteps = 5;
+
     public AnalysisWizard( MainFrame callingframe, GeneAnnotations geneAnnots ) {
         super( callingframe, WIZARD_PREFERRED_WIDTH, WIZARD_PREFERRED_HEIGHT );
         this.callingframe = callingframe;
@@ -70,10 +70,10 @@ public class AnalysisWizard extends Wizard {
         this.addStep( step1, true );
         step2 = new AnalysisWizardStep2( this, settings );
         this.addStep( step2 );
-        step3 = new AnalysisWizardStep3( this, geneAnnots );
+        // step3 = new AnalysisWizardStep3( this, geneAnnots );
+        // this.addStep( step3 );
+        step3 = new AnalysisWizardStep3( this, settings );
         this.addStep( step3 );
-        step31 = new AnalysisWizardStep3_1( this, settings );
-        this.addStep( step31 );
         step4 = new AnalysisWizardStep4( this, settings );
         this.addStep( step4 );
         step5 = new AnalysisWizardStep5( this, settings );
@@ -89,6 +89,7 @@ public class AnalysisWizard extends Wizard {
             setFinishEnabled();
         }
     }
+
     /**
      * @return
      */
@@ -123,12 +124,7 @@ public class AnalysisWizard extends Wizard {
         }
     }
 
-    /**
-     * 
-     */
     private void checkNumSteps() {
-        maxSteps = 6;
-
         if ( step == 1 ) {
             this.setTitle( "Create New Analysis - Step 1 of " + maxSteps );
             step1.revalidate();
@@ -160,23 +156,14 @@ public class AnalysisWizard extends Wizard {
             nextButton.setEnabled( true );
             step2.revalidate();
             this.repaint();
-        } else if ( step == 31 ) {
+        } else if ( step == 4 ) {
             step = 3;
-            this.getContentPane().remove( step31 );
-            this.setTitle( "Create New Analysis - Step 3 of " + maxSteps );
+            this.getContentPane().remove( step4 );
+            this.setTitle( "Create New Analysis - Step 4 of " + maxSteps );
             this.getContentPane().add( step3 );
             checkIfReady();
             nextButton.setEnabled( true );
-            step2.revalidate();
-            this.repaint();
-        } else if ( step == 4 ) {
-            step = 31;
-            this.getContentPane().remove( step4 );
-            this.setTitle( "Create New Analysis - Step 4 of " + maxSteps );
-            this.getContentPane().add( step31 );
-            checkIfReady();
-            nextButton.setEnabled( true );
-            step31.revalidate();
+            step3.revalidate();
             this.repaint();
         } else if ( step == 5 ) {
             step = 4;
@@ -231,9 +218,9 @@ public class AnalysisWizard extends Wizard {
             backButton.setEnabled( true );
             setFinishEnabled();
             this.repaint();
-            nextButton.grabFocus();
+            nextButton.requestFocusInWindow();
             this.nextButton.setEnabled( true );
-        } else if ( step == 2 && step2.isReady() ) {
+        } else if ( step == 2 ) {
             step = 3;
             this.getContentPane().remove( step2 );
             this.setTitle( "Create New Analysis - Step 3 of " + maxSteps );
@@ -243,18 +230,9 @@ public class AnalysisWizard extends Wizard {
             step3.revalidate();
             this.repaint();
         } else if ( step == 3 ) {
-            step = 31;
+            step = 4;
             this.getContentPane().remove( step3 );
             this.setTitle( "Create New Analysis - Step 4 of " + maxSteps );
-            this.getContentPane().add( step31 );
-            checkIfReady();
-            this.nextButton.setEnabled( true );
-            step31.revalidate();
-            this.repaint();
-        } else if ( step == 31 ) {
-            step = 4;
-            this.getContentPane().remove( step31 );
-            this.setTitle( "Create New Analysis - Step 5 of " + maxSteps );
             this.getContentPane().add( step4 );
             checkIfReady();
             step4.revalidate();
@@ -264,7 +242,7 @@ public class AnalysisWizard extends Wizard {
             this.getContentPane().remove( step4 );
             step5.addVarPanel( analysisType );
             checkIfReady();
-            this.setTitle( "Create New Analysis - Step 6 of " + maxSteps );
+            this.setTitle( "Create New Analysis - Step 5 of " + maxSteps );
             this.getContentPane().add( step5 );
             step5.revalidate();
             nextButton.setEnabled( false );
@@ -275,8 +253,8 @@ public class AnalysisWizard extends Wizard {
     void saveValues() {
         step1.saveValues();
         step2.saveValues();
-        // step3.saveValues();
-        step31.saveValues();
+        // step31.saveValues();
+        step3.saveValues();
         step4.saveValues();
         step5.saveValues();
     }

@@ -152,9 +152,6 @@ public class MainFrame extends JFrame {
     private GeneSetTablePanel tablePanel;
     private GeneSetTreePanel treePanel;
 
-    private FindDialog findByGeneDialog = null;
-    private FindDialog findByNameDialog = null;
-
     private JMenu analysisMenu = new JMenu();
     private JMenu diagnosticsMenu = new JMenu();
     private JMenu classMenu = new JMenu();
@@ -208,7 +205,7 @@ public class MainFrame extends JFrame {
      */
     public void filter( Collection<GeneSetTerm> selectedTerms ) {
         this.tablePanel.filter( selectedTerms );
-        // this.treePanel.filter( selectedTerms );
+        this.treePanel.filter( selectedTerms );
     }
 
     /**
@@ -482,17 +479,14 @@ public class MainFrame extends JFrame {
         // searchPanel.setEnabled( true );
     }
 
-    private void find( String searchOn, boolean searchGenes ) {
+    private int find( String searchOn, boolean searchGenes ) {
         Collection<GeneSetTerm> geneSets = new HashSet<GeneSetTerm>();
 
         if ( StringUtils.isBlank( searchOn ) ) {
             statusMessenger.clear();
-            geneSets = geneData.getAllTerms();
-            filter( geneSets );
-            return;
+            filter( new HashSet<GeneSetTerm>() );
+            statusMessenger.showStatus( "Showing all gene sets" );
         }
-
-        statusMessenger.showStatus( "Searching '" + searchOn + "'" );
 
         if ( searchGenes ) {
             geneSets = geneData.findSetsByGene( searchOn );
@@ -500,11 +494,11 @@ public class MainFrame extends JFrame {
             geneSets = geneData.findSetsByName( searchOn );
         }
 
-        statusMessenger.showStatus( geneSets.size() + " matching gene sets found." );
-
         if ( geneSets.size() > 0 ) {
             filter( geneSets );
         }
+
+        return geneSets.size();
     }
 
     /**
@@ -1128,9 +1122,25 @@ public class MainFrame extends JFrame {
 
         queryTextField.addKeyListener( new KeyAdapter() {
             @Override
-            public void keyReleased( KeyEvent e ) {
-                if ( e.getKeyCode() == KeyEvent.VK_ENTER )
-                    find( ( ( JTextField ) e.getComponent() ).getText(), searchGenesChx.isSelected() );
+            public void keyReleased( final KeyEvent e ) {
+                if ( e.getKeyCode() == KeyEvent.VK_ENTER ) {
+
+                    SwingWorker<Integer, Object> r = new SwingWorker<Integer, Object>() {
+
+                        @Override
+                        protected Integer doInBackground() throws Exception {
+                            statusMessenger.showStatus( "Searching ..." );
+
+                            int found = find( ( ( JTextField ) e.getComponent() ).getText(), searchGenesChx
+                                    .isSelected() );
+                            statusMessenger.showStatus( "Found " + found + " matching gene sets" );
+                            return found;
+                        }
+                    };
+
+                    r.execute();
+
+                }
             }
         } );
 
@@ -1145,9 +1155,10 @@ public class MainFrame extends JFrame {
                      */
                     if ( StringUtils.isNotBlank( queryTextField.getText() ) ) {
                         queryTextField.setText( "" );
-                        statusMessenger.clear();
-                        Collection<GeneSetTerm> geneSets = geneData.getAllTerms();
-                        filter( geneSets );
+                        // Collection<GeneSetTerm> geneSets = geneData.getAllTerms();
+                        // filter( geneSets ); // maybe we should just put in an empty one?
+                        filter( new HashSet<GeneSetTerm>() );
+                        statusMessenger.showStatus( "Showing all gene sets" );
                     }
                     queryTextField.requestFocusInWindow();
                 }
@@ -1340,16 +1351,6 @@ public class MainFrame extends JFrame {
         maybeEnableSomeMenus();
         if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
         cancelAnalysisMenuItem.setEnabled( false );
-    }
-
-    void findClassMenuItem_actionPerformed() {
-        if ( findByNameDialog == null ) findByNameDialog = new FindDialog( this, geneData );
-        findByNameDialog.setVisible( true );
-    }
-
-    void findGeneMenuItem_actionPerformed() {
-        if ( findByGeneDialog == null ) findByGeneDialog = new FindByGeneDialog( this, geneData );
-        findByGeneDialog.setVisible( true );
     }
 
     void loadAnalysisMenuItem_actionPerformed() {

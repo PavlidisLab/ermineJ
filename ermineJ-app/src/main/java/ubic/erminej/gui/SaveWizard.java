@@ -76,7 +76,7 @@ public class SaveWizard extends Wizard {
                 backButton.setEnabled( true );
                 nextButton.setEnabled( false );
                 finishButton.setEnabled( true );
-                finishButton.grabFocus();
+                finishButton.requestFocusInWindow();
                 this.repaint();
             } else {
                 showError( "No analyses to save." );

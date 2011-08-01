@@ -14,7 +14,9 @@
  */
 package ubic.erminej.gui.geneset.tree;
 
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -36,38 +38,19 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
 
     private static final long serialVersionUID = 1L;
 
-    boolean filterBySize = true;
-    boolean filterBySignificance = false;
-    boolean filterByRedundancy = false;
+    private boolean filterBySize = true;
 
-    public boolean isFilterByRedundancy() {
-        return filterByRedundancy;
-    }
-
-    public void setFilterByRedundancy( boolean filterByRedundancy ) {
-        this.filterByRedundancy = filterByRedundancy;
-    }
+    private boolean filterBySignificance = false;
 
     private GeneSetPvalRun results;
 
-    public boolean isFilterBySize() {
-        return filterBySize;
-    }
+    private GeneAnnotations annots;
 
-    public void setFilterBySize( boolean filterBySize ) {
-        this.filterBySize = filterBySize;
-    }
+    private Collection<GeneSetTerm> selectedTerms = new HashSet<GeneSetTerm>();
 
-    public boolean isFilterBySignificance() {
-        return filterBySignificance;
-    }
-
-    public void setFilterBySignificance( boolean filterBySignificance ) {
-        this.filterBySignificance = filterBySignificance;
-    }
-
-    public void setResults( GeneSetPvalRun results ) {
-        this.results = results;
+    public FilteredGeneSetTreeModel( GeneAnnotations annots, TreeModel toWrap ) {
+        super( ( TreeNode ) toWrap.getRoot() );
+        this.annots = annots;
     }
 
     /*
@@ -87,6 +70,15 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
             GeneSetTreeNode node = ( GeneSetTreeNode ) children.nextElement();
             GeneSetTerm term = node.getTerm();
 
+            if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
+                continue;
+            }
+
+            if ( !this.selectedTerms.isEmpty() && !selectedTerms.contains( term )
+                    && ( node.isLeaf() || !node.hasSelectedChild() ) ) {
+                continue;
+            }
+
             if ( filterBySignificance && this.results != null ) {
                 GeneSetResult geneSetResult = results.getResults().get( term );
                 //
@@ -97,14 +89,7 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
                 } else if ( !node.hasSignificantChild() ) {
                     continue;
                 }
-
             }
-            if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
-                continue;
-            }
-//            else if ( filterByRedundancy && annots.skipDueToRedundancy( term ) ) {
-//                continue;
-//            }
 
             if ( i == index ) {
                 return node;
@@ -124,6 +109,15 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
             GeneSetTreeNode node = ( GeneSetTreeNode ) children.nextElement();
             GeneSetTerm term = node.getTerm();
 
+            if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
+                continue;
+            }
+
+            if ( !this.selectedTerms.isEmpty() && !selectedTerms.contains( term )
+                    && ( node.isLeaf() || !node.hasSelectedChild() ) ) {
+                continue;
+            }
+
             if ( filterBySignificance && this.results != null ) {
                 GeneSetResult geneSetResult = results.getResults().get( term );
 
@@ -136,22 +130,34 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
                 }
 
             }
-            if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
-                continue;
-            }
-            // if ( filterByRedundancy && annots.skipDueToRedundancy( term ) ) {
-            // continue;
-            // }
+
             i++;
         }
         return i;
     }
 
-    private GeneAnnotations annots;
+    public boolean isFilterBySignificance() {
+        return filterBySignificance;
+    }
 
-    public FilteredGeneSetTreeModel( GeneAnnotations annots, TreeModel toWrap ) {
-        super( ( TreeNode ) toWrap.getRoot() );
-        this.annots = annots;
+    public boolean isFilterBySize() {
+        return filterBySize;
+    }
+
+    public void setFilterBySignificance( boolean filterBySignificance ) {
+        this.filterBySignificance = filterBySignificance;
+    }
+
+    public void setFilterBySize( boolean filterBySize ) {
+        this.filterBySize = filterBySize;
+    }
+
+    public void setFilterSelectedTerms( Collection<GeneSetTerm> selectedTerms ) {
+        this.selectedTerms = selectedTerms;
+    }
+
+    public void setResults( GeneSetPvalRun results ) {
+        this.results = results;
     }
 
 }

@@ -141,7 +141,10 @@ public class GeneSetTableModel extends AbstractTableModel {
             for ( Iterator<GeneSetTerm> it = gsl.iterator(); it.hasNext(); ) {
                 GeneSetTerm t = it.next();
 
+                // order matters.
                 if ( filterEmpty && geneData.getGeneSetGenes( t ).isEmpty() ) {
+                    it.remove();
+                } else if ( filterNonUsers && !t.isUserDefined() ) {
                     it.remove();
                 } else if ( filterInsignificant && !this.results.isEmpty() ) {
                     // keep if there is at least one significant result.
@@ -154,8 +157,6 @@ public class GeneSetTableModel extends AbstractTableModel {
                         }
                     }
                     if ( !keep ) it.remove();
-                } else if ( filterNonUsers && !t.isUserDefined() ) {
-                    it.remove();
                 }
             }
             super.fireTableStructureChanged();
