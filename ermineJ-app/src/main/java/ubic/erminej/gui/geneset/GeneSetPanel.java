@@ -205,9 +205,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         popup.add( hideInsig );
 
         if ( classID == null ) return null;
-        if ( geneData.getUserDefinedTerms().contains( classID ) ) {
-            // user-defineda
-            assert classID.isUserDefined();
+        if ( classID.isUserDefined() ) {
             modMenuItem.setEnabled( true );
             deleteGeneSetMenuItem.setEnabled( true );
             visitAmigoMenuItem.setEnabled( false ); // won't be a GO term.

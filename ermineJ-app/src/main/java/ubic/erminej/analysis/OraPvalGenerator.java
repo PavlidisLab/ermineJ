@@ -43,8 +43,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     protected double geneScoreThreshold;
 
-    private static final int ALERT_UPDATE_FREQUENCY = 300;
-
     private GeneScores geneScores;
 
     private Collection<Gene> genesAboveThreshold = new HashSet<Gene>();

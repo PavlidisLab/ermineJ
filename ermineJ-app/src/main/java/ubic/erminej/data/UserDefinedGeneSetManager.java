@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -430,9 +431,22 @@ public class UserDefinedGeneSetManager {
 
             if ( fields.length > 2 ) {
                 /*
-                 * We assume there is one record per row; includes MolSigDB (which includes KEGG) gene symbol files.
+                 * We assume there is one record per row; includes MolSigDB (which also distributes a representation of
+                 * KEGG) gene symbol files.
                  */
-                newSet = new GeneSet( new GeneSetTerm( fields[0], fields[1] ) );
+                String geneSetID = fields[0];
+                String geneSetName = fields[1];
+
+                /*
+                 * Pretty-up the name (use ID if it's better)
+                 */
+                if ( geneSetName.contains( "broadinstitute.org" ) ) {
+                    geneSetName = WordUtils.capitalize( StringUtils.lowerCase( geneSetID ) ).replaceAll( "_", " " );
+                } else {
+                    // Future: add additional case-specific cleanups. Worse case: blank.
+                }
+
+                newSet = new GeneSet( new GeneSetTerm( geneSetID, geneSetName ) );
                 newSet.setIsGenes( true );
                 newSet.setUserDefined( true );
                 for ( int i = 2; i < fields.length; i++ ) {

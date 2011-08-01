@@ -38,6 +38,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JTree;
+import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -48,6 +49,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -148,7 +150,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         if ( classID == null ) return false;
 
-        TreePath path = this.find( classID );
+        final TreePath path = this.find( classID );
         boolean foundIt = false;
         if ( path == null ) {
             this.callingFrame.getStatusMessenger().showError(
@@ -161,9 +163,17 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( foundIt ) {
             log.debug( "Expanding to path for " + classID );
 
-            goTree.expandPath( path );
-            goTree.setSelectionPath( path );
-            goTree.scrollPathToVisible( path );
+            SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    goTree.expandPath( path );
+                    goTree.setSelectionPath( path );
+                    goTree.scrollPathToVisible( path );
+                    return null;
+                }
+            };
+            w.execute();
+
         }
         return foundIt;
     }
@@ -175,7 +185,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         this.currentSelectedSets = selectedTerms;
         this.rend.setSelectedTerms( selectedTerms );
-
+        log.info( selectedTerms.size() + "selected" );
         refreshView();
 
         if ( !selectedTerms.isEmpty() ) {
@@ -252,12 +262,122 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
+     * @return
+     */
+    public Collection<GeneSetTreeNode> getLeaves() {
+        GeneSetTreeNode node = ( GeneSetTreeNode ) goTree.getModel().getRoot();
+        return getLeaves( node );
+    }
+
+    /**
+     * @param node
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Collection<GeneSetTreeNode> getLeaves( GeneSetTreeNode node ) {
+        Collection<GeneSetTreeNode> result = new HashSet<GeneSetTreeNode>();
+        Enumeration<GeneSetTreeNode> dfe = node.depthFirstEnumeration();
+        int i = 0;
+        while ( dfe.hasMoreElements() ) {
+            GeneSetTreeNode no = dfe.nextElement();
+            if ( no.isLeaf() ) {
+                result.add( no );
+            }
+            ++i;
+        }
+
+        return result;
+    }
+
+    /**
+     * 
+     */
+    private void setNodeStatesForFilter() {
+        Collection<GeneSetTreeNode> leaves = this.getLeaves();
+        // log.info( leaves.size() + " leaves" ); // 22000!
+        // int i = 0;
+        for ( GeneSetTreeNode le : leaves ) {
+            if ( getCurrentResultSet() != null ) {
+                markHasSignificantChild( le, false );
+            }
+            markHasSelectedChild( le, false );
+            // if ( ++i % 2000 == 0 ) {
+            // log.info( "Checking branches " + i );
+            // }
+        }
+
+    }
+
+    /**
+     * @param node
+     * @param set
+     */
+    private void markHasSignificantChild( GeneSetTreeNode node, boolean set ) {
+
+        if ( node == null ) return;
+
+        if ( set ) {
+            // we already found a path, so all are true.
+            node.setHasSignificantChild( true );
+            markHasSignificantChild( ( GeneSetTreeNode ) node.getParent(), true );
+            return;
+        }
+
+        // check the node.
+        boolean s1 = false;
+        GeneSetResult result = getCurrentResultSet().getResults().get( node.getTerm() );
+        if ( result != null && result.getCorrectedPvalue() <= GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
+            s1 = true;
+            node.setHasSignificantChild( true );
+        } else {
+            // node.setHasSignificantChild( false );
+        }
+        markHasSignificantChild( ( GeneSetTreeNode ) node.getParent(), s1 );
+
+    }
+
+    /**
+     * @param node
+     * @param set
+     */
+    private void markHasSelectedChild( GeneSetTreeNode node, boolean set ) {
+
+        if ( node == null ) return;
+        // log.info( node + " __>" );
+
+        if ( set ) {
+            // we already found a path, so all parents are true, we don't need to check.
+            node.setHasSelectedChild( true );
+      //      log.info( "marking: " + node );
+
+            markHasSelectedChild( ( GeneSetTreeNode ) node.getParent(), true );
+            return;
+        }
+
+        // check the node.
+        boolean s1 = false;
+        if ( this.getCurrentSelectedSets().contains( node.getTerm() ) ) {
+            s1 = true;
+            node.setHasSelectedChild( true );
+        //    log.info( "end: " + node );
+        } else {
+            // node.setHasSelectedChild( false );
+        }
+        markHasSelectedChild( ( GeneSetTreeNode ) node.getParent(), s1 );
+    }
+
+    /**
      * Called via reflection == has to be public. DO NOT REMOVE
      * 
      * @param node
      */
     @SuppressWarnings("unchecked")
     public void hasSignificantChild( GeneSetTreeNode node ) {
+
+        // this is inefficient, because this called over the whole tree (see also hasSelectedChild). I can't think of a
+        // way to do this with less than two full tree traversals. 1) find all the leaves 2) walk back to the root. JDK
+        // recommends this approach.
+
         node.setHasSignificantChild( false );
 
         if ( getCurrentResultSet() == null ) {
@@ -365,15 +485,22 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     @Override
     public void refreshView() {
-        this.messenger.showStatus( "Updating view ..." );
 
+        // SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
+        // @Override
+        // protected Object doInBackground() throws Exception {
         updateNodeStyles();
 
+        log.info( "filter" );
         filter( false );
 
         goTree.revalidate();
         goTree.repaint();
-        this.messenger.clear();
+        messenger.clear();
+        // return null;
+        // }
+        // };
+        // w.execute();
     }
 
     /**
@@ -419,52 +546,59 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * 
      */
     private void updateNodeStyles() {
-        log.debug( "Updating nodes" );
-        try {
-            visitAllNodes( goTree, new Method[] {
-                    this.getClass().getMethod( "hasSignificantChild", new Class[] { GeneSetTreeNode.class } ),
-                    this.getClass().getMethod( "hasSelectedChild", new Class[] { GeneSetTreeNode.class } ) } );
 
-        } catch ( Exception e ) {
-            log.error( e, e );
-        }
+        // StopWatch timer = new StopWatch();
+        // timer.start();
+        setNodeStatesForFilter();
+        // log.info( "Visit nodes: " + timer.getTime() );
+
+        // try {
+        // visitAllNodes( goTree, new Method[] {
+        // this.getClass().getMethod( "hasSignificantChild", new Class[] { GeneSetTreeNode.class } ),
+        // this.getClass().getMethod( "hasSelectedChild", new Class[] { GeneSetTreeNode.class } ) } );
+        //
+        // } catch ( Exception e ) {
+        // log.error( e, e );
+        // }
+
     }
 
-    /**
-     * http://javaalmanac.com/egs/javax.swing.tree/GetNodes.html
-     * 
-     * @param tree
-     */
-    private void visitAllNodes( JTree tree, Method[] methods ) {
-        TreeNode root = ( TreeNode ) tree.getModel().getRoot();
-        visitAllNodes( root, methods );
-    }
-
-    /**
-     * http://javaalmanac.com/egs/javax.swing.tree/GetNodes.html
-     * 
-     * @param node
-     * @param process
-     */
-    @SuppressWarnings("unchecked")
-    private void visitAllNodes( TreeNode node, Method[] methods ) {
-        if ( methods.length != 0 ) {
-            try {
-                for ( int i = 0; i < methods.length; i++ ) {
-                    methods[i].invoke( this, new Object[] { node } );
-                }
-            } catch ( Exception e ) {
-                log.error( e, e );
-            }
-        }
-
-        if ( node.getChildCount() >= 0 ) {
-            for ( Enumeration<GeneSetTreeNode> e = node.children(); e.hasMoreElements(); ) {
-                TreeNode n = e.nextElement();
-                visitAllNodes( n, methods );
-            }
-        }
-    }
+    // /**
+    // * http://javaalmanac.com/egs/javax.swing.tree/GetNodes.html
+    // *
+    // * @param tree
+    // */
+    // private void visitAllNodes( JTree tree, Method[] methods ) {
+    // GeneSetTreeNode root = ( GeneSetTreeNode ) tree.getModel().getRoot();
+    // visitAllNodes( root, methods );
+    // }
+    //
+    // /**
+    // * http://javaalmanac.com/egs/javax.swing.tree/GetNodes.html
+    // *
+    // * @param node
+    // * @param process
+    // */
+    // @SuppressWarnings("unchecked")
+    // private void visitAllNodes( GeneSetTreeNode node, Method[] methods ) {
+    //
+    // if ( methods.length != 0 ) {
+    // try {
+    // for ( int i = 0; i < methods.length; i++ ) {
+    // methods[i].invoke( this, new Object[] { node } );
+    // }
+    // } catch ( Exception e ) {
+    // log.error( e, e );
+    // }
+    // }
+    //
+    // if ( node.getChildCount() >= 0 ) {
+    // for ( Enumeration<GeneSetTreeNode> e = node.children(); e.hasMoreElements(); ) {
+    // GeneSetTreeNode n = e.nextElement();
+    // visitAllNodes( n, methods );
+    // }
+    // }
+    // }
 
     @Override
     protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
@@ -476,17 +610,39 @@ public class GeneSetTreePanel extends GeneSetPanel {
     /**
      * @param expand If false, collapses all nodes. If true, expands them all.
      */
-    protected void expandAll( boolean expand ) {
+    protected void expandAll( final boolean expand ) {
         TreeNode root = ( TreeNode ) goTree.getModel().getRoot();
         expandNode( new TreePath( root ), expand );
+    }
+
+    protected void expandNode( final TreePath parent, final boolean expand ) {
+        /*
+         * For big parts of the tree, it is actually faster to do this in the EDT, unless there is a trick.
+         */
+        // SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
+
+        // @Override
+        // protected Object doInBackground() throws Exception {
+        doExpandNode( parent, expand );
+        // return null;
+        // }
+        //
+        // @Override
+        // protected void done() {
+        // super.done();
+        // goTree.repaint();
+        // }
+        //
+        // };
+        // w.execute();
     }
 
     /**
      * @param parent
      * @param expand if true expand, otherwise collapse.
      */
-    protected void expandNode( TreePath parent, boolean expand ) {
-        // Traverse children
+    private void doExpandNode( TreePath parent, boolean expand ) {
+        // http://www.exampledepot.com/egs/javax.swing.tree/ExpandAll.html
         GeneSetTreeNode node = ( GeneSetTreeNode ) parent.getLastPathComponent();
 
         TreeModel treeModel = this.goTree.getModel();
@@ -494,9 +650,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         for ( int i = 0; i < treeModel.getChildCount( node ); i++ ) {
             TreeNode n = ( GeneSetTreeNode ) treeModel.getChild( node, i );
             TreePath path = parent.pathByAddingChild( n );
-
-            expandNode( path, expand );
-
+            doExpandNode( path, expand );
         }
 
         // expand from leaves up.
@@ -507,7 +661,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
             if ( parent.getParentPath() == null ) return;
             goTree.collapsePath( parent );
         }
-
     }
 
     @Override
@@ -515,6 +668,18 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         filteredTreeModel = new FilteredGeneSetTreeModel( this.geneData, geneSetTreeModel );
         this.goTree.setModel( filteredTreeModel );
+
+        // Enumeration<GeneSetTreeNode> e = ( ( GeneSetTreeNode ) this.goTree.getModel().getRoot() )
+        // .breadthFirstEnumeration();
+        // int i = 0;
+        // while ( e.hasMoreElements() ) {
+        // GeneSetTreeNode nextElement = e.nextElement();
+        // if ( nextElement.hasSelectedChild() ) {
+        // log.info( "yah " + nextElement );
+        // // assert this.currentSelectedSets.contains( nextElement.getTerm() );
+        // }
+        // i++;
+        // }
 
         filteredTreeModel.setFilterBySize( hideEmpty );
         filteredTreeModel.setResults( getCurrentResultSet() );

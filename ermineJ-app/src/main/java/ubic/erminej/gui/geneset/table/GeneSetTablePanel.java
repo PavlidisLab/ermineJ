@@ -252,7 +252,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         generateResultColumnHeadingTooltip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
 
         currentResultSetIndex = results.size() - 1;
-        this.callingFrame.setCurrentResultSet( currentResultSetIndex );
+        this.callingFrame.setCurrentResultSetIndex( currentResultSetIndex );
         table.revalidate();
 
         try {
@@ -448,7 +448,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
             model.removeRunData( currentColumnIndex );
 
             model.fireTableStructureChanged();
-            callingFrame.setCurrentResultSet( runIndex );
+            callingFrame.setCurrentResultSetIndex( runIndex );
 
             results.remove( runIndex ); // This should be done by the parent.
             resultToolTips.remove( runIndex );

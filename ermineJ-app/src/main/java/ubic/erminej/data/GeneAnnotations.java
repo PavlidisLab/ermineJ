@@ -650,9 +650,8 @@ public class GeneAnnotations {
     public Set<GeneSet> getUserDefinedGeneSets() {
         Set<GeneSet> result = new HashSet<GeneSet>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
-            GeneSet gs = geneSets.get( term );
-            if ( gs.isUserDefined() ) {
-                result.add( gs );
+            if ( term.isUserDefined() ) {
+                result.add( geneSets.get( term ) );
             }
         }
         return result;
@@ -666,8 +665,7 @@ public class GeneAnnotations {
     public Set<GeneSetTerm> getUserDefinedTerms() {
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
-            GeneSet gs = geneSets.get( term );
-            if ( gs.isUserDefined() ) {
+            if ( term.isUserDefined() ) {
                 result.add( term );
             }
         }

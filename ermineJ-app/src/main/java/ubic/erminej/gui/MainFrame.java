@@ -203,9 +203,18 @@ public class MainFrame extends JFrame {
     /**
      * @param selectedTerms
      */
-    public void filter( Collection<GeneSetTerm> selectedTerms ) {
-        this.tablePanel.filter( selectedTerms );
-        this.treePanel.filter( selectedTerms );
+    public void filter( final Collection<GeneSetTerm> selectedTerms ) {
+
+        // SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
+        // @Override
+        // protected Object doInBackground() throws Exception {
+        tablePanel.filter( selectedTerms );
+        treePanel.filter( selectedTerms );
+        // return null;
+        // }
+        // };
+        // w.execute();
+
     }
 
     /**
@@ -294,7 +303,7 @@ public class MainFrame extends JFrame {
     /**
      * @param runIndex
      */
-    public void setCurrentResultSet( int runIndex ) {
+    public void setCurrentResultSetIndex( int runIndex ) {
         this.currentResultSet = runIndex;
         treePanel.fireResultsChanged();
     }
@@ -306,7 +315,7 @@ public class MainFrame extends JFrame {
         for ( int i = 0; i < results.size(); i++ ) {
             GeneSetPvalRun element = results.get( i );
             if ( element.getName().equals( resultSetName ) ) {
-                this.setCurrentResultSet( i );
+                this.setCurrentResultSetIndex( i );
             }
         }
     }
@@ -429,7 +438,7 @@ public class MainFrame extends JFrame {
         }
 
         if ( numZeroPvalues == numPvalues || numUnityPvalue == numPvalues ) {
-            GuiUtil.error( "The results indicate that you may need to adjust your\nanalysis settings.\n"
+            GuiUtil.error( "The results indicate that you may need to adjust your analysis settings.\n"
                     + "For example, make sure your setting for 'larger scores are better' is correct." );
         }
 
@@ -483,9 +492,9 @@ public class MainFrame extends JFrame {
         Collection<GeneSetTerm> geneSets = new HashSet<GeneSetTerm>();
 
         if ( StringUtils.isBlank( searchOn ) ) {
-            statusMessenger.clear();
             filter( new HashSet<GeneSetTerm>() );
             statusMessenger.showStatus( "Showing all gene sets" );
+            return geneData.numGeneSets();
         }
 
         if ( searchGenes ) {
@@ -1120,43 +1129,42 @@ public class MainFrame extends JFrame {
         queryTextField.setMaximumSize( new Dimension( 140, 20 ) );
         final JCheckBox searchGenesChx = new JCheckBox( "Search genes" );
 
+        // hitting enter while the search field has focus.
         queryTextField.addKeyListener( new KeyAdapter() {
             @Override
             public void keyReleased( final KeyEvent e ) {
                 if ( e.getKeyCode() == KeyEvent.VK_ENTER ) {
 
-                    SwingWorker<Integer, Object> r = new SwingWorker<Integer, Object>() {
+                    // SwingWorker<Integer, Object> r = new SwingWorker<Integer, Object>() {
 
-                        @Override
-                        protected Integer doInBackground() throws Exception {
-                            statusMessenger.showStatus( "Searching ..." );
+                    // @Override
+                    // protected Integer doInBackground() throws Exception {
+                    // statusMessenger.showStatus( "Searching ..." );
 
-                            int found = find( ( ( JTextField ) e.getComponent() ).getText(), searchGenesChx
-                                    .isSelected() );
-                            statusMessenger.showStatus( "Found " + found + " matching gene sets" );
-                            return found;
-                        }
-                    };
-
-                    r.execute();
+                    int found = find( ( ( JTextField ) e.getComponent() ).getText(), searchGenesChx.isSelected() );
+                    statusMessenger.showStatus( "Found " + found + " matching gene sets" );
+                    // return found;
+                    // }
+                    // };
+                    //
+                    // r.execute();
 
                 }
             }
         } );
 
+        // Hitting ctrl-F: reset the search
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher( new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent( KeyEvent e ) {
-                if ( e.getID() == KeyEvent.KEY_RELEASED
-                        && e.getKeyCode() == KeyStroke.getKeyStroke( KeyEvent.VK_F, InputEvent.CTRL_MASK ).getKeyCode() ) {
+                if ( e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_F
+                        && 0 != ( e.getModifiers() & InputEvent.CTRL_DOWN_MASK ) ) {
                     /*
                      * Remove find filter
                      */
                     if ( StringUtils.isNotBlank( queryTextField.getText() ) ) {
                         queryTextField.setText( "" );
-                        // Collection<GeneSetTerm> geneSets = geneData.getAllTerms();
-                        // filter( geneSets ); // maybe we should just put in an empty one?
                         filter( new HashSet<GeneSetTerm>() );
                         statusMessenger.showStatus( "Showing all gene sets" );
                     }

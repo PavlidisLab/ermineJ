@@ -36,6 +36,8 @@ import ubic.erminej.data.GeneSetTerms;
 public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( AbstractGeneSetPvalGenerator.class );
 
+    protected static final int ALERT_UPDATE_FREQUENCY = 300;
+
     protected SettingsHolder settings;
 
     protected GeneAnnotations geneAnnots;

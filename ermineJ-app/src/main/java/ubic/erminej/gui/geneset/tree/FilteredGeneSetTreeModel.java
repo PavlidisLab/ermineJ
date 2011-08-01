@@ -74,14 +74,9 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
                 continue;
             }
 
-            if ( !this.selectedTerms.isEmpty() && !selectedTerms.contains( term )
-                    && ( node.isLeaf() || !node.hasSelectedChild() ) ) {
-                continue;
-            }
-
             if ( filterBySignificance && this.results != null ) {
                 GeneSetResult geneSetResult = results.getResults().get( term );
-                //
+
                 if ( geneSetResult != null ) {
                     if ( geneSetResult.getCorrectedPvalue() >= GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
                         continue;
@@ -89,6 +84,11 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
                 } else if ( !node.hasSignificantChild() ) {
                     continue;
                 }
+            }
+
+            if ( !this.selectedTerms.isEmpty() && !term.isAspect() && !selectedTerms.contains( term )
+                    && !node.hasSelectedChild() ) {
+                continue;
             }
 
             if ( i == index ) {
@@ -104,17 +104,14 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
     public int getChildCount( Object parent ) {
         Enumeration children = ( ( GeneSetTreeNode ) parent ).children();
 
+        // System.err.println( this.selectedTerms.size() );
+
         int i = 0;
         while ( children.hasMoreElements() ) {
             GeneSetTreeNode node = ( GeneSetTreeNode ) children.nextElement();
             GeneSetTerm term = node.getTerm();
 
             if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
-                continue;
-            }
-
-            if ( !this.selectedTerms.isEmpty() && !selectedTerms.contains( term )
-                    && ( node.isLeaf() || !node.hasSelectedChild() ) ) {
                 continue;
             }
 
@@ -129,6 +126,11 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
                     continue;
                 }
 
+            }
+
+            if ( !this.selectedTerms.isEmpty() && !term.isAspect() && !selectedTerms.contains( term )
+                    && !node.hasSelectedChild() ) {
+                continue;
             }
 
             i++;
@@ -153,6 +155,7 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
     }
 
     public void setFilterSelectedTerms( Collection<GeneSetTerm> selectedTerms ) {
+        // System.err.println( selectedTerms.size() + " terms selected" );
         this.selectedTerms = selectedTerms;
     }
 

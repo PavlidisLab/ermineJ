@@ -41,10 +41,6 @@ public class GeneSet {
     // How was it originally represented. This affects how things are stored on disk. Genes is better.
     private boolean isGenes = true;
 
-    // private boolean skipDueToRedundancy = false;
-
-    private boolean isUserDefined = false;
-
     private String sourceFile;
 
     private Collection<Probe> probes = new HashSet<Probe>();
@@ -200,7 +196,7 @@ public class GeneSet {
     // }
 
     public boolean isUserDefined() {
-        return isUserDefined;
+        return term.isUserDefined();
     }
 
     public void setGenes( boolean isGenes ) {
@@ -242,7 +238,6 @@ public class GeneSet {
     }
 
     public void setUserDefined( boolean isUserDefined ) {
-        this.isUserDefined = isUserDefined;
         this.term.setUserDefined( isUserDefined );
     }
 
