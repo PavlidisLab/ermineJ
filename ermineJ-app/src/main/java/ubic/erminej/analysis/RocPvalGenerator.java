@@ -81,12 +81,11 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             GeneSetResult res = this.classPval( className );
             if ( res != null ) {
                 results.put( className, res );
-                count++;
+                if ( messenger != null && ++count % ALERT_UPDATE_FREQUENCY == 0 ) {
+                    messenger.showStatus( count + " gene sets analyzed" );
+                }
             }
 
-            if ( messenger != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
-                messenger.showStatus( count + " gene sets analyzed" );
-            }
         }
         return results;
     }

@@ -1060,7 +1060,7 @@ public class GeneAnnotations {
     }
 
     /**
-     * Identify classes which are absoluely identical to others. This isn't superfast. This should be called after
+     * Identify classes which are absoluely identical to others. This should be called after
      * adding parents.
      */
     private void redundancyCheck() {
@@ -1070,19 +1070,30 @@ public class GeneAnnotations {
         messenger.showStatus( "There are " + numGeneSets()
                 + " gene sets in the annotations, checking for redundancy ..." );
 
-        Collection<GeneSet> checked = new HashSet<GeneSet>();
-        int i = 0;
+        List<GeneSet> bySize = new ArrayList<GeneSet>( this.geneSets.values() );
+        Collections.sort( bySize, new Comparator<GeneSet>() {
+            @Override
+            public int compare( GeneSet o1, GeneSet o2 ) {
+                if ( o1.getGenes().size() > o2.getGenes().size() ) return -1;
+                if ( o1.getGenes().size() == o2.getGenes().size() ) return o1.getId().compareTo( o2.getId() );
+                return 1;
+            }
+        } );
+
         int numRedundant = 0;
-        for ( GeneSet gs1 : this.geneSets.values() ) {
+        for ( int i = 0; i < bySize.size(); i++ ) {
+
+            GeneSet gs1 = bySize.get( i );
             Collection<Gene> genes1 = gs1.getGenes();
 
-            gs: for ( GeneSet gs2 : this.geneSets.values() ) {
+            gs: for ( int j = i + 1; j < bySize.size(); j++ ) {
 
-                if ( checked.contains( gs2 ) || gs1.equals( gs2 ) ) continue;
-
+                GeneSet gs2 = bySize.get( j );
                 Collection<Gene> genes2 = gs2.getGenes();
 
-                if ( genes1.size() != genes2.size() ) continue; // not identical.
+                assert genes2.size() <= genes1.size();
+
+                if ( genes2.size() < genes1.size() ) break; 
 
                 for ( Gene g1 : genes1 ) {
                     if ( !genes2.contains( g1 ) ) continue gs; // not redundant.
@@ -1090,18 +1101,11 @@ public class GeneAnnotations {
 
                 gs1.addRedundantGroup( gs2 );
                 gs2.addRedundantGroup( gs1 );
-
             }
-
-            checked.add( gs1 ); // either we found all its redundancies or it has none, so we don't need to look at
-            // it
-            // again.
-
+            if ( i > 0 && i % 2000 == 0 ) {
+                messenger.showStatus( i + " sets checked for redundancy, " + numRedundant + " found ..." );
+            }
             if ( gs1.hasRedundancy() ) numRedundant++;
-
-            if ( ++i % 500 == 0 ) {
-                messenger.showStatus( checked.size() + " sets checked for redundancy, " + numRedundant + " found ..." );
-            }
 
         }
 

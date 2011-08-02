@@ -372,9 +372,15 @@ public class UserDefinedGeneSetManager {
                     GeneSetTerm id = set.getTerm();
 
                     if ( set.getGenes().isEmpty() ) {
-                        statusMessenger.showError( "Gene set has no genes matching annotations (" + id + ")" );
+                        if ( this.numTimesWarnedOfProblems < MAX_WARNINGS ) {
+                            statusMessenger.showError( "Gene set has no genes matching annotations (" + id + ")" );
+                            this.numTimesWarnedOfProblems++;
+                        }
                     } else if ( isExistingGeneSet( id ) ) {
-                        statusMessenger.showError( "Gene set IDs must be unique, please rename it (" + id + ")" );
+                        if ( this.numTimesWarnedOfProblems < MAX_WARNINGS ) {
+                            statusMessenger.showError( "Gene set IDs must be unique, please rename it (" + id + ")" );
+                            this.numTimesWarnedOfProblems++;
+                        }
                     } else {
                         geneData.addGeneSet( set.getTerm(), set.getGenes(), classFile );
                     }
