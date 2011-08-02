@@ -24,6 +24,8 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -33,7 +35,6 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.dataStructure.matrix.FastRowAccessDoubleMatrix;
 import ubic.basecode.io.reader.DoubleMatrixReader;
-import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
@@ -47,6 +48,7 @@ import ubic.erminej.data.Probe;
  * @version $Id$
  */
 public class AnalysisThread extends Thread {
+
     protected static final Log log = LogFactory.getLog( AnalysisThread.class );
     private Map<String, GeneScores> geneScoreSets;
     private volatile GeneSetPvalRun latestResults;
@@ -57,9 +59,10 @@ public class AnalysisThread extends Thread {
     private Map<String, DoubleMatrix<Probe, String>> rawDataSets;
     private volatile Method runningMethod;
     private SettingsHolder settings;
-    private volatile boolean stop = false;
-    private boolean wasError = false;
-    private boolean finishedNormally = false;
+
+    private volatile AtomicBoolean stop = new AtomicBoolean( false );
+    private AtomicBoolean wasError = new AtomicBoolean( false );
+    private AtomicBoolean finishedNormally = new AtomicBoolean( false );
 
     /**
      * @param csframe
@@ -88,6 +91,8 @@ public class AnalysisThread extends Thread {
     }
 
     /**
+     * For loading an analysis from a file.
+     * 
      * @param csframe
      * @param settings
      * @param messenger
@@ -133,7 +138,7 @@ public class AnalysisThread extends Thread {
 
     public synchronized GeneSetPvalRun getLatestResults() throws IllegalStateException {
         log.debug( "Status: " + latestResults );
-        while ( !stop && this.latestResults == null ) {
+        while ( !stop.get() && this.latestResults == null ) {
             try {
                 wait( 100 );
             } catch ( InterruptedException e ) {
@@ -150,15 +155,15 @@ public class AnalysisThread extends Thread {
      * @return Returns the finishedNormally.
      */
     public boolean isFinishedNormally() {
-        return this.finishedNormally;
+        return this.finishedNormally.get();
     }
 
     /**
      * @return
      */
     public boolean isStop() {
-        if ( stop == false ) this.finishedNormally = false;
-        return stop;
+        if ( !stop.get() ) this.finishedNormally.set( false );
+        return stop.get();
 
     }
 
@@ -166,7 +171,7 @@ public class AnalysisThread extends Thread {
      * @return Returns the wasError.
      */
     public boolean isWasError() {
-        return this.wasError;
+        return this.wasError.get();
     }
 
     /**
@@ -175,7 +180,7 @@ public class AnalysisThread extends Thread {
      * @return
      * @throws IOException
      */
-    public synchronized GeneSetPvalRun loadAnalysis() throws IOException {
+    public synchronized GeneSetPvalRun loadAnalysis() throws Exception {
         ResultsFileReader rfr = new ResultsFileReader( geneAnnots, loadFile, messenger );
         Map<GeneSetTerm, GeneSetResult> results = rfr.getResults();
         return doAnalysis( results );
@@ -184,7 +189,7 @@ public class AnalysisThread extends Thread {
     @Override
     public void run() {
         try {
-            this.wasError = false;
+            this.wasError.set( false );
             assert runningMethod != null : "No running method assigned";
             log.debug( "Invoking runner in " + Thread.currentThread().getName() );
             log.debug( "Running method is " + runningMethod.getName() );
@@ -192,11 +197,10 @@ public class AnalysisThread extends Thread {
             log.debug( "Runner returned" );
 
             if ( results == null ) {
-                stop = true;
-                this.finishedNormally = false;
+                this.finishedNormally.set( false );
             } else {
                 this.setLatestResults( results );
-                this.finishedNormally = true;
+                this.finishedNormally.set( true );
             }
         } catch ( InvocationTargetException e ) {
             if ( !( e.getCause() instanceof CancellationException ) ) {
@@ -206,9 +210,10 @@ public class AnalysisThread extends Thread {
             }
             if ( messenger != null ) messenger.showStatus( "Ready" );
         } catch ( Exception e ) {
-            stop = true;
             showError( e );
             throw new RuntimeException( e.getCause() );
+        } finally {
+            stop.set( true );
         }
     }
 
@@ -216,7 +221,7 @@ public class AnalysisThread extends Thread {
      * @param stop
      */
     public void stopRunning( boolean s ) {
-        this.stop = s;
+        this.stop.set( s );
         log.debug( "Stop set to : " + s );
     }
 
@@ -278,8 +283,7 @@ public class AnalysisThread extends Thread {
                 .getDataCol() );
 
         if ( omatrix.rows() == 0 ) {
-            throw new IllegalArgumentException(
-                    "No rows were read from the file for the probes in the annotations." );
+            throw new IllegalArgumentException( "No rows were read from the file for the probes in the annotations." );
         }
 
         rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
@@ -299,38 +303,41 @@ public class AnalysisThread extends Thread {
      * @param results
      * @throws IOException
      */
-    private synchronized GeneSetPvalRun doAnalysis( Map<GeneSetTerm, GeneSetResult> results ) throws IOException {
-        log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
+    private synchronized GeneSetPvalRun doAnalysis( Map<GeneSetTerm, GeneSetResult> results ) throws Exception {
+        try {
+            log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
 
-        StopWatch timer = new StopWatch();
-        timer.start();
+            StopWatch timer = new StopWatch();
+            timer.start();
 
-        DoubleMatrix<Probe, String> rawData = null;
-        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
-            rawData = addRawData();
+            DoubleMatrix<Probe, String> rawData = null;
+            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
+                rawData = addRawData();
+            }
+            GeneScores geneScores = addGeneScores();
+            if ( this.stop.get() ) return null;
+
+            /* do work */
+            if ( messenger != null ) messenger.showStatus( "Starting analysis..." );
+            GeneSetPvalRun newResults = null;
+            if ( results != null ) { // read from a file.
+                newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, results,
+                        "LoadedRun" );
+            } else {
+                newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, "NewRun" );
+            }
+
+            timer.stop();
+            if ( messenger != null )
+                messenger.showStatus( String.format( "%d seconds elapsed", Math.round( timer.getTime() / 1000 ) ) );
+
+            if ( this.stop.get() ) return null;
+            // settings.writePrefs();
+            oldSettings = settings;
+            return newResults;
+        } catch ( Exception e ) {
+            throw e;
         }
-        GeneScores geneScores = addGeneScores();
-        if ( this.stop ) return null;
-
-        if ( this.stop ) return null;
-
-        /* do work */
-        if ( messenger != null ) messenger.showStatus( "Starting analysis..." );
-        GeneSetPvalRun newResults = null;
-        if ( results != null ) { // read from a file.
-            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, results, "LoadedRun" );
-        } else {
-            newResults = new GeneSetPvalRun( settings, geneAnnots, rawData, geneScores, messenger, "NewRun" );
-        }
-
-        timer.stop();
-        if ( messenger != null )
-            messenger.showStatus( String.format( "%d seconds elapsed", Math.round( timer.getTime() / 1000 ) ) );
-
-        if ( this.stop ) return null;
-        // settings.writePrefs();
-        oldSettings = settings;
-        return newResults;
     }
 
     // see if we have to read the gene scores or if we can just use the old ones
@@ -344,7 +351,7 @@ public class AnalysisThread extends Thread {
      */
     private synchronized void setLatestResults( GeneSetPvalRun newResults ) {
         log.debug( "Status: " + latestResults );
-        while ( !stop && this.latestResults != null ) {
+        while ( !stop.get() && this.latestResults != null ) {
             log.debug( "Still waiting for last set of results to be cleared" );
             try {
                 wait( 100 );
@@ -360,7 +367,7 @@ public class AnalysisThread extends Thread {
      */
     private synchronized void showError( Throwable e ) {
         log.error( e, e );
-        wasError = true;
+        wasError.set( true );
         if ( messenger != null ) messenger.showError( e );
     }
 

@@ -1219,7 +1219,10 @@ public class GeneAnnotations {
 
         formGeneSets();
 
-        assert !this.geneSets.isEmpty();
+        if ( this.geneSets.isEmpty() ) {
+            throw new IllegalStateException( "No gene sets were formed." );
+        }
+
         prune( true /* subcloning */);
 
         redundancyCheck( start );

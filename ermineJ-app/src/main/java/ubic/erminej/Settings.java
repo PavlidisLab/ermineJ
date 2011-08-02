@@ -95,33 +95,33 @@ public class Settings extends SettingsHolder {
     public static void writeAnalysisSettings( SettingsHolder settings, String fileName, StatusViewer viewer )
             throws IOException {
         PropertiesConfiguration configToWrite = settings.getConfig();
-        Writer out;
-        if ( fileName == null ) {
-            log.debug( "Output to STDOUT" );
-            out = new BufferedWriter( new PrintWriter( System.out ) );
-        } else {
+        Writer out = null;
 
-            if ( !new File( fileName ).exists() || !new File( fileName ).canWrite() ) {
-                viewer.showError( "Could not write to: " + fileName );
+        try {
+            if ( fileName == null ) {
+                out = new BufferedWriter( new PrintWriter( System.out ) );
+            } else {
+                viewer.showStatus( "Writing configuration to: " + fileName );
+                out = new BufferedWriter( new FileWriter( fileName ) );
             }
 
-            log.debug( "output " + fileName );
-            log.debug( "Saving configuration to " + fileName );
-            out = new BufferedWriter( new FileWriter( fileName ) );
-        }
+            for ( String propertyName : ANALYSIS_SETTINGS ) {
+                if ( configToWrite.getProperty( propertyName ) == null ) {
+                    if ( log.isDebugEnabled() ) log.debug( "No property " + propertyName + ", skipping" );
+                    continue;
+                }
 
-        for ( String propertyName : ANALYSIS_SETTINGS ) {
-            if ( configToWrite.getProperty( propertyName ) == null ) {
-                log.debug( "No property " + propertyName + ", skipping" );
-                continue;
+                out.write( propertyName + " = " );
+                out.write( StringEscapeUtils.escapeJava( configToWrite.getProperty( propertyName ).toString() ) );
+                out.write( "\n" );
+                if ( log.isDebugEnabled() )
+                    log.debug( "Writing " + propertyName + "=" + configToWrite.getProperty( propertyName ).toString() );
             }
-
-            out.write( propertyName + " = " );
-            out.write( StringEscapeUtils.escapeJava( configToWrite.getProperty( propertyName ).toString() ) );
-            out.write( "\n" );
-            log.debug( "Writing " + propertyName + "=" + configToWrite.getProperty( propertyName ).toString() );
+        } catch ( IOException e ) {
+            throw e;
+        } finally {
+            if ( out != null ) out.close();
         }
-        out.close();
     }
 
     /**

@@ -57,6 +57,14 @@ public class ResultsFileReader {
     public ResultsFileReader( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
             throws NumberFormatException, IOException {
 
+        /*
+         * FIXME this really should parse the settings at the same time.
+         */
+
+        /*
+         * FIXME handle the sitaution where the annotations do not match the file.
+         */
+
         if ( StringUtils.isBlank( filename ) ) {
             throw new IllegalArgumentException( "File name was blank" );
         }
@@ -77,7 +85,8 @@ public class ResultsFileReader {
 
         boolean warned = false;
         messenger.showStatus( "Loading analysis..." );
-        String line;
+
+        String line = null;
 
         /*
          * FIXME, handle multi-results version
@@ -97,15 +106,15 @@ public class ResultsFileReader {
                 }
 
                 // we could recompute this, but better not.
-                int size = Integer.parseInt( st.nextToken() );
-                int effsize = Integer.parseInt( st.nextToken() );
+                int numProbes = Integer.parseInt( st.nextToken() );
+                int numGenes = Integer.parseInt( st.nextToken() );
                 double score = Double.parseDouble( st.nextToken() );
                 double pval = Double.parseDouble( st.nextToken() );
 
                 // we could recompute this, but better not.
                 double correctedPval = Double.parseDouble( st.nextToken() );
 
-                GeneSetResult c = new GeneSetResult( term, size, effsize, score, pval, correctedPval );
+                GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval );
                 results.put( term, c );
             }
         }

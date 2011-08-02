@@ -19,6 +19,7 @@
 package ubic.erminej.gui.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.CancellationException;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -142,14 +143,21 @@ public class StatusJlabel extends StatusDebugLogger {
      */
     @Override
     public void showError( Throwable e ) {
-        final String m = "There was an error: see logs for details";
+
+        String m = "There was an error: " + e.getMessage() + "; See logs for details.";
+
+        if ( e instanceof CancellationException ) {
+            m = "Cancelled";
+        }
+
         if ( SwingUtilities.isEventDispatchThread() ) {
             setLabel( m, errorIcon );
         } else {
+            final String mf = m;
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
                     public void run() {
-                        setLabel( m, errorIcon );
+                        setLabel( mf, errorIcon );
                     }
                 } );
             } catch ( InterruptedException ex ) {

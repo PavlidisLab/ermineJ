@@ -105,6 +105,9 @@ public class LoadDialog extends AppDialog {
     @Override
     protected void actionButton_actionPerformed( ActionEvent e ) {
         if ( FileTools.testFile( loadFile.getText() ) ) {
+            /*
+             * FIXME this should use the swingworker pattern?
+             */
             new Thread() {
                 @Override
                 public void run() {
@@ -112,8 +115,8 @@ public class LoadDialog extends AppDialog {
                         ( ( MainFrame ) callingframe ).loadAnalysis( loadFile.getText() );
                         ( ( MainFrame ) callingframe ).setSettings( settings );
                         ( ( MainFrame ) callingframe ).enableMenusForAnalysis();
-                    } catch ( IOException e1 ) {
-                        GuiUtil.error( "There was an error: " + e1.getMessage() );
+                    } catch ( Exception e1 ) {
+                        GuiUtil.error( "There was an error:\n" + e1.getMessage() );
                     }
                 }
             }.start();

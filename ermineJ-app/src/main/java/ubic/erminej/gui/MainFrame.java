@@ -285,6 +285,7 @@ public class MainFrame extends JFrame {
             GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n" + e.getMessage() );
             return;
         }
+
         if ( !checkValid( loadSettings ) ) {
             GuiUtil
                     .error( "There was a problem loading the analysis.\nFiles referred to in the analysis may have been moved or deleted." );
@@ -448,13 +449,18 @@ public class MainFrame extends JFrame {
      * @param loadSettings
      */
     private boolean checkValid( Settings loadSettings ) {
+
         /*
          * Strict validation is turned off. But I'm not sure we need this at all?
          */
+        if ( !loadSettings.getAnnotFile().equals( this.settings.getAnnotFile() ) ) {
+            this.statusMessenger
+                    .showError( "The annotation file in the file doesn't match the one you have loaded, there could be problems." );
+        }
 
         String file;
 
-        file = checkFile( loadSettings.getRawDataFileName() );
+        file = checkFile( loadSettings.getRawDataFileName() ); // looks for the file.
         // if ( file == null ) {
         // return false;
         // }
@@ -788,7 +794,7 @@ public class MainFrame extends JFrame {
         quitMenuItem.setText( "Quit" );
         quitMenuItem.addActionListener( new GeneSetScoreFrame_quitMenuItem_actionAdapter( this ) );
         quitMenuItem.setMnemonic( 'Q' );
-        quitMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Q, InputEvent.CTRL_MASK ) );
+        quitMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK ) );
         fileMenu.add( quitMenuItem );
 
         JMenuItem saveProjectMenuItem = new JMenuItem( "Save project ..." );
@@ -816,7 +822,7 @@ public class MainFrame extends JFrame {
         defineClassMenuItem.setText( "Define New Gene Set" );
         defineClassMenuItem.addActionListener( new GeneSetScoreFrame_defineClassMenuItem_actionAdapter( this ) );
         defineClassMenuItem.setMnemonic( 'D' );
-        defineClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_D, InputEvent.CTRL_MASK ) );
+        defineClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK ) );
 
         modClassMenuItem.setText( "View/Modify Gene Set" );
         modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
@@ -844,20 +850,20 @@ public class MainFrame extends JFrame {
         runAnalysisMenuItem.setText( "Run Analysis" );
         runAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
         runAnalysisMenuItem.setMnemonic( 'R' );
-        runAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_R, InputEvent.CTRL_MASK ) );
+        runAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK ) );
         cancelAnalysisMenuItem.setText( "Cancel Analysis" );
         cancelAnalysisMenuItem.setEnabled( false );
         cancelAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( this ) );
         cancelAnalysisMenuItem.setMnemonic( 'C' );
-        cancelAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.CTRL_MASK ) );
+        cancelAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK ) );
         loadAnalysisMenuItem.setText( "Load Analysis" );
         loadAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( this ) );
         loadAnalysisMenuItem.setMnemonic( 'L' );
-        loadAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_L, InputEvent.CTRL_MASK ) );
+        loadAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK ) );
         saveAnalysisMenuItem.setText( "Save Analysis" );
         saveAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( this ) );
         saveAnalysisMenuItem.setMnemonic( 'S' );
-        saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_MASK ) );
+        saveAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK ) );
         saveAnalysisMenuItem.setEnabled( false ); // no runs to begin with.
 
         JMenuItem switchDataFileMenuItem = new JMenuItem();

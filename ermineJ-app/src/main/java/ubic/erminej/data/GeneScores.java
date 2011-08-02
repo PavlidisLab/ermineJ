@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.CancellationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.math.Rank;
-import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
@@ -355,7 +355,6 @@ public class GeneScores {
 
         return rankedGenes;
     }
- 
 
     /**
      * @param probe_id

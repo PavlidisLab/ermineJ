@@ -21,7 +21,7 @@ package ubic.erminej.analysis;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.util.CancellationException;
+import java.util.concurrent.CancellationException;
 
 /**
  * @author pavlidis

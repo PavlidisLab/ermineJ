@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -362,7 +363,7 @@ public class UserDefinedGeneSetManager {
                 numLoaded += loadedSets.size();
 
                 if ( !loadedSets.isEmpty() ) {
-                    Collection<String> customGeneSetFiles = settings.getCustomGeneSetFiles();
+                    Set<String> customGeneSetFiles = new HashSet<String>( settings.getCustomGeneSetFiles() );
                     customGeneSetFiles.add( classFilePath );
                     settings.setCustomGeneSetFiles( customGeneSetFiles );
                 }

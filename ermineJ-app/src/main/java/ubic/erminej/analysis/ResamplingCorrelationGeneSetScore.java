@@ -18,14 +18,15 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.concurrent.CancellationException;
+
 import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.MatrixStats;
 import ubic.basecode.math.RandomChooser;
-import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive; 
+import cern.jet.stat.Descriptive;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Probe;

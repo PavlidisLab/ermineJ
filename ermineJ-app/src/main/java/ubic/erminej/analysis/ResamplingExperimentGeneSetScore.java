@@ -18,12 +18,13 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.concurrent.CancellationException;
+
 import org.apache.commons.lang.ArrayUtils;
 
 import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.RandomChooser;
 import ubic.basecode.math.Stats;
-import ubic.basecode.util.CancellationException;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;

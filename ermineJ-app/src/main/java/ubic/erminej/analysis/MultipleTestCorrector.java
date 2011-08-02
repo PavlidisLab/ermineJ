@@ -32,7 +32,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.util.CancellationException;
+import java.util.concurrent.CancellationException;
 import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.SettingsHolder;
@@ -286,10 +286,10 @@ public class MultipleTestCorrector extends AbstractLongTask {
                     /*
                      * monitor what happens to the best class.
                      */
-                    System.err.println( "Sim " + i + " class# " + j + " " + nextclass + " size="
-                            + res.getNumGenes() + " q=" + nf.format( q ) + " qprev=" + nf.format( qprev )
-                            + " pperm=" + nf.format( permp ) + " actp=" + nf.format( actual_p ) + " countj="
-                            + counts[j] + " currentp=" + ( double ) counts[j] / ( i + 1 ) );
+                    System.err.println( "Sim " + i + " class# " + j + " " + nextclass + " size=" + res.getNumGenes()
+                            + " q=" + nf.format( q ) + " qprev=" + nf.format( qprev ) + " pperm=" + nf.format( permp )
+                            + " actp=" + nf.format( actual_p ) + " countj=" + counts[j] + " currentp="
+                            + ( double ) counts[j] / ( i + 1 ) );
 
                 }
                 j++;
