@@ -48,14 +48,19 @@ public class Gene implements Comparable<Gene> {
      * Updates membership (for probes too).
      * 
      * @param t
+     * @return true if it was added; false if it was already there.
      */
-    public void addGeneSet( GeneSetTerm t ) {
+    public boolean addGeneSet( GeneSetTerm t ) {
         assert t != null;
+
+        if ( this.geneSets.contains( t ) ) return false;
 
         this.geneSets.add( t );
         for ( Probe p : probes ) {
             p.addToGeneSet( t );
         }
+
+        return true;
     }
 
     /**

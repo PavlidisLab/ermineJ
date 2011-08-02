@@ -98,6 +98,7 @@ import ubic.erminej.data.GeneSetTerms;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.analysis.AnalysisWizard;
 import ubic.erminej.gui.analysis.MultiFuncDiagWindow;
+import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.geneset.details.JGeneScoreFileChooser;
 import ubic.erminej.gui.geneset.details.JRawFileChooser;
 import ubic.erminej.gui.geneset.table.GeneSetTablePanel;
@@ -116,6 +117,21 @@ import ubic.erminej.gui.util.StatusJlabel;
  * @version $Id$
  */
 public class MainFrame extends JFrame {
+
+    private final class ProjectFileFilter extends FileFilter {
+        @Override
+        public boolean accept( File pathname ) {
+            if ( pathname.isDirectory() ) {
+                return true;
+            }
+            return pathname.getPath().endsWith( ".project" );
+        }
+
+        @Override
+        public String getDescription() {
+            return "ErmineJ project files (*.project)";
+        }
+    }
 
     private static final String START_CARD = "START";
 
@@ -271,6 +287,10 @@ public class MainFrame extends JFrame {
         return this.treePanel;
     }
 
+    /**
+     * @param loadFile
+     * @throws IOException
+     */
     public void loadAnalysis( String loadFile ) throws IOException {
 
         assert loadFile != null;
@@ -812,6 +832,15 @@ public class MainFrame extends JFrame {
             }
         } );
 
+        JMenuItem switchAnnotationFileMenuItem = new JMenuItem( "Switch annotation source ..." );
+        switchAnnotationFileMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                switchAnnotations();
+            }
+        } );
+
+        fileMenu.add( switchAnnotationFileMenuItem );
         fileMenu.add( saveProjectMenuItem );
         fileMenu.add( loadProjectMenuItem );
 
@@ -950,24 +979,90 @@ public class MainFrame extends JFrame {
 
     }
 
+    /**
+     * 
+     */
+    protected void loadAnalysis() {
+        JFileChooser chooser = new JFileChooser();
+        String RESULTS_LOAD_LOCATION = "resultsLoadPath";
+        chooser.setCurrentDirectory( new File( settings.getConfig().getString( RESULTS_LOAD_LOCATION,
+                settings.getDataDirectory() ) ) );
+        chooser.setDialogTitle( "Open saved analysis" );
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+
+            settings.getConfig().setProperty( RESULTS_LOAD_LOCATION, chooser.getSelectedFile().getAbsolutePath() );
+            final String path = chooser.getSelectedFile().getAbsolutePath();
+            if ( FileTools.testFile( path ) ) {
+                /*
+                 * FIXME this should use the swingworker pattern?
+                 */
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            loadAnalysis( path );
+                        } catch ( Exception e1 ) {
+                            GuiUtil.error( "There was an error:\n" + e1.getMessage() );
+                        }
+                    }
+                }.start();
+            } else {
+                GuiUtil.error( "File is not readable." );
+            }
+        }
+
+    }
+
+    protected void switchAnnotations() {
+
+        /*
+         * If there are already analyses, we should prompt them to save.
+         */
+
+        /*
+         * User selects annotation file
+         */
+        JFileChooser annotFileChooser = new JFileChooser( settings.getDataDirectory() );
+        annotFileChooser.setFileFilter( new DataFileFilter() );
+        annotFileChooser.setDialogTitle( "Select annotation file" );
+        int yesno = annotFileChooser.showDialog( this, "Open" );
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+
+            File selectedFile = annotFileChooser.getSelectedFile();
+
+            if ( selectedFile.getAbsolutePath().equals( settings.getAnnotFile() ) ) {
+                /*
+                 * TODO Alert the user -- they can reload if they want, or bail.
+                 */
+            }
+
+            this.settings.setAnnotFile( selectedFile.getAbsolutePath() );
+
+            SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+
+                @Override
+                protected Object doInBackground() throws Exception {
+                    initializeAllData();
+                    return null;
+                }
+            };
+            r.execute();
+        }
+    }
+
     protected void loadProject() {
+
+        /*
+         * If there are already analyses, we should prompt them to save.
+         */
 
         /*
          * User selects project file
          */
         JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
-        projectPathChooser.setFileFilter( new FileFilter() {
-            @Override
-            public boolean accept( File pathname ) {
-                return pathname.getPath().endsWith( ".project" );
-            }
-
-            @Override
-            public String getDescription() {
-                return "ErmineJ project files (*.project)";
-            }
-        } );
-
+        projectPathChooser.setFileFilter( new ProjectFileFilter() );
+        projectPathChooser.setDialogTitle( "Open/Switch project" );
         int yesno = projectPathChooser.showDialog( this, "Open" );
 
         /*
@@ -1022,20 +1117,9 @@ public class MainFrame extends JFrame {
 
         final JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
 
-        projectPathChooser.setFileFilter( new FileFilter() {
-
-            @Override
-            public boolean accept( File pathname ) {
-                return pathname.getPath().endsWith( ".project" );
-            }
-
-            @Override
-            public String getDescription() {
-                return "ErmineJ project files (*.project)";
-            }
-        } );
-
-        int yesno = projectPathChooser.showDialog( this, "Choose project file name" );
+        projectPathChooser.setFileFilter( new ProjectFileFilter() );
+        projectPathChooser.setDialogTitle( "Save the current project" );
+        int yesno = projectPathChooser.showDialog( this, "Save" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
 
@@ -1367,11 +1451,6 @@ public class MainFrame extends JFrame {
         cancelAnalysisMenuItem.setEnabled( false );
     }
 
-    void loadAnalysisMenuItem_actionPerformed() {
-        LoadDialog lgsd = new LoadDialog( this );
-        lgsd.showDialog();
-    }
-
     void modClassMenuItem_actionPerformed() {
         GeneSetWizard cwiz = new GeneSetWizard( this, geneData, false );
         cwiz.showWizard();
@@ -1455,7 +1534,7 @@ class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.e
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.loadAnalysisMenuItem_actionPerformed();
+        adaptee.loadAnalysis();
     }
 }
 

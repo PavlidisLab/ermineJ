@@ -35,13 +35,15 @@ public class DataFileFilter extends FileFilter {
             return true;
         }
 
+        /*
+         * This used to filter on the file ending, but causes too many problems.
+         */
         return true;
 
     }
 
     @Override
     public String getDescription() {
-
         return "Plain or compressed text files";
     }
 }

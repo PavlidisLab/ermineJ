@@ -63,8 +63,7 @@ public class GeneSet {
      */
     public GeneSet( GeneSetTerm name, Collection<Gene> items ) {
         this( name );
-        for ( Gene g : items )
-            addGene( g );
+        addGenes( items );
     }
 
     /**

@@ -83,7 +83,7 @@ public class GeneSetPvalRun {
      * @return
      */
     public synchronized GeneAnnotations getPrunedAnnotations( Collection<Probe> activeProbes, GeneAnnotations original ) {
-        return new GeneAnnotations( original, activeProbes, true );
+        return original.subClone( activeProbes );
     }
 
     /**

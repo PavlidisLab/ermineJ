@@ -16,10 +16,11 @@ package ubic.erminej;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 
@@ -339,13 +340,13 @@ public class SettingsHolder {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<String> getSelectedCustomGeneSets() {
-        return config.getList( SELECTED_CUSTOM_GENESETS, new ArrayList<String>() );
+    public Set<String> getSelectedCustomGeneSets() {
+        return new HashSet<String>( config.getList( SELECTED_CUSTOM_GENESETS, new ArrayList<String>() ) );
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<String> getCustomGeneSetFiles() {
-        return config.getList( CUSTOM_GENESET_FILES, new ArrayList<String>() );
+    public Set<String> getCustomGeneSetFiles() {
+        return new HashSet<String>( config.getList( CUSTOM_GENESET_FILES, new ArrayList<String>() ) );
     }
 
     /**
@@ -395,16 +396,16 @@ public class SettingsHolder {
                 ( Boolean ) getDefaultSettingsValue( USE_USER_DEFINED_GROUPS ) );
     }
 
-//    /**
-//     * @return true if multiple values for a gene should be combined, or whether each probe should be treated
-//     *         independently regardless; basically this is always going to be true.
-//     * @see getGeneRepTreatment for setting of how the combination occurs.
-//     */
-//    public boolean getUseWeights() {
-//        if ( this.getGeneRepTreatment().equals( MultiProbeHandling.MEAN )
-//                || this.getGeneRepTreatment().equals( MultiProbeHandling.BEST ) ) return true;
-//        return false;
-//    }
+    // /**
+    // * @return true if multiple values for a gene should be combined, or whether each probe should be treated
+    // * independently regardless; basically this is always going to be true.
+    // * @see getGeneRepTreatment for setting of how the combination occurs.
+    // */
+    // public boolean getUseWeights() {
+    // if ( this.getGeneRepTreatment().equals( MultiProbeHandling.MEAN )
+    // || this.getGeneRepTreatment().equals( MultiProbeHandling.BEST ) ) return true;
+    // return false;
+    // }
 
     public boolean isTester() {
         return config.getBoolean( IS_TESTER, false );

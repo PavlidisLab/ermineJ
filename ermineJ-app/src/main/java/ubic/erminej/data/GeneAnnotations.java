@@ -85,24 +85,15 @@ public class GeneAnnotations {
      */
     private Map<GeneSetTerm, GeneSet> geneSets = new HashMap<GeneSetTerm, GeneSet>();
 
-    private Collection<Probe> probes = new HashSet<Probe>();
-
-    private Collection<Gene> genes = new HashSet<Gene>();
-
     private GeneSetTerms geneSetTerms;
 
     private StatusViewer messenger = new StatusStderr();
 
-    private Map<String, Probe> probeNameMap = new HashMap<String, Probe>();
+    private Map<String, Probe> probes = new HashMap<String, Probe>();
 
-    private Map<String, Gene> geneSymbolMap = new HashMap<String, Gene>();
+    private Map<String, Gene> genes = new HashMap<String, Gene>();
 
     UserDefinedGeneSetManager userDefinedGeneSetManager;
-
-    // /**
-    // * Gene sets taht are redundant and (semi-arbitrarily) will be ignored.
-    // */
-    // private Collection<GeneSetTerm> skipDueToRedundancy = new HashSet<GeneSetTerm>();
 
     /**
      * Used to protect instances
@@ -111,6 +102,8 @@ public class GeneAnnotations {
 
     private Settings settings;
 
+    private Collection<GeneAnnotations> subClones = new HashSet<GeneAnnotations>();
+
     /**
      * @param genes
      * @param geneSetTerms
@@ -118,18 +111,15 @@ public class GeneAnnotations {
      */
     public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, Settings settings, StatusViewer messenger ) {
         if ( messenger != null ) this.messenger = messenger;
-        this.probes = new HashSet<Probe>();
         assert !genes.isEmpty();
-        this.genes.addAll( genes );
         this.geneSetTerms = geneSetTerms;
         this.settings = settings;
 
-        for ( Gene gene : this.genes ) {
+        for ( Gene gene : genes ) {
             Collection<Probe> geneProbes = gene.getProbes();
-            this.probes.addAll( geneProbes );
-            this.geneSymbolMap.put( gene.getSymbol(), gene );
+            this.genes.put( gene.getSymbol(), gene );
             for ( Probe p : geneProbes ) {
-                this.probeNameMap.put( p.getName(), p );
+                this.probes.put( p.getName(), p );
             }
         }
 
@@ -137,21 +127,22 @@ public class GeneAnnotations {
     }
 
     /**
-     * Create a new annotation set based on an existing one, for selected probes, retaining all probes including those
-     * which have no annotations. See the related contructor GeneAnnotations( GeneAnnotations start, Collection<Probe>
-     * probes, boolean pruneUnannotated ).
+     * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected probes, removing
+     * probes with no annotations.
      * 
      * @param start
      * @param probes
+     * @see GeneAnnotations(start, probes, pruneUnannotated)
      */
     public GeneAnnotations( GeneAnnotations start, Collection<Probe> probes ) {
-        this( start, probes, false );
+        this( start, probes, true );
     }
 
     /**
      * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected probes, optionally
      * removing unannotated probes. This involves making new GeneSets, but the GeneSetTerms, Genes and Probes themselves
-     * are 'reused'. Multifunctionality is recomputed based on the restricted set.
+     * are 'reused'. Multifunctionality is recomputed based on the restricted set. However, you should use subClone() to
+     * avoid excessive duplication of annotation sets.
      * 
      * @param start
      * @param probes which must be a subset of those in start (others will be ignored)
@@ -178,14 +169,12 @@ public class GeneAnnotations {
                 continue;
             }
 
-            this.probes.add( p );
-
             for ( Gene g : p.getGenes() ) {
-                this.geneSymbolMap.put( g.getSymbol(), g );
-                this.genes.add( g );
+                this.genes.put( g.getSymbol(), g );
             }
-            this.probeNameMap.put( p.getName(), p );
+            this.probes.put( p.getName(), p );
         }
+
         messenger.showStatus( "Cloning a reduced annotation set for " + this.probes.size() + " probes (out of "
                 + start.getProbes().size() + ")" );
 
@@ -217,11 +206,9 @@ public class GeneAnnotations {
         for ( int i = 0; i < geneSymbols.size(); i++ ) {
             Gene gene = geneSymbols.get( i );
             Collection<Probe> geneProbes = gene.getProbes();
-            this.genes.add( gene );
-            this.probes.addAll( geneProbes );
-            this.geneSymbolMap.put( gene.getSymbol(), gene );
+            this.genes.put( gene.getSymbol(), gene );
             for ( Probe p : geneProbes ) {
-                this.probeNameMap.put( p.getName(), p );
+                this.probes.put( p.getName(), p );
             }
 
             Collection<GeneSetTerm> terms = goTerms.get( i );
@@ -253,7 +240,7 @@ public class GeneAnnotations {
             String g = genes.get( i );
             Gene ge = new Gene( g );
             ge.addProbe( new Probe( probes.get( i ) ) );
-            this.genes.add( ge );
+            this.genes.put( ge.getSymbol(), ge );
 
             for ( Collection<String> gss : goTerms ) {
                 for ( String gs : gss ) {
@@ -263,18 +250,15 @@ public class GeneAnnotations {
                     ge.addGeneSet( term );
                 }
             }
-            this.genes.add( ge );
 
         }
 
         this.geneSetTerms = new GeneSetTerms( terms );
 
-        for ( Gene gene : this.genes ) {
+        for ( Gene gene : this.genes.values() ) {
             Collection<Probe> geneProbes = gene.getProbes();
-            this.probes.addAll( geneProbes );
-            this.geneSymbolMap.put( gene.getSymbol(), gene );
             for ( Probe p : geneProbes ) {
-                this.probeNameMap.put( p.getName(), p );
+                this.probes.put( p.getName(), p );
             }
         }
 
@@ -282,11 +266,18 @@ public class GeneAnnotations {
 
     }
 
-    public void addAnnotation( Gene gene, Collection<GeneSetTerm> terms ) {
+    /**
+     * @param gene
+     * @param terms
+     * @return how many annotations were added (i.e., were not already there)
+     */
+    public int addAnnotation( Gene gene, Collection<GeneSetTerm> terms ) {
+        int i = 0;
         for ( GeneSetTerm t : terms ) {
             assert t != null;
-            gene.addGeneSet( t );
+            if ( gene.addGeneSet( t ) ) i++;
         }
+        return i;
     }
 
     /**
@@ -305,17 +296,22 @@ public class GeneAnnotations {
         this.addGeneSet( geneSetId, gs, null );
     }
 
+    /**
+     * Add a user-defined gene set.
+     * 
+     * @param geneSetId
+     * @param gs -- these should already be checked for compatibility (don't add new genes here, might be okay but
+     *        considered undefined)
+     * @param sourceFile used for tracking sources and later modification/persistence.
+     * @return
+     */
     public GeneSet addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs, String sourceFile ) {
-        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
-        for ( Gene g : gs ) {
-            if ( !this.hasGene( g ) ) {
-                throw new IllegalArgumentException( "Adding gene sets cannot involved previously un-used genes" );
-                // log.warn( "Adding previously unseen gene " + g ); // which is somewhat useless.
-                // this.genes.add( g );
-                // this.geneSymbolMap.put( g.getSymbol(), g );
-                // this.probes.addAll( g.getProbes() );
-            }
-        }
+        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a read-only annotation set" );
+        // for ( Gene g : gs ) {
+        // if ( !this.hasGene( g ) ) {
+        // throw new IllegalArgumentException( "New gene sets cannot involved previously unseen genes" );
+        // }
+        // }
 
         geneSetId.setUserDefined( true );
         this.geneSetTerms.addUserDefinedTerm( geneSetId );
@@ -328,7 +324,8 @@ public class GeneAnnotations {
 
         if ( this.multifunctionality != null ) this.multifunctionality.setStale( true );
 
-        log.debug( "Added new gene set: " + gs.size() + " genes in gene set " + geneSetId );
+        if ( log.isDebugEnabled() )
+            log.debug( "Added new gene set: " + gs.size() + " genes in gene set " + geneSetId );
 
         return newSet;
     }
@@ -351,8 +348,7 @@ public class GeneAnnotations {
         for ( Probe p : probesForNew ) {
             if ( !hasProbe( p ) ) {
                 log.warn( "Adding new probe : " + p );
-                this.probes.add( p );
-                this.probeNameMap.put( p.getName(), p );
+                this.probes.put( p.getName(), p );
             }
         }
 
@@ -393,7 +389,7 @@ public class GeneAnnotations {
     }
 
     public Gene findGene( String symbol ) {
-        return this.geneSymbolMap.get( symbol );
+        return this.genes.get( symbol );
     }
 
     public GeneSet findGeneSet( GeneSetTerm term ) {
@@ -408,7 +404,7 @@ public class GeneAnnotations {
     }
 
     public Probe findProbe( String probe ) {
-        return this.probeNameMap.get( probe );
+        return this.probes.get( probe );
     }
 
     /**
@@ -420,7 +416,7 @@ public class GeneAnnotations {
 
         String searchOnUp = searchOn.toUpperCase();
         Set<Probe> results = new HashSet<Probe>();
-        for ( Probe probe : probes ) {
+        for ( Probe probe : probes.values() ) {
             Gene candidate = probe.getGene();
 
             if ( candidate.getSymbol().toUpperCase().startsWith( searchOnUp )
@@ -439,43 +435,12 @@ public class GeneAnnotations {
      */
     public Collection<GeneSetTerm> findSetsByGene( String searchOn ) {
 
-        String searchOnUp = searchOn.toUpperCase();
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
 
-        for ( GeneSetTerm candidateGeneSet : geneSets.keySet() ) {
-            boolean found = false;
-            Collection<Probe> p = geneSets.get( candidateGeneSet ).getProbes();
-
-            for ( Probe candidate : p ) {
-                if ( candidate.getName().toUpperCase().startsWith( searchOnUp ) ) {
-                    found = true;
-                    // log.debug( "Found " + candidate + " in " + candidateGeneSet );
-                    break;
-                }
-            }
-
-            if ( found ) {
-                result.add( candidateGeneSet );
-                continue;
-            }
-
-            Collection<Gene> g = this.getGeneSetGenes( candidateGeneSet );
-            for ( Gene candidate : g ) {
-                if ( candidate.getSymbol().toUpperCase().startsWith( searchOnUp )
-                        || candidate.getName().toUpperCase().contains( searchOnUp ) ) {
-                    found = true;
-                    log.debug( "Found " + candidate + " in " + candidateGeneSet );
-                    break;
-                }
-            }
-
-            if ( found ) {
-                result.add( candidateGeneSet );
-                continue;
-            }
-
+        Collection<Gene> g = findGenesByName( searchOn );
+        for ( Gene gene : g ) {
+            result.addAll( gene.getGeneSets() );
         }
-
         return result;
     }
 
@@ -483,7 +448,6 @@ public class GeneAnnotations {
      * @param searchOn
      */
     public Collection<GeneSetTerm> findSetsByName( String searchOn ) {
-
         String searchOnUp = searchOn.toUpperCase();
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
@@ -548,7 +512,7 @@ public class GeneAnnotations {
      */
     public Collection<Gene> getGenes() {
         Collection<Gene> finalList = new HashSet<Gene>();
-        for ( Probe p : probes ) {
+        for ( Probe p : probes.values() ) {
             finalList.addAll( p.getGenes() );
         }
         return Collections.unmodifiableCollection( finalList );
@@ -618,7 +582,7 @@ public class GeneAnnotations {
 
     /**
      * Get a collection of all (active) gene sets -- ones which have at least one probe. Use for analysis. Of course,
-     * further filtering of these will typically be done later (FIXME this might not be needed?)
+     * further filtering of these will typically be done later
      * 
      * @return
      */
@@ -630,18 +594,11 @@ public class GeneAnnotations {
         return Collections.unmodifiableCollection( result );
     }
 
-    // /**
-    // * @return the set of gene set terms which are skipped due to redundancy.
-    // */
-    // public Collection<GeneSetTerm> getRedundant() {
-    // return skipDueToRedundancy;
-    // }
-
     /**
      * @return the list of probes.
      */
     public Collection<Probe> getProbes() {
-        return Collections.unmodifiableCollection( this.probes );
+        return Collections.unmodifiableCollection( this.probes.values() );
     }
 
     /**
@@ -673,7 +630,7 @@ public class GeneAnnotations {
     }
 
     public boolean hasGene( Gene g ) {
-        return this.genes.contains( g );
+        return this.genes.values().contains( g );
     }
 
     /**
@@ -689,7 +646,7 @@ public class GeneAnnotations {
      * @return
      */
     public boolean hasProbe( Probe probeId ) {
-        return this.probes.contains( probeId );
+        return this.probes.values().contains( probeId );
     }
 
     /**
@@ -727,7 +684,7 @@ public class GeneAnnotations {
      */
     public int numAnnotatedGenes() {
         int count = 0;
-        for ( Gene gene : genes ) {
+        for ( Gene gene : genes.values() ) {
             Collection<GeneSetTerm> element = gene.getGeneSets();
             if ( element.size() > 0 ) {
                 count++;
@@ -806,7 +763,7 @@ public class GeneAnnotations {
     public void print( Writer out ) throws IOException {
         out.write( "Probe\tSymbol\tName\tGeneSets\n" );
         out.flush();
-        for ( Probe probe : probes ) {
+        for ( Probe probe : probes.values() ) {
             Gene gene = probe.getGene();
             String desc = probe.getDescription();
             out.write( probe + "\t" + gene.getSymbol() + "\t" + desc + "\t" );
@@ -856,12 +813,43 @@ public class GeneAnnotations {
     }
 
     /**
+     * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected probes, removing
+     * probes with no annotations.
+     * 
+     * @param probesToRetain
+     * @return
+     */
+    public GeneAnnotations subClone( Collection<Probe> probesToRetain ) {
+
+        if ( this.getProbes().size() == probesToRetain.size() && this.getProbes().containsAll( probesToRetain ) ) {
+            // WARNING this is a modifiable version of the annotations, but copying is memory hog.
+            // TODO create a lightweight unmodifiable wrapper
+            log.info( "Subcloning not needed" );
+            return this;
+        }
+
+        // these return unmodifiable copies.
+        for ( GeneAnnotations existingSubClone : subClones ) {
+            if ( existingSubClone.getProbes().size() == probesToRetain.size()
+                    && existingSubClone.getProbes().containsAll( probesToRetain ) ) {
+                log.info( "Found a usable existing annotation set" );
+                return existingSubClone;
+            }
+        }
+
+        this.messenger.showStatus( "Creating subsetted annotations" );
+        GeneAnnotations clone = new GeneAnnotations( this, probesToRetain );
+        this.subClones.add( clone );
+        return clone;
+    }
+
+    /**
      * @return
      */
     public TableModel toTableModel() {
 
         // this is not actually used except for a test .. but it could be used.
-        final List<Probe> pL = new ArrayList<Probe>( probes );
+        final List<Probe> pL = new ArrayList<Probe>( probes.values() );
         return new AbstractTableModel() {
             private static final long serialVersionUID = 1L;
             private String[] columnNames = { "Probe", "Gene", "Description" };
@@ -910,7 +898,9 @@ public class GeneAnnotations {
         Map<Gene, Collection<GeneSetTerm>> toBeAdded = new HashMap<Gene, Collection<GeneSetTerm>>();
         Map<GeneSetTerm, Collection<GeneSetTerm>> parentCache = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
         int count = 0;
-        for ( Gene gene : genes ) {
+        int affectedGenes = 0;
+
+        for ( Gene gene : genes.values() ) {
 
             Collection<GeneSetTerm> terms = gene.getGeneSets();
 
@@ -940,13 +930,16 @@ public class GeneAnnotations {
         int numAnnotsAdded = 0;
         for ( Gene g : toBeAdded.keySet() ) {
             Collection<GeneSetTerm> parents = toBeAdded.get( g );
-            addAnnotation( g, parents );
-            numAnnotsAdded += parents.size();
+            int numAdded = addAnnotation( g, parents );
+            numAnnotsAdded += numAdded;
+            if ( numAdded > 0 ) {
+                affectedGenes++;
+            }
         }
 
         if ( messenger != null ) {
-            messenger.showStatus( "Added " + numAnnotsAdded + " inferred annotations (affected " + toBeAdded.size()
-                    + "/" + genes.size() + " genes)" );
+            messenger.showStatus( "Added " + numAnnotsAdded + " inferred annotations (affected " + affectedGenes + "/"
+                    + genes.size() + " genes)" );
         }
     }
 
@@ -965,10 +958,34 @@ public class GeneAnnotations {
     }
 
     /**
+     * @param searchOn
+     * @return
+     */
+    private Collection<Gene> findGenesByName( String searchOn ) {
+
+        Collection<Gene> results = new HashSet<Gene>();
+
+        Gene g = this.findGene( searchOn );
+        if ( g != null ) results.add( g );
+
+        // possibly return?
+
+        String searchOnUp = searchOn.toUpperCase();
+
+        for ( Gene c : getGenes() ) {
+            if ( c.getName().contains( searchOnUp ) ) {
+                results.add( g );
+            }
+        }
+
+        return results;
+    }
+
+    /**
      */
     private void formGeneSets() {
         this.geneSets = new HashMap<GeneSetTerm, GeneSet>();
-        for ( Gene g : this.genes ) {
+        for ( Gene g : this.genes.values() ) {
             for ( GeneSetTerm term : g.getGeneSets() ) {
                 assert term != null;
                 if ( !geneSets.containsKey( term ) ) {
@@ -983,24 +1000,6 @@ public class GeneAnnotations {
 
     private Collection<GeneSetTerm> getAllParents( GeneSetTerm geneSet ) {
         return this.geneSetTerms.getAllParents( geneSet );
-    }
-
-    /**
-     * @param id
-     * @param subCloning
-     */
-    private void prune( GeneSetTerm id, boolean subCloning ) {
-        if ( isReadOnly() ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
-
-        // deals with probes.
-        for ( Gene g : getGeneSetGenes( id ) ) {
-            g.removeGeneSet( id );
-        }
-
-        geneSets.remove( id );
-
-        // when subcloning do not remove it from the tree, this is not for display purposes.
-        if ( !subCloning && id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
     }
 
     /**
@@ -1060,8 +1059,25 @@ public class GeneAnnotations {
     }
 
     /**
-     * Identify classes which are absoluely identical to others. This should be called after
-     * adding parents.
+     * @param id
+     * @param subCloning
+     */
+    private void prune( GeneSetTerm id, boolean subCloning ) {
+        if ( isReadOnly() ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
+
+        // deals with probes.
+        for ( Gene g : getGeneSetGenes( id ) ) {
+            g.removeGeneSet( id );
+        }
+
+        geneSets.remove( id );
+
+        // when subcloning do not remove it from the tree, this is not for display purposes.
+        if ( !subCloning && id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
+    }
+
+    /**
+     * Identify classes which are absoluely identical to others. This should be called after adding parents.
      */
     private void redundancyCheck() {
 
@@ -1093,7 +1109,7 @@ public class GeneAnnotations {
 
                 assert genes2.size() <= genes1.size();
 
-                if ( genes2.size() < genes1.size() ) break; 
+                if ( genes2.size() < genes1.size() ) break;
 
                 for ( Gene g1 : genes1 ) {
                     if ( !genes2.contains( g1 ) ) continue gs; // not redundant.

@@ -360,7 +360,6 @@ public class UserDefinedGeneSetManager {
             try {
 
                 Collection<GeneSet> loadedSets = loadUserGeneSetFile( classFilePath );
-                numLoaded += loadedSets.size();
 
                 if ( !loadedSets.isEmpty() ) {
                     Set<String> customGeneSetFiles = new HashSet<String>( settings.getCustomGeneSetFiles() );
@@ -383,17 +382,18 @@ public class UserDefinedGeneSetManager {
                         }
                     } else {
                         geneData.addGeneSet( set.getTerm(), set.getGenes(), classFile );
+                        if ( ++numLoaded % 500 == 0 ) {
+                            statusMessenger.showStatus( "Loading custom sets: " + numLoaded + " (Last was "
+                                    + StringUtils.abbreviate( set.getTerm() + " from " + classFile + ")", 100 ) );
+                        }
                     }
+
                 }
 
             } catch ( IOException e ) {
                 // This error will be shown if there are files that don't fit the format.
                 statusMessenger.showError( "Could not load gene sets from " + classFilePath + ": " + e.getMessage() );
 
-            }
-
-            if ( numLoaded > 0 && numLoaded % 100 == 0 ) {
-                statusMessenger.showStatus( "Loading custom sets: " + numLoaded );
             }
 
             statusMessenger.clear();
