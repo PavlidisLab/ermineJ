@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -49,7 +48,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -185,7 +183,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         this.currentSelectedSets = selectedTerms;
         this.rend.setSelectedTerms( selectedTerms );
-        log.info( selectedTerms.size() + "selected" );
+        log.debug( selectedTerms.size() + " selected" );
         refreshView();
 
         if ( !selectedTerms.isEmpty() ) {
@@ -294,16 +292,17 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     private void setNodeStatesForFilter() {
         Collection<GeneSetTreeNode> leaves = this.getLeaves();
-        // log.info( leaves.size() + " leaves" ); // 22000!
-        // int i = 0;
         for ( GeneSetTreeNode le : leaves ) {
+
+            assert le.isLeaf();
+
+            le.setHasSelectedChild( false );
+            le.setHasSignificantChild( false );
+
             if ( getCurrentResultSet() != null ) {
                 markHasSignificantChild( le, false );
             }
             markHasSelectedChild( le, false );
-            // if ( ++i % 2000 == 0 ) {
-            // log.info( "Checking branches " + i );
-            // }
         }
 
     }
@@ -317,23 +316,19 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( node == null ) return;
 
         if ( set ) {
+            assert !node.isLeaf();
             // we already found a path, so all are true.
             node.setHasSignificantChild( true );
+
+            // continue up the tree
             markHasSignificantChild( ( GeneSetTreeNode ) node.getParent(), true );
             return;
         }
 
         // check the node.
-        boolean s1 = false;
         GeneSetResult result = getCurrentResultSet().getResults().get( node.getTerm() );
-        if ( result != null && result.getCorrectedPvalue() <= GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
-            s1 = true;
-            node.setHasSignificantChild( true );
-        } else {
-            // node.setHasSignificantChild( false );
-        }
-        markHasSignificantChild( ( GeneSetTreeNode ) node.getParent(), s1 );
-
+        boolean isSig = result != null && result.getCorrectedPvalue() < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
+        markHasSignificantChild( ( GeneSetTreeNode ) node.getParent(), isSig );
     }
 
     /**
@@ -343,58 +338,21 @@ public class GeneSetTreePanel extends GeneSetPanel {
     private void markHasSelectedChild( GeneSetTreeNode node, boolean set ) {
 
         if ( node == null ) return;
-        // log.info( node + " __>" );
 
         if ( set ) {
             // we already found a path, so all parents are true, we don't need to check.
+            assert !node.isLeaf();
             node.setHasSelectedChild( true );
-      //      log.info( "marking: " + node );
 
+            // continue up the tree.
             markHasSelectedChild( ( GeneSetTreeNode ) node.getParent(), true );
             return;
         }
 
         // check the node.
-        boolean s1 = false;
-        if ( this.getCurrentSelectedSets().contains( node.getTerm() ) ) {
-            s1 = true;
-            node.setHasSelectedChild( true );
-        //    log.info( "end: " + node );
-        } else {
-            // node.setHasSelectedChild( false );
-        }
-        markHasSelectedChild( ( GeneSetTreeNode ) node.getParent(), s1 );
-    }
+        boolean isSel = this.getCurrentSelectedSets().contains( node.getTerm() );
+        markHasSelectedChild( ( GeneSetTreeNode ) node.getParent(), isSel );
 
-    /**
-     * Called via reflection == has to be public. DO NOT REMOVE
-     * 
-     * @param node
-     */
-    @SuppressWarnings("unchecked")
-    public void hasSignificantChild( GeneSetTreeNode node ) {
-
-        // this is inefficient, because this called over the whole tree (see also hasSelectedChild). I can't think of a
-        // way to do this with less than two full tree traversals. 1) find all the leaves 2) walk back to the root. JDK
-        // recommends this approach.
-
-        node.setHasSignificantChild( false );
-
-        if ( getCurrentResultSet() == null ) {
-            return;
-        }
-
-        Enumeration<GeneSetTreeNode> e = node.breadthFirstEnumeration();
-        e.nextElement();
-        while ( e.hasMoreElements() ) {
-            GeneSetTreeNode childNode = e.nextElement();
-            GeneSetTerm t = childNode.getTerm();
-            GeneSetResult result = getCurrentResultSet().getResults().get( t );
-            if ( result != null && result.getCorrectedPvalue() <= GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
-                node.setHasSignificantChild( true );
-                return;
-            }
-        }
     }
 
     /**
@@ -489,9 +447,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
         // SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
         // @Override
         // protected Object doInBackground() throws Exception {
-        updateNodeStyles();
-
-        log.info( "filter" );
+        setNodeStatesForFilter();
+        log.debug( "filter" );
         filter( false );
 
         goTree.revalidate();
@@ -542,68 +499,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     }
 
-    /**
-     * 
-     */
-    private void updateNodeStyles() {
-
-        // StopWatch timer = new StopWatch();
-        // timer.start();
-        setNodeStatesForFilter();
-        // log.info( "Visit nodes: " + timer.getTime() );
-
-        // try {
-        // visitAllNodes( goTree, new Method[] {
-        // this.getClass().getMethod( "hasSignificantChild", new Class[] { GeneSetTreeNode.class } ),
-        // this.getClass().getMethod( "hasSelectedChild", new Class[] { GeneSetTreeNode.class } ) } );
-        //
-        // } catch ( Exception e ) {
-        // log.error( e, e );
-        // }
-
-    }
-
-    // /**
-    // * http://javaalmanac.com/egs/javax.swing.tree/GetNodes.html
-    // *
-    // * @param tree
-    // */
-    // private void visitAllNodes( JTree tree, Method[] methods ) {
-    // GeneSetTreeNode root = ( GeneSetTreeNode ) tree.getModel().getRoot();
-    // visitAllNodes( root, methods );
-    // }
-    //
-    // /**
-    // * http://javaalmanac.com/egs/javax.swing.tree/GetNodes.html
-    // *
-    // * @param node
-    // * @param process
-    // */
-    // @SuppressWarnings("unchecked")
-    // private void visitAllNodes( GeneSetTreeNode node, Method[] methods ) {
-    //
-    // if ( methods.length != 0 ) {
-    // try {
-    // for ( int i = 0; i < methods.length; i++ ) {
-    // methods[i].invoke( this, new Object[] { node } );
-    // }
-    // } catch ( Exception e ) {
-    // log.error( e, e );
-    // }
-    // }
-    //
-    // if ( node.getChildCount() >= 0 ) {
-    // for ( Enumeration<GeneSetTreeNode> e = node.children(); e.hasMoreElements(); ) {
-    // GeneSetTreeNode n = e.nextElement();
-    // visitAllNodes( n, methods );
-    // }
-    // }
-    // }
-
     @Override
     protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
         boolean deleted = super.deleteUserGeneSet( classID );
-        // if ( deleted ) this.removedGeneSet( classID );
         return deleted;
     }
 
@@ -668,18 +566,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         filteredTreeModel = new FilteredGeneSetTreeModel( this.geneData, geneSetTreeModel );
         this.goTree.setModel( filteredTreeModel );
-
-        // Enumeration<GeneSetTreeNode> e = ( ( GeneSetTreeNode ) this.goTree.getModel().getRoot() )
-        // .breadthFirstEnumeration();
-        // int i = 0;
-        // while ( e.hasMoreElements() ) {
-        // GeneSetTreeNode nextElement = e.nextElement();
-        // if ( nextElement.hasSelectedChild() ) {
-        // log.info( "yah " + nextElement );
-        // // assert this.currentSelectedSets.contains( nextElement.getTerm() );
-        // }
-        // i++;
-        // }
 
         filteredTreeModel.setFilterBySize( hideEmpty );
         filteredTreeModel.setResults( getCurrentResultSet() );
@@ -863,7 +749,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         if ( currentResultSet != null ) {
             displayedText = addResultsFlags( node, id, displayedText );
         }
-        this.setText( displayedText );
+        this.setText( "<html>" + displayedText + "</html>" );
 
         if ( id.isUserDefined() ) {
             this.setBackground( GeneSetPanel.USER_NODE_COLOR );
@@ -899,7 +785,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
         boolean redund = geneData.hasRedundancy( id );
 
-        String textToDisplay = "<html>" + id.getName() + " [ " + id.getId() + ( redund ? "&nbsp;&bull;" : "" ) + " ]";
+        String textToDisplay = id.getName() + " [ " + id.getId() + ( redund ? "&nbsp;&bull;" : "" ) + " ]";
 
         this.setFont( this.getFont().deriveFont( Font.ITALIC ) );
         this.setForeground( Color.GRAY );
@@ -922,7 +808,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         if ( id.isUserDefined() ) {
             this.setForeground( GeneSetPanel.USER_NODE_TEXT_COLOR );
         }
-        return textToDisplay + "</html>";
+        return textToDisplay;
     }
 
     /**
@@ -937,36 +823,35 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         assert currentResultSet.getResults() != null;
 
         GeneSetResult result = currentResultSet.getResults().get( id );
-
+        String resultString = displayedText;
+        boolean isSig = false;
         if ( result != null ) {
             double pvalue = result.getPvalue();
-            displayedText = displayedText + " -- p = " + String.format( "%.3g", pvalue );
             double pvalCorr = result.getCorrectedPvalue();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             this.setBackground( bgColor );
+            isSig = pvalCorr < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
+            resultString = displayedText + " &mdash; p = " + String.format( "%.3g", pvalue );
+        }
 
-            if ( pvalCorr < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER ) {
-                if ( node.hasSignificantChild() ) {
-                    this.setIcon( goodPvalueGoodChildIcon );
-                } else {
-                    this.setIcon( goodPvalueIcon );
-                }
-            } else if ( node.hasSignificantChild() ) {
-                this.setIcon( goodChildIcon );
+        if ( node.hasSignificantChild() ) {
+            assert !node.isLeaf();
+            if ( isSig ) {
+                this.setIcon( goodPvalueGoodChildIcon );
             } else {
-                this.setIcon( regularIcon );
+                this.setIcon( goodChildIcon );
             }
 
         } else {
-            this.setBackground( Color.WHITE );
-
-            if ( node.hasSignificantChild() ) {
-                this.setIcon( goodChildIcon );
+            if ( isSig ) {
+                this.setIcon( goodPvalueIcon );
             } else {
                 this.setIcon( regularIcon );
             }
         }
-        return displayedText;
+
+        return resultString;
+
     }
 
     /**

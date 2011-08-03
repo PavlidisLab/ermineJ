@@ -87,6 +87,7 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.AnalysisThread;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
@@ -1249,7 +1250,7 @@ public class MainFrame extends JFrame {
             @Override
             public boolean dispatchKeyEvent( KeyEvent e ) {
                 if ( e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_F
-                        && 0 != ( e.getModifiers() & InputEvent.CTRL_DOWN_MASK ) ) {
+                        && 1 != ( e.getModifiers() & InputEvent.CTRL_DOWN_MASK ) ) {
                     /*
                      * Remove find filter
                      */
@@ -1476,13 +1477,77 @@ public class MainFrame extends JFrame {
         awiz.showWizard();
     }
 
-    void saveAnalysisMenuItem_actionPerformed() {
+    /**
+     * 
+     */
+    public void saveAnalysisAction() {
         if ( results.size() == 0 ) {
             statusMessenger.showError( "There are no runs to save" );
             return;
         }
-        SaveWizard swiz = new SaveWizard( this, results );
-        swiz.showWizard();
+
+        /*
+         * FIXME allow for possibility that run was already selected (e.g. from popup menu on header of table)
+         */
+
+        /*
+         * 1. Pick the run and get other settings (latter needed even if only one result available)
+         */
+        SaveAnalysisDialog dialog = new SaveAnalysisDialog( this, this.results, this.settings, this
+                .getCurrentResultSet() );
+
+        if ( dialog.wasCancelled() ) {
+            this.statusMessenger.showStatus( "Save cancelled." );
+            return;
+        }
+
+        int runNum = dialog.getSelectedRunNum();
+        GeneSetPvalRun runToSave = this.results.get( runNum );
+        boolean includeGenes = dialog.isSaveAllGenes();
+
+        /*
+         * 2. Pick the file.
+         */
+        JFileChooser chooser = new JFileChooser();
+        chooser = new JFileChooser();
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        chooser.setApproveButtonText( "OK" );
+        chooser.setDialogTitle( "Save Analysis As:" );
+        // FIXME suggest a name.
+        int result = chooser.showOpenDialog( this );
+
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            File f = new File( chooser.getSelectedFile().toString() );
+
+            if ( f.exists() ) {
+                int k = JOptionPane.showConfirmDialog( this, "That file exists. Overwrite?", "File exists",
+                        JOptionPane.YES_NO_CANCEL_OPTION );
+                if ( k != JOptionPane.YES_OPTION ) {
+                    this.statusMessenger.showStatus( "Save cancelled." );
+                    return;
+                } // otherwise, bail.
+            }
+
+            /*
+             * 3. Save.
+             */
+            SettingsHolder saveSettings = runToSave.getSettings();
+            String saveFileName = f.getAbsolutePath();
+            try {
+
+                /* first we stream the prefs to the file. */
+                Settings.writeAnalysisSettings( saveSettings, saveFileName, statusMessenger );
+
+                /* then we pile on the results. */
+                ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, includeGenes );
+                rp.printResults( true );
+                this.statusMessenger.showStatus( "Saved" );
+            } catch ( IOException ioe ) {
+                GuiUtil.error( "Could not write results to the file. " + ioe );
+            }
+        } else {
+            this.statusMessenger.showStatus( "Save cancelled." );
+        }
     }
 
 }
@@ -1583,7 +1648,7 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements java.awt.e
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.saveAnalysisMenuItem_actionPerformed();
+        adaptee.saveAnalysisAction();
     }
 }
 

@@ -152,6 +152,15 @@ public class GeneAnnotations {
     public GeneAnnotations( GeneAnnotations start, Collection<Probe> probes, boolean pruneUnannotated ) {
         if ( messenger != null ) this.messenger = start.messenger;
 
+        if ( probes.isEmpty() ) {
+            throw new IllegalArgumentException( "No probes were selected." );
+        }
+
+        Set<Probe> startProbes = new HashSet<Probe>(start.getProbes());
+
+        messenger.showStatus( "Creating a subsetted annotation set for " + probes.size() + "/" + startProbes.size()
+                + " probes)" );
+
         if ( probes.size() > start.numProbes() ) {
             messenger.showError( "The new analysis has more probes than the original, any extras will be ignored" );
         }
@@ -160,12 +169,12 @@ public class GeneAnnotations {
 
         for ( Probe p : probes ) {
 
-            if ( !start.getProbes().contains( p ) ) {
+            if ( !startProbes.contains( p ) ) {
                 log.warn( "Probe not in original" );
                 continue;
             }
 
-            if ( p.getGeneSets().isEmpty() && pruneUnannotated ) {
+            if ( pruneUnannotated && !p.hasAnnots() ) {
                 continue;
             }
 
@@ -175,8 +184,7 @@ public class GeneAnnotations {
             this.probes.put( p.getName(), p );
         }
 
-        messenger.showStatus( "Cloning a reduced annotation set for " + this.probes.size() + " probes (out of "
-                + start.getProbes().size() + ")" );
+        log.info( "Finished selecting genes" );
 
         setUp( start );
 
@@ -598,7 +606,8 @@ public class GeneAnnotations {
      * @return the list of probes.
      */
     public Collection<Probe> getProbes() {
-        return Collections.unmodifiableCollection( this.probes.values() );
+        // return Collections.unmodifiableCollection( this.probes.values() );
+        return this.probes.values();
     }
 
     /**
@@ -821,6 +830,10 @@ public class GeneAnnotations {
      */
     public GeneAnnotations subClone( Collection<Probe> probesToRetain ) {
 
+        StopWatch timer = new StopWatch();
+        timer.start();
+        messenger.showStatus( "Creating annotation set ..." );
+
         if ( this.getProbes().size() == probesToRetain.size() && this.getProbes().containsAll( probesToRetain ) ) {
             // WARNING this is a modifiable version of the annotations, but copying is memory hog.
             // TODO create a lightweight unmodifiable wrapper
@@ -830,16 +843,24 @@ public class GeneAnnotations {
 
         // these return unmodifiable copies.
         for ( GeneAnnotations existingSubClone : subClones ) {
-            if ( existingSubClone.getProbes().size() == probesToRetain.size()
-                    && existingSubClone.getProbes().containsAll( probesToRetain ) ) {
+            Collection<Probe> existingSubCloneProbes = new HashSet<Probe>(existingSubClone.getProbes());
+            if ( existingSubCloneProbes.size() == probesToRetain.size()
+                    && existingSubCloneProbes.containsAll( probesToRetain ) ) {
                 log.info( "Found a usable existing annotation set" );
                 return existingSubClone;
             }
         }
 
-        this.messenger.showStatus( "Creating subsetted annotations" );
+        log.info( "Check for usable set: " + timer.getTime() );
+
         GeneAnnotations clone = new GeneAnnotations( this, probesToRetain );
+
+        log.info( "Clone: " + timer.getTime() );
+
+        // FIXME allow us to clear these out if we are not using them any more. (RAM)
         this.subClones.add( clone );
+
+        this.messenger.clear();
         return clone;
     }
 
@@ -1236,6 +1257,8 @@ public class GeneAnnotations {
      * @param start
      */
     private void setUp( GeneAnnotations start ) {
+
+        log.info( "Entering setup phase" );
 
         formGeneSets();
 

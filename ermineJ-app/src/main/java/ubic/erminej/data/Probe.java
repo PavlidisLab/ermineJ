@@ -56,11 +56,6 @@ public class Probe {
         }
     }
 
-    protected void addGene( Gene g ) {
-        // a little bit dangerous
-        this.genes.add( g );
-    }
-
     /**
      * @param geneSet
      */
@@ -101,6 +96,10 @@ public class Probe {
         return name;
     }
 
+    public boolean hasAnnots() {
+        return !this.geneSets.isEmpty();
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -130,6 +129,11 @@ public class Probe {
     @Override
     public String toString() {
         return "Probe [name=" + name + ", " + getGene() + "]";
+    }
+
+    protected void addGene( Gene g ) {
+        // a little bit dangerous
+        this.genes.add( g );
     }
 
     protected void removeGeneSet( GeneSetTerm t ) {

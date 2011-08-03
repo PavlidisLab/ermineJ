@@ -147,13 +147,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
      */
     protected void setUpHeaderPopupMenus() {
 
-        EditRunPopupMenu removeRunPopup = new EditRunPopupMenu();
+        EditRunPopupMenu runPopupMenu = new EditRunPopupMenu();
 
-        JMenuItem removeRunMenuItem = new JMenuItem( "Remove this run..." );
+        JMenuItem removeRunMenuItem = new JMenuItem( "Remove this run ..." );
         removeRunMenuItem.addActionListener( new RemoveRunPopupMenu_actionAdapter( this ) );
-        removeRunPopup.add( removeRunMenuItem );
+        runPopupMenu.add( removeRunMenuItem );
 
-        JMenuItem renameRunMenuItem = new JMenuItem( "Rename this run..." );
+        JMenuItem renameRunMenuItem = new JMenuItem( "Rename this run ..." );
         renameRunMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
@@ -166,9 +166,20 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 }
             }
         } );
-        removeRunPopup.add( renameRunMenuItem );
-        MouseListener removeRunPopupListener = new EditRunPopupListener( removeRunPopup );
+        runPopupMenu.add( renameRunMenuItem );
+
+        JMenuItem saveRunMenuItem = new JMenuItem( "Save this run ..." );
+        saveRunMenuItem.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                callingFrame.saveAnalysisAction();
+            }
+        } );
+
+        runPopupMenu.add( saveRunMenuItem );
+
+        MouseListener removeRunPopupListener = new EditRunPopupListener( runPopupMenu );
         table.getTableHeader().addMouseListener( removeRunPopupListener );
+
     }
 
     /**

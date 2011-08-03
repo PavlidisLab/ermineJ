@@ -40,9 +40,6 @@ import ubic.erminej.gui.util.GuiUtil;
  */
 public class DataDirectoryDialog extends AppDialog {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 745890257151041233L;
     JFileChooser chooser = new JFileChooser();
     JButton loadBrowseButton = new JButton();
@@ -93,7 +90,7 @@ public class DataDirectoryDialog extends AppDialog {
         hh.initHelp( helpButton );
     }
 
-    void dataDirBrowseButton_actionPerformed(  ) {
+    void dataDirBrowseButton_actionPerformed() {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             dataDir.setText( chooser.getSelectedFile().toString() );
@@ -143,7 +140,7 @@ class DataDirectoryDialog_dataDirBrowseButton_actionAdapter implements java.awt.
     }
 
     public void actionPerformed( ActionEvent e ) {
-        adaptee.dataDirBrowseButton_actionPerformed(  );
+        adaptee.dataDirBrowseButton_actionPerformed();
     }
 }
 

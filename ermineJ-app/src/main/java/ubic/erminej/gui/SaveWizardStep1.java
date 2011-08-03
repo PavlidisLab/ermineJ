@@ -56,23 +56,7 @@ public class SaveWizardStep1 extends WizardStep {
     // Component initialization
     @Override
     protected void jbInit() {
-        runPanel = new JPanel();
-        runPanel.setLayout( new BorderLayout() );
-        JPanel topPanel = new JPanel();
-        runLabel = new JLabel();
-        runLabel.setText( "Choose the analysis to save:" );
-        topPanel.add( runLabel );
-        JPanel centerPanel = new JPanel();
-        runComboBox = new JComboBox();
-        runComboBox.setPreferredSize( new Dimension( 150, 15 ) );
-        centerPanel.add( runComboBox );
-        runPanel.add( topPanel, BorderLayout.NORTH );
-        runPanel.add( centerPanel, BorderLayout.CENTER );
-
-        this.addHelp( "<html><b>You may save " + "the results of an analysis in a file.</b><br>" + "This file"
-                + " can be used in other software (e.g. Excel) or loaded"
-                + " back into this application to be viewed later." );
-        this.addMain( runPanel );
+        
     }
 
     @Override
