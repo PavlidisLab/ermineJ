@@ -814,9 +814,8 @@ public class GeneSetDetailsFrame extends JFrame {
 
         this.setTitle( title );
 
-        this
-                .setIconImage( new ImageIcon( this.getClass().getResource(
-                        MainFrame.RESOURCE_LOCATION + "logoIcon64.gif" ) ).getImage() );
+        this.setIconImage( new ImageIcon( this.getClass().getResource(
+                MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
     }
 
     /**

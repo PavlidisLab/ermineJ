@@ -25,6 +25,7 @@ import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.util.Map;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -52,6 +53,7 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.Multifunctionality;
+import ubic.erminej.gui.MainFrame;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
@@ -75,6 +77,9 @@ public class MultiFuncDiagWindow extends JFrame {
      */
     public MultiFuncDiagWindow( GeneAnnotations geneAnnots, GeneScores geneScores ) {
         super( "Multifunctionality analysis" );
+
+        this.setIconImage( new ImageIcon( this.getClass().getResource(
+                MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
 
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab( "Set size dist.", getTermsPerGeneDistribution( geneAnnots ) );

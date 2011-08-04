@@ -181,26 +181,10 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         }
 
         try {
-            MatrixPreviewer.previewMatrix( wiz, rawFileTextField.getText(), -1 );
+            MatrixPreviewer.previewMatrix( wiz, scoreFileTextField.getText(), -1 );
         } catch ( IOException e ) {
             GuiUtil.error( "Error previewing data: " + e.getMessage(), e );
         }
-
-        // GeneScores test;
-        // try {
-        // test = new GeneScores( filename, settings, wiz.getStatusField(), wiz.getGeneAnnots(), 100 );
-        // } catch ( IOException e1 ) {
-        // wiz.showError( "The file could not be previewed: " + e1.getMessage() );
-        // return;
-        // }
-        //
-        // List<Object[]> table = new ArrayList<Object[]>();
-        //
-        // for ( Probe p : test.getProbeToScoreMap().keySet() ) {
-        // table.add( new Object[] { p.getName(), test.getProbeToScoreMap().get( p ) } );
-        // }
-        //
-        // MatrixPreviewer.previewMatrix( wiz, table, new Object[] { "ID", "Score" } );
 
     }
 

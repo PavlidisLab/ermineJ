@@ -448,8 +448,23 @@ public class GeneSetTablePanel extends GeneSetPanel {
             assert runIndex >= 0;
 
             /*
-             * If possible, remove the annotations.
+             * TODO If possible, remove the annotations.
              */
+            boolean canRemove = true;
+            GeneAnnotations runAnnots = results.get( runIndex ).getGeneData();
+            if ( results.size() > 1 ) {
+
+                for ( GeneSetPvalRun r : results ) {
+                    if ( r == results.get( runIndex ) ) continue;
+                    if ( r.getGeneData().equals( runAnnots ) ) {
+                        canRemove = false;
+                    }
+                }
+            }
+
+            if ( canRemove ) {
+                this.geneData.deleteSubClone( runAnnots );
+            }
 
             table.removeColumn( col );
             model.removeRunData( currentColumnIndex );

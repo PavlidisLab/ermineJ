@@ -122,9 +122,9 @@ public class MatrixPreviewer {
         Object[][] mat = new Object[matrix.rows()][numColumnsShown];
         Object[] headings = new Object[numColumnsShown];
 
-        headings[0] = "ID";
+        headings[0] = "1: ID";
         for ( int k = 1; k < numColumnsShown; k++ ) {
-            headings[k] = matrix.getColName( k - 1 );
+            headings[k] = ( k + 1 ) + ": " + matrix.getColName( k - 1 );
         }
 
         /*

@@ -392,6 +392,16 @@ public class GeneAnnotations {
         if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
     }
 
+    /**
+     * Remove a no-longer-needed subclone. This only removes the reference from this, if other objects maintain a
+     * reference it will obviously not be freed.
+     * 
+     * @param runAnnots
+     */
+    public void deleteSubClone( GeneAnnotations runAnnots ) {
+        this.subClones.remove( runAnnots );
+    }
+
     public boolean deleteUserGeneSet( GeneSetTerm classID ) {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
         return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
