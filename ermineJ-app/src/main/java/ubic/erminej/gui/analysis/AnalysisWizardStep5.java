@@ -253,7 +253,6 @@ public class AnalysisWizardStep5 extends WizardStep {
             oraPanel.add( jCheckBoxBigIsBetter );
             oraPanel.add( jCheckBoxDoMultiFuncCorr );
 
-            // temporary - until we have it enabled for GSR.
             jCheckBoxDoMultiFuncCorr.setEnabled( true );
             jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
 
@@ -265,8 +264,7 @@ public class AnalysisWizardStep5 extends WizardStep {
             resampPanel.add( subPanel );
             resampPanel.add( jCheckBoxDoMultiFuncCorr );
 
-            // temporary - until we have it enabled for GSR.
-            jCheckBoxDoMultiFuncCorr.setEnabled( false );
+            jCheckBoxDoMultiFuncCorr.setEnabled( true );
             jCheckBoxDoMultiFuncCorr.setSelected( false );
 
             this.addHelp( extraHelp );
@@ -276,7 +274,6 @@ public class AnalysisWizardStep5 extends WizardStep {
             rocPanel.add( jCheckBoxBigIsBetter, null );
             rocPanel.add( jCheckBoxDoMultiFuncCorr );
 
-            // temporary - until we have it enabled for GSR.
             jCheckBoxDoMultiFuncCorr.setEnabled( true );
             jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
 

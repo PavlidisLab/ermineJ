@@ -657,11 +657,11 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     * Show the multifunctionality for the current selected annotation and gene scores.
      */
     private void multifunctionalityDiagnostics() {
         /*
-         * Should allow user to pick?
+         * Should allow user to pick.
          */
         GeneAnnotations ga = this.geneData;
         GeneScores gs = null;
@@ -746,14 +746,14 @@ public class MainFrame extends JFrame {
 
         // end slow(ish) part.
 
-        if ( geneData == null || geneData.getNonEmptyGeneSets() == null ) {
+        if ( geneData == null || geneData.getGeneSetTerms() == null ) {
             throw new IllegalArgumentException( "The gene annotation file was not valid. "
                     + "Check that you have selected the correct format.\n" );
         }
 
-        if ( geneData.getNonEmptyGeneSets().size() == 0 ) {
-            throw new IllegalArgumentException( "The gene annotation file contains no gene set information. "
-                    + "Check that the file format is correct.\n" );
+        if ( geneData.getGeneSetTerms().size() == 0 ) {
+            throw new IllegalArgumentException( "The gene annotation file contains no usable gene set information. "
+                    + "Check that the file format is correct or that you have annotations for enough genes.\n" );
         }
 
         if ( geneData.getGenes().size() == 0 ) {
@@ -1168,10 +1168,6 @@ public class MainFrame extends JFrame {
             String path = selectedFile.getAbsolutePath();
 
             /*
-             * FIXME: user files listed over and over.
-             */
-
-            /*
              * Write the file in ermineJ.data in *.project files. The format will be configurations - we just write a
              * copy of the settings.
              * 
@@ -1249,26 +1245,28 @@ public class MainFrame extends JFrame {
         queryTextField.setMaximumSize( new Dimension( 140, 20 ) );
         final JCheckBox searchGenesChx = new JCheckBox( "Search genes" );
 
-        // hitting enter while the search field has focus.
+        // hitting enter while the search field has focus: search.
         queryTextField.addKeyListener( new KeyAdapter() {
             @Override
             public void keyReleased( final KeyEvent e ) {
                 if ( e.getKeyCode() == KeyEvent.VK_ENTER ) {
-
-                    // SwingWorker<Integer, Object> r = new SwingWorker<Integer, Object>() {
-
-                    // @Override
-                    // protected Integer doInBackground() throws Exception {
-                    // statusMessenger.showStatus( "Searching ..." );
-
-                    int found = find( ( ( JTextField ) e.getComponent() ).getText(), searchGenesChx.isSelected() );
-                    statusMessenger.showStatus( "Found " + found + " matching gene sets" );
-                    // return found;
-                    // }
-                    // };
-                    //
-                    // r.execute();
-
+                    statusMessenger.clear();
+                    String queryString = ( ( JTextField ) e.getComponent() ).getText();
+                    boolean searchByGene = searchGenesChx.isSelected();
+                    int found = find( queryString, searchByGene );
+                    if ( searchByGene ) {
+                        if ( found == 0 ) {
+                            statusMessenger.showError( "No gene sets contain genes matching query" );
+                        } else {
+                            statusMessenger.showStatus( found + " gene sets with matching genes" );
+                        }
+                    } else {
+                        if ( found == 0 ) {
+                            statusMessenger.showError( "No matching gene sets " );
+                        } else {
+                            statusMessenger.showStatus( found + " matching gene sets" );
+                        }
+                    }
                 }
             }
         } );
@@ -1278,8 +1276,7 @@ public class MainFrame extends JFrame {
         manager.addKeyEventDispatcher( new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent( KeyEvent e ) {
-                if ( e.getID() == KeyEvent.KEY_RELEASED && e.getKeyCode() == KeyEvent.VK_F
-                        && 1 != ( e.getModifiers() & InputEvent.CTRL_DOWN_MASK ) ) {
+                if ( e.getKeyCode() == KeyEvent.VK_F && e.isControlDown() ) {
                     /*
                      * Remove find filter
                      */
@@ -1293,8 +1290,6 @@ public class MainFrame extends JFrame {
                 return false;
             }
         } );
-
-        // JSeparator j = new JSeparator( SwingConstants.VERTICAL );
 
         gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( queryTextField ).addComponent( searchGenesChx )
                 .addPreferredGap( ComponentPlacement.UNRELATED, 20, 20 ).addComponent( jLabelStatus ) );

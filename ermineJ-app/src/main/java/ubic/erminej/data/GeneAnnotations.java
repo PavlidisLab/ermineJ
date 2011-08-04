@@ -70,7 +70,7 @@ public class GeneAnnotations {
     /**
      * The minimum size of a 'set' of genes. Seems reasonable, doesn't it?
      */
-    private static final int ABSOLUTE_MINIMUM_GENESET_SIZE = 2;
+    protected static final int ABSOLUTE_MINIMUM_GENESET_SIZE = 2;
 
     private static Log log = LogFactory.getLog( GeneAnnotations.class.getName() );
 
@@ -522,12 +522,20 @@ public class GeneAnnotations {
     }
 
     /**
-     * @return view of all gene sets, including empty ones (?)
+     * @return view of all gene set terms, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes
+     *         (i.e., 2).
      */
-    public Set<GeneSet> getAllGeneSets() {
-        Set<GeneSet> res = new HashSet<GeneSet>();
-        res.addAll( this.geneSets.values() );
+    public Set<GeneSetTerm> getGeneSetTerms() {
+        Set<GeneSetTerm> res = new HashSet<GeneSetTerm>();
+        res.addAll( this.geneSets.keySet() );
         return Collections.unmodifiableSet( res );
+    }
+
+    /**
+     * @return view of all gene sets, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes (i.e., 2).
+     */
+    public Set<GeneSet> getGeneSets() {
+        return Collections.unmodifiableSet( ( Set<? extends GeneSet> ) this.geneSets.values() );
     }
 
     /**
@@ -612,29 +620,8 @@ public class GeneAnnotations {
         return Collections.unmodifiableCollection( res );
     }
 
-    /**
-     * @return
-     */
-    public GeneSetTerms getGeneSetTerms() {
-        return this.geneSetTerms;
-    }
-
     public Multifunctionality getMultifunctionality() {
         return multifunctionality;
-    }
-
-    /**
-     * Get a collection of all (active) gene sets -- ones which have at least one probe. Use for analysis. Of course,
-     * further filtering of these will typically be done later
-     * 
-     * @return
-     */
-    public Set<GeneSetTerm> getNonEmptyGeneSets() {
-        Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
-        for ( GeneSetTerm gst : this.geneSets.keySet() ) {
-            if ( this.getGeneSetProbes( gst ).size() > 1 ) result.add( gst );
-        }
-        return Collections.unmodifiableSet( result );
     }
 
     /**
@@ -756,7 +743,7 @@ public class GeneAnnotations {
      * @return
      */
     public int numGeneSets() {
-        return this.getNonEmptyGeneSets().size();
+        return this.getGeneSetTerms().size();
     }
 
     /**
@@ -1030,13 +1017,19 @@ public class GeneAnnotations {
         Gene g = this.findGene( searchOn );
         if ( g != null ) results.add( g );
 
+        g = this.findGene( searchOn.toUpperCase() );
+        if ( g != null ) results.add( g );
+
+        g = this.findGene( searchOn.toLowerCase() );
+        if ( g != null ) results.add( g );
+
         // possibly return?
 
         String searchOnUp = searchOn.toUpperCase();
 
         for ( Gene c : getGenes() ) {
             if ( c.getName().contains( searchOnUp ) ) {
-                results.add( g );
+                results.add( c );
             }
         }
 

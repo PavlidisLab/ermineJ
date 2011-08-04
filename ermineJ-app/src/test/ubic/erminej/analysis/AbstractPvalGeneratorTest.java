@@ -23,7 +23,7 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 import ubic.erminej.Settings;
-import ubic.erminej.SettingsHolder.MultiProbeHandling; 
+import ubic.erminej.SettingsHolder.MultiProbeHandling;
 import ubic.erminej.analysis.OraPvalGenerator;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
@@ -43,7 +43,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
     protected InputStream ism = null;
     protected InputStream isi = null;
     protected Settings s = null;
-    protected GeneSetTerms gon = null; 
+    protected GeneSetTerms gon = null;
 
     @Override
     protected void setUp() throws Exception {
@@ -70,13 +70,12 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         annotations = p.read( ism, Format.DEFAULT, s );
 
         assertTrue( annotations.getGenes().size() > 0 );
-        assertTrue( annotations.getNonEmptyGeneSets().size() > 0 );
+        assertTrue( annotations.getGeneSetTerms().size() > 0 );
 
         scores = new GeneScores( is, s, null, annotations );
 
         assertNotNull( scores.getGeneScores() );
         assertNotNull( scores.getProbeToScoreMap() );
- 
 
         super.setUp();
     }

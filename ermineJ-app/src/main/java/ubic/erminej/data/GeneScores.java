@@ -213,7 +213,7 @@ public class GeneScores {
             }
         }
         reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
-                numRepeatedProbes );
+                numRepeatedProbes, probes.size() );
         setUpGeneToScoreMap();
     }
 
@@ -424,6 +424,8 @@ public class GeneScores {
         Collection<String> unannotatedProbes = new HashSet<String>();
 
         boolean warned = false;
+
+        int totalProbes = 0;
         while ( ( row = dis.readLine() ) != null ) {
             String[] fields = row.split( "\t" );
 
@@ -441,6 +443,8 @@ public class GeneScores {
                 }
                 continue;
             }
+
+            totalProbes++;
 
             // only keep probes that are in our array platform.
 
@@ -504,7 +508,7 @@ public class GeneScores {
         dis.close();
 
         reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
-                numRepeatedProbes );
+                numRepeatedProbes, totalProbes );
 
         setUpGeneToScoreMap();
 
@@ -517,10 +521,11 @@ public class GeneScores {
      * @param invalidNumber
      * @param badNumberString
      * @param numProbesKept
+     * @param totalProbes
      */
     private void reportProblems( boolean invalidLog, Collection<String> unknownProbes,
             Collection<String> unannotatedProbes, boolean invalidNumber, String badNumberString, int numProbesKept,
-            int numRepeatedProbes ) {
+            int numRepeatedProbes, int totalProbes ) {
         if ( invalidNumber && messenger != null ) {
 
             messenger.showError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
@@ -532,8 +537,9 @@ public class GeneScores {
                             + SMALL );
         }
         if ( messenger != null && unknownProbes.size() > 0 ) {
-            messenger.showError( "Warning: " + unknownProbes.size()
-                    + " probes in your gene score file don't match the ones in the annotation file." );
+            messenger.showError( "Warning: " + unknownProbes.size() + " probes ("
+                    + String.format( "%.2f", 100.00 * unknownProbes.size() / totalProbes )
+                    + "%) in your gene score file were not found in the annotations." );
 
             int count = 0;
             StringBuffer buf = new StringBuffer();

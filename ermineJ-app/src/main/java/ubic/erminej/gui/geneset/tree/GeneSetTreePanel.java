@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -49,11 +48,11 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
-import ubic.basecode.util.StringUtil;
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
@@ -65,7 +64,6 @@ import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.geneset.GeneSetPanel;
 import ubic.erminej.gui.geneset.GeneSetPanelPopupMenu;
 import ubic.erminej.gui.util.Colors;
-import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * A Tree display that shows Gene Sets and their scores, and allows uer interaction.
@@ -219,7 +217,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
                 int i = 0;
                 for ( GeneSetTerm t : selectedTerms ) {
                     expandNode( find( t ), true );
-                    if ( ++i > 5 ) break;
+                    if ( ++i > 0 ) break;
                 }
             }
         }
@@ -262,29 +260,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
     public Collection<GeneSetTreeNode> getLeaves() {
         GeneSetTreeNode node = ( GeneSetTreeNode ) goTree.getModel().getRoot();
         return getLeaves( node );
-    }
-
-    /**
-     * Called via reflection == has to be public. DO NOT REMOVE
-     * 
-     * @param node
-     */
-    @SuppressWarnings("unchecked")
-    public void hasSelectedChild( GeneSetTreeNode node ) {
-        node.setHasSelectedChild( false );
-
-        if ( getCurrentSelectedSets().isEmpty() ) return;
-
-        Enumeration<GeneSetTreeNode> e = node.breadthFirstEnumeration();
-        e.nextElement();
-        while ( e.hasMoreElements() ) {
-            GeneSetTreeNode childNode = e.nextElement();
-            GeneSetTerm t = childNode.getTerm();
-            if ( getCurrentSelectedSets().contains( t ) ) {
-                node.setHasSelectedChild( true );
-                return;
-            }
-        }
     }
 
     /**
@@ -515,8 +490,21 @@ public class GeneSetTreePanel extends GeneSetPanel {
     /**
      * 
      */
+    @SuppressWarnings("unchecked")
     private void setNodeStatesForFilter() {
         Collection<GeneSetTreeNode> leaves = this.getLeaves();
+
+        /*
+         * Reset all nodes
+         */
+        Enumeration<GeneSetTreeNode> e = ( ( GeneSetTreeNode ) this.goTree.getModel().getRoot() )
+                .breadthFirstEnumeration();
+        while ( e.hasMoreElements() ) {
+            GeneSetTreeNode n = e.nextElement();
+            n.setHasSelectedChild( false );
+            n.setHasSignificantChild( false );
+        }
+
         for ( GeneSetTreeNode le : leaves ) {
 
             assert le.isLeaf();
@@ -590,74 +578,16 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param parent
      * @param expand
      */
-    protected void expandNode( final TreePath parent, final boolean expand ) {
-
-        expansionCancel.set( false );
-
-        /*
-         * Note that for big parts of the tree, it is actually faster to do this in the EDT, unless there is a trick.
-         */
-        final SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
-
-            @Override
-            protected Object doInBackground() throws Exception {
-                doExpandNode( parent, expand );
-                notify();
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                super.done();
-                messenger.clear();
-                goTree.repaint();
-            }
-
-        };
-
-        w.execute();
-
-        /*
-         * TODO: disable the popup menu to avoid users trying to expand more than one node at a time...I'm only keeping
-         * one sentinel.
-         */
-
-        /*
-         * monitor w and kill it if it is taking too long
-         */
-        SwingWorker<Object, Object> m = new SwingWorker<Object, Object>() {
-
-            @Override
-            protected Object doInBackground() throws Exception {
-                synchronized ( w ) {
-                    int i = 0;
-                    int maxWaits = 50; /* 5 seconds */
-                    while ( !w.isDone() ) {
-                        try {
-                            w.wait( 100 ); /* ms */
-                            if ( ++i > maxWaits ) {
-                                messenger.clear();
-                                expansionCancel.set( true );
-                                goTree.repaint();
-                                GuiUtil.error( "Expanding/Collapsing was taking too long.\n"
-                                        + "Try expanding smaller parts of the tree." );
-                            }
-                        } catch ( InterruptedException e ) {
-                            //
-                        }
-                    }
-                    log.info( "Done!" );
-                }
-                return null;
-            }
-        };
-
-        m.execute();
+    protected synchronized void expandNode( final TreePath parent, final boolean expand ) {
 
         if ( expand )
             messenger.showStatus( "Expanding ..." );
         else
             messenger.showStatus( "Collapsing ..." );
+
+        doExpandNode( parent, expand );
+
+        messenger.clear();
 
     }
 
@@ -790,20 +720,16 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
      */
     private final Icon goodPvalueGoodChildIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_GOODCHILD_ICON ) );
 
-    private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
-    private Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
-
-    private boolean selected;
+    private static final Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
+    private static final Font italicFont = new Font( "SansSerif", Font.ITALIC, 11 );
+    private static final Font boldFont = new Font( "SansSerif", Font.BOLD, 11 );
 
     private Collection<GeneSetTerm> selectedTerms = new HashSet<GeneSetTerm>();
 
     public GeneSetTreeNodeRenderer( GeneAnnotations geneData ) {
         super();
+        this.setOpaque( true );
         this.geneData = geneData;
-        nff.setMaximumFractionDigits( 4 );
-        this.setOpenIcon( regularIcon );
-        this.setLeafIcon( regularIcon );
-        this.setClosedIcon( regularIcon );
     }
 
     public void clearRun() {
@@ -819,36 +745,31 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
     @Override
     public Component getTreeCellRendererComponent( JTree tree, Object value, boolean s, boolean expanded, boolean leaf,
             int row, boolean f ) {
-        super.getTreeCellRendererComponent( tree, value, s, expanded, leaf, row, hasFocus );
-
-        this.selected = s;
-        this.hasFocus = f;
-        setOpaque( true );
+        super.getTreeCellRendererComponent( tree, value, s, expanded, leaf, row, f );
 
         GeneSetTreeNode node = ( GeneSetTreeNode ) value;
 
-        GeneSetTerm id = node.getTerm();
+        if ( node.getTerm().isUserDefined() ) {
+            this.setBackground( GeneSetPanel.USER_NODE_COLOR );
+        } else {
+            this.setBackground( Color.WHITE );
+        }
 
         setupToolTip( node );
 
-        String displayedText = addGeneSetSizeInformation( id, node );
+        String displayedText = addGeneSetSizeInformation( node );
 
-        this.setBackground( Color.WHITE );
         if ( currentResultSet != null ) {
-            displayedText = addResultsFlags( node, id, displayedText );
+            displayedText = addResultsFlags( node, displayedText );
         }
         this.setText( "<html>" + displayedText + "</html>" );
 
-        if ( id.isUserDefined() ) {
-            this.setBackground( GeneSetPanel.USER_NODE_COLOR );
-        }
-
-        if ( this.selected ) {
-            this.setBackground( Color.LIGHT_GRAY );
-        }
-
-        if ( !this.selectedTerms.isEmpty() && !selectedTerms.contains( id ) ) {
+        if ( !this.selectedTerms.isEmpty() && !selectedTerms.contains( node.getTerm() ) ) {
             this.setForeground( Color.LIGHT_GRAY ); // leaves should also be hidden.
+        }
+
+        if ( s || f ) {
+            setBackground( Color.DARK_GRAY );
         }
 
         return this;
@@ -868,39 +789,36 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * @param name
-     * @param id
      * @param node
      * @return
      */
-    private String addGeneSetSizeInformation( GeneSetTerm id, GeneSetTreeNode node ) {
+    private String addGeneSetSizeInformation( GeneSetTreeNode node ) {
 
+        GeneSetTerm id = node.getTerm();
         boolean redund = geneData.hasRedundancy( id );
+        StringBuilder buf = new StringBuilder();
+        buf.append( id.getName() + " [ " + id.getId() + ( redund ? "&nbsp;&bull;" : "" ) + " ]" );
 
-        String textToDisplay = id.getName() + " [ " + id.getId() + ( redund ? "&nbsp;&bull;" : "" ) + " ]";
-
-        this.setFont( this.getFont().deriveFont( Font.ITALIC ) );
+        this.setFont( italicFont );
         this.setForeground( Color.GRAY );
         int numGenesInGeneSet = geneData.numGenesInGeneSet( id );
 
         if ( id.isAspect() || id.getId().equals( "all" ) ) {
             this.setIcon( emptySetIcon );
-            this.setFont( this.getFont().deriveFont( Font.BOLD ) );
+            this.setFont( boldFont );
             this.setForeground( Color.DARK_GRAY );
-        } else if ( !geneData.getNonEmptyGeneSets().contains( id ) || numGenesInGeneSet == 0 ) {
+        } else if ( numGenesInGeneSet == 0 ) {
             this.setIcon( emptySetIcon );
-            textToDisplay += " (No genes in your data)";
+            buf.append( " (No genes in your data)" );
         } else {
-            textToDisplay += " &mdash; " + numGenesInGeneSet + " genes, multifunc. "
-                    + String.format( "%.2f", this.geneData.getMultifunctionality().getGOTermMultifunctionality( id ) );
+            buf.append( " &mdash; " + numGenesInGeneSet + " genes, multifunc. "
+                    + String.format( "%.2f", this.geneData.getMultifunctionality().getGOTermMultifunctionality( id ) ) );
             this.setFont( plain );
             this.setIcon( regularIcon );
             this.setForeground( Color.BLACK );
         }
-        if ( id.isUserDefined() ) {
-            this.setForeground( GeneSetPanel.USER_NODE_TEXT_COLOR );
-        }
-        return textToDisplay;
+
+        return buf.toString();
     }
 
     /**
@@ -909,12 +827,12 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
      * @param displayedText
      * @return
      */
-    private String addResultsFlags( GeneSetTreeNode node, GeneSetTerm id, String displayedText ) {
+    private String addResultsFlags( GeneSetTreeNode node, String displayedText ) {
 
         assert currentResultSet != null;
         assert currentResultSet.getResults() != null;
 
-        GeneSetResult result = currentResultSet.getResults().get( id );
+        GeneSetResult result = currentResultSet.getResults().get( node.getTerm() );
         String resultString = displayedText;
         boolean isSig = false;
         if ( result != null ) {
@@ -923,7 +841,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             this.setBackground( bgColor );
             isSig = pvalCorr < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
-            resultString = displayedText + " &mdash; p = " + String.format( "%.3g", pvalue );
+            resultString = resultString + String.format( " &mdash; p = %.3g", pvalue );
         }
 
         if ( node.hasSignificantChild() ) {
@@ -989,7 +907,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         }
 
         /*
-         * FIXME add information on the result.
+         * add information on the result.
          */
         boolean showResult = false;
         String resultStr = "";
@@ -997,7 +915,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             GeneSetResult result = this.currentResultSet.getResults().get( term );
             if ( result != null ) {
                 showResult = true;
-                resultStr = String.format( "Corr. P = %.2g<br/>", result.getCorrectedPvalue() );
+                resultStr = String.format( "Corrected P = %.2g<br/>", result.getCorrectedPvalue() );
             }
         }
 
@@ -1017,8 +935,8 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
                 + redund
                 + ( showParents ? parentTerms : "" )
                 + "<br/>"
-                + StringUtil.wrap( StringUtils.abbreviate( definition, GeneSetPanel.MAX_DEFINITION_LENGTH ), 50,
-                        "<br/>" ) );
+                + WordUtils.wrap( StringUtils.abbreviate( definition, GeneSetPanel.MAX_DEFINITION_LENGTH ), 50,
+                        "<br/>", true ) );
     }
 
     /**

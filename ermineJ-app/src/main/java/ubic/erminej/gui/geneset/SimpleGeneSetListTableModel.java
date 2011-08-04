@@ -59,7 +59,7 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
      * @param geneDat
      */
     public SimpleGeneSetListTableModel( GeneAnnotations geneDat ) {
-        this.geneSets.addAll( geneDat.getAllGeneSets() );
+        this.geneSets.addAll( geneDat.getGeneSets() );
         nf.setMaximumFractionDigits( 3 );
         columnNames.add( "Name" );
         columnNames.add( "Description" );

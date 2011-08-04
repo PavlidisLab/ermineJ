@@ -105,7 +105,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         int count = 0;
 
-        for ( GeneSetTerm geneSetName : geneAnnots.getNonEmptyGeneSets() ) {
+        for ( GeneSetTerm geneSetName : geneAnnots.getGeneSetTerms() ) {
 
             GeneSetResult res = classPval( geneSetName );
             if ( res != null ) {

@@ -95,7 +95,7 @@ public class GeneSetMapTools {
 
         // iterate over all the classes, starting from the smallest one.
         // List sortedList = ga.sortGeneSetsBySize();
-        List<GeneSetTerm> sortedList = new ArrayList<GeneSetTerm>( ga.getNonEmptyGeneSets() );
+        List<GeneSetTerm> sortedList = new ArrayList<GeneSetTerm>( ga.getGeneSetTerms() );
         Collections.shuffle( sortedList );
 
         // OUTER - compare all classes to each other.
@@ -172,7 +172,7 @@ public class GeneSetMapTools {
             throw new IllegalArgumentException( "Unknown aspect requested" );
         }
 
-        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
+        Collection<GeneSetTerm> geneSets = ga.getGeneSetTerms();
 
         Collection<GeneSetTerm> removeUs = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm geneSet : geneSets ) {
@@ -205,7 +205,7 @@ public class GeneSetMapTools {
      */
     public static void removeBySize( GeneAnnotations ga, StatusViewer messenger, int minClassSize, int maxClassSize ) {
 
-        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
+        Collection<GeneSetTerm> geneSets = ga.getGeneSetTerms();
 
         Collection<GeneSetTerm> removeUs = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm geneSet : geneSets ) {

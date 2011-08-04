@@ -54,18 +54,10 @@ public class Colors {
      * @return
      */
     public static Color chooseBackgroundColorForPvalue( double pvalCorr ) {
-        Color bgColor = null;
-        if ( pvalCorr < 0.001 ) {
-            bgColor = Colors.LIGHTGREEN2;
-        } else if ( pvalCorr < 0.01 ) {
-            bgColor = Colors.LIGHTGREEN3;
-        } else if ( pvalCorr < 0.05 ) {
-            bgColor = Colors.LIGHTGREEN4;
-        } else if ( pvalCorr < 0.1 ) {
-            bgColor = Colors.LIGHTGREEN5;
-        } else {
-            bgColor = Color.WHITE;
-        }
-        return bgColor;
+        if ( pvalCorr > 0.1 ) return Color.WHITE;
+        if ( pvalCorr > 0.05 ) return Colors.LIGHTGREEN5;
+        if ( pvalCorr > 0.01 ) return Colors.LIGHTGREEN4;
+        if ( pvalCorr > 0.001 ) return Colors.LIGHTGREEN3;
+        return Colors.LIGHTGREEN2;
     }
 }

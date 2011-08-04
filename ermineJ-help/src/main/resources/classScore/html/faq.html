@@ -28,6 +28,24 @@
 			lists of things organized into groups. If you need help figuring out
 			how to make ermineJ work for your situation, let us know.
 		</p>
+		
+		<p><strong>What are the system requirements for running ErmineJ?</strong> ErmineJ
+		requires Java 6, and is configured by default to use up to 1G of RAM. 
+		Pleae see <a href="tutorial/memory.html">the manual</a> for more information, including advice on avoiding memory problems.</p>
+
+
+<p>
+			<strong>Do I input the list of gene scores for the
+				significantly changed genes, or all the genes in my experiment (e.g., microarray or genome)?</strong> All of them. The
+			resampling and ROC methods use the gene scores for all the genes. The
+			built-in overrepresentation analysis will use the threshold you set
+			in the gene score threshold parameter to select genes. If your data have been filtered, the output
+			panel does not list the actual number of genes (or probes) in your gene
+			sets. See
+			<A href="tutorial/numitems.html">this page</A> &nbsp;for a
+			clarification.
+		</p>
+
 
 		<p>
 			<strong>Which gene scoring method should I use?</strong> If you are
@@ -104,11 +122,8 @@
 		<p>
 			<strong>How do I know if a gene set p value is
 				'significant'?</strong> One has to consider the problem of multiple testing,
-			but because the gene sets (Gene Onotology group) overlap, simple
-			methods will be too conservative. For this reason we don't recommend
-			using a Bonferroni correction, though if a Bonferonni correction
-			yields 'significant' results, you can certainly consider them
-			reasonably trustworthy.
+			but because the gene sets often overlap, simple
+			methods will be too conservative. 
 		</p>
 
 		<p>
@@ -116,12 +131,12 @@
 			leads to p values shown in a color at different levels of false
 			discovery rate (see this
 			<A href="tutorial/mtc.html">page</A>). However, this method still
-			assumes the gene sets are independent and will lead to a convervative
+			assumes the gene sets are independent and will lead to a slightly convervative
 			estimate of the FDR.
 		</p>
 
 		<p>
-			If you want to use Bonferroni, you can either use the command-line
+			If you want to use Bonferroni correction , you can either use the command-line
 			interface, or compute them yourself.&nbsp;To compute the
 			Bonferroni-corrected p values, multiply your gene set p values by the
 			number of gene sets analyzed (maximum of 1). Then you can use a
@@ -130,8 +145,8 @@
 
 		<p>
 			<strong>What is multifunctionality?</strong> This refers to the fact
-			that some genes have many more GO terms than others. This has a
-			dramatic effect on the type of analysis ErmineJ does. This topic is
+			that some genes are in more gene sets (e.g., GO groups) than others. This has a
+			substantial effect on the type of analysis ErmineJ does. This topic is
 			covered in more detail in the
 			<a href="tutorial/multifunc.html">manual</a>.
 		</p>
@@ -141,15 +156,14 @@
 				run ermineJ with resampling I get significant gene sets. How do I
 				interpret these results?</strong> Carefully. ErmineJ's resampling methods are
 			based on analyzing your gene expression data in isolation, without
-			reference to any theoretical background model (other methods may be
-			added in future versions of ermineJ that allow this). It is capable
+			reference to any theoretical background model. It is capable
 			of identifying the most interesting gene sets in your data, but this
 			does not necessarily mean those gene sets are interesting in general.
 			We recommend using such findings as an exploratory method for helping
 			identify potential genes of interest, but because no gene is
 			statistically significant on its own, the results for any given gene
 			would have to be dealt with on a case-by-case basis using
-			considerations other that statistical significance.
+			considerations other than statistical significance.
 		</p>
 
 		<p>
@@ -171,11 +185,11 @@
 		<p>
 			A related issue is that gene sets whose members have correlated
 			transcription in all conditions (that is, not relevant to your study)
-			can sometimes yield incorrect results. The remedy to this problem is
+			can sometimes yield misleading results. The remedy to this problem is
 			to do resampling over the samples, but ermineJ currently does not
 			support this ability. In the meantime, when you have weak or no clear
 			differential expression effect on the genes in a gene set, and the
-			genes are highly correlated, you should view the results carefully.
+			genes in that set are highly correlated, you should view the results carefully.
 			Typically this affects gene sets like the ribosomal proteins,
 			histones&nbsp;or proteasome, whose members are always highly
 			correlated. You can test for gene sets like this using
@@ -187,29 +201,17 @@
 		</p>
 
 		<p>
-			Data sets where there are weak signals can also be heavily influenced
+			Data sets where there are weak signals can also be more heavily influenced
 			by
-			<a href="tutorial/multifunc.html">multifunctionality</a>.
+			<a href="tutorial/multifunc.html">multifunctionality</a>, which tends to mask
+			subtle signals at the expense of generic ones.
 		</p>
 
-		<p>
-			<strong>Do I input the list of gene scores for the
-				significantly changed genes, or all the genes?</strong> All of them. The
-			resampling method uses the gene scores for all the genes. The
-			built-in overrepresentation analysis will use the threshold you set
-			in the gene score threshold parameter to select genes. Note that we
-			find that removing unexpressed genes can help the analysis, but it
-			isn't required. Note that if your data have been filtered, the output
-			panel does not list the actual number of probes or genes in your gene
-			sets. See
-			<A href="tutorial/numitems.html">this page</A> &nbsp;for a
-			clarification.
-		</p>
-
+		
 		<p>
 			<strong>How do I find out which genes are in a gene set
-				without doing an analysis?</strong> You can use the "View/Modify Gene set"
-			tools, available from the main 'analysis' menu, or the
+				without doing an analysis?</strong> Several ways. You can double-click on a gene set, or use the "View/Modify Gene set"
+			tools, available from the main 'analysis' menu, or use the
 			context-specific pop-up menu on the gene set list. See
 			<A href="tutorial/classes.html#viewgeneset">this page</A>
 		</p>
@@ -229,15 +231,10 @@
 		</p>
 
 		<p>
-			<strong>I don't see an annotation file for my microarray.
-				What should I do?</strong> Unfortunately we cannot generally create
-			annotations for microarrays that are not commonly used. If we
-			identify a commonly used platform, we will add it. This means that
-			'home made' spotted microarrays are not supported in most cases. Feel
-			free to let us know if you have a microarray design that needs
-			annotations for class scoring. In the meantime, you could try to use
-			one of the "Generic" annotation files we provide, possibly with the
-			help of your local friendly bioinformatician.
+			<strong>I don't see an annotation file for my microarray or genome.
+				What should I do?</strong> Through the Gemma system, we provide
+				annotations for hundreds of microarray platforms and several popular genomes.
+				 Feel free to let us know if you need help with annotation files.
 		</p>
 
 		<p>
@@ -258,9 +255,9 @@
 				color="#2a00ff" size="1"><font color="#000000" size="4">"Some
 						probes in your gene score file don't match the ones in the
 						annotation file"</font> </font> "?</strong> This happens if your gene annotation file
-			isn't the right one for the microarray you used (in which case your
-			analysis will not work well), but can also happen if your file format
-			isn't quite right. The analysis still proceeds when this happens.
+			isn't the right one for the platform you used (in which case your
+			analysis will not work well). The analysis still proceeds when this happens, but suggest you
+			check that the annotation file you are using is the correct one for the gene score or data matrix files you are providing.
 		</p>
 
 		<p>
@@ -321,8 +318,8 @@
 		</p>
 
 		<p>
-			<strong>What happens to probes that don't have any GO
-				annotations?</strong> They are ignored.
+			<strong>What happens to probes/genes that don't have any GO
+				annotations?</strong> They are ignored entirely.
 		</p>
 
 		<p>
@@ -330,18 +327,20 @@
 				gene score threshold determined?</strong> This is a trick question. There is
 			no threshold used. Instead, all genes in a set contribute to the
 			score for the gene set. For more details on how this works, see
-			<A href="tutorial/resampling.html">this page</A> .
+			<A href="tutorial/resampling.html">this page</A>.
 		</p>
 
 		<p>
 			<strong>What happens if there are two probes for&nbsp;one
-				gene?</strong> See
+				gene?</strong> A single score has to be arrived at for the genes. ErmineJ offers two ways to do this. See
 			<A href="tutorial/genereps.html">this page</A> .
 		</p>
 
 		<p>
 			<strong>Why are the number of gene and probes shown in the
-				output panel incorrect when my data set has been filtered?</strong> See
+				output panel incorrect when my data set has been filtered?</strong> The numbers shown refer to the annotation file.
+				If you hover over a set's p-value in a Result Run column, you get a tooltip that shows you the actual values used for that analysis. for
+				more information see
 			<a href="tutorial/numitems.html">this page</a>.
 		</p>
 
@@ -349,7 +348,7 @@
 			<strong>What do the different icons mean in the tree view?</strong>
 			The icons are used to indicate where to look to find "significant"
 			gene sets. The specific icons are explained
-			<A href="tutorial/analysis.html#treepanel">here</A>
+			<A href="tutorial/treeview.html">here</A>
 		</p>
 
 		<p>

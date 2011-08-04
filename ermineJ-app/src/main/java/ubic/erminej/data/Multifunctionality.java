@@ -161,12 +161,12 @@ public class Multifunctionality {
      * @param goId
      * @return the computed multifunctionality score for the GO term. This is the area under the ROC curve for the genes
      *         in the group, in the ranking of all genes for multifunctionality. Higher values indicate higher
-     *         multifunctionality
+     *         multifunctionality. 0.5 is the expected value under the null; values much less than 0.5 indicate
+     *         "monofunctionality" (relatively speaking).
      */
     public double getGOTermMultifunctionality( GeneSetTerm goId ) {
         if ( stale.get() ) init();
         if ( !this.goTermMultifunctionality.containsKey( goId ) ) {
-            // log.warn( "GO term: " + goId + " not found" );
             return -1;
         }
 
@@ -176,13 +176,12 @@ public class Multifunctionality {
     /**
      * @param goId
      * @return the relative rank of the GO group in multifunctionality, where 1 is the highest multifunctionality, 0 is
-     *         lowest. WARNING, this does not correct for the presence of multiple GO groups with the same genes
-     *         (redundancy)
+     *         lowest. <strong>WARNING</strong>, this does not correct for the presence of multiple GO groups with the
+     *         same genes (redundancy)
      */
     public double getGOTermMultifunctionalityRank( GeneSetTerm goId ) {
         if ( stale.get() ) init();
         if ( !this.goTermMultifunctionalityRank.containsKey( goId ) ) {
-            // throw new IllegalArgumentException( "GO term: " + goId + " not found" );
             return -1;
         }
 
@@ -270,16 +269,13 @@ public class Multifunctionality {
      */
     private void computeGoTermMultifunctionalityRanks( Map<Gene, Integer> rawGeneMultifunctionalityRanks ) {
         int numGenes = genesWithGoTerms.size();
-        int numGoGroups = geneAnnots.getNonEmptyGeneSets().size();
+        int numGoGroups = geneAnnots.getGeneSetTerms().size();
         /*
          * For each go term, compute it's AUC w.r.t. the multifunctionality ranking.. We work with the
          * multifunctionality ranks, rawGeneMultifunctionalityRanks
          */
 
-        /*
-         * FIXME only use non-redundant groups to compute the ranks of gene sets.
-         */
-        for ( GeneSetTerm goset : geneAnnots.getNonEmptyGeneSets() ) {
+        for ( GeneSetTerm goset : geneAnnots.getGeneSetTerms() ) {
 
             if ( !goGroupSizes.containsKey( goset ) ) {
                 log.debug( "No size recorded for: " + goset );
@@ -288,6 +284,8 @@ public class Multifunctionality {
 
             int inGroup = goGroupSizes.get( goset );
             int outGroup = numGenes - inGroup;
+
+            assert inGroup >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE;
 
             if ( outGroup == 0 ) {
                 continue;
@@ -311,11 +309,18 @@ public class Multifunctionality {
             double auc = Math.max( 0.0, 1.0 - t3 / t2 );
 
             assert auc >= 0.0 && auc <= 1.0 : "AUC was " + auc;
+
+            assert auc > 0 : "AUC was zero for " + goset;
+
             goTermMultifunctionality.put( goset, auc );
         }
 
+        /*
+         * FIXME only use non-redundant groups to compute the ranks of gene sets.
+         */
         // convert to relative ranks, where 1.0 is the most multifunctional
         Map<GeneSetTerm, Integer> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionality, true );
+
         for ( GeneSetTerm goTerm : rankedGOMf.keySet() ) {
             double rankRatio = ( rankedGOMf.get( goTerm ) + 1 ) / ( double ) numGoGroups;
             this.goTermMultifunctionalityRank.put( goTerm, Math.max( 0.0, 1 - rankRatio ) );
@@ -335,7 +340,7 @@ public class Multifunctionality {
             timer.start();
 
             genesWithGoTerms = new HashSet<Gene>();
-            for ( GeneSetTerm goset : geneAnnots.getNonEmptyGeneSets() ) {
+            for ( GeneSetTerm goset : geneAnnots.getGeneSetTerms() ) {
                 Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( goset );
                 if ( geneSetGenes.isEmpty() ) continue;
                 genesWithGoTerms.addAll( geneSetGenes );

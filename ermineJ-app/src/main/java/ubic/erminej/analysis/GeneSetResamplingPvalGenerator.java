@@ -88,7 +88,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, hist );
 
         int i = 0;
-        for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getGeneSetTerms().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
             GeneSetTerm className = iter.next();
             GeneSetResult res = cpv.classPval( className, geneToScoreMap );
@@ -111,7 +111,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         results = new HashMap<GeneSetTerm, Double>();
         ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, hist );
 
-        for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getGeneSetTerms().iterator(); iter.hasNext(); ) {
             GeneSetTerm className = iter.next();
             double pval = cpv.classPvalue( className, group_pval_map );
 

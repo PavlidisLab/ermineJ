@@ -32,10 +32,11 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.util.StringUtil;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.GeneAnnotations;
@@ -332,7 +333,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             setText( value.toString() ); // integers, whatever.
         }
 
-        setCellBackgroundColor( value, isSelected, hasFocus, column );
+        if ( !isSelected ) setCellBackgroundColor( value, column );
 
         // set tool tips etc.
         if ( value != null ) {
@@ -346,45 +347,45 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
             GeneSetTerm term = ( GeneSetTerm ) o;
 
-            // boolean redundant = geneData.skipDueToRedundancy( term );
-
-            if ( /* redundant || */geneData.numGenesInGeneSet( term ) == 0 || value instanceof EmptyGeneSetResult ) {
+            if ( geneData.numGenesInGeneSet( term ) == 0 || value instanceof EmptyGeneSetResult ) {
                 setForeground( Color.GRAY );
             } else {
                 setForeground( Color.BLACK );
             }
 
-            if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
-                GeneSetResult res = ( GeneSetResult ) value;
-                setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
-                        + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
-                        + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
-            } else {
-
-                String aspect = term.getAspect();
-                String definition = term.getDefinition();
-
-                String redund = this.getToolTipTextForRedundancy( term );
-                setToolTipText( "<html>"
-                        + term.getName()
-                        + " ("
-                        + term.getId()
-                        + ")<br/>"
-                        + "Aspect: "
-                        + aspect
-                        + "<br/>"
-                        + redund
-                        + StringUtil
-                                .wrap( definition.substring( 0, Math.min( definition.length(), 200 ) ), 50, "<br/>" )
-                        + ( definition.length() > GeneSetPanel.MAX_DEFINITION_LENGTH ? "..." : "" ) );
-
-            }
+            configureToolTip( column, value, term );
 
         } else {
             setToolTipText( null );
         }
 
         return this;
+    }
+
+    private void configureToolTip( int column, Object value, GeneSetTerm term ) {
+        if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
+            GeneSetResult res = ( GeneSetResult ) value;
+            setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
+                    + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
+                    + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
+        } else {
+
+            String aspect = term.getAspect();
+            String definition = term.getDefinition();
+
+            String redund = this.getToolTipTextForRedundancy( term );
+            setToolTipText( "<html>"
+                    + term.getName()
+                    + " ("
+                    + term.getId()
+                    + ")<br/>"
+                    + "Aspect: "
+                    + aspect
+                    + "<br/>"
+                    + redund
+                    + WordUtils.wrap( StringUtils.abbreviate( definition, GeneSetPanel.MAX_DEFINITION_LENGTH ), 50,
+                            "<br/>", true ) );
+        }
     }
 
     private void chooseMultifunctionalityIndicatorColor( double auc ) {
@@ -404,17 +405,11 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
     }
 
-    private void setCellBackgroundColor( Object value, boolean isSelected, boolean hasFocus, int column ) {
-
-        if ( isSelected ) return;
+    private void setCellBackgroundColor( Object value, int column ) {
 
         setBackground( Color.WHITE );
         // set cell background
         setOpaque( true );
-        if ( isSelected || hasFocus ) {
-            setOpaque( true );
-            setBackground( Color.LIGHT_GRAY );
-        }
 
         if ( column == GeneSetTablePanel.MULTIFUNC_COLUMN_INDEX ) {
             chooseMultifunctionalityIndicatorColor( ( Double ) value );

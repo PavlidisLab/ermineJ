@@ -66,7 +66,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         totalSize = geneRanks.size();
 
-        for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
+        for ( Iterator<GeneSetTerm> iter = geneAnnots.getGeneSetTerms().iterator(); iter.hasNext(); ) {
             GeneSetTerm className = iter.next();
             GeneSetResult res = this.classPval( className );
             if ( res != null ) {

@@ -158,7 +158,7 @@ public class TestGeneAnnotations extends TestCase {
     public final void testReadAffyCsv() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( is, null, settings );
-        Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
+        Collection<GeneSetTerm> geneSets = g.getGeneSetTerms();
         assertTrue( geneSets.size() > 0 );
     }
 
@@ -173,7 +173,7 @@ public class TestGeneAnnotations extends TestCase {
                 .getResourceAsStream( "/data/MoGene-1_0-st-v1.na31.mm9.transcript.sample.txt.gz" ) );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( isa, null, settings );
-        Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
+        Collection<GeneSetTerm> geneSets = g.getGeneSetTerms();
         assertTrue( geneSets.size() > 0 );
     }
 
@@ -182,7 +182,7 @@ public class TestGeneAnnotations extends TestCase {
         InputStream isa = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U95A.affy.2011format.sample.csv" );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( isa, null, settings );
-        Collection<GeneSetTerm> geneSets = g.getNonEmptyGeneSets();
+        Collection<GeneSetTerm> geneSets = g.getGeneSetTerms();
         assertTrue( geneSets.size() > 0 );
 
         // note that many terms in the file get pruned or collapsed.
@@ -232,9 +232,9 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testRemoveBySize() throws Exception {
-        assertEquals( 255, ga.getNonEmptyGeneSets().size() ); // not checked by hand.
+        assertEquals( 255, ga.getGeneSetTerms().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
-        assertEquals( 192, ga.getNonEmptyGeneSets().size() ); // not checked by hand
+        assertEquals( 192, ga.getGeneSetTerms().size() ); // not checked by hand
     }
 
     public void testSelectSetsByGene() throws Exception {

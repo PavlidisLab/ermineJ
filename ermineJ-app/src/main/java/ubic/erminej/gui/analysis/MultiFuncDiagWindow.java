@@ -52,6 +52,7 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSet;
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Multifunctionality;
 import ubic.erminej.gui.MainFrame;
 import cern.colt.list.DoubleArrayList;
@@ -82,7 +83,8 @@ public class MultiFuncDiagWindow extends JFrame {
                 MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab( "Set size dist.", getTermsPerGeneDistribution( geneAnnots ) );
+        tabs.addTab( "Sets per gene", getTermsPerGeneDistribution( geneAnnots ) );
+        tabs.addTab( "Set multifunc. dist.", getGroupMultifunctionalityDistribution( geneAnnots ) );
         tabs.addTab( "Gene multifunc. dist.", getGenesPerGroupDistribution( geneAnnots ) );
 
         String annotFileName = new File( geneAnnots.getSettings().getAnnotFile() ).getName();
@@ -246,7 +248,7 @@ public class MultiFuncDiagWindow extends JFrame {
         }
 
         HistogramDataset series = new HistogramDataset();
-        series.addSeries( "sizes", vec.elements(), 50, 2, 200 );
+        series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), 50, 2, 200 );
 
         JFreeChart histogram = ChartFactory.createHistogram( "Gene multifuntionality", "Number of sets gene has",
                 "Number of genes", series, PlotOrientation.VERTICAL, false, false, false );
@@ -276,20 +278,65 @@ public class MultiFuncDiagWindow extends JFrame {
      */
     private ChartPanel getGenesPerGroupDistribution( GeneAnnotations annots ) {
         /*
-         * Show histogram of GO group sizes; allow filtering for user-defined, or by aspect?
+         * Show histogram of GO group sizes
          */
         DoubleArrayList vec = new DoubleArrayList();
-        for ( GeneSet g : annots.getAllGeneSets() ) {
-            vec.add( g.getGenes().size() );
+        for ( GeneSetTerm g : annots.getGeneSetTerms() ) {
+            int numGenes = annots.numGenesInGeneSet( g );
+            assert numGenes > 0;
+            vec.add( numGenes );
         }
 
         HistogramDataset series = new HistogramDataset();
-        series.addSeries( "sizes", vec.elements(), 50, 2, 200 );
+        series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), 50, 2, 200 );
 
         JFreeChart histogram = ChartFactory.createHistogram( "Gene set sizes", "Number of genes in set",
                 "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
 
         histogram.setTitle( "How big are the sets" );
+        setChartTitleFont( histogram );
+
+        XYPlot plot = histogram.getXYPlot();
+        plot.setRangeGridlinesVisible( false );
+        plot.setDomainGridlinesVisible( false );
+        plot.setBackgroundPaint( Color.white );
+
+        XYBarRenderer renderer = ( XYBarRenderer ) plot.getRenderer();
+        renderer.setBasePaint( Color.white );
+        renderer.setSeriesPaint( 0, Color.DARK_GRAY );
+
+        renderer.setDrawBarOutline( false );
+        renderer.setShadowVisible( false );
+
+        ChartPanel p = new ChartPanel( histogram );
+        return p;
+    }
+
+    /**
+     * @param annots
+     * @return
+     */
+    private ChartPanel getGroupMultifunctionalityDistribution( GeneAnnotations annots ) {
+        /*
+         * Show histogram of GO group multifunctionality
+         */
+        DoubleArrayList vec = new DoubleArrayList();
+        for ( GeneSetTerm g : annots.getGeneSetTerms() ) {
+            // vec.add( g.getGenes().size() );
+
+            assert annots.getGeneSet( g ).size() > 0;
+            double mf = annots.getMultifunctionality().getGOTermMultifunctionality( g );
+            if ( mf <= 0 ) continue; // missing
+            vec.add( mf );
+        }
+
+        HistogramDataset series = new HistogramDataset();
+        series.addSeries( "ROCs", MatrixUtil.fromList( vec ).toArray(), 50, 0.0, 1.0 );
+
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene set multifunctionalities", "Area under ROC curve",
+                "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
+
+        histogram.setTitle( "How multifunctional are the sets?" );
         setChartTitleFont( histogram );
 
         XYPlot plot = histogram.getXYPlot();
