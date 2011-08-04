@@ -87,8 +87,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
         return this.table.getRowCount();
     }
 
-    public GeneSetTablePanel( MainFrame callingFrame, List<GeneSetPvalRun> results, Settings settings ) {
-        super( settings, results, callingFrame );
+    public GeneSetTablePanel( MainFrame callingFrame, Settings settings ) {
+        super( settings, callingFrame );
     }
 
     /**
@@ -116,7 +116,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         };
 
         assert geneData != null;
-        model = new GeneSetTableModel( geneData, results );
+        model = new GeneSetTableModel( geneData, callingFrame.getResultSets() );
         table.setModel( model );
 
         MouseListener m = super.configurePopupListener();
@@ -188,7 +188,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @return
      */
     protected String getRunName( int runIndex ) {
-        return results.get( runIndex ).getName();
+        return callingFrame.getResultSet( runIndex ).getName();
     }
 
     /**
@@ -199,7 +199,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         TableColumn col = table.getColumn( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
         model.renameRun( runIndex, newName );
         col.setIdentifier( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
-        results.get( runIndex ).setName( newName );
+        callingFrame.getResultSet( runIndex ).setName( newName );
         model.fireTableStructureChanged();
         this.callingFrame.updateRunViewMenu();
     }
@@ -263,7 +263,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
         generateResultColumnHeadingTooltip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
 
-        int currentResultSetIndex = results.size() - 1;
+        int currentResultSetIndex = callingFrame.getNumResultSets() - 1;
         this.callingFrame.setCurrentResultSetIndex( currentResultSetIndex );
         table.revalidate();
 
@@ -329,8 +329,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @param runIndex
      */
     protected void generateResultColumnHeadingTooltip( int runIndex ) {
-        assert results != null : "Null results";
-        GeneSetPvalRun geneSetPvalRun = results.get( runIndex );
+
+        GeneSetPvalRun geneSetPvalRun = callingFrame.getResultSet( runIndex );
         assert geneSetPvalRun != null : "No results with index " + runIndex;
         log.debug( "Generating tooltip for run #" + runIndex );
         SettingsHolder runSettings = geneSetPvalRun.getSettings();
@@ -436,6 +436,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @param currentColumnIndex
      */
     private void removeRun( int currentColumnIndex ) {
+
         String columnName = model.getColumnName( currentColumnIndex );
         TableColumn col = table.getColumn( columnName );
         assert col != null;
@@ -448,26 +449,25 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
             table.removeColumn( col );
             model.removeRunData( currentColumnIndex );
-
             model.fireTableStructureChanged();
             callingFrame.setCurrentResultSetIndex( runIndex );
             resultToolTips.remove( runIndex );
-
             table.revalidate();
-
-            // Resort by a remaining run, after removing a run.
-            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-            int newSortIndex = 0;
-            if ( results.size() > 0 ) {
-                newSortIndex = GeneSetTableModel.INIT_COLUMNS;
-            }
-            sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
-            sorter.setSortKeys( sortKeys );
 
             /*
              * Now really try to remove the object.
              */
             callingFrame.removeRun( runIndex );
+
+            // Resort by a remaining run, after removing a run.
+            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+            int newSortIndex = 0;
+            if ( callingFrame.getNumResultSets() > 0 ) {
+                newSortIndex = GeneSetTableModel.INIT_COLUMNS;
+            }
+            sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
+            sorter.setSortKeys( sortKeys );
+
         }
     }
 
@@ -483,7 +483,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         GeneSetTerm term = ( GeneSetTerm ) table.getValueAt( i, 0 );
         if ( table.getValueAt( i, j ) != null && j >= GeneSetTableModel.INIT_COLUMNS ) {
             _runnum = model.getRunIndex( j );
-            run = this.results.get( _runnum );
+            run = callingFrame.getResultSet( _runnum );
             callingFrame.setCurrentResultSetIndex( _runnum );
         }
 
@@ -539,7 +539,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      */
     private void resortByCurrentResults() {
         int sortColumn = 0;
-        int currentResultSetIndex = callingFrame.getCurrentResultSet();
+        int currentResultSetIndex = callingFrame.getCurrentResultSetIndex();
         if ( currentResultSetIndex > 0 ) {
             sortColumn = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
 

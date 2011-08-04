@@ -21,10 +21,8 @@ package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -35,7 +33,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import ubic.erminej.Settings;
-import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**
@@ -48,16 +45,16 @@ public class SaveAnalysisDialog extends JDialog {
 
     private Settings settings;
 
-    private List<GeneSetPvalRun> runData;
-
     private JComboBox runComboBox = new JComboBox();
 
     private JCheckBox saveAllGenes = new JCheckBox();
 
-    public SaveAnalysisDialog( Frame owner, List<GeneSetPvalRun> runData, Settings settings, int initialSelection ) {
+    private MainFrame owner;
+
+    public SaveAnalysisDialog( MainFrame owner, Settings settings, int initialSelection ) {
         super( owner );
+        this.owner = owner;
         this.setModal( true );
-        this.runData = runData;
         this.settings = settings;
         jbInit();
         GuiUtil.centerContainer( this );
@@ -143,11 +140,11 @@ public class SaveAnalysisDialog extends JDialog {
     }
 
     void showChoices() {
-        if ( runData == null || runData.size() < 1 ) {
+        if ( owner.getNumResultSets() < 1 ) {
             runComboBox.addItem( "No runs available to save" );
         } else {
-            for ( int i = 0; i < runData.size(); i++ ) {
-                runComboBox.insertItemAt( runData.get( i ).getName(), i );
+            for ( int i = 0; i < owner.getNumResultSets(); i++ ) {
+                runComboBox.insertItemAt( owner.getResultSet( i ).getName(), i );
             }
             runComboBox.setSelectedIndex( 0 );
         }

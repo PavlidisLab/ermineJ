@@ -25,10 +25,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
@@ -42,7 +40,6 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
-
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
@@ -81,7 +78,6 @@ public abstract class GeneSetPanel extends JScrollPane {
     protected MainFrame callingFrame;
     protected GeneAnnotations geneData;
     protected StatusViewer messenger = new StatusStderr();
-    protected List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
 
     protected Settings settings;
     public static final String NOACTION = "NOACTION";
@@ -98,9 +94,8 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     private Collection<GeneSetPanel> dependentPanels = new HashSet<GeneSetPanel>();
 
-    public GeneSetPanel( Settings settings, List<GeneSetPvalRun> results, MainFrame callingFrame ) {
+    public GeneSetPanel( Settings settings, MainFrame callingFrame ) {
         this.settings = settings;
-        this.results = results;
         this.callingFrame = callingFrame;
     }
 
@@ -126,12 +121,6 @@ public abstract class GeneSetPanel extends JScrollPane {
         GeneSetTerm classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
         callingFrame.findGeneSetInTree( classID );
-    }
-
-    public GeneSetPvalRun getCurrentResultSet() {
-        int i = callingFrame.getCurrentResultSet();
-        if ( i < 0 ) return null;
-        return this.results.get( i );
     }
 
     /**

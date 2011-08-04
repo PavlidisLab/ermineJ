@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -158,7 +159,8 @@ public class MainFrame extends JFrame {
     private Settings settings;
 
     private int currentResultSet = -1;
-    private AnalysisThread athread;
+
+    private AnalysisThread athread; // Ideally this would be a local variable.
 
     private StatusViewer statusMessenger;
     private GeneSetTablePanel tablePanel;
@@ -241,7 +243,12 @@ public class MainFrame extends JFrame {
     /**
      * @return
      */
-    public int getCurrentResultSet() {
+    public GeneSetPvalRun getCurrentResultSet() {
+        if ( this.currentResultSet < 0 ) return null;
+        return this.results.get( this.currentResultSet );
+    }
+
+    public int getCurrentResultSetIndex() {
         return this.currentResultSet;
     }
 
@@ -312,6 +319,7 @@ public class MainFrame extends JFrame {
         athread.run();
         log.debug( "Waiting" );
         addResult( athread.getLatestResults() );
+        athread = null;
 
         log.debug( "done" );
         enableMenusForAnalysis();
@@ -368,7 +376,7 @@ public class MainFrame extends JFrame {
         GeneSetPvalRun latestResult = athread.getLatestResults();
         checkForReasonableResults( latestResult );
         if ( latestResult != null ) addResult( latestResult );
-
+        athread = null;
         enableMenusForAnalysis();
     }
 
@@ -658,8 +666,8 @@ public class MainFrame extends JFrame {
         GeneAnnotations ga = this.geneData;
         GeneScores gs = null;
 
-        if ( this.getCurrentResultSet() >= 0 && !this.results.isEmpty() ) {
-            gs = this.results.get( this.getCurrentResultSet() ).getGeneScores();
+        if ( this.getCurrentResultSetIndex() >= 0 && !this.results.isEmpty() ) {
+            gs = getCurrentResultSet().getGeneScores();
             ga = gs.getGeneAnnots();
         } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
             try {
@@ -794,9 +802,9 @@ public class MainFrame extends JFrame {
      * Tabs that have our table and tree.
      */
     private void setupMainPanels() {
-        tablePanel = new GeneSetTablePanel( this, results, settings );
+        tablePanel = new GeneSetTablePanel( this, settings );
         tablePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
-        treePanel = new GeneSetTreePanel( this, results, settings );
+        treePanel = new GeneSetTreePanel( this, settings );
         treePanel.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
 
         tabs.setPreferredSize( new Dimension( START_WIDTH, START_HEIGHT ) );
@@ -1458,6 +1466,7 @@ public class MainFrame extends JFrame {
         }
 
         athread.stopRunning( true );
+        athread = null;
         enableMenusForAnalysis();
         this.statusMessenger.showStatus( "Ready" );
 
@@ -1514,8 +1523,7 @@ public class MainFrame extends JFrame {
         /*
          * 1. Pick the run and get other settings (latter needed even if only one result available)
          */
-        SaveAnalysisDialog dialog = new SaveAnalysisDialog( this, this.results, this.settings, this
-                .getCurrentResultSet() );
+        SaveAnalysisDialog dialog = new SaveAnalysisDialog( this, this.settings, getCurrentResultSetIndex() );
 
         if ( dialog.wasCancelled() ) {
             this.statusMessenger.showStatus( "Save cancelled." );
@@ -1604,6 +1612,24 @@ public class MainFrame extends JFrame {
 
         this.treePanel.removeRun( runToRemove );
         this.tablePanel.removeRun( runToRemove );
+    }
+
+    public GeneSetPvalRun getResultSet( int runIndex ) {
+        if ( runIndex < 0 || runIndex > this.results.size() - 1 ) {
+            return null;
+        }
+        return this.results.get( runIndex );
+    }
+
+    public int getNumResultSets() {
+        return this.results.size();
+    }
+
+    /**
+     * @return unmodifiable list view.
+     */
+    public List<GeneSetPvalRun> getResultSets() {
+        return Collections.unmodifiableList( this.results );
     }
 
 }

@@ -83,7 +83,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     public static final int INIT_COLUMNS = 5;
 
     private GeneAnnotations geneData;
-    private List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
+    private List<GeneSetPvalRun> results;
 
     private List<String> columnIdentifiers = new Vector<String>();
     private List<GeneSetTerm> gsl;

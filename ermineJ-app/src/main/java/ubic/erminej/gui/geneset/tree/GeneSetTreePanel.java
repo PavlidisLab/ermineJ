@@ -30,7 +30,6 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -94,8 +93,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     private AtomicBoolean expansionCancel = new AtomicBoolean( false );
 
-    public GeneSetTreePanel( MainFrame callingFrame, List<GeneSetPvalRun> results, Settings settings ) {
-        super( settings, results, callingFrame );
+    public GeneSetTreePanel( MainFrame callingFrame, Settings settings ) {
+        super( settings, callingFrame );
     }
 
     /*
@@ -193,7 +192,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         this.goTree.setModel( filteredTreeModel );
 
         filteredTreeModel.setFilterBySize( hideEmpty );
-        filteredTreeModel.setResults( getCurrentResultSet() );
+        filteredTreeModel.setResults( callingFrame.getCurrentResultSet() );
         filteredTreeModel.setFilterBySignificance( hideInsignificant );
         filteredTreeModel.setFilterSelectedTerms( this.currentSelectedSets );
 
@@ -244,7 +243,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
         log.debug( "Changing results" );
         if ( callingFrame != null && this.goTree != null ) {
 
-            ( ( GeneSetTreeNodeRenderer ) this.goTree.getCellRenderer() ).setCurrentResultSet( getCurrentResultSet() );
+            ( ( GeneSetTreeNodeRenderer ) this.goTree.getCellRenderer() ).setCurrentResultSet( callingFrame
+                    .getCurrentResultSet() );
         }
         refreshView();
     }
@@ -318,7 +318,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( e.getClickCount() < 2 ) {
             return;
         }
-        showDetailsForGeneSet( currentlySelectedGeneSet, getCurrentResultSet() );
+        showDetailsForGeneSet( currentlySelectedGeneSet, callingFrame.getCurrentResultSet() );
     }
 
     /**
@@ -507,7 +507,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
 
         // check the node.
-        GeneSetResult result = getCurrentResultSet().getResults().get( node.getTerm() );
+        GeneSetResult result = callingFrame.getCurrentResultSet().getResults().get( node.getTerm() );
         boolean isSig = result != null && result.getCorrectedPvalue() < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
         markHasSignificantChild( ( GeneSetTreeNode ) node.getParent(), isSig );
     }
@@ -524,7 +524,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
             le.setHasSelectedChild( false );
             le.setHasSignificantChild( false );
 
-            if ( getCurrentResultSet() != null ) {
+            if ( callingFrame.getCurrentResultSet() != null ) {
                 markHasSignificantChild( le, false );
             }
             markHasSelectedChild( le, false );
