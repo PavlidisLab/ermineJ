@@ -78,9 +78,10 @@ public class Multifunctionality {
 
     /**
      * @param geneScores
+     * @param useRanks If true, the ranks of the gene scores will be used for regression.
      * @return
      */
-    public Map<Gene, Double> adjustScores( GeneScores geneScores ) {
+    public Map<Gene, Double> adjustScores( GeneScores geneScores, boolean useRanks ) {
         Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
 
         DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
@@ -97,10 +98,14 @@ public class Multifunctionality {
             i++;
         }
 
-        DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
-        scoreRanks.assign( Functions.div( scoreRanks.size() ) );
-
-        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores );
+        LeastSquaresFit fit;
+        if ( useRanks ) {
+            DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
+            scoreRanks.assign( Functions.div( scoreRanks.size() ) );
+            fit = new LeastSquaresFit( mfs, scoreRanks );
+        } else {
+            fit = new LeastSquaresFit( mfs, scores );
+        }
 
         DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 

@@ -809,10 +809,10 @@ public class GeneSetDetailsFrame extends JFrame {
         }
         this.getContentPane().setLayout( new BorderLayout() );
         this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
-        this.setTitle( StringUtils.abbreviate( this.geneSetDetails.getClassID().getName(), 50 ) + " [ "
-                + this.geneSetDetails.getClassID().getId() + " ] - "
-                + this.geneSetDetails.getGeneData().getGeneSetGenes( this.geneSetDetails.getClassID() ).size()
-                + " genes" );
+
+        String title = StringUtils.abbreviate( this.geneSetDetails.getTitle(), 200 );
+
+        this.setTitle( title );
 
         this
                 .setIconImage( new ImageIcon( this.getClass().getResource(
@@ -1091,6 +1091,7 @@ public class GeneSetDetailsFrame extends JFrame {
             settings.setDataCol( fc.getStartColumn() );
 
             this.geneSetDetails.loadDataMatrix( rawdataFile );
+            this.setTitle( StringUtils.abbreviate( this.geneSetDetails.getTitle(), 200 ) );
 
             /*
              * Have to rebuild the entire table.

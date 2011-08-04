@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import ubic.basecode.util.StatusStderr;
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
@@ -35,13 +37,42 @@ import ubic.erminej.data.Histogram;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
+public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private Histogram hist;
 
-    public GeneSetPvalSeriesGenerator( SettingsHolder settings, GeneAnnotations geneData, Histogram hi ) {
+    private StatusViewer messenger = new StatusStderr();
+
+    /**
+     * @param settings
+     * @param geneToScoreMap Should already be multifunctionality corrected if desired.
+     * @param geneData
+     * @param messenger
+     */
+    public GeneSetResamplingPvalGenerator( SettingsHolder settings, Map<Gene, Double> geneToScoreMap,
+            GeneAnnotations geneData, StatusViewer messenger ) {
         super( settings, geneData );
-        this.hist = hi;
+
+        if ( messenger != null ) this.messenger = messenger;
+
+        NullDistributionGenerator probePvalMapper = new GeneSetResamplingBackgroundDistributionGenerator( settings,
+                geneToScoreMap );
+
+        hist = probePvalMapper.generateNullDistribution( messenger );
+
+    }
+
+    /**
+     * @param settings
+     * @param geneData
+     * @param hist - Should be based on resampling of multifunctionality corrected scoers, if desired.
+     * @param messenger
+     */
+    public GeneSetResamplingPvalGenerator( SettingsHolder settings, GeneAnnotations geneData, Histogram hist,
+            StatusViewer messenger ) {
+        super( settings, geneData );
+        this.hist = hist;
+        if ( messenger != null ) this.messenger = messenger;
 
     }
 
@@ -54,14 +85,18 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
     public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( Map<Gene, Double> geneToScoreMap ) {
         Map<GeneSetTerm, GeneSetResult> results;
         results = new HashMap<GeneSetTerm, GeneSetResult>();
-        ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots,   hist );
+        ExperimentScorePvalGenerator cpv = new ExperimentScorePvalGenerator( settings, geneAnnots, hist );
 
+        int i = 0;
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();
             GeneSetTerm className = iter.next();
             GeneSetResult res = cpv.classPval( className, geneToScoreMap );
             if ( res != null ) {
                 results.put( className, res );
+                if ( ++i % ALERT_UPDATE_FREQUENCY == 0 ) {
+                    messenger.showStatus( i + " gene sets analyzed" );
+                }
             }
         }
         return results;
@@ -69,18 +104,18 @@ public class GeneSetPvalSeriesGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Same thing as class_pval_generator, but returns a collection of scores (pvalues) (see below) instead of adding
-     * them to the results object. This is used to get class pvalues for permutation analysis.
+     * them to the results object. This is used to get class pvalues for permutation analysis (W-Y correction)
      */
-    public Map<GeneSetTerm, Double> class_v_pval_generator( Map<Gene, Double> group_pval_map ) {
+    public Map<GeneSetTerm, Double> classPvalGeneratorRaw( Map<Gene, Double> group_pval_map ) {
         Map<GeneSetTerm, Double> results;
         results = new HashMap<GeneSetTerm, Double>();
-        ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots,  hist );
+        ExperimentScoreQuickPvalGenerator cpv = new ExperimentScoreQuickPvalGenerator( settings, geneAnnots, hist );
 
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
             GeneSetTerm className = iter.next();
             double pval = cpv.classPvalue( className, group_pval_map );
 
-            log.debug( "pval: " + pval );
+            if ( log.isDebugEnabled() ) log.debug( "pval: " + pval );
 
             if ( pval >= 0.0 ) {
                 results.put( className, pval );

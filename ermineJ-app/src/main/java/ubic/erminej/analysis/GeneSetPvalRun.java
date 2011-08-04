@@ -36,6 +36,7 @@ import ubic.basecode.util.StatusViewer;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
@@ -67,8 +68,6 @@ public class GeneSetPvalRun {
     private StatusViewer messenger = new StatusStderr();
 
     private double multifunctionalityCorrelation = -1;
-
-    private long randomSeed = -1;
 
     private String name; // name of this run.
 
@@ -253,17 +252,6 @@ public class GeneSetPvalRun {
         this.name = name;
     }
 
-    /**
-     * Set a specific random seed for use in all resampling-based runs. If not set, the seed is chosen by the software.
-     * <p>
-     * 
-     * @param randomSeed A positive value. Negative values are ignored.
-     */
-    public void setRandomSeed( long randomSeed ) {
-        if ( randomSeed < 0 ) return;
-        this.randomSeed = randomSeed;
-    }
-
     @Override
     public String toString() {
         return "GeneSetPvalRun [name=" + name + "]";
@@ -304,29 +292,28 @@ public class GeneSetPvalRun {
      */
     private void runAnalysis() {
 
+        Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
+
         switch ( settings.getClassScoreMethod() ) {
             case GSR: {
-                NullDistributionGenerator probePvalMapper = new ResamplingExperimentGeneSetScore( settings, geneScores );
 
-                if ( messenger != null ) messenger.showStatus( "Starting resampling" );
+                if ( messenger != null ) messenger.showStatus( "Starting GSR analysis" );
 
-                if ( randomSeed >= 0 ) {
-                    probePvalMapper.setRandomSeed( randomSeed );
+                if ( settings.useMultifunctionalityCorrection() ) {
+                    geneToScoreMap = this.geneData.getMultifunctionality()
+                            .adjustScores( geneScores, false /* not ranks */);
                 }
-                hist = probePvalMapper.generateNullDistribution( messenger );
-                if ( Thread.currentThread().isInterrupted() ) return;
-                if ( messenger != null ) messenger.showStatus( "Finished resampling" );
 
-                GeneSetPvalSeriesGenerator pvg = new GeneSetPvalSeriesGenerator( settings, geneData, hist );
+                GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( settings, geneToScoreMap,
+                        geneData, messenger );
                 if ( Thread.currentThread().isInterrupted() ) return;
-                // calculate the actual class scores and correct sorting.
-                results = pvg.classPvalGenerator( geneScores.getGeneToScoreMap() );
 
+                results = pvg.classPvalGenerator( geneToScoreMap );
                 break;
             }
             case ORA: {
 
-                if ( messenger != null ) messenger.showStatus( "Starting ORA analysis" );
+                messenger.showStatus( "Starting ORA analysis" );
 
                 OraPvalGenerator pvg = new OraPvalGenerator( settings, geneScores, geneData );
 
@@ -337,38 +324,46 @@ public class GeneSetPvalRun {
                     break;
                 }
 
-                results = pvg.classPvalGenerator( geneScores.getGeneToScoreMap(), messenger );
+                results = pvg.classPvalGenerator( geneToScoreMap, messenger );
 
-                if ( messenger != null )
-                    messenger.showStatus( "Finished with ORA computations: " + numOver
-                            + " probes passed your threshold." );
+                messenger.showStatus( "Finished with ORA computations: " + numOver + " probes passed your threshold." );
+
                 break;
             }
             case CORR: {
                 if ( rawData == null )
                     throw new IllegalArgumentException( "Raw data cannot be null for Correlation analysis" );
-                if ( messenger != null )
-                    messenger.showStatus( "Starting correlation resampling in " + Thread.currentThread().getName() );
+
+                messenger.showStatus( "Starting correlation resampling in " + Thread.currentThread().getName() );
+
                 NullDistributionGenerator probePvalMapper = new ResamplingCorrelationGeneSetScore( settings, rawData );
 
-                if ( randomSeed >= 0 ) {
-                    probePvalMapper.setRandomSeed( randomSeed );
-                }
-
                 hist = probePvalMapper.generateNullDistribution( messenger );
+
                 if ( Thread.currentThread().isInterrupted() ) return;
+
                 CorrelationPvalGenerator pvg = new CorrelationPvalGenerator( settings, geneData, rawData, hist );
-                if ( messenger != null ) messenger.showStatus( "Finished resampling, computing for gene sets" );
+
+                messenger.showStatus( "Finished resampling, computing for gene sets" );
+
                 results = pvg.classPvalGenerator( messenger );
+
                 if ( Thread.currentThread().isInterrupted() ) return;
-                if ( messenger != null ) messenger.showStatus( "Finished computing scores" );
+
+                messenger.showStatus( "Finished computing scores" );
 
                 break;
             }
             case ROC: {
                 RocPvalGenerator rpg = new RocPvalGenerator( settings, geneData, messenger );
-                if ( messenger != null ) messenger.showStatus( "Computing gene set scores" );
-                results = rpg.classPvalGenerator( geneScores );
+
+                if ( settings.useMultifunctionalityCorrection() ) {
+                    geneToScoreMap = this.geneData.getMultifunctionality().adjustScores( geneScores, true );
+                }
+
+                messenger.showStatus( "Computing gene set scores" );
+
+                results = rpg.classPvalGenerator( geneToScoreMap );
 
                 break;
             }

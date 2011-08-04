@@ -135,8 +135,8 @@ public class JGeneScoreFileChooser extends JFileChooser {
 
                     try {
                         MatrixPreviewer.previewMatrix( null, file, skipColumns );
-                    } catch ( IOException e1 ) {
-                        GuiUtil.error( "Error previewing data: " + e1.getMessage(), e1 );
+                    } catch ( Exception e1 ) {
+                        GuiUtil.error( "Error previewing data: " + e1.getMessage() );
                         return;
                     }
                 }

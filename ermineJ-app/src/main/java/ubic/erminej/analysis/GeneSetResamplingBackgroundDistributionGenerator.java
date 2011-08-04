@@ -18,6 +18,7 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -28,20 +29,21 @@ import ubic.basecode.math.Stats;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.Gene;
 import ubic.erminej.data.Histogram;
 import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
 
 /**
- * Calculates a background distribution for class sscores derived from randomly selected individual gene scores...and
+ * Calculates a background distribution for class scores derived from randomly selected individual gene scores...and
  * does other things. Created 09/02/02.
  * 
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
  */
-public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetScore {
-    private Double[] groupPvals = null; // pvalues for groups.
+public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractResamplingGeneSetScore {
+
+    private Double[] geneScores = null; // pvalues for groups.
 
     private static int quantile = 50;
     private static double quantfract = 0.5;
@@ -83,8 +85,8 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
         }
 
         // do the right thing if we are using weights.
-        numGenes = groupPvals.length;
-        in_pval = groupPvals;
+        numGenes = geneScores.length;
+        in_pval = geneScores;
 
         if ( numGenes == 0 ) {
             throw new IllegalStateException( "No pvalues!" );
@@ -116,15 +118,21 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
                 hist.update( geneSetSize, rawscore );
                 if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
                         && k > 0 && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
+
                     double mean = Descriptive.mean( values );
                     double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
                             .sumOfSquares( values ) );
+
                     if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
+
                         hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
-                        log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + k
-                                + " iterations." );
+
+                        if ( log.isDebugEnabled() )
+                            log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + k
+                                    + " iterations." );
                         break;
                     }
+
                     oldmean = mean;
                     oldvar = variance;
                 }
@@ -157,9 +165,9 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
     /**
      * @param settings
-     * @param geneScores
+     * @param geneScores Should already be multifunctionality corrected if desired.
      */
-    public ResamplingExperimentGeneSetScore( SettingsHolder settings, GeneScores geneScores ) {
+    public GeneSetResamplingBackgroundDistributionGenerator( SettingsHolder settings, Map<Gene, Double> geneToScoreMap ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();
@@ -173,7 +181,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
         this.numClasses = classMaxSize - classMinSize + 1;
 
-        groupPvals = geneScores.getGeneScores();
+        this.geneScores = geneToScoreMap.values().toArray( new Double[] {} );
 
         this.setHistogramRange();
         this.hist = new Histogram( numClasses, classMinSize, numRuns, histogramMax, histogramMin );
@@ -183,7 +191,7 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
      * @return double[]
      */
     public Double[] get_in_pvals() {
-        return groupPvals;
+        return geneScores;
     }
 
     /**
@@ -237,11 +245,11 @@ public class ResamplingExperimentGeneSetScore extends AbstractResamplingGeneSetS
 
     /**  */
     public void setHistogramRange() {
-        if ( groupPvals == null ) {
+        if ( geneScores == null ) {
             throw new IllegalStateException( "Null gene score arrays for histogram range setting" );
         }
 
-        double[] pgpvals = ArrayUtils.toPrimitive( groupPvals );
+        double[] pgpvals = ArrayUtils.toPrimitive( geneScores );
 
         histogramMax = Descriptive.max( new DoubleArrayList( pgpvals ) );
         histogramMin = Descriptive.min( new DoubleArrayList( pgpvals ) );

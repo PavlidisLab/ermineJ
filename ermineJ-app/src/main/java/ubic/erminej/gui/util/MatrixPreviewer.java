@@ -31,8 +31,6 @@ import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import org.apache.commons.lang.StringUtils;
-
 import ubic.basecode.dataStructure.matrix.StringMatrix;
 import ubic.basecode.io.reader.StringMatrixReader;
 
@@ -79,8 +77,6 @@ public class MatrixPreviewer {
         JButton closeButton = new JButton( "Close" );
 
         closeButton.addActionListener( new ActionListener() {
-
-            @Override
             public void actionPerformed( ActionEvent e ) {
                 previewPanel.dispose();
             }
@@ -101,13 +97,18 @@ public class MatrixPreviewer {
         previewPanel.requestFocusInWindow();
     }
 
-    public static void previewMatrix( Window x, String fileName, Integer startCol ) throws IOException {
+    /**
+     * @param x
+     * @param fileName
+     * @param numColumnsToSkip
+     * @throws IOException
+     */
+    public static void previewMatrix( Window x, String fileName, Integer numColumnsToSkip ) throws IOException {
         StringMatrixReader r = new StringMatrixReader();
         StringMatrix<String, String> test;
 
-        test = r.read( fileName, 100, startCol );
+        test = r.read( fileName, 100, numColumnsToSkip );
         previewMatrix( x, test );
-
     }
 
     /**
@@ -116,15 +117,25 @@ public class MatrixPreviewer {
      */
     public static void previewMatrix( Window w, StringMatrix<String, String> matrix ) {
 
-        Object[][] mat = new Object[matrix.rows()][matrix.columns()];
-        Object[] headings = new Object[matrix.columns()];
+        int numColumnsShown = 1 + Math.min( 20 /* MAX_COLUMNS_TO_PREVIEW */, matrix.columns() + 1 );
 
+        Object[][] mat = new Object[matrix.rows()][numColumnsShown];
+        Object[] headings = new Object[numColumnsShown];
+
+        headings[0] = "ID";
+        for ( int k = 1; k < numColumnsShown; k++ ) {
+            headings[k] = matrix.getColName( k - 1 );
+        }
+
+        /*
+         * The row names go in the first column.
+         */
         for ( int i = 0; i < matrix.rows(); i++ ) {
-            for ( int j = 0; j < Math.min( 20 /* MAX COLUMNS */, matrix.columns() ); j++ ) {
-                if ( i == 0 ) {
-                    headings[j] = ( j + 1 ) + ": " + StringUtils.abbreviate( matrix.getColName( j ), 75 );
-                }
-                mat[i][j] = matrix.get( i, j );
+
+            mat[i][0] = matrix.getRowName( i );
+
+            for ( int j = 1; j < numColumnsShown; j++ ) {
+                mat[i][j] = matrix.get( i, j - 1 );
             }
         }
 

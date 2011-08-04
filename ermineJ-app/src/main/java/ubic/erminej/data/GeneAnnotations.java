@@ -156,7 +156,7 @@ public class GeneAnnotations {
             throw new IllegalArgumentException( "No probes were selected." );
         }
 
-        Set<Probe> startProbes = new HashSet<Probe>(start.getProbes());
+        Set<Probe> startProbes = new HashSet<Probe>( start.getProbes() );
 
         messenger.showStatus( "Creating a subsetted annotation set for " + probes.size() + "/" + startProbes.size()
                 + " probes)" );
@@ -420,7 +420,7 @@ public class GeneAnnotations {
      * 
      * @param searchOn A string to be searched.
      */
-    public Collection<Probe> findProbes( String searchOn ) {
+    public Set<Probe> findProbes( String searchOn ) {
 
         String searchOnUp = searchOn.toUpperCase();
         Set<Probe> results = new HashSet<Probe>();
@@ -441,11 +441,11 @@ public class GeneAnnotations {
      * 
      * @param searchOn
      */
-    public Collection<GeneSetTerm> findSetsByGene( String searchOn ) {
+    public Set<GeneSetTerm> findSetsByGene( String searchOn ) {
 
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
 
-        Collection<Gene> g = findGenesByName( searchOn );
+        Set<Gene> g = findGenesByName( searchOn );
         for ( Gene gene : g ) {
             result.addAll( gene.getGeneSets() );
         }
@@ -455,7 +455,7 @@ public class GeneAnnotations {
     /**
      * @param searchOn
      */
-    public Collection<GeneSetTerm> findSetsByName( String searchOn ) {
+    public Set<GeneSetTerm> findSetsByName( String searchOn ) {
         String searchOnUp = searchOn.toUpperCase();
         Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
@@ -489,10 +489,10 @@ public class GeneAnnotations {
     /**
      * @return view of all gene sets, including empty ones (?)
      */
-    public Collection<GeneSet> getAllGeneSets() {
-        Collection<GeneSet> res = new HashSet<GeneSet>();
+    public Set<GeneSet> getAllGeneSets() {
+        Set<GeneSet> res = new HashSet<GeneSet>();
         res.addAll( this.geneSets.values() );
-        return Collections.unmodifiableCollection( res );
+        return Collections.unmodifiableSet( res );
     }
 
     /**
@@ -501,8 +501,8 @@ public class GeneAnnotations {
      * 
      * @return
      */
-    public Collection<GeneSetTerm> getAllTerms() {
-        return Collections.unmodifiableCollection( this.geneSetTerms.getGeneSets() );
+    public Set<GeneSetTerm> getAllTerms() {
+        return Collections.unmodifiableSet( this.geneSetTerms.getGeneSets() );
     }
 
     /**
@@ -534,16 +534,16 @@ public class GeneAnnotations {
      * @param goset
      * @return set of genes in the given gene set (if any), based on the currently active probes
      */
-    public Collection<Gene> getGeneSetGenes( GeneSetTerm goset ) {
+    public Set<Gene> getGeneSetGenes( GeneSetTerm goset ) {
         GeneSet geneSet = this.geneSets.get( goset );
         if ( geneSet == null ) {
             /*
              * This is a little bit misleading/confusing -- asking for a non-existing geneSet could be an error (but
              * it's not at the moment!)
              */
-            return Collections.unmodifiableCollection( new HashSet<Gene>() );
+            return Collections.unmodifiableSet( new HashSet<Gene>() );
         }
-        return Collections.unmodifiableCollection( geneSet.getGenes() );
+        return Collections.unmodifiableSet( geneSet.getGenes() );
     }
 
     /**
@@ -557,10 +557,10 @@ public class GeneAnnotations {
      * @param geneSetId
      * @return active probes for the given gene set
      */
-    public Collection<Probe> getGeneSetProbes( GeneSetTerm geneSetId ) {
+    public Set<Probe> getGeneSetProbes( GeneSetTerm geneSetId ) {
         GeneSet geneSet = this.geneSets.get( geneSetId );
-        if ( geneSet == null ) return Collections.unmodifiableCollection( new HashSet<Probe>() );
-        return Collections.unmodifiableCollection( geneSet.getProbes() );
+        if ( geneSet == null ) return Collections.unmodifiableSet( ( new HashSet<Probe>() ) );
+        return geneSet.getProbes(); // unmodifiable
     }
 
     /**
@@ -594,20 +594,19 @@ public class GeneAnnotations {
      * 
      * @return
      */
-    public Collection<GeneSetTerm> getNonEmptyGeneSets() {
-        Collection<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+    public Set<GeneSetTerm> getNonEmptyGeneSets() {
+        Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
         for ( GeneSetTerm gst : this.geneSets.keySet() ) {
             if ( this.getGeneSetProbes( gst ).size() > 1 ) result.add( gst );
         }
-        return Collections.unmodifiableCollection( result );
+        return Collections.unmodifiableSet( result );
     }
 
     /**
      * @return the list of probes.
      */
-    public Collection<Probe> getProbes() {
-        // return Collections.unmodifiableCollection( this.probes.values() );
-        return this.probes.values();
+    public Set<Probe> getProbes() {
+        return Collections.unmodifiableSet( new HashSet<Probe>( this.probes.values() ) );
     }
 
     /**
@@ -843,7 +842,7 @@ public class GeneAnnotations {
 
         // these return unmodifiable copies.
         for ( GeneAnnotations existingSubClone : subClones ) {
-            Collection<Probe> existingSubCloneProbes = new HashSet<Probe>(existingSubClone.getProbes());
+            Collection<Probe> existingSubCloneProbes = new HashSet<Probe>( existingSubClone.getProbes() );
             if ( existingSubCloneProbes.size() == probesToRetain.size()
                     && existingSubCloneProbes.containsAll( probesToRetain ) ) {
                 log.info( "Found a usable existing annotation set" );
@@ -982,9 +981,9 @@ public class GeneAnnotations {
      * @param searchOn
      * @return
      */
-    private Collection<Gene> findGenesByName( String searchOn ) {
+    private Set<Gene> findGenesByName( String searchOn ) {
 
-        Collection<Gene> results = new HashSet<Gene>();
+        Set<Gene> results = new HashSet<Gene>();
 
         Gene g = this.findGene( searchOn );
         if ( g != null ) results.add( g );

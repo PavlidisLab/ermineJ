@@ -66,8 +66,16 @@ public class MultiFuncDiagWindow extends JFrame {
 
     private static Log log = LogFactory.getLog( MultiFuncDiagWindow.class );
 
+    /**
+     * @param geneAnnots
+     * @param geneScores
+     */
     public MultiFuncDiagWindow( GeneAnnotations geneAnnots, GeneScores geneScores ) {
         super( "Multifunctionality analysis" );
+        
+        /*
+         * TODO: show title of annotation source; show title of gene scores; allow switch.
+         */
 
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab( "Sizes", getTermsPerGeneDistribution( geneAnnots ) );

@@ -114,7 +114,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     /**
      * @param e
      */
-    public void findInTreeMenuItem_actionAdapter( ActionEvent e ) {
+    public void findInTree( ActionEvent e ) {
         GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         GeneSetTerm classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;

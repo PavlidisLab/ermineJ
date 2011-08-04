@@ -318,6 +318,7 @@ public class MainFrame extends JFrame {
         athread.run();
         log.debug( "Waiting" );
         addResult( athread.getLatestResults() );
+
         log.debug( "done" );
         enableMenusForAnalysis();
     }
@@ -402,6 +403,16 @@ public class MainFrame extends JFrame {
         result.setName( "Run " + ( results.size() + 1 ) );
         results.add( result );
         this.updateRunViewMenu();
+
+        try {
+            Thread.sleep( 100 );
+        } catch ( InterruptedException e ) {
+            // give the gui a chance to catch up; an attempt (in vain?) to avoid errors in logs like "
+            // java.lang.ClassCastException:
+            // ubic.erminej.data.EmptyGeneSetResult cannot be cast to java.lang.String at
+            // ubic.erminej.gui.geneset.table.GeneSetTableCellRenderer.getTableCellRendererComponent(GeneSetTableModel.java:316)"
+        }
+
         tablePanel.addRun();
         treePanel.addRun();
         athread = null;
@@ -650,7 +661,7 @@ public class MainFrame extends JFrame {
         GeneAnnotations ga = this.geneData;
         GeneScores gs = null;
 
-        if ( this.getCurrentResultSet() >= 0 ) {
+        if ( this.getCurrentResultSet() >= 0 && !this.results.isEmpty() ) {
             gs = this.results.get( this.getCurrentResultSet() ).getGeneScores();
             ga = gs.getGeneAnnots();
         } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
@@ -723,6 +734,10 @@ public class MainFrame extends JFrame {
         log.info( "Setup done: " + timer.getTime() + " ms" );
 
         updateProgress( 90 );
+
+        File annotF = new File( settings.getAnnotFile() );
+        String fileName = annotF.getName();
+        this.setTitle( "ErmineJ : " + fileName );
 
         // end slow(ish) part.
 
@@ -1092,6 +1107,7 @@ public class MainFrame extends JFrame {
                     protected Object doInBackground() throws Exception {
                         initializeAllData(); // Perhaps skip if the files have not changed?
                         loadAnalysis( path );
+                        resetSignificanceFilters();
                         return null;
                     }
                 };
@@ -1108,6 +1124,14 @@ public class MainFrame extends JFrame {
             }
         }
 
+    }
+
+    /**
+     * 
+     */
+    protected void resetSignificanceFilters() {
+        this.treePanel.setHideInsignificant( false );
+        this.treePanel.filter( true );
     }
 
     protected void saveProject() {

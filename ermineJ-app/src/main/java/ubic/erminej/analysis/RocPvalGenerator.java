@@ -21,7 +21,6 @@ package ubic.erminej.analysis;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,6 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.Probe;
 
 /**
  * Compute gene set p values based on the receiver-operator characterisic (ROC).
@@ -60,29 +58,23 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * Generate a complete set of class results.
      */
-    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( GeneScores geneScores1 ) {
+    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( Map<Gene, Double> geneToScoreMap ) {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         int count = 0;
-
-        Map<Gene, Double> geneToScoreMap = geneScores1.getGeneToScoreMap();
-
-        if ( settings.useMultifunctionalityCorrection() ) {
-            geneToScoreMap = this.geneAnnots.getMultifunctionality().adjustScores( geneScores1 );
-
-        }
 
         geneRanks = Rank.rankTransform( geneToScoreMap );
 
         totalSize = geneRanks.size();
 
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getNonEmptyGeneSets().iterator(); iter.hasNext(); ) {
-            ifInterruptedStop();
             GeneSetTerm className = iter.next();
             GeneSetResult res = this.classPval( className );
             if ( res != null ) {
                 results.put( className, res );
                 if ( messenger != null && ++count % ALERT_UPDATE_FREQUENCY == 0 ) {
                     messenger.showStatus( count + " gene sets analyzed" );
+                    ifInterruptedStop();
+
                 }
             }
 
@@ -108,17 +100,14 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             return null;
         }
 
-        Collection<Probe> values = geneAnnots.getGeneSetProbes( geneSet );
+        Collection<Gene> values = geneAnnots.getGeneSetGenes( geneSet );
 
         boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
                 || ( !settings.getDoLog() && settings.getBigIsBetter() );
 
-        Collection<Gene> seenGenes = new HashSet<Gene>();
-        for ( Probe p : values ) {
+        for ( Gene g : values ) {
 
             Integer rank;
-            Gene g = p.getGene();
-            if ( seenGenes.contains( g ) ) continue;
             rank = geneRanks.get( g );
 
             if ( rank == null ) continue;
@@ -130,7 +119,6 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             }
 
             targetRanks.add( new Integer( rank + 1 ) ); // make ranks 1-based.
-
         }
 
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );

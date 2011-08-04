@@ -207,27 +207,17 @@ public class MultipleTestCorrector extends AbstractLongTask {
         Collections.reverse( toUseForMTC ); // start from the worst class.
         Map<GeneSetTerm, Double> permscores;
 
-        GeneSetPvalSeriesGenerator cver = new GeneSetPvalSeriesGenerator( settings, geneData, hist );
+        GeneSetResamplingPvalGenerator cver = new GeneSetResamplingPvalGenerator( settings, geneData, hist, messenger );
 
         for ( int i = 0; i < trials; i++ ) {
             // System.err.println("Trial: " + i );
 
-            Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToScoreMap( true ); // shuffle
-            // the
-            // association
-            // of
-            // pvalues
-            // to
-            // genes.
-
-            // Just for AROC:
-            /*
-             * doesn't seem to get used??? (homin 7/25) Map scinput_rank_map; if (weight_on) { scinput_rank_map =
-             * Rank.rankTransform(scgroup_pval_map); } else { scinput_rank_map = Rank.rankTransform(scprobepvalmap); }
-             */
+            // shuffle the association of pvalues to genes.
+            // FIXME these should be multifunctionality corrected!!
+            Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToScoreMap( true );
 
             // / permscores contains a list of the p values for the shuffled data.
-            permscores = cver.class_v_pval_generator( scgroup_pval_map ); // end of step 1.
+            permscores = cver.classPvalGeneratorRaw( scgroup_pval_map ); // end of step 1.
 
             int j = 0;
             double permp = 0.0;

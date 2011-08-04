@@ -23,10 +23,13 @@ import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox; 
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import ubic.erminej.Settings;
+import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
@@ -52,7 +55,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         super( wizard );
         this.settings = settings;
         this.jbInit();
-        wizard.clearStatus();
+        if ( wizard != null ) wizard.clearStatus();
         setValues();
     }
 
@@ -76,6 +79,21 @@ public class AnalysisWizardStep3 extends WizardStep {
         settings.setUseUserDefined( this.userDefinedButton.isSelected() );
     }
 
+    public static void main( String[] args ) throws Exception {
+        try {
+            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+        } catch ( Exception e ) {
+
+        }
+        JFrame f = new JFrame();
+        f.setSize( new Dimension( 400, 600 ) );
+        AnalysisWizardStep3 p = new AnalysisWizardStep3( null, new Settings() );
+        f.add( p );
+        f.pack();
+        GuiUtil.centerContainer( f );
+        f.setVisible( true );
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -90,32 +108,27 @@ public class AnalysisWizardStep3 extends WizardStep {
         buttonPanel.setPreferredSize( new Dimension( 550, 140 ) );
 
         biologicalProcessButton = new JCheckBox();
+        biologicalProcessButton.setBorder( BorderFactory.createEmptyBorder( 15, 5, 2, 20 ) );
         molecularFunctionButton = new JCheckBox();
+        molecularFunctionButton.setBorder( BorderFactory.createEmptyBorder( 15, 5, 2, 20 ) );
         cellularComponentButton = new JCheckBox();
+        cellularComponentButton.setBorder( BorderFactory.createEmptyBorder( 15, 5, 2, 20 ) );
         userDefinedButton = new JCheckBox();
+        userDefinedButton.setBorder( BorderFactory.createEmptyBorder( 15, 5, 2, 20 ) );
 
         biologicalProcessButton.setText( "Biological Process" );
-        biologicalProcessButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
-        biologicalProcessButton.setPreferredSize( new Dimension( 140, 17 ) );
         buttonPanel.add( biologicalProcessButton, null );
 
         molecularFunctionButton.setText( "Molecular Function" );
-        molecularFunctionButton.setSelected( true );
-        molecularFunctionButton.setPreferredSize( new Dimension( 140, 17 ) );
-        molecularFunctionButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
         buttonPanel.add( molecularFunctionButton, null );
 
         cellularComponentButton.setText( "Cellular Component" );
-        cellularComponentButton.setPreferredSize( new Dimension( 140, 17 ) );
-        cellularComponentButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
         buttonPanel.add( cellularComponentButton, null );
 
         userDefinedButton.setText( "Your custom groups" );
-        userDefinedButton.setPreferredSize( new Dimension( 140, 17 ) );
-        userDefinedButton.setBorder( BorderFactory.createLineBorder( Color.black ) );
         buttonPanel.add( userDefinedButton, null );
 
-        buttonPanel.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
+        buttonPanel.setBorder( BorderFactory.createEmptyBorder( 20, 40, 20, 40 ) );
 
         this.addHelp( "<html><b>Select the aspects to include in the analysis.</b><br>" + "</html>" );
         this.addMain( buttonPanel );

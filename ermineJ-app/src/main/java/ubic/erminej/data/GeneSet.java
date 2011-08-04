@@ -17,6 +17,7 @@ package ubic.erminej.data;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -31,19 +32,19 @@ public class GeneSet {
 
     private boolean modified = false;
 
-    private Collection<Gene> genes = new HashSet<Gene>();
+    private Set<Gene> genes = new HashSet<Gene>();
 
     /**
      * Gene sets that have the exact same members.
      */
-    private Collection<GeneSet> redundantGroups = new HashSet<GeneSet>();
+    private Set<GeneSet> redundantGroups = new HashSet<GeneSet>();
 
     // How was it originally represented. This affects how things are stored on disk. Genes is better.
     private boolean isGenes = true;
 
     private String sourceFile;
 
-    private Collection<Probe> probes = new HashSet<Probe>();
+    private Set<Probe> probes = new HashSet<Probe>();
 
     private GeneSetFileFormat format = GeneSetFileFormat.DEFAULT;
 
@@ -106,8 +107,8 @@ public class GeneSet {
      * 
      * @return
      */
-    public Collection<Gene> getGenes() {
-        return Collections.unmodifiableCollection( genes );
+    public Set<Gene> getGenes() {
+        return Collections.unmodifiableSet( genes );
     }
 
     /**
@@ -127,13 +128,13 @@ public class GeneSet {
     /**
      * @return
      */
-    public Collection<Probe> getProbes() {
+    public Set<Probe> getProbes() {
         if ( this.probes.isEmpty() ) {
             for ( Gene g : genes ) {
                 probes.addAll( g.getProbes() );
             }
         }
-        return Collections.unmodifiableCollection( this.probes );
+        return Collections.unmodifiableSet( this.probes );
     }
 
     public void addRedundantGroup( GeneSet redundant ) {
@@ -152,8 +153,8 @@ public class GeneSet {
      * 
      * @return
      */
-    public Collection<GeneSet> getRedundantGroups() {
-        return Collections.unmodifiableCollection( redundantGroups );
+    public Set<GeneSet> getRedundantGroups() {
+        return Collections.unmodifiableSet( redundantGroups );
     }
 
     public String getSourceFile() {
@@ -217,7 +218,7 @@ public class GeneSet {
         this.modified = modified;
     }
 
-    public void setRedundantGroups( Collection<GeneSet> redundantGroups ) {
+    public void setRedundantGroups( Set<GeneSet> redundantGroups ) {
         this.redundantGroups = redundantGroups;
     }
 

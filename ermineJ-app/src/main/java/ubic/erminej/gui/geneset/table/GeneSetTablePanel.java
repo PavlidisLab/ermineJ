@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -166,6 +167,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 }
             }
         } );
+
         runPopupMenu.add( renameRunMenuItem );
 
         JMenuItem saveRunMenuItem = new JMenuItem( "Save this run ..." );
@@ -266,27 +268,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         this.callingFrame.setCurrentResultSetIndex( currentResultSetIndex );
         table.revalidate();
 
-        try {
-            Thread.sleep( 100 );
-        } catch ( InterruptedException e ) {
-            // give the gui a chance to catch up; an attempt (in vain?) to avoid errors in logs like "
-            // java.lang.ClassCastException:
-            // ubic.erminej.data.EmptyGeneSetResult cannot be cast to java.lang.String
-            // at
-            // ubic.erminej.gui.geneset.table.GeneSetTableCellRenderer.getTableCellRendererComponent(GeneSetTableModel.java:316)"
-        }
-
         this.model.filter();
-
-        try {
-            Thread.sleep( 100 );
-        } catch ( InterruptedException e ) {
-            // give the gui a chance to catch up; an attempt (in vain?) to avoid errors in logs like "
-            // java.lang.ClassCastException:
-            // ubic.erminej.data.EmptyGeneSetResult cannot be cast to java.lang.String
-            // at
-            // ubic.erminej.gui.geneset.table.GeneSetTableCellRenderer.getTableCellRendererComponent(GeneSetTableModel.java:316)"
-        }
 
         List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );
@@ -398,6 +380,16 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 tooltip += "Class Raw Score Method: Median <br>";
         }
 
+        if ( runSettings.getScoreFile() != null ) {
+            String fileName = new File( runSettings.getScoreFile() ).getName();
+            coda += "Scores: " + fileName + "<br/>";
+        }
+
+        if ( runSettings.getRawDataFileName() != null ) {
+            String fileName = new File( runSettings.getRawDataFileName() ).getName();
+            coda += "Profiles: " + fileName + "<br/>";
+        }
+
         tooltip += coda;
         resultToolTips.add( runIndex, tooltip );
     }
@@ -452,9 +444,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
         int yesno = JOptionPane.showConfirmDialog( null, "Are you sure you want to remove " + columnName + "?",
                 "Remove Run", JOptionPane.YES_NO_OPTION );
         if ( yesno == JOptionPane.YES_OPTION ) {
-            log.debug( "remove popup for col: " + currentColumnIndex );
             int runIndex = model.getRunIndex( currentColumnIndex );
             assert runIndex >= 0;
+
+            /*
+             * If possible, remove the annotations.
+             */
+
             table.removeColumn( col );
             model.removeRunData( currentColumnIndex );
 
@@ -592,7 +588,7 @@ class FindInTreeListener implements ActionListener {
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed( ActionEvent e ) {
-        adaptee.findInTreeMenuItem_actionAdapter( e );
+        adaptee.findInTree( e );
 
     }
 

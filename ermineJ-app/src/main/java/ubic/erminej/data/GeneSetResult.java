@@ -32,6 +32,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
 
     GeneSetTerm geneSetTerm;
 
+    String runName = "";
     private double pvalue = 1.0;
     private double score = 0.0;
     private int numGenes = 0;

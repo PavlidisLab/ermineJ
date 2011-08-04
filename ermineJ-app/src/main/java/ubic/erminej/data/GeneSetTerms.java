@@ -161,8 +161,8 @@ public class GeneSetTerms {
     /**
      * @return all the geneset terms.
      */
-    public Collection<GeneSetTerm> getGeneSets() {
-        return Collections.unmodifiableCollection( this.getGraph().getValues() );
+    public Set<GeneSetTerm> getGeneSets() {
+        return Collections.unmodifiableSet( new HashSet<GeneSetTerm>( this.getGraph().getValues() ) );
     }
 
     /**
@@ -249,7 +249,7 @@ public class GeneSetTerms {
     void addUserDefinedTerm( GeneSetTerm id ) {
         assert id.isUserDefined();
         if ( getGraph() == null ) return;
-        assert this.getGraph().get( USER_DEFINED ) != null; 
+        assert this.getGraph().get( USER_DEFINED ) != null;
         this.getGraph().addChildTo( USER_DEFINED, id.getId(), id );
     }
 

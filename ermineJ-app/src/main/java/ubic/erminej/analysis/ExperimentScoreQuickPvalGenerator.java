@@ -77,7 +77,7 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
             }
         }
 
-        rawscore = ResamplingExperimentGeneSetScore.computeRawScore( groupPvalArr, numGenesInSet, settings
+        rawscore = GeneSetResamplingBackgroundDistributionGenerator.computeRawScore( groupPvalArr, numGenesInSet, settings
                 .getGeneSetResamplingScoreMethod() );
         pval = scoreToPval( numGenesInSet, rawscore );
 

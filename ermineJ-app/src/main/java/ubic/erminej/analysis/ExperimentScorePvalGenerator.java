@@ -19,9 +19,7 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
@@ -31,7 +29,7 @@ import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
 
 /**
- * Generates gene set p values using the resampling-based 'experiment score' method of Pavlidis et al.
+ * Generates gene set p values using the resampling-based 'experiment score' method of Pavlidis et al. 2002
  * 
  * @author Paul Pavlidis
  * @version $Id$
@@ -60,19 +58,19 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param probesToPvals
      * @return
      */
-    public GeneSetResult classPval( GeneSetTerm geneSetName, Map<Gene, Double> geneToPvalMap ) {
+    public GeneSetResult classPval( GeneSetTerm geneSetName, Map<Gene, Double> geneToScoreMap ) {
         if ( !super.checkAspectAndRedundancy( geneSetName ) ) return null;
-        int effSize = numGenesInSet( geneSetName );
-        if ( effSize < settings.getMinClassSize() || effSize > settings.getMaxClassSize() ) {
+
+        int numGenesInSet = numGenesInSet( geneSetName );
+
+        if ( numGenesInSet < settings.getMinClassSize() || numGenesInSet > settings.getMaxClassSize() ) {
             return null;
         }
 
         Collection<Gene> values = geneAnnots.getGeneSetGenes( geneSetName );
 
-        double[] groupPvalArr = new double[effSize]; // store pvalues for items in
-        // the class.
-
-        Set<Gene> record = new HashSet<Gene>();
+        // store pvalues for items in the class.
+        double[] groupPvalArr = new double[numGenesInSet];
 
         int v_size = 0;
 
@@ -80,24 +78,17 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         for ( Gene gene : values ) {
             ifInterruptedStop();
 
-            if ( geneToPvalMap.containsKey( gene ) ) { // if it is in the data
-                // set. This is invariant
-                // under permutations.
-
-                if ( !record.contains( gene ) ) { // only count it once.
-
-                    record.add( gene ); // mark
-                    groupPvalArr[v_size] = geneToPvalMap.get( gene );
-                    v_size++;
-                }
-
+            // if it is in the data set. This is invariant under permutations.
+            if ( geneToScoreMap.containsKey( gene ) ) {
+                groupPvalArr[v_size] = geneToScoreMap.get( gene );
+                v_size++;
             } // if in data set
-        } // end of while over items in the class.
+        }
 
         // get raw score and pvalue.
-        double rawscore = ResamplingExperimentGeneSetScore.computeRawScore( groupPvalArr, effSize, settings
-                .getGeneSetResamplingScoreMethod() );
-        double pval = scoreToPval( effSize, rawscore );
+        double rawscore = GeneSetResamplingBackgroundDistributionGenerator.computeRawScore( groupPvalArr,
+                numGenesInSet, settings.getGeneSetResamplingScoreMethod() );
+        double pval = scoreToPval( numGenesInSet, rawscore );
 
         if ( pval < 0.0 ) {
             throw new IllegalStateException( "A raw score (" + rawscore + ") yielded an invalid pvalue: Classname: "

@@ -40,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -140,15 +141,23 @@ public class StartupPanel extends JPanel {
         JPanel formPanel = new JPanel();
         GroupLayout gl = new GroupLayout( formPanel );
         formPanel.setLayout( gl );
+        formPanel.setMaximumSize( new Dimension( 800, 1000 ) );
+        formPanel.setBorder( BorderFactory.createEmptyBorder( 10, 50, 10, 50 ) );
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );
-        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( projectPanel ).addComponent( twoFilePanel ) );
+        gl.setHorizontalGroup( gl.createParallelGroup( Alignment.CENTER ).addComponent( projectPanel ).addComponent(
+                twoFilePanel ) );
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( projectPanel ).addComponent( twoFilePanel ) );
 
         JPanel centerPanel = new JPanel(); // holds help and the forms
-        centerPanel.setLayout( new BorderLayout() );
-        centerPanel.add( instructions, BorderLayout.NORTH );
-        centerPanel.add( formPanel, BorderLayout.CENTER );
+        GroupLayout cgl = new GroupLayout( centerPanel );
+        centerPanel.setLayout( cgl );
+        cgl.setHorizontalGroup( cgl.createParallelGroup( Alignment.CENTER ).addComponent( instructions ).addComponent(
+                formPanel ) );
+        cgl.setVerticalGroup( cgl.createSequentialGroup().addComponent( instructions ).addComponent( formPanel ) );
+
+        // centerPanel.add( instructions, BorderLayout.NORTH );
+        // centerPanel.add( formPanel, BorderLayout.CENTER );
 
         this.setLayout( new BorderLayout() );
         this.add( logoPanel, BorderLayout.NORTH );
@@ -254,8 +263,7 @@ public class StartupPanel extends JPanel {
         instructions.setEditable( false );
         instructions.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
         instructions.setContentType( "text/html" );
-        instructions.setMaximumSize( new Dimension( 500, 200 ) );
-        instructions.setBorder( BorderFactory.createEmptyBorder( 0, 20, 20, 20 ) );
+        instructions.setBorder( BorderFactory.createEmptyBorder( 0, 20, 10, 20 ) );
         instructions.addHyperlinkListener( new HyperlinkListener() {
             public void hyperlinkUpdate( HyperlinkEvent e ) {
                 if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {

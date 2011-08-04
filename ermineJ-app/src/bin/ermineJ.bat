@@ -83,7 +83,7 @@ goto Win9xApp
 
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
-if "%ERMINEJ_OPTS%"=="" SET ERMINEJ_OPTS="-Xmx700m"
+if "%ERMINEJ_OPTS%"=="" SET ERMINEJ_OPTS="-Xmx1024m"
 SET ERMINEJ_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 SET ERMINEJ_CLASSPATH="%ERMINEJ_HOME%\lib\forehead.jar"
 SET ERMINEJ_MAIN_CLASS="com.werken.forehead.Forehead"

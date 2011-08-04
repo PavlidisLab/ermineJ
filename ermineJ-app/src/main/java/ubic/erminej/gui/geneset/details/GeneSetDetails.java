@@ -167,12 +167,29 @@ public class GeneSetDetails {
      * @param probeIDs
      * @return
      */
-    public String getTitle( String runName, GeneSetResult res ) {
+    public String getTitle() {
         String title = this.classID.getId() + " - " + StringUtils.abbreviate( this.classID.getName(), 50 ) + " ("
                 + this.probes.size() + " items ";
-        if ( runName != null ) title = title + runName + " ";
-        if ( res != null ) title = title + " p = " + String.format( "%.4g", res.getPvalue() );
-        title = title + ")";
+
+        if ( this.result != null ) {
+            title = title + " ; p = " + String.format( "%.2g", result.getPvalue() ) + " data from "
+                    + new File( this.settings.getRawDataFileName() ).getName();
+        }
+
+        title = title + ") ";
+
+        /* this gets kind of long, this information needs to be available somewhere */
+
+        if ( dataMatrix != null ) {
+            String rawDataSource = new File( settings.getRawDataFileName() ).getName();
+            title += "  Profiles: " + rawDataSource;
+        }
+
+        if ( probeScores != null ) {
+            String scoreSource = new File( settings.getScoreFile() ).getName();
+            title += "  Scores: " + scoreSource;
+        }
+
         return title;
     }
 

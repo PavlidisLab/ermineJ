@@ -27,8 +27,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -42,13 +40,9 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
-import org.apache.commons.lang.StringUtils;
-
 import ubic.basecode.util.FileTools;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.GeneScores;
-import ubic.erminej.data.Probe;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.MatrixPreviewer;
 import ubic.erminej.gui.util.WizardStep;
@@ -64,6 +58,7 @@ import ubic.erminej.gui.util.WizardStep;
 public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     private static final long serialVersionUID = -1L;
+
     // test method
     public static void main( String[] args ) throws Exception {
 
@@ -82,6 +77,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         GuiUtil.centerContainer( f );
         f.setVisible( true );
     }
+
     private AnalysisWizard wiz;
     private Settings settings;
     private JFileChooser chooser = new JFileChooser();
@@ -109,16 +105,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             return;
         }
 
-        String colText = dataColTextField.getText();
-        if ( StringUtils.isBlank( colText ) ) {
-            wiz.showError( "You must choose a valid column" );
-            return;
-        }
-
-        Integer startCol = Integer.valueOf( colText );
-
         try {
-            MatrixPreviewer.previewMatrix( wiz, rawFileTextField.getText(), startCol );
+            MatrixPreviewer.previewMatrix( wiz, rawFileTextField.getText(), -1 );
         } catch ( IOException e ) {
             GuiUtil.error( "Error previewing data: " + e.getMessage(), e );
         }
@@ -192,29 +180,27 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             return;
         }
 
-        if ( StringUtils.isBlank( scoreColTextField.getText() ) ) {
-            wiz.showError( "You must choose a valid column" );
-            return;
-        }
-
-        int column = Integer.valueOf( scoreColTextField.getText() ).intValue();
-        settings.setScoreCol( column );
-
-        GeneScores test;
         try {
-            test = new GeneScores( filename, settings, wiz.getStatusField(), wiz.getGeneAnnots(), 100 );
-        } catch ( IOException e1 ) {
-            wiz.showError( "The file could not be previewed: " + e1.getMessage() );
-            return;
+            MatrixPreviewer.previewMatrix( wiz, rawFileTextField.getText(), -1 );
+        } catch ( IOException e ) {
+            GuiUtil.error( "Error previewing data: " + e.getMessage(), e );
         }
 
-        List<Object[]> table = new ArrayList<Object[]>();
-
-        for ( Probe p : test.getProbeToScoreMap().keySet() ) {
-            table.add( new Object[] { p.getName(), test.getProbeToScoreMap().get( p ) } );
-        }
-
-        MatrixPreviewer.previewMatrix( wiz, table, new Object[] { "ID", "Score" } );
+        // GeneScores test;
+        // try {
+        // test = new GeneScores( filename, settings, wiz.getStatusField(), wiz.getGeneAnnots(), 100 );
+        // } catch ( IOException e1 ) {
+        // wiz.showError( "The file could not be previewed: " + e1.getMessage() );
+        // return;
+        // }
+        //
+        // List<Object[]> table = new ArrayList<Object[]>();
+        //
+        // for ( Probe p : test.getProbeToScoreMap().keySet() ) {
+        // table.add( new Object[] { p.getName(), test.getProbeToScoreMap().get( p ) } );
+        // }
+        //
+        // MatrixPreviewer.previewMatrix( wiz, table, new Object[] { "ID", "Score" } );
 
     }
 

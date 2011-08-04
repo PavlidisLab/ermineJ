@@ -658,6 +658,15 @@ public class GeneSetTreePanel extends GeneSetPanel {
         popup.show( e.getComponent(), e.getX(), e.getY() );
     }
 
+    /**
+     * Has no effect unless you call filter() afterwards
+     * 
+     * @param b
+     */
+    public void setHideInsignificant( boolean b ) {
+        hideInsignificant = b;
+    }
+
 }
 
 /**

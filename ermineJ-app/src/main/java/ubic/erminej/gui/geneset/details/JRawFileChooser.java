@@ -21,7 +21,6 @@ import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -140,7 +139,7 @@ public class JRawFileChooser extends JFileChooser {
 
                     try {
                         MatrixPreviewer.previewMatrix( null, file, skipColumns );
-                    } catch ( IOException e1 ) {
+                    } catch ( Exception e1 ) {
                         GuiUtil.error( "Error previewing data: " + e1.getMessage(), e1 );
                         return;
                     }
