@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -38,7 +37,6 @@ import javax.swing.border.EmptyBorder;
 
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.gui.StartupPanel;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.WizardStep;
 

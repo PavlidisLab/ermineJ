@@ -19,14 +19,17 @@
 package ubic.erminej.gui.analysis;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
+import java.io.File;
 import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
@@ -72,19 +75,21 @@ public class MultiFuncDiagWindow extends JFrame {
      */
     public MultiFuncDiagWindow( GeneAnnotations geneAnnots, GeneScores geneScores ) {
         super( "Multifunctionality analysis" );
-        
-        /*
-         * TODO: show title of annotation source; show title of gene scores; allow switch.
-         */
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab( "Sizes", getTermsPerGeneDistribution( geneAnnots ) );
-        tabs.addTab( "Multifun", getGenesPerGroupDistribution( geneAnnots ) );
+        tabs.addTab( "Set size dist.", getTermsPerGeneDistribution( geneAnnots ) );
+        tabs.addTab( "Gene multifunc. dist.", getGenesPerGroupDistribution( geneAnnots ) );
 
+        String annotFileName = new File( geneAnnots.getSettings().getAnnotFile() ).getName();
+        String scoreFileName = "  Scores: ";
         if ( geneScores != null ) {
-            tabs.addTab( "Bias", multifunctionalityBias( geneAnnots, geneScores ) );
-            tabs.addTab( "Correct", regressed( geneAnnots, geneScores ) );
+            tabs.addTab( "Score bias (Ranks)", multifunctionalityBias( geneAnnots, geneScores ) );
+            tabs.addTab( "Score bias (Raw)", regressed( geneAnnots, geneScores ) );
+            scoreFileName = scoreFileName + new File( geneAnnots.getSettings().getScoreFile() ).getName();
         }
+
+        this.setTitle( getTitle() + "  | Annotations: " + StringUtils.abbreviate( annotFileName, 50 )
+                + StringUtils.abbreviate( scoreFileName, 50 ) );
 
         this.add( tabs );
     }
@@ -102,7 +107,6 @@ public class MultiFuncDiagWindow extends JFrame {
 
         int i = 0;
         for ( Gene g : geneToScoreMap.keySet() ) {
-            // Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityScore( g );
             Double mf = ( double ) geneAnnots.getMultifunctionality().getNumGoTerms( g );
 
             Double s = geneToScoreMap.get( g );
@@ -110,13 +114,7 @@ public class MultiFuncDiagWindow extends JFrame {
             mfs.set( i, mf );
             i++;
         }
-
-        // DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
-        // scoreRanks.assign( Functions.div( scoreRanks.size() ) );
-
         LeastSquaresFit fit = new LeastSquaresFit( mfs, scores );
-
-        // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
         DoubleMatrix1D fittedValues = fit.getFitted().viewRow( 0 );
 
@@ -141,7 +139,8 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Multifunctionality", "Score", ds,
                 PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
-        c.setTitle( "Regression" );
+        c.setTitle( "How biased are the gene scores\n(raw; regression)" );
+        setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );
         plot.getRenderer().setSeriesPaint( 0, Color.GRAY );
@@ -153,6 +152,10 @@ public class MultiFuncDiagWindow extends JFrame {
         ChartPanel p = new ChartPanel( c );
         return p;
 
+    }
+
+    private void setChartTitleFont( JFreeChart c ) {
+        c.getTitle().setFont( c.getTitle().getFont().deriveFont( Font.PLAIN, 12 ) );
     }
 
     /**
@@ -208,7 +211,8 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality bias", "Multifunctionality rank",
                 "Score rank", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
-        c.setTitle( "How biased are the gene scores" );
+        c.setTitle( "How biased are the gene scores\n(Ranks, smoothed trend)" );
+        setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );
         plot.getRenderer().setSeriesPaint( 0, Color.GRAY );
@@ -239,10 +243,11 @@ public class MultiFuncDiagWindow extends JFrame {
         HistogramDataset series = new HistogramDataset();
         series.addSeries( "sizes", vec.elements(), 50, 2, 200 );
 
-        JFreeChart histogram = ChartFactory.createHistogram( "Gene multifuntionality", "Number of groups",
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene multifuntionality", "Number of sets gene has",
                 "Number of genes", series, PlotOrientation.VERTICAL, false, false, false );
 
-        histogram.setTitle( "How many genes have how many annotations" );
+        histogram.setTitle( "How many sets are genes in" );
+        setChartTitleFont( histogram );
 
         XYPlot plot = histogram.getXYPlot();
         plot.setRangeGridlinesVisible( false );
@@ -276,10 +281,11 @@ public class MultiFuncDiagWindow extends JFrame {
         HistogramDataset series = new HistogramDataset();
         series.addSeries( "sizes", vec.elements(), 50, 2, 200 );
 
-        JFreeChart histogram = ChartFactory.createHistogram( "Gene set sizes", "Number of genes", "Number of groups",
-                series, PlotOrientation.VERTICAL, false, false, false );
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene set sizes", "Number of genes in set",
+                "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
 
-        histogram.setTitle( "How big are the groups" );
+        histogram.setTitle( "How big are the sets" );
+        setChartTitleFont( histogram );
 
         XYPlot plot = histogram.getXYPlot();
         plot.setRangeGridlinesVisible( false );

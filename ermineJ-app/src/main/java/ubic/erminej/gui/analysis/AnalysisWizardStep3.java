@@ -18,7 +18,6 @@
  */
 package ubic.erminej.gui.analysis;
 
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.BorderFactory;

@@ -42,6 +42,7 @@ import ubic.basecode.dataStructure.graph.DirectedGraph;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 
 /**
  * Maintains gene annotations. Be clear on the distinction between a GeneSetTerm (just a term) and a GeneSet (the set of
@@ -607,6 +608,13 @@ public class GeneAnnotations {
      */
     public Set<Probe> getProbes() {
         return Collections.unmodifiableSet( new HashSet<Probe>( this.probes.values() ) );
+    }
+
+    /**
+     * @return
+     */
+    public SettingsHolder getSettings() {
+        return settings.getSettingsHolder();
     }
 
     /**
