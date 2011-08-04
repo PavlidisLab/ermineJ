@@ -78,7 +78,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
     public static final int GENE_COUNT_COLUMN_INDEX = 3;
     public static final int MULTIFUNC_COLUMN_INDEX = 4;
 
-    private int currentResultSetIndex = -1;
     protected GeneSetTableModel model = null;
     protected List<String> resultToolTips = new LinkedList<String>();
 
@@ -264,7 +263,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
         generateResultColumnHeadingTooltip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
 
-        currentResultSetIndex = results.size() - 1;
+        int currentResultSetIndex = results.size() - 1;
         this.callingFrame.setCurrentResultSetIndex( currentResultSetIndex );
         table.revalidate();
 
@@ -447,39 +446,16 @@ public class GeneSetTablePanel extends GeneSetPanel {
             int runIndex = model.getRunIndex( currentColumnIndex );
             assert runIndex >= 0;
 
-            /*
-             * TODO If possible, remove the annotations.
-             */
-            boolean canRemove = true;
-            GeneAnnotations runAnnots = results.get( runIndex ).getGeneData();
-            if ( results.size() > 1 ) {
-
-                for ( GeneSetPvalRun r : results ) {
-                    if ( r == results.get( runIndex ) ) continue;
-                    if ( r.getGeneData().equals( runAnnots ) ) {
-                        canRemove = false;
-                    }
-                }
-            }
-
-            if ( canRemove ) {
-                this.geneData.deleteSubClone( runAnnots );
-            }
-
             table.removeColumn( col );
             model.removeRunData( currentColumnIndex );
 
             model.fireTableStructureChanged();
             callingFrame.setCurrentResultSetIndex( runIndex );
-
-            results.remove( runIndex ); // This should be done by the parent.
             resultToolTips.remove( runIndex );
-            currentResultSetIndex = results.size() - 1;
 
             table.revalidate();
 
-            // bug 159! pretty sure this is working .. trying to get the table to resort by a remaining run, after
-            // removing a run.
+            // Resort by a remaining run, after removing a run.
             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
             int newSortIndex = 0;
             if ( results.size() > 0 ) {
@@ -487,6 +463,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
             }
             sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
             sorter.setSortKeys( sortKeys );
+
+            /*
+             * Now really try to remove the object.
+             */
+            callingFrame.removeRun( runIndex );
         }
     }
 
@@ -503,7 +484,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         if ( table.getValueAt( i, j ) != null && j >= GeneSetTableModel.INIT_COLUMNS ) {
             _runnum = model.getRunIndex( j );
             run = this.results.get( _runnum );
-            this.currentResultSetIndex = _runnum;
+            callingFrame.setCurrentResultSetIndex( _runnum );
         }
 
         messenger.showStatus( "Viewing details for " + term + "..." );
@@ -558,6 +539,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
      */
     private void resortByCurrentResults() {
         int sortColumn = 0;
+        int currentResultSetIndex = callingFrame.getCurrentResultSet();
         if ( currentResultSetIndex > 0 ) {
             sortColumn = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
 
@@ -568,6 +550,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
             sorter.setSortKeys( sortKeys );
         }
+    }
+
+    @Override
+    public void removeRun( GeneSetPvalRun runToRemove ) {
+        // Perhaps nothing, since it was done locally? could refactor from removeRun(int);
     }
 
 }

@@ -396,32 +396,56 @@ public class GeneAnnotations {
      * Remove a no-longer-needed subclone. This only removes the reference from this, if other objects maintain a
      * reference it will obviously not be freed.
      * 
-     * @param runAnnots
+     * @param a
      */
-    public void deleteSubClone( GeneAnnotations runAnnots ) {
-        this.subClones.remove( runAnnots );
+    public void deleteSubClone( GeneAnnotations a ) {
+        log.info( "Deleting annotations" );
+        boolean removed = this.subClones.remove( a );
+        if ( !removed ) {
+            log.warn( "Was not able to remove the annotations!" );
+        }
     }
 
+    /**
+     * @param classID
+     * @return
+     */
     public boolean deleteUserGeneSet( GeneSetTerm classID ) {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
         return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
     }
 
+    /**
+     * @param symbol
+     * @return
+     */
     public Gene findGene( String symbol ) {
         return this.genes.get( symbol );
     }
 
+    /**
+     * @param term
+     * @return
+     */
     public GeneSet findGeneSet( GeneSetTerm term ) {
         if ( term == null ) return null;
         return this.geneSets.get( term );
     }
 
+    /**
+     * @param name
+     * @return
+     */
     public GeneSet findGeneSet( String name ) {
         GeneSetTerm term = this.findTerm( name );
         if ( term == null ) return null;
         return findGeneSet( term );
     }
 
+    /**
+     * @param probe
+     * @return
+     */
     public Probe findProbe( String probe ) {
         return this.probes.get( probe );
     }

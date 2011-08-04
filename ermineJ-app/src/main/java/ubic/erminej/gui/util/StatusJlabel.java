@@ -26,6 +26,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.lang.StringUtils;
+
 import ubic.basecode.util.StatusDebugLogger;
 
 /**
@@ -34,6 +36,8 @@ import ubic.basecode.util.StatusDebugLogger;
  */
 public class StatusJlabel extends StatusDebugLogger {
 
+    private static final int MAX_LABEL_TEXT = 200;
+
     protected JLabel jlabel;
 
     private static Icon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
@@ -41,7 +45,7 @@ public class StatusJlabel extends StatusDebugLogger {
     /*
      * How long we display error messages for by default
      */
-    private static final int MESSAGE_DELAY = 1600; // milliseconds
+    private static final int MESSAGE_DELAY = 1300; // milliseconds
 
     public StatusJlabel( JLabel l ) {
         this.jlabel = l;
@@ -77,7 +81,7 @@ public class StatusJlabel extends StatusDebugLogger {
      */
     @Override
     public void showStatus( String s, boolean callSuper ) {
-        final String m = s;
+        final String m = StringUtils.abbreviate( s, MAX_LABEL_TEXT );
 
         if ( SwingUtilities.isEventDispatchThread() ) {
             setLabel( m, null );
@@ -104,7 +108,7 @@ public class StatusJlabel extends StatusDebugLogger {
     @Override
     public void showError( String s ) {
 
-        final String m = s;
+        final String m = StringUtils.abbreviate( s, MAX_LABEL_TEXT );
 
         if ( SwingUtilities.isEventDispatchThread() ) {
             setLabel( m, errorIcon );

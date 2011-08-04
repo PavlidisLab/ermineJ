@@ -36,18 +36,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import javax.swing.filechooser.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
@@ -72,6 +69,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
@@ -80,7 +78,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
-import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
@@ -96,7 +93,6 @@ import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSetTerms;
-import ubic.erminej.data.Probe;
 import ubic.erminej.gui.analysis.AnalysisWizard;
 import ubic.erminej.gui.analysis.MultiFuncDiagWindow;
 import ubic.erminej.gui.file.DataFileFilter;
@@ -156,10 +152,9 @@ public class MainFrame extends JFrame {
     private static final String MAINWINDOWPOSITIONY = "mainview.WindowYPosition";
 
     private GeneAnnotations geneData = null; // original.
-    private Map<String, GeneScores> geneScoreSets = new HashMap<String, GeneScores>();
 
-    private Map<String, DoubleMatrix<Probe, String>> rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
-    private List<GeneSetPvalRun> results = new LinkedList<GeneSetPvalRun>();
+    private List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
+
     private Settings settings;
 
     private int currentResultSet = -1;
@@ -313,8 +308,7 @@ public class MainFrame extends JFrame {
             return;
         }
 
-        this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, rawDataSets, geneScoreSets,
-                loadFile );
+        this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, loadFile );
         athread.run();
         log.debug( "Waiting" );
         addResult( athread.getLatestResults() );
@@ -355,9 +349,12 @@ public class MainFrame extends JFrame {
         statusMessenger.showError( message, e );
     }
 
+    /**
+     * @param runSettings
+     */
     public void startAnalysis( Settings runSettings ) {
         disableMenusForAnalysis();
-        this.athread = new AnalysisThread( runSettings, statusMessenger, geneData, rawDataSets, geneScoreSets );
+        this.athread = new AnalysisThread( runSettings, statusMessenger, geneData );
         log.debug( "Starting analysis thread" );
         try {
             athread.start();
@@ -1572,6 +1569,41 @@ public class MainFrame extends JFrame {
         } else {
             this.statusMessenger.showStatus( "Save cancelled." );
         }
+    }
+
+    /**
+     * Remove a run from the list of results that are currently loaded.
+     * 
+     * @param runIndex
+     */
+    public void removeRun( int runIndex ) {
+
+        /*
+         * If possible, remove the annotations.
+         */
+        boolean canRemoveAnnots = true;
+        GeneSetPvalRun runToRemove = results.get( runIndex );
+        GeneAnnotations runAnnots = runToRemove.getGeneData();
+        if ( results.size() > 1 ) {
+
+            for ( GeneSetPvalRun r : results ) {
+                if ( r == runToRemove ) continue;
+                if ( r.getGeneData().equals( runAnnots ) ) {
+                    // someone else is using it.
+                    canRemoveAnnots = false;
+                }
+            }
+        }
+
+        if ( canRemoveAnnots ) {
+            this.geneData.deleteSubClone( runAnnots );
+        }
+
+        results.remove( runIndex );
+        setCurrentResultSetIndex( results.size() - 1 );
+
+        this.treePanel.removeRun( runToRemove );
+        this.tablePanel.removeRun( runToRemove );
     }
 
 }

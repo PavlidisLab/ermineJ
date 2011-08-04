@@ -30,8 +30,6 @@ import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
 public class GeneSet {
     private GeneSetTerm term;
 
-    private boolean modified = false;
-
     private Set<Gene> genes = new HashSet<Gene>();
 
     /**
@@ -187,14 +185,6 @@ public class GeneSet {
         return isGenes;
     }
 
-    public boolean isModified() {
-        return modified;
-    }
-
-    // public boolean isSkipDueToRedundancy() {
-    // return skipDueToRedundancy;
-    // }
-
     public boolean isUserDefined() {
         return term.isUserDefined();
     }
@@ -214,17 +204,9 @@ public class GeneSet {
         this.isGenes = isGenes;
     }
 
-    public void setModified( boolean modified ) {
-        this.modified = modified;
-    }
-
     public void setRedundantGroups( Set<GeneSet> redundantGroups ) {
         this.redundantGroups = redundantGroups;
     }
-
-    // public void setSkipDueToRedundancy( boolean skipDueToRedundancy ) {
-    // this.skipDueToRedundancy = skipDueToRedundancy;
-    // }
 
     public void setSourceFile( String fileName ) {
         this.sourceFile = fileName;

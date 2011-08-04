@@ -543,7 +543,8 @@ public class GeneScores {
                 buf.append( probe + "," );
                 count++;
             }
-            messenger.showError( "Unmatched probes are (up to 10 shown): " + buf );
+            messenger.showError( "Unmatched probes are (up to 10 shown): "
+                    + StringUtils.abbreviate( buf.toString(), 100 ) );
         }
 
         if ( messenger != null && !unannotatedProbes.isEmpty() ) {

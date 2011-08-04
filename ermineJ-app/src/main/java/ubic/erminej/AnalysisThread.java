@@ -50,13 +50,10 @@ import ubic.erminej.data.Probe;
 public class AnalysisThread extends Thread {
 
     protected static final Log log = LogFactory.getLog( AnalysisThread.class );
-    private Map<String, GeneScores> geneScoreSets;
     private volatile GeneSetPvalRun latestResults;
     private String loadFile;
     private StatusViewer messenger;
     private GeneAnnotations geneAnnots;
-    private SettingsHolder oldSettings = null;
-    private Map<String, DoubleMatrix<Probe, String>> rawDataSets;
     private volatile Method runningMethod;
     private SettingsHolder settings;
 
@@ -72,12 +69,9 @@ public class AnalysisThread extends Thread {
      * @param rawDataSets
      * @param geneScoreSets
      */
-    public AnalysisThread( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
-            Map<String, DoubleMatrix<Probe, String>> rawDataSets, Map<String, GeneScores> geneScoreSets ) {
+    public AnalysisThread( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots ) {
         this.settings = settings;
         this.messenger = messenger;
-        this.rawDataSets = rawDataSets;
-        this.geneScoreSets = geneScoreSets;
         this.geneAnnots = geneAnnots;
 
         try {
@@ -102,12 +96,10 @@ public class AnalysisThread extends Thread {
      * @param loadFile
      */
     public AnalysisThread( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
-            Map<String, DoubleMatrix<Probe, String>> rawDataSets, Map<String, GeneScores> geneScoreSets, String loadFile ) {
+            String loadFile ) {
         this.settings = settings;
         this.messenger = messenger;
         this.loadFile = loadFile;
-        this.rawDataSets = rawDataSets;
-        this.geneScoreSets = geneScoreSets;
         this.geneAnnots = geneAnnots;
 
         if ( StringUtils.isBlank( loadFile ) ) {
@@ -234,20 +226,9 @@ public class AnalysisThread extends Thread {
         if ( StringUtils.isBlank( settings.getScoreFile() ) ) {
             return null;
         }
-
-        GeneScores geneScores = null;
-        if ( !geneScoreSettingsDirty() && geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-            if ( messenger != null ) messenger.showStatus( "Gene Scores are in memory" );
-            geneScores = geneScoreSets.get( settings.getScoreFile() );
-        } else {
-            if ( messenger != null )
-                messenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
-            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneAnnots );
-            geneScoreSets.put( settings.getScoreFile(), geneScores );
-        }
-        if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
-            if ( messenger != null ) messenger.showStatus( "Didn't get geneScores" );
-        }
+        messenger.showStatus( "Reading gene scores from file " + StringUtils.abbreviate( settings.getScoreFile(), 50 ) );
+        GeneScores geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneAnnots );
+        messenger.clear();
         return geneScores;
     }
 
@@ -256,44 +237,10 @@ public class AnalysisThread extends Thread {
      * @throws IOException
      */
     private synchronized DoubleMatrix<Probe, String> addRawData() throws IOException {
-        DoubleMatrix<Probe, String> rawData;
-        if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
-            if ( messenger != null ) messenger.showStatus( "Raw data are in memory" );
-            rawData = rawDataSets.get( settings.getRawDataFileName() );
-        } else {
-            if ( messenger != null )
-                messenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
-            rawData = readDataMatrixForAnalysis();
-
-            rawDataSets.put( settings.getRawDataFileName(), rawData );
-        }
-        return rawData;
-    }
-
-    private DoubleMatrix<Probe, String> readDataMatrixForAnalysis() throws IOException {
-        DoubleMatrix<Probe, String> rawData;
-        DoubleMatrixReader r = new DoubleMatrixReader();
-
-        Collection<String> usableRowNames = new HashSet<String>();
-        for ( Probe p : geneAnnots.getProbes() ) {
-            usableRowNames.add( p.getName() );
-        }
-
-        DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName(), usableRowNames, settings
-                .getDataCol() );
-
-        if ( omatrix.rows() == 0 ) {
-            throw new IllegalArgumentException( "No rows were read from the file for the probes in the annotations." );
-        }
-
-        rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
-        rawData.setColumnNames( omatrix.getColNames() );
-        for ( int i = 0; i < omatrix.rows(); i++ ) {
-            String n = omatrix.getRowName( i );
-            Probe p = geneAnnots.findProbe( n );
-            assert p != null;
-            rawData.setRowName( p, i );
-        }
+        messenger.showStatus( "Reading raw data from file "
+                + StringUtils.abbreviate( settings.getRawDataFileName(), 50 ) );
+        DoubleMatrix<Probe, String> rawData = readDataMatrixForAnalysis();
+        messenger.clear();
         return rawData;
     }
 
@@ -332,18 +279,42 @@ public class AnalysisThread extends Thread {
                 messenger.showStatus( String.format( "%d seconds elapsed", Math.round( timer.getTime() / 1000 ) ) );
 
             if ( this.stop.get() ) return null;
-            // settings.writePrefs();
-            oldSettings = settings;
+
             return newResults;
         } catch ( Exception e ) {
             throw e;
         }
     }
 
-    // see if we have to read the gene scores or if we can just use the old ones
-    private synchronized boolean geneScoreSettingsDirty() {
-        if ( oldSettings == null ) return true;
-        return settings.getDoLog() != oldSettings.getDoLog() || settings.getScoreCol() != oldSettings.getScoreCol();
+    /**
+     * @return
+     * @throws IOException
+     */
+    private DoubleMatrix<Probe, String> readDataMatrixForAnalysis() throws IOException {
+        DoubleMatrix<Probe, String> rawData;
+        DoubleMatrixReader r = new DoubleMatrixReader();
+
+        Collection<String> usableRowNames = new HashSet<String>();
+        for ( Probe p : geneAnnots.getProbes() ) {
+            usableRowNames.add( p.getName() );
+        }
+
+        DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName(), usableRowNames, settings
+                .getDataCol() );
+
+        if ( omatrix.rows() == 0 ) {
+            throw new IllegalArgumentException( "No rows were read from the file for the probes in the annotations." );
+        }
+
+        rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
+        rawData.setColumnNames( omatrix.getColNames() );
+        for ( int i = 0; i < omatrix.rows(); i++ ) {
+            String n = omatrix.getRowName( i );
+            Probe p = geneAnnots.findProbe( n );
+            assert p != null;
+            rawData.setRowName( p, i );
+        }
+        return rawData;
     }
 
     /**

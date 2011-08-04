@@ -155,14 +155,6 @@ public class TestGeneAnnotations extends TestCase {
                 .getDefinition() );
     }
 
-    public void testMeanGenesPerSet() throws Exception {
-        assertEquals( 4.451, GeneSetMapTools.meanGeneSetSize( ga, false ), 0.01 ); // not hand checked
-    }
-
-    public void testMeanSetsPerGenes() throws Exception {
-        assertEquals( 49.34, GeneSetMapTools.meanSetsPerProbe( ga, false ), 0.01 );// not hand checked
-    }
-
     public final void testReadAffyCsv() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( is, null, settings );

@@ -344,6 +344,12 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     @Override
+    public void removeRun( GeneSetPvalRun runToRemove ) {
+        ( ( FilteredGeneSetTreeModel ) this.goTree.getModel() ).removeResults();
+        ( ( GeneSetTreeNodeRenderer ) this.goTree.getCellRenderer() ).clearRun();
+    }
+
+    @Override
     public void resetView() {
         // anyting else we need to do?
         // filter( new HashSet<GeneSetTerm>() );
@@ -798,6 +804,12 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         this.setOpenIcon( regularIcon );
         this.setLeafIcon( regularIcon );
         this.setClosedIcon( regularIcon );
+    }
+
+    public void clearRun() {
+        this.currentResultSet = null;
+        this.validate();
+        this.repaint();
     }
 
     /**

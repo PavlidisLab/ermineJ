@@ -112,6 +112,13 @@ public abstract class GeneSetPanel extends JScrollPane {
     public abstract void addRun();
 
     /**
+     * Do any extra cleanup after a run has been deleted.
+     * 
+     * @param runToRemove
+     */
+    public abstract void removeRun( GeneSetPvalRun runToRemove );
+
+    /**
      * @param e
      */
     public void findInTree( ActionEvent e ) {

@@ -18,9 +18,6 @@
  */
 package ubic.erminej.data;
 
-import hep.aida.IHistogram1D;
-import hep.aida.ref.Histogram1D;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,7 +33,9 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.StatusViewer;
 
 /**
- * Methods to 'clean' a set of geneSets - to remove redundancies, for example.
+ * Utility methods
+ * <p>
+ * Note that in ErmineJ 3 these are no longer used.
  * 
  * @author Paul Pavlidis
  * @version $Id$
@@ -44,26 +43,6 @@ import ubic.basecode.util.StatusViewer;
 public class GeneSetMapTools {
 
     protected static final Log log = LogFactory.getLog( GeneSetMapTools.class );
-
-    /**
-     * @param ga
-     * @param numBins
-     * @param minSize
-     * @param maxSize
-     * @return
-     */
-    public static IHistogram1D geneSetSizeDistribution( GeneAnnotations ga, int numBins, int minSize, int maxSize ) {
-        Histogram1D hist = new Histogram1D( "Distribution of gene set sizes", numBins, minSize, maxSize );
-
-        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
-        for ( Iterator<GeneSetTerm> iter = geneSets.iterator(); iter.hasNext(); ) {
-            GeneSetTerm geneSet = iter.next();
-
-            Collection<Gene> element = ga.getGeneSetGenes( geneSet );
-            hist.fill( element.size() );
-        }
-        return hist;
-    }
 
     /**
      * @param classId
@@ -183,61 +162,6 @@ public class GeneSetMapTools {
 
     /**
      * @param ga
-     * @param countEmpty if false, gene sets that have no members are not counted in the total.
-     * @return The average size of the gene sets.
-     */
-    public static double meanGeneSetSize( GeneAnnotations ga, boolean countEmpty ) {
-        double sum = 0.0;
-        int n = 0;
-
-        Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();
-
-        for ( GeneSetTerm geneSet : geneSets ) {
-
-            Collection<Gene> element = ga.getGeneSetGenes( geneSet );
-
-            if ( !countEmpty && element.size() == 0 ) {
-                continue;
-            }
-
-            sum += element.size();
-            n++;
-        }
-
-        return sum / n;
-
-    }
-
-    /* ignoreSimilar */
-
-    /**
-     * @param sum
-     * @param ga
-     * @param countEmpty if false ,genes that have no gene sets assigned to them are not counted in the total.
-     * @return The average number of gene sets per gene (per probe actually). This is a measure of gene set overlap. If
-     *         the value is 1, it means that each gene is (on average) in only one set. Large values indicate larger
-     *         amounts of overelap between gene sets.
-     */
-    public static double meanSetsPerProbe( GeneAnnotations ga, boolean countEmpty ) {
-        double sum = 0.0;
-        int n = 0;
-
-        for ( Probe probe : ga.getProbes() ) {
-
-            Collection<GeneSetTerm> element = probe.getGeneSets();
-
-            if ( !countEmpty && element.size() == 0 ) {
-                continue;
-            }
-
-            sum += element.size();
-            n++;
-        }
-        return sum / n;
-    }
-
-    /**
-     * @param ga
      * @param gon
      * @param messenger
      * @param aspect
@@ -245,7 +169,7 @@ public class GeneSetMapTools {
     public static void removeAspect( GeneAnnotations ga, GeneSetTerms gon, StatusViewer messenger, String aspect ) {
         if ( !( aspect.equals( "molecular_function" ) || aspect.equals( "biological_process" )
                 || aspect.equals( "cellular_component" ) || aspect.equals( GeneSetTerms.USER_DEFINED ) ) ) {
-            throw new IllegalArgumentException( "Unknown aspect requested" );  
+            throw new IllegalArgumentException( "Unknown aspect requested" );
         }
 
         Collection<GeneSetTerm> geneSets = ga.getNonEmptyGeneSets();

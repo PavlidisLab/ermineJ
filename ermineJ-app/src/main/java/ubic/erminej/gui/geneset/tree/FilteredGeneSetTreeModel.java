@@ -163,4 +163,8 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
         this.results = results;
     }
 
+    public void removeResults() {
+        this.results = null;
+    }
+
 }

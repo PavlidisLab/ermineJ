@@ -239,7 +239,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     }
 
     public void removeRunData( int runIndex ) {
-        columnIdentifiers.remove( runIndex ); // CHECK
+        columnIdentifiers.remove( runIndex );
         log.debug( "number of cols: " + columnIdentifiers.size() );
     }
 
