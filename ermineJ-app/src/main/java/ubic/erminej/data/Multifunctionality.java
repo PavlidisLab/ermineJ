@@ -310,7 +310,7 @@ public class Multifunctionality {
 
             assert auc >= 0.0 && auc <= 1.0 : "AUC was " + auc;
 
-            assert auc > 0 : "AUC was zero for " + goset;
+            // assert auc > 0 : "AUC was " + auc + " for " + goset; // this can happen in toy tests.
 
             goTermMultifunctionality.put( goset, auc );
         }
