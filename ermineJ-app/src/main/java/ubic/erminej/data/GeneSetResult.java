@@ -30,17 +30,17 @@ import java.text.DecimalFormat;
  */
 public class GeneSetResult implements Comparable<GeneSetResult> {
 
-    GeneSetTerm geneSetTerm;
+    GeneSetTerm geneSetTerm = null;
 
     String runName = "";
     private double pvalue = 1.0;
     private double score = 0.0;
     private int numGenes = 0;
-    private double correctedPvalue = 0.0;
+    private double correctedPvalue = 1.0;
     private double multifunctionality = 0.5;
-    private int rank;
+    private int rank = Integer.MAX_VALUE;
 
-    private int numProbes;
+    private int numProbes = 0;
 
     public GeneSetResult() {
         this( null, 0, 0, 0.0, 1.0, 1.0 );
@@ -76,10 +76,86 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     }
 
     /**
-     * @param auc
+     * Default comparator for this class: sorts by the pvalue.
+     * 
+     * @param ob Object
+     * @return int
      */
-    public void setMultifunctionality( double auc ) {
-        this.multifunctionality = auc;
+    public int compareTo( GeneSetResult other ) {
+
+        if ( other == null ) return -1;
+
+        if ( other instanceof EmptyGeneSetResult ) return -1;
+
+        if ( this.equals( other ) ) return 0;
+
+        if ( this.pvalue > other.pvalue ) {
+            return 1;
+        } else if ( this.pvalue < other.pvalue ) {
+            return -1;
+        } else {
+            // break ties alphabetically.
+            return this.geneSetTerm.compareTo( other.geneSetTerm );
+        }
+    }
+
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) return true;
+        if ( obj == null ) return false;
+        if ( getClass() != obj.getClass() ) return false;
+        GeneSetResult other = ( GeneSetResult ) obj;
+        if ( geneSetTerm == null ) {
+            if ( other.geneSetTerm != null ) return false;
+        } else if ( !geneSetTerm.equals( other.geneSetTerm ) ) return false;
+        return true;
+    }
+
+    public double getCorrectedPvalue() {
+        return correctedPvalue;
+    }
+
+    public GeneSetTerm getGeneSetId() {
+        return this.geneSetTerm;
+    }
+
+    /**
+     * @return
+     */
+    public int getNumGenes() {
+        return numGenes;
+    }
+
+    /**
+     * @return int
+     */
+    public int getNumProbes() {
+        return numProbes;
+    }
+
+    public double getPvalue() {
+        return pvalue;
+    }
+
+    /**
+     * Low numbers are better ranks.
+     * 
+     * @return
+     */
+    public int getRank() {
+        return rank;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( geneSetTerm == null ) ? 0 : geneSetTerm.hashCode() );
+        return result;
     }
 
     public void print( Writer out ) throws IOException {
@@ -118,80 +194,37 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
                 + "\n" );
     }
 
-    public void setSizes( int size, int effsize ) {
-        this.numProbes = size;
-        this.numGenes = effsize;
+    public void setCorrectedPvalue( double a ) {
+        correctedPvalue = a;
     }
 
-    public void setScore( double ascore ) {
-        score = ascore;
+    /**
+     * @param auc
+     */
+    public void setMultifunctionality( double auc ) {
+        this.multifunctionality = auc;
     }
 
     public void setPValue( double apvalue ) {
         pvalue = apvalue;
     }
 
-    public void setCorrectedPvalue( double a ) {
-        correctedPvalue = a;
-    }
-
-    public GeneSetTerm getGeneSetId() {
-        return this.geneSetTerm;
-    }
-
-    public double getPvalue() {
-        return pvalue;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
     /**
-     * FIXME this is just the number of genes.
+     * Where 1 is the best.
      * 
-     * @return
+     * @param n
      */
-    public int getNumGenes() {
-        return numGenes;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
     public void setRank( int n ) {
         rank = n;
     }
 
-    public double getCorrectedPvalue() {
-        return correctedPvalue;
+    public void setScore( double ascore ) {
+        score = ascore;
     }
 
-    /**
-     * @return int
-     */
-    public int getNumProbes() {
-        return numProbes;
-    }
-
-    /**
-     * Default comparator for this class: sorts by the pvalue.
-     * 
-     * @param ob Object
-     * @return int
-     */
-    public int compareTo( GeneSetResult other ) {
-
-        if ( other == null ) return 1;
-
-        if ( this.pvalue > other.pvalue ) {
-            return 1;
-        } else if ( this.pvalue < other.pvalue ) {
-            return -1;
-        } else {
-            return 0;
-        }
+    public void setSizes( int size, int effsize ) {
+        this.numProbes = size;
+        this.numGenes = effsize;
     }
 
 }

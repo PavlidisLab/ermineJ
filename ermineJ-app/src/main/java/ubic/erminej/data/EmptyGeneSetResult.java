@@ -15,7 +15,7 @@
 package ubic.erminej.data;
 
 /**
- * Placeholder.
+ * Placeholder for sets that were not used.
  * 
  * @author paul
  * @version $Id$
@@ -24,6 +24,11 @@ public class EmptyGeneSetResult extends GeneSetResult {
 
     public EmptyGeneSetResult( GeneSetTerm id ) {
         this.geneSetTerm = id;
+    }
+
+    @Override
+    public int compareTo( GeneSetResult other ) {
+        return 1;
     }
 
     @Override

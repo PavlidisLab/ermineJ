@@ -20,6 +20,7 @@ import java.awt.Font;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 
 /**
@@ -46,8 +47,9 @@ public class Plotting {
 
         XYBarRenderer renderer = ( XYBarRenderer ) plot.getRenderer();
         renderer.setBasePaint( Color.white );
-        renderer.setSeriesPaint( 0, Color.DARK_GRAY );
+        renderer.setSeriesPaint( 0, Color.decode( "#AAAAAA" ) );
 
+        renderer.setBarPainter( new StandardXYBarPainter() );
         renderer.setDrawBarOutline( false );
         renderer.setShadowVisible( false );
 

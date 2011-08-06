@@ -101,7 +101,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         assert seenGenes.size() == geneSetGenes.size();
-
+        assert geneSuccesses >= 0;
         /*
          * 
          * Multifuncationality correction: Determine which of those gene above threshold is the most multifunctional
@@ -110,9 +110,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( useMultifunctionalityCorrection ) {
             geneSuccesses = multiFunctionalityCorrect( geneSuccesses );
         }
+        assert geneSuccesses >= 0;
 
         int successes = geneSuccesses;
-        assert successes >= 0;
 
         int numGenes = geneScores.getGeneToScoreMap().size();
 
@@ -133,7 +133,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
 
         this.numGenesUsed = geneToGeneScoreMap.size();
-        
+
         int count = 0;
 
         for ( GeneSetTerm geneSetName : geneAnnots.getGeneSetTerms() ) {
@@ -244,28 +244,34 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * @param geneSuccesses
-     * @return
+     * @return adjusted value
      */
     private int multiFunctionalityCorrect( int geneSuccesses ) {
+
+        int amountOfCorrection = 2; // TEMPORARY!
+
+        // not quite sure what to do here ...
+        if ( geneSuccesses <= amountOfCorrection ) return geneSuccesses;
+
+        int adjustedSuccesses = geneSuccesses;
         Collection<Gene> filteredGenes = new HashSet<Gene>();
         filteredGenes.addAll( genesAboveThreshold );
 
-        int amountOfCorrection = 2; // TEMPORARY!
         for ( int i = 0; i < amountOfCorrection; i++ ) {
-            // shortcut/kludge to get multiple mf hits -- should just work with the ranked one - a bit slow.
+            // shortcut/kludge to get multiple mf hits -- should just work with the ranked one - this is a bit slow.
             Gene mostMultifunctional = geneAnnots.getMultifunctionality().getMostMultifunctional( filteredGenes );
             filteredGenes.remove( mostMultifunctional );
 
             // Remove just one.
             if ( genesAboveThreshold.contains( mostMultifunctional ) ) {
-                geneSuccesses--;
+                adjustedSuccesses--;
             }
 
-            if ( geneSuccesses == 0 ) {
+            if ( adjustedSuccesses == 0 ) {
                 break;
             }
         }
-        return geneSuccesses;
+        return adjustedSuccesses;
     }
 
     /**

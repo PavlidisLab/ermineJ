@@ -68,6 +68,15 @@ public class MultipleTestCorrector extends AbstractLongTask {
     List<GeneSetTerm> toUseForMTC;
     Map<GeneSetTerm, Collection<GeneSetTerm>> usedToSkipped = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
 
+    /**
+     * @param set
+     * @param sc
+     * @param h
+     * @param geneData
+     * @param geneScores - only used for Westfall-Young
+     * @param results
+     * @param messenger
+     */
     public MultipleTestCorrector( SettingsHolder set, List<GeneSetTerm> sc, Histogram h, GeneAnnotations geneData,
             GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results, StatusViewer messenger ) {
         this.settings = set;

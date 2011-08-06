@@ -79,16 +79,16 @@ public class MultiFuncDiagWindow extends JFrame {
         this.setIconImage( new ImageIcon( this.getClass().getResource(
                 MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
 
-        JTabbedPane tabs = new JTabbedPane();
+        JTabbedPane tabs = new JTabbedPane( JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT );
         tabs.addTab( "Sets per gene", getTermsPerGeneDistribution( geneAnnots ) );
-        tabs.addTab( "Set multifunc. dist.", getGroupMultifunctionalityDistribution( geneAnnots ) );
-        tabs.addTab( "Gene multifunc. dist.", getGenesPerGroupDistribution( geneAnnots ) );
+        tabs.addTab( "Set multifunc.", getGroupMultifunctionalityDistribution( geneAnnots ) );
+        tabs.addTab( "Gene multifunc.", getGenesPerGroupDistribution( geneAnnots ) );
 
         String annotFileName = new File( geneAnnots.getSettings().getAnnotFile() ).getName();
         String scoreFileName = "  Scores: ";
         if ( geneScores != null ) {
-            tabs.addTab( "Score bias (Ranks)", multifunctionalityBias( geneAnnots, geneScores ) );
-            tabs.addTab( "Score bias (Raw)", regressed( geneAnnots, geneScores ) );
+            tabs.addTab( "Score bias I", multifunctionalityBias( geneAnnots, geneScores ) );
+            tabs.addTab( "Score bias II", regressed( geneAnnots, geneScores ) );
             scoreFileName = scoreFileName + new File( geneAnnots.getSettings().getScoreFile() ).getName();
         }
 
@@ -140,8 +140,8 @@ public class MultiFuncDiagWindow extends JFrame {
         ds.addSeries( "Raw", rawSeries );
         ds.addSeries( "Fit", fittedSeries );
 
-        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Multifunctionality", "Score", ds,
-                PlotOrientation.VERTICAL, false, false, false );
+        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality",
+                "Gene score", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
         c.setTitle( "How biased are the gene scores\n(raw; regression)" );
         Plotting.setChartTitleFont( c );
@@ -195,21 +195,26 @@ public class MultiFuncDiagWindow extends JFrame {
         DefaultXYDataset ds = new DefaultXYDataset();
         ds.addSeries( "Raw", ser.toArray() );
 
-        DoubleMatrix1D movingAverage = Smooth.movingAverage( new DenseDoubleMatrix1D( ser.toArray()[1] ), scoreRanks
-                .size() / 10 );
+        int windowSize = scoreRanks.size() / 10;
+        DoubleMatrix1D movingAverage = Smooth.movingAverage( new DenseDoubleMatrix1D( ser.toArray()[1] ), windowSize );
 
         XYSeries smoothed = new XYSeries( ser.getKey() + " - Smoothed" );
 
         for ( int i = 0; i < array[1].length; i++ ) {
             array[1][i] = scoreRanks.getQuick( i ) / array[1].length; // relative ranks.
             ser.add( array[0][i], array[1][i] );
-            smoothed.add( array[0][i], movingAverage.get( i ) );
+
+            if ( i < windowSize / 2 ) {
+                smoothed.add( array[0][i], Double.NaN ); // skip messy start
+            } else {
+                smoothed.add( array[0][i], movingAverage.get( i ) );
+            }
         }
 
         ds.addSeries( "Smoothed", smoothed.toArray() );
 
-        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality bias", "Multifunctionality rank",
-                "Score rank", ds, PlotOrientation.VERTICAL, false, false, false );
+        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality bias", "Gene multifunctionality rank",
+                "Gene score rank", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
         c.setTitle( "How biased are the gene scores\n(Ranks, smoothed trend)" );
         Plotting.setChartTitleFont( c );
@@ -241,12 +246,13 @@ public class MultiFuncDiagWindow extends JFrame {
         }
 
         HistogramDataset series = new HistogramDataset();
-        series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), 50, 2, 200 );
+        int numBins = 39;
+        series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), numBins, 2, 200 );
 
-        JFreeChart histogram = ChartFactory.createHistogram( "Gene multifuntionality", "Number of sets gene has",
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene multifuntionality", "Number of sets gene is in",
                 "Number of genes", series, PlotOrientation.VERTICAL, false, false, false );
 
-        return Plotting.plotHistogram( "How many sets are genes in", histogram );
+        return Plotting.plotHistogram( "How many sets each gene is in", histogram );
     }
 
     /**
@@ -265,7 +271,8 @@ public class MultiFuncDiagWindow extends JFrame {
         }
 
         HistogramDataset series = new HistogramDataset();
-        series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), 50, 2, 200 );
+        int numBins = 39;
+        series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), numBins, 2, 200 );
 
         JFreeChart histogram = ChartFactory.createHistogram( "Gene set sizes", "Number of genes in set",
                 "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
@@ -292,10 +299,12 @@ public class MultiFuncDiagWindow extends JFrame {
         }
 
         HistogramDataset series = new HistogramDataset();
-        series.addSeries( "ROCs", MatrixUtil.fromList( vec ).toArray(), 50, 0.0, 1.0 );
+        int numBins = 39;
+        series.addSeries( "ROCs", MatrixUtil.fromList( vec ).toArray(), numBins, 0.0, 1.0 );
 
-        JFreeChart histogram = ChartFactory.createHistogram( "Gene set multifunctionalities", "Area under ROC curve",
-                "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene set multifunctionalities",
+                "Bias towards multifunctional genes\n(Area under ROC curve)", "Number of sets", series,
+                PlotOrientation.VERTICAL, false, false, false );
 
         String title = "How multifunctional are the sets?";
         return Plotting.plotHistogram( title, histogram );

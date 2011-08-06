@@ -549,7 +549,7 @@ public class GeneScores {
                     + " ("
                     + String.format( "%.2f", 100.00 * probeToScoreMap.size()
                             / ( probeToScoreMap.size() + unknownProbes.size() ) )
-                    + ") of the scores were usable (others may not have genes in the annotations?)" );
+                    + "%) of the scores were usable (others may not have genes in the annotations?)" );
         }
 
         if ( !unannotatedProbes.isEmpty() ) {

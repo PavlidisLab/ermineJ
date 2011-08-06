@@ -468,7 +468,7 @@ public class MainFrame extends JFrame {
      * 
      */
     private void checkForReasonableResults( GeneSetPvalRun results1 ) {
-        if ( !athread.isFinishedNormally() ) return;
+        if ( athread == null || !athread.isFinishedNormally() ) return;
         int numZeroPvalues = 0;
         if ( results1 == null || results1.getResults() == null ) {
             GuiUtil.error( "There was an error during analysis - there were no valid results. Please check the logs." );
@@ -577,7 +577,9 @@ public class MainFrame extends JFrame {
             @Override
             protected Object doInBackground() throws Exception {
                 try {
-                    setupStatusBar();
+
+                    tablePanel.setMessenger( statusMessenger );
+                    treePanel.setMessenger( statusMessenger );
                     initializeAllData();
 
                     /*
@@ -637,13 +639,14 @@ public class MainFrame extends JFrame {
         this.getContentPane().setPreferredSize( new Dimension( 1000, 600 ) );
 
         setupMenus();
+        setupStatusBar();
 
         disableMenusForLoad();
 
         final JPanel cards = new JPanel( new CardLayout() );
         this.getContentPane().add( cards, BorderLayout.CENTER );
 
-        final StartupPanel startupPanel = new StartupPanel( settings );
+        final StartupPanel startupPanel = new StartupPanel( settings, this.statusMessenger );
         cards.add( startupPanel, START_CARD );
 
         JPanel progressPanel = setupProgressPanel();
@@ -1047,10 +1050,6 @@ public class MainFrame extends JFrame {
     protected void switchAnnotations() {
 
         /*
-         * If there are already analyses, we should prompt them to save.
-         */
-
-        /*
          * User selects annotation file
          */
         JFileChooser annotFileChooser = new JFileChooser( settings.getDataDirectory() );
@@ -1061,23 +1060,50 @@ public class MainFrame extends JFrame {
 
             File selectedFile = annotFileChooser.getSelectedFile();
 
-            if ( selectedFile.getAbsolutePath().equals( settings.getAnnotFile() ) ) {
+            boolean newIsSameAsOld = selectedFile.getAbsolutePath().equals( settings.getAnnotFile() );
+            if ( newIsSameAsOld ) {
                 /*
                  * Alert the user -- they can reload if they want, or bail.
                  */
-                int response = JOptionPane.showConfirmDialog( null, "File already loaded", "The selected annotations"
-                        + " are already loaded. Force reload?", JOptionPane.OK_CANCEL_OPTION,
+                int response = JOptionPane.showConfirmDialog( null, "The selected annotations"
+                        + " are already loaded. Force reload?", "File already loaded", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE );
                 if ( response == JOptionPane.CANCEL_OPTION ) return;
             }
 
+            /*
+             * FIXME If there are already analyses, we should prompt them to save, as it will mess them up? Need to test
+             * behaviour.
+             */
+            if ( !this.results.isEmpty() ) {
+                // int response = JOptionPane
+                // .showConfirmDialog(
+                // null,
+                // "Your current results will be discarded when"
+                // +
+                // "the anotations load.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
+                // "Unsaved results will be lost",
+                //
+                // JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+                // if ( response == JOptionPane.CANCEL_OPTION ) return;
+            }
+
             this.settings.setAnnotFile( selectedFile.getAbsolutePath() );
+
+            /*
+             * The settings for the geneScores and rawData should be blanked, if the annotation file is different.
+             */
+            if ( !newIsSameAsOld ) {
+                settings.setScoreFile( null );
+                settings.setRawFile( null );
+            }
 
             SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
 
                 @Override
                 protected Object doInBackground() throws Exception {
                     initializeAllData();
+
                     return null;
                 }
             };
@@ -1087,9 +1113,17 @@ public class MainFrame extends JFrame {
 
     protected void loadProject() {
 
-        /*
-         * FIXME If there are already analyses, we should prompt them to save.
-         */
+        if ( !this.results.isEmpty() ) {
+            int response = JOptionPane
+                    .showConfirmDialog(
+                            null,
+                            "Your current results will be discarded when"
+                                    + "the project loads.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
+                            "Unsaved results will be lost",
+
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+            if ( response == JOptionPane.CANCEL_OPTION ) return;
+        }
 
         /*
          * User selects project file
@@ -1116,8 +1150,7 @@ public class MainFrame extends JFrame {
                  */
 
                 /*
-                 * Rebuilt the application data structures, pretty much from scratch. Really the results import thing
-                 * should do that normally.
+                 * Rebuilt the application data structures, pretty much from scratch
                  */
                 SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
 
@@ -1189,7 +1222,7 @@ public class MainFrame extends JFrame {
             try {
 
                 ResultsPrinter.write( path, this.settings, this.results );
-
+                this.statusMessenger.showStatus( "Saved to " + selectedFile.getAbsolutePath() );
             } catch ( IOException e ) {
                 GuiUtil.error( "Could not save the project: " + e.getMessage() );
                 log.error( e, e );
@@ -1309,8 +1342,6 @@ public class MainFrame extends JFrame {
         this.statusMessenger = new StatusJlabel( jLabelStatus );
         this.getContentPane().add( statusBarPanel, BorderLayout.SOUTH );
 
-        tablePanel.setMessenger( this.statusMessenger );
-        treePanel.setMessenger( this.statusMessenger );
     }
 
     private void updateProgress( int val ) {

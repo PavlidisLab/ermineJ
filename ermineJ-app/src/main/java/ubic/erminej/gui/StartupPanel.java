@@ -21,36 +21,42 @@ package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.util.BrowserLauncher;
+import ubic.basecode.util.StatusStderr;
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.gui.file.DataFileFilter;
@@ -65,8 +71,11 @@ import ubic.erminej.gui.util.GuiUtil;
  */
 public class StartupPanel extends JPanel {
 
+    private static final String GO_ARCHIVE_DIR = "http://archive.geneontology.org/latest-termdb";
+
     private static final String INSTRUCTIONS = "<html>For annotation files, visit "
-            + "<a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots</a></html>";
+            + "<a href=\"http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
+            + " <a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots/</a></html>.";
 
     private static Log log = LogFactory.getLog( StartupPanel.class );
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
@@ -80,7 +89,7 @@ public class StartupPanel extends JPanel {
         }
         JFrame f = new JFrame();
         f.setSize( new Dimension( 400, 600 ) );
-        StartupPanel p = new StartupPanel( new Settings() );
+        StartupPanel p = new StartupPanel( new Settings(), null );
         f.add( p );
         f.pack();
         GuiUtil.centerContainer( f );
@@ -100,8 +109,11 @@ public class StartupPanel extends JPanel {
 
     private Settings settings;
 
-    public StartupPanel( Settings settings ) {
+    private StatusViewer statusMessenger = new StatusStderr();
+
+    public StartupPanel( Settings settings, StatusViewer statusMessenger ) {
         this.settings = settings;
+        if ( statusMessenger != null ) this.statusMessenger = statusMessenger;
         jbInit();
         setValues();
     }
@@ -126,8 +138,6 @@ public class StartupPanel extends JPanel {
 
         JPanel annotPanel = makeAnnotFilePickerPanel();
 
-        JEditorPane instructions = makeInstructionsPane();
-
         JPanel twoFilePanel = new JPanel(); // holds the GO and annotations.
         twoFilePanel.setBorder( BorderFactory.createTitledBorder( "... OR choose the starting files individually." ) );
         GroupLayout tfp = new GroupLayout( twoFilePanel );
@@ -149,19 +159,9 @@ public class StartupPanel extends JPanel {
                 twoFilePanel ) );
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( projectPanel ).addComponent( twoFilePanel ) );
 
-        JPanel centerPanel = new JPanel(); // holds help and the forms
-        GroupLayout cgl = new GroupLayout( centerPanel );
-        centerPanel.setLayout( cgl );
-        cgl.setHorizontalGroup( cgl.createParallelGroup( Alignment.CENTER ).addComponent( instructions ).addComponent(
-                formPanel ) );
-        cgl.setVerticalGroup( cgl.createSequentialGroup().addComponent( instructions ).addComponent( formPanel ) );
-
-        // centerPanel.add( instructions, BorderLayout.NORTH );
-        // centerPanel.add( formPanel, BorderLayout.CENTER );
-
         this.setLayout( new BorderLayout() );
         this.add( logoPanel, BorderLayout.NORTH );
-        this.add( centerPanel, BorderLayout.CENTER );
+        this.add( formPanel, BorderLayout.CENTER );
         this.add( buttonPanel, BorderLayout.SOUTH );
 
     }
@@ -200,7 +200,7 @@ public class StartupPanel extends JPanel {
 
     private JPanel makeAnnotFilePickerPanel() {
         // /// panel to hold the annotation file 'browse' and format setting
-        JPanel annotPanel = new JPanel();
+        final JPanel annotPanel = new JPanel();
         TitledBorder annotPanelBorder = BorderFactory.createTitledBorder( "Gene annotation file" );
         annotPanel.setBorder( annotPanelBorder );
         this.annotFileTextField = GuiUtil.fileBrowsePanel( annotPanel, new AnnotFilePickListener( this ) );
@@ -222,15 +222,23 @@ public class StartupPanel extends JPanel {
             annotFormat.setSelectedItem( "ErmineJ" );
         }
 
+        JButton locateAnnotsButton = new JButton( "Locate" );
+        locateAnnotsButton.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                helpLocateAnnotations();
+            }
+        } );
+
         JPanel formatPanel = new JPanel();
         GroupLayout fpL = new GroupLayout( formatPanel );
         formatPanel.setLayout( fpL );
         fpL.setAutoCreateContainerGaps( true );
         fpL.setAutoCreateGaps( true );
         fpL.setHorizontalGroup( fpL.createSequentialGroup().addComponent( annotFileFormatLabel ).addComponent(
-                annotFormat ) );
+                annotFormat ).addComponent( locateAnnotsButton ) );
         fpL.setVerticalGroup( fpL.createParallelGroup( GroupLayout.Alignment.BASELINE ).addComponent(
-                annotFileFormatLabel ).addComponent( annotFormat ) );
+                annotFileFormatLabel ).addComponent( annotFormat ).addComponent( locateAnnotsButton ) );
 
         GroupLayout apL = new GroupLayout( annotPanel );
         annotPanel.setLayout( apL );
@@ -241,6 +249,18 @@ public class StartupPanel extends JPanel {
         apL.setVerticalGroup( apL.createSequentialGroup().addComponent( annotFileTextField.getParent() ).addComponent(
                 formatPanel ) );
         return annotPanel;
+    }
+
+    /**
+     * 
+     */
+    protected void helpLocateAnnotations() {
+        JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Locating annotations", JOptionPane.INFORMATION_MESSAGE );
+
+        /*
+         * TODO provide a list
+         */
+
     }
 
     private JPanel makeGOFilePickerPanel() {
@@ -256,27 +276,6 @@ public class StartupPanel extends JPanel {
         cpL.setAutoCreateContainerGaps( true );
         cpL.setAutoCreateGaps( true );
         return classPanel;
-    }
-
-    private JEditorPane makeInstructionsPane() {
-        JEditorPane instructions = new JEditorPane();
-        instructions.setEditable( false );
-        instructions.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
-        instructions.setContentType( "text/html" );
-        instructions.setBorder( BorderFactory.createEmptyBorder( 0, 20, 10, 20 ) );
-        instructions.addHyperlinkListener( new HyperlinkListener() {
-            public void hyperlinkUpdate( HyperlinkEvent e ) {
-                if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
-                    try {
-                        BrowserLauncher.openURL( e.getURL().toExternalForm() );
-                    } catch ( Exception e1 ) {
-                        GuiUtil.error( "Could not open link" );
-                    }
-                }
-            }
-        } );
-        instructions.setText( INSTRUCTIONS );
-        return instructions;
     }
 
     private JPanel makeProjectPickerPanel() {
@@ -316,21 +315,75 @@ public class StartupPanel extends JPanel {
     }
 
     private void setValues() {
-        if ( settings.getClassFile() == null ) {
-            // see if there is a file available.
-            String testPath = settings.getDataDirectory() + System.getProperty( "file.separator" )
-                    + DEFAULT_GO_TERM_FILE_NAME;
-            File testFile = new File( testPath );
+
+        if ( StringUtils.isNotBlank( settings.getClassFile() ) ) {
+            classFileTextField.setText( settings.getClassFile() );
+
+            File testFile = new File( settings.getClassFile() );
             if ( testFile.exists() && testFile.canRead() && testFile.isFile() && testFile.length() > 0 ) {
-                settings.setClassFile( testPath );
+                classFileTextField.setText( settings.getClassFile() );
+            } else {
+                fetchGOFile();
             }
+
+        } else {
+            fetchGOFile();
         }
-        classFileTextField.setText( settings.getClassFile() );
+
+        // TODO if this is missing, provide a list from microannots.
         annotFileTextField.setText( settings.getAnnotFile() );
+
         String dataDirectory = settings.getDataDirectory();
         if ( dataDirectory == null ) {
             settings.setDataDirectory( System.getProperty( "user.dir" ) );
         }
+    }
+
+    private void fetchGOFile() {
+
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                statusMessenger.showStatus( "Looking for GO file ..." );
+
+                try {
+                    final String testPath = settings.getDataDirectory() + File.separator + DEFAULT_GO_TERM_FILE_NAME;
+
+                    classFileTextField.setText( "Attempting to locate ..." );
+
+                    URL urlPattern = new URL( GO_ARCHIVE_DIR + "/go_daily-termdb.rdf-xml.gz" );
+
+                    InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
+                    String localGoFileName = testPath;
+
+                    OutputStream outputStream = new FileOutputStream( new File( localGoFileName ) );
+
+                    final byte[] buffer = new byte[65536];
+                    int read = -1;
+                    int totalRead = 0;
+
+                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                        outputStream.write( buffer, 0, read );
+                        totalRead += read;
+                        statusMessenger.showStatus( "GO: " + totalRead + " bytes read ..." );
+                    }
+                    outputStream.close();
+
+                    statusMessenger.clear();
+
+                    settings.setClassFile( localGoFileName );
+                    classFileTextField.setText( settings.getClassFile() );
+                } catch ( Exception e ) {
+                    classFileTextField.setText( "" );
+                } finally {
+                    // ...
+                }
+                return null;
+            }
+
+        };
+
+        sw.execute();
     }
 
     protected void actionButton_actionPerformed( ActionEvent e ) {

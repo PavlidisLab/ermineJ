@@ -21,7 +21,6 @@ package ubic.erminej.analysis;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +35,7 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.DataIOUtils;
+import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -53,8 +53,8 @@ import ubic.erminej.data.Probe;
  */
 public class GeneSetPvalRun {
 
-    private GeneAnnotations geneData; // ones used in the analysis -- this will be immutable, should only be used for
-    // this.
+    private GeneAnnotations geneData; // ones used in the analysis -- this may be immutable, should only be used for
+    // analysis
 
     private Histogram hist;
     private Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
@@ -71,14 +71,51 @@ public class GeneSetPvalRun {
     private int numGenesUsed = 0;
 
     /**
-     * Restrict to genes that have annotations and which are included in the data.
-     * 
-     * @param activeProbes
-     * @param geneDataSets
-     * @return
+     * Do a new analysis, starting from the bare essentials (correlation method not available) (simple API)
      */
-    private synchronized GeneAnnotations getPrunedAnnotations( Collection<Probe> activeProbes, GeneAnnotations original ) {
-        return original.subClone( activeProbes );
+    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations geneData, GeneScores geneScores ) {
+        this.settings = settings;
+
+        this.geneData = geneData;
+
+        Set<Probe> activeProbes = getActiveProbes( null, geneScores );
+
+        this.geneData = getPrunedAnnotations( activeProbes, geneData );
+        geneScores = new GeneScores( geneScores, this.geneData.getProbes() );
+
+        runAnalysis( null, geneScores );
+    }
+
+    /**
+     * Use this when we are loading in existing results from a file.
+     * 
+     * @param settings
+     * @param originalAnnots - this does not need to be pruned by the Reader.
+     * @param messenger
+     * @param results
+     * @param name Name of the run
+     */
+    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations originalAnnots, StatusViewer messenger,
+            Map<GeneSetTerm, GeneSetResult> results, String name ) throws IOException {
+
+        this.results = results;
+        this.settings = settings;
+        if ( messenger != null ) this.messenger = messenger;
+        this.name = name;
+
+        DoubleMatrix<Probe, String> rawData = null;
+        GeneScores geneScores = null;
+
+        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
+            // this is quite wasteful -- we really just need to know the probe names
+            rawData = DataIOUtils.readDataMatrixForAnalysis( originalAnnots, settings );
+        } else {
+            // this is wasteful, but not as big a deal.
+            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, originalAnnots );
+        }
+
+        Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
+        this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
     }
 
     /**
@@ -127,68 +164,6 @@ public class GeneSetPvalRun {
         }
     }
 
-    private Set<Probe> getActiveProbes( DoubleMatrix<Probe, String> rawData, GeneScores geneScores ) {
-        Set<Probe> activeProbes = null;
-        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) && rawData != null ) {
-            activeProbes = new HashSet<Probe>( rawData.getRowNames() );
-        } else {
-            assert geneScores != null;
-            activeProbes = geneScores.getProbeToScoreMap().keySet();
-        }
-        return activeProbes;
-    }
-
-    /**
-     * Use this when we are loading in existing results from a file.
-     * 
-     * @param settings
-     * @param originalAnnots - this does not need to be pruned by the Reader.
-     * @param messenger
-     * @param results
-     * @param name Name of the run
-     */
-    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations originalAnnots, StatusViewer messenger,
-            Map<GeneSetTerm, GeneSetResult> results, String name ) throws IOException {
-
-        this.results = results;
-        this.settings = settings;
-        if ( messenger != null ) this.messenger = messenger;
-        this.name = name;
-
-        DoubleMatrix<Probe, String> rawData = null;
-        GeneScores geneScores = null;
-
-        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
-            // this is quite wasteful -- we really just need to know the probe names
-            rawData = DataIOUtils.readDataMatrixForAnalysis( originalAnnots, settings );
-        } else {
-            // this is wasteful, but not as big a deal.
-            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, originalAnnots );
-        }
-
-        Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
-
-        this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
-        setMultifunctionalities( geneScores );
-
-    }
-
-    /**
-     * Do a new analysis, starting from the bare essentials (correlation method not available) (simple API)
-     */
-    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations geneData, GeneScores geneScores ) {
-        this.settings = settings;
-
-        this.geneData = geneData;
-
-        Set<Probe> activeProbes = getActiveProbes( null, geneScores );
-
-        this.geneData = getPrunedAnnotations( activeProbes, geneData );
-        geneScores = new GeneScores( geneScores, this.geneData.getProbes() );
-
-        runAnalysis( null, geneScores );
-    }
-
     public GeneAnnotations getGeneData() {
         return geneData;
     }
@@ -206,6 +181,22 @@ public class GeneSetPvalRun {
     }
 
     /**
+     * ORA-only.
+     * 
+     * @return
+     */
+    public int getNumAboveThreshold() {
+        return numAboveThreshold;
+    }
+
+    /**
+     * @return how many genes were available for analysis.
+     */
+    public int getNumGenesUsed() {
+        return this.numGenesUsed;
+    }
+
+    /**
      * @return Map the results
      */
     public Map<GeneSetTerm, GeneSetResult> getResults() {
@@ -220,25 +211,6 @@ public class GeneSetPvalRun {
         return settings;
     }
 
-    /**
-     * @return Map the results
-     */
-    @SuppressWarnings("unchecked")
-    public List<GeneSetTerm> getSortedClasses() {
-        Comparator c = new Comparator<GeneSetTerm>() {
-            @Override
-            public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
-                return results.get( o1 ).compareTo( results.get( o2 ) );
-            }
-        };
-
-        TreeMap<GeneSetTerm, GeneSetResult> sorted = new TreeMap<GeneSetTerm, GeneSetResult>( c );
-        sorted.putAll( results );
-
-        return Collections.unmodifiableList( new ArrayList( sorted.keySet() ) );
-
-    }
-
     public void setName( String name ) {
         this.name = name;
     }
@@ -250,13 +222,73 @@ public class GeneSetPvalRun {
 
     /* private methods */
 
+    private Set<Probe> getActiveProbes( DoubleMatrix<Probe, String> rawData, GeneScores geneScores ) {
+        Set<Probe> activeProbes = null;
+        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) && rawData != null ) {
+            activeProbes = new HashSet<Probe>( rawData.getRowNames() );
+        } else {
+            assert geneScores != null;
+            activeProbes = geneScores.getProbeToScoreMap().keySet();
+        }
+        return activeProbes;
+    }
+
+    /**
+     * Restrict to genes that have annotations and which are included in the data.
+     * 
+     * @param activeProbes
+     * @param geneDataSets
+     * @return
+     */
+    private synchronized GeneAnnotations getPrunedAnnotations( Collection<Probe> activeProbes, GeneAnnotations original ) {
+        return original.subClone( activeProbes );
+    }
+
+    /**
+     * @return Ranked list. Removes any sets which are not scored.
+     */
+    @SuppressWarnings("unchecked")
+    private List<GeneSetTerm> getSortedClasses() {
+        Comparator c = new Comparator<GeneSetTerm>() {
+            @Override
+            public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
+                return results.get( o1 ).compareTo( results.get( o2 ) );
+            }
+        };
+
+        TreeMap<GeneSetTerm, GeneSetResult> sorted = new TreeMap<GeneSetTerm, GeneSetResult>( c );
+        sorted.putAll( results );
+
+        assert sorted.size() == results.size();
+
+        List<GeneSetTerm> sortedSets = new ArrayList<GeneSetTerm>();
+        for ( GeneSetTerm r : sorted.keySet() ) {
+            if ( results.get( r ) instanceof EmptyGeneSetResult /* just checking... */) {
+                continue;
+            }
+            sortedSets.add( r );
+        }
+
+        return sortedSets;
+
+    }
+
     /**
      * @param csc
      */
-    private void multipleTestCorrect( GeneScores geneScores ) {
-        if ( messenger != null ) messenger.showStatus( "Multiple test correction..." );
-        MultipleTestCorrector mt = new MultipleTestCorrector( settings, this.getSortedClasses(), hist, geneData,
-                geneScores, results, messenger );
+    private void rankAndMultipleTestCorrect( GeneScores geneScores ) {
+        List<GeneSetTerm> sortedClasses = this.getSortedClasses();
+
+        assert sortedClasses.size() > 0;
+
+        messenger.showStatus( "Multiple test correction for " + sortedClasses.size() + " scored sets." );
+        for ( int i = 0; i < sortedClasses.size(); i++ ) {
+            results.get( sortedClasses.get( i ) ).setRank( i + 1 );
+        }
+
+        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, hist, geneData, geneScores,
+                results, messenger );
+
         Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
         if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.BONFERONNI ) {
             mt.bonferroni();
@@ -358,8 +390,7 @@ public class GeneSetPvalRun {
             return;
         }
 
-        if ( Thread.currentThread().isInterrupted() ) return;
-        multipleTestCorrect( geneScores );
+        rankAndMultipleTestCorrect( geneScores );
 
         setMultifunctionalities( geneScores );
 
@@ -385,22 +416,6 @@ public class GeneSetPvalRun {
             gsr.setMultifunctionality( auc );
         }
 
-    }
-
-    /**
-     * @return how many genes were available for analysis.
-     */
-    public int getNumGenesUsed() {
-        return this.numGenesUsed;
-    }
-
-    /**
-     * ORA-only.
-     * 
-     * @return
-     */
-    public int getNumAboveThreshold() {
-        return numAboveThreshold;
     }
 
 }

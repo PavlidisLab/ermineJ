@@ -367,6 +367,12 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
     private void configureToolTip( int column, Object value, GeneSetTerm term ) {
         if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
             GeneSetResult res = ( GeneSetResult ) value;
+
+            if ( res instanceof EmptyGeneSetResult ) {
+                setToolTipText( "[No result]" );
+                return;
+            }
+
             setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
                     + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
                     + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );

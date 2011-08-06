@@ -55,6 +55,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
+import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
@@ -913,7 +914,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         String resultStr = "";
         if ( this.currentResultSet != null ) {
             GeneSetResult result = this.currentResultSet.getResults().get( term );
-            if ( result != null ) {
+            if ( result != null && !( result instanceof EmptyGeneSetResult ) ) {
                 showResult = true;
                 resultStr = String.format( "Corrected P = %.2g<br/>", result.getCorrectedPvalue() );
             }
