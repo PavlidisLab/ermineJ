@@ -1171,7 +1171,10 @@ public class MainFrame extends JFrame {
             if ( selectedFile.exists() ) {
                 int response = JOptionPane.showConfirmDialog( null, "Overwrite existing file?", "Confirm Overwrite",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
-                if ( response == JOptionPane.CANCEL_OPTION ) return;
+                if ( response == JOptionPane.CANCEL_OPTION ) {
+                    statusMessenger.showStatus( "Cancelled." );
+                    return;
+                }
             }
 
             if ( !selectedFile.getName().endsWith( ".project" ) ) {

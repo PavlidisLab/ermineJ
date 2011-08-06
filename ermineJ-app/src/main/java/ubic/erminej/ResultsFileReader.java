@@ -74,13 +74,20 @@ public class ResultsFileReader {
         while ( dis.ready() ) {
             GeneSetPvalRun loadedResults = readOne( dis, geneAnnots, runNum, messenger );
             if ( loadedResults != null ) finalResult.add( loadedResults );
-
         }
         dis.close();
 
         return finalResult;
     }
 
+    /**
+     * @param geneAnnots
+     * @param filename
+     * @param messenger
+     * @return
+     * @throws IOException
+     * @throws ConfigurationException
+     */
     public static GeneSetPvalRun loadOne( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
             throws IOException, ConfigurationException {
         BufferedReader dis = new BufferedReader( new FileReader( filename ) );
@@ -88,6 +95,10 @@ public class ResultsFileReader {
         return loadedResults;
     }
 
+    /**
+     * @param filename
+     * @throws IOException
+     */
     private static void checkFile( String filename ) throws IOException {
         if ( StringUtils.isBlank( filename ) ) {
             throw new IllegalArgumentException( "File name was blank" );
@@ -117,7 +128,7 @@ public class ResultsFileReader {
         /*
          * Load settings for the analysis.
          */
-        Settings runSettings = readOneSetOfSettings( dis );
+        SettingsHolder runSettings = readOneSetOfSettings( dis );
 
         Map<GeneSetTerm, GeneSetResult> results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
 
@@ -194,17 +205,21 @@ public class ResultsFileReader {
      * @throws IOException
      * @throws ConfigurationException
      */
-    private static Settings readOneSetOfSettings( BufferedReader r ) throws IOException, ConfigurationException {
+    private static SettingsHolder readOneSetOfSettings( BufferedReader r ) throws IOException, ConfigurationException {
 
         File tmp = File.createTempFile( "ermineJ.", ".tmp.properties" );
         Writer w = new FileWriter( tmp );
         while ( r.ready() ) {
             String line = r.readLine();
-            w.write( line );
-            if ( line.startsWith( "=====" ) ) break;
-        }
+            if ( line.startsWith( ResultsPrinter.END_OF_SETTINGS_SEPARATOR ) ) {
+                break;
+            }
 
-        Settings s = new Settings( tmp.getAbsolutePath() );
+            w.write( line + "\n" );
+        }
+        w.close();
+
+        SettingsHolder s = new Settings( tmp.getAbsolutePath() ).getSettingsHolder();
 
         tmp.delete();
 

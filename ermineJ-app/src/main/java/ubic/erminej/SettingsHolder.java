@@ -128,14 +128,14 @@ public class SettingsHolder {
 
     static {
         defaults.put( QUANTILE_CONFIG_NAME, 50 );
-        defaults.put( MIN_CLASS_SIZE, 5 );
-        defaults.put( MAX_CLASS_SIZE, 50 );
-        defaults.put( ITERATIONS, 100 );
+        defaults.put( MIN_CLASS_SIZE, 10 );
+        defaults.put( MAX_CLASS_SIZE, 100 );
+        defaults.put( ITERATIONS, 1000 );
         defaults.put( GENE_SCORE_THRESHOLD, 0.001 );
         defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
         defaults.put( SettingsHolder.GENE_URL_BASE, DEFAULT_GENE_URL_BASE );
         defaults.put( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
-        defaults.put( FILTER_NONSPECIFIC, false );
+        defaults.put( FILTER_NONSPECIFIC, true );
         defaults.put( DO_LOG, true );
         defaults.put( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
         defaults.put( DATA_DIRECTORY, getDefaultUserDataDirPath() );
@@ -145,14 +145,13 @@ public class SettingsHolder {
         defaults.put( USE_USER_DEFINED_GROUPS, true );
         defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, false );
         defaults.put( SAVE_ALL_GENES_IN_OUTPUT, false );
-
+        defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.BENJAMINIHOCHBERG );
         defaults.put( USE_MOL_FUNC, true );
         defaults.put( USE_CELL_COMP, true );
         defaults.put( USE_BIOL_PROC, true );
         defaults.put( DO_LOG, true );
         defaults.put( SCORE_COL, 2 );
         defaults.put( DATA_COL, 2 );
-
     }
 
     /**
@@ -212,7 +211,7 @@ public class SettingsHolder {
      * @return true if outputs should include all genes genes in each gene set.
      */
     public boolean getSaveAllGenesInOutput() {
-        return config.getBoolean( SAVE_ALL_GENES_IN_OUTPUT );
+        return config.getBoolean( SAVE_ALL_GENES_IN_OUTPUT, false );
     }
 
     /**

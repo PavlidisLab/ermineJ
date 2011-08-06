@@ -85,14 +85,15 @@ public class Settings extends SettingsHolder {
             + "Do not delete this file if you want your ermineJ settings to stay across sessions.\nFor more information see http://www.chibi.ubc.ca/ermineJ/";
 
     /**
-     * Write a configuration to the given file.
+     * Write a configuration to the given file - but just settings relevant to analysis (not window locations, for
+     * example).
      * 
      * @param settings
      * @param fileName
      * @throws IOException
      */
     public static void writeAnalysisSettings( SettingsHolder settings, String fileName ) throws IOException {
-        PropertiesConfiguration configToWrite = settings.getConfig();
+
         Writer out = null;
 
         try {
@@ -102,22 +103,35 @@ public class Settings extends SettingsHolder {
                 out = new BufferedWriter( new FileWriter( fileName ) );
             }
 
-            for ( String propertyName : ANALYSIS_SETTINGS ) {
-                if ( configToWrite.getProperty( propertyName ) == null ) {
-                    if ( log.isDebugEnabled() ) log.debug( "No property " + propertyName + ", skipping" );
-                    continue;
-                }
-
-                out.write( propertyName + " = " );
-                out.write( StringEscapeUtils.escapeJava( configToWrite.getProperty( propertyName ).toString() ) );
-                out.write( "\n" );
-                if ( log.isDebugEnabled() )
-                    log.debug( "Writing " + propertyName + "=" + configToWrite.getProperty( propertyName ).toString() );
-            }
+            writeAnalysisSettings( settings, out );
         } catch ( IOException e ) {
             throw e;
         } finally {
             if ( out != null ) out.close();
+        }
+    }
+
+    /**
+     * Write a configuration to the given output - but just settings relevant to analysis (not window locations, for
+     * example).
+     * 
+     * @param settings
+     * @param out
+     * @throws IOException
+     */
+    public static void writeAnalysisSettings( SettingsHolder settings, Writer out ) throws IOException {
+        PropertiesConfiguration configToWrite = settings.getConfig();
+        for ( String propertyName : ANALYSIS_SETTINGS ) {
+            if ( configToWrite.getProperty( propertyName ) == null ) {
+                if ( log.isDebugEnabled() ) log.debug( "No property " + propertyName + ", skipping" );
+                continue;
+            }
+
+            out.write( propertyName + " = " );
+            out.write( StringEscapeUtils.escapeJava( configToWrite.getProperty( propertyName ).toString() ) );
+            out.write( "\n" );
+            if ( log.isDebugEnabled() )
+                log.debug( "Writing " + propertyName + "=" + configToWrite.getProperty( propertyName ).toString() );
         }
     }
 
@@ -348,6 +362,10 @@ public class Settings extends SettingsHolder {
         return new SettingsHolder( config );
     }
 
+    public boolean isAutoSaving() {
+        return this.config.isAutoSave();
+    }
+
     /**
      * @param b
      */
@@ -386,6 +404,15 @@ public class Settings extends SettingsHolder {
 
     public void setCustomGeneSetDirectory( String val ) {
         this.config.setProperty( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, val );
+    }
+
+    public void setCustomGeneSetFiles( Collection<String> filePaths ) {
+        this.config.setProperty( CUSTOM_GENESET_FILES, filePaths );
+    }
+
+    public void setDataCol( int val ) {
+        log.debug( "Setting data start column to " + val );
+        this.config.setProperty( DATA_COL, val );
     }
 
     public void setDataDirectory( String val ) {
@@ -490,14 +517,14 @@ public class Settings extends SettingsHolder {
         this.config.setProperty( RAW_FILE_CONFIG_NAME, val );
     }
 
+    public void setSaveAllGenesInOutput( boolean saveAllGenes ) {
+        config.setProperty( SAVE_ALL_GENES_IN_OUTPUT, saveAllGenes );
+
+    }
+
     public void setScoreCol( int val ) {
         log.debug( "Setting score start column to " + val );
         this.config.setProperty( SCORE_COL, val );
-    }
-
-    public void setDataCol( int val ) {
-        log.debug( "Setting data start column to " + val );
-        this.config.setProperty( DATA_COL, val );
     }
 
     public void setScoreFile( String val ) {
@@ -509,10 +536,6 @@ public class Settings extends SettingsHolder {
         for ( GeneSetTerm t : addedClasses )
             addedClassesIds.add( t.getId() );
         this.config.setProperty( SELECTED_CUSTOM_GENESETS, addedClassesIds );
-    }
-
-    public void setCustomGeneSetFiles( Collection<String> filePaths ) {
-        this.config.setProperty( CUSTOM_GENESET_FILES, filePaths );
     }
 
     public void setTester( boolean isTester ) {
@@ -600,6 +623,15 @@ public class Settings extends SettingsHolder {
         } catch ( ConfigurationException e ) {
             log.error( e, e );
         }
+    }
+
+    /**
+     * @return
+     */
+    private File getSettingsFilePath() {
+        File newConfigFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                + USERGUI_PROPERTIES );
+        return newConfigFile;
     }
 
     /**
@@ -706,15 +738,6 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * @return
-     */
-    private File getSettingsFilePath() {
-        File newConfigFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                + USERGUI_PROPERTIES );
-        return newConfigFile;
-    }
-
-    /**
      * 
      */
     private void logLocale() {
@@ -727,15 +750,6 @@ public class Settings extends SettingsHolder {
         log.info( "    OS arch: " + System.getProperty( "os.arch" ) );
         log.info( "    OS version: " + System.getProperty( "os.name" ) );
         log.info( "    File encoding: " + System.getProperty( "file.encoding" ) );
-    }
-
-    public boolean isAutoSaving() {
-        return this.config.isAutoSave();
-    }
-
-    public void setSaveAllGenesInOutput( boolean saveAllGenes ) {
-        config.setProperty( SAVE_ALL_GENES_IN_OUTPUT, saveAllGenes );
-
     }
 
 }

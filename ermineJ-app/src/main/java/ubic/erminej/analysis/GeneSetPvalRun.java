@@ -164,12 +164,12 @@ public class GeneSetPvalRun {
         } else {
             // this is wasteful, but not as big a deal.
             geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, originalAnnots );
-            setMultifunctionalities( geneScores );
         }
 
         Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
 
         this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
+        setMultifunctionalities( geneScores );
 
     }
 
@@ -308,7 +308,8 @@ public class GeneSetPvalRun {
 
                 results = pvg.classPvalGenerator( geneToScoreMap, messenger );
 
-                messenger.showStatus( "Finished with ORA computations: " + numAboveThreshold + " probes passed your threshold." );
+                messenger.showStatus( "Finished with ORA computations: " + numAboveThreshold
+                        + " probes passed your threshold." );
 
                 break;
             }

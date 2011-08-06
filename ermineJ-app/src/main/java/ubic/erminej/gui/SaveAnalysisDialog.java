@@ -120,8 +120,11 @@ public class SaveAnalysisDialog extends JDialog {
         cancelButton.setMnemonic( 'c' );
         okButton.setText( "OK" );
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add( cancelButton );
+
+        // OK on the left is 'standard'
         buttonPanel.add( okButton );
+        buttonPanel.add( cancelButton );
+
         cancelButton.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {

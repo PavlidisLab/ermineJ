@@ -152,7 +152,7 @@ public class AnalysisThread extends Thread {
     }
 
     /**
-     * Load from a file.
+     * Load from a file, which can contain more than one set.
      * 
      * @return
      * @throws IOException
