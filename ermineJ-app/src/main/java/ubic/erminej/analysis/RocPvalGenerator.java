@@ -32,7 +32,6 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 
@@ -63,6 +62,8 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         int count = 0;
 
         geneRanks = Rank.rankTransform( geneToScoreMap );
+
+        this.numGenesUsed = geneToScoreMap.size();
 
         totalSize = geneRanks.size();
 

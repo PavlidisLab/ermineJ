@@ -96,6 +96,7 @@ public class SaveAnalysisDialog extends JDialog {
         JPanel jPanel11 = new JPanel();
 
         saveAllGenes.setSelected( false ); // FIXME save this setting.
+
         JLabel saveAllGenesLabel = new JLabel();
         saveAllGenesLabel.setText( "Include all genes in output" );
         saveAllGenesLabel.setLabelFor( saveAllGenes );
@@ -133,6 +134,7 @@ public class SaveAnalysisDialog extends JDialog {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 cancelled = false;
+                settings.setSaveAllGenesInOutput( isSaveAllGenes() );
                 dispose();
             }
         } );
@@ -140,6 +142,9 @@ public class SaveAnalysisDialog extends JDialog {
     }
 
     void showChoices() {
+
+        this.saveAllGenes.setSelected( settings.getSaveAllGenesInOutput() );
+
         if ( owner.getNumResultSets() < 1 ) {
             runComboBox.addItem( "No runs available to save" );
         } else {

@@ -85,7 +85,6 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.AnalysisThread;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
-import ubic.erminej.SettingsHolder;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
@@ -318,7 +317,13 @@ public class MainFrame extends JFrame {
         this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, loadFile );
         athread.run();
         log.debug( "Waiting" );
-        addResult( athread.getLatestResults() );
+
+        Collection<GeneSetPvalRun> latestResults = athread.getLatestResults();
+        for ( GeneSetPvalRun latestResult : latestResults ) {
+            checkForReasonableResults( latestResult );
+            if ( latestResult != null ) addResult( latestResult );
+        }
+
         athread = null;
 
         log.debug( "done" );
@@ -373,9 +378,16 @@ public class MainFrame extends JFrame {
         }
         log.debug( "Waiting..." );
 
-        GeneSetPvalRun latestResult = athread.getLatestResults();
-        checkForReasonableResults( latestResult );
-        if ( latestResult != null ) addResult( latestResult );
+        Collection<GeneSetPvalRun> latestResults = athread.getLatestResults();
+        for ( GeneSetPvalRun latestResult : latestResults ) {
+            checkForReasonableResults( latestResult );
+            if ( latestResult != null ) addResult( latestResult );
+            try {
+                Thread.sleep( 100 );
+            } catch ( InterruptedException e ) {
+                // 
+            }
+        }
         athread = null;
         enableMenusForAnalysis();
     }
@@ -420,7 +432,6 @@ public class MainFrame extends JFrame {
 
         tablePanel.addRun();
         treePanel.addRun();
-        athread = null;
     }
 
     /**
@@ -665,17 +676,18 @@ public class MainFrame extends JFrame {
          */
         GeneAnnotations ga = this.geneData;
         GeneScores gs = null;
-
-        if ( this.getCurrentResultSetIndex() >= 0 && !this.results.isEmpty() ) {
-            gs = getCurrentResultSet().getGeneScores();
-            ga = gs.getGeneAnnots();
-        } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
-            try {
+        try {
+            if ( this.getCurrentResultSetIndex() >= 0 && !this.results.isEmpty() ) {
+                gs = new GeneScores( getCurrentResultSet().getSettings().getScoreFile(), settings, statusMessenger,
+                        this.geneData );
+                ga = gs.getGeneAnnots();
+            } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
                 gs = new GeneScores( settings.getScoreFile(), settings, statusMessenger, this.geneData );
                 ga = gs.getGeneAnnots();
-            } catch ( IOException e ) {
-                // nothing to do;
             }
+        } catch ( IOException e ) {
+            GuiUtil.error( "Data for multifunctionality could not be read", e );
+            return;
         }
 
         MultiFuncDiagWindow w = new MultiFuncDiagWindow( ga, gs );
@@ -1015,9 +1027,6 @@ public class MainFrame extends JFrame {
             settings.getConfig().setProperty( RESULTS_LOAD_LOCATION, chooser.getSelectedFile().getAbsolutePath() );
             final String path = chooser.getSelectedFile().getAbsolutePath();
             if ( FileTools.testFile( path ) ) {
-                /*
-                 * FIXME this should use the swingworker pattern?
-                 */
                 new Thread() {
                     @Override
                     public void run() {
@@ -1054,8 +1063,12 @@ public class MainFrame extends JFrame {
 
             if ( selectedFile.getAbsolutePath().equals( settings.getAnnotFile() ) ) {
                 /*
-                 * TODO Alert the user -- they can reload if they want, or bail.
+                 * Alert the user -- they can reload if they want, or bail.
                  */
+                int response = JOptionPane.showConfirmDialog( null, "File already loaded", "The selected annotations"
+                        + " are already loaded. Force reload?", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE );
+                if ( response == JOptionPane.CANCEL_OPTION ) return;
             }
 
             this.settings.setAnnotFile( selectedFile.getAbsolutePath() );
@@ -1075,7 +1088,7 @@ public class MainFrame extends JFrame {
     protected void loadProject() {
 
         /*
-         * If there are already analyses, we should prompt them to save.
+         * FIXME If there are already analyses, we should prompt them to save.
          */
 
         /*
@@ -1168,18 +1181,12 @@ public class MainFrame extends JFrame {
             String path = selectedFile.getAbsolutePath();
 
             /*
-             * Write the file in ermineJ.data in *.project files. The format will be configurations - we just write a
-             * copy of the settings.
-             * 
-             * What about the current results? Perhaps make a multi-result file format.
+             * Write the file in ermineJ.data in *.project
              */
             try {
-                Settings.writeAnalysisSettings( this.settings, path, this.statusMessenger ); // ??
-                // resultsprinter does not save the settings.
-                if ( !this.results.isEmpty() ) {
-                    ResultsPrinter rp = new ResultsPrinter( path, this.results );
-                    rp.printResults( true );
-                }
+
+                ResultsPrinter.write( path, this.settings, this.results );
+
             } catch ( IOException e ) {
                 GuiUtil.error( "Could not save the project: " + e.getMessage() );
                 log.error( e, e );
@@ -1513,6 +1520,8 @@ public class MainFrame extends JFrame {
 
         /*
          * FIXME allow for possibility that run was already selected (e.g. from popup menu on header of table)
+         * 
+         * FIXME add "save all" option.
          */
 
         /*
@@ -1555,16 +1564,10 @@ public class MainFrame extends JFrame {
             /*
              * 3. Save.
              */
-            SettingsHolder saveSettings = runToSave.getSettings();
-            String saveFileName = f.getAbsolutePath();
+
             try {
-
-                /* first we stream the prefs to the file. */
-                Settings.writeAnalysisSettings( saveSettings, saveFileName, statusMessenger );
-
-                /* then we pile on the results. */
-                ResultsPrinter rp = new ResultsPrinter( saveFileName, runToSave, includeGenes );
-                rp.printResults( true );
+                String saveFileName = f.getAbsolutePath();
+                ResultsPrinter.write( saveFileName, runToSave, includeGenes );
                 this.statusMessenger.showStatus( "Saved" );
             } catch ( IOException ioe ) {
                 GuiUtil.error( "Could not write results to the file. " + ioe );

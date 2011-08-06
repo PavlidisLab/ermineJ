@@ -23,7 +23,7 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 
 /**
- * Data structure to store class scoring information about a class.
+ * Data structure to store class scoring information about a class. This also knows how to print itself out.
  * 
  * @author Paul Pavlidis
  * @version $Id$

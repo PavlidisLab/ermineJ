@@ -36,7 +36,6 @@ import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
@@ -191,6 +190,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
         int count = 0;
         setTests( 0 );
         setCacheHits( 0 );
+
+        this.numGenesUsed = geneAnnots.numGenes(); // is this going to be right?
 
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getGeneSetTerms().iterator(); iter.hasNext(); ) {
             ifInterruptedStop();

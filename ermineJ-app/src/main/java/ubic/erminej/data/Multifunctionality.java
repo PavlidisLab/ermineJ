@@ -47,7 +47,7 @@ public class Multifunctionality {
 
     private static Log log = LogFactory.getLog( Multifunctionality.class );
 
-    private Map<Gene, Double> multifunctionality = new HashMap<Gene, Double>();
+    private Map<Gene, Double> geneMultifunctionality = new HashMap<Gene, Double>();
 
     private Map<GeneSetTerm, Integer> goGroupSizes = new HashMap<GeneSetTerm, Integer>();
 
@@ -55,9 +55,10 @@ public class Multifunctionality {
 
     private Map<GeneSetTerm, Double> goTermMultifunctionality = new HashMap<GeneSetTerm, Double>();
 
+    // FIXME not really used.
     private Map<GeneSetTerm, Double> goTermMultifunctionalityRank = new HashMap<GeneSetTerm, Double>();
 
-    private Map<Gene, Double> multifunctionalityRank = new HashMap<Gene, Double>();
+    private Map<Gene, Double> geneMultifunctionalityRank = new HashMap<Gene, Double>();
 
     private GeneAnnotations geneAnnots;
 
@@ -128,7 +129,7 @@ public class Multifunctionality {
 
         DoubleArrayList rawVals = new DoubleArrayList();
         for ( Gene gene : rankedGenes ) {
-            if ( !this.multifunctionality.containsKey( gene ) ) continue;
+            if ( !this.geneMultifunctionality.containsKey( gene ) ) continue;
             double mf = this.getMultifunctionalityScore( gene );
             rawVals.add( mf );
         }
@@ -216,12 +217,12 @@ public class Multifunctionality {
      */
     public double getMultifunctionalityRank( Gene gene ) {
         if ( stale.get() ) init();
-        if ( !this.multifunctionalityRank.containsKey( gene ) ) {
+        if ( !this.geneMultifunctionalityRank.containsKey( gene ) ) {
             // throw new IllegalArgumentException( "Gene: " + gene + " not found" );
             return 0.0;
         }
 
-        return this.multifunctionalityRank.get( gene );
+        return this.geneMultifunctionalityRank.get( gene );
     }
 
     /**
@@ -232,12 +233,12 @@ public class Multifunctionality {
      */
     public double getMultifunctionalityScore( Gene gene ) {
         if ( stale.get() ) init();
-        if ( !this.multifunctionality.containsKey( gene ) ) {
+        if ( !this.geneMultifunctionality.containsKey( gene ) ) {
             // throw new IllegalArgumentException( "Gene: " + gene + " not found" );
             return 0.0;
         }
 
-        return this.multifunctionality.get( gene );
+        return this.geneMultifunctionality.get( gene );
     }
 
     /**
@@ -320,7 +321,6 @@ public class Multifunctionality {
          */
         // convert to relative ranks, where 1.0 is the most multifunctional
         Map<GeneSetTerm, Integer> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionality, true );
-
         for ( GeneSetTerm goTerm : rankedGOMf.keySet() ) {
             double rankRatio = ( rankedGOMf.get( goTerm ) + 1 ) / ( double ) numGoGroups;
             this.goTermMultifunctionalityRank.put( goTerm, Math.max( 0.0, 1 - rankRatio ) );
@@ -371,15 +371,15 @@ public class Multifunctionality {
 
                     mf += 1.0 / ( inGroup * outGroup );
                 }
-                this.multifunctionality.put( gene, mf );
+                this.geneMultifunctionality.put( gene, mf );
             }
 
-            Map<Gene, Integer> rawGeneMultifunctionalityRanks = Rank.rankTransform( this.multifunctionality, true );
+            Map<Gene, Integer> rawGeneMultifunctionalityRanks = Rank.rankTransform( this.geneMultifunctionality, true );
             for ( Gene gene : rawGeneMultifunctionalityRanks.keySet() ) {
                 // 1-base the rank before calculating ratio
                 double geneMultifunctionalityRankRatio = ( rawGeneMultifunctionalityRanks.get( gene ) + 1 )
                         / ( double ) numGenes;
-                this.multifunctionalityRank.put( gene, Math.max( 0.0, 1.0 - geneMultifunctionalityRankRatio ) );
+                this.geneMultifunctionalityRank.put( gene, Math.max( 0.0, 1.0 - geneMultifunctionalityRankRatio ) );
             }
 
             computeGoTermMultifunctionalityRanks( rawGeneMultifunctionalityRanks );

@@ -54,7 +54,7 @@ public class GeneSetDetails {
 
     private GeneSetTerm classID;
 
-    private GeneSetResult result; // TODO show current result in the title.
+    private GeneSetResult result;  
     private GeneAnnotations geneData;
 
     private Settings settings;
@@ -63,6 +63,8 @@ public class GeneSetDetails {
     private Map<Probe, Double> probeScores = new HashMap<Probe, Double>();
 
     private DoubleMatrix<Probe, String> dataMatrix = null;
+
+    private GeneScores geneScores;
 
     /**
      * Show without any results.
@@ -109,6 +111,7 @@ public class GeneSetDetails {
 
         if ( geneScores != null ) {
             this.probes = geneScores.getGeneAnnots().getGeneSetProbes( classID );
+            this.geneScores = geneScores;
         }
 
         this.result = result;
@@ -239,7 +242,8 @@ public class GeneSetDetails {
     /**
      * @param geneScores
      */
-    private void initGeneScores( GeneScores geneScores ) {
+    private void initGeneScores( GeneScores gs ) {
+        this.geneScores = gs;
         probeScores = new HashMap<Probe, Double>();
         if ( probes == null || probes.isEmpty() ) return;
 
@@ -304,6 +308,15 @@ public class GeneSetDetails {
      */
     public void setGeneScores( GeneScores scores ) {
         initGeneScores( scores );
+    }
+
+    /**
+     * The full set of GeneScores from which this was derived.
+     * 
+     * @return
+     */
+    public GeneScores getSourceGeneScores() {
+        return geneScores;
     }
 
 }

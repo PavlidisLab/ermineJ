@@ -18,20 +18,23 @@
  */
 package ubic.erminej;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.Writer;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
 
 import ubic.basecode.util.StatusViewer;
-
+import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
@@ -45,31 +48,50 @@ import ubic.erminej.data.GeneSetTerm;
  */
 public class ResultsFileReader {
 
-    private Map<GeneSetTerm, GeneSetResult> results;
-
     /**
+     * Possibility that this is a project, vs. a single analysis.
+     * 
      * @param geneAnnots
      * @param filename
      * @param messenger
-     * @throws NumberFormatException
      * @throws IOException
      */
-    public ResultsFileReader( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
-            throws NumberFormatException, IOException {
+    public static Collection<GeneSetPvalRun> load( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
+            throws IOException, ConfigurationException {
+
+        checkFile( filename );
+
+        messenger.showStatus( "Loading analysis..." );
+
+        Collection<GeneSetPvalRun> finalResult = new LinkedHashSet<GeneSetPvalRun>();
+
+        BufferedReader dis = new BufferedReader( new FileReader( filename ) );
 
         /*
-         * FIXME this really should parse the settings at the same time.
+         * Until we get to the end of the file ....
          */
+        int runNum = 1;
+        while ( dis.ready() ) {
+            GeneSetPvalRun loadedResults = readOne( dis, geneAnnots, runNum, messenger );
+            if ( loadedResults != null ) finalResult.add( loadedResults );
 
-        /*
-         * FIXME handle the sitaution where the annotations do not match the file.
-         */
+        }
+        dis.close();
 
+        return finalResult;
+    }
+
+    public static GeneSetPvalRun loadOne( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
+            throws IOException, ConfigurationException {
+        BufferedReader dis = new BufferedReader( new FileReader( filename ) );
+        GeneSetPvalRun loadedResults = readOne( dis, geneAnnots, 1, messenger );
+        return loadedResults;
+    }
+
+    private static void checkFile( String filename ) throws IOException {
         if ( StringUtils.isBlank( filename ) ) {
             throw new IllegalArgumentException( "File name was blank" );
         }
-
-        results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
 
         File infile = new File( filename );
         if ( !infile.exists() || !infile.canRead() ) {
@@ -79,22 +101,36 @@ public class ResultsFileReader {
         if ( infile.length() == 0 ) {
             throw new IOException( "File has zero length" );
         }
+    }
 
-        BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( new FileInputStream(
-                filename ) ) ) );
+    /**
+     * @param dis
+     * @param geneAnnots
+     * @param runNum
+     * @param messenger
+     * @return
+     * @throws IOException
+     * @throws ConfigurationException
+     */
+    private static GeneSetPvalRun readOne( BufferedReader dis, GeneAnnotations geneAnnots, int runNum,
+            StatusViewer messenger ) throws IOException, ConfigurationException {
+        /*
+         * Load settings for the analysis.
+         */
+        Settings runSettings = readOneSetOfSettings( dis );
+
+        Map<GeneSetTerm, GeneSetResult> results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
 
         boolean warned = false;
-        messenger.showStatus( "Loading analysis..." );
-
         String line = null;
-
-        /*
-         * FIXME, handle multi-results version
-         */
-
+        String runName = "";
         while ( ( line = dis.readLine() ) != null ) {
             StringTokenizer st = new StringTokenizer( line, "\t" );
             String firstword = st.nextToken();
+
+            /*
+             * Lines that start with the commons configuration comment character "!" indicate data.
+             */
             if ( firstword.compareTo( "!" ) == 0 ) {
                 st.nextToken(); // / class name, ignored.
                 String classId = st.nextToken();
@@ -116,14 +152,63 @@ public class ResultsFileReader {
 
                 GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval );
                 results.put( term, c );
+            } else if ( firstword.startsWith( ResultsPrinter.RUN_NAME_FIELD_PATTERN ) ) {
+                /*
+                 * Special field to get run name.
+                 */
+                String[] kv = StringUtils.splitByWholeSeparator( firstword, "=", 2 );
+                if ( kv.length > 1 ) {
+                    runName = kv[1];
+                } else {
+                    runName = "Run " + runNum;
+                    ++runNum;
+                }
+            } else if ( firstword.startsWith( ResultsPrinter.RUN_INDICATOR ) ) {
+                // reached end of the run.
+                break;
             }
         }
-        dis.close();
-        messenger.showStatus( results.size() + " class results read from file" );
+
+        if ( results.isEmpty() ) {
+            messenger.showError( "Results section was empty" );
+            return null;
+        }
+
+        /*
+         * At this point, it is possible that we got a corrupted file, and the results are only partial, etc. Hard to
+         * know.
+         */
+
+        GeneSetPvalRun newResults = new GeneSetPvalRun( runSettings, geneAnnots, messenger, results, runName );
+
+        messenger.showStatus( "Read run: " + runName );
+
+        return newResults;
     }
 
-    public Map<GeneSetTerm, GeneSetResult> getResults() {
-        return results;
+    /**
+     * Genreate Settings from the file, reading from the current point to the next 'end of settings' marker.
+     * 
+     * @param r
+     * @return
+     * @throws IOException
+     * @throws ConfigurationException
+     */
+    private static Settings readOneSetOfSettings( BufferedReader r ) throws IOException, ConfigurationException {
+
+        File tmp = File.createTempFile( "ermineJ.", ".tmp.properties" );
+        Writer w = new FileWriter( tmp );
+        while ( r.ready() ) {
+            String line = r.readLine();
+            w.write( line );
+            if ( line.startsWith( "=====" ) ) break;
+        }
+
+        Settings s = new Settings( tmp.getAbsolutePath() );
+
+        tmp.delete();
+
+        return s;
     }
 
 }

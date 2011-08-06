@@ -21,6 +21,11 @@ package ubic.erminej.gui.analysis;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -29,12 +34,15 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.Method;
+import ubic.erminej.data.GeneScores;
 import ubic.erminej.gui.util.WizardStep;
+import cern.jet.math.Arithmetic;
 
 /**
  * The last step of the analysis wizard, picking method-specific settings.
@@ -67,12 +75,188 @@ public class AnalysisWizardStep5 extends WizardStep {
     private String help;
     private String extraHelp;
 
+    Double[] geneScores = null;
+
     public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
         this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
         setValues();
+    }
+
+    /**
+     * @param analysisType
+     */
+    public void addVarPanel( Method analysisType ) {
+        setValues();
+        if ( analysisType.equals( Method.ORA ) ) {
+            oraPanel.add( jCheckBoxDoLog );
+            oraPanel.add( jCheckBoxBigIsBetter );
+            oraPanel.add( jCheckBoxDoMultiFuncCorr );
+
+            jCheckBoxDoMultiFuncCorr.setEnabled( true );
+            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+
+            step5Panel.add( oraPanel );
+            this.addHelp( extraHelp );
+            this.checkOraThresholdEffects();
+        } else if ( analysisType.equals( Method.GSR ) ) {
+            resampPanel.add( jCheckBoxDoLog, null );
+            resampPanel.add( jCheckBoxBigIsBetter );
+            resampPanel.add( subPanel );
+            resampPanel.add( jCheckBoxDoMultiFuncCorr );
+
+            jCheckBoxDoMultiFuncCorr.setEnabled( true );
+            jCheckBoxDoMultiFuncCorr.setSelected( false );
+
+            this.addHelp( extraHelp );
+            step5Panel.add( resampPanel, null );
+        } else if ( analysisType.equals( Method.ROC ) ) {
+            rocPanel.add( jCheckBoxDoLog, null );
+            rocPanel.add( jCheckBoxBigIsBetter, null );
+            rocPanel.add( jCheckBoxDoMultiFuncCorr );
+
+            jCheckBoxDoMultiFuncCorr.setEnabled( true );
+            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+
+            this.addHelp( extraHelp );
+            step5Panel.add( rocPanel, null );
+        } else if ( analysisType.equals( Method.CORR ) ) {
+            corrPanel.add( subPanel, null );
+            this.addHelp( help );
+            step5Panel.add( corrPanel, null );
+        }
+    }
+
+    @Override
+    public boolean isReady() {
+        return true;
+    }
+
+    /**
+     * @param analysisType
+     */
+    public void removeVarPanel( Settings.Method analysisType ) {
+        if ( analysisType.equals( SettingsHolder.Method.ORA ) ) {
+            step5Panel.remove( oraPanel );
+        } else if ( analysisType.equals( SettingsHolder.Method.GSR ) ) {
+            resampPanel.remove( subPanel );
+            step5Panel.remove( resampPanel );
+        } else if ( analysisType.equals( SettingsHolder.Method.CORR ) ) {
+            corrPanel.remove( subPanel );
+            step5Panel.remove( corrPanel );
+        } else if ( analysisType.equals( SettingsHolder.Method.ROC ) ) {
+            step5Panel.remove( rocPanel );
+        }
+    }
+
+    /**
+     * 
+     *
+     */
+    public void saveValues() {
+        settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
+
+        if ( jRadioButtonMean.isSelected() ) {
+            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
+        } else {
+            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
+        }
+
+        settings.setGeneScoreThreshold( Double.valueOf( geneScoreThresholdTextField.getText() ).doubleValue() );
+        settings.setDoLog( jCheckBoxDoLog.isSelected() );
+        settings.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
+        settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );
+        settings.setUseMultifunctionalityCorrection( jCheckBoxDoMultiFuncCorr.isSelected() );
+    }
+
+    public boolean upperTail() {
+        return jCheckBoxDoLog.isSelected() && !jCheckBoxBigIsBetter.isSelected() || !jCheckBoxDoLog.isSelected()
+                && jCheckBoxBigIsBetter.isSelected();
+    }
+
+    /**
+     * ORA only: Figure out how many genes are selected at the given threshold, to give the user guidance.
+     */
+    private void checkOraThresholdEffects() {
+
+        if ( settings.getClassScoreMethod() != Method.ORA ) {
+            return;
+        }
+
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                try {
+
+                    double thresh = Double.parseDouble( geneScoreThresholdTextField.getText() );
+                    if ( jCheckBoxDoLog.isSelected() ) {
+                        thresh = -Arithmetic.log10( thresh );
+                    }
+
+                    AnalysisWizard w = ( AnalysisWizard ) getOwner();
+                    if ( geneScores == null ) {
+
+                        Settings settingsTemp = new Settings( w.getSettings() );
+                        settingsTemp.setDoLog( jCheckBoxDoLog.isSelected() );
+                        settingsTemp.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
+
+                        GeneScores gs = new GeneScores( settingsTemp.getScoreFile(), settingsTemp, null, w
+                                .getGeneAnnots() );
+
+                        geneScores = gs.getGeneScores();
+                        w.getStatusField().clear();
+                    }
+
+                    int n = 0;
+                    for ( Double s : geneScores ) {
+                        if ( scorePassesThreshold( s, thresh ) ) {
+                            n++;
+                        }
+                    }
+                    if ( n == 0 ) {
+                        w.getStatusField().showError( "No genes selected at that threshold" );
+                    } else {
+                        w.getStatusField().showStatus( n + " genes selected." );
+                    }
+
+                } catch ( NumberFormatException ex ) {
+                    return null;
+                } catch ( IOException ex ) {
+                    return null;
+                }
+                return null;
+            }
+        };
+
+        sw.execute();
+    }
+
+    private boolean scorePassesThreshold( double geneScore, double threshold ) {
+        return ( upperTail() && geneScore >= threshold ) || ( !upperTail() && geneScore <= threshold );
+    }
+
+    /**
+     * 
+     *
+     */
+    private void setValues() {
+        jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
+
+        if ( settings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) ) {
+            jRadioButtonMean.setSelected( true );
+        } else {
+            jRadioButtonMedian.setSelected( true );
+        }
+
+        geneScoreThresholdTextField.setText( String.valueOf( settings.getGeneScoreThreshold() ) );
+        jCheckBoxDoLog.setSelected( settings.getDoLog() );
+        jCheckBoxBigIsBetter.setSelected( settings.getBigIsBetter() );
+        jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
+        jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
     }
 
     // Component initialization
@@ -104,8 +288,20 @@ public class AnalysisWizardStep5 extends WizardStep {
         JRadioButton corrRadioButton1 = new JRadioButton();
         JRadioButton corrRadioButton2 = new JRadioButton();
         jCheckBoxDoLog = new JCheckBox();
+        jCheckBoxDoLog.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                checkOraThresholdEffects();
+            }
+        } );
 
         jCheckBoxBigIsBetter = new JCheckBox();
+        jCheckBoxBigIsBetter.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                checkOraThresholdEffects();
+            }
+        } );
 
         step5Panel = new JPanel();
         step5Panel.setPreferredSize( new Dimension( 550, 280 ) );
@@ -167,6 +363,14 @@ public class AnalysisWizardStep5 extends WizardStep {
         jPanel15.add( jLabel6, null );
         jPanel15.add( geneScoreThresholdTextField, null );
         oraPanel.add( jPanel15, null );
+
+        geneScoreThresholdTextField.addKeyListener( new KeyAdapter() {
+            @Override
+            public void keyReleased( KeyEvent e ) {
+                checkOraThresholdEffects();
+            }
+
+        } );
 
         // resampPanel stuff///////////////////////////////////////////////////////
         resampPanel.setPreferredSize( new Dimension( 380, 250 ) );
@@ -242,109 +446,5 @@ public class AnalysisWizardStep5 extends WizardStep {
                 + " original input file, and should be unchecked if your input is raw p-values.</p>";
 
         this.addMain( step5Panel );
-    }
-
-    /**
-     * @param analysisType
-     */
-    public void addVarPanel( Method analysisType ) {
-        if ( analysisType.equals( Method.ORA ) ) {
-            oraPanel.add( jCheckBoxDoLog );
-            oraPanel.add( jCheckBoxBigIsBetter );
-            oraPanel.add( jCheckBoxDoMultiFuncCorr );
-
-            jCheckBoxDoMultiFuncCorr.setEnabled( true );
-            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
-
-            step5Panel.add( oraPanel );
-            this.addHelp( extraHelp );
-        } else if ( analysisType.equals( Method.GSR ) ) {
-            resampPanel.add( jCheckBoxDoLog, null );
-            resampPanel.add( jCheckBoxBigIsBetter );
-            resampPanel.add( subPanel );
-            resampPanel.add( jCheckBoxDoMultiFuncCorr );
-
-            jCheckBoxDoMultiFuncCorr.setEnabled( true );
-            jCheckBoxDoMultiFuncCorr.setSelected( false );
-
-            this.addHelp( extraHelp );
-            step5Panel.add( resampPanel, null );
-        } else if ( analysisType.equals( Method.ROC ) ) {
-            rocPanel.add( jCheckBoxDoLog, null );
-            rocPanel.add( jCheckBoxBigIsBetter, null );
-            rocPanel.add( jCheckBoxDoMultiFuncCorr );
-
-            jCheckBoxDoMultiFuncCorr.setEnabled( true );
-            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
-
-            this.addHelp( extraHelp );
-            step5Panel.add( rocPanel, null );
-        } else if ( analysisType.equals( Method.CORR ) ) {
-            corrPanel.add( subPanel, null );
-            this.addHelp( help );
-            step5Panel.add( corrPanel, null );
-        }
-    }
-
-    /**
-     * @param analysisType
-     */
-    public void removeVarPanel( Settings.Method analysisType ) {
-        if ( analysisType.equals( SettingsHolder.Method.ORA ) ) {
-            step5Panel.remove( oraPanel );
-        } else if ( analysisType.equals( SettingsHolder.Method.GSR ) ) {
-            resampPanel.remove( subPanel );
-            step5Panel.remove( resampPanel );
-        } else if ( analysisType.equals( SettingsHolder.Method.CORR ) ) {
-            corrPanel.remove( subPanel );
-            step5Panel.remove( corrPanel );
-        } else if ( analysisType.equals( SettingsHolder.Method.ROC ) ) {
-            step5Panel.remove( rocPanel );
-        }
-    }
-
-    /**
-     * 
-     *
-     */
-    private void setValues() {
-        jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
-
-        if ( settings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) ) {
-            jRadioButtonMean.setSelected( true );
-        } else {
-            jRadioButtonMedian.setSelected( true );
-        }
-
-        geneScoreThresholdTextField.setText( String.valueOf( settings.getGeneScoreThreshold() ) );
-        jCheckBoxDoLog.setSelected( settings.getDoLog() );
-        jCheckBoxBigIsBetter.setSelected( settings.getBigIsBetter() );
-        jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
-        jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
-    }
-
-    /**
-     * 
-     *
-     */
-    public void saveValues() {
-        settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
-
-        if ( jRadioButtonMean.isSelected() ) {
-            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
-        } else {
-            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
-        }
-
-        settings.setGeneScoreThreshold( Double.valueOf( geneScoreThresholdTextField.getText() ).doubleValue() );
-        settings.setDoLog( jCheckBoxDoLog.isSelected() );
-        settings.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
-        settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );
-        settings.setUseMultifunctionalityCorrection( jCheckBoxDoMultiFuncCorr.isSelected() );
-    }
-
-    @Override
-    public boolean isReady() {
-        return true;
     }
 }

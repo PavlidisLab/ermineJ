@@ -20,8 +20,6 @@ package ubic.erminej;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.UIManager;
 
@@ -40,9 +38,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
-import ubic.basecode.dataStructure.matrix.DoubleMatrix;
-import ubic.basecode.dataStructure.matrix.FastRowAccessDoubleMatrix;
-import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
@@ -53,9 +48,7 @@ import ubic.erminej.SettingsHolder.MultiTestCorrMethod;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetTerms;
-import ubic.erminej.data.Probe;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
@@ -97,9 +90,7 @@ public class classScoreCMD {
             initialize();
             try {
                 GeneSetPvalRun result = analyze();
-                getSettings().writeAnalysisSettings( getSaveFileName() );
-                ResultsPrinter rp = new ResultsPrinter( getSaveFileName(), result, isSaveAllGenes() );
-                rp.printResults( true );
+                ResultsPrinter.write( getSaveFileName(), result, isSaveAllGenes() );
             } catch ( Exception e ) {
                 getStatusMessenger().showStatus( "Error During analysis:" + e );
                 e.printStackTrace();
@@ -121,8 +112,8 @@ public class classScoreCMD {
     protected StatusViewer statusMessenger;
     protected GeneSetTerms goData;
     protected GeneAnnotations geneData;
-    protected Map<String, DoubleMatrix<Probe, String>> rawDataSets;
-    protected Map<String, GeneScores> geneScoreSets;
+    // protected Map<String, DoubleMatrix<Probe, String>> rawDataSets;
+    // protected Map<String, GeneScores> geneScoreSets;
     private String saveFileName = null;
     private boolean useCommandLineInterface = true;
 
@@ -140,8 +131,8 @@ public class classScoreCMD {
             log.fatal( "There was an error with the configuration: " + e );
             System.exit( 1 );
         }
-        rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
-        geneScoreSets = new HashMap<String, GeneScores>();
+        // rawDataSets = new HashMap<String, DoubleMatrix<Probe, String>>();
+        // geneScoreSets = new HashMap<String, GeneScores>();
         this.buildOptions();
     }
 
@@ -704,57 +695,8 @@ public class classScoreCMD {
      * @throws IOException
      */
     protected GeneSetPvalRun analyze() throws IOException {
-        DoubleMatrix<Probe, String> rawData = null;
-        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
-            if ( rawDataSets.containsKey( settings.getRawDataFileName() ) ) {
-                statusMessenger.showStatus( "Raw data are in memory" );
-                rawData = rawDataSets.get( settings.getRawDataFileName() );
-            } else {
-                statusMessenger.showStatus( "Reading raw data from file " + settings.getRawDataFileName() );
-                DoubleMatrixReader r = new DoubleMatrixReader();
-
-                DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName() );
-
-                rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
-                rawData.setColumnNames( omatrix.getColNames() );
-                for ( int i = 0; i < omatrix.rows(); i++ ) {
-                    String n = omatrix.getRowName( i );
-                    Probe p = geneData.findProbe( n );
-                    if ( p == null ) {
-                        throw new IllegalArgumentException(
-                                "Some probes in the data don't match those in the annotations" );
-                    }
-                    rawData.setRowName( p, i );
-                }
-
-                rawDataSets.put( settings.getRawDataFileName(), rawData );
-            }
-        }
-
-        GeneScores geneScores = null;
-        if ( !( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) /*
-                                                                                       * except correlation scoring, no
-                                                                                       * gene scores required
-                                                                                       */) {
-            if ( geneScoreSets.containsKey( settings.getScoreFile() ) ) {
-                statusMessenger.showStatus( "Gene Scores are in memory" );
-                geneScores = geneScoreSets.get( settings.getScoreFile() );
-            } else {
-                assert settings.getScoreFile() != null;
-                statusMessenger.showStatus( "Reading gene scores from file " + settings.getScoreFile() );
-                geneScores = new GeneScores( settings.getScoreFile(), settings, statusMessenger, geneData );
-                geneScoreSets.put( settings.getScoreFile(), geneScores );
-            }
-
-            if ( !settings.getScoreFile().equals( "" ) && geneScores == null ) {
-                statusMessenger.showStatus( "Didn't get geneScores" );
-            }
-        }
-
-        /* do work */
         statusMessenger.showStatus( "Starting analysis..." );
-        GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, rawData, geneScores, statusMessenger,
-                "command" );
+        GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, statusMessenger, "command" );
         return runResult;
     }
 

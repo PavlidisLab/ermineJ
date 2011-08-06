@@ -28,8 +28,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import cern.colt.list.DoubleArrayList;
 
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.math.Rank;
@@ -92,8 +95,22 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         }
         this.geneData = geneSetDetails.getGeneData();
 
+        // all ranks.
+
+        Double[] geneScores = geneSetDetails.getSourceGeneScores().getGeneScores();
+        DoubleArrayList allScoreRanks = Rank.rankTransform(
+                new DoubleArrayList( ArrayUtils.toPrimitive( geneScores ) ), settings.getBigIsBetter() );
+        for ( int i = 0; i < allScoreRanks.size(); i++ ) {
+            double rank = allScoreRanks.get( i );
+            double score = geneScores[i];
+
+            // FIXME compute permiles (probably overkill...)
+
+            // also has to be done for multifunctionality.
+
+        }
+
         configure();
-        createLinkLabels();
     }
 
     @Override

@@ -19,7 +19,6 @@
 package ubic.erminej.gui.analysis;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
@@ -38,7 +37,6 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
@@ -51,7 +49,6 @@ import ubic.basecode.math.Smooth;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
-import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Multifunctionality;
 import ubic.erminej.gui.MainFrame;
@@ -147,7 +144,7 @@ public class MultiFuncDiagWindow extends JFrame {
                 PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
         c.setTitle( "How biased are the gene scores\n(raw; regression)" );
-        setChartTitleFont( c );
+        Plotting.setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );
         plot.getRenderer().setSeriesPaint( 0, Color.GRAY );
@@ -159,10 +156,6 @@ public class MultiFuncDiagWindow extends JFrame {
         ChartPanel p = new ChartPanel( c );
         return p;
 
-    }
-
-    private void setChartTitleFont( JFreeChart c ) {
-        c.getTitle().setFont( c.getTitle().getFont().deriveFont( Font.PLAIN, 12 ) );
     }
 
     /**
@@ -219,7 +212,7 @@ public class MultiFuncDiagWindow extends JFrame {
                 "Score rank", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
         c.setTitle( "How biased are the gene scores\n(Ranks, smoothed trend)" );
-        setChartTitleFont( c );
+        Plotting.setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );
         plot.getRenderer().setSeriesPaint( 0, Color.GRAY );
@@ -253,23 +246,7 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart histogram = ChartFactory.createHistogram( "Gene multifuntionality", "Number of sets gene has",
                 "Number of genes", series, PlotOrientation.VERTICAL, false, false, false );
 
-        histogram.setTitle( "How many sets are genes in" );
-        setChartTitleFont( histogram );
-
-        XYPlot plot = histogram.getXYPlot();
-        plot.setRangeGridlinesVisible( false );
-        plot.setDomainGridlinesVisible( false );
-        plot.setBackgroundPaint( Color.white );
-
-        XYBarRenderer renderer = ( XYBarRenderer ) plot.getRenderer();
-        renderer.setBasePaint( Color.white );
-        renderer.setSeriesPaint( 0, Color.DARK_GRAY );
-
-        renderer.setDrawBarOutline( false );
-        renderer.setShadowVisible( false );
-
-        ChartPanel p = new ChartPanel( histogram );
-        return p;
+        return Plotting.plotHistogram( "How many sets are genes in", histogram );
     }
 
     /**
@@ -293,23 +270,7 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart histogram = ChartFactory.createHistogram( "Gene set sizes", "Number of genes in set",
                 "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
 
-        histogram.setTitle( "How big are the sets" );
-        setChartTitleFont( histogram );
-
-        XYPlot plot = histogram.getXYPlot();
-        plot.setRangeGridlinesVisible( false );
-        plot.setDomainGridlinesVisible( false );
-        plot.setBackgroundPaint( Color.white );
-
-        XYBarRenderer renderer = ( XYBarRenderer ) plot.getRenderer();
-        renderer.setBasePaint( Color.white );
-        renderer.setSeriesPaint( 0, Color.DARK_GRAY );
-
-        renderer.setDrawBarOutline( false );
-        renderer.setShadowVisible( false );
-
-        ChartPanel p = new ChartPanel( histogram );
-        return p;
+        return Plotting.plotHistogram( "How big are the sets", histogram );
     }
 
     /**
@@ -336,22 +297,8 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart histogram = ChartFactory.createHistogram( "Gene set multifunctionalities", "Area under ROC curve",
                 "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
 
-        histogram.setTitle( "How multifunctional are the sets?" );
-        setChartTitleFont( histogram );
-
-        XYPlot plot = histogram.getXYPlot();
-        plot.setRangeGridlinesVisible( false );
-        plot.setDomainGridlinesVisible( false );
-        plot.setBackgroundPaint( Color.white );
-
-        XYBarRenderer renderer = ( XYBarRenderer ) plot.getRenderer();
-        renderer.setBasePaint( Color.white );
-        renderer.setSeriesPaint( 0, Color.DARK_GRAY );
-
-        renderer.setDrawBarOutline( false );
-        renderer.setShadowVisible( false );
-
-        ChartPanel p = new ChartPanel( histogram );
-        return p;
+        String title = "How multifunctional are the sets?";
+        return Plotting.plotHistogram( title, histogram );
     }
+
 }

@@ -147,8 +147,8 @@ public class GeneAnnotations {
      * 
      * @param start
      * @param probes which must be a subset of those in start (others will be ignored)
-     * @param pruneUnannotated if true, probes lacking annotations are removed. This then becomes unmutable in the sense
-     *        that adding annotations is not allowed. This constructor should generally be used
+     * @param pruneUnannotated if true (normally!), probes lacking annotations are removed. This then becomes unmutable
+     *        in the sense that adding annotations is not allowed.
      */
     public GeneAnnotations( GeneAnnotations start, Collection<Probe> probes, boolean pruneUnannotated ) {
         if ( messenger != null ) this.messenger = start.messenger;
@@ -430,6 +430,14 @@ public class GeneAnnotations {
     public GeneSet findGeneSet( GeneSetTerm term ) {
         if ( term == null ) return null;
         return this.geneSets.get( term );
+    }
+
+    /**
+     * @return
+     */
+    public GeneSetTerms getGeneSetTermsHolder() {
+        // FIXME stupid method name .. conflicts with other.
+        return this.geneSetTerms;
     }
 
     /**
@@ -885,7 +893,6 @@ public class GeneAnnotations {
 
         log.info( "Clone: " + timer.getTime() );
 
-        // FIXME allow us to clear these out if we are not using them any more. (RAM)
         this.subClones.add( clone );
 
         this.messenger.clear();
@@ -1060,9 +1067,6 @@ public class GeneAnnotations {
     /**
      * Remove classes that have too few members, or which are obsolete. These are not removed from the GO tree
      * 
-     * @param lowThreshold - in practice, 2
-     * @param highThreshold - FIXME setting this 'low' can cause problems (orphaned child terms), so in practice don't
-     *        use it.
      * @param subCloning signals that we're making a copy of another annotation set for the purpose of analysis; ensures
      *        the original is not pruned.
      */

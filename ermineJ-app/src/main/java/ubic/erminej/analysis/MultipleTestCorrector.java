@@ -33,6 +33,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.concurrent.CancellationException;
+
+import javax.help.UnsupportedOperationException;
+
 import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.SettingsHolder;
@@ -175,6 +178,8 @@ public class MultipleTestCorrector extends AbstractLongTask {
      * @see westfallyoung(numtrials)
      */
     public void westfallyoung() {
+        if ( geneScores == null )
+            throw new UnsupportedOperationException( "Can't run WY correction on correlated method results." );
         westfallyoung( DEFAULT_WY_TRIALS ); // default number of trials.
     }
 

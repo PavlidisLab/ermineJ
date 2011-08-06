@@ -38,7 +38,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.FileTools;
-import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneAnnotationParser.Format;
@@ -92,8 +91,7 @@ public class Settings extends SettingsHolder {
      * @param fileName
      * @throws IOException
      */
-    public static void writeAnalysisSettings( SettingsHolder settings, String fileName, StatusViewer viewer )
-            throws IOException {
+    public static void writeAnalysisSettings( SettingsHolder settings, String fileName ) throws IOException {
         PropertiesConfiguration configToWrite = settings.getConfig();
         Writer out = null;
 
@@ -101,7 +99,6 @@ public class Settings extends SettingsHolder {
             if ( fileName == null ) {
                 out = new BufferedWriter( new PrintWriter( System.out ) );
             } else {
-                viewer.showStatus( "Writing configuration to: " + fileName );
                 out = new BufferedWriter( new FileWriter( fileName ) );
             }
 
@@ -734,6 +731,11 @@ public class Settings extends SettingsHolder {
 
     public boolean isAutoSaving() {
         return this.config.isAutoSave();
+    }
+
+    public void setSaveAllGenesInOutput( boolean saveAllGenes ) {
+        config.setProperty( SAVE_ALL_GENES_IN_OUTPUT, saveAllGenes );
+
     }
 
 }

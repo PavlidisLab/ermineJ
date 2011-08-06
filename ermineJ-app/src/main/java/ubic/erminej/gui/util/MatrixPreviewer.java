@@ -117,7 +117,8 @@ public class MatrixPreviewer {
      */
     public static void previewMatrix( Window w, StringMatrix<String, String> matrix ) {
 
-        int numColumnsShown = 1 + Math.min( 20 /* MAX_COLUMNS_TO_PREVIEW */, matrix.columns() + 1 );
+        // including the row labels.
+        int numColumnsShown = 1 + Math.min( 20 /* MAX_COLUMNS_TO_PREVIEW */, matrix.columns() );
 
         Object[][] mat = new Object[matrix.rows()][numColumnsShown];
         Object[] headings = new Object[numColumnsShown];

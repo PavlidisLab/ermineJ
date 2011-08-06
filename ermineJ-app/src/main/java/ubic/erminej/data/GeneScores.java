@@ -58,6 +58,8 @@ import ubic.erminej.SettingsHolder;
  */
 public class GeneScores {
 
+    private static final String PROBE_IGNORE_REGEX = "AFFX.*";
+
     private static final double SMALL = 10e-16;
     protected static final Log log = LogFactory.getLog( GeneScores.class );
 
@@ -93,7 +95,7 @@ public class GeneScores {
      */
     public GeneScores( GeneScores source, Collection<Probe> probes ) {
         this.geneAnnots = source.geneAnnots;
-        this.messenger = source.messenger;
+        if ( source.messenger != null ) this.messenger = source.messenger;
 
         this.biggerIsBetter = source.biggerIsBetter;
         this.logTransform = source.logTransform;
@@ -187,7 +189,7 @@ public class GeneScores {
                 continue;
             }
 
-            if ( probe.getName().matches( "AFFX.*" ) ) { // FIXME: put this rule somewhere else // todo use a filter.
+            if ( probe.getName().matches( PROBE_IGNORE_REGEX ) ) {
                 continue;
             }
 
@@ -247,7 +249,7 @@ public class GeneScores {
             throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
         }
         this.geneAnnots = geneAnnots;
-        this.messenger = messenger;
+        if ( messenger != null ) this.messenger = messenger;
         this.init( settings );
         FileTools.checkPathIsReadableFile( filename );
         InputStream is = FileTools.getInputStreamFromPlainOrCompressedFile( filename );
@@ -436,22 +438,23 @@ public class GeneScores {
 
             String probeId = StringUtils.strip( fields[0] );
 
-            if ( probeId.matches( "AFFX.*" ) ) { // FIXME: put this rule somewhere else
-                if ( messenger != null && !warned ) {
+            if ( probeId.matches( PROBE_IGNORE_REGEX ) ) {
+                if ( !warned ) {
                     messenger.showStatus( "Skipping probe in pval file: " + probeId + " (further warnings suppressed)" );
                     warned = true;
                 }
                 continue;
             }
 
+            // number of rows ... less those skipped above.
             totalProbes++;
 
-            // only keep probes that are in our array platform.
+            // only keep probes that have annotations.
 
             Probe p = geneAnnots.findProbe( probeId );
 
             if ( p == null ) {
-                if ( log.isDebugEnabled() ) log.debug( "\"" + probeId + "\" not in the annotations, ignoring" );
+                // Probably just means there are no annotations at all.
                 unknownProbes.add( probeId );
                 numUnknownProbes++;
                 continue;
@@ -462,7 +465,7 @@ public class GeneScores {
                 continue;
             }
 
-            double score = 0.0;
+            double score = Double.NaN;
             try {
                 score = Double.parseDouble( fields[scoreColumnIndex] );
             } catch ( NumberFormatException e ) {
@@ -526,56 +529,55 @@ public class GeneScores {
     private void reportProblems( boolean invalidLog, Collection<String> unknownProbes,
             Collection<String> unannotatedProbes, boolean invalidNumber, String badNumberString, int numProbesKept,
             int numRepeatedProbes, int totalProbes ) {
-        if ( invalidNumber && messenger != null ) {
+        if ( invalidNumber ) {
 
             messenger.showError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
-                    + " found for input file. These are set to an initial value of zero." );
+                    + " found for input file. These are set to missing" );
         }
-        if ( invalidLog && messenger != null ) {
+        if ( invalidLog ) {
             messenger
                     .showError( "Warning: There were attempts to take the log of non-positive values. These are set to "
                             + SMALL );
         }
-        if ( messenger != null && unknownProbes.size() > 0 ) {
-            messenger.showError( "Warning: " + unknownProbes.size() + " probes ("
-                    + String.format( "%.2f", 100.00 * unknownProbes.size() / totalProbes )
-                    + "%) in your gene score file were not found in the annotations." );
+        if ( unknownProbes.size() > 0 ) {
 
-            int count = 0;
-            StringBuffer buf = new StringBuffer();
-            for ( Iterator<String> iter = unknownProbes.iterator(); iter.hasNext(); ) {
-                if ( count >= 10 ) break;
-                String probe = iter.next();
-                buf.append( probe + "," );
-                count++;
-            }
-            messenger.showError( "Unmatched probes are (up to 10 shown): "
-                    + StringUtils.abbreviate( buf.toString(), 100 ) );
+            /*
+             * Probes which have absolutely no annotations or gene assigned will be missed entirely. So this needn't be
+             * a scary message
+             */
+            messenger.showError( probeToScoreMap.size()
+                    + " ("
+                    + String.format( "%.2f", 100.00 * probeToScoreMap.size()
+                            / ( probeToScoreMap.size() + unknownProbes.size() ) )
+                    + ") of the scores were usable (others may not have genes in the annotations?)" );
         }
 
-        if ( messenger != null && !unannotatedProbes.isEmpty() ) {
+        if ( !unannotatedProbes.isEmpty() ) {
+            /*
+             * This is in addition to those which have no gene (listed as unknownProbes)
+             */
             messenger.showError( unannotatedProbes.size()
-                    + " probes in your gene score file had no gene annotations and were ignored." );
+                    + " probes in your gene score file had no gene sets and were ignored." );
         }
 
-        if ( messenger != null && numRepeatedProbes > 0 ) {
+        if ( numRepeatedProbes > 0 ) {
             messenger
                     .showError( "Warning: "
                             + numRepeatedProbes
                             + " identifiers in your gene score file were repeats. Only the first occurrence encountered was kept in each case." );
         }
 
-        if ( numProbesKept == 0 && messenger != null ) {
+        if ( numProbesKept == 0 ) {
             messenger.showError( "None of the probes in the gene score file correspond to probes in the "
                     + "annotation file you selected. None of your data will be displayed." );
         }
 
-        if ( probeToScoreMap.isEmpty() && messenger != null ) {
+        if ( probeToScoreMap.isEmpty() ) {
             messenger.showError( "No probe scores found! Please check the file has"
                     + " the correct plain text format and"
                     + " corresponds to the gene annotation (\".an\") file you selected." );
         } else if ( messenger != null ) {
-            messenger.showStatus( "Found " + probeToScoreMap.size() + " scores in the file" );
+            // messenger.showStatus( "Found " + probeToScoreMap.size() + " usable scores in the file" );
         }
     }
 

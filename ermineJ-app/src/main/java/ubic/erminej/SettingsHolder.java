@@ -105,6 +105,7 @@ public class SettingsHolder {
     protected static final String USE_CELL_COMP = "useGOCellularComponent";
     protected static final String USE_USER_DEFINED_GROUPS = "useUserDefinedGroups";
     protected static final String CUSTOM_GENE_SET_DIRECTORY_PROPERTY = "classFolder";
+    protected static final String SAVE_ALL_GENES_IN_OUTPUT = "saveAllGenesInOutput";
 
     public static final String GENE_URL_BASE = "gene.url.base";
     protected static final String DEFAULT_CUSTOM_GENE_SET_DIR_NAME = "genesets";
@@ -143,6 +144,7 @@ public class SettingsHolder {
         defaults.put( BIG_IS_BETTER, false );
         defaults.put( USE_USER_DEFINED_GROUPS, true );
         defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, false );
+        defaults.put( SAVE_ALL_GENES_IN_OUTPUT, false );
 
         defaults.put( USE_MOL_FUNC, true );
         defaults.put( USE_CELL_COMP, true );
@@ -204,6 +206,13 @@ public class SettingsHolder {
     public String getClassFile() {
         assert config != null;
         return config.getString( CLASS_FILE );
+    }
+
+    /**
+     * @return true if outputs should include all genes genes in each gene set.
+     */
+    public boolean getSaveAllGenesInOutput() {
+        return config.getBoolean( SAVE_ALL_GENES_IN_OUTPUT );
     }
 
     /**

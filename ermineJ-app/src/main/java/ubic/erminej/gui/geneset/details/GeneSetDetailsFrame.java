@@ -712,9 +712,34 @@ public class GeneSetDetailsFrame extends JFrame {
             }
         } );
 
+        /*
+         * Add
+         */
+        JMenu analysisMenu = new JMenu( "Analysis" );
+        JMenuItem contextMenuItem = new JMenuItem( "Context in score ranking" );
+        contextMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                viewContext();
+            }
+        } );
+
+        analysisMenu.add( contextMenuItem );
+
         menuBar.add( fileMenu );
         menuBar.add( viewMenu );
         menuBar.add( optionsMenu );
+        menuBar.add( analysisMenu );
+    }
+
+    /**
+     * Pop up a chart showing ROC and PR curves for this gene set in the full ranking.
+     */
+    protected void viewContext() {
+        GeneSetRankingContextWindow w = new GeneSetRankingContextWindow( this.geneSetDetails );
+        w.setSize( new Dimension( 500, 500 ) );
+        GuiUtil.centerContainer( w );
+        w.setVisible( true );
     }
 
     /**
@@ -889,6 +914,8 @@ public class GeneSetDetailsFrame extends JFrame {
         sorter.setComparator( matrixColumnCount + 2, new Comparator<List<Double>>() {
             @Override
             public int compare( List<Double> o1, List<Double> o2 ) {
+                if ( o1 == null || o2 == null || o1.size() < 2 || o2.size() < 2 ) return 0;
+
                 if ( settings.getBigIsBetter() ) return -o1.get( 1 ).compareTo( o2.get( 1 ) );
                 return o1.get( 1 ).compareTo( o2.get( 1 ) );
             }
@@ -1033,7 +1060,7 @@ public class GeneSetDetailsFrame extends JFrame {
     } // end saveImage
 
     /**
-     * Keep the same gene set, but change the scores. FIXME let use choose the start column.
+     * Keep the same gene set, but change the scores.
      */
     protected void switchGeneScoreFile() {
         JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( settings.getScoreFile(), settings.getScoreCol() );

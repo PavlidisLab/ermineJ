@@ -143,7 +143,9 @@ public class GeneSetTableModel extends AbstractTableModel {
                 GeneSetTerm t = it.next();
 
                 // order matters.
-                if ( filterEmpty && geneData.getGeneSetGenes( t ).isEmpty() ) {
+                if ( t.isAspect() ) {
+                    it.remove(); // never show aspect.
+                } else if ( filterEmpty && geneData.getGeneSetGenes( t ).isEmpty() ) {
                     it.remove();
                 } else if ( filterNonUsers && !t.isUserDefined() ) {
                     it.remove();

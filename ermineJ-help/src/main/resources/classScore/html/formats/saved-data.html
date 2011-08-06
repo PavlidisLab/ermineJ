@@ -18,29 +18,34 @@
 plain text file that can be opened in Excel or a similar program. Here
 is a <a href="../samples/sample-savedrun.txt">sample</a>.</p>
 
+<p>The same format is used for "projects".</p>
+
 <p>If you intend to load the results back into ermineJ at some future
 point, we recommend not editing this file. Instead, make a copy after
 you load it into excel.</p>
 
-<p>The file is tab-delimited and has three parts:</p>
+<p>The file is tab-delimited and can contain zero, one, or more result sets. Files
+with zero result sets can just contain settings. Each result set has its own settings stored in the file.</p>
+
+<p>Each result set is stored in two main sections:</p>
 
 <ol>
-	<li>A header, which contains information about the configuration used
-	during analysis. This information is used by ermineJ to recreate the
+	<li>A header, which contains settings (information about the configuration used
+	during analysis). This information is used by ermineJ to recreate the
 	conditions that existed after the analysis was run. Most of it is
-	human-readable. Currently some settings are encoded as numbers
-	(e.g.,"rawScoreMethod = 0", which means that the mean of gene scores is
-	taken during analysis). Future versions of ermineJ may changes this.
-	Note that the number of lines in the header is not fixed and may change
+	human-readable. In versions of ErmineJ prior to 3.0, some settings were encoded as numbers
+	(e.g.,"rawScoreMethod = 0"). This format is still usable by ErmineJ but might be removed at a later date. 
+	If you are planning downstream analysis of the output, be aware that the number of lines in the header is not fixed and may change
 	in future versions of ermineJ.</li>
 
-	<li>Column headers, which are preceded by a "#". For explanations of
-	these values, see below.</li>
-
-	<li>The values, one row for each gene set. Note that due to numerical
-	roundoff, when you reload an analysis into ermineJ you may lose some
-	precision in the pvalues, for example. The</li>
+	<li>The analysis results themselves, one row for each gene set. This section has a row of column headers, 
+	which are preceded by "#!". For explanations of these values, see below. 
+	Note that when you reload an analysis into ermineJ you may lose small amounts of 
+	numerical precision. For example, small but non-zero 
+	pvalues might be read in only as zeros.</li>
 </ol>
+
+<p>In addition to these sections, the file may contain comments preceded by "#".
 
 
 <p>The columns in the output file are:</p>
@@ -59,6 +64,8 @@ you load it into excel.</p>
 	<li>Pval - the p value for the gene set.</li>
 	<li>CorrectedPvalue - the corrected p pvalue. See <a
 		href="../tutorial/mtc.html">this page</a> for more information.</li>
+	<li>MultifuncBias - How biased the genes in the set are towards
+	 <a href="../tutorial/multifunc.html">multifunctional genes</a>. </li>
 	<li>Same as - a list of gene sets which have the exact same members as
 	this one. Such gene sets are not listed anywhere else.</li>
 	<li>Similar to - Currently not used</li>
@@ -67,13 +74,27 @@ you load it into excel.</p>
 	separated by "|".</li>
 </ol>
 
-<p>Note to programmers: ErmineJ uses Apache Commons configuration to
+<p style="font-size=smaller">Note to programmers: ErmineJ uses Apache Commons configuration to
 manage properties files. The results file is treated as a properties
-file when it is reloaded, but we're only interested in the header.
+file when it is reloaded, but we're only interested in the configuration lines, not the analysis results.
 Therefore lines that are not properties must be commented out. This is
 why there are lines that start with # and !. We use ! instead of # to
 help parsers distinguish between data lines and header lines. One of
-these days we'll fix this oddity.</p>
+these days we'll fix this oddity (well, probably not; it works pretty well).</p>
 
+
+		<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
+		: "http://www.");
+document
+		.write(unescape("%3Cscript src='"
+				+ gaJsHost
+				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+		<script type="text/javascript">
+var pageTracker = _gat._getTracker('UA-4826357-1');
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 </body>
 </html>

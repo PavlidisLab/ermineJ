@@ -45,11 +45,17 @@ import ubic.erminej.data.GeneSetTerm;
  * @version $Id$
  */
 public class ResultsPrinter {
+
+    /*
+     * File format formalities
+     */
+
+    protected static final String RUN_NAME_FIELD_PATTERN = "!# runName=";
+    private static final String SYMBOL_SEPARATOR = "|";
+    protected static final String RUN_INDICATOR = "!#======";
+    private static final String RUN_SEPARATOR = RUN_INDICATOR + " End run =======";
+
     private static Log log = LogFactory.getLog( ResultsPrinter.class.getName() );
-    protected String destFile;
-    private boolean saveAllGeneNames = false;
-    private List<GeneSetPvalRun> runsToSave = new ArrayList<GeneSetPvalRun>();
-    private GeneAnnotations geneData;
 
     /**
      * @param destFile output file name
@@ -57,54 +63,39 @@ public class ResultsPrinter {
      * @param goName GO information
      * @param saveAllGeneNames Whether the output should include all the genes
      */
-    public ResultsPrinter( String destFile, GeneSetPvalRun run, boolean saveAllGeneNames ) {
-        this.destFile = destFile;
-        this.saveAllGeneNames = saveAllGeneNames;
-        this.runsToSave.add( run );
-
-        this.geneData = run.getGeneData();
-
-        if ( saveAllGeneNames ) log.debug( "Will save all genes" );
+    public static void write( String destFile, GeneSetPvalRun run, boolean saveAllGeneNames ) throws IOException {
+        Settings.writeAnalysisSettings( run.getSettings(), destFile );
+        printOneResultSet( run, getDestination( destFile ), saveAllGeneNames, true );
     }
 
     /**
-     * @param path
+     * Used for saving "projects".
+     * 
+     * @param path Output path
+     * @param masterSettings
      * @param runsToSave
      */
-    public ResultsPrinter( String path, Collection<GeneSetPvalRun> runsToSave ) {
+    public static void write( String path, Settings masterSettings, Collection<GeneSetPvalRun> runsToSave )
+            throws IOException {
+
         if ( runsToSave.isEmpty() ) {
+            // only the settings to consider.
+            masterSettings.writeAnalysisSettings( path );
             return;
         }
-        this.runsToSave.addAll( runsToSave );
-        this.geneData = runsToSave.iterator().next().getGeneData();
-        this.destFile = path;
-    }
 
-    /**
-     * @return
-     */
-    public String getDestFile() {
-        return destFile;
-    }
+        Writer w = getDestination( path );
+        for ( GeneSetPvalRun run : runsToSave ) {
+            w.write( "# Start analysis run: " + run.getName() + "\n" );
+            // followed by settings.
+            w.write( "# Settings\n" );
+            Settings.writeAnalysisSettings( run.getSettings(), path );
+            w.write( RUN_NAME_FIELD_PATTERN + run.getName() + "\n" );
+            printOneResultSet( run, w, masterSettings.getSaveAllGenesInOutput(), true );
 
-    /**
-     * @throws IOException Print the results (without the settings on top)
-     */
-    public void printResults() throws IOException {
-        this.printResults( false );
-    }
-
-    public void printResults( boolean sort ) throws IOException {
-        Writer out = getDestination();
-
-        for ( GeneSetPvalRun run : this.runsToSave ) {
-            printOneResultSet( run, out, sort );
-            out.write( "!# ====\ncurrentRunName=" + run.getName() + "\n" );
-            if ( runsToSave.size() > 1 ) {
-
-            }
+            w.write( RUN_SEPARATOR );
         }
-        out.close();
+
     }
 
     /**
@@ -112,7 +103,8 @@ public class ResultsPrinter {
      * 
      * @param sort Sort the results so the best class (by score pvalue) is listed first.
      */
-    public void printOneResultSet( GeneSetPvalRun resultRun, Writer out, boolean sort ) throws IOException {
+    private static void printOneResultSet( GeneSetPvalRun resultRun, Writer out, boolean saveAllGeneNames, boolean sort )
+            throws IOException {
 
         if ( resultRun == null ) {
             log.warn( "No results to print" );
@@ -120,6 +112,7 @@ public class ResultsPrinter {
         }
 
         Map<GeneSetTerm, GeneSetResult> results = resultRun.getResults();
+        GeneAnnotations geneData = resultRun.getGeneData();
 
         boolean first = true;
         if ( sort ) {
@@ -132,7 +125,7 @@ public class ResultsPrinter {
                     first = false;
                     res.printHeadings( out, "\tSame as" + "\tGeneMembers" );
                 }
-                print( out, res );
+                print( out, saveAllGeneNames, geneData, res );
             }
         } else {
             // output them in alphabetical order. This is useful for testing.
@@ -145,7 +138,7 @@ public class ResultsPrinter {
                     first = false;
                     res.printHeadings( out, "\tSame as" + "\tGenesMembers" );
                 }
-                print( out, res );
+                print( out, saveAllGeneNames, geneData, res );
             }
         }
 
@@ -156,12 +149,13 @@ public class ResultsPrinter {
      * @param res
      * @throws IOException
      */
-    private void print( Writer out, GeneSetResult res ) throws IOException {
-        res.print( out, "\t" + formatRedundantAndSimilar( res.getGeneSetId() ) + "\t"
-                + ( this.saveAllGeneNames ? formatGeneNames( res.getGeneSetId() ) : "" ) + "\t" );
+    private static void print( Writer out, boolean saveAllGeneNames, GeneAnnotations geneData, GeneSetResult res )
+            throws IOException {
+        res.print( out, "\t" + formatRedundantAndSimilar( geneData, res.getGeneSetId() ) + "\t"
+                + ( saveAllGeneNames ? formatGeneNames( geneData, res.getGeneSetId() ) : "" ) + "\t" );
     }
 
-    private Writer getDestination() throws IOException {
+    private static Writer getDestination( String destFile ) throws IOException {
         Writer out;
         if ( destFile == null ) {
             log.debug( "Writing results to STDOUT" );
@@ -174,26 +168,19 @@ public class ResultsPrinter {
     }
 
     /**
-     * @param destFile
-     */
-    public void setDestFile( String destFile ) {
-        this.destFile = destFile;
-    }
-
-    /**
      * @param className
      * @return
      */
-    private String formatGeneNames( GeneSetTerm className ) {
+    private static String formatGeneNames( GeneAnnotations geneData, GeneSetTerm className ) {
         if ( className == null ) return "";
-        Collection<Gene> genes = this.geneData.getGeneSetGenes( className );
+        Collection<Gene> genes = geneData.getGeneSetGenes( className );
         if ( genes == null || genes.size() == 0 ) return "";
         List<Gene> sortedGenes = new ArrayList<Gene>( genes );
         Collections.sort( sortedGenes );
         StringBuffer buf = new StringBuffer();
         for ( Iterator<Gene> iter = sortedGenes.iterator(); iter.hasNext(); ) {
             Gene gene = iter.next();
-            buf.append( gene.getSymbol() + "|" );
+            buf.append( gene.getSymbol() + SYMBOL_SEPARATOR );
         }
         return buf.toString();
     }
@@ -204,7 +191,7 @@ public class ResultsPrinter {
      * @param classid String
      * @return String
      */
-    private String formatRedundantAndSimilar( GeneSetTerm classid ) {
+    private static String formatRedundantAndSimilar( GeneAnnotations geneData, GeneSetTerm classid ) {
         Collection<GeneSet> redund = geneData.findGeneSet( classid ).getRedundantGroups();
         String return_value = "";
         if ( redund.isEmpty() ) {
@@ -212,7 +199,7 @@ public class ResultsPrinter {
         }
 
         for ( GeneSet nextid : redund ) {
-            return_value = return_value + nextid.getId() + "|" + nextid.getName() + ", ";
+            return_value = return_value + nextid.getId() + SYMBOL_SEPARATOR + nextid.getName() + ", ";
         }
 
         return return_value;

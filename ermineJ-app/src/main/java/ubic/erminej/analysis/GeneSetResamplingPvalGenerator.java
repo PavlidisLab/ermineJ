@@ -53,6 +53,8 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
             GeneAnnotations geneData, StatusViewer messenger ) {
         super( settings, geneData );
 
+        this.numGenesUsed = geneToScoreMap.size();
+
         if ( messenger != null ) this.messenger = messenger;
 
         NullDistributionGenerator probePvalMapper = new GeneSetResamplingBackgroundDistributionGenerator( settings,

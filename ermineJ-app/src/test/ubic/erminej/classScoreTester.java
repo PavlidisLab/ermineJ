@@ -77,8 +77,7 @@ public class classScoreTester extends classScoreCMD {
 
                 try {
                     GeneSetPvalRun result = analyze();
-                    ResultsPrinter rp = new ResultsPrinter( saveFileName, result, false );
-                    rp.printResults( false ); // don't sort.
+                    ResultsPrinter.write( saveFileName, result, false );
                 } catch ( Exception e ) {
                     statusMessenger.showStatus( "Error During analysis: " + e );
                     e.printStackTrace();
