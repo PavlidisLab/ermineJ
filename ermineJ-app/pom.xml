@@ -3,13 +3,13 @@
 	<parent>
 		<artifactId>ermineJ</artifactId>
 		<groupId>ermineJ</groupId>
-		<version>2.1.22-SNAPSHOT</version>
+		<version>3.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>ermineJ-app</artifactId>
 	<name>ermineJ-app</name>
 	<groupId>ermineJ</groupId>
-	<version>2.1.22-SNAPSHOT</version>
+	<version>3.0-SNAPSHOT</version>
 	<description>application jar file for ermineJ</description>
 	<packaging>jar</packaging>
 	<dependencies>
