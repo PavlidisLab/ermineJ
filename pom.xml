@@ -8,7 +8,7 @@
 		<name>UBC Centre for High-Throughput Biology</name>
 		<url>http://www.chibi.ubc.ca</url>
 	</organization>
-	<inceptionYear>2002</inceptionYear> <!-- yes, the first code was laid down in 2002! --/>
+	<inceptionYear>2002</inceptionYear> <!-- yes, the first code was laid down in 2002! -->
 	<description>
 		ErmineJ performs analyses of gene sets in genomics studies. A typical goal is to determine whether
 		particular biological pathways are "doing something interesting", given a ranked list of genes. The software is designed to be
