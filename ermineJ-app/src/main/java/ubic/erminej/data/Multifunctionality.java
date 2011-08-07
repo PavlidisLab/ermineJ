@@ -58,7 +58,6 @@ public class Multifunctionality {
 
     private Map<GeneSetTerm, Double> goTermMultifunctionality = new HashMap<GeneSetTerm, Double>();
 
-    // FIXME not really used.
     private Map<GeneSetTerm, Double> goTermMultifunctionalityRank = new HashMap<GeneSetTerm, Double>();
 
     private Map<Gene, Double> geneMultifunctionalityRank = new HashMap<Gene, Double>();
@@ -68,6 +67,8 @@ public class Multifunctionality {
     private Collection<Gene> genesWithGoTerms;
 
     private AtomicBoolean stale = new AtomicBoolean( true );
+
+    private QuantileBin1D quantiles = null;
 
     /**
      * Construct Multifunctionality information based on the state of the GO annotations -- this accounts only for the
@@ -164,6 +165,24 @@ public class Multifunctionality {
             rawVals.add( mf );
         }
         return -Distance.spearmanRankCorrelation( rawVals );
+    }
+
+    /**
+     * Get QuantileBin1D, which can tell you the quantile for a given value, or the expected value for a given quantile.
+     * 
+     * @return
+     */
+    public QuantileBin1D getGeneMultifunctionalityQuantiles() {
+        if ( this.quantiles == null ) {
+
+            this.quantiles = new QuantileBin1D( true, this.geneMultifunctionality.size(), 0.0, 0.0, 1000,
+                    new cern.jet.random.engine.DRand() );
+
+            quantiles.addAllOf( new DoubleArrayList( ArrayUtils.toPrimitive( this.geneMultifunctionality.values()
+                    .toArray( new Double[] {} ) ) ) );
+
+        }
+        return quantiles;
     }
 
     /**
@@ -394,20 +413,5 @@ public class Multifunctionality {
         } finally {
             stale.set( false );
         }
-    }
-
-    public QuantileBin1D getGeneMultifunctionalityQuantiles() {
-
-        /*
-         * FIXME this could be done just once. No big deal.
-         */
-
-        QuantileBin1D scoreQuantiles = new QuantileBin1D( true, this.geneMultifunctionality.size(), 0.0, 0.0, 1000,
-                new cern.jet.random.engine.DRand() );
-
-        scoreQuantiles.addAllOf( new DoubleArrayList( ArrayUtils.toPrimitive( this.geneMultifunctionality.values()
-                .toArray( new Double[] {} ) ) ) );
-
-        return scoreQuantiles;
     }
 }

@@ -944,7 +944,7 @@ public class GeneSetDetailsFrame extends JFrame {
         table.setSize( d );
 
         /*
-         * FIXME: hide the score columns if we don't have them, reshow after loading scores?
+         * we could hide the score & multifunctionality columns if we don't have them, reshow after loading scores?
          */
 
     }// end createDetailsTable

@@ -236,11 +236,6 @@ public class GeneSetWizard extends Wizard {
 
     @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
-
-        /*
-         * FIXME Reset the tables
-         */
-
         dispose();
     }
 
@@ -308,7 +303,7 @@ public class GeneSetWizard extends Wizard {
                 geneData.saveGeneSet( toSave );
             } else if ( modifiedTheGeneSet( toSave ) ) {
                 showStatus( "Saving modified gene set " + toSave + "( based on " + oldGeneSet + ")" );
- 
+
                 geneData.saveGeneSet( toSave );
             } else {
                 showStatus( "Gene set was not created or changed, nothing to do." );

@@ -257,7 +257,7 @@ public class StartupPanel extends JPanel {
         JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Locating annotations", JOptionPane.INFORMATION_MESSAGE );
 
         /*
-         * TODO provide a list
+         * TODO provide a list of gene annotation files to download.
          */
 
     }

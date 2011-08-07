@@ -95,7 +95,7 @@ public class SaveAnalysisDialog extends JDialog {
 
         JPanel jPanel11 = new JPanel();
 
-        saveAllGenes.setSelected( false ); // FIXME save this setting.
+        saveAllGenes.setSelected( settings.getSaveAllGenesInOutput() );
 
         JLabel saveAllGenesLabel = new JLabel();
         saveAllGenesLabel.setText( "Include all genes in output" );

@@ -227,7 +227,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
             // System.err.println("Trial: " + i );
 
             // shuffle the association of pvalues to genes.
-            // FIXME these should be multifunctionality corrected!!
+            // these should be multifunctionality corrected!!
             Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToScoreMap( true );
 
             // / permscores contains a list of the p values for the shuffled data.

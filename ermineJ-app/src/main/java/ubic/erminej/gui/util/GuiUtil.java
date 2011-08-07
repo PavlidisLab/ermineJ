@@ -55,7 +55,7 @@ public class GuiUtil {
         JTextField textField = new JTextField();
 
         /*
-         * TODO this really should return a JPanel subclass that has a getFileName method.
+         * this really should return a JPanel subclass that has a getFileName method.
          */
 
         GroupLayout gl = new GroupLayout( panel );

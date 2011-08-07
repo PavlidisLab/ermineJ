@@ -88,8 +88,10 @@ public class SettingsHolder {
     protected static final String MTC_CONFIG_NAME = "mtc";
     protected static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     protected static final String OUTPUT_FILE = "outputFile";
-    protected static final String GENE_SCORE_THRESHOLD = "pValThreshold"; // TODO deprecate this string, use
-    // 'scoreThreshold' instead.
+
+    protected static final String GENE_SCORE_THRESHOLD_KEY = "scoreThreshold";
+
+    protected static final String GENE_SCORE_THRESHOLD_LEGACY_KEY = "pValThreshold";
     protected static final String PREFERENCES_FILE_NAME = "preferencesFileName";
     protected static final String QUANTILE_CONFIG_NAME = "quantile";
     protected static final String RAW_FILE_CONFIG_NAME = "rawFile";
@@ -131,7 +133,7 @@ public class SettingsHolder {
         defaults.put( MIN_CLASS_SIZE, 10 );
         defaults.put( MAX_CLASS_SIZE, 100 );
         defaults.put( ITERATIONS, 1000 );
-        defaults.put( GENE_SCORE_THRESHOLD, 0.001 );
+        defaults.put( GENE_SCORE_THRESHOLD_KEY, 0.001 );
         defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
         defaults.put( SettingsHolder.GENE_URL_BASE, DEFAULT_GENE_URL_BASE );
         defaults.put( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
@@ -267,8 +269,8 @@ public class SettingsHolder {
      * 
      * @return
      */
-    public double getGeneScoreThreshold() {
-        return config.getDouble( GENE_SCORE_THRESHOLD, 0.001 );
+    public double getGeneScoreThreshold() { 
+        return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
     }
 
     /**

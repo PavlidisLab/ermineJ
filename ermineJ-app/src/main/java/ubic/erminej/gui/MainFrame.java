@@ -1553,12 +1553,6 @@ public class MainFrame extends JFrame {
         }
 
         /*
-         * FIXME allow for possibility that run was already selected (e.g. from popup menu on header of table)
-         * 
-         * FIXME add "save all" option.
-         */
-
-        /*
          * 1. Pick the run and get other settings (latter needed even if only one result available)
          */
         SaveAnalysisDialog dialog = new SaveAnalysisDialog( this, this.settings, getCurrentResultSetIndex() );
@@ -1580,7 +1574,8 @@ public class MainFrame extends JFrame {
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         chooser.setApproveButtonText( "OK" );
         chooser.setDialogTitle( "Save Analysis As:" );
-        // FIXME suggest a name.
+        chooser.setSelectedFile( new File( getCurrentResultSet().getName() + ".erminej.txt" ) );
+
         int result = chooser.showOpenDialog( this );
 
         if ( result == JFileChooser.APPROVE_OPTION ) {

@@ -83,9 +83,11 @@ public class GeneSet {
             this.probes.add( p );
         }
 
-        assert redundantGroups.isEmpty() :
-        // FIXME: the redundantGroups should be invalidated/checked?
-        "Do not add genes to sets after redundantGroups has been populated!";
+        if ( !redundantGroups.isEmpty() ) {
+            // this would be a programming error.
+            throw new IllegalStateException( "Illegal attempt to add gene (" + g.getSymbol() + ") to a set ("
+                    + this.getId() + ") that already has redundancy computed." );
+        }
     }
 
     @Override

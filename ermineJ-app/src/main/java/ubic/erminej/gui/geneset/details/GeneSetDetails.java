@@ -240,7 +240,26 @@ public class GeneSetDetails {
      * @param dm
      */
     public void setDataMatrix( DoubleMatrix<Probe, String> dm ) {
-        /* FIXME check that probes match; if they don't not actually any harm, but won't display, no warning */
+        int numNotKnown = 0;
+        for ( Probe p : dm.getRowNames() ) {
+            if ( !geneData.hasProbe( p ) ) {
+                numNotKnown++;
+            }
+        }
+
+        if ( numNotKnown > 0 ) {
+
+            if ( numNotKnown == dm.rows() ) {
+                callerStatusViewer.showError( "The selected matrix has no probes that match the current annotations" );
+                throw new IllegalArgumentException(
+                        "The selected matrix has no probes that match the current annotations" );
+            }
+
+            callerStatusViewer.showError( "Warning: " + numNotKnown
+                    + " of the probes in the data matrix don't match the current annotations" );
+
+        }
+
         this.dataMatrix = dm;
     }
 

@@ -61,7 +61,7 @@ public class Settings extends SettingsHolder {
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
      * etc.)
      */
-    protected static final String[] ANALYSIS_SETTINGS = new String[] { GENE_SCORE_THRESHOLD, QUANTILE_CONFIG_NAME,
+    protected static final String[] ANALYSIS_SETTINGS = new String[] { GENE_SCORE_THRESHOLD_KEY, QUANTILE_CONFIG_NAME,
             GENE_SET_RESAMPLING_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE,
             SCORE_COL, MTC_CONFIG_NAME, ITERATIONS, CLASS_FILE, BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT,
             ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD, FILTER_NONSPECIFIC,
@@ -229,6 +229,21 @@ public class Settings extends SettingsHolder {
         }
 
         return Format.valueOf( storedValue );
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.erminej.SettingsHolder#getGeneScoreThreshold()
+     */
+    @Override
+    public double getGeneScoreThreshold() {
+
+        if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
+            config.setProperty( GENE_SCORE_THRESHOLD_KEY, config.getDouble( GENE_SCORE_THRESHOLD_LEGACY_KEY, 0.001 ) );
+        }
+
+        return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
     }
 
     /**
@@ -438,7 +453,7 @@ public class Settings extends SettingsHolder {
      */
     public void setGeneScoreThreshold( double val ) {
         log.debug( "gene score threshold set to " + val );
-        this.config.setProperty( GENE_SCORE_THRESHOLD, val );
+        this.config.setProperty( GENE_SCORE_THRESHOLD_KEY, val );
     }
 
     /**

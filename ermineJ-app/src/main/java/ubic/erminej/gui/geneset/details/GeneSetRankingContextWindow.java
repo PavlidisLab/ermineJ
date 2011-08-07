@@ -40,7 +40,9 @@ import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.analysis.Plotting;
 
 /**
- * TODO Document Me
+ * Show ROC and Precision-recall curves -- things that show the gene set in the context of the full ranking.
+ * <p>
+ * The QQ plot partly serves the same purpose, but these are standard visualizations.
  * 
  * @author paul
  * @version $Id$

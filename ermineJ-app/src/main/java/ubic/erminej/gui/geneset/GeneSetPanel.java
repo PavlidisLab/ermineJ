@@ -85,7 +85,7 @@ public abstract class GeneSetPanel extends JScrollPane {
     public static final String DELETED = "DELETED";
     public static final int MAX_DEFINITION_LENGTH = 300;
 
-    // FIXME: TODO
+    // TODO: Gemma view of gene set
     private static final String GEMMA_URL_BASE = "http://www.chibi.ubc.ca/Gemma/(GO TO GO GROUP)";
 
     protected static boolean hideEmpty = true;
@@ -194,7 +194,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         } );
 
         popup.add( visitAmigoMenuItem );
-        // popup.add(gemmaMenuItem); TODO
+        // popup.add(gemmaMenuItem); TODO: Gemma popup item for gene set
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
         popup.add( hideEmptyMenuItem );

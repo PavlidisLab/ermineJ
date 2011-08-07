@@ -246,7 +246,7 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "threshold" ).withDescription(
                 "Score threshold, only used for ORA; default = "
-                        + settings.getDefaultSettingsValue( Settings.GENE_SCORE_THRESHOLD ) ).withArgName( "value" )
+                        + settings.getDefaultSettingsValue( Settings.GENE_SCORE_THRESHOLD_KEY ) ).withArgName( "value" )
                 .create( 't' ) );
 
         options.addOption( OptionBuilder.hasArg()
