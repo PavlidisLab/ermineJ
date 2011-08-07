@@ -54,7 +54,7 @@ public class GeneSetDetails {
 
     private GeneSetTerm classID;
 
-    private GeneSetResult result;  
+    private GeneSetResult result;
     private GeneAnnotations geneData;
 
     private Settings settings;
@@ -156,6 +156,11 @@ public class GeneSetDetails {
         return Collections.unmodifiableCollection( probes );
     }
 
+    /**
+     * Just for the probes in this set.
+     * 
+     * @return
+     */
     public Map<Probe, Double> getProbeScores() {
         return Collections.unmodifiableMap( probeScores );
     }

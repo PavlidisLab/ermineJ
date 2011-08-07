@@ -14,6 +14,8 @@
  */
 package ubic.erminej.data;
 
+import hep.aida.bin.QuantileBin1D;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,6 +109,11 @@ public class Multifunctionality {
             fit = new LeastSquaresFit( mfs, scoreRanks );
         } else {
             fit = new LeastSquaresFit( mfs, scores );
+        }
+
+        log.info( fit.getCoefficients() );
+        if ( fit.getCoefficients().get( 0, 1 ) < 0 ) {
+
         }
 
         DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
@@ -268,7 +276,7 @@ public class Multifunctionality {
      * 
      * @param rawGeneMultifunctionalityRanks in descending order
      */
-    private void computeGoTermMultifunctionalityRanks( Map<Gene, Integer> rawGeneMultifunctionalityRanks ) {
+    private void computeGoTermMultifunctionalityRanks( Map<Gene, Double> rawGeneMultifunctionalityRanks ) {
         int numGenes = genesWithGoTerms.size();
         int numGoGroups = geneAnnots.getGeneSetTerms().size();
         /*
@@ -301,7 +309,7 @@ public class Multifunctionality {
              */
             double sumOfRanks = 0.0;
             for ( Gene gene : geneAnnots.getGeneSetGenes( goset ) ) {
-                int rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
+                double rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
                 sumOfRanks += rank;
             }
 
@@ -316,13 +324,10 @@ public class Multifunctionality {
             goTermMultifunctionality.put( goset, auc );
         }
 
-        /*
-         * FIXME only use non-redundant groups to compute the ranks of gene sets.
-         */
-        // convert to relative ranks, where 1.0 is the most multifunctional
-        Map<GeneSetTerm, Integer> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionality, true );
+        // convert to relative ranks, where 1.0 is the most multifunctional; ties are broken by averaging.
+        Map<GeneSetTerm, Double> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionality, true );
         for ( GeneSetTerm goTerm : rankedGOMf.keySet() ) {
-            double rankRatio = ( rankedGOMf.get( goTerm ) + 1 ) / ( double ) numGoGroups;
+            double rankRatio = ( rankedGOMf.get( goTerm ) + 1 ) / numGoGroups;
             this.goTermMultifunctionalityRank.put( goTerm, Math.max( 0.0, 1 - rankRatio ) );
         }
     }
@@ -374,11 +379,10 @@ public class Multifunctionality {
                 this.geneMultifunctionality.put( gene, mf );
             }
 
-            Map<Gene, Integer> rawGeneMultifunctionalityRanks = Rank.rankTransform( this.geneMultifunctionality, true );
+            Map<Gene, Double> rawGeneMultifunctionalityRanks = Rank.rankTransform( this.geneMultifunctionality, true );
             for ( Gene gene : rawGeneMultifunctionalityRanks.keySet() ) {
                 // 1-base the rank before calculating ratio
-                double geneMultifunctionalityRankRatio = ( rawGeneMultifunctionalityRanks.get( gene ) + 1 )
-                        / ( double ) numGenes;
+                double geneMultifunctionalityRankRatio = ( rawGeneMultifunctionalityRanks.get( gene ) + 1 ) / numGenes;
                 this.geneMultifunctionalityRank.put( gene, Math.max( 0.0, 1.0 - geneMultifunctionalityRankRatio ) );
             }
 
@@ -390,5 +394,20 @@ public class Multifunctionality {
         } finally {
             stale.set( false );
         }
+    }
+
+    public QuantileBin1D getGeneMultifunctionalityQuantiles() {
+
+        /*
+         * FIXME this could be done just once. No big deal.
+         */
+
+        QuantileBin1D scoreQuantiles = new QuantileBin1D( true, this.geneMultifunctionality.size(), 0.0, 0.0, 1000,
+                new cern.jet.random.engine.DRand() );
+
+        scoreQuantiles.addAllOf( new DoubleArrayList( ArrayUtils.toPrimitive( this.geneMultifunctionality.values()
+                .toArray( new Double[] {} ) ) ) );
+
+        return scoreQuantiles;
     }
 }

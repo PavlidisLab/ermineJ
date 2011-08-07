@@ -47,7 +47,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     StatusViewer messenger;
 
-    Map<Gene, Integer> geneRanks;
+    Map<Gene, Double> geneRanks;
 
     public RocPvalGenerator( SettingsHolder set, GeneAnnotations an, StatusViewer messenger ) {
         super( set, an );
@@ -94,7 +94,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     private GeneSetResult classPval( GeneSetTerm geneSet ) {
         if ( !super.checkAspectAndRedundancy( geneSet ) ) return null;
         // variables for outputs
-        List<Integer> targetRanks = new ArrayList<Integer>();
+        List<Double> targetRanks = new ArrayList<Double>();
 
         int numGenesInSet = numGenesInSet( geneSet );
         if ( numGenesInSet < settings.getMinClassSize() || numGenesInSet > settings.getMaxClassSize() ) {
@@ -108,8 +108,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         for ( Gene g : values ) {
 
-            Integer rank;
-            rank = geneRanks.get( g );
+            Double rank = geneRanks.get( g );
 
             if ( rank == null ) continue;
 
@@ -119,7 +118,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
                 assert rank >= 0;
             }
 
-            targetRanks.add( new Integer( rank + 1 ) ); // make ranks 1-based.
+            targetRanks.add(  rank + 1.0  ); // make ranks 1-based.
         }
 
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );

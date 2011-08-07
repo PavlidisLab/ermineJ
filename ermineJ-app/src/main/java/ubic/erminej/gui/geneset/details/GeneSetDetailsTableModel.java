@@ -18,6 +18,8 @@
  */
 package ubic.erminej.gui.geneset.details;
 
+import hep.aida.bin.QuantileBin1D;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,18 +30,17 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import cern.colt.list.DoubleArrayList;
 
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.math.Rank;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.analysis.ScoreQuantiles;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.table.MatrixPoint;
 import ubic.erminej.gui.util.JLinkLabel;
@@ -57,12 +58,12 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     private static final String URL_REPLACE_TAG = "@@";
     private MatrixDisplay<Probe, String> matrixDisplay;
     private List<Probe> probeIDs;
-    private Map<Probe, Double> probeScores;
-    private Map<Probe, Integer> scoreRanks;
+    private Map<Probe, Double> scoresForProbesInSet;
+    private Map<Probe, Double> scoreRanks;
     private GeneAnnotations geneData;
     private Settings settings;
     private Map<Gene, JLinkLabel> linkLabels;
-    private String[] tableColumnNames = { "Probe", "Score", "Vis. score", "Symbol", "Name", "Multifunc" };
+    private String[] tableColumnNames = { "Probe", "Score", "QQ Score", "Symbol", "Name", "Multifunc", "QQ Multifunc" };
     public static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term="
             + URL_REPLACE_TAG;
 
@@ -73,6 +74,11 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     private static final String RESOURCE_LOCATION = "/ubic/erminej/";
 
     private final Icon gemmaIcon = new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "/gemmaTiny.gif" ) );
+
+    QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
+    QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
+    private Map<Probe, Double> mfRanks;
+    private Map<Probe, Double> multifuncForProbesInSet = new HashMap<Probe, Double>();
 
     /**
      * @param matrixDisplay
@@ -87,27 +93,25 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         this.matrixDisplay = matrixDisplay;
         this.probeIDs = new ArrayList<Probe>( geneSetDetails.getProbes() );
 
-        probeScores = geneSetDetails.getProbeScores();
+        scoresForProbesInSet = geneSetDetails.getProbeScores();
         this.settings = settings;
-
-        if ( probeScores != null && !probeScores.isEmpty() ) {
-            scoreRanks = Rank.rankTransform( probeScores, settings.getBigIsBetter() );
-        }
         this.geneData = geneSetDetails.getGeneData();
 
-        // all ranks.
+        if ( scoresForProbesInSet != null && !scoresForProbesInSet.isEmpty() ) {
+            scoreRanks = Rank.rankTransform( scoresForProbesInSet, settings.getBigIsBetter() );
 
-        Double[] geneScores = geneSetDetails.getSourceGeneScores().getGeneScores();
-        DoubleArrayList allScoreRanks = Rank.rankTransform(
-                new DoubleArrayList( ArrayUtils.toPrimitive( geneScores ) ), settings.getBigIsBetter() );
-        for ( int i = 0; i < allScoreRanks.size(); i++ ) {
-            double rank = allScoreRanks.get( i );
-            double score = geneScores[i];
+            for ( Probe p : scoreRanks.keySet() ) {
+                multifuncForProbesInSet.put( p, geneSetDetails.getGeneData().getMultifunctionality()
+                        .getMultifunctionalityScore( p.getGene() ) );
+            }
 
-            // FIXME compute permiles (probably overkill...)
+            mfRanks = Rank.rankTransform( multifuncForProbesInSet, true );
+            // this is a wee bit wasteful
+            GeneScores geneScores = geneSetDetails.getSourceGeneScores();
+            this.scoreQuantiles = ScoreQuantiles.computeQuantiles( settings, geneScores );
 
-            // also has to be done for multifunctionality.
-
+            this.mfQuantiles = geneSetDetails.getGeneData().getMultifunctionality()
+                    .getGeneMultifunctionalityQuantiles();
         }
 
         configure();
@@ -119,7 +123,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
 
         if ( columnIndex < offset ) {
-            return Double.class; // matrix, or pvals.
+            return Double.class; // matrix
         } else if ( columnIndex - offset == 0 ) {
             return Probe.class; // probe
         } else if ( columnIndex - offset == 1 ) {
@@ -130,9 +134,11 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
             return JLinkLabel.class; // symbol
         } else if ( columnIndex - offset == 4 ) {
             return String.class; // description
+        } else if ( columnIndex - offset == 5 ) {
+            return Double.class; // score
         }
-
-        return String.class; // mf.
+        // return String.class; // mf.
+        return Object.class;// QQ plot for mf.
     }
 
     /*
@@ -203,31 +209,25 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 return probeID;
             case 1:
                 // scores
-                if ( probeScores == null || !probeScores.containsKey( probeID ) ) return new Double( Double.NaN );
-                return probeScores.get( probeID );
+                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( probeID ) )
+                    return new Double( Double.NaN );
+                return scoresForProbesInSet.get( probeID );
             case 2:
-                // p value bar - only displayed if we have pvalues.
                 List<Double> values = new ArrayList<Double>();
-                if ( !settings.getDoLog() || probeScores == null ) { // kludgy way to figure out if we have pvalues.
-                    values.add( 0, new Double( Double.NaN ) );
-                    values.add( 1, new Double( Double.NaN ) );
+                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( probeID ) ) {
+                    values.add( 0, 1.0 );
+                    values.add( 1, 1.0 );
                 } else {
 
-                    if ( probeScores == null || !probeScores.containsKey( probeID ) ) {
-                        values.add( 0, new Double( 1.0 ) );
-                        values.add( 1, new Double( 1.0 ) );
-                    } else {
-                        // actual p value
-                        Double actualValue = probeScores.get( probeID );
-                        values.add( 0, actualValue );
-                        // expected p value, but only if we had an actual pvalue
-                        if ( !Double.isNaN( actualValue.doubleValue() ) && scoreRanks != null
-                                && scoreRanks.containsKey( probeID ) ) {
-                            int position = scoreRanks.get( probeID );
-                            Double expectedValue = new Double( 1.0f / getRowCount() * ( position + 1 ) );
-                            values.add( 1, expectedValue );
-                        }
-                    }
+                    // this is the quantile of the scores in the full data set.(but reverse so large is better)
+                    double quantile = Math.max( 1.0 / scoreQuantiles.size(), scoreQuantiles
+                            .quantileInverse( scoresForProbesInSet.get( probeID ) ) );
+
+                    Double position = scoreRanks.get( probeID );
+                    double expectedQuantile = ( position + 1 ) / scoresForProbesInSet.size();
+
+                    values.add( 0, -Math.log10( expectedQuantile ) );
+                    values.add( 1, -Math.log10( quantile ) );
                 }
                 return values;
             case 3:
@@ -237,12 +237,31 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 // description
                 return geneData == null ? "" : probeID.getDescription();
             case 5:
-                // multifunctionality.
+                // // multifunctionality. ugly.
                 if ( geneData == null ) return "";
                 gene_name = probeID.getGene();
                 return String.format( "%.3f (%d)", Math.max( 0.0, geneData.getMultifunctionality()
                         .getMultifunctionalityRank( gene_name ) ), geneData.getMultifunctionality().getNumGoTerms(
                         gene_name ) );
+
+            case 6:
+                // multifunctionality graphic.
+                List<Double> mfv = new ArrayList<Double>();
+                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( probeID ) ) {
+                    mfv.add( 0, 1.0 );
+                    mfv.add( 1, 1.0 );
+                } else {
+                    double mfQuantile = 1.0 - Math.max( 1.0 / mfQuantiles.size(), mfQuantiles.quantileInverse( geneData
+                            .getMultifunctionality().getMultifunctionalityScore( gene_name ) ) );
+
+                    Double position = mfRanks.get( probeID );
+                    double expectedQuantile = ( position + 1 ) / multifuncForProbesInSet.size();
+
+                    mfv.add( 0, -Math.log10( expectedQuantile ) );
+                    mfv.add( 1, -Math.log10( mfQuantile ) );
+                }
+
+                return mfv;
             default:
                 return "";
         }

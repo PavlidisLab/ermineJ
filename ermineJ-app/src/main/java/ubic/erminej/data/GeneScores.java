@@ -26,12 +26,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.CancellationException;
 
@@ -39,7 +41,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.math.Rank;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
@@ -346,16 +347,18 @@ public class GeneScores {
      */
     public List<Gene> getRankedGenes() {
 
-        Map<Gene, Integer> ranked = Rank.rankTransform( getGeneToScoreMap(), this.rankLargeScoresBest() );
+        TreeMap<Gene, Double> m = new TreeMap<Gene, Double>( new Comparator<Gene>() {
 
-        List<Gene> rankedGenes = new ArrayList<Gene>( ranked.keySet() );
+            @Override
+            public int compare( Gene o1, Gene o2 ) {
+                if ( o1.equals( o2 ) ) return 0;
+                return getGeneToScoreMap().get( o1 ).compareTo( getGeneToScoreMap().get( o2 ) );
+            }
+        } );
 
-        for ( Gene g : ranked.keySet() ) {
-            Integer r = ranked.get( g );
-            rankedGenes.set( r, g );
-        }
+        m.putAll( getGeneToScoreMap() );
 
-        return rankedGenes;
+        return Collections.unmodifiableList( new ArrayList<Gene>( m.keySet() ) );
     }
 
     /**

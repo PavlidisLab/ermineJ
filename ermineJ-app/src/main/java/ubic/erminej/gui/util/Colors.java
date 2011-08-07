@@ -46,6 +46,12 @@ public class Colors {
     public static final Color LIGHTGREEN4 = new Color( 200, 240, 200 );
     public static final Color LIGHTGREEN5 = new Color( 220, 240, 220 ); // light
 
+    static public final Color LIGHTBLUE1 = new Color( 100, 100, 240 ); // dark
+    static public final Color LIGHTBLUE2 = new Color( 140, 140, 240 );
+    static public final Color LIGHTBLUE3 = new Color( 180, 180, 240 );
+    static public final Color LIGHTBLUE4 = new Color( 200, 200, 240 );
+    static public final Color LIGHTBLUE5 = new Color( 220, 220, 240 ); // light
+
     public static final Color PINK = new Color( 220, 160, 220 );
     public static final Color LIGHTYELLOW = new Color( 255, 239, 142 );
 

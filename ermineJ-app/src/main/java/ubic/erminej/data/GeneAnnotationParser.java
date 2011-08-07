@@ -482,7 +482,7 @@ public class GeneAnnotationParser {
      * @param settings
      * @throws IOException
      */
-    protected GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, Settings settings )
+    public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, Settings settings )
             throws IOException {
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );

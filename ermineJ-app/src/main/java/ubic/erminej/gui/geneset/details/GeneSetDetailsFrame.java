@@ -125,6 +125,8 @@ public class GeneSetDetailsFrame extends JFrame {
     private static final int PREFERRED_WIDTH_PVALUEBAR_COLUMN = 75;
     private static final String SAVESTARTPATH = "detailsview.startPath";
     private static final int PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN = 75;
+    private static final int PREFERRED_WIDTH_MULTIFUNCTIONALITY_QQCOLUMN = 55;
+
     public static final int MAX_GENES_FOR_DETAIL_VIEWING = 1000;
     protected static final String GEMMA_GENE_SEARCH_URL_BASE = "http://www.chibi.ubc.ca/Gemma/searcher.html?scope=G&query=";
 
@@ -572,6 +574,9 @@ public class GeneSetDetailsFrame extends JFrame {
         col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
 
         // multifunctionality
+
+        // Score
+
         col = table.getColumnModel().getColumn( matrixColumnCount + 5 );
         col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN );
         col.setCellRenderer( new DefaultTableCellRenderer() {
@@ -615,6 +620,12 @@ public class GeneSetDetailsFrame extends JFrame {
                 return this;
             }
         } );
+
+        // QQ plot
+        col = table.getColumnModel().getColumn( matrixColumnCount + 6 );
+        col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_QQCOLUMN );
+        col.setCellRenderer( new JBarGraphCellRenderer( 3.0, new Color[] { Color.LIGHT_GRAY, Colors.LIGHTRED3 } ) );
+
     }
 
     /**
@@ -910,8 +921,8 @@ public class GeneSetDetailsFrame extends JFrame {
         }
         table.getRowSorter().setSortKeys( sortKeys );
 
-        // sorter for the 'pvalue bar' column
-        sorter.setComparator( matrixColumnCount + 2, new Comparator<List<Double>>() {
+        // sorter for the 'qq plot' columns
+        Comparator<List<Double>> quantileComparator = new Comparator<List<Double>>() {
             @Override
             public int compare( List<Double> o1, List<Double> o2 ) {
                 if ( o1 == null || o2 == null || o1.size() < 2 || o2.size() < 2 ) return 0;
@@ -919,15 +930,15 @@ public class GeneSetDetailsFrame extends JFrame {
                 if ( settings.getBigIsBetter() ) return -o1.get( 1 ).compareTo( o2.get( 1 ) );
                 return o1.get( 1 ).compareTo( o2.get( 1 ) );
             }
-        } );
+        };
+        sorter.setComparator( matrixColumnCount + 2, quantileComparator ); // probe score QQ
+        sorter.setComparator( matrixColumnCount + 6, quantileComparator ); // MF QQ
 
         // Save the dimensions of the table just in case
         int totalWidth = matrixColumnCount * matrixColumnWidth + PREFERRED_WIDTH_PROBEID_COLUMN
                 + PREFERRED_WIDTH_PVALUE_COLUMN + PREFERRED_WIDTH_GENENAME_COLUMN + PREFERRED_WIDTH_DESCRIPTION_COLUMN
                 + PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN;
         int totalheight = table.getPreferredScrollableViewportSize().height;
-
-        // table.setAutoResizeMode( JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS );
 
         Dimension d = new Dimension( totalWidth, totalheight );
         table.setSize( d );

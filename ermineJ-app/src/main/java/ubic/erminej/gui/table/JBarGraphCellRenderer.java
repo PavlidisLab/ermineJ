@@ -32,6 +32,8 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
+import ubic.erminej.gui.util.Colors;
+
 /**
  * Renders the "pvalue bars" in the details views.
  * 
@@ -44,7 +46,7 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
 
     protected List<Double> m_values = null;
     protected final static int LINE_WIDTH = 2;
-    protected final static Color[] COLORS = { Color.BLUE, Color.GRAY, Color.RED, Color.GREEN, Color.CYAN,
+    protected final static Color[] COLORS = { Color.GRAY, Colors.LIGHTBLUE2, Colors.LIGHTRED3, Color.GREEN, Color.CYAN,
             Color.MAGENTA, Color.ORANGE };
     protected static Border m_noFocusBorder = new EmptyBorder( 1, 1, 1, 1 );
     protected static Color m_selectionBackground;
@@ -52,10 +54,21 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
     protected boolean m_isBarGraph = false;
     DecimalFormat m_regular = new DecimalFormat();
 
+    private double maxValue;
+
+    private Color[] colors;
+    private static final double defaultMaxValue = 5;
+
     public JBarGraphCellRenderer() {
+        this( defaultMaxValue, COLORS );
+    }
+
+    public JBarGraphCellRenderer( double maxValue, Color[] colors ) {
         super();
         setOpaque( false );
         setBorder( m_noFocusBorder );
+        this.maxValue = maxValue;
+        this.colors = colors;
     }
 
     /**
@@ -93,11 +106,15 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
             // bar graphF
             m_isBarGraph = true;
             m_values = ( List<Double> ) value;
+            // setText( m_values.get( 1 ).toString() );
         } else if ( value instanceof Double ) {
             // just double value, no bar graph
             setText( value.toString() );
             setFont( table.getFont() );
         }
+
+        // revalidate();
+        // repaint();
 
         // Since the renderer is a component, return itself
         return this;
@@ -120,60 +137,49 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
         if ( !m_isBarGraph ) return;
         if ( m_values == null ) return;
 
-        final int width = getWidth();
+        final int width = getWidth() - 2; // leave a little gap on each side.
         final int height = getHeight();
         final int y = 0;
 
-        double maxPval = 10.0;
-
         for ( int i = 0; i < m_values.size(); i++ ) {
 
-            // @todo only use log if doLog is requested. probably log should be in genesettablemodel
             double val = m_values.get( i );
 
             if ( Double.isNaN( val ) ) {
                 continue;
             }
 
-            double logval = 0.0;
+            int x = ( int ) ( width * val / maxValue );
 
-            if ( val > 0 && val <= 1.0 ) {
-                logval = Math.min( maxPval, -Math.log( val ) / Math.log( 10 ) );
+            // what color to use?
+            if ( i < colors.length ) {
+                g.setColor( colors[i] );
+            } else {
+                // ran out of colors!
+                g.setColor( Color.LIGHT_GRAY );
             }
 
-            if ( !Double.isNaN( logval ) ) {
-                // map from [0,1] range to [0,width] range
-                int x = ( int ) ( width * logval / maxPval );
-
-                // what color to use?
-                if ( i < COLORS.length ) {
-                    g.setColor( COLORS[i] );
-                } else {
-                    // ran out of colors!
-                    g.setColor( Color.LIGHT_GRAY );
-                }
-
-                // draw the vertical bar line
-                if ( x > width ) x = width - LINE_WIDTH;
-                g.fillRect( x, y, LINE_WIDTH, height );
-            }
+            // draw the vertical bar line
+            if ( x > width ) x = width - LINE_WIDTH;
+            g.fillRect( x + 1 /* gap */, y, LINE_WIDTH, height );
         }
+
     } // end paintComponent
+    //
+    // @Override
+    // public void validate() {
+    // }
+    //
+    // @Override
+    // public void revalidate() {
+    // }
+    //
+    // @Override
+    // public void repaint( long tm, int x, int y, int width, int height ) {
+    // }
+    //
+    // @Override
+    // public void repaint( Rectangle r ) {
+    // }
 
-    @Override
-    public void validate() {
-    }
-
-    @Override
-    public void revalidate() {
-    }
-
-    @Override
-    public void repaint( long tm, int x, int y, int width, int height ) {
-    }
-
-    @Override
-    public void repaint( Rectangle r ) {
-    }
-
-} // end class
+}

@@ -28,7 +28,7 @@ import org.apache.commons.lang.ArrayUtils;
 import ubic.basecode.util.RegressionTesting;
 
 import junit.framework.TestCase;
-import ubic.erminej.Settings; 
+import ubic.erminej.Settings;
 import ubic.erminej.data.GeneScores;
 
 /**
@@ -38,14 +38,14 @@ import ubic.erminej.data.GeneScores;
 public class GeneScoreReaderTest extends TestCase {
     InputStream is = null;
     InputStream ism = null;
-    GeneScores test = null;
+    protected GeneScores test = null;
 
     /*
      * @see TestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception {
-        Settings s = new Settings();
+        Settings s = new Settings( false );
 
         ism = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.an.txt" );
 

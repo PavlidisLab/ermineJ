@@ -21,7 +21,6 @@ package ubic.erminej.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -330,7 +329,6 @@ public class StartupPanel extends JPanel {
             fetchGOFile();
         }
 
-        // TODO if this is missing, provide a list from microannots.
         annotFileTextField.setText( settings.getAnnotFile() );
 
         String dataDirectory = settings.getDataDirectory();
@@ -488,7 +486,7 @@ public class StartupPanel extends JPanel {
                 this.classFileTextField.setText( settings.getClassFile() );
                 this.annotFileTextField.setText( settings.getAnnotFile() );
                 this.annotFileTextField.setEnabled( false );
-                this.classFileTextField.setEnabled( false ); // FIXME have to disable the entire choose.
+                this.classFileTextField.setEnabled( false ); // FIXME have to disable the entire chooser.
 
             } catch ( ConfigurationException e ) {
                 GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
