@@ -101,14 +101,17 @@ public class MatrixPreviewer {
      * @param x
      * @param fileName
      * @param numColumnsToSkip
+     * @return the preview matrix
      * @throws IOException
      */
-    public static void previewMatrix( Window x, String fileName, Integer numColumnsToSkip ) throws IOException {
+    public static StringMatrix<String, String> previewMatrix( Window x, String fileName, Integer numColumnsToSkip )
+            throws IOException {
         StringMatrixReader r = new StringMatrixReader();
         StringMatrix<String, String> test;
 
         test = r.read( fileName, 100, numColumnsToSkip );
         previewMatrix( x, test );
+        return test;
     }
 
     /**

@@ -224,7 +224,7 @@ public class AnalysisThread extends Thread {
 
         if ( messenger != null ) messenger.showStatus( "Starting analysis..." );
 
-        answer.add( new GeneSetPvalRun( settings, geneAnnots, messenger, "NewRun" ) );
+        answer.add( new GeneSetPvalRun( settings, geneAnnots, messenger  ) );
 
         log.info( "Analysis: " + timer.getTime() + "ms" );
 

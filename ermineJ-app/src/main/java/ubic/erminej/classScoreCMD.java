@@ -696,7 +696,7 @@ public class classScoreCMD {
      */
     protected GeneSetPvalRun analyze() throws IOException {
         statusMessenger.showStatus( "Starting analysis..." );
-        GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, statusMessenger, "command" );
+        GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, statusMessenger );
         return runResult;
     }
 

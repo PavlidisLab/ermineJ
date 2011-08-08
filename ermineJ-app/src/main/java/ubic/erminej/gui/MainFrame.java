@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
@@ -415,9 +416,18 @@ public class MainFrame extends JFrame {
         runViewMenu.revalidate();
     }
 
+    /**
+     * @param result
+     */
     private void addResult( GeneSetPvalRun result ) {
         if ( result == null || result.getResults().size() == 0 ) return;
-        result.setName( "Run " + ( results.size() + 1 ) );
+
+        String n = result.getName();
+        if ( StringUtils.isBlank( n ) ) {
+            n = "Run " + ( results.size() + 1 );
+        }
+
+        result.setName( n );
         results.add( result );
         this.updateRunViewMenu();
 
@@ -981,6 +991,9 @@ public class MainFrame extends JFrame {
         geneAnnotsWebLinkMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 try {
+                    /*
+                     * FIXME make this easier... and can point to Gemma.
+                     */
                     BrowserLauncher.openURL( "http://www.chibi.ubc.ca/microannots" );
                 } catch ( Exception ex ) {
                     GuiUtil.error( "Could not open a web browser window to get annotations" );
@@ -1257,7 +1270,7 @@ public class MainFrame extends JFrame {
         JPanel progressBarContainer = new JPanel();
         progressBarContainer.setLayout( new BoxLayout( progressBarContainer, BoxLayout.Y_AXIS ) );
         progressBarContainer.setPreferredSize( new Dimension( 500, 300 ) );
-        //
+
         progressBarContainer.setBackground( Color.WHITE );
 
         progressBar.setIndeterminate( true );
@@ -1268,6 +1281,8 @@ public class MainFrame extends JFrame {
 
         progressPanel.add( logoPanel );
         progressPanel.add( progressBarContainer );
+
+        progressPanel.add( Box.createVerticalGlue() );
 
         return progressPanel;
     }
@@ -1457,7 +1472,7 @@ public class MainFrame extends JFrame {
     }
 
     protected void switchRawDataFile() {
-        JRawFileChooser fchooser = new JRawFileChooser( settings.getRawDataFileName(), settings.getDataCol() );
+        JRawFileChooser fchooser = new JRawFileChooser( settings.getRawDataFileName() );
         fchooser.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 

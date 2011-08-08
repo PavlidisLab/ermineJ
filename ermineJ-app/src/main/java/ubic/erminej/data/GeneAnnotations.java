@@ -1284,7 +1284,7 @@ public class GeneAnnotations {
 
         redundancyCheck(); // <-- slow, 8s for 7700 terms
 
-        this.multifunctionality = new Multifunctionality( this ); // < 1 s.
+        this.multifunctionality = new Multifunctionality( this, this.messenger ); // < 1 s.
 
         log.info( "Total annotation setup: " + timer.getTime() + "ms" );
     }
@@ -1308,7 +1308,7 @@ public class GeneAnnotations {
 
         redundancyCheck( start );
 
-        this.multifunctionality = new Multifunctionality( this );
+        this.multifunctionality = new Multifunctionality( this, this.messenger );
     }
 
 }

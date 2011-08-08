@@ -1089,6 +1089,7 @@ public class GeneSetDetailsFrame extends JFrame {
                         this.geneSetDetails.getGeneData() );
 
                 this.geneSetDetails.setGeneScores( scores );
+                this.setTitle( geneSetDetails.getTitle() );
 
             } catch ( IOException e ) {
                 statusMessenger
@@ -1117,7 +1118,7 @@ public class GeneSetDetailsFrame extends JFrame {
                             JOptionPane.INFORMATION_MESSAGE );
         }
 
-        JRawFileChooser fc = new JRawFileChooser( settings.getRawDataFileName(), settings.getDataCol() );
+        JRawFileChooser fc = new JRawFileChooser( settings.getRawDataFileName() );
         fc.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fc.showDialog( this, "Open" );
 
@@ -1128,7 +1129,7 @@ public class GeneSetDetailsFrame extends JFrame {
             settings.setDataCol( fc.getStartColumn() );
 
             this.geneSetDetails.loadDataMatrix( rawdataFile );
-            this.setTitle( StringUtils.abbreviate( this.geneSetDetails.getTitle(), 200 ) );
+            this.setTitle( this.geneSetDetails.getTitle() );
 
             /*
              * Have to rebuild the entire table.

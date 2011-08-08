@@ -79,6 +79,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
     private Map<Probe, Double> mfRanks;
     private Map<Probe, Double> multifuncForProbesInSet = new HashMap<Probe, Double>();
+    private Map<Gene, Double> multifuncForGenesInSet = new HashMap<Gene, Double>();
 
     /**
      * @param matrixDisplay
@@ -102,6 +103,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
             for ( Probe p : scoreRanks.keySet() ) {
                 multifuncForProbesInSet.put( p, geneSetDetails.getGeneData().getMultifunctionality()
+                        .getMultifunctionalityScore( p.getGene() ) );
+                multifuncForGenesInSet.put( p.getGene(), geneSetDetails.getGeneData().getMultifunctionality()
                         .getMultifunctionalityScore( p.getGene() ) );
             }
 
@@ -255,7 +258,9 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                             .getMultifunctionality().getMultifunctionalityScore( gene_name ) ) );
 
                     Double position = mfRanks.get( probeID );
-                    double expectedQuantile = ( position + 1 ) / multifuncForProbesInSet.size();
+                    // FIXME this is counting probes but we really need to be on genes here.
+                    // double expectedQuantile = ( position + 1 ) / multifuncForProbesInSet.size();
+                    double expectedQuantile = ( position + 1 ) / multifuncForGenesInSet.size();
 
                     mfv.add( 0, -Math.log10( expectedQuantile ) );
                     mfv.add( 1, -Math.log10( mfQuantile ) );

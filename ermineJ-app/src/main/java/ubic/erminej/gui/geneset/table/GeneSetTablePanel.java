@@ -379,7 +379,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         if ( runSettings.getScoreFile() != null ) {
             String fileName = new File( runSettings.getScoreFile() ).getName();
-            coda += "Scores: " + fileName + "<br/>";
+            coda += "Scores: " + fileName + " col. " + runSettings.getScoreCol() + " "
+                    + geneSetPvalRun.getGeneScoreColumnName() + "<br/>";
         }
 
         if ( runSettings.getRawDataFileName() != null ) {

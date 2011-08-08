@@ -158,7 +158,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
                     "Could not find " + classID + " in any aspect, the term may be obsolete." );
             foundIt = false;
         } else {
-            this.callingFrame.getStatusMessenger().showStatus( "Showing " + classID );
+            // this.callingFrame.getStatusMessenger().showStatus( "Showing " + classID );
             foundIt = true;
         }
         if ( foundIt ) {

@@ -38,6 +38,8 @@ import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.Rank;
+import ubic.basecode.util.StatusStderr;
+import ubic.basecode.util.StatusViewer;
 
 /**
  * Implementation of multifunctionality computations as described in Gillis and Pavlidis (2011) PLoS ONE 6:2:e17258.
@@ -66,6 +68,8 @@ public class Multifunctionality {
 
     private Collection<Gene> genesWithGoTerms;
 
+    private StatusViewer messenger = new StatusStderr();
+
     private AtomicBoolean stale = new AtomicBoolean( true );
 
     private QuantileBin1D quantiles = null;
@@ -76,8 +80,9 @@ public class Multifunctionality {
      * 
      * @param go These annotations should already be pruned down to those used in analysis.
      */
-    public Multifunctionality( GeneAnnotations go ) {
+    public Multifunctionality( GeneAnnotations go, StatusViewer m ) {
         this.geneAnnots = go;
+        if ( m != null ) this.messenger = m;
         init();
     }
 
@@ -99,7 +104,7 @@ public class Multifunctionality {
             Double mf = this.getMultifunctionalityRank( g );
             Double s = geneToScoreMap.get( g );
             scores.set( i, s );
-            mfs.set( i, mf ); // <- these are alread ranks.
+            mfs.set( i, mf );
             i++;
         }
 
@@ -113,8 +118,9 @@ public class Multifunctionality {
         }
 
         log.info( fit.getCoefficients() );
-        if ( fit.getCoefficients().get( 0, 1 ) < 0 ) {
-
+        if ( fit.getCoefficients().get( 1, 0 ) < 0 ) {
+            messenger.showStatus( "Multifunctionality correction skipped: correlation is negative" );
+            return geneToScoreMap;
         }
 
         DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );

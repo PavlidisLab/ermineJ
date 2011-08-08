@@ -88,6 +88,8 @@ public class GeneScores {
 
     private Settings.MultiProbeHandling gpMethod = SettingsHolder.MultiProbeHandling.BEST;
 
+    private String scoreColumnName = "";
+
     /**
      * Create a copy of source that contains only the probes given.
      * 
@@ -259,6 +261,15 @@ public class GeneScores {
     }
 
     /**
+     * Might not be available.
+     * 
+     * @return
+     */
+    public String getScoreColumnName() {
+        return scoreColumnName;
+    }
+
+    /**
      * @param filename
      * @param settings
      * @param messenger
@@ -425,7 +436,14 @@ public class GeneScores {
         int numUnknownProbes = 0;
         int numRepeatedProbes = 0;
         Collection<String> unknownProbes = new HashSet<String>();
-        dis.readLine(); // skip header.
+
+        String heading = dis.readLine();
+        String[] headings = heading.split( "\t" );
+        if ( headings.length >= scoreCol ) {
+            // this is not essential information.
+            this.scoreColumnName = headings[scoreColumnIndex];
+        }
+
         Collection<String> unannotatedProbes = new HashSet<String>();
 
         boolean warned = false;

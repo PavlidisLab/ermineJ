@@ -150,7 +150,7 @@ public class StartupPanel extends JPanel {
         JPanel formPanel = new JPanel();
         GroupLayout gl = new GroupLayout( formPanel );
         formPanel.setLayout( gl );
-        formPanel.setMaximumSize( new Dimension( 800, 1000 ) );
+        formPanel.setMaximumSize( new Dimension( 700, 1000 ) );
         formPanel.setBorder( BorderFactory.createEmptyBorder( 10, 50, 10, 50 ) );
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );
@@ -194,6 +194,7 @@ public class StartupPanel extends JPanel {
         buttonPanel.add( helpButton );
         buttonPanel.add( cancelButton );
         buttonPanel.add( actionButton );
+        buttonPanel.setBorder( BorderFactory.createEmptyBorder( 2, 2, 20, 2 ) );
         return buttonPanel;
     }
 

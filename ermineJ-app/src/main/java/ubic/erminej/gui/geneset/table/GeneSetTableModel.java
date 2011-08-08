@@ -396,6 +396,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         }
     }
 
+    /**
+     * @param auc
+     */
     private void chooseMultifunctionalityIndicatorColor( double auc ) {
         if ( auc >= 0.99 ) {
             setBackground( Colors.LIGHTRED1 );
@@ -422,7 +425,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         if ( column == GeneSetTablePanel.MULTIFUNC_COLUMN_INDEX ) {
             chooseMultifunctionalityIndicatorColor( ( Double ) value );
         } else if ( value instanceof EmptyGeneSetResult || value instanceof String ) {
-            // nothing to do. This is weird that this happens, only when we are adding result sets
+            // nothing to do. This is weird that this happens, only when we are adding result sets; race condition
         } else if ( column == 0 && ( ( GeneSetTerm ) value ).isUserDefined() ) {
             setBackground( GeneSetPanel.USER_NODE_COLOR );
         } else if ( value instanceof GeneSetResult ) {
@@ -436,7 +439,6 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
         if ( id.isAspect() || id.getId().equals( "all" ) || geneData.getGeneSet( id ) == null ) return "";
 
-        // boolean redundant = geneData.skipDueToRedundancy( id );
         Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();
 
         String redund = "";

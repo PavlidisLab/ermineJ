@@ -43,7 +43,7 @@ public class StatusJlabel extends StatusDebugLogger {
     private static Icon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
 
     /*
-     * How long we display error messages for by default
+     * How long we display error messages for by default. too short, user can't read it; too long, slows things donw.
      */
     private static final int MESSAGE_DELAY = 1300; // milliseconds
 
@@ -202,7 +202,7 @@ public class StatusJlabel extends StatusDebugLogger {
      * @param m
      */
     protected void setLabel( final String m, final Icon icon ) {
-        jlabel.setText( m );
+        jlabel.setText( StringUtils.abbreviate( m, 300 ) );
         jlabel.setIcon( icon );
         jlabel.repaint();
     }

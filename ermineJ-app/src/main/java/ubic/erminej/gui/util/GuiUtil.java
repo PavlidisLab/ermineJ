@@ -64,7 +64,7 @@ public class GuiUtil {
         button.setText( "Browse..." );
         button.addActionListener( h );
         textField.setPreferredSize( new Dimension( 400, 19 ) );
-        textField.setMaximumSize( new Dimension( 800, 19 ) );
+        textField.setMaximumSize( new Dimension( 700, 19 ) );
 
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );

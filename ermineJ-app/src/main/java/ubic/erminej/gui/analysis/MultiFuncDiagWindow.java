@@ -74,7 +74,7 @@ public class MultiFuncDiagWindow extends JFrame {
      * @param geneScores
      */
     public MultiFuncDiagWindow( GeneAnnotations geneAnnots, GeneScores geneScores ) {
-        super( "Multifunctionality analysis" );
+        super( "Multifunc. diagnostics" );
 
         this.setIconImage( new ImageIcon( this.getClass().getResource(
                 MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
@@ -85,15 +85,20 @@ public class MultiFuncDiagWindow extends JFrame {
         tabs.addTab( "Gene multifunc.", getGenesPerGroupDistribution( geneAnnots ) );
 
         String annotFileName = new File( geneAnnots.getSettings().getAnnotFile() ).getName();
-        String scoreFileName = "  Scores: ";
         if ( geneScores != null ) {
             tabs.addTab( "Score bias I", multifunctionalityBias( geneAnnots, geneScores ) );
             tabs.addTab( "Score bias II", regressed( geneAnnots, geneScores ) );
-            scoreFileName = scoreFileName + new File( geneAnnots.getSettings().getScoreFile() ).getName();
         }
 
-        this.setTitle( getTitle() + "  | Annotations: " + StringUtils.abbreviate( annotFileName, 50 )
-                + StringUtils.abbreviate( scoreFileName, 50 ) );
+        String title = getTitle() + "  | Annotations: " + StringUtils.abbreviate( annotFileName, 50 );
+
+        if ( geneScores != null ) {
+            String scoreFileInfo = " Scores: " + new File( geneAnnots.getSettings().getScoreFile() ).getName()
+                    + " col: " + geneAnnots.getSettings().getScoreCol() + ", " + geneScores.getScoreColumnName();
+            title = title + scoreFileInfo;
+        }
+
+        this.setTitle( StringUtils.abbreviate( title, 400 ) );
 
         this.add( tabs );
     }

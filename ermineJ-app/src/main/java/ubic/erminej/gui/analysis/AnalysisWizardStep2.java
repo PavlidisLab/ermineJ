@@ -40,6 +40,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import ubic.basecode.dataStructure.matrix.StringMatrix;
 import ubic.basecode.util.FileTools;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
@@ -181,7 +182,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         }
 
         try {
-            MatrixPreviewer.previewMatrix( wiz, scoreFileTextField.getText(), -1 );
+            StringMatrix<String, String> testMatrix = MatrixPreviewer.previewMatrix( wiz, scoreFileTextField.getText(),
+                    -1 );
+            testMatrix.getColNames();
         } catch ( IOException e ) {
             GuiUtil.error( "Error previewing data: " + e.getMessage(), e );
         }

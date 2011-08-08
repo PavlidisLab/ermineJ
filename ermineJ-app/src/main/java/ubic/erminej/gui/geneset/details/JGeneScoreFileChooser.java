@@ -121,9 +121,6 @@ public class JGeneScoreFileChooser extends JFileChooser {
             dataPreviewButton.addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed( ActionEvent e ) {
-                    String col = scoreColTextField.getText();
-
-                    Integer skipColumns = Integer.valueOf( col );
 
                     if ( fileChooser.getSelectedFile() == null ) {
                         GuiUtil.error( "You must choose a file to preview" );
@@ -133,7 +130,7 @@ public class JGeneScoreFileChooser extends JFileChooser {
                     String file = fileChooser.getSelectedFile().getAbsolutePath();
 
                     try {
-                        MatrixPreviewer.previewMatrix( null, file, skipColumns );
+                        MatrixPreviewer.previewMatrix( null, file, -1 );
                     } catch ( Exception e1 ) {
                         GuiUtil.error( "Error previewing data: " + e1.getMessage() );
                         return;
@@ -143,7 +140,5 @@ public class JGeneScoreFileChooser extends JFileChooser {
             scoreColumnPanel.add( dataPreviewButton, BorderLayout.SOUTH );
             return scoreColumnPanel;
         }
-    } // end private class JDataFileChooserOptions
-
-} // end class JDetailsFileChooser
-
+    }
+}

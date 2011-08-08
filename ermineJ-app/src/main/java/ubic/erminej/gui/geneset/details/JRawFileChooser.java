@@ -46,14 +46,14 @@ public class JRawFileChooser extends JFileChooser {
 
     JTextField dataColTextField = new JTextField();
 
-    public JRawFileChooser( String startPath, int skipColumns ) {
+    public JRawFileChooser( String startPath ) {
         super( startPath );
 
         // Create a file filter for the file chooser
         DataFileFilter dataFileFilter = new DataFileFilter();
         super.setFileFilter( dataFileFilter );
         super.setAcceptAllFileFilterUsed( false );
-        m_options = new JRawFileChooserOptions( this, skipColumns );
+        m_options = new JRawFileChooserOptions( this, -1 );
         super.setAccessory( m_options );
         this.setSelectedFile( new File( startPath ) );
     }
@@ -126,10 +126,6 @@ public class JRawFileChooser extends JFileChooser {
             dataPreviewButton.addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed( ActionEvent e ) {
-                    String col = dataColTextField.getText();
-
-                    Integer skipColumns = Integer.valueOf( col );
-
                     if ( fileChooser.getSelectedFile() == null ) {
                         GuiUtil.error( "You must choose a file to preview" );
                         return;
@@ -138,7 +134,7 @@ public class JRawFileChooser extends JFileChooser {
                     String file = fileChooser.getSelectedFile().getAbsolutePath();
 
                     try {
-                        MatrixPreviewer.previewMatrix( null, file, skipColumns );
+                        MatrixPreviewer.previewMatrix( null, file, -1 );
                     } catch ( Exception e1 ) {
                         GuiUtil.error( "Error previewing data: " + e1.getMessage(), e1 );
                         return;
