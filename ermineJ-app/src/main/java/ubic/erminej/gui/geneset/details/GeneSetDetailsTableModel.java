@@ -71,9 +71,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     protected static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
 
-    private static final String RESOURCE_LOCATION = "/ubic/erminej/";
+    // private static final String RESOURCE_LOCATION = "/ubic/erminej/";
 
-    private final Icon gemmaIcon = new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "/gemmaTiny.gif" ) );
+    // private final Icon gemmaIcon = new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "/gemmaTiny.gif" )
+    // );
 
     QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
     QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
