@@ -91,7 +91,7 @@ public class ClassScoreSimple {
     public void run( List<Double> geneScores ) {
         GeneAnnotations geneData = new GeneAnnotations( probes, genes, goAssociations );
         GeneScores scores = new GeneScores( probes, geneScores, geneData, settings );
-        results = new GeneSetPvalRun( settings, geneData, scores );
+        results = new GeneSetPvalRun( settings, scores );
     }
 
     /**

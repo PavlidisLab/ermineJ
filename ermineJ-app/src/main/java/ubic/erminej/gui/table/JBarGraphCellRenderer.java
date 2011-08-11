@@ -21,7 +21,6 @@ package ubic.erminej.gui.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -31,6 +30,8 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
+
+import org.apache.commons.lang.StringUtils;
 
 import ubic.erminej.gui.util.Colors;
 
@@ -106,6 +107,7 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
             // bar graphF
             m_isBarGraph = true;
             m_values = ( List<Double> ) value;
+            this.setToolTipText( StringUtils.join( m_values, "," ) );
             // setText( m_values.get( 1 ).toString() );
         } else if ( value instanceof Double ) {
             // just double value, no bar graph

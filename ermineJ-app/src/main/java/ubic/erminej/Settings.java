@@ -421,10 +421,6 @@ public class Settings extends SettingsHolder {
         this.config.setProperty( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, val );
     }
 
-    public void setCustomGeneSetFiles( Collection<String> filePaths ) {
-        this.config.setProperty( CUSTOM_GENESET_FILES, filePaths );
-    }
-
     public void setDataCol( int val ) {
         log.debug( "Setting data start column to " + val );
         this.config.setProperty( DATA_COL, val );

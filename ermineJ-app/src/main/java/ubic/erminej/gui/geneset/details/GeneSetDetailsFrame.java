@@ -545,7 +545,7 @@ public class GeneSetDetailsFrame extends JFrame {
         // p value bar
         col = table.getColumnModel().getColumn( matrixColumnCount + 2 );
         col.setPreferredWidth( PREFERRED_WIDTH_PVALUEBAR_COLUMN );
-        col.setCellRenderer( new JBarGraphCellRenderer() );
+        col.setCellRenderer( new JBarGraphCellRenderer( 4.0, new Color[] { Color.LIGHT_GRAY, Colors.LIGHTBLUE2 } ) );
 
         // name (gene)
         col = table.getColumnModel().getColumn( matrixColumnCount + 3 );
@@ -624,7 +624,8 @@ public class GeneSetDetailsFrame extends JFrame {
         // QQ plot
         col = table.getColumnModel().getColumn( matrixColumnCount + 6 );
         col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_QQCOLUMN );
-        col.setCellRenderer( new JBarGraphCellRenderer( 3.0, new Color[] { Color.LIGHT_GRAY, Colors.LIGHTRED3 } ) );
+        double maxValue = 3.0; // values above this will be clipped for display.
+        col.setCellRenderer( new JBarGraphCellRenderer( maxValue, new Color[] { Color.LIGHT_GRAY, Colors.LIGHTRED2 } ) );
 
     }
 
@@ -820,11 +821,11 @@ public class GeneSetDetailsFrame extends JFrame {
         m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
         m_colorRangeSlider.setPreferredSize( new Dimension( 90, 24 ) );
         m_colorRangeSlider.addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter( this ) );
-        toolBar.add( m_cellWidthLabel, null );
-        toolBar.add( m_cellWidthSlider, null );
-        toolBar.add( m_colorRangeLabel, null );
-        toolBar.add( m_colorRangeSlider, null );
-        toolBar.add( m_gradientBar, null );
+        toolBar.add( m_cellWidthLabel );
+        toolBar.add( m_cellWidthSlider );
+        toolBar.add( m_colorRangeLabel );
+        toolBar.add( m_colorRangeSlider );
+        toolBar.add( m_gradientBar );
     }
 
     /**
@@ -927,7 +928,15 @@ public class GeneSetDetailsFrame extends JFrame {
             public int compare( List<Double> o1, List<Double> o2 ) {
                 if ( o1 == null || o2 == null || o1.size() < 2 || o2.size() < 2 ) return 0;
 
-                if ( settings.getBigIsBetter() ) return -o1.get( 1 ).compareTo( o2.get( 1 ) );
+                if ( settings.getBigIsBetter() ) {
+                    if ( o1.get( 1 ).equals( o2.get( 1 ) ) ) {
+                        return -o1.get( 0 ).compareTo( o2.get( 0 ) );
+                    }
+                    return -o1.get( 1 ).compareTo( o2.get( 1 ) );
+                }
+                if ( o1.get( 1 ).equals( o2.get( 1 ) ) ) {
+                    return o1.get( 0 ).compareTo( o2.get( 0 ) );
+                }
                 return o1.get( 1 ).compareTo( o2.get( 1 ) );
             }
         };
@@ -1137,6 +1146,9 @@ public class GeneSetDetailsFrame extends JFrame {
             createDetailsTable();
             this.validate();
             this.statusMessenger.showStatus( "Matrix file set to: " + rawdataFile );
+
+            this.m_cellWidthSlider.setEnabled( true );
+            this.m_colorRangeSlider.setEnabled( true );
 
         }
 

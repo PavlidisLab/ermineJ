@@ -16,6 +16,7 @@ package ubic.erminej;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -269,7 +270,7 @@ public class SettingsHolder {
      * 
      * @return
      */
-    public double getGeneScoreThreshold() { 
+    public double getGeneScoreThreshold() {
         return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
     }
 
@@ -423,6 +424,10 @@ public class SettingsHolder {
 
     public void setUseUserDefined( boolean b ) {
         this.config.setProperty( USE_USER_DEFINED_GROUPS, b );
+    }
+
+    public void setCustomGeneSetFiles( Collection<String> filePaths ) {
+        this.config.setProperty( CUSTOM_GENESET_FILES, filePaths );
     }
 
     /**

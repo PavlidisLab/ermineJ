@@ -43,6 +43,7 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
@@ -158,8 +159,19 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         GeneSetPanelPopupMenu popup = new GeneSetPanelPopupMenu( classID );
 
-        JMenuItem modMenuItem = new JMenuItem( "View/Modify this gene set..." );
-        modMenuItem.addActionListener( new OutputPanel_modMenuItem_actionAdapter( this ) );
+        JMenuItem viewItem = new JMenuItem( "Open detailed view ..." );
+        viewItem.addActionListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                // FIXME: get the result set at the menu point.
+                showDetailsForGeneSet( classID, callingFrame.getCurrentResultSet() );
+            }
+        } );
+        ;
+
+        JMenuItem modMenuItem = new JMenuItem( "Modify this gene set..." );
+        modMenuItem.addActionListener( new ModifySetActionAdapter( this ) );
 
         final JMenuItem visitAmigoMenuItem = new JMenuItem( "Go to GO web site" );
         visitAmigoMenuItem.addActionListener( new UrlActionAdapter( this, AMIGO_URL_BASE ) );
@@ -311,19 +323,6 @@ public abstract class GeneSetPanel extends JScrollPane {
      */
     protected void showDetailsForGeneSet( final GeneSetTerm id, final GeneSetPvalRun run ) {
 
-        GeneSet geneSet = this.geneData.getGeneSet( id );
-
-        if ( geneSet == null ) return; // aspect etc.
-
-        int numGenes = geneSet.getGenes().size();
-        if ( numGenes > GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING ) {
-            messenger.showError( StringUtils.abbreviate( id.getId(), 30 ) + " has too many genes to display ("
-                    + numGenes + ", max is set to " + GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING + ")" );
-            return;
-        }
-
-        messenger.showStatus( "Viewing details of data for " + id + " ..." );
-
         new Thread() {
             @Override
             public void run() {
@@ -332,18 +331,53 @@ public abstract class GeneSetPanel extends JScrollPane {
                         log.debug( "Got null geneset id" );
                         return;
                     }
+
+                    GeneAnnotations prunedGeneAnnots = null;
+                    GeneScores geneScores = null;
+                    if ( run != null ) {
+                        prunedGeneAnnots = run.getGeneData();
+                    } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
+                        // SLOW, if we don't already have results. Possibly store in a field?
+                        geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData );
+                        prunedGeneAnnots = geneScores.getPrunedGeneAnnotations();
+                        // } else if ( StringUtils.isNotBlank( settings.getRawDataFileName() ) ) {
+                        /*
+                         * Get the probe list from the raw data file. FIXME implement; could be slow.
+                         */
+                        // geneAnnots = geneAnnots.subClone(...);
+                    } else {
+                        prunedGeneAnnots = geneData;
+                    }
+
+                    GeneSet geneSet = prunedGeneAnnots.getGeneSet( id );
+                    if ( geneSet == null ) return; // aspect etc.
+
+                    int numGenes = geneSet.getGenes().size();
+                    if ( numGenes > GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING ) {
+                        messenger.showError( StringUtils.abbreviate( id.getId(), 30 )
+                                + " has too many genes to display (" + numGenes + ", max is set to "
+                                + GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING + ")" );
+                        return;
+                    }
+
+                    messenger.showStatus( "Viewing details of data for " + id + " ..." );
+
                     log.debug( "Request for details of gene set: " + id + ", run: " + run );
-                    if ( !geneData.hasGeneSet( id ) ) {
+                    if ( !prunedGeneAnnots.hasGeneSet( id ) ) {
                         callingFrame.getStatusMessenger()
                                 .showError( id + " is not available for viewing in your data." );
                         return;
                     }
 
-                    GeneSetResult r = null;
+                    GeneSetResult result = null; // might stay this way.
                     if ( run != null ) {
-                        r = run.getResults().get( id );
+                        result = run.getResults().get( id );
                     }
-                    GeneSetDetails details = new GeneSetDetails( id, r, geneData, settings, null, messenger );
+
+                    // assert geneScores.getGeneToScoreMap().keySet().containsAll( geneSet.getGenes() );
+
+                    GeneSetDetails details = new GeneSetDetails( id, result, prunedGeneAnnots, settings,
+                            geneScores /* could be null */, messenger );
 
                     GeneSetDetailsFrame detailsFrame = new GeneSetDetailsFrame( details, messenger );
                     detailsFrame.setVisible( true );
@@ -380,10 +414,10 @@ class UrlActionAdapter implements java.awt.event.ActionListener {
     }
 }
 
-class OutputPanel_modMenuItem_actionAdapter implements java.awt.event.ActionListener {
+class ModifySetActionAdapter implements java.awt.event.ActionListener {
     GeneSetPanel adaptee;
 
-    OutputPanel_modMenuItem_actionAdapter( GeneSetPanel adaptee ) {
+    ModifySetActionAdapter( GeneSetPanel adaptee ) {
         this.adaptee = adaptee;
     }
 

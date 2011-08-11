@@ -693,11 +693,12 @@ public class MainFrame extends JFrame {
             if ( this.getCurrentResultSetIndex() >= 0 && !this.results.isEmpty() ) {
                 gs = new GeneScores( getCurrentResultSet().getSettings().getScoreFile(), settings, statusMessenger,
                         this.geneData );
-                ga = gs.getGeneAnnots();
+                ga = gs.getPrunedGeneAnnotations();
             } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
                 gs = new GeneScores( settings.getScoreFile(), settings, statusMessenger, this.geneData );
-                ga = gs.getGeneAnnots();
+                ga = gs.getPrunedGeneAnnotations();
             }
+            // if we just have 'matrix data', this isn't relevant (yet)
         } catch ( IOException e ) {
             GuiUtil.error( "Data for multifunctionality could not be read", e );
             return;

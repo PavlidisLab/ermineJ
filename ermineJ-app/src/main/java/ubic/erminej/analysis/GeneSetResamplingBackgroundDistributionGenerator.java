@@ -19,11 +19,9 @@
 package ubic.erminej.analysis;
 
 import java.util.Map;
-import java.util.concurrent.CancellationException;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.RandomChooser;
 import ubic.basecode.math.Stats;
 import ubic.basecode.util.StatusViewer;
@@ -36,14 +34,18 @@ import cern.jet.stat.Descriptive;
 
 /**
  * Calculates a background distribution for class scores derived from randomly selected individual gene scores...and
- * does other things. Created 09/02/02.
+ * does other things.
  * 
  * @author Shahmil Merchant, Paul Pavlidis
+ * @since Created 09/02/02.
  * @version $Id$
  */
 public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractResamplingGeneSetScore {
 
-    private Double[] geneScores = null; // pvalues for groups.
+    /**
+     * Scores for ALL the genes.
+     */
+    private Double[] geneScores = null;
 
     private static int quantile = 50;
     private static double quantfract = 0.5;
@@ -77,24 +79,10 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
      */
     public Histogram generateNullDistribution( StatusViewer m ) {
 
-        int numGenes;
-        Double[] in_pval;
+        int numGenes = geneScores.length;
 
-        if ( hist == null ) {
-            throw new IllegalStateException( "Histogram object was null." );
-        }
-
-        // do the right thing if we are using weights.
-        numGenes = geneScores.length;
-        in_pval = geneScores;
-
-        if ( numGenes == 0 ) {
-            throw new IllegalStateException( "No pvalues!" );
-        }
-
-        if ( numGenes < classMinSize ) {
-            throw new IllegalStateException( "Not enough genes to analyze classes of size " + classMinSize );
-        }
+        assert hist != null;
+        assert numGenes >= classMaxSize;
 
         // we use this throughout.
         int[] deck = new int[numGenes];
@@ -102,20 +90,20 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
             deck[i] = i;
         }
 
-        double oldmean = Double.MAX_VALUE;
-        double oldvar = Double.MAX_VALUE;
-
         for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize && geneSetSize <= numGenes; geneSetSize++ ) {
 
-            double[] randomClass = new double[geneSetSize]; // holds data for random class.
-            double rawscore = 0.0;
             DoubleArrayList values = new DoubleArrayList();
+            double oldmean = Double.MAX_VALUE;
+            double oldvar = Double.MAX_VALUE;
+
             for ( int k = 0; k < numRuns; k++ ) {
 
-                RandomChooser.chooserandom( randomClass, in_pval, deck, numGenes, geneSetSize );
-                rawscore = computeRawScore( randomClass, geneSetSize, method );
+                double[] randomClass = RandomChooser.chooserandom( geneScores, deck, geneSetSize );
+                double rawscore = computeRawScore( randomClass, method );
                 values.add( rawscore );
                 hist.update( geneSetSize, rawscore );
+
+                // check convergence.
                 if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
                         && k > 0 && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
 
@@ -124,9 +112,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
                             .sumOfSquares( values ) );
 
                     if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
-
                         hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
-
                         if ( log.isDebugEnabled() )
                             log.debug( "Class size: " + geneSetSize + " - Reached convergence to normal after " + k
                                     + " iterations." );
@@ -136,14 +122,11 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
                     oldmean = mean;
                     oldvar = variance;
                 }
+
                 if ( k % 1000 == 0 ) {
-                    try {
-                        ifInterruptedStop();
-                        Thread.sleep( 10 );
-                    } catch ( InterruptedException e ) {
-                        throw new CancellationException();
-                    }
+                    ifInterruptedStop();
                 }
+
             }
 
             if ( m != null ) {
@@ -175,6 +158,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
         this.setMethod( settings.getGeneSetResamplingScoreMethod() );
         this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
         this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
+
         if ( classMaxSize < classMinSize ) {
             throw new IllegalArgumentException( "The maximum class size is smaller than the minimum." );
         }
@@ -188,13 +172,6 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
     }
 
     /**
-     * @return double[]
-     */
-    public Double[] get_in_pvals() {
-        return geneScores;
-    }
-
-    /**
      * @param value int
      */
     public void setQuantile( int value ) {
@@ -203,32 +180,25 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
     }
 
     /**
-     * @return int
-     */
-    public int get_quantile() {
-        return quantile;
-    }
-
-    /**
-     * Basic method to calculate the raw score, given an array of the gene scores for items in the class. Note that
-     * performance here is important.
+     * Basic method to calculate the raw score for a gene set, given an array of the gene scores for items in the class.
+     * Note that speed here is important. In the prototypical GSR method, the score is the mean of the values for the
+     * gene.
      * 
      * @param genevalues double[]
-     * @param effsize int
-     * @throws IllegalArgumentException
      * @return double
      */
-    public static double computeRawScore( double[] genevalues, int effsize, Settings.GeneScoreMethod method )
-            throws IllegalArgumentException {
+    public static double computeRawScore( double[] genevalues, Settings.GeneScoreMethod method ) {
 
         if ( method.equals( Settings.GeneScoreMethod.MEAN ) ) {
-            return DescriptiveWithMissing.mean( genevalues, effsize );
+            return Descriptive.mean( new DoubleArrayList( genevalues ) );
         }
-        int index = ( int ) Math.floor( quantfract * effsize );
+
+        int index = ( int ) Math.floor( quantfract * genevalues.length );
+
         if ( method.equals( Settings.GeneScoreMethod.QUANTILE ) ) {
-            return Stats.quantile( index, genevalues, effsize );
+            return Stats.quantile( index, genevalues, genevalues.length );
         } else if ( method.equals( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE ) ) {
-            return Stats.meanAboveQuantile( index, genevalues, effsize );
+            return Stats.meanAboveQuantile( index, genevalues, genevalues.length );
         } else {
             throw new IllegalStateException( "Unknown raw score calculation method selected" );
         }

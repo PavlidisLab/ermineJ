@@ -101,7 +101,7 @@ public class GeneAnnotations {
      */
     private boolean allowModification = true;
 
-    private Settings settings;
+    private SettingsHolder settings;
 
     private Collection<GeneAnnotations> subClones = new HashSet<GeneAnnotations>();
 
@@ -151,13 +151,16 @@ public class GeneAnnotations {
      *        in the sense that adding annotations is not allowed.
      */
     public GeneAnnotations( GeneAnnotations start, Collection<Probe> probes, boolean pruneUnannotated ) {
+
+        StopWatch timer = new StopWatch();
+        timer.start();
         if ( messenger != null ) this.messenger = start.messenger;
 
         if ( probes.isEmpty() ) {
             throw new IllegalArgumentException( "No probes were selected." );
         }
 
-        Set<Probe> startProbes = new HashSet<Probe>( start.getProbes() );
+        Set<Probe> startProbes = new HashSet<Probe>( start.getProbes() ); // this has to get made.
 
         messenger.showStatus( "Creating a subsetted annotation set for " + probes.size() + "/" + startProbes.size()
                 + " probes)" );
@@ -167,7 +170,11 @@ public class GeneAnnotations {
         }
 
         this.geneSetTerms = start.geneSetTerms;
+        this.settings = start.getSettings();
 
+        /*
+         * First select probes that have annotations at all.
+         */
         for ( Probe p : probes ) {
 
             if ( !startProbes.contains( p ) ) {
@@ -185,11 +192,13 @@ public class GeneAnnotations {
             this.probes.put( p.getName(), p );
         }
 
-        log.info( "Finished selecting genes" );
-
         setUp( start );
 
         this.allowModification = false;
+
+        if ( timer.getTime() > 1000 ) {
+            log.info( "Subclone: " + timer.getTime() + "ms" );
+        }
     }
 
     /**
@@ -543,7 +552,7 @@ public class GeneAnnotations {
      * @return view of all gene sets, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes (i.e., 2).
      */
     public Set<GeneSet> getGeneSets() {
-        return Collections.unmodifiableSet( ( Set<? extends GeneSet> ) this.geneSets.values() );
+        return Collections.unmodifiableSet( new HashSet<GeneSet>( this.geneSets.values() ) );
     }
 
     /**
@@ -594,7 +603,7 @@ public class GeneAnnotations {
              */
             return Collections.unmodifiableSet( new HashSet<Gene>() );
         }
-        return Collections.unmodifiableSet( geneSet.getGenes() );
+        return geneSet.getGenes(); // already unmodifiable.
     }
 
     /**
@@ -643,7 +652,7 @@ public class GeneAnnotations {
      * @return
      */
     public SettingsHolder getSettings() {
-        return settings.getSettingsHolder();
+        return settings;
     }
 
     /**
@@ -868,34 +877,31 @@ public class GeneAnnotations {
 
         StopWatch timer = new StopWatch();
         timer.start();
-        messenger.showStatus( "Creating annotation set ..." );
+        // messenger.showStatus( "Creating annotation set ..." );
 
+        // perhaps there is no pruning to be done:
         if ( this.getProbes().size() == probesToRetain.size() && this.getProbes().containsAll( probesToRetain ) ) {
             // WARNING this is a modifiable version of the annotations, but copying is memory hog.
-            // TODO create a lightweight unmodifiable wrapper
-            log.info( "Subcloning not needed" );
+            // TODO create a lightweight unmodifiable wrapper.
+            // log.info( "Subcloning not needed" );
             return this;
         }
 
-        // these return unmodifiable copies.
+        // use an existing subclone?
         for ( GeneAnnotations existingSubClone : subClones ) {
             Collection<Probe> existingSubCloneProbes = new HashSet<Probe>( existingSubClone.getProbes() );
             if ( existingSubCloneProbes.size() == probesToRetain.size()
                     && existingSubCloneProbes.containsAll( probesToRetain ) ) {
-                log.info( "Found a usable existing annotation set" );
+                // log.info( "Found a usable existing annotation set" );
                 return existingSubClone;
             }
         }
 
-        log.info( "Check for usable set: " + timer.getTime() );
-
         GeneAnnotations clone = new GeneAnnotations( this, probesToRetain );
-
-        log.info( "Clone: " + timer.getTime() );
-
         this.subClones.add( clone );
-
         this.messenger.clear();
+
+        if ( timer.getTime() > 1000 ) log.info( "Subclone annotations: " + timer.getTime() + "ms" );
         return clone;
     }
 
@@ -1271,7 +1277,7 @@ public class GeneAnnotations {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        if ( settings != null && !settings.getConfig().getBoolean( "ignore.userdefined", false ) )
+        if ( settings != null && !settings.getUseUserDefined() )
             userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
 
         addParents(); // <- 1s
@@ -1296,19 +1302,17 @@ public class GeneAnnotations {
      */
     private void setUp( GeneAnnotations start ) {
 
-        log.info( "Entering setup phase" );
-
-        formGeneSets();
+        formGeneSets(); // fast
 
         if ( this.geneSets.isEmpty() ) {
             throw new IllegalStateException( "No gene sets were formed." );
         }
 
-        prune( true /* subcloning */);
+        prune( true /* subcloning */); // fast
 
-        redundancyCheck( start );
+        redundancyCheck( start );// fast
 
-        this.multifunctionality = new Multifunctionality( this, this.messenger );
+        this.multifunctionality = new Multifunctionality( this, this.messenger ); // ~1s
     }
 
 }

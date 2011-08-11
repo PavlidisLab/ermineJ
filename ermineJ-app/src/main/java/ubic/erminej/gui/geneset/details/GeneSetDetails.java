@@ -72,7 +72,7 @@ public class GeneSetDetails {
      * Show without any results.
      * 
      * @param classID
-     * @param geneData
+     * @param geneData Should be the pruned set, if appropriate
      * @param callerStatusViewer
      */
     public GeneSetDetails( GeneSetTerm classID, GeneAnnotations geneData, StatusViewer callerStatusViewer ) {
@@ -88,7 +88,7 @@ public class GeneSetDetails {
      * 
      * @param classID
      * @param result - optional
-     * @param geneData
+     * @param geneData Should be the pruned set, if appropriate
      * @param settings - optional, if not supplied will be read in
      * @param geneScores - optional, if not supplied will be read in based on settings.
      * @param statusViewer
@@ -111,11 +111,7 @@ public class GeneSetDetails {
         } else {
             this.settings = settings;
         }
-
-        if ( geneScores != null ) {
-            this.probes = geneScores.getGeneAnnots().getGeneSetProbes( classID );
-            this.geneScores = geneScores;
-        }
+        this.probes = geneData.getGeneSetProbes( classID );
 
         this.result = result;
 
@@ -128,7 +124,6 @@ public class GeneSetDetails {
         }
 
         GeneScores gsToUse = geneScores;
-
         if ( gsToUse == null ) {
             gsToUse = tryToGetGeneScores();
         }
@@ -141,6 +136,9 @@ public class GeneSetDetails {
 
         initMatrix();
 
+        // sanity
+        assert this.geneScores.getGeneToScoreMap().keySet().containsAll( this.geneData.getGeneSetGenes( this.classID ) );
+
     }
 
     public GeneSetTerm getClassID() {
@@ -151,10 +149,16 @@ public class GeneSetDetails {
         return dataMatrix;
     }
 
+    /**
+     * @return
+     */
     public GeneAnnotations getGeneData() {
         return geneData;
     }
 
+    /**
+     * @return
+     */
     public Collection<Probe> getProbes() {
         return Collections.unmodifiableCollection( probes );
     }

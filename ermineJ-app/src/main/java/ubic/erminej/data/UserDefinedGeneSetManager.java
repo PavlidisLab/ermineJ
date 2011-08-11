@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 
 /**
  * This is designed to work as a singleton in the scope of a running ErmineJ instance.
@@ -67,7 +67,7 @@ public class UserDefinedGeneSetManager {
 
     private StatusViewer statusMessenger = new StatusStderr();
 
-    private Settings settings;
+    private SettingsHolder settings;
 
     private int numTimesWarnedOfProblems = 0;
 
@@ -76,7 +76,7 @@ public class UserDefinedGeneSetManager {
      */
     private GeneAnnotations geneData;
 
-    public UserDefinedGeneSetManager( GeneAnnotations annots, Settings settings, StatusViewer messenger ) {
+    public UserDefinedGeneSetManager( GeneAnnotations annots, SettingsHolder settings, StatusViewer messenger ) {
         if ( messenger != null ) this.statusMessenger = messenger;
         assert settings != null;
         init( annots, settings );
@@ -296,7 +296,7 @@ public class UserDefinedGeneSetManager {
      * @param gd
      * @param set
      */
-    private void init( GeneAnnotations gd, Settings set ) {
+    private void init( GeneAnnotations gd, SettingsHolder set ) {
         geneData = gd;
         settings = set;
         loadUserGeneSets();

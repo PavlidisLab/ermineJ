@@ -37,14 +37,17 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.CancellationException;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 
+import cern.colt.list.DoubleArrayList;
 import cern.jet.math.Arithmetic;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
@@ -62,24 +65,32 @@ public class GeneScores {
     private static final String PROBE_IGNORE_REGEX = "AFFX.*";
 
     private static final double SMALL = 10e-16;
-    protected static final Log log = LogFactory.getLog( GeneScores.class );
 
-    /**
-     * @return true if these scores were transformed via -log_10(x) when they were read in (according to the settings)
-     */
-    public boolean isNegativeLog10Transformed() {
-        return logTransform;
-    }
+    private static final Log log = LogFactory.getLog( GeneScores.class );
 
     private Map<Gene, Double> geneToScoreMap;
+
     private Map<Probe, Double> probeToScoreMap;
-    final private GeneAnnotations geneAnnots;
+
+    final private GeneAnnotations originalGeneAnnots;
+
     private StatusViewer messenger = new StatusStderr();
 
     /**
      * Refers to the _original_ scores.
      */
     private boolean biggerIsBetter = false;
+
+    /**
+     * @return
+     */
+    public GeneAnnotations getPrunedGeneAnnotations() {
+        // lightweight except for first time.
+        GeneAnnotations subClone = originalGeneAnnots.subClone( this.probeToScoreMap.keySet() );
+        assert this.probeToScoreMap.keySet().containsAll( subClone.getProbes() );
+        assert subClone.getProbes().containsAll( this.probeToScoreMap.keySet() );
+        return subClone;
+    }
 
     /**
      * Refers to what was done to the original scores. The scores stored here are negative-logged if this is true.
@@ -94,18 +105,18 @@ public class GeneScores {
      * Create a copy of source that contains only the probes given.
      * 
      * @param source
-     * @param probes
+     * @param geneAnnots - the original gene annotation set, the probes here will be used as a starting point
      */
-    public GeneScores( GeneScores source, Collection<Probe> probes ) {
-        this.geneAnnots = source.geneAnnots;
+    public GeneScores( GeneScores source, GeneAnnotations geneAnnots ) {
         if ( source.messenger != null ) this.messenger = source.messenger;
 
+        this.originalGeneAnnots = geneAnnots;
         this.biggerIsBetter = source.biggerIsBetter;
         this.logTransform = source.logTransform;
         this.gpMethod = source.gpMethod;
 
         this.init();
-
+        Collection<Probe> probes = geneAnnots.getProbes();
         for ( Probe p : probes ) {
             Double s = source.getProbeToScoreMap().get( p );
             if ( s == null ) {
@@ -121,7 +132,7 @@ public class GeneScores {
      * @param is - input stream
      * @param settings
      * @param messenger
-     * @param geneAnnotations
+     * @param geneAnnotations Source (original) geneannotation set.
      * @throws IOException
      */
     public GeneScores( InputStream is, SettingsHolder settings, StatusViewer m, GeneAnnotations geneAnnotations )
@@ -131,18 +142,10 @@ public class GeneScores {
         if ( geneAnnotations == null ) {
             throw new IllegalArgumentException( "Annotations cannot be null" );
         }
-        this.geneAnnots = geneAnnotations;
+        this.originalGeneAnnots = geneAnnotations;
         this.init( settings );
         if ( m != null ) this.messenger = m;
-        read( is, settings.getScoreCol(), -1 );
-
-    }
-
-    /**
-     * @return The annotation set that was used to set this up.
-     */
-    public GeneAnnotations getGeneAnnots() {
-        return geneAnnots;
+        read( is, settings.getScoreCol() );
     }
 
     /**
@@ -150,12 +153,12 @@ public class GeneScores {
      * 
      * @param probes List of Strings.
      * @param scores List of java.lang.Doubles containing the scores for each probe.
-     * @param geneAnnots
+     * @param geneAnnots Source (original) geneannotation set.
      * @param settings
      */
     public GeneScores( List<String> probes, List<Double> scores, GeneAnnotations geneAnnots, SettingsHolder settings ) {
 
-        this.geneAnnots = geneAnnots;
+        this.originalGeneAnnots = geneAnnots;
 
         if ( probes.size() != scores.size() ) {
             throw new IllegalArgumentException( "Probe and scores must be equal in number" );
@@ -217,68 +220,41 @@ public class GeneScores {
                 probeToScoreMap.put( probe, new Double( pValue ) );
             }
         }
+
         reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
                 numRepeatedProbes, probes.size() );
         setUpGeneToScoreMap();
-    }
 
-    public int numGenesAboveThreshold( double geneScoreThreshold ) {
-        int count = 0;
-
-        double t = geneScoreThreshold;
-        if ( isNegativeLog10Transformed() ) {
-            t = -Arithmetic.log10( geneScoreThreshold );
-        }
-
-        for ( Gene g : this.geneToScoreMap.keySet() ) {
-
-            if ( rankLargeScoresBest() ) {
-                if ( this.geneToScoreMap.get( g ) > t ) {
-                    count++;
-                }
-            } else {
-                if ( this.geneToScoreMap.get( g ) < t ) {
-                    count++;
-                }
-            }
-        }
-
-        return count;
-    }
-
-    public GeneScores( String filename, SettingsHolder settings, StatusViewer messenger, GeneAnnotations geneAnnots,
-            int limit ) throws IOException {
-        if ( StringUtils.isBlank( filename ) ) {
-            throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
-        }
-        this.geneAnnots = geneAnnots;
-        if ( messenger != null ) this.messenger = messenger;
-        this.init( settings );
-        FileTools.checkPathIsReadableFile( filename );
-        InputStream is = FileTools.getInputStreamFromPlainOrCompressedFile( filename );
-        read( is, settings.getScoreCol(), limit );
-        is.close();
-    }
-
-    /**
-     * Might not be available.
-     * 
-     * @return
-     */
-    public String getScoreColumnName() {
-        return scoreColumnName;
     }
 
     /**
      * @param filename
      * @param settings
      * @param messenger
-     * @param geneAnnots
+     * @param geneAnnots Source (original) geneannotation set.
      * @throws IOException
      */
     public GeneScores( String filename, SettingsHolder settings, StatusViewer messenger, GeneAnnotations geneAnnots )
             throws IOException {
-        this( filename, settings, messenger, geneAnnots, -1 );
+        if ( StringUtils.isBlank( filename ) ) {
+            throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
+        }
+        this.originalGeneAnnots = geneAnnots;
+        if ( messenger != null ) this.messenger = messenger;
+        this.init( settings );
+        FileTools.checkPathIsReadableFile( filename );
+        InputStream is = FileTools.getInputStreamFromPlainOrCompressedFile( filename );
+        read( is, settings.getScoreCol() );
+        is.close();
+
+        // Sanity check.
+
+        // GeneAnnotations annots = this.getPrunedGeneAnnotations();
+        // for ( GeneSet gs : annots.getGeneSets() ) {
+        // assert this.getGeneToScoreMap().keySet().containsAll( gs.getGenes() );
+        // assert annots.getGeneSetGenes( gs.getTerm() ).containsAll( gs.getGenes() );
+        // }
+
     }
 
     /**
@@ -288,6 +264,29 @@ public class GeneScores {
      */
     public Double[] getGeneScores() {
         return this.geneToScoreMap.values().toArray( new Double[] {} );
+    }
+
+    /**
+     * Get the gene scores for just the genes in the set indicated.
+     * 
+     * @param geneSetTerm
+     * @return
+     */
+    public Double[] getGeneSetScores( GeneSetTerm geneSetTerm ) {
+        DoubleArrayList p = new DoubleArrayList();
+        for ( Gene g : this.getPrunedGeneAnnotations().getGeneSetGenes( geneSetTerm ) ) {
+            if ( geneToScoreMap.containsKey( g ) ) p.add( geneToScoreMap.get( g ) );
+        }
+        return ArrayUtils.toObject( MatrixUtil.fromList( p ).toArray() );
+    }
+
+    /**
+     * Note that these values will already be log tranformed if that was requested.
+     * 
+     * @return
+     */
+    public Map<Gene, Double> getGeneToScoreMap() {
+        return geneToScoreMap;
     }
 
     /**
@@ -318,21 +317,12 @@ public class GeneScores {
 
     }
 
-    /**
-     * Note that these values will already be log tranformed if that was requested.
-     * 
-     * @return
-     */
-    public Map<Gene, Double> getGeneToScoreMap() {
-        return geneToScoreMap;
+    public int getNumGenesUsed() {
+        return geneToScoreMap.size();
     }
 
     public int getNumProbesUsed() {
         return probeToScoreMap.size();
-    }
-
-    public int getNumGenesUsed() {
-        return geneToScoreMap.size();
     }
 
     /**
@@ -358,18 +348,48 @@ public class GeneScores {
      */
     public List<Gene> getRankedGenes() {
 
+        assert this.geneToScoreMap.keySet().containsAll( this.getPrunedGeneAnnotations().getGenes() );
+        assert this.getPrunedGeneAnnotations().getGenes().containsAll( this.geneToScoreMap.keySet() );
+
+        final boolean flip = originalGeneAnnots.getSettings().upperTail();
         TreeMap<Gene, Double> m = new TreeMap<Gene, Double>( new Comparator<Gene>() {
 
             @Override
             public int compare( Gene o1, Gene o2 ) {
+
                 if ( o1.equals( o2 ) ) return 0;
-                return getGeneToScoreMap().get( o1 ).compareTo( getGeneToScoreMap().get( o2 ) );
+
+                double d1 = geneToScoreMap.get( o1 );
+                double d2 = geneToScoreMap.get( o2 );
+
+                if ( d1 == d2 ) return o1.compareTo( o2 );
+
+                if ( flip ) {
+                    if ( d1 > d2 ) return -1;
+                    return 1;
+                }
+
+                if ( d1 > d2 ) return 1;
+                return -1;
+
             }
         } );
 
-        m.putAll( getGeneToScoreMap() );
+        m.putAll( geneToScoreMap );
+
+        assert m.size() == this.geneToScoreMap.size();
+        assert m.keySet().containsAll( this.geneToScoreMap.keySet() );
 
         return Collections.unmodifiableList( new ArrayList<Gene>( m.keySet() ) );
+    }
+
+    /**
+     * Might not be available.
+     * 
+     * @return
+     */
+    public String getScoreColumnName() {
+        return scoreColumnName;
     }
 
     /**
@@ -384,6 +404,52 @@ public class GeneScores {
         }
 
         return value;
+    }
+
+    /**
+     * @return true if these scores were transformed via -log_10(x) when they were read in (according to the settings)
+     */
+    public boolean isNegativeLog10Transformed() {
+        return logTransform;
+    }
+
+    public int numGenesAboveThreshold( double geneScoreThreshold ) {
+        int count = 0;
+
+        double t = geneScoreThreshold;
+        if ( isNegativeLog10Transformed() ) {
+            t = -Arithmetic.log10( geneScoreThreshold );
+        }
+
+        for ( Gene g : this.geneToScoreMap.keySet() ) {
+
+            if ( rankLargeScoresBest() ) {
+                if ( this.geneToScoreMap.get( g ) > t ) {
+                    count++;
+                }
+            } else {
+                if ( this.geneToScoreMap.get( g ) < t ) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * @see also Settings.upperTail(), which does the same thing.
+     * @return true if the values returned by methods such as getGeneToScoreMap are returning values which should be
+     *         treated as "big better". This will be true in the following (common) cases based on the settings the user
+     *         made:
+     *         <ul>
+     *         <li>The scores were -log transformed, and small values are better (e.g., input probabilities)
+     *         <li>The scores were not -log transformed, and big values were better in the original input.
+     *         </ul>
+     */
+    public boolean rankLargeScoresBest() {
+        // The first case is the common one, if input is pvalues.
+        return ( logTransform && !biggerIsBetter ) || ( !logTransform && biggerIsBetter );
     }
 
     @Override
@@ -412,12 +478,11 @@ public class GeneScores {
 
     /**
      * @param is
-     * @param limit
+     * @param scoreCol
      * @throws IOException
-     * @throws IllegalStateException
      */
-    private void read( InputStream is, int scoreCol, int limit ) throws IOException, IllegalStateException {
-        assert geneAnnots != null;
+    private void read( InputStream is, int scoreCol ) throws IOException {
+        assert originalGeneAnnots != null;
         if ( scoreCol < 2 ) {
             throw new IllegalArgumentException( "Illegal column number " + scoreCol + ", must be greater than 1" );
         }
@@ -472,7 +537,7 @@ public class GeneScores {
 
             // only keep probes that have annotations.
 
-            Probe p = geneAnnots.findProbe( probeId );
+            Probe p = originalGeneAnnots.findProbe( probeId );
 
             if ( p == null ) {
                 // Probably just means there are no annotations at all.
@@ -525,8 +590,6 @@ public class GeneScores {
                 dis.close();
                 throw new CancellationException();
             }
-
-            if ( limit > 0 && numProbesKept == limit ) break;
 
         }
         dis.close();
@@ -603,34 +666,29 @@ public class GeneScores {
     }
 
     /**
-     * Each pvalue is adjusted to the mean (or best) of all the values in the 'replicate group' to yield a "group to
-     * pvalue map".
-     * 
-     * @param settings
-     * @param collection - this should be generated from the annotation file.
-     * @param messenger
+     * Each gene is assigned a score, built from the values for the probes for that genes; either BEST or MEAN as
+     * selected by the user.
      */
     private void setUpGeneToScoreMap() {
 
-        Collection<Gene> genes = geneAnnots.getGenes();
+        // just used to get gene->probe maps.
+        Collection<Gene> genes = originalGeneAnnots.getGenes();
 
         assert genes.size() > 0;
-        double[] geneScoreTemp = new double[genes.size()];
+
         int counter = 0;
 
-        for ( Gene geneSymbol : genes ) {
-
-            if ( Thread.currentThread().isInterrupted() ) {
-                return;
-            }
+        for ( Gene gene : genes ) {
 
             /*
              * probes in this group according to the array platform.
              */
-            Collection<Probe> probes = geneSymbol.getProbes();
+            Collection<Probe> probes = gene.getProbes();
+
+            double geneScore = 0.0;
 
             // Analyze all probes in this 'group' (pointing to the same gene)
-            int in_size = 0;
+            int usableProbesForGene = 0;
             for ( Probe probe : probes ) {
 
                 if ( !probeToScoreMap.containsKey( probe ) ) {
@@ -642,18 +700,18 @@ public class GeneScores {
 
                 switch ( gpMethod ) {
                     case MEAN: {
-                        geneScoreTemp[counter] += score;
+                        geneScore += score;
                         break;
                     }
                     case BEST: {
-                        if ( in_size == 0 ) {
-                            geneScoreTemp[counter] = score;
+                        if ( usableProbesForGene == 0 ) {
+                            geneScore = score;
                         } else {
 
                             if ( rankLargeScoresBest() ) {
-                                geneScoreTemp[counter] = Math.max( score, geneScoreTemp[counter] );
+                                geneScore = Math.max( score, geneScore );
                             } else {
-                                geneScoreTemp[counter] = Math.min( score, geneScoreTemp[counter] );
+                                geneScore = Math.min( score, geneScore );
                             }
                         }
                         break;
@@ -662,42 +720,26 @@ public class GeneScores {
                         throw new IllegalArgumentException( "Illegal selection for groups score method." );
                     }
                 }
-                in_size++;
-            }
+                usableProbesForGene++;
+            } // end iter over probes for genes.
 
-            if ( in_size > 0 ) {
+            if ( usableProbesForGene > 0 ) {
                 if ( gpMethod.equals( SettingsHolder.MultiProbeHandling.MEAN ) ) {
-                    geneScoreTemp[counter] /= in_size; // take the mean
+                    geneScore /= usableProbesForGene; // take the mean
                 }
-                Double dbb = new Double( geneScoreTemp[counter] );
-                geneToScoreMap.put( geneSymbol, dbb );
+                geneToScoreMap.put( gene, geneScore );
                 counter++;
             }
-        } // end of while
+        } // end of iter over genes.
 
         if ( counter == 0 ) {
             // this is okay, if we're trying to show the class despite there being no results.
-            log.warn( "No valid gene to score mappings were found." );
+            log.warn( "No valid gene-to-score mappings were found." );
             return;
         }
 
-        if ( messenger != null ) messenger.showStatus( counter + " distinct genes found in the gene scores." );
+        messenger.showStatus( "Usable scores for " + counter + " distinct genes found in the gene scores." );
 
-    }
-
-    /**
-     * @see also Settings.upperTail(), which does the same thing.
-     * @return true if the values returned by methods such as getGeneToScoreMap are returning values which should be
-     *         treated as "big better". This will be true in the following (common) cases based on the settings the user
-     *         made:
-     *         <ul>
-     *         <li>The scores were -log transformed, and small values are better (e.g., input probabilities)
-     *         <li>The scores were not -log transformed, and big values were better in the original input.
-     *         </ul>
-     */
-    public boolean rankLargeScoresBest() {
-        // The first case is the common one, if input is pvalues.
-        return ( logTransform && !biggerIsBetter ) || ( !logTransform && biggerIsBetter );
     }
 
 } // end of class

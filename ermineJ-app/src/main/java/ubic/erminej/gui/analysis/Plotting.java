@@ -49,6 +49,10 @@ public class Plotting {
         renderer.setBasePaint( Color.white );
         renderer.setSeriesPaint( 0, Color.decode( "#AAAAAA" ) );
 
+        if ( histogram.getXYPlot().getSeriesCount() > 1 ) {
+            renderer.setSeriesPaint( 1, Color.RED );
+        }
+
         renderer.setBarPainter( new StandardXYBarPainter() );
         renderer.setDrawBarOutline( false );
         renderer.setShadowVisible( false );

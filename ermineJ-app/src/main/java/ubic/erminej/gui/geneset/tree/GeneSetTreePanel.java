@@ -770,9 +770,16 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         }
 
         if ( s || f ) {
-            setBackground( Color.DARK_GRAY );
-        }
 
+            float[] col1comps = new float[3];
+            Color.decode( "#6688FF" ).getColorComponents( col1comps );
+            float[] col2comps = new float[3];
+            getBackground().getColorComponents( col2comps );
+
+            float r = 0.2f;
+            setBackground( new Color( col1comps[0] * r + col2comps[0] * ( 1.0f - r ), col1comps[1] * r + col2comps[1]
+                    * ( 1.0f - r ), col1comps[2] * r + col2comps[2] * ( 1.0f - r ) ) );
+        }
         return this;
     }
 

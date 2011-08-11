@@ -335,7 +335,18 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             setText( value.toString() ); // integers, whatever.
         }
 
-        if ( !isSelected ) setCellBackgroundColor( value, column );
+        setCellBackgroundColor( value, column );
+
+        if ( isSelected || hasFocus ) {
+            float[] col1comps = new float[3];
+            Color.decode( "#6688FF" ).getColorComponents( col1comps );
+            float[] col2comps = new float[3];
+            getBackground().getColorComponents( col2comps );
+
+            float r = 0.2f;
+            setBackground( new Color( col1comps[0] * r + col2comps[0] * ( 1.0f - r ), col1comps[1] * r + col2comps[1]
+                    * ( 1.0f - r ), col1comps[2] * r + col2comps[2] * ( 1.0f - r ) ) );
+        }
 
         // set tool tips etc.
         if ( value != null ) {
@@ -397,18 +408,18 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
     }
 
     /**
-     * @param auc
+     * @param auc; because so many values are high, this is quite steep.
      */
     private void chooseMultifunctionalityIndicatorColor( double auc ) {
-        if ( auc >= 0.99 ) {
+        if ( auc >= 0.999 ) {
             setBackground( Colors.LIGHTRED1 );
-        } else if ( auc >= 0.95 ) {
+        } else if ( auc >= 0.99 ) {
             setBackground( Colors.LIGHTRED2 );
-        } else if ( auc >= 0.9 ) {
+        } else if ( auc >= 0.95 ) {
             setBackground( Colors.LIGHTRED3 );
-        } else if ( auc >= 0.85 ) {
+        } else if ( auc >= 0.9 ) {
             setBackground( Colors.LIGHTRED4 );
-        } else if ( auc >= 0.8 ) {
+        } else if ( auc >= 0.85 ) {
             setBackground( Colors.LIGHTRED5 );
         } else {
             setBackground( Color.WHITE );

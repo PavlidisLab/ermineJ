@@ -77,15 +77,9 @@ public class GeneSetPvalRun {
     /**
      * Do a new analysis, starting from the bare essentials (correlation method not available) (simple API)
      */
-    public GeneSetPvalRun( SettingsHolder settings, GeneAnnotations geneData, GeneScores geneScores ) {
+    public GeneSetPvalRun( SettingsHolder settings, GeneScores geneScores ) {
         this.settings = settings;
-
-        this.geneData = geneData;
-
-        Set<Probe> activeProbes = getActiveProbes( null, geneScores );
-
-        this.geneData = getPrunedAnnotations( activeProbes, geneData );
-        geneScores = new GeneScores( geneScores, this.geneData.getProbes() );
+        this.geneData = geneScores.getPrunedGeneAnnotations();
         runAnalysis( null, geneScores );
     }
 
@@ -105,32 +99,18 @@ public class GeneSetPvalRun {
         if ( messenger != null ) this.messenger = messenger;
         this.settings = settings;
         try {
-            /*
-             * Read the gene scores, or raw data, figure out which probes are being used.
-             */
-
             DoubleMatrix<Probe, String> rawData = null;
             GeneScores geneScores = null;
             if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
                 rawData = DataIOUtils.readDataMatrixForAnalysis( originalAnnots, settings );
-                setName( "New run" );
+                this.geneData = originalAnnots.subClone( rawData.getRowNames() );
+                setName( "New corr. run" );
             } else {
                 geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, originalAnnots );
                 if ( StringUtils.isNotBlank( geneScores.getScoreColumnName() ) ) {
                     setName( "Run on: " + geneScores.getScoreColumnName() );
                 }
-            }
-
-            Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
-
-            this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
-
-            // pruning.
-            if ( rawData != null ) {
-                rawData = rawData.subsetRows( this.geneData.getProbes() );
-            }
-            if ( geneScores != null ) {
-                geneScores = new GeneScores( geneScores, this.geneData.getProbes() );
+                this.geneData = geneScores.getPrunedGeneAnnotations();
             }
 
             runAnalysis( rawData, geneScores );
@@ -316,6 +296,12 @@ public class GeneSetPvalRun {
         }
     }
 
+    /**
+     * Perform the requested analysis, using the rawData or geneScores as appropriate.
+     * 
+     * @param rawData may be null if not needed
+     * @param geneScores may be null if not needed.
+     */
     private void runAnalysis( DoubleMatrix<Probe, String> rawData, GeneScores geneScores ) {
 
         if ( geneScores != null ) geneScoreColumnName = geneScores.getScoreColumnName();

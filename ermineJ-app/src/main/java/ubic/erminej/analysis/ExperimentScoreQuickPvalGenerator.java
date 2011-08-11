@@ -61,7 +61,7 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
             return -1.0;
         }
 
-        double[] groupPvalArr = new double[numGenesInSet]; // store pvalues for items in
+        double[] scoresForGenesInSet = new double[numGenesInSet]; // store pvalues for items in
         // the class.
         Set<Gene> record = new HashSet<Gene>();
 
@@ -72,12 +72,12 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
             Double grouppval = genePvalueMap.get( gene );
             if ( !record.contains( gene ) ) {
                 record.add( gene );
-                groupPvalArr[v_size] = grouppval.doubleValue();
+                scoresForGenesInSet[v_size] = grouppval.doubleValue();
                 v_size++;
             }
         }
 
-        rawscore = GeneSetResamplingBackgroundDistributionGenerator.computeRawScore( groupPvalArr, numGenesInSet, settings
+        rawscore = GeneSetResamplingBackgroundDistributionGenerator.computeRawScore( scoresForGenesInSet, settings
                 .getGeneSetResamplingScoreMethod() );
         pval = scoreToPval( numGenesInSet, rawscore );
 

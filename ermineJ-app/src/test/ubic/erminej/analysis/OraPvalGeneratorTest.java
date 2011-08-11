@@ -77,7 +77,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval1() {
         double expectedReturn = 0.3216374; // checked // dhyper(2, 11, 8, 2)
 
-        assertEquals( 11, scores.getGeneAnnots().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
+        assertEquals( 11, scores.getPrunedGeneAnnotations().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
 
         GeneSetResult r = test.classPval( new GeneSetTerm( "GO:1" ) );
 

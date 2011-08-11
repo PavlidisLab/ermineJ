@@ -15,6 +15,7 @@
 package ubic.erminej.gui.geneset.details;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
@@ -23,15 +24,23 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.DefaultXYDataset;
 
+import cern.colt.list.DoubleArrayList;
+
+import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -50,7 +59,9 @@ import ubic.erminej.gui.analysis.Plotting;
 public class GeneSetRankingContextWindow extends JFrame {
 
     private GeneAnnotations geneData;
+
     private GeneScores geneScores;
+
     private GeneSetTerm geneSetTerm;
 
     public GeneSetRankingContextWindow( GeneSetDetails gsd ) {
@@ -59,14 +70,19 @@ public class GeneSetRankingContextWindow extends JFrame {
         this.setIconImage( new ImageIcon( this.getClass().getResource(
                 MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
 
-        this.geneData = gsd.getGeneData();
         this.geneScores = gsd.getSourceGeneScores();
+
+        if ( this.geneScores == null ) {
+            // .... FIXME
+        }
+
         this.geneSetTerm = gsd.getClassID();
+        this.geneData = geneScores.getPrunedGeneAnnotations();
 
         JTabbedPane tabs = new JTabbedPane();
-
         tabs.add( "ROC", this.getRocPlot() );
         tabs.add( "PR", this.precisionRecallPlot() );
+        tabs.add( "Hist", this.histograms() ); // could add one for multifunctionality.
 
         String annotFileName = new File( geneData.getSettings().getAnnotFile() ).getName();
         String scoreFileName = new File( geneData.getSettings().getScoreFile() ).getName();
@@ -78,31 +94,89 @@ public class GeneSetRankingContextWindow extends JFrame {
         this.add( tabs );
     }
 
-    private double[][] gerPrecisionRecallCurve() {
+    /**
+     * @return
+     */
+    private Component histograms() {
+
+        Double[] gs = geneScores.getGeneScores();
+
+        Double[] geneSetScores = geneScores.getGeneSetScores( this.geneSetTerm );
+
+        assert this.geneData != null;
+
+        if ( geneData.getSettings().getDoLog() ) {
+            /*
+             * de-log..
+             */
+            for ( int i = 0; i < gs.length; i++ ) {
+                gs[i] = Math.pow( 10, -gs[i] );
+            }
+            for ( int i = 0; i < geneSetScores.length; i++ ) {
+                geneSetScores[i] = Math.pow( 10, -geneSetScores[i] );
+            }
+        }
+
+        double min = DescriptiveWithMissing.min( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
+        double max = DescriptiveWithMissing.max( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
+
+        if ( geneData.getSettings().getBigIsBetter() ) {
+            /*
+             * reverse the order of the axis?
+             */
+            double om = min;
+            min = max;
+            max = om;
+        }
+
+        HistogramDataset series = new HistogramDataset();
+        series.setType( HistogramType.RELATIVE_FREQUENCY );
+        int numBins = 39;
+
+        series.addSeries( "Background", ArrayUtils.toPrimitive( gs ), numBins, min, max );
+        series.addSeries( "Gene set", ArrayUtils.toPrimitive( geneSetScores ), numBins, min, max );
+
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene Score distributions", "Score", "Density", series,
+                PlotOrientation.VERTICAL, false, false, false );
+
+        return Plotting.plotHistogram( "Score distributions", histogram );
+    }
+
+    private static Log log = LogFactory.getLog( GeneSetRankingContextWindow.class );
+
+    /**
+     * @return
+     */
+    private double[][] getPrecisionRecallCurve() {
         List<Gene> rankedGenes = geneScores.getRankedGenes();
 
-        Set<Gene> positives = geneData.getGeneSetGenes( geneSetTerm );
+        Set<Gene> positives = geneScores.getPrunedGeneAnnotations().getGeneSetGenes( geneSetTerm );
+
+        assert geneScores.getGeneToScoreMap().keySet().containsAll( positives );
 
         double[] precisions = new double[rankedGenes.size()];
         double[] recalls = new double[rankedGenes.size()];
 
-        int currentRecall = 0;
+        int currentPosCount = 0;
         int currentNegCount = 0;
         int i = 0;
-        for ( Gene raw : rankedGenes ) {
-            if ( positives.contains( raw ) ) {
-                currentRecall++;
+        for ( Gene g : rankedGenes ) {
+            if ( positives.contains( g ) ) {
+                currentPosCount++;
             } else {
                 currentNegCount++;
             }
 
-            double recall = ( double ) currentRecall / positives.size();
-            double precision = ( double ) currentRecall / ( currentNegCount + currentRecall );
+            double recall = ( double ) currentPosCount / positives.size();
+            double precision = ( double ) currentPosCount / ( currentNegCount + currentPosCount );
 
             precisions[i] = precision;
             recalls[i] = recall;
             i++;
         }
+
+        // we should see all the positives!!
+        // assert currentPosCount == positives.size();
 
         double[][] series = new double[][] { recalls, precisions };
         return series;
@@ -173,7 +247,7 @@ public class GeneSetRankingContextWindow extends JFrame {
      */
     private ChartPanel precisionRecallPlot() {
 
-        double[][] series = gerPrecisionRecallCurve();
+        double[][] series = getPrecisionRecallCurve();
 
         DefaultXYDataset ds = new DefaultXYDataset();
         ds.addSeries( "PR", series );

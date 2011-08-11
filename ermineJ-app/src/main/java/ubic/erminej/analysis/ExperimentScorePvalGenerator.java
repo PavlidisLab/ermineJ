@@ -41,8 +41,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @param settings
      * @param a
-     * @param csc
-     * @param hi
+     * @param hi null distributions
      */
     public ExperimentScorePvalGenerator( SettingsHolder settings, GeneAnnotations a, Histogram hi ) {
         super( settings, a );
@@ -76,8 +75,6 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
         // foreach item in the class.
         for ( Gene gene : values ) {
-            ifInterruptedStop();
-
             // if it is in the data set. This is invariant under permutations.
             if ( geneToScoreMap.containsKey( gene ) ) {
                 groupPvalArr[v_size] = geneToScoreMap.get( gene );
@@ -86,8 +83,9 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         // get raw score and pvalue.
-        double rawscore = GeneSetResamplingBackgroundDistributionGenerator.computeRawScore( groupPvalArr,
-                numGenesInSet, settings.getGeneSetResamplingScoreMethod() );
+        double rawscore = GeneSetResamplingBackgroundDistributionGenerator.computeRawScore( groupPvalArr, settings
+                .getGeneSetResamplingScoreMethod() );
+
         double pval = scoreToPval( numGenesInSet, rawscore );
 
         if ( pval < 0.0 ) {
@@ -103,21 +101,18 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
 
     }
 
-    /* scoreClass */
-
     /**
-     * convert a raw score into a pvalue, based on random background distribution
+     * Convert a raw score into a pvalue, based on background distribution
      * 
-     * @param in_size int
-     * @param rawscore double
-     * @throws IllegalStateException
-     * @return double
+     * @param geneSetSize the size of the gene set that this score is for (used to identify which distribution to use)
+     * @param rawscore the raw score of the gene set
+     * @return double the pvalue for the raw score.
      */
-    protected double scoreToPval( int in_size, double rawscore ) throws IllegalStateException {
+    protected double scoreToPval( int geneSetSize, double rawscore ) {
 
         if ( hist == null ) throw new IllegalStateException( "Histogram is null" );
 
-        double pval = hist.getValue( in_size, rawscore, settings.upperTail() );
+        double pval = hist.getValue( geneSetSize, rawscore, settings.upperTail() );
 
         if ( pval < 0.0 ) {
             throw new IllegalStateException( "P value less than zero. Upper tail?" + settings.upperTail()
@@ -127,6 +122,7 @@ public class ExperimentScorePvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( Double.isNaN( pval ) ) {
             throw new IllegalStateException( "A pvalue was not a number: raw score = " + rawscore );
         }
+
         return pval;
     }
 

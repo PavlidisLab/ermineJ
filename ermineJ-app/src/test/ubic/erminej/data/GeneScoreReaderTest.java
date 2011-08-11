@@ -109,6 +109,11 @@ public class GeneScoreReaderTest extends TestCase {
         int expectedReturn = 21;
         int actualReturn = test.getNumProbesUsed();
         assertEquals( "return value", expectedReturn, actualReturn );
+
+        GeneAnnotations annots = test.getPrunedGeneAnnotations();
+        for ( GeneSet gs : annots.getGeneSets() ) {
+            assertTrue( gs.toString(), test.getGeneToScoreMap().keySet().containsAll( gs.getGenes() ) );
+        }
     }
 
     /*
