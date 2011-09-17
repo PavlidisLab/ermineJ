@@ -90,13 +90,21 @@ public class AnalysisWizardStep5 extends WizardStep {
      */
     public void addVarPanel( Method analysisType ) {
         setValues();
+
+        /*
+         * this is for during development, so we don't expose this functionality prematurely
+         */
+        boolean enableMultifunc = settings.getConfig().getBoolean( "multifunc.correct.enabled" );
+
         if ( analysisType.equals( Method.ORA ) ) {
             oraPanel.add( jCheckBoxDoLog );
             oraPanel.add( jCheckBoxBigIsBetter );
-            oraPanel.add( jCheckBoxDoMultiFuncCorr );
 
-            jCheckBoxDoMultiFuncCorr.setEnabled( true );
-            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+            if ( enableMultifunc ) {
+                oraPanel.add( jCheckBoxDoMultiFuncCorr );
+                jCheckBoxDoMultiFuncCorr.setEnabled( true );
+                jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+            }
 
             step5Panel.add( oraPanel );
             this.addHelp( extraHelp );
@@ -105,20 +113,24 @@ public class AnalysisWizardStep5 extends WizardStep {
             resampPanel.add( jCheckBoxDoLog, null );
             resampPanel.add( jCheckBoxBigIsBetter );
             resampPanel.add( subPanel );
-            resampPanel.add( jCheckBoxDoMultiFuncCorr );
 
-            jCheckBoxDoMultiFuncCorr.setEnabled( true );
-            jCheckBoxDoMultiFuncCorr.setSelected( false );
+            if ( enableMultifunc ) {
+                resampPanel.add( jCheckBoxDoMultiFuncCorr );
+                jCheckBoxDoMultiFuncCorr.setEnabled( true );
+                jCheckBoxDoMultiFuncCorr.setSelected( false );
+            }
 
             this.addHelp( extraHelp );
             step5Panel.add( resampPanel, null );
         } else if ( analysisType.equals( Method.ROC ) ) {
             rocPanel.add( jCheckBoxDoLog, null );
             rocPanel.add( jCheckBoxBigIsBetter, null );
-            rocPanel.add( jCheckBoxDoMultiFuncCorr );
 
-            jCheckBoxDoMultiFuncCorr.setEnabled( true );
-            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+            if ( enableMultifunc ) {
+                rocPanel.add( jCheckBoxDoMultiFuncCorr );
+                jCheckBoxDoMultiFuncCorr.setEnabled( true );
+                jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+            }
 
             this.addHelp( extraHelp );
             step5Panel.add( rocPanel, null );
