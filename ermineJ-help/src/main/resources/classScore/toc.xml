@@ -12,7 +12,7 @@
 			<tocitem text="Software basics" target="starting" />
 			<tocitem text="Frequently Asked Questions" target="faq" />
 			<tocitem text="Analysis" target="analysis" />
-			<tocitem text="Diagnostics and multifunctionality" target="multifunc.html" />
+			<tocitem text="Diagnostics and multifunctionality" target="multifunc" />
 			
 			<tocitem text="Analysis methods" expand="true">
 				<tocitem text="ORA (over-representation)" target="ora" />

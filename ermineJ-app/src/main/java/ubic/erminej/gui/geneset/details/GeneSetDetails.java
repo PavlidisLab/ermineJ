@@ -103,8 +103,7 @@ public class GeneSetDetails {
             try {
                 this.settings = new Settings();
             } catch ( IOException e ) {
-                GuiUtil.error( "Problem accessing settings for the details view: " + e
-                        + ", see the logs for more details." );
+                GuiUtil.error( "Problem accessing settings for the details view:\n" + e.getMessage() );
                 log.error( e, e );
                 return;
             }

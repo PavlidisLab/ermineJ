@@ -590,6 +590,10 @@ public class MainFrame extends JFrame {
 
                     tablePanel.setMessenger( statusMessenger );
                     treePanel.setMessenger( statusMessenger );
+                    
+                    /*
+                     * FIXME if we are loading a project, we have to use the settings of the project here.
+                     */
                     initializeAllData();
 
                     /*
@@ -762,7 +766,7 @@ public class MainFrame extends JFrame {
         }
 
         assert geneData != null;
-        log.info( "Setup done: " + timer.getTime() + " ms" );
+        log.info( "Annotation initialization done: " + timer.getTime() + " ms" );
 
         updateProgress( 90 );
 
