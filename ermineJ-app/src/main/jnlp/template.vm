@@ -2,8 +2,8 @@
 	<information>
 	<title>ErmineJ</title>
 	<vendor>$project.Organization.Name</vendor>
-	<homepage href="http://www.bioinformatics.ubc.ca/ermineJ"/>
-	<description>ErmineJ gene set enrichment analysis</description>
+	<homepage href="http://www.chibi.ubc.ca/ermineJ"/>
+	<description>ErmineJ gene set analysis</description>
 	<icon href="ermineJ.gif"/>
 #if($offlineAllowed) 
 	<offline-allowed/>
@@ -15,7 +15,7 @@
 	</security>
 #end
  	<resources>
-	<j2se version="$j2seVersion" max-heap-size="512m"/>
+	<j2se version="$j2seVersion" max-heap-size="1g"/>
      	$dependencies 
 	</resources> 
 	<application-desc main-class="$mainClass"/>
