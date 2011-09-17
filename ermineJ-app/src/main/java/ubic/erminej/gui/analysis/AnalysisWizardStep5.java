@@ -94,7 +94,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         /*
          * this is for during development, so we don't expose this functionality prematurely
          */
-        boolean enableMultifunc = settings.getConfig().getBoolean( "multifunc.correct.enabled" );
+        boolean enableMultifunc = settings.getConfig().getBoolean( "multifunc.correct.enabled", false );
 
         if ( analysisType.equals( Method.ORA ) ) {
             oraPanel.add( jCheckBoxDoLog );
