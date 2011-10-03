@@ -1,8 +1,8 @@
-
-
 @echo off
 @REM enable echoing my setting ERMINEJ_BATCH_ECHO to 'on'
 @if "%ERMINEJ_BATCH_ECHO%" == "on"  echo %ERMINEJ_BATCH_ECHO%
+
+echo Starting ErmineJ ...
 
 @REM Execute a user defined script before this one
 if exist "%HOME%\ermineJrc_pre.bat" call "%HOME%\ermineJrc_pre.bat"
@@ -45,7 +45,7 @@ goto end
 if exist "%ERMINEJ_HOME%\bin\ermineJ.bat" goto init
 
 echo.
-echo ERROR: ERMINEJ_HOME is set to an invalid directory.
+echo ERROR: ERMINEJ_HOME is set to an invalid directory or does not contain the bin\ermineJ.bat script
 echo ERMINEJ_HOME = %ERMINEJ_HOME%
 echo Please set the ERMINEJ_HOME variable in your environment to match the
 echo location of the ermineJ installation
@@ -55,9 +55,6 @@ goto end
 
 :init
 @REM Decide how to startup depending on the version of windows
-
-@REM -- Win98ME
-if NOT "%OS%"=="Windows_NT" goto Win9xArg
 
 @REM -- 4NT shell
 if "%eval[2+2]" == "4" goto 4NTArgs
@@ -71,20 +68,21 @@ goto endInit
 set ERMINEJ_CMD_LINE_ARGS=%$
 goto endInit
 
-:Win9xArg
-@REM Slurp the command line arguments.  This loop allows for an unlimited number
-@REM of agruments (up to the command line limit, anyway).
-set ERMINEJ_CMD_LINE_ARGS=
-:Win9xApp
-if %1a==a goto endInit
-set ERMINEJ_CMD_LINE_ARGS=%ERMINEJ_CMD_LINE_ARGS% %1
-shift
-goto Win9xApp
-
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
 if "%ERMINEJ_OPTS%"=="" SET ERMINEJ_OPTS="-Xmx1024m"
 SET ERMINEJ_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
+
+if exist "%ERMINEJ_JAVA_EXE%"  goto run
+echo.
+echo ERROR: ERMINEJ_JAVA_EXE is set to an invalid path.
+echo ERMINEJ_JAVA_EXE = %ERMINEJ_JAVA_EXE%
+echo Please set the JAVA_HOME variable in your environment to match the
+echo location of the java installation
+echo.
+goto end
+
+:run
 SET ERMINEJ_CLASSPATH="%ERMINEJ_HOME%\lib\forehead.jar"
 SET ERMINEJ_MAIN_CLASS="com.werken.forehead.Forehead"
 SET ERMINEJ_ENDORSED="%JAVA_HOME%\lib\endorsed;%ERMINEJ_HOME%\lib"
