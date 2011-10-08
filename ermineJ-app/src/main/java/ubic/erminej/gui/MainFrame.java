@@ -1477,7 +1477,7 @@ public class MainFrame extends JFrame {
     }
 
     protected void switchRawDataFile() {
-        JRawFileChooser fchooser = new JRawFileChooser( settings.getRawDataFileName() );
+        JRawFileChooser fchooser = new JRawFileChooser( settings.getRawDataFileName(), settings.getDataCol() );
         fchooser.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 

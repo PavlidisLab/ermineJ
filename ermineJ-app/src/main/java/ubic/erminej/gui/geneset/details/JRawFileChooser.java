@@ -46,14 +46,14 @@ public class JRawFileChooser extends JFileChooser {
 
     JTextField dataColTextField = new JTextField();
 
-    public JRawFileChooser( String startPath ) {
+    public JRawFileChooser( String startPath, int currentSettingForDataColumn ) {
         super( startPath );
 
         // Create a file filter for the file chooser
         DataFileFilter dataFileFilter = new DataFileFilter();
         super.setFileFilter( dataFileFilter );
         super.setAcceptAllFileFilterUsed( false );
-        m_options = new JRawFileChooserOptions( this, -1 );
+        m_options = new JRawFileChooserOptions( this, currentSettingForDataColumn );
         super.setAccessory( m_options );
         this.setSelectedFile( new File( startPath ) );
     }
