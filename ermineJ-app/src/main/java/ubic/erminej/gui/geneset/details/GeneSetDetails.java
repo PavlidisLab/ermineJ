@@ -296,18 +296,18 @@ public class GeneSetDetails {
     }
 
     private void initMatrix() {
-
-        log.debug( "Raw data file is " + settings.getRawDataFileName() );
-
         String filename = settings.getRawDataFileName();
 
-        if ( !StringUtils.isBlank( filename ) && ( new File( filename ) ).canRead() ) {
-            loadDataMatrix( filename );
-
-        } else {
+        if ( StringUtils.isBlank( filename ) ) {
+            // GuiUtil.error( "The data file name was not supplied.\n" );
+            callerStatusViewer.showError( "Data file for heatmap is not defined" );
+        } else if ( !( new File( filename ) ).canRead() ) {
             GuiUtil.error( "The data file \"" + filename + "\" was not readable." + "\n"
                     + "Please make sure this file exists and the filename and directory path are correct,\n"
                     + "and that it is a valid raw data file (tab-delimited).\n" );
+        } else {
+            loadDataMatrix( filename );
+
         }
     }
 
