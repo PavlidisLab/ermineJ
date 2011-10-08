@@ -85,7 +85,7 @@ OPTIONS
 		Sets the multiple test correction method: 0 = Bonferonni,  1 = Westfall-Young (slow),  2 =  Benjamini-Hochberg (default)
 
 	-C file ... or --config file ...
-		Sets the configuration file to be used.
+		Sets the configuration file to be used, in the same format as ermineJ.properties
 
 	-G or --gui
 		Launch the GUI.
@@ -96,6 +96,11 @@ OPTIONS
 		<h2>
 			Configuration files and the command line
 		</h2>
+		<p>For GUI users, the configuration file refers to the "settings" file, 
+		normally called "erminej.properties" and stored in the user's home directory. The CLI permits
+		the use of a configuration file (identified with the <code>-C</code> option) instead of setting parameters as arguments to the shell command.
+		This section describes how the CLI interprets this option.</p>
+		
 		<p>
 			Note that this behavior has changed in recent versions of ermineJ.
 			Please note that when running ermineJ from Webstart or the Windows
