@@ -304,7 +304,7 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     private boolean onGeneSymbolCell( int i, int j ) {
         if ( i < 0 || j < 0 ) return false;
-        return table.getValueAt( i, j ) != null && j == table.getColumnCount() - 3;
+        return table.getValueAt( i, j ) != null && j == table.getColumnCount() - 4;
     }
 
     private boolean onMultifunctionalityCell( int i, int j ) {
