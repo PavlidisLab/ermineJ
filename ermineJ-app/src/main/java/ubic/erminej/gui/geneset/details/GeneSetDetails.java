@@ -232,9 +232,7 @@ public class GeneSetDetails {
             }
 
         } catch ( IOException e ) {
-            GuiUtil.error( "Error loading data from file " + filename + "\n"
-                    + "Please make sure this file exists and the filename and directory path are correct,\n"
-                    + "and that it is a valid raw data file (tab-delimited).\n" );
+            GuiUtil.error( "Could not load data from " + filename, e );
         }
     }
 

@@ -1127,7 +1127,12 @@ public class GeneSetDetailsFrame extends JFrame {
                             JOptionPane.INFORMATION_MESSAGE );
         }
 
-        JRawFileChooser fc = new JRawFileChooser( settings.getRawDataFileName(), settings.getDataCol() );
+        String rawDataFileName = settings.getRawDataFileName();
+        if ( StringUtils.isBlank( rawDataFileName ) ) {
+            rawDataFileName = this.settings.getDataDirectory();
+        }
+
+        JRawFileChooser fc = new JRawFileChooser( rawDataFileName, settings.getDataCol() );
         fc.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fc.showDialog( this, "Open" );
 

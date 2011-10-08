@@ -590,7 +590,7 @@ public class MainFrame extends JFrame {
 
                     tablePanel.setMessenger( statusMessenger );
                     treePanel.setMessenger( statusMessenger );
-                    
+
                     /*
                      * FIXME if we are loading a project, we have to use the settings of the project here.
                      */
@@ -1461,23 +1461,34 @@ public class MainFrame extends JFrame {
      * 
      */
     protected void switchGeneScoreFile() {
-        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( settings.getScoreFile(), settings.getScoreCol() );
+        String scoreFile = settings.getScoreFile();
+        if ( StringUtils.isBlank( scoreFile ) ) {
+            scoreFile = this.settings.getDataDirectory();
+        }
+
+        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( scoreFile, settings.getScoreCol() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
-            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile()
-                    + ", reading values from column " + settings.getScoreCol() );
+            statusMessenger.showStatus( "Score file set to " + scoreFile + ", reading values from column "
+                    + settings.getScoreCol() );
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
             settings.setScoreCol( fchooser.getStartColumn() );
-            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile() );
+            statusMessenger.showStatus( "Score file set to " + scoreFile );
         }
 
     }
 
     protected void switchRawDataFile() {
-        JRawFileChooser fchooser = new JRawFileChooser( settings.getRawDataFileName(), settings.getDataCol() );
+        String rawDataFileName = settings.getRawDataFileName();
+
+        if ( StringUtils.isBlank( rawDataFileName ) ) {
+            rawDataFileName = this.settings.getDataDirectory();
+        }
+
+        JRawFileChooser fchooser = new JRawFileChooser( rawDataFileName, settings.getDataCol() );
         fchooser.setDialogTitle( "Choose the expression data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
