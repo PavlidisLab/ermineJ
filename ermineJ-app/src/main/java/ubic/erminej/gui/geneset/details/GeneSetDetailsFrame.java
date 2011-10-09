@@ -485,6 +485,11 @@ public class GeneSetDetailsFrame extends JFrame {
         m_colorRangeSlider.setEnabled( enabled );
         m_colorRangeLabel.setEnabled( enabled );
         m_gradientBar.setVisible( enabled );
+
+        if ( enabled ) {
+            m_gradientBar.setColorMap( matrixDisplay.getColorMap() );
+            initColorRangeWidget();
+        }
     }
 
     /**
@@ -1152,9 +1157,7 @@ public class GeneSetDetailsFrame extends JFrame {
             this.validate();
             this.statusMessenger.showStatus( "Matrix file set to: " + rawdataFile );
 
-            this.m_cellWidthSlider.setEnabled( true );
-            this.m_colorRangeSlider.setEnabled( true );
-
+            setDisplayMatrixGUIEnabled( true );
         }
 
     }

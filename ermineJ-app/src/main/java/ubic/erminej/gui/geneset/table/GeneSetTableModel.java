@@ -316,7 +316,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             // note: sometimes we end up here when the table is being modified; this is some kind of bug
             // with adding columns and sorting/repainting at the same time?
 
-        } else if ( column == 1 ) {
+        } else if ( column == 1 && value instanceof String ) {
             setText( ( String ) value );
         } else if ( value instanceof EmptyGeneSetResult ) {
             setText( "not run" );
@@ -437,7 +437,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             chooseMultifunctionalityIndicatorColor( ( Double ) value );
         } else if ( value instanceof EmptyGeneSetResult || value instanceof String ) {
             // nothing to do. This is weird that this happens, only when we are adding result sets; race condition
-        } else if ( column == 0 && ( ( GeneSetTerm ) value ).isUserDefined() ) {
+        } else if ( column == 0 && value instanceof GeneSetTerm && ( ( GeneSetTerm ) value ).isUserDefined() ) {
             setBackground( GeneSetPanel.USER_NODE_COLOR );
         } else if ( value instanceof GeneSetResult ) {
             double pvalCorr = ( ( GeneSetResult ) value ).getCorrectedPvalue();
