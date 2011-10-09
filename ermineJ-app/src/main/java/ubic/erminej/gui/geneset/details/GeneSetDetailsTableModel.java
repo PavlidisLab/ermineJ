@@ -41,6 +41,7 @@ import ubic.erminej.analysis.ScoreQuantiles;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.Multifunctionality;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.table.MatrixPoint;
 import ubic.erminej.gui.util.JLinkLabel;
@@ -78,9 +79,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
     QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
-    private Map<Probe, Double> mfRanks;
+    private Map<Probe, Double> mfRanks = new HashMap<Probe, Double>();
     private Map<Probe, Double> multifuncForProbesInSet = new HashMap<Probe, Double>();
     private Map<Gene, Double> multifuncForGenesInSet = new HashMap<Gene, Double>();
+    private Map<Gene, Double> mfGeneRanks = new HashMap<Gene, Double>();
 
     /**
      * @param matrixDisplay
@@ -110,6 +112,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
             }
 
             mfRanks = Rank.rankTransform( multifuncForProbesInSet, true );
+            mfGeneRanks = Rank.rankTransform( multifuncForGenesInSet, true );
             // this is a wee bit wasteful
             GeneScores geneScores = geneSetDetails.getSourceGeneScores();
             this.scoreQuantiles = ScoreQuantiles.computeQuantiles( settings, geneScores );
@@ -206,7 +209,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                     matrixDisplay.getRowIndexByName( probeID ), column ) ); // coords into JMatrixDisplay
         }
         column -= offset;
-        Gene gene_name = probeID.getGene();
+        Gene gene = probeID.getGene();
+        Multifunctionality multifunctionality = geneData.getMultifunctionality();
         switch ( column ) { // after it's been offset
             case 0:
                 // probe ID
@@ -236,17 +240,17 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 return values;
             case 3:
                 // gene symbols displayed nicely
-                return linkLabels.get( gene_name );
+                return linkLabels.get( gene );
             case 4:
                 // description
                 return geneData == null ? "" : probeID.getDescription();
             case 5:
                 // // multifunctionality. ugly.
                 if ( geneData == null ) return "";
-                gene_name = probeID.getGene();
-                return String.format( "%.3f (%d)", Math.max( 0.0, geneData.getMultifunctionality()
-                        .getMultifunctionalityRank( gene_name ) ), geneData.getMultifunctionality().getNumGoTerms(
-                        gene_name ) );
+                gene = probeID.getGene();
+                return String.format( "%.3f (%d)",
+                        Math.max( 0.0, multifunctionality.getMultifunctionalityRank( gene ) ), multifunctionality
+                                .getNumGoTerms( gene ) );
 
             case 6:
                 // multifunctionality graphic.
@@ -255,12 +259,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                     mfv.add( 0, 1.0 );
                     mfv.add( 1, 1.0 );
                 } else {
-                    double mfQuantile = 1.0 - Math.max( 1.0 / mfQuantiles.size(), mfQuantiles.quantileInverse( geneData
-                            .getMultifunctionality().getMultifunctionalityScore( gene_name ) ) );
+                    double mfQuantile = 1.0 - Math.max( 1.0 / mfQuantiles.size(), mfQuantiles
+                            .quantileInverse( multifunctionality.getMultifunctionalityScore( gene ) ) );
 
-                    Double position = mfRanks.get( probeID );
-                    // FIXME this is counting probes but we really need to be on genes here.
-                    // double expectedQuantile = ( position + 1 ) / multifuncForProbesInSet.size();
+                    Double position = mfGeneRanks.get( gene );
                     double expectedQuantile = ( position + 1 ) / multifuncForGenesInSet.size();
 
                     mfv.add( 0, -Math.log10( expectedQuantile ) );
