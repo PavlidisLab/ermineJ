@@ -70,9 +70,9 @@ public class GeneSetPvalRun {
 
     private int numAboveThreshold = 0;
 
-    private int numGenesUsed = 0;
-
     private String geneScoreColumnName = "";
+
+    private double multifunctionalityEnrichment = -1;
 
     /**
      * Do a new analysis, starting from the bare essentials (correlation method not available) (simple API)
@@ -168,6 +168,15 @@ public class GeneSetPvalRun {
         return multifunctionalityCorrelation;
     }
 
+    /**
+     * For ORA only.
+     * 
+     * @return
+     */
+    public double getMultifunctionalityEnrichment() {
+        return multifunctionalityEnrichment;
+    }
+
     public String getName() {
         return name;
     }
@@ -179,13 +188,6 @@ public class GeneSetPvalRun {
      */
     public int getNumAboveThreshold() {
         return numAboveThreshold;
-    }
-
-    /**
-     * @return how many genes were available for analysis.
-     */
-    public int getNumGenesUsed() {
-        return this.numGenesUsed;
     }
 
     /**
@@ -306,6 +308,9 @@ public class GeneSetPvalRun {
 
         if ( geneScores != null ) geneScoreColumnName = geneScores.getScoreColumnName();
 
+        // only used for ORA
+        Collection<Gene> genesAboveThreshold = new HashSet<Gene>();
+
         switch ( settings.getClassScoreMethod() ) {
             case GSR: {
 
@@ -342,6 +347,8 @@ public class GeneSetPvalRun {
                 Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
 
                 results = pvg.classPvalGenerator( geneToScoreMap, messenger );
+
+                genesAboveThreshold = pvg.getGenesAboveThreshold();
 
                 messenger.showStatus( "Finished with ORA computations: " + numAboveThreshold
                         + " probes passed your threshold." );
@@ -400,15 +407,15 @@ public class GeneSetPvalRun {
 
         rankAndMultipleTestCorrect( geneScores );
 
-        setMultifunctionalities( geneScores );
+        setMultifunctionalities( geneScores, genesAboveThreshold );
 
         if ( messenger != null ) messenger.showStatus( "Done!" );
     }
 
     /**
-     * 
+     * @param genesAboveThreshold
      */
-    private void setMultifunctionalities( GeneScores geneScores ) {
+    private void setMultifunctionalities( GeneScores geneScores, Collection<Gene> genesAboveThreshold ) {
 
         Multifunctionality mf = geneData.getMultifunctionality();
 
@@ -416,6 +423,10 @@ public class GeneSetPvalRun {
             multifunctionalityCorrelation = mf.correlationWithGeneMultifunctionality( geneScores.getRankedGenes() );
             messenger.showStatus( String.format( "Multifunctionality correlation is %.2f for %d values",
                     multifunctionalityCorrelation, geneScores.getRankedGenes().size() ) );
+
+            if ( genesAboveThreshold != null && !genesAboveThreshold.isEmpty() ) {
+                this.multifunctionalityEnrichment = mf.enrichmentForMultifunctionality( genesAboveThreshold );
+            }
         }
 
         for ( Object o : this.results.values() ) {

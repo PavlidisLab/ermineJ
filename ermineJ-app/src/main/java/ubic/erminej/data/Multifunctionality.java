@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -298,10 +299,8 @@ public class Multifunctionality {
     /**
      * Implementation of algorithm for computing AUC, described in Section 1 of the supplement to Gillis and Pavlidis;
      * see {@link http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U}.
-     * 
-     * @param rawGeneMultifunctionalityRanks in descending order
      */
-    private void computeGoTermMultifunctionalityRanks( Map<Gene, Double> rawGeneMultifunctionalityRanks ) {
+    private void computeGoTermMultifunctionalityRanks() {
         int numGenes = genesWithGoTerms.size();
         int numGoGroups = geneAnnots.getGeneSetTerms().size();
         /*
@@ -316,33 +315,18 @@ public class Multifunctionality {
                 continue;
             }
 
-            int inGroup = goGroupSizes.get( goset );
+            Set<Gene> genes = geneAnnots.getGeneSetGenes( goset );
+            int inGroup = genes.size();
             int outGroup = numGenes - inGroup;
 
             assert inGroup >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE;
 
+            // check for pathological condition
             if ( outGroup == 0 ) {
                 continue;
             }
 
-            double t1 = inGroup * ( inGroup + 1.0 ) / 2.0;
-
-            double t2 = inGroup * outGroup;
-
-            /*
-             * Extract the ranks of the genes in the goset, where highest ranking is the best.
-             */
-            double sumOfRanks = 0.0;
-            for ( Gene gene : geneAnnots.getGeneSetGenes( goset ) ) {
-                double rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
-                sumOfRanks += rank;
-            }
-
-            double t3 = sumOfRanks - t1;
-
-            double auc = Math.max( 0.0, 1.0 - t3 / t2 );
-
-            assert auc >= 0.0 && auc <= 1.0 : "AUC was " + auc;
+            double auc = enrichmentForMultifunctionality( genes );
 
             // assert auc > 0 : "AUC was " + auc + " for " + goset; // this can happen in toy tests.
 
@@ -404,14 +388,14 @@ public class Multifunctionality {
                 this.geneMultifunctionality.put( gene, mf );
             }
 
-            Map<Gene, Double> rawGeneMultifunctionalityRanks = Rank.rankTransform( this.geneMultifunctionality, true );
+            rawGeneMultifunctionalityRanks = Rank.rankTransform( this.geneMultifunctionality, true );
             for ( Gene gene : rawGeneMultifunctionalityRanks.keySet() ) {
                 // 1-base the rank before calculating ratio
                 double geneMultifunctionalityRankRatio = ( rawGeneMultifunctionalityRanks.get( gene ) + 1 ) / numGenes;
                 this.geneMultifunctionalityRank.put( gene, Math.max( 0.0, 1.0 - geneMultifunctionalityRankRatio ) );
             }
 
-            computeGoTermMultifunctionalityRanks( rawGeneMultifunctionalityRanks );
+            computeGoTermMultifunctionalityRanks();
 
             if ( timer.getTime() > 1000 ) {
                 log.info( "Multifunctionality computation: " + timer.getTime() + "ms" );
@@ -419,5 +403,46 @@ public class Multifunctionality {
         } finally {
             stale.set( false );
         }
+    }
+
+    Map<Gene, Double> rawGeneMultifunctionalityRanks;
+
+    /**
+     * This is like correlationWithGeneMultifunctionality(List<Gene>), but without an order list to start with, and
+     * intended for cases where the number of genes is smaller than the total number of genes. We do this the same we we
+     * do for GO groups.
+     * 
+     * @param keptGenes
+     */
+    public double enrichmentForMultifunctionality( Collection<Gene> genes ) {
+        double sumOfRanks = 0.0;
+        int inGroup = 0;
+        for ( Gene gene : genes ) {
+            if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
+                inGroup++;
+            }
+        }
+
+        int outGroup = genesWithGoTerms.size() - inGroup;
+
+        if ( outGroup <= 0 ) return 0.0;
+
+        double t1 = inGroup * ( inGroup + 1.0 ) / 2.0;
+        double t2 = inGroup * outGroup;
+
+        for ( Gene gene : genes ) {
+            if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
+                double rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
+                sumOfRanks += rank;
+            }
+        }
+
+        double t3 = sumOfRanks - t1;
+
+        double auc = Math.max( 0.0, 1.0 - t3 / t2 );
+
+        assert auc >= 0.0 && auc <= 1.0 : "AUC was " + auc;
+
+        return auc;
     }
 }

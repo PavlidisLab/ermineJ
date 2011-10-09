@@ -26,6 +26,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -40,6 +43,7 @@ import javax.swing.border.TitledBorder;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.Method;
+import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.gui.util.WizardStep;
 import cern.jet.math.Arithmetic;
@@ -74,7 +78,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     JCheckBox jCheckBoxUseEmpirical;
     private String help;
     private String extraHelp;
-
+    boolean enableMultifunc = true;
     Double[] geneScores = null;
 
     public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
@@ -92,9 +96,10 @@ public class AnalysisWizardStep5 extends WizardStep {
         setValues();
 
         /*
-         * this is for during development, so we don't expose this functionality prematurely
+         * this is for during development, so we don't expose this functionality prematurely: set to false to turn it
+         * off etc.
          */
-        boolean enableMultifunc = settings.getConfig().getBoolean( "multifunc.correct.enabled", false );
+        enableMultifunc = settings.getConfig().getBoolean( "multifunc.correct.enabled", true );
 
         if ( analysisType.equals( Method.ORA ) ) {
             oraPanel.add( jCheckBoxDoLog );
@@ -199,6 +204,8 @@ public class AnalysisWizardStep5 extends WizardStep {
 
         SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
 
+            private GeneScores gs;
+
             @Override
             protected Object doInBackground() throws Exception {
 
@@ -210,29 +217,36 @@ public class AnalysisWizardStep5 extends WizardStep {
                     }
 
                     AnalysisWizard w = ( AnalysisWizard ) getOwner();
-                    if ( geneScores == null ) {
+                    if ( gs == null ) {
 
                         Settings settingsTemp = new Settings( w.getSettings() );
                         settingsTemp.setDoLog( jCheckBoxDoLog.isSelected() );
                         settingsTemp.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
 
-                        GeneScores gs = new GeneScores( settingsTemp.getScoreFile(), settingsTemp, null, w
-                                .getGeneAnnots() );
+                        gs = new GeneScores( settingsTemp.getScoreFile(), settingsTemp, null, w.getGeneAnnots() );
 
-                        geneScores = gs.getGeneScores();
                         w.getStatusField().clear();
                     }
 
                     int n = 0;
-                    for ( Double s : geneScores ) {
+                    Map<Gene, Double> geneToScoreMap = gs.getGeneToScoreMap();
+                    Collection<Gene> keptGenes = new HashSet<Gene>();
+                    for ( Gene g : geneToScoreMap.keySet() ) {
+                        Double s = geneToScoreMap.get( g );
                         if ( scorePassesThreshold( s, thresh ) ) {
                             n++;
+                            keptGenes.add( g );
                         }
                     }
                     if ( n == 0 ) {
                         w.getStatusField().showError( "No genes selected at that threshold" );
                     } else {
-                        w.getStatusField().showStatus( n + " genes selected." );
+                        double auc = w.getGeneAnnots().getMultifunctionality().enrichmentForMultifunctionality(
+                                keptGenes );
+
+                        w.getStatusField().showStatus(
+                                String.format( " %d genes selected. MF bias (AUROC) = %.2f", n, auc ) );
+
                     }
 
                 } catch ( NumberFormatException ex ) {

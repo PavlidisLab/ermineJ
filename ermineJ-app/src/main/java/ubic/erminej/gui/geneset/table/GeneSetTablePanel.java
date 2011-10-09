@@ -333,29 +333,33 @@ public class GeneSetTablePanel extends GeneSetPanel {
         assert geneSetPvalRun != null : "No results with index " + runIndex;
         log.debug( "Generating tooltip for run #" + runIndex );
         SettingsHolder runSettings = geneSetPvalRun.getSettings();
-        int numGenesUsed = geneSetPvalRun.getNumGenesUsed();
 
         String tooltip = new String( "<html>" );
         String coda = new String();
+        String mf = "";
 
         if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
             tooltip += "ORA Analysis<br>";
             int numAboveThresh = geneSetPvalRun.getNumAboveThreshold();
             coda += "Score threshold: " + runSettings.getGeneScoreThreshold();
             coda += ", Genes meeting: " + numAboveThresh + "<br/>";
+            // note use of enrichment in this case.
+            mf = String.format( "Multifunct. bias (AUROC): %.2f<br>", geneSetPvalRun.getMultifunctionalityEnrichment() );
         } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
             tooltip += "Resampling Analysis<br>";
             coda += runSettings.getIterations() + " iterations<br>";
             coda += "Using score column: " + runSettings.getScoreCol();
+            mf = String.format( "Multifunct. bias (corr): %.2f<br>", geneSetPvalRun.getMultifunctionalityCorrelation() );
         } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
             tooltip += "Correlation Analysis<br>";
             coda += runSettings.getIterations() + " iterations";
+            // no multifunctionality issues dealt with
         } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ROC ) ) {
             tooltip += "ROC Analysis<br>";
+            mf = String.format( "Multifunct. bias (corr): %.2f<br>", geneSetPvalRun.getMultifunctionalityCorrelation() );
         }
 
-        tooltip += String.format( "Multifunct. bias: %.2f, %d genes<br>", geneSetPvalRun
-                .getMultifunctionalityCorrelation(), numGenesUsed );
+        tooltip += mf;
 
         tooltip += new String( "Max set size: " + runSettings.getMaxClassSize() + "<br>" + "Min set size: "
                 + runSettings.getMinClassSize() + "<br>" );

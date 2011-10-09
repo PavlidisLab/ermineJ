@@ -174,6 +174,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     }
 
+    public Collection<Gene> getGenesAboveThreshold() {
+        return genesAboveThreshold;
+    }
+
     public double getGeneScoreThreshold() {
         return geneScoreThreshold;
     }
