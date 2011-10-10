@@ -308,7 +308,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @param geneSuccesses
      * @return adjusted value
+     * @deprecated, this was just a prototype
      */
+    @Deprecated
     private int multiFunctionalityCorrect( int geneSuccesses ) {
 
         int amountOfCorrection = 2; // TEMPORARY!
@@ -380,16 +382,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         assert seenGenes.size() == geneSetGenes.size();
         assert geneSuccesses >= 0;
-        /*
-         * 
-         * Multifuncationality correction: Determine which of those gene above threshold is the most multifunctional
-         */
-        // FIXME remove this in favour of a global correction.
-        boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection();
-        if ( useMultifunctionalityCorrection ) {
-            geneSuccesses = multiFunctionalityCorrect( geneSuccesses );
-        }
-        assert geneSuccesses >= 0;
+
+        // original prototype method for Multifuncationality correction: Determine which of those gene above threshold
+        // is the most multifunctional
+        // boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection();
+        // if ( useMultifunctionalityCorrection ) {
+        // geneSuccesses = multiFunctionalityCorrect( geneSuccesses );
+        // }
+        // assert geneSuccesses >= 0;
 
         int successes = geneSuccesses;
 
