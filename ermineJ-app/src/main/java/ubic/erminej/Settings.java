@@ -239,8 +239,16 @@ public class Settings extends SettingsHolder {
     @Override
     public double getGeneScoreThreshold() {
 
-        if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
+        // use the new key; delete the old one
+        if ( config.containsKey( GENE_SCORE_THRESHOLD_KEY ) ) {
+            config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
+            if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
+                config.clearProperty( GENE_SCORE_THRESHOLD_LEGACY_KEY );
+
+            }
+        } else if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
             config.setProperty( GENE_SCORE_THRESHOLD_KEY, config.getDouble( GENE_SCORE_THRESHOLD_LEGACY_KEY, 0.001 ) );
+            config.clearProperty( GENE_SCORE_THRESHOLD_LEGACY_KEY );
         }
 
         return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
