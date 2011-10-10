@@ -67,7 +67,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         assertEquals( 2, test.getNumGenesOverThreshold() ); // checked
         assertEquals( 17, test.getNumGenesUnderThreshold() ); // checked
 
-        GeneSetResult r = test.classPval( new GeneSetTerm( "GO:2" ) );
+        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:2" ) );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
 
@@ -79,7 +79,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         assertEquals( 11, scores.getPrunedGeneAnnotations().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
 
-        GeneSetResult r = test.classPval( new GeneSetTerm( "GO:1" ) );
+        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:1" ) );
 
         assertNotNull( r );
         double actualReturn = r.getPvalue();
@@ -90,7 +90,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval3() {
         double expectedReturn = 0.7894737; // checked // dhyper(1, 10,9, 2) + dhyper(2, 10,9, 2)
 
-        GeneSetResult r = test.classPval( new GeneSetTerm( "GO:3" ) );
+        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:3" ) );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
 

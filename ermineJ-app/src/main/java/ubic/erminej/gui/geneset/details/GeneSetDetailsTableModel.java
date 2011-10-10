@@ -26,8 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.commons.logging.Log;
@@ -79,7 +77,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
     QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
-    private Map<Probe, Double> mfRanks = new HashMap<Probe, Double>();
+    // private Map<Probe, Double> mfRanks = new HashMap<Probe, Double>();
     private Map<Probe, Double> multifuncForProbesInSet = new HashMap<Probe, Double>();
     private Map<Gene, Double> multifuncForGenesInSet = new HashMap<Gene, Double>();
     private Map<Gene, Double> mfGeneRanks = new HashMap<Gene, Double>();
@@ -111,7 +109,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                         .getMultifunctionalityScore( p.getGene() ) );
             }
 
-            mfRanks = Rank.rankTransform( multifuncForProbesInSet, true );
+            // mfRanks = Rank.rankTransform( multifuncForProbesInSet, true );
             mfGeneRanks = Rank.rankTransform( multifuncForGenesInSet, true );
             // this is a wee bit wasteful
             GeneScores geneScores = geneSetDetails.getSourceGeneScores();

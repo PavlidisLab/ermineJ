@@ -164,6 +164,8 @@ public class MultiFuncDiagWindow extends JFrame {
     }
 
     /**
+     * Plot of ranks, smoothed.
+     * 
      * @param geneAnnots
      * @param geneScores
      * @return
@@ -174,7 +176,8 @@ public class MultiFuncDiagWindow extends JFrame {
         XYSeries ser = new XYSeries( "Gene scores" );
 
         for ( Gene g : geneToScoreMap.keySet() ) {
-            Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityRank( g );
+            // Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityRank( g );
+            Double mf = Math.log10( geneAnnots.getMultifunctionality().getMultifunctionalityScore( g ) );
             Double s = geneToScoreMap.get( g );
             ser.add( mf, s );
         }
@@ -187,13 +190,14 @@ public class MultiFuncDiagWindow extends JFrame {
 
         double r = Distance.spearmanRankCorrelation( new DoubleArrayList( array[0] ), scores );
 
-        // todo: put this in a status bar.
         log.info( String.format( "Correlation is %.2f for %d values", r, array[0].length ) );
 
         ser.clear();
 
+        // replace with ranks.
         for ( int i = 0; i < array[1].length; i++ ) {
-            ser.add( array[0][i], scoreRanks.get( i ) );
+            ser.add( array[0][i] /* mf */, scoreRanks.get( i ) );
+            // debug
             // ser.add( array[0][i], scores.get( i ) );
         }
 
@@ -203,7 +207,7 @@ public class MultiFuncDiagWindow extends JFrame {
         int windowSize = scoreRanks.size() / 10;
         DoubleMatrix1D movingAverage = Smooth.movingAverage( new DenseDoubleMatrix1D( ser.toArray()[1] ), windowSize );
 
-        XYSeries smoothed = new XYSeries( ser.getKey() + " - Smoothed" );
+        XYSeries smoothed = new XYSeries( ser.getKey() + String.format( " - Smoothed (r=%.2f)", r ) );
 
         for ( int i = 0; i < array[1].length; i++ ) {
             array[1][i] = scoreRanks.getQuick( i ) / array[1].length; // relative ranks.
@@ -221,7 +225,7 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality bias", "Gene multifunctionality rank",
                 "Gene score rank", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
-        c.setTitle( "How biased are the gene scores\n(Ranks, smoothed trend)" );
+        c.setTitle( String.format( "How biased are the gene scores\n(Ranks, smoothed trend; r=%.2f)", r ) );
         Plotting.setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );

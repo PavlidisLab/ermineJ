@@ -71,7 +71,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
     /**
      * @param set
      * @param sc
-     * @param h
+     * @param h only used for Westfall-Young
      * @param geneData
      * @param geneScores - only used for Westfall-Young
      * @param results
@@ -99,7 +99,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
 
             if ( skip.contains( t ) ) continue;
 
-            Collection<GeneSet> redundantGroups = geneData.getGeneSet( t ).getRedundantGroups();
+            Collection<GeneSet> redundantGroups = this.geneData.getGeneSet( t ).getRedundantGroups();
 
             if ( !redundantGroups.isEmpty() ) {
                 if ( !usedToSkipped.containsKey( t ) ) {

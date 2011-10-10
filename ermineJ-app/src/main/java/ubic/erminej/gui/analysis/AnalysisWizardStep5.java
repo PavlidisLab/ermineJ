@@ -93,7 +93,6 @@ public class AnalysisWizardStep5 extends WizardStep {
      * @param analysisType
      */
     public void addVarPanel( Method analysisType ) {
-        setValues();
 
         /*
          * this is for during development, so we don't expose this functionality prematurely: set to false to turn it
@@ -181,7 +180,8 @@ public class AnalysisWizardStep5 extends WizardStep {
             settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
         }
 
-        settings.setGeneScoreThreshold( Double.valueOf( geneScoreThresholdTextField.getText() ).doubleValue() );
+        String threshText = geneScoreThresholdTextField.getText();
+        settings.setGeneScoreThreshold( Double.valueOf( threshText ).doubleValue() );
         settings.setDoLog( jCheckBoxDoLog.isSelected() );
         settings.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
         settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );
@@ -266,8 +266,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     }
 
     /**
-     * 
-     *
+     * Setup
      */
     private void setValues() {
         jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );

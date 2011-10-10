@@ -18,14 +18,20 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import ubic.basecode.math.SpecFunc;
 import ubic.basecode.util.StatusViewer;
+import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -72,53 +78,31 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * Get results for one class, based on class id. The other arguments are things that are not constant under
-     * permutations of the data.
+     * @return Ranked list. Removes any sets which are not scored.
      */
-    public GeneSetResult classPval( GeneSetTerm className ) {
-
-        if ( !super.checkAspectAndRedundancy( className ) ) {
-            return null;
-        }
-
-        int numGenesInSet = numGenesInSet( className );
-        if ( numGenesInSet == 0 || numGenesInSet < settings.getMinClassSize()
-                || numGenesInSet > settings.getMaxClassSize() ) {
-            if ( log.isDebugEnabled() ) log.debug( "Class " + className + " is outside of selected size range" );
-            return null;
-        }
-
-        Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( className );
-
-        Collection<Gene> seenGenes = new HashSet<Gene>();
-        int geneSuccesses = 0;
-        for ( Gene g : geneSetGenes ) {
-
-            if ( !seenGenes.contains( g ) && genesAboveThreshold.contains( g ) ) {
-                geneSuccesses++;
+    @SuppressWarnings("unchecked")
+    private List<GeneSetTerm> getSortedClasses( final Map<GeneSetTerm, GeneSetResult> results ) {
+        Comparator c = new Comparator<GeneSetTerm>() {
+            @Override
+            public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
+                return results.get( o1 ).compareTo( results.get( o2 ) );
             }
-            seenGenes.add( g );
+        };
+
+        TreeMap<GeneSetTerm, GeneSetResult> sorted = new TreeMap<GeneSetTerm, GeneSetResult>( c );
+        sorted.putAll( results );
+
+        assert sorted.size() == results.size();
+
+        List<GeneSetTerm> sortedSets = new ArrayList<GeneSetTerm>();
+        for ( GeneSetTerm r : sorted.keySet() ) {
+            if ( results.get( r ) instanceof EmptyGeneSetResult /* just checking... */) {
+                continue;
+            }
+            sortedSets.add( r );
         }
 
-        assert seenGenes.size() == geneSetGenes.size();
-        assert geneSuccesses >= 0;
-        /*
-         * 
-         * Multifuncationality correction: Determine which of those gene above threshold is the most multifunctional
-         */
-        boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection();
-        if ( useMultifunctionalityCorrection ) {
-            geneSuccesses = multiFunctionalityCorrect( geneSuccesses );
-        }
-        assert geneSuccesses >= 0;
-
-        int successes = geneSuccesses;
-
-        int numGenes = geneScores.getGeneToScoreMap().size();
-
-        int numOverThreshold = this.getNumGenesOverThreshold();
-
-        return computeResult( className, numGenes, numGenesInSet, successes, numOverThreshold );
+        return sortedSets;
 
     }
 
@@ -136,19 +120,94 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         int count = 0;
 
-        for ( GeneSetTerm geneSetName : geneAnnots.getGeneSetTerms() ) {
+        boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection();
+        double sigThresh = 0.01;
+        double maxGroupsFraction = 0.01;
+        int numMultifunctionalRemoved = 0;
+        Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
+        Collection<Gene> filteredGenes = new HashSet<Gene>();
+        filteredGenes.addAll( genesAboveThreshold );
 
-            GeneSetResult res = classPval( geneSetName );
-            if ( res != null ) {
-                results.put( geneSetName, res );
+        while ( true ) {
 
-                if ( ++count % 100 == 0 ) ifInterruptedStop();
-                if ( messenger != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
-                    messenger.showStatus( count + " gene sets analyzed" );
+            /*
+             * See bug 2290
+             */
+
+            for ( GeneSetTerm geneSetName : geneAnnots.getGeneSetTerms() ) {
+
+                GeneSetResult res = classPval( filteredGenes, geneSetName );
+                if ( res != null ) {
+                    results.put( geneSetName, res );
+
+                    if ( ++count % 100 == 0 ) ifInterruptedStop();
+                    if ( messenger != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
+                        messenger.showStatus( count + " gene sets analyzed" );
+                    }
                 }
             }
 
+            if ( results.isEmpty() ) {
+                break;
+            }
+
+            if ( !useMultifunctionalityCorrection ) {
+                break;
+            }
+
+            List<GeneSetTerm> sortedClasses = getSortedClasses( results );
+            MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, null, geneAnnots,
+                    geneScores, results, messenger );
+
+            if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.BONFERONNI ) {
+                mt.bonferroni();
+            } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
+                mt.benjaminihochberg();
+            } else {
+                throw new UnsupportedOperationException( multipleTestCorrMethod
+                        + " is not supported for this analysis method" );
+            }
+
+            /*
+             * Determine how many groups meet the threshold.
+             */
+            int maxGroupsToSelect = ( int ) Math.floor( results.size() * maxGroupsFraction );
+
+            if ( maxGroupsToSelect < 1 ) {
+                throw new IllegalArgumentException( "No results" );
+            }
+
+            int numSelected = 0;
+            for ( GeneSetTerm t : sortedClasses ) {
+                GeneSetResult r = results.get( t );
+                if ( r.getCorrectedPvalue() > sigThresh ) {
+                    break;
+                }
+                numSelected++;
+            }
+
+            if ( numSelected > maxGroupsToSelect ) {
+                /*
+                 * Remove a multifunctional gene and try again
+                 */
+                numMultifunctionalRemoved++;
+                Gene mostMultifunctional = geneAnnots.getMultifunctionality().getMostMultifunctional( filteredGenes );
+                log.info( "Removing " + mostMultifunctional + " (most multifunc of hits)" );
+                filteredGenes.remove( mostMultifunctional );
+                if ( filteredGenes.isEmpty() ) {
+                    log.warn( "No genes left after remove MF genes" );
+                    break;
+                }
+            } else {
+                break;
+            }
         }
+
+        if ( numMultifunctionalRemoved > 0 ) {
+            // TODO make sure the user knows about this.
+            log.info( numMultifunctionalRemoved + " most multifunctional genes were removed from the selected genes" );
+        }
+
         return results;
     }
 
@@ -288,5 +347,57 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     private boolean scorePassesThreshold( double geneScore ) {
         return ( settings.upperTail() && geneScore >= geneScoreThreshold )
                 || ( !settings.upperTail() && geneScore <= geneScoreThreshold );
+    }
+
+    /**
+     * Get results for one class, based on class id. The other arguments are things that are not constant under
+     * permutations of the data.
+     */
+    protected GeneSetResult classPval( Collection<Gene> genesAboveThresh, GeneSetTerm className ) {
+
+        if ( !super.checkAspectAndRedundancy( className ) ) {
+            return null;
+        }
+
+        int numGenesInSet = numGenesInSet( className );
+        if ( numGenesInSet == 0 || numGenesInSet < settings.getMinClassSize()
+                || numGenesInSet > settings.getMaxClassSize() ) {
+            if ( log.isDebugEnabled() ) log.debug( "Class " + className + " is outside of selected size range" );
+            return null;
+        }
+
+        Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( className );
+
+        Collection<Gene> seenGenes = new HashSet<Gene>();
+        int geneSuccesses = 0;
+        for ( Gene g : geneSetGenes ) {
+
+            if ( !seenGenes.contains( g ) && genesAboveThresh.contains( g ) ) {
+                geneSuccesses++;
+            }
+            seenGenes.add( g );
+        }
+
+        assert seenGenes.size() == geneSetGenes.size();
+        assert geneSuccesses >= 0;
+        /*
+         * 
+         * Multifuncationality correction: Determine which of those gene above threshold is the most multifunctional
+         */
+        // FIXME remove this in favour of a global correction.
+        boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection();
+        if ( useMultifunctionalityCorrection ) {
+            geneSuccesses = multiFunctionalityCorrect( geneSuccesses );
+        }
+        assert geneSuccesses >= 0;
+
+        int successes = geneSuccesses;
+
+        int numGenes = geneScores.getGeneToScoreMap().size();
+
+        int numOverThreshold = this.getNumGenesOverThreshold();
+
+        return computeResult( className, numGenes, numGenesInSet, successes, numOverThreshold );
+
     }
 }

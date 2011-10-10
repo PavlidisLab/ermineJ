@@ -384,6 +384,7 @@ public class Multifunctionality {
                     assert inGroup > 0;
 
                     mf += 1.0 / ( inGroup * outGroup );
+                    // mf += 1.0; // count of go terms ONLY, if you ever want to compare ...
                 }
                 this.geneMultifunctionality.put( gene, mf );
             }
