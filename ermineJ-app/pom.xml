@@ -103,7 +103,7 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 			<type>jar</type>
-		</dependency>
+		</dependency>  
 	</dependencies>
 	<build>
 		<directory>target</directory>
@@ -178,6 +178,34 @@
 					<tasks>
 						<echo message="Unpacking bundle ${project.build.directory}/${artifactId}-${version}-generic-bundle.zip" />
 						<unzip src="${project.build.directory}/${artifactId}-${version}-generic-bundle.zip" dest="${project.build.directory}" />
+						<copy todir="${project.build.directory}/staging/lib" >
+							<fileset dir="${project.build.directory}/${artifactId}-${version}/lib" >
+								<include  name="ermineJ-app.jar" />
+								<include  name="ermineJ-help.jar" />
+								<include  name="forehead.jar" />
+								<include  name="baseCode.jar" />
+								<include  name="colt.jar" />
+								<include  name="commons-lang.jar" />
+								<include  name="commons-configuration.jar" />
+								<include  name="commons-collections.jar" />
+								<include  name="jh.jar" />
+								<include  name="commons-cli.jar" />
+								<include  name="commons-logging.jar" />
+								<include  name="opencsv.jar" />
+								<include  name="xerces.jar" />
+								<include  name="jfreechart.jar" />
+								<include  name="jcommon.jar" />
+								<include  name="mtj.jar" />
+								<include  name="log4j.jar" />
+							</fileset>  
+						</copy>
+						<copy todir="${project.build.directory}/staging/bin" >
+							<fileset dir="${project.build.directory}/${artifactId}-${version}/bin" >
+								<include name="**" />
+							</fileset>
+						</copy>
+						<copy file="${basedir}/src/main/izpac/LICENSE.txt" todir="${project.build.directory}/staging" />
+						<copy file="${basedir}/src/main/izpack/README.txt" todir="${project.build.directory}/staging" />
 					</tasks>
 				</configuration>
 			</plugin>
@@ -280,6 +308,27 @@
 					<pack200>false</pack200>
 					<gzip>true</gzip>
 					<verbose>false</verbose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.izpack</groupId>
+				<artifactId>izpack-maven-plugin</artifactId>
+				<version>5.0.0-beta8</version>
+				<configuration>
+					<izpackBasedir>${project.build.directory}/${artifactId}-${version}</izpackBasedir>							
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>osxappbundle-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<configuration>
+					<bundleName>ermineJ</bundleName>
+					<mainClass>ubic.gemma.erminej.classScoreGUI</mainClass>
+					<javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub>
+					<jvmVersion>1.6+</jvmVersion>
+					<vmOptions>-Xmx1g</vmOptions>
+					<!--<iconFile>${basedir}/src/main/osx/icon.icns</iconFile>-->
 				</configuration>
 			</plugin>
 		</plugins>

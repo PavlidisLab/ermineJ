@@ -140,9 +140,9 @@
 			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
-			<id>mojo</id>
-			<name>Mojo</name>
-			<url>http://snapshots.maven.codehaus.org/maven2/</url>
+			<id>codehaus</id>
+			<name>Codehaus</name>
+			<url>http://snapshots.repository.codehaus.org/</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>false</enabled>

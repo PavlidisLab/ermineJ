@@ -9,4 +9,8 @@ To build the NSIS installer, you must have NSIS installed. Put makensis on your 
 mvn nsis:generate-project nsis:compile -Dnsis.makensis.bin="C:\Program Files\NSIS\makensis.exe"
  
  
+For the izpack installer, run 
 
+mvn izpack:izpack
+
+(The osx installer build does not work as of Oct 2011)
