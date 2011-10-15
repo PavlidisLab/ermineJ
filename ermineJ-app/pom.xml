@@ -204,7 +204,7 @@
 								<include name="**" />
 							</fileset>
 						</copy>
-						<copy file="${basedir}/src/main/izpac/LICENSE.txt" todir="${project.build.directory}/staging" />
+						<copy file="${basedir}/src/main/izpack/LICENSE.txt" todir="${project.build.directory}/staging" />
 						<copy file="${basedir}/src/main/izpack/README.txt" todir="${project.build.directory}/staging" />
 					</tasks>
 				</configuration>
@@ -316,19 +316,6 @@
 				<version>5.0.0-beta8</version>
 				<configuration>
 					<izpackBasedir>${project.build.directory}/${artifactId}-${version}</izpackBasedir>							
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>osxappbundle-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<configuration>
-					<bundleName>ermineJ</bundleName>
-					<mainClass>ubic.gemma.erminej.classScoreGUI</mainClass>
-					<javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub>
-					<jvmVersion>1.6+</jvmVersion>
-					<vmOptions>-Xmx1g</vmOptions>
-					<!--<iconFile>${basedir}/src/main/osx/icon.icns</iconFile>-->
 				</configuration>
 			</plugin>
 		</plugins>
