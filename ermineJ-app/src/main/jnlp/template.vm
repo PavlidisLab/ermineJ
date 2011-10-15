@@ -15,7 +15,7 @@
 	</security>
 #end
  	<resources>
-	<j2se version="$j2seVersion" max-heap-size="1g"/>
+	<j2se version="$j2seVersion" java-vm-args="-Xmx1024m -Xms256m -Xss8m" />
      	$dependencies 
 	</resources> 
 	<application-desc main-class="$mainClass"/>
