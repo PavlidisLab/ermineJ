@@ -56,14 +56,17 @@ public class ProbeTableModel extends AbstractTableModel {
         return columnNames[i];
     }
 
+    @Override
     public int getColumnCount() {
         return 3;
     }
 
+    @Override
     public int getRowCount() {
         return pl.size();
     }
 
+    @Override
     public Object getValueAt( int i, int j ) {
 
         Probe probeid = pl.get( i );

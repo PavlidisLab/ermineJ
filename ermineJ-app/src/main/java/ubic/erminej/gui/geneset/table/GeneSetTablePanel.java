@@ -154,6 +154,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         JMenuItem renameRunMenuItem = new JMenuItem( "Rename this run ..." );
         renameRunMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
                 int columnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
@@ -170,6 +171,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         JMenuItem saveRunMenuItem = new JMenuItem( "Save this run ..." );
         saveRunMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 callingFrame.saveAnalysisAction();
             }
@@ -220,7 +222,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     public void refreshView() {
 
         this.messenger.showStatus( "Updating view" );
-        //       
+        //
         // List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
         // sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
         // sorter.setSortKeys( sortKeys );
@@ -565,6 +567,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 // //////////////////////////////////////////////////////////////////////////////
 class EditRunPopupMenu extends JPopupMenu {
 
+    private static final long serialVersionUID = 1L;
     Point popupPoint;
 
     public Point getPoint() {
@@ -592,6 +595,7 @@ class FindInTreeListener implements ActionListener {
      * 
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.findInTree( e );
 
@@ -651,6 +655,7 @@ class RemoveRunPopupMenu_actionAdapter implements java.awt.event.ActionListener 
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.removeRunPopupMenu_actionPerformed( e );
     }

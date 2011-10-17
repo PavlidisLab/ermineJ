@@ -57,13 +57,15 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
+import ubic.erminej.data.AnnotationFileFetcher;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.file.XMLFileFilter;
 import ubic.erminej.gui.util.GuiUtil;
+import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
- * Replaces old Startup dialog
+ * Panel shown on initial startup of the application.
  * 
  * @author paul
  * @version $Id$
@@ -84,7 +86,7 @@ public class StartupPanel extends JPanel {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
         } catch ( Exception e ) {
-
+            //
         }
         JFrame f = new JFrame();
         f.setSize( new Dimension( 400, 600 ) );
@@ -154,8 +156,8 @@ public class StartupPanel extends JPanel {
         formPanel.setBorder( BorderFactory.createEmptyBorder( 10, 50, 10, 50 ) );
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );
-        gl.setHorizontalGroup( gl.createParallelGroup( Alignment.CENTER ).addComponent( projectPanel ).addComponent(
-                twoFilePanel ) );
+        gl.setHorizontalGroup( gl.createParallelGroup( Alignment.CENTER ).addComponent( projectPanel )
+                .addComponent( twoFilePanel ) );
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( projectPanel ).addComponent( twoFilePanel ) );
 
         this.setLayout( new BorderLayout() );
@@ -235,19 +237,19 @@ public class StartupPanel extends JPanel {
         formatPanel.setLayout( fpL );
         fpL.setAutoCreateContainerGaps( true );
         fpL.setAutoCreateGaps( true );
-        fpL.setHorizontalGroup( fpL.createSequentialGroup().addComponent( annotFileFormatLabel ).addComponent(
-                annotFormat ).addComponent( locateAnnotsButton ) );
-        fpL.setVerticalGroup( fpL.createParallelGroup( GroupLayout.Alignment.BASELINE ).addComponent(
-                annotFileFormatLabel ).addComponent( annotFormat ).addComponent( locateAnnotsButton ) );
+        fpL.setHorizontalGroup( fpL.createSequentialGroup().addComponent( annotFileFormatLabel )
+                .addComponent( annotFormat ).addComponent( locateAnnotsButton ) );
+        fpL.setVerticalGroup( fpL.createParallelGroup( GroupLayout.Alignment.BASELINE )
+                .addComponent( annotFileFormatLabel ).addComponent( annotFormat ).addComponent( locateAnnotsButton ) );
 
         GroupLayout apL = new GroupLayout( annotPanel );
         annotPanel.setLayout( apL );
         apL.setAutoCreateContainerGaps( true );
         apL.setAutoCreateGaps( true );
-        apL.setHorizontalGroup( apL.createParallelGroup( GroupLayout.Alignment.LEADING ).addComponent(
-                annotFileTextField.getParent() ).addComponent( formatPanel ) );
-        apL.setVerticalGroup( apL.createSequentialGroup().addComponent( annotFileTextField.getParent() ).addComponent(
-                formatPanel ) );
+        apL.setHorizontalGroup( apL.createParallelGroup( GroupLayout.Alignment.LEADING )
+                .addComponent( annotFileTextField.getParent() ).addComponent( formatPanel ) );
+        apL.setVerticalGroup( apL.createSequentialGroup().addComponent( annotFileTextField.getParent() )
+                .addComponent( formatPanel ) );
         return annotPanel;
     }
 
@@ -255,11 +257,74 @@ public class StartupPanel extends JPanel {
      * 
      */
     protected void helpLocateAnnotations() {
-        JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Locating annotations", JOptionPane.INFORMATION_MESSAGE );
 
         /*
-         * TODO provide a list of gene annotation files to download.
+         * provide a list of gene annotation files to download.
          */
+        try {
+            final AnnotationFileFetcher f = new AnnotationFileFetcher();
+            final ArrayDesignValueObject result = f.pickAnnotation();
+            if ( result != null ) {
+                SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        statusMessenger.showStatus( "Looking for annotation file ..." );
+
+                        try {
+                            // f.fetch(result);
+
+                            final String testPath = settings.getDataDirectory() + File.separator
+                                    + result.getShortName() + ".an.txt.gz";
+
+                            annotFileTextField.setText( "Fetching annots for " + result.getShortName() + " ..." );
+                            //
+                            URL urlPattern = new URL( "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotations/"
+                                    + result.getShortName() );
+
+                            // FIXME use proper REST client
+                            // Client c = Client.create();
+
+                            //
+                            InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
+                            //
+                            OutputStream outputStream = new FileOutputStream( new File( testPath ) );
+
+                            final byte[] buffer = new byte[65536];
+                            int read = -1;
+                            int totalRead = 0;
+
+                            while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                                outputStream.write( buffer, 0, read );
+                                totalRead += read;
+                                statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read ..." );
+                            }
+                            outputStream.close();
+
+                            statusMessenger.clear();
+
+                            settings.setAnnotFile( testPath );
+                            annotFileTextField.setText( settings.getAnnotFile() );
+                        } catch ( Exception e ) {
+                            annotFileTextField.setText( "" );
+                        } finally {
+                            // ...
+                        }
+                        return null;
+                    }
+
+                };
+
+                sw.execute();
+
+            }
+
+        } catch ( IOException e ) {
+            /*
+             * Fall back: unable to obtain the listing dynamically.
+             */
+            JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Unable to automatically get annotations",
+                    JOptionPane.INFORMATION_MESSAGE );
+        }
 
     }
 
@@ -518,6 +583,7 @@ class AnnotFilePickListener implements ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.annotBrowseButton_actionPerformed();
     }
@@ -530,6 +596,7 @@ class GOFilePickListener implements ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.classBrowseButton_actionPerformed();
     }
@@ -542,6 +609,7 @@ class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionLi
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.actionButton_actionPerformed( e );
     }
@@ -549,6 +617,7 @@ class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionLi
 
 class StartupPanel_cancelButton_actionAdapter implements java.awt.event.ActionListener {
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         System.exit( 0 );
     }

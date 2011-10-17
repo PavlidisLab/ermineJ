@@ -151,6 +151,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * 
      * @see javax.swing.table.TableModel#getColumnCount()
      */
+    @Override
     public int getColumnCount() {
         int matrixColumnCount = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
         return tableColumnNames.length + matrixColumnCount;
@@ -184,6 +185,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * 
      * @see javax.swing.table.TableModel#getRowCount()
      */
+    @Override
     public int getRowCount() {
         return probeIDs.size();
     }
@@ -193,6 +195,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * 
      * @see javax.swing.table.TableModel#getValueAt(int, int)
      */
+    @Override
     public Object getValueAt( int row, int column ) {
 
         // matrix display ends
