@@ -168,7 +168,6 @@ public abstract class GeneSetPanel extends JScrollPane {
                 showDetailsForGeneSet( classID, callingFrame.getCurrentResultSet() );
             }
         } );
-        ;
 
         JMenuItem modMenuItem = new JMenuItem( "Modify this gene set..." );
         modMenuItem.addActionListener( new ModifySetActionAdapter( this ) );
