@@ -30,22 +30,6 @@
 			http://chibi.ubc.ca/faculty/pavlidis/lab/bugs/buglist.cgi?product=ermineJ&amp;bug_status=__open__
 		</url>
 	</issueManagement>
-	<ciManagement>
-		<system>continuum</system>
-		<url>http://broca.ubic.ca/continuum/</url>
-		<notifiers>
-			<notifier>
-				<type>mail</type>
-				<sendOnError>true</sendOnError>
-				<sendOnFailure>true</sendOnFailure>
-				<sendOnSuccess>true</sendOnSuccess>
-				<sendOnWarning>true</sendOnWarning>
-				<configuration>
-					<address>paul@chibi.ubc.ca</address>
-				</configuration>
-			</notifier>
-		</notifiers>
-	</ciManagement>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -117,12 +101,11 @@
 			</url>
 			<layout>default</layout>
 			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
+				<enabled>false</enabled>
 			</snapshots>
 			<releases>
 				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
+				<updatePolicy>never</updatePolicy>
 			</releases>
 		</repository>
 	</repositories>
@@ -148,7 +131,7 @@
 				<enabled>false</enabled>
 			</releases>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 				<updatePolicy>daily</updatePolicy>
 			</snapshots>
 		</pluginRepository>
