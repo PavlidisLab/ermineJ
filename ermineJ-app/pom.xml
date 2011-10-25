@@ -120,7 +120,7 @@
 	<build>
 		<directory>target</directory>
 		<outputDirectory>target/classes</outputDirectory>
-		<finalName>${project.artifactId}-${version}</finalName>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test</testSourceDirectory>
 		<testOutputDirectory>target/test-classes</testOutputDirectory>
@@ -190,13 +190,13 @@
 				<configuration>
 					<tasks>
 						<echo
-							message="Unpacking bundle ${project.build.directory}/${artifactId}-${version}-generic-bundle.zip" />
+							message="Unpacking bundle ${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" />
 						<unzip
-							src="${project.build.directory}/${artifactId}-${version}-generic-bundle.zip"
+							src="${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip"
 							dest="${project.build.directory}" />
 						<copy todir="${project.build.directory}/staging/lib">
 							<fileset
-								dir="${project.build.directory}/${artifactId}-${version}/lib">
+								dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
 								<include name="ermineJ-app.jar" />
 								<include name="ermineJ-help.jar" />
 								<include name="forehead.jar" />
@@ -218,7 +218,7 @@
 						</copy>
 						<copy todir="${project.build.directory}/staging/bin">
 							<fileset
-								dir="${project.build.directory}/${artifactId}-${version}/bin">
+								dir="${project.build.directory}/${project.artifactId}-${project.version}/bin">
 								<include name="**" />
 							</fileset>
 						</copy>
@@ -333,7 +333,7 @@
 				<artifactId>izpack-maven-plugin</artifactId>
 				<version>5.0.0-beta8</version>
 				<configuration>
-					<izpackBasedir>${project.build.directory}/${artifactId}-${version}</izpackBasedir>
+					<izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}</izpackBasedir>
 				</configuration>
 			</plugin>
 		</plugins>
