@@ -241,9 +241,8 @@ public class GeneSetPvalRun {
     /**
      * @return Ranked list. Removes any sets which are not scored.
      */
-    @SuppressWarnings("unchecked")
     private List<GeneSetTerm> getSortedClasses() {
-        Comparator c = new Comparator<GeneSetTerm>() {
+        Comparator<GeneSetTerm> c = new Comparator<GeneSetTerm>() {
             @Override
             public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
                 return results.get( o1 ).compareTo( results.get( o2 ) );

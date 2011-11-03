@@ -50,8 +50,8 @@ public class classScoreTester extends classScoreCMD {
     public classScoreTester() {
         super();
 
-        BufferedReader dis = new BufferedReader( new InputStreamReader( classScoreTester.class
-                .getResourceAsStream( "/data/test.configs.txt" ) ) );
+        BufferedReader dis = new BufferedReader( new InputStreamReader(
+                classScoreTester.class.getResourceAsStream( "/data/test.configs.txt" ) ) );
         String configFileName = "";
 
         try {
@@ -109,6 +109,7 @@ public class classScoreTester extends classScoreCMD {
 
     }
 
+    @SuppressWarnings("unused")
     public static void main( String[] args ) {
         new classScoreTester();
     }

@@ -29,6 +29,7 @@ import ubic.erminej.gui.geneset.details.GeneUrlDialog;
  */
 public class GeneUrlDialogTest {
 
+    @SuppressWarnings("unused")
     public static void main( String[] args ) throws Exception {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );

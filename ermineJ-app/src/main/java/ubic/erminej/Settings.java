@@ -169,7 +169,6 @@ public class Settings extends SettingsHolder {
      * 
      * @param settings - settings object to copy
      */
-    @SuppressWarnings("unchecked")
     public Settings( Settings settingsToCopy ) {
         this.config = new PropertiesConfiguration();
         PropertiesConfiguration oldConfig = settingsToCopy.getConfig();

@@ -368,6 +368,11 @@ public class GeneAnnotationParser {
         }
 
         dis.close();
+
+        if ( genes.isEmpty() ) {
+            throw new IllegalStateException( "There were no genes found in the annotation file." );
+        }
+
         GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
 
         if ( result.numProbes() == 0 ) {
@@ -465,6 +470,11 @@ public class GeneAnnotationParser {
 
         /* Fill in the genegroupreader and the classmap */
         dis.close();
+
+        if ( genes.isEmpty() ) {
+            throw new IllegalStateException( "There were no genes found in the annotation file." );
+        }
+
         GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
 
         if ( result.numProbes() == 0 ) {
@@ -494,7 +504,6 @@ public class GeneAnnotationParser {
 
             if ( line.startsWith( "#" ) ) continue;
 
-            // String[] tokens = StringUtils.splitPreserveAllTokens( line, "\t" );
             String[] tokens = line.split( "\t" );
             int length = tokens.length;
             if ( length < 2 ) continue;
@@ -560,6 +569,8 @@ public class GeneAnnotationParser {
                 }
             }
 
+            // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
+
             if ( messenger != null && ++n % LINES_READ_UPDATE_FREQ == 0 ) {
                 messenger.showStatus( "Read " + n + " probes" );
                 try {
@@ -571,6 +582,10 @@ public class GeneAnnotationParser {
             }
         }
         dis.close();
+        if ( genes.isEmpty() ) {
+            throw new IllegalStateException( "There were no genes found in the annotation file." );
+        }
+
         GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
 
         return result;

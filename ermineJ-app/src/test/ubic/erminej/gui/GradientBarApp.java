@@ -18,6 +18,7 @@ import ubic.basecode.graphics.JGradientBar;
 public class GradientBarApp {
 
     // Main method: args[0] can contain the name of the data file
+    @SuppressWarnings("unused")
     public static void main( String[] args ) {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );

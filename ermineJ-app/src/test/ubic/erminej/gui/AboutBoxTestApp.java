@@ -29,6 +29,7 @@ import ubic.erminej.gui.AboutBox;
  */
 public class AboutBoxTestApp {
 
+    @SuppressWarnings("unused")
     public static void main( String[] args ) {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );

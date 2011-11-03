@@ -160,7 +160,6 @@ public class SettingsHolder {
     /**
      * @param oldConfig
      */
-    @SuppressWarnings("unchecked")
     public SettingsHolder( PropertiesConfiguration oldConfig ) {
         this.config = new PropertiesConfiguration();
         for ( Iterator<String> iter = oldConfig.getKeys(); iter.hasNext(); ) {
@@ -315,8 +314,8 @@ public class SettingsHolder {
      * @return Returns the mtc.
      */
     public MultiTestCorrMethod getMtc() {
-        return MultiTestCorrMethod.valueOf( config.getString( MTC_CONFIG_NAME, MultiTestCorrMethod.BENJAMINIHOCHBERG
-                .toString() ) );
+        return MultiTestCorrMethod.valueOf( config.getString( MTC_CONFIG_NAME,
+                MultiTestCorrMethod.BENJAMINIHOCHBERG.toString() ) );
     }
 
     public int getQuantile() {
@@ -350,12 +349,10 @@ public class SettingsHolder {
         return config.getString( SCORE_FILE );
     }
 
-    @SuppressWarnings("unchecked")
     public Set<String> getSelectedCustomGeneSets() {
         return new HashSet<String>( config.getList( SELECTED_CUSTOM_GENESETS, new ArrayList<String>() ) );
     }
 
-    @SuppressWarnings("unchecked")
     public Set<String> getCustomGeneSetFiles() {
         return new HashSet<String>( config.getList( CUSTOM_GENESET_FILES, new ArrayList<String>() ) );
     }
@@ -455,6 +452,14 @@ public class SettingsHolder {
 
     protected Object getProperty( String propertyName ) {
         return this.config.getProperty( propertyName );
+    }
+
+    /**
+     * @param propertyName
+     * @return
+     */
+    public String getStringProperty( String propertyName ) {
+        return this.config.getProperty( propertyName ).toString();
     }
 
 }

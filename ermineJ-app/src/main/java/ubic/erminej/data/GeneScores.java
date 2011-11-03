@@ -498,7 +498,6 @@ public class GeneScores {
         String badNumberString = "";
         int scoreColumnIndex = scoreCol - 1;
         int numProbesKept = 0;
-        int numUnknownProbes = 0;
         int numRepeatedProbes = 0;
         Collection<String> unknownProbes = new HashSet<String>();
 
@@ -542,7 +541,6 @@ public class GeneScores {
             if ( p == null ) {
                 // Probably just means there are no annotations at all.
                 unknownProbes.add( probeId );
-                numUnknownProbes++;
                 continue;
             }
 
@@ -631,8 +629,8 @@ public class GeneScores {
              */
             messenger.showError( probeToScoreMap.size()
                     + " ("
-                    + String.format( "%.2f", 100.00 * probeToScoreMap.size()
-                            / ( probeToScoreMap.size() + unknownProbes.size() ) )
+                    + String.format( "%.2f",
+                            100.00 * probeToScoreMap.size() / ( probeToScoreMap.size() + unknownProbes.size() ) )
                     + "%) of the scores were usable (others may not have genes in the annotations?)" );
         }
 

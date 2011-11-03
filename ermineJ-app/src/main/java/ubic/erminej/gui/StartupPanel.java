@@ -110,6 +110,8 @@ public class StartupPanel extends JPanel {
 
     private Settings settings;
 
+    JButton locateAnnotsButton;
+
     private StatusViewer statusMessenger = new StatusStderr();
 
     public StartupPanel( Settings settings, StatusViewer statusMessenger ) {
@@ -224,11 +226,25 @@ public class StartupPanel extends JPanel {
             annotFormat.setSelectedItem( "ErmineJ" );
         }
 
-        JButton locateAnnotsButton = new JButton( "Locate" );
+        locateAnnotsButton = new JButton( "Get from Gemma" );
         locateAnnotsButton.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 helpLocateAnnotations();
+            }
+        } );
+
+        annotFormat.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                String formatS = ( String ) annotFormat.getSelectedItem();
+                if ( formatS.equals( "ErmineJ" ) ) {
+                    locateAnnotsButton.setEnabled( true );
+                } else if ( formatS.equals( "Affy CSV" ) ) {
+                    locateAnnotsButton.setEnabled( false );
+                } else {
+                    locateAnnotsButton.setEnabled( false );
+                }
             }
         } );
 
@@ -262,61 +278,65 @@ public class StartupPanel extends JPanel {
          * provide a list of gene annotation files to download.
          */
         try {
-            final AnnotationFileFetcher f = new AnnotationFileFetcher();
+            final AnnotationFileFetcher f = new AnnotationFileFetcher( this.settings );
             final ArrayDesignValueObject result = f.pickAnnotation();
-            if ( result != null ) {
-                SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        statusMessenger.showStatus( "Looking for annotation file ..." );
 
-                        try {
-                            // f.fetch(result);
-
-                            final String testPath = settings.getDataDirectory() + File.separator
-                                    + result.getShortName() + ".an.txt.gz";
-
-                            annotFileTextField.setText( "Fetching annots for " + result.getShortName() + " ..." );
-                            //
-                            URL urlPattern = new URL( "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotations/"
-                                    + result.getShortName() );
-
-                            // FIXME use proper REST client
-                            // Client c = Client.create();
-
-                            //
-                            InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
-                            //
-                            OutputStream outputStream = new FileOutputStream( new File( testPath ) );
-
-                            final byte[] buffer = new byte[65536];
-                            int read = -1;
-                            int totalRead = 0;
-
-                            while ( ( read = inputStream.read( buffer ) ) > -1 ) {
-                                outputStream.write( buffer, 0, read );
-                                totalRead += read;
-                                statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read ..." );
-                            }
-                            outputStream.close();
-
-                            statusMessenger.clear();
-
-                            settings.setAnnotFile( testPath );
-                            annotFileTextField.setText( settings.getAnnotFile() );
-                        } catch ( Exception e ) {
-                            annotFileTextField.setText( "" );
-                        } finally {
-                            // ...
-                        }
-                        return null;
-                    }
-
-                };
-
-                sw.execute();
-
+            if ( result == null ) {
+                return;
             }
+            final StartupPanel owner = this;
+            SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+                @Override
+                protected Object doInBackground() throws Exception {
+                    statusMessenger.showStatus( "Looking for annotation file ..." );
+
+                    try {
+
+                        final String testPath = settings.getDataDirectory() + File.separator + result.getShortName()
+                                + ".an.txt.gz";
+
+                        annotFileTextField.setText( "Fetching annots for " + result.getShortName() + " ..." );
+
+                        URL urlPattern = new URL( settings.getStringProperty( "annotation.file.fetch.rest.url.base" )
+                                + "/" + result.getShortName() );
+
+                        // FIXME use proper REST client, this doesn't handle errors well at all.
+                        // Client c = Client.create();
+
+                        //
+                        InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
+                        //
+                        OutputStream outputStream = new FileOutputStream( new File( testPath ) );
+
+                        final byte[] buffer = new byte[65536];
+                        int read = -1;
+                        int totalRead = 0;
+
+                        while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                            outputStream.write( buffer, 0, read );
+                            totalRead += read;
+                            statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read ..." );
+                        }
+                        outputStream.close();
+
+                        statusMessenger.clear();
+
+                        settings.setAnnotFile( testPath );
+                        annotFileTextField.setText( settings.getAnnotFile() );
+                    } catch ( Exception e ) {
+                        log.error( e, e );
+                        annotFileTextField.setText( "" );
+                        JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "Unable to fetch annotations",
+                                JOptionPane.INFORMATION_MESSAGE );
+                    } finally {
+                        // ...
+                    }
+                    return null;
+                }
+
+            };
+
+            sw.execute();
 
         } catch ( IOException e ) {
             /*
@@ -400,6 +420,15 @@ public class StartupPanel extends JPanel {
         String dataDirectory = settings.getDataDirectory();
         if ( dataDirectory == null ) {
             settings.setDataDirectory( System.getProperty( "user.dir" ) );
+        }
+
+        String formatS = ( String ) annotFormat.getSelectedItem();
+        if ( formatS.equals( "ErmineJ" ) ) {
+            locateAnnotsButton.setEnabled( true );
+        } else if ( formatS.equals( "Affy CSV" ) ) {
+            locateAnnotsButton.setEnabled( false );
+        } else {
+            locateAnnotsButton.setEnabled( false );
         }
     }
 

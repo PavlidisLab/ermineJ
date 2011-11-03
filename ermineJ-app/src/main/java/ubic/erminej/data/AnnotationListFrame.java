@@ -24,6 +24,9 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -37,7 +40,7 @@ import javax.swing.table.AbstractTableModel;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
- * TODO Document Me
+ * Shows list of available annotation files for download.
  * 
  * @author paul
  * @version $Id$
@@ -52,7 +55,7 @@ public class AnnotationListFrame extends JDialog {
 
     private static final int COL2WIDTH = 60;
 
-    private static final int COL3WIDTH = 30;
+    // private static final int COL3WIDTH = 30;
     private final List<ArrayDesignValueObject> arrays;
 
     private ArrayDesignValueObject selected;
@@ -64,7 +67,20 @@ public class AnnotationListFrame extends JDialog {
     public AnnotationListFrame( List<ArrayDesignValueObject> a ) {
         super();
 
-        this.arrays = a;
+        this.arrays = new ArrayList<ArrayDesignValueObject>();
+
+        for ( ArrayDesignValueObject v : a ) {
+            if ( v.getHasAnnotationFile() ) this.arrays.add( v );
+        }
+
+        // initially sort by short name.
+        Collections.sort( arrays, new Comparator<ArrayDesignValueObject>() {
+            @Override
+            public int compare( ArrayDesignValueObject o1, ArrayDesignValueObject o2 ) {
+                return o1.getShortName().compareTo( o2.getShortName() );
+            }
+        } );
+
         this.setModal( true );
         final JTable t = new JTable();
         setTitle( "Available annotation files" );
@@ -76,7 +92,7 @@ public class AnnotationListFrame extends JDialog {
         t.getColumnModel().getColumn( 0 ).setPreferredWidth( COL0WIDTH );
         t.getColumnModel().getColumn( 1 ).setPreferredWidth( COL1WIDTH );
         t.getColumnModel().getColumn( 2 ).setPreferredWidth( COL2WIDTH );
-        t.getColumnModel().getColumn( 3 ).setPreferredWidth( COL3WIDTH );
+        // t.getColumnModel().getColumn( 3 ).setPreferredWidth( COL3WIDTH );
         t.getTableHeader().setReorderingAllowed( false );
 
         JScrollPane scrollPane = new JScrollPane( t );
@@ -143,7 +159,8 @@ public class AnnotationListFrame extends JDialog {
 class ADTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
-    private final String[] columnNames = { "Short Name", "Name", "Taxon", "Annots. Avail." };
+    // private final String[] columnNames = { "Short Name", "Name", "Taxon", "Annots. Avail." };
+    private final String[] columnNames = { "Short Name", "Name", "Taxon" };
     List<ArrayDesignValueObject> designs;
 
     public ADTableModel( List<ArrayDesignValueObject> designs ) {
@@ -164,7 +181,7 @@ class ADTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 4;
+        return 3; // 4 if we have the 'has annotation file' field.
     }
 
     @Override
@@ -178,8 +195,8 @@ class ADTableModel extends AbstractTableModel {
 
             case 2:
                 return designs.get( rowIndex ).getTaxon();
-            case 3:
-                return designs.get( rowIndex ).getHasAnnotationFile();
+                // case 3:
+                // return designs.get( rowIndex ).getHasAnnotationFile();
             default:
                 return "";
         }

@@ -72,12 +72,12 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         add( splitPane );
     }
 
-    @SuppressWarnings("unchecked")
     public void valueChanged( TreeSelectionEvent e ) {
         DefaultMutableTreeNode node = ( DefaultMutableTreeNode ) tree.getLastSelectedPathComponent();
 
         if ( node == null ) return;
 
+        @SuppressWarnings("rawtypes")
         DirectedGraphNode nodeInfo = ( DirectedGraphNode ) node.getUserObject();
         detailPane.setText( nodeInfo.toString() );
     }

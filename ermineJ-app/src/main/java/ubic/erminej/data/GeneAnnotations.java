@@ -112,7 +112,9 @@ public class GeneAnnotations {
      */
     public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, Settings settings, StatusViewer messenger ) {
         if ( messenger != null ) this.messenger = messenger;
-        assert !genes.isEmpty();
+        if ( genes.isEmpty() ) {
+            throw new IllegalArgumentException( "There were no genes" );
+        }
         this.geneSetTerms = geneSetTerms;
         this.settings = settings;
 

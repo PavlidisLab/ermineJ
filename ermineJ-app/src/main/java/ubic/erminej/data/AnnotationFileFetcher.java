@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.erminej.SettingsHolder;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
@@ -49,8 +50,12 @@ public class AnnotationFileFetcher {
 
     private static Log log = LogFactory.getLog( AnnotationFileFetcher.class );
 
-    // private static final String GEMMA_ARRAY_DESIGN_URL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/";
-    private static final String GEMMA_ARRAY_DESIGN_URL = "http://localhost:8080/Gemma/rest/arraydesign/";
+    private SettingsHolder settingsHolder;
+
+    public AnnotationFileFetcher( SettingsHolder settingsHolder ) {
+        super();
+        this.settingsHolder = settingsHolder;
+    }
 
     /**
      * Show a list of available annotation files.
@@ -73,7 +78,7 @@ public class AnnotationFileFetcher {
     public List<ArrayDesignValueObject> fetchList() throws IOException {
 
         try {
-            URL toBeGotten = new URL( GEMMA_ARRAY_DESIGN_URL + "listAll" );
+            URL toBeGotten = new URL( settingsHolder.getStringProperty( "annotation.file.list.rest.url" ) );
             InputStream is = toBeGotten.openStream();
             JSONParser parser = new JSONParser( is );
             JSONValue v = parser.nextValue();
