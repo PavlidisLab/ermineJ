@@ -70,7 +70,6 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
     /**
      * @return the GeneSetTerm associated with this
      */
-    @SuppressWarnings("unchecked")
     public GeneSetTerm getTerm() {
         return ( ( DirectedGraphNode<String, GeneSetTerm> ) super.getUserObject() ).getItem();
     }

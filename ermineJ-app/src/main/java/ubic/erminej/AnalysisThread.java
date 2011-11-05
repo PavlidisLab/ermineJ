@@ -161,7 +161,6 @@ public class AnalysisThread extends Thread {
         return ResultsFileReader.load( geneAnnots, loadFile, messenger );
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void run() {
         try {

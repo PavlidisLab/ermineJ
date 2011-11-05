@@ -415,7 +415,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @param node
      * @return
      */
-    @SuppressWarnings("unchecked")
     private Collection<GeneSetTreeNode> getLeaves( GeneSetTreeNode node ) {
         Collection<GeneSetTreeNode> result = new HashSet<GeneSetTreeNode>();
         Enumeration<GeneSetTreeNode> dfe = node.depthFirstEnumeration();
@@ -491,7 +490,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
     /**
      * 
      */
-    @SuppressWarnings("unchecked")
     private void setNodeStatesForFilter() {
         Collection<GeneSetTreeNode> leaves = this.getLeaves();
 

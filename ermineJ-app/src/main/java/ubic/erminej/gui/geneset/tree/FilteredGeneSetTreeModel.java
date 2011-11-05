@@ -60,7 +60,6 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
      * 
      * @see javax.swing.tree.DefaultTreeModel#getChild(java.lang.Object, int)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Object getChild( Object parent, int index ) {
         Enumeration children = ( ( GeneSetTreeNode ) parent ).children();
@@ -99,7 +98,6 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public int getChildCount( Object parent ) {
         Enumeration children = ( ( GeneSetTreeNode ) parent ).children();
