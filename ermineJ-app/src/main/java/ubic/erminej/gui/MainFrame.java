@@ -310,8 +310,7 @@ public class MainFrame extends JFrame {
         }
 
         if ( !checkValid( loadSettings ) ) {
-            GuiUtil
-                    .error( "There was a problem loading the analysis.\nFiles referred to in the analysis may have been moved or deleted." );
+            GuiUtil.error( "There was a problem loading the analysis.\nFiles referred to in the analysis may have been moved or deleted." );
             return;
         }
 
@@ -386,7 +385,7 @@ public class MainFrame extends JFrame {
             try {
                 Thread.sleep( 100 );
             } catch ( InterruptedException e ) {
-                // 
+                //
             }
         }
         athread = null;
@@ -1356,8 +1355,8 @@ public class MainFrame extends JFrame {
 
         gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( queryTextField ).addComponent( searchGenesChx )
                 .addPreferredGap( ComponentPlacement.UNRELATED, 20, 20 ).addComponent( jLabelStatus ) );
-        gl.setVerticalGroup( gl.createParallelGroup( Alignment.BASELINE ).addComponent( queryTextField ).addComponent(
-                searchGenesChx ).addComponent( jLabelStatus ) );
+        gl.setVerticalGroup( gl.createParallelGroup( Alignment.BASELINE ).addComponent( queryTextField )
+                .addComponent( searchGenesChx ).addComponent( jLabelStatus ) );
 
         this.statusMessenger = new StatusJlabel( jLabelStatus );
         this.getContentPane().add( statusBarPanel, BorderLayout.SOUTH );
@@ -1510,7 +1509,8 @@ public class MainFrame extends JFrame {
     }
 
     void aboutMenuItem_actionPerformed() {
-        new AboutBox( this );
+        AboutBox aboutBox = new AboutBox( this );
+        aboutBox.setVisible( true );
     }
 
     void defineClassMenuItem_actionPerformed() {

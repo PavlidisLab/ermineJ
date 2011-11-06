@@ -163,7 +163,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         viewItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed( ActionEvent e ) {
+            public void actionPerformed( ActionEvent e1 ) {
                 // FIXME: get the result set at the menu point.
                 showDetailsForGeneSet( classID, callingFrame.getCurrentResultSet() );
             }

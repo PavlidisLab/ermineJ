@@ -305,18 +305,15 @@ public class GeneSetPvalRun {
      */
     private void runAnalysis( DoubleMatrix<Probe, String> rawData, GeneScores geneScores ) {
 
-        if ( geneScores != null ) geneScoreColumnName = geneScores.getScoreColumnName();
-
         // only used for ORA
         Collection<Gene> genesAboveThreshold = new HashSet<Gene>();
 
         switch ( settings.getClassScoreMethod() ) {
             case GSR: {
 
-                assert geneScores != null;
                 messenger.showStatus( "Starting GSR analysis" );
                 Map<Gene, Double> geneToScoreMap;
-
+                geneScoreColumnName = geneScores.getScoreColumnName();
                 if ( settings.useMultifunctionalityCorrection() ) {
                     geneToScoreMap = this.geneData.getMultifunctionality()
                             .adjustScores( geneScores, false /* not ranks */);
@@ -332,7 +329,7 @@ public class GeneSetPvalRun {
                 break;
             }
             case ORA: {
-
+                geneScoreColumnName = geneScores.getScoreColumnName();
                 messenger.showStatus( "Starting ORA analysis" );
                 assert geneScores != null;
                 OraPvalGenerator pvg = new OraPvalGenerator( settings, geneScores, geneData );

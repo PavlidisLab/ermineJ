@@ -29,17 +29,18 @@ import ubic.erminej.gui.util.GuiUtil;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class classScoreGUI {
+public class ErmineJGui {
     public static void main( String[] args ) {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            new classScoreGUI( new Settings( true ) );
+            @SuppressWarnings("unused")
+            ErmineJGui ermineJGui = new ErmineJGui( new Settings( true ) );
         } catch ( Exception e ) {
             e.printStackTrace();
         }
     }
 
-    public classScoreGUI( final Settings settings ) {
+    public ErmineJGui( final Settings settings ) {
         MainFrame frame = new MainFrame( settings );
         init( frame );
     }
