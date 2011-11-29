@@ -64,7 +64,7 @@ public class GeneSetTerms {
     private DirectedGraph<String, GeneSetTerm> graph;
 
     /**
-     * @param inputStream
+     * @param inputStream assumed to be in recent format.
      * @throws IOException
      * @throws SAXException
      */
@@ -72,23 +72,34 @@ public class GeneSetTerms {
         if ( inputStream == null ) {
             throw new IOException( "Input stream was null" );
         }
-        this.initialize( inputStream );
+        this.initialize( inputStream, false );
         inputStream.close();
     }
 
     /**
+     * @param fileNamefilename <code>String</code> The XML file containing class to name mappings. First column is the
+     *        class id, second is a description that will be used init program output.
+     * @throws SAXException
+     * @throws IOException
+     */
+    public GeneSetTerms( String fileName ) throws SAXException, IOException {
+        this( fileName, false );
+    }
+
+    /**
      * @param filename <code>String</code> The XML file containing class to name mappings. First column is the class id,
-     *        second is a description that will be used int program output.
+     *        second is a description that will be used init program output.
+     * @param oldFormat set to true to indicate that the RDF is 'old style' (pre ~2008)
      * @throws IOException
      * @throws SAXException
      */
-    public GeneSetTerms( String fileName ) throws SAXException, IOException {
+    public GeneSetTerms( String fileName, boolean oldFormat ) throws SAXException, IOException {
         if ( fileName == null || fileName.length() == 0 ) {
             throw new IllegalArgumentException( "Invalid filename " + fileName + " or no filename was given" );
         }
 
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
-        this.initialize( i );
+        this.initialize( i, oldFormat );
         i.close();
     }
 
@@ -282,11 +293,12 @@ public class GeneSetTerms {
 
     /**
      * @param inputStream
+     * @param oldFormat
      * @throws IOException
      * @throws SAXException
      */
-    private void initialize( InputStream inputStream ) throws IOException, SAXException {
-        GOParser parser = new GOParser( inputStream );
+    private void initialize( InputStream inputStream, boolean oldFormat ) throws IOException, SAXException {
+        GOParser parser = new GOParser( inputStream, oldFormat );
         this.graph = parser.getGraph();
 
         assert graph != null;
