@@ -19,9 +19,12 @@
 package ubic.erminej.data;
 
 import java.io.InputStream;
+import java.util.Set;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
 import junit.framework.TestCase;
+import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 import ubic.basecode.util.RegressionTesting;
 import ubic.erminej.data.GOParser;
 
@@ -82,13 +85,108 @@ public class TestGOParser extends TestCase {
     }
 
     public void testGOParserCBig() throws Exception {
-        ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
-                .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
+        ZipInputStream z = new ZipInputStream(
+                TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
         z.getNextEntry();
         gOParser = new GOParser( z );
 
         assertNotNull( gOParser.getGraph().getRoot() );
 
     }
+
+    /**
+     * Old rdf format. Really old.
+     * 
+     * @throws Exception
+     */
+    public void testGOParserOld() throws Exception {
+        InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200212-termdb.xml.gz" ) );
+        gOParser = new GOParser( z, true );
+        System.err.println( gOParser.getGraph().toString() );
+
+        assertNotNull( gOParser.getGraph().getRoot() );
+        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0045034" );
+
+        assertNotNull( testnode );
+        Set<String> parentKeys = testnode.getParentKeys();
+        assertTrue( parentKeys.size() > 0 );
+    }
+
+    //
+    // /**
+    // * Old rdf format.
+    // *
+    // * @throws Exception
+    // */
+    // public void testGOParserOld2() throws Exception {
+    // InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200407-termdb.xml.gz" ) );
+    // gOParser = new GOParser( z, true );
+    // // System.err.println( gOParser.getGraph().toString() );
+    //
+    // assertNotNull( gOParser.getGraph().getRoot() );
+    // assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
+    //
+    // DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0045034" );
+    //
+    // assertNotNull( testnode );
+    // Set<String> parentKeys = testnode.getParentKeys();
+    // assertTrue( parentKeys.size() > 0 );
+    //
+    // }
+
+    // /**
+    // * Old rdf format.
+    // *
+    // * @throws Exception
+    // */
+    // public void testGOParserOld3() throws Exception {
+    // InputStream z = new GZIPInputStream(
+    // TestGOParser.class.getResourceAsStream( "/data/go_200808-termdb.rdf-xml.gz" ) );
+    // gOParser = new GOParser( z, true );
+    //
+    // assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
+    //
+    // assertNotNull( gOParser.getGraph().getRoot() );
+    //
+    // DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0045034" );
+    // assertNotNull( testnode );
+    // Set<String> parentKeys = testnode.getParentKeys();
+    // assertTrue( parentKeys.size() > 0 );
+    //
+    // }
+    //
+    // /**
+    // * New rdf format.
+    // *
+    // * @throws Exception
+    // */
+    // public void testGOParserNewFormat() throws Exception {
+    // InputStream z = new GZIPInputStream(
+    // TestGOParser.class.getResourceAsStream( "/data/go_201012-termdb.rdf-xml.gz" ) );
+    // gOParser = new GOParser( z, false );
+    // assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
+    // assertNotNull( gOParser.getGraph().getRoot() );
+    //
+    // DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0002643" );
+    // assertNotNull( testnode );
+    // Set<String> parentKeys = testnode.getParentKeys();
+    // assertTrue( parentKeys.size() > 0 );
+    //
+    // }
+
+    // public void testGOParserNewFormatLatest() throws Exception {
+    // InputStream z = new GZIPInputStream(
+    // TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.gz" ) );
+    // gOParser = new GOParser( z, false );
+    //
+    // assertNotNull( gOParser.getGraph().getRoot() );
+    //
+    // DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:2001172" );
+    // assertNotNull( testnode );
+    // Set<String> parentKeys = testnode.getParentKeys();
+    // assertTrue( parentKeys.size() > 0 );
+    //
+    // }
 
 }

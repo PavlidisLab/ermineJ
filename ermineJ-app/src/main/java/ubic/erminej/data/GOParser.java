@@ -46,12 +46,17 @@ public class GOParser {
 
     private DirectedGraph<String, GeneSetTerm> termGraph;
 
+    public GOParser( InputStream i ) throws IOException, SAXException {
+        this( i, false );
+    }
+
     /**
      * @param i
+     * @param oldFormat if true, use the old-fashioned scheme
      * @throws IOException
      * @throws SAXException
      */
-    public GOParser( InputStream i ) throws IOException, SAXException {
+    public GOParser( InputStream i, boolean oldFormat ) throws IOException, SAXException {
 
         if ( i.available() == 0 ) {
             throw new IOException( "XML stream contains no data." );
@@ -60,7 +65,12 @@ public class GOParser {
         System.setProperty( "org.xml.sax.driver", "org.apache.xerces.parsers.SAXParser" );
 
         XMLReader xr = XMLReaderFactory.createXMLReader();
-        GOHandler handler = new GOHandler();
+        GOHandler handler;
+        if ( oldFormat ) {
+            handler = new OldGOHandler();
+        } else {
+            handler = new GOHandler();
+        }
         xr.setFeature( "http://xml.org/sax/features/validation", false );
         xr.setFeature( "http://xml.org/sax/features/external-general-entities", false );
         xr.setFeature( "http://apache.org/xml/features/nonvalidating/load-external-dtd", false );
@@ -103,6 +113,10 @@ public class GOParser {
         return termGraph;
     }
 
+    /**
+     * In the new GO, aspects are not represented the way they used to be, so we have to explicitly set them to be part
+     * of the aspect themselves.
+     */
     private void populateAspect() {
         DirectedGraphNode<String, GeneSetTerm> root = this.getGraph().getRoot();
 
@@ -132,35 +146,24 @@ public class GOParser {
 }
 
 class GOHandler extends DefaultHandler {
-    private DirectedGraph<String, GeneSetTerm> termGraph;
+    protected DirectedGraph<String, GeneSetTerm> termGraph;
 
     private Collection<String> forbiddenParents = new HashSet<String>();
 
-    private boolean inTerm = false;
+    protected boolean inTerm = false;
 
-    private boolean inDef = false;
-    private boolean inAcc = false;
-    private boolean inName = false;
-    // private String currentAspect;
-    private StringBuffer nameBuf;
-    private StringBuffer accBuf;
+    protected boolean inDef = false;
+    protected boolean inAcc = false;
+    protected boolean inName = false;
+    protected StringBuffer nameBuf;
+    protected StringBuffer accBuf;
 
-    private StringBuffer defBuf;
+    protected StringBuffer defBuf;
 
     public GOHandler() {
         super();
         termGraph = new DirectedGraph<String, GeneSetTerm>();
-
-        /*
-         * This is a workaround for a change in GO: the terms obsolete_molecular_function etc. are never defined. See
-         * bug
-         */
-        initializeNewNode( "all" );
-
-        forbiddenParents.add( "obsolete_molecular_function" );
-        forbiddenParents.add( "obsolete_biological_process" );
-        forbiddenParents.add( "obsolete_cellular_component" );
-
+        init();
     }
 
     @Override
@@ -189,24 +192,10 @@ class GOHandler extends DefaultHandler {
             String currentTerm = accBuf.toString();
             termGraph.getNodeContents( currentTerm ).setDefinition( defBuf.toString() );
             inDef = false;
-        } else if ( name.equals( "is_a" ) ) {
-
-        } else if ( name.equals( "part_of" ) ) {
-
-        } else if ( name.equals( "synonym" ) ) {
-
-        } else if ( name.equals( "negatively_regulates" ) ) {
-
-        } else if ( name.equals( "positively_regulates" ) ) {
-
-        } else if ( name.equals( "regulates" ) ) {
-
         } else if ( name.equals( "name" ) ) {
             inName = false;
             String currentTerm = accBuf.toString();
-
             String currentName = nameBuf.toString();
-
             GeneSetTerm term = termGraph.getNodeContents( currentTerm );
             term.setName( currentName );
         }
@@ -227,7 +216,8 @@ class GOHandler extends DefaultHandler {
         } else if ( name.equals( "definition" ) ) {
             defBuf = new StringBuffer();
             inDef = true;
-        } else if ( name.equals( "is_a" ) || name.equals( "part_of" ) ) {
+        } else if ( name.equals( "is_a" ) || name.equals( "part_of" ) || name.equals( "part-of" )
+                || name.equals( "isa" ) ) {
 
             String res = atts.getValue( "rdf:resource" );
             String parent = res.substring( res.lastIndexOf( '#' ) + 1, res.length() );
@@ -250,11 +240,82 @@ class GOHandler extends DefaultHandler {
     }
 
     /**
+     * 
+     */
+    protected void init() {
+        /*
+         * This is a workaround for a change in GO: the terms obsolete_molecular_function etc. are never defined. See
+         * bug
+         */
+        initializeNewNode( "all" );
+
+        forbiddenParents.add( "obsolete_molecular_function" );
+        forbiddenParents.add( "obsolete_biological_process" );
+        forbiddenParents.add( "obsolete_cellular_component" );
+    }
+
+    /**
      * @param id
      */
-    private void initializeNewNode( String id ) {
+    protected void initializeNewNode( String id ) {
         GeneSetTerm item = new GeneSetTerm( id, "[No name provided]", "[No definition]" );
         termGraph.addNode( id, item );
+    }
+
+}
+
+/**
+ * For GO rdf-xml before ~2009 or so. Pre 2004 or so, it was even more different.
+ */
+class OldGOHandler extends GOHandler {
+
+    private String currentAspect;
+
+    public OldGOHandler() {
+        super();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.erminej.data.GOHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+     */
+    @Override
+    public void endElement( String uri, String name, String qName ) {
+        if ( name.equals( "term" ) ) {
+            inTerm = false;
+        } else if ( name.equals( "accession" ) ) {
+            inAcc = false;
+            String currentTerm = accBuf.toString();
+            initializeNewNode( currentTerm );
+        } else if ( name.equals( "definition" ) ) {
+            String currentTerm = accBuf.toString();
+            termGraph.getNodeContents( currentTerm ).setDefinition( defBuf.toString() );
+            inDef = false;
+        } else if ( name.equals( "name" ) ) {
+            inName = false;
+            String currentTerm = accBuf.toString();
+            String currentName = nameBuf.toString();
+
+            GeneSetTerm term = termGraph.getNodeContents( currentTerm );
+            term.setName( currentName );
+
+            if ( currentName.equalsIgnoreCase( "molecular_function" )
+                    || currentName.equalsIgnoreCase( "biological_process" )
+                    || currentName.equalsIgnoreCase( "cellular_component" )
+                    || currentName.equalsIgnoreCase( "obsolete_molecular_function" )
+                    || currentName.equalsIgnoreCase( "obsolete_biological_process" )
+                    || currentName.equalsIgnoreCase( "obsolete_cellullar_component" ) ) {
+                currentAspect = currentName;
+                termGraph.getNodeContents( currentTerm ).setAspect( currentAspect );
+            }
+
+        }
+    }
+
+    @Override
+    protected void init() {
+        // noop
     }
 
 }
