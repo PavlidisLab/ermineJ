@@ -132,7 +132,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         } else if ( ( wiz.getAnalysisType().equals( SettingsHolder.Method.GSR ) || wiz.getAnalysisType().equals(
                 SettingsHolder.Method.ORA ) )
                 && scoreFileTextField.getText().compareTo( "" ) == 0 ) {
-            wiz.showError( "ORA and resampling analyses require a gene score file." );
+            wiz.showError( "ORA, resampling and pre-re methods require a gene score file." );
             return false;
         }
 
@@ -232,7 +232,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         JPanel rawDataPanel = new JPanel();
 
         TitledBorder rawDataFileTitleBorder = BorderFactory
-                .createTitledBorder( "Data profiles file (optional for ROC, ORA or GSR, but used for visualization):" );
+                .createTitledBorder( "Data profiles file (optional for all but CORR, but used for visualization):" );
         rawDataPanel.setBorder( rawDataFileTitleBorder );
         rawDataPanel.setLayout( new GridLayout( 2, 1 ) );
         // file browser
@@ -270,7 +270,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         scoreFilePanel.setLayout( new GridLayout( 2, 1 ) );
 
         TitledBorder geneScoreFileTitleBorder = BorderFactory
-                .createTitledBorder( "Gene score file (optional for correlation score):" );
+                .createTitledBorder( "Gene score file (optional for CORR):" );
 
         scoreFilePanel.setBorder( geneScoreFileTitleBorder );
         JButton scoreFileBrowseButton = new JButton();

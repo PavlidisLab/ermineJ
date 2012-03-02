@@ -136,7 +136,14 @@ public class GeneSetDetails {
         initMatrix();
 
         // sanity
-        assert this.geneScores.getGeneToScoreMap().keySet().containsAll( this.geneData.getGeneSetGenes( this.classID ) );
+        if ( this.geneScores != null ) {
+            assert this.geneData != null;
+            assert this.geneScores.getGeneToScoreMap() != null;
+            assert !this.geneScores.getGeneToScoreMap().keySet().isEmpty();
+            assert this.geneData.getGeneSetGenes( this.classID ) != null;
+            assert this.geneScores.getGeneToScoreMap().keySet()
+                    .containsAll( this.geneData.getGeneSetGenes( this.classID ) );
+        }
 
     }
 
@@ -196,10 +203,13 @@ public class GeneSetDetails {
             title += " Profiles: " + rawDataSource;
         }
 
-        if ( probeScores != null ) {
-            String scoreSource = new File( settings.getScoreFile() ).getName();
-            title += " Scores: " + scoreSource + " col: " + settings.getScoreCol() + " "
-                    + this.geneScores.getScoreColumnName();
+        if ( probeScores != null && !probeScores.isEmpty() ) {
+            if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
+                String scoreSource = new File( settings.getScoreFile() ).getName();
+                title += " Scores: " + scoreSource;
+            }
+            title += " col: " + settings.getScoreCol() + " " + this.geneScores.getScoreColumnName();
+
         }
 
         return title;
@@ -220,8 +230,8 @@ public class GeneSetDetails {
 
             DoubleMatrixReader matrixReader = new DoubleMatrixReader();
 
-            DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet(), settings
-                    .getDataCol() );
+            DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet(),
+                    settings.getDataCol() );
 
             this.dataMatrix = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
             dataMatrix.setColumnNames( omatrix.getColNames() );

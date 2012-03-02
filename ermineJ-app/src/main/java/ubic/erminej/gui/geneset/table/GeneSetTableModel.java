@@ -392,14 +392,18 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             String aspect = term.getAspect();
             String definition = term.getDefinition();
 
+            double mfScore = geneData.getMultifunctionality().getGOTermMultifunctionalityRank( term );
+
             String redund = this.getToolTipTextForRedundancy( term );
-            setToolTipText( "<html>"
-                    + term.getName()
+            setToolTipText( "<html>" + term.getName()
                     + " ("
                     + term.getId()
                     + ")<br/>"
                     + "Aspect: "
                     + aspect
+                    + "<br/>"
+                    + "Multifunctionality rank: " // <-- using the rank
+                    + String.format( "%.2f", mfScore )
                     + "<br/>"
                     + redund
                     + WordUtils.wrap( StringUtils.abbreviate( definition, GeneSetPanel.MAX_DEFINITION_LENGTH ), 50,

@@ -211,8 +211,8 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     private void initChoosers() {
         // clean up the class id so it can be used to form file names (this is not foolproof)
-        String fileNameBase = this.geneSetDetails.getClassID().getId().replaceAll(
-                "[:\\s\\(\\)\\*&^%$#@\\!\\`\\'\\\"]+", "_" );
+        String fileNameBase = this.geneSetDetails.getClassID().getId()
+                .replaceAll( "[:\\s\\(\\)\\*&^%$#@\\!\\`\\'\\\"]+", "_" );
         imageChooser = new DetailsOutputImageFileChooser( settings.getConfig().getBoolean( INCLUDELABELS, true ),
                 settings.getConfig().getBoolean( NORMALIZE_SAVED_IMAGE, true ), fileNameBase + ".png" );
         fileChooser = new DetailsOutputDataFileChooser( settings.getConfig().getBoolean( INCLUDEEVERYTHING, true ),
@@ -753,6 +753,14 @@ public class GeneSetDetailsFrame extends JFrame {
      * Pop up a chart showing ROC and PR curves for this gene set in the full ranking.
      */
     protected void viewContext() {
+        if ( this.geneSetDetails.getSourceGeneScores() == null
+                || this.geneSetDetails.getSourceGeneScores().getRankedGenes().isEmpty() ) {
+            /*
+             * FIXME prompt for the gene scores?
+             */
+            statusMessenger.showError( "You have to define non-empty gene scores" );
+            return;
+        }
         GeneSetRankingContextWindow w = new GeneSetRankingContextWindow( this.geneSetDetails );
         w.setSize( new Dimension( 500, 500 ) );
         GuiUtil.centerContainer( w );

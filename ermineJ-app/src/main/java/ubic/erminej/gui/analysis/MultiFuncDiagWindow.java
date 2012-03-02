@@ -58,7 +58,7 @@ import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.math.Functions;
 
 /**
- * Visualizations of multifunctionality statistics. TODO refactor non-visualization code.
+ * Visualizations of multifunctionality statistics across all the gene sets. TODO refactor non-visualization code.
  * 
  * @author paul
  * @version $Id$
@@ -186,6 +186,9 @@ public class MultiFuncDiagWindow extends JFrame {
 
         DoubleArrayList scores = new DoubleArrayList( array[1] );
         DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( scores ) );
+
+        assert scoreRanks != null;
+
         scoreRanks.assign( Functions.div( scoreRanks.size() ) );
 
         double r = Distance.spearmanRankCorrelation( new DoubleArrayList( array[0] ), scores );
@@ -311,9 +314,13 @@ public class MultiFuncDiagWindow extends JFrame {
         int numBins = 39;
         series.addSeries( "ROCs", MatrixUtil.fromList( vec ).toArray(), numBins, 0.0, 1.0 );
 
+        /*
+         * The value plotted here is based on the AU-ROC, but see Multifunctionality to see how it is computed for
+         * display (we have changed it a few times).
+         */
         JFreeChart histogram = ChartFactory.createHistogram( "Gene set multifunctionalities",
-                "Bias towards multifunctional genes\n(Area under ROC curve)", "Number of sets", series,
-                PlotOrientation.VERTICAL, false, false, false );
+                "Bias towards multifunctional genes\n", "Number of sets", series, PlotOrientation.VERTICAL, false,
+                false, false );
 
         String title = "How multifunctional are the sets?";
         return Plotting.plotHistogram( title, histogram );

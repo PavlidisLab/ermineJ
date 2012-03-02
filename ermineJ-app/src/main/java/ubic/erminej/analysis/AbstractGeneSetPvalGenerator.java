@@ -18,11 +18,21 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.basecode.math.Rank;
+import ubic.basecode.util.StatusStderr;
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
+import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSetTerms;
 
@@ -38,11 +48,58 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
     protected static final int ALERT_UPDATE_FREQUENCY = 300;
 
+    private StatusViewer messenger = new StatusStderr();
+
     protected SettingsHolder settings;
 
+    protected Map<Gene, Double> geneRanks;
+    protected Map<Gene, Double> geneToScoreMap;
     protected GeneAnnotations geneAnnots;
-
     protected int numGenesUsed = 0;
+
+    private int maxGeneSetSize;
+
+    private int minGeneSetSize;
+
+    private boolean globalMissingAspectTreatedAsUsable = false;
+
+    /**
+     * @param set
+     * @param annots
+     * @param geneToScoreMap can be null if the method doesn't use gene scores.
+     * @param messenger2
+     */
+    public AbstractGeneSetPvalGenerator( SettingsHolder set, GeneAnnotations annots, Map<Gene, Double> geneToScoreMap,
+            StatusViewer messenger ) {
+        this.settings = set;
+        this.geneAnnots = annots;
+        this.geneToScoreMap = geneToScoreMap;
+
+        if ( messenger != null ) this.messenger = messenger;
+    }
+
+    public abstract Map<GeneSetTerm, GeneSetResult> generateGeneSetResults();
+
+    /**
+     */
+    public int getMaxClassSize() {
+        return maxGeneSetSize;
+    }
+
+    public StatusViewer getMessenger() {
+        return messenger;
+    }
+
+    /**
+     * @return
+     */
+    public int getMinGeneSetSize() {
+        return minGeneSetSize;
+    }
+
+    public int getNumGenesUsed() {
+        return numGenesUsed;
+    }
 
     public int numGenesInSet( GeneSetTerm t ) {
         return geneAnnots.getGeneSetGenes( t ).size();
@@ -50,20 +107,6 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
     public int numProbesInSet( GeneSetTerm t ) {
         return geneAnnots.getGeneSetProbes( t ).size();
-    }
-
-    public int getNumGenesUsed() {
-        return numGenesUsed;
-    }
-
-    private int maxGeneSetSize;
-    private int minGeneSetSize;
-
-    private boolean globalMissingAspectTreatedAsUsable = false;
-
-    public AbstractGeneSetPvalGenerator( SettingsHolder set, GeneAnnotations annots ) {
-        this.settings = set;
-        this.geneAnnots = annots;
     }
 
     /**
@@ -81,16 +124,13 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     }
 
     /**
+     * Thisis to deal with the possibility of genesets that lack an aspect -- but this should not happen (any more). It
+     * was a problem for obsolete GO Terms, but we ignore those anyway.
+     * 
+     * @param globalMissingAspectTreatedAsUsable The globalMissingAspectTreatedAsUsable to set.
      */
-    public int getMaxClassSize() {
-        return maxGeneSetSize;
-    }
-
-    /**
-     * @return
-     */
-    public int getMinGeneSetSize() {
-        return minGeneSetSize;
+    public void setGlobalMissingAspectTreatedAsUsable( boolean globalMissingAspectTreatedAsUsable ) {
+        this.globalMissingAspectTreatedAsUsable = globalMissingAspectTreatedAsUsable;
     }
 
     /**
@@ -136,13 +176,34 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     }
 
     /**
-     * Thisis to deal with the possibility of genesets that lack an aspect -- but this should not happen (any more). It
-     * was a problem for obsolete GO Terms, but we ignore those anyway.
-     * 
-     * @param globalMissingAspectTreatedAsUsable The globalMissingAspectTreatedAsUsable to set.
+     * @param genesInSet
+     * @return 1-based ranks of genes in the set, taking into account "bigger is better" etc.
      */
-    public void setGlobalMissingAspectTreatedAsUsable( boolean globalMissingAspectTreatedAsUsable ) {
-        this.globalMissingAspectTreatedAsUsable = globalMissingAspectTreatedAsUsable;
+    protected List<Double> ranksOfGenesInSet( Collection<Gene> genesInSet ) {
+        boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
+                || ( !settings.getDoLog() && settings.getBigIsBetter() );
+
+        if ( this.geneRanks == null ) {
+            geneRanks = Rank.rankTransform( geneToScoreMap );
+        }
+
+        int totalSize = geneRanks.size();
+        List<Double> targetRanks = new ArrayList<Double>();
+        for ( Gene g : genesInSet ) {
+
+            Double rank = geneRanks.get( g );
+
+            if ( rank == null ) continue;
+
+            /* if the values are log-transformed, and bigger is not better, we need to invert the rank */
+            if ( invert ) {
+                rank = totalSize - rank;
+                assert rank >= 0;
+            }
+
+            targetRanks.add( rank + 1.0 ); // make ranks 1-based.
+        }
+        return targetRanks;
     }
 
 }

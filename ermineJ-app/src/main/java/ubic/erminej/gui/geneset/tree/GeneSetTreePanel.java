@@ -418,13 +418,11 @@ public class GeneSetTreePanel extends GeneSetPanel {
     private Collection<GeneSetTreeNode> getLeaves( GeneSetTreeNode node ) {
         Collection<GeneSetTreeNode> result = new HashSet<GeneSetTreeNode>();
         Enumeration<GeneSetTreeNode> dfe = node.depthFirstEnumeration();
-        int i = 0;
         while ( dfe.hasMoreElements() ) {
             GeneSetTreeNode no = dfe.nextElement();
             if ( no.isLeaf() ) {
                 result.add( no );
             }
-            ++i;
         }
 
         return result;

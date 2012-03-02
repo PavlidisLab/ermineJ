@@ -37,7 +37,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         super.setUp();
 
-        test = new OraPvalGenerator( s, super.scores, annotations );
+        test = new OraPvalGenerator( s, super.scores, annotations, null );
         test.setGlobalMissingAspectTreatedAsUsable( true );
 
     }
@@ -55,7 +55,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         // there are 19 genes; GO:2 has 4 members, so it should be 15 not in the group
 
-        // 
+        //
         // strange, phyper(1, 4, 15, 2) gives the wrong answer of zero.
         // there is a 0.2 prob of a hit per trial; total should be just shy of 0.4
 

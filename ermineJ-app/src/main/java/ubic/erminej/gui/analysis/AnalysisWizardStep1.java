@@ -37,6 +37,7 @@ import javax.swing.border.EmptyBorder;
 
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.WizardStep;
 
@@ -72,7 +73,7 @@ public class AnalysisWizardStep1 extends WizardStep {
     private JRadioButton oraButton;
     private JRadioButton resampButton;
     private JRadioButton corrButton;
-
+    private JRadioButton prButton;
     private JRadioButton rocButton;
 
     public AnalysisWizardStep1( AnalysisWizard wiz, Settings settings ) {
@@ -94,22 +95,33 @@ public class AnalysisWizardStep1 extends WizardStep {
             settings.setClassScoreMethod( SettingsHolder.Method.ORA );
         } else if ( resampButton.isSelected() ) {
             settings.setClassScoreMethod( SettingsHolder.Method.GSR );
+            if ( settings.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL ) ) {
+                settings.setGeneSetResamplingScoreMethod( GeneScoreMethod.MEAN ); // default.
+            }
         } else if ( corrButton.isSelected() ) {
             settings.setClassScoreMethod( SettingsHolder.Method.CORR );
         } else if ( rocButton.isSelected() ) {
             settings.setClassScoreMethod( SettingsHolder.Method.ROC );
+        } else if ( prButton.isSelected() ) {
+            settings.setClassScoreMethod( SettingsHolder.Method.GSR );
+            settings.setGeneSetResamplingScoreMethod( GeneScoreMethod.PRECISIONRECALL );
         }
     }
 
     public void setValues() {
-        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) )
+        if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
             oraButton.setSelected( true );
-        else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) )
-            resampButton.setSelected( true );
-        else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) )
+        } else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
+            if ( settings.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL ) ) {
+                prButton.setSelected( true );
+            } else {
+                resampButton.setSelected( true );
+            }
+        } else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
             corrButton.setSelected( true );
-
-        else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ROC ) ) rocButton.setSelected( true );
+        } else if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ROC ) ) {
+            rocButton.setSelected( true );
+        }
     }
 
     // Component initialization
@@ -125,32 +137,19 @@ public class AnalysisWizardStep1 extends WizardStep {
         resampButton = new JRadioButton();
         corrButton = new JRadioButton();
         rocButton = new JRadioButton();
+        prButton = new JRadioButton();
 
-        // JPanel oraPanel = new JPanel();
-        // oraPanel.setLayout( new BoxLayout( oraPanel, BoxLayout.X_AXIS ) );
-        // oraPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
-        // oraPanel.setPreferredSize( new Dimension( 400, 19 ) );
         oraButton.setText( "ORA" );
         oraButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         oraButton.addActionListener( new AnalysisWizardStep1_oraButton_actionAdapter( this ) );
         buttonGroup1.add( oraButton );
-        // oraPanel.add( oraButton );
 
-        // JPanel gsrPanel = new JPanel();
-        // gsrPanel.setLayout( new BoxLayout( gsrPanel, BoxLayout.X_AXIS ) );
-        // gsrPanel.setPreferredSize( new Dimension( 400, 19 ) );
-        // gsrPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
-        resampButton.setText( "Gene score resampling" );
+        resampButton.setText( "GSR" );
         resampButton.setSelected( true );
         resampButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         resampButton.addActionListener( new AnalysisWizardStep1_resampButton_actionAdapter( this ) );
         buttonGroup1.add( resampButton );
-        // gsrPanel.add( resampButton );
 
-        // JPanel rocPanel = new JPanel();
-        // rocPanel.setLayout( new BoxLayout( rocPanel, BoxLayout.X_AXIS ) );
-        // rocPanel.setPreferredSize( new Dimension( 400, 19 ) );
-        // rocPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
         rocButton.setText( "ROC" );
         rocButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         rocButton.addActionListener( new ActionListener() {
@@ -159,13 +158,18 @@ public class AnalysisWizardStep1 extends WizardStep {
             }
         } );
         buttonGroup1.add( rocButton );
-        // rocPanel.add( rocButton );
 
-        // JPanel corrPanel = new JPanel();
-        // corrPanel.setLayout( new BoxLayout( corrPanel, BoxLayout.X_AXIS ) );
-        // corrPanel.setPreferredSize( new Dimension( 400, 19 ) );
-        // corrPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
-        corrButton.setText( "Correlation" );
+        prButton.setText( "PREREC" );
+        prButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
+        prButton.addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent e ) {
+                wiz.setAnalysisType( SettingsHolder.Method.GSR );
+                // FIXME
+            }
+        } );
+        buttonGroup1.add( prButton );
+
+        corrButton.setText( "CORR" );
         corrButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         corrButton.addActionListener( new AnalysisWizardStep1_corrButton_actionAdapter( this ) );
         buttonGroup1.add( corrButton );
@@ -175,62 +179,56 @@ public class AnalysisWizardStep1 extends WizardStep {
         JLabel corrLabel = new JLabel();
         JLabel oraLabel = new JLabel();
         JLabel rocLabel = new JLabel();
+        JLabel prLabel = new JLabel();
 
         oraLabel.setText( "Over-representation analysis" );
         oraLabel.setPreferredSize( new Dimension( 200, 17 ) );
         oraLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
-        // oraLabel.setLabelFor( oraButton );
-        // oraPanel.add( oraLabel );
 
-        gsrLabel.setText( "Examines distribution of gene scores" );
+        gsrLabel.setText( "Examines distribution of gene scores in each set" );
         gsrLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
         gsrLabel.setPreferredSize( new Dimension( 200, 17 ) );
-        // gsrLabel.setLabelFor( resampButton );
-        // gsrPanel.add( gsrLabel );
 
-        rocLabel.setText( "Uses ranks of gene scores" );
+        rocLabel.setText( "Uses ranks of gene scores to compute ROC" );
         rocLabel.setPreferredSize( new Dimension( 200, 17 ) );
         rocLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
-        // rocLabel.setLabelFor( rocButton );
-        // rocPanel.add( rocLabel );
+
+        prLabel.setText( "Use ranks of gene scores to compute precision-recall" );
+        prLabel.setPreferredSize( new Dimension( 200, 17 ) );
+        prLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
 
         corrLabel.setText( "Uses correlation of expression profiles" );
         corrLabel.setPreferredSize( new Dimension( 200, 17 ) );
         corrLabel.setAlignmentX( Component.RIGHT_ALIGNMENT );
-        // corrLabel.setLabelFor( corrButton );
-        // corrPanel.add( corrLabel );
 
         GroupLayout gl = new GroupLayout( step1Panel );
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );
         step1Panel.setLayout( gl );
         step1Panel.setBorder( BorderFactory.createEmptyBorder( 20, 40, 20, 40 ) );
-        gl.setHorizontalGroup( gl.createSequentialGroup().addGroup(
-                gl.createParallelGroup( Alignment.LEADING ).addComponent( resampButton ).addComponent( oraButton )
-                        .addComponent( rocButton ).addComponent( corrButton ) ).addGroup(
-                gl.createParallelGroup( Alignment.LEADING ).addComponent( gsrLabel ).addComponent( oraLabel )
-                        .addComponent( rocLabel ).addComponent( corrLabel ) ) );
+        gl.setHorizontalGroup( gl
+                .createSequentialGroup()
+                .addGroup(
+                        gl.createParallelGroup( Alignment.LEADING ).addComponent( resampButton )
+                                .addComponent( oraButton ).addComponent( rocButton ).addComponent( prButton )
+                                .addComponent( corrButton ) )
+                .addGroup(
+                        gl.createParallelGroup( Alignment.LEADING ).addComponent( gsrLabel ).addComponent( oraLabel )
+                                .addComponent( rocLabel ).addComponent( prLabel ).addComponent( corrLabel ) ) );
 
-        gl
-                .setVerticalGroup( gl.createSequentialGroup().addGroup(
-                        gl.createParallelGroup( Alignment.BASELINE ).addComponent( resampButton ).addComponent(
-                                gsrLabel ) )
-                        .addGroup(
-                                gl.createParallelGroup( Alignment.BASELINE ).addComponent( oraButton ).addComponent(
-                                        oraLabel ) ).addGroup(
-                                gl.createParallelGroup( Alignment.BASELINE ).addComponent( rocButton ).addComponent(
-                                        rocLabel ) ).addGroup(
-                                gl.createParallelGroup( Alignment.BASELINE ).addComponent( corrButton ).addComponent(
-                                        corrLabel ) ) );
-
-        // step1Panel.setBorder( new EmptyBorder( 20, 20, 20, 20 ) );
-        // step1Panel.add( oraPanel );
-        // step1Panel.add( Box.createVerticalStrut( 10 ) );
-        // step1Panel.add( gsrPanel );
-        // step1Panel.add( Box.createVerticalStrut( 10 ) );
-        // step1Panel.add( rocPanel );
-        // step1Panel.add( Box.createVerticalStrut( 10 ) );
-        // step1Panel.add( corrPanel );
+        gl.setVerticalGroup( gl
+                .createSequentialGroup()
+                .addGroup(
+                        gl.createParallelGroup( Alignment.BASELINE ).addComponent( resampButton )
+                                .addComponent( gsrLabel ) )
+                .addGroup(
+                        gl.createParallelGroup( Alignment.BASELINE ).addComponent( oraButton ).addComponent( oraLabel ) )
+                .addGroup(
+                        gl.createParallelGroup( Alignment.BASELINE ).addComponent( rocButton ).addComponent( rocLabel ) )
+                .addGroup( gl.createParallelGroup( Alignment.BASELINE ).addComponent( prButton ).addComponent( prLabel ) )
+                .addGroup(
+                        gl.createParallelGroup( Alignment.BASELINE ).addComponent( corrButton )
+                                .addComponent( corrLabel ) ) );
 
         this.addHelp( "<html><b>Select the method to " + "use for scoring gene sets.</b><br>" + "</html>" );
         this.addMain( step1Panel );
@@ -246,6 +244,13 @@ public class AnalysisWizardStep1 extends WizardStep {
 
     void resampButton_actionPerformed() {
         wiz.setAnalysisType( SettingsHolder.Method.GSR );
+        wiz.setGeneScoreMethod( GeneScoreMethod.MEAN ); // this isn't actually used, it's just to let us know that it's
+                                                        // NOT precision-recall.
+    }
+
+    void prButton_actionPerformed() {
+        wiz.setAnalysisType( SettingsHolder.Method.GSR );
+        wiz.setGeneScoreMethod( GeneScoreMethod.PRECISIONRECALL );
     }
 }
 

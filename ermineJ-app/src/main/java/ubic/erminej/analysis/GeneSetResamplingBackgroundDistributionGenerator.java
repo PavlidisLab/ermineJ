@@ -18,11 +18,18 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import org.apache.commons.lang.ArrayUtils;
 
+import ubic.basecode.math.PrecisionRecall;
 import ubic.basecode.math.RandomChooser;
+import ubic.basecode.math.Rank;
 import ubic.basecode.math.Stats;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
@@ -33,8 +40,7 @@ import cern.colt.list.DoubleArrayList;
 import cern.jet.stat.Descriptive;
 
 /**
- * Calculates a background distribution for class scores derived from randomly selected individual gene scores...and
- * does other things.
+ * Calculates a background distribution for class scores derived from randomly selected individual gene scores.
  * 
  * @author Shahmil Merchant, Paul Pavlidis
  * @since Created 09/02/02.
@@ -47,14 +53,20 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
      */
     private Double[] geneScores = null;
 
+    /**
+     * Ranks for all the genes.
+     */
+    private Map<Gene, Double> geneRanks;
+
     private static int quantile = 50;
     private static double quantfract = 0.5;
     private Settings.GeneScoreMethod method;
+
     private static final int MIN_SET_SIZE_FOR_ESTIMATION = 30; // after this size, switch to doing it by normal
     // approximation.
 
     /**
-     * Minimum mumber of interations to perform when using approximation methods.
+     * Minimum number of iterations to perform when using approximation methods.
      */
     private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
 
@@ -80,7 +92,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
     public Histogram generateNullDistribution( StatusViewer m ) {
 
         int numGenes = geneScores.length;
-
+        List<Gene> genes = new Vector<Gene>( geneRanks.keySet() );
         assert hist != null;
         assert numGenes >= classMaxSize;
 
@@ -90,6 +102,8 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
             deck[i] = i;
         }
 
+        boolean usingPrecisionRecall = method.equals( SettingsHolder.GeneScoreMethod.PRECISIONRECALL );
+
         for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize && geneSetSize <= numGenes; geneSetSize++ ) {
 
             DoubleArrayList values = new DoubleArrayList();
@@ -98,18 +112,31 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
 
             for ( int k = 0; k < numRuns; k++ ) {
 
-                double[] randomClass = RandomChooser.chooserandom( geneScores, deck, geneSetSize );
-                double rawscore = computeRawScore( randomClass, method );
-                values.add( rawscore );
-                hist.update( geneSetSize, rawscore );
+                double rawScore = 0;
 
-                // check convergence.
-                if ( useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
-                        && k > 0 && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
+                /*
+                 * Depending on the method, we need either random gene scores or a list of genes.
+                 */
+
+                if ( usingPrecisionRecall ) {
+                    List<Gene> randomClass = ( List<Gene> ) RandomChooser.chooserandom( genes, deck, geneSetSize );
+                    rawScore = computeRawScore( null, randomClass );
+                } else {
+                    double[] randomClassScores = RandomChooser.chooserandom( geneScores, deck, geneSetSize );
+                    rawScore = computeRawScore( randomClassScores, null );
+                }
+
+                values.add( rawScore );
+                hist.update( geneSetSize, rawScore );
+
+                // check convergence. This doesn't apply to precision recall.
+                if ( !usingPrecisionRecall && useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION
+                        && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION && k > 0
+                        && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
 
                     double mean = Descriptive.mean( values );
-                    double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
-                            .sumOfSquares( values ) );
+                    double variance = Descriptive.variance( values.size(), Descriptive.sum( values ),
+                            Descriptive.sumOfSquares( values ) );
 
                     if ( Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE ) {
                         hist.addExactNormalProbabilityComputer( geneSetSize, mean, variance );
@@ -167,6 +194,8 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
 
         this.geneScores = geneToScoreMap.values().toArray( new Double[] {} );
 
+        geneRanks = Rank.rankTransform( geneToScoreMap );
+
         this.setHistogramRange();
         this.hist = new Histogram( numClasses, classMinSize, numRuns, histogramMax, histogramMin );
     }
@@ -184,13 +213,18 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
      * Note that speed here is important. In the prototypical GSR method, the score is the mean of the values for the
      * gene.
      * 
-     * @param genevalues double[]
+     * @param genevalues double[] raw scores for the items in the class.
+     * @param genesInSet
      * @return double
+     * @see Settings.GeneScoreMethod for choices of methods.
      */
-    public static double computeRawScore( double[] genevalues, Settings.GeneScoreMethod method ) {
+    public double computeRawScore( double[] genevalues, Collection<Gene> genesInSet ) {
 
         if ( method.equals( Settings.GeneScoreMethod.MEAN ) ) {
             return Descriptive.mean( new DoubleArrayList( genevalues ) );
+        } else if ( method.equals( Settings.GeneScoreMethod.PRECISIONRECALL ) ) {
+            assert genesInSet != null;
+            return averagePrecision( genesInSet );
         }
 
         int index = ( int ) Math.floor( quantfract * genevalues.length );
@@ -202,6 +236,25 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
         } else {
             throw new IllegalStateException( "Unknown raw score calculation method selected" );
         }
+
+    }
+
+    /**
+     * @param genesInSet
+     * @return
+     */
+    protected double averagePrecision( Collection<Gene> genesInSet ) {
+        assert geneRanks.size() >= genesInSet.size();
+
+        Set<Double> ranksOfPositives = new HashSet<Double>();
+        for ( Gene gene : genesInSet ) {
+            if ( geneRanks.containsKey( gene ) ) {
+                Double rank = geneRanks.get( gene );
+                ranksOfPositives.add( rank );
+            }
+        }
+
+        return PrecisionRecall.averagePrecision( geneRanks.size(), ranksOfPositives );
 
     }
 

@@ -649,15 +649,11 @@ public class GeneScores {
                             + " identifiers in your gene score file were repeats. Only the first occurrence encountered was kept in each case." );
         }
 
-        if ( numProbesKept == 0 ) {
-            messenger.showError( "None of the probes in the gene score file correspond to probes in the "
-                    + "annotation file you selected. None of your data will be displayed." );
-        }
-
-        if ( probeToScoreMap.isEmpty() ) {
-            messenger.showError( "No probe scores found! Please check the file has"
-                    + " the correct plain text format and"
-                    + " corresponds to the gene annotation (\".an\") file you selected." );
+        if ( numProbesKept == 0 || probeToScoreMap.isEmpty() ) {
+            messenger
+                    .showError( "No usable probe scores found. Please check you have selected the right column, that the file has"
+                            + " the correct plain text format and"
+                            + " that it corresponds to the gene annotation file you selected." );
         } else if ( messenger != null ) {
             // messenger.showStatus( "Found " + probeToScoreMap.size() + " usable scores in the file" );
         }

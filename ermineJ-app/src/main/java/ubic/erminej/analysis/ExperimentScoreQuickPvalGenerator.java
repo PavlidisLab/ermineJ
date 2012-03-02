@@ -22,22 +22,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.Histogram;
 
 /**
- * Does the same thing as {@link ExperimentScorePvalGenerator}but is stripped-down for using during resampling.
+ * Does the same thing as {@link GeneSetResamplingPvalGenerator}but is stripped-down for using during resampling.
  * 
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenerator {
+public class ExperimentScoreQuickPvalGenerator extends GeneSetResamplingPvalGenerator {
 
-    public ExperimentScoreQuickPvalGenerator( SettingsHolder settings, GeneAnnotations a, Histogram hi ) {
-        super( settings, a, hi );
+    public ExperimentScoreQuickPvalGenerator( SettingsHolder settings, GeneAnnotations a,
+            Map<Gene, Double> geneToScoreMap, StatusViewer messenger ) {
+        super( settings, a, geneToScoreMap, messenger );
     }
 
     /**
@@ -49,7 +50,7 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
      * @throws IllegalStateException
      * @return double
      */
-    public double classPvalue( GeneSetTerm geneSetName, Map<Gene, Double> genePvalueMap ) {
+    public double classPvalue( GeneSetTerm geneSetName ) {
 
         double pval = 0.0;
         double rawscore = 0.0;
@@ -67,18 +68,18 @@ public class ExperimentScoreQuickPvalGenerator extends ExperimentScorePvalGenera
 
         int v_size = 0;
 
-        for ( Gene gene : this.geneAnnots.getGeneSetGenes( geneSetName ) ) {
+        Set<Gene> geneSetGenes = this.geneAnnots.getGeneSetGenes( geneSetName );
+        for ( Gene gene : geneSetGenes ) {
 
-            Double grouppval = genePvalueMap.get( gene );
+            Double geneScore = geneToScoreMap.get( gene );
             if ( !record.contains( gene ) ) {
                 record.add( gene );
-                scoresForGenesInSet[v_size] = grouppval.doubleValue();
+                scoresForGenesInSet[v_size] = geneScore.doubleValue();
                 v_size++;
             }
         }
 
-        rawscore = GeneSetResamplingBackgroundDistributionGenerator.computeRawScore( scoresForGenesInSet, settings
-                .getGeneSetResamplingScoreMethod() );
+        rawscore = generator.computeRawScore( scoresForGenesInSet, geneSetGenes );
         pval = scoreToPval( numGenesInSet, rawscore );
 
         if ( pval < 0 ) {

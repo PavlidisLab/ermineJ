@@ -713,21 +713,22 @@ public class Settings extends SettingsHolder {
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
 
             this.config = new PropertiesConfiguration( configFileLocation );
+
+            // make sure defaults are defined.
+            PropertiesConfiguration defaultConfig = getDefaultConfig();
+            for ( Iterator<String> it = defaultConfig.getKeys(); it.hasNext(); ) {
+                String key = it.next();
+                if ( config.getProperty( key ) == null ) {
+                    log.info( "Setting default for: " + key + "=" + defaultConfig.getProperty( key ) );
+                    config.setProperty( key, defaultConfig.getProperty( key ) );
+                }
+            }
+
             log.info( "Got configuration from " + configFileLocation );
         } catch ( ConfigurationException e ) {
             try {
                 log.info( "User properties file doesn't exist, creating new one from defaults" );
-                URL defaultConfigFileLocation = this.getClass().getResource(
-                        "/ubic/erminej/" + USERGUI_DEFAULT_PROPERTIES );
-
-                // URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
-
-                if ( defaultConfigFileLocation == null ) {
-                    throw new ConfigurationException( "Defaults not found either!" );
-                }
-
-                log.info( "Found defaults at " + defaultConfigFileLocation );
-                PropertiesConfiguration defaultConfig = new PropertiesConfiguration( defaultConfigFileLocation );
+                PropertiesConfiguration defaultConfig = getDefaultConfig();
 
                 this.config = new PropertiesConfiguration( newConfigFile );
                 this.config.setPath( newConfigFile.getAbsolutePath() );
@@ -740,7 +741,7 @@ public class Settings extends SettingsHolder {
                 log.info( "Saved the new configuration in " + config.getPath() );
 
             } catch ( ConfigurationException e1 ) {
-                log.error( "Failed to initialize the configuration file, falling back" );
+                log.error( "Failed to initialize the configuration file, falling back: " + e1.getMessage() );
                 try {
                     this.config = new PropertiesConfiguration( newConfigFile );
                 } catch ( ConfigurationException e2 ) {
@@ -753,6 +754,24 @@ public class Settings extends SettingsHolder {
         if ( this.config != null ) this.config.setHeader( HEADER );
 
         if ( this.config != null ) this.config.setAutoSave( true );
+    }
+
+    /**
+     * @return
+     * @throws ConfigurationException
+     */
+    private PropertiesConfiguration getDefaultConfig() throws ConfigurationException {
+        URL defaultConfigFileLocation = this.getClass().getResource( "/ubic/erminej/" + USERGUI_DEFAULT_PROPERTIES );
+
+        // URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
+
+        if ( defaultConfigFileLocation == null ) {
+            throw new ConfigurationException( "Defaults not found either!" );
+        }
+
+        log.info( "Found defaults at " + defaultConfigFileLocation );
+        PropertiesConfiguration defaultConfig = new PropertiesConfiguration( defaultConfigFileLocation );
+        return defaultConfig;
     }
 
     /**

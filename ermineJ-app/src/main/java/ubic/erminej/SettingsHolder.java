@@ -40,7 +40,7 @@ public class SettingsHolder {
      * For the gene set resampling method, how are scores computed for the group?
      */
     public enum GeneScoreMethod {
-        MEAN, MEAN_ABOVE_QUANTILE, QUANTILE
+        MEAN, MEAN_ABOVE_QUANTILE, QUANTILE, PRECISIONRECALL
     }
 
     /**
@@ -459,7 +459,9 @@ public class SettingsHolder {
      * @return
      */
     public String getStringProperty( String propertyName ) {
-        return this.config.getProperty( propertyName ).toString();
+        Object prop = this.config.getProperty( propertyName );
+        if ( prop == null ) return null;
+        return prop.toString();
     }
 
 }

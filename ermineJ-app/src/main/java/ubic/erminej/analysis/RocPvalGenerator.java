@@ -18,7 +18,6 @@
  */
 package ubic.erminej.analysis;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,21 +42,17 @@ import ubic.erminej.data.GeneSetTerm;
  */
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
-    private int totalSize = 0;
-
-    StatusViewer messenger;
-
-    Map<Gene, Double> geneRanks;
-
-    public RocPvalGenerator( SettingsHolder set, GeneAnnotations an, StatusViewer messenger ) {
-        super( set, an );
-        this.messenger = messenger;
+    public RocPvalGenerator( SettingsHolder set, GeneAnnotations an, Map<Gene, Double> geneToScoreMap,
+            StatusViewer messenger ) {
+        super( set, an, geneToScoreMap, messenger );
     }
 
-    /**
-     * Generate a complete set of class results.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#generateGeneSetResults()
      */
-    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( Map<Gene, Double> geneToScoreMap ) {
+    public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         int count = 0;
 
@@ -65,15 +60,13 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         this.numGenesUsed = geneToScoreMap.size();
 
-        totalSize = geneRanks.size();
-
         for ( Iterator<GeneSetTerm> iter = geneAnnots.getGeneSetTerms().iterator(); iter.hasNext(); ) {
             GeneSetTerm className = iter.next();
             GeneSetResult res = this.classPval( className );
             if ( res != null ) {
                 results.put( className, res );
-                if ( messenger != null && ++count % ALERT_UPDATE_FREQUENCY == 0 ) {
-                    messenger.showStatus( count + " gene sets analyzed" );
+                if ( ++count % ALERT_UPDATE_FREQUENCY == 0 ) {
+                    getMessenger().showStatus( count + " gene sets analyzed" );
                     ifInterruptedStop();
 
                 }
@@ -94,33 +87,17 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     private GeneSetResult classPval( GeneSetTerm geneSet ) {
         if ( !super.checkAspectAndRedundancy( geneSet ) ) return null;
         // variables for outputs
-        List<Double> targetRanks = new ArrayList<Double>();
 
         int numGenesInSet = numGenesInSet( geneSet );
         if ( numGenesInSet < settings.getMinClassSize() || numGenesInSet > settings.getMaxClassSize() ) {
             return null;
         }
 
-        Collection<Gene> values = geneAnnots.getGeneSetGenes( geneSet );
+        Collection<Gene> genesInSet = geneAnnots.getGeneSetGenes( geneSet );
 
-        boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
-                || ( !settings.getDoLog() && settings.getBigIsBetter() );
+        List<Double> targetRanks = ranksOfGenesInSet( genesInSet );
 
-        for ( Gene g : values ) {
-
-            Double rank = geneRanks.get( g );
-
-            if ( rank == null ) continue;
-
-            /* if the values are log-transformed, and bigger is not better, we need to invert the rank */
-            if ( invert ) {
-                rank = totalSize - rank;
-                assert rank >= 0;
-            }
-
-            targetRanks.add(  rank + 1.0  ); // make ranks 1-based.
-        }
-
+        int totalSize = geneRanks.size();
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );
         double roc_pval = ROC.rocpval( totalSize, targetRanks );
 

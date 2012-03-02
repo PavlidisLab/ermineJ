@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,6 +43,7 @@ import javax.swing.border.TitledBorder;
 
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
@@ -61,30 +63,33 @@ public class AnalysisWizardStep5 extends WizardStep {
     private JPanel step5Panel;
     private JRadioButton jRadioButtonMedian;
     private JRadioButton jRadioButtonMean;
-    private JTextField geneScoreThresholdTextField;
-    // JTextField jTextFieldScoreCol;
-    private JTextField jTextFieldIterations;
-    private JCheckBox jCheckBoxDoLog;
-    private JCheckBox jCheckBoxBigIsBetter;
-    private JCheckBox jCheckBoxDoMultiFuncCorr;
+
     private JPanel oraPanel;
     private JPanel resampPanel;
+    private JPanel prPanel;
     private JPanel rocPanel;
     private JPanel corrPanel;
-    private JPanel numIterationsPanel;
-    private JPanel useResamplingPanel;
-    private JPanel subPanel;
 
-    JCheckBox jCheckBoxUseEmpirical;
     private String help;
     private String extraHelp;
     boolean enableMultifunc = true;
-    Double[] geneScores = null;
+
+    private int numIterations = 0;
+
+    private boolean doFullEmpirical = false;
+
+    private double oraThreshold = 0.001;
+
+    private boolean bigIsBetter = false;
+
+    private boolean doLog = true;
+
+    private boolean doMfCorr = true;
 
     public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
-        this.jbInit();
         this.settings = settings;
+        this.jbInit();
         wiz.clearStatus();
         setValues();
     }
@@ -92,54 +97,31 @@ public class AnalysisWizardStep5 extends WizardStep {
     /**
      * @param analysisType
      */
-    public void addVarPanel( Method analysisType ) {
+    public void addVarPanel( Method analysisType, GeneScoreMethod scoreMethod ) {
 
         /*
          * this is for during development, so we don't expose this functionality prematurely: set to false to turn it
-         * off etc.
+         * off.
          */
         enableMultifunc = settings.getConfig().getBoolean( "multifunc.correct.enabled", true );
 
         if ( analysisType.equals( Method.ORA ) ) {
-            oraPanel.add( jCheckBoxDoLog );
-            oraPanel.add( jCheckBoxBigIsBetter );
-
-            if ( enableMultifunc ) {
-                oraPanel.add( jCheckBoxDoMultiFuncCorr );
-                jCheckBoxDoMultiFuncCorr.setEnabled( true );
-                jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
-            }
-
             step5Panel.add( oraPanel );
             this.addHelp( extraHelp );
             this.checkOraThresholdEffects();
         } else if ( analysisType.equals( Method.GSR ) ) {
-            resampPanel.add( jCheckBoxDoLog, null );
-            resampPanel.add( jCheckBoxBigIsBetter );
-            resampPanel.add( subPanel );
-
-            if ( enableMultifunc ) {
-                resampPanel.add( jCheckBoxDoMultiFuncCorr );
-                jCheckBoxDoMultiFuncCorr.setEnabled( true );
-                jCheckBoxDoMultiFuncCorr.setSelected( false );
-            }
-
             this.addHelp( extraHelp );
-            step5Panel.add( resampPanel, null );
-        } else if ( analysisType.equals( Method.ROC ) ) {
-            rocPanel.add( jCheckBoxDoLog, null );
-            rocPanel.add( jCheckBoxBigIsBetter, null );
 
-            if ( enableMultifunc ) {
-                rocPanel.add( jCheckBoxDoMultiFuncCorr );
-                jCheckBoxDoMultiFuncCorr.setEnabled( true );
-                jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+            if ( scoreMethod != null && scoreMethod.equals( GeneScoreMethod.PRECISIONRECALL ) ) {
+                step5Panel.add( prPanel, null );
+            } else {
+                step5Panel.add( resampPanel, null );
             }
 
+        } else if ( analysisType.equals( Method.ROC ) ) {
             this.addHelp( extraHelp );
             step5Panel.add( rocPanel, null );
         } else if ( analysisType.equals( Method.CORR ) ) {
-            corrPanel.add( subPanel, null );
             this.addHelp( help );
             step5Panel.add( corrPanel, null );
         }
@@ -157,10 +139,9 @@ public class AnalysisWizardStep5 extends WizardStep {
         if ( analysisType.equals( SettingsHolder.Method.ORA ) ) {
             step5Panel.remove( oraPanel );
         } else if ( analysisType.equals( SettingsHolder.Method.GSR ) ) {
-            resampPanel.remove( subPanel );
             step5Panel.remove( resampPanel );
+            step5Panel.remove( prPanel );
         } else if ( analysisType.equals( SettingsHolder.Method.CORR ) ) {
-            corrPanel.remove( subPanel );
             step5Panel.remove( corrPanel );
         } else if ( analysisType.equals( SettingsHolder.Method.ROC ) ) {
             step5Panel.remove( rocPanel );
@@ -168,29 +149,56 @@ public class AnalysisWizardStep5 extends WizardStep {
     }
 
     /**
-     * 
-     *
+     * Save the values to the configuration.
      */
     public void saveValues() {
-        settings.setIterations( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
+        settings.setIterations( numIterations );
 
-        if ( jRadioButtonMean.isSelected() ) {
-            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
-        } else {
-            settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
+        if ( !settings.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL ) ) {
+            if ( jRadioButtonMean.isSelected() ) {
+                settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
+            } else {
+                settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
+            }
         }
 
-        String threshText = geneScoreThresholdTextField.getText();
-        settings.setGeneScoreThreshold( Double.valueOf( threshText ).doubleValue() );
-        settings.setDoLog( jCheckBoxDoLog.isSelected() );
-        settings.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
-        settings.setAlwaysUseEmpirical( jCheckBoxUseEmpirical.isSelected() );
-        settings.setUseMultifunctionalityCorrection( jCheckBoxDoMultiFuncCorr.isSelected() );
+        settings.setGeneScoreThreshold( oraThreshold );
+        settings.setDoLog( doLog );
+        settings.setBigIsBetter( bigIsBetter );
+        settings.setAlwaysUseEmpirical( doFullEmpirical );
+        settings.setUseMultifunctionalityCorrection( doMfCorr );
     }
 
     public boolean upperTail() {
-        return jCheckBoxDoLog.isSelected() && !jCheckBoxBigIsBetter.isSelected() || !jCheckBoxDoLog.isSelected()
-                && jCheckBoxBigIsBetter.isSelected();
+        return doLog && !bigIsBetter || !doLog && bigIsBetter;
+    }
+
+    // Component initialization
+    @Override
+    protected void jbInit() {
+        JPanel topPanel = new JPanel();
+
+        jRadioButtonMedian = new JRadioButton();
+        jRadioButtonMean = new JRadioButton();
+
+        step5Panel = new JPanel();
+        // step5Panel.setPreferredSize( new Dimension( 550, 280 ) );
+
+        createROCSettingsPanel();
+        createORASettingsPanel();
+        createPRSettingsPanel();
+        createGSRSettingsPanel();
+        createCorrelationSettingsPanel();
+
+        this.addHelp( help );
+        help = "<html><b>Adjust settings specific for your analysis method.</b><br>";
+
+        extraHelp = help
+                + "<p>Take special care to ensure the"
+                + " log transformation and 'larger scores are better' settings are correct. 'larger scores are better' refers to your "
+                + " original input file, and should be unchecked if your input is raw p-values.</p>";
+        step5Panel.add( topPanel, null );
+        this.addMain( step5Panel );
     }
 
     /**
@@ -211,8 +219,8 @@ public class AnalysisWizardStep5 extends WizardStep {
 
                 try {
 
-                    double thresh = Double.parseDouble( geneScoreThresholdTextField.getText() );
-                    if ( jCheckBoxDoLog.isSelected() ) {
+                    double thresh = oraThreshold;
+                    if ( doLog ) {
                         thresh = -Arithmetic.log10( thresh );
                     }
 
@@ -220,8 +228,8 @@ public class AnalysisWizardStep5 extends WizardStep {
                     if ( gs == null ) {
 
                         Settings settingsTemp = new Settings( w.getSettings() );
-                        settingsTemp.setDoLog( jCheckBoxDoLog.isSelected() );
-                        settingsTemp.setBigIsBetter( jCheckBoxBigIsBetter.isSelected() );
+                        settingsTemp.setDoLog( doLog );
+                        settingsTemp.setBigIsBetter( bigIsBetter );
 
                         gs = new GeneScores( settingsTemp.getScoreFile(), settingsTemp, null, w.getGeneAnnots() );
 
@@ -241,8 +249,8 @@ public class AnalysisWizardStep5 extends WizardStep {
                     if ( n == 0 ) {
                         w.getStatusField().showError( "No genes selected at that threshold" );
                     } else {
-                        double auc = w.getGeneAnnots().getMultifunctionality().enrichmentForMultifunctionality(
-                                keptGenes );
+                        double auc = w.getGeneAnnots().getMultifunctionality()
+                                .enrichmentForMultifunctionality( keptGenes );
 
                         w.getStatusField().showStatus(
                                 String.format( " %d genes selected. MF bias (AUROC) = %.2f", n, auc ) );
@@ -261,103 +269,61 @@ public class AnalysisWizardStep5 extends WizardStep {
         sw.execute();
     }
 
-    private boolean scorePassesThreshold( double geneScore, double threshold ) {
-        return ( upperTail() && geneScore >= threshold ) || ( !upperTail() && geneScore <= threshold );
+    private void createCorrelationSettingsPanel() {
+        corrPanel = new JPanel();
+        corrPanel.setBorder( new TitledBorder( "Correlation" ) );
+
+        JPanel corrMetricPanel = new JPanel(); // not using this yet.
+
+        // ButtonGroup corrButtonGroup = new ButtonGroup();
+        // JLabel corrMetricLabel = new JLabel();
+        // JRadioButton corrRadioButton1 = new JRadioButton();
+        // JRadioButton corrRadioButton2 = new JRadioButton();
+        // corrMetricPanel.setBorder( null );
+        // corrMetricPanel.setBackground( SystemColor.control );
+        // corrMetricPanel.setBackground( SystemColor.control );
+        // corrMetricPanel.setToolTipText( "metric tool tip." );
+        // corrMetricLabel.setText( "Correlation Metric" );
+        // corrMetricLabel.setToolTipText( "metric tool tip." );
+        //
+        // corrRadioButton1.setText( "Metric 1" );
+        // corrRadioButton1.setSelected( true );
+        // corrRadioButton1.setBackground( SystemColor.control );
+        // corrRadioButton1.setToolTipText( "metric 1 tool tip" );
+        // corrRadioButton2.setText( "Metric 2" );
+        //
+        // corrButtonGroup.add( corrRadioButton1 );
+        // corrButtonGroup.add( corrRadioButton2 );
+        // corrMetricPanel.add( corrMetricLabel, null );
+        // corrMetricPanel.add( corrRadioButton1, null );
+        // corrMetricPanel.add( corrRadioButton2, null );
+
+        JPanel resampSettingsPanel = createResamplingSettingsPanel();
+        corrPanel.add( resampSettingsPanel, null );
+        corrPanel.add( corrMetricPanel, null );
+        JCheckBox mfCorrectionCheckBox = getMfCorrectionCheckBox();
+
+        GroupLayout gl = new GroupLayout( corrPanel );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        corrPanel.setLayout( gl );
+        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( resampSettingsPanel )
+                .addComponent( corrMetricPanel ).addComponent( mfCorrectionCheckBox ) );
+
+        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( resampSettingsPanel )
+                .addComponent( corrMetricPanel ).addComponent( mfCorrectionCheckBox ) );
+
     }
 
-    /**
-     * Setup
-     */
-    private void setValues() {
-        jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
+    private void createGSRSettingsPanel() {
+        resampPanel = new JPanel();
+        resampPanel.setBorder( new TitledBorder( "GSR" ) );
 
-        if ( settings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) ) {
-            jRadioButtonMean.setSelected( true );
-        } else {
-            jRadioButtonMedian.setSelected( true );
-        }
-
-        geneScoreThresholdTextField.setText( String.valueOf( settings.getGeneScoreThreshold() ) );
-        jCheckBoxDoLog.setSelected( settings.getDoLog() );
-        jCheckBoxBigIsBetter.setSelected( settings.getBigIsBetter() );
-        jCheckBoxUseEmpirical.setSelected( settings.getAlwaysUseEmpirical() );
-        jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
-    }
-
-    // Component initialization
-    @Override
-    protected void jbInit() {
-        JPanel step4TopPanel = new JPanel();
+        // panel that describes how we combine scores for genes; does not apply to precision-recall.
         JPanel jPanelAnalysisFrameMethods = new JPanel();
         JLabel jLabelAnalysisFrameMethod = new JLabel();
-        ButtonGroup buttonGroup2 = new ButtonGroup();
-        jRadioButtonMedian = new JRadioButton();
-        jRadioButtonMean = new JRadioButton();
-
-        oraPanel = new JPanel();
-        TitledBorder oraTitledBorder;
-        JPanel jPanel15 = new JPanel();
-        JLabel jLabel6 = new JLabel();
-        geneScoreThresholdTextField = new JTextField();
-        resampPanel = new JPanel();
-        TitledBorder resampTitledBorder;
-
-        numIterationsPanel = new JPanel();
-        JLabel numIterationsLabel = new JLabel();
-        jTextFieldIterations = new JTextField();
-        corrPanel = new JPanel();
-        TitledBorder corrTitledBorder;
-        JPanel corrMetricPanel = new JPanel();
-        ButtonGroup corrButtonGroup = new ButtonGroup();
-        JLabel corrMetricLabel = new JLabel();
-        JRadioButton corrRadioButton1 = new JRadioButton();
-        JRadioButton corrRadioButton2 = new JRadioButton();
-        jCheckBoxDoLog = new JCheckBox();
-        jCheckBoxDoLog.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                checkOraThresholdEffects();
-            }
-        } );
-
-        jCheckBoxBigIsBetter = new JCheckBox();
-        jCheckBoxBigIsBetter.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                checkOraThresholdEffects();
-            }
-        } );
-
-        step5Panel = new JPanel();
-        step5Panel.setPreferredSize( new Dimension( 550, 280 ) );
-
-        jCheckBoxDoLog.setBackground( SystemColor.control );
-        jCheckBoxDoLog.setToolTipText( "If you are loading raw p values, you should check this box." );
-        jCheckBoxDoLog.setSelected( true );
-        jCheckBoxDoLog.setText( "Take the negative log of the gene scores" );
-
-        jCheckBoxBigIsBetter.setToolTipText( "If you are loading raw p values, you should UNcheck this box." );
-        jCheckBoxBigIsBetter.setSelected( false );
-        jCheckBoxBigIsBetter.setText( "Larger scores in your gene score file are better." );
-
-        jCheckBoxDoMultiFuncCorr = new JCheckBox();
-        jCheckBoxDoMultiFuncCorr.setSelected( true );
-        jCheckBoxDoMultiFuncCorr.setText( "Reduce the effect of multifunctional genes" );
-
-        // roc pane
-        rocPanel = new JPanel();
-        rocPanel.setPreferredSize( new Dimension( 335, 150 ) );
-        rocPanel.setBorder( new TitledBorder( "ROC" ) );
-
-        // oraPanel stuff//////////////////////////////////////////////////////////
-        oraPanel.setPreferredSize( new Dimension( 335, 150 ) );
-        oraTitledBorder = new TitledBorder( "ORA" );
-        oraPanel.setBorder( oraTitledBorder );
         jPanelAnalysisFrameMethods.setBorder( null );
-        jPanelAnalysisFrameMethods.setMinimumSize( new Dimension( 250, 37 ) );
-        jPanelAnalysisFrameMethods.setPreferredSize( new Dimension( 250, 45 ) );
-        jLabelAnalysisFrameMethod.setMaximumSize( new Dimension( 267, 18 ) );
-        jLabelAnalysisFrameMethod.setMinimumSize( new Dimension( 267, 18 ) );
+
         jLabelAnalysisFrameMethod.setToolTipText( "Determines how the gene scores are combined to make a class score." );
         jLabelAnalysisFrameMethod.setText( "Class Scoring Method" );
         jRadioButtonMedian.setText( "Median" );
@@ -369,107 +335,289 @@ public class AnalysisWizardStep5 extends WizardStep {
                 + "the class" );
         jRadioButtonMean.setSelected( true );
         jRadioButtonMean.setText( "Mean" );
+        ButtonGroup buttonGroup2 = new ButtonGroup();
         buttonGroup2.add( jRadioButtonMean );
         buttonGroup2.add( jRadioButtonMedian );
         jPanelAnalysisFrameMethods.add( jLabelAnalysisFrameMethod, null );
         jPanelAnalysisFrameMethods.add( jRadioButtonMean, null );
         jPanelAnalysisFrameMethods.add( jRadioButtonMedian, null );
-        step5Panel.add( step4TopPanel, null );
-        jPanel15.setMinimumSize( new Dimension( 180, 29 ) );
 
+        JPanel resamplingSettingsPanel = createResamplingSettingsPanel();
+
+        final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
+        final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
+        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+        GroupLayout gl = new GroupLayout( resampPanel );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        resampPanel.setLayout( gl );
+        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanelAnalysisFrameMethods )
+                .addComponent( resamplingSettingsPanel ).addComponent( mfCheckBox ) );
+
+        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanelAnalysisFrameMethods )
+                .addComponent( resamplingSettingsPanel ).addComponent( mfCheckBox ) );
+
+    }
+
+    /**
+     * @return a panel with a field for "number of iterations".
+     */
+    private JPanel createNumIterationsPanel() {
+        JPanel numIterationsPanel;
+        numIterationsPanel = new JPanel();
+
+        // we reuse this for resampling.
+        assert numIterationsPanel != null;
+        numIterationsPanel.setBorder( null );
+        final JTextField jTextFieldIterations = new JTextField();
+        JLabel numIterationsLabel = new JLabel();
+        numIterationsLabel.setLabelFor( jTextFieldIterations );
+        numIterationsLabel.setText( "Maximum iterations to run" );
+
+        jTextFieldIterations.setHorizontalAlignment( SwingConstants.RIGHT );
+        jTextFieldIterations.setToolTipText( "Maximum number of iterations run per gene set size." );
+        jTextFieldIterations.setPreferredSize( new Dimension( 100, 19 ) );
+        jTextFieldIterations.setEditable( true );
+
+        GroupLayout gl = new GroupLayout( numIterationsPanel );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        numIterationsPanel.setLayout( gl );
+        gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( numIterationsLabel )
+                .addComponent( jTextFieldIterations ) );
+
+        gl.setVerticalGroup( gl.createParallelGroup().addComponent( numIterationsLabel )
+                .addComponent( jTextFieldIterations ) );
+
+        jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
+
+        jTextFieldIterations.addKeyListener( new KeyAdapter() {
+            @Override
+            public void keyReleased( KeyEvent e ) {
+                try {
+                    numIterations = Integer.valueOf( jTextFieldIterations.getText() ).intValue();
+                } catch ( NumberFormatException e1 ) {
+                    //
+                }
+            }
+        } );
+
+        return numIterationsPanel;
+    }
+
+    /**
+     */
+    private void createORASettingsPanel() {
+        JPanel jPanel15 = new JPanel();
+        oraPanel = new JPanel();
+        oraPanel.setBorder( new TitledBorder( "ORA" ) );
+        final JTextField geneScoreThresholdTextField = new JTextField();
         // stuff to set gene score threshold.
+        JLabel jLabel6 = new JLabel();
         jLabel6.setLabelFor( geneScoreThresholdTextField );
         jLabel6.setText( "Gene score threshold" );
         geneScoreThresholdTextField.setEditable( true );
-        geneScoreThresholdTextField.setPreferredSize( new Dimension( 150, 19 ) );
         geneScoreThresholdTextField.setToolTipText( "Score Threshold used for Over-Representation analysis" );
         geneScoreThresholdTextField.setText( "0.001" ); // default (assume it's p-value like).
         geneScoreThresholdTextField.setHorizontalAlignment( SwingConstants.RIGHT );
+        geneScoreThresholdTextField.setText( String.valueOf( settings.getGeneScoreThreshold() ) );
+
         jPanel15.add( jLabel6, null );
         jPanel15.add( geneScoreThresholdTextField, null );
-        oraPanel.add( jPanel15, null );
+
+        final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
+        final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
+        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+        GroupLayout gl = new GroupLayout( oraPanel );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        oraPanel.setLayout( gl );
+        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanel15 ).addComponent( mfCheckBox ) );
+
+        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanel15 ).addComponent( mfCheckBox ) );
 
         geneScoreThresholdTextField.addKeyListener( new KeyAdapter() {
             @Override
             public void keyReleased( KeyEvent e ) {
+                String threshText = geneScoreThresholdTextField.getText();
+                oraThreshold = Double.valueOf( threshText ).doubleValue();
                 checkOraThresholdEffects();
             }
 
         } );
+    }
 
-        // resampPanel stuff///////////////////////////////////////////////////////
-        resampPanel.setPreferredSize( new Dimension( 380, 250 ) );
-        resampPanel.add( jPanelAnalysisFrameMethods, null );
-        resampTitledBorder = new TitledBorder( "Resampling" );
-        resampPanel.setBorder( resampTitledBorder );
+    /**
+     * Precision-recall stuff
+     */
+    private void createPRSettingsPanel() {
+        prPanel = new JPanel();
+        prPanel.setBorder( new TitledBorder( "Precision-recall" ) );
 
-        subPanel = new JPanel();
+        JPanel numIterationsPanel = createNumIterationsPanel();
+        GroupLayout gl = new GroupLayout( prPanel );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        prPanel.setLayout( gl );
+
+        final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
+        final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
+        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+
+        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( numIterationsPanel ).addComponent( mfCheckBox ) );
+
+        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( numIterationsPanel ).addComponent( mfCheckBox ) );
+
+    }
+
+    /**
+     * 
+     */
+    private JPanel createResamplingSettingsPanel() {
+
+        JPanel subPanel = new JPanel();
         subPanel.setLayout( new BorderLayout() );
 
-        numIterationsPanel.setBorder( null );
-        numIterationsLabel.setMaximumSize( new Dimension( 100, 15 ) );
-        numIterationsLabel.setLabelFor( jTextFieldIterations );
-        numIterationsLabel.setText( "Maximum iterations to run" );
-        jTextFieldIterations.setHorizontalAlignment( SwingConstants.RIGHT );
-        jTextFieldIterations.setText( "10000" );
-        jTextFieldIterations.setToolTipText( "Maximum number of iterations run per gene set size." );
-        jTextFieldIterations.setPreferredSize( new Dimension( 100, 19 ) );
-        jTextFieldIterations.setEditable( true );
-        numIterationsPanel.add( numIterationsLabel, null );
-        numIterationsPanel.add( jTextFieldIterations, null );
+        JPanel useResamplingPanel = new JPanel();
+        final JCheckBox jCheckBoxUseEmpirical = new JCheckBox();
+        jCheckBoxUseEmpirical.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent arg0 ) {
+                doFullEmpirical = jCheckBoxUseEmpirical.isSelected();
+            }
+        } );
 
-        useResamplingPanel = new JPanel();
-        jCheckBoxUseEmpirical = new JCheckBox();
         JLabel useResamplingLabel = new JLabel();
         useResamplingLabel.setLabelFor( jCheckBoxUseEmpirical );
-        jCheckBoxUseEmpirical.setSelected( false );
+
+        doFullEmpirical = settings.getAlwaysUseEmpirical();
+        jCheckBoxUseEmpirical.setSelected( doFullEmpirical );
+
         jCheckBoxUseEmpirical.setHorizontalAlignment( SwingConstants.RIGHT );
         useResamplingLabel.setText( "Always use full resampling (slower)" );
         jCheckBoxUseEmpirical.setToolTipText( "If this box is unchecked, " + "some approximations are used which can"
                 + " dramatically speed up the resampling," + " at a possible risk of reduced accuracy" );
         useResamplingPanel.add( useResamplingLabel, null );
         useResamplingPanel.add( jCheckBoxUseEmpirical, null );
-        // subPanel.setPreferredSize( new java.awt.Dimension( 340, 80 ) );
 
-        subPanel.add( numIterationsPanel, BorderLayout.NORTH );
+        subPanel.add( createNumIterationsPanel(), BorderLayout.NORTH );
         subPanel.add( useResamplingPanel, BorderLayout.SOUTH );
 
-        // corrPanel stuff/////////////////////////////////////////////////////////
-        corrPanel.setPreferredSize( new java.awt.Dimension( 380, 150 ) );
-        corrTitledBorder = new TitledBorder( "Correlation" );
-        corrPanel.setBorder( corrTitledBorder );
-        corrMetricPanel.setPreferredSize( new Dimension( 150, 50 ) );
-        corrMetricPanel.setMinimumSize( new Dimension( 150, 37 ) );
-        corrMetricPanel.setBorder( null );
-        corrMetricPanel.setBackground( SystemColor.control );
-        corrMetricPanel.setBackground( SystemColor.control );
-        corrMetricPanel.setToolTipText( "metric tool tip." );
-        corrMetricLabel.setText( "Correlation Metric" );
-        corrMetricLabel.setToolTipText( "metric tool tip." );
-        corrMetricLabel.setMinimumSize( new Dimension( 167, 18 ) );
-        corrMetricLabel.setMaximumSize( new Dimension( 167, 18 ) );
-        corrRadioButton1.setText( "Metric 1" );
-        corrRadioButton1.setSelected( true );
-        corrRadioButton1.setBackground( SystemColor.control );
-        corrRadioButton1.setToolTipText( "metric 1 tool tip" );
-        corrRadioButton2.setText( "Metric 2" );
-        useResamplingPanel.setPreferredSize( new java.awt.Dimension( 330, 30 ) );
-        numIterationsPanel.setPreferredSize( new java.awt.Dimension( 234, 30 ) );
-        corrButtonGroup.add( corrRadioButton1 );
-        corrButtonGroup.add( corrRadioButton2 );
-        corrMetricPanel.add( corrMetricLabel, null );
-        corrMetricPanel.add( corrRadioButton1, null );
-        corrMetricPanel.add( corrRadioButton2, null );
-        // corrPanel.add(corrMetricPanel, null); // @todo disabled because there is no choice of metric.
+        // FIXME: use a better layout method.
 
-        this.addHelp( help );
-        help = "<html><b>Adjust settings specific for your analysis method.</b><br>";
+        return subPanel;
+    }
 
-        extraHelp = help
-                + "<p>Take special care to ensure the"
-                + " log transformation and 'larger scores are better' settings are correct. 'larger scores are better' refers to your "
-                + " original input file, and should be unchecked if your input is raw p-values.</p>";
+    /**
+     * 
+     */
+    private void createROCSettingsPanel() {
+        rocPanel = new JPanel();
+        rocPanel.setBorder( new TitledBorder( "ROC" ) );
 
-        this.addMain( step5Panel );
+        GroupLayout gl = new GroupLayout( rocPanel );
+        gl.setAutoCreateContainerGaps( true );
+        gl.setAutoCreateGaps( true );
+        rocPanel.setLayout( gl );
+        final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
+        final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
+        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+        gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( mfCheckBox ) );
+
+        gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( mfCheckBox ) );
+
+    }
+
+    /**
+     * @return
+     */
+    private JCheckBox getBigIsBetterCheckBox() {
+        final JCheckBox jCheckBoxBigIsBetter = new JCheckBox();
+        jCheckBoxBigIsBetter.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                bigIsBetter = jCheckBoxBigIsBetter.isSelected();
+                checkOraThresholdEffects();
+            }
+        } );
+
+        jCheckBoxBigIsBetter.setToolTipText( "If you are loading raw p values, you should UNcheck this box." );
+        jCheckBoxBigIsBetter.setSelected( false );
+        jCheckBoxBigIsBetter.setText( "Larger scores in your gene score file are better." );
+
+        this.bigIsBetter = settings.getBigIsBetter();
+
+        jCheckBoxBigIsBetter.setSelected( this.bigIsBetter );
+
+        return jCheckBoxBigIsBetter;
+    }
+
+    /**
+     * @return
+     */
+    private JCheckBox getDoLogCheckBox() {
+        final JCheckBox jCheckBoxDoLog = new JCheckBox();
+        jCheckBoxDoLog.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                doLog = jCheckBoxDoLog.isSelected();
+                checkOraThresholdEffects();
+            }
+        } );
+
+        jCheckBoxDoLog.setBackground( SystemColor.control );
+        jCheckBoxDoLog.setToolTipText( "If you are loading raw p values, you should check this box." );
+        jCheckBoxDoLog.setSelected( true );
+        jCheckBoxDoLog.setText( "Take the negative log of the gene scores" );
+
+        this.doLog = settings.getDoLog();
+        jCheckBoxDoLog.setSelected( this.doLog );
+
+        return jCheckBoxDoLog;
+    }
+
+    private JCheckBox getMfCorrectionCheckBox() {
+        final JCheckBox jCheckBoxDoMultiFuncCorr = new JCheckBox();
+        jCheckBoxDoMultiFuncCorr.setSelected( true );
+        jCheckBoxDoMultiFuncCorr.setText( "Reduce the effect of multifunctional genes" );
+
+        jCheckBoxDoMultiFuncCorr.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent arg0 ) {
+                doMfCorr = jCheckBoxDoMultiFuncCorr.isSelected();
+            }
+        } );
+
+        if ( enableMultifunc ) {
+            jCheckBoxDoMultiFuncCorr.setEnabled( true );
+            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+        }
+
+        return jCheckBoxDoMultiFuncCorr;
+    }
+
+    private boolean scorePassesThreshold( double geneScore, double threshold ) {
+        return ( upperTail() && geneScore >= threshold ) || ( !upperTail() && geneScore <= threshold );
+    }
+
+    /**
+     * Setup
+     */
+    private void setValues() {
+
+        if ( settings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) ) {
+            jRadioButtonMean.setSelected( true );
+        } else {
+            jRadioButtonMedian.setSelected( true );
+        }
+
     }
 }

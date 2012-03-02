@@ -112,7 +112,7 @@ public class ClassScoreSimple {
     public void setClassScoreMethod( int val ) {
         switch ( val ) {
             case 0:
-                settings.setClassScoreMethod( SettingsHolder.Method.ORA );
+                settings.setClassScoreMethod( SettingsHolder.Method.ORA ); // could be precision-recall.
                 break;
             case 1:
                 settings.setClassScoreMethod( SettingsHolder.Method.GSR );
@@ -152,7 +152,7 @@ public class ClassScoreSimple {
     /**
      * Set the method to be used to summarize gene sets during resampling analysis. This is ignored otherwise.
      * 
-     * @param val Either ClassScoreSimple.MEAN or ClassScoreSimple.MEDIAN.
+     * @param val Either GeneScoreMethod.MEAN, MEDIAN, MEAN_ABOVE_QUANTILE or PRECISIONRECALL
      */
     public void setGeneScoreSummaryMethod( int val ) {
         switch ( val ) {
@@ -164,6 +164,9 @@ public class ClassScoreSimple {
                 break;
             case 2:
                 settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                break;
+            case 3:
+                settings.setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.PRECISIONRECALL );
                 break;
             default:
                 throw new IllegalArgumentException();

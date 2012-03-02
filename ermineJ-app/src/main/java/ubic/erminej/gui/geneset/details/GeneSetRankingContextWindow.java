@@ -64,6 +64,9 @@ public class GeneSetRankingContextWindow extends JFrame {
 
     private GeneSetTerm geneSetTerm;
 
+    /**
+     * @param gsd
+     */
     public GeneSetRankingContextWindow( GeneSetDetails gsd ) {
         super( "Context" );
 
@@ -73,7 +76,7 @@ public class GeneSetRankingContextWindow extends JFrame {
         this.geneScores = gsd.getSourceGeneScores();
 
         if ( this.geneScores == null ) {
-            // .... FIXME
+            throw new IllegalStateException( "You cannot create a gene set ranking without defining gene scores" );
         }
 
         this.geneSetTerm = gsd.getClassID();

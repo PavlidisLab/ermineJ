@@ -340,16 +340,26 @@ public class GeneSetTablePanel extends GeneSetPanel {
         String coda = new String();
         String mf = "";
 
+        boolean usingPrecisionRecall = runSettings.getGeneSetResamplingScoreMethod().equals(
+                SettingsHolder.GeneScoreMethod.PRECISIONRECALL );
+
         if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
             tooltip += "ORA Analysis<br>";
             int numAboveThresh = geneSetPvalRun.getNumAboveThreshold();
             coda += "Score threshold: " + runSettings.getGeneScoreThreshold();
             coda += ", Genes meeting: " + numAboveThresh + "<br/>";
             // note use of enrichment in this case.
-            mf = String.format( "Multifunct. bias (AUROC): %.2f<br>", geneSetPvalRun.getMultifunctionalityEnrichment() );
+            mf = String.format( "Multifunct. bias (AUROC): %.2f p = %.2g<br>",
+                    geneSetPvalRun.getMultifunctionalityEnrichment(),
+                    geneSetPvalRun.getMultifunctionalityEnrichmentPvalue() );
         } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
-            tooltip += "Resampling Analysis<br>";
-            coda += runSettings.getIterations() + " iterations<br>";
+
+            if ( usingPrecisionRecall ) {
+                tooltip += "Precision-recall analysis<br>";
+            } else {
+                tooltip += "Gene set score analysis<br>";
+            }
+            coda += runSettings.getIterations() + " resampling iterations<br>";
             coda += "Using score column: " + runSettings.getScoreCol();
             mf = String.format( "Multifunct. bias (corr): %.2f<br>", geneSetPvalRun.getMultifunctionalityCorrelation() );
         } else if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
@@ -371,16 +381,19 @@ public class GeneSetTablePanel extends GeneSetPanel {
             tooltip += "Multifunctionality corrected<br>";
         }
 
-        if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) )
+        if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) ) {
             tooltip += "Gene Rep Treatment: Mean <br>";
-        else if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) )
+        } else if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) ) {
             tooltip += "Gene Rep Treatment: Best <br>";
+        }
 
-        if ( runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
-            if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) )
+        if ( !usingPrecisionRecall && runSettings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) {
+            if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.MEAN ) ) {
                 tooltip += "Class Raw Score Method: Mean <br>";
-            else if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.QUANTILE ) )
+            } else if ( runSettings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.QUANTILE ) ) {
                 tooltip += "Class Raw Score Method: Median <br>";
+            }
+
         }
 
         if ( runSettings.getScoreFile() != null ) {
@@ -410,7 +423,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         } else if ( index == GENE_COUNT_COLUMN_INDEX ) {
             return "How many genes are in the group";
         } else if ( index == MULTIFUNC_COLUMN_INDEX ) {
-            return "Measurement of how biased the category is towards multifunctional genes";
+            return "Measurement of how biased the category is towards multifunctional genes (1 = highest bias)";
         } else if ( index >= GeneSetTableModel.INIT_COLUMNS ) {
             int runIndex = model.getRunIndex( index );
             return resultToolTips.get( runIndex );

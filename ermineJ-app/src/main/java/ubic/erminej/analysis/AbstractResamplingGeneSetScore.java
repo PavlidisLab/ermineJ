@@ -58,6 +58,10 @@ public abstract class AbstractResamplingGeneSetScore extends AbstractLongTask im
     protected int classMinSize = 2;
     protected Histogram hist = null;
 
+    public Histogram getHist() {
+        return hist;
+    }
+
     /**
      * @param value int
      */

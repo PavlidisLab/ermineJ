@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.gui.MainFrame;
@@ -47,12 +48,17 @@ public class AnalysisWizard extends Wizard {
     int step = 1;
     Method analysisType = Method.ORA;
 
+    // really only needed for precision-recall method.
+    GeneScoreMethod geneScoreMethod = GeneScoreMethod.MEAN;
+
     Settings settings;
 
     GeneAnnotations geneAnnots;
 
     AnalysisWizardStep1 step1;
+
     AnalysisWizardStep2 step2;
+
     // AnalysisWizardStep3 step3;
     AnalysisWizardStep3 step3;
     AnalysisWizardStep4 step4;
@@ -82,8 +88,7 @@ public class AnalysisWizard extends Wizard {
 
         // determine if the "finish" button should be disabled or not
         if ( ( settings.getRawDataFileName() == null || ( settings.getRawDataFileName() == null || settings
-                .getRawDataFileName().length() == 0 )
-                && settings.getScoreFile().length() == 0 ) ) {
+                .getRawDataFileName().length() == 0 ) && settings.getScoreFile().length() == 0 ) ) {
             setFinishDisabled();
         } else {
             setFinishEnabled();
@@ -101,6 +106,10 @@ public class AnalysisWizard extends Wizard {
         return geneAnnots;
     }
 
+    public GeneScoreMethod getGeneScoreMethod() {
+        return geneScoreMethod;
+    }
+
     public Settings getSettings() {
         return settings;
     }
@@ -113,23 +122,8 @@ public class AnalysisWizard extends Wizard {
         this.checkNumSteps();
     }
 
-    /**
-     * 
-     */
-    private void checkIfReady() {
-        if ( step2.isReady() ) {
-            finishButton.setEnabled( true );
-        } else {
-            finishButton.setEnabled( false );
-        }
-    }
-
-    private void checkNumSteps() {
-        if ( step == 1 ) {
-            this.setTitle( "Create New Analysis - Step 1 of " + maxSteps );
-            step1.revalidate();
-            this.repaint();
-        }
+    public void setGeneScoreMethod( GeneScoreMethod geneScoreMethod ) {
+        this.geneScoreMethod = geneScoreMethod;
     }
 
     @Override
@@ -209,6 +203,7 @@ public class AnalysisWizard extends Wizard {
             step = 2;
             step1.saveValues();
             this.analysisType = settings.getClassScoreMethod();
+            this.geneScoreMethod = settings.getGeneSetResamplingScoreMethod();
             checkNumSteps();
             checkIfReady();
             this.getContentPane().remove( step1 );
@@ -240,7 +235,7 @@ public class AnalysisWizard extends Wizard {
         } else if ( step == 4 ) {
             step = 5;
             this.getContentPane().remove( step4 );
-            step5.addVarPanel( analysisType );
+            step5.addVarPanel( analysisType, geneScoreMethod );
             checkIfReady();
             this.setTitle( "Create New Analysis - Step 5 of " + maxSteps );
             this.getContentPane().add( step5 );
@@ -256,6 +251,25 @@ public class AnalysisWizard extends Wizard {
         step3.saveValues();
         step4.saveValues();
         step5.saveValues();
+    }
+
+    /**
+     * 
+     */
+    private void checkIfReady() {
+        if ( step2.isReady() ) {
+            finishButton.setEnabled( true );
+        } else {
+            finishButton.setEnabled( false );
+        }
+    }
+
+    private void checkNumSteps() {
+        if ( step == 1 ) {
+            this.setTitle( "Create New Analysis - Step 1 of " + maxSteps );
+            step1.revalidate();
+            this.repaint();
+        }
     }
 
 }

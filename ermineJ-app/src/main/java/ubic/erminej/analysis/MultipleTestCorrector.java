@@ -45,7 +45,6 @@ import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.Histogram;
 
 /**
  * Perform multiple test correction on class scores. Multiple test correction is based on the non-redundant set of gene
@@ -59,7 +58,6 @@ public class MultipleTestCorrector extends AbstractLongTask {
     protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
     private List<GeneSetTerm> sortedclasses;
     private Map<GeneSetTerm, GeneSetResult> results;
-    private Histogram hist;
     private GeneAnnotations geneData;
     private NumberFormat nf = NumberFormat.getInstance();
     private GeneScores geneScores;
@@ -71,18 +69,16 @@ public class MultipleTestCorrector extends AbstractLongTask {
     /**
      * @param set
      * @param sc
-     * @param h only used for Westfall-Young
      * @param geneData
      * @param geneScores - only used for Westfall-Young
      * @param results
      * @param messenger
      */
-    public MultipleTestCorrector( SettingsHolder set, List<GeneSetTerm> sc, Histogram h, GeneAnnotations geneData,
+    public MultipleTestCorrector( SettingsHolder set, List<GeneSetTerm> sc, GeneAnnotations geneData,
             GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results, StatusViewer messenger ) {
         this.settings = set;
         this.sortedclasses = sc;
         this.results = results;
-        this.hist = h;
         this.geneData = geneData;
         this.geneScores = geneScores;
         this.messenger = messenger;
@@ -221,7 +217,8 @@ public class MultipleTestCorrector extends AbstractLongTask {
         Collections.reverse( toUseForMTC ); // start from the worst class.
         Map<GeneSetTerm, Double> permscores;
 
-        GeneSetResamplingPvalGenerator cver = new GeneSetResamplingPvalGenerator( settings, geneData, hist, messenger );
+        ExperimentScoreQuickPvalGenerator cver = new ExperimentScoreQuickPvalGenerator( settings, geneData,
+                geneScores.getGeneToScoreMap(), messenger );
 
         for ( int i = 0; i < trials; i++ ) {
             // System.err.println("Trial: " + i );
@@ -231,7 +228,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
             Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToScoreMap( true );
 
             // / permscores contains a list of the p values for the shuffled data.
-            permscores = cver.classPvalGeneratorRaw( scgroup_pval_map ); // end of step 1.
+            permscores = cver.classPvalGeneratorRaw(); // end of step 1.
 
             int j = 0;
             double permp = 0.0;

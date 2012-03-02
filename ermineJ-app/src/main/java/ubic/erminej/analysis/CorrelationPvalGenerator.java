@@ -66,8 +66,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param hist
      */
     public CorrelationPvalGenerator( SettingsHolder settings, GeneAnnotations geneAnnots,
-            DoubleMatrix<Probe, String> rawData, Histogram hist ) {
-        super( settings, geneAnnots );
+            DoubleMatrix<Probe, String> rawData, Histogram hist, StatusViewer messenger ) {
+        super( settings, geneAnnots, null, messenger );
 
         this.geneAnnots = geneAnnots;
         this.data = rawData;
@@ -184,7 +184,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @param messenger
      */
-    public Map<GeneSetTerm, GeneSetResult> classPvalGenerator( StatusViewer messenger ) {
+    public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
 
         int count = 0;
@@ -202,8 +202,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                 results.put( geneSetName, res );
             }
             count++;
-            if ( messenger != null && count % 100 == 0 ) {
-                messenger.showStatus( count + " gene sets analyzed" );
+            if ( count % 100 == 0 ) {
+                getMessenger().showStatus( count + " gene sets analyzed" );
             }
         }
 

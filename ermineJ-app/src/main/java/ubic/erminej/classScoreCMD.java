@@ -225,8 +225,10 @@ public class classScoreCMD {
                         "Method for computing raw class statistics (used for GSR/resampling only): "
                                 + SettingsHolder.GeneScoreMethod.MEAN + " (mean),  "
                                 + SettingsHolder.GeneScoreMethod.QUANTILE + " (quantile), or  "
-                                + SettingsHolder.GeneScoreMethod.MEAN + " (mean above quantile)." )
-                .withLongOpt( "stats" ).withArgName( "value" ).create( 'm' ) );
+                                + SettingsHolder.GeneScoreMethod.MEAN + " (mean above quantile), or "
+                                + SettingsHolder.GeneScoreMethod.PRECISIONRECALL
+                                + " (area under the precision-recall curve)" ).withLongOpt( "stats" )
+                .withArgName( "value" ).create( 'm' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
@@ -496,7 +498,7 @@ public class classScoreCMD {
                             throw new IllegalArgumentException();
                     }
                     System.err
-                            .println( "Please consider switching to the new command line style for this option (MEAN, QUANTILE or MEAN_ABOVE_QUANTILE)" );
+                            .println( "Please consider switching to the new command line style for this option (MEAN, QUANTILE, MEAN_ABOVE_QUANTILE or PRECISIONRECALL)" );
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -504,7 +506,8 @@ public class classScoreCMD {
                 GeneScoreMethod opt = SettingsHolder.GeneScoreMethod.valueOf( arg );
                 settings.setGeneSetResamplingScoreMethod( opt );
             } catch ( Exception e ) {
-                System.err.println( "Raw score method must be set to MEAN, QUANTILE or MEAN_ABOVE_QUANTILE" );
+                System.err
+                        .println( "Raw score method must be set to MEAN, QUANTILE, MEAN_ABOVE_QUANTILE or PRECISIONRECALL" );
                 showHelp();
                 return false;
             }

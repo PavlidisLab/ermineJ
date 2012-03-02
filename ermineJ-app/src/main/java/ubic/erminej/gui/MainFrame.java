@@ -107,7 +107,7 @@ import ubic.erminej.gui.util.ScrollingTextAreaDialog;
 import ubic.erminej.gui.util.StatusJlabel;
 
 /**
- * The main ErmineJ application GUI Sframe.
+ * The main ErmineJ application GUI frame.
  * 
  * @author Homin K Lee
  * @author Paul Pavlidis
@@ -115,6 +115,8 @@ import ubic.erminej.gui.util.StatusJlabel;
  * @version $Id$
  */
 public class MainFrame extends JFrame {
+
+    private static final String LOGO_GIF = "/ubic/erminej/logoIcon64.gif";
 
     private final class ProjectFileFilter extends FileFilter {
         @Override
@@ -141,7 +143,7 @@ public class MainFrame extends JFrame {
 
     private static Log log = LogFactory.getLog( MainFrame.class.getName() );
 
-    private static final int START_HEIGHT = 630;
+    private static final int START_HEIGHT = 730;
 
     private static final int START_WIDTH = 830;
 
@@ -641,7 +643,7 @@ public class MainFrame extends JFrame {
 
         this.setDefaultCloseOperation( EXIT_ON_CLOSE );
 
-        this.setSize( new Dimension( 886, 450 ) );
+        this.setSize( new Dimension( 900, 600 ) );
 
         this.readPrefs();
 
@@ -649,7 +651,7 @@ public class MainFrame extends JFrame {
         this.setIconImage( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "logoIcon64.gif" ) )
                 .getImage() );
         this.getContentPane().setLayout( new BorderLayout() );
-        this.getContentPane().setPreferredSize( new Dimension( 1000, 600 ) );
+        this.getContentPane().setPreferredSize( new Dimension( 900, 600 ) );
 
         setupMenus();
         setupStatusBar();
@@ -679,7 +681,7 @@ public class MainFrame extends JFrame {
 
         ( ( CardLayout ) cards.getLayout() ).show( cards, START_CARD );
 
-        setIconImage( new ImageIcon( this.getClass().getResource( "/ubic/erminej/logoIcon64.gif" ) ).getImage() );
+        setIconImage( new ImageIcon( this.getClass().getResource( LOGO_GIF ) ).getImage() );
 
     }
 

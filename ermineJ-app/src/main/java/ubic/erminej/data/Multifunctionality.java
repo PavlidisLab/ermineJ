@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -34,10 +35,12 @@ import cern.colt.list.DoubleArrayList;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.math.Functions;
+import cern.jet.stat.Probability;
 
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.LeastSquaresFit;
+import ubic.basecode.math.ROC;
 import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
@@ -50,6 +53,12 @@ import ubic.basecode.util.StatusViewer;
  * @version $Id$
  */
 public class Multifunctionality {
+
+    /**
+     * Should we just use the plain old AU-ROC (which ignores the gene set size), or the pvalue for the AU-ROC (which
+     * needs to be scaled in an ad-hoc way to be reasonable)
+     */
+    private static final boolean USE_AUC_FOR_GENE_SET_MF = true;
 
     private static Log log = LogFactory.getLog( Multifunctionality.class );
 
@@ -74,6 +83,8 @@ public class Multifunctionality {
     private AtomicBoolean stale = new AtomicBoolean( true );
 
     private QuantileBin1D quantiles = null;
+
+    private Map<Gene, Double> rawGeneMultifunctionalityRanks;
 
     /**
      * Construct Multifunctionality information based on the state of the GO annotations -- this accounts only for the
@@ -112,6 +123,11 @@ public class Multifunctionality {
         LeastSquaresFit fit;
         if ( useRanks ) {
             DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
+
+            if ( scoreRanks == null ) {
+                throw new IllegalStateException( "Ranks were null" );
+            }
+
             scoreRanks.assign( Functions.div( scoreRanks.size() ) );
             fit = new LeastSquaresFit( mfs, scoreRanks );
         } else {
@@ -124,7 +140,7 @@ public class Multifunctionality {
             return geneToScoreMap;
         }
 
-        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+        DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();
 
@@ -175,6 +191,68 @@ public class Multifunctionality {
     }
 
     /**
+     * This is like correlationWithGeneMultifunctionality(List<Gene>), but without an order list to start with, and
+     * intended for cases where the number of genes is smaller than the total number of genes. We do this the same we we
+     * do for GO groups. Implementation of algorithm for computing AUC, described in Section 1 of the supplement to
+     * Gillis and Pavlidis; see {@link http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U}.
+     * 
+     * @param genesInSet
+     * @return the ROC AUC for the genes in the set compared to the multifunctionality ranking
+     * @see ROC.java in baseCode for a generic implementation
+     */
+    public double enrichmentForMultifunctionality( Collection<Gene> genesInSet ) {
+
+        double sumOfRanks = 0.0;
+        int inGroup = 0;
+        for ( Gene gene : genesInSet ) {
+            if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
+                inGroup++;
+            }
+        }
+
+        int outGroup = genesWithGoTerms.size() - inGroup;
+
+        if ( outGroup <= 0 ) return 0.0;
+
+        double t1 = inGroup * ( inGroup + 1.0 ) / 2.0;
+        double t2 = inGroup * outGroup;
+
+        for ( Gene gene : genesInSet ) {
+            if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
+                double rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
+                sumOfRanks += rank;
+            }
+        }
+
+        double t3 = sumOfRanks - t1;
+
+        double auc = Math.max( 0.0, 1.0 - t3 / t2 );
+
+        assert auc >= 0.0 && auc <= 1.0 : "AUC was " + auc;
+
+        return auc;
+    }
+
+    /**
+     * @param genesInSet
+     * @return The pvalue associated with the ROC AUC for the genes in the set compared to the multifunctionality
+     *         ranking, based on the Mann-Whitney U test / Wilcoxon
+     */
+    public double enrichmentForMultifunctionalityPvalue( Collection<Gene> genesInSet ) {
+
+        List<Double> ranksOfGeneInSet = new Vector<Double>();
+
+        for ( Gene gene : genesInSet ) {
+            if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
+                double rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
+                ranksOfGeneInSet.add( rank );
+            }
+        }
+
+        return ROC.rocpval( genesWithGoTerms.size(), ranksOfGeneInSet );
+    }
+
+    /**
      * Get QuantileBin1D, which can tell you the quantile for a given value, or the expected value for a given quantile.
      * 
      * @return
@@ -194,10 +272,11 @@ public class Multifunctionality {
 
     /**
      * @param goId
-     * @return the computed multifunctionality score for the GO term. This is the area under the ROC curve for the genes
-     *         in the group, in the ranking of all genes for multifunctionality. Higher values indicate higher
-     *         multifunctionality. 0.5 is the expected value under the null; values much less than 0.5 indicate
-     *         "monofunctionality" (relatively speaking).
+     * @return the computed multifunctionality score for the GO term.
+     *         <p>
+     *         This is computed from the area under the ROC curve for the genes in the group, in the ranking of all
+     *         genes for multifunctionality. The exact method for computing this is defined by
+     *         computeGoTermMultifunctionalityRanks
      */
     public double getGOTermMultifunctionality( GeneSetTerm goId ) {
         if ( stale.get() ) init();
@@ -297,17 +376,26 @@ public class Multifunctionality {
     }
 
     /**
-     * Implementation of algorithm for computing AUC, described in Section 1 of the supplement to Gillis and Pavlidis;
-     * see {@link http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U}.
+     * 
      */
     private void computeGoTermMultifunctionalityRanks() {
+
+        /*
+         * This value is picked to be small enough to give us a spread of values that go above this...
+         */
+        double minPvalue = 1e-100;
+        double maxProbit = Math.abs( Probability.normalInverse( minPvalue ) );
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
         int numGenes = genesWithGoTerms.size();
         int numGoGroups = geneAnnots.getGeneSetTerms().size();
+
         /*
          * For each go term, compute it's AUC w.r.t. the multifunctionality ranking.. We work with the
          * multifunctionality ranks, rawGeneMultifunctionalityRanks
          */
-
         for ( GeneSetTerm goset : geneAnnots.getGeneSetTerms() ) {
 
             if ( !goGroupSizes.containsKey( goset ) ) {
@@ -315,8 +403,8 @@ public class Multifunctionality {
                 continue;
             }
 
-            Set<Gene> genes = geneAnnots.getGeneSetGenes( goset );
-            int inGroup = genes.size();
+            Set<Gene> genesInSet = geneAnnots.getGeneSetGenes( goset );
+            int inGroup = genesInSet.size();
             int outGroup = numGenes - inGroup;
 
             assert inGroup >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE;
@@ -326,11 +414,38 @@ public class Multifunctionality {
                 continue;
             }
 
-            double auc = enrichmentForMultifunctionality( genes );
+            double mfScore = 0.0;
+            if ( USE_AUC_FOR_GENE_SET_MF ) {
+                /*
+                 * This method doesn't take into account the size of the gene set, but it _does_ reflect how high the
+                 * genes are ranked.
+                 */
+                double auc = enrichmentForMultifunctionality( genesInSet );
+                mfScore = auc;
+            } else {
+                /*
+                 * Note that this is really rather difficult to "get right". Large groups very easily get good p-values.
+                 */
+                double aucp = enrichmentForMultifunctionalityPvalue( genesInSet );
+                assert aucp >= 0.0 && aucp <= 1.0;
 
-            // assert auc > 0 : "AUC was " + auc + " for " + goset; // this can happen in toy tests.
+                double probit = 1.0;
+                if ( aucp == 1.0 ) {
+                    probit = 0.0;
+                } else if ( aucp > minPvalue ) {
+                    probit = Math.abs( Probability.normalInverse( aucp ) ) / maxProbit;
+                }
 
-            goTermMultifunctionality.put( goset, auc );
+                if ( log.isDebugEnabled() ) log.debug( String.format( "%.3f\t%.2g", probit, aucp ) );
+
+                mfScore = probit;
+            }
+
+            goTermMultifunctionality.put( goset, mfScore );
+        }
+
+        if ( timer.getTime() > 1000 ) {
+            log.info( "Multifunctionality enrichment of GO groups computed in " + timer.getTime() + "ms" );
         }
 
         // convert to relative ranks, where 1.0 is the most multifunctional; ties are broken by averaging.
@@ -390,9 +505,11 @@ public class Multifunctionality {
             }
 
             rawGeneMultifunctionalityRanks = Rank.rankTransform( this.geneMultifunctionality, true );
+            assert numGenes == rawGeneMultifunctionalityRanks.size();
             for ( Gene gene : rawGeneMultifunctionalityRanks.keySet() ) {
                 // 1-base the rank before calculating ratio
                 double geneMultifunctionalityRankRatio = ( rawGeneMultifunctionalityRanks.get( gene ) + 1 ) / numGenes;
+                assert geneMultifunctionalityRankRatio >= 0.0 && geneMultifunctionalityRankRatio <= 1.0;
                 this.geneMultifunctionalityRank.put( gene, Math.max( 0.0, 1.0 - geneMultifunctionalityRankRatio ) );
             }
 
@@ -406,44 +523,4 @@ public class Multifunctionality {
         }
     }
 
-    Map<Gene, Double> rawGeneMultifunctionalityRanks;
-
-    /**
-     * This is like correlationWithGeneMultifunctionality(List<Gene>), but without an order list to start with, and
-     * intended for cases where the number of genes is smaller than the total number of genes. We do this the same we we
-     * do for GO groups.
-     * 
-     * @param keptGenes
-     */
-    public double enrichmentForMultifunctionality( Collection<Gene> genes ) {
-        double sumOfRanks = 0.0;
-        int inGroup = 0;
-        for ( Gene gene : genes ) {
-            if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
-                inGroup++;
-            }
-        }
-
-        int outGroup = genesWithGoTerms.size() - inGroup;
-
-        if ( outGroup <= 0 ) return 0.0;
-
-        double t1 = inGroup * ( inGroup + 1.0 ) / 2.0;
-        double t2 = inGroup * outGroup;
-
-        for ( Gene gene : genes ) {
-            if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
-                double rank = rawGeneMultifunctionalityRanks.get( gene ) + 1; // +1 cuz ranks are zero-based.
-                sumOfRanks += rank;
-            }
-        }
-
-        double t3 = sumOfRanks - t1;
-
-        double auc = Math.max( 0.0, 1.0 - t3 / t2 );
-
-        assert auc >= 0.0 && auc <= 1.0 : "AUC was " + auc;
-
-        return auc;
-    }
 }

@@ -41,7 +41,7 @@ import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 
 /**
- * TODO Document Me
+ * Assistance in getting gene annotation files.
  * 
  * @author paul
  * @version $Id$
@@ -66,19 +66,25 @@ public class AnnotationFileFetcher {
 
         AnnotationListFrame f = new AnnotationListFrame( i );
 
-        // parent.setEnabled( false );
-
         return f.getSelected();
     }
 
     /**
+     * Get the list of available annotations
+     * 
      * @return
      * @throws IOException
      */
     public List<ArrayDesignValueObject> fetchList() throws IOException {
 
         try {
-            URL toBeGotten = new URL( settingsHolder.getStringProperty( "annotation.file.list.rest.url" ) );
+            // defined in ermineJdefault.properties.
+            String url = settingsHolder.getStringProperty( "annotation.file.list.rest.url" );
+            if ( url == null ) {
+                log.warn( "There was no valid setting for the URL to fetch the annotation file list" );
+                throw new IOException( "There was no valid setting for the URL to fetch the annotation file list" );
+            }
+            URL toBeGotten = new URL( url );
             InputStream is = toBeGotten.openStream();
             JSONParser parser = new JSONParser( is );
             JSONValue v = parser.nextValue();
