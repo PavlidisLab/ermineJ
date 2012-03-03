@@ -26,8 +26,6 @@ import javax.swing.JTabbedPane;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -50,8 +48,6 @@ import ubic.erminej.gui.analysis.Plotting;
 
 /**
  * Show ROC and Precision-recall curves -- things that show the gene set in the context of the full ranking.
- * <p>
- * The QQ plot partly serves the same purpose, but these are standard visualizations.
  * 
  * @author paul
  * @version $Id$
@@ -90,62 +86,12 @@ public class GeneSetRankingContextWindow extends JFrame {
         String annotFileName = new File( geneData.getSettings().getAnnotFile() ).getName();
         String scoreFileName = new File( geneData.getSettings().getScoreFile() ).getName();
 
-        this.setTitle( "Context for" + geneSetTerm.getId() + "  | Annotations: "
+        this.setTitle( "Context for " + geneSetTerm.getId() + "  | Annotations: "
                 + StringUtils.abbreviate( annotFileName, 50 ) + " Scores: "
                 + StringUtils.abbreviate( scoreFileName, 50 ) );
 
         this.add( tabs );
     }
-
-    /**
-     * @return
-     */
-    private Component histograms() {
-
-        Double[] gs = geneScores.getGeneScores();
-
-        Double[] geneSetScores = geneScores.getGeneSetScores( this.geneSetTerm );
-
-        assert this.geneData != null;
-
-        if ( geneData.getSettings().getDoLog() ) {
-            /*
-             * de-log..
-             */
-            for ( int i = 0; i < gs.length; i++ ) {
-                gs[i] = Math.pow( 10, -gs[i] );
-            }
-            for ( int i = 0; i < geneSetScores.length; i++ ) {
-                geneSetScores[i] = Math.pow( 10, -geneSetScores[i] );
-            }
-        }
-
-        double min = DescriptiveWithMissing.min( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
-        double max = DescriptiveWithMissing.max( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
-
-        if ( geneData.getSettings().getBigIsBetter() ) {
-            /*
-             * reverse the order of the axis?
-             */
-            double om = min;
-            min = max;
-            max = om;
-        }
-
-        HistogramDataset series = new HistogramDataset();
-        series.setType( HistogramType.RELATIVE_FREQUENCY );
-        int numBins = 39;
-
-        series.addSeries( "Background", ArrayUtils.toPrimitive( gs ), numBins, min, max );
-        series.addSeries( "Gene set", ArrayUtils.toPrimitive( geneSetScores ), numBins, min, max );
-
-        JFreeChart histogram = ChartFactory.createHistogram( "Gene Score distributions", "Score", "Density", series,
-                PlotOrientation.VERTICAL, false, false, false );
-
-        return Plotting.plotHistogram( "Score distributions", histogram );
-    }
-
-    private static Log log = LogFactory.getLog( GeneSetRankingContextWindow.class );
 
     /**
      * @return
@@ -241,6 +187,54 @@ public class GeneSetRankingContextWindow extends JFrame {
         plot.setBackgroundPaint( Color.white );
         ChartPanel p = new ChartPanel( c );
         return p;
+    }
+
+    /**
+     * @return
+     */
+    private Component histograms() {
+
+        Double[] gs = geneScores.getGeneScores();
+
+        Double[] geneSetScores = geneScores.getGeneSetScores( this.geneSetTerm );
+
+        assert this.geneData != null;
+
+        if ( geneData.getSettings().getDoLog() ) {
+            /*
+             * de-log..
+             */
+            for ( int i = 0; i < gs.length; i++ ) {
+                gs[i] = Math.pow( 10, -gs[i] );
+            }
+            for ( int i = 0; i < geneSetScores.length; i++ ) {
+                geneSetScores[i] = Math.pow( 10, -geneSetScores[i] );
+            }
+        }
+
+        double min = DescriptiveWithMissing.min( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
+        double max = DescriptiveWithMissing.max( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
+
+        if ( geneData.getSettings().getBigIsBetter() ) {
+            /*
+             * reverse the order of the axis?
+             */
+            double om = min;
+            min = max;
+            max = om;
+        }
+
+        HistogramDataset series = new HistogramDataset();
+        series.setType( HistogramType.RELATIVE_FREQUENCY );
+        int numBins = 39;
+
+        series.addSeries( "Gene set", ArrayUtils.toPrimitive( geneSetScores ), numBins, min, max );
+        series.addSeries( "Background", ArrayUtils.toPrimitive( gs ), numBins, min, max );
+
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene Score distributions", "Score", "Density", series,
+                PlotOrientation.VERTICAL, false, false, false );
+
+        return Plotting.plotHistogram( "Score distributions", histogram );
     }
 
     /**

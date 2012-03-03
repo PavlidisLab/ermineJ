@@ -74,7 +74,8 @@ public class AnalysisWizardStep5 extends WizardStep {
     private String extraHelp;
     boolean enableMultifunc = true;
 
-    private int numIterations = 0;
+    // start with reasonable defaults.
+    private int numIterations = 10000;
 
     private boolean doFullEmpirical = false;
 
@@ -365,8 +366,7 @@ public class AnalysisWizardStep5 extends WizardStep {
      * @return a panel with a field for "number of iterations".
      */
     private JPanel createNumIterationsPanel() {
-        JPanel numIterationsPanel;
-        numIterationsPanel = new JPanel();
+        JPanel numIterationsPanel = new JPanel();
 
         // we reuse this for resampling.
         assert numIterationsPanel != null;
@@ -391,7 +391,10 @@ public class AnalysisWizardStep5 extends WizardStep {
         gl.setVerticalGroup( gl.createParallelGroup().addComponent( numIterationsLabel )
                 .addComponent( jTextFieldIterations ) );
 
-        jTextFieldIterations.setText( String.valueOf( settings.getIterations() ) );
+        int iterations = settings.getIterations();
+        if ( iterations > 0 ) {
+            jTextFieldIterations.setText( String.valueOf( iterations ) );
+        }
 
         jTextFieldIterations.addKeyListener( new KeyAdapter() {
             @Override

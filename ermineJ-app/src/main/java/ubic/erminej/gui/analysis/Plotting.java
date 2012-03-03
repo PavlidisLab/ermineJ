@@ -47,10 +47,10 @@ public class Plotting {
 
         XYBarRenderer renderer = ( XYBarRenderer ) plot.getRenderer();
         renderer.setBasePaint( Color.white );
-        renderer.setSeriesPaint( 0, Color.decode( "#AAAAAA" ) );
+        renderer.setSeriesPaint( 0, Color.decode( "#888888" ) );
 
         if ( histogram.getXYPlot().getSeriesCount() > 1 ) {
-            renderer.setSeriesPaint( 1, Color.RED );
+            renderer.setSeriesPaint( 1, Color.decode( "#BBBBBB" ) );
         }
 
         renderer.setBarPainter( new StandardXYBarPainter() );

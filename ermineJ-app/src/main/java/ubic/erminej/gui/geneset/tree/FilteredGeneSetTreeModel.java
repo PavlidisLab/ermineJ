@@ -62,11 +62,11 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
      */
     @Override
     public Object getChild( Object parent, int index ) {
-        Enumeration children = ( ( GeneSetTreeNode ) parent ).children();
+        Enumeration<GeneSetTreeNode> children = ( ( GeneSetTreeNode ) parent ).children();
 
         int i = 0;
         while ( children.hasMoreElements() ) {
-            GeneSetTreeNode node = ( GeneSetTreeNode ) children.nextElement();
+            GeneSetTreeNode node = children.nextElement();
             GeneSetTerm term = node.getTerm();
 
             if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {
@@ -100,13 +100,13 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
 
     @Override
     public int getChildCount( Object parent ) {
-        Enumeration children = ( ( GeneSetTreeNode ) parent ).children();
+        Enumeration<GeneSetTreeNode> children = ( ( GeneSetTreeNode ) parent ).children();
 
         // System.err.println( this.selectedTerms.size() );
 
         int i = 0;
         while ( children.hasMoreElements() ) {
-            GeneSetTreeNode node = ( GeneSetTreeNode ) children.nextElement();
+            GeneSetTreeNode node = children.nextElement();
             GeneSetTerm term = node.getTerm();
 
             if ( filterBySize && !term.isAspect() && annots.getGeneSetGenes( term ).size() == 0 ) {

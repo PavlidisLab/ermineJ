@@ -32,7 +32,8 @@ import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
 
 /**
- * Generates gene set p values using the resampling-based 'experiment score' method of Pavlidis et al. 2002
+ * Generates gene set p values using the resampling-based 'experiment score' method of Pavlidis et al. 2002, or by using
+ * precision-recall curves (which are also calibrated by using resampling).
  * 
  * @author Paul Pavlidis
  * @version $Id$
@@ -98,7 +99,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
 
         Collection<Gene> genesInSet = geneAnnots.getGeneSetGenes( geneSetName );
 
-        // store pvalues for items in the class.
+        // store p-values for items in the class.
         double[] groupPvalArr = new double[numGenesInSet];
 
         int v_size = 0;
