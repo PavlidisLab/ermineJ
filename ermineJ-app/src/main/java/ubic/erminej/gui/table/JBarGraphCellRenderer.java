@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -107,16 +108,17 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
             // bar graphF
             m_isBarGraph = true;
             m_values = ( List<Double> ) value;
-            this.setToolTipText( StringUtils.join( m_values, "," ) );
+            List<String> formatted = new Vector<String>();
+            for ( Double v : m_values ) {
+                formatted.add( String.format( "%.4g", v ) );
+            }
+            this.setToolTipText( StringUtils.join( formatted, "," ) );
             // setText( m_values.get( 1 ).toString() );
         } else if ( value instanceof Double ) {
             // just double value, no bar graph
             setText( value.toString() );
             setFont( table.getFont() );
         }
-
-        // revalidate();
-        // repaint();
 
         // Since the renderer is a component, return itself
         return this;
@@ -166,22 +168,6 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
             g.fillRect( x + 1 /* gap */, y, LINE_WIDTH, height );
         }
 
-    } // end paintComponent
-    //
-    // @Override
-    // public void validate() {
-    // }
-    //
-    // @Override
-    // public void revalidate() {
-    // }
-    //
-    // @Override
-    // public void repaint( long tm, int x, int y, int width, int height ) {
-    // }
-    //
-    // @Override
-    // public void repaint( Rectangle r ) {
-    // }
+    }
 
 }
