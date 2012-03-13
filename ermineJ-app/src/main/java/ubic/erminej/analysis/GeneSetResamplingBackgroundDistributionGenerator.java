@@ -108,7 +108,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
     /**
      * Basic method to calculate the raw score for a gene set, given an array of the gene scores for items in the class.
      * Note that speed here is important. In the prototypical GSR method, the score is the mean of the values for the
-     * gene.
+     * gene. For precision-recall, it is the average precision.
      * 
      * @param genevalues double[] raw scores for the items in the class.
      * @param genesInSet
@@ -195,7 +195,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
                 values.add( rawScore );
                 hist.update( geneSetSize, rawScore );
 
-                // check convergence. This doesn't apply to precision recall.
+                // check convergence. Not using this for precision-recall at the moment
                 if ( !usingPrecisionRecall && useNormalApprox && k > MIN_ITERATIONS_FOR_ESTIMATION
                         && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION && k > 0
                         && k % ( 4 * NORMAL_APPROX_SAMPLE_FREQUENCY ) == 0 ) { // less frequent checking.
@@ -299,7 +299,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
             }
         }
 
-        return PrecisionRecall.averagePrecision( geneRanks.size(), ranksOfPositives );
+        return PrecisionRecall.averagePrecision( ranksOfPositives );
 
     }
 
