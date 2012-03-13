@@ -20,6 +20,8 @@ package ubic.erminej.gui.util;
 
 import java.awt.Color;
 
+import ubic.erminej.data.GeneSetResult;
+
 /**
  * @author pavlidis
  * @version $Id$
@@ -65,5 +67,28 @@ public class Colors {
         if ( pvalCorr > 0.01 ) return Colors.LIGHTGREEN4;
         if ( pvalCorr > 0.001 ) return Colors.LIGHTGREEN3;
         return Colors.LIGHTGREEN2;
+    }
+
+    public static Color chooseColorForMultifunctionalityEffect( GeneSetResult value ) {
+
+        if ( value.getCorrectedPvalue() > 0.2 ) {
+            return Color.WHITE;
+        }
+
+        int step = value.getMultifunctionalityCorrectedRankDelta();
+
+        if ( step > 100 ) {
+            return Colors.LIGHTRED1;
+        }
+        if ( step > 20 ) {
+            return Colors.LIGHTRED3;
+        }
+        if ( step > 10 ) {
+            return Colors.LIGHTYELLOW;
+        }
+        if ( step > 0 ) {
+            return Colors.LIGHTGREEN2;
+        }
+        return Colors.LIGHTGREEN1;
     }
 }

@@ -19,15 +19,12 @@
 package ubic.erminej.analysis;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,7 +35,6 @@ import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.data.DataIOUtils;
-import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -60,15 +56,15 @@ public class GeneSetPvalRun {
     // analysis
 
     private Histogram hist;
+
     private Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
+
     private SettingsHolder settings;
 
     private StatusViewer messenger = new StatusStderr();
 
     private double multifunctionalityCorrelation = -1;
-
     private String name; // name of this run.
-
     private int numAboveThreshold = 0;
 
     private String geneScoreColumnName = "";
@@ -102,7 +98,7 @@ public class GeneSetPvalRun {
             } else {
                 geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, originalAnnots );
                 if ( StringUtils.isNotBlank( geneScores.getScoreColumnName() ) ) {
-                    setName( "Run on: " + geneScores.getScoreColumnName() );
+                    setName( "Run on " + geneScores.getScoreColumnName() );
                 }
                 this.geneData = geneScores.getPrunedGeneAnnotations();
             }
@@ -144,6 +140,9 @@ public class GeneSetPvalRun {
 
         Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
         this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
+        AbstractGeneSetPvalGenerator.populateRanks( results );
+
+        addMetaData();
     }
 
     /**
@@ -221,6 +220,46 @@ public class GeneSetPvalRun {
         return "GeneSetPvalRun [name=" + name + "]";
     }
 
+    /**
+     * @param runSettings
+     * @param newResults
+     */
+    private void addMetaData() {
+        if ( StringUtils.isNotBlank( settings.getStringProperty( "multifunctionalityCorrelation" ) ) ) {
+            try {
+                this.multifunctionalityCorrelation = Double.parseDouble( settings
+                        .getStringProperty( "multifunctionalityCorrelation" ) );
+
+            } catch ( NumberFormatException e ) {
+
+            }
+        }
+        if ( StringUtils.isNotBlank( settings.getStringProperty( "multifunctionalityEnrichment" ) ) ) {
+            try {
+                this.multifunctionalityEnrichment = Double.parseDouble( settings
+                        .getStringProperty( "multifunctionalityEnrichment" ) );
+
+            } catch ( NumberFormatException e ) {
+
+            }
+        }
+        if ( StringUtils.isNotBlank( settings.getStringProperty( "multifunctionalityEnrichmentPvalue" ) ) ) {
+            try {
+                this.multifunctionalityEnrichmentPvalue = Double.parseDouble( settings
+                        .getStringProperty( "multifunctionalityEnrichmentPvalue" ) );
+            } catch ( NumberFormatException e ) {
+
+            }
+        }
+        if ( StringUtils.isNotBlank( settings.getStringProperty( "numAboveThreshold" ) ) ) {
+            try {
+                this.numAboveThreshold = Integer.parseInt( settings.getStringProperty( "numAboveThreshold" ) );
+            } catch ( NumberFormatException e ) {
+
+            }
+        }
+    }
+
     /* private methods */
 
     private Set<Probe> getActiveProbes( DoubleMatrix<Probe, String> rawData, GeneScores geneScores ) {
@@ -246,45 +285,12 @@ public class GeneSetPvalRun {
     }
 
     /**
-     * @return Ranked list. Removes any sets which are not scored.
-     */
-    private List<GeneSetTerm> getSortedClasses() {
-        Comparator<GeneSetTerm> c = new Comparator<GeneSetTerm>() {
-            @Override
-            public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
-                return results.get( o1 ).compareTo( results.get( o2 ) );
-            }
-        };
-
-        TreeMap<GeneSetTerm, GeneSetResult> sorted = new TreeMap<GeneSetTerm, GeneSetResult>( c );
-        sorted.putAll( results );
-
-        assert sorted.size() == results.size();
-
-        List<GeneSetTerm> sortedSets = new ArrayList<GeneSetTerm>();
-        for ( GeneSetTerm r : sorted.keySet() ) {
-            if ( results.get( r ) instanceof EmptyGeneSetResult /* just checking... */) {
-                continue;
-            }
-            sortedSets.add( r );
-        }
-
-        return sortedSets;
-
-    }
-
-    /**
      * @param csc
      */
-    private void rankAndMultipleTestCorrect( GeneScores geneScores ) {
-        List<GeneSetTerm> sortedClasses = this.getSortedClasses();
-
-        assert sortedClasses.size() > 0;
+    private void multipleTestCorrect( GeneScores geneScores ) {
+        List<GeneSetTerm> sortedClasses = AbstractGeneSetPvalGenerator.getSortedClasses( results );
 
         messenger.showStatus( "Multiple test correction for " + sortedClasses.size() + " scored sets." );
-        for ( int i = 0; i < sortedClasses.size(); i++ ) {
-            results.get( sortedClasses.get( i ) ).setRank( i + 1 );
-        }
 
         MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, geneData, geneScores, results,
                 messenger );
@@ -326,12 +332,8 @@ public class GeneSetPvalRun {
 
                 Map<Gene, Double> geneToScoreMap;
                 geneScoreColumnName = geneScores.getScoreColumnName();
-                if ( settings.useMultifunctionalityCorrection() ) {
-                    geneToScoreMap = this.geneData.getMultifunctionality()
-                            .adjustScores( geneScores, false /* not ranks */);
-                } else {
-                    geneToScoreMap = geneScores.getGeneToScoreMap();
-                }
+
+                geneToScoreMap = geneScores.getGeneToScoreMap();
 
                 GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( settings, geneData,
                         geneToScoreMap, messenger );
@@ -387,11 +389,8 @@ public class GeneSetPvalRun {
             }
             case ROC: {
                 Map<Gene, Double> geneToScoreMap;
-                if ( settings.useMultifunctionalityCorrection() ) {
-                    geneToScoreMap = this.geneData.getMultifunctionality().adjustScores( geneScores, true );
-                } else {
-                    geneToScoreMap = geneScores.getGeneToScoreMap();
-                }
+
+                geneToScoreMap = geneScores.getGeneToScoreMap();
 
                 RocPvalGenerator rpg = new RocPvalGenerator( settings, geneData, geneToScoreMap, messenger );
 
@@ -413,7 +412,7 @@ public class GeneSetPvalRun {
             return;
         }
 
-        rankAndMultipleTestCorrect( geneScores );
+        multipleTestCorrect( geneScores );
 
         setMultifunctionalities( geneScores, genesAboveThreshold );
 

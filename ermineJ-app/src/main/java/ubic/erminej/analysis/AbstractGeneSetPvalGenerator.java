@@ -20,8 +20,10 @@ package ubic.erminej.analysis;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +32,7 @@ import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
@@ -48,7 +51,7 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
     protected static final int ALERT_UPDATE_FREQUENCY = 300;
 
-    private StatusViewer messenger = new StatusStderr();
+    protected StatusViewer messenger = new StatusStderr();
 
     protected SettingsHolder settings;
 
@@ -78,6 +81,11 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
         if ( messenger != null ) this.messenger = messenger;
     }
 
+    /**
+     * Compute the results for all the gene sets under consideration.
+     * 
+     * @return A map of GeneSetTerm to GeneSetResult.
+     */
     public abstract Map<GeneSetTerm, GeneSetResult> generateGeneSetResults();
 
     /**
@@ -204,6 +212,51 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
             targetRanks.add( rank + 1.0 ); // make ranks 1-based.
         }
         return targetRanks;
+    }
+
+    /**
+     * Fill in the ranks
+     * 
+     * @return sorted classes
+     */
+    protected static List<GeneSetTerm> populateRanks( final Map<GeneSetTerm, GeneSetResult> results ) {
+        List<GeneSetTerm> sortedClasses = getSortedClasses( results );
+
+        assert sortedClasses.size() > 0;
+        for ( int i = 0; i < sortedClasses.size(); i++ ) {
+            GeneSetResult geneSetResult = results.get( sortedClasses.get( i ) );
+            geneSetResult.setRank( i + 1 );
+            geneSetResult.setRelativeRank( ( double ) i / sortedClasses.size() );
+        }
+        return sortedClasses;
+    }
+
+    /**
+     * @return Ranked list. Removes any sets which are not scored.
+     */
+    protected static List<GeneSetTerm> getSortedClasses( final Map<GeneSetTerm, GeneSetResult> results ) {
+        Comparator<GeneSetTerm> c = new Comparator<GeneSetTerm>() {
+            @Override
+            public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
+                return results.get( o1 ).compareTo( results.get( o2 ) );
+            }
+        };
+
+        TreeMap<GeneSetTerm, GeneSetResult> sorted = new TreeMap<GeneSetTerm, GeneSetResult>( c );
+        sorted.putAll( results );
+
+        assert sorted.size() == results.size();
+
+        List<GeneSetTerm> sortedSets = new ArrayList<GeneSetTerm>();
+        for ( GeneSetTerm r : sorted.keySet() ) {
+            if ( results.get( r ) instanceof EmptyGeneSetResult /* just checking... */) {
+                continue;
+            }
+            sortedSets.add( r );
+        }
+
+        return sortedSets;
+
     }
 
 }

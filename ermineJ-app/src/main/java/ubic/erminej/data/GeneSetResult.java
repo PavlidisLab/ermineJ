@@ -30,17 +30,20 @@ import java.text.DecimalFormat;
  */
 public class GeneSetResult implements Comparable<GeneSetResult> {
 
-    GeneSetTerm geneSetTerm = null;
+    protected GeneSetTerm geneSetTerm = null;
 
-    String runName = "";
     private double pvalue = 1.0;
     private double score = 0.0;
     private int numGenes = 0;
     private double correctedPvalue = 1.0;
     private double multifunctionality = 0.5;
-    private int rank = Integer.MAX_VALUE;
+    private int rank = -12345;
+
+    private int multifunctionalityCorrectedRankDelta = -12345;
 
     private int numProbes = 0;
+
+    private double relativeRank = 1.0;
 
     public GeneSetResult() {
         this( null, 0, 0, 0.0, 1.0, 1.0 );
@@ -119,6 +122,10 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         return this.geneSetTerm;
     }
 
+    public int getMultifunctionalityCorrectedRankDelta() {
+        return multifunctionalityCorrectedRankDelta;
+    }
+
     /**
      * @return
      */
@@ -144,6 +151,10 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      */
     public int getRank() {
         return rank;
+    }
+
+    public double getRelativeRank() {
+        return relativeRank;
     }
 
     public double getScore() {
@@ -176,7 +187,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         out.write( "!\t" + geneSetTerm.getName() + "\t" + geneSetTerm.getId() + "\t" + numProbes + "\t" + numGenes
                 + "\t" + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) )
                 + "\t" + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
-                + "\t" + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
+                + "\t" + ( this.multifunctionalityCorrectedRankDelta ) + "\t"
+                + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
     }
 
     public void printHeadings( Writer out ) throws IOException {
@@ -190,8 +202,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      */
     public void printHeadings( Writer out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
-        out.write( "\tName\tID\tProbes\tNumGenes\tRawScore\tPval" + "\tCorrectedPvalue\tMultifuncBias" + extracolumns
-                + "\n" );
+        out.write( "\tName\tID\tProbes\tNumGenes\tRawScore\tPval"
+                + "\tCorrectedPvalue\tMultifuncSensitivity\tMultifuncBias" + extracolumns + "\n" );
     }
 
     public void setCorrectedPvalue( double a ) {
@@ -205,6 +217,16 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         this.multifunctionality = auc;
     }
 
+    /**
+     * Set how much this result changes in rank when multifunctionality correction is applied. Positive values mean a
+     * lot of change.
+     * 
+     * @param multifunctionalityCorrectedRankDelta
+     */
+    public void setMultifunctionalityCorrectedRankDelta( int multifunctionalityCorrectedRankDelta ) {
+        this.multifunctionalityCorrectedRankDelta = multifunctionalityCorrectedRankDelta;
+    }
+
     public void setPValue( double apvalue ) {
         pvalue = apvalue;
     }
@@ -216,6 +238,18 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      */
     public void setRank( int n ) {
         rank = n;
+    }
+
+    /**
+     * Where 0 is the best and 1 is the worst.
+     * 
+     * @param i
+     */
+    public void setRelativeRank( double i ) {
+        if ( i < 0.0 || i > 1.0 ) {
+            throw new IllegalArgumentException( "Relative rank must be in [0,1]" );
+        }
+        relativeRank = i;
     }
 
     public void setScore( double ascore ) {

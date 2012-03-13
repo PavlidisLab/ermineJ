@@ -131,10 +131,20 @@ public class ResultsPrinter {
             return;
         }
 
-        out.write( "# Start analysis run: " + resultRun.getName() + "\n" );
+        out.write( "# Start output of analysis run: " + resultRun.getName() + "\n" );
         // followed by settings.
         out.write( "# Settings\n" );
         Settings.writeAnalysisSettings( resultRun.getSettings(), out );
+
+        /*
+         * Add meta-information about the run. Treat it like a setting.
+         */
+        out.write( String.format( "multifunctionalityCorrelation=%.4f\n", resultRun.getMultifunctionalityCorrelation() ) );
+        out.write( String.format( "multifunctionalityEnrichment=%.4f\n", resultRun.getMultifunctionalityEnrichment() ) );
+        out.write( String.format( "multifunctionalityEnrichmentPvalue=%.4g\n",
+                resultRun.getMultifunctionalityEnrichmentPvalue() ) );
+        out.write( String.format( "numAboveThreshold=%d\n", resultRun.getNumAboveThreshold() ) );
+
         out.write( END_OF_SETTINGS_SEPARATOR + "\n" );
         out.write( RUN_NAME_FIELD_PATTERN + resultRun.getName() + "\n" );
 

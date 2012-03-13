@@ -53,6 +53,18 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#generateGeneSetResults()
      */
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
+        boolean useMultifunctionalityCorrection = settings.useMultifunctionalityCorrection();
+
+        Map<GeneSetTerm, GeneSetResult> results = generateGeneSetResults( useMultifunctionalityCorrection );
+
+        return results;
+    }
+
+    /**
+     * @param useMultifunctionalityCorrection
+     * @return
+     */
+    protected Map<GeneSetTerm, GeneSetResult> generateGeneSetResults( boolean useMultifunctionalityCorrection ) {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         int count = 0;
 
@@ -71,7 +83,23 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
                 }
             }
+        }
 
+        populateRanks( results );
+
+        if ( useMultifunctionalityCorrection ) {
+            Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
+                    false /* not ranks */);
+            RocPvalGenerator rpg = new RocPvalGenerator( settings, geneAnnots, adjustScores, messenger );
+            Map<GeneSetTerm, GeneSetResult> generateGeneSetResults = rpg.generateGeneSetResults( false );
+            populateRanks( generateGeneSetResults );
+
+            for ( GeneSetTerm t : results.keySet() ) {
+                GeneSetResult geneSetResult = results.get( t );
+                if ( generateGeneSetResults.get( t ) != null )
+                    geneSetResult.setMultifunctionalityCorrectedRankDelta( generateGeneSetResults.get( t ).getRank()
+                            - geneSetResult.getRank() );
+            }
         }
         return results;
     }

@@ -99,12 +99,11 @@ public class Multifunctionality {
     }
 
     /**
-     * @param geneScores
+     * @param geneToScoreMap
      * @param useRanks If true, the ranks of the gene scores will be used for regression.
      * @return
      */
-    public Map<Gene, Double> adjustScores( GeneScores geneScores, boolean useRanks ) {
-        Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
+    public Map<Gene, Double> adjustScores( Map<Gene, Double> geneToScoreMap, boolean useRanks ) {
 
         DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
         DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
@@ -140,6 +139,7 @@ public class Multifunctionality {
             return geneToScoreMap;
         }
 
+        // FIXME deal with missing values.
         DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();

@@ -56,12 +56,37 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         this.hist = generator.generateNullDistribution( messenger );
     }
 
+    /**
+     * Clone a generator; don't recompute the background.
+     * 
+     * @param toclone
+     * @param geneToScoreMap
+     */
+    public GeneSetResamplingPvalGenerator( GeneSetResamplingPvalGenerator toclone, Map<Gene, Double> geneToScoreMap ) {
+        super( toclone.settings, toclone.geneAnnots, geneToScoreMap, toclone.messenger );
+        this.generator = toclone.generator;
+        this.hist = toclone.hist;
+    }
+
     /*
      * (non-Javadoc)
      * 
      * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#classPvalGenerator()
      */
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
+
+        boolean useMultifunctionalityCorrection = settings.useMultifunctionalityCorrection();
+
+        Map<GeneSetTerm, GeneSetResult> results = generateGeneSetResults( useMultifunctionalityCorrection );
+
+        return results;
+    }
+
+    /**
+     * @param useMultifunctionalityCorrection
+     * @return
+     */
+    protected Map<GeneSetTerm, GeneSetResult> generateGeneSetResults( boolean useMultifunctionalityCorrection ) {
         Map<GeneSetTerm, GeneSetResult> results;
         results = new HashMap<GeneSetTerm, GeneSetResult>();
 
@@ -75,6 +100,25 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
                     getMessenger().showStatus( i + " gene sets analyzed" );
                 }
             }
+        }
+
+        populateRanks( results );
+
+        if ( useMultifunctionalityCorrection ) {
+            Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
+                    false /* not ranks */);
+            GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( this, adjustScores );
+
+            Map<GeneSetTerm, GeneSetResult> generateGeneSetResults = pvg.generateGeneSetResults( false );
+            populateRanks( generateGeneSetResults );
+
+            for ( GeneSetTerm t : results.keySet() ) {
+                GeneSetResult geneSetResult = results.get( t );
+                if ( generateGeneSetResults.get( t ) != null )
+                    geneSetResult.setMultifunctionalityCorrectedRankDelta( generateGeneSetResults.get( t ).getRank()
+                            - geneSetResult.getRank() );
+            }
+
         }
         return results;
     }

@@ -162,6 +162,11 @@ public class ResultsFileReader {
                 double correctedPval = Double.parseDouble( st.nextToken() );
 
                 GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval );
+
+                // we cannot easily recompute this.
+                int mfRankChange = Integer.parseInt( st.nextToken() );
+                c.setMultifunctionalityCorrectedRankDelta( mfRankChange );
+
                 results.put( term, c );
             } else if ( firstword.startsWith( ResultsPrinter.RUN_NAME_FIELD_PATTERN ) ) {
                 /*
@@ -197,8 +202,9 @@ public class ResultsFileReader {
         return newResults;
     }
 
+   
     /**
-     * Genreate Settings from the file, reading from the current point to the next 'end of settings' marker.
+     * Generate Settings from the file, reading from the current point to the next 'end of settings' marker.
      * 
      * @param r
      * @return

@@ -378,7 +378,7 @@ public class GeneScores {
         m.putAll( geneToScoreMap );
 
         assert m.size() == this.geneToScoreMap.size();
-        assert m.keySet().containsAll( this.geneToScoreMap.keySet() );
+        assert m.keySet().containsAll( this.geneToScoreMap.keySet() ); // !!
 
         return Collections.unmodifiableList( new ArrayList<Gene>( m.keySet() ) );
     }

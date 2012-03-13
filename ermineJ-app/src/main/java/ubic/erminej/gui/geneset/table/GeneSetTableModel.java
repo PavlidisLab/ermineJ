@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -120,7 +121,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     }
 
     public void addRun() {
-        addColumn( results.get( results.size() - 1 ).getName() + " Pval" );
+        addColumn( results.get( results.size() - 1 ).getName() );
     }
 
     public void setFilterEmpty( boolean b ) {
@@ -384,7 +385,12 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                 return;
             }
 
-            setToolTipText( "<html>Rank: " + res.getRank() + "<br>Score: " + nff.format( res.getScore() )
+            String mfString = "";
+            // if ( res.getMultifunctionalityCorrectedRank() > 0 ) {
+            mfString = " [MF corrected: " + ( res.getRank() + res.getMultifunctionalityCorrectedRankDelta() ) + "]";
+            // }
+
+            setToolTipText( "<html>Rank: " + res.getRank() + mfString + "<br>Score: " + nff.format( res.getScore() )
                     + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
                     + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
         } else {
@@ -447,6 +453,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             double pvalCorr = ( ( GeneSetResult ) value ).getCorrectedPvalue();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             setBackground( bgColor );
+
+            Color mfColor = Colors.chooseColorForMultifunctionalityEffect( ( GeneSetResult ) value );
+            this.setBorder( BorderFactory.createLineBorder( mfColor, 2 ) );
         }
     }
 

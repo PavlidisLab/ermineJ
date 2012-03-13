@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -79,7 +80,7 @@ public class AnalysisWizardStep5 extends WizardStep {
 
     private boolean doFullEmpirical = false;
 
-    private double oraThreshold = 0.001;
+    private AtomicReference<Double> oraThreshold = new AtomicReference<Double>( 0.001 );
 
     private boolean bigIsBetter = false;
 
@@ -163,7 +164,7 @@ public class AnalysisWizardStep5 extends WizardStep {
             }
         }
 
-        settings.setGeneScoreThreshold( oraThreshold );
+        settings.setGeneScoreThreshold( oraThreshold.get() );
         settings.setDoLog( doLog );
         settings.setBigIsBetter( bigIsBetter );
         settings.setAlwaysUseEmpirical( doFullEmpirical );
@@ -220,7 +221,7 @@ public class AnalysisWizardStep5 extends WizardStep {
 
                 try {
 
-                    double thresh = oraThreshold;
+                    double thresh = oraThreshold.get();
                     if ( doLog ) {
                         thresh = -Arithmetic.log10( thresh );
                     }
@@ -252,9 +253,10 @@ public class AnalysisWizardStep5 extends WizardStep {
                     } else {
                         double auc = w.getGeneAnnots().getMultifunctionality()
                                 .enrichmentForMultifunctionality( keptGenes );
-
+                        double p = w.getGeneAnnots().getMultifunctionality()
+                                .enrichmentForMultifunctionalityPvalue( keptGenes );
                         w.getStatusField().showStatus(
-                                String.format( " %d genes selected. MF bias (AUROC) = %.2f", n, auc ) );
+                                String.format( " %d genes selected. MF bias (AUROC) = %.2f, p = %.2g", n, auc, p ) );
 
                     }
 
@@ -423,10 +425,9 @@ public class AnalysisWizardStep5 extends WizardStep {
         jLabel6.setText( "Gene score threshold" );
         geneScoreThresholdTextField.setEditable( true );
         geneScoreThresholdTextField.setToolTipText( "Score Threshold used for Over-Representation analysis" );
-        geneScoreThresholdTextField.setText( "0.001" ); // default (assume it's p-value like).
         geneScoreThresholdTextField.setHorizontalAlignment( SwingConstants.RIGHT );
         geneScoreThresholdTextField.setText( String.valueOf( settings.getGeneScoreThreshold() ) );
-
+        oraThreshold.set( settings.getGeneScoreThreshold() );
         jPanel15.add( jLabel6, null );
         jPanel15.add( geneScoreThresholdTextField, null );
 
@@ -447,7 +448,7 @@ public class AnalysisWizardStep5 extends WizardStep {
             @Override
             public void keyReleased( KeyEvent e ) {
                 String threshText = geneScoreThresholdTextField.getText();
-                oraThreshold = Double.valueOf( threshText ).doubleValue();
+                oraThreshold.set( Double.valueOf( threshText ).doubleValue() );
                 checkOraThresholdEffects();
             }
 
@@ -590,7 +591,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     private JCheckBox getMfCorrectionCheckBox() {
         final JCheckBox jCheckBoxDoMultiFuncCorr = new JCheckBox();
         jCheckBoxDoMultiFuncCorr.setSelected( true );
-        jCheckBoxDoMultiFuncCorr.setText( "Reduce the effect of multifunctional genes" );
+        jCheckBoxDoMultiFuncCorr.setText( "Test the effect of multifunctional genes" );
 
         jCheckBoxDoMultiFuncCorr.addActionListener( new ActionListener() {
             @Override

@@ -1607,7 +1607,9 @@ public class MainFrame extends JFrame {
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         chooser.setApproveButtonText( "OK" );
         chooser.setDialogTitle( "Save Analysis As:" );
-        chooser.setSelectedFile( new File( getCurrentResultSet().getName() + ".erminej.txt" ) );
+        // suggest a file name.
+        chooser.setSelectedFile( new File( getCurrentResultSet().getName().replaceAll( "(\\s|:)+", "_" )
+                + ".erminej.txt" ) );
 
         int result = chooser.showOpenDialog( this );
 
