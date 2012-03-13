@@ -101,7 +101,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
                 }
             }
         }
-
+        if ( results.isEmpty() ) return results;
         populateRanks( results );
 
         if ( useMultifunctionalityCorrection ) {

@@ -206,6 +206,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                 getMessenger().showStatus( count + " gene sets analyzed" );
             }
         }
+        if ( results.isEmpty() ) return results;
         populateRanks( results );
 
         log.debug( "Tests: " + getTests() );

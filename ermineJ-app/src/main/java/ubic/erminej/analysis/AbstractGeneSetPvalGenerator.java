@@ -220,6 +220,7 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
      * @return sorted classes
      */
     protected static List<GeneSetTerm> populateRanks( final Map<GeneSetTerm, GeneSetResult> results ) {
+        if ( results.isEmpty() ) return new ArrayList<GeneSetTerm>();
         List<GeneSetTerm> sortedClasses = getSortedClasses( results );
 
         assert sortedClasses.size() > 0;

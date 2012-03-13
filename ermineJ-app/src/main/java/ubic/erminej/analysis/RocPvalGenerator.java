@@ -84,7 +84,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
                 }
             }
         }
-
+        if ( results.isEmpty() ) return results;
         populateRanks( results );
 
         if ( useMultifunctionalityCorrection ) {

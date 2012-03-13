@@ -330,6 +330,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 }
             }
         }
+
+        if ( results.isEmpty() ) return results;
+
         populateRanks( results );
         return results;
     }
