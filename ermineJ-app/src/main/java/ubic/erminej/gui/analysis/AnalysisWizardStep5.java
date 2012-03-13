@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.ButtonGroup;
@@ -76,7 +77,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     boolean enableMultifunc = true;
 
     // start with reasonable defaults.
-    private int numIterations = 10000;
+    private AtomicInteger numIterations = new AtomicInteger( 10000 );
 
     private boolean doFullEmpirical = false;
 
@@ -154,7 +155,7 @@ public class AnalysisWizardStep5 extends WizardStep {
      * Save the values to the configuration.
      */
     public void saveValues() {
-        settings.setIterations( numIterations );
+        settings.setIterations( numIterations.get() );
 
         if ( !settings.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL ) ) {
             if ( jRadioButtonMean.isSelected() ) {
@@ -402,7 +403,7 @@ public class AnalysisWizardStep5 extends WizardStep {
             @Override
             public void keyReleased( KeyEvent e ) {
                 try {
-                    numIterations = Integer.valueOf( jTextFieldIterations.getText() ).intValue();
+                    numIterations.set( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
                 } catch ( NumberFormatException e1 ) {
                     //
                 }

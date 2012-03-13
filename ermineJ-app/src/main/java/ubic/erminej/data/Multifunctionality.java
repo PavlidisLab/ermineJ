@@ -133,7 +133,7 @@ public class Multifunctionality {
             fit = new LeastSquaresFit( mfs, scores );
         }
 
-        log.info( fit.getCoefficients() );
+        // log.info( fit.getCoefficients() );
         if ( fit.getCoefficients().get( 1, 0 ) < 0 ) {
             messenger.showStatus( "Multifunctionality correction skipped: correlation is negative" );
             return geneToScoreMap;
