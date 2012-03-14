@@ -292,6 +292,7 @@
 					<dependencies>
 						<includes>
 							<include>baseCode:baseCode</include>
+							<include>gemma-mda:gemma-mda</include>
 							<include>colt:colt</include>
 							<include>commons-lang:commons-lang</include>
 							<include>commons-configuration:commons-configuration</include>
