@@ -1,5 +1,5 @@
 <!--
-	Configuration for maven assembly plugin for binary distribution. To use this, run "mvn package assembly:assembly -Dassemble-bin"
+	Configuration for maven assembly plugin for binary distribution. To use this, run "mvn package assembly:assembly -Dbin-assemble"
 	$Id$ 
 -->
 <assembly>
