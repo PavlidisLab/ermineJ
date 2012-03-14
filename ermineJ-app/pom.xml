@@ -211,6 +211,7 @@
 								<include name="jsontools-core.jar" />
 								<include name="jcommon.jar" />
 								<include name="mtj.jar" />
+								<include name="antlr.jar"
 								<include name="log4j.jar" />
 							</fileset>
 						</copy>
@@ -293,16 +294,17 @@
 							<include>commons-math:commons-math</include>
 							<include>commons-configuration:commons-configuration</include>
 							<include>commons-collections:commons-collections</include>
-							<include>mtj:mtj</include>
-							<include>javahelp:jh</include>
 							<include>commons-cli:commons-cli</include>
 							<include>commons-logging:commons-logging</include>
+							<include>mtj:mtj</include>
+							<include>javahelp:jh</include>
 							<include>opencsv:opencsv</include>
 							<include>xerces:xercesImpl</include>
 							<include>jfree:jfreechart</include>
 							<include>jfree:jcommon</include>
 							<include>log4j:log4j</include>
-							<include>com.sdicons.jsontools:jsontools-core</include>
+							<include>antlr:antlr</include>
+							<include>jsontools:jsontools-core</include>
 							<include>ermineJ:ermineJ-help</include>
 						</includes>
 					</dependencies>
