@@ -198,6 +198,7 @@
 								<include name="forehead.jar" />
 								<include name="baseCode.jar" />
 								<include name="gemma-mda.jar" />
+								<include name="gemma-util.jar" />
 								<include name="colt.jar" />
 								<include name="commons-lang.jar" />
 								<include name="commons-configuration.jar" />
@@ -275,7 +276,7 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>jnlp</goal>
+							<goal>jnlp-inline</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -285,29 +286,12 @@
 						<mainClass>ubic.erminej.ErmineJGui</mainClass>
 						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
 					</jnlp>
-					<!--	<dependencies>
-					 <includes>
-							<include>baseCode:baseCode</include>
-							<include>gemma:gemma-mda</include>
-							<include>colt:colt</include>
-							<include>commons-lang:commons-lang</include>
-							<include>commons-math:commons-math</include>
-							<include>commons-configuration:commons-configuration</include>
-							<include>commons-collections:commons-collections</include>
-							<include>commons-cli:commons-cli</include>
-							<include>commons-logging:commons-logging</include>
-							<include>mtj:mtj</include>
-							<include>javahelp:jh</include>
-							<include>opencsv:opencsv</include>
-							<include>xerces:xercesImpl</include>
-							<include>jfree:jfreechart</include>
-							<include>jfree:jcommon</include>
-							<include>log4j:log4j</include>
-							<include>antlr:antlr</include>
-							<include>jsontools:jsontools-core</include>
-							<include>ermineJ:ermineJ-help</include>
-						</includes>
-					</dependencies>-->
+					<!-- <dependencies> <includes> <include>baseCode:baseCode</include> <include>gemma:gemma-mda</include> <include>gemma:gemma-util</include> 
+						<include>colt:colt</include> <include>commons-lang:commons-lang</include> <include>commons-math:commons-math</include> <include>commons-configuration:commons-configuration</include> 
+						<include>commons-collections:commons-collections</include> <include>commons-cli:commons-cli</include> <include>commons-logging:commons-logging</include> 
+						<include>mtj:mtj</include> <include>javahelp:jh</include> <include>opencsv:opencsv</include> <include>xerces:xercesImpl</include> 
+						<include>jfree:jfreechart</include> <include>jfree:jcommon</include> <include>log4j:log4j</include> <include>antlr:antlr</include> 
+						<include>jsontools:jsontools-core</include> <include>ermineJ:ermineJ-help</include> </includes> </dependencies> -->
 					<sign>
 						<keypass>m2m2m2</keypass>
 						<storepass>m2m2m2</storepass>
@@ -328,7 +312,7 @@
 					<unsign>true</unsign>
 					<pack200>false</pack200>
 					<gzip>true</gzip>
-					<verbose>false</verbose>
+					<verbose>true</verbose>
 				</configuration>
 			</plugin>
 			<plugin>
