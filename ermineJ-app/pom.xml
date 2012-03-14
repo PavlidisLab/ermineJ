@@ -270,7 +270,7 @@
 				<!-- See http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html -->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>webstart-maven-plugin</artifactId>
-				<version>1.0-beta-4</version>
+				<version>1.0-beta-3</version>
 				<inherited>false</inherited>
 				<executions>
 					<execution>
