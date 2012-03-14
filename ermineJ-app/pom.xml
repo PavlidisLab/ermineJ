@@ -201,6 +201,7 @@
 								<include name="ermineJ-help.jar" />
 								<include name="forehead.jar" />
 								<include name="baseCode.jar" />
+								<include name="gemma-mda.jar" />
 								<include name="colt.jar" />
 								<include name="commons-lang.jar" />
 								<include name="commons-configuration.jar" />
@@ -211,6 +212,7 @@
 								<include name="opencsv.jar" />
 								<include name="xerces.jar" />
 								<include name="jfreechart.jar" />
+								<include name="jsontools-core.jar" />
 								<include name="jcommon.jar" />
 								<include name="mtj.jar" />
 								<include name="log4j.jar" />
@@ -284,7 +286,7 @@
 				<configuration>
 					<jnlp>
 						<outputFile>ermineJ.jnlp</outputFile>
-						<mainClass>ubic.erminej.classScoreGUI</mainClass>
+						<mainClass>ubic.erminej.ErmineJGui</mainClass>
 						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
 					</jnlp>
 					<dependencies>
@@ -302,6 +304,8 @@
 							<include>jfree:jfreechart</include>
 							<include>jfree:jcommon</include>
 							<include>log4j:log4j</include>
+							<include>gemma-mda</include>
+							<include>jsontools-core</include>
 							<include>ermineJ:ermineJ-help</include>
 						</includes>
 					</dependencies>
