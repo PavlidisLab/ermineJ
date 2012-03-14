@@ -189,14 +189,10 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<configuration>
 					<tasks>
-						<echo
-							message="Unpacking bundle ${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" />
-						<unzip
-							src="${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip"
-							dest="${project.build.directory}" />
+						<echo message="Unpacking bundle ${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" />
+						<unzip src="${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" dest="${project.build.directory}" />
 						<copy todir="${project.build.directory}/staging/lib">
-							<fileset
-								dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
+							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
 								<include name="ermineJ-app.jar" />
 								<include name="ermineJ-help.jar" />
 								<include name="forehead.jar" />
@@ -219,8 +215,7 @@
 							</fileset>
 						</copy>
 						<copy todir="${project.build.directory}/staging/bin">
-							<fileset
-								dir="${project.build.directory}/${project.artifactId}-${project.version}/bin">
+							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/bin">
 								<include name="**" />
 							</fileset>
 						</copy>
@@ -295,8 +290,10 @@
 							<include>gemma:gemma-mda</include>
 							<include>colt:colt</include>
 							<include>commons-lang:commons-lang</include>
+							<include>commons-math:commons-math</include>
 							<include>commons-configuration:commons-configuration</include>
 							<include>commons-collections:commons-collections</include>
+							<include>mtj:mtj</include>
 							<include>javahelp:jh</include>
 							<include>commons-cli:commons-cli</include>
 							<include>commons-logging:commons-logging</include>
