@@ -211,7 +211,7 @@
 								<include name="jsontools-core.jar" />
 								<include name="jcommon.jar" />
 								<include name="mtj.jar" />
-								<include name="antlr.jar"
+								<include name="antlr.jar" />
 								<include name="log4j.jar" />
 							</fileset>
 						</copy>
