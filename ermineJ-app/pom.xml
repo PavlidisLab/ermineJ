@@ -268,9 +268,9 @@
 			</plugin>
 			<plugin>
 				<!-- See http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html -->
-				<groupId>org.codehaus.mojo.webstart</groupId>
+				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>webstart-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
+				<version>1.0-beta-4</version>
 				<inherited>false</inherited>
 				<executions>
 					<execution>
@@ -285,8 +285,8 @@
 						<mainClass>ubic.erminej.ErmineJGui</mainClass>
 						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
 					</jnlp>
-					<dependencies>
-						<includes>
+					<!--	<dependencies>
+					 <includes>
 							<include>baseCode:baseCode</include>
 							<include>gemma:gemma-mda</include>
 							<include>colt:colt</include>
@@ -307,7 +307,7 @@
 							<include>jsontools:jsontools-core</include>
 							<include>ermineJ:ermineJ-help</include>
 						</includes>
-					</dependencies>
+					</dependencies>-->
 					<sign>
 						<keypass>m2m2m2</keypass>
 						<storepass>m2m2m2</storepass>
