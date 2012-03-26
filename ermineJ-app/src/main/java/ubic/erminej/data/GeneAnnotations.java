@@ -333,6 +333,10 @@ public class GeneAnnotations {
         // }
         // }
 
+        if ( gs.isEmpty() ) {
+            throw new IllegalArgumentException( "Could not create a gene set that contains no genes." );
+        }
+
         geneSetId.setUserDefined( true );
         this.geneSetTerms.addUserDefinedTerm( geneSetId );
 
@@ -1279,7 +1283,7 @@ public class GeneAnnotations {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        if ( settings != null && !settings.getUseUserDefined() )
+        if ( settings != null && settings.getUseUserDefined() )
             userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
 
         addParents(); // <- 1s

@@ -16,6 +16,7 @@ package ubic.erminej.data;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 
@@ -33,33 +34,70 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
 public class TestMultifunctionality extends TestCase {
 
     public void testMf1() throws Exception {
-        InputStream is = TestMultifunctionality.class.getResourceAsStream( "/data/HG-U133_Plus_2_annot_sample.csv" );
-        ZipInputStream z = new ZipInputStream( TestMultifunctionality.class
-                .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
+
+        /*
+         * JG was provided with this file for cross-checking.
+         */
+        InputStream is = TestMultifunctionality.class
+                .getResourceAsStream( "/data/multfunc.annot.testfile.withoutdups.txt" );
+
+        ZipInputStream z = new ZipInputStream(
+                TestMultifunctionality.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
         z.getNextEntry();
         GeneSetTerms geneSets = new GeneSetTerms( z );
 
-        assertEquals( 32508, geneSets.getGeneSets().size() );
+        assertEquals( 32508, geneSets.getGeneSets().size() ); // rechecked (includes the roots)
 
         assertNotNull( geneSets.getGraph().getRoot() );
 
         GeneAnnotationParser p = new GeneAnnotationParser( geneSets );
 
-        GeneAnnotations ga = p.read( is, Format.AFFYCSV, new Settings() );
+        Settings settings = new Settings();
+        settings.setUseUserDefined( false );
+
+        GeneAnnotations ga = p.read( is, Format.DEFAULT, settings );
+
+        assertEquals( 211, ga.getGeneSets().size() ); // jesse confirms
+
+        assertEquals( 81, ga.getGenes().size() ); // jesse confirms
 
         Multifunctionality mf = ga.getMultifunctionality();
 
-        double actual = mf.getMultifunctionalityScore( new Gene( "PAX8" ) );
-        assertEquals( 0.4065, actual, 0.001 ); // not checked by hand.
+        assertEquals( "Wrong number of genes in multifunctionality", 81, mf.getNumGenes() ); // Jesse confirmed.
 
-        int actualNumG = mf.getNumGoTerms( new Gene( "PAX8" ) );
-        assertEquals( 80, actualNumG );// not checked by hand.
+        assertEquals( "Wrong number of GO terms for gene", 80, mf.getNumGoTerms( new Gene( "PAX8" ) ) ); // Jesse
+        // confirmed.
 
-        double actualR = mf.getMultifunctionalityRank( new Gene( "PAX8" ) );
-        assertEquals( 0.96, actualR, 0.01 );// not checked by hand.
+        // System.err.println( "-------------------------" );
+        // for ( GeneSetTerm gs : ga.findGene( "PAX8" ).getGeneSets() ) {
+        // System.err.println( gs.getId() );
+        // }
+        // System.err.println( "-------------------------" );
 
-        double actualGoMF = mf.getGOTermMultifunctionalityRank( new GeneSetTerm( "GO:0005634" ) );
-        assertEquals( 0.4171, actualGoMF, 0.001 );// not checked by hand.
+        // it's the second-most multifunctional (rank = 1 by our reckoning)
+        assertEquals( 1.0, mf.getRawGeneMultifunctionalityRank( new Gene( "PAX8" ) ), 0.00001 ); // Jesse confirmed.
+
+        assertEquals( 1.0 - 2.0 / 81.0, mf.getMultifunctionalityRank( new Gene( "PAX8" ) ), 0.01 );
+
+        assertEquals( 0.23961, mf.getMultifunctionalityScore( new Gene( "PAX8" ) ), 0.001 ); // Jesse confirmed it is
+                                                                                             // 0.2396
+
+        // from Jesse's results.
+        assertEquals( 0.038061, mf.getMultifunctionalityScore( new Gene( "VMD2L2" ) ), 0.001 );
+        assertEquals( 0, mf.getMultifunctionalityScore( new Gene( "ARMCX4" ) ), 0.0001 );
+        assertEquals( 0.015758, mf.getMultifunctionalityScore( new Gene( "CRYZL1" ) ), 0.0001 );
+        assertEquals( 0.0067805, mf.getMultifunctionalityScore( new Gene( "LOC201158" ) ), 0.0001 );
+        assertEquals( 0.13531, mf.getMultifunctionalityScore( new Gene( "CCL5" ) ), 0.0001 );
+
+        // actual rank should be 124. I checked this in R with (see test_mf.roc_scores.gillis.txt)
+        // cbind(test_mf.roc_scores.gillis,rank(-test_mf.roc_scores.gillis[,2]))
+        assertEquals( 1.0 - 124.0 / 211.0, mf.getGOTermMultifunctionalityRank( new GeneSetTerm( "GO:0005634" ) ), 0.001 );
+
+        // more tests from Jesse's output.
+        assertEquals( 0.8552036, mf.getGOTermMultifunctionality( new GeneSetTerm( "GO:0005634" ) ), 0.001 );
+        assertEquals( 0.86056, mf.getGOTermMultifunctionality( new GeneSetTerm( "GO:0001882" ) ), 0.001 );
+        assertEquals( 0.78394, mf.getGOTermMultifunctionality( new GeneSetTerm( "GO:0019538" ) ), 0.001 );
+        assertEquals( 0.53797, mf.getGOTermMultifunctionality( new GeneSetTerm( "GO:0044421" ) ), 0.001 );
 
         List<Gene> li = new ArrayList<Gene>();
         li.add( new Gene( "EYA3" ) );
@@ -82,8 +120,6 @@ public class TestMultifunctionality extends TestCase {
         li.add( new Gene( "UBE1L" ) );
         li.add( new Gene( "C6orf199" ) );
         li.add( new Gene( "foonotagene" ) );
-        double cgm = mf.correlationWithGeneMultifunctionality( li );
-        assertEquals( 0.7070, cgm, 0.001 ); // not checked by hand.
+        assertEquals( 0.707017, mf.correlationWithGeneMultifunctionality( li ), 0.001 ); // not checked by hand.
     }
-
 }

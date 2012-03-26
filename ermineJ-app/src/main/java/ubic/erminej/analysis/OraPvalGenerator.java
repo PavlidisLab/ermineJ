@@ -220,7 +220,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 break;
             }
 
-            // compute new results.
+            // compute new results. FIXME only do this for groups the removed gene was in!
             Map<GeneSetTerm, GeneSetResult> results = computeResultsForHitList( filteredGenes, true );
             if ( results.isEmpty() ) {
                 break;

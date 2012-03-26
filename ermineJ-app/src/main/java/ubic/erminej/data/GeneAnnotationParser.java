@@ -486,7 +486,9 @@ public class GeneAnnotationParser {
     } // Agilent
 
     /**
-     * Main default reading method.
+     * Main default reading method. Because we want to be tolerant of file format variation, headers are not treated
+     * differently than other rows. This extra "gene" can be counted in things like rankings, so we do try to avoid it
+     * if we can, but doesn't directly effect most calculations.
      * 
      * @param bis
      * @param settings
@@ -502,7 +504,11 @@ public class GeneAnnotationParser {
         String line = "";
         while ( ( line = dis.readLine() ) != null ) {
 
+            // check for things that don't look like data, or other skippable things.
             if ( line.startsWith( "#" ) ) continue;
+            if ( n == 0 && ( line.toLowerCase().startsWith( "probe" ) || line.toLowerCase().startsWith( "gene" ) ) ) {
+                continue;
+            }
 
             String[] tokens = line.split( "\t" );
             int length = tokens.length;

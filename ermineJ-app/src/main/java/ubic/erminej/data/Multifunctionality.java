@@ -60,6 +60,11 @@ public class Multifunctionality {
      */
     private static final boolean USE_AUC_FOR_GENE_SET_MF = true;
 
+    /**
+     * Do we count genes that don't have GO terms? .
+     */
+    private static final boolean USE_UNANNOTATED_GENES = true;
+
     private static Log log = LogFactory.getLog( Multifunctionality.class );
 
     private Map<Gene, Double> geneMultifunctionality = new HashMap<Gene, Double>();
@@ -210,7 +215,9 @@ public class Multifunctionality {
             }
         }
 
-        int outGroup = genesWithGoTerms.size() - inGroup;
+        int numGenes = USE_UNANNOTATED_GENES ? rawGeneMultifunctionalityRanks.size() : genesWithGoTerms.size();
+
+        int outGroup = numGenes - inGroup;
 
         if ( outGroup <= 0 ) return 0.0;
 
@@ -389,7 +396,8 @@ public class Multifunctionality {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        int numGenes = genesWithGoTerms.size();
+        int numGenes = USE_UNANNOTATED_GENES ? rawGeneMultifunctionalityRanks.size() : genesWithGoTerms.size();
+
         int numGoGroups = geneAnnots.getGeneSetTerms().size();
 
         /*
@@ -476,27 +484,34 @@ public class Multifunctionality {
                 goGroupSizes.put( goset, geneSetGenes.size() );
             }
 
-            int numGenes = genesWithGoTerms.size();
+            int numGenes = USE_UNANNOTATED_GENES ? this.geneAnnots.getGenes().size() : genesWithGoTerms.size();
 
             for ( Gene gene : geneAnnots.getGenes() ) {
-                if ( !genesWithGoTerms.contains( gene ) ) continue;
+
+                boolean geneHasAnnots = genesWithGoTerms.contains( gene );
+
+                if ( !geneHasAnnots && !USE_UNANNOTATED_GENES ) continue;
 
                 double mf = 0.0;
                 Collection<GeneSetTerm> sets = gene.getGeneSets();
-                this.numGoTerms.put( gene, sets.size() ); // genes with no go terms are ignored.
+                this.numGoTerms.put( gene, sets.size() );
                 for ( GeneSetTerm goset : sets ) {
+                    int inGroup = 0;
                     if ( !goGroupSizes.containsKey( goset ) ) {
-                        // log.debug( "No size recorded for " + goset );
-                        continue;
+                        if ( !USE_UNANNOTATED_GENES ) {
+                            continue;
+                        }
+                    } else {
+                        inGroup = goGroupSizes.get( goset );
                     }
-                    int inGroup = goGroupSizes.get( goset );
+
                     int outGroup = numGenes - inGroup;
 
                     if ( outGroup == 0 ) {
                         continue;
                     }
 
-                    assert inGroup > 0;
+                    assert inGroup > 0 || USE_UNANNOTATED_GENES;
 
                     mf += 1.0 / ( inGroup * outGroup );
                     // mf += 1.0; // count of go terms ONLY, if you ever want to compare ...
@@ -508,9 +523,10 @@ public class Multifunctionality {
             assert numGenes == rawGeneMultifunctionalityRanks.size();
             for ( Gene gene : rawGeneMultifunctionalityRanks.keySet() ) {
                 // 1-base the rank before calculating ratio
-                double geneMultifunctionalityRankRatio = ( rawGeneMultifunctionalityRanks.get( gene ) + 1 ) / numGenes;
-                assert geneMultifunctionalityRankRatio >= 0.0 && geneMultifunctionalityRankRatio <= 1.0;
-                this.geneMultifunctionalityRank.put( gene, Math.max( 0.0, 1.0 - geneMultifunctionalityRankRatio ) );
+                double geneMultifuncationalityRelativeRank = ( rawGeneMultifunctionalityRanks.get( gene ) + 1 )
+                        / numGenes;
+                assert geneMultifuncationalityRelativeRank >= 0.0 && geneMultifuncationalityRelativeRank <= 1.0;
+                this.geneMultifunctionalityRank.put( gene, Math.max( 0.0, 1.0 - geneMultifuncationalityRelativeRank ) );
             }
 
             computeGoTermMultifunctionalityRanks();
@@ -521,6 +537,23 @@ public class Multifunctionality {
         } finally {
             stale.set( false );
         }
+    }
+
+    /**
+     * @param gene
+     * @return rank. Where zero is the highest rank, ties accounted for.
+     */
+    public Double getRawGeneMultifunctionalityRank( Gene gene ) {
+        return this.rawGeneMultifunctionalityRanks.get( gene );
+    }
+
+    /**
+     * How many genes have multifunctionality scores.
+     * 
+     * @return
+     */
+    public int getNumGenes() {
+        return new Double( rawGeneMultifunctionalityRanks.size() ).intValue();
     }
 
 }

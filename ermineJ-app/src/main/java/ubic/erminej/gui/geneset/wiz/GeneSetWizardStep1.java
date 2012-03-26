@@ -98,9 +98,9 @@ public class GeneSetWizardStep1 extends WizardStep {
         buttonGroup1.add( fileInputButton );
         buttonGroup1.add( manInputButton );
         JLabel jLabel4 = new JLabel();
-        jLabel4.setText( "- File with gene or probe symbols" );
+        jLabel4.setText( "File with gene or probe symbols" );
         JLabel jLabel5 = new JLabel();
-        jLabel5.setText( "- Enter manually in the next step" );
+        jLabel5.setText( "Enter manually in the next step" );
         jPanel4.add( jLabel5, new GridBagConstraints( 1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
                 GridBagConstraints.NONE, new Insets( 0, 16, 8, 10 ), 125, 10 ) );
         jPanel4.add( jLabel4, new GridBagConstraints( 1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
