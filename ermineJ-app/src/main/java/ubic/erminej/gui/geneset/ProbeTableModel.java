@@ -32,23 +32,26 @@ import ubic.erminej.data.Probe;
 public class ProbeTableModel extends AbstractTableModel {
     private static final long serialVersionUID = -1L;
     private String[] columnNames = { "Probe", "Gene", "Description" };
-    List<Probe> pl;
+    private List<Probe> pl;
+
+    public ProbeTableModel( Collection<Probe> probesToUse ) {
+        this.setProbes( probesToUse );
+    }
 
     public ProbeTableModel( GeneAnnotations geneData ) {
         pl = new ArrayList<Probe>( geneData.getProbes() );
     }
 
-    public List<Probe> getProbes() {
-        return pl;
+    public void addProbes( Collection<Probe> probelist ) {
+        for ( Probe probe : probelist ) {
+            if ( !pl.contains( probe ) ) pl.add( probe );
+        }
+
     }
 
-    public void setProbes( Collection<Probe> probesToUse ) {
-        pl = new ArrayList<Probe>( probesToUse );
-        this.fireTableDataChanged();
-    }
-
-    public ProbeTableModel( Collection<Probe> probesToUse ) {
-        this.setProbes( probesToUse );
+    @Override
+    public int getColumnCount() {
+        return 3;
     }
 
     @Override
@@ -56,9 +59,8 @@ public class ProbeTableModel extends AbstractTableModel {
         return columnNames[i];
     }
 
-    @Override
-    public int getColumnCount() {
-        return 3;
+    public List<Probe> getProbes() {
+        return pl;
     }
 
     @Override
@@ -80,5 +82,10 @@ public class ProbeTableModel extends AbstractTableModel {
             default:
                 return null;
         }
+    }
+
+    public void setProbes( Collection<Probe> probesToUse ) {
+        pl = new ArrayList<Probe>( probesToUse );
+        this.fireTableDataChanged();
     }
 }

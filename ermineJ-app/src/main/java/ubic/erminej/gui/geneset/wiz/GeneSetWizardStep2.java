@@ -245,7 +245,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         }
 
         log.debug( "Got " + probelist.size() + " new probes to add" );
-        ncTableModel.getProbes().addAll( probelist );
+        ncTableModel.addProbes( probelist );
         ncTableModel.fireTableDataChanged();
         updateCountLabel();
     }
