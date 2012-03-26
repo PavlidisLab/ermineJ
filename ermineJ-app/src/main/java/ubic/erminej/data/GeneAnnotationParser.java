@@ -507,6 +507,7 @@ public class GeneAnnotationParser {
             // check for things that don't look like data, or other skippable things.
             if ( line.startsWith( "#" ) ) continue;
             if ( n == 0 && ( line.toLowerCase().startsWith( "probe" ) || line.toLowerCase().startsWith( "gene" ) ) ) {
+                ++n;
                 continue;
             }
 

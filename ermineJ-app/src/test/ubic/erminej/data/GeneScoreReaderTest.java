@@ -46,13 +46,14 @@ public class GeneScoreReaderTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         Settings s = new Settings( false );
+        s.setUseUserDefined( false );
 
         ism = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.an.txt" );
 
         is = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.scores.txt" );
 
-        GeneSetTerms geneSetTerms = new GeneSetTerms( GeneScoreReaderTest.class
-                .getResourceAsStream( "/data/go-termdb-test.xml" ) );
+        GeneSetTerms geneSetTerms = new GeneSetTerms(
+                GeneScoreReaderTest.class.getResourceAsStream( "/data/go-termdb-test.xml" ) );
         GeneAnnotationParser p = new GeneAnnotationParser( geneSetTerms );
         GeneAnnotations g = p.readDefault( ism, null, s );
 
