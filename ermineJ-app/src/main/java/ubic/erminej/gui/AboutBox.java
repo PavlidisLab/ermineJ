@@ -21,18 +21,17 @@ package ubic.erminej.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
 import java.awt.Insets;
-import java.awt.Toolkit;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -54,177 +53,126 @@ import ubic.erminej.gui.util.JLinkLabel;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class AboutBox extends JDialog implements ActionListener {
+public class AboutBox extends JDialog {
 
-    private static final long serialVersionUID = 1L;
     private static Log log = LogFactory.getLog( AboutBox.class.getName() );
 
-    private static final int TOTAL_HEIGHT = 550;
-
+    private static final int TOTAL_HEIGHT = 460;
     private static final int PREFERRED_WIDTH = 450;
-    private String VERSION = "2.2";
+    private String version = "3.0";
+
     private final static String COPYRIGHT = "<html>Copyright &copy; University of British Columbia</html>";
     private static final String SOFTWARENAME = "ermineJ";
-
-    JPanel mainPanel = new JPanel();
-    JPanel centerPanel = new JPanel();
-    JPanel buttonPanel = new JPanel();
-    JPanel blurbsPanel = new JPanel();
-    JButton button1 = new JButton();
-    JLabel labelAuthors = new JLabel();
-    String homepageURL = "http://www.chibi.ubc.ca/ermineJ/";
-    JLinkLabel labelHomepage = new JLinkLabel( homepageURL, homepageURL );
-    JLabel imageLabel = new JLabel();
-    JLabel label1 = new JLabel();
-    JLabel versionLabel = new JLabel();
-    JLabel copyrightLabel = new JLabel();
-    ImageIcon image1;
-
-    JTextPane licensePanel = new JTextPane();
+    private static String homepageURL = "http://www.chibi.ubc.ca/ermineJ/";
 
     public AboutBox( Frame parent ) {
-        super( parent );
-        // enableEvents( AWTEvent.WINDOW_EVENT_MASK );
-        // enableEvents( AWTEvent.MOUSE_EVENT_MASK );
-        try {
-            jbInit();
-        } catch ( Exception e ) {
-            e.printStackTrace();
-        }
-        setModal( true );
-        setResizable( true );
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension dlgSize = getPreferredSize();
-        setLocation( ( screenSize.width - dlgSize.width ) / 2, ( screenSize.height - dlgSize.height ) / 2 );
-        pack();
-        this.setVisible( true );
+        super( parent, "About " + SOFTWARENAME, true );
+        this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
+        Point centerPoint = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+        // this.setLocationRelativeTo( parent );
+        this.setLocation( ( int ) centerPoint.getX() - ( PREFERRED_WIDTH / 2 ), ( int ) centerPoint.getY()
+                - ( TOTAL_HEIGHT / 2 ) );
+        jbInit();
+
     }
 
     // Component initialization
-    private void jbInit() throws Exception {
+    private void jbInit() {
 
         this.getContentPane().setBackground( Color.white );
-        this.setResizable( false );
-        this.setTitle( "About " + SOFTWARENAME );
+        this.setSize( new Dimension( PREFERRED_WIDTH + 20, TOTAL_HEIGHT + 20 ) );
 
-        getVersion();
+        JPanel mainPanel = new JPanel();
 
         mainPanel.setLayout( new BorderLayout() );
         mainPanel.setBackground( Color.white );
-        mainPanel.setPreferredSize( new Dimension( PREFERRED_WIDTH, TOTAL_HEIGHT ) );
-        mainPanel.setRequestFocusEnabled( true );
-        mainPanel.setVerifyInputWhenFocusTarget( true );
 
-        centerPanel.setBackground( Color.white );
-
-        imageLabel.setDebugGraphicsOptions( 0 );
+        JLabel imageLabel = new JLabel();
         imageLabel.setHorizontalAlignment( SwingConstants.CENTER );
         imageLabel.setHorizontalTextPosition( SwingConstants.CENTER );
-        URL icon = MainFrame.class.getResource( "/ubic/erminej/logo1small.gif" );
-        if ( icon != null ) {
-            imageLabel.setIcon( new ImageIcon( icon ) );
-            imageLabel.setIconTextGap( 0 );
-        }
+        URL icon = this.getClass().getResource( "/ubic/erminej/logo1small.gif" );
+        imageLabel.setIcon( new ImageIcon( icon ) );
 
-        versionLabel.setBackground( Color.white );
-        versionLabel.setFont( new java.awt.Font( "Dialog", 1, 11 ) );
+        JLabel versionLabel = new JLabel();
         versionLabel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 30 ) );
         versionLabel.setHorizontalAlignment( SwingConstants.CENTER );
         versionLabel.setHorizontalTextPosition( SwingConstants.LEFT );
-        versionLabel.setText( "Version " + VERSION );
+        versionLabel.setText( "Version " + getVersion() );
 
+        JLabel copyrightLabel = new JLabel();
         copyrightLabel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 30 ) );
         copyrightLabel.setHorizontalAlignment( SwingConstants.CENTER );
         copyrightLabel.setText( COPYRIGHT );
 
+        JLabel labelAuthors = new JLabel();
         labelAuthors.setPreferredSize( new Dimension( PREFERRED_WIDTH, 60 ) );
         labelAuthors.setHorizontalAlignment( SwingConstants.CENTER );
         labelAuthors.setHorizontalTextPosition( SwingConstants.CENTER );
+        labelAuthors.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
         labelAuthors
-                .setText( "By: Paul Pavlidis, Homin Lee, Will Braynen, Shahmil Merchant, Kiran Keshav, Kelsey Hamer and others" );
+                .setText( "<html>By: Paul Pavlidis, Homin Lee, Will Braynen, Shahmil Merchant, Kiran Keshav, Kelsey Hamer and others</html>" );
 
+        JLinkLabel labelHomepage = new JLinkLabel( homepageURL, homepageURL );
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
-        // labelHomepage.setHorizontalTextPosition( SwingConstants.CENTER );
         labelHomepage.setPreferredSize( new Dimension( 200, 20 ) );
 
-        blurbsPanel.setLayout( new FlowLayout() );
+        JPanel blurbsPanel = new JPanel();
         blurbsPanel.setBackground( Color.white );
-        blurbsPanel.setOpaque( true );
-        blurbsPanel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 180 ) );
+        blurbsPanel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 160 ) );
         blurbsPanel.setRequestFocusEnabled( true );
-        blurbsPanel.add( versionLabel, null );
-        blurbsPanel.add( copyrightLabel, null );
-        blurbsPanel.add( labelAuthors, null );
-        blurbsPanel.add( labelHomepage, null );
+        blurbsPanel.add( versionLabel );
+        blurbsPanel.add( copyrightLabel );
+        blurbsPanel.add( labelAuthors );
+        blurbsPanel.add( labelHomepage );
 
+        JTextPane licensePanel = new JTextPane();
         licensePanel.setBackground( Color.white );
-        licensePanel.setAlignmentX( ( float ) 0.5 );
-        licensePanel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 200 ) );
-        licensePanel.setDisabledTextColor( Color.black );
+        licensePanel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 150 ) );
         licensePanel.setEditable( false );
         licensePanel.setMargin( new Insets( 10, 10, 10, 10 ) );
         licensePanel.setContentType( "text/html" );
-        licensePanel.setText( "<p>ErmineJ is licensed under the Apache 2 Public License.</p><p>Direct questions to "
-                + "erminej@chibi.ubc.ca</p><p>If you use this software for your work, please cite:<br/> "
+        licensePanel
+                .setText( "<html><p>ErmineJ is licensed under the Apache 2 Public License.</p><p>Direct questions to "
+                        + "erminej@chibi.ubc.ca</p><p>If you use this software for your work, please cite:<br/> "
 
-                + "Gillis J, Mistry M, Pavlidis P. (2010)"
-                + " Gene function analysis in complex data sets using ErmineJ. Nature Protocols 5:1148-59"
-                + "</p></html>" );
+                        + "Gillis J, Mistry M, Pavlidis P. (2010)"
+                        + " Gene function analysis in complex data sets using ErmineJ. Nature Protocols 5:1148-59"
+                        + "</p></html>" );
 
+        JPanel centerPanel = new JPanel( new BorderLayout() );
+        centerPanel.setBackground( Color.white );
         centerPanel.add( blurbsPanel, BorderLayout.NORTH );
-        centerPanel.add( licensePanel, BorderLayout.CENTER );
+        centerPanel.add( licensePanel, BorderLayout.SOUTH );
 
-        button1.setText( "Ok" );
-        button1.addActionListener( this );
+        JButton closeButton = new JButton( "Ok" );
 
+        closeButton.setAction( new AbstractAction( "Ok" ) {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                dispose();
+            }
+        } );
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground( Color.white );
         buttonPanel.setBorder( BorderFactory.createEtchedBorder() );
-        buttonPanel.add( button1, null );
+        buttonPanel.add( closeButton );
+
         mainPanel.add( imageLabel, BorderLayout.NORTH );
         mainPanel.add( centerPanel, BorderLayout.CENTER );
         mainPanel.add( buttonPanel, BorderLayout.SOUTH );
 
-        this.getContentPane().add( mainPanel, BorderLayout.CENTER );
-
+        this.add( mainPanel );
+        pack();
     }
 
-    /**
-     * @throws IOException
-     */
-    private void getVersion() {
+    private String getVersion() {
         try {
-            VERSION = ( new BufferedReader( new InputStreamReader( new BufferedInputStream( this.getClass()
-                    .getResourceAsStream( "resources/version" ) ) ) ) ).readLine();
+            InputStream resourceAsStream = this.getClass().getResourceAsStream( "/ubic/erminej/version" );
+            return ( new BufferedReader( new InputStreamReader( resourceAsStream ) ) ).readLine();
         } catch ( Exception e ) {
-            log.error( "Could not determine version number" );
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.swing.JDialog#processWindowEvent(java.awt.event.WindowEvent)
-     */
-    @Override
-    protected void processWindowEvent( WindowEvent e ) {
-        if ( e.getID() == WindowEvent.WINDOW_CLOSING ) {
-            cancel();
-        }
-        super.processWindowEvent( e );
-    }
-
-    // Close the dialog
-    void cancel() {
-        dispose();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
-    public void actionPerformed( ActionEvent e ) {
-        if ( e.getSource() == button1 ) {
-            cancel();
+            log.error( "Could not determine version number: " + e );
+            return this.version;
         }
     }
 
