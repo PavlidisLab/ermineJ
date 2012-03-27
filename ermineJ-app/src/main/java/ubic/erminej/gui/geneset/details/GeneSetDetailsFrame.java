@@ -203,7 +203,7 @@ public class GeneSetDetailsFrame extends JFrame {
 
     private String getProbeID( int row ) {
         int offset = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount(); // matrix display ends
-        return ( String ) table.getValueAt( row, offset + 0 );
+        return ( ( Probe ) table.getValueAt( row, offset + 0 ) ).getName();
     }
 
     /**
