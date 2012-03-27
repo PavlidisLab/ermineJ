@@ -82,7 +82,7 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
         }
         setBackground( matrixColor );
 
-        // The tooltip should always show the actual (non-normalized) value
+        // The tooltip should always show the actual (non-normalized) value; temporarily switch it (HACK)
         double matrixValue;
         boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
         m_matrixDisplay.setStandardizedEnabled( false );

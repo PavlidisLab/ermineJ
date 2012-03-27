@@ -647,7 +647,8 @@ public class GeneSetDetailsFrame extends JFrame {
             statusMessenger.showError( "None of the probes in this gene set were in the data file." );
         } else {
             matrixDisplay = new MatrixDisplay<Probe, String>( matrix );
-            matrixDisplay.setStandardizedEnabled( true );
+            matrixDisplay.setColorMap( this.colorMap );
+            matrixDisplay.setStandardizedEnabled( this.normalizeMatrixView );
             // Make the columns in the matrix display not too wide (cell-size)
             // and set a custom cell renderer
             matrixCellRenderer = new JMatrixCellRenderer( matrixDisplay ); // create one instance
@@ -713,7 +714,6 @@ public class GeneSetDetailsFrame extends JFrame {
         switchDataFileMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 switchRawDataFile();
-                createDetailsTable();
                 table.revalidate();
             }
         } );
@@ -724,7 +724,6 @@ public class GeneSetDetailsFrame extends JFrame {
         switchGeneScoreFileMenuItem.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent e ) {
                 switchGeneScoreFile();
-                createDetailsTable();
                 table.revalidate();
             }
         } );
@@ -1170,10 +1169,14 @@ public class GeneSetDetailsFrame extends JFrame {
 
     }
 
+    // TODO make these a setting that persists across sessions
+    private Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
+    private boolean normalizeMatrixView = true;
+
     void m_blackbodyColormapMenuItem_actionPerformed() {
 
         try {
-            Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
+            colorMap = ColorMap.BLACKBODY_COLORMAP;
             matrixDisplay.setColorMap( colorMap );
             m_gradientBar.setColorMap( colorMap );
             table.repaint();
@@ -1218,7 +1221,7 @@ public class GeneSetDetailsFrame extends JFrame {
     void m_greenredColormapMenuItem_actionPerformed( @SuppressWarnings("unused") ActionEvent e ) {
 
         try {
-            Color[] colorMap = ColorMap.GREENRED_COLORMAP;
+            colorMap = ColorMap.GREENRED_COLORMAP;
             matrixDisplay.setColorMap( colorMap );
             m_gradientBar.setColorMap( colorMap );
             table.repaint();
@@ -1229,8 +1232,8 @@ public class GeneSetDetailsFrame extends JFrame {
 
     void m_normalizeMenuItem_actionPerformed() {
 
-        boolean normalize = m_normalizeMenuItem.isSelected();
-        matrixDisplay.setStandardizedEnabled( normalize );
+        normalizeMatrixView = m_normalizeMenuItem.isSelected();
+        matrixDisplay.setStandardizedEnabled( normalizeMatrixView );
 
         initColorRangeWidget();
         table.repaint();
