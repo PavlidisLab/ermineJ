@@ -433,9 +433,6 @@ public class UserDefinedGeneSetManager {
             }
 
             String[] fields = StringUtils.split( row, '\t' );
-            if ( fields.length == 0 ) {
-                continue;
-            }
 
             if ( fields.length > 2 ) {
                 /*
@@ -506,10 +503,13 @@ public class UserDefinedGeneSetManager {
                 continue;
             }
 
-            // third line of group: name
-            if ( StringUtils.isBlank( newSet.getTerm().getName() )
-                    || newSet.getName().equals( GeneSetTerm.NO_NAME_AVAILABLE ) ) {
-                newSet.getTerm().setName( row );
+            // third line of group: name; might be blank.
+            if ( StringUtils.isBlank( newSet.getName() ) ) {
+                if ( StringUtils.isBlank( row ) ) {
+                    newSet.getTerm().setName( GeneSetTerm.NO_NAME_AVAILABLE );
+                } else {
+                    newSet.getTerm().setName( row );
+                }
                 continue;
             }
 
