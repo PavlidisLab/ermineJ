@@ -259,15 +259,19 @@ public class GeneSetTerms {
      */
     void addUserDefinedTerm( GeneSetTerm id ) {
         assert id.isUserDefined();
-        if ( getGraph() == null ) return;
+
+        // FIXME I think this happens already by this point, so it's already present. This is a (minor) bug.
+        // assert this.getGraph().get( id.getId() ) == null : "Programming error: annots already contains " + id;
+        if ( this.getGraph().get( USER_DEFINED ).hasChild( id.getId() ) ) {
+            return;
+        }
+
         assert this.getGraph().get( USER_DEFINED ) != null;
+        id.setAspect( USER_DEFINED ); // defensive.
         this.getGraph().addChildTo( USER_DEFINED, id.getId(), id );
     }
 
     /***
-     * This is to help try to make sure we populate the aspects. This could be happening for disconnected obsolete
-     * terms, so nothing to worry about?
-     * 
      * @param term
      * @param goNames
      * @return
@@ -277,16 +281,13 @@ public class GeneSetTerms {
 
         Collection<GeneSetTerm> parents = getParents( term );
         if ( parents.isEmpty() ) {
-            // log.warn( "Term without parent: " + term );
             return null;
         }
         for ( GeneSetTerm parent : parents ) {
             String a = getAspect( parent );
             if ( a != null ) {
-                // log.info( "Found aspect for " + term );
                 return a;
             }
-            // log.warn( "Parent lacks aspect: " + parent );
         }
         return null;
     }

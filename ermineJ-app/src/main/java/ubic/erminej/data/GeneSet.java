@@ -62,6 +62,7 @@ public class GeneSet {
      */
     public GeneSet( GeneSetTerm name, Collection<Gene> items ) {
         this( name );
+        this.isGenes = true;
         addGenes( items );
     }
 

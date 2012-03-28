@@ -94,7 +94,7 @@ public class GeneAnnotations {
 
     private Map<String, Gene> genes = new HashMap<String, Gene>();
 
-    UserDefinedGeneSetManager userDefinedGeneSetManager;
+    private UserDefinedGeneSetManager userDefinedGeneSetManager;
 
     /**
      * Used to protect instances
@@ -304,7 +304,7 @@ public class GeneAnnotations {
      * @param set
      */
     public void addGeneSet( GeneSet set ) {
-        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
+        checkModifiability();
         this.addGeneSet( set.getTerm(), set.getGenes() );
     }
 
@@ -326,12 +326,11 @@ public class GeneAnnotations {
      * @return
      */
     public GeneSet addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs, String sourceFile ) {
-        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a read-only annotation set" );
-        // for ( Gene g : gs ) {
-        // if ( !this.hasGene( g ) ) {
-        // throw new IllegalArgumentException( "New gene sets cannot involved previously unseen genes" );
-        // }
-        // }
+        checkModifiability();
+
+        if ( this.hasGeneSet( geneSetId ) ) {
+            throw new IllegalArgumentException( "Don't add sets twice" );
+        }
 
         if ( gs.isEmpty() ) {
             throw new IllegalArgumentException( "Could not create a gene set that contains no genes." );
@@ -351,7 +350,25 @@ public class GeneAnnotations {
         if ( log.isDebugEnabled() )
             log.debug( "Added new gene set: " + gs.size() + " genes in gene set " + geneSetId );
 
+        updateSubClones( newSet );
+
         return newSet;
+    }
+
+    /**
+     * Add a new set to the subclones.
+     * 
+     * @param newSet
+     */
+    private void updateSubClones( GeneSet newSet ) {
+        for ( GeneAnnotations clone : this.subClones ) {
+            if ( clone.hasGeneSet( newSet.getTerm() ) ) {
+                throw new IllegalStateException( "Don't add sets to subclones that already have them!" );
+            }
+            clone.geneSetTerms.addUserDefinedTerm( newSet.getTerm() );
+            clone.geneSets.put( newSet.getTerm(), newSet );
+            if ( clone.multifunctionality != null ) clone.multifunctionality.setStale( true );
+        }
     }
 
     /**
@@ -362,7 +379,7 @@ public class GeneAnnotations {
      */
     public void addSet( GeneSetTerm geneSetId, Collection<Probe> probesForNew ) {
 
-        if ( !allowModification ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
+        checkModifiability();
 
         if ( probesForNew.isEmpty() ) {
             log.debug( "No probes to add for " + geneSetId );
@@ -395,7 +412,7 @@ public class GeneAnnotations {
      */
     public void deleteGeneSet( GeneSetTerm id ) {
 
-        if ( isReadOnly() ) throw new IllegalStateException( "Attempt to modify a ready-only annotation set" );
+        checkModifiability();
 
         // deals with probes.
         for ( Gene g : getGeneSetGenes( id ) ) {
@@ -445,14 +462,6 @@ public class GeneAnnotations {
     public GeneSet findGeneSet( GeneSetTerm term ) {
         if ( term == null ) return null;
         return this.geneSets.get( term );
-    }
-
-    /**
-     * @return
-     */
-    public GeneSetTerms getGeneSetTermsHolder() {
-        // FIXME stupid method name .. conflicts with other.
-        return this.geneSetTerms;
     }
 
     /**
@@ -545,23 +554,6 @@ public class GeneAnnotations {
     }
 
     /**
-     * @return view of all gene set terms, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes
-     *         (i.e., 2).
-     */
-    public Set<GeneSetTerm> getGeneSetTerms() {
-        Set<GeneSetTerm> res = new HashSet<GeneSetTerm>();
-        res.addAll( this.geneSets.keySet() );
-        return Collections.unmodifiableSet( res );
-    }
-
-    /**
-     * @return view of all gene sets, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes (i.e., 2).
-     */
-    public Set<GeneSet> getGeneSets() {
-        return Collections.unmodifiableSet( new HashSet<GeneSet>( this.geneSets.values() ) );
-    }
-
-    /**
      * Get all gene sets, including ones that might be empty or redundant. Use for displaying lists that can then be
      * filtered.
      * 
@@ -630,6 +622,13 @@ public class GeneAnnotations {
     }
 
     /**
+     * @return view of all gene sets, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes (i.e., 2).
+     */
+    public Set<GeneSet> getGeneSets() {
+        return Collections.unmodifiableSet( new HashSet<GeneSet>( this.geneSets.values() ) );
+    }
+
+    /**
      * @param terms
      * @return
      */
@@ -641,6 +640,24 @@ public class GeneAnnotations {
             }
         }
         return Collections.unmodifiableCollection( res );
+    }
+
+    /**
+     * @return view of all gene set terms, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes
+     *         (i.e., 2).
+     */
+    public Set<GeneSetTerm> getGeneSetTerms() {
+        Set<GeneSetTerm> res = new HashSet<GeneSetTerm>();
+        res.addAll( this.geneSets.keySet() );
+        return Collections.unmodifiableSet( res );
+    }
+
+    /**
+     * @return
+     */
+    public GeneSetTerms getGeneSetTermsHolder() {
+        // FIXME stupid method name .. conflicts with other.
+        return this.geneSetTerms;
     }
 
     public Multifunctionality getMultifunctionality() {
@@ -844,6 +861,13 @@ public class GeneAnnotations {
     public void saveGeneSet( GeneSet toSave ) throws IOException {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
         assert toSave.isUserDefined();
+
+        if ( userDefinedGeneSetManager == null ) {
+            // can happen if the 'use user-defined' was false at startup.
+            userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
+            settings.setUseUserDefined( true );
+        }
+
         this.userDefinedGeneSetManager.saveGeneSet( toSave );
         if ( this.multifunctionality != null ) this.multifunctionality.setStale( true );
         refreshRedundancyCheck( toSave );
@@ -1009,6 +1033,13 @@ public class GeneAnnotations {
             messenger.showStatus( "Added " + numAnnotsAdded + " inferred annotations (affected " + affectedGenes + "/"
                     + genes.size() + " genes)" );
         }
+    }
+
+    /**
+     * @throws IllegalStateException if modification is not allowed.
+     */
+    private void checkModifiability() {
+        if ( isReadOnly() ) throw new IllegalStateException( "Attempt to modify a read-only annotation set" );
     }
 
     /**
@@ -1283,8 +1314,10 @@ public class GeneAnnotations {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        if ( settings != null && settings.getUseUserDefined() )
+        if ( settings != null && settings.getUseUserDefined() ) {
+            // For test environments. Typically this setting would be true.
             userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
+        }
 
         addParents(); // <- 1s
 

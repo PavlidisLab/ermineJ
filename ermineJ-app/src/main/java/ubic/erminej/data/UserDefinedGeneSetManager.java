@@ -232,6 +232,7 @@ public class UserDefinedGeneSetManager {
         /*
          * Handle case of multiple groups per file. We re-write it, clobber the file.
          */
+        log.info( "Saving set to " + fileName );
         if ( ( new File( fileName ) ).canRead() ) {
             Collection<GeneSet> sets = loadUserGeneSetFile( fileName );
 
@@ -596,6 +597,11 @@ public class UserDefinedGeneSetManager {
      */
     private void writeSet( GeneSet geneeSet, Writer out ) throws IOException {
         String cleanedDescription = geneeSet.getTerm().getName().replaceAll( "[\r\n\t]+", " " );
+
+        if ( StringUtils.isBlank( cleanedDescription ) ) {
+            cleanedDescription = GeneSetTerm.NO_NAME_AVAILABLE;
+        }
+
         String filetype = ( geneeSet.isGenes() ) ? "gene" : "probe";
 
         if ( geneeSet.getFormat() == GeneSetFileFormat.DEFAULT ) {

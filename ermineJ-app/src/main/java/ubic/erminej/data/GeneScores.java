@@ -627,7 +627,7 @@ public class GeneScores {
              * Probes which have absolutely no annotations or gene assigned will be missed entirely. So this needn't be
              * a scary message
              */
-            messenger.showError( probeToScoreMap.size()
+            messenger.showWarning( probeToScoreMap.size()
                     + " ("
                     + String.format( "%.2f",
                             100.00 * probeToScoreMap.size() / ( probeToScoreMap.size() + unknownProbes.size() ) )
@@ -638,13 +638,13 @@ public class GeneScores {
             /*
              * This is in addition to those which have no gene (listed as unknownProbes)
              */
-            messenger.showError( unannotatedProbes.size()
+            messenger.showWarning( unannotatedProbes.size()
                     + " probes in your gene score file had no gene sets and were ignored." );
         }
 
         if ( numRepeatedProbes > 0 ) {
             messenger
-                    .showError( "Warning: "
+                    .showWarning( "Warning: "
                             + numRepeatedProbes
                             + " identifiers in your gene score file were repeats. Only the first occurrence encountered was kept in each case." );
         }

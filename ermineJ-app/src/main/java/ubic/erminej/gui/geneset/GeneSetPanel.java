@@ -349,7 +349,10 @@ public abstract class GeneSetPanel extends JScrollPane {
                     }
 
                     GeneSet geneSet = prunedGeneAnnots.getGeneSet( id );
-                    if ( geneSet == null ) return; // aspect etc.
+                    if ( geneSet == null ) {
+                        messenger.showWarning( "No gene set with ID " + id + " was available for viewing." );
+                        return; // aspect etc.
+                    }
 
                     int numGenes = geneSet.getGenes().size();
                     if ( numGenes > GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING ) {

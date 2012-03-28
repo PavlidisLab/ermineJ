@@ -267,6 +267,7 @@ public class GeneSetWizard extends Wizard {
             if ( id.equals( oldGeneSet.getId() ) ) {
                 // update members and description from the data we have
                 toSave = oldGeneSet; // in this case, the GeneAnnotations will be okay automatically.
+
                 toSave.getTerm().setName( desc );
 
             } else {
