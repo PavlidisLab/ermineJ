@@ -69,7 +69,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
         for ( GeneSet geneSet : sets ) {
             assertEquals( GeneSetFileFormat.DEFAULT, geneSet.getFormat() );
             assertTrue( geneSet.getId().contains( "my" ) );
-            assertTrue( geneSet.getName().contains( "test" ) );
+            assertTrue( "Got: " + geneSet.getName(), geneSet.getName().contains( "test" ) );
             for ( Probe p : geneSet.getProbes() ) {
                 assertTrue( p.getName().endsWith( "_at" ) );
             }
@@ -82,7 +82,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
         assertEquals( 1, sets.size() );
         GeneSet s = sets.iterator().next();
         assertEquals( "GO:0004994", s.getId() );
-        assertEquals( "somatostatin receptor activity", s.getName() );
+        assertEquals( "Got: " + s.getName(), "somatostatin receptor activity", s.getName() );
         assertEquals( 7, s.getProbes().size() ); // six lines but we pull in another via the gene symbol.
         assertEquals( 6, s.getGenes().size() );
     }

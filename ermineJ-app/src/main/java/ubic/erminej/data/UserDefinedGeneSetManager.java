@@ -504,7 +504,7 @@ public class UserDefinedGeneSetManager {
             }
 
             // third line of group: name; might be blank.
-            if ( StringUtils.isBlank( newSet.getName() ) ) {
+            if ( StringUtils.isBlank( newSet.getName() ) || newSet.getName().equals( GeneSetTerm.NO_NAME_AVAILABLE ) ) {
                 if ( StringUtils.isBlank( row ) ) {
                     newSet.getTerm().setName( GeneSetTerm.NO_NAME_AVAILABLE );
                 } else {
