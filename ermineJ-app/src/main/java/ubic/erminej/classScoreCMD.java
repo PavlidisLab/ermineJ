@@ -350,7 +350,7 @@ public class classScoreCMD {
         if ( commandLine.hasOption( 'a' ) ) {
             arg = commandLine.getOptionValue( 'a' );
             if ( FileTools.testFile( arg ) )
-                settings.setAnnotFile( arg );
+                settings.setAnnotFile( new File( arg ).getAbsolutePath() );
             else {
                 System.err.println( "Invalid annotation file name (-a " + arg + ")" );
                 showHelp();
@@ -367,7 +367,7 @@ public class classScoreCMD {
         if ( commandLine.hasOption( 'c' ) ) {
             arg = commandLine.getOptionValue( 'c' );
             if ( FileTools.testFile( arg ) )
-                settings.setClassFile( arg );
+                settings.setClassFile( new File( arg ).getAbsolutePath() );
             else {
                 System.err.println( "Invalid gene set definition file name (-c " + arg + ")" );
                 showHelp();
@@ -382,7 +382,7 @@ public class classScoreCMD {
         if ( commandLine.hasOption( 'd' ) ) {
             arg = commandLine.getOptionValue( 'd' );
             if ( FileTools.testDir( arg ) )
-                settings.setDataDirectory( arg );
+                settings.setDataDirectory( new File( arg ).getAbsolutePath() );
             else {
                 System.err.println( "Invalid path for data folder (-d " + arg + ")" );
                 showHelp();
@@ -410,7 +410,7 @@ public class classScoreCMD {
             arg = commandLine.getOptionValue( 'f' );
             if ( !FileTools.testDir( arg ) ) new File( arg ).mkdir();
 
-            settings.setCustomGeneSetDirectory( arg );
+            settings.setCustomGeneSetDirectory( new File( arg ).getAbsolutePath() );
             log.debug( settings.getCustomGeneSetDirectory() );
         }
         if ( commandLine.hasOption( 'g' ) ) {
@@ -628,7 +628,7 @@ public class classScoreCMD {
         if ( commandLine.hasOption( 's' ) ) {
             arg = commandLine.getOptionValue( 's' );
             if ( FileTools.testFile( arg ) )
-                settings.setScoreFile( arg );
+                settings.setScoreFile( new File( arg ).getAbsolutePath() );
             else {
                 System.err.println( "Invalid score file name (-s " + arg + ")" );
                 showHelp();

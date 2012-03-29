@@ -121,6 +121,7 @@ public class JLinkLabel extends DefaultTableCellRenderer implements Comparable<J
         this.setForeground( Color.BLUE );
         this.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 5 ) );
         this.setOpaque( true );
+        @SuppressWarnings("rawtypes")
         Map attrs = this.getFont().getAttributes();
         attrs.put( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL );
         this.setFont( this.getFont().deriveFont( attrs ) );
