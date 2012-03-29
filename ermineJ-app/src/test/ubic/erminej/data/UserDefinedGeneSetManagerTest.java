@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.Collection;
 
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
 
@@ -44,7 +45,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
         GeneAnnotationParser p = new GeneAnnotationParser( gonames );
         geneAnnots = p.read( ism, Format.DEFAULT, new Settings() );
 
-        Settings settings = new Settings();
+        SettingsHolder settings = new Settings();
 
         manager = new UserDefinedGeneSetManager( geneAnnots, settings, null );
 

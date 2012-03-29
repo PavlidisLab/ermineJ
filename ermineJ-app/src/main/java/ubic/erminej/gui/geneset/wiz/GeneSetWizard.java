@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSet;
@@ -48,7 +48,7 @@ public class GeneSetWizard extends Wizard {
 
     private static final long serialVersionUID = 1L;
     private static Log log = LogFactory.getLog( GeneSetWizard.class.getName() );
-    private Settings settings;
+    private SettingsHolder settings;
     private GeneAnnotations geneData;
     private GeneSetWizardStep1 step1; // case 1 (manual creating) and case 2 (new from file)
     private GeneSetWizardStep1A step1A; // case 3 (modifying existing)

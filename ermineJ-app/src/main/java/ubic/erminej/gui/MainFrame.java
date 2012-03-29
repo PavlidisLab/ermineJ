@@ -86,6 +86,7 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.AnalysisThread;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
@@ -296,23 +297,18 @@ public class MainFrame extends JFrame {
      * @param loadFile
      * @throws IOException
      */
-    public void loadAnalysis( String loadFile ) throws IOException {
+    protected void loadAnalysis( String loadFile ) throws IOException {
 
         assert loadFile != null;
 
         disableMenusForAnalysis();
 
         // the settings used for the analysis, not the same as the application settings.
-        Settings loadSettings;
+        SettingsHolder loadSettings;
         try {
             loadSettings = new Settings( loadFile );
         } catch ( ConfigurationException e ) {
             GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n" + e.getMessage() );
-            return;
-        }
-
-        if ( !checkValid( loadSettings ) ) {
-            GuiUtil.error( "There was a problem loading the analysis.\nFiles referred to in the analysis may have been moved or deleted." );
             return;
         }
 
@@ -367,7 +363,7 @@ public class MainFrame extends JFrame {
     /**
      * @param runSettings
      */
-    public void startAnalysis( Settings runSettings ) {
+    public void startAnalysis( SettingsHolder runSettings ) {
         disableMenusForAnalysis();
         this.athread = new AnalysisThread( runSettings, statusMessenger, geneData );
         log.debug( "Starting analysis thread" );
@@ -446,36 +442,6 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Check whether a file exists, and if not, prompt the user to enter one. The path is returned.
-     * 
-     * @param file
-     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
-     */
-    private String checkFile( String file ) {
-        if ( StringUtils.isBlank( file ) ) return null;
-        log.info( "Seeking file '" + file + "'" );
-        if ( !FileTools.testFile( file ) ) {
-
-            // try to start them somewhere useful.
-            JFileChooser fc = new JFileChooser( settings.getGeneScoreFileDirectory() );
-            //
-            // GuiUtil.error( "A file referred to in the results file\n(" + file
-            // + ")\nwas not found at the listed path.\nIt may have been moved.\nYou will be prompted to"
-            // + " enter the location" );
-            fc.setDialogTitle( "Missing file: please locate " + file );
-            fc.setDialogType( JFileChooser.OPEN_DIALOG );
-            fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
-            int result = fc.showOpenDialog( this );
-            if ( result == JFileChooser.APPROVE_OPTION ) {
-                File f = fc.getSelectedFile();
-                return f.getAbsolutePath();
-            }
-            return null;
-        }
-        return file;
-    }
-
-    /**
      * 
      */
     private void checkForReasonableResults( GeneSetPvalRun results1 ) {
@@ -502,36 +468,6 @@ public class MainFrame extends JFrame {
                     + "For example, make sure your setting for 'larger scores are better' is correct." );
         }
 
-    }
-
-    /**
-     * @param loadSettings
-     */
-    private boolean checkValid( Settings loadSettings ) {
-
-        /*
-         * Strict validation is turned off. But I'm not sure we need this at all?
-         */
-        if ( !loadSettings.getAnnotFile().equals( this.settings.getAnnotFile() ) ) {
-            this.statusMessenger
-                    .showError( "The annotation file in the file doesn't match the one you have loaded, there could be problems." );
-        }
-
-        String file;
-
-        file = checkFile( loadSettings.getRawDataFileName() ); // looks for the file.
-        // if ( file == null ) {
-        // return false;
-        // }
-        loadSettings.setRawFile( file );
-
-        file = checkFile( loadSettings.getScoreFile() );
-        // if ( file == null ) {
-        // return false;
-        // }
-        loadSettings.setScoreFile( file );
-
-        return true;
     }
 
     private void disableMenusForAnalysis() {

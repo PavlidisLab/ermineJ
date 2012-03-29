@@ -18,6 +18,7 @@
  */
 package ubic.erminej;
 
+import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -30,17 +31,23 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.swing.JFileChooser;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
+import ubic.erminej.gui.util.GuiUtil;
 
 /**
- * Load results from a file
+ * Load results from a file. Files can contain more than one result set.
  * 
  * @author Paul Pavlidis
  * @author Homin Lee
@@ -48,18 +55,17 @@ import ubic.erminej.data.GeneSetTerm;
  */
 public class ResultsFileReader {
 
+    private static Log log = LogFactory.getLog( ResultsFileReader.class );
+
     /**
-     * Possibility that this is a project, vs. a single analysis.
-     * 
      * @param geneAnnots
-     * @param filename
+     * @param filename .
      * @param messenger
-     * @throws IOException
+     * @return
      */
     public static Collection<GeneSetPvalRun> load( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
             throws IOException, ConfigurationException {
-
-        checkFile( filename );
+        FileTools.testFile( filename );
 
         messenger.showStatus( "Loading analysis..." );
 
@@ -81,40 +87,6 @@ public class ResultsFileReader {
     }
 
     /**
-     * @param geneAnnots
-     * @param filename
-     * @param messenger
-     * @return
-     * @throws IOException
-     * @throws ConfigurationException
-     */
-    public static GeneSetPvalRun loadOne( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
-            throws IOException, ConfigurationException {
-        BufferedReader dis = new BufferedReader( new FileReader( filename ) );
-        GeneSetPvalRun loadedResults = readOne( dis, geneAnnots, 1, messenger );
-        return loadedResults;
-    }
-
-    /**
-     * @param filename
-     * @throws IOException
-     */
-    private static void checkFile( String filename ) throws IOException {
-        if ( StringUtils.isBlank( filename ) ) {
-            throw new IllegalArgumentException( "File name was blank" );
-        }
-
-        File infile = new File( filename );
-        if ( !infile.exists() || !infile.canRead() ) {
-            throw new IOException( "Could not read " + filename );
-        }
-
-        if ( infile.length() == 0 ) {
-            throw new IOException( "File has zero length" );
-        }
-    }
-
-    /**
      * @param dis
      * @param geneAnnots
      * @param runNum
@@ -128,7 +100,7 @@ public class ResultsFileReader {
         /*
          * Load settings for the analysis.
          */
-        SettingsHolder runSettings = readOneSetOfSettings( dis );
+        SettingsHolder runSettings = readOneSetOfSettings( geneAnnots, dis, messenger );
 
         Map<GeneSetTerm, GeneSetResult> results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
 
@@ -202,16 +174,18 @@ public class ResultsFileReader {
         return newResults;
     }
 
-   
     /**
      * Generate Settings from the file, reading from the current point to the next 'end of settings' marker.
      * 
+     * @param annots
      * @param r
+     * @param statusViewer
      * @return
      * @throws IOException
      * @throws ConfigurationException
      */
-    private static SettingsHolder readOneSetOfSettings( BufferedReader r ) throws IOException, ConfigurationException {
+    private static SettingsHolder readOneSetOfSettings( GeneAnnotations annots, BufferedReader r,
+            StatusViewer statusViewer ) throws IOException, ConfigurationException {
 
         File tmp = File.createTempFile( "ermineJ.", ".tmp.properties" );
         Writer w = new FileWriter( tmp );
@@ -227,9 +201,76 @@ public class ResultsFileReader {
 
         SettingsHolder s = new Settings( tmp.getAbsolutePath() ).getSettingsHolder();
 
+        if ( !checkValid( s ) ) {
+            GuiUtil.error( "There was a problem loading the analysis.\nFiles referred to in the analysis may have been moved or deleted." );
+        }
+
         tmp.delete();
 
         return s;
+    }
+
+    /**
+     * @param loadSettings
+     */
+    private static boolean checkValid( SettingsHolder loadSettings ) {
+
+        String file;
+
+        String rawDataFileName = loadSettings.getRawDataFileName();
+        if ( StringUtils.isNotBlank( rawDataFileName ) ) {
+            file = checkFile( loadSettings, rawDataFileName ); // looks for the file.
+            if ( file == null ) {
+                return false;
+            }
+            loadSettings.setRawFile( file );
+        }
+
+        String scoreFile = loadSettings.getScoreFile();
+        if ( StringUtils.isNotBlank( scoreFile ) ) {
+            file = checkFile( loadSettings, scoreFile );
+            if ( file == null ) {
+                return false;
+            }
+            loadSettings.setScoreFile( file );
+        }
+
+        return true;
+    }
+
+    /**
+     * Check whether a file exists, and if not and the GUI is available, prompt the user to enter one. The path is
+     * returned.
+     * 
+     * @param file
+     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
+     */
+    private static String checkFile( SettingsHolder settings, String file ) {
+        if ( StringUtils.isBlank( file ) ) return null;
+
+        if ( !FileTools.testFile( file ) ) {
+
+            try {
+
+                // try to start them somewhere useful.
+                JFileChooser fc = new JFileChooser( settings.getGeneScoreFileDirectory() );
+
+                fc.setDialogTitle( "Please locate " + new File( file ).getName() );
+                fc.setDialogType( JFileChooser.OPEN_DIALOG );
+                fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
+                int result = fc.showOpenDialog( null );
+                if ( result == JFileChooser.APPROVE_OPTION ) {
+                    File f = fc.getSelectedFile();
+                    return f.getAbsolutePath();
+                }
+            } catch ( HeadlessException e ) {
+                // we must be using the CLI.
+                log.error( file + " referred to in the file could not be found; please fix the file" );
+                return null;
+            }
+            return null;
+        }
+        return file;
     }
 
 }

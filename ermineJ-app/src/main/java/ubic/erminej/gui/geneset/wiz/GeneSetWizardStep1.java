@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
@@ -54,7 +54,7 @@ public class GeneSetWizardStep1 extends WizardStep {
     private JFileChooser chooser;
     int inputMethod;
 
-    public GeneSetWizardStep1( GeneSetWizard wiz, Settings settings ) {
+    public GeneSetWizardStep1( GeneSetWizard wiz, SettingsHolder settings ) {
         super( wiz );
         this.jbInit();
         chooser = new JFileChooser();

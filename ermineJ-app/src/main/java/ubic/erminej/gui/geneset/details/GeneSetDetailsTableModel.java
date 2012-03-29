@@ -33,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.math.Rank;
-import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.analysis.ScoreQuantiles;
 import ubic.erminej.data.Gene;
@@ -60,7 +59,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     private Map<Probe, Double> scoresForProbesInSet;
     private Map<Probe, Double> scoreRanks;
     private GeneAnnotations geneData;
-    private Settings settings;
+    private SettingsHolder settings;
     private Map<Gene, JLinkLabel> linkLabels;
     private String[] tableColumnNames = { "Probe", "Score", "QQ Score", "Symbol", "Name", "Multifunc", "QQ Multifunc" };
     public static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term="
@@ -90,7 +89,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * @param nf
      */
     public GeneSetDetailsTableModel( MatrixDisplay<Probe, String> matrixDisplay, GeneSetDetails geneSetDetails,
-            Settings settings ) {
+            SettingsHolder settings ) {
 
         this.matrixDisplay = matrixDisplay;
         this.probeIDs = new ArrayList<Probe>( geneSetDetails.getProbes() );
@@ -229,8 +228,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 } else {
 
                     // this is the quantile of the scores in the full data set.(but reverse so large is better)
-                    double quantile = Math.max( 1.0 / scoreQuantiles.size(), scoreQuantiles
-                            .quantileInverse( scoresForProbesInSet.get( probeID ) ) );
+                    double quantile = Math.max( 1.0 / scoreQuantiles.size(),
+                            scoreQuantiles.quantileInverse( scoresForProbesInSet.get( probeID ) ) );
 
                     Double position = scoreRanks.get( probeID );
                     double expectedQuantile = ( position + 1 ) / scoresForProbesInSet.size();
@@ -250,8 +249,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 if ( geneData == null ) return "";
                 gene = probeID.getGene();
                 return String.format( "%.3f (%d)",
-                        Math.max( 0.0, multifunctionality.getMultifunctionalityRank( gene ) ), multifunctionality
-                                .getNumGoTerms( gene ) );
+                        Math.max( 0.0, multifunctionality.getMultifunctionalityRank( gene ) ),
+                        multifunctionality.getNumGoTerms( gene ) );
 
             case 6:
                 // multifunctionality graphic.
@@ -260,8 +259,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                     mfv.add( 0, 1.0 );
                     mfv.add( 1, 1.0 );
                 } else {
-                    double mfQuantile = 1.0 - Math.max( 1.0 / mfQuantiles.size(), mfQuantiles
-                            .quantileInverse( multifunctionality.getMultifunctionalityScore( gene ) ) );
+                    double mfQuantile = 1.0 - Math.max( 1.0 / mfQuantiles.size(),
+                            mfQuantiles.quantileInverse( multifunctionality.getMultifunctionalityScore( gene ) ) );
 
                     Double position = mfGeneRanks.get( gene );
                     double expectedQuantile = ( position + 1 ) / multifuncForGenesInSet.size();
@@ -312,7 +311,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * 
      */
     protected void configure() {
-        String candidateUrlBase = settings.getConfig().getString( SettingsHolder.GENE_URL_BASE );
+        String candidateUrlBase = settings.getStringProperty( SettingsHolder.GENE_URL_BASE );
         if ( candidateUrlBase != null && candidateUrlBase.indexOf( URL_REPLACE_TAG ) >= 0 ) {
             this.urlbase = candidateUrlBase;
             log.debug( "Setting urlbase to " + urlbase );

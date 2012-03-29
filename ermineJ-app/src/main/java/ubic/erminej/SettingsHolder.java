@@ -28,8 +28,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
- * Holds settings for retrieval but doesn't allow changing or saving them. This is basically a value object to use
- * during analyses.
+ * Holds settings for retrieval but doesn't allow changing them (with a couple of exceptions) or saving them. This is
+ * basically a value object to use during analyses.
  * 
  * @author paul
  * @version $Id$
@@ -73,6 +73,7 @@ public class SettingsHolder {
      * Strings used in the config file
      */
     protected static final String ALWAYS_USE_EMPIRICAL = "alwaysUseEmpirical";
+
     protected static final String ANNOT_FILE = "annotFile";
     protected static final String ANNOT_FORMAT = "annotFormat";
     protected static final String BIG_IS_BETTER = "bigIsBetter";
@@ -89,10 +90,10 @@ public class SettingsHolder {
     protected static final String MTC_CONFIG_NAME = "mtc";
     protected static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     protected static final String OUTPUT_FILE = "outputFile";
-
     protected static final String GENE_SCORE_THRESHOLD_KEY = "scoreThreshold";
 
     protected static final String GENE_SCORE_THRESHOLD_LEGACY_KEY = "pValThreshold";
+
     protected static final String PREFERENCES_FILE_NAME = "preferencesFileName";
     protected static final String QUANTILE_CONFIG_NAME = "quantile";
     protected static final String RAW_FILE_CONFIG_NAME = "rawFile";
@@ -109,8 +110,8 @@ public class SettingsHolder {
     protected static final String USE_USER_DEFINED_GROUPS = "useUserDefinedGroups";
     protected static final String CUSTOM_GENE_SET_DIRECTORY_PROPERTY = "classFolder";
     protected static final String SAVE_ALL_GENES_IN_OUTPUT = "saveAllGenesInOutput";
-
     public static final String GENE_URL_BASE = "gene.url.base";
+
     protected static final String DEFAULT_CUSTOM_GENE_SET_DIR_NAME = "genesets";
     protected static final String DEFAULT_USER_DATA_DIR_NAME = "ermineJ.data";
 
@@ -210,13 +211,6 @@ public class SettingsHolder {
     }
 
     /**
-     * @return true if outputs should include all genes genes in each gene set.
-     */
-    public boolean getSaveAllGenesInOutput() {
-        return config.getBoolean( SAVE_ALL_GENES_IN_OUTPUT, false );
-    }
-
-    /**
      * @return
      */
     public Settings.Method getClassScoreMethod() {
@@ -227,6 +221,14 @@ public class SettingsHolder {
 
     public String getCustomGeneSetDirectory() {
         return config.getString( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, getDefaultUserClassesDirPath() );
+    }
+
+    public Set<String> getCustomGeneSetFiles() {
+        return new HashSet<String>( config.getList( CUSTOM_GENESET_FILES, new ArrayList<String>() ) );
+    }
+
+    public int getDataCol() {
+        return config.getInteger( DATA_COL, ( Integer ) getDefaultSettingsValue( DATA_COL ) );
     }
 
     public String getDataDirectory() {
@@ -262,6 +264,17 @@ public class SettingsHolder {
     public MultiProbeHandling getGeneRepTreatment() {
         String storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
         return Settings.MultiProbeHandling.valueOf( storedValue );
+    }
+
+    /**
+     * @return the path to the last directory used for gene scores
+     */
+    public String getGeneScoreFileDirectory() {
+        String gsf = this.getScoreFile();
+        if ( gsf == null ) return getDataDirectory();
+
+        File gsfFile = new File( gsf );
+        return gsfFile.getParent() == null ? getDataDirectory() : gsfFile.getParent();
     }
 
     /**
@@ -337,12 +350,15 @@ public class SettingsHolder {
         return config.getString( RAW_FILE_CONFIG_NAME );
     }
 
-    public int getScoreCol() {
-        return config.getInteger( SCORE_COL, ( Integer ) getDefaultSettingsValue( SCORE_COL ) );
+    /**
+     * @return true if outputs should include all genes genes in each gene set.
+     */
+    public boolean getSaveAllGenesInOutput() {
+        return config.getBoolean( SAVE_ALL_GENES_IN_OUTPUT, false );
     }
 
-    public int getDataCol() {
-        return config.getInteger( DATA_COL, ( Integer ) getDefaultSettingsValue( DATA_COL ) );
+    public int getScoreCol() {
+        return config.getInteger( SCORE_COL, ( Integer ) getDefaultSettingsValue( SCORE_COL ) );
     }
 
     public String getScoreFile() {
@@ -353,8 +369,14 @@ public class SettingsHolder {
         return new HashSet<String>( config.getList( SELECTED_CUSTOM_GENESETS, new ArrayList<String>() ) );
     }
 
-    public Set<String> getCustomGeneSetFiles() {
-        return new HashSet<String>( config.getList( CUSTOM_GENESET_FILES, new ArrayList<String>() ) );
+    /**
+     * @param propertyName
+     * @return
+     */
+    public String getStringProperty( String propertyName ) {
+        Object prop = this.config.getProperty( propertyName );
+        if ( prop == null ) return null;
+        return prop.toString();
     }
 
     /**
@@ -399,11 +421,6 @@ public class SettingsHolder {
         return dir;
     }
 
-    public boolean getUseUserDefined() {
-        return config.getBoolean( USE_USER_DEFINED_GROUPS,
-                ( Boolean ) getDefaultSettingsValue( USE_USER_DEFINED_GROUPS ) );
-    }
-
     // /**
     // * @return true if multiple values for a gene should be combined, or whether each probe should be treated
     // * independently regardless; basically this is always going to be true.
@@ -415,16 +432,21 @@ public class SettingsHolder {
     // return false;
     // }
 
+    public boolean getUseUserDefined() {
+        return config.getBoolean( USE_USER_DEFINED_GROUPS,
+                ( Boolean ) getDefaultSettingsValue( USE_USER_DEFINED_GROUPS ) );
+    }
+
     public boolean isTester() {
         return config.getBoolean( IS_TESTER, false );
     }
 
-    public void setUseUserDefined( boolean b ) {
-        this.config.setProperty( USE_USER_DEFINED_GROUPS, b );
-    }
-
     public void setCustomGeneSetFiles( Collection<String> filePaths ) {
         this.config.setProperty( CUSTOM_GENESET_FILES, filePaths );
+    }
+
+    public void setUseUserDefined( boolean b ) {
+        this.config.setProperty( USE_USER_DEFINED_GROUPS, b );
     }
 
     /**
@@ -454,14 +476,12 @@ public class SettingsHolder {
         return this.config.getProperty( propertyName );
     }
 
-    /**
-     * @param propertyName
-     * @return
-     */
-    public String getStringProperty( String propertyName ) {
-        Object prop = this.config.getProperty( propertyName );
-        if ( prop == null ) return null;
-        return prop.toString();
+    public void setRawFile( String val ) {
+        this.config.setProperty( RAW_FILE_CONFIG_NAME, val );
+    }
+
+    public void setScoreFile( String val ) {
+        this.config.setProperty( SCORE_FILE, val );
     }
 
 }

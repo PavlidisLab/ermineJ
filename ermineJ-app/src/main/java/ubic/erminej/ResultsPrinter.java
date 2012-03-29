@@ -93,7 +93,7 @@ public class ResultsPrinter {
      * @param masterSettings
      * @param runsToSave
      */
-    public static void write( String path, Settings masterSettings, Collection<GeneSetPvalRun> runsToSave )
+    public static void write( String path, SettingsHolder masterSettings, Collection<GeneSetPvalRun> runsToSave )
             throws IOException {
         Writer w = null;
         try {

@@ -23,6 +23,7 @@ import java.util.zip.ZipInputStream;
 import junit.framework.TestCase;
 
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneAnnotationParser.Format;
@@ -52,7 +53,7 @@ public class TestMultifunctionality extends TestCase {
 
         GeneAnnotationParser p = new GeneAnnotationParser( geneSets );
 
-        Settings settings = new Settings();
+        SettingsHolder settings = new Settings();
         settings.setUseUserDefined( false );
 
         GeneAnnotations ga = p.read( is, Format.DEFAULT, settings );

@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.data.GeneAnnotations;
@@ -110,7 +111,7 @@ public class AnalysisWizard extends Wizard {
         return geneScoreMethod;
     }
 
-    public Settings getSettings() {
+    public SettingsHolder getSettings() {
         return settings;
     }
 
@@ -187,7 +188,7 @@ public class AnalysisWizard extends Wizard {
             new Thread() {
                 @Override
                 public void run() {
-                    Settings copyOfSettings = new Settings( settings );
+                    SettingsHolder copyOfSettings = new Settings( settings );
                     ( ( MainFrame ) callingframe ).startAnalysis( copyOfSettings );
                 }
             }.start();

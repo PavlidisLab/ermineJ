@@ -20,6 +20,7 @@ package ubic.erminej.gui.util;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
@@ -109,8 +110,13 @@ public class GuiUtil {
      * @param message
      */
     public static void error( String message ) {
-        JOptionPane.showMessageDialog( null, "Error: " + message + "\n", "Error", JOptionPane.ERROR_MESSAGE );
-        log.error( message );
+        try {
+            JOptionPane.showMessageDialog( null, "Error: " + message + "\n", "Error", JOptionPane.ERROR_MESSAGE );
+            log.error( message );
+        } catch ( HeadlessException e ) {
+            // must be using the CLI actually.
+            log.error( message );
+        }
     }
 
     /**

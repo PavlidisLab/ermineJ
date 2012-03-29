@@ -41,7 +41,6 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.dataStructure.graph.DirectedGraph;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
-import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
 /**
@@ -110,7 +109,7 @@ public class GeneAnnotations {
      * @param geneSetTerms
      * @param messenger
      */
-    public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, Settings settings, StatusViewer messenger ) {
+    public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, SettingsHolder settings, StatusViewer messenger ) {
         if ( messenger != null ) this.messenger = messenger;
         if ( genes.isEmpty() ) {
             throw new IllegalArgumentException( "There were no genes" );

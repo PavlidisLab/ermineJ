@@ -169,7 +169,7 @@ public class Settings extends SettingsHolder {
      * 
      * @param settings - settings object to copy
      */
-    public Settings( Settings settingsToCopy ) {
+    public Settings( SettingsHolder settingsToCopy ) {
         this.config = new PropertiesConfiguration();
         PropertiesConfiguration oldConfig = settingsToCopy.getConfig();
         for ( Iterator<String> iter = oldConfig.getKeys(); iter.hasNext(); ) {
@@ -258,32 +258,32 @@ public class Settings extends SettingsHolder {
      */
     @Override
     public Settings.Method getClassScoreMethod() {
-        String storedValue = config.getString( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
+        String storedValue = config.getString( CLASS_SCORE_METHOD, SettingsHolder.Method.ORA.toString() );
 
         // backwards compatibility
         if ( NumberUtils.isDigits( storedValue ) ) {
             int oldVal = Integer.parseInt( storedValue );
             switch ( oldVal ) {
                 case 0:
-                    setClassScoreMethod( Settings.Method.ORA );
+                    setClassScoreMethod( SettingsHolder.Method.ORA );
                     break;
                 case 1:
-                    setClassScoreMethod( Settings.Method.GSR );
+                    setClassScoreMethod( SettingsHolder.Method.GSR );
                     break;
                 case 2:
-                    setClassScoreMethod( Settings.Method.CORR );
+                    setClassScoreMethod( SettingsHolder.Method.CORR );
                     break;
                 case 3:
-                    setClassScoreMethod( Settings.Method.ROC );
+                    setClassScoreMethod( SettingsHolder.Method.ROC );
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
-            storedValue = config.getString( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
+            storedValue = config.getString( CLASS_SCORE_METHOD, SettingsHolder.Method.ORA.toString() );
 
         }
 
-        return Settings.Method.valueOf( storedValue );
+        return SettingsHolder.Method.valueOf( storedValue );
     }
 
     /**
@@ -310,10 +310,10 @@ public class Settings extends SettingsHolder {
             int oldVal = Integer.parseInt( storedValue );
             switch ( oldVal ) {
                 case 1:
-                    setGeneRepTreatment( Settings.MultiProbeHandling.BEST );
+                    setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
                     break;
                 case 2:
-                    setGeneRepTreatment( Settings.MultiProbeHandling.MEAN );
+                    setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -321,19 +321,9 @@ public class Settings extends SettingsHolder {
             storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() );
         }
 
-        return Settings.MultiProbeHandling.valueOf( storedValue );
+        return SettingsHolder.MultiProbeHandling.valueOf( storedValue );
     }
 
-    /**
-     * @return the path to the last directory used for gene scores
-     */
-    public String getGeneScoreFileDirectory() {
-        String gsf = this.getScoreFile();
-        if ( gsf == null ) return getDataDirectory();
-
-        File gsfFile = new File( gsf );
-        return gsfFile.getParent() == null ? getDataDirectory() : gsfFile.getParent();
-    }
 
     /**
      * @return the method to be used to combine scores. This is only relevant for the gene set resampling method.
@@ -348,13 +338,13 @@ public class Settings extends SettingsHolder {
 
             switch ( oldVal ) {
                 case 0:
-                    setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN );
+                    setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN );
                     break;
                 case 1:
-                    setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.QUANTILE );
+                    setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.QUANTILE );
                     break;
                 case 2:
-                    setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
+                    setGeneSetResamplingScoreMethod( SettingsHolder.GeneScoreMethod.MEAN_ABOVE_QUANTILE );
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -362,7 +352,7 @@ public class Settings extends SettingsHolder {
             storedValue = config.getString( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
         }
 
-        return Settings.GeneScoreMethod.valueOf( storedValue );
+        return SettingsHolder.GeneScoreMethod.valueOf( storedValue );
     }
 
     /**
@@ -531,10 +521,6 @@ public class Settings extends SettingsHolder {
         this.config.setProperty( QUANTILE_CONFIG_NAME, val );
     }
 
-    public void setRawFile( String val ) {
-        this.config.setProperty( RAW_FILE_CONFIG_NAME, val );
-    }
-
     public void setSaveAllGenesInOutput( boolean saveAllGenes ) {
         config.setProperty( SAVE_ALL_GENES_IN_OUTPUT, saveAllGenes );
 
@@ -543,10 +529,6 @@ public class Settings extends SettingsHolder {
     public void setScoreCol( int val ) {
         log.debug( "Setting score start column to " + val );
         this.config.setProperty( SCORE_COL, val );
-    }
-
-    public void setScoreFile( String val ) {
-        this.config.setProperty( SCORE_FILE, val );
     }
 
     public void setSelectedCustomGeneSets( Collection<GeneSetTerm> addedClasses ) {

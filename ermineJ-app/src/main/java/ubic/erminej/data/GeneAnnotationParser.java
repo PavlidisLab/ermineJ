@@ -35,7 +35,7 @@ import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.basecode.util.StringUtil;
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 
 /**
  * * Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
@@ -82,7 +82,7 @@ public class GeneAnnotationParser {
      * @return
      * @throws IOException
      */
-    public GeneAnnotations read( InputStream i, Format format, Settings settings ) throws IOException {
+    public GeneAnnotations read( InputStream i, Format format, SettingsHolder settings ) throws IOException {
         warned = false;
         if ( i == null ) {
             throw new IOException( "Inputstream was null" );
@@ -119,7 +119,7 @@ public class GeneAnnotationParser {
      * @return
      * @throws IOException
      */
-    public GeneAnnotations read( String fileName, Format format, Settings settings ) throws IOException {
+    public GeneAnnotations read( String fileName, Format format, SettingsHolder settings ) throws IOException {
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
         return this.read( i, format, settings );
     }
@@ -199,15 +199,15 @@ public class GeneAnnotationParser {
     /**
      * @param bis
      */
-    private GeneAnnotations readAffyCsv( InputStream bis, Settings settings ) throws IOException {
+    private GeneAnnotations readAffyCsv( InputStream bis, SettingsHolder settings ) throws IOException {
         return this.readAffyCsv( bis, null, settings );
     }
 
-    private GeneAnnotations readAgilent( InputStream bis, Settings settings ) throws IOException {
+    private GeneAnnotations readAgilent( InputStream bis, SettingsHolder settings ) throws IOException {
         return this.readAgilent( bis, null, settings );
     }
 
-    private GeneAnnotations readDefault( InputStream bis, Settings settings ) throws IOException {
+    private GeneAnnotations readDefault( InputStream bis, SettingsHolder settings ) throws IOException {
         return this.readDefault( bis, null, settings );
     }
 
@@ -217,7 +217,7 @@ public class GeneAnnotationParser {
      * @param bis
      * @param object
      */
-    protected GeneAnnotations readAffyCsv( InputStream bis, Set<String> activeGenes, Settings settings )
+    protected GeneAnnotations readAffyCsv( InputStream bis, Set<String> activeGenes, SettingsHolder settings )
             throws IOException {
         if ( bis == null ) {
             throw new IOException( "Inputstream was null" );
@@ -388,7 +388,7 @@ public class GeneAnnotationParser {
      * @param settings
      * @throws IOException
      */
-    protected GeneAnnotations readAgilent( InputStream bis, Set<String> activeGenes, Settings settings )
+    protected GeneAnnotations readAgilent( InputStream bis, Set<String> activeGenes, SettingsHolder settings )
             throws IOException {
         if ( bis == null ) {
             throw new IOException( "Inputstream was null" );
@@ -494,7 +494,7 @@ public class GeneAnnotationParser {
      * @param settings
      * @throws IOException
      */
-    public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, Settings settings )
+    public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, SettingsHolder settings )
             throws IOException {
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );

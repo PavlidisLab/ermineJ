@@ -141,7 +141,7 @@ public class classScoreCMD {
         return saveFileName;
     }
 
-    public Settings getSettings() {
+    public SettingsHolder getSettings() {
         return settings;
     }
 
@@ -181,7 +181,7 @@ public class classScoreCMD {
 
         options.addOption( OptionBuilder.withDescription(
                 "Sets 'big is better' option for gene scores to true [default = "
-                        + settings.getDefaultSettingsValue( Settings.BIG_IS_BETTER ) + "]" ).create( 'b' ) );
+                        + settings.getDefaultSettingsValue( SettingsHolder.BIG_IS_BETTER ) + "]" ).create( 'b' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" )
                 .withDescription( "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" )
@@ -261,21 +261,21 @@ public class classScoreCMD {
                 .withLongOpt( "threshold" )
                 .withDescription(
                         "Score threshold, only used for ORA; default = "
-                                + settings.getDefaultSettingsValue( Settings.GENE_SCORE_THRESHOLD_KEY ) )
+                                + settings.getDefaultSettingsValue( SettingsHolder.GENE_SCORE_THRESHOLD_KEY ) )
                 .withArgName( "value" ).create( 't' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
                 .withDescription(
                         "Sets the minimum class size; default = "
-                                + settings.getDefaultSettingsValue( Settings.MIN_CLASS_SIZE ) ).withArgName( "integer" )
+                                + settings.getDefaultSettingsValue( SettingsHolder.MIN_CLASS_SIZE ) ).withArgName( "integer" )
                 .withLongOpt( "minClassSize" ).create( 'y' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
                 .withDescription(
                         "Sets the maximum class size; default = "
-                                + settings.getDefaultSettingsValue( Settings.MAX_CLASS_SIZE ) ).withArgName( "integer" )
+                                + settings.getDefaultSettingsValue( SettingsHolder.MAX_CLASS_SIZE ) ).withArgName( "integer" )
                 .withLongOpt( "maxClassSize" ).create( 'x' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" )

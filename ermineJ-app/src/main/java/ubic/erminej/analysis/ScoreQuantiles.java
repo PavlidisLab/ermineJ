@@ -18,7 +18,7 @@ import hep.aida.bin.QuantileBin1D;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneScores;
 import cern.colt.list.DoubleArrayList;
 
@@ -33,7 +33,7 @@ public class ScoreQuantiles {
      * @param geneScores
      * @return
      */
-    public static QuantileBin1D computeQuantiles( Settings settings, GeneScores geneScores ) {
+    public static QuantileBin1D computeQuantiles( SettingsHolder settings, GeneScores geneScores ) {
         Double[] scores = geneScores.getGeneScores();
         QuantileBin1D scoreQuantiles = new QuantileBin1D( true, scores.length, 0.0, 0.0, 1000,
                 new cern.jet.random.engine.DRand() );

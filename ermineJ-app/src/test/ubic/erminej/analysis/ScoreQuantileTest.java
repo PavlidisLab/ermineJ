@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import hep.aida.bin.QuantileBin1D;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScoreReaderTest;
@@ -41,7 +42,7 @@ public class ScoreQuantileTest extends TestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        Settings s = new Settings( false );
+        SettingsHolder s = new Settings( false );
 
         InputStream is = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.scores.txt" );
 
