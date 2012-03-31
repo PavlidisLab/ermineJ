@@ -380,11 +380,6 @@ public class MainFrame extends JFrame {
         for ( GeneSetPvalRun latestResult : latestResults ) {
             checkForReasonableResults( latestResult );
             if ( latestResult != null ) addResult( latestResult );
-            try {
-                Thread.sleep( 100 );
-            } catch ( InterruptedException e ) {
-                //
-            }
         }
         athread = null;
         enableMenusForAnalysis();
@@ -426,19 +421,11 @@ public class MainFrame extends JFrame {
 
         result.setName( n );
         results.add( result );
-        this.updateRunViewMenu();
 
-        try {
-            Thread.sleep( 100 );
-        } catch ( InterruptedException e ) {
-            // give the gui a chance to catch up; an attempt (in vain?) to avoid errors in logs like "
-            // java.lang.ClassCastException:
-            // ubic.erminej.data.EmptyGeneSetResult cannot be cast to java.lang.String at
-            // ubic.erminej.gui.geneset.table.GeneSetTableCellRenderer.getTableCellRendererComponent(GeneSetTableModel.java:316)"
-        }
-
+        updateRunViewMenu();
         tablePanel.addRun();
         treePanel.addRun();
+
     }
 
     /**

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
@@ -155,7 +156,6 @@ public class AnalysisWizardStep5 extends WizardStep {
      * Save the values to the configuration.
      */
     public void saveValues() {
-        settings.setIterations( numIterations.get() );
 
         if ( !settings.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL ) ) {
             if ( jRadioButtonMean.isSelected() ) {
@@ -170,6 +170,8 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setBigIsBetter( bigIsBetter );
         settings.setAlwaysUseEmpirical( doFullEmpirical );
         settings.setUseMultifunctionalityCorrection( doMfCorr );
+        settings.setIterations( numIterations.get() );
+
     }
 
     public boolean upperTail() {
@@ -394,18 +396,30 @@ public class AnalysisWizardStep5 extends WizardStep {
         gl.setVerticalGroup( gl.createParallelGroup().addComponent( numIterationsLabel )
                 .addComponent( jTextFieldIterations ) );
 
-        int iterations = settings.getIterations();
-        if ( iterations > 0 ) {
-            jTextFieldIterations.setText( String.valueOf( iterations ) );
+        numIterations.set( settings.getIterations() );
+        if ( numIterations.get() > 0 ) {
+            jTextFieldIterations.setText( String.valueOf( numIterations.get() ) );
         }
 
-        jTextFieldIterations.addKeyListener( new KeyAdapter() {
+        // not sure both of these are needed ... probably just the key listener.
+        jTextFieldIterations.addActionListener( new AbstractAction() {
             @Override
-            public void keyReleased( KeyEvent e ) {
+            public void actionPerformed( ActionEvent arg0 ) {
                 try {
                     numIterations.set( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
                 } catch ( NumberFormatException e1 ) {
-                    //
+                    log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
+                }
+            }
+        } );
+
+        jTextFieldIterations.addKeyListener( new KeyAdapter() {
+            @Override
+            public void keyTyped( KeyEvent e ) {
+                try {
+                    numIterations.set( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
+                } catch ( NumberFormatException e1 ) {
+                    log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
                 }
             }
         } );

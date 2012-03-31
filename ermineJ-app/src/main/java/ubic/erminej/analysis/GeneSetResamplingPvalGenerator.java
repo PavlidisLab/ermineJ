@@ -176,9 +176,8 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
     }
 
     /**
-     * Same thing as class_pval_generator, but returns a more raw map of genesets to scores (pvalues) (see below)
-     * instead of adding them to the results object. This is used to get class pvalues for permutation analysis (W-Y
-     * correction)
+     * Same thing as classPval, but returns a more raw map of genesets to scores (pvalues) (see below) instead of adding
+     * them to the results object. This is used to get class pvalues for permutation analysis (W-Y correction)
      */
     public Map<GeneSetTerm, Double> classPvalGeneratorRaw() {
         Map<GeneSetTerm, Double> results = new HashMap<GeneSetTerm, Double>();

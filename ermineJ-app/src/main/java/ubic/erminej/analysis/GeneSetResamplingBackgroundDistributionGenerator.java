@@ -19,10 +19,8 @@
 package ubic.erminej.analysis;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -99,7 +97,17 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
 
         this.geneScores = geneToScoreMap.values().toArray( new Double[] {} );
 
-        geneRanks = Rank.rankTransform( geneToScoreMap );
+        /*
+         * Taking into account the "bigger is better" / "log-transform" setting.
+         */
+        if ( settings.getBigIsBetter() && !settings.getDoLog() ) {
+            geneRanks = Rank.rankTransform( geneToScoreMap, true );
+        } else if ( settings.getDoLog() && !settings.getBigIsBetter() ) {
+            // no need to actually do the transform.
+            geneRanks = Rank.rankTransform( geneToScoreMap, true );
+        } else {
+            geneRanks = Rank.rankTransform( geneToScoreMap, false );
+        }
 
         this.setHistogramRange();
         this.hist = new Histogram( numClasses, classMinSize, numRuns, histogramMax, histogramMin );
@@ -291,11 +299,13 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
     protected double averagePrecision( Collection<Gene> genesInSet ) {
         assert geneRanks.size() >= genesInSet.size();
 
-        Set<Double> ranksOfPositives = new HashSet<Double>();
+        List<Double> ranksOfPositives = new Vector<Double>();
         for ( Gene gene : genesInSet ) {
             if ( geneRanks.containsKey( gene ) ) {
                 Double rank = geneRanks.get( gene );
                 ranksOfPositives.add( rank );
+            } else {
+                log.warn( "Missing rank for " + gene );
             }
         }
 

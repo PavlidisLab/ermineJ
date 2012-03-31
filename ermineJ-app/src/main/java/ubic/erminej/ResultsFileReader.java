@@ -264,7 +264,7 @@ public class ResultsFileReader {
                     return f.getAbsolutePath();
                 }
             } catch ( HeadlessException e ) {
-                // we must be using the CLI.
+                // we must be using the CLI... though that really doesn't make much sense. Just in case.
                 log.error( file + " referred to in the file could not be found; please fix the file" );
                 return null;
             }
