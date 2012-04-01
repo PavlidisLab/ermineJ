@@ -144,7 +144,7 @@ public class Multifunctionality {
             return geneToScoreMap;
         }
 
-        // FIXME deal with missing values.
+        // This does not deal with missing values.
         DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();

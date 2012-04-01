@@ -55,7 +55,9 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
     protected SettingsHolder settings;
 
+    // used for precision-recall.
     protected Map<Gene, Double> geneRanks;
+
     protected Map<Gene, Double> geneToScoreMap;
     protected GeneAnnotations geneAnnots;
     protected int numGenesUsed = 0;

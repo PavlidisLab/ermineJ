@@ -16,7 +16,6 @@ package ubic.erminej.data;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 

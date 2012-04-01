@@ -24,8 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import ubic.basecode.math.ROC;
-import ubic.basecode.math.Rank;
+import ubic.basecode.math.ROC; 
 import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.SettingsHolder;
@@ -35,7 +34,7 @@ import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 
 /**
- * Compute gene set p values based on the receiver-operator characterisic (ROC).
+ * Compute gene set p values based on the receiver operating characteristic (ROC).
  * 
  * @author Paul Pavlidis
  * @version $Id$
@@ -67,8 +66,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     protected Map<GeneSetTerm, GeneSetResult> generateGeneSetResults( boolean useMultifunctionalityCorrection ) {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         int count = 0;
-
-        geneRanks = Rank.rankTransform( geneToScoreMap );
+ 
 
         this.numGenesUsed = geneToScoreMap.size();
 
@@ -125,7 +123,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         List<Double> targetRanks = ranksOfGenesInSet( genesInSet );
 
-        int totalSize = geneRanks.size();
+        int totalSize = geneToScoreMap.size();
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );
         double roc_pval = ROC.rocpval( totalSize, targetRanks );
 
