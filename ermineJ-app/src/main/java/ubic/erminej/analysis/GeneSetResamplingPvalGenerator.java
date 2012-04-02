@@ -168,7 +168,8 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         }
 
         // set up the return object.
-        GeneSetResult res = new GeneSetResult( geneSetName, numProbesInSet( geneSetName ), numGenesInSet( geneSetName ) );
+        GeneSetResult res = new GeneSetResult( geneSetName, numProbesInSet( geneSetName ),
+                numGenesInSet( geneSetName ), settings );
         res.setScore( rawscore );
         res.setPValue( pval );
         return res;

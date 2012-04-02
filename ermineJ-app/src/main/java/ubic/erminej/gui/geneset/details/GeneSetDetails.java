@@ -36,6 +36,7 @@ import ubic.basecode.io.reader.DoubleMatrixReader;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
@@ -68,6 +69,8 @@ public class GeneSetDetails {
 
     private int numGenes = 0;
 
+    private SettingsHolder runSettings;
+
     /**
      * Show without any results.
      * 
@@ -98,6 +101,8 @@ public class GeneSetDetails {
 
         this( classID, geneData, statusViewer );
 
+        if ( result != null ) this.runSettings = result.getSettings();
+
         if ( settings == null ) {
             log.debug( "No settings, reading them in" );
             try {
@@ -110,6 +115,7 @@ public class GeneSetDetails {
         } else {
             this.settings = settings;
         }
+
         this.probes = geneData.getGeneSetProbes( classID );
 
         this.result = result;
@@ -178,8 +184,24 @@ public class GeneSetDetails {
         return Collections.unmodifiableMap( probeScores );
     }
 
+    /**
+     * @return the settings used for analysis of this gene set (will be null if we aren't looking at a result)
+     */
+    public SettingsHolder getRunSettings() {
+        return runSettings;
+    }
+
     public Settings getSettings() {
         return settings;
+    }
+
+    /**
+     * The full set of GeneScores from which this was derived.
+     * 
+     * @return
+     */
+    public GeneScores getSourceGeneScores() {
+        return geneScores;
     }
 
     /**
@@ -196,19 +218,21 @@ public class GeneSetDetails {
             title = title + " p = " + String.format( "%.2g", result.getPvalue() );
         }
 
+        SettingsHolder s = getSettingsToUse();
+
         /* this gets kind of long, this information needs to be available somewhere */
 
         if ( dataMatrix != null ) {
-            String rawDataSource = new File( settings.getRawDataFileName() ).getName();
+            String rawDataSource = new File( s.getRawDataFileName() ).getName();
             title += " Profiles: " + rawDataSource;
         }
 
         if ( probeScores != null && !probeScores.isEmpty() ) {
-            if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
-                String scoreSource = new File( settings.getScoreFile() ).getName();
+            if ( StringUtils.isNotBlank( s.getScoreFile() ) ) {
+                String scoreSource = new File( s.getScoreFile() ).getName();
                 title += " Scores: " + scoreSource;
             }
-            title += " col: " + settings.getScoreCol() + " " + this.geneScores.getScoreColumnName();
+            title += " col: " + s.getScoreCol() + " " + this.geneScores.getScoreColumnName();
 
         }
 
@@ -227,11 +251,11 @@ public class GeneSetDetails {
             for ( Probe p : probes ) {
                 probeNames.put( p.getName(), p );
             }
+            SettingsHolder s = getSettingsToUse();
 
             DoubleMatrixReader matrixReader = new DoubleMatrixReader();
 
-            DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet(),
-                    settings.getDataCol() );
+            DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet(), s.getDataCol() );
 
             this.dataMatrix = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
             dataMatrix.setColumnNames( omatrix.getColNames() );
@@ -276,6 +300,22 @@ public class GeneSetDetails {
     }
 
     /**
+     * Switch out the gene scores.
+     * 
+     * @param scores
+     */
+    public void setGeneScores( GeneScores scores ) {
+        initGeneScores( scores );
+    }
+
+    /**
+     * @return
+     */
+    private SettingsHolder getSettingsToUse() {
+        return runSettings == null ? settings : runSettings;
+    }
+
+    /**
      * @param geneScores
      */
     private void initGeneScores( GeneScores gs ) {
@@ -304,7 +344,8 @@ public class GeneSetDetails {
     }
 
     private void initMatrix() {
-        String filename = settings.getRawDataFileName();
+        SettingsHolder s = getSettingsToUse();
+        String filename = s.getRawDataFileName();
 
         if ( StringUtils.isBlank( filename ) ) {
             // GuiUtil.error( "The data file name was not supplied.\n" );
@@ -325,34 +366,19 @@ public class GeneSetDetails {
      */
     private GeneScores tryToGetGeneScores() throws IllegalStateException {
         assert settings != null : "Null settings.";
-        String scoreFile = settings.getScoreFile();
+        SettingsHolder s = getSettingsToUse();
+
+        String scoreFile = s.getScoreFile();
+
         if ( StringUtils.isNotBlank( scoreFile ) ) {
             try {
                 callerStatusViewer.showStatus( "Getting gene scores from " + scoreFile );
-                return new GeneScores( scoreFile, settings, null, this.geneData );
+                return new GeneScores( scoreFile, s, null, this.geneData );
             } catch ( Exception e ) {
                 callerStatusViewer.showError( scoreFile + " is not readable: " + e );
             }
         }
         return null;
-    }
-
-    /**
-     * Switch out the gene scores.
-     * 
-     * @param scores
-     */
-    public void setGeneScores( GeneScores scores ) {
-        initGeneScores( scores );
-    }
-
-    /**
-     * The full set of GeneScores from which this was derived.
-     * 
-     * @return
-     */
-    public GeneScores getSourceGeneScores() {
-        return geneScores;
     }
 
 }

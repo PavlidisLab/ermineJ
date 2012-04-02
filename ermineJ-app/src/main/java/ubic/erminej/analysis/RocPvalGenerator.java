@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import ubic.basecode.math.ROC; 
+import ubic.basecode.math.ROC;
 import ubic.basecode.util.StatusViewer;
 
 import ubic.erminej.SettingsHolder;
@@ -66,7 +66,6 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     protected Map<GeneSetTerm, GeneSetResult> generateGeneSetResults( boolean useMultifunctionalityCorrection ) {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
         int count = 0;
- 
 
         this.numGenesUsed = geneToScoreMap.size();
 
@@ -127,7 +126,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );
         double roc_pval = ROC.rocpval( totalSize, targetRanks );
 
-        GeneSetResult res = new GeneSetResult( geneSet, numProbesInSet( geneSet ), numGenesInSet );
+        GeneSetResult res = new GeneSetResult( geneSet, numProbesInSet( geneSet ), numGenesInSet, settings );
         res.setScore( areaUnderROC );
         res.setPValue( roc_pval );
         return res;

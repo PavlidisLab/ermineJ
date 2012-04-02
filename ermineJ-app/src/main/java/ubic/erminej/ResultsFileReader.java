@@ -133,7 +133,7 @@ public class ResultsFileReader {
                 // we could recompute this, but better not.
                 double correctedPval = Double.parseDouble( st.nextToken() );
 
-                GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval );
+                GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval, runSettings );
 
                 // we cannot easily recompute this.
                 int mfRankChange = Integer.parseInt( st.nextToken() );

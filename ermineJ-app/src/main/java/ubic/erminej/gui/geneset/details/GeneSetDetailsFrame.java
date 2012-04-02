@@ -78,6 +78,7 @@ import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Probe;
@@ -175,6 +176,7 @@ public class GeneSetDetailsFrame extends JFrame {
     private boolean normalizeSavedData = false;
     private boolean normalizeSavedImage = true;
     private GeneSetDetailsTableModel tableModel;
+    private SettingsHolder runSettings;
 
     // private StatusViewer callerStatusViewer = null;
 
@@ -194,6 +196,8 @@ public class GeneSetDetailsFrame extends JFrame {
         } else {
             this.settings = geneSetDetails.getSettings();
         }
+
+        this.runSettings = geneSetDetails.getRunSettings();
 
         readPrefs();
         createDetailsTable();
@@ -1095,6 +1099,11 @@ public class GeneSetDetailsFrame extends JFrame {
      * Keep the same gene set, but change the scores.
      */
     protected void switchGeneScoreFile() {
+
+        if ( runSettings != null ) {
+
+        }
+
         JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( settings.getScoreFile(), settings.getScoreCol() );
         fchooser.setDialogTitle( "Choose the gene score file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );

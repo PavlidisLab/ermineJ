@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 
+import ubic.erminej.SettingsHolder;
+
 /**
  * Data structure to store class scoring information about a class. This also knows how to print itself out.
  * 
@@ -39,6 +41,12 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     private double multifunctionality = 0.5;
     private int rank = -12345;
 
+    private SettingsHolder settings;
+
+    public SettingsHolder getSettings() {
+        return settings;
+    }
+
     private int multifunctionalityCorrectedRankDelta = -12345;
 
     private int numProbes = 0;
@@ -46,7 +54,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     private double relativeRank = 1.0;
 
     public GeneSetResult() {
-        this( null, 0, 0, 0.0, 1.0, 1.0 );
+        this( null, 0, 0, 0.0, 1.0, 1.0, null );
     }
 
     /**
@@ -54,9 +62,10 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @param numProbes (in set)
      * @param numGenes (in set)
      */
-    public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes ) {
+    public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes, SettingsHolder settings ) {
         this();
         this.geneSetTerm = id;
+        this.settings = settings;
         this.setSizes( numProbes, numGenes );
     }
 
@@ -69,13 +78,14 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @param pvalue
      */
     public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes, double score, double pvalue,
-            double correctedPvalue ) {
+            double correctedPvalue, SettingsHolder settings ) {
         this.geneSetTerm = id;
         this.pvalue = pvalue;
         this.score = score;
         this.numProbes = numProbes;
         this.numGenes = numGenes;
         this.correctedPvalue = correctedPvalue;
+        this.settings = settings;
     }
 
     /**

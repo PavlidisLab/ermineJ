@@ -492,7 +492,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             oraPval = 1.0;
         }
 
-        GeneSetResult res = new GeneSetResult( className, numProbesInSet( className ), numGenesInSet );
+        GeneSetResult res = new GeneSetResult( className, numProbesInSet( className ), numGenesInSet, settings );
         res.setScore( successes );
         res.setPValue( oraPval );
         return res;

@@ -58,7 +58,7 @@ public class Multifunctionality {
      * Should we just use the plain old AU-ROC (which ignores the gene set size), or the pvalue for the AU-ROC (which
      * needs to be scaled in an ad-hoc way to be reasonable)
      */
-    private static final boolean USE_AUC_FOR_GENE_SET_MF = true;
+    private static final boolean USE_AUC_FOR_GENE_SET_MF = false;
 
     /**
      * Do we count genes that don't have GO terms? .
@@ -144,10 +144,14 @@ public class Multifunctionality {
             return geneToScoreMap;
         }
 
-        // This does not deal with missing values.
-        DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
+        // This does not deal with missing values. SHOULD WE USED STUDENTIZED RESIDUALS OR NOT? I think not. We could
+        // easily use a multivariate regression.
+        // DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
+        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();
+
+        assert residuals.size() == genesInSomeOrder.size();
 
         for ( i = 0; i < residuals.size(); i++ ) {
             result.put( genesInSomeOrder.get( i ), residuals.get( i ) );
@@ -390,7 +394,7 @@ public class Multifunctionality {
         /*
          * This value is picked to be small enough to give us a spread of values that go above this...
          */
-        double minPvalue = 1e-100;
+        double minPvalue = 1e-20;
         double maxProbit = Math.abs( Probability.normalInverse( minPvalue ) );
 
         StopWatch timer = new StopWatch();
@@ -423,6 +427,9 @@ public class Multifunctionality {
             }
 
             double mfScore = 0.0;
+            /*
+             * Such that high numbers are "more multifunctional".
+             */
             if ( USE_AUC_FOR_GENE_SET_MF ) {
                 /*
                  * This method doesn't take into account the size of the gene set, but it _does_ reflect how high the
@@ -434,15 +441,16 @@ public class Multifunctionality {
                 /*
                  * Note that this is really rather difficult to "get right". Large groups very easily get good p-values.
                  */
-                double aucp = enrichmentForMultifunctionalityPvalue( genesInSet );
+                double aucp = Math.max( enrichmentForMultifunctionalityPvalue( genesInSet ), minPvalue );
                 assert aucp >= 0.0 && aucp <= 1.0;
 
-                double probit = 1.0;
-                if ( aucp == 1.0 ) {
-                    probit = 0.0;
-                } else if ( aucp > minPvalue ) {
-                    probit = Math.abs( Probability.normalInverse( aucp ) ) / maxProbit;
-                }
+                double probit = -Math.log10( aucp ) / -Math.log10( minPvalue );
+                // double probit = 1.0;
+                // if ( aucp == 1.0 ) {
+                // probit = 0.0;
+                // } else if ( aucp > minPvalue ) {
+                // probit = Math.abs( Probability.normalInverse( aucp ) ) / maxProbit;
+                // }
 
                 if ( log.isDebugEnabled() ) log.debug( String.format( "%.3f\t%.2g", probit, aucp ) );
 
@@ -460,7 +468,7 @@ public class Multifunctionality {
         Map<GeneSetTerm, Double> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionality, true );
         for ( GeneSetTerm goTerm : rankedGOMf.keySet() ) {
             double rankRatio = ( rankedGOMf.get( goTerm ) + 1 ) / numGoGroups;
-            this.goTermMultifunctionalityRank.put( goTerm, Math.max( 0.0, 1 - rankRatio ) );
+            this.goTermMultifunctionalityRank.put( goTerm, Math.max( 0.0, 1.0 - rankRatio ) );
         }
     }
 
