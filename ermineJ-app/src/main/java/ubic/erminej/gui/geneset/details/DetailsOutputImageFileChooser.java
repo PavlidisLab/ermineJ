@@ -79,7 +79,7 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
          */
         private static final long serialVersionUID = 1L;
         JCheckBox m_includeLabels = new JCheckBox( "Include row and column labels" );
-        JCheckBox m_normalize = new JCheckBox( "Normalize" );
+        JCheckBox m_normalize = new JCheckBox( "Standardize" );
 
         GridLayout gridLayout1 = new GridLayout( 12, 2 );
         JLabel m_titleLabel = new JLabel();

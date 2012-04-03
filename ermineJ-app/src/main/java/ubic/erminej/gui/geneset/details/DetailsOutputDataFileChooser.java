@@ -78,7 +78,7 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
 
         private JCheckBox includeMatrixValuesCheckBox = new JCheckBox( "Include annotations and scores" );
 
-        private JCheckBox m_normalize = new JCheckBox( "Normalize" );
+        private JCheckBox m_normalize = new JCheckBox( "Standardize" );
 
         private GridLayout gridLayout1 = new GridLayout( 12, 2 );
         private JLabel m_titleLabel = new JLabel();
