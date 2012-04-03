@@ -59,8 +59,8 @@ public class TestGeneAnnotations extends TestCase {
     static {
 
         try {
-            ZipInputStream z = new ZipInputStream( TestGeneAnnotations.class
-                    .getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
+            ZipInputStream z = new ZipInputStream(
+                    TestGeneAnnotations.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
             z.getNextEntry();
             goNames = new GeneSetTerms( z );
             z.close();
@@ -151,8 +151,8 @@ public class TestGeneAnnotations extends TestCase {
         assertTrue( parents.contains( new GeneSetTerm( "GO:0043231" ) ) );
         assertEquals( "A semiautonomous, self replicating organelle that occurs"
                 + " in varying numbers, shapes, and sizes in the cytoplasm"
-                + " of virtually all eukaryotic cells. It is notably the site of tissue respiration.", cellComp
-                .getDefinition() );
+                + " of virtually all eukaryotic cells. It is notably the site of tissue respiration.",
+                cellComp.getDefinition() );
     }
 
     public final void testReadAffyCsv() throws Exception {
@@ -169,8 +169,9 @@ public class TestGeneAnnotations extends TestCase {
      */
     public final void testReadAffyCsv2() throws Exception {
         // second affytest
-        GZIPInputStream isa = new GZIPInputStream( TestGeneAnnotations.class
-                .getResourceAsStream( "/data/MoGene-1_0-st-v1.na31.mm9.transcript.sample.txt.gz" ) );
+        GZIPInputStream isa = new GZIPInputStream(
+                TestGeneAnnotations.class
+                        .getResourceAsStream( "/data/MoGene-1_0-st-v1.na31.mm9.transcript.sample.txt.gz" ) );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( isa, null, settings );
         Collection<GeneSetTerm> geneSets = g.getGeneSetTerms();
@@ -209,7 +210,7 @@ public class TestGeneAnnotations extends TestCase {
         Probe probe = g.findProbe( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
-        int expectedValue = 113; // not checked by hand.
+        int expectedValue = 119; // not checked by hand.
         int actualValue = probe.getGeneSets().size();
         assertEquals( expectedValue, actualValue );
     }
@@ -222,7 +223,7 @@ public class TestGeneAnnotations extends TestCase {
 
     public void testReadPipeDelimited() throws Exception {
         int actualValue = ga.findProbe( "32304_at" ).getGeneSets().size();
-        int expectedValue = 113; // not checked by hand.
+        int expectedValue = 119; // not checked by hand.
         assertEquals( expectedValue, actualValue );
     }
 
@@ -232,9 +233,9 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testRemoveBySize() throws Exception {
-        assertEquals( 255, ga.getGeneSetTerms().size() ); // not checked by hand.
+        assertEquals( 262, ga.getGeneSetTerms().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
-        assertEquals( 192, ga.getGeneSetTerms().size() ); // not checked by hand
+        assertEquals( 199, ga.getGeneSetTerms().size() ); // not checked by hand
     }
 
     public void testSelectSetsByGene() throws Exception {
