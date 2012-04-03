@@ -634,6 +634,7 @@ public class MainFrame extends JFrame {
 
         MultiFuncDiagWindow w = new MultiFuncDiagWindow( ga, gs );
         w.setSize( new Dimension( 500, 500 ) );
+        w.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
         GuiUtil.centerContainer( w );
         w.setVisible( true );
     }
@@ -847,6 +848,7 @@ public class MainFrame extends JFrame {
         this.runViewMenu.setText( "Results" );
         runViewMenu.setMnemonic( 'R' );
         runViewMenu.setEnabled( false );
+        runViewMenu.setToolTipText( "Only used for the tree view" );
 
         analysisMenu.setText( "Analysis" );
         analysisMenu.setMnemonic( 'A' );

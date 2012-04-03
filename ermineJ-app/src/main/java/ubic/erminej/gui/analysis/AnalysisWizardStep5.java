@@ -406,6 +406,7 @@ public class AnalysisWizardStep5 extends WizardStep {
             @Override
             public void actionPerformed( ActionEvent arg0 ) {
                 try {
+                    log.info( "yay" );
                     numIterations.set( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
                 } catch ( NumberFormatException e1 ) {
                     log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
@@ -417,6 +418,8 @@ public class AnalysisWizardStep5 extends WizardStep {
             @Override
             public void keyTyped( KeyEvent e ) {
                 try {
+                    log.info( "yay" );
+
                     numIterations.set( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
                 } catch ( NumberFormatException e1 ) {
                     log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );

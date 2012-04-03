@@ -113,9 +113,11 @@ public class MultiFuncDiagWindow extends JFrame {
 
         DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
         DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
-
+        DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
+        scoreRanks.assign( Functions.div( scoreRanks.size() ) );
         int i = 0;
         for ( Gene g : geneToScoreMap.keySet() ) {
+            // using # go terms because it is more intuitive.
             Double mf = ( double ) geneAnnots.getMultifunctionality().getNumGoTerms( g );
 
             Double s = geneToScoreMap.get( g );
@@ -123,7 +125,9 @@ public class MultiFuncDiagWindow extends JFrame {
             mfs.set( i, mf );
             i++;
         }
-        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores );
+        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores, scoreRanks.copy().assign( Functions.inv ) );
+
+        double slope = fit.getCoefficients().get( 1, 0 );
 
         DoubleMatrix1D fittedValues = fit.getFitted().viewRow( 0 );
 
@@ -145,10 +149,10 @@ public class MultiFuncDiagWindow extends JFrame {
         ds.addSeries( "Raw", rawSeries );
         ds.addSeries( "Fit", fittedSeries );
 
-        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality",
+        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality (# groups)",
                 "Gene score", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
-        c.setTitle( "How biased are the gene scores\n(raw; regression)" );
+        c.setTitle( String.format( "How biased are the gene scores\n(raw; regression; slope=%.2g)", slope ) );
         Plotting.setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );
@@ -176,8 +180,8 @@ public class MultiFuncDiagWindow extends JFrame {
         XYSeries ser = new XYSeries( "Gene scores" );
 
         for ( Gene g : geneToScoreMap.keySet() ) {
-            // Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityRank( g );
-            Double mf = Math.log10( geneAnnots.getMultifunctionality().getMultifunctionalityScore( g ) );
+            Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityRank( g );
+            // Double mf = Math.log10( geneAnnots.getMultifunctionality().getMultifunctionalityScore( g ) );
             Double s = geneToScoreMap.get( g );
             ser.add( mf, s );
         }

@@ -106,7 +106,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
 
         if ( useMultifunctionalityCorrection ) {
             Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
-                    false /* not ranks */);
+                    false /* not ranks */, true /* weighted regression */);
             GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( this, adjustScores );
 
             Map<GeneSetTerm, GeneSetResult> generateGeneSetResults = pvg.generateGeneSetResults( false );

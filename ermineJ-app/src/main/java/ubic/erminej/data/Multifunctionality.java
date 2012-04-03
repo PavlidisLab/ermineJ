@@ -31,11 +31,12 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import cern.colt.function.DoubleFunction;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.math.Functions;
-import cern.jet.stat.Probability;
+import cern.jet.math.Mult;
 
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
@@ -53,17 +54,17 @@ import ubic.basecode.util.StatusViewer;
  * @version $Id$
  */
 public class Multifunctionality {
-
-    /**
-     * Should we just use the plain old AU-ROC (which ignores the gene set size), or the pvalue for the AU-ROC (which
-     * needs to be scaled in an ad-hoc way to be reasonable)
-     */
-    private static final boolean USE_AUC_FOR_GENE_SET_MF = false;
+    //
+    // /**
+    // * Should we just use the plain old AU-ROC (which ignores the gene set size), or the pvalue for the AU-ROC (which
+    // * needs to be scaled in an ad-hoc way to be reasonable)
+    // */
+    // private static final boolean USE_AUC_FOR_GENE_SET_MF = false;
 
     /**
      * Do we count genes that don't have GO terms? .
      */
-    private static final boolean USE_UNANNOTATED_GENES = true;
+    // private static final boolean USE_UNANNOTATED_GENES = true;
 
     private static Log log = LogFactory.getLog( Multifunctionality.class );
 
@@ -106,9 +107,10 @@ public class Multifunctionality {
     /**
      * @param geneToScoreMap
      * @param useRanks If true, the ranks of the gene scores will be used for regression.
+     * @param weight If true, the regression will be weighted by 1/x, where x is the rank of the score
      * @return
      */
-    public Map<Gene, Double> adjustScores( Map<Gene, Double> geneToScoreMap, boolean useRanks ) {
+    public Map<Gene, Double> adjustScores( Map<Gene, Double> geneToScoreMap, boolean useRanks, boolean weight ) {
 
         DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
         DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
@@ -125,17 +127,22 @@ public class Multifunctionality {
         }
 
         LeastSquaresFit fit;
+        DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
+        scoreRanks.assign( Functions.div( scoreRanks.size() ) );
+
         if ( useRanks ) {
-            DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
 
-            if ( scoreRanks == null ) {
-                throw new IllegalStateException( "Ranks were null" );
+            if ( weight ) {
+                fit = new LeastSquaresFit( mfs, scoreRanks, scoreRanks.copy().assign( Functions.inv ) );
+            } else {
+                fit = new LeastSquaresFit( mfs, scoreRanks );
             }
-
-            scoreRanks.assign( Functions.div( scoreRanks.size() ) );
-            fit = new LeastSquaresFit( mfs, scoreRanks );
         } else {
-            fit = new LeastSquaresFit( mfs, scores );
+            if ( weight ) {
+                fit = new LeastSquaresFit( mfs, scores, scoreRanks.copy().assign( Functions.inv ) );
+            } else {
+                fit = new LeastSquaresFit( mfs, scores );
+            }
         }
 
         // log.info( fit.getCoefficients() );
@@ -146,8 +153,8 @@ public class Multifunctionality {
 
         // This does not deal with missing values. SHOULD WE USED STUDENTIZED RESIDUALS OR NOT? I think not. We could
         // easily use a multivariate regression.
-        // DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
-        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+        DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
+        // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();
 
@@ -219,7 +226,8 @@ public class Multifunctionality {
             }
         }
 
-        int numGenes = USE_UNANNOTATED_GENES ? rawGeneMultifunctionalityRanks.size() : genesWithGoTerms.size();
+        // int numGenes = USE_UNANNOTATED_GENES ? rawGeneMultifunctionalityRanks.size() : genesWithGoTerms.size();
+        int numGenes = rawGeneMultifunctionalityRanks.size();
 
         int outGroup = numGenes - inGroup;
 
@@ -387,21 +395,25 @@ public class Multifunctionality {
     }
 
     /**
-     * 
+     * Populate the multifuncationality of each gene set. This is computed by looking at how the genes in the set
+     * compare to the gene multifuncxtionality ranking, using ROC.
      */
     private void computeGoTermMultifunctionalityRanks() {
 
         /*
          * This value is picked to be small enough to give us a spread of values that go above this...
          */
-        double minPvalue = 1e-20;
-        double maxProbit = Math.abs( Probability.normalInverse( minPvalue ) );
+        double minPvalue = 1e-30;
+
+        double maxLoggedPvalue = -Math.log10( minPvalue );
+
+        // double maxProbit = Math.abs( Probability.normalInverse( minPvalue ) );
 
         StopWatch timer = new StopWatch();
         timer.start();
 
-        int numGenes = USE_UNANNOTATED_GENES ? rawGeneMultifunctionalityRanks.size() : genesWithGoTerms.size();
-
+        // int numGenes = USE_UNANNOTATED_GENES ? rawGeneMultifunctionalityRanks.size() : genesWithGoTerms.size();
+        int numGenes = rawGeneMultifunctionalityRanks.size();
         int numGoGroups = geneAnnots.getGeneSetTerms().size();
 
         /*
@@ -426,36 +438,16 @@ public class Multifunctionality {
                 continue;
             }
 
-            double mfScore = 0.0;
+            double aucp = Math.max( enrichmentForMultifunctionalityPvalue( genesInSet ), minPvalue );
+            assert aucp >= 0.0 && aucp <= 1.0;
+
             /*
-             * Such that high numbers are "more multifunctional".
+             * Our score is a transformed pvalue that simply compares it to the minimum usable value. I experimented
+             * with probit-transformed pvalues, but this seems okay (if a bit arbitrary).
              */
-            if ( USE_AUC_FOR_GENE_SET_MF ) {
-                /*
-                 * This method doesn't take into account the size of the gene set, but it _does_ reflect how high the
-                 * genes are ranked.
-                 */
-                double auc = enrichmentForMultifunctionality( genesInSet );
-                mfScore = auc;
-            } else {
-                /*
-                 * Note that this is really rather difficult to "get right". Large groups very easily get good p-values.
-                 */
-                double aucp = Math.max( enrichmentForMultifunctionalityPvalue( genesInSet ), minPvalue );
-                assert aucp >= 0.0 && aucp <= 1.0;
+            double mfScore = -Math.log10( aucp ) / maxLoggedPvalue;
 
-                double probit = -Math.log10( aucp ) / -Math.log10( minPvalue );
-                // double probit = 1.0;
-                // if ( aucp == 1.0 ) {
-                // probit = 0.0;
-                // } else if ( aucp > minPvalue ) {
-                // probit = Math.abs( Probability.normalInverse( aucp ) ) / maxProbit;
-                // }
-
-                if ( log.isDebugEnabled() ) log.debug( String.format( "%.3f\t%.2g", probit, aucp ) );
-
-                mfScore = probit;
-            }
+            if ( log.isDebugEnabled() ) log.debug( String.format( "%.3f\t%.2g", mfScore, aucp ) );
 
             goTermMultifunctionality.put( goset, mfScore );
         }
@@ -492,13 +484,14 @@ public class Multifunctionality {
                 goGroupSizes.put( goset, geneSetGenes.size() );
             }
 
-            int numGenes = USE_UNANNOTATED_GENES ? this.geneAnnots.getGenes().size() : genesWithGoTerms.size();
+            // int numGenes = USE_UNANNOTATED_GENES ? this.geneAnnots.getGenes().size() : genesWithGoTerms.size();
+            int numGenes = this.geneAnnots.getGenes().size();
 
             for ( Gene gene : geneAnnots.getGenes() ) {
 
                 boolean geneHasAnnots = genesWithGoTerms.contains( gene );
 
-                if ( !geneHasAnnots && !USE_UNANNOTATED_GENES ) continue;
+                // if ( !geneHasAnnots && !USE_UNANNOTATED_GENES ) continue;
 
                 double mf = 0.0;
                 Collection<GeneSetTerm> sets = gene.getGeneSets();
@@ -506,9 +499,10 @@ public class Multifunctionality {
                 for ( GeneSetTerm goset : sets ) {
                     int inGroup = 0;
                     if ( !goGroupSizes.containsKey( goset ) ) {
-                        if ( !USE_UNANNOTATED_GENES ) {
-                            continue;
-                        }
+                        // if ( !USE_UNANNOTATED_GENES ) {
+                        // continue;
+                        // }
+                        inGroup = 0;
                     } else {
                         inGroup = goGroupSizes.get( goset );
                     }
@@ -519,7 +513,7 @@ public class Multifunctionality {
                         continue;
                     }
 
-                    assert inGroup > 0 || USE_UNANNOTATED_GENES;
+                    // assert inGroup > 0 || USE_UNANNOTATED_GENES;
 
                     mf += 1.0 / ( inGroup * outGroup );
                     // mf += 1.0; // count of go terms ONLY, if you ever want to compare ...

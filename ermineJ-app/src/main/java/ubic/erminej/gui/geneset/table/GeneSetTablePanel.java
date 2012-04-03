@@ -39,6 +39,7 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -254,25 +255,30 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     @Override
     public void addRun() {
-        model.addRun();
 
-        int c = model.getColumnCount() - 1;
-        TableColumn col = new TableColumn( c );
-        col.setIdentifier( model.getColumnName( c ) );
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                model.addRun();
 
-        table.addColumn( col );
-        table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
-        generateResultColumnHeadingTooltip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
+                int c = model.getColumnCount() - 1;
+                TableColumn col = new TableColumn( c );
+                col.setIdentifier( model.getColumnName( c ) );
 
-        int currentResultSetIndex = callingFrame.getNumResultSets() - 1;
-        this.callingFrame.setCurrentResultSetIndex( currentResultSetIndex );
-        table.revalidate();
+                table.addColumn( col );
+                table.getColumnModel().getColumn( c ).setPreferredWidth( RUN_COLUMN_START_WIDTH );
+                generateResultColumnHeadingTooltip( model.getColumnCount() - GeneSetTableModel.INIT_COLUMNS - 1 );
 
-        this.model.filter();
+                int currentResultSetIndex = callingFrame.getNumResultSets() - 1;
+                callingFrame.setCurrentResultSetIndex( currentResultSetIndex );
+                table.revalidate();
 
-        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );
-        sorter.setSortKeys( sortKeys );
+                model.filter();
+
+                List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+                sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );
+                sorter.setSortKeys( sortKeys );
+            }
+        } );
     }
 
     // called if 'cancel', 'find' or 'reset' have been hit.
@@ -453,40 +459,48 @@ public class GeneSetTablePanel extends GeneSetPanel {
     /**
      * @param currentColumnIndex
      */
-    private void removeRun( int currentColumnIndex ) {
+    private void removeRun( final int currentColumnIndex ) {
 
-        String columnName = model.getColumnName( currentColumnIndex );
-        TableColumn col = table.getColumn( columnName );
-        assert col != null;
+        final String columnName = model.getColumnName( currentColumnIndex );
 
         int yesno = JOptionPane.showConfirmDialog( null, "Are you sure you want to remove " + columnName + "?",
                 "Remove Run", JOptionPane.YES_NO_OPTION );
         if ( yesno == JOptionPane.YES_OPTION ) {
-            int runIndex = model.getRunIndex( currentColumnIndex );
-            assert runIndex >= 0;
 
-            table.removeColumn( col );
-            model.removeRunData( currentColumnIndex );
-            model.fireTableStructureChanged();
-            callingFrame.setCurrentResultSetIndex( runIndex );
-            resultToolTips.remove( runIndex );
-            table.revalidate();
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    int runIndex = model.getRunIndex( currentColumnIndex );
+                    assert runIndex >= 0;
+                    TableColumn col = table.getColumn( columnName );
+                    assert col != null;
 
-            /*
-             * Now really try to remove the object.
-             */
-            callingFrame.removeRun( runIndex );
+                    table.removeColumn( col );
 
-            // Resort by a remaining run, after removing a run.
-            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-            int newSortIndex = 0;
-            if ( callingFrame.getNumResultSets() > 0 ) {
-                newSortIndex = GeneSetTableModel.INIT_COLUMNS;
-            }
-            sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
-            sorter.setSortKeys( sortKeys );
+                    model.removeRunData( currentColumnIndex );
+                    model.fireTableStructureChanged();
+
+                    callingFrame.setCurrentResultSetIndex( runIndex );
+                    resultToolTips.remove( runIndex );
+                    table.revalidate();
+
+                    /*
+                     * Now really try to remove the object.
+                     */
+                    callingFrame.removeRun( runIndex );
+
+                    // Resort by a remaining run, after removing a run.
+                    List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+                    int newSortIndex = 0;
+                    if ( callingFrame.getNumResultSets() > 0 ) {
+                        newSortIndex = GeneSetTableModel.INIT_COLUMNS;
+                    }
+                    sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
+                    sorter.setSortKeys( sortKeys );
+                }
+            } );
 
         }
+
     }
 
     /**
