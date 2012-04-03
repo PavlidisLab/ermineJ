@@ -31,12 +31,10 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cern.colt.function.DoubleFunction;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.math.Functions;
-import cern.jet.math.Mult;
 
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
@@ -151,8 +149,7 @@ public class Multifunctionality {
             return geneToScoreMap;
         }
 
-        // This does not deal with missing values. SHOULD WE USED STUDENTIZED RESIDUALS OR NOT? I think not. We could
-        // easily use a multivariate regression.
+        // This does not deal with missing values. SHOULD WE USED STUDENTIZED RESIDUALS OR NOT?
         DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
         // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
