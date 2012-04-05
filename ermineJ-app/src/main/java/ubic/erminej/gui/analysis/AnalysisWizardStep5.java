@@ -236,7 +236,9 @@ public class AnalysisWizardStep5 extends WizardStep {
                         settingsTemp.setDoLog( doLog );
                         settingsTemp.setBigIsBetter( bigIsBetter );
 
-                        gs = new GeneScores( settingsTemp.getScoreFile(), settingsTemp, null, w.getGeneAnnots() );
+                        String scoreFile = settingsTemp.getScoreFile();
+                        log.info( "Checking ORA threshold effect using " + scoreFile );
+                        gs = new GeneScores( scoreFile, settingsTemp, null, w.getGeneAnnots() );
 
                         w.getStatusField().clear();
                     }
@@ -466,8 +468,13 @@ public class AnalysisWizardStep5 extends WizardStep {
             @Override
             public void keyReleased( KeyEvent e ) {
                 String threshText = geneScoreThresholdTextField.getText();
-                oraThreshold.set( Double.valueOf( threshText ).doubleValue() );
-                checkOraThresholdEffects();
+                try {
+                    oraThreshold.set( Double.valueOf( threshText ).doubleValue() );
+                    checkOraThresholdEffects();
+                } catch ( NumberFormatException e1 ) {
+                    //
+                }
+
             }
 
         } );

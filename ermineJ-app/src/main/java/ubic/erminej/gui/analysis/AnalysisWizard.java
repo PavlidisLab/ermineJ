@@ -60,7 +60,6 @@ public class AnalysisWizard extends Wizard {
 
     AnalysisWizardStep2 step2;
 
-    // AnalysisWizardStep3 step3;
     AnalysisWizardStep3 step3;
     AnalysisWizardStep4 step4;
     AnalysisWizardStep5 step5;
@@ -77,8 +76,6 @@ public class AnalysisWizard extends Wizard {
         this.addStep( step1, true );
         step2 = new AnalysisWizardStep2( this, settings );
         this.addStep( step2 );
-        // step3 = new AnalysisWizardStep3( this, geneAnnots );
-        // this.addStep( step3 );
         step3 = new AnalysisWizardStep3( this, settings );
         this.addStep( step3 );
         step4 = new AnalysisWizardStep4( this, settings );
@@ -218,6 +215,7 @@ public class AnalysisWizard extends Wizard {
             this.nextButton.setEnabled( true );
         } else if ( step == 2 ) {
             step = 3;
+            step2.saveValues();
             this.getContentPane().remove( step2 );
             this.setTitle( "Create New Analysis - Step 3 of " + maxSteps );
             this.getContentPane().add( step3 );
@@ -227,6 +225,7 @@ public class AnalysisWizard extends Wizard {
             this.repaint();
         } else if ( step == 3 ) {
             step = 4;
+            step3.saveValues();
             this.getContentPane().remove( step3 );
             this.setTitle( "Create New Analysis - Step 4 of " + maxSteps );
             this.getContentPane().add( step4 );
@@ -235,6 +234,7 @@ public class AnalysisWizard extends Wizard {
             this.repaint();
         } else if ( step == 4 ) {
             step = 5;
+            step4.saveValues();
             this.getContentPane().remove( step4 );
             step5.addVarPanel( analysisType, geneScoreMethod );
             checkIfReady();

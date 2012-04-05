@@ -211,7 +211,7 @@ public class TestGeneAnnotations extends TestCase {
         Probe probe = g.findProbe( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
-        int expectedValue = 119; // not checked by hand.
+        int expectedValue = 113; // not checked by hand.
         int actualValue = probe.getGeneSets().size();
         assertEquals( expectedValue, actualValue );
     }
@@ -251,7 +251,7 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testRemoveBySize() throws Exception {
-        assertEquals( 262, ga.getGeneSetTerms().size() ); // not checked by hand.
+        assertEquals( 259, ga.getGeneSetTerms().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
         assertEquals( 199, ga.getGeneSetTerms().size() ); // not checked by hand
     }
