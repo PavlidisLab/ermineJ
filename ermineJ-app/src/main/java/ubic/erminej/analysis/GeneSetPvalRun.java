@@ -97,7 +97,7 @@ public class GeneSetPvalRun {
                 setName( settings.getClassScoreMethod() + " run" );
             } else {
                 geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, originalAnnots );
-                setName( settings.getClassScoreMethod()
+                setName( settings.getClassScoreMethodName()
                         + " run "
                         + ( StringUtils.isNotBlank( geneScores.getScoreColumnName() ) ? "on '"
                                 + geneScores.getScoreColumnName() + "'" : "" ) );

@@ -219,6 +219,19 @@ public class SettingsHolder {
         return Settings.Method.valueOf( storedValue );
     }
 
+    /**
+     * A human-readable version of the name
+     * 
+     * @return
+     */
+    public String getClassScoreMethodName() {
+        if ( this.getClassScoreMethod().equals( Method.GSR )
+                && this.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL ) ) {
+            return "PRERE";
+        }
+        return this.getClassScoreMethod().toString();
+    }
+
     public String getCustomGeneSetDirectory() {
         return config.getString( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, getDefaultUserClassesDirPath() );
     }
