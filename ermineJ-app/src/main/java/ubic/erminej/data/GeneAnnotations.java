@@ -109,7 +109,8 @@ public class GeneAnnotations {
      * @param geneSetTerms
      * @param messenger
      */
-    public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, SettingsHolder settings, StatusViewer messenger ) {
+    public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, SettingsHolder settings,
+            StatusViewer messenger ) {
         if ( messenger != null ) this.messenger = messenger;
         if ( genes.isEmpty() ) {
             throw new IllegalArgumentException( "There were no genes" );
@@ -370,37 +371,37 @@ public class GeneAnnotations {
         }
     }
 
-    /**
-     * Add a new gene set. Used to set up user-defined gene sets.
-     * 
-     * @param id String class to be added
-     * @param probesForNew collection of members.
-     */
-    public void addSet( GeneSetTerm geneSetId, Collection<Probe> probesForNew ) {
-
-        checkModifiability();
-
-        if ( probesForNew.isEmpty() ) {
-            log.debug( "No probes to add for " + geneSetId );
-            return;
-        }
-
-        for ( Probe p : probesForNew ) {
-            if ( !hasProbe( p ) ) {
-                log.warn( "Adding new probe : " + p );
-                this.probes.put( p.getName(), p );
-            }
-        }
-
-        Collection<Gene> gs = new HashSet<Gene>();
-        for ( Probe p : probesForNew ) {
-            p.addToGeneSet( geneSetId );
-            gs.addAll( p.getGenes() );
-        }
-
-        this.addGeneSet( geneSetId, gs );
-
-    }
+    // /**
+    // * Add a new gene set. Used to set up user-defined gene sets.
+    // *
+    // * @param id String class to be added
+    // * @param probesForNew collection of members.
+    // */
+    // public void addSet( GeneSetTerm geneSetId, Collection<Probe> probesForNew ) {
+    //
+    // checkModifiability();
+    //
+    // if ( probesForNew.isEmpty() ) {
+    // log.debug( "No probes to add for " + geneSetId );
+    // return;
+    // }
+    //
+    // for ( Probe p : probesForNew ) {
+    // if ( !hasProbe( p ) ) {
+    // log.warn( "Adding new probe : " + p );
+    // this.probes.put( p.getName(), p );
+    // }
+    // }
+    //
+    // Collection<Gene> gs = new HashSet<Gene>();
+    // for ( Probe p : probesForNew ) {
+    // p.addToGeneSet( geneSetId );
+    // gs.addAll( p.getGenes() );
+    // }
+    //
+    // this.addGeneSet( geneSetId, gs );
+    //
+    // }
 
     /**
      * Remove a gene set (class) from all the maps that reference it. This basically completely removes the class, and

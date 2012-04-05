@@ -30,6 +30,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.swing.table.TableModel;
 
+import org.apache.commons.lang.StringUtils;
 import org.xml.sax.SAXException;
 
 import ubic.basecode.util.StatusStderr;
@@ -45,15 +46,15 @@ import junit.framework.TestCase;
  */
 public class TestGeneAnnotations extends TestCase {
 
-    InputStream is;
-    InputStream ia;
-    InputStream imb;
-    List<String> probes;
-    List<Gene> geneIds;
-    List<Collection<GeneSetTerm>> goIds;
-    static GeneSetTerms goNames;
+    private InputStream is;
+    private InputStream ia;
+    private InputStream imb;
+    private List<String> probes;
+    private List<Gene> geneIds;
+    private List<Collection<GeneSetTerm>> goIds;
+    private static GeneSetTerms goNames;
 
-    GeneAnnotations ga;
+    private GeneAnnotations ga;
     private Settings settings;
 
     static {
@@ -222,9 +223,26 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     public void testReadPipeDelimited() throws Exception {
-        int actualValue = ga.findProbe( "32304_at" ).getGeneSets().size();
-        int expectedValue = 119; // not checked by hand.
-        assertEquals( expectedValue, actualValue );
+
+        String[] gotr = new String[] { "GO:0030856" };
+        String id = "FOOFAKE_at";
+
+        check( gotr, id );
+
+        // ANOTHER TEST
+        // // terms for 32304_at from the source file geneAnnotation.sample.txt, removing:
+        // GO:0000074: obsolete.
+        // GO:0007242 - has canonical id GO:0035556, which is not picked up.
+        gotr = StringUtils.split( "GO:0000188|GO:0004672|GO:0004674|GO:0004682|GO:0004691|GO:0004697|"
+                + "GO:0004698|GO:0004713|GO:0005509|GO:0005515|GO:0005524|GO:0005624|GO:0005634|"
+                + "GO:0005737|GO:0005739|GO:0006468|GO:0006469|GO:0006937|GO:0007166|"
+                + "GO:0008624|GO:0008629|GO:0016740|GO:0019992|GO:0030593|GO:0046325|GO:0046627|"
+                + "GO:0050729|GO:0050730|GO:0050930", '|' );
+
+        assertEquals( 29, gotr.length );
+
+        check( gotr, "32304_at" );
+
     }
 
     public void testRemoveAspect() throws Exception {
@@ -295,13 +313,60 @@ public class TestGeneAnnotations extends TestCase {
         is = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U133_Plus_2_annot_sample.csv" );
         imb = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample-goidddelimittest.txt" );
         ia = TestGeneAnnotations.class.getResourceAsStream( "/data/agilentannots.test.txt" );
+
         InputStream im = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample.txt" );
+
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         settings = new Settings( false );
-        settings.setProperty( "ignore.userdefined", true );
+        settings.setProperty( "useUserDefinedGroups", false );
         ga = p.readDefault( im, null, settings );
         ga.setMessenger( new StatusStderr() );
 
     }
 
+    /**
+     * Check that the GO Terms parsed match ...
+     * 
+     * @param gotr
+     * @param id
+     */
+    private void check( String[] gotr, String id ) {
+        Collection<GeneSetTerm> geneSets = ga.findProbe( id ).getGeneSets();
+
+        Set<GeneSetTerm> re = new HashSet<GeneSetTerm>();
+        for ( String g : gotr ) {
+            GeneSetTerm t = ga.findTerm( g );
+
+            if ( t == null ) continue;
+            if ( ga.hasGeneSet( t ) ) {
+                if ( t.getDefinition().startsWith( "OBSOLETE" ) ) continue;
+                if ( ga.getGeneSet( t ).size() >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE ) re.add( t );
+            }
+
+            Collection<GeneSetTerm> allParents = ga.getGeneSetTermsHolder().getAllParents( t );
+
+            for ( GeneSetTerm geneSetTerm : allParents ) {
+                if ( geneSetTerm.getDefinition().startsWith( "OBSOLETE" ) ) continue;
+                if ( ga.hasGeneSet( geneSetTerm )
+                        && ga.getGeneSet( geneSetTerm ).size() >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE ) {
+                    re.add( geneSetTerm );
+                }
+            }
+
+        }
+
+        assertEquals( re.size(), geneSets.size() );
+        for ( GeneSetTerm t : re ) {
+            if ( !geneSets.contains( t ) ) {
+                Set<GeneSetTerm> allChildren = ga.getGeneSetTermsHolder().getAllChildren( t );
+                for ( String s : gotr ) {
+                    if ( allChildren.contains( new GeneSetTerm( s ) ) ) {
+                        System.err.println( t + " is a parent of listed term " + s
+                                + " in the geneAnnotations, but not found for the probe." );
+                    }
+                }
+            }
+            assertTrue( "Probe is missing annotation: " + t, geneSets.contains( t ) );
+        }
+    }
 }

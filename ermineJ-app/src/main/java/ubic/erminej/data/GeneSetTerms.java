@@ -212,7 +212,7 @@ public class GeneSetTerms {
 
     /**
      * @param id
-     * @return
+     * @return all parents EXCEPT for obsolete terms, aspect and root.
      */
     public Collection<GeneSetTerm> getAllParents( GeneSetTerm id ) {
         assert id != null;
@@ -231,6 +231,7 @@ public class GeneSetTerms {
             if ( goEntry == null ) continue;
             if ( goEntry.getId().equals( "all" ) ) continue;
             if ( goEntry.isAspect() ) continue;
+            if ( goEntry.getDefinition().startsWith( "OBSOLETE" ) ) continue;
             returnVal.add( goEntry );
         }
         return returnVal;

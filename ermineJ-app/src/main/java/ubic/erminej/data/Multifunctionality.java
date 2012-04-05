@@ -486,7 +486,7 @@ public class Multifunctionality {
 
             for ( Gene gene : geneAnnots.getGenes() ) {
 
-                boolean geneHasAnnots = genesWithGoTerms.contains( gene );
+              //  boolean geneHasAnnots = genesWithGoTerms.contains( gene );
 
                 // if ( !geneHasAnnots && !USE_UNANNOTATED_GENES ) continue;
 
