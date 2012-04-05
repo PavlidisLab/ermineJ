@@ -198,7 +198,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
                 + "\t" + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) )
                 + "\t" + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
                 + "\t" + ( this.multifunctionalityCorrectedRankDelta ) + "\t"
-                + String.format( "%.2f", this.multifunctionality ) + extracolumns + "\n" );
+                + String.format( "%.3g", this.multifunctionality ) + extracolumns + "\n" );
     }
 
     public void printHeadings( Writer out ) throws IOException {
@@ -223,8 +223,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     /**
      * @param auc
      */
-    public void setMultifunctionality( double auc ) {
-        this.multifunctionality = auc;
+    public void setMultifunctionality( double mf ) {
+        this.multifunctionality = mf;
     }
 
     /**

@@ -74,6 +74,8 @@ public class Multifunctionality {
 
     private Map<GeneSetTerm, Double> goTermMultifunctionality = new HashMap<GeneSetTerm, Double>();
 
+    private Map<GeneSetTerm, Double> goTermMultifunctionalityPvalue = new HashMap<GeneSetTerm, Double>();
+
     private Map<GeneSetTerm, Double> goTermMultifunctionalityRank = new HashMap<GeneSetTerm, Double>();
 
     private Map<Gene, Double> geneMultifunctionalityRank = new HashMap<Gene, Double>();
@@ -197,7 +199,7 @@ public class Multifunctionality {
     public double correlationWithGoTermMultifunctionality( List<GeneSetTerm> rankedGoTerms ) {
         DoubleArrayList rawVals = new DoubleArrayList();
         for ( GeneSetTerm goTerm : rankedGoTerms ) {
-            double mf = this.getGOTermMultifunctionality( goTerm );
+            double mf = -Math.log10( this.getGOTermMultifunctionalityPvalue( goTerm ) );
             rawVals.add( mf );
         }
         return -Distance.spearmanRankCorrelation( rawVals );
@@ -305,6 +307,20 @@ public class Multifunctionality {
 
     /**
      * @param goId
+     * @return the pvalue associated with the multifunctionality of the gene set
+     * @see getGOTermMultifunctionality
+     */
+    public double getGOTermMultifunctionalityPvalue( GeneSetTerm goId ) {
+        if ( stale.get() ) init();
+        if ( !this.goTermMultifunctionalityPvalue.containsKey( goId ) ) {
+            return -1;
+        }
+
+        return this.goTermMultifunctionalityPvalue.get( goId );
+    }
+
+    /**
+     * @param goId
      * @return the relative rank of the GO group in multifunctionality, where 1 is the highest multifunctionality, 0 is
      *         lowest. <strong>WARNING</strong>, this does not correct for the presence of multiple GO groups with the
      *         same genes (redundancy)
@@ -397,15 +413,6 @@ public class Multifunctionality {
      */
     private void computeGoTermMultifunctionalityRanks() {
 
-        /*
-         * This value is picked to be small enough to give us a spread of values that go above this...
-         */
-        double minPvalue = 1e-30;
-
-        double maxLoggedPvalue = -Math.log10( minPvalue );
-
-        // double maxProbit = Math.abs( Probability.normalInverse( minPvalue ) );
-
         StopWatch timer = new StopWatch();
         timer.start();
 
@@ -435,18 +442,11 @@ public class Multifunctionality {
                 continue;
             }
 
-            double aucp = Math.max( enrichmentForMultifunctionalityPvalue( genesInSet ), minPvalue );
+            double auc = enrichmentForMultifunctionality( genesInSet );
+            double aucp = enrichmentForMultifunctionalityPvalue( genesInSet );
             assert aucp >= 0.0 && aucp <= 1.0;
-
-            /*
-             * Our score is a transformed pvalue that simply compares it to the minimum usable value. I experimented
-             * with probit-transformed pvalues, but this seems okay (if a bit arbitrary).
-             */
-            double mfScore = -Math.log10( aucp ) / maxLoggedPvalue;
-
-            if ( log.isDebugEnabled() ) log.debug( String.format( "%.3f\t%.2g", mfScore, aucp ) );
-
-            goTermMultifunctionality.put( goset, mfScore );
+            goTermMultifunctionality.put( goset, auc );
+            goTermMultifunctionalityPvalue.put( goset, aucp );
         }
 
         if ( timer.getTime() > 1000 ) {
@@ -454,7 +454,7 @@ public class Multifunctionality {
         }
 
         // convert to relative ranks, where 1.0 is the most multifunctional; ties are broken by averaging.
-        Map<GeneSetTerm, Double> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionality, true );
+        Map<GeneSetTerm, Double> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionalityPvalue );
         for ( GeneSetTerm goTerm : rankedGOMf.keySet() ) {
             double rankRatio = ( rankedGOMf.get( goTerm ) + 1 ) / numGoGroups;
             this.goTermMultifunctionalityRank.put( goTerm, Math.max( 0.0, 1.0 - rankRatio ) );
@@ -486,7 +486,7 @@ public class Multifunctionality {
 
             for ( Gene gene : geneAnnots.getGenes() ) {
 
-              //  boolean geneHasAnnots = genesWithGoTerms.contains( gene );
+                // boolean geneHasAnnots = genesWithGoTerms.contains( gene );
 
                 // if ( !geneHasAnnots && !USE_UNANNOTATED_GENES ) continue;
 

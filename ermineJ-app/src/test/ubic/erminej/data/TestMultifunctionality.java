@@ -91,7 +91,8 @@ public class TestMultifunctionality extends TestCase {
 
         // actual rank should be 124. I checked this in R with (see test_mf.roc_scores.gillis.txt)
         // cbind(test_mf.roc_scores.gillis,rank(-test_mf.roc_scores.gillis[,2]))
-    //    assertEquals( 1.0 - 124.0 / 211.0, mf.getGOTermMultifunctionalityRank( new GeneSetTerm( "GO:0005634" ) ), 0.001 );
+        // assertEquals( 1.0 - 124.0 / 211.0, mf.getGOTermMultifunctionalityRank( new GeneSetTerm( "GO:0005634" ) ),
+        // 0.001 );
 
         // more tests from Jesse's output.
         assertEquals( 0.8552036, mf.getGOTermMultifunctionality( new GeneSetTerm( "GO:0005634" ) ), 0.001 );

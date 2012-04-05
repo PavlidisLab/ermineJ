@@ -253,7 +253,7 @@ public class TestGeneAnnotations extends TestCase {
     public void testRemoveBySize() throws Exception {
         assertEquals( 259, ga.getGeneSetTerms().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
-        assertEquals( 199, ga.getGeneSetTerms().size() ); // not checked by hand
+        assertEquals( 196, ga.getGeneSetTerms().size() ); // not checked by hand
     }
 
     public void testSelectSetsByGene() throws Exception {
