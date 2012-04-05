@@ -213,6 +213,8 @@ public class GeneSetTableModel extends AbstractTableModel {
     public Object getValueAt( int rowIndex, int colIndex ) {
 
         GeneSetTerm classid = gsl.get( rowIndex );
+        double minPvalue = 1e-30;
+        double maxLoggedPvalue = -Math.log10( minPvalue );
 
         if ( colIndex < INIT_COLUMNS ) {
             switch ( colIndex ) {
@@ -225,7 +227,9 @@ public class GeneSetTableModel extends AbstractTableModel {
                 case 3:
                     return new Integer( geneData.numGenesInGeneSet( classid ) );
                 case 4:
-                    return geneData.getMultifunctionality().getGOTermMultifunctionality( classid );
+                    return Math.min(
+                            -Math.log10( geneData.getMultifunctionality().getGOTermMultifunctionalityPvalue( classid ) )
+                                    / maxLoggedPvalue, 1.0 );
 
             }
         } else { // results
@@ -455,7 +459,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             setBackground( bgColor );
 
             Color mfColor = Colors.chooseColorForMultifunctionalityEffect( ( GeneSetResult ) value );
-            this.setBorder( BorderFactory.createLineBorder( mfColor, 2 ) );
+            this.setBorder( BorderFactory.createLineBorder( mfColor, 1 ) );
         }
     }
 

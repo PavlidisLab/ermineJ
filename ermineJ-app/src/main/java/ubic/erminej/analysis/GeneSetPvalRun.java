@@ -94,12 +94,14 @@ public class GeneSetPvalRun {
             if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
                 rawData = DataIOUtils.readDataMatrixForAnalysis( originalAnnots, settings );
                 this.geneData = originalAnnots.subClone( rawData.getRowNames() );
-                setName( "New corr. run" );
+                setName( settings.getClassScoreMethod() + " run" );
             } else {
                 geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, originalAnnots );
-                if ( StringUtils.isNotBlank( geneScores.getScoreColumnName() ) ) {
-                    setName( "Run on " + geneScores.getScoreColumnName() );
-                }
+                setName( settings.getClassScoreMethod()
+                        + " run "
+                        + ( StringUtils.isNotBlank( geneScores.getScoreColumnName() ) ? "on '"
+                                + geneScores.getScoreColumnName() + "'" : "" ) );
+
                 this.geneData = geneScores.getPrunedGeneAnnotations();
             }
 

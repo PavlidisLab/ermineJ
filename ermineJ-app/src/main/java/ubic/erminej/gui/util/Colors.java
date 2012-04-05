@@ -71,9 +71,9 @@ public class Colors {
 
     public static Color chooseColorForMultifunctionalityEffect( GeneSetResult value ) {
 
-        if ( value.getCorrectedPvalue() > 0.2 ) {
-            return Color.WHITE;
-        }
+//        if ( value.getCorrectedPvalue() > 0.1 ) {
+//            return Color.WHITE;
+//        }
 
         int step = value.getMultifunctionalityCorrectedRankDelta();
 

@@ -309,7 +309,7 @@ public class MultiFuncDiagWindow extends JFrame {
             // vec.add( g.getGenes().size() );
 
             assert annots.getGeneSet( g ).size() > 0;
-            double mf = annots.getMultifunctionality().getGOTermMultifunctionality( g );
+            double mf = -Math.log10( annots.getMultifunctionality().getGOTermMultifunctionalityPvalue( g ) );
             if ( mf <= 0 ) continue; // missing
             vec.add( mf );
         }

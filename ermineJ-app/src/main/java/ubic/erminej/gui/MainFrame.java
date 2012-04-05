@@ -416,7 +416,7 @@ public class MainFrame extends JFrame {
 
         String n = result.getName();
         if ( StringUtils.isBlank( n ) ) {
-            n = "Run " + ( results.size() + 1 );
+            n = result.getSettings().getClassScoreMethod() + " Run " + ( results.size() + 1 );
         }
 
         result.setName( n );

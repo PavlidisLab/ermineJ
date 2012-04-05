@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.help.UnsupportedOperationException;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -740,9 +741,9 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
      *      boolean, boolean, int, boolean)
      */
     @Override
-    public Component getTreeCellRendererComponent( JTree tree, Object value, boolean s, boolean expanded, boolean leaf,
-            int row, boolean f ) {
-        super.getTreeCellRendererComponent( tree, value, s, expanded, leaf, row, f );
+    public Component getTreeCellRendererComponent( JTree tree, Object value, boolean sel, boolean expanded,
+            boolean leaf, int row, boolean foc ) {
+        super.getTreeCellRendererComponent( tree, value, selected, expanded, leaf, row, hasFocus );
 
         GeneSetTreeNode node = ( GeneSetTreeNode ) value;
 
@@ -765,7 +766,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             this.setForeground( Color.LIGHT_GRAY ); // leaves should also be hidden.
         }
 
-        if ( s || f ) {
+        if ( sel || foc ) {
 
             float[] col1comps = new float[3];
             Color.decode( "#6688FF" ).getColorComponents( col1comps );
@@ -776,6 +777,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             setBackground( new Color( col1comps[0] * r + col2comps[0] * ( 1.0f - r ), col1comps[1] * r + col2comps[1]
                     * ( 1.0f - r ), col1comps[2] * r + col2comps[2] * ( 1.0f - r ) ) );
         }
+
         return this;
     }
 
@@ -815,8 +817,10 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             this.setIcon( emptySetIcon );
             buf.append( " (No genes in your data)" );
         } else {
-            buf.append( " &mdash; " + numGenesInGeneSet + " genes, multifunc. "
-                    + String.format( "%.2f", this.geneData.getMultifunctionality().getGOTermMultifunctionality( id ) ) );
+            buf.append( " &mdash; "
+                    + numGenesInGeneSet
+                    + " genes, multifunc rank="
+                    + String.format( "%.2f", this.geneData.getMultifunctionality().getGOTermMultifunctionalityRank( id ) ) );
             this.setFont( plain );
             this.setIcon( regularIcon );
             this.setForeground( Color.BLACK );
@@ -838,12 +842,15 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
         GeneSetResult result = currentResultSet.getResults().get( node.getTerm() );
         String resultString = displayedText;
+        this.setBorder( null );
         boolean isSig = false;
         if ( result != null ) {
             double pvalue = result.getPvalue();
             double pvalCorr = result.getCorrectedPvalue();
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
+
             this.setBackground( bgColor );
+
             isSig = pvalCorr < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
             resultString = resultString + String.format( " &mdash; p = %.3g", pvalue );
         }
@@ -858,7 +865,9 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
         } else {
             if ( isSig ) {
+                Color mfColor = Colors.chooseColorForMultifunctionalityEffect( result );
                 this.setIcon( goodPvalueIcon );
+                this.setBorder( BorderFactory.createLineBorder( mfColor, 1 ) );
             } else {
                 this.setIcon( regularIcon );
             }
@@ -921,6 +930,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
                 showResult = true;
                 resultStr = String.format( "Corrected P = %.2g<br/>", result.getCorrectedPvalue() );
             }
+
         }
 
         setToolTipText( "<html>"
