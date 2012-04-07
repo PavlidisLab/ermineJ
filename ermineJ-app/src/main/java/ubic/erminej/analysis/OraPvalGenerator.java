@@ -204,8 +204,21 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         double smax = -1.0;
         int numMfToRemove = 0;
         previousRanks.putAll( monitoredRanks );
-        double hitListMultifunctionalityBiasPvalue;
+        double hitListMultifunctionalityBiasPvalue = this.geneAnnots.getMultifunctionality()
+                .enrichmentForMultifunctionalityPvalue( filteredGenes );
+
         List<GeneSetTerm> correctedRanking = new ArrayList<GeneSetTerm>();
+
+        if ( hitListMultifunctionalityBiasPvalue > MF_BIAS_TO_TRIGGER_CORRECTION ) {
+            log.info( "No multifunctionality correction needed" );
+            numMultifunctionalRemoved = 0;
+            return;
+        }
+
+        log.info( String.format(
+                "Before correction enrichment of hit list (%d genes) for multifunctionality is P=%.3g",
+                filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
+
         while ( true ) {
 
             /*
@@ -256,10 +269,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
              * Stop if our list is no longer multifunctionality-biased.
              */
             hitListMultifunctionalityBiasPvalue = this.geneAnnots.getMultifunctionality()
-                    .enrichmentForMultifunctionality( filteredGenes );
+                    .enrichmentForMultifunctionalityPvalue( filteredGenes );
             log.info( String.format( "After removing " + numMultifunctionalRemoved
-                    + " genes, enrichment of hit list (%d genes) for multifunctionality is %.3g", filteredGenes.size(),
-                    hitListMultifunctionalityBiasPvalue ) );
+                    + " genes, enrichment of hit list (%d genes) for multifunctionality is P=%.3g",
+                    filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
             if ( hitListMultifunctionalityBiasPvalue >= MF_BIAS_TO_TRIGGER_CORRECTION ) {
                 break;
             }

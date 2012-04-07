@@ -46,6 +46,7 @@ import ubic.basecode.math.Distance;
 import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.Rank;
 import ubic.basecode.math.Smooth;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -105,16 +106,19 @@ public class MultiFuncDiagWindow extends JFrame {
 
     /**
      * @param geneAnnots
-     * @param geneScores
+     * @param geneScores must be already log-tranformed (if requested)
      * @return
      */
     private JPanel regressed( GeneAnnotations geneAnnots, GeneScores geneScores ) {
         Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
 
+        // copies code from Multifunctationality, except always using weighted regression.
+        SettingsHolder settings = geneAnnots.getSettings();
+        boolean doLog = settings.getDoLog(); // note scores would already have been log-transformed.
+        boolean invert = ( doLog && !settings.getBigIsBetter() ) || ( !doLog && settings.getBigIsBetter() );
+
         DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
         DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
-        DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
-        scoreRanks.assign( Functions.div( scoreRanks.size() ) );
         int i = 0;
         for ( Gene g : geneToScoreMap.keySet() ) {
             // using # go terms because it is more intuitive.
@@ -125,7 +129,12 @@ public class MultiFuncDiagWindow extends JFrame {
             mfs.set( i, mf );
             i++;
         }
-        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores, scoreRanks.copy().assign( Functions.inv ) );
+
+        // We want the weight to be highest for the best score. So if big is better, we use the increasing sort
+        DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), !invert ) );
+        weights.assign( Functions.div( weights.size() ) );
+
+        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores, weights );
 
         double slope = fit.getCoefficients().get( 1, 0 );
 
@@ -152,7 +161,7 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality (# groups)",
                 "Gene score", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
-        c.setTitle( String.format( "How biased are the gene scores\n(raw; regression; slope=%.2g)", slope ) );
+        c.setTitle( String.format( "How biased are the gene scores\n(raw; weighted regression; slope=%.2g)", slope ) );
         Plotting.setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );
@@ -181,7 +190,6 @@ public class MultiFuncDiagWindow extends JFrame {
 
         for ( Gene g : geneToScoreMap.keySet() ) {
             Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityRank( g );
-            // Double mf = Math.log10( geneAnnots.getMultifunctionality().getMultifunctionalityScore( g ) );
             Double s = geneToScoreMap.get( g );
             ser.add( mf, s );
         }
@@ -316,7 +324,7 @@ public class MultiFuncDiagWindow extends JFrame {
 
         HistogramDataset series = new HistogramDataset();
         int numBins = 39;
-        series.addSeries( "ROCs", MatrixUtil.fromList( vec ).toArray(), numBins, 0.0, 1.0 );
+        series.addSeries( "pvalues for ROCs (-log10)", MatrixUtil.fromList( vec ).toArray(), numBins, 0.0, 20.0 );
 
         /*
          * The value plotted here is based on the AU-ROC, but see Multifunctionality to see how it is computed for

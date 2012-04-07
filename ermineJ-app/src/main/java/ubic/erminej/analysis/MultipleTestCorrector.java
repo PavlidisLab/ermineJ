@@ -38,8 +38,7 @@ import javax.help.UnsupportedOperationException;
 
 import ubic.basecode.util.StatusViewer;
 
-import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.Gene;
+import ubic.erminej.SettingsHolder; 
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSet;
@@ -225,7 +224,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
 
             // shuffle the association of pvalues to genes.
             // these should be multifunctionality corrected!!
-            Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToScoreMap( true );
+            // Map<Gene, Double> scgroup_pval_map = geneScores.getGeneToScoreMap( true );
 
             // / permscores contains a list of the p values for the shuffled data.
             permscores = cver.classPvalGeneratorRaw(); // end of step 1.

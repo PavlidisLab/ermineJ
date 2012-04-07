@@ -18,13 +18,18 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
@@ -47,7 +52,8 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
     /**
      * @param settings
      * @param a
-     * @param hi null distributions
+     * @param geneToScoreMap already log-transformed, if requested.
+     * @param messenger
      */
     public GeneSetResamplingPvalGenerator( SettingsHolder settings, GeneAnnotations a,
             Map<Gene, Double> geneToScoreMap, StatusViewer messenger ) {
@@ -107,6 +113,28 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         if ( useMultifunctionalityCorrection ) {
             Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
                     false /* not ranks */, true /* weighted regression */);
+
+            if ( !settings.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL ) ) {
+                /*
+                 * For GSR, we mustn't use the adjusted scores, we need to make them like the original scores; otherwise
+                 * we need to do resampling again.
+                 */
+                Map<Gene, Double> adjustedRanks = Rank.rankTransform( adjustScores );
+
+                List<Double> originalScores = new ArrayList<Double>();
+                originalScores.addAll( geneToScoreMap.values() );
+                Collections.sort( originalScores );
+
+                // maybe there is a better way to do this.
+                for ( Gene g : adjustedRanks.keySet() ) {
+                    Double rank = adjustedRanks.get( g );
+                    int m = ( int ) Math.max( 0.0, Math.floor( rank ) );
+                    assert m < originalScores.size();
+                    adjustScores.put( g, originalScores.get( m ) );
+                }
+
+            }
+
             GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( this, adjustScores );
 
             Map<GeneSetTerm, GeneSetResult> generateGeneSetResults = pvg.generateGeneSetResults( false );

@@ -71,23 +71,19 @@ public class Colors {
 
     public static Color chooseColorForMultifunctionalityEffect( GeneSetResult value ) {
 
-//        if ( value.getCorrectedPvalue() > 0.1 ) {
-//            return Color.WHITE;
-//        }
-
         int step = value.getMultifunctionalityCorrectedRankDelta();
 
         if ( step > 100 ) {
-            return Colors.LIGHTRED1;
+            return Color.RED;
         }
         if ( step > 20 ) {
-            return Colors.LIGHTRED3;
+            return Color.RED.darker();
         }
         if ( step > 10 ) {
-            return Colors.LIGHTYELLOW;
+            return Colors.LIGHTRED2;
         }
         if ( step > 0 ) {
-            return Colors.LIGHTGREEN2;
+            return Colors.LIGHTYELLOW.darker();
         }
         return Colors.LIGHTGREEN1;
     }

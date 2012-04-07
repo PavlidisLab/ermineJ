@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.help.UnsupportedOperationException;
-import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -186,17 +185,14 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @see ubic.erminej.gui.geneset.GeneSetPanel#filter(boolean)
      */
     @Override
-    public void filter( boolean propagate ) {
-
-        filteredTreeModel = new FilteredGeneSetTreeModel( this.geneData, geneSetTreeModel );
-        this.goTree.setModel( filteredTreeModel );
-
+    public void filter( final boolean propagate ) {
+        filteredTreeModel = new FilteredGeneSetTreeModel( geneData, geneSetTreeModel );
         filteredTreeModel.setFilterBySize( hideEmpty );
         filteredTreeModel.setResults( callingFrame.getCurrentResultSet() );
         filteredTreeModel.setFilterBySignificance( hideInsignificant );
-        filteredTreeModel.setFilterSelectedTerms( this.currentSelectedSets );
-
-        if ( propagate ) this.callingFrame.getTablePanel().filter( false );
+        filteredTreeModel.setFilterSelectedTerms( currentSelectedSets );
+        goTree.setModel( filteredTreeModel );
+        if ( propagate ) callingFrame.getTablePanel().filter( false );
     }
 
     /**
@@ -852,7 +848,20 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
             this.setBackground( bgColor );
 
             isSig = pvalCorr < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
-            resultString = resultString + String.format( " &mdash; p = %.3g", pvalue );
+
+            int step = result.getMultifunctionalityCorrectedRankDelta();
+            String mfstring = "";
+            int size = 4;
+
+            if ( step > 0 ) {
+                String col = Integer.toHexString( Colors.chooseColorForMultifunctionalityEffect( result ).getRGB() )
+                        .substring( 2, 8 );
+
+                mfstring = "&nbsp;<font size=" + size + " + color=#" + col + ">&#9830;</font>";
+            }
+
+            resultString = resultString + String.format( " &mdash; p = %.3g", pvalue ) + mfstring;
+
         }
 
         if ( node.hasSignificantChild() ) {
@@ -865,9 +874,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
         } else {
             if ( isSig ) {
-                Color mfColor = Colors.chooseColorForMultifunctionalityEffect( result );
                 this.setIcon( goodPvalueIcon );
-                this.setBorder( BorderFactory.createLineBorder( mfColor, 1 ) );
             } else {
                 this.setIcon( regularIcon );
             }

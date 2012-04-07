@@ -127,7 +127,7 @@ public class Gene implements Comparable<Gene> {
 
     @Override
     public String toString() {
-        return "Gene [symbol=" + symbol + ", name=" + name + "]";
+        return "Gene [" + symbol + ", " + name + "]";
     }
 
     public void setActiveProbes( Collection<Probe> activeProbes ) {

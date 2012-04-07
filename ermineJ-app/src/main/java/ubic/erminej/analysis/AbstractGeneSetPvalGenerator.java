@@ -55,11 +55,18 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
     protected SettingsHolder settings;
 
-    // used for precision-recall.
-    protected Map<Gene, Double> geneRanks;
+    /*
+     * 1-based ranks, taking into account bigger is better and log-transform.
+     */
+    private Map<Gene, Double> geneRanks;
 
+    /*
+     * Log-transformed (if requested)
+     */
     protected Map<Gene, Double> geneToScoreMap;
+
     protected GeneAnnotations geneAnnots;
+
     protected int numGenesUsed = 0;
 
     private int maxGeneSetSize;
@@ -71,7 +78,8 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     /**
      * @param set
      * @param annots
-     * @param geneToScoreMap can be null if the method doesn't use gene scores.
+     * @param geneToScoreMap can be null if the method doesn't use gene scores; must already be log-transformed, if
+     *        requested.
      * @param messenger2
      */
     public AbstractGeneSetPvalGenerator( SettingsHolder set, GeneAnnotations annots, Map<Gene, Double> geneToScoreMap,
@@ -187,31 +195,25 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
 
     /**
      * @param genesInSet
-     * @return 1-based ranks of genes in the set, taking into account "bigger is better" etc.
+     * @return 1-based ranks of genes in the set, taking into account "bigger is better" and log-transformation.
      */
     protected List<Double> ranksOfGenesInSet( Collection<Gene> genesInSet ) {
+
         boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
                 || ( !settings.getDoLog() && settings.getBigIsBetter() );
 
         if ( this.geneRanks == null ) {
-            geneRanks = Rank.rankTransform( geneToScoreMap );
+            geneRanks = Rank.rankTransform( geneToScoreMap, invert );
+            for ( Gene g : geneRanks.keySet() ) {
+                geneRanks.put( g, geneRanks.get( g ) + 1.0 );
+            }
         }
 
-        int totalSize = geneRanks.size();
         List<Double> targetRanks = new ArrayList<Double>();
         for ( Gene g : genesInSet ) {
-
             Double rank = geneRanks.get( g );
-
             if ( rank == null ) continue;
-
-            /* if the values are log-transformed, and bigger is not better, we need to invert the rank */
-            if ( invert ) {
-                rank = totalSize - rank;
-                assert rank >= 0;
-            }
-
-            targetRanks.add( rank + 1.0 ); // make ranks 1-based.
+            targetRanks.add( rank );
         }
         return targetRanks;
     }

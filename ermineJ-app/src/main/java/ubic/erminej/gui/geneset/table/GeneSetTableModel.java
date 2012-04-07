@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -327,7 +326,19 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             setText( "not run" );
             setForeground( Color.LIGHT_GRAY );
         } else if ( value instanceof GeneSetResult ) {
-            setText( nf.format( ( ( GeneSetResult ) value ).getPvalue() ) );
+            GeneSetResult result = ( GeneSetResult ) value;
+            int step = result.getMultifunctionalityCorrectedRankDelta();
+
+            String mfstring = "";
+            int size = 4;
+
+            if ( step > 0 ) {
+                String col = Integer.toHexString( Colors.chooseColorForMultifunctionalityEffect( result ).getRGB() )
+                        .substring( 2, 8 );
+
+                mfstring = "&nbsp;<font size=" + size + " + color=#" + col + ">&#9830;</font>";
+            }
+            setText( String.format( "<html>%.3g" + mfstring + "</html>", result.getPvalue() ) );
         } else if ( column == 4 && ( Double ) value < 0 ) {
             setText( "" );
         } else if ( value instanceof Double ) {
@@ -343,6 +354,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         setCellBackgroundColor( value, column );
 
         if ( isSelected || hasFocus ) {
+            // blend colours
             float[] col1comps = new float[3];
             Color.decode( "#6688FF" ).getColorComponents( col1comps );
             float[] col2comps = new float[3];
@@ -458,8 +470,8 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             Color bgColor = Colors.chooseBackgroundColorForPvalue( pvalCorr );
             setBackground( bgColor );
 
-            Color mfColor = Colors.chooseColorForMultifunctionalityEffect( ( GeneSetResult ) value );
-            this.setBorder( BorderFactory.createLineBorder( mfColor, 1 ) );
+            // Color mfColor = Colors.chooseColorForMultifunctionalityEffect( ( GeneSetResult ) value );
+            // this.setBorder( BorderFactory.createLineBorder( mfColor, 1 ) );
         }
     }
 

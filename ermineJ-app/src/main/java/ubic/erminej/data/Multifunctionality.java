@@ -43,6 +43,7 @@ import ubic.basecode.math.ROC;
 import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
+import ubic.erminej.SettingsHolder;
 
 /**
  * Implementation of multifunctionality computations as described in Gillis and Pavlidis (2011) PLoS ONE 6:2:e17258.
@@ -105,7 +106,7 @@ public class Multifunctionality {
     }
 
     /**
-     * @param geneToScoreMap
+     * @param geneToScoreMap Already log transformed, if requested.
      * @param useRanks If true, the ranks of the gene scores will be used for regression.
      * @param weight If true, the regression will be weighted by 1/x, where x is the rank of the score
      * @return
@@ -115,31 +116,36 @@ public class Multifunctionality {
         DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
         DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
 
+        SettingsHolder settings = geneAnnots.getSettings();
+        boolean doLog = settings.getDoLog(); // note scores would already have been log-transformed.
+        boolean invert = ( doLog && !settings.getBigIsBetter() ) || ( !doLog && settings.getBigIsBetter() );
+
         List<Gene> genesInSomeOrder = new ArrayList<Gene>( geneToScoreMap.keySet() );
 
         int i = 0;
         for ( Gene g : genesInSomeOrder ) {
             Double mf = this.getMultifunctionalityRank( g );
             Double s = geneToScoreMap.get( g );
+
             scores.set( i, s );
             mfs.set( i, mf );
             i++;
         }
 
         LeastSquaresFit fit;
-        DoubleMatrix1D scoreRanks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ) ) );
-        scoreRanks.assign( Functions.div( scoreRanks.size() ) );
+        DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), !invert ) )
+                .assign( Functions.div( scores.size() ) );
 
         if ( useRanks ) {
-
+            DoubleMatrix1D ranks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) );
             if ( weight ) {
-                fit = new LeastSquaresFit( mfs, scoreRanks, scoreRanks.copy().assign( Functions.inv ) );
+                fit = new LeastSquaresFit( mfs, ranks, weights );
             } else {
-                fit = new LeastSquaresFit( mfs, scoreRanks );
+                fit = new LeastSquaresFit( mfs, ranks );
             }
         } else {
             if ( weight ) {
-                fit = new LeastSquaresFit( mfs, scores, scoreRanks.copy().assign( Functions.inv ) );
+                fit = new LeastSquaresFit( mfs, scores, weights );
             } else {
                 fit = new LeastSquaresFit( mfs, scores );
             }
@@ -151,9 +157,8 @@ public class Multifunctionality {
             return geneToScoreMap;
         }
 
-        // This does not deal with missing values. SHOULD WE USED STUDENTIZED RESIDUALS OR NOT?
-        DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
-        // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+        DoubleMatrix1D studRes = fit.getStudentizedResiduals().viewRow( 0 );
+        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();
 
@@ -161,6 +166,18 @@ public class Multifunctionality {
 
         for ( i = 0; i < residuals.size(); i++ ) {
             result.put( genesInSomeOrder.get( i ), residuals.get( i ) );
+        }
+
+        /*
+         * DEBUGGING CODE
+         */
+        i = 0;
+        for ( Gene g : genesInSomeOrder ) {
+            double w = weights.get( i );
+            Double mf = this.getMultifunctionalityRank( g );
+            System.err.println( String.format( "%s\t%.2f\t%.2f\t%.2f\t%.3g\t%.3g", g.toString(),
+                    geneToScoreMap.get( g ), result.get( g ), studRes.get( i ), w, mf ) );
+            i++;
         }
 
         return result;
