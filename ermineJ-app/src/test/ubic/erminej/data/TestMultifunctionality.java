@@ -16,8 +16,14 @@ package ubic.erminej.data;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipInputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import junit.framework.TestCase;
 
@@ -32,6 +38,8 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * @version $Id$
  */
 public class TestMultifunctionality extends TestCase {
+
+    private static Log log = LogFactory.getLog( TestMultifunctionality.class );
 
     public void testMf1() throws Exception {
 
@@ -52,7 +60,7 @@ public class TestMultifunctionality extends TestCase {
 
         GeneAnnotationParser p = new GeneAnnotationParser( geneSets );
 
-        SettingsHolder settings = new Settings();
+        SettingsHolder settings = new Settings(); // assumed: log = true.
         settings.setUseUserDefined( false );
 
         GeneAnnotations ga = p.read( is, Format.DEFAULT, settings );
@@ -122,5 +130,38 @@ public class TestMultifunctionality extends TestCase {
         li.add( new Gene( "C6orf199" ) );
         li.add( new Gene( "foonotagene" ) );
         assertEquals( 0.707017, mf.correlationWithGeneMultifunctionality( li ), 0.001 ); // not checked by hand.
+
+        Map<Gene, Double> geneToScoreMap = new LinkedHashMap<Gene, Double>();
+        int i = li.size();
+        for ( Gene g : li ) {
+            // these are 'already log-transformed'.
+            geneToScoreMap.put( g, ( double ) i-- );
+        }
+        Map<Gene, Double> adjustedScores = mf.adjustScores( geneToScoreMap, false, true );
+
+        // for ( Gene g : li ) {
+        // System.err.println( adjustedScores.get( g ) );
+        // System.err.println( String.format( "%s\t%.4g\t%.4g", g, mf.getMultifunctionalityRank( g ),
+        // geneToScoreMap.get( g ) ) );
+        // }
+
+        // mfscorestest <-
+        // read.delim("C:/Users/paul/dev/eclipseworkspace/ermineJ/ermineJ-app/src/test/data/mfscorestest.txt")
+        // cat(residuals(lm(mfscorestest$GeneScore ~mfscorestest$MFRank , weights =1/c(1:20)) ), sep=",")
+        // cat(rstudent(lm(mfscorestest$GeneScore ~mfscorestest$MFRank , weights =1/c(1:20)) ), sep=",")
+
+        // here are the plain old residuals.
+        // double[] expectedAdjustedScores = new double[] { 3.033775, 1.427687, -0.1784013, 2.153857, 0.3980867,
+        // -2.268042, 1.578209, -5.480219, -4.360137, -2.329696, -4.240055, -8.87413, -8.661954, -3.603526,
+        // 0.848813, -7.723608, -0.5450989, -5.785262, -4.66518, 6.451675 };
+
+        double[] expectedAdjustedScoresStudentized = new double[] { 2.801387, 0.7126326, -0.06987865, 0.7145039,
+                0.1154752, -0.6070027, 0.3899923, -1.318726, -0.9556866, -0.475843, -0.8333633, -1.788133, -1.649778,
+                -0.6296883, 0.1493991, -1.29153, -0.0898998, -0.9070473, -0.7163117, 1.228161 };
+
+        for ( int j = 0; j < expectedAdjustedScoresStudentized.length; j++ ) {
+            assertEquals( expectedAdjustedScoresStudentized[j], adjustedScores.get( li.get( j ) ), 0.01 );
+        }
+
     }
 }

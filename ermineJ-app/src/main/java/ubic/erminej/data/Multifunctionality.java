@@ -133,8 +133,8 @@ public class Multifunctionality {
         }
 
         LeastSquaresFit fit;
-        DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), !invert ) )
-                .assign( Functions.div( scores.size() ) );
+        DoubleMatrix1D weights = MatrixUtil.fromList( ( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) ) )
+                .assign( Functions.inv );
 
         if ( useRanks ) {
             DoubleMatrix1D ranks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) );
@@ -157,8 +157,8 @@ public class Multifunctionality {
             return geneToScoreMap;
         }
 
-        DoubleMatrix1D studRes = fit.getStudentizedResiduals().viewRow( 0 );
-        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+        DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
+        // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();
 
@@ -171,14 +171,14 @@ public class Multifunctionality {
         /*
          * DEBUGGING CODE
          */
-        i = 0;
-        for ( Gene g : genesInSomeOrder ) {
-            double w = weights.get( i );
-            Double mf = this.getMultifunctionalityRank( g );
-            System.err.println( String.format( "%s\t%.2f\t%.2f\t%.2f\t%.3g\t%.3g", g.toString(),
-                    geneToScoreMap.get( g ), result.get( g ), studRes.get( i ), w, mf ) );
-            i++;
-        }
+        // i = 0;
+        // for ( Gene g : genesInSomeOrder ) {
+        // double w = weights.get( i );
+        // Double mf = this.getMultifunctionalityRank( g );
+        // System.err.println( String.format( "%s\t%.2f\t%.2f\t%.2f\t%.3g\t%.3g", g.toString(),
+        // geneToScoreMap.get( g ), result.get( g ), studRes.get( i ), w, mf ) );
+        // i++;
+        // }
 
         return result;
 
