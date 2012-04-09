@@ -131,7 +131,7 @@ public class MultiFuncDiagWindow extends JFrame {
         }
 
         // We want the weight to be highest for the best score. So if big is better, we use the increasing sort
-        DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), !invert ) );
+        DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) );
         weights.assign( Functions.div( weights.size() ) );
 
         LeastSquaresFit fit = new LeastSquaresFit( mfs, scores, weights );

@@ -44,6 +44,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
+import org.apache.commons.lang.StringUtils;
+
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
@@ -407,25 +409,25 @@ public class AnalysisWizardStep5 extends WizardStep {
         jTextFieldIterations.addActionListener( new AbstractAction() {
             @Override
             public void actionPerformed( ActionEvent arg0 ) {
-                try {
-                    log.info( "yay" );
-                    numIterations.set( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
-                } catch ( NumberFormatException e1 ) {
-                    log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
-                }
+                getNumIterationsFromField( jTextFieldIterations );
             }
+
         } );
 
         jTextFieldIterations.addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped( KeyEvent e ) {
-                try {
-                    log.info( "yay" );
+                getNumIterationsFromField( jTextFieldIterations );
+            }
 
-                    numIterations.set( Integer.valueOf( jTextFieldIterations.getText() ).intValue() );
-                } catch ( NumberFormatException e1 ) {
-                    log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
-                }
+            @Override
+            public void keyPressed( KeyEvent e ) {
+                getNumIterationsFromField( jTextFieldIterations );
+            }
+
+            @Override
+            public void keyReleased( KeyEvent e ) {
+                getNumIterationsFromField( jTextFieldIterations );
             }
         } );
 
@@ -478,6 +480,17 @@ public class AnalysisWizardStep5 extends WizardStep {
             }
 
         } );
+    }
+
+    /**
+     * @param jTextFieldIterations
+     */
+    private void getNumIterationsFromField( final JTextField jTextFieldIterations ) {
+        try {
+            numIterations.set( Integer.valueOf( StringUtils.strip( jTextFieldIterations.getText() ) ).intValue() );
+        } catch ( NumberFormatException e1 ) {
+            log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
+        }
     }
 
     /**

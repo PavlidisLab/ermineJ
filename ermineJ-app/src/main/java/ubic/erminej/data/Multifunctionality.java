@@ -130,14 +130,30 @@ public class Multifunctionality {
             scores.set( i, s );
             mfs.set( i, mf );
             i++;
+
         }
 
         LeastSquaresFit fit;
-        DoubleMatrix1D weights = MatrixUtil.fromList( ( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) ) )
-                .assign( Functions.inv );
+        DoubleArrayList rawRanks = Rank.rankTransform( MatrixUtil.toList( scores ), invert );
+        DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv );
+
+        /*
+         * DEBUGGING CODE
+         */
+        i = 0;
+        for ( Gene g : genesInSomeOrder ) {
+            double w = weights.get( i );
+            double s = scores.get( i );
+            double rr = rawRanks.get( i );
+            Double mf = mfs.get( i );
+            if ( s > 20 ) {
+                System.err.println( String.format( "%s\t%.4f\t%.4f\t%.8f\t%.8f", g.getSymbol(), mf, s, w, rr ) );
+            }
+            i++;
+        }
 
         if ( useRanks ) {
-            DoubleMatrix1D ranks = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) );
+            DoubleMatrix1D ranks = MatrixUtil.fromList( rawRanks );
             if ( weight ) {
                 fit = new LeastSquaresFit( mfs, ranks, weights );
             } else {
@@ -153,7 +169,9 @@ public class Multifunctionality {
 
         // log.info( fit.getCoefficients() );
         if ( fit.getCoefficients().get( 1, 0 ) < 0 ) {
-            messenger.showStatus( "Multifunctionality correction skipped: correlation is negative" );
+            messenger.showStatus( String.format(
+                    "Multifunctionality correction skipped: correlation is negative: %.2f ",
+                    fit.getCoefficients().get( 1, 0 ) ) );
             return geneToScoreMap;
         }
 
@@ -167,18 +185,6 @@ public class Multifunctionality {
         for ( i = 0; i < residuals.size(); i++ ) {
             result.put( genesInSomeOrder.get( i ), residuals.get( i ) );
         }
-
-        /*
-         * DEBUGGING CODE
-         */
-        // i = 0;
-        // for ( Gene g : genesInSomeOrder ) {
-        // double w = weights.get( i );
-        // Double mf = this.getMultifunctionalityRank( g );
-        // System.err.println( String.format( "%s\t%.2f\t%.2f\t%.2f\t%.3g\t%.3g", g.toString(),
-        // geneToScoreMap.get( g ), result.get( g ), studRes.get( i ), w, mf ) );
-        // i++;
-        // }
 
         return result;
 

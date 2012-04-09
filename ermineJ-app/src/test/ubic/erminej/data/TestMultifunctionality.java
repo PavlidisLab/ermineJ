@@ -16,14 +16,10 @@ package ubic.erminej.data;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import junit.framework.TestCase;
 
@@ -38,8 +34,6 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * @version $Id$
  */
 public class TestMultifunctionality extends TestCase {
-
-    private static Log log = LogFactory.getLog( TestMultifunctionality.class );
 
     public void testMf1() throws Exception {
 

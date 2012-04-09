@@ -138,6 +138,7 @@ public class AnalysisWizard extends Wizard {
             checkIfReady();
             backButton.setEnabled( false );
             nextButton.setEnabled( true );
+            step2.saveValues();
             this.repaint();
         } else if ( step == 3 ) {
             step = 2;
@@ -147,12 +148,14 @@ public class AnalysisWizard extends Wizard {
             checkIfReady();
             nextButton.setEnabled( true );
             step2.revalidate();
+            step3.saveValues();
             this.repaint();
         } else if ( step == 4 ) {
             step = 3;
             this.getContentPane().remove( step4 );
             this.setTitle( "Create New Analysis - Step 4 of " + maxSteps );
             this.getContentPane().add( step3 );
+            step4.saveValues();
             checkIfReady();
             nextButton.setEnabled( true );
             step3.revalidate();
@@ -163,6 +166,7 @@ public class AnalysisWizard extends Wizard {
             this.getContentPane().remove( step5 );
             this.setTitle( "Create New Analysis - Step 5 of " + maxSteps );
             this.getContentPane().add( step4 );
+            step5.saveValues();
             checkIfReady();
             nextButton.setEnabled( true );
             step4.revalidate();
