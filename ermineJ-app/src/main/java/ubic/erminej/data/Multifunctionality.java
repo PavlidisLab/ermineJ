@@ -110,7 +110,7 @@ public class Multifunctionality {
      * 
      * @param geneToScoreMap Should already be log transformed, if requested.
      * @param useRanks If true, the ranks of the gene scores will be used for regression.
-     * @param weight If true, the regression will be weighted by 1/x, where x is the rank of the score
+     * @param weight If true, the regression will be weighted [FIXME document how]
      * @return residuals from the regression, which are to be used as the new scores.
      */
     public Map<Gene, Double> adjustScores( Map<Gene, Double> geneToScoreMap, boolean useRanks, boolean weight ) {
@@ -137,6 +137,8 @@ public class Multifunctionality {
 
         LeastSquaresFit fit;
         DoubleArrayList rawRanks = Rank.rankTransform( MatrixUtil.toList( scores ), invert );
+
+        // FIXME experimenting with weightings. 1/X is too much.
         DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv ).assign( Functions.sqrt );
 
         /*

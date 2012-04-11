@@ -41,8 +41,10 @@ import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -138,9 +140,9 @@ public class GeneSetDetailsFrame extends JFrame {
     private boolean includeScalebar = false;
     private int matrixColumnWidth; // how wide the color image columns are.
 
-    protected final JTable table = new JTable();
-    protected JScrollPane tableScrollPane = new JScrollPane();
-    protected JToolBar toolBar = new JToolBar();
+    private final JTable table = new JTable();
+    private JScrollPane tableScrollPane = new JScrollPane();
+    private JToolBar toolBar = new JToolBar();
 
     private JRadioButtonMenuItem blackbodyColormapMenuItem = new JRadioButtonMenuItem();
     private DetailsOutputDataFileChooser fileChooser = null;
@@ -557,36 +559,27 @@ public class GeneSetDetailsFrame extends JFrame {
         col.setCellRenderer( new JBarGraphCellRenderer( 4.0, new Color[] { Color.LIGHT_GRAY, Colors.LIGHTBLUE2 } ) );
 
         // name (gene)
-        col = table.getColumnModel().getColumn( matrixColumnCount + 3 );
-        col.setPreferredWidth( PREFERRED_WIDTH_GENENAME_COLUMN );
-        col.setCellRenderer( new DefaultTableCellRenderer() {
-            public void fillColor( JTable t, JLinkLabel l, boolean isSelected ) {
-                if ( isSelected ) {
-                    l.setBackground( t.getSelectionBackground() );
-                    l.setForeground( t.getSelectionForeground() );
-                } else {
-                    l.setBackground( t.getBackground() );
-                    l.setForeground( Color.BLUE );
-                }
-            }
+        setupGeneSymbolColumn( table.getColumnModel().getColumn( matrixColumnCount + 3 ) );
 
-            @Override
-            public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int column ) {
-                fillColor( table, ( JLinkLabel ) value, isSelected );
-                return ( JLinkLabel ) value;
-            }
-        } );
-
-        // description
+        // gene description
         col = table.getColumnModel().getColumn( matrixColumnCount + 4 );
         col.setPreferredWidth( PREFERRED_WIDTH_DESCRIPTION_COLUMN );
 
-        // multifunctionality
+        // multifunctionality Score
+        setupMultifunctionalityColumn( table.getColumnModel().getColumn( matrixColumnCount + 5 ) );
 
-        // Score
+        // QQ plot for multifunctionality.
+        col = table.getColumnModel().getColumn( matrixColumnCount + 6 );
+        col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_QQCOLUMN );
+        double maxValue = 3.0; // values above this will be clipped for display.
+        col.setCellRenderer( new JBarGraphCellRenderer( maxValue, new Color[] { Color.LIGHT_GRAY, Colors.LIGHTRED2 } ) );
 
-        col = table.getColumnModel().getColumn( matrixColumnCount + 5 );
+    }
+
+    /**
+     * @param col
+     */
+    private void setupMultifunctionalityColumn( TableColumn col ) {
         col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN );
         col.setCellRenderer( new DefaultTableCellRenderer() {
             private static final long serialVersionUID = 1L;
@@ -629,12 +622,32 @@ public class GeneSetDetailsFrame extends JFrame {
                 return this;
             }
         } );
+    }
 
-        // QQ plot
-        col = table.getColumnModel().getColumn( matrixColumnCount + 6 );
-        col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_QQCOLUMN );
-        double maxValue = 3.0; // values above this will be clipped for display.
-        col.setCellRenderer( new JBarGraphCellRenderer( maxValue, new Color[] { Color.LIGHT_GRAY, Colors.LIGHTRED2 } ) );
+    /**
+     * @param col
+     */
+    private void setupGeneSymbolColumn( TableColumn col ) {
+        col.setPreferredWidth( PREFERRED_WIDTH_GENENAME_COLUMN );
+        col.setCellRenderer( new DefaultTableCellRenderer() {
+            public void fillColor( JTable t, JComponent l, boolean isSelected ) {
+                if ( isSelected ) {
+                    l.setBackground( t.getSelectionBackground() );
+                    l.setForeground( t.getSelectionForeground() );
+                } else {
+                    l.setBackground( t.getBackground() );
+                    l.setForeground( Color.BLUE );
+                }
+            }
+
+            @Override
+            public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column ) {
+                fillColor( table, ( JComponent ) value, isSelected );
+                return ( JComponent ) value;
+            }
+
+        } );
 
     }
 
@@ -788,19 +801,22 @@ public class GeneSetDetailsFrame extends JFrame {
      * 
      */
     private void setupTable() {
-        // table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
-
         table.setAutoResizeMode( JTable.AUTO_RESIZE_ALL_COLUMNS );
 
         // Prevent user from moving columns around
         table.getTableHeader().setReorderingAllowed( false );
+
         // For html links on gene names
         table.addMouseListener( new JGeneSetFrame_m_mouseAdapter( this ) );
+
         table.addMouseMotionListener( new JGeneSetFrame_m_mouseMotionListener( this ) );
+
         // change the cursor to a hand over a header
         table.getTableHeader().addMouseListener( new JGeneSetFrameTableHeader_mouseAdapterCursorChanger( this ) );
+
         // Make sure the matrix display doesn't have a grid separating color cells.
         table.setIntercellSpacing( new Dimension( 0, 0 ) );
+
         // The rest of the table (text and value) should have a light gray grid
         table.setGridColor( Color.lightGray );
     }
@@ -816,18 +832,17 @@ public class GeneSetDetailsFrame extends JFrame {
         m_cellWidthSlider.setMinimum( MIN_WIDTH_MATRIXDISPLAY_COLUMN );
         m_cellWidthSlider.setValue( matrixColumnWidth );
         m_cellWidthSlider.setMinorTickSpacing( 3 );
-        m_cellWidthSlider.setPaintLabels( false );
-        m_cellWidthSlider.setPaintTicks( true );
-        m_cellWidthSlider.setPaintTrack( true );
-        m_cellWidthSlider.setPaintTicks( false );
         m_cellWidthSlider.setMaximumSize( new Dimension( 90, 24 ) );
         m_cellWidthSlider.setPreferredSize( new Dimension( 90, 24 ) );
         m_cellWidthSlider.addChangeListener( new JGeneSetFrame_m_cellWidthSlider_changeAdapter( this ) );
         this.setResizable( true );
         m_cellWidthLabel.setText( "Cell Width:" );
+        m_cellWidthLabel.setBorder( BorderFactory.createEmptyBorder( 5, 10, 0, 0 ) );
+        m_cellWidthLabel.setToolTipText( "Change the width of the heatmap cells" );
 
         m_colorRangeLabel.setText( "Color Range:" );
-        m_colorRangeLabel.setBorder( BorderFactory.createEmptyBorder( 0, 10, 0, 0 ) );
+        m_colorRangeLabel.setLabelFor( m_colorRangeSlider );
+        m_colorRangeLabel.setBorder( BorderFactory.createEmptyBorder( 5, 10, 0, 0 ) );
         m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
         m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
         if ( matrixDisplay != null ) {
@@ -837,11 +852,23 @@ public class GeneSetDetailsFrame extends JFrame {
         m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
         m_colorRangeSlider.setPreferredSize( new Dimension( 90, 24 ) );
         m_colorRangeSlider.addChangeListener( new JGeneSetFrame_m_colorRangeSlider_changeAdapter( this ) );
-        toolBar.add( m_cellWidthLabel );
-        toolBar.add( m_cellWidthSlider );
-        toolBar.add( m_colorRangeLabel );
-        toolBar.add( m_colorRangeSlider );
-        toolBar.add( m_gradientBar );
+
+        GroupLayout gl = new GroupLayout( toolBar );
+        toolBar.setLayout( gl );
+        gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( m_cellWidthLabel )
+                .addComponent( m_cellWidthSlider ).addComponent( m_colorRangeLabel ).addComponent( m_colorRangeSlider )
+                .addComponent( m_gradientBar ) );
+        gl.setVerticalGroup( gl.createParallelGroup().addComponent( m_cellWidthLabel ).addComponent( m_cellWidthSlider )
+                .addComponent( m_colorRangeLabel ).addComponent( m_colorRangeSlider ).addComponent( m_gradientBar ) );
+        // toolBar.add( m_cellWidthLabel );
+        // toolBar.add( m_cellWidthSlider );
+        // toolBar.add( m_colorRangeLabel );
+        // toolBar.add( m_colorRangeSlider );
+        // toolBar.add( m_gradientBar );
+
+        /*
+         * FIXME: probably should use a better layout manager. Looks wrong in Linux?
+         */
     }
 
     /**
@@ -1475,11 +1502,6 @@ class JGeneSetFrame_m_mouseAdapter extends java.awt.event.MouseAdapter {
     }
 
     @Override
-    public void mouseEntered( MouseEvent e ) {
-        // adaptee.table_mouseEntered(e);
-    }
-
-    @Override
     public void mouseExited( MouseEvent e ) {
         adaptee.table_mouseExited();
     }
@@ -1491,14 +1513,11 @@ class JGeneSetFrame_m_mouseAdapter extends java.awt.event.MouseAdapter {
 
 }
 
-class JGeneSetFrame_m_mouseMotionListener implements java.awt.event.MouseMotionListener {
+class JGeneSetFrame_m_mouseMotionListener extends java.awt.event.MouseAdapter {
     GeneSetDetailsFrame adaptee;
 
     JGeneSetFrame_m_mouseMotionListener( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
-    }
-
-    public void mouseDragged( MouseEvent e ) {
     }
 
     public void mouseMoved( MouseEvent e ) {
@@ -1571,6 +1590,7 @@ class JGeneSetFrame_windowListenerAdapter extends java.awt.event.WindowAdapter {
     }
 }
 
+// show the hand cursor on hover
 class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter {
     GeneSetDetailsFrame adaptee;
 
