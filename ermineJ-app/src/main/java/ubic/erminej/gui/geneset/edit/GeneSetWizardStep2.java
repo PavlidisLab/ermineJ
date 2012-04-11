@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.gui.geneset.wiz;
+package ubic.erminej.gui.geneset.edit;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -57,12 +57,19 @@ import ubic.erminej.gui.util.WizardStep;
 public class GeneSetWizardStep2 extends WizardStep {
 
     private static final long serialVersionUID = 1L;
+
     private GeneAnnotations geneData = null;
+
     private JTable probeTable = null;
+
     private JTable newClassTable = null;
+
     private ProbeTableModel ncTableModel = null;
+
     private JTextField searchTextField = null;
-    ProbeTableModel sourceProbeModel;
+
+    private ProbeTableModel sourceProbeModel;
+
     private final static int COL0WIDTH = 80;
     private final static int COL1WIDTH = 80;
     private final static int COL2WIDTH = 200;
@@ -71,7 +78,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         assert jLabel2 != null;
         jLabel2.setText( original.toString() );
         this.ncTableModel.setProbes( original.getProbes() );
-        this.ncTableModel.fireTableDataChanged();
+        this.sourceProbeModel.removeProbes( original.getProbes() );
     }
 
     /**
@@ -90,7 +97,6 @@ public class GeneSetWizardStep2 extends WizardStep {
             assert jLabel2 != null;
             jLabel2.setText( wiz.getOriginalGeneSet().toString() );
             this.ncTableModel.setProbes( wiz.getOriginalGeneSet().getProbes() );
-            this.ncTableModel.fireTableDataChanged();
         }
 
     }
@@ -190,9 +196,9 @@ public class GeneSetWizardStep2 extends WizardStep {
             log.debug( "Removing " + probe );
             Probe p = geneData.findProbe( probe );
             assert p != null;
-            ncTableModel.getProbes().remove( p );
+            ncTableModel.removeProbe( p );
+            sourceProbeModel.addProbe( p );
         }
-        ncTableModel.fireTableDataChanged();
 
         updateCountLabel();
     }
@@ -204,7 +210,7 @@ public class GeneSetWizardStep2 extends WizardStep {
             String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
             log.debug( "Got probe: " + probe );
             Probe p = geneData.findProbe( probe );
-            this.addGene( p.getGene() );
+            this.addGeneToSet( p.getGene() );
         }
     }
 
@@ -217,7 +223,7 @@ public class GeneSetWizardStep2 extends WizardStep {
             return;
         }
         Gene g = p.getGene();
-        this.addGene( g );
+        this.addGeneToSet( g );
 
     }
 
@@ -230,13 +236,13 @@ public class GeneSetWizardStep2 extends WizardStep {
             return;
         }
 
-        this.addGene( g );
+        this.addGeneToSet( g );
     }
 
     /**
      * @param gene
      */
-    void addGene( Gene gene ) {
+    void addGeneToSet( Gene gene ) {
         Collection<Probe> probelist = gene.getProbes();
 
         if ( probelist.size() == 0 ) {
@@ -247,11 +253,16 @@ public class GeneSetWizardStep2 extends WizardStep {
         log.debug( "Got " + probelist.size() + " new probes to add" );
         ncTableModel.addProbes( probelist );
         ncTableModel.fireTableDataChanged();
+
+        sourceProbeModel.removeProbes( probelist );
+        sourceProbeModel.fireTableDataChanged();
+
         updateCountLabel();
     }
 
     public void updateCountLabel() {
-        showStatus( "Number of Probes selected: " + ncTableModel.getProbes().size() );
+        showStatus( "Number of Probes selected: " + ncTableModel.getProbeCount() + " [ " + ncTableModel.getGeneCount()
+                + " genes]" );
     }
 
     /**

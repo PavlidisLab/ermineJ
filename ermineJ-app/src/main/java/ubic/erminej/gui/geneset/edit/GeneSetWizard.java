@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.gui.geneset.wiz;
+package ubic.erminej.gui.geneset.edit;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
