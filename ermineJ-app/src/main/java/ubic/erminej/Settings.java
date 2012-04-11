@@ -324,7 +324,6 @@ public class Settings extends SettingsHolder {
         return SettingsHolder.MultiProbeHandling.valueOf( storedValue );
     }
 
-
     /**
      * @return the method to be used to combine scores. This is only relevant for the gene set resampling method.
      */
@@ -563,6 +562,9 @@ public class Settings extends SettingsHolder {
         this.config.setProperty( USE_MOL_FUNC, useMolecularFunction );
     }
 
+    /**
+     * @param b
+     */
     public void setUseMultifunctionalityCorrection( boolean b ) {
         this.config.setProperty( USE_MULTIFUNCTIONALITY_CORRECTION, b );
     }

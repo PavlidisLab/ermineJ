@@ -147,7 +147,7 @@ public class SettingsHolder {
         defaults.put( ANNOT_FORMAT, Format.DEFAULT.toString() );
         defaults.put( BIG_IS_BETTER, false );
         defaults.put( USE_USER_DEFINED_GROUPS, true );
-        defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, false );
+        defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, true );
         defaults.put( SAVE_ALL_GENES_IN_OUTPUT, false );
         defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.BENJAMINIHOCHBERG );
         defaults.put( USE_MOL_FUNC, true );
@@ -478,7 +478,11 @@ public class SettingsHolder {
      * @return true if multifunctionality corrections should be applied, if possible.
      */
     public boolean useMultifunctionalityCorrection() {
-        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, false );
+        /*
+         * Note that the intention is that this always be true. The reason to turn it off would be for testing or
+         * performance reasons.
+         */
+        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, true );
     }
 
     protected PropertiesConfiguration getConfig() {

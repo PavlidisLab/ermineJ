@@ -204,7 +204,8 @@ public class classScoreCMD {
                 .withArgName( "value" )
                 .withLongOpt( "reps" )
                 .withDescription(
-                        "What to do when genes have multiple scores in input file (due to multiple probes per gene): 1 = best of replicates; 2 = mean of replicates; " )
+                        "What to do when genes have multiple scores"
+                                + " in input file (due to multiple probes per gene): 1 = best of replicates; 2 = mean of replicates; " )
                 .create( 'g' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" )
@@ -234,12 +235,16 @@ public class classScoreCMD {
                 .hasArg()
                 .withDescription(
                         "Method for computing gene set significance:  " + SettingsHolder.Method.ORA + " (ORA),  "
-                                + SettingsHolder.Method.GSR + " (resampling of gene scores),  "
+                                + SettingsHolder.Method.GSR
+                                + " (resampling of gene scores; use with -m to choose algorithm),  "
                                 + SettingsHolder.Method.CORR + " (profile correlation),  " + SettingsHolder.Method.ROC
                                 + " (ROC)" ).withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
 
-        options.addOption( OptionBuilder.withDescription(
-                "Enable multifunctionality correction for ORA (default: off; ignored unless using ORA)" ).create( "mf" ) );
+        /*
+         * The intention is that this would be on
+         */
+        options.addOption( OptionBuilder.withDescription( "Disable multifunctionality correction (default: on)" )
+                .create( "nomf" ) );
 
         options.addOption( OptionBuilder.hasArg()
                 .withDescription( "Output file name; if omitted, results are written to standard out" )
@@ -268,15 +273,15 @@ public class classScoreCMD {
                 .hasArg()
                 .withDescription(
                         "Sets the minimum class size; default = "
-                                + settings.getDefaultSettingsValue( SettingsHolder.MIN_CLASS_SIZE ) ).withArgName( "integer" )
-                .withLongOpt( "minClassSize" ).create( 'y' ) );
+                                + settings.getDefaultSettingsValue( SettingsHolder.MIN_CLASS_SIZE ) )
+                .withArgName( "integer" ).withLongOpt( "minClassSize" ).create( 'y' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
                 .withDescription(
                         "Sets the maximum class size; default = "
-                                + settings.getDefaultSettingsValue( SettingsHolder.MAX_CLASS_SIZE ) ).withArgName( "integer" )
-                .withLongOpt( "maxClassSize" ).create( 'x' ) );
+                                + settings.getDefaultSettingsValue( SettingsHolder.MAX_CLASS_SIZE ) )
+                .withArgName( "integer" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" )
                 .withDescription( "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
@@ -584,10 +589,10 @@ public class classScoreCMD {
                 return false;
             }
 
-            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) && commandLine.hasOption( "mf" ) ) {
-                settings.setUseMultifunctionalityCorrection( true );
-            } else {
+            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) && commandLine.hasOption( "nomf" ) ) {
                 settings.setUseMultifunctionalityCorrection( false );
+            } else {
+                settings.setUseMultifunctionalityCorrection( true );
             }
         }
 
