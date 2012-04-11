@@ -71,7 +71,9 @@ public class Colors {
 
     public static Color chooseColorForMultifunctionalityEffect( GeneSetResult value ) {
 
-        int step = value.getMultifunctionalityCorrectedRankDelta();
+        Integer step = value.getMultifunctionalityCorrectedRankDelta();
+
+        if ( step == null ) return null;
 
         if ( step > 100 ) {
             return Color.RED;

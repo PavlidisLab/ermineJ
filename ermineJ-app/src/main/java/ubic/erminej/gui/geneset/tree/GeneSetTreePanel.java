@@ -849,11 +849,10 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
             isSig = pvalCorr < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
 
-            int step = result.getMultifunctionalityCorrectedRankDelta();
             String mfstring = "";
             int size = 4;
 
-            if ( step > 0 ) {
+            if ( result.getMultifunctionalityCorrectedRankDelta() != null ) {
                 String col = Integer.toHexString( Colors.chooseColorForMultifunctionalityEffect( result ).getRGB() )
                         .substring( 2, 8 );
 

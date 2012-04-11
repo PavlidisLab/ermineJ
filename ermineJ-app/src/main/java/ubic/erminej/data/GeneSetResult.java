@@ -38,8 +38,10 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     private double score = 0.0;
     private int numGenes = 0;
     private double correctedPvalue = 1.0;
-    private double multifunctionality = 0.5;
+    private Double multifunctionality = 0.5;
     private int rank = -12345;
+
+    private double mfCorrectedPvalue = 1.0; // FIXME
 
     private SettingsHolder settings;
 
@@ -47,7 +49,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         return settings;
     }
 
-    private int multifunctionalityCorrectedRankDelta = -12345;
+    private Integer multifunctionalityCorrectedRankDelta = null;
 
     private int numProbes = 0;
 
@@ -132,7 +134,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         return this.geneSetTerm;
     }
 
-    public int getMultifunctionalityCorrectedRankDelta() {
+    public Integer getMultifunctionalityCorrectedRankDelta() {
         return multifunctionalityCorrectedRankDelta;
     }
 
@@ -221,7 +223,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     }
 
     /**
-     * @param auc
+     * @param auc The raw area under the ROC curve
      */
     public void setMultifunctionality( double mf ) {
         this.multifunctionality = mf;
@@ -233,7 +235,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * 
      * @param multifunctionalityCorrectedRankDelta
      */
-    public void setMultifunctionalityCorrectedRankDelta( int multifunctionalityCorrectedRankDelta ) {
+    public void setMultifunctionalityCorrectedRankDelta( Integer multifunctionalityCorrectedRankDelta ) {
         this.multifunctionalityCorrectedRankDelta = multifunctionalityCorrectedRankDelta;
     }
 

@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
@@ -47,7 +44,6 @@ import ubic.erminej.data.GeneSetTerms;
  */
 
 public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
-    protected static final Log log = LogFactory.getLog( AbstractGeneSetPvalGenerator.class );
 
     protected static final int ALERT_UPDATE_FREQUENCY = 300;
 

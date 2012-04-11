@@ -19,25 +19,23 @@
 package ubic.erminej.gui.util;
 
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.font.TextAttribute;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.JLabel;
 
 import ubic.basecode.util.BrowserLauncher;
 
 /**
- * A clickable link label that contains a URL. When a mouse pointer is placed over it, it turns into a hand.
+ * Note that this cannot be a mouselistener because of limitations in how Java makes tables -- the cells is not a
+ * component (for performance reasons). Thus clicks on this have to be handled by a container.
  * 
  * @author Will Braynen
  * @version $Id$
  */
-public class JLinkLabel extends DefaultTableCellRenderer implements Comparable<JLinkLabel> {
+public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
 
     private static final long serialVersionUID = -1L;
 
@@ -99,7 +97,6 @@ public class JLinkLabel extends DefaultTableCellRenderer implements Comparable<J
     public void setText( String text, String url ) {
         m_text = text;
         m_url = url.replaceFirst( "\\|.+", "" ); // multigene.
-        // super.setText( "<a href=\"" + m_url + "\">" + text + "</a>" );
         super.setText( text );
     }
 
@@ -120,40 +117,12 @@ public class JLinkLabel extends DefaultTableCellRenderer implements Comparable<J
         this.setBackground( Color.WHITE );
         this.setForeground( Color.BLUE );
         this.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 5 ) );
-        this.setOpaque( true );
+        this.setOpaque( false );
         @SuppressWarnings("rawtypes")
         Map attrs = this.getFont().getAttributes();
         attrs.put( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL );
         this.setFont( this.getFont().deriveFont( attrs ) );
 
-        this.addMouseListener( new MouseListener() {
-
-            @Override
-            public void mouseClicked( MouseEvent e ) {
-                openUrl();
-            }
-
-            @Override
-            public void mouseEntered( MouseEvent e ) {
-                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-
-            }
-
-            @Override
-            public void mouseExited( MouseEvent e ) {
-                setCursor( Cursor.getDefaultCursor() );
-
-            }
-
-            @Override
-            public void mousePressed( MouseEvent e ) {
-            }
-
-            @Override
-            public void mouseReleased( MouseEvent e ) {
-
-            }
-        } );
     }
 
 }

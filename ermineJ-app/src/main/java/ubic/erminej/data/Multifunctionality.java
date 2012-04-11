@@ -31,11 +31,6 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cern.colt.list.DoubleArrayList;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.jet.math.Functions;
-
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.LeastSquaresFit;
@@ -44,6 +39,10 @@ import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
+import cern.colt.list.DoubleArrayList;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.jet.math.Functions;
 
 /**
  * Implementation of multifunctionality computations as described in Gillis and Pavlidis (2011) PLoS ONE 6:2:e17258.
@@ -106,10 +105,13 @@ public class Multifunctionality {
     }
 
     /**
-     * @param geneToScoreMap Already log transformed, if requested.
+     * Given a set of scores for genes, adjust them to correct for multifunctionality, using a regression approach. If
+     * the regression coefficient (slope) is negative, no correction will be done.
+     * 
+     * @param geneToScoreMap Should already be log transformed, if requested.
      * @param useRanks If true, the ranks of the gene scores will be used for regression.
      * @param weight If true, the regression will be weighted by 1/x, where x is the rank of the score
-     * @return
+     * @return residuals from the regression, which are to be used as the new scores.
      */
     public Map<Gene, Double> adjustScores( Map<Gene, Double> geneToScoreMap, boolean useRanks, boolean weight ) {
 
@@ -135,22 +137,22 @@ public class Multifunctionality {
 
         LeastSquaresFit fit;
         DoubleArrayList rawRanks = Rank.rankTransform( MatrixUtil.toList( scores ), invert );
-        DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv );
+        DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv ).assign( Functions.sqrt );
 
         /*
          * DEBUGGING CODE
          */
-        i = 0;
-        for ( Gene g : genesInSomeOrder ) {
-            double w = weights.get( i );
-            double s = scores.get( i );
-            double rr = rawRanks.get( i );
-            Double mf = mfs.get( i );
-            if ( s > 20 ) {
-                System.err.println( String.format( "%s\t%.4f\t%.4f\t%.8f\t%.8f", g.getSymbol(), mf, s, w, rr ) );
-            }
-            i++;
-        }
+        // i = 0;
+        // for ( Gene g : genesInSomeOrder ) {
+        // double w = weights.get( i );
+        // double s = scores.get( i );
+        // double rr = rawRanks.get( i );
+        // Double mf = mfs.get( i );
+        // if ( s > 20 ) {
+        // System.err.println( String.format( "%s\t%.4f\t%.4f\t%.8f\t%.8f", g.getSymbol(), mf, s, w, rr ) );
+        // }
+        // i++;
+        // }
 
         if ( useRanks ) {
             DoubleMatrix1D ranks = MatrixUtil.fromList( rawRanks );
@@ -170,13 +172,16 @@ public class Multifunctionality {
         // log.info( fit.getCoefficients() );
         if ( fit.getCoefficients().get( 1, 0 ) < 0 ) {
             messenger.showStatus( String.format(
-                    "Multifunctionality correction skipped: correlation is negative: %.2f ",
+                    "Multifunctionality correction skipped: coefficient is negative: %.2f ",
                     fit.getCoefficients().get( 1, 0 ) ) );
             return geneToScoreMap;
         }
 
-        DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
-        // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+        /*
+         * The studentized residuals are normalized
+         */
+        // DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
+        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();
 

@@ -327,12 +327,11 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             setForeground( Color.LIGHT_GRAY );
         } else if ( value instanceof GeneSetResult ) {
             GeneSetResult result = ( GeneSetResult ) value;
-            int step = result.getMultifunctionalityCorrectedRankDelta();
 
             String mfstring = "";
             int size = 4;
 
-            if ( step > 0 ) {
+            if ( result.getMultifunctionalityCorrectedRankDelta() != null ) {
                 String col = Integer.toHexString( Colors.chooseColorForMultifunctionalityEffect( result ).getRGB() )
                         .substring( 2, 8 );
 
@@ -402,9 +401,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             }
 
             String mfString = "";
-            // if ( res.getMultifunctionalityCorrectedRank() > 0 ) {
-            mfString = " [MF corrected: " + ( res.getRank() + res.getMultifunctionalityCorrectedRankDelta() ) + "]";
-            // }
+            if ( res.getMultifunctionalityCorrectedRankDelta() != null ) {
+                mfString = " [MF corrected: " + ( res.getRank() + res.getMultifunctionalityCorrectedRankDelta() ) + "]";
+            }
 
             setToolTipText( "<html>Rank: " + res.getRank() + mfString + "<br>Score: " + nff.format( res.getScore() )
                     + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "

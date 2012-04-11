@@ -48,7 +48,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * We only deal with multifunctionality if the hit list is nominally enriched for multifunctional genes in the first
-     * place.
+     * place. This is a p-value
      */
     private static final double MF_BIAS_TO_TRIGGER_CORRECTION = 0.05;
 
@@ -128,7 +128,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         double hitListMultifunctionalityBiasPvalue = this.geneAnnots.getMultifunctionality()
                 .enrichmentForMultifunctionalityPvalue( genesAboveThreshold );
 
-        log.info( String.format( "Hit list (%d genes) enrichment for multifunctionality: P = %.3g",
+        this.messenger.showStatus( String.format( "Hit list (%d genes) enrichment for multifunctionality: P = %.3g",
                 genesAboveThreshold.size(), hitListMultifunctionalityBiasPvalue ) );
 
         boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection()
@@ -137,6 +137,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         Map<GeneSetTerm, GeneSetResult> referenceResults = computeResultsForHitList( genesAboveThreshold, false );
 
         if ( referenceResults.isEmpty() || !useMultifunctionalityCorrection ) {
+            this.messenger
+                    .showStatus( "'Hits' are not significantly multifunctionality-biased, no multifunctionality correction needed" );
             return referenceResults;
         }
 
@@ -146,7 +148,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         Map<GeneSetTerm, Double> monitoredRanks = getMFMonitoredSets( referenceResults, sortedClasses );
 
         if ( monitoredRanks.isEmpty() ) {
-            log.info( "Insufficient enrichment found, skipping multifunctionality correction" );
+            this.messenger.showStatus( "Insufficient enrichment found, skipping multifunctionality correction" );
             return referenceResults;
         }
 
@@ -210,12 +212,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         List<GeneSetTerm> correctedRanking = new ArrayList<GeneSetTerm>();
 
         if ( hitListMultifunctionalityBiasPvalue > MF_BIAS_TO_TRIGGER_CORRECTION ) {
-            log.info( "No multifunctionality correction needed" );
+            // this is a redundant check
+            this.messenger
+                    .showStatus( "'Hits' are not significantly multifunctionality-biased, no multifunctionality correction needed" );
             numMultifunctionalRemoved = 0;
             return;
         }
 
-        log.info( String.format(
+        this.messenger.showStatus( String.format(
                 "Before correction enrichment of hit list (%d genes) for multifunctionality is P=%.3g",
                 filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
 
@@ -226,10 +230,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
              */
             numMultifunctionalRemoved++;
             Gene mostMultifunctional = geneAnnots.getMultifunctionality().getMostMultifunctional( filteredGenes );
-            log.info( "MF correct: Testing removal of " + mostMultifunctional.getSymbol() + " (most multifunc of hits)" );
+            this.messenger.showStatus( "MF correct: Testing removal of " + mostMultifunctional.getSymbol()
+                    + " (most multifunc of hits)" );
             filteredGenes.remove( mostMultifunctional );
             if ( filteredGenes.isEmpty() ) {
-                log.warn( "No genes left after remove MF genes" );
+                this.messenger.showWarning( "No genes left after remove MF genes" );
                 break;
             }
 
@@ -270,7 +275,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
              */
             hitListMultifunctionalityBiasPvalue = this.geneAnnots.getMultifunctionality()
                     .enrichmentForMultifunctionalityPvalue( filteredGenes );
-            log.info( String.format( "After removing " + numMultifunctionalRemoved
+            this.messenger.showStatus( String.format( "After removing " + numMultifunctionalRemoved
                     + " genes, enrichment of hit list (%d genes) for multifunctionality is P=%.3g",
                     filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
             if ( hitListMultifunctionalityBiasPvalue >= MF_BIAS_TO_TRIGGER_CORRECTION ) {
@@ -280,7 +285,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         // Done figuring out the threshold.
 
         if ( numMfToRemove > 0 ) {
-            log.info( "Computing multifunctionality effect" );
+            this.messenger.showStatus( "Computing multifunctionality effect" );
             /*
              * Now we do the final correction.
              */
@@ -436,7 +441,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         int numGenesInSet = numGenesInSet( className );
         if ( numGenesInSet == 0 || numGenesInSet < settings.getMinClassSize()
                 || numGenesInSet > settings.getMaxClassSize() ) {
-            if ( log.isDebugEnabled() ) log.debug( "Class " + className + " is outside of selected size range" );
+            // if ( log.isDebugEnabled() ) log.debug( "Class " + className + " is outside of selected size range" );
             return null;
         }
 
@@ -497,10 +502,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 }
             }
 
-            if ( log.isDebugEnabled() )
-                log.debug( className + " ingroupoverthresh=" + successes + " setsize=" + numGenesInSet
-                        + " totalinputsize=" + numGenes + " totaloverthresh=" + numOverThreshold + " oraP="
-                        + String.format( "%.2g", oraPval ) );
+            // if ( log.isDebugEnabled() )
+            // log.debug( className + " ingroupoverthresh=" + successes + " setsize=" + numGenesInSet
+            // + " totalinputsize=" + numGenes + " totaloverthresh=" + numOverThreshold + " oraP="
+            // + String.format( "%.2g", oraPval ) );
         } else {
             oraPval = 1.0;
         }

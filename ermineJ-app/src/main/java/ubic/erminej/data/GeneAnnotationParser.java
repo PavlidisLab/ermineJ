@@ -576,7 +576,15 @@ public class GeneAnnotationParser {
                 }
             }
 
-            // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
+            if ( length >= 6 ) {
+                // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
+                String ncbiID = tokens[5];
+                try {
+                    gene.setNcbiId( Integer.parseInt( ncbiID ) );
+                } catch ( NumberFormatException e ) {
+                    // no big deal
+                }
+            }
 
             if ( messenger != null && ++n % LINES_READ_UPDATE_FREQ == 0 ) {
                 messenger.showStatus( "Read " + n + " probes" );

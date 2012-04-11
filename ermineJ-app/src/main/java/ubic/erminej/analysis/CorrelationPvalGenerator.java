@@ -209,8 +209,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
         if ( results.isEmpty() ) return results;
         populateRanks( results );
 
-        log.debug( "Tests: " + getTests() );
-        log.debug( "Cache hits: " + getCacheHits() );
+        // log.debug( "Tests: " + getTests() );
+        // log.debug( "Cache hits: " + getCacheHits() );
         return results;
     }
 

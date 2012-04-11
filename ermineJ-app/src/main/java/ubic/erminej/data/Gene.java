@@ -34,6 +34,8 @@ public class Gene implements Comparable<Gene> {
 
     private Collection<GeneSetTerm> geneSets = new HashSet<GeneSetTerm>();
 
+    private Integer ncbiId = null;
+
     public Gene( String symbol ) {
         this( symbol, null );
     }
@@ -63,17 +65,6 @@ public class Gene implements Comparable<Gene> {
         return true;
     }
 
-    /**
-     * @param probe
-     */
-    protected void addProbe( Probe probe ) {
-        this.probes.add( probe );
-        probe.addGene( this ); // have to be careful here not to cause stack overflow
-        for ( GeneSetTerm gs : this.geneSets ) {
-            probe.addToGeneSet( gs );
-        }
-    }
-
     @Override
     public int compareTo( Gene o ) {
         return this.symbol.compareTo( o.getSymbol() );
@@ -98,6 +89,10 @@ public class Gene implements Comparable<Gene> {
 
     public String getName() {
         return name;
+    }
+
+    public Integer getNcbiId() {
+        return ncbiId;
     }
 
     public Collection<Probe> getProbes() {
@@ -125,11 +120,6 @@ public class Gene implements Comparable<Gene> {
         return this.geneSets.remove( t );
     }
 
-    @Override
-    public String toString() {
-        return "Gene [" + symbol + ", " + name + "]";
-    }
-
     public void setActiveProbes( Collection<Probe> activeProbes ) {
         this.activeProbes = activeProbes;
     }
@@ -138,7 +128,27 @@ public class Gene implements Comparable<Gene> {
         this.geneSets = geneSets;
     }
 
+    public void setNcbiId( Integer ncbiId ) {
+        this.ncbiId = ncbiId;
+    }
+
     public void setProbes( Collection<Probe> probes ) {
         this.probes = probes;
+    }
+
+    @Override
+    public String toString() {
+        return "Gene [" + symbol + ", " + name + "]";
+    }
+
+    /**
+     * @param probe
+     */
+    protected void addProbe( Probe probe ) {
+        this.probes.add( probe );
+        probe.addGene( this ); // have to be careful here not to cause stack overflow
+        for ( GeneSetTerm gs : this.geneSets ) {
+            probe.addToGeneSet( gs );
+        }
     }
 }

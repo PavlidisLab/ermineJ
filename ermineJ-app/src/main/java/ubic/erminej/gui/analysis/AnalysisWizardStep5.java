@@ -77,7 +77,7 @@ public class AnalysisWizardStep5 extends WizardStep {
 
     private String help;
     private String extraHelp;
-    boolean enableMultifunc = true;
+    boolean enableMultifuncCheckbox = true;
 
     // start with reasonable defaults.
     private AtomicInteger numIterations = new AtomicInteger( 10000 );
@@ -107,9 +107,9 @@ public class AnalysisWizardStep5 extends WizardStep {
 
         /*
          * this is for during development, so we don't expose this functionality prematurely: set to false to turn it
-         * off.
+         * off. It doesn't turn off multifunctionality 'correction', just the ability of the user to set it.
          */
-        enableMultifunc = settings.getConfig().getBoolean( "multifunc.correct.enabled", true );
+        enableMultifuncCheckbox = settings.getConfig().getBoolean( "multifunc.correct.enabled", false );
 
         if ( analysisType.equals( Method.ORA ) ) {
             step5Panel.add( oraPanel );
@@ -638,9 +638,12 @@ public class AnalysisWizardStep5 extends WizardStep {
             }
         } );
 
-        if ( enableMultifunc ) {
+        if ( enableMultifuncCheckbox ) {
             jCheckBoxDoMultiFuncCorr.setEnabled( true );
             jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+        } else {
+            jCheckBoxDoMultiFuncCorr.setEnabled( false );
+            jCheckBoxDoMultiFuncCorr.setVisible( false );
         }
 
         return jCheckBoxDoMultiFuncCorr;
