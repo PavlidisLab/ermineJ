@@ -50,7 +50,7 @@ import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.geneset.details.GeneSetDetails;
 import ubic.erminej.gui.geneset.details.GeneSetDetailsFrame;
-import ubic.erminej.gui.geneset.wiz.GeneSetWizard;
+import ubic.erminej.gui.geneset.edit.GeneSetWizard;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**

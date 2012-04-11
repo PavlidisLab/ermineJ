@@ -122,7 +122,6 @@ public class MultiFuncDiagWindow extends JFrame {
         DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
         int i = 0;
         for ( Gene g : geneToScoreMap.keySet() ) {
-            // using # go terms because it is more intuitive.
             // Double mf = ( double ) geneAnnots.getMultifunctionality().getNumGoTerms( g );
             // Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityScore( g );
             Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityRank( g );
@@ -133,11 +132,11 @@ public class MultiFuncDiagWindow extends JFrame {
             i++;
         }
 
-        // We want the weight to be highest for the best score. So if big is better, we use the increasing sort
-        DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) );
-        weights.assign( Functions.inv ).assign( Functions.sqrt );
+        // DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) );
+        // weights.assign( Functions.inv ).assign( Functions.sqrt ); // FIXME make sure we do this the same way as in
+        // // Multifunctionality.java.
 
-        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores, weights ); // , weights
+        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores ); // , weights
 
         double slope = fit.getCoefficients().get( 1, 0 );
 
@@ -161,10 +160,10 @@ public class MultiFuncDiagWindow extends JFrame {
         ds.addSeries( "Raw", rawSeries );
         ds.addSeries( "Fit", fittedSeries );
 
-        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality",
+        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality"/* rank */,
                 "Gene score", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
-        c.setTitle( String.format( "How biased are the gene scores\n(raw; weighted regression; slope=%.2g)", slope ) );
+        c.setTitle( String.format( "How biased are the gene scores\n(slope=%.2g)", slope ) );
         Plotting.setChartTitleFont( c );
         XYPlot plot = c.getXYPlot();
         plot.setRangeGridlinesVisible( false );

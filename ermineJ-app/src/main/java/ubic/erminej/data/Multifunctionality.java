@@ -138,8 +138,17 @@ public class Multifunctionality {
         LeastSquaresFit fit;
         DoubleArrayList rawRanks = Rank.rankTransform( MatrixUtil.toList( scores ), invert );
 
-        // FIXME experimenting with weightings. 1/X is too much.
-        DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv ).assign( Functions.sqrt );
+        // FIXME experimenting with weightings. 1/rank is too much.
+
+        // 1/Rank
+        // DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv );
+
+        // 1 - Rank/N
+        DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.div( rawRanks.size() ) )
+                .assign( Functions.sign ).assign( Functions.plus( 1.0 ) );
+
+        // 1/sqrt(rank)
+        // DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv ).assign( Functions.sqrt );
 
         /*
          * DEBUGGING CODE
@@ -180,10 +189,10 @@ public class Multifunctionality {
         }
 
         /*
-         * The studentized residuals are normalized
+         * The studentized residuals are normalized; this doesn't make _that_ much of a difference.
          */
-        // DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
-        DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
+        DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
+        // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
         Map<Gene, Double> result = new HashMap<Gene, Double>();
 
