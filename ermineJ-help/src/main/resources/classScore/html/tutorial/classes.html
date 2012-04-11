@@ -13,208 +13,166 @@
 	<h1>Viewing, defining and modifying gene sets</h1>
 
 	<p>
-		A <b>gene set</b>&nbsp;is any grouping of genes defined by criteria
-		other than the data currently being analyzed. Our baseline gene sets
-		are defined using Gene Ontology terms as applied in the publicly
-		available sources listed on the GO web site.
+		A <b>gene set</b>&nbsp;is any grouping of genes defined by criteria other than the data currently being analyzed. Our
+		baseline gene sets are defined using Gene Ontology terms as applied in the publicly available sources listed on the GO
+		web site.
 	</p>
 
-	<p>You can view, import, define, or modify gene sets as you like,
-		using the "gene set" menu on the main panel of the software. This page
-		explains how.</p>
+	<p>You can view, import, define, or modify gene sets as you like, using the "gene set" menu on the main panel of
+		the software. This page explains how.</p>
 
 	<h2>
 		<a name="viewgeneset"></a>Viewing a gene set
 	</h2>
 
-	<p>When the software first starts, the gene sets are defined by the
-		gene annotation file you uploaded. Prior to doing any analysis, or at
-		any other time, you can view the list of genes in a gene set in one of
-		three ways.</p>
+	<p>When the software first starts, the gene sets are defined by the gene annotation file you uploaded. Prior to
+		doing any analysis, or at any other time, you can view the list of genes in a gene set in one of three ways.</p>
 
 	<ol>
 		<li>
-			<div>You can "right click" on the gene set name and select
-				"View/Modify gene set". You will be shown the details for that gene
-				set in a new window. If you are just looking, and don't want to
-				modify the gene set, just hit cancel when you are done.</div>
+			<div>You can "right click" on the gene set name and select "View/Modify gene set". You will be shown the
+				details for that gene set in a new window. If you are just looking, and don't want to modify the gene set, just hit
+				cancel when you are done.</div>
 		</li>
 
 		<li>
-			<div>You can select the "View/Modify gene set" from the
-				analysis menu. In this case you then select which gene set to view.
-			</div>
+			<div>You can select the "View/Modify gene set" from the analysis menu. In this case you then select which gene
+				set to view.</div>
 		</li>
 
-		<li>You can double-click on the gene set name to bring up the <a
-			href="visualize.html">visualization</a> of the gene set
+		<li>You can double-click on the gene set name to bring up the <a href="visualize.html">visualization</a> of the
+			gene set
 		</li>
 	</ol>
 
-	<p>The first two options are appropriate if you want to modify the
-		gene set.</p>
+	<p>The first two options are appropriate if you want to modify the gene set.</p>
 
 	<h2>Creating a new gene set from scratch</h2>
 
-	<p>Select "Define New Gene Set" from the "Gene Sets" menu. This gets
-		you to the new gene set wizard.</p>
+	<p>Select "Define New Gene Set" from the "Gene Sets" menu. This gets you to the new gene set wizard.</p>
 
-	<p>You can import a file describing a gene set, or you can create
-		one manually from the list of genes on the array you are using. You
-		choose which to use by selecting "file" or "manual"&nbsp;in the first
-		step of the new gene set wizard:</p>
+	<p>You can import a file describing a gene set, or you can create one manually from the list of genes on the array
+		you are using. You choose which to use by selecting "file" or "manual"&nbsp;in the first step of the new gene set
+		wizard:</p>
 
 
-	<img border=0 src="newGeneSet_files/newGeneSet0_1.png"
-		usemap="#frame0map">
+	<img border=0 src="newGeneSet_files/newGeneSet0_1.png" usemap="#frame0map">
 	<br>
 	<br>
 
 	<h2>Adding new genes manually</h2>
 
-	<p>Select probes from the left panel and click "add" to move
-		them to the right panel. Note that here we added one probe for the
-		MTCP1 gene, but three probes were moved to the right. This is because
-		there are three probes which assay MTCP1; all of them are added to the
-		gene set automatically. Similarly you can delete probes from the right
-		panel by using the 'delete' button.</p>
+	<p>Select probes from the left panel and click "add" to move them to the right panel. Note that here we added one
+		probe for the MTCP1 gene, but three probes were moved to the right. This is because there are three probes which assay
+		MTCP1; all of them are added to the gene set automatically. Similarly you can delete probes from the right panel by
+		using the 'delete' button.</p>
 
-	<img border=0 src="newGeneSet_files/newGeneSet1_1.png"
-		usemap="#frame1map">
+	<img border=0 src="newGeneSet_files/newGeneSet1_1.png" usemap="#frame1map">
 	<br>
 	<br>
 
 	<h3>Using the 'find' function to help locate genes.</h3>
 
-	<p>To make it easier to build new gene sets, a 'find' function is
-		provided. Here we searched for "cell cycle".</p>
+	<p>To make it easier to build new gene sets, a 'find' function is provided. Here we searched for "cell cycle".</p>
 
-	<img border=0 src="modifyGeneSet_files/modifyGeneSet1_1.png"
-		usemap="#frame0map">
+	<img border=0 src="modifyGeneSet_files/modifyGeneSet1_1.png" usemap="#frame0map">
 	<br>
 	<br>
 
 	<h3>Giving the new gene set a name and description</h3>
 
-	<p>After adding the probes and genes to the gene set and hitting
-		"next", you will be asked to enter a new identifier and description
-		for the gene set you defined. When you hit finish, the information
-		about this gene set is saved to disk and you are returned to the main
-		panel.</p>
+	<p>After adding the probes and genes to the gene set and hitting "next", you will be asked to enter a new
+		identifier and description for the gene set you defined. When you hit finish, the information about this gene set is
+		saved to disk and you are returned to the main panel.</p>
 
 
-	<img border=0 src="newGeneSet_files/newGeneSet2_1.png"
-		usemap="#frame2map">
+	<img border=0 src="newGeneSet_files/newGeneSet2_1.png" usemap="#frame2map">
 	<br>
 	<br>
 
 	<p>
-		After hitting 'finish', the new gene set is shown in color in the
-		output panel. The gene set is also saved to disk for future use. The
-		format and file locations are described <a
-			href="../formats/geneset.html">here</a>.
+		After hitting 'finish', the new gene set is shown in color in the output panel. The gene set is also saved to disk for
+		future use. The format and file locations are described <a href="../formats/geneset.html">here</a>.
 	</p>
 
-	<p>If you can't see the new gene set on the output panel, press
-		"Ctrl-U" to hide all but the user-defined gene sets. Hitting "Ctrl-U"
-		again shows all the gene sets.</p>
+	<p>If you can't see the new gene set on the output panel, press "Ctrl-U" to hide all but the user-defined gene
+		sets. Hitting "Ctrl-U" again shows all the gene sets.</p>
 
 	<h2>Entering a gene set from a file</h2>
 
 	<p>
-		Gene sets can be loaded in from files created by the user. For details
-		on the format, see <a href="../formats/geneset.html">this page</a>.
-		But basically it is just a list of genes, one per row.
+		Gene sets can be loaded in from files created by the user. For details on the format, see <a
+			href="../formats/geneset.html">this page</a>. But basically it is just a list of genes, one per row.
 	</p>
 
 	<p>Select the load from "File" option:</p>
 
-	<img border=0 src="loadGeneSet_files/loadGeneSet0_1.png"
-		usemap="#frame0map">
+	<img border=0 src="loadGeneSet_files/loadGeneSet0_1.png" usemap="#frame0map">
 	<br>
 	<br>
 
-	<p>After loading a gene set, you will be able to check modify it
-		before giving it a name and saving it to disk.</p>
+	<p>After loading a gene set, you will be able to check modify it before giving it a name and saving it to disk.</p>
 
-	<img border=0 src="loadGeneSet_files/loadGeneSet1_1.png"
-		usemap="#frame1map">
+	<img border=0 src="loadGeneSet_files/loadGeneSet1_1.png" usemap="#frame1map">
 	<br>
 	<br>
 
 
 	<h2>Modifying an existing gene set</h2>
 
-	<p>You can modify a pre-existing gene set by adding or removing
-		genes. This is done using the "Modify this gene set" wizard. This can be
-		accessed either by right-clicking on the gene set in the Output Panel
-		or by selecting the "View/Modify Gene Set" item from the "Gene Sets" menu.</p>
+	<p>You can modify a pre-existing gene set by adding or removing genes. This is done using the "Modify this gene
+		set" wizard. This can be accessed either by right-clicking on the gene set in the Output Panel or by selecting the
+		"View/Modify Gene Set" item from the "Gene Sets" menu.</p>
 
-	<p>If you use the "Gene Sets" menu, you will get a list of all the
-		available gene sets. Select one by clicking on it. You can use the
-		find function to help locate a specific set. After this step, the
-		procedure is very similar to the "create new" gene set procedure
-		explained above.</p>
+	<p>If you use the "Gene Sets" menu, you will get a list of all the available gene sets. Select one by clicking on
+		it. You can use the find function to help locate a specific set. After this step, the procedure is very similar to the
+		"create new" gene set procedure explained above.</p>
 
-	<img border=0 src="modifyGeneSet_files/modifyGeneSet0_1.png"
-		usemap="#frame0map">
+	<img border=0 src="modifyGeneSet_files/modifyGeneSet0_1.png" usemap="#frame0map">
 	<br>
 	<br>
 
 
-	<p>The next screen lists the available probes on the left, and the
-		probes in the set on the right. Similar to the 'create new gene set'
-		procedure shown above, you can add or delete probes.</p>
+	<p>The next screen lists the available probes on the left, and the probes in the set on the right. Similar to the
+		'create new gene set' procedure shown above, you can add or delete probes.</p>
 
 
-	<img border=0 src="modifyGeneSet_files/modifyGeneSet2_1.png"
-		usemap="#frame2map">
+	<img border=0 src="modifyGeneSet_files/modifyGeneSet2_1.png" usemap="#frame2map">
 	<br>
 	<br>
 
-	<p>If you change the name of a gene set once it is created, you
-		will create a new gene set with the new name. This will not occur if you change the gene
-		set's description.</p>
+	<p>If you change the name of a gene set once it is created, you will create a new gene set with the new name. This
+		will not occur if you change the gene set's description.</p>
 
-	<img border=0 src="modifyGeneSet_files/modifyGeneSet3_1.png"
-		usemap="#frame3map">
+	<img border=0 src="modifyGeneSet_files/modifyGeneSet3_1.png" usemap="#frame3map">
 	<br>
 	<br>
 
 	<p>
-		<strong>Note!</strong>: If you rename a Gene Ontology gene set, next
-		time you start the software, your redefined gene set will <u>always</u>
-		replace the one defined in the GO XML file. See below.
+		<strong>Note!</strong>: If you rename a Gene Ontology gene set, next time you start the software, your redefined gene
+		set will <u>always</u> replace the one defined in the GO XML file. See below.
 	</p>
 
-	<p>As for new gene sets, the modified gene sets are shown on the
-		main panel in a different color to indicate they were modified by the
-		user. Use "Ctrl-U" to make them show up on their own, or look in the
-		"user-defined" section of the tree panel.</p>
+	<p>As for new gene sets, the modified gene sets are shown on the main panel in a different color to indicate they
+		were modified by the user. Use "Ctrl-U" to make them show up on their own, or look in the "user-defined" section of
+		the tree panel.</p>
 
-	<img border=0
-		src="userDefinedGeneSetsInMainPanel_files/userDefinedGeneSetsInMainPanel0_1.png"
-		usemap="#frame0map">
+	<img border=0 src="userDefinedGeneSetsInMainPanel_files/userDefinedGeneSetsInMainPanel0_1.png" usemap="#frame0map">
 	<br>
 	<br>
 
-	<img border=0
-		src="userDefinedGeneSetsInMainPanel_files/userDefinedGeneSetsInMainPanel1_1.png"
-		usemap="#frame1map">
+	<img border=0 src="userDefinedGeneSetsInMainPanel_files/userDefinedGeneSetsInMainPanel1_1.png" usemap="#frame1map">
 	<br>
 	<br>
 
 	<h2>I don't like my gene set, how do I get rid of it?</h2>
 
-	<p>You can delete user-defined gene sets using the popup menu in
-		the table or tree view. You cannot delete gene sets that were loaded
-		as part of the Gene Ontology. In the case where you have modified a
-		gene set but not changed its identifier, you can "reset" it to its
-		previous state.</p>
+	<p>You can delete user-defined gene sets using the popup menu in the table or tree view. You cannot delete gene
+		sets that were loaded as part of the Gene Ontology. In the case where you have modified a gene set but not changed its
+		identifier, you can "reset" it to its previous state.</p>
 
-	<p>Gene sets can also be deleted maually by finding the place where
-		ermineJ stores gene sets (in your home directory, under
-		ermineJ.data/genesets) and delete the files by hand.</p>
+	<p>Gene sets can also be deleted maually by finding the place where ermineJ stores gene sets (in your home
+		directory, under ermineJ.data/genesets) and delete the files by hand.</p>
 	<script type="text/javascript">
 		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
 				: "http://www.");

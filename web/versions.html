@@ -26,7 +26,7 @@
 		</tr>
 	</table>
 	<h2>Current version</h2>
-	<p>Version 3.0 - (August 2011) Many major and minor new features, numerous bug fixes, and major code rewrites:</p>
+	<p>Version 3.0 - (April 2012) Many major and minor new features, numerous bug fixes, and major code rewrites:</p>
 	<ul>
 		<li>Application package for Mac OSX</li>
 		<li>Overhaul of management of user-defined (non-GO) gene groups. This simplifies the use of schemes such as KEGG.
@@ -36,7 +36,9 @@
 		<li>Introduction of "gene multifunctionality" features, a unique new feature of ErmineJ. See <a
 			href="ermineJ-help/classScore/html/tutorial/multifunc.html">the documentation</a> for details.
 		</li>
-		<li>Introduction of a new gene set scoring method based on precision-recall.</li>
+		<li>Introduction of a new gene set scoring method based on <a
+			href="ermineJ-help/classScore/html/tutorial/precisionrecall.html">precision-recall</a>.
+		</li>
 		<li>Allow the creation of "projects" that store information on the annotations that were used as well as the data
 			and analysis results (in addition to the existing "save/load results"). This means it is now possible to switch the
 			annotation file without restarting ErmineJ.</li>
@@ -53,8 +55,7 @@
 			(containing the same genes) were identified but not handled particularly well. Now redundant groups are exhaustively
 			identified. While these groups are included in the analysis (to avoid confusion and other problems), they are
 			considered as one in multiple testing correction.</li>
-		<li>Table view enhancements: You can hide rows in the table to remove clutter due to redundant or empty gene
-			sets.</li>
+		<li>Table view enhancements: You can hide rows in the table to remove clutter due to empty gene sets.</li>
 		<li>Improvement: A major cleanup of the way ErmineJ handles gene annotations. A number of lurking problems were
 			flushed out. Perhaps the most serious was that it is not clear whether redundant gene sets were being excluded from
 			analyses (as they should). It is now much easier to find out how many gene sets there are, how many have genes, and
@@ -74,7 +75,7 @@
 			genes ( <a href="ermineJ-help/classScore/html/faq.html">FAQ</a>). There are quite a few updates to the manual.
 		</li>
 		<li>(Behind the scenes) Large parts of ErmineJ's code has been rewritten to improve future maintainability and
-			modularity. A wide range of other minor bugs have been fixed. And probably some bugs have been introduced.</li>
+			modularity. A wide range of other minor bugs have been fixed.</li>
 	</ul>
 	<hr />
 	<h2>Older versions</h2>

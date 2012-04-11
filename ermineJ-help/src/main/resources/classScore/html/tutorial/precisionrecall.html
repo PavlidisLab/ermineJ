@@ -15,42 +15,38 @@
 
 	<h2>Method Overview</h2>
 
+	<p>
+		<a href="http://en.wikipedia.org/wiki/Precision_and_recall">Precision-recall</a> curves are a standard way to analyze
+		the quality of a classifier, as are <a href="roc.html">ROC</a> curves. The difference between ROC and Precision-recall
+		(PR) is that PR is mostly concerned with what is happening at the top of the ranking, while ROC looks at the whole
+		ranking. The precision-recall method in ErmineJ is similar in intent to the method popularized in "<a
+			href="http://www.broadinstitute.org/gsea">GSEA</a>", but uses standard precision-recall (GSEA originally used
+		Kolmogorov-Smirnov statistics, but was changed to use a modified K-S statistic that makes it more
+		precision-recall-like).
+	</p>
 
-
-	<p>Unlike the other methods in ermineJ other than the ROC method, the PRC method uses only the ranks of the gene
-		scores. That is, all it cares about is the ordering of items obtained by your gene scores (e.g., t-test or
-		fold-change), but doesn't use the information about the relative values of the scores.</p>
-
-
-
+	<p>Like the ROC method, the PRC method uses only the ranks of the gene scores. That is, all it cares about is the
+		ordering of items obtained by your gene scores (e.g., t-test or fold-change), but doesn't use the information about
+		the relative values of the scores.</p>
 
 	<h2>When to use PRC scoring</h2>
 
 	<p>
-		Like other non-parametric techniques, using ranks costs some statistical power, but also makes fewer assumptions.
-		Specifically, if you think the ordering of items in your data is more accurate than the actual p-values themselves,
-		the ROC might be appropriate. A nice thing about ROC compared to <a href="resampling">gene score resampling</a> is
-		that the p-values are more precise, wherease gene score resampling p-value precision is limited by the number of
-		random samples used.
-	</p>
-
+		PR-scoring is rather like the <a href="ora.html">ORA method</a> in that it is concerned with what is going on at the
+		"top" of your list, but unlike ORA it does not use a threhold. Thus PR-scoring would be appropriate whenever you
+		consider the ORA method appropriate. The PR method requires a resampling step, so it is slower to run than ORA.
 	<h2>Walkthrough</h2>
 
 	<p>
-		If you have read the <A href="ora.html">ORA</A> page (please do), you will recognize the first 5 steps of the wizard.
-		The only different one is the last step, where the only difference is no p-value threshold is needed.
+		The precision-recall method workflow is the same as the <a href="resampling.html">Gene set resampling</a> method. The
+		difference is in how the scores are computed. Whereas for GSR the score is the mean (or other summary statistic) of
+		the gene scores in the set, PR uses the average precision, which is closely related to the area under the
+		precision-recall curve.
 	</p>
 
-	<p>
-		There is another explanation of gene scores <A href="scores.html">here</A>.
-	</p>
+	<h2>Multifunctionality correction</h2>
 
-	<p>&nbsp;</p>
-
-	<p>
-		* <font size="2">Breslin, T, Ede P, Krogh M. Comparing functional annotation analyses with Catmap. BMC
-			Bioinformatics 2004:5:193</font>.
-	</p>
+	<p>TODO</p>
 
 	<script type="text/javascript">
 		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."

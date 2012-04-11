@@ -1,84 +1,68 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-	<head>
-		<title>Saving and loading analyses</title>
-		<link rel="stylesheet" type="text/css" href="../style.css">
-	</head>
-	<body>
-		<img src="../images/logo1small.gif" />
-		<h1>
-			Saving and loading analyses and projects
-		</h1>
-		
-		<p>
-			You can save an analysis you did and load it again later. You can also save the entire state of the
-			program as a project.
-		</p>
-		
-		<h2>Saving or loading analyses</h2>
-		<p>
-			Saving or loading an analysis is done in the main window using the "Analysis" menu. Use "save" when
-			you want to save an analysis file for use in other software or documentation purposes. Use "load" when you
-			want to add an analysis to the current view. Loading an analysis will not work unless
-			you have already loaded the appropriate annotation file. If you want to switch annotation files, use the "Project" commands.
-		</p>
-		<h3>
-			Saving:
-		</h3>
-		<p>
-			<img alt="" src="../images/save_analysis.gif" border="0">
-		</p>
-		<p>
-			You can also optionally check a box to "include all genes" in the
-			output. If you select that, each line in the output file will include
-			a list of genes which are in the gene set.
-		</p>
-		<p>
-			The output format is described
-			<a href="../formats/saved-data.html">here</a>
-		</p>
-		<h3>
-			Loading an analysis
-		</h3>
-		<p>
-			Once you have saved an analysis, you can load it back in using the
-			"Analysis -> load analysis" item:
-		</p>
-		<p>
-			<img alt="" src="../images/loadanalysis.gif" border="0">
-		</p>
-		<p>
-			<strong>Note:</strong> In order to load in an analysis, you must have the same gene annotations loaded as when you did the analysis.
-			This limitation is to avoid problems finding annotation files based on the paths stored in the result file headers. Thus if you want to 
-			send your result file to someone else to examine in ermineJ, you should also include your annotation file (and any custom gene set files).
-		</p>
-		<p>
-			&nbsp;
-		</p>
-		
-		<h2>Projects</h2>
-		
-		<p>In contrast to the save/load analysis commands, projects allow you to completely reset the 
-		software to a different annotation file, gene scores, data matrix, and (if present) analysis results.</p>
-		
-		<h3>Saving a project</h3>
-		
-		<p>Simply use the File ... Save project menu item. You will be prompted to save a file for the project. We recommend
-		you save projects in the default location for the software (ermineJ.data in your home directory). The files
-		are given the extension ".project". The resulting file contains the settings for the session, as well as the 
-		analysis results, if any.</p>
-		
-		<h3>Loading a project</h3>
-		
-		<p>Use the File ... Load project menu item to select a ".project" file. The software will then proceed
-		to go through the same routine as when the sofware is initially started, loading the annotations, and then
-		loading the gene score and data matrix file you used; followed by loading the analysis results stored in the project, if any.</p> 
-		
-		<p><strong>Note</strong> that when you load a project, the settings stored in the project become your current settings. However, if you change a setting in the program
-		(such as the gene set size limit in the analysis), the project file will <em>not</em> be modified. This is to make sure
-		projects are not modified until you select "Save project".</p>
-		
-		<script type="text/javascript">
+<head>
+<title>Saving and loading analyses</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+	<img src="../images/logo1small.gif" />
+	<h1>Saving and loading analyses and projects</h1>
+
+	<p>You can save an analysis you did and load it again later. You can also save the entire state of the program as a
+		project.</p>
+
+	<h2>Saving or loading analyses</h2>
+	<p>Saving or loading an analysis is done in the main window using the "Analysis" menu. Use "save" when you want to
+		save an analysis file for use in other software or documentation purposes. Use "load" when you want to add an analysis
+		to the current view. Loading an analysis will not work unless you have already loaded the appropriate annotation file.
+		If you want to switch annotation files, use the "Project" commands.</p>
+	<h3>Saving:</h3>
+	<p>
+		<img alt="" src="../images/save_analysis.gif" border="0">
+	</p>
+	<p>You can also optionally check a box to "include all genes" in the output. If you select that, each line in the
+		output file will include a list of genes which are in the gene set.</p>
+	<p>
+		The output format is described <a href="../formats/saved-data.html">here</a>
+	</p>
+	<h3>Loading an analysis</h3>
+	<p>Once you have saved an analysis, you can load it back in using the "Analysis -> load analysis" item:</p>
+	<p>
+		<img alt="" src="../images/loadanalysis.gif" border="0">
+	</p>
+	<p>
+		<strong>Note:</strong> In order to load in an analysis, you must have the same gene annotations loaded as when you did
+		the analysis. This limitation is to avoid problems finding annotation files based on the paths stored in the result
+		file headers. Thus if you want to send your result file to someone else to examine in ermineJ, you should also include
+		your annotation file (and any custom gene set files).
+	</p>
+	<p>&nbsp;</p>
+
+	<h2>Projects</h2>
+
+	<p>In contrast to the save/load analysis commands, projects allow you to completely reset the software to a
+		different annotation file, gene scores, data matrix, and (if present) analysis results.</p>
+
+	<h3>Saving a project</h3>
+
+	<p>Simply use the File ... Save project menu item. You will be prompted to save a file for the project. We
+		recommend you save projects in the default location for the software (ermineJ.data in your home directory). The files
+		are given the extension ".project". The resulting file contains the settings for the session, as well as the analysis
+		results, if any.</p>
+
+	<h3>Loading a project</h3>
+
+	<p>Use the File ... Load project menu item to select a ".project" file. The software will then proceed to go
+		through the same routine as when the sofware is initially started, loading the annotations, and then loading the gene
+		score and data matrix file you used; followed by loading the analysis results stored in the project, if any.</p>
+
+	<p>
+		<strong>Note</strong> that when you load a project, the settings stored in the project become your current settings.
+		However, if you change a setting in the program (such as the gene set size limit in the analysis), the project file
+		will <em>not</em> be modified. This is to make sure projects are not modified until you select "Save project".
+	</p>
+
+	<script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
 		: "http://www.");
 document
@@ -86,10 +70,10 @@ document
 				+ gaJsHost
 				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
 </script>
-		<script type="text/javascript">
+	<script type="text/javascript">
 var pageTracker = _gat._getTracker('UA-4826357-1');
 pageTracker._initData();
 pageTracker._trackPageview();
 </script>
-	</body>
+</body>
 </html>

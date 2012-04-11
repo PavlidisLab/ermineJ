@@ -1,48 +1,53 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-	<head>
-		<link href="../style.css" rel="stylesheet" type="text/css" media="all">
-		<title>System requirements</title>
-	</head>
-	<body>
-		<img src="../images/logo1small.gif" />
-		<h1>
-			System requirements for ErmineJ
-		</h1>
-		 
-		 <p>ErmineJ should run on any platform that has Java 6 installed. If you have trouble running ErmineJ, please let us know (erminej@chibi.ubc.ca).</p>
-		 
-		 <p>ErmineJ is configured to use up to 1 gigabyte of RAM (1024 megabytes). If your computer does not have this much RAM installed, ErmineJ may fail to start.
-		 Under typical operating conditions, ErmineJ should not require more than ~600Mb of RAM. Memory use increases somewhat if you run multiple analyses in one session, 
-		 but more dramatically if you use different sets of input genes for different analyses. This is because ErmineJ makes a partial copy of the gene
-		 annotations to match the characteristic of each set of gene scores. This is required to do correct bookkeeping of which genes are in which gene sets, without
-		 destroying the "master" annotation set, but at the cost of memory.</p>
-		 
-		 <p>For example, if you are working with a generic human genome annotation set, and your gene scores only include a subset of the genes in the genome,
-		 a subsetted copy of the annotations will be created. If you perform a second analysis using a gene score file that includes a <em>different</em> set of
-		 genes, another copy will be made in memory.</p>
-		 
-		 <p>Thus you can avoid memory problems by deleting "runs" that you are no longer interested in; and/or by limiting sessions to the analysis of a single
-		 gene score file. Memory problems that are not addressed by these measures should be reported to us (erminej@chibi.ubc.ca)</p>
-		 
-		 <h2>Advanced: adjustment of memory settings</h2>
-		 
-		 <p>You can reduce or increase ErmineJ's maximum memory by editing the startup script. Find the section that says "-Xmx1024m". Change the value 1024 to be
-		 smaller or larger. Values less than 200 will almost certainly be problematic. Settings larger than ~1500 may cause problems on some computers, and in no
-		 case can you set the value to be larger than the installed RAM on the machine!</p>
-		 
-		 <script type="text/javascript">
+<head>
+<link href="../style.css" rel="stylesheet" type="text/css" media="all">
+<title>System requirements</title>
+</head>
+<body>
+	<img src="../images/logo1small.gif" />
+	<h1>System requirements for ErmineJ</h1>
+
+	<p>ErmineJ should run on any platform that has Java 6 installed. If you have trouble running ErmineJ, please let us
+		know (erminej@chibi.ubc.ca).</p>
+
+	<p>ErmineJ is configured to use up to 1 gigabyte of RAM (1024 megabytes). If your computer does not have this much
+		RAM installed, ErmineJ may fail to start. Under typical operating conditions, ErmineJ should not require more than
+		~600Mb of RAM. Memory use increases somewhat if you run multiple analyses in one session, but more dramatically if you
+		use different sets of input genes for different analyses. This is because ErmineJ makes a partial copy of the gene
+		annotations to match the characteristic of each set of gene scores. This is required to do correct bookkeeping of
+		which genes are in which gene sets, without destroying the "master" annotation set, but at the cost of memory.</p>
+
+	<p>
+		For example, if you are working with a generic human genome annotation set, and your gene scores only include a subset
+		of the genes in the genome, a subsetted copy of the annotations will be created. If you perform a second analysis
+		using a gene score file that includes a <em>different</em> set of genes, another copy will be made in memory.
+	</p>
+
+	<p>Thus you can avoid memory problems by deleting "runs" that you are no longer interested in; and/or by limiting
+		sessions to the analysis of a single gene score file. Memory problems that are not addressed by these measures should
+		be reported to us (erminej@chibi.ubc.ca)</p>
+
+	<h2>Advanced: adjustment of memory settings</h2>
+
+	<p>You can reduce or increase ErmineJ's maximum memory by editing the startup script. Find the section that says
+		"-Xmx1024m". Change the value 1024 to be smaller or larger. Values less than 200 will almost certainly be problematic.
+		Settings larger than ~1500 may cause problems on some computers, and in no case can you set the value to be larger
+		than the installed RAM on the machine!</p>
+
+	<script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
 		: "http://www.");
 document
 		.write(unescape("%3Cscript src='"
 				+ gaJsHost
 				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script> <script type="text/javascript">
+</script>
+	<script type="text/javascript">
 var pageTracker = _gat._getTracker('UA-4826357-1');
 pageTracker._initData();
 pageTracker._trackPageview();
 </script>
-	</body>
+</body>
 
 </html>

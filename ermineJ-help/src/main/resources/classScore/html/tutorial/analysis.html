@@ -12,23 +12,22 @@
 	<img src="../images/logo1small.gif" />
 	<h1>Running an analysis and using the output panel</h1>
 
-	<p>To run an analysis, choose "run analysis" from the analysis
-		menu.</p>
+	<p>To run an analysis, choose "run analysis" from the analysis menu.</p>
 
 	<p>The first screen you are presented with is this one:</p>
 
 	<p>
-		<IMG alt="" src="../images/analysis1_1.png" <!--height="284" width="418--> border="0">
+		<IMG alt="" src="../images/analysis1_1.png"
+		<!--height="284" width="418-->
+		border="0">
 	</p>
 
-	<p>Choose the type of analysis you want to do. Directions on the
-		specific types of analysis are available:</p>
+	<p>Choose the type of analysis you want to do. Directions on the specific types of analysis are available:</p>
 
 	<ul>
 		<li>
 			<div>
-				<A href="ora.html">ORA</A>&nbsp; - start here to read general
-				information about conducting an analysis.
+				<A href="ora.html">ORA</A>&nbsp; - start here to read general information about conducting an analysis.
 			</div>
 		<li>
 			<div>
@@ -41,132 +40,106 @@
 		</li>
 	</ul>
 
-	<p>(the rest of this tutorial assumes you have run some analysis
-		using the directions)</p>
+	<p>(the rest of this tutorial assumes you have run some analysis using the directions)</p>
 
 	<p>
-		When you are done with an analysis, the output panel will show the
-		results. Here is the output panel after an analysis. Note that the
-		"Probes" and "Genes" columns show how many probe and genes are on the
-		array design, not necessarily the number represented in your data.
-		Please read this <A href="numitems.html">note</A> for more
-		explanation. To get the number used in the analysis, hover your the
-		mouse pointer over the results column and read the sizes from the tool
-		tip.
+		When you are done with an analysis, the output panel will show the results. Here is the output panel after an
+		analysis. Note that the "Probes" and "Genes" columns show how many probe and genes are on the array design, not
+		necessarily the number represented in your data. Please read this <A href="numitems.html">note</A> for more
+		explanation. To get the number used in the analysis, hover your the mouse pointer over the results column and read the
+		sizes from the tool tip.
 	</p>
 
-	<img border=0 src="afterAnalysis_files/afterAnalysis0_1.png"
-		usemap="#frame0map">
+	<img border=0 src="afterAnalysis_files/afterAnalysis0_1.png" usemap="#frame0map">
 	<br>
 	<br>
 
 	<p>
-		The results of each run are shown in columns after the standard four.
-		Each value is the p value associated with the gene set for that run.
-		Rows that have "good" pvalues are shown in color. (the specific
-		meaning of the colors is subject to change: currently only gene sets
-		that meet a <a href="mtc.html">FDR</a> of 0.1 are in color.)
+		The results of each run are shown in columns after the standard four. Each value is the p value associated with the
+		gene set for that run. Rows that have "good" pvalues are shown in color. (the specific meaning of the colors is
+		subject to change: currently only gene sets that meet a <a href="mtc.html">FDR</a> of 0.1 are in color.)
 	</p>
 
-	<p>If you hold the mouse over a p-value for a gene set, a tool tip
-		will be displayed that shows additional information, including the
-		correct number of probes and genes for the gene set as represented in
-		the data you used.</p>
+	<p>If you hold the mouse over a p-value for a gene set, a tool tip will be displayed that shows additional
+		information, including the correct number of probes and genes for the gene set as represented in the data you used.</p>
 
 	<p>
-		The colors indicate classes that passed a multiple test correction.
-		Read details <A href="mtc.html">here</A>.
+		The colors indicate classes that passed a multiple test correction. Read details <A href="mtc.html">here</A>.
 	</p>
 
 	<a name="treepanel" />
 	<h2>The tree panel</h2>
 
-	<p>Selecting the tree panel lets you view the results of the
-		analysis in another way:</p>
-	<img border=0 src="afterAnalysis_files/afterAnalysis1_1.png"
-		usemap="#frame1map">
+	<p>Selecting the tree panel lets you view the results of the analysis in another way:</p>
+	<img border=0 src="afterAnalysis_files/afterAnalysis1_1.png" usemap="#frame1map">
 	<br>
 	<br>
 
 	<p>
-		As <a href="starting.html#treeview">discussed elsewhere</a>, gene sets
-		that appear in grey italic are empty or redundant with other sets.
+		As <a href="starting.html#treeview">discussed elsewhere</a>, gene sets that appear in grey italic are empty or
+		redundant with other sets.
 	</p>
 
 	<p>
-		The <strong>green color-coding</strong> has the same meaning as for
-		the table panel - it indicates gene sets that have "good" pvalues.
-		(the specific meaning of the colors is subject to change: currently
-		only gene sets that meet a <a href="mtc.html">FDR</a> of 0.1 are in
-		color.)
+		The <strong>green color-coding</strong> has the same meaning as for the table panel - it indicates gene sets that have
+		"good" pvalues. (the specific meaning of the colors is subject to change: currently only gene sets that meet a <a
+			href="mtc.html">FDR</a> of 0.1 are in color.)
 	</p>
 
 	<p>
-		The <strong>icons</strong> also have specific meaning to help you find
-		interesting reuslts more quickly (Note: the icons may change in future
-		versions of the software.):
+		The <strong>icons</strong> also have specific meaning to help you find interesting reuslts more quickly (Note: the
+		icons may change in future versions of the software.):
 	</p>
 
 	<ul>
-		<li><strong>Yellow spots</strong> indicate that the gene set has
-			a "good" pvalue (it would be shown in color).</li>
-		<li><strong>Purple diamonds</strong> indicate that the gene set
-			has a child that has a "good" pvalue.</li>
-		<li><strong>Yellow spots with a purple center</strong> indicate
-			that the gene set has a good pvalue AND it has a child that has a
-			good pvalue.</li>
-		<li>Blue squares indicate a gene set that has no children with
-			good pvalues.</li>
+		<li><strong>Yellow spots</strong> indicate that the gene set has a "good" pvalue (it would be shown in color).</li>
+		<li><strong>Purple diamonds</strong> indicate that the gene set has a child that has a "good" pvalue.</li>
+		<li><strong>Yellow spots with a purple center</strong> indicate that the gene set has a good pvalue AND it has a
+			child that has a good pvalue.</li>
+		<li>Blue squares indicate a gene set that has no children with good pvalues.</li>
 
 	</ul>
 
 	<h3>Selecting the analysis in the tree view</h3>
 
-	<p>After an analysis is run, the results of the new analysis are
-		shown in the tree. To switch to a different analysis, use the
-		"Results" menu and select the run you would like to view. If you have
-		done fewer than two analyses, the "Results" menu will be greyed out.</p>
+	<p>After an analysis is run, the results of the new analysis are shown in the tree. To switch to a different
+		analysis, use the "Results" menu and select the run you would like to view. If you have done fewer than two analyses,
+		the "Results" menu will be greyed out.</p>
 
 	<h2>Deleting a run</h2>
 
 	<p>
-		You can <strong>delete a run by right-clicking on its column
-			heading</strong> and selecting "delete this run". <strong>Note</strong>:
-		A known issue is that the table will resort itself after doing this;
-		just click on a header to resort it the way you want.
+		You can <strong>delete a run by right-clicking on its column heading</strong> and selecting "delete this run". <strong>Note</strong>:
+		A known issue is that the table will resort itself after doing this; just click on a header to resort it the way you
+		want.
 	</p>
 
 	<h2>Renaming a run</h2>
 
 	<p>
-		You can <strong>Rename a run</strong> by right-clicking on its column
-		heading and selecting "rename this run". This can be convenient if you
-		have a lot of runs.
+		You can <strong>Rename a run</strong> by right-clicking on its column heading and selecting "rename this run". This
+		can be convenient if you have a lot of runs.
 	</p>
 
 	<h2>Viewing the details of a gene set</h2>
 
 	<p>
-		You can <strong>double-click on a row</strong> to get the details for
-		a gene set. For example, to view the details for run 2, "response to
-		hypoxia", click on the cell in the "Run 2 Pval" column on the
-		"response to hypoxia" row. The window you get is explained <A
-			href="visualize.html">here</A>.
+		You can <strong>double-click on a row</strong> to get the details for a gene set. For example, to view the details for
+		run 2, "response to hypoxia", click on the cell in the "Run 2 Pval" column on the "response to hypoxia" row. The
+		window you get is explained <A href="visualize.html">here</A>.
 	</p>
 
 	<h2>View information about a gene set on the GO web site</h2>
 
 	<p>
-		By <strong>right-clicking on a row</strong>, you will get a
-		pop-up menu. The first item on this menu should open a web browser
-		showing the <a
-			href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?search_constraint=terms&amp;action=replace_tree">Amigo</a>
-		web page for the gene set selected.
+		By <strong>right-clicking on a row</strong>, you will get a pop-up menu. The first item on this menu should open a web
+		browser showing the <a
+			href="http://www.godatabase.org/cgi-bin/amigo/go.cgi?search_constraint=terms&amp;action=replace_tree">Amigo</a> web
+		page for the gene set selected.
 	</p>
 
 	<p>
-		The other menu item allows you to <A href="classes.html">view or
-			modify the gene set</A>.
+		The other menu item allows you to <A href="classes.html">view or modify the gene set</A>.
 	</p>
 	<script type="text/javascript">
 		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."

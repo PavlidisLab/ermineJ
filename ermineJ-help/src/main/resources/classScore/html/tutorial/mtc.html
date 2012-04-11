@@ -1,75 +1,58 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-	<head>
-		<meta name="generator" content="HTML Tidy, see www.w3.org">
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
 
-		<title>Multiple test correction</title>
-		<link rel="stylesheet" type="text/css" href="../style.css">
-	</head>
+<title>Multiple test correction</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
 
-	<body>
-		<img src="../images/logo1small.gif" />
-		<h2>
-			Multiple Test Correction in ermineJ
-		</h2>
+<body>
+	<img src="../images/logo1small.gif" />
+	<h2>Multiple Test Correction in ermineJ</h2>
 
-		<p>
-			ErmineJ uses Benjamini-Hochberg correction of p values to determine
-			which gene sets are selected with a particular false discovery rate
-			(FDR). Hihg-ranking sets are colored shades of color in the pval
-			column, as shown in the figure below. Gene sets which to not meet the
-			criterion are not colored. Currently gene sets with FDRs higher than
-			0.1 are plain white.
-		</p>
+	<p>ErmineJ uses Benjamini-Hochberg correction of p values to determine which gene sets are selected with a
+		particular false discovery rate (FDR). Hihg-ranking sets are colored shades of color in the pval column, as shown in
+		the figure below. Gene sets which to not meet the criterion are not colored. Currently gene sets with FDRs higher than
+		0.1 are plain white.</p>
 
-		<p>
-			Brighter shades of color indicate lower FDRs. Currently the colors
-			indicate FDRs of 0.001, 0.01, 0.05 and 0.1. If you have trouble
-			figuring out which color is which, just look at the tooltip you get
-			when you point the mouse at a result, or save the results to a file -
-			the corrected p-values are saved in their own column.
-		</p>
+	<p>Brighter shades of color indicate lower FDRs. Currently the colors indicate FDRs of 0.001, 0.01, 0.05 and 0.1.
+		If you have trouble figuring out which color is which, just look at the tooltip you get when you point the mouse at a
+		result, or save the results to a file - the corrected p-values are saved in their own column.</p>
 
-		<p>
-			Note that the color reflects the FDR when the p values for the gene
-			set indicated is used as the threshold. Thus it is possible for the
-			FDR to go up and down as you go down the list. It is not uncommon for
-			the FDR at very stringent thresholds to be above 0.05, while at less
-			stringent thresholds is can be lower. This counterintuitive result is
-			due to the way the FDR is computed. If you want to control the FDR at
-			0.05, you should pick the lowest-ranked gene set that has thath FDR,
-			and all gene sets listed above would be selected.
-		</p>
+	<p>Note that the color reflects the FDR when the p values for the gene set indicated is used as the threshold. Thus
+		it is possible for the FDR to go up and down as you go down the list. It is not uncommon for the FDR at very stringent
+		thresholds to be above 0.05, while at less stringent thresholds is can be lower. This counterintuitive result is due
+		to the way the FDR is computed. If you want to control the FDR at 0.05, you should pick the lowest-ranked gene set
+		that has thath FDR, and all gene sets listed above would be selected.</p>
 
-		<p>
-			If you feel using the FDR is not appropriate, other multiple test
-			correction methods such as Bonferroni can be accessed from the
-			<a href="cli.html">command line interface</a>. You can also work with
-			the results file you save to compute other types of corrected p
-			values from your data.
-		</p>
+	<p>
+		If you feel using the FDR is not appropriate, other multiple test correction methods such as Bonferroni can be
+		accessed from the <a href="cli.html">command line interface</a>. You can also work with the results file you save to
+		compute other types of corrected p values from your data.
+	</p>
 
-		<p>
-			<em>This screen shot is not up-to-date</em>
-		</p>
+	<p>
+		<em>This screen shot is not up-to-date</em>
+	</p>
 
-		<p>
-			<img alt="" src="../images/mtc.gif" border="0">
-		</p>
+	<p>
+		<img alt="" src="../images/mtc.gif" border="0">
+	</p>
 
-		<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
-		: "http://www.");
-document
-		.write(unescape("%3Cscript src='"
-				+ gaJsHost
-				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-		<script type="text/javascript">
-var pageTracker = _gat._getTracker('UA-4826357-1');
-pageTracker._initData();
-pageTracker._trackPageview();
-</script>
-	</body>
+	<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
+				: "http://www.");
+		document
+				.write(unescape("%3Cscript src='"
+						+ gaJsHost
+						+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+		var pageTracker = _gat._getTracker('UA-4826357-1');
+		pageTracker._initData();
+		pageTracker._trackPageview();
+	</script>
+</body>
 </html>

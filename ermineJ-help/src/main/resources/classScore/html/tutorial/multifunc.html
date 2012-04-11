@@ -1,165 +1,107 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-	<head>
-		<title>Gene multifunctionality</title>
-		<link rel="stylesheet" type="text/css" href="../style.css">
-	</head>
+<head>
+<title>Gene multifunctionality</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
 
-	<body>
-		<br>
-		<img src="../images/logo1small.gif" />
-		<p>
-			Gene multifunctionality (or just "multifunctionality" for short)
-			refers to the fact that some genes have more "functions" than others.
-			Recently
-			<a
-				href="http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0017258">our
-				lab showed (Gillis and Pavlidis, 2011)</a> how this has a profound
-			effect on the analysis of functional genomics data. A manuscript
-			describing the effects on enrichment-type analyses is in preparation.
-		</p>
-		<p>
-			ErmineJ has several features designed to make it easier to detect and
-			understand the effect of multifunctionality on your analysis. These
-			are detailed in the help sections relevant to the features. This page
-			provides some background information on how multifunctionality is
-			computed and how to interpret it.
-		</p>
+<body>
+	<br>
+	<img src="../images/logo1small.gif" />
+	<p>
+		Gene multifunctionality (or just "multifunctionality" for short) refers to the fact that some genes have more
+		"functions" than others. Recently <a href="http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0017258">our
+			lab showed (Gillis and Pavlidis, 2011)</a> how this has a profound effect on the analysis of functional genomics data
+		(see also <a href="http://www.ploscompbiol.org/article/info%3Adoi%2F10.1371%2Fjournal.pcbi.1002444">Gillis and
+			Pavlidis 2012</a>). A manuscript describing the effects on enrichment-type analyses is in preparation.
+	</p>
+	<p>ErmineJ has several features designed to make it easier to detect and understand the effect of
+		multifunctionality on your analysis. These are detailed in the help sections relevant to the features. This page
+		provides some background information on how multifunctionality is computed and how to interpret it.</p>
 
-		<h2>
-			Defining function
-		</h2>
-		<p>
-			For the purposes of ErmineJ, a "function" is defined by the
-			annotations a gene has. For standard uses of ErmineJ, this means gene
-			ontology terms. Whether those annotations are a "true" representation
-			of the multifunctionality of a gene is of no consequence for the
-			effects on the analysis. For more discussion of this issue see the
-			article linked above.
-		</p>
+	<h2>Defining function</h2>
 
-		<h2>
-			Computing the multifunctionality of a gene
-		</h2>
-		<p>
-			While the number of GO terms a gene has is a simple measure of
-			multifunctionality, ErmineJ uses the definition given in Gillis and
-			Pavlidis (2011). This definition takes into account the size of GO
-			groups. Thus a gene that is a member of many small GO groups is more
-			multifunctional than a gene that is a member of the same number of
-			large GO groups. This definition arises from a mathematical proof of
-			the "optimal" ranking of genes, but it makes sense that large,
-			"general" functions be counted less. In practice this doesn't make
-			that much of a difference and you will notice the computed
-			multifunctionality is correlated with the number of GO terms. If it
-			makes it easier to understand, just think of multifunctionality as
-			the number of GO terms.
-		</p>
+	<p>For the purposes of ErmineJ, a "function" is defined by the annotations a gene has. For standard uses of
+		ErmineJ, this means gene ontology terms. Whether those annotations are a "true" representation of the
+		multifunctionality of a gene is of no consequence for the effects on the analysis. For more discussion of this issue
+		see the articles linked above.</p>
 
-		<h2>
-			Computing the multifunctionality of a gene group
-		</h2>
-		<p>
-			Some gene groups (e.g. GO terms) tend to contain genes which are also
-			members of many other GO groups. Such "correlated" GO terms are
-			particularly problematic. ErmineJ computes the multifunctionality of
-			a gene group as described in Gillis and Pavlidis (2011). The score is
-			the area under the reciever operating characteristic curve obtained
-			by comparing the genes in the group to the ranking provided by the
-			multifunctionality definition given above. Thus, a value of 0.5
-			indicates that the genes in the group are not biased towards
-			multifunctionality; 1.0 is the maximum bias; and 0.0 (not observed in
-			practice) would mean the genes in the group are highly
-			"unifunctional".
-		</p>
+	<h2>Computing the multifunctionality of a gene</h2>
 
-		<h2>
-			Interpreting mulitfunctionality
-		</h2>
+	<p>While the number of GO terms a gene has is a simple measure of multifunctionality, ErmineJ uses the definition
+		given in Gillis and Pavlidis (2011). This definition takes into account the size of GO groups. Thus a gene that is a
+		member of many small GO groups is more multifunctional than a gene that is a member of the same number of large GO
+		groups. This definition arises from a mathematical proof of the "optimal" ranking of genes (under one reasonable
+		definition of "optimal"), but it makes sense that large, "general" functions be counted less. In practice this doesn't
+		make that much of a difference and you will notice the computed multifunctionality is correlated with the number of GO
+		terms. If it makes it easier to understand, just think of multifunctionality as the number of GO terms.</p>
 
-		<p>
-			There are two ways that ErmineJ uses multifunctionality to highlight
-			its importance. These ways are demonstrated precisely on the relevant
-			help pages. Here we address some of the theoretical considerations.
-		</p>
+	<h2>Computing the multifunctionality of a gene group</h2>
 
-		<p>
-			<strong>Multifunctionality bias in gene scores</strong> - When you
-			provide ErmineJ with a ranked list of genes, presumably that list
-			came from some experimental result. Given
-			<em>any</em> experiment, a priori, we expect multifunctional genes to
-			"show up". This should be intuititive: a gene that is involved in
-			many functions will be found to be "relevant" in many types of
-			experiments.
-		</p>
-		<p>
-			The GO terms associated with a gene can be thought of as a rough
-			proxy measure for the true multifunctionality of a gene (since the
-			true multifunctionality is not readily observable). Using the measure
-			of multifunctionality based on GO, ErmineJ will tell you if your
-			input list is "enriched" for multifunctional genes. In our
-			experience, it is not all that common for an input list to be
-			strongly correlated with the multifunctionality ranking, but even
-			very weak correlations can have strong effects.
-		</p>
-		<p>
-			Even if your list is not enriched for multifunctional genes,
-			the presence of a small number of multifunctional genes high in your
-			input rankings can have profound effects on your GO enrichment
-			results. The "multifunctionality correction" for the
-			<a href="ora.html">ORA</a> analysis should be used to reduce the impact of
-			multifunctional genes on your results.
-		</p> 
-		
-		<h2>
-			FAQs about multifunctionality
-		</h2>
+	<p>Some gene groups (e.g. GO terms) tend to contain genes which are also members of many other GO groups. Such
+		"correlated" GO terms are particularly problematic. ErmineJ computes the multifunctionality of a gene group as
+		described in Gillis and Pavlidis (2011). The score is the area under the reciever operating characteristic curve
+		obtained by comparing the genes in the group to the ranking provided by the multifunctionality definition given above.
+		Thus, a value of 0.5 indicates that the genes in the group are not biased towards multifunctionality; 1.0 is the
+		maximum bias; and 0.0 (not observed in practice) would mean the genes in the group are highly "unifunctional". In
+		ErmineJ we report the p-value associated with the AU-ROC for a group because for small groups, larger AU-ROCs are more
+		likely to occur by chance.</p>
 
-		<ul>
-			<li>
-				<strong>Is multifunctionality really a problem?</strong> It depends
-				on your point of view. We think that having the results of a
-				functional genomics study skewed by a small number of genes is a bad
-				thing. We are not claiming that multifunctionality is incorrect or
-				"bad". Genes with many functions really are biologically important,
-				but in computational analyses they "distract" the algorithms from
-				other genes of potential interest.
-			</li>
-			<li>
-				<strong>Isn't this just a problem with GO?</strong> Not really. We
-				have observed the same phenomenon with KEGG and other gene
-				groupings, and it's not specific to the "biological process" part of
-				GO either, for example. The problem is that not every gene has the
-				same number of functions. This is presumably at least partly a
-				biological fact, but it is true that if every gene did have the same
-				number of GO terms, the problem would go away.
-			</li>
-			<li>
-				<strong>Can't I just filter out the multifunctional genes?</strong>
-				We don't recommend this as a preprocessing step; instead you should
-				let ErmineJ help you. There is no clear separation between
-				"multifunctional" and "non-multifunctional" genes. Second, highly
-				multifunctional genes are important, so removing them entirely could
-				be counterproductive. ErmineJ has methods to measure the impact of
-				multifunctionality, and to reduct it by filtering out the most
-				multifunctional genes from analyses in carefully designed ways.
-			</li>
-		</ul>
+	<h2>Interpreting mulitfunctionality</h2>
+
+	<p>There are two ways that ErmineJ uses multifunctionality to highlight its importance. These ways are demonstrated
+		in more detail on the relevant help pages. Here we address some of the theoretical considerations.</p>
+
+	<p>
+		<strong>Multifunctionality bias in gene scores</strong> - When you provide ErmineJ with a ranked list of genes,
+		presumably that list came from some experimental result. Given <em>any</em> experiment, a priori, we expect
+		multifunctional genes to "show up". This should be intuititive: a gene that is involved in many functions will be
+		found to be "relevant" in many types of experiments.
+	</p>
+	<p>The GO terms associated with a gene can be thought of as a rough proxy measure for the true multifunctionality
+		of a gene (since the true multifunctionality is not readily observable, and the apparent multifunctionality is what is
+		actually exposed to enrichment methods). Using the measure of multifunctionality based on GO, ErmineJ will tell you if
+		your input list is "enriched" for multifunctional genes. In our experience, it is not all that common for an input
+		list to be strongly correlated with the multifunctionality ranking, but even very weak correlations can have strong
+		effects. ErmineJ helps you determine if this is likely to be a problem in your data set, and shows you the impact it
+		has on the results.</p>
+
+	<h2>FAQs about multifunctionality</h2>
+
+	<ul>
+
+		<li><strong>Is multifunctionality really a problem?</strong> It depends on your point of view. We think that
+			having the results of a functional genomics study skewed by a small number of genes is a bad thing. We are not
+			claiming that multifunctionality is incorrect or "bad". Genes with many functions really are biologically important,
+			but in computational analyses they "distract" the algorithms from other genes of potential interest.</li>
+
+		<li><strong>Isn't this just a problem with GO?</strong> No. We have observed the same phenomenon with KEGG and
+			other gene grouping schemes, and it's not specific to the "biological process" part of GO either, for example, nor
+			with particular evidence codes in GO. The problem is that not every gene has the same number of functions. This is
+			presumably at least partly a biological fact, but it is true that if every gene did have the same number of
+			functions, the problem would go away.</li>
+
+		<li><strong>Can't I just filter out the multifunctional genes?</strong> We don't recommend this as a
+			preprocessing step; instead you should let ErmineJ help you. There is no clear separation between "multifunctional"
+			and "non-multifunctional" genes. Second, highly multifunctional genes <em>are</em> important, so removing them
+			entirely could be counterproductive. ErmineJ has methods to measure the impact of multifunctionality, and to reduct
+			it by filtering out the most multifunctional genes from analyses in carefully designed ways.</li>
+	</ul>
 
 
-		<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
-		: "http://www.");
-document
-		.write(unescape("%3Cscript src='"
-				+ gaJsHost
-				+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-		<script type="text/javascript">
-var pageTracker = _gat._getTracker('UA-4826357-1');
-pageTracker._initData();
-pageTracker._trackPageview();
-</script>
-	</body>
+	<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl."
+				: "http://www.");
+		document
+				.write(unescape("%3Cscript src='"
+						+ gaJsHost
+						+ "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+		var pageTracker = _gat._getTracker('UA-4826357-1');
+		pageTracker._initData();
+		pageTracker._trackPageview();
+	</script>
+</body>
 </html>

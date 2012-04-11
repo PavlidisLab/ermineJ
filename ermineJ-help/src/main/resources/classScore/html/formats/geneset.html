@@ -1,88 +1,64 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
-	<head>
-		<meta name="generator" content="HTML Tidy, see www.w3.org">
+<head>
+<meta name="generator" content="HTML Tidy, see www.w3.org">
 
-		<title>Gene sets</title>
-		<link href="../style.css" rel="stylesheet" type="text/css" media="all">
-	</head>
+<title>Gene sets</title>
+<link href="../style.css" rel="stylesheet" type="text/css" media="all">
+</head>
 
-	<body>
-		<img height="112" alt="ermineJ logo" src="../images/logo1small.gif"
-			width="266" border="0">
-		<h1>
-			Gene set files
-		</h1>
+<body>
+	<img height="112" alt="ermineJ logo" src="../images/logo1small.gif" width="266" border="0">
+	<h1>Gene set files</h1>
 
-		<p>
-			User-defined gene sets can be created from within ermineJ, or
-			imported using several different formats. This way you can define
-			gene sets yourself or use other schemes such as KEGG by providing an
-			appropriate file for erminJ.
-		</p>
+	<p>User-defined gene sets can be created from within ermineJ, or imported using several different formats. This way
+		you can define gene sets yourself or use other schemes such as KEGG by providing an appropriate file for erminJ.</p>
 
-		<p>
-
-			Knowledge of the formats gives you the ability to define gene sets
-			outside of ermineJ. When ermineJ starts up, it looks for these files
-			in a predefined location (see below) and loads them.
-		</p>
+	<p>Knowledge of the formats gives you the ability to define gene sets outside of ermineJ. When ermineJ starts up,
+		it looks for these files in a predefined location (see below) and loads them.</p>
 
 
-		<p>
-			Gene set files created by ermineJ are saved in the directory
-			<code>
-				ermineJ.data/genesets
-			</code>
-			. (e.g.,
-			<code>
-				C:/Documents and Settings/[your user name]/ermineJ.data/genesets
-			</code>
-			). You should place your own "handmade" gene set files in this
-			location so they are automatically visible to the software.
-		</p>
+	<p>
+		Gene set files created by ermineJ are saved in the directory
+		<code> ermineJ.data/genesets </code>
+		. (e.g.,
+		<code> C:/Documents and Settings/[your user name]/ermineJ.data/genesets </code>
+		). You should place your own "handmade" gene set files in this location so they are automatically visible to the
+		software.
+	</p>
 
-		<p>
-			<strong>Note!</strong> If you create a gene set when using one
-			platform, and then switch to another next time you run ermineJ,
-			ermineJ will try to load your old gene sets. If any probes on the
-			previous design match the identifiers on the current one, the gene
-			set will be loaded to the extent it can. We may change this in a
-			future version of ermineJ, to provide more species and platform
-			information in each file.
-			<a href="mailto:erminej@chibi.ubc.ca">Let us know</a> if this is
-			important to you.
-		</p>
-		
-		<p><strong>Note:</strong>Gene sets that have only one gene will not be loaded. In addition,
-		by default the user interface hides sets that are empty, even though the software knows about them (such as GO terms).
-		You can reveal these with the context (pop-up) menu in the table or tree view.</p>
+	<p>
+		<strong>Note!</strong> If you create a gene set when using one platform, and then switch to another next time you run
+		ermineJ, ermineJ will try to load your old gene sets. If any probes on the previous design match the identifiers on
+		the current one, the gene set will be loaded to the extent it can. We may change this in a future version of ermineJ,
+		to provide more species and platform information in each file. <a href="mailto:erminej@chibi.ubc.ca">Let us know</a>
+		if this is important to you.
+	</p>
 
-		<h1>
-			Formats
-		</h1>
+	<p>
+		<strong>Note:</strong>Gene sets that have only one gene will not be loaded. In addition, by default the user interface
+		hides sets that are empty, even though the software knows about them (such as GO terms). You can reveal these with the
+		context (pop-up) menu in the table or tree view.
+	</p>
 
-		<p>
-			You can either use the
-			<A href="#option1">ermineJ-native format</A>, a
-			<a href="#option2">second format</a> with one gene set defined per
-			tab-delimited line, or
-			<a href="#option3">import a simple list of genes</a>.
-		</p>
-		<h2>
-			<a name="option1"></a>Option 1: ErmineJ-native format
-		</h2>
+	<h1>Formats</h1>
+
+	<p>
+		You can either use the <A href="#option1">ermineJ-native format</A>, a <a href="#option2">second format</a> with one
+		gene set defined per tab-delimited line, or <a href="#option3">import a simple list of genes</a>.
+	</p>
+	<h2>
+		<a name="option1"></a>Option 1: ErmineJ-native format
+	</h2>
 
 
-		<p>
-			This format allows you to store one or more gene set in a single file
-			with a very simple format, identified either by probe (handy for
-			mapping to expression arrays) or gene symbols that match the ones in
-			your
-			<a href="annotations.html">annotation file</a>. Here is a sample:
-		</p>
-		<pre>
+	<p>
+		This format allows you to store one or more gene set in a single file with a very simple format, identified either by
+		probe (handy for mapping to expression arrays) or gene symbols that match the ones in your <a href="annotations.html">annotation
+			file</a>. Here is a sample:
+	</p>
+	<pre>
 # this is a comment
 probe
 MyGeneSet
@@ -112,161 +88,96 @@ More genes I like
 346_s_at
 </pre>
 
-		<p>
-			(or
-			<A href="../samples/geneset.txt">download the sample</A> as a file)
-		</p>
+	<p>
+		(or <A href="../samples/geneset.txt">download the sample</A> as a file)
+	</p>
 
 
 
 
-		<p>
-			The full description of the format is follows.
-		</p>
+	<p>The full description of the format is follows.</p>
 
-		<ul>
-			<li>
-				The file is plain text (ASCII)
-			</li>
-			<li>
-				There can be more than one gene set defined, demarcated by "===" on
-				a line by itself.
-			</li>
-			<li>
-				Lines beginning with "#" are ignored.
-			</li>
-			<li>
-				Blank lines are ignored.
-			</li>
-		</ul>
+	<ul>
+		<li>The file is plain text (ASCII)</li>
+		<li>There can be more than one gene set defined, demarcated by "===" on a line by itself.</li>
+		<li>Lines beginning with "#" are ignored.</li>
+		<li>Blank lines are ignored.</li>
+	</ul>
 
-		<p>
-			Within each gene set definition, you must declare at least four
-			non-blank, non-comment lines:
-		</p>
-		<ul>
-			<li>
-				The first line describes the type of identifier in the file and is
-				either "probe" or "gene". The former must match the identifiers in
-				the first column of your
-				<a href="annotations.html">annotation file</a>. The second should
-				match the symbols in the second column in your annotation file.
-			</li>
-			<li>
-				The second line is the unique ID or name of the gene set. This name
-				must be distinct from other groups used in the session (including GO
-				terms).
-			</li>
-			<li>
-				The third line is a longer description of the gene set. There is no
-				limit to the length of this description but in practice it should be
-				just a few words.
-			</li>
-			<li>
-				The fourth and subsequent lines are the identifiers (probe ids or
-				official gene names).
-			</li>
-		</ul>
+	<p>Within each gene set definition, you must declare at least four non-blank, non-comment lines:</p>
+	<ul>
+		<li>The first line describes the type of identifier in the file and is either "probe" or "gene". The former must
+			match the identifiers in the first column of your <a href="annotations.html">annotation file</a>. The second should
+			match the symbols in the second column in your annotation file.
+		</li>
+		<li>The second line is the unique ID or name of the gene set. This name must be distinct from other groups used
+			in the session (including GO terms).</li>
+		<li>The third line is a longer description of the gene set. There is no limit to the length of this description
+			but in practice it should be just a few words.</li>
+		<li>The fourth and subsequent lines are the identifiers (probe ids or official gene names).</li>
+	</ul>
 
-		<h2>
-			<a name="option2"></a>Option 2: A tab-delimited file with one set per
-			line (e.g. MolSigDB)
-		</h2>
+	<h2>
+		<a name="option2"></a>Option 2: A tab-delimited file with one set per line (e.g. MolSigDB)
+	</h2>
 
-		<p>
-			This is a slightly simpler alternative to the native format, with the
-			limitation that only gene symbols are supported. Your annotation file
-			will be used to figure out which probes are relevant.
-			<a href="../samples/kegg-example.txt">Here is a sample</a>. Like the
-			files described for Option 1, these files should be placed in your
-			ermineJ.data/genesets directory, where they will automatically be
-			detected and imported by the software.
-		</p>
+	<p>
+		This is a slightly simpler alternative to the native format, with the limitation that only gene symbols are supported.
+		Your annotation file will be used to figure out which probes are relevant. <a href="../samples/kegg-example.txt">Here
+			is a sample</a>. Like the files described for Option 1, these files should be placed in your ermineJ.data/genesets
+		directory, where they will automatically be detected and imported by the software.
+	</p>
 
-		<p>
-			The format is essentially the same as 
-			the <a href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">MolSigDB "gmt" format</a>.
-			In fact you can use a file directly obtained from MolSigDb 
-			(the <a href="http://www.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/3.0/msigdb.v3.0.symbols.gmt">gene symbol</a> version ).
-		</p>
+	<p>
+		The format is essentially the same as the <a
+			href="http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">MolSigDB
+			"gmt" format</a>. In fact you can use a file directly obtained from MolSigDb (the <a
+			href="http://www.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/3.0/msigdb.v3.0.symbols.gmt">gene
+			symbol</a> version ).
+	</p>
 
-		<ul>
-			<li>
-				The file is tab-delimited ASCII text
-			</li>
-			<li>
-				There is one gene set defined per line
-			</li>
-			<li>
-				One one line, the fields are:
-				<ol>
-					<li>
-						A unique gene set identifier
-					</li>
-					<li>
-						A description (can be blank, but cannot be ommitted)
-					</li>
-					<li>
-						The remaining fields are interpreted as gene symbols (keyed to the
-						second column of your
-						<a href="annotations.html">annotation file</a>).
-					</li>
-				</ol>
-			</li>
-		</ul>
+	<ul>
+		<li>The file is tab-delimited ASCII text</li>
+		<li>There is one gene set defined per line</li>
+		<li>One one line, the fields are:
+			<ol>
+				<li>A unique gene set identifier</li>
+				<li>A description (can be blank, but cannot be ommitted)</li>
+				<li>The remaining fields are interpreted as gene symbols (keyed to the second column of your <a
+					href="annotations.html">annotation file</a>).
+				</li>
+			</ol>
+		</li>
+	</ul>
 
 
-		<h2>
-			<a name="option3"></a>Option 3: Import files containing lists of
-			genes using the "Define new gene set" menu item
-		</h2>
+	<h2>
+		<a name="option3"></a>Option 3: Import files containing lists of genes using the "Define new gene set" menu item
+	</h2>
 
-		<p>
-			This method has the benefit of requiring a very simple format, but
-			you must load the files one at a time using ermineJ's graphical
-			interface. (If this is a pain, a simple Perl or Python script can
-			convert the lists into the other format.)
-		</p>
+	<p>This method has the benefit of requiring a very simple format, but you must load the files one at a time using
+		ermineJ's graphical interface. (If this is a pain, a simple Perl or Python script can convert the lists into the other
+		format.)</p>
 
-		<p>
-			The file in this case is just a list of genes, with one on each line.
-			The names must be the gene symbols that are used in your gene
-			annotation file. Other symbols will be ignored. Here's an example
-			with just three genes:
-		</p>
-		<pre>
+	<p>The file in this case is just a list of genes, with one on each line. The names must be the gene symbols that
+		are used in your gene annotation file. Other symbols will be ignored. Here's an example with just three genes:</p>
+	<pre>
 alox12b
 ALOX15
 alox12
 </pre>
 
-		<p>
-			A full description of the file format is:
-		</p>
+	<p>A full description of the file format is:</p>
 
-		<ul>
-			<li>
-				Each file describes just one gene set.
-			</li>
-			<li>
-				The file is plain text (ASCII)
-			</li>
-			<li>
-				Each line contains the official symbol of one gene
-			</li>
-			<li>
-				Capitalization is ignored
-			</li>
-			<li>
-				Blank lines and symbols not found in the current array design are
-				ignored
-			</li>
-		</ul>
+	<ul>
+		<li>Each file describes just one gene set.</li>
+		<li>The file is plain text (ASCII)</li>
+		<li>Each line contains the official symbol of one gene</li>
+		<li>Capitalization is ignored</li>
+		<li>Blank lines and symbols not found in the current array design are ignored</li>
+	</ul>
 
-		<p>
-			On loading in, the list of genes is converted to a list of probes.
-			You will be given the chance to edit the gene list and give it a name
-			before finalizing it
-		</p>
-	</body>
+	<p>On loading in, the list of genes is converted to a list of probes. You will be given the chance to edit the gene
+		list and give it a name before finalizing it</p>
+</body>
 </html>
