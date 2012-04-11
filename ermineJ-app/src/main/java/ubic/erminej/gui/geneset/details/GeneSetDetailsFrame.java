@@ -860,15 +860,7 @@ public class GeneSetDetailsFrame extends JFrame {
                 .addComponent( m_gradientBar ) );
         gl.setVerticalGroup( gl.createParallelGroup().addComponent( m_cellWidthLabel ).addComponent( m_cellWidthSlider )
                 .addComponent( m_colorRangeLabel ).addComponent( m_colorRangeSlider ).addComponent( m_gradientBar ) );
-        // toolBar.add( m_cellWidthLabel );
-        // toolBar.add( m_cellWidthSlider );
-        // toolBar.add( m_colorRangeLabel );
-        // toolBar.add( m_colorRangeSlider );
-        // toolBar.add( m_gradientBar );
 
-        /*
-         * FIXME: probably should use a better layout manager. Looks wrong in Linux?
-         */
     }
 
     /**

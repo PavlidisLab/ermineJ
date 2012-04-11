@@ -81,9 +81,10 @@ public class MultiFuncDiagWindow extends JFrame {
                 MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
 
         JTabbedPane tabs = new JTabbedPane( JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT );
+
+        tabs.addTab( "Set sizes.", getGenesPerGroupDistribution( geneAnnots ) );
         tabs.addTab( "Sets per gene", getTermsPerGeneDistribution( geneAnnots ) );
         tabs.addTab( "Set multifunc.", getGroupMultifunctionalityDistribution( geneAnnots ) );
-        tabs.addTab( "Gene multifunc.", getGenesPerGroupDistribution( geneAnnots ) );
 
         String annotFileName = new File( geneAnnots.getSettings().getAnnotFile() ).getName();
         if ( geneScores != null ) {
@@ -112,7 +113,7 @@ public class MultiFuncDiagWindow extends JFrame {
     private JPanel regressed( GeneAnnotations geneAnnots, GeneScores geneScores ) {
         Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
 
-        // copies code from Multifunctationality, except always using weighted regression.
+        // copies code from Multifunctionality, using weighted regression.
         SettingsHolder settings = geneAnnots.getSettings();
         boolean doLog = settings.getDoLog(); // note scores would already have been log-transformed.
         boolean invert = ( doLog && !settings.getBigIsBetter() ) || ( !doLog && settings.getBigIsBetter() );
@@ -122,7 +123,9 @@ public class MultiFuncDiagWindow extends JFrame {
         int i = 0;
         for ( Gene g : geneToScoreMap.keySet() ) {
             // using # go terms because it is more intuitive.
-            Double mf = ( double ) geneAnnots.getMultifunctionality().getNumGoTerms( g );
+            // Double mf = ( double ) geneAnnots.getMultifunctionality().getNumGoTerms( g );
+            // Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityScore( g );
+            Double mf = geneAnnots.getMultifunctionality().getMultifunctionalityRank( g );
 
             Double s = geneToScoreMap.get( g );
             scores.set( i, s );
@@ -132,9 +135,9 @@ public class MultiFuncDiagWindow extends JFrame {
 
         // We want the weight to be highest for the best score. So if big is better, we use the increasing sort
         DoubleMatrix1D weights = MatrixUtil.fromList( Rank.rankTransform( MatrixUtil.toList( scores ), invert ) );
-        weights.assign( Functions.div( weights.size() ) );
+        weights.assign( Functions.inv ).assign( Functions.sqrt );
 
-        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores, weights );
+        LeastSquaresFit fit = new LeastSquaresFit( mfs, scores, weights ); // , weights
 
         double slope = fit.getCoefficients().get( 1, 0 );
 
@@ -158,7 +161,7 @@ public class MultiFuncDiagWindow extends JFrame {
         ds.addSeries( "Raw", rawSeries );
         ds.addSeries( "Fit", fittedSeries );
 
-        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality (# groups)",
+        JFreeChart c = ChartFactory.createScatterPlot( "Multifuntionality corr.", "Gene multifunctionality",
                 "Gene score", ds, PlotOrientation.VERTICAL, false, false, false );
         Shape circle = new Ellipse2D.Float( -1.0f, -1.0f, 1.0f, 1.0f );
         c.setTitle( String.format( "How biased are the gene scores\n(raw; weighted regression; slope=%.2g)", slope ) );
@@ -273,10 +276,10 @@ public class MultiFuncDiagWindow extends JFrame {
         int numBins = 39;
         series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), numBins, 2, 200 );
 
-        JFreeChart histogram = ChartFactory.createHistogram( "Gene multifuntionality", "Number of sets gene is in",
+        JFreeChart histogram = ChartFactory.createHistogram( "Gene multifunctionality", "Number of sets gene is in",
                 "Number of genes", series, PlotOrientation.VERTICAL, false, false, false );
 
-        return Plotting.plotHistogram( "How many sets each gene is in", histogram );
+        return Plotting.plotHistogram( "Gene multifunctionality: How many sets each gene is in", histogram );
     }
 
     /**
@@ -301,7 +304,7 @@ public class MultiFuncDiagWindow extends JFrame {
         JFreeChart histogram = ChartFactory.createHistogram( "Gene set sizes", "Number of genes in set",
                 "Number of sets", series, PlotOrientation.VERTICAL, false, false, false );
 
-        return Plotting.plotHistogram( "How big are the sets", histogram );
+        return Plotting.plotHistogram( "How big are the gene sets", histogram );
     }
 
     /**
@@ -317,22 +320,23 @@ public class MultiFuncDiagWindow extends JFrame {
             // vec.add( g.getGenes().size() );
 
             assert annots.getGeneSet( g ).size() > 0;
-            double mf = -Math.log10( annots.getMultifunctionality().getGOTermMultifunctionalityPvalue( g ) );
+            // double mf = -Math.log10( annots.getMultifunctionality().getGOTermMultifunctionalityPvalue( g ) );
+            double mf = annots.getMultifunctionality().getGOTermMultifunctionality( g );
             if ( mf <= 0 ) continue; // missing
             vec.add( mf );
         }
 
         HistogramDataset series = new HistogramDataset();
         int numBins = 39;
-        series.addSeries( "pvalues for ROCs (-log10)", MatrixUtil.fromList( vec ).toArray(), numBins, 0.0, 20.0 );
+        series.addSeries( "", MatrixUtil.fromList( vec ).toArray(), numBins, 0.0, 1.0 );
 
         /*
          * The value plotted here is based on the AU-ROC, but see Multifunctionality to see how it is computed for
          * display (we have changed it a few times).
          */
         JFreeChart histogram = ChartFactory.createHistogram( "Gene set multifunctionalities",
-                "Bias towards multifunctional genes\n", "Number of sets", series, PlotOrientation.VERTICAL, false,
-                false, false );
+                "Bias towards multifunctional genes", "Number of sets", series, PlotOrientation.VERTICAL, false, false,
+                false );
 
         String title = "How multifunctional are the sets?";
         return Plotting.plotHistogram( title, histogram );

@@ -49,7 +49,7 @@ import ubic.erminej.gui.util.Colors;
 import corejava.Format;
 
 /**
- * Model for displaying lists of gene sets.
+ * Model for displaying list of gene sets and results in the main frame.
  * 
  * @author pavlidis
  * @version $Id$
@@ -212,7 +212,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     public Object getValueAt( int rowIndex, int colIndex ) {
 
         GeneSetTerm classid = gsl.get( rowIndex );
-        double minPvalue = 1e-30;
+        double minPvalue = 1e-50;
         double maxLoggedPvalue = -Math.log10( minPvalue );
 
         if ( colIndex < INIT_COLUMNS ) {
@@ -226,9 +226,10 @@ public class GeneSetTableModel extends AbstractTableModel {
                 case 3:
                     return new Integer( geneData.numGenesInGeneSet( classid ) );
                 case 4:
-                    return Math.min(
-                            -Math.log10( geneData.getMultifunctionality().getGOTermMultifunctionalityPvalue( classid ) )
-                                    / maxLoggedPvalue, 1.0 );
+                    // return Math.min(
+                    // -Math.log10( geneData.getMultifunctionality().getGOTermMultifunctionalityPvalue( classid ) )
+                    // / maxLoggedPvalue, 1.0 );
+                    return geneData.getMultifunctionality().getGOTermMultifunctionalityRank( classid );
 
             }
         } else { // results
@@ -391,6 +392,11 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         return this;
     }
 
+    /**
+     * @param column
+     * @param value
+     * @param term
+     */
     private void configureToolTip( int column, Object value, GeneSetTerm term ) {
         if ( column >= GeneSetTableModel.INIT_COLUMNS ) {
             GeneSetResult res = ( GeneSetResult ) value;
@@ -410,21 +416,27 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                     + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
         } else {
 
+            /*
+             * Tool tip for the gene set
+             */
             String aspect = term.getAspect();
             String definition = term.getDefinition();
 
-            double mfScore = geneData.getMultifunctionality().getGOTermMultifunctionalityRank( term );
+            double mfRank = geneData.getMultifunctionality().getGOTermMultifunctionalityRank( term );
+            double mfScore = geneData.getMultifunctionality().getGOTermMultifunctionality( term );
+            double mfPvalue = geneData.getMultifunctionality().getGOTermMultifunctionalityPvalue( term );
 
             String redund = this.getToolTipTextForRedundancy( term );
-            setToolTipText( "<html>" + term.getName()
+            setToolTipText( "<html>"
+                    + term.getName()
                     + " ("
                     + term.getId()
                     + ")<br/>"
                     + "Aspect: "
                     + aspect
                     + "<br/>"
-                    + "Multifunctionality rank: " // <-- using the rank
-                    + String.format( "%.2f", mfScore )
+                    + "Multifunctionality rank= "
+                    + String.format( "%.2f (AUC=%.2f, p=%.3g)", mfRank, mfScore, mfPvalue )
                     + "<br/>"
                     + redund
                     + WordUtils.wrap( StringUtils.abbreviate( definition, GeneSetPanel.MAX_DEFINITION_LENGTH ), 50,
