@@ -499,12 +499,13 @@ public class UserDefinedGeneSetManager {
                 newSet = new GeneSet( term );
                 newSet.setUserDefined( true );
                 newSet.setIsGenes( isGenes );
+                newSet.getTerm().setName( null );
                 newSet.setFormat( GeneSetFileFormat.DEFAULT );
                 continue;
             }
 
             // third line of group: name; might be blank.
-            if ( StringUtils.isBlank( newSet.getName() ) || newSet.getName().equals( GeneSetTerm.NO_NAME_AVAILABLE ) ) {
+            if ( StringUtils.isBlank( newSet.getName() ) ) {
                 if ( StringUtils.isBlank( row ) ) {
                     newSet.getTerm().setName( GeneSetTerm.NO_NAME_AVAILABLE );
                 } else {

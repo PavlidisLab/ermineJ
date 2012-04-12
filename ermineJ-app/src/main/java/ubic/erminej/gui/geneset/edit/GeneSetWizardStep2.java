@@ -196,8 +196,15 @@ public class GeneSetWizardStep2 extends WizardStep {
             log.debug( "Removing " + probe );
             Probe p = geneData.findProbe( probe );
             assert p != null;
-            ncTableModel.removeProbe( p );
-            sourceProbeModel.addProbe( p );
+
+            // remove all of the probes for the gene, not just the selected one (otherwise doesn't make much sense).
+            Collection<Probe> probes = new HashSet<Probe>();
+            for ( Gene g : p.getGenes() ) {
+                probes.addAll( g.getProbes() );
+            }
+
+            ncTableModel.removeProbes( probes );
+            sourceProbeModel.addProbes( probes );
         }
 
         updateCountLabel();

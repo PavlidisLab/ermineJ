@@ -870,6 +870,7 @@ public class GeneAnnotations {
 
         this.userDefinedGeneSetManager.saveGeneSet( toSave );
         if ( this.multifunctionality != null ) this.multifunctionality.setStale( true );
+
         refreshRedundancyCheck( toSave );
     }
 
@@ -1264,9 +1265,10 @@ public class GeneAnnotations {
      * @param toSave
      */
     private void refreshRedundancyCheck( GeneSet toSave ) {
-        toSave.clearRedundancy();
+        this.messenger.showStatus( "Updating redundancy information ..." );
+        toSave.clearRedundancy(); // reset it completely.
         Collection<Gene> genes1 = toSave.getGenes();
-        for ( GeneSet gs2 : this.geneSets.values() ) {
+        sets: for ( GeneSet gs2 : this.geneSets.values() ) {
 
             if ( toSave.equals( gs2 ) ) continue;
 
@@ -1275,18 +1277,21 @@ public class GeneAnnotations {
             if ( genes1.size() != genes2.size() ) {
                 gs2.clearRedundancy( toSave );
                 continue;
-            }// not identical.
+            } // not identical.
 
             for ( Gene g1 : genes1 ) {
                 if ( !genes2.contains( g1 ) ) {
                     gs2.clearRedundancy( toSave );
-                    continue;
-                }// not redundant.
+                    continue sets;
+                } // not redundant.
             }
 
+            // If we get here, it means the groups are the same.
             toSave.addRedundantGroup( gs2 );
             gs2.addRedundantGroup( toSave );
         }
+
+        this.messenger.clear();
     }
 
     /**

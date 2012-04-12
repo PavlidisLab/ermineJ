@@ -150,6 +150,33 @@ public class GeneSetTerms {
         return directedGraphNode.getItem();
     }
 
+    // /**
+    // * @param id
+    // * @return The length of the shortest path to the root
+    // */
+    // public int depth( GeneSetTerm id ) {
+    // Collection<GeneSetTerm> parents = getParents( id );
+    // return depth( id, parents, 0 );
+    // }
+    //
+    // /*
+    // * FIXME
+    // */
+    // private int depth( GeneSetTerm id, Collection<GeneSetTerm> parents, int i ) {
+    // for ( GeneSetTerm p : parents ) {
+    // depth( p, getParents( p ), i );
+    // }
+    // return i;
+    // }
+
+    /**
+     * @param id
+     * @return true if this term has no children
+     */
+    public boolean isLeaf( GeneSetTerm id ) {
+        return getChildren( id ).isEmpty();
+    }
+
     /**
      * @param id
      * @return a Set containing the ids of geneSets which are immediately below the selected one in the hierarchy.

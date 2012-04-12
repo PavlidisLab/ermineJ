@@ -87,7 +87,8 @@ public class GeneSet {
         if ( !redundantGroups.isEmpty() ) {
             // this would be a programming error.
             throw new IllegalStateException( "Illegal attempt to add gene (" + g.getSymbol() + ") to a set ("
-                    + this.getId() + ") that already has redundancy computed." );
+                    + this.getId() + ") that already has redundancy computed: has " + redundantGroups.size()
+                    + " redundancies." );
         }
     }
 
@@ -248,7 +249,7 @@ public class GeneSet {
     public void clearGenes() {
         genes = new HashSet<Gene>();
         probes = new HashSet<Probe>();
-        assert this.redundantGroups.isEmpty(); // for now...
+        clearRedundancy();
     }
 
     public void setFormat( GeneSetFileFormat f ) {

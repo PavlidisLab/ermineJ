@@ -56,8 +56,8 @@ public class GeneSetWizard extends Wizard {
     private GeneSetWizardStep3 step3;
 
     private int step;
-    boolean makingNewGeneSet;
-    boolean nostep1 = false;
+    private boolean makingNewGeneSet;
+    private boolean nostep1 = false;
 
     private GeneSet oldGeneSet;
     private StatusViewer messenger = new StatusStderr();
@@ -127,6 +127,9 @@ public class GeneSetWizard extends Wizard {
         step3 = new GeneSetWizardStep3( this );
         this.addStep( step3 );
 
+        step3.setIdText( oldGeneSet.getId() );
+        step3.setDescText( oldGeneSet.getName() );
+        step2.setStartingSet( this.oldGeneSet );
         this.repaint();
     }
 
@@ -150,7 +153,6 @@ public class GeneSetWizard extends Wizard {
                     this.setTitle( "Define New Gene Set - Step 2 of 3" );
                 } else { // case 3 - editing an existing set.
                     assert this.oldGeneSet != null;
-                    step2.setStartingSet( this.oldGeneSet );
                     this.getContentPane().remove( step1A );
                     this.setTitle( "Modify Gene Set - Step 2 of 3" );
                 }
@@ -171,18 +173,11 @@ public class GeneSetWizard extends Wizard {
 
             this.getContentPane().remove( step2 );
             step = 3;
+            step3.setIdFieldEnabled( true );
             if ( makingNewGeneSet ) {
                 this.setTitle( "Define New Gene Set - Step 3 of 3" );
-                step3.setIdFieldEnabled( true );
-
             } else {
                 this.setTitle( "Modify Gene Set - Step 3 of 3" );
-                // if ( ( ( GeneSetScoreFrame ) callingframe ).userOverWrote( geneSetId ) )
-                step3.setIdFieldEnabled( true );
-
-                step3.setIdText( oldGeneSet.getId() );
-                step3.setDescText( oldGeneSet.getName() );
-
             }
             backButton.setEnabled( true );
             nextButton.setEnabled( false );
@@ -241,6 +236,9 @@ public class GeneSetWizard extends Wizard {
 
     @Override
     protected void finishEditing( ActionEvent e ) {
+
+        messenger.showStatus( "Finishing ..." );
+
         Collection<Probe> probes = step2.getProbes();
 
         String id = step3.getGeneSetId();
@@ -260,9 +258,13 @@ public class GeneSetWizard extends Wizard {
             showError( "Note that changing the ID of an existing gene set will result in creation of a new one." );
         }
 
-        GeneSet toSave;
+        GeneSet toSave = null;
+
+        boolean modified = false;
 
         if ( oldGeneSet != null ) {
+
+            modified = modifiedTheGeneSet();
 
             if ( id.equals( oldGeneSet.getId() ) ) {
                 // update members and description from the data we have
@@ -288,6 +290,7 @@ public class GeneSetWizard extends Wizard {
         log.debug( "Got modified or new gene set: " + id );
 
         toSave.clearGenes();
+
         for ( Probe probe : probes ) {
             toSave.addGene( probe.getGene() );
         }
@@ -298,16 +301,17 @@ public class GeneSetWizard extends Wizard {
         }
         try {
             if ( makingNewGeneSet || !toSave.getId().equals( oldGeneSet.getId() ) ) {
-                showStatus( "Saving new gene set in its own file" );
-
+                // showStatus( "Saving new gene set in its own file" );
+                messenger.showStatus( "Saving new gene set in its own file" );
                 geneData.addGeneSet( toSave );
                 geneData.saveGeneSet( toSave );
-            } else if ( modifiedTheGeneSet( toSave ) ) {
-                showStatus( "Saving modified gene set " + toSave + "( based on " + oldGeneSet + ")" );
-
+            } else if ( modified ) {
+                // showStatus( "Saving modified gene set " + toSave + "( based on " + oldGeneSet + ")" );
+                messenger.showStatus( "Saving modified gene set " + toSave + "( based on " + oldGeneSet + ")" );
                 geneData.saveGeneSet( toSave );
             } else {
-                showStatus( "Gene set was not created or changed, nothing to do." );
+                // showStatus( "Gene set was not created or changed, nothing to do." );
+                messenger.showStatus( "Gene set was not created or changed, nothing to do." );
             }
             ( ( MainFrame ) callingframe ).addedNewGeneSet( toSave );
             dispose();
@@ -320,13 +324,11 @@ public class GeneSetWizard extends Wizard {
     /**
      * @return
      */
-    private boolean modifiedTheGeneSet( GeneSet toSave ) {
-
+    private boolean modifiedTheGeneSet() {
         assert oldGeneSet != null;
-
-        return !toSave.equals( oldGeneSet ) || toSave.getGenes().size() != oldGeneSet.getGenes().size()
-                || !toSave.getGenes().containsAll( oldGeneSet.getGenes() )
-                || !toSave.getName().equals( oldGeneSet.getName() );
+        return step2.getProbes().size() != oldGeneSet.getProbes().size()
+                || !step2.getProbes().containsAll( oldGeneSet.getProbes() )
+                || !step3.getGeneSetName().equals( oldGeneSet.getName() );
     }
 
     public boolean getMakingNew() {

@@ -112,7 +112,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
         TreePath existing = find( id );
 
         if ( existing != null ) {
-            log.warn( "Node was already there: " + id );
+            // no problem, we are just editing it.
+            log.debug( "Node was already there: " + id );
             return;
         }
 
