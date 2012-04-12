@@ -344,6 +344,9 @@ public class StartupPanel extends JPanel {
              */
             JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Unable to automatically get annotations",
                     JOptionPane.INFORMATION_MESSAGE );
+        } catch ( Exception e ) {
+            JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Unable to automatically get annotations",
+                    JOptionPane.INFORMATION_MESSAGE );
         }
 
     }
