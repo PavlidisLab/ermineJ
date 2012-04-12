@@ -38,6 +38,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.table.JTableHeader;
@@ -202,7 +203,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
         model.renameRun( runIndex, newName );
         col.setIdentifier( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
         callingFrame.getResultSet( runIndex ).setName( newName );
+
+        List<? extends SortKey> sortKeys = new ArrayList<SortKey>( sorter.getSortKeys() );
         model.fireTableStructureChanged();
+        sorter.setSortKeys( sortKeys );
+
         this.callingFrame.updateRunViewMenu();
     }
 
@@ -223,13 +228,15 @@ public class GeneSetTablePanel extends GeneSetPanel {
     public void refreshView() {
 
         this.messenger.showStatus( "Updating view" );
-        //
-        // List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        // sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
-        // sorter.setSortKeys( sortKeys );
+
+        List<? extends SortKey> sortKeys = new ArrayList<SortKey>( sorter.getSortKeys() );
+
         this.model.filter();
         this.messenger.showStatus( table.getRowCount() + " sets shown" );
         table.revalidate();
+
+        sorter.setSortKeys( sortKeys );
+
     }
 
     /*
@@ -477,6 +484,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
                     table.removeColumn( col );
 
                     model.removeRunData( currentColumnIndex );
+
                     model.fireTableStructureChanged();
 
                     callingFrame.setCurrentResultSetIndex( runIndex );
@@ -486,9 +494,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
                     /*
                      * Now really try to remove the object.
                      */
+
                     callingFrame.removeRun( runIndex );
 
-                    // Resort by a remaining run, after removing a run.
+                    // Resort by a remaining run, after removing a run; otherwise, sort by the first column
                     List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
                     int newSortIndex = 0;
                     if ( callingFrame.getNumResultSets() > 0 ) {
@@ -496,6 +505,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
                     }
                     sortKeys.add( new RowSorter.SortKey( newSortIndex, SortOrder.ASCENDING ) );
                     sorter.setSortKeys( sortKeys );
+
                 }
             } );
 

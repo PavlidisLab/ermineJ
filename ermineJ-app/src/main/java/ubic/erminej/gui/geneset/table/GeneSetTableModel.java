@@ -317,10 +317,6 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                     setText( ( ( GeneSetTerm ) value ).getId() );
                 }
             }
-
-            // note: sometimes we end up here when the table is being modified; this is some kind of bug
-            // with adding columns and sorting/repainting at the same time?
-
         } else if ( column == 1 && value instanceof String ) {
             setText( ( String ) value );
         } else if ( value instanceof EmptyGeneSetResult ) {
