@@ -36,6 +36,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.RowSorter.SortKey;
@@ -119,6 +120,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
         assert geneData != null;
         model = new GeneSetTableModel( geneData, callingFrame.getResultSets() );
         table.setModel( model );
+
+        table.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
 
         MouseListener m = super.configurePopupListener();
         table.addMouseListener( m );
