@@ -52,7 +52,7 @@ Section "ermineJ (required)"
 
   ; Jars (ours and third-party)
   SetOutPath "$INSTDIR\lib"
- ; !include includes.deps.nsi
+  !include includes.deps.nsi
 
   ; .bat file
   SetOutPath "$INSTDIR\bin"
