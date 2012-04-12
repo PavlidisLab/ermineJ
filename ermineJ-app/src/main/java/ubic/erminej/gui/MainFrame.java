@@ -95,6 +95,7 @@ import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.gui.MainFrame.ResultSetMenuItem;
 import ubic.erminej.gui.analysis.AnalysisWizard;
 import ubic.erminej.gui.analysis.MultiFuncDiagWindow;
 import ubic.erminej.gui.file.DataFileFilter;
@@ -337,15 +338,11 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * @param resultSetName
+     * @param resultSet
      */
-    public void setCurrentResultSet( String resultSetName ) {
-        for ( int i = 0; i < results.size(); i++ ) {
-            GeneSetPvalRun element = results.get( i );
-            if ( element.getName().equals( resultSetName ) ) {
-                this.setCurrentResultSetIndex( i );
-            }
-        }
+    public void setCurrentResultSet( GeneSetPvalRun resultSet ) {
+        assert results.contains( resultSet );
+        this.setCurrentResultSetIndex( results.indexOf( resultSet ) );
     }
 
     public void setSettings( Settings settings ) {
@@ -385,26 +382,39 @@ public class MainFrame extends JFrame {
         enableMenusForAnalysis();
     }
 
+    class ResultSetMenuItem extends JMenuItem {
+        private final GeneSetPvalRun resultSet;
+
+        public ResultSetMenuItem( GeneSetPvalRun resultSet ) {
+            this.resultSet = resultSet;
+            this.setText( resultSet.getName() );
+        }
+
+        public GeneSetPvalRun getResultSet() {
+            return resultSet;
+        }
+    }
+
     /**
      * 
      */
     public void updateRunViewMenu() {
         log.debug( "Updating runViewMenu" );
         runViewMenu.removeAll();
-        for ( Iterator<GeneSetPvalRun> iter = this.results.iterator(); iter.hasNext(); ) {
-            GeneSetPvalRun resultSet = iter.next();
+        for ( GeneSetPvalRun resultSet : this.results ) {
             String name = resultSet.getName();
             log.debug( "Adding " + name );
-            JMenuItem newSet = new JMenuItem();
+            ResultSetMenuItem newSet = new ResultSetMenuItem( resultSet );
             newSet.setIcon( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "noCheckBox.gif" ) ) );
             newSet.addActionListener( new RunSet_Choose_ActionAdapter( this ) );
-            newSet.setText( name );
             this.runViewMenu.add( newSet );
         }
+
         if ( runViewMenu.getItemCount() > 0 ) {
             runViewMenu.getItem( runViewMenu.getItemCount() - 1 ).setIcon(
                     new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "checkBox.gif" ) ) );
         }
+
         runViewMenu.revalidate();
     }
 
@@ -1599,6 +1609,8 @@ public class MainFrame extends JFrame {
 
         this.treePanel.removeRun( runToRemove );
         this.tablePanel.removeRun( runToRemove );
+
+        updateRunViewMenu();
     }
 
     public GeneSetPvalRun getResultSet( int runIndex ) {
@@ -1733,25 +1745,25 @@ class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
     }
 
     public void actionPerformed( ActionEvent e ) {
-        JMenuItem source = ( JMenuItem ) e.getSource();
+        assert e.getSource() instanceof ResultSetMenuItem;
+        ResultSetMenuItem source = ( ResultSetMenuItem ) e.getSource();
         source.setIcon( new ImageIcon( this.getClass().getResource( "/ubic/erminej/checkBox.gif" ) ) );
         source.setSelected( true );
-        String resultSetName = source.getText();
-        clearOtherMenuItems( resultSetName );
-        adaptee.setCurrentResultSet( resultSetName );
+        clearOtherMenuItems( source.getResultSet() );
+        adaptee.setCurrentResultSet( source.getResultSet() );
     }
 
     /**
      * clear icon for other menu items.
      * 
      * @param source
-     * @param resultSetName
+     * @param geneSetPvalRun
      */
-    private void clearOtherMenuItems( String resultSetName ) {
+    private void clearOtherMenuItems( GeneSetPvalRun geneSetPvalRun ) {
         JMenu rvm = adaptee.getRunViewMenu();
         for ( int i = 0; i < rvm.getItemCount(); i++ ) {
-            JMenuItem jmi = rvm.getItem( i );
-            if ( !jmi.getText().equals( resultSetName ) ) {
+            ResultSetMenuItem jmi = ( ResultSetMenuItem ) rvm.getItem( i );
+            if ( !jmi.getResultSet().equals( geneSetPvalRun ) ) {
                 jmi.setIcon( new ImageIcon( this.getClass().getResource( "/ubic/erminej/noCheckBox.gif" ) ) );
             }
         }
