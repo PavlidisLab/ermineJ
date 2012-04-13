@@ -18,15 +18,12 @@
  */
 package ubic.erminej.analysis;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
@@ -107,38 +104,44 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
             }
         }
         if ( results.isEmpty() ) return results;
-        populateRanks( results );
+        GeneSetPvalRun.populateRanks( results );
 
         if ( useMultifunctionalityCorrection ) {
             Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
                     false /* not ranks */, true /* weighted regression */);
 
-//            /* Make the adjusted scores like the original scores in distribution */
-//            Map<Gene, Double> adjustedRanks = Rank.rankTransform( adjustScores );
-//            List<Double> originalScores = new ArrayList<Double>();
-//            originalScores.addAll( geneToScoreMap.values() );
-//            Collections.sort( originalScores );
-//            // maybe there is a better way to do this.
-//            for ( Gene g : adjustedRanks.keySet() ) {
-//                Double rank = adjustedRanks.get( g );
-//                int m = ( int ) Math.max( 0.0, Math.floor( rank ) );
-//                assert m < originalScores.size();
-//                // adjustScores.put( g, originalScores.get( m ) );
-//            }
+            // /* Make the adjusted scores like the original scores in distribution */
+            // Map<Gene, Double> adjustedRanks = Rank.rankTransform( adjustScores );
+            // List<Double> originalScores = new ArrayList<Double>();
+            // originalScores.addAll( geneToScoreMap.values() );
+            // Collections.sort( originalScores );
+            // // maybe there is a better way to do this.
+            // for ( Gene g : adjustedRanks.keySet() ) {
+            // Double rank = adjustedRanks.get( g );
+            // int m = ( int ) Math.max( 0.0, Math.floor( rank ) );
+            // assert m < originalScores.size();
+            // // adjustScores.put( g, originalScores.get( m ) );
+            // }
 
             /* compute new results */
             // GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( this, adjustScores );
             GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( this.settings, this.geneAnnots,
                     adjustScores, this.messenger );
 
-            Map<GeneSetTerm, GeneSetResult> generateGeneSetResults = pvg.generateGeneSetResults( false );
-            populateRanks( generateGeneSetResults );
+            Map<GeneSetTerm, GeneSetResult> correctedResults = pvg.generateGeneSetResults( false );
+            List<GeneSetTerm> sortedClasses = GeneSetPvalRun.getSortedClasses( correctedResults );
+            multipleTestCorrect( sortedClasses, correctedResults );
+            GeneSetPvalRun.populateRanks( correctedResults );
 
             for ( GeneSetTerm t : results.keySet() ) {
                 GeneSetResult geneSetResult = results.get( t );
-                if ( generateGeneSetResults.get( t ) != null )
-                    geneSetResult.setMultifunctionalityCorrectedRankDelta( generateGeneSetResults.get( t ).getRank()
+                if ( correctedResults.get( t ) != null ) {
+                    geneSetResult.setMultifunctionalityCorrectedRankDelta( correctedResults.get( t ).getRank()
                             - geneSetResult.getRank() );
+
+                    geneSetResult.setMfCorrectedPvalue( correctedResults.get( t ).getPvalue() );
+                    geneSetResult.setMfCorrectedFdr( correctedResults.get( t ).getCorrectedPvalue() );
+                }
             }
 
         }

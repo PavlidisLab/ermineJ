@@ -26,8 +26,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -87,6 +89,108 @@ public class ResultsFileReader {
     }
 
     /**
+     * Check whether a file exists, and if not and the GUI is available, prompt the user to enter one. The path is
+     * returned.
+     * 
+     * @param file
+     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
+     */
+    private static String checkFile( SettingsHolder settings, String file ) {
+        if ( StringUtils.isBlank( file ) ) return null;
+
+        if ( !FileTools.testFile( file ) ) {
+
+            try {
+
+                // try to start them somewhere useful.
+                JFileChooser fc = new JFileChooser( settings.getGeneScoreFileDirectory() );
+
+                fc.setDialogTitle( "Please locate " + new File( file ).getName() );
+                fc.setDialogType( JFileChooser.OPEN_DIALOG );
+                fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
+                int result = fc.showOpenDialog( null );
+                if ( result == JFileChooser.APPROVE_OPTION ) {
+                    File f = fc.getSelectedFile();
+                    return f.getAbsolutePath();
+                }
+            } catch ( HeadlessException e ) {
+                // we must be using the CLI... though that really doesn't make much sense. Just in case.
+                log.error( file + " referred to in the file could not be found; please fix the file" );
+                return null;
+            }
+            return null;
+        }
+        return file;
+    }
+
+    /**
+     * @param loadSettings
+     */
+    private static boolean checkValid( SettingsHolder loadSettings ) {
+
+        String file;
+
+        String rawDataFileName = loadSettings.getRawDataFileName();
+        if ( StringUtils.isNotBlank( rawDataFileName ) ) {
+            file = checkFile( loadSettings, rawDataFileName ); // looks for the file.
+            if ( file == null ) {
+                return false;
+            }
+            loadSettings.setRawFile( file );
+        }
+
+        String scoreFile = loadSettings.getScoreFile();
+        if ( StringUtils.isNotBlank( scoreFile ) ) {
+            file = checkFile( loadSettings, scoreFile );
+            if ( file == null ) {
+                return false;
+            }
+            loadSettings.setScoreFile( file );
+        }
+
+        return true;
+    }
+
+    /**
+     * Compute the multifunctionality rank delta.
+     * 
+     * @param newResults
+     */
+    private static void fillInMultifuncationalityRankDelta( GeneSetPvalRun newResults ) {
+        Map<GeneSetTerm, GeneSetResult> r = newResults.getResults();
+
+        List<GeneSetTerm> sortedR = GeneSetPvalRun.getSortedClasses( r );
+
+        Map<GeneSetTerm, Double> ranks = new HashMap<GeneSetTerm, Double>();
+        int index = 0;
+        for ( GeneSetTerm t : sortedR ) {
+            double rank = ( index + 1 ) / sortedR.size();
+            ranks.put( t, rank );
+
+            index++;
+        }
+
+        Map<GeneSetTerm, Double> mfcRanks = new HashMap<GeneSetTerm, Double>();
+        List<GeneSetTerm> mfsortedR = GeneSetPvalRun.getSortedClasses( r, true );
+        index = 0;
+        for ( GeneSetTerm t : mfsortedR ) {
+            double rank = ( index + 1 ) / mfsortedR.size();
+            mfcRanks.put( t, rank );
+
+            index++;
+        }
+
+        for ( int i = 0; i < mfsortedR.size(); i++ ) {
+            GeneSetTerm geneSetTerm = mfsortedR.get( i );
+            int correctedRank = i + 1;
+            GeneSetResult referenceResult = r.get( geneSetTerm );
+            int originalRank = referenceResult.getRank();
+            referenceResult.setMultifunctionalityCorrectedRankDelta( correctedRank - originalRank );
+
+        }
+    }
+
+    /**
      * @param dis
      * @param geneAnnots
      * @param runNum
@@ -135,9 +239,15 @@ public class ResultsFileReader {
 
                 GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval, runSettings );
 
-                // we cannot easily recompute this.
-                int mfRankChange = Integer.parseInt( st.nextToken() );
-                c.setMultifunctionalityCorrectedRankDelta( mfRankChange );
+                double mfpvalue = Double.parseDouble( st.nextToken() );
+                double mfCorrectedpvalue = Double.parseDouble( st.nextToken() );
+                double mf = Double.parseDouble( st.nextToken() );
+
+                c.setMfCorrectedPvalue( mfpvalue );
+                c.setMfCorrectedFdr( mfCorrectedpvalue );
+                c.setMultifunctionalityRank( mf );
+
+                // int mfRankChange = c.setMultifunctionalityCorrectedRankDelta( mfRankChange );
 
                 results.put( term, c );
             } else if ( firstword.startsWith( ResultsPrinter.RUN_NAME_FIELD_PATTERN ) ) {
@@ -168,6 +278,8 @@ public class ResultsFileReader {
          */
 
         GeneSetPvalRun newResults = new GeneSetPvalRun( runSettings, geneAnnots, messenger, results, runName );
+
+        fillInMultifuncationalityRankDelta( newResults );
 
         messenger.showStatus( "Read run: " + runName );
 
@@ -208,69 +320,6 @@ public class ResultsFileReader {
         tmp.delete();
 
         return s;
-    }
-
-    /**
-     * @param loadSettings
-     */
-    private static boolean checkValid( SettingsHolder loadSettings ) {
-
-        String file;
-
-        String rawDataFileName = loadSettings.getRawDataFileName();
-        if ( StringUtils.isNotBlank( rawDataFileName ) ) {
-            file = checkFile( loadSettings, rawDataFileName ); // looks for the file.
-            if ( file == null ) {
-                return false;
-            }
-            loadSettings.setRawFile( file );
-        }
-
-        String scoreFile = loadSettings.getScoreFile();
-        if ( StringUtils.isNotBlank( scoreFile ) ) {
-            file = checkFile( loadSettings, scoreFile );
-            if ( file == null ) {
-                return false;
-            }
-            loadSettings.setScoreFile( file );
-        }
-
-        return true;
-    }
-
-    /**
-     * Check whether a file exists, and if not and the GUI is available, prompt the user to enter one. The path is
-     * returned.
-     * 
-     * @param file
-     * @return If the user doesn't locate the file, return null, otherwise the path to the file.
-     */
-    private static String checkFile( SettingsHolder settings, String file ) {
-        if ( StringUtils.isBlank( file ) ) return null;
-
-        if ( !FileTools.testFile( file ) ) {
-
-            try {
-
-                // try to start them somewhere useful.
-                JFileChooser fc = new JFileChooser( settings.getGeneScoreFileDirectory() );
-
-                fc.setDialogTitle( "Please locate " + new File( file ).getName() );
-                fc.setDialogType( JFileChooser.OPEN_DIALOG );
-                fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
-                int result = fc.showOpenDialog( null );
-                if ( result == JFileChooser.APPROVE_OPTION ) {
-                    File f = fc.getSelectedFile();
-                    return f.getAbsolutePath();
-                }
-            } catch ( HeadlessException e ) {
-                // we must be using the CLI... though that really doesn't make much sense. Just in case.
-                log.error( file + " referred to in the file could not be found; please fix the file" );
-                return null;
-            }
-            return null;
-        }
-        return file;
     }
 
 }

@@ -20,16 +20,14 @@ package ubic.erminej.analysis;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import ubic.basecode.math.Rank;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
+import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
@@ -215,49 +213,24 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     }
 
     /**
-     * Fill in the ranks
+     * Perform multiple test correction during the multifunctionality correction. DOES NOT SUPPORT WESTFALL-YOUNG
+     * CORRECTION
      * 
-     * @return sorted classes
+     * @param sortedClasses
+     * @param results
      */
-    protected static List<GeneSetTerm> populateRanks( final Map<GeneSetTerm, GeneSetResult> results ) {
-        if ( results.isEmpty() ) return new ArrayList<GeneSetTerm>();
-        List<GeneSetTerm> sortedClasses = getSortedClasses( results );
-
-        assert sortedClasses.size() > 0;
-        for ( int i = 0; i < sortedClasses.size(); i++ ) {
-            GeneSetResult geneSetResult = results.get( sortedClasses.get( i ) );
-            geneSetResult.setRank( i + 1 );
-            geneSetResult.setRelativeRank( ( double ) i / sortedClasses.size() );
+    protected void multipleTestCorrect( List<GeneSetTerm> sortedClasses, Map<GeneSetTerm, GeneSetResult> results ) {
+        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, geneAnnots, null, results,
+                getMessenger() );
+        Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
+        if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BONFERONNI ) ) {
+            mt.bonferroni();
+        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
+            mt.benjaminihochberg();
+        } else {
+            throw new UnsupportedOperationException( multipleTestCorrMethod
+                    + " is not supported for this analysis method" );
         }
-        return sortedClasses;
-    }
-
-    /**
-     * @return Ranked list. Removes any sets which are not scored.
-     */
-    protected static List<GeneSetTerm> getSortedClasses( final Map<GeneSetTerm, GeneSetResult> results ) {
-        Comparator<GeneSetTerm> c = new Comparator<GeneSetTerm>() {
-            @Override
-            public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
-                return results.get( o1 ).compareTo( results.get( o2 ) );
-            }
-        };
-
-        TreeMap<GeneSetTerm, GeneSetResult> sorted = new TreeMap<GeneSetTerm, GeneSetResult>( c );
-        sorted.putAll( results );
-
-        assert sorted.size() == results.size();
-
-        List<GeneSetTerm> sortedSets = new ArrayList<GeneSetTerm>();
-        for ( GeneSetTerm r : sorted.keySet() ) {
-            if ( results.get( r ) instanceof EmptyGeneSetResult /* just checking... */) {
-                continue;
-            }
-            sortedSets.add( r );
-        }
-
-        return sortedSets;
-
     }
 
 }

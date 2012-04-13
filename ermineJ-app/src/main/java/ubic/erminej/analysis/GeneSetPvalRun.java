@@ -19,12 +19,15 @@
 package ubic.erminej.analysis;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -35,6 +38,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.data.DataIOUtils;
+import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -53,7 +57,64 @@ import ubic.erminej.data.Probe;
 public class GeneSetPvalRun {
 
     private GeneAnnotations geneData; // ones used in the analysis -- this may be immutable, should only be used for
+
     // analysis
+    /**
+     * @param
+     * @param useMfCorrection Use the multifunctionality results stored.
+     * @return Ranked list. Removes any sets which are not scored.
+     */
+    public static List<GeneSetTerm> getSortedClasses( final Map<GeneSetTerm, GeneSetResult> results,
+            boolean useMfCorrection ) {
+        Comparator<GeneSetTerm> c;
+
+        if ( useMfCorrection ) {
+            c = new Comparator<GeneSetTerm>() {
+                @Override
+                public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
+                    Double pvalue1 = results.get( o1 ).getMfCorrectedPvalue();
+                    double pvalue2 = results.get( o2 ).getMfCorrectedPvalue();
+                    if ( pvalue1 > pvalue2 ) {
+                        return 1;
+                    } else if ( pvalue1 < pvalue2 ) {
+                        return -1;
+                    } else {
+                        // break ties alphabetically.
+                        return o1.compareTo( o2 );
+                    }
+                }
+            };
+
+        } else {
+            c = new Comparator<GeneSetTerm>() {
+                @Override
+                public int compare( GeneSetTerm o1, GeneSetTerm o2 ) {
+                    return results.get( o1 ).compareTo( results.get( o2 ) );
+                }
+            };
+        }
+
+        TreeMap<GeneSetTerm, GeneSetResult> sorted = new TreeMap<GeneSetTerm, GeneSetResult>( c );
+
+        sorted.putAll( results );
+
+        assert sorted.size() == results.size();
+
+        List<GeneSetTerm> sortedSets = new ArrayList<GeneSetTerm>();
+        for ( GeneSetTerm r : sorted.keySet() ) {
+            if ( results.get( r ) instanceof EmptyGeneSetResult /* just checking... */) {
+                continue;
+            }
+            sortedSets.add( r );
+        }
+
+        return sortedSets;
+
+    }
+
+    public static List<GeneSetTerm> getSortedClasses( final Map<GeneSetTerm, GeneSetResult> results ) {
+        return getSortedClasses( results, false );
+    }
 
     private Histogram hist;
 
@@ -142,9 +203,27 @@ public class GeneSetPvalRun {
 
         Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
         this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
-        AbstractGeneSetPvalGenerator.populateRanks( results );
+        populateRanks( results );
 
         addMetaData();
+    }
+
+    /**
+     * Fill in the ranks
+     * 
+     * @return sorted classes
+     */
+    public static List<GeneSetTerm> populateRanks( final Map<GeneSetTerm, GeneSetResult> results ) {
+        if ( results.isEmpty() ) return new ArrayList<GeneSetTerm>();
+        List<GeneSetTerm> sortedClasses = GeneSetPvalRun.getSortedClasses( results );
+
+        assert sortedClasses.size() > 0;
+        for ( int i = 0; i < sortedClasses.size(); i++ ) {
+            GeneSetResult geneSetResult = results.get( sortedClasses.get( i ) );
+            geneSetResult.setRank( i + 1 );
+            geneSetResult.setRelativeRank( ( double ) i / sortedClasses.size() );
+        }
+        return sortedClasses;
     }
 
     /**
@@ -290,7 +369,7 @@ public class GeneSetPvalRun {
      * @param csc
      */
     private void multipleTestCorrect( GeneScores geneScores ) {
-        List<GeneSetTerm> sortedClasses = AbstractGeneSetPvalGenerator.getSortedClasses( results );
+        List<GeneSetTerm> sortedClasses = getSortedClasses( results );
 
         messenger.showStatus( "Multiple test correction for " + sortedClasses.size() + " scored sets." );
 
@@ -442,8 +521,8 @@ public class GeneSetPvalRun {
 
         for ( Object o : this.results.values() ) {
             GeneSetResult gsr = ( GeneSetResult ) o;
-            double auc = mf.getGOTermMultifunctionality( gsr.getGeneSetId() );
-            gsr.setMultifunctionality( auc );
+            double rank = mf.getGOTermMultifunctionalityRank( gsr.getGeneSetId() );
+            gsr.setMultifunctionalityRank( rank );
         }
 
     }

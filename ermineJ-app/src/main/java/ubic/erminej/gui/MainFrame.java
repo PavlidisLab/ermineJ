@@ -1543,7 +1543,8 @@ public class MainFrame extends JFrame {
         chooser.setApproveButtonText( "OK" );
         chooser.setDialogTitle( "Save Analysis As:" );
         // suggest a file name.
-        chooser.setSelectedFile( new File( getCurrentResultSet().getName().replaceAll( "(\\s|:)+", "_" )
+        chooser.setSelectedFile( new File( StringUtils.strip(
+                getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
                 + ".erminej.txt" ) );
 
         int result = chooser.showOpenDialog( this );

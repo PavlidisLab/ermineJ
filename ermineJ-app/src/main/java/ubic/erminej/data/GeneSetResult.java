@@ -38,16 +38,13 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     private double score = 0.0;
     private int numGenes = 0;
     private double correctedPvalue = 1.0;
-    private Double multifunctionality = 0.5;
+    private Double multifunctionalityRank = 0.5;
     private int rank = -12345;
 
-    private double mfCorrectedPvalue = 1.0; // FIXME
+    private double mfCorrectedPvalue = -1.0;
+    private double mfCorrectedFdr = -1.0;
 
     private SettingsHolder settings;
-
-    public SettingsHolder getSettings() {
-        return settings;
-    }
 
     private Integer multifunctionalityCorrectedRankDelta = null;
 
@@ -55,20 +52,15 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
 
     private double relativeRank = 1.0;
 
-    public GeneSetResult() {
-        this( null, 0, 0, 0.0, 1.0, 1.0, null );
+    private final static DecimalFormat nf = new DecimalFormat();
+    private final static DecimalFormat exp = new DecimalFormat( "0.###E00" );
+    static {
+        nf.setMaximumFractionDigits( 8 );
+        nf.setMinimumFractionDigits( 3 );
     }
 
-    /**
-     * @param id
-     * @param numProbes (in set)
-     * @param numGenes (in set)
-     */
-    public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes, SettingsHolder settings ) {
-        this();
-        this.geneSetTerm = id;
-        this.settings = settings;
-        this.setSizes( numProbes, numGenes );
+    public GeneSetResult() {
+        this( null, 0, 0, 0.0, 1.0, 1.0, null );
     }
 
     /**
@@ -88,6 +80,24 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         this.numGenes = numGenes;
         this.correctedPvalue = correctedPvalue;
         this.settings = settings;
+
+        /*
+         * Initialize these to default values.
+         */
+        this.mfCorrectedPvalue = this.pvalue;
+        this.mfCorrectedFdr = this.correctedPvalue;
+    }
+
+    /**
+     * @param id
+     * @param numProbes (in set)
+     * @param numGenes (in set)
+     */
+    public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes, SettingsHolder settings ) {
+        this();
+        this.geneSetTerm = id;
+        this.settings = settings;
+        this.setSizes( numProbes, numGenes );
     }
 
     /**
@@ -134,8 +144,20 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         return this.geneSetTerm;
     }
 
+    public double getMfCorrectedFdr() {
+        return mfCorrectedFdr;
+    }
+
+    public double getMfCorrectedPvalue() {
+        return mfCorrectedPvalue;
+    }
+
     public Integer getMultifunctionalityCorrectedRankDelta() {
         return multifunctionalityCorrectedRankDelta;
+    }
+
+    public Double getMultifunctionalityRank() {
+        return multifunctionalityRank;
     }
 
     /**
@@ -173,6 +195,10 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         return score;
     }
 
+    public SettingsHolder getSettings() {
+        return settings;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -186,21 +212,32 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     }
 
     /**
+     * The format is:
+     * 
+     * <pre>
+     * Gene set name
+     * Gene set ID (e.g. GO:xxxxx)
+     * Number of probes
+     * Number of genes
+     * Score
+     * Pvalue
+     * Multiple-testing corrected pvalue (FDR)
+     * Multifunctionality-corrected pvalue TODO
+     * Multifunctionality-corrected pvalue, multiple-test corrected (FDR) TODO
+     * Multifunctionality of the gene set (relative rank, 1 is most multifunctional)
+     * -- One more extra columns such as the redundant gene sets and the gene symbols of the members.
+     * </pre>
+     * 
      * @param out
      * @param extracolumns
      * @throws IOException
      */
     public void print( Writer out, String extracolumns ) throws IOException {
-        DecimalFormat nf = new DecimalFormat();
-        nf.setMaximumFractionDigits( 8 );
-        nf.setMinimumFractionDigits( 3 );
 
-        DecimalFormat exp = new DecimalFormat( "0.###E00" );
         out.write( "!\t" + geneSetTerm.getName() + "\t" + geneSetTerm.getId() + "\t" + numProbes + "\t" + numGenes
-                + "\t" + nf.format( score ) + "\t" + ( pvalue < 10e-3 ? exp.format( pvalue ) : nf.format( pvalue ) )
-                + "\t" + ( correctedPvalue < 10e-3 ? exp.format( correctedPvalue ) : nf.format( correctedPvalue ) )
-                + "\t" + ( this.multifunctionalityCorrectedRankDelta ) + "\t"
-                + String.format( "%.3g", this.multifunctionality ) + extracolumns + "\n" );
+                + "\t" + nf.format( score ) + "\t" + formatPvalue( pvalue ) + "\t" + formatPvalue( correctedPvalue )
+                + "\t" + formatPvalue( mfCorrectedPvalue ) + "\t" + formatPvalue( mfCorrectedFdr ) + "\t"
+                + String.format( "%.3g", this.multifunctionalityRank ) + extracolumns + "\n" );
     }
 
     public void printHeadings( Writer out ) throws IOException {
@@ -215,18 +252,20 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     public void printHeadings( Writer out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
         out.write( "\tName\tID\tProbes\tNumGenes\tRawScore\tPval"
-                + "\tCorrectedPvalue\tMultifuncSensitivity\tMultifuncBias" + extracolumns + "\n" );
+                + "\tCorrectedPvalue\tMFCorrectedPvalue\tMFPvalue\tCorrectedMFPvalue\tMultifuntionality" + extracolumns
+                + "\n" );
     }
 
     public void setCorrectedPvalue( double a ) {
         correctedPvalue = a;
     }
 
-    /**
-     * @param auc The raw area under the ROC curve
-     */
-    public void setMultifunctionality( double mf ) {
-        this.multifunctionality = mf;
+    public void setMfCorrectedFdr( double mfCorrectedFdr ) {
+        this.mfCorrectedFdr = mfCorrectedFdr;
+    }
+
+    public void setMfCorrectedPvalue( double mfCorrectedPvalue ) {
+        this.mfCorrectedPvalue = mfCorrectedPvalue;
     }
 
     /**
@@ -237,6 +276,13 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      */
     public void setMultifunctionalityCorrectedRankDelta( Integer multifunctionalityCorrectedRankDelta ) {
         this.multifunctionalityCorrectedRankDelta = multifunctionalityCorrectedRankDelta;
+    }
+
+    /**
+     * @param rank relative, where 1 is most multifunctional
+     */
+    public void setMultifunctionalityRank( Double rank ) {
+        this.multifunctionalityRank = rank;
     }
 
     public void setPValue( double apvalue ) {
@@ -271,6 +317,13 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     public void setSizes( int size, int effsize ) {
         this.numProbes = size;
         this.numGenes = effsize;
+    }
+
+    /**
+     * @return
+     */
+    private String formatPvalue( double p ) {
+        return p < 10e-3 ? exp.format( p ) : nf.format( p );
     }
 
 }

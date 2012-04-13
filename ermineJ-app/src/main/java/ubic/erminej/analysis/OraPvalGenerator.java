@@ -27,7 +27,6 @@ import java.util.Map;
 
 import ubic.basecode.math.SpecFunc;
 import ubic.basecode.util.StatusViewer;
-import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
@@ -142,7 +141,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             return referenceResults;
         }
 
-        List<GeneSetTerm> sortedClasses = getSortedClasses( referenceResults );
+        List<GeneSetTerm> sortedClasses = GeneSetPvalRun.getSortedClasses( referenceResults );
         multipleTestCorrect( sortedClasses, referenceResults );
 
         Map<GeneSetTerm, Double> monitoredRanks = getMFMonitoredSets( referenceResults, sortedClasses );
@@ -223,6 +222,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 "Before correction enrichment of hit list (%d genes) for multifunctionality is P=%.3g",
                 filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
 
+        Map<GeneSetTerm, GeneSetResult> correctedResults = null;
         while ( true ) {
 
             /*
@@ -233,18 +233,21 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             this.messenger.showStatus( "MF correct: Testing removal of " + mostMultifunctional.getSymbol()
                     + " (most multifunc of hits)" );
             filteredGenes.remove( mostMultifunctional );
-            if ( filteredGenes.isEmpty() ) {
-                this.messenger.showWarning( "No genes left after remove MF genes" );
+
+            if ( filteredGenes.size() < genesAboveThreshold.size() / 2 ) {
+                this.messenger
+                        .showWarning( "Halting removal of multifunctional genes after more than 1/2 were removed" );
                 break;
             }
 
-            // compute new results. FIXME only do this for groups the removed gene was in!
-            Map<GeneSetTerm, GeneSetResult> results = computeResultsForHitList( filteredGenes, true );
-            if ( results.isEmpty() ) {
+            // compute new results.
+            correctedResults = computeResultsForHitList( filteredGenes, true );
+            if ( correctedResults.isEmpty() ) {
+                // this would be odd.
                 break;
             }
-            List<GeneSetTerm> sortedRevisedClasses = getSortedClasses( results );
-            multipleTestCorrect( sortedRevisedClasses, results );
+            List<GeneSetTerm> sortedRevisedClasses = GeneSetPvalRun.getSortedClasses( correctedResults );
+            multipleTestCorrect( sortedRevisedClasses, correctedResults );
 
             // get the new ranks for the monitored set of gene sets.
             Map<GeneSetTerm, Double> newRanks = new HashMap<GeneSetTerm, Double>();
@@ -294,9 +297,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             for ( int i = 0; i < correctedRanking.size(); i++ ) {
                 GeneSetTerm geneSetTerm = correctedRanking.get( i );
                 int correctedRank = i + 1;
-                int originalRank = referenceResults.get( geneSetTerm ).getRank();
-                referenceResults.get( geneSetTerm ).setMultifunctionalityCorrectedRankDelta(
-                        correctedRank - originalRank );
+                GeneSetResult referenceResult = referenceResults.get( geneSetTerm );
+                int originalRank = referenceResult.getRank();
+                referenceResult.setMultifunctionalityCorrectedRankDelta( correctedRank - originalRank );
+
+                if ( correctedResults != null && correctedResults.containsKey( geneSetTerm ) ) {
+                    referenceResult.setMfCorrectedPvalue( correctedResults.get( geneSetTerm ).getPvalue() );
+                    referenceResult.setMfCorrectedFdr( correctedResults.get( geneSetTerm ).getCorrectedPvalue() );
+                }
             }
 
         }
@@ -351,7 +359,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         if ( results.isEmpty() ) return results;
 
-        populateRanks( results );
+        GeneSetPvalRun. populateRanks( results );
         return results;
     }
 
@@ -380,26 +388,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         }
 
         return Descriptive.mean( newR ) - Descriptive.mean( oldR );
-    }
-
-    /**
-     * Perform multiple test correction during the multifunctionality correction.
-     * 
-     * @param sortedClasses
-     * @param results
-     */
-    private void multipleTestCorrect( List<GeneSetTerm> sortedClasses, Map<GeneSetTerm, GeneSetResult> results ) {
-        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, geneAnnots, geneScores, results,
-                getMessenger() );
-        Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BONFERONNI ) ) {
-            mt.bonferroni();
-        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
-            mt.benjaminihochberg();
-        } else {
-            throw new UnsupportedOperationException( multipleTestCorrMethod
-                    + " is not supported for this analysis method" );
-        }
     }
 
     public Collection<Gene> getGenesAboveThreshold() {
