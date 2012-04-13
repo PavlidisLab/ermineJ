@@ -227,7 +227,7 @@
 						</copy>
 						<copy file="${basedir}/src/main/izpack/LICENSE.txt" todir="${project.build.directory}/staging" />
 						<copy file="${basedir}/src/main/izpack/README.txt" todir="${project.build.directory}/staging" />
-						<echo message="${project.version}-${buildNumber}" file="${basedir}/src/main/resources/ubic/erminej/version" />
+						<echo message="${project.version}" file="${basedir}/src/main/resources/ubic/erminej/version" />
 					</tasks>
 				</configuration>
 			</plugin>

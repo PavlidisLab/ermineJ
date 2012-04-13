@@ -74,12 +74,7 @@ public class GeneSetWizardStep2 extends WizardStep {
     private final static int COL1WIDTH = 80;
     private final static int COL2WIDTH = 200;
 
-    protected void setStartingSet( GeneSet original ) {
-        assert jLabel2 != null;
-        jLabel2.setText( original.toString() );
-        this.ncTableModel.setProbes( original.getProbes() );
-        this.sourceProbeModel.removeProbes( original.getProbes() );
-    }
+    JLabel jLabel2 = new JLabel();
 
     /**
      * @param wiz
@@ -90,18 +85,35 @@ public class GeneSetWizardStep2 extends WizardStep {
         this.jbInit();
         this.geneData = geneData;
         wiz.clearStatus();
-        populateTables();
+        populateTables(); 
+    }
 
-        if ( wiz.getOriginalGeneSet() != null ) {
-            // it will be null at construction time, so this is pretty useless.
-            assert jLabel2 != null;
-            jLabel2.setText( wiz.getOriginalGeneSet().toString() );
-            this.ncTableModel.setProbes( wiz.getOriginalGeneSet().getProbes() );
-        }
+    /**
+     * Get the results of the user's picking.
+     * 
+     * @return
+     */
+    public Collection<Probe> getProbes() {
+        return this.ncTableModel.getProbes();
+    }
+
+    @Override
+    public boolean isReady() {
+        return !getProbes().isEmpty();
 
     }
 
-    JLabel jLabel2 = new JLabel();
+    /**
+     * do a search.
+     */
+    public void searchButton_actionPerformed_adapter() {
+        find();
+    }
+
+    public void updateCountLabel() {
+        showStatus( "Number of Probes selected: " + ncTableModel.getProbeCount() + " [ " + ncTableModel.getGeneCount()
+                + " genes]" );
+    }
 
     // Component initialization
     @Override
@@ -183,67 +195,11 @@ public class GeneSetWizardStep2 extends WizardStep {
         this.addMain( step2Panel );
     }
 
-    @Override
-    public boolean isReady() {
-        return !getProbes().isEmpty();
-
-    }
-
-    void deleteProbesFromRightTable() {
-        int[] rows = newClassTable.getSelectedRows();
-        for ( int i = 0; i < rows.length; i++ ) {
-            String probe = ( String ) newClassTable.getValueAt( rows[i] - i, 0 );
-            log.debug( "Removing " + probe );
-            Probe p = geneData.findProbe( probe );
-            assert p != null;
-
-            // remove all of the probes for the gene, not just the selected one (otherwise doesn't make much sense).
-            Collection<Probe> probes = new HashSet<Probe>();
-            for ( Gene g : p.getGenes() ) {
-                probes.addAll( g.getProbes() );
-            }
-
-            ncTableModel.removeProbes( probes );
-            sourceProbeModel.addProbes( probes );
-        }
-
-        updateCountLabel();
-    }
-
-    void addProbesFromLeftTableToRight() {
-        int[] rows = probeTable.getSelectedRows();
-        log.debug( rows.length + " rows selected" );
-        for ( int i = 0; i < rows.length; i++ ) {
-            String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
-            log.debug( "Got probe: " + probe );
-            Probe p = geneData.findProbe( probe );
-            this.addGeneToSet( p.getGene() );
-        }
-    }
-
-    void editorProbe_actionPerformed( ChangeEvent e ) {
-        String newProbe = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
-
-        Probe p = geneData.findProbe( newProbe );
-        if ( p == null ) {
-            showError( "Probe " + newProbe + " does not exist." );
-            return;
-        }
-        Gene g = p.getGene();
-        this.addGeneToSet( g );
-
-    }
-
-    void editorGene_actionPerformed( ChangeEvent e ) {
-        String newGene = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
-
-        Gene g = geneData.findGene( newGene );
-        if ( g == null ) {
-            showError( "Gene " + newGene + " does not exist." );
-            return;
-        }
-
-        this.addGeneToSet( g );
+    protected void setStartingSet( GeneSet original ) {
+        assert jLabel2 != null;
+        jLabel2.setText( original.toString() );
+        this.ncTableModel.setProbes( original.getProbes() );
+        this.sourceProbeModel.removeProbes( original.getProbes() );
     }
 
     /**
@@ -267,9 +223,77 @@ public class GeneSetWizardStep2 extends WizardStep {
         updateCountLabel();
     }
 
-    public void updateCountLabel() {
-        showStatus( "Number of Probes selected: " + ncTableModel.getProbeCount() + " [ " + ncTableModel.getGeneCount()
-                + " genes]" );
+    void addProbesFromLeftTableToRight() {
+        int[] rows = probeTable.getSelectedRows();
+        log.debug( rows.length + " rows selected" );
+        for ( int i = 0; i < rows.length; i++ ) {
+            String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
+            log.debug( "Got probe: " + probe );
+            Probe p = geneData.findProbe( probe );
+            this.addGeneToSet( p.getGene() );
+        }
+    }
+
+    void deleteProbesFromRightTable() {
+        int[] rows = newClassTable.getSelectedRows();
+        for ( int i = 0; i < rows.length; i++ ) {
+            String probe = ( String ) newClassTable.getValueAt( rows[i] - i, 0 );
+            log.debug( "Removing " + probe );
+            Probe p = geneData.findProbe( probe );
+            assert p != null;
+
+            // remove all of the probes for the gene, not just the selected one (otherwise doesn't make much sense).
+            Collection<Probe> probes = new HashSet<Probe>();
+            for ( Gene g : p.getGenes() ) {
+                probes.addAll( g.getProbes() );
+            }
+
+            ncTableModel.removeProbes( probes );
+            sourceProbeModel.addProbes( probes );
+        }
+
+        updateCountLabel();
+    }
+
+    void editorGene_actionPerformed( ChangeEvent e ) {
+        String newGene = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
+
+        Gene g = geneData.findGene( newGene );
+        if ( g == null ) {
+            showError( "Gene " + newGene + " does not exist." );
+            return;
+        }
+
+        this.addGeneToSet( g );
+    }
+
+    void editorProbe_actionPerformed( ChangeEvent e ) {
+        String newProbe = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
+
+        Probe p = geneData.findProbe( newProbe );
+        if ( p == null ) {
+            showError( "Probe " + newProbe + " does not exist." );
+            return;
+        }
+        Gene g = p.getGene();
+        this.addGeneToSet( g );
+
+    }
+
+    void find() {
+        String searchOn = searchTextField.getText();
+
+        Collection<Probe> leftHandProbes = new HashSet<Probe>();
+        if ( searchOn.equals( "" ) ) {
+            leftHandProbes = geneData.getProbes();
+        } else {
+            leftHandProbes = geneData.findProbes( searchOn );
+        }
+        sourceProbeModel.setProbes( leftHandProbes );
+    }
+
+    void searchTextField_actionPerformed() {
+        find();
     }
 
     /**
@@ -318,37 +342,17 @@ public class GeneSetWizardStep2 extends WizardStep {
         newClassTable.revalidate();
         showStatus( "Available probes: " + geneData.numProbes() );
     }
+}
 
-    /**
-     * do a search.
-     */
-    public void searchButton_actionPerformed_adapter() {
-        find();
+class GeneSetWizardStep2_addButton_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetWizardStep2 adaptee;
+
+    GeneSetWizardStep2_addButton_actionAdapter( GeneSetWizardStep2 adaptee ) {
+        this.adaptee = adaptee;
     }
 
-    void searchTextField_actionPerformed() {
-        find();
-    }
-
-    void find() {
-        String searchOn = searchTextField.getText();
-
-        Collection<Probe> leftHandProbes = new HashSet<Probe>();
-        if ( searchOn.equals( "" ) ) {
-            leftHandProbes = geneData.getProbes();
-        } else {
-            leftHandProbes = geneData.findProbes( searchOn );
-        }
-        sourceProbeModel.setProbes( leftHandProbes );
-    }
-
-    /**
-     * Get the results of the user's picking.
-     * 
-     * @return
-     */
-    public Collection<Probe> getProbes() {
-        return this.ncTableModel.getProbes();
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.addProbesFromLeftTableToRight();
     }
 }
 
@@ -364,15 +368,19 @@ class GeneSetWizardStep2_delete_actionPerformed_actionAdapter implements java.aw
     }
 }
 
-class GeneSetWizardStep2_addButton_actionAdapter implements java.awt.event.ActionListener {
+class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
     GeneSetWizardStep2 adaptee;
 
-    GeneSetWizardStep2_addButton_actionAdapter( GeneSetWizardStep2 adaptee ) {
+    GeneSetWizardStep2_editorGeneAdaptor( GeneSetWizardStep2 adaptee ) {
         this.adaptee = adaptee;
     }
 
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.addProbesFromLeftTableToRight();
+    public void editingCanceled( ChangeEvent e ) {
+        editingCanceled( e );
+    }
+
+    public void editingStopped( ChangeEvent e ) {
+        adaptee.editorGene_actionPerformed( e );
     }
 }
 
@@ -383,32 +391,31 @@ class GeneSetWizardStep2_editorProbeAdaptor implements CellEditorListener {
         this.adaptee = adaptee;
     }
 
-    public void editingStopped( ChangeEvent e ) {
-        adaptee.editorProbe_actionPerformed( e );
-    }
-
     public void editingCanceled( ChangeEvent e ) {
         editingCanceled( e );
-    }
-}
-
-class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
-    GeneSetWizardStep2 adaptee;
-
-    GeneSetWizardStep2_editorGeneAdaptor( GeneSetWizardStep2 adaptee ) {
-        this.adaptee = adaptee;
     }
 
     public void editingStopped( ChangeEvent e ) {
-        adaptee.editorGene_actionPerformed( e );
-    }
-
-    public void editingCanceled( ChangeEvent e ) {
-        editingCanceled( e );
+        adaptee.editorProbe_actionPerformed( e );
     }
 }
 
 // hitting enter in search also activates it.
+
+class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {
+    GeneSetWizardStep2 adaptee;
+
+    public GeneSetWizardStep2_searchButton_actionAdapter( GeneSetWizardStep2 adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.searchButton_actionPerformed_adapter();
+    }
+
+}
+
+// respond to typing in the search field. - incremental search could go here.
 
 class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
     GeneSetWizardStep2 adaptee;
@@ -422,7 +429,7 @@ class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
     }
 }
 
-// respond to typing in the search field. - incremental search could go here.
+// respond to search request.
 
 class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
@@ -439,21 +446,6 @@ class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
     }
 
     public void keyTyped( KeyEvent e ) {
-    }
-
-}
-
-// respond to search request.
-
-class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {
-    GeneSetWizardStep2 adaptee;
-
-    public GeneSetWizardStep2_searchButton_actionAdapter( GeneSetWizardStep2 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.searchButton_actionPerformed_adapter();
     }
 
 }

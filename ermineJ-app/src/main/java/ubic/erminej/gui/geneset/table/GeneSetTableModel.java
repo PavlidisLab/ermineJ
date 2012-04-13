@@ -212,8 +212,8 @@ public class GeneSetTableModel extends AbstractTableModel {
     public Object getValueAt( int rowIndex, int colIndex ) {
 
         GeneSetTerm classid = gsl.get( rowIndex );
-        double minPvalue = 1e-50;
-        double maxLoggedPvalue = -Math.log10( minPvalue );
+        // double minPvalue = 1e-50;
+        // double maxLoggedPvalue = -Math.log10( minPvalue );
 
         if ( colIndex < INIT_COLUMNS ) {
             switch ( colIndex ) {

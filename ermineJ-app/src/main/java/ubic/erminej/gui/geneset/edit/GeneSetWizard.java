@@ -152,9 +152,11 @@ public class GeneSetWizard extends Wizard {
                     this.getContentPane().remove( step1 );
                     this.setTitle( "Define New Gene Set - Step 2 of 3" );
                 } else { // case 3 - editing an existing set.
-                    assert this.oldGeneSet != null;
+                    assert step1A.getSelectedGeneSet() != null;
+                    this.oldGeneSet = step1A.getSelectedGeneSet();
                     this.getContentPane().remove( step1A );
                     this.setTitle( "Modify Gene Set - Step 2 of 3" );
+                    step2.setStartingSet( oldGeneSet );
                 }
                 step = 2;
                 backButton.setEnabled( true );
@@ -329,21 +331,6 @@ public class GeneSetWizard extends Wizard {
         return step2.getProbes().size() != oldGeneSet.getProbes().size()
                 || !step2.getProbes().containsAll( oldGeneSet.getProbes() )
                 || !step3.getGeneSetName().equals( oldGeneSet.getName() );
-    }
-
-    public boolean getMakingNew() {
-        return makingNewGeneSet;
-    }
-
-    /**
-     * @param geneSet
-     */
-    public void setOriginalGeneSet( GeneSet geneSet ) {
-        this.oldGeneSet = geneSet;
-    }
-
-    public GeneSet getOriginalGeneSet() {
-        return this.oldGeneSet;
     }
 
 }

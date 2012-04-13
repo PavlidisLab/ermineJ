@@ -14,7 +14,6 @@
  */
 package ubic.erminej.gui.geneset;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +25,7 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSet;
 
 /**
- * Simpleified table model for listing gene sets (e.g. in a picker situation)
+ * Simplified table model for listing gene sets (e.g. in a picker situation)
  * 
  * @author paul
  * @version $Id$
@@ -35,8 +34,21 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
     private List<String> columnNames = new Vector<String>();
-    private NumberFormat nf = NumberFormat.getInstance();
     private List<GeneSet> geneSets = new ArrayList<GeneSet>();
+
+    @Override
+    public Class<?> getColumnClass( int columnIndex ) {
+        if ( columnIndex == 0 ) {
+            return String.class;
+        } else if ( columnIndex == 1 ) {
+            return String.class;
+        } else if ( columnIndex == 2 ) {
+            return Integer.class;
+        } else if ( columnIndex == 3 ) {
+            return Integer.class;
+        }
+        return String.class;
+    }
 
     /**
      * Offer up only the given gene sets
@@ -45,7 +57,6 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
      * @param geneSets
      */
     public SimpleGeneSetListTableModel( Collection<GeneSet> geneSets ) {
-        nf.setMaximumFractionDigits( 3 );
         columnNames.add( "Name" );
         columnNames.add( "Description" );
         columnNames.add( "# of Probes" );
@@ -60,7 +71,6 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
      */
     public SimpleGeneSetListTableModel( GeneAnnotations geneDat ) {
         this.geneSets.addAll( geneDat.getGeneSets() );
-        nf.setMaximumFractionDigits( 3 );
         columnNames.add( "Name" );
         columnNames.add( "Description" );
         columnNames.add( "# of Probes" );

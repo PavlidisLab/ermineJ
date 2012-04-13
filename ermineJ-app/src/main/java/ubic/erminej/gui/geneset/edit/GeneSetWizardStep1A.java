@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableRowSorter;
 
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSet;
@@ -52,14 +53,7 @@ public class GeneSetWizardStep1A extends WizardStep {
     private GeneAnnotations geneData = null;
     private JTable oldClassTable = null;
     private JTextField searchTextField = null;
-
-    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, Collection<GeneSet> geneSets ) {
-        super( wiz );
-        this.jbInit();
-        this.geneData = geneData;
-        wiz.clearStatus();
-        populateTables( geneSets );
-    }
+    private GeneSet selectedGeneSet;
 
     /**
      * Only show the user's sets
@@ -73,6 +67,48 @@ public class GeneSetWizardStep1A extends WizardStep {
         this.geneData = geneData;
         wiz.clearStatus();
         populateTables( null );
+    }
+
+    public GeneSetWizardStep1A( GeneSetWizard wiz, GeneAnnotations geneData, Collection<GeneSet> geneSets ) {
+        super( wiz );
+        this.jbInit();
+        this.geneData = geneData;
+        wiz.clearStatus();
+        populateTables( geneSets );
+    }
+
+    public void find() {
+        String searchOn = searchTextField.getText();
+        Collection<GeneSetTerm> terms;
+        if ( searchOn.equals( "" ) ) {
+            terms = geneData.getUserDefinedTerms();
+        } else {
+            terms = geneData.findSetsByName( searchOn );
+            terms.retainAll( geneData.getUserDefinedTerms() );
+        }
+        populateTables( geneData.getGeneSets( terms ) );
+    }
+
+    public GeneSet getSelectedGeneSet() {
+        return selectedGeneSet;
+    }
+
+    @Override
+    public boolean isReady() {
+        int n = oldClassTable.getSelectedRowCount();
+        if ( n < 1 ) {
+            showError( "You must pick a gene set to be modified." );
+            return false;
+        }
+
+        int row = oldClassTable.getSelectedRow();
+        String id = ( String ) oldClassTable.getValueAt( row, 0 );
+
+        this.selectedGeneSet = geneData.findGeneSet( id );
+        assert selectedGeneSet != null;
+
+        return true;
+
     }
 
     // Component initialization
@@ -130,24 +166,6 @@ public class GeneSetWizardStep1A extends WizardStep {
         this.addMain( step1MPanel );
     }
 
-    @Override
-    public boolean isReady() {
-        int n = oldClassTable.getSelectedRowCount();
-        if ( n < 1 ) {
-            showError( "You must pick a gene set to be modified." );
-            return false;
-        }
-
-        int row = oldClassTable.getSelectedRow();
-        String id = ( String ) oldClassTable.getValueAt( row, 0 );
-
-        GeneSet geneSet = geneData.findGeneSet( id );
-        assert geneSet != null;
-        ( ( GeneSetWizard ) this.getOwner() ).setOriginalGeneSet( geneSet );
-        return true;
-
-    }
-
     /**
      * @param geneSets
      */
@@ -158,8 +176,9 @@ public class GeneSetWizardStep1A extends WizardStep {
         } else {
             model = new SimpleGeneSetListTableModel( geneSets );
         }
-
-        oldClassTable.setAutoCreateRowSorter( true );
+        TableRowSorter<SimpleGeneSetListTableModel> sorter = new TableRowSorter<SimpleGeneSetListTableModel>( model );
+        oldClassTable.setRowSorter( sorter );
+        // oldClassTable.setAutoCreateRowSorter( true );
         oldClassTable.setModel( model );
         oldClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 30 );
         oldClassTable.getColumnModel().getColumn( 2 ).setPreferredWidth( 30 );
@@ -167,18 +186,6 @@ public class GeneSetWizardStep1A extends WizardStep {
         oldClassTable.revalidate();
 
         showStatus( "Available sets: " + geneData.numGeneSets() );
-    }
-
-    public void find() {
-        String searchOn = searchTextField.getText();
-        Collection<GeneSetTerm> terms;
-        if ( searchOn.equals( "" ) ) {
-            terms = geneData.getUserDefinedTerms();
-        } else {
-            terms = geneData.findSetsByName( searchOn );
-            terms.retainAll( geneData.getUserDefinedTerms() );
-        }
-        populateTables( geneData.getGeneSets( terms ) );
     }
 }
 
