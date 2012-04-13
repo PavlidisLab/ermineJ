@@ -393,10 +393,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 + runSettings.getMinClassSize() + "<br>" );
         if ( runSettings.getDoLog() ) tooltip += "Negative log transformed<br>";
 
-        if ( runSettings.useMultifunctionalityCorrection() ) {
-            tooltip += "Multifunctionality corrected<br>";
-        }
-
         if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) ) {
             tooltip += "Gene Rep Treatment: Mean <br>";
         } else if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) ) {

@@ -127,6 +127,25 @@ public class Settings extends SettingsHolder {
                 continue;
             }
 
+            /*
+             * Don't print out irrelevant settings
+             */
+            if ( propertyName.equals( GENE_SCORE_THRESHOLD_KEY ) && !settings.getClassScoreMethod().equals( Method.ORA ) ) {
+                continue;
+            } else if ( !settings.getClassScoreMethod().equals( Method.GSR ) ) {
+                if ( propertyName.equals( ITERATIONS ) ) {
+                    continue;
+                }
+
+                if ( propertyName.equals( GENE_SET_RESAMPLING_SCORE_METHOD ) ) {
+                    continue;
+                }
+
+                if ( propertyName.equals( ALWAYS_USE_EMPIRICAL ) ) {
+                    continue;
+                }
+            }
+
             out.write( propertyName + " = " );
             out.write( StringEscapeUtils.escapeJava( configToWrite.getProperty( propertyName ).toString() ) );
             out.write( "\n" );

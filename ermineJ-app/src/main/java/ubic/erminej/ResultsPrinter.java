@@ -34,6 +34,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
@@ -140,10 +141,14 @@ public class ResultsPrinter {
          * Add meta-information about the run. Treat it like a setting.
          */
         out.write( String.format( "multifunctionalityCorrelation=%.4f\n", resultRun.getMultifunctionalityCorrelation() ) );
-        out.write( String.format( "multifunctionalityEnrichment=%.4f\n", resultRun.getMultifunctionalityEnrichment() ) );
-        out.write( String.format( "multifunctionalityEnrichmentPvalue=%.4g\n",
-                resultRun.getMultifunctionalityEnrichmentPvalue() ) );
-        out.write( String.format( "numAboveThreshold=%d\n", resultRun.getNumAboveThreshold() ) );
+
+        if ( resultRun.getSettings().getClassScoreMethod().equals( Method.ORA ) ) {
+            out.write( String.format( "multifunctionalityEnrichment=%.4f\n",
+                    resultRun.getMultifunctionalityEnrichment() ) );
+            out.write( String.format( "multifunctionalityEnrichmentPvalue=%.4g\n",
+                    resultRun.getMultifunctionalityEnrichmentPvalue() ) );
+            out.write( String.format( "numAboveThreshold=%d\n", resultRun.getNumAboveThreshold() ) );
+        }
 
         out.write( END_OF_SETTINGS_SEPARATOR + "\n" );
         out.write( RUN_NAME_FIELD_PATTERN + resultRun.getName() + "\n" );
