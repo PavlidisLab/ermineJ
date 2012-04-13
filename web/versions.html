@@ -26,7 +26,9 @@
 		</tr>
 	</table>
 	<h2>Current version</h2>
-	<p>Version 3.0 - (April 2012) Many major and minor new features, numerous bug fixes, and major code rewrites:</p>
+	<p>Version 3.0 - (April 2012) Many major and minor new features, numerous bug fixes, and major code rewrites</p>
+	<p>Note that this version of ErmineJ is not completely backwards-compatible with previous versions. Your old results
+		files may not load properly, and old settings (erminej.properties) may not be read in completely.</p>
 	<ul>
 		<li>Application package for Mac OSX</li>
 		<li>Overhaul of management of user-defined (non-GO) gene groups. This simplifies the use of schemes such as KEGG.
@@ -60,6 +62,8 @@
 			flushed out. Perhaps the most serious was that it is not clear whether redundant gene sets were being excluded from
 			analyses (as they should). It is now much easier to find out how many gene sets there are, how many have genes, and
 			how many are redundant.</li>
+		<li>Output file format changes: The output is more informative so settings which were not used are not listed.
+			The output also now includes additional columns on multifunctionality.</li>
 		<li>Bug fix: Error handling is improved, so mysterious stoppages of analyses should be easier to diagnose.</li>
 		<li>Bug fix: Command line tool didn't correctly deal with correlation method when no score file was supplied.</li>
 		<li>Bug fix: Command line tool assumed gene scores were p-value like when validating the "threshold" option.</li>
