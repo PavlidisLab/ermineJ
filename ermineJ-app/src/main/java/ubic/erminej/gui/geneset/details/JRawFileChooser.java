@@ -30,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import org.apache.commons.lang.StringUtils;
+
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.MatrixPreviewer;
@@ -56,7 +58,9 @@ public class JRawFileChooser extends JFileChooser {
         m_options = new JRawFileChooserOptions( this, currentSettingForDataColumn );
         super.setAccessory( m_options );
 
-        this.setSelectedFile( new File( startPath ) );
+        if ( StringUtils.isNotBlank( startPath ) && new File( startPath ).exists() ) {
+            this.setSelectedFile( new File( startPath ) );
+        }
     }
 
     /**

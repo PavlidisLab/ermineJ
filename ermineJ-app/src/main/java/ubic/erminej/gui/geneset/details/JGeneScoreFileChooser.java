@@ -30,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import org.apache.commons.lang.StringUtils;
+
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.MatrixPreviewer;
@@ -55,7 +57,10 @@ public class JGeneScoreFileChooser extends JFileChooser {
         super.setAcceptAllFileFilterUsed( false );
         m_options = new JScoreChooserOptions( this, skipColumns );
         super.setAccessory( m_options );
-        this.setSelectedFile( new File( startPath ) );
+
+        if ( StringUtils.isNotBlank( startPath ) && new File( startPath ).exists() ) {
+            this.setSelectedFile( new File( startPath ) );
+        }
     }
 
     public int getStartColumn() {
