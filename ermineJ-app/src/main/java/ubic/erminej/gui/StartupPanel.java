@@ -192,7 +192,7 @@ public class StartupPanel extends JPanel {
         cancelButton.setText( "Quit" );
         helpButton.setText( "Help" );
         HelpHelper hh = new HelpHelper();
-        hh.initHelp( helpButton );
+        hh.initHelp( helpButton, settings );
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add( helpButton );

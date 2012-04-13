@@ -501,4 +501,8 @@ public class SettingsHolder {
         this.config.setProperty( SCORE_FILE, val );
     }
 
+    public String getHelpUrl() {
+        return this.config.getString( "help.url" );
+    }
+
 }

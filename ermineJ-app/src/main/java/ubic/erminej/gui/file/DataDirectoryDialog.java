@@ -87,7 +87,7 @@ public class DataDirectoryDialog extends AppDialog {
         addMain( centerPanel );
         this.setTitle( "Locate the data directory" );
         HelpHelper hh = new HelpHelper();
-        hh.initHelp( helpButton );
+        hh.initHelp( helpButton, settings );
     }
 
     void dataDirBrowseButton_actionPerformed() {

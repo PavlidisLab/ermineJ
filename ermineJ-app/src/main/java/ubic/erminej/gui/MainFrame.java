@@ -954,7 +954,7 @@ public class MainFrame extends JFrame {
         helpMenuItem.setMnemonic( 'T' );
 
         HelpHelper hh = new HelpHelper();
-        hh.initHelp( helpMenuItem );
+        hh.initHelp( helpMenuItem, settings );
 
         helpMenu.add( helpMenuItem );
         helpMenu.add( geneAnnotsWebLinkMenuItem );

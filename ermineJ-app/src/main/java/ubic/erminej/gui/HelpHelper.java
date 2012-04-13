@@ -18,12 +18,18 @@
  */
 package ubic.erminej.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
 
 import javax.help.CSH;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.swing.AbstractButton;
+
+import ubic.basecode.util.BrowserLauncher;
+import ubic.erminej.SettingsHolder;
+import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * Makes it easier to add help access wherever we want To use this, you can do the following, for example for a menu
@@ -49,20 +55,34 @@ public class HelpHelper {
      * @param c an AbstractButton (typically a JButton or JMenuItem) which will respond to help requests.
      * @return true if successful
      */
-    public boolean initHelp( AbstractButton c ) {
+    public boolean initHelp( AbstractButton c, final SettingsHolder settings ) {
 
-        // Create HelpSet and HelpBroker objects
-        HelpSet hs = getHelpSet( "classScore/main.hs" );
-        if ( hs != null ) {
-            m_helpBroker = hs.createHelpBroker();
-            // Assign help to components
-            CSH.setHelpIDString( c, "top" );
-            c.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
-            return true;
-        }
-        // GuiUtil.error( "Couldn't load help" );
-        System.err.println( "Couldn't load help" );
-        return false;
+        // // Create HelpSet and HelpBroker objects
+        // HelpSet hs = getHelpSet( "classScore/main.hs" );
+        // if ( hs != null ) {
+        // m_helpBroker = hs.createHelpBroker();
+        // // Assign help to components
+        // CSH.setHelpIDString( c, "top" );
+        // c.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
+        // return true;
+        // }
+        // // GuiUtil.error( "Couldn't load help" );
+        // System.err.println( "Couldn't load help" );
+        // return false;
+
+        c.addActionListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                try {
+                    BrowserLauncher.openURL( settings.getHelpUrl() );
+                } catch ( Exception e1 ) {
+                    GuiUtil.error( "Could not open a web browser. For help visit " + settings.getHelpUrl() );
+                }
+            }
+        } );
+
+        return true;
     }
 
     /**
