@@ -576,9 +576,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
     protected synchronized void expandNode( final TreePath parent, final boolean expand ) {
 
         if ( expand )
-            messenger.showStatus( "Expanding ..." );
+            messenger.showProgress( "Expanding" );
         else
-            messenger.showStatus( "Collapsing ..." );
+            messenger.showProgress( "Collapsing" );
 
         doExpandNode( parent, expand );
 

@@ -99,7 +99,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
             if ( res != null ) {
                 results.put( className, res );
                 if ( ++i % ALERT_UPDATE_FREQUENCY == 0 ) {
-                    getMessenger().showStatus( i + " gene sets analyzed" );
+                    getMessenger().showProgress( i + " gene sets analyzed" );
                 }
             }
         }

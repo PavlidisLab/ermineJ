@@ -351,7 +351,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 if ( ++count % 100 == 0 ) ifInterruptedStop();
                 if ( !quiet ) {
                     if ( getMessenger() != null && count % ALERT_UPDATE_FREQUENCY == 0 ) {
-                        getMessenger().showStatus( count + " gene sets analyzed" );
+                        getMessenger().showProgress( count + " gene sets analyzed" );
                     }
                 }
             }
@@ -359,7 +359,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         if ( results.isEmpty() ) return results;
 
-        GeneSetPvalRun. populateRanks( results );
+        GeneSetPvalRun.populateRanks( results );
         return results;
     }
 

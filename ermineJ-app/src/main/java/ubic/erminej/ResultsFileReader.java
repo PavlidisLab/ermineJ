@@ -69,7 +69,7 @@ public class ResultsFileReader {
             throws IOException, ConfigurationException {
         FileTools.testFile( filename );
 
-        messenger.showStatus( "Loading analysis..." );
+        messenger.showProgress( "Loading analysis..." );
 
         Collection<GeneSetPvalRun> finalResult = new LinkedHashSet<GeneSetPvalRun>();
 
@@ -84,6 +84,8 @@ public class ResultsFileReader {
             if ( loadedResults != null ) finalResult.add( loadedResults );
         }
         dis.close();
+
+        messenger.clear();
 
         return finalResult;
     }

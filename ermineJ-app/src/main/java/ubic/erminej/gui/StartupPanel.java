@@ -288,7 +288,7 @@ public class StartupPanel extends JPanel {
             SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    statusMessenger.showStatus( "Looking for annotation file ..." );
+                    statusMessenger.showProgress( "Looking for annotation file ..." );
 
                     try {
 
@@ -315,7 +315,7 @@ public class StartupPanel extends JPanel {
                         while ( ( read = inputStream.read( buffer ) ) > -1 ) {
                             outputStream.write( buffer, 0, read );
                             totalRead += read;
-                            statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read ..." );
+                            statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read ..." );
                         }
                         outputStream.close();
 
@@ -440,7 +440,7 @@ public class StartupPanel extends JPanel {
         SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
             @Override
             protected Object doInBackground() throws Exception {
-                statusMessenger.showStatus( "Looking for GO file ..." );
+                statusMessenger.showProgress( "Looking for GO file ..." );
 
                 try {
                     final String testPath = settings.getDataDirectory() + File.separator + DEFAULT_GO_TERM_FILE_NAME;
@@ -461,7 +461,7 @@ public class StartupPanel extends JPanel {
                     while ( ( read = inputStream.read( buffer ) ) > -1 ) {
                         outputStream.write( buffer, 0, read );
                         totalRead += read;
-                        statusMessenger.showStatus( "GO: " + totalRead + " bytes read ..." );
+                        statusMessenger.showProgress( "GO: " + totalRead + " bytes read ..." );
                     }
                     outputStream.close();
 

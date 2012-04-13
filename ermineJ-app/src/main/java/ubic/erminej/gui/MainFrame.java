@@ -67,10 +67,12 @@ import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -536,12 +538,11 @@ public class MainFrame extends JFrame {
                     if ( StringUtils.isNotBlank( projectFile ) ) loadAnalysis( projectFile );
 
                     ( ( CardLayout ) cards.getLayout() ).show( cards, TABS_CARD );
-                    statusMessenger.showStatus( "Ready." );
+
                     enableMenusOnStart();
-                    statusMessenger.showStatus( "Done with initialization." );
+                    statusMessenger.showStatus( "Ready." );
                 } catch ( Exception e ) {
-                    GuiUtil.error( "Error during initialization: " + e.getMessage() );
-                    log.error( e, e );
+                    GuiUtil.error( "Error during initialization: " + e.getMessage() ); 
                 }
                 return null;
             }
@@ -658,7 +659,7 @@ public class MainFrame extends JFrame {
         timer.start();
         updateProgress( 10 );
 
-        statusMessenger.showStatus( "Reading GO hierarchy from: " + settings.getClassFile() );
+        statusMessenger.showProgress( "Reading GO hierarchy from: " + settings.getClassFile() );
         assert settings.getClassFile() != null;
 
         GeneSetTerms goData = null;
@@ -666,12 +667,10 @@ public class MainFrame extends JFrame {
             goData = new GeneSetTerms( settings.getClassFile() );
         } catch ( SAXException e ) {
             GuiUtil.error( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid GO XML file." );
-            log.error( e, e );
+                    + "\nPlease check that it is a valid GO XML file." ); 
             return;
         } catch ( IOException e ) {
-            GuiUtil.error( "Error during GO initialization: " + e.getMessage() );
-            log.error( e, e );
+            GuiUtil.error( "Error during GO initialization: " + e.getMessage() ); 
             return;
         }
 
@@ -1119,8 +1118,7 @@ public class MainFrame extends JFrame {
                 r.execute();
 
             } catch ( IOException e ) {
-                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
-                log.error( e, e );
+                GuiUtil.error( "Error while loading the project: " + e.getMessage() ); 
                 return;
             } catch ( ConfigurationException e ) {
                 GuiUtil.error( "Error while loading the project: " + e.getMessage() );
@@ -1179,7 +1177,6 @@ public class MainFrame extends JFrame {
                 this.statusMessenger.showStatus( "Saved to " + selectedFile.getAbsolutePath() );
             } catch ( IOException e ) {
                 GuiUtil.error( "Could not save the project: " + e.getMessage() );
-                log.error( e, e );
             }
         }
 
@@ -1230,9 +1227,14 @@ public class MainFrame extends JFrame {
 
     private void setupStatusBar() {
         JLabel jLabelStatus = new JLabel();
-        jLabelStatus.setPreferredSize( new Dimension( 800, 25 ) );
+        jLabelStatus.setPreferredSize( new Dimension( 800, 20 ) );
+        jLabelStatus.setHorizontalTextPosition( SwingConstants.TRAILING );
+        jLabelStatus.setIconTextGap( 10 );
+        // jLabelStatus.setBorder( BorderFactory.createBevelBorder( BevelBorder.LOWERED ) );
+        // jLabelStatus.setIcon( new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/wait.gif" ) ) );
 
         statusBarPanel = new JPanel();
+        // statusBarPanel.setPreferredSize( new Dimension( 800, 20 ) );
         GroupLayout gl = new GroupLayout( statusBarPanel );
         statusBarPanel.setLayout( gl );
         statusBarPanel.setBorder( BorderFactory.createEtchedBorder() );

@@ -110,7 +110,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             ifInterruptedStop();
 
             if ( messenger != null ) {
-                messenger.showStatus( "Currently running class size " + geneSetSize );
+                messenger.showProgress( "Currently running class size " + geneSetSize );
             }
 
             double oldmean = Double.MAX_VALUE;

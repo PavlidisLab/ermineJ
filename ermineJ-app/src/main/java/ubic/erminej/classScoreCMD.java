@@ -719,7 +719,7 @@ public class classScoreCMD {
      * @throws IOException
      */
     protected GeneSetPvalRun analyze() throws IOException {
-        statusMessenger.showStatus( "Starting analysis..." );
+        statusMessenger.showProgress( "Starting analysis" );
         GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, statusMessenger );
         return runResult;
     }
@@ -730,20 +730,20 @@ public class classScoreCMD {
     protected void initialize() {
         try {
             statusMessenger = new StatusStderr();
-            statusMessenger.showStatus( "Reading GO descriptions from " + settings.getClassFile() );
+            statusMessenger.showProgress( "Reading GO descriptions from " + settings.getClassFile() );
 
             goData = new GeneSetTerms( settings.getClassFile() );
             GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
 
-            statusMessenger.showStatus( "Reading gene annotations from " + settings.getAnnotFile() );
+            statusMessenger.showProgress( "Reading gene annotations from " + settings.getAnnotFile() );
             if ( settings.getAnnotFormat().equals( Format.DEFAULT ) ) {
                 boolean filterNonSpecific = settings.getFilterNonSpecific();
                 parser.setFilterNonSpecific( filterNonSpecific );
             }
             geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat(), settings );
 
-            statusMessenger.showStatus( "Initializing gene class mapping" );
-            statusMessenger.showStatus( "Done with setup" );
+            statusMessenger.showProgress( "Initializing gene class mapping" );
+            statusMessenger.showProgress( "Done with setup" );
             statusMessenger.showStatus( "Ready." );
         } catch ( IOException e ) {
             statusMessenger.showStatus( "File reading or writing error during initialization: " + e.getMessage()

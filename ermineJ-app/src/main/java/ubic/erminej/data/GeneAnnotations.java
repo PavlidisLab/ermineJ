@@ -164,7 +164,7 @@ public class GeneAnnotations {
 
         Set<Probe> startProbes = new HashSet<Probe>( start.getProbes() ); // this has to get made.
 
-        messenger.showStatus( "Creating a subsetted annotation set for " + probes.size() + "/" + startProbes.size()
+        messenger.showProgress( "Creating a subsetted annotation set for " + probes.size() + "/" + startProbes.size()
                 + " probes)" );
 
         if ( probes.size() > start.numProbes() ) {
@@ -236,7 +236,7 @@ public class GeneAnnotations {
             this.addAnnotation( gene, terms );
 
             if ( i > 0 && i % 2000 == 0 ) {
-                this.messenger.showStatus( "Loaded info for " + i + " genes" );
+                this.messenger.showProgress( "Loaded info for " + i + " genes" );
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
@@ -245,7 +245,7 @@ public class GeneAnnotations {
             }
         }
 
-        this.messenger.showStatus( "Loaded info for " + this.genes.size() + " genes" );
+        this.messenger.showProgress( "Loaded info for " + this.genes.size() + " genes" );
 
         this.setUp();
     }
@@ -986,7 +986,7 @@ public class GeneAnnotations {
     private void addParents() {
 
         if ( messenger != null ) {
-            messenger.showStatus( "Inferring annotations in graph" );
+            messenger.showProgress( "Inferring annotations in graph" );
         }
         Map<Gene, Collection<GeneSetTerm>> toBeAdded = new HashMap<Gene, Collection<GeneSetTerm>>();
         Map<GeneSetTerm, Collection<GeneSetTerm>> parentCache = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
@@ -1016,7 +1016,7 @@ public class GeneAnnotations {
             }
 
             if ( ++count % 3000 == 0 && messenger != null ) {
-                messenger.showStatus( count + " genes examined for term parents ..." );
+                messenger.showProgress( count + " genes examined for term parents ..." );
             }
         }
 
@@ -1031,8 +1031,8 @@ public class GeneAnnotations {
         }
 
         if ( messenger != null ) {
-            messenger.showStatus( "Added " + numAnnotsAdded + " inferred annotations (affected " + affectedGenes + "/"
-                    + genes.size() + " genes)" );
+            messenger.showProgress( "Added " + numAnnotsAdded + " inferred annotations (affected " + affectedGenes
+                    + "/" + genes.size() + " genes)" );
         }
     }
 
@@ -1148,7 +1148,7 @@ public class GeneAnnotations {
         }
 
         if ( !removeUs.isEmpty() ) {
-            this.messenger.showStatus( "Pruning: " + removeUs.size() + "/" + startCount + " sets removed: obsolete ("
+            this.messenger.showProgress( "Pruning: " + removeUs.size() + "/" + startCount + " sets removed: obsolete ("
                     + obsoleteRemoved + "), too small (" + tooSmallRemoved + ") or too big (" + tooBigRemoved
                     + ") terms pruned." );
         }
@@ -1186,7 +1186,7 @@ public class GeneAnnotations {
 
         StopWatch timer = new StopWatch();
         timer.start();
-        messenger.showStatus( "There are " + numGeneSets()
+        messenger.showProgress( "There are " + numGeneSets()
                 + " gene sets in the annotations, checking for redundancy ..." );
 
         List<GeneSet> bySize = new ArrayList<GeneSet>( this.geneSets.values() );
@@ -1222,13 +1222,13 @@ public class GeneAnnotations {
                 gs2.addRedundantGroup( gs1 );
             }
             if ( i > 0 && i % 2000 == 0 ) {
-                messenger.showStatus( i + " sets checked for redundancy, " + numRedundant + " found ..." );
+                messenger.showProgress( i + " sets checked for redundancy, " + numRedundant + " found ..." );
             }
             if ( gs1.hasRedundancy() ) numRedundant++;
 
         }
 
-        messenger.showStatus( numRedundant + "/" + geneSets.size()
+        messenger.showProgress( numRedundant + "/" + geneSets.size()
                 + " gene sets are redundant with at least one other." );
 
         log.info( "Redundancy check: " + timer.getTime() + "ms" );
@@ -1265,7 +1265,7 @@ public class GeneAnnotations {
      * @param toSave
      */
     private void refreshRedundancyCheck( GeneSet toSave ) {
-        this.messenger.showStatus( "Updating redundancy information ..." );
+        this.messenger.showProgress( "Updating redundancy information ..." );
         toSave.clearRedundancy(); // reset it completely.
         Collection<Gene> genes1 = toSave.getGenes();
         sets: for ( GeneSet gs2 : this.geneSets.values() ) {

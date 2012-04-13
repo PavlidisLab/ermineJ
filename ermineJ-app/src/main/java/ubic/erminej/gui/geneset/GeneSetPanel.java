@@ -387,8 +387,7 @@ public abstract class GeneSetPanel extends JScrollPane {
                 } catch ( Exception ex ) {
                     GuiUtil.error( "There was an unexpected error while trying to display the gene "
                             + "set details.\nSee the log file for details.\nThe summary message was:\n"
-                            + ex.getMessage() );
-                    log.error( ex, ex );
+                            + ex.getMessage() ); 
                     messenger
                             .showError( "There was an unexpected error while trying to display the gene set details.\n"
                                     + "See the log file for details.\nThe summary message was:\n" + ex.getMessage() );

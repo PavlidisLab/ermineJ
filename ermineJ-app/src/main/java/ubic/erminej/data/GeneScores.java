@@ -488,7 +488,7 @@ public class GeneScores {
         }
 
         if ( messenger != null ) {
-            messenger.showStatus( "Reading gene scores from column " + scoreCol );
+            messenger.showProgress( "Reading gene scores from column " + scoreCol );
         }
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( new BufferedInputStream( is ) ) );

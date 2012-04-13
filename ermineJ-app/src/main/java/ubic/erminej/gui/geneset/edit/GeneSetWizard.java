@@ -239,7 +239,7 @@ public class GeneSetWizard extends Wizard {
     @Override
     protected void finishEditing( ActionEvent e ) {
 
-        messenger.showStatus( "Finishing ..." );
+        messenger.showProgress( "Finishing" );
 
         Collection<Probe> probes = step2.getProbes();
 
@@ -320,6 +320,8 @@ public class GeneSetWizard extends Wizard {
         } catch ( IOException e1 ) {
             GuiUtil.error( "Error writing the new gene set to file:", e1 );
         }
+
+        messenger.clear();
 
     }
 

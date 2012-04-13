@@ -231,7 +231,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
             }
 
             if ( m != null ) {
-                m.showStatus( "Generating background distribution for class size " + geneSetSize + " [maxiters = "
+                m.showProgress( "Generating background distribution for class size " + geneSetSize + " [maxiters = "
                         + numRuns + "]" );
             }
 

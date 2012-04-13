@@ -356,7 +356,7 @@ public class GeneAnnotationParser {
             }
 
             if ( messenger != null && n % LINES_READ_UPDATE_FREQ == 0 ) {
-                messenger.showStatus( "Read " + n + " probes" );
+                messenger.showProgress( "Read " + n + " probes" );
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
@@ -457,7 +457,7 @@ public class GeneAnnotationParser {
             }
 
             if ( messenger != null && n % LINES_READ_UPDATE_FREQ == 0 ) {
-                messenger.showStatus( "Read " + n + " probes" );
+                messenger.showProgress( "Read " + n + " probes" );
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
@@ -587,7 +587,7 @@ public class GeneAnnotationParser {
             }
 
             if ( messenger != null && ++n % LINES_READ_UPDATE_FREQ == 0 ) {
-                messenger.showStatus( "Read " + n + " probes" );
+                messenger.showProgress( "Read " + n + " probes" );
                 try {
                     Thread.sleep( 20 );
                 } catch ( InterruptedException e ) {

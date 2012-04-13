@@ -21,7 +21,6 @@ package ubic.erminej.gui.util;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CancellationException;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -40,7 +39,9 @@ public class StatusJlabel extends StatusDebugLogger {
 
     protected JLabel jlabel;
 
-    private static Icon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
+    private static ImageIcon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
+
+    private static ImageIcon waitingIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/wait.gif" ) );
 
     /*
      * How long we display error messages for by default. too short, user can't read it; too long, slows things donw.
@@ -49,6 +50,7 @@ public class StatusJlabel extends StatusDebugLogger {
 
     public StatusJlabel( JLabel l ) {
         this.jlabel = l;
+        this.jlabel.setIcon( null );
     }
 
     /*
@@ -130,6 +132,34 @@ public class StatusJlabel extends StatusDebugLogger {
 
     }
 
+    @Override
+    public void showProgress( String m ) {
+
+        String mm = m;
+
+        if ( StringUtils.isNotBlank( mm ) ) {
+            mm = mm + ( mm.endsWith( "..." ) ? "" : " ..." );
+        }
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            setLabel( mm, waitingIcon );
+        } else {
+            final String mf = mm;
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    public void run() {
+                        setLabel( mf, waitingIcon );
+                    }
+                } );
+            } catch ( InterruptedException ex ) {
+                ex.printStackTrace();
+            } catch ( InvocationTargetException ex ) {
+                ex.printStackTrace();
+            }
+        }
+        super.showProgress( mm );
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -178,16 +208,6 @@ public class StatusJlabel extends StatusDebugLogger {
         this.showStatus( s, true );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ubic.basecode.util.StatusDebugLogger#showStatus(java.lang.String, int)
-     */
-    @Override
-    public void showStatus( String s, int sleepSeconds ) {
-        super.showStatus( s, sleepSeconds );
-    }
-
     /** 
      */
     private void letUserReadMessage( int mswait ) {
@@ -201,9 +221,11 @@ public class StatusJlabel extends StatusDebugLogger {
     /**
      * @param m
      */
-    protected void setLabel( final String m, final Icon icon ) {
-        jlabel.setText( StringUtils.abbreviate( m, 300 ) );
+    protected void setLabel( final String message, final ImageIcon icon ) {
         jlabel.setIcon( icon );
-        jlabel.repaint();
+
+        jlabel.setText( StringUtils.abbreviate( message, 300 ) );
+
     }
+
 }

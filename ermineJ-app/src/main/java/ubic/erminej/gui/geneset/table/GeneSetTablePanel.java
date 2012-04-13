@@ -230,7 +230,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     @Override
     public void refreshView() {
 
-        this.messenger.showStatus( "Updating view" );
+        this.messenger.showProgress( "Updating view" );
 
         List<? extends SortKey> sortKeys = new ArrayList<SortKey>( sorter.getSortKeys() );
 
@@ -528,7 +528,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
             callingFrame.setCurrentResultSetIndex( _runnum );
         }
 
-        messenger.showStatus( "Viewing details for " + term + "..." );
+        messenger.showProgress( "Viewing details for " + term + "..." );
 
         showDetailsForGeneSet( term, run );
 
