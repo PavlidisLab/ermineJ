@@ -19,6 +19,9 @@
 package ubic.erminej.gui.util;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.font.TextAttribute;
 import java.util.Map;
 
@@ -61,6 +64,36 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
         this.setText( text );
         setURL( url );
         configure();
+    }
+
+    public void makeMouseListener() {
+        this.addMouseListener( new MouseListener() {
+
+            @Override
+            public void mouseClicked( MouseEvent e ) {
+                openUrl();
+            }
+
+            @Override
+            public void mouseEntered( MouseEvent e ) {
+                setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+
+            }
+
+            @Override
+            public void mouseExited( MouseEvent e ) {
+                setCursor( Cursor.getDefaultCursor() );
+            }
+
+            @Override
+            public void mousePressed( MouseEvent e ) {
+            }
+
+            @Override
+            public void mouseReleased( MouseEvent e ) {
+
+            }
+        } );
     }
 
     @Override

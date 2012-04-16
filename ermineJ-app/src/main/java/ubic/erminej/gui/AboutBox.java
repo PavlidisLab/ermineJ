@@ -63,7 +63,7 @@ public class AboutBox extends JDialog {
 
     private final static String COPYRIGHT = "<html>Copyright &copy; University of British Columbia</html>";
     private static final String SOFTWARENAME = "ermineJ";
-    private static String homepageURL = "http://www.chibi.ubc.ca/ermineJ/";
+    private static String homepageURL = "http://erminej.chibi.ubc.ca/";
 
     public AboutBox( Frame parent ) {
         super( parent, "About " + SOFTWARENAME, true );
@@ -114,7 +114,8 @@ public class AboutBox extends JDialog {
 
         JLinkLabel labelHomepage = new JLinkLabel( homepageURL, homepageURL );
         labelHomepage.setHorizontalAlignment( SwingConstants.CENTER );
-        labelHomepage.setPreferredSize( new Dimension( 200, 20 ) );
+        // labelHomepage.setPreferredSize( new Dimension( 200, 20 ) );
+        labelHomepage.makeMouseListener();
 
         JPanel blurbsPanel = new JPanel();
         blurbsPanel.setBackground( Color.white );
