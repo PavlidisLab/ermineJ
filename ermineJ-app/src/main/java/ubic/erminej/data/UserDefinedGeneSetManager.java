@@ -163,27 +163,27 @@ public class UserDefinedGeneSetManager {
      */
     public Collection<Gene> loadPlainGeneList( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
-        String row;
+        String line;
         Collection<Gene> genes = new ArrayList<Gene>();
 
         boolean probesNotFound = false;
-        while ( ( row = dis.readLine() ) != null ) {
-            if ( row.length() == 0 ) continue;
+        while ( ( line = dis.readLine() ) != null ) {
+            if ( StringUtils.isBlank( line ) ) continue;
 
-            if ( row.startsWith( "#" ) || row.startsWith( "=" ) ) continue;
+            if ( line.startsWith( "#" ) || line.startsWith( "=" ) ) continue;
 
-            row = StringUtils.strip( row );
+            line = StringUtils.strip( line );
 
-            Gene g = geneData.findGene( row );
+            Gene g = geneData.findGene( line );
             if ( g == null ) {
-                g = geneData.findGene( row.toUpperCase() );
+                g = geneData.findGene( line.toUpperCase() );
             }
             if ( g == null ) {
-                g = geneData.findGene( row.toLowerCase() );
+                g = geneData.findGene( line.toLowerCase() );
             }
 
             if ( g == null ) {
-                Probe p = geneData.findProbe( row );
+                Probe p = geneData.findProbe( line );
                 if ( p == null ) {
                     // log.warn( "Could not identify " + row ); // maybe we should add it.
                     probesNotFound = true;
