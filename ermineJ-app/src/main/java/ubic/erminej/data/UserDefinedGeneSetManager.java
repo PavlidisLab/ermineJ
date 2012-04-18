@@ -174,13 +174,7 @@ public class UserDefinedGeneSetManager {
 
             line = StringUtils.strip( line );
 
-            Gene g = geneData.findGene( line );
-            if ( g == null ) {
-                g = geneData.findGene( line.toUpperCase() );
-            }
-            if ( g == null ) {
-                g = geneData.findGene( line.toLowerCase() );
-            }
+            Gene g = geneData.findGeneCaseInsensitive( line );
 
             if ( g == null ) {
                 Probe p = geneData.findProbe( line );

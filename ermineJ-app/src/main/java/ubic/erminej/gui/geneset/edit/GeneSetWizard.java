@@ -154,7 +154,7 @@ public class GeneSetWizard extends Wizard {
                     this.getContentPane().remove( step1 );
                     this.setTitle( "Define New Gene Set - Step 2 of 3" );
 
-                    if ( !this.loadedGenes.isEmpty() ) {
+                    if ( this.loadedGenes != null && !this.loadedGenes.isEmpty() ) {
                         step2.setStartingSet( this.loadedGenes );
                     }
 

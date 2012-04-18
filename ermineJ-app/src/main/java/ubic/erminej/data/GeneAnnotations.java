@@ -356,19 +356,24 @@ public class GeneAnnotations {
     }
 
     /**
-     * Add a new set to the subclones.
+     * Remove a gene set (class) from all the maps that reference it. This basically completely removes the class, and
+     * it cannot be restored unless there is a backup. If it is user-defined it is deleted entirely from the
+     * GeneSetTerms tree.
      * 
-     * @param newSet
+     * @param id
      */
-    private void updateSubClones( GeneSet newSet ) {
-        for ( GeneAnnotations clone : this.subClones ) {
-            if ( clone.hasGeneSet( newSet.getTerm() ) ) {
-                throw new IllegalStateException( "Don't add sets to subclones that already have them!" );
-            }
-            clone.geneSetTerms.addUserDefinedTerm( newSet.getTerm() );
-            clone.geneSets.put( newSet.getTerm(), newSet );
-            if ( clone.multifunctionality != null ) clone.multifunctionality.setStale( true );
+    public void deleteGeneSet( GeneSetTerm id ) {
+
+        checkModifiability();
+
+        // deals with probes.
+        for ( Gene g : getGeneSetGenes( id ) ) {
+            g.removeGeneSet( id );
         }
+
+        geneSets.remove( id );
+
+        if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
     }
 
     // /**
@@ -404,27 +409,6 @@ public class GeneAnnotations {
     // }
 
     /**
-     * Remove a gene set (class) from all the maps that reference it. This basically completely removes the class, and
-     * it cannot be restored unless there is a backup. If it is user-defined it is deleted entirely from the
-     * GeneSetTerms tree.
-     * 
-     * @param id
-     */
-    public void deleteGeneSet( GeneSetTerm id ) {
-
-        checkModifiability();
-
-        // deals with probes.
-        for ( Gene g : getGeneSetGenes( id ) ) {
-            g.removeGeneSet( id );
-        }
-
-        geneSets.remove( id );
-
-        if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
-    }
-
-    /**
      * Remove a no-longer-needed subclone. This only removes the reference from this, if other objects maintain a
      * reference it will obviously not be freed.
      * 
@@ -453,6 +437,22 @@ public class GeneAnnotations {
      */
     public Gene findGene( String symbol ) {
         return this.genes.get( symbol );
+    }
+
+    /**
+     * @param symbol
+     * @return
+     */
+    public Gene findGeneCaseInsensitive( String symbol ) {
+        Gene g = this.findGene( symbol );
+        if ( g != null ) return g;
+
+        // try upper and lower case.
+        g = this.findGene( symbol.toUpperCase() );
+        if ( g == null ) {
+            return this.findGene( symbol.toLowerCase() );
+        }
+        return g;
     }
 
     /**
@@ -1357,6 +1357,22 @@ public class GeneAnnotations {
         redundancyCheck( start );// fast
 
         this.multifunctionality = new Multifunctionality( this, this.messenger ); // ~1s
+    }
+
+    /**
+     * Add a new set to the subclones.
+     * 
+     * @param newSet
+     */
+    private void updateSubClones( GeneSet newSet ) {
+        for ( GeneAnnotations clone : this.subClones ) {
+            if ( clone.hasGeneSet( newSet.getTerm() ) ) {
+                throw new IllegalStateException( "Don't add sets to subclones that already have them!" );
+            }
+            clone.geneSetTerms.addUserDefinedTerm( newSet.getTerm() );
+            clone.geneSets.put( newSet.getTerm(), newSet );
+            if ( clone.multifunctionality != null ) clone.multifunctionality.setStale( true );
+        }
     }
 
 }
