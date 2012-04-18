@@ -158,10 +158,10 @@ public class UserDefinedGeneSetManager {
      * Read in a list of genes or probe ids from a file. The list of genes is unadorned, one per row.
      * 
      * @param fileName
-     * @return incomplete gene set. The caller has to arrange for this to be finished.
+     * @return list of genes that match ones in the file
      * @throws IOException
      */
-    public GeneSet loadPlainGeneList( String fileName ) throws IOException {
+    public Collection<Gene> loadPlainGeneList( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
         String row;
         Collection<Gene> genes = new ArrayList<Gene>();
@@ -170,7 +170,18 @@ public class UserDefinedGeneSetManager {
         while ( ( row = dis.readLine() ) != null ) {
             if ( row.length() == 0 ) continue;
 
+            if ( row.startsWith( "#" ) || row.startsWith( "=" ) ) continue;
+
+            row = StringUtils.strip( row );
+
             Gene g = geneData.findGene( row );
+            if ( g == null ) {
+                g = geneData.findGene( row.toUpperCase() );
+            }
+            if ( g == null ) {
+                g = geneData.findGene( row.toLowerCase() );
+            }
+
             if ( g == null ) {
                 Probe p = geneData.findProbe( row );
                 if ( p == null ) {
@@ -188,7 +199,6 @@ public class UserDefinedGeneSetManager {
         if ( genes.isEmpty() && numTimesWarnedOfProblems < MAX_WARNINGS ) {
             statusMessenger.showError( "None of the items in your file matched the current annotations." );
             numTimesWarnedOfProblems++;
-            return null;
         }
 
         if ( probesNotFound && numTimesWarnedOfProblems < MAX_WARNINGS ) {
@@ -197,12 +207,7 @@ public class UserDefinedGeneSetManager {
             numTimesWarnedOfProblems++;
         }
 
-        GeneSet result = new GeneSet();
-        result.setGenes( genes );
-        result.setSourceFile( null ); // if we rewrite it, it will be a new file.
-        result.setUserDefined( true );
-        result.getTerm().setAspect( GeneSetTerms.USER_DEFINED );
-        return result;
+        return genes;
     }
 
     /**

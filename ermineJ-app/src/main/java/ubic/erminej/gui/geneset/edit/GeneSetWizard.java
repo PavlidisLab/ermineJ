@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSet;
@@ -61,6 +62,7 @@ public class GeneSetWizard extends Wizard {
 
     private GeneSet oldGeneSet;
     private StatusViewer messenger = new StatusStderr();
+    private Collection<Gene> loadedGenes;
 
     /**
      * Use this constructor to let the user choose which gene set to look at or to make a new one.
@@ -140,7 +142,7 @@ public class GeneSetWizard extends Wizard {
             if ( makingNewGeneSet || step1A.isReady() ) { // not (case 3 with no class picked)
                 if ( makingNewGeneSet && step1.getInputMethod() == 1 ) { // case 2, load from file
                     try {
-                        this.oldGeneSet = geneData.loadPlainGeneList( step1.getLoadFile() );
+                        this.loadedGenes = geneData.loadPlainGeneList( step1.getLoadFile() );
                     } catch ( IOException e1 ) {
                         GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
                                 + " the file is readable." );
@@ -151,6 +153,11 @@ public class GeneSetWizard extends Wizard {
                     // at this point we don't have any information except the method they will use
                     this.getContentPane().remove( step1 );
                     this.setTitle( "Define New Gene Set - Step 2 of 3" );
+
+                    if ( !this.loadedGenes.isEmpty() ) {
+                        step2.setStartingSet( this.loadedGenes );
+                    }
+
                 } else { // case 3 - editing an existing set.
                     assert step1A.getSelectedGeneSet() != null;
                     this.oldGeneSet = step1A.getSelectedGeneSet();
@@ -285,6 +292,8 @@ public class GeneSetWizard extends Wizard {
             // make a new one.
             GeneSetTerm newGeneSetT = new GeneSetTerm( id, desc );
             toSave = new GeneSet( newGeneSetT );
+            toSave.setUserDefined( true );
+            toSave.setGenes( this.loadedGenes );
         }
 
         toSave.setUserDefined( true );

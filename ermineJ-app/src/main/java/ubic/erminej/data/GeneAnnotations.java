@@ -749,7 +749,7 @@ public class GeneAnnotations {
         return !this.allowModification;
     }
 
-    public GeneSet loadPlainGeneList( String loadFile ) throws IOException {
+    public Collection<Gene> loadPlainGeneList( String loadFile ) throws IOException {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
         return this.userDefinedGeneSetManager.loadPlainGeneList( loadFile );
     }

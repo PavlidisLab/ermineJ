@@ -224,6 +224,7 @@ public class GeneSet {
     }
 
     public void setUserDefined( boolean isUserDefined ) {
+        if ( term == null ) return;
         this.term.setUserDefined( isUserDefined );
     }
 

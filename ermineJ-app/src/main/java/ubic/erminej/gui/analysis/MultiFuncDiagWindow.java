@@ -107,7 +107,7 @@ public class MultiFuncDiagWindow extends JFrame {
 
     /**
      * @param geneAnnots
-     * @param geneScores must be already log-tranformed (if requested)
+     * @param geneScores must be already log-transformed (if requested)
      * @return
      */
     private JPanel regressed( GeneAnnotations geneAnnots, GeneScores geneScores ) {

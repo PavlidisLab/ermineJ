@@ -85,7 +85,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         this.jbInit();
         this.geneData = geneData;
         wiz.clearStatus();
-        populateTables(); 
+        populateTables();
     }
 
     /**
@@ -200,6 +200,14 @@ public class GeneSetWizardStep2 extends WizardStep {
         jLabel2.setText( original.toString() );
         this.ncTableModel.setProbes( original.getProbes() );
         this.sourceProbeModel.removeProbes( original.getProbes() );
+    }
+
+    protected void setStartingSet( Collection<Gene> genes ) {
+        for ( Gene gene : genes ) {
+            this.ncTableModel.addProbes( gene.getProbes() );
+            this.sourceProbeModel.removeProbes( gene.getProbes() );
+        }
+
     }
 
     /**
@@ -342,6 +350,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         newClassTable.revalidate();
         showStatus( "Available probes: " + geneData.numProbes() );
     }
+
 }
 
 class GeneSetWizardStep2_addButton_actionAdapter implements java.awt.event.ActionListener {
