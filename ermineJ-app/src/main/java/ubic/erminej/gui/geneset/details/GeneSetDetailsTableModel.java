@@ -67,16 +67,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     private String urlbase = DEFAULT_GENE_URL_BASE;
 
-    protected static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
+    private static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
 
-    // private static final String RESOURCE_LOCATION = "/ubic/erminej/";
-
-    // private final Icon gemmaIcon = new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "/gemmaTiny.gif" )
-    // );
-
-    QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
-    QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
-    // private Map<Probe, Double> mfRanks = new HashMap<Probe, Double>();
+    private QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
+    private QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
     private Map<Probe, Double> multifuncForProbesInSet = new HashMap<Probe, Double>();
     private Map<Gene, Double> multifuncForGenesInSet = new HashMap<Gene, Double>();
     private Map<Gene, Double> mfGeneRanks = new HashMap<Gene, Double>();
@@ -275,38 +269,6 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         }
     } // end getValueAt
 
-    private void createLinkLabels() {
-        assert probeIDs != null;
-
-        /*
-         * Each is a little panel that has multiple labels in a
-         */
-
-        this.linkLabels = new HashMap<Gene, JLinkLabel>();
-        for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
-            final Probe probe = iter.next();
-            Gene gene = probe.getGene();
-            if ( gene == null ) {
-                continue;
-            }
-            String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene.getSymbol() );
-
-            // JPanel p = new JPanel();
-            // p.setName( "Panel for " + probe );
-            // p.setBackground( Color.WHITE );
-            // p.setLayout( new BoxLayout( p, BoxLayout.LINE_AXIS ) );
-            // p.setAlignmentY( Component.BOTTOM_ALIGNMENT );
-            // p.setOpaque( false );
-
-            JLinkLabel baseLink = new JLinkLabel( gene.getSymbol(), url );
-            // p.add( );
-            // p.add( new JLinkLabel( gemmaIcon, "" ) );
-
-            linkLabels.put( gene, baseLink );
-        }
-        this.fireTableDataChanged();
-    }
-
     /**
      * 
      */
@@ -320,5 +282,24 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
             log.warn( "No gene tag in user's url base" );
         }
         this.createLinkLabels();
+    }
+
+    /**
+     * 
+     */
+    private void createLinkLabels() {
+        assert probeIDs != null;
+        this.linkLabels = new HashMap<Gene, JLinkLabel>();
+        for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            final Probe probe = iter.next();
+            Gene gene = probe.getGene();
+            if ( gene == null ) {
+                continue;
+            }
+            String url = urlbase.replaceFirst( URL_REPLACE_TAG, gene.getSymbol() );
+            JLinkLabel baseLink = new JLinkLabel( gene.getSymbol(), url );
+            linkLabels.put( gene, baseLink );
+        }
+        this.fireTableDataChanged();
     }
 } // end class DetailsTableModel

@@ -231,6 +231,7 @@ public class GeneSetTerms {
             GeneSetTerm goEntry = parent.getItem();
             if ( goEntry == null ) continue;
             if ( goEntry.getId().equals( "all" ) ) continue;
+            if ( goEntry.getId().equals( "top" ) ) continue; // very old GO
             if ( goEntry.isAspect() ) continue;
             returnVal.add( goEntry );
         }

@@ -26,15 +26,11 @@ import java.awt.font.TextAttribute;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import ubic.basecode.util.BrowserLauncher;
 
 /**
- * Note that this cannot be a mouselistener because of limitations in how Java makes tables -- the cells is not a
- * component (for performance reasons). Thus clicks on this have to be handled by a container.
- * 
  * @author Will Braynen
  * @version $Id$
  */
@@ -42,30 +38,30 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
 
     private static final long serialVersionUID = -1L;
 
-    protected String m_url = null;
-
-    protected String m_text = "";
-
-    /** Creates a new instance of JLinkLabel */
-    public JLinkLabel() {
-        super();
-        configure();
-    }
-
-    public JLinkLabel( Icon icon, String url ) {
-        super();
-        this.setIcon( icon );
-        setURL( url );
-        configure();
-    }
+    protected String url = null;
 
     public JLinkLabel( String text, String url ) {
         super();
         this.setText( text );
-        setURL( url );
+        this.url = url;
         configure();
     }
 
+    @Override
+    public int compareTo( JLinkLabel o ) {
+        return this.getText().compareTo( o.getText() );
+    }
+
+    /**
+     * @return
+     */
+    public String getURL() {
+        return url;
+    }
+
+    /**
+     * If this is to be used outside of a JTable rendering context, you should call this method.
+     */
     public void makeMouseListener() {
         this.addMouseListener( new MouseListener() {
 
@@ -96,22 +92,10 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
         } );
     }
 
-    @Override
-    public int compareTo( JLinkLabel o ) {
-        return this.m_text.compareTo( o.m_text );
-    }
-
-    /**
-     * @return
-     */
-    public String getURL() {
-        return m_url;
-    }
-
     public void openUrl() {
-        if ( m_url != null ) {
+        if ( url != null ) {
             try {
-                BrowserLauncher.openURL( m_url );
+                BrowserLauncher.openURL( url );
             } catch ( Exception ex ) {
                 GuiUtil.error( "Could not open a web browser window:\n" + ex.getMessage() );
             }
@@ -119,38 +103,16 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
     }
 
     @Override
-    public void setText( String text ) {
-        if ( m_url != null ) {
-            setText( text, m_url );
-        } else {
-            setText( text, text );
-        }
-    }
-
-    public void setText( String text, String url ) {
-        m_text = text;
-        m_url = url.replaceFirst( "\\|.+", "" ); // multigene.
-        super.setText( text );
-    }
-
-    /**
-     * @param url
-     */
-    public void setURL( String url ) {
-        setText( m_text, url );
-    }
-
-    @Override
     public String toString() {
-        return "<html><a href=\"" + m_url + "\">" + m_text + "</a></html>";
+        return "<html><a href=\"" + url + "\">" + getText() + "</a></html>";
     }
 
     @SuppressWarnings("unchecked")
     private void configure() {
         this.setBackground( Color.WHITE );
         this.setForeground( Color.BLUE );
+        this.setOpaque( true );
         this.setBorder( BorderFactory.createEmptyBorder( 0, 5, 0, 5 ) );
-        this.setOpaque( false );
         @SuppressWarnings("rawtypes")
         Map attrs = this.getFont().getAttributes();
         attrs.put( TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL );

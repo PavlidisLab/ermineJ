@@ -20,8 +20,6 @@ package ubic.erminej.gui.table;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.text.DecimalFormat;
-
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -41,17 +39,9 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
 
     MatrixDisplay<Probe, String> m_matrixDisplay;
 
-    // to format tooltips
-    DecimalFormat m_scientificNotation = new DecimalFormat( "0.##E0" );
-    DecimalFormat m_regular = new DecimalFormat();
-
     public JMatrixCellRenderer( MatrixDisplay<Probe, String> matrixDisplay ) {
-
         m_matrixDisplay = matrixDisplay;
         setOpaque( true );
-
-        // for tooltips
-        m_regular.setMaximumFractionDigits( 3 );
     }
 
     // This method is called each time a cell in a column
@@ -61,54 +51,59 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
         // 'value' is value contained in the cell located at
         // (rowIndex, vColIndex)
 
-        if ( isSelected ) {
-            // cell (and perhaps other cells) are selected
-        }
-
-        if ( hasFocus ) {
-            // this cell is the anchor and the table has the focus
-        }
-
         MatrixPoint coords = ( MatrixPoint ) tableCellValue;
         int row = coords.x;
         int column = coords.y;
 
-        // Set the color
         Color matrixColor;
         try {
             matrixColor = m_matrixDisplay.getColor( row, column );
         } catch ( ArrayIndexOutOfBoundsException e ) {
             matrixColor = m_matrixDisplay.getMissingColor();
         }
-        setBackground( matrixColor );
+        if ( isSelected || hasFocus ) {
+            // this cell is the anchor and the table has the focus
+            if ( isSelected || hasFocus ) {
+                // blend colours
+                float[] col1comps = new float[3];
+                col1comps = table.getSelectionBackground().getColorComponents( col1comps );
+                float[] col2comps = new float[3];
+                col2comps = matrixColor.getColorComponents( col2comps );
 
-        // The tooltip should always show the actual (non-normalized) value; temporarily switch it (HACK)
-        double matrixValue;
-        boolean isStandardized = m_matrixDisplay.getStandardizedEnabled();
-        m_matrixDisplay.setStandardizedEnabled( false );
-        {
-            try {
-                matrixValue = m_matrixDisplay.getValue( row, column );
-            } catch ( ArrayIndexOutOfBoundsException e ) {
-                matrixValue = Double.NaN;
+                float r = 0.2f;
+                matrixColor = new Color( col1comps[0] * r + col2comps[0] * ( 1.0f - r ), col1comps[1] * r
+                        + col2comps[1] * ( 1.0f - r ), col1comps[2] * r + col2comps[2] * ( 1.0f - r ) );
             }
+
         }
-        m_matrixDisplay.setStandardizedEnabled( isStandardized ); // return to
-        // previous
-        // state
+
+        // Set the color
+
+        this.setBackground( matrixColor );
+
+        setToolTip( row, column );
+
+        // Since the renderer is a component, return itself
+        return this;
+    }
+
+    /**
+     * @param row
+     * @param column
+     */
+    private void setToolTip( int row, int column ) {
+        // The tooltip should always show the actual (non-normalized) value
+        double matrixValue = m_matrixDisplay.getRawValue( row, column );
 
         // Only very small and very large numbers should be displayed in
         // scientific notation
         String value;
         if ( Math.abs( matrixValue ) < 0.01 || Math.abs( matrixValue ) > 100000 ) {
-            value = m_scientificNotation.format( matrixValue );
+            value = String.format( "%.3g", matrixValue );
         } else {
-            value = m_regular.format( matrixValue );
+            value = String.format( "%.2f", matrixValue );
         }
         setToolTipText( value );
-
-        // Since the renderer is a component, return itself
-        return this;
     }
 
     // The following methods override the defaults for performance reasons

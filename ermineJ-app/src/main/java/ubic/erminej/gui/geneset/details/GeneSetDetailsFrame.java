@@ -614,7 +614,6 @@ public class GeneSetDetailsFrame extends JFrame {
                     setBackground( Colors.LIGHTRED5 );
                 } else {
                     setBackground( Color.WHITE );
-                    // setOpaque( true );
                 }
 
                 setForeground( Color.BLACK );
@@ -813,9 +812,6 @@ public class GeneSetDetailsFrame extends JFrame {
 
         // change the cursor to a hand over a header
         table.getTableHeader().addMouseListener( new JGeneSetFrameTableHeader_mouseAdapterCursorChanger( this ) );
-
-        // Make sure the matrix display doesn't have a grid separating color cells.
-        table.setIntercellSpacing( new Dimension( 0, 0 ) );
 
         // The rest of the table (text and value) should have a light gray grid
         table.setGridColor( Color.lightGray );
