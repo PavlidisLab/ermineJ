@@ -48,7 +48,7 @@ public class GeneAnnotationParser {
     private static final int LINES_READ_UPDATE_FREQ = 2500;
 
     public enum Format {
-        DEFAULT, AFFYCSV, AGILENT
+        DEFAULT, AFFYCSV, AGILENT, SIMPLE
     }
 
     private static Log log = LogFactory.getLog( GeneAnnotationParser.class.getName() );
@@ -95,7 +95,7 @@ public class GeneAnnotationParser {
         GeneAnnotations result = null;
         switch ( format ) {
             case DEFAULT:
-                result = this.readDefault( i, settings );
+                result = this.readDefault( i, settings, false );
                 break;
             case AFFYCSV:
                 result = this.readAffyCsv( i, settings );
@@ -103,6 +103,8 @@ public class GeneAnnotationParser {
             case AGILENT:
                 result = this.readAgilent( i, settings );
                 break;
+            case SIMPLE:
+                result = this.readDefault( i, settings, true );
             default:
                 throw new IllegalStateException();
         }
@@ -207,8 +209,15 @@ public class GeneAnnotationParser {
         return this.readAgilent( bis, null, settings );
     }
 
-    private GeneAnnotations readDefault( InputStream bis, SettingsHolder settings ) throws IOException {
-        return this.readDefault( bis, null, settings );
+    /**
+     * @param bis
+     * @param settings
+     * @param simple
+     * @return
+     * @throws IOException
+     */
+    private GeneAnnotations readDefault( InputStream bis, SettingsHolder settings, boolean simple ) throws IOException {
+        return this.readDefault( bis, null, settings, simple );
     }
 
     /**
@@ -491,11 +500,14 @@ public class GeneAnnotationParser {
      * if we can, but doesn't directly effect most calculations.
      * 
      * @param bis
+     * @param genes
      * @param settings
+     * @param simple If true, assume two-column format with GO terms pipe-delimited in column 2, and only one gene per
+     *        row (no ABC|ABC2 stuff)
      * @throws IOException
      */
-    public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, SettingsHolder settings )
-            throws IOException {
+    public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, SettingsHolder settings,
+            boolean simple ) throws IOException {
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         Map<String, Gene> genes = new HashMap<String, Gene>();
@@ -512,39 +524,42 @@ public class GeneAnnotationParser {
             }
 
             String[] tokens = line.split( "\t" );
-            int length = tokens.length;
-            if ( length < 2 ) continue;
-
-            String probeId = tokens[0];
-
-            if ( probeId.matches( "AFFX.*" ) ) {
-                continue;
-            }
-
-            String geneName = tokens[1];
-
-            // correctly deal with things like Nasp|Nasp or Nasp|Nasp2
-            if ( geneName.matches( ".+?[\\|,].+?" ) ) {
-                String[] multig = geneName.split( "[\\|,]" );
-                Collection<String> multigenes = new HashSet<String>();
-                for ( String g : multig ) {
-                    // log.debug( g + " found in " + geneName );
-                    multigenes.add( g );
-                }
-
-                if ( multigenes.size() > 1 && filterNonSpecific ) {
+            int numTokens = tokens.length;
+            if ( numTokens < 2 ) continue;
+            String geneName = "";
+            String probeId = "";
+            String description = NO_DESCRIPTION;
+            if ( simple ) {
+                geneName = tokens[0];
+                probeId = geneName;
+            } else {
+                probeId = tokens[0];
+                if ( probeId.matches( "AFFX.*" ) ) {
                     continue;
                 }
+                geneName = tokens[1];
 
-                geneName = multigenes.iterator().next();
-            }
+                // correctly deal with things like Nasp|Nasp or Nasp|Nasp2
+                if ( geneName.matches( ".+?[\\|,].+?" ) ) {
+                    String[] multig = geneName.split( "[\\|,]" );
+                    Collection<String> multigenes = new HashSet<String>();
+                    for ( String g : multig ) {
+                        // log.debug( g + " found in " + geneName );
+                        multigenes.add( g );
+                    }
 
-            /* read gene description */
-            String description = "";
-            if ( length >= 3 ) {
-                description = tokens[2];
-            } else {
-                description = NO_DESCRIPTION;
+                    if ( multigenes.size() > 1 && filterNonSpecific ) {
+                        continue;
+                    }
+
+                    geneName = multigenes.iterator().next();
+                }
+                /* read gene description */
+                if ( numTokens >= 3 ) {
+                    description = tokens[2];
+                } else {
+                    description = NO_DESCRIPTION;
+                }
             }
 
             Probe probe = new Probe( probeId, description );
@@ -566,23 +581,32 @@ public class GeneAnnotationParser {
             }
 
             /* read GO data */
-            if ( length >= 4 ) {
-                String classIds = tokens[3];
+            if ( simple ) {
+                String classIds = tokens[1];
                 Collection<GeneSetTerm> goTerms = extractPipeDelimitedGoIds( classIds );
-
                 for ( GeneSetTerm term : goTerms ) {
                     gene.addGeneSet( term );
                     probe.addToGeneSet( term );
                 }
-            }
+            } else {
+                if ( numTokens >= 4 ) {
+                    String classIds = tokens[3];
+                    Collection<GeneSetTerm> goTerms = extractPipeDelimitedGoIds( classIds );
 
-            if ( length >= 6 ) {
-                // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
-                String ncbiID = tokens[5];
-                try {
-                    gene.setNcbiId( Integer.parseInt( ncbiID ) );
-                } catch ( NumberFormatException e ) {
-                    // no big deal
+                    for ( GeneSetTerm term : goTerms ) {
+                        gene.addGeneSet( term );
+                        probe.addToGeneSet( term );
+                    }
+                }
+
+                if ( numTokens >= 6 ) {
+                    // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
+                    String ncbiID = tokens[5];
+                    try {
+                        gene.setNcbiId( Integer.parseInt( ncbiID ) );
+                    } catch ( NumberFormatException e ) {
+                        // no big deal
+                    }
                 }
             }
 

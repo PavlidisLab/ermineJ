@@ -206,7 +206,7 @@ public class TestGeneAnnotations extends TestCase {
 
     public void testReadCommaDelimited() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        GeneAnnotations g = p.readDefault( imb, null, settings );
+        GeneAnnotations g = p.readDefault( imb, null, settings, false );
 
         Probe probe = g.findProbe( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
@@ -319,9 +319,20 @@ public class TestGeneAnnotations extends TestCase {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         settings = new Settings( false );
         settings.setProperty( "useUserDefinedGroups", false );
-        ga = p.readDefault( im, null, settings );
+        ga = p.readDefault( im, null, settings, false );
         ga.setMessenger( new StatusStderr() );
 
+    }
+
+    public void testSimple() throws Exception {
+        InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
+        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
+        GeneAnnotations r = p.readDefault( i, null, settings, true );
+        assertEquals( 9, r.getGenes().size() );
+
+        Gene g = r.findGene( "TAH1" );
+        assertNotNull( g );
+        assertTrue( g.getGeneSets().contains( new GeneSetTerm( "GO:0005737" ) ) );
     }
 
     /**

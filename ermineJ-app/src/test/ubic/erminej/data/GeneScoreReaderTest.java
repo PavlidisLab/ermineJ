@@ -56,7 +56,7 @@ public class GeneScoreReaderTest extends TestCase {
         GeneSetTerms geneSetTerms = new GeneSetTerms(
                 GeneScoreReaderTest.class.getResourceAsStream( "/data/go-termdb-test.xml" ) );
         GeneAnnotationParser p = new GeneAnnotationParser( geneSetTerms );
-        GeneAnnotations g = p.readDefault( ism, null, s );
+        GeneAnnotations g = p.readDefault( ism, null, s, false );
 
         test = new GeneScores( is, s, null, g );
         super.setUp();
