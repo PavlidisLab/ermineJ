@@ -106,7 +106,7 @@ public class GeneAnnotationParser {
             case SIMPLE:
                 result = this.readDefault( i, settings, true );
             default:
-                throw new IllegalStateException();
+                throw new IllegalStateException( "No such format: " + format );
         }
 
         return result;

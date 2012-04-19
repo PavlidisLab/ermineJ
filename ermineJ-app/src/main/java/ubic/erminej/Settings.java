@@ -240,8 +240,11 @@ public class Settings extends SettingsHolder {
                 case 2:
                     setAnnotFormat( Format.AGILENT );
                     break;
+                case 3:
+                    setAnnotFormat( Format.SIMPLE );
+                    break;
                 default:
-                    throw new IllegalStateException();
+                    throw new IllegalStateException( "Format could not be identified: " + storedValue );
             }
             storedValue = config.getString( ANNOT_FORMAT, Format.DEFAULT.toString() );
         }
