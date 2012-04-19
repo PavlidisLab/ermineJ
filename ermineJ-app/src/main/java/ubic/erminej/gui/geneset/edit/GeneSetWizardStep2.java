@@ -234,32 +234,39 @@ public class GeneSetWizardStep2 extends WizardStep {
     void addProbesFromLeftTableToRight() {
         int[] rows = probeTable.getSelectedRows();
         log.debug( rows.length + " rows selected" );
+
+        Collection<Probe> probes = new HashSet<Probe>();
         for ( int i = 0; i < rows.length; i++ ) {
             String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
             log.debug( "Got probe: " + probe );
             Probe p = geneData.findProbe( probe );
-            this.addGeneToSet( p.getGene() );
+            if ( p != null ) probes.add( p );
+
         }
+
+        ncTableModel.addProbes( probes );
+        sourceProbeModel.removeProbes( probes );
+        updateCountLabel();
     }
 
     void deleteProbesFromRightTable() {
         int[] rows = newClassTable.getSelectedRows();
+        Collection<Probe> probes = new HashSet<Probe>();
         for ( int i = 0; i < rows.length; i++ ) {
-            String probe = ( String ) newClassTable.getValueAt( rows[i] - i, 0 );
+            String probe = ( String ) newClassTable.getValueAt( rows[i], 0 );
             log.debug( "Removing " + probe );
             Probe p = geneData.findProbe( probe );
-            assert p != null;
 
             // remove all of the probes for the gene, not just the selected one (otherwise doesn't make much sense).
-            Collection<Probe> probes = new HashSet<Probe>();
-            for ( Gene g : p.getGenes() ) {
-                probes.addAll( g.getProbes() );
+            if ( p != null ) {
+                for ( Gene g : p.getGenes() ) {
+                    probes.addAll( g.getProbes() );
+                }
             }
 
-            ncTableModel.removeProbes( probes );
-            sourceProbeModel.addProbes( probes );
         }
-
+        ncTableModel.removeProbes( probes );
+        sourceProbeModel.addProbes( probes );
         updateCountLabel();
     }
 
