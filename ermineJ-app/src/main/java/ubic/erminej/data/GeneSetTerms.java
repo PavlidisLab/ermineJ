@@ -77,8 +77,7 @@ public class GeneSetTerms {
     }
 
     /**
-     * @param fileNamefilename <code>String</code> The XML file containing class to name mappings. First column is the
-     *        class id, second is a description that will be used init program output.
+     * @param fileNamefilename <code>String</code> The XML file containing class to name mappings.
      * @throws SAXException
      * @throws IOException
      */
@@ -87,8 +86,7 @@ public class GeneSetTerms {
     }
 
     /**
-     * @param filename <code>String</code> The XML file containing class to name mappings. First column is the class id,
-     *        second is a description that will be used init program output.
+     * @param filename <code>String</code> The XML file containing class to name mappings.
      * @param oldFormat set to true to indicate that the RDF is 'old style' (pre ~2008)
      * @throws IOException
      * @throws SAXException

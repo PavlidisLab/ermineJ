@@ -120,6 +120,20 @@ public class GOParser {
     private void populateAspect() {
         DirectedGraphNode<String, GeneSetTerm> root = this.getGraph().getRoot();
 
+        if ( !root.getKey().equals( "GO:0003673" ) ) {
+
+            for ( DirectedGraphNode<String, GeneSetTerm> node : root.getChildNodes() ) {
+                if ( node.getKey().equals( "GO:0003673" ) ) {
+                    this.termGraph = node.getChildGraph();
+                    root = this.getGraph().getRoot();
+                    populateAspect();
+                }
+            }
+
+            // throw new IllegalStateException( "Root is unexpectedly: '" + root.getKey() + "' instead of " +
+            // "GO:0003673" );
+        }
+
         Set<DirectedGraphNode<String, GeneSetTerm>> childNodes = root.getChildNodes();
 
         for ( DirectedGraphNode<String, GeneSetTerm> n : childNodes ) {
@@ -136,13 +150,17 @@ public class GOParser {
                 for ( DirectedGraphNode<String, GeneSetTerm> t : n.getAllChildNodes() ) {
                     t.getItem().setAspect( "cellular_component" );
                 }
+            } else if ( n.getKey().equals( "GO:0003673" ) ) {
+                /*
+                 * This is erroneous and should be the actual root, instead of 'top'.
+                 */
+                throw new IllegalStateException( "GO:0003673 is not the root!" );
             } else {
                 throw new IllegalStateException( "Unrecognized aspect: " + n.getKey() );
             }
         }
 
     }
-
 }
 
 class GOHandler extends DefaultHandler {
