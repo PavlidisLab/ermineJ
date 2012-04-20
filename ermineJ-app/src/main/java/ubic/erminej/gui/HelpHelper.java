@@ -20,11 +20,7 @@ package ubic.erminej.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 
-import javax.help.CSH;
-import javax.help.HelpBroker;
-import javax.help.HelpSet;
 import javax.swing.AbstractButton;
 
 import ubic.basecode.util.BrowserLauncher;
@@ -45,9 +41,6 @@ import ubic.erminej.gui.util.GuiUtil;
  */
 public class HelpHelper {
 
-    // JavaHelp
-    private HelpBroker m_helpBroker = null;
-
     /**
      * Initializes JavaHelp by creating HelpSet and HelpBroker objects and attaching an action listener an
      * AbstractButton
@@ -56,19 +49,6 @@ public class HelpHelper {
      * @return true if successful
      */
     public boolean initHelp( AbstractButton c, final SettingsHolder settings ) {
-
-        // // Create HelpSet and HelpBroker objects
-        // HelpSet hs = getHelpSet( "classScore/main.hs" );
-        // if ( hs != null ) {
-        // m_helpBroker = hs.createHelpBroker();
-        // // Assign help to components
-        // CSH.setHelpIDString( c, "top" );
-        // c.addActionListener( new CSH.DisplayHelpFromSource( m_helpBroker ) );
-        // return true;
-        // }
-        // // GuiUtil.error( "Couldn't load help" );
-        // System.err.println( "Couldn't load help" );
-        // return false;
 
         c.addActionListener( new ActionListener() {
 
@@ -83,27 +63,6 @@ public class HelpHelper {
         } );
 
         return true;
-    }
-
-    /**
-     * Finds the helpset file and creates a HelpSet object.
-     * 
-     * @param helpsetFilename filename of the *.hs file relative to the classpath
-     * @return the help set object created from the file; if the file was not loaded for whatever reason, returns null.
-     */
-    private HelpSet getHelpSet( String helpsetFilename ) {
-        HelpSet hs = null;
-        try {
-            ClassLoader cl = this.getClass().getClassLoader();
-            // URL hsURL = HelpSet.findHelpSet( cl, helpsetFilename );
-            URL hsURL = cl.getResource( helpsetFilename );
-            hs = new HelpSet( cl, hsURL );
-        } catch ( Exception e ) {
-            System.err.println( "HelpSet: " + e.getMessage() );
-            System.err.println( "HelpSet: " + helpsetFilename + " not found" );
-            e.printStackTrace();
-        }
-        return hs;
     }
 
 }

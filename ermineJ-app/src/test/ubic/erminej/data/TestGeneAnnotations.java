@@ -204,6 +204,18 @@ public class TestGeneAnnotations extends TestCase {
         assertEquals( 12, actualValue ); // not checked by hand.
     }
 
+    public void testReadAgilent2012() throws Exception {
+        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
+        InputStream a = TestGeneAnnotations.class.getResourceAsStream( "/data/agilentannots.test2012.txt" );
+        GeneAnnotations g = p.readAgilent( a, null, settings );
+        assertEquals( 37, g.getProbes().size() );
+        assertEquals( 30, g.getGenes().size() ); // not checked by hand.
+        Probe testp = g.findProbe( "A_84_P22735" );
+        assertNotNull( testp );
+        int actualValue = testp.getGeneSets().size();
+        assertEquals( 23, actualValue ); // not checked by hand.
+    }
+
     public void testReadCommaDelimited() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readDefault( imb, null, settings, false );

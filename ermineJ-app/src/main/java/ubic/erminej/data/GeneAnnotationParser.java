@@ -415,6 +415,11 @@ public class GeneAnnotationParser {
         int geneNameIndex = ParserHelper.getAgilentGeneNameIndex( header );
         int geneSymbolIndex = ParserHelper.getAgilentGeneSymbolIndex( header );
 
+        if ( probeIndex < 0 || goIndex < 0 || geneNameIndex < 0 || geneSymbolIndex < 0 ) {
+            throw new IllegalArgumentException(
+                    "File format was incorrect, please check that it has the correct headings." );
+        }
+
         assert ( numFields > probeIndex + 1 && numFields > geneSymbolIndex + 1 );
         Pattern pat = Pattern.compile( "[0-9]+" );
 

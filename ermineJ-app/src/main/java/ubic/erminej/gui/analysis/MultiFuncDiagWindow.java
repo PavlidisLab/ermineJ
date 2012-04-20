@@ -45,8 +45,7 @@ import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.Rank;
-import ubic.basecode.math.Smooth;
-import ubic.erminej.SettingsHolder;
+import ubic.basecode.math.Smooth; 
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -114,9 +113,9 @@ public class MultiFuncDiagWindow extends JFrame {
         Map<Gene, Double> geneToScoreMap = geneScores.getGeneToScoreMap();
 
         // copies code from Multifunctionality, using weighted regression.
-        SettingsHolder settings = geneAnnots.getSettings();
-        boolean doLog = settings.getDoLog(); // note scores would already have been log-transformed.
-        boolean invert = ( doLog && !settings.getBigIsBetter() ) || ( !doLog && settings.getBigIsBetter() );
+        // SettingsHolder settings = geneAnnots.getSettings();
+        // boolean doLog = settings.getDoLog(); // note scores would already have been log-transformed.
+        // boolean invert = ( doLog && !settings.getBigIsBetter() ) || ( !doLog && settings.getBigIsBetter() );
 
         DoubleMatrix1D scores = new DenseDoubleMatrix1D( geneToScoreMap.size() );
         DoubleMatrix1D mfs = new DenseDoubleMatrix1D( geneToScoreMap.size() );
