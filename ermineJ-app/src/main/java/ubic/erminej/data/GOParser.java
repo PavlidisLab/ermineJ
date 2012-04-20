@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -43,6 +44,9 @@ import ubic.basecode.dataStructure.graph.DirectedGraphNode;
  * @version $Id$
  */
 public class GOParser {
+
+    private static final String ROOT = "GO:0003673";
+    private static final String ALL = "all";
 
     private DirectedGraph<String, GeneSetTerm> termGraph;
 
@@ -119,47 +123,68 @@ public class GOParser {
      */
     private void populateAspect() {
         DirectedGraphNode<String, GeneSetTerm> root = this.getGraph().getRoot();
+        root.getItem().setAspect( "Gene_Ontology" );
 
-        if ( !root.getKey().equals( "GO:0003673" ) ) {
-
+        if ( !root.getKey().equals( ROOT ) && !root.getKey().equals( ALL ) ) {
             for ( DirectedGraphNode<String, GeneSetTerm> node : root.getChildNodes() ) {
-                if ( node.getKey().equals( "GO:0003673" ) ) {
+                if ( node.getKey().equals( ROOT ) || node.getKey().equals( ALL ) ) {
                     this.termGraph = node.getChildGraph();
-                    root = this.getGraph().getRoot();
                     populateAspect();
+                    return;
                 }
             }
-
-            // throw new IllegalStateException( "Root is unexpectedly: '" + root.getKey() + "' instead of " +
-            // "GO:0003673" );
+            throw new IllegalStateException( ROOT
+                    + " is not the root and none of the children of the root were either. (instead it was '"
+                    + root.getKey() + "')" );
         }
 
         Set<DirectedGraphNode<String, GeneSetTerm>> childNodes = root.getChildNodes();
 
         for ( DirectedGraphNode<String, GeneSetTerm> n : childNodes ) {
-            n.getItem().setAspect( "Root" );
             if ( n.getKey().equals( "GO:0003674" ) ) {
+                n.getItem().setAspect( "molecular_function" );
                 for ( DirectedGraphNode<String, GeneSetTerm> t : n.getAllChildNodes() ) {
                     t.getItem().setAspect( "molecular_function" );
+                    fillAspect( t );
                 }
             } else if ( n.getKey().equals( "GO:0008150" ) ) {
+                n.getItem().setAspect( "biological_process" );
                 for ( DirectedGraphNode<String, GeneSetTerm> t : n.getAllChildNodes() ) {
                     t.getItem().setAspect( "biological_process" );
+                    fillAspect( t );
                 }
             } else if ( n.getKey().equals( "GO:0005575" ) ) {
+                n.getItem().setAspect( "cellular_component" );
                 for ( DirectedGraphNode<String, GeneSetTerm> t : n.getAllChildNodes() ) {
                     t.getItem().setAspect( "cellular_component" );
+                    fillAspect( t );
                 }
-            } else if ( n.getKey().equals( "GO:0003673" ) ) {
+            } else if ( n.getKey().equals( ROOT ) || n.getKey().equals( ALL ) ) {
                 /*
                  * This is erroneous and should be the actual root, instead of 'top'.
                  */
-                throw new IllegalStateException( "GO:0003673 is not the root!" );
+                throw new IllegalStateException( "Root is a child!" );
             } else {
                 throw new IllegalStateException( "Unrecognized aspect: " + n.getKey() );
             }
         }
 
+    }
+
+    /**
+     * Make double-extra sure, recursively.
+     * 
+     * @param n
+     * @param aspect
+     */
+    void fillAspect( DirectedGraphNode<String, GeneSetTerm> n ) {
+        String aspect = n.getItem().getAspect();
+        for ( DirectedGraphNode<String, GeneSetTerm> c : n.getChildNodes() ) {
+            GeneSetTerm item = c.getItem();
+            assert StringUtils.isBlank( item.getAspect() ) || item.getAspect().equals( aspect );
+            item.setAspect( aspect );
+            fillAspect( c );
+        }
     }
 }
 

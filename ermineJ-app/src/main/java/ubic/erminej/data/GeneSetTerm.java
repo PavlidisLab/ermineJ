@@ -123,7 +123,12 @@ public class GeneSetTerm implements Comparable<GeneSetTerm> {
     }
 
     public void setAspect( String aspect ) {
-        this.aspect = aspect;
+        if ( this.aspect == null )
+            this.aspect = aspect;
+        else if ( this.aspect.equals( aspect ) )
+            return;
+        else
+            throw new IllegalArgumentException( "Attempt to change aspect" );
     }
 
     public void setDefinition( String d ) {

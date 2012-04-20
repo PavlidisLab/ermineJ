@@ -307,7 +307,7 @@ public class TestGeneAnnotations extends TestCase {
         goIds.get( 1 ).add( new GeneSetTerm( "2" ) );
         for ( Collection<GeneSetTerm> gs : goIds ) {
             for ( GeneSetTerm g : gs )
-                g.setAspect( "fooAspect" );
+                g.setAspect( "User-defined" );
         }
 
         is = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U133_Plus_2_annot_sample.csv" );
@@ -327,6 +327,26 @@ public class TestGeneAnnotations extends TestCase {
     public void testSimple() throws Exception {
         InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
+        GeneAnnotations r = p.readDefault( i, null, settings, true );
+        assertEquals( 9, r.getGenes().size() );
+
+        Gene g = r.findGene( "TAH1" );
+        assertNotNull( g );
+        assertTrue( g.getGeneSets().contains( new GeneSetTerm( "GO:0005737" ) ) );
+    }
+
+    public void testSimpleOldGo() throws Exception {
+        InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
+
+        InputStream z = new GZIPInputStream(
+                TestGeneAnnotations.class.getResourceAsStream( "/data/go_200109-termdb.xml.gz" ) );
+        GeneSetTerms go = new GeneSetTerms( z, true );
+
+        for ( GeneSetTerm g : go.getTerms() ) {
+            assertNotNull( g.toString(), g.getAspect() );
+        }
+
+        GeneAnnotationParser p = new GeneAnnotationParser( go );
         GeneAnnotations r = p.readDefault( i, null, settings, true );
         assertEquals( 9, r.getGenes().size() );
 

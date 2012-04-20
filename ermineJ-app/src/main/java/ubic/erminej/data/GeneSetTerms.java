@@ -125,6 +125,11 @@ public class GeneSetTerms {
         }
     }
 
+    public GeneSetTerms( InputStream i, boolean oldFormat ) throws SAXException, IOException {
+        this.initialize( i, oldFormat );
+        i.close();
+    }
+
     /**
      * @param id
      */
@@ -346,7 +351,11 @@ public class GeneSetTerms {
          */
         for ( GeneSetTerm geneSet : this.getGraph().getValues() ) {
             if ( geneSet.getAspect() == null ) {
-                geneSet.setAspect( this.getAspect( geneSet ) );
+                String aspect = this.getAspect( geneSet );
+                if ( aspect == null && !geneSet.getDefinition().startsWith( "OBSOLETE" ) ) {
+                    log.info( "Could not locate aspect for " + geneSet );
+                }
+                geneSet.setAspect( aspect );
             }
         }
 
