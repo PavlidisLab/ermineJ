@@ -36,6 +36,8 @@ public class Gene implements Comparable<Gene> {
 
     private Integer ncbiId = null;
 
+    private Integer ncbiTaxonId = null;
+
     public Gene( String symbol ) {
         this( symbol, null );
     }
@@ -76,6 +78,11 @@ public class Gene implements Comparable<Gene> {
         if ( obj == null ) return false;
         if ( getClass() != obj.getClass() ) return false;
         Gene other = ( Gene ) obj;
+
+        if ( this.ncbiId != null && other.ncbiId != null ) {
+            return this.ncbiId.equals( other.ncbiId );
+        }
+
         return symbol.equals( other.symbol );
     }
 
@@ -95,6 +102,10 @@ public class Gene implements Comparable<Gene> {
         return ncbiId;
     }
 
+    public Integer getNcbiTaxonId() {
+        return ncbiTaxonId;
+    }
+
     public Collection<Probe> getProbes() {
         return Collections.unmodifiableCollection( probes );
     }
@@ -105,6 +116,9 @@ public class Gene implements Comparable<Gene> {
 
     @Override
     public int hashCode() {
+        if ( ncbiId != null ) {
+            return ncbiId.hashCode();
+        }
         return symbol.hashCode();
     }
 
@@ -130,6 +144,10 @@ public class Gene implements Comparable<Gene> {
 
     public void setNcbiId( Integer ncbiId ) {
         this.ncbiId = ncbiId;
+    }
+
+    public void setNcbiTaxonId( Integer ncbiTaxonId ) {
+        this.ncbiTaxonId = ncbiTaxonId;
     }
 
     public void setProbes( Collection<Probe> probes ) {

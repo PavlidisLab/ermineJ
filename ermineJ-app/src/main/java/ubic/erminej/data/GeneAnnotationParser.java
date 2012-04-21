@@ -45,11 +45,11 @@ import ubic.erminej.SettingsHolder;
  */
 public class GeneAnnotationParser {
 
-    private static final int LINES_READ_UPDATE_FREQ = 2500;
-
     public enum Format {
         DEFAULT, AFFYCSV, AGILENT, SIMPLE
     }
+
+    private static final int LINES_READ_UPDATE_FREQ = 2500;
 
     private static Log log = LogFactory.getLog( GeneAnnotationParser.class.getName() );
 
@@ -65,6 +65,8 @@ public class GeneAnnotationParser {
     private StatusViewer messenger = new StatusStderr();
 
     private static Pattern pipePattern = Pattern.compile( "\\s*[\\s\\|,]\\s*" );
+
+    boolean warned = false;
 
     public GeneAnnotationParser( GeneSetTerms geneSets ) {
         this.geneSetTerms = geneSets;
@@ -114,8 +116,6 @@ public class GeneAnnotationParser {
     }
 
     /**
-     * Fixme, all this needs is the settings.
-     * 
      * @param fileName
      * @param format
      * @param settings
@@ -128,97 +128,157 @@ public class GeneAnnotationParser {
     }
 
     /**
-     * @param classIds
+     * Main default reading method. Because we want to be tolerant of file format variation, headers are not treated
+     * differently than other rows. This extra "gene" can be counted in things like rankings, so we do try to avoid it
+     * if we can, but doesn't directly effect most calculations.
+     * 
+     * @param bis
+     * @param genes
+     * @param settings
+     * @param simple If true, assume two-column format with GO terms pipe-delimited in column 2, and only one gene per
+     *        row (no ABC|ABC2 stuff)
+     * @throws IOException
      */
-    private Collection<GeneSetTerm> extractPipeDelimitedGoIds( String classIds ) {
-        String[] classIdAry = pipePattern.split( classIds );
+    public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, SettingsHolder settings,
+            boolean simple ) throws IOException {
 
-        Collection<GeneSetTerm> result = new HashSet<GeneSetTerm>();
-        if ( classIdAry.length == 0 ) return result;
-        for ( String go : classIdAry ) {
+        BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
+        Map<String, Gene> genes = new HashMap<String, Gene>();
+        warned = false;
+        int n = 0;
+        String line = "";
+        while ( ( line = dis.readLine() ) != null ) {
 
-            GeneSetTerm goterm = this.geneSetTerms.get( go );
-            if ( goterm == null ) {
+            // check for things that don't look like data, or other skippable things.
+            if ( line.startsWith( "#" ) ) continue;
+            if ( n == 0 && ( line.toLowerCase().startsWith( "probe" ) || line.toLowerCase().startsWith( "gene" ) ) ) {
+                ++n;
                 continue;
             }
 
-            result.add( goterm );
+            String[] tokens = line.split( "\t" );
+            int numTokens = tokens.length;
+            if ( numTokens < 2 ) continue;
+            String geneName = "";
+            String probeId = "";
+            String description = NO_DESCRIPTION;
+            if ( simple ) {
+                geneName = tokens[0];
+                probeId = geneName;
+            } else {
+                probeId = tokens[0];
+                if ( probeId.matches( "AFFX.*" ) ) {
+                    continue;
+                }
+                geneName = tokens[1];
+
+                // correctly deal with things like Nasp|Nasp or Nasp|Nasp2
+                if ( geneName.matches( ".+?[\\|,].+?" ) ) {
+                    String[] multig = geneName.split( "[\\|,]" );
+                    Collection<String> multigenes = new HashSet<String>();
+                    for ( String g : multig ) {
+                        // log.debug( g + " found in " + geneName );
+                        multigenes.add( g );
+                    }
+
+                    if ( multigenes.size() > 1 && filterNonSpecific ) {
+                        continue;
+                    }
+
+                    geneName = multigenes.iterator().next();
+                }
+                /* read gene description */
+                if ( numTokens >= 3 ) {
+                    description = tokens[2];
+                } else {
+                    description = NO_DESCRIPTION;
+                }
+            }
+
+            Probe probe = new Probe( probeId, description );
+
+            Gene gene;
+            if ( genes.containsKey( geneName ) ) {
+                gene = genes.get( geneName );
+            } else {
+                gene = new Gene( geneName, description );
+                genes.put( geneName, gene );
+            }
+
+            gene.addProbe( probe );
+            probe.setGene( gene );
+
+            if ( activeGenes != null && !activeGenes.contains( gene ) ) {
+                genes.remove( gene.getSymbol() );
+                continue;
+            }
+
+            /* read GO data */
+            if ( simple ) {
+                String classIds = tokens[1];
+                Collection<GeneSetTerm> goTerms = extractPipeDelimitedGoIds( classIds );
+                for ( GeneSetTerm term : goTerms ) {
+                    gene.addGeneSet( term );
+                    probe.addToGeneSet( term );
+                }
+            } else {
+                if ( numTokens >= 4 ) {
+                    String classIds = tokens[3];
+                    Collection<GeneSetTerm> goTerms = extractPipeDelimitedGoIds( classIds );
+
+                    for ( GeneSetTerm term : goTerms ) {
+                        gene.addGeneSet( term );
+                        probe.addToGeneSet( term );
+                    }
+                }
+
+                if ( numTokens >= 6 ) {
+                    // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
+                    String ncbiID = tokens[5];
+                    try {
+                        gene.setNcbiId( Integer.parseInt( ncbiID ) );
+                    } catch ( NumberFormatException e ) {
+                        // no big deal
+                    }
+                }
+            }
+
+            if ( messenger != null && ++n % LINES_READ_UPDATE_FREQ == 0 ) {
+                messenger.showProgress( "Read " + n + " probes" );
+                try {
+                    Thread.sleep( 20 );
+                } catch ( InterruptedException e ) {
+                    dis.close();
+                    throw new CancellationException();
+                }
+            }
         }
+        dis.close();
+        if ( genes.isEmpty() ) {
+            throw new IllegalStateException( "There were no genes found in the annotation file." );
+        }
+
+        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
+
         return result;
     }
 
     /**
-     * @param go
-     * @return
-     */
-    private String padGoTerm( String go ) {
-        String goPadded = go;
-        if ( !goPadded.startsWith( "GO:" ) ) {
-            int needZeros = 7 - goPadded.length();
-            for ( int j = 0; j < needZeros; j++ ) {
-                goPadded = "0" + goPadded;
-            }
-            goPadded = "GO:" + goPadded;
-        }
-        return goPadded;
-    }
-
-    boolean warned = false;
-
-    /**
-     * @param pat
-     * @param goi
-     * @return the GeneSetTerm (from the canonical list provided to the constructor)
-     */
-    private GeneSetTerm parseGoTerm( Pattern pat, String goi ) {
-        Matcher mat = pat.matcher( goi );
-        if ( !mat.find() ) {
-            return null;
-        }
-        int start = mat.start();
-        int end = mat.end();
-        String go = goi.substring( start, end );
-
-        go = padGoTerm( go );
-
-        assert go.matches( "GO:[0-9]{7}" ) : "Trying to fix up : " + goi;
-
-        GeneSetTerm goterm = this.geneSetTerms.get( go );
-
-        if ( goterm == null ) {
-            log.warn( "GO term " + go + " not recognized" );
-            if ( messenger != null && !warned ) {
-                messenger.showStatus( "GO term " + go
-                        + " not recognized in the annotation file; further warnings suppressed" );
-                warned = true;
-            }
-            return null;
-        }
-        // log.info( goterm );
-        return goterm;
-
-    }
-
-    /**
-     * @param bis
-     */
-    private GeneAnnotations readAffyCsv( InputStream bis, SettingsHolder settings ) throws IOException {
-        return this.readAffyCsv( bis, null, settings );
-    }
-
-    private GeneAnnotations readAgilent( InputStream bis, SettingsHolder settings ) throws IOException {
-        return this.readAgilent( bis, null, settings );
-    }
-
-    /**
-     * @param bis
+     * @param fileName
+     * @param genes Annotations for genes other than these will be ignored.
      * @param settings
      * @param simple
      * @return
      * @throws IOException
      */
-    private GeneAnnotations readDefault( InputStream bis, SettingsHolder settings, boolean simple ) throws IOException {
-        return this.readDefault( bis, null, settings, simple );
+    public GeneAnnotations readDefault( String fileName, Collection<Gene> genes, SettingsHolder settings, boolean simple )
+            throws IOException {
+        InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
+        return this.readDefault( i, genes, settings, simple );
+    }
+
+    public void setFilterNonSpecific( boolean b ) {
+        this.filterNonSpecific = b;
     }
 
     /**
@@ -501,143 +561,95 @@ public class GeneAnnotationParser {
     } // Agilent
 
     /**
-     * Main default reading method. Because we want to be tolerant of file format variation, headers are not treated
-     * differently than other rows. This extra "gene" can be counted in things like rankings, so we do try to avoid it
-     * if we can, but doesn't directly effect most calculations.
-     * 
-     * @param bis
-     * @param genes
-     * @param settings
-     * @param simple If true, assume two-column format with GO terms pipe-delimited in column 2, and only one gene per
-     *        row (no ABC|ABC2 stuff)
-     * @throws IOException
+     * @param classIds
      */
-    public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, SettingsHolder settings,
-            boolean simple ) throws IOException {
+    private Collection<GeneSetTerm> extractPipeDelimitedGoIds( String classIds ) {
+        String[] classIdAry = pipePattern.split( classIds );
 
-        BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
-        Map<String, Gene> genes = new HashMap<String, Gene>();
-        warned = false;
-        int n = 0;
-        String line = "";
-        while ( ( line = dis.readLine() ) != null ) {
+        Collection<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+        if ( classIdAry.length == 0 ) return result;
+        for ( String go : classIdAry ) {
 
-            // check for things that don't look like data, or other skippable things.
-            if ( line.startsWith( "#" ) ) continue;
-            if ( n == 0 && ( line.toLowerCase().startsWith( "probe" ) || line.toLowerCase().startsWith( "gene" ) ) ) {
-                ++n;
+            GeneSetTerm goterm = this.geneSetTerms.get( go );
+            if ( goterm == null ) {
                 continue;
             }
 
-            String[] tokens = line.split( "\t" );
-            int numTokens = tokens.length;
-            if ( numTokens < 2 ) continue;
-            String geneName = "";
-            String probeId = "";
-            String description = NO_DESCRIPTION;
-            if ( simple ) {
-                geneName = tokens[0];
-                probeId = geneName;
-            } else {
-                probeId = tokens[0];
-                if ( probeId.matches( "AFFX.*" ) ) {
-                    continue;
-                }
-                geneName = tokens[1];
-
-                // correctly deal with things like Nasp|Nasp or Nasp|Nasp2
-                if ( geneName.matches( ".+?[\\|,].+?" ) ) {
-                    String[] multig = geneName.split( "[\\|,]" );
-                    Collection<String> multigenes = new HashSet<String>();
-                    for ( String g : multig ) {
-                        // log.debug( g + " found in " + geneName );
-                        multigenes.add( g );
-                    }
-
-                    if ( multigenes.size() > 1 && filterNonSpecific ) {
-                        continue;
-                    }
-
-                    geneName = multigenes.iterator().next();
-                }
-                /* read gene description */
-                if ( numTokens >= 3 ) {
-                    description = tokens[2];
-                } else {
-                    description = NO_DESCRIPTION;
-                }
-            }
-
-            Probe probe = new Probe( probeId, description );
-
-            Gene gene;
-            if ( genes.containsKey( geneName ) ) {
-                gene = genes.get( geneName );
-            } else {
-                gene = new Gene( geneName, description );
-                genes.put( geneName, gene );
-            }
-
-            gene.addProbe( probe );
-            probe.setGene( gene );
-
-            if ( activeGenes != null && !activeGenes.contains( gene ) ) {
-                genes.remove( gene.getSymbol() );
-                continue;
-            }
-
-            /* read GO data */
-            if ( simple ) {
-                String classIds = tokens[1];
-                Collection<GeneSetTerm> goTerms = extractPipeDelimitedGoIds( classIds );
-                for ( GeneSetTerm term : goTerms ) {
-                    gene.addGeneSet( term );
-                    probe.addToGeneSet( term );
-                }
-            } else {
-                if ( numTokens >= 4 ) {
-                    String classIds = tokens[3];
-                    Collection<GeneSetTerm> goTerms = extractPipeDelimitedGoIds( classIds );
-
-                    for ( GeneSetTerm term : goTerms ) {
-                        gene.addGeneSet( term );
-                        probe.addToGeneSet( term );
-                    }
-                }
-
-                if ( numTokens >= 6 ) {
-                    // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
-                    String ncbiID = tokens[5];
-                    try {
-                        gene.setNcbiId( Integer.parseInt( ncbiID ) );
-                    } catch ( NumberFormatException e ) {
-                        // no big deal
-                    }
-                }
-            }
-
-            if ( messenger != null && ++n % LINES_READ_UPDATE_FREQ == 0 ) {
-                messenger.showProgress( "Read " + n + " probes" );
-                try {
-                    Thread.sleep( 20 );
-                } catch ( InterruptedException e ) {
-                    dis.close();
-                    throw new CancellationException();
-                }
-            }
+            result.add( goterm );
         }
-        dis.close();
-        if ( genes.isEmpty() ) {
-            throw new IllegalStateException( "There were no genes found in the annotation file." );
-        }
-
-        GeneAnnotations result = new GeneAnnotations( genes.values(), geneSetTerms, settings, messenger );
-
         return result;
     }
 
-    public void setFilterNonSpecific( boolean b ) {
-        this.filterNonSpecific = b;
+    /**
+     * @param go
+     * @return
+     */
+    private String padGoTerm( String go ) {
+        String goPadded = go;
+        if ( !goPadded.startsWith( "GO:" ) ) {
+            int needZeros = 7 - goPadded.length();
+            for ( int j = 0; j < needZeros; j++ ) {
+                goPadded = "0" + goPadded;
+            }
+            goPadded = "GO:" + goPadded;
+        }
+        return goPadded;
+    }
+
+    /**
+     * @param pat
+     * @param goi
+     * @return the GeneSetTerm (from the canonical list provided to the constructor)
+     */
+    private GeneSetTerm parseGoTerm( Pattern pat, String goi ) {
+        Matcher mat = pat.matcher( goi );
+        if ( !mat.find() ) {
+            return null;
+        }
+        int start = mat.start();
+        int end = mat.end();
+        String go = goi.substring( start, end );
+
+        go = padGoTerm( go );
+
+        assert go.matches( "GO:[0-9]{7}" ) : "Trying to fix up : " + goi;
+
+        GeneSetTerm goterm = this.geneSetTerms.get( go );
+
+        if ( goterm == null ) {
+            log.warn( "GO term " + go + " not recognized" );
+            if ( messenger != null && !warned ) {
+                messenger.showStatus( "GO term " + go
+                        + " not recognized in the annotation file; further warnings suppressed" );
+                warned = true;
+            }
+            return null;
+        }
+        // log.info( goterm );
+        return goterm;
+
+    }
+
+    /**
+     * @param bis
+     */
+    private GeneAnnotations readAffyCsv( InputStream bis, SettingsHolder settings ) throws IOException {
+        return this.readAffyCsv( bis, null, settings );
+    }
+
+    private GeneAnnotations readAgilent( InputStream bis, SettingsHolder settings ) throws IOException {
+        return this.readAgilent( bis, null, settings );
+    }
+
+    /**
+     * @param bis
+     * @param settings
+     * @param simple
+     * @return
+     * @throws IOException
+     */
+    private GeneAnnotations readDefault( InputStream bis, SettingsHolder settings, boolean simple ) throws IOException {
+        return this.readDefault( bis, null, settings, simple );
     }
 }
 
