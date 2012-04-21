@@ -290,16 +290,17 @@ public class GeneSetTerms {
      * @param name
      */
     void addUserDefinedTerm( GeneSetTerm id ) {
-        assert id.isUserDefined();
+
+        if ( id.getAspect() == null ) id.setAspect( USER_DEFINED );
 
         // FIXME I think this happens already by this point, so it's already present. This is a (minor) bug.
         // assert this.getGraph().get( id.getId() ) == null : "Programming error: annots already contains " + id;
+
         if ( this.getGraph().get( USER_DEFINED ).hasChild( id.getId() ) ) {
             return;
         }
 
         assert this.getGraph().get( USER_DEFINED ) != null;
-        id.setAspect( USER_DEFINED ); // defensive.
         this.getGraph().addChildTo( USER_DEFINED, id.getId(), id );
     }
 
