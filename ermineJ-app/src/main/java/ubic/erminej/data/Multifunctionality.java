@@ -474,7 +474,7 @@ public class Multifunctionality {
             int inGroup = genesInSet.size();
             int outGroup = numGenes - inGroup;
 
-            assert inGroup >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE;
+            assert inGroup >= geneAnnots.getMinimumGeneSetSize();
 
             // check for pathological condition
             if ( outGroup == 0 ) {

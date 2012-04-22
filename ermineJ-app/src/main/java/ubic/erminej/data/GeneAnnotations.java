@@ -69,7 +69,9 @@ public class GeneAnnotations {
     /**
      * The minimum size of a 'set' of genes. Seems reasonable, doesn't it?
      */
-    protected static final int ABSOLUTE_MINIMUM_GENESET_SIZE = 2;
+    private static final int ABSOLUTE_MINIMUM_GENESET_SIZE = 2;
+
+    private int minimumGeneSetSize = ABSOLUTE_MINIMUM_GENESET_SIZE;
 
     private static Log log = LogFactory.getLog( GeneAnnotations.class.getName() );
 
@@ -376,6 +378,29 @@ public class GeneAnnotations {
         if ( id.isUserDefined() ) geneSetTerms.removeUserDefined( id );
     }
 
+    /**
+     * Remove a no-longer-needed subclone. This only removes the reference from this, if other objects maintain a
+     * reference it will obviously not be freed.
+     * 
+     * @param a
+     */
+    public void deleteSubClone( GeneAnnotations a ) {
+        log.info( "Deleting annotations" );
+        boolean removed = this.subClones.remove( a );
+        if ( !removed ) {
+            log.warn( "Was not able to remove the annotations!" );
+        }
+    }
+
+    /**
+     * @param classID
+     * @return
+     */
+    public boolean deleteUserGeneSet( GeneSetTerm classID ) {
+        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
+        return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
+    }
+
     // /**
     // * Add a new gene set. Used to set up user-defined gene sets.
     // *
@@ -407,29 +432,6 @@ public class GeneAnnotations {
     // this.addGeneSet( geneSetId, gs );
     //
     // }
-
-    /**
-     * Remove a no-longer-needed subclone. This only removes the reference from this, if other objects maintain a
-     * reference it will obviously not be freed.
-     * 
-     * @param a
-     */
-    public void deleteSubClone( GeneAnnotations a ) {
-        log.info( "Deleting annotations" );
-        boolean removed = this.subClones.remove( a );
-        if ( !removed ) {
-            log.warn( "Was not able to remove the annotations!" );
-        }
-    }
-
-    /**
-     * @param classID
-     * @return
-     */
-    public boolean deleteUserGeneSet( GeneSetTerm classID ) {
-        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
-        return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
-    }
 
     /**
      * @param symbol
@@ -622,7 +624,7 @@ public class GeneAnnotations {
     }
 
     /**
-     * @return view of all gene sets, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes (i.e., 2).
+     * @return view of all gene sets, NOT including empty ones - at least minimumGeneSetSize genes (i.e., 2).
      */
     public Set<GeneSet> getGeneSets() {
         return Collections.unmodifiableSet( new HashSet<GeneSet>( this.geneSets.values() ) );
@@ -643,8 +645,7 @@ public class GeneAnnotations {
     }
 
     /**
-     * @return view of all gene set terms, NOT including empty ones - at least ABSOLUTE_MINIMUM_GENESET_SIZE genes
-     *         (i.e., 2).
+     * @return view of all gene set terms, NOT including empty ones - at least minimumGeneSetSize genes (i.e., 2).
      */
     public Set<GeneSetTerm> getGeneSetTerms() {
         Set<GeneSetTerm> res = new HashSet<GeneSetTerm>();
@@ -658,6 +659,10 @@ public class GeneAnnotations {
     public GeneSetTerms getGeneSetTermsHolder() {
         // FIXME stupid method name .. conflicts with other.
         return this.geneSetTerms;
+    }
+
+    public int getMinimumGeneSetSize() {
+        return minimumGeneSetSize;
     }
 
     public Multifunctionality getMultifunctionality() {
@@ -897,6 +902,10 @@ public class GeneAnnotations {
         this.messenger = m;
     }
 
+    public void setMinimumGeneSetSize( int minimumGeneSetSize ) {
+        this.minimumGeneSetSize = minimumGeneSetSize;
+    }
+
     /**
      * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected probes, removing
      * probes with no annotations.
@@ -1133,7 +1142,7 @@ public class GeneAnnotations {
             } else {
                 int numP = numProbesInGeneSet( id );
                 int numG = numGenesInGeneSet( id );
-                if ( numP < ABSOLUTE_MINIMUM_GENESET_SIZE || numG < ABSOLUTE_MINIMUM_GENESET_SIZE ) {
+                if ( numP < minimumGeneSetSize || numG < minimumGeneSetSize ) {
                     tooSmallRemoved++;
                     removeUs.add( id );
                 } else if ( numP > PRACTICAL_MAXIMUM_GENESET_SIZE || numG > PRACTICAL_MAXIMUM_GENESET_SIZE ) {
@@ -1156,7 +1165,7 @@ public class GeneAnnotations {
         if ( this.geneSets.isEmpty() ) {
             throw new IllegalStateException(
                     "All gene sets were removed due to being too small, too big, or obsolete; usable size range="
-                            + ABSOLUTE_MINIMUM_GENESET_SIZE + " - " + PRACTICAL_MAXIMUM_GENESET_SIZE );
+                            + this.minimumGeneSetSize + " - " + PRACTICAL_MAXIMUM_GENESET_SIZE );
         }
 
     }

@@ -383,15 +383,14 @@ public class TestGeneAnnotations extends TestCase {
             if ( t == null ) continue;
             if ( ga.hasGeneSet( t ) ) {
                 if ( t.getDefinition().startsWith( "OBSOLETE" ) ) continue;
-                if ( ga.getGeneSet( t ).size() >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE ) re.add( t );
+                if ( ga.getGeneSet( t ).size() >= ga.getMinimumGeneSetSize() ) re.add( t );
             }
 
             Collection<GeneSetTerm> allParents = ga.getGeneSetTermsHolder().getAllParents( t );
 
             for ( GeneSetTerm geneSetTerm : allParents ) {
                 if ( geneSetTerm.getDefinition().startsWith( "OBSOLETE" ) ) continue;
-                if ( ga.hasGeneSet( geneSetTerm )
-                        && ga.getGeneSet( geneSetTerm ).size() >= GeneAnnotations.ABSOLUTE_MINIMUM_GENESET_SIZE ) {
+                if ( ga.hasGeneSet( geneSetTerm ) && ga.getGeneSet( geneSetTerm ).size() >= ga.getMinimumGeneSetSize() ) {
                     re.add( geneSetTerm );
                 }
             }
