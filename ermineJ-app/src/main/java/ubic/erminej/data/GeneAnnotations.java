@@ -1365,7 +1365,7 @@ public class GeneAnnotations {
                 if ( minimumGeneSetSize < 1 )
                     throw new IllegalArgumentException( "minimum.geneset.size must be at least 1 (was: "
                             + minimumGeneSetSize + ")" );
-
+                log.info( "Minimum gene set size set to " + this.minimumGeneSetSize );
             } catch ( NumberFormatException e ) {
                 throw new IllegalArgumentException( "minimum.geneset.size was not a valid integer value" );
             }
