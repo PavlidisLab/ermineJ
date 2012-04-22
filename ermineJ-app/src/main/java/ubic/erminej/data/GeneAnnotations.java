@@ -34,6 +34,7 @@ import java.util.Set;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -902,10 +903,6 @@ public class GeneAnnotations {
         this.messenger = m;
     }
 
-    public void setMinimumGeneSetSize( int minimumGeneSetSize ) {
-        this.minimumGeneSetSize = minimumGeneSetSize;
-    }
-
     /**
      * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected probes, removing
      * probes with no annotations.
@@ -1359,6 +1356,19 @@ public class GeneAnnotations {
 
         if ( this.geneSets.isEmpty() ) {
             throw new IllegalStateException( "No gene sets were formed." );
+        }
+
+        // undocumented for now, allows more flexible use of API without restriction of value = 2.
+        if ( StringUtils.isNotBlank( settings.getStringProperty( "minimum.geneset.size" ) ) ) {
+            try {
+                this.minimumGeneSetSize = Integer.parseInt( settings.getStringProperty( "minimum.geneset.size" ) );
+                if ( minimumGeneSetSize < 1 )
+                    throw new IllegalArgumentException( "minimum.geneset.size must be at least 1 (was: "
+                            + minimumGeneSetSize + ")" );
+
+            } catch ( NumberFormatException e ) {
+                throw new IllegalArgumentException( "minimum.geneset.size was not a valid integer value" );
+            }
         }
 
         prune( true /* subcloning */); // fast
