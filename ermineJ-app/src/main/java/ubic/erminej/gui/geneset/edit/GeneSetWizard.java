@@ -100,8 +100,8 @@ public class GeneSetWizard extends Wizard {
     }
 
     /**
-     * Use this constructor when you know the gene set to be looked at. (modify a gene set). We basically go right to
-     * step 2.
+     * Use this constructor when you know the gene set to be looked at, and the user doesn't have to selected it from
+     * the list (modify a gene set). We basically go right to step 2.
      * 
      * @param callingframe
      * @param geneData
@@ -122,16 +122,18 @@ public class GeneSetWizard extends Wizard {
         this.setTitle( "Modify Gene Set - Step 2 of 3" );
         step = 2;
         backButton.setEnabled( false );
+
         step2 = new GeneSetWizardStep2( this, geneData );
         this.addStep( step2, true ); // hack for starting at step 2
         this.addStep( step2 );
         step2.updateCountLabel();
+        step2.setStartingSet( this.oldGeneSet );
+
         step3 = new GeneSetWizardStep3( this );
         this.addStep( step3 );
-
         step3.setIdText( oldGeneSet.getId() );
         step3.setDescText( oldGeneSet.getName() );
-        step2.setStartingSet( this.oldGeneSet );
+
         this.repaint();
     }
 
@@ -187,6 +189,8 @@ public class GeneSetWizard extends Wizard {
                 this.setTitle( "Define New Gene Set - Step 3 of 3" );
             } else {
                 this.setTitle( "Modify Gene Set - Step 3 of 3" );
+                step3.setIdText( oldGeneSet.getId() );
+                step3.setDescText( oldGeneSet.getName() );
             }
             backButton.setEnabled( true );
             nextButton.setEnabled( false );
@@ -293,7 +297,12 @@ public class GeneSetWizard extends Wizard {
             GeneSetTerm newGeneSetT = new GeneSetTerm( id, desc );
             toSave = new GeneSet( newGeneSetT );
             toSave.setUserDefined( true );
-            toSave.setGenes( this.loadedGenes );
+
+            Collection<Probe> selectedProbes = step2.getProbes();
+            for ( Probe probe : selectedProbes ) {
+                toSave.addGenes( probe.getGenes() );
+            }
+
         }
 
         toSave.setUserDefined( true );

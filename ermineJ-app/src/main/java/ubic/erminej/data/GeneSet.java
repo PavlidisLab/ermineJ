@@ -198,6 +198,9 @@ public class GeneSet {
     }
 
     public void setGenes( Collection<Gene> genes ) {
+        if (genes == null) {
+            throw new IllegalArgumentException("Genes was null");
+        }
         this.genes.clear();
         for ( Gene gene : genes ) {
             this.addGene( gene );
