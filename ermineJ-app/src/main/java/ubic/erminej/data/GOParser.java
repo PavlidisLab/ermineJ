@@ -314,6 +314,8 @@ class OldGOHandler extends GOHandler {
 
     private String currentAspect;
 
+    private String currentTerm;
+
     public OldGOHandler() {
         super();
     }
@@ -330,9 +332,9 @@ class OldGOHandler extends GOHandler {
              * if there is an "accession" element.
              */
             String res = atts.getValue( "rdf:about" );
-            String acc = res.substring( res.lastIndexOf( '#' ) + 1, res.length() );
-            accBuf = new StringBuffer();
-            accBuf.append( acc );
+            currentTerm = res.substring( res.lastIndexOf( '#' ) + 1, res.length() );
+
+            initializeNewNode( currentTerm );
 
         } else if ( name.equals( "accession" ) ) {
             accBuf = new StringBuffer();
@@ -349,7 +351,7 @@ class OldGOHandler extends GOHandler {
             if ( !termGraph.containsKey( parent ) ) {
                 initializeNewNode( parent );
             }
-            String currentTerm = accBuf.toString();
+            if ( StringUtils.isBlank( currentTerm ) ) currentTerm = accBuf.toString();
 
             if ( !forbiddenParents.contains( parent ) ) {
                 termGraph.addParentTo( currentTerm, parent );
@@ -374,18 +376,21 @@ class OldGOHandler extends GOHandler {
             inTerm = false;
         } else if ( name.equals( "accession" ) ) {
             inAcc = false;
-            String currentTerm = accBuf.toString();
+            currentTerm = accBuf.toString();
             initializeNewNode( currentTerm );
         } else if ( name.equals( "definition" ) ) {
-            String currentTerm = accBuf.toString();
+            if ( StringUtils.isBlank( currentTerm ) ) currentTerm = accBuf.toString();
             termGraph.getNodeContents( currentTerm ).setDefinition( defBuf.toString() );
             inDef = false;
         } else if ( name.equals( "name" ) ) {
             inName = false;
-            String currentTerm = accBuf.toString();
+
+            if ( StringUtils.isBlank( currentTerm ) ) currentTerm = accBuf.toString();
             String currentName = nameBuf.toString();
 
             GeneSetTerm term = termGraph.getNodeContents( currentTerm );
+            assert term != null;
+
             term.setName( currentName );
 
             if ( currentName.equalsIgnoreCase( "molecular_function" )

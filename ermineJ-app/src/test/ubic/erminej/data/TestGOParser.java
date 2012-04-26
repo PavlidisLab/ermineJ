@@ -116,8 +116,23 @@ public class TestGOParser extends TestCase {
     public void testGOParserOld2() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200109-termdb.xml.gz" ) );
         gOParser = new GOParser( z, true );
-        System.err.println( gOParser.getGraph().toString() );
+        assertNotNull( gOParser.getGraph().getRoot() );
+        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0008920" );
 
+        assertNotNull( testnode );
+        Set<String> parentKeys = testnode.getParentKeys();
+        assertTrue( parentKeys.size() > 0 );
+    }
+
+    /**
+     * Faulty file doesn't have acc elements.
+     * 
+     * @throws Exception
+     */
+    public void testGOParserOld3() throws Exception {
+        InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200111-termdb.xml.gz" ) );
+        gOParser = new GOParser( z, true );
         assertNotNull( gOParser.getGraph().getRoot() );
         assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
         DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0008920" );
@@ -135,7 +150,6 @@ public class TestGOParser extends TestCase {
     public void testGOParser3() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200408-termdb.xml.gz" ) );
         gOParser = new GOParser( z, true );
-        System.err.println( gOParser.getGraph().toString() );
 
         assertNotNull( gOParser.getGraph().getRoot() );
         assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
