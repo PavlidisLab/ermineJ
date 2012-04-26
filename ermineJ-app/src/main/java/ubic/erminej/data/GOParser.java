@@ -85,9 +85,6 @@ public class GOParser {
         xr.setDTDHandler( handler );
         InputSource inputSource = new InputSource( i );
 
-        // some GO XML files have mangled utf-8
-        inputSource.setEncoding( "ascii" );
-
         xr.parse( inputSource );
 
         termGraph = handler.getResults();
