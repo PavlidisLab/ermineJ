@@ -191,7 +191,7 @@ public class GOParser {
 class GOHandler extends DefaultHandler {
     protected DirectedGraph<String, GeneSetTerm> termGraph;
 
-    private Collection<String> forbiddenParents = new HashSet<String>();
+    protected Collection<String> forbiddenParents = new HashSet<String>();
 
     protected boolean inTerm = false;
 
@@ -199,7 +199,7 @@ class GOHandler extends DefaultHandler {
     protected boolean inAcc = false;
     protected boolean inName = false;
     protected StringBuffer nameBuf;
-    protected StringBuffer accBuf;
+    protected StringBuffer accBuf = null;
 
     protected StringBuffer defBuf;
 
@@ -308,7 +308,7 @@ class GOHandler extends DefaultHandler {
 }
 
 /**
- * For GO rdf-xml before ~2009 or so. Pre 2004 or so, it was even more different.
+ * For GO rdf-xml before ~ 2004 or so, it was even more different.
  */
 class OldGOHandler extends GOHandler {
 
@@ -316,6 +316,51 @@ class OldGOHandler extends GOHandler {
 
     public OldGOHandler() {
         super();
+    }
+
+    @Override
+    public void startElement( String uri, String name, String qName, Attributes atts ) {
+
+        if ( name.equals( "term" ) ) {
+            inTerm = true;
+
+            /*
+             * Some very old GO XML files lack the go:accession element. This is probably a bug in the generation of
+             * those files, but it means we have to get the accession from the rdf:about part. This will get clobbered
+             * if there is an "accession" element.
+             */
+            String res = atts.getValue( "rdf:about" );
+            String acc = res.substring( res.lastIndexOf( '#' ) + 1, res.length() );
+            accBuf = new StringBuffer();
+            accBuf.append( acc );
+
+        } else if ( name.equals( "accession" ) ) {
+            accBuf = new StringBuffer();
+            inAcc = true;
+        } else if ( name.equals( "definition" ) ) {
+            defBuf = new StringBuffer();
+            inDef = true;
+        } else if ( name.equals( "is_a" ) || name.equals( "part_of" ) || name.equals( "part-of" )
+                || name.equals( "isa" ) ) {
+
+            String res = atts.getValue( "rdf:resource" );
+            String parent = res.substring( res.lastIndexOf( '#' ) + 1, res.length() );
+
+            if ( !termGraph.containsKey( parent ) ) {
+                initializeNewNode( parent );
+            }
+            String currentTerm = accBuf.toString();
+
+            if ( !forbiddenParents.contains( parent ) ) {
+                termGraph.addParentTo( currentTerm, parent );
+            }
+
+        } else if ( name.equals( "synonym" ) ) {
+            // inSyn = true;
+        } else if ( name.equals( "name" ) ) {
+            nameBuf = new StringBuffer();
+            inName = true;
+        }
     }
 
     /*

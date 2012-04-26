@@ -347,6 +347,21 @@ public class TestGeneAnnotations extends TestCase {
         assertTrue( g.getGeneSets().contains( new GeneSetTerm( "GO:0005737" ) ) );
     }
 
+    /**
+     * Test the 'minimum.geneset.size' feature.
+     * 
+     * @throws Exception
+     */
+    public void testSimpleMinSize() throws Exception {
+        InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
+        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
+        settings.setProperty( "minimum.geneset.size", 1 );
+
+        GeneAnnotations r = p.readDefault( i, null, settings, true );
+        assertEquals( 9, r.getGenes().size() );
+
+    }
+
     public void testSimpleOldGo() throws Exception {
         InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
 

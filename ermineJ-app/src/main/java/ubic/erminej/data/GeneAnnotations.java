@@ -62,6 +62,9 @@ import ubic.erminej.SettingsHolder;
  */
 public class GeneAnnotations {
 
+    // undocumented for now, allows more flexible use of API without restriction of value = 2.
+    private static final String MINIMUM_GENESET_SIZE_PROPERTY = "minimum.geneset.size";
+
     /**
      * Whether to filter out probes that hit more than one gene
      */
@@ -1115,6 +1118,25 @@ public class GeneAnnotations {
     }
 
     /**
+     * 
+     */
+    private void maybeSetMinimumGenesetSize() {
+        // undocumented for now, allows more flexible use of API without restriction of value = 2.
+        if ( StringUtils.isNotBlank( settings.getStringProperty( MINIMUM_GENESET_SIZE_PROPERTY ) ) ) {
+            try {
+                this.minimumGeneSetSize = Integer
+                        .parseInt( settings.getStringProperty( MINIMUM_GENESET_SIZE_PROPERTY ) );
+                if ( minimumGeneSetSize < 1 )
+                    throw new IllegalArgumentException( "minimum.geneset.size must be at least 1 (was: "
+                            + minimumGeneSetSize + ")" );
+                log.info( "Minimum gene set size set to " + this.minimumGeneSetSize );
+            } catch ( NumberFormatException e ) {
+                throw new IllegalArgumentException( "minimum.geneset.size was not a valid integer value" );
+            }
+        }
+    }
+
+    /**
      * Remove classes that have too few members, or which are obsolete. These are not removed from the GO tree
      * 
      * @param subCloning signals that we're making a copy of another annotation set for the purpose of analysis; ensures
@@ -1335,6 +1357,8 @@ public class GeneAnnotations {
         formGeneSets(); // 1s
 
         assert !this.geneSets.isEmpty();
+        
+        maybeSetMinimumGenesetSize();
 
         prune( false ); // / 100 ms
 
@@ -1358,18 +1382,7 @@ public class GeneAnnotations {
             throw new IllegalStateException( "No gene sets were formed." );
         }
 
-        // undocumented for now, allows more flexible use of API without restriction of value = 2.
-        if ( StringUtils.isNotBlank( settings.getStringProperty( "minimum.geneset.size" ) ) ) {
-            try {
-                this.minimumGeneSetSize = Integer.parseInt( settings.getStringProperty( "minimum.geneset.size" ) );
-                if ( minimumGeneSetSize < 1 )
-                    throw new IllegalArgumentException( "minimum.geneset.size must be at least 1 (was: "
-                            + minimumGeneSetSize + ")" );
-                log.info( "Minimum gene set size set to " + this.minimumGeneSetSize );
-            } catch ( NumberFormatException e ) {
-                throw new IllegalArgumentException( "minimum.geneset.size was not a valid integer value" );
-            }
-        }
+        maybeSetMinimumGenesetSize();
 
         prune( true /* subcloning */); // fast
 
