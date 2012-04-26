@@ -78,11 +78,17 @@ public class GOParser {
         xr.setFeature( "http://xml.org/sax/features/validation", false );
         xr.setFeature( "http://xml.org/sax/features/external-general-entities", false );
         xr.setFeature( "http://apache.org/xml/features/nonvalidating/load-external-dtd", false );
+
         xr.setContentHandler( handler );
         xr.setErrorHandler( handler );
         xr.setEntityResolver( handler );
         xr.setDTDHandler( handler );
-        xr.parse( new InputSource( i ) );
+        InputSource inputSource = new InputSource( i );
+
+        // some GO XML files have mangled utf-8
+        inputSource.setEncoding( "ascii" );
+
+        xr.parse( inputSource );
 
         termGraph = handler.getResults();
 

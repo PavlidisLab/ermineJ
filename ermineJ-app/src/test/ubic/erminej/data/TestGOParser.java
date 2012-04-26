@@ -102,7 +102,6 @@ public class TestGOParser extends TestCase {
     public void testGOParserOld() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200212-termdb.xml.gz" ) );
         gOParser = new GOParser( z, true );
-        System.err.println( gOParser.getGraph().toString() );
 
         assertNotNull( gOParser.getGraph().getRoot() );
         assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
@@ -132,6 +131,23 @@ public class TestGOParser extends TestCase {
      */
     public void testGOParserOld3() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200111-termdb.xml.gz" ) );
+        gOParser = new GOParser( z, true );
+        assertNotNull( gOParser.getGraph().getRoot() );
+        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0008920" );
+
+        assertNotNull( testnode );
+        Set<String> parentKeys = testnode.getParentKeys();
+        assertTrue( parentKeys.size() > 0 );
+    }
+
+    /**
+     * Was giving "invalid byte 2 of 2-type UTF-8 sequence"
+     * 
+     * @throws Exception
+     */
+    public void testGOParserOld4() throws Exception {
+        InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200205-termdb.xml.gz" ) );
         gOParser = new GOParser( z, true );
         assertNotNull( gOParser.getGraph().getRoot() );
         assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
