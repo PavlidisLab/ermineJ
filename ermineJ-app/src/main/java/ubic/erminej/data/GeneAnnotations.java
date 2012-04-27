@@ -295,6 +295,12 @@ public class GeneAnnotations {
             }
         }
 
+        try {
+            this.settings = new Settings( false );
+        } catch ( IOException e1 ) {
+            throw new RuntimeException( e1 );
+        }
+
         setUp();
 
     }
