@@ -42,6 +42,7 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.dataStructure.graph.DirectedGraph;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
+import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
 /**
@@ -222,6 +223,12 @@ public class GeneAnnotations {
     public GeneAnnotations( List<Gene> geneSymbols, List<Collection<GeneSetTerm>> goTerms, StatusViewer m ) {
         checkValidData( geneSymbols, goTerms );
         if ( m != null ) this.messenger = m;
+
+        try {
+            this.settings = new Settings( false );
+        } catch ( IOException e1 ) {
+            throw new RuntimeException( e1 );
+        }
 
         Collection<GeneSetTerm> allTerms = new HashSet<GeneSetTerm>();
         for ( Collection<GeneSetTerm> geneSetTerm : goTerms ) {
@@ -1121,6 +1128,8 @@ public class GeneAnnotations {
      * 
      */
     private void maybeSetMinimumGenesetSize() {
+        assert settings != null;
+
         // undocumented for now, allows more flexible use of API without restriction of value = 2.
         if ( StringUtils.isNotBlank( settings.getStringProperty( MINIMUM_GENESET_SIZE_PROPERTY ) ) ) {
             try {
@@ -1357,7 +1366,7 @@ public class GeneAnnotations {
         formGeneSets(); // 1s
 
         assert !this.geneSets.isEmpty();
-        
+
         maybeSetMinimumGenesetSize();
 
         prune( false ); // / 100 ms
