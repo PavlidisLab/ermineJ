@@ -82,14 +82,17 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
         return columnNames.get( i );
     }
 
+    @Override
     public int getColumnCount() {
         return columnNames.size();
     }
 
+    @Override
     public int getRowCount() {
         return this.geneSets.size();
     }
 
+    @Override
     public Object getValueAt( int i, int j ) {
 
         GeneSet geneSet = geneSets.get( i );

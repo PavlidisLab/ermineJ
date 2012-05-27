@@ -267,6 +267,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     public void addRun() {
 
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 model.addRun();
 
@@ -474,6 +475,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         if ( yesno == JOptionPane.YES_OPTION ) {
 
             SwingUtilities.invokeLater( new Runnable() {
+                @Override
                 public void run() {
                     int runIndex = model.getRunIndex( currentColumnIndex );
                     assert runIndex >= 0;

@@ -75,6 +75,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
      * 
      * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#classPvalGenerator()
      */
+    @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
 
         boolean useMultifunctionalityCorrection = settings.useMultifunctionalityCorrection();

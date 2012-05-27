@@ -180,6 +180,7 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
         deleteGeneSetMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e1 ) {
                 deleteUserGeneSet( classID ); //
             }
@@ -189,6 +190,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         final JCheckBoxMenuItem hideInsig = new JCheckBoxMenuItem( "Hide non-significant", hideInsignificant );
 
         hideEmptyMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e1 ) {
                 hideEmpty = hideEmptyMenuItem.getState();
                 filter( true );
@@ -197,6 +199,7 @@ public abstract class GeneSetPanel extends JScrollPane {
         } );
 
         hideInsig.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e1 ) {
                 hideInsignificant = hideInsig.getState();
                 filter( true );
@@ -408,6 +411,7 @@ class UrlActionAdapter implements java.awt.event.ActionListener {
         this.urlBase = urlBase;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         GeneSetTerm classID = sourcePopup.getSelectedItem();
@@ -422,6 +426,7 @@ class ModifySetActionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.modMenuItem_actionPerformed( e );
     }

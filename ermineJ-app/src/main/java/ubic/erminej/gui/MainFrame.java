@@ -842,6 +842,7 @@ public class MainFrame extends JFrame {
         modClassMenuItem.setMnemonic( 'M' );
 
         showUsersMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 showUserMenuItemActionPerformed( showUsersMenuItem.getState() );
             }
@@ -886,6 +887,7 @@ public class MainFrame extends JFrame {
         switchDataFileMenuItem.setActionCommand( "Set raw data file" );
         switchDataFileMenuItem.setText( "Set raw data file..." );
         switchDataFileMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 switchRawDataFile();
             }
@@ -894,6 +896,7 @@ public class MainFrame extends JFrame {
         switchGeneScoreFileMenuItem.setActionCommand( "Set gene score file" );
         switchGeneScoreFileMenuItem.setText( "Set gene score file..." );
         switchGeneScoreFileMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 switchGeneScoreFile();
             }
@@ -920,6 +923,7 @@ public class MainFrame extends JFrame {
         logMenuItem.setText( "View log" );
         logMenuItem.setToolTipText( "Debugging information" );
         logMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 showLogs();
             }
@@ -928,6 +932,7 @@ public class MainFrame extends JFrame {
         geneAnnotsWebLinkMenuItem.setText( "Get annotations" );
         geneAnnotsWebLinkMenuItem.setToolTipText( "Find annotation files on the ErmineJ web site" );
         geneAnnotsWebLinkMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 try {
                     /*
@@ -1310,6 +1315,7 @@ public class MainFrame extends JFrame {
 
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
                     public void run() {
                         progressBar.setValue( value );
                     }
@@ -1645,6 +1651,7 @@ class GeneSetScoreFrame_aboutMenuItem_actionAdapter implements java.awt.event.Ac
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.aboutMenuItem_actionPerformed();
     }
@@ -1657,6 +1664,7 @@ class GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter implements java.awt
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.doCancel();
     }
@@ -1669,6 +1677,7 @@ class GeneSetScoreFrame_defineClassMenuItem_actionAdapter implements java.awt.ev
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.defineClassMenuItem_actionPerformed();
     }
@@ -1681,6 +1690,7 @@ class GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter implements java.awt.e
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.loadAnalysis();
     }
@@ -1693,6 +1703,7 @@ class GeneSetScoreFrame_modClassMenuItem_actionAdapter implements java.awt.event
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.modClassMenuItem_actionPerformed();
     }
@@ -1705,6 +1716,7 @@ class GeneSetScoreFrame_quitMenuItem_actionAdapter implements java.awt.event.Act
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.quitMenuItem_actionPerformed( e );
     }
@@ -1717,6 +1729,7 @@ class GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter implements java.awt.ev
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.runAnalysisMenuItem_actionPerformed();
     }
@@ -1730,6 +1743,7 @@ class GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter implements java.awt.e
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.saveAnalysisAction();
     }
@@ -1746,6 +1760,7 @@ class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         assert e.getSource() instanceof ResultSetMenuItem;
         ResultSetMenuItem source = ( ResultSetMenuItem ) e.getSource();

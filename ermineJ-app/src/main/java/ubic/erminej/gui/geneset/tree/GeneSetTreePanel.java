@@ -543,6 +543,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         this.goTree.addMouseListener( popupListener );
         this.goTree.addMouseListener( new GeneSetTreePanel_mouseListener( this ) );
         this.goTree.addTreeSelectionListener( new TreeSelectionListener() {
+            @Override
             public void valueChanged( TreeSelectionEvent e ) {
                 currentlySelectedTreePath = e.getPath();
                 GeneSetTreeNode currentNode = ( GeneSetTreeNode ) currentlySelectedTreePath.getLastPathComponent();
@@ -651,6 +652,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         JMenuItem collapseNodeMenuItem = new JMenuItem( "Fully collapse this node" );
         collapseNodeMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e1 ) {
                 expandNode( currentlySelectedTreePath, false );
             }
@@ -658,6 +660,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
         JMenuItem expandNodeMenuItem = new JMenuItem( "Fully expand this node" );
         expandNodeMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e1 ) {
                 expandNode( currentlySelectedTreePath, true );
             }

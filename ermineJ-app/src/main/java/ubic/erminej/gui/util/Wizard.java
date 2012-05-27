@@ -213,6 +213,7 @@ class Wizard_backButton_actionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.backButton_actionPerformed( e );
     }
@@ -225,6 +226,7 @@ class Wizard_cancelButton_actionAdapter implements java.awt.event.ActionListener
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.cancelButton_actionPerformed( e );
     }
@@ -237,6 +239,7 @@ class Wizard_finishButton_actionAdapter implements java.awt.event.ActionListener
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.finishEditing( e );
     }
@@ -249,6 +252,7 @@ class Wizard_nextButton_actionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.nextButton_actionPerformed( e );
     }

@@ -152,6 +152,7 @@ public class GeneSetWizardStep1A extends WizardStep {
         searchTextField = new JTextField();
         searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
         searchTextField.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 find();
             }
@@ -202,6 +203,7 @@ class GeneSetWizardStep1A_searchButton_actionAdapter implements ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.find();
 

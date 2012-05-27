@@ -179,6 +179,7 @@ public abstract class AppDialog extends JDialog {
          * 
          * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
          */
+        @Override
         public void hyperlinkUpdate( HyperlinkEvent e ) {
             if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
                 try {
@@ -199,6 +200,7 @@ class AppDialog_actionButton_actionAdapter implements java.awt.event.ActionListe
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.actionButton_actionPerformed( e );
     }
@@ -211,6 +213,7 @@ class AppDialog_cancelButton_actionAdapter implements java.awt.event.ActionListe
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.cancelButton_actionPerformed( e );
     }
@@ -223,6 +226,7 @@ class AppDialog_helpButton_actionAdapter implements java.awt.event.ActionListene
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.helpButton_actionPerformed( e );
     }
@@ -244,6 +248,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
+    @Override
     public void mouseClicked( MouseEvent e ) {
         adaptee.mouseButton_actionPerformed( e );
     }
@@ -253,6 +258,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
      */
+    @Override
     public void mouseEntered( MouseEvent e ) {
     }
 
@@ -261,6 +267,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
      */
+    @Override
     public void mouseExited( MouseEvent e ) {
     }
 
@@ -269,6 +276,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
+    @Override
     public void mousePressed( MouseEvent e ) {
     }
 
@@ -277,6 +285,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      * 
      * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
      */
+    @Override
     public void mouseReleased( MouseEvent e ) {
     }
 

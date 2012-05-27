@@ -184,6 +184,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @param messenger
      */
+    @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
         Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
 

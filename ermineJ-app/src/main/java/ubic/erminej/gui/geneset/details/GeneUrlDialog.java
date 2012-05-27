@@ -195,6 +195,7 @@ class SetButton_actionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.setActionPerformed();
     }
@@ -207,6 +208,7 @@ class CancelButton_actionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.cancelButton_actionPerformed();
     }

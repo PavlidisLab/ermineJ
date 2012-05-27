@@ -969,6 +969,7 @@ public class GeneAnnotations {
             private static final long serialVersionUID = 1L;
             private String[] columnNames = { "Probe", "Gene", "Description" };
 
+            @Override
             public int getColumnCount() {
                 return 3;
             }
@@ -978,10 +979,12 @@ public class GeneAnnotations {
                 return columnNames[i];
             }
 
+            @Override
             public int getRowCount() {
                 return probes.size();
             }
 
+            @Override
             public Object getValueAt( int i, int j ) {
                 Probe probeid = pL.get( i );
                 switch ( j ) {
@@ -1433,6 +1436,7 @@ class ClassSizeComparator implements Comparator<GeneSet>, Serializable {
      * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    @Override
     public int compare( GeneSet a, GeneSet b ) {
 
         int sizea = a.size();

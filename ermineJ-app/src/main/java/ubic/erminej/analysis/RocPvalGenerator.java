@@ -51,6 +51,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * 
      * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#generateGeneSetResults()
      */
+    @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
         boolean useMultifunctionalityCorrection = settings.useMultifunctionalityCorrection();
 

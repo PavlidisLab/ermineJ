@@ -87,6 +87,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      * 
      * @return histogram containing the random distributions of correlations.
      */
+    @Override
     public Histogram generateNullDistribution( StatusViewer messenger ) {
 
         int[] deck = new int[data.rows()];
@@ -225,6 +226,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      * 
      * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
      */
+    @Override
     public void setRandomSeed( long randomSeed ) {
         RandomChooser.init( randomSeed );
     }

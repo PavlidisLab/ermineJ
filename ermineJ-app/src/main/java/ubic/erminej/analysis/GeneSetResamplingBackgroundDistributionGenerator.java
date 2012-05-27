@@ -163,6 +163,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
      * @return A histogram object containing a cdf that can be used to generate pvalues.
      * @param m
      */
+    @Override
     public Histogram generateNullDistribution( StatusViewer m ) {
 
         int numGenes = geneScores.length;
@@ -289,6 +290,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
      * 
      * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
      */
+    @Override
     public void setRandomSeed( long randomSeed ) {
         RandomChooser.init( randomSeed );
     }

@@ -153,6 +153,7 @@ public class AnalysisWizardStep1 extends WizardStep {
         rocButton.setText( "ROC" );
         rocButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         rocButton.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 wiz.setAnalysisType( SettingsHolder.Method.ROC );
             }
@@ -162,6 +163,7 @@ public class AnalysisWizardStep1 extends WizardStep {
         prButton.setText( "PREREC" );
         prButton.setBorder( new EmptyBorder( 0, 0, 0, 20 ) );
         prButton.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 wiz.setAnalysisType( SettingsHolder.Method.GSR );
                 // FIXME
@@ -261,6 +263,7 @@ class AnalysisWizardStep1_corrButton_actionAdapter implements java.awt.event.Act
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.corrButton_actionPerformed();
     }
@@ -273,6 +276,7 @@ class AnalysisWizardStep1_oraButton_actionAdapter implements java.awt.event.Acti
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.oraButton_actionPerformed();
     }
@@ -285,6 +289,7 @@ class AnalysisWizardStep1_resampButton_actionAdapter implements java.awt.event.A
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.resampButton_actionPerformed();
     }

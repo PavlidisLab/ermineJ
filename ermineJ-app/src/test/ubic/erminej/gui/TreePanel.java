@@ -72,6 +72,7 @@ public class TreePanel extends JPanel implements TreeSelectionListener {
         add( splitPane );
     }
 
+    @Override
     public void valueChanged( TreeSelectionEvent e ) {
         DefaultMutableTreeNode node = ( DefaultMutableTreeNode ) tree.getLastSelectedPathComponent();
 

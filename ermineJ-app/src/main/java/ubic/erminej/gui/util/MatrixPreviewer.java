@@ -77,6 +77,7 @@ public class MatrixPreviewer {
         JButton closeButton = new JButton( "Close" );
 
         closeButton.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 previewPanel.dispose();
             }

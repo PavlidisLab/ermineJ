@@ -728,6 +728,7 @@ public class GeneSetDetailsFrame extends JFrame {
         switchDataFileMenuItem.setText( "Set Dataset ..." );
         switchDataFileMenuItem.setToolTipText( "Set or change the source of the data used for the heatmap" );
         switchDataFileMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 switchRawDataFile();
                 table.revalidate();
@@ -738,6 +739,7 @@ public class GeneSetDetailsFrame extends JFrame {
         switchGeneScoreFileMenuItem
                 .setToolTipText( "Set or change the source of the data used for the 'score' columns" );
         switchGeneScoreFileMenuItem.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 switchGeneScoreFile();
                 table.revalidate();
@@ -1441,6 +1443,7 @@ class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter implements java.aw
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.m_blackbodyColormapMenuItem_actionPerformed();
     }
@@ -1453,6 +1456,7 @@ class JGeneSetFrame_m_cellWidthSlider_changeAdapter implements javax.swing.event
         this.adaptee = adaptee;
     }
 
+    @Override
     public void stateChanged( ChangeEvent e ) {
         adaptee.m_cellWidthSlider_stateChanged( e );
     }
@@ -1465,6 +1469,7 @@ class JGeneSetFrame_m_colorRangeSlider_changeAdapter implements javax.swing.even
         this.adaptee = adaptee;
     }
 
+    @Override
     public void stateChanged( ChangeEvent e ) {
         adaptee.m_colorRangeSlider_stateChanged( e );
     }
@@ -1477,6 +1482,7 @@ class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter implements java.awt
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.m_greenredColormapMenuItem_actionPerformed( e );
     }
@@ -1508,6 +1514,7 @@ class JGeneSetFrame_m_mouseMotionListener extends java.awt.event.MouseAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void mouseMoved( MouseEvent e ) {
         adaptee.table_mouseMoved( e );
     }
@@ -1520,6 +1527,7 @@ class JGeneSetFrame_m_normalizeMenuItem_actionAdapter implements java.awt.event.
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.m_normalizeMenuItem_actionPerformed();
     }
@@ -1532,6 +1540,7 @@ class JGeneSetFrame_m_saveDataMenuItem_actionAdapter implements java.awt.event.A
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.saveDataAction();
     }
@@ -1544,6 +1553,7 @@ class JGeneSetFrame_m_saveImageMenuItem_actionAdapter implements java.awt.event.
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.m_saveImageMenuItem_actionPerformed();
     }
@@ -1560,6 +1570,7 @@ class JGeneSetFrame_viewGeneUrlDialog_actionAdapter implements java.awt.event.Ac
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.viewGeneUrlDialogMenuItem_actionPerformed();
     }

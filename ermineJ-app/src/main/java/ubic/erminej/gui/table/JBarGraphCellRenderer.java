@@ -84,6 +84,7 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
      * @param column the column of the cell to render
      * @return the default table cell renderer
      */
+    @Override
     @SuppressWarnings("unchecked")
     public Component getTableCellRendererComponent( JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column ) {

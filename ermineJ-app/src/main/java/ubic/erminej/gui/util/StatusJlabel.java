@@ -65,6 +65,7 @@ public class StatusJlabel extends StatusDebugLogger {
         } else {
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
                     public void run() {
                         setLabel( "", null );
                     }
@@ -91,6 +92,7 @@ public class StatusJlabel extends StatusDebugLogger {
 
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
                     public void run() {
                         setLabel( m, null );
                     }
@@ -117,6 +119,7 @@ public class StatusJlabel extends StatusDebugLogger {
         } else {
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
                     public void run() {
                         setLabel( m, errorIcon );
                         letUserReadMessage( MESSAGE_DELAY );
@@ -147,6 +150,7 @@ public class StatusJlabel extends StatusDebugLogger {
             final String mf = mm;
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
                     public void run() {
                         setLabel( mf, waitingIcon );
                     }
@@ -190,6 +194,7 @@ public class StatusJlabel extends StatusDebugLogger {
             final String mf = m;
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
                     public void run() {
                         setLabel( mf, errorIcon );
                     }

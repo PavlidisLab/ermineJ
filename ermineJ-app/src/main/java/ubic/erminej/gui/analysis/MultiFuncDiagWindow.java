@@ -28,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -79,7 +80,7 @@ public class MultiFuncDiagWindow extends JFrame {
         this.setIconImage( new ImageIcon( this.getClass().getResource(
                 MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
 
-        JTabbedPane tabs = new JTabbedPane( JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT );
+        JTabbedPane tabs = new JTabbedPane( SwingConstants.TOP, JTabbedPane.SCROLL_TAB_LAYOUT );
 
         tabs.addTab( "Set sizes.", getGenesPerGroupDistribution( geneAnnots ) );
         tabs.addTab( "Sets per gene", getTermsPerGeneDistribution( geneAnnots ) );

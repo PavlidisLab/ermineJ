@@ -414,6 +414,7 @@ class RawFileBrowse implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.rawBrowseButton_actionPerformed();
     }
@@ -426,6 +427,7 @@ class ScoreFileBrowse implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.scoreBrowseButton_actionPerformed();
     }

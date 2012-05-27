@@ -46,6 +46,7 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
 
     // This method is called each time a cell in a column
     // using this renderer needs to be rendered.
+    @Override
     public Component getTableCellRendererComponent( JTable table, Object tableCellValue, boolean isSelected,
             boolean hasFocus, int displayedRow, int displayedColumn ) {
         // 'value' is value contained in the cell located at

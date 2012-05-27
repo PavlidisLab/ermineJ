@@ -106,6 +106,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @param ob Object
      * @return int
      */
+    @Override
     public int compareTo( GeneSetResult other ) {
 
         if ( other == null ) return -1;
