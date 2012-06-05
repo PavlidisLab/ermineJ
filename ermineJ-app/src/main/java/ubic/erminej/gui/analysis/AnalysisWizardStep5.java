@@ -222,7 +222,7 @@ public class AnalysisWizardStep5 extends WizardStep {
             private GeneScores gs;
 
             @Override
-            protected Object doInBackground() throws Exception {
+            protected Object doInBackground() {
 
                 try {
 

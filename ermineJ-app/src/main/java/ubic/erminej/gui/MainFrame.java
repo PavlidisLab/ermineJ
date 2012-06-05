@@ -71,7 +71,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement; 
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -520,7 +520,7 @@ public class MainFrame extends JFrame {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
 
             @Override
-            protected Object doInBackground() throws Exception {
+            protected Object doInBackground() {
                 try {
 
                     tablePanel.setMessenger( statusMessenger );
@@ -541,7 +541,7 @@ public class MainFrame extends JFrame {
                     enableMenusOnStart();
                     statusMessenger.showStatus( "Ready." );
                 } catch ( Exception e ) {
-                    GuiUtil.error( "Error during initialization: " + e.getMessage() ); 
+                    GuiUtil.error( "Error during initialization: " + e.getMessage() );
                 }
                 return null;
             }
@@ -666,10 +666,10 @@ public class MainFrame extends JFrame {
             goData = new GeneSetTerms( settings.getClassFile() );
         } catch ( SAXException e ) {
             GuiUtil.error( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid GO XML file." ); 
+                    + "\nPlease check that it is a valid GO XML file." );
             return;
         } catch ( IOException e ) {
-            GuiUtil.error( "Error during GO initialization: " + e.getMessage() ); 
+            GuiUtil.error( "Error during GO initialization: " + e.getMessage() );
             return;
         }
 
@@ -1058,7 +1058,7 @@ public class MainFrame extends JFrame {
             SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
 
                 @Override
-                protected Object doInBackground() throws Exception {
+                protected Object doInBackground() {
                     initializeAllData();
 
                     return null;
@@ -1122,7 +1122,7 @@ public class MainFrame extends JFrame {
                 r.execute();
 
             } catch ( IOException e ) {
-                GuiUtil.error( "Error while loading the project: " + e.getMessage() ); 
+                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
                 return;
             } catch ( ConfigurationException e ) {
                 GuiUtil.error( "Error while loading the project: " + e.getMessage() );

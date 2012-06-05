@@ -207,7 +207,7 @@ public class AnalysisThread extends Thread {
      * @param results
      * @throws IOException
      */
-    public synchronized Collection<GeneSetPvalRun> doAnalysis() throws Exception {
+    public synchronized Collection<GeneSetPvalRun> doAnalysis() {
 
         Collection<GeneSetPvalRun> answer = new HashSet<GeneSetPvalRun>();
 
