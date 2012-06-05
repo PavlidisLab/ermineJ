@@ -15,12 +15,6 @@
 	<packaging>jar</packaging>
 	<dependencies>
 		<dependency>
-			<groupId>ermineJ</groupId>
-			<artifactId>ermineJ-help</artifactId>
-			<version>${project.version}</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
 			<groupId>colt</groupId>
 			<artifactId>colt</artifactId>
 			<version>1.2.0</version>

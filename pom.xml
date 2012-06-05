@@ -16,7 +16,6 @@
 	</description>
 	<modules>
 		<module>ermineJ-app</module>
-		<module>ermineJ-help</module>
 	</modules>
 	<packaging>pom</packaging>
 	<scm>
