@@ -94,7 +94,7 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
             }
         }
 
-        private void jbInit() throws Exception {
+        private void jbInit() {
             setLayout( gridLayout1 );
             includeMatrixValuesCheckBox
                     .setToolTipText( "Leave this box unchecked if you just want the expression value matrix" );

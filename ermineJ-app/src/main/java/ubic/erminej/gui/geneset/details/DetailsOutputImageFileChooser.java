@@ -95,7 +95,7 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
             }
         }
 
-        private void jbInit() throws Exception {
+        private void jbInit() {
             setLayout( gridLayout1 );
             this.setMaximumSize( new Dimension( 264, 63 ) );
             this.setMinimumSize( new Dimension( 264, 63 ) );

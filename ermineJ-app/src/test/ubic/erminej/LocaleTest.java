@@ -60,7 +60,7 @@ public class LocaleTest extends TestCase {
      * 
      *
      */
-    public void testLocale() throws Exception {
+    public void testLocale() {
         log.debug( "testLocale" );
         double num = 100.01;
         Locale locale_us = new Locale( "US" );

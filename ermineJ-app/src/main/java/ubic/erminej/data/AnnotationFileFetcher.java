@@ -123,7 +123,7 @@ public class AnnotationFileFetcher {
             }
 
             @Override
-            public JSONValue toJSON( Object aPojo ) throws MapperException {
+            public JSONValue toJSON( Object aPojo ) {
                 return null; // not needed
             }
         } );

@@ -439,7 +439,7 @@ public class StartupPanel extends JPanel {
 
         SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
             @Override
-            protected Object doInBackground() throws Exception {
+            protected Object doInBackground() {
                 statusMessenger.showProgress( "Looking for GO file ..." );
 
                 try {

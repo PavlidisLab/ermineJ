@@ -402,7 +402,6 @@ public class Multifunctionality {
     public double getMultifunctionalityRank( Gene gene ) {
         if ( stale.get() ) init();
         if ( !this.geneMultifunctionalityRank.containsKey( gene ) ) {
-            // throw new IllegalArgumentException( "Gene: " + gene + " not found" );
             return 0.0;
         }
 
@@ -418,7 +417,6 @@ public class Multifunctionality {
     public double getMultifunctionalityScore( Gene gene ) {
         if ( stale.get() ) init();
         if ( !this.geneMultifunctionality.containsKey( gene ) ) {
-            // throw new IllegalArgumentException( "Gene: " + gene + " not found" );
             return 0.0;
         }
 
@@ -447,8 +445,8 @@ public class Multifunctionality {
     }
 
     /**
-     * Populate the multifuncationality of each gene set. This is computed by looking at how the genes in the set
-     * compare to the gene multifuncxtionality ranking, using ROC.
+     * Populate the multifunctionality of each gene set. This is computed by looking at how the genes in the set compare
+     * to the gene multifuncxtionality ranking, using ROC.
      */
     private void computeGoTermMultifunctionalityRanks() {
 
@@ -533,15 +531,15 @@ public class Multifunctionality {
                 Collection<GeneSetTerm> sets = gene.getGeneSets();
                 this.numGoTerms.put( gene, sets.size() );
                 for ( GeneSetTerm goset : sets ) {
-                    int inGroup = 0;
+
                     if ( !goGroupSizes.containsKey( goset ) ) {
                         // if ( !USE_UNANNOTATED_GENES ) {
                         // continue;
                         // }
-                        inGroup = 0;
-                    } else {
-                        inGroup = goGroupSizes.get( goset );
+                        // inGroup = 0;
+                        throw new IllegalStateException( "Size not computed for " + goset );
                     }
+                    int inGroup = goGroupSizes.get( goset );
 
                     int outGroup = numGenes - inGroup;
 

@@ -167,7 +167,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
             SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
                 @Override
-                protected Object doInBackground() throws Exception {
+                protected Object doInBackground() {
                     goTree.expandPath( path );
                     goTree.setSelectionPath( path );
                     goTree.scrollPathToVisible( path );

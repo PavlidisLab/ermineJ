@@ -95,7 +95,7 @@ public class JRawFileChooser extends JFileChooser {
             }
         }
 
-        private void jbInit() throws Exception {
+        private void jbInit() {
             setLayout( gridLayout1 );
             JLabel m_titleLabel = new JLabel();
             m_titleLabel.setHorizontalAlignment( SwingConstants.CENTER );

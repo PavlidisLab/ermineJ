@@ -73,7 +73,7 @@ public class TestGeneAnnotations extends TestCase {
 
     }
 
-    public void testAddGeneSet() throws Exception {
+    public void testAddGeneSet() {
         List<Gene> newGeneSet = new ArrayList<Gene>();
         Gene g = new Gene( "LARS2" );
         g.addProbe( new Probe( "34764_at" ) );
@@ -86,7 +86,7 @@ public class TestGeneAnnotations extends TestCase {
 
     }
 
-    public void testConstructPruned() throws Exception {
+    public void testConstructPruned() {
         Set<Probe> keepers = new HashSet<Probe>();
         keepers.add( ga.findProbe( "36949_at" ) );
         keepers.add( ga.findProbe( "41208_at" ) );
@@ -98,21 +98,21 @@ public class TestGeneAnnotations extends TestCase {
         assertEquals( 59, pruned.numGeneSets() ); // not checked by hand.
     }
 
-    public void testGeneAnnotationsApiA() throws Exception {
+    public void testGeneAnnotationsApiA() {
         GeneAnnotations val = new GeneAnnotations( geneIds, goIds, new StatusStderr() );
         int actualValue = val.numGenes();
         int expectedValue = 3;
         assertEquals( expectedValue, actualValue );
     }
 
-    public void testGeneAnnotationsApiB() throws Exception {
+    public void testGeneAnnotationsApiB() {
         GeneAnnotations val = new GeneAnnotations( geneIds, goIds, new StatusStderr() );
         int actualValue = val.numProbesForGene( val.findGene( "aGene" ) );
         int expectedValue = 1;
         assertEquals( expectedValue, actualValue );
     }
 
-    public void testGeneAnnotationsApiC() throws Exception {
+    public void testGeneAnnotationsApiC() {
         GeneAnnotations val = new GeneAnnotations( geneIds, goIds, new StatusStderr() );
         Collection<GeneSetTerm> geneSets = val.findGene( "aGene" ).getGeneSets();
         int actualValue = geneSets.size();
@@ -120,7 +120,7 @@ public class TestGeneAnnotations extends TestCase {
         assertEquals( expectedValue, actualValue );
     }
 
-    public void testGetParents() throws Exception {
+    public void testGetParents() {
         GeneSetTerm t = ga.findTerm( "GO:0042246" );
         GeneSetTerm p = ga.findTerm( "GO:0048589" );
 
@@ -132,7 +132,7 @@ public class TestGeneAnnotations extends TestCase {
         assertTrue( pa.contains( p ) );
     }
 
-    public void testGoNames() throws Exception {
+    public void testGoNames() {
         // http://amigo.geneontology.org/cgi-bin/amigo/term_details?term=GO:0005739 - "mitochondrion"
         GeneSetTerm cellComp = goNames.get( "GO:0005739" );
         assertNotNull( cellComp );
@@ -164,9 +164,7 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     /**
-     * Updated format
-     * 
-     * @throws Exception
+     * Updated format @
      */
     public final void testReadAffyCsv2() throws Exception {
         // second affytest
@@ -228,13 +226,13 @@ public class TestGeneAnnotations extends TestCase {
         assertEquals( expectedValue, actualValue );
     }
 
-    public void testReadDescription() throws Exception {
+    public void testReadDescription() {
         String actualValue = ga.findProbe( "32304_at" ).getDescription();
         String expectedValue = "protein kinase C, alpha";
         assertEquals( expectedValue, actualValue );
     }
 
-    public void testReadPipeDelimited() throws Exception {
+    public void testReadPipeDelimited() {
 
         String[] gotr = new String[] { "GO:0030856" };
         String id = "FOOFAKE_at";
@@ -257,18 +255,18 @@ public class TestGeneAnnotations extends TestCase {
 
     }
 
-    public void testRemoveAspect() throws Exception {
+    public void testRemoveAspect() {
         GeneSetMapTools.removeAspect( ga, goNames, null, "cellular_component" );
         assertEquals( 0, ga.getGeneSetProbes( new GeneSetTerm( "GO:0005739" ) ).size() );
     }
 
-    public void testRemoveBySize() throws Exception {
+    public void testRemoveBySize() {
         assertEquals( 259, ga.getGeneSetTerms().size() ); // not checked by hand.
         GeneSetMapTools.removeBySize( ga, null, 2, 5 );
         assertEquals( 196, ga.getGeneSetTerms().size() ); // not checked by hand
     }
 
-    public void testSelectSetsByGene() throws Exception {
+    public void testSelectSetsByGene() {
         Collection<GeneSetTerm> selectedSets = ga.findSetsByGene( "LARS2" ); // from geneAnnotation.sample.txt
         assertEquals( "34764_at", ga.findGene( "LARS2" ).getProbes().iterator().next().getName() );
         GeneSetTerm geneset = new GeneSetTerm( "GO:0005739" );
@@ -279,7 +277,7 @@ public class TestGeneAnnotations extends TestCase {
         assertEquals( 2, ga.getGeneSetProbes( geneset ).size() );
     }
 
-    public void testToTableModel() throws Exception {
+    public void testToTableModel() {
         GeneAnnotations val = new GeneAnnotations( geneIds, goIds, null );
         TableModel actualValue = val.toTableModel();
         assertEquals( 3, actualValue.getColumnCount() );
@@ -348,9 +346,7 @@ public class TestGeneAnnotations extends TestCase {
     }
 
     /**
-     * Test the 'minimum.geneset.size' feature.
-     * 
-     * @throws Exception
+     * Test the 'minimum.geneset.size' feature. @
      */
     public void testSimpleMinSize() throws Exception {
         InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
