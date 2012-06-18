@@ -223,8 +223,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * Score
      * Pvalue
      * Multiple-testing corrected pvalue (FDR)
-     * Multifunctionality-corrected pvalue TODO
-     * Multifunctionality-corrected pvalue, multiple-test corrected (FDR) TODO
+     * Multifunctionality-corrected pvalue  
+     * Multifunctionality-corrected pvalue, multiple-test corrected (FDR)  
      * Multifunctionality of the gene set (relative rank, 1 is most multifunctional)
      * -- One more extra columns such as the redundant gene sets and the gene symbols of the members.
      * </pre>
