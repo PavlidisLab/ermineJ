@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>1.0.11-SNAPSHOT</version>
+			<version>1.0.11</version>
 			<type>jar</type>
 			<!-- Pulls in : commons-math, mtj. -->
 		</dependency>
@@ -151,7 +151,8 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
+				<artifactId>maven-compiler-plugin</artifactId>				
+				<version>2.5.1</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -178,8 +179,8 @@
 				<artifactId>surefire-report-maven-plugin</artifactId>
 				<version>2.0-beta-1</version>
 			</plugin>
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId> <executions> <execution> 
-				<phase>initialize</phase> <goals> <goal>create</goal> </goals> </execution> </executions> <configuration> <doCheck>false</doCheck> 
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId> <executions> <execution>
+				<phase>initialize</phase> <goals> <goal>create</goal> </goals> </execution> </executions> <configuration> <doCheck>false</doCheck>
 				<doUpdate>false</doUpdate> <timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat> </configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -285,11 +286,11 @@
 						<mainClass>ubic.erminej.ErmineJGui</mainClass>
 						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
 					</jnlp>
-					<!-- <dependencies> <includes> <include>baseCode:baseCode</include> <include>gemma:gemma-mda</include> <include>gemma:gemma-util</include> 
-						<include>colt:colt</include> <include>commons-lang:commons-lang</include> <include>commons-configuration:commons-configuration</include> 
-						<include>commons-collections:commons-collections</include> <include>commons-cli:commons-cli</include> <include>commons-logging:commons-logging</include> 
-						<include>mtj:mtj</include> <include>javahelp:jh</include> <include>opencsv:opencsv</include> <include>xerces:xercesImpl</include> 
-						<include>jfree:jfreechart</include> <include>jfree:jcommon</include> <include>log4j:log4j</include> <include>antlr:antlr</include> 
+					<!-- <dependencies> <includes> <include>baseCode:baseCode</include> <include>gemma:gemma-mda</include> <include>gemma:gemma-util</include>
+						<include>colt:colt</include> <include>commons-lang:commons-lang</include> <include>commons-configuration:commons-configuration</include>
+						<include>commons-collections:commons-collections</include> <include>commons-cli:commons-cli</include> <include>commons-logging:commons-logging</include>
+						<include>mtj:mtj</include> <include>javahelp:jh</include> <include>opencsv:opencsv</include> <include>xerces:xercesImpl</include>
+						<include>jfree:jfreechart</include> <include>jfree:jcommon</include> <include>log4j:log4j</include> <include>antlr:antlr</include>
 						<include>jsontools:jsontools-core</include> <include>ermineJ:ermineJ-help</include> </includes> </dependencies> -->
 					<sign>
 						<keypass>m2m2m2</keypass>
@@ -323,5 +324,12 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+		</extensions>
 	</build>
 </project>
