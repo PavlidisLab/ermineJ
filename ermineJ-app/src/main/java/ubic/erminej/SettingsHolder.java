@@ -65,6 +65,8 @@ public class SettingsHolder {
     }
 
     public static Map<String, Object> defaults = new HashMap<String, Object>();
+    
+    public static final String GEMMA_URL_BASE = "http://gemma.chibi.ubc.ca/";
 
     // not this is also listed in erminejdefault.properties.
     private static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@";
