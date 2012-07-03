@@ -155,7 +155,7 @@ public class AnalysisWizardStep3 extends WizardStep {
         if ( numUserDefined <= 0 ) {
             userDefinedButton.setText( "Your custom groups (None loaded)" );
             userDefinedButton.setEnabled( false );
-            this.userDefinedButton.setSelected( settings.getUseUserDefined() );
+            this.userDefinedButton.setSelected( false );
             this.userDefinedButton.setToolTipText( "You have no user-defined groups available" );
         } else {
             userDefinedButton.setText( "Your custom groups (" + numUserDefined + " available)" );

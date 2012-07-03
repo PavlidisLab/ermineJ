@@ -169,6 +169,6 @@ public class TestMultifunctionality extends TestCase {
         for ( int j = 0; j < expectedAdjustedScoresStudentized.length; j++ ) {
             assertEquals( expectedAdjustedScoresStudentized[j], adjustedScores.get( li.get( j ) ), 0.01 );
         }
-
+        settings.setLoadUserDefined( true );
     }
 }

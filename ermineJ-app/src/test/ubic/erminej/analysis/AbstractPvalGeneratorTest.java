@@ -92,6 +92,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         isi.close();
         ism.close();
         is.close();
+        s.setLoadUserDefined( true );
         super.tearDown();
     }
 
