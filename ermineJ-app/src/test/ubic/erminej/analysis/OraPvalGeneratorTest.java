@@ -18,10 +18,9 @@
  */
 package ubic.erminej.analysis;
 
-import cern.jet.math.Arithmetic;
-import ubic.erminej.analysis.OraPvalGenerator;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
+import cern.jet.math.Arithmetic;
 
 /**
  * @author pavlidis
@@ -29,26 +28,17 @@ import ubic.erminej.data.GeneSetTerm;
  */
 public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
-    /*
-     * @see TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
+    public void testClassPval1() {
+        double expectedReturn = 0.3216374; // checked // dhyper(2, 11, 8, 2)
 
-        super.setUp();
+        assertEquals( 11, scores.getPrunedGeneAnnotations().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
 
-        test = new OraPvalGenerator( s, super.scores, annotations, null );
-        test.setGlobalMissingAspectTreatedAsUsable( true );
+        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:1" ) );
 
-    }
+        assertNotNull( r );
+        double actualReturn = r.getPvalue();
 
-    /*
-     * @see TestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        test = null;
+        assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
 
     public void testClassPval2() {
@@ -74,19 +64,6 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
 
-    public void testClassPval1() {
-        double expectedReturn = 0.3216374; // checked // dhyper(2, 11, 8, 2)
-
-        assertEquals( 11, scores.getPrunedGeneAnnotations().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
-
-        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:1" ) );
-
-        assertNotNull( r );
-        double actualReturn = r.getPvalue();
-
-        assertEquals( expectedReturn, actualReturn, 0.0001 );
-    }
-
     public void testClassPval3() {
         double expectedReturn = 0.7894737; // checked // dhyper(1, 10,9, 2) + dhyper(2, 10,9, 2)
 
@@ -95,6 +72,27 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         double actualReturn = r.getPvalue();
 
         assertEquals( expectedReturn, actualReturn, 0.0001 );
+    }
+
+    /*
+     * @see TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception {
+
+        super.setUp();
+
+        test = new OraPvalGenerator( s, super.scores, annotations, null );
+
+    }
+
+    /*
+     * @see TestCase#tearDown()
+     */
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        test = null;
     }
 
 }

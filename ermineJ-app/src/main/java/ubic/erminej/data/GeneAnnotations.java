@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
@@ -375,6 +376,39 @@ public class GeneAnnotations {
     }
 
     /**
+     * @param geneSetName
+     * @param missingAspectTreatedAsUsable What to do if the aspect is missing. User-defined groups (which don't have an
+     *        aspect) aren't affected by this
+     * @return true if the gene set would be included in the analysis.
+     */
+    public boolean checkAspect( GeneSetTerm geneSetName, boolean missingAspectTreatedAsUsable ) {
+        String aspect = geneSetName.getAspect();
+
+        /*
+         * If there is no aspect, we don't use it, unless it's user-defined (though that should have an aspect ... )
+         */
+        if ( aspect == null && !geneSetName.isUserDefined() ) {
+            return missingAspectTreatedAsUsable;
+        }
+
+        if ( aspect == null ) {
+            return false;
+        }
+
+        if ( this.settings.getUseBiologicalProcess() && aspect.equalsIgnoreCase( "biological_process" ) ) {
+            return true;
+        } else if ( this.settings.getUseMolecularFunction() && aspect.equalsIgnoreCase( "molecular_function" ) ) {
+            return true;
+        } else if ( this.settings.getUseCellularComponent() && aspect.equalsIgnoreCase( "cellular_component" ) ) {
+            return true;
+        } else if ( this.settings.getUseUserDefined() && aspect.equalsIgnoreCase( GeneSetTerms.USER_DEFINED ) ) {
+            // probably won't reach this?
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Remove a gene set (class) from all the maps that reference it. This basically completely removes the class, and
      * it cannot be restored unless there is a backup. If it is user-defined it is deleted entirely from the
      * GeneSetTerms tree.
@@ -409,15 +443,6 @@ public class GeneAnnotations {
         }
     }
 
-    /**
-     * @param classID
-     * @return
-     */
-    public boolean deleteUserGeneSet( GeneSetTerm classID ) {
-        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
-        return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
-    }
-
     // /**
     // * Add a new gene set. Used to set up user-defined gene sets.
     // *
@@ -449,6 +474,15 @@ public class GeneAnnotations {
     // this.addGeneSet( geneSetId, gs );
     //
     // }
+
+    /**
+     * @param classID
+     * @return
+     */
+    public boolean deleteUserGeneSet( GeneSetTerm classID ) {
+        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
+        return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
+    }
 
     /**
      * @param symbol
@@ -774,6 +808,37 @@ public class GeneAnnotations {
     public Collection<Gene> loadPlainGeneList( String loadFile ) throws IOException {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
         return this.userDefinedGeneSetManager.loadPlainGeneList( loadFile );
+    }
+
+    /**
+     * Count how many gene sets will be analyzed given the user's current settings (min and max size and aspects)
+     * 
+     * @return
+     */
+    public int numActiveGeneSets() {
+        int minSize = this.settings.getMinClassSize();
+        int maxSize = this.settings.getMaxClassSize();
+        return numActiveGeneSets( minSize, maxSize );
+    }
+
+    /**
+     * Count how many gene sets will be analyzed given the user's current selected aspects and the provided minimum and
+     * maximum sizes.
+     * 
+     * @param minSize
+     * @param maxSize
+     * @return
+     */
+    public int numActiveGeneSets( int minSize, int maxSize ) {
+        int c = 0;
+        for ( Entry<GeneSetTerm, GeneSet> e : this.geneSets.entrySet() ) {
+            GeneSetTerm t = e.getKey();
+            GeneSet geneSet = e.getValue();
+            if ( geneSet.size() >= minSize && geneSet.size() <= maxSize && checkAspect( t, false ) ) {
+                c++;
+            }
+        }
+        return c;
     }
 
     /**
@@ -1365,8 +1430,7 @@ public class GeneAnnotations {
         StopWatch timer = new StopWatch();
         timer.start();
 
-        if ( settings != null && settings.getUseUserDefined() ) {
-            // For test environments. Typically this setting would be true.
+        if ( settings != null && settings.loadUserDefined() ) {
             userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
         }
 

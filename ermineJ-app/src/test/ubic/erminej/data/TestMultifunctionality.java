@@ -22,11 +22,8 @@ import java.util.Map;
 import java.util.zip.ZipInputStream;
 
 import junit.framework.TestCase;
-
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.Gene;
-import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
@@ -55,7 +52,7 @@ public class TestMultifunctionality extends TestCase {
         GeneAnnotationParser p = new GeneAnnotationParser( geneSets );
 
         SettingsHolder settings = new Settings(); // assumed: log = true.
-        settings.setUseUserDefined( false );
+        settings.setLoadUserDefined( false );
 
         GeneAnnotations ga = p.read( is, Format.DEFAULT, settings );
 
@@ -148,10 +145,26 @@ public class TestMultifunctionality extends TestCase {
         // double[] expectedAdjustedScores = new double[] { 3.033775, 1.427687, -0.1784013, 2.153857, 0.3980867,
         // -2.268042, 1.578209, -5.480219, -4.360137, -2.329696, -4.240055, -8.87413, -8.661954, -3.603526,
         // 0.848813, -7.723608, -0.5450989, -5.785262, -4.66518, 6.451675 };
+        // stduentized
+        // double[] expectedAdjustedScoresStudentized = new double[] { 2.801387, 0.7126326, -0.06987865, 0.7145039,
+        // 0.1154752, -0.6070027, 0.3899923, -1.318726, -0.9556866, -0.475843, -0.8333633, -1.788133, -1.649778,
+        // -0.6296883, 0.1493991, -1.29153, -0.0898998, -0.9070473, -0.7163117, 1.228161 };
 
-        double[] expectedAdjustedScoresStudentized = new double[] { 2.801387, 0.7126326, -0.06987865, 0.7145039,
-                0.1154752, -0.6070027, 0.3899923, -1.318726, -0.9556866, -0.475843, -0.8333633, -1.788133, -1.649778,
-                -0.6296883, 0.1493991, -1.29153, -0.0898998, -0.9070473, -0.7163117, 1.228161 };
+        /*
+         * Square root.
+         */
+        // mfscorestest <-
+        // read.delim("C:/Users/paul/dev/eclipseworkspace/ermineJ/ermineJ-app/src/test/data/mfscorestest.txt")
+        // cat(residuals(lm(mfscorestest$GeneScore ~mfscorestest$MFRank , weights =1/sqrt(c(1:20))) ), sep=",")
+        // cat(rstudent(lm(mfscorestest$GeneScore ~mfscorestest$MFRank , weights =1/sqrt(c(1:20))) ), sep=",")
+        // plain residuals with square-root weighting.
+        // double[] expectedAdjustedScores =
+        // {4.631408,3.10432,1.577231,3.475151,1.817891,-0.6310691,2.583505,-3.685246,-2.841503,-1.206061,-2.99776,-7.158158,-7.103981,-2.835229,0.9064338,-6.678972,-0.5664777,-5.253963,-4.410221,5.127282}
+
+        // studentized.
+        double[] expectedAdjustedScoresStudentized = { 2.292787, 1.146938, 0.507715, 1.032061, 0.4980303, -0.1650407,
+                0.6509431, -0.921432, -0.6719097, -0.2733478, -0.6696485, -1.685027, -1.618964, -0.5984784, 0.1954458,
+                -1.414458, -0.1186639, -1.07232, -0.8935964, 1.3674652 };
 
         for ( int j = 0; j < expectedAdjustedScoresStudentized.length; j++ ) {
             assertEquals( expectedAdjustedScoresStudentized[j], adjustedScores.get( li.get( j ) ), 0.01 );

@@ -32,7 +32,6 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.GeneSetTerms;
 
 /**
  * Base implementation of pvalue generator
@@ -66,8 +65,6 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     private int maxGeneSetSize;
 
     private int minGeneSetSize;
-
-    private boolean globalMissingAspectTreatedAsUsable = false;
 
     /**
      * @param set
@@ -136,13 +133,13 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
     }
 
     /**
-     * Thisis to deal with the possibility of genesets that lack an aspect -- but this should not happen (any more). It
-     * was a problem for obsolete GO Terms, but we ignore those anyway.
-     * 
-     * @param globalMissingAspectTreatedAsUsable The globalMissingAspectTreatedAsUsable to set.
+     * @param geneSetName
+     * @param missingAspectTreatedAsUsable Whether gene sets missing an aspect should be treated as usable or not. This
+     *        parameter is provided partly for testing. Global setting can override this if set to true.
+     * @return true if the set should be retained (e.g. it is in the correct aspect )
      */
-    public void setGlobalMissingAspectTreatedAsUsable( boolean globalMissingAspectTreatedAsUsable ) {
-        this.globalMissingAspectTreatedAsUsable = globalMissingAspectTreatedAsUsable;
+    protected boolean checkAspect( GeneSetTerm geneSetName, boolean missingAspectTreatedAsUsable ) {
+        return this.geneAnnots.checkAspect( geneSetName, missingAspectTreatedAsUsable );
     }
 
     /**
@@ -153,38 +150,28 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
      * @return
      */
     protected boolean checkAspectAndRedundancy( GeneSetTerm geneSetName ) {
-        return this.checkAspectAndRedundancy( geneSetName, false );
+        return this.checkAspect( geneSetName, false );
     }
 
     /**
-     * @param geneSetName
-     * @param missingAspectTreatedAsUsable Whether gene sets missing an aspect should be treated as usable or not. This
-     *        parameter is provided partly for testing. Global setting can override this if set to true.
-     * @return true if the set should be retained (e.g. it is in the correct aspect )
+     * Perform multiple test correction during the multifunctionality correction. DOES NOT SUPPORT WESTFALL-YOUNG
+     * CORRECTION
+     * 
+     * @param sortedClasses
+     * @param results
      */
-    protected boolean checkAspectAndRedundancy( GeneSetTerm geneSetName, boolean missingAspectTreatedAsUsable ) {
-
-        String aspect = geneSetName.getAspect();
-
-        /*
-         * If there is no aspect, we don't use it, unless it's user-defined (though that should have an aspect ... )
-         */
-        if ( aspect == null && !geneSetName.isUserDefined() ) {
-            return missingAspectTreatedAsUsable || this.globalMissingAspectTreatedAsUsable;
+    protected void multipleTestCorrect( List<GeneSetTerm> sortedClasses, Map<GeneSetTerm, GeneSetResult> results ) {
+        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, geneAnnots, null, results,
+                getMessenger() );
+        Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
+        if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BONFERONNI ) ) {
+            mt.bonferroni();
+        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
+            mt.benjaminihochberg();
+        } else {
+            throw new UnsupportedOperationException( multipleTestCorrMethod
+                    + " is not supported for this analysis method" );
         }
-
-        if ( aspect != null ) {
-            if ( aspect.equalsIgnoreCase( "biological_process" ) && this.settings.getUseBiologicalProcess() ) {
-                return true;
-            } else if ( aspect.equalsIgnoreCase( "cellular_component" ) && this.settings.getUseCellularComponent() ) {
-                return true;
-            } else if ( aspect.equalsIgnoreCase( "molecular_function" ) && this.settings.getUseMolecularFunction() ) {
-                return true;
-            } else if ( aspect.equalsIgnoreCase( GeneSetTerms.USER_DEFINED ) && this.settings.getUseUserDefined() ) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -210,27 +197,6 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
             targetRanks.add( rank );
         }
         return targetRanks;
-    }
-
-    /**
-     * Perform multiple test correction during the multifunctionality correction. DOES NOT SUPPORT WESTFALL-YOUNG
-     * CORRECTION
-     * 
-     * @param sortedClasses
-     * @param results
-     */
-    protected void multipleTestCorrect( List<GeneSetTerm> sortedClasses, Map<GeneSetTerm, GeneSetResult> results ) {
-        MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, geneAnnots, null, results,
-                getMessenger() );
-        Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BONFERONNI ) ) {
-            mt.bonferroni();
-        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
-            mt.benjaminihochberg();
-        } else {
-            throw new UnsupportedOperationException( multipleTestCorrMethod
-                    + " is not supported for this analysis method" );
-        }
     }
 
 }

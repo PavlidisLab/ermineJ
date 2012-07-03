@@ -65,7 +65,7 @@ public class SettingsHolder {
     }
 
     public static Map<String, Object> defaults = new HashMap<String, Object>();
-    
+
     public static final String GEMMA_URL_BASE = "http://gemma.chibi.ubc.ca/";
 
     // not this is also listed in erminejdefault.properties.
@@ -323,6 +323,10 @@ public class SettingsHolder {
         return config.getString( GOLD_STANDARD_FILE );
     }
 
+    public String getHelpUrl() {
+        return this.config.getString( "help.url" );
+    }
+
     /**
      * @return
      */
@@ -425,17 +429,6 @@ public class SettingsHolder {
 
     }
 
-    /**
-     * Get the path to the directory where custom gene sets are stored (default should be like
-     * ${HOME}/ermineJ.data/genesets). This path is not guaranteed to exist.
-     * 
-     * @return
-     */
-    public String getUserGeneSetDirectory() {
-        String dir = config.getString( CUSTOM_GENE_SET_DIRECTORY_PROPERTY );
-        return dir;
-    }
-
     // /**
     // * @return true if multiple values for a gene should be combined, or whether each probe should be treated
     // * independently regardless; basically this is always going to be true.
@@ -447,6 +440,17 @@ public class SettingsHolder {
     // return false;
     // }
 
+    /**
+     * Get the path to the directory where custom gene sets are stored (default should be like
+     * ${HOME}/ermineJ.data/genesets). This path is not guaranteed to exist.
+     * 
+     * @return
+     */
+    public String getUserGeneSetDirectory() {
+        String dir = config.getString( CUSTOM_GENE_SET_DIRECTORY_PROPERTY );
+        return dir;
+    }
+
     public boolean getUseUserDefined() {
         return config.getBoolean( USE_USER_DEFINED_GROUPS,
                 ( Boolean ) getDefaultSettingsValue( USE_USER_DEFINED_GROUPS ) );
@@ -456,8 +460,25 @@ public class SettingsHolder {
         return config.getBoolean( IS_TESTER, false );
     }
 
+    // primarily for testing.
+    public boolean loadUserDefined() {
+        return this.config.getBoolean( "loadUserDefinedGeneGroups" );
+    }
+
     public void setCustomGeneSetFiles( Collection<String> filePaths ) {
         this.config.setProperty( CUSTOM_GENESET_FILES, filePaths );
+    }
+
+    public void setLoadUserDefined( boolean b ) {
+        this.config.setProperty( "loadUserDefinedGeneGroups", b );
+    }
+
+    public void setRawFile( String val ) {
+        this.config.setProperty( RAW_FILE_CONFIG_NAME, val );
+    }
+
+    public void setScoreFile( String val ) {
+        this.config.setProperty( SCORE_FILE, val );
     }
 
     public void setUseUserDefined( boolean b ) {
@@ -493,18 +514,6 @@ public class SettingsHolder {
 
     protected Object getProperty( String propertyName ) {
         return this.config.getProperty( propertyName );
-    }
-
-    public void setRawFile( String val ) {
-        this.config.setProperty( RAW_FILE_CONFIG_NAME, val );
-    }
-
-    public void setScoreFile( String val ) {
-        this.config.setProperty( SCORE_FILE, val );
-    }
-
-    public String getHelpUrl() {
-        return this.config.getString( "help.url" );
     }
 
 }

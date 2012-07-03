@@ -19,6 +19,8 @@
 package ubic.erminej.gui.analysis;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -40,43 +42,6 @@ import ubic.erminej.gui.util.WizardStep;
 public class AnalysisWizardStep3 extends WizardStep {
 
     private static final long serialVersionUID = 9064542224892172L;
-    private final Settings settings;
-    private JCheckBox biologicalProcessButton;
-    private JCheckBox molecularFunctionButton;
-    private JCheckBox cellularComponentButton;
-    private JCheckBox userDefinedButton;
-
-    /**
-     * @param wizard
-     * @param settings
-     */
-    public AnalysisWizardStep3( AnalysisWizard wizard, Settings settings ) {
-        super( wizard );
-        this.settings = settings;
-        this.jbInit();
-        if ( wizard != null ) wizard.clearStatus();
-        setValues();
-    }
-
-    /**
-     * 
-     */
-    private void setValues() {
-        this.biologicalProcessButton.setSelected( settings.getUseBiologicalProcess() );
-        this.molecularFunctionButton.setSelected( settings.getUseMolecularFunction() );
-        this.cellularComponentButton.setSelected( settings.getUseCellularComponent() );
-        this.userDefinedButton.setSelected( settings.getUseUserDefined() );
-    }
-
-    /**
-     * 
-     */
-    public void saveValues() {
-        settings.setUseBiologicalProcess( this.biologicalProcessButton.isSelected() );
-        settings.setUseCellularComponent( this.cellularComponentButton.isSelected() );
-        settings.setUseMolecularFunction( this.molecularFunctionButton.isSelected() );
-        settings.setUseUserDefined( this.userDefinedButton.isSelected() );
-    }
 
     public static void main( String[] args ) throws Exception {
         try {
@@ -91,6 +56,56 @@ public class AnalysisWizardStep3 extends WizardStep {
         f.pack();
         GuiUtil.centerContainer( f );
         f.setVisible( true );
+    }
+
+    private final Settings settings;
+    private JCheckBox biologicalProcessButton;
+    private JCheckBox molecularFunctionButton;
+    private JCheckBox cellularComponentButton;
+
+    private JCheckBox userDefinedButton;
+
+    private ActionListener countNumGroupsListener = new ActionListener() {
+
+        @Override
+        public void actionPerformed( ActionEvent arg0 ) {
+            updateNumGeneSetsActive();
+        }
+    };
+
+    /**
+     * @param wizard
+     * @param settings
+     */
+    public AnalysisWizardStep3( AnalysisWizard wizard, Settings settings ) {
+        super( wizard );
+        this.settings = settings;
+        this.jbInit();
+        if ( wizard != null ) wizard.clearStatus();
+        setValues();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see baseCode.gui.WizardStep#isReady()
+     */
+    @Override
+    public boolean isReady() {
+        if ( updateNumGeneSetsActive() <= 0 ) {
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * 
+     */
+    public void saveValues() {
+        settings.setUseBiologicalProcess( this.biologicalProcessButton.isSelected() );
+        settings.setUseCellularComponent( this.cellularComponentButton.isSelected() );
+        settings.setUseMolecularFunction( this.molecularFunctionButton.isSelected() );
+        settings.setUseUserDefined( this.userDefinedButton.isSelected() );
     }
 
     /*
@@ -124,24 +139,65 @@ public class AnalysisWizardStep3 extends WizardStep {
         cellularComponentButton.setText( "Cellular Component" );
         buttonPanel.add( cellularComponentButton, null );
 
-        userDefinedButton.setText( "Your custom groups" );
-        buttonPanel.add( userDefinedButton, null );
+        /*
+         * add a listener for the buttons that tells the user how many groups are selected.
+         */
+        biologicalProcessButton.addActionListener( countNumGroupsListener );
+        molecularFunctionButton.addActionListener( countNumGroupsListener );
+        cellularComponentButton.addActionListener( countNumGroupsListener );
+        userDefinedButton.addActionListener( countNumGroupsListener );
 
+        int numUserDefined = ( ( AnalysisWizard ) getOwner() ).getGeneAnnots().getUserDefinedGeneSets().size();
+
+        buttonPanel.add( userDefinedButton, null );
         buttonPanel.setBorder( BorderFactory.createEmptyBorder( 20, 40, 20, 40 ) );
+
+        if ( numUserDefined <= 0 ) {
+            userDefinedButton.setText( "Your custom groups (None loaded)" );
+            userDefinedButton.setEnabled( false );
+            this.userDefinedButton.setSelected( settings.getUseUserDefined() );
+            this.userDefinedButton.setToolTipText( "You have no user-defined groups available" );
+        } else {
+            userDefinedButton.setText( "Your custom groups (" + numUserDefined + " available)" );
+            userDefinedButton.setEnabled( true );
+            this.userDefinedButton.setSelected( settings.getUseUserDefined() );
+        }
 
         this.addHelp( "<html><b>Select the aspects to include in the analysis.</b><br>" + "</html>" );
         this.addMain( buttonPanel );
 
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * 
-     * @see baseCode.gui.WizardStep#isReady()
      */
-    @Override
-    public boolean isReady() {
-        return false;
+    protected int updateNumGeneSetsActive() {
+        AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
+        saveValues();
+        int numActiveGeneSets = wiz.getGeneAnnots().numActiveGeneSets();
+        if ( numActiveGeneSets <= 0 ) {
+
+            String suf = "";
+            if ( biologicalProcessButton.isSelected() || molecularFunctionButton.isSelected()
+                    || cellularComponentButton.isSelected() || userDefinedButton.isSelected() ) {
+                suf = " (check size range, next page)";
+            }
+
+            wiz.showError( numActiveGeneSets + " sets selected " + suf );
+        } else {
+            wiz.showStatus( numActiveGeneSets + " sets selected" );
+        }
+        return numActiveGeneSets;
+    }
+
+    /**
+     * 
+     */
+    private void setValues() {
+        this.biologicalProcessButton.setSelected( settings.getUseBiologicalProcess() );
+        this.molecularFunctionButton.setSelected( settings.getUseMolecularFunction() );
+        this.cellularComponentButton.setSelected( settings.getUseCellularComponent() );
+        if ( userDefinedButton.isEnabled() ) this.userDefinedButton.setSelected( settings.getUseUserDefined() );
     }
 
 }

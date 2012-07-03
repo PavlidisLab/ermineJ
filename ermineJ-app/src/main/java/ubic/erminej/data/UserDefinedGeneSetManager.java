@@ -271,6 +271,83 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
+     * For testing only -- does NOT set the file name since we don't know it.
+     * 
+     * @param is
+     * @return
+     * @throws IOException
+     */
+    protected Collection<GeneSet> loadUserGeneSetFile( InputStream is ) throws IOException {
+        BufferedReader dis = new BufferedReader( new InputStreamReader( is ) );
+        Collection<GeneSet> result = new HashSet<GeneSet>();
+
+        while ( dis.ready() ) {
+            GeneSet newSet = readOneSet( dis );
+            if ( newSet == null ) {
+                log.warn( "Set was not read" );
+                continue;
+            }
+            result.add( newSet );
+        }
+        dis.close();
+        return result;
+    }
+
+    /**
+     * Add user-defined gene set(s) to the GeneData.
+     * <ul>
+     * <li>Rows starting with "#" are ignored as comments.</li>
+     * <li>A row starting with "===" delimits multiple gene sets in one file.</li>
+     * </ul>
+     * The format of a group is:
+     * <ol>
+     * <li>The first line in a group: The type of gene set {gene|probe}</li>
+     * <li>Second line: The identifier for the gene set, e.g, "My gene set"; tab characters should be avoided in this
+     * line to avoid confusion with the other supported format</li>
+     * <li>Third line: The description for the gene set, e.g, "Genes I like"; tab characters should be avoided in this
+     * line to avoid confusion with the other format</li>
+     * <li>Any number of rows containing gene or probe identifiers.</li>
+     * </ol>
+     * Alternatively, a tab-delimited file can be provided with one group per row, with the following format (which it
+     * turns out MolSigDB uses):
+     * <ol>
+     * <li>A name for the group (e.g., KEGG identifier)</li>
+     * <li>A description for the group (can be blank but must present)</li>
+     * <li>The remaining fields are interpreted as gene symbols</li>
+     * <li>Lines starting with "#" are ignored as comments.</li>
+     * <li>Lines starting with "===" are ignored.</li>
+     * </ol>
+     * <p>
+     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
+     * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
+     * that this behavior is not desirable.
+     * <p>
+     * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
+     * 
+     * @param file which stores the probes or genes.
+     * @return true if some probes were read in which are on the current array design.
+     * @throws IOException
+     */
+    Collection<GeneSet> loadUserGeneSetFile( String fileName ) throws IOException {
+        BufferedReader dis = setUpToLoad( fileName );
+
+        Collection<GeneSet> result = new HashSet<GeneSet>();
+
+        while ( dis.ready() ) {
+            GeneSet newSet = readOneSet( dis );
+
+            if ( newSet == null ) {
+                continue;
+            }
+            newSet.setSourceFile( fileName );
+            result.add( newSet );
+        }
+        dis.close();
+
+        return result;
+    }
+
+    /**
      * @return
      */
     private String cleanGeneSetName( String id ) {
@@ -344,6 +421,9 @@ public class UserDefinedGeneSetManager {
             statusMessenger.showStatus( "No gene sets found in " + settings.getUserGeneSetDirectory() );
             return;
         }
+
+        statusMessenger.showStatus( classFiles.length + " gene set files found in "
+                + settings.getUserGeneSetDirectory() );
 
         int numLoaded = 0;
 
@@ -626,83 +706,6 @@ public class UserDefinedGeneSetManager {
             }
             out.write( "\n" );
         }
-    }
-
-    /**
-     * For testing only -- does NOT set the file name since we don't know it.
-     * 
-     * @param is
-     * @return
-     * @throws IOException
-     */
-    protected Collection<GeneSet> loadUserGeneSetFile( InputStream is ) throws IOException {
-        BufferedReader dis = new BufferedReader( new InputStreamReader( is ) );
-        Collection<GeneSet> result = new HashSet<GeneSet>();
-
-        while ( dis.ready() ) {
-            GeneSet newSet = readOneSet( dis );
-            if ( newSet == null ) {
-                log.warn( "Set was not read" );
-                continue;
-            }
-            result.add( newSet );
-        }
-        dis.close();
-        return result;
-    }
-
-    /**
-     * Add user-defined gene set(s) to the GeneData.
-     * <ul>
-     * <li>Rows starting with "#" are ignored as comments.</li>
-     * <li>A row starting with "===" delimits multiple gene sets in one file.</li>
-     * </ul>
-     * The format of a group is:
-     * <ol>
-     * <li>The first line in a group: The type of gene set {gene|probe}</li>
-     * <li>Second line: The identifier for the gene set, e.g, "My gene set"; tab characters should be avoided in this
-     * line to avoid confusion with the other supported format</li>
-     * <li>Third line: The description for the gene set, e.g, "Genes I like"; tab characters should be avoided in this
-     * line to avoid confusion with the other format</li>
-     * <li>Any number of rows containing gene or probe identifiers.</li>
-     * </ol>
-     * Alternatively, a tab-delimited file can be provided with one group per row, with the following format (which it
-     * turns out MolSigDB uses):
-     * <ol>
-     * <li>A name for the group (e.g., KEGG identifier)</li>
-     * <li>A description for the group (can be blank but must present)</li>
-     * <li>The remaining fields are interpreted as gene symbols</li>
-     * <li>Lines starting with "#" are ignored as comments.</li>
-     * <li>Lines starting with "===" are ignored.</li>
-     * </ol>
-     * <p>
-     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
-     * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
-     * that this behavior is not desirable.
-     * <p>
-     * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
-     * 
-     * @param file which stores the probes or genes.
-     * @return true if some probes were read in which are on the current array design.
-     * @throws IOException
-     */
-    Collection<GeneSet> loadUserGeneSetFile( String fileName ) throws IOException {
-        BufferedReader dis = setUpToLoad( fileName );
-
-        Collection<GeneSet> result = new HashSet<GeneSet>();
-
-        while ( dis.ready() ) {
-            GeneSet newSet = readOneSet( dis );
-
-            if ( newSet == null ) {
-                continue;
-            }
-            newSet.setSourceFile( fileName );
-            result.add( newSet );
-        }
-        dis.close();
-
-        return result;
     }
 
 }

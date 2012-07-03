@@ -144,11 +144,14 @@ public class Multifunctionality {
         // DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv );
 
         // 1 - Rank/N
-        DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.div( rawRanks.size() ) )
-                .assign( Functions.sign ).assign( Functions.plus( 1.0 ) );
+        // DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.div( rawRanks.size() ) )
+        // .assign( Functions.sign ).assign( Functions.plus( 1.0 ) );
 
-        // 1/sqrt(rank)
-        // DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv ).assign( Functions.sqrt );
+        /*
+         * 1/sqrt(rank). Jesse's argument for this is that this mimics the effect of uncertainty in the area under the
+         * PR curve, which (asymptotically) has variance proportional to sqrt(n).
+         */
+        DoubleMatrix1D weights = MatrixUtil.fromList( rawRanks ).assign( Functions.inv ).assign( Functions.sqrt );
 
         /*
          * DEBUGGING CODE
@@ -424,6 +427,15 @@ public class Multifunctionality {
     }
 
     /**
+     * How many genes have multifunctionality scores.
+     * 
+     * @return
+     */
+    public int getNumGenes() {
+        return new Double( rawGeneMultifunctionalityRanks.size() ).intValue();
+    }
+
+    /**
      * @param gene
      * @return number of GO terms for the given gene.
      */
@@ -434,6 +446,14 @@ public class Multifunctionality {
             return 0;
         }
         return this.numGoTerms.get( gene );
+    }
+
+    /**
+     * @param gene
+     * @return rank. Where zero is the highest rank, ties accounted for.
+     */
+    public Double getRawGeneMultifunctionalityRank( Gene gene ) {
+        return this.rawGeneMultifunctionalityRanks.get( gene );
     }
 
     public boolean isStale() {
@@ -573,23 +593,6 @@ public class Multifunctionality {
         } finally {
             stale.set( false );
         }
-    }
-
-    /**
-     * @param gene
-     * @return rank. Where zero is the highest rank, ties accounted for.
-     */
-    public Double getRawGeneMultifunctionalityRank( Gene gene ) {
-        return this.rawGeneMultifunctionalityRanks.get( gene );
-    }
-
-    /**
-     * How many genes have multifunctionality scores.
-     * 
-     * @return
-     */
-    public int getNumGenes() {
-        return new Double( rawGeneMultifunctionalityRanks.size() ).intValue();
     }
 
 }

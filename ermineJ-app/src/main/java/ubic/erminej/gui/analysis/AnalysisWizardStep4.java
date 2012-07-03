@@ -20,6 +20,9 @@ package ubic.erminej.gui.analysis;
 
 import java.awt.Dimension;
 import java.awt.SystemColor;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
@@ -47,12 +50,44 @@ public class AnalysisWizardStep4 extends WizardStep {
     private JRadioButton jRadioButtonBestReplicates;
     private JRadioButton jRadioButtonMeanReplicates;
 
+    private KeyListener countNumGroupsKeyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased( KeyEvent e ) {
+            updateNumGeneSetsActive();
+        }
+    };
+
     public AnalysisWizardStep4( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
         this.jbInit();
         this.settings = settings;
         wiz.clearStatus();
         setValues();
+    }
+
+    @Override
+    public boolean isReady() {
+        if ( updateNumGeneSetsActive() <= 0 ) {
+            return false;
+        }
+        return true;
+    }
+
+    public void saveValues() {
+        try {
+            settings.setMaxClassSize( Integer.valueOf( jTextFieldMaxClassSize.getText() ).intValue() );
+            settings.setMinClassSize( Integer.valueOf( jTextFieldMinClassSize.getText() ).intValue() );
+        } catch ( NumberFormatException e ) {
+            throw new IllegalStateException( "Size ranges must be numbers" );
+        }
+
+        if ( jRadioButtonBestReplicates.isSelected() ) {
+            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
+        } else if ( jRadioButtonMeanReplicates.isSelected() ) {
+            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
+        } else {
+            throw new IllegalStateException( "Invalid gene rep treatment method" );
+        }
     }
 
     // Component initialization
@@ -74,6 +109,13 @@ public class AnalysisWizardStep4 extends WizardStep {
         ButtonGroup replicateButtonGroup = new ButtonGroup();
         jRadioButtonBestReplicates = new JRadioButton();
         jRadioButtonMeanReplicates = new JRadioButton();
+
+        /*
+         * FIXME add a listener for the jTextFieldMaxClassSize and jTextFieldMaxClassSize that tells the user how many
+         * groups are selected.
+         */
+        jTextFieldMaxClassSize.addKeyListener( countNumGroupsKeyListener );
+        jTextFieldMinClassSize.addKeyListener( countNumGroupsKeyListener );
 
         JPanel step4Panel = new JPanel();
         step4Panel.setPreferredSize( new Dimension( 550, 280 ) );
@@ -146,6 +188,30 @@ public class AnalysisWizardStep4 extends WizardStep {
         this.addMain( step4Panel );
     }
 
+    /**
+     * 
+     */
+    protected int updateNumGeneSetsActive() {
+        AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
+        try {
+            int maxSize = Integer.valueOf( jTextFieldMaxClassSize.getText() ).intValue();
+            int minSize = Integer.valueOf( jTextFieldMinClassSize.getText() ).intValue();
+            saveValues();
+            int numActiveGeneSets = wiz.getGeneAnnots().numActiveGeneSets( minSize, maxSize );
+            if ( numActiveGeneSets <= 0 ) {
+                wiz.showError( numActiveGeneSets + " sets selected" );
+            } else {
+                wiz.showStatus( numActiveGeneSets + " sets selected" );
+            }
+            return numActiveGeneSets;
+        } catch ( NumberFormatException e ) {
+            // ok, fall back. Possibly just bail.
+
+            wiz.showError( "? sets selected" );
+            return wiz.getGeneAnnots().numActiveGeneSets();
+        }
+    }
+
     private void setValues() {
         jTextFieldMaxClassSize.setText( String.valueOf( settings.getMaxClassSize() ) );
         jTextFieldMinClassSize.setText( String.valueOf( settings.getMinClassSize() ) );
@@ -157,23 +223,5 @@ public class AnalysisWizardStep4 extends WizardStep {
         } else {
             throw new IllegalStateException( "Invalid gene rep treatment method" );
         }
-    }
-
-    public void saveValues() {
-        settings.setMaxClassSize( Integer.valueOf( jTextFieldMaxClassSize.getText() ).intValue() );
-        settings.setMinClassSize( Integer.valueOf( jTextFieldMinClassSize.getText() ).intValue() );
-
-        if ( jRadioButtonBestReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
-        } else if ( jRadioButtonMeanReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
-        } else {
-            throw new IllegalStateException( "Invalid gene rep treatment method" );
-        }
-    }
-
-    @Override
-    public boolean isReady() {
-        return true;
     }
 }

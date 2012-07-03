@@ -92,6 +92,33 @@ public class GeneSet {
         }
     }
 
+    public void addGenes( Collection<Gene> gs ) {
+        for ( Gene g : gs ) {
+            this.addGene( g );
+        }
+    }
+
+    public void addRedundantGroup( GeneSet redundant ) {
+        if ( this.equals( redundant ) ) {
+            return;
+        }
+        this.redundantGroups.add( redundant );
+    }
+
+    public void clearGenes() {
+        genes = new HashSet<Gene>();
+        probes = new HashSet<Probe>();
+        clearRedundancy();
+    }
+
+    public void clearRedundancy() {
+        this.redundantGroups.clear();
+    }
+
+    public void clearRedundancy( GeneSet toclear ) {
+        this.redundantGroups.remove( toclear );
+    }
+
     @Override
     public boolean equals( Object obj ) {
         if ( this == obj ) return true;
@@ -102,6 +129,13 @@ public class GeneSet {
             if ( other.term != null ) return false;
         } else if ( !term.equals( other.term ) ) return false;
         return true;
+    }
+
+    /**
+     * @return the file format that this group came in (only applies for User-defined groups)
+     */
+    public GeneSetFileFormat getFormat() {
+        return format;
     }
 
     /**
@@ -139,17 +173,6 @@ public class GeneSet {
         return Collections.unmodifiableSet( this.probes );
     }
 
-    public void addRedundantGroup( GeneSet redundant ) {
-        if ( this.equals( redundant ) ) {
-            return;
-        }
-        this.redundantGroups.add( redundant );
-    }
-
-    public boolean hasRedundancy() {
-        return !redundantGroups.isEmpty();
-    }
-
     /**
      * Can not modify this collection directly; use addRedundantGroup instead.
      * 
@@ -170,19 +193,16 @@ public class GeneSet {
         return term;
     }
 
-    /**
-     * @return the file format that this group came in (only applies for User-defined groups)
-     */
-    public GeneSetFileFormat getFormat() {
-        return format;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ( ( term == null ) ? 0 : term.hashCode() );
         return result;
+    }
+
+    public boolean hasRedundancy() {
+        return !redundantGroups.isEmpty();
     }
 
     public boolean isGenes() {
@@ -193,13 +213,18 @@ public class GeneSet {
         return term.isUserDefined();
     }
 
+    public void setFormat( GeneSetFileFormat f ) {
+        this.format = f;
+
+    }
+
     public void setGenes( boolean isGenes ) {
         this.isGenes = isGenes;
     }
 
     public void setGenes( Collection<Gene> genes ) {
-        if (genes == null) {
-            throw new IllegalArgumentException("Genes was null");
+        if ( genes == null ) {
+            throw new IllegalArgumentException( "Genes was null" );
         }
         this.genes.clear();
         for ( Gene gene : genes ) {
@@ -242,30 +267,5 @@ public class GeneSet {
     public String toString() {
         return term.getId() + " - " + StringUtils.abbreviate( term.getName(), 40 ) + " (" + this.getGenes().size()
                 + " genes)";
-    }
-
-    public void addGenes( Collection<Gene> gs ) {
-        for ( Gene g : gs ) {
-            this.addGene( g );
-        }
-    }
-
-    public void clearGenes() {
-        genes = new HashSet<Gene>();
-        probes = new HashSet<Probe>();
-        clearRedundancy();
-    }
-
-    public void setFormat( GeneSetFileFormat f ) {
-        this.format = f;
-
-    }
-
-    public void clearRedundancy() {
-        this.redundantGroups.clear();
-    }
-
-    public void clearRedundancy( GeneSet toclear ) {
-        this.redundantGroups.remove( toclear );
     }
 }

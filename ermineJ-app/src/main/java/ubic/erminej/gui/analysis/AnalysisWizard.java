@@ -158,6 +158,7 @@ public class AnalysisWizard extends Wizard {
             step4.saveValues();
             checkIfReady();
             nextButton.setEnabled( true );
+            step3.updateNumGeneSetsActive();
             step3.revalidate();
             this.repaint();
         } else if ( step == 5 ) {
@@ -169,6 +170,7 @@ public class AnalysisWizard extends Wizard {
             step5.saveValues();
             checkIfReady();
             nextButton.setEnabled( true );
+            step4.updateNumGeneSetsActive();
             step4.revalidate();
             this.repaint();
         }
@@ -225,6 +227,7 @@ public class AnalysisWizard extends Wizard {
             this.getContentPane().add( step3 );
             checkIfReady();
             this.nextButton.setEnabled( true );
+            step3.updateNumGeneSetsActive();
             step3.revalidate();
             this.repaint();
         } else if ( step == 3 ) {
@@ -234,6 +237,7 @@ public class AnalysisWizard extends Wizard {
             this.setTitle( "Create New Analysis - Step 4 of " + maxSteps );
             this.getContentPane().add( step4 );
             checkIfReady();
+            step4.updateNumGeneSetsActive();
             step4.revalidate();
             this.repaint();
         } else if ( step == 4 ) {

@@ -52,6 +52,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -67,11 +68,10 @@ import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -119,7 +119,18 @@ import ubic.erminej.gui.util.StatusJlabel;
  */
 public class MainFrame extends JFrame {
 
-    private static final String LOGO_GIF = "/ubic/erminej/logoIcon64.gif";
+    class ResultSetMenuItem extends JMenuItem {
+        private final GeneSetPvalRun resultSet;
+
+        public ResultSetMenuItem( GeneSetPvalRun resultSet ) {
+            this.resultSet = resultSet;
+            this.setText( resultSet.getName() );
+        }
+
+        public GeneSetPvalRun getResultSet() {
+            return resultSet;
+        }
+    }
 
     private final class ProjectFileFilter extends FileFilter {
         @Override
@@ -136,6 +147,8 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private static final String LOGO_GIF = "/ubic/erminej/logoIcon64.gif";
+
     private static final String START_CARD = "START";
 
     private static final String TABS_CARD = "TABS";
@@ -151,10 +164,10 @@ public class MainFrame extends JFrame {
     private static final int START_WIDTH = 830;
 
     private static final int STARTING_OVERALL_WIDTH = 830;
-
     private static final String MAINWINDOWHEIGHT = "mainview.WindowHeight";
     private static final String MAINWINDOWWIDTH = "mainview.WindowWidth";
     private static final String MAINWINDOWPOSITIONX = "mainview.WindowXPosition";
+
     private static final String MAINWINDOWPOSITIONY = "mainview.WindowYPosition";
 
     private GeneAnnotations geneData = null; // original.
@@ -166,28 +179,28 @@ public class MainFrame extends JFrame {
     private int currentResultSet = -1;
 
     private AnalysisThread athread; // Ideally this would be a local variable.
-
     private StatusViewer statusMessenger;
     private GeneSetTablePanel tablePanel;
-    private GeneSetTreePanel treePanel;
 
+    private GeneSetTreePanel treePanel;
     private JMenu analysisMenu = new JMenu();
     private JMenu diagnosticsMenu = new JMenu();
-    private JMenu classMenu = new JMenu();
 
+    private JMenu classMenu = new JMenu();
     private JMenu fileMenu = new JMenu();
+
     private JMenu helpMenu = new JMenu();
 
     private JMenu runViewMenu = new JMenu();
-
     private JTabbedPane tabs = new JTabbedPane();
-    private JProgressBar progressBar = new JProgressBar();
 
+    private JProgressBar progressBar = new JProgressBar();
     private JMenuItem defineClassMenuItem = new JMenuItem();
     private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
     private JMenuItem loadAnalysisMenuItem = new JMenuItem();
     private JMenuItem modClassMenuItem = new JMenuItem();
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
+
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
 
     private JPanel statusBarPanel;
@@ -257,6 +270,10 @@ public class MainFrame extends JFrame {
         return this.currentResultSet;
     }
 
+    public int getNumResultSets() {
+        return this.results.size();
+    }
+
     /**
      * Get the original, "fresh" gene annotation data.
      * 
@@ -264,6 +281,20 @@ public class MainFrame extends JFrame {
      */
     public GeneAnnotations getOriginalGeneData() {
         return geneData;
+    }
+
+    public GeneSetPvalRun getResultSet( int runIndex ) {
+        if ( runIndex < 0 || runIndex > this.results.size() - 1 ) {
+            return null;
+        }
+        return this.results.get( runIndex );
+    }
+
+    /**
+     * @return unmodifiable list view.
+     */
+    public List<GeneSetPvalRun> getResultSets() {
+        return Collections.unmodifiableList( this.results );
     }
 
     /**
@@ -296,46 +327,106 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * @param loadFile
-     * @throws IOException
+     * Remove a run from the list of results that are currently loaded.
+     * 
+     * @param runIndex
      */
-    protected void loadAnalysis( String loadFile ) throws IOException {
+    public void removeRun( int runIndex ) {
 
-        assert loadFile != null;
+        /*
+         * If possible, remove the annotations.
+         */
+        boolean canRemoveAnnots = true;
+        GeneSetPvalRun runToRemove = results.get( runIndex );
+        GeneAnnotations runAnnots = runToRemove.getGeneData();
+        if ( results.size() > 1 ) {
 
-        disableMenusForAnalysis();
-
-        // the settings used for the analysis, not the same as the application settings.
-        SettingsHolder loadSettings;
-        try {
-            loadSettings = new Settings( loadFile );
-        } catch ( ConfigurationException e ) {
-            GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n" + e.getMessage() );
-            return;
+            for ( GeneSetPvalRun r : results ) {
+                if ( r == runToRemove ) continue;
+                if ( r.getGeneData().equals( runAnnots ) ) {
+                    // someone else is using it.
+                    canRemoveAnnots = false;
+                }
+            }
         }
 
-        this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, loadFile );
-        athread.run();
-        log.debug( "Waiting" );
-
-        Collection<GeneSetPvalRun> latestResults = athread.getLatestResults();
-        for ( GeneSetPvalRun latestResult : latestResults ) {
-            checkForReasonableResults( latestResult );
-            if ( latestResult != null ) addResult( latestResult );
+        if ( canRemoveAnnots ) {
+            this.geneData.deleteSubClone( runAnnots );
         }
 
-        athread = null;
+        results.remove( runIndex );
+        setCurrentResultSetIndex( results.size() - 1 );
 
-        log.debug( "done" );
-        enableMenusForAnalysis();
+        this.treePanel.removeRun( runToRemove );
+        this.tablePanel.removeRun( runToRemove );
+
+        updateRunViewMenu();
     }
 
     /**
-     * @param runIndex
+     * 
      */
-    public void setCurrentResultSetIndex( int runIndex ) {
-        this.currentResultSet = runIndex;
-        treePanel.fireResultsChanged();
+    public void saveAnalysisAction() {
+        if ( results.size() == 0 ) {
+            statusMessenger.showError( "There are no runs to save" );
+            return;
+        }
+
+        /*
+         * 1. Pick the run and get other settings (latter needed even if only one result available)
+         */
+        SaveAnalysisDialog dialog = new SaveAnalysisDialog( this, this.settings, getCurrentResultSetIndex() );
+
+        if ( dialog.wasCancelled() ) {
+            this.statusMessenger.showStatus( "Save cancelled." );
+            return;
+        }
+
+        int runNum = dialog.getSelectedRunNum();
+        GeneSetPvalRun runToSave = this.results.get( runNum );
+        boolean includeGenes = dialog.isSaveAllGenes();
+
+        /*
+         * 2. Pick the file.
+         */
+        JFileChooser chooser = new JFileChooser();
+        chooser = new JFileChooser();
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        chooser.setApproveButtonText( "OK" );
+        chooser.setDialogTitle( "Save Analysis As:" );
+        // suggest a file name.
+        chooser.setSelectedFile( new File( StringUtils.strip(
+                getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
+                + ".erminej.txt" ) );
+
+        int result = chooser.showOpenDialog( this );
+
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            File f = new File( chooser.getSelectedFile().toString() );
+
+            if ( f.exists() ) {
+                int k = JOptionPane.showConfirmDialog( this, "That file exists. Overwrite?", "File exists",
+                        JOptionPane.YES_NO_CANCEL_OPTION );
+                if ( k != JOptionPane.YES_OPTION ) {
+                    this.statusMessenger.showStatus( "Save cancelled." );
+                    return;
+                } // otherwise, bail.
+            }
+
+            /*
+             * 3. Save.
+             */
+
+            try {
+                String saveFileName = f.getAbsolutePath();
+                ResultsPrinter.write( saveFileName, runToSave, includeGenes );
+                this.statusMessenger.showStatus( "Saved" );
+            } catch ( IOException ioe ) {
+                GuiUtil.error( "Could not write results to the file. " + ioe );
+            }
+        } else {
+            this.statusMessenger.showStatus( "Save cancelled." );
+        }
     }
 
     /**
@@ -344,6 +435,14 @@ public class MainFrame extends JFrame {
     public void setCurrentResultSet( GeneSetPvalRun resultSet ) {
         assert results.contains( resultSet );
         this.setCurrentResultSetIndex( results.indexOf( resultSet ) );
+    }
+
+    /**
+     * @param runIndex
+     */
+    public void setCurrentResultSetIndex( int runIndex ) {
+        this.currentResultSet = runIndex;
+        treePanel.fireResultsChanged();
     }
 
     public void setSettings( Settings settings ) {
@@ -383,19 +482,6 @@ public class MainFrame extends JFrame {
         enableMenusForAnalysis();
     }
 
-    class ResultSetMenuItem extends JMenuItem {
-        private final GeneSetPvalRun resultSet;
-
-        public ResultSetMenuItem( GeneSetPvalRun resultSet ) {
-            this.resultSet = resultSet;
-            this.setText( resultSet.getName() );
-        }
-
-        public GeneSetPvalRun getResultSet() {
-            return resultSet;
-        }
-    }
-
     /**
      * 
      */
@@ -417,6 +503,453 @@ public class MainFrame extends JFrame {
         }
 
         runViewMenu.revalidate();
+    }
+
+    /**
+     * Reinitialize everything
+     */
+    protected void initializeAllData() {
+        readDataFilesForStartup(); // sets up geneData.
+        treePanel.initialize( geneData );
+        tablePanel.initialize( geneData );
+    }
+
+    /**
+     * 
+     */
+    protected void loadAnalysis() {
+        JFileChooser chooser = new JFileChooser();
+        String RESULTS_LOAD_LOCATION = "resultsLoadPath";
+        chooser.setCurrentDirectory( new File( settings.getConfig().getString( RESULTS_LOAD_LOCATION,
+                settings.getDataDirectory() ) ) );
+        chooser.setDialogTitle( "Open saved analysis" );
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+
+            settings.getConfig().setProperty( RESULTS_LOAD_LOCATION, chooser.getSelectedFile().getAbsolutePath() );
+            final String path = chooser.getSelectedFile().getAbsolutePath();
+            if ( FileTools.testFile( path ) ) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            loadAnalysis( path );
+                        } catch ( Exception e1 ) {
+                            GuiUtil.error( "There was an error:\n" + e1.getMessage() );
+                        }
+                    }
+                }.start();
+            } else {
+                GuiUtil.error( "File is not readable." );
+            }
+        }
+
+    }
+
+    /**
+     * @param loadFile
+     * @throws IOException
+     */
+    protected void loadAnalysis( String loadFile ) throws IOException {
+
+        assert loadFile != null;
+
+        disableMenusForAnalysis();
+
+        // the settings used for the analysis, not the same as the application settings.
+        SettingsHolder loadSettings;
+        try {
+            loadSettings = new Settings( loadFile );
+        } catch ( ConfigurationException e ) {
+            GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n" + e.getMessage() );
+            return;
+        }
+
+        this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, loadFile );
+        athread.run();
+        log.debug( "Waiting" );
+
+        Collection<GeneSetPvalRun> latestResults = athread.getLatestResults();
+        for ( GeneSetPvalRun latestResult : latestResults ) {
+            checkForReasonableResults( latestResult );
+            if ( latestResult != null ) addResult( latestResult );
+        }
+
+        athread = null;
+
+        log.debug( "done" );
+        enableMenusForAnalysis();
+    }
+
+    protected void loadProject() {
+
+        if ( !this.results.isEmpty() ) {
+            int response = JOptionPane
+                    .showConfirmDialog(
+                            null,
+                            "Your current results will be discarded when"
+                                    + "the project loads.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
+                            "Unsaved results will be lost",
+
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+            if ( response == JOptionPane.CANCEL_OPTION ) return;
+        }
+
+        /*
+         * User selects project file
+         */
+        JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
+        projectPathChooser.setFileFilter( new ProjectFileFilter() );
+        projectPathChooser.setDialogTitle( "Open/Switch project" );
+        int yesno = projectPathChooser.showDialog( this, "Open" );
+
+        /*
+         * Import it as the current settings - actually use the results import function?
+         */
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+
+            final String path = projectPathChooser.getSelectedFile().getAbsolutePath();
+
+            try {
+                Settings projectSettings = new Settings( path );
+
+                this.settings = projectSettings;
+
+                /*
+                 * Note: those settings are not auto-saved, so the project is not modified.
+                 */
+
+                /*
+                 * Rebuilt the application data structures, pretty much from scratch
+                 */
+                SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        initializeAllData(); // Perhaps skip if the files have not changed?
+                        loadAnalysis( path );
+                        resetSignificanceFilters();
+                        return null;
+                    }
+                };
+                r.execute();
+
+            } catch ( IOException e ) {
+                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
+                return;
+            } catch ( ConfigurationException e ) {
+                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
+                log.error( e, e );
+                return;
+            }
+        }
+
+    }
+
+    protected void maybeEnableSomeMenus() {
+
+        if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
+            runViewMenu.setEnabled( true );
+        } else {
+            runViewMenu.setEnabled( false );
+        }
+    }
+
+    /**
+     * 
+     */
+    protected void resetSignificanceFilters() {
+        this.treePanel.setHideInsignificant( false );
+        this.treePanel.filter( true );
+    }
+
+    protected void saveProject() {
+
+        /*
+         * Prompt user for file name (and possibly the name of the project)
+         */
+
+        final JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
+
+        projectPathChooser.setFileFilter( new ProjectFileFilter() );
+        projectPathChooser.setDialogTitle( "Save the current project" );
+        int yesno = projectPathChooser.showDialog( this, "Save" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+
+            File selectedFile = projectPathChooser.getSelectedFile();
+
+            if ( selectedFile.exists() ) {
+                int response = JOptionPane.showConfirmDialog( null, "Overwrite existing file?", "Confirm Overwrite",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+                if ( response == JOptionPane.CANCEL_OPTION ) {
+                    statusMessenger.showStatus( "Cancelled." );
+                    return;
+                }
+            }
+
+            if ( !selectedFile.getName().endsWith( ".project" ) ) {
+                selectedFile = new File( selectedFile.getAbsolutePath() + ".project" );
+            }
+
+            String path = selectedFile.getAbsolutePath();
+
+            /*
+             * Write the file in ermineJ.data in *.project
+             */
+            try {
+
+                ResultsPrinter.write( path, this.settings, this.results );
+                this.statusMessenger.showStatus( "Saved to " + selectedFile.getAbsolutePath() );
+            } catch ( IOException e ) {
+                GuiUtil.error( "Could not save the project: " + e.getMessage() );
+            }
+        }
+
+    }
+
+    /**
+     * 
+     */
+    protected void showLogs() {
+        StringBuffer bif = new StringBuffer();
+        File logFile = settings.getLogFile();
+
+        if ( logFile == null ) {
+            GuiUtil.error( "Cannot locate log file" );
+            return;
+        }
+
+        if ( !logFile.canRead() ) {
+            GuiUtil.error( "Cannot read log file from " + logFile );
+            return;
+        }
+
+        try {
+
+            BufferedReader fis = new BufferedReader( new FileReader( logFile ) );
+            String line;
+            while ( ( line = fis.readLine() ) != null ) {
+                bif.append( line );
+                bif.append( "\n" );
+            }
+            fis.close();
+            ScrollingTextAreaDialog b = new ScrollingTextAreaDialog( this, "ErmineJ Log", true );
+            b.setText( "The log file is located at:\n" + logFile + "\n\nLog contents:\n" + bif.toString() );
+            b.setEditable( false );
+            b.setSize( new Dimension( 350, 500 ) );
+            b.setResizable( true );
+            b.setLocation( GuiUtil.chooseChildLocation( b, this ) );
+            b.setCaretPosition( 0 );
+            b.pack();
+            b.validate();
+            b.setVisible( true );
+        } catch ( FileNotFoundException e ) {
+            GuiUtil.error( "The log file could not be found: was looking in " + logFile );
+            log.error( e );
+        } catch ( IOException e ) {
+            GuiUtil.error( "There was an error reading the log file from " + logFile );
+            log.error( e );
+        }
+    }
+
+    /**
+     * @param b
+     */
+    protected void showUserMenuItemActionPerformed( boolean b ) {
+        /*
+         * I deem this filtering unnecessary for the tree, but it could be done.
+         */
+        this.tablePanel.filterByUserGeneSets( b );
+
+        if ( b ) {
+            statusMessenger.showStatus( this.tablePanel.getRowCount() + " custom gene sets shown" );
+        } else {
+            statusMessenger.showStatus( this.tablePanel.getRowCount() + " gene sets shown" );
+
+        }
+    }
+
+    protected void switchAnnotations() {
+
+        /*
+         * User selects annotation file
+         */
+        JFileChooser annotFileChooser = new JFileChooser( settings.getDataDirectory() );
+        annotFileChooser.setFileFilter( new DataFileFilter() );
+        annotFileChooser.setDialogTitle( "Select annotation file" );
+        int yesno = annotFileChooser.showDialog( this, "Open" );
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+
+            File selectedFile = annotFileChooser.getSelectedFile();
+
+            boolean newIsSameAsOld = selectedFile.getAbsolutePath().equals( settings.getAnnotFile() );
+            if ( newIsSameAsOld ) {
+                /*
+                 * Alert the user -- they can reload if they want, or bail.
+                 */
+                int response = JOptionPane.showConfirmDialog( null, "The selected annotations"
+                        + " are already loaded. Force reload?", "File already loaded", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE );
+                if ( response == JOptionPane.CANCEL_OPTION ) return;
+            }
+
+            /*
+             * FIXME If there are already analyses, we should prompt them to save, as it will mess them up? Need to test
+             * behaviour.
+             */
+            if ( !this.results.isEmpty() ) {
+                // int response = JOptionPane
+                // .showConfirmDialog(
+                // null,
+                // "Your current results will be discarded when"
+                // +
+                // "the anotations load.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
+                // "Unsaved results will be lost",
+                //
+                // JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+                // if ( response == JOptionPane.CANCEL_OPTION ) return;
+            }
+
+            this.settings.setAnnotFile( selectedFile.getAbsolutePath() );
+
+            /*
+             * The settings for the geneScores and rawData should be blanked, if the annotation file is different.
+             */
+            if ( !newIsSameAsOld ) {
+                settings.setScoreFile( null );
+                settings.setRawFile( null );
+            }
+
+            SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+
+                @Override
+                protected Object doInBackground() {
+                    initializeAllData();
+
+                    return null;
+                }
+            };
+            r.execute();
+        }
+    }
+
+    /**
+     * 
+     */
+    protected void switchGeneScoreFile() {
+        String scoreFile = settings.getScoreFile();
+        if ( StringUtils.isBlank( scoreFile ) ) {
+            scoreFile = this.settings.getDataDirectory();
+        }
+
+        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( scoreFile, settings.getScoreCol() );
+        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            statusMessenger.showStatus( "Score file set to " + scoreFile + ", reading values from column "
+                    + settings.getScoreCol() );
+            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.setScoreCol( fchooser.getStartColumn() );
+            statusMessenger.showStatus( "Score file set to " + scoreFile );
+        }
+
+    }
+
+    protected void switchRawDataFile() {
+        String rawDataFileName = settings.getRawDataFileName();
+
+        if ( StringUtils.isBlank( rawDataFileName ) ) {
+            rawDataFileName = this.settings.getDataDirectory();
+        }
+
+        JRawFileChooser fchooser = new JRawFileChooser( rawDataFileName, settings.getDataCol() );
+        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.setDataCol( fchooser.getStartColumn() );
+            statusMessenger.showStatus( "Data file set to " + settings.getScoreFile() );
+        }
+    }
+
+    /**
+     * 
+     */
+    protected void writePrefs() {
+        settings.getConfig().setProperty( MAINWINDOWWIDTH, String.valueOf( this.getWidth() ) );
+        settings.getConfig().setProperty( MAINWINDOWHEIGHT, String.valueOf( this.getHeight() ) );
+        settings.getConfig().setProperty( MAINWINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
+        settings.getConfig().setProperty( MAINWINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
+    }
+
+    void aboutMenuItem_actionPerformed() {
+        AboutBox aboutBox = new AboutBox( this );
+        aboutBox.setVisible( true );
+    }
+
+    void defineClassMenuItem_actionPerformed() {
+        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, true );
+        cwiz.showWizard();
+    }
+
+    /**
+     * Cancel the currently running analysis task.
+     */
+    void doCancel() {
+        log.debug( "Got cancel in thread " + Thread.currentThread().getName() );
+
+        assert athread != null : "Attempt to cancel a null analysis thread";
+        athread.interrupt();
+
+        try {
+            Thread.sleep( 100 );
+        } catch ( InterruptedException e ) {
+        }
+
+        athread.stopRunning( true );
+        athread = null;
+        enableMenusForAnalysis();
+        this.statusMessenger.showStatus( "Ready" );
+
+    }
+
+    void enableMenusForAnalysis() {
+        defineClassMenuItem.setEnabled( true );
+        modClassMenuItem.setEnabled( true );
+        runAnalysisMenuItem.setEnabled( true );
+        loadAnalysisMenuItem.setEnabled( true );
+        maybeEnableSomeMenus();
+        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
+        cancelAnalysisMenuItem.setEnabled( false );
+    }
+
+    void modClassMenuItem_actionPerformed() {
+        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, false );
+        cwiz.showWizard();
+    }
+
+    /**
+     * @param e ActionEvent
+     */
+    void quitMenuItem_actionPerformed( ActionEvent e ) {
+        statusMessenger.clear();
+
+        /*
+         * This is appropriate if for example we loaded a project (which we do not change), but we might as well keep
+         * the settings for next time.
+         */
+        settings.writePrefs();
+
+        System.exit( 0 );
+    }
+
+    void runAnalysisMenuItem_actionPerformed() {
+        AnalysisWizard awiz = new AnalysisWizard( this, geneData );
+        awiz.showWizard();
     }
 
     /**
@@ -459,6 +992,11 @@ public class MainFrame extends JFrame {
             } else if ( p == 1.0 ) {
                 numUnityPvalue++;
             }
+        }
+
+        if ( numPvalues == 0 ) {
+            GuiUtil.error( "No gene sets yielded any results. Check your settings.\n"
+                    + "For example, make sure you have selected a non-empty size range for gene sets." );
         }
 
         if ( numZeroPvalues == numPvalues || numUnityPvalue == numPvalues ) {
@@ -550,15 +1088,6 @@ public class MainFrame extends JFrame {
 
         r.execute();
 
-    }
-
-    /**
-     * Reinitialize everything
-     */
-    protected void initializeAllData() {
-        readDataFilesForStartup(); // sets up geneData.
-        treePanel.initialize( geneData );
-        tablePanel.initialize( geneData );
     }
 
     /**
@@ -973,220 +1502,6 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
-     */
-    protected void loadAnalysis() {
-        JFileChooser chooser = new JFileChooser();
-        String RESULTS_LOAD_LOCATION = "resultsLoadPath";
-        chooser.setCurrentDirectory( new File( settings.getConfig().getString( RESULTS_LOAD_LOCATION,
-                settings.getDataDirectory() ) ) );
-        chooser.setDialogTitle( "Open saved analysis" );
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-
-            settings.getConfig().setProperty( RESULTS_LOAD_LOCATION, chooser.getSelectedFile().getAbsolutePath() );
-            final String path = chooser.getSelectedFile().getAbsolutePath();
-            if ( FileTools.testFile( path ) ) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            loadAnalysis( path );
-                        } catch ( Exception e1 ) {
-                            GuiUtil.error( "There was an error:\n" + e1.getMessage() );
-                        }
-                    }
-                }.start();
-            } else {
-                GuiUtil.error( "File is not readable." );
-            }
-        }
-
-    }
-
-    protected void switchAnnotations() {
-
-        /*
-         * User selects annotation file
-         */
-        JFileChooser annotFileChooser = new JFileChooser( settings.getDataDirectory() );
-        annotFileChooser.setFileFilter( new DataFileFilter() );
-        annotFileChooser.setDialogTitle( "Select annotation file" );
-        int yesno = annotFileChooser.showDialog( this, "Open" );
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-
-            File selectedFile = annotFileChooser.getSelectedFile();
-
-            boolean newIsSameAsOld = selectedFile.getAbsolutePath().equals( settings.getAnnotFile() );
-            if ( newIsSameAsOld ) {
-                /*
-                 * Alert the user -- they can reload if they want, or bail.
-                 */
-                int response = JOptionPane.showConfirmDialog( null, "The selected annotations"
-                        + " are already loaded. Force reload?", "File already loaded", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.QUESTION_MESSAGE );
-                if ( response == JOptionPane.CANCEL_OPTION ) return;
-            }
-
-            /*
-             * FIXME If there are already analyses, we should prompt them to save, as it will mess them up? Need to test
-             * behaviour.
-             */
-            if ( !this.results.isEmpty() ) {
-                // int response = JOptionPane
-                // .showConfirmDialog(
-                // null,
-                // "Your current results will be discarded when"
-                // +
-                // "the anotations load.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
-                // "Unsaved results will be lost",
-                //
-                // JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
-                // if ( response == JOptionPane.CANCEL_OPTION ) return;
-            }
-
-            this.settings.setAnnotFile( selectedFile.getAbsolutePath() );
-
-            /*
-             * The settings for the geneScores and rawData should be blanked, if the annotation file is different.
-             */
-            if ( !newIsSameAsOld ) {
-                settings.setScoreFile( null );
-                settings.setRawFile( null );
-            }
-
-            SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
-
-                @Override
-                protected Object doInBackground() {
-                    initializeAllData();
-
-                    return null;
-                }
-            };
-            r.execute();
-        }
-    }
-
-    protected void loadProject() {
-
-        if ( !this.results.isEmpty() ) {
-            int response = JOptionPane
-                    .showConfirmDialog(
-                            null,
-                            "Your current results will be discarded when"
-                                    + "the project loads.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
-                            "Unsaved results will be lost",
-
-                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
-            if ( response == JOptionPane.CANCEL_OPTION ) return;
-        }
-
-        /*
-         * User selects project file
-         */
-        JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
-        projectPathChooser.setFileFilter( new ProjectFileFilter() );
-        projectPathChooser.setDialogTitle( "Open/Switch project" );
-        int yesno = projectPathChooser.showDialog( this, "Open" );
-
-        /*
-         * Import it as the current settings - actually use the results import function?
-         */
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-
-            final String path = projectPathChooser.getSelectedFile().getAbsolutePath();
-
-            try {
-                Settings projectSettings = new Settings( path );
-
-                this.settings = projectSettings;
-
-                /*
-                 * Note: those settings are not auto-saved, so the project is not modified.
-                 */
-
-                /*
-                 * Rebuilt the application data structures, pretty much from scratch
-                 */
-                SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
-
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        initializeAllData(); // Perhaps skip if the files have not changed?
-                        loadAnalysis( path );
-                        resetSignificanceFilters();
-                        return null;
-                    }
-                };
-                r.execute();
-
-            } catch ( IOException e ) {
-                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
-                return;
-            } catch ( ConfigurationException e ) {
-                GuiUtil.error( "Error while loading the project: " + e.getMessage() );
-                log.error( e, e );
-                return;
-            }
-        }
-
-    }
-
-    /**
-     * 
-     */
-    protected void resetSignificanceFilters() {
-        this.treePanel.setHideInsignificant( false );
-        this.treePanel.filter( true );
-    }
-
-    protected void saveProject() {
-
-        /*
-         * Prompt user for file name (and possibly the name of the project)
-         */
-
-        final JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
-
-        projectPathChooser.setFileFilter( new ProjectFileFilter() );
-        projectPathChooser.setDialogTitle( "Save the current project" );
-        int yesno = projectPathChooser.showDialog( this, "Save" );
-
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-
-            File selectedFile = projectPathChooser.getSelectedFile();
-
-            if ( selectedFile.exists() ) {
-                int response = JOptionPane.showConfirmDialog( null, "Overwrite existing file?", "Confirm Overwrite",
-                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
-                if ( response == JOptionPane.CANCEL_OPTION ) {
-                    statusMessenger.showStatus( "Cancelled." );
-                    return;
-                }
-            }
-
-            if ( !selectedFile.getName().endsWith( ".project" ) ) {
-                selectedFile = new File( selectedFile.getAbsolutePath() + ".project" );
-            }
-
-            String path = selectedFile.getAbsolutePath();
-
-            /*
-             * Write the file in ermineJ.data in *.project
-             */
-            try {
-
-                ResultsPrinter.write( path, this.settings, this.results );
-                this.statusMessenger.showStatus( "Saved to " + selectedFile.getAbsolutePath() );
-            } catch ( IOException e ) {
-                GuiUtil.error( "Could not save the project: " + e.getMessage() );
-            }
-        }
-
-    }
-
-    /**
      * The panel that show up while the initial inputs are loaded.
      * 
      * @return
@@ -1327,316 +1642,6 @@ public class MainFrame extends JFrame {
             }
         }
 
-    }
-
-    protected void maybeEnableSomeMenus() {
-
-        if ( results.size() > 1 && tabs.getSelectedIndex() == 1 ) {
-            runViewMenu.setEnabled( true );
-        } else {
-            runViewMenu.setEnabled( false );
-        }
-    }
-
-    /**
-     * 
-     */
-    protected void showLogs() {
-        StringBuffer bif = new StringBuffer();
-        File logFile = settings.getLogFile();
-
-        if ( logFile == null ) {
-            GuiUtil.error( "Cannot locate log file" );
-            return;
-        }
-
-        if ( !logFile.canRead() ) {
-            GuiUtil.error( "Cannot read log file from " + logFile );
-            return;
-        }
-
-        try {
-
-            BufferedReader fis = new BufferedReader( new FileReader( logFile ) );
-            String line;
-            while ( ( line = fis.readLine() ) != null ) {
-                bif.append( line );
-                bif.append( "\n" );
-            }
-            fis.close();
-            ScrollingTextAreaDialog b = new ScrollingTextAreaDialog( this, "ErmineJ Log", true );
-            b.setText( "The log file is located at:\n" + logFile + "\n\nLog contents:\n" + bif.toString() );
-            b.setEditable( false );
-            b.setSize( new Dimension( 350, 500 ) );
-            b.setResizable( true );
-            b.setLocation( GuiUtil.chooseChildLocation( b, this ) );
-            b.setCaretPosition( 0 );
-            b.pack();
-            b.validate();
-            b.setVisible( true );
-        } catch ( FileNotFoundException e ) {
-            GuiUtil.error( "The log file could not be found: was looking in " + logFile );
-            log.error( e );
-        } catch ( IOException e ) {
-            GuiUtil.error( "There was an error reading the log file from " + logFile );
-            log.error( e );
-        }
-    }
-
-    /**
-     * @param b
-     */
-    protected void showUserMenuItemActionPerformed( boolean b ) {
-        /*
-         * I deem this filtering unnecessary for the tree, but it could be done.
-         */
-        this.tablePanel.filterByUserGeneSets( b );
-
-        if ( b ) {
-            statusMessenger.showStatus( this.tablePanel.getRowCount() + " custom gene sets shown" );
-        } else {
-            statusMessenger.showStatus( this.tablePanel.getRowCount() + " gene sets shown" );
-
-        }
-    }
-
-    /**
-     * 
-     */
-    protected void switchGeneScoreFile() {
-        String scoreFile = settings.getScoreFile();
-        if ( StringUtils.isBlank( scoreFile ) ) {
-            scoreFile = this.settings.getDataDirectory();
-        }
-
-        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( scoreFile, settings.getScoreCol() );
-        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
-        int yesno = fchooser.showDialog( this, "Open" );
-
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
-            statusMessenger.showStatus( "Score file set to " + scoreFile + ", reading values from column "
-                    + settings.getScoreCol() );
-            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
-            settings.setScoreCol( fchooser.getStartColumn() );
-            statusMessenger.showStatus( "Score file set to " + scoreFile );
-        }
-
-    }
-
-    protected void switchRawDataFile() {
-        String rawDataFileName = settings.getRawDataFileName();
-
-        if ( StringUtils.isBlank( rawDataFileName ) ) {
-            rawDataFileName = this.settings.getDataDirectory();
-        }
-
-        JRawFileChooser fchooser = new JRawFileChooser( rawDataFileName, settings.getDataCol() );
-        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
-        int yesno = fchooser.showDialog( this, "Open" );
-
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
-            settings.setDataCol( fchooser.getStartColumn() );
-            statusMessenger.showStatus( "Data file set to " + settings.getScoreFile() );
-        }
-    }
-
-    /**
-     * 
-     */
-    protected void writePrefs() {
-        settings.getConfig().setProperty( MAINWINDOWWIDTH, String.valueOf( this.getWidth() ) );
-        settings.getConfig().setProperty( MAINWINDOWHEIGHT, String.valueOf( this.getHeight() ) );
-        settings.getConfig().setProperty( MAINWINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
-        settings.getConfig().setProperty( MAINWINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
-    }
-
-    void aboutMenuItem_actionPerformed() {
-        AboutBox aboutBox = new AboutBox( this );
-        aboutBox.setVisible( true );
-    }
-
-    void defineClassMenuItem_actionPerformed() {
-        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, true );
-        cwiz.showWizard();
-    }
-
-    /**
-     * Cancel the currently running analysis task.
-     */
-    void doCancel() {
-        log.debug( "Got cancel in thread " + Thread.currentThread().getName() );
-
-        assert athread != null : "Attempt to cancel a null analysis thread";
-        athread.interrupt();
-
-        try {
-            Thread.sleep( 100 );
-        } catch ( InterruptedException e ) {
-        }
-
-        athread.stopRunning( true );
-        athread = null;
-        enableMenusForAnalysis();
-        this.statusMessenger.showStatus( "Ready" );
-
-    }
-
-    void enableMenusForAnalysis() {
-        defineClassMenuItem.setEnabled( true );
-        modClassMenuItem.setEnabled( true );
-        runAnalysisMenuItem.setEnabled( true );
-        loadAnalysisMenuItem.setEnabled( true );
-        maybeEnableSomeMenus();
-        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
-        cancelAnalysisMenuItem.setEnabled( false );
-    }
-
-    void modClassMenuItem_actionPerformed() {
-        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, false );
-        cwiz.showWizard();
-    }
-
-    /**
-     * @param e ActionEvent
-     */
-    void quitMenuItem_actionPerformed( ActionEvent e ) {
-        statusMessenger.clear();
-
-        /*
-         * This is appropriate if for example we loaded a project (which we do not change), but we might as well keep
-         * the settings for next time.
-         */
-        settings.writePrefs();
-
-        System.exit( 0 );
-    }
-
-    void runAnalysisMenuItem_actionPerformed() {
-        AnalysisWizard awiz = new AnalysisWizard( this, geneData );
-        awiz.showWizard();
-    }
-
-    /**
-     * 
-     */
-    public void saveAnalysisAction() {
-        if ( results.size() == 0 ) {
-            statusMessenger.showError( "There are no runs to save" );
-            return;
-        }
-
-        /*
-         * 1. Pick the run and get other settings (latter needed even if only one result available)
-         */
-        SaveAnalysisDialog dialog = new SaveAnalysisDialog( this, this.settings, getCurrentResultSetIndex() );
-
-        if ( dialog.wasCancelled() ) {
-            this.statusMessenger.showStatus( "Save cancelled." );
-            return;
-        }
-
-        int runNum = dialog.getSelectedRunNum();
-        GeneSetPvalRun runToSave = this.results.get( runNum );
-        boolean includeGenes = dialog.isSaveAllGenes();
-
-        /*
-         * 2. Pick the file.
-         */
-        JFileChooser chooser = new JFileChooser();
-        chooser = new JFileChooser();
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setApproveButtonText( "OK" );
-        chooser.setDialogTitle( "Save Analysis As:" );
-        // suggest a file name.
-        chooser.setSelectedFile( new File( StringUtils.strip(
-                getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
-                + ".erminej.txt" ) );
-
-        int result = chooser.showOpenDialog( this );
-
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            File f = new File( chooser.getSelectedFile().toString() );
-
-            if ( f.exists() ) {
-                int k = JOptionPane.showConfirmDialog( this, "That file exists. Overwrite?", "File exists",
-                        JOptionPane.YES_NO_CANCEL_OPTION );
-                if ( k != JOptionPane.YES_OPTION ) {
-                    this.statusMessenger.showStatus( "Save cancelled." );
-                    return;
-                } // otherwise, bail.
-            }
-
-            /*
-             * 3. Save.
-             */
-
-            try {
-                String saveFileName = f.getAbsolutePath();
-                ResultsPrinter.write( saveFileName, runToSave, includeGenes );
-                this.statusMessenger.showStatus( "Saved" );
-            } catch ( IOException ioe ) {
-                GuiUtil.error( "Could not write results to the file. " + ioe );
-            }
-        } else {
-            this.statusMessenger.showStatus( "Save cancelled." );
-        }
-    }
-
-    /**
-     * Remove a run from the list of results that are currently loaded.
-     * 
-     * @param runIndex
-     */
-    public void removeRun( int runIndex ) {
-
-        /*
-         * If possible, remove the annotations.
-         */
-        boolean canRemoveAnnots = true;
-        GeneSetPvalRun runToRemove = results.get( runIndex );
-        GeneAnnotations runAnnots = runToRemove.getGeneData();
-        if ( results.size() > 1 ) {
-
-            for ( GeneSetPvalRun r : results ) {
-                if ( r == runToRemove ) continue;
-                if ( r.getGeneData().equals( runAnnots ) ) {
-                    // someone else is using it.
-                    canRemoveAnnots = false;
-                }
-            }
-        }
-
-        if ( canRemoveAnnots ) {
-            this.geneData.deleteSubClone( runAnnots );
-        }
-
-        results.remove( runIndex );
-        setCurrentResultSetIndex( results.size() - 1 );
-
-        this.treePanel.removeRun( runToRemove );
-        this.tablePanel.removeRun( runToRemove );
-
-        updateRunViewMenu();
-    }
-
-    public GeneSetPvalRun getResultSet( int runIndex ) {
-        if ( runIndex < 0 || runIndex > this.results.size() - 1 ) {
-            return null;
-        }
-        return this.results.get( runIndex );
-    }
-
-    public int getNumResultSets() {
-        return this.results.size();
-    }
-
-    /**
-     * @return unmodifiable list view.
-     */
-    public List<GeneSetPvalRun> getResultSets() {
-        return Collections.unmodifiableList( this.results );
     }
 
 }
