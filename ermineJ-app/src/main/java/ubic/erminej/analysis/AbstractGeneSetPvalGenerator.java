@@ -139,7 +139,7 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
      * @return true if the set should be retained (e.g. it is in the correct aspect )
      */
     protected boolean checkAspect( GeneSetTerm geneSetName, boolean missingAspectTreatedAsUsable ) {
-        return this.geneAnnots.checkAspect( geneSetName, missingAspectTreatedAsUsable );
+        return this.geneAnnots.hasUsableAspect( geneSetName, missingAspectTreatedAsUsable );
     }
 
     /**

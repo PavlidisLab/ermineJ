@@ -462,7 +462,7 @@ public class SettingsHolder {
 
     // primarily for testing.
     public boolean loadUserDefined() {
-        return this.config.getBoolean( "loadUserDefinedGeneGroups" );
+        return this.config.getBoolean( "loadUserDefinedGeneGroups", true );
     }
 
     public void setCustomGeneSetFiles( Collection<String> filePaths ) {

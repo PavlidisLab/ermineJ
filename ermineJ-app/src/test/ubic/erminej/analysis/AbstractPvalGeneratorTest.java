@@ -24,12 +24,12 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder.MultiProbeHandling;
-import ubic.erminej.analysis.OraPvalGenerator;
 import ubic.erminej.data.GeneAnnotationParser;
+import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSetTerms;
-import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
  * @author pavlidis
@@ -56,6 +56,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         s = new Settings();
         s.setGeneScoreThreshold( 0.015 );
         s.setMinClassSize( 2 );
+        s.setMaxClassSize( 200 );
         s.setScoreCol( 2 );
         s.setUseMultifunctionalityCorrection( false );
         s.setDoLog( true );
@@ -63,6 +64,8 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         s.setUseBiologicalProcess( true );
         s.setUseCellularComponent( true );
         s.setUseMolecularFunction( true );
+        s.setUseUserDefined( false );
+        s.setLoadUserDefined( false );
         s.setGeneRepTreatment( MultiProbeHandling.MEAN );
 
         gon = new GeneSetTerms( isi );
@@ -71,6 +74,10 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
 
         assertTrue( annotations.getGenes().size() > 0 );
         assertTrue( annotations.getGeneSetTerms().size() > 0 );
+
+        for ( GeneSetTerm t : annotations.getGeneSetTerms() ) {
+            assertNotNull( t.getAspect() );
+        }
 
         scores = new GeneScores( is, s, null, annotations );
 

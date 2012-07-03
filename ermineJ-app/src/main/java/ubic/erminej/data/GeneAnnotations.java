@@ -376,39 +376,6 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param geneSetName
-     * @param missingAspectTreatedAsUsable What to do if the aspect is missing. User-defined groups (which don't have an
-     *        aspect) aren't affected by this
-     * @return true if the gene set would be included in the analysis.
-     */
-    public boolean checkAspect( GeneSetTerm geneSetName, boolean missingAspectTreatedAsUsable ) {
-        String aspect = geneSetName.getAspect();
-
-        /*
-         * If there is no aspect, we don't use it, unless it's user-defined (though that should have an aspect ... )
-         */
-        if ( aspect == null && !geneSetName.isUserDefined() ) {
-            return missingAspectTreatedAsUsable;
-        }
-
-        if ( aspect == null ) {
-            return false;
-        }
-
-        if ( this.settings.getUseBiologicalProcess() && aspect.equalsIgnoreCase( "biological_process" ) ) {
-            return true;
-        } else if ( this.settings.getUseMolecularFunction() && aspect.equalsIgnoreCase( "molecular_function" ) ) {
-            return true;
-        } else if ( this.settings.getUseCellularComponent() && aspect.equalsIgnoreCase( "cellular_component" ) ) {
-            return true;
-        } else if ( this.settings.getUseUserDefined() && aspect.equalsIgnoreCase( GeneSetTerms.USER_DEFINED ) ) {
-            // probably won't reach this?
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Remove a gene set (class) from all the maps that reference it. This basically completely removes the class, and
      * it cannot be restored unless there is a backup. If it is user-defined it is deleted entirely from the
      * GeneSetTerms tree.
@@ -443,6 +410,15 @@ public class GeneAnnotations {
         }
     }
 
+    /**
+     * @param classID
+     * @return
+     */
+    public boolean deleteUserGeneSet( GeneSetTerm classID ) {
+        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
+        return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
+    }
+
     // /**
     // * Add a new gene set. Used to set up user-defined gene sets.
     // *
@@ -474,15 +450,6 @@ public class GeneAnnotations {
     // this.addGeneSet( geneSetId, gs );
     //
     // }
-
-    /**
-     * @param classID
-     * @return
-     */
-    public boolean deleteUserGeneSet( GeneSetTerm classID ) {
-        if ( this.isReadOnly() ) throw new UnsupportedOperationException();
-        return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
-    }
 
     /**
      * @param symbol
@@ -795,6 +762,40 @@ public class GeneAnnotations {
     }
 
     /**
+     * @param geneSetTerm
+     * @param missingAspectTreatedAsUsable What to do if the aspect is missing. User-defined groups (which don't have an
+     *        aspect) aren't affected by this
+     * @return true if the gene set would be included in the analysis.
+     */
+    public boolean hasUsableAspect( GeneSetTerm geneSetTerm, boolean missingAspectTreatedAsUsable ) {
+        String aspect = geneSetTerm.getAspect();
+
+        /*
+         * If there is no aspect, we don't use it, unless it's user-defined (though that should have an aspect ... )
+         */
+        if ( aspect == null && !geneSetTerm.isUserDefined() ) {
+            return missingAspectTreatedAsUsable;
+        }
+
+        if ( aspect == null ) {
+            return false;
+        }
+
+        if ( this.settings.getUseBiologicalProcess() && aspect.equalsIgnoreCase( "biological_process" ) ) {
+            return true;
+        } else if ( this.settings.getUseMolecularFunction() && aspect.equalsIgnoreCase( "molecular_function" ) ) {
+            return true;
+        } else if ( this.settings.getUseCellularComponent() && aspect.equalsIgnoreCase( "cellular_component" ) ) {
+            return true;
+        } else if ( this.settings.getUseUserDefined() && aspect.equalsIgnoreCase( GeneSetTerms.USER_DEFINED ) ) {
+            // probably won't reach this?
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Test whether this was constructed 'subcloning' style. This should usually be true in the context of analyses,
      * which focus on analyzed subsets of the annotated genes. I recommend testing this in your code to make sure you
      * aren't forgetting to do that step.
@@ -834,7 +835,7 @@ public class GeneAnnotations {
         for ( Entry<GeneSetTerm, GeneSet> e : this.geneSets.entrySet() ) {
             GeneSetTerm t = e.getKey();
             GeneSet geneSet = e.getValue();
-            if ( geneSet.size() >= minSize && geneSet.size() <= maxSize && checkAspect( t, false ) ) {
+            if ( geneSet.size() >= minSize && geneSet.size() <= maxSize && hasUsableAspect( t, false ) ) {
                 c++;
             }
         }

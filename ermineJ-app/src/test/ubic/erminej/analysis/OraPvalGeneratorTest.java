@@ -19,7 +19,6 @@
 package ubic.erminej.analysis;
 
 import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm;
 import cern.jet.math.Arithmetic;
 
 /**
@@ -31,9 +30,9 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval1() {
         double expectedReturn = 0.3216374; // checked // dhyper(2, 11, 8, 2)
 
-        assertEquals( 11, scores.getPrunedGeneAnnotations().getGeneSetGenes( new GeneSetTerm( "GO:1" ) ).size() );
+        assertEquals( 11, scores.getPrunedGeneAnnotations().getGeneSetGenes( annotations.findTerm( "GO:1" ) ).size() );
 
-        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:1" ) );
+        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), annotations.findTerm( "GO:1" ) );
 
         assertNotNull( r );
         double actualReturn = r.getPvalue();
@@ -57,7 +56,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         assertEquals( 2, test.getNumGenesOverThreshold() ); // checked
         assertEquals( 17, test.getNumGenesUnderThreshold() ); // checked
 
-        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:2" ) );
+        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), annotations.findTerm( "GO:2" ) );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
 
@@ -67,7 +66,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     public void testClassPval3() {
         double expectedReturn = 0.7894737; // checked // dhyper(1, 10,9, 2) + dhyper(2, 10,9, 2)
 
-        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), new GeneSetTerm( "GO:3" ) );
+        GeneSetResult r = test.classPval( test.getGenesAboveThreshold(), annotations.findTerm( "GO:3" ) );
         assertNotNull( r );
         double actualReturn = r.getPvalue();
 
