@@ -128,6 +128,7 @@ public class AnalysisWizard extends Wizard {
     protected void backButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 2 ) {
+            this.clearStatus();
             step = 1;
             this.analysisType = settings.getClassScoreMethod();
             this.getContentPane().remove( step2 );
@@ -135,33 +136,33 @@ public class AnalysisWizard extends Wizard {
             this.setTitle( "Create New Analysis - Step 1 of " + maxSteps );
             this.getContentPane().add( step1 );
             step1.revalidate();
-            checkIfReady();
             backButton.setEnabled( false );
             nextButton.setEnabled( true );
             step2.saveValues();
             this.repaint();
         } else if ( step == 3 ) {
+            this.clearStatus();
             step = 2;
             this.getContentPane().remove( step3 );
             this.setTitle( "Create New Analysis - Step 2 of " + maxSteps );
             this.getContentPane().add( step2 );
-            checkIfReady();
             nextButton.setEnabled( true );
             step2.revalidate();
             step3.saveValues();
             this.repaint();
         } else if ( step == 4 ) {
+            this.clearStatus();
             step = 3;
             this.getContentPane().remove( step4 );
             this.setTitle( "Create New Analysis - Step 4 of " + maxSteps );
             this.getContentPane().add( step3 );
             step4.saveValues();
-            checkIfReady();
             nextButton.setEnabled( true );
             step3.updateNumGeneSetsActive();
             step3.revalidate();
             this.repaint();
         } else if ( step == 5 ) {
+            this.clearStatus();
             step = 4;
             step5.removeVarPanel( analysisType );
             this.getContentPane().remove( step5 );
@@ -183,7 +184,7 @@ public class AnalysisWizard extends Wizard {
 
     @Override
     protected void finishEditing( ActionEvent e ) {
-        if ( step2.isReady() ) {
+        if ( step2.isReady() && step3.isReady() && step4.isReady() ) {
 
             saveValues();
             log.info( "Starting analysis" );
@@ -204,6 +205,7 @@ public class AnalysisWizard extends Wizard {
     protected void nextButton_actionPerformed( ActionEvent e ) {
         clearStatus();
         if ( step == 1 && step1.isReady() ) {
+            this.clearStatus();
             step = 2;
             step1.saveValues();
             this.analysisType = settings.getClassScoreMethod();
@@ -219,7 +221,8 @@ public class AnalysisWizard extends Wizard {
             this.repaint();
             nextButton.requestFocusInWindow();
             this.nextButton.setEnabled( true );
-        } else if ( step == 2 ) {
+        } else if ( step == 2 && step2.isReady() ) {
+            this.clearStatus();
             step = 3;
             step2.saveValues();
             this.getContentPane().remove( step2 );
@@ -230,7 +233,8 @@ public class AnalysisWizard extends Wizard {
             step3.updateNumGeneSetsActive();
             step3.revalidate();
             this.repaint();
-        } else if ( step == 3 ) {
+        } else if ( step == 3 && step3.isReady() ) {
+            this.clearStatus();
             step = 4;
             step3.saveValues();
             this.getContentPane().remove( step3 );
@@ -240,7 +244,8 @@ public class AnalysisWizard extends Wizard {
             step4.updateNumGeneSetsActive();
             step4.revalidate();
             this.repaint();
-        } else if ( step == 4 ) {
+        } else if ( step == 4 && step4.isReady() ) {
+            this.clearStatus();
             step = 5;
             step4.saveValues();
             this.getContentPane().remove( step4 );

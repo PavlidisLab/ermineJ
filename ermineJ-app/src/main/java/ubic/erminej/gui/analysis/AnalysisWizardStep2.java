@@ -40,6 +40,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import org.apache.commons.lang.StringUtils;
+
 import ubic.basecode.dataStructure.matrix.StringMatrix;
 import ubic.basecode.util.FileTools;
 import ubic.erminej.Settings;
@@ -126,12 +128,11 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     public boolean isReady() {
 
         if ( wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
-                && rawFileTextField.getText().compareTo( "" ) == 0 ) {
+                && StringUtils.isBlank( rawFileTextField.getText() ) ) {
             wiz.showError( "Correlation analyses require a raw data file." );
             return false;
-        } else if ( ( wiz.getAnalysisType().equals( SettingsHolder.Method.GSR ) || wiz.getAnalysisType().equals(
-                SettingsHolder.Method.ORA ) )
-                && scoreFileTextField.getText().compareTo( "" ) == 0 ) {
+        } else if ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
+                && StringUtils.isBlank( scoreFileTextField.getText() ) ) {
             wiz.showError( "ORA, resampling and pre-re methods require a gene score file." );
             return false;
         }

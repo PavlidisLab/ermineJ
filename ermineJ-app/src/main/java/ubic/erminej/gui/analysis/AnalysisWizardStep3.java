@@ -92,10 +92,10 @@ public class AnalysisWizardStep3 extends WizardStep {
      */
     @Override
     public boolean isReady() {
-        if ( updateNumGeneSetsActive() <= 0 ) {
-            return false;
-        }
-        return false;
+        AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
+        return ( wiz.getGeneAnnots().numActiveGeneSets() > 0 || this.biologicalProcessButton.isSelected()
+                || this.cellularComponentButton.isSelected() || this.molecularFunctionButton.isSelected() || this.userDefinedButton
+                    .isSelected() );
     }
 
     /**
@@ -175,18 +175,24 @@ public class AnalysisWizardStep3 extends WizardStep {
         AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
         saveValues();
         int numActiveGeneSets = wiz.getGeneAnnots().numActiveGeneSets();
+        boolean isOK = true;
         if ( numActiveGeneSets <= 0 ) {
+            isOK = false;
+        } else {
+            isOK = true;
+        }
 
+        if ( isOK ) {
+            wiz.showStatus( numActiveGeneSets + " sets selected" );
+        } else {
             String suf = "";
             if ( biologicalProcessButton.isSelected() || molecularFunctionButton.isSelected()
                     || cellularComponentButton.isSelected() || userDefinedButton.isSelected() ) {
                 suf = " (check size range, next page)";
             }
-
             wiz.showError( numActiveGeneSets + " sets selected " + suf );
-        } else {
-            wiz.showStatus( numActiveGeneSets + " sets selected" );
         }
+
         return numActiveGeneSets;
     }
 

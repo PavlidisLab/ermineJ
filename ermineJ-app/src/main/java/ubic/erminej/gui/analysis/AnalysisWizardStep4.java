@@ -67,7 +67,9 @@ public class AnalysisWizardStep4 extends WizardStep {
 
     @Override
     public boolean isReady() {
-        if ( updateNumGeneSetsActive() <= 0 ) {
+        AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
+
+        if ( wiz.getGeneAnnots().numActiveGeneSets() <= 0 ) {
             return false;
         }
         return true;

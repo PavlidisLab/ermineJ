@@ -482,8 +482,10 @@ public class SettingsHolder {
     }
 
     public void setUseUserDefined( boolean b ) {
-        this.config.setProperty( "loadUserDefinedGeneGroups", b );
         this.config.setProperty( USE_USER_DEFINED_GROUPS, b );
+        if ( b ) {
+            this.config.setProperty( "loadUserDefinedGeneGroups", true );
+        }
     }
 
     /**
