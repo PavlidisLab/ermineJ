@@ -230,7 +230,8 @@ public class GeneSetTableModel extends AbstractTableModel {
                     // -Math.log10( geneData.getMultifunctionality().getGOTermMultifunctionalityPvalue( classid ) )
                     // / maxLoggedPvalue, 1.0 );
                     return geneData.getMultifunctionality().getGOTermMultifunctionalityRank( classid );
-
+                default:
+                    return null;
             }
         } else { // results
             int runIndex = getRunIndex( colIndex );
@@ -243,7 +244,6 @@ public class GeneSetTableModel extends AbstractTableModel {
 
             return data.get( classid );
         }
-        return null;
     }
 
     public void removeRunData( int runIndex ) {

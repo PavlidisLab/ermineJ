@@ -314,7 +314,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * Get the classes we are using as a reference.
      * 
-     * @param referenceResults
+     * @param referenceResults for the gene groups that are initially considered "significant"
      * @param sortedClasses
      * @return
      */
@@ -365,14 +365,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * Compute the change in the ranks for the selected terms.
+     * Compute the change in the ranks for the selected terms, for multifunctionality correction.
      * 
      * <pre>
      * s = mean(new ranks) - mean(old ranks)
      * </pre>
      * 
-     * @param previousRanks
-     * @param monitoredRanks
+     * @param oldRanks
+     * @param newRanks
      * @return s
      */
     private double score( Map<GeneSetTerm, Double> oldRanks, Map<GeneSetTerm, Double> newRanks ) {
