@@ -34,11 +34,9 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.concurrent.CancellationException;
 
-import javax.help.UnsupportedOperationException;
-
 import ubic.basecode.util.StatusViewer;
 
-import ubic.erminej.SettingsHolder; 
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSet;
