@@ -155,9 +155,6 @@ public class GeneScores {
      */
     private void makeScores( Collection<String> identifiers, SettingsHolder settings ) {
 
-        Collection<String> unknownProbes = new HashSet<String>();
-        Collection<String> unannotatedProbes = new HashSet<String>();
-
         boolean warned = false;
 
         Double hitScore = 1.0;
@@ -169,9 +166,12 @@ public class GeneScores {
             hitScore = -hitScore;
         }
 
-        for ( String id : identifiers ) {
+        int i = 0;
+        for ( String idr : identifiers ) {
 
-            Probe p = originalGeneAnnots.findProbe( id );
+            String id = StringUtils.strip( idr );
+
+            Probe p = originalGeneAnnots.findProbeCaseInsensitive( id );
 
             Gene g;
             if ( p == null ) {
@@ -179,16 +179,16 @@ public class GeneScores {
                 /*
                  * Try parsing as a gene.
                  */
-                g = originalGeneAnnots.findGene( id );
+                g = originalGeneAnnots.findGeneCaseInsensitive( id );
 
-                unknownProbes.add( id );
-                continue;
+                if ( g == null ) {
+                    continue;
+                }
             } else {
                 g = p.getGene();
             }
 
             if ( g.getGeneSets().isEmpty() ) {
-                unannotatedProbes.add( id );
                 continue;
             }
 
@@ -200,18 +200,19 @@ public class GeneScores {
             } else {
                 probeToScoreMap.put( p, hitScore );
             }
+            if ( ++i % 100 == 0 ) {
+                messenger.showStatus( "Parsed " + i + " ..." );
+            }
 
         }
 
         Double missScore = -hitScore;
 
         if ( probeToScoreMap.isEmpty() ) {
-            messenger.showStatus( "None of the identifiers were recognized" );
             throw new IllegalArgumentException( "None of the identifiers were recognized" );
         }
 
         if ( probeToScoreMap.size() == 1 ) {
-            messenger.showStatus( "Hit list must have at least two recognized items" );
             throw new IllegalArgumentException( "Hit list must have at least two recognized items" );
         }
 
@@ -829,7 +830,7 @@ public class GeneScores {
 
         if ( counter == 0 ) {
             // this is okay, if we're trying to show the class despite there being no results.
-            log.warn( "No valid gene-to-score mappings were found." );
+            messenger.showStatus( "No valid gene-to-score mappings were found." );
             return;
         }
 

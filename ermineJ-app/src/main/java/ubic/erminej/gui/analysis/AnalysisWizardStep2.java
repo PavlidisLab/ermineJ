@@ -389,6 +389,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
      * Show a box for pasting in a list of genes.
      */
     void quickpickButton_actionPerformed() {
+        wiz.getStatusField().clear();
+
         final JDialog frame = new JDialog( this.getOwner() );
         final JTextPane textPane = new JTextPane();
         textPane.setPreferredSize( new Dimension( 500, 500 ) );
@@ -450,6 +452,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     }
 
     /**
+     * TODO refactor out.
+     * 
      * @param textPane
      */
     final private void getGeneScoresFromQuickList( final JTextPane textPane ) {
@@ -458,17 +462,67 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
              * Get the text, parse into a list of elements
              */
             String t = textPane.getDocument().getText( 0, textPane.getDocument().getLength() );
+
+            if ( t.isEmpty() ) {
+                wiz.showError( "You didn't provide any identifiers" );
+                scoreFileTextField.setText( null );
+                settings.setScoreFile( null );
+                return;
+            }
+
             String[] fa = StringUtils.split( t, '\n' );
+
+            if ( fa.length == 0 ) {
+                scoreFileTextField.setText( null );
+                settings.setScoreFile( null );
+                wiz.showError( "You didn't provide any identifiers" );
+                return;
+            }
+
+            if ( fa.length < 2 ) {
+                scoreFileTextField.setText( null );
+                settings.setScoreFile( null );
+                wiz.showError( "Your quick list must have at least 2 items" );
+                return;
+            }
+
             Collection<String> fields = Arrays.asList( fa );
 
             GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots() );
 
-            File tmpfile = File.createTempFile( "QuickList", ".txt", new File( settings.getGeneScoreFileDirectory() ) );
+            int i = 0;
+            boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
+                    || ( !settings.getDoLog() && settings.getBigIsBetter() );
+            for ( Double d : gs.getGeneScores() ) {
+                if ( invert ) {
+                    if ( d < 0 ) i++;
+                } else {
+                    if ( d > 0 ) i++;
+                }
+            }
+
+            if ( i == 0 ) {
+                scoreFileTextField.setText( null );
+                settings.setScoreFile( null );
+                wiz.showError( "None of the genes were recognized" );
+                return;
+            } else if ( i == 1 ) {
+                scoreFileTextField.setText( null );
+                settings.setScoreFile( null );
+                wiz.showError( "Your quick list must have at least 2 items" );
+                return;
+            } else {
+                wiz.showStatus( i + " genes were recognized out of " + fa.length + " ids." );
+            }
+
+            File tmpfile = File.createTempFile( "QuickList.", ".txt", new File( settings.getGeneScoreFileDirectory() ) );
             gs.write( tmpfile );
+
+            // display
             scoreColTextField.setText( "2" );
             scoreFileTextField.setText( tmpfile.getAbsolutePath() );
 
-            // do we do this now?
+            // do we do this now? Might be okay to wait?
             settings.setScoreFile( tmpfile.getAbsolutePath() );
             settings.setScoreCol( 2 );
 
@@ -480,6 +534,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             log.info( e1 );
         } catch ( IOException ioe ) {
             log.info( ioe );
+            wiz.getStatusField().showError( ioe.getMessage() );
+        } catch ( Exception e ) {
+            wiz.getStatusField().showError( e.getMessage() );
         }
     }
 

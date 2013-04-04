@@ -109,6 +109,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     @Override
     public int compareTo( GeneSetResult other ) {
 
+        if ( this instanceof EmptyGeneSetResult && other instanceof EmptyGeneSetResult ) return 0;
+
         if ( other == null ) return -1;
 
         if ( other instanceof EmptyGeneSetResult ) return -1;
@@ -253,8 +255,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     public void printHeadings( Writer out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
         out.write( "\tName\tID\tProbes\tNumGenes\tRawScore\tPval"
-                + "\tCorrectedPvalue\tMFPvalue\tCorrectedMFPvalue\tMultifuntionality" + extracolumns
-                + "\n" );
+                + "\tCorrectedPvalue\tMFPvalue\tCorrectedMFPvalue\tMultifuntionality" + extracolumns + "\n" );
     }
 
     public void setCorrectedPvalue( double a ) {

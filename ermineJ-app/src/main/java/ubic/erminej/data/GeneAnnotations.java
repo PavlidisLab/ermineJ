@@ -1490,6 +1490,51 @@ public class GeneAnnotations {
         }
     }
 
+    /**
+     * Find the first match, ignoring case.
+     * 
+     * @param id
+     * @return
+     */
+    public Probe findProbeCaseInsensitive( String id ) {
+        Probe p = this.findProbe( id );
+        if ( p != null ) {
+            return p;
+        }
+
+        String idup = id.toUpperCase();
+
+        for ( Probe probe : probes.values() ) {
+            if ( probe.getName().toUpperCase().equals( idup ) ) {
+                return probe;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find the first match, ignoring case.
+     * 
+     * @param id
+     * @return
+     */
+    public Gene findGeneCaseInensitive( String id ) {
+        Gene g = this.findGene( id );
+        if ( g != null ) {
+            return g;
+        }
+
+        String idup = id.toUpperCase();
+
+        for ( Gene gene : genes.values() ) {
+            if ( gene.getSymbol().toUpperCase().equals( idup ) ) {
+                return gene;
+            }
+        }
+
+        return null;
+    }
+
 }
 
 class ClassSizeComparator implements Comparator<GeneSet>, Serializable {
