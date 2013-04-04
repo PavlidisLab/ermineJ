@@ -547,6 +547,11 @@ public class Settings extends SettingsHolder {
 
     }
 
+    /**
+     * Which column of the input score file has the scores. 2 means the first column after the row names.
+     * 
+     * @param val
+     */
     public void setScoreCol( int val ) {
         log.debug( "Setting score start column to " + val );
         this.config.setProperty( SCORE_COL, val );

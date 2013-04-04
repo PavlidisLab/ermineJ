@@ -27,18 +27,29 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -46,6 +57,8 @@ import ubic.basecode.dataStructure.matrix.StringMatrix;
 import ubic.basecode.util.FileTools;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.GeneScores;
+import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.MatrixPreviewer;
 import ubic.erminej.gui.util.WizardStep;
@@ -87,13 +100,14 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     private JTextField rawFileTextField;
     private JTextField scoreFileTextField;
     private JTextField scoreColTextField;
-
+    private JPanel quickPickPanel = new JPanel();
     private JTextField dataColTextField;
 
     public AnalysisWizardStep2( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
-        this.jbInit();
         this.wiz = wiz;
+        this.jbInit();
+
         this.settings = settings;
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         setValues();
@@ -259,6 +273,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         return rawDataPanel;
     }
 
+    JButton scoreFileBrowseButton = new JButton();
+
     @Override
     protected void jbInit() {
         // initialization
@@ -274,7 +290,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                 .createTitledBorder( "Gene score file (optional for CORR):" );
 
         scoreFilePanel.setBorder( geneScoreFileTitleBorder );
-        JButton scoreFileBrowseButton = new JButton();
         scoreFileBrowseButton.setEnabled( true );
         scoreFileBrowseButton.setText( "Browse" );
         scoreFileBrowseButton.addActionListener( new ScoreFileBrowse( this ) );
@@ -314,9 +329,22 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
         // -----------------------------------------------------
 
+        /*
+         * FIXME we have to set this after we know what the analysis is.
+         */
+
+        scoreFilePanel.setLayout( new GridLayout( 3, 1 ) );
+
+        // quickPickPanel.setLayout( new BoxLayout( quickPickPanel, BoxLayout.X_AXIS ) );
+        JButton quickPickPanelButton = new JButton();
+        quickPickPanelButton.setEnabled( true );
+        quickPickPanelButton.setText( "Quick list" );
+        quickPickPanelButton.addActionListener( new QuickPickEnter( this ) );
+        quickPickPanel.add( quickPickPanelButton );
+        scoreFilePanel.add( quickPickPanel );
         scoreFilePanel.add( scoreFileBrowsePanel );
         scoreFilePanel.add( scoreColumnPanel );
-
+        quickPickPanel.setVisible( false );
         // -----------------------------------------------------
 
         JPanel rawDataPanel = setupDataMatrixFileChooser();
@@ -357,11 +385,107 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         }
     }
 
+    /**
+     * Show a box for pasting in a list of genes.
+     */
+    void quickpickButton_actionPerformed() {
+        final JDialog frame = new JDialog( this.getOwner() );
+        final JTextPane textPane = new JTextPane();
+        textPane.setPreferredSize( new Dimension( 500, 500 ) );
+        textPane.setCaretPosition( 0 );
+
+        Style def = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
+        StyleConstants.setFontFamily( def, "SansSerif" );
+
+        frame.setLayout( new BorderLayout() );
+        frame.getContentPane().add( new JScrollPane( textPane ), BorderLayout.CENTER );
+        frame.setTitle( "Type or paste in a list of identifiers" );
+        frame.setLocation( GuiUtil.chooseChildLocation( frame, this ) );
+        // GuiUtil.centerContainer( frame );
+
+        JButton ok = new JButton( "OK" );
+        JButton cancel = new JButton( "Cancel" );
+        ok.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                frame.dispose();
+                getGeneScoresFromQuickList( textPane );
+            }
+        } );
+
+        cancel.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                frame.dispose();
+            }
+        } );
+
+        /*
+         * TODO make prettier
+         */
+        JPanel p = new JPanel();
+        p.setLayout( new GridLayout( 1, 2 ) );
+        p.add( ok );
+        p.add( cancel );
+
+        frame.add( p, BorderLayout.SOUTH );
+
+        frame.pack();
+        frame.setIconImage( new ImageIcon( this.getClass().getResource(
+                MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
+        frame.setAlwaysOnTop( true );
+
+        frame.setSize( new Dimension( 500, 500 ) );
+        frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
+        frame.setVisible( true );
+        textPane.requestFocusInWindow();
+
+    }
+
     void setValues() {
         scoreColTextField.setText( String.valueOf( settings.getScoreCol() ) );
         scoreFileTextField.setText( settings.getScoreFile() );
         rawFileTextField.setText( settings.getRawDataFileName() );
         dataColTextField.setText( String.valueOf( settings.getDataCol() ) );
+    }
+
+    /**
+     * @param textPane
+     */
+    final private void getGeneScoresFromQuickList( final JTextPane textPane ) {
+        try {
+            /*
+             * Get the text, parse into a list of elements
+             */
+            String t = textPane.getDocument().getText( 0, textPane.getDocument().getLength() );
+            String[] fa = StringUtils.split( t, '\n' );
+            Collection<String> fields = Arrays.asList( fa );
+
+            GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots() );
+
+            File tmpfile = File.createTempFile( "QuickList", ".txt", new File( settings.getGeneScoreFileDirectory() ) );
+            gs.write( tmpfile );
+            scoreColTextField.setText( "2" );
+            scoreFileTextField.setText( tmpfile.getAbsolutePath() );
+
+            // do we do this now?
+            settings.setScoreFile( tmpfile.getAbsolutePath() );
+            settings.setScoreCol( 2 );
+
+            // definitely have to do this now.
+            settings.setGeneScoreThreshold( 0.0 );
+
+            setValues();
+        } catch ( BadLocationException e1 ) {
+            log.info( e1 );
+        } catch ( IOException ioe ) {
+            log.info( ioe );
+        }
+    }
+
+    public void updateView() {
+        assert wiz != null;
+        quickPickPanel.setVisible( wiz.getAnalysisType().equals( SettingsHolder.Method.ORA ) );
     }
 
 }
@@ -431,5 +555,19 @@ class ScoreFileBrowse implements java.awt.event.ActionListener {
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.scoreBrowseButton_actionPerformed();
+    }
+}
+
+class QuickPickEnter implements java.awt.event.ActionListener {
+
+    AnalysisWizardStep2 adaptee;
+
+    QuickPickEnter( AnalysisWizardStep2 adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.quickpickButton_actionPerformed();
     }
 }

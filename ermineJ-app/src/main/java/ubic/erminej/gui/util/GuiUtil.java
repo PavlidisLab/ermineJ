@@ -101,8 +101,8 @@ public class GuiUtil {
         Dimension childSize = child.getPreferredSize();
         Dimension parentSize = parent.getSize();
         Point loc = parent.getLocation();
-        Point childLoc = new Point( ( parentSize.width - childSize.width ) / 2 + loc.x,
-                ( parentSize.height - childSize.height ) / 2 + loc.y );
+        Point childLoc = new Point( Math.max( 0, ( parentSize.width - childSize.width ) / 2 + loc.x ), Math.max( 0,
+                ( parentSize.height - childSize.height ) / 2 + loc.y ) );
         return childLoc;
     }
 

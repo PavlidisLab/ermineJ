@@ -147,7 +147,12 @@ public class AnalysisWizardStep3 extends WizardStep {
         cellularComponentButton.addActionListener( countNumGroupsListener );
         userDefinedButton.addActionListener( countNumGroupsListener );
 
-        int numUserDefined = ( ( AnalysisWizard ) getOwner() ).getGeneAnnots().getUserDefinedGeneSets().size();
+        int numUserDefined = 0;
+
+        if ( getOwner() != null && ( ( AnalysisWizard ) getOwner() ).getGeneAnnots() != null ) {
+            // for test situation.
+            numUserDefined = ( ( AnalysisWizard ) getOwner() ).getGeneAnnots().getUserDefinedGeneSets().size();
+        }
 
         buttonPanel.add( userDefinedButton, null );
         buttonPanel.setBorder( BorderFactory.createEmptyBorder( 20, 40, 20, 40 ) );

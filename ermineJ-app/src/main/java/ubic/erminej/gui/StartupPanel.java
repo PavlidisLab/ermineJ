@@ -104,7 +104,7 @@ public class StartupPanel extends JPanel {
 
     private JTextField annotFileTextField = new JTextField();
 
-    private JComboBox annotFormat = new JComboBox();
+    private JComboBox<String> annotFormat = new JComboBox<String>();
 
     private JTextField projectFileTextField = new JTextField();
 

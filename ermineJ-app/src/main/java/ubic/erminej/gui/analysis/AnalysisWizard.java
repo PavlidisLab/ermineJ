@@ -215,6 +215,7 @@ public class AnalysisWizard extends Wizard {
             this.getContentPane().remove( step1 );
             this.setTitle( "Create New Analysis - Step 2 of " + maxSteps );
             this.getContentPane().add( step2 );
+            step2.updateView();
             step2.revalidate();
             backButton.setEnabled( true );
             setFinishEnabled();
