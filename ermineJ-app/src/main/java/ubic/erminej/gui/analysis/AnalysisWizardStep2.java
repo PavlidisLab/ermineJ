@@ -470,7 +470,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                 return;
             }
 
-            String[] fa = StringUtils.split( t, '\n' );
+            String[] fa = StringUtils.split( t, "\n\t ,|" );
 
             if ( fa.length == 0 ) {
                 scoreFileTextField.setText( null );
