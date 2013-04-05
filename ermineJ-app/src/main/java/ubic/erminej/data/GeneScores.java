@@ -51,7 +51,6 @@ import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 
 import cern.colt.list.DoubleArrayList;
-import cern.jet.math.Arithmetic;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
@@ -65,44 +64,51 @@ import ubic.erminej.SettingsHolder;
  */
 public class GeneScores {
 
+    private static final Log log = LogFactory.getLog( GeneScores.class );
+
     private static final String PROBE_IGNORE_REGEX = "AFFX.*";
 
     private static final double SMALL = 10e-16;
-
-    private static final Log log = LogFactory.getLog( GeneScores.class );
-
-    private Map<Gene, Double> geneToScoreMap;
-
-    private Map<Probe, Double> probeToScoreMap;
-
-    final private GeneAnnotations originalGeneAnnots;
-
-    private StatusViewer messenger = new StatusStderr();
 
     /**
      * Refers to the _original_ scores.
      */
     private boolean biggerIsBetter = false;
 
-    /**
-     * @return
-     */
-    public GeneAnnotations getPrunedGeneAnnotations() {
-        // lightweight except for first time.
-        GeneAnnotations subClone = originalGeneAnnots.subClone( this.probeToScoreMap.keySet() );
-        assert this.probeToScoreMap.keySet().containsAll( subClone.getProbes() );
-        assert subClone.getProbes().containsAll( this.probeToScoreMap.keySet() );
-        return subClone;
-    }
+    private Map<Gene, Double> geneToScoreMap;
+
+    private Settings.MultiProbeHandling gpMethod = SettingsHolder.MultiProbeHandling.BEST;
 
     /**
      * Refers to what was done to the original scores. The scores stored here are negative-logged if this is true.
      */
     private boolean logTransform = true;
 
-    private Settings.MultiProbeHandling gpMethod = SettingsHolder.MultiProbeHandling.BEST;
+    private StatusViewer messenger = new StatusStderr();
+
+    final private GeneAnnotations originalGeneAnnots;
+
+    private Map<Probe, Double> probeToScoreMap;
 
     private String scoreColumnName = "";
+
+    /**
+     * Constructor for the case when we are just taking in a hit list. The scores for all non-hit genes are set such
+     * that the appropriate threshold will be zero. Note that no background set can be defined!
+     * 
+     * @param identifiers
+     * @param settings
+     * @param m
+     * @param geneAnnotations
+     */
+    public GeneScores( Collection<String> identifiers, SettingsHolder settings, StatusViewer m,
+            GeneAnnotations geneAnnotations ) {
+        this.originalGeneAnnots = geneAnnotations;
+        if ( m != null ) this.messenger = m;
+        this.init( settings );
+        makeScores( identifiers, settings );
+
+    }
 
     /**
      * Create a copy of source that contains only the probes given.
@@ -126,105 +132,6 @@ public class GeneScores {
                 throw new IllegalArgumentException( "Probe given that wasn't in the source: " + p );
             }
             this.probeToScoreMap.put( p, s );
-        }
-
-        setUpGeneToScoreMap();
-    }
-
-    /**
-     * Constructor for the case when we are just taking in a hit list. The scores for all non-hit genes are set such
-     * that the appropriate threshold will be zero. Note that no background set can be defined!
-     * 
-     * @param identifiers
-     * @param settings
-     * @param m
-     * @param geneAnnotations
-     */
-    public GeneScores( Collection<String> identifiers, SettingsHolder settings, StatusViewer m,
-            GeneAnnotations geneAnnotations ) {
-        this.originalGeneAnnots = geneAnnotations;
-        if ( m != null ) this.messenger = m;
-        this.init( settings );
-        makeScores( identifiers, settings );
-
-    }
-
-    /**
-     * @param identifiers
-     * @param settings
-     */
-    private void makeScores( Collection<String> identifiers, SettingsHolder settings ) {
-
-        boolean warned = false;
-
-        Double hitScore = 1.0;
-
-        boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
-                || ( !settings.getDoLog() && settings.getBigIsBetter() );
-
-        if ( invert ) {
-            hitScore = -hitScore;
-        }
-
-        int i = 0;
-        for ( String idr : identifiers ) {
-
-            String id = StringUtils.strip( idr );
-
-            Probe p = originalGeneAnnots.findProbeCaseInsensitive( id );
-
-            Gene g;
-            if ( p == null ) {
-
-                /*
-                 * Try parsing as a gene.
-                 */
-                g = originalGeneAnnots.findGeneCaseInsensitive( id );
-
-                if ( g == null ) {
-                    continue;
-                }
-            } else {
-                g = p.getGene();
-            }
-
-            if ( g.getGeneSets().isEmpty() ) {
-                continue;
-            }
-
-            if ( probeToScoreMap.containsKey( p ) ) {
-                if ( !warned ) {
-                    messenger.showStatus( "Repeated identifier: " + id + ", keeping original value." );
-                    warned = true;
-                }
-            } else {
-                probeToScoreMap.put( p, hitScore );
-            }
-            if ( ++i % 100 == 0 ) {
-                messenger.showStatus( "Parsed " + i + " ..." );
-            }
-
-        }
-
-        Double missScore = -hitScore;
-
-        if ( probeToScoreMap.isEmpty() ) {
-            throw new IllegalArgumentException( "None of the identifiers were recognized" );
-        }
-
-        if ( probeToScoreMap.size() == 1 ) {
-            throw new IllegalArgumentException( "Hit list must have at least two recognized items" );
-        }
-
-        messenger.showStatus( probeToScoreMap + " genes/elements were recognized." );
-
-        /*
-         * Now add dummy scores for the non-entered
-         */
-        for ( Probe p : originalGeneAnnots.getProbes() ) {
-            if ( !probeToScoreMap.containsKey( p ) ) {
-                probeToScoreMap.put( p, missScore );
-            }
         }
 
         setUpGeneToScoreMap();
@@ -310,7 +217,7 @@ public class GeneScores {
             }
 
             if ( settings.getDoLog() ) {
-                pValue = -Arithmetic.log10( pValue );
+                pValue = -Math.log10( pValue );
             }
 
             /* we're done... */
@@ -444,6 +351,17 @@ public class GeneScores {
     }
 
     /**
+     * @return
+     */
+    public GeneAnnotations getPrunedGeneAnnotations() {
+        // lightweight except for first time.
+        GeneAnnotations subClone = originalGeneAnnots.subClone( this.probeToScoreMap.keySet() );
+        assert this.probeToScoreMap.keySet().containsAll( subClone.getProbes() );
+        assert subClone.getProbes().containsAll( this.probeToScoreMap.keySet() );
+        return subClone;
+    }
+
+    /**
      * @return list of genes in order of their scores, where the <em>first</em> gene is the 'best'. If 'big is better',
      *         genes with large scores will be given first. If smaller is better (pvalues) and the data are -log
      *         transformed (usual), then the gene that had the smallest pvalue will be first.
@@ -515,17 +433,23 @@ public class GeneScores {
         return logTransform;
     }
 
+    /**
+     * @param geneScoreThreshold
+     * @return
+     */
     public int numGenesAboveThreshold( double geneScoreThreshold ) {
         int count = 0;
 
         double t = geneScoreThreshold;
         if ( isNegativeLog10Transformed() ) {
-            t = -Arithmetic.log10( geneScoreThreshold );
+            t = -Math.log10( geneScoreThreshold );
         }
+
+        boolean rankLargeScoresBest = rankLargeScoresBest();
 
         for ( Gene g : this.geneToScoreMap.keySet() ) {
 
-            if ( rankLargeScoresBest() ) {
+            if ( rankLargeScoresBest ) {
                 if ( this.geneToScoreMap.get( g ) > t ) {
                     count++;
                 }
@@ -557,11 +481,30 @@ public class GeneScores {
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
+        boolean r = this.logTransform;
+
         for ( Probe probe : probeToScoreMap.keySet() ) {
             double score = probeToScoreMap.get( probe );
-            buf.append( probe.getName() + "\t" + score + "\n" );
+
+            if ( r ) {
+                score = Math.pow( 10, -score );
+            }
+            buf.append( String.format( "%s\t%.3g\n", probe.getName(), score ) );
         }
         return buf.toString();
+    }
+
+    /**
+     * Write the gene scores to a file.
+     * 
+     * @param createTempFile
+     */
+    public void write( File f ) throws IOException {
+        BufferedWriter w = new BufferedWriter( new FileWriter( f ) );
+        w.write( "# Gene score file generated by ErmineJ. If created from a quicklist, the scores will be dummy values.\n" );
+        w.write( "Element\tScore\n" );
+        w.write( this.toString() );
+        w.close();
     }
 
     private void init() {
@@ -576,6 +519,101 @@ public class GeneScores {
         this.logTransform = settings.getDoLog();
         this.gpMethod = settings.getGeneRepTreatment();
 
+    }
+
+    /**
+     * @param identifiers
+     * @param settings
+     */
+    private void makeScores( Collection<String> identifiers, SettingsHolder settings ) {
+
+        boolean warned = false;
+
+        Double hitScore = -1.0;
+        Double missScore = 1.0;
+        if ( settings.getDoLog() ) {
+            hitScore = 0.1; // becomes 1
+            missScore = 10.0; // becomes -1
+            if ( settings.getBigIsBetter() ) {
+                hitScore = 10.0;
+                missScore = 0.1;
+            }
+        } else if ( settings.getBigIsBetter() ) {
+            hitScore = 1.0;
+            missScore = -1.0;
+        }
+
+        if ( settings.getDoLog() ) {
+            hitScore = -Math.log10( hitScore );
+            missScore = -Math.log10( missScore );
+        }
+
+        int i = 0;
+        for ( String idr : identifiers ) {
+
+            String id = StringUtils.strip( idr );
+
+            Probe p = originalGeneAnnots.findProbeCaseInsensitive( id );
+
+            Gene g;
+            if ( p == null ) {
+
+                /*
+                 * Try parsing as a gene.
+                 */
+                g = originalGeneAnnots.findGeneCaseInsensitive( id );
+
+                if ( g == null ) {
+                    continue;
+                }
+
+                p = g.getProbes().iterator().next();
+
+                if ( p == null ) {
+                    continue; // shouldn't happen.
+                }
+            } else {
+                g = p.getGene();
+            }
+
+            if ( g.getGeneSets().isEmpty() ) {
+                continue;
+            }
+
+            if ( probeToScoreMap.containsKey( p ) ) {
+                if ( !warned ) {
+                    messenger.showStatus( "Repeated identifier: " + id + ", keeping original value." );
+                    warned = true;
+                }
+            } else {
+                probeToScoreMap.put( p, hitScore );
+            }
+            if ( ++i % 100 == 0 ) {
+                messenger.showStatus( "Parsed " + i + " ..." );
+            }
+
+        }
+
+        if ( probeToScoreMap.isEmpty() ) {
+            throw new IllegalArgumentException( "None of the identifiers were recognized" );
+        }
+
+        if ( probeToScoreMap.size() == 1 ) {
+            throw new IllegalArgumentException( "Hit list must have at least two recognized items" );
+        }
+
+        messenger.showStatus( probeToScoreMap.size() + " genes/elements were recognized." );
+
+        /*
+         * Now add dummy scores for the non-entered
+         */
+        for ( Probe p : originalGeneAnnots.getProbes() ) {
+            if ( !probeToScoreMap.containsKey( p ) ) {
+                probeToScoreMap.put( p, missScore );
+            }
+        }
+
+        setUpGeneToScoreMap();
     }
 
     /**
@@ -670,7 +708,7 @@ public class GeneScores {
             }
 
             if ( logTransform ) {
-                score = -Arithmetic.log10( score );
+                score = -Math.log10( score );
             }
 
             /* we're done... */
@@ -836,19 +874,6 @@ public class GeneScores {
 
         messenger.showStatus( "Usable scores for " + counter + " distinct genes found in the gene scores." );
 
-    }
-
-    /**
-     * Write the gene scores to a file.
-     * 
-     * @param createTempFile
-     */
-    public void write( File f ) throws IOException {
-        BufferedWriter w = new BufferedWriter( new FileWriter( f ) );
-        w.write( "# Gene score file generated by ErmineJ. If created from a quicklist, the scores will be dummy values.\n" );
-        w.write( "Element\tScore\n" );
-        w.write( this.toString() );
-        w.close();
     }
 
 } // end of class

@@ -64,33 +64,33 @@ import cern.jet.math.Arithmetic;
 public class AnalysisWizardStep5 extends WizardStep {
 
     private static final long serialVersionUID = 2682780215238903138L;
-    private Settings settings;
-    private JPanel step5Panel;
-    private JRadioButton jRadioButtonMedian;
+    boolean enableMultifuncCheckbox = true;
+    private boolean bigIsBetter = false;
+    private JPanel corrPanel;
+    private boolean doFullEmpirical = false;
+
+    private boolean doLog = true;
+    private boolean doMfCorr = true;
+    private String extraHelp;
+    private String help;
     private JRadioButton jRadioButtonMean;
 
-    private JPanel oraPanel;
-    private JPanel resampPanel;
-    private JPanel prPanel;
-    private JPanel rocPanel;
-    private JPanel corrPanel;
-
-    private String help;
-    private String extraHelp;
-    boolean enableMultifuncCheckbox = true;
-
+    private JRadioButton jRadioButtonMedian;
     // start with reasonable defaults.
     private AtomicInteger numIterations = new AtomicInteger( 10000 );
-
-    private boolean doFullEmpirical = false;
+    private JPanel oraPanel;
 
     private AtomicReference<Double> oraThreshold = new AtomicReference<Double>( 0.001 );
 
-    private boolean bigIsBetter = false;
+    private JPanel prPanel;
 
-    private boolean doLog = true;
+    private JPanel resampPanel;
 
-    private boolean doMfCorr = true;
+    private JPanel rocPanel;
+
+    private Settings settings;
+
+    private JPanel step5Panel;
 
     public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
@@ -174,6 +174,13 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setUseMultifunctionalityCorrection( doMfCorr );
         settings.setIterations( numIterations.get() );
 
+    }
+
+    /**
+     * Resync with the settings.
+     */
+    public void update() {
+        setValues();
     }
 
     public boolean upperTail() {
@@ -416,17 +423,17 @@ public class AnalysisWizardStep5 extends WizardStep {
 
         jTextFieldIterations.addKeyListener( new KeyAdapter() {
             @Override
-            public void keyTyped( KeyEvent e ) {
-                getNumIterationsFromField( jTextFieldIterations );
-            }
-
-            @Override
             public void keyPressed( KeyEvent e ) {
                 getNumIterationsFromField( jTextFieldIterations );
             }
 
             @Override
             public void keyReleased( KeyEvent e ) {
+                getNumIterationsFromField( jTextFieldIterations );
+            }
+
+            @Override
+            public void keyTyped( KeyEvent e ) {
                 getNumIterationsFromField( jTextFieldIterations );
             }
         } );
@@ -440,7 +447,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         JPanel jPanel15 = new JPanel();
         oraPanel = new JPanel();
         oraPanel.setBorder( new TitledBorder( "ORA" ) );
-        final JTextField geneScoreThresholdTextField = new JTextField();
+        final JTextField geneScoreThresholdTextField = new JTextField(6);
         // stuff to set gene score threshold.
         JLabel jLabel6 = new JLabel();
         jLabel6.setLabelFor( geneScoreThresholdTextField );
@@ -480,17 +487,6 @@ public class AnalysisWizardStep5 extends WizardStep {
             }
 
         } );
-    }
-
-    /**
-     * @param jTextFieldIterations
-     */
-    private void getNumIterationsFromField( final JTextField jTextFieldIterations ) {
-        try {
-            numIterations.set( Integer.valueOf( StringUtils.strip( jTextFieldIterations.getText() ) ).intValue() );
-        } catch ( NumberFormatException e1 ) {
-            log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
-        }
     }
 
     /**
@@ -649,6 +645,17 @@ public class AnalysisWizardStep5 extends WizardStep {
         return jCheckBoxDoMultiFuncCorr;
     }
 
+    /**
+     * @param jTextFieldIterations
+     */
+    private void getNumIterationsFromField( final JTextField jTextFieldIterations ) {
+        try {
+            numIterations.set( Integer.valueOf( StringUtils.strip( jTextFieldIterations.getText() ) ).intValue() );
+        } catch ( NumberFormatException e1 ) {
+            log.debug( "Could not parse integer: " + jTextFieldIterations.getText() );
+        }
+    }
+
     private boolean scorePassesThreshold( double geneScore, double threshold ) {
         return ( upperTail() && geneScore >= threshold ) || ( !upperTail() && geneScore <= threshold );
     }
@@ -665,4 +672,5 @@ public class AnalysisWizardStep5 extends WizardStep {
         }
 
     }
+
 }

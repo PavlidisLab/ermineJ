@@ -20,6 +20,7 @@ package ubic.erminej.gui.analysis;
 
 import java.awt.event.ActionEvent;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,8 +86,7 @@ public class AnalysisWizard extends Wizard {
         this.setTitle( "Create New Analysis - Step 1 of " + maxSteps );
 
         // determine if the "finish" button should be disabled or not
-        if ( ( settings.getRawDataFileName() == null || ( settings.getRawDataFileName() == null || settings
-                .getRawDataFileName().length() == 0 ) && settings.getScoreFile().length() == 0 ) ) {
+        if ( StringUtils.isBlank( settings.getRawDataFileName() ) && StringUtils.isBlank( settings.getScoreFile() ) ) {
             setFinishDisabled();
         } else {
             setFinishEnabled();
@@ -254,6 +254,7 @@ public class AnalysisWizard extends Wizard {
             checkIfReady();
             this.setTitle( "Create New Analysis - Step 5 of " + maxSteps );
             this.getContentPane().add( step5 );
+            step5.update();
             step5.revalidate();
             nextButton.setEnabled( false );
             this.repaint();

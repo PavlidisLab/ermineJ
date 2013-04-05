@@ -490,16 +490,13 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
             GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots() );
 
-            int i = 0;
-            boolean invert = ( settings.getDoLog() && !settings.getBigIsBetter() )
-                    || ( !settings.getDoLog() && settings.getBigIsBetter() );
-            for ( Double d : gs.getGeneScores() ) {
-                if ( invert ) {
-                    if ( d < 0 ) i++;
-                } else {
-                    if ( d > 0 ) i++;
-                }
+            // definitely have to do this now.
+            settings.setGeneScoreThreshold( 0.0 );
+            if ( settings.getDoLog() ) {
+                settings.setGeneScoreThreshold( 1.0 ); // becomes 0.
             }
+
+            int i = gs.numGenesAboveThreshold( settings.getGeneScoreThreshold() );
 
             if ( i == 0 ) {
                 scoreFileTextField.setText( null );
@@ -525,9 +522,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             // do we do this now? Might be okay to wait?
             settings.setScoreFile( tmpfile.getAbsolutePath() );
             settings.setScoreCol( 2 );
-
-            // definitely have to do this now.
-            settings.setGeneScoreThreshold( 0.0 );
 
             setValues();
         } catch ( BadLocationException e1 ) {

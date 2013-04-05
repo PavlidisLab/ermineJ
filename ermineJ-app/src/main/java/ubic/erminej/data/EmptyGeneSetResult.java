@@ -28,7 +28,10 @@ public class EmptyGeneSetResult extends GeneSetResult {
 
     @Override
     public int compareTo( GeneSetResult other ) {
-        return 1;
+        if ( !( other instanceof EmptyGeneSetResult ) ) {
+            return 1;
+        }
+        return this.geneSetTerm.compareTo( other.geneSetTerm );
     }
 
     @Override

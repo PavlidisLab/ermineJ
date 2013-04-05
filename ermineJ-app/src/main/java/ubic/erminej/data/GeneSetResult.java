@@ -109,13 +109,20 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
     @Override
     public int compareTo( GeneSetResult other ) {
 
-        if ( this instanceof EmptyGeneSetResult && other instanceof EmptyGeneSetResult ) return 0;
+        if ( this instanceof EmptyGeneSetResult && other instanceof EmptyGeneSetResult ) {
+            // I don't think this will happen.
+            return this.geneSetTerm.compareTo( other.geneSetTerm );
+        }
 
-        if ( other == null ) return -1;
-
-        if ( other instanceof EmptyGeneSetResult ) return -1;
-
-        if ( this.equals( other ) ) return 0;
+        if ( other == null ) {
+            return -1;
+        }
+        if ( other instanceof EmptyGeneSetResult ) {
+            return -1;
+        }
+        if ( this.equals( other ) ) {
+            return 0;
+        }
 
         if ( this.pvalue > other.pvalue ) {
             return 1;
