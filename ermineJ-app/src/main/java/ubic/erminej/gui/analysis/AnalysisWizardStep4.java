@@ -107,7 +107,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         JPanel step4RightPanel = new JPanel();
         JPanel jPanelReplicateTreaments = new JPanel();
         JLabel jLabelReplicateTreament = new JLabel();
-        JList jList1 = new JList();
+
         ButtonGroup replicateButtonGroup = new ButtonGroup();
         jRadioButtonBestReplicates = new JRadioButton();
         jRadioButtonMeanReplicates = new JRadioButton();
@@ -177,6 +177,7 @@ public class AnalysisWizardStep4 extends WizardStep {
 
         jPanelReplicateTreaments.add( jRadioButtonBestReplicates, null );
         jPanelReplicateTreaments.add( jRadioButtonMeanReplicates, null );
+        JList jList1 = new JList();
         jPanelReplicateTreaments.add( jList1, null );
 
         step4RightPanel.add( jPanelReplicateTreaments, null );

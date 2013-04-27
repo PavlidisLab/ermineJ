@@ -390,11 +390,10 @@ public class MainFrame extends JFrame {
          * 2. Pick the file.
          */
         JFileChooser chooser = new JFileChooser();
-        chooser = new JFileChooser();
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         chooser.setApproveButtonText( "OK" );
         chooser.setDialogTitle( "Save Analysis As:" );
-        // suggest a file name.
+        // suggest a file name. FIXME this doesn't work right on MacOS?
         chooser.setSelectedFile( new File( StringUtils.strip(
                 getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
                 + ".erminej.txt" ) );
@@ -1391,23 +1390,23 @@ public class MainFrame extends JFrame {
         analysisMenu.setText( "Analysis" );
         analysisMenu.setMnemonic( 'A' );
         analysisMenu.setEnabled( false );
-        
+
         runAnalysisMenuItem.setText( "Run Analysis" );
         runAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_runAnalysisMenuItem_actionAdapter( this ) );
         runAnalysisMenuItem.setMnemonic( 'R' );
         runAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK ) );
-        
+
         cancelAnalysisMenuItem.setText( "Cancel Analysis" );
         cancelAnalysisMenuItem.setEnabled( false );
         cancelAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_cancelAnalysisMenuItem_actionAdapter( this ) );
         cancelAnalysisMenuItem.setMnemonic( 'C' );
         cancelAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK ) );
-        
+
         loadAnalysisMenuItem.setText( "Load Analysis" );
         loadAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_loadAnalysisMenuItem_actionAdapter( this ) );
         loadAnalysisMenuItem.setMnemonic( 'L' );
         loadAnalysisMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK ) );
-        
+
         saveAnalysisMenuItem.setText( "Save Analysis" );
         saveAnalysisMenuItem.addActionListener( new GeneSetScoreFrame_saveAnalysisMenuItem_actionAdapter( this ) );
         saveAnalysisMenuItem.setMnemonic( 'S' );

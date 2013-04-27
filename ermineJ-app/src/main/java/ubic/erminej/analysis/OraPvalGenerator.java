@@ -66,7 +66,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * Maximum number of gene sets which will be monitored for sensitivity to removing multifunctional genes.
      */
-    private final int NUMBER_OF_RANKS_TO_INSPECT_FOR_MF_SENSITIVITY = 10;
+    private final int NUMBER_OF_RANKS_TO_INSPECT_FOR_MF_SENSITIVITY = 20;
 
     /**
      * @param settings
@@ -321,6 +321,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             referenceResults.get( t ).setRelativeRank( relativeRank );
             numSelected++;
         }
+
+        this.messenger.showStatus( monitoredRanks.size()
+                + " top groups will be monitored for multifunctionality sensitivity" );
         return monitoredRanks;
     }
 
@@ -424,7 +427,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             int index = 0;
             for ( GeneSetTerm t : sortedRevisedClasses ) {
                 if ( monitoredRanks.containsKey( t ) ) {
-                    double rank = ( index + 1 ) / sortedRevisedClasses.size();
+                    double rank = ( index + 1.0 ) / sortedRevisedClasses.size();
                     newRanks.put( t, rank );
                 }
                 index++;
@@ -433,6 +436,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             /*
              * see how much the groups change.
              */
+            assert newRanks.size() <= monitoredRanks.size();
             double s = score( previousRanks, newRanks );
             if ( s > smax ) {
                 smax = s;
@@ -448,9 +452,13 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
              */
             hitListMultifunctionalityBiasPvalue = this.geneAnnots.getMultifunctionality()
                     .enrichmentForMultifunctionalityPvalue( filteredGenes );
-            this.messenger.showStatus( String.format( "After removing " + numMultifunctionalRemoved
-                    + " genes, enrichment of hit list (%d genes left) for multifunctionality is P=%.3g",
-                    filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
+            this.messenger
+                    .showStatus( String
+                            .format(
+                                    "After removing "
+                                            + numMultifunctionalRemoved
+                                            + " genes, enrichment of hit list (%d genes left) for multifunctionality is P=%.3g, current removal score=%.3g, max score=%.3g",
+                                    filteredGenes.size(), hitListMultifunctionalityBiasPvalue, s, smax ) );
             if ( hitListMultifunctionalityBiasPvalue >= MF_BIAS_TO_TRIGGER_CORRECTION ) {
                 break;
             }
@@ -458,7 +466,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         // Done figuring out the threshold.
 
         if ( numMfToRemove > 0 ) {
-            this.messenger.showStatus( "Computing multifunctionality effect" );
+            this.messenger.showStatus( "Computing multifunctionality effect, with " + numMfToRemove + " genes removed" );
             /*
              * Now we do the final correction.
              */
@@ -492,15 +500,43 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     private int removeOneOrMoreMostMfGenes( int numMultifunctionalRemoved, double hitListMultifunctionalityBiasPvalue,
             Collection<Gene> filteredGenes ) {
         int numToRemove = 1;
-        if ( filteredGenes.size() > 100 ) {
+        /*
+         * Remove genes at more than one at a time, to speed convergence
+         */
+        if ( filteredGenes.size() > 500 ) {
             /*
              * FIXME these parameters are not highly tuned, and should be factored out or made configurable.
              */
+            if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
+                numToRemove = 20;
+            } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
+                numToRemove = 10;
+            } else if ( hitListMultifunctionalityBiasPvalue < 1e-6 ) {
+                numToRemove = 6;
+            } else if ( hitListMultifunctionalityBiasPvalue < 1e-3 ) {
+                numToRemove = 3;
+            }
+        } else if ( filteredGenes.size() > 100 ) {
+
+            if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
+                numToRemove = 10;
+            } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
+                numToRemove = 6;
+            } else if ( hitListMultifunctionalityBiasPvalue < 1e-6 ) {
+                numToRemove = 3;
+            }
+        } else if ( filteredGenes.size() > 50 ) {
             if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
                 numToRemove = 5;
             } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
                 numToRemove = 3;
             } else if ( hitListMultifunctionalityBiasPvalue < 1e-6 ) {
+                numToRemove = 2;
+            }
+        } else if ( filteredGenes.size() > 20 ) {
+            if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
+                numToRemove = 3;
+            } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
                 numToRemove = 2;
             }
         }
@@ -540,6 +576,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             newR.add( double1 );
         }
 
+        assert Descriptive.sampleVariance( newR, Descriptive.mean( newR ) ) > 0.0;
         return Descriptive.mean( newR ) - Descriptive.mean( oldR );
     }
 

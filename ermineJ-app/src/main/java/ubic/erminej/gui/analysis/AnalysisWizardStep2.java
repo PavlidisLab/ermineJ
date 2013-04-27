@@ -396,22 +396,29 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         textPane.setPreferredSize( new Dimension( 500, 500 ) );
         textPane.setCaretPosition( 0 );
 
+        JPanel nameP = new JPanel();
+        nameP.setLayout( new GridLayout( 1, 2 ) );
+        final JTextField groupNameField = new JTextField();
+        groupNameField.setPreferredSize( new Dimension( 300, 20 ) );
+        nameP.add( new JLabel( "Group name (optional, used in file name)" ) );
+        nameP.add( groupNameField );
+
         Style def = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
         StyleConstants.setFontFamily( def, "SansSerif" );
 
         frame.setLayout( new BorderLayout() );
         frame.getContentPane().add( new JScrollPane( textPane ), BorderLayout.CENTER );
+        frame.getContentPane().add( nameP, BorderLayout.NORTH );
         frame.setTitle( "Type or paste in a list of identifiers" );
         frame.setLocation( GuiUtil.chooseChildLocation( frame, this ) );
-        // GuiUtil.centerContainer( frame );
 
         JButton ok = new JButton( "OK" );
         JButton cancel = new JButton( "Cancel" );
         ok.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                getGeneScoresFromQuickList( textPane, groupNameField.getText() );
                 frame.dispose();
-                getGeneScoresFromQuickList( textPane );
             }
         } );
 
@@ -455,8 +462,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
      * TODO refactor out.
      * 
      * @param textPane
+     * @param name optional
      */
-    final private void getGeneScoresFromQuickList( final JTextPane textPane ) {
+    final private void getGeneScoresFromQuickList( final JTextPane textPane, String name ) {
         try {
             /*
              * Get the text, parse into a list of elements
@@ -512,24 +520,39 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                 wiz.showStatus( i + " genes were recognized out of " + fa.length + " ids." );
             }
 
-            File tmpfile = File.createTempFile( "QuickList.", ".txt", new File( settings.getGeneScoreFileDirectory() ) );
-            gs.write( tmpfile );
+            File file;
+            String cleanName = "";
+
+            if ( StringUtils.isNotBlank( name ) ) {
+                cleanName = name;
+                cleanName = cleanName.replaceAll( "[\\s\\\\\\/]*", "" );
+                cleanName = cleanName.replaceAll( "^\\.", "" );
+                cleanName = cleanName.replaceAll( "\\.$", "" );
+            }
+            if ( StringUtils.isNotBlank( cleanName ) ) {
+                file = new File( new File( settings.getGeneScoreFileDirectory() ), "QuickList." + cleanName + ".txt" );
+
+            } else {
+                file = File.createTempFile( "QuickList.", ".txt", new File( settings.getGeneScoreFileDirectory() ) );
+            }
+            gs.write( file );
 
             // display
             scoreColTextField.setText( "2" );
-            scoreFileTextField.setText( tmpfile.getAbsolutePath() );
+            scoreFileTextField.setText( file.getAbsolutePath() );
 
             // do we do this now? Might be okay to wait?
-            settings.setScoreFile( tmpfile.getAbsolutePath() );
+            settings.setScoreFile( file.getAbsolutePath() );
             settings.setScoreCol( 2 );
 
             setValues();
         } catch ( BadLocationException e1 ) {
-            log.info( e1 );
+            log.error( e1, e1 );
         } catch ( IOException ioe ) {
-            log.info( ioe );
+            log.error( ioe, ioe );
             wiz.getStatusField().showError( ioe.getMessage() );
         } catch ( Exception e ) {
+            log.error( e, e );
             wiz.getStatusField().showError( e.getMessage() );
         }
     }

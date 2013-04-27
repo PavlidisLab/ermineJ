@@ -103,6 +103,11 @@ public class GeneScores {
      */
     public GeneScores( Collection<String> identifiers, SettingsHolder settings, StatusViewer m,
             GeneAnnotations geneAnnotations ) {
+
+        if ( geneAnnotations == null ) {
+            throw new IllegalStateException( "Annotations were null" ); // test situations?
+        }
+
         this.originalGeneAnnots = geneAnnotations;
         if ( m != null ) this.messenger = m;
         this.init( settings );
