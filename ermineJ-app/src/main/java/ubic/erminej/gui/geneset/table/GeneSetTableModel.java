@@ -407,9 +407,19 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                 mfString = " [MF corrected: " + ( res.getRank() + res.getMultifunctionalityCorrectedRankDelta() ) + "]";
             }
 
-            setToolTipText( "<html>Rank: " + res.getRank() + mfString + "<br>Score: " + nff.format( res.getScore() )
-                    + "<br>Corrected p: " + nf.format( res.getCorrectedPvalue() ) + "<br>Genes used: "
-                    + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
+            setToolTipText( "<html>Rank: "
+                    + res.getRank()
+                    + mfString
+                    + "<br>Score: "
+                    + nff.format( res.getScore() )
+                    + "<br>Corrected p: "
+                    + nf.format( res.getCorrectedPvalue() )
+                    +
+
+                    ( ( res.getMultifunctionalityCorrectedRankDelta() != null ) ? "<br>p after MFcorr: "
+                            + nf.format( res.getMfCorrectedPvalue() ) : "" )
+
+                    + "<br>Genes used: " + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
         } else {
 
             /*

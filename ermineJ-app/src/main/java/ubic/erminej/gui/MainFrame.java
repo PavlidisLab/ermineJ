@@ -393,7 +393,7 @@ public class MainFrame extends JFrame {
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
         chooser.setApproveButtonText( "OK" );
         chooser.setDialogTitle( "Save Analysis As:" );
-        // suggest a file name. FIXME this doesn't work right on MacOS?
+        // suggest a file name. FIXME this doesn't display right on MacOS?
         chooser.setSelectedFile( new File( StringUtils.strip(
                 getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
                 + ".erminej.txt" ) );

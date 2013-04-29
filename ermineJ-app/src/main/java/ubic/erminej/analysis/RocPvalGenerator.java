@@ -89,20 +89,20 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
             Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
                     false /* not ranks */, false /* unweighted regression */);
             RocPvalGenerator rpg = new RocPvalGenerator( settings, geneAnnots, adjustScores, messenger );
-            Map<GeneSetTerm, GeneSetResult> correctedResults = rpg.generateGeneSetResults( false );
+            Map<GeneSetTerm, GeneSetResult> mfCorrectedResults = rpg.generateGeneSetResults( false );
 
-            List<GeneSetTerm> sortedClasses = GeneSetPvalRun.getSortedClasses( correctedResults );
-            multipleTestCorrect( sortedClasses, correctedResults );
-            GeneSetPvalRun.populateRanks( correctedResults );
+            List<GeneSetTerm> sortedClasses = GeneSetPvalRun.getSortedClasses( mfCorrectedResults );
+            multipleTestCorrect( sortedClasses, mfCorrectedResults );
+            GeneSetPvalRun.populateRanks( mfCorrectedResults );
 
             for ( GeneSetTerm t : results.keySet() ) {
                 GeneSetResult geneSetResult = results.get( t );
-                if ( correctedResults.get( t ) != null ) {
-                    geneSetResult.setMultifunctionalityCorrectedRankDelta( correctedResults.get( t ).getRank()
+                if ( mfCorrectedResults.get( t ) != null ) {
+                    geneSetResult.setMultifunctionalityCorrectedRankDelta( mfCorrectedResults.get( t ).getRank()
                             - geneSetResult.getRank() );
 
-                    geneSetResult.setMfCorrectedPvalue( correctedResults.get( t ).getPvalue() );
-                    geneSetResult.setMfCorrectedFdr( correctedResults.get( t ).getCorrectedPvalue() );
+                    geneSetResult.setMfCorrectedPvalue( mfCorrectedResults.get( t ).getPvalue() );
+                    geneSetResult.setMfCorrectedFdr( mfCorrectedResults.get( t ).getCorrectedPvalue() );
 
                 }
             }

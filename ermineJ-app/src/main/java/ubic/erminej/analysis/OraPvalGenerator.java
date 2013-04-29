@@ -25,6 +25,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.TransformerUtils;
+import org.apache.commons.collections.set.TransformedSet;
+import org.apache.commons.lang.StringUtils;
+
 import ubic.basecode.math.SpecFunc;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
@@ -123,8 +127,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         this.numGenesUsed = geneToScoreMap.size();
 
-        int numMultifunctionalRemoved = 0;
-
         double hitListMultifunctionalityBiasPvalue = this.geneAnnots.getMultifunctionality()
                 .enrichmentForMultifunctionalityPvalue( genesAboveThreshold );
 
@@ -152,7 +154,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             return referenceResults;
         }
 
-        multifunctionalityCorrect( referenceResults, monitoredRanks, numMultifunctionalRemoved );
+        multifunctionalityCorrect( referenceResults, monitoredRanks );
 
         return referenceResults;
     }
@@ -362,12 +364,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * 
      * @param referenceResults
      * @param monitoredRanks
-     * @param numMultifunctionalRemoved
      * @author PP, JG (algorithm)
      * @since 3.0
      */
     private void multifunctionalityCorrect( Map<GeneSetTerm, GeneSetResult> referenceResults,
-            Map<GeneSetTerm, Double> monitoredRanks, int numMultifunctionalRemoved ) {
+            Map<GeneSetTerm, Double> monitoredRanks ) {
         Map<GeneSetTerm, Double> previousRanks = new HashMap<GeneSetTerm, Double>();
 
         Collection<Gene> filteredGenes = new HashSet<Gene>();
@@ -381,11 +382,12 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         List<GeneSetTerm> correctedRanking = new ArrayList<GeneSetTerm>();
 
+        int numMultifunctionalRemoved = 0;
+
         if ( hitListMultifunctionalityBiasPvalue > MF_BIAS_TO_TRIGGER_CORRECTION ) {
             // this is a redundant check
             this.messenger
                     .showStatus( "'Hits' are not significantly multifunctionality-biased, no multifunctionality correction needed" );
-            numMultifunctionalRemoved = 0;
             return;
         }
 
@@ -393,15 +395,16 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 "Before correction enrichment of hit list (%d genes) for multifunctionality is P=%.3g",
                 filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
 
-        Map<GeneSetTerm, GeneSetResult> correctedResults = null;
+        Collection<Gene> removedGenesAtOptimum = new HashSet<Gene>();
+        Map<GeneSetTerm, GeneSetResult> mfCorrectedResults = null;
+
         while ( true ) {
 
             /*
-             * Remove a multifunctional gene and recompute
+             * Remove most multifunctional gene(s) and recompute
              */
 
-            numMultifunctionalRemoved = removeOneOrMoreMostMfGenes( numMultifunctionalRemoved,
-                    hitListMultifunctionalityBiasPvalue, filteredGenes );
+            numMultifunctionalRemoved += removeOneOrMoreMostMfGenes( hitListMultifunctionalityBiasPvalue, filteredGenes );
 
             double fracToBail = 0.5; // make configurable.
             if ( filteredGenes.size() < fracToBail * genesAboveThreshold.size() ) {
@@ -414,13 +417,13 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             }
 
             // compute new results.
-            correctedResults = computeResultsForHitList( filteredGenes, true );
-            if ( correctedResults.isEmpty() ) {
+            mfCorrectedResults = computeResultsForHitList( filteredGenes, true );
+            if ( mfCorrectedResults.isEmpty() ) {
                 // this would be odd.
                 break;
             }
-            List<GeneSetTerm> sortedRevisedClasses = GeneSetPvalRun.getSortedClasses( correctedResults );
-            multipleTestCorrect( sortedRevisedClasses, correctedResults );
+            List<GeneSetTerm> sortedRevisedClasses = GeneSetPvalRun.getSortedClasses( mfCorrectedResults );
+            multipleTestCorrect( sortedRevisedClasses, mfCorrectedResults );
 
             // get the new ranks for the monitored set of gene sets.
             Map<GeneSetTerm, Double> newRanks = new HashMap<GeneSetTerm, Double>();
@@ -441,8 +444,12 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             if ( s > smax ) {
                 smax = s;
                 numMfToRemove = numMultifunctionalRemoved;
-                // We could keep these results.
                 correctedRanking = sortedRevisedClasses;
+                removedGenesAtOptimum = new HashSet<Gene>();
+                removedGenesAtOptimum.addAll( genesAboveThreshold );
+                removedGenesAtOptimum.removeAll( filteredGenes );
+                assert removedGenesAtOptimum.size() == numMfToRemove : removedGenesAtOptimum.size() + " != "
+                        + numMfToRemove;
             }
             previousRanks.clear();
             previousRanks.putAll( newRanks );
@@ -466,10 +473,25 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         // Done figuring out the threshold.
 
         if ( numMfToRemove > 0 ) {
+
+            Collection<Gene> tc = TransformedSet.decorate( new HashSet<Gene>(),
+                    TransformerUtils.invokerTransformer( "getSymbol" ) );
+            tc.addAll( removedGenesAtOptimum );
+            this.messenger.showStatus( "Genes removed: " + StringUtils.join( tc, " " ) );
+
             this.messenger.showStatus( "Computing multifunctionality effect, with " + numMfToRemove + " genes removed" );
+
             /*
-             * Now we do the final correction.
+             * Do one last computation, where we go back to the maximum effect point, to get the final corrected
+             * results.
              */
+            Collection<Gene> finalCorrectedHitList = new HashSet<Gene>();
+            finalCorrectedHitList.addAll( genesAboveThreshold );
+            finalCorrectedHitList.removeAll( removedGenesAtOptimum );
+            mfCorrectedResults = computeResultsForHitList( finalCorrectedHitList, true );
+            List<GeneSetTerm> sortedRevisedClasses = GeneSetPvalRun.getSortedClasses( mfCorrectedResults );
+            multipleTestCorrect( sortedRevisedClasses, mfCorrectedResults );
+
             assert correctedRanking != null && !correctedRanking.isEmpty();
 
             for ( int i = 0; i < correctedRanking.size(); i++ ) {
@@ -479,9 +501,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 int originalRank = referenceResult.getRank();
                 referenceResult.setMultifunctionalityCorrectedRankDelta( correctedRank - originalRank );
 
-                if ( correctedResults != null && correctedResults.containsKey( geneSetTerm ) ) {
-                    referenceResult.setMfCorrectedPvalue( correctedResults.get( geneSetTerm ).getPvalue() );
-                    referenceResult.setMfCorrectedFdr( correctedResults.get( geneSetTerm ).getCorrectedPvalue() );
+                if ( mfCorrectedResults != null && mfCorrectedResults.containsKey( geneSetTerm ) ) {
+                    referenceResult.setMfCorrectedPvalue( mfCorrectedResults.get( geneSetTerm ).getPvalue() );
+                    referenceResult.setMfCorrectedFdr( mfCorrectedResults.get( geneSetTerm ).getCorrectedPvalue() );
                 }
             }
 
@@ -497,59 +519,27 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param filteredGenes
      * @return
      */
-    private int removeOneOrMoreMostMfGenes( int numMultifunctionalRemoved, double hitListMultifunctionalityBiasPvalue,
-            Collection<Gene> filteredGenes ) {
+    private int removeOneOrMoreMostMfGenes( double hitListMultifunctionalityBiasPvalue, Collection<Gene> filteredGenes ) {
         int numToRemove = 1;
-        /*
-         * Remove genes at more than one at a time, to speed convergence
-         */
-        if ( filteredGenes.size() > 500 ) {
-            /*
-             * FIXME these parameters are not highly tuned, and should be factored out or made configurable.
-             */
-            if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
-                numToRemove = 20;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
-                numToRemove = 10;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-6 ) {
-                numToRemove = 6;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-3 ) {
-                numToRemove = 3;
-            }
-        } else if ( filteredGenes.size() > 100 ) {
 
-            if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
-                numToRemove = 10;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
-                numToRemove = 6;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-6 ) {
-                numToRemove = 3;
-            }
-        } else if ( filteredGenes.size() > 50 ) {
-            if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
-                numToRemove = 5;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
-                numToRemove = 3;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-6 ) {
-                numToRemove = 2;
-            }
-        } else if ( filteredGenes.size() > 20 ) {
-            if ( hitListMultifunctionalityBiasPvalue < 1e-16 ) {
-                numToRemove = 3;
-            } else if ( hitListMultifunctionalityBiasPvalue < 1e-10 ) {
-                numToRemove = 2;
-            }
+        int hitListSize = genesAboveThreshold.size();
+        if ( hitListSize > 50 ) {
+            // remove more if the list is big.
+            numToRemove = ( int ) Math.ceil( 0.02 * hitListSize );
         }
 
-        numMultifunctionalRemoved += numToRemove;
+        int numRemoved = numToRemove;
 
-        while ( numToRemove-- > 0 ) {
+        while ( numRemoved-- > 0 ) {
+            // this is slightly slow because it does an O(N) search each time. Could speed this up by keeping
+            // filteredGenes sorted by MF.
             Gene mostMultifunctional = geneAnnots.getMultifunctionality().getMostMultifunctional( filteredGenes );
             // this.messenger.showStatus( "MF correct: Testing removal of " + mostMultifunctional.getSymbol()
             // + " (most multifunc of hits)" );
             filteredGenes.remove( mostMultifunctional );
         }
-        return numMultifunctionalRemoved;
+
+        return numToRemove;
     }
 
     /**
