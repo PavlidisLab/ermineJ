@@ -370,7 +370,7 @@ public abstract class GeneSetPanel extends JScrollPane {
                     log.debug( "Request for details of gene set: " + id + ", run: " + run );
                     if ( !prunedGeneAnnots.hasGeneSet( id ) ) {
                         callingFrame.getStatusMessenger()
-                                .showError( id + " is not available for viewing in your data." );
+                                .showWarning( id + " is not available for viewing in your data." );
                         return;
                     }
 

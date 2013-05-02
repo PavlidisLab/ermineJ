@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
- import javax.swing.Icon;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JTree;
@@ -154,7 +154,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         final TreePath path = this.find( classID );
         boolean foundIt = false;
         if ( path == null ) {
-            this.callingFrame.getStatusMessenger().showError(
+            this.callingFrame.getStatusMessenger().showWarning(
                     "Could not find " + classID + " in any aspect, the term may be obsolete." );
             foundIt = false;
         } else {

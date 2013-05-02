@@ -80,12 +80,6 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
         this.numGenes = numGenes;
         this.correctedPvalue = correctedPvalue;
         this.settings = settings;
-
-        /*
-         * Initialize these to default values.
-         */
-        this.mfCorrectedPvalue = this.pvalue;
-        this.mfCorrectedFdr = this.correctedPvalue;
     }
 
     /**
@@ -332,6 +326,9 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * @return
      */
     private String formatPvalue( double p ) {
+        if ( p < 0.0 ) {
+            return "";
+        }
         return p < 10e-3 ? exp.format( p ) : nf.format( p );
     }
 

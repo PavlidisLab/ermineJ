@@ -108,7 +108,7 @@ public class GeneSetDetails {
             try {
                 this.settings = new Settings();
             } catch ( IOException e ) {
-                GuiUtil.error( "Problem accessing settings for the details view:\n" + e.getMessage() ); 
+                GuiUtil.error( "Problem accessing settings for the details view:\n" + e.getMessage() );
                 return;
             }
         } else {
@@ -290,7 +290,7 @@ public class GeneSetDetails {
                         "The selected matrix has no probes that match the current annotations" );
             }
 
-            callerStatusViewer.showError( "Warning: " + numNotKnown
+            callerStatusViewer.showWarning( numNotKnown
                     + " of the probes in the data matrix don't match the current annotations" );
 
         }
@@ -347,8 +347,7 @@ public class GeneSetDetails {
         String filename = s.getRawDataFileName();
 
         if ( StringUtils.isBlank( filename ) ) {
-            // GuiUtil.error( "The data file name was not supplied.\n" );
-            callerStatusViewer.showError( "Data file for heatmap is not defined" );
+            callerStatusViewer.showWarning( "Data file for heatmap is not defined" );
         } else if ( !( new File( filename ) ).canRead() ) {
             GuiUtil.error( "The data file \"" + filename + "\" was not readable." + "\n"
                     + "Please make sure this file exists and the filename and directory path are correct,\n"

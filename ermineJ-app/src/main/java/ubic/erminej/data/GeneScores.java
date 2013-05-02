@@ -736,7 +736,7 @@ public class GeneScores {
 
         }
         dis.close();
-
+        messenger.clear();
         reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
                 numRepeatedProbes, totalProbes );
 
@@ -758,12 +758,12 @@ public class GeneScores {
             int numRepeatedProbes, int totalProbes ) {
         if ( invalidNumber ) {
 
-            messenger.showError( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
+            messenger.showWarning( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
                     + " found for input file. These are set to missing" );
         }
         if ( invalidLog ) {
             messenger
-                    .showError( "Warning: There were attempts to take the log of non-positive values. These are set to "
+                    .showWarning( "Warning: There were attempts to take the log of non-positive values. These are set to "
                             + SMALL );
         }
         if ( unknownProbes.size() > 0 ) {
@@ -772,7 +772,7 @@ public class GeneScores {
              * Probes which have absolutely no annotations or gene assigned will be missed entirely. So this needn't be
              * a scary message
              */
-            messenger.showWarning( probeToScoreMap.size()
+            messenger.showStatus( probeToScoreMap.size()
                     + " ("
                     + String.format( "%.2f",
                             100.00 * probeToScoreMap.size() / ( probeToScoreMap.size() + unknownProbes.size() ) )
@@ -789,8 +789,7 @@ public class GeneScores {
 
         if ( numRepeatedProbes > 0 ) {
             messenger
-                    .showWarning( "Warning: "
-                            + numRepeatedProbes
+                    .showWarning( numRepeatedProbes
                             + " identifiers in your gene score file were repeats. Only the first occurrence encountered was kept in each case." );
         }
 
@@ -816,7 +815,7 @@ public class GeneScores {
         assert genes.size() > 0;
 
         int counter = 0;
-
+        int notUsable = 0;
         for ( Gene gene : genes ) {
 
             /*
@@ -868,6 +867,8 @@ public class GeneScores {
                 }
                 geneToScoreMap.put( gene, geneScore );
                 counter++;
+            } else {
+                notUsable++;
             }
         } // end of iter over genes.
 
@@ -877,8 +878,13 @@ public class GeneScores {
             return;
         }
 
-        messenger.showStatus( "Usable scores for " + counter + " distinct genes found in the gene scores." );
-
+        if ( notUsable > 0 && counter / ( double ) notUsable < 0.1 ) {
+            messenger.showWarning( "Usable scores for only " + counter + " distinct genes found ("
+                    + String.format( "%.2f", 100.0 * counter / ( double ) notUsable ) + "%)" );
+        } else {
+            messenger.showStatus( "Usable scores for " + counter + " distinct genes found ("
+                    + String.format( "%.2f", 100.0 * counter / ( double ) notUsable ) + "%)" );
+        }
     }
 
 } // end of class

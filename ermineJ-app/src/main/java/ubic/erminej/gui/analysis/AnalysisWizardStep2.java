@@ -43,6 +43,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
@@ -383,6 +384,38 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             scoreFileTextField.setText( chooser.getSelectedFile().toString() );
             settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
         }
+
+        validateFile();
+
+    }
+
+    /**
+     * Check the score file
+     */
+    private void validateFile() {
+
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+            private GeneScores gs;
+            AnalysisWizard w = ( AnalysisWizard ) getOwner();
+
+            @Override
+            protected Object doInBackground() {
+                w.getStatusField().clear();
+                try {
+                    if ( gs == null ) {
+
+                        String scoreFile = settings.getScoreFile();
+                        gs = new GeneScores( scoreFile, settings, w.getStatusField(), w.getGeneAnnots() );
+                    }
+                } catch ( IOException e ) {
+                    w.getStatusField().showError( "Error reading scores: " + e.getMessage(), e );
+                }
+
+                return null;
+            }
+        };
+
+        sw.execute();
     }
 
     /**
@@ -456,6 +489,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         scoreFileTextField.setText( settings.getScoreFile() );
         rawFileTextField.setText( settings.getRawDataFileName() );
         dataColTextField.setText( String.valueOf( settings.getDataCol() ) );
+
     }
 
     /**
@@ -560,6 +594,10 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     public void updateView() {
         assert wiz != null;
         quickPickPanel.setVisible( wiz.getAnalysisType().equals( SettingsHolder.Method.ORA ) );
+
+        if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
+            validateFile();
+        }
     }
 
 }

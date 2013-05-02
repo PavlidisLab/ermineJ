@@ -410,7 +410,7 @@ public class UserDefinedGeneSetManager {
 
         File userGeneSetDir = new File( settings.getUserGeneSetDirectory() );
         if ( !userGeneSetDir.exists() ) {
-            statusMessenger.showError( "No custom gene set directory found, none will be loaded - looked for "
+            statusMessenger.showWarning( "No custom gene set directory found, none will be loaded - looked for "
                     + settings.getUserGeneSetDirectory() );
             return;
         }

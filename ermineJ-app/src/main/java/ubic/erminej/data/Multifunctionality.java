@@ -43,6 +43,7 @@ import cern.colt.list.DoubleArrayList;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.math.Functions;
+import cern.jet.stat.Descriptive;
 
 /**
  * Implementation of multifunctionality computations as described in Gillis and Pavlidis (2011) PLoS ONE 6:2:e17258.
@@ -91,6 +92,37 @@ public class Multifunctionality {
     private QuantileBin1D quantiles = null;
 
     private Map<Gene, Double> rawGeneMultifunctionalityRanks;
+
+    /**
+     * @return weights computed on multifunctionality as per Tarca et al. (2012)
+     */
+    public Map<Gene, Double> padogWeights() {
+
+        Map<Gene, Double> weig = new HashMap<Gene, Double>();
+        Collection<Integer> numgt = numGoTerms.values();
+
+        DoubleArrayList gotermcounts = new DoubleArrayList();
+        for ( Integer gtv : numgt ) {
+            gotermcounts.add( gtv.doubleValue() );
+        }
+
+        double min = Descriptive.min( gotermcounts );
+        // double min = 1;
+
+        double max = Descriptive.max( gotermcounts );
+
+        // double max = 300;
+
+        assert min < max;
+
+        for ( Gene g : geneAnnots.getGenes() ) {
+            double mfg = Math.min( max, numGoTerms.get( g ) );
+            double weight = 1.0 + Math.sqrt( ( max - mfg ) / ( max - min ) );
+            weig.put( g, weight );
+        }
+
+        return weig;
+    }
 
     /**
      * Construct Multifunctionality information based on the state of the GO annotations -- this accounts only for the

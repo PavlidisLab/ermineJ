@@ -1,5 +1,5 @@
 /*
- * The ermineJ project
+ * The ermineJ project/
  * 
  * Copyright (c) 2006-2011 University of British Columbia
  * 
@@ -65,13 +65,13 @@ public class GeneSetTableModel extends AbstractTableModel {
     public Class<?> getColumnClass( int columnIndex ) {
         if ( columnIndex == 0 ) {
             return GeneSetTerm.class;
-        } else if ( columnIndex == 1 ) {
+        } else if ( columnIndex == 1 ) { // name
             return String.class;
-        } else if ( columnIndex == 2 ) {
+        } else if ( columnIndex == 2 ) { // description
             return Integer.class;
-        } else if ( columnIndex == 3 ) {
-            return Integer.class;
-        } else if ( columnIndex == 4 ) {
+        } else if ( columnIndex == 3 ) { // size
+            return Double.class;
+        } else if ( columnIndex == 3 ) { // mf
             return Double.class;
         } else {
             return GeneSetResult.class;
@@ -81,7 +81,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     /**
      * The number of columns that are always there, before runs are listed.
      */
-    public static final int INIT_COLUMNS = 5;
+    public static final int INIT_COLUMNS = 4;
 
     private GeneAnnotations geneData;
     private List<GeneSetPvalRun> results;
@@ -111,8 +111,8 @@ public class GeneSetTableModel extends AbstractTableModel {
         this.geneData = geneData;
         addColumn( "Name" );
         addColumn( "Description" );
-        addColumn( "Probes" );
-        addColumn( "Genes" );
+        // addColumn( "Probes" );
+        addColumn( "Size" );
         addColumn( "Multifunc" );
         assert INIT_COLUMNS == this.getColumnCount();
         gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
@@ -217,18 +217,15 @@ public class GeneSetTableModel extends AbstractTableModel {
 
         if ( colIndex < INIT_COLUMNS ) {
             switch ( colIndex ) {
-                case 0:
+                case 0: // group
                     return classid;
-                case 1:
+                case 1: // description
                     return classid.getName();
-                case 2:
-                    return new Integer( geneData.numProbesInGeneSet( classid ) );
-                case 3:
-                    return new Integer( geneData.numGenesInGeneSet( classid ) );
-                case 4:
-                    // return Math.min(
-                    // -Math.log10( geneData.getMultifunctionality().getGOTermMultifunctionalityPvalue( classid ) )
-                    // / maxLoggedPvalue, 1.0 );
+                case 2: // size
+                    int probes = geneData.numProbesInGeneSet( classid );
+                    int genes = geneData.numGenesInGeneSet( classid );
+                    return new GeneSetSize( genes, probes );
+                case 3: // mf
                     return geneData.getMultifunctionality().getGOTermMultifunctionalityRank( classid );
                 default:
                     return null;
@@ -292,6 +289,8 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         nff.setMaximumFractionDigits( 4 );
     }
 
+    private final String mfIndicatorChar = "&#9830;"; // diamond
+
     /*
      * (non-Javadoc)
      * 
@@ -317,7 +316,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                     setText( ( ( GeneSetTerm ) value ).getId() );
                 }
             }
-        } else if ( column == 1 && value instanceof String ) {
+        } else if ( column == 1 && value instanceof String ) { /* description */
             setText( ( String ) value );
         } else if ( value instanceof EmptyGeneSetResult ) {
             setText( "not run" );
@@ -327,15 +326,23 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
             String mfstring = "";
             int size = 4;
-
+            String textColor = "#000000";
             if ( result.getMultifunctionalityCorrectedRankDelta() != null ) {
                 String col = Integer.toHexString( Colors.chooseColorForMultifunctionalityEffect( result ).getRGB() )
                         .substring( 2, 8 );
+                mfstring = "<font size=" + size + " + color=#" + col + ">" + mfIndicatorChar + "</font>";
 
-                mfstring = "&nbsp;<font size=" + size + " + color=#" + col + ">&#9830;</font>";
+                // make it more obvious when shifts are large - show symbol twice (could make it bigger, etc.)
+                if ( result.getMultifunctionalityCorrectedRankDelta() > 200 ) {
+                    mfstring += mfstring;
+                }
+                if ( result.getMfCorrectedPvalue() > 0.1 ) {
+                    textColor = "#777777";
+                }
             }
-            setText( String.format( "<html>%.3g" + mfstring + "</html>", result.getPvalue() ) );
-        } else if ( column == 4 && ( Double ) value < 0 ) {
+            setText( String.format( "<html><font color=\"" + textColor + "\">%.3g</font>&nbsp;" + mfstring + "</html>",
+                    result.getPvalue() ) );
+        } else if ( column == 3 && ( Double ) value < 0 ) { // MF score
             setText( "" );
         } else if ( value instanceof Double ) {
             if ( ( ( Double ) value ).isNaN() ) {
@@ -343,6 +350,8 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             } else {
                 setText( String.format( "%.2f", ( Double ) value ) );
             }
+        } else if ( column == 2 ) { // gene count
+            setText( value.toString() );
         } else {
             setText( value.toString() ); // integers, whatever.
         }
@@ -508,6 +517,78 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             redund += "<br/>";
         }
         return redund;
+    }
+
+}
+
+/**
+ * Helper for sorting and display of gene set sizes.
+ * 
+ * @author Paul
+ * @version $Id$
+ */
+class GeneSetSize implements Comparable<GeneSetSize> {
+
+    private Integer numGenes = 0;
+
+    private Integer numProbes = 0;
+
+    public GeneSetSize( Integer numGenes, Integer numProbes ) {
+        super();
+        this.numGenes = numGenes;
+        this.numProbes = numProbes;
+    }
+
+    @Override
+    public int compareTo( GeneSetSize o ) {
+        return this.numGenes.compareTo( o.numGenes );
+    }
+
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) return true;
+        if ( obj == null ) return false;
+        if ( getClass() != obj.getClass() ) return false;
+        GeneSetSize other = ( GeneSetSize ) obj;
+        if ( numGenes == null ) {
+            if ( other.numGenes != null ) return false;
+        } else if ( !numGenes.equals( other.numGenes ) ) return false;
+        if ( numProbes == null ) {
+            if ( other.numProbes != null ) return false;
+        } else if ( !numProbes.equals( other.numProbes ) ) return false;
+        return true;
+    }
+
+    public Integer getNumGenes() {
+        return numGenes;
+    }
+
+    public Integer getNumProbes() {
+        return numProbes;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( numGenes == null ) ? 0 : numGenes.hashCode() );
+        result = prime * result + ( ( numProbes == null ) ? 0 : numProbes.hashCode() );
+        return result;
+    }
+
+    public void setNumGenes( Integer numGenes ) {
+        this.numGenes = numGenes;
+    }
+
+    public void setNumProbes( Integer numProbes ) {
+        this.numProbes = numProbes;
+    }
+
+    @Override
+    public String toString() {
+        return "<html>" + numGenes + ""
+                + ( numProbes.equals( numGenes ) ? "" : "&nbsp;<font color=\"#777777\">[ " + numProbes + " ]</font>" )
+                + "</html>";
     }
 
 }

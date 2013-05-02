@@ -61,7 +61,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         super( wiz );
         this.jbInit();
         this.settings = settings;
-        wiz.clearStatus();
+     //   wiz.clearStatus();
         setValues();
     }
 

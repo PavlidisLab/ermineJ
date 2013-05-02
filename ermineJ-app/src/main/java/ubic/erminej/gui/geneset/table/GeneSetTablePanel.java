@@ -73,12 +73,12 @@ public class GeneSetTablePanel extends GeneSetPanel {
     private static final long serialVersionUID = -1L;
     private final static int GENESET_ID_COLUMN_WIDTH = 80;
     private final static int GENESET_NAME_COLUMN_WIDTH = 350;
-    private final static int NUMPROBES_COLUMN_WIDTH = 40;
+    // private final static int NUMPROBES_COLUMN_WIDTH = 40;
     private final static int NUMGENES_COLUMN_WIDTH = 40;
     private final static int RUN_COLUMN_START_WIDTH = 80;
-    public static final int PROBE_COUNT_COLUMN_INDEX = 2;
-    public static final int GENE_COUNT_COLUMN_INDEX = 3;
-    public static final int MULTIFUNC_COLUMN_INDEX = 4;
+    // public static final int PROBE_COUNT_COLUMN_INDEX = 2;
+    public static final int GENE_COUNT_COLUMN_INDEX = 2;
+    public static final int MULTIFUNC_COLUMN_INDEX = 3;
 
     protected GeneSetTableModel model = null;
     protected List<String> resultToolTips = new LinkedList<String>();
@@ -153,7 +153,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         EditRunPopupMenu runPopupMenu = new EditRunPopupMenu();
 
-        JMenuItem removeRunMenuItem = new JMenuItem( "Remove this run ..." );
+        final JMenuItem removeRunMenuItem = new JMenuItem( "Remove this run ..." );
         removeRunMenuItem.addActionListener( new RemoveRunPopupMenu_actionAdapter( this ) );
         runPopupMenu.add( removeRunMenuItem );
 
@@ -164,7 +164,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
                 int columnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
                 int runIndex = model.getRunIndex( columnIndex );
-                String newName = JOptionPane.showInputDialog( table, "Enter a new name", getRunName( runIndex ) );
+                String newName = JOptionPane.showInputDialog( removeRunMenuItem, "Enter a new name",
+                        getRunName( runIndex ) );
 
                 if ( newName != null && newName.length() > 0 ) {
                     renameRun( runIndex, newName );
@@ -306,7 +307,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         this.getViewport().add( table, null );
         table.getColumnModel().getColumn( 0 ).setPreferredWidth( GENESET_ID_COLUMN_WIDTH );
         table.getColumnModel().getColumn( 1 ).setPreferredWidth( GENESET_NAME_COLUMN_WIDTH );
-        table.getColumnModel().getColumn( PROBE_COUNT_COLUMN_INDEX ).setPreferredWidth( NUMPROBES_COLUMN_WIDTH );
+        // table.getColumnModel().getColumn( PROBE_COUNT_COLUMN_INDEX ).setPreferredWidth( NUMPROBES_COLUMN_WIDTH );
         table.getColumnModel().getColumn( GENE_COUNT_COLUMN_INDEX ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
         table.getColumnModel().getColumn( MULTIFUNC_COLUMN_INDEX ).setPreferredWidth( NUMGENES_COLUMN_WIDTH );
 
@@ -431,10 +432,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
     protected String getHeaderToolTip( int index ) {
         if ( index == 0 || index == 1 ) { // descriptions of the category.
             return "Classes shown: " + table.getRowCount();
-        } else if ( index == PROBE_COUNT_COLUMN_INDEX ) {
-            return "How many probes are in the group (there can be more than one probe per gene)";
+            // } else if ( index == PROBE_COUNT_COLUMN_INDEX ) {
+            // return "How many probes are in the group (there can be more than one probe per gene)";
         } else if ( index == GENE_COUNT_COLUMN_INDEX ) {
-            return "How many genes are in the group";
+            return "How many genes are in the group (#probes shown in brackets if different)";
         } else if ( index == MULTIFUNC_COLUMN_INDEX ) {
             return "Measurement of how biased the category is towards multifunctional genes (1 = highest bias)";
         } else if ( index >= GeneSetTableModel.INIT_COLUMNS ) {

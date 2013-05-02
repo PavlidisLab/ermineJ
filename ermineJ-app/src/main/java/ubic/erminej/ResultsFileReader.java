@@ -31,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.swing.JFileChooser;
 
@@ -154,7 +153,7 @@ public class ResultsFileReader {
     }
 
     /**
-     * Compute the multifunctionality rank delta.
+     * Compute the multifunctionality rank delta (only if mf correction was done)
      * 
      * @param newResults
      */
@@ -213,43 +212,52 @@ public class ResultsFileReader {
         boolean warned = false;
         String line = null;
         String runName = "";
+        boolean hasMfCorrectedValues = false;
         while ( ( line = dis.readLine() ) != null ) {
-            StringTokenizer st = new StringTokenizer( line, "\t" );
-            String firstword = st.nextToken();
+            String[] toks = StringUtils.splitPreserveAllTokens( line, "\t" );
+            // StringTokenizer st = new StringTokenizer( line, "\t" );
+            // String firstword = st.nextToken();
+            String firstword = toks[0];
 
             /*
              * Lines that start with the commons configuration comment character "!" indicate data.
              */
             if ( firstword.compareTo( "!" ) == 0 ) {
-                st.nextToken(); // / class name, ignored.
-                String classId = st.nextToken();
+                // st.nextToken(); // / class name, ignored.
+                String classId = toks[2];
                 GeneSetTerm term = geneAnnots.findTerm( classId );
                 if ( term == null && !warned ) {
-                    messenger.showError( "Term " + classId + " not recognized, skipping (further warnings skipped)" );
+                    messenger.showWarning( "Term " + classId + " not recognized, skipping (further warnings skipped)" );
                     warned = true;
                     continue;
                 }
 
                 // we could recompute this, but better not.
-                int numProbes = Integer.parseInt( st.nextToken() );
-                int numGenes = Integer.parseInt( st.nextToken() );
-                double score = Double.parseDouble( st.nextToken() );
-                double pval = Double.parseDouble( st.nextToken() );
+                int numProbes = Integer.parseInt( toks[3] );
+                int numGenes = Integer.parseInt( toks[4] );
+                double score = Double.parseDouble( toks[5] );
+                double pval = Double.parseDouble( toks[6] );
 
                 // we could recompute this, but better not.
-                double correctedPval = Double.parseDouble( st.nextToken() );
+                double correctedPval = Double.parseDouble( toks[7] );
 
                 GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval, runSettings );
 
-                double mfpvalue = Double.parseDouble( st.nextToken() );
-                double mfCorrectedpvalue = Double.parseDouble( st.nextToken() );
-                double mf = Double.parseDouble( st.nextToken() );
-
-                c.setMfCorrectedPvalue( mfpvalue );
-                c.setMfCorrectedFdr( mfCorrectedpvalue );
+                double mf = Double.parseDouble( toks[10] );
                 c.setMultifunctionalityRank( mf );
 
-                // int mfRankChange = c.setMultifunctionalityCorrectedRankDelta( mfRankChange );
+                if ( StringUtils.isNotBlank( toks[8] ) ) {
+                    try {
+                        double mfpvalue = Double.parseDouble( toks[8] );
+                        double mfCorrectedpvalue = Double.parseDouble( toks[9] );
+                        c.setMfCorrectedPvalue( mfpvalue );
+                        c.setMfCorrectedFdr( mfCorrectedpvalue );
+                        hasMfCorrectedValues = true;
+                    } catch ( NumberFormatException e ) {
+                        // ok, value might not have been provided.
+                        hasMfCorrectedValues = false;
+                    }
+                }
 
                 results.put( term, c );
             } else if ( firstword.startsWith( ResultsPrinter.RUN_NAME_FIELD_PATTERN ) ) {
@@ -281,7 +289,9 @@ public class ResultsFileReader {
 
         GeneSetPvalRun newResults = new GeneSetPvalRun( runSettings, geneAnnots, messenger, results, runName );
 
-        fillInMultifuncationalityRankDelta( newResults );
+        if ( hasMfCorrectedValues ) {
+            fillInMultifuncationalityRankDelta( newResults );
+        }
 
         messenger.showStatus( "Read run: " + runName );
 

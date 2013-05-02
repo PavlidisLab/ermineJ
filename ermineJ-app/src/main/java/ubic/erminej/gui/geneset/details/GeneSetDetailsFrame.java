@@ -660,7 +660,9 @@ public class GeneSetDetailsFrame extends JFrame {
         DoubleMatrix<Probe, String> matrix = this.geneSetDetails.getDataMatrix();
 
         if ( matrix == null || matrix.rows() == 0 ) {
-            statusMessenger.showError( "None of the probes in this gene set were in the data file." );
+            if ( StringUtils.isNotBlank( settings.getRawDataFileName() ) ) {
+                statusMessenger.showError( "None of the probes in this gene set were in the data file." );
+            }
         } else {
             matrixDisplay = new MatrixDisplay<Probe, String>( matrix );
             matrixDisplay.setColorMap( this.colorMap );

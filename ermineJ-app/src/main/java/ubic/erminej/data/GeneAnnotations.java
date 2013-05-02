@@ -176,7 +176,7 @@ public class GeneAnnotations {
                 + " probes)" );
 
         if ( probes.size() > start.numProbes() ) {
-            messenger.showError( "The new analysis has more probes than the original, any extras will be ignored" );
+            messenger.showWarning( "The new analysis has more probes than the original, any extras will be ignored" );
         }
 
         this.geneSetTerms = start.geneSetTerms;
@@ -1450,6 +1450,8 @@ public class GeneAnnotations {
         this.multifunctionality = new Multifunctionality( this, this.messenger ); // < 1 s.
 
         log.info( "Total annotation setup: " + timer.getTime() + "ms" );
+
+        this.messenger.clear();
     }
 
     /**

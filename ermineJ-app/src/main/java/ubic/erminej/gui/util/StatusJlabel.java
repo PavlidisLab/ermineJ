@@ -1,7 +1,7 @@
 /*
- * The baseCode project
+ * The ermineJ project
  * 
- * Copyright (c) 2006 University of British Columbia
+ * Copyright (c) 2006-2013 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,13 @@ public class StatusJlabel extends StatusDebugLogger {
 
     protected JLabel jlabel;
 
-    private static ImageIcon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/alert.gif" ) );
+    private static ImageIcon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/error.png" ) );
+    private static ImageIcon warningIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/warn.png" ) );
 
     private static ImageIcon waitingIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/wait.gif" ) );
 
     /*
-     * How long we display error messages for by default. too short, user can't read it; too long, slows things donw.
+     * How long we display error messages for by default. too short, user can't read it; too long, slows things down.
      */
     private static final int MESSAGE_DELAY = 1300; // milliseconds
 
@@ -60,6 +61,7 @@ public class StatusJlabel extends StatusDebugLogger {
      */
     @Override
     public void clear() {
+        // System.err.println( "Clearing" );
         if ( SwingUtilities.isEventDispatchThread() ) {
             setLabel( "", null );
         } else {
@@ -133,6 +135,31 @@ public class StatusJlabel extends StatusDebugLogger {
         }
         super.showError( s );
 
+    }
+
+    @Override
+    public void showWarning( String s ) {
+
+        final String m = StringUtils.abbreviate( s, MAX_LABEL_TEXT );
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            setLabel( m, warningIcon );
+        } else {
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
+                    public void run() {
+                        setLabel( m, warningIcon );
+                        letUserReadMessage( MESSAGE_DELAY );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
+        super.showWarning( s );
     }
 
     @Override
@@ -228,7 +255,6 @@ public class StatusJlabel extends StatusDebugLogger {
      */
     protected void setLabel( final String message, final ImageIcon icon ) {
         jlabel.setIcon( icon );
-
         jlabel.setText( StringUtils.abbreviate( message, 300 ) );
 
     }

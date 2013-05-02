@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +47,7 @@ import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.Rank;
-import ubic.basecode.math.Smooth; 
+import ubic.basecode.math.Smooth;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -274,6 +275,10 @@ public class MultiFuncDiagWindow extends JFrame {
         HistogramDataset series = new HistogramDataset();
         int numBins = 39;
         series.addSeries( "sizes", MatrixUtil.fromList( vec ).toArray(), numBins, 2, 200 );
+
+        // Map<Gene, Double> padogWeights = mf.padogWeights();
+        // double[] dpw = ArrayUtils.toPrimitive( padogWeights.values().toArray( new Double[] {} ) );
+        // series.addSeries( "PADOG", dpw, numBins, 1, 2 );
 
         JFreeChart histogram = ChartFactory.createHistogram( "Gene multifunctionality", "Number of sets gene is in",
                 "Number of genes", series, PlotOrientation.VERTICAL, false, false, false );

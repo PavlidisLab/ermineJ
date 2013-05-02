@@ -444,18 +444,6 @@ public class MainFrame extends JFrame {
         treePanel.fireResultsChanged();
     }
 
-    public void setSettings( Settings settings ) {
-        this.settings = settings;
-    }
-
-    /**
-     * @param message
-     * @param e Throwable
-     */
-    public void showError( String message, Throwable e ) {
-        statusMessenger.showError( message, e );
-    }
-
     /**
      * @param runSettings
      */
@@ -1579,13 +1567,13 @@ public class MainFrame extends JFrame {
                     int found = find( queryString, searchByGene );
                     if ( searchByGene ) {
                         if ( found == 0 ) {
-                            statusMessenger.showError( "No gene sets contain genes matching query" );
+                            statusMessenger.showWarning( "No gene sets contain genes matching query" );
                         } else {
                             statusMessenger.showStatus( found + " gene sets with matching genes" );
                         }
                     } else {
                         if ( found == 0 ) {
-                            statusMessenger.showError( "No matching gene sets " );
+                            statusMessenger.showWarning( "No matching gene sets " );
                         } else {
                             statusMessenger.showStatus( found + " matching gene sets" );
                         }

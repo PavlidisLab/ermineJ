@@ -96,7 +96,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         super( wiz );
         this.settings = settings;
         this.jbInit();
-        wiz.clearStatus();
+    //   wiz.clearStatus();
         setValues();
     }
 
@@ -264,6 +264,8 @@ public class AnalysisWizardStep5 extends WizardStep {
                     }
                     if ( n == 0 ) {
                         w.getStatusField().showError( "No genes selected at that threshold" );
+                    } else if ( n == geneToScoreMap.size() ) {
+                        w.getStatusField().showError( "All genes selected at that threshold" );
                     } else {
                         double auc = w.getGeneAnnots().getMultifunctionality()
                                 .enrichmentForMultifunctionality( keptGenes );
@@ -447,7 +449,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         JPanel jPanel15 = new JPanel();
         oraPanel = new JPanel();
         oraPanel.setBorder( new TitledBorder( "ORA" ) );
-        final JTextField geneScoreThresholdTextField = new JTextField(6);
+        final JTextField geneScoreThresholdTextField = new JTextField( 6 );
         // stuff to set gene score threshold.
         JLabel jLabel6 = new JLabel();
         jLabel6.setLabelFor( geneScoreThresholdTextField );
