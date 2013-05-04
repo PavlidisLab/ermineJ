@@ -419,38 +419,6 @@ public class GeneAnnotations {
         return this.userDefinedGeneSetManager.deleteUserGeneSet( classID );
     }
 
-    // /**
-    // * Add a new gene set. Used to set up user-defined gene sets.
-    // *
-    // * @param id String class to be added
-    // * @param probesForNew collection of members.
-    // */
-    // public void addSet( GeneSetTerm geneSetId, Collection<Probe> probesForNew ) {
-    //
-    // checkModifiability();
-    //
-    // if ( probesForNew.isEmpty() ) {
-    // log.debug( "No probes to add for " + geneSetId );
-    // return;
-    // }
-    //
-    // for ( Probe p : probesForNew ) {
-    // if ( !hasProbe( p ) ) {
-    // log.warn( "Adding new probe : " + p );
-    // this.probes.put( p.getName(), p );
-    // }
-    // }
-    //
-    // Collection<Gene> gs = new HashSet<Gene>();
-    // for ( Probe p : probesForNew ) {
-    // p.addToGeneSet( geneSetId );
-    // gs.addAll( p.getGenes() );
-    // }
-    //
-    // this.addGeneSet( geneSetId, gs );
-    //
-    // }
-
     /**
      * Case insensitive
      * 
@@ -889,6 +857,7 @@ public class GeneAnnotations {
      * @return
      */
     public int numProbesForGene( Gene g ) {
+        if ( g == null ) throw new IllegalArgumentException( "Gene cannot be null" );
         return g.getProbes().size();
     }
 
@@ -1514,8 +1483,9 @@ class CaseInsensitiveMap<V> extends HashMap<String, V> {
         return super.put( key.toLowerCase(), value );
     }
 
-    // @Override
-    public V get( String key ) {
-        return super.get( key.toLowerCase() );
+    @Override
+    public V get( Object key ) {
+        if ( !( key instanceof String ) ) return null;
+        return super.get( ( ( String ) key ).toLowerCase() );
     }
 }
