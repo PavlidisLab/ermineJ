@@ -174,7 +174,7 @@ public class UserDefinedGeneSetManager {
 
             line = StringUtils.strip( line );
 
-            Gene g = geneData.findGeneCaseInsensitive( line );
+            Gene g = geneData.findGene( line );
 
             if ( g == null ) {
                 Probe p = geneData.findProbe( line );

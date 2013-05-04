@@ -574,7 +574,7 @@ public class MainFrame extends JFrame {
             int response = JOptionPane
                     .showConfirmDialog(
                             null,
-                            "Your current results will be discarded when"
+                            "Your current results will be discarded when "
                                     + "the project loads.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
                             "Unsaved results will be lost",
 

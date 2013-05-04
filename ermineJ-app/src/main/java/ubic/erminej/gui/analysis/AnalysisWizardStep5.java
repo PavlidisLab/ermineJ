@@ -96,7 +96,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         super( wiz );
         this.settings = settings;
         this.jbInit();
-    //   wiz.clearStatus();
+        // wiz.clearStatus();
         setValues();
     }
 
@@ -239,18 +239,18 @@ public class AnalysisWizardStep5 extends WizardStep {
                     }
 
                     AnalysisWizard w = ( AnalysisWizard ) getOwner();
-                    if ( gs == null ) {
+                    // if ( gs == null ) {
 
-                        Settings settingsTemp = new Settings( w.getSettings() );
-                        settingsTemp.setDoLog( doLog );
-                        settingsTemp.setBigIsBetter( bigIsBetter );
+                    Settings settingsTemp = new Settings( w.getSettings() );
+                    settingsTemp.setDoLog( doLog );
+                    settingsTemp.setBigIsBetter( bigIsBetter );
 
-                        String scoreFile = settingsTemp.getScoreFile();
-                        log.info( "Checking ORA threshold effect using " + scoreFile );
-                        gs = new GeneScores( scoreFile, settingsTemp, null, w.getGeneAnnots() );
+                    String scoreFile = settingsTemp.getScoreFile();
+                    log.info( "Checking ORA threshold effect using " + scoreFile );
+                    gs = new GeneScores( scoreFile, settingsTemp, null, w.getGeneAnnots() );
 
-                        w.getStatusField().clear();
-                    }
+                    w.getStatusField().clear();
+                    // }
 
                     int n = 0;
                     Map<Gene, Double> geneToScoreMap = gs.getGeneToScoreMap();
@@ -455,7 +455,8 @@ public class AnalysisWizardStep5 extends WizardStep {
         jLabel6.setLabelFor( geneScoreThresholdTextField );
         jLabel6.setText( "Gene score threshold" );
         geneScoreThresholdTextField.setEditable( true );
-        geneScoreThresholdTextField.setToolTipText( "Score Threshold used for Over-Representation analysis" );
+        geneScoreThresholdTextField
+                .setToolTipText( "Score threshold used for ORA - refers to value you provide, before possible log transformation" );
         geneScoreThresholdTextField.setHorizontalAlignment( SwingConstants.RIGHT );
         geneScoreThresholdTextField.setText( String.valueOf( settings.getGeneScoreThreshold() ) );
         oraThreshold.set( settings.getGeneScoreThreshold() );

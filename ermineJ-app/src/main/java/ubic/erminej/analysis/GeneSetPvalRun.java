@@ -519,8 +519,7 @@ public class GeneSetPvalRun {
             }
         }
 
-        for ( Object o : this.results.values() ) {
-            GeneSetResult gsr = ( GeneSetResult ) o;
+        for ( GeneSetResult gsr : this.results.values() ) {
             double rank = mf.getGOTermMultifunctionalityRank( gsr.getGeneSetId() );
             gsr.setMultifunctionalityRank( rank );
         }

@@ -333,9 +333,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                 mfstring = "<font size=" + size + " + color=#" + col + ">" + mfIndicatorChar + "</font>";
 
                 // make it more obvious when shifts are large - show symbol twice (could make it bigger, etc.)
-                if ( result.getMultifunctionalityCorrectedRankDelta() > 200 ) {
-                    mfstring += mfstring;
-                }
+//                if ( result.getMultifunctionalityCorrectedRankDelta() > 200 ) {
+//                    mfstring += mfstring;
+//                }
                 if ( result.getMfCorrectedPvalue() > 0.1 ) {
                     textColor = "#777777";
                 }

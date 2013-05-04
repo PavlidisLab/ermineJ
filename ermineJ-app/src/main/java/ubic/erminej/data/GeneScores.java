@@ -558,7 +558,7 @@ public class GeneScores {
 
             String id = StringUtils.strip( idr );
 
-            Probe p = originalGeneAnnots.findProbeCaseInsensitive( id );
+            Probe p = originalGeneAnnots.findProbe( id );
 
             Gene g;
             if ( p == null ) {
@@ -566,7 +566,7 @@ public class GeneScores {
                 /*
                  * Try parsing as a gene.
                  */
-                g = originalGeneAnnots.findGeneCaseInsensitive( id );
+                g = originalGeneAnnots.findGene( id );
 
                 if ( g == null ) {
                     continue;

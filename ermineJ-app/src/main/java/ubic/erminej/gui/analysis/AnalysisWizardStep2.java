@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -141,6 +142,10 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     @Override
     public boolean isReady() {
+
+        if ( !ready.get() ) {
+            return false;
+        }
 
         if ( wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
                 && StringUtils.isBlank( rawFileTextField.getText() ) ) {
@@ -481,7 +486,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
         frame.setVisible( true );
         textPane.requestFocusInWindow();
-
+        this.ready.set( false );
     }
 
     void setValues() {
@@ -492,103 +497,129 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     }
 
+    private AtomicBoolean ready = new AtomicBoolean( true );
+
     /**
      * TODO refactor out.
      * 
      * @param textPane
      * @param name optional
      */
-    final private void getGeneScoresFromQuickList( final JTextPane textPane, String name ) {
-        try {
-            /*
-             * Get the text, parse into a list of elements
-             */
-            String t = textPane.getDocument().getText( 0, textPane.getDocument().getLength() );
+    final private void getGeneScoresFromQuickList( final JTextPane textPane, final String name ) {
 
-            if ( t.isEmpty() ) {
-                wiz.showError( "You didn't provide any identifiers" );
-                scoreFileTextField.setText( null );
-                settings.setScoreFile( null );
-                return;
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+
+            AnalysisWizard w = ( AnalysisWizard ) getOwner();
+
+            @Override
+            protected Object doInBackground() {
+                w.getStatusField().clear();
+                ready.set( false );
+                /*
+                 * TODO: set an atomicboolean to say we are not ready
+                 */
+
+                try {
+                    /*
+                     * Get the text, parse into a list of elements
+                     */
+                    String t = textPane.getDocument().getText( 0, textPane.getDocument().getLength() );
+
+                    if ( t.isEmpty() ) {
+                        wiz.showError( "You didn't provide any identifiers" );
+                        scoreFileTextField.setText( null );
+                        settings.setScoreFile( null );
+                        return null;
+                    }
+
+                    String[] fa = StringUtils.split( t, "\n\t ,|" );
+
+                    if ( fa.length == 0 ) {
+                        scoreFileTextField.setText( null );
+                        settings.setScoreFile( null );
+                        wiz.showError( "You didn't provide any identifiers" );
+                        return null;
+                    }
+
+                    if ( fa.length < 2 ) {
+                        scoreFileTextField.setText( null );
+                        settings.setScoreFile( null );
+                        wiz.showError( "Your quick list must have at least 2 items" );
+                        return null;
+                    }
+
+                    Collection<String> fields = Arrays.asList( fa );
+
+                    w.getStatusField().showProgress( "Parsing list ..." );
+                    GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots() );
+
+                    // definitely have to do this now.
+                    settings.setGeneScoreThreshold( 0.0 );
+                    if ( settings.getDoLog() ) {
+                        settings.setGeneScoreThreshold( 1.0 ); // becomes 0.
+                    }
+
+                    int i = gs.numGenesAboveThreshold( settings.getGeneScoreThreshold() );
+
+                    if ( i == 0 ) {
+                        scoreFileTextField.setText( null );
+                        settings.setScoreFile( null );
+                        wiz.showError( "None of the genes were recognized" );
+                        return null;
+                    } else if ( i == 1 ) {
+                        scoreFileTextField.setText( null );
+                        settings.setScoreFile( null );
+                        wiz.showError( "Your quick list must have at least 2 items" );
+                        return null;
+                    } else {
+                        wiz.showStatus( i + " genes were recognized out of " + fa.length + " ids." );
+                    }
+
+                    File file;
+                    String cleanName = "";
+
+                    if ( StringUtils.isNotBlank( name ) ) {
+                        cleanName = name;
+                        cleanName = cleanName.replaceAll( "[\\s\\\\\\/]*", "" );
+                        cleanName = cleanName.replaceAll( "^\\.", "" );
+                        cleanName = cleanName.replaceAll( "\\.$", "" );
+                    }
+                    if ( StringUtils.isNotBlank( cleanName ) ) {
+                        file = new File( new File( settings.getGeneScoreFileDirectory() ), "QuickList." + cleanName
+                                + ".txt" );
+
+                    } else {
+                        file = File.createTempFile( "QuickList.", ".txt",
+                                new File( settings.getGeneScoreFileDirectory() ) );
+                    }
+                    gs.write( file );
+
+                    // display
+                    scoreColTextField.setText( "2" );
+                    scoreFileTextField.setText( file.getAbsolutePath() );
+
+                    // do we do this now? Might be okay to wait?
+                    settings.setScoreFile( file.getAbsolutePath() );
+                    settings.setScoreCol( 2 );
+
+                    setValues();
+                } catch ( BadLocationException e1 ) {
+                    log.error( e1, e1 );
+                } catch ( IOException ioe ) {
+                    log.error( ioe, ioe );
+                    wiz.getStatusField().showError( ioe.getMessage() );
+                } catch ( Exception e ) {
+                    log.error( e, e );
+                    wiz.getStatusField().showError( e.getMessage() );
+                } finally {
+                    ready.set( true );
+                }
+
+                return null;
             }
+        };
 
-            String[] fa = StringUtils.split( t, "\n\t ,|" );
-
-            if ( fa.length == 0 ) {
-                scoreFileTextField.setText( null );
-                settings.setScoreFile( null );
-                wiz.showError( "You didn't provide any identifiers" );
-                return;
-            }
-
-            if ( fa.length < 2 ) {
-                scoreFileTextField.setText( null );
-                settings.setScoreFile( null );
-                wiz.showError( "Your quick list must have at least 2 items" );
-                return;
-            }
-
-            Collection<String> fields = Arrays.asList( fa );
-
-            GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots() );
-
-            // definitely have to do this now.
-            settings.setGeneScoreThreshold( 0.0 );
-            if ( settings.getDoLog() ) {
-                settings.setGeneScoreThreshold( 1.0 ); // becomes 0.
-            }
-
-            int i = gs.numGenesAboveThreshold( settings.getGeneScoreThreshold() );
-
-            if ( i == 0 ) {
-                scoreFileTextField.setText( null );
-                settings.setScoreFile( null );
-                wiz.showError( "None of the genes were recognized" );
-                return;
-            } else if ( i == 1 ) {
-                scoreFileTextField.setText( null );
-                settings.setScoreFile( null );
-                wiz.showError( "Your quick list must have at least 2 items" );
-                return;
-            } else {
-                wiz.showStatus( i + " genes were recognized out of " + fa.length + " ids." );
-            }
-
-            File file;
-            String cleanName = "";
-
-            if ( StringUtils.isNotBlank( name ) ) {
-                cleanName = name;
-                cleanName = cleanName.replaceAll( "[\\s\\\\\\/]*", "" );
-                cleanName = cleanName.replaceAll( "^\\.", "" );
-                cleanName = cleanName.replaceAll( "\\.$", "" );
-            }
-            if ( StringUtils.isNotBlank( cleanName ) ) {
-                file = new File( new File( settings.getGeneScoreFileDirectory() ), "QuickList." + cleanName + ".txt" );
-
-            } else {
-                file = File.createTempFile( "QuickList.", ".txt", new File( settings.getGeneScoreFileDirectory() ) );
-            }
-            gs.write( file );
-
-            // display
-            scoreColTextField.setText( "2" );
-            scoreFileTextField.setText( file.getAbsolutePath() );
-
-            // do we do this now? Might be okay to wait?
-            settings.setScoreFile( file.getAbsolutePath() );
-            settings.setScoreCol( 2 );
-
-            setValues();
-        } catch ( BadLocationException e1 ) {
-            log.error( e1, e1 );
-        } catch ( IOException ioe ) {
-            log.error( ioe, ioe );
-            wiz.getStatusField().showError( ioe.getMessage() );
-        } catch ( Exception e ) {
-            log.error( e, e );
-            wiz.getStatusField().showError( e.getMessage() );
-        }
+        sw.execute();
     }
 
     public void updateView() {

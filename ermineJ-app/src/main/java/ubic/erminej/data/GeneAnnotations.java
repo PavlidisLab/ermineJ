@@ -97,9 +97,9 @@ public class GeneAnnotations {
 
     private StatusViewer messenger = new StatusStderr();
 
-    private Map<String, Probe> probes = new HashMap<String, Probe>();
+    private Map<String, Probe> probes = new CaseInsensitiveMap<Probe>();
 
-    private Map<String, Gene> genes = new HashMap<String, Gene>();
+    private Map<String, Gene> genes = new CaseInsensitiveMap<Gene>();
 
     private UserDefinedGeneSetManager userDefinedGeneSetManager;
 
@@ -452,27 +452,13 @@ public class GeneAnnotations {
     // }
 
     /**
+     * Case insensitive
+     * 
      * @param symbol
      * @return
      */
     public Gene findGene( String symbol ) {
         return this.genes.get( symbol );
-    }
-
-    /**
-     * @param symbol
-     * @return
-     */
-    public Gene findGeneCaseInsensitive( String symbol ) {
-        Gene g = this.findGene( symbol );
-        if ( g != null ) return g;
-
-        // try upper and lower case.
-        g = this.findGene( symbol.toUpperCase() );
-        if ( g == null ) {
-            return this.findGene( symbol.toLowerCase() );
-        }
-        return g;
     }
 
     /**
@@ -495,6 +481,8 @@ public class GeneAnnotations {
     }
 
     /**
+     * Case insensitive
+     * 
      * @param probe
      * @return
      */
@@ -1492,51 +1480,6 @@ public class GeneAnnotations {
         }
     }
 
-    /**
-     * Find the first match, ignoring case.
-     * 
-     * @param id
-     * @return
-     */
-    public Probe findProbeCaseInsensitive( String id ) {
-        Probe p = this.findProbe( id );
-        if ( p != null ) {
-            return p;
-        }
-
-        String idup = id.toUpperCase();
-
-        for ( Probe probe : probes.values() ) {
-            if ( probe.getName().toUpperCase().equals( idup ) ) {
-                return probe;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Find the first match, ignoring case.
-     * 
-     * @param id
-     * @return
-     */
-    public Gene findGeneCaseInensitive( String id ) {
-        Gene g = this.findGene( id );
-        if ( g != null ) {
-            return g;
-        }
-
-        String idup = id.toUpperCase();
-
-        for ( Gene gene : genes.values() ) {
-            if ( gene.getSymbol().toUpperCase().equals( idup ) ) {
-                return gene;
-            }
-        }
-
-        return null;
-    }
-
 }
 
 class ClassSizeComparator implements Comparator<GeneSet>, Serializable {
@@ -1561,5 +1504,18 @@ class ClassSizeComparator implements Comparator<GeneSet>, Serializable {
         }
 
         return 0;
+    }
+}
+
+class CaseInsensitiveMap<V> extends HashMap<String, V> {
+
+    @Override
+    public V put( String key, V value ) {
+        return super.put( key.toLowerCase(), value );
+    }
+
+    // @Override
+    public V get( String key ) {
+        return super.get( key.toLowerCase() );
     }
 }

@@ -317,6 +317,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             double relativeRank = numSelected / sortedClasses.size();
             if ( r.getCorrectedPvalue() < GROUP_SELECTION_THRESHOLD_FOR_MF_CHECK
                     && monitoredRanks.size() < NUMBER_OF_RANKS_TO_INSPECT_FOR_MF_SENSITIVITY ) {
+                /*
+                 * FIXME: jesse doesn't use the NUMBER_OF_RANKS_TO_INSPECT_FOR_MF_SENSITIVITY?
+                 */
                 monitoredRanks.put( t, relativeRank );
             }
             referenceResults.get( t ).setRank( numSelected + 1 );
