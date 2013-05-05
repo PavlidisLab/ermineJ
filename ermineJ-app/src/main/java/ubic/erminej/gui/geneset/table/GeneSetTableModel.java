@@ -333,9 +333,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                 mfstring = "<font size=" + size + " + color=#" + col + ">" + mfIndicatorChar + "</font>";
 
                 // make it more obvious when shifts are large - show symbol twice (could make it bigger, etc.)
-//                if ( result.getMultifunctionalityCorrectedRankDelta() > 200 ) {
-//                    mfstring += mfstring;
-//                }
+                // if ( result.getMultifunctionalityCorrectedRankDelta() > 200 ) {
+                // mfstring += mfstring;
+                // }
                 if ( result.getMfCorrectedPvalue() > 0.1 ) {
                     textColor = "#777777";
                 }
@@ -343,7 +343,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             setText( String.format( "<html><font color=\"" + textColor + "\">%.3g</font>&nbsp;" + mfstring + "</html>",
                     result.getPvalue() ) );
         } else if ( column == 3 && ( Double ) value < 0 ) { // MF score
-            setText( "" );
+            setText( "" ); // didn't compute it.
         } else if ( value instanceof Double ) {
             if ( ( ( Double ) value ).isNaN() ) {
                 setText( "" );

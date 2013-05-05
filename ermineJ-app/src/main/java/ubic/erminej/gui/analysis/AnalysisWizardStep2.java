@@ -48,6 +48,8 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -307,6 +309,55 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         scoreFileBrowsePanel.setLayout( new BoxLayout( scoreFileBrowsePanel, BoxLayout.X_AXIS ) );
         scoreFileBrowsePanel.add( scoreFileTextField, null );
         scoreFileBrowsePanel.add( scoreFileBrowseButton, null );
+
+        /*
+         * When the score text field changes, if it is a valid file, check how it matches the annotations.
+         */
+        scoreFileTextField.addActionListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                // TODO Auto-generated method stub
+
+            }
+        } );
+
+        scoreFileTextField.getDocument().addDocumentListener( new DocumentListener() {
+            @Override
+            public void changedUpdate( DocumentEvent e ) {
+                // no-op
+            }
+
+            @Override
+            public void removeUpdate( DocumentEvent e ) {
+                check( e );
+            }
+
+            @Override
+            public void insertUpdate( DocumentEvent e ) {
+                if ( e.getLength() == 0 || e.getOffset() == 0 ) {
+                    // don't check when we are first initializing. Handle manually.
+                    return;
+                }
+                check( e );
+            }
+
+            void check( DocumentEvent e ) {
+                wiz.getStatusField().clear();
+                File f;
+                try {
+                    f = new File( e.getDocument().getText( 0, e.getDocument().getLength() ) );
+                    if ( f.canRead() ) {
+                        validateFile();
+                    }
+                } catch ( BadLocationException e1 ) {
+                    return;
+                }
+
+            }
+        } )
+
+        ;
 
         /*
          * Column choice. Label, field, button in a row.

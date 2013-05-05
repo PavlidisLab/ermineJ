@@ -372,60 +372,78 @@ public class MainFrame extends JFrame {
             return;
         }
 
-        /*
-         * 1. Pick the run and get other settings (latter needed even if only one result available)
-         */
-        SaveAnalysisDialog dialog = new SaveAnalysisDialog( this, this.settings, getCurrentResultSetIndex() );
+        final MainFrame mainFrame = this;
 
-        if ( dialog.wasCancelled() ) {
-            this.statusMessenger.showStatus( "Save cancelled." );
-            return;
-        }
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
 
-        int runNum = dialog.getSelectedRunNum();
-        GeneSetPvalRun runToSave = this.results.get( runNum );
-        boolean includeGenes = dialog.isSaveAllGenes();
+            @Override
+            protected Object doInBackground() throws Exception {
 
-        /*
-         * 2. Pick the file.
-         */
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setApproveButtonText( "OK" );
-        chooser.setDialogTitle( "Save Analysis As:" );
-        // suggest a file name. FIXME this doesn't display right on MacOS?
-        chooser.setSelectedFile( new File( StringUtils.strip(
-                getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
-                + ".erminej.txt" ) );
+                statusMessenger.showProgress( "Waiting for save" );
 
-        int result = chooser.showOpenDialog( this );
+                try {
+                    /*
+                     * 1. Pick the run and get other settings (latter needed even if only one result available)
+                     */
+                    SaveAnalysisDialog dialog = new SaveAnalysisDialog( mainFrame, settings, getCurrentResultSetIndex() );
 
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            File f = new File( chooser.getSelectedFile().toString() );
+                    if ( dialog.wasCancelled() ) {
+                        statusMessenger.showStatus( "Save cancelled." );
+                        return null;
+                    }
 
-            if ( f.exists() ) {
-                int k = JOptionPane.showConfirmDialog( this, "That file exists. Overwrite?", "File exists",
-                        JOptionPane.YES_NO_CANCEL_OPTION );
-                if ( k != JOptionPane.YES_OPTION ) {
-                    this.statusMessenger.showStatus( "Save cancelled." );
-                    return;
-                } // otherwise, bail.
+                    int runNum = dialog.getSelectedRunNum();
+                    GeneSetPvalRun runToSave = results.get( runNum );
+                    boolean includeGenes = dialog.isSaveAllGenes();
+
+                    /*
+                     * 2. Pick the file.
+                     */
+                    JFileChooser chooser = new JFileChooser();
+                    chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+                    chooser.setApproveButtonText( "OK" );
+                    chooser.setDialogTitle( "Save Analysis As:" );
+                    // suggest a file name. FIXME this doesn't display right on MacOS?
+                    chooser.setSelectedFile( new File( StringUtils.strip(
+                            getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
+                            + ".erminej.txt" ) );
+
+                    int result = chooser.showOpenDialog( mainFrame );
+
+                    if ( result == JFileChooser.APPROVE_OPTION ) {
+                        File f = new File( chooser.getSelectedFile().toString() );
+
+                        if ( f.exists() ) {
+                            int k = JOptionPane.showConfirmDialog( mainFrame, "That file exists. Overwrite?",
+                                    "File exists", JOptionPane.YES_NO_CANCEL_OPTION );
+                            if ( k != JOptionPane.YES_OPTION ) {
+                                statusMessenger.showStatus( "Save cancelled." );
+                                return null;
+                            } // otherwise, bail.
+                        }
+
+                        /*
+                         * 3. Save.
+                         */
+
+                        try {
+                            String saveFileName = f.getAbsolutePath();
+                            ResultsPrinter.write( saveFileName, runToSave, includeGenes );
+                            statusMessenger.showStatus( "Saved in " + saveFileName );
+                        } catch ( IOException ioe ) {
+                            GuiUtil.error( "Could not write results to the file. " + ioe );
+                        }
+                    } else {
+                        statusMessenger.showStatus( "Save cancelled." );
+                    }
+                } finally {
+                    // statusMessenger.clear();
+                }
+                return null;
             }
+        };
 
-            /*
-             * 3. Save.
-             */
-
-            try {
-                String saveFileName = f.getAbsolutePath();
-                ResultsPrinter.write( saveFileName, runToSave, includeGenes );
-                this.statusMessenger.showStatus( "Saved" );
-            } catch ( IOException ioe ) {
-                GuiUtil.error( "Could not write results to the file. " + ioe );
-            }
-        } else {
-            this.statusMessenger.showStatus( "Save cancelled." );
-        }
+        r.execute();
     }
 
     /**
@@ -539,33 +557,56 @@ public class MainFrame extends JFrame {
      */
     protected void loadAnalysis( String loadFile ) throws IOException {
 
-        assert loadFile != null;
-
-        disableMenusForAnalysis();
-
-        // the settings used for the analysis, not the same as the application settings.
-        SettingsHolder loadSettings;
         try {
-            loadSettings = new Settings( loadFile );
-        } catch ( ConfigurationException e ) {
-            GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n" + e.getMessage() );
-            return;
+            assert loadFile != null;
+
+            disableMenusForAnalysis();
+
+            // the settings used for the analysis, not the same as the application settings.
+            SettingsHolder loadSettings;
+            try {
+                loadSettings = new Settings( loadFile );
+            } catch ( ConfigurationException e ) {
+                GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n" + e.getMessage() );
+                return;
+            }
+
+            if ( StringUtils.isBlank( loadSettings.getAnnotFile() ) ) {
+                GuiUtil.error( "There was a problem loading the settings from:\n" + loadFile + "\n"
+                        + "The annotation file was blank" );
+                return;
+            }
+
+            /*
+             * Check that we're not switching annotations. Match the file names.
+             */
+            File analysisAnnots = new File( loadSettings.getAnnotFile() );
+            File currentAnnots = new File( this.settings.getAnnotFile() );
+            if ( !analysisAnnots.getName().equals( currentAnnots.getName() ) ) {
+                int response = JOptionPane.showConfirmDialog( this,
+                        "The annotation file for the analysis you are loading seems to be different from the current annotations.\n"
+                                + "This can cause unexpected behaviour. Are you sure you want to proceed?\n\nCurrent: "
+                                + currentAnnots + "\nUsed in analysis: " + analysisAnnots, "Annotation mismatch?",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+                if ( response == JOptionPane.CANCEL_OPTION ) return;
+            }
+
+            this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, loadFile );
+            athread.run();
+            log.debug( "Waiting" );
+
+            Collection<GeneSetPvalRun> latestResults = athread.getLatestResults();
+            for ( GeneSetPvalRun latestResult : latestResults ) {
+                checkForReasonableResults( latestResult );
+                if ( latestResult != null ) addResult( latestResult );
+            }
+
+            athread = null;
+
+            log.debug( "done" );
+        } finally {
+            enableMenusForAnalysis();
         }
-
-        this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, loadFile );
-        athread.run();
-        log.debug( "Waiting" );
-
-        Collection<GeneSetPvalRun> latestResults = athread.getLatestResults();
-        for ( GeneSetPvalRun latestResult : latestResults ) {
-            checkForReasonableResults( latestResult );
-            if ( latestResult != null ) addResult( latestResult );
-        }
-
-        athread = null;
-
-        log.debug( "done" );
-        enableMenusForAnalysis();
     }
 
     protected void loadProject() {
@@ -782,20 +823,18 @@ public class MainFrame extends JFrame {
             }
 
             /*
-             * FIXME If there are already analyses, we should prompt them to save, as it will mess them up? Need to test
-             * behaviour.
+             * If there are already analyses, warn.
              */
             if ( !this.results.isEmpty() ) {
-                // int response = JOptionPane
-                // .showConfirmDialog(
-                // null,
-                // "Your current results will be discarded when"
-                // +
-                // "the anotations load.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
-                // "Unsaved results will be lost",
-                //
-                // JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
-                // if ( response == JOptionPane.CANCEL_OPTION ) return;
+                int response = JOptionPane
+                        .showConfirmDialog(
+                                null,
+                                "Your current results will be discarded when"
+                                        + "the anotations load.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
+                                "Unsaved results will be lost",
+
+                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+                if ( response == JOptionPane.CANCEL_OPTION ) return;
             }
 
             this.settings.setAnnotFile( selectedFile.getAbsolutePath() );
@@ -889,7 +928,9 @@ public class MainFrame extends JFrame {
     void doCancel() {
         log.debug( "Got cancel in thread " + Thread.currentThread().getName() );
 
+        // programming error - cancellation button was enabled when not valid.
         assert athread != null : "Attempt to cancel a null analysis thread";
+
         athread.interrupt();
 
         try {
@@ -923,15 +964,40 @@ public class MainFrame extends JFrame {
      * @param e ActionEvent
      */
     void quitMenuItem_actionPerformed( ActionEvent e ) {
+
+        if ( shutDown() ) {
+
+            System.exit( 0 );
+        }
+    }
+
+    /**
+     * @return
+     */
+    private boolean shutDown() {
         statusMessenger.clear();
+
+        for ( GeneSetPvalRun r : this.results ) {
+            if ( !r.hasBeenSavedToFile() ) {
+                int response = JOptionPane.showConfirmDialog( this, "You have unsaved result(s): " + r.getName()
+                        + ". Quit anyway?", "Unsaved results", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE );
+
+                if ( response == JOptionPane.CANCEL_OPTION ) {
+                    return false;
+                }
+
+                break;
+            }
+        }
 
         /*
          * This is appropriate if for example we loaded a project (which we do not change), but we might as well keep
          * the settings for next time.
          */
         settings.writePrefs();
-
-        System.exit( 0 );
+        statusMessenger.showStatus( "Bye" );
+        return true;
     }
 
     void runAnalysisMenuItem_actionPerformed() {
@@ -1086,11 +1152,14 @@ public class MainFrame extends JFrame {
         this.addWindowListener( new WindowAdapter() {
             @Override
             public void windowClosing( WindowEvent e ) {
-                writePrefs();
+                if ( shutDown() ) {
+                    dispose();
+                    System.exit( 0 );
+                }
             }
         } );
 
-        this.setDefaultCloseOperation( EXIT_ON_CLOSE );
+        this.setDefaultCloseOperation( DO_NOTHING_ON_CLOSE );
 
         this.setSize( new Dimension( 900, 600 ) );
 

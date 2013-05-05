@@ -234,9 +234,11 @@ public class GeneAnnotationParser {
 
                 if ( numTokens >= 6 ) {
                     // Additional columns are ignored. However, new annotation files have the Gemma and NCBI gene ids.
+                    String gemmaID = tokens[4];
                     String ncbiID = tokens[5];
                     try {
-                        gene.setNcbiId( Integer.parseInt( ncbiID ) );
+                        if ( StringUtils.isNotBlank( gemmaID ) ) gene.setGemmaId( Long.parseLong( gemmaID ) );
+                        if ( StringUtils.isNotBlank( ncbiID ) ) gene.setNcbiId( Integer.parseInt( ncbiID ) );
                     } catch ( NumberFormatException e ) {
                         // no big deal
                     }

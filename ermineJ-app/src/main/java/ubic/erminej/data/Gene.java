@@ -24,19 +24,21 @@ import java.util.HashSet;
  */
 public class Gene implements Comparable<Gene> {
 
-    private final String symbol;
-
-    private String name = "[No Name]";
-
-    private Collection<Probe> probes = new HashSet<Probe>();
-
     private Collection<Probe> activeProbes = new HashSet<Probe>();
 
+    private Long gemmaID = null;
+
     private Collection<GeneSetTerm> geneSets = new HashSet<GeneSetTerm>();
+
+    private String name = "[No Name]";
 
     private Integer ncbiId = null;
 
     private Integer ncbiTaxonId = null;
+
+    private Collection<Probe> probes = new HashSet<Probe>();
+
+    private final String symbol;
 
     public Gene( String symbol ) {
         this( symbol, null );
@@ -90,6 +92,10 @@ public class Gene implements Comparable<Gene> {
         return Collections.unmodifiableCollection( activeProbes );
     }
 
+    public Long getGemmaID() {
+        return gemmaID;
+    }
+
     public Collection<GeneSetTerm> getGeneSets() {
         return Collections.unmodifiableCollection( geneSets );
     }
@@ -136,6 +142,10 @@ public class Gene implements Comparable<Gene> {
 
     public void setActiveProbes( Collection<Probe> activeProbes ) {
         this.activeProbes = activeProbes;
+    }
+
+    public void setGemmaId( Long id ) {
+        this.gemmaID = id;
     }
 
     public void setGeneSets( Collection<GeneSetTerm> geneSets ) {

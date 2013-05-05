@@ -123,7 +123,7 @@ public class SaveAnalysisDialog extends JDialog {
 
         // OK on the left is 'standard'
         buttonPanel.add( okButton );
-        buttonPanel.add( cancelButton );
+        buttonPanel.add( cancelButton ); 
 
         cancelButton.addActionListener( new ActionListener() {
             @Override

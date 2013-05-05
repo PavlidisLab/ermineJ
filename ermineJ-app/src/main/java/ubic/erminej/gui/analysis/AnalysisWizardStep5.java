@@ -224,6 +224,10 @@ public class AnalysisWizardStep5 extends WizardStep {
             return;
         }
 
+        /*
+         * TODO: show MF bias for non-ORA settings.
+         */
+
         SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
 
             private GeneScores gs;

@@ -56,9 +56,10 @@ import ubic.erminej.data.Probe;
  */
 public class GeneSetPvalRun {
 
-    private GeneAnnotations geneData; // ones used in the analysis -- this may be immutable, should only be used for
+    public static List<GeneSetTerm> getSortedClasses( final Map<GeneSetTerm, GeneSetResult> results ) {
+        return getSortedClasses( results, false );
+    }
 
-    // analysis
     /**
      * @param
      * @param useMfCorrection Use the multifunctionality results stored.
@@ -112,27 +113,47 @@ public class GeneSetPvalRun {
 
     }
 
-    public static List<GeneSetTerm> getSortedClasses( final Map<GeneSetTerm, GeneSetResult> results ) {
-        return getSortedClasses( results, false );
+    /**
+     * Fill in the ranks
+     * 
+     * @return sorted classes
+     */
+    public static List<GeneSetTerm> populateRanks( final Map<GeneSetTerm, GeneSetResult> results ) {
+        if ( results.isEmpty() ) return new ArrayList<GeneSetTerm>();
+        List<GeneSetTerm> sortedClasses = GeneSetPvalRun.getSortedClasses( results );
+
+        assert sortedClasses.size() > 0;
+        for ( int i = 0; i < sortedClasses.size(); i++ ) {
+            GeneSetResult geneSetResult = results.get( sortedClasses.get( i ) );
+            geneSetResult.setRank( i + 1 );
+            geneSetResult.setRelativeRank( ( double ) i / sortedClasses.size() );
+        }
+        return sortedClasses;
     }
 
+    // ones used in the analysis -- this may be immutable, should only be used for
+    // analysis
+    private GeneAnnotations geneData;
+
+    private String geneScoreColumnName = "";
+
+    private boolean hasBeenSavedToFile = false;
+
     private Histogram hist;
+
+    private StatusViewer messenger = new StatusStderr();
+    private double multifunctionalityCorrelation = -1;
+    private double multifunctionalityEnrichment = -1;
+
+    private double multifunctionalityEnrichmentPvalue = 1.0;
+
+    private String name; // name of this run.
+
+    private int numAboveThreshold = 0;
 
     private Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
 
     private SettingsHolder settings;
-
-    private StatusViewer messenger = new StatusStderr();
-
-    private double multifunctionalityCorrelation = -1;
-    private String name; // name of this run.
-    private int numAboveThreshold = 0;
-
-    private String geneScoreColumnName = "";
-
-    private double multifunctionalityEnrichment = -1;
-
-    private double multifunctionalityEnrichmentPvalue = 1.0;
 
     /**
      * Do a new analysis.
@@ -209,24 +230,6 @@ public class GeneSetPvalRun {
     }
 
     /**
-     * Fill in the ranks
-     * 
-     * @return sorted classes
-     */
-    public static List<GeneSetTerm> populateRanks( final Map<GeneSetTerm, GeneSetResult> results ) {
-        if ( results.isEmpty() ) return new ArrayList<GeneSetTerm>();
-        List<GeneSetTerm> sortedClasses = GeneSetPvalRun.getSortedClasses( results );
-
-        assert sortedClasses.size() > 0;
-        for ( int i = 0; i < sortedClasses.size(); i++ ) {
-            GeneSetResult geneSetResult = results.get( sortedClasses.get( i ) );
-            geneSetResult.setRank( i + 1 );
-            geneSetResult.setRelativeRank( ( double ) i / sortedClasses.size() );
-        }
-        return sortedClasses;
-    }
-
-    /**
      * Do a new analysis, starting from the bare essentials (correlation method not available) (simple API)
      */
     public GeneSetPvalRun( SettingsHolder settings, GeneScores geneScores ) {
@@ -292,8 +295,16 @@ public class GeneSetPvalRun {
         return settings;
     }
 
+    public boolean hasBeenSavedToFile() {
+        return hasBeenSavedToFile;
+    }
+
     public void setName( String name ) {
         this.name = name;
+    }
+
+    public void setSavedToFile( boolean hasBeenSavedToFile ) {
+        this.hasBeenSavedToFile = hasBeenSavedToFile;
     }
 
     @Override

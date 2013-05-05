@@ -46,6 +46,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -179,6 +180,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
         saveRunMenuItem.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+                int columnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
+                int runIndex = model.getRunIndex( columnIndex );
+                callingFrame.setCurrentResultSetIndex( runIndex );
                 callingFrame.saveAnalysisAction();
             }
         } );
@@ -206,7 +211,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
         TableColumn col = table.getColumn( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
         model.renameRun( runIndex, newName );
         col.setIdentifier( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
-        callingFrame.getResultSet( runIndex ).setName( newName );
+        GeneSetPvalRun resultSet = callingFrame.getResultSet( runIndex );
+        resultSet.setName( newName );
+        resultSet.setSavedToFile( false ); // invalidate
 
         List<? extends SortKey> sortKeys = new ArrayList<SortKey>( sorter.getSortKeys() );
         model.fireTableStructureChanged();
@@ -410,13 +417,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
         }
 
-        if ( runSettings.getScoreFile() != null ) {
+        if ( StringUtils.isNotBlank( runSettings.getScoreFile() ) ) {
             String fileName = new File( runSettings.getScoreFile() ).getName();
             coda += "<br/>Scores: " + fileName + " col. " + runSettings.getScoreCol() + " "
                     + geneSetPvalRun.getGeneScoreColumnName() + "<br/>";
         }
 
-        if ( runSettings.getRawDataFileName() != null ) {
+        if ( StringUtils.isNotBlank( runSettings.getRawDataFileName() ) ) {
             String fileName = new File( runSettings.getRawDataFileName() ).getName();
             coda += "Profiles: " + fileName + "<br/>";
         }
@@ -437,7 +444,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
         } else if ( index == GENE_COUNT_COLUMN_INDEX ) {
             return "How many genes are in the group (#probes shown in brackets if different)";
         } else if ( index == MULTIFUNC_COLUMN_INDEX ) {
-            return "Measurement of how biased the category is towards multifunctional genes (1 = highest bias)";
+            return "<html>Measurement of how biased the category<br/> is towards multifunctional genes<br/>"
+                    + "(1 = highest bias; very big groups not counted)</html>";
         } else if ( index >= GeneSetTableModel.INIT_COLUMNS ) {
             int runIndex = model.getRunIndex( index );
             return resultToolTips.get( runIndex );

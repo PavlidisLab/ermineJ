@@ -288,6 +288,7 @@ public class ResultsFileReader {
          */
 
         GeneSetPvalRun newResults = new GeneSetPvalRun( runSettings, geneAnnots, messenger, results, runName );
+        newResults.setSavedToFile( true );
 
         if ( hasMfCorrectedValues ) {
             fillInMultifuncationalityRankDelta( newResults );

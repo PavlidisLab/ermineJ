@@ -61,7 +61,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         super( wiz );
         this.jbInit();
         this.settings = settings;
-     //   wiz.clearStatus();
+        // wiz.clearStatus();
         setValues();
     }
 
@@ -105,17 +105,13 @@ public class AnalysisWizardStep4 extends WizardStep {
         jTextFieldMinClassSize = new JTextField();
         // ButtonGroup buttonGroup2 = new ButtonGroup();
         JPanel step4RightPanel = new JPanel();
-        JPanel jPanelReplicateTreaments = new JPanel();
+        JPanel jPanelReplicateTreatments = new JPanel();
         JLabel jLabelReplicateTreament = new JLabel();
 
         ButtonGroup replicateButtonGroup = new ButtonGroup();
         jRadioButtonBestReplicates = new JRadioButton();
         jRadioButtonMeanReplicates = new JRadioButton();
 
-        /*
-         * FIXME add a listener for the jTextFieldMaxClassSize and jTextFieldMaxClassSize that tells the user how many
-         * groups are selected.
-         */
         jTextFieldMaxClassSize.addKeyListener( countNumGroupsKeyListener );
         jTextFieldMinClassSize.addKeyListener( countNumGroupsKeyListener );
 
@@ -150,10 +146,10 @@ public class AnalysisWizardStep4 extends WizardStep {
 
         jLabelReplicateTreament.setToolTipText( "How will replicates of the same gene be treated?" );
         jLabelReplicateTreament.setText( "Gene replicate treatment" );
-        jPanelReplicateTreaments.setBackground( SystemColor.control );
-        jPanelReplicateTreaments.setBorder( null );
-        jPanelReplicateTreaments.setPreferredSize( new Dimension( 175, 100 ) );
-        jPanelReplicateTreaments
+        jPanelReplicateTreatments.setBackground( SystemColor.control );
+        jPanelReplicateTreatments.setBorder( null );
+        jPanelReplicateTreatments.setPreferredSize( new Dimension( 175, 100 ) );
+        jPanelReplicateTreatments
                 .setToolTipText( "How will replicates of the same gene be treated? (this setting doesn't apply to correlation analysis)" );
         // todo replicate treatments for correlation tooltip.
         jRadioButtonBestReplicates.setBackground( SystemColor.control );
@@ -173,14 +169,14 @@ public class AnalysisWizardStep4 extends WizardStep {
         replicateButtonGroup.add( jRadioButtonBestReplicates );
 
         replicateButtonGroup.add( jRadioButtonMeanReplicates );
-        jPanelReplicateTreaments.add( jLabelReplicateTreament, null );
+        jPanelReplicateTreatments.add( jLabelReplicateTreament, null );
 
-        jPanelReplicateTreaments.add( jRadioButtonBestReplicates, null );
-        jPanelReplicateTreaments.add( jRadioButtonMeanReplicates, null );
-        JList jList1 = new JList();
-        jPanelReplicateTreaments.add( jList1, null );
+        jPanelReplicateTreatments.add( jRadioButtonBestReplicates, null );
+        jPanelReplicateTreatments.add( jRadioButtonMeanReplicates, null );
+        JList<?> jList1 = new JList(); // what is this for?
+        jPanelReplicateTreatments.add( jList1, null );
 
-        step4RightPanel.add( jPanelReplicateTreaments, null );
+        step4RightPanel.add( jPanelReplicateTreatments, null );
         this.addHelp( "<html>" + "<b>Choose"
                 + " the range of class sizes to be considered and how genes occuring more than once are handled.</b>" );
 

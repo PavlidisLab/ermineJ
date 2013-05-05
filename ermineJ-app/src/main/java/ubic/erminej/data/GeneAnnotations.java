@@ -943,8 +943,12 @@ public class GeneAnnotations {
     }
 
     /**
-     * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected probes, removing
-     * probes with no annotations.
+     * Create a new annotation set based on an existing one, for selected probes, removing probes with no annotations.
+     * Subclones should be treated as unmodifiable (though we don't enforce that strongly as it would greatly increase
+     * memory requirements)
+     * <p>
+     * Note that this could be changed in the future to consider the annotation aspect (BP, MF etc) not just the probes
+     * to retain. See comment in the Multifunctionality javadoc.
      * 
      * @param probesToRetain
      * @return

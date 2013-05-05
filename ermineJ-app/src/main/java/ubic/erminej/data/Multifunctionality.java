@@ -47,10 +47,15 @@ import cern.jet.stat.Descriptive;
 
 /**
  * Implementation of multifunctionality computations as described in Gillis and Pavlidis (2011) PLoS ONE 6:2:e17258.
- * This is designed with ErmineJ in mind.
+ * <p>
+ * Note: This computes multifunctionality at 'startup' based on all the annotations available, not necessarily the ones
+ * selected for analysis. For example, if you load KEGG groups along with GO, multifunctionality is computed based on
+ * both of them. But if the user selects only to analyze KEGG, multifunctionality correction is based on the bias in
+ * KEGG+GO. This could be fixed by changing the 'subclone' method of GeneAnnotations to trim aspects, not just genes.
  * 
  * @author paul
  * @version $Id$
+ * @see Gemma for another implementation of parts of this.
  */
 public class Multifunctionality {
     //
@@ -59,6 +64,12 @@ public class Multifunctionality {
     // * needs to be scaled in an ad-hoc way to be reasonable)
     // */
     // private static final boolean USE_AUC_FOR_GENE_SET_MF = false;
+
+    /**
+     * Largest group that we consider for computing multifunctionality. This mostly affects how we compute rankings of
+     * the terms.
+     */
+    private static final int MAX_GROUP_SIZE_FOR_MF = 2000;
 
     /**
      * Do we count genes that don't have GO terms? .
@@ -164,7 +175,6 @@ public class Multifunctionality {
             scores.set( i, s );
             mfs.set( i, mf );
             i++;
-
         }
 
         LeastSquaresFit fit;
@@ -409,7 +419,7 @@ public class Multifunctionality {
     }
 
     /**
-     * Convenience method
+     * Convenience method.
      * 
      * @param genes
      * @return the gene with the highest multifunctionality
@@ -498,7 +508,7 @@ public class Multifunctionality {
 
     /**
      * Populate the multifunctionality of each gene set. This is computed by looking at how the genes in the set compare
-     * to the gene multifuncxtionality ranking, using ROC.
+     * to the gene multifuncttionality ranking, using ROC.
      */
     private void computeGoTermMultifunctionalityRanks() {
 
@@ -507,12 +517,13 @@ public class Multifunctionality {
 
         // int numGenes = USE_UNANNOTATED_GENES ? rawGeneMultifunctionalityRanks.size() : genesWithGoTerms.size();
         int numGenes = rawGeneMultifunctionalityRanks.size();
-        int numGoGroups = geneAnnots.getGeneSetTerms().size();
+        // int numGoGroups = geneAnnots.getGeneSetTerms().size();
 
         /*
-         * For each go term, compute it's AUC w.r.t. the multifunctionality ranking.. We work with the
-         * multifunctionality ranks, rawGeneMultifunctionalityRanks
+         * For each go term, compute its AUC w.r.t. the multifunctionality ranking.. We work with the multifunctionality
+         * ranks, rawGeneMultifunctionalityRanks
          */
+        Map<GeneSetTerm, MFV> tmp = new HashMap<GeneSetTerm, MFV>();
         for ( GeneSetTerm goset : geneAnnots.getGeneSetTerms() ) {
 
             if ( !goGroupSizes.containsKey( goset ) ) {
@@ -526,6 +537,10 @@ public class Multifunctionality {
 
             assert inGroup >= geneAnnots.getMinimumGeneSetSize();
 
+            if ( inGroup > MAX_GROUP_SIZE_FOR_MF ) {
+                continue;
+            }
+
             // check for pathological condition
             if ( outGroup == 0 ) {
                 continue;
@@ -536,6 +551,7 @@ public class Multifunctionality {
             assert aucp >= 0.0 && aucp <= 1.0;
             goTermMultifunctionality.put( goset, auc );
             goTermMultifunctionalityPvalue.put( goset, aucp );
+            tmp.put( goset, new MFV( auc, aucp ) );
         }
 
         if ( timer.getTime() > 1000 ) {
@@ -543,9 +559,10 @@ public class Multifunctionality {
         }
 
         // convert to relative ranks, where 1.0 is the most multifunctional; ties are broken by averaging.
-        Map<GeneSetTerm, Double> rankedGOMf = Rank.rankTransform( this.goTermMultifunctionalityPvalue );
+        Map<GeneSetTerm, Double> rankedGOMf = Rank.rankTransform( tmp );
+
         for ( GeneSetTerm goTerm : rankedGOMf.keySet() ) {
-            double rankRatio = ( rankedGOMf.get( goTerm ) + 1 ) / numGoGroups;
+            double rankRatio = rankedGOMf.get( goTerm ) / rankedGOMf.size();
             this.goTermMultifunctionalityRank.put( goTerm, Math.max( 0.0, 1.0 - rankRatio ) );
         }
     }
@@ -627,4 +644,27 @@ public class Multifunctionality {
         }
     }
 
+}
+
+class MFV implements Comparable<MFV> {
+    private Double p;
+    private Double a;
+
+    public MFV( Double a, Double p ) {
+        this.a = a;
+        this.p = p;
+    }
+
+    @Override
+    public int compareTo( MFV o ) {
+
+        if ( this.p.equals( o.p ) ) {
+            // large AUC better.
+            return -this.a.compareTo( o.a );
+        }
+
+        // small P better.
+        return this.p.compareTo( o.p );
+
+    }
 }

@@ -80,6 +80,7 @@ public class ResultsPrinter {
         Writer w = getDestination( destFile );
         printHeading( w );
         printOneResultSet( run, w, saveAllGeneNames, true );
+        run.setSavedToFile( true );
         w.close();
     }
 

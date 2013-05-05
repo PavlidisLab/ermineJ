@@ -814,7 +814,7 @@ public class GeneScores {
 
         assert genes.size() > 0;
 
-        int counter = 0;
+        int usable = 0;
         int notUsable = 0;
         for ( Gene gene : genes ) {
 
@@ -866,24 +866,24 @@ public class GeneScores {
                     geneScore /= usableProbesForGene; // take the mean
                 }
                 geneToScoreMap.put( gene, geneScore );
-                counter++;
+                usable++;
             } else {
                 notUsable++;
             }
         } // end of iter over genes.
 
-        if ( counter == 0 ) {
+        if ( usable == 0 ) {
             // this is okay, if we're trying to show the class despite there being no results.
             messenger.showStatus( "No valid gene-to-score mappings were found." );
             return;
         }
 
-        if ( notUsable > 0 && counter / ( double ) notUsable < 0.1 ) {
-            messenger.showWarning( "Usable scores for only " + counter + " distinct genes found ("
-                    + String.format( "%.2f", 100.0 * counter / ( double ) notUsable ) + "%)" );
+        if ( notUsable > 0 && usable / ( double ) notUsable < 0.1 ) {
+            messenger.showWarning( "Usable scores for only " + usable + " distinct genes found ("
+                    + String.format( "%.2f", 100.0 * usable / ( double ) ( usable + notUsable ) ) + "%)" );
         } else {
-            messenger.showStatus( "Usable scores for " + counter + " distinct genes found ("
-                    + String.format( "%.2f", 100.0 * counter / ( double ) notUsable ) + "%)" );
+            messenger.showStatus( "Usable scores for " + usable + " distinct genes found ("
+                    + String.format( "%.2f", 100.0 * usable / ( double ) ( usable + notUsable ) ) + "%)" );
         }
     }
 
