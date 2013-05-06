@@ -468,7 +468,7 @@ public class Multifunctionality {
         return this.geneMultifunctionality.get( gene );
     }
 
-    /**
+    /** 
      * How many genes have multifunctionality scores.
      * 
      * @return

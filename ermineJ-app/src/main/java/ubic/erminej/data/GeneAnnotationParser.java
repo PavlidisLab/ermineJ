@@ -246,7 +246,7 @@ public class GeneAnnotationParser {
             }
 
             if ( messenger != null && ++n % LINES_READ_UPDATE_FREQ == 0 ) {
-                messenger.showProgress( "Read " + n + " probes" );
+                messenger.showProgress( "Read " + n + " elements" );
                 try {
                     Thread.sleep( 20 );
                 } catch ( InterruptedException e ) {
@@ -385,7 +385,7 @@ public class GeneAnnotationParser {
             String geneSymbol = fields[geneSymbolIndex];
 
             if ( StringUtils.isBlank( probeId ) || probeId.equals( "---" ) ) {
-                throw new IllegalStateException( "Probe name was missing or invalid at line " + n
+                throw new IllegalStateException( "Element name was missing or invalid at line " + n
                         + "; it is possible the file format is not readable; contact the developers." );
             }
 

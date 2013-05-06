@@ -360,6 +360,7 @@ public class GeneScores {
      */
     public GeneAnnotations getPrunedGeneAnnotations() {
         // lightweight except for first time.
+        if ( this.probeToScoreMap.isEmpty() ) return this.originalGeneAnnots;
         GeneAnnotations subClone = originalGeneAnnots.subClone( this.probeToScoreMap.keySet() );
         assert this.probeToScoreMap.keySet().containsAll( subClone.getProbes() );
         assert subClone.getProbes().containsAll( this.probeToScoreMap.keySet() );

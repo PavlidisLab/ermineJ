@@ -341,7 +341,13 @@ public abstract class GeneSetPanel extends JScrollPane {
                     } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
                         // SLOW, if we don't already have results. Possibly store in a field?
                         geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData );
-                        prunedGeneAnnots = geneScores.getPrunedGeneAnnotations();
+
+                        if ( geneScores.getProbeToScoreMap().isEmpty() ) {
+                            geneScores = null;
+                            prunedGeneAnnots = geneData;
+                        } else {
+                            prunedGeneAnnots = geneScores.getPrunedGeneAnnotations();
+                        }
                         // } else if ( StringUtils.isNotBlank( settings.getRawDataFileName() ) ) {
                         /*
                          * Get the probe list from the raw data file. FIXME implement; could be slow.
@@ -369,8 +375,8 @@ public abstract class GeneSetPanel extends JScrollPane {
 
                     log.debug( "Request for details of gene set: " + id + ", run: " + run );
                     if ( !prunedGeneAnnots.hasGeneSet( id ) ) {
-                        callingFrame.getStatusMessenger()
-                                .showWarning( id + " is not available for viewing in your data." );
+                        callingFrame.getStatusMessenger().showWarning(
+                                id + " is not available for viewing in your data." );
                         return;
                     }
 
@@ -390,7 +396,7 @@ public abstract class GeneSetPanel extends JScrollPane {
                 } catch ( Exception ex ) {
                     GuiUtil.error( "There was an unexpected error while trying to display the gene "
                             + "set details.\nSee the log file for details.\nThe summary message was:\n"
-                            + ex.getMessage() ); 
+                            + ex.getMessage() );
                     messenger
                             .showError( "There was an unexpected error while trying to display the gene set details.\n"
                                     + "See the log file for details.\nThe summary message was:\n" + ex.getMessage() );

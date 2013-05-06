@@ -371,7 +371,11 @@ public class GeneSetDetails {
         if ( StringUtils.isNotBlank( scoreFile ) ) {
             try {
                 callerStatusViewer.showStatus( "Getting gene scores from " + scoreFile );
-                return new GeneScores( scoreFile, s, null, this.geneData );
+                GeneScores scores = new GeneScores( scoreFile, s, null, this.geneData );
+                if ( scores.getProbeToScoreMap().isEmpty() ) {
+                    return null;
+                }
+                return scores;
             } catch ( Exception e ) {
                 callerStatusViewer.showError( scoreFile + " is not readable: " + e );
             }

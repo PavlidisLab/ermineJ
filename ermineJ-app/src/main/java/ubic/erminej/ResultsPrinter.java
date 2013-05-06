@@ -111,6 +111,7 @@ public class ResultsPrinter {
 
             for ( GeneSetPvalRun run : runsToSave ) {
                 printOneResultSet( run, w, masterSettings.getSaveAllGenesInOutput(), true );
+                run.setSavedToFile( true );
             }
         } catch ( IOException e ) {
             throw e;
