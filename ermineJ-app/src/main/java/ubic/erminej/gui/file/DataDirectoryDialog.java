@@ -70,7 +70,7 @@ public class DataDirectoryDialog extends AppDialog {
         loadBrowseButton.setEnabled( true );
         loadBrowseButton.setText( "Browse...." );
         loadBrowseButton.addActionListener( new DataDirectoryDialog_dataDirBrowseButton_actionAdapter( this ) );
-        annotLabel.setPreferredSize( new Dimension( 320, 15 ) );
+        annotLabel.setMinimumSize( new Dimension( 320, 15 ) );
         annotLabel.setText( "Load file:" );
         loadPanel.setBackground( SystemColor.control );
         loadPanel.setPreferredSize( new Dimension( 330, 50 ) );

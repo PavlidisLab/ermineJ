@@ -78,7 +78,6 @@ public class GeneSetWizardStep1 extends WizardStep {
         jLabel8.setText( "Choose the method of data entry:" );
         jLabel8.setMaximumSize( new Dimension( 999, 15 ) );
         jLabel8.setMinimumSize( new Dimension( 259, 15 ) );
-        jLabel8.setPreferredSize( new Dimension( 259, 15 ) );
 
         JPanel jPanel4 = new JPanel(); // holds radio buttons
         jPanel4.setBorder( BorderFactory.createEtchedBorder() );

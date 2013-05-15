@@ -119,7 +119,7 @@ public class AnalysisWizardStep3 extends WizardStep {
 
         buttonPanel.setLayout( new BoxLayout( buttonPanel, BoxLayout.Y_AXIS ) );
 
-        buttonPanel.setPreferredSize( new Dimension( 550, 140 ) );
+        buttonPanel.setMinimumSize( new Dimension( 550, 140 ) );
 
         biologicalProcessButton = new JCheckBox();
         biologicalProcessButton.setBorder( BorderFactory.createEmptyBorder( 15, 5, 2, 20 ) );

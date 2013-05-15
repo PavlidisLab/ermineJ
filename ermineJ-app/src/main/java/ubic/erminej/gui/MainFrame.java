@@ -400,6 +400,7 @@ public class MainFrame extends JFrame {
                      * 2. Pick the file.
                      */
                     JFileChooser chooser = new JFileChooser();
+                    chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
                     chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
                     chooser.setApproveButtonText( "OK" );
                     chooser.setDialogTitle( "Save Analysis As:" );

@@ -336,7 +336,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                 // if ( result.getMultifunctionalityCorrectedRankDelta() > 200 ) {
                 // mfstring += mfstring;
                 // }
-                if ( result.getMfCorrectedPvalue() > 0.1 ) {
+                if ( result.getMfCorrectedFdr() > 0.1 ) {
                     textColor = "#777777";
                 }
             }

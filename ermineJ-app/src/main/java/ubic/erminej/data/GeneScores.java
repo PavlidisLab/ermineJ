@@ -555,6 +555,9 @@ public class GeneScores {
         }
 
         int i = 0;
+        Set<String> unMatched = new HashSet<String>();
+        Set<String> unAnnotated = new HashSet<String>();
+
         for ( String idr : identifiers ) {
 
             String id = StringUtils.strip( idr );
@@ -570,6 +573,7 @@ public class GeneScores {
                 g = originalGeneAnnots.findGene( id );
 
                 if ( g == null ) {
+                    unMatched.add( id );
                     continue;
                 }
 
@@ -583,6 +587,7 @@ public class GeneScores {
             }
 
             if ( g.getGeneSets().isEmpty() ) {
+                unAnnotated.add( id );
                 continue;
             }
 
@@ -606,6 +611,16 @@ public class GeneScores {
 
         if ( probeToScoreMap.size() == 1 ) {
             throw new IllegalArgumentException( "Hit list must have at least two recognized items" );
+        }
+
+        if ( !unAnnotated.isEmpty() ) {
+            messenger.showStatus( unAnnotated.size() + " of the genes in the list were unannotated" );
+        }
+
+        if ( !unMatched.isEmpty() ) {
+            messenger.showStatus( "Some identifiers were not identified. Examples: "
+                    + StringUtils.join(
+                            ArrayUtils.subarray( unMatched.toArray(), 0, Math.max( unMatched.size(), 20 ) ), " " ) );
         }
 
         messenger.showStatus( probeToScoreMap.size() + " genes/elements were recognized." );

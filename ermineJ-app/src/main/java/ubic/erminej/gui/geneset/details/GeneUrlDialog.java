@@ -109,7 +109,7 @@ public class GeneUrlDialog extends JDialog {
 
         urlTextField = new JTextField();
         initializeFieldText();
-        urlTextField.setPreferredSize( new Dimension( 500, 19 ) );
+        urlTextField.setMinimumSize( new Dimension( 500, 19 ) );
         centerPanel.add( urlTextField, null );
 
         bottomPanel.setPreferredSize( new Dimension( 200, 40 ) );

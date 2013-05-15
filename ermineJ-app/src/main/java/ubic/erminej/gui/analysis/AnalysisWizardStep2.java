@@ -233,7 +233,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         jLabel4.setLabelFor( dataColumnPanel );
 
         dataColTextField = new JTextField();
-        dataColTextField.setPreferredSize( new Dimension( 50, 19 ) );
+        dataColTextField.setMinimumSize( new Dimension( 50, 19 ) );
         dataColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
         dataColTextField.setText( "2" );
         dataColTextField
@@ -265,8 +265,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         rawFileBrowseButton.setText( "Browse" );
         rawFileBrowseButton.addActionListener( new RawFileBrowse( this ) );
         rawFileTextField = new JTextField();
-        rawFileTextField.setPreferredSize( new Dimension( 325, 19 ) );
-        rawFileTextField.setMaximumSize( new Dimension( 500, 19 ) );
+        rawFileTextField.setMinimumSize( new Dimension( 325, 19 ) );
+        rawFileTextField.setMaximumSize( new Dimension( 500, 190 ) );
 
         rawDataBrowsePanel.setLayout( new BoxLayout( rawDataBrowsePanel, BoxLayout.X_AXIS ) );
         rawDataBrowsePanel.add( rawFileTextField );
@@ -301,9 +301,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         scoreFileBrowseButton.setEnabled( true );
         scoreFileBrowseButton.setText( "Browse" );
         scoreFileBrowseButton.addActionListener( new ScoreFileBrowse( this ) );
-        scoreFileTextField = new JTextField();
+        scoreFileTextField = new JTextField( 2 );
         scoreFileTextField.setMaximumSize( new Dimension( 500, 19 ) );
-        scoreFileTextField.setPreferredSize( new Dimension( 225, 19 ) );
+        scoreFileTextField.setMinimumSize( new Dimension( 225, 19 ) );
 
         JPanel scoreFileBrowsePanel = new JPanel();
         scoreFileBrowsePanel.setLayout( new BoxLayout( scoreFileBrowsePanel, BoxLayout.X_AXIS ) );
@@ -368,10 +368,10 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         jLabel3.setText( "Column:" );
         jLabel3.setLabelFor( scoreColumnPanel );
 
-        scoreColTextField = new JTextField();
-        scoreColTextField.setPreferredSize( new Dimension( 50, 19 ) );
+        scoreColTextField = new JTextField( 2 );
+        scoreColTextField.setMinimumSize( new Dimension( 50, 19 ) );
         scoreColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
-        scoreColTextField.setText( "2" );
+        scoreColTextField.setText( "2" ); // default before any settings.
         scoreColTextField
                 .setToolTipText( "Column of the score file containing the scores. This must be a value of 2 or higher." );
         scoreColTextField.setEditable( true );
