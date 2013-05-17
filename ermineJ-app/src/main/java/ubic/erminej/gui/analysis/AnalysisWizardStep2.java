@@ -675,7 +675,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     public void updateView() {
         assert wiz != null;
-        quickPickPanel.setVisible( wiz.getAnalysisType().equals( SettingsHolder.Method.ORA ) );
+        boolean makeQuickPickVisible = wiz.getAnalysisType().equals( SettingsHolder.Method.ORA );
+        log.info( "Quick pick is available" );
+        quickPickPanel.setVisible( makeQuickPickVisible );
 
         if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
             validateFile();

@@ -2,7 +2,7 @@
 	<information>
 	<title>ErmineJ</title>
 	<vendor>$project.Organization.Name</vendor>
-	<homepage href="http://www.chibi.ubc.ca/ermineJ"/>
+	<homepage href="http://ermineJ.chibi.ubc.ca/"/>
 	<description>ErmineJ gene set analysis</description>
 	<icon href="ermineJ.gif"/>
 #if($offlineAllowed) 
