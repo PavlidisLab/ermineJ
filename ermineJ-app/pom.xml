@@ -235,6 +235,7 @@
 					<setupScript>${basedir}/src/main/nsis/ermineJ-setup.nsi</setupScript>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -286,45 +287,56 @@
 						<mainClass>ubic.erminej.ErmineJGui</mainClass>
 						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
 					</jnlp>
-					<!-- <dependencies> <includes> <include>baseCode:baseCode</include> <include>gemma:gemma-mda</include> <include>gemma:gemma-util</include> 
-						<include>colt:colt</include> <include>commons-lang:commons-lang</include> <include>commons-configuration:commons-configuration</include> 
-						<include>commons-collections:commons-collections</include> <include>commons-cli:commons-cli</include> <include>commons-logging:commons-logging</include> 
-						<include>mtj:mtj</include> <include>javahelp:jh</include> <include>opencsv:opencsv</include> <include>xerces:xercesImpl</include> 
-						<include>jfree:jfreechart</include> <include>jfree:jcommon</include> <include>log4j:log4j</include> <include>antlr:antlr</include> 
-						<include>jsontools:jsontools-core</include> <include>ermineJ:ermineJ-help</include> </includes> </dependencies> -->
 					<sign>
-						<keypass>m2m2m2</keypass>
-						<storepass>m2m2m2</storepass>
+						<keypass>${jarpass}</keypass>
+						<storepass>${jarpass}</storepass>
 						<alias>pavlab</alias>
 						<validity>180</validity>
-						<dnameCn>bioinformatics.ubc.ca</dnameCn>
-						<dnameOu>CHiBi</dnameOu>
-						<dnameO>Pavlidis Lab</dnameO>
+						<dnameCn>www.chibi.ubc.ca</dnameCn>
+						<dnameOu>PavlidisLab</dnameOu>
+						<dnameO>CHiBi</dnameO>
 						<dnameL>Vancouver</dnameL>
 						<dnameSt>BC</dnameSt>
 						<dnameC>CN</dnameC>
 						<verify>true</verify>
 						<keystoreConfig>
-							<delete>false</delete>
-							<gen>false</gen>
+						  <delete>false</delete>
+						  <gen>false</gen>
 						</keystoreConfig>
 					</sign>
-					<unsign>true</unsign>
+					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
+					<unsign>true</unsign> <!-- old? -->
 					<pack200>false</pack200>
 					<gzip>true</gzip>
 					<verbose>true</verbose>
+					<verifyjar>true</verifyjar>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.izpack</groupId>
-				<artifactId>izpack-maven-plugin</artifactId>
-				<version>5.0.0-beta8</version>
-				<configuration>
-					<izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}</izpackBasedir>
-				</configuration>
+			   <groupId>org.codehaus.mojo</groupId>
+			   <artifactId>keytool-maven-plugin</artifactId>
+			   <version>1.2</version>
+			   <executions>
+			     <execution>
+			   <goals><goal>generateKeyPair</goal></goals></execution></executions>
+			   <configuration>
+			     <keystore>~/.keystore</keystore>
+			     <storepass>${jarpass}</storepass>
+			     <keypass>${jarpass}</keypass>
+			     <alias>pavlab</alias>
+			     <dname>cn=erminej.chibi.ubc.ca, ou=PavlidisLab, L=Vancouver, ST=BC, o=CHiBi, c=CA</dname>
+			   </configuration>
 			</plugin>
-		</plugins>
-		<extensions>
+			<plugin>
+			  <groupId>org.codehaus.izpack</groupId>
+			  <artifactId>izpack-maven-plugin</artifactId>
+			  <version>5.0.0-beta8</version>
+			  <configuration>
+			    <izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}</izpackBasedir>
+			  </configuration>
+			</plugin>
+		      </plugins>
+		      <extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ssh-external</artifactId>
