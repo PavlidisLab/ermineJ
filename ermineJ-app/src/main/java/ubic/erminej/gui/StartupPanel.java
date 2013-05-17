@@ -293,7 +293,7 @@ public class StartupPanel extends JPanel {
                     try {
 
                         final String testPath = settings.getDataDirectory() + File.separator + result.getShortName()
-                                + ".an.txt.gz";
+                                + "_noParents.an.txt.gz";
 
                         annotFileTextField.setText( "Fetching annots for " + result.getShortName() + " ..." );
 

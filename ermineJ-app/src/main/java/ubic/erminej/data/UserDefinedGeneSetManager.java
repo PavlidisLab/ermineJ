@@ -281,13 +281,22 @@ public class UserDefinedGeneSetManager {
         BufferedReader dis = new BufferedReader( new InputStreamReader( is ) );
         Collection<GeneSet> result = new HashSet<GeneSet>();
 
+        int failures = 0;
         while ( dis.ready() ) {
             GeneSet newSet = readOneSet( dis );
             if ( newSet == null ) {
                 log.warn( "Set was not read" );
+                failures++;
                 continue;
             }
             result.add( newSet );
+
+            // incorrectly formatted files can cause a lot of trouble.
+            if ( failures > 10 ) {
+                statusMessenger.showError( "There were too many errors reading the gene set file, stopping" );
+                break;
+            }
+
         }
         dis.close();
         return result;
@@ -333,12 +342,23 @@ public class UserDefinedGeneSetManager {
 
         Collection<GeneSet> result = new HashSet<GeneSet>();
 
+        int failures = 0;
         while ( dis.ready() ) {
             GeneSet newSet = readOneSet( dis );
 
             if ( newSet == null ) {
+                failures++;
+
+                if ( failures > 10 ) {
+                    // incorrectly formatted files can cause a lot of trouble.
+                    statusMessenger.showError( "There were too many errors reading a gene set file, stopping: "
+                            + fileName );
+                    break;
+                }
+
                 continue;
             }
+
             newSet.setSourceFile( fileName );
             result.add( newSet );
         }

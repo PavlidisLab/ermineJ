@@ -131,7 +131,6 @@ public class AnnotationListFrame extends JDialog {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 dispose();
-
             }
         } );
 
