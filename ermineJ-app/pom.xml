@@ -193,8 +193,8 @@
 						<copy todir="${project.build.directory}/staging/lib">
 							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
 								<include name="ermineJ-app.jar" />
-								<!--<include name="ermineJ-help.jar" />-->
-								<!-- <include name="forehead.jar" />   -->
+								<!--<include name="ermineJ-help.jar" /> -->
+								<!-- <include name="forehead.jar" /> -->
 								<include name="baseCode.jar" />
 								<include name="gemma-mda.jar" />
 								<include name="gemma-util.jar" />
@@ -270,30 +270,30 @@
 			</plugin>
 
 			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-jarsigner-plugin</artifactId>
-			  <version>1.2</version>
-			  <executions>
-			    <execution>
-			      <id>sign</id>
-			      <goals>
-				<goal>sign</goal>
-			      </goals>
-			    </execution>
-			    <execution>
-			      <id>verify</id>
-			      <goals>
-				<goal>verify</goal>
-			      </goals>
-			    </execution>
-			  </executions>
-			  <configuration>
-			    <keystore>~/.keystore</keystore>
-			    <alias>pavlab</alias>
-			    <storepass>${jarpass}</storepass>
-			    <keypass>${jarpass}</keypass>
-			    <removeExistingSignatures>true</removeExistingSignatures>
-			  </configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>~/.keystore</keystore>
+					<alias>pavlab</alias>
+					<storepass>${jarpass}</storepass>
+					<keypass>${jarpass}</keypass>
+					<removeExistingSignatures>true</removeExistingSignatures>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -303,93 +303,92 @@
 				<version>1.0-beta-3</version>
 				<inherited>false</inherited>
 				<executions>
-				  <execution>
-<!--				    <phase>package</phase>-->
-				    <goals>
-				      <goal>jnlp-inline</goal>
-				    </goals>
-				  </execution>
+					<execution>
+						<!-- <phase>package</phase> -->
+						<goals>
+							<goal>jnlp-inline</goal>
+						</goals>
+					</execution>
 				</executions>
 				<configuration>
-				  <dependencies>
-				    <includes>
-				      <include>baseCode:baseCode</include>
-				      <include>gemma:gemma-mda</include>
-				      <include>gemma:gemma-util</include>
-				      <include>colt:colt</include>
-				      <include>commons-lang:commons-lang</include>
-				      <include>commons-configuration:commons-configuration</include>
-				      <include>commons-collections:commons-collections</include>
-				      <include>commons-cli:commons-cli</include>
-				      <include>commons-logging:commons-logging</include>
-				      <include>org.apache.commons:commons-math</include>
-				      <include>mtj:mtj</include>
-				      <include>xerces:xercesImpl</include>
-				      <include>jfree:jfreechart</include>
-				      <include>com.sdicons.jsontools:jsontools-core</include>
-				      <include>jfree:jcommon</include>
-				      <include>antlr:antlr</include>
-				      <include>log4j:log4j</include>
-				    </includes>
-				  </dependencies>
-				  <jnlp>
-				    <outputFile>ermineJ.jnlp</outputFile>
-				    <mainClass>ubic.erminej.ErmineJGui</mainClass>
-				    <inputTemplate>src/main/jnlp/template.vm</inputTemplate>
-				  </jnlp>
-<!--				  <excludeTransitive>true</excludeTransitive>-->
-				  <sign>
-				    <keystore>~/.keystore</keystore>
-				    <keypass>${jarpass}</keypass>
-				    <storepass>${jarpass}</storepass>
-				    <alias>pavlab</alias>
-				    <!--				    <validity>1800</validity>
-				    <dnameCn>www.chibi.ubc.ca</dnameCn>
-				    <dnameOu>PavlidisLab</dnameOu>
-				    <dnameO>CHiBi</dnameO>
-				    <dnameL>Vancouver</dnameL>
-				    <dnameSt>BC</dnameSt>
-				    <dnameC>CN</dnameC>-->
-<!--				    <verify>true</verify>-->
-				    <keystoreConfig>
-				      <delete>false</delete>
-				      <gen>false</gen>
-				    </keystoreConfig>
-				  </sign>
-				  <unsignAlreadySignedJars>true</unsignAlreadySignedJars>
-				  <unsign>true</unsign> <!-- old? -->
-				  <pack200>false</pack200>
-				  <gzip>true</gzip>
-				  <verbose>true</verbose>
-				  <verifyjar>true</verifyjar>
+					<dependencies>
+						<includes>
+							<include>baseCode:baseCode</include>
+							<include>gemma:gemma-mda</include>
+							<include>gemma:gemma-util</include>
+							<include>colt:colt</include>
+							<include>commons-lang:commons-lang</include>
+							<include>commons-configuration:commons-configuration</include>
+							<include>commons-collections:commons-collections</include>
+							<include>commons-cli:commons-cli</include>
+							<include>commons-logging:commons-logging</include>
+							<include>org.apache.commons:commons-math</include>
+							<include>mtj:mtj</include>
+							<include>xerces:xercesImpl</include>
+							<include>jfree:jfreechart</include>
+							<include>com.sdicons.jsontools:jsontools-core</include>
+							<include>jfree:jcommon</include>
+							<include>antlr:antlr</include>
+							<include>log4j:log4j</include>
+						</includes>
+					</dependencies>
+					<jnlp>
+						<outputFile>ermineJ.jnlp</outputFile>
+						<mainClass>ubic.erminej.ErmineJGui</mainClass>
+						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
+					</jnlp>
+					<!-- <excludeTransitive>true</excludeTransitive> -->
+					<sign>
+						<keystore>~/.keystore</keystore>
+						<keypass>${jarpass}</keypass>
+						<storepass>${jarpass}</storepass>
+						<alias>pavlab</alias>
+						<!-- <validity>1800</validity> <dnameCn>www.chibi.ubc.ca</dnameCn> <dnameOu>PavlidisLab</dnameOu> <dnameO>CHiBi</dnameO> 
+							<dnameL>Vancouver</dnameL> <dnameSt>BC</dnameSt> <dnameC>CN</dnameC> -->
+						<!-- <verify>true</verify> -->
+						<keystoreConfig>
+							<delete>false</delete>
+							<gen>false</gen>
+						</keystoreConfig>
+					</sign>
+					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
+					<unsign>true</unsign> <!-- old? -->
+					<pack200>false</pack200>
+					<gzip>true</gzip>
+					<verbose>true</verbose>
+					<verifyjar>true</verifyjar>
 				</configuration>
 			</plugin>
 			<plugin>
-			   <groupId>org.codehaus.mojo</groupId>
-			   <artifactId>keytool-maven-plugin</artifactId>
-			   <version>1.2</version>
-			   <executions>
-			     <execution>
-			   <goals><goal>generateKeyPair</goal></goals></execution></executions>
-			   <configuration>
-			     <keystore>~/.keystore</keystore>
-			     <storepass>${jarpass}</storepass>
-			     <keypass>${jarpass}</keypass>
-			     <alias>pavlab</alias>
-			     <dname>cn=erminej.chibi.ubc.ca, ou=PavlidisLab, L=Vancouver, ST=BC, o=CHiBi, c=CA</dname>
-			     <validity>1800</validity>
-			   </configuration>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>keytool-maven-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generateKeyPair</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>~/.keystore</keystore>
+					<storepass>${jarpass}</storepass>
+					<keypass>${jarpass}</keypass>
+					<alias>pavlab</alias>
+					<dname>cn=erminej.chibi.ubc.ca, ou=PavlidisLab, L=Vancouver, ST=BC, o=CHiBi, c=CA</dname>
+					<validity>1800</validity>
+				</configuration>
 			</plugin>
 			<plugin>
-			  <groupId>org.codehaus.izpack</groupId>
-			  <artifactId>izpack-maven-plugin</artifactId>
-			  <version>5.0.0-beta8</version>
-			  <configuration>
-			    <izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}</izpackBasedir>
-			  </configuration>
+				<groupId>org.codehaus.izpack</groupId>
+				<artifactId>izpack-maven-plugin</artifactId>
+				<version>5.0.0-beta8</version>
+				<configuration>
+					<izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}</izpackBasedir>
+				</configuration>
 			</plugin>
-		      </plugins>
-		      <extensions>
+		</plugins>
+		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ssh-external</artifactId>
