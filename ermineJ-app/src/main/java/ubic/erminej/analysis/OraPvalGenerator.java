@@ -149,7 +149,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         Map<GeneSetTerm, Double> monitoredRanks = getMFMonitoredSets( referenceResults, sortedClasses );
 
-        if ( monitoredRanks.isEmpty() ) {
+        if ( monitoredRanks.isEmpty() || monitoredRanks.size() < 2 /* heuristic to avoid problems */) {
             this.messenger.showStatus( "Insufficient enrichment found, skipping multifunctionality correction" );
             return referenceResults;
         }
@@ -565,7 +565,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         for ( GeneSetTerm k : oldRanks.keySet() ) {
             oldR.add( oldRanks.get( k ) );
             Double double1 = newRanks.get( k );
-            assert double1 != null;
+            assert double1 != null : "There was no new ranking for " + k;
             newR.add( double1 );
         }
 
