@@ -52,12 +52,6 @@
 			<type>jar</type>
 		</dependency>
 		<dependency>
-			<groupId>javahelp</groupId>
-			<artifactId>jh</artifactId>
-			<version>2.0</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
 			<groupId>forehead</groupId>
 			<artifactId>forehead</artifactId>
 			<version>1.0-beta-5</version>
@@ -193,7 +187,6 @@
 						<copy todir="${project.build.directory}/staging/lib">
 							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
 								<include name="ermineJ-app.jar" />
-								<!--<include name="ermineJ-help.jar" /> -->
 								<!-- <include name="forehead.jar" /> -->
 								<include name="baseCode.jar" />
 								<include name="gemma-mda.jar" />
@@ -269,32 +262,11 @@
 				</executions>
 			</plugin>
 
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jarsigner-plugin</artifactId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<id>sign</id>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>verify</id>
-						<goals>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>~/.keystore</keystore>
-					<alias>pavlab</alias>
-					<storepass>${jarpass}</storepass>
-					<keypass>${jarpass}</keypass>
-					<removeExistingSignatures>true</removeExistingSignatures>
-				</configuration>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jarsigner-plugin</artifactId> <version>1.2</version> 
+				<executions> <execution> <id>sign</id> <goals> <goal>sign</goal> </goals> </execution> <execution> <id>verify</id> <goals> 
+				<goal>verify</goal> </goals> </execution> </executions> <configuration> <keystore>~/.keystore</keystore> <alias>pavlab</alias> 
+				<storepass>${jarpass}</storepass> <keypass>${jarpass}</keypass> <removeExistingSignatures>true</removeExistingSignatures> 
+				</configuration> </plugin> -->
 
 			<plugin>
 				<!-- See http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html -->
@@ -315,7 +287,7 @@
 						<includes>
 							<include>baseCode:baseCode</include>
 							<include>gemma:gemma-mda</include>
-							<include>gemma:gemma-util</include>
+							<!-- <include>gemma:gemma-util</include> -->
 							<include>colt:colt</include>
 							<include>commons-lang:commons-lang</include>
 							<include>commons-configuration:commons-configuration</include>
@@ -323,7 +295,7 @@
 							<include>commons-cli:commons-cli</include>
 							<include>commons-logging:commons-logging</include>
 							<include>org.apache.commons:commons-math</include>
-							<include>mtj:mtj</include>
+							<include>mtj:mtj</include> <!-- needed? -->
 							<include>xerces:xercesImpl</include>
 							<include>jfree:jfreechart</include>
 							<include>com.sdicons.jsontools:jsontools-core</include>
@@ -343,9 +315,6 @@
 						<keypass>${jarpass}</keypass>
 						<storepass>${jarpass}</storepass>
 						<alias>pavlab</alias>
-						<!-- <validity>1800</validity> <dnameCn>www.chibi.ubc.ca</dnameCn> <dnameOu>PavlidisLab</dnameOu> <dnameO>CHiBi</dnameO> 
-							<dnameL>Vancouver</dnameL> <dnameSt>BC</dnameSt> <dnameC>CN</dnameC> -->
-						<!-- <verify>true</verify> -->
 						<keystoreConfig>
 							<delete>false</delete>
 							<gen>false</gen>
