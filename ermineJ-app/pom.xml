@@ -269,7 +269,7 @@
 				</executions>
 			</plugin>
 
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jarsigner-plugin</artifactId>
 				<version>1.2</version>
@@ -294,7 +294,7 @@
 					<keypass>${jarpass}</keypass>
 					<removeExistingSignatures>true</removeExistingSignatures>
 				</configuration>
-			</plugin>
+			</plugin> -->
 
 			<plugin>
 				<!-- See http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html -->
