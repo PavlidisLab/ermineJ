@@ -79,7 +79,7 @@ public class SaveAnalysisDialog extends JDialog {
 
     private void jbInit() {
         this.setTitle( "Set options for saving" );
-        this.setSize( new Dimension( 400, 400 ) );
+        this.setMinimumSize( new Dimension( 400, 200 ) );
         this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
 
         JPanel runPanel = new JPanel();
@@ -88,7 +88,7 @@ public class SaveAnalysisDialog extends JDialog {
         JPanel topPanel = new JPanel();
         topPanel.setBorder( BorderFactory.createTitledBorder( "Choose the analysis to save:" ) );
 
-        runComboBox.setPreferredSize( new Dimension( 250, 19 ) );
+        runComboBox.setMinimumSize( new Dimension( 250, 19 ) );
         topPanel.add( runComboBox );
 
         runPanel.add( topPanel, BorderLayout.NORTH );
@@ -123,7 +123,7 @@ public class SaveAnalysisDialog extends JDialog {
 
         // OK on the left is 'standard'
         buttonPanel.add( okButton );
-        buttonPanel.add( cancelButton ); 
+        buttonPanel.add( cancelButton );
 
         cancelButton.addActionListener( new ActionListener() {
             @Override

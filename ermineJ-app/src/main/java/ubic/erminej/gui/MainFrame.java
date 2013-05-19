@@ -91,7 +91,6 @@ import ubic.erminej.SettingsHolder;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
@@ -1208,31 +1207,29 @@ public class MainFrame extends JFrame {
      * Show the multifunctionality for the current selected annotation and gene scores.
      */
     private void multifunctionalityDiagnostics() {
-        /*
-         * Should allow user to pick.
-         */
-        GeneAnnotations ga = this.geneData;
-        GeneScores gs = null;
-        try {
-            if ( this.getCurrentResultSetIndex() >= 0 && !this.results.isEmpty() ) {
-                gs = new GeneScores( getCurrentResultSet().getSettings().getScoreFile(), settings, statusMessenger,
-                        this.geneData );
-                ga = gs.getPrunedGeneAnnotations();
-            } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
-                gs = new GeneScores( settings.getScoreFile(), settings, statusMessenger, this.geneData );
-                ga = gs.getPrunedGeneAnnotations();
-            }
-            // if we just have 'matrix data', this isn't relevant (yet)
-        } catch ( IOException e ) {
-            GuiUtil.error( "Data for multifunctionality could not be read", e );
-            return;
-        }
 
-        MultiFuncDiagWindow w = new MultiFuncDiagWindow( ga, gs );
-        w.setSize( new Dimension( 500, 500 ) );
-        w.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
-        GuiUtil.centerContainer( w );
-        w.setVisible( true );
+        final MainFrame mf = this;
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+
+                statusMessenger.showProgress( "Computing ..." );
+
+                try {
+                    MultiFuncDiagWindow w = new MultiFuncDiagWindow( mf );
+                    w.setSize( new Dimension( 500, 500 ) );
+                    w.setDefaultCloseOperation( DISPOSE_ON_CLOSE );
+                    GuiUtil.centerContainer( w );
+                    w.setVisible( true );
+                    return null;
+                } catch ( Exception e ) {
+                    return null;
+                }
+            }
+        };
+
+        r.execute();
     }
 
     /**

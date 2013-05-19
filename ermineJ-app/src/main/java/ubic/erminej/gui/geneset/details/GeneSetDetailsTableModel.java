@@ -62,6 +62,9 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     private SettingsHolder settings;
     private Map<Gene, JLinkLabel> linkLabels;
     private String[] tableColumnNames = { "Probe", "Score", "QQ Score", "Symbol", "Name", "Multifunc", "QQ Multifunc" };
+
+    // private String[] tableColumnTooltips = { "", "", "", "", "", "" };
+
     public static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term="
             + URL_REPLACE_TAG;
 
