@@ -205,7 +205,7 @@ public class ResultsFileReader {
         /*
          * Load settings for the analysis.
          */
-        SettingsHolder runSettings = readOneSetOfSettings( geneAnnots, dis, messenger );
+        SettingsHolder runSettings = readOneSetOfSettings( geneAnnots, dis );
 
         Map<GeneSetTerm, GeneSetResult> results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
 
@@ -278,7 +278,7 @@ public class ResultsFileReader {
         }
 
         if ( results.isEmpty() ) {
-            messenger.showError( "Results section was empty" );
+            if ( messenger != null ) messenger.showError( "Results section was empty" );
             return null;
         }
 
@@ -294,7 +294,7 @@ public class ResultsFileReader {
             fillInMultifuncationalityRankDelta( newResults );
         }
 
-        messenger.showStatus( "Read run: " + runName );
+        if ( messenger != null ) messenger.showStatus( "Read run: " + runName );
 
         return newResults;
     }
@@ -304,13 +304,12 @@ public class ResultsFileReader {
      * 
      * @param annots
      * @param r
-     * @param statusViewer
      * @return
      * @throws IOException
      * @throws ConfigurationException
      */
-    private static SettingsHolder readOneSetOfSettings( GeneAnnotations annots, BufferedReader r,
-            StatusViewer statusViewer ) throws IOException, ConfigurationException {
+    private static SettingsHolder readOneSetOfSettings( GeneAnnotations annots, BufferedReader r ) throws IOException,
+            ConfigurationException {
 
         File tmp = File.createTempFile( "ermineJ.", ".tmp.properties" );
         Writer w = new FileWriter( tmp );
