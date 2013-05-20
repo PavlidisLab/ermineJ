@@ -85,6 +85,7 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.MainFrame;
+import ubic.erminej.gui.file.GeneSetDetailsImageWriter;
 import ubic.erminej.gui.table.JBarGraphCellRenderer;
 import ubic.erminej.gui.table.JMatrixCellRenderer;
 import ubic.erminej.gui.table.JVerticalHeaderRenderer;
@@ -1099,7 +1100,7 @@ public class GeneSetDetailsFrame extends JFrame {
         matrixDisplay.setStandardizedEnabled( normalized );
         matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
         try {
-            matrixDisplay.saveImage( matrixDisplay.getColorMatrix(), filename, includeLabels, includeScalebar,
+            GeneSetDetailsImageWriter.writePng( geneSetDetails, filename, colorMap, includeLabels, includeScalebar,
                     normalized );
         } catch ( IOException e ) {
             // clean up
@@ -1108,12 +1109,10 @@ public class GeneSetDetailsFrame extends JFrame {
             throw e;
         }
 
-        // clean up
-
         matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
         matrixDisplay.resetRowKeys();
 
-    } // end saveImage
+    }
 
     /**
      * Keep the same gene set, but change the scores.
