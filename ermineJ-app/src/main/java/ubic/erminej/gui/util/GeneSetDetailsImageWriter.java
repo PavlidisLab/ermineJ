@@ -12,12 +12,13 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package ubic.erminej.gui.file;
+package ubic.erminej.gui.util;
 
 import java.awt.Color;
 import java.io.IOException;
 
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
+import ubic.basecode.graphics.ColorMap;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.geneset.details.GeneSetDetails;
@@ -41,6 +42,10 @@ public class GeneSetDetailsImageWriter {
     public static void writePng( GeneSetDetails geneSetDetails, String fileName, Color[] colorMap,
             boolean includeLabels, boolean includeScalebar, boolean normalized ) throws IOException {
         DoubleMatrix<Probe, String> matrix = geneSetDetails.getDataMatrix();
+
+        if ( colorMap == null ) {
+            colorMap = ColorMap.BLACKBODY_COLORMAP;
+        }
 
         MatrixDisplay<Probe, String> matrixDisplay = new MatrixDisplay<Probe, String>( matrix );
         matrixDisplay.setColorMap( colorMap );

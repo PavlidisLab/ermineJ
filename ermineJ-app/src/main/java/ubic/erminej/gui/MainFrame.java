@@ -84,7 +84,7 @@ import org.xml.sax.SAXException;
 import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
-import ubic.erminej.AnalysisThread;
+import ubic.erminej.Analyzer;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
@@ -177,7 +177,7 @@ public class MainFrame extends JFrame {
 
     private int currentResultSet = -1;
 
-    private AnalysisThread athread; // Ideally this would be a local variable.
+    private Analyzer athread; // Ideally this would be a local variable.
     private StatusViewer statusMessenger;
     private GeneSetTablePanel tablePanel;
 
@@ -467,7 +467,7 @@ public class MainFrame extends JFrame {
      */
     public void startAnalysis( SettingsHolder runSettings ) {
         disableMenusForAnalysis();
-        this.athread = new AnalysisThread( runSettings, statusMessenger, geneData );
+        this.athread = new Analyzer( runSettings, statusMessenger, geneData );
         log.debug( "Starting analysis thread" );
         try {
             athread.start();
@@ -592,7 +592,7 @@ public class MainFrame extends JFrame {
                 if ( response == JOptionPane.CANCEL_OPTION ) return;
             }
 
-            this.athread = new AnalysisThread( loadSettings, statusMessenger, geneData, loadFile );
+            this.athread = new Analyzer( loadSettings, statusMessenger, geneData, loadFile );
             athread.run();
             log.debug( "Waiting" );
 

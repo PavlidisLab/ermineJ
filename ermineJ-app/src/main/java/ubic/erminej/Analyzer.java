@@ -39,9 +39,9 @@ import ubic.erminej.data.GeneAnnotations;
  * @author pavlidis
  * @version $Id$
  */
-public class AnalysisThread extends Thread {
+public class Analyzer extends Thread {
 
-    protected static final Log log = LogFactory.getLog( AnalysisThread.class );
+    protected static final Log log = LogFactory.getLog( Analyzer.class );
     private volatile Collection<GeneSetPvalRun> latestResults = new HashSet<GeneSetPvalRun>();
     private String loadFile;
     private StatusViewer messenger;
@@ -61,13 +61,13 @@ public class AnalysisThread extends Thread {
      * @param rawDataSets
      * @param geneScoreSets
      */
-    public AnalysisThread( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots ) {
+    public Analyzer( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots ) {
         this.settings = settings;
         this.messenger = messenger;
         this.geneAnnots = geneAnnots;
 
         try {
-            this.runningMethod = AnalysisThread.class.getMethod( "doAnalysis", new Class[] {} );
+            this.runningMethod = Analyzer.class.getMethod( "doAnalysis", new Class[] {} );
             this.setName( "Analysis Thread" );
         } catch ( SecurityException e ) {
             e.printStackTrace();
@@ -87,7 +87,7 @@ public class AnalysisThread extends Thread {
      * @param geneScoreSets
      * @param loadFile
      */
-    public AnalysisThread( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
+    public Analyzer( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
             String loadFile ) {
         this.settings = settings;
         this.messenger = messenger;
@@ -99,7 +99,7 @@ public class AnalysisThread extends Thread {
         }
 
         try {
-            this.runningMethod = AnalysisThread.class.getMethod( "loadAnalysis", new Class[] {} );
+            this.runningMethod = Analyzer.class.getMethod( "loadAnalysis", new Class[] {} );
             this.setName( "Loading analysis thread" );
         } catch ( SecurityException e ) {
             e.printStackTrace();
