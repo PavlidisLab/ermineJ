@@ -255,8 +255,8 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      */
     public void printHeadings( Writer out, String extracolumns ) throws IOException {
         out.write( "#\n#!" );
-        out.write( "\tName\tID\tProbes\tNumGenes\tRawScore\tPval"
-                + "\tCorrectedPvalue\tMFPvalue\tCorrectedMFPvalue\tMultifuntionality" + extracolumns + "\n" );
+        out.write( "\tName\tID\tNumProbes\tNumGenes\tRawScore\tPval"
+                + "\tCorrectedPvalue\tMFPvalue\tCorrectedMFPvalue\tMultifunctionality" + extracolumns + "\n" );
     }
 
     public void setCorrectedPvalue( double a ) {
