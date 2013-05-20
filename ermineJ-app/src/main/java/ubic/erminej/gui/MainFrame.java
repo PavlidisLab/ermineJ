@@ -582,6 +582,7 @@ public class MainFrame extends JFrame {
              */
             File analysisAnnots = new File( loadSettings.getAnnotFile() );
             File currentAnnots = new File( this.settings.getAnnotFile() );
+            // FIXME: this does not always behave correctly when loading projects? Or at least, it's confusing.
             if ( !analysisAnnots.getName().equals( currentAnnots.getName() ) ) {
                 int response = JOptionPane.showConfirmDialog( this,
                         "The annotation file for the analysis you are loading seems to be different from the current annotations.\n"
@@ -612,10 +613,20 @@ public class MainFrame extends JFrame {
     protected void loadProject() {
 
         if ( !this.results.isEmpty() ) {
+
+            boolean allSaved = true;
+            for ( GeneSetPvalRun r : this.results ) {
+                if ( !r.hasBeenSavedToFile() ) {
+                    allSaved = false;
+                }
+            }
+
+            if ( allSaved ) return;
+
             int response = JOptionPane
                     .showConfirmDialog(
                             null,
-                            "Your current results will be discarded when "
+                            "Your current unsaved results will be discarded when "
                                     + "the project loads.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
                             "Unsaved results will be lost",
 

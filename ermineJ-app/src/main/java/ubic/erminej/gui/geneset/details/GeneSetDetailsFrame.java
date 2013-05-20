@@ -154,7 +154,7 @@ public class GeneSetDetailsFrame extends JFrame {
     private JSlider m_cellWidthSlider = new JSlider();
     private JLabel m_colorRangeLabel = new JLabel();
     private JSlider m_colorRangeSlider = new JSlider();
-    private JGradientBar m_gradientBar = new JGradientBar();
+    private JGradientBar colorScaleBar = new JGradientBar();
     private JCheckBoxMenuItem m_normalizeMenuItem = new JCheckBoxMenuItem();
     private JMenuItem saveDataMenuItem = new JMenuItem();
 
@@ -248,7 +248,7 @@ public class GeneSetDetailsFrame extends JFrame {
         // init gradient bar
         double min = matrixDisplay.getDisplayMin();
         double max = matrixDisplay.getDisplayMax();
-        m_gradientBar.setLabels( min, max );
+        colorScaleBar.setLabels( min, max );
     }
 
     /**
@@ -260,8 +260,9 @@ public class GeneSetDetailsFrame extends JFrame {
         this.addWindowListener( new JGeneSetFrame_windowListenerAdapter( this ) );
 
         setupTable();
-        setupMenus();
         setupToolBar();
+
+        setupMenus();
         setUpStatusBar();
         setupWindow();
 
@@ -490,10 +491,10 @@ public class GeneSetDetailsFrame extends JFrame {
         m_cellWidthLabel.setEnabled( enabled );
         m_colorRangeSlider.setEnabled( enabled );
         m_colorRangeLabel.setEnabled( enabled );
-        m_gradientBar.setVisible( enabled );
+        colorScaleBar.setVisible( enabled );
 
         if ( enabled ) {
-            m_gradientBar.setColorMap( matrixDisplay.getColorMap() );
+            colorScaleBar.setColorMap( matrixDisplay.getColorMap() );
             initColorRangeWidget();
         }
     }
@@ -843,10 +844,10 @@ public class GeneSetDetailsFrame extends JFrame {
         m_colorRangeLabel.setText( "Color Range:" );
         m_colorRangeLabel.setLabelFor( m_colorRangeSlider );
         m_colorRangeLabel.setBorder( BorderFactory.createEmptyBorder( 5, 10, 0, 0 ) );
-        m_gradientBar.setMaximumSize( new Dimension( 200, 30 ) );
-        m_gradientBar.setPreferredSize( new Dimension( 120, 30 ) );
+        colorScaleBar.setMaximumSize( new Dimension( 200, 20 ) );
+        colorScaleBar.setMinimumSize( new Dimension( 120, 15 ) );
         if ( matrixDisplay != null ) {
-            m_gradientBar.setColorMap( matrixDisplay.getColorMap() );
+            colorScaleBar.setColorMap( matrixDisplay.getColorMap() );
             initColorRangeWidget();
         }
         m_colorRangeSlider.setMaximumSize( new Dimension( 90, 24 ) );
@@ -857,9 +858,9 @@ public class GeneSetDetailsFrame extends JFrame {
         toolBar.setLayout( gl );
         gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( m_cellWidthLabel )
                 .addComponent( m_cellWidthSlider ).addComponent( m_colorRangeLabel ).addComponent( m_colorRangeSlider )
-                .addComponent( m_gradientBar ) );
+                .addComponent( colorScaleBar ) );
         gl.setVerticalGroup( gl.createParallelGroup().addComponent( m_cellWidthLabel ).addComponent( m_cellWidthSlider )
-                .addComponent( m_colorRangeLabel ).addComponent( m_colorRangeSlider ).addComponent( m_gradientBar ) );
+                .addComponent( m_colorRangeLabel ).addComponent( m_colorRangeSlider ).addComponent( colorScaleBar ) );
 
     }
 
@@ -1206,7 +1207,7 @@ public class GeneSetDetailsFrame extends JFrame {
         try {
             colorMap = ColorMap.BLACKBODY_COLORMAP;
             matrixDisplay.setColorMap( colorMap );
-            m_gradientBar.setColorMap( colorMap );
+            colorScaleBar.setColorMap( colorMap );
             table.repaint();
         } catch ( Exception ex ) {
         }
@@ -1241,7 +1242,7 @@ public class GeneSetDetailsFrame extends JFrame {
             displayMax = midpoint + ( range / 2 );
         }
 
-        m_gradientBar.setLabels( displayMin, displayMax );
+        colorScaleBar.setLabels( displayMin, displayMax );
         matrixDisplay.setDisplayRange( displayMin, displayMax );
         table.repaint();
     }
@@ -1251,7 +1252,7 @@ public class GeneSetDetailsFrame extends JFrame {
         try {
             colorMap = ColorMap.GREENRED_COLORMAP;
             matrixDisplay.setColorMap( colorMap );
-            m_gradientBar.setColorMap( colorMap );
+            colorScaleBar.setColorMap( colorMap );
             table.repaint();
         } catch ( Exception ex ) {
         }
