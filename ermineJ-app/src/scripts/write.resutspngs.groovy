@@ -7,13 +7,17 @@ import ubic.basecode.graphics.ColorMap;
 import ubic.erminej.*
 import ubic.erminej.analysis.*
 import ubic.erminej.data.*
-import ubic.erminej.gui.util.GeneSetDetailsImageWriter;
-
 import ubic.erminej.util.*
 
-loadFile = "myresults.erminej.txt"
+loadFile = args[0]
+assert loadFile != null
+
 settings = new Settings( loadFile );
-goData = new GeneSetTerms( settings.classFile )
+assert settings != null
+
+assert settings.classFile != null
+
+goData = new GeneSetTerms( settings.classFile + "", settings )
 parser = new GeneAnnotationParser( goData, null )
 geneData = parser.read( settings.annotFile, settings.annotFormat, settings )
 
@@ -22,12 +26,14 @@ gs = new GeneScores(settings.scoreFile, settings, null, geneData)
 athread = new Analyzer( settings, null, geneData, loadFile );
 results = athread.loadAnalysis();
 
-result = results[0]
+assert results != null && results.size > 0, "No results were loaded from " + loadFile
+
+result = results.asList()[0]
 
 rlist = result.getResults().values()
 rlist.sort()
 
-rlist.eachWithIndex { it, i ->
+rlist.eachWithIndex {  it, i ->
     if (i > 10) {
         return
     }
@@ -35,5 +41,4 @@ rlist.eachWithIndex { it, i ->
     details = new GeneSetDetails(it.geneSetTerm, it, result.geneData, settings, gs, null)
     GeneSetDetailsImageWriter.writePng( details, result.name + "." + (1+i) + ".png", ColorMap.BLACKBODY_COLORMAP, true, false, true )
 }
-
 

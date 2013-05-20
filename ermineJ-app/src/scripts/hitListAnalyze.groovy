@@ -20,7 +20,7 @@ config.geneScoreThreshold = 1.0  // this is a peculiarity of the hitlist style
 config.doLog = true
 config.bigIsBetter = false
 
-goData = new GeneSetTerms( "go_daily-termdb.rdf-xml.gz" ) // not using this.
+goData = new GeneSetTerms( "go_daily-termdb.rdf-xml.gz", config)
 parser = new GeneAnnotationParser( goData, null )
 geneData = parser.read( "Generic_human.an.txt", "DEFAULT", config )
 
@@ -33,8 +33,15 @@ file.eachLine{ line ->
     println(name + " " + (f.size - 1) + " genes ...")
 
     try {
-        gs = new GeneScores(f, config, null, geneData)
+
+        /*
+         * Create a GeneScores object from the list. We also save it to a file, so that the analysis can be loaded back in.
+         */
+        gs = new GeneScores(f, config, null, geneData, name + ".quicklist.txt")
+
+        // do the analysis
         results = new GeneSetPvalRun(config, gs)
+
         ResultsPrinter.write(name + ".erminej.txt", results, false)
     } catch (e ) {
         println(name + " FAILED: " + e)
