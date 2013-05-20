@@ -170,6 +170,22 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<quiet>true</quiet>
+					<links>
+						<link>http://docs.oracle.com/javase/6/docs/api</link>
+						<link>http://dsd.lbl.gov/~hoschek/colt/api/</link>
+						<link>http://commons.apache.org/proper/commons-collections/javadocs/api-release/</link>
+						<link>http://commons.apache.org/proper/commons-lang/javadocs/api-3.1</link>
+						<limk>http://chibi.ubc.ca/faculty/pavlidis/basecode/apidocs</limk>
+					</links>
+					 <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>surefire-report-maven-plugin</artifactId>
 				<version>2.0-beta-1</version>

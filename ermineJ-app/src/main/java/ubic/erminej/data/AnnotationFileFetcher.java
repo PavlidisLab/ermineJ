@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.gui.file.AnnotationListFrame;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;

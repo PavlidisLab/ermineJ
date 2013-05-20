@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 /**
- * Represents an assayable item that can refer to more than one gene.
+ * Represents an assayable item such as a microarray probe (or probeset) that can refer to more than one gene.
  * 
  * @author paul
  * @version $Id$

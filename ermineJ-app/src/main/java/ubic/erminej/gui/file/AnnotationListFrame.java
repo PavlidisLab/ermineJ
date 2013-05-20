@@ -17,7 +17,7 @@
  *
  */
 
-package ubic.erminej.data;
+package ubic.erminej.gui.file;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

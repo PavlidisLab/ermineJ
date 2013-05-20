@@ -24,6 +24,8 @@ import org.apache.commons.lang.StringUtils;
 import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
 
 /**
+ * A group of genes, such as those defined by GO annotations or KEGG pathways.
+ * 
  * @author paul
  * @version $Id$
  */

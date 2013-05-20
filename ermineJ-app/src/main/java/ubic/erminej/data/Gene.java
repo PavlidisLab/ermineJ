@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.HashSet;
 
 /**
+ * Represents a Gene entity.
+ * 
  * @author paul
  * @version $Id$
  */

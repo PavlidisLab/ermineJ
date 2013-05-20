@@ -38,7 +38,7 @@ import ubic.basecode.util.StringUtil;
 import ubic.erminej.SettingsHolder;
 
 /**
- * * Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
+ * Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
  * 
  * @author paul
  * @version $Id$
