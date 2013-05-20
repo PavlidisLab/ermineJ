@@ -108,6 +108,10 @@ public class GeneSetTerms {
      * @param terms
      */
     public GeneSetTerms( Collection<GeneSetTerm> terms ) {
+        if ( terms == null || terms.isEmpty() ) {
+            throw new IllegalArgumentException( "Terms cannot be missing" );
+        }
+
         this.graph = new DirectedGraph<String, GeneSetTerm>();
 
         GeneSetTerm item = new GeneSetTerm( "all", "[No name provided]", "[No definition]" );
@@ -210,6 +214,7 @@ public class GeneSetTerms {
      * @return graph representation of the term hierarchy
      */
     public DirectedGraph<String, GeneSetTerm> getGraph() {
+        assert graph != null;
         return graph;
     }
 
