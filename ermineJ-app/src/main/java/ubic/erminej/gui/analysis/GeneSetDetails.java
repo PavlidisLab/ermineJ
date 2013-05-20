@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.gui.geneset.details;
+package ubic.erminej.gui.analysis;
 
 import java.io.File;
 import java.io.IOException;

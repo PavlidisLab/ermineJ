@@ -21,7 +21,7 @@ import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.graphics.ColorMap;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.erminej.data.Probe;
-import ubic.erminej.gui.geneset.details.GeneSetDetails;
+import ubic.erminej.gui.analysis.GeneSetDetails;
 
 /**
  * Methods for writing a GeneSetDetails heatmap to a image file

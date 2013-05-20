@@ -48,7 +48,7 @@ import ubic.erminej.data.GeneSet;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.MainFrame;
-import ubic.erminej.gui.geneset.details.GeneSetDetails;
+import ubic.erminej.gui.analysis.GeneSetDetails;
 import ubic.erminej.gui.geneset.details.GeneSetDetailsFrame;
 import ubic.erminej.gui.geneset.edit.GeneSetWizard;
 import ubic.erminej.gui.util.GuiUtil;

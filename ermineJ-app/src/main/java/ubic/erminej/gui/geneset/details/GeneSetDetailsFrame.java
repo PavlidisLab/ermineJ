@@ -85,6 +85,7 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.Probe;
 import ubic.erminej.gui.MainFrame;
+import ubic.erminej.gui.analysis.GeneSetDetails;
 import ubic.erminej.gui.table.JBarGraphCellRenderer;
 import ubic.erminej.gui.table.JMatrixCellRenderer;
 import ubic.erminej.gui.table.JVerticalHeaderRenderer;
