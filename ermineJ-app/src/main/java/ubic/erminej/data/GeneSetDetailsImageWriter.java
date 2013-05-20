@@ -12,7 +12,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package ubic.erminej.gui.util;
+package ubic.erminej.data;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -20,8 +20,6 @@ import java.io.IOException;
 import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.graphics.ColorMap;
 import ubic.basecode.graphics.MatrixDisplay;
-import ubic.erminej.data.GeneSetDetails;
-import ubic.erminej.data.Probe;
 
 /**
  * Methods for writing a GeneSetDetails heatmap to a image file
