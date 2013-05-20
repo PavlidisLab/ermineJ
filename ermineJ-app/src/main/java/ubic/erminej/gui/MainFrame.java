@@ -398,12 +398,14 @@ public class MainFrame extends JFrame {
                     /*
                      * 2. Pick the file.
                      */
+                    // suggest a file name. FIXME this doesn't display right on MacOS?
+
                     JFileChooser chooser = new JFileChooser();
                     chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
                     chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
                     chooser.setApproveButtonText( "OK" );
                     chooser.setDialogTitle( "Save Analysis As:" );
-                    // suggest a file name. FIXME this doesn't display right on MacOS?
+
                     chooser.setSelectedFile( new File( StringUtils.strip(
                             getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
                             + ".erminej.txt" ) );
@@ -917,6 +919,7 @@ public class MainFrame extends JFrame {
      * 
      */
     protected void writePrefs() {
+        settings.writePrefs();
         settings.getConfig().setProperty( MAINWINDOWWIDTH, String.valueOf( this.getWidth() ) );
         settings.getConfig().setProperty( MAINWINDOWHEIGHT, String.valueOf( this.getHeight() ) );
         settings.getConfig().setProperty( MAINWINDOWPOSITIONX, new Double( this.getLocation().getX() ) );
@@ -1006,7 +1009,7 @@ public class MainFrame extends JFrame {
          * This is appropriate if for example we loaded a project (which we do not change), but we might as well keep
          * the settings for next time.
          */
-        settings.writePrefs();
+        writePrefs();
         statusMessenger.showStatus( "Bye" );
         return true;
     }
@@ -1180,7 +1183,7 @@ public class MainFrame extends JFrame {
         this.setIconImage( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "logoIcon64.gif" ) )
                 .getImage() );
         this.getContentPane().setLayout( new BorderLayout() );
-        this.getContentPane().setPreferredSize( new Dimension( 900, 600 ) );
+        this.getContentPane().setPreferredSize( new Dimension( 900, 800 ) );
 
         setupMenus();
         setupStatusBar();
