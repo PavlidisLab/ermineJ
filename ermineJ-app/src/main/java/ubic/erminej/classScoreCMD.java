@@ -18,8 +18,14 @@
  */
 package ubic.erminej;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 import javax.swing.UIManager;
 
@@ -34,6 +40,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
@@ -60,8 +67,8 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  */
 public class classScoreCMD {
 
-    private static final String HEADER = "Options:";
     private static final String FOOTER = "ermineJ, Copyright (c) 2006-2011 University of British Columbia.";
+    private static final String HEADER = "Options:";
 
     private static Log log = LogFactory.getLog( classScoreCMD.class );
 
@@ -74,55 +81,22 @@ public class classScoreCMD {
         }
     }
 
-    /**
-     * @param args
-     * @throws IOException
-     */
-    protected boolean run( String[] args ) throws Exception {
+    protected GeneAnnotations geneData;
 
-        boolean okay = processCommandLine( "ermineJ", args );
-
-        if ( !okay ) {
-            return false;
-        }
-
-        if ( isUseCommandLineInterface() ) {
-            initialize();
-            try {
-                GeneSetPvalRun result = analyze();
-                ResultsPrinter.write( getSaveFileName(), result, isSaveAllGenes() );
-            } catch ( Exception e ) {
-                getStatusMessenger().showStatus( "Error During analysis:" + e );
-                e.printStackTrace();
-                return false;
-            }
-        } else {
-            try {
-                UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            } catch ( Exception e ) {
-                e.printStackTrace();
-                return false;
-            }
-            @SuppressWarnings("unused")
-            ErmineJGui classScoreGUI = new ErmineJGui( settings );
-        }
-        return true;
-    }
-
+    protected GeneSetTerms goData;
     protected Settings settings;
     protected StatusViewer statusMessenger;
-    protected GeneSetTerms goData;
-    protected GeneAnnotations geneData;
-    // protected Map<String, DoubleMatrix<Probe, String>> rawDataSets;
-    // protected Map<String, GeneScores> geneScoreSets;
-    private String saveFileName = null;
-    private boolean useCommandLineInterface = true;
+    private File batchFile;
+    private CommandLine commandLine;
+    private Options options = new Options();
 
     private boolean saveAllGenes = false;
 
-    private Options options = new Options();
+    // protected Map<String, DoubleMatrix<Probe, String>> rawDataSets;
+    // protected Map<String, GeneScores> geneScoreSets;
+    private String saveFileName = null;
 
-    private CommandLine commandLine;
+    private boolean useCommandLineInterface = true;
 
     public classScoreCMD() {
         try {
@@ -155,6 +129,168 @@ public class classScoreCMD {
 
     public boolean isUseCommandLineInterface() {
         return useCommandLineInterface;
+    }
+
+    /**
+     * @throws IllegalArgumentException
+     * @return
+     * @throws IOException
+     */
+    protected GeneSetPvalRun analyze() throws IOException {
+        statusMessenger.showProgress( "Starting analysis" );
+        GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, statusMessenger );
+        return runResult;
+    }
+
+    /**
+     * @param scoreFiles
+     * @return
+     * @throws IOException
+     */
+    protected void batchAnalyze() throws IOException {
+        Collection<GeneSetPvalRun> results = new HashSet<GeneSetPvalRun>();
+
+        if ( settings.getClassScoreMethod().equals( Method.CORR ) ) {
+            throw new IllegalArgumentException(
+                    "Batch analysis is only supported for gene score methods; option CORR not applicable" );
+        }
+
+        Collection<File> scoreFiles = readScoreFileList();
+        statusMessenger.showProgress( "Batch processing " + scoreFiles.size() + " files" );
+
+        for ( File file : scoreFiles ) {
+
+            if ( !file.canRead() ) {
+                statusMessenger.showError( "Could not read score file: " + file );
+                continue;
+
+            }
+
+            settings.setScoreFile( file.getAbsolutePath() );
+            statusMessenger.showProgress( "Starting analysis of " + file );
+            GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, statusMessenger );
+            results.add( runResult );
+            String outputFile = file.getAbsolutePath().replaceAll( "\\.txt$", "" ) + ".erminej.txt";
+            statusMessenger.showProgress( "Writing results to " + outputFile );
+            ResultsPrinter.write( outputFile, runResult, isSaveAllGenes() );
+        }
+    }
+
+    /**
+     * @see ubic.erminej.gui.MainFrame.readDataFilesForStartup
+     */
+    protected void initialize() {
+        try {
+            statusMessenger = new StatusStderr();
+            statusMessenger.showProgress( "Reading GO descriptions from " + settings.getClassFile() );
+
+            goData = new GeneSetTerms( settings.getClassFile(), settings );
+            GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
+
+            statusMessenger.showProgress( "Reading gene annotations from " + settings.getAnnotFile() );
+            if ( settings.getAnnotFormat().equals( Format.DEFAULT ) ) {
+                boolean filterNonSpecific = settings.getFilterNonSpecific();
+                parser.setFilterNonSpecific( filterNonSpecific );
+            }
+            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat(), settings );
+
+            statusMessenger.showProgress( "Initializing gene class mapping" );
+            statusMessenger.showProgress( "Done with setup" );
+            statusMessenger.showStatus( "Ready." );
+        } catch ( IOException e ) {
+            statusMessenger.showStatus( "File reading or writing error during initialization: " + e.getMessage()
+                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
+            System.exit( 1 );
+        } catch ( SAXException e ) {
+            statusMessenger.showStatus( "Gene Ontology file format is incorrect. "
+                    + "\nPlease check that it is a valid XML file. "
+                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
+            System.exit( 1 );
+        }
+
+        statusMessenger.showStatus( "Done with initialization." );
+    }
+
+    /**
+     * @param command The name of the command as used at the command line.
+     */
+    protected void printHelp( String command ) {
+        HelpFormatter h = new HelpFormatter();
+        h.printHelp( command + " [options]", HEADER, options, FOOTER );
+    }
+
+    protected final boolean processCommandLine( String commandName, String[] args ) throws Exception {
+        /* COMMAND LINE PARSER STAGE */
+        BasicParser parser = new BasicParser();
+
+        if ( args == null ) {
+            printHelp( commandName );
+            return false;
+        }
+
+        try {
+            commandLine = parser.parse( options, args );
+        } catch ( ParseException e ) {
+            if ( e instanceof MissingOptionException ) {
+                System.out.println( "Required option(s) were not supplied: " + e.getMessage() );
+            } else if ( e instanceof AlreadySelectedException ) {
+                System.out.println( "The option(s) " + e.getMessage() + " were already selected" );
+            } else if ( e instanceof MissingArgumentException ) {
+                System.out.println( "Missing argument: " + e.getMessage() );
+            } else if ( e instanceof UnrecognizedOptionException ) {
+                System.out.println( "Unrecognized option: " + e.getMessage() );
+            } else {
+                e.printStackTrace();
+            }
+
+            printHelp( commandName );
+
+            return false;
+        }
+
+        return processOptions();
+    }
+
+    /**
+     * @param args
+     * @throws IOException
+     */
+    protected boolean run( String[] args ) throws Exception {
+
+        boolean okay = processCommandLine( "ermineJ", args );
+
+        if ( !okay ) {
+            return false;
+        }
+
+        if ( isUseCommandLineInterface() ) {
+            initialize();
+
+            if ( batchFile != null ) {
+                batchAnalyze();
+            } else {
+
+                try {
+                    GeneSetPvalRun result = analyze();
+                    ResultsPrinter.write( getSaveFileName(), result, isSaveAllGenes() );
+                } catch ( Exception e ) {
+                    getStatusMessenger().showStatus( "Error During analysis:" + e );
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+        } else {
+            try {
+                UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
+            } catch ( Exception e ) {
+                e.printStackTrace();
+                return false;
+            }
+            @SuppressWarnings("unused")
+            ErmineJGui classScoreGUI = new ErmineJGui( settings );
+        }
+        return true;
     }
 
     @SuppressWarnings("static-access")
@@ -240,6 +376,10 @@ public class classScoreCMD {
                                 + SettingsHolder.Method.CORR + " (profile correlation),  " + SettingsHolder.Method.ROC
                                 + " (ROC)" ).withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
 
+        options.addOption( OptionBuilder.hasArg()
+                .withDescription( "Batch process score files from a list, one per line. Incompatible with -o, -s, -G" )
+                .withArgName( "scoreFileList" ).create( "batch" ) );
+
         /*
          * The intention is that this would be on
          */
@@ -308,6 +448,23 @@ public class classScoreCMD {
         if ( commandLine.hasOption( 'h' ) ) {
             showHelp();
             return false;
+        }
+
+        if ( commandLine.hasOption( "batch" ) ) {
+            if ( commandLine.hasOption( 'G' ) || commandLine.hasOption( "s" ) || commandLine.hasOption( "o" ) ) {
+                System.err.println( "Cannot combine --batch with certain other options" );
+                showHelp();
+                return false;
+            }
+
+            String batchFileOption = commandLine.getOptionValue( "batch" );
+            batchFile = new File( batchFileOption );
+            if ( !batchFile.canRead() ) {
+                System.err.println( "Cannot read from batch file " + batchFile.getAbsolutePath() );
+                showHelp();
+                return false;
+            }
+
         }
 
         if ( commandLine.hasOption( 'G' ) ) {
@@ -709,93 +866,28 @@ public class classScoreCMD {
         return true;
     }
 
-    private void showHelp() {
-        printHelp( "ermineJ" );
-    }
-
     /**
-     * @throws IllegalArgumentException
      * @return
+     * @throws FileNotFoundException
      * @throws IOException
      */
-    protected GeneSetPvalRun analyze() throws IOException {
-        statusMessenger.showProgress( "Starting analysis" );
-        GeneSetPvalRun runResult = new GeneSetPvalRun( settings, geneData, statusMessenger );
-        return runResult;
+    private Collection<File> readScoreFileList() throws FileNotFoundException, IOException {
+        Collection<File> scoreFiles = new ArrayList<File>();
+
+        BufferedReader scoreFileListReader = new BufferedReader( new FileReader( batchFile ) );
+
+        while ( scoreFileListReader.ready() ) {
+            String rawLine = scoreFileListReader.readLine();
+            String fileName = StringUtils.strip( rawLine );
+            File f = new File( fileName );
+            scoreFiles.add( f );
+
+        }
+        scoreFileListReader.close();
+        return scoreFiles;
     }
 
-    /**
-     * @see ubic.erminej.gui.MainFrame.readDataFilesForStartup
-     */
-    protected void initialize() {
-        try {
-            statusMessenger = new StatusStderr();
-            statusMessenger.showProgress( "Reading GO descriptions from " + settings.getClassFile() );
-
-            goData = new GeneSetTerms( settings.getClassFile(), settings );
-            GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
-
-            statusMessenger.showProgress( "Reading gene annotations from " + settings.getAnnotFile() );
-            if ( settings.getAnnotFormat().equals( Format.DEFAULT ) ) {
-                boolean filterNonSpecific = settings.getFilterNonSpecific();
-                parser.setFilterNonSpecific( filterNonSpecific );
-            }
-            geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat(), settings );
-
-            statusMessenger.showProgress( "Initializing gene class mapping" );
-            statusMessenger.showProgress( "Done with setup" );
-            statusMessenger.showStatus( "Ready." );
-        } catch ( IOException e ) {
-            statusMessenger.showStatus( "File reading or writing error during initialization: " + e.getMessage()
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 );
-        } catch ( SAXException e ) {
-            statusMessenger.showStatus( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid XML file. "
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 );
-        }
-
-        statusMessenger.showStatus( "Done with initialization." );
-    }
-
-    /**
-     * @param command The name of the command as used at the command line.
-     */
-    protected void printHelp( String command ) {
-        HelpFormatter h = new HelpFormatter();
-        h.printHelp( command + " [options]", HEADER, options, FOOTER );
-    }
-
-    protected final boolean processCommandLine( String commandName, String[] args ) throws Exception {
-        /* COMMAND LINE PARSER STAGE */
-        BasicParser parser = new BasicParser();
-
-        if ( args == null ) {
-            printHelp( commandName );
-            return false;
-        }
-
-        try {
-            commandLine = parser.parse( options, args );
-        } catch ( ParseException e ) {
-            if ( e instanceof MissingOptionException ) {
-                System.out.println( "Required option(s) were not supplied: " + e.getMessage() );
-            } else if ( e instanceof AlreadySelectedException ) {
-                System.out.println( "The option(s) " + e.getMessage() + " were already selected" );
-            } else if ( e instanceof MissingArgumentException ) {
-                System.out.println( "Missing argument: " + e.getMessage() );
-            } else if ( e instanceof UnrecognizedOptionException ) {
-                System.out.println( "Unrecognized option: " + e.getMessage() );
-            } else {
-                e.printStackTrace();
-            }
-
-            printHelp( commandName );
-
-            return false;
-        }
-
-        return processOptions();
+    private void showHelp() {
+        printHelp( "ermineJ" );
     }
 }
