@@ -42,9 +42,9 @@ import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSetDetails;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.MainFrame;
-import ubic.erminej.gui.analysis.GeneSetDetails;
 import ubic.erminej.gui.analysis.Plotting;
 
 /**

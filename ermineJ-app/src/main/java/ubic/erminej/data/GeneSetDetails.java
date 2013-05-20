@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ubic.erminej.gui.analysis;
+package ubic.erminej.data;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,11 +37,6 @@ import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneScores;
-import ubic.erminej.data.GeneSetResult;
-import ubic.erminej.data.GeneSetTerm;
-import ubic.erminej.data.Probe;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**

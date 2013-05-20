@@ -38,9 +38,9 @@ import ubic.erminej.analysis.ScoreQuantiles;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
+import ubic.erminej.data.GeneSetDetails;
 import ubic.erminej.data.Multifunctionality;
 import ubic.erminej.data.Probe;
-import ubic.erminej.gui.analysis.GeneSetDetails;
 import ubic.erminej.gui.table.MatrixPoint;
 import ubic.erminej.gui.util.JLinkLabel;
 
