@@ -203,7 +203,7 @@
 						<copy todir="${project.build.directory}/staging/lib">
 							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
 								<include name="ermineJ-app.jar" />
-								<!-- <include name="forehead.jar" /> -->
+								<include name="forehead.jar" />
 								<include name="baseCode.jar" />
 								<include name="gemma-mda.jar" />
 								<include name="gemma-util.jar" />
@@ -216,7 +216,7 @@
 								<include name="commons-logging.jar" />
 								<include name="commons-math.jar" />
 								<include name="mtj.jar" />
-								<include name="xerces.jar" />
+								<include name="xercesImpl.jar" />
 								<include name="jfreechart.jar" />
 								<include name="jsontools-core.jar" />
 								<include name="jcommon.jar" />
