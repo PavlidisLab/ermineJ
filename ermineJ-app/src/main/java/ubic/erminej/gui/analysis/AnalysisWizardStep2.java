@@ -266,7 +266,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         rawFileBrowseButton.addActionListener( new RawFileBrowse( this ) );
         rawFileTextField = new JTextField();
         rawFileTextField.setMinimumSize( new Dimension( 325, 19 ) );
-        rawFileTextField.setMaximumSize( new Dimension( 500, 190 ) );
+        rawFileTextField.setMaximumSize( new Dimension( 500, 30 ) );
 
         rawDataBrowsePanel.setLayout( new BoxLayout( rawDataBrowsePanel, BoxLayout.X_AXIS ) );
         rawDataBrowsePanel.add( rawFileTextField );
@@ -302,7 +302,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         scoreFileBrowseButton.setText( "Browse" );
         scoreFileBrowseButton.addActionListener( new ScoreFileBrowse( this ) );
         scoreFileTextField = new JTextField( 2 );
-        scoreFileTextField.setMaximumSize( new Dimension( 500, 19 ) );
+        scoreFileTextField.setMaximumSize( new Dimension( 500, 30 ) );
         scoreFileTextField.setMinimumSize( new Dimension( 225, 19 ) );
 
         JPanel scoreFileBrowsePanel = new JPanel();
@@ -506,6 +506,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         ok.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
+                scoreColTextField.setText( "" );
                 getGeneScoresFromQuickList( textPane, groupNameField.getText() );
                 frame.dispose();
             }
@@ -602,13 +603,10 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                     Collection<String> fields = Arrays.asList( fa );
 
                     w.getStatusField().showProgress( "Parsing list ..." );
-                    GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots() );
 
-                    // definitely have to do this now.
-                    settings.setGeneScoreThreshold( 0.0 );
-                    if ( settings.getDoLog() ) {
-                        settings.setGeneScoreThreshold( 1.0 ); // becomes 0.
-                    }
+                    File file = getQuickListFileName( name );
+                    GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots(),
+                            file.getAbsolutePath() );
 
                     int i = gs.numGenesAboveThreshold( settings.getGeneScoreThreshold() );
 
@@ -626,32 +624,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                         wiz.showStatus( i + " genes were recognized out of " + fa.length + " ids." );
                     }
 
-                    File file;
-                    String cleanName = "";
-
-                    if ( StringUtils.isNotBlank( name ) ) {
-                        cleanName = name;
-                        cleanName = cleanName.replaceAll( "[\\s\\\\\\/]*", "" );
-                        cleanName = cleanName.replaceAll( "^\\.", "" );
-                        cleanName = cleanName.replaceAll( "\\.$", "" );
-                    }
-                    if ( StringUtils.isNotBlank( cleanName ) ) {
-                        file = new File( new File( settings.getGeneScoreFileDirectory() ), "QuickList." + cleanName
-                                + ".txt" );
-
-                    } else {
-                        file = File.createTempFile( "QuickList.", ".txt",
-                                new File( settings.getGeneScoreFileDirectory() ) );
-                    }
-                    gs.write( file );
-
                     // display
                     scoreColTextField.setText( "2" );
                     scoreFileTextField.setText( file.getAbsolutePath() );
-
-                    // do we do this now? Might be okay to wait?
-                    settings.setScoreFile( file.getAbsolutePath() );
-                    settings.setScoreCol( 2 );
 
                     setValues();
                 } catch ( BadLocationException e1 ) {
@@ -667,6 +642,31 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                 }
 
                 return null;
+            }
+
+            /**
+             * @param name
+             * @return
+             * @throws IOException
+             */
+            private File getQuickListFileName( final String name ) throws IOException {
+                File file;
+                String cleanName = "";
+
+                if ( StringUtils.isNotBlank( name ) ) {
+                    cleanName = name;
+                    cleanName = cleanName.replaceAll( "[\\s\\\\\\/]*", "" );
+                    cleanName = cleanName.replaceAll( "^\\.", "" );
+                    cleanName = cleanName.replaceAll( "\\.$", "" );
+                }
+                if ( StringUtils.isNotBlank( cleanName ) ) {
+                    file = new File( new File( settings.getGeneScoreFileDirectory() ), "QuickList." + cleanName
+                            + ".txt" );
+
+                } else {
+                    file = File.createTempFile( "QuickList.", ".txt", new File( settings.getGeneScoreFileDirectory() ) );
+                }
+                return file;
             }
         };
 

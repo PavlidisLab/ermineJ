@@ -100,9 +100,10 @@ public class GeneScores {
      * @param settings
      * @param m
      * @param geneAnnotations
+     * @param outputFileName if provided, also save this, and update the settings.
      */
-    public GeneScores( Collection<String> identifiers, SettingsHolder settings, StatusViewer m,
-            GeneAnnotations geneAnnotations ) {
+    public GeneScores( Collection<String> identifiers, Settings settings, StatusViewer m,
+            GeneAnnotations geneAnnotations, String outputFileName ) {
 
         if ( geneAnnotations == null ) {
             throw new IllegalStateException( "Annotations were null" ); // test situations?
@@ -112,6 +113,23 @@ public class GeneScores {
         if ( m != null ) this.messenger = m;
         this.init( settings );
         makeScores( identifiers, settings );
+
+        if ( StringUtils.isNotBlank( outputFileName ) ) {
+            File f = new File( outputFileName );
+            try {
+                this.write( f );
+            } catch ( IOException e ) {
+                throw new RuntimeException( "Failed to save the scores to " + outputFileName );
+            }
+            settings.setScoreFile( f.getAbsolutePath() );
+            settings.setScoreCol( 2 );
+        }
+
+        // definitely have to do this now.
+        settings.setGeneScoreThreshold( 0.0 );
+        if ( settings.getDoLog() ) {
+            settings.setGeneScoreThreshold( 1.0 ); // becomes 0.
+        }
 
     }
 
@@ -501,9 +519,9 @@ public class GeneScores {
     }
 
     /**
-     * Write the gene scores to a file.
+     * Write the gene scores to a file. Note: does not affect the setting's value of scoreFile.
      * 
-     * @param createTempFile
+     * @param f path to write to
      */
     public void write( File f ) throws IOException {
         BufferedWriter w = new BufferedWriter( new FileWriter( f ) );
