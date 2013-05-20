@@ -732,7 +732,7 @@ public class classScoreCMD {
             statusMessenger = new StatusStderr();
             statusMessenger.showProgress( "Reading GO descriptions from " + settings.getClassFile() );
 
-            goData = new GeneSetTerms( settings.getClassFile() );
+            goData = new GeneSetTerms( settings.getClassFile(), settings );
             GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
 
             statusMessenger.showProgress( "Reading gene annotations from " + settings.getAnnotFile() );

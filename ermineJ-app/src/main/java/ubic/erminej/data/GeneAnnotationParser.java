@@ -15,6 +15,7 @@
 package ubic.erminej.data;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -126,7 +127,9 @@ public class GeneAnnotationParser {
     public GeneAnnotations read( String fileName, Format format, Settings settings ) throws IOException {
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
         GeneAnnotations ga = this.read( i, format, settings );
-        settings.setAnnotFile( fileName ); // ensure this is set if we are using the bare API
+
+        // ensure this is set if we are using the bare API
+        settings.setAnnotFile( new File( fileName ).getAbsolutePath() );
         return ga;
     }
 

@@ -18,6 +18,7 @@
  */
 package ubic.erminej.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import org.xml.sax.SAXException;
 import ubic.basecode.dataStructure.graph.DirectedGraph;
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 import ubic.basecode.util.FileTools;
+import ubic.erminej.Settings;
 
 /**
  * Maintain information on GeneSetTerms (including but not limited GO terms). Note that this does not keep track of
@@ -81,8 +83,10 @@ public class GeneSetTerms {
      * @throws SAXException
      * @throws IOException
      */
-    public GeneSetTerms( String fileName ) throws SAXException, IOException {
+    public GeneSetTerms( String fileName, Settings settings ) throws SAXException, IOException {
         this( fileName, false );
+        // Ensure the settings are updated, if we are calling this with the bare API
+        settings.setClassFile( new File( fileName ).getAbsolutePath() );
     }
 
     /**

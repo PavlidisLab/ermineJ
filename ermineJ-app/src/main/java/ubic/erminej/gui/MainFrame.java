@@ -1257,7 +1257,7 @@ public class MainFrame extends JFrame {
 
         GeneSetTerms goData = null;
         try {
-            goData = new GeneSetTerms( settings.getClassFile() );
+            goData = new GeneSetTerms( settings.getClassFile(), settings );
         } catch ( SAXException e ) {
             GuiUtil.error( "Gene Ontology file format is incorrect. "
                     + "\nPlease check that it is a valid GO XML file." );
