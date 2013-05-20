@@ -425,7 +425,7 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * Sets setting values.
+     * @param val This is the GO XML file.
      */
     public void setClassFile( String val ) {
         this.config.setProperty( CLASS_FILE, val );

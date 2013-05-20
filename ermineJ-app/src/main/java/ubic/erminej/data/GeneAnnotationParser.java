@@ -35,6 +35,7 @@ import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.basecode.util.StringUtil;
+import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
 /**
@@ -122,9 +123,11 @@ public class GeneAnnotationParser {
      * @return
      * @throws IOException
      */
-    public GeneAnnotations read( String fileName, Format format, SettingsHolder settings ) throws IOException {
+    public GeneAnnotations read( String fileName, Format format, Settings settings ) throws IOException {
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
-        return this.read( i, format, settings );
+        GeneAnnotations ga = this.read( i, format, settings );
+        settings.setAnnotFile( fileName ); // ensure this is set if we are using the bare API
+        return ga;
     }
 
     /**
