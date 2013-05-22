@@ -104,7 +104,6 @@ public class AnalysisWizardStep4 extends WizardStep {
         JLabel jLabel12 = new JLabel();
         jTextFieldMinClassSize = new JTextField( 4 );
         JPanel jPanelReplicateTreatmentsPanel = new JPanel();
-        JLabel jLabelReplicateTreament = new JLabel();
 
         ButtonGroup replicateButtonGroup = new ButtonGroup();
         jRadioButtonBestReplicates = new JRadioButton();
