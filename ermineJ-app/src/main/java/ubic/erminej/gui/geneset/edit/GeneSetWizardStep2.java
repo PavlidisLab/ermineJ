@@ -31,7 +31,9 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashSet;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,7 +51,7 @@ import ubic.erminej.gui.geneset.ProbeTableModel;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
- * Step to add/remove probes/genes from a gene set.
+ * Step to add/remove genes from a gene set.
  * 
  * @author Homin K Lee
  * @version $Id$
@@ -111,8 +113,12 @@ public class GeneSetWizardStep2 extends WizardStep {
     }
 
     public void updateCountLabel() {
-        showStatus( "Number of Probes selected: " + ncTableModel.getProbeCount() + " [ " + ncTableModel.getGeneCount()
-                + " genes]" );
+        if ( ncTableModel.getProbeCount() != ncTableModel.getGeneCount() ) {
+            showStatus( ncTableModel.getGeneCount() + " genes selected [" + ncTableModel.getProbeCount() + " probes]" );
+        } else {
+            showStatus( ncTableModel.getGeneCount() + " genes selected" );
+
+        }
     }
 
     // Component initialization
@@ -123,11 +129,11 @@ public class GeneSetWizardStep2 extends WizardStep {
         // countLabel = new JLabel();
         JLabel jLabel1 = new JLabel();
 
-        jLabel1.setPreferredSize( new Dimension( 250, 15 ) );
-        jLabel1.setText( "All available probes and genes" );
-        jLabel2.setPreferredSize( new Dimension( 250, 15 ) );
+        jLabel1.setMinimumSize( new Dimension( 250, 19 ) );
+        jLabel1.setText( "All available genes (or probes)" );
+        jLabel2.setMinimumSize( new Dimension( 250, 19 ) );
         jLabel2.setText( "Gene set members" );
-        showStatus( "Number of Probes selected: 0" );
+        showStatus( "0 genes selected" );
         topPanel.add( jLabel1, null );
         topPanel.add( jLabel2, null );
 
@@ -159,29 +165,43 @@ public class GeneSetWizardStep2 extends WizardStep {
         centerPanel.add( newClassScrollPane, null );
 
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setPreferredSize( new Dimension( 300, 50 ) );
+        GroupLayout gl = new GroupLayout( bottomPanel );
+        bottomPanel.setLayout( gl );
+        bottomPanel.setBorder( BorderFactory.createEmptyBorder( 5, 15, 5, 15 ) );
+        bottomPanel.setMinimumSize( new Dimension( 200, 30 ) );
 
         JButton searchButton = new JButton();
         searchButton.setText( "Find" );
         searchButton.addActionListener( new GeneSetWizardStep2_searchButton_actionAdapter( this ) );
 
         searchTextField = new JTextField();
-        searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
+        searchTextField.setMinimumSize( new Dimension( 50, 19 ) );
+        searchTextField.setToolTipText( "Enter search terms for genes here" );
+        searchTextField.getInsets().set( 5, 8, 5, 15 );
         searchTextField.addKeyListener( new GeneSetWizardStep2_searchText_keyAdapter( this ) );
         searchTextField.addActionListener( new GeneSetWizardStep2_searchTextField_actionAdapter( this ) );
+
         JButton addButton = new JButton();
         addButton.setSelected( false );
         addButton.setText( "Add >" );
         addButton.addActionListener( new GeneSetWizardStep2_addButton_actionAdapter( this ) );
+
         JButton deleteButton = new JButton();
         deleteButton.setSelected( false );
         deleteButton.setText( "Delete" );
         deleteButton.addActionListener( new GeneSetWizardStep2_delete_actionPerformed_actionAdapter( this ) );
 
+        gl.setHorizontalGroup( gl.createSequentialGroup().addComponent( searchButton ).addGap( 3 )
+                .addComponent( searchTextField ).addGap( 15 ).addComponent( addButton ).addComponent( deleteButton ) );
+
+        gl.setVerticalGroup( gl.createParallelGroup().addComponent( searchButton ).addComponent( searchTextField )
+                .addComponent( addButton ).addComponent( deleteButton ) );
+
         bottomPanel.add( searchButton );
         bottomPanel.add( searchTextField );
-        bottomPanel.add( addButton, null );
-        bottomPanel.add( deleteButton, null );
+        bottomPanel.add( addButton );
+        bottomPanel.add( deleteButton );
+
         step2Panel.add( topPanel, BorderLayout.NORTH );
         step2Panel.add( centerPanel, BorderLayout.CENTER );
         step2Panel.add( bottomPanel, BorderLayout.SOUTH );

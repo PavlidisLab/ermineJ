@@ -61,17 +61,15 @@ public class GeneSetWizardStep3 extends WizardStep {
         idPanel.setPreferredSize( new Dimension( 500, 51 ) );
 
         JLabel classIDL = new JLabel( "Gene Set name: " );
-        classIDTF = new JTextField();
-        classIDTF.setPreferredSize( new Dimension( 240, 19 ) );
-        classIDTF.setBorder( BorderFactory.createLoweredBevelBorder() );
+        classIDTF = new JTextField( 20 );
+        classIDTF.setMinimumSize( new Dimension( 240, 19 ) );
 
         idPanel.add( classIDL );
         idPanel.add( classIDTF );
 
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setPreferredSize( new Dimension( 500, 180 ) );
-        JLabel classDescL = new JLabel( "Description: " );
-        classDescL.setRequestFocusEnabled( true );
+        JLabel classDescL = new JLabel( "Description" );
 
         classDescTA = new JTextArea();
         classDescTA.setLineWrap( true );
@@ -85,9 +83,9 @@ public class GeneSetWizardStep3 extends WizardStep {
         descriptionPanel.add( classDescTA );
 
         step3Panel.add( idPanel, BorderLayout.NORTH );
-        step3Panel.add( descriptionPanel, BorderLayout.SOUTH );
+        step3Panel.add( descriptionPanel, BorderLayout.CENTER );
 
-        this.addHelp( "<html><b>Choose or edit the gene set identifier and description.</b><br>"
+        this.addHelp( "<html><b>Choose or edit the gene set identifier and optional description.</b><br>"
                 + "The custom gene set will automatically be saved on your system"
                 + " to be used again in future analyses." );
         this.addMain( step3Panel );
@@ -95,7 +93,6 @@ public class GeneSetWizardStep3 extends WizardStep {
 
     @Override
     public boolean isReady() {
-
         return StringUtils.isNotBlank( classIDTF.getText() );
     }
 

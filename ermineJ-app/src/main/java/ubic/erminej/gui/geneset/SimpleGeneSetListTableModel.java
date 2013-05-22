@@ -59,8 +59,8 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
     public SimpleGeneSetListTableModel( Collection<GeneSet> geneSets ) {
         columnNames.add( "Name" );
         columnNames.add( "Description" );
-        columnNames.add( "# of Probes" );
-        columnNames.add( "# of Genes" );
+        columnNames.add( "Elements" );
+        columnNames.add( "Genes" );
         this.geneSets.addAll( geneSets );
     }
 
@@ -73,8 +73,8 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
         this.geneSets.addAll( geneDat.getGeneSets() );
         columnNames.add( "Name" );
         columnNames.add( "Description" );
-        columnNames.add( "# of Probes" );
-        columnNames.add( "# of Genes" );
+        columnNames.add( "Elements" );
+        columnNames.add( "Genes" );
     }
 
     @Override

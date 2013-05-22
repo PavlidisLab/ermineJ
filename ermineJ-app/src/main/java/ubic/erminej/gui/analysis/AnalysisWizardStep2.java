@@ -19,6 +19,7 @@
 package ubic.erminej.gui.analysis;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -104,7 +105,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     private JTextField rawFileTextField;
     private JTextField scoreFileTextField;
     private JTextField scoreColTextField;
-    private JPanel quickPickPanel = new JPanel();
+    private JButton quickPickButton = new JButton( "Quick list" );
     private JTextField dataColTextField;
 
     public AnalysisWizardStep2( AnalysisWizard wiz, Settings settings ) {
@@ -148,6 +149,14 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         if ( !ready.get() ) {
             return false;
         }
+        if ( StringUtils.isNotBlank( rawFileTextField.getText() ) ) {
+            try {
+                Integer.parseInt( dataColTextField.getText() );
+            } catch ( NumberFormatException e ) {
+                wiz.showError( "Data column must be a number" );
+                return false;
+            }
+        }
 
         if ( wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
                 && StringUtils.isBlank( rawFileTextField.getText() ) ) {
@@ -159,9 +168,14 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             return false;
         }
 
-        if ( ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR ) )
-                && Integer.valueOf( scoreColTextField.getText() ).intValue() < 2 ) {
-            wiz.showError( "The score column must be 2 or higher" );
+        try {
+            int scoreCol = Integer.parseInt( scoreColTextField.getText() );
+            if ( ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR ) ) && scoreCol < 2 ) {
+                wiz.showError( "The score column must be 2 or higher" );
+                return false;
+            }
+        } catch ( NumberFormatException e ) {
+            wiz.showError( "The score column must be given" );
             return false;
         }
 
@@ -218,7 +232,14 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         settings.setScoreCol( Integer.valueOf( scoreColTextField.getText() ) );
         settings.setScoreFile( scoreFileTextField.getText() );
         settings.setRawFile( rawFileTextField.getText() );
-        settings.setDataCol( Integer.valueOf( dataColTextField.getText() ) );
+        try {
+            Integer dataCol = Integer.valueOf( dataColTextField.getText() );
+            settings.setDataCol( dataCol );
+        } catch ( NumberFormatException e ) {
+            if ( StringUtils.isNotBlank( rawFileTextField.getText() ) ) {
+                showError( "Could not save setting of data column" );
+            }
+        }
         settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
     }
 
@@ -232,7 +253,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         jLabel4.setText( "First data column:" );
         jLabel4.setLabelFor( dataColumnPanel );
 
-        dataColTextField = new JTextField();
+        dataColTextField = new JTextField( 3 );
         dataColTextField.setMinimumSize( new Dimension( 50, 19 ) );
         dataColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
         dataColTextField.setText( "2" );
@@ -294,10 +315,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         JPanel scoreFilePanel = new JPanel();
         scoreFilePanel.setLayout( new GridLayout( 2, 1 ) );
 
-        TitledBorder geneScoreFileTitleBorder = BorderFactory
-                .createTitledBorder( "Gene score file (optional for CORR):" );
-
-        scoreFilePanel.setBorder( geneScoreFileTitleBorder );
+        scoreFilePanel.setBorder( BorderFactory.createTitledBorder( "Gene score file (optional for CORR):" ) );
         scoreFileBrowseButton.setEnabled( true );
         scoreFileBrowseButton.setText( "Browse" );
         scoreFileBrowseButton.addActionListener( new ScoreFileBrowse( this ) );
@@ -307,8 +325,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
         JPanel scoreFileBrowsePanel = new JPanel();
         scoreFileBrowsePanel.setLayout( new BoxLayout( scoreFileBrowsePanel, BoxLayout.X_AXIS ) );
-        scoreFileBrowsePanel.add( scoreFileTextField, null );
-        scoreFileBrowsePanel.add( scoreFileBrowseButton, null );
+        scoreFileBrowsePanel.add( scoreFileTextField );
+        scoreFileBrowsePanel.add( scoreFileBrowseButton );
 
         /*
          * When the score text field changes, if it is a valid file, check how it matches the annotations.
@@ -363,12 +381,13 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
          * Column choice. Label, field, button in a row.
          */
         JPanel scoreColumnPanel = new JPanel();
-        scoreColumnPanel.setPreferredSize( new Dimension( 120, 40 ) );
+        // scoreColumnPanel.setPreferredSize( new Dimension( 120, 40 ) );
         JLabel jLabel3 = new JLabel();
         jLabel3.setText( "Column:" );
+        scoreColumnPanel.setBorder( BorderFactory.createEmptyBorder( 2, 2, 2, 2 ) );
         jLabel3.setLabelFor( scoreColumnPanel );
 
-        scoreColTextField = new JTextField( 2 );
+        scoreColTextField = new JTextField( 3 );
         scoreColTextField.setMinimumSize( new Dimension( 50, 19 ) );
         scoreColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
         scoreColTextField.setText( "2" ); // default before any settings.
@@ -378,30 +397,21 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
         scoreColTextField.addKeyListener( this );
         scoreColumnPanel.add( jLabel3, null );
+        scoreColumnPanel.setMinimumSize( new Dimension( 200, 30 ) );
         scoreColumnPanel.add( scoreColTextField, BorderLayout.WEST );
         JButton previewButton = new JButton( "Preview" );
         previewButton.setToolTipText( "Preview the scores to be imported" );
         previewButton.addActionListener( new PreviewButtonAdapter( this ) );
-        scoreColumnPanel.add( previewButton, BorderLayout.EAST );
+        scoreColumnPanel.add( previewButton, BorderLayout.CENTER );
 
-        // -----------------------------------------------------
+        quickPickButton.setEnabled( true );
+        quickPickButton.setText( "Quick list" );
+        quickPickButton.setVisible( false );
 
-        /*
-         * FIXME we have to set this after we know what the analysis is.
-         */
-
-        scoreFilePanel.setLayout( new GridLayout( 3, 1 ) );
-
-        // quickPickPanel.setLayout( new BoxLayout( quickPickPanel, BoxLayout.X_AXIS ) );
-        JButton quickPickPanelButton = new JButton();
-        quickPickPanelButton.setEnabled( true );
-        quickPickPanelButton.setText( "Quick list" );
-        quickPickPanelButton.addActionListener( new QuickPickEnter( this ) );
-        quickPickPanel.add( quickPickPanelButton );
-        scoreFilePanel.add( quickPickPanel );
+        quickPickButton.addActionListener( new QuickPickEnter( this ) );
+        scoreColumnPanel.add( quickPickButton );
         scoreFilePanel.add( scoreFileBrowsePanel );
-        scoreFilePanel.add( scoreColumnPanel );
-        quickPickPanel.setVisible( false );
+        scoreFilePanel.add( scoreColumnPanel, BorderLayout.EAST );
         // -----------------------------------------------------
 
         JPanel rawDataPanel = setupDataMatrixFileChooser();
@@ -412,10 +422,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         step2Panel.add( rawDataPanel );
         this.addHelp( "<html><b>Choose the data files to use</b><br>"
                 + "&quot;Gene scores&quot; refer to a score or p value "
-                + " associated with each gene in your data set. This "
-                + "file can have as few as two columns. &quot;Data profiles&quot;"
-                + " refers to the expression or similar profile data, usually a large matrix. "
-                + "Files must be tab-delimited text. For details, see the user manual." );
+                + " associated with each gene in your data set. &quot;Data profiles&quot;"
+                + " refers to the expression or similar data, usually a large matrix. "
+                + "Files must be tab-delimited text.</html>" );
         this.addMain( step2Panel );
 
     }
@@ -578,7 +587,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                     String t = textPane.getDocument().getText( 0, textPane.getDocument().getLength() );
 
                     if ( t.isEmpty() ) {
-                        wiz.showError( "You didn't provide any identifiers" );
+
+                        w.showError( "You didn't provide any identifiers" );
                         scoreFileTextField.setText( null );
                         settings.setScoreFile( null );
                         return null;
@@ -645,16 +655,16 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             }
 
             /**
-             * @param name
+             * @param baseName
              * @return
              * @throws IOException
              */
-            private File getQuickListFileName( final String name ) throws IOException {
+            private File getQuickListFileName( final String baseName ) throws IOException {
                 File file;
                 String cleanName = "";
 
-                if ( StringUtils.isNotBlank( name ) ) {
-                    cleanName = name;
+                if ( StringUtils.isNotBlank( baseName ) ) {
+                    cleanName = baseName;
                     cleanName = cleanName.replaceAll( "[\\s\\\\\\/]*", "" );
                     cleanName = cleanName.replaceAll( "^\\.", "" );
                     cleanName = cleanName.replaceAll( "\\.$", "" );
@@ -677,7 +687,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         assert wiz != null;
         boolean makeQuickPickVisible = wiz.getAnalysisType().equals( SettingsHolder.Method.ORA );
         if ( makeQuickPickVisible ) log.info( "Quick pick is available" );
-        quickPickPanel.setVisible( makeQuickPickVisible );
+        quickPickButton.setVisible( makeQuickPickVisible );
 
         if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
             validateFile();

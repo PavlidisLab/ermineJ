@@ -34,7 +34,7 @@ import ubic.erminej.data.Probe;
  */
 public class ProbeTableModel extends AbstractTableModel {
     private static final long serialVersionUID = -1L;
-    private String[] columnNames = { "Probe", "Gene", "Description" };
+    private String[] columnNames = { "Element", "Gene", "Description" };
     private List<Probe> pl;
 
     public ProbeTableModel( Collection<Probe> probesToUse ) {

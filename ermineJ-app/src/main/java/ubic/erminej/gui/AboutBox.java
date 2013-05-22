@@ -130,7 +130,7 @@ public class AboutBox extends JDialog {
         licensePanel.setBackground( Color.white );
         licensePanel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 150 ) );
         licensePanel.setEditable( false );
-        licensePanel.setMargin( new Insets( 10, 10, 10, 10 ) );
+        licensePanel.setBorder( BorderFactory.createEmptyBorder( 2, 10, 10, 10 ) );
         licensePanel.setContentType( "text/html" );
         licensePanel
                 .setText( "<html><p>ErmineJ is licensed under the Apache 2 Public License.</p><p>Direct questions to "

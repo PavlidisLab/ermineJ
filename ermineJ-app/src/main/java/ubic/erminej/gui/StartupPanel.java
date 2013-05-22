@@ -144,8 +144,8 @@ public class StartupPanel extends JPanel {
         JPanel twoFilePanel = new JPanel(); // holds the GO and annotations.
         twoFilePanel.setBorder( BorderFactory.createTitledBorder( "... OR choose the starting files individually." ) );
         GroupLayout tfp = new GroupLayout( twoFilePanel );
-        tfp.setAutoCreateContainerGaps( true );
-        tfp.setAutoCreateGaps( true );
+        // tfp.setAutoCreateContainerGaps( true );
+        // tfp.setAutoCreateGaps( true );
         twoFilePanel.setLayout( tfp );
         tfp.setHorizontalGroup( tfp.createParallelGroup().addComponent( classPanel ).addComponent( annotPanel ) );
         tfp.setVerticalGroup( tfp.createSequentialGroup().addComponent( classPanel ).addComponent( annotPanel ) );
@@ -155,9 +155,9 @@ public class StartupPanel extends JPanel {
         GroupLayout gl = new GroupLayout( formPanel );
         formPanel.setLayout( gl );
         formPanel.setMaximumSize( new Dimension( 700, 1000 ) );
-        formPanel.setBorder( BorderFactory.createEmptyBorder( 10, 50, 10, 50 ) );
-        gl.setAutoCreateContainerGaps( true );
-        gl.setAutoCreateGaps( true );
+        formPanel.setBorder( BorderFactory.createEmptyBorder( 10, 20, 10, 20 ) );
+        // gl.setAutoCreateContainerGaps( true );
+        // gl.setAutoCreateGaps( true );
         gl.setHorizontalGroup( gl.createParallelGroup( Alignment.CENTER ).addComponent( projectPanel )
                 .addComponent( twoFilePanel ) );
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( projectPanel ).addComponent( twoFilePanel ) );
@@ -198,7 +198,7 @@ public class StartupPanel extends JPanel {
         buttonPanel.add( helpButton );
         buttonPanel.add( cancelButton );
         buttonPanel.add( actionButton );
-        buttonPanel.setBorder( BorderFactory.createEmptyBorder( 2, 2, 20, 2 ) );
+        buttonPanel.setBorder( BorderFactory.createEmptyBorder( 2, 2, 15, 2 ) );
         return buttonPanel;
     }
 
@@ -380,8 +380,9 @@ public class StartupPanel extends JPanel {
         projectPanel.setLayout( ppL );
         ppL.setHorizontalGroup( ppL.createParallelGroup().addComponent( projectFileTextField.getParent() ) );
         ppL.setVerticalGroup( ppL.createSequentialGroup().addComponent( projectFileTextField.getParent() ) );
-        ppL.setAutoCreateContainerGaps( true );
-        ppL.setAutoCreateGaps( true );
+
+        // ppL.setAutoCreateContainerGaps( true );
+        // ppL.setAutoCreateGaps( true );
         return projectPanel;
     }
 

@@ -19,6 +19,7 @@
 package ubic.erminej.gui.geneset.edit;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -86,7 +87,9 @@ public class GeneSetWizardStep1A extends WizardStep {
             terms = geneData.findSetsByName( searchOn );
             terms.retainAll( geneData.getUserDefinedTerms() );
         }
-        populateTables( geneData.getGeneSets( terms ) );
+        Collection<GeneSet> foundGeneSets = geneData.getGeneSets( terms );
+        populateTables( foundGeneSets );
+
     }
 
     public GeneSet getSelectedGeneSet() {
@@ -140,8 +143,10 @@ public class GeneSetWizardStep1A extends WizardStep {
 
         step1MPanel.setPreferredSize( new Dimension( 250, 250 ) );
         step1MPanel.add( oldClassScrollPane, BorderLayout.CENTER );
+        step1MPanel.setBackground( Color.BLUE );
 
         JPanel searchPanel = new JPanel();
+        searchPanel.setMinimumSize( new Dimension( 150, 20 ) );
 
         JButton searchButton = new JButton();
         searchButton.setText( "Find" );
@@ -149,8 +154,9 @@ public class GeneSetWizardStep1A extends WizardStep {
 
         searchPanel.add( searchButton );
 
-        searchTextField = new JTextField();
-        searchTextField.setPreferredSize( new Dimension( 80, 19 ) );
+        searchTextField = new JTextField( 18 );
+        searchTextField.setMinimumSize( new Dimension( 100, 19 ) );
+
         searchTextField.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
@@ -172,21 +178,22 @@ public class GeneSetWizardStep1A extends WizardStep {
      */
     private void populateTables( Collection<GeneSet> geneSets ) {
         SimpleGeneSetListTableModel model;
-        if ( geneSets == null || geneSets.isEmpty() ) {
+        if ( geneSets == null ) {
             model = new SimpleGeneSetListTableModel( geneData.getUserDefinedGeneSets() );
+            showStatus( "Showing " + geneData.getUserDefinedGeneSets().size() + " user-defined sets" );
+
         } else {
             model = new SimpleGeneSetListTableModel( geneSets );
+            showStatus( "Showing " + geneSets.size() + " user-defined sets" );
         }
         TableRowSorter<SimpleGeneSetListTableModel> sorter = new TableRowSorter<SimpleGeneSetListTableModel>( model );
         oldClassTable.setRowSorter( sorter );
-        // oldClassTable.setAutoCreateRowSorter( true );
         oldClassTable.setModel( model );
         oldClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 30 );
         oldClassTable.getColumnModel().getColumn( 2 ).setPreferredWidth( 30 );
         oldClassTable.getColumnModel().getColumn( 3 ).setPreferredWidth( 30 );
         oldClassTable.revalidate();
 
-        showStatus( "Available sets: " + geneData.numGeneSets() );
     }
 }
 
