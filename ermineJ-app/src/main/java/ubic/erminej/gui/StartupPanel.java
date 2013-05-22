@@ -34,6 +34,7 @@ import java.net.URL;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -45,7 +46,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 
@@ -75,7 +75,8 @@ public class StartupPanel extends JPanel {
     private static final String GO_ARCHIVE_DIR = "http://archive.geneontology.org/latest-termdb";
 
     private static final String INSTRUCTIONS = "<html>For annotation files, visit "
-            + "<a href=\"http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
+    // +
+    // "<a href=\"http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
             + " <a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots/</a></html>.";
 
     private static Log log = LogFactory.getLog( StartupPanel.class );
@@ -110,12 +111,18 @@ public class StartupPanel extends JPanel {
 
     private Settings settings;
 
+    /**
+     * This Settings object does not get overwritten when a project file is loaded.
+     */
+    private Settings defaultSettings;
+
     JButton locateAnnotsButton;
 
     private StatusViewer statusMessenger = new StatusStderr();
 
     public StartupPanel( Settings settings, StatusViewer statusMessenger ) {
         this.settings = settings;
+        this.defaultSettings = settings;
         if ( statusMessenger != null ) this.statusMessenger = statusMessenger;
         jbInit();
         setValues();
@@ -278,7 +285,7 @@ public class StartupPanel extends JPanel {
          * provide a list of gene annotation files to download.
          */
         try {
-            final AnnotationFileFetcher f = new AnnotationFileFetcher( this.settings );
+            final AnnotationFileFetcher f = new AnnotationFileFetcher( defaultSettings );
             final ArrayDesignValueObject result = f.pickAnnotation();
 
             if ( result == null ) {
@@ -292,13 +299,14 @@ public class StartupPanel extends JPanel {
 
                     try {
 
-                        final String testPath = settings.getDataDirectory() + File.separator + result.getShortName()
-                                + "_noParents.an.txt.gz";
+                        final String testPath = defaultSettings.getDataDirectory() + File.separator
+                                + result.getShortName() + "_noParents.an.txt.gz";
 
                         annotFileTextField.setText( "Fetching annots for " + result.getShortName() + " ..." );
 
-                        URL urlPattern = new URL( settings.getStringProperty( "annotation.file.fetch.rest.url.base" )
-                                + "/" + result.getShortName() );
+                        URL urlPattern = new URL(
+                                defaultSettings.getStringProperty( "annotation.file.fetch.rest.url.base" ) + "/"
+                                        + result.getShortName() );
 
                         // FIXME use proper REST client, this doesn't handle errors well at all.
                         // Client c = Client.create();
@@ -586,7 +594,6 @@ public class StartupPanel extends JPanel {
                 this.annotFileTextField.setText( settings.getAnnotFile() );
                 this.annotFileTextField.setEnabled( false );
                 this.classFileTextField.setEnabled( false ); // FIXME have to disable the entire chooser.
-
             } catch ( ConfigurationException e ) {
                 GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
                 enableIndividualFilePickers();
