@@ -24,7 +24,7 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractButton;
 
 import ubic.basecode.util.BrowserLauncher;
-import ubic.erminej.SettingsHolder;
+import ubic.erminej.Settings;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**
@@ -42,22 +42,19 @@ import ubic.erminej.gui.util.GuiUtil;
 public class HelpHelper {
 
     /**
-     * Initializes JavaHelp by creating HelpSet and HelpBroker objects and attaching an action listener an
-     * AbstractButton
-     * 
      * @param c an AbstractButton (typically a JButton or JMenuItem) which will respond to help requests.
      * @return true if successful
      */
-    public boolean initHelp( AbstractButton c, final SettingsHolder settings ) {
+    public boolean initHelp( AbstractButton c ) {
 
         c.addActionListener( new ActionListener() {
 
             @Override
             public void actionPerformed( ActionEvent e ) {
                 try {
-                    BrowserLauncher.openURL( settings.getHelpUrl() );
+                    BrowserLauncher.openURL( Settings.HELPURL );
                 } catch ( Exception e1 ) {
-                    GuiUtil.error( "Could not open a web browser. For help visit " + settings.getHelpUrl() );
+                    GuiUtil.error( "Could not open a web browser. For help visit " + Settings.HELPURL );
                 }
             }
         } );
