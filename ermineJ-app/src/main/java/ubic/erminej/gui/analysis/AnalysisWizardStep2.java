@@ -496,7 +496,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         JPanel nameP = new JPanel();
         nameP.setLayout( new GridLayout( 1, 2 ) );
         final JTextField groupNameField = new JTextField();
-        groupNameField.setPreferredSize( new Dimension( 300, 20 ) );
+        groupNameField.setMinimumSize( new Dimension( 100, 20 ) );
         nameP.add( new JLabel( "Group name (optional, used in file name)" ) );
         nameP.add( groupNameField );
 
