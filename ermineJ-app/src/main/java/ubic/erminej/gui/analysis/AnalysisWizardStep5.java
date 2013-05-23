@@ -594,7 +594,7 @@ public class AnalysisWizardStep5 extends WizardStep {
             }
         } );
 
-        jCheckBoxBigIsBetter.setToolTipText( "If you are loading raw p values, you should UNcheck this box." );
+        jCheckBoxBigIsBetter.setToolTipText( "If you are using raw p values, you should uncheck this box" );
         jCheckBoxBigIsBetter.setSelected( false );
         jCheckBoxBigIsBetter.setText( "Larger scores in your gene score file are better." );
 
@@ -619,7 +619,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         } );
 
         jCheckBoxDoLog.setBackground( SystemColor.control );
-        jCheckBoxDoLog.setToolTipText( "If you are loading raw p values, you should check this box." );
+        jCheckBoxDoLog.setToolTipText( "If you are using raw p values, you should check this box." );
         jCheckBoxDoLog.setSelected( true );
         jCheckBoxDoLog.setText( "Take the negative log of the gene scores" );
 
