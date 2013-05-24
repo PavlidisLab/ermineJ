@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
+import ubic.erminej.gui.util.GuiUtil;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
@@ -141,15 +142,8 @@ public class AnnotationListFrame extends JDialog {
         contentPane.add( bottomPanel, BorderLayout.SOUTH );
 
         this.pack();
+        GuiUtil.centerContainer( this );
         this.setVisible( true );
-
-    }
-
-    /**
-     * @param args
-     */
-    public static void main( String[] args ) {
-        // TODO Auto-generated method stub
 
     }
 

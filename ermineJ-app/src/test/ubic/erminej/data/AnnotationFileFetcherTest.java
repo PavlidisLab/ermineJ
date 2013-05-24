@@ -16,7 +16,6 @@ package ubic.erminej.data;
 
 import java.util.List;
 
-import ubic.erminej.Settings;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 import com.sdicons.json.model.JSONValue;
@@ -31,7 +30,7 @@ import junit.framework.TestCase;
 public class AnnotationFileFetcherTest extends TestCase {
 
     public void testConvert() throws Exception {
-        AnnotationFileFetcher f = new AnnotationFileFetcher( new Settings() );
+        AnnotationFileFetcher f = new AnnotationFileFetcher();
         final JSONParser lParser = new JSONParser(
                 AnnotationFileFetcherTest.class.getResourceAsStream( "/data/arrayExample.json" ) );
         final JSONValue v = lParser.nextValue();

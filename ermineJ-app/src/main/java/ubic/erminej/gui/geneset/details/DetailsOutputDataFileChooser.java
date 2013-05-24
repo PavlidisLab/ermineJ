@@ -41,7 +41,7 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
 
     private static final long serialVersionUID = -4213033434706180241L;
 
-    JDataFileChooserOptions m_options;
+    private JDataFileChooserOptions m_options;
 
     public DetailsOutputDataFileChooser( boolean includeEverything, boolean normalize, String initialFileName ) {
 

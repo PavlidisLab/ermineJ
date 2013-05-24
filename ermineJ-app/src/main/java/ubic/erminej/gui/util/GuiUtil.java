@@ -20,12 +20,17 @@ package ubic.erminej.gui.util;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
+import java.io.File;
+
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -34,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.FileTools;
+import ubic.basecode.util.StatusViewer;
 
 /**
  * Little oft-used functions.
@@ -43,6 +49,55 @@ import ubic.basecode.util.FileTools;
 public class GuiUtil {
 
     protected static final Log log = LogFactory.getLog( GuiUtil.class );
+
+    /**
+     * Platform-independent chooser for saving files. For opening files you can just use a JFileChooser. This solves the
+     * problem on MacOS where the user has no way to enter the name of the file they want to save in.
+     * 
+     * @param owner the frame that will own the dialog
+     * @param startingDirectory
+     * @param startingFileName
+     * @param statusMessenger
+     * @return
+     */
+    public static File chooseOutputFile( Frame owner, String startingDirectory, String startingFileName,
+            StatusViewer statusMessenger ) {
+        String osName = System.getProperty( "os.name" );
+        boolean isMac = osName.contains( "OS X" );
+        if ( isMac ) {
+
+            FileDialog chooser = new FileDialog( owner );
+            chooser.setDirectory( startingDirectory );
+            chooser.setMultipleMode( false );
+            chooser.setFile( startingFileName );
+
+            String fileName = chooser.getFile();
+            if ( fileName == null ) {
+                statusMessenger.showStatus( "Save cancelled." );
+                return null;
+            }
+            return new File( fileName );
+
+        } else {
+
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
+            chooser.setCurrentDirectory( new File( startingDirectory ) );
+            chooser.setApproveButtonText( "OK" );
+            chooser.setDialogTitle( "Save Analysis As:" );
+
+            chooser.setSelectedFile( new File( startingFileName ) );
+
+            int result = chooser.showOpenDialog( owner );
+
+            if ( result == JFileChooser.APPROVE_OPTION ) {
+                return chooser.getSelectedFile();
+            } else {
+                statusMessenger.showStatus( "Save cancelled." );
+                return null;
+            }
+        }
+    }
 
     /**
      * Build a standardized file browse field+button.

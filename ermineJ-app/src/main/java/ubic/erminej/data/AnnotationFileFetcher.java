@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.erminej.SettingsHolder;
+import ubic.erminej.Settings;
 import ubic.erminej.gui.file.AnnotationListFrame;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 import antlr.RecognitionException;
@@ -51,13 +51,6 @@ public class AnnotationFileFetcher {
 
     private static Log log = LogFactory.getLog( AnnotationFileFetcher.class );
 
-    private SettingsHolder settingsHolder;
-
-    public AnnotationFileFetcher( SettingsHolder settingsHolder ) {
-        super();
-        this.settingsHolder = settingsHolder;
-    }
-
     /**
      * Show a list of available annotation files.
      */
@@ -77,20 +70,14 @@ public class AnnotationFileFetcher {
      * @throws IOException
      */
     public List<ArrayDesignValueObject> fetchList() throws IOException {
-
         try {
-            // defined in ermineJdefault.properties.
-            String url = settingsHolder.getStringProperty( "annotation.file.list.rest.url" );
-            if ( url == null ) {
-                log.warn( "There was no valid setting for the URL to fetch the annotation file list" );
-                throw new IOException( "There was no valid setting for the URL to fetch the annotation file list" );
-            }
+            String url = Settings.ANNOTATION_FILE_LIST_RESTURL;
+            assert url != null;
             URL toBeGotten = new URL( url );
             InputStream is = toBeGotten.openStream();
             JSONParser parser = new JSONParser( is );
             JSONValue v = parser.nextValue();
             return convert( v );
-
         } catch ( RecognitionException e ) {
             throw new IOException( e );
         } catch ( TokenStreamException e ) {

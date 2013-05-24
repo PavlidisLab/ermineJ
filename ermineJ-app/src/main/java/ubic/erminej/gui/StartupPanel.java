@@ -26,15 +26,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -46,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 
@@ -75,8 +79,7 @@ public class StartupPanel extends JPanel {
     private static final String GO_ARCHIVE_DIR = "http://archive.geneontology.org/latest-termdb";
 
     private static final String INSTRUCTIONS = "<html>For annotation files, visit "
-    // +
-    // "<a href=\"http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
+            + "<a href=\"http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
             + " <a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots/</a></html>.";
 
     private static Log log = LogFactory.getLog( StartupPanel.class );
@@ -111,18 +114,12 @@ public class StartupPanel extends JPanel {
 
     private Settings settings;
 
-    /**
-     * This Settings object does not get overwritten when a project file is loaded.
-     */
-    private Settings defaultSettings;
-
     JButton locateAnnotsButton;
 
     private StatusViewer statusMessenger = new StatusStderr();
 
     public StartupPanel( Settings settings, StatusViewer statusMessenger ) {
         this.settings = settings;
-        this.defaultSettings = settings;
         if ( statusMessenger != null ) this.statusMessenger = statusMessenger;
         jbInit();
         setValues();
@@ -199,7 +196,7 @@ public class StartupPanel extends JPanel {
         cancelButton.setText( "Quit" );
         helpButton.setText( "Help" );
         HelpHelper hh = new HelpHelper();
-        hh.initHelp( helpButton, settings );
+        hh.initHelp( helpButton );
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add( helpButton );
@@ -284,78 +281,75 @@ public class StartupPanel extends JPanel {
         /*
          * provide a list of gene annotation files to download.
          */
-        try {
-            final AnnotationFileFetcher f = new AnnotationFileFetcher( defaultSettings );
-            final ArrayDesignValueObject result = f.pickAnnotation();
+        statusMessenger.showProgress( "Looking for annotation files ..." );
 
-            if ( result == null ) {
-                return;
-            }
-            final StartupPanel owner = this;
-            SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
-                @Override
-                protected Object doInBackground() throws Exception {
-                    statusMessenger.showProgress( "Looking for annotation file ..." );
+        final StartupPanel owner = this;
+
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                URL urlPattern = null;
+                try {
+                    final AnnotationFileFetcher f = new AnnotationFileFetcher();
+                    final ArrayDesignValueObject result = f.pickAnnotation();
+
+                    if ( result == null ) {
+                        return null;
+                    }
+                    // this is kind of lame, but it's the same as in Gemma's ArrayDesignAnnotationServiceImpl.
+                    String cleanedShortName = result.getShortName().replaceAll( Pattern.quote( "/" ), "_" );
+
+                    final String outputFilePath = settings.getDataDirectory() + File.separator + cleanedShortName
+                            + "_noParents.an.txt.gz";
+
+                    annotFileTextField.setText( "Fetching annots for " + result.getShortName() );
+
+                    urlPattern = new URL( Settings.ANNOTATION_FILE_FETCH_RESTURL + "/" + result.getShortName() );
+
+                    InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
+
+                    OutputStream outputStream = new FileOutputStream( new File( outputFilePath ) );
+
+                    final byte[] buffer = new byte[65536];
+                    int read = -1;
+                    int totalRead = 0;
+
+                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                        outputStream.write( buffer, 0, read );
+                        totalRead += read;
+                        statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read" );
+                    }
+                    outputStream.close();
 
                     try {
-
-                        final String testPath = defaultSettings.getDataDirectory() + File.separator
-                                + result.getShortName() + "_noParents.an.txt.gz";
-
-                        annotFileTextField.setText( "Fetching annots for " + result.getShortName() + " ..." );
-
-                        URL urlPattern = new URL(
-                                defaultSettings.getStringProperty( "annotation.file.fetch.rest.url.base" ) + "/"
-                                        + result.getShortName() );
-
-                        // FIXME use proper REST client, this doesn't handle errors well at all.
-                        // Client c = Client.create();
-
-                        //
-                        InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
-                        //
-                        OutputStream outputStream = new FileOutputStream( new File( testPath ) );
-
-                        final byte[] buffer = new byte[65536];
-                        int read = -1;
-                        int totalRead = 0;
-
-                        while ( ( read = inputStream.read( buffer ) ) > -1 ) {
-                            outputStream.write( buffer, 0, read );
-                            totalRead += read;
-                            statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read ..." );
-                        }
-                        outputStream.close();
-
-                        statusMessenger.clear();
-
-                        settings.setAnnotFile( testPath );
-                        annotFileTextField.setText( settings.getAnnotFile() );
-                    } catch ( Exception e ) {
-                        log.error( e, e );
+                        GZIPInputStream gf = new GZIPInputStream( new FileInputStream( new File( outputFilePath ) ) );
+                        gf.read();
+                    } catch ( IOException e ) {
                         annotFileTextField.setText( "" );
-                        JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "Unable to fetch annotations",
+                        statusMessenger.clear();
+                        JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "File downloaded was not a valid archive",
                                 JOptionPane.INFORMATION_MESSAGE );
-                    } finally {
-                        // ...
                     }
-                    return null;
+
+                    statusMessenger.clear();
+
+                    settings.setAnnotFile( outputFilePath );
+                    annotFileTextField.setText( settings.getAnnotFile() );
+                } catch ( Exception e ) {
+                    log.error( e, e );
+                    annotFileTextField.setText( "" );
+                    statusMessenger.clear();
+                    JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "Unable to fetch from " + urlPattern,
+                            JOptionPane.INFORMATION_MESSAGE );
+                } finally {
+                    // ...
                 }
+                return null;
+            }
 
-            };
+        };
 
-            sw.execute();
-
-        } catch ( IOException e ) {
-            /*
-             * Fall back: unable to obtain the listing dynamically.
-             */
-            JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Unable to automatically get annotations",
-                    JOptionPane.INFORMATION_MESSAGE );
-        } catch ( Exception e ) {
-            JOptionPane.showMessageDialog( this, INSTRUCTIONS, "Unable to automatically get annotations",
-                    JOptionPane.INFORMATION_MESSAGE );
-        }
+        sw.execute();
 
     }
 
@@ -594,6 +588,7 @@ public class StartupPanel extends JPanel {
                 this.annotFileTextField.setText( settings.getAnnotFile() );
                 this.annotFileTextField.setEnabled( false );
                 this.classFileTextField.setEnabled( false ); // FIXME have to disable the entire chooser.
+
             } catch ( ConfigurationException e ) {
                 GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
                 enableIndividualFilePickers();

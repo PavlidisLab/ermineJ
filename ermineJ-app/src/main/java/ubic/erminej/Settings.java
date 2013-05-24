@@ -53,10 +53,6 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  */
 public class Settings extends SettingsHolder {
 
-    private static final String ERMINE_J_LOG_FILE_NAME = "ermineJ.log";
-
-    private static final Log log = LogFactory.getLog( Settings.class );
-
     /**
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
      * etc.)
@@ -69,6 +65,14 @@ public class Settings extends SettingsHolder {
             CUSTOM_GENESET_FILES };
 
     /**
+     * Header for the config file.
+     */
+    protected static final String HEADER = "Configuration file for ermineJ."
+            + "Do not delete this file if you want your ermineJ settings to stay across sessions.\nFor more information see http://www.chibi.ubc.ca/ermineJ/";
+
+    public static final String HELPURL = "http://erminej.chibi.ubc.ca/help";
+
+    /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
      */
     protected static final String USERGUI_DEFAULT_PROPERTIES = "ermineJdefault.properties";
@@ -78,11 +82,16 @@ public class Settings extends SettingsHolder {
      */
     protected static final String USERGUI_PROPERTIES = "ermineJ.properties";
 
-    /**
-     * Header for the config file.
+    private static final String ERMINE_J_LOG_FILE_NAME = "ermineJ.log";
+
+    private static final Log log = LogFactory.getLog( Settings.class );
+
+    /*
+     * URLS for web services used by the software.
      */
-    protected static final String HEADER = "Configuration file for ermineJ."
-            + "Do not delete this file if you want your ermineJ settings to stay across sessions.\nFor more information see http://www.chibi.ubc.ca/ermineJ/";
+  //  public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/fetchAnnotations";
+    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotations";
+    public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/listAll";
 
     /**
      * Write a configuration to the given file - but just settings relevant to analysis (not window locations, for
@@ -252,29 +261,6 @@ public class Settings extends SettingsHolder {
         return Format.valueOf( storedValue );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ubic.erminej.SettingsHolder#getGeneScoreThreshold()
-     */
-    @Override
-    public double getGeneScoreThreshold() {
-
-        // use the new key; delete the old one
-        if ( config.containsKey( GENE_SCORE_THRESHOLD_KEY ) ) {
-            config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
-            if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
-                config.clearProperty( GENE_SCORE_THRESHOLD_LEGACY_KEY );
-
-            }
-        } else if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
-            config.setProperty( GENE_SCORE_THRESHOLD_KEY, config.getDouble( GENE_SCORE_THRESHOLD_LEGACY_KEY, 0.001 ) );
-            config.clearProperty( GENE_SCORE_THRESHOLD_LEGACY_KEY );
-        }
-
-        return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
-    }
-
     /**
      * @return
      */
@@ -344,6 +330,29 @@ public class Settings extends SettingsHolder {
         }
 
         return SettingsHolder.MultiProbeHandling.valueOf( storedValue );
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.erminej.SettingsHolder#getGeneScoreThreshold()
+     */
+    @Override
+    public double getGeneScoreThreshold() {
+
+        // use the new key; delete the old one
+        if ( config.containsKey( GENE_SCORE_THRESHOLD_KEY ) ) {
+            config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
+            if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
+                config.clearProperty( GENE_SCORE_THRESHOLD_LEGACY_KEY );
+
+            }
+        } else if ( config.containsKey( GENE_SCORE_THRESHOLD_LEGACY_KEY ) ) {
+            config.setProperty( GENE_SCORE_THRESHOLD_KEY, config.getDouble( GENE_SCORE_THRESHOLD_LEGACY_KEY, 0.001 ) );
+            config.clearProperty( GENE_SCORE_THRESHOLD_LEGACY_KEY );
+        }
+
+        return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
     }
 
     /**
@@ -656,6 +665,24 @@ public class Settings extends SettingsHolder {
 
     /**
      * @return
+     * @throws ConfigurationException
+     */
+    private PropertiesConfiguration getDefaultConfig() throws ConfigurationException {
+        URL defaultConfigFileLocation = this.getClass().getResource( "/ubic/erminej/" + USERGUI_DEFAULT_PROPERTIES );
+
+        // URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
+
+        if ( defaultConfigFileLocation == null ) {
+            throw new ConfigurationException( "Defaults not found either!" );
+        }
+
+        log.info( "Found defaults at " + defaultConfigFileLocation );
+        PropertiesConfiguration defaultConfig = new PropertiesConfiguration( defaultConfigFileLocation );
+        return defaultConfig;
+    }
+
+    /**
+     * @return
      */
     private File getSettingsFilePath() {
         File newConfigFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
@@ -765,24 +792,6 @@ public class Settings extends SettingsHolder {
         if ( this.config != null ) this.config.setHeader( HEADER );
 
         if ( this.config != null ) this.config.setAutoSave( true );
-    }
-
-    /**
-     * @return
-     * @throws ConfigurationException
-     */
-    private PropertiesConfiguration getDefaultConfig() throws ConfigurationException {
-        URL defaultConfigFileLocation = this.getClass().getResource( "/ubic/erminej/" + USERGUI_DEFAULT_PROPERTIES );
-
-        // URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
-
-        if ( defaultConfigFileLocation == null ) {
-            throw new ConfigurationException( "Defaults not found either!" );
-        }
-
-        log.info( "Found defaults at " + defaultConfigFileLocation );
-        PropertiesConfiguration defaultConfig = new PropertiesConfiguration( defaultConfigFileLocation );
-        return defaultConfig;
     }
 
     /**

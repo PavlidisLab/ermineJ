@@ -68,7 +68,7 @@ public class SettingsHolder {
 
     public static final String GEMMA_URL_BASE = "http://gemma.chibi.ubc.ca/";
 
-    // not this is also listed in erminejdefault.properties.
+    // note this is also listed in erminejdefault.properties.
     private static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@";
 
     /*
@@ -321,10 +321,6 @@ public class SettingsHolder {
      */
     public String getGoldStandardFile() {
         return config.getString( GOLD_STANDARD_FILE );
-    }
-
-    public String getHelpUrl() {
-        return this.config.getString( "help.url" );
     }
 
     /**

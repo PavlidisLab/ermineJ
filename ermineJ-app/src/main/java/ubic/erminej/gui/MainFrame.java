@@ -22,7 +22,6 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -401,46 +400,16 @@ public class MainFrame extends JFrame {
                      */
                     // suggest a file name. FIXME this doesn't display right on MacOS?
 
-                    String osName = System.getProperty( "os.name" );
-                    boolean isMac = osName.contains( "OS X" );
+                    File selectedOutputFile = null;
+                    String startingDirectory = new File( settings.getDataDirectory() ).getAbsolutePath();
+                    String startingFileName = StringUtils.strip(
+                            getCurrentResultSet().getName().replaceAll( "['\"\\s|:]+", "_" ), "_" )
+                            + ".erminej.txt";
 
-                    File f = null;
-                    if ( isMac ) {
+                    selectedOutputFile = GuiUtil.chooseOutputFile( mainFrame, startingDirectory, startingFileName,
+                            statusMessenger );
 
-                        FileDialog chooser = new FileDialog( mainFrame );
-                        chooser.setDirectory( new File( settings.getDataDirectory() ).getAbsolutePath() );
-                        chooser.setMultipleMode( false );
-
-                        String fileName = chooser.getFile();
-                        if ( fileName == null ) {
-                            statusMessenger.showStatus( "Save cancelled." );
-                            return null;
-                        }
-                        f = new File( fileName );
-
-                    } else {
-
-                        JFileChooser chooser = new JFileChooser();
-                        chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
-                        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-                        chooser.setApproveButtonText( "OK" );
-                        chooser.setDialogTitle( "Save Analysis As:" );
-
-                        chooser.setSelectedFile( new File( StringUtils.strip( getCurrentResultSet().getName()
-                                .replaceAll( "['\"\\s|:]+", "_" ), "_" )
-                                + ".erminej.txt" ) );
-
-                        int result = chooser.showOpenDialog( mainFrame );
-
-                        if ( result == JFileChooser.APPROVE_OPTION ) {
-                            f = chooser.getSelectedFile();
-                        } else {
-                            statusMessenger.showStatus( "Save cancelled." );
-                            return null;
-                        }
-                    }
-
-                    if ( f.exists() ) {
+                    if ( selectedOutputFile.exists() ) {
                         int k = JOptionPane.showConfirmDialog( mainFrame, "That file exists. Overwrite?",
                                 "File exists", JOptionPane.YES_NO_CANCEL_OPTION );
                         if ( k != JOptionPane.YES_OPTION ) {
@@ -454,7 +423,7 @@ public class MainFrame extends JFrame {
                      */
 
                     try {
-                        String saveFileName = f.getAbsolutePath();
+                        String saveFileName = selectedOutputFile.getAbsolutePath();
                         ResultsPrinter.write( saveFileName, runToSave, includeGenes );
                         statusMessenger.showStatus( "Saved in " + saveFileName );
                     } catch ( IOException ioe ) {
