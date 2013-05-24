@@ -63,7 +63,7 @@ public class CliTest extends TestCase {
     }
 
     public final void testCliA() throws Exception {
-        classScoreCMD cmd = new classScoreCMD();
+        ErmineJCli cmd = new ErmineJCli();
         assertTrue( !cmd.run( new String[] {} ) );
     }
 
@@ -73,7 +73,7 @@ public class CliTest extends TestCase {
      * @throws Exception
      */
     public final void testCliB() throws Exception {
-        classScoreCMD cmd = new classScoreCMD();
+        ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.processCommandLine( "foo", new String[] { "-a",
                 basePath + File.separator + "HG-U95A.an.txt", "-n", "2", "-c", gofile, "-r",
                 basePath + File.separator + "melanoma_and_sarcomaMAS5.txt" } );
@@ -84,7 +84,7 @@ public class CliTest extends TestCase {
      * @throws Exception
      */
     public final void testCliC() throws Exception {
-        classScoreCMD cmd = new classScoreCMD();
+        ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.run( new String[] { "-a", "foo", "-n", "2" } );
         assertTrue( !okay );
     }
@@ -95,7 +95,7 @@ public class CliTest extends TestCase {
      * @throws Exception
      */
     public final void testCliD() throws Exception {
-        classScoreCMD cmd = new classScoreCMD();
+        ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.run( new String[] { "-a", basePath + File.separator + "HG-U95A.an.txt", "-n", "1", "-c",
                 gofile, "-s", basePath + File.separator + "one-way-anova-parsed.txt", "-x", "10", "-o", output } );
         assertTrue( okay );
@@ -124,7 +124,7 @@ public class CliTest extends TestCase {
      * @throws Exception
      */
     public final void testCliE() throws Exception {
-        classScoreCMD cmd = new classScoreCMD();
+        ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.processCommandLine( "foo", new String[] { "-a",
                 basePath + File.separator + "HG-U95A.an.txt", "-n", "2", "-c", gofile, "-r",
                 basePath + File.separator + "melanoma_and_sarcomaMAS5.txt", "-s",

@@ -65,15 +65,15 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * @author keshav
  * @version $Id$
  */
-public class classScoreCMD {
+public class ErmineJCli {
 
     private static final String FOOTER = "ermineJ, Copyright (c) 2006-2011 University of British Columbia.";
     private static final String HEADER = "Options:";
 
-    private static Log log = LogFactory.getLog( classScoreCMD.class );
+    private static Log log = LogFactory.getLog( ErmineJCli.class );
 
     public static void main( String[] args ) throws Exception {
-        classScoreCMD cmd = new classScoreCMD();
+        ErmineJCli cmd = new ErmineJCli();
         try {
             cmd.run( args );
         } catch ( IOException e ) {
@@ -98,7 +98,7 @@ public class classScoreCMD {
 
     private boolean useCommandLineInterface = true;
 
-    public classScoreCMD() {
+    public ErmineJCli() {
         try {
             settings = new Settings( false );
         } catch ( IOException e ) {

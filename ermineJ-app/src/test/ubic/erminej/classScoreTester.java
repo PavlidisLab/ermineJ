@@ -33,7 +33,7 @@ import ubic.basecode.util.RegressionTesting;
 
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.Settings;
-import ubic.erminej.classScoreCMD;
+import ubic.erminej.ErmineJCli;
 import ubic.erminej.analysis.GeneSetPvalRun;
 
 /**
@@ -42,7 +42,7 @@ import ubic.erminej.analysis.GeneSetPvalRun;
  * @author pavlidis
  * @version $Id$
  */
-public class classScoreTester extends classScoreCMD {
+public class classScoreTester extends ErmineJCli {
     private static Log log = LogFactory.getLog( classScoreTester.class.getName() );
     private static final double TOLERANCE = 0.001;
 
