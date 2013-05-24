@@ -105,10 +105,6 @@
 					<groupId>netlib-java</groupId>
 				</exclusion>
 				<exclusion>
-					<artifactId>opencsv</artifactId>
-					<groupId>opencsv</groupId>
-				</exclusion>
-				<exclusion>
 					<artifactId>commons-dbcp</artifactId>
 					<groupId>commons-dbcp</groupId>
 				</exclusion>
@@ -474,6 +470,7 @@
 								<include name="jcommon.jar" />
 								<include name="antlr.jar" />
 								<include name="log4j.jar" />
+								<include name="opencsv.jar" />
 							</fileset>
 						</copy>
 						<copy todir="${project.build.directory}/staging/bin">
@@ -570,6 +567,7 @@
 							<include>jfree:jcommon</include>
 							<include>antlr:antlr</include>
 							<include>log4j:log4j</include>
+							<include>opencsv:opencsv</include> <!--  needed to read affy csv -->
 						</includes>
 					</dependencies>
 					<jnlp>
