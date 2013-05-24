@@ -98,14 +98,18 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         f.setVisible( true );
     }
 
-    private AnalysisWizard wiz;
-    private Settings settings;
+    JButton scoreFileBrowseButton = new JButton();
     private JFileChooser chooser = new JFileChooser();
-    private JTextField rawFileTextField;
-    private JTextField scoreFileTextField;
-    private JTextField scoreColTextField;
-    private JButton quickPickButton = new JButton( "Quick list" );
     private JTextField dataColTextField;
+    private JButton quickPickButton = new JButton( "Quick list" );
+    private JTextField rawFileTextField;
+    private AtomicBoolean quicklistReady = new AtomicBoolean( true );
+    private JTextField scoreColTextField;
+    private JTextField scoreFileTextField;
+
+    private Settings settings;
+
+    private AnalysisWizard wiz;
 
     public AnalysisWizardStep2( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
@@ -145,7 +149,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     @Override
     public boolean isReady() {
 
-        if ( !ready.get() ) {
+        if ( !quicklistReady.get() ) {
+            log.info( "Not ready" );
             return false;
         }
         if ( StringUtils.isNotBlank( rawFileTextField.getText() ) ) {
@@ -242,66 +247,115 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
     }
 
+    public void updateView() {
+        assert wiz != null;
+        boolean makeQuickPickVisible = wiz.getAnalysisType().equals( SettingsHolder.Method.ORA );
+        if ( makeQuickPickVisible ) log.info( "Quick pick is available" );
+        quickPickButton.setVisible( makeQuickPickVisible );
+
+        if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
+            validateFile();
+        }
+    }
+
     /**
-     * @return
+     * Show a box for pasting in a list of genes.
      */
-    private JPanel setUpDataColumnField() {
-        JPanel dataColumnPanel = new JPanel();
-        dataColumnPanel.setPreferredSize( new Dimension( 120, 40 ) );
-        JLabel jLabel4 = new JLabel();
-        jLabel4.setText( "First data column:" );
-        jLabel4.setLabelFor( dataColumnPanel );
+    void quickpickButton_actionPerformed() {
 
-        dataColTextField = new JTextField( 3 );
-        dataColTextField.setMinimumSize( new Dimension( 50, 19 ) );
-        dataColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
-        dataColTextField.setText( "2" );
-        dataColTextField
-                .setToolTipText( "Column of the data file where the data starts. This must be a value of 2 or higher." );
-        dataColTextField.setEditable( true );
+        final JDialog frame = new JDialog( this.getOwner() );
+        final JTextPane textPane = new JTextPane();
+        textPane.setPreferredSize( new Dimension( 500, 500 ) );
+        textPane.setCaretPosition( 0 );
 
-        dataColTextField.addKeyListener( this );
-        dataColumnPanel.add( jLabel4 );
-        dataColumnPanel.add( dataColTextField, BorderLayout.WEST );
-        JButton dataPreviewButton = new JButton( "Preview" );
-        dataPreviewButton.setToolTipText( "Preview the data to be imported; limited to first few rows and columns" );
-        dataPreviewButton.addActionListener( new DataPreviewButtonAdapter( this ) );
-        dataColumnPanel.add( dataPreviewButton, BorderLayout.EAST );
-        return dataColumnPanel;
+        JPanel nameP = new JPanel();
+        nameP.setLayout( new GridLayout( 1, 2 ) );
+        final JTextField groupNameField = new JTextField();
+        groupNameField.setMinimumSize( new Dimension( 100, 20 ) );
+        nameP.add( new JLabel( "Group name (optional, used in file name)" ) );
+        nameP.add( groupNameField );
+
+        Style def = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
+        StyleConstants.setFontFamily( def, "SansSerif" );
+
+        frame.setLayout( new BorderLayout() );
+        frame.getContentPane().add( new JScrollPane( textPane ), BorderLayout.CENTER );
+        frame.getContentPane().add( nameP, BorderLayout.NORTH );
+        frame.setTitle( "Type or paste in a list of identifiers" );
+        frame.setLocation( GuiUtil.chooseChildLocation( frame, this ) );
+
+        JButton ok = new JButton( "OK" );
+        JButton cancel = new JButton( "Cancel" );
+        ok.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                scoreColTextField.setText( "" );
+                getGeneScoresFromQuickList( textPane, groupNameField.getText() );
+                frame.dispose();
+            }
+        } );
+
+        cancel.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                frame.dispose();
+            }
+        } );
+
+        /*
+         * TODO make prettier
+         */
+        JPanel p = new JPanel();
+        p.setLayout( new GridLayout( 1, 2 ) );
+        p.add( ok );
+        p.add( cancel );
+
+        frame.add( p, BorderLayout.SOUTH );
+
+        frame.pack();
+        frame.setIconImage( new ImageIcon( this.getClass().getResource(
+                MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
+        frame.setAlwaysOnTop( true );
+
+        frame.setSize( new Dimension( 500, 500 ) );
+        frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
+        GuiUtil.centerContainer( frame );
+        frame.setVisible( true );
+        textPane.requestFocusInWindow();
     }
 
-    private JPanel setupDataMatrixFileChooser() {
-        // panel 4
-        JPanel rawDataPanel = new JPanel();
-
-        TitledBorder rawDataFileTitleBorder = BorderFactory
-                .createTitledBorder( "Data profiles file (optional for all but CORR, but used for visualization):" );
-        rawDataPanel.setBorder( rawDataFileTitleBorder );
-        rawDataPanel.setLayout( new GridLayout( 2, 1 ) );
-        // file browser
-        JPanel rawDataBrowsePanel = new JPanel();
-        JButton rawFileBrowseButton = new JButton();
-        rawFileBrowseButton.setEnabled( true );
-        rawFileBrowseButton.setText( "Browse" );
-        rawFileBrowseButton.addActionListener( new RawFileBrowse( this ) );
-        rawFileTextField = new JTextField();
-        rawFileTextField.setMinimumSize( new Dimension( 325, 19 ) );
-        rawFileTextField.setMaximumSize( new Dimension( 500, 30 ) );
-
-        rawDataBrowsePanel.setLayout( new BoxLayout( rawDataBrowsePanel, BoxLayout.X_AXIS ) );
-        rawDataBrowsePanel.add( rawFileTextField );
-        rawDataBrowsePanel.add( rawFileBrowseButton );
-
-        // / --------------------------------------------
-
-        JPanel dataColumnPanel = setUpDataColumnField();
-
-        rawDataPanel.add( rawDataBrowsePanel );
-        rawDataPanel.add( dataColumnPanel );
-        return rawDataPanel;
+    void rawBrowseButton_actionPerformed() {
+        chooser.setCurrentDirectory( new File( settings.getRawDataFileDirectory() ) );
+        chooser.setDialogTitle( "Choose Raw Data File" );
+        wiz.clearStatus();
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            rawFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
+        }
     }
 
-    JButton scoreFileBrowseButton = new JButton();
+    void scoreBrowseButton_actionPerformed() {
+        chooser.setCurrentDirectory( new File( settings.getGeneScoreFileDirectory() ) );
+        chooser.setDialogTitle( "Choose Gene Score File" );
+        wiz.clearStatus();
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            scoreFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
+        }
+
+        validateFile();
+
+    }
+
+    void setValues() {
+        scoreColTextField.setText( String.valueOf( settings.getScoreCol() ) );
+        scoreFileTextField.setText( settings.getScoreFile() );
+        rawFileTextField.setText( settings.getRawDataFileName() );
+        dataColTextField.setText( String.valueOf( settings.getDataCol() ) );
+
+    }
 
     @Override
     protected void jbInit() {
@@ -346,11 +400,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
             }
 
             @Override
-            public void removeUpdate( DocumentEvent e ) {
-                check( e );
-            }
-
-            @Override
             public void insertUpdate( DocumentEvent e ) {
                 if ( e.getLength() == 0 || e.getOffset() == 0 ) {
                     // don't check when we are first initializing. Handle manually.
@@ -359,8 +408,12 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                 check( e );
             }
 
+            @Override
+            public void removeUpdate( DocumentEvent e ) {
+                check( e );
+            }
+
             void check( DocumentEvent e ) {
-                wiz.getStatusField().clear();
                 File f;
                 try {
                     f = new File( e.getDocument().getText( 0, e.getDocument().getLength() ) );
@@ -428,137 +481,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     }
 
-    void rawBrowseButton_actionPerformed() {
-        chooser.setCurrentDirectory( new File( settings.getRawDataFileDirectory() ) );
-        chooser.setDialogTitle( "Choose Raw Data File" );
-        wiz.clearStatus();
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            rawFileTextField.setText( chooser.getSelectedFile().toString() );
-            settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
-        }
-    }
-
-    void scoreBrowseButton_actionPerformed() {
-        chooser.setCurrentDirectory( new File( settings.getGeneScoreFileDirectory() ) );
-        chooser.setDialogTitle( "Choose Gene Score File" );
-        wiz.clearStatus();
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            scoreFileTextField.setText( chooser.getSelectedFile().toString() );
-            settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
-        }
-
-        validateFile();
-
-    }
-
-    /**
-     * Check the score file
-     */
-    private void validateFile() {
-
-        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
-            private GeneScores gs;
-            AnalysisWizard w = ( AnalysisWizard ) getOwner();
-
-            @Override
-            protected Object doInBackground() {
-                w.getStatusField().clear();
-                try {
-                    if ( gs == null ) {
-
-                        String scoreFile = settings.getScoreFile();
-                        gs = new GeneScores( scoreFile, settings, w.getStatusField(), w.getGeneAnnots() );
-                    }
-                } catch ( IOException e ) {
-                    w.getStatusField().showError( "Error reading scores: " + e.getMessage(), e );
-                }
-
-                return null;
-            }
-        };
-
-        sw.execute();
-    }
-
-    /**
-     * Show a box for pasting in a list of genes.
-     */
-    void quickpickButton_actionPerformed() {
-        wiz.getStatusField().clear();
-
-        final JDialog frame = new JDialog( this.getOwner() );
-        final JTextPane textPane = new JTextPane();
-        textPane.setPreferredSize( new Dimension( 500, 500 ) );
-        textPane.setCaretPosition( 0 );
-
-        JPanel nameP = new JPanel();
-        nameP.setLayout( new GridLayout( 1, 2 ) );
-        final JTextField groupNameField = new JTextField();
-        groupNameField.setMinimumSize( new Dimension( 100, 20 ) );
-        nameP.add( new JLabel( "Group name (optional, used in file name)" ) );
-        nameP.add( groupNameField );
-
-        Style def = StyleContext.getDefaultStyleContext().getStyle( StyleContext.DEFAULT_STYLE );
-        StyleConstants.setFontFamily( def, "SansSerif" );
-
-        frame.setLayout( new BorderLayout() );
-        frame.getContentPane().add( new JScrollPane( textPane ), BorderLayout.CENTER );
-        frame.getContentPane().add( nameP, BorderLayout.NORTH );
-        frame.setTitle( "Type or paste in a list of identifiers" );
-        frame.setLocation( GuiUtil.chooseChildLocation( frame, this ) );
-
-        JButton ok = new JButton( "OK" );
-        JButton cancel = new JButton( "Cancel" );
-        ok.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                scoreColTextField.setText( "" );
-                getGeneScoresFromQuickList( textPane, groupNameField.getText() );
-                frame.dispose();
-            }
-        } );
-
-        cancel.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                frame.dispose();
-            }
-        } );
-
-        /*
-         * TODO make prettier
-         */
-        JPanel p = new JPanel();
-        p.setLayout( new GridLayout( 1, 2 ) );
-        p.add( ok );
-        p.add( cancel );
-
-        frame.add( p, BorderLayout.SOUTH );
-
-        frame.pack();
-        frame.setIconImage( new ImageIcon( this.getClass().getResource(
-                MainFrame.RESOURCE_LOCATION + "logoInverse32.gif" ) ).getImage() );
-        frame.setAlwaysOnTop( true );
-
-        frame.setSize( new Dimension( 500, 500 ) );
-        frame.setDefaultCloseOperation( WindowConstants.DISPOSE_ON_CLOSE );
-        frame.setVisible( true );
-        textPane.requestFocusInWindow();
-        this.ready.set( false );
-    }
-
-    void setValues() {
-        scoreColTextField.setText( String.valueOf( settings.getScoreCol() ) );
-        scoreFileTextField.setText( settings.getScoreFile() );
-        rawFileTextField.setText( settings.getRawDataFileName() );
-        dataColTextField.setText( String.valueOf( settings.getDataCol() ) );
-
-    }
-
-    private AtomicBoolean ready = new AtomicBoolean( true );
-
     /**
      * TODO refactor out.
      * 
@@ -566,18 +488,13 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
      * @param name optional
      */
     final private void getGeneScoresFromQuickList( final JTextPane textPane, final String name ) {
+        final AnalysisWizard w = ( AnalysisWizard ) getOwner();
 
         SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
-
-            AnalysisWizard w = ( AnalysisWizard ) getOwner();
-
             @Override
             protected Object doInBackground() {
                 w.getStatusField().clear();
-                ready.set( false );
-                /*
-                 * TODO: set an atomicboolean to say we are not ready
-                 */
+                quicklistReady.set( false );
 
                 try {
                     /*
@@ -614,7 +531,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                     w.getStatusField().showProgress( "Parsing list ..." );
 
                     File file = getQuickListFileName( name );
-                    GeneScores gs = new GeneScores( fields, settings, wiz.getStatusField(), wiz.getGeneAnnots(),
+                    GeneScores gs = new GeneScores( fields, settings, w.getStatusField(), w.getGeneAnnots(),
                             file.getAbsolutePath() );
 
                     int i = gs.numGenesAboveThreshold( settings.getGeneScoreThreshold() );
@@ -622,15 +539,15 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                     if ( i == 0 ) {
                         scoreFileTextField.setText( null );
                         settings.setScoreFile( null );
-                        wiz.showError( "None of the genes were recognized" );
+                        w.showError( "None of the genes were recognized" );
                         return null;
                     } else if ( i == 1 ) {
                         scoreFileTextField.setText( null );
                         settings.setScoreFile( null );
-                        wiz.showError( "Your quick list must have at least 2 items" );
+                        w.showError( "Your quick list must have at least 2 items" );
                         return null;
                     } else {
-                        wiz.showStatus( i + " genes were recognized out of " + fa.length + " ids." );
+                        w.showStatus( i + " genes were recognized out of " + fa.length + " ids." );
                     }
 
                     // display
@@ -647,9 +564,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                     log.error( e, e );
                     wiz.getStatusField().showError( e.getMessage() );
                 } finally {
-                    ready.set( true );
+                    quicklistReady.set( true );
                 }
-
                 return null;
             }
 
@@ -682,15 +598,92 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         sw.execute();
     }
 
-    public void updateView() {
-        assert wiz != null;
-        boolean makeQuickPickVisible = wiz.getAnalysisType().equals( SettingsHolder.Method.ORA );
-        if ( makeQuickPickVisible ) log.info( "Quick pick is available" );
-        quickPickButton.setVisible( makeQuickPickVisible );
+    /**
+     * @return
+     */
+    private JPanel setUpDataColumnField() {
+        JPanel dataColumnPanel = new JPanel();
+        dataColumnPanel.setPreferredSize( new Dimension( 120, 40 ) );
+        JLabel jLabel4 = new JLabel();
+        jLabel4.setText( "First data column:" );
+        jLabel4.setLabelFor( dataColumnPanel );
 
-        if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
-            validateFile();
-        }
+        dataColTextField = new JTextField( 3 );
+        dataColTextField.setMinimumSize( new Dimension( 50, 19 ) );
+        dataColTextField.setHorizontalAlignment( SwingConstants.LEFT ); // moves textbox text to the right
+        dataColTextField.setText( "2" );
+        dataColTextField
+                .setToolTipText( "Column of the data file where the data starts. This must be a value of 2 or higher." );
+        dataColTextField.setEditable( true );
+
+        dataColTextField.addKeyListener( this );
+        dataColumnPanel.add( jLabel4 );
+        dataColumnPanel.add( dataColTextField, BorderLayout.WEST );
+        JButton dataPreviewButton = new JButton( "Preview" );
+        dataPreviewButton.setToolTipText( "Preview the data to be imported; limited to first few rows and columns" );
+        dataPreviewButton.addActionListener( new DataPreviewButtonAdapter( this ) );
+        dataColumnPanel.add( dataPreviewButton, BorderLayout.EAST );
+        return dataColumnPanel;
+    }
+
+    private JPanel setupDataMatrixFileChooser() {
+        // panel 4
+        JPanel rawDataPanel = new JPanel();
+
+        TitledBorder rawDataFileTitleBorder = BorderFactory
+                .createTitledBorder( "Data profiles file (optional for all but CORR, but used for visualization):" );
+        rawDataPanel.setBorder( rawDataFileTitleBorder );
+        rawDataPanel.setLayout( new GridLayout( 2, 1 ) );
+        // file browser
+        JPanel rawDataBrowsePanel = new JPanel();
+        JButton rawFileBrowseButton = new JButton();
+        rawFileBrowseButton.setEnabled( true );
+        rawFileBrowseButton.setText( "Browse" );
+        rawFileBrowseButton.addActionListener( new RawFileBrowse( this ) );
+        rawFileTextField = new JTextField();
+        rawFileTextField.setMinimumSize( new Dimension( 325, 19 ) );
+        rawFileTextField.setMaximumSize( new Dimension( 500, 30 ) );
+
+        rawDataBrowsePanel.setLayout( new BoxLayout( rawDataBrowsePanel, BoxLayout.X_AXIS ) );
+        rawDataBrowsePanel.add( rawFileTextField );
+        rawDataBrowsePanel.add( rawFileBrowseButton );
+
+        // / --------------------------------------------
+
+        JPanel dataColumnPanel = setUpDataColumnField();
+
+        rawDataPanel.add( rawDataBrowsePanel );
+        rawDataPanel.add( dataColumnPanel );
+        return rawDataPanel;
+    }
+
+    /**
+     * Check the score file
+     */
+    private void validateFile() {
+
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+            AnalysisWizard w = ( AnalysisWizard ) getOwner();
+            private GeneScores gs;
+
+            @Override
+            protected Object doInBackground() {
+                w.getStatusField().clear();
+                try {
+                    if ( gs == null ) {
+
+                        String scoreFile = settings.getScoreFile();
+                        gs = new GeneScores( scoreFile, settings, w.getStatusField(), w.getGeneAnnots() );
+                    }
+                } catch ( IOException e ) {
+                    w.getStatusField().showError( "Error reading scores: " + e.getMessage(), e );
+                }
+
+                return null;
+            }
+        };
+
+        sw.execute();
     }
 
 }
@@ -737,6 +730,20 @@ class PreviewButtonAdapter implements ActionListener {
 
 }
 
+class QuickPickEnter implements java.awt.event.ActionListener {
+
+    AnalysisWizardStep2 adaptee;
+
+    QuickPickEnter( AnalysisWizardStep2 adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.quickpickButton_actionPerformed();
+    }
+}
+
 class RawFileBrowse implements java.awt.event.ActionListener {
     AnalysisWizardStep2 adaptee;
 
@@ -760,19 +767,5 @@ class ScoreFileBrowse implements java.awt.event.ActionListener {
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.scoreBrowseButton_actionPerformed();
-    }
-}
-
-class QuickPickEnter implements java.awt.event.ActionListener {
-
-    AnalysisWizardStep2 adaptee;
-
-    QuickPickEnter( AnalysisWizardStep2 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.quickpickButton_actionPerformed();
     }
 }
