@@ -328,7 +328,7 @@ public class TestGeneAnnotations extends TestCase {
 
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         settings = new Settings( false );
-        settings.setProperty( "useUserDefinedGroups", false );
+        settings.setUseUserDefined( false );
         ga = p.readDefault( im, null, settings, false );
         ga.setMessenger( new StatusStderr() );
 
