@@ -74,7 +74,7 @@ public class SettingsHolder {
         if ( !defaults.containsKey( key ) ) {
             return "";
         }
-        return defaults.get( key ).toString();
+        return defaults.get( key );
     }
 
     public static final String GEMMA_URL_BASE = "http://gemma.chibi.ubc.ca/";
