@@ -89,8 +89,9 @@ public class Settings extends SettingsHolder {
     /*
      * URLS for web services used by the software.
      */
-  //  public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/fetchAnnotations";
-    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotations";
+    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/fetchAnnotationsById";
+    // public static final String ANNOTATION_FILE_FETCH_RESTURL =
+    // "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotationsById";
     public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/listAll";
 
     /**

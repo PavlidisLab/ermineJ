@@ -54,6 +54,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -295,15 +296,15 @@ public class StartupPanel extends JPanel {
                     if ( result == null ) {
                         return null;
                     }
+
                     // this is kind of lame, but it's the same as in Gemma's ArrayDesignAnnotationServiceImpl.
                     String cleanedShortName = result.getShortName().replaceAll( Pattern.quote( "/" ), "_" );
-
                     final String outputFilePath = settings.getDataDirectory() + File.separator + cleanedShortName
                             + "_noParents.an.txt.gz";
 
                     annotFileTextField.setText( "Fetching annots for " + result.getShortName() );
 
-                    urlPattern = new URL( Settings.ANNOTATION_FILE_FETCH_RESTURL + "/" + result.getShortName() );
+                    urlPattern = new URL( Settings.ANNOTATION_FILE_FETCH_RESTURL + "/" + result.getId() );
 
                     InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
 
@@ -313,11 +314,19 @@ public class StartupPanel extends JPanel {
                     int read = -1;
                     int totalRead = 0;
 
+                    StopWatch timer = new StopWatch();
+                    timer.start();
                     while ( ( read = inputStream.read( buffer ) ) > -1 ) {
                         outputStream.write( buffer, 0, read );
                         totalRead += read;
-                        statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read" );
+                        if ( timer.getTime() > 500 ) {
+                            statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read" );
+                            timer.reset();
+                            timer.start();
+                        }
                     }
+                    statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read" );
+
                     outputStream.close();
 
                     try {
