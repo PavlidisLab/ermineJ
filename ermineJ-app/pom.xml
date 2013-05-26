@@ -77,7 +77,7 @@
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>1.0.14-SNAPSHOT</version>
+			<version>1.0.14</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -567,7 +567,7 @@
 							<include>jfree:jcommon</include>
 							<include>antlr:antlr</include>
 							<include>log4j:log4j</include>
-							<include>opencsv:opencsv</include> <!--  needed to read affy csv -->
+							<include>opencsv:opencsv</include> <!-- needed to read affy csv -->
 						</includes>
 					</dependencies>
 					<jnlp>
