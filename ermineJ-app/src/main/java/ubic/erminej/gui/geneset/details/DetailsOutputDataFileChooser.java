@@ -84,10 +84,10 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
         private JLabel m_titleLabel = new JLabel();
         private JLabel m_spacerLabel = new JLabel();
 
-        public JDataFileChooserOptions( boolean includeEverything, boolean normalize ) throws HeadlessException {
+        public JDataFileChooserOptions( boolean includeEverything, boolean standardize ) throws HeadlessException {
             try {
                 includeMatrixValuesCheckBox.setSelected( includeEverything );
-                m_normalize.setSelected( normalize );
+                m_normalize.setSelected( standardize );
                 jbInit();
             } catch ( Exception e ) {
                 e.printStackTrace();
@@ -97,9 +97,8 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
         private void jbInit() {
             setLayout( gridLayout1 );
             includeMatrixValuesCheckBox
-                    .setToolTipText( "Leave this box unchecked if you just want the expression value matrix" );
-            m_normalize.setToolTipText( "Check this box to normalize the rows of the data matrix." );
-            this.setMaximumSize( new Dimension( 264, 63 ) );
+                    .setToolTipText( "Leave this box unchecked if you just want the data value matrix" );
+            m_normalize.setToolTipText( "Check this box to standardize the rows of the data matrix." );
             this.setMinimumSize( new Dimension( 264, 63 ) );
             m_titleLabel.setHorizontalAlignment( SwingConstants.CENTER );
             m_titleLabel.setText( "Save Options:" );
@@ -122,7 +121,5 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
             return includeMatrixValuesCheckBox.isSelected();
         }
 
-    } // end private class JDataFileChooserOptions
-
-} // end class JDetailsFileChooser
-
+    }
+}

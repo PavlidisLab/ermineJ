@@ -85,10 +85,10 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
         JLabel m_titleLabel = new JLabel();
         JLabel m_spacerLabel = new JLabel();
 
-        public JDetailsFileChooserOptions( boolean includeLabels, boolean normalize ) throws HeadlessException {
+        public JDetailsFileChooserOptions( boolean includeLabels, boolean standardize ) throws HeadlessException {
             try {
                 m_includeLabels.setSelected( includeLabels );
-                m_normalize.setSelected( normalize );
+                m_normalize.setSelected( standardize );
                 jbInit();
             } catch ( Exception e ) {
                 e.printStackTrace();
@@ -97,12 +97,10 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
 
         private void jbInit() {
             setLayout( gridLayout1 );
-            this.setMaximumSize( new Dimension( 264, 63 ) );
             this.setMinimumSize( new Dimension( 264, 63 ) );
-            m_includeLabels
-                    .setToolTipText( "Leave this box unchecked if you just want the expression value matrix without labels" );
+            m_includeLabels.setToolTipText( "Leave this box unchecked if you just want the data matrix without labels" );
             m_normalize
-                    .setToolTipText( "Check this box to normalize the rows of the data matrix before creating the image." );
+                    .setToolTipText( "Check this box to standardize the rows of the data matrix before creating the image." );
             m_titleLabel.setHorizontalAlignment( SwingConstants.CENTER );
             m_titleLabel.setText( "Save Options:" );
             m_spacerLabel.setText( "" );
@@ -123,6 +121,5 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
         public boolean includeLabels() {
             return m_includeLabels.isSelected();
         }
-    } // end private class JImageFileChooserOptions
-
-} // end class JDetailsFileChooser
+    }
+}
