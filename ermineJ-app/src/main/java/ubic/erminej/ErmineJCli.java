@@ -67,7 +67,7 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  */
 public class ErmineJCli {
 
-    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2011 University of British Columbia.";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2013 University of British Columbia.\nFor more help go to ermineJ.chibi.ubc.ca";
     private static final String HEADER = "Options:";
 
     private static Log log = LogFactory.getLog( ErmineJCli.class );
@@ -216,7 +216,7 @@ public class ErmineJCli {
      */
     protected void printHelp( String command ) {
         HelpFormatter h = new HelpFormatter();
-        h.printHelp( command + " [options]", HEADER, options, FOOTER );
+        h.printHelp( 100, "$ERMINEJ_HOME/bin/ermineJ.sh ", HEADER, options, FOOTER, true );
     }
 
     protected final boolean processCommandLine( String commandName, String[] args ) throws Exception {
@@ -296,7 +296,7 @@ public class ErmineJCli {
     @SuppressWarnings("static-access")
     private void buildOptions() {
 
-        options.addOption( OptionBuilder.withLongOpt( "help" ).create( 'h' ) );
+        options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Print this message" ).create( 'h' ) );
 
         options.addOption( OptionBuilder
                 .withLongOpt( "config" )
@@ -317,7 +317,7 @@ public class ErmineJCli {
 
         options.addOption( OptionBuilder.withDescription(
                 "Sets 'big is better' option for gene scores to true [default = "
-                        + settings.getDefaultSettingsValue( SettingsHolder.BIG_IS_BETTER ) + "]" ).create( 'b' ) );
+                        + SettingsHolder.getDefault( SettingsHolder.BIG_IS_BETTER ) + "]" ).create( 'b' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" )
                 .withDescription( "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" )
@@ -326,26 +326,27 @@ public class ErmineJCli {
         options.addOption( OptionBuilder.hasArg().withDescription( "Column for scores in input file" )
                 .withLongOpt( "scoreCol" ).withArgName( "integer" ).create( 'e' ) );
 
-        options.addOption( OptionBuilder.hasArg().withArgName( "directory" ).withDescription( "Data directory" )
-                .create( 'd' ) );
+        options.addOption( OptionBuilder.hasArg().withArgName( "directory" )
+                .withDescription( "Data directory; default is your ermineJ.data directory" ).create( 'd' ) );
 
         options.addOption( OptionBuilder.hasArg().withArgName( "directory" )
                 .withDescription( "Directory where custom gene set are located" ).create( 'f' ) );
 
         options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" )
-                .withDescription( "Filter out non-specific probes (default annotation format only)" ).create( 'F' ) );
+                .withDescription( "Filter out non-specific probes (default annotation format only), default=true" )
+                .create( 'F' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
-                .withArgName( "value" )
+                .withArgName( "BEST|MEAN" )
                 .withLongOpt( "reps" )
                 .withDescription(
                         "What to do when genes have multiple scores"
-                                + " in input file (due to multiple probes per gene): 1 = best of replicates; 2 = mean of replicates; " )
-                .create( 'g' ) );
+                                + " in input file (due to multiple probes per gene): BEST = best of replicates; MEAN = mean of replicates; default="
+                                + SettingsHolder.getDefault( SettingsHolder.GENE_REP_TREATMENT ) ).create( 'g' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" )
-                .withDescription( "Number of iterations (for iterative methods only" ).withArgName( "integer" )
+                .withDescription( "Number of iterations (GSR and CORR methods only)" ).withArgName( "iterations" )
                 .create( 'i' ) );
 
         options.addOption( OptionBuilder
@@ -353,19 +354,23 @@ public class ErmineJCli {
                         "Output should include gene symbols for all gene sets (default=don't include symbols)" )
                 .withLongOpt( "genesOut" ).create( 'j' ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "logTrans" )
-                .withDescription( "Log transform the scores [recommended for p-values]" ).create( 'l' ) );
+        options.addOption( OptionBuilder
+                .withLongOpt( "logTrans" )
+                .withDescription(
+                        "Log transform the scores (and change sign; recommended for p-values), default="
+                                + SettingsHolder.getDefault( SettingsHolder.DO_LOG ) ).create( 'l' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
                 .withDescription(
-                        "Method for computing raw class statistics (used for GSR/resampling only): "
+                        "Method for computing raw class statistics (used for test=GSR only): "
                                 + SettingsHolder.GeneScoreMethod.MEAN + " (mean),  "
                                 + SettingsHolder.GeneScoreMethod.QUANTILE + " (quantile), or  "
-                                + SettingsHolder.GeneScoreMethod.MEAN + " (mean above quantile), or "
+                                + SettingsHolder.GeneScoreMethod.MEAN_ABOVE_QUANTILE + " (mean above quantile), or "
                                 + SettingsHolder.GeneScoreMethod.PRECISIONRECALL
-                                + " (area under the precision-recall curve)" ).withLongOpt( "stats" )
-                .withArgName( "value" ).create( 'm' ) );
+                                + " (area under the precision-recall curve); default="
+                                + SettingsHolder.getDefault( SettingsHolder.CLASS_SCORE_METHOD ) )
+                .withLongOpt( "stats" ).withArgName( "option" ).create( 'm' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
@@ -388,46 +393,44 @@ public class ErmineJCli {
 
         options.addOption( OptionBuilder.hasArg()
                 .withDescription( "Output file name; if omitted, results are written to standard out" )
-                .withArgName( "file" ).withLongOpt( "output" ).create( 'o' ) );
+                .withArgName( "output file" ).withLongOpt( "output" ).create( 'o' ) );
 
-        options.addOption( OptionBuilder.withDescription( "quantile to use" ).withArgName( "integer" )
-                .withLongOpt( "quantile" ).hasArg().create( 'q' ) );
+        options.addOption( OptionBuilder
+                .withDescription( "quantile to use, only used for 'MEAN_ABOVE_QUANTILE', default=50 (median)" )
+                .withArgName( "quantile" ).withLongOpt( "quantile" ).hasArg().create( 'q' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "rawData" )
-                .withDescription( "Raw data file, only needed for profile correlation analysis." ).withArgName( "file" )
-                .create( 'r' ) );
+                .withDescription( "Raw data file, only needed for profile correlation analysis" )
+                .withArgName( "data file" ).create( 'r' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "scoreFile" )
-                .withDescription( "Score file, required for all but profile correlation method" ).withArgName( "file" )
-                .create( 's' ) );
+                .withDescription( "Score file, required for all but profile correlation method" )
+                .withArgName( "score file" ).create( 's' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
                 .withLongOpt( "threshold" )
                 .withDescription(
                         "Score threshold, only used for ORA; default = "
-                                + settings.getDefaultSettingsValue( SettingsHolder.GENE_SCORE_THRESHOLD_KEY ) )
-                .withArgName( "value" ).create( 't' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.GENE_SCORE_THRESHOLD_KEY ) )
+                .withArgName( "threshold" ).create( 't' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
                 .withDescription(
                         "Sets the minimum class size; default = "
-                                + settings.getDefaultSettingsValue( SettingsHolder.MIN_CLASS_SIZE ) )
-                .withArgName( "integer" ).withLongOpt( "minClassSize" ).create( 'y' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.MIN_CLASS_SIZE ) )
+                .withArgName( "minClassSize" ).withLongOpt( "minClassSize" ).create( 'y' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
                 .withDescription(
                         "Sets the maximum class size; default = "
-                                + settings.getDefaultSettingsValue( SettingsHolder.MAX_CLASS_SIZE ) )
-                .withArgName( "integer" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.MAX_CLASS_SIZE ) )
+                .withArgName( "maxClassSize" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" )
                 .withDescription( "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "save" ).withDescription( "Save settings to the selected file" )
-                .withArgName( "file" ).create( 'S' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()

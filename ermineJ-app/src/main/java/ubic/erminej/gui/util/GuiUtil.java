@@ -20,7 +20,6 @@ package ubic.erminej.gui.util;
 
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.Point;
@@ -62,41 +61,41 @@ public class GuiUtil {
      */
     public static File chooseOutputFile( Frame owner, String startingDirectory, String startingFileName,
             StatusViewer statusMessenger ) {
-        String osName = System.getProperty( "os.name" );
-        boolean isMac = osName.contains( "OS X" );
-        if ( isMac ) {
+        // String osName = System.getProperty( "os.name" );
+        // boolean isMac = osName.contains( "OS X" );
+        // if ( isMac ) {
+        //
+        // FileDialog chooser = new FileDialog( owner );
+        // chooser.setDirectory( startingDirectory );
+        // chooser.setMultipleMode( false );
+        // chooser.setFile( startingFileName );
+        //
+        // String fileName = chooser.getFile();
+        // if ( fileName == null ) {
+        // statusMessenger.showStatus( "Save cancelled." );
+        // return null;
+        // }
+        // return new File( fileName );
+        //
+        // } else {
 
-            FileDialog chooser = new FileDialog( owner );
-            chooser.setDirectory( startingDirectory );
-            chooser.setMultipleMode( false );
-            chooser.setFile( startingFileName );
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
+        chooser.setCurrentDirectory( new File( startingDirectory ) );
+        chooser.setApproveButtonText( "OK" );
+        chooser.setDialogTitle( "Save Analysis As:" );
 
-            String fileName = chooser.getFile();
-            if ( fileName == null ) {
-                statusMessenger.showStatus( "Save cancelled." );
-                return null;
-            }
-            return new File( fileName );
+        chooser.setSelectedFile( new File( startingFileName ) );
 
+        int result = chooser.showOpenDialog( owner );
+
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            return chooser.getSelectedFile();
         } else {
-
-            JFileChooser chooser = new JFileChooser();
-            chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
-            chooser.setCurrentDirectory( new File( startingDirectory ) );
-            chooser.setApproveButtonText( "OK" );
-            chooser.setDialogTitle( "Save Analysis As:" );
-
-            chooser.setSelectedFile( new File( startingFileName ) );
-
-            int result = chooser.showOpenDialog( owner );
-
-            if ( result == JFileChooser.APPROVE_OPTION ) {
-                return chooser.getSelectedFile();
-            } else {
-                statusMessenger.showStatus( "Save cancelled." );
-                return null;
-            }
+            statusMessenger.showStatus( "Save cancelled." );
+            return null;
         }
+        // }
     }
 
     /**

@@ -44,7 +44,7 @@ public class SettingsHolder {
     }
 
     /**
-     * Which gene set scoring method to use.
+     * Which gene set scoring method to use. PREREC is a subtype of GSR.
      */
     public enum Method {
         ORA, ROC, GSR, CORR
@@ -65,6 +65,17 @@ public class SettingsHolder {
     }
 
     public static Map<String, Object> defaults = new HashMap<String, Object>();
+
+    /**
+     * @param key
+     * @return the default setting for the key, or null if there is no such setting.
+     */
+    public static Object getDefault( String key ) {
+        if ( !defaults.containsKey( key ) ) {
+            return "";
+        }
+        return defaults.get( key ).toString();
+    }
 
     public static final String GEMMA_URL_BASE = "http://gemma.chibi.ubc.ca/";
 
@@ -132,6 +143,9 @@ public class SettingsHolder {
 
     protected PropertiesConfiguration config = null;
 
+    /*
+     * Define default values.
+     */
     static {
         defaults.put( QUANTILE_CONFIG_NAME, 50 );
         defaults.put( MIN_CLASS_SIZE, 10 );
@@ -141,21 +155,20 @@ public class SettingsHolder {
         defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
         defaults.put( SettingsHolder.GENE_URL_BASE, DEFAULT_GENE_URL_BASE );
         defaults.put( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
-        defaults.put( FILTER_NONSPECIFIC, true );
-        defaults.put( DO_LOG, true );
+        defaults.put( FILTER_NONSPECIFIC, Boolean.TRUE );
+        defaults.put( DO_LOG, Boolean.TRUE );
         defaults.put( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
         defaults.put( DATA_DIRECTORY, getDefaultUserDataDirPath() );
         defaults.put( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, getDefaultUserClassesDirPath() );
         defaults.put( ANNOT_FORMAT, Format.DEFAULT.toString() );
-        defaults.put( BIG_IS_BETTER, false );
-        defaults.put( USE_USER_DEFINED_GROUPS, true );
-        defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, true );
-        defaults.put( SAVE_ALL_GENES_IN_OUTPUT, false );
+        defaults.put( BIG_IS_BETTER, Boolean.FALSE );
+        defaults.put( USE_USER_DEFINED_GROUPS, Boolean.TRUE );
+        defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, Boolean.TRUE );
+        defaults.put( SAVE_ALL_GENES_IN_OUTPUT, Boolean.FALSE );
         defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.BENJAMINIHOCHBERG );
-        defaults.put( USE_MOL_FUNC, true );
-        defaults.put( USE_CELL_COMP, true );
-        defaults.put( USE_BIOL_PROC, true );
-        defaults.put( DO_LOG, true );
+        defaults.put( USE_MOL_FUNC, Boolean.TRUE );
+        defaults.put( USE_CELL_COMP, Boolean.TRUE );
+        defaults.put( USE_BIOL_PROC, Boolean.TRUE );
         defaults.put( SCORE_COL, 2 );
         defaults.put( DATA_COL, 2 );
     }
@@ -243,7 +256,7 @@ public class SettingsHolder {
     }
 
     public int getDataCol() {
-        return config.getInteger( DATA_COL, ( Integer ) getDefaultSettingsValue( DATA_COL ) );
+        return config.getInteger( DATA_COL, ( Integer ) getDefault( DATA_COL ) );
     }
 
     public String getDataDirectory() {
@@ -255,22 +268,18 @@ public class SettingsHolder {
         return DEFAULT_GENE_URL_BASE;
     }
 
-    public Object getDefaultSettingsValue( String propertyName ) {
-        return defaults.get( propertyName );
-    }
-
     /**
      * @return
      */
     public boolean getDoLog() {
-        return config.getBoolean( DO_LOG, true );
+        return config.getBoolean( DO_LOG, ( Boolean ) getDefault( DO_LOG ) );
     }
 
     /**
      * @return
      */
     public boolean getFilterNonSpecific() {
-        return config.getBoolean( FILTER_NONSPECIFIC, false );
+        return config.getBoolean( FILTER_NONSPECIFIC, ( Boolean ) getDefault( FILTER_NONSPECIFIC ) );
     }
 
     /**
@@ -298,7 +307,7 @@ public class SettingsHolder {
      * @return
      */
     public double getGeneScoreThreshold() {
-        return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
+        return config.getDouble( GENE_SCORE_THRESHOLD_KEY, ( Double ) getDefault( GENE_SCORE_THRESHOLD_KEY ) );
     }
 
     /**
@@ -373,7 +382,7 @@ public class SettingsHolder {
     }
 
     public int getScoreCol() {
-        return config.getInteger( SCORE_COL, ( Integer ) getDefaultSettingsValue( SCORE_COL ) );
+        return config.getInteger( SCORE_COL, ( Integer ) getDefault( SCORE_COL ) );
     }
 
     public String getScoreFile() {
@@ -398,7 +407,7 @@ public class SettingsHolder {
      * @return Returns the useBiologicalProcess.
      */
     public boolean getUseBiologicalProcess() {
-        return config.getBoolean( USE_BIOL_PROC, ( Boolean ) getDefaultSettingsValue( USE_BIOL_PROC ) );
+        return config.getBoolean( USE_BIOL_PROC, ( Boolean ) getDefault( USE_BIOL_PROC ) );
 
     }
 
@@ -406,7 +415,7 @@ public class SettingsHolder {
      * @return Returns the useCellularComponent.
      */
     public boolean getUseCellularComponent() {
-        return config.getBoolean( USE_CELL_COMP, ( Boolean ) getDefaultSettingsValue( USE_CELL_COMP ) );
+        return config.getBoolean( USE_CELL_COMP, ( Boolean ) getDefault( USE_CELL_COMP ) );
 
     }
 
@@ -421,7 +430,7 @@ public class SettingsHolder {
      * @return Returns the useMolecularFunction.
      */
     public boolean getUseMolecularFunction() {
-        return config.getBoolean( USE_MOL_FUNC, ( Boolean ) getDefaultSettingsValue( USE_MOL_FUNC ) );
+        return config.getBoolean( USE_MOL_FUNC, ( Boolean ) getDefault( USE_MOL_FUNC ) );
 
     }
 
@@ -448,8 +457,7 @@ public class SettingsHolder {
     }
 
     public boolean getUseUserDefined() {
-        return config.getBoolean( USE_USER_DEFINED_GROUPS,
-                ( Boolean ) getDefaultSettingsValue( USE_USER_DEFINED_GROUPS ) );
+        return config.getBoolean( USE_USER_DEFINED_GROUPS, ( Boolean ) getDefault( USE_USER_DEFINED_GROUPS ) );
     }
 
     public boolean isTester() {
