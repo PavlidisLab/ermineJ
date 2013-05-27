@@ -136,8 +136,8 @@
 			<version>1.7-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
-					<artifactId>gemma</artifactId>
-					<groupId>gemma-util</groupId>
+					<groupId>gemma</groupId>
+					<artifactId>gemma-util</<artifactId>>
 				</exclusion>
 				<exclusion>
 					<artifactId>ehcache-core</artifactId>
@@ -154,10 +154,6 @@
 				<exclusion>
 					<artifactId>spring-beans</artifactId>
 					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>gemma-util</artifactId>
-					<groupId>gemma</groupId>
 				</exclusion>
 				<exclusion>
 					<artifactId>spring-aop</artifactId>

@@ -460,7 +460,7 @@ public class MultiFuncDiagWindow extends JFrame {
         d.setTitle( "Choose which gene scores to display" );
         d.setMinimumSize( new Dimension( 200, 100 ) );
         GuiUtil.centerContainer( d );
-        final JComboBox<String> runComboBox = new JComboBox<String>();
+        final JComboBox runComboBox = new JComboBox();
         runComboBox.setMinimumSize( new Dimension( 140, 19 ) );
 
         final Map<String, GeneSetPvalRun> scoreSettings = new HashMap<String, GeneSetPvalRun>();

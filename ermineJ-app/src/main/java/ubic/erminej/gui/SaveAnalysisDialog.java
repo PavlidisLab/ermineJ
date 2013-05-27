@@ -45,7 +45,7 @@ public class SaveAnalysisDialog extends JDialog {
 
     private Settings settings;
 
-    private JComboBox<String> runComboBox = new JComboBox<String>();
+    private JComboBox runComboBox = new JComboBox();
 
     private JCheckBox saveAllGenes = new JCheckBox();
 

@@ -364,6 +364,17 @@ public class GeneSetDetails {
         String scoreFile = s.getScoreFile();
 
         if ( StringUtils.isNotBlank( scoreFile ) ) {
+
+            File f = new File( scoreFile );
+            if ( !f.canRead() ) {
+                /*
+                 * This can happen if things have moved. Let's ignore the setting in the future.
+                 */
+                callerStatusViewer.showWarning( "Gene scores were not readable from  " + scoreFile + "; ignoring" );
+                settings.setScoreFile( null );
+                return null;
+            }
+
             try {
                 callerStatusViewer.showStatus( "Getting gene scores from " + scoreFile );
                 GeneScores scores = new GeneScores( scoreFile, s, null, this.geneData );
@@ -372,6 +383,7 @@ public class GeneSetDetails {
                 }
                 return scores;
             } catch ( Exception e ) {
+                // just in case
                 callerStatusViewer.showError( scoreFile + " is not readable: " + e );
             }
         }
