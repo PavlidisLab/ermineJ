@@ -63,10 +63,10 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.data.AnnotationFileFetcher;
 import ubic.erminej.data.GeneAnnotationParser.Format;
+import ubic.erminej.data.Platform;
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.file.XMLFileFilter;
 import ubic.erminej.gui.util.GuiUtil;
-import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
  * Panel shown on initial startup of the application.
@@ -291,7 +291,7 @@ public class StartupPanel extends JPanel {
                 URL urlPattern = null;
                 try {
                     final AnnotationFileFetcher f = new AnnotationFileFetcher();
-                    final ArrayDesignValueObject result = f.pickAnnotation();
+                    final Platform result = f.pickAnnotation();
 
                     if ( result == null ) {
                         return null;

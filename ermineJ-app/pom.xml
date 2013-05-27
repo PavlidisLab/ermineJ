@@ -131,165 +131,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>gemma</groupId>
-			<artifactId>gemma-mda</artifactId>
-			<version>1.7-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>gemma</groupId>
-					<artifactId>gemma-util</artifactId>
-				</exclusion>
-				<exclusion>
-					<artifactId>ehcache-core</artifactId>
-					<groupId>net.sf.ehcache</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-aspects</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-test</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-aop</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-jdbc</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-expression</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>aspectjrt</artifactId>
-					<groupId>org.aspectj</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-context-support</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>aspectjweaver</artifactId>
-					<groupId>org.aspectj</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-security-config</artifactId>
-					<groupId>org.springframework.security</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>terracotta-toolkit-1.3-runtime</artifactId>
-					<groupId>org.terracotta</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-web</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-security-core</artifactId>
-					<groupId>org.springframework.security</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-security-acl</artifactId>
-					<groupId>org.springframework.security</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>hibernate-core</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-security-web</artifactId>
-					<groupId>org.springframework.security</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-context</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>hibernate-ehcache</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-orm</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-core</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-retry</artifactId>
-					<groupId>org.springframework.retry</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>ehcache-terracotta</artifactId>
-					<groupId>net.sf.ehcache</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>cglib</artifactId>
-					<groupId>cglib</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>activemq-core</artifactId>
-					<groupId>org.apache.activemq</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>terracotta-toolkit-1.5-runtime</artifactId>
-					<groupId>org.terracotta</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>classmexer</artifactId>
-					<groupId>classmexer</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>guava</artifactId>
-					<groupId>com.google.guava</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-social-twitter</artifactId>
-					<groupId>org.springframework.social</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>ant</artifactId>
-					<groupId>ant</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>xbean-spring</artifactId>
-					<groupId>org.apache.xbean</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-jms</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>spring-social-core</artifactId>
-					<groupId>org.springframework.social</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>javassist</artifactId>
-					<groupId>javassist</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>mysql-connector-java</artifactId>
-					<groupId>mysql</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<version>2.6.2</version>
@@ -449,13 +290,10 @@
 								<include name="ermineJ-app.jar" />
 								<include name="forehead.jar" />
 								<include name="baseCode.jar" />
-								<include name="gemma-mda.jar" />
-								<!-- <include name="gemma-util.jar" /> -->
 								<include name="colt.jar" />
 								<include name="commons-lang.jar" />
 								<include name="commons-configuration.jar" />
 								<include name="commons-collections.jar" />
-								<!-- <include name="jh.jar" /> -->
 								<include name="commons-cli.jar" />
 								<include name="commons-logging.jar" />
 								<include name="commons-math.jar" />
@@ -547,8 +385,6 @@
 					<dependencies>
 						<includes>
 							<include>baseCode:baseCode</include>
-							<include>gemma:gemma-mda</include>
-							<!-- <include>gemma:gemma-util</include> -->
 							<include>colt:colt</include>
 							<include>commons-lang:commons-lang</include>
 							<include>commons-configuration:commons-configuration</include>

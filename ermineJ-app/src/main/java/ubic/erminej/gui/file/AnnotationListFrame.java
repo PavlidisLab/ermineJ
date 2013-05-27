@@ -37,8 +37,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
+import ubic.erminej.data.Platform;
 import ubic.erminej.gui.util.GuiUtil;
-import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
  * Shows list of available annotation files for download.
@@ -57,27 +57,27 @@ public class AnnotationListFrame extends JDialog {
     private static final int COL2WIDTH = 60;
 
     // private static final int COL3WIDTH = 30;
-    private final List<ArrayDesignValueObject> arrays;
+    private final List<Platform> arrays;
 
-    private ArrayDesignValueObject selected;
+    private Platform selected;
 
-    public ArrayDesignValueObject getSelected() {
+    public Platform getSelected() {
         return selected;
     }
 
-    public AnnotationListFrame( List<ArrayDesignValueObject> a ) {
+    public AnnotationListFrame( List<Platform> a ) {
         super();
 
-        this.arrays = new ArrayList<ArrayDesignValueObject>();
+        this.arrays = new ArrayList<Platform>();
 
-        for ( ArrayDesignValueObject v : a ) {
+        for ( Platform v : a ) {
             if ( v.getHasAnnotationFile() ) this.arrays.add( v );
         }
 
         // initially sort by short name.
-        Collections.sort( arrays, new Comparator<ArrayDesignValueObject>() {
+        Collections.sort( arrays, new Comparator<Platform>() {
             @Override
-            public int compare( ArrayDesignValueObject o1, ArrayDesignValueObject o2 ) {
+            public int compare( Platform o1, Platform o2 ) {
                 return o1.getShortName().compareTo( o2.getShortName() );
             }
         } );
@@ -154,9 +154,9 @@ class ADTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
     // private final String[] columnNames = { "Short Name", "Name", "Taxon", "Annots. Avail." };
     private final String[] columnNames = { "Short Name", "Name", "Taxon" };
-    List<ArrayDesignValueObject> designs;
+    List<Platform> designs;
 
-    public ADTableModel( List<ArrayDesignValueObject> designs ) {
+    public ADTableModel( List<Platform> designs ) {
         super();
 
         this.designs = designs;

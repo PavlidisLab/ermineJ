@@ -16,8 +16,6 @@ package ubic.erminej.data;
 
 import java.util.List;
 
-import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
-
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 
@@ -35,7 +33,7 @@ public class AnnotationFileFetcherTest extends TestCase {
                 AnnotationFileFetcherTest.class.getResourceAsStream( "/data/arrayExample.json" ) );
         final JSONValue v = lParser.nextValue();
 
-        List<ArrayDesignValueObject> converted = f.convert( v );
+        List<Platform> converted = f.convert( v );
 
         assertEquals( 2, converted.size() );
 

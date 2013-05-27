@@ -20,13 +20,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
 import ubic.erminej.gui.file.AnnotationListFrame;
-import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 
@@ -54,13 +58,61 @@ public class AnnotationFileFetcher {
     /**
      * Show a list of available annotation files.
      */
-    public ArrayDesignValueObject pickAnnotation() throws IOException {
-        List<ArrayDesignValueObject> i = fetchList();
-        log.info( i.size() + " designs read" );
+    public Platform pickAnnotation() throws IOException {
 
-        AnnotationListFrame f = new AnnotationListFrame( i );
+        List<Platform> designs = fetchPlatformList();
+
+        AnnotationListFrame f = new AnnotationListFrame( designs );
 
         return f.getSelected();
+    }
+
+    /**
+     * @return
+     */
+    private List<Platform> fetchPlatformList() {
+        List<Platform> designs = null;
+
+        FutureTask<List<Platform>> future = new FutureTask<List<Platform>>( new Callable<List<Platform>>() {
+            @Override
+            public List<Platform> call() throws Exception {
+                return fetchList();
+            }
+
+        } );
+
+        Executors.newSingleThreadExecutor().execute( future );
+        try {
+            StopWatch timer = new StopWatch();
+            timer.start();
+            while ( !future.isDone() ) {
+                try {
+                    Thread.sleep( 2000 );
+                    log.info( "Waiting for response ..." );
+                } catch ( InterruptedException ie ) {
+                    throw new IOException( "Fetching platforms interrupted" );
+                }
+                if ( timer.getTime() > 20000 ) {
+                    throw new IOException( "Fetching platforms timed out" );
+                }
+            }
+
+            List<Platform> list = future.get();
+            if ( !list.isEmpty() ) {
+                designs = list;
+            } else {
+                throw new IOException( "Got no platforms" );
+            }
+        } catch ( ExecutionException e ) {
+            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
+        } catch ( IOException e ) {
+            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
+        }
+
+        log.info( designs.size() + " designs read" );
+        return designs;
     }
 
     /**
@@ -69,7 +121,7 @@ public class AnnotationFileFetcher {
      * @return
      * @throws IOException
      */
-    public List<ArrayDesignValueObject> fetchList() throws IOException {
+    public List<Platform> fetchList() throws IOException {
         try {
             String url = Settings.ANNOTATION_FILE_LIST_RESTURL;
             assert url != null;
@@ -89,9 +141,9 @@ public class AnnotationFileFetcher {
      * @param v
      * @return
      */
-    protected List<ArrayDesignValueObject> convert( JSONValue v ) {
+    protected List<Platform> convert( JSONValue v ) {
 
-        List<ArrayDesignValueObject> result = new ArrayList<ArrayDesignValueObject>();
+        List<Platform> result = new ArrayList<Platform>();
         JSONObject o = ( JSONObject ) v;
 
         JSONArray recs = ( ( JSONArray ) o.get( "records" ) );
@@ -118,8 +170,7 @@ public class AnnotationFileFetcher {
         try {
             for ( int i = 0; i < recs.size(); i++ ) {
                 JSONValue val = recs.get( i );
-                ArrayDesignValueObject java = ( ArrayDesignValueObject ) JSONMapper.toJava( val,
-                        ArrayDesignValueObject.class );
+                Platform java = ( Platform ) JSONMapper.toJava( val, Platform.class );
                 result.add( java );
             }
 
