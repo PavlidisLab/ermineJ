@@ -544,6 +544,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         this.goTree.addTreeSelectionListener( new TreeSelectionListener() {
             @Override
             public void valueChanged( TreeSelectionEvent e ) {
+                if ( e == null ) return;
                 currentlySelectedTreePath = e.getPath();
                 GeneSetTreeNode currentNode = ( GeneSetTreeNode ) currentlySelectedTreePath.getLastPathComponent();
                 currentlySelectedGeneSet = currentNode.getTerm();

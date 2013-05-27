@@ -32,16 +32,7 @@ import ubic.erminej.gui.util.GuiUtil;
 public class ErmineJGui {
     public static void main( String[] args ) {
         try {
-
-            String osName = System.getProperty( "os.name" );
-            boolean isMac = osName.contains( "OS X" );
-
-            if ( isMac ) {
-                // ugly, but safer.
-                UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() );
-            } else {
-                UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
-            }
+            UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
 
             @SuppressWarnings("unused")
             ErmineJGui ermineJGui = new ErmineJGui( new Settings( true ) );

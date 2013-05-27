@@ -61,33 +61,16 @@ public class GuiUtil {
      */
     public static File chooseOutputFile( Frame owner, String startingDirectory, String startingFileName,
             StatusViewer statusMessenger ) {
-        // String osName = System.getProperty( "os.name" );
-        // boolean isMac = osName.contains( "OS X" );
-        // if ( isMac ) {
-        //
-        // FileDialog chooser = new FileDialog( owner );
-        // chooser.setDirectory( startingDirectory );
-        // chooser.setMultipleMode( false );
-        // chooser.setFile( startingFileName );
-        //
-        // String fileName = chooser.getFile();
-        // if ( fileName == null ) {
-        // statusMessenger.showStatus( "Save cancelled." );
-        // return null;
-        // }
-        // return new File( fileName );
-        //
-        // } else {
 
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode( JFileChooser.FILES_ONLY );
         chooser.setCurrentDirectory( new File( startingDirectory ) );
-        chooser.setApproveButtonText( "OK" );
-        chooser.setDialogTitle( "Save Analysis As:" );
-
         chooser.setSelectedFile( new File( startingFileName ) );
 
-        int result = chooser.showOpenDialog( owner );
+        chooser.setApproveButtonText( "OK" );
+        chooser.setDialogTitle( "Save As:" );
+
+        int result = chooser.showSaveDialog( owner );
 
         if ( result == JFileChooser.APPROVE_OPTION ) {
             return chooser.getSelectedFile();
