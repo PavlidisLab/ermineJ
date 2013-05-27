@@ -880,11 +880,9 @@ public class MainFrame extends JFrame {
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
-            statusMessenger.showStatus( "Score file set to " + scoreFile + ", reading values from column "
-                    + settings.getScoreCol() );
-            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
             settings.setScoreCol( fchooser.getStartColumn() );
-            statusMessenger.showStatus( "Score file set to " + scoreFile );
+            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile()
+                    + ", reading values from column " + settings.getScoreCol() );
         }
 
     }
@@ -897,13 +895,13 @@ public class MainFrame extends JFrame {
         }
 
         JRawFileChooser fchooser = new JRawFileChooser( rawDataFileName, settings.getDataCol() );
-        fchooser.setDialogTitle( "Choose the expression data file or cancel." );
+        fchooser.setDialogTitle( "Choose the data file or cancel." );
         int yesno = fchooser.showDialog( this, "Open" );
 
         if ( yesno == JFileChooser.APPROVE_OPTION ) {
             settings.setRawFile( fchooser.getSelectedFile().getAbsolutePath() );
             settings.setDataCol( fchooser.getStartColumn() );
-            statusMessenger.showStatus( "Data file set to " + settings.getScoreFile() );
+            statusMessenger.showStatus( "Data file set to " + settings.getRawDataFileName() );
         }
     }
 
