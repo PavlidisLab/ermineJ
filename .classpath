@@ -38,6 +38,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.7/antlr-2.7.7.jar"/>
-	<classpathentry kind="var" path="M2_REPO/gemma/gemma-mda/1.6-SNAPSHOT/gemma-mda-1.6-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/gemma/gemma-mda/1.7-SNAPSHOT/gemma-mda-1.7-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
