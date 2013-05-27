@@ -294,6 +294,7 @@ public class StartupPanel extends JPanel {
                     final Platform result = f.pickAnnotation();
 
                     if ( result == null ) {
+                        statusMessenger.clear();
                         return null;
                     }
 

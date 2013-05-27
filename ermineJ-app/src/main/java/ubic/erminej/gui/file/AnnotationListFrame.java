@@ -56,10 +56,9 @@ public class AnnotationListFrame extends JDialog {
 
     private static final int COL2WIDTH = 60;
 
-    // private static final int COL3WIDTH = 30;
     private final List<Platform> arrays;
 
-    private Platform selected;
+    private Platform selected = null;
 
     public Platform getSelected() {
         return selected;
