@@ -535,6 +535,8 @@ public class StartupPanel extends JPanel {
             annotFileTextField.setText( chooser.getSelectedFile().toString() );
             settings.setDataDirectory( chooser.getSelectedFile().getParent() );
             projectFileTextField.setText( "" );
+            this.annotFileTextField.setEnabled( true );
+            this.classFileTextField.setEnabled( true );
         }
     }
 
@@ -550,6 +552,8 @@ public class StartupPanel extends JPanel {
             classFileTextField.setText( chooser.getSelectedFile().toString() );
             settings.setDataDirectory( chooser.getSelectedFile().getParent() );
             projectFileTextField.setText( "" );
+            this.annotFileTextField.setEnabled( true );
+            this.classFileTextField.setEnabled( true );
         }
     }
 
@@ -596,7 +600,7 @@ public class StartupPanel extends JPanel {
                 this.classFileTextField.setText( settings.getClassFile() );
                 this.annotFileTextField.setText( settings.getAnnotFile() );
                 this.annotFileTextField.setEnabled( false );
-                this.classFileTextField.setEnabled( false ); // FIXME have to disable the entire chooser.
+                this.classFileTextField.setEnabled( false );
 
             } catch ( ConfigurationException e ) {
                 GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
