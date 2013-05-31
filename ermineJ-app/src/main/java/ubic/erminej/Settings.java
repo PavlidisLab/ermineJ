@@ -636,16 +636,20 @@ public class Settings extends SettingsHolder {
         }
 
         for ( String propertyName : ANALYSIS_SETTINGS ) {
-            if ( this.getProperty( propertyName ) == null ) {
-                /*
-                 * This happens if we are using the defaults.
-                 */
-                log.debug( "No property " + propertyName + ", skipping" );
+
+            if ( !this.loadUserDefined() && propertyName.equals( CUSTOM_GENESET_FILES ) ) {
                 continue;
             }
 
+            String value = "";
+            if ( this.getProperty( propertyName ) == null ) {
+                value = getDefault( propertyName ).toString();
+            } else {
+                value = config.getProperty( propertyName ).toString();
+            }
+
             out.write( propertyName + " = " );
-            out.write( StringEscapeUtils.escapeJava( config.getProperty( propertyName ).toString() ) );
+            out.write( StringEscapeUtils.escapeJava( value ) );
             out.write( "\n" );
         }
         out.close();

@@ -53,7 +53,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
 
         if ( ism == null || is == null || isi == null ) throw new IOException();
 
-        s = new Settings();
+        s = new Settings( false );
         s.setGeneScoreThreshold( 0.015 );
         s.setMinClassSize( 2 );
         s.setMaxClassSize( 200 );
@@ -67,6 +67,9 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         s.setUseUserDefined( false );
         s.setLoadUserDefined( false );
         s.setGeneRepTreatment( MultiProbeHandling.MEAN );
+        s.setScoreFile( AbstractPvalGeneratorTest.class.getResource( "/data/test.scores.txt" ).getFile() );
+        s.setAnnotFile( AbstractPvalGeneratorTest.class.getResource( "/data/test.an.txt" ).getFile() );
+        s.setClassFile( AbstractPvalGeneratorTest.class.getResource( "/data/go-termdb-test.xml" ).getFile() );
 
         gon = new GeneSetTerms( isi );
         GeneAnnotationParser p = new GeneAnnotationParser( gon );

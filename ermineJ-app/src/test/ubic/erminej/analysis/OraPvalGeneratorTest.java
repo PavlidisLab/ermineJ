@@ -18,6 +18,13 @@
  */
 package ubic.erminej.analysis;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Collection;
+
+import ubic.erminej.ResultsFileReader;
+import ubic.erminej.ResultsPrinter;
 import ubic.erminej.data.GeneSetResult;
 import cern.jet.math.Arithmetic;
 
@@ -71,6 +78,43 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         double actualReturn = r.getPvalue();
 
         assertEquals( expectedReturn, actualReturn, 0.0001 );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public void testReadWrite() throws Exception {
+        GeneSetPvalRun results = new GeneSetPvalRun( s, scores );
+
+        File tmp = File.createTempFile( "erminejtest.", ".txt" );
+        ResultsPrinter.write( tmp.getAbsolutePath(), results, false );
+
+        FileReader fr = new FileReader( tmp );
+        BufferedReader br = new BufferedReader( fr );
+        boolean found1 = false;
+        boolean found2 = false;
+        boolean found3 = false;
+
+        while ( br.ready() ) {
+            String line = br.readLine();
+            if ( line.startsWith( "numAboveThreshold" ) ) {
+                found1 = true;
+            } else if ( line.startsWith( "maxClassSize" ) ) {
+                found2 = true;
+            } else if ( line.startsWith( "useUserDefinedGroups" ) ) {
+                found3 = true;
+            }
+
+            System.err.println( line );
+        }
+
+        assertTrue( found1 && found2 && found3 );
+
+        Collection<GeneSetPvalRun> loadedresults = ResultsFileReader.load( this.annotations, tmp.getAbsolutePath(),
+                null );
+
+        assertEquals( 1, loadedresults.size() );
+
     }
 
     /*

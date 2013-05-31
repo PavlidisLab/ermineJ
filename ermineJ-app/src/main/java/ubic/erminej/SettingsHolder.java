@@ -97,7 +97,7 @@ public class SettingsHolder {
     protected static final String GENE_SCORE_THRESHOLD_LEGACY_KEY = "pValThreshold";
     protected static final String GENE_SET_RESAMPLING_SCORE_METHOD = "rawScoreMethod";
     protected static final String GOLD_STANDARD_FILE = "goldStandardFile";
-
+    protected static final String LOAD_USER_DEFINED_GENE_GROUPS = "loadUserDefinedGeneGroups";
     protected static final String IS_TESTER = "isTester";
 
     protected static final String ITERATIONS = "iterations";
@@ -492,7 +492,7 @@ public class SettingsHolder {
 
     // primarily for testing.
     public boolean loadUserDefined() {
-        return this.config.getBoolean( "loadUserDefinedGeneGroups", true );
+        return this.config.getBoolean( LOAD_USER_DEFINED_GENE_GROUPS, true );
     }
 
     public void setCustomGeneSetFiles( Collection<String> filePaths ) {
@@ -500,7 +500,7 @@ public class SettingsHolder {
     }
 
     public void setLoadUserDefined( boolean b ) {
-        this.config.setProperty( "loadUserDefinedGeneGroups", b );
+        this.config.setProperty( LOAD_USER_DEFINED_GENE_GROUPS, b );
     }
 
     public void setRawFile( String val ) {
@@ -514,7 +514,7 @@ public class SettingsHolder {
     public void setUseUserDefined( boolean b ) {
         this.config.setProperty( USE_USER_DEFINED_GROUPS, b );
         if ( b ) {
-            this.config.setProperty( "loadUserDefinedGeneGroups", true );
+            this.config.setProperty( LOAD_USER_DEFINED_GENE_GROUPS, true );
         }
     }
 
