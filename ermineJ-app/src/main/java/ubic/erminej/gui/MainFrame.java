@@ -1169,7 +1169,7 @@ public class MainFrame extends JFrame {
 
         this.readPrefs();
 
-        this.setTitle( "ErmineJ" );
+        this.setTitle( "ErmineJ " + SettingsHolder.getVersion() );
         this.setIconImage( new ImageIcon( this.getClass().getResource( RESOURCE_LOCATION + "logoIcon64.gif" ) )
                 .getImage() );
         this.getContentPane().setLayout( new BorderLayout() );

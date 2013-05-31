@@ -14,7 +14,10 @@
  */
 package ubic.erminej;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,14 +43,14 @@ public class SettingsHolder {
      * For the gene set resampling method, how are scores computed for the group?
      */
     public enum GeneScoreMethod {
-        MEAN, MEAN_ABOVE_QUANTILE, QUANTILE, PRECISIONRECALL
+        MEAN, MEAN_ABOVE_QUANTILE, PRECISIONRECALL, QUANTILE
     }
 
     /**
      * Which gene set scoring method to use. PREREC is a subtype of GSR.
      */
     public enum Method {
-        ORA, ROC, GSR, CORR
+        CORR, GSR, ORA, ROC
     }
 
     /**
@@ -61,26 +64,14 @@ public class SettingsHolder {
      * How to correct for multiple tests.
      */
     public enum MultiTestCorrMethod {
-        BONFERONNI, WESTFALLYOUNG, BENJAMINIHOCHBERG
+        BENJAMINIHOCHBERG, BONFERONNI, WESTFALLYOUNG
     }
 
     public static Map<String, Object> defaults = new HashMap<String, Object>();
 
-    /**
-     * @param key
-     * @return the default setting for the key, or null if there is no such setting.
-     */
-    public static Object getDefault( String key ) {
-        if ( !defaults.containsKey( key ) ) {
-            return "";
-        }
-        return defaults.get( key );
-    }
-
     public static final String GEMMA_URL_BASE = "http://gemma.chibi.ubc.ca/";
 
-    // note this is also listed in erminejdefault.properties.
-    private static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@";
+    public static final String GENE_URL_BASE = "gene.url.base";
 
     /*
      * Strings used in the config file
@@ -88,60 +79,55 @@ public class SettingsHolder {
     protected static final String ALWAYS_USE_EMPIRICAL = "alwaysUseEmpirical";
 
     protected static final String ANNOT_FILE = "annotFile";
+
     protected static final String ANNOT_FORMAT = "annotFormat";
     protected static final String BIG_IS_BETTER = "bigIsBetter";
     protected static final String CLASS_FILE = "classFile";
     protected static final String CLASS_SCORE_METHOD = "classScoreMethod";
+    protected static final String CUSTOM_GENE_SET_DIRECTORY_PROPERTY = "classFolder";
+    protected static final String CUSTOM_GENESET_FILES = "customGeneSetFiles";
+    protected static final String DATA_COL = "dataCol"; // in data matrix, where the first data are.
     protected static final String DATA_DIRECTORY = "dataDirectory";
+    protected static final String DEFAULT_CUSTOM_GENE_SET_DIR_NAME = "genesets";
+    protected static final String DEFAULT_USER_DATA_DIR_NAME = "ermineJ.data";
     protected static final String DO_LOG = "doLog";
+    protected static final String FILTER_NONSPECIFIC = "filterNonSpecific";
     protected static final String GENE_REP_TREATMENT = "geneRepTreatment";
+    protected static final String GENE_SCORE_THRESHOLD_KEY = "scoreThreshold";
+    protected static final String GENE_SCORE_THRESHOLD_LEGACY_KEY = "pValThreshold";
+    protected static final String GENE_SET_RESAMPLING_SCORE_METHOD = "rawScoreMethod";
     protected static final String GOLD_STANDARD_FILE = "goldStandardFile";
+
     protected static final String IS_TESTER = "isTester";
+
     protected static final String ITERATIONS = "iterations";
     protected static final String MAX_CLASS_SIZE = "maxClassSize";
     protected static final String MIN_CLASS_SIZE = "minClassSize";
     protected static final String MTC_CONFIG_NAME = "mtc";
-    protected static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     protected static final String OUTPUT_FILE = "outputFile";
-    protected static final String GENE_SCORE_THRESHOLD_KEY = "scoreThreshold";
-
-    protected static final String GENE_SCORE_THRESHOLD_LEGACY_KEY = "pValThreshold";
-
     protected static final String PREFERENCES_FILE_NAME = "preferencesFileName";
     protected static final String QUANTILE_CONFIG_NAME = "quantile";
     protected static final String RAW_FILE_CONFIG_NAME = "rawFile";
-    protected static final String GENE_SET_RESAMPLING_SCORE_METHOD = "rawScoreMethod";
+    protected static final String SAVE_ALL_GENES_IN_OUTPUT = "saveAllGenesInOutput";
     protected static final String SCORE_COL = "scoreCol";
     protected static final String SCORE_FILE = "scoreFile";
-    protected static final String DATA_COL = "dataCol"; // in data matrix, where the first data are.
     protected static final String SELECTED_CUSTOM_GENESETS = "selectedCustomGeneSets";
-    protected static final String CUSTOM_GENESET_FILES = "customGeneSetFiles";
-    protected static final String FILTER_NONSPECIFIC = "filterNonSpecific";
     protected static final String USE_BIOL_PROC = "useGOBiologicalProcess";
-    protected static final String USE_MOL_FUNC = "useGOMolecularFunction";
     protected static final String USE_CELL_COMP = "useGOCellularComponent";
+    protected static final String USE_MOL_FUNC = "useGOMolecularFunction";
+    protected static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     protected static final String USE_USER_DEFINED_GROUPS = "useUserDefinedGroups";
-    protected static final String CUSTOM_GENE_SET_DIRECTORY_PROPERTY = "classFolder";
-    protected static final String SAVE_ALL_GENES_IN_OUTPUT = "saveAllGenesInOutput";
-    public static final String GENE_URL_BASE = "gene.url.base";
+    protected static final String VERSIONPARAM = "softwareVersion";
 
-    protected static final String DEFAULT_CUSTOM_GENE_SET_DIR_NAME = "genesets";
-    protected static final String DEFAULT_USER_DATA_DIR_NAME = "ermineJ.data";
-
-    protected static String getDefaultUserClassesDirPath() {
-        return getDefaultUserDataDirPath() + System.getProperty( "file.separator" ) + DEFAULT_CUSTOM_GENE_SET_DIR_NAME;
-    }
+    // note this is also listed in erminejdefault.properties.
+    private static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@";
 
     /**
-     * @return
+     * Hard-coded in case of a failure to retrieve the actual version.
      */
-    protected static String getDefaultUserDataDirPath() {
-        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                + DEFAULT_USER_DATA_DIR_NAME;
-        return dataDirName;
-    }
+    private static final String FALLBACK_VERSION = "3.0";
 
-    protected PropertiesConfiguration config = null;
+    private static String version = FALLBACK_VERSION;
 
     /*
      * Define default values.
@@ -171,12 +157,44 @@ public class SettingsHolder {
         defaults.put( USE_BIOL_PROC, Boolean.TRUE );
         defaults.put( SCORE_COL, 2 );
         defaults.put( DATA_COL, 2 );
+        defaults.put( VERSIONPARAM, version );
     }
+
+    /**
+     * @param key
+     * @return the default setting for the key, or null if there is no such setting.
+     */
+    public static Object getDefault( String key ) {
+        if ( !defaults.containsKey( key ) ) {
+            return "";
+        }
+        return defaults.get( key );
+    }
+
+    public static String getVersion() {
+        return version;
+    }
+
+    protected static String getDefaultUserClassesDirPath() {
+        return getDefaultUserDataDirPath() + System.getProperty( "file.separator" ) + DEFAULT_CUSTOM_GENE_SET_DIR_NAME;
+    }
+
+    /**
+     * @return
+     */
+    protected static String getDefaultUserDataDirPath() {
+        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
+                + DEFAULT_USER_DATA_DIR_NAME;
+        return dataDirName;
+    }
+
+    protected PropertiesConfiguration config = null;
 
     /**
      * @param oldConfig
      */
     public SettingsHolder( PropertiesConfiguration oldConfig ) {
+        this();
         this.config = new PropertiesConfiguration();
         for ( Iterator<String> iter = oldConfig.getKeys(); iter.hasNext(); ) {
             String key = iter.next();
@@ -186,7 +204,15 @@ public class SettingsHolder {
     }
 
     protected SettingsHolder() {
-
+        try {
+            InputStream resourceAsStream = getClass().getResourceAsStream( "/ubic/erminej/version" );
+            BufferedReader r = new BufferedReader( new InputStreamReader( resourceAsStream ) );
+            String v = r.readLine();
+            r.close();
+            version = v;
+        } catch ( Exception e ) {
+            // no big deal.
+        }
     }
 
     /**
@@ -426,14 +452,6 @@ public class SettingsHolder {
         return config.getBoolean( DO_LOG, true );
     }
 
-    /**
-     * @return Returns the useMolecularFunction.
-     */
-    public boolean getUseMolecularFunction() {
-        return config.getBoolean( USE_MOL_FUNC, ( Boolean ) getDefault( USE_MOL_FUNC ) );
-
-    }
-
     // /**
     // * @return true if multiple values for a gene should be combined, or whether each probe should be treated
     // * independently regardless; basically this is always going to be true.
@@ -444,6 +462,14 @@ public class SettingsHolder {
     // || this.getGeneRepTreatment().equals( MultiProbeHandling.BEST ) ) return true;
     // return false;
     // }
+
+    /**
+     * @return Returns the useMolecularFunction.
+     */
+    public boolean getUseMolecularFunction() {
+        return config.getBoolean( USE_MOL_FUNC, ( Boolean ) getDefault( USE_MOL_FUNC ) );
+
+    }
 
     /**
      * Get the path to the directory where custom gene sets are stored (default should be like

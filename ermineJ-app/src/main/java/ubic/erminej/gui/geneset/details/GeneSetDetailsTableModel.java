@@ -62,7 +62,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     private GeneAnnotations geneData;
     private SettingsHolder settings;
     private Map<Gene, JLinkLabel> linkLabels;
-    private String[] tableColumnNames = { "Probe", "Score", "QQ Score", "Symbol", "Name", "Multifunc", "QQ Multifunc" };
+    private String[] tableColumnNames = { "Element", "Score", "QQ Score", "Symbol", "Name", "Multifunc", "QQ Multifunc" };
 
     // private String[] tableColumnTooltips = { "", "", "", "", "", "" };
 

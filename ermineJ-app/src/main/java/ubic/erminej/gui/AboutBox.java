@@ -25,9 +25,6 @@ import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.swing.AbstractAction;
@@ -40,9 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.gui.util.JLinkLabel;
 
 /**
@@ -54,11 +49,8 @@ import ubic.erminej.gui.util.JLinkLabel;
  */
 public class AboutBox extends JDialog {
 
-    private static Log log = LogFactory.getLog( AboutBox.class.getName() );
-
     private static final int TOTAL_HEIGHT = 460;
     private static final int PREFERRED_WIDTH = 450;
-    private String version = "3.0";
 
     private final static String COPYRIGHT = "<html>Copyright &copy; University of British Columbia</html>";
     private static final String SOFTWARENAME = "ermineJ";
@@ -96,7 +88,7 @@ public class AboutBox extends JDialog {
         versionLabel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 30 ) );
         versionLabel.setHorizontalAlignment( SwingConstants.CENTER );
         versionLabel.setHorizontalTextPosition( SwingConstants.LEFT );
-        versionLabel.setText( "Version " + getVersion() );
+        versionLabel.setText( "Version " + SettingsHolder.getVersion() );
 
         JLabel copyrightLabel = new JLabel();
         copyrightLabel.setPreferredSize( new Dimension( PREFERRED_WIDTH, 30 ) );
@@ -164,16 +156,6 @@ public class AboutBox extends JDialog {
 
         this.add( mainPanel );
         pack();
-    }
-
-    private String getVersion() {
-        try {
-            InputStream resourceAsStream = this.getClass().getResourceAsStream( "/ubic/erminej/version" );
-            return ( new BufferedReader( new InputStreamReader( resourceAsStream ) ) ).readLine();
-        } catch ( Exception e ) {
-            log.error( "Could not determine version number: " + e );
-            return this.version;
-        }
     }
 
 }
