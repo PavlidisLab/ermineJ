@@ -166,10 +166,15 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                 && StringUtils.isBlank( rawFileTextField.getText() ) ) {
             wiz.showError( "Correlation analyses require a raw data file." );
             return false;
-        } else if ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR )
-                && StringUtils.isBlank( scoreFileTextField.getText() ) ) {
-            wiz.showError( "ORA, resampling and pre-re methods require a gene score file." );
-            return false;
+        } else if ( !wiz.getAnalysisType().equals( SettingsHolder.Method.CORR ) ) {
+
+            if ( StringUtils.isBlank( scoreFileTextField.getText() ) ) {
+                wiz.showError( "ORA, resampling and pre-re methods require a valid gene score file." );
+                return false;
+            } else if ( !scoreFileOk.get() ) {
+                wiz.showError( "Method requires a valid gene-to-score mapping" );
+                return false;
+            }
         }
 
         try {
@@ -657,6 +662,8 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         return rawDataPanel;
     }
 
+    private AtomicBoolean scoreFileOk = new AtomicBoolean( true );
+
     /**
      * Check the score file
      */
@@ -674,9 +681,16 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
                         String scoreFile = settings.getScoreFile();
                         gs = new GeneScores( scoreFile, settings, w.getStatusField(), w.getGeneAnnots() );
+
+                        if ( gs.getGeneToScoreMap().isEmpty() ) {
+                            w.getStatusField().showError(
+                                    "No valid gene scores were found, check format and identifiers" );
+                            scoreFileOk.set( false );
+                        }
                     }
                 } catch ( IOException e ) {
                     w.getStatusField().showError( "Error reading scores: " + e.getMessage(), e );
+                    scoreFileOk.set( false );
                 }
 
                 return null;

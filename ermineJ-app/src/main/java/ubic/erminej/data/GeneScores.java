@@ -908,7 +908,6 @@ public class GeneScores {
 
         if ( usable == 0 ) {
             // this is okay, if we're trying to show the class despite there being no results.
-            messenger.showStatus( "No valid gene-to-score mappings were found." );
             return;
         }
 
