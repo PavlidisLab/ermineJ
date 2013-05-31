@@ -14,6 +14,9 @@
  */
 package ubic.erminej.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotationParser.Format;
@@ -30,8 +34,9 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * @author paul
  * @version $Id$
  */
-public class TestMultifunctionality extends TestCase {
+public class TestMultifunctionality {
 
+    @Test
     public void testMf1() throws Exception {
 
         /*

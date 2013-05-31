@@ -1,7 +1,7 @@
 /*
  * The ermineJ project
  * 
- * Copyright (c) 2006 University of British Columbia
+ * Copyright (c) 2006-2013 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,18 @@
  */
 package ubic.erminej.analysis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collection;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ubic.erminej.ResultsFileReader;
 import ubic.erminej.ResultsPrinter;
@@ -34,6 +42,30 @@ import cern.jet.math.Arithmetic;
  */
 public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
+    /*
+     * @see TestCase#setUp()
+     */
+    @Override
+    @Before
+    public void setUp() throws Exception {
+
+        super.setUp();
+
+        test = new OraPvalGenerator( s, super.scores, annotations, null );
+
+    }
+
+    /*
+     * @see TestCase#tearDown()
+     */
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+        test = null;
+    }
+
+    @Test
     public void testClassPval1() {
         double expectedReturn = 0.3216374; // checked // dhyper(2, 11, 8, 2)
 
@@ -47,6 +79,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
 
+    @Test
     public void testClassPval2() {
 
         // there are 19 genes; GO:2 has 4 members, so it should be 15 not in the group
@@ -70,6 +103,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         assertEquals( expectedReturn, actualReturn, 0.0001 );
     }
 
+    @Test
     public void testClassPval3() {
         double expectedReturn = 0.7894737; // checked // dhyper(1, 10,9, 2) + dhyper(2, 10,9, 2)
 
@@ -83,6 +117,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
     /**
      * @throws Exception
      */
+    @Test
     public void testReadWrite() throws Exception {
         GeneSetPvalRun results = new GeneSetPvalRun( s, scores );
 
@@ -105,7 +140,7 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
                 found3 = true;
             }
 
-            System.err.println( line );
+            // System.err.println( line );
         }
 
         assertTrue( found1 && found2 && found3 );
@@ -115,27 +150,6 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
 
         assertEquals( 1, loadedresults.size() );
 
-    }
-
-    /*
-     * @see TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
-
-        super.setUp();
-
-        test = new OraPvalGenerator( s, super.scores, annotations, null );
-
-    }
-
-    /*
-     * @see TestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        test = null;
     }
 
 }

@@ -14,28 +14,32 @@
  */
 package ubic.erminej.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
 
-import junit.framework.TestCase;
-
 /**
  * @author paul
  * @version $Id$
  */
-public class UserDefinedGeneSetManagerTest extends TestCase {
+public class UserDefinedGeneSetManagerTest {
 
     GeneAnnotations geneAnnots;
 
     UserDefinedGeneSetManager manager;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
 
         InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
@@ -51,6 +55,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
 
     }
 
+    @Test
     public final void testKegg() throws Exception {
 
         String filePath = new File( this.getClass().getResource( "/data/genesets/kegg.txt" ).toURI() )
@@ -63,6 +68,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
         }
     }
 
+    @Test
     public final void testMulti() throws Exception {
         Collection<GeneSet> sets = manager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
                 "/data/genesets/my.test-classes.txt" ) );
@@ -77,6 +83,7 @@ public class UserDefinedGeneSetManagerTest extends TestCase {
         }
     }
 
+    @Test
     public final void testSingle() throws Exception {
         Collection<GeneSet> sets = manager.loadUserGeneSetFile( this.getClass().getResourceAsStream(
                 "/data/genesets/GO-0004994-class.txt" ) );

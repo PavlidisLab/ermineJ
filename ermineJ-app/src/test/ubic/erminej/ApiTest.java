@@ -23,21 +23,19 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import ubic.erminej.ClassScoreSimple;
+import org.junit.Test;
 
 /**
  * @author pavlidis
  * @version $Id$
  */
-public class ApiTest extends TestCase {
+public class ApiTest {
 
     private static Log log = LogFactory.getLog( ApiTest.class.getName() );
 
+    @Test
     public final void test() {
         // List of identifiers to be analyzed
         List<String> probes = new ArrayList<String>();

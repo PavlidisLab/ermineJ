@@ -18,6 +18,9 @@
  */
 package ubic.erminej;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,40 +29,18 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 /**
  * @author keshav
  * @version $Id$
  */
-public class LocaleTest extends TestCase {
+public class LocaleTest {
     Log log = LogFactory.getLog( this.getClass() );
 
-    /**
-     * @param is
-     * @throws IOException
-     * @throws ParseException
-     */
-    private void readFile( InputStream is ) throws IOException, ParseException {
-        NumberFormat numberFormat = NumberFormat.getInstance( Locale.FRANCE );
-
-        BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
-        String row;
-        br.readLine();
-        while ( ( row = br.readLine() ) != null ) {
-            String[] vals = row.split( "\t" );
-            Number num = numberFormat.parse( vals[1] );
-            log.debug( num );
-        }
-    }
-
-    /**
-     * 
-     *
-     */
+    @Test
     public void testLocale() {
         log.debug( "testLocale" );
         double num = 100.01;
@@ -83,6 +64,7 @@ public class LocaleTest extends TestCase {
      * The locale can be determined at runtime by getDefault(), which is determined by the Virtual Machine on startup
      * based on the host operating system and the user preferences established on that system
      */
+    @Test
     public void testLocaleParse() throws Exception {
         log.debug( "testLocaleParse" );
         InputStream is = this.getClass().getResourceAsStream( "/data/test.data.euro.txt" );
@@ -90,6 +72,24 @@ public class LocaleTest extends TestCase {
 
         readFile( is );
 
+    }
+
+    /**
+     * @param is
+     * @throws IOException
+     * @throws ParseException
+     */
+    private void readFile( InputStream is ) throws IOException, ParseException {
+        NumberFormat numberFormat = NumberFormat.getInstance( Locale.FRANCE );
+
+        BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
+        String row;
+        br.readLine();
+        while ( ( row = br.readLine() ) != null ) {
+            String[] vals = row.split( "\t" );
+            Number num = numberFormat.parse( vals[1] );
+            log.debug( num );
+        }
     }
 
 }

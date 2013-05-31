@@ -14,12 +14,16 @@
  */
 package ubic.erminej;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests of command line - mostly just parsing, actual analysis not always run.
@@ -27,7 +31,7 @@ import junit.framework.TestCase;
  * @author paul
  * @version $Id$
  */
-public class CliTest extends TestCase {
+public class CliTest {
 
     private String basePath = "";
 
@@ -35,9 +39,8 @@ public class CliTest extends TestCase {
 
     private String gofile;
 
-    @Override
+    @Before
     public final void setUp() throws Exception {
-        super.setUp();
         URL go = this.getClass().getResource( "/data/go_daily-termdb.rdf-xml.zip" );
         File f = new File( go.toURI() );
         gofile = f.getAbsolutePath();
@@ -51,9 +54,8 @@ public class CliTest extends TestCase {
 
     }
 
-    @Override
+    @After
     public final void tearDown() throws Exception {
-        super.tearDown();
         try {
             new File( output ).delete();
         } catch ( Exception e ) {
@@ -62,6 +64,7 @@ public class CliTest extends TestCase {
 
     }
 
+    @Test
     public final void testCliA() throws Exception {
         ErmineJCli cmd = new ErmineJCli();
         assertTrue( !cmd.run( new String[] {} ) );
@@ -72,6 +75,7 @@ public class CliTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public final void testCliB() throws Exception {
         ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.processCommandLine( "foo", new String[] { "-a",
@@ -83,6 +87,7 @@ public class CliTest extends TestCase {
     /**
      * @throws Exception
      */
+    @Test
     public final void testCliC() throws Exception {
         ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.run( new String[] { "-a", "foo", "-n", "2" } );
@@ -94,6 +99,7 @@ public class CliTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public final void testCliD() throws Exception {
         ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.run( new String[] { "-a", basePath + File.separator + "HG-U95A.an.txt", "-n", "1", "-c",
@@ -123,6 +129,7 @@ public class CliTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public final void testCliE() throws Exception {
         ErmineJCli cmd = new ErmineJCli();
         boolean okay = cmd.processCommandLine( "foo", new String[] { "-a",

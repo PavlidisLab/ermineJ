@@ -25,7 +25,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import ubic.erminej.Settings;
-import ubic.erminej.gui.MainFrame;
 
 /**
  * Test the save dialog wizard.

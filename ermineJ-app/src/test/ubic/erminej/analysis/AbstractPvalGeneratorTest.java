@@ -18,10 +18,15 @@
  */
 package ubic.erminej.analysis;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder.MultiProbeHandling;
 import ubic.erminej.data.GeneAnnotationParser;
@@ -35,7 +40,7 @@ import ubic.erminej.data.GeneSetTerms;
  * @author pavlidis
  * @version $Id$
  */
-public abstract class AbstractPvalGeneratorTest extends TestCase {
+public abstract class AbstractPvalGeneratorTest {
     protected OraPvalGenerator test = null;
     protected GeneAnnotations annotations = null;
     protected GeneScores scores = null;
@@ -45,8 +50,8 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
     protected Settings s = null;
     protected GeneSetTerms gon = null;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         ism = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.an.txt" );
         is = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/test.scores.txt" );
         isi = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/go-termdb-test.xml" );
@@ -58,7 +63,7 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
         s.setMinClassSize( 2 );
         s.setMaxClassSize( 200 );
         s.setScoreCol( 2 );
-        s.setUseMultifunctionalityCorrection( false );
+        s.setUseMultifunctionalityCorrection( true );
         s.setDoLog( true );
         s.setBigIsBetter( false );
         s.setUseBiologicalProcess( true );
@@ -86,17 +91,14 @@ public abstract class AbstractPvalGeneratorTest extends TestCase {
 
         assertNotNull( scores.getGeneScores() );
         assertNotNull( scores.getProbeToScoreMap() );
-
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
         isi.close();
         ism.close();
         is.close();
+    }
+
+    @After
+    public void tearDown() throws Exception {
         s.setLoadUserDefined( true );
-        super.tearDown();
     }
 
 }

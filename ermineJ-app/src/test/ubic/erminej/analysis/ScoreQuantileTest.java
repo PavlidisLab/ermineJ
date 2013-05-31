@@ -14,13 +14,15 @@
  */
 package ubic.erminej.analysis;
 
+import static org.junit.Assert.assertEquals;
+import hep.aida.bin.QuantileBin1D;
+
 import java.io.InputStream;
 
 import org.apache.commons.lang.StringUtils;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-import hep.aida.bin.QuantileBin1D;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotationParser;
@@ -33,30 +35,28 @@ import ubic.erminej.data.GeneSetTerms;
  * @author paul
  * @version $Id$
  */
-public class ScoreQuantileTest extends TestCase {
+public class ScoreQuantileTest {
 
     private GeneScores test;
 
-    /*
-     * @see TestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         SettingsHolder s = new Settings( false );
 
         InputStream is = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.scores.txt" );
 
         InputStream ism = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.an.txt" );
 
-        GeneSetTerms geneSetTerms = new GeneSetTerms( GeneScoreReaderTest.class
-                .getResourceAsStream( "/data/go-termdb-test.xml" ) );
+        GeneSetTerms geneSetTerms = new GeneSetTerms(
+                GeneScoreReaderTest.class.getResourceAsStream( "/data/go-termdb-test.xml" ) );
         GeneAnnotationParser p = new GeneAnnotationParser( geneSetTerms );
-        GeneAnnotations g = p.readDefault( ism, null, s, false  );
+        GeneAnnotations g = p.readDefault( ism, null, s, false );
 
         test = new GeneScores( is, s, null, g );
-        super.setUp();
+
     }
 
+    @Test
     public final void testQ1() throws Exception {
 
         System.err.println( StringUtils.join( test.getProbeScores(), "," ) );

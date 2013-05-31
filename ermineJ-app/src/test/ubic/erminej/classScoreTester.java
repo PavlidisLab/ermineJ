@@ -30,10 +30,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.util.RegressionTesting;
-
-import ubic.erminej.ResultsPrinter;
-import ubic.erminej.Settings;
-import ubic.erminej.ErmineJCli;
 import ubic.erminej.analysis.GeneSetPvalRun;
 
 /**
@@ -45,6 +41,11 @@ import ubic.erminej.analysis.GeneSetPvalRun;
 public class classScoreTester extends ErmineJCli {
     private static Log log = LogFactory.getLog( classScoreTester.class.getName() );
     private static final double TOLERANCE = 0.001;
+
+    @SuppressWarnings("unused")
+    public static void main( String[] args ) {
+        new classScoreTester();
+    }
 
     // find settings in the data directory; read each one, run analyses on them.
     public classScoreTester() {
@@ -107,11 +108,6 @@ public class classScoreTester extends ErmineJCli {
             log.fatal( e, e );
         }
 
-    }
-
-    @SuppressWarnings("unused")
-    public static void main( String[] args ) {
-        new classScoreTester();
     }
 
     private boolean compareResults( String a, String b ) throws IOException {

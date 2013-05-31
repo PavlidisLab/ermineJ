@@ -24,7 +24,6 @@ import javax.swing.UIManager;
 import org.xml.sax.SAXException;
 
 import ubic.erminej.data.GOParser;
-import ubic.erminej.gui.TreePanel;
 import ubic.erminej.gui.geneset.tree.GeneSetTreeNode;
 
 /**

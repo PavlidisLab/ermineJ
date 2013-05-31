@@ -18,25 +18,28 @@
  */
 package ubic.erminej.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import ubic.basecode.util.RegressionTesting;
-
-import junit.framework.TestCase;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.GeneScores;
 
 /**
  * @author pavlidis
  * @version $Id$
  */
-public class GeneScoreReaderTest extends TestCase {
+public class GeneScoreReaderTest {
     InputStream is = null;
     InputStream ism = null;
     protected GeneScores test = null;
@@ -44,8 +47,8 @@ public class GeneScoreReaderTest extends TestCase {
     /*
      * @see TestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         SettingsHolder s = new Settings( false );
         s.setUseUserDefined( false );
 
@@ -59,22 +62,34 @@ public class GeneScoreReaderTest extends TestCase {
         GeneAnnotations g = p.readDefault( ism, null, s, false );
 
         test = new GeneScores( is, s, null, g );
-        super.setUp();
+
     }
 
     /*
      * @see TestCase#tearDown()
      */
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
         ism.close();
         is.close();
+    }
+
+    @Test
+    public void testGet_numpvals() {
+        int expectedReturn = 21;
+        int actualReturn = test.getNumProbesUsed();
+        assertEquals( "return value", expectedReturn, actualReturn );
+
+        GeneAnnotations annots = test.getPrunedGeneAnnotations();
+        for ( GeneSet gs : annots.getGeneSets() ) {
+            assertTrue( gs.toString(), test.getGeneToScoreMap().keySet().containsAll( gs.getGenes() ) );
+        }
     }
 
     /**
      * 
      */
+    @Test
     public void testGet_probe_ids() {
         String[] expectedReturn = new String[] { "ProbeA", "ProbeB", "ProbeC", "ProbeD", "ProbeE", "ProbeF", "ProbeG",
                 "ProbeH", "ProbeI", "ProbeJ", "ProbeK", "ProbeL", "ProbeM", "ProbeN", "ProbeO", "ProbeP", "ProbeQ",
@@ -89,38 +104,10 @@ public class GeneScoreReaderTest extends TestCase {
         }
     }
 
-    /**
-     * 
-     */
-    public void testGetPvalues() {
-        double[] expectedReturn = new double[] { -Math.log10( 0.01 ), -Math.log10( 0.01 ), -Math.log10( 0.02 ),
-                -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ),
-                -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ),
-                -Math.log10( 0.25 ), -Math.log10( 0.3 ), -Math.log10( 0.4 ), -Math.log10( 0.5 ), -Math.log10( 0.6 ),
-                -Math.log10( 0.7 ), -Math.log10( 0.8 ), -Math.log10( 0.9 ) };
-        Double[] actualReturn = test.getProbeScores();
-
-        assertEquals( expectedReturn.length, actualReturn.length );
-
-        assertEquals( 19, test.getGeneScores().length );
-
-        assertTrue( RegressionTesting.closeEnough( expectedReturn, ArrayUtils.toPrimitive( actualReturn ), 0.001 ) );
-    }
-
-    public void testGet_numpvals() {
-        int expectedReturn = 21;
-        int actualReturn = test.getNumProbesUsed();
-        assertEquals( "return value", expectedReturn, actualReturn );
-
-        GeneAnnotations annots = test.getPrunedGeneAnnotations();
-        for ( GeneSet gs : annots.getGeneSets() ) {
-            assertTrue( gs.toString(), test.getGeneToScoreMap().keySet().containsAll( gs.getGenes() ) );
-        }
-    }
-
     /*
      * Class under test for Map getGeneToPvalMap()
      */
+    @Test
     public void testGetGeneToPvalMap() {
         Set<Gene> expectedReturn = new HashSet<Gene>();
         expectedReturn.add( new Gene( "GeneA" ) );
@@ -146,6 +133,25 @@ public class GeneScoreReaderTest extends TestCase {
         Set<Gene> actualReturn = test.getGeneToScoreMap().keySet();
 
         assertTrue( RegressionTesting.containsSame( expectedReturn, actualReturn ) );
+    }
+
+    /**
+     * 
+     */
+    @Test
+    public void testGetPvalues() {
+        double[] expectedReturn = new double[] { -Math.log10( 0.01 ), -Math.log10( 0.01 ), -Math.log10( 0.02 ),
+                -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ), -Math.log10( 0.1 ),
+                -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ), -Math.log10( 0.2 ),
+                -Math.log10( 0.25 ), -Math.log10( 0.3 ), -Math.log10( 0.4 ), -Math.log10( 0.5 ), -Math.log10( 0.6 ),
+                -Math.log10( 0.7 ), -Math.log10( 0.8 ), -Math.log10( 0.9 ) };
+        Double[] actualReturn = test.getProbeScores();
+
+        assertEquals( expectedReturn.length, actualReturn.length );
+
+        assertEquals( 19, test.getGeneScores().length );
+
+        assertTrue( RegressionTesting.closeEnough( expectedReturn, ArrayUtils.toPrimitive( actualReturn ), 0.001 ) );
     }
 
 }

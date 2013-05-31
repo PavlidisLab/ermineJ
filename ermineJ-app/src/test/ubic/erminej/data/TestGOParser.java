@@ -18,21 +18,25 @@
  */
 package ubic.erminej.data;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 import ubic.basecode.util.RegressionTesting;
-import ubic.erminej.data.GOParser;
 
 /**
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class TestGOParser extends TestCase {
+public class TestGOParser {
 
     private GOParser gOParser = null;
 
@@ -41,6 +45,7 @@ public class TestGOParser extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testGOParser() throws Exception {
 
         InputStream i = TestGOParser.class.getResourceAsStream( "/data/go-termdb-sample.xml" );
@@ -63,8 +68,28 @@ public class TestGOParser extends TestCase {
     }
 
     /**
+     * Was failing with 'unrecognized aspect'
+     * 
      * @throws Exception
      */
+    @Test
+    public void testGOParser3() throws Exception {
+        InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200408-termdb.xml.gz" ) );
+        gOParser = new GOParser( z, true );
+
+        assertNotNull( gOParser.getGraph().getRoot() );
+        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0045034" );
+
+        assertNotNull( testnode );
+        Set<String> parentKeys = testnode.getParentKeys();
+        assertTrue( parentKeys.size() > 0 );
+    }
+
+    /**
+     * @throws Exception
+     */
+    @Test
     public void testGOParserB() throws Exception {
 
         InputStream i = TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
@@ -84,6 +109,7 @@ public class TestGOParser extends TestCase {
         assertNotNull( gOParser.getGraph().getRoot() );
     }
 
+    @Test
     public void testGOParserCBig() throws Exception {
         ZipInputStream z = new ZipInputStream(
                 TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
@@ -99,6 +125,7 @@ public class TestGOParser extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testGOParserOld() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200212-termdb.xml.gz" ) );
         gOParser = new GOParser( z, true );
@@ -112,25 +139,9 @@ public class TestGOParser extends TestCase {
         assertTrue( parentKeys.size() > 0 );
     }
 
+    @Test
     public void testGOParserOld2() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200109-termdb.xml.gz" ) );
-        gOParser = new GOParser( z, true );
-        assertNotNull( gOParser.getGraph().getRoot() );
-        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
-        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0008920" );
-
-        assertNotNull( testnode );
-        Set<String> parentKeys = testnode.getParentKeys();
-        assertTrue( parentKeys.size() > 0 );
-    }
-
-    /**
-     * Faulty file doesn't have acc elements.
-     * 
-     * @throws Exception
-     */
-    public void testGOParserOld3() throws Exception {
-        InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200111-termdb.xml.gz" ) );
         gOParser = new GOParser( z, true );
         assertNotNull( gOParser.getGraph().getRoot() );
         assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
@@ -160,17 +171,17 @@ public class TestGOParser extends TestCase {
     // }
 
     /**
-     * Was failing with 'unrecognized aspect'
+     * Faulty file doesn't have acc elements.
      * 
      * @throws Exception
      */
-    public void testGOParser3() throws Exception {
-        InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200408-termdb.xml.gz" ) );
+    @Test
+    public void testGOParserOld3() throws Exception {
+        InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200111-termdb.xml.gz" ) );
         gOParser = new GOParser( z, true );
-
         assertNotNull( gOParser.getGraph().getRoot() );
         assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
-        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0045034" );
+        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0008920" );
 
         assertNotNull( testnode );
         Set<String> parentKeys = testnode.getParentKeys();

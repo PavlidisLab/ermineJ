@@ -14,19 +14,22 @@
  */
 package ubic.erminej.data;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
+
+import org.junit.Test;
 
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
-
-import junit.framework.TestCase;
 
 /**
  * @author paul
  * @version $Id$
  */
-public class AnnotationFileFetcherTest extends TestCase {
+public class AnnotationFileFetcherTest {
 
+    @Test
     public void testConvert() throws Exception {
         AnnotationFileFetcher f = new AnnotationFileFetcher();
         final JSONParser lParser = new JSONParser(
