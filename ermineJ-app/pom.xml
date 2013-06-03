@@ -249,7 +249,6 @@
 						<include>**/*Test.java</include>
 					</includes>
 					<excludes>
-						<exclude>**/AllTests.java</exclude>
 						<exclude>**/Abstract*.java</exclude>
 						<exclude>**/gui/*</exclude>
 					</excludes>
