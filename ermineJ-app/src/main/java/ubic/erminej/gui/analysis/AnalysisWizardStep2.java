@@ -686,13 +686,16 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                             w.getStatusField().showError(
                                     "No valid gene scores were found, check format and identifiers" );
                             scoreFileOk.set( false );
+                            return null;
                         }
                     }
                 } catch ( IOException e ) {
                     w.getStatusField().showError( "Error reading scores: " + e.getMessage(), e );
                     scoreFileOk.set( false );
+                    return null;
                 }
 
+                scoreFileOk.set( true );
                 return null;
             }
         };
