@@ -329,15 +329,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * Has no effect unless you call filter() afterwards
-     * 
-     * @param b
-     */
-    public void setHideInsignificant( boolean b ) {
-        hideInsignificant = b;
-    }
-
-    /**
      * @param parent
      * @param expand if true expand, otherwise collapse.
      */

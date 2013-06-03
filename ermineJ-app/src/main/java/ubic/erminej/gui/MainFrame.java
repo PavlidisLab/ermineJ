@@ -195,6 +195,7 @@ public class MainFrame extends JFrame {
 
     private JProgressBar progressBar = new JProgressBar();
     private JMenuItem defineClassMenuItem = new JMenuItem();
+
     private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
     private JMenuItem loadAnalysisMenuItem = new JMenuItem();
     private JMenuItem modClassMenuItem = new JMenuItem();
@@ -359,6 +360,8 @@ public class MainFrame extends JFrame {
         this.treePanel.removeRun( runToRemove );
         this.tablePanel.removeRun( runToRemove );
 
+        boolean hasResults = !this.results.isEmpty();
+        this.setHideNonSignificantClassMenuItemEnabled( hasResults ); 
         updateRunViewMenu();
     }
 
@@ -692,10 +695,15 @@ public class MainFrame extends JFrame {
      * 
      */
     protected void resetSignificanceFilters() {
+        hideNonsignificantClassMenuItem.setState( false );
+        hideNonsignificantClassMenuItem.setEnabled( true );
         this.treePanel.setHideInsignificant( false );
         this.treePanel.filter( true );
     }
 
+    /**
+     * 
+     */
     protected void saveProject() {
 
         /*
@@ -926,6 +934,13 @@ public class MainFrame extends JFrame {
         cwiz.showWizard();
     }
 
+    void hideNonsignificantClassActionPerformed( boolean checked ) {
+        this.treePanel.setHideInsignificant( checked );
+        this.tablePanel.setHideInsignificant( checked );
+
+        this.tablePanel.filter( true );
+    }
+
     /**
      * Cancel the currently running analysis task.
      */
@@ -949,13 +964,45 @@ public class MainFrame extends JFrame {
 
     }
 
+    /**
+     * @param state
+     */
+    public void setHideNonSignificantClassMenuItemEnabled( boolean state ) {
+        hideNonsignificantClassMenuItem.setEnabled( state );
+        treePanel.setHideInsignificantEnabled( state );
+        tablePanel.setHideInsignificantEnabled( state );
+    }
+
+    /**
+     * @param state
+     */
+    public void setHideNonSignificantClassMenuItemState( boolean state ) {
+        if ( state ) {
+            hideNonsignificantClassMenuItem.setEnabled( true );
+        }
+        hideNonsignificantClassMenuItem.setState( state );
+    }
+
+    /**
+     * Called after an analysis (failed or successful)
+     */
     void enableMenusForAnalysis() {
         defineClassMenuItem.setEnabled( true );
         modClassMenuItem.setEnabled( true );
         runAnalysisMenuItem.setEnabled( true );
         loadAnalysisMenuItem.setEnabled( true );
         maybeEnableSomeMenus();
-        if ( results.size() > 0 ) saveAnalysisMenuItem.setEnabled( true );
+        if ( results.size() > 0 ) {
+            hideNonsignificantClassMenuItem.setEnabled( true );
+            treePanel.setHideInsignificantEnabled( true );
+            tablePanel.setHideInsignificantEnabled( true );
+            saveAnalysisMenuItem.setEnabled( true );
+        } else {
+            hideNonsignificantClassMenuItem.setEnabled( false );
+            treePanel.setHideInsignificantEnabled( false );
+            tablePanel.setHideInsignificantEnabled( false );
+            tablePanel.setHideInsignificantEnabled( false );
+        }
         cancelAnalysisMenuItem.setEnabled( false );
     }
 
@@ -1079,6 +1126,7 @@ public class MainFrame extends JFrame {
         diagnosticsMenu.setEnabled( true );
         runViewMenu.setEnabled( false );
         helpMenu.setEnabled( true );
+        this.setHideNonSignificantClassMenuItemEnabled( false );
         // searchPanel.setEnabled( true );
     }
 
@@ -1368,13 +1416,20 @@ public class MainFrame extends JFrame {
         tabs.addTab( "Tree", treePanel );
     }
 
+    final private JCheckBoxMenuItem hideNonsignificantClassMenuItem = new JCheckBoxMenuItem();
+
+    public boolean getNonsignificantClassMenuItemState() {
+        return hideNonsignificantClassMenuItem.getState();
+    }
+
     /**
      * 
      */
     private void setupMenus() {
         JMenuBar jMenuBar1 = new JMenuBar();
         this.setJMenuBar( jMenuBar1 );
-        final JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined gene sets", false );
+        final JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined only", false );
+
         JMenuItem quitMenuItem = new JMenuItem();
         JMenuItem logMenuItem = new JMenuItem();
         JMenuItem geneAnnotsWebLinkMenuItem = new JMenuItem();
@@ -1424,6 +1479,18 @@ public class MainFrame extends JFrame {
         defineClassMenuItem.setMnemonic( 'D' );
         defineClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK ) );
 
+        hideNonsignificantClassMenuItem.setText( "Show significant only" );
+        hideNonsignificantClassMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                hideNonsignificantClassActionPerformed( hideNonsignificantClassMenuItem.getState() );
+            }
+        } );
+
+        hideNonsignificantClassMenuItem.setMnemonic( 'H' );
+        hideNonsignificantClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_H,
+                InputEvent.CTRL_DOWN_MASK ) );
+
         modClassMenuItem.setText( "View/Modify Gene Set" );
         modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
         modClassMenuItem.setMnemonic( 'M' );
@@ -1440,6 +1507,7 @@ public class MainFrame extends JFrame {
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
         classMenu.add( showUsersMenuItem );
+        classMenu.add( hideNonsignificantClassMenuItem );
 
         this.runViewMenu.setText( "Results" );
         runViewMenu.setMnemonic( 'R' );

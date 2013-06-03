@@ -61,6 +61,18 @@ public class GeneSetPvalRun {
     }
 
     /**
+     * @return true if there is at least one result with a corrected pvalue better than 0.1, false otherwise.
+     */
+    public boolean hasSignificant() {
+        for ( GeneSetResult gsr : this.results.values() ) {
+            if ( gsr.getCorrectedPvalue() < 0.1 ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param
      * @param useMfCorrection Use the multifunctionality results stored.
      * @return Ranked list. Removes any sets which are not scored.

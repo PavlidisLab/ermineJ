@@ -576,6 +576,11 @@ public class GeneSetTablePanel extends GeneSetPanel {
         resortByCurrentResults();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see ubic.erminej.gui.geneset.GeneSetPanel#filter(boolean)
+     */
     @Override
     public void filter( boolean propagate ) {
         this.model.setFilterEmpty( hideEmpty );

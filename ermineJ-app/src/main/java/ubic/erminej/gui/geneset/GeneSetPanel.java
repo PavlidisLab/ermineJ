@@ -61,37 +61,41 @@ import ubic.erminej.gui.util.GuiUtil;
  */
 public abstract class GeneSetPanel extends JScrollPane {
 
+    public static final String DELETED = "DELETED";
+
     public static final double FDR_THRESHOLD_FOR_FILTER = 0.1;
+
+    public static final int MAX_DEFINITION_LENGTH = 300;
+
+    public static final String NOACTION = "NOACTION";
+
+    public static final String RESOURCE_LOCATION = "/ubic/erminej/";
+
+    public static final String RESTORED = "RESTORED";
 
     public static final Color USER_NODE_COLOR = Color.decode( "#FAFABB" );
 
     public static final Color USER_NODE_TEXT_COLOR = Color.BLACK;
-
-    public static final String RESOURCE_LOCATION = "/ubic/erminej/";
-
-    private static final long serialVersionUID = 1L;
-
-    static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
-
     static final String AMIGO_URL_BASE = "http://amigo.geneontology.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
-
-    protected MainFrame callingFrame;
-    protected GeneAnnotations geneData;
-    protected StatusViewer messenger = new StatusStderr();
-
-    protected Settings settings;
-    public static final String NOACTION = "NOACTION";
-    public static final String RESTORED = "RESTORED";
-    public static final String DELETED = "DELETED";
-    public static final int MAX_DEFINITION_LENGTH = 300;
-
-    // TODO: Gemma view of gene set
-    private static final String GEMMA_URL_BASE = "http://www.chibi.ubc.ca/Gemma/(GO TO GO GROUP)";
+    static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
 
     protected static boolean hideEmpty = true;
     protected static boolean hideInsignificant = false;
     protected static boolean hideNonCustom = false;
+    private static final long serialVersionUID = 1L;
+    protected MainFrame callingFrame;
+
+    // TODO: Gemma view of gene set
+    // private static final String GEMMA_URL_BASE = "http://www.chibi.ubc.ca/Gemma/(GO TO GO GROUP)";
+
+    protected GeneAnnotations geneData;
+    protected final JCheckBoxMenuItem hideInsigPopupMenuItem = new JCheckBoxMenuItem( "Hide non-significant",
+            hideInsignificant );
+
+    protected StatusViewer messenger = new StatusStderr();
+
+    protected Settings settings;
 
     private Collection<GeneSetPanel> dependentPanels = new HashSet<GeneSetPanel>();
 
@@ -108,11 +112,9 @@ public abstract class GeneSetPanel extends JScrollPane {
     public abstract void addRun();
 
     /**
-     * Do any extra cleanup after a run has been deleted.
-     * 
-     * @param runToRemove
+     * @param propagate to the
      */
-    public abstract void removeRun( GeneSetPvalRun runToRemove );
+    public abstract void filter( boolean propagate );
 
     /**
      * @param e
@@ -125,14 +127,41 @@ public abstract class GeneSetPanel extends JScrollPane {
     }
 
     /**
+     * Updating, reapplying filters
+     */
+    public abstract void refreshView();
+
+    /**
+     * Do any extra cleanup after a run has been deleted.
+     * 
+     * @param runToRemove
+     */
+    public abstract void removeRun( GeneSetPvalRun runToRemove );
+
+    /**
      * Restore view
      */
     public abstract void resetView();
 
     /**
-     * Updating, reapplying filters
+     * Has no effect unless you call filter() afterwards
+     * 
+     * @param b
      */
-    public abstract void refreshView();
+    public void setHideInsignificant( boolean b ) {
+        hideInsignificant = b;
+        hideInsigPopupMenuItem.setState( b );
+        callingFrame.setHideNonSignificantClassMenuItemState( b );
+    }
+
+    /**
+     * Enable or disable the state of the popup menu item.
+     * 
+     * @param b
+     */
+    public void setHideInsignificantEnabled( boolean b ) {
+        this.hideInsigPopupMenuItem.setEnabled( b );
+    }
 
     /**
      * @param messenger
@@ -159,24 +188,24 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         GeneSetPanelPopupMenu popup = new GeneSetPanelPopupMenu( classID );
 
-        JMenuItem viewItem = new JMenuItem( "Open detailed view ..." );
-        viewItem.addActionListener( new ActionListener() {
-
-            @Override
-            public void actionPerformed( ActionEvent e1 ) {
-                // FIXME: get the result set at the menu point.
-                showDetailsForGeneSet( classID, callingFrame.getCurrentResultSet() );
-            }
-        } );
+        // JMenuItem viewItem = new JMenuItem( "Open detailed view ..." );
+        // viewItem.addActionListener( new ActionListener() {
+        //
+        // @Override
+        // public void actionPerformed( ActionEvent e1 ) {
+        // // FIXME: get the result set at the menu point.
+        // showDetailsForGeneSet( classID, callingFrame.getCurrentResultSet() );
+        // }
+        // } );
 
         JMenuItem modMenuItem = new JMenuItem( "Modify this gene set..." );
         modMenuItem.addActionListener( new ModifySetActionAdapter( this ) );
 
         final JMenuItem visitAmigoMenuItem = new JMenuItem( "Go to GO web site" );
         visitAmigoMenuItem.addActionListener( new UrlActionAdapter( this, AMIGO_URL_BASE ) );
-
-        final JMenuItem gemmaMenuItem = new JMenuItem( "Examine in Gemma" );
-        gemmaMenuItem.addActionListener( new UrlActionAdapter( this, GEMMA_URL_BASE ) );
+        //
+        // final JMenuItem gemmaMenuItem = new JMenuItem( "Examine in Gemma" );
+        // gemmaMenuItem.addActionListener( new UrlActionAdapter( this, GEMMA_URL_BASE ) );
 
         final JMenuItem deleteGeneSetMenuItem = new JMenuItem( "Delete this gene set" );
         deleteGeneSetMenuItem.addActionListener( new ActionListener() {
@@ -187,7 +216,6 @@ public abstract class GeneSetPanel extends JScrollPane {
         } );
 
         final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty );
-        final JCheckBoxMenuItem hideInsig = new JCheckBoxMenuItem( "Hide non-significant", hideInsignificant );
 
         hideEmptyMenuItem.addActionListener( new ActionListener() {
             @Override
@@ -198,21 +226,23 @@ public abstract class GeneSetPanel extends JScrollPane {
 
         } );
 
-        hideInsig.addActionListener( new ActionListener() {
+        hideInsigPopupMenuItem.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e1 ) {
-                hideInsignificant = hideInsig.getState();
+                hideInsignificant = hideInsigPopupMenuItem.getState();
+                callingFrame.setHideNonSignificantClassMenuItemState( hideInsignificant );
                 filter( true );
             }
 
         } );
 
+        // poup.add(viewItem);
         popup.add( visitAmigoMenuItem );
         // popup.add(gemmaMenuItem); TODO: Gemma popup item for gene set
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
         popup.add( hideEmptyMenuItem );
-        popup.add( hideInsig );
+        popup.add( hideInsigPopupMenuItem );
 
         if ( classID == null ) return null;
         if ( classID.isUserDefined() ) {
@@ -224,6 +254,16 @@ public abstract class GeneSetPanel extends JScrollPane {
             deleteGeneSetMenuItem.setEnabled( false );
             visitAmigoMenuItem.setEnabled( true );
         }
+
+        boolean showHideNonSig = false;
+
+        for ( GeneSetPvalRun r : this.callingFrame.getResultSets() ) {
+            if ( r.hasSignificant() ) {
+                showHideNonSig = true;
+                break;
+            }
+        }
+        hideEmptyMenuItem.setEnabled( showHideNonSig );
 
         return popup;
 
@@ -279,7 +319,14 @@ public abstract class GeneSetPanel extends JScrollPane {
 
     }
 
-    public abstract void filter( boolean propagate );
+    protected void modMenuItem_actionPerformed( ActionEvent e ) {
+        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
+        GeneSetTerm classID = null;
+        classID = sourcePopup.getSelectedItem();
+        if ( classID == null ) return;
+        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, classID );
+        cwiz.showWizard();
+    }
 
     /**
      * Forms a url like url + term.getId().
@@ -297,15 +344,6 @@ public abstract class GeneSetPanel extends JScrollPane {
             log.error( e1, e1 );
             GuiUtil.error( "Could not open a web browser window" );
         }
-    }
-
-    protected void modMenuItem_actionPerformed( ActionEvent e ) {
-        GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
-        GeneSetTerm classID = null;
-        classID = sourcePopup.getSelectedItem();
-        if ( classID == null ) return;
-        GeneSetWizard cwiz = new GeneSetWizard( callingFrame, geneData, classID );
-        cwiz.showWizard();
     }
 
     protected abstract GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e );
@@ -408,6 +446,19 @@ public abstract class GeneSetPanel extends JScrollPane {
     protected abstract void showPopupMenu( MouseEvent e );
 }
 
+class ModifySetActionAdapter implements java.awt.event.ActionListener {
+    GeneSetPanel adaptee;
+
+    ModifySetActionAdapter( GeneSetPanel adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.modMenuItem_actionPerformed( e );
+    }
+}
+
 class UrlActionAdapter implements java.awt.event.ActionListener {
     private GeneSetPanel adaptee;
     private String urlBase;
@@ -422,18 +473,5 @@ class UrlActionAdapter implements java.awt.event.ActionListener {
         GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         GeneSetTerm classID = sourcePopup.getSelectedItem();
         adaptee.openUrlForGeneSet( urlBase, classID );
-    }
-}
-
-class ModifySetActionAdapter implements java.awt.event.ActionListener {
-    GeneSetPanel adaptee;
-
-    ModifySetActionAdapter( GeneSetPanel adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.modMenuItem_actionPerformed( e );
     }
 }
