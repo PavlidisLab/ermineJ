@@ -580,7 +580,6 @@ public class MainFrame extends JFrame {
             File analysisAnnots = new File( loadSettings.getAnnotFile() );
             File currentAnnots = new File( this.settings.getAnnotFile() );
 
-            // FIXME: this does not always behave correctly when loading projects? Or at least, it's confusing.
             if ( !analysisAnnots.getName().equals( currentAnnots.getName() ) ) {
                 int response = JOptionPane.showConfirmDialog( this,
                         "The annotation file for the analysis you are loading seems to be different from the current annotations.\n"
@@ -597,7 +596,9 @@ public class MainFrame extends JFrame {
             Collection<GeneSetPvalRun> latestResults = athread.getLatestResults();
             for ( GeneSetPvalRun latestResult : latestResults ) {
                 checkForReasonableResults( latestResult );
-                if ( latestResult != null ) addResult( latestResult );
+                if ( latestResult != null ) {
+                    addResult( latestResult );
+                }
             }
 
             athread = null;
@@ -605,6 +606,7 @@ public class MainFrame extends JFrame {
             log.debug( "done" );
         } finally {
             enableMenusForAnalysis();
+
         }
     }
 
@@ -1081,6 +1083,7 @@ public class MainFrame extends JFrame {
         tablePanel.addRun();
         treePanel.addRun();
 
+        resetSignificanceFilters();
     }
 
     /**
@@ -1133,7 +1136,9 @@ public class MainFrame extends JFrame {
         diagnosticsMenu.setEnabled( true );
         runViewMenu.setEnabled( false );
         helpMenu.setEnabled( true );
-        this.setHideNonSignificantClassMenuItemEnabled( false );
+        if ( this.results.isEmpty() ) {
+            this.setHideNonSignificantClassMenuItemEnabled( false );
+        }
         // searchPanel.setEnabled( true );
     }
 
