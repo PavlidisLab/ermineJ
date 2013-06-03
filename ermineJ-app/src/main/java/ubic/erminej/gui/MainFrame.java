@@ -361,7 +361,7 @@ public class MainFrame extends JFrame {
         this.tablePanel.removeRun( runToRemove );
 
         boolean hasResults = !this.results.isEmpty();
-        this.setHideNonSignificantClassMenuItemEnabled( hasResults ); 
+        this.setHideNonSignificantClassMenuItemEnabled( hasResults );
         updateRunViewMenu();
     }
 
@@ -579,6 +579,7 @@ public class MainFrame extends JFrame {
              */
             File analysisAnnots = new File( loadSettings.getAnnotFile() );
             File currentAnnots = new File( this.settings.getAnnotFile() );
+
             // FIXME: this does not always behave correctly when loading projects? Or at least, it's confusing.
             if ( !analysisAnnots.getName().equals( currentAnnots.getName() ) ) {
                 int response = JOptionPane.showConfirmDialog( this,
@@ -607,8 +608,12 @@ public class MainFrame extends JFrame {
         }
     }
 
+    /**
+     * 
+     */
     protected void loadProject() {
 
+        // check for unsaved results.
         if ( !this.results.isEmpty() ) {
 
             boolean allSaved = true;
@@ -618,17 +623,18 @@ public class MainFrame extends JFrame {
                 }
             }
 
-            if ( allSaved ) return;
+            if ( !allSaved ) {
 
-            int response = JOptionPane
-                    .showConfirmDialog(
-                            null,
-                            "Your current unsaved results will be discarded when "
-                                    + "the project loads.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
-                            "Unsaved results will be lost",
+                int response = JOptionPane
+                        .showConfirmDialog(
+                                null,
+                                "Your current unsaved results will be discarded when "
+                                        + "the project loads.\nYou can click Cancel and then save results you want to keep, or click OK to proceed.",
+                                "Unsaved results will be lost",
 
-                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
-            if ( response == JOptionPane.CANCEL_OPTION ) return;
+                                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
+                if ( response == JOptionPane.CANCEL_OPTION ) return;
+            }
         }
 
         /*
@@ -649,7 +655,7 @@ public class MainFrame extends JFrame {
             try {
                 Settings projectSettings = new Settings( path );
 
-                this.settings = projectSettings;
+                settings = projectSettings;
 
                 /*
                  * Note: those settings are not auto-saved, so the project is not modified.
@@ -698,6 +704,7 @@ public class MainFrame extends JFrame {
         hideNonsignificantClassMenuItem.setState( false );
         hideNonsignificantClassMenuItem.setEnabled( true );
         this.treePanel.setHideInsignificant( false );
+        this.tablePanel.setHideInsignificant( false );
         this.treePanel.filter( true );
     }
 
@@ -1170,8 +1177,9 @@ public class MainFrame extends JFrame {
                     treePanel.setMessenger( statusMessenger );
 
                     /*
-                     * FIXME if we are loading a project, we have to use the settings of the project here.
+                     * If we are loading a project, we have to use the settings of the project here.
                      */
+                    if ( StringUtils.isNotBlank( projectFile ) ) settings = new Settings( projectFile );
                     initializeAllData();
 
                     /*

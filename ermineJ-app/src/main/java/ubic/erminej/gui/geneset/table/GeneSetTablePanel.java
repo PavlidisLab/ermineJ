@@ -293,6 +293,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
                 model.filter();
 
+                sortByRun( c );
+            }
+
+            /**
+             * @param c
+             */
+            private void sortByRun( int c ) {
                 List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
                 sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );
                 sorter.setSortKeys( sortKeys );
@@ -594,7 +601,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     /**
      * Resort by the current result set, if there is one. Otherwise leave it alone.
      */
-    private void resortByCurrentResults() {
+    public void resortByCurrentResults() {
         int sortColumn = 0;
         int currentResultSetIndex = callingFrame.getCurrentResultSetIndex();
         if ( currentResultSetIndex > 0 ) {
