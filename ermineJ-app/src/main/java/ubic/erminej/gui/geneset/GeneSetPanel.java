@@ -263,7 +263,7 @@ public abstract class GeneSetPanel extends JScrollPane {
                 break;
             }
         }
-        hideEmptyMenuItem.setEnabled( showHideNonSig );
+        hideInsigPopupMenuItem.setEnabled( showHideNonSig );
 
         return popup;
 
