@@ -513,8 +513,7 @@ public class StartupPanel extends JPanel {
         } else {
             log.debug( "Saving configuration" );
 
-            // if ( projectFile.isEmpty() )
-            saveSettings();
+            if ( projectFile.isEmpty() ) saveSettings();
 
             Object[] listeners = listenerList.getListenerList();
             for ( int i = 0; i < listeners.length; i += 2 ) {

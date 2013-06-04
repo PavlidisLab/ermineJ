@@ -675,11 +675,13 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
             @Override
             protected Object doInBackground() {
+                scoreFileOk.set( true ); // assume okay until proven otherwise. Don't want to get stuck here.
                 w.getStatusField().clear();
                 try {
                     if ( gs == null ) {
 
                         String scoreFile = settings.getScoreFile();
+                        // this takes a couple of seconds, which is a bit annoying.
                         gs = new GeneScores( scoreFile, settings, w.getStatusField(), w.getGeneAnnots() );
 
                         if ( gs.getGeneToScoreMap().isEmpty() ) {
@@ -695,7 +697,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
                     return null;
                 }
 
-                scoreFileOk.set( true );
                 return null;
             }
         };

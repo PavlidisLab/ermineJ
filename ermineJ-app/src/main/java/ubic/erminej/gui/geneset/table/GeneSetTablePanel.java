@@ -39,6 +39,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.SwingWorker;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
@@ -293,13 +294,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
                 model.filter();
 
-                sortByRun( c );
-            }
-
-            /**
-             * @param c
-             */
-            private void sortByRun( int c ) {
                 List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
                 sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );
                 sorter.setSortKeys( sortKeys );
@@ -589,28 +583,35 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * @see ubic.erminej.gui.geneset.GeneSetPanel#filter(boolean)
      */
     @Override
-    public void filter( boolean propagate ) {
-        this.model.setFilterEmpty( hideEmpty );
-        this.model.setFilterEmptyResults( hideInsignificant );
-        this.model.filter();
+    public void filter( final boolean propagate ) {
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
 
-        if ( propagate ) this.callingFrame.getTreePanel().filter( false );
-
+            @Override
+            protected Object doInBackground() throws Exception {
+                model.setFilterEmpty( hideEmpty );
+                model.setFilterEmptyResults( hideInsignificant );
+                model.filter();
+                resortByCurrentResults();
+                if ( propagate ) callingFrame.getTreePanel().filter( false );
+                return null;
+            }
+        };
+        r.execute();
     }
 
     /**
      * Resort by the current result set, if there is one. Otherwise leave it alone.
      */
     public void resortByCurrentResults() {
-        int sortColumn = 0;
+        int sortColumnIndex = 0;
         int currentResultSetIndex = callingFrame.getCurrentResultSetIndex();
-        if ( currentResultSetIndex > 0 ) {
-            sortColumn = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
+        if ( currentResultSetIndex >= 0 ) {
+            sortColumnIndex = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
 
-            assert sortColumn < this.table.getColumnCount();
+            assert sortColumnIndex < this.table.getColumnCount();
 
             List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-            sortKeys.add( new RowSorter.SortKey( sortColumn, SortOrder.ASCENDING ) );
+            sortKeys.add( new RowSorter.SortKey( sortColumnIndex, SortOrder.ASCENDING ) );
 
             sorter.setSortKeys( sortKeys );
         }

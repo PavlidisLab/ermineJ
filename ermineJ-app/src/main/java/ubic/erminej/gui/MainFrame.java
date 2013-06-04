@@ -68,6 +68,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -657,7 +659,7 @@ public class MainFrame extends JFrame {
             try {
                 Settings projectSettings = new Settings( path );
 
-                settings = projectSettings;
+                this.settings = projectSettings;
 
                 /*
                  * Note: those settings are not auto-saved, so the project is not modified.
@@ -672,7 +674,7 @@ public class MainFrame extends JFrame {
                     protected Object doInBackground() throws Exception {
                         initializeAllData(); // Perhaps skip if the files have not changed?
                         loadAnalysis( path );
-                        resetSignificanceFilters();
+                        resetSignificanceFilters( true );
                         return null;
                     }
                 };
@@ -702,12 +704,12 @@ public class MainFrame extends JFrame {
     /**
      * 
      */
-    protected void resetSignificanceFilters() {
+    protected void resetSignificanceFilters( boolean filter ) {
         hideNonsignificantClassMenuItem.setState( false );
         hideNonsignificantClassMenuItem.setEnabled( true );
         this.treePanel.setHideInsignificant( false );
         this.tablePanel.setHideInsignificant( false );
-        this.treePanel.filter( true );
+        this.treePanel.filter( filter );
     }
 
     /**
@@ -943,11 +945,23 @@ public class MainFrame extends JFrame {
         cwiz.showWizard();
     }
 
-    void hideNonsignificantClassActionPerformed( boolean checked ) {
-        this.treePanel.setHideInsignificant( checked );
-        this.tablePanel.setHideInsignificant( checked );
+    /**
+     * @param checked
+     */
+    void hideNonsignificantClassActionPerformed( final boolean checked ) {
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
 
-        this.tablePanel.filter( true );
+            @Override
+            protected Object doInBackground() throws Exception {
+                treePanel.setHideInsignificant( checked );
+                tablePanel.setHideInsignificant( checked );
+                tablePanel.filter( true );
+                return null;
+            }
+        };
+
+        r.execute();
+
     }
 
     /**
@@ -1083,7 +1097,7 @@ public class MainFrame extends JFrame {
         tablePanel.addRun();
         treePanel.addRun();
 
-        resetSignificanceFilters();
+        resetSignificanceFilters( false );
     }
 
     /**
