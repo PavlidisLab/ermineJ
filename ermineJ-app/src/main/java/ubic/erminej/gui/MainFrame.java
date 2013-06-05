@@ -47,6 +47,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -672,7 +673,7 @@ public class MainFrame extends JFrame {
                     protected Object doInBackground() throws Exception {
                         initializeAllData(); // Perhaps skip if the files have not changed?
                         loadAnalysis( path );
-                        resetSignificanceFilters( true );
+                        resetSignificanceFilters();
                         return null;
                     }
                 };
@@ -702,12 +703,10 @@ public class MainFrame extends JFrame {
     /**
      * 
      */
-    protected void resetSignificanceFilters( boolean filter ) {
-        hideNonsignificantClassMenuItem.setState( false );
+    protected void resetSignificanceFilters() {
+        hideNonsignificantClassMenuItem.setSelected( false );
         hideNonsignificantClassMenuItem.setEnabled( true );
-        this.treePanel.setHideInsignificant( false );
-        this.tablePanel.setHideInsignificant( false );
-        this.treePanel.filter( filter );
+        this.setHideNonSignificant( false );
     }
 
     /**
@@ -944,15 +943,15 @@ public class MainFrame extends JFrame {
     }
 
     /**
+     * Menu action
+     * 
      * @param checked
      */
     void hideNonsignificantClassActionPerformed( final boolean checked ) {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
             @Override
             protected Object doInBackground() throws Exception {
-                treePanel.setHideInsignificant( checked );
-                tablePanel.setHideInsignificant( checked );
-                tablePanel.filter( true );
+                setHideNonSignificant( checked );
                 return null;
             }
         };
@@ -989,28 +988,18 @@ public class MainFrame extends JFrame {
      */
     public void setHideNonSignificantClassMenuItemEnabled( boolean state ) {
         hideNonsignificantClassMenuItem.setEnabled( state );
-        treePanel.setHideInsignificantEnabled( state );
-        tablePanel.setHideInsignificantEnabled( state );
     }
 
     /**
      * @param state
      */
-    public void setHideNonSignificantClassMenuItemState( Boolean state ) {
-
-        if ( state.equals( hideNonsignificantClassMenuItem.getState() ) ) {
-            return;
+    public void setHideNonSignificant( Boolean state ) {
+        Boolean oldState = this.hideNonSignificant.get();
+        this.hideNonSignificant.set( state );
+        if ( !state.equals( oldState ) ) {
+            // only notify components if something has changed.
+            this.firePropertyChange( "hideNonSignificant", oldState, state );
         }
-
-        if ( state ) {
-            hideNonsignificantClassMenuItem.setEnabled( true );
-        }
-        hideNonsignificantClassMenuItem.setState( state );
-
-        // if ( !GeneSetPanel.isHideInsignificant().equals( state ) ) {
-        treePanel.setHideInsignificant( state );
-        tablePanel.setHideInsignificant( state );
-        // }
     }
 
     /**
@@ -1024,14 +1013,9 @@ public class MainFrame extends JFrame {
         maybeEnableSomeMenus();
         if ( results.size() > 0 ) {
             hideNonsignificantClassMenuItem.setEnabled( true );
-            treePanel.setHideInsignificantEnabled( true );
-            tablePanel.setHideInsignificantEnabled( true );
             saveAnalysisMenuItem.setEnabled( true );
         } else {
             hideNonsignificantClassMenuItem.setEnabled( false );
-            treePanel.setHideInsignificantEnabled( false );
-            tablePanel.setHideInsignificantEnabled( false );
-            tablePanel.setHideInsignificantEnabled( false );
         }
         cancelAnalysisMenuItem.setEnabled( false );
     }
@@ -1104,7 +1088,7 @@ public class MainFrame extends JFrame {
         tablePanel.addRun();
         treePanel.addRun();
 
-        resetSignificanceFilters( false );
+        resetSignificanceFilters();
     }
 
     /**
@@ -1448,7 +1432,12 @@ public class MainFrame extends JFrame {
         } );
         tabs.addTab( "Table", tablePanel );
         tabs.addTab( "Tree", treePanel );
+
+        this.addPropertyChangeListener( tablePanel );
+        this.addPropertyChangeListener( treePanel );
     }
+
+    private AtomicBoolean hideNonSignificant = new AtomicBoolean( false );
 
     final private JCheckBoxMenuItem hideNonsignificantClassMenuItem = new JCheckBoxMenuItem();
 
@@ -1806,6 +1795,10 @@ public class MainFrame extends JFrame {
             }
         }
 
+    }
+
+    public boolean getHideNonSignificant() {
+        return this.hideNonSignificant.get();
     }
 
 }

@@ -154,7 +154,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         final TreePath path = this.find( classID );
         boolean foundIt = false;
         if ( path == null ) {
-            this.callingFrame.getStatusMessenger().showWarning(
+            this.mainFrame.getStatusMessenger().showWarning(
                     "Could not find " + classID + " in any aspect, the term may be obsolete." );
             foundIt = false;
         } else {
@@ -188,11 +188,13 @@ public class GeneSetTreePanel extends GeneSetPanel {
     public void filter( final boolean propagate ) {
         filteredTreeModel = new FilteredGeneSetTreeModel( geneData, geneSetTreeModel );
         filteredTreeModel.setFilterBySize( hideEmpty );
-        filteredTreeModel.setResults( callingFrame.getCurrentResultSet() );
-        filteredTreeModel.setFilterBySignificance( hideInsignificant );
+        filteredTreeModel.setResults( mainFrame.getCurrentResultSet() );
+        filteredTreeModel.setFilterBySignificance( mainFrame.getHideNonSignificant() );
         filteredTreeModel.setFilterSelectedTerms( currentSelectedSets );
         goTree.setModel( filteredTreeModel );
-        if ( propagate ) callingFrame.getTablePanel().filter( false );
+
+        // should probably do away with this and do it by events.
+        if ( propagate ) mainFrame.getTablePanel().filter( false );
     }
 
     /**
@@ -237,9 +239,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     public void fireResultsChanged() {
         log.debug( "Changing results" );
-        if ( callingFrame != null && this.goTree != null ) {
+        if ( mainFrame != null && this.goTree != null ) {
 
-            ( ( GeneSetTreeNodeRenderer ) this.goTree.getCellRenderer() ).setCurrentResultSet( callingFrame
+            ( ( GeneSetTreeNodeRenderer ) this.goTree.getCellRenderer() ).setCurrentResultSet( mainFrame
                     .getCurrentResultSet() );
         }
         refreshView();
@@ -291,7 +293,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         if ( e.getClickCount() < 2 ) {
             return;
         }
-        showDetailsForGeneSet( currentlySelectedGeneSet, callingFrame.getCurrentResultSet() );
+        showDetailsForGeneSet( currentlySelectedGeneSet, mainFrame.getCurrentResultSet() );
     }
 
     /**
@@ -460,7 +462,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
         }
 
         // check the node.
-        GeneSetResult result = callingFrame.getCurrentResultSet().getResults().get( node.getTerm() );
+        GeneSetResult result = mainFrame.getCurrentResultSet().getResults().get( node.getTerm() );
         boolean isSig = result != null && result.getCorrectedPvalue() < GeneSetPanel.FDR_THRESHOLD_FOR_FILTER;
         markHasSignificantChild( ( GeneSetTreeNode ) node.getParent(), isSig );
     }
@@ -489,7 +491,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
             le.setHasSelectedChild( false );
             le.setHasSignificantChild( false );
 
-            if ( callingFrame.getCurrentResultSet() != null ) {
+            if ( mainFrame.getCurrentResultSet() != null ) {
                 markHasSignificantChild( le, false );
             }
             markHasSelectedChild( le, false );
