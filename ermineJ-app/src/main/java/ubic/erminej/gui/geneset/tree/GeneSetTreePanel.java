@@ -299,10 +299,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     @Override
     public void refreshView() {
-
-        // SwingWorker<Object, Object> w = new SwingWorker<Object, Object>() {
-        // @Override
-        // protected Object doInBackground() throws Exception {
         setNodeStatesForFilter();
         log.debug( "filter" );
         filter( false );
@@ -310,10 +306,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
         goTree.revalidate();
         goTree.repaint();
         messenger.clear();
-        // return null;
-        // }
-        // };
-        // w.execute();
     }
 
     @Override

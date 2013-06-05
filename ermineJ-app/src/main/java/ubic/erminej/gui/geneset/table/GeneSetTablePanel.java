@@ -555,26 +555,39 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * 
      */
     private void clearRowFilter() {
-        this.sorter.setRowFilter( null );
-        resortByCurrentResults();
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                sorter.setRowFilter( null );
+                resortByCurrentResults();
+                return null;
+            }
+        };
+        r.execute();
     }
 
     public void filter( final Collection<GeneSetTerm> selectedTerms ) {
-
-        if ( selectedTerms.isEmpty() ) {
-            clearRowFilter();
-            return;
-        }
-
-        RowFilter<GeneSetTableModel, Object> rf = new RowFilter<GeneSetTableModel, Object>() {
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
             @Override
-            public boolean include( RowFilter.Entry<? extends GeneSetTableModel, ? extends Object> entry ) {
-                GeneSetTerm term = ( GeneSetTerm ) entry.getValue( 0 );
-                return selectedTerms.contains( term );
+            protected Object doInBackground() throws Exception {
+                if ( selectedTerms.isEmpty() ) {
+                    clearRowFilter();
+                    return null;
+                }
+
+                RowFilter<GeneSetTableModel, Object> rf = new RowFilter<GeneSetTableModel, Object>() {
+                    @Override
+                    public boolean include( RowFilter.Entry<? extends GeneSetTableModel, ? extends Object> entry ) {
+                        GeneSetTerm term = ( GeneSetTerm ) entry.getValue( 0 );
+                        return selectedTerms.contains( term );
+                    }
+                };
+                sorter.setRowFilter( rf );
+                resortByCurrentResults();
+                return null;
             }
         };
-        this.sorter.setRowFilter( rf );
-        resortByCurrentResults();
+        r.execute();
     }
 
     /*
@@ -585,7 +598,6 @@ public class GeneSetTablePanel extends GeneSetPanel {
     @Override
     public void filter( final boolean propagate ) {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
-
             @Override
             protected Object doInBackground() throws Exception {
                 model.setFilterEmpty( hideEmpty );
@@ -603,18 +615,26 @@ public class GeneSetTablePanel extends GeneSetPanel {
      * Resort by the current result set, if there is one. Otherwise leave it alone.
      */
     public void resortByCurrentResults() {
-        int sortColumnIndex = 0;
-        int currentResultSetIndex = callingFrame.getCurrentResultSetIndex();
-        if ( currentResultSetIndex >= 0 ) {
-            sortColumnIndex = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                int sortColumnIndex = 0;
+                int currentResultSetIndex = callingFrame.getCurrentResultSetIndex();
+                if ( currentResultSetIndex >= 0 ) {
+                    sortColumnIndex = GeneSetTableModel.INIT_COLUMNS + currentResultSetIndex;
 
-            assert sortColumnIndex < this.table.getColumnCount();
+                    assert sortColumnIndex < table.getColumnCount();
 
-            List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-            sortKeys.add( new RowSorter.SortKey( sortColumnIndex, SortOrder.ASCENDING ) );
+                    List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+                    sortKeys.add( new RowSorter.SortKey( sortColumnIndex, SortOrder.ASCENDING ) );
 
-            sorter.setSortKeys( sortKeys );
-        }
+                    sorter.setSortKeys( sortKeys );
+
+                }
+                return null;
+            }
+        };
+        r.execute();
     }
 
     @Override

@@ -68,8 +68,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -950,7 +948,6 @@ public class MainFrame extends JFrame {
      */
     void hideNonsignificantClassActionPerformed( final boolean checked ) {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
-
             @Override
             protected Object doInBackground() throws Exception {
                 treePanel.setHideInsignificant( checked );
@@ -999,11 +996,21 @@ public class MainFrame extends JFrame {
     /**
      * @param state
      */
-    public void setHideNonSignificantClassMenuItemState( boolean state ) {
+    public void setHideNonSignificantClassMenuItemState( Boolean state ) {
+
+        if ( state.equals( hideNonsignificantClassMenuItem.getState() ) ) {
+            return;
+        }
+
         if ( state ) {
             hideNonsignificantClassMenuItem.setEnabled( true );
         }
         hideNonsignificantClassMenuItem.setState( state );
+
+        // if ( !GeneSetPanel.isHideInsignificant().equals( state ) ) {
+        treePanel.setHideInsignificant( state );
+        tablePanel.setHideInsignificant( state );
+        // }
     }
 
     /**

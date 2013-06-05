@@ -81,7 +81,12 @@ public abstract class GeneSetPanel extends JScrollPane {
     static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
 
     protected static boolean hideEmpty = true;
-    protected static boolean hideInsignificant = false;
+    protected static Boolean hideInsignificant = false;
+
+    public static Boolean isHideInsignificant() {
+        return hideInsignificant;
+    }
+
     protected static boolean hideNonCustom = false;
     private static final long serialVersionUID = 1L;
     protected MainFrame callingFrame;
