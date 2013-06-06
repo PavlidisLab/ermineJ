@@ -21,8 +21,8 @@
 	</modules>
 	<packaging>pom</packaging>
 	<scm>
-		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/space/cvs:ermineJ</connection>
-		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/space/cvs:ermineJ</developerConnection>
+		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</connection>
+		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</developerConnection>
 		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
 	</scm>
 	<issueManagement>
