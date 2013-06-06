@@ -48,8 +48,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
@@ -69,8 +67,6 @@ import ubic.erminej.gui.geneset.GeneSetPanelPopupMenu;
  * @version $Id$
  */
 public class GeneSetTablePanel extends GeneSetPanel {
-
-    private static Log log = LogFactory.getLog( GeneSetTablePanel.class );
 
     private static final long serialVersionUID = -1L;
     private final static int GENESET_ID_COLUMN_WIDTH = 80;
@@ -599,7 +595,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
             @Override
             protected Object doInBackground() throws Exception {
-                model.setFilterEmpty( hideEmpty );
+                model.setFilterEmpty( mainFrame.getHideEmpty() );
                 model.setFilterEmptyResults( mainFrame.getHideNonSignificant() );
                 model.filter();
                 resortByCurrentResults();

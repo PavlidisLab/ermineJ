@@ -30,7 +30,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.HashSet;
 
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -82,16 +81,13 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
             + "view=details&search_constraint=terms&depth=0&query=";
     static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
 
-    protected static boolean hideEmpty = true;
-
     @Override
     public void propertyChange( PropertyChangeEvent evt ) {
-        if ( evt.getPropertyName().equals( "hideNonSignificant" ) ) {
+        if ( evt.getPropertyName().equals( "hideNonSignificant" ) || ( evt.getPropertyName().equals( "hideEmpty" ) ) ) {
             filter( false );
         }
     }
 
-    protected static boolean hideNonCustom = false;
     private static final long serialVersionUID = 1L;
     protected MainFrame mainFrame;
 
@@ -190,20 +186,9 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
             }
         } );
 
-        final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty );
-
-        hideEmptyMenuItem.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e1 ) {
-                hideEmpty = hideEmptyMenuItem.getState();
-                filter( true );
-            }
-
-        } );
         popup.add( visitAmigoMenuItem );
         popup.add( modMenuItem );
         popup.add( deleteGeneSetMenuItem );
-        popup.add( hideEmptyMenuItem );
 
         if ( classID == null ) return null;
         if ( classID.isUserDefined() ) {

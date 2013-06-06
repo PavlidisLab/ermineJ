@@ -187,7 +187,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     @Override
     public void filter( final boolean propagate ) {
         filteredTreeModel = new FilteredGeneSetTreeModel( geneData, geneSetTreeModel );
-        filteredTreeModel.setFilterBySize( hideEmpty );
+        filteredTreeModel.setFilterBySize( mainFrame.getHideEmpty() );
         filteredTreeModel.setResults( mainFrame.getCurrentResultSet() );
         filteredTreeModel.setFilterBySignificance( mainFrame.getHideNonSignificant() );
         filteredTreeModel.setFilterSelectedTerms( currentSelectedSets );

@@ -147,64 +147,68 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private static final String LOGO_GIF = "/ubic/erminej/logoIcon64.gif";
-
-    private static final String START_CARD = "START";
-
-    private static final String TABS_CARD = "TABS";
-
-    private static final String PROGRESS_CARD = "PROGRESS";
-
     public final static String RESOURCE_LOCATION = "/ubic/erminej/";
 
     private static Log log = LogFactory.getLog( MainFrame.class.getName() );
 
-    private static final int START_HEIGHT = 730;
+    private static final String LOGO_GIF = "/ubic/erminej/logoIcon64.gif";
 
-    private static final int START_WIDTH = 830;
-
-    private static final int STARTING_OVERALL_WIDTH = 830;
     private static final String MAINWINDOWHEIGHT = "mainview.WindowHeight";
-    private static final String MAINWINDOWWIDTH = "mainview.WindowWidth";
+
     private static final String MAINWINDOWPOSITIONX = "mainview.WindowXPosition";
 
     private static final String MAINWINDOWPOSITIONY = "mainview.WindowYPosition";
 
-    private GeneAnnotations geneData = null; // original.
+    private static final String MAINWINDOWWIDTH = "mainview.WindowWidth";
 
-    private List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
+    private static final String PROGRESS_CARD = "PROGRESS";
 
-    private Settings settings;
+    private static final String START_CARD = "START";
+    private static final int START_HEIGHT = 730;
+    private static final int START_WIDTH = 830;
+    private static final int STARTING_OVERALL_WIDTH = 830;
 
-    private int currentResultSet = -1;
+    private static final String TABS_CARD = "TABS";
+
+    private JMenu analysisMenu = new JMenu();
 
     private Analyzer athread; // Ideally this would be a local variable.
-    private StatusViewer statusMessenger;
-    private GeneSetTablePanel tablePanel;
-
-    private GeneSetTreePanel treePanel;
-    private JMenu analysisMenu = new JMenu();
-    private JMenu diagnosticsMenu = new JMenu();
-
-    private JMenu classMenu = new JMenu();
-    private JMenu fileMenu = new JMenu();
-
-    private JMenu helpMenu = new JMenu();
-
-    private JMenu runViewMenu = new JMenu();
-    private JTabbedPane tabs = new JTabbedPane();
-
-    private JProgressBar progressBar = new JProgressBar();
-    private JMenuItem defineClassMenuItem = new JMenuItem();
 
     private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
+
+    private JMenu classMenu = new JMenu();
+
+    private int currentResultSet = -1;
+    private JMenuItem defineClassMenuItem = new JMenuItem();
+    private JMenu diagnosticsMenu = new JMenu();
+
+    private JMenu fileMenu = new JMenu();
+
+    private GeneAnnotations geneData = null; // original.
+    private JMenu helpMenu = new JMenu();
+    final private AtomicBoolean hideEmpty = new AtomicBoolean( true );
+    final private AtomicBoolean hideNonSignificant = new AtomicBoolean( false );
+
+    final private JCheckBoxMenuItem hideNonsignificantClassMenuItem = new JCheckBoxMenuItem();
+
     private JMenuItem loadAnalysisMenuItem = new JMenuItem();
     private JMenuItem modClassMenuItem = new JMenuItem();
+
+    private JProgressBar progressBar = new JProgressBar();
+    private List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
     private JMenuItem runAnalysisMenuItem = new JMenuItem();
-
+    private JMenu runViewMenu = new JMenu();
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
-
+    private Settings settings;
     private JPanel statusBarPanel;
+
+    private StatusViewer statusMessenger;
+
+    private GeneSetTablePanel tablePanel;
+
+    private JTabbedPane tabs = new JTabbedPane();
+
+    private GeneSetTreePanel treePanel;
 
     /**
      * @throws IOException
@@ -269,6 +273,14 @@ public class MainFrame extends JFrame {
 
     public int getCurrentResultSetIndex() {
         return this.currentResultSet;
+    }
+
+    public boolean getHideEmpty() {
+        return this.hideEmpty.get();
+    }
+
+    public boolean getHideNonSignificant() {
+        return this.hideNonSignificant.get();
     }
 
     public int getNumResultSets() {
@@ -460,6 +472,34 @@ public class MainFrame extends JFrame {
         treePanel.fireResultsChanged();
     }
 
+    public void setHideEmpty( Boolean state ) {
+        Boolean oldState = this.hideEmpty.get();
+        this.hideEmpty.set( state );
+        if ( !state.equals( oldState ) ) {
+            // only notify components if something has changed.
+            this.firePropertyChange( "hideEmpty", oldState, state );
+        }
+    }
+
+    /**
+     * @param state
+     */
+    public void setHideNonSignificant( Boolean state ) {
+        Boolean oldState = this.hideNonSignificant.get();
+        this.hideNonSignificant.set( state );
+        if ( !state.equals( oldState ) ) {
+            // only notify components if something has changed.
+            this.firePropertyChange( "hideNonSignificant", oldState, state );
+        }
+    }
+
+    /**
+     * @param state
+     */
+    public void setHideNonSignificantClassMenuItemEnabled( boolean state ) {
+        hideNonsignificantClassMenuItem.setEnabled( state );
+    }
+
     /**
      * @param runSettings
      */
@@ -506,6 +546,108 @@ public class MainFrame extends JFrame {
         }
 
         runViewMenu.revalidate();
+    }
+
+    void aboutMenuItem_actionPerformed() {
+        AboutBox aboutBox = new AboutBox( this );
+        aboutBox.setVisible( true );
+    }
+
+    void defineClassMenuItem_actionPerformed() {
+        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, true );
+        cwiz.showWizard();
+    }
+
+    /**
+     * Cancel the currently running analysis task.
+     */
+    void doCancel() {
+        log.debug( "Got cancel in thread " + Thread.currentThread().getName() );
+
+        // programming error - cancellation button was enabled when not valid.
+        assert athread != null : "Attempt to cancel a null analysis thread";
+
+        athread.interrupt();
+
+        try {
+            Thread.sleep( 100 );
+        } catch ( InterruptedException e ) {
+        }
+
+        athread.stopRunning( true );
+        athread = null;
+        enableMenusForAnalysis();
+        this.statusMessenger.showStatus( "Ready" );
+
+    }
+
+    /**
+     * Called after an analysis (failed or successful)
+     */
+    void enableMenusForAnalysis() {
+        defineClassMenuItem.setEnabled( true );
+        modClassMenuItem.setEnabled( true );
+        runAnalysisMenuItem.setEnabled( true );
+        loadAnalysisMenuItem.setEnabled( true );
+        maybeEnableSomeMenus();
+        if ( results.size() > 0 ) {
+            hideNonsignificantClassMenuItem.setEnabled( true );
+            saveAnalysisMenuItem.setEnabled( true );
+        } else {
+            hideNonsignificantClassMenuItem.setEnabled( false );
+        }
+        cancelAnalysisMenuItem.setEnabled( false );
+    }
+
+    void hideEmptyClassActionPerformed( final Boolean checked ) {
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                setHideEmpty( checked );
+                return null;
+            }
+        };
+
+        r.execute();
+    }
+
+    /**
+     * Menu action
+     * 
+     * @param checked
+     */
+    void hideNonsignificantClassActionPerformed( final boolean checked ) {
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                setHideNonSignificant( checked );
+                return null;
+            }
+        };
+
+        r.execute();
+
+    }
+
+    void modClassMenuItem_actionPerformed() {
+        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, false );
+        cwiz.showWizard();
+    }
+
+    /**
+     * @param e ActionEvent
+     */
+    void quitMenuItem_actionPerformed( ActionEvent e ) {
+
+        if ( shutDown() ) {
+
+            System.exit( 0 );
+        }
+    }
+
+    void runAnalysisMenuItem_actionPerformed() {
+        AnalysisWizard awiz = new AnalysisWizard( this, geneData );
+        awiz.showWizard();
     }
 
     /**
@@ -932,144 +1074,6 @@ public class MainFrame extends JFrame {
         settings.getConfig().setProperty( MAINWINDOWPOSITIONY, new Double( this.getLocation().getY() ) );
     }
 
-    void aboutMenuItem_actionPerformed() {
-        AboutBox aboutBox = new AboutBox( this );
-        aboutBox.setVisible( true );
-    }
-
-    void defineClassMenuItem_actionPerformed() {
-        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, true );
-        cwiz.showWizard();
-    }
-
-    /**
-     * Menu action
-     * 
-     * @param checked
-     */
-    void hideNonsignificantClassActionPerformed( final boolean checked ) {
-        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
-            @Override
-            protected Object doInBackground() throws Exception {
-                setHideNonSignificant( checked );
-                return null;
-            }
-        };
-
-        r.execute();
-
-    }
-
-    /**
-     * Cancel the currently running analysis task.
-     */
-    void doCancel() {
-        log.debug( "Got cancel in thread " + Thread.currentThread().getName() );
-
-        // programming error - cancellation button was enabled when not valid.
-        assert athread != null : "Attempt to cancel a null analysis thread";
-
-        athread.interrupt();
-
-        try {
-            Thread.sleep( 100 );
-        } catch ( InterruptedException e ) {
-        }
-
-        athread.stopRunning( true );
-        athread = null;
-        enableMenusForAnalysis();
-        this.statusMessenger.showStatus( "Ready" );
-
-    }
-
-    /**
-     * @param state
-     */
-    public void setHideNonSignificantClassMenuItemEnabled( boolean state ) {
-        hideNonsignificantClassMenuItem.setEnabled( state );
-    }
-
-    /**
-     * @param state
-     */
-    public void setHideNonSignificant( Boolean state ) {
-        Boolean oldState = this.hideNonSignificant.get();
-        this.hideNonSignificant.set( state );
-        if ( !state.equals( oldState ) ) {
-            // only notify components if something has changed.
-            this.firePropertyChange( "hideNonSignificant", oldState, state );
-        }
-    }
-
-    /**
-     * Called after an analysis (failed or successful)
-     */
-    void enableMenusForAnalysis() {
-        defineClassMenuItem.setEnabled( true );
-        modClassMenuItem.setEnabled( true );
-        runAnalysisMenuItem.setEnabled( true );
-        loadAnalysisMenuItem.setEnabled( true );
-        maybeEnableSomeMenus();
-        if ( results.size() > 0 ) {
-            hideNonsignificantClassMenuItem.setEnabled( true );
-            saveAnalysisMenuItem.setEnabled( true );
-        } else {
-            hideNonsignificantClassMenuItem.setEnabled( false );
-        }
-        cancelAnalysisMenuItem.setEnabled( false );
-    }
-
-    void modClassMenuItem_actionPerformed() {
-        GeneSetWizard cwiz = new GeneSetWizard( this, geneData, false );
-        cwiz.showWizard();
-    }
-
-    /**
-     * @param e ActionEvent
-     */
-    void quitMenuItem_actionPerformed( ActionEvent e ) {
-
-        if ( shutDown() ) {
-
-            System.exit( 0 );
-        }
-    }
-
-    /**
-     * @return
-     */
-    private boolean shutDown() {
-        statusMessenger.clear();
-
-        for ( GeneSetPvalRun r : this.results ) {
-            if ( !r.hasBeenSavedToFile() ) {
-                int response = JOptionPane.showConfirmDialog( this, "You have unsaved result(s): " + r.getName()
-                        + ". Quit anyway?", "Unsaved results", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.QUESTION_MESSAGE );
-
-                if ( response == JOptionPane.CANCEL_OPTION ) {
-                    return false;
-                }
-
-                break;
-            }
-        }
-
-        /*
-         * This is appropriate if for example we loaded a project (which we do not change), but we might as well keep
-         * the settings for next time.
-         */
-        writePrefs();
-        statusMessenger.showStatus( "Bye" );
-        return true;
-    }
-
-    void runAnalysisMenuItem_actionPerformed() {
-        AnalysisWizard awiz = new AnalysisWizard( this, geneData );
-        awiz.showWizard();
-    }
-
     /**
      * @param result
      */
@@ -1437,14 +1441,6 @@ public class MainFrame extends JFrame {
         this.addPropertyChangeListener( treePanel );
     }
 
-    private AtomicBoolean hideNonSignificant = new AtomicBoolean( false );
-
-    final private JCheckBoxMenuItem hideNonsignificantClassMenuItem = new JCheckBoxMenuItem();
-
-    public boolean getNonsignificantClassMenuItemState() {
-        return hideNonsignificantClassMenuItem.getState();
-    }
-
     /**
      * 
      */
@@ -1527,9 +1523,20 @@ public class MainFrame extends JFrame {
         showUsersMenuItem.setMnemonic( 'U' );
         showUsersMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.CTRL_MASK ) );
 
+        final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty.get() );
+
+        hideEmptyMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e1 ) {
+                boolean he = hideEmptyMenuItem.isSelected();
+                hideEmptyClassActionPerformed( he );
+            }
+
+        } );
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
         classMenu.add( showUsersMenuItem );
+        classMenu.add( hideEmptyMenuItem );
         classMenu.add( hideNonsignificantClassMenuItem );
 
         this.runViewMenu.setText( "Results" );
@@ -1774,6 +1781,35 @@ public class MainFrame extends JFrame {
 
     }
 
+    /**
+     * @return
+     */
+    private boolean shutDown() {
+        statusMessenger.clear();
+
+        for ( GeneSetPvalRun r : this.results ) {
+            if ( !r.hasBeenSavedToFile() ) {
+                int response = JOptionPane.showConfirmDialog( this, "You have unsaved result(s): " + r.getName()
+                        + ". Quit anyway?", "Unsaved results", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE );
+
+                if ( response == JOptionPane.CANCEL_OPTION ) {
+                    return false;
+                }
+
+                break;
+            }
+        }
+
+        /*
+         * This is appropriate if for example we loaded a project (which we do not change), but we might as well keep
+         * the settings for next time.
+         */
+        writePrefs();
+        statusMessenger.showStatus( "Bye" );
+        return true;
+    }
+
     private void updateProgress( int val ) {
         final int value = val;
 
@@ -1795,10 +1831,6 @@ public class MainFrame extends JFrame {
             }
         }
 
-    }
-
-    public boolean getHideNonSignificant() {
-        return this.hideNonSignificant.get();
     }
 
 }
