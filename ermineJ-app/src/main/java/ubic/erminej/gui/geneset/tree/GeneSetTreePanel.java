@@ -186,15 +186,32 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     @Override
     public void filter( final boolean propagate ) {
-        filteredTreeModel = new FilteredGeneSetTreeModel( geneData, geneSetTreeModel );
-        filteredTreeModel.setFilterBySize( mainFrame.getHideEmpty() );
-        filteredTreeModel.setResults( mainFrame.getCurrentResultSet() );
-        filteredTreeModel.setFilterBySignificance( mainFrame.getHideNonSignificant() );
-        filteredTreeModel.setFilterSelectedTerms( currentSelectedSets );
-        goTree.setModel( filteredTreeModel );
+        SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                filteredTreeModel = new FilteredGeneSetTreeModel( geneData, geneSetTreeModel );
+                filteredTreeModel.setFilterBySize( mainFrame.getHideEmpty() );
+                filteredTreeModel.setResults( mainFrame.getCurrentResultSet() );
+                filteredTreeModel.setFilterBySignificance( mainFrame.getHideNonSignificant() );
+                filteredTreeModel.setFilterSelectedTerms( currentSelectedSets );
+                goTree.setModel( filteredTreeModel );
 
-        // should probably do away with this and do it by events.
-        if ( propagate ) mainFrame.getTablePanel().filter( false );
+                // should probably do away with this and do it by events.
+                if ( propagate ) mainFrame.getTablePanel().filter( false );
+
+                return null;
+            }
+        };
+        r.execute();
+
+        this.mainFrame.getStatusMessenger().showProgress( "Updating" );
+        try {
+            r.get();
+        } catch ( Exception e ) {
+            log.warn( e, e );
+        }
+        this.mainFrame.getStatusMessenger().clear();
+
     }
 
     /**

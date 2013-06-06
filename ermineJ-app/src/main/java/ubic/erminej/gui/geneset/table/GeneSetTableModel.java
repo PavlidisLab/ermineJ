@@ -59,7 +59,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 4190174776749215486L;
 
-    private static Log log = LogFactory.getLog( GeneSetTableModel.class.getName() );
+    protected static Log log = LogFactory.getLog( GeneSetTableModel.class.getName() );
 
     @Override
     public Class<?> getColumnClass( int columnIndex ) {
@@ -131,13 +131,16 @@ public class GeneSetTableModel extends AbstractTableModel {
         this.filterInsignificant = b;
     }
 
+    /**
+     * Changes state with user's settings such as "hide non-significant".
+     */
     public void filter() {
 
         // reset.
         gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
         int beforeCount = gsl.size();
 
-        if ( filterEmpty || filterInsignificant ) {
+        if ( filterEmpty || filterInsignificant || filterNonUsers ) {
 
             for ( Iterator<GeneSetTerm> it = gsl.iterator(); it.hasNext(); ) {
                 GeneSetTerm t = it.next();

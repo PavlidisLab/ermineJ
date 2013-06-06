@@ -79,7 +79,6 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
     public static final Color USER_NODE_TEXT_COLOR = Color.BLACK;
     static final String AMIGO_URL_BASE = "http://amigo.geneontology.org/cgi-bin/amigo/go.cgi?"
             + "view=details&search_constraint=terms&depth=0&query=";
-    static Log log = LogFactory.getLog( GeneSetPanel.class.getName() );
 
     @Override
     public void propertyChange( PropertyChangeEvent evt ) {
@@ -281,6 +280,8 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
             GuiUtil.error( "Could not open a web browser window" );
         }
     }
+
+    private static Log log = LogFactory.getLog( GeneSetPanel.class );
 
     protected abstract GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e );
 

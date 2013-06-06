@@ -152,15 +152,10 @@ public class MainFrame extends JFrame {
     private static Log log = LogFactory.getLog( MainFrame.class.getName() );
 
     private static final String LOGO_GIF = "/ubic/erminej/logoIcon64.gif";
-
     private static final String MAINWINDOWHEIGHT = "mainview.WindowHeight";
-
     private static final String MAINWINDOWPOSITIONX = "mainview.WindowXPosition";
-
     private static final String MAINWINDOWPOSITIONY = "mainview.WindowYPosition";
-
     private static final String MAINWINDOWWIDTH = "mainview.WindowWidth";
-
     private static final String PROGRESS_CARD = "PROGRESS";
 
     private static final String START_CARD = "START";
@@ -170,44 +165,41 @@ public class MainFrame extends JFrame {
 
     private static final String TABS_CARD = "TABS";
 
-    private JMenu analysisMenu = new JMenu();
+    private final JMenu analysisMenu = new JMenu();
 
     private Analyzer athread; // Ideally this would be a local variable.
 
-    private JMenuItem cancelAnalysisMenuItem = new JMenuItem();
+    private final JMenuItem cancelAnalysisMenuItem = new JMenuItem();
 
-    private JMenu classMenu = new JMenu();
+    private final JMenu classMenu = new JMenu();
 
     private int currentResultSet = -1;
-    private JMenuItem defineClassMenuItem = new JMenuItem();
-    private JMenu diagnosticsMenu = new JMenu();
+    private final JMenuItem defineClassMenuItem = new JMenuItem();
+    private final JMenu diagnosticsMenu = new JMenu();
 
-    private JMenu fileMenu = new JMenu();
+    private final JMenu fileMenu = new JMenu();
 
     private GeneAnnotations geneData = null; // original.
-    private JMenu helpMenu = new JMenu();
+    private final JMenu helpMenu = new JMenu();
     final private AtomicBoolean hideEmpty = new AtomicBoolean( true );
+    private final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty.get() );
+
     final private AtomicBoolean hideNonSignificant = new AtomicBoolean( false );
 
     final private JCheckBoxMenuItem hideNonsignificantClassMenuItem = new JCheckBoxMenuItem();
-
-    private JMenuItem loadAnalysisMenuItem = new JMenuItem();
-    private JMenuItem modClassMenuItem = new JMenuItem();
-
-    private JProgressBar progressBar = new JProgressBar();
-    private List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
-    private JMenuItem runAnalysisMenuItem = new JMenuItem();
+    private final JMenuItem loadAnalysisMenuItem = new JMenuItem();
+    private final JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined only", false );
+    private final JMenuItem modClassMenuItem = new JMenuItem();
+    private final JProgressBar progressBar = new JProgressBar();
+    private final List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
+    private final JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenu runViewMenu = new JMenu();
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
     private Settings settings;
     private JPanel statusBarPanel;
-
     private StatusViewer statusMessenger;
-
     private GeneSetTablePanel tablePanel;
-
     private JTabbedPane tabs = new JTabbedPane();
-
     private GeneSetTreePanel treePanel;
 
     /**
@@ -947,7 +939,7 @@ public class MainFrame extends JFrame {
     /**
      * @param b
      */
-    protected void showUserMenuItemActionPerformed( boolean b ) {
+    protected void showUserDefinedMenuActionPerformed( boolean b ) {
         /*
          * I deem this filtering unnecessary for the tree, but it could be done.
          */
@@ -1447,7 +1439,6 @@ public class MainFrame extends JFrame {
     private void setupMenus() {
         JMenuBar jMenuBar1 = new JMenuBar();
         this.setJMenuBar( jMenuBar1 );
-        final JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined only", false );
 
         JMenuItem quitMenuItem = new JMenuItem();
         JMenuItem logMenuItem = new JMenuItem();
@@ -1510,21 +1501,6 @@ public class MainFrame extends JFrame {
         hideNonsignificantClassMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_H,
                 InputEvent.CTRL_DOWN_MASK ) );
 
-        modClassMenuItem.setText( "View/Modify Gene Set" );
-        modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
-        modClassMenuItem.setMnemonic( 'M' );
-
-        showUsersMenuItem.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                showUserMenuItemActionPerformed( showUsersMenuItem.getState() );
-            }
-        } );
-        showUsersMenuItem.setMnemonic( 'U' );
-        showUsersMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.CTRL_MASK ) );
-
-        final JCheckBoxMenuItem hideEmptyMenuItem = new JCheckBoxMenuItem( "Hide empty", hideEmpty.get() );
-
         hideEmptyMenuItem.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e1 ) {
@@ -1533,6 +1509,22 @@ public class MainFrame extends JFrame {
             }
 
         } );
+        hideEmptyMenuItem.setMnemonic( 'E' );
+        hideEmptyMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK ) );
+
+        modClassMenuItem.setText( "View/Modify Gene Set" );
+        modClassMenuItem.addActionListener( new GeneSetScoreFrame_modClassMenuItem_actionAdapter( this ) );
+        modClassMenuItem.setMnemonic( 'M' );
+
+        showUsersMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                showUserDefinedMenuActionPerformed( showUsersMenuItem.getState() );
+            }
+        } );
+        showUsersMenuItem.setMnemonic( 'U' );
+        showUsersMenuItem.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.CTRL_MASK ) );
+
         classMenu.add( defineClassMenuItem );
         classMenu.add( modClassMenuItem );
         classMenu.add( showUsersMenuItem );
