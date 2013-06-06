@@ -159,6 +159,10 @@
 					<name>deploy.local</name>
 				</property>
 			</activation>
+			<scm>
+				<connection>scm:local:/space/cvs:ermineJ</connection>
+				<developerConnection>scm:local:/space/cvs:ermineJ</developerConnection>
+			</scm>
 			<distributionManagement>
 				<repository>
 					<id>repo</id>
