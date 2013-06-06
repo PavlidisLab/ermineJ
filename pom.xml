@@ -21,8 +21,8 @@
 	</modules>
 	<packaging>pom</packaging>
 	<scm>
-		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/space/cvs:ermineJ</connection>
-		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/space/cvs:ermineJ</developerConnection>
+		<connection>scm:local:/space/cvs:ermineJ</connection>
+		<developerConnection>scm:local:/space/cvs:ermineJ</developerConnection>
 		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
 	</scm>
 	<issueManagement>
@@ -159,10 +159,6 @@
 					<name>deploy.local</name>
 				</property>
 			</activation>
-			<scm>
-				<connection>scm:local:/space/cvs:ermineJ</connection>
-				<developerConnection>scm:local:/space/cvs:ermineJ</developerConnection>
-			</scm>
 			<distributionManagement>
 				<repository>
 					<id>repo</id>
