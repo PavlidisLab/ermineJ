@@ -89,6 +89,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      */
     public GeneSetResult( GeneSetTerm id, int numProbes, int numGenes, SettingsHolder settings ) {
         this();
+        assert id != null;
         this.geneSetTerm = id;
         this.settings = settings;
         this.setSizes( numProbes, numGenes );
@@ -124,6 +125,9 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
             return -1;
         } else {
             // break ties alphabetically.
+            if ( this.geneSetTerm == null ) {
+                return 0; // stuck, but this shouldn't happen.
+            }
             return this.geneSetTerm.compareTo( other.geneSetTerm );
         }
     }

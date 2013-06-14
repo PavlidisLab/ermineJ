@@ -450,7 +450,13 @@ public class UserDefinedGeneSetManager {
         for ( int i = 0; i < classFiles.length; i++ ) {
 
             String classFile = classFiles[i];
+
             if ( StringUtils.isEmpty( classFile ) ) {
+                continue;
+            }
+
+            // skip some common patterns
+            if ( classFile.startsWith( "." ) || classFile.endsWith( "~" ) ) {
                 continue;
             }
 

@@ -223,7 +223,7 @@ public class ResultsFileReader {
              * Lines that start with the commons configuration comment character "!" indicate data.
              */
             if ( firstword.compareTo( "!" ) == 0 ) {
-                // st.nextToken(); // / class name, ignored.
+                // st.nextToken(); // / toks[1] is class name, ignored.
                 String classId = toks[2];
                 GeneSetTerm term = geneAnnots.findTerm( classId );
                 if ( term == null && !warned ) {
@@ -233,14 +233,29 @@ public class ResultsFileReader {
                 }
 
                 // we could recompute this, but better not.
-                int numProbes = Integer.parseInt( toks[3] );
-                int numGenes = Integer.parseInt( toks[4] );
-                double score = Double.parseDouble( toks[5] );
-                double pval = Double.parseDouble( toks[6] );
+
+                int numProbes = -1;
+                int numGenes = -1;
+                double score = 1.0;
+                double pval = 1.0;
+                try {
+                    numProbes = Integer.parseInt( toks[3] );
+                    numGenes = Integer.parseInt( toks[4] );
+                    score = Double.parseDouble( toks[5] );
+                    pval = Double.parseDouble( toks[6] );
+                } catch ( NumberFormatException e ) {
+                    if ( !warned ) {
+                        messenger.showWarning( "Number format was invalid for a result for: " + term
+                                + ", skipping (further warnings skipped)" );
+                        warned = true;
+                        continue;
+                    }
+                }
 
                 // we could recompute this, but better not.
                 double correctedPval = Double.parseDouble( toks[7] );
 
+                assert term != null;
                 GeneSetResult c = new GeneSetResult( term, numProbes, numGenes, score, pval, correctedPval, runSettings );
 
                 double mf = Double.parseDouble( toks[10] );
