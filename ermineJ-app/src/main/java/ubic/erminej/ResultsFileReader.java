@@ -101,6 +101,12 @@ public class ResultsFileReader {
 
         if ( !FileTools.testFile( file ) ) {
 
+            File possibleMatch = new File( settings.getDataDirectory() + File.separator + new File( file ).getName() );
+            if ( FileTools.testFile( possibleMatch ) ) {
+                log.warn( "Using match from user's data directory: " + possibleMatch );
+                return possibleMatch.getAbsolutePath();
+            }
+
             try {
 
                 // try to start them somewhere useful.
@@ -120,6 +126,7 @@ public class ResultsFileReader {
                 return null;
             }
             return null;
+
         }
         return file;
     }
@@ -149,6 +156,18 @@ public class ResultsFileReader {
             loadSettings.setScoreFile( file );
         }
 
+        /*
+         * The annotation file has to match the one we have already loaded.
+         */
+        // String annotFile = loadSettings.getAnnotFile();
+        // if ( StringUtils.isNotBlank( annotFile ) ) {
+        // file = checkFile( loadSettings, annotFile );
+        // if ( file == null ) {
+        // return false;
+        // }
+        // loadSettings.setAnnotFile( file );
+        // }
+
         return true;
     }
 
@@ -157,7 +176,7 @@ public class ResultsFileReader {
      * 
      * @param newResults
      */
-    private static void fillInMultifuncationalityRankDelta( GeneSetPvalRun newResults ) {
+    private static void fillInMultifunctationalityRankDelta( GeneSetPvalRun newResults ) {
         Map<GeneSetTerm, GeneSetResult> r = newResults.getResults();
 
         List<GeneSetTerm> sortedR = GeneSetPvalRun.getSortedClasses( r );
@@ -306,7 +325,7 @@ public class ResultsFileReader {
         newResults.setSavedToFile( true );
 
         if ( hasMfCorrectedValues ) {
-            fillInMultifuncationalityRankDelta( newResults );
+            fillInMultifunctationalityRankDelta( newResults );
         }
 
         if ( messenger != null ) messenger.showStatus( "Read run: " + runName );

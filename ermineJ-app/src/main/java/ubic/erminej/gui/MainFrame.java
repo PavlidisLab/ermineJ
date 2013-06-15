@@ -713,6 +713,17 @@ public class MainFrame extends JFrame {
              * Check that we're not switching annotations. Match the file names.
              */
             File analysisAnnots = new File( loadSettings.getAnnotFile() );
+
+            if ( !analysisAnnots.exists() ) {
+                // look in the user's directory for a match.
+                File maybeMatchAnnots = new File( settings.getDataDirectory() + File.separator
+                        + analysisAnnots.getName() );
+                if ( maybeMatchAnnots.canRead() ) {
+                    log.warn( "Using match from user's data directory: " + maybeMatchAnnots );
+                    analysisAnnots = maybeMatchAnnots;
+                }
+            }
+
             File currentAnnots = new File( this.settings.getAnnotFile() );
 
             if ( !analysisAnnots.getName().equals( currentAnnots.getName() ) ) {
