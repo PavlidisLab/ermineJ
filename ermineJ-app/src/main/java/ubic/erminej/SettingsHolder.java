@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.ArrayUtils;
 
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
@@ -278,7 +280,7 @@ public class SettingsHolder {
     }
 
     public Set<String> getCustomGeneSetFiles() {
-        return new HashSet<String>( config.getList( CUSTOM_GENESET_FILES, new ArrayList<String>() ) );
+        return new HashSet<String>( Arrays.asList( config.getStringArray( CUSTOM_GENESET_FILES ) ) );
     }
 
     public int getDataCol() {
@@ -416,7 +418,7 @@ public class SettingsHolder {
     }
 
     public Set<String> getSelectedCustomGeneSets() {
-        return new HashSet<String>( config.getList( SELECTED_CUSTOM_GENESETS, new ArrayList<String>() ) );
+        return new HashSet<String>( Arrays.asList( config.getStringArray( SELECTED_CUSTOM_GENESETS ) ) );
     }
 
     /**
