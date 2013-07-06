@@ -1,0 +1,4 @@
+probe
+GO:0019911
+structural constituent of myelin sheath
+38051_at

@@ -1,0 +1,2 @@
+/data/testSettings/test1.settings
+/data/testSettings/test2.settings

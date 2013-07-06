@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
 	<name>ermineJ</name>
-	<groupId>ermineJ</groupId>
 	<version>3.0.1-SNAPSHOT</version>
 	<organization>
 		<name>UBC Centre for High-Throughput Biology</name>
@@ -15,11 +16,7 @@
 		particular biological pathways are "doing something interesting", given a ranked list of genes. The software is designed to be
 		used by biologists with little or no informatics background.
 	</description>
-	<modules>
-		<!-- todo: move this up to the top. We used to have a separate help module. -->
-		<module>ermineJ-app</module>
-	</modules>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 	<scm>
 		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</connection>
 		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</developerConnection>
@@ -47,145 +44,486 @@
 			<organization>University of British Columbia</organization>
 		</developer>
 	</developers>
-	<dependencies />
+	<dependencies>
+		<dependency>
+			<groupId>colt</groupId>
+			<artifactId>colt</artifactId>
+			<version>1.2.0</version>
+			<type>jar</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>concurrent</artifactId>
+					<groupId>concurrent</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1</version>
+			<type>jar</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>avalon-framework</artifactId>
+					<groupId>avalon-framework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>logkit</artifactId>
+					<groupId>logkit</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>servlet-api</artifactId>
+					<groupId>javax.servlet</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.8</version>
+			<type>jar</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>dom4j</artifactId>
+					<groupId>dom4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-beanutils-core</artifactId>
+					<groupId>commons-beanutils</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>servlet-api</artifactId>
+					<groupId>javax.servlet</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-digester</artifactId>
+					<groupId>commons-digester</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-beanutils-bean-collections</artifactId>
+					<groupId>commons-beanutils</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>baseCode</groupId>
+			<artifactId>baseCode</artifactId>
+			<version>1.0.15-SNAPSHOT</version>
+			<type>jar</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>JRI</artifactId>
+					<groupId>RoSuDA</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jena</artifactId>
+					<groupId>com.hp.hpl.jena</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lucene-core</artifactId>
+					<groupId>org.apache.lucene</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>JRIEngine</artifactId>
+					<groupId>RoSuDA</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>arpack-combo</artifactId>
+					<groupId>netlib-java</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>netlib-java</artifactId>
+					<groupId>netlib-java</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-dbcp</artifactId>
+					<groupId>commons-dbcp</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>arq</artifactId>
+					<groupId>com.hp.hpl.jena</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>Rserve</artifactId>
+					<groupId>RoSuDA</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-pool</artifactId>
+					<groupId>commons-pool</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>REngine</artifactId>
+					<groupId>RoSuDA</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>poi</artifactId>
+					<groupId>org.apache.poi</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jena-sdb</artifactId>
+					<groupId>org.apache.jena</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jena-larq</artifactId>
+					<groupId>org.apache.jena</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jena-iri</artifactId>
+					<groupId>org.apache.jena</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jena-core</artifactId>
+					<groupId>org.apache.jena</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jena-arq</artifactId>
+					<groupId>org.apache.jena</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>fluent-hc</artifactId>
+					<groupId>org.apache.httpcomponents</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>httpcore</artifactId>
+					<groupId>org.apache.httpcomponents</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.6.2</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>forehead</groupId>
+			<artifactId>forehead</artifactId>
+			<version>1.0-beta-5</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.0.13</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.1</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.sdicons.jsontools</groupId>
+			<artifactId>jsontools-core</artifactId>
+			<version>1.7</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
 	<build>
-	</build>
-	<repositories>
-		<repository>
-			<id>pavlab</id>
-			<name>PavLab</name>
-			<url>
-				http://www.chibi.ubc.ca/maven2
-			</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</releases>
-		</repository>
-		<repository>
-			<id>ibiblio</id>
-			<name>ibiblio</name>
-			<url>
-				http://mirrors.ibiblio.org/pub/mirrors/maven2
-			</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>apache.plugin.snapshots</id>
-			<name>Apache Development Repository</name>
-			<url>http://cvs.apache.org/maven-snapshot-repository</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>codehaus</id>
-			<name>Codehaus</name>
-			<url>http://snapshots.repository.codehaus.org/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>pavlab</id>
-			<name>PavLab</name>
-			<url>
-				http://www.chibi.ubc.ca/maven2
-			</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-			</releases>
-		</pluginRepository>
-	</pluginRepositories>
-	<profiles>
-		<profile>
-			<id>assemble-src</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<property>
-					<name>assemble-src</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2-beta-2</version>
+		<directory>target</directory>
+		<outputDirectory>target/classes</outputDirectory>
+		<finalName>${project.artifactId}-${project.version}</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test</testSourceDirectory>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>${basedir}/src/test</directory>
+				<excludes>
+					<exclude>**/*</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/test</directory>
+				<includes>
+					<include>**/*.txt</include>
+					<include>**/*.xml</include>
+					<include>**/*.csv</include>
+					<include>**/*.zip</include>
+					<include>**/*.gz</include>
+					<include>**/*.settings</include>
+					<include>**/*.gold</include>
+					<include>**/*.properties</include>
+					<include>**/*.R</include>
+					<include>**/*.json</include>
+				</includes>
+				<filtering>false</filtering>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>osxappbundle-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<configuration>
+					<bundleName>ermineJ</bundleName>
+					<mainClass>ubic.erminej.ErmineJGui</mainClass>
+					<javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub>
+					<jvmVersion>1.6+</jvmVersion>
+					<vmOptions>-Xmx1g</vmOptions>
+					<iconFile>${basedir}/src/main/osx/icon.icns</iconFile>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<argLine>-enableassertions -Xmx512m -Djava.awt.headless=true</argLine>
+					<reportsDirectory>target/surefire-reports</reportsDirectory>
+					<includes>
+						<include>**/Test*.java</include>
+						<include>**/*Test.java</include>
+					</includes>
+					<excludes>
+						<exclude>**/Abstract*.java</exclude>
+						<exclude>**/gui/*</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<quiet>true</quiet>
+					<links>
+						<link>http://docs.oracle.com/javase/6/docs/api</link>
+						<link>http://dsd.lbl.gov/~hoschek/colt/api/</link>
+						<link>http://commons.apache.org/proper/commons-collections/javadocs/api-release/</link>
+						<link>http://commons.apache.org/proper/commons-lang/javadocs/api-3.1</link>
+						<limk>http://chibi.ubc.ca/faculty/pavlidis/basecode/apidocs</limk>
+					</links>
+					<stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>surefire-report-maven-plugin</artifactId>
+				<version>2.0-beta-1</version>
+			</plugin>
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId> <executions> <execution> 
+				<phase>initialize</phase> <goals> <goal>create</goal> </goals> </execution> </executions> <configuration> <doCheck>false</doCheck> 
+				<doUpdate>false</doUpdate> <timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat> </configuration> </plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<configuration>
+					<tasks>
+						<echo message="Unpacking bundle ${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" />
+						<unzip src="${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" dest="${project.build.directory}" />
+						<copy todir="${project.build.directory}/staging/lib">
+							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
+								<include name="ermineJ-app.jar" />
+								<include name="forehead.jar" />
+								<include name="baseCode.jar" />
+								<include name="colt.jar" />
+								<include name="commons-lang.jar" />
+								<include name="commons-configuration.jar" />
+								<include name="commons-collections.jar" />
+								<include name="commons-cli.jar" />
+								<include name="commons-logging.jar" />
+								<include name="commons-math.jar" />
+								<include name="mtj.jar" />
+								<include name="xercesImpl.jar" />
+								<include name="jfreechart.jar" />
+								<include name="jsontools-core.jar" />
+								<include name="jcommon.jar" />
+								<include name="antlr.jar" />
+								<include name="log4j.jar" />
+								<include name="opencsv.jar" />
+							</fileset>
+						</copy>
+						<copy todir="${project.build.directory}/staging/bin">
+							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/bin">
+								<include name="**" />
+							</fileset>
+						</copy>
+						<copy file="${basedir}/src/main/izpack/LICENSE.txt" todir="${project.build.directory}/staging" />
+						<copy file="${basedir}/src/main/izpack/README.txt" todir="${project.build.directory}/staging" />
+						<echo message="${project.version}" file="${basedir}/src/main/resources/ubic/erminej/version" />
+					</tasks>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>nsis-maven-plugin</artifactId>
+				<inherited>false</inherited>
+				<version>1.0-PRE</version>
+				<configuration>
+					<setupScript>${basedir}/src/main/nsis/ermineJ-setup.nsi</setupScript>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-2</version>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>bin-assemble</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assembly</goal>
+						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>src-assembly.xml</descriptor>
+								<descriptor>src/main/assembly/bin-assembly.xml</descriptor>
 							</descriptors>
 						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<!-- For deployment where host is local (and ssh isn't available for builder, e.g. CI) -->
-			<id>local-deploy</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<property>
-					<name>deploy.local</name>
-				</property>
-			</activation>
-			<distributionManagement>
-				<repository>
-					<id>repo</id>
-					<name>Pavlab</name>
-					<url>file:///space/maven2</url>
-				</repository>
-				<snapshotRepository>
-					<id>repo</id>
-					<name>Pavlab</name>
-					<url>file:///space/maven2</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
-	<distributionManagement>
-		<repository>
-			<id>repo</id>
-			<name>Pavlab</name>
-			<url>scp://otto.pavlab.chibi.ubc.ca:/space/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>repo</id>
-			<name>Pavlab</name>
-			<url>scp://otto.pavlab.chibi.ubc.ca:/space/maven2</url>
-		</snapshotRepository>
-	</distributionManagement>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+					</execution>
+					<execution>
+						<id>src-assemble</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assembly</goal>
+						</goals>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>src</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jarsigner-plugin</artifactId> <version>1.2</version> 
+				<executions> <execution> <id>sign</id> <goals> <goal>sign</goal> </goals> </execution> <execution> <id>verify</id> <goals> 
+				<goal>verify</goal> </goals> </execution> </executions> <configuration> <keystore>~/.keystore</keystore> <alias>pavlab</alias> 
+				<storepass>${jarpass}</storepass> <keypass>${jarpass}</keypass> <removeExistingSignatures>true</removeExistingSignatures> 
+				</configuration> </plugin> -->
+
+			<plugin>
+				<!-- See http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<!-- <phase>package</phase> -->
+						<goals>
+							<goal>jnlp-inline</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!--  
+					<dependencies>
+						<includes>
+							<include>baseCode:baseCode</include>
+							<include>colt:colt</include>
+							<include>commons-lang:commons-lang</include>
+							<include>org.apache.commons:commons-lang3</include>
+							<include>commons-configuration:commons-configuration</include>
+							<include>commons-collections:commons-collections</include>
+							<include>commons-cli:commons-cli</include>
+							<include>commons-logging:commons-logging</include>
+							<include>org.apache.commons:commons-math</include>
+							<include>mtj:mtj</include>
+							<include>xerces:xercesImpl</include>
+							<include>jfree:jfreechart</include>
+							<include>com.sdicons.jsontools:jsontools-core</include>
+							<include>jfree:jcommon</include>
+							<include>antlr:antlr</include>
+							<include>log4j:log4j</include>
+							<include>opencsv:opencsv</include>
+						</includes>
+					</dependencies>
+					-->
+					<jnlp>
+						<outputFile>ermineJ.jnlp</outputFile>
+						<mainClass>ubic.erminej.ErmineJGui</mainClass>
+						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
+					</jnlp>
+					<!-- <excludeTransitive>true</excludeTransitive> -->
+					<sign>
+						<keystore>~/.keystore</keystore>
+						<keypass>${jarpass}</keypass>
+						<storepass>${jarpass}</storepass>
+						<alias>pavlab</alias>
+						<keystoreConfig>
+							<delete>false</delete>
+							<gen>false</gen>
+						</keystoreConfig>
+					</sign>
+					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
+					<unsign>true</unsign> <!-- old? -->
+					<pack200>false</pack200>
+					<gzip>true</gzip>
+					<verbose>true</verbose>
+					<verifyjar>true</verifyjar>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>keytool-maven-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generateKeyPair</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<keystore>~/.keystore</keystore>
+					<storepass>${jarpass}</storepass>
+					<keypass>${jarpass}</keypass>
+					<alias>pavlab</alias>
+					<dname>cn=erminej.chibi.ubc.ca, ou=PavlidisLab, L=Vancouver, ST=BC, o=CHiBi, c=CA</dname>
+					<validity>1800</validity>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.izpack</groupId>
+				<artifactId>izpack-maven-plugin</artifactId>
+				<version>5.0.0-beta8</version>
+				<configuration>
+					<izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}</izpackBasedir>
+				</configuration>
+			</plugin>
+		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+		</extensions>
+	</build>
 </project>

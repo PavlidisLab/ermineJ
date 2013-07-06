@@ -1,9 +1,0 @@
-probe
-GO:0004994
-somatostatin receptor activity
-341_at
-778_s_at
-35024_at
-36724_s_at
-39994_at
-33682_at

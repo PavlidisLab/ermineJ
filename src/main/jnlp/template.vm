@@ -1,0 +1,22 @@
+<jnlp spec="$jnlpspec" codebase="http://www.chibi.ubc.ca/ermineJ/webstart" href="$outputFile">
+	<information>
+	<title>ErmineJ</title>
+	<vendor>$project.Organization.Name</vendor>
+	<homepage href="http://ermineJ.chibi.ubc.ca/"/>
+	<description>ErmineJ gene set analysis</description>
+	<icon href="ermineJ.gif"/>
+#if($offlineAllowed) 
+	<offline-allowed/>
+#end 
+	</information>
+#if($allPermissions)
+	<security>
+		<all-permissions/>
+	</security>
+#end
+ 	<resources>
+	<j2se version="$j2seVersion" java-vm-args="-Xmx1024m -Xms256m -Xss8m" />
+     	$dependencies 
+	</resources> 
+	<application-desc main-class="$mainClass"/>
+</jnlp>
