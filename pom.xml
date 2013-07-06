@@ -347,11 +347,12 @@
 						<unzip src="${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" dest="${project.build.directory}" />
 						<copy todir="${project.build.directory}/staging/lib">
 							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
-								<include name="ermineJ-app.jar" />
+								<include name="ermineJ.jar" />
 								<include name="forehead.jar" />
 								<include name="baseCode.jar" />
 								<include name="colt.jar" />
 								<include name="commons-lang.jar" />
+								<include name="commons-lang3.jar" />
 								<include name="commons-configuration.jar" />
 								<include name="commons-collections.jar" />
 								<include name="commons-cli.jar" />
