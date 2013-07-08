@@ -200,10 +200,9 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
         if ( getClass() != obj.getClass() ) return false;
         Platform other = ( Platform ) obj;
         if ( id == null ) {
-            if ( other.id != null )
-                return false;
-            else
-                return id.equals( other.id );
+            if ( other.id != null ) return false;
+
+            return id.equals( other.id );
         } else if ( !id.equals( other.id ) ) return false;
         if ( shortName == null ) {
             if ( other.shortName != null ) return false;

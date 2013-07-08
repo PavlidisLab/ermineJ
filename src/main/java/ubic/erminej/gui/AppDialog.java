@@ -71,6 +71,7 @@ public abstract class AppDialog extends JDialog {
      * @param e
      */
     public void mouseButton_actionPerformed( MouseEvent e ) {
+        //
     }
 
     public void showDialog() {
@@ -260,6 +261,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      */
     @Override
     public void mouseEntered( MouseEvent e ) {
+        //
     }
 
     /*
@@ -269,6 +271,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      */
     @Override
     public void mouseExited( MouseEvent e ) {
+        //
     }
 
     /*
@@ -278,6 +281,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      */
     @Override
     public void mousePressed( MouseEvent e ) {
+        //
     }
 
     /*
@@ -287,6 +291,7 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
      */
     @Override
     public void mouseReleased( MouseEvent e ) {
+        //
     }
 
 }

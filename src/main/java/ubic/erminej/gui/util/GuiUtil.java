@@ -74,11 +74,10 @@ public class GuiUtil {
 
         if ( result == JFileChooser.APPROVE_OPTION ) {
             return chooser.getSelectedFile();
-        } else {
-            statusMessenger.showStatus( "Save cancelled." );
-            return null;
         }
-        // }
+        statusMessenger.showStatus( "Save cancelled." );
+        return null;
+
     }
 
     /**

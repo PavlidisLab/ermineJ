@@ -233,17 +233,19 @@ public class GeneSetTableModel extends AbstractTableModel {
                 default:
                     return null;
             }
-        } else { // results
-            int runIndex = getRunIndex( colIndex );
-            assert runIndex >= 0;
-            Map<GeneSetTerm, GeneSetResult> data = results.get( runIndex ).getResults();
-
-            if ( !data.containsKey( classid ) ) {
-                return new EmptyGeneSetResult( classid );
-            }
-
-            return data.get( classid );
         }
+
+        // results
+        int runIndex = getRunIndex( colIndex );
+        assert runIndex >= 0;
+        Map<GeneSetTerm, GeneSetResult> data = results.get( runIndex ).getResults();
+
+        if ( !data.containsKey( classid ) ) {
+            return new EmptyGeneSetResult( classid );
+        }
+
+        return data.get( classid );
+
     }
 
     public void removeRunData( int runIndex ) {

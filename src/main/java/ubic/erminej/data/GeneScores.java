@@ -914,10 +914,10 @@ public class GeneScores {
 
         if ( notUsable > 0 && usable / ( double ) notUsable < 0.1 ) {
             messenger.showWarning( "Usable scores for only " + usable + " distinct genes found ("
-                    + String.format( "%.2f", 100.0 * usable / ( double ) ( usable + notUsable ) ) + "%)" );
+                    + String.format( "%.2f", 100.0 * usable / ( usable + notUsable ) ) + "%)" );
         } else {
             messenger.showStatus( "Usable scores for " + usable + " distinct genes found ("
-                    + String.format( "%.2f", 100.0 * usable / ( double ) ( usable + notUsable ) ) + "%)" );
+                    + String.format( "%.2f", 100.0 * usable / ( usable + notUsable ) ) + "%)" );
         }
     }
 

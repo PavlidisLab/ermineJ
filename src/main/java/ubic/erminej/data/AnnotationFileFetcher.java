@@ -58,7 +58,7 @@ public class AnnotationFileFetcher {
     /**
      * Show a list of available annotation files.
      */
-    public Platform pickAnnotation() throws IOException {
+    public Platform pickAnnotation() {
 
         List<Platform> designs = fetchPlatformList();
 
