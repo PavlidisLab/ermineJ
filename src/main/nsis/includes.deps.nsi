@@ -6,6 +6,7 @@
   File "${PROJECT_BUILD_DIR}\${PROJECT_ARTIFACT_ID}-${PROJECT_VERSION}\lib\jsontools-core.jar"
   File "${PROJECT_BUILD_DIR}\${PROJECT_ARTIFACT_ID}-${PROJECT_VERSION}\lib\xercesImpl.jar"
   File "${PROJECT_BUILD_DIR}\${PROJECT_ARTIFACT_ID}-${PROJECT_VERSION}\lib\commons-lang3.jar"
+  File "${PROJECT_BUILD_DIR}\${PROJECT_ARTIFACT_ID}-${PROJECT_VERSION}\lib\commons-beanutils.jar"
   File "${PROJECT_BUILD_DIR}\${PROJECT_ARTIFACT_ID}-${PROJECT_VERSION}\lib\opencsv.jar"
   File "${PROJECT_BUILD_DIR}\${PROJECT_ARTIFACT_ID}-${PROJECT_VERSION}\lib\commons-configuration.jar"
   File "${PROJECT_BUILD_DIR}\${PROJECT_ARTIFACT_ID}-${PROJECT_VERSION}\lib\commons-logging.jar" 
