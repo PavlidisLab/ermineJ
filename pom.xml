@@ -150,6 +150,12 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<!-- needed for commons-configuration builders -->
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.8.3</version>
+		</dependency>
+		<dependency>
 			<groupId>forehead</groupId>
 			<artifactId>forehead</artifactId>
 			<version>1.0-beta-5</version>
@@ -293,7 +299,7 @@
 								<include name="forehead.jar" />
 								<include name="baseCode.jar" />
 								<include name="colt.jar" />
-								<include name="commons-lang.jar" />
+								<include name="commons-beanutils.jar" />
 								<include name="commons-lang3.jar" />
 								<include name="commons-configuration.jar" />
 								<include name="commons-collections.jar" />
