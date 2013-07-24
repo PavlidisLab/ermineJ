@@ -11,8 +11,6 @@ For the izpack installer, run
 
 mvn izpack:izpack
 
-(The osx installer build does not work as of Oct 2011)
-
 For osx run
 
  mvn install osxappbundle:bundle

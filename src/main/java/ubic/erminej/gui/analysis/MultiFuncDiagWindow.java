@@ -138,8 +138,6 @@ public class MultiFuncDiagWindow extends JFrame {
             throw ( e );
         }
 
-        assert geneScores != null;
-
         tabs.addTab( "Set sizes.", getGenesPerGroupDistribution( geneAnnots ) );
         tabs.addTab( "Sets per gene", getTermsPerGeneDistribution( geneAnnots ) );
         tabs.addTab( "Set multifunc.", getGroupMultifunctionalityDistribution( geneAnnots ) );
