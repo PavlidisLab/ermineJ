@@ -32,11 +32,13 @@ import java.util.Iterator;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.configuration.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.basecode.util.ConfigUtils;
 import ubic.basecode.util.FileTools;
 
 import ubic.erminej.data.GeneSetTerm;
@@ -188,7 +190,13 @@ public class Settings extends SettingsHolder {
         if ( readFromFile ) {
             loadOrCreateInitialConfig();
         } else {
-            this.config = new PropertiesConfiguration();
+            this.configBuilder = new FileBasedConfigurationBuilder<PropertiesConfiguration>(
+                    PropertiesConfiguration.class );
+            try {
+                this.config = configBuilder.getConfiguration();
+            } catch ( ConfigurationException e ) {
+                throw new IOException( e );
+            }
         }
         initUserDirectories();
     }
@@ -199,7 +207,12 @@ public class Settings extends SettingsHolder {
      * @param settings - settings object to copy
      */
     public Settings( SettingsHolder settingsToCopy ) {
-        this.config = new PropertiesConfiguration();
+        this.configBuilder = new FileBasedConfigurationBuilder<PropertiesConfiguration>( PropertiesConfiguration.class );
+        try {
+            this.config = configBuilder.getConfiguration();
+        } catch ( ConfigurationException e ) {
+            throw new RuntimeException( e );
+        }
         PropertiesConfiguration oldConfig = settingsToCopy.getConfig();
         for ( Iterator<String> iter = oldConfig.getKeys(); iter.hasNext(); ) {
             String key = iter.next();
@@ -216,7 +229,8 @@ public class Settings extends SettingsHolder {
      * @throws IOException
      */
     public Settings( String configurationFile ) throws ConfigurationException, IOException {
-        this.config = new PropertiesConfiguration( configurationFile );
+        this.configBuilder = ConfigUtils.getConfigBuilder( configurationFile );
+        this.config = configBuilder.getConfiguration();
         initUserDirectories();
     }
 
@@ -227,7 +241,8 @@ public class Settings extends SettingsHolder {
      * @throws IOException
      */
     public Settings( URL resource ) throws ConfigurationException, IOException {
-        this.config = new PropertiesConfiguration( resource );
+        this.configBuilder = ConfigUtils.getConfigBuilder( resource );
+        this.config = configBuilder.getConfiguration();
         initUserDirectories();
     }
 
@@ -406,7 +421,7 @@ public class Settings extends SettingsHolder {
     }
 
     public boolean isAutoSaving() {
-        return this.config.isAutoSave();
+        return this.configBuilder.isAutoSave();
     }
 
     /**
@@ -659,10 +674,11 @@ public class Settings extends SettingsHolder {
      * Save the preferences to disk, if necessary, to the DEFAULT location (e.g. ermineJ.properties).
      */
     public void writePrefs() {
-        if ( config.isAutoSave() ) return;
+        if ( configBuilder.isAutoSave() ) return;
         try {
             log.debug( "Saving configuration to default location." );
-            config.save( this.getSettingsFilePath() );
+            configBuilder.getFileHandler().setFile( this.getSettingsFilePath() );
+            configBuilder.save();
         } catch ( ConfigurationException e ) {
             log.error( e, e );
         }
@@ -682,7 +698,7 @@ public class Settings extends SettingsHolder {
         }
 
         log.info( "Found defaults at " + defaultConfigFileLocation );
-        PropertiesConfiguration defaultConfig = new PropertiesConfiguration( defaultConfigFileLocation );
+        PropertiesConfiguration defaultConfig = ConfigUtils.loadConfig( defaultConfigFileLocation );
         return defaultConfig;
     }
 
@@ -755,8 +771,8 @@ public class Settings extends SettingsHolder {
             URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
 
-            this.config = new PropertiesConfiguration( configFileLocation );
-
+            this.configBuilder = ConfigUtils.getConfigBuilder( configFileLocation );
+            this.config = configBuilder.getConfiguration();
             // make sure defaults are defined.
             PropertiesConfiguration defaultConfig = getDefaultConfig();
             for ( Iterator<String> it = defaultConfig.getKeys(); it.hasNext(); ) {
@@ -773,30 +789,34 @@ public class Settings extends SettingsHolder {
                 log.info( "User properties file doesn't exist, creating new one from defaults" );
                 PropertiesConfiguration defaultConfig = getDefaultConfig();
 
-                this.config = new PropertiesConfiguration( newConfigFile );
-                this.config.setPath( newConfigFile.getAbsolutePath() );
+                this.configBuilder = ConfigUtils.getConfigBuilder( newConfigFile );
+                this.configBuilder.getFileHandler().setPath( newConfigFile.getAbsolutePath() );
+                this.config = configBuilder.getConfiguration();
                 Iterator<?> keys = defaultConfig.getKeys();
                 for ( ; keys.hasNext(); ) {
                     String k = ( String ) keys.next();
                     this.config.addProperty( k, defaultConfig.getProperty( k ) );
                 }
 
-                log.info( "Saved the new configuration in " + config.getPath() );
+                log.info( "Saved the new configuration in " + configBuilder.getFileHandler().getPath() );
 
             } catch ( ConfigurationException e1 ) {
                 log.error( "Failed to initialize the configuration file, falling back: " + e1.getMessage() );
                 try {
-                    this.config = new PropertiesConfiguration( newConfigFile );
+                    this.configBuilder = ConfigUtils.getConfigBuilder( newConfigFile );
+                    this.config = configBuilder.getConfiguration();
                 } catch ( ConfigurationException e2 ) {
                     throw new RuntimeException( "Completely failed to get configuration" );
                 }
-                this.config.setPath( newConfigFile.getAbsolutePath() );
+                this.configBuilder.getFileHandler().setPath( newConfigFile.getAbsolutePath() );
             }
         }
 
         if ( this.config != null ) this.config.setHeader( HEADER );
 
-        if ( this.config != null ) this.config.setAutoSave( true );
+        if ( this.config != null ) this.configBuilder.setAutoSave( true );
+
+        assert this.configBuilder != null;
     }
 
     /**

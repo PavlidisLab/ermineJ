@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import ubic.basecode.math.PrecisionRecall;
 import ubic.basecode.math.RandomChooser;

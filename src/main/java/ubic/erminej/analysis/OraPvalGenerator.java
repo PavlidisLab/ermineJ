@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.TransformerUtils;
 import org.apache.commons.collections.set.TransformedSet;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import ubic.basecode.math.SpecFunc;
 import ubic.basecode.util.StatusViewer;

@@ -26,7 +26,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.builder.FileBasedConfigurationBuilder;
 
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
@@ -190,12 +192,25 @@ public class SettingsHolder {
 
     protected PropertiesConfiguration config = null;
 
+    protected FileBasedConfigurationBuilder<PropertiesConfiguration> configBuilder = null;
+
     /**
      * @param oldConfig
      */
     public SettingsHolder( PropertiesConfiguration oldConfig ) {
         this();
-        this.config = new PropertiesConfiguration();
+        this.configBuilder = new FileBasedConfigurationBuilder<PropertiesConfiguration>( PropertiesConfiguration.class );
+
+        try {
+            this.config = configBuilder.getConfiguration();
+        } catch ( ConfigurationException e ) {
+            throw new RuntimeException( e );
+        }
+
+        /*
+         * Copy configuration over.
+         */
+        configBuilder.setParameters( new HashMap<String, Object>() );
         for ( Iterator<String> iter = oldConfig.getKeys(); iter.hasNext(); ) {
             String key = iter.next();
             Object value = oldConfig.getProperty( key );

@@ -16,7 +16,7 @@ package ubic.erminej.analysis;
 
 import hep.aida.bin.QuantileBin1D;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneScores;

@@ -34,7 +34,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.swing.table.TableModel;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

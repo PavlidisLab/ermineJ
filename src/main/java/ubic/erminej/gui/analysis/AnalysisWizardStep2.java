@@ -55,7 +55,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import ubic.basecode.dataStructure.matrix.StringMatrix;
 import ubic.basecode.util.FileTools;
