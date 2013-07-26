@@ -171,11 +171,11 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
         assert hist != null;
         assert numGenes >= classMaxSize;
 
-        // we use this throughout.
-        int[] deck = new int[numGenes];
-        for ( int i = 0; i < numGenes; i++ ) {
-            deck[i] = i;
-        }
+        // // we use this throughout.
+        // int[] deck = new int[numGenes];
+        // for ( int i = 0; i < numGenes; i++ ) {
+        // deck[i] = i;
+        // }
 
         boolean usingPrecisionRecall = method.equals( SettingsHolder.GeneScoreMethod.PRECISIONRECALL );
 
@@ -185,6 +185,8 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
             double oldmean = Double.MAX_VALUE;
             double oldvar = Double.MAX_VALUE;
 
+            double[] primGeneScores = ArrayUtils.toPrimitive( geneScores );
+
             for ( int k = 0; k < numRuns; k++ ) {
 
                 double rawScore = 0;
@@ -192,12 +194,11 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
                 /*
                  * Depending on the method, we need either random gene scores or a list of genes.
                  */
-
                 if ( usingPrecisionRecall ) {
-                    List<Gene> randomClass = ( List<Gene> ) RandomChooser.chooserandom( genes, deck, geneSetSize );
+                    List<Gene> randomClass = ( List<Gene> ) RandomChooser.chooserandom( genes, geneSetSize );
                     rawScore = computeRawScore( null, randomClass );
                 } else {
-                    double[] randomClassScores = RandomChooser.chooserandom( geneScores, deck, geneSetSize );
+                    double[] randomClassScores = RandomChooser.chooserandom( primGeneScores, geneSetSize );
                     rawScore = computeRawScore( randomClassScores, null );
                 }
 

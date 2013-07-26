@@ -106,8 +106,6 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
         for ( int geneSetSize = classMinSize; geneSetSize <= classMaxSize; geneSetSize++ ) {
 
-            int[] randomnums = new int[geneSetSize];
-
             ifInterruptedStop();
 
             if ( messenger != null ) {
@@ -120,7 +118,7 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             DoubleArrayList values = new DoubleArrayList();
             for ( int j = 0; j < numRuns; j++ ) {
 
-                RandomChooser.chooserandom( randomnums, deck, data.rows(), geneSetSize );
+                int[] randomnums = RandomChooser.chooserandom( deck, geneSetSize );
                 double avecorrel = geneSetMeanCorrel( randomnums );
                 values.add( avecorrel );
                 hist.update( geneSetSize, avecorrel );
@@ -128,8 +126,8 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
                 if ( useNormalApprox && j > MIN_ITERATIONS_FOR_ESTIMATION && geneSetSize > MIN_SET_SIZE_FOR_ESTIMATION
                         && j > 0 && j % NORMAL_APPROX_SAMPLE_FREQUENCY == 0 ) {
                     double mean = Descriptive.mean( values );
-                    double variance = Descriptive.variance( values.size(), Descriptive.sum( values ), Descriptive
-                            .sumOfSquares( values ) );
+                    double variance = Descriptive.variance( values.size(), Descriptive.sum( values ),
+                            Descriptive.sumOfSquares( values ) );
 
                     if ( isConverged( oldmean, oldvar, mean, variance ) ) {
                         stableChecks++; // this is necessary because we are not guaranteed to decrease the error.
