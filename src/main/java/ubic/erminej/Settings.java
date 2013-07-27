@@ -766,6 +766,14 @@ public class Settings extends SettingsHolder {
         logLocale();
 
         File newConfigFile = getSettingsFilePath();
+        if ( !newConfigFile.exists() ) {
+            try {
+                FileTools.touch( newConfigFile );
+            } catch ( IOException e ) {
+                throw new RuntimeException( "Could not initialize the configuration file: " + newConfigFile
+                        + "; please make sure the directory is writeable" );
+            }
+        }
 
         try {
             URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
@@ -790,7 +798,6 @@ public class Settings extends SettingsHolder {
                 PropertiesConfiguration defaultConfig = getDefaultConfig();
 
                 this.configBuilder = ConfigUtils.getConfigBuilder( newConfigFile );
-                this.configBuilder.getFileHandler().setPath( newConfigFile.getAbsolutePath() );
                 this.config = configBuilder.getConfiguration();
                 Iterator<?> keys = defaultConfig.getKeys();
                 for ( ; keys.hasNext(); ) {
@@ -806,7 +813,8 @@ public class Settings extends SettingsHolder {
                     this.configBuilder = ConfigUtils.getConfigBuilder( newConfigFile );
                     this.config = configBuilder.getConfiguration();
                 } catch ( ConfigurationException e2 ) {
-                    throw new RuntimeException( "Completely failed to get configuration: " + e2.getMessage() );
+                    throw new RuntimeException( "Completely failed to get configuration (" + newConfigFile + "): "
+                            + e2.getMessage() );
                 }
                 this.configBuilder.getFileHandler().setPath( newConfigFile.getAbsolutePath() );
             }
@@ -820,18 +828,22 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * 
+     * print out information about user's setup.
      */
     private void logLocale() {
-        log.info( "System information:" );
-        log.info( "    User country: " + System.getProperty( "user.country" ) );
-        log.info( "    User language: " + System.getProperty( "user.language" ) );
-        log.info( "    User home directory: " + System.getProperty( "user.home" ) );
-        log.info( "    User working directory: " + System.getProperty( "user.dir" ) );
-        log.info( "    Java version: " + System.getProperty( "java.runtime.version" ) );
-        log.info( "    OS arch: " + System.getProperty( "os.arch" ) );
-        log.info( "    OS version: " + System.getProperty( "os.name" ) );
-        log.info( "    File encoding: " + System.getProperty( "file.encoding" ) );
+        try {
+            log.info( "System information:" );
+            log.info( "    User country: " + System.getProperty( "user.country" ) );
+            log.info( "    User language: " + System.getProperty( "user.language" ) );
+            log.info( "    User home directory: " + System.getProperty( "user.home" ) );
+            log.info( "    User working directory: " + System.getProperty( "user.dir" ) );
+            log.info( "    Java version: " + System.getProperty( "java.runtime.version" ) );
+            log.info( "    OS arch: " + System.getProperty( "os.arch" ) );
+            log.info( "    OS version: " + System.getProperty( "os.name" ) );
+            log.info( "    File encoding: " + System.getProperty( "file.encoding" ) );
+        } catch ( SecurityException e ) {
+            log.info( "Unable to get system information due to security restriction: " + e.getMessage() );
+        }
     }
 
 }
