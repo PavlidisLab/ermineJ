@@ -806,7 +806,7 @@ public class Settings extends SettingsHolder {
                     this.configBuilder = ConfigUtils.getConfigBuilder( newConfigFile );
                     this.config = configBuilder.getConfiguration();
                 } catch ( ConfigurationException e2 ) {
-                    throw new RuntimeException( "Completely failed to get configuration" );
+                    throw new RuntimeException( "Completely failed to get configuration: " + e2.getMessage() );
                 }
                 this.configBuilder.getFileHandler().setPath( newConfigFile.getAbsolutePath() );
             }
