@@ -21,9 +21,7 @@ package ubic.erminej.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -93,22 +91,6 @@ public class GOParser {
 
         i.close();
 
-    }
-
-    /**
-     * Get a simple Map that contains keys that are the GO ids, values are the names. This can replace the functionality
-     * of the GONameReader in classScore.
-     * 
-     * @return Map
-     */
-    public Map<String, GeneSetTerm> getGONameMap() {
-        Map<String, DirectedGraphNode<String, GeneSetTerm>> nodes = termGraph.getItems();
-        Map<String, GeneSetTerm> result = new HashMap<String, GeneSetTerm>();
-        for ( DirectedGraphNode<String, GeneSetTerm> node : nodes.values() ) {
-            GeneSetTerm e = node.getItem();
-            result.put( e.getId(), e );
-        }
-        return result;
     }
 
     /**

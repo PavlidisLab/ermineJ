@@ -691,8 +691,6 @@ public class Settings extends SettingsHolder {
     private PropertiesConfiguration getDefaultConfig() throws ConfigurationException {
         URL defaultConfigFileLocation = this.getClass().getResource( "/ubic/erminej/" + USERGUI_DEFAULT_PROPERTIES );
 
-        // URL defaultConfigFileLocation = ConfigurationUtils.locate( USERGUI_DEFAULT_PROPERTIES );
-
         if ( defaultConfigFileLocation == null ) {
             throw new ConfigurationException( "Defaults not found either!" );
         }
