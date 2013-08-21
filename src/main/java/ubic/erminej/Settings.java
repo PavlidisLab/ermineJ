@@ -37,6 +37,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import ubic.basecode.util.ConfigUtils;
 import ubic.basecode.util.FileTools;
@@ -55,6 +58,17 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  */
 public class Settings extends SettingsHolder {
 
+    /*
+     * URLS for web services used by the software.
+     */
+    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/fetchAnnotationsById";
+
+    // public static final String ANNOTATION_FILE_FETCH_RESTURL =
+    // "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotationsById";
+    public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/listAll";
+
+    public static final String HELPURL = "http://erminej.chibi.ubc.ca/help";
+
     /**
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
      * etc.)
@@ -72,8 +86,6 @@ public class Settings extends SettingsHolder {
     protected static final String HEADER = "Configuration file for ermineJ."
             + "Do not delete this file if you want your ermineJ settings to stay across sessions.\nFor more information see http://www.chibi.ubc.ca/ermineJ/";
 
-    public static final String HELPURL = "http://erminej.chibi.ubc.ca/help";
-
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
      */
@@ -83,18 +95,7 @@ public class Settings extends SettingsHolder {
      * Filename for settings.
      */
     protected static final String USERGUI_PROPERTIES = "ermineJ.properties";
-
-    private static final String ERMINE_J_LOG_FILE_NAME = "ermineJ.log";
-
     private static final Log log = LogFactory.getLog( Settings.class );
-
-    /*
-     * URLS for web services used by the software.
-     */
-    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/fetchAnnotationsById";
-    // public static final String ANNOTATION_FILE_FETCH_RESTURL =
-    // "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotationsById";
-    public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/listAll";
 
     /**
      * Write a configuration to the given file - but just settings relevant to analysis (not window locations, for
@@ -165,11 +166,6 @@ public class Settings extends SettingsHolder {
                 log.debug( "Writing " + propertyName + "=" + configToWrite.getProperty( propertyName ).toString() );
         }
     }
-
-    /**
-     * 
-     */
-    private File logFile;
 
     /**
      * Create the settings, reading them from a file to be determined by the constructor.
@@ -319,6 +315,7 @@ public class Settings extends SettingsHolder {
         if ( config == null ) {
             throw new IllegalStateException( "Unable to initialize configuration" );
         }
+
         return config;
     }
 
@@ -399,21 +396,6 @@ public class Settings extends SettingsHolder {
         }
 
         return SettingsHolder.GeneScoreMethod.valueOf( storedValue );
-    }
-
-    /**
-     * Determine where to put the log file.
-     * 
-     * @return
-     */
-    public File getLogFile() {
-        // rotating logs: not implemented.
-        if ( logFile == null ) {
-            logFile = new File( System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                    + ERMINE_J_LOG_FILE_NAME );
-            return logFile;
-        }
-        return logFile;
     }
 
     public SettingsHolder getSettingsHolder() {
@@ -751,17 +733,16 @@ public class Settings extends SettingsHolder {
             }
         }
         this.setDataDirectory( dataDirName );
-        log.info( "Data directory is " + this.getDataDirectory() );
 
+        log.info( "Data directory is " + this.getDataDirectory() );
         initCustomClassesDirectory();
+
     }
 
     /**
      * 
      */
     private void loadOrCreateInitialConfig() {
-
-        logLocale();
 
         File newConfigFile = getSettingsFilePath();
         if ( !newConfigFile.exists() ) {
@@ -822,13 +803,28 @@ public class Settings extends SettingsHolder {
 
         if ( this.config != null ) this.configBuilder.setAutoSave( true );
 
+        configLogging();
+
+        logLocale();
+
         assert this.configBuilder != null;
+    }
+
+    /**
+     * 
+     */
+    private void configLogging() {
+        Logger logger = LogManager.getRootLogger();
+        FileAppender appender = ( FileAppender ) logger.getAppender( "F" );
+        appender.setFile( this.getLogFile().getAbsolutePath() );
+        appender.activateOptions();
     }
 
     /**
      * print out information about user's setup.
      */
     private void logLocale() {
+        log.info( "Log file is " + this.getLogFile() );
         try {
             log.info( "System information:" );
             log.info( "    User country: " + System.getProperty( "user.country" ) );

@@ -1229,7 +1229,8 @@ public class GeneAnnotations {
         if ( this.geneSets.isEmpty() ) {
             throw new IllegalStateException(
                     "All gene sets were removed due to being too small, too big, or obsolete; usable size range="
-                            + this.minimumGeneSetSize + " - " + PRACTICAL_MAXIMUM_GENESET_SIZE );
+                            + this.minimumGeneSetSize + " - " + PRACTICAL_MAXIMUM_GENESET_SIZE
+                            + ". Check the format of your file and the score column selection." );
         }
 
     }

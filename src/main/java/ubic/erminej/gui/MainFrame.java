@@ -1301,7 +1301,10 @@ public class MainFrame extends JFrame {
                     w.setVisible( true );
                     return null;
                 } catch ( Exception e ) {
+                    GuiUtil.error( "There was a problem computing multifunctionality statistics", e );
                     return null;
+                } finally {
+                    statusMessenger.clear();
                 }
             }
         };

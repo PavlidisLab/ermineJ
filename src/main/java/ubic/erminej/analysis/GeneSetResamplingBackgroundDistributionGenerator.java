@@ -97,6 +97,10 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
 
         this.geneScores = geneToScoreMap.values().toArray( new Double[] {} );
 
+        if ( geneScores.length < 2 ) {
+            throw new IllegalArgumentException( "Gene scores are not valid, too few values" );
+        }
+
         /*
          * Taking into account the "bigger is better" / "log-transform" setting.
          */

@@ -202,9 +202,9 @@ public class GeneScores {
         this.init( settings );
         boolean invalidLog = false;
         boolean invalidNumber = false;
-        String badNumberString = "";
         int numProbesKept = 0;
         int numRepeatedProbes = 0;
+        int numBadNumberStrings = 0;
         Collection<String> unknownProbes = new HashSet<String>();
         Collection<String> unannotatedProbes = new HashSet<String>();
 
@@ -231,16 +231,21 @@ public class GeneScores {
                 continue;
             }
 
-            double pValue = value.doubleValue();
+            double score = value.doubleValue();
+
+            if ( Double.isNaN( score ) ) {
+                numBadNumberStrings++;
+                continue;
+            }
 
             // Fudge when pvalues are zero.
-            if ( settings.getDoLog() && pValue <= 0.0 ) {
+            if ( settings.getDoLog() && score <= 0.0 ) {
                 invalidLog = true;
-                pValue = SMALL;
+                score = SMALL;
             }
 
             if ( settings.getDoLog() ) {
-                pValue = -Math.log10( pValue );
+                score = -Math.log10( score );
             }
 
             /* we're done... */
@@ -249,12 +254,12 @@ public class GeneScores {
                 log.warn( "Repeated identifier: " + probe + ", keeping original value." );
                 numRepeatedProbes++;
             } else {
-                probeToScoreMap.put( probe, new Double( pValue ) );
+                probeToScoreMap.put( probe, new Double( score ) );
             }
         }
 
-        reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
-                numRepeatedProbes, probes.size() );
+        reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, "", numProbesKept,
+                numRepeatedProbes, numBadNumberStrings, probes.size() );
         setUpGeneToScoreMap();
 
     }
@@ -679,6 +684,7 @@ public class GeneScores {
         int scoreColumnIndex = scoreCol - 1;
         int numProbesKept = 0;
         int numRepeatedProbes = 0;
+        int numMissingValues = 0;
 
         String heading = dis.readLine();
         String[] headings = heading.split( "\t" );
@@ -737,6 +743,8 @@ public class GeneScores {
                 if ( probeToScoreMap.size() > 0 ) {
                     invalidNumber = true;
                     badNumberString = fields[scoreColumnIndex];
+                    numMissingValues++;
+                    continue;
                 }
             }
 
@@ -744,7 +752,6 @@ public class GeneScores {
             if ( logTransform && score <= 0.0 ) {
                 invalidLog = true;
                 score = SMALL;
-
             }
 
             if ( logTransform ) {
@@ -773,7 +780,7 @@ public class GeneScores {
         dis.close();
         messenger.clear();
         reportProblems( invalidLog, unknownProbes, unannotatedProbes, invalidNumber, badNumberString, numProbesKept,
-                numRepeatedProbes, totalProbes );
+                numRepeatedProbes, numMissingValues, totalProbes );
 
         setUpGeneToScoreMap();
 
@@ -786,21 +793,23 @@ public class GeneScores {
      * @param invalidNumber
      * @param badNumberString
      * @param numProbesKept
+     * @param numBadNumberStrings
      * @param totalProbes
      */
     private void reportProblems( boolean invalidLog, Collection<String> unknownProbes,
             Collection<String> unannotatedProbes, boolean invalidNumber, String badNumberString, int numProbesKept,
-            int numRepeatedProbes, int totalProbes ) {
+            int numRepeatedProbes, int numBadNumberStrings, int totalProbes ) {
         if ( invalidNumber ) {
-
-            messenger.showWarning( "Non-numeric gene scores(s) " + " ('" + badNumberString + "') "
-                    + " found for input file. These are set to missing" );
+            messenger.showWarning( "Non-numeric gene scores(s) " + " (e.g. '" + badNumberString + "') "
+                    + " found for input file. These are set to missing (" + numBadNumberStrings + " missing)" );
         }
+
         if ( invalidLog ) {
             messenger
                     .showWarning( "Warning: There were attempts to take the log of non-positive values. These are set to "
                             + SMALL );
         }
+
         if ( unknownProbes.size() > 0 ) {
 
             /*

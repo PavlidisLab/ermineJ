@@ -99,10 +99,11 @@ public class SettingsHolder {
     protected static final String GENE_SCORE_THRESHOLD_LEGACY_KEY = "pValThreshold";
     protected static final String GENE_SET_RESAMPLING_SCORE_METHOD = "rawScoreMethod";
     protected static final String GOLD_STANDARD_FILE = "goldStandardFile";
-    protected static final String LOAD_USER_DEFINED_GENE_GROUPS = "loadUserDefinedGeneGroups";
     protected static final String IS_TESTER = "isTester";
-
     protected static final String ITERATIONS = "iterations";
+    protected static final String LOAD_USER_DEFINED_GENE_GROUPS = "loadUserDefinedGeneGroups";
+    protected static final String LOG_FILE = "logFile";
+
     protected static final String MAX_CLASS_SIZE = "maxClassSize";
     protected static final String MIN_CLASS_SIZE = "minClassSize";
     protected static final String MTC_CONFIG_NAME = "mtc";
@@ -120,9 +121,10 @@ public class SettingsHolder {
     protected static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
     protected static final String USE_USER_DEFINED_GROUPS = "useUserDefinedGroups";
     protected static final String VERSIONPARAM = "softwareVersion";
-
     // note this is also listed in erminejdefault.properties.
     private static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@";
+
+    private static final String ERMINE_J_LOG_FILE_NAME = "ermineJ.log";
 
     /**
      * Hard-coded in case of a failure to retrieve the actual version.
@@ -160,6 +162,8 @@ public class SettingsHolder {
         defaults.put( SCORE_COL, 2 );
         defaults.put( DATA_COL, 2 );
         defaults.put( VERSIONPARAM, version );
+        defaults.put( LOG_FILE, defaults.get( DATA_DIRECTORY ) + File.separator + ERMINE_J_LOG_FILE_NAME );
+
     }
 
     /**
@@ -178,15 +182,14 @@ public class SettingsHolder {
     }
 
     protected static String getDefaultUserClassesDirPath() {
-        return getDefaultUserDataDirPath() + System.getProperty( "file.separator" ) + DEFAULT_CUSTOM_GENE_SET_DIR_NAME;
+        return getDefaultUserDataDirPath() + File.separator + DEFAULT_CUSTOM_GENE_SET_DIR_NAME;
     }
 
     /**
      * @return
      */
     protected static String getDefaultUserDataDirPath() {
-        String dataDirName = System.getProperty( "user.home" ) + System.getProperty( "file.separator" )
-                + DEFAULT_USER_DATA_DIR_NAME;
+        String dataDirName = System.getProperty( "user.home" ) + File.separator + DEFAULT_USER_DATA_DIR_NAME;
         return dataDirName;
     }
 
@@ -219,6 +222,7 @@ public class SettingsHolder {
     }
 
     protected SettingsHolder() {
+
         try {
             InputStream resourceAsStream = getClass().getResourceAsStream( "/ubic/erminej/version" );
             BufferedReader r = new BufferedReader( new InputStreamReader( resourceAsStream ) );
@@ -378,6 +382,13 @@ public class SettingsHolder {
      */
     public int getIterations() {
         return config.getInteger( ITERATIONS, 10000 );
+    }
+
+    /**
+     * @return
+     */
+    public File getLogFile() {
+        return new File( config.getString( LOG_FILE, ( String ) getDefault( LOG_FILE ) ) );
     }
 
     public int getMaxClassSize() {
