@@ -1301,6 +1301,10 @@ public class MainFrame extends JFrame {
                     w.setVisible( true );
                     return null;
                 } catch ( Exception e ) {
+                    /*
+                     * TODO: provide opportunity to select the score file / column, as this is a typical source of
+                     * problems.
+                     */
                     GuiUtil.error( "There was a problem computing multifunctionality statistics", e );
                     return null;
                 } finally {
