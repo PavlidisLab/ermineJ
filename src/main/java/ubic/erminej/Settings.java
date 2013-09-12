@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.ConfigurationUtils;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -755,7 +754,7 @@ public class Settings extends SettingsHolder {
         }
 
         try {
-            URL configFileLocation = ConfigurationUtils.locate( USERGUI_PROPERTIES );
+            URL configFileLocation = ConfigUtils.locate( USERGUI_PROPERTIES );
             if ( configFileLocation == null ) throw new ConfigurationException( "Doesn't exist" );
 
             this.configBuilder = ConfigUtils.getConfigBuilder( configFileLocation );
