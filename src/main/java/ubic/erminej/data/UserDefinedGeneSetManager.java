@@ -283,13 +283,18 @@ public class UserDefinedGeneSetManager {
 
         int failures = 0;
         while ( dis.ready() ) {
-            GeneSet newSet = readOneSet( dis );
-            if ( newSet == null ) {
-                log.warn( "Set was not read" );
+            GeneSet newSet;
+            try {
+                newSet = readOneSet( dis );
+                if ( newSet == null ) {
+                    // warning, not a failure - e.g. empty gene set.
+                    continue;
+                }
+                result.add( newSet );
+            } catch ( UnreadableGeneSetException e ) {
+                log.debug( "Set was not read" );
                 failures++;
-                continue;
             }
-            result.add( newSet );
 
             // incorrectly formatted files can cause a lot of trouble. See bug 3858 - if the file contains a lot of sets
             // that have only one gene, it will fail here.
@@ -346,24 +351,29 @@ public class UserDefinedGeneSetManager {
 
         int failures = 0;
         while ( dis.ready() ) {
-            GeneSet newSet = readOneSet( dis );
+            GeneSet newSet;
+            try {
+                newSet = readOneSet( dis );
 
-            if ( newSet == null ) {
-                failures++;
-
-                if ( failures > 10 ) {
-                    // incorrectly formatted files can cause a lot of trouble.
-                    statusMessenger.showError( "There were too many errors reading a gene set file, stopping: "
-                            + fileName );
-                    break;
+                if ( newSet == null ) {
+                    continue;
                 }
-
-                continue;
+                newSet.setSourceFile( fileName );
+                result.add( newSet );
+            } catch ( UnreadableGeneSetException e ) {
+                failures++;
             }
 
-            newSet.setSourceFile( fileName );
-            result.add( newSet );
+            if ( failures > 10 ) {
+                // incorrectly formatted files can cause a lot of trouble.
+                statusMessenger.showError( "There were too many errors reading a gene set file, stopping: " + fileName );
+                break;
+            }
+
+            continue;
+
         }
+
         dis.close();
 
         return result;
@@ -517,8 +527,9 @@ public class UserDefinedGeneSetManager {
      * @param dis
      * @return
      * @throws IOException
+     * @throws UnreadableGeneSetException
      */
-    private GeneSet readOneSet( BufferedReader dis ) throws IOException {
+    private GeneSet readOneSet( BufferedReader dis ) throws IOException, UnreadableGeneSetException {
         String type = null;
         boolean hasUnknownProbes = false;
         boolean isGenes = true;
@@ -593,7 +604,7 @@ public class UserDefinedGeneSetManager {
                 } else {
                     statusMessenger.showError( "Unknown data type '" + type
                             + "' for group; In this format each group must start with 'probe' or 'gene'" );
-                    return null;
+                    throw new UnreadableGeneSetException();
                 }
                 continue;
             }
@@ -641,7 +652,7 @@ public class UserDefinedGeneSetManager {
         } // end of iteration over lines
 
         if ( newSet == null ) {
-            return null;
+            throw new UnreadableGeneSetException();
         }
 
         if ( hasUnknownProbes ) {
