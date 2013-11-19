@@ -142,7 +142,7 @@ public class GeneSetTerms {
      * @param id
      */
     protected void removeUserDefined( GeneSetTerm id ) {
-        if ( id.isUserDefined() ) {
+        if ( id.isUserDefined() && this.graph.containsKey( id.getId() ) ) {
             this.graph.deleteLeaf( id.getId() );
         }
     }
