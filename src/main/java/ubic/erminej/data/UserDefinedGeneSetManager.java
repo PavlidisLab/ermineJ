@@ -291,9 +291,11 @@ public class UserDefinedGeneSetManager {
             }
             result.add( newSet );
 
-            // incorrectly formatted files can cause a lot of trouble.
+            // incorrectly formatted files can cause a lot of trouble. See bug 3858 - if the file contains a lot of sets
+            // that have only one gene, it will fail here.
             if ( failures > 10 ) {
-                statusMessenger.showError( "There were too many errors reading the gene set file, stopping" );
+                statusMessenger.showError( "There were too many errors (" + failures
+                        + ") reading the gene set file, stopping" );
                 break;
             }
 
@@ -652,9 +654,16 @@ public class UserDefinedGeneSetManager {
                 numTimesWarnedOfProblems++;
             }
             // } else if ( newSet != null && newSet.getProbes().isEmpty() ) {
-        } else if ( newSet.getProbes().size() < 2 ) {
+        } else if ( newSet.getProbes().isEmpty() ) {
             if ( numTimesWarnedOfProblems < MAX_WARNINGS ) {
                 statusMessenger.showError( "No genes for " + newSet.getId()
+                        + " match current annotations; further warnings suppressed" );
+                numTimesWarnedOfProblems++;
+            }
+            return null;
+        } else if ( newSet.getProbes().size() == 1 ) {
+            if ( numTimesWarnedOfProblems < MAX_WARNINGS ) {
+                statusMessenger.showError( "Too few genes for " + newSet.getId()
                         + " match current annotations; further warnings suppressed" );
                 numTimesWarnedOfProblems++;
             }
