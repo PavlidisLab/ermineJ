@@ -48,7 +48,7 @@ import ubic.erminej.SettingsHolder;
 public class GeneAnnotationParser {
 
     public enum Format {
-        DEFAULT, AFFYCSV, AGILENT, SIMPLE
+        AFFYCSV, AGILENT, DEFAULT, SIMPLE
     }
 
     private static final int LINES_READ_UPDATE_FREQ = 2500;
@@ -60,15 +60,17 @@ public class GeneAnnotationParser {
      */
     private static final String NO_DESCRIPTION = "[No description]";
 
+    private static Pattern pipePattern = Pattern.compile( "\\s*[\\s\\|,]\\s*" );
+
     private boolean filterNonSpecific = false;
 
     private GeneSetTerms geneSetTerms;
 
+    private int MAX_WARNINGS = 20;
+
     private StatusViewer messenger = new StatusStderr();
 
-    private static Pattern pipePattern = Pattern.compile( "\\s*[\\s\\|,]\\s*" );
-
-    boolean warned = false;
+    private int timesWarned = 0;
 
     public GeneAnnotationParser( GeneSetTerms geneSets ) {
         this.geneSetTerms = geneSets;
@@ -87,7 +89,7 @@ public class GeneAnnotationParser {
      * @throws IOException
      */
     public GeneAnnotations read( InputStream i, Format format, SettingsHolder settings ) throws IOException {
-        warned = false;
+        timesWarned = 0;
         if ( i == null ) {
             throw new IOException( "Inputstream was null" );
         }
@@ -150,7 +152,8 @@ public class GeneAnnotationParser {
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         Map<String, Gene> genes = new HashMap<String, Gene>();
-        warned = false;
+        Set<String> seenProbes = new HashSet<String>();
+        timesWarned = 0;
         int n = 0;
         String line = "";
         while ( ( line = dis.readLine() ) != null ) {
@@ -173,9 +176,30 @@ public class GeneAnnotationParser {
                 probeId = geneName;
             } else {
                 probeId = tokens[0];
+
+                if ( StringUtils.isBlank( probeId ) ) {
+                    if ( shouldWarn() ) {
+                        log.warn( "Blank field where element/probe ID was expected at line " + n );
+                        timesWarned++;
+                        maybeNotifyAboutWarningSuppression();
+                    }
+                    continue;
+                }
+
                 if ( probeId.matches( "AFFX.*" ) ) {
                     continue;
                 }
+
+                if ( seenProbes.contains( probeId ) ) {
+                    if ( shouldWarn() ) {
+                        log.warn( "Duplicated element: " + probeId + " at line " + n + ", skipping" );
+                        timesWarned++;
+                        maybeNotifyAboutWarningSuppression();
+                    }
+                    continue;
+                }
+                seenProbes.add( probeId );
+
                 geneName = tokens[1];
 
                 // correctly deal with things like Nasp|Nasp or Nasp|Nasp2
@@ -300,7 +324,7 @@ public class GeneAnnotationParser {
         if ( bis == null ) {
             throw new IOException( "Inputstream was null" );
         }
-        warned = false;
+        timesWarned = 0;
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         String classIds = null;
         Map<String, Gene> genes = new HashMap<String, Gene>();
@@ -471,7 +495,7 @@ public class GeneAnnotationParser {
         if ( bis == null ) {
             throw new IOException( "Inputstream was null" );
         }
-        warned = false;
+        timesWarned = 0;
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         String classIds = null;
         Map<String, Gene> genes = new HashMap<String, Gene>();
@@ -589,6 +613,15 @@ public class GeneAnnotationParser {
     }
 
     /**
+     * 
+     */
+    private void maybeNotifyAboutWarningSuppression() {
+        if ( !shouldWarn() ) {
+            log.warn( "Further warnings on annotation file format suppressed" );
+        }
+    }
+
+    /**
      * @param go
      * @return
      */
@@ -626,10 +659,10 @@ public class GeneAnnotationParser {
 
         if ( goterm == null ) {
             log.warn( "GO term " + go + " not recognized" );
-            if ( messenger != null && !warned ) {
-                messenger.showStatus( "GO term " + go
-                        + " not recognized in the annotation file; further warnings suppressed" );
-                warned = true;
+            if ( messenger != null && shouldWarn() ) {
+                messenger.showStatus( "GO term " + go + " not recognized in the annotation file" );
+                timesWarned++;
+                maybeNotifyAboutWarningSuppression();
             }
             return null;
         }
@@ -658,6 +691,10 @@ public class GeneAnnotationParser {
      */
     private GeneAnnotations readDefault( InputStream bis, SettingsHolder settings, boolean simple ) throws IOException {
         return this.readDefault( bis, null, settings, simple );
+    }
+
+    private boolean shouldWarn() {
+        return timesWarned < MAX_WARNINGS;
     }
 }
 

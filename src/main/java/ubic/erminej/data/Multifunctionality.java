@@ -582,7 +582,10 @@ public class Multifunctionality {
             genesWithGoTerms = new HashSet<Gene>();
             for ( GeneSetTerm goset : geneAnnots.getGeneSetTerms() ) {
                 Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( goset );
-                if ( geneSetGenes.isEmpty() ) continue;
+                if ( geneSetGenes.isEmpty() ) {
+                    log.debug( "No genes for: " + goset );
+                    continue;
+                }
                 genesWithGoTerms.addAll( geneSetGenes );
                 goGroupSizes.put( goset, geneSetGenes.size() );
             }
@@ -606,9 +609,15 @@ public class Multifunctionality {
                         // continue;
                         // }
                         // inGroup = 0;
-                        throw new IllegalStateException( "Size not computed for " + goset );
+                        // log.info( this.geneAnnots.getGeneSet( goset ).getGenes() );
+                        if ( this.geneAnnots.getGeneSet( goset ) == null ) {
+                            log.warn( "? Annotations don't contain gene set: " + goset + ", size was not computed." );
+                        } else {
+                            log.warn( "Set size not available for " + goset );
+                        }
+                        continue;
                     }
-                    int inGroup = goGroupSizes.get( goset );
+                    Integer inGroup = goGroupSizes.get( goset );
 
                     int outGroup = numGenes - inGroup;
 
