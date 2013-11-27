@@ -4,7 +4,7 @@
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
 	<name>ermineJ</name>
-	<version>3.0.1</version>
+	<version>3.0.2-SNAPSHOT</version>
 	<organization>
 		<name>UBC Centre for High-Throughput Biology</name>
 		<url>http://www.chibi.ubc.ca</url>
@@ -20,7 +20,6 @@
 		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</connection>
 		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</developerConnection>
 		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
-	  <tag>ermineJ-3_0_1</tag>
   </scm>
 	<issueManagement>
 		<system>Bugzilla</system>
