@@ -271,14 +271,18 @@ public class GeneScores {
      * @param geneAnnots Source (original) geneannotation set.
      * @throws IOException
      */
-    public GeneScores( String filename, SettingsHolder settings, StatusViewer messenger, GeneAnnotations geneAnnots )
+    public GeneScores( String filename, SettingsHolder settings, StatusViewer m, GeneAnnotations geneAnnots )
             throws IOException {
         if ( StringUtils.isBlank( filename ) ) {
             throw new IllegalArgumentException( "Filename for gene scores can't be blank" );
         }
         this.originalGeneAnnots = geneAnnots;
-        if ( messenger != null ) this.messenger = messenger;
+        if ( m != null ) {
+            this.messenger = m;
+            m.showStatus( "Reading scores from " + filename );
+        }
         this.init( settings );
+
         FileTools.checkPathIsReadableFile( filename );
         InputStream is = FileTools.getInputStreamFromPlainOrCompressedFile( filename );
         read( is, settings.getScoreCol() );

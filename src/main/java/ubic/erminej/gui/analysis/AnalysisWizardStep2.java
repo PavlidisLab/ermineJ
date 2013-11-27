@@ -102,6 +102,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     private JFileChooser chooser = new JFileChooser();
     private JTextField dataColTextField;
     private JButton quickPickButton = new JButton( "Quick list" );
+
     private JTextField rawFileTextField;
     private AtomicBoolean quicklistReady = new AtomicBoolean( true );
     private JTextField scoreColTextField;
@@ -258,9 +259,9 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         if ( makeQuickPickVisible ) log.info( "Quick pick is available" );
         quickPickButton.setVisible( makeQuickPickVisible );
 
-        if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
-            validateFile();
-        }
+        // if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
+        // validateFile();
+        // }
     }
 
     /**
@@ -347,6 +348,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         int result = chooser.showOpenDialog( this );
         if ( result == JFileChooser.APPROVE_OPTION ) {
             scoreFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setScoreFile( chooser.getSelectedFile().toString() );
             settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
         }
 
@@ -463,12 +465,26 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
         quickPickButton.setEnabled( true );
         quickPickButton.setText( "Quick list" );
+        quickPickButton.setToolTipText( "Create a simple hit list from selected genes" );
         quickPickButton.setVisible( false );
 
         quickPickButton.addActionListener( new QuickPickEnter( this ) );
         scoreColumnPanel.add( quickPickButton );
+
+        JButton validateButton = new JButton( "Validate" );
+        validateButton.setToolTipText( "Re-validate your selection" );
+        validateButton.addActionListener( new ActionListener() {
+
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                validateFile();
+            }
+        } );
+        scoreColumnPanel.add( validateButton );
+
         scoreFilePanel.add( scoreFileBrowsePanel );
-        scoreFilePanel.add( scoreColumnPanel, BorderLayout.EAST );
+        scoreFilePanel.add( scoreColumnPanel, BorderLayout.CENTER );
+
         // -----------------------------------------------------
 
         JPanel rawDataPanel = setupDataMatrixFileChooser();
