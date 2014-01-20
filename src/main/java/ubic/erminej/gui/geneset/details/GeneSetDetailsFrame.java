@@ -383,7 +383,12 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     private void printMatrixValueForRow( BufferedWriter out, DecimalFormat nf, String probeID ) throws IOException {
         assert this.matrixDisplay != null;
-        double[] row = matrixDisplay.getRowByName( this.geneSetDetails.getGeneData().findProbe( probeID ) );
+        Probe probe = this.geneSetDetails.getGeneData().findProbe( probeID );
+        if ( probe == null ) {
+            log.warn( "No element found in data matrix for: " + probeID );
+            return;
+        }
+        double[] row = matrixDisplay.getRowByName( probe );
         for ( int c = 0; c < row.length; c++ ) {
             out.write( "\t" + nf.format( row[c] ) );
         }
@@ -1025,7 +1030,10 @@ public class GeneSetDetailsFrame extends JFrame {
             // for this row: write out matrix values
             String probeID = getProbeID( r );
             Probe probe = this.geneSetDetails.getGeneData().findProbe( probeID );
-            assert probe != null;
+            if ( probe == null ) {
+                log.warn( " No element found in data matrix for: " + probeID );
+                continue;
+            }
             rowKeys[r] = matrixDisplay.getRowIndexByName( probe );
         }
 
