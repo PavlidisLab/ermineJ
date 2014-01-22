@@ -177,7 +177,7 @@ public class UserDefinedGeneSetManager {
             Gene g = geneData.findGene( line );
 
             if ( g == null ) {
-                Probe p = geneData.findProbe( line );
+                Element p = geneData.findElement( line );
                 if ( p == null ) {
                     // log.warn( "Could not identify " + row ); // maybe we should add it.
                     probesNotFound = true;
@@ -334,14 +334,14 @@ public class UserDefinedGeneSetManager {
      * <li>Lines starting with "===" are ignored.</li>
      * </ol>
      * <p>
-     * Probes which aren't found on the currently active array design are ignored, but any probes that match identifiers
+     * Probes which aren't found on the currently active array design are ignored, but any elements that match identifiers
      * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
      * that this behavior is not desirable.
      * <p>
      * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
      * 
-     * @param file which stores the probes or genes.
-     * @return true if some probes were read in which are on the current array design.
+     * @param file which stores the elements or genes.
+     * @return true if some elements were read in which are on the current array design.
      * @throws IOException
      */
     Collection<GeneSet> loadUserGeneSetFile( String fileName ) throws IOException {
@@ -642,7 +642,7 @@ public class UserDefinedGeneSetManager {
                 }
                 newSet.addGene( gene );
             } else {
-                Probe probe = geneData.findProbe( row );
+                Element probe = geneData.findElement( row );
                 if ( probe == null ) {
                     hasUnknownProbes = true;
                 } else {
@@ -657,7 +657,7 @@ public class UserDefinedGeneSetManager {
 
         if ( hasUnknownProbes ) {
             /*
-             * We could add these probes (and genes). This would release users from having to have the annotation file,
+             * We could add these elements (and genes). This would release users from having to have the annotation file,
              * but I don't think it's that big of a deal.
              */
             if ( numTimesWarnedOfProblems < MAX_WARNINGS ) {
@@ -740,7 +740,7 @@ public class UserDefinedGeneSetManager {
                     out.write( g.getSymbol() + "\n" );
                 }
             } else {
-                for ( Probe p : geneeSet.getProbes() ) {
+                for ( Element p : geneeSet.getProbes() ) {
                     out.write( p.getName() + "\n" );
                 }
             }

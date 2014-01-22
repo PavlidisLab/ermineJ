@@ -24,10 +24,10 @@ import javax.swing.table.AbstractTableModel;
 
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 
 /**
- * Simple tabular representation of probes.
+ * Simple tabular representation of elements.
  * 
  * @author paul
  * @version $Id$
@@ -35,15 +35,15 @@ import ubic.erminej.data.Probe;
 public class ProbeTableModel extends AbstractTableModel {
     private static final long serialVersionUID = -1L;
     private String[] columnNames = { "Element", "Gene", "Description" };
-    private List<Probe> pl;
+    private List<Element> pl;
 
-    public ProbeTableModel( Collection<Probe> probesToUse ) {
+    public ProbeTableModel( Collection<Element> probesToUse ) {
         this.setProbes( probesToUse );
         fireTableDataChanged();
     }
 
     public ProbeTableModel( GeneAnnotations geneData ) {
-        pl = new ArrayList<Probe>( geneData.getProbes() );
+        pl = new ArrayList<Element>( geneData.getProbes() );
         fireTableDataChanged();
     }
 
@@ -53,21 +53,21 @@ public class ProbeTableModel extends AbstractTableModel {
 
     public int getGeneCount() {
         Set<Gene> g = new HashSet<Gene>();
-        for ( Probe p : pl ) {
+        for ( Element p : pl ) {
             g.addAll( p.getGenes() );
         }
         return g.size();
     }
 
-    public void addProbes( Collection<Probe> probelist ) {
-        for ( Probe probe : probelist ) {
+    public void addProbes( Collection<Element> probelist ) {
+        for ( Element probe : probelist ) {
             if ( !pl.contains( probe ) ) pl.add( probe );
         }
         fireTableDataChanged();
     }
 
-    public void removeProbes( Collection<Probe> probelist ) {
-        for ( Probe probe : probelist ) {
+    public void removeProbes( Collection<Element> probelist ) {
+        for ( Element probe : probelist ) {
             if ( pl.contains( probe ) ) pl.remove( probe );
         }
         fireTableDataChanged();
@@ -83,7 +83,7 @@ public class ProbeTableModel extends AbstractTableModel {
         return columnNames[i];
     }
 
-    public List<Probe> getProbes() {
+    public List<Element> getProbes() {
         return pl;
     }
 
@@ -95,30 +95,30 @@ public class ProbeTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt( int i, int j ) {
 
-        Probe probeid = pl.get( i );
+        Element elementId = pl.get( i );
         switch ( j ) {
             case 0:
-                return probeid.getName();
+                return elementId.getName();
             case 1:
-                return probeid.getGene().getSymbol();
+                return elementId.getGene().getSymbol();
             case 2:
-                return probeid.getGene().getName();
+                return elementId.getGene().getName();
             default:
                 return null;
         }
     }
 
-    public void setProbes( Collection<Probe> probesToUse ) {
-        pl = new ArrayList<Probe>( probesToUse );
+    public void setProbes( Collection<Element> probesToUse ) {
+        pl = new ArrayList<Element>( probesToUse );
         this.fireTableDataChanged();
     }
 
-    public void addProbe( Probe p ) {
+    public void addProbe( Element p ) {
         if ( !pl.contains( p ) ) pl.add( p );
         fireTableDataChanged();
     }
 
-    public void removeProbe( Probe p ) {
+    public void removeProbe( Element p ) {
         if ( pl.contains( p ) ) pl.remove( p );
         fireTableDataChanged();
     }

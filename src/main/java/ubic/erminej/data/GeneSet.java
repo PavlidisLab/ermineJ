@@ -44,7 +44,7 @@ public class GeneSet {
 
     private String sourceFile;
 
-    private Set<Probe> probes = new HashSet<Probe>();
+    private Set<Element> elements = new HashSet<Element>();
 
     private GeneSetFileFormat format = GeneSetFileFormat.DEFAULT;
 
@@ -69,7 +69,7 @@ public class GeneSet {
     }
 
     /**
-     * Add the gene (and its probes)
+     * Add the gene (and its elements)
      * 
      * @param g
      */
@@ -81,9 +81,9 @@ public class GeneSet {
         // make sure the gene and probe have the term referenced.... this is just in case!
         assert this.term != null;
         g.addGeneSet( this.term );
-        for ( Probe p : g.getProbes() ) {
+        for ( Element p : g.getProbes() ) {
             p.addToGeneSet( this.term );
-            this.probes.add( p );
+            this.elements.add( p );
         }
 
         if ( !redundantGroups.isEmpty() ) {
@@ -109,7 +109,7 @@ public class GeneSet {
 
     public void clearGenes() {
         genes = new HashSet<Gene>();
-        probes = new HashSet<Probe>();
+        elements = new HashSet<Element>();
         clearRedundancy();
     }
 
@@ -166,13 +166,13 @@ public class GeneSet {
     /**
      * @return
      */
-    public Set<Probe> getProbes() {
-        if ( this.probes.isEmpty() ) {
+    public Set<Element> getProbes() {
+        if ( this.elements.isEmpty() ) {
             for ( Gene g : genes ) {
-                probes.addAll( g.getProbes() );
+                elements.addAll( g.getProbes() );
             }
         }
-        return Collections.unmodifiableSet( this.probes );
+        return Collections.unmodifiableSet( this.elements );
     }
 
     /**

@@ -225,7 +225,7 @@ public class GeneSetResult implements Comparable<GeneSetResult> {
      * <pre>
      * Gene set name
      * Gene set ID (e.g. GO:xxxxx)
-     * Number of probes
+     * Number of elements
      * Number of genes
      * Score
      * Pvalue

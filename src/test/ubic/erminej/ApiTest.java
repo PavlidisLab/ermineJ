@@ -38,21 +38,21 @@ public class ApiTest {
     @Test
     public final void test() {
         // List of identifiers to be analyzed
-        List<String> probes = new ArrayList<String>();
-        probes.add( "a" );
-        probes.add( "b" );
-        probes.add( "c" );
-        probes.add( "c_1" );
+        List<String> elements = new ArrayList<String>();
+        elements.add( "a" );
+        elements.add( "b" );
+        elements.add( "c" );
+        elements.add( "c_1" );
 
-        // List of genes corresponding to the probes. Indicates the Many-to-one mapping
-        // of probes to genes
+        // List of genes corresponding to the elements. Indicates the Many-to-one mapping
+        // of elements to genes
         List<String> genes = new ArrayList<String>();
         genes.add( "aGene" );
         genes.add( "bGene" );
         genes.add( "cGene" );
-        genes.add( "cGene" ); // two probes with the same gene.
+        genes.add( "cGene" ); // two elements with the same gene.
 
-        // List of Collections of go terms for the probes.
+        // List of Collections of go terms for the elements.
         List<Collection<String>> goAssociations = new ArrayList<Collection<String>>();
         Collection<String> gotermsA = new HashSet<String>();
         gotermsA.add( "foo" );
@@ -78,7 +78,7 @@ public class ApiTest {
 
         /* ... code to initialize these data structures goes here ... */
 
-        ClassScoreSimple css = new ClassScoreSimple( probes, genes, goAssociations );
+        ClassScoreSimple css = new ClassScoreSimple( elements, genes, goAssociations );
 
         // in our raw data, smaller values are better (like pvalues, unlike fold
         // change)

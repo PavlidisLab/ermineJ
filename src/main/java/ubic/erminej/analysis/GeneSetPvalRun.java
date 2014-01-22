@@ -46,7 +46,7 @@ import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Multifunctionality;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 
 /**
  * Class that does all the work in doing gene set scoring. Holds the results as well.
@@ -183,7 +183,7 @@ public class GeneSetPvalRun {
         if ( messenger != null ) this.messenger = messenger;
         this.settings = settings;
         try {
-            DoubleMatrix<Probe, String> rawData = null;
+            DoubleMatrix<Element, String> rawData = null;
             GeneScores geneScores = null;
             if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
                 rawData = DataIOUtils.readDataMatrixForAnalysis( originalAnnots, settings );
@@ -222,7 +222,7 @@ public class GeneSetPvalRun {
         if ( messenger != null ) this.messenger = messenger;
         this.name = name;
 
-        DoubleMatrix<Probe, String> rawData = null;
+        DoubleMatrix<Element, String> rawData = null;
         GeneScores geneScores = null;
 
         if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) ) {
@@ -234,7 +234,7 @@ public class GeneSetPvalRun {
             this.geneScoreColumnName = geneScores.getScoreColumnName();
         }
 
-        Set<Probe> activeProbes = getActiveProbes( rawData, geneScores );
+        Set<Element> activeProbes = getActiveElements( rawData, geneScores );
         this.geneData = getPrunedAnnotations( activeProbes, originalAnnots );
         populateRanks( results );
 
@@ -366,10 +366,10 @@ public class GeneSetPvalRun {
 
     /* private methods */
 
-    private Set<Probe> getActiveProbes( DoubleMatrix<Probe, String> rawData, GeneScores geneScores ) {
-        Set<Probe> activeProbes = null;
+    private Set<Element> getActiveElements( DoubleMatrix<Element, String> rawData, GeneScores geneScores ) {
+        Set<Element> activeProbes = null;
         if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR ) && rawData != null ) {
-            activeProbes = new HashSet<Probe>( rawData.getRowNames() );
+            activeProbes = new HashSet<Element>( rawData.getRowNames() );
         } else {
             assert geneScores != null;
             activeProbes = geneScores.getProbeToScoreMap().keySet();
@@ -384,7 +384,8 @@ public class GeneSetPvalRun {
      * @param geneDataSets
      * @return
      */
-    private synchronized GeneAnnotations getPrunedAnnotations( Collection<Probe> activeProbes, GeneAnnotations original ) {
+    private synchronized GeneAnnotations getPrunedAnnotations( Collection<Element> activeProbes,
+            GeneAnnotations original ) {
         return original.subClone( activeProbes );
     }
 
@@ -420,7 +421,7 @@ public class GeneSetPvalRun {
      * @param rawData may be null if not needed
      * @param geneScores may be null if not needed.
      */
-    private void runAnalysis( DoubleMatrix<Probe, String> rawData, GeneScores geneScores ) {
+    private void runAnalysis( DoubleMatrix<Element, String> rawData, GeneScores geneScores ) {
 
         // only used for ORA
         Collection<Gene> genesAboveThreshold = new HashSet<Gene>();
@@ -464,7 +465,7 @@ public class GeneSetPvalRun {
                 genesAboveThreshold = pvg.getGenesAboveThreshold();
 
                 messenger.showStatus( "Finished with ORA computations: " + numAboveThreshold
-                        + " probes passed your threshold." );
+                        + " elements passed your threshold." );
 
                 break;
             }

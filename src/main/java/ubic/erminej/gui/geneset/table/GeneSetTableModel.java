@@ -111,7 +111,6 @@ public class GeneSetTableModel extends AbstractTableModel {
         this.geneData = geneData;
         addColumn( "Name" );
         addColumn( "Description" );
-        // addColumn( "Probes" );
         addColumn( "Size" );
         addColumn( "Multifunc" );
         assert INIT_COLUMNS == this.getColumnCount();
@@ -225,9 +224,9 @@ public class GeneSetTableModel extends AbstractTableModel {
                 case 1: // description
                     return classid.getName();
                 case 2: // size
-                    int probes = geneData.numProbesInGeneSet( classid );
+                    int elements = geneData.numElementsInGeneSet( classid );
                     int genes = geneData.numGenesInGeneSet( classid );
-                    return new GeneSetSize( genes, probes );
+                    return new GeneSetSize( genes, elements );
                 case 3: // mf
                     return geneData.getMultifunctionality().getGOTermMultifunctionalityRank( classid );
                 default:
@@ -433,7 +432,7 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
                     ( ( res.getMultifunctionalityCorrectedRankDelta() != null ) ? "<br>p after MFcorr: "
                             + nf.format( res.getMfCorrectedPvalue() ) : "" )
 
-                    + "<br>Genes used: " + res.getNumGenes() + "<br>Probes used: " + res.getNumProbes() );
+                    + "<br>Genes used: " + res.getNumGenes() + "<br>Elements used: " + res.getNumProbes() );
         } else {
 
             /*
@@ -536,12 +535,12 @@ class GeneSetSize implements Comparable<GeneSetSize> {
 
     private Integer numGenes = 0;
 
-    private Integer numProbes = 0;
+    private Integer numElements = 0;
 
-    public GeneSetSize( Integer numGenes, Integer numProbes ) {
+    public GeneSetSize( Integer numGenes, Integer numElements ) {
         super();
         this.numGenes = numGenes;
-        this.numProbes = numProbes;
+        this.numElements = numElements;
     }
 
     @Override
@@ -558,9 +557,9 @@ class GeneSetSize implements Comparable<GeneSetSize> {
         if ( numGenes == null ) {
             if ( other.numGenes != null ) return false;
         } else if ( !numGenes.equals( other.numGenes ) ) return false;
-        if ( numProbes == null ) {
-            if ( other.numProbes != null ) return false;
-        } else if ( !numProbes.equals( other.numProbes ) ) return false;
+        if ( numElements == null ) {
+            if ( other.numElements != null ) return false;
+        } else if ( !numElements.equals( other.numElements ) ) return false;
         return true;
     }
 
@@ -569,7 +568,7 @@ class GeneSetSize implements Comparable<GeneSetSize> {
     }
 
     public Integer getNumProbes() {
-        return numProbes;
+        return numElements;
     }
 
     @Override
@@ -577,7 +576,7 @@ class GeneSetSize implements Comparable<GeneSetSize> {
         final int prime = 31;
         int result = 1;
         result = prime * result + ( ( numGenes == null ) ? 0 : numGenes.hashCode() );
-        result = prime * result + ( ( numProbes == null ) ? 0 : numProbes.hashCode() );
+        result = prime * result + ( ( numElements == null ) ? 0 : numElements.hashCode() );
         return result;
     }
 
@@ -585,15 +584,17 @@ class GeneSetSize implements Comparable<GeneSetSize> {
         this.numGenes = numGenes;
     }
 
-    public void setNumProbes( Integer numProbes ) {
-        this.numProbes = numProbes;
+    public void setNumElements( Integer numElements ) {
+        this.numElements = numElements;
     }
 
     @Override
     public String toString() {
-        return "<html>" + numGenes + ""
-                + ( numProbes.equals( numGenes ) ? "" : "&nbsp;<font color=\"#777777\">[ " + numProbes + " ]</font>" )
-                + "</html>";
+        return "<html>"
+                + numGenes
+                + ""
+                + ( numElements.equals( numGenes ) ? "" : "&nbsp;<font color=\"#777777\">[ " + numElements
+                        + " ]</font>" ) + "</html>";
     }
 
 }

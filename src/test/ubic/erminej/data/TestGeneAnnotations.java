@@ -75,7 +75,7 @@ public class TestGeneAnnotations {
     private InputStream imb;
 
     private InputStream is;
-    private List<String> probes;
+    private List<String> elements;
 
     private Settings settings;
 
@@ -85,17 +85,17 @@ public class TestGeneAnnotations {
     @Before
     public void setUp() throws Exception {
 
-        probes = new ArrayList<String>();
-        probes.add( "a" );
-        probes.add( "b" );
-        probes.add( "c" );
+        elements = new ArrayList<String>();
+        elements.add( "a" );
+        elements.add( "b" );
+        elements.add( "c" );
         geneIds = new ArrayList<Gene>();
         Gene agene = new Gene( "aGene" );
         Gene bgene = new Gene( "bGene" );
         Gene cgene = new Gene( "cGene" );
-        agene.addProbe( new Probe( "a" ) );
-        bgene.addProbe( new Probe( "b" ) );
-        cgene.addProbe( new Probe( "c" ) );
+        agene.addElement( new Element( "a" ) );
+        bgene.addElement( new Element( "b" ) );
+        cgene.addElement( new Element( "c" ) );
 
         geneIds.add( agene );
         geneIds.add( bgene );
@@ -134,8 +134,8 @@ public class TestGeneAnnotations {
     public void testAddGeneSet() {
         List<Gene> newGeneSet = new ArrayList<Gene>();
         Gene g = new Gene( "LARS2" );
-        g.addProbe( new Probe( "34764_at" ) );
-        g.addProbe( new Probe( "32636_f_at" ) );
+        g.addElement( new Element( "34764_at" ) );
+        g.addElement( new Element( "32636_f_at" ) );
         newGeneSet.add( g );
         GeneSetTerm term = new GeneSetTerm( "Foo" );
         ga.addGeneSet( term, newGeneSet );
@@ -146,11 +146,11 @@ public class TestGeneAnnotations {
 
     @Test
     public void testConstructPruned() {
-        Set<Probe> keepers = new HashSet<Probe>();
-        keepers.add( ga.findProbe( "36949_at" ) );
-        keepers.add( ga.findProbe( "41208_at" ) );
-        keepers.add( ga.findProbe( "34764_at" ) );
-        keepers.add( ga.findProbe( "33338_at" ) );
+        Set<Element> keepers = new HashSet<Element>();
+        keepers.add( ga.findElement( "36949_at" ) );
+        keepers.add( ga.findElement( "41208_at" ) );
+        keepers.add( ga.findElement( "34764_at" ) );
+        keepers.add( ga.findElement( "33338_at" ) );
         GeneAnnotations pruned = new GeneAnnotations( ga, keepers );
         assertEquals( 4, pruned.numGenes() );
         assertEquals( 4, pruned.numProbes() );
@@ -168,7 +168,7 @@ public class TestGeneAnnotations {
     @Test
     public void testGeneAnnotationsApiB() {
         GeneAnnotations val = new GeneAnnotations( geneIds, goIds, new StatusStderr() );
-        int actualValue = val.numProbesForGene( val.findGene( "aGene" ) );
+        int actualValue = val.numElementsForGene( val.findGene( "aGene" ) );
         int expectedValue = 1;
         assertEquals( expectedValue, actualValue );
     }
@@ -266,7 +266,7 @@ public class TestGeneAnnotations {
     public void testReadAgilent() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readAgilent( ia, null, settings );
-        int actualValue = g.findProbe( "A_52_P311491" ).getGeneSets().size();
+        int actualValue = g.findElement( "A_52_P311491" ).getGeneSets().size();
         assertEquals( 12, actualValue ); // not checked by hand.
     }
 
@@ -277,7 +277,7 @@ public class TestGeneAnnotations {
         GeneAnnotations g = p.readAgilent( a, null, settings );
         assertEquals( 37, g.getProbes().size() );
         assertEquals( 30, g.getGenes().size() ); // not checked by hand.
-        Probe testp = g.findProbe( "A_84_P22735" );
+        Element testp = g.findElement( "A_84_P22735" );
         assertNotNull( testp );
         int actualValue = testp.getGeneSets().size();
         assertEquals( 23, actualValue ); // not checked by hand.
@@ -288,7 +288,7 @@ public class TestGeneAnnotations {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readDefault( imb, null, settings, false );
 
-        Probe probe = g.findProbe( "32304_at" );
+        Element probe = g.findElement( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
         int expectedValue = 113; // not checked by hand.
@@ -298,7 +298,7 @@ public class TestGeneAnnotations {
 
     @Test
     public void testReadDescription() {
-        String actualValue = ga.findProbe( "32304_at" ).getDescription();
+        String actualValue = ga.findElement( "32304_at" ).getDescription();
         String expectedValue = "protein kinase C, alpha";
         assertEquals( expectedValue, actualValue );
     }
@@ -330,7 +330,7 @@ public class TestGeneAnnotations {
     @Test
     public void testRemoveAspect() {
         GeneSetMapTools.removeAspect( ga, goNames, null, "cellular_component" );
-        assertEquals( 0, ga.getGeneSetProbes( new GeneSetTerm( "GO:0005739" ) ).size() );
+        assertEquals( 0, ga.getGeneSetElements( new GeneSetTerm( "GO:0005739" ) ).size() );
     }
 
     public void testRemoveBySize() {
@@ -347,7 +347,7 @@ public class TestGeneAnnotations {
         assertEquals( 2, ga.numGenesInGeneSet( geneset ) );
         assertEquals( 59, selectedSets.size() ); // not checked by hand
         assertTrue( selectedSets.contains( geneset ) );
-        assertEquals( 2, ga.getGeneSetProbes( geneset ).size() );
+        assertEquals( 2, ga.getGeneSetElements( geneset ).size() );
     }
 
     @Test
@@ -411,7 +411,7 @@ public class TestGeneAnnotations {
      * @param id
      */
     private void check( String[] gotr, String id ) {
-        Collection<GeneSetTerm> geneSets = ga.findProbe( id ).getGeneSets();
+        Collection<GeneSetTerm> geneSets = ga.findElement( id ).getGeneSets();
 
         Set<GeneSetTerm> re = new HashSet<GeneSetTerm>();
         for ( String g : gotr ) {
@@ -441,11 +441,11 @@ public class TestGeneAnnotations {
                 for ( String s : gotr ) {
                     if ( allChildren.contains( new GeneSetTerm( s ) ) ) {
                         System.err.println( t + " is a parent of listed term " + s
-                                + " in the geneAnnotations, but not found for the probe." );
+                                + " in the geneAnnotations, but not found for the element." );
                     }
                 }
             }
-            assertTrue( "Probe is missing annotation: " + t, geneSets.contains( t ) );
+            assertTrue( "Element is missing annotation: " + t, geneSets.contains( t ) );
         }
     }
 }

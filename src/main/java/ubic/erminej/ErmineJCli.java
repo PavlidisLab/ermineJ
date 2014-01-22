@@ -50,7 +50,7 @@ import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.SettingsHolder.Method;
-import ubic.erminej.SettingsHolder.MultiProbeHandling;
+import ubic.erminej.SettingsHolder.MultiElementHandling;
 import ubic.erminej.SettingsHolder.MultiTestCorrMethod;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
@@ -333,7 +333,7 @@ public class ErmineJCli {
                 .withDescription( "Directory where custom gene set are located" ).create( 'f' ) );
 
         options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" )
-                .withDescription( "Filter out non-specific probes (default annotation format only), default=true" )
+                .withDescription( "Filter out non-specific elements (default annotation format only), default=true" )
                 .create( 'F' ) );
 
         options.addOption( OptionBuilder
@@ -342,7 +342,7 @@ public class ErmineJCli {
                 .withLongOpt( "reps" )
                 .withDescription(
                         "What to do when genes have multiple scores"
-                                + " in input file (due to multiple probes per gene): BEST = best of replicates; MEAN = mean of replicates; default="
+                                + " in input file (due to multiple elements per gene): BEST = best of replicates; MEAN = mean of replicates; default="
                                 + SettingsHolder.getDefault( SettingsHolder.GENE_REP_TREATMENT ) ).create( 'g' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" )
@@ -587,10 +587,10 @@ public class ErmineJCli {
 
                     switch ( intarg ) {
                         case 1:
-                            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
+                            settings.setGeneRepTreatment( SettingsHolder.MultiElementHandling.BEST );
                             break;
                         case 2:
-                            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
+                            settings.setGeneRepTreatment( SettingsHolder.MultiElementHandling.MEAN );
                             break;
                         default:
                             throw new IllegalArgumentException();
@@ -602,7 +602,7 @@ public class ErmineJCli {
                     throw new IllegalArgumentException();
                 }
             } catch ( NumberFormatException e ) {
-                MultiProbeHandling val = SettingsHolder.MultiProbeHandling.valueOf( arg );
+                MultiElementHandling val = SettingsHolder.MultiElementHandling.valueOf( arg );
                 settings.setGeneRepTreatment( val );
             } catch ( Exception e ) {
                 System.err.println( "Gene rep treatment must be either BEST or MEAN (-g)" );

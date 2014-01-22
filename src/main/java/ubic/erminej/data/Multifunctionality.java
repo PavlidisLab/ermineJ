@@ -137,7 +137,7 @@ public class Multifunctionality {
 
     /**
      * Construct Multifunctionality information based on the state of the GO annotations -- this accounts only for the
-     * probes in the annotations. Genes with no GO terms are completely ignored.
+     * elements in the annotations. Genes with no GO terms are completely ignored.
      * 
      * @param go These annotations should already be pruned down to those used in analysis.
      */

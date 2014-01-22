@@ -114,8 +114,6 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
      * Get results for one class, based on class id.
      * 
      * @param geneSet name of the gene set to be tested.
-     * @param probesToPvals (or genesToPvals, if using weights)
-     * @param rankMap Ranks of all genes (if using weights) or probes.
      * @return a GeneSetResult
      */
     private GeneSetResult classPval( GeneSetTerm geneSet ) {
@@ -135,7 +133,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
         double areaUnderROC = ROC.aroc( totalSize, targetRanks );
         double roc_pval = ROC.rocpval( totalSize, targetRanks );
 
-        GeneSetResult res = new GeneSetResult( geneSet, numProbesInSet( geneSet ), numGenesInSet, settings );
+        GeneSetResult res = new GeneSetResult( geneSet, numElementsInSet( geneSet ), numGenesInSet, settings );
         res.setScore( areaUnderROC );
         res.setPValue( roc_pval );
         return res;

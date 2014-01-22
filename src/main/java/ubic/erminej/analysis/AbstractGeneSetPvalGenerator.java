@@ -114,21 +114,21 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
         return geneAnnots.getGeneSetGenes( t ).size();
     }
 
-    public int numProbesInSet( GeneSetTerm t ) {
-        return geneAnnots.getGeneSetProbes( t ).size();
+    public int numElementsInSet( GeneSetTerm t ) {
+        return geneAnnots.getGeneSetElements( t ).size();
     }
 
     /**
      * @param value
      */
-    public void set_class_max_size( int value ) {
+    public void setClassMaxSize( int value ) {
         maxGeneSetSize = value;
     }
 
     /**
      * @param value
      */
-    public void set_class_min_size( int value ) {
+    public void setClassMinSize( int value ) {
         minGeneSetSize = value;
     }
 

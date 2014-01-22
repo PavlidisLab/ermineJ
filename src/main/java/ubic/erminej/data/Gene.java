@@ -26,7 +26,7 @@ import java.util.HashSet;
  */
 public class Gene implements Comparable<Gene> {
 
-    private Collection<Probe> activeProbes = new HashSet<Probe>();
+    private Collection<Element> activeElements = new HashSet<Element>();
 
     private Long gemmaID = null;
 
@@ -38,7 +38,7 @@ public class Gene implements Comparable<Gene> {
 
     private Integer ncbiTaxonId = null;
 
-    private Collection<Probe> probes = new HashSet<Probe>();
+    private Collection<Element> elements = new HashSet<Element>();
 
     private final String symbol;
 
@@ -53,7 +53,7 @@ public class Gene implements Comparable<Gene> {
     }
 
     /**
-     * Updates membership (for probes too).
+     * Updates membership (for elements too).
      * 
      * @param t
      * @return true if it was added; false if it was already there.
@@ -64,7 +64,7 @@ public class Gene implements Comparable<Gene> {
         if ( this.geneSets.contains( t ) ) return false;
 
         this.geneSets.add( t );
-        for ( Probe p : probes ) {
+        for ( Element p : elements ) {
             p.addToGeneSet( t );
         }
 
@@ -90,8 +90,8 @@ public class Gene implements Comparable<Gene> {
         return symbol.equals( other.symbol );
     }
 
-    public Collection<Probe> getActiveProbes() {
-        return Collections.unmodifiableCollection( activeProbes );
+    public Collection<Element> getActiveProbes() {
+        return Collections.unmodifiableCollection( activeElements );
     }
 
     public Long getGemmaID() {
@@ -114,8 +114,8 @@ public class Gene implements Comparable<Gene> {
         return ncbiTaxonId;
     }
 
-    public Collection<Probe> getProbes() {
-        return Collections.unmodifiableCollection( probes );
+    public Collection<Element> getProbes() {
+        return Collections.unmodifiableCollection( elements );
     }
 
     public String getSymbol() {
@@ -136,14 +136,14 @@ public class Gene implements Comparable<Gene> {
      */
     public boolean removeGeneSet( GeneSetTerm t ) {
         assert t != null;
-        for ( Probe p : this.probes ) {
+        for ( Element p : this.elements ) {
             p.removeGeneSet( t );
         }
         return this.geneSets.remove( t );
     }
 
-    public void setActiveProbes( Collection<Probe> activeProbes ) {
-        this.activeProbes = activeProbes;
+    public void setActiveElements( Collection<Element> activeProbes ) {
+        this.activeElements = activeProbes;
     }
 
     public void setGemmaId( Long id ) {
@@ -162,8 +162,8 @@ public class Gene implements Comparable<Gene> {
         this.ncbiTaxonId = ncbiTaxonId;
     }
 
-    public void setProbes( Collection<Probe> probes ) {
-        this.probes = probes;
+    public void setElements( Collection<Element> elements ) {
+        this.elements = elements;
     }
 
     @Override
@@ -174,8 +174,8 @@ public class Gene implements Comparable<Gene> {
     /**
      * @param probe
      */
-    protected void addProbe( Probe probe ) {
-        this.probes.add( probe );
+    protected void addElement( Element probe ) {
+        this.elements.add( probe );
         probe.addGene( this ); // have to be careful here not to cause stack overflow
         for ( GeneSetTerm gs : this.geneSets ) {
             probe.addToGeneSet( gs );

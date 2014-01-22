@@ -77,7 +77,7 @@ public class UserDefinedGeneSetManagerTest {
             assertEquals( GeneSetFileFormat.DEFAULT, geneSet.getFormat() );
             assertTrue( geneSet.getId().contains( "my" ) );
             assertTrue( "Got: " + geneSet.getName(), geneSet.getName().contains( "test" ) );
-            for ( Probe p : geneSet.getProbes() ) {
+            for ( Element p : geneSet.getProbes() ) {
                 assertTrue( p.getName().endsWith( "_at" ) );
             }
         }

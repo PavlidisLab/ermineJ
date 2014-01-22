@@ -46,7 +46,7 @@ import javax.swing.event.ChangeEvent;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSet;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 import ubic.erminej.gui.geneset.ProbeTableModel;
 import ubic.erminej.gui.util.WizardStep;
 
@@ -95,7 +95,7 @@ public class GeneSetWizardStep2 extends WizardStep {
      * 
      * @return
      */
-    public Collection<Probe> getProbes() {
+    public Collection<Element> getProbes() {
         return this.ncTableModel.getProbes();
     }
 
@@ -114,7 +114,7 @@ public class GeneSetWizardStep2 extends WizardStep {
 
     public void updateCountLabel() {
         if ( ncTableModel.getProbeCount() != ncTableModel.getGeneCount() ) {
-            showStatus( ncTableModel.getGeneCount() + " genes selected [" + ncTableModel.getProbeCount() + " probes]" );
+            showStatus( ncTableModel.getGeneCount() + " genes selected [" + ncTableModel.getProbeCount() + " elements]" );
         } else {
             showStatus( ncTableModel.getGeneCount() + " genes selected" );
 
@@ -130,7 +130,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         JLabel jLabel1 = new JLabel();
 
         jLabel1.setMinimumSize( new Dimension( 250, 19 ) );
-        jLabel1.setText( "All available genes (or probes)" );
+        jLabel1.setText( "All available genes (or elements)" );
         jLabel2.setMinimumSize( new Dimension( 250, 19 ) );
         jLabel2.setText( "Gene set members" );
         showStatus( "0 genes selected" );
@@ -207,9 +207,9 @@ public class GeneSetWizardStep2 extends WizardStep {
         step2Panel.add( bottomPanel, BorderLayout.SOUTH );
 
         this.addHelp( "<html><b>Set up the gene set</b><br>"
-                + "Add or remove probes/genes using the buttons below the table. "
-                + "The list of all possible available probes is provided at the left. "
-                + "The list of probes/genes that are in the gene set is given at right. "
+                + "Add or remove elements/genes using the buttons below the table. "
+                + "The list of all possible available elements is provided at the left. "
+                + "The list of elements/genes that are in the gene set is given at right. "
                 + "To find a specific gene use the 'find' tool. "
                 + "If you don't want to make any changes, press 'cancel'." );
         this.addMain( step2Panel );
@@ -234,14 +234,14 @@ public class GeneSetWizardStep2 extends WizardStep {
      * @param gene
      */
     void addGeneToSet( Gene gene ) {
-        Collection<Probe> probelist = gene.getProbes();
+        Collection<Element> probelist = gene.getProbes();
 
         if ( probelist.size() == 0 ) {
-            showError( "No probes for gene " + gene );
+            showError( "No elements for gene " + gene );
             return;
         }
 
-        log.debug( "Got " + probelist.size() + " new probes to add" );
+        log.debug( "Got " + probelist.size() + " new elements to add" );
         ncTableModel.addProbes( probelist );
         ncTableModel.fireTableDataChanged();
 
@@ -255,38 +255,38 @@ public class GeneSetWizardStep2 extends WizardStep {
         int[] rows = probeTable.getSelectedRows();
         log.debug( rows.length + " rows selected" );
 
-        Collection<Probe> probes = new HashSet<Probe>();
+        Collection<Element> elements = new HashSet<Element>();
         for ( int i = 0; i < rows.length; i++ ) {
             String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
             log.debug( "Got probe: " + probe );
-            Probe p = geneData.findProbe( probe );
-            if ( p != null ) probes.add( p );
+            Element p = geneData.findElement( probe );
+            if ( p != null ) elements.add( p );
 
         }
 
-        ncTableModel.addProbes( probes );
-        sourceProbeModel.removeProbes( probes );
+        ncTableModel.addProbes( elements );
+        sourceProbeModel.removeProbes( elements );
         updateCountLabel();
     }
 
     void deleteProbesFromRightTable() {
         int[] rows = newClassTable.getSelectedRows();
-        Collection<Probe> probes = new HashSet<Probe>();
+        Collection<Element> elements = new HashSet<Element>();
         for ( int i = 0; i < rows.length; i++ ) {
             String probe = ( String ) newClassTable.getValueAt( rows[i], 0 );
             log.debug( "Removing " + probe );
-            Probe p = geneData.findProbe( probe );
+            Element p = geneData.findElement( probe );
 
-            // remove all of the probes for the gene, not just the selected one (otherwise doesn't make much sense).
+            // remove all of the elements for the gene, not just the selected one (otherwise doesn't make much sense).
             if ( p != null ) {
                 for ( Gene g : p.getGenes() ) {
-                    probes.addAll( g.getProbes() );
+                    elements.addAll( g.getProbes() );
                 }
             }
 
         }
-        ncTableModel.removeProbes( probes );
-        sourceProbeModel.addProbes( probes );
+        ncTableModel.removeProbes( elements );
+        sourceProbeModel.addProbes( elements );
         updateCountLabel();
     }
 
@@ -305,9 +305,9 @@ public class GeneSetWizardStep2 extends WizardStep {
     void editorProbe_actionPerformed( ChangeEvent e ) {
         String newProbe = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
 
-        Probe p = geneData.findProbe( newProbe );
+        Element p = geneData.findElement( newProbe );
         if ( p == null ) {
-            showError( "Probe " + newProbe + " does not exist." );
+            showError( "Element" + newProbe + " does not exist." );
             return;
         }
         Gene g = p.getGene();
@@ -318,7 +318,7 @@ public class GeneSetWizardStep2 extends WizardStep {
     void find() {
         String searchOn = searchTextField.getText();
 
-        Collection<Probe> leftHandProbes = new HashSet<Probe>();
+        Collection<Element> leftHandProbes = new HashSet<Element>();
         if ( searchOn.equals( "" ) ) {
             leftHandProbes = geneData.getProbes();
         } else {
@@ -358,7 +358,7 @@ public class GeneSetWizardStep2 extends WizardStep {
 
         probeTable.revalidate();
 
-        ncTableModel = new ProbeTableModel( new HashSet<Probe>() );
+        ncTableModel = new ProbeTableModel( new HashSet<Element>() );
         newClassTable.setModel( ncTableModel );
         newClassTable.setAutoCreateRowSorter( true );
         newClassTable.getTableHeader().addMouseListener( new MouseAdapter() {
@@ -375,7 +375,7 @@ public class GeneSetWizardStep2 extends WizardStep {
         newClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 40 );
         newClassTable.getColumnModel().getColumn( 1 ).setPreferredWidth( 40 );
         newClassTable.revalidate();
-        showStatus( "Available probes: " + geneData.numProbes() );
+        showStatus( "Available elements: " + geneData.numProbes() );
     }
 
 }

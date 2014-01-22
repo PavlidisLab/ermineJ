@@ -34,30 +34,30 @@ import ubic.erminej.data.GeneScores;
  */
 public class ClassScoreSimple {
 
-    // List of genes corresponding to the probes. Indicates the Many-to-one mapping of
-    // probes to
+    // List of genes corresponding to the elements. Indicates the Many-to-one mapping of
+    // elements to
     // genes.
     private List<String> genes = null;
 
-    // List of Collections of go terms for the probes.
+    // List of Collections of go terms for the elements.
     private List<Collection<String>> goAssociations = null;
 
     // List of identifiers to be analyzed
-    private List<String> probes = null;
+    private List<String> elements = null;
 
     private GeneSetPvalRun results;
 
     private Settings settings = null;
 
     /**
-     * Note that these Lists must all be in the same order with respect to the probes.
+     * Note that these Lists must all be in the same order with respect to the elements.
      * 
-     * @param probes List of identifiers to be analyzed
-     * @param genes List of genes corresponding to the probes. Indicates the Many-to-one mapping of probes to genes.
-     * @param goAssociations List of Collections of go terms for the probes.
+     * @param elements List of identifiers to be analyzed
+     * @param genes List of genes corresponding to the elements. Indicates the Many-to-one mapping of elements to genes.
+     * @param goAssociations List of Collections of go terms for the elements.
      */
-    public ClassScoreSimple( List<String> probes, List<String> genes, List<Collection<String>> goAssociations ) {
-        this.probes = probes;
+    public ClassScoreSimple( List<String> elements, List<String> genes, List<Collection<String>> goAssociations ) {
+        this.elements = elements;
         this.genes = genes;
         this.goAssociations = goAssociations;
 
@@ -89,8 +89,8 @@ public class ClassScoreSimple {
      * Run an analysis using the current configuration.
      */
     public void run( List<Double> geneScores ) {
-        GeneAnnotations geneData = new GeneAnnotations( probes, genes, goAssociations );
-        GeneScores scores = new GeneScores( probes, geneScores, geneData, settings );
+        GeneAnnotations geneData = new GeneAnnotations( elements, genes, goAssociations );
+        GeneScores scores = new GeneScores( elements, geneScores, geneData, settings );
         results = new GeneSetPvalRun( settings, scores );
     }
 
@@ -136,11 +136,11 @@ public class ClassScoreSimple {
     public void setGeneReplicateTreatment( int val ) {
         switch ( val ) {
             case 1:
-                settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
+                settings.setGeneRepTreatment( SettingsHolder.MultiElementHandling.BEST );
 
                 break;
             case 2:
-                settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
+                settings.setGeneRepTreatment( SettingsHolder.MultiElementHandling.MEAN );
 
                 break;
             default:

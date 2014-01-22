@@ -84,9 +84,9 @@ public class AnalysisWizardStep4 extends WizardStep {
         }
 
         if ( jRadioButtonBestReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
+            settings.setGeneRepTreatment( SettingsHolder.MultiElementHandling.BEST );
         } else if ( jRadioButtonMeanReplicates.isSelected() ) {
-            settings.setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
+            settings.setGeneRepTreatment( SettingsHolder.MultiElementHandling.MEAN );
         } else {
             throw new IllegalStateException( "Invalid gene rep treatment method" );
         }
@@ -139,13 +139,12 @@ public class AnalysisWizardStep4 extends WizardStep {
         step4LeftPanel.add( jPanel17, null );
         step4LeftPanel.add( jPanel16, null );
 
-        jPanelReplicateTreatmentsPanel.setToolTipText( "How will replicates of the same gene be treated?" );
+        jPanelReplicateTreatmentsPanel
+                .setToolTipText( "How will multiple values for the same gene be treated? (doesn't apply to correlation analysis)" );
         jPanelReplicateTreatmentsPanel.setLayout( new GridLayout( 2, 1 ) );
         jPanelReplicateTreatmentsPanel.setBorder( BorderFactory.createTitledBorder( BorderFactory.createEtchedBorder(),
                 "Gene replicate treatment" ) );
         jPanelReplicateTreatmentsPanel.setMinimumSize( new Dimension( 175, 120 ) );
-        jPanelReplicateTreatmentsPanel.setToolTipText( "How will replicates of the same gene be treated? "
-                + "(this setting doesn't apply to correlation analysis)" );
         // todo replicate treatments for correlation tooltip.
         jRadioButtonBestReplicates.setMinimumSize( new Dimension( 171, 23 ) );
         jRadioButtonBestReplicates
@@ -205,9 +204,9 @@ public class AnalysisWizardStep4 extends WizardStep {
         jTextFieldMaxClassSize.setText( String.valueOf( settings.getMaxClassSize() ) );
         jTextFieldMinClassSize.setText( String.valueOf( settings.getMinClassSize() ) );
 
-        if ( settings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) ) {
+        if ( settings.getGeneRepTreatment().equals( SettingsHolder.MultiElementHandling.BEST ) ) {
             jRadioButtonBestReplicates.setSelected( true );
-        } else if ( settings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) ) {
+        } else if ( settings.getGeneRepTreatment().equals( SettingsHolder.MultiElementHandling.MEAN ) ) {
             jRadioButtonMeanReplicates.setSelected( true );
         } else {
             throw new IllegalStateException( "Invalid gene rep treatment method" );

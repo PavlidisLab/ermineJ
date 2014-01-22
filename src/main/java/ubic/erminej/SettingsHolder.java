@@ -58,7 +58,7 @@ public class SettingsHolder {
     /**
      * What to do when there are multiple values for a gene.
      */
-    public enum MultiProbeHandling {
+    public enum MultiElementHandling {
         BEST, MEAN
     }
 
@@ -144,7 +144,7 @@ public class SettingsHolder {
         defaults.put( GENE_SCORE_THRESHOLD_KEY, 0.001 );
         defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
         defaults.put( SettingsHolder.GENE_URL_BASE, DEFAULT_GENE_URL_BASE );
-        defaults.put( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
+        defaults.put( GENE_REP_TREATMENT, MultiElementHandling.MEAN.toString() );
         defaults.put( FILTER_NONSPECIFIC, Boolean.TRUE );
         defaults.put( DO_LOG, Boolean.TRUE );
         defaults.put( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
@@ -330,9 +330,9 @@ public class SettingsHolder {
     /**
      * @return
      */
-    public MultiProbeHandling getGeneRepTreatment() {
-        String storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.MEAN.toString() );
-        return Settings.MultiProbeHandling.valueOf( storedValue );
+    public MultiElementHandling getGeneRepTreatment() {
+        String storedValue = config.getString( GENE_REP_TREATMENT, MultiElementHandling.MEAN.toString() );
+        return Settings.MultiElementHandling.valueOf( storedValue );
     }
 
     /**

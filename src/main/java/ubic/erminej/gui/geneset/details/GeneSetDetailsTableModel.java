@@ -40,7 +40,7 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetDetails;
 import ubic.erminej.data.Multifunctionality;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 import ubic.erminej.gui.table.MatrixPoint;
 import ubic.erminej.gui.util.JLinkLabel;
 
@@ -55,10 +55,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = -1L;
     private static final String URL_REPLACE_TAG = "@@";
-    private MatrixDisplay<Probe, String> matrixDisplay;
-    private List<Probe> probeIDs;
-    private Map<Probe, Double> scoresForProbesInSet;
-    private Map<Probe, Double> scoreRanks;
+    private MatrixDisplay<Element, String> matrixDisplay;
+    private List<Element> probeIDs;
+    private Map<Element, Double> scoresForProbesInSet;
+    private Map<Element, Double> scoreRanks;
     private GeneAnnotations geneData;
     private SettingsHolder settings;
     private Map<Gene, JLinkLabel> linkLabels;
@@ -75,7 +75,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     private QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
     private QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
-    private Map<Probe, Double> multifuncForProbesInSet = new HashMap<Probe, Double>();
+    private Map<Element, Double> multifuncForProbesInSet = new HashMap<Element, Double>();
     private Map<Gene, Double> multifuncForGenesInSet = new HashMap<Gene, Double>();
     private Map<Gene, Double> mfGeneRanks = new HashMap<Gene, Double>();
 
@@ -86,11 +86,11 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
      * @param geneData
      * @param nf
      */
-    public GeneSetDetailsTableModel( MatrixDisplay<Probe, String> matrixDisplay, GeneSetDetails geneSetDetails,
+    public GeneSetDetailsTableModel( MatrixDisplay<Element, String> matrixDisplay, GeneSetDetails geneSetDetails,
             SettingsHolder settings ) {
 
         this.matrixDisplay = matrixDisplay;
-        this.probeIDs = new ArrayList<Probe>( geneSetDetails.getProbes() );
+        this.probeIDs = new ArrayList<Element>( geneSetDetails.getProbes() );
 
         scoresForProbesInSet = geneSetDetails.getProbeScores();
         this.settings = settings;
@@ -99,7 +99,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         if ( scoresForProbesInSet != null && !scoresForProbesInSet.isEmpty() ) {
             scoreRanks = Rank.rankTransform( scoresForProbesInSet, settings.getBigIsBetter() );
 
-            for ( Probe p : scoreRanks.keySet() ) {
+            for ( Element p : scoreRanks.keySet() ) {
                 multifuncForProbesInSet.put( p, geneSetDetails.getGeneData().getMultifunctionality()
                         .getMultifunctionalityScore( p.getGene() ) );
                 multifuncForGenesInSet.put( p.getGene(), geneSetDetails.getGeneData().getMultifunctionality()
@@ -127,7 +127,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         if ( columnIndex < offset ) {
             return Double.class; // matrix
         } else if ( columnIndex - offset == 0 ) {
-            return Probe.class; // probe
+            return Element.class; // probe
         } else if ( columnIndex - offset == 1 ) {
             return Double.class; // score
         } else if ( columnIndex - offset == 2 ) {
@@ -172,9 +172,9 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     } // end getColumnName
 
-    public Probe getProbeAtRow( int r ) {
+    public Element getProbeAtRow( int r ) {
         int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
-        return ( Probe ) getValueAt( r, offset );
+        return ( Element ) getValueAt( r, offset );
     }
 
     /*
@@ -198,38 +198,38 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         // matrix display ends
         int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
 
-        // get the probeID for the current row
-        Probe probeID = probeIDs.get( row );
+        // get the elementId for the current row
+        Element elementId = probeIDs.get( row );
 
         // If this is part of the matrix display
         if ( matrixDisplay != null && column < offset ) {
-            return new MatrixPoint( matrixDisplay.getRowIndexByName( probeID ), column, matrixDisplay.getValue(
-                    matrixDisplay.getRowIndexByName( probeID ), column ) ); // coords into JMatrixDisplay
+            return new MatrixPoint( matrixDisplay.getRowIndexByName( elementId ), column, matrixDisplay.getValue(
+                    matrixDisplay.getRowIndexByName( elementId ), column ) ); // coords into JMatrixDisplay
         }
         column -= offset;
-        Gene gene = probeID.getGene();
+        Gene gene = elementId.getGene();
         Multifunctionality multifunctionality = geneData.getMultifunctionality();
         switch ( column ) { // after it's been offset
             case 0:
                 // probe ID
-                return probeID;
+                return elementId;
             case 1:
                 // scores
-                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( probeID ) )
+                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( elementId ) )
                     return new Double( Double.NaN );
-                return scoresForProbesInSet.get( probeID );
+                return scoresForProbesInSet.get( elementId );
             case 2:
                 List<Double> values = new ArrayList<Double>();
-                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( probeID ) ) {
+                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( elementId ) ) {
                     values.add( 0, 1.0 );
                     values.add( 1, 1.0 );
                 } else {
 
                     // this is the quantile of the scores in the full data set.(but reverse so large is better)
                     double quantile = Math.max( 1.0 / scoreQuantiles.size(),
-                            scoreQuantiles.quantileInverse( scoresForProbesInSet.get( probeID ) ) );
+                            scoreQuantiles.quantileInverse( scoresForProbesInSet.get( elementId ) ) );
 
-                    Double position = scoreRanks.get( probeID );
+                    Double position = scoreRanks.get( elementId );
                     double expectedQuantile = ( position + 1 ) / scoresForProbesInSet.size();
 
                     values.add( 0, -Math.log10( expectedQuantile ) );
@@ -241,11 +241,11 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                 return linkLabels.get( gene );
             case 4:
                 // description
-                return geneData == null ? "" : probeID.getDescription();
+                return geneData == null ? "" : elementId.getDescription();
             case 5:
                 // // multifunctionality. ugly.
                 if ( geneData == null ) return "";
-                gene = probeID.getGene();
+                gene = elementId.getGene();
                 return String.format( "%.3f (%d)",
                         Math.max( 0.0, multifunctionality.getMultifunctionalityRank( gene ) ),
                         multifunctionality.getNumGoTerms( gene ) );
@@ -253,7 +253,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
             case 6:
                 // multifunctionality graphic.
                 List<Double> mfv = new ArrayList<Double>();
-                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( probeID ) ) {
+                if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( elementId ) ) {
                     mfv.add( 0, 1.0 );
                     mfv.add( 1, 1.0 );
                 } else {
@@ -294,8 +294,8 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     private void createLinkLabels() {
         assert probeIDs != null;
         this.linkLabels = new HashMap<Gene, JLinkLabel>();
-        for ( Iterator<Probe> iter = probeIDs.iterator(); iter.hasNext(); ) {
-            final Probe probe = iter.next();
+        for ( Iterator<Element> iter = probeIDs.iterator(); iter.hasNext(); ) {
+            final Element probe = iter.next();
             Gene gene = probe.getGene();
             if ( gene == null ) {
                 continue;

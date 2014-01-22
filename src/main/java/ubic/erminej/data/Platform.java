@@ -359,7 +359,7 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
 
     /**
      * <p>
-     * The number of probes that have BLAT alignments.
+     * The number of elements that have BLAT alignments.
      * </p>
      */
     public String getNumProbeAlignments() {
@@ -368,7 +368,7 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
 
     /**
      * <p>
-     * The number of probes that map to bioSequences.
+     * The number of elements that map to bioSequences.
      * </p>
      */
     public String getNumProbeSequences() {
@@ -377,7 +377,7 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
 
     /**
      * <p>
-     * The number of probes that map to genes. This count includes probe-aligned regions, predicted genes, and known
+     * The number of elements that map to genes. This count includes probe-aligned regions, predicted genes, and known
      * genes.
      * </p>
      */

@@ -33,7 +33,7 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSet;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.Wizard;
@@ -178,7 +178,7 @@ public class GeneSetWizard extends Wizard {
             }
         } else if ( step == 2 ) {
             if ( step2.getProbes().isEmpty() ) {
-                showError( "You have not selected any genes/probes." );
+                showError( "You have not selected any genes/elements." );
                 return;
             }
 
@@ -252,7 +252,7 @@ public class GeneSetWizard extends Wizard {
 
         messenger.showProgress( "Finishing" );
 
-        Collection<Probe> probes = step2.getProbes();
+        Collection<Element> elements = step2.getProbes();
 
         String id = step3.getGeneSetId();
         String desc = step3.getGeneSetName();
@@ -298,8 +298,8 @@ public class GeneSetWizard extends Wizard {
             toSave = new GeneSet( newGeneSetT );
             toSave.setUserDefined( true );
 
-            Collection<Probe> selectedProbes = step2.getProbes();
-            for ( Probe probe : selectedProbes ) {
+            Collection<Element> selectedProbes = step2.getProbes();
+            for ( Element probe : selectedProbes ) {
                 toSave.addGenes( probe.getGenes() );
             }
 
@@ -311,7 +311,7 @@ public class GeneSetWizard extends Wizard {
 
         toSave.clearGenes();
 
-        for ( Probe probe : probes ) {
+        for ( Element probe : elements ) {
             toSave.addGene( probe.getGene() );
         }
 

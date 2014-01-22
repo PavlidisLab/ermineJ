@@ -71,13 +71,11 @@ import ubic.erminej.gui.geneset.GeneSetPanelPopupMenu;
  */
 public class GeneSetTablePanel extends GeneSetPanel {
 
-    // public static final int PROBE_COUNT_COLUMN_INDEX = 2;
     public static final int GENE_COUNT_COLUMN_INDEX = 2;
     public static final int MULTIFUNC_COLUMN_INDEX = 3;
     private final static int GENESET_ID_COLUMN_WIDTH = 80;
     private final static int GENESET_NAME_COLUMN_WIDTH = 350;
     private static Log log = LogFactory.getLog( GeneSetTablePanel.class );
-    // private final static int NUMPROBES_COLUMN_WIDTH = 40;
     private final static int NUMGENES_COLUMN_WIDTH = 40;
     private final static int RUN_COLUMN_START_WIDTH = 80;
 
@@ -357,9 +355,9 @@ public class GeneSetTablePanel extends GeneSetPanel {
                 + runSettings.getMinClassSize() + "<br>" );
         if ( runSettings.getDoLog() ) tooltip += "Negative log transformed<br>";
 
-        if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.MEAN ) ) {
+        if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiElementHandling.MEAN ) ) {
             tooltip += "Gene Rep Treatment: Mean <br>";
-        } else if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiProbeHandling.BEST ) ) {
+        } else if ( runSettings.getGeneRepTreatment().equals( SettingsHolder.MultiElementHandling.BEST ) ) {
             tooltip += "Gene Rep Treatment: Best <br>";
         }
 
@@ -394,10 +392,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
     protected String getHeaderToolTip( int index ) {
         if ( index == 0 || index == 1 ) { // descriptions of the category.
             return "Classes shown: " + table.getRowCount();
-            // } else if ( index == PROBE_COUNT_COLUMN_INDEX ) {
-            // return "How many probes are in the group (there can be more than one probe per gene)";
         } else if ( index == GENE_COUNT_COLUMN_INDEX ) {
-            return "How many genes are in the group (#probes shown in brackets if different)";
+            return "How many genes are in the group (# of scored elements shown in brackets if different)";
         } else if ( index == MULTIFUNC_COLUMN_INDEX ) {
             return "<html>Measurement of how biased the category<br/> is towards multifunctional genes<br/>"
                     + "(1 = highest bias; very big groups not counted)</html>";

@@ -28,7 +28,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import ubic.erminej.Settings;
-import ubic.erminej.SettingsHolder.MultiProbeHandling;
+import ubic.erminej.SettingsHolder.MultiElementHandling;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.GeneAnnotations;
@@ -71,7 +71,7 @@ public abstract class AbstractPvalGeneratorTest {
         s.setUseMolecularFunction( true );
         s.setUseUserDefined( false );
         s.setLoadUserDefined( false );
-        s.setGeneRepTreatment( MultiProbeHandling.MEAN );
+        s.setGeneRepTreatment( MultiElementHandling.MEAN );
         s.setScoreFile( AbstractPvalGeneratorTest.class.getResource( "/data/test.scores.txt" ).getFile() );
         s.setAnnotFile( AbstractPvalGeneratorTest.class.getResource( "/data/test.an.txt" ).getFile() );
         s.setClassFile( AbstractPvalGeneratorTest.class.getResource( "/data/go-termdb-test.xml" ).getFile() );

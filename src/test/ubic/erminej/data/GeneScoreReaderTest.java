@@ -77,7 +77,7 @@ public class GeneScoreReaderTest {
     @Test
     public void testGet_numpvals() {
         int expectedReturn = 21;
-        int actualReturn = test.getNumProbesUsed();
+        int actualReturn = test.getNumElementsUsed();
         assertEquals( "return value", expectedReturn, actualReturn );
 
         GeneAnnotations annots = test.getPrunedGeneAnnotations();
@@ -95,12 +95,12 @@ public class GeneScoreReaderTest {
                 "ProbeH", "ProbeI", "ProbeJ", "ProbeK", "ProbeL", "ProbeM", "ProbeN", "ProbeO", "ProbeP", "ProbeQ",
                 "ProbeR", "ProbeS", "ProbeT", "ProbeU" };
 
-        Collection<Probe> actualReturn = test.getProbeToScoreMap().keySet();
+        Collection<Element> actualReturn = test.getProbeToScoreMap().keySet();
 
         assertEquals( expectedReturn.length, actualReturn.size() );
 
         for ( String e : expectedReturn ) {
-            assertTrue( "Did not contain " + e, actualReturn.contains( new Probe( e ) ) );
+            assertTrue( "Did not contain " + e, actualReturn.contains( new Element( e ) ) );
         }
     }
 

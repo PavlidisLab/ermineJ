@@ -100,16 +100,16 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution.
      * 
-     * @param geneScores The pvalues for the probes (no weights) or groups (weights)
+     * @param geneScores The pvalues for the elements (no weights) or groups (weights)
      * @return number of entries that meet the user-set threshold.
      * @todo make this private and called by OraPvalGenerator.
      */
     public void computeCounts() {
 
-        Map<Gene, Double> probeScores = geneScores.getGeneToScoreMap();
+        Map<Gene, Double> elementScores = geneScores.getGeneToScoreMap();
 
-        for ( Gene p : probeScores.keySet() ) {
-            double geneScore = probeScores.get( p );
+        for ( Gene p : elementScores.keySet() ) {
+            double geneScore = elementScores.get( p );
 
             if ( scorePassesThreshold( geneScore ) ) {
                 genesAboveThreshold.add( p );
@@ -232,8 +232,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      * criteria
      * 
      * @param clasName
-     * @param total number of genes (or probes)
-     * @param number of genes in the set (or the number of probes)
+     * @param total number of genes (or elements)
+     * @param number of genes in the set (or the number of elements)
      * @param how many passed the threshold
      */
     private GeneSetResult computeResult( GeneSetTerm className, int numGenes, int numGenesInSet, int successes,
@@ -267,7 +267,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             oraPval = 1.0;
         }
 
-        GeneSetResult res = new GeneSetResult( className, numProbesInSet( className ), numGenesInSet, settings );
+        GeneSetResult res = new GeneSetResult( className, numElementsInSet( className ), numGenesInSet, settings );
         res.setScore( successes );
         res.setPValue( oraPval );
         return res;

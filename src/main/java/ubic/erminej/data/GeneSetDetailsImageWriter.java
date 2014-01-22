@@ -39,13 +39,13 @@ public class GeneSetDetailsImageWriter {
      */
     public static void writePng( GeneSetDetails geneSetDetails, String fileName, Color[] colorMap,
             boolean includeLabels, boolean includeScalebar, boolean normalized ) throws IOException {
-        DoubleMatrix<Probe, String> matrix = geneSetDetails.getDataMatrix();
+        DoubleMatrix<Element, String> matrix = geneSetDetails.getDataMatrix();
 
         if ( colorMap == null ) {
             colorMap = ColorMap.BLACKBODY_COLORMAP;
         }
 
-        MatrixDisplay<Probe, String> matrixDisplay = new MatrixDisplay<Probe, String>( matrix );
+        MatrixDisplay<Element, String> matrixDisplay = new MatrixDisplay<Element, String>( matrix );
         matrixDisplay.setColorMap( colorMap );
         matrixDisplay.setStandardizedEnabled( normalized );
         writePng( matrixDisplay, fileName, includeLabels, includeScalebar, normalized );
@@ -60,7 +60,7 @@ public class GeneSetDetailsImageWriter {
      * @param matrixDisplay
      * @throws IOException
      */
-    private static void writePng( MatrixDisplay<Probe, String> matrixDisplay, String fileName, boolean includeLabels,
+    private static void writePng( MatrixDisplay<Element, String> matrixDisplay, String fileName, boolean includeLabels,
             boolean includeScalebar, boolean normalized ) throws IOException {
         matrixDisplay.saveImage( matrixDisplay.getColorMatrix(), fileName, includeLabels, includeScalebar, normalized );
     }

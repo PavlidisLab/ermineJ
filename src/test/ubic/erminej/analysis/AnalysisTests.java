@@ -29,7 +29,7 @@ import ubic.erminej.Analyzer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.SettingsHolder.Method;
-import ubic.erminej.SettingsHolder.MultiProbeHandling;
+import ubic.erminej.SettingsHolder.MultiElementHandling;
 import ubic.erminej.data.GeneAnnotationParser;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.GeneAnnotations;
@@ -63,7 +63,7 @@ public class AnalysisTests {
         s.setUseMolecularFunction( true );
         s.setUseUserDefined( false );
         s.setLoadUserDefined( false );
-        s.setGeneRepTreatment( MultiProbeHandling.MEAN );
+        s.setGeneRepTreatment( MultiElementHandling.MEAN );
         s.setIterations( 200 );
         s.setScoreFile( AbstractPvalGeneratorTest.class.getResource( "/data/one-way-anova-parsed.txt" ).getFile() );
         s.setAnnotFile( AbstractPvalGeneratorTest.class.getResource( "/data/HG-U95A.an.txt" ).getFile() );

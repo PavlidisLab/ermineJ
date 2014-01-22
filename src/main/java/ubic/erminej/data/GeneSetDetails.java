@@ -55,10 +55,10 @@ public class GeneSetDetails {
 
     private Settings settings;
     private StatusViewer callerStatusViewer = new StatusStderr();
-    private Collection<Probe> probes = new HashSet<Probe>();
-    private Map<Probe, Double> probeScores = new HashMap<Probe, Double>();
+    private Collection<Element> elements = new HashSet<Element>();
+    private Map<Element, Double> probeScores = new HashMap<Element, Double>();
 
-    private DoubleMatrix<Probe, String> dataMatrix = null;
+    private DoubleMatrix<Element, String> dataMatrix = null;
 
     private GeneScores geneScores;
 
@@ -77,7 +77,7 @@ public class GeneSetDetails {
         if ( callerStatusViewer != null ) this.callerStatusViewer = callerStatusViewer;
         this.classID = classID;
         this.geneData = geneData;
-        this.probes = geneData.getGeneSetProbes( classID );
+        this.elements = geneData.getGeneSetElements( classID );
         this.numGenes = geneData.getGeneSetGenes( classID ).size();
     }
 
@@ -110,14 +110,14 @@ public class GeneSetDetails {
             this.settings = settings;
         }
 
-        this.probes = geneData.getGeneSetProbes( classID );
+        this.elements = geneData.getGeneSetElements( classID );
 
         this.result = result;
 
         assert classID != null;
         assert result == null || result.getGeneSetId().equals( classID );
 
-        if ( probes == null || probes.isEmpty() ) {
+        if ( elements == null || elements.isEmpty() ) {
             log.warn( "Empty gene set " + classID );
             return;
         }
@@ -127,7 +127,7 @@ public class GeneSetDetails {
             gsToUse = tryToGetGeneScores();
         }
 
-        this.probes = geneData.getGeneSetProbes( classID );
+        this.elements = geneData.getGeneSetElements( classID );
 
         if ( gsToUse != null ) {
             initGeneScores( gsToUse );
@@ -151,7 +151,7 @@ public class GeneSetDetails {
         return classID;
     }
 
-    public DoubleMatrix<Probe, String> getDataMatrix() {
+    public DoubleMatrix<Element, String> getDataMatrix() {
         return dataMatrix;
     }
 
@@ -165,16 +165,16 @@ public class GeneSetDetails {
     /**
      * @return
      */
-    public Collection<Probe> getProbes() {
-        return Collections.unmodifiableCollection( probes );
+    public Collection<Element> getProbes() {
+        return Collections.unmodifiableCollection( elements );
     }
 
     /**
-     * Just for the probes in this set.
+     * Just for the elements in this set.
      * 
      * @return
      */
-    public Map<Probe, Double> getProbeScores() {
+    public Map<Element, Double> getProbeScores() {
         return Collections.unmodifiableMap( probeScores );
     }
 
@@ -241,8 +241,8 @@ public class GeneSetDetails {
      */
     public void loadDataMatrix( String filename ) {
         try {
-            Map<String, Probe> probeNames = new HashMap<String, Probe>();
-            for ( Probe p : probes ) {
+            Map<String, Element> probeNames = new HashMap<String, Element>();
+            for ( Element p : elements ) {
                 probeNames.put( p.getName(), p );
             }
             SettingsHolder s = getSettingsToUse();
@@ -251,7 +251,7 @@ public class GeneSetDetails {
 
             DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet(), s.getDataCol() );
 
-            this.dataMatrix = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
+            this.dataMatrix = new FastRowAccessDoubleMatrix<Element, String>( omatrix.asArray() );
             dataMatrix.setColumnNames( omatrix.getColNames() );
             int i = 0;
             for ( String r : omatrix.getRowNames() ) {
@@ -269,9 +269,9 @@ public class GeneSetDetails {
      * 
      * @param dm
      */
-    public void setDataMatrix( DoubleMatrix<Probe, String> dm ) {
+    public void setDataMatrix( DoubleMatrix<Element, String> dm ) {
         int numNotKnown = 0;
-        for ( Probe p : dm.getRowNames() ) {
+        for ( Element p : dm.getRowNames() ) {
             if ( !geneData.hasProbe( p ) ) {
                 numNotKnown++;
             }
@@ -280,13 +280,13 @@ public class GeneSetDetails {
         if ( numNotKnown > 0 ) {
 
             if ( numNotKnown == dm.rows() ) {
-                callerStatusViewer.showError( "The selected matrix has no probes that match the current annotations" );
+                callerStatusViewer.showError( "The selected matrix has no elements that match the current annotations" );
                 throw new IllegalArgumentException(
-                        "The selected matrix has no probes that match the current annotations" );
+                        "The selected matrix has no elements that match the current annotations" );
             }
 
             callerStatusViewer.showWarning( numNotKnown
-                    + " of the probes in the data matrix don't match the current annotations" );
+                    + " of the elements in the data matrix don't match the current annotations" );
 
         }
 
@@ -314,26 +314,26 @@ public class GeneSetDetails {
      */
     private void initGeneScores( GeneScores gs ) {
         this.geneScores = gs;
-        probeScores = new HashMap<Probe, Double>();
-        if ( probes == null || probes.isEmpty() ) return;
+        probeScores = new HashMap<Element, Double>();
+        if ( elements == null || elements.isEmpty() ) return;
 
         assert geneScores != null;
-        for ( Probe probeID : probes ) {
+        for ( Element elementId : elements ) {
 
-            if ( !geneScores.getProbeToScoreMap().containsKey( probeID ) ) {
+            if ( !geneScores.getProbeToScoreMap().containsKey( elementId ) ) {
                 continue;
             }
 
             Double pvalue;
 
             if ( geneScores.isNegativeLog10Transformed() ) {
-                double negLogPval = geneScores.getProbeToScoreMap().get( probeID );
+                double negLogPval = geneScores.getProbeToScoreMap().get( elementId );
                 pvalue = new Double( Math.pow( 10.0, -negLogPval ) );
             } else {
-                pvalue = geneScores.getProbeToScoreMap().get( probeID );
+                pvalue = geneScores.getProbeToScoreMap().get( elementId );
             }
 
-            probeScores.put( probeID, pvalue );
+            probeScores.put( elementId, pvalue );
         }
     }
 

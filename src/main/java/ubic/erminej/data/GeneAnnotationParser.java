@@ -40,7 +40,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
 /**
- * Reads tab-delimited file to create maps of probes to classes, classes to probes, probes to genes, genes to probes.
+ * Reads tab-delimited file to create maps of elements to classes, classes to elements, elements to genes, genes to elements.
  * 
  * @author paul
  * @version $Id$
@@ -169,15 +169,15 @@ public class GeneAnnotationParser {
             int numTokens = tokens.length;
             if ( numTokens < 2 ) continue;
             String geneName = "";
-            String probeId = "";
+            String elementId = "";
             String description = NO_DESCRIPTION;
             if ( simple ) {
                 geneName = tokens[0];
-                probeId = geneName;
+                elementId = geneName;
             } else {
-                probeId = tokens[0];
+                elementId = tokens[0];
 
-                if ( StringUtils.isBlank( probeId ) ) {
+                if ( StringUtils.isBlank( elementId ) ) {
                     if ( shouldWarn() ) {
                         log.warn( "Blank field where element/probe ID was expected at line " + n );
                         timesWarned++;
@@ -186,19 +186,19 @@ public class GeneAnnotationParser {
                     continue;
                 }
 
-                if ( probeId.matches( "AFFX.*" ) ) {
+                if ( elementId.matches( "AFFX.*" ) ) {
                     continue;
                 }
 
-                if ( seenProbes.contains( probeId ) ) {
+                if ( seenProbes.contains( elementId ) ) {
                     if ( shouldWarn() ) {
-                        log.warn( "Duplicated element: " + probeId + " at line " + n + ", skipping" );
+                        log.warn( "Duplicated element: " + elementId + " at line " + n + ", skipping" );
                         timesWarned++;
                         maybeNotifyAboutWarningSuppression();
                     }
                     continue;
                 }
-                seenProbes.add( probeId );
+                seenProbes.add( elementId );
 
                 geneName = tokens[1];
 
@@ -225,7 +225,7 @@ public class GeneAnnotationParser {
                 }
             }
 
-            Probe probe = new Probe( probeId, description );
+            Element probe = new Element( elementId, description );
 
             Gene gene;
             if ( genes.containsKey( geneName ) ) {
@@ -235,7 +235,7 @@ public class GeneAnnotationParser {
                 genes.put( geneName, gene );
             }
 
-            gene.addProbe( probe );
+            gene.addElement( probe );
             probe.setGene( gene );
 
             if ( activeGenes != null && !activeGenes.contains( gene ) ) {
@@ -383,8 +383,8 @@ public class GeneAnnotationParser {
          */
         Pattern pat = Pattern.compile( "(GO:)?[0-9]{1,7}$" );
 
-        // loop through rows. Makes hash map of probes to go, and map of go to
-        // probes.
+        // loop through rows. Makes hash map of elements to go, and map of go to
+        // elements.
         int n = 0;
 
         log.debug( "File opened okay, parsing Affy annotation file" );
@@ -406,15 +406,15 @@ public class GeneAnnotationParser {
                 continue; // skip lines that don't meet criteria.
             }
 
-            String probeId = fields[probeIndex];
+            String elementId = fields[probeIndex];
 
-            if ( probeId.matches( "AFFX.*" ) ) {
+            if ( elementId.matches( "AFFX.*" ) ) {
                 continue;
             }
 
             String geneSymbol = fields[geneSymbolIndex];
 
-            if ( StringUtils.isBlank( probeId ) || probeId.equals( "---" ) ) {
+            if ( StringUtils.isBlank( elementId ) || elementId.equals( "---" ) ) {
                 throw new IllegalStateException( "Element name was missing or invalid at line " + n
                         + "; it is possible the file format is not readable; contact the developers." );
             }
@@ -435,7 +435,7 @@ public class GeneAnnotationParser {
             String description = fields[geneNameIndex];
             if ( description.equals( "---" ) ) description = NO_DESCRIPTION;
 
-            Probe probe = new Probe( probeId, description );
+            Element probe = new Element( elementId, description );
             Gene gene;
             if ( genes.containsKey( geneSymbol ) ) {
                 gene = genes.get( geneSymbol );
@@ -443,7 +443,7 @@ public class GeneAnnotationParser {
                 gene = new Gene( geneSymbol, description );
                 genes.put( geneSymbol, gene );
             }
-            gene.addProbe( probe );
+            gene.addElement( probe );
             probe.setGene( gene );
 
             classIds = " // " + fields[goBpIndex] + " // " + fields[goMfIndex] + " // " + fields[goCcIndex];
@@ -458,7 +458,7 @@ public class GeneAnnotationParser {
             }
 
             if ( messenger != null && n % LINES_READ_UPDATE_FREQ == 0 ) {
-                messenger.showProgress( "Read " + n + " probes" );
+                messenger.showProgress( "Read " + n + " elements" );
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
@@ -524,11 +524,11 @@ public class GeneAnnotationParser {
                 continue; // skip lines that don't meet criteria.
             }
 
-            String probeId = fields[probeIndex];
+            String elementId = fields[probeIndex];
             String geneSymbol = fields[geneSymbolIndex];
             String geneName = fields[geneNameIndex];
 
-            Probe probe = new Probe( probeId, geneName );
+            Element probe = new Element( elementId, geneName );
 
             Gene gene;
             if ( genes.containsKey( geneSymbol ) ) {
@@ -537,7 +537,7 @@ public class GeneAnnotationParser {
                 gene = new Gene( geneSymbol, geneName );
                 genes.put( geneSymbol, gene );
             }
-            gene.addProbe( probe );
+            gene.addElement( probe );
             probe.setGene( gene );
 
             if ( activeGenes != null && !activeGenes.contains( gene ) ) {
@@ -564,7 +564,7 @@ public class GeneAnnotationParser {
             }
 
             if ( messenger != null && n % LINES_READ_UPDATE_FREQ == 0 ) {
-                messenger.showProgress( "Read " + n + " probes" );
+                messenger.showProgress( "Read " + n + " elements" );
                 try {
                     Thread.sleep( 10 );
                 } catch ( InterruptedException e ) {
@@ -839,7 +839,7 @@ class ParserHelper {
      * @return
      */
     public static int getAgilentProbeIndex( String header ) {
-        String pattern = "ProbeID";
+        String pattern = "elementId";
         return findField( header, "\t", pattern );
     }
 

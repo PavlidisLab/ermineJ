@@ -322,26 +322,26 @@ public class Settings extends SettingsHolder {
      * @return
      */
     @Override
-    public MultiProbeHandling getGeneRepTreatment() {
-        String storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() );
+    public MultiElementHandling getGeneRepTreatment() {
+        String storedValue = config.getString( GENE_REP_TREATMENT, MultiElementHandling.BEST.toString() );
 
         // backwards compatibility
         if ( NumberUtils.isDigits( storedValue ) ) {
             int oldVal = Integer.parseInt( storedValue );
             switch ( oldVal ) {
                 case 1:
-                    setGeneRepTreatment( SettingsHolder.MultiProbeHandling.BEST );
+                    setGeneRepTreatment( SettingsHolder.MultiElementHandling.BEST );
                     break;
                 case 2:
-                    setGeneRepTreatment( SettingsHolder.MultiProbeHandling.MEAN );
+                    setGeneRepTreatment( SettingsHolder.MultiElementHandling.MEAN );
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
-            storedValue = config.getString( GENE_REP_TREATMENT, MultiProbeHandling.BEST.toString() );
+            storedValue = config.getString( GENE_REP_TREATMENT, MultiElementHandling.BEST.toString() );
         }
 
-        return SettingsHolder.MultiProbeHandling.valueOf( storedValue );
+        return SettingsHolder.MultiElementHandling.valueOf( storedValue );
     }
 
     /*
@@ -462,7 +462,7 @@ public class Settings extends SettingsHolder {
         this.config.setProperty( FILTER_NONSPECIFIC, new Boolean( val ) );
     }
 
-    public void setGeneRepTreatment( MultiProbeHandling val ) {
+    public void setGeneRepTreatment( MultiElementHandling val ) {
         this.config.setProperty( GENE_REP_TREATMENT, val.toString() );
     }
 

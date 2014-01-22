@@ -32,13 +32,13 @@ public class DataIOUtils {
      * @return
      * @throws IOException
      */
-    public static DoubleMatrix<Probe, String> readDataMatrixForAnalysis( GeneAnnotations geneAnnots,
+    public static DoubleMatrix<Element, String> readDataMatrixForAnalysis( GeneAnnotations geneAnnots,
             SettingsHolder settings ) throws IOException {
-        DoubleMatrix<Probe, String> rawData;
+        DoubleMatrix<Element, String> rawData;
         DoubleMatrixReader r = new DoubleMatrixReader();
 
         Collection<String> usableRowNames = new HashSet<String>();
-        for ( Probe p : geneAnnots.getProbes() ) {
+        for ( Element p : geneAnnots.getProbes() ) {
             usableRowNames.add( p.getName() );
         }
 
@@ -46,14 +46,14 @@ public class DataIOUtils {
                 .getDataCol() );
 
         if ( omatrix.rows() == 0 ) {
-            throw new IllegalArgumentException( "No rows were read from the file for the probes in the annotations." );
+            throw new IllegalArgumentException( "No rows were read from the file for the elements in the annotations." );
         }
 
-        rawData = new FastRowAccessDoubleMatrix<Probe, String>( omatrix.asArray() );
+        rawData = new FastRowAccessDoubleMatrix<Element, String>( omatrix.asArray() );
         rawData.setColumnNames( omatrix.getColNames() );
         for ( int i = 0; i < omatrix.rows(); i++ ) {
             String n = omatrix.getRowName( i );
-            Probe p = geneAnnots.findProbe( n );
+            Element p = geneAnnots.findElement( n );
             assert p != null;
             rawData.setRowName( p, i );
         }

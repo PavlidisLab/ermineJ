@@ -85,7 +85,7 @@ import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetDetails;
 import ubic.erminej.data.GeneSetDetailsImageWriter;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.table.JBarGraphCellRenderer;
 import ubic.erminej.gui.table.JMatrixCellRenderer;
@@ -176,7 +176,7 @@ public class GeneSetDetailsFrame extends JFrame {
     private Settings settings;
     private GeneSetDetails geneSetDetails;
     private int matrixColumnCount = 0;
-    public MatrixDisplay<Probe, String> matrixDisplay = null;
+    public MatrixDisplay<Element, String> matrixDisplay = null;
     private boolean normalizeSavedData = false;
     private boolean normalizeSavedImage = true;
     private GeneSetDetailsTableModel tableModel;
@@ -211,7 +211,7 @@ public class GeneSetDetailsFrame extends JFrame {
 
     private String getProbeID( int row ) {
         int offset = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount(); // matrix display ends
-        return ( ( Probe ) table.getValueAt( row, offset + 0 ) ).getName();
+        return ( ( Element ) table.getValueAt( row, offset + 0 ) ).getName();
     }
 
     /**
@@ -361,7 +361,7 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     private void printHeader( boolean includeMatrixValues, boolean includeAnnots, BufferedWriter out, int colCount )
             throws IOException {
-        out.write( "Probe" );
+        out.write( "Element" );
         if ( includeAnnots ) {
             out.write( "\tScore\tSymbol\tName" );
         }
@@ -378,14 +378,14 @@ public class GeneSetDetailsFrame extends JFrame {
     /**
      * @param out
      * @param nf
-     * @param probeID
+     * @param elementId
      * @throws IOException
      */
-    private void printMatrixValueForRow( BufferedWriter out, DecimalFormat nf, String probeID ) throws IOException {
+    private void printMatrixValueForRow( BufferedWriter out, DecimalFormat nf, String elementId ) throws IOException {
         assert this.matrixDisplay != null;
-        Probe probe = this.geneSetDetails.getGeneData().findProbe( probeID );
+        Element probe = this.geneSetDetails.getGeneData().findElement( elementId );
         if ( probe == null ) {
-            log.warn( "No element found in data matrix for: " + probeID );
+            log.warn( "No element found in data matrix for: " + elementId );
             return;
         }
         double[] row = matrixDisplay.getRowByName( probe );
@@ -539,7 +539,7 @@ public class GeneSetDetailsFrame extends JFrame {
             public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column ) {
                 super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
-                setText( ( ( Probe ) value ).getName() );
+                setText( ( ( Element ) value ).getName() );
                 return this;
             }
         } );
@@ -665,14 +665,14 @@ public class GeneSetDetailsFrame extends JFrame {
      */
     private void setUpMatrixView() {
 
-        DoubleMatrix<Probe, String> matrix = this.geneSetDetails.getDataMatrix();
+        DoubleMatrix<Element, String> matrix = this.geneSetDetails.getDataMatrix();
 
         if ( matrix == null || matrix.rows() == 0 ) {
             if ( StringUtils.isNotBlank( settings.getRawDataFileName() ) ) {
-                statusMessenger.showError( "None of the probes in this gene set were in the data file." );
+                statusMessenger.showError( "None of the elements in this gene set were in the data file." );
             }
         } else {
-            matrixDisplay = new MatrixDisplay<Probe, String>( matrix );
+            matrixDisplay = new MatrixDisplay<Element, String>( matrix );
             matrixDisplay.setColorMap( this.colorMap );
             matrixDisplay.setStandardizedEnabled( this.normalizeMatrixView );
             // Make the columns in the matrix display not too wide (cell-size)
@@ -1028,10 +1028,10 @@ public class GeneSetDetailsFrame extends JFrame {
         // write out the table, one row at a time
         for ( int r = 0; r < matrixRowCount; r++ ) {
             // for this row: write out matrix values
-            String probeID = getProbeID( r );
-            Probe probe = this.geneSetDetails.getGeneData().findProbe( probeID );
+            String elementId = getProbeID( r );
+            Element probe = this.geneSetDetails.getGeneData().findElement( elementId );
             if ( probe == null ) {
-                log.warn( " No element found in data matrix for: " + probeID );
+                log.warn( " No element found in data matrix for: " + elementId );
                 continue;
             }
             rowKeys[r] = matrixDisplay.getRowIndexByName( probe );
@@ -1077,15 +1077,15 @@ public class GeneSetDetailsFrame extends JFrame {
         // write out the table, one row at a time
         for ( int r = 0; r < totalRowCount; r++ ) {
 
-            String probeID = getProbeID( r );
-            out.write( probeID );
+            String elementId = getProbeID( r );
+            out.write( elementId );
 
             if ( addAnnots ) {
                 printAnnotationsForRow( out, matrixColumnCount, r );
             }
 
             if ( includeMatrix ) {
-                printMatrixValueForRow( out, nf, probeID );
+                printMatrixValueForRow( out, nf, elementId );
             }
             out.write( NEWLINE );
         }
@@ -1373,7 +1373,7 @@ public class GeneSetDetailsFrame extends JFrame {
 
             r = table.getRowSorter().convertRowIndexToModel( r );
 
-            final Probe p = ( ( GeneSetDetailsTableModel ) source.getModel() ).getProbeAtRow( r );
+            final Element p = ( ( GeneSetDetailsTableModel ) source.getModel() ).getProbeAtRow( r );
 
             JPopupMenu pm = new JPopupMenu();
 

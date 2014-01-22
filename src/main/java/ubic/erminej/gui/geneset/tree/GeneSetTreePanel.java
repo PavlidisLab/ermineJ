@@ -957,7 +957,7 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
                 + size
                 + " Genes, "
                 + probeSize
-                + " probes.<br />"
+                + " elements.<br />"
                 + redund
                 + ( showParents ? parentTerms : "" )
                 + "<br/>"

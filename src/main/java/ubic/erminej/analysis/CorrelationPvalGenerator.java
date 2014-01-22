@@ -39,7 +39,7 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 
 /**
  * @author Shahmil Merchant
@@ -49,9 +49,9 @@ import ubic.erminej.data.Probe;
 public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     private double histRange = 0;
-    private DoubleMatrix<Probe, String> data = null;
+    private DoubleMatrix<Element, String> data = null;
     private Histogram hist;
-    private Settings.MultiProbeHandling geneRepTreatment = Settings.MultiProbeHandling.BEST;
+    private Settings.MultiElementHandling geneRepTreatment = Settings.MultiElementHandling.BEST;
     private int cacheHits = 0;
     private int tests = 0;
     private boolean[][] nanStatusMatrix;
@@ -66,7 +66,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param hist
      */
     public CorrelationPvalGenerator( SettingsHolder settings, GeneAnnotations geneAnnots,
-            DoubleMatrix<Probe, String> rawData, Histogram hist, StatusViewer messenger ) {
+            DoubleMatrix<Element, String> rawData, Histogram hist, StatusViewer messenger ) {
         super( settings, geneAnnots, null, messenger );
 
         this.geneAnnots = geneAnnots;
@@ -77,8 +77,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         setHistogram( hist );
         setGeneRepTreatment( settings.getGeneRepTreatment() );
-        set_class_max_size( settings.getMaxClassSize() );
-        set_class_min_size( settings.getMinClassSize() );
+        setClassMaxSize( settings.getMaxClassSize() );
+        setClassMinSize( settings.getMinClassSize() );
 
     }
 
@@ -93,58 +93,58 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
             return null;
         }
 
-        Collection<Probe> probesInSet = geneAnnots.getGeneSetProbes( geneSetName );
+        Collection<Element> elementsInSet = geneAnnots.getGeneSetElements( geneSetName );
 
         /*
-         * Iterate over the probes to get pairwise correlations.; we do this in a list so we can do each comparison just
-         * once.
+         * Iterate over the elements to get pairwise correlations.; we do this in a list so we can do each comparison
+         * just once.
          */
         double sumCorrel = 0.0;
         double nummeas = 0;
         Map<Long, Double> values = new HashMap<Long, Double>();
-        List<Probe> probeList = new ArrayList<Probe>( probesInSet );
+        List<Element> elementList = new ArrayList<Element>( elementsInSet );
 
-        for ( int i = probeList.size() - 1; i >= 0; i-- ) {
-            Probe probei = probeList.get( i );
+        for ( int i = elementList.size() - 1; i >= 0; i-- ) {
+            Element elementi = elementList.get( i );
 
-            if ( !data.containsRowName( probei ) ) {
+            if ( !data.containsRowName( elementi ) ) {
                 continue;
             }
 
-            int iIndex = data.getRowIndexByName( probei );
-            Gene genei = probei.getGene();
+            int iIndex = data.getRowIndexByName( elementi );
+            Gene genei = elementi.getGene();
             double[] irow = data.getRow( iIndex );
-            int numProbesForGeneI = geneAnnots.numProbesForGene( genei );
-            boolean multipleProbesI = numProbesForGeneI > 1;
+            int numElementsForGeneI = geneAnnots.numElementsForGene( genei );
+            boolean multipleElementsI = numElementsForGeneI > 1;
 
             for ( int j = i - 1; j >= 0; j-- ) {
 
-                Probe probej = probeList.get( j );
+                Element elementj = elementList.get( j );
 
-                if ( !data.containsRowName( probej ) ) {
+                if ( !data.containsRowName( elementj ) ) {
                     continue;
                 }
 
-                int jIndex = data.getRowIndexByName( probej );
-                Gene genej = probej.getGene();
+                int jIndex = data.getRowIndexByName( elementj );
+                Gene genej = elementj.getGene();
 
                 if ( genei.equals( genej ) ) {
                     continue; // always ignore self-comparisons.
                 }
-                int numProbesForGeneJ = geneAnnots.numProbesForGene( genej );
+                int numElementsForGeneJ = geneAnnots.numElementsForGene( genej );
                 double[] jrow = data.getRow( jIndex );
                 double corr = Math.abs( DescriptiveWithMissing.correlation( irow, jrow, selfSquaredMatrix[iIndex],
                         selfSquaredMatrix[jIndex], nanStatusMatrix[iIndex], nanStatusMatrix[jIndex] ) );
                 tests++;
 
-                if ( multipleProbesI || numProbesForGeneJ > 1 ) { // do we even need to bother?
-                    if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
+                if ( multipleElementsI || numElementsForGeneJ > 1 ) { // do we even need to bother?
+                    if ( geneRepTreatment.equals( Settings.MultiElementHandling.BEST ) ) {
                         Long key = StringUtil.twoStringHashKey( genei.getSymbol(), genej.getSymbol() );
                         if ( !values.containsKey( key ) || values.get( key ) < corr ) {
                             values.put( key, new Double( corr ) );
                         }
-                    } else if ( geneRepTreatment.equals( Settings.MultiProbeHandling.MEAN ) ) {
-                        double weight = 1.0 / ( ( double ) numProbesForGeneJ * ( double ) numProbesForGeneI );
+                    } else if ( geneRepTreatment.equals( Settings.MultiElementHandling.MEAN ) ) {
+                        double weight = 1.0 / ( ( double ) numElementsForGeneJ * ( double ) numElementsForGeneI );
                         corr *= weight;
                         sumCorrel += corr;
                         nummeas += weight;
@@ -155,7 +155,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
                 } else {
                     sumCorrel += corr;
                     nummeas++;
-                    if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
+                    if ( geneRepTreatment.equals( Settings.MultiElementHandling.BEST ) ) {
                         Long key = StringUtil.twoStringHashKey( genei.getSymbol(), genej.getSymbol() );
                         values.put( key, new Double( corr ) );
                     }
@@ -163,7 +163,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
             }
         }
 
-        if ( geneRepTreatment.equals( Settings.MultiProbeHandling.BEST ) ) {
+        if ( geneRepTreatment.equals( Settings.MultiElementHandling.BEST ) ) {
             sumCorrel = 0.0;
             nummeas = 0;
             for ( Iterator<Double> iter = values.values().iterator(); iter.hasNext(); ) {
@@ -174,7 +174,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         double geneSetMeanCorrel = sumCorrel / nummeas;
 
-        GeneSetResult result = new GeneSetResult( geneSetName, numProbesInSet( geneSetName ),
+        GeneSetResult result = new GeneSetResult( geneSetName, numElementsInSet( geneSetName ),
                 numGenesInSet( geneSetName ), settings );
         result.setScore( geneSetMeanCorrel );
         result.setPValue( hist.getValue( effSize, geneSetMeanCorrel, true ) ); // always upper tail.
@@ -219,7 +219,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
      * @param name
      * @return
      */
-    public boolean containsRow( Probe name ) {
+    public boolean containsRow( Element name ) {
         return data.containsRowName( name );
     }
 
@@ -259,7 +259,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @return
      */
-    public DoubleMatrix<Probe, String> getData() {
+    public DoubleMatrix<Element, String> getData() {
         return data;
     }
 
@@ -286,7 +286,7 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * @param geneRepTreatment
      */
-    public void setGeneRepTreatment( Settings.MultiProbeHandling geneRepTreatment ) {
+    public void setGeneRepTreatment( Settings.MultiElementHandling geneRepTreatment ) {
         this.geneRepTreatment = geneRepTreatment;
     }
 

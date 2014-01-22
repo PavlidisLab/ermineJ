@@ -29,7 +29,7 @@ import java.util.HashSet;
  * @author paul
  * @version $Id$
  */
-public class Probe {
+public class Element {
 
     private String name;
 
@@ -39,15 +39,15 @@ public class Probe {
 
     private Collection<GeneSetTerm> geneSets = new HashSet<GeneSetTerm>();
 
-    public Probe( String probeId ) {
-        this( probeId, null );
+    public Element( String elementId ) {
+        this( elementId, null );
     }
 
-    public Probe( String name, String description ) {
+    public Element( String name, String description ) {
         this( name, description, null );
     }
 
-    public Probe( String name, String description, Collection<Gene> genes ) {
+    public Element( String name, String description, Collection<Gene> genes ) {
         super();
         this.name = name;
         this.description = description;
@@ -68,7 +68,7 @@ public class Probe {
         if ( this == obj ) return true;
         if ( obj == null ) return false;
         if ( getClass() != obj.getClass() ) return false;
-        Probe other = ( Probe ) obj;
+        Element other = ( Element ) obj;
         if ( name == null ) {
             if ( other.name != null ) return false;
         } else if ( !name.equals( other.name ) ) return false;
@@ -128,7 +128,7 @@ public class Probe {
 
     @Override
     public String toString() {
-        return "Probe [name=" + name + ", " + getGene() + "]";
+        return "Element [name=" + name + ", " + getGene() + "]";
     }
 
     protected void addGene( Gene g ) {

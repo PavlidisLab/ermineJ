@@ -25,7 +25,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import ubic.basecode.graphics.MatrixDisplay;
-import ubic.erminej.data.Probe;
+import ubic.erminej.data.Element;
 
 /**
  * For rendering heatmaps in tables.
@@ -37,9 +37,9 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
 
     private static final long serialVersionUID = 120496422792943100L;
 
-    MatrixDisplay<Probe, String> m_matrixDisplay;
+    MatrixDisplay<Element, String> m_matrixDisplay;
 
-    public JMatrixCellRenderer( MatrixDisplay<Probe, String> matrixDisplay ) {
+    public JMatrixCellRenderer( MatrixDisplay<Element, String> matrixDisplay ) {
         m_matrixDisplay = matrixDisplay;
         setOpaque( true );
     }

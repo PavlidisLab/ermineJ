@@ -1387,7 +1387,7 @@ public class MainFrame extends JFrame {
         }
 
         if ( geneData.getGenes().size() == 0 ) {
-            throw new IllegalArgumentException( "The gene annotation file contains no probes. "
+            throw new IllegalArgumentException( "The gene annotation file contains no elements. "
                     + "Check that the file format is correct.\n" );
         }
 
