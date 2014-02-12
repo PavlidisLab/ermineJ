@@ -907,9 +907,15 @@ public class MainFrame extends JFrame {
      */
     protected void showLogs() {
         StringBuffer bif = new StringBuffer();
-        File logFile = settings.getLogFile();
+        File logFile = null;
+        try {
+            logFile = settings.getLogFile();
 
-        if ( logFile == null ) {
+            if ( logFile == null ) {
+                GuiUtil.error( "Cannot locate log file" );
+                return;
+            }
+        } catch ( IOException e1 ) {
             GuiUtil.error( "Cannot locate log file" );
             return;
         }

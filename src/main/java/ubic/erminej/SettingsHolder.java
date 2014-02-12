@@ -16,6 +16,7 @@ package ubic.erminej;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -387,8 +388,16 @@ public class SettingsHolder {
     /**
      * @return
      */
-    public File getLogFile() {
-        return new File( config.getString( LOG_FILE, ( String ) getDefault( LOG_FILE ) ) );
+    public File getLogFile() throws IOException {
+        File f = new File( config.getString( LOG_FILE, ( String ) getDefault( LOG_FILE ) ) );
+        if ( !f.canWrite() ) {
+
+            f = File.createTempFile( "ermineJ", "log" );
+            System.err.println( "Cannot write to log file: " + f.getAbsolutePath()
+                    + ", logging will be to generic temporary file: " + f.getAbsolutePath() );
+
+        }
+        return f;
     }
 
     public int getMaxClassSize() {

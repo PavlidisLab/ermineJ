@@ -815,7 +815,12 @@ public class Settings extends SettingsHolder {
     private void configLogging() {
         Logger logger = LogManager.getRootLogger();
         FileAppender appender = ( FileAppender ) logger.getAppender( "F" );
-        appender.setFile( this.getLogFile().getAbsolutePath() );
+
+        try {
+            appender.setFile( this.getLogFile().getAbsolutePath() );
+        } catch ( IOException e ) {
+            throw new RuntimeException( e );
+        }
         appender.activateOptions();
     }
 
@@ -823,7 +828,11 @@ public class Settings extends SettingsHolder {
      * print out information about user's setup.
      */
     private void logLocale() {
-        log.info( "Log file is " + this.getLogFile() );
+        try {
+            log.info( "Log file is " + this.getLogFile() );
+        } catch ( IOException e1 ) {
+            log.error( "Could not identify log file!" );
+        }
         try {
             log.info( "System information:" );
             log.info( "    User country: " + System.getProperty( "user.country" ) );
