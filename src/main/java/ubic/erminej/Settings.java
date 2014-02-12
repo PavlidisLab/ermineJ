@@ -39,6 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import ubic.basecode.util.ConfigUtils;
 import ubic.basecode.util.FileTools;
@@ -817,11 +818,23 @@ public class Settings extends SettingsHolder {
         FileAppender appender = ( FileAppender ) logger.getAppender( "F" );
 
         try {
-            appender.setFile( this.getLogFile().getAbsolutePath() );
+            File logFile = this.getLogFile();
+            assert logFile != null;
+
+            /*
+             * FIXME for some reason, with the command line the appender is null.
+             */
+            if ( appender == null ) {
+                appender = new FileAppender( new PatternLayout( "%p: %m%n" ), logFile.getAbsolutePath(), false );
+                logger.addAppender( appender );
+            } else {
+                appender.setFile( logFile.getAbsolutePath() );
+            }
+            appender.activateOptions();
         } catch ( IOException e ) {
             throw new RuntimeException( e );
         }
-        appender.activateOptions();
+
     }
 
     /**
@@ -841,7 +854,7 @@ public class Settings extends SettingsHolder {
             log.info( "    User working directory: " + System.getProperty( "user.dir" ) );
             log.info( "    Java version: " + System.getProperty( "java.runtime.version" ) );
             log.info( "    OS arch: " + System.getProperty( "os.arch" ) );
-            log.info( "    OS version: " + System.getProperty( "os.name" ) );
+            log.info( "    OS name: " + System.getProperty( "os.name" ) );
             log.info( "    File encoding: " + System.getProperty( "file.encoding" ) );
         } catch ( SecurityException e ) {
             log.info( "Unable to get system information due to security restriction: " + e.getMessage() );

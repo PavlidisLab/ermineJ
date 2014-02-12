@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
@@ -20,7 +21,7 @@
 		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</connection>
 		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</developerConnection>
 		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
-  </scm>
+	</scm>
 	<issueManagement>
 		<system>Bugzilla</system>
 		<url>
@@ -184,6 +185,12 @@
 			<scope>test</scope>
 			<type>jar</type>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
@@ -345,6 +352,7 @@
 								<include name="antlr.jar" />
 								<include name="log4j.jar" />
 								<include name="opencsv.jar" />
+								<include name="slf4j.jar" />
 							</fileset>
 						</copy>
 						<copy todir="${project.build.directory}/staging/bin">
@@ -426,8 +434,8 @@
 						<include>org.apache.commons:commons-lang3</include> <include>commons-configuration:commons-configuration</include> <include>commons-collections:commons-collections</include> 
 						<include>commons-cli:commons-cli</include> <include>commons-logging:commons-logging</include> <include>org.apache.commons:commons-math</include> 
 						<include>mtj:mtj</include> <include>xerces:xercesImpl</include> <include>jfree:jfreechart</include> <include>com.sdicons.jsontools:jsontools-core</include> 
-						<include>jfree:jcommon</include> <include>antlr:antlr</include> <include>log4j:log4j</include> <include>opencsv:opencsv</include> 
-						</includes> </dependencies> -->
+						<include>jfree:jcommon</include> <include>antlr:antlr</include> <include>log4j:log4j</include> <include>opencsv:opencsv</include><include 
+						name="slf4j.jar" /> </includes> </dependencies> -->
 					<jnlp>
 						<outputFile>ermineJ.jnlp</outputFile>
 						<mainClass>ubic.erminej.ErmineJGui</mainClass>

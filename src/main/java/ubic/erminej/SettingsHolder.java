@@ -390,7 +390,7 @@ public class SettingsHolder {
      */
     public File getLogFile() throws IOException {
         File f = new File( config.getString( LOG_FILE, ( String ) getDefault( LOG_FILE ) ) );
-        if ( !f.canWrite() ) {
+        if ( !f.getParentFile().isDirectory() || !f.getParentFile().canWrite() ) {
 
             f = File.createTempFile( "ermineJ", "log" );
             System.err.println( "Cannot write to log file: " + f.getAbsolutePath()
