@@ -42,8 +42,12 @@ public class DataIOUtils {
             usableRowNames.add( p.getName() );
         }
 
-        DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName(), usableRowNames, settings
-                .getDataCol() );
+        /*
+         * The -2 is because the read method counts from index 0, not counting the label column. So the second column of
+         * the file is index 0 as far as read() is concerned.
+         */
+        DoubleMatrix<String, String> omatrix = r.read( settings.getRawDataFileName(), usableRowNames,
+                settings.getDataCol() - 2 );
 
         if ( omatrix.rows() == 0 ) {
             throw new IllegalArgumentException( "No rows were read from the file for the elements in the annotations." );

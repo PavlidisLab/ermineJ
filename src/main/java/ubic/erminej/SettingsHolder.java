@@ -301,6 +301,12 @@ public class SettingsHolder {
         return new HashSet<String>( Arrays.asList( config.getStringArray( CUSTOM_GENESET_FILES ) ) );
     }
 
+    /**
+     * The first column in the data file that has data in it. This is numbered "naturally" so that 2 means the second
+     * column of the file.
+     * 
+     * @return
+     */
     public int getDataCol() {
         return config.getInteger( DATA_COL, ( Integer ) getDefault( DATA_COL ) );
     }

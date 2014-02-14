@@ -249,7 +249,12 @@ public class GeneSetDetails {
 
             DoubleMatrixReader matrixReader = new DoubleMatrixReader();
 
-            DoubleMatrix<String, String> omatrix = matrixReader.read( filename, probeNames.keySet(), s.getDataCol() );
+            /*
+             * The -2 is because the read method counts from index 0, not counting the label column. So the second
+             * column of the file is index 0 as far as read() is concerned.
+             */
+            DoubleMatrix<String, String> omatrix = matrixReader
+                    .read( filename, probeNames.keySet(), s.getDataCol() - 2 );
 
             this.dataMatrix = new FastRowAccessDoubleMatrix<Element, String>( omatrix.asArray() );
             dataMatrix.setColumnNames( omatrix.getColNames() );

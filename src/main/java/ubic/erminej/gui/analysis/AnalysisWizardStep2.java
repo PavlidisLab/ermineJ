@@ -139,14 +139,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     }
 
-    public String getDataFileName() {
-        return rawFileTextField.getText();
-    }
-
-    public Integer getDataStartColumn() {
-        return Integer.valueOf( this.dataColTextField.getText() );
-    }
-
     @Override
     public boolean isReady() {
 
