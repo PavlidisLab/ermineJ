@@ -47,7 +47,7 @@ import cern.jet.stat.Descriptive;
  * @since Created 09/02/02.
  * @version $Id$
  */
-public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractResamplingGeneSetScore {
+public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSetScore {
 
     /**
      * Scores for ALL the genes.
@@ -75,7 +75,7 @@ public class GeneSetResamplingBackgroundDistributionGenerator extends AbstractRe
      * @param settings
      * @param geneScores Should already be multifunctionality corrected if desired.
      */
-    public GeneSetResamplingBackgroundDistributionGenerator( SettingsHolder settings, Map<Gene, Double> geneToScoreMap ) {
+    public GeneSetResamplingBkgDistGenerator( SettingsHolder settings, Map<Gene, Double> geneToScoreMap ) {
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();

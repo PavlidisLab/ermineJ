@@ -43,7 +43,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
 
     protected Histogram hist;
 
-    protected GeneSetResamplingBackgroundDistributionGenerator generator;
+    protected GeneSetResamplingBkgDistGenerator generator;
 
     /**
      * @param settings
@@ -54,7 +54,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
     public GeneSetResamplingPvalGenerator( SettingsHolder settings, GeneAnnotations a,
             Map<Gene, Double> geneToScoreMap, StatusViewer messenger ) {
         super( settings, a, geneToScoreMap, messenger );
-        this.generator = new GeneSetResamplingBackgroundDistributionGenerator( settings, geneToScoreMap );
+        this.generator = new GeneSetResamplingBkgDistGenerator( settings, geneToScoreMap );
         this.hist = generator.generateNullDistribution( messenger );
     }
 

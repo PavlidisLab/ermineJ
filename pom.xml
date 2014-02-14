@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
@@ -20,7 +21,7 @@
 		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</connection>
 		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</developerConnection>
 		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
-  </scm>
+	</scm>
 	<issueManagement>
 		<system>Bugzilla</system>
 		<url>
@@ -341,6 +342,7 @@
 								<include name="commons-configuration.jar" />
 								<include name="commons-collections.jar" />
 								<include name="commons-cli.jar" />
+								<include name="commons-io.jar" />
 								<include name="commons-logging.jar" />
 								<include name="commons-math3.jar" />
 								<include name="mtj.jar" />
@@ -351,7 +353,8 @@
 								<include name="antlr.jar" />
 								<include name="log4j.jar" />
 								<include name="opencsv.jar" />
-								<include name="slf4j.jar" />
+								<include name="slf4j-log4j12.jar" />
+								<include name="slf4j-api.jar" />
 							</fileset>
 						</copy>
 						<copy todir="${project.build.directory}/staging/bin">
@@ -407,13 +410,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jarsigner-plugin</artifactId> <version>1.2</version> 
-				<executions> <execution> <id>sign</id> <goals> <goal>sign</goal> </goals> </execution> <execution> <id>verify</id> <goals> 
-				<goal>verify</goal> </goals> </execution> </executions> <configuration> <keystore>~/.keystore</keystore> <alias>pavlab</alias> 
-				<storepass>${jarpass}</storepass> <keypass>${jarpass}</keypass> <removeExistingSignatures>true</removeExistingSignatures> 
-				</configuration> </plugin> -->
-
 			<plugin>
 				<!-- See http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html -->
 				<groupId>org.codehaus.mojo</groupId>
@@ -429,11 +425,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- <dependencies> <includes> <include>baseCode:baseCode</include> <include>colt:colt</include> <include>commons-lang:commons-lang</include> 
-						<include>org.apache.commons:commons-lang3</include> <include>commons-configuration:commons-configuration</include> <include>commons-collections:commons-collections</include> 
-						<include>commons-cli:commons-cli</include> <include>commons-logging:commons-logging</include> <include>org.apache.commons:commons-math</include> 
-						<include>mtj:mtj</include> <include>xerces:xercesImpl</include> <include>jfree:jfreechart</include> <include>com.sdicons.jsontools:jsontools-core</include> 
-						<include>jfree:jcommon</include> <include>antlr:antlr</include> <include>log4j:log4j</include> <include>opencsv:opencsv</include><include name="slf4j.jar" /> </includes> </dependencies> -->
 					<jnlp>
 						<outputFile>ermineJ.jnlp</outputFile>
 						<mainClass>ubic.erminej.ErmineJGui</mainClass>
