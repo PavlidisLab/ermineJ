@@ -51,6 +51,7 @@ import javax.swing.UIManager;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
@@ -560,17 +561,7 @@ public class StartupPanel extends JPanel {
     void projectChooseActionPerformed() {
 
         JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
-        projectPathChooser.setFileFilter( new FileFilter() {
-            @Override
-            public boolean accept( File pathname ) {
-                return pathname.getPath().endsWith( ".project" );
-            }
-
-            @Override
-            public String getDescription() {
-                return "ErmineJ project files (*.project)";
-            }
-        } );
+        projectPathChooser.setFileFilter( new FileNameExtensionFilter( "Project", "project", "PROJECT" ) );
 
         int yesno = projectPathChooser.showDialog( this, "Open" );
 
