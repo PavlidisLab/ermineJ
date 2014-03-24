@@ -197,7 +197,7 @@ public class TestGeneAnnotations {
 
     @Test
     public void testGoNames() {
-        // http://amigo.geneontology.org/cgi-bin/amigo/term_details?term=GO:0005739 - "mitochondrion"
+        // http://amigo.geneontology.org/amigo/term/GO:0005739 - "mitochondrion"
         GeneSetTerm cellComp = goNames.get( "GO:0005739" );
         assertNotNull( cellComp );
         assertEquals( "cellular_component", cellComp.getAspect() );
