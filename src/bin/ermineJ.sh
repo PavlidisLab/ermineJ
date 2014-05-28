@@ -1,5 +1,5 @@
 #!/bin/sh
-ERMINEJ_OPTS="-Xmx1024m"
+ERMINEJ_OPTS="-Xmx3g"
 
 # OS specific support.  $var _must_ be set to either true or false.
 cygwin=false;

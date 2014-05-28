@@ -70,7 +70,7 @@ goto endInit
 
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
-if "%ERMINEJ_OPTS%"=="" SET ERMINEJ_OPTS="-Xmx1024m"
+if "%ERMINEJ_OPTS%"=="" SET ERMINEJ_OPTS="-Xmx3g"
 SET ERMINEJ_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
 if exist "%ERMINEJ_JAVA_EXE%"  goto run
