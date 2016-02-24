@@ -265,10 +265,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>3.5.1</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -279,7 +279,7 @@
 					<bundleName>ermineJ</bundleName>
 					<mainClass>ubic.erminej.ErmineJGui</mainClass>
 					<javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub>
-					<jvmVersion>1.6+</jvmVersion>
+					<jvmVersion>1.7+</jvmVersion>
 					<vmOptions>-Xmx1g</vmOptions>
 					<iconFile>${basedir}/src/main/osx/icon.icns</iconFile>
 				</configuration>
