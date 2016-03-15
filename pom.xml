@@ -372,7 +372,7 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>nsis-maven-plugin</artifactId>
 				<inherited>false</inherited>
-				<version>1.0-PRE</version>
+				<version>1.0-alpha-1</version>
 				<configuration>
 					<setupScript>${basedir}/src/main/nsis/ermineJ-setup.nsi</setupScript>
 				</configuration>
@@ -414,7 +414,7 @@
 				<!-- See http://mojo.codehaus.org/webstart/webstart-maven-plugin/jnlp-mojos-overview.html -->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>webstart-maven-plugin</artifactId>
-				<version>1.0-beta-3</version>
+				<version>1.0-beta-7</version>
 				<inherited>false</inherited>
 				<executions>
 					<execution>
@@ -428,14 +428,13 @@
 					<jnlp>
 						<outputFile>ermineJ.jnlp</outputFile>
 						<mainClass>ubic.erminej.ErmineJGui</mainClass>
-						<inputTemplate>src/main/jnlp/template.vm</inputTemplate>
+						<inputTemplate>template.vm</inputTemplate>
 					</jnlp>
 					<!-- <excludeTransitive>true</excludeTransitive> -->
 					<sign>
-						<keystore>~/.keystore</keystore>
-						<keypass>${jarpass}</keypass>
+						<keystore>.keystore</keystore>
 						<storepass>${jarpass}</storepass>
-						<alias>pavlab</alias>
+						<alias>msl-code</alias>
 						<keystoreConfig>
 							<delete>false</delete>
 							<gen>false</gen>
@@ -443,30 +442,14 @@
 					</sign>
 					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
 					<unsign>true</unsign> <!-- old? -->
-					<pack200>false</pack200>
+					<pack200>
+						<enabled>false</enabled>
+					</pack200>
 					<gzip>true</gzip>
 					<verbose>true</verbose>
-					<verifyjar>true</verifyjar>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>keytool-maven-plugin</artifactId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generateKeyPair</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<keystore>~/.keystore</keystore>
-					<storepass>${jarpass}</storepass>
-					<keypass>${jarpass}</keypass>
-					<alias>pavlab</alias>
-					<dname>cn=erminej.chibi.ubc.ca, ou=PavlidisLab, L=Vancouver, ST=BC, o=CHiBi, c=CA</dname>
-					<validity>1800</validity>
+					<updateManifestEntries>
+			 			<Permissions>all-permissions</Permissions>
+					</updateManifestEntries>
 				</configuration>
 			</plugin>
 			<plugin>
