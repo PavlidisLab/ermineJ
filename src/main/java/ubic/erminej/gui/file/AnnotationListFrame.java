@@ -39,6 +39,7 @@ import javax.swing.table.AbstractTableModel;
 
 import ubic.erminej.data.Platform;
 import ubic.erminej.gui.util.GuiUtil;
+import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
  * Shows list of available annotation files for download.
@@ -56,27 +57,27 @@ public class AnnotationListFrame extends JDialog {
 
     private static final int COL2WIDTH = 60;
 
-    private final List<Platform> arrays;
+    private final List<ArrayDesignValueObject> arrays;
 
-    private Platform selected = null;
+    private ArrayDesignValueObject selected = null;
 
-    public Platform getSelected() {
+    public ArrayDesignValueObject getSelected() {
         return selected;
     }
 
-    public AnnotationListFrame( List<Platform> a ) {
+    public AnnotationListFrame( List<ArrayDesignValueObject> a ) {
         super();
 
-        this.arrays = new ArrayList<Platform>();
+        this.arrays = new ArrayList<ArrayDesignValueObject>();
 
-        for ( Platform v : a ) {
+        for ( ArrayDesignValueObject v : a ) {
             if ( v.getHasAnnotationFile() ) this.arrays.add( v );
         }
 
         // initially sort by short name.
-        Collections.sort( arrays, new Comparator<Platform>() {
+        Collections.sort( arrays, new Comparator<ArrayDesignValueObject>() {
             @Override
-            public int compare( Platform o1, Platform o2 ) {
+            public int compare( ArrayDesignValueObject o1, ArrayDesignValueObject o2 ) {
                 return o1.getShortName().compareTo( o2.getShortName() );
             }
         } );
@@ -116,7 +117,7 @@ public class AnnotationListFrame extends JDialog {
                 for ( int j = 0; j < arrays.size(); j++ ) {
                     if ( arrays.get( j ).getShortName().equals( v ) ) {
                         selected = arrays.get( j );
-                        if ( selected != null /* && selected.getHasAnnotationFile() */) dispose();
+                        if ( selected != null /* && selected.getHasAnnotationFile() */ ) dispose();
 
                         // show alert?
                     }
@@ -153,9 +154,9 @@ class ADTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
     // private final String[] columnNames = { "Short Name", "Name", "Taxon", "Annots. Avail." };
     private final String[] columnNames = { "Short Name", "Name", "Taxon" };
-    List<Platform> designs;
+    List<ArrayDesignValueObject> designs;
 
-    public ADTableModel( List<Platform> designs ) {
+    public ADTableModel( List<ArrayDesignValueObject> designs ) {
         super();
 
         this.designs = designs;
@@ -187,8 +188,8 @@ class ADTableModel extends AbstractTableModel {
 
             case 2:
                 return designs.get( rowIndex ).getTaxon();
-                // case 3:
-                // return designs.get( rowIndex ).getHasAnnotationFile();
+            // case 3:
+            // return designs.get( rowIndex ).getHasAnnotationFile();
             default:
                 return "";
         }

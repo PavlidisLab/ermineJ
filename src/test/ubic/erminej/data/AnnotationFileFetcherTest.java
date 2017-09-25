@@ -23,6 +23,8 @@ import org.junit.Test;
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 
+import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
+
 /**
  * @author paul
  * @version $Id$
@@ -36,7 +38,7 @@ public class AnnotationFileFetcherTest {
                 AnnotationFileFetcherTest.class.getResourceAsStream( "/data/arrayExample.json" ) );
         final JSONValue v = lParser.nextValue();
 
-        List<Platform> converted = f.convert( v );
+        List<ArrayDesignValueObject> converted = f.convert( v );
 
         assertEquals( 2, converted.size() );
 

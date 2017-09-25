@@ -329,11 +329,12 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
                         prunedGeneAnnots = geneData;
                     }
 
-                    GeneSet geneSet = prunedGeneAnnots.getGeneSet( id );
-                    if ( geneSet == null ) {
-                        messenger.showWarning( "No gene set with ID " + id + " was available for viewing." );
-                        return; // aspect etc.
+                    if ( !prunedGeneAnnots.hasGeneSet( id ) ) {
+                        mainFrame.getStatusMessenger().showWarning( id + " is not available for viewing in your data." );
+                        return;
                     }
+
+                    GeneSet geneSet = prunedGeneAnnots.getGeneSet( id );
 
                     int numGenes = geneSet.getGenes().size();
                     if ( numGenes > GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING ) {
@@ -346,10 +347,6 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
                     messenger.showStatus( "Viewing details of data for " + id + " ..." );
 
                     log.debug( "Request for details of gene set: " + id + ", run: " + run );
-                    if ( !prunedGeneAnnots.hasGeneSet( id ) ) {
-                        mainFrame.getStatusMessenger().showWarning( id + " is not available for viewing in your data." );
-                        return;
-                    }
 
                     GeneSetResult result = null; // might stay this way.
                     if ( run != null ) {

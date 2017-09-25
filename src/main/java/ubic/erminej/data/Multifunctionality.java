@@ -1,13 +1,13 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -33,9 +33,9 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
-import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.ROC;
 import ubic.basecode.math.Rank;
+import ubic.basecode.math.linearmodels.LeastSquaresFit;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
@@ -52,7 +52,7 @@ import cern.jet.stat.Descriptive;
  * selected for analysis. For example, if you load KEGG groups along with GO, multifunctionality is computed based on
  * both of them. But if the user selects only to analyze KEGG, multifunctionality correction is based on the bias in
  * KEGG+GO. This could be fixed by changing the 'subclone' method of GeneAnnotations to trim aspects, not just genes.
- * 
+ *
  * @author paul
  * @version $Id$
  * @see Gemma for another implementation of parts of this.
@@ -78,19 +78,19 @@ public class Multifunctionality {
 
     private static Log log = LogFactory.getLog( Multifunctionality.class );
 
-    private Map<Gene, Double> geneMultifunctionality = new HashMap<Gene, Double>();
+    private Map<Gene, Double> geneMultifunctionality = new HashMap<>();
 
-    private Map<GeneSetTerm, Integer> goGroupSizes = new HashMap<GeneSetTerm, Integer>();
+    private Map<GeneSetTerm, Integer> goGroupSizes = new HashMap<>();
 
-    private Map<Gene, Integer> numGoTerms = new HashMap<Gene, Integer>();
+    private Map<Gene, Integer> numGoTerms = new HashMap<>();
 
-    private Map<GeneSetTerm, Double> goTermMultifunctionality = new HashMap<GeneSetTerm, Double>();
+    private Map<GeneSetTerm, Double> goTermMultifunctionality = new HashMap<>();
 
-    private Map<GeneSetTerm, Double> goTermMultifunctionalityPvalue = new HashMap<GeneSetTerm, Double>();
+    private Map<GeneSetTerm, Double> goTermMultifunctionalityPvalue = new HashMap<>();
 
-    private Map<GeneSetTerm, Double> goTermMultifunctionalityRank = new HashMap<GeneSetTerm, Double>();
+    private Map<GeneSetTerm, Double> goTermMultifunctionalityRank = new HashMap<>();
 
-    private Map<Gene, Double> geneMultifunctionalityRank = new HashMap<Gene, Double>();
+    private Map<Gene, Double> geneMultifunctionalityRank = new HashMap<>();
 
     private GeneAnnotations geneAnnots;
 
@@ -109,7 +109,7 @@ public class Multifunctionality {
      */
     public Map<Gene, Double> padogWeights() {
 
-        Map<Gene, Double> weig = new HashMap<Gene, Double>();
+        Map<Gene, Double> weig = new HashMap<>();
         Collection<Integer> numgt = numGoTerms.values();
 
         DoubleArrayList gotermcounts = new DoubleArrayList();
@@ -138,7 +138,7 @@ public class Multifunctionality {
     /**
      * Construct Multifunctionality information based on the state of the GO annotations -- this accounts only for the
      * elements in the annotations. Genes with no GO terms are completely ignored.
-     * 
+     *
      * @param go These annotations should already be pruned down to those used in analysis.
      */
     public Multifunctionality( GeneAnnotations go, StatusViewer m ) {
@@ -150,7 +150,7 @@ public class Multifunctionality {
     /**
      * Given a set of scores for genes, adjust them to correct for multifunctionality, using a regression approach. If
      * the regression coefficient (slope) is negative, no correction will be done.
-     * 
+     *
      * @param geneToScoreMap Should already be log transformed, if requested.
      * @param useRanks If true, the ranks of the gene scores will be used for regression.
      * @param weight If true, the regression will be weighted (current implementation is by 1/sqrt(rank))
@@ -165,7 +165,7 @@ public class Multifunctionality {
         boolean doLog = settings.getDoLog(); // note scores would already have been log-transformed.
         boolean invert = ( doLog && !settings.getBigIsBetter() ) || ( !doLog && settings.getBigIsBetter() );
 
-        List<Gene> genesInSomeOrder = new ArrayList<Gene>( geneToScoreMap.keySet() );
+        List<Gene> genesInSomeOrder = new ArrayList<>( geneToScoreMap.keySet() );
 
         int i = 0;
         for ( Gene g : genesInSomeOrder ) {
@@ -239,7 +239,7 @@ public class Multifunctionality {
         DoubleMatrix1D residuals = fit.getStudentizedResiduals().viewRow( 0 );
         // DoubleMatrix1D residuals = fit.getResiduals().viewRow( 0 );
 
-        Map<Gene, Double> result = new HashMap<Gene, Double>();
+        Map<Gene, Double> result = new HashMap<>();
 
         assert residuals.size() == genesInSomeOrder.size();
 
@@ -294,7 +294,7 @@ public class Multifunctionality {
      * intended for cases where the number of genes is smaller than the total number of genes. We do this the same we we
      * do for GO groups. Implementation of algorithm for computing AUC, described in Section 1 of the supplement to
      * Gillis and Pavlidis; see {@link http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U}.
-     * 
+     *
      * @param genesInSet
      * @return the ROC AUC for the genes in the set compared to the multifunctionality ranking
      * @see ROC.java in baseCode for a generic implementation
@@ -342,7 +342,7 @@ public class Multifunctionality {
      */
     public double enrichmentForMultifunctionalityPvalue( Collection<Gene> genesInSet ) {
 
-        List<Double> ranksOfGeneInSet = new Vector<Double>();
+        List<Double> ranksOfGeneInSet = new Vector<>();
 
         for ( Gene gene : genesInSet ) {
             if ( rawGeneMultifunctionalityRanks.containsKey( gene ) ) {
@@ -356,7 +356,7 @@ public class Multifunctionality {
 
     /**
      * Get QuantileBin1D, which can tell you the quantile for a given value, or the expected value for a given quantile.
-     * 
+     *
      * @return
      */
     public QuantileBin1D getGeneMultifunctionalityQuantiles() {
@@ -420,7 +420,7 @@ public class Multifunctionality {
 
     /**
      * Convenience method.
-     * 
+     *
      * @param genes
      * @return the gene with the highest multifunctionality
      */
@@ -470,7 +470,7 @@ public class Multifunctionality {
 
     /**
      * How many genes have multifunctionality scores.
-     * 
+     *
      * @return
      */
     public int getNumGenes() {
@@ -523,7 +523,7 @@ public class Multifunctionality {
          * For each go term, compute its AUC w.r.t. the multifunctionality ranking.. We work with the multifunctionality
          * ranks, rawGeneMultifunctionalityRanks
          */
-        Map<GeneSetTerm, MFV> tmp = new HashMap<GeneSetTerm, MFV>();
+        Map<GeneSetTerm, MFV> tmp = new HashMap<>();
         for ( GeneSetTerm goset : geneAnnots.getGeneSetTerms() ) {
 
             if ( !goGroupSizes.containsKey( goset ) ) {
@@ -579,7 +579,7 @@ public class Multifunctionality {
 
             timer.start();
 
-            genesWithGoTerms = new HashSet<Gene>();
+            genesWithGoTerms = new HashSet<>();
             for ( GeneSetTerm goset : geneAnnots.getGeneSetTerms() ) {
                 Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( goset );
                 if ( geneSetGenes.isEmpty() ) {

@@ -63,11 +63,10 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * 
  * @author Paul Pavlidis
  * @author keshav
- * @version $Id$
  */
 public class ErmineJCli {
 
-    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2013 University of British Columbia.\nFor more help go to ermineJ.chibi.ubc.ca";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2017 University of British Columbia.\nFor more help go to ermineJ.chibi.ubc.ca";
     private static final String HEADER = "Options:";
 
     private static Log log = LogFactory.getLog( ErmineJCli.class );
@@ -148,7 +147,7 @@ public class ErmineJCli {
      * @throws IOException
      */
     protected void batchAnalyze() throws IOException {
-        Collection<GeneSetPvalRun> results = new HashSet<GeneSetPvalRun>();
+        Collection<GeneSetPvalRun> results = new HashSet<>();
 
         if ( settings.getClassScoreMethod().equals( Method.CORR ) ) {
             throw new IllegalArgumentException(
@@ -188,10 +187,7 @@ public class ErmineJCli {
             GeneAnnotationParser parser = new GeneAnnotationParser( goData, statusMessenger );
 
             statusMessenger.showProgress( "Reading gene annotations from " + settings.getAnnotFile() );
-            if ( settings.getAnnotFormat().equals( Format.DEFAULT ) ) {
-                boolean filterNonSpecific = settings.getFilterNonSpecific();
-                parser.setFilterNonSpecific( filterNonSpecific );
-            }
+
             geneData = parser.read( settings.getAnnotFile(), settings.getAnnotFormat(), settings );
 
             statusMessenger.showProgress( "Initializing gene class mapping" );
@@ -312,18 +308,19 @@ public class ErmineJCli {
                 .withDescription( "Annotation file to be used [required unless using GUI]" ).withLongOpt( "annots" )
                 .withArgName( "file" ).create( 'a' ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Affymetrix annotation file format" )
+        options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Annotation file is in Affymetrix format" )
                 .create( 'A' ) );
 
         options.addOption( OptionBuilder.withDescription(
                 "Sets 'big is better' option for gene scores to true [default = "
-                        + SettingsHolder.getDefault( SettingsHolder.BIG_IS_BETTER ) + "]" ).create( 'b' ) );
+                        + SettingsHolder.getDefault( SettingsHolder.BIG_IS_BETTER ) + "]" )
+                .create( 'b' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" )
                 .withDescription( "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" )
                 .withArgName( "file" ).create( 'c' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Column for scores in input file" )
+        options.addOption( OptionBuilder.hasArg().withDescription( "Column index for scores in input file (default: 2)" )
                 .withLongOpt( "scoreCol" ).withArgName( "integer" ).create( 'e' ) );
 
         options.addOption( OptionBuilder.hasArg().withArgName( "directory" )
@@ -343,7 +340,8 @@ public class ErmineJCli {
                 .withDescription(
                         "What to do when genes have multiple scores"
                                 + " in input file (due to multiple elements per gene): BEST = best of replicates; MEAN = mean of replicates; default="
-                                + SettingsHolder.getDefault( SettingsHolder.GENE_REP_TREATMENT ) ).create( 'g' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.GENE_REP_TREATMENT ) )
+                .create( 'g' ) );
 
         options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" )
                 .withDescription( "Number of iterations (GSR and CORR methods only)" ).withArgName( "iterations" )
@@ -357,8 +355,8 @@ public class ErmineJCli {
         options.addOption( OptionBuilder
                 .withLongOpt( "logTrans" )
                 .withDescription(
-                        "Log transform the scores (and change sign; recommended for p-values), default="
-                                + SettingsHolder.getDefault( SettingsHolder.DO_LOG ) ).create( 'l' ) );
+                        "Log transform the scores (and change sign; recommended for p-values), default=don't transform" )
+                .create( 'l' ) );
 
         options.addOption( OptionBuilder
                 .hasArg()
@@ -379,7 +377,8 @@ public class ErmineJCli {
                                 + SettingsHolder.Method.GSR
                                 + " (resampling of gene scores; use with -m to choose algorithm),  "
                                 + SettingsHolder.Method.CORR + " (profile correlation),  " + SettingsHolder.Method.ROC
-                                + " (ROC)" ).withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
+                                + " (ROC)" )
+                .withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
 
         options.addOption( OptionBuilder.hasArg()
                 .withDescription( "Batch process score files from a list, one per line. Incompatible with -o, -s, -G" )
@@ -438,7 +437,8 @@ public class ErmineJCli {
                         "Multiple test correction method: " + SettingsHolder.MultiTestCorrMethod.BONFERONNI
                                 + " = Bonferonni FWE, " + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
                                 + " = Westfall-Young (slow), " + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
-                                + " = Benjamini-Hochberg FDR [default]" ).withLongOpt( "mtc" ).withArgName( "value" )
+                                + " = Benjamini-Hochberg FDR [default]" )
+                .withLongOpt( "mtc" ).withArgName( "value" )
                 .create( 'M' ) );
 
     }
@@ -663,7 +663,8 @@ public class ErmineJCli {
                             throw new IllegalArgumentException();
                     }
                     System.err
-                            .println( "Please consider switching to the new command line style for this option (MEAN, QUANTILE, MEAN_ABOVE_QUANTILE or PRECISIONRECALL)" );
+                            .println(
+                                    "Please consider switching to the new command line style for this option (MEAN, QUANTILE, MEAN_ABOVE_QUANTILE or PRECISIONRECALL)" );
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -700,7 +701,8 @@ public class ErmineJCli {
                     }
 
                     System.err
-                            .println( "Please consider switching to the new command line style for this option (BONFERONNI, WESTFALLYOUNG or BENJAMINIHOCHBERG)" );
+                            .println(
+                                    "Please consider switching to the new command line style for this option (BONFERONNI, WESTFALLYOUNG or BENJAMINIHOCHBERG)" );
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -875,19 +877,22 @@ public class ErmineJCli {
      * @throws IOException
      */
     private Collection<File> readScoreFileList() throws FileNotFoundException, IOException {
-        Collection<File> scoreFiles = new ArrayList<File>();
+        Collection<File> scoreFiles = new ArrayList<>();
 
-        BufferedReader scoreFileListReader = new BufferedReader( new FileReader( batchFile ) );
+        try (BufferedReader scoreFileListReader = new BufferedReader( new FileReader( batchFile ) )) {
 
-        while ( scoreFileListReader.ready() ) {
-            String rawLine = scoreFileListReader.readLine();
-            String fileName = StringUtils.strip( rawLine );
-            File f = new File( fileName );
-            scoreFiles.add( f );
+            while ( scoreFileListReader.ready() ) {
+                String rawLine = scoreFileListReader.readLine();
+                String fileName = StringUtils.strip( rawLine );
+                File f = new File( fileName );
+                scoreFiles.add( f );
 
+            }
+            scoreFileListReader.close();
+            return scoreFiles;
+        } catch ( Exception e ) {
+            throw ( e );
         }
-        scoreFileListReader.close();
-        return scoreFiles;
     }
 
     private void showHelp() {

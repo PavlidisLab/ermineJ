@@ -109,14 +109,12 @@ public class GeneSetDetails {
         } else {
             this.settings = settings;
         }
-
-        this.elements = geneData.getGeneSetElements( classID );
+        assert classID != null;
 
         this.result = result;
-
-        assert classID != null;
         assert result == null || result.getGeneSetId().equals( classID );
 
+        this.elements = geneData.getGeneSetElements( classID );
         if ( elements == null || elements.isEmpty() ) {
             log.warn( "Empty gene set " + classID );
             return;
@@ -126,8 +124,6 @@ public class GeneSetDetails {
         if ( gsToUse == null ) {
             gsToUse = tryToGetGeneScores();
         }
-
-        this.elements = geneData.getGeneSetElements( classID );
 
         if ( gsToUse != null ) {
             initGeneScores( gsToUse );

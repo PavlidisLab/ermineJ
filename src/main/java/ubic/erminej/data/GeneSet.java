@@ -164,6 +164,8 @@ public class GeneSet {
     }
 
     /**
+     * FIXME this should return only the *active* Elements? - those which have Scores.
+     * 
      * @return
      */
     public Set<Element> getProbes() {

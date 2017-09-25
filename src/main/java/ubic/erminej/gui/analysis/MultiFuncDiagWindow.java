@@ -55,9 +55,9 @@ import org.jfree.data.xy.XYSeries;
 
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
-import ubic.basecode.math.LeastSquaresFit;
 import ubic.basecode.math.Rank;
 import ubic.basecode.math.Smooth;
+import ubic.basecode.math.linearmodels.LeastSquaresFit;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.analysis.GeneSetPvalRun;

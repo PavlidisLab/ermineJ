@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
 import ubic.erminej.gui.file.AnnotationListFrame;
+import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 
@@ -58,9 +59,9 @@ public class AnnotationFileFetcher {
     /**
      * Show a list of available annotation files.
      */
-    public Platform pickAnnotation() {
+    public ArrayDesignValueObject pickAnnotation() {
 
-        List<Platform> designs = fetchPlatformList();
+        List<ArrayDesignValueObject> designs = fetchPlatformList();
 
         AnnotationListFrame f = new AnnotationListFrame( designs );
 
@@ -70,12 +71,12 @@ public class AnnotationFileFetcher {
     /**
      * @return
      */
-    private List<Platform> fetchPlatformList() {
-        List<Platform> designs = null;
+    private List<ArrayDesignValueObject> fetchPlatformList() {
+        List<ArrayDesignValueObject> designs = null;
 
-        FutureTask<List<Platform>> future = new FutureTask<List<Platform>>( new Callable<List<Platform>>() {
+        FutureTask<List<ArrayDesignValueObject>> future = new FutureTask<List<ArrayDesignValueObject>>( new Callable<List<ArrayDesignValueObject>>() {
             @Override
-            public List<Platform> call() throws Exception {
+            public List<ArrayDesignValueObject> call() throws Exception {
                 return fetchList();
             }
 
@@ -97,7 +98,7 @@ public class AnnotationFileFetcher {
                 }
             }
 
-            List<Platform> list = future.get();
+            List<ArrayDesignValueObject> list = future.get();
             if ( !list.isEmpty() ) {
                 designs = list;
             } else {
@@ -121,7 +122,7 @@ public class AnnotationFileFetcher {
      * @return
      * @throws IOException
      */
-    public List<Platform> fetchList() throws IOException {
+    public List<ArrayDesignValueObject> fetchList() throws IOException {
         try {
             String url = Settings.ANNOTATION_FILE_LIST_RESTURL;
             assert url != null;
@@ -141,12 +142,13 @@ public class AnnotationFileFetcher {
      * @param v
      * @return
      */
-    protected List<Platform> convert( JSONValue v ) {
+    protected List<ArrayDesignValueObject> convert( JSONValue v ) {
 
-        List<Platform> result = new ArrayList<Platform>();
+        List<ArrayDesignValueObject> result = new ArrayList<ArrayDesignValueObject>();
         JSONObject o = ( JSONObject ) v;
 
-        JSONArray recs = ( ( JSONArray ) o.get( "records" ) );
+        JSONArray recs = ( ( JSONArray ) o.get( "data" ) );
+
         JSONMapper.addHelper( new SimpleMapperHelper() {
 
             @Override
@@ -167,10 +169,11 @@ public class AnnotationFileFetcher {
                 return null; // not needed
             }
         } );
+
         try {
             for ( int i = 0; i < recs.size(); i++ ) {
                 JSONValue val = recs.get( i );
-                Platform java = ( Platform ) JSONMapper.toJava( val, Platform.class );
+                ArrayDesignValueObject java = ( ArrayDesignValueObject ) JSONMapper.toJava( val, ArrayDesignValueObject.class );
                 result.add( java );
             }
 

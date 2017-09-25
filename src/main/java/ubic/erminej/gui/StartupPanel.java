@@ -67,6 +67,7 @@ import ubic.erminej.data.Platform;
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.file.XMLFileFilter;
 import ubic.erminej.gui.util.GuiUtil;
+import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
  * Panel shown on initial startup of the application.
@@ -291,7 +292,7 @@ public class StartupPanel extends JPanel {
                 URL urlPattern = null;
                 try {
                     final AnnotationFileFetcher f = new AnnotationFileFetcher();
-                    final Platform result = f.pickAnnotation();
+                    final ArrayDesignValueObject result = f.pickAnnotation();
 
                     if ( result == null ) {
                         statusMessenger.clear();
@@ -305,7 +306,7 @@ public class StartupPanel extends JPanel {
 
                     annotFileTextField.setText( "Fetching annots for " + result.getShortName() );
 
-                    urlPattern = new URL( Settings.ANNOTATION_FILE_FETCH_RESTURL + "/" + result.getId() );
+                    urlPattern = new URL( String.format( Settings.ANNOTATION_FILE_FETCH_RESTURL, result.getId() ) );
 
                     InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
 

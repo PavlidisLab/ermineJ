@@ -54,18 +54,18 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * @author Kiran Keshav
  * @author Homin Lee
  * @author Will Braynen
- * @version $Id$
  */
 public class Settings extends SettingsHolder {
 
     /*
-     * URLS for web services used by the software.
+     * URLS for web services used by the software. Use String.format to replace the %s with the desired platform short
+     * name.
      */
-    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/fetchAnnotationsById";
+    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/%s/annotations";
 
     // public static final String ANNOTATION_FILE_FETCH_RESTURL =
-    // "http://localhost:8080/Gemma/rest/arraydesign/fetchAnnotationsById";
-    public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/arraydesign/listAll";
+    // "http://localhost:8080/Gemma/rest/v2/platforms/?offset=0&limit=100000";
+    public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/?offset=0&limit=100000";
 
     public static final String HELPURL = "http://erminej.chibi.ubc.ca/help";
 
@@ -186,7 +186,7 @@ public class Settings extends SettingsHolder {
         if ( readFromFile ) {
             loadOrCreateInitialConfig();
         } else {
-            this.configBuilder = new FileBasedConfigurationBuilder<PropertiesConfiguration>(
+            this.configBuilder = new FileBasedConfigurationBuilder<>(
                     PropertiesConfiguration.class );
             try {
                 this.config = configBuilder.getConfiguration();
@@ -203,7 +203,7 @@ public class Settings extends SettingsHolder {
      * @param settings - settings object to copy
      */
     public Settings( SettingsHolder settingsToCopy ) {
-        this.configBuilder = new FileBasedConfigurationBuilder<PropertiesConfiguration>( PropertiesConfiguration.class );
+        this.configBuilder = new FileBasedConfigurationBuilder<>( PropertiesConfiguration.class );
         try {
             this.config = configBuilder.getConfiguration();
         } catch ( ConfigurationException e ) {
@@ -565,7 +565,7 @@ public class Settings extends SettingsHolder {
     }
 
     public void setSelectedCustomGeneSets( Collection<GeneSetTerm> addedClasses ) {
-        Collection<String> addedClassesIds = new HashSet<String>();
+        Collection<String> addedClassesIds = new HashSet<>();
         for ( GeneSetTerm t : addedClasses )
             addedClassesIds.add( t.getId() );
         this.config.setProperty( SELECTED_CUSTOM_GENESETS, addedClassesIds );
