@@ -7,8 +7,8 @@
 	<name>ermineJ</name>
 	<version>3.0.3-SNAPSHOT</version>
 	<organization>
-		<name>UBC Centre for High-Throughput Biology</name>
-		<url>http://www.chibi.ubc.ca</url>
+		<name>UBC Michael Smith Laboratories</name>
+		<url>http://www.msl.ubc.ca</url>
 	</organization>
 	<inceptionYear>2002</inceptionYear> <!-- yes, the first code was laid down in 2002! -->
 	<description>
@@ -18,14 +18,14 @@
 	</description>
 	<packaging>jar</packaging>
 	<scm>
-		<connection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</connection>
-		<developerConnection>scm:cvs:ext:@otto.pavlab.chibi.ubc.ca:/cvs:ermineJ</developerConnection>
-		<url>http://www.chibi.ubc.ca/faculty/pavlidis/fisheye/browse/pavlab/ermineJ</url>
+	<url>https://github.com/ppavlidis/ermineJ</url>
+		<connection>scm:git:git://https://github.com/ppavlidis/ermineJ.git</connection>
+		<developerConnection>scm:git:git@github.com:https://github.com/ppavlidis/ermineJ.git</developerConnection>
 	</scm>
 	<issueManagement>
-		<system>Bugzilla</system>
+		<system>GitHub</system>
 		<url>
-			http://chibi.ubc.ca/faculty/pavlidis/lab/bugs/buglist.cgi?product=ermineJ&amp;bug_status=__open__
+			https://github.com/ppavlidis/ermineJ/issues
 		</url>
 	</issueManagement>
 	<licenses>
