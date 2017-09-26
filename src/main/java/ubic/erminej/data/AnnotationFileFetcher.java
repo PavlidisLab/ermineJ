@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ubic.erminej.Settings;
 import ubic.erminej.gui.file.AnnotationListFrame;
+import ubic.gemma.model.common.auditAndSecurity.eventType.AuditEventType;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
@@ -162,6 +163,24 @@ public class AnnotationFileFetcher {
                     return new Date( ( ( JSONInteger ) aValue ).getValue().longValue() );
                 }
                 return DateMapper.fromISO8601( ( ( JSONString ) aValue ).getValue().trim() );
+            }
+
+            @Override
+            public JSONValue toJSON( Object aPojo ) {
+                return null; // not needed
+            }
+        } );
+
+        JSONMapper.addHelper( new SimpleMapperHelper() {
+
+            @Override
+            public Class getHelpedClass() {
+                return AuditEventType.class;
+            }
+
+            @Override
+            public Object toJava( JSONValue aValue, Class aRequestedClass ) throws MapperException {
+                return null;
             }
 
             @Override

@@ -27,7 +27,6 @@ import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
  * @author paul
- * @version $Id$
  */
 public class AnnotationFileFetcherTest {
 
@@ -40,7 +39,7 @@ public class AnnotationFileFetcherTest {
 
         List<ArrayDesignValueObject> converted = f.convert( v );
 
-        assertEquals( 2, converted.size() );
+        assertEquals( 20, converted.size() );
 
         assertEquals( "GPL1355", converted.get( 1 ).getShortName() );
     }
