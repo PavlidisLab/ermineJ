@@ -15,11 +15,10 @@
 package ubic.erminej.data;
 
 /**
- * This is the same as ArrayDesignValueObject from Gemma. We don't use a direct dependency because of incompatible java
+ * This is based on ArrayDesignValueObject from Gemma. We don't use a direct dependency because of incompatible java
  * versions, which made it more trouble that it was worth.
  * 
  * @author Paul
- * @version $Id$
  */
 public class Platform implements java.io.Serializable, Comparable<Platform> {
 
@@ -36,6 +35,8 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
     private Long designElementCount;
 
     private Long expressionExperimentCount;
+
+    private boolean hasAnnotationFile;
 
     private Boolean hasBlatAssociations;
 
@@ -63,6 +64,8 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
 
     private String name;
 
+    private Boolean needsAttention;
+
     private String numGenes;
 
     private String numProbeAlignments;
@@ -73,25 +76,17 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
 
     private String shortName;
 
-    private Boolean troubled = false;
-
-    private Boolean validated = false;
+    private String curationNote;
 
     private String taxon;
 
     private String technologyType;
 
-    private boolean hasAnnotationFile;
+    private Boolean troubled = false;
 
     private String troubleDetails = "(Details of trouble not populated)";
 
-    public Boolean getValidated() {
-        return validated;
-    }
-
-    public String getTroubleDetails() {
-        return troubleDetails;
-    }
+    private Boolean validated = false;
 
     public Platform() {
     }
@@ -105,13 +100,18 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
     public Platform( Platform otherBean ) {
         this( otherBean.getName(), otherBean.getShortName(), otherBean.getDesignElementCount(), otherBean.getTaxon(),
                 otherBean.getExpressionExperimentCount(), otherBean.getHasSequenceAssociations(), otherBean
-                        .getHasBlatAssociations(), otherBean.getHasGeneAssociations(), otherBean.getId(), otherBean
-                        .getColor(), otherBean.getNumProbeSequences(), otherBean.getNumProbeAlignments(), otherBean
-                        .getNumProbesToGenes(), otherBean.getNumGenes(), otherBean.getDateCached(), otherBean
-                        .getLastSequenceUpdate(), otherBean.getLastSequenceAnalysis(), otherBean.getLastGeneMapping(),
+                        .getHasBlatAssociations(),
+                otherBean.getHasGeneAssociations(), otherBean.getId(), otherBean
+                        .getColor(),
+                otherBean.getNumProbeSequences(), otherBean.getNumProbeAlignments(), otherBean
+                        .getNumProbesToGenes(),
+                otherBean.getNumGenes(), otherBean.getDateCached(), otherBean
+                        .getLastSequenceUpdate(),
+                otherBean.getLastSequenceAnalysis(), otherBean.getLastGeneMapping(),
                 otherBean.getIsSubsumed(), otherBean.getIsSubsumer(), otherBean.getIsMerged(), otherBean.getIsMergee(),
                 otherBean.getLastRepeatMask(), otherBean.getTroubled(), otherBean.getValidated(), otherBean
-                        .getDateCreated(), otherBean.getDescription(), otherBean.getTechnologyType() );
+                        .getDateCreated(),
+                otherBean.getDescription(), otherBean.getTechnologyType() );
     }
 
     public Platform( String name, String shortName, Long designElementCount, String taxon,
@@ -150,6 +150,15 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
         this.dateCreated = dateCreated;
         this.description = description;
         this.technologyType = technologyType;
+    }
+
+    @Override
+    public int compareTo( Platform arg0 ) {
+
+        if ( arg0.getDateCreated() == null || this.getDateCreated() == null ) return 0;
+
+        return arg0.getDateCreated().compareTo( this.getDateCreated() );
+
     }
 
     /**
@@ -349,6 +358,13 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
     }
 
     /**
+     * @return the needsAttention
+     */
+    public Boolean getNeedsAttention() {
+        return needsAttention;
+    }
+
+    /**
      * <p>
      * The number of unique genes that this array design maps to.
      * </p>
@@ -413,11 +429,19 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
         return troubled;
     }
 
+    public String getTroubleDetails() {
+        return troubleDetails;
+    }
+
     /**
      * The last uncleared TroubleEvent associated with this ArrayDesign.
      */
     public Boolean getTroubleEvent() {
         return this.troubled;
+    }
+
+    public Boolean getValidated() {
+        return validated;
     }
 
     /**
@@ -523,6 +547,13 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
         this.name = name;
     }
 
+    /**
+     * @param needsAttention the needsAttention to set
+     */
+    public void setNeedsAttention( Boolean needsAttention ) {
+        this.needsAttention = needsAttention;
+    }
+
     public void setNumGenes( String numGenes ) {
         this.numGenes = numGenes;
     }
@@ -576,13 +607,18 @@ public class Platform implements java.io.Serializable, Comparable<Platform> {
         return this.getShortName();
     }
 
-    @Override
-    public int compareTo( Platform arg0 ) {
+    /**
+     * @return the curationNote
+     */
+    public String getCurationNote() {
+        return curationNote;
+    }
 
-        if ( arg0.getDateCreated() == null || this.getDateCreated() == null ) return 0;
-
-        return arg0.getDateCreated().compareTo( this.getDateCreated() );
-
+    /**
+     * @param curationNote the curationNote to set
+     */
+    public void setCurationNote( String curationNote ) {
+        this.curationNote = curationNote;
     }
 
 }

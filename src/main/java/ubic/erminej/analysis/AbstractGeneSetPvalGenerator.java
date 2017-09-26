@@ -114,6 +114,13 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
         return geneAnnots.getGeneSetGenes( t ).size();
     }
 
+    /**
+     * The number of elements in the given term. Note that this reports what is in the annotations, and may not reflect
+     * what is actually being used in the analysis.
+     * 
+     * @param t
+     * @return
+     */
     public int numElementsInSet( GeneSetTerm t ) {
         return geneAnnots.getGeneSetElements( t ).size();
     }

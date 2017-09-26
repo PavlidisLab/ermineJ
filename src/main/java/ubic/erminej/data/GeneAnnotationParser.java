@@ -40,7 +40,8 @@ import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
 /**
- * Reads tab-delimited file to create maps of elements to classes, classes to elements, elements to genes, genes to elements.
+ * Reads tab-delimited file to create maps of elements to classes, classes to elements, elements to genes, genes to
+ * elements.
  * 
  * @author paul
  * @version $Id$
@@ -61,8 +62,6 @@ public class GeneAnnotationParser {
     private static final String NO_DESCRIPTION = "[No description]";
 
     private static Pattern pipePattern = Pattern.compile( "\\s*[\\s\\|,]\\s*" );
-
-    private boolean filterNonSpecific = false;
 
     private GeneSetTerms geneSetTerms;
 
@@ -211,7 +210,7 @@ public class GeneAnnotationParser {
                         multigenes.add( g );
                     }
 
-                    if ( multigenes.size() > 1 && filterNonSpecific ) {
+                    if ( multigenes.size() > 1 && settings.getFilterNonSpecific() ) {
                         continue;
                     }
 
@@ -307,10 +306,6 @@ public class GeneAnnotationParser {
             throws IOException {
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
         return this.readDefault( i, genes, settings, simple );
-    }
-
-    public void setFilterNonSpecific( boolean b ) {
-        this.filterNonSpecific = b;
     }
 
     /**

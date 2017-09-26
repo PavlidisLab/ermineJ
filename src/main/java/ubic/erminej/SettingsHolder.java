@@ -38,7 +38,6 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * basically a value object to use during analyses.
  * 
  * @author paul
- * @version $Id$
  */
 public class SettingsHolder {
 
