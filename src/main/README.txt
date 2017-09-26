@@ -13,4 +13,4 @@ mvn izpack:izpack
 
 For osx run
 
- mvn install osxappbundle:bundle
+mvn package appbundle:bundle

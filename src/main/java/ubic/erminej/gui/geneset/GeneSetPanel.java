@@ -27,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -310,23 +311,25 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
                         return;
                     }
 
-                    GeneAnnotations prunedGeneAnnots = null;
+                    GeneAnnotations prunedGeneAnnots = geneData; // default, may modify
                     GeneScores geneScores = null;
                     if ( run != null ) {
                         prunedGeneAnnots = run.getGeneData();
                     } else if ( StringUtils.isNotBlank( settings.getScoreFile() ) ) {
-                        // SLOW, if we don't already have results. Possibly store in a field?
-                        geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData );
 
-                        if ( geneScores.getProbeToScoreMap().isEmpty() ) {
-                            geneScores = null;
-                            prunedGeneAnnots = geneData;
+                        File f = new File( settings.getScoreFile() );
+                        if ( f.canRead() ) {
+                            geneScores = new GeneScores( settings.getScoreFile(), settings, messenger, geneData );
+
+                            if ( geneScores.getProbeToScoreMap().isEmpty() ) {
+                                geneScores = null;
+                            } else {
+                                prunedGeneAnnots = geneScores.getPrunedGeneAnnotations();
+                            }
                         } else {
-                            prunedGeneAnnots = geneScores.getPrunedGeneAnnotations();
+                            log.warn( "Could not read configured score file, ignoring: " + settings.getScoreFile() );
                         }
 
-                    } else {
-                        prunedGeneAnnots = geneData;
                     }
 
                     if ( !prunedGeneAnnots.hasGeneSet( id ) ) {
