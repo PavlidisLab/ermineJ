@@ -722,6 +722,13 @@
 			</extension>
 		</extensions>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>pavlabrepo</id>
+			<name>Pavlab</name>
+			<url>scpexe://willie.msl.ubc.ca/space/maven2</url>
+		</repository>
+	</distributionManagement>
 	<profiles>
 		<profile>
 			<!-- For deployment where host is local (and ssh isn't available for builder, e.g. CI) -->
