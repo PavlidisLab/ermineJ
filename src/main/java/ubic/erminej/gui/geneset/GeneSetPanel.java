@@ -467,6 +467,7 @@ class ModifySetActionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.modMenuItem_actionPerformed( e );
@@ -482,6 +483,7 @@ class UrlActionAdapter implements java.awt.event.ActionListener {
         this.urlBase = urlBase;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();

@@ -55,7 +55,7 @@ import ubic.erminej.SettingsHolder;
  * see Gemma for another implementation of parts of this.
  *
  * @author paul
- *
+ * @version $Id: $Id
  */
 public class Multifunctionality {
     //
@@ -727,11 +727,18 @@ class MFV implements Comparable<MFV> {
     private Double p;
     private Double a;
 
+    /**
+     * <p>Constructor for MFV.</p>
+     *
+     * @param a a {@link java.lang.Double} object.
+     * @param p a {@link java.lang.Double} object.
+     */
     public MFV( Double a, Double p ) {
         this.a = a;
         this.p = p;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int compareTo( MFV o ) {
 

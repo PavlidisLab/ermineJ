@@ -301,6 +301,7 @@ class AppDialog_cancelButton_actionAdapter implements java.awt.event.ActionListe
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.cancelButton_actionPerformed( e );
@@ -336,26 +337,31 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseClicked( MouseEvent e ) {
         adaptee.mouseButton_actionPerformed( e );
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseEntered( MouseEvent e ) {
         //
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseExited( MouseEvent e ) {
         //
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mousePressed( MouseEvent e ) {
         //
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseReleased( MouseEvent e ) {
         //

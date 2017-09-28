@@ -735,11 +735,13 @@ class EditRunPopupListener extends MouseAdapter {
         popup = popupMenu;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mousePressed( MouseEvent e ) {
         maybeShowPopup( e );
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseReleased( MouseEvent e ) {
         maybeShowPopup( e );
@@ -764,10 +766,18 @@ class EditRunPopupMenu extends JPopupMenu {
     private static final long serialVersionUID = 1L;
     Point popupPoint;
 
+    /**
+     * <p>getPoint.</p>
+     *
+     * @return a {@link java.awt.Point} object.
+     */
     public Point getPoint() {
         return popupPoint;
     }
 
+    /**
+     * <p>Constructor for FindInTreeListener.</p>
+     */
     public void setPoint( Point point ) {
         popupPoint = point;
     }
@@ -780,6 +790,7 @@ class FindInTreeListener implements ActionListener {
     /**
      * @param adaptee
      */
+    /** {@inheritDoc} */
     public FindInTreeListener( GeneSetPanel adaptee ) {
         super();
         this.adaptee = adaptee;
@@ -796,6 +807,7 @@ class FindInTreeListener implements ActionListener {
 
     }
 
+/** {@inheritDoc} */
 }
 
 class GeneSetTableMouseAdapter extends java.awt.event.MouseAdapter {
@@ -821,6 +833,7 @@ class RemoveRunPopupMenu_actionAdapter implements java.awt.event.ActionListener 
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.removeRunPopupMenu_actionPerformed( e );

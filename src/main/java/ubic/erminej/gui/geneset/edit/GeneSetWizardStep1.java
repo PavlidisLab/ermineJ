@@ -201,7 +201,6 @@ class GeneSetWizardStep1_browseButton_actionAdapter implements java.awt.event.Ac
     }
 
     /** {@inheritDoc} */
-
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.browseButton_actionPerformed();
@@ -229,6 +228,7 @@ class GeneSetWizardStep1_manInputButton_actionAdapter implements java.awt.event.
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.manInputButton_actionPerformed();

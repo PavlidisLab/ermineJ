@@ -48,6 +48,12 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
 
     private Collection<GeneSetTerm> selectedTerms = new HashSet<>();
 
+    /**
+     * <p>Constructor for FilteredGeneSetTreeModel.</p>
+     *
+     * @param annots a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param toWrap a {@link javax.swing.tree.TreeModel} object.
+     */
     public FilteredGeneSetTreeModel( GeneAnnotations annots, TreeModel toWrap ) {
         super( ( TreeNode ) toWrap.getRoot() );
         this.annots = annots;
@@ -60,6 +66,7 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
      *
      * @see javax.swing.tree.DefaultTreeModel#getChild(java.lang.Object, int)
      */
+    /** {@inheritDoc} */
     @Override
     public Object getChild( Object parent, int index ) {
         Enumeration<GeneSetTreeNode> children = ( ( GeneSetTreeNode ) parent ).children();
@@ -98,6 +105,7 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getChildCount( Object parent ) {
         Enumeration<GeneSetTreeNode> children = ( ( GeneSetTreeNode ) parent ).children();
@@ -136,31 +144,64 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
         return i;
     }
 
+    /**
+     * <p>isFilterBySignificance.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isFilterBySignificance() {
         return filterBySignificance;
     }
 
+    /**
+     * <p>isFilterBySize.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isFilterBySize() {
         return filterBySize;
     }
 
+    /**
+     * <p>removeResults.</p>
+     */
     public void removeResults() {
         this.results = null;
     }
 
+    /**
+     * <p>Setter for the field <code>filterBySignificance</code>.</p>
+     *
+     * @param filterBySignificance a boolean.
+     */
     public void setFilterBySignificance( boolean filterBySignificance ) {
         this.filterBySignificance = filterBySignificance;
     }
 
+    /**
+     * <p>Setter for the field <code>filterBySize</code>.</p>
+     *
+     * @param filterBySize a boolean.
+     */
     public void setFilterBySize( boolean filterBySize ) {
         this.filterBySize = filterBySize;
     }
 
+    /**
+     * <p>setFilterSelectedTerms.</p>
+     *
+     * @param selectedTerms a {@link java.util.Collection} object.
+     */
     public void setFilterSelectedTerms( Collection<GeneSetTerm> selectedTerms ) {
         // System.err.println( selectedTerms.size() + " terms selected" );
         this.selectedTerms = selectedTerms;
     }
 
+    /**
+     * <p>Setter for the field <code>results</code>.</p>
+     *
+     * @param results a {@link ubic.erminej.analysis.GeneSetPvalRun} object.
+     */
     public void setResults( GeneSetPvalRun results ) {
         this.results = results;
     }

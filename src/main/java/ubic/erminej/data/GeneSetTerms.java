@@ -48,6 +48,10 @@ import ubic.erminej.Settings;
  * @see GeneSet which represents the actual annotations (and Gene and Probes also keep track of their own)
  * @see GeneSets which provides convenient methods to work with the sets themselves.
  * @see GeneSets which provides convenient methods to work with the sets themselves.
+ * @see GeneSets which provides convenient methods to work with the sets themselves.
+ * @see GeneSets which provides convenient methods to work with the sets themselves.
+ * @see GeneSets which provides convenient methods to work with the sets themselves.
+ * @see GeneSets which provides convenient methods to work with the sets themselves.
  * @see UserDefinedGeneSetManager which helps deal with ones the user has stored separately from GO
  */
 public class GeneSetTerms {

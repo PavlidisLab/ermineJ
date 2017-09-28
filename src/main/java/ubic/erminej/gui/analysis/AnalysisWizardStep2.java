@@ -779,6 +779,7 @@ class PreviewButtonAdapter implements ActionListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
 
@@ -797,7 +798,6 @@ class QuickPickEnter implements java.awt.event.ActionListener {
     }
 
     /** {@inheritDoc} */
-
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.quickpickButton_actionPerformed();
@@ -813,6 +813,7 @@ class RawFileBrowse implements java.awt.event.ActionListener {
     }
 
     @Override
+    /** {@inheritDoc} */
     public void actionPerformed( ActionEvent e ) {
         adaptee.rawBrowseButton_actionPerformed();
     }
@@ -826,6 +827,7 @@ class ScoreFileBrowse implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.scoreBrowseButton_actionPerformed();

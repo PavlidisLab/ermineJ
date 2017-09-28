@@ -65,8 +65,12 @@ public class Histogram {
      * </p>
      *
      * @param minGeneSetSize a int.
+     * @param minGeneSetSize a int.
      * @param numRuns a int.
      * @param max a double.
+     * @param minGeneSetSize a int.
+     * @param minGeneSetSize a int.
+     * @param minGeneSetSize a int.
      * @param minGeneSetSize
      * @param min a double.
      * @param numGeneSetSizes a int.

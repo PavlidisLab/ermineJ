@@ -1,4 +1,4 @@
-/*
+ /*
  * The ermineJ project
  *
  * Copyright (c) 2011 University of British Columbia
@@ -696,7 +696,6 @@ class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionLi
     }
 
     /** {@inheritDoc} */
-
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.actionButton_actionPerformed( e );
@@ -708,6 +707,7 @@ class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionLi
 class StartupPanel_cancelButton_actionAdapter implements java.awt.event.ActionListener {
 
     @Override
+    /** {@inheritDoc} */
     public void actionPerformed( ActionEvent e ) {
         System.exit( 0 );
     }

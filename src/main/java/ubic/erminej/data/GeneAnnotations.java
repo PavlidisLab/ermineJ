@@ -1619,12 +1619,14 @@ public class GeneAnnotations {
 
 class CaseInsensitiveMap<V> extends HashMap<String, V> {
 
+    /** {@inheritDoc} */
     @Override
     public V get( Object key ) {
         if ( !( key instanceof String ) ) return null;
         return super.get( ( ( String ) key ).toLowerCase() );
     }
 
+     /** {@inheritDoc} */
     @Override
     public V put( String key, V value ) {
         return super.put( key.toLowerCase(), value );

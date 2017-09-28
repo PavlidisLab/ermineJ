@@ -754,6 +754,8 @@ class ParserHelper {
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
+     * @param sep a {@link java.lang.String} object.
+     * @param pattern a {@link java.lang.String} object.
      */
     public static int findField( String header, String sep, String pattern ) {
         String[] fields = header.split( sep );
@@ -766,6 +768,12 @@ class ParserHelper {
         return -1;
     }
 
+    /**
+     * <p>getAffyAlternateGeneSymbolIndex.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
+     */
     public static int getAffyAlternateGeneSymbolIndex( String header ) {
 
         String[] alternates = new String[] { "Transcript ID", "Transcript ID(Array Design)", "UniGene ID", "swissprot",
@@ -812,6 +820,7 @@ class ParserHelper {
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
+     * @throws java.io.IOException if any.
      */
     public static int getAffyGeneNameIndex( String header ) throws IOException {
         String pattern = "(Gene Title|gene_assignment)";
@@ -839,6 +848,7 @@ class ParserHelper {
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
+     * @throws java.io.IOException if any.
      */
     public static int getAffyMfIndex( String header ) throws IOException {
         String pattern = "(Gene Ontology Molecular Function|GO_molecular_function)";
@@ -866,6 +876,7 @@ class ParserHelper {
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
+     * @throws java.io.IOException if any.
      */
     public static int getAffyProbeIndex( String header ) throws IOException {
         String pattern = "(Probe Set ID|probeset_id)";
@@ -899,8 +910,10 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>getAgilentGoIndex.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentGoIndex( String header ) {
         String pattern = "GO";
@@ -908,8 +921,10 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>getAgilentNumFields.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentNumFields( String header ) {
         String[] fields = header.split( "\t" );
@@ -917,8 +932,10 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>getAgilentProbeIndex.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentProbeIndex( String header ) {
         String pattern = "elementId";

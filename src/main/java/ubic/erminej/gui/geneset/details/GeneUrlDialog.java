@@ -178,6 +178,7 @@ class CancelButton_actionAdapter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.cancelButton_actionPerformed();
@@ -190,7 +191,6 @@ class SetButton_actionAdapter implements java.awt.event.ActionListener {
     SetButton_actionAdapter( GeneUrlDialog adaptee ) {
         this.adaptee = adaptee;
     }
-
     /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {

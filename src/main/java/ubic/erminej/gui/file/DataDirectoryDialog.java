@@ -161,6 +161,7 @@ class DataDirectoryDialog_actionButton_actionAdapter implements java.awt.event.A
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.actionButton_actionPerformed( e );
@@ -174,6 +175,7 @@ class DataDirectoryDialog_cancelButton_actionAdapter implements java.awt.event.A
         this.adaptee = adaptee;
         /** {@inheritDoc} */
     }
+/** {@inheritDoc} */
 
     @Override
     public void actionPerformed( ActionEvent e ) {
@@ -189,6 +191,7 @@ class DataDirectoryDialog_dataDirBrowseButton_actionAdapter implements java.awt.
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.dataDirBrowseButton_actionPerformed();

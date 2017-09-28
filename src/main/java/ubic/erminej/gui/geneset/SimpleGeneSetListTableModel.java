@@ -39,8 +39,7 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
     /**
      * Offer up only the given gene sets
      *
-     * @param geneDat
-     * @param geneSets
+     * @param geneSets a {@link java.util.Collection} object.
      */
     public SimpleGeneSetListTableModel( Collection<GeneSet> geneSets ) {
         columnNames.add( "Name" );
@@ -53,7 +52,7 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
     /**
      * Offer up all gene sets.
      *
-     * @param geneDat
+     * @param geneDat a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public SimpleGeneSetListTableModel( GeneAnnotations geneDat ) {
         this.geneSets.addAll( geneDat.getGeneSets() );
@@ -63,6 +62,7 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
         columnNames.add( "Genes" );
     }
 
+    /** {@inheritDoc} */
     @Override
     public Class<?> getColumnClass( int columnIndex ) {
         if ( columnIndex == 0 ) {
@@ -77,21 +77,25 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
         return String.class;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getColumnCount() {
         return columnNames.size();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getColumnName( int i ) {
         return columnNames.get( i );
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getRowCount() {
         return this.geneSets.size();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object getValueAt( int i, int j ) {
 
