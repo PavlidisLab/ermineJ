@@ -268,14 +268,14 @@ public class Multifunctionality {
     }
 
     /**
-     * This is like correlationWithGeneMultifunctionality(List<Gene>), but without an order list to start with, and
+     * This is like correlationWithGeneMultifunctionality( ), but without an order list to start with, and
      * intended for cases where the number of genes is smaller than the total number of genes. We do this the same we we
      * do for GO groups. Implementation of algorithm for computing AUC, described in Section 1 of the supplement to
-     * Gillis and Pavlidis; see {@link http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U}.
+     * Gillis and Pavlidis; see https://en.wikipedia.org/wiki/Mann-Whitney_U_test .
      *
      * @param genesInSet a {@link java.util.Collection} object.
      * @return the ROC AUC for the genes in the set compared to the multifunctionality ranking
-     * @see ROC.java in baseCode for a generic implementation
+     * @see ubic.basecode.math.ROC for a generic implementation
      */
     public double enrichmentForMultifunctionality( Collection<Gene> genesInSet ) {
 
@@ -728,7 +728,9 @@ class MFV implements Comparable<MFV> {
     private Double a;
 
     /**
-     * <p>Constructor for MFV.</p>
+     * <p>
+     * Constructor for MFV.
+     * </p>
      *
      * @param a a {@link java.lang.Double} object.
      * @param p a {@link java.lang.Double} object.

@@ -43,7 +43,6 @@ import ubic.basecode.util.StatusViewer;
 /**
  * Little oft-used functions.
  *
- * @version $Id$
  * @author paul
  */
 public class GuiUtil {
@@ -199,11 +198,11 @@ public class GuiUtil {
 
     /**
      * <p>
-     * testFile.
+     * testFile. see {@link ubic.basecode.util.FileTools#checkPathIsReadableFile(String)}
      * </p>
      *
      * @param filename a {@link java.lang.String} object.
-     * @see basecode.util.FileTools#checkPathIsReadableFile(String)
+     * 
      * @return a boolean.
      */
     public static boolean testFile( String filename ) {

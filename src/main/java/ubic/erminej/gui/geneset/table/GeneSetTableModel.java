@@ -52,7 +52,6 @@ import ubic.erminej.gui.util.Colors;
  * Model for displaying list of gene sets and results in the main frame.
  *
  * @author pavlidis
- * @version $Id$
  * @see GeneSetDetailsTableModel for model used for displaying the genes in a single gene set.
  */
 public class GeneSetTableModel extends AbstractTableModel {

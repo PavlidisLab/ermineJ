@@ -148,7 +148,7 @@ public class GeneAnnotations {
      *
      * @param start a {@link ubic.erminej.data.GeneAnnotations} object.
      * @param elements a {@link java.util.Collection} object.
-     * @see GeneAnnotations(start, elements, pruneUnannotated)
+     * @see ubic.erminej.data.GeneAnnotations
      */
     public GeneAnnotations( GeneAnnotations start, Collection<Element> elements ) {
         this( start, elements, true );
@@ -224,7 +224,7 @@ public class GeneAnnotations {
      *
      * @param geneSymbols A List of gene symbols (e.g., ACTB), corresponding to the elements (in the same order)
      * @param goTerms A List of Collections of Strings corresponding to the GO terms for each probe.
-     * @throws IllegaArgumentException if any of the required arguments are null, don't have sizes that match, etc.
+     * @throws IllegalArgumentException if any of the required arguments are null, don't have sizes that match, etc.
      * @param m a {@link ubic.basecode.util.StatusViewer} object.
      */
     public GeneAnnotations( List<Gene> geneSymbols, List<Collection<GeneSetTerm>> goTerms, StatusViewer m ) {
@@ -1626,7 +1626,7 @@ class CaseInsensitiveMap<V> extends HashMap<String, V> {
         return super.get( ( ( String ) key ).toLowerCase() );
     }
 
-     /** {@inheritDoc} */
+    /** {@inheritDoc} */
     @Override
     public V put( String key, V value ) {
         return super.put( key.toLowerCase(), value );

@@ -54,12 +54,11 @@ import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
 /**
- * Parse and store probe->score associations. The values are stored in a Map probeToPvalMap. This is used to see what
+ * Parse and store probe-&gt;score associations. The values are stored in a Map probeToPvalMap. This is used to see what
  * elements are int the data set, as well as the score for each probe.
  *
  * @author Shahmil Merchant
  * @author Paul Pavlidis
- * @version $Id$
  */
 public class GeneScores {
 
@@ -548,7 +547,7 @@ public class GeneScores {
      * rankLargeScoresBest.
      * </p>
      *
-     * @see also Settings.upperTail(), which does the same thing.
+     * @see Settings#upperTail
      * @return true if the values returned by methods such as getGeneToScoreMap are returning values which should be
      *         treated as "big better". This will be true in the following (common) cases based on the settings the user
      *         made:

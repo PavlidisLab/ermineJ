@@ -235,7 +235,7 @@ public class ErmineJCli {
      * initialize.
      * </p>
      *
-     * @see ubic.erminej.gui.MainFrame.readDataFilesForStartup
+     * @see ubic.erminej.gui.MainFrame#readDataFilesForStartup
      */
     protected void initialize() {
         try {

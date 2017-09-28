@@ -40,19 +40,16 @@ import ubic.erminej.Settings;
 /**
  * Maintain information on GeneSetTerms (including but not limited GO terms). Note that this does not keep track of
  * which genes are annotated with these terms.
+ * 
+ * Related: {@link ubic.erminej.data.GeneSet}, which represents the actual annotations (and Gene and Probes also keep
+ * track of their own)
+ * and {@link ubic.erminej.data.UserDefinedGeneSetManager} which helps deal with ones the user has stored separately from
+ * GO
  *
  * @author Paul Pavlidis
  * @author Homin Lee
- * @version $Id$
  * @see GeneAnnotations
- * @see GeneSet which represents the actual annotations (and Gene and Probes also keep track of their own)
- * @see GeneSets which provides convenient methods to work with the sets themselves.
- * @see GeneSets which provides convenient methods to work with the sets themselves.
- * @see GeneSets which provides convenient methods to work with the sets themselves.
- * @see GeneSets which provides convenient methods to work with the sets themselves.
- * @see GeneSets which provides convenient methods to work with the sets themselves.
- * @see GeneSets which provides convenient methods to work with the sets themselves.
- * @see UserDefinedGeneSetManager which helps deal with ones the user has stored separately from GO
+ * 
  */
 public class GeneSetTerms {
 

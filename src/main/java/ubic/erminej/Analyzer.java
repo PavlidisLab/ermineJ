@@ -116,7 +116,6 @@ public class Analyzer extends Thread {
      * doAnalysis.
      * </p>
      *
-     * @throws IOException if any.
      * @return a {@link java.util.Collection} object.
      */
     public synchronized Collection<GeneSetPvalRun> doAnalysis() {
@@ -209,6 +208,7 @@ public class Analyzer extends Thread {
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     public void run() {
         try {

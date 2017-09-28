@@ -46,7 +46,6 @@ import ubic.erminej.data.GeneSetTerm;
  * sets, to avoid overcorrecting.
  *
  * @author Paul Pavlidis
- * @version $Id$
  */
 public class MultipleTestCorrector extends AbstractLongTask {
     private static final int DEFAULT_WY_TRIALS = 10000;
@@ -178,7 +177,6 @@ public class MultipleTestCorrector extends AbstractLongTask {
     /**
      * Run WY with a default number of trials.
      *
-     * @see westfallyoung(numtrials)
      */
     public void westfallyoung() {
         if ( geneScores == null )
@@ -198,12 +196,14 @@ public class MultipleTestCorrector extends AbstractLongTask {
      * <li>a. qk = pk (class with worst pvalue)
      * <li>b. qk-1 = min (qk, pk-1) ...
      * </ol>
-     * <li>at each step a.... if qi <= pi, count_i++ end loop.
+     * <li>at each step a.... if qi &lt;= pi, count_i++ end loop.
      * <li>p_i* = count_i/n 7. enforce monotonicity by using successive maximization.
      * </ol>
+     * 
+     * todo get this working with the other types of scoring methods (ORA, ROC for example)
      *
-     * @param trials How many random trials to do. According to W-Y, it should be >=10,000.
-     * @todo get this working with the other types of scoring methods (ORA, ROC for example)
+     * @param trials How many random trials to do. According to W-Y, it should be &gt;=10,000.
+     * 
      */
     public void westfallyoung( int trials ) {
 

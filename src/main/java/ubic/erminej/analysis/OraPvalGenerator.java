@@ -45,7 +45,6 @@ import ubic.erminej.data.GeneSetTerm;
  * Compute gene set scores based on over-representation analysis (ORA).
  *
  * @author Paul Pavlidis
- * @version $Id$
  */
 public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
@@ -101,7 +100,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution.
      *
-     * @todo make this private and called by OraPvalGenerator.
+     * TODO make this private and called by OraPvalGenerator.
      */
     public void computeCounts() {
 
@@ -121,7 +120,6 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      *
      * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#generateGeneSetResults()
      */
-    /** {@inheritDoc} */
     @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
 

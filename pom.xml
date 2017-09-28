@@ -556,6 +556,7 @@
 				<version>3.0.0-M1</version>
 				<configuration>
 					<quiet>true</quiet>
+					<failOnError>false</failOnError>
 					<links>
 						<link>http://docs.oracle.com/javase/8/docs/api</link>
 						<link>http://dst.lbl.gov/ACSSoftware/colt/api/</link>
