@@ -553,12 +553,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9</version>
+				<version>3.0.0-M1</version>
 				<configuration>
 					<quiet>true</quiet>
 					<links>
-						<link>http://docs.oracle.com/javase/6/docs/api</link>
-						<link>http://dsd.lbl.gov/~hoschek/colt/api/</link>
+						<link>http://docs.oracle.com/javase/8/docs/api</link>
+						<link>http://dst.lbl.gov/ACSSoftware/colt/api/</link>
 						<link>http://commons.apache.org/proper/commons-collections/javadocs/api-release/</link>
 						<link>http://commons.apache.org/proper/commons-lang/javadocs/api-3.1</link>
 						<limk>http://chibi.ubc.ca/faculty/pavlidis/basecode/apidocs</limk>
