@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,6 +53,10 @@ import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.xy.DefaultXYDataset;
 import org.jfree.data.xy.XYSeries;
 
+import cern.colt.list.DoubleArrayList;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.jet.math.Functions;
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.Rank;
@@ -68,14 +72,10 @@ import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Multifunctionality;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.GuiUtil;
-import cern.colt.list.DoubleArrayList;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.jet.math.Functions;
 
 /**
  * Visualizations of multifunctionality statistics across all the gene sets. TODO refactor non-visualization code.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -91,8 +91,12 @@ public class MultiFuncDiagWindow extends JFrame {
     private final StatusViewer statusMessenger;
 
     /**
-     * @param geneAnnots
-     * @param geneScores
+     * <p>
+     * Constructor for MultiFuncDiagWindow.
+     * </p>
+     *
+     * @param mainFrame a {@link ubic.erminej.gui.MainFrame} object.
+     * @throws java.lang.Exception if any.
      */
     public MultiFuncDiagWindow( final MainFrame mainFrame ) throws Exception {
         super( "Multifunc. diagnostics" );
@@ -277,7 +281,7 @@ public class MultiFuncDiagWindow extends JFrame {
 
     /**
      * Plot of ranks, smoothed.
-     * 
+     *
      * @param geneAnnots
      * @param geneScores
      * @return
@@ -458,10 +462,10 @@ public class MultiFuncDiagWindow extends JFrame {
         d.setTitle( "Choose which gene scores to display" );
         d.setMinimumSize( new Dimension( 200, 100 ) );
         GuiUtil.centerContainer( d );
-        final JComboBox<String> runComboBox = new JComboBox<String>();
+        final JComboBox<String> runComboBox = new JComboBox<>();
         runComboBox.setMinimumSize( new Dimension( 140, 19 ) );
 
-        final Map<String, GeneSetPvalRun> scoreSettings = new HashMap<String, GeneSetPvalRun>();
+        final Map<String, GeneSetPvalRun> scoreSettings = new HashMap<>();
         int i = 1;
         for ( GeneSetPvalRun r : mainFrame.getResultSets() ) {
             // FIXME really we need to do this for different scores, not different runs (which could all use the

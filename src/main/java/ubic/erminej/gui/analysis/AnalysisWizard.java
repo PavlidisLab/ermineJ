@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,10 @@ import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.Wizard;
 
 /**
+ * <p>
+ * AnalysisWizard class.
+ * </p>
+ *
  * @author Homin Lee
  * @version $Id$
  */
@@ -66,6 +70,14 @@ public class AnalysisWizard extends Wizard {
     AnalysisWizardStep5 step5;
     int maxSteps = 5;
 
+    /**
+     * <p>
+     * Constructor for AnalysisWizard.
+     * </p>
+     *
+     * @param callingframe a {@link ubic.erminej.gui.MainFrame} object.
+     * @param geneAnnots a {@link ubic.erminej.data.GeneAnnotations} object.
+     */
     public AnalysisWizard( MainFrame callingframe, GeneAnnotations geneAnnots ) {
         super( callingframe, WIZARD_PREFERRED_WIDTH, WIZARD_PREFERRED_HEIGHT );
         this.callingframe = callingframe;
@@ -94,36 +106,81 @@ public class AnalysisWizard extends Wizard {
     }
 
     /**
-     * @return
+     * <p>
+     * Getter for the field <code>analysisType</code>.
+     * </p>
+     *
+     * @return a ubic.erminej.Settings$Method object.
      */
     public Settings.Method getAnalysisType() {
         return this.analysisType;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>geneAnnots</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
+     */
     public GeneAnnotations getGeneAnnots() {
         return geneAnnots;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>geneScoreMethod</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.SettingsHolder.GeneScoreMethod} object.
+     */
     public GeneScoreMethod getGeneScoreMethod() {
         return geneScoreMethod;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>settings</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.SettingsHolder} object.
+     */
     public SettingsHolder getSettings() {
         return settings;
     }
 
     /**
-     * @param val
+     * <p>
+     * Setter for the field <code>analysisType</code>.
+     * </p>
+     *
+     * @param val a {@link ubic.erminej.SettingsHolder.Method} object.
      */
     public void setAnalysisType( Method val ) {
         this.analysisType = val;
         this.checkNumSteps();
     }
 
+    /**
+     * <p>
+     * Setter for the field <code>geneScoreMethod</code>.
+     * </p>
+     *
+     * @param geneScoreMethod a {@link ubic.erminej.SettingsHolder.GeneScoreMethod} object.
+     */
     public void setGeneScoreMethod( GeneScoreMethod geneScoreMethod ) {
         this.geneScoreMethod = geneScoreMethod;
     }
 
+    void saveValues() {
+        step1.saveValues();
+        step2.saveValues();
+        step3.saveValues();
+        step4.saveValues();
+        step5.saveValues();
+    }
+
+    /** {@inheritDoc} */
     @Override
     protected void backButton_actionPerformed( ActionEvent e ) {
         clearStatus();
@@ -177,11 +234,13 @@ public class AnalysisWizard extends Wizard {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         dispose();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void finishEditing( ActionEvent e ) {
         if ( step2.isReady() && step3.isReady() && step4.isReady() ) {
@@ -201,6 +260,7 @@ public class AnalysisWizard extends Wizard {
         this.dispose();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void nextButton_actionPerformed( ActionEvent e ) {
         clearStatus();
@@ -261,16 +321,8 @@ public class AnalysisWizard extends Wizard {
         }
     }
 
-    void saveValues() {
-        step1.saveValues();
-        step2.saveValues();
-        step3.saveValues();
-        step4.saveValues();
-        step5.saveValues();
-    }
-
     /**
-     * 
+     *
      */
     private void checkIfReady() {
         if ( step2.isReady() ) {

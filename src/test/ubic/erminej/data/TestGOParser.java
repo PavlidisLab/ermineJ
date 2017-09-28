@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ public class TestGOParser {
 
     /**
      * This sample is of a rather old version of the ontology
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -69,7 +69,7 @@ public class TestGOParser {
 
     /**
      * Was failing with 'unrecognized aspect'
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -122,7 +122,7 @@ public class TestGOParser {
 
     /**
      * Old rdf format. Really old.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -172,7 +172,7 @@ public class TestGOParser {
 
     /**
      * Faulty file doesn't have acc elements.
-     * 
+     *
      * @throws Exception
      */
     @Test

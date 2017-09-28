@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,7 @@ import ubic.basecode.graphics.text.Util;
 
 /**
  * Create text going up vertically for the headings.
- * 
+ *
  * @author Will Braynen
  * @version $Id$
  */
@@ -42,7 +42,21 @@ public class JVerticalHeaderRenderer extends JTableHeader implements TableCellRe
     final int PREFERRED_HEIGHT = 80;
     final int MAX_TEXT_LENGTH = 12;
 
+    /** {@inheritDoc} */
+    @Override
+    public void firePropertyChange( String propertyName, boolean oldValue, boolean newValue ) {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Dimension getPreferredSize() {
+
+        return new Dimension( super.getPreferredSize().width, PREFERRED_HEIGHT );
+    }
+
     /**
+     * {@inheritDoc}
+     *
      * This method is called each time a column header using this renderer needs to be rendered.
      */
     @Override
@@ -63,6 +77,23 @@ public class JVerticalHeaderRenderer extends JTableHeader implements TableCellRe
         return this;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void revalidate() {
+    }
+
+    // The following methods override the defaults for performance reasons
+    /** {@inheritDoc} */
+    @Override
+    public void validate() {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void firePropertyChange( String propertyName, Object oldValue, Object newValue ) {
+    }
+
+    /** {@inheritDoc} */
     @Override
     protected void paintComponent( Graphics g ) {
 
@@ -76,28 +107,5 @@ public class JVerticalHeaderRenderer extends JTableHeader implements TableCellRe
         int x = getSize().width - 4;
         int y = getSize().height - 4;
         Util.drawVerticalString( g, m_columnName, font, x, y );
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-
-        return new Dimension( super.getPreferredSize().width, PREFERRED_HEIGHT );
-    }
-
-    // The following methods override the defaults for performance reasons
-    @Override
-    public void validate() {
-    }
-
-    @Override
-    public void revalidate() {
-    }
-
-    @Override
-    protected void firePropertyChange( String propertyName, Object oldValue, Object newValue ) {
-    }
-
-    @Override
-    public void firePropertyChange( String propertyName, boolean oldValue, boolean newValue ) {
     }
 }

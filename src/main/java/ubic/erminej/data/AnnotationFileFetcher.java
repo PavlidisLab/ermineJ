@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -29,13 +29,6 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.erminej.Settings;
-import ubic.erminej.gui.file.AnnotationListFrame;
-import ubic.gemma.model.common.auditAndSecurity.eventType.AuditEventType;
-import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
-
 import com.sdicons.json.mapper.JSONMapper;
 import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.mapper.helper.SimpleMapperHelper;
@@ -47,9 +40,16 @@ import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 
+import antlr.RecognitionException;
+import antlr.TokenStreamException;
+import ubic.erminej.Settings;
+import ubic.erminej.gui.file.AnnotationListFrame;
+import ubic.gemma.model.common.auditAndSecurity.eventType.AuditEventType;
+import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
+
 /**
  * Assistance in getting gene annotation files.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -58,70 +58,10 @@ public class AnnotationFileFetcher {
     private static Log log = LogFactory.getLog( AnnotationFileFetcher.class );
 
     /**
-     * Show a list of available annotation files.
-     */
-    public ArrayDesignValueObject pickAnnotation() {
-
-        List<ArrayDesignValueObject> designs = fetchPlatformList();
-
-        AnnotationListFrame f = new AnnotationListFrame( designs );
-
-        return f.getSelected();
-    }
-
-    /**
-     * @return
-     */
-    private List<ArrayDesignValueObject> fetchPlatformList() {
-        List<ArrayDesignValueObject> designs = null;
-
-        FutureTask<List<ArrayDesignValueObject>> future = new FutureTask<List<ArrayDesignValueObject>>( new Callable<List<ArrayDesignValueObject>>() {
-            @Override
-            public List<ArrayDesignValueObject> call() throws Exception {
-                return fetchList();
-            }
-
-        } );
-
-        Executors.newSingleThreadExecutor().execute( future );
-        try {
-            StopWatch timer = new StopWatch();
-            timer.start();
-            while ( !future.isDone() ) {
-                try {
-                    Thread.sleep( 2000 );
-                    log.info( "Waiting for response ..." );
-                } catch ( InterruptedException ie ) {
-                    throw new IOException( "Fetching platforms interrupted" );
-                }
-                if ( timer.getTime() > 20000 ) {
-                    throw new IOException( "Fetching platforms timed out" );
-                }
-            }
-
-            List<ArrayDesignValueObject> list = future.get();
-            if ( !list.isEmpty() ) {
-                designs = list;
-            } else {
-                throw new IOException( "Got no platforms" );
-            }
-        } catch ( ExecutionException e ) {
-            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
-        } catch ( InterruptedException e ) {
-            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
-        } catch ( IOException e ) {
-            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
-        }
-
-        log.info( designs.size() + " designs read" );
-        return designs;
-    }
-
-    /**
      * Get the list of available annotations
-     * 
-     * @return
-     * @throws IOException
+     *
+     * @throws java.io.IOException if any.
+     * @return a {@link java.util.List} object.
      */
     public List<ArrayDesignValueObject> fetchList() throws IOException {
         try {
@@ -140,12 +80,30 @@ public class AnnotationFileFetcher {
     }
 
     /**
-     * @param v
-     * @return
+     * Show a list of available annotation files.
+     *
+     * @return a {@link ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject} object.
+     */
+    public ArrayDesignValueObject pickAnnotation() {
+
+        List<ArrayDesignValueObject> designs = fetchPlatformList();
+
+        AnnotationListFrame f = new AnnotationListFrame( designs );
+
+        return f.getSelected();
+    }
+
+    /**
+     * <p>
+     * convert.
+     * </p>
+     *
+     * @param v a {@link com.sdicons.json.model.JSONValue} object.
+     * @return a {@link java.util.List} object.
      */
     protected List<ArrayDesignValueObject> convert( JSONValue v ) {
 
-        List<ArrayDesignValueObject> result = new ArrayList<ArrayDesignValueObject>();
+        List<ArrayDesignValueObject> result = new ArrayList<>();
         JSONObject o = ( JSONObject ) v;
 
         JSONArray recs = ( ( JSONArray ) o.get( "data" ) );
@@ -201,6 +159,54 @@ public class AnnotationFileFetcher {
         }
 
         return result;
+    }
+
+    /**
+     * @return
+     */
+    private List<ArrayDesignValueObject> fetchPlatformList() {
+        List<ArrayDesignValueObject> designs = null;
+
+        FutureTask<List<ArrayDesignValueObject>> future = new FutureTask<>( new Callable<List<ArrayDesignValueObject>>() {
+            @Override
+            public List<ArrayDesignValueObject> call() throws Exception {
+                return fetchList();
+            }
+
+        } );
+
+        Executors.newSingleThreadExecutor().execute( future );
+        try {
+            StopWatch timer = new StopWatch();
+            timer.start();
+            while ( !future.isDone() ) {
+                try {
+                    Thread.sleep( 2000 );
+                    log.info( "Waiting for response ..." );
+                } catch ( InterruptedException ie ) {
+                    throw new IOException( "Fetching platforms interrupted" );
+                }
+                if ( timer.getTime() > 20000 ) {
+                    throw new IOException( "Fetching platforms timed out" );
+                }
+            }
+
+            List<ArrayDesignValueObject> list = future.get();
+            if ( !list.isEmpty() ) {
+                designs = list;
+            } else {
+                throw new IOException( "Got no platforms" );
+            }
+        } catch ( ExecutionException e ) {
+            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
+        } catch ( InterruptedException e ) {
+            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
+        } catch ( IOException e ) {
+            throw new RuntimeException( "Fetching platforms failed: " + e.getMessage(), e );
+        }
+
+        log.info( designs.size() + " designs read" );
+        return designs;
     }
 
 }

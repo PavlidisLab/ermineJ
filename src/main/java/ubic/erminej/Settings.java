@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,17 +43,17 @@ import org.apache.log4j.PatternLayout;
 
 import ubic.basecode.util.ConfigUtils;
 import ubic.basecode.util.FileTools;
-
-import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneAnnotationParser.Format;
+import ubic.erminej.data.GeneSetTerm;
 
 /**
  * Basically a wrapper around a Commons Configuration object.
- * 
+ *
  * @author Paul Pavlidis (total rewrite)
  * @author Kiran Keshav
  * @author Homin Lee
  * @author Will Braynen
+ * @version $Id: $Id
  */
 public class Settings extends SettingsHolder {
 
@@ -61,12 +61,15 @@ public class Settings extends SettingsHolder {
      * URLS for web services used by the software. Use String.format to replace the %s with the desired platform short
      * name.
      */
+    /** Constant <code>ANNOTATION_FILE_FETCH_RESTURL="http://www.chibi.ubc.ca/Gemma/rest/v2/p"{trunked}</code> */
     public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/%s/annotations";
 
     // public static final String ANNOTATION_FILE_FETCH_RESTURL =
     // "http://localhost:8080/Gemma/rest/v2/platforms/?offset=0&limit=100000";
+    /** Constant <code>ANNOTATION_FILE_LIST_RESTURL="http://www.chibi.ubc.ca/Gemma/rest/v2/p"{trunked}</code> */
     public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/?offset=0&limit=100000";
 
+    /** Constant <code>HELPURL="http://erminej.chibi.ubc.ca/help"</code> */
     public static final String HELPURL = "http://erminej.chibi.ubc.ca/help";
 
     /**
@@ -100,10 +103,10 @@ public class Settings extends SettingsHolder {
     /**
      * Write a configuration to the given file - but just settings relevant to analysis (not window locations, for
      * example).
-     * 
-     * @param settings
-     * @param fileName
-     * @throws IOException
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param fileName a {@link java.lang.String} object.
+     * @throws java.io.IOException if any.
      */
     public static void writeAnalysisSettings( SettingsHolder settings, String fileName ) throws IOException {
 
@@ -127,10 +130,10 @@ public class Settings extends SettingsHolder {
     /**
      * Write a configuration to the given output - but just settings relevant to analysis (not window locations, for
      * example).
-     * 
-     * @param settings
-     * @param out
-     * @throws IOException
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param out a {@link java.io.Writer} object.
+     * @throws java.io.IOException if any.
      */
     public static void writeAnalysisSettings( SettingsHolder settings, Writer out ) throws IOException {
         PropertiesConfiguration configToWrite = settings.getConfig();
@@ -169,17 +172,21 @@ public class Settings extends SettingsHolder {
 
     /**
      * Create the settings, reading them from a file to be determined by the constructor.
-     * 
-     * @throws IOException if there are problems setting up the configuration.
+     *
+     * @throws java.io.IOException if there are problems setting up the configuration.
      */
     public Settings() throws IOException {
         this( true );
     }
 
     /**
+     * <p>
+     * Constructor for Settings.
+     * </p>
+     *
      * @param readFromFile if true, the user's config will be read in. If false, a blank (default) configuration will be
      *        initialized.
-     * @throws IOException
+     * @throws java.io.IOException if any.
      */
     public Settings( boolean readFromFile ) throws IOException {
         super();
@@ -199,8 +206,8 @@ public class Settings extends SettingsHolder {
 
     /**
      * Creates settings object from a copy. Note that in this situation, autoSave is FALSE.
-     * 
-     * @param settings - settings object to copy
+     *
+     * @param settingsToCopy a {@link ubic.erminej.SettingsHolder} object.
      */
     public Settings( SettingsHolder settingsToCopy ) {
         this.configBuilder = new FileBasedConfigurationBuilder<>( PropertiesConfiguration.class );
@@ -220,9 +227,10 @@ public class Settings extends SettingsHolder {
     /**
      * Create a Settings object from the header of a results file or from a regular configuration file - autosave will
      * not be set so they cannot be changed.
-     * 
-     * @param configurationFile
-     * @throws IOException
+     *
+     * @param configurationFile a {@link java.lang.String} object.
+     * @throws java.io.IOException if any.
+     * @throws org.apache.commons.configuration.ConfigurationException if any.
      */
     public Settings( String configurationFile ) throws ConfigurationException, IOException {
         this.configBuilder = ConfigUtils.getConfigBuilder( configurationFile );
@@ -232,9 +240,10 @@ public class Settings extends SettingsHolder {
 
     /**
      * Autosave will not be set.
-     * 
-     * @param resource
-     * @throws IOException
+     *
+     * @param resource a {@link java.net.URL} object.
+     * @throws java.io.IOException if any.
+     * @throws org.apache.commons.configuration.ConfigurationException if any.
      */
     public Settings( URL resource ) throws ConfigurationException, IOException {
         this.configBuilder = ConfigUtils.getConfigBuilder( resource );
@@ -242,9 +251,7 @@ public class Settings extends SettingsHolder {
         initUserDirectories();
     }
 
-    /**
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public Format getAnnotFormat() {
         String storedValue = config.getString( ANNOT_FORMAT, Format.DEFAULT.toString() );
@@ -273,9 +280,7 @@ public class Settings extends SettingsHolder {
         return Format.valueOf( storedValue );
     }
 
-    /**
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public Settings.Method getClassScoreMethod() {
         String storedValue = config.getString( CLASS_SCORE_METHOD, SettingsHolder.Method.ORA.toString() );
@@ -306,9 +311,7 @@ public class Settings extends SettingsHolder {
         return SettingsHolder.Method.valueOf( storedValue );
     }
 
-    /**
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public PropertiesConfiguration getConfig() {
         if ( config == null ) loadOrCreateInitialConfig();
@@ -319,9 +322,7 @@ public class Settings extends SettingsHolder {
         return config;
     }
 
-    /**
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public MultiElementHandling getGeneRepTreatment() {
         String storedValue = config.getString( GENE_REP_TREATMENT, MultiElementHandling.BEST.toString() );
@@ -347,9 +348,10 @@ public class Settings extends SettingsHolder {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ubic.erminej.SettingsHolder#getGeneScoreThreshold()
      */
+    /** {@inheritDoc} */
     @Override
     public double getGeneScoreThreshold() {
 
@@ -368,9 +370,7 @@ public class Settings extends SettingsHolder {
         return config.getDouble( GENE_SCORE_THRESHOLD_KEY, 0.001 );
     }
 
-    /**
-     * @return the method to be used to combine scores. This is only relevant for the gene set resampling method.
-     */
+    /** {@inheritDoc} */
     @Override
     public GeneScoreMethod getGeneSetResamplingScoreMethod() {
         String storedValue = config.getString( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
@@ -398,79 +398,165 @@ public class Settings extends SettingsHolder {
         return SettingsHolder.GeneScoreMethod.valueOf( storedValue );
     }
 
+    /**
+     * <p>
+     * getSettingsHolder.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.SettingsHolder} object.
+     */
     public SettingsHolder getSettingsHolder() {
         return new SettingsHolder( config );
     }
 
+    /**
+     * <p>
+     * isAutoSaving.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean isAutoSaving() {
         return this.configBuilder.isAutoSave();
     }
 
     /**
-     * @param b
+     * <p>
+     * setAlwaysUseEmpirical.
+     * </p>
+     *
+     * @param b a boolean.
      */
     public void setAlwaysUseEmpirical( boolean b ) {
         this.config.setProperty( ALWAYS_USE_EMPIRICAL, b );
     }
 
+    /**
+     * <p>
+     * setAnnotFile.
+     * </p>
+     *
+     * @param val a {@link java.lang.String} object.
+     */
     public void setAnnotFile( String val ) {
         this.config.setProperty( ANNOT_FILE, val );
     }
 
     /**
-     * @param arg
+     * <p>
+     * setAnnotFormat.
+     * </p>
+     *
+     * @param arg a {@link ubic.erminej.data.GeneAnnotationParser.Format} object.
      */
     public void setAnnotFormat( Format arg ) {
         this.config.setProperty( ANNOT_FORMAT, arg.toString() );
     }
 
     /**
-     * @param b
+     * <p>
+     * setBigIsBetter.
+     * </p>
+     *
+     * @param b a boolean.
      */
     public void setBigIsBetter( boolean b ) {
         this.config.setProperty( BIG_IS_BETTER, b );
     }
 
     /**
+     * <p>
+     * setClassFile.
+     * </p>
+     *
      * @param val This is the GO XML file.
      */
     public void setClassFile( String val ) {
         this.config.setProperty( CLASS_FILE, val );
     }
 
+    /**
+     * <p>
+     * setClassScoreMethod.
+     * </p>
+     *
+     * @param val a Settings.Method object.
+     */
     public void setClassScoreMethod( Settings.Method val ) {
         this.config.setProperty( CLASS_SCORE_METHOD, val.toString() );
     }
 
+    /**
+     * <p>
+     * setCustomGeneSetDirectory.
+     * </p>
+     *
+     * @param val a {@link java.lang.String} object.
+     */
     public void setCustomGeneSetDirectory( String val ) {
         this.config.setProperty( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, val );
     }
 
+    /**
+     * <p>
+     * setDataCol.
+     * </p>
+     *
+     * @param val a int.
+     */
     public void setDataCol( int val ) {
         log.debug( "Setting data start column to " + val );
         this.config.setProperty( DATA_COL, val );
     }
 
+    /**
+     * <p>
+     * setDataDirectory.
+     * </p>
+     *
+     * @param val a {@link java.lang.String} object.
+     */
     public void setDataDirectory( String val ) {
         this.config.setProperty( DATA_DIRECTORY, val );
     }
 
+    /**
+     * <p>
+     * setDoLog.
+     * </p>
+     *
+     * @param val a boolean.
+     */
     public void setDoLog( boolean val ) {
         this.config.setProperty( DO_LOG, new Boolean( val ) );
     }
 
+    /**
+     * <p>
+     * setFilterNonSpecific.
+     * </p>
+     *
+     * @param val a boolean.
+     */
     public void setFilterNonSpecific( boolean val ) {
         this.config.setProperty( FILTER_NONSPECIFIC, new Boolean( val ) );
     }
 
+    /**
+     * <p>
+     * setGeneRepTreatment.
+     * </p>
+     *
+     * @param val a MultiElementHandling object.
+     */
     public void setGeneRepTreatment( MultiElementHandling val ) {
         this.config.setProperty( GENE_REP_TREATMENT, val.toString() );
     }
 
     /**
      * Only applies to ORA
-     * 
-     * @param val
+     *
+     * @param val a double.
      */
     public void setGeneScoreThreshold( double val ) {
         log.debug( "gene score threshold set to " + val );
@@ -479,15 +565,19 @@ public class Settings extends SettingsHolder {
 
     /**
      * Set the method used to compute how values are combined (GSR method only).
-     * 
-     * @param val
+     *
+     * @param val a Settings.GeneScoreMethod object.
      */
     public void setGeneSetResamplingScoreMethod( Settings.GeneScoreMethod val ) {
         this.config.setProperty( GENE_SET_RESAMPLING_SCORE_METHOD, val.toString() );
     }
 
     /**
-     * @param url
+     * <p>
+     * setGeneUrlBase.
+     * </p>
+     *
+     * @param url a {@link java.lang.String} object.
      */
     public void setGeneUrlBase( String url ) {
         this.config.setProperty( GENE_URL_BASE, url );
@@ -495,26 +585,51 @@ public class Settings extends SettingsHolder {
 
     /**
      * Mostly used for testing
-     * 
-     * @param goldStandardFile
+     *
+     * @param goldStandardFile a {@link java.lang.String} object.
      */
     public void setGoldStandardFile( String goldStandardFile ) {
         this.config.setProperty( GOLD_STANDARD_FILE, goldStandardFile );
     }
 
+    /**
+     * <p>
+     * setIterations.
+     * </p>
+     *
+     * @param val a int.
+     */
     public void setIterations( int val ) {
         this.config.setProperty( ITERATIONS, val );
     }
 
+    /**
+     * <p>
+     * setMaxClassSize.
+     * </p>
+     *
+     * @param val a int.
+     */
     public void setMaxClassSize( int val ) {
         this.config.setProperty( MAX_CLASS_SIZE, val );
     }
 
+    /**
+     * <p>
+     * setMinClassSize.
+     * </p>
+     *
+     * @param val a int.
+     */
     public void setMinClassSize( int val ) {
         this.config.setProperty( MIN_CLASS_SIZE, val );
     }
 
     /**
+     * <p>
+     * setMtc.
+     * </p>
+     *
      * @param mtc The mtc to set.
      */
     public void setMtc( MultiTestCorrMethod mtc ) {
@@ -523,32 +638,53 @@ public class Settings extends SettingsHolder {
 
     /**
      * Mostly used for testing
-     * 
-     * @param outputFile
+     *
+     * @param outputFile a {@link java.lang.String} object.
      */
     public void setOutputFile( String outputFile ) {
         this.config.setProperty( OUTPUT_FILE, outputFile );
     }
 
+    /**
+     * <p>
+     * setPrefFile.
+     * </p>
+     *
+     * @param val a {@link java.lang.String} object.
+     */
     public void setPrefFile( String val ) {
         this.config.setProperty( PREFERENCES_FILE_NAME, val );
     }
 
     /**
      * Set an arbitrary property. Handy for 'ad hoc' configuration parameters only used by specific classes.
-     * 
-     * @param key
-     * @param value
+     *
+     * @param key a {@link java.lang.String} object.
+     * @param value a {@link java.lang.Object} object.
      */
     public void setProperty( String key, Object value ) {
         log.debug( "Setting property: " + key + " = " + value );
         this.getConfig().setProperty( key, value );
     }
 
+    /**
+     * <p>
+     * setQuantile.
+     * </p>
+     *
+     * @param val a int.
+     */
     public void setQuantile( int val ) {
         this.config.setProperty( QUANTILE_CONFIG_NAME, val );
     }
 
+    /**
+     * <p>
+     * setSaveAllGenesInOutput.
+     * </p>
+     *
+     * @param saveAllGenes a boolean.
+     */
     public void setSaveAllGenesInOutput( boolean saveAllGenes ) {
         config.setProperty( SAVE_ALL_GENES_IN_OUTPUT, saveAllGenes );
 
@@ -556,14 +692,21 @@ public class Settings extends SettingsHolder {
 
     /**
      * Which column of the input score file has the scores. 2 means the first column after the row names.
-     * 
-     * @param val
+     *
+     * @param val a int.
      */
     public void setScoreCol( int val ) {
         log.debug( "Setting score start column to " + val );
         this.config.setProperty( SCORE_COL, val );
     }
 
+    /**
+     * <p>
+     * setSelectedCustomGeneSets.
+     * </p>
+     *
+     * @param addedClasses a {@link java.util.Collection} object.
+     */
     public void setSelectedCustomGeneSets( Collection<GeneSetTerm> addedClasses ) {
         Collection<String> addedClassesIds = new HashSet<>();
         for ( GeneSetTerm t : addedClasses )
@@ -571,11 +714,22 @@ public class Settings extends SettingsHolder {
         this.config.setProperty( SELECTED_CUSTOM_GENESETS, addedClassesIds );
     }
 
+    /**
+     * <p>
+     * setTester.
+     * </p>
+     *
+     * @param isTester a boolean.
+     */
     public void setTester( boolean isTester ) {
         this.config.setProperty( IS_TESTER, isTester );
     }
 
     /**
+     * <p>
+     * setUseBiologicalProcess.
+     * </p>
+     *
      * @param useBiologicalProcess The useBiologicalProcess to set.
      */
     public void setUseBiologicalProcess( boolean useBiologicalProcess ) {
@@ -583,6 +737,10 @@ public class Settings extends SettingsHolder {
     }
 
     /**
+     * <p>
+     * setUseCellularComponent.
+     * </p>
+     *
      * @param useCellularComponent The useCellularComponent to set.
      */
     public void setUseCellularComponent( boolean useCellularComponent ) {
@@ -590,6 +748,10 @@ public class Settings extends SettingsHolder {
     }
 
     /**
+     * <p>
+     * setUseMolecularFunction.
+     * </p>
+     *
      * @param useMolecularFunction The useMolecularFunction to set.
      */
     public void setUseMolecularFunction( boolean useMolecularFunction ) {
@@ -597,19 +759,28 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * @param b
+     * <p>
+     * setUseMultifunctionalityCorrection.
+     * </p>
+     *
+     * @param b a boolean.
      */
     public void setUseMultifunctionalityCorrection( boolean b ) {
         this.config.setProperty( USE_MULTIFUNCTIONALITY_CORRECTION, b );
     }
 
     /**
+     * <p>
+     * setUserGeneSetDirectory.
+     * </p>
+     *
      * @param dir The dir to set.
      */
     public void setUserGeneSetDirectory( String dir ) {
         this.config.setProperty( CUSTOM_GENE_SET_DIRECTORY_PROPERTY, dir );
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return this.config.toString();
@@ -617,9 +788,9 @@ public class Settings extends SettingsHolder {
 
     /**
      * Intended to be used for saving results to the header of an output file.
-     * 
-     * @param fileName
-     * @throws IOException
+     *
+     * @param fileName a {@link java.lang.String} object.
+     * @throws java.io.IOException if any.
      */
     public void writeAnalysisSettings( String fileName ) throws IOException {
         Writer out;
@@ -664,6 +835,33 @@ public class Settings extends SettingsHolder {
         } catch ( ConfigurationException e ) {
             log.error( e, e );
         }
+    }
+
+    /**
+     *
+     */
+    private void configLogging() {
+        Logger logger = LogManager.getRootLogger();
+        FileAppender appender = ( FileAppender ) logger.getAppender( "F" );
+
+        try {
+            File logFile = this.getLogFile();
+            assert logFile != null;
+
+            /*
+             * FIXME for some reason, with the command line the appender is null.
+             */
+            if ( appender == null ) {
+                appender = new FileAppender( new PatternLayout( "%p: %m%n" ), logFile.getAbsolutePath(), false );
+                logger.addAppender( appender );
+            } else {
+                appender.setFile( logFile.getAbsolutePath() );
+            }
+            appender.activateOptions();
+        } catch ( IOException e ) {
+            throw new RuntimeException( e );
+        }
+
     }
 
     /**
@@ -740,7 +938,7 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * 
+     *
      */
     private void loadOrCreateInitialConfig() {
 
@@ -808,33 +1006,6 @@ public class Settings extends SettingsHolder {
         logLocale();
 
         assert this.configBuilder != null;
-    }
-
-    /**
-     * 
-     */
-    private void configLogging() {
-        Logger logger = LogManager.getRootLogger();
-        FileAppender appender = ( FileAppender ) logger.getAppender( "F" );
-
-        try {
-            File logFile = this.getLogFile();
-            assert logFile != null;
-
-            /*
-             * FIXME for some reason, with the command line the appender is null.
-             */
-            if ( appender == null ) {
-                appender = new FileAppender( new PatternLayout( "%p: %m%n" ), logFile.getAbsolutePath(), false );
-                logger.addAppender( appender );
-            } else {
-                appender.setFile( logFile.getAbsolutePath() );
-            }
-            appender.activateOptions();
-        } catch ( IOException e ) {
-            throw new RuntimeException( e );
-        }
-
     }
 
     /**

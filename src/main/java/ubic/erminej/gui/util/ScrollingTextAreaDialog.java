@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,24 +31,29 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /**
+ * <p>
+ * ScrollingTextAreaDialog class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
 public class ScrollingTextAreaDialog extends JDialog {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8888590244789533769L;
     private JTextArea ta;
 
-    public void setEditable( boolean b ) {
-        ta.setEditable( b );
-    }
-
-    public void setCaretPosition( int position ) {
-        ta.setCaretPosition( position );
-    }
-
+    /**
+     * <p>
+     * Constructor for ScrollingTextAreaDialog.
+     * </p>
+     *
+     * @param owner a {@link java.awt.Frame} object.
+     * @param title a {@link java.lang.String} object.
+     * @param modal a boolean.
+     */
     public ScrollingTextAreaDialog( Frame owner, String title, boolean modal ) {
         super( owner, title, modal );
         jbInit();
@@ -56,7 +61,33 @@ public class ScrollingTextAreaDialog extends JDialog {
     }
 
     /**
-     * @param text
+     * <p>
+     * setCaretPosition.
+     * </p>
+     *
+     * @param position a int.
+     */
+    public void setCaretPosition( int position ) {
+        ta.setCaretPosition( position );
+    }
+
+    /**
+     * <p>
+     * setEditable.
+     * </p>
+     *
+     * @param b a boolean.
+     */
+    public void setEditable( boolean b ) {
+        ta.setEditable( b );
+    }
+
+    /**
+     * <p>
+     * setText.
+     * </p>
+     *
+     * @param text a {@link java.lang.String} object.
      */
     public void setText( String text ) {
         ta.setText( text );
@@ -71,7 +102,7 @@ public class ScrollingTextAreaDialog extends JDialog {
         ta.setBackground( Color.WHITE );
 
         Font oldFont = ta.getFont();
-        Font newFont = new Font( oldFont.getFontName(), oldFont.getStyle(), 10 /* points */);
+        Font newFont = new Font( oldFont.getFontName(), oldFont.getStyle(), 10 /* points */ );
         ta.setFont( newFont );
         JScrollPane sp = new JScrollPane( ta );
         pan.add( sp, BorderLayout.CENTER );

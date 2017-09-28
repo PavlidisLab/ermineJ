@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,10 @@ import javax.swing.filechooser.FileFilter;
 import ubic.basecode.util.FileTools;
 
 /**
+ * <p>
+ * ImageFileFilter class.
+ * </p>
+ *
  * @author Will Braynen
  * @version $Id$
  */
@@ -32,9 +36,7 @@ public class ImageFileFilter extends FileFilter {
 
     private String description = "image files";
 
-    /**
-     * 
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean accept( File f ) {
 
@@ -46,16 +48,18 @@ public class ImageFileFilter extends FileFilter {
 
     } // end accept
 
-    /**
-     * 
-     */
+    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return description;
     }
 
     /**
-     * @param description
+     * <p>
+     * Setter for the field <code>description</code>.
+     * </p>
+     *
+     * @param description a {@link java.lang.String} object.
      */
     public void setDescription( String description ) {
         this.description = description;

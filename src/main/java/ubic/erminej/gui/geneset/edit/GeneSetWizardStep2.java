@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006-2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,22 +43,28 @@ import javax.swing.JTextField;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
+import ubic.erminej.data.Element;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSet;
-import ubic.erminej.data.Element;
 import ubic.erminej.gui.geneset.ProbeTableModel;
 import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Step to add/remove genes from a gene set.
- * 
+ *
  * @author Homin K Lee
  * @version $Id$
  */
 public class GeneSetWizardStep2 extends WizardStep {
 
     private static final long serialVersionUID = 1L;
+
+    private final static int COL0WIDTH = 80;
+
+    private final static int COL1WIDTH = 80;
+
+    private final static int COL2WIDTH = 200;
 
     private GeneAnnotations geneData = null;
 
@@ -67,20 +73,18 @@ public class GeneSetWizardStep2 extends WizardStep {
     private JTable newClassTable = null;
 
     private ProbeTableModel ncTableModel = null;
-
     private JTextField searchTextField = null;
-
     private ProbeTableModel sourceProbeModel;
-
-    private final static int COL0WIDTH = 80;
-    private final static int COL1WIDTH = 80;
-    private final static int COL2WIDTH = 200;
 
     JLabel jLabel2 = new JLabel();
 
     /**
-     * @param wiz
-     * @param geneData
+     * <p>
+     * Constructor for GeneSetWizardStep2.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.geneset.edit.GeneSetWizard} object.
+     * @param geneData a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneSetWizardStep2( GeneSetWizard wiz, GeneAnnotations geneData ) {
         super( wiz );
@@ -92,13 +96,14 @@ public class GeneSetWizardStep2 extends WizardStep {
 
     /**
      * Get the results of the user's picking.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Collection} object.
      */
     public Collection<Element> getProbes() {
         return this.ncTableModel.getProbes();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isReady() {
         return !getProbes().isEmpty();
@@ -112,6 +117,11 @@ public class GeneSetWizardStep2 extends WizardStep {
         find();
     }
 
+    /**
+     * <p>
+     * updateCountLabel.
+     * </p>
+     */
     public void updateCountLabel() {
         if ( ncTableModel.getProbeCount() != ncTableModel.getGeneCount() ) {
             showStatus( ncTableModel.getGeneCount() + " genes selected [" + ncTableModel.getProbeCount() + " elements]" );
@@ -121,7 +131,109 @@ public class GeneSetWizardStep2 extends WizardStep {
         }
     }
 
+    /**
+     * @param gene
+     */
+    void addGeneToSet( Gene gene ) {
+        Collection<Element> probelist = gene.getProbes();
+
+        if ( probelist.size() == 0 ) {
+            showError( "No elements for gene " + gene );
+            return;
+        }
+
+        log.debug( "Got " + probelist.size() + " new elements to add" );
+        ncTableModel.addProbes( probelist );
+        ncTableModel.fireTableDataChanged();
+
+        sourceProbeModel.removeProbes( probelist );
+        sourceProbeModel.fireTableDataChanged();
+
+        updateCountLabel();
+    }
+
+    void addProbesFromLeftTableToRight() {
+        int[] rows = probeTable.getSelectedRows();
+        log.debug( rows.length + " rows selected" );
+
+        Collection<Element> elements = new HashSet<>();
+        for ( int i = 0; i < rows.length; i++ ) {
+            String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
+            log.debug( "Got probe: " + probe );
+            Element p = geneData.findElement( probe );
+            if ( p != null ) elements.add( p );
+
+        }
+
+        ncTableModel.addProbes( elements );
+        sourceProbeModel.removeProbes( elements );
+        updateCountLabel();
+    }
+
+    void deleteProbesFromRightTable() {
+        int[] rows = newClassTable.getSelectedRows();
+        Collection<Element> elements = new HashSet<>();
+        for ( int i = 0; i < rows.length; i++ ) {
+            String probe = ( String ) newClassTable.getValueAt( rows[i], 0 );
+            log.debug( "Removing " + probe );
+            Element p = geneData.findElement( probe );
+
+            // remove all of the elements for the gene, not just the selected one (otherwise doesn't make much sense).
+            if ( p != null ) {
+                for ( Gene g : p.getGenes() ) {
+                    elements.addAll( g.getProbes() );
+                }
+            }
+
+        }
+        ncTableModel.removeProbes( elements );
+        sourceProbeModel.addProbes( elements );
+        updateCountLabel();
+    }
+
+    void editorGene_actionPerformed( ChangeEvent e ) {
+        String newGene = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
+
+        Gene g = geneData.findGene( newGene );
+        if ( g == null ) {
+            showError( "Gene " + newGene + " does not exist." );
+            return;
+        }
+
+        this.addGeneToSet( g );
+    }
+
+    void editorProbe_actionPerformed( ChangeEvent e ) {
+        String newProbe = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
+
+        Element p = geneData.findElement( newProbe );
+        if ( p == null ) {
+            showError( "Element" + newProbe + " does not exist." );
+            return;
+        }
+        Gene g = p.getGene();
+        this.addGeneToSet( g );
+
+    }
+
+    void find() {
+        String searchOn = searchTextField.getText();
+
+        Collection<Element> leftHandProbes = new HashSet<>();
+        if ( searchOn.equals( "" ) ) {
+            leftHandProbes = geneData.getProbes();
+        } else {
+            leftHandProbes = geneData.findProbes( searchOn );
+        }
+        sourceProbeModel.setProbes( leftHandProbes );
+    }
+
+    void searchTextField_actionPerformed() {
+        find();
+    }
+
     // Component initialization
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         this.setLayout( new BorderLayout() );
@@ -215,13 +327,13 @@ public class GeneSetWizardStep2 extends WizardStep {
         this.addMain( step2Panel );
     }
 
-    protected void setStartingSet( GeneSet original ) {
-        assert jLabel2 != null;
-        jLabel2.setText( original.toString() );
-        this.ncTableModel.setProbes( original.getProbes() );
-        this.sourceProbeModel.removeProbes( original.getProbes() );
-    }
-
+    /**
+     * <p>
+     * setStartingSet.
+     * </p>
+     *
+     * @param genes a {@link java.util.Collection} object.
+     */
     protected void setStartingSet( Collection<Gene> genes ) {
         for ( Gene gene : genes ) {
             this.ncTableModel.addProbes( gene.getProbes() );
@@ -231,108 +343,21 @@ public class GeneSetWizardStep2 extends WizardStep {
     }
 
     /**
-     * @param gene
+     * <p>
+     * setStartingSet.
+     * </p>
+     *
+     * @param original a {@link ubic.erminej.data.GeneSet} object.
      */
-    void addGeneToSet( Gene gene ) {
-        Collection<Element> probelist = gene.getProbes();
-
-        if ( probelist.size() == 0 ) {
-            showError( "No elements for gene " + gene );
-            return;
-        }
-
-        log.debug( "Got " + probelist.size() + " new elements to add" );
-        ncTableModel.addProbes( probelist );
-        ncTableModel.fireTableDataChanged();
-
-        sourceProbeModel.removeProbes( probelist );
-        sourceProbeModel.fireTableDataChanged();
-
-        updateCountLabel();
-    }
-
-    void addProbesFromLeftTableToRight() {
-        int[] rows = probeTable.getSelectedRows();
-        log.debug( rows.length + " rows selected" );
-
-        Collection<Element> elements = new HashSet<Element>();
-        for ( int i = 0; i < rows.length; i++ ) {
-            String probe = ( String ) probeTable.getValueAt( rows[i], 0 );
-            log.debug( "Got probe: " + probe );
-            Element p = geneData.findElement( probe );
-            if ( p != null ) elements.add( p );
-
-        }
-
-        ncTableModel.addProbes( elements );
-        sourceProbeModel.removeProbes( elements );
-        updateCountLabel();
-    }
-
-    void deleteProbesFromRightTable() {
-        int[] rows = newClassTable.getSelectedRows();
-        Collection<Element> elements = new HashSet<Element>();
-        for ( int i = 0; i < rows.length; i++ ) {
-            String probe = ( String ) newClassTable.getValueAt( rows[i], 0 );
-            log.debug( "Removing " + probe );
-            Element p = geneData.findElement( probe );
-
-            // remove all of the elements for the gene, not just the selected one (otherwise doesn't make much sense).
-            if ( p != null ) {
-                for ( Gene g : p.getGenes() ) {
-                    elements.addAll( g.getProbes() );
-                }
-            }
-
-        }
-        ncTableModel.removeProbes( elements );
-        sourceProbeModel.addProbes( elements );
-        updateCountLabel();
-    }
-
-    void editorGene_actionPerformed( ChangeEvent e ) {
-        String newGene = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
-
-        Gene g = geneData.findGene( newGene );
-        if ( g == null ) {
-            showError( "Gene " + newGene + " does not exist." );
-            return;
-        }
-
-        this.addGeneToSet( g );
-    }
-
-    void editorProbe_actionPerformed( ChangeEvent e ) {
-        String newProbe = ( String ) ( ( DefaultCellEditor ) e.getSource() ).getCellEditorValue();
-
-        Element p = geneData.findElement( newProbe );
-        if ( p == null ) {
-            showError( "Element" + newProbe + " does not exist." );
-            return;
-        }
-        Gene g = p.getGene();
-        this.addGeneToSet( g );
-
-    }
-
-    void find() {
-        String searchOn = searchTextField.getText();
-
-        Collection<Element> leftHandProbes = new HashSet<Element>();
-        if ( searchOn.equals( "" ) ) {
-            leftHandProbes = geneData.getProbes();
-        } else {
-            leftHandProbes = geneData.findProbes( searchOn );
-        }
-        sourceProbeModel.setProbes( leftHandProbes );
-    }
-
-    void searchTextField_actionPerformed() {
-        find();
+    protected void setStartingSet( GeneSet original ) {
+        assert jLabel2 != null;
+        jLabel2.setText( original.toString() );
+        this.ncTableModel.setProbes( original.getProbes() );
+        this.sourceProbeModel.removeProbes( original.getProbes() );
     }
 
     /**
-     * 
+     *
      */
     private void populateTables() {
 
@@ -387,6 +412,7 @@ class GeneSetWizardStep2_addButton_actionAdapter implements java.awt.event.Actio
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.addProbesFromLeftTableToRight();
@@ -400,6 +426,7 @@ class GeneSetWizardStep2_delete_actionPerformed_actionAdapter implements java.aw
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.deleteProbesFromRightTable();
@@ -411,11 +438,13 @@ class GeneSetWizardStep2_editorGeneAdaptor implements CellEditorListener {
 
     GeneSetWizardStep2_editorGeneAdaptor( GeneSetWizardStep2 adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override
     public void editingCanceled( ChangeEvent e ) {
         editingCanceled( e );
+        /** {@inheritDoc} */
     }
 
     @Override
@@ -431,11 +460,13 @@ class GeneSetWizardStep2_editorProbeAdaptor implements CellEditorListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void editingCanceled( ChangeEvent e ) {
         editingCanceled( e );
     }
 
+    /** {@inheritDoc} */
     @Override
     public void editingStopped( ChangeEvent e ) {
         adaptee.editorProbe_actionPerformed( e );
@@ -444,37 +475,63 @@ class GeneSetWizardStep2_editorProbeAdaptor implements CellEditorListener {
 
 // hitting enter in search also activates it.
 
+/**
+ * <p>
+ * Constructor for GeneSetWizardStep2_searchButton_actionAdapter.
+ * </p>
+ *
+ * @param adaptee a {@link ubic.erminej.gui.geneset.edit.GeneSetWizardStep2} object.
+ */
 class GeneSetWizardStep2_searchButton_actionAdapter implements ActionListener {
     GeneSetWizardStep2 adaptee;
 
     public GeneSetWizardStep2_searchButton_actionAdapter( GeneSetWizardStep2 adaptee ) {
+        /** {@inheritDoc} */
         this.adaptee = adaptee;
     }
 
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.searchButton_actionPerformed_adapter();
+        /**
+         * <p>
+         * Constructor for GeneSetWizardStep2_searchText_actionAdapter.
+         * </p>
+         *
+         * @param adaptee a {@link ubic.erminej.gui.geneset.edit.GeneSetWizardStep2} object.
+         */
     }
 
 }
 
+/** {@inheritDoc} */
 // respond to typing in the search field. - incremental search could go here.
 
 class GeneSetWizardStep2_searchText_actionAdapter implements ActionListener {
     GeneSetWizardStep2 adaptee;
 
+    /**
+     * <p>
+     * Constructor for GeneSetWizardStep2_searchText_keyAdapter.
+     * </p>
+     *
+     * @param adaptee a {@link ubic.erminej.gui.geneset.edit.GeneSetWizardStep2} object.
+     */
     public GeneSetWizardStep2_searchText_actionAdapter( GeneSetWizardStep2 adaptee ) {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.searchButton_actionPerformed_adapter();
     }
+    /** {@inheritDoc} */
 }
 
 // respond to search request.
 
+/** {@inheritDoc} */
 class GeneSetWizardStep2_searchText_keyAdapter implements KeyListener {
 
     GeneSetWizardStep2 adaptee;
@@ -502,6 +559,7 @@ class GeneSetWizardStep2_searchTextField_actionAdapter implements java.awt.event
 
     GeneSetWizardStep2_searchTextField_actionAdapter( GeneSetWizardStep2 adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override

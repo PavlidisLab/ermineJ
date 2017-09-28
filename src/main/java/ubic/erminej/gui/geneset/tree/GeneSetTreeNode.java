@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,16 +28,16 @@ import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 import ubic.erminej.data.GeneSetTerm;
 
 /**
+ * <p>
+ * GeneSetTreeNode class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
 public class GeneSetTreeNode extends DefaultMutableTreeNode {
 
     private static final long serialVersionUID = 1L;
-
-    private boolean hasSignificantChild = false;
-
-    private boolean hasSelectedChild = false;
 
     private static Comparator<GeneSetTreeNode> comparator = new Comparator<GeneSetTreeNode>() {
 
@@ -47,19 +47,53 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
         }
     };
 
+    private boolean hasSignificantChild = false;
+
+    private boolean hasSelectedChild = false;
+
+    /**
+     * <p>
+     * Constructor for GeneSetTreeNode.
+     * </p>
+     *
+     * @param root a {@link ubic.basecode.dataStructure.graph.DirectedGraphNode} object.
+     */
     public GeneSetTreeNode( DirectedGraphNode<String, GeneSetTerm> root ) {
         super( root );
     }
 
     /**
+     * <p>
+     * getTerm.
+     * </p>
+     *
+     * @return the GeneSetTerm associated with this
+     */
+    public GeneSetTerm getTerm() {
+        return ( ( DirectedGraphNode<String, GeneSetTerm> ) super.getUserObject() ).getItem();
+    }
+
+    /**
      * If it's included in a filtered set.
-     * 
+     *
      * @return true if one or more of the children of this node should be displayed in a selection.
      */
     public boolean hasSelectedChild() {
         return hasSelectedChild;
     }
 
+    /**
+     * <p>
+     * hasSignificantChild.
+     * </p>
+     *
+     * @return true if one ore more children of this node should be displayed as 'significant'.
+     */
+    public boolean hasSignificantChild() {
+        return this.hasSignificantChild;
+    }
+
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public void insert( MutableTreeNode newChild, int childIndex ) {
@@ -68,29 +102,30 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
     }
 
     /**
-     * @return the GeneSetTerm associated with this
+     * <p>
+     * Setter for the field <code>hasSelectedChild</code>.
+     * </p>
+     *
+     * @param b a boolean.
      */
-    public GeneSetTerm getTerm() {
-        return ( ( DirectedGraphNode<String, GeneSetTerm> ) super.getUserObject() ).getItem();
+    public void setHasSelectedChild( boolean b ) {
+        this.hasSelectedChild = b;
     }
 
     /**
-     * @return true if one ore more children of this node should be displayed as 'significant'.
+     * <p>
+     * Setter for the field <code>hasSignificantChild</code>.
+     * </p>
+     *
+     * @param b a boolean.
      */
-    public boolean hasSignificantChild() {
-        return this.hasSignificantChild;
-    }
-
     public void setHasSignificantChild( boolean b ) {
         this.hasSignificantChild = b;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return this.getTerm().toString();
-    }
-
-    public void setHasSelectedChild( boolean b ) {
-        this.hasSelectedChild = b;
     }
 }

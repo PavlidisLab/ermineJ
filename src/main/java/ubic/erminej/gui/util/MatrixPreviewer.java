@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -36,15 +36,20 @@ import ubic.basecode.io.reader.StringMatrixReader;
 
 /**
  * Uses a dialog box (FIXME: this could just extend JDialog)
- * 
+ *
  * @author paul
  * @version $Id$
  */
 public class MatrixPreviewer {
 
     /**
-     * @param table
-     * @param columnNames
+     * <p>
+     * previewMatrix.
+     * </p>
+     *
+     * @param table a {@link java.util.List} object.
+     * @param columnNames an array of {@link java.lang.Object} objects.
+     * @param parent a {@link java.awt.Window} object.
      */
     public static void previewMatrix( Window parent, List<Object[]> table, Object[] columnNames ) {
         Object[][] tab = new Object[table.size()][];
@@ -53,6 +58,64 @@ public class MatrixPreviewer {
         }
 
         previewMatrix( parent, tab, columnNames );
+    }
+
+    /**
+     * <p>
+     * previewMatrix.
+     * </p>
+     *
+     * @param x a {@link java.awt.Window} object.
+     * @param fileName a {@link java.lang.String} object.
+     * @param numColumnsToSkip a {@link java.lang.Integer} object.
+     * @return the preview matrix
+     * @throws java.io.IOException if any.
+     */
+    public static StringMatrix<String, String> previewMatrix( Window x, String fileName, Integer numColumnsToSkip )
+            throws IOException {
+        StringMatrixReader r = new StringMatrixReader();
+        StringMatrix<String, String> test;
+
+        test = r.read( fileName, 100, numColumnsToSkip );
+        previewMatrix( x, test );
+        return test;
+    }
+
+    /**
+     * <p>
+     * previewMatrix.
+     * </p>
+     *
+     * @param w a {@link java.awt.Window} object.
+     * @param matrix a {@link ubic.basecode.dataStructure.matrix.StringMatrix} object.
+     */
+    public static void previewMatrix( Window w, StringMatrix<String, String> matrix ) {
+
+        // including the row labels.
+        int numColumnsShown = 1 + Math.min( 20 /* MAX_COLUMNS_TO_PREVIEW */, matrix.columns() );
+
+        Object[][] mat = new Object[matrix.rows()][numColumnsShown];
+        Object[] headings = new Object[numColumnsShown];
+
+        headings[0] = "1: ID";
+        for ( int k = 1; k < numColumnsShown; k++ ) {
+            headings[k] = ( k + 1 ) + ": " + matrix.getColName( k - 1 );
+        }
+
+        /*
+         * The row names go in the first column.
+         */
+        for ( int i = 0; i < matrix.rows(); i++ ) {
+
+            mat[i][0] = matrix.getRowName( i );
+
+            for ( int j = 1; j < numColumnsShown; j++ ) {
+                mat[i][j] = matrix.get( i, j - 1 );
+            }
+        }
+
+        previewMatrix( w, mat, headings );
+
     }
 
     /**
@@ -96,55 +159,5 @@ public class MatrixPreviewer {
         previewPanel.setVisible( true );
         previewPanel.requestFocus();
         previewPanel.requestFocusInWindow();
-    }
-
-    /**
-     * @param x
-     * @param fileName
-     * @param numColumnsToSkip
-     * @return the preview matrix
-     * @throws IOException
-     */
-    public static StringMatrix<String, String> previewMatrix( Window x, String fileName, Integer numColumnsToSkip )
-            throws IOException {
-        StringMatrixReader r = new StringMatrixReader();
-        StringMatrix<String, String> test;
-
-        test = r.read( fileName, 100, numColumnsToSkip );
-        previewMatrix( x, test );
-        return test;
-    }
-
-    /**
-     * @param w
-     * @param matrix
-     */
-    public static void previewMatrix( Window w, StringMatrix<String, String> matrix ) {
-
-        // including the row labels.
-        int numColumnsShown = 1 + Math.min( 20 /* MAX_COLUMNS_TO_PREVIEW */, matrix.columns() );
-
-        Object[][] mat = new Object[matrix.rows()][numColumnsShown];
-        Object[] headings = new Object[numColumnsShown];
-
-        headings[0] = "1: ID";
-        for ( int k = 1; k < numColumnsShown; k++ ) {
-            headings[k] = ( k + 1 ) + ": " + matrix.getColName( k - 1 );
-        }
-
-        /*
-         * The row names go in the first column.
-         */
-        for ( int i = 0; i < matrix.rows(); i++ ) {
-
-            mat[i][0] = matrix.getRowName( i );
-
-            for ( int j = 1; j < numColumnsShown; j++ ) {
-                mat[i][j] = matrix.get( i, j - 1 );
-            }
-        }
-
-        previewMatrix( w, mat, headings );
-
     }
 }

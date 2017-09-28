@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006-2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,13 +53,13 @@ import ubic.erminej.SettingsHolder;
  * This is initialized by providing a set of elements (e.g. 'elements') with 'gene' and 'geneset' associations. When
  * ErmineJ is started, the annotation file provided determines the set of elements/genes that are available.
  * <p>
- * At later stages, when the user's analysis results are read in, they might not have all the elements/genes used. A copy
+ * At later stages, when the user's analysis results are read in, they might not have all the elements/genes used. A
+ * copy
  * of the GeneAnnotations should be made that references just the subset of elements/genes that are relevant.
- * 
+ *
  * @author Paul Pavlidis
  * @author Shamhil Merchant
  * @author Homin Lee
- * @version $Id$
  * @version Extensively rewritten for 2.2 (PP)
  */
 public class GeneAnnotations {
@@ -77,8 +77,6 @@ public class GeneAnnotations {
      */
     private static final int ABSOLUTE_MINIMUM_GENESET_SIZE = 2;
 
-    private int minimumGeneSetSize = ABSOLUTE_MINIMUM_GENESET_SIZE;
-
     private static Log log = LogFactory.getLog( GeneAnnotations.class.getName() );
 
     /**
@@ -86,20 +84,22 @@ public class GeneAnnotations {
      */
     private static final int PRACTICAL_MAXIMUM_GENESET_SIZE = 50000;
 
+    private int minimumGeneSetSize = ABSOLUTE_MINIMUM_GENESET_SIZE;
+
     private Multifunctionality multifunctionality;
 
     /**
      * This includes all gene set terms, including ones which are redundant.
      */
-    private Map<GeneSetTerm, GeneSet> geneSets = new HashMap<GeneSetTerm, GeneSet>();
+    private Map<GeneSetTerm, GeneSet> geneSets = new HashMap<>();
 
     private GeneSetTerms geneSetTerms;
 
     private StatusViewer messenger = new StatusStderr();
 
-    private Map<String, Element> elements = new CaseInsensitiveMap<Element>();
+    private Map<String, Element> elements = new CaseInsensitiveMap<>();
 
-    private Map<String, Gene> genes = new CaseInsensitiveMap<Gene>();
+    private Map<String, Gene> genes = new CaseInsensitiveMap<>();
 
     private UserDefinedGeneSetManager userDefinedGeneSetManager;
 
@@ -110,12 +110,17 @@ public class GeneAnnotations {
 
     private SettingsHolder settings;
 
-    private Collection<GeneAnnotations> subClones = new HashSet<GeneAnnotations>();
+    private Collection<GeneAnnotations> subClones = new HashSet<>();
 
     /**
-     * @param genes
-     * @param geneSetTerms
-     * @param messenger
+     * <p>
+     * Constructor for GeneAnnotations.
+     * </p>
+     *
+     * @param genes a {@link java.util.Collection} object.
+     * @param geneSetTerms a {@link ubic.erminej.data.GeneSetTerms} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      */
     public GeneAnnotations( Collection<Gene> genes, GeneSetTerms geneSetTerms, SettingsHolder settings,
             StatusViewer messenger ) {
@@ -140,9 +145,9 @@ public class GeneAnnotations {
     /**
      * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected elements, removing
      * elements with no annotations.
-     * 
-     * @param start
-     * @param elements
+     *
+     * @param start a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param elements a {@link java.util.Collection} object.
      * @see GeneAnnotations(start, elements, pruneUnannotated)
      */
     public GeneAnnotations( GeneAnnotations start, Collection<Element> elements ) {
@@ -150,14 +155,17 @@ public class GeneAnnotations {
     }
 
     /**
-     * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected elements, optionally
-     * removing unannotated elements. This involves making new GeneSets, but the GeneSetTerms, Genes and Probes themselves
+     * Create a <strong>read-only</strong> new annotation set based on an existing one, for selected elements,
+     * optionally
+     * removing unannotated elements. This involves making new GeneSets, but the GeneSetTerms, Genes and Probes
+     * themselves
      * are 'reused'. Multifunctionality is recomputed based on the restricted set. However, you should use subClone() to
      * avoid excessive duplication of annotation sets.
-     * 
-     * @param start
+     *
+     * @param start a {@link ubic.erminej.data.GeneAnnotations} object.
      * @param elements which must be a subset of those in start (others will be ignored)
-     * @param pruneUnannotated if true (normally!), elements lacking annotations are removed. This then becomes unmutable
+     * @param pruneUnannotated if true (normally!), elements lacking annotations are removed. This then becomes
+     *        unmutable
      *        in the sense that adding annotations is not allowed.
      */
     public GeneAnnotations( GeneAnnotations start, Collection<Element> elements, boolean pruneUnannotated ) {
@@ -170,7 +178,7 @@ public class GeneAnnotations {
             throw new IllegalArgumentException( "No elements were selected." );
         }
 
-        Set<Element> startProbes = new HashSet<Element>( start.getProbes() ); // this has to get made.
+        Set<Element> startProbes = new HashSet<>( start.getProbes() ); // this has to get made.
 
         messenger.showProgress( "Creating a subsetted annotation set for " + elements.size() + "/" + startProbes.size()
                 + " elements)" );
@@ -213,13 +221,11 @@ public class GeneAnnotations {
 
     /**
      * Constructor designed for use when a file is not the immediate input of the data.
-     * 
-     * @param elements A List of elements
+     *
      * @param geneSymbols A List of gene symbols (e.g., ACTB), corresponding to the elements (in the same order)
-     * @param geneNames A List of gene names (e.g., "Actin"), corresponding to the elements (in the same order). This can
-     *        be null.
      * @param goTerms A List of Collections of Strings corresponding to the GO terms for each probe.
      * @throws IllegaArgumentException if any of the required arguments are null, don't have sizes that match, etc.
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
      */
     public GeneAnnotations( List<Gene> geneSymbols, List<Collection<GeneSetTerm>> goTerms, StatusViewer m ) {
         checkValidData( geneSymbols, goTerms );
@@ -231,7 +237,7 @@ public class GeneAnnotations {
             throw new RuntimeException( e1 );
         }
 
-        Collection<GeneSetTerm> allTerms = new HashSet<GeneSetTerm>();
+        Collection<GeneSetTerm> allTerms = new HashSet<>();
         for ( Collection<GeneSetTerm> geneSetTerm : goTerms ) {
             allTerms.addAll( geneSetTerm );
         }
@@ -265,11 +271,16 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param genes
-     * @param goTerms
+     * <p>
+     * Constructor for GeneAnnotations.
+     * </p>
+     *
+     * @param genes a {@link java.util.List} object.
+     * @param goTerms a {@link java.util.List} object.
+     * @param elements a {@link java.util.List} object.
      */
     public GeneAnnotations( List<String> elements, List<String> genes, List<Collection<String>> goTerms ) {
-        Collection<GeneSetTerm> terms = new HashSet<GeneSetTerm>();
+        Collection<GeneSetTerm> terms = new HashSet<>();
         for ( int i = 0; i < genes.size(); i++ ) {
             String g = genes.get( i );
             Gene ge = new Gene( g );
@@ -307,8 +318,12 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param gene
-     * @param terms
+     * <p>
+     * addAnnotation.
+     * </p>
+     *
+     * @param gene a {@link ubic.erminej.data.Gene} object.
+     * @param terms a {@link java.util.Collection} object.
      * @return how many annotations were added (i.e., were not already there)
      */
     public int addAnnotation( Gene gene, Collection<GeneSetTerm> terms ) {
@@ -321,7 +336,11 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param set
+     * <p>
+     * addGeneSet.
+     * </p>
+     *
+     * @param set a {@link ubic.erminej.data.GeneSet} object.
      */
     public void addGeneSet( GeneSet set ) {
         checkModifiability();
@@ -329,8 +348,12 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param geneSetId
-     * @param gs
+     * <p>
+     * addGeneSet.
+     * </p>
+     *
+     * @param geneSetId a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @param gs a {@link java.util.Collection} object.
      */
     public void addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs ) {
         this.addGeneSet( geneSetId, gs, null );
@@ -338,12 +361,12 @@ public class GeneAnnotations {
 
     /**
      * Add a user-defined gene set.
-     * 
-     * @param geneSetId
+     *
+     * @param geneSetId a {@link ubic.erminej.data.GeneSetTerm} object.
      * @param gs -- these should already be checked for compatibility (don't add new genes here, might be okay but
      *        considered undefined)
      * @param sourceFile used for tracking sources and later modification/persistence.
-     * @return
+     * @return a {@link ubic.erminej.data.GeneSet} object.
      */
     public GeneSet addGeneSet( GeneSetTerm geneSetId, Collection<Gene> gs, String sourceFile ) {
         checkModifiability();
@@ -379,8 +402,8 @@ public class GeneAnnotations {
      * Remove a gene set (class) from all the maps that reference it. This basically completely removes the class, and
      * it cannot be restored unless there is a backup. If it is user-defined it is deleted entirely from the
      * GeneSetTerms tree.
-     * 
-     * @param id
+     *
+     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     public void deleteGeneSet( GeneSetTerm id ) {
 
@@ -399,8 +422,8 @@ public class GeneAnnotations {
     /**
      * Remove a no-longer-needed subclone. This only removes the reference from this, if other objects maintain a
      * reference it will obviously not be freed.
-     * 
-     * @param a
+     *
+     * @param a a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public void deleteSubClone( GeneAnnotations a ) {
         log.info( "Deleting annotations" );
@@ -411,8 +434,12 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param classID
-     * @return
+     * <p>
+     * deleteUserGeneSet.
+     * </p>
+     *
+     * @param classID a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a boolean.
      */
     public boolean deleteUserGeneSet( GeneSetTerm classID ) {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
@@ -421,17 +448,31 @@ public class GeneAnnotations {
 
     /**
      * Case insensitive
-     * 
-     * @param symbol
-     * @return
+     *
+     * @param probe a {@link java.lang.String} object.
+     * @return a {@link ubic.erminej.data.Element} object.
+     */
+    public Element findElement( String probe ) {
+        return this.elements.get( probe );
+    }
+
+    /**
+     * Case insensitive
+     *
+     * @param symbol a {@link java.lang.String} object.
+     * @return a {@link ubic.erminej.data.Gene} object.
      */
     public Gene findGene( String symbol ) {
         return this.genes.get( symbol );
     }
 
     /**
-     * @param term
-     * @return
+     * <p>
+     * findGeneSet.
+     * </p>
+     *
+     * @param term a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a {@link ubic.erminej.data.GeneSet} object.
      */
     public GeneSet findGeneSet( GeneSetTerm term ) {
         if ( term == null ) return null;
@@ -439,8 +480,12 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param name
-     * @return
+     * <p>
+     * findGeneSet.
+     * </p>
+     *
+     * @param name a {@link java.lang.String} object.
+     * @return a {@link ubic.erminej.data.GeneSet} object.
      */
     public GeneSet findGeneSet( String name ) {
         GeneSetTerm term = this.findTerm( name );
@@ -449,24 +494,15 @@ public class GeneAnnotations {
     }
 
     /**
-     * Case insensitive
-     * 
-     * @param probe
-     * @return
-     */
-    public Element findElement( String probe ) {
-        return this.elements.get( probe );
-    }
-
-    /**
      * Create a selected elements list based on a search string.
-     * 
+     *
      * @param searchOn A string to be searched.
+     * @return a {@link java.util.Set} object.
      */
     public Set<Element> findProbes( String searchOn ) {
 
         String searchOnUp = searchOn.toUpperCase();
-        Set<Element> results = new HashSet<Element>();
+        Set<Element> results = new HashSet<>();
         for ( Element probe : elements.values() ) {
             Gene candidate = probe.getGene();
 
@@ -481,12 +517,13 @@ public class GeneAnnotations {
 
     /**
      * Identify gene sets that contain a particular gene or probe.
-     * 
-     * @param searchOn
+     *
+     * @param searchOn a {@link java.lang.String} object.
+     * @return a {@link java.util.Set} object.
      */
     public Set<GeneSetTerm> findSetsByGene( String searchOn ) {
 
-        Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+        Set<GeneSetTerm> result = new HashSet<>();
 
         Set<Gene> g = findGenesByName( searchOn );
         for ( Gene gene : g ) {
@@ -496,11 +533,16 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param searchOn
+     * <p>
+     * findSetsByName.
+     * </p>
+     *
+     * @param searchOn a {@link java.lang.String} object.
+     * @return a {@link java.util.Set} object.
      */
     public Set<GeneSetTerm> findSetsByName( String searchOn ) {
         String searchOnUp = searchOn.toUpperCase();
-        Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+        Set<GeneSetTerm> result = new HashSet<>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
             String candidateN = term.getName().toUpperCase();
             String candidateI = term.getId().toUpperCase();
@@ -512,8 +554,12 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param id
-     * @return
+     * <p>
+     * findTerm.
+     * </p>
+     *
+     * @param id a {@link java.lang.String} object.
+     * @return a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     public GeneSetTerm findTerm( String id ) {
         return this.geneSetTerms.get( id );
@@ -521,7 +567,7 @@ public class GeneAnnotations {
 
     /**
      * Returns true if the class is in the classToProbe map
-     * 
+     *
      * @param id String a class id
      * @return boolean
      */
@@ -532,15 +578,19 @@ public class GeneAnnotations {
     /**
      * Get all gene sets, including ones that might be empty or redundant. Use for displaying lists that can then be
      * filtered.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Set} object.
      */
     public Set<GeneSetTerm> getAllTerms() {
         return Collections.unmodifiableSet( this.geneSetTerms.getGeneSets() );
     }
 
     /**
-     * @param id
+     * <p>
+     * getChildren.
+     * </p>
+     *
+     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
      * @return immediate children of the term
      */
     public Set<GeneSetTerm> getChildren( GeneSetTerm id ) {
@@ -549,23 +599,49 @@ public class GeneAnnotations {
 
     /**
      * Return all genes, including those that are 'inactive'.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Collection} object.
      */
     public Collection<Gene> getGenes() {
-        Collection<Gene> finalList = new HashSet<Gene>();
+        Collection<Gene> finalList = new HashSet<>();
         for ( Element p : elements.values() ) {
             finalList.addAll( p.getGenes() );
         }
         return Collections.unmodifiableCollection( finalList );
     }
 
+    /**
+     * <p>
+     * getGeneSet.
+     * </p>
+     *
+     * @param classid a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a {@link ubic.erminej.data.GeneSet} object.
+     */
     public GeneSet getGeneSet( GeneSetTerm classid ) {
         return this.geneSets.get( classid );
     }
 
     /**
-     * @param goset
+     * <p>
+     * getGeneSetElements.
+     * </p>
+     *
+     * @param geneSetId a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return active elements for the given gene set
+     */
+    public Set<Element> getGeneSetElements( GeneSetTerm geneSetId ) {
+        GeneSet geneSet = this.geneSets.get( geneSetId );
+        if ( geneSet == null ) return Collections.unmodifiableSet( ( new HashSet<Element>() ) );
+        return geneSet.getProbes(); // unmodifiable
+    }
+
+    /**
+     * <p>
+     * getGeneSetGenes.
+     * </p>
+     *
+     * @param goset a {@link ubic.erminej.data.GeneSetTerm} object.
      * @return set of genes in the given gene set (if any), based on the currently active elements
      */
     public Set<Gene> getGeneSetGenes( GeneSetTerm goset ) {
@@ -581,35 +657,37 @@ public class GeneAnnotations {
     }
 
     /**
-     * @return
+     * <p>
+     * getGeneSetGraph.
+     * </p>
+     *
+     * @return a {@link ubic.basecode.dataStructure.graph.DirectedGraph} object.
      */
     public DirectedGraph<String, GeneSetTerm> getGeneSetGraph() {
         return this.geneSetTerms.getGraph();
     }
 
     /**
-     * @param geneSetId
-     * @return active elements for the given gene set
-     */
-    public Set<Element> getGeneSetElements( GeneSetTerm geneSetId ) {
-        GeneSet geneSet = this.geneSets.get( geneSetId );
-        if ( geneSet == null ) return Collections.unmodifiableSet( ( new HashSet<Element>() ) );
-        return geneSet.getProbes(); // unmodifiable
-    }
-
-    /**
+     * <p>
+     * Getter for the field <code>geneSets</code>.
+     * </p>
+     *
      * @return view of all gene sets, NOT including empty ones - at least minimumGeneSetSize genes (i.e., 2).
      */
     public Set<GeneSet> getGeneSets() {
-        return Collections.unmodifiableSet( new HashSet<GeneSet>( this.geneSets.values() ) );
+        return Collections.unmodifiableSet( new HashSet<>( this.geneSets.values() ) );
     }
 
     /**
-     * @param terms
-     * @return
+     * <p>
+     * Getter for the field <code>geneSets</code>.
+     * </p>
+     *
+     * @param terms a {@link java.util.Collection} object.
+     * @return a {@link java.util.Collection} object.
      */
     public Collection<GeneSet> getGeneSets( Collection<GeneSetTerm> terms ) {
-        Collection<GeneSet> res = new HashSet<GeneSet>();
+        Collection<GeneSet> res = new HashSet<>();
         for ( GeneSetTerm t : terms ) {
             if ( this.geneSets.containsKey( t ) ) {
                 res.add( geneSets.get( t ) );
@@ -619,49 +697,83 @@ public class GeneAnnotations {
     }
 
     /**
+     * <p>
+     * Getter for the field <code>geneSetTerms</code>.
+     * </p>
+     *
      * @return view of all gene set terms, NOT including empty ones - at least minimumGeneSetSize genes (i.e., 2).
      */
     public Set<GeneSetTerm> getGeneSetTerms() {
-        Set<GeneSetTerm> res = new HashSet<GeneSetTerm>();
+        Set<GeneSetTerm> res = new HashSet<>();
         res.addAll( this.geneSets.keySet() );
         return Collections.unmodifiableSet( res );
     }
 
     /**
-     * @return
+     * <p>
+     * getGeneSetTermsHolder.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.data.GeneSetTerms} object.
      */
     public GeneSetTerms getGeneSetTermsHolder() {
         // FIXME stupid method name .. conflicts with other.
         return this.geneSetTerms;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>minimumGeneSetSize</code>.
+     * </p>
+     *
+     * @return a int.
+     */
     public int getMinimumGeneSetSize() {
         return minimumGeneSetSize;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>multifunctionality</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.data.Multifunctionality} object.
+     */
     public Multifunctionality getMultifunctionality() {
         return multifunctionality;
     }
 
     /**
+     * <p>
+     * getProbes.
+     * </p>
+     *
      * @return the list of elements.
      */
     public Set<Element> getProbes() {
-        return Collections.unmodifiableSet( new HashSet<Element>( this.elements.values() ) );
+        return Collections.unmodifiableSet( new HashSet<>( this.elements.values() ) );
     }
 
     /**
-     * @return
+     * <p>
+     * Getter for the field <code>settings</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.SettingsHolder} object.
      */
     public SettingsHolder getSettings() {
         return settings;
     }
 
     /**
-     * @return
+     * <p>
+     * getUserDefinedGeneSets.
+     * </p>
+     *
+     * @return a {@link java.util.Set} object.
      */
     public Set<GeneSet> getUserDefinedGeneSets() {
-        Set<GeneSet> result = new HashSet<GeneSet>();
+        Set<GeneSet> result = new HashSet<>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
             if ( term.isUserDefined() ) {
                 result.add( geneSets.get( term ) );
@@ -672,11 +784,11 @@ public class GeneAnnotations {
 
     /**
      * Get the gene sets that are user-defined.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Set} object.
      */
     public Set<GeneSetTerm> getUserDefinedTerms() {
-        Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+        Set<GeneSetTerm> result = new HashSet<>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
             if ( term.isUserDefined() ) {
                 result.add( term );
@@ -685,21 +797,37 @@ public class GeneAnnotations {
         return Collections.unmodifiableSet( result );
     }
 
+    /**
+     * <p>
+     * hasGene.
+     * </p>
+     *
+     * @param g a {@link ubic.erminej.data.Gene} object.
+     * @return a boolean.
+     */
     public boolean hasGene( Gene g ) {
         return this.genes.values().contains( g );
     }
 
     /**
-     * @param id
-     * @return
+     * <p>
+     * hasGeneSet.
+     * </p>
+     *
+     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a boolean.
      */
     public boolean hasGeneSet( GeneSetTerm id ) {
         return this.geneSets.containsKey( id );
     }
 
     /**
-     * @param elementId
-     * @return
+     * <p>
+     * hasProbe.
+     * </p>
+     *
+     * @param elementId a {@link ubic.erminej.data.Element} object.
+     * @return a boolean.
      */
     public boolean hasProbe( Element elementId ) {
         return this.elements.values().contains( elementId );
@@ -707,9 +835,9 @@ public class GeneAnnotations {
 
     /**
      * Check if a group has any redundancies.
-     * 
-     * @param id
-     * @return
+     *
+     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a boolean.
      */
     public boolean hasRedundancy( GeneSetTerm id ) {
         GeneSet geneSet = this.getGeneSet( id );
@@ -718,7 +846,11 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param geneSetTerm
+     * <p>
+     * hasUsableAspect.
+     * </p>
+     *
+     * @param geneSetTerm a {@link ubic.erminej.data.GeneSetTerm} object.
      * @param missingAspectTreatedAsUsable What to do if the aspect is missing. User-defined groups (which don't have an
      *        aspect) aren't affected by this
      * @return true if the gene set would be included in the analysis.
@@ -755,13 +887,22 @@ public class GeneAnnotations {
      * Test whether this was constructed 'subcloning' style. This should usually be true in the context of analyses,
      * which focus on analyzed subsets of the annotated genes. I recommend testing this in your code to make sure you
      * aren't forgetting to do that step.
-     * 
-     * @return
+     *
+     * @return a boolean.
      */
     public boolean isReadOnly() {
         return !this.allowModification;
     }
 
+    /**
+     * <p>
+     * loadPlainGeneList.
+     * </p>
+     *
+     * @param loadFile a {@link java.lang.String} object.
+     * @return a {@link java.util.Collection} object.
+     * @throws java.io.IOException if any.
+     */
     public Collection<Gene> loadPlainGeneList( String loadFile ) throws IOException {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
         return this.userDefinedGeneSetManager.loadPlainGeneList( loadFile );
@@ -769,8 +910,8 @@ public class GeneAnnotations {
 
     /**
      * Count how many gene sets will be analyzed given the user's current settings (min and max size and aspects)
-     * 
-     * @return
+     *
+     * @return a int.
      */
     public int numActiveGeneSets() {
         int minSize = this.settings.getMinClassSize();
@@ -781,10 +922,10 @@ public class GeneAnnotations {
     /**
      * Count how many gene sets will be analyzed given the user's current selected aspects and the provided minimum and
      * maximum sizes.
-     * 
-     * @param minSize
-     * @param maxSize
-     * @return
+     *
+     * @param minSize a int.
+     * @param maxSize a int.
+     * @return a int.
      */
     public int numActiveGeneSets( int minSize, int maxSize ) {
         int c = 0;
@@ -800,8 +941,8 @@ public class GeneAnnotations {
 
     /**
      * Compute how many genes have Gene set annotations.
-     * 
-     * @return
+     *
+     * @return a int.
      */
     public int numAnnotatedGenes() {
         int count = 0;
@@ -815,46 +956,10 @@ public class GeneAnnotations {
     }
 
     /**
-     * How many genes are currently available
-     */
-    public int numGenes() {
-        return this.getGenes().size();
-    }
-
-    /**
-     * Get the number of gene sets currently available.
-     * 
-     * @return
-     */
-    public int numGeneSets() {
-        return this.getGeneSetTerms().size();
-    }
-
-    /**
-     * Get the number of genes in a gene set, identified by id.
-     * 
-     * @param id String a class id
-     * @return int number of genes in the class
-     */
-    public int numGenesInGeneSet( GeneSetTerm id ) {
-        if ( !geneSets.containsKey( id ) ) {
-            return 0;
-        }
-        return getGeneSetGenes( id ).size();
-    }
-
-    /**
-     * @return
-     */
-    public int numProbes() {
-        return elements.size();
-    }
-
-    /**
      * Get how many elements point to the same gene. This is like the old "numReplicates".
-     * 
-     * @param g
-     * @return
+     *
+     * @param g a {@link ubic.erminej.data.Gene} object.
+     * @return a int.
      */
     public int numElementsForGene( Gene g ) {
         if ( g == null ) throw new IllegalArgumentException( "Gene cannot be null" );
@@ -863,7 +968,7 @@ public class GeneAnnotations {
 
     /**
      * Get the number of elements in a gene set, identified by id.
-     * 
+     *
      * @param id String a class id
      * @return int number of elements in the class
      */
@@ -876,11 +981,53 @@ public class GeneAnnotations {
     }
 
     /**
+     * How many genes are currently available
+     *
+     * @return a int.
+     */
+    public int numGenes() {
+        return this.getGenes().size();
+    }
+
+    /**
+     * Get the number of gene sets currently available.
+     *
+     * @return a int.
+     */
+    public int numGeneSets() {
+        return this.getGeneSetTerms().size();
+    }
+
+    /**
+     * Get the number of genes in a gene set, identified by id.
+     *
+     * @param id String a class id
+     * @return int number of genes in the class
+     */
+    public int numGenesInGeneSet( GeneSetTerm id ) {
+        if ( !geneSets.containsKey( id ) ) {
+            return 0;
+        }
+        return getGeneSetGenes( id ).size();
+    }
+
+    /**
+     * <p>
+     * numProbes.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int numProbes() {
+        return elements.size();
+    }
+
+    /**
      * Print out the gene annotations in the same format we got them in, but if the gene sets have been modified, this
      * will be reflected.
-     * 
-     * @param out
-     * @throws IOException
+     *
+     * @param out a {@link java.io.Writer} object.
+     * @throws java.io.IOException if any.
      */
     public void print( Writer out ) throws IOException {
         out.write( "Probe\tSymbol\tName\tGeneSets\n" );
@@ -899,9 +1046,9 @@ public class GeneAnnotations {
 
     /**
      * Save changes to a user-defined gene set.
-     * 
-     * @param toSave
-     * @throws IOException
+     *
+     * @param toSave a {@link ubic.erminej.data.GeneSet} object.
+     * @throws java.io.IOException if any.
      */
     public void saveGeneSet( GeneSet toSave ) throws IOException {
         if ( this.isReadOnly() ) throw new UnsupportedOperationException();
@@ -921,10 +1068,12 @@ public class GeneAnnotations {
 
     /**
      * Make the selection the user-defined sets only.
+     *
+     * @return a {@link java.util.Collection} object.
      */
     public Collection<GeneSetTerm> selectUserDefined() {
 
-        Set<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+        Set<GeneSetTerm> result = new HashSet<>();
         for ( GeneSetTerm term : geneSets.keySet() ) {
             if ( term.isUserDefined() ) {
                 result.add( term );
@@ -935,7 +1084,11 @@ public class GeneAnnotations {
     }
 
     /**
-     * @param m
+     * <p>
+     * Setter for the field <code>messenger</code>.
+     * </p>
+     *
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
      */
     public void setMessenger( StatusViewer m ) {
         if ( m == null ) return;
@@ -943,15 +1096,17 @@ public class GeneAnnotations {
     }
 
     /**
-     * Create a new annotation set based on an existing one, for selected elements, removing elements with no annotations.
+     * Create a new annotation set based on an existing one, for selected elements, removing elements with no
+     * annotations.
      * Subclones should be treated as unmodifiable (though we don't enforce that strongly as it would greatly increase
      * memory requirements)
      * <p>
-     * Note that this could be changed in the future to consider the annotation aspect (BP, MF etc) not just the elements
+     * Note that this could be changed in the future to consider the annotation aspect (BP, MF etc) not just the
+     * elements
      * to retain. See comment in the Multifunctionality javadoc.
-     * 
-     * @param probesToRetain
-     * @return
+     *
+     * @param probesToRetain a {@link java.util.Collection} object.
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneAnnotations subClone( Collection<Element> probesToRetain ) {
 
@@ -969,7 +1124,7 @@ public class GeneAnnotations {
 
         // use an existing subclone?
         for ( GeneAnnotations existingSubClone : subClones ) {
-            Collection<Element> existingSubCloneProbes = new HashSet<Element>( existingSubClone.getProbes() );
+            Collection<Element> existingSubCloneProbes = new HashSet<>( existingSubClone.getProbes() );
             if ( existingSubCloneProbes.size() == probesToRetain.size()
                     && existingSubCloneProbes.containsAll( probesToRetain ) ) {
                 // log.info( "Found a usable existing annotation set" );
@@ -986,12 +1141,16 @@ public class GeneAnnotations {
     }
 
     /**
-     * @return
+     * <p>
+     * toTableModel.
+     * </p>
+     *
+     * @return a {@link javax.swing.table.TableModel} object.
      */
     public TableModel toTableModel() {
 
         // this is not actually used except for a test .. but it could be used.
-        final List<Element> pL = new ArrayList<Element>( elements.values() );
+        final List<Element> pL = new ArrayList<>( elements.values() );
         return new AbstractTableModel() {
             private static final long serialVersionUID = 1L;
             private String[] columnNames = { "Element", "Gene", "Description" };
@@ -1031,7 +1190,7 @@ public class GeneAnnotations {
 
     /**
      * Add the parents of each term to the association for each gene.
-     * 
+     *
      * @param ga
      * @param goNames
      */
@@ -1040,8 +1199,8 @@ public class GeneAnnotations {
         if ( messenger != null ) {
             messenger.showProgress( "Inferring annotations in graph" );
         }
-        Map<Gene, Collection<GeneSetTerm>> toBeAdded = new HashMap<Gene, Collection<GeneSetTerm>>();
-        Map<GeneSetTerm, Collection<GeneSetTerm>> parentCache = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
+        Map<Gene, Collection<GeneSetTerm>> toBeAdded = new HashMap<>();
+        Map<GeneSetTerm, Collection<GeneSetTerm>> parentCache = new HashMap<>();
         int count = 0;
         int affectedGenes = 0;
 
@@ -1115,7 +1274,7 @@ public class GeneAnnotations {
      */
     private Set<Gene> findGenesByName( String searchOn ) {
 
-        Set<Gene> results = new HashSet<Gene>();
+        Set<Gene> results = new HashSet<>();
 
         Gene g = this.findGene( searchOn );
         if ( g != null ) results.add( g );
@@ -1142,7 +1301,7 @@ public class GeneAnnotations {
     /**
      */
     private void formGeneSets() {
-        this.geneSets = new HashMap<GeneSetTerm, GeneSet>();
+        this.geneSets = new HashMap<>();
         for ( Gene g : this.genes.values() ) {
             for ( GeneSetTerm term : g.getGeneSets() ) {
                 assert term != null;
@@ -1161,7 +1320,7 @@ public class GeneAnnotations {
     }
 
     /**
-     * 
+     *
      */
     private void maybeSetMinimumGenesetSize() {
         assert settings != null;
@@ -1183,7 +1342,7 @@ public class GeneAnnotations {
 
     /**
      * Remove classes that have too few members, or which are obsolete. These are not removed from the GO tree
-     * 
+     *
      * @param subCloning signals that we're making a copy of another annotation set for the purpose of analysis; ensures
      *        the original is not pruned.
      */
@@ -1193,7 +1352,7 @@ public class GeneAnnotations {
             throw new IllegalStateException( "There are no gene sets" );
         }
 
-        Set<GeneSetTerm> removeUs = new HashSet<GeneSetTerm>();
+        Set<GeneSetTerm> removeUs = new HashSet<>();
         int obsoleteRemoved = 0;
         int tooBigRemoved = 0;
         int tooSmallRemoved = 0;
@@ -1263,7 +1422,7 @@ public class GeneAnnotations {
         messenger.showProgress( "There are " + numGeneSets()
                 + " gene sets in the annotations, checking for redundancy ..." );
 
-        List<GeneSet> bySize = new ArrayList<GeneSet>( this.geneSets.values() );
+        List<GeneSet> bySize = new ArrayList<>( this.geneSets.values() );
         Collections.sort( bySize, new Comparator<GeneSet>() {
             @Override
             public int compare( GeneSet o1, GeneSet o2 ) {
@@ -1311,7 +1470,7 @@ public class GeneAnnotations {
     /**
      * Used during subcloning of annotations. Make use of the fact that if two sets are redundant before, they will
      * still be redundant even if we remove elements (as long as there are any elements left).
-     * 
+     *
      * @param start the clone source
      */
     private void redundancyCheck( GeneAnnotations start ) {
@@ -1335,7 +1494,7 @@ public class GeneAnnotations {
 
     /**
      * Update the redundancy information for one gene set.
-     * 
+     *
      * @param toSave
      */
     private void refreshRedundancyCheck( GeneSet toSave ) {
@@ -1385,18 +1544,20 @@ public class GeneAnnotations {
 
     /**
      * Initialize the gene sets and other data structures that needs special handling before use.
-     * 
+     *
      * @param goNames
      */
     private void setUp() {
 
         StopWatch timer = new StopWatch();
         timer.start();
+        /** {@inheritDoc} */
 
         if ( settings != null && settings.loadUserDefined() ) {
             userDefinedGeneSetManager = new UserDefinedGeneSetManager( this, settings, this.messenger );
         }
 
+        /** {@inheritDoc} */
         addParents(); // <- 1s
 
         formGeneSets(); // 1s
@@ -1418,7 +1579,7 @@ public class GeneAnnotations {
 
     /**
      * Less intensive setup for when we are cloning a starting point.
-     * 
+     *
      * @param start
      */
     private void setUp( GeneAnnotations start ) {
@@ -1431,7 +1592,7 @@ public class GeneAnnotations {
 
         maybeSetMinimumGenesetSize();
 
-        prune( true /* subcloning */); // fast
+        prune( true /* subcloning */ ); // fast
 
         redundancyCheck( start );// fast
 
@@ -1440,7 +1601,7 @@ public class GeneAnnotations {
 
     /**
      * Add a new set to the subclones.
-     * 
+     *
      * @param newSet
      */
     private void updateSubClones( GeneSet newSet ) {
@@ -1456,15 +1617,30 @@ public class GeneAnnotations {
 
 }
 
+class CaseInsensitiveMap<V> extends HashMap<String, V> {
+
+    @Override
+    public V get( Object key ) {
+        if ( !( key instanceof String ) ) return null;
+        return super.get( ( ( String ) key ).toLowerCase() );
+    }
+
+    @Override
+    public V put( String key, V value ) {
+        return super.put( key.toLowerCase(), value );
+    }
+}
+
 class ClassSizeComparator implements Comparator<GeneSet>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
+    /** {@inheritDoc} */
     @Override
     public int compare( GeneSet a, GeneSet b ) {
 
@@ -1478,19 +1654,5 @@ class ClassSizeComparator implements Comparator<GeneSet>, Serializable {
         }
 
         return 0;
-    }
-}
-
-class CaseInsensitiveMap<V> extends HashMap<String, V> {
-
-    @Override
-    public V put( String key, V value ) {
-        return super.put( key.toLowerCase(), value );
-    }
-
-    @Override
-    public V get( Object key ) {
-        if ( !( key instanceof String ) ) return null;
-        return super.get( ( ( String ) key ).toLowerCase() );
     }
 }

@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -104,7 +104,7 @@ public class TestMultifunctionality {
         assertEquals( 0.78394, mf.getGOTermMultifunctionality( new GeneSetTerm( "GO:0019538" ) ), 0.001 );
         assertEquals( 0.53797, mf.getGOTermMultifunctionality( new GeneSetTerm( "GO:0044421" ) ), 0.001 );
 
-        List<Gene> li = new ArrayList<Gene>();
+        List<Gene> li = new ArrayList<>();
         li.add( new Gene( "EYA3" ) );
         li.add( new Gene( "EPHB3" ) );
         li.add( new Gene( "MAPK1" ) );
@@ -127,7 +127,7 @@ public class TestMultifunctionality {
         li.add( new Gene( "foonotagene" ) );
         assertEquals( 0.707017, mf.correlationWithGeneMultifunctionality( li ), 0.001 ); // not checked by hand.
 
-        Map<Gene, Double> geneToScoreMap = new LinkedHashMap<Gene, Double>();
+        Map<Gene, Double> geneToScoreMap = new LinkedHashMap<>();
         int i = li.size();
         for ( Gene g : li ) {
             // these are 'already log-transformed'.

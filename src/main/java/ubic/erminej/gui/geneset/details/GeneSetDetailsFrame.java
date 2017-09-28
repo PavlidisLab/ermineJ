@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,11 +81,11 @@ import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.Element;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetDetails;
 import ubic.erminej.data.GeneSetDetailsImageWriter;
-import ubic.erminej.data.Element;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.table.JBarGraphCellRenderer;
 import ubic.erminej.gui.table.JMatrixCellRenderer;
@@ -96,6 +96,10 @@ import ubic.erminej.gui.util.JLinkLabel;
 import ubic.erminej.gui.util.StatusJlabel;
 
 /**
+ * <p>
+ * GeneSetDetailsFrame class.
+ * </p>
+ *
  * @author Paul Pavlidis
  * @author Kiran Keshav
  * @author Will Braynen
@@ -104,6 +108,7 @@ import ubic.erminej.gui.util.StatusJlabel;
 public class GeneSetDetailsFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
+    /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( GeneSetDetailsFrame.class );
     private static final int COLOR_RANGE_SLIDER_MIN = 1;
     private static final int COLOR_RANGE_SLIDER_RESOLUTION = 12;
@@ -132,7 +137,9 @@ public class GeneSetDetailsFrame extends JFrame {
     private static final int PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN = 75;
     private static final int PREFERRED_WIDTH_MULTIFUNCTIONALITY_QQCOLUMN = 55;
 
+    /** Constant <code>MAX_GENES_FOR_DETAIL_VIEWING=1000</code> */
     public static final int MAX_GENES_FOR_DETAIL_VIEWING = 1000;
+    /** Constant <code>GEMMA_GENE_SEARCH_URL_BASE="http://www.chibi.ubc.ca/Gemma/searcher."{trunked}</code> */
     protected static final String GEMMA_GENE_SEARCH_URL_BASE = "http://www.chibi.ubc.ca/Gemma/searcher.html?scope=G&query=";
 
     private int width;
@@ -184,6 +191,19 @@ public class GeneSetDetailsFrame extends JFrame {
 
     // private StatusViewer callerStatusViewer = null;
 
+    // TODO make these a setting that persists across sessions
+    private Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
+
+    private boolean normalizeMatrixView = true;
+
+    /**
+     * <p>
+     * Constructor for GeneSetDetailsFrame.
+     * </p>
+     *
+     * @param geneSetDetails a {@link ubic.erminej.data.GeneSetDetails} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     */
     public GeneSetDetailsFrame( GeneSetDetails geneSetDetails, StatusViewer messenger ) {
         this.geneSetDetails = geneSetDetails;
         this.statusMessenger = messenger;
@@ -209,13 +229,568 @@ public class GeneSetDetailsFrame extends JFrame {
         jbInit();
     }
 
+    void m_blackbodyColormapMenuItem_actionPerformed() {
+
+        try {
+            colorMap = ColorMap.BLACKBODY_COLORMAP;
+            matrixDisplay.setColorMap( colorMap );
+            colorScaleBar.setColorMap( colorMap );
+            table.repaint();
+        } catch ( Exception ex ) {
+        }
+
+    }
+
+    void m_cellWidthSlider_stateChanged( ChangeEvent e ) {
+        JSlider source = ( JSlider ) e.getSource();
+        int v = source.getValue();
+        resizeMatrixColumns( v );
+    }
+
+    void m_colorRangeSlider_stateChanged( ChangeEvent e ) {
+
+        JSlider source = ( JSlider ) e.getSource();
+        double value = source.getValue();
+
+        double displayMin, displayMax;
+        boolean normalized = matrixDisplay.getStandardizedEnabled();
+        if ( normalized ) {
+            double rangeMax = NORMALIZED_COLOR_RANGE_MAX;
+            double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
+            double range = value / zoomFactor;
+            displayMin = -( range / 2 );
+            displayMax = +( range / 2 );
+        } else {
+            double rangeMax = matrixDisplay.getMax() - matrixDisplay.getMin();
+            double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
+            double range = value / zoomFactor;
+            double midpoint = matrixDisplay.getMax() - ( rangeMax / 2 );
+            displayMin = midpoint - ( range / 2 );
+            displayMax = midpoint + ( range / 2 );
+        }
+
+        colorScaleBar.setLabels( displayMin, displayMax );
+        matrixDisplay.setDisplayRange( displayMin, displayMax );
+        table.repaint();
+    }
+
+    void m_greenredColormapMenuItem_actionPerformed( @SuppressWarnings("unused") ActionEvent e ) {
+
+        try {
+            colorMap = ColorMap.GREENRED_COLORMAP;
+            matrixDisplay.setColorMap( colorMap );
+            colorScaleBar.setColorMap( colorMap );
+            table.repaint();
+        } catch ( Exception ex ) {
+        }
+
+    }
+
+    void m_normalizeMenuItem_actionPerformed() {
+
+        normalizeMatrixView = m_normalizeMenuItem.isSelected();
+        matrixDisplay.setStandardizedEnabled( normalizeMatrixView );
+
+        initColorRangeWidget();
+        table.repaint();
+    }
+
+    void m_saveImageMenuItem_actionPerformed() {
+        if ( matrixDisplay == null ) return;
+        initChoosers();
+        int returnVal = imageChooser.showSaveDialog( this );
+        if ( returnVal == JFileChooser.APPROVE_OPTION ) {
+
+            File file = imageChooser.getSelectedFile();
+
+            if ( file.exists() ) {
+                returnVal = JOptionPane.showConfirmDialog( null, "File exists. Overwrite?" );
+                if ( returnVal != JOptionPane.OK_OPTION ) return;
+            }
+
+            this.includeLabels = imageChooser.includeLabels();
+            this.normalizeSavedImage = imageChooser.normalized();
+            settings.setProperty( INCLUDELABELS, new Boolean( includeLabels ) );
+            settings.setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( normalizeSavedImage ) );
+            settings.writePrefs();
+
+            // Make sure the filename has an image extension
+            String filename = file.getPath();
+
+            if ( !FileTools.hasImageExtension( filename ) ) {
+                filename = FileTools.addImageExtension( filename );
+            }
+            // Save the color matrix image
+            try {
+                saveImage( filename, normalizeSavedImage );
+            } catch ( IOException ex ) {
+                GuiUtil.error( "There was an error saving the data to " + filename + "." );
+            }
+            settings.getConfig().setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
+        }
+        // else canceled by user
+    }
+
+    /**
+     * Adjust the width of every matrix display column
+     *
+     * @param desiredCellWidth
+     */
+    void resizeMatrixColumns( int desiredCellWidth ) {
+        if ( matrixDisplay == null ) return;
+        if ( desiredCellWidth >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && desiredCellWidth <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
+
+            // table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
+
+            int numColumns = matrixDisplay.getColumnCount();
+            for ( int i = 0; i < numColumns; i++ ) {
+                TableColumn col = table.getColumnModel().getColumn( i );
+                col.setResizable( false );
+                col.setPreferredWidth( desiredCellWidth );
+            }
+            this.matrixColumnWidth = desiredCellWidth; // copy value into our parameter.
+        }
+    }
+
+    void saveDataAction() {
+        initChoosers();
+        int returnVal = fileChooser.showSaveDialog( this );
+        if ( returnVal == JFileChooser.APPROVE_OPTION ) {
+
+            File file = fileChooser.getSelectedFile();
+
+            if ( file.exists() ) {
+                returnVal = JOptionPane.showConfirmDialog( null, "File exists. Overwrite?" );
+                if ( returnVal != JOptionPane.OK_OPTION ) return;
+            }
+
+            this.includeAnnotations = fileChooser.includeAnnotations() || matrixDisplay == null;// always save
+            // _something_
+            this.normalizeSavedData = fileChooser.normalized();
+            settings.setProperty( INCLUDEEVERYTHING, new Boolean( includeAnnotations ) );
+            settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( normalizeSavedData ) );
+            settings.writePrefs();
+
+            String filename = file.getPath();
+
+            // Save the values
+            try {
+                saveData( filename, matrixDisplay != null, includeAnnotations, normalizeSavedData );
+            } catch ( IOException ex ) {
+                GuiUtil.error( "There was an error saving the data to " + filename + "." );
+            }
+            settings.getConfig().setProperty( SAVESTARTPATH, fileChooser.getCurrentDirectory().getAbsolutePath() );
+        }
+        // else canceled by user
+    }
+
+    void showPopupMenu( MouseEvent e ) {
+        if ( e.getSource() instanceof JTable ) {
+            JTable source = ( JTable ) e.getSource();
+            assert source != null;
+            int r = source.rowAtPoint( e.getPoint() );
+
+            r = table.getRowSorter().convertRowIndexToModel( r );
+
+            final Element p = ( ( GeneSetDetailsTableModel ) source.getModel() ).getProbeAtRow( r );
+
+            JPopupMenu pm = new JPopupMenu();
+
+            JMenuItem gemmaSearchMenuItem = new JMenuItem( "Search Gemma for " + p.getGene().getSymbol() );
+            gemmaSearchMenuItem.addActionListener( new ActionListener() {
+                @Override
+                public void actionPerformed( @SuppressWarnings("hiding") ActionEvent e ) {
+                    Gene g = p.getGene();
+                    g.getSymbol();
+                    openUrlForGene( GEMMA_GENE_SEARCH_URL_BASE, g );
+                }
+            } );
+            pm.add( gemmaSearchMenuItem );
+
+            pm.show( e.getComponent(), e.getX(), e.getY() );
+
+        }
+    }
+
+    void table_mouseExited() {
+        resetUrl();
+    }
+
+    void table_mouseMoved( MouseEvent e ) {
+        int i = table.rowAtPoint( e.getPoint() );
+        int j = table.columnAtPoint( e.getPoint() );
+        if ( onGeneSymbolCell( i, j ) ) {
+            setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+            Object values = table.getValueAt( i, j );
+            if ( values instanceof JLinkLabel ) {
+                JLinkLabel geneLink = ( JLinkLabel ) values;
+                String url = geneLink.getURL();
+                if ( StringUtils.isNotBlank( url ) ) statusMessenger.showStatus( url, false );
+            } else {
+                statusMessenger.showStatus( values.toString(), false );
+            }
+
+        } else {
+            resetUrl();
+        }
+    }
+
+    void table_mouseReleased( MouseEvent e ) {
+        if ( SwingUtilities.isLeftMouseButton( e ) ) {
+            int i = table.getSelectedRow();
+            int j = table.getSelectedColumn();
+            if ( onGeneSymbolCell( i, j ) ) {
+                if ( table.getValueAt( i, j ) instanceof JLinkLabel ) {
+                    JLinkLabel geneLink = ( JLinkLabel ) table.getValueAt( i, j );
+                    // Events on cells are apparently not propagated to the children.
+                    if ( geneLink != null ) geneLink.openUrl();
+                } else {
+                    // show the link.
+                    statusMessenger.showStatus( table.getValueAt( i, j ).toString(), false );
+                }
+            } else if ( onMultifunctionalityCell( i, j ) ) {
+                // possibly update status bar.
+            }
+        }
+        /** {@inheritDoc} */
+    }
+
+    /**
+     * @param e
+     */
+    void viewGeneUrlDialogMenuItem_actionPerformed() {
+        GeneUrlDialog geneUrlDialog = new GeneUrlDialog( settings );
+        String url = geneUrlDialog.getUrl();
+        settings.setGeneUrlBase( url );
+        tableModel.configure();
+    }
+
+    /**
+     * <p>
+     * closeWindow_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.WindowEvent} object.
+     */
+    protected void closeWindow_actionPerformed( WindowEvent e ) {
+        writePrefs();
+        this.dispose();
+    }
+
+    /**
+     * <p>
+     * createDetailsTable.
+     * </p>
+     */
+    protected void createDetailsTable() {
+
+        setUpMatrixView(); // sets up matrixDisplay.
+
+        tableModel = new GeneSetDetailsTableModel( matrixDisplay, geneSetDetails, settings );
+        table.setModel( tableModel );
+
+        // table.setAutoCreateRowSorter( true );
+        TableRowSorter<GeneSetDetailsTableModel> sorter = new TableRowSorter<>(
+                ( GeneSetDetailsTableModel ) table.getModel() );
+        table.setRowSorter( sorter );
+
+        setupColumns();
+
+        // Sort initially by the score column, based on the user's original input (so we don't use -log-transformed
+        // values)
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        if ( settings.getBigIsBetter() ) {
+            sortKeys.add( new RowSorter.SortKey( matrixColumnCount + 1, SortOrder.DESCENDING ) );
+        } else {
+            sortKeys.add( new RowSorter.SortKey( matrixColumnCount + 1, SortOrder.ASCENDING ) );
+        }
+        table.getRowSorter().setSortKeys( sortKeys );
+
+        // sorter for the 'qq plot' columns
+        Comparator<List<Double>> quantileComparator = new Comparator<List<Double>>() {
+            @Override
+            public int compare( List<Double> o1, List<Double> o2 ) {
+                if ( o1 == null || o2 == null || o1.size() < 2 || o2.size() < 2 ) return 0;
+
+                if ( settings.getBigIsBetter() ) {
+                    if ( o1.get( 1 ).equals( o2.get( 1 ) ) ) {
+                        return -o1.get( 0 ).compareTo( o2.get( 0 ) );
+                    }
+                    return -o1.get( 1 ).compareTo( o2.get( 1 ) );
+                }
+                if ( o1.get( 1 ).equals( o2.get( 1 ) ) ) {
+                    return o1.get( 0 ).compareTo( o2.get( 0 ) );
+                }
+                return o1.get( 1 ).compareTo( o2.get( 1 ) );
+            }
+        };
+        sorter.setComparator( matrixColumnCount + 2, quantileComparator ); // probe score QQ
+        sorter.setComparator( matrixColumnCount + 6, quantileComparator ); // MF QQ
+
+        // Save the dimensions of the table just in case
+        int totalWidth = matrixColumnCount * matrixColumnWidth + PREFERRED_WIDTH_PROBEID_COLUMN
+                + PREFERRED_WIDTH_PVALUE_COLUMN + PREFERRED_WIDTH_GENENAME_COLUMN + PREFERRED_WIDTH_DESCRIPTION_COLUMN
+                + PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN;
+        int totalheight = table.getPreferredScrollableViewportSize().height;
+
+        Dimension d = new Dimension( totalWidth, totalheight );
+        table.setSize( d );
+
+        /*
+         * we could hide the score & multifunctionality columns if we don't have them, reshow after loading scores?
+         */
+
+    }// end createDetailsTable
+
+    /**
+     * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay). You would probably want to call this method
+     * to print out the matrix in the order in which it is displayed in the table. In this case, you will want to do
+     * something like this: <br>
+     * <br>
+     * <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code>
+     * <p>
+     * However, do not forget to call
+     * </p>
+     * <code>m_matrixDisplay.resetRowKeys()</code>
+     * <p>
+     * when you are done because the table sorter filter does its own mapping, so the matrix rows have to remain in
+     * their original order (or it might not be displayed correctly inside the table).
+     *
+     * @return an array of int.
+     */
+    protected int[] getCurrentMatrixDisplayRowOrder() {
+
+        /*
+         * There must be a simpler way to get this from the tablerowsorter? like
+         * table.getRowSorter().convertRowIndexToView( index )?
+         */
+
+        int matrixRowCount = matrixDisplay.getRowCount();
+        int[] rowKeys = new int[matrixRowCount];
+
+        // write out the table, one row at a time
+        for ( int r = 0; r < matrixRowCount; r++ ) {
+            // for this row: write out matrix values
+            String elementId = getProbeID( r );
+            Element probe = this.geneSetDetails.getGeneData().findElement( elementId );
+            if ( probe == null ) {
+                log.warn( " No element found in data matrix for: " + elementId );
+                continue;
+            }
+            rowKeys[r] = matrixDisplay.getRowIndexByName( probe );
+        }
+
+        return rowKeys;
+
+    } // end createRowKeys
+
+    /**
+     * fixme - this should not be in the gui.
+     *
+     * @param filename a {@link java.lang.String} object.
+     * @param normalized a boolean.
+     * @throws java.io.IOException if any.
+     * @param includeMatrix a boolean.
+     * @param addAnnots a boolean.
+     */
+    protected void saveData( String filename, boolean includeMatrix, boolean addAnnots, boolean normalized )
+            throws IOException {
+
+        final String NEWLINE = System.getProperty( "line.separator" );
+
+        File outputFile = new File( filename );
+
+        BufferedWriter out = new BufferedWriter( new FileWriter( outputFile ) );
+
+        boolean isStandardized = matrixDisplay != null && matrixDisplay.getStandardizedEnabled();
+        if ( matrixDisplay != null ) {
+            matrixDisplay.setStandardizedEnabled( normalized );
+        }
+
+        int totalRowCount = table.getRowCount();
+        matrixColumnCount = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount();
+
+        printHeader( includeMatrix, addAnnots, out, matrixColumnCount );
+
+        DecimalFormat nf = new DecimalFormat();
+        nf.setMaximumFractionDigits( 8 );
+        nf.setMinimumFractionDigits( 3 );
+        nf.setGroupingUsed( false );
+
+        // write out the table, one row at a time
+        for ( int r = 0; r < totalRowCount; r++ ) {
+
+            String elementId = getProbeID( r );
+            out.write( elementId );
+
+            if ( addAnnots ) {
+                printAnnotationsForRow( out, matrixColumnCount, r );
+            }
+
+            if ( includeMatrix ) {
+                printMatrixValueForRow( out, nf, elementId );
+            }
+            out.write( NEWLINE );
+        }
+
+        if ( matrixDisplay != null ) matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous
+        // state
+
+        // close the file
+        out.close();
+
+    } // end saveData
+
+    /**
+     * <p>
+     * saveImage.
+     * </p>
+     *
+     * @param filename a {@link java.lang.String} object.
+     * @param normalized a boolean.
+     * @throws java.io.IOException if any.
+     */
+    protected void saveImage( String filename, boolean normalized ) throws IOException {
+        if ( matrixDisplay == null ) return;
+        boolean isStandardized = matrixDisplay.getStandardizedEnabled();
+        matrixDisplay.setStandardizedEnabled( normalized );
+        matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
+        try {
+            GeneSetDetailsImageWriter.writePng( geneSetDetails, filename, colorMap, includeLabels, includeScalebar,
+                    normalized );
+        } catch ( IOException e ) {
+            // clean up
+            matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+            matrixDisplay.resetRowKeys();
+            throw e;
+        }
+
+        matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
+        matrixDisplay.resetRowKeys();
+
+    }
+
+    /**
+     * Keep the same gene set, but change the scores.
+     */
+    protected void switchGeneScoreFile() {
+
+        if ( runSettings != null ) {
+
+        }
+
+        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( settings.getScoreFile(), settings.getScoreCol() );
+        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
+        int yesno = fchooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
+            settings.setScoreCol( fchooser.getStartColumn() );
+            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile()
+                    + ", reading values from column " + settings.getScoreCol() );
+
+            try {
+                GeneScores scores = new GeneScores( settings.getScoreFile(), settings, statusMessenger,
+                        this.geneSetDetails.getGeneData() );
+
+                this.geneSetDetails.setGeneScores( scores );
+                this.setTitle( geneSetDetails.getTitle() );
+
+            } catch ( IOException e ) {
+                statusMessenger
+                        .showError( "Error during loading of " + settings.getScoreFile() + ": " + e.getMessage() );
+            }
+
+        }
+
+    }
+
+    /**
+     * <p>
+     * switchRawDataFile.
+     * </p>
+     */
+    protected void switchRawDataFile() {
+        this.switchRawDataFile( false );
+    }
+
+    /**
+     * <p>
+     * switchRawDataFile.
+     * </p>
+     *
+     * @param showHelp a boolean.
+     */
+    protected void switchRawDataFile( boolean showHelp ) {
+
+        if ( showHelp ) {
+            JOptionPane
+                    .showMessageDialog(
+                            this,
+                            "You have requested to view the details of a gene set without first"
+                                    + " setting an expression data file to display.\n After you close this window, you will be prompted to"
+                                    + " choose one if you want, or proceed without selecting one.\n"
+                                    + " You can select or change the data file used"
+                                    + " from the 'Options' menu of the details view.\n",
+                            "Selecting a data file",
+                            JOptionPane.INFORMATION_MESSAGE );
+        }
+
+        String rawDataFileName = settings.getRawDataFileName();
+        if ( StringUtils.isBlank( rawDataFileName ) ) {
+            rawDataFileName = this.settings.getDataDirectory();
+        }
+
+        JRawFileChooser fc = new JRawFileChooser( rawDataFileName, settings.getDataCol() );
+        fc.setDialogTitle( "Choose the expression data file or cancel." );
+        int yesno = fc.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            String rawdataFile = fc.getSelectedFile().getAbsolutePath();
+
+            settings.setRawFile( rawdataFile );
+            settings.setDataCol( fc.getStartColumn() );
+
+            this.geneSetDetails.loadDataMatrix( rawdataFile );
+            this.setTitle( this.geneSetDetails.getTitle() );
+
+            /*
+             * Have to rebuild the entire table.
+             */
+            createDetailsTable();
+            this.validate();
+            this.statusMessenger.showStatus( "Matrix file set to: " + rawdataFile );
+
+            setDisplayMatrixGUIEnabled( true );
+        }
+
+    }
+
+    /**
+     * Pop up a chart showing ROC and PR curves for this gene set in the full ranking.
+     */
+    protected void viewContext() {
+        if ( this.geneSetDetails.getSourceGeneScores() == null
+                || this.geneSetDetails.getSourceGeneScores().getRankedGenes().isEmpty() ) {
+            /*
+             * FIXME prompt for the gene scores?
+             */
+            statusMessenger.showError( "You have to define non-empty gene scores" );
+            return;
+        }
+        GeneSetRankingContextWindow w = new GeneSetRankingContextWindow( this.geneSetDetails );
+        w.setSize( new Dimension( 500, 500 ) );
+        GuiUtil.centerContainer( w );
+        w.setVisible( true );
+    }
+
     private String getProbeID( int row ) {
         int offset = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount(); // matrix display ends
         return ( ( Element ) table.getValueAt( row, offset + 0 ) ).getName();
     }
 
     /**
-     * 
+     *
      */
     private void initChoosers() {
         // clean up the class id so it can be used to form file names (this is not foolproof)
@@ -395,7 +970,7 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      *
      */
     private void readPathPrefs() {
@@ -457,7 +1032,7 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void repositionViewport() {
         // Reposition the table inside the scrollpane
@@ -472,7 +1047,7 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void resetUrl() {
         setCursor( Cursor.getDefaultCursor() );
@@ -587,53 +1162,6 @@ public class GeneSetDetailsFrame extends JFrame {
     /**
      * @param col
      */
-    private void setupMultifunctionalityColumn( TableColumn col ) {
-        col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN );
-        col.setCellRenderer( new DefaultTableCellRenderer() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
-                    boolean hasFocus, int row, int column ) {
-
-                super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
-
-                if ( isSelected || hasFocus ) return this;
-
-                String sv = ( String ) value;
-
-                String ds = sv.split( " " )[0]; // kludgy. But it works.
-
-                if ( StringUtils.isBlank( ds ) ) {
-                    return this;
-                }
-
-                double v = Double.parseDouble( ds );
-                // log.info( "" + v );
-                if ( v >= 0.99 ) {
-                    setBackground( Colors.LIGHTRED1 );
-                } else if ( v >= 0.95 ) {
-                    setBackground( Colors.LIGHTRED2 );
-                } else if ( v >= 0.9 ) {
-                    setBackground( Colors.LIGHTRED3 );
-                } else if ( v >= 0.85 ) {
-                    setBackground( Colors.LIGHTRED4 );
-                } else if ( v >= 0.8 ) {
-                    setBackground( Colors.LIGHTRED5 );
-                } else {
-                    setBackground( Color.WHITE );
-                }
-
-                setForeground( Color.BLACK );
-
-                return this;
-            }
-        } );
-    }
-
-    /**
-     * @param col
-     */
     private void setupGeneSymbolColumn( TableColumn col ) {
         col.setPreferredWidth( PREFERRED_WIDTH_GENENAME_COLUMN );
         col.setCellRenderer( new DefaultTableCellRenderer() {
@@ -672,7 +1200,7 @@ public class GeneSetDetailsFrame extends JFrame {
                 statusMessenger.showError( "None of the elements in this gene set were in the data file." );
             }
         } else {
-            matrixDisplay = new MatrixDisplay<Element, String>( matrix );
+            matrixDisplay = new MatrixDisplay<>( matrix );
             matrixDisplay.setColorMap( this.colorMap );
             matrixDisplay.setStandardizedEnabled( this.normalizeMatrixView );
             // Make the columns in the matrix display not too wide (cell-size)
@@ -688,7 +1216,7 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void setupMenus() {
 
@@ -777,25 +1305,54 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * Pop up a chart showing ROC and PR curves for this gene set in the full ranking.
+     * @param col
      */
-    protected void viewContext() {
-        if ( this.geneSetDetails.getSourceGeneScores() == null
-                || this.geneSetDetails.getSourceGeneScores().getRankedGenes().isEmpty() ) {
-            /*
-             * FIXME prompt for the gene scores?
-             */
-            statusMessenger.showError( "You have to define non-empty gene scores" );
-            return;
-        }
-        GeneSetRankingContextWindow w = new GeneSetRankingContextWindow( this.geneSetDetails );
-        w.setSize( new Dimension( 500, 500 ) );
-        GuiUtil.centerContainer( w );
-        w.setVisible( true );
+    private void setupMultifunctionalityColumn( TableColumn col ) {
+        col.setPreferredWidth( PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN );
+        col.setCellRenderer( new DefaultTableCellRenderer() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Component getTableCellRendererComponent( JTable t, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column ) {
+
+                super.getTableCellRendererComponent( table, value, isSelected, hasFocus, row, column );
+
+                if ( isSelected || hasFocus ) return this;
+
+                String sv = ( String ) value;
+
+                String ds = sv.split( " " )[0]; // kludgy. But it works.
+
+                if ( StringUtils.isBlank( ds ) ) {
+                    return this;
+                }
+
+                double v = Double.parseDouble( ds );
+                // log.info( "" + v );
+                if ( v >= 0.99 ) {
+                    setBackground( Colors.LIGHTRED1 );
+                } else if ( v >= 0.95 ) {
+                    setBackground( Colors.LIGHTRED2 );
+                } else if ( v >= 0.9 ) {
+                    setBackground( Colors.LIGHTRED3 );
+                } else if ( v >= 0.85 ) {
+                    setBackground( Colors.LIGHTRED4 );
+                } else if ( v >= 0.8 ) {
+                    setBackground( Colors.LIGHTRED5 );
+                } else {
+                    setBackground( Color.WHITE );
+                }
+
+                setForeground( Color.BLACK );
+
+                return this;
+            }
+        } );
     }
 
     /**
-     * 
+     *
      */
     private void setUpStatusBar() {
         // status bar
@@ -809,7 +1366,7 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void setupTable() {
         table.setAutoResizeMode( JTable.AUTO_RESIZE_ALL_COLUMNS );
@@ -830,7 +1387,7 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void setupToolBar() {
         toolBar.setFloatable( false );
@@ -872,7 +1429,7 @@ public class GeneSetDetailsFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void setupWindow() {
 
@@ -900,7 +1457,7 @@ public class GeneSetDetailsFrame extends JFrame {
 
     /**
      * Ridiculously simple to remove tags.
-     * 
+     *
      * @param s
      * @return
      */
@@ -926,525 +1483,6 @@ public class GeneSetDetailsFrame extends JFrame {
         settings.writePrefs();
     }
 
-    /**
-     * @param e
-     */
-    protected void closeWindow_actionPerformed( WindowEvent e ) {
-        writePrefs();
-        this.dispose();
-    }
-
-    /**
-     * @param probeIDs2
-     * @param probeIDs
-     * @param pvalues
-     * @param geneData
-     * @param filename
-     */
-    protected void createDetailsTable() {
-
-        setUpMatrixView(); // sets up matrixDisplay.
-
-        tableModel = new GeneSetDetailsTableModel( matrixDisplay, geneSetDetails, settings );
-        table.setModel( tableModel );
-
-        // table.setAutoCreateRowSorter( true );
-        TableRowSorter<GeneSetDetailsTableModel> sorter = new TableRowSorter<GeneSetDetailsTableModel>(
-                ( GeneSetDetailsTableModel ) table.getModel() );
-        table.setRowSorter( sorter );
-
-        setupColumns();
-
-        // Sort initially by the score column, based on the user's original input (so we don't use -log-transformed
-        // values)
-        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        if ( settings.getBigIsBetter() ) {
-            sortKeys.add( new RowSorter.SortKey( matrixColumnCount + 1, SortOrder.DESCENDING ) );
-        } else {
-            sortKeys.add( new RowSorter.SortKey( matrixColumnCount + 1, SortOrder.ASCENDING ) );
-        }
-        table.getRowSorter().setSortKeys( sortKeys );
-
-        // sorter for the 'qq plot' columns
-        Comparator<List<Double>> quantileComparator = new Comparator<List<Double>>() {
-            @Override
-            public int compare( List<Double> o1, List<Double> o2 ) {
-                if ( o1 == null || o2 == null || o1.size() < 2 || o2.size() < 2 ) return 0;
-
-                if ( settings.getBigIsBetter() ) {
-                    if ( o1.get( 1 ).equals( o2.get( 1 ) ) ) {
-                        return -o1.get( 0 ).compareTo( o2.get( 0 ) );
-                    }
-                    return -o1.get( 1 ).compareTo( o2.get( 1 ) );
-                }
-                if ( o1.get( 1 ).equals( o2.get( 1 ) ) ) {
-                    return o1.get( 0 ).compareTo( o2.get( 0 ) );
-                }
-                return o1.get( 1 ).compareTo( o2.get( 1 ) );
-            }
-        };
-        sorter.setComparator( matrixColumnCount + 2, quantileComparator ); // probe score QQ
-        sorter.setComparator( matrixColumnCount + 6, quantileComparator ); // MF QQ
-
-        // Save the dimensions of the table just in case
-        int totalWidth = matrixColumnCount * matrixColumnWidth + PREFERRED_WIDTH_PROBEID_COLUMN
-                + PREFERRED_WIDTH_PVALUE_COLUMN + PREFERRED_WIDTH_GENENAME_COLUMN + PREFERRED_WIDTH_DESCRIPTION_COLUMN
-                + PREFERRED_WIDTH_MULTIFUNCTIONALITY_COLUMN;
-        int totalheight = table.getPreferredScrollableViewportSize().height;
-
-        Dimension d = new Dimension( totalWidth, totalheight );
-        table.setSize( d );
-
-        /*
-         * we could hide the score & multifunctionality columns if we don't have them, reshow after loading scores?
-         */
-
-    }// end createDetailsTable
-
-    /**
-     * Creates new row keys for the JMatrixDisplay object (m_matrixDisplay). You would probably want to call this method
-     * to print out the matrix in the order in which it is displayed in the table. In this case, you will want to do
-     * something like this: <br>
-     * <br>
-     * <code>m_matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );</code>
-     * <p>
-     * However, do not forget to call
-     * </p>
-     * <code>m_matrixDisplay.resetRowKeys()</code>
-     * <p>
-     * when you are done because the table sorter filter does its own mapping, so the matrix rows have to remain in
-     * their original order (or it might not be displayed correctly inside the table).
-     */
-    protected int[] getCurrentMatrixDisplayRowOrder() {
-
-        /*
-         * There must be a simpler way to get this from the tablerowsorter? like
-         * table.getRowSorter().convertRowIndexToView( index )?
-         */
-
-        int matrixRowCount = matrixDisplay.getRowCount();
-        int[] rowKeys = new int[matrixRowCount];
-
-        // write out the table, one row at a time
-        for ( int r = 0; r < matrixRowCount; r++ ) {
-            // for this row: write out matrix values
-            String elementId = getProbeID( r );
-            Element probe = this.geneSetDetails.getGeneData().findElement( elementId );
-            if ( probe == null ) {
-                log.warn( " No element found in data matrix for: " + elementId );
-                continue;
-            }
-            rowKeys[r] = matrixDisplay.getRowIndexByName( probe );
-        }
-
-        return rowKeys;
-
-    } // end createRowKeys
-
-    /**
-     * fixme - this should not be in the gui.
-     * 
-     * @param filename
-     * @param includeMatrixValues
-     * @param includeNonMatrix
-     * @param normalized
-     * @throws IOException
-     */
-    protected void saveData( String filename, boolean includeMatrix, boolean addAnnots, boolean normalized )
-            throws IOException {
-
-        final String NEWLINE = System.getProperty( "line.separator" );
-
-        File outputFile = new File( filename );
-
-        BufferedWriter out = new BufferedWriter( new FileWriter( outputFile ) );
-
-        boolean isStandardized = matrixDisplay != null && matrixDisplay.getStandardizedEnabled();
-        if ( matrixDisplay != null ) {
-            matrixDisplay.setStandardizedEnabled( normalized );
-        }
-
-        int totalRowCount = table.getRowCount();
-        matrixColumnCount = matrixDisplay == null ? 0 : matrixDisplay.getColumnCount();
-
-        printHeader( includeMatrix, addAnnots, out, matrixColumnCount );
-
-        DecimalFormat nf = new DecimalFormat();
-        nf.setMaximumFractionDigits( 8 );
-        nf.setMinimumFractionDigits( 3 );
-        nf.setGroupingUsed( false );
-
-        // write out the table, one row at a time
-        for ( int r = 0; r < totalRowCount; r++ ) {
-
-            String elementId = getProbeID( r );
-            out.write( elementId );
-
-            if ( addAnnots ) {
-                printAnnotationsForRow( out, matrixColumnCount, r );
-            }
-
-            if ( includeMatrix ) {
-                printMatrixValueForRow( out, nf, elementId );
-            }
-            out.write( NEWLINE );
-        }
-
-        if ( matrixDisplay != null ) matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous
-        // state
-
-        // close the file
-        out.close();
-
-    } // end saveData
-
-    /**
-     * @param filename
-     * @param normalized
-     * @throws IOException
-     */
-    protected void saveImage( String filename, boolean normalized ) throws IOException {
-        if ( matrixDisplay == null ) return;
-        boolean isStandardized = matrixDisplay.getStandardizedEnabled();
-        matrixDisplay.setStandardizedEnabled( normalized );
-        matrixDisplay.setRowKeys( getCurrentMatrixDisplayRowOrder() );
-        try {
-            GeneSetDetailsImageWriter.writePng( geneSetDetails, filename, colorMap, includeLabels, includeScalebar,
-                    normalized );
-        } catch ( IOException e ) {
-            // clean up
-            matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
-            matrixDisplay.resetRowKeys();
-            throw e;
-        }
-
-        matrixDisplay.setStandardizedEnabled( isStandardized ); // return to previous state
-        matrixDisplay.resetRowKeys();
-
-    }
-
-    /**
-     * Keep the same gene set, but change the scores.
-     */
-    protected void switchGeneScoreFile() {
-
-        if ( runSettings != null ) {
-
-        }
-
-        JGeneScoreFileChooser fchooser = new JGeneScoreFileChooser( settings.getScoreFile(), settings.getScoreCol() );
-        fchooser.setDialogTitle( "Choose the gene score file or cancel." );
-        int yesno = fchooser.showDialog( this, "Open" );
-
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            settings.setScoreFile( fchooser.getSelectedFile().getAbsolutePath() );
-            settings.setScoreCol( fchooser.getStartColumn() );
-            statusMessenger.showStatus( "Score file set to " + settings.getScoreFile()
-                    + ", reading values from column " + settings.getScoreCol() );
-
-            try {
-                GeneScores scores = new GeneScores( settings.getScoreFile(), settings, statusMessenger,
-                        this.geneSetDetails.getGeneData() );
-
-                this.geneSetDetails.setGeneScores( scores );
-                this.setTitle( geneSetDetails.getTitle() );
-
-            } catch ( IOException e ) {
-                statusMessenger
-                        .showError( "Error during loading of " + settings.getScoreFile() + ": " + e.getMessage() );
-            }
-
-        }
-
-    }
-
-    protected void switchRawDataFile() {
-        this.switchRawDataFile( false );
-    }
-
-    protected void switchRawDataFile( boolean showHelp ) {
-
-        if ( showHelp ) {
-            JOptionPane
-                    .showMessageDialog(
-                            this,
-                            "You have requested to view the details of a gene set without first"
-                                    + " setting an expression data file to display.\n After you close this window, you will be prompted to"
-                                    + " choose one if you want, or proceed without selecting one.\n"
-                                    + " You can select or change the data file used"
-                                    + " from the 'Options' menu of the details view.\n", "Selecting a data file",
-                            JOptionPane.INFORMATION_MESSAGE );
-        }
-
-        String rawDataFileName = settings.getRawDataFileName();
-        if ( StringUtils.isBlank( rawDataFileName ) ) {
-            rawDataFileName = this.settings.getDataDirectory();
-        }
-
-        JRawFileChooser fc = new JRawFileChooser( rawDataFileName, settings.getDataCol() );
-        fc.setDialogTitle( "Choose the expression data file or cancel." );
-        int yesno = fc.showDialog( this, "Open" );
-
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            String rawdataFile = fc.getSelectedFile().getAbsolutePath();
-
-            settings.setRawFile( rawdataFile );
-            settings.setDataCol( fc.getStartColumn() );
-
-            this.geneSetDetails.loadDataMatrix( rawdataFile );
-            this.setTitle( this.geneSetDetails.getTitle() );
-
-            /*
-             * Have to rebuild the entire table.
-             */
-            createDetailsTable();
-            this.validate();
-            this.statusMessenger.showStatus( "Matrix file set to: " + rawdataFile );
-
-            setDisplayMatrixGUIEnabled( true );
-        }
-
-    }
-
-    // TODO make these a setting that persists across sessions
-    private Color[] colorMap = ColorMap.BLACKBODY_COLORMAP;
-    private boolean normalizeMatrixView = true;
-
-    void m_blackbodyColormapMenuItem_actionPerformed() {
-
-        try {
-            colorMap = ColorMap.BLACKBODY_COLORMAP;
-            matrixDisplay.setColorMap( colorMap );
-            colorScaleBar.setColorMap( colorMap );
-            table.repaint();
-        } catch ( Exception ex ) {
-        }
-
-    }
-
-    void m_cellWidthSlider_stateChanged( ChangeEvent e ) {
-        JSlider source = ( JSlider ) e.getSource();
-        int v = source.getValue();
-        resizeMatrixColumns( v );
-    }
-
-    void m_colorRangeSlider_stateChanged( ChangeEvent e ) {
-
-        JSlider source = ( JSlider ) e.getSource();
-        double value = source.getValue();
-
-        double displayMin, displayMax;
-        boolean normalized = matrixDisplay.getStandardizedEnabled();
-        if ( normalized ) {
-            double rangeMax = NORMALIZED_COLOR_RANGE_MAX;
-            double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
-            double range = value / zoomFactor;
-            displayMin = -( range / 2 );
-            displayMax = +( range / 2 );
-        } else {
-            double rangeMax = matrixDisplay.getMax() - matrixDisplay.getMin();
-            double zoomFactor = COLOR_RANGE_SLIDER_RESOLUTION / rangeMax;
-            double range = value / zoomFactor;
-            double midpoint = matrixDisplay.getMax() - ( rangeMax / 2 );
-            displayMin = midpoint - ( range / 2 );
-            displayMax = midpoint + ( range / 2 );
-        }
-
-        colorScaleBar.setLabels( displayMin, displayMax );
-        matrixDisplay.setDisplayRange( displayMin, displayMax );
-        table.repaint();
-    }
-
-    void m_greenredColormapMenuItem_actionPerformed( @SuppressWarnings("unused") ActionEvent e ) {
-
-        try {
-            colorMap = ColorMap.GREENRED_COLORMAP;
-            matrixDisplay.setColorMap( colorMap );
-            colorScaleBar.setColorMap( colorMap );
-            table.repaint();
-        } catch ( Exception ex ) {
-        }
-
-    }
-
-    void m_normalizeMenuItem_actionPerformed() {
-
-        normalizeMatrixView = m_normalizeMenuItem.isSelected();
-        matrixDisplay.setStandardizedEnabled( normalizeMatrixView );
-
-        initColorRangeWidget();
-        table.repaint();
-    }
-
-    void m_saveImageMenuItem_actionPerformed() {
-        if ( matrixDisplay == null ) return;
-        initChoosers();
-        int returnVal = imageChooser.showSaveDialog( this );
-        if ( returnVal == JFileChooser.APPROVE_OPTION ) {
-
-            File file = imageChooser.getSelectedFile();
-
-            if ( file.exists() ) {
-                returnVal = JOptionPane.showConfirmDialog( null, "File exists. Overwrite?" );
-                if ( returnVal != JOptionPane.OK_OPTION ) return;
-            }
-
-            this.includeLabels = imageChooser.includeLabels();
-            this.normalizeSavedImage = imageChooser.normalized();
-            settings.setProperty( INCLUDELABELS, new Boolean( includeLabels ) );
-            settings.setProperty( NORMALIZE_SAVED_IMAGE, new Boolean( normalizeSavedImage ) );
-            settings.writePrefs();
-
-            // Make sure the filename has an image extension
-            String filename = file.getPath();
-
-            if ( !FileTools.hasImageExtension( filename ) ) {
-                filename = FileTools.addImageExtension( filename );
-            }
-            // Save the color matrix image
-            try {
-                saveImage( filename, normalizeSavedImage );
-            } catch ( IOException ex ) {
-                GuiUtil.error( "There was an error saving the data to " + filename + "." );
-            }
-            settings.getConfig().setProperty( SAVESTARTPATH, imageChooser.getCurrentDirectory().getAbsolutePath() );
-        }
-        // else canceled by user
-    }
-
-    /**
-     * Adjust the width of every matrix display column
-     * 
-     * @param desiredCellWidth
-     */
-    void resizeMatrixColumns( int desiredCellWidth ) {
-        if ( matrixDisplay == null ) return;
-        if ( desiredCellWidth >= MIN_WIDTH_MATRIXDISPLAY_COLUMN && desiredCellWidth <= MAX_WIDTH_MATRIXDISPLAY_COLUMN ) {
-
-            // table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
-
-            int numColumns = matrixDisplay.getColumnCount();
-            for ( int i = 0; i < numColumns; i++ ) {
-                TableColumn col = table.getColumnModel().getColumn( i );
-                col.setResizable( false );
-                col.setPreferredWidth( desiredCellWidth );
-            }
-            this.matrixColumnWidth = desiredCellWidth; // copy value into our parameter.
-        }
-    }
-
-    void saveDataAction() {
-        initChoosers();
-        int returnVal = fileChooser.showSaveDialog( this );
-        if ( returnVal == JFileChooser.APPROVE_OPTION ) {
-
-            File file = fileChooser.getSelectedFile();
-
-            if ( file.exists() ) {
-                returnVal = JOptionPane.showConfirmDialog( null, "File exists. Overwrite?" );
-                if ( returnVal != JOptionPane.OK_OPTION ) return;
-            }
-
-            this.includeAnnotations = fileChooser.includeAnnotations() || matrixDisplay == null;// always save
-            // _something_
-            this.normalizeSavedData = fileChooser.normalized();
-            settings.setProperty( INCLUDEEVERYTHING, new Boolean( includeAnnotations ) );
-            settings.setProperty( NORMALIZE_SAVED_DATA, new Boolean( normalizeSavedData ) );
-            settings.writePrefs();
-
-            String filename = file.getPath();
-
-            // Save the values
-            try {
-                saveData( filename, matrixDisplay != null, includeAnnotations, normalizeSavedData );
-            } catch ( IOException ex ) {
-                GuiUtil.error( "There was an error saving the data to " + filename + "." );
-            }
-            settings.getConfig().setProperty( SAVESTARTPATH, fileChooser.getCurrentDirectory().getAbsolutePath() );
-        }
-        // else canceled by user
-    }
-
-    void showPopupMenu( MouseEvent e ) {
-        if ( e.getSource() instanceof JTable ) {
-            JTable source = ( JTable ) e.getSource();
-            assert source != null;
-            int r = source.rowAtPoint( e.getPoint() );
-
-            r = table.getRowSorter().convertRowIndexToModel( r );
-
-            final Element p = ( ( GeneSetDetailsTableModel ) source.getModel() ).getProbeAtRow( r );
-
-            JPopupMenu pm = new JPopupMenu();
-
-            JMenuItem gemmaSearchMenuItem = new JMenuItem( "Search Gemma for " + p.getGene().getSymbol() );
-            gemmaSearchMenuItem.addActionListener( new ActionListener() {
-                @Override
-                public void actionPerformed( @SuppressWarnings("hiding") ActionEvent e ) {
-                    Gene g = p.getGene();
-                    g.getSymbol();
-                    openUrlForGene( GEMMA_GENE_SEARCH_URL_BASE, g );
-                }
-            } );
-            pm.add( gemmaSearchMenuItem );
-
-            pm.show( e.getComponent(), e.getX(), e.getY() );
-
-        }
-    }
-
-    void table_mouseExited() {
-        resetUrl();
-    }
-
-    void table_mouseMoved( MouseEvent e ) {
-        int i = table.rowAtPoint( e.getPoint() );
-        int j = table.columnAtPoint( e.getPoint() );
-        if ( onGeneSymbolCell( i, j ) ) {
-            setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
-            Object values = table.getValueAt( i, j );
-            if ( values instanceof JLinkLabel ) {
-                JLinkLabel geneLink = ( JLinkLabel ) values;
-                String url = geneLink.getURL();
-                if ( StringUtils.isNotBlank( url ) ) statusMessenger.showStatus( url, false );
-            } else {
-                statusMessenger.showStatus( values.toString(), false );
-            }
-
-        } else {
-            resetUrl();
-        }
-    }
-
-    void table_mouseReleased( MouseEvent e ) {
-        if ( SwingUtilities.isLeftMouseButton( e ) ) {
-            int i = table.getSelectedRow();
-            int j = table.getSelectedColumn();
-            if ( onGeneSymbolCell( i, j ) ) {
-                if ( table.getValueAt( i, j ) instanceof JLinkLabel ) {
-                    JLinkLabel geneLink = ( JLinkLabel ) table.getValueAt( i, j );
-                    // Events on cells are apparently not propagated to the children.
-                    if ( geneLink != null ) geneLink.openUrl();
-                } else {
-                    // show the link.
-                    statusMessenger.showStatus( table.getValueAt( i, j ).toString(), false );
-                }
-            } else if ( onMultifunctionalityCell( i, j ) ) {
-                // possibly update status bar.
-            }
-        }
-    }
-
-    /**
-     * @param e
-     */
-    void viewGeneUrlDialogMenuItem_actionPerformed() {
-        GeneUrlDialog geneUrlDialog = new GeneUrlDialog( settings );
-        String url = geneUrlDialog.getUrl();
-        settings.setGeneUrlBase( url );
-        tableModel.configure();
-    }
-
 } // end class JGeneSetFrame
 
 class JGeneSetFrame_m_blackbodyColormapMenuItem_actionAdapter implements java.awt.event.ActionListener {
@@ -1467,6 +1505,7 @@ class JGeneSetFrame_m_cellWidthSlider_changeAdapter implements javax.swing.event
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void stateChanged( ChangeEvent e ) {
         adaptee.m_cellWidthSlider_stateChanged( e );
@@ -1480,6 +1519,7 @@ class JGeneSetFrame_m_colorRangeSlider_changeAdapter implements javax.swing.even
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void stateChanged( ChangeEvent e ) {
         adaptee.m_colorRangeSlider_stateChanged( e );
@@ -1491,6 +1531,7 @@ class JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter implements java.awt
 
     JGeneSetFrame_m_greenredColormapMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override
@@ -1504,13 +1545,16 @@ class JGeneSetFrame_m_mouseAdapter extends java.awt.event.MouseAdapter {
 
     JGeneSetFrame_m_mouseAdapter( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override
     public void mouseExited( MouseEvent e ) {
         adaptee.table_mouseExited();
+        /** {@inheritDoc} */
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseReleased( MouseEvent e ) {
         adaptee.table_mouseReleased( e );
@@ -1525,6 +1569,7 @@ class JGeneSetFrame_m_mouseMotionListener extends java.awt.event.MouseAdapter {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void mouseMoved( MouseEvent e ) {
         adaptee.table_mouseMoved( e );
@@ -1545,6 +1590,7 @@ class JGeneSetFrame_m_normalizeMenuItem_actionAdapter implements java.awt.event.
 }
 
 class JGeneSetFrame_m_saveDataMenuItem_actionAdapter implements java.awt.event.ActionListener {
+    /** {@inheritDoc} */
     GeneSetDetailsFrame adaptee;
 
     JGeneSetFrame_m_saveDataMenuItem_actionAdapter( GeneSetDetailsFrame adaptee ) {
@@ -1564,6 +1610,7 @@ class JGeneSetFrame_m_saveImageMenuItem_actionAdapter implements java.awt.event.
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.m_saveImageMenuItem_actionPerformed();
@@ -1574,17 +1621,24 @@ class JGeneSetFrame_viewGeneUrlDialog_actionAdapter implements java.awt.event.Ac
     GeneSetDetailsFrame adaptee;
 
     /**
-     * @param adaptee
+     * <p>
+     * Constructor for JGeneSetFrame_viewGeneUrlDialog_actionAdapter.
+     * </p>
+     *
+     * @param adaptee a {@link ubic.erminej.gui.geneset.details.GeneSetDetailsFrame} object.
      */
     public JGeneSetFrame_viewGeneUrlDialog_actionAdapter( GeneSetDetailsFrame adaptee ) {
         super();
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
+
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.viewGeneUrlDialogMenuItem_actionPerformed();
     }
+    /** {@inheritDoc} */
 }
 
 class JGeneSetFrame_windowListenerAdapter extends java.awt.event.WindowAdapter {
@@ -1601,11 +1655,13 @@ class JGeneSetFrame_windowListenerAdapter extends java.awt.event.WindowAdapter {
 }
 
 // show the hand cursor on hover
+/** {@inheritDoc} */
 class JGeneSetFrameTableHeader_mouseAdapterCursorChanger extends java.awt.event.MouseAdapter {
     GeneSetDetailsFrame adaptee;
 
     JGeneSetFrameTableHeader_mouseAdapterCursorChanger( GeneSetDetailsFrame adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override

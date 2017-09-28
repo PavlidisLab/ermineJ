@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Test application (not a unit test)
- * 
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -36,7 +36,7 @@ public class BufferedImageApp {
     private static Log log = LogFactory.getLog( BufferedImageApp.class );
 
     /**
-     * 
+     *
      *
      */
     public static void main( String[] args ) {

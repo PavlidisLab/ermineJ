@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006-2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,7 @@ import ubic.erminej.SettingsHolder;
 
 /**
  * This is designed to work as a singleton in the scope of a running ErmineJ instance.
- * 
+ *
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @version $Id$
@@ -76,6 +76,15 @@ public class UserDefinedGeneSetManager {
      */
     private GeneAnnotations geneData;
 
+    /**
+     * <p>
+     * Constructor for UserDefinedGeneSetManager.
+     * </p>
+     *
+     * @param annots a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     */
     public UserDefinedGeneSetManager( GeneAnnotations annots, SettingsHolder settings, StatusViewer messenger ) {
         if ( messenger != null ) this.statusMessenger = messenger;
         assert settings != null;
@@ -85,8 +94,9 @@ public class UserDefinedGeneSetManager {
     /**
      * Delete a user-defined gene set from disk and from the annotations in memory.
      * <p>
-     * 
-     * @param ngs
+     *
+     * @param termToDelete a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a boolean.
      */
     public boolean deleteUserGeneSet( GeneSetTerm termToDelete ) {
         GeneSet geneSet = geneData.getGeneSet( termToDelete );
@@ -156,15 +166,15 @@ public class UserDefinedGeneSetManager {
 
     /**
      * Read in a list of genes or probe ids from a file. The list of genes is unadorned, one per row.
-     * 
-     * @param fileName
+     *
+     * @param fileName a {@link java.lang.String} object.
      * @return list of genes that match ones in the file
-     * @throws IOException
+     * @throws java.io.IOException if any.
      */
     public Collection<Gene> loadPlainGeneList( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
         String line;
-        Collection<Gene> genes = new ArrayList<Gene>();
+        Collection<Gene> genes = new ArrayList<>();
 
         boolean probesNotFound = false;
         while ( ( line = dis.readLine() ) != null ) {
@@ -206,9 +216,9 @@ public class UserDefinedGeneSetManager {
 
     /**
      * Write a gene set to disk, in the directory set in the preferences. Use for update or create.
-     * 
-     * @param type
-     * @throws IOException
+     *
+     * @throws java.io.IOException if any.
+     * @param setToSave a {@link ubic.erminej.data.GeneSet} object.
      */
     public void saveGeneSet( GeneSet setToSave ) throws IOException {
         if ( !setToSave.isUserDefined() ) {
@@ -271,45 +281,6 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
-     * For testing only -- does NOT set the file name since we don't know it.
-     * 
-     * @param is
-     * @return
-     * @throws IOException
-     */
-    protected Collection<GeneSet> loadUserGeneSetFile( InputStream is ) throws IOException {
-        BufferedReader dis = new BufferedReader( new InputStreamReader( is ) );
-        Collection<GeneSet> result = new HashSet<GeneSet>();
-
-        int failures = 0;
-        while ( dis.ready() ) {
-            GeneSet newSet;
-            try {
-                newSet = readOneSet( dis );
-                if ( newSet == null ) {
-                    // warning, not a failure - e.g. empty gene set.
-                    continue;
-                }
-                result.add( newSet );
-            } catch ( UnreadableGeneSetException e ) {
-                log.debug( "Set was not read" );
-                failures++;
-            }
-
-            // incorrectly formatted files can cause a lot of trouble. See bug 3858 - if the file contains a lot of sets
-            // that have only one gene, it will fail here.
-            if ( failures > 10 ) {
-                statusMessenger.showError( "There were too many errors (" + failures
-                        + ") reading the gene set file, stopping" );
-                break;
-            }
-
-        }
-        dis.close();
-        return result;
-    }
-
-    /**
      * Add user-defined gene set(s) to the GeneData.
      * <ul>
      * <li>Rows starting with "#" are ignored as comments.</li>
@@ -334,12 +305,13 @@ public class UserDefinedGeneSetManager {
      * <li>Lines starting with "===" are ignored.</li>
      * </ol>
      * <p>
-     * Probes which aren't found on the currently active array design are ignored, but any elements that match identifiers
+     * Probes which aren't found on the currently active array design are ignored, but any elements that match
+     * identifiers
      * with ones on the current array design are used to build as much of the gene set as possible. It is conceivable
      * that this behavior is not desirable.
      * <p>
      * This overwrites any attributes this instance may have alreadhy had for a gene set (id, description)
-     * 
+     *
      * @param file which stores the elements or genes.
      * @return true if some elements were read in which are on the current array design.
      * @throws IOException
@@ -347,7 +319,7 @@ public class UserDefinedGeneSetManager {
     Collection<GeneSet> loadUserGeneSetFile( String fileName ) throws IOException {
         BufferedReader dis = setUpToLoad( fileName );
 
-        Collection<GeneSet> result = new HashSet<GeneSet>();
+        Collection<GeneSet> result = new HashSet<>();
 
         int failures = 0;
         while ( dis.ready() ) {
@@ -380,6 +352,45 @@ public class UserDefinedGeneSetManager {
     }
 
     /**
+     * For testing only -- does NOT set the file name since we don't know it.
+     *
+     * @param is a {@link java.io.InputStream} object.
+     * @throws java.io.IOException if any.
+     * @return a {@link java.util.Collection} object.
+     */
+    protected Collection<GeneSet> loadUserGeneSetFile( InputStream is ) throws IOException {
+        BufferedReader dis = new BufferedReader( new InputStreamReader( is ) );
+        Collection<GeneSet> result = new HashSet<>();
+
+        int failures = 0;
+        while ( dis.ready() ) {
+            GeneSet newSet;
+            try {
+                newSet = readOneSet( dis );
+                if ( newSet == null ) {
+                    // warning, not a failure - e.g. empty gene set.
+                    continue;
+                }
+                result.add( newSet );
+            } catch ( UnreadableGeneSetException e ) {
+                log.debug( "Set was not read" );
+                failures++;
+            }
+
+            // incorrectly formatted files can cause a lot of trouble. See bug 3858 - if the file contains a lot of sets
+            // that have only one gene, it will fail here.
+            if ( failures > 10 ) {
+                statusMessenger.showError( "There were too many errors (" + failures
+                        + ") reading the gene set file, stopping" );
+                break;
+            }
+
+        }
+        dis.close();
+        return result;
+    }
+
+    /**
      * @return
      */
     private String cleanGeneSetName( String id ) {
@@ -401,7 +412,7 @@ public class UserDefinedGeneSetManager {
 
     /**
      * Usually this would be called only once per application run. The annotations kept here are the 'canonical' ones.
-     * 
+     *
      * @param gd
      * @param set
      */
@@ -413,7 +424,7 @@ public class UserDefinedGeneSetManager {
 
     /**
      * Open file for writing, add header.
-     * 
+     *
      * @param classFile
      * @return
      * @throws IOException
@@ -480,7 +491,7 @@ public class UserDefinedGeneSetManager {
                 Collection<GeneSet> loadedSets = loadUserGeneSetFile( classFilePath );
 
                 if ( !loadedSets.isEmpty() ) {
-                    Set<String> customGeneSetFiles = new HashSet<String>( settings.getCustomGeneSetFiles() );
+                    Set<String> customGeneSetFiles = new HashSet<>( settings.getCustomGeneSetFiles() );
                     customGeneSetFiles.add( classFilePath );
                     settings.setCustomGeneSetFiles( customGeneSetFiles );
                 }
@@ -657,7 +668,8 @@ public class UserDefinedGeneSetManager {
 
         if ( hasUnknownProbes ) {
             /*
-             * We could add these elements (and genes). This would release users from having to have the annotation file,
+             * We could add these elements (and genes). This would release users from having to have the annotation
+             * file,
              * but I don't think it's that big of a deal.
              */
             if ( numTimesWarnedOfProblems < MAX_WARNINGS ) {
@@ -716,7 +728,7 @@ public class UserDefinedGeneSetManager {
 
     /**
      * The set will be written in the format set (geneSet.getFormat())
-     * 
+     *
      * @param geneeSet
      * @param out
      * @throws IOException

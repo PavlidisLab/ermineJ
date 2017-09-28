@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ import ubic.erminej.gui.util.JLinkLabel;
 
 /**
  * Displays 'about' information for the software.
- * 
+ *
  * @author Kiran Keshav
  * @author Paul Pavlidis
  * @version $Id$
@@ -56,6 +56,13 @@ public class AboutBox extends JDialog {
     private static final String SOFTWARENAME = "ermineJ";
     private static String homepageURL = "http://erminej.chibi.ubc.ca/";
 
+    /**
+     * <p>
+     * Constructor for AboutBox.
+     * </p>
+     *
+     * @param parent a {@link java.awt.Frame} object.
+     */
     public AboutBox( Frame parent ) {
         super( parent, "About " + SOFTWARENAME, true );
         this.setDefaultCloseOperation( DISPOSE_ON_CLOSE );

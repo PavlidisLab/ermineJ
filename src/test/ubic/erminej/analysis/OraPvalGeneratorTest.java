@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006-2013 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,10 +31,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import cern.jet.math.Arithmetic;
 import ubic.erminej.ResultsFileReader;
 import ubic.erminej.ResultsPrinter;
 import ubic.erminej.data.GeneSetResult;
-import cern.jet.math.Arithmetic;
 
 /**
  * @author pavlidis

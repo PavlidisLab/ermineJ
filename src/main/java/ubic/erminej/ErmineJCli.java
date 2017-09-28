@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,15 +54,16 @@ import ubic.erminej.SettingsHolder.MultiElementHandling;
 import ubic.erminej.SettingsHolder.MultiTestCorrMethod;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotationParser;
+import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerms;
-import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
  * Run ermineJ from the command line (or fire up the GUI).
- * 
+ *
  * @author Paul Pavlidis
  * @author keshav
+ * @version $Id: $Id
  */
 public class ErmineJCli {
 
@@ -71,6 +72,14 @@ public class ErmineJCli {
 
     private static Log log = LogFactory.getLog( ErmineJCli.class );
 
+    /**
+     * <p>
+     * main.
+     * </p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.lang.Exception if any.
+     */
     public static void main( String[] args ) throws Exception {
         ErmineJCli cmd = new ErmineJCli();
         try {
@@ -97,6 +106,11 @@ public class ErmineJCli {
 
     private boolean useCommandLineInterface = true;
 
+    /**
+     * <p>
+     * Constructor for ErmineJCli.
+     * </p>
+     */
     public ErmineJCli() {
         try {
             settings = new Settings( false );
@@ -110,30 +124,69 @@ public class ErmineJCli {
         this.buildOptions();
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>saveFileName</code>.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getSaveFileName() {
         return saveFileName;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>settings</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.SettingsHolder} object.
+     */
     public SettingsHolder getSettings() {
         return settings;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>statusMessenger</code>.
+     * </p>
+     *
+     * @return a {@link ubic.basecode.util.StatusViewer} object.
+     */
     public StatusViewer getStatusMessenger() {
         return statusMessenger;
     }
 
+    /**
+     * <p>
+     * isSaveAllGenes.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean isSaveAllGenes() {
         return saveAllGenes;
     }
 
+    /**
+     * <p>
+     * isUseCommandLineInterface.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean isUseCommandLineInterface() {
         return useCommandLineInterface;
     }
 
     /**
-     * @throws IllegalArgumentException
-     * @return
-     * @throws IOException
+     * <p>
+     * analyze.
+     * </p>
+     *
+     * @throws java.lang.IllegalArgumentException
+     * @throws java.io.IOException if any.
+     * @return a {@link ubic.erminej.analysis.GeneSetPvalRun} object.
      */
     protected GeneSetPvalRun analyze() throws IOException {
         statusMessenger.showProgress( "Starting analysis" );
@@ -142,9 +195,11 @@ public class ErmineJCli {
     }
 
     /**
-     * @param scoreFiles
-     * @return
-     * @throws IOException
+     * <p>
+     * batchAnalyze.
+     * </p>
+     *
+     * @throws java.io.IOException if any.
      */
     protected void batchAnalyze() throws IOException {
         Collection<GeneSetPvalRun> results = new HashSet<>();
@@ -176,6 +231,10 @@ public class ErmineJCli {
     }
 
     /**
+     * <p>
+     * initialize.
+     * </p>
+     *
      * @see ubic.erminej.gui.MainFrame.readDataFilesForStartup
      */
     protected void initialize() {
@@ -208,6 +267,10 @@ public class ErmineJCli {
     }
 
     /**
+     * <p>
+     * printHelp.
+     * </p>
+     *
      * @param command The name of the command as used at the command line.
      */
     protected void printHelp( String command ) {
@@ -215,6 +278,16 @@ public class ErmineJCli {
         h.printHelp( 100, "$ERMINEJ_HOME/bin/ermineJ.sh ", HEADER, options, FOOTER, true );
     }
 
+    /**
+     * <p>
+     * processCommandLine.
+     * </p>
+     *
+     * @param commandName a {@link java.lang.String} object.
+     * @param args an array of {@link java.lang.String} objects.
+     * @return a boolean.
+     * @throws java.lang.Exception if any.
+     */
     protected final boolean processCommandLine( String commandName, String[] args ) throws Exception {
         /* COMMAND LINE PARSER STAGE */
         BasicParser parser = new BasicParser();
@@ -248,8 +321,14 @@ public class ErmineJCli {
     }
 
     /**
-     * @param args
-     * @throws IOException
+     * <p>
+     * run.
+     * </p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws IOException if any.
+     * @return a boolean.
+     * @throws java.lang.Exception if any.
      */
     protected boolean run( String[] args ) throws Exception {
 
@@ -292,74 +371,118 @@ public class ErmineJCli {
     @SuppressWarnings("static-access")
     private void buildOptions() {
 
-        options.addOption( OptionBuilder.withLongOpt( "help" ).withDescription( "Print this message" ).create( 'h' ) );
+        OptionBuilder.withLongOpt( "help" );
+        OptionBuilder.withDescription( "Print this message" );
+        options.addOption( OptionBuilder.create( 'h' ) );
 
-        options.addOption( OptionBuilder
-                .withLongOpt( "config" )
-                .hasArg()
+        OptionBuilder
+                .withLongOpt( "config" );
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
                 .withDescription(
                         "Configuration file to use (saves typing); additional options given on the command line override those in the file."
-                                + " If you don't use this option, no configuration file will be used." )
-                .withArgName( "config file" ).create( 'C' ) );
+                                + " If you don't use this option, no configuration file will be used." );
+        OptionBuilder
+                .withArgName( "config file" );
+        options.addOption( OptionBuilder.create( 'C' ) );
 
-        options.addOption( OptionBuilder.withDescription( "Launch the GUI." ).withLongOpt( "gui" ).create( 'G' ) );
+        OptionBuilder.withDescription( "Launch the GUI." );
+        OptionBuilder.withLongOpt( "gui" );
+        options.addOption( OptionBuilder.create( 'G' ) );
 
-        options.addOption( OptionBuilder.hasArg()
-                .withDescription( "Annotation file to be used [required unless using GUI]" ).withLongOpt( "annots" )
-                .withArgName( "file" ).create( 'a' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription( "Annotation file to be used [required unless using GUI]" );
+        OptionBuilder.withLongOpt( "annots" );
+        OptionBuilder
+                .withArgName( "file" );
+        options.addOption( OptionBuilder.create( 'a' ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "affy" ).withDescription( "Annotation file is in Affymetrix format" )
+        OptionBuilder.withLongOpt( "affy" );
+        OptionBuilder.withDescription( "Annotation file is in Affymetrix format" );
+        options.addOption( OptionBuilder
                 .create( 'A' ) );
 
-        options.addOption( OptionBuilder.withDescription(
+        OptionBuilder.withDescription(
                 "Sets 'big is better' option for gene scores to true [default = "
-                        + SettingsHolder.getDefault( SettingsHolder.BIG_IS_BETTER ) + "]" )
+                        + SettingsHolder.getDefault( SettingsHolder.BIG_IS_BETTER ) + "]" );
+        options.addOption( OptionBuilder
                 .create( 'b' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "classFile" )
-                .withDescription( "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" )
-                .withArgName( "file" ).create( 'c' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder.withLongOpt( "classFile" );
+        OptionBuilder
+                .withDescription( "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" );
+        OptionBuilder
+                .withArgName( "file" );
+        options.addOption( OptionBuilder.create( 'c' ) );
 
-        options.addOption( OptionBuilder.hasArg().withDescription( "Column index for scores in input file (default: 2)" )
-                .withLongOpt( "scoreCol" ).withArgName( "integer" ).create( 'e' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder.withDescription( "Column index for scores in input file (default: 2)" );
+        OptionBuilder
+                .withLongOpt( "scoreCol" );
+        OptionBuilder.withArgName( "integer" );
+        options.addOption( OptionBuilder.create( 'e' ) );
 
-        options.addOption( OptionBuilder.hasArg().withArgName( "directory" )
-                .withDescription( "Data directory; default is your ermineJ.data directory" ).create( 'd' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "directory" );
+        OptionBuilder
+                .withDescription( "Data directory; default is your ermineJ.data directory" );
+        options.addOption( OptionBuilder.create( 'd' ) );
 
-        options.addOption( OptionBuilder.hasArg().withArgName( "directory" )
-                .withDescription( "Directory where custom gene set are located" ).create( 'f' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder.withArgName( "directory" );
+        OptionBuilder
+                .withDescription( "Directory where custom gene set are located" );
+        options.addOption( OptionBuilder.create( 'f' ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "filterNonSpecific" )
-                .withDescription( "Filter out non-specific elements (default annotation format only), default=true" )
+        OptionBuilder.withLongOpt( "filterNonSpecific" );
+        OptionBuilder
+                .withDescription( "Filter out non-specific elements (default annotation format only), default=true" );
+        options.addOption( OptionBuilder
                 .create( 'F' ) );
 
-        options.addOption( OptionBuilder
-                .hasArg()
-                .withArgName( "BEST|MEAN" )
-                .withLongOpt( "reps" )
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
+                .withArgName( "BEST|MEAN" );
+        OptionBuilder
+                .withLongOpt( "reps" );
+        OptionBuilder
                 .withDescription(
                         "What to do when genes have multiple scores"
                                 + " in input file (due to multiple elements per gene): BEST = best of replicates; MEAN = mean of replicates; default="
-                                + SettingsHolder.getDefault( SettingsHolder.GENE_REP_TREATMENT ) )
+                                + SettingsHolder.getDefault( SettingsHolder.GENE_REP_TREATMENT ) );
+        options.addOption( OptionBuilder
                 .create( 'g' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "iters" )
-                .withDescription( "Number of iterations (GSR and CORR methods only)" ).withArgName( "iterations" )
+        OptionBuilder.hasArg();
+        OptionBuilder.withLongOpt( "iters" );
+        OptionBuilder
+                .withDescription( "Number of iterations (GSR and CORR methods only)" );
+        OptionBuilder.withArgName( "iterations" );
+        options.addOption( OptionBuilder
                 .create( 'i' ) );
 
-        options.addOption( OptionBuilder
+        OptionBuilder
                 .withDescription(
-                        "Output should include gene symbols for all gene sets (default=don't include symbols)" )
-                .withLongOpt( "genesOut" ).create( 'j' ) );
+                        "Output should include gene symbols for all gene sets (default=don't include symbols)" );
+        OptionBuilder
+                .withLongOpt( "genesOut" );
+        options.addOption( OptionBuilder.create( 'j' ) );
 
-        options.addOption( OptionBuilder
-                .withLongOpt( "logTrans" )
+        OptionBuilder
+                .withLongOpt( "logTrans" );
+        OptionBuilder
                 .withDescription(
-                        "Log transform the scores (and change sign; recommended for p-values), default=don't transform" )
+                        "Log transform the scores (and change sign; recommended for p-values), default=don't transform" );
+        options.addOption( OptionBuilder
                 .create( 'l' ) );
 
-        options.addOption( OptionBuilder
-                .hasArg()
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
                 .withDescription(
                         "Method for computing raw class statistics (used for test=GSR only): "
                                 + SettingsHolder.GeneScoreMethod.MEAN + " (mean),  "
@@ -367,78 +490,125 @@ public class ErmineJCli {
                                 + SettingsHolder.GeneScoreMethod.MEAN_ABOVE_QUANTILE + " (mean above quantile), or "
                                 + SettingsHolder.GeneScoreMethod.PRECISIONRECALL
                                 + " (area under the precision-recall curve); default="
-                                + SettingsHolder.getDefault( SettingsHolder.CLASS_SCORE_METHOD ) )
-                .withLongOpt( "stats" ).withArgName( "option" ).create( 'm' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.CLASS_SCORE_METHOD ) );
+        OptionBuilder
+                .withLongOpt( "stats" );
+        OptionBuilder.withArgName( "option" );
+        options.addOption( OptionBuilder.create( 'm' ) );
 
-        options.addOption( OptionBuilder
-                .hasArg()
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
                 .withDescription(
                         "Method for computing gene set significance:  " + SettingsHolder.Method.ORA + " (ORA),  "
                                 + SettingsHolder.Method.GSR
                                 + " (resampling of gene scores; use with -m to choose algorithm),  "
                                 + SettingsHolder.Method.CORR + " (profile correlation),  " + SettingsHolder.Method.ROC
-                                + " (ROC)" )
-                .withLongOpt( "test" ).withArgName( "value" ).create( 'n' ) );
+                                + " (ROC)" );
+        OptionBuilder
+                .withLongOpt( "test" );
+        OptionBuilder.withArgName( "value" );
+        options.addOption( OptionBuilder.create( 'n' ) );
 
-        options.addOption( OptionBuilder.hasArg()
-                .withDescription( "Batch process score files from a list, one per line. Incompatible with -o, -s, -G" )
-                .withArgName( "scoreFileList" ).create( "batch" ) );
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription( "Batch process score files from a list, one per line. Incompatible with -o, -s, -G" );
+        OptionBuilder
+                .withArgName( "scoreFileList" );
+        options.addOption( OptionBuilder.create( "batch" ) );
 
+        OptionBuilder.withDescription( "Disable multifunctionality correction (default: on)" );
         /*
          * The intention is that this would be on
          */
-        options.addOption( OptionBuilder.withDescription( "Disable multifunctionality correction (default: on)" )
+        options.addOption( OptionBuilder
                 .create( "nomf" ) );
 
-        options.addOption( OptionBuilder.hasArg()
-                .withDescription( "Output file name; if omitted, results are written to standard out" )
-                .withArgName( "output file" ).withLongOpt( "output" ).create( 'o' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder
+                .withDescription( "Output file name; if omitted, results are written to standard out" );
+        OptionBuilder
+                .withArgName( "output file" );
+        OptionBuilder.withLongOpt( "output" );
+        options.addOption( OptionBuilder.create( 'o' ) );
 
-        options.addOption( OptionBuilder
-                .withDescription( "quantile to use, only used for 'MEAN_ABOVE_QUANTILE', default=50 (median)" )
-                .withArgName( "quantile" ).withLongOpt( "quantile" ).hasArg().create( 'q' ) );
+        OptionBuilder
+                .withDescription( "quantile to use, only used for 'MEAN_ABOVE_QUANTILE', default=50 (median)" );
+        OptionBuilder
+                .withArgName( "quantile" );
+        OptionBuilder.withLongOpt( "quantile" );
+        OptionBuilder.hasArg();
+        options.addOption( OptionBuilder.create( 'q' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "rawData" )
-                .withDescription( "Raw data file, only needed for profile correlation analysis" )
-                .withArgName( "data file" ).create( 'r' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder.withLongOpt( "rawData" );
+        OptionBuilder
+                .withDescription( "Raw data file, only needed for profile correlation analysis" );
+        OptionBuilder
+                .withArgName( "data file" );
+        options.addOption( OptionBuilder.create( 'r' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "scoreFile" )
-                .withDescription( "Score file, required for all but profile correlation method" )
-                .withArgName( "score file" ).create( 's' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder.withLongOpt( "scoreFile" );
+        OptionBuilder
+                .withDescription( "Score file, required for all but profile correlation method" );
+        OptionBuilder
+                .withArgName( "score file" );
+        options.addOption( OptionBuilder.create( 's' ) );
 
-        options.addOption( OptionBuilder
-                .hasArg()
-                .withLongOpt( "threshold" )
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
+                .withLongOpt( "threshold" );
+        OptionBuilder
                 .withDescription(
                         "Score threshold, only used for ORA; default = "
-                                + SettingsHolder.getDefault( SettingsHolder.GENE_SCORE_THRESHOLD_KEY ) )
-                .withArgName( "threshold" ).create( 't' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.GENE_SCORE_THRESHOLD_KEY ) );
+        OptionBuilder
+                .withArgName( "threshold" );
+        options.addOption( OptionBuilder.create( 't' ) );
 
-        options.addOption( OptionBuilder
-                .hasArg()
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
                 .withDescription(
                         "Sets the minimum class size; default = "
-                                + SettingsHolder.getDefault( SettingsHolder.MIN_CLASS_SIZE ) )
-                .withArgName( "minClassSize" ).withLongOpt( "minClassSize" ).create( 'y' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.MIN_CLASS_SIZE ) );
+        OptionBuilder
+                .withArgName( "minClassSize" );
+        OptionBuilder.withLongOpt( "minClassSize" );
+        options.addOption( OptionBuilder.create( 'y' ) );
 
-        options.addOption( OptionBuilder
-                .hasArg()
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
                 .withDescription(
                         "Sets the maximum class size; default = "
-                                + SettingsHolder.getDefault( SettingsHolder.MAX_CLASS_SIZE ) )
-                .withArgName( "maxClassSize" ).withLongOpt( "maxClassSize" ).create( 'x' ) );
+                                + SettingsHolder.getDefault( SettingsHolder.MAX_CLASS_SIZE ) );
+        OptionBuilder
+                .withArgName( "maxClassSize" );
+        OptionBuilder.withLongOpt( "maxClassSize" );
+        options.addOption( OptionBuilder.create( 'x' ) );
 
-        options.addOption( OptionBuilder.hasArg().withLongOpt( "saveconfig" )
-                .withDescription( "Save preferences in the specified file" ).withArgName( "file" ).create( 'S' ) );
+        OptionBuilder.hasArg();
+        OptionBuilder.withLongOpt( "saveconfig" );
+        OptionBuilder
+                .withDescription( "Save preferences in the specified file" );
+        OptionBuilder.withArgName( "file" );
+        options.addOption( OptionBuilder.create( 'S' ) );
 
-        options.addOption( OptionBuilder
-                .hasArg()
+        OptionBuilder
+                .hasArg();
+        OptionBuilder
                 .withDescription(
                         "Multiple test correction method: " + SettingsHolder.MultiTestCorrMethod.BONFERONNI
                                 + " = Bonferonni FWE, " + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
                                 + " = Westfall-Young (slow), " + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
-                                + " = Benjamini-Hochberg FDR [default]" )
-                .withLongOpt( "mtc" ).withArgName( "value" )
+                                + " = Benjamini-Hochberg FDR [default]" );
+        OptionBuilder
+                .withLongOpt( "mtc" );
+        OptionBuilder.withArgName( "value" );
+        options.addOption( OptionBuilder
                 .create( 'M' ) );
 
     }

@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,7 @@ import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Choose where the user is getting the information for the new gene set: either a file, or manual entry.
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  */
@@ -52,6 +52,14 @@ public class GeneSetWizardStep1 extends WizardStep {
     private JFileChooser chooser;
     int inputMethod;
 
+    /**
+     * <p>
+     * Constructor for GeneSetWizardStep1.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.geneset.edit.GeneSetWizard} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     */
     public GeneSetWizardStep1( GeneSetWizard wiz, SettingsHolder settings ) {
         super( wiz );
         this.jbInit();
@@ -61,7 +69,59 @@ public class GeneSetWizardStep1 extends WizardStep {
         wiz.clearStatus();
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>inputMethod</code>.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getInputMethod() {
+        return inputMethod;
+    }
+
+    /** {@inheritDoc} */
+
+    /**
+     * <p>
+     * getLoadFile.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    public String getLoadFile() {
+        return classFile.getText();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isReady() {
+        return true;
+    }
+
+    void browseButton_actionPerformed() {
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            classFile.setText( chooser.getSelectedFile().toString() );
+        }
+    }
+
+    void fileInputButton_actionPerformed() {
+        classFile.setEditable( true );
+        classFile.setEnabled( true );
+        browseButton.setEnabled( true );
+        inputMethod = 1;
+    }
+
+    void manInputButton_actionPerformed() {
+        classFile.setEditable( false );
+        classFile.setEnabled( false );
+        browseButton.setEnabled( false );
+        inputMethod = 0;
+    }
+
     // Component initialization
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         JPanel mainPanel = new JPanel();
@@ -106,7 +166,8 @@ public class GeneSetWizardStep1 extends WizardStep {
                                 .addComponent( jLabel4 ) )
                 .addGroup(
                         gl.createParallelGroup( Alignment.BASELINE ).addComponent( manInputButton )
-                                .addComponent( jLabel5 ) ).addGap( 5 ) );
+                                .addComponent( jLabel5 ) )
+                .addGap( 5 ) );
 
         // bottom
         JPanel fileBrowsePanel = new JPanel(); // holds file chooser
@@ -130,39 +191,34 @@ public class GeneSetWizardStep1 extends WizardStep {
                 + "You can load them in from a file, or add them from the list of available elements." );
         this.addMain( mainPanel );
     }
+}
+
+class GeneSetWizardStep1_browseButton_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetWizardStep1 adaptee;
+
+    GeneSetWizardStep1_browseButton_actionAdapter( GeneSetWizardStep1 adaptee ) {
+        this.adaptee = adaptee;
+    }
+
+    /** {@inheritDoc} */
 
     @Override
-    public boolean isReady() {
-        return true;
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.browseButton_actionPerformed();
+    }
+}
+
+class GeneSetWizardStep1_fileInputButton_actionAdapter implements java.awt.event.ActionListener {
+    GeneSetWizardStep1 adaptee;
+
+    GeneSetWizardStep1_fileInputButton_actionAdapter( GeneSetWizardStep1 adaptee ) {
+        this.adaptee = adaptee;
     }
 
-    void manInputButton_actionPerformed() {
-        classFile.setEditable( false );
-        classFile.setEnabled( false );
-        browseButton.setEnabled( false );
-        inputMethod = 0;
-    }
-
-    void fileInputButton_actionPerformed() {
-        classFile.setEditable( true );
-        classFile.setEnabled( true );
-        browseButton.setEnabled( true );
-        inputMethod = 1;
-    }
-
-    void browseButton_actionPerformed() {
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            classFile.setText( chooser.getSelectedFile().toString() );
-        }
-    }
-
-    public int getInputMethod() {
-        return inputMethod;
-    }
-
-    public String getLoadFile() {
-        return classFile.getText();
+    /** {@inheritDoc} */
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.fileInputButton_actionPerformed();
     }
 }
 
@@ -176,31 +232,5 @@ class GeneSetWizardStep1_manInputButton_actionAdapter implements java.awt.event.
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.manInputButton_actionPerformed();
-    }
-}
-
-class GeneSetWizardStep1_fileInputButton_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetWizardStep1 adaptee;
-
-    GeneSetWizardStep1_fileInputButton_actionAdapter( GeneSetWizardStep1 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.fileInputButton_actionPerformed();
-    }
-}
-
-class GeneSetWizardStep1_browseButton_actionAdapter implements java.awt.event.ActionListener {
-    GeneSetWizardStep1 adaptee;
-
-    GeneSetWizardStep1_browseButton_actionAdapter( GeneSetWizardStep1 adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.browseButton_actionPerformed();
     }
 }

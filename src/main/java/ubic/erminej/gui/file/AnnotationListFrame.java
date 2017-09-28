@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,13 +37,12 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
-import ubic.erminej.data.Platform;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
  * Shows list of available annotation files for download.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -61,14 +60,17 @@ public class AnnotationListFrame extends JDialog {
 
     private ArrayDesignValueObject selected = null;
 
-    public ArrayDesignValueObject getSelected() {
-        return selected;
-    }
-
+    /**
+     * <p>
+     * Constructor for AnnotationListFrame.
+     * </p>
+     *
+     * @param a a {@link java.util.List} object.
+     */
     public AnnotationListFrame( List<ArrayDesignValueObject> a ) {
         super();
 
-        this.arrays = new ArrayList<ArrayDesignValueObject>();
+        this.arrays = new ArrayList<>();
 
         for ( ArrayDesignValueObject v : a ) {
             if ( v.getHasAnnotationFile() ) this.arrays.add( v );
@@ -147,6 +149,17 @@ public class AnnotationListFrame extends JDialog {
 
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>selected</code>.
+     * </p>
+     *
+     * @return a {@link ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject} object.
+     */
+    public ArrayDesignValueObject getSelected() {
+        return selected;
+    }
+
 }
 
 class ADTableModel extends AbstractTableModel {
@@ -156,27 +169,38 @@ class ADTableModel extends AbstractTableModel {
     private final String[] columnNames = { "Short Name", "Name", "Taxon" };
     List<ArrayDesignValueObject> designs;
 
+    /**
+     * <p>
+     * Constructor for ADTableModel.
+     * </p>
+     *
+     * @param designs a {@link java.util.List} object.
+     */
     public ADTableModel( List<ArrayDesignValueObject> designs ) {
         super();
 
         this.designs = designs;
     }
 
-    @Override
-    public String getColumnName( int column ) {
-        return columnNames[column];
-    }
-
-    @Override
-    public int getRowCount() {
-        return designs.size();
-    }
-
+    /** {@inheritDoc} */
     @Override
     public int getColumnCount() {
         return 3; // 4 if we have the 'has annotation file' field.
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String getColumnName( int column ) {
+        return columnNames[column];
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getRowCount() {
+        return designs.size();
+    }
+
+    /** {@inheritDoc} */
     @Override
     public Object getValueAt( int rowIndex, int columnIndex ) {
         switch ( columnIndex ) {

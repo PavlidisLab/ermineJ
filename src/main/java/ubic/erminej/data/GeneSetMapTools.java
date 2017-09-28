@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,18 +36,23 @@ import ubic.basecode.util.StatusViewer;
  * Utility methods
  * <p>
  * Note that in ErmineJ 3 these are no longer used.
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
 public class GeneSetMapTools {
 
+    /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( GeneSetMapTools.class );
 
     /**
-     * @param classId
-     * @param classesToSimilarMap
-     * @return
+     * <p>
+     * getSimilarities.
+     * </p>
+     *
+     * @param classId a {@link java.lang.String} object.
+     * @param classesToSimilarMap a {@link java.util.Map} object.
+     * @return a {@link java.util.Collection} object.
      */
     public static Collection<String> getSimilarities( String classId,
             Map<String, Collection<String>> classesToSimilarMap ) {
@@ -70,10 +75,10 @@ public class GeneSetMapTools {
      * of genes in the smaller class which are also found in the larger class. Thus, setting this threshold to be 0.0
      * means that no overlap is tolerated. Setting it to 1 means that classes will never be discarded.
      * </p>
-     * 
+     *
      * @param fractionSameThreshold A value between 0 and 1, indicating how similar a class must be before it gets
      *        ditched.
-     * @param ga
+     * @param ga a {@link ubic.erminej.data.GeneAnnotations} object.
      * @param messenger For updating a log.
      * @param maxClassSize Large class considered. (that doesn't mean they are removed)
      * @param minClassSize Smallest class considered. (that doesn't mean they are removed)
@@ -84,9 +89,9 @@ public class GeneSetMapTools {
     public static void ignoreSimilar( double fractionSameThreshold, GeneAnnotations ga, StatusViewer messenger,
             int maxClassSize, int minClassSize, double bigClassPenalty ) {
 
-        Map<GeneSetTerm, Collection<GeneSetTerm>> classesToSimilarMap = new LinkedHashMap<GeneSetTerm, Collection<GeneSetTerm>>();
-        Collection<GeneSetTerm> seenit = new HashSet<GeneSetTerm>();
-        Collection<GeneSetTerm> deleteUs = new HashSet<GeneSetTerm>();
+        Map<GeneSetTerm, Collection<GeneSetTerm>> classesToSimilarMap = new LinkedHashMap<>();
+        Collection<GeneSetTerm> seenit = new HashSet<>();
+        Collection<GeneSetTerm> deleteUs = new HashSet<>();
 
         if ( messenger != null ) {
             messenger.showStatus( "...Highly (" + fractionSameThreshold * 100
@@ -95,7 +100,7 @@ public class GeneSetMapTools {
 
         // iterate over all the classes, starting from the smallest one.
         // List sortedList = ga.sortGeneSetsBySize();
-        List<GeneSetTerm> sortedList = new ArrayList<GeneSetTerm>( ga.getGeneSetTerms() );
+        List<GeneSetTerm> sortedList = new ArrayList<>( ga.getGeneSetTerms() );
         Collections.shuffle( sortedList );
 
         // OUTER - compare all classes to each other.
@@ -161,10 +166,14 @@ public class GeneSetMapTools {
     }
 
     /**
-     * @param ga
-     * @param gon
-     * @param messenger
-     * @param aspect
+     * <p>
+     * removeAspect.
+     * </p>
+     *
+     * @param ga a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param gon a {@link ubic.erminej.data.GeneSetTerms} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @param aspect a {@link java.lang.String} object.
      */
     public static void removeAspect( GeneAnnotations ga, GeneSetTerms gon, StatusViewer messenger, String aspect ) {
         if ( !( aspect.equals( "molecular_function" ) || aspect.equals( "biological_process" )
@@ -174,7 +183,7 @@ public class GeneSetMapTools {
 
         Collection<GeneSetTerm> geneSets = ga.getGeneSetTerms();
 
-        Collection<GeneSetTerm> removeUs = new HashSet<GeneSetTerm>();
+        Collection<GeneSetTerm> removeUs = new HashSet<>();
         for ( GeneSetTerm geneSet : geneSets ) {
             if ( geneSet.getAspect() == null ) {
                 log.warn( "No aspect for " + geneSet );
@@ -197,17 +206,17 @@ public class GeneSetMapTools {
 
     /**
      * Remove gene sets that don't meet certain criteria.
-     * 
-     * @param ga
-     * @param messenger
-     * @param minClassSize
-     * @param maxClassSize
+     *
+     * @param ga a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @param minClassSize a int.
+     * @param maxClassSize a int.
      */
     public static void removeBySize( GeneAnnotations ga, StatusViewer messenger, int minClassSize, int maxClassSize ) {
 
         Collection<GeneSetTerm> geneSets = ga.getGeneSetTerms();
 
-        Collection<GeneSetTerm> removeUs = new HashSet<GeneSetTerm>();
+        Collection<GeneSetTerm> removeUs = new HashSet<>();
         for ( GeneSetTerm geneSet : geneSets ) {
             Collection<Gene> element = ga.getGeneSetGenes( geneSet );
             if ( element.size() < minClassSize || element.size() > maxClassSize ) {

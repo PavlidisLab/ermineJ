@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,12 +27,12 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.EmptyBorder;
 
 import ubic.erminej.Settings;
@@ -43,7 +43,7 @@ import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Choose the method for the analysis.
- * 
+ *
  * @author homin
  * @version $Id$
  */
@@ -52,6 +52,14 @@ public class AnalysisWizardStep1 extends WizardStep {
 
     /*
      * For tests.
+     */
+    /**
+     * <p>
+     * main.
+     * </p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.lang.Exception if any.
      */
     public static void main( String[] args ) throws Exception {
         try {
@@ -76,6 +84,14 @@ public class AnalysisWizardStep1 extends WizardStep {
     private JRadioButton prButton;
     private JRadioButton rocButton;
 
+    /**
+     * <p>
+     * Constructor for AnalysisWizardStep1.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.analysis.AnalysisWizard} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public AnalysisWizardStep1( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
         this.jbInit();
@@ -85,11 +101,17 @@ public class AnalysisWizardStep1 extends WizardStep {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isReady() {
         return true;
     }
 
+    /**
+     * <p>
+     * saveValues.
+     * </p>
+     */
     public void saveValues() {
         if ( oraButton.isSelected() ) {
             settings.setClassScoreMethod( SettingsHolder.Method.ORA );
@@ -108,6 +130,11 @@ public class AnalysisWizardStep1 extends WizardStep {
         }
     }
 
+    /**
+     * <p>
+     * setValues.
+     * </p>
+     */
     public void setValues() {
         if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) ) {
             oraButton.setSelected( true );
@@ -124,7 +151,29 @@ public class AnalysisWizardStep1 extends WizardStep {
         }
     }
 
+    void corrButton_actionPerformed() {
+        wiz.setAnalysisType( SettingsHolder.Method.CORR );
+    }
+
+    void oraButton_actionPerformed() {
+        wiz.setAnalysisType( SettingsHolder.Method.ORA );
+    }
+
+    void prButton_actionPerformed() {
+        wiz.setAnalysisType( SettingsHolder.Method.GSR );
+        wiz.setGeneScoreMethod( GeneScoreMethod.PRECISIONRECALL );
+    }
+
+    /** {@inheritDoc} */
+
+    void resampButton_actionPerformed() {
+        wiz.setAnalysisType( SettingsHolder.Method.GSR );
+        wiz.setGeneScoreMethod( GeneScoreMethod.MEAN ); // this isn't actually used, it's just to let us know that it's
+                                                        // NOT precision-recall.
+    }
+
     // Component initialization
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         JPanel step1Panel = new JPanel();
@@ -235,26 +284,9 @@ public class AnalysisWizardStep1 extends WizardStep {
         this.addHelp( "<html><b>Select the method to " + "use for scoring gene sets.</b><br>" + "</html>" );
         this.addMain( step1Panel );
     }
-
-    void corrButton_actionPerformed() {
-        wiz.setAnalysisType( SettingsHolder.Method.CORR );
-    }
-
-    void oraButton_actionPerformed() {
-        wiz.setAnalysisType( SettingsHolder.Method.ORA );
-    }
-
-    void resampButton_actionPerformed() {
-        wiz.setAnalysisType( SettingsHolder.Method.GSR );
-        wiz.setGeneScoreMethod( GeneScoreMethod.MEAN ); // this isn't actually used, it's just to let us know that it's
-                                                        // NOT precision-recall.
-    }
-
-    void prButton_actionPerformed() {
-        wiz.setAnalysisType( SettingsHolder.Method.GSR );
-        wiz.setGeneScoreMethod( GeneScoreMethod.PRECISIONRECALL );
-    }
 }
+
+/** {@inheritDoc} */
 
 class AnalysisWizardStep1_corrButton_actionAdapter implements java.awt.event.ActionListener {
     AnalysisWizardStep1 adaptee;
@@ -269,6 +301,7 @@ class AnalysisWizardStep1_corrButton_actionAdapter implements java.awt.event.Act
     }
 }
 
+/** {@inheritDoc} */
 class AnalysisWizardStep1_oraButton_actionAdapter implements java.awt.event.ActionListener {
     AnalysisWizardStep1 adaptee;
 

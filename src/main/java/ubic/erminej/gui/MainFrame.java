@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006-2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -111,7 +111,7 @@ import ubic.erminej.gui.util.StatusJlabel;
 
 /**
  * The main ErmineJ application GUI frame.
- * 
+ *
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @author Will Braynen
@@ -191,7 +191,7 @@ public class MainFrame extends JFrame {
     private final JCheckBoxMenuItem showUsersMenuItem = new JCheckBoxMenuItem( "Show user-defined only", false );
     private final JMenuItem modClassMenuItem = new JMenuItem();
     private final JProgressBar progressBar = new JProgressBar();
-    private final List<GeneSetPvalRun> results = new ArrayList<GeneSetPvalRun>();
+    private final List<GeneSetPvalRun> results = new ArrayList<>();
     private final JMenuItem runAnalysisMenuItem = new JMenuItem();
     private JMenu runViewMenu = new JMenu();
     private JMenuItem saveAnalysisMenuItem = new JMenuItem();
@@ -281,7 +281,7 @@ public class MainFrame extends JFrame {
 
     /**
      * Get the original, "fresh" gene annotation data.
-     * 
+     *
      * @return
      */
     public GeneAnnotations getOriginalGeneData() {
@@ -333,7 +333,7 @@ public class MainFrame extends JFrame {
 
     /**
      * Remove a run from the list of results that are currently loaded.
-     * 
+     *
      * @param runIndex
      */
     public void removeRun( int runIndex ) {
@@ -371,7 +371,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     public void saveAnalysisAction() {
         if ( results.size() == 0 ) {
@@ -518,7 +518,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     public void updateRunViewMenu() {
         log.debug( "Updating runViewMenu" );
@@ -605,7 +605,7 @@ public class MainFrame extends JFrame {
 
     /**
      * Menu action
-     * 
+     *
      * @param checked
      */
     void hideNonsignificantClassActionPerformed( final boolean checked ) {
@@ -652,7 +652,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     protected void loadAnalysis() {
         JFileChooser chooser = new JFileChooser();
@@ -730,7 +730,8 @@ public class MainFrame extends JFrame {
                 int response = JOptionPane.showConfirmDialog( this,
                         "The annotation file for the analysis you are loading seems to be different from the current annotations.\n"
                                 + "This can cause unexpected behaviour. Are you sure you want to proceed?\n\nCurrent: "
-                                + currentAnnots + "\nUsed in analysis: " + analysisAnnots, "Annotation mismatch?",
+                                + currentAnnots + "\nUsed in analysis: " + analysisAnnots,
+                        "Annotation mismatch?",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE );
                 if ( response == JOptionPane.CANCEL_OPTION ) return;
             }
@@ -757,7 +758,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     protected void loadProject() {
 
@@ -846,7 +847,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     protected void resetSignificanceFilters() {
         hideNonsignificantClassMenuItem.setSelected( false );
@@ -855,7 +856,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     protected void saveProject() {
 
@@ -903,7 +904,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     protected void showLogs() {
         StringBuffer bif = new StringBuffer();
@@ -1033,7 +1034,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     protected void switchGeneScoreFile() {
         String scoreFile = settings.getScoreFile();
@@ -1073,7 +1074,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     protected void writePrefs() {
         settings.writePrefs();
@@ -1105,7 +1106,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void checkForReasonableResults( GeneSetPvalRun results1 ) {
         if ( athread == null || !athread.isFinishedNormally() ) return;
@@ -1161,7 +1162,7 @@ public class MainFrame extends JFrame {
     }
 
     private int find( String searchOn, boolean searchGenes ) {
-        Collection<GeneSetTerm> geneSets = new HashSet<GeneSetTerm>();
+        Collection<GeneSetTerm> geneSets = new HashSet<>();
 
         if ( StringUtils.isBlank( searchOn ) ) {
             filter( new HashSet<GeneSetTerm>() );
@@ -1184,7 +1185,7 @@ public class MainFrame extends JFrame {
 
     /**
      * aFter the user has clicked "okay" for their initial setup.
-     * 
+     *
      * @param
      */
     private void initialize( final JPanel cards, final String projectFile ) {
@@ -1227,7 +1228,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     *  
+     *
      */
     private void jbInit() {
 
@@ -1400,7 +1401,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void readPrefs() {
         int width = STARTING_OVERALL_WIDTH;
@@ -1458,7 +1459,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void setupMenus() {
         JMenuBar jMenuBar1 = new JMenuBar();
@@ -1679,7 +1680,7 @@ public class MainFrame extends JFrame {
 
     /**
      * The panel that show up while the initial inputs are loaded.
-     * 
+     *
      * @return
      */
     private JPanel setupProgressPanel() {
@@ -1982,7 +1983,7 @@ class RunSet_Choose_ActionAdapter implements java.awt.event.ActionListener {
 
     /**
      * clear icon for other menu items.
-     * 
+     *
      * @param source
      * @param geneSetPvalRun
      */

@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,14 +38,14 @@ import ubic.basecode.util.StatusViewer;
 /**
  * Simple "wizard" implementation. To use, call the "addStep" method with a new WizardStep as an argument. Actions must
  * be defined for the "back", "cancel", "finish" and "next" buttons.
- * 
+ *
  * @author pavlidis
  * @author Homin Lee
  * @version $Id$
  */
 public abstract class Wizard extends JDialog {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     protected JPanel mainPanel;
@@ -60,9 +60,18 @@ public abstract class Wizard extends JDialog {
     protected JButton finishButton = new JButton();
 
     protected JFrame callingframe;
-    List<WizardStep> steps = new Vector<WizardStep>();
+    List<WizardStep> steps = new Vector<>();
     private StatusViewer statusMessenger;
 
+    /**
+     * <p>
+     * Constructor for Wizard.
+     * </p>
+     *
+     * @param callingframe a {@link javax.swing.JFrame} object.
+     * @param width a int.
+     * @param height a int.
+     */
     public Wizard( JFrame callingframe, int width, int height ) {
         this.callingframe = callingframe;
         setModal( true );
@@ -74,6 +83,17 @@ public abstract class Wizard extends JDialog {
      */
     public void clearStatus() {
         statusMessenger.clear();
+    }
+
+    /**
+     * <p>
+     * getStatusField.
+     * </p>
+     *
+     * @return a {@link ubic.basecode.util.StatusViewer} object.
+     */
+    public StatusViewer getStatusField() {
+        return this.statusMessenger;
     }
 
     /**
@@ -92,8 +112,8 @@ public abstract class Wizard extends JDialog {
 
     /**
      * Print an error message to the status bar.
-     * 
-     * @param a
+     *
+     * @param a a {@link java.lang.String} object.
      */
     public void showError( String a ) {
         statusMessenger.showError( a );
@@ -101,13 +121,18 @@ public abstract class Wizard extends JDialog {
 
     /**
      * Print a message to the status bar.
-     * 
-     * @param a
+     *
+     * @param a a {@link java.lang.String} object.
      */
     public void showStatus( String a ) {
         statusMessenger.showStatus( a );
     }
 
+    /**
+     * <p>
+     * showWizard.
+     * </p>
+     */
     public void showWizard() {
         Dimension dlgSize = getPreferredSize();
         Dimension frmSize = callingframe.getSize();
@@ -118,44 +143,55 @@ public abstract class Wizard extends JDialog {
         this.setVisible( true );
     }
 
+    /**
+     * <p>
+     * addStep.
+     * </p>
+     *
+     * @param panel a {@link ubic.erminej.gui.util.WizardStep} object.
+     */
     protected void addStep( WizardStep panel ) {
         steps.add( panel );
     }
 
+    /**
+     * <p>
+     * addStep.
+     * </p>
+     *
+     * @param panel a {@link ubic.erminej.gui.util.WizardStep} object.
+     * @param first a boolean.
+     */
     protected void addStep( WizardStep panel, boolean first ) {
         this.addStep( panel );
         if ( first ) mainPanel.add( steps.get( 0 ), BorderLayout.CENTER );
     }
 
-    public StatusViewer getStatusField() {
-        return this.statusMessenger;
-    }
-
     /**
      * Define what happens when the 'back' button is pressed
-     * 
-     * @param e
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
      */
     protected abstract void backButton_actionPerformed( ActionEvent e );
 
     /**
      * Define what happens when the 'cancel' button is pressed.
-     * 
-     * @param e
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
      */
     protected abstract void cancelButton_actionPerformed( ActionEvent e );
 
     /**
      * Define what happens when the 'finish' button is pressed.
-     * 
-     * @param e
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
      */
     protected abstract void finishEditing( ActionEvent e );
 
     /**
      * Define what happens when the 'next' button is pressed
-     * 
-     * @param e
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
      */
     protected abstract void nextButton_actionPerformed( ActionEvent e );
 
@@ -187,6 +223,7 @@ public abstract class Wizard extends JDialog {
         BottomPanel.add( cancelButton, null );
         BottomPanel.add( backButton, null );
         BottomPanel.add( nextButton, null );
+        /** {@inheritDoc} */
         BottomPanel.add( finishButton, null );
 
         // status bar
@@ -200,6 +237,7 @@ public abstract class Wizard extends JDialog {
 
         BottomPanelWrap.add( BottomPanel, BorderLayout.NORTH );
         BottomPanelWrap.add( jPanelStatus, BorderLayout.SOUTH );
+        /** {@inheritDoc} */
 
         mainPanel.add( BottomPanelWrap, BorderLayout.SOUTH );
 
@@ -211,6 +249,7 @@ class Wizard_backButton_actionAdapter implements java.awt.event.ActionListener {
 
     Wizard_backButton_actionAdapter( Wizard adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override
@@ -224,6 +263,7 @@ class Wizard_cancelButton_actionAdapter implements java.awt.event.ActionListener
 
     Wizard_cancelButton_actionAdapter( Wizard adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override

@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,10 +40,10 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
-import javax.swing.SwingWorker;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -64,14 +64,16 @@ import ubic.erminej.gui.geneset.GeneSetPanelPopupMenu;
 
 /**
  * A table that lists the Gene Sets with their scores, and allows user interaction.
- * 
+ *
  * @author Homin Lee
  * @author Paul Pavlidis
  * @version $Id$
  */
 public class GeneSetTablePanel extends GeneSetPanel {
 
+    /** Constant <code>GENE_COUNT_COLUMN_INDEX=2</code> */
     public static final int GENE_COUNT_COLUMN_INDEX = 2;
+    /** Constant <code>MULTIFUNC_COLUMN_INDEX=3</code> */
     public static final int MULTIFUNC_COLUMN_INDEX = 3;
     private final static int GENESET_ID_COLUMN_WIDTH = 80;
     private final static int GENESET_NAME_COLUMN_WIDTH = 350;
@@ -82,26 +84,36 @@ public class GeneSetTablePanel extends GeneSetPanel {
     private static final long serialVersionUID = -1L;
     protected GeneSetTableModel model = null;
 
-    protected List<String> resultToolTips = new LinkedList<String>();
+    protected List<String> resultToolTips = new LinkedList<>();
 
     protected JTable table = null;
 
     private TableRowSorter<GeneSetTableModel> sorter;
 
+    /**
+     * <p>
+     * Constructor for GeneSetTablePanel.
+     * </p>
+     *
+     * @param callingFrame a {@link ubic.erminej.gui.MainFrame} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public GeneSetTablePanel( MainFrame callingFrame, Settings settings ) {
         super( settings, callingFrame );
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ubic.erminej.gui.GeneSetPanel#addedGeneSet(ubic.erminej.data.GeneSetTerm)
      */
+    /** {@inheritDoc} */
     @Override
     public void addedGeneSet( GeneSetTerm id ) {
         refreshView();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void addRun() {
 
@@ -124,7 +136,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
                 model.filter();
 
-                List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+                List<RowSorter.SortKey> sortKeys = new ArrayList<>();
                 sortKeys.add( new RowSorter.SortKey( c, SortOrder.ASCENDING ) );
                 sorter.setSortKeys( sortKeys );
             }
@@ -133,9 +145,10 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ubic.erminej.gui.geneset.GeneSetPanel#filter(boolean)
      */
+    /** {@inheritDoc} */
     @Override
     public void filter( final boolean propagate ) {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
@@ -161,6 +174,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     }
 
+    /**
+     * <p>
+     * filter.
+     * </p>
+     *
+     * @param selectedTerms a {@link java.util.Collection} object.
+     */
     public void filter( final Collection<GeneSetTerm> selectedTerms ) {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
             @Override
@@ -185,27 +205,50 @@ public class GeneSetTablePanel extends GeneSetPanel {
         r.execute();
     }
 
+    /**
+     * <p>
+     * filterByUserGeneSets.
+     * </p>
+     *
+     * @param b a boolean.
+     */
     public void filterByUserGeneSets( boolean b ) {
         this.model.setFilterNonUsers( b );
         filter( false );
     }
 
+    /**
+     * <p>
+     * getRowCount.
+     * </p>
+     *
+     * @return a int.
+     */
     public int getRowCount() {
         return this.table.getRowCount();
     }
 
     // called when we first set up the table.
+    /**
+     * <p>
+     * initialize.
+     * </p>
+     *
+     * @param initialGoData a {@link ubic.erminej.data.GeneAnnotations} object.
+     */
     public void initialize( GeneAnnotations initialGoData ) {
         this.geneData = initialGoData;
         setUpTable();
         setUpHeaderPopupMenus();
         setTableAttributes();
-        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add( new RowSorter.SortKey( 0, SortOrder.ASCENDING ) );
         sorter.setSortKeys( sortKeys );
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Revalidate, refilter and (resort? NO) the table.
      */
     @Override
@@ -223,12 +266,14 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public void removeRun( GeneSetPvalRun runToRemove ) {
         // Perhaps nothing, since it was done locally? could refactor from removeRun(int);
     }
 
     // called if 'cancel', 'find' or 'reset' have been hit.
+    /** {@inheritDoc} */
     @Override
     public void resetView() {
         filter( new HashSet<GeneSetTerm>() );
@@ -248,7 +293,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
                     assert sortColumnIndex < table.getColumnCount();
 
-                    List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+                    List<RowSorter.SortKey> sortKeys = new ArrayList<>();
                     sortKeys.add( new RowSorter.SortKey( sortColumnIndex, SortOrder.ASCENDING ) );
 
                     sorter.setSortKeys( sortKeys );
@@ -260,6 +305,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         r.execute();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void showPopupMenu( final MouseEvent e ) {
 
@@ -295,6 +341,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
         boolean deleted = super.deleteUserGeneSet( classID );
@@ -305,8 +352,8 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     /**
      * Create the text shown when user hovers mouse over the heading of a result column
-     * 
-     * @param runIndex
+     *
+     * @param runIndex a int.
      */
     protected void generateResultColumnHeadingTooltip( int runIndex ) {
 
@@ -386,8 +433,12 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     /**
-     * @param index
-     * @return
+     * <p>
+     * getHeaderToolTip.
+     * </p>
+     *
+     * @param index a int.
+     * @return a {@link java.lang.String} object.
      */
     protected String getHeaderToolTip( int index ) {
         if ( index == 0 || index == 1 ) { // descriptions of the category.
@@ -405,17 +456,18 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     /**
-     * @param runIndex
-     * @return
+     * <p>
+     * getRunName.
+     * </p>
+     *
+     * @param runIndex a int.
+     * @return a {@link java.lang.String} object.
      */
     protected String getRunName( int runIndex ) {
         return mainFrame.getResultSet( runIndex ).getName();
     }
 
-    /**
-     * @param e
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     protected GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e ) {
         JTable source = ( JTable ) e.getSource();
@@ -427,14 +479,22 @@ public class GeneSetTablePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ubic.erminej.gui.GeneSetPanel#removedGeneSet(ubic.erminej.data.GeneSetTerm)
      */
+    /** {@inheritDoc} */
     @Override
     protected void removedGeneSet( GeneSetTerm addedTerm ) {
         refreshView();
     }
 
+    /**
+     * <p>
+     * removeRunPopupMenu_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
+     */
     protected void removeRunPopupMenu_actionPerformed( ActionEvent e ) {
         EditRunPopupMenu sourcePopup = ( EditRunPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         int currentColumnIndex = table.getTableHeader().columnAtPoint( sourcePopup.getPoint() );
@@ -442,8 +502,12 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     /**
-     * @param runIndex
-     * @param newName
+     * <p>
+     * renameRun.
+     * </p>
+     *
+     * @param runIndex a int.
+     * @param newName a {@link java.lang.String} object.
      */
     protected void renameRun( int runIndex, String newName ) {
         TableColumn col = table.getColumn( model.getColumnName( model.getColumnIndexForRun( runIndex ) ) );
@@ -509,7 +573,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     /**
-     * 
+     *
      */
     private void clearRowFilter() {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
@@ -559,7 +623,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
                     mainFrame.removeRun( runIndex );
 
                     // Resort by a remaining run, after removing a run; otherwise, sort by the first column
-                    List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+                    List<RowSorter.SortKey> sortKeys = new ArrayList<>();
                     int newSortIndex = 0;
                     if ( mainFrame.getNumResultSets() > 0 ) {
                         newSortIndex = GeneSetTableModel.INIT_COLUMNS;
@@ -575,7 +639,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     /**
-     * 
+     *
      */
     private void setTableAttributes() {
         table.setModel( model );
@@ -597,7 +661,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
     }
 
     /**
-     * 
+     *
      */
     private void setUpTable() {
         table = new JTable() {
@@ -610,11 +674,13 @@ public class GeneSetTablePanel extends GeneSetPanel {
                     private static final long serialVersionUID = -1L;
 
                     @Override
+                    /** {@inheritDoc} */
                     public String getToolTipText( MouseEvent e ) {
                         java.awt.Point p = e.getPoint();
                         int index = columnModel.getColumnIndexAtX( p.x );
                         int realIndex = columnModel.getColumn( index ).getModelIndex();
                         return getHeaderToolTip( realIndex );
+                        /** {@inheritDoc} */
                     }
                 };
             }
@@ -629,7 +695,7 @@ public class GeneSetTablePanel extends GeneSetPanel {
         MouseListener m = super.configurePopupListener();
         table.addMouseListener( m );
 
-        sorter = new TableRowSorter<GeneSetTableModel>( ( GeneSetTableModel ) table.getModel() );
+        sorter = new TableRowSorter<>( ( GeneSetTableModel ) table.getModel() );
 
         table.setRowSorter( sorter );
         table.addMouseListener( new GeneSetTableMouseAdapter( this ) );
@@ -638,10 +704,22 @@ public class GeneSetTablePanel extends GeneSetPanel {
             @Override
             public void mouseEntered( MouseEvent e ) {
                 setCursor( Cursor.getPredefinedCursor( Cursor.HAND_CURSOR ) );
+                /**
+                 * <p>
+                 * getPoint.
+                 * </p>
+                 *
+                 * @return a {@link java.awt.Point} object.
+                 */
             }
 
             @Override
             public void mouseExited( MouseEvent e ) {
+                /**
+                 * <p>
+                 * Constructor for FindInTreeListener.
+                 * </p>
+                 */
                 setCursor( Cursor.getDefaultCursor() );
             }
         } );
@@ -653,6 +731,7 @@ class EditRunPopupListener extends MouseAdapter {
     EditRunPopupMenu popup;
 
     EditRunPopupListener( EditRunPopupMenu popupMenu ) {
+        /** {@inheritDoc} */
         popup = popupMenu;
     }
 
@@ -669,6 +748,7 @@ class EditRunPopupListener extends MouseAdapter {
     private void maybeShowPopup( MouseEvent e ) {
         if ( e.isPopupTrigger() ) {
             JTableHeader source = ( JTableHeader ) e.getSource();
+            /** {@inheritDoc} */
             int c = source.columnAtPoint( e.getPoint() );
             if ( c >= GeneSetTableModel.INIT_COLUMNS ) {
                 popup.show( e.getComponent(), e.getX(), e.getY() );
@@ -694,6 +774,7 @@ class EditRunPopupMenu extends JPopupMenu {
 }
 
 class FindInTreeListener implements ActionListener {
+    /** {@inheritDoc} */
     GeneSetPanel adaptee;
 
     /**
@@ -706,7 +787,7 @@ class FindInTreeListener implements ActionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     @Override

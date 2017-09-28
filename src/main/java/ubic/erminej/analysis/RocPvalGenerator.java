@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006-2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,6 @@ import java.util.Map;
 
 import ubic.basecode.math.ROC;
 import ubic.basecode.util.StatusViewer;
-
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
@@ -35,12 +34,22 @@ import ubic.erminej.data.GeneSetTerm;
 
 /**
  * Compute gene set p values based on the receiver operating characteristic (ROC).
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
 public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
+    /**
+     * <p>
+     * Constructor for RocPvalGenerator.
+     * </p>
+     *
+     * @param set a {@link ubic.erminej.SettingsHolder} object.
+     * @param an a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param geneToScoreMap a {@link java.util.Map} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     */
     public RocPvalGenerator( SettingsHolder set, GeneAnnotations an, Map<Gene, Double> geneToScoreMap,
             StatusViewer messenger ) {
         super( set, an, geneToScoreMap, messenger );
@@ -48,9 +57,10 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#generateGeneSetResults()
      */
+    /** {@inheritDoc} */
     @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
         boolean useMultifunctionalityCorrection = settings.useMultifunctionalityCorrection();
@@ -61,11 +71,15 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * @param useMultifunctionalityCorrection
-     * @return
+     * <p>
+     * generateGeneSetResults.
+     * </p>
+     *
+     * @param useMultifunctionalityCorrection a boolean.
+     * @return a {@link java.util.Map} object.
      */
     protected Map<GeneSetTerm, GeneSetResult> generateGeneSetResults( boolean useMultifunctionalityCorrection ) {
-        Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
+        Map<GeneSetTerm, GeneSetResult> results = new HashMap<>();
         int count = 0;
 
         this.numGenesUsed = geneToScoreMap.size();
@@ -87,7 +101,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         if ( useMultifunctionalityCorrection ) {
             Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
-                    false /* not ranks */, false /* unweighted regression */);
+                    false /* not ranks */, false /* unweighted regression */ );
             RocPvalGenerator rpg = new RocPvalGenerator( settings, geneAnnots, adjustScores, messenger );
             Map<GeneSetTerm, GeneSetResult> mfCorrectedResults = rpg.generateGeneSetResults( false );
 
@@ -112,7 +126,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Get results for one class, based on class id.
-     * 
+     *
      * @param geneSet name of the gene set to be tested.
      * @return a GeneSetResult
      */

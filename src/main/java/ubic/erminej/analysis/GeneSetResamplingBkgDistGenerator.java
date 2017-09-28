@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,8 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import cern.colt.list.DoubleArrayList;
+import cern.jet.stat.Descriptive;
 import ubic.basecode.math.PrecisionRecall;
 import ubic.basecode.math.RandomChooser;
 import ubic.basecode.math.Rank;
@@ -35,13 +37,11 @@ import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.Histogram;
-import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive;
 
 /**
  * Calculates a background distribution for class scores derived from randomly selected individual gene scores. This is
  * used for either the "GSR" method or the precision-recall method.
- * 
+ *
  * @author Shahmil Merchant
  * @author Paul Pavlidis
  * @since Created 09/02/02.
@@ -49,6 +49,16 @@ import cern.jet.stat.Descriptive;
  */
 public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSetScore {
 
+    private static int quantile = 50;
+
+    private static double quantfract = 0.5;
+
+    // after this size, switch to doing it by normal approximation.
+    private static final int MIN_SET_SIZE_FOR_ESTIMATION = 30;
+    /**
+     * Minimum number of iterations to perform when using approximation methods.
+     */
+    private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
     /**
      * Scores for ALL the genes.
      */
@@ -59,21 +69,15 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
      */
     private Map<Gene, Double> geneRanks;
 
-    private static int quantile = 50;
-    private static double quantfract = 0.5;
     private Settings.GeneScoreMethod method;
 
-    // after this size, switch to doing it by normal approximation.
-    private static final int MIN_SET_SIZE_FOR_ESTIMATION = 30;
-
     /**
-     * Minimum number of iterations to perform when using approximation methods.
-     */
-    private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
-
-    /**
-     * @param settings
-     * @param geneScores Should already be multifunctionality corrected if desired.
+     * <p>
+     * Constructor for GeneSetResamplingBkgDistGenerator.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param geneToScoreMap a {@link java.util.Map} object.
      */
     public GeneSetResamplingBkgDistGenerator( SettingsHolder settings, Map<Gene, Double> geneToScoreMap ) {
         this.classMaxSize = settings.getMaxClassSize();
@@ -121,9 +125,9 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
      * Basic method to calculate the raw score for a gene set, given an array of the gene scores for items in the class.
      * Note that speed here is important. In the prototypical GSR method, the score is the mean of the values for the
      * gene. For precision-recall, it is the average precision.
-     * 
+     *
      * @param genevalues double[] raw scores for the items in the class.
-     * @param genesInSet
+     * @param genesInSet a {@link java.util.Collection} object.
      * @return double
      * @see Settings.GeneScoreMethod for choices of methods.
      */
@@ -150,10 +154,10 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
 
     /**
      * Generate a null distribution, using a selected random seed.
-     * 
-     * @param m
-     * @param randomSeed
-     * @return
+     *
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
+     * @param randomSeed a long.
+     * @return a {@link ubic.erminej.data.Histogram} object.
      */
     public Histogram generateNulldistribution( StatusViewer m, long randomSeed ) {
         RandomChooser.init( randomSeed );
@@ -161,17 +165,16 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Used for methods which require randomly sampling classes to generate a null distribution of scores based on
      * gene-by-gene scores.
-     * 
-     * @return A histogram object containing a cdf that can be used to generate pvalues.
-     * @param m
      */
     @Override
     public Histogram generateNullDistribution( StatusViewer m ) {
 
         int numGenes = geneScores.length;
-        List<Gene> genes = new Vector<Gene>( geneRanks.keySet() );
+        List<Gene> genes = new Vector<>( geneRanks.keySet() );
         assert hist != null;
         assert numGenes >= classMaxSize;
 
@@ -283,6 +286,10 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
     }
 
     /**
+     * <p>
+     * Setter for the field <code>quantile</code>.
+     * </p>
+     *
      * @param value int
      */
     public void setQuantile( int value ) {
@@ -292,22 +299,27 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
      */
+    /** {@inheritDoc} */
     @Override
     public void setRandomSeed( long randomSeed ) {
         RandomChooser.init( randomSeed );
     }
 
     /**
-     * @param genesInSet
-     * @return
+     * <p>
+     * averagePrecision.
+     * </p>
+     *
+     * @param genesInSet a {@link java.util.Collection} object.
+     * @return a double.
      */
     protected double averagePrecision( Collection<Gene> genesInSet ) {
         assert geneRanks.size() >= genesInSet.size();
 
-        List<Double> ranksOfPositives = new Vector<Double>();
+        List<Double> ranksOfPositives = new Vector<>();
         for ( Gene gene : genesInSet ) {
             if ( geneRanks.containsKey( gene ) ) {
                 Double rank = geneRanks.get( gene );

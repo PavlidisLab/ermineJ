@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,19 +45,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import cern.colt.list.DoubleArrayList;
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
-
-import cern.colt.list.DoubleArrayList;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 
 /**
  * Parse and store probe->score associations. The values are stored in a Map probeToPvalMap. This is used to see what
  * elements are int the data set, as well as the score for each probe.
- * 
+ *
  * @author Shahmil Merchant
  * @author Paul Pavlidis
  * @version $Id$
@@ -95,11 +94,11 @@ public class GeneScores {
     /**
      * Constructor for the case when we are just taking in a hit list. The scores for all non-hit genes are set such
      * that the appropriate threshold will be zero. Note that no background set can be defined!
-     * 
-     * @param identifiers
-     * @param settings
-     * @param m
-     * @param geneAnnotations
+     *
+     * @param identifiers a {@link java.util.Collection} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
+     * @param geneAnnotations a {@link ubic.erminej.data.GeneAnnotations} object.
      * @param outputFileName if provided, also save this, and update the settings.
      */
     public GeneScores( Collection<String> identifiers, Settings settings, StatusViewer m,
@@ -135,8 +134,8 @@ public class GeneScores {
 
     /**
      * Create a copy of source that contains only the elements given.
-     * 
-     * @param source
+     *
+     * @param source a {@link ubic.erminej.data.GeneScores} object.
      * @param geneAnnots - the original gene annotation set, the elements here will be used as a starting point
      */
     public GeneScores( GeneScores source, GeneAnnotations geneAnnots ) {
@@ -161,11 +160,15 @@ public class GeneScores {
     }
 
     /**
+     * <p>
+     * Constructor for GeneScores.
+     * </p>
+     *
      * @param is - input stream
-     * @param settings
-     * @param messenger
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      * @param geneAnnotations Source (original) geneannotation set.
-     * @throws IOException
+     * @throws java.io.IOException if any.
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
      */
     public GeneScores( InputStream is, SettingsHolder settings, StatusViewer m, GeneAnnotations geneAnnotations )
             throws IOException {
@@ -182,11 +185,11 @@ public class GeneScores {
 
     /**
      * Constructor designed for use when input is not a file.
-     * 
+     *
      * @param elements List of Strings.
      * @param scores List of java.lang.Doubles containing the scores for each probe.
      * @param geneAnnots Source (original) geneannotation set.
-     * @param settings
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      */
     public GeneScores( List<String> elements, List<Double> scores, GeneAnnotations geneAnnots, SettingsHolder settings ) {
 
@@ -205,8 +208,8 @@ public class GeneScores {
         int numElementsKept = 0;
         int numRepeatedElements = 0;
         int numBadNumberStrings = 0;
-        Collection<String> unknownElements = new HashSet<String>();
-        Collection<String> unannotatedElements = new HashSet<String>();
+        Collection<String> unknownElements = new HashSet<>();
+        Collection<String> unannotatedElements = new HashSet<>();
 
         for ( int i = 0; i < elements.size(); i++ ) {
             String ps = elements.get( i );
@@ -265,11 +268,15 @@ public class GeneScores {
     }
 
     /**
-     * @param filename
-     * @param settings
-     * @param messenger
+     * <p>
+     * Constructor for GeneScores.
+     * </p>
+     *
+     * @param filename a {@link java.lang.String} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      * @param geneAnnots Source (original) geneannotation set.
-     * @throws IOException
+     * @throws java.io.IOException if any.
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
      */
     public GeneScores( String filename, SettingsHolder settings, StatusViewer m, GeneAnnotations geneAnnots )
             throws IOException {
@@ -300,8 +307,8 @@ public class GeneScores {
 
     /**
      * Note that these will already be log-transformed, if that was requested by the user.
-     * 
-     * @return
+     *
+     * @return an array of {@link java.lang.Double} objects.
      */
     public Double[] getGeneScores() {
         return this.geneToScoreMap.values().toArray( new Double[] {} );
@@ -309,9 +316,9 @@ public class GeneScores {
 
     /**
      * Get the gene scores for just the genes in the set indicated.
-     * 
-     * @param geneSetTerm
-     * @return
+     *
+     * @param geneSetTerm a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return an array of {@link java.lang.Double} objects.
      */
     public Double[] getGeneSetScores( GeneSetTerm geneSetTerm ) {
         DoubleArrayList p = new DoubleArrayList();
@@ -323,26 +330,30 @@ public class GeneScores {
 
     /**
      * Note that these values will already be log tranformed if that was requested.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Map} object.
      */
     public Map<Gene, Double> getGeneToScoreMap() {
         return geneToScoreMap;
     }
 
     /**
+     * <p>
+     * Getter for the field <code>geneToScoreMap</code>.
+     * </p>
+     *
      * @param shuffle Whether the map should be scrambled first. If so, then groups are randomly associated with scores,
      *        but the actual values are the same. This is used for resampling multiple test correction.
      * @return Map of groups of genes to scores (which will have been -log-transformed already, if requested)
      */
     public Map<Gene, Double> getGeneToScoreMap( boolean shuffle ) {
         if ( shuffle ) {
-            Map<Gene, Double> scrambled_map = new LinkedHashMap<Gene, Double>();
+            Map<Gene, Double> scrambled_map = new LinkedHashMap<>();
             Set<Gene> keys = geneToScoreMap.keySet();
             Iterator<Gene> it = keys.iterator();
 
             Collection<Double> values = geneToScoreMap.values();
-            List<Double> valvec = new Vector<Double>( values );
+            List<Double> valvec = new Vector<>( values );
             Collections.shuffle( valvec );
 
             // randomly associate keys and values
@@ -358,18 +369,32 @@ public class GeneScores {
 
     }
 
-    public int getNumGenesUsed() {
-        return geneToScoreMap.size();
-    }
-
+    /**
+     * <p>
+     * getNumElementsUsed.
+     * </p>
+     *
+     * @return a int.
+     */
     public int getNumElementsUsed() {
         return probeToScoreMap.size();
     }
 
     /**
+     * <p>
+     * getNumGenesUsed.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getNumGenesUsed() {
+        return geneToScoreMap.size();
+    }
+
+    /**
      * Note that these values will already be log-transformed if that was requested.
-     * 
-     * @return
+     *
+     * @return an array of {@link java.lang.Double} objects.
      */
     public Double[] getProbeScores() {
         return this.probeToScoreMap.values().toArray( new Double[] {} );
@@ -377,13 +402,19 @@ public class GeneScores {
 
     /**
      * Note that these values will already be log-transformed if that was requested
+     *
+     * @return a {@link java.util.Map} object.
      */
     public Map<Element, Double> getProbeToScoreMap() {
         return probeToScoreMap;
     }
 
     /**
-     * @return
+     * <p>
+     * getPrunedGeneAnnotations.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneAnnotations getPrunedGeneAnnotations() {
         // lightweight except for first time.
@@ -395,6 +426,10 @@ public class GeneScores {
     }
 
     /**
+     * <p>
+     * getRankedGenes.
+     * </p>
+     *
      * @return list of genes in order of their scores, where the <em>first</em> gene is the 'best'. If 'big is better',
      *         genes with large scores will be given first. If smaller is better (pvalues) and the data are -log
      *         transformed (usual), then the gene that had the smallest pvalue will be first.
@@ -405,7 +440,7 @@ public class GeneScores {
         assert this.getPrunedGeneAnnotations().getGenes().containsAll( this.geneToScoreMap.keySet() );
 
         final boolean flip = originalGeneAnnots.getSettings().upperTail();
-        TreeMap<Gene, Double> m = new TreeMap<Gene, Double>( new Comparator<Gene>() {
+        TreeMap<Gene, Double> m = new TreeMap<>( new Comparator<Gene>() {
 
             @Override
             public int compare( Gene o1, Gene o2 ) {
@@ -433,21 +468,25 @@ public class GeneScores {
         assert m.size() == this.geneToScoreMap.size();
         assert m.keySet().containsAll( this.geneToScoreMap.keySet() ); // !!
 
-        return Collections.unmodifiableList( new ArrayList<Gene>( m.keySet() ) );
+        return Collections.unmodifiableList( new ArrayList<>( m.keySet() ) );
     }
 
     /**
      * Might not be available.
-     * 
-     * @return
+     *
+     * @return a {@link java.lang.String} object.
      */
     public String getScoreColumnName() {
         return scoreColumnName;
     }
 
     /**
-     * @param probe_id
-     * @return
+     * <p>
+     * getValueMap.
+     * </p>
+     *
+     * @param probe_id a {@link java.lang.String} object.
+     * @return a double.
      */
     public double getValueMap( String probe_id ) {
         double value = 0.0;
@@ -460,6 +499,10 @@ public class GeneScores {
     }
 
     /**
+     * <p>
+     * isNegativeLog10Transformed.
+     * </p>
+     *
      * @return true if these scores were transformed via -log_10(x) when they were read in (according to the settings)
      */
     public boolean isNegativeLog10Transformed() {
@@ -467,8 +510,12 @@ public class GeneScores {
     }
 
     /**
-     * @param geneScoreThreshold
-     * @return
+     * <p>
+     * numGenesAboveThreshold.
+     * </p>
+     *
+     * @param geneScoreThreshold a double.
+     * @return a int.
      */
     public int numGenesAboveThreshold( double geneScoreThreshold ) {
         int count = 0;
@@ -497,6 +544,10 @@ public class GeneScores {
     }
 
     /**
+     * <p>
+     * rankLargeScoresBest.
+     * </p>
+     *
      * @see also Settings.upperTail(), which does the same thing.
      * @return true if the values returned by methods such as getGeneToScoreMap are returning values which should be
      *         treated as "big better". This will be true in the following (common) cases based on the settings the user
@@ -511,6 +562,7 @@ public class GeneScores {
         return ( logTransform && !biggerIsBetter ) || ( !logTransform && biggerIsBetter );
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
@@ -529,8 +581,9 @@ public class GeneScores {
 
     /**
      * Write the gene scores to a file. Note: does not affect the setting's value of scoreFile.
-     * 
+     *
      * @param f path to write to
+     * @throws java.io.IOException if any.
      */
     public void write( File f ) throws IOException {
         BufferedWriter w = new BufferedWriter( new FileWriter( f ) );
@@ -541,8 +594,8 @@ public class GeneScores {
     }
 
     private void init() {
-        this.geneToScoreMap = new LinkedHashMap<Gene, Double>( 1000 );
-        this.probeToScoreMap = new LinkedHashMap<Element, Double>( 1000 );
+        this.geneToScoreMap = new LinkedHashMap<>( 1000 );
+        this.probeToScoreMap = new LinkedHashMap<>( 1000 );
     }
 
     private void init( SettingsHolder settings ) {
@@ -582,7 +635,7 @@ public class GeneScores {
         }
 
         int i = 0;
-        Set<String> unMatched = new HashSet<String>();
+        Set<String> unMatched = new HashSet<>();
         // Set<String> unAnnotated = new HashSet<String>();
 
         for ( String idr : identifiers ) {
@@ -697,8 +750,8 @@ public class GeneScores {
             this.scoreColumnName = headings[scoreColumnIndex];
         }
 
-        Collection<String> unknownElements = new HashSet<String>();
-        Collection<String> unannotatedElements = new HashSet<String>();
+        Collection<String> unknownElements = new HashSet<>();
+        Collection<String> unannotatedElements = new HashSet<>();
 
         boolean warned = false;
 

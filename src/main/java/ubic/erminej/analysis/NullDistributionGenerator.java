@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,15 +22,31 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.data.Histogram;
 
 /**
+ * <p>
+ * NullDistributionGenerator interface.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
 public interface NullDistributionGenerator {
 
+    /**
+     * <p>
+     * generateNullDistribution.
+     * </p>
+     *
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @return a {@link ubic.erminej.data.Histogram} object.
+     */
     public Histogram generateNullDistribution( StatusViewer messenger );
 
     /**
-     * @param randomSeed
+     * <p>
+     * setRandomSeed.
+     * </p>
+     *
+     * @param randomSeed a long.
      */
     public void setRandomSeed( long randomSeed );
 

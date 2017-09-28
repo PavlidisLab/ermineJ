@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,11 +41,12 @@ import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * Combination of scores and data for a gene set, for visualization
- * 
+ *
  * @author pavlidis
  * @version $Id$
  */
 public class GeneSetDetails {
+    /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( GeneSetDetails.class );
 
     private GeneSetTerm classID;
@@ -55,8 +56,8 @@ public class GeneSetDetails {
 
     private Settings settings;
     private StatusViewer callerStatusViewer = new StatusStderr();
-    private Collection<Element> elements = new HashSet<Element>();
-    private Map<Element, Double> probeScores = new HashMap<Element, Double>();
+    private Collection<Element> elements = new HashSet<>();
+    private Map<Element, Double> probeScores = new HashMap<>();
 
     private DoubleMatrix<Element, String> dataMatrix = null;
 
@@ -68,10 +69,10 @@ public class GeneSetDetails {
 
     /**
      * Show without any results.
-     * 
-     * @param classID
+     *
+     * @param classID a {@link ubic.erminej.data.GeneSetTerm} object.
      * @param geneData Should be the pruned set, if appropriate
-     * @param callerStatusViewer
+     * @param callerStatusViewer a {@link ubic.basecode.util.StatusViewer} object.
      */
     public GeneSetDetails( GeneSetTerm classID, GeneAnnotations geneData, StatusViewer callerStatusViewer ) {
         if ( callerStatusViewer != null ) this.callerStatusViewer = callerStatusViewer;
@@ -83,13 +84,13 @@ public class GeneSetDetails {
 
     /**
      * The data matrix will be read in based on the settings, or can be changed later.
-     * 
-     * @param classID
+     *
+     * @param classID a {@link ubic.erminej.data.GeneSetTerm} object.
      * @param result - optional
      * @param geneData Should be the pruned set, if appropriate
      * @param settings - optional, if not supplied will be read in
      * @param geneScores - optional, if not supplied will be read in based on settings.
-     * @param statusViewer
+     * @param statusViewer a {@link ubic.basecode.util.StatusViewer} object.
      */
     public GeneSetDetails( GeneSetTerm classID, GeneSetResult result, GeneAnnotations geneData, Settings settings,
             GeneScores geneScores, StatusViewer statusViewer ) {
@@ -143,23 +144,45 @@ public class GeneSetDetails {
 
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>classID</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.data.GeneSetTerm} object.
+     */
     public GeneSetTerm getClassID() {
         return classID;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>dataMatrix</code>.
+     * </p>
+     *
+     * @return a {@link ubic.basecode.dataStructure.matrix.DoubleMatrix} object.
+     */
     public DoubleMatrix<Element, String> getDataMatrix() {
         return dataMatrix;
     }
 
     /**
-     * @return
+     * <p>
+     * Getter for the field <code>geneData</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneAnnotations getGeneData() {
         return geneData;
     }
 
     /**
-     * @return
+     * <p>
+     * getProbes.
+     * </p>
+     *
+     * @return a {@link java.util.Collection} object.
      */
     public Collection<Element> getProbes() {
         return Collections.unmodifiableCollection( elements );
@@ -167,38 +190,50 @@ public class GeneSetDetails {
 
     /**
      * Just for the elements in this set.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Map} object.
      */
     public Map<Element, Double> getProbeScores() {
         return Collections.unmodifiableMap( probeScores );
     }
 
     /**
+     * <p>
+     * Getter for the field <code>runSettings</code>.
+     * </p>
+     *
      * @return the settings used for analysis of this gene set (will be null if we aren't looking at a result)
      */
     public SettingsHolder getRunSettings() {
         return runSettings;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>settings</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.Settings} object.
+     */
     public Settings getSettings() {
         return settings;
     }
 
     /**
      * The full set of GeneScores from which this was derived.
-     * 
-     * @return
+     *
+     * @return a {@link ubic.erminej.data.GeneScores} object.
      */
     public GeneScores getSourceGeneScores() {
         return geneScores;
     }
 
     /**
-     * @param res
-     * @param nf
-     * @param probeIDs
-     * @return
+     * <p>
+     * getTitle.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
      */
     public String getTitle() {
         String title = this.classID.getId() + " - " + StringUtils.abbreviate( this.classID.getName(), 50 ) + " ("
@@ -232,12 +267,12 @@ public class GeneSetDetails {
     /**
      * Update or set the data matrix source. You only need to use this if you want to replace the matrix with one that
      * is not in the Settings (this is called during construction)
-     * 
-     * @param filename
+     *
+     * @param filename a {@link java.lang.String} object.
      */
     public void loadDataMatrix( String filename ) {
         try {
-            Map<String, Element> probeNames = new HashMap<String, Element>();
+            Map<String, Element> probeNames = new HashMap<>();
             for ( Element p : elements ) {
                 probeNames.put( p.getName(), p );
             }
@@ -252,7 +287,7 @@ public class GeneSetDetails {
             DoubleMatrix<String, String> omatrix = matrixReader
                     .read( filename, probeNames.keySet(), s.getDataCol() - 2 );
 
-            this.dataMatrix = new FastRowAccessDoubleMatrix<Element, String>( omatrix.asArray() );
+            this.dataMatrix = new FastRowAccessDoubleMatrix<>( omatrix.asArray() );
             dataMatrix.setColumnNames( omatrix.getColNames() );
             int i = 0;
             for ( String r : omatrix.getRowNames() ) {
@@ -267,8 +302,8 @@ public class GeneSetDetails {
 
     /**
      * You only need to use this if you want to replace the matrix.
-     * 
-     * @param dm
+     *
+     * @param dm a {@link ubic.basecode.dataStructure.matrix.DoubleMatrix} object.
      */
     public void setDataMatrix( DoubleMatrix<Element, String> dm ) {
         int numNotKnown = 0;
@@ -296,8 +331,8 @@ public class GeneSetDetails {
 
     /**
      * Switch out the gene scores.
-     * 
-     * @param scores
+     *
+     * @param scores a {@link ubic.erminej.data.GeneScores} object.
      */
     public void setGeneScores( GeneScores scores ) {
         initGeneScores( scores );
@@ -315,7 +350,7 @@ public class GeneSetDetails {
      */
     private void initGeneScores( GeneScores gs ) {
         this.geneScores = gs;
-        probeScores = new HashMap<Element, Double>();
+        probeScores = new HashMap<>();
         if ( elements == null || elements.isEmpty() ) return;
 
         assert geneScores != null;

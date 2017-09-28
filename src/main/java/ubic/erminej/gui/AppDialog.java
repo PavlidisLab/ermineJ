@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,10 +41,52 @@ import ubic.basecode.util.BrowserLauncher;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**
+ * <p>
+ * Abstract AppDialog class.
+ * </p>
+ *
  * @author Homin Lee
  * @version $Id$
  */
 public abstract class AppDialog extends JDialog {
+
+    // Slightly specialized editor pane.
+    class HelpEditorPane extends JEditorPane {
+        /** {@inheritDoc} */
+        /**
+         *
+         */
+        private static final long serialVersionUID = -5734511581620275891L;
+
+        HelpEditorPane( String text ) {
+            super();
+            this.setEditable( false );
+            this.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
+            this.setContentType( "text/html" );
+            this.setText( text );
+            this.addHyperlinkListener( new LinkFollower() );
+        }
+    }
+
+    // helper to respond to links.
+    class LinkFollower implements HyperlinkListener {
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
+         */
+        @Override
+        public void hyperlinkUpdate( HyperlinkEvent e ) {
+            if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
+                try {
+                    BrowserLauncher.openURL( e.getURL().toExternalForm() );
+                } catch ( Exception e1 ) {
+                    GuiUtil.error( "Could not open link" );
+                }
+            }
+        }
+    }
 
     private static final long serialVersionUID = 1L;
     protected JButton actionButton = new JButton();
@@ -52,15 +94,31 @@ public abstract class AppDialog extends JDialog {
     protected JButton helpButton = new JButton();
     protected Container callingframe;
     JPanel mainPanel;
+
     BorderLayout borderLayout1 = new BorderLayout();
+
     JPanel contentPanel = new JPanel();
 
     JPanel bottomPanel = new JPanel();
 
+    /**
+     * <p>
+     * Constructor for AppDialog.
+     * </p>
+     */
     public AppDialog() {
 
     }
 
+    /**
+     * <p>
+     * Constructor for AppDialog.
+     * </p>
+     *
+     * @param callingframe a {@link javax.swing.JFrame} object.
+     * @param width a int.
+     * @param height a int.
+     */
     public AppDialog( JFrame callingframe, int width, int height ) {
         this.callingframe = callingframe;
         setModal( true );
@@ -68,12 +126,21 @@ public abstract class AppDialog extends JDialog {
     }
 
     /**
-     * @param e
+     * <p>
+     * mouseButton_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.MouseEvent} object.
      */
     public void mouseButton_actionPerformed( MouseEvent e ) {
         //
     }
 
+    /**
+     * <p>
+     * showDialog.
+     * </p>
+     */
     public void showDialog() {
         this.setResizable( true );
         Point center = GuiUtil.chooseChildLocation( this, callingframe );
@@ -83,8 +150,22 @@ public abstract class AppDialog extends JDialog {
         this.setVisible( true );
     }
 
+    /**
+     * <p>
+     * actionButton_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
+     */
     protected abstract void actionButton_actionPerformed( ActionEvent e );
 
+    /**
+     * <p>
+     * addHelp.
+     * </p>
+     *
+     * @param text a {@link java.lang.String} object.
+     */
     protected void addHelp( String text ) {
 
         HelpEditorPane helpArea = null;
@@ -109,22 +190,64 @@ public abstract class AppDialog extends JDialog {
 
     }
 
+    /**
+     * <p>
+     * addMain.
+     * </p>
+     *
+     * @param panel a {@link javax.swing.JPanel} object.
+     */
     protected void addMain( JPanel panel ) {
         contentPanel.add( panel, BorderLayout.CENTER );
     }
 
+    /**
+     * <p>
+     * cancelButton_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
+     */
     protected abstract void cancelButton_actionPerformed( ActionEvent e );
 
+    /**
+     * <p>
+     * helpButton_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
+     */
     protected abstract void helpButton_actionPerformed( ActionEvent e );
 
+    /**
+     * <p>
+     * setActionButtonText.
+     * </p>
+     *
+     * @param val a {@link java.lang.String} object.
+     */
     protected void setActionButtonText( String val ) {
         actionButton.setText( val );
     }
 
+    /**
+     * <p>
+     * setCancelButtonText.
+     * </p>
+     *
+     * @param val a {@link java.lang.String} object.
+     */
     protected void setCancelButtonText( String val ) {
         cancelButton.setText( val );
     }
 
+    /**
+     * <p>
+     * setHelpButtonText.
+     * </p>
+     *
+     * @param val a {@link java.lang.String} object.
+     */
     protected void setHelpButtonText( String val ) {
         helpButton.setText( val );
     }
@@ -155,43 +278,6 @@ public abstract class AppDialog extends JDialog {
         mainPanel.add( bottomPanel, BorderLayout.SOUTH );
     }
 
-    // Slightly specialized editor pane.
-    class HelpEditorPane extends JEditorPane {
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -5734511581620275891L;
-
-        HelpEditorPane( String text ) {
-            super();
-            this.setEditable( false );
-            this.setFont( new Font( "SansSerif", Font.PLAIN, 11 ) );
-            this.setContentType( "text/html" );
-            this.setText( text );
-            this.addHyperlinkListener( new LinkFollower() );
-        }
-    }
-
-    // helper to respond to links.
-    class LinkFollower implements HyperlinkListener {
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
-         */
-        @Override
-        public void hyperlinkUpdate( HyperlinkEvent e ) {
-            if ( e.getEventType() == HyperlinkEvent.EventType.ACTIVATED ) {
-                try {
-                    BrowserLauncher.openURL( e.getURL().toExternalForm() );
-                } catch ( Exception e1 ) {
-                    GuiUtil.error( "Could not open link" );
-                }
-            }
-        }
-    }
-
 }
 
 class AppDialog_actionButton_actionAdapter implements java.awt.event.ActionListener {
@@ -201,6 +287,7 @@ class AppDialog_actionButton_actionAdapter implements java.awt.event.ActionListe
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.actionButton_actionPerformed( e );
@@ -227,6 +314,7 @@ class AppDialog_helpButton_actionAdapter implements java.awt.event.ActionListene
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.helpButton_actionPerformed( e );
@@ -238,57 +326,36 @@ class AppDialog_mouselistener_actionAdapter implements MouseListener {
     AppDialog adaptee;
 
     /**
-     * @param adaptee
+     * <p>
+     * Constructor for AppDialog_mouselistener_actionAdapter.
+     * </p>
+     *
+     * @param adaptee a {@link ubic.erminej.gui.AppDialog} object.
      */
     public AppDialog_mouselistener_actionAdapter( AppDialog adaptee ) {
         this.adaptee = adaptee;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-     */
     @Override
     public void mouseClicked( MouseEvent e ) {
         adaptee.mouseButton_actionPerformed( e );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-     */
     @Override
     public void mouseEntered( MouseEvent e ) {
         //
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-     */
     @Override
     public void mouseExited( MouseEvent e ) {
         //
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-     */
     @Override
     public void mousePressed( MouseEvent e ) {
         //
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-     */
     @Override
     public void mouseReleased( MouseEvent e ) {
         //

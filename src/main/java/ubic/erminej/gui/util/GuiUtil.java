@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,22 +42,59 @@ import ubic.basecode.util.StatusViewer;
 
 /**
  * Little oft-used functions.
- * 
+ *
  * @version $Id$
+ * @author paul
  */
 public class GuiUtil {
 
+    /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( GuiUtil.class );
+
+    /**
+     * Center a frame on the screen.
+     *
+     * @param frame a {@link java.awt.Container} object.
+     */
+    public static void centerContainer( Container frame ) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension frameSize = frame.getSize();
+        if ( frameSize.height > screenSize.height ) {
+            frameSize.height = screenSize.height;
+        }
+        if ( frameSize.width > screenSize.width ) {
+            frameSize.width = screenSize.width;
+        }
+        frame.setLocation( ( screenSize.width - frameSize.width ) / 2, ( screenSize.height - frameSize.height ) / 2 );
+    }
+
+    /**
+     * <p>
+     * chooseChildLocation.
+     * </p>
+     *
+     * @param child a {@link java.awt.Container} object.
+     * @param parent a {@link java.awt.Container} object.
+     * @return a {@link java.awt.Point} object.
+     */
+    public static Point chooseChildLocation( Container child, Container parent ) {
+        Dimension childSize = child.getPreferredSize();
+        Dimension parentSize = parent.getSize();
+        Point loc = parent.getLocation();
+        Point childLoc = new Point( Math.max( 0, ( parentSize.width - childSize.width ) / 2 + loc.x ), Math.max( 0,
+                ( parentSize.height - childSize.height ) / 2 + loc.y ) );
+        return childLoc;
+    }
 
     /**
      * Platform-independent chooser for saving files. For opening files you can just use a JFileChooser. This solves the
      * problem on MacOS where the user has no way to enter the name of the file they want to save in.
-     * 
+     *
      * @param owner the frame that will own the dialog
-     * @param startingDirectory
-     * @param startingFileName
-     * @param statusMessenger
-     * @return
+     * @param startingDirectory a {@link java.lang.String} object.
+     * @param startingFileName a {@link java.lang.String} object.
+     * @param statusMessenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @return a {@link java.io.File} object.
      */
     public static File chooseOutputFile( Frame owner, String startingDirectory, String startingFileName,
             StatusViewer statusMessenger ) {
@@ -81,9 +118,40 @@ public class GuiUtil {
     }
 
     /**
+     * <p>
+     * error.
+     * </p>
+     *
+     * @param message a {@link java.lang.String} object.
+     */
+    public static void error( String message ) {
+        try {
+            JOptionPane.showMessageDialog( null, "Error: " + message + "\n", "Error", JOptionPane.ERROR_MESSAGE );
+            log.error( message );
+        } catch ( HeadlessException e ) {
+            // must be using the CLI actually.
+            log.error( message );
+        }
+    }
+
+    /**
+     * <p>
+     * error.
+     * </p>
+     *
+     * @param message a {@link java.lang.String} object.
+     * @param e a {@link java.lang.Throwable} object.
+     */
+    public static void error( String message, Throwable e ) {
+        JOptionPane.showMessageDialog( null, "Error: " + message + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE );
+        log.error( e );
+        e.printStackTrace();
+    }
+
+    /**
      * Build a standardized file browse field+button.
-     * 
-     * @param container
+     *
+     * @param container a {@link java.awt.Container} object.
      * @param h actionListener that should be wired to a file browser.
      * @return field that will contain the file name.
      */
@@ -114,60 +182,12 @@ public class GuiUtil {
     }
 
     /**
-     * Center a frame on the screen.
-     * 
-     * @param frame
-     */
-    public static void centerContainer( Container frame ) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension frameSize = frame.getSize();
-        if ( frameSize.height > screenSize.height ) {
-            frameSize.height = screenSize.height;
-        }
-        if ( frameSize.width > screenSize.width ) {
-            frameSize.width = screenSize.width;
-        }
-        frame.setLocation( ( screenSize.width - frameSize.width ) / 2, ( screenSize.height - frameSize.height ) / 2 );
-    }
-
-    /**
-     * @return
-     */
-    public static Point chooseChildLocation( Container child, Container parent ) {
-        Dimension childSize = child.getPreferredSize();
-        Dimension parentSize = parent.getSize();
-        Point loc = parent.getLocation();
-        Point childLoc = new Point( Math.max( 0, ( parentSize.width - childSize.width ) / 2 + loc.x ), Math.max( 0,
-                ( parentSize.height - childSize.height ) / 2 + loc.y ) );
-        return childLoc;
-    }
-
-    /**
-     * @param message
-     */
-    public static void error( String message ) {
-        try {
-            JOptionPane.showMessageDialog( null, "Error: " + message + "\n", "Error", JOptionPane.ERROR_MESSAGE );
-            log.error( message );
-        } catch ( HeadlessException e ) {
-            // must be using the CLI actually.
-            log.error( message );
-        }
-    }
-
-    /**
-     * @param message
-     * @param e
-     */
-    public static void error( String message, Throwable e ) {
-        JOptionPane.showMessageDialog( null, "Error: " + message + "\n" + e, "Error", JOptionPane.ERROR_MESSAGE );
-        log.error( e );
-        e.printStackTrace();
-    }
-
-    /**
-     * @param text
-     * @return
+     * <p>
+     * testDir.
+     * </p>
+     *
+     * @param filename a {@link java.lang.String} object.
+     * @return a boolean.
      */
     public static boolean testDir( String filename ) {
         if ( !FileTools.testDir( filename ) ) {
@@ -178,9 +198,13 @@ public class GuiUtil {
     }
 
     /**
-     * @param filename
-     * @return
+     * <p>
+     * testFile.
+     * </p>
+     *
+     * @param filename a {@link java.lang.String} object.
      * @see basecode.util.FileTools#checkPathIsReadableFile(String)
+     * @return a boolean.
      */
     public static boolean testFile( String filename ) {
         if ( !FileTools.testFile( filename ) ) {

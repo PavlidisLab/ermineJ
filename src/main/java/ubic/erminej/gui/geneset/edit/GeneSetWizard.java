@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,18 +29,18 @@ import org.apache.commons.logging.LogFactory;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.Element;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
-import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSet;
-import ubic.erminej.data.Element;
+import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.erminej.gui.util.Wizard;
 
 /**
  * For creating or editing gene sets.
- * 
+ *
  * @author Homin K Lee
  * @author Paul Pavlidis
  * @version $Id$
@@ -66,11 +66,10 @@ public class GeneSetWizard extends Wizard {
 
     /**
      * Use this constructor to let the user choose which gene set to look at or to make a new one.
-     * 
-     * @param callingframe
-     * @param geneData
-     * @param makenew if true, the user is asked to create a new gene set. If false, they are asked to choose from a
-     *        list of existing gene sets.
+     *
+     * @param callingframe a {@link ubic.erminej.gui.MainFrame} object.
+     * @param geneData a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param makingNew a boolean.
      */
     public GeneSetWizard( MainFrame callingframe, GeneAnnotations geneData, boolean makingNew ) {
         super( callingframe, 550, 350 );
@@ -102,11 +101,10 @@ public class GeneSetWizard extends Wizard {
     /**
      * Use this constructor when you know the gene set to be looked at, and the user doesn't have to selected it from
      * the list (modify a gene set). We basically go right to step 2.
-     * 
-     * @param callingframe
-     * @param geneData
-     * @param goData
-     * @param geneSetId
+     *
+     * @param callingframe a {@link ubic.erminej.gui.MainFrame} object.
+     * @param geneData a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param geneSetId a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     public GeneSetWizard( MainFrame callingframe, GeneAnnotations geneData, GeneSetTerm geneSetId ) {
         super( callingframe, 550, 350 );
@@ -137,71 +135,7 @@ public class GeneSetWizard extends Wizard {
         this.repaint();
     }
 
-    @Override
-    protected void nextButton_actionPerformed( ActionEvent e ) {
-        clearStatus();
-        if ( step == 1 ) {
-            if ( makingNewGeneSet || step1A.isReady() ) { // not (case 3 with no class picked)
-                if ( makingNewGeneSet && step1.getInputMethod() == 1 ) { // case 2, load from file
-                    try {
-                        this.loadedGenes = geneData.loadPlainGeneList( step1.getLoadFile() );
-                    } catch ( IOException e1 ) {
-                        GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
-                                + " the file is readable." );
-                    }
-                }
-
-                if ( makingNewGeneSet ) { // cases 1 & 2
-                    // at this point we don't have any information except the method they will use
-                    this.getContentPane().remove( step1 );
-                    this.setTitle( "Define New Gene Set - Step 2 of 3" );
-
-                    if ( this.loadedGenes != null && !this.loadedGenes.isEmpty() ) {
-                        step2.setStartingSet( this.loadedGenes );
-                    }
-
-                } else { // case 3 - editing an existing set.
-                    assert step1A.getSelectedGeneSet() != null;
-                    this.oldGeneSet = step1A.getSelectedGeneSet();
-                    this.getContentPane().remove( step1A );
-                    this.setTitle( "Modify Gene Set - Step 2 of 3" );
-                    step2.setStartingSet( oldGeneSet );
-                }
-                step = 2;
-                backButton.setEnabled( true );
-                finishButton.setEnabled( false );
-                this.getContentPane().add( step2 );
-                step2.revalidate();
-                step2.updateCountLabel();
-                this.repaint();
-
-            }
-        } else if ( step == 2 ) {
-            if ( step2.getProbes().isEmpty() ) {
-                showError( "You have not selected any genes/elements." );
-                return;
-            }
-
-            this.getContentPane().remove( step2 );
-            step = 3;
-            step3.setIdFieldEnabled( true );
-            if ( makingNewGeneSet ) {
-                this.setTitle( "Define New Gene Set - Step 3 of 3" );
-            } else {
-                this.setTitle( "Modify Gene Set - Step 3 of 3" );
-                step3.setIdText( oldGeneSet.getId() );
-                step3.setDescText( oldGeneSet.getName() );
-            }
-            backButton.setEnabled( true );
-            nextButton.setEnabled( false );
-            finishButton.setEnabled( true );
-
-            this.getContentPane().add( step3 );
-            step3.revalidate();
-            this.repaint();
-        }
-    }
-
+    /** {@inheritDoc} */
     @Override
     protected void backButton_actionPerformed( ActionEvent e ) {
         clearStatus();
@@ -242,11 +176,13 @@ public class GeneSetWizard extends Wizard {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void cancelButton_actionPerformed( ActionEvent e ) {
         dispose();
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void finishEditing( ActionEvent e ) {
 
@@ -341,6 +277,72 @@ public class GeneSetWizard extends Wizard {
 
         messenger.clear();
 
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void nextButton_actionPerformed( ActionEvent e ) {
+        clearStatus();
+        if ( step == 1 ) {
+            if ( makingNewGeneSet || step1A.isReady() ) { // not (case 3 with no class picked)
+                if ( makingNewGeneSet && step1.getInputMethod() == 1 ) { // case 2, load from file
+                    try {
+                        this.loadedGenes = geneData.loadPlainGeneList( step1.getLoadFile() );
+                    } catch ( IOException e1 ) {
+                        GuiUtil.error( "Error loading gene set information. Please check the file format and make sure"
+                                + " the file is readable." );
+                    }
+                }
+
+                if ( makingNewGeneSet ) { // cases 1 & 2
+                    // at this point we don't have any information except the method they will use
+                    this.getContentPane().remove( step1 );
+                    this.setTitle( "Define New Gene Set - Step 2 of 3" );
+
+                    if ( this.loadedGenes != null && !this.loadedGenes.isEmpty() ) {
+                        step2.setStartingSet( this.loadedGenes );
+                    }
+
+                } else { // case 3 - editing an existing set.
+                    assert step1A.getSelectedGeneSet() != null;
+                    this.oldGeneSet = step1A.getSelectedGeneSet();
+                    this.getContentPane().remove( step1A );
+                    this.setTitle( "Modify Gene Set - Step 2 of 3" );
+                    step2.setStartingSet( oldGeneSet );
+                }
+                step = 2;
+                backButton.setEnabled( true );
+                finishButton.setEnabled( false );
+                this.getContentPane().add( step2 );
+                step2.revalidate();
+                step2.updateCountLabel();
+                this.repaint();
+
+            }
+        } else if ( step == 2 ) {
+            if ( step2.getProbes().isEmpty() ) {
+                showError( "You have not selected any genes/elements." );
+                return;
+            }
+
+            this.getContentPane().remove( step2 );
+            step = 3;
+            step3.setIdFieldEnabled( true );
+            if ( makingNewGeneSet ) {
+                this.setTitle( "Define New Gene Set - Step 3 of 3" );
+            } else {
+                this.setTitle( "Modify Gene Set - Step 3 of 3" );
+                step3.setIdText( oldGeneSet.getId() );
+                step3.setDescText( oldGeneSet.getName() );
+            }
+            backButton.setEnabled( true );
+            nextButton.setEnabled( false );
+            finishButton.setEnabled( true );
+
+            this.getContentPane().add( step3 );
+            step3.revalidate();
+            this.repaint();
+        }
     }
 
     /**

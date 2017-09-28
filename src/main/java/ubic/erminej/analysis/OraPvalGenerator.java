@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,9 @@ import org.apache.commons.collections.TransformerUtils;
 import org.apache.commons.collections.set.TransformedSet;
 import org.apache.commons.lang3.StringUtils;
 
+import cern.colt.list.DoubleArrayList;
+import cern.jet.math.Arithmetic;
+import cern.jet.stat.Descriptive;
 import ubic.basecode.math.SpecFunc;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
@@ -37,13 +40,10 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
-import cern.colt.list.DoubleArrayList;
-import cern.jet.math.Arithmetic;
-import cern.jet.stat.Descriptive;
 
 /**
  * Compute gene set scores based on over-representation analysis (ORA).
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
@@ -57,7 +57,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     protected double geneScoreThreshold;
 
-    private Collection<Gene> genesAboveThreshold = new HashSet<Gene>();
+    private Collection<Gene> genesAboveThreshold = new HashSet<>();
 
     private GeneScores geneScores;
 
@@ -73,13 +73,14 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     private final int NUMBER_OF_RANKS_TO_INSPECT_FOR_MF_SENSITIVITY = 20;
 
     /**
-     * @param settings
-     * @param a
-     * @param messenger
-     * @param csc
-     * @param not
-     * @param nut
-     * @param inputSize
+     * <p>
+     * Constructor for OraPvalGenerator.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param a a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @param geneScores a {@link ubic.erminej.data.GeneScores} object.
      */
     public OraPvalGenerator( SettingsHolder settings, GeneScores geneScores, GeneAnnotations a, StatusViewer messenger ) {
 
@@ -99,9 +100,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Calculate numOverThreshold and numUnderThreshold for hypergeometric distribution.
-     * 
-     * @param geneScores The pvalues for the elements (no weights) or groups (weights)
-     * @return number of entries that meet the user-set threshold.
+     *
      * @todo make this private and called by OraPvalGenerator.
      */
     public void computeCounts() {
@@ -119,9 +118,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ubic.erminej.analysis.AbstractGeneSetPvalGenerator#generateGeneSetResults()
      */
+    /** {@inheritDoc} */
     @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
 
@@ -149,7 +149,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         Map<GeneSetTerm, Double> monitoredRanks = getMFMonitoredSets( referenceResults, sortedClasses );
 
-        if ( monitoredRanks.isEmpty() || monitoredRanks.size() < 2 /* heuristic to avoid problems */) {
+        if ( monitoredRanks.isEmpty() || monitoredRanks.size() < 2 /* heuristic to avoid problems */ ) {
             this.messenger.showStatus( "Insufficient enrichment found, skipping multifunctionality correction" );
             return referenceResults;
         }
@@ -159,18 +159,32 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         return referenceResults;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>genesAboveThreshold</code>.
+     * </p>
+     *
+     * @return a {@link java.util.Collection} object.
+     */
     public Collection<Gene> getGenesAboveThreshold() {
         return genesAboveThreshold;
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>geneScoreThreshold</code>.
+     * </p>
+     *
+     * @return a double.
+     */
     public double getGeneScoreThreshold() {
         return geneScoreThreshold;
     }
 
     /**
      * Always for the genes.
-     * 
-     * @return
+     *
+     * @return a int.
      */
     public int getNumGenesOverThreshold() {
         return genesAboveThreshold.size();
@@ -178,8 +192,8 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Always for genes.
-     * 
-     * @return
+     *
+     * @return a int.
      */
     public int getNumGenesUnderThreshold() {
         return geneScores.getGeneToScoreMap().size() - getNumGenesOverThreshold();
@@ -188,6 +202,10 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * Get results for one class, based on class id. The other arguments are things that are not constant under
      * permutations of the data.
+     *
+     * @param genesAboveThresh a {@link java.util.Collection} object.
+     * @param className a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a {@link ubic.erminej.data.GeneSetResult} object.
      */
     protected GeneSetResult classPval( Collection<Gene> genesAboveThresh, GeneSetTerm className ) {
 
@@ -204,7 +222,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         Collection<Gene> geneSetGenes = geneAnnots.getGeneSetGenes( className );
 
-        Collection<Gene> seenGenes = new HashSet<Gene>();
+        Collection<Gene> seenGenes = new HashSet<>();
         int geneSuccesses = 0;
         for ( Gene g : geneSetGenes ) {
 
@@ -230,7 +248,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * Hypergeometric p value calculation (or binomial approximation) successes=number of genes in class which meet
      * criteria
-     * 
+     *
      * @param clasName
      * @param total number of genes (or elements)
      * @param number of genes in the set (or the number of elements)
@@ -279,7 +297,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      */
     private Map<GeneSetTerm, GeneSetResult> computeResultsForHitList( Collection<Gene> histList, boolean quiet ) {
         int count = 0;
-        Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
+        Map<GeneSetTerm, GeneSetResult> results = new HashMap<>();
         for ( GeneSetTerm geneSetName : geneAnnots.getGeneSetTerms() ) {
             GeneSetResult res = classPval( histList, geneSetName );
             if ( res != null ) {
@@ -301,7 +319,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Get the classes we are using as a reference.
-     * 
+     *
      * @param referenceResults for the gene groups that are initially considered "significant"
      * @param sortedClasses
      * @return
@@ -309,7 +327,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     private Map<GeneSetTerm, Double> getMFMonitoredSets( Map<GeneSetTerm, GeneSetResult> referenceResults,
             List<GeneSetTerm> sortedClasses ) {
 
-        Map<GeneSetTerm, Double> monitoredRanks = new HashMap<GeneSetTerm, Double>();
+        Map<GeneSetTerm, Double> monitoredRanks = new HashMap<>();
         int numSelected = 0;
         for ( GeneSetTerm t : sortedClasses ) {
             GeneSetResult r = referenceResults.get( t );
@@ -334,37 +352,37 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Algorithm as described by JG -- the thresholds etc. described are just examples.
-     * 
+     *
      * <pre>
      * A=set of genes (unordered) [hit list]
      * erminer=function that returns list of p-values for enrichment of A in a given ontology
-     * 
+     *
      * p_vals=erminer(A,ontology);
-     * 
+     *
      * rank_of_p_vals is the p_vals with its values replaced by ranks (e.g., lowest is 1)
-     * 
+     *
      * counter=0;
-     * 
+     *
      * while at least one p_val is less than 0.05 and A is significantly enriched for multifunctional genes
      *   counter=counter+1; %number of genes to be removed
-     * 
+     *
      *   A_2=A;
-     * 
+     *
      *   A_2 has its most multifunctional gene removed (as defined by ontology)
-     * 
+     *
      *   p_vals2=erminer(A2,ontology)
-     * 
+     *
      *   score(counter)= (average rank in p_vals2 of (rank_of_p_vals <=10 & p_vals<0.05)) minus average rank in p_vals of (rank_of_p_vals<=10 & p_vals<0.05)
      *   % basically, calculate the new ranks of the previously top 10 functions (or the subset which are significant); the part subtracted is just in case of ties or not a full 10
-     * 
+     *
      *   A=A_2;
      *   p_vals=p_vals2;
      * end
-     * 
-     * Find counter associated with maximum score and remove that many genes as correction.  
+     *
+     * Find counter associated with maximum score and remove that many genes as correction.
      * If the original list was not enriched for multifunctional genes (using ROC method), no correction should be made.
      * </pre>
-     * 
+     *
      * @param referenceResults
      * @param monitoredRanks
      * @author PP, JG (algorithm)
@@ -372,9 +390,9 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
      */
     private void multifunctionalityCorrect( Map<GeneSetTerm, GeneSetResult> referenceResults,
             Map<GeneSetTerm, Double> monitoredRanks ) {
-        Map<GeneSetTerm, Double> previousRanks = new HashMap<GeneSetTerm, Double>();
+        Map<GeneSetTerm, Double> previousRanks = new HashMap<>();
 
-        Collection<Gene> filteredGenes = new HashSet<Gene>();
+        Collection<Gene> filteredGenes = new HashSet<>();
         filteredGenes.addAll( genesAboveThreshold );
 
         double smax = -1.0;
@@ -383,7 +401,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         double hitListMultifunctionalityBiasPvalue = this.geneAnnots.getMultifunctionality()
                 .enrichmentForMultifunctionalityPvalue( filteredGenes );
 
-        List<GeneSetTerm> correctedRanking = new ArrayList<GeneSetTerm>();
+        List<GeneSetTerm> correctedRanking = new ArrayList<>();
 
         int numMultifunctionalRemoved = 0;
 
@@ -398,7 +416,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 "Before correction enrichment of hit list (%d genes) for multifunctionality is P=%.3g",
                 filteredGenes.size(), hitListMultifunctionalityBiasPvalue ) );
 
-        Collection<Gene> removedGenesAtOptimum = new HashSet<Gene>();
+        Collection<Gene> removedGenesAtOptimum = new HashSet<>();
         Map<GeneSetTerm, GeneSetResult> mfCorrectedResults = null;
 
         while ( true ) {
@@ -429,7 +447,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
             multipleTestCorrect( sortedRevisedClasses, mfCorrectedResults );
 
             // get the new ranks for the monitored set of gene sets.
-            Map<GeneSetTerm, Double> newRanks = new HashMap<GeneSetTerm, Double>();
+            Map<GeneSetTerm, Double> newRanks = new HashMap<>();
             int index = 0;
             for ( GeneSetTerm t : sortedRevisedClasses ) {
                 if ( monitoredRanks.containsKey( t ) ) {
@@ -448,7 +466,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
                 smax = s;
                 numMfToRemove = numMultifunctionalRemoved;
                 correctedRanking = sortedRevisedClasses;
-                removedGenesAtOptimum = new HashSet<Gene>();
+                removedGenesAtOptimum = new HashSet<>();
                 removedGenesAtOptimum.addAll( genesAboveThreshold );
                 removedGenesAtOptimum.removeAll( filteredGenes );
                 assert removedGenesAtOptimum.size() == numMfToRemove : removedGenesAtOptimum.size() + " != "
@@ -488,7 +506,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
              * Do one last computation, where we go back to the maximum effect point, to get the final corrected
              * results.
              */
-            Collection<Gene> finalCorrectedHitList = new HashSet<Gene>();
+            Collection<Gene> finalCorrectedHitList = new HashSet<>();
             finalCorrectedHitList.addAll( genesAboveThreshold );
             finalCorrectedHitList.removeAll( removedGenesAtOptimum );
             mfCorrectedResults = computeResultsForHitList( finalCorrectedHitList, true );
@@ -516,7 +534,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
     /**
      * If the pvalue is really small, and the hit list is not too small, we can remove more than one at a time, to speed
      * things up.
-     * 
+     *
      * @param numMultifunctionalRemoved
      * @param hitListMultifunctionalityBiasPvalue
      * @param filteredGenes
@@ -547,11 +565,11 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Compute the change in the ranks for the selected terms, for multifunctionality correction.
-     * 
+     *
      * <pre>
      * s = mean(new ranks) - mean(old ranks)
      * </pre>
-     * 
+     *
      * @param oldRanks
      * @param newRanks
      * @return s
@@ -575,7 +593,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     /**
      * Test whether a score meets a threshold.
-     * 
+     *
      * @param geneScore
      * @param geneScoreThreshold
      * @return

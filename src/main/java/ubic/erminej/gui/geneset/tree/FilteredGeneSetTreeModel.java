@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -30,7 +30,7 @@ import ubic.erminej.gui.geneset.GeneSetPanel;
 
 /**
  * Deals with showing filtered views of the gene set tree.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -46,7 +46,7 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
 
     private GeneAnnotations annots;
 
-    private Collection<GeneSetTerm> selectedTerms = new HashSet<GeneSetTerm>();
+    private Collection<GeneSetTerm> selectedTerms = new HashSet<>();
 
     public FilteredGeneSetTreeModel( GeneAnnotations annots, TreeModel toWrap ) {
         super( ( TreeNode ) toWrap.getRoot() );
@@ -55,9 +55,9 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * Filtering criteria implemented here.
-     * 
+     *
      * @see javax.swing.tree.DefaultTreeModel#getChild(java.lang.Object, int)
      */
     @Override
@@ -144,6 +144,10 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
         return filterBySize;
     }
 
+    public void removeResults() {
+        this.results = null;
+    }
+
     public void setFilterBySignificance( boolean filterBySignificance ) {
         this.filterBySignificance = filterBySignificance;
     }
@@ -159,10 +163,6 @@ public class FilteredGeneSetTreeModel extends DefaultTreeModel {
 
     public void setResults( GeneSetPvalRun results ) {
         this.results = results;
-    }
-
-    public void removeResults() {
-        this.results = null;
     }
 
 }

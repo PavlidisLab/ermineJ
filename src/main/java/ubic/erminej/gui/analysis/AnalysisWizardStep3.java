@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Choose the aspects to use.
- * 
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -43,6 +43,14 @@ public class AnalysisWizardStep3 extends WizardStep {
 
     private static final long serialVersionUID = 9064542224892172L;
 
+    /**
+     * <p>
+     * main.
+     * </p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.lang.Exception if any.
+     */
     public static void main( String[] args ) throws Exception {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
@@ -74,32 +82,39 @@ public class AnalysisWizardStep3 extends WizardStep {
     };
 
     /**
-     * @param wizard
-     * @param settings
+     * <p>
+     * Constructor for AnalysisWizardStep3.
+     * </p>
+     *
+     * @param wizard a {@link ubic.erminej.gui.analysis.AnalysisWizard} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
      */
     public AnalysisWizardStep3( AnalysisWizard wizard, Settings settings ) {
         super( wizard );
         this.settings = settings;
         this.jbInit();
-     //   if ( wizard != null ) wizard.clearStatus();
+        //   if ( wizard != null ) wizard.clearStatus();
         setValues();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see baseCode.gui.WizardStep#isReady()
      */
+    /** {@inheritDoc} */
     @Override
     public boolean isReady() {
         AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
         return ( wiz.getGeneAnnots().numActiveGeneSets() > 0 || this.biologicalProcessButton.isSelected()
                 || this.cellularComponentButton.isSelected() || this.molecularFunctionButton.isSelected() || this.userDefinedButton
-                    .isSelected() );
+                        .isSelected() );
     }
 
     /**
-     * 
+     * <p>
+     * saveValues.
+     * </p>
      */
     public void saveValues() {
         settings.setUseBiologicalProcess( this.biologicalProcessButton.isSelected() );
@@ -110,9 +125,10 @@ public class AnalysisWizardStep3 extends WizardStep {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see baseCode.gui.WizardStep#jbInit()
      */
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         JPanel buttonPanel = new JPanel();
@@ -174,7 +190,11 @@ public class AnalysisWizardStep3 extends WizardStep {
     }
 
     /**
-     * 
+     * <p>
+     * updateNumGeneSetsActive.
+     * </p>
+     *
+     * @return a int.
      */
     protected int updateNumGeneSetsActive() {
         AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
@@ -202,7 +222,7 @@ public class AnalysisWizardStep3 extends WizardStep {
     }
 
     /**
-     * 
+     *
      */
     private void setValues() {
         this.biologicalProcessButton.setSelected( settings.getUseBiologicalProcess() );

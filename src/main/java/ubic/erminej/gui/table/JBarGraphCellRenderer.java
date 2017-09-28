@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ import ubic.erminej.gui.util.Colors;
 
 /**
  * Renders the "pvalue bars" in the details views.
- * 
+ *
  * @author Will Braynen
  * @version $Id$
  */
@@ -46,25 +46,42 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
 
     private static final long serialVersionUID = 3914501898335944322L;
 
-    protected List<Double> m_values = null;
+    /** Constant <code>LINE_WIDTH=2</code> */
     protected final static int LINE_WIDTH = 2;
+    /** Constant <code>COLORS</code> */
     protected final static Color[] COLORS = { Color.GRAY, Colors.LIGHTBLUE2, Colors.LIGHTRED3, Color.GREEN, Color.CYAN,
             Color.MAGENTA, Color.ORANGE };
+    /** Constant <code>m_noFocusBorder</code> */
     protected static Border m_noFocusBorder = new EmptyBorder( 1, 1, 1, 1 );
+    /** Constant <code>m_selectionBackground</code> */
     protected static Color m_selectionBackground;
+    private static final double defaultMaxValue = 5;
+    protected List<Double> m_values = null;
     protected boolean m_isSelected = false;
     protected boolean m_isBarGraph = false;
+
     DecimalFormat m_regular = new DecimalFormat();
 
     private double maxValue;
-
     private Color[] colors;
-    private static final double defaultMaxValue = 5;
 
+    /**
+     * <p>
+     * Constructor for JBarGraphCellRenderer.
+     * </p>
+     */
     public JBarGraphCellRenderer() {
         this( defaultMaxValue, COLORS );
     }
 
+    /**
+     * <p>
+     * Constructor for JBarGraphCellRenderer.
+     * </p>
+     *
+     * @param maxValue a double.
+     * @param colors an array of {@link java.awt.Color} objects.
+     */
     public JBarGraphCellRenderer( double maxValue, Color[] colors ) {
         super();
         setOpaque( false );
@@ -74,15 +91,9 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
     }
 
     /**
+     * {@inheritDoc}
+     *
      * This method is called each time a cell in a column using this renderer needs to be rendered.
-     * 
-     * @param table the <code>JTable</code>
-     * @param value the value to assign to the cell at <code>[row, column]</code>
-     * @param isSelected true if cell is selected
-     * @param hasFocus true if cell has focus
-     * @param row the row of the cell to render
-     * @param column the column of the cell to render
-     * @return the default table cell renderer
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -109,7 +120,7 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
             // bar graphF
             m_isBarGraph = true;
             m_values = ( List<Double> ) value;
-            List<String> formatted = new Vector<String>();
+            List<String> formatted = new Vector<>();
             for ( Double v : m_values ) {
                 formatted.add( String.format( "%.4g", v ) );
             }
@@ -125,11 +136,19 @@ public class JBarGraphCellRenderer extends JLabel implements TableCellRenderer {
         return this;
     }
 
+    /**
+     * <p>
+     * paintBackground.
+     * </p>
+     *
+     * @param g a {@link java.awt.Graphics} object.
+     */
     protected void paintBackground( Graphics g ) {
         g.setColor( m_selectionBackground );
         g.fillRect( 0, 0, getWidth(), getHeight() );
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void paintComponent( Graphics g ) {
 

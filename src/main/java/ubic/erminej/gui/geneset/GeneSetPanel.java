@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,39 +57,42 @@ import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * A generic class to support the display of lists or trees Gene Sets and analysis results.
- * 
+ *
  * @author pavlidis
  * @version $Id$
  */
 public abstract class GeneSetPanel extends JScrollPane implements PropertyChangeListener {
 
+    /** Constant <code>DELETED="DELETED"</code> */
     public static final String DELETED = "DELETED";
 
+    /** Constant <code>FDR_THRESHOLD_FOR_FILTER=0.1</code> */
     public static final double FDR_THRESHOLD_FOR_FILTER = 0.1;
 
+    /** Constant <code>MAX_DEFINITION_LENGTH=300</code> */
     public static final int MAX_DEFINITION_LENGTH = 300;
 
+    /** Constant <code>NOACTION="NOACTION"</code> */
     public static final String NOACTION = "NOACTION";
 
+    /** Constant <code>RESOURCE_LOCATION="/ubic/erminej/"</code> */
     public static final String RESOURCE_LOCATION = "/ubic/erminej/";
 
+    /** Constant <code>RESTORED="RESTORED"</code> */
     public static final String RESTORED = "RESTORED";
 
+    /** Constant <code>USER_NODE_COLOR</code> */
     public static final Color USER_NODE_COLOR = Color.decode( "#FAFABB" );
 
+    /** Constant <code>USER_NODE_TEXT_COLOR</code> */
     public static final Color USER_NODE_TEXT_COLOR = Color.BLACK;
 
     // Update for Amigo2 (2014)
     static final String AMIGO_URL_BASE = "http://amigo.geneontology.org/amigo/term/";
 
-    @Override
-    public void propertyChange( PropertyChangeEvent evt ) {
-        if ( evt.getPropertyName().equals( "hideNonSignificant" ) || ( evt.getPropertyName().equals( "hideEmpty" ) ) ) {
-            filter( false );
-        }
-    }
-
     private static final long serialVersionUID = 1L;
+
+    private static Log log = LogFactory.getLog( GeneSetPanel.class );
     protected MainFrame mainFrame;
 
     protected GeneAnnotations geneData;
@@ -98,33 +101,69 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
 
     protected Settings settings;
 
-    private Collection<GeneSetPanel> dependentPanels = new HashSet<GeneSetPanel>();
+    private Collection<GeneSetPanel> dependentPanels = new HashSet<>();
 
+    /**
+     * <p>
+     * Constructor for GeneSetPanel.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.Settings} object.
+     * @param callingFrame a {@link ubic.erminej.gui.MainFrame} object.
+     */
     public GeneSetPanel( Settings settings, MainFrame callingFrame ) {
         this.settings = settings;
         this.mainFrame = callingFrame;
     }
 
+    /**
+     * <p>
+     * addDependentPanel.
+     * </p>
+     *
+     * @param panel a {@link ubic.erminej.gui.geneset.GeneSetPanel} object.
+     */
     public void addDependentPanel( GeneSetPanel panel ) {
         if ( panel == this ) return;
         this.dependentPanels.add( panel );
     }
 
+    /**
+     * <p>
+     * addRun.
+     * </p>
+     */
     public abstract void addRun();
 
     /**
+     * <p>
+     * filter.
+     * </p>
+     *
      * @param propagate to the
      */
     public abstract void filter( boolean propagate );
 
     /**
-     * @param e
+     * <p>
+     * findInTree.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
      */
     public void findInTree( ActionEvent e ) {
         GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         GeneSetTerm classID = sourcePopup.getSelectedItem();
         if ( classID == null ) return;
         mainFrame.findGeneSetInTree( classID );
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void propertyChange( PropertyChangeEvent evt ) {
+        if ( evt.getPropertyName().equals( "hideNonSignificant" ) || ( evt.getPropertyName().equals( "hideEmpty" ) ) ) {
+            filter( false );
+        }
     }
 
     /**
@@ -134,8 +173,8 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
 
     /**
      * Do any extra cleanup after a run has been deleted.
-     * 
-     * @param runToRemove
+     *
+     * @param runToRemove a {@link ubic.erminej.analysis.GeneSetPvalRun} object.
      */
     public abstract void removeRun( GeneSetPvalRun runToRemove );
 
@@ -145,7 +184,11 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
     public abstract void resetView();
 
     /**
-     * @param messenger
+     * <p>
+     * Setter for the field <code>messenger</code>.
+     * </p>
+     *
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
      */
     public void setMessenger( StatusViewer messenger ) {
         if ( messenger == null ) return;
@@ -153,19 +196,27 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
     }
 
     /**
-     * @param addedTerm
+     * <p>
+     * addedGeneSet.
+     * </p>
+     *
+     * @param addedTerm a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     protected abstract void addedGeneSet( GeneSetTerm addedTerm );
 
     /**
      * Configure the base popup common to any compoment showing gene sets.
-     * 
+     *
      * @param e
      * @return popup
      */
     /**
-     * @param e
-     * @return
+     * <p>
+     * configurePopup.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.MouseEvent} object.
+     * @return a {@link ubic.erminej.gui.geneset.GeneSetPanelPopupMenu} object.
      */
     protected GeneSetPanelPopupMenu configurePopup( MouseEvent e ) {
 
@@ -207,6 +258,10 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
     }
 
     /**
+     * <p>
+     * configurePopupListener.
+     * </p>
+     *
      * @return listener for popup on a gene set.
      */
     protected MouseListener configurePopupListener() {
@@ -233,8 +288,12 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
     }
 
     /**
-     * @param classID
-     * @return
+     * <p>
+     * deleteUserGeneSet.
+     * </p>
+     *
+     * @param classID a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a boolean.
      */
     protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
         if ( classID == null ) return false;
@@ -256,6 +315,13 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
 
     }
 
+    /**
+     * <p>
+     * modMenuItem_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
+     */
     protected void modMenuItem_actionPerformed( ActionEvent e ) {
         GeneSetPanelPopupMenu sourcePopup = ( GeneSetPanelPopupMenu ) ( ( Container ) e.getSource() ).getParent();
         GeneSetTerm classID = null;
@@ -267,9 +333,9 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
 
     /**
      * Forms a url like url + term.getId().
-     * 
-     * @param url
-     * @param term
+     *
+     * @param url a {@link java.lang.String} object.
+     * @param term a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     protected void openUrlForGeneSet( String url, GeneSetTerm term ) {
 
@@ -283,21 +349,27 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
         }
     }
 
-    private static Log log = LogFactory.getLog( GeneSetPanel.class );
-
+    /**
+     * <p>
+     * popupRespondAndGetGeneSet.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.MouseEvent} object.
+     * @return a {@link ubic.erminej.data.GeneSetTerm} object.
+     */
     protected abstract GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e );
 
     /**
      * Update the view to reflect changes
-     * 
-     * @param addedTerm
+     *
+     * @param addedTerm a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     protected abstract void removedGeneSet( GeneSetTerm addedTerm );
 
     /**
      * Create the popup window with the visualization for a specific gene set and results.
-     * 
-     * @param id
+     *
+     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
      * @param run can be null
      */
     protected void showDetailsForGeneSet( final GeneSetTerm id, final GeneSetPvalRun run ) {
@@ -338,6 +410,7 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
                     }
 
                     GeneSet geneSet = prunedGeneAnnots.getGeneSet( id );
+                    /** {@inheritDoc} */
 
                     int numGenes = geneSet.getGenes().size();
                     if ( numGenes > GeneSetDetailsFrame.MAX_GENES_FOR_DETAIL_VIEWING ) {
@@ -353,6 +426,7 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
 
                     GeneSetResult result = null; // might stay this way.
                     if ( run != null ) {
+                        /** {@inheritDoc} */
                         result = run.getResults().get( id );
                     }
 
@@ -376,6 +450,13 @@ public abstract class GeneSetPanel extends JScrollPane implements PropertyChange
         }.start();
     }
 
+    /**
+     * <p>
+     * showPopupMenu.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.MouseEvent} object.
+     */
     protected abstract void showPopupMenu( MouseEvent e );
 }
 

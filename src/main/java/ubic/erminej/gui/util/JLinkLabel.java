@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,10 @@ import javax.swing.JLabel;
 import ubic.basecode.util.BrowserLauncher;
 
 /**
+ * <p>
+ * JLinkLabel class.
+ * </p>
+ *
  * @author Will Braynen
  * @version $Id$
  */
@@ -40,6 +44,14 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
 
     protected String url = null;
 
+    /**
+     * <p>
+     * Constructor for JLinkLabel.
+     * </p>
+     *
+     * @param text a {@link java.lang.String} object.
+     * @param url a {@link java.lang.String} object.
+     */
     public JLinkLabel( String text, String url ) {
         super();
         this.setText( text );
@@ -47,13 +59,18 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
         configure();
     }
 
+    /** {@inheritDoc} */
     @Override
     public int compareTo( JLinkLabel o ) {
         return this.getText().compareTo( o.getText() );
     }
 
     /**
-     * @return
+     * <p>
+     * getURL.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
      */
     public String getURL() {
         return url;
@@ -92,6 +109,11 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
         } );
     }
 
+    /**
+     * <p>
+     * openUrl.
+     * </p>
+     */
     public void openUrl() {
         if ( url != null ) {
             try {
@@ -102,6 +124,7 @@ public class JLinkLabel extends JLabel implements Comparable<JLinkLabel> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "<html><a href=\"" + url + "\">" + getText() + "</a></html>";

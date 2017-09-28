@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,39 +32,14 @@ import javax.swing.SwingConstants;
 import ubic.erminej.gui.file.ImageFileFilter;
 
 /**
+ * <p>
+ * DetailsOutputImageFileChooser class.
+ * </p>
+ *
  * @author Will Braynen
  * @version $Id$
  */
 public class DetailsOutputImageFileChooser extends JFileChooser {
-
-    private static final long serialVersionUID = -1L;
-
-    JDetailsFileChooserOptions m_options;
-
-    /**
-     * Creates a new instance of JDetailsFileChooser
-     */
-    public DetailsOutputImageFileChooser( boolean includeLabels, boolean normalize, String initialFileName ) {
-
-        super();
-        // Create a file filter for the file chooser
-        ImageFileFilter imageFileFilter = new ImageFileFilter();
-        imageFileFilter.setDescription( "PNG files" );
-        super.setFileFilter( imageFileFilter );
-        super.setAcceptAllFileFilterUsed( false );
-        if ( initialFileName != null ) this.setSelectedFile( new File( initialFileName ) );
-        // Create other save options (e.g. include row and column labels in image)
-        m_options = new JDetailsFileChooserOptions( includeLabels, normalize );
-        super.setAccessory( m_options );
-    }
-
-    public boolean normalized() {
-        return m_options.normalized();
-    }
-
-    public boolean includeLabels() {
-        return m_options.includeLabels();
-    }
 
     /**
      * The accessory component for the file chooser.
@@ -75,7 +50,7 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
     class JDetailsFileChooserOptions extends JComponent {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
         JCheckBox m_includeLabels = new JCheckBox( "Include row and column labels" );
@@ -93,6 +68,14 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
+        }
+
+        public boolean includeLabels() {
+            return m_includeLabels.isSelected();
+        }
+
+        public boolean normalized() {
+            return m_normalize.isSelected();
         }
 
         private void jbInit() {
@@ -113,13 +96,52 @@ public class DetailsOutputImageFileChooser extends JFileChooser {
             this.add( m_includeLabels, null );
             this.add( m_normalize, null );
         }
+    }
 
-        public boolean normalized() {
-            return m_normalize.isSelected();
-        }
+    private static final long serialVersionUID = -1L;
 
-        public boolean includeLabels() {
-            return m_includeLabels.isSelected();
-        }
+    JDetailsFileChooserOptions m_options;
+
+    /**
+     * Creates a new instance of JDetailsFileChooser
+     *
+     * @param includeLabels a boolean.
+     * @param normalize a boolean.
+     * @param initialFileName a {@link java.lang.String} object.
+     */
+    public DetailsOutputImageFileChooser( boolean includeLabels, boolean normalize, String initialFileName ) {
+
+        super();
+        // Create a file filter for the file chooser
+        ImageFileFilter imageFileFilter = new ImageFileFilter();
+        imageFileFilter.setDescription( "PNG files" );
+        super.setFileFilter( imageFileFilter );
+        super.setAcceptAllFileFilterUsed( false );
+        if ( initialFileName != null ) this.setSelectedFile( new File( initialFileName ) );
+        // Create other save options (e.g. include row and column labels in image)
+        m_options = new JDetailsFileChooserOptions( includeLabels, normalize );
+        super.setAccessory( m_options );
+    }
+
+    /**
+     * <p>
+     * includeLabels.
+     * </p>
+     *
+     * @return a boolean.
+     */
+    public boolean includeLabels() {
+        return m_options.includeLabels();
+    }
+
+    /**
+     * <p>
+     * normalized.
+     * </p>
+     *
+     * @return a boolean.
+     */
+    public boolean normalized() {
+        return m_options.normalized();
     }
 }
