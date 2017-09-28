@@ -19,8 +19,8 @@
 	<packaging>jar</packaging>
 	<scm>
 		<url>https://github.com/ppavlidis/ermineJ</url>
-		<connection>scm:git:git://https://github.com/ppavlidis/ermineJ.git</connection>
-		<developerConnection>scm:git:git@github.com:https://github.com/ppavlidis/ermineJ.git</developerConnection>
+		<connection>scm:git:https://github.com/ppavlidis/ermineJ.git</connection>
+		<developerConnection>scm:git:https://github.com/ppavlidis/ermineJ.git</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
