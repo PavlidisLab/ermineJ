@@ -1,8 +1,8 @@
-/*
+ /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ import java.util.zip.GZIPInputStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -48,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -63,7 +63,6 @@ import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.data.AnnotationFileFetcher;
 import ubic.erminej.data.GeneAnnotationParser.Format;
-import ubic.erminej.data.Platform;
 import ubic.erminej.gui.file.DataFileFilter;
 import ubic.erminej.gui.file.XMLFileFilter;
 import ubic.erminej.gui.util.GuiUtil;
@@ -71,7 +70,7 @@ import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
 /**
  * Panel shown on initial startup of the application.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -87,6 +86,14 @@ public class StartupPanel extends JPanel {
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
 
     // for testing.
+    /**
+     * <p>
+     * main.
+     * </p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.lang.Exception if any.
+     */
     public static void main( String[] args ) throws Exception {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
@@ -109,7 +116,7 @@ public class StartupPanel extends JPanel {
 
     private JTextField annotFileTextField = new JTextField();
 
-    private JComboBox<String> annotFormat = new JComboBox<String>();
+    private JComboBox<String> annotFormat = new JComboBox<>();
 
     private JTextField projectFileTextField = new JTextField();
 
@@ -119,6 +126,14 @@ public class StartupPanel extends JPanel {
 
     private StatusViewer statusMessenger = new StatusStderr();
 
+    /**
+     * <p>
+     * Constructor for StartupPanel.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.Settings} object.
+     * @param statusMessenger a {@link ubic.basecode.util.StatusViewer} object.
+     */
     public StartupPanel( Settings settings, StatusViewer statusMessenger ) {
         this.settings = settings;
         if ( statusMessenger != null ) this.statusMessenger = statusMessenger;
@@ -126,12 +141,296 @@ public class StartupPanel extends JPanel {
         setValues();
     }
 
+    /**
+     * <p>
+     * addActionListener.
+     * </p>
+     *
+     * @param listener a {@link java.awt.event.ActionListener} object.
+     */
     public void addActionListener( ActionListener listener ) {
         listenerList.add( ActionListener.class, listener );
     }
 
+    /**
+     * <p>
+     * getProjectFileName.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    public String getProjectFileName() {
+        return this.projectFileTextField.getText();
+    }
+
+    /**
+     * <p>
+     * removeActionListener.
+     * </p>
+     *
+     * @param listener a {@link java.awt.event.ActionListener} object.
+     */
     public void removeActionListener( ActionListener listener ) {
         listenerList.remove( ActionListener.class, listener );
+    }
+
+    void annotBrowseButton_actionPerformed() {
+        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        chooser.setDialogTitle( "Choose the annotation file:" );
+        DataFileFilter fileFilter = new DataFileFilter();
+        chooser.setFileFilter( fileFilter ); // JFileChooser method
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            annotFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
+            projectFileTextField.setText( "" );
+            this.annotFileTextField.setEnabled( true );
+            this.classFileTextField.setEnabled( true );
+        }
+    }
+
+    void classBrowseButton_actionPerformed() {
+        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
+        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
+        chooser.setDialogTitle( "Choose the GO XML file:" );
+        XMLFileFilter fileFilter = new XMLFileFilter();
+        chooser.setFileFilter( fileFilter ); // JFileChooser method
+        chooser.setAcceptAllFileFilterUsed( false );
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            classFileTextField.setText( chooser.getSelectedFile().toString() );
+            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
+            projectFileTextField.setText( "" );
+            this.annotFileTextField.setEnabled( true );
+            this.classFileTextField.setEnabled( true );
+        }
+    }
+
+    void projectChooseActionPerformed() {
+
+        JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
+        projectPathChooser.setFileFilter( new FileNameExtensionFilter( "Project", "project", "PROJECT" ) );
+
+        int yesno = projectPathChooser.showDialog( this, "Open" );
+
+        if ( yesno == JFileChooser.APPROVE_OPTION ) {
+            File projectFile = projectPathChooser.getSelectedFile();
+
+            if ( !projectFile.canRead() ) {
+                GuiUtil.error( "The project file was invalid:\nCannot read" );
+                enableIndividualFilePickers();
+                return;
+            } else if ( projectFile.length() == 0 ) {
+                GuiUtil.error( "The project file was invalid:\nEmpty file" );
+                enableIndividualFilePickers();
+                return;
+            }
+
+            projectFileTextField.setText( projectFile.toString() );
+            settings.setDataDirectory( projectFile.getParent() );
+
+            /*
+             * Now set the values in the xml and annotation file fields as well ...
+             */
+            Settings projectSettings;
+            try {
+                projectSettings = new Settings( projectFile.getAbsolutePath() );
+                this.settings = projectSettings;
+                this.classFileTextField.setText( settings.getClassFile() );
+                this.annotFileTextField.setText( settings.getAnnotFile() );
+                this.annotFileTextField.setEnabled( false );
+                this.classFileTextField.setEnabled( false );
+
+            } catch ( ConfigurationException e ) {
+                GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
+                enableIndividualFilePickers();
+            } catch ( IOException e ) {
+                GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
+                enableIndividualFilePickers();
+            }
+
+        }
+    }
+
+    /**
+     * <p>
+     * actionButton_actionPerformed.
+     * </p>
+     *
+     * @param e a {@link java.awt.event.ActionEvent} object.
+     */
+    protected void actionButton_actionPerformed( ActionEvent e ) {
+        String annotFileName = annotFileTextField.getText();
+        String goFileName = classFileTextField.getText();
+        String projectFile = projectFileTextField.getText();
+
+        File annotFile = new File( annotFileName );
+        File goFile = new File( goFileName );
+
+        if ( goFileName.length() == 0 ) {
+            GuiUtil.error( "You must enter the Gene Ontology XML file location" );
+        } else if ( annotFileName.length() == 0 ) {
+            GuiUtil.error( "You must enter the annotation file location for your experiment" );
+        } else if ( !annotFile.exists() || !annotFile.canRead() ) {
+            GuiUtil.error( "Could not read file: " + annotFileName );
+        } else if ( !goFile.exists() || !goFile.canRead() ) {
+            GuiUtil.error( "Could not read file: " + goFileName );
+        } else {
+            log.debug( "Saving configuration" );
+
+            if ( projectFile.isEmpty() ) saveSettings();
+
+            Object[] listeners = listenerList.getListenerList();
+            for ( int i = 0; i < listeners.length; i += 2 ) {
+                if ( listeners[i] == ActionListener.class ) {
+                    ( ( ActionListener ) listeners[i + 1] ).actionPerformed( e );
+                }
+            }
+        }
+    }
+
+    /**
+     * <p>
+     * helpLocateAnnotations.
+     * </p>
+     */
+    protected void helpLocateAnnotations() {
+
+        /*
+         * provide a list of gene annotation files to download.
+         */
+        statusMessenger.showProgress( "Looking for annotation files ..." );
+
+        final StartupPanel owner = this;
+
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                URL urlPattern = null;
+                try {
+                    final AnnotationFileFetcher f = new AnnotationFileFetcher();
+                    final ArrayDesignValueObject result = f.pickAnnotation();
+
+                    if ( result == null ) {
+                        statusMessenger.clear();
+                        return null;
+                    }
+
+                    // this is kind of lame, but it's the same as in Gemma's ArrayDesignAnnotationServiceImpl.
+                    String cleanedShortName = result.getShortName().replaceAll( Pattern.quote( "/" ), "_" );
+                    final String outputFilePath = settings.getDataDirectory() + File.separator + cleanedShortName
+                            + "_noParents.an.txt.gz";
+
+                    annotFileTextField.setText( "Fetching annots for " + result.getShortName() );
+
+                    urlPattern = new URL( String.format( Settings.ANNOTATION_FILE_FETCH_RESTURL, result.getId() ) );
+
+                    InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
+
+                    OutputStream outputStream = new FileOutputStream( new File( outputFilePath ) );
+
+                    final byte[] buffer = new byte[65536];
+                    int read = -1;
+                    int totalRead = 0;
+
+                    StopWatch timer = new StopWatch();
+                    timer.start();
+                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                        outputStream.write( buffer, 0, read );
+                        totalRead += read;
+                        if ( timer.getTime() > 500 ) {
+                            statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read" );
+                            timer.reset();
+                            timer.start();
+                        }
+                    }
+                    statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read" );
+
+                    outputStream.close();
+
+                    try {
+                        GZIPInputStream gf = new GZIPInputStream( new FileInputStream( new File( outputFilePath ) ) );
+                        gf.read();
+                    } catch ( IOException e ) {
+                        annotFileTextField.setText( "" );
+                        statusMessenger.clear();
+                        JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "File downloaded was not a valid archive",
+                                JOptionPane.INFORMATION_MESSAGE );
+                    }
+
+                    statusMessenger.clear();
+
+                    settings.setAnnotFile( outputFilePath );
+                    annotFileTextField.setText( settings.getAnnotFile() );
+                } catch ( Exception e ) {
+                    log.error( e, e );
+                    annotFileTextField.setText( "" );
+                    statusMessenger.clear();
+                    JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "Unable to fetch from " + urlPattern,
+                            JOptionPane.INFORMATION_MESSAGE );
+                } finally {
+                    // ...
+                }
+                return null;
+            }
+
+        };
+
+        sw.execute();
+
+    }
+
+    private void enableIndividualFilePickers() {
+        this.annotFileTextField.setEnabled( true );
+        this.classFileTextField.setEnabled( true );
+    }
+
+    private void fetchGOFile() {
+
+        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
+            @Override
+            protected Object doInBackground() {
+                statusMessenger.showProgress( "Looking for GO file ..." );
+
+                try {
+                    final String testPath = settings.getDataDirectory() + File.separator + DEFAULT_GO_TERM_FILE_NAME;
+
+                    classFileTextField.setText( "Attempting to locate ..." );
+
+                    URL urlPattern = new URL( GO_ARCHIVE_DIR + "/go_daily-termdb.rdf-xml.gz" );
+
+                    InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
+                    String localGoFileName = testPath;
+
+                    OutputStream outputStream = new FileOutputStream( new File( localGoFileName ) );
+
+                    final byte[] buffer = new byte[65536];
+                    int read = -1;
+                    int totalRead = 0;
+
+                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                        outputStream.write( buffer, 0, read );
+                        totalRead += read;
+                        statusMessenger.showProgress( "GO: " + totalRead + " bytes read ..." );
+                    }
+                    outputStream.close();
+
+                    statusMessenger.clear();
+
+                    settings.setClassFile( localGoFileName );
+                    classFileTextField.setText( settings.getClassFile() );
+                } catch ( Exception e ) {
+                    classFileTextField.setText( "" );
+                } finally {
+                    // ...
+                }
+                return null;
+            }
+
+        };
+
+        sw.execute();
     }
 
     private void jbInit() {
@@ -172,17 +471,6 @@ public class StartupPanel extends JPanel {
         this.add( formPanel, BorderLayout.CENTER );
         this.add( buttonPanel, BorderLayout.SOUTH );
 
-    }
-
-    private JPanel makeLogoPanel() {
-        // decoration
-        JLabel logoLabel = new JLabel();
-        logoLabel
-                .setIcon( new ImageIcon( MainFrame.class.getResource( MainFrame.RESOURCE_LOCATION + "logo1small.gif" ) ) );
-        JPanel logoPanel = new JPanel();
-        logoPanel.setBackground( Color.WHITE );
-        logoPanel.add( logoLabel );
-        return logoPanel;
     }
 
     private JPanel makeActionButtons() {
@@ -274,95 +562,6 @@ public class StartupPanel extends JPanel {
         return annotPanel;
     }
 
-    /**
-     * 
-     */
-    protected void helpLocateAnnotations() {
-
-        /*
-         * provide a list of gene annotation files to download.
-         */
-        statusMessenger.showProgress( "Looking for annotation files ..." );
-
-        final StartupPanel owner = this;
-
-        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
-            @Override
-            protected Object doInBackground() throws Exception {
-                URL urlPattern = null;
-                try {
-                    final AnnotationFileFetcher f = new AnnotationFileFetcher();
-                    final ArrayDesignValueObject result = f.pickAnnotation();
-
-                    if ( result == null ) {
-                        statusMessenger.clear();
-                        return null;
-                    }
-
-                    // this is kind of lame, but it's the same as in Gemma's ArrayDesignAnnotationServiceImpl.
-                    String cleanedShortName = result.getShortName().replaceAll( Pattern.quote( "/" ), "_" );
-                    final String outputFilePath = settings.getDataDirectory() + File.separator + cleanedShortName
-                            + "_noParents.an.txt.gz";
-
-                    annotFileTextField.setText( "Fetching annots for " + result.getShortName() );
-
-                    urlPattern = new URL( String.format( Settings.ANNOTATION_FILE_FETCH_RESTURL, result.getId() ) );
-
-                    InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
-
-                    OutputStream outputStream = new FileOutputStream( new File( outputFilePath ) );
-
-                    final byte[] buffer = new byte[65536];
-                    int read = -1;
-                    int totalRead = 0;
-
-                    StopWatch timer = new StopWatch();
-                    timer.start();
-                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
-                        outputStream.write( buffer, 0, read );
-                        totalRead += read;
-                        if ( timer.getTime() > 500 ) {
-                            statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read" );
-                            timer.reset();
-                            timer.start();
-                        }
-                    }
-                    statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read" );
-
-                    outputStream.close();
-
-                    try {
-                        GZIPInputStream gf = new GZIPInputStream( new FileInputStream( new File( outputFilePath ) ) );
-                        gf.read();
-                    } catch ( IOException e ) {
-                        annotFileTextField.setText( "" );
-                        statusMessenger.clear();
-                        JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "File downloaded was not a valid archive",
-                                JOptionPane.INFORMATION_MESSAGE );
-                    }
-
-                    statusMessenger.clear();
-
-                    settings.setAnnotFile( outputFilePath );
-                    annotFileTextField.setText( settings.getAnnotFile() );
-                } catch ( Exception e ) {
-                    log.error( e, e );
-                    annotFileTextField.setText( "" );
-                    statusMessenger.clear();
-                    JOptionPane.showMessageDialog( owner, INSTRUCTIONS, "Unable to fetch from " + urlPattern,
-                            JOptionPane.INFORMATION_MESSAGE );
-                } finally {
-                    // ...
-                }
-                return null;
-            }
-
-        };
-
-        sw.execute();
-
-    }
-
     private JPanel makeGOFilePickerPanel() {
         // /// panel to hold GO file browser
         JPanel classPanel = new JPanel();
@@ -376,6 +575,17 @@ public class StartupPanel extends JPanel {
         cpL.setAutoCreateContainerGaps( true );
         cpL.setAutoCreateGaps( true );
         return classPanel;
+    }
+
+    private JPanel makeLogoPanel() {
+        // decoration
+        JLabel logoLabel = new JLabel();
+        logoLabel
+                .setIcon( new ImageIcon( MainFrame.class.getResource( MainFrame.RESOURCE_LOCATION + "logo1small.gif" ) ) );
+        JPanel logoPanel = new JPanel();
+        logoPanel.setBackground( Color.WHITE );
+        logoPanel.add( logoLabel );
+        return logoPanel;
     }
 
     private JPanel makeProjectPickerPanel() {
@@ -399,7 +609,7 @@ public class StartupPanel extends JPanel {
     }
 
     /**
-     * 
+     *
      */
     private void saveSettings() {
         settings.setClassFile( classFileTextField.getText() );
@@ -448,171 +658,6 @@ public class StartupPanel extends JPanel {
         }
     }
 
-    private void fetchGOFile() {
-
-        SwingWorker<Object, Object> sw = new SwingWorker<Object, Object>() {
-            @Override
-            protected Object doInBackground() {
-                statusMessenger.showProgress( "Looking for GO file ..." );
-
-                try {
-                    final String testPath = settings.getDataDirectory() + File.separator + DEFAULT_GO_TERM_FILE_NAME;
-
-                    classFileTextField.setText( "Attempting to locate ..." );
-
-                    URL urlPattern = new URL( GO_ARCHIVE_DIR + "/go_daily-termdb.rdf-xml.gz" );
-
-                    InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
-                    String localGoFileName = testPath;
-
-                    OutputStream outputStream = new FileOutputStream( new File( localGoFileName ) );
-
-                    final byte[] buffer = new byte[65536];
-                    int read = -1;
-                    int totalRead = 0;
-
-                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
-                        outputStream.write( buffer, 0, read );
-                        totalRead += read;
-                        statusMessenger.showProgress( "GO: " + totalRead + " bytes read ..." );
-                    }
-                    outputStream.close();
-
-                    statusMessenger.clear();
-
-                    settings.setClassFile( localGoFileName );
-                    classFileTextField.setText( settings.getClassFile() );
-                } catch ( Exception e ) {
-                    classFileTextField.setText( "" );
-                } finally {
-                    // ...
-                }
-                return null;
-            }
-
-        };
-
-        sw.execute();
-    }
-
-    protected void actionButton_actionPerformed( ActionEvent e ) {
-        String annotFileName = annotFileTextField.getText();
-        String goFileName = classFileTextField.getText();
-        String projectFile = projectFileTextField.getText();
-
-        File annotFile = new File( annotFileName );
-        File goFile = new File( goFileName );
-
-        if ( goFileName.length() == 0 ) {
-            GuiUtil.error( "You must enter the Gene Ontology XML file location" );
-        } else if ( annotFileName.length() == 0 ) {
-            GuiUtil.error( "You must enter the annotation file location for your experiment" );
-        } else if ( !annotFile.exists() || !annotFile.canRead() ) {
-            GuiUtil.error( "Could not read file: " + annotFileName );
-        } else if ( !goFile.exists() || !goFile.canRead() ) {
-            GuiUtil.error( "Could not read file: " + goFileName );
-        } else {
-            log.debug( "Saving configuration" );
-
-            if ( projectFile.isEmpty() ) saveSettings();
-
-            Object[] listeners = listenerList.getListenerList();
-            for ( int i = 0; i < listeners.length; i += 2 ) {
-                if ( listeners[i] == ActionListener.class ) {
-                    ( ( ActionListener ) listeners[i + 1] ).actionPerformed( e );
-                }
-            }
-        }
-    }
-
-    void annotBrowseButton_actionPerformed() {
-        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setDialogTitle( "Choose the annotation file:" );
-        DataFileFilter fileFilter = new DataFileFilter();
-        chooser.setFileFilter( fileFilter ); // JFileChooser method
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            annotFileTextField.setText( chooser.getSelectedFile().toString() );
-            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
-            projectFileTextField.setText( "" );
-            this.annotFileTextField.setEnabled( true );
-            this.classFileTextField.setEnabled( true );
-        }
-    }
-
-    void classBrowseButton_actionPerformed() {
-        JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
-        chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setDialogTitle( "Choose the GO XML file:" );
-        XMLFileFilter fileFilter = new XMLFileFilter();
-        chooser.setFileFilter( fileFilter ); // JFileChooser method
-        chooser.setAcceptAllFileFilterUsed( false );
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            classFileTextField.setText( chooser.getSelectedFile().toString() );
-            settings.setDataDirectory( chooser.getSelectedFile().getParent() );
-            projectFileTextField.setText( "" );
-            this.annotFileTextField.setEnabled( true );
-            this.classFileTextField.setEnabled( true );
-        }
-    }
-
-    void projectChooseActionPerformed() {
-
-        JFileChooser projectPathChooser = new JFileChooser( settings.getDataDirectory() );
-        projectPathChooser.setFileFilter( new FileNameExtensionFilter( "Project", "project", "PROJECT" ) );
-
-        int yesno = projectPathChooser.showDialog( this, "Open" );
-
-        if ( yesno == JFileChooser.APPROVE_OPTION ) {
-            File projectFile = projectPathChooser.getSelectedFile();
-
-            if ( !projectFile.canRead() ) {
-                GuiUtil.error( "The project file was invalid:\nCannot read" );
-                enableIndividualFilePickers();
-                return;
-            } else if ( projectFile.length() == 0 ) {
-                GuiUtil.error( "The project file was invalid:\nEmpty file" );
-                enableIndividualFilePickers();
-                return;
-            }
-
-            projectFileTextField.setText( projectFile.toString() );
-            settings.setDataDirectory( projectFile.getParent() );
-
-            /*
-             * Now set the values in the xml and annotation file fields as well ...
-             */
-            Settings projectSettings;
-            try {
-                projectSettings = new Settings( projectFile.getAbsolutePath() );
-                this.settings = projectSettings;
-                this.classFileTextField.setText( settings.getClassFile() );
-                this.annotFileTextField.setText( settings.getAnnotFile() );
-                this.annotFileTextField.setEnabled( false );
-                this.classFileTextField.setEnabled( false );
-
-            } catch ( ConfigurationException e ) {
-                GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
-                enableIndividualFilePickers();
-            } catch ( IOException e ) {
-                GuiUtil.error( "The project file was invalid:\n" + e.getMessage() );
-                enableIndividualFilePickers();
-            }
-
-        }
-    }
-
-    private void enableIndividualFilePickers() {
-        this.annotFileTextField.setEnabled( true );
-        this.classFileTextField.setEnabled( true );
-    }
-
-    public String getProjectFileName() {
-        return this.projectFileTextField.getText();
-    }
-
 }
 
 class AnnotFilePickListener implements ActionListener {
@@ -622,6 +667,7 @@ class AnnotFilePickListener implements ActionListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.annotBrowseButton_actionPerformed();
@@ -635,6 +681,7 @@ class GOFilePickListener implements ActionListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.classBrowseButton_actionPerformed();
@@ -648,15 +695,19 @@ class StartupPanel_actionButton_actionAdapter implements java.awt.event.ActionLi
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.actionButton_actionPerformed( e );
     }
 }
 
+/** {@inheritDoc} */
+
 class StartupPanel_cancelButton_actionAdapter implements java.awt.event.ActionListener {
 
     @Override
+    /** {@inheritDoc} */
     public void actionPerformed( ActionEvent e ) {
         System.exit( 0 );
     }

@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,12 +18,16 @@
  */
 package ubic.erminej.analysis;
 
+import java.util.concurrent.CancellationException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.concurrent.CancellationException;
-
 /**
+ * <p>
+ * Abstract AbstractLongTask class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -31,6 +35,11 @@ public abstract class AbstractLongTask {
 
     private static Log log = LogFactory.getLog( AbstractLongTask.class.getName() );
 
+    /**
+     * <p>
+     * ifInterruptedStop.
+     * </p>
+     */
     public void ifInterruptedStop() {
         Thread.yield(); // let another thread have some time perhaps to stop this one.
         if ( Thread.currentThread().isInterrupted() ) {

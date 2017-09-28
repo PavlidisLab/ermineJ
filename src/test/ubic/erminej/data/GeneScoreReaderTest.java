@@ -1,8 +1,8 @@
 /*
  * The Gemma project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -87,7 +87,7 @@ public class GeneScoreReaderTest {
     }
 
     /**
-     * 
+     *
      */
     @Test
     public void testGet_probe_ids() {
@@ -109,7 +109,7 @@ public class GeneScoreReaderTest {
      */
     @Test
     public void testGetGeneToPvalMap() {
-        Set<Gene> expectedReturn = new HashSet<Gene>();
+        Set<Gene> expectedReturn = new HashSet<>();
         expectedReturn.add( new Gene( "GeneA" ) );
         expectedReturn.add( new Gene( "GeneB" ) );
         expectedReturn.add( new Gene( "GeneC" ) );
@@ -136,7 +136,7 @@ public class GeneScoreReaderTest {
     }
 
     /**
-     * 
+     *
      */
     @Test
     public void testGetPvalues() {

@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,10 @@ import ubic.erminej.SettingsHolder;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**
+ * <p>
+ * GeneUrlDialog class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -55,16 +59,11 @@ public class GeneUrlDialog extends JDialog {
     private SettingsHolder settings;
 
     /**
-     * Get the url that was set.
-     * 
-     * @return
-     */
-    public String getUrl() {
-        return StringUtils.strip( this.urlTextField.getText() );
-    }
-
-    /**
-     * @param settings
+     * <p>
+     * Constructor for GeneUrlDialog.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      */
     public GeneUrlDialog( SettingsHolder settings ) {
         this.settings = settings;
@@ -89,7 +88,52 @@ public class GeneUrlDialog extends JDialog {
     }
 
     /**
-     * 
+     * Get the url that was set.
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    public String getUrl() {
+        return StringUtils.strip( this.urlTextField.getText() );
+    }
+
+    void cancelButton_actionPerformed() {
+        dispose();
+    }
+
+    /**
+     * This is the business
+     */
+    protected void setActionPerformed() {
+        String candidateUrlBase = urlTextField.getText().trim();
+
+        if ( StringUtils.isBlank( candidateUrlBase ) ) {
+            statusMessenger.showError( "URL must not be blank." );
+            return;
+        }
+
+        if ( candidateUrlBase.indexOf( GENEPLACEHOLDER ) < 0 ) {
+            statusMessenger.showError( "URL must contain the string '" + GENEPLACEHOLDER
+                    + "' for substitution with the gene name" );
+            return;
+        }
+
+        if ( StringUtils.deleteWhitespace( candidateUrlBase ).length() < candidateUrlBase.length() ) {
+            statusMessenger.showError( "URL must not contain any spaces" );
+            return;
+        }
+
+        dispose();
+    }
+
+    private void initializeFieldText() {
+        assert settings != null;
+        String oldUrlBase = this.settings.getGeneUrlBase();
+        log.debug( "Found url base " + oldUrlBase );
+        urlTextField.setText( oldUrlBase );
+    }
+
+    /**
+     *
      */
     private void jbInit() {
         setResizable( true );
@@ -123,41 +167,21 @@ public class GeneUrlDialog extends JDialog {
         this.setTitle( "URL for gene links ('" + GENEPLACEHOLDER + "' replaced by gene)" );
 
     }
+}
 
-    private void initializeFieldText() {
-        assert settings != null;
-        String oldUrlBase = this.settings.getGeneUrlBase();
-        log.debug( "Found url base " + oldUrlBase );
-        urlTextField.setText( oldUrlBase );
+class CancelButton_actionAdapter implements java.awt.event.ActionListener {
+    GeneUrlDialog adaptee;
+
+    /** {@inheritDoc} */
+
+    CancelButton_actionAdapter( GeneUrlDialog adaptee ) {
+        this.adaptee = adaptee;
     }
 
-    void cancelButton_actionPerformed() {
-        dispose();
-    }
-
-    /**
-     * This is the business
-     */
-    protected void setActionPerformed() {
-        String candidateUrlBase = urlTextField.getText().trim();
-
-        if ( StringUtils.isBlank( candidateUrlBase ) ) {
-            statusMessenger.showError( "URL must not be blank." );
-            return;
-        }
-
-        if ( candidateUrlBase.indexOf( GENEPLACEHOLDER ) < 0 ) {
-            statusMessenger.showError( "URL must contain the string '" + GENEPLACEHOLDER
-                    + "' for substitution with the gene name" );
-            return;
-        }
-
-        if ( StringUtils.deleteWhitespace( candidateUrlBase ).length() < candidateUrlBase.length() ) {
-            statusMessenger.showError( "URL must not contain any spaces" );
-            return;
-        }
-
-        dispose();
+    /** {@inheritDoc} */
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.cancelButton_actionPerformed();
     }
 }
 
@@ -167,22 +191,9 @@ class SetButton_actionAdapter implements java.awt.event.ActionListener {
     SetButton_actionAdapter( GeneUrlDialog adaptee ) {
         this.adaptee = adaptee;
     }
-
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.setActionPerformed();
-    }
-}
-
-class CancelButton_actionAdapter implements java.awt.event.ActionListener {
-    GeneUrlDialog adaptee;
-
-    CancelButton_actionAdapter( GeneUrlDialog adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.cancelButton_actionPerformed();
     }
 }

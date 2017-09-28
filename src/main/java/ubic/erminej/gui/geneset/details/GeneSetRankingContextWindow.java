@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -37,7 +37,6 @@ import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.DefaultXYDataset;
 
 import cern.colt.list.DoubleArrayList;
-
 import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
@@ -49,7 +48,7 @@ import ubic.erminej.gui.analysis.Plotting;
 
 /**
  * Show ROC and Precision-recall curves -- things that show the gene set in the context of the full ranking.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -62,7 +61,11 @@ public class GeneSetRankingContextWindow extends JFrame {
     private GeneSetTerm geneSetTerm;
 
     /**
-     * @param gsd
+     * <p>
+     * Constructor for GeneSetRankingContextWindow.
+     * </p>
+     *
+     * @param gsd a {@link ubic.erminej.data.GeneSetDetails} object.
      */
     public GeneSetRankingContextWindow( GeneSetDetails gsd ) {
         super( "Context" );
@@ -161,7 +164,7 @@ public class GeneSetRankingContextWindow extends JFrame {
 
     /**
      * Generate an ROC curve for the gene set
-     * 
+     *
      * @return
      */
     private ChartPanel getRocPlot() {
@@ -240,7 +243,7 @@ public class GeneSetRankingContextWindow extends JFrame {
 
     /**
      * Generate a precision-recall curve for the gene set
-     * 
+     *
      * @return
      */
     private ChartPanel precisionRecallPlot() {

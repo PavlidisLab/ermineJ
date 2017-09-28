@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Generic settings common to all methods (range of gene set sizes, replicate probe handling)
- * 
+ *
  * @author Homin K Lee
  * @version $Id$
  */
@@ -57,6 +57,14 @@ public class AnalysisWizardStep4 extends WizardStep {
         }
     };
 
+    /**
+     * <p>
+     * Constructor for AnalysisWizardStep4.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.analysis.AnalysisWizard} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public AnalysisWizardStep4( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
         this.jbInit();
@@ -65,6 +73,7 @@ public class AnalysisWizardStep4 extends WizardStep {
         setValues();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isReady() {
         AnalysisWizard wiz = ( AnalysisWizard ) getOwner();
@@ -75,6 +84,11 @@ public class AnalysisWizardStep4 extends WizardStep {
         return true;
     }
 
+    /**
+     * <p>
+     * saveValues.
+     * </p>
+     */
     public void saveValues() {
         try {
             settings.setMaxClassSize( Integer.valueOf( jTextFieldMaxClassSize.getText() ).intValue() );
@@ -93,6 +107,7 @@ public class AnalysisWizardStep4 extends WizardStep {
     }
 
     // Component initialization
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         JPanel step4TopPanel = new JPanel();
@@ -177,7 +192,11 @@ public class AnalysisWizardStep4 extends WizardStep {
     }
 
     /**
-     * 
+     * <p>
+     * updateNumGeneSetsActive.
+     * </p>
+     *
+     * @return a int.
      */
     protected int updateNumGeneSetsActive() {
         AnalysisWizard wiz = ( AnalysisWizard ) getOwner();

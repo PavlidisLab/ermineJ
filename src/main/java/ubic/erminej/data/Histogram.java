@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,26 +26,26 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.basecode.math.Stats;
-import ubic.basecode.math.distribution.NormalProbabilityComputer;
-import ubic.basecode.math.distribution.ProbabilityComputer;
-
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
 import cern.colt.map.OpenIntObjectHashMap;
 import cern.colt.matrix.DoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.jet.stat.Descriptive;
+import ubic.basecode.math.Stats;
+import ubic.basecode.math.distribution.NormalProbabilityComputer;
+import ubic.basecode.math.distribution.ProbabilityComputer;
 
 /**
  * Stores distributions for geneSets ( a series of histograms). For generic histograms, use hep.aida.
- * 
+ *
  * @author Shahmil Merchant, Paul Pavlidis
  * @version $Id$
  */
 public class Histogram {
     private static final double SMALL = 10e-13;
     private static final double BINSPERUNIT = 500;
+    /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( Histogram.class );
     private int minimumGeneSetSize = 0;
     private double binSize = 0.002;
@@ -60,11 +60,20 @@ public class Histogram {
     private boolean isCDF = false;
 
     /**
-     * @param numGeneSets
+     * <p>
+     * Constructor for Histogram.
+     * </p>
+     *
+     * @param minGeneSetSize a int.
+     * @param minGeneSetSize a int.
+     * @param numRuns a int.
+     * @param max a double.
+     * @param minGeneSetSize a int.
+     * @param minGeneSetSize a int.
+     * @param minGeneSetSize a int.
      * @param minGeneSetSize
-     * @param numRuns
-     * @param max
-     * @param min
+     * @param min a double.
+     * @param numGeneSetSizes a int.
      */
     public Histogram( int numGeneSetSizes, int minGeneSetSize, int numRuns, double max, double min ) {
 
@@ -82,7 +91,7 @@ public class Histogram {
         this.minimumGeneSetSize = minGeneSetSize;
         setNumRuns( numRuns );
         calcNumOfBins();
-        analyticDistributions = new HashMap<Integer, NormalProbabilityComputer>();
+        analyticDistributions = new HashMap<>();
         empiricalDistributions = new OpenIntObjectHashMap();
 
         for ( int i = 0; i < numGeneSetSizes; i++ ) {
@@ -92,8 +101,22 @@ public class Histogram {
     }
 
     /**
-     * 
+     * <p>
+     * addExactNormalProbabilityComputer.
+     * </p>
      *
+     * @param i a int.
+     * @param mean a double.
+     * @param variance a double.
+     */
+    public void addExactNormalProbabilityComputer( int i, double mean, double variance ) {
+        analyticDistributions.put( new Integer( i ), new NormalProbabilityComputer( mean, variance ) );
+    }
+
+    /**
+     * <p>
+     * calcNumOfBins.
+     * </p>
      */
     public void calcNumOfBins() {
         numBins = ( int ) ( ( maximum - minimum ) / binSize );
@@ -103,65 +126,25 @@ public class Histogram {
     }
 
     /**
-     * @param runs int
+     * <p>
+     * getBins.
+     * </p>
+     *
+     * @return an array of double.
      */
-    public void setNumRuns( int runs ) {
-        numItemsPerHistogram = runs;
-        minPval = 0.5 / numItemsPerHistogram; // the best possible
-        // pvalue for
-        // a class.
-        log.debug( "Minimum pvalue will be " + minPval + ", " + numItemsPerHistogram + " runs." );
+    public double[] getBins() {
+        double[] returnVal = new double[numBins];
+        for ( int i = 0; i < returnVal.length; i++ ) {
+            returnVal[i] = i * this.binSize + minimum;
+        }
+        return returnVal;
     }
 
     /**
-     * Update the count for one bin.
-     * 
-     * @param row int
-     * @param value double
-     */
-    public void update( int classSize, double value ) {
-
-        int thebin = ( int ) Math.floor( ( value - minimum ) / binSize );
-
-        // make sure we're in the range
-        if ( thebin < 0 ) {
-            thebin = 0;
-        }
-
-        if ( thebin > numBins - 1 ) { // this shouldn't happen since we
-            // make sure there are enough bins.
-            log.debug( "Last bin exceeded! " + value );
-            thebin = numBins - 1;
-        }
-        DenseDoubleMatrix1D histRow = ( ( DenseDoubleMatrix1D ) empiricalDistributions.get( classSize ) );
-        histRow.setQuick( thebin, histRow.getQuick( thebin ) + 1 );
-    }
-
-    /**
-     * Convert raw histograms to CDFs.
-     */
-    public void tocdf() {
-
-        IntArrayList sizes = empiricalDistributions.keys();
-
-        for ( int i = 0; i < sizes.size(); i++ ) {
-            DenseDoubleMatrix1D pdf = ( DenseDoubleMatrix1D ) empiricalDistributions.get( sizes.get( i ) );
-            DoubleArrayList dal = new DoubleArrayList( pdf.toArray() );
-
-            if ( Descriptive.sum( dal ) == 0 ) {
-                empiricalDistributions.removeKey( sizes.get( i ) );
-            }
-
-            DoubleArrayList cdf = Stats.cdf( dal );
-            for ( int j = 0; j < cdf.size(); j++ ) {
-                pdf.setQuick( j, cdf.getQuick( j ) );
-            }
-        }
-        log.debug( "Made cdf" );
-        this.isCDF = true;
-    }
-
-    /**
+     * <p>
+     * Getter for the field <code>binSize</code>.
+     * </p>
+     *
      * @return double
      */
     public double getBinSize() {
@@ -169,13 +152,24 @@ public class Histogram {
     }
 
     /**
-     * @return double
+     * <p>
+     * getClassIndex.
+     * </p>
+     *
+     * @return int
+     * @param geneSetSize a int.
+     * @param minGeneSetSize a int.
      */
-    public double getHistMin() {
-        return minimum;
+    public int getClassIndex( int geneSetSize, int minGeneSetSize ) {
+        // get corresponding index for each class size
+        return geneSetSize - minGeneSetSize;
     }
 
     /**
+     * <p>
+     * getHistMax.
+     * </p>
+     *
      * @return double
      */
     public double getHistMax() {
@@ -183,60 +177,115 @@ public class Histogram {
     }
 
     /**
+     * <p>
+     * getHistMin.
+     * </p>
+     *
+     * @return double
+     */
+    public double getHistMin() {
+        return minimum;
+    }
+
+    /**
+     * <p>
+     * getHistogram.
+     * </p>
+     *
+     * @param geneSetSize a int.
+     * @return an array of double.
+     */
+    public double[] getHistogram( int geneSetSize ) {
+        int usedGeneSetSize = findNearestUsableHistogram( geneSetSize );
+        // return M.viewRow( row ).toArray();
+        return ( ( DoubleMatrix1D ) empiricalDistributions.get( usedGeneSetSize ) ).toArray();
+    }
+
+    /**
+     * <p>
+     * getMinGeneSetSize.
+     * </p>
+     *
+     * @return a int.
+     */
+    public int getMinGeneSetSize() {
+        return minimumGeneSetSize;
+    }
+
+    /**
+     * <p>
+     * Getter for the field <code>numBins</code>.
+     * </p>
+     *
      * @return int
      */
     public int getNumBins() {
         return numBins;
     }
 
+    /**
+     * <p>
+     * getNumHistograms.
+     * </p>
+     *
+     * @return a int.
+     */
     public int getNumHistograms() {
         // return M.rows();
         return empiricalDistributions.size();
     }
 
     /**
+     * <p>
+     * getNumRuns.
+     * </p>
+     *
      * @return int
      */
     public int getNumRuns() {
         return numItemsPerHistogram;
     }
 
-    public int getMinGeneSetSize() {
-        return minimumGeneSetSize;
-    }
-
-    @Override
-    public String toString() {
-        return "There are " + numBins + " bins in the histogram. The maximum possible value is " + maximum
-                + ", the minimum is " + minimum + "." + " Min class is " + minimumGeneSetSize + ".";
-    }
-
     /**
-     * @param class_size int
-     * @param min_class_size int
-     * @return int
+     * <p>
+     * getProbability.
+     * </p>
+     *
+     * @param upperTail a boolean.
+     * @param binnum int
+     * @return double
+     * @param classSize a int.
      */
-    public int getClassIndex( int geneSetSize, int minGeneSetSize ) {
-        // get corresponding index for each class size
-        return geneSetSize - minGeneSetSize;
-    }
+    public double getProbability( int classSize, int binnum, boolean upperTail ) {
 
-    private int findNearestUsableHistogram( int geneSetSize ) {
-        int usedGeneSetSize = geneSetSize;
-        while ( !empiricalDistributions.containsKey( usedGeneSetSize ) ) {
-            usedGeneSetSize--;
-            if ( usedGeneSetSize < minimumGeneSetSize ) {
-                throw new IllegalArgumentException( "No distribution or near distribution found for gene set size "
-                        + geneSetSize );
-            }
+        if ( !empiricalDistributions.containsKey( classSize ) ) {
+            throw new IllegalArgumentException( "There is no empirical distribution for class size " + classSize );
         }
-        return usedGeneSetSize;
+
+        double pval = ( ( DoubleMatrix1D ) empiricalDistributions.get( classSize ) ).getQuick( binnum );
+        if ( !upperTail ) {
+            pval = 1.0 - pval;
+        }
+
+        if ( pval < 0.0 - SMALL || pval > 1.0 + SMALL ) { // sanity check.
+            throw new IllegalStateException( "Pvalue was " + pval );
+        }
+
+        if ( pval < SMALL ) {
+            return SMALL;
+        }
+
+        return pval;
     }
 
     /**
+     * <p>
+     * getValue.
+     * </p>
+     *
      * @param geneSetSize int - NOT the row, that is determined here.
      * @param rawscore double
-     * @param upperTail
+     * @param upperTail a boolean.
      * @return double probability
      */
     public double getValue( int geneSetSize, double rawscore, boolean upperTail ) {
@@ -276,43 +325,10 @@ public class Histogram {
     }
 
     /**
-     * @param upperTail
-     * @param geneSetSize
-     * @param rawscore
-     * @return
-     */
-    private double getExactProbability( int geneSetSize, double rawScore, boolean upperTail ) {
-        ProbabilityComputer p = analyticDistributions.get( new Integer( geneSetSize ) );
-        if ( p == null ) {
-            throw new IllegalStateException( "Gene set size " + geneSetSize
-                    + " is not associated with an exact probability density." );
-        }
-        return Math.max( SMALL, p.probability( rawScore, upperTail ) );
-    }
-
-    /**
-     * @param classSize
-     * @return
-     */
-    public double[] getHistogram( int geneSetSize ) {
-        int usedGeneSetSize = findNearestUsableHistogram( geneSetSize );
-        // return M.viewRow( row ).toArray();
-        return ( ( DoubleMatrix1D ) empiricalDistributions.get( usedGeneSetSize ) ).toArray();
-    }
-
-    /**
-     * @return
-     */
-    public double[] getBins() {
-        double[] returnVal = new double[numBins];
-        for ( int i = 0; i < returnVal.length; i++ ) {
-            returnVal[i] = i * this.binSize + minimum;
-        }
-        return returnVal;
-    }
-
-    /**
      * Prints the histogram to stdout.
+     *
+     * @param s a {@link java.io.Writer} object.
+     * @throws java.io.IOException if any.
      */
     public void print( Writer s ) throws IOException {
         // print a heading
@@ -336,31 +352,100 @@ public class Histogram {
     }
 
     /**
-     * @param upperTail
-     * @param row int
-     * @param binnum int
-     * @return double
+     * <p>
+     * setNumRuns.
+     * </p>
+     *
+     * @param runs int
      */
-    public double getProbability( int classSize, int binnum, boolean upperTail ) {
+    public void setNumRuns( int runs ) {
+        numItemsPerHistogram = runs;
+        minPval = 0.5 / numItemsPerHistogram; // the best possible
+        // pvalue for
+        // a class.
+        log.debug( "Minimum pvalue will be " + minPval + ", " + numItemsPerHistogram + " runs." );
+    }
 
-        if ( !empiricalDistributions.containsKey( classSize ) ) {
-            throw new IllegalArgumentException( "There is no empirical distribution for class size " + classSize );
+    /**
+     * Convert raw histograms to CDFs.
+     */
+    public void tocdf() {
+
+        IntArrayList sizes = empiricalDistributions.keys();
+
+        for ( int i = 0; i < sizes.size(); i++ ) {
+            DenseDoubleMatrix1D pdf = ( DenseDoubleMatrix1D ) empiricalDistributions.get( sizes.get( i ) );
+            DoubleArrayList dal = new DoubleArrayList( pdf.toArray() );
+
+            if ( Descriptive.sum( dal ) == 0 ) {
+                empiricalDistributions.removeKey( sizes.get( i ) );
+            }
+
+            DoubleArrayList cdf = Stats.cdf( dal );
+            for ( int j = 0; j < cdf.size(); j++ ) {
+                pdf.setQuick( j, cdf.getQuick( j ) );
+            }
+        }
+        log.debug( "Made cdf" );
+        this.isCDF = true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "There are " + numBins + " bins in the histogram. The maximum possible value is " + maximum
+                + ", the minimum is " + minimum + "." + " Min class is " + minimumGeneSetSize + ".";
+    }
+
+    /**
+     * Update the count for one bin.
+     *
+     * @param value double
+     * @param classSize a int.
+     */
+    public void update( int classSize, double value ) {
+
+        int thebin = ( int ) Math.floor( ( value - minimum ) / binSize );
+
+        // make sure we're in the range
+        if ( thebin < 0 ) {
+            thebin = 0;
         }
 
-        double pval = ( ( DoubleMatrix1D ) empiricalDistributions.get( classSize ) ).getQuick( binnum );
-        if ( !upperTail ) {
-            pval = 1.0 - pval;
+        if ( thebin > numBins - 1 ) { // this shouldn't happen since we
+            // make sure there are enough bins.
+            log.debug( "Last bin exceeded! " + value );
+            thebin = numBins - 1;
         }
+        DenseDoubleMatrix1D histRow = ( ( DenseDoubleMatrix1D ) empiricalDistributions.get( classSize ) );
+        histRow.setQuick( thebin, histRow.getQuick( thebin ) + 1 );
+    }
 
-        if ( pval < 0.0 - SMALL || pval > 1.0 + SMALL ) { // sanity check.
-            throw new IllegalStateException( "Pvalue was " + pval );
+    private int findNearestUsableHistogram( int geneSetSize ) {
+        int usedGeneSetSize = geneSetSize;
+        while ( !empiricalDistributions.containsKey( usedGeneSetSize ) ) {
+            usedGeneSetSize--;
+            if ( usedGeneSetSize < minimumGeneSetSize ) {
+                throw new IllegalArgumentException( "No distribution or near distribution found for gene set size "
+                        + geneSetSize );
+            }
         }
+        return usedGeneSetSize;
+    }
 
-        if ( pval < SMALL ) {
-            return SMALL;
+    /**
+     * @param upperTail
+     * @param geneSetSize
+     * @param rawscore
+     * @return
+     */
+    private double getExactProbability( int geneSetSize, double rawScore, boolean upperTail ) {
+        ProbabilityComputer p = analyticDistributions.get( new Integer( geneSetSize ) );
+        if ( p == null ) {
+            throw new IllegalStateException( "Gene set size " + geneSetSize
+                    + " is not associated with an exact probability density." );
         }
-
-        return pval;
+        return Math.max( SMALL, p.probability( rawScore, upperTail ) );
     }
 
     private boolean useExactPvalue( int geneSetSize ) {
@@ -369,15 +454,6 @@ public class Histogram {
             return true;
         }
         return false;
-    }
-
-    /**
-     * @param i
-     * @param mean
-     * @param variance
-     */
-    public void addExactNormalProbabilityComputer( int i, double mean, double variance ) {
-        analyticDistributions.put( new Integer( i ), new NormalProbabilityComputer( mean, variance ) );
     }
 
 }

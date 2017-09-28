@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +18,6 @@
  */
 package ubic.erminej.gui.geneset.details;
 
-import hep.aida.bin.QuantileBin1D;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,22 +29,23 @@ import javax.swing.table.AbstractTableModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import hep.aida.bin.QuantileBin1D;
 import ubic.basecode.graphics.MatrixDisplay;
 import ubic.basecode.math.Rank;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.analysis.ScoreQuantiles;
+import ubic.erminej.data.Element;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetDetails;
 import ubic.erminej.data.Multifunctionality;
-import ubic.erminej.data.Element;
 import ubic.erminej.gui.table.MatrixPoint;
 import ubic.erminej.gui.util.JLinkLabel;
 
 /**
  * Our table model for one gene set.
- * 
+ *
  * @author Will Braynen
  * @version $Id$
  * @see GeneSetDetailsFrame for the renderer
@@ -55,42 +54,45 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = -1L;
     private static final String URL_REPLACE_TAG = "@@";
+    /** Constant <code>DEFAULT_GENE_URL_BASE="http://www.ncbi.nlm.nih.gov/entrez/quer"{trunked}</code> */
+    public static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term="
+            + URL_REPLACE_TAG;
+    private static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
     private MatrixDisplay<Element, String> matrixDisplay;
     private List<Element> probeIDs;
     private Map<Element, Double> scoresForProbesInSet;
     private Map<Element, Double> scoreRanks;
     private GeneAnnotations geneData;
     private SettingsHolder settings;
-    private Map<Gene, JLinkLabel> linkLabels;
-    private String[] tableColumnNames = { "Element", "Score", "QQ Score", "Symbol", "Name", "Multifunc", "QQ Multifunc" };
 
     // private String[] tableColumnTooltips = { "", "", "", "", "", "" };
 
-    public static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term="
-            + URL_REPLACE_TAG;
+    private Map<Gene, JLinkLabel> linkLabels;
+
+    private String[] tableColumnNames = { "Element", "Score", "QQ Score", "Symbol", "Name", "Multifunc", "QQ Multifunc" };
 
     private String urlbase = DEFAULT_GENE_URL_BASE;
 
-    private static final Log log = LogFactory.getLog( GeneSetDetailsTableModel.class );
-
     private QuantileBin1D scoreQuantiles = new QuantileBin1D( 0.01 );
     private QuantileBin1D mfQuantiles = new QuantileBin1D( 0.01 );
-    private Map<Element, Double> multifuncForProbesInSet = new HashMap<Element, Double>();
-    private Map<Gene, Double> multifuncForGenesInSet = new HashMap<Gene, Double>();
-    private Map<Gene, Double> mfGeneRanks = new HashMap<Gene, Double>();
+    private Map<Element, Double> multifuncForProbesInSet = new HashMap<>();
+    private Map<Gene, Double> multifuncForGenesInSet = new HashMap<>();
+    private Map<Gene, Double> mfGeneRanks = new HashMap<>();
 
     /**
-     * @param matrixDisplay
-     * @param probeIDs
-     * @param pvalues
-     * @param geneData
-     * @param nf
+     * <p>
+     * Constructor for GeneSetDetailsTableModel.
+     * </p>
+     *
+     * @param matrixDisplay a {@link ubic.basecode.graphics.MatrixDisplay} object.
+     * @param geneSetDetails a {@link ubic.erminej.data.GeneSetDetails} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      */
     public GeneSetDetailsTableModel( MatrixDisplay<Element, String> matrixDisplay, GeneSetDetails geneSetDetails,
             SettingsHolder settings ) {
 
         this.matrixDisplay = matrixDisplay;
-        this.probeIDs = new ArrayList<Element>( geneSetDetails.getProbes() );
+        this.probeIDs = new ArrayList<>( geneSetDetails.getProbes() );
 
         scoresForProbesInSet = geneSetDetails.getProbeScores();
         this.settings = settings;
@@ -119,6 +121,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
         configure();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Class<?> getColumnClass( int columnIndex ) {
 
@@ -145,9 +148,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.table.TableModel#getColumnCount()
      */
+    /** {@inheritDoc} */
     @Override
     public int getColumnCount() {
         int matrixColumnCount = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
@@ -156,9 +160,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.table.AbstractTableModel#getColumnName(int)
      */
+    /** {@inheritDoc} */
     @Override
     public String getColumnName( int column ) {
 
@@ -172,6 +177,14 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     } // end getColumnName
 
+    /**
+     * <p>
+     * getProbeAtRow.
+     * </p>
+     *
+     * @param r a int.
+     * @return a {@link ubic.erminej.data.Element} object.
+     */
     public Element getProbeAtRow( int r ) {
         int offset = ( matrixDisplay != null ) ? matrixDisplay.getColumnCount() : 0;
         return ( Element ) getValueAt( r, offset );
@@ -179,9 +192,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.table.TableModel#getRowCount()
      */
+    /** {@inheritDoc} */
     @Override
     public int getRowCount() {
         return probeIDs.size();
@@ -189,9 +203,10 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.table.TableModel#getValueAt(int, int)
      */
+    /** {@inheritDoc} */
     @Override
     public Object getValueAt( int row, int column ) {
 
@@ -219,7 +234,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
                     return new Double( Double.NaN );
                 return scoresForProbesInSet.get( elementId );
             case 2:
-                List<Double> values = new ArrayList<Double>();
+                List<Double> values = new ArrayList<>();
                 if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( elementId ) ) {
                     values.add( 0, 1.0 );
                     values.add( 1, 1.0 );
@@ -252,7 +267,7 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
 
             case 6:
                 // multifunctionality graphic.
-                List<Double> mfv = new ArrayList<Double>();
+                List<Double> mfv = new ArrayList<>();
                 if ( scoresForProbesInSet == null || !scoresForProbesInSet.containsKey( elementId ) ) {
                     mfv.add( 0, 1.0 );
                     mfv.add( 1, 1.0 );
@@ -274,7 +289,9 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     } // end getValueAt
 
     /**
-     * 
+     * <p>
+     * configure.
+     * </p>
      */
     protected void configure() {
         String candidateUrlBase = settings.getStringProperty( SettingsHolder.GENE_URL_BASE );
@@ -289,11 +306,11 @@ public class GeneSetDetailsTableModel extends AbstractTableModel {
     }
 
     /**
-     * 
+     *
      */
     private void createLinkLabels() {
         assert probeIDs != null;
-        this.linkLabels = new HashMap<Gene, JLinkLabel>();
+        this.linkLabels = new HashMap<>();
         for ( Iterator<Element> iter = probeIDs.iterator(); iter.hasNext(); ) {
             final Element probe = iter.next();
             Gene gene = probe.getGene();

@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,13 +36,18 @@ import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.GeneAnnotations;
 
 /**
+ * <p>
+ * Analyzer class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
 public class Analyzer extends Thread {
 
+    /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( Analyzer.class );
-    private volatile Collection<GeneSetPvalRun> latestResults = new HashSet<GeneSetPvalRun>();
+    private volatile Collection<GeneSetPvalRun> latestResults = new HashSet<>();
     private String loadFile;
     private StatusViewer messenger;
     private GeneAnnotations geneAnnots;
@@ -54,12 +59,13 @@ public class Analyzer extends Thread {
     private AtomicBoolean finishedNormally = new AtomicBoolean( false );
 
     /**
-     * @param csframe
-     * @param settings
-     * @param messenger
-     * @param geneAnnots
-     * @param rawDataSets
-     * @param geneScoreSets
+     * <p>
+     * Constructor for Analyzer.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @param geneAnnots a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public Analyzer( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots ) {
         this.settings = settings;
@@ -78,14 +84,11 @@ public class Analyzer extends Thread {
 
     /**
      * For loading an analysis from a file.
-     * 
-     * @param csframe
-     * @param settings
-     * @param messenger
-     * @param geneAnnots
-     * @param rawDataSets
-     * @param geneScoreSets
-     * @param loadFile
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @param geneAnnots a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param loadFile a {@link java.lang.String} object.
      */
     public Analyzer( SettingsHolder settings, final StatusViewer messenger, GeneAnnotations geneAnnots,
             String loadFile ) {
@@ -109,10 +112,40 @@ public class Analyzer extends Thread {
     }
 
     /**
+     * <p>
+     * doAnalysis.
+     * </p>
+     *
+     * @return a {@link java.util.Collection} object.
+     */
+    public synchronized Collection<GeneSetPvalRun> doAnalysis() {
+
+        Collection<GeneSetPvalRun> answer = new HashSet<>();
+
+        log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
+
+        StopWatch timer = new StopWatch();
+        timer.start();
+
+        if ( this.finished.get() ) {
+            log.warn( "Bailed early." );
+            return null;
+        }
+
+        if ( messenger != null ) messenger.showProgress( "Starting analysis..." );
+
+        answer.add( new GeneSetPvalRun( settings, geneAnnots, messenger ) );
+
+        log.info( "Analysis: " + timer.getTime() + "ms" );
+
+        return answer;
+    }
+
+    /**
      * Blocks until results are returned.
-     * 
-     * @return
-     * @throws IllegalStateException
+     *
+     * @throws java.lang.IllegalStateException if any.
+     * @return a {@link java.util.Collection} object.
      */
     public synchronized Collection<GeneSetPvalRun> getLatestResults() throws IllegalStateException {
         log.debug( "Status: " + latestResults );
@@ -123,12 +156,16 @@ public class Analyzer extends Thread {
             }
         }
         notifyAll();
-        Collection<GeneSetPvalRun> lastResults = new HashSet<GeneSetPvalRun>( latestResults );
+        Collection<GeneSetPvalRun> lastResults = new HashSet<>( latestResults );
         this.latestResults.clear();
         return lastResults;
     }
 
     /**
+     * <p>
+     * isFinishedNormally.
+     * </p>
+     *
      * @return Returns the finishedNormally.
      */
     public boolean isFinishedNormally() {
@@ -136,7 +173,11 @@ public class Analyzer extends Thread {
     }
 
     /**
-     * @return
+     * <p>
+     * isStop.
+     * </p>
+     *
+     * @return a boolean.
      */
     public boolean isStop() {
         if ( !finished.get() ) this.finishedNormally.set( false );
@@ -145,6 +186,10 @@ public class Analyzer extends Thread {
     }
 
     /**
+     * <p>
+     * isWasError.
+     * </p>
+     *
      * @return Returns the wasError.
      */
     public boolean isWasError() {
@@ -153,14 +198,17 @@ public class Analyzer extends Thread {
 
     /**
      * Load from a file, which can contain more than one set.
-     * 
-     * @return
-     * @throws IOException
+     *
+     * @throws IOException if any.
+     * @return a {@link java.util.Collection} object.
+     * @throws java.lang.Exception if any.
      */
     public synchronized Collection<GeneSetPvalRun> loadAnalysis() throws Exception {
         return ResultsFileReader.load( geneAnnots, loadFile, messenger );
     }
 
+    /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     public void run() {
         try {
@@ -194,40 +242,15 @@ public class Analyzer extends Thread {
     }
 
     /**
-     * @param finished
+     * <p>
+     * stopRunning.
+     * </p>
+     *
+     * @param s a boolean.
      */
     public void stopRunning( boolean s ) {
         this.finished.set( s );
         log.debug( "Stop set to : " + s );
-    }
-
-    /**
-     * @return
-     * @return
-     * @param results
-     * @throws IOException
-     */
-    public synchronized Collection<GeneSetPvalRun> doAnalysis() {
-
-        Collection<GeneSetPvalRun> answer = new HashSet<GeneSetPvalRun>();
-
-        log.debug( "Entering doAnalysis in " + Thread.currentThread().getName() );
-
-        StopWatch timer = new StopWatch();
-        timer.start();
-
-        if ( this.finished.get() ) {
-            log.warn( "Bailed early." );
-            return null;
-        }
-
-        if ( messenger != null ) messenger.showProgress( "Starting analysis..." );
-
-        answer.add( new GeneSetPvalRun( settings, geneAnnots, messenger ) );
-
-        log.info( "Analysis: " + timer.getTime() + "ms" );
-
-        return answer;
     }
 
     /**

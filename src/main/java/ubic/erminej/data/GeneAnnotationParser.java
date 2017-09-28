@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -42,7 +42,7 @@ import ubic.erminej.SettingsHolder;
 /**
  * Reads tab-delimited file to create maps of elements to classes, classes to elements, elements to genes, genes to
  * elements.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -71,21 +71,40 @@ public class GeneAnnotationParser {
 
     private int timesWarned = 0;
 
+    /**
+     * <p>
+     * Constructor for GeneAnnotationParser.
+     * </p>
+     *
+     * @param geneSets a {@link ubic.erminej.data.GeneSetTerms} object.
+     */
     public GeneAnnotationParser( GeneSetTerms geneSets ) {
         this.geneSetTerms = geneSets;
     }
 
+    /**
+     * <p>
+     * Constructor for GeneAnnotationParser.
+     * </p>
+     *
+     * @param geneSets a {@link ubic.erminej.data.GeneSetTerms} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     */
     public GeneAnnotationParser( GeneSetTerms geneSets, StatusViewer messenger ) {
         this( geneSets );
         if ( messenger != null ) this.messenger = messenger;
     }
 
     /**
-     * @param i
-     * @param format
-     * @param settings
-     * @return
-     * @throws IOException
+     * <p>
+     * read.
+     * </p>
+     *
+     * @param i a {@link java.io.InputStream} object.
+     * @param format a {@link ubic.erminej.data.GeneAnnotationParser.Format} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @throws java.io.IOException if any.
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneAnnotations read( InputStream i, Format format, SettingsHolder settings ) throws IOException {
         timesWarned = 0;
@@ -119,11 +138,15 @@ public class GeneAnnotationParser {
     }
 
     /**
-     * @param fileName
-     * @param format
-     * @param settings
-     * @return
-     * @throws IOException
+     * <p>
+     * read.
+     * </p>
+     *
+     * @param fileName a {@link java.lang.String} object.
+     * @param format a {@link ubic.erminej.data.GeneAnnotationParser.Format} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     * @throws java.io.IOException if any.
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneAnnotations read( String fileName, Format format, Settings settings ) throws IOException {
         InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
@@ -138,20 +161,21 @@ public class GeneAnnotationParser {
      * Main default reading method. Because we want to be tolerant of file format variation, headers are not treated
      * differently than other rows. This extra "gene" can be counted in things like rankings, so we do try to avoid it
      * if we can, but doesn't directly effect most calculations.
-     * 
-     * @param bis
-     * @param genes
-     * @param settings
+     *
+     * @param bis a {@link java.io.InputStream} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      * @param simple If true, assume two-column format with GO terms pipe-delimited in column 2, and only one gene per
      *        row (no ABC|ABC2 stuff)
-     * @throws IOException
+     * @throws java.io.IOException if any.
+     * @param activeGenes a {@link java.util.Collection} object.
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneAnnotations readDefault( InputStream bis, Collection<Gene> activeGenes, SettingsHolder settings,
             boolean simple ) throws IOException {
 
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
-        Map<String, Gene> genes = new HashMap<String, Gene>();
-        Set<String> seenProbes = new HashSet<String>();
+        Map<String, Gene> genes = new HashMap<>();
+        Set<String> seenProbes = new HashSet<>();
         timesWarned = 0;
         int n = 0;
         String line = "";
@@ -204,7 +228,7 @@ public class GeneAnnotationParser {
                 // correctly deal with things like Nasp|Nasp or Nasp|Nasp2
                 if ( geneName.matches( ".+?[\\|,].+?" ) ) {
                     String[] multig = geneName.split( "[\\|,]" );
-                    Collection<String> multigenes = new HashSet<String>();
+                    Collection<String> multigenes = new HashSet<>();
                     for ( String g : multig ) {
                         // log.debug( g + " found in " + geneName );
                         multigenes.add( g );
@@ -295,12 +319,16 @@ public class GeneAnnotationParser {
     }
 
     /**
-     * @param fileName
+     * <p>
+     * readDefault.
+     * </p>
+     *
+     * @param fileName a {@link java.lang.String} object.
      * @param genes Annotations for genes other than these will be ignored.
-     * @param settings
-     * @param simple
-     * @return
-     * @throws IOException
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param simple a boolean.
+     * @throws java.io.IOException if any.
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public GeneAnnotations readDefault( String fileName, Collection<Gene> genes, SettingsHolder settings, boolean simple )
             throws IOException {
@@ -310,9 +338,12 @@ public class GeneAnnotationParser {
 
     /**
      * Parse affy formatted files (CSV or tabbed should be okay)
-     * 
-     * @param bis
-     * @param object
+     *
+     * @param bis a {@link java.io.InputStream} object.
+     * @param activeGenes a {@link java.util.Set} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @throws java.io.IOException if any.
      */
     protected GeneAnnotations readAffyCsv( InputStream bis, Set<String> activeGenes, SettingsHolder settings )
             throws IOException {
@@ -322,7 +353,7 @@ public class GeneAnnotationParser {
         timesWarned = 0;
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         String classIds = null;
-        Map<String, Gene> genes = new HashMap<String, Gene>();
+        Map<String, Gene> genes = new HashMap<>();
 
         /*
          * Skip comment lines (new format)
@@ -481,9 +512,15 @@ public class GeneAnnotationParser {
     } // AFFY CSV
 
     /**
-     * @param bis
-     * @param settings
-     * @throws IOException
+     * <p>
+     * readAgilent.
+     * </p>
+     *
+     * @param bis a {@link java.io.InputStream} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @throws java.io.IOException if any.
+     * @param activeGenes a {@link java.util.Set} object.
+     * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     protected GeneAnnotations readAgilent( InputStream bis, Set<String> activeGenes, SettingsHolder settings )
             throws IOException {
@@ -493,7 +530,7 @@ public class GeneAnnotationParser {
         timesWarned = 0;
         BufferedReader dis = new BufferedReader( new InputStreamReader( bis ) );
         String classIds = null;
-        Map<String, Gene> genes = new HashMap<String, Gene>();
+        Map<String, Gene> genes = new HashMap<>();
 
         String header = dis.readLine();
         int numFields = ParserHelper.getAgilentNumFields( header );
@@ -593,7 +630,7 @@ public class GeneAnnotationParser {
     private Collection<GeneSetTerm> extractPipeDelimitedGoIds( String classIds ) {
         String[] classIdAry = pipePattern.split( classIds );
 
-        Collection<GeneSetTerm> result = new HashSet<GeneSetTerm>();
+        Collection<GeneSetTerm> result = new HashSet<>();
         if ( classIdAry.length == 0 ) return result;
         for ( String go : classIdAry ) {
 
@@ -608,7 +645,7 @@ public class GeneAnnotationParser {
     }
 
     /**
-     * 
+     *
      */
     private void maybeNotifyAboutWarningSuppression() {
         if ( !shouldWarn() ) {
@@ -667,7 +704,12 @@ public class GeneAnnotationParser {
     }
 
     /**
-     * @param bis
+     * <p>
+     * findField.
+     * </p>
+     *
+     * @param sep a {@link java.lang.String} object.
+     * @return a int.
      */
     private GeneAnnotations readAffyCsv( InputStream bis, SettingsHolder settings ) throws IOException {
         return this.readAffyCsv( bis, null, settings );
@@ -688,6 +730,15 @@ public class GeneAnnotationParser {
         return this.readDefault( bis, null, settings, simple );
     }
 
+    /**
+     * <p>
+     * getAffyAlternateGeneSymbolIndex.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
+     */
+
     private boolean shouldWarn() {
         return timesWarned < MAX_WARNINGS;
     }
@@ -697,9 +748,14 @@ class ParserHelper {
     private static final String AFFY_FIELD_SEPARATION_REGEX = "[,\t]";
 
     /**
-     * @param limit
-     * @param header
-     * @param pattern
+     * <p>
+     * getAffyGeneNameIndex.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
+     * @param sep a {@link java.lang.String} object.
+     * @param pattern a {@link java.lang.String} object.
      */
     public static int findField( String header, String sep, String pattern ) {
         String[] fields = header.split( sep );
@@ -712,6 +768,12 @@ class ParserHelper {
         return -1;
     }
 
+    /**
+     * <p>getAffyAlternateGeneSymbolIndex.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
+     */
     public static int getAffyAlternateGeneSymbolIndex( String header ) {
 
         String[] alternates = new String[] { "Transcript ID", "Transcript ID(Array Design)", "UniGene ID", "swissprot",
@@ -724,9 +786,13 @@ class ParserHelper {
     }
 
     /**
-     * @throws IOException
-     * @param header
-     * @return
+     * <p>
+     * getAffyGeneSymbolIndex.
+     * </p>
+     *
+     * @throws java.io.IOException if any.
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAffyBpIndex( String header ) throws IOException {
         String pattern = "(Gene Ontology Biological Process|GO_biological_process)";
@@ -734,9 +800,13 @@ class ParserHelper {
     }
 
     /**
-     * @throws IOException
-     * @param header
-     * @return
+     * <p>
+     * getAffyMfIndex.
+     * </p>
+     *
+     * @throws java.io.IOException if any.
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAffyCcIndex( String header ) throws IOException {
         String pattern = "(Gene Ontology Cellular Component|GO_cellular_component)";
@@ -744,9 +814,13 @@ class ParserHelper {
     }
 
     /**
-     * @throws IOException
-     * @param header
-     * @return
+     * <p>
+     * getAffyNumFields.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
+     * @throws java.io.IOException if any.
      */
     public static int getAffyGeneNameIndex( String header ) throws IOException {
         String pattern = "(Gene Title|gene_assignment)";
@@ -754,9 +828,13 @@ class ParserHelper {
     }
 
     /**
-     * @throws IOException
-     * @param header
-     * @return
+     * <p>
+     * getAffyProbeIndex.
+     * </p>
+     *
+     * @throws java.io.IOException if any.
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAffyGeneSymbolIndex( String header ) throws IOException {
         String pattern = "(Gene Symbol|gene_assignment)";
@@ -764,9 +842,13 @@ class ParserHelper {
     }
 
     /**
-     * @throws IOException
-     * @param header
-     * @return
+     * <p>
+     * getAgilentGeneNameIndex.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
+     * @throws java.io.IOException if any.
      */
     public static int getAffyMfIndex( String header ) throws IOException {
         String pattern = "(Gene Ontology Molecular Function|GO_molecular_function)";
@@ -774,8 +856,12 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>
+     * getAgilentGeneSymbolIndex.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAffyNumFields( String header ) {
 
@@ -784,9 +870,13 @@ class ParserHelper {
     }
 
     /**
-     * @throws IOException
-     * @param header
-     * @return
+     * <p>
+     * getAgilentGoIndex.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
+     * @throws java.io.IOException if any.
      */
     public static int getAffyProbeIndex( String header ) throws IOException {
         String pattern = "(Probe Set ID|probeset_id)";
@@ -794,8 +884,12 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>
+     * getAgilentNumFields.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentGeneNameIndex( String header ) {
         String pattern = "GeneName";
@@ -803,8 +897,12 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>
+     * getAgilentProbeIndex.
+     * </p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentGeneSymbolIndex( String header ) {
         String pattern = "GeneSymbol";
@@ -812,8 +910,10 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>getAgilentGoIndex.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentGoIndex( String header ) {
         String pattern = "GO";
@@ -821,8 +921,10 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>getAgilentNumFields.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentNumFields( String header ) {
         String[] fields = header.split( "\t" );
@@ -830,8 +932,10 @@ class ParserHelper {
     }
 
     /**
-     * @param header
-     * @return
+     * <p>getAgilentProbeIndex.</p>
+     *
+     * @param header a {@link java.lang.String} object.
+     * @return a int.
      */
     public static int getAgilentProbeIndex( String header ) {
         String pattern = "elementId";

@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,10 @@ import ubic.erminej.gui.MainFrame;
 import ubic.erminej.gui.util.GuiUtil;
 
 /**
+ * <p>
+ * DataDirectoryDialog class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -49,6 +53,29 @@ public class DataDirectoryDialog extends AppDialog {
     JLabel annotLabel = new JLabel();
     JPanel centerPanel = new JPanel();
 
+    /**
+     * <p>
+     * Constructor for DataDirectoryDialog.
+     * </p>
+     *
+     * @param callingframe a {@link ubic.erminej.gui.MainFrame} object.
+     */
+    public DataDirectoryDialog( MainFrame callingframe ) {
+        super( callingframe, 400, 200 );
+        this.settings = callingframe.getSettings();
+        // chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
+        chooser.setDialogTitle( "Locate the data directory" );
+        jbInit();
+
+    }
+
+    /**
+     * <p>
+     * Constructor for DataDirectoryDialog.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public DataDirectoryDialog( Settings settings ) {
         this.settings = settings;
         this.callingframe = this.getOwner();
@@ -56,12 +83,47 @@ public class DataDirectoryDialog extends AppDialog {
         jbInit();
     }
 
-    public DataDirectoryDialog( MainFrame callingframe ) {
-        super( callingframe, 400, 200 );
-        this.settings = callingframe.getSettings();
-        // chooser.setCurrentDirectory( new File( settings.getDataFolder() ) );
-        chooser.setDialogTitle( "Locate the data directory" );
-        jbInit();
+    void dataDirBrowseButton_actionPerformed() {
+        int result = chooser.showOpenDialog( this );
+        if ( result == JFileChooser.APPROVE_OPTION ) {
+            dataDir.setText( chooser.getSelectedFile().toString() );
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see baseCode.gui.AppDialog#actionButton_actionPerformed(java.awt.event.ActionEvent)
+     */
+    /** {@inheritDoc} */
+    @Override
+    protected void actionButton_actionPerformed( ActionEvent e ) {
+        if ( GuiUtil.testDir( dataDir.getText() ) ) {
+            settings.setDataDirectory( dataDir.getText() );
+            dispose();
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see baseCode.gui.AppDialog#cancelButton_actionPerformed(java.awt.event.ActionEvent)
+     */
+    /** {@inheritDoc} */
+    @Override
+    protected void cancelButton_actionPerformed( ActionEvent e ) {
+        dispose();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
+     */
+    /** {@inheritDoc} */
+    /** {@inheritDoc} */
+    @Override
+    protected void helpButton_actionPerformed( ActionEvent e ) {
 
     }
 
@@ -90,72 +152,6 @@ public class DataDirectoryDialog extends AppDialog {
         hh.initHelp( helpButton );
     }
 
-    void dataDirBrowseButton_actionPerformed() {
-        int result = chooser.showOpenDialog( this );
-        if ( result == JFileChooser.APPROVE_OPTION ) {
-            dataDir.setText( chooser.getSelectedFile().toString() );
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see baseCode.gui.AppDialog#cancelButton_actionPerformed(java.awt.event.ActionEvent)
-     */
-    @Override
-    protected void cancelButton_actionPerformed( ActionEvent e ) {
-        dispose();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see baseCode.gui.AppDialog#actionButton_actionPerformed(java.awt.event.ActionEvent)
-     */
-    @Override
-    protected void actionButton_actionPerformed( ActionEvent e ) {
-        if ( GuiUtil.testDir( dataDir.getText() ) ) {
-            settings.setDataDirectory( dataDir.getText() );
-            dispose();
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see baseCode.gui.AppDialog#helpButton_actionPerformed(java.awt.event.ActionEvent)
-     */
-    @Override
-    protected void helpButton_actionPerformed( ActionEvent e ) {
-
-    }
-
-}
-
-class DataDirectoryDialog_dataDirBrowseButton_actionAdapter implements java.awt.event.ActionListener {
-    DataDirectoryDialog adaptee;
-
-    DataDirectoryDialog_dataDirBrowseButton_actionAdapter( DataDirectoryDialog adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.dataDirBrowseButton_actionPerformed();
-    }
-}
-
-class DataDirectoryDialog_cancelButton_actionAdapter implements java.awt.event.ActionListener {
-    DataDirectoryDialog adaptee;
-
-    DataDirectoryDialog_cancelButton_actionAdapter( DataDirectoryDialog adaptee ) {
-        this.adaptee = adaptee;
-    }
-
-    @Override
-    public void actionPerformed( ActionEvent e ) {
-        adaptee.cancelButton_actionPerformed( e );
-    }
 }
 
 class DataDirectoryDialog_actionButton_actionAdapter implements java.awt.event.ActionListener {
@@ -165,8 +161,39 @@ class DataDirectoryDialog_actionButton_actionAdapter implements java.awt.event.A
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.actionButton_actionPerformed( e );
+    }
+}
+
+class DataDirectoryDialog_cancelButton_actionAdapter implements java.awt.event.ActionListener {
+    DataDirectoryDialog adaptee;
+
+    DataDirectoryDialog_cancelButton_actionAdapter( DataDirectoryDialog adaptee ) {
+        this.adaptee = adaptee;
+        /** {@inheritDoc} */
+    }
+/** {@inheritDoc} */
+
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.cancelButton_actionPerformed( e );
+    }
+}
+
+class DataDirectoryDialog_dataDirBrowseButton_actionAdapter implements java.awt.event.ActionListener {
+    DataDirectoryDialog adaptee;
+
+    DataDirectoryDialog_dataDirBrowseButton_actionAdapter( DataDirectoryDialog adaptee ) {
+        /** {@inheritDoc} */
+        this.adaptee = adaptee;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void actionPerformed( ActionEvent e ) {
+        adaptee.dataDirBrowseButton_actionPerformed();
     }
 }

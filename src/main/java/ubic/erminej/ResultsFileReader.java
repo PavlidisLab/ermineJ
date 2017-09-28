@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,7 +49,7 @@ import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * Load results from a file. Files can contain more than one result set.
- * 
+ *
  * @author Paul Pavlidis
  * @author Homin Lee
  * @version $Id$
@@ -59,10 +59,16 @@ public class ResultsFileReader {
     private static Log log = LogFactory.getLog( ResultsFileReader.class );
 
     /**
-     * @param geneAnnots
+     * <p>
+     * load.
+     * </p>
+     *
+     * @param geneAnnots a {@link ubic.erminej.data.GeneAnnotations} object.
      * @param filename .
-     * @param messenger
-     * @return
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     * @return a {@link java.util.Collection} object.
+     * @throws java.io.IOException if any.
+     * @throws org.apache.commons.configuration.ConfigurationException if any.
      */
     public static Collection<GeneSetPvalRun> load( GeneAnnotations geneAnnots, String filename, StatusViewer messenger )
             throws IOException, ConfigurationException {
@@ -70,7 +76,7 @@ public class ResultsFileReader {
 
         if ( messenger != null ) messenger.showProgress( "Loading analysis..." );
 
-        Collection<GeneSetPvalRun> finalResult = new LinkedHashSet<GeneSetPvalRun>();
+        Collection<GeneSetPvalRun> finalResult = new LinkedHashSet<>();
 
         BufferedReader dis = new BufferedReader( new FileReader( filename ) );
 
@@ -92,7 +98,7 @@ public class ResultsFileReader {
     /**
      * Check whether a file exists, and if not and the GUI is available, prompt the user to enter one. The path is
      * returned.
-     * 
+     *
      * @param file
      * @return If the user doesn't locate the file, return null, otherwise the path to the file.
      */
@@ -173,7 +179,7 @@ public class ResultsFileReader {
 
     /**
      * Compute the multifunctionality rank delta (only if mf correction was done)
-     * 
+     *
      * @param newResults
      */
     private static void fillInMultifunctationalityRankDelta( GeneSetPvalRun newResults ) {
@@ -181,7 +187,7 @@ public class ResultsFileReader {
 
         List<GeneSetTerm> sortedR = GeneSetPvalRun.getSortedClasses( r );
 
-        Map<GeneSetTerm, Double> ranks = new HashMap<GeneSetTerm, Double>();
+        Map<GeneSetTerm, Double> ranks = new HashMap<>();
         int index = 0;
         for ( GeneSetTerm t : sortedR ) {
             double rank = ( index + 1 ) / sortedR.size();
@@ -190,7 +196,7 @@ public class ResultsFileReader {
             index++;
         }
 
-        Map<GeneSetTerm, Double> mfcRanks = new HashMap<GeneSetTerm, Double>();
+        Map<GeneSetTerm, Double> mfcRanks = new HashMap<>();
         List<GeneSetTerm> mfsortedR = GeneSetPvalRun.getSortedClasses( r, true );
         index = 0;
         for ( GeneSetTerm t : mfsortedR ) {
@@ -226,7 +232,7 @@ public class ResultsFileReader {
          */
         SettingsHolder runSettings = readOneSetOfSettings( geneAnnots, dis );
 
-        Map<GeneSetTerm, GeneSetResult> results = new LinkedHashMap<GeneSetTerm, GeneSetResult>();
+        Map<GeneSetTerm, GeneSetResult> results = new LinkedHashMap<>();
 
         boolean warned = false;
         String line = null;
@@ -335,7 +341,7 @@ public class ResultsFileReader {
 
     /**
      * Generate Settings from the file, reading from the current point to the next 'end of settings' marker.
-     * 
+     *
      * @param annots
      * @param r
      * @return

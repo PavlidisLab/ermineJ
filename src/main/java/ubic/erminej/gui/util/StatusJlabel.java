@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006-2013 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 import ubic.basecode.util.StatusDebugLogger;
 
 /**
+ * <p>
+ * StatusJlabel class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -37,11 +41,9 @@ public class StatusJlabel extends StatusDebugLogger {
 
     private static final int MAX_LABEL_TEXT = 200;
 
-    protected JLabel jlabel;
-
     private static ImageIcon errorIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/error.png" ) );
-    private static ImageIcon warningIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/warn.png" ) );
 
+    private static ImageIcon warningIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/warn.png" ) );
     private static ImageIcon waitingIcon = new ImageIcon( StatusJlabel.class.getResource( "/ubic/erminej/wait.gif" ) );
 
     /*
@@ -49,6 +51,15 @@ public class StatusJlabel extends StatusDebugLogger {
      */
     private static final int MESSAGE_DELAY = 1300; // milliseconds
 
+    protected JLabel jlabel;
+
+    /**
+     * <p>
+     * Constructor for StatusJlabel.
+     * </p>
+     *
+     * @param l a {@link javax.swing.JLabel} object.
+     */
     public StatusJlabel( JLabel l ) {
         this.jlabel = l;
         this.jlabel.setIcon( null );
@@ -56,9 +67,10 @@ public class StatusJlabel extends StatusDebugLogger {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see basecode.util.StatusViewer#clear()
      */
+    /** {@inheritDoc} */
     @Override
     public void clear() {
         // System.err.println( "Clearing" );
@@ -80,37 +92,7 @@ public class StatusJlabel extends StatusDebugLogger {
         }
     }
 
-    /**
-     * @param s
-     * @param callSuper
-     */
-    @Override
-    public void showStatus( String s, boolean callSuper ) {
-        final String m = StringUtils.abbreviate( s, MAX_LABEL_TEXT );
-
-        if ( SwingUtilities.isEventDispatchThread() ) {
-            setLabel( m, null );
-        } else {
-
-            try {
-                SwingUtilities.invokeAndWait( new Runnable() {
-                    @Override
-                    public void run() {
-                        setLabel( m, null );
-                    }
-                } );
-            } catch ( InterruptedException e ) {
-                e.printStackTrace();
-            } catch ( InvocationTargetException e ) {
-                e.printStackTrace();
-            }
-        }
-
-        if ( callSuper ) {
-            super.showStatus( s );
-        }
-    }
-
+    /** {@inheritDoc} */
     @Override
     public void showError( String s ) {
 
@@ -137,31 +119,44 @@ public class StatusJlabel extends StatusDebugLogger {
 
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void showWarning( String s ) {
+    public void showError( String message, Throwable e ) {
+        super.showError( message, e );
+        this.showError( message );
+    }
 
-        final String m = StringUtils.abbreviate( s, MAX_LABEL_TEXT );
+    /** {@inheritDoc} */
+    @Override
+    public void showError( Throwable e ) {
+
+        String m = "There was an error: " + e.getMessage() + "; See logs for details.";
+
+        if ( e instanceof CancellationException ) {
+            m = "Cancelled";
+        }
 
         if ( SwingUtilities.isEventDispatchThread() ) {
-            setLabel( m, warningIcon );
+            setLabel( m, errorIcon );
         } else {
+            final String mf = m;
             try {
                 SwingUtilities.invokeAndWait( new Runnable() {
                     @Override
                     public void run() {
-                        setLabel( m, warningIcon );
-                        letUserReadMessage( MESSAGE_DELAY );
+                        setLabel( mf, errorIcon );
                     }
                 } );
-            } catch ( InterruptedException e ) {
-                e.printStackTrace();
-            } catch ( InvocationTargetException e ) {
-                e.printStackTrace();
+            } catch ( InterruptedException ex ) {
+                ex.printStackTrace();
+            } catch ( InvocationTargetException ex ) {
+                ex.printStackTrace();
             }
         }
-        super.showWarning( s );
+        super.showError( e );
     }
 
+    /** {@inheritDoc} */
     @Override
     public void showProgress( String m ) {
 
@@ -193,54 +188,85 @@ public class StatusJlabel extends StatusDebugLogger {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see basecode.util.StatusViewer#setError(java.lang.String)
      */
 
-    @Override
-    public void showError( String message, Throwable e ) {
-        super.showError( message, e );
-        this.showError( message );
-    }
-
-    /**
-     * 
-     */
-    @Override
-    public void showError( Throwable e ) {
-
-        String m = "There was an error: " + e.getMessage() + "; See logs for details.";
-
-        if ( e instanceof CancellationException ) {
-            m = "Cancelled";
-        }
-
-        if ( SwingUtilities.isEventDispatchThread() ) {
-            setLabel( m, errorIcon );
-        } else {
-            final String mf = m;
-            try {
-                SwingUtilities.invokeAndWait( new Runnable() {
-                    @Override
-                    public void run() {
-                        setLabel( mf, errorIcon );
-                    }
-                } );
-            } catch ( InterruptedException ex ) {
-                ex.printStackTrace();
-            } catch ( InvocationTargetException ex ) {
-                ex.printStackTrace();
-            }
-        }
-        super.showError( e );
-    }
-
+    /** {@inheritDoc} */
     @Override
     public void showStatus( String s ) {
         this.showStatus( s, true );
     }
 
-    /** 
+    /** {@inheritDoc} */
+    @Override
+    public void showStatus( String s, boolean callSuper ) {
+        final String m = StringUtils.abbreviate( s, MAX_LABEL_TEXT );
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            setLabel( m, null );
+        } else {
+
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
+                    public void run() {
+                        setLabel( m, null );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
+
+        if ( callSuper ) {
+            super.showStatus( s );
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void showWarning( String s ) {
+
+        final String m = StringUtils.abbreviate( s, MAX_LABEL_TEXT );
+
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            setLabel( m, warningIcon );
+        } else {
+            try {
+                SwingUtilities.invokeAndWait( new Runnable() {
+                    @Override
+                    public void run() {
+                        setLabel( m, warningIcon );
+                        letUserReadMessage( MESSAGE_DELAY );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            } catch ( InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
+        super.showWarning( s );
+    }
+
+    /**
+     * <p>
+     * setLabel.
+     * </p>
+     *
+     * @param message a {@link java.lang.String} object.
+     * @param icon a {@link javax.swing.ImageIcon} object.
+     */
+    protected void setLabel( final String message, final ImageIcon icon ) {
+        jlabel.setIcon( icon );
+        jlabel.setText( StringUtils.abbreviate( message, 300 ) );
+
+    }
+
+    /**
      */
     private void letUserReadMessage( int mswait ) {
         try {
@@ -248,15 +274,6 @@ public class StatusJlabel extends StatusDebugLogger {
         } catch ( InterruptedException e ) {
             return;
         }
-    }
-
-    /**
-     * @param m
-     */
-    protected void setLabel( final String message, final ImageIcon icon ) {
-        jlabel.setIcon( icon );
-        jlabel.setText( StringUtils.abbreviate( message, 300 ) );
-
     }
 
 }

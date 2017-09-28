@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import ubic.erminej.data.GeneScores;
 
 /**
  * Simple API to run ermineJ analyses, using Strings as the initial representations.
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
@@ -51,7 +51,7 @@ public class ClassScoreSimple {
 
     /**
      * Note that these Lists must all be in the same order with respect to the elements.
-     * 
+     *
      * @param elements List of identifiers to be analyzed
      * @param genes List of genes corresponding to the elements. Indicates the Many-to-one mapping of elements to genes.
      * @param goAssociations List of Collections of go terms for the elements.
@@ -73,7 +73,7 @@ public class ClassScoreSimple {
 
     /**
      * Gene the resulting gene set pvalue for a given id.
-     * 
+     *
      * @param id The id of the gene set, e.g,. GO:0000232
      * @return -1 if the id is not in the results. Otherwise, the pvalue for the gene set.
      */
@@ -87,6 +87,8 @@ public class ClassScoreSimple {
 
     /**
      * Run an analysis using the current configuration.
+     *
+     * @param geneScores a {@link java.util.List} object.
      */
     public void run( List<Double> geneScores ) {
         GeneAnnotations geneData = new GeneAnnotations( elements, genes, goAssociations );
@@ -97,8 +99,8 @@ public class ClassScoreSimple {
     /**
      * Indicate that in the original gene scores, whether big values are better. If your inputs are p-values this should
      * be set to false. If you are using fold-changes, set to true.
-     * 
-     * @param b
+     *
+     * @param b a boolean.
      */
     public void setBigGeneScoreIsBetter( boolean b ) {
         this.settings.setBigIsBetter( b );
@@ -106,7 +108,7 @@ public class ClassScoreSimple {
 
     /**
      * Set the type of anlaysis to run. ORA is over-representation analysis.
-     * 
+     *
      * @param val either ClassScoreSimple.ORA or ClassScoreSimple.RESAMPLING or ROC
      */
     public void setClassScoreMethod( int val ) {
@@ -130,7 +132,7 @@ public class ClassScoreSimple {
 
     /**
      * How to handle situations when more than one probe corresponds to the same gene.
-     * 
+     *
      * @param val either BEST_GENE_SCORE or MEAN_GENE_SCORE
      */
     public void setGeneReplicateTreatment( int val ) {
@@ -151,7 +153,7 @@ public class ClassScoreSimple {
 
     /**
      * Set the method to be used to summarize gene sets during resampling analysis. This is ignored otherwise.
-     * 
+     *
      * @param val Either GeneScoreMethod.MEAN, MEDIAN, MEAN_ABOVE_QUANTILE or PRECISIONRECALL
      */
     public void setGeneScoreSummaryMethod( int val ) {
@@ -175,8 +177,8 @@ public class ClassScoreSimple {
 
     /**
      * Set the threshold to use for ORA analysis. This is ignored otherwise.
-     * 
-     * @param val
+     *
+     * @param val a double.
      */
     public void setGeneScoreThreshold( double val ) {
         this.settings.setGeneScoreThreshold( val );
@@ -184,8 +186,8 @@ public class ClassScoreSimple {
 
     /**
      * The number of iterations to be used during resampling. This is ignored for ORA analysis.
-     * 
-     * @param val
+     *
+     * @param val a int.
      */
     public void setIterations( int val ) {
         if ( val < 1 ) throw new IllegalArgumentException( "Value must be positive" );
@@ -194,7 +196,7 @@ public class ClassScoreSimple {
 
     /**
      * Set to true if your inputs are p-values.
-     * 
+     *
      * @param val If true, your gene scores will be transformed by -log base 10.
      */
     public void setLogTransformGeneScores( boolean val ) {
@@ -203,8 +205,8 @@ public class ClassScoreSimple {
 
     /**
      * The maximum gene set size to be considered.
-     * 
-     * @param val
+     *
+     * @param val a int.
      */
     public void setMaxGeneSetSize( int val ) {
         if ( val < 1 ) throw new IllegalArgumentException( "Value must be positive" );
@@ -213,8 +215,8 @@ public class ClassScoreSimple {
 
     /**
      * The minimum gene set size to be considered.
-     * 
-     * @param val
+     *
+     * @param val a int.
      */
     public void setMinGeneSetSize( int val ) {
         if ( val < 1 ) throw new IllegalArgumentException( "Value must be positive" );

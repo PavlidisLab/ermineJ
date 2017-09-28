@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,13 +31,17 @@ import org.jfree.data.xy.XYSeriesCollection;
 import ubic.erminej.data.Histogram;
 
 /**
+ * <p>
+ * JHistViewer class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
 public class JHistViewer extends JFrame {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8747183839731697937L;
 
@@ -49,6 +53,10 @@ public class JHistViewer extends JFrame {
 
     /**
      * This is the default constructor
+     *
+     * @param hist a {@link ubic.erminej.data.Histogram} object.
+     * @param inSize a int.
+     * @param rawScore a double.
      */
     public JHistViewer( Histogram hist, int inSize, double rawScore ) {
         super();
@@ -61,7 +69,7 @@ public class JHistViewer extends JFrame {
 
     /**
      * This method initializes this
-     * 
+     *
      * @return void
      */
     private void initialize() {
@@ -74,7 +82,7 @@ public class JHistViewer extends JFrame {
     }
 
     /**
-     * 
+     *
      */
     private void makePlot() {
 

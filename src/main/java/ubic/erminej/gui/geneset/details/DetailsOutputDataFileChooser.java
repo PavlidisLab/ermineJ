@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,38 +33,11 @@ import ubic.erminej.gui.file.DataFileFilter;
 
 /**
  * Customized file browser.
- * 
+ *
  * @author Will Braynen
  * @version $Id$
  */
 public class DetailsOutputDataFileChooser extends JFileChooser {
-
-    private static final long serialVersionUID = -4213033434706180241L;
-
-    private JDataFileChooserOptions m_options;
-
-    public DetailsOutputDataFileChooser( boolean includeEverything, boolean normalize, String initialFileName ) {
-
-        super();
-
-        // Create a file filter for the file chooser
-        DataFileFilter dataFileFilter = new DataFileFilter();
-        super.setFileFilter( dataFileFilter );
-        super.setAcceptAllFileFilterUsed( false );
-        if ( initialFileName != null ) super.setSelectedFile( new File( initialFileName ) );
-
-        // Create other save options (e.g. include row and column labels in image)
-        m_options = new JDataFileChooserOptions( includeEverything, normalize );
-        super.setAccessory( m_options );
-    }
-
-    public boolean normalized() {
-        return m_options.normalized();
-    }
-
-    public boolean includeAnnotations() {
-        return m_options.includeAnnotations();
-    }
 
     /**
      * The accessory component for the file chooser.
@@ -94,6 +67,14 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
             }
         }
 
+        public boolean includeAnnotations() {
+            return includeMatrixValuesCheckBox.isSelected();
+        }
+
+        public boolean normalized() {
+            return m_normalize.isSelected();
+        }
+
         private void jbInit() {
             setLayout( gridLayout1 );
             includeMatrixValuesCheckBox
@@ -113,13 +94,55 @@ public class DetailsOutputDataFileChooser extends JFileChooser {
             this.add( m_normalize, null );
         }
 
-        public boolean normalized() {
-            return m_normalize.isSelected();
-        }
+    }
 
-        public boolean includeAnnotations() {
-            return includeMatrixValuesCheckBox.isSelected();
-        }
+    private static final long serialVersionUID = -4213033434706180241L;
 
+    private JDataFileChooserOptions m_options;
+
+    /**
+     * <p>
+     * Constructor for DetailsOutputDataFileChooser.
+     * </p>
+     *
+     * @param includeEverything a boolean.
+     * @param normalize a boolean.
+     * @param initialFileName a {@link java.lang.String} object.
+     */
+    public DetailsOutputDataFileChooser( boolean includeEverything, boolean normalize, String initialFileName ) {
+
+        super();
+
+        // Create a file filter for the file chooser
+        DataFileFilter dataFileFilter = new DataFileFilter();
+        super.setFileFilter( dataFileFilter );
+        super.setAcceptAllFileFilterUsed( false );
+        if ( initialFileName != null ) super.setSelectedFile( new File( initialFileName ) );
+
+        // Create other save options (e.g. include row and column labels in image)
+        m_options = new JDataFileChooserOptions( includeEverything, normalize );
+        super.setAccessory( m_options );
+    }
+
+    /**
+     * <p>
+     * includeAnnotations.
+     * </p>
+     *
+     * @return a boolean.
+     */
+    public boolean includeAnnotations() {
+        return m_options.includeAnnotations();
+    }
+
+    /**
+     * <p>
+     * normalized.
+     * </p>
+     *
+     * @return a boolean.
+     */
+    public boolean normalized() {
+        return m_options.normalized();
     }
 }

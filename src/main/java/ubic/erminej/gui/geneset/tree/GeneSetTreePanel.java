@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,9 +67,9 @@ import ubic.erminej.gui.util.Colors;
 
 /**
  * A Tree display that shows Gene Sets and their scores, and allows uer interaction.
- * 
+ *
  * @author pavlidis
- * @version $Id$
+ * @version $Id: $Id
  */
 public class GeneSetTreePanel extends GeneSetPanel {
 
@@ -87,19 +87,26 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     private TreePath currentlySelectedTreePath = null;
 
-    private Collection<GeneSetTerm> currentSelectedSets = new HashSet<GeneSetTerm>();
+    private Collection<GeneSetTerm> currentSelectedSets = new HashSet<>();
 
     private AtomicBoolean expansionCancel = new AtomicBoolean( false );
 
+    /**
+     * <p>Constructor for GeneSetTreePanel.</p>
+     *
+     * @param callingFrame a {@link ubic.erminej.gui.MainFrame} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public GeneSetTreePanel( MainFrame callingFrame, Settings settings ) {
         super( settings, callingFrame );
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see classScore.gui.GeneSetsResultsScrollPane#addedNewGeneSet()
      */
+    /** {@inheritDoc} */
     @Override
     public void addedGeneSet( GeneSetTerm id ) {
         /*
@@ -136,16 +143,20 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see classScore.gui.GeneSetsResultsScrollPane#addRun()
      */
+    /** {@inheritDoc} */
     @Override
     public void addRun() {
         fireResultsChanged();
     }
 
     /**
+     * <p>expandToGeneSet.</p>
+     *
      * @param classID a node somewhere in the tree; we expand the path
+     * @return a boolean.
      */
     public boolean expandToGeneSet( GeneSetTerm classID ) {
 
@@ -181,9 +192,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see ubic.erminej.gui.geneset.GeneSetPanel#filter(boolean)
      */
+    /** {@inheritDoc} */
     @Override
     public void filter( final boolean propagate ) {
         SwingWorker<Object, Object> r = new SwingWorker<Object, Object>() {
@@ -215,7 +227,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * @param selectedTerms
+     * <p>filter.</p>
+     *
+     * @param selectedTerms a {@link java.util.Collection} object.
      */
     public void filter( Collection<GeneSetTerm> selectedTerms ) {
 
@@ -241,9 +255,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * @param tree
-     * @param names
-     * @return
+     * <p>find.</p>
+     *
+     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a {@link javax.swing.tree.TreePath} object.
      */
     public TreePath find( GeneSetTerm id ) {
         if ( id == null ) return null;
@@ -252,7 +267,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * 
+     * <p>fireResultsChanged.</p>
      */
     public void fireResultsChanged() {
         log.debug( "Changing results" );
@@ -265,6 +280,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
+     * <p>Getter for the field <code>currentlySelectedGeneSet</code>.</p>
+     *
      * @return Returns the currentlySelectedGeneSet.
      */
     public GeneSetTerm getCurrentlySelectedGeneSet() {
@@ -272,7 +289,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * @return
+     * <p>getLeaves.</p>
+     *
+     * @return a {@link java.util.Collection} object.
      */
     public Collection<GeneSetTreeNode> getLeaves() {
         GeneSetTreeNode node = ( GeneSetTreeNode ) goTree.getModel().getRoot();
@@ -281,9 +300,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /**
      * Called after data files are read in.
-     * 
-     * @param goData
-     * @param geneData
+     *
+     * @param gd a {@link ubic.erminej.data.GeneAnnotations} object.
      */
     public void initialize( GeneAnnotations gd ) {
 
@@ -304,7 +322,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * @param e
+     * <p>mouseReleased.</p>
+     *
+     * @param e a {@link java.awt.event.MouseEvent} object.
      */
     public void mouseReleased( MouseEvent e ) {
         if ( e.getClickCount() < 2 ) {
@@ -314,6 +334,8 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Force to repaint, reapply filters.
      */
     @Override
@@ -327,16 +349,135 @@ public class GeneSetTreePanel extends GeneSetPanel {
         messenger.clear();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void removeRun( GeneSetPvalRun runToRemove ) {
         ( ( FilteredGeneSetTreeModel ) this.goTree.getModel() ).removeResults();
         ( ( GeneSetTreeNodeRenderer ) this.goTree.getCellRenderer() ).clearRun();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void resetView() {
         // anyting else we need to do?
         // filter( new HashSet<GeneSetTerm>() );
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
+        boolean deleted = super.deleteUserGeneSet( classID );
+        return deleted;
+    }
+
+    /**
+     * <p>expandAll.</p>
+     *
+     * @param expand If false, collapses all nodes. If true, expands them all.
+     */
+    protected void expandAll( final boolean expand ) {
+        TreeNode root = ( TreeNode ) goTree.getModel().getRoot();
+        expandNode( new TreePath( root ), expand );
+    }
+
+    /**
+     * Fully expand or collapse a node.
+     *
+     * @param parent a {@link javax.swing.tree.TreePath} object.
+     * @param expand a boolean.
+     */
+    protected synchronized void expandNode( final TreePath parent, final boolean expand ) {
+
+        if ( expand )
+            messenger.showProgress( "Expanding" );
+        else
+            messenger.showProgress( "Collapsing" );
+
+        doExpandNode( parent, expand );
+
+        messenger.clear();
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e ) {
+        JTree source = ( JTree ) e.getSource();
+        int x = e.getX();
+        int y = e.getY();
+        TreePath path = source.getPathForLocation( x, y );
+
+        if ( path == null ) return null;
+
+        source.setSelectionPath( path );
+        source.scrollPathToVisible( path );
+
+        GeneSetTreeNode selectedNode = ( GeneSetTreeNode ) path.getLastPathComponent();
+        return selectedNode.getTerm();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see ubic.erminej.gui.GeneSetPanel#removedGeneSet(ubic.erminej.data.GeneSetTerm)
+     */
+    /** {@inheritDoc} */
+    @Override
+    protected void removedGeneSet( GeneSetTerm id ) {
+        assert id.isUserDefined();
+
+        // find it in the tree
+        TreePath p = find( id );
+
+        if ( p == null ) {
+            log.warn( "Path to set wasn't found. Already gone?" );
+            return;
+        }
+
+        GeneSetTreeNode node = ( GeneSetTreeNode ) p.getLastPathComponent();
+
+        if ( node == null ) {
+            log.warn( "Node to delete wasn't found" );
+            return;
+        }
+
+        if ( node.getChildCount() != 0 ) {
+            throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
+        }
+
+        // remove it from the model.
+        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( node );
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void showPopupMenu( MouseEvent e ) {
+
+        GeneSetPanelPopupMenu popup = super.configurePopup( e );
+
+        if ( popup == null ) return;
+
+        JMenuItem collapseNodeMenuItem = new JMenuItem( "Fully collapse this node" );
+        collapseNodeMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e1 ) {
+                expandNode( currentlySelectedTreePath, false );
+            }
+        } );
+
+        JMenuItem expandNodeMenuItem = new JMenuItem( "Fully expand this node" );
+        expandNodeMenuItem.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed( ActionEvent e1 ) {
+                expandNode( currentlySelectedTreePath, true );
+            }
+        } );
+
+        popup.add( collapseNodeMenuItem );
+        popup.add( expandNodeMenuItem );
+
+        popup.show( e.getComponent(), e.getX(), e.getY() );
     }
 
     /**
@@ -374,7 +515,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     /**
      * http://javaalmanac.com/egs/javax.swing.tree/FindNode.html
-     * 
+     *
      * @param tree
      * @param parent
      * @param nodes
@@ -415,7 +556,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
      * @return
      */
     private Collection<GeneSetTreeNode> getLeaves( GeneSetTreeNode node ) {
-        Collection<GeneSetTreeNode> result = new HashSet<GeneSetTreeNode>();
+        Collection<GeneSetTreeNode> result = new HashSet<>();
         Enumeration<GeneSetTreeNode> dfe = node.depthFirstEnumeration();
         while ( dfe.hasMoreElements() ) {
             GeneSetTreeNode no = dfe.nextElement();
@@ -485,7 +626,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * 
+     *
      */
     private void setNodeStatesForFilter() {
         Collection<GeneSetTreeNode> leaves = this.getLeaves();
@@ -516,7 +657,7 @@ public class GeneSetTreePanel extends GeneSetPanel {
     }
 
     /**
-     * 
+     *
      */
     private void setRenderer() {
         rend = new GeneSetTreeNodeRenderer( geneData );
@@ -556,124 +697,6 @@ public class GeneSetTreePanel extends GeneSetPanel {
 
     }
 
-    @Override
-    protected boolean deleteUserGeneSet( GeneSetTerm classID ) {
-        boolean deleted = super.deleteUserGeneSet( classID );
-        return deleted;
-    }
-
-    /**
-     * @param expand If false, collapses all nodes. If true, expands them all.
-     */
-    protected void expandAll( final boolean expand ) {
-        TreeNode root = ( TreeNode ) goTree.getModel().getRoot();
-        expandNode( new TreePath( root ), expand );
-    }
-
-    /**
-     * Fully expand or collapse a node.
-     * 
-     * @param parent
-     * @param expand
-     */
-    protected synchronized void expandNode( final TreePath parent, final boolean expand ) {
-
-        if ( expand )
-            messenger.showProgress( "Expanding" );
-        else
-            messenger.showProgress( "Collapsing" );
-
-        doExpandNode( parent, expand );
-
-        messenger.clear();
-
-    }
-
-    /**
-     * @param e
-     * @return
-     */
-    @Override
-    protected GeneSetTerm popupRespondAndGetGeneSet( MouseEvent e ) {
-        JTree source = ( JTree ) e.getSource();
-        int x = e.getX();
-        int y = e.getY();
-        TreePath path = source.getPathForLocation( x, y );
-
-        if ( path == null ) return null;
-
-        source.setSelectionPath( path );
-        source.scrollPathToVisible( path );
-
-        GeneSetTreeNode selectedNode = ( GeneSetTreeNode ) path.getLastPathComponent();
-        return selectedNode.getTerm();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ubic.erminej.gui.GeneSetPanel#removedGeneSet(ubic.erminej.data.GeneSetTerm)
-     */
-    @Override
-    protected void removedGeneSet( GeneSetTerm id ) {
-        assert id.isUserDefined();
-
-        // find it in the tree
-        TreePath p = find( id );
-
-        if ( p == null ) {
-            log.warn( "Path to set wasn't found. Already gone?" );
-            return;
-        }
-
-        GeneSetTreeNode node = ( GeneSetTreeNode ) p.getLastPathComponent();
-
-        if ( node == null ) {
-            log.warn( "Node to delete wasn't found" );
-            return;
-        }
-
-        if ( node.getChildCount() != 0 ) {
-            throw new UnsupportedOperationException( "Can't delete node that has children, sorry" );
-        }
-
-        // remove it from the model.
-        ( ( DefaultTreeModel ) this.goTree.getModel() ).removeNodeFromParent( node );
-
-    }
-
-    /**
-     * 
-     */
-    @Override
-    protected void showPopupMenu( MouseEvent e ) {
-
-        GeneSetPanelPopupMenu popup = super.configurePopup( e );
-
-        if ( popup == null ) return;
-
-        JMenuItem collapseNodeMenuItem = new JMenuItem( "Fully collapse this node" );
-        collapseNodeMenuItem.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e1 ) {
-                expandNode( currentlySelectedTreePath, false );
-            }
-        } );
-
-        JMenuItem expandNodeMenuItem = new JMenuItem( "Fully expand this node" );
-        expandNodeMenuItem.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e1 ) {
-                expandNode( currentlySelectedTreePath, true );
-            }
-        } );
-
-        popup.add( collapseNodeMenuItem );
-        popup.add( expandNodeMenuItem );
-
-        popup.show( e.getComponent(), e.getX(), e.getY() );
-    }
-
 }
 
 /**
@@ -694,6 +717,12 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
 
     private static final String EMPTYSET_ICON = GeneSetPanel.RESOURCE_LOCATION + "littleLighterGreySquare.gif";
 
+    private static final Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
+
+    private static final Font italicFont = new Font( "SansSerif", Font.ITALIC, 11 );
+
+    private static final Font boldFont = new Font( "SansSerif", Font.BOLD, 11 );
+
     private GeneSetPvalRun currentResultSet = null;
 
     private GeneAnnotations geneData;
@@ -712,36 +741,35 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
      * Represents a node that is statistically significant but which lacks any significant children.
      */
     private final Icon goodPvalueIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_ICON ) );
-
     private final Icon emptySetIcon = new ImageIcon( this.getClass().getResource( EMPTYSET_ICON ) );
-
     /**
      * Represents a node that is statistically significant and also has significant children.
      */
     private final Icon goodPvalueGoodChildIcon = new ImageIcon( this.getClass().getResource( GOODPVAL_GOODCHILD_ICON ) );
 
-    private static final Font plain = new Font( "SansSerif", Font.PLAIN, 11 );
-    private static final Font italicFont = new Font( "SansSerif", Font.ITALIC, 11 );
-    private static final Font boldFont = new Font( "SansSerif", Font.BOLD, 11 );
+    private Collection<GeneSetTerm> selectedTerms = new HashSet<>();
 
-    private Collection<GeneSetTerm> selectedTerms = new HashSet<GeneSetTerm>();
-
+    /**
+     * <p>Constructor for GeneSetTreeNodeRenderer.</p>
+     *
+     * @param geneData a {@link ubic.erminej.data.GeneAnnotations} object.
+     */
     public GeneSetTreeNodeRenderer( GeneAnnotations geneData ) {
         super();
         this.setOpaque( true );
         this.geneData = geneData;
     }
 
+    /**
+     * <p>clearRun.</p>
+     */
     public void clearRun() {
         this.currentResultSet = null;
         this.validate();
         this.repaint();
     }
 
-    /**
-     * @see javax.swing.tree.TreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean,
-     *      boolean, boolean, int, boolean)
-     */
+    /** {@inheritDoc} */
     @Override
     public Component getTreeCellRendererComponent( JTree tree, Object value, boolean sel, boolean expanded,
             boolean leaf, int row, boolean foc ) {
@@ -784,7 +812,9 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * @param geneSetPvalRun
+     * <p>Setter for the field <code>currentResultSet</code>.</p>
+     *
+     * @param geneSetPvalRun a {@link ubic.erminej.analysis.GeneSetPvalRun} object.
      */
     public void setCurrentResultSet( GeneSetPvalRun geneSetPvalRun ) {
         this.currentResultSet = geneSetPvalRun;
@@ -792,8 +822,45 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         this.repaint();
     }
 
+    /**
+     * <p>Setter for the field <code>selectedTerms</code>.</p>
+     *
+     * @param selectedTerms a {@link java.util.Collection} object.
+     */
     public void setSelectedTerms( Collection<GeneSetTerm> selectedTerms ) {
         this.selectedTerms = selectedTerms;
+    }
+
+    /**
+     * <p>getToolTipTextForRedundancy.</p>
+     *
+     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a {@link java.lang.String} object.
+     */
+    protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
+
+        if ( id.isAspect() || id.getId().equals( "all" ) ) return "";
+
+        // boolean redundant = geneData.skipDueToRedundancy( id );
+        GeneSet qGeneSet = geneData.getGeneSet( id );
+
+        if ( qGeneSet == null ) {
+            System.err.println( "No set " + id );
+            return "";
+        }
+
+        Collection<GeneSet> redundantGroups = qGeneSet.getRedundantGroups();
+
+        String redund = "";
+        if ( !redundantGroups.isEmpty() ) {
+            redund = "<strong>Redundant</strong> with:<br/>";
+
+            for ( GeneSet geneSet : redundantGroups ) {
+                redund += geneSet + "<br/>";
+            }
+            // redund += "<br/>";
+        }
+        return redund;
     }
 
     /**
@@ -932,6 +999,46 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         }
 
         /*
+    private void setupToolTip( GeneSetTreeNode node ) {
+
+        GeneSetTerm term = node.getTerm();
+
+        String aspect = term.getAspect();
+        String definition = term.getDefinition();
+        String size = geneData.getGeneSet( term ) == null ? "?" : "" + geneData.getGeneSet( term ).size();
+        String probeSize = geneData.getGeneSet( term ) == null ? "?" : ""
+                + geneData.getGeneSet( term ).getProbes().size();
+        String redund = getToolTipTextForRedundancy( term );
+
+        DirectedGraphNode<String, GeneSetTerm> termNode = geneData.getGeneSetGraph().get( term.getId() );
+
+        boolean showParents = false;
+
+        String parentTerms = "";
+
+        if ( termNode != null ) {
+            GeneSetTreeNode jtreeParent = ( ( GeneSetTreeNode ) node.getParent() );
+
+            if ( jtreeParent != null ) {
+
+                Set<String> parentKeys = termNode.getParentKeys();
+
+                if ( parentKeys.size() > 1 ) {
+                    showParents = true;
+                    for ( String p : parentKeys ) {
+                        if ( p.equals( jtreeParent.getTerm().getId() ) ) {
+                            continue;
+                        }
+                        DirectedGraphNode<String, GeneSetTerm> parentNode = termNode.getGraph().get( p );
+
+                        parentTerms = parentTerms + "<br/>" + parentNode.getItem();
+                    }
+                }
+                parentTerms = "<strong>Other parents:</strong> " + parentTerms + "<br/>";
+            }
+        }
+
+        /*
          * add information on the result.
          */
         boolean showResult = false;
@@ -939,11 +1046,13 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
         if ( this.currentResultSet != null ) {
             GeneSetResult result = this.currentResultSet.getResults().get( term );
             if ( result != null && !( result instanceof EmptyGeneSetResult ) ) {
+                /** {@inheritDoc} */
                 showResult = true;
                 resultStr = String.format( "Corrected P = %.2g<br/>", result.getCorrectedPvalue() );
             }
 
         }
+/** {@inheritDoc} */
 
         setToolTipText( "<html>"
                 + term.getName()
@@ -964,38 +1073,12 @@ class GeneSetTreeNodeRenderer extends DefaultTreeCellRenderer {
                 + WordUtils.wrap( StringUtils.abbreviate( definition, GeneSetPanel.MAX_DEFINITION_LENGTH ), 50,
                         "<br/>", true ) );
     }
-
-    /**
-     * @param id
-     * @return
-     */
-    protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
-
-        if ( id.isAspect() || id.getId().equals( "all" ) ) return "";
-
-        // boolean redundant = geneData.skipDueToRedundancy( id );
-        GeneSet qGeneSet = geneData.getGeneSet( id );
-
-        if ( qGeneSet == null ) {
-            System.err.println( "No set " + id );
-            return "";
-        }
-
-        Collection<GeneSet> redundantGroups = qGeneSet.getRedundantGroups();
-
-        String redund = "";
-        if ( !redundantGroups.isEmpty() ) {
-            redund = "<strong>Redundant</strong> with:<br/>";
-
-            for ( GeneSet geneSet : redundantGroups ) {
-                redund += geneSet + "<br/>";
-            }
-            // redund += "<br/>";
-        }
-        return redund;
-    }
 }
 
+/**
+ *
+  *
+  */
 class GeneSetTreePanel_mouseListener extends MouseAdapter {
     private GeneSetTreePanel adaptee;
 

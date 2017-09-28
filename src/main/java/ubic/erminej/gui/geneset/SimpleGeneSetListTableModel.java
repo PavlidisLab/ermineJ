@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -26,16 +26,43 @@ import ubic.erminej.data.GeneSet;
 
 /**
  * Simplified table model for listing gene sets (e.g. in a picker situation)
- * 
+ *
  * @author paul
  * @version $Id$
  */
 public class SimpleGeneSetListTableModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 1L;
-    private List<String> columnNames = new Vector<String>();
-    private List<GeneSet> geneSets = new ArrayList<GeneSet>();
+    private List<String> columnNames = new Vector<>();
+    private List<GeneSet> geneSets = new ArrayList<>();
 
+    /**
+     * Offer up only the given gene sets
+     *
+     * @param geneSets a {@link java.util.Collection} object.
+     */
+    public SimpleGeneSetListTableModel( Collection<GeneSet> geneSets ) {
+        columnNames.add( "Name" );
+        columnNames.add( "Description" );
+        columnNames.add( "Elements" );
+        columnNames.add( "Genes" );
+        this.geneSets.addAll( geneSets );
+    }
+
+    /**
+     * Offer up all gene sets.
+     *
+     * @param geneDat a {@link ubic.erminej.data.GeneAnnotations} object.
+     */
+    public SimpleGeneSetListTableModel( GeneAnnotations geneDat ) {
+        this.geneSets.addAll( geneDat.getGeneSets() );
+        columnNames.add( "Name" );
+        columnNames.add( "Description" );
+        columnNames.add( "Elements" );
+        columnNames.add( "Genes" );
+    }
+
+    /** {@inheritDoc} */
     @Override
     public Class<?> getColumnClass( int columnIndex ) {
         if ( columnIndex == 0 ) {
@@ -50,48 +77,25 @@ public class SimpleGeneSetListTableModel extends AbstractTableModel {
         return String.class;
     }
 
-    /**
-     * Offer up only the given gene sets
-     * 
-     * @param geneDat
-     * @param geneSets
-     */
-    public SimpleGeneSetListTableModel( Collection<GeneSet> geneSets ) {
-        columnNames.add( "Name" );
-        columnNames.add( "Description" );
-        columnNames.add( "Elements" );
-        columnNames.add( "Genes" );
-        this.geneSets.addAll( geneSets );
-    }
-
-    /**
-     * Offer up all gene sets.
-     * 
-     * @param geneDat
-     */
-    public SimpleGeneSetListTableModel( GeneAnnotations geneDat ) {
-        this.geneSets.addAll( geneDat.getGeneSets() );
-        columnNames.add( "Name" );
-        columnNames.add( "Description" );
-        columnNames.add( "Elements" );
-        columnNames.add( "Genes" );
-    }
-
-    @Override
-    public String getColumnName( int i ) {
-        return columnNames.get( i );
-    }
-
+    /** {@inheritDoc} */
     @Override
     public int getColumnCount() {
         return columnNames.size();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String getColumnName( int i ) {
+        return columnNames.get( i );
+    }
+
+    /** {@inheritDoc} */
     @Override
     public int getRowCount() {
         return this.geneSets.size();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object getValueAt( int i, int j ) {
 

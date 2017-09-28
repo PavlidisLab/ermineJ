@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -38,39 +38,11 @@ import ubic.erminej.gui.util.MatrixPreviewer;
 
 /**
  * Similar to JGeneScoreFileChooser
- * 
+ *
  * @author paul
  * @version $Id$
  */
 public class JRawFileChooser extends JFileChooser {
-
-    JRawFileChooserOptions m_options;
-
-    JTextField dataColTextField = new JTextField();
-
-    public JRawFileChooser( String startPath, int currentSettingForDataColumn ) {
-        super( startPath );
-
-        // Create a file filter for the file chooser
-        DataFileFilter dataFileFilter = new DataFileFilter();
-        super.setFileFilter( dataFileFilter );
-        super.setAcceptAllFileFilterUsed( false );
-        m_options = new JRawFileChooserOptions( this, currentSettingForDataColumn );
-        super.setAccessory( m_options );
-
-        if ( StringUtils.isNotBlank( startPath ) && new File( startPath ).exists() ) {
-            this.setSelectedFile( new File( startPath ) );
-        }
-    }
-
-    /**
-     * The column number where the data to import starts.
-     * 
-     * @return
-     */
-    public int getStartColumn() {
-        return Integer.valueOf( dataColTextField.getText() );
-    }
 
     /**
      * The accessory component for the file chooser.
@@ -151,5 +123,40 @@ public class JRawFileChooser extends JFileChooser {
         }
     } // end private class JDataFileChooserOptions
 
-} // end class JDetailsFileChooser
+    JRawFileChooserOptions m_options;
 
+    JTextField dataColTextField = new JTextField();
+
+    /**
+     * <p>
+     * Constructor for JRawFileChooser.
+     * </p>
+     *
+     * @param startPath a {@link java.lang.String} object.
+     * @param currentSettingForDataColumn a int.
+     */
+    public JRawFileChooser( String startPath, int currentSettingForDataColumn ) {
+        super( startPath );
+
+        // Create a file filter for the file chooser
+        DataFileFilter dataFileFilter = new DataFileFilter();
+        super.setFileFilter( dataFileFilter );
+        super.setAcceptAllFileFilterUsed( false );
+        m_options = new JRawFileChooserOptions( this, currentSettingForDataColumn );
+        super.setAccessory( m_options );
+
+        if ( StringUtils.isNotBlank( startPath ) && new File( startPath ).exists() ) {
+            this.setSelectedFile( new File( startPath ) );
+        }
+    }
+
+    /**
+     * The column number where the data to import starts.
+     *
+     * @return a int.
+     */
+    public int getStartColumn() {
+        return Integer.valueOf( dataColTextField.getText() );
+    }
+
+} // end class JDetailsFileChooser

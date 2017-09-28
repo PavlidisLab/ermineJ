@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,10 @@ import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 
 /**
+ * <p>
+ * ResultsPrinter class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
@@ -52,12 +56,15 @@ public class ResultsPrinter {
      * File format formalities
      */
 
+    /** Constant <code>RUN_NAME_FIELD_PATTERN="!# runName="</code> */
     protected static final String RUN_NAME_FIELD_PATTERN = "!# runName=";
     private static final String SYMBOL_SEPARATOR = "|";
+    /** Constant <code>RUN_INDICATOR="!#======"</code> */
     protected static final String RUN_INDICATOR = "!#======";
 
     private static final String RUN_SEPARATOR = RUN_INDICATOR + " End run =======";
 
+    /** Constant <code>END_OF_SETTINGS_SEPARATOR="#!----"</code> */
     protected static final String END_OF_SETTINGS_SEPARATOR = "#!----";
 
     private static final String CITATION = "Gillis J, Mistry M, Pavlidis P. (2010) Gene function analysis in complex data sets using ErmineJ Nat Protoc 5(6):1148-59";
@@ -70,10 +77,14 @@ public class ResultsPrinter {
     private static Log log = LogFactory.getLog( ResultsPrinter.class.getName() );
 
     /**
+     * <p>
+     * write.
+     * </p>
+     *
      * @param destFile output file name
      * @param run Analysis run to be saved
-     * @param goName GO information
      * @param saveAllGeneNames Whether the output should include all the genes
+     * @throws java.io.IOException if any.
      */
     public static void write( String destFile, GeneSetPvalRun run, boolean saveAllGeneNames ) throws IOException {
 
@@ -84,16 +95,13 @@ public class ResultsPrinter {
         w.close();
     }
 
-    private static void printHeading( Writer w ) throws IOException {
-        w.write( HEADING );
-    }
-
     /**
      * Used for saving "projects".
-     * 
+     *
      * @param path Output path (always clobbered)
-     * @param masterSettings
-     * @param runsToSave
+     * @param masterSettings a {@link ubic.erminej.SettingsHolder} object.
+     * @param runsToSave a {@link java.util.Collection} object.
+     * @throws java.io.IOException if any.
      */
     public static void write( String path, SettingsHolder masterSettings, Collection<GeneSetPvalRun> runsToSave )
             throws IOException {
@@ -122,8 +130,74 @@ public class ResultsPrinter {
     }
 
     /**
+     * @param className
+     * @return
+     */
+    private static String formatGeneNames( GeneAnnotations geneData, GeneSetTerm className ) {
+        if ( className == null ) return "";
+        Collection<Gene> genes = geneData.getGeneSetGenes( className );
+        if ( genes == null || genes.size() == 0 ) return "";
+        List<Gene> sortedGenes = new ArrayList<>( genes );
+        Collections.sort( sortedGenes );
+        StringBuffer buf = new StringBuffer();
+        for ( Iterator<Gene> iter = sortedGenes.iterator(); iter.hasNext(); ) {
+            Gene gene = iter.next();
+            buf.append( gene.getSymbol() + SYMBOL_SEPARATOR );
+        }
+        return buf.toString();
+    }
+
+    /**
+     * Set up the string the way I want it.
+     *
+     * @param classid String
+     * @return String
+     */
+    private static String formatRedundantAndSimilar( GeneAnnotations geneData, GeneSetTerm classid ) {
+        Collection<GeneSet> redund = geneData.findGeneSet( classid ).getRedundantGroups();
+        String return_value = "";
+        if ( redund.isEmpty() ) {
+            return return_value;
+        }
+
+        for ( GeneSet nextid : redund ) {
+            return_value = return_value + nextid.getId() + SYMBOL_SEPARATOR + nextid.getName() + ", ";
+        }
+
+        return return_value;
+
+    }
+
+    private static Writer getDestination( String destFile ) throws IOException {
+        Writer out;
+        if ( destFile == null ) {
+            log.debug( "Writing results to STDOUT" );
+            out = new BufferedWriter( new PrintWriter( System.out ) );
+        } else {
+            log.info( "Writing results to " + destFile );
+            out = new BufferedWriter( new FileWriter( destFile, false ) ); // NOT APPENDING.
+        }
+        return out;
+    }
+
+    /**
+     * @param out
+     * @param res
+     * @throws IOException
+     */
+    private static void print( Writer out, boolean saveAllGeneNames, GeneAnnotations geneData, GeneSetResult res )
+            throws IOException {
+        res.print( out, "\t" + formatRedundantAndSimilar( geneData, res.getGeneSetId() ) + "\t"
+                + ( saveAllGeneNames ? formatGeneNames( geneData, res.getGeneSetId() ) : "" ) + "\t" );
+    }
+
+    private static void printHeading( Writer w ) throws IOException {
+        w.write( HEADING );
+    }
+
+    /**
      * Print the settings and results (but not the heading)
-     * 
+     *
      * @param sort Sort the results so the best class (by score pvalue) is listed first.
      */
     private static void printOneResultSet( GeneSetPvalRun resultRun, Writer out, boolean saveAllGeneNames, boolean sort )
@@ -161,7 +235,7 @@ public class ResultsPrinter {
         boolean first = true;
         if ( sort ) {
 
-            List<GeneSetResult> sortedResults = new ArrayList<GeneSetResult>( results.values() );
+            List<GeneSetResult> sortedResults = new ArrayList<>( results.values() );
             Collections.sort( sortedResults );
 
             for ( GeneSetResult res : sortedResults ) {
@@ -173,7 +247,7 @@ public class ResultsPrinter {
             }
         } else {
             // output them in alphabetical order. This is useful for testing.
-            List<GeneSetTerm> c = new ArrayList<GeneSetTerm>( results.keySet() );
+            List<GeneSetTerm> c = new ArrayList<>( results.keySet() );
             Collections.sort( c );
 
             for ( GeneSetTerm t : c ) {
@@ -187,68 +261,6 @@ public class ResultsPrinter {
         }
 
         out.write( RUN_SEPARATOR );
-
-    }
-
-    /**
-     * @param out
-     * @param res
-     * @throws IOException
-     */
-    private static void print( Writer out, boolean saveAllGeneNames, GeneAnnotations geneData, GeneSetResult res )
-            throws IOException {
-        res.print( out, "\t" + formatRedundantAndSimilar( geneData, res.getGeneSetId() ) + "\t"
-                + ( saveAllGeneNames ? formatGeneNames( geneData, res.getGeneSetId() ) : "" ) + "\t" );
-    }
-
-    private static Writer getDestination( String destFile ) throws IOException {
-        Writer out;
-        if ( destFile == null ) {
-            log.debug( "Writing results to STDOUT" );
-            out = new BufferedWriter( new PrintWriter( System.out ) );
-        } else {
-            log.info( "Writing results to " + destFile );
-            out = new BufferedWriter( new FileWriter( destFile, false ) ); // NOT APPENDING.
-        }
-        return out;
-    }
-
-    /**
-     * @param className
-     * @return
-     */
-    private static String formatGeneNames( GeneAnnotations geneData, GeneSetTerm className ) {
-        if ( className == null ) return "";
-        Collection<Gene> genes = geneData.getGeneSetGenes( className );
-        if ( genes == null || genes.size() == 0 ) return "";
-        List<Gene> sortedGenes = new ArrayList<Gene>( genes );
-        Collections.sort( sortedGenes );
-        StringBuffer buf = new StringBuffer();
-        for ( Iterator<Gene> iter = sortedGenes.iterator(); iter.hasNext(); ) {
-            Gene gene = iter.next();
-            buf.append( gene.getSymbol() + SYMBOL_SEPARATOR );
-        }
-        return buf.toString();
-    }
-
-    /**
-     * Set up the string the way I want it.
-     * 
-     * @param classid String
-     * @return String
-     */
-    private static String formatRedundantAndSimilar( GeneAnnotations geneData, GeneSetTerm classid ) {
-        Collection<GeneSet> redund = geneData.findGeneSet( classid ).getRedundantGroups();
-        String return_value = "";
-        if ( redund.isEmpty() ) {
-            return return_value;
-        }
-
-        for ( GeneSet nextid : redund ) {
-            return_value = return_value + nextid.getId() + SYMBOL_SEPARATOR + nextid.getName() + ", ";
-        }
-
-        return return_value;
 
     }
 

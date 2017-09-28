@@ -1,8 +1,8 @@
 /*
  * The ermineJ project/
- * 
+ *
  * Copyright (c) 2006-2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import corejava.Format;
 import ubic.erminej.analysis.GeneSetPvalRun;
 import ubic.erminej.data.EmptyGeneSetResult;
 import ubic.erminej.data.GeneAnnotations;
@@ -46,13 +47,11 @@ import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.gui.geneset.GeneSetPanel;
 import ubic.erminej.gui.geneset.details.GeneSetDetailsTableModel;
 import ubic.erminej.gui.util.Colors;
-import corejava.Format;
 
 /**
  * Model for displaying list of gene sets and results in the main frame.
- * 
+ *
  * @author pavlidis
- * @version $Id$
  * @see GeneSetDetailsTableModel for model used for displaying the genes in a single gene set.
  */
 public class GeneSetTableModel extends AbstractTableModel {
@@ -61,49 +60,22 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     protected static Log log = LogFactory.getLog( GeneSetTableModel.class.getName() );
 
-    @Override
-    public Class<?> getColumnClass( int columnIndex ) {
-        if ( columnIndex == 0 ) {
-            return GeneSetTerm.class;
-        } else if ( columnIndex == 1 ) { // name
-            return String.class;
-        } else if ( columnIndex == 2 ) { // description
-            return Integer.class;
-        } else if ( columnIndex == 3 ) { // size
-            return Double.class;
-        } else if ( columnIndex == 3 ) { // mf
-            return Double.class;
-        } else {
-            return GeneSetResult.class;
-        }
-    }
-
     /**
      * The number of columns that are always there, before runs are listed.
      */
     public static final int INIT_COLUMNS = 4;
 
     private GeneAnnotations geneData;
+
     private List<GeneSetPvalRun> results;
+    private List<String> columnIdentifiers = new Vector<>();
 
-    private List<String> columnIdentifiers = new Vector<String>();
     private List<GeneSetTerm> gsl;
-
-    @Override
-    public void fireTableDataChanged() {
-        gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
-        super.fireTableDataChanged();
-    }
-
     private boolean filterEmpty = true;
 
     private boolean filterInsignificant = false;
 
     private boolean filterNonUsers;
-
-    public void setFilterNonUsers( boolean filterNonUsers ) {
-        this.filterNonUsers = filterNonUsers;
-    }
 
     public GeneSetTableModel( GeneAnnotations geneData, List<GeneSetPvalRun> results ) {
         super();
@@ -114,20 +86,12 @@ public class GeneSetTableModel extends AbstractTableModel {
         addColumn( "Size" );
         addColumn( "Multifunc" );
         assert INIT_COLUMNS == this.getColumnCount();
-        gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
+        gsl = new ArrayList<>( geneData.getAllTerms() );
         filter();
     }
 
     public void addRun() {
         addColumn( results.get( results.size() - 1 ).getName() );
-    }
-
-    public void setFilterEmpty( boolean b ) {
-        this.filterEmpty = b;
-    }
-
-    public void setFilterEmptyResults( boolean b ) {
-        this.filterInsignificant = b;
     }
 
     /**
@@ -136,7 +100,7 @@ public class GeneSetTableModel extends AbstractTableModel {
     public void filter() {
 
         // reset.
-        gsl = new ArrayList<GeneSetTerm>( geneData.getAllTerms() );
+        gsl = new ArrayList<>( geneData.getAllTerms() );
         int beforeCount = gsl.size();
 
         if ( filterEmpty || filterInsignificant || filterNonUsers ) {
@@ -168,6 +132,29 @@ public class GeneSetTableModel extends AbstractTableModel {
         }
 
         log.info( gsl.size() + " gene sets (out of " + beforeCount + ")" );
+    }
+
+    @Override
+    public void fireTableDataChanged() {
+        gsl = new ArrayList<>( geneData.getAllTerms() );
+        super.fireTableDataChanged();
+    }
+
+    @Override
+    public Class<?> getColumnClass( int columnIndex ) {
+        if ( columnIndex == 0 ) {
+            return GeneSetTerm.class;
+        } else if ( columnIndex == 1 ) { // name
+            return String.class;
+        } else if ( columnIndex == 2 ) { // description
+            return Integer.class;
+        } else if ( columnIndex == 3 ) { // size
+            return Double.class;
+        } else if ( columnIndex == 3 ) { // mf
+            return Double.class;
+        } else {
+            return GeneSetResult.class;
+        }
     }
 
     @Override
@@ -207,7 +194,7 @@ public class GeneSetTableModel extends AbstractTableModel {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.table.TableModel#getValueAt(int, int)
      */
     @Override
@@ -261,6 +248,18 @@ public class GeneSetTableModel extends AbstractTableModel {
         this.renameColumn( this.getColumnIndexForRun( runIndex ), newName );
     }
 
+    public void setFilterEmpty( boolean b ) {
+        this.filterEmpty = b;
+    }
+
+    public void setFilterEmptyResults( boolean b ) {
+        this.filterInsignificant = b;
+    }
+
+    public void setFilterNonUsers( boolean filterNonUsers ) {
+        this.filterNonUsers = filterNonUsers;
+    }
+
     private void addColumn( String string ) {
         columnIdentifiers.add( string );
     }
@@ -276,7 +275,82 @@ public class GeneSetTableModel extends AbstractTableModel {
 }
 
 /**
- *  
+ * Helper for sorting and display of gene set sizes.
+ *
+ * @author Paul
+ * @version $Id$
+ */
+class GeneSetSize implements Comparable<GeneSetSize> {
+
+    private Integer numGenes = 0;
+
+    private Integer numElements = 0;
+
+    public GeneSetSize( Integer numGenes, Integer numElements ) {
+        super();
+        this.numGenes = numGenes;
+        this.numElements = numElements;
+    }
+
+    @Override
+    public int compareTo( GeneSetSize o ) {
+        return this.numGenes.compareTo( o.numGenes );
+    }
+
+    @Override
+    public boolean equals( Object obj ) {
+        if ( this == obj ) return true;
+        if ( obj == null ) return false;
+        if ( getClass() != obj.getClass() ) return false;
+        GeneSetSize other = ( GeneSetSize ) obj;
+        if ( numGenes == null ) {
+            if ( other.numGenes != null ) return false;
+        } else if ( !numGenes.equals( other.numGenes ) ) return false;
+        if ( numElements == null ) {
+            if ( other.numElements != null ) return false;
+        } else if ( !numElements.equals( other.numElements ) ) return false;
+        return true;
+    }
+
+    public Integer getNumGenes() {
+        return numGenes;
+    }
+
+    public Integer getNumProbes() {
+        return numElements;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( numGenes == null ) ? 0 : numGenes.hashCode() );
+        result = prime * result + ( ( numElements == null ) ? 0 : numElements.hashCode() );
+        return result;
+    }
+
+    public void setNumElements( Integer numElements ) {
+        this.numElements = numElements;
+    }
+
+    public void setNumGenes( Integer numGenes ) {
+        this.numGenes = numGenes;
+    }
+
+    @Override
+    public String toString() {
+        return "<html>"
+                + numGenes
+                + ""
+                + ( numElements.equals( numGenes ) ? "" : "&nbsp;<font color=\"#777777\">[ " + numElements
+                        + " ]</font>" )
+                + "</html>";
+    }
+
+}
+
+/**
+ *
  */
 class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
 
@@ -286,6 +360,8 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
     private DecimalFormat nff = new DecimalFormat(); // for the tool tip score
     private GeneAnnotations geneData;
 
+    private final String mfIndicatorChar = "&#9830;"; // diamond
+
     public GeneSetTableCellRenderer( GeneAnnotations goData ) {
         super();
         this.geneData = goData;
@@ -293,11 +369,9 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         nff.setMaximumFractionDigits( 4 );
     }
 
-    private final String mfIndicatorChar = "&#9830;"; // diamond
-
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable,
      * java.lang.Object, boolean, boolean, int, int)
      */
@@ -401,6 +475,44 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         return this;
     }
 
+    protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
+
+        if ( id.isAspect() || id.getId().equals( "all" ) || geneData.getGeneSet( id ) == null ) return "";
+
+        Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();
+
+        String redund = "";
+        if ( !redundantGroups.isEmpty() ) {
+            redund = "<strong>Redundant</strong> with:<br/>";
+
+            for ( GeneSet geneSet : redundantGroups ) {
+                redund += geneSet + "<br/>";
+            }
+            redund += "<br/>";
+        }
+        return redund;
+    }
+
+    /**
+     * @param auc; because so many values are high, this is quite steep.
+     */
+    private void chooseMultifunctionalityIndicatorColor( double auc ) {
+        if ( auc >= 0.999 ) {
+            setBackground( Colors.LIGHTRED1 );
+        } else if ( auc >= 0.99 ) {
+            setBackground( Colors.LIGHTRED2 );
+        } else if ( auc >= 0.95 ) {
+            setBackground( Colors.LIGHTRED3 );
+        } else if ( auc >= 0.9 ) {
+            setBackground( Colors.LIGHTRED4 );
+        } else if ( auc >= 0.85 ) {
+            setBackground( Colors.LIGHTRED5 );
+        } else {
+            setBackground( Color.WHITE );
+        }
+
+    }
+
     /**
      * @param column
      * @param value
@@ -463,26 +575,6 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
         }
     }
 
-    /**
-     * @param auc; because so many values are high, this is quite steep.
-     */
-    private void chooseMultifunctionalityIndicatorColor( double auc ) {
-        if ( auc >= 0.999 ) {
-            setBackground( Colors.LIGHTRED1 );
-        } else if ( auc >= 0.99 ) {
-            setBackground( Colors.LIGHTRED2 );
-        } else if ( auc >= 0.95 ) {
-            setBackground( Colors.LIGHTRED3 );
-        } else if ( auc >= 0.9 ) {
-            setBackground( Colors.LIGHTRED4 );
-        } else if ( auc >= 0.85 ) {
-            setBackground( Colors.LIGHTRED5 );
-        } else {
-            setBackground( Color.WHITE );
-        }
-
-    }
-
     private void setCellBackgroundColor( Object value, int column ) {
 
         setBackground( Color.WHITE );
@@ -503,98 +595,6 @@ class GeneSetTableCellRenderer extends DefaultTableCellRenderer {
             // Color mfColor = Colors.chooseColorForMultifunctionalityEffect( ( GeneSetResult ) value );
             // this.setBorder( BorderFactory.createLineBorder( mfColor, 1 ) );
         }
-    }
-
-    protected String getToolTipTextForRedundancy( GeneSetTerm id ) {
-
-        if ( id.isAspect() || id.getId().equals( "all" ) || geneData.getGeneSet( id ) == null ) return "";
-
-        Collection<GeneSet> redundantGroups = geneData.getGeneSet( id ).getRedundantGroups();
-
-        String redund = "";
-        if ( !redundantGroups.isEmpty() ) {
-            redund = "<strong>Redundant</strong> with:<br/>";
-
-            for ( GeneSet geneSet : redundantGroups ) {
-                redund += geneSet + "<br/>";
-            }
-            redund += "<br/>";
-        }
-        return redund;
-    }
-
-}
-
-/**
- * Helper for sorting and display of gene set sizes.
- * 
- * @author Paul
- * @version $Id$
- */
-class GeneSetSize implements Comparable<GeneSetSize> {
-
-    private Integer numGenes = 0;
-
-    private Integer numElements = 0;
-
-    public GeneSetSize( Integer numGenes, Integer numElements ) {
-        super();
-        this.numGenes = numGenes;
-        this.numElements = numElements;
-    }
-
-    @Override
-    public int compareTo( GeneSetSize o ) {
-        return this.numGenes.compareTo( o.numGenes );
-    }
-
-    @Override
-    public boolean equals( Object obj ) {
-        if ( this == obj ) return true;
-        if ( obj == null ) return false;
-        if ( getClass() != obj.getClass() ) return false;
-        GeneSetSize other = ( GeneSetSize ) obj;
-        if ( numGenes == null ) {
-            if ( other.numGenes != null ) return false;
-        } else if ( !numGenes.equals( other.numGenes ) ) return false;
-        if ( numElements == null ) {
-            if ( other.numElements != null ) return false;
-        } else if ( !numElements.equals( other.numElements ) ) return false;
-        return true;
-    }
-
-    public Integer getNumGenes() {
-        return numGenes;
-    }
-
-    public Integer getNumProbes() {
-        return numElements;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ( ( numGenes == null ) ? 0 : numGenes.hashCode() );
-        result = prime * result + ( ( numElements == null ) ? 0 : numElements.hashCode() );
-        return result;
-    }
-
-    public void setNumGenes( Integer numGenes ) {
-        this.numGenes = numGenes;
-    }
-
-    public void setNumElements( Integer numElements ) {
-        this.numElements = numElements;
-    }
-
-    @Override
-    public String toString() {
-        return "<html>"
-                + numGenes
-                + ""
-                + ( numElements.equals( numGenes ) ? "" : "&nbsp;<font color=\"#777777\">[ " + numElements
-                        + " ]</font>" ) + "</html>";
     }
 
 }

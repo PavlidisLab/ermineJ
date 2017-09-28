@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -29,12 +29,6 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import ubic.erminej.Settings;
-import ubic.erminej.gui.file.AnnotationListFrame;
-import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
-
 import com.sdicons.json.mapper.JSONMapper;
 import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.mapper.helper.SimpleMapperHelper;
@@ -46,9 +40,16 @@ import com.sdicons.json.model.JSONString;
 import com.sdicons.json.model.JSONValue;
 import com.sdicons.json.parser.JSONParser;
 
+import antlr.RecognitionException;
+import antlr.TokenStreamException;
+import ubic.erminej.Settings;
+import ubic.erminej.gui.file.AnnotationListFrame;
+import ubic.gemma.model.common.auditAndSecurity.eventType.AuditEventType;
+import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
+
 /**
  * Assistance in getting gene annotation files.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -57,7 +58,31 @@ public class AnnotationFileFetcher {
     private static Log log = LogFactory.getLog( AnnotationFileFetcher.class );
 
     /**
+     * Get the list of available annotations
+     *
+     * @throws java.io.IOException if any.
+     * @return a {@link java.util.List} object.
+     */
+    public List<ArrayDesignValueObject> fetchList() throws IOException {
+        try {
+            String url = Settings.ANNOTATION_FILE_LIST_RESTURL;
+            assert url != null;
+            URL toBeGotten = new URL( url );
+            InputStream is = toBeGotten.openStream();
+            JSONParser parser = new JSONParser( is );
+            JSONValue v = parser.nextValue();
+            return convert( v );
+        } catch ( RecognitionException e ) {
+            throw new IOException( e );
+        } catch ( TokenStreamException e ) {
+            throw new IOException( e );
+        }
+    }
+
+    /**
      * Show a list of available annotation files.
+     *
+     * @return a {@link ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject} object.
      */
     public ArrayDesignValueObject pickAnnotation() {
 
@@ -69,12 +94,80 @@ public class AnnotationFileFetcher {
     }
 
     /**
+     * <p>
+     * convert.
+     * </p>
+     *
+     * @param v a {@link com.sdicons.json.model.JSONValue} object.
+     * @return a {@link java.util.List} object.
+     */
+    protected List<ArrayDesignValueObject> convert( JSONValue v ) {
+
+        List<ArrayDesignValueObject> result = new ArrayList<>();
+        JSONObject o = ( JSONObject ) v;
+
+        JSONArray recs = ( ( JSONArray ) o.get( "data" ) );
+
+        JSONMapper.addHelper( new SimpleMapperHelper() {
+
+            @Override
+            public Class getHelpedClass() {
+                return Date.class;
+            }
+
+            @Override
+            public Object toJava( JSONValue aValue, Class aRequestedClass ) throws MapperException {
+                if ( aValue.isInteger() ) {
+                    return new Date( ( ( JSONInteger ) aValue ).getValue().longValue() );
+                }
+                return DateMapper.fromISO8601( ( ( JSONString ) aValue ).getValue().trim() );
+            }
+
+            @Override
+            public JSONValue toJSON( Object aPojo ) {
+                return null; // not needed
+            }
+        } );
+
+        JSONMapper.addHelper( new SimpleMapperHelper() {
+
+            @Override
+            public Class getHelpedClass() {
+                return AuditEventType.class;
+            }
+
+            @Override
+            public Object toJava( JSONValue aValue, Class aRequestedClass ) throws MapperException {
+                return null;
+            }
+
+            @Override
+            public JSONValue toJSON( Object aPojo ) {
+                return null; // not needed
+            }
+        } );
+
+        try {
+            for ( int i = 0; i < recs.size(); i++ ) {
+                JSONValue val = recs.get( i );
+                ArrayDesignValueObject java = ( ArrayDesignValueObject ) JSONMapper.toJava( val, ArrayDesignValueObject.class );
+                result.add( java );
+            }
+
+        } catch ( MapperException e ) {
+            throw new RuntimeException( e );
+        }
+
+        return result;
+    }
+
+    /**
      * @return
      */
     private List<ArrayDesignValueObject> fetchPlatformList() {
         List<ArrayDesignValueObject> designs = null;
 
-        FutureTask<List<ArrayDesignValueObject>> future = new FutureTask<List<ArrayDesignValueObject>>( new Callable<List<ArrayDesignValueObject>>() {
+        FutureTask<List<ArrayDesignValueObject>> future = new FutureTask<>( new Callable<List<ArrayDesignValueObject>>() {
             @Override
             public List<ArrayDesignValueObject> call() throws Exception {
                 return fetchList();
@@ -114,74 +207,6 @@ public class AnnotationFileFetcher {
 
         log.info( designs.size() + " designs read" );
         return designs;
-    }
-
-    /**
-     * Get the list of available annotations
-     * 
-     * @return
-     * @throws IOException
-     */
-    public List<ArrayDesignValueObject> fetchList() throws IOException {
-        try {
-            String url = Settings.ANNOTATION_FILE_LIST_RESTURL;
-            assert url != null;
-            URL toBeGotten = new URL( url );
-            InputStream is = toBeGotten.openStream();
-            JSONParser parser = new JSONParser( is );
-            JSONValue v = parser.nextValue();
-            return convert( v );
-        } catch ( RecognitionException e ) {
-            throw new IOException( e );
-        } catch ( TokenStreamException e ) {
-            throw new IOException( e );
-        }
-    }
-
-    /**
-     * @param v
-     * @return
-     */
-    protected List<ArrayDesignValueObject> convert( JSONValue v ) {
-
-        List<ArrayDesignValueObject> result = new ArrayList<ArrayDesignValueObject>();
-        JSONObject o = ( JSONObject ) v;
-
-        JSONArray recs = ( ( JSONArray ) o.get( "data" ) );
-
-        JSONMapper.addHelper( new SimpleMapperHelper() {
-
-            @Override
-            public Class getHelpedClass() {
-                return Date.class;
-            }
-
-            @Override
-            public Object toJava( JSONValue aValue, Class aRequestedClass ) throws MapperException {
-                if ( aValue.isInteger() ) {
-                    return new Date( ( ( JSONInteger ) aValue ).getValue().longValue() );
-                }
-                return DateMapper.fromISO8601( ( ( JSONString ) aValue ).getValue().trim() );
-            }
-
-            @Override
-            public JSONValue toJSON( Object aPojo ) {
-                return null; // not needed
-            }
-        } );
-
-        try {
-            for ( int i = 0; i < recs.size(); i++ ) {
-                JSONValue val = recs.get( i );
-                ArrayDesignValueObject java = ( ArrayDesignValueObject ) JSONMapper.toJava( val, ArrayDesignValueObject.class );
-                result.add( java );
-            }
-
-        } catch ( MapperException e ) {
-            throw new RuntimeException( e );
-        }
-
-        return result;
     }
 
 }

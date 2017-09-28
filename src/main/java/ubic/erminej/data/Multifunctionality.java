@@ -14,8 +14,6 @@
  */
 package ubic.erminej.data;
 
-import hep.aida.bin.QuantileBin1D;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +29,12 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import cern.colt.list.DoubleArrayList;
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.jet.math.Functions;
+import cern.jet.stat.Descriptive;
+import hep.aida.bin.QuantileBin1D;
 import ubic.basecode.dataStructure.matrix.MatrixUtil;
 import ubic.basecode.math.Distance;
 import ubic.basecode.math.ROC;
@@ -39,11 +43,6 @@ import ubic.basecode.math.linearmodels.LeastSquaresFit;
 import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
-import cern.colt.list.DoubleArrayList;
-import cern.colt.matrix.DoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.jet.math.Functions;
-import cern.jet.stat.Descriptive;
 
 /**
  * Implementation of multifunctionality computations as described in Gillis and Pavlidis (2011) PLoS ONE 6:2:e17258.
@@ -53,9 +52,10 @@ import cern.jet.stat.Descriptive;
  * both of them. But if the user selects only to analyze KEGG, multifunctionality correction is based on the bias in
  * KEGG+GO. This could be fixed by changing the 'subclone' method of GeneAnnotations to trim aspects, not just genes.
  *
+ * see Gemma for another implementation of parts of this.
+ *
  * @author paul
- * @version $Id$
- * @see Gemma for another implementation of parts of this.
+ * @version $Id: $Id
  */
 public class Multifunctionality {
     //
@@ -105,41 +105,11 @@ public class Multifunctionality {
     private Map<Gene, Double> rawGeneMultifunctionalityRanks;
 
     /**
-     * @return weights computed on multifunctionality as per Tarca et al. (2012)
-     */
-    public Map<Gene, Double> padogWeights() {
-
-        Map<Gene, Double> weig = new HashMap<>();
-        Collection<Integer> numgt = numGoTerms.values();
-
-        DoubleArrayList gotermcounts = new DoubleArrayList();
-        for ( Integer gtv : numgt ) {
-            gotermcounts.add( gtv.doubleValue() );
-        }
-
-        double min = Descriptive.min( gotermcounts );
-        // double min = 1;
-
-        double max = Descriptive.max( gotermcounts );
-
-        // double max = 300;
-
-        assert min < max;
-
-        for ( Gene g : geneAnnots.getGenes() ) {
-            double mfg = Math.min( max, numGoTerms.get( g ) );
-            double weight = 1.0 + Math.sqrt( ( max - mfg ) / ( max - min ) );
-            weig.put( g, weight );
-        }
-
-        return weig;
-    }
-
-    /**
      * Construct Multifunctionality information based on the state of the GO annotations -- this accounts only for the
      * elements in the annotations. Genes with no GO terms are completely ignored.
      *
      * @param go These annotations should already be pruned down to those used in analysis.
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
      */
     public Multifunctionality( GeneAnnotations go, StatusViewer m ) {
         this.geneAnnots = go;
@@ -252,9 +222,13 @@ public class Multifunctionality {
     }
 
     /**
-     * @param rankedGenes, with the "best" gene first.
+     * <p>
+     * correlationWithGeneMultifunctionality.
+     * </p>
+     *
      * @return the rank correlation of the given list with the ranks of the multifunctionality of the genes. A positive
      *         correlation means the given list is "multifunctionality-biased". Genes lacking GO terms are ignored.
+     * @param rankedGenes a {@link java.util.List} object.
      */
     public double correlationWithGeneMultifunctionality( List<Gene> rankedGenes ) {
 
@@ -276,9 +250,13 @@ public class Multifunctionality {
     }
 
     /**
-     * @param rankedGoTerms, with the "best" GO term first.
+     * <p>
+     * correlationWithGoTermMultifunctionality.
+     * </p>
+     *
      * @return the rank correlation of the given list with the ranks of the GO term multifunctionality of the terms. A
      *         positive correlation means the given list of terms is "multifunctionality-biased".
+     * @param rankedGoTerms a {@link java.util.List} object.
      */
     public double correlationWithGoTermMultifunctionality( List<GeneSetTerm> rankedGoTerms ) {
         DoubleArrayList rawVals = new DoubleArrayList();
@@ -290,14 +268,14 @@ public class Multifunctionality {
     }
 
     /**
-     * This is like correlationWithGeneMultifunctionality(List<Gene>), but without an order list to start with, and
+     * This is like correlationWithGeneMultifunctionality( ), but without an order list to start with, and
      * intended for cases where the number of genes is smaller than the total number of genes. We do this the same we we
      * do for GO groups. Implementation of algorithm for computing AUC, described in Section 1 of the supplement to
-     * Gillis and Pavlidis; see {@link http://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U}.
+     * Gillis and Pavlidis; see https://en.wikipedia.org/wiki/Mann-Whitney_U_test .
      *
-     * @param genesInSet
+     * @param genesInSet a {@link java.util.Collection} object.
      * @return the ROC AUC for the genes in the set compared to the multifunctionality ranking
-     * @see ROC.java in baseCode for a generic implementation
+     * @see ubic.basecode.math.ROC for a generic implementation
      */
     public double enrichmentForMultifunctionality( Collection<Gene> genesInSet ) {
 
@@ -336,7 +314,11 @@ public class Multifunctionality {
     }
 
     /**
-     * @param genesInSet
+     * <p>
+     * enrichmentForMultifunctionalityPvalue.
+     * </p>
+     *
+     * @param genesInSet a {@link java.util.Collection} object.
      * @return The pvalue associated with the ROC AUC for the genes in the set compared to the multifunctionality
      *         ranking, based on the Mann-Whitney U test / Wilcoxon
      */
@@ -357,7 +339,7 @@ public class Multifunctionality {
     /**
      * Get QuantileBin1D, which can tell you the quantile for a given value, or the expected value for a given quantile.
      *
-     * @return
+     * @return a {@link hep.aida.bin.QuantileBin1D} object.
      */
     public QuantileBin1D getGeneMultifunctionalityQuantiles() {
         if ( this.quantiles == null ) {
@@ -373,7 +355,11 @@ public class Multifunctionality {
     }
 
     /**
-     * @param goId
+     * <p>
+     * getGOTermMultifunctionality.
+     * </p>
+     *
+     * @param goId a {@link ubic.erminej.data.GeneSetTerm} object.
      * @return the computed multifunctionality score for the GO term.
      *         <p>
      *         This is computed from the area under the ROC curve for the genes in the group, in the ranking of all
@@ -390,7 +376,11 @@ public class Multifunctionality {
     }
 
     /**
-     * @param goId
+     * <p>
+     * getGOTermMultifunctionalityPvalue.
+     * </p>
+     *
+     * @param goId a {@link ubic.erminej.data.GeneSetTerm} object.
      * @return the pvalue associated with the multifunctionality of the gene set
      * @see getGOTermMultifunctionality
      */
@@ -404,7 +394,11 @@ public class Multifunctionality {
     }
 
     /**
-     * @param goId
+     * <p>
+     * getGOTermMultifunctionalityRank.
+     * </p>
+     *
+     * @param goId a {@link ubic.erminej.data.GeneSetTerm} object.
      * @return the relative rank of the GO group in multifunctionality, where 1 is the highest multifunctionality, 0 is
      *         lowest. <strong>WARNING</strong>, this does not correct for the presence of multiple GO groups with the
      *         same genes (redundancy)
@@ -421,7 +415,7 @@ public class Multifunctionality {
     /**
      * Convenience method.
      *
-     * @param genes
+     * @param genes a {@link java.util.Collection} object.
      * @return the gene with the highest multifunctionality
      */
     public Gene getMostMultifunctional( Collection<Gene> genes ) {
@@ -441,7 +435,11 @@ public class Multifunctionality {
     }
 
     /**
-     * @param gene
+     * <p>
+     * getMultifunctionalityRank.
+     * </p>
+     *
+     * @param gene a {@link ubic.erminej.data.Gene} object.
      * @return relative rank of the gene in multifunctionality where 1 is the highest multifunctionality, 0 is lowest
      */
     public double getMultifunctionalityRank( Gene gene ) {
@@ -454,7 +452,11 @@ public class Multifunctionality {
     }
 
     /**
-     * @param gene
+     * <p>
+     * getMultifunctionalityScore.
+     * </p>
+     *
+     * @param gene a {@link ubic.erminej.data.Gene} object.
      * @return multifunctionality score. Note that this score by itself is not all that useful; use the rank instead; or
      *         for a "human-readable" version use the number of GO terms, which this approximates (in terms of ranks).
      *         Higher values indicate higher multifunctionality
@@ -471,14 +473,18 @@ public class Multifunctionality {
     /**
      * How many genes have multifunctionality scores.
      *
-     * @return
+     * @return a int.
      */
     public int getNumGenes() {
         return new Double( rawGeneMultifunctionalityRanks.size() ).intValue();
     }
 
     /**
-     * @param gene
+     * <p>
+     * Getter for the field <code>numGoTerms</code>.
+     * </p>
+     *
+     * @param gene a {@link ubic.erminej.data.Gene} object.
      * @return number of GO terms for the given gene.
      */
     public int getNumGoTerms( Gene gene ) {
@@ -491,17 +497,70 @@ public class Multifunctionality {
     }
 
     /**
-     * @param gene
+     * <p>
+     * getRawGeneMultifunctionalityRank.
+     * </p>
+     *
+     * @param gene a {@link ubic.erminej.data.Gene} object.
      * @return rank. Where zero is the highest rank, ties accounted for.
      */
     public Double getRawGeneMultifunctionalityRank( Gene gene ) {
         return this.rawGeneMultifunctionalityRanks.get( gene );
     }
 
+    /**
+     * <p>
+     * isStale.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean isStale() {
         return stale.get();
     }
 
+    /**
+     * <p>
+     * padogWeights.
+     * </p>
+     *
+     * @return weights computed on multifunctionality as per Tarca et al. (2012)
+     */
+    public Map<Gene, Double> padogWeights() {
+
+        Map<Gene, Double> weig = new HashMap<>();
+        Collection<Integer> numgt = numGoTerms.values();
+
+        DoubleArrayList gotermcounts = new DoubleArrayList();
+        for ( Integer gtv : numgt ) {
+            gotermcounts.add( gtv.doubleValue() );
+        }
+
+        double min = Descriptive.min( gotermcounts );
+        // double min = 1;
+
+        double max = Descriptive.max( gotermcounts );
+
+        // double max = 300;
+
+        assert min < max;
+
+        for ( Gene g : geneAnnots.getGenes() ) {
+            double mfg = Math.min( max, numGoTerms.get( g ) );
+            double weight = 1.0 + Math.sqrt( ( max - mfg ) / ( max - min ) );
+            weig.put( g, weight );
+        }
+
+        return weig;
+    }
+
+    /**
+     * <p>
+     * Setter for the field <code>stale</code>.
+     * </p>
+     *
+     * @param stale a boolean.
+     */
     public void setStale( boolean stale ) {
         this.stale.set( stale );
     }
@@ -626,11 +685,20 @@ public class Multifunctionality {
                     }
 
                     // assert inGroup > 0 || USE_UNANNOTATED_GENES;
+                    /**
+                     * <p>
+                     * Constructor for MFV.
+                     * </p>
+                     *
+                     * @param a a {@link java.lang.Double} object.
+                     * @param p a {@link java.lang.Double} object.
+                     */
 
                     mf += 1.0 / ( inGroup * outGroup );
                     // mf += 1.0; // count of go terms ONLY, if you ever want to compare ...
                 }
                 this.geneMultifunctionality.put( gene, mf );
+                /** {@inheritDoc} */
             }
 
             rawGeneMultifunctionalityRanks = Rank.rankTransform( this.geneMultifunctionality, true );
@@ -659,11 +727,20 @@ class MFV implements Comparable<MFV> {
     private Double p;
     private Double a;
 
+    /**
+     * <p>
+     * Constructor for MFV.
+     * </p>
+     *
+     * @param a a {@link java.lang.Double} object.
+     * @param p a {@link java.lang.Double} object.
+     */
     public MFV( Double a, Double p ) {
         this.a = a;
         this.p = p;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int compareTo( MFV o ) {
 

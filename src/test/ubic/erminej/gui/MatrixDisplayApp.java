@@ -14,7 +14,7 @@ import ubic.basecode.io.reader.DoubleMatrixReader;
 
 /**
  * This is an example of how you'd display a microarray.
- * 
+ *
  * @author Will Braynen
  * @version $Id$
  */
@@ -52,7 +52,7 @@ public class MatrixDisplayApp {
         try {
             DoubleMatrixReader m_matrixReader = new DoubleMatrixReader();
             DoubleMatrix<String, String> matrix = m_matrixReader.read( inDataFilename );
-            matrixDisplay = new MatrixDisplay<String, String>( matrix );
+            matrixDisplay = new MatrixDisplay<>( matrix );
         } catch ( java.io.IOException e ) {
             System.err.println( "Unable to open file " + inDataFilename );
             return;

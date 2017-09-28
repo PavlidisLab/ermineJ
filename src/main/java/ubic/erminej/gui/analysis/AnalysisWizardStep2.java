@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,7 @@ import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Set the inputs for the analysis - score file, raw data file.
- * 
+ *
  * @author Kiran Keshav
  * @author Homin Lee
  * @author Paul Pavlidis
@@ -80,6 +80,14 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
     private static final long serialVersionUID = -1L;
 
     // test method
+    /**
+     * <p>
+     * main.
+     * </p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     * @throws java.lang.Exception if any.
+     */
     public static void main( String[] args ) throws Exception {
 
         try {
@@ -112,6 +120,16 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     private AnalysisWizard wiz;
 
+    private AtomicBoolean scoreFileOk = new AtomicBoolean( true );
+
+    /**
+     * <p>
+     * Constructor for AnalysisWizardStep2.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.analysis.AnalysisWizard} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public AnalysisWizardStep2( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
         this.wiz = wiz;
@@ -124,6 +142,11 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         if ( wiz != null ) wiz.clearStatus();
     }
 
+    /**
+     * <p>
+     * dataPreviewScoresActionPerformed.
+     * </p>
+     */
     public void dataPreviewScoresActionPerformed() {
         String filename = rawFileTextField.getText();
         if ( filename.length() != 0 && !FileTools.testFile( filename ) ) {
@@ -139,6 +162,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isReady() {
 
@@ -196,14 +220,17 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void keyPressed( KeyEvent e ) {
     }
 
+    /** {@inheritDoc} */
     @Override
     public void keyReleased( KeyEvent e ) {
     }
 
+    /** {@inheritDoc} */
     @Override
     public void keyTyped( KeyEvent e ) {
         wiz.clearStatus();
@@ -230,6 +257,11 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     }
 
+    /**
+     * <p>
+     * saveValues.
+     * </p>
+     */
     public void saveValues() {
         settings.setScoreCol( Integer.valueOf( scoreColTextField.getText() ) );
         settings.setScoreFile( scoreFileTextField.getText() );
@@ -245,6 +277,11 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         settings.setDataDirectory( chooser.getCurrentDirectory().toString() );
     }
 
+    /**
+     * <p>
+     * updateView.
+     * </p>
+     */
     public void updateView() {
         assert wiz != null;
         boolean makeQuickPickVisible = wiz.getAnalysisType().equals( SettingsHolder.Method.ORA );
@@ -356,6 +393,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         // initialization
@@ -496,7 +534,7 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
 
     /**
      * TODO refactor out.
-     * 
+     *
      * @param textPane
      * @param name optional
      */
@@ -670,8 +708,6 @@ public class AnalysisWizardStep2 extends WizardStep implements KeyListener {
         return rawDataPanel;
     }
 
-    private AtomicBoolean scoreFileOk = new AtomicBoolean( true );
-
     /**
      * Check the score file
      */
@@ -723,9 +759,10 @@ class DataPreviewButtonAdapter implements ActionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
 
@@ -742,11 +779,7 @@ class PreviewButtonAdapter implements ActionListener {
         this.adaptee = adaptee;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
 
@@ -764,6 +797,7 @@ class QuickPickEnter implements java.awt.event.ActionListener {
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.quickpickButton_actionPerformed();
@@ -775,9 +809,11 @@ class RawFileBrowse implements java.awt.event.ActionListener {
 
     RawFileBrowse( AnalysisWizardStep2 adaptee ) {
         this.adaptee = adaptee;
+        /** {@inheritDoc} */
     }
 
     @Override
+    /** {@inheritDoc} */
     public void actionPerformed( ActionEvent e ) {
         adaptee.rawBrowseButton_actionPerformed();
     }
@@ -787,9 +823,11 @@ class ScoreFileBrowse implements java.awt.event.ActionListener {
     AnalysisWizardStep2 adaptee;
 
     ScoreFileBrowse( AnalysisWizardStep2 adaptee ) {
+        /** {@inheritDoc} */
         this.adaptee = adaptee;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void actionPerformed( ActionEvent e ) {
         adaptee.scoreBrowseButton_actionPerformed();

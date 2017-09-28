@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ package ubic.erminej.gui.table;
 
 import java.awt.Color;
 import java.awt.Component;
+
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -29,7 +30,7 @@ import ubic.erminej.data.Element;
 
 /**
  * For rendering heatmaps in tables.
- * 
+ *
  * @author Will Braynen
  * @version $Id$
  */
@@ -39,13 +40,26 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
 
     MatrixDisplay<Element, String> m_matrixDisplay;
 
+    /**
+     * <p>
+     * Constructor for JMatrixCellRenderer.
+     * </p>
+     *
+     * @param matrixDisplay a {@link ubic.basecode.graphics.MatrixDisplay} object.
+     */
     public JMatrixCellRenderer( MatrixDisplay<Element, String> matrixDisplay ) {
         m_matrixDisplay = matrixDisplay;
         setOpaque( true );
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void firePropertyChange( String propertyName, boolean oldValue, boolean newValue ) {
+    }
+
     // This method is called each time a cell in a column
     // using this renderer needs to be rendered.
+    /** {@inheritDoc} */
     @Override
     public Component getTableCellRendererComponent( JTable table, Object tableCellValue, boolean isSelected,
             boolean hasFocus, int displayedRow, int displayedColumn ) {
@@ -88,6 +102,22 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
         return this;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void revalidate() {
+    }
+
+    // The following methods override the defaults for performance reasons
+    /** {@inheritDoc} */
+    @Override
+    public void validate() {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void firePropertyChange( String propertyName, Object oldValue, Object newValue ) {
+    }
+
     /**
      * @param row
      * @param column
@@ -105,23 +135,6 @@ public class JMatrixCellRenderer extends JLabel implements TableCellRenderer {
             value = String.format( "%.2f", matrixValue );
         }
         setToolTipText( value );
-    }
-
-    // The following methods override the defaults for performance reasons
-    @Override
-    public void validate() {
-    }
-
-    @Override
-    public void revalidate() {
-    }
-
-    @Override
-    protected void firePropertyChange( String propertyName, Object oldValue, Object newValue ) {
-    }
-
-    @Override
-    public void firePropertyChange( String propertyName, boolean oldValue, boolean newValue ) {
     }
 
 } // end class MatrixDisplayCellRenderer

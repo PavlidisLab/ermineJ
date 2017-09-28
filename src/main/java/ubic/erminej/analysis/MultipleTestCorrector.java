@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,14 +28,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.concurrent.CancellationException;
-
 import ubic.basecode.util.StatusViewer;
-
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
@@ -46,12 +44,12 @@ import ubic.erminej.data.GeneSetTerm;
 /**
  * Perform multiple test correction on class scores. Multiple test correction is based on the non-redundant set of gene
  * sets, to avoid overcorrecting.
- * 
+ *
  * @author Paul Pavlidis
- * @version $Id$
  */
 public class MultipleTestCorrector extends AbstractLongTask {
     private static final int DEFAULT_WY_TRIALS = 10000;
+    /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( MultipleTestCorrector.class );
     private List<GeneSetTerm> sortedclasses;
     private Map<GeneSetTerm, GeneSetResult> results;
@@ -61,15 +59,19 @@ public class MultipleTestCorrector extends AbstractLongTask {
     private SettingsHolder settings;
     private StatusViewer messenger;
     List<GeneSetTerm> toUseForMTC;
-    Map<GeneSetTerm, Collection<GeneSetTerm>> usedToSkipped = new HashMap<GeneSetTerm, Collection<GeneSetTerm>>();
+    Map<GeneSetTerm, Collection<GeneSetTerm>> usedToSkipped = new HashMap<>();
 
     /**
-     * @param set
-     * @param sc
-     * @param geneData
+     * <p>
+     * Constructor for MultipleTestCorrector.
+     * </p>
+     *
+     * @param set a {@link ubic.erminej.SettingsHolder} object.
+     * @param sc a {@link java.util.List} object.
+     * @param geneData a {@link ubic.erminej.data.GeneAnnotations} object.
      * @param geneScores - only used for Westfall-Young
-     * @param results
-     * @param messenger
+     * @param results a {@link java.util.Map} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
      */
     public MultipleTestCorrector( SettingsHolder set, List<GeneSetTerm> sc, GeneAnnotations geneData,
             GeneScores geneScores, Map<GeneSetTerm, GeneSetResult> results, StatusViewer messenger ) {
@@ -83,9 +85,9 @@ public class MultipleTestCorrector extends AbstractLongTask {
         /*
          * Deal with redundancy. Make it so we can find the redundant ones at the end to put their corrected pvalues in.
          */
-        toUseForMTC = new ArrayList<GeneSetTerm>(); // same order as sorted.
+        toUseForMTC = new ArrayList<>(); // same order as sorted.
 
-        Set<GeneSetTerm> skip = new HashSet<GeneSetTerm>(); // need this for fast lookup.
+        Set<GeneSetTerm> skip = new HashSet<>(); // need this for fast lookup.
         for ( GeneSetTerm t : sortedclasses ) {
 
             assert t != null;
@@ -114,8 +116,6 @@ public class MultipleTestCorrector extends AbstractLongTask {
 
     /**
      * Benjamini-Hochberg correction of pvalues. Default method, used for GUI
-     * 
-     * @param fdr double desired false discovery rate.
      */
     public void benjaminihochberg() {
         int numclasses = toUseForMTC.size();
@@ -176,8 +176,7 @@ public class MultipleTestCorrector extends AbstractLongTask {
 
     /**
      * Run WY with a default number of trials.
-     * 
-     * @see westfallyoung(numtrials)
+     *
      */
     public void westfallyoung() {
         if ( geneScores == null )
@@ -197,12 +196,14 @@ public class MultipleTestCorrector extends AbstractLongTask {
      * <li>a. qk = pk (class with worst pvalue)
      * <li>b. qk-1 = min (qk, pk-1) ...
      * </ol>
-     * <li>at each step a.... if qi <= pi, count_i++ end loop.
+     * <li>at each step a.... if qi &lt;= pi, count_i++ end loop.
      * <li>p_i* = count_i/n 7. enforce monotonicity by using successive maximization.
      * </ol>
      * 
-     * @param trials How many random trials to do. According to W-Y, it should be >=10,000.
-     * @todo get this working with the other types of scoring methods (ORA, ROC for example)
+     * todo get this working with the other types of scoring methods (ORA, ROC for example)
+     *
+     * @param trials How many random trials to do. According to W-Y, it should be &gt;=10,000.
+     * 
      */
     public void westfallyoung( int trials ) {
 

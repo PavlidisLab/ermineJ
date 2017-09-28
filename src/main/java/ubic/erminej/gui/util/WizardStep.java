@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * <p>
+ * Abstract WizardStep class.
+ * </p>
+ *
  * @author Homin Lee
  * @author pavlidis
  * @version $Id$
@@ -37,15 +41,16 @@ public abstract class WizardStep extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
+    /** Constant <code>log</code> */
     protected static Log log = LogFactory.getLog( WizardStep.class.getName() );
     private Wizard owner;
 
-    public Wizard getOwner() {
-        return owner;
-    }
-
     /**
-     * @param wiz
+     * <p>
+     * Constructor for WizardStep.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.util.Wizard} object.
      */
     public WizardStep( Wizard wiz ) {
         super();
@@ -57,11 +62,29 @@ public abstract class WizardStep extends JPanel {
         }
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>owner</code>.
+     * </p>
+     *
+     * @return a {@link ubic.erminej.gui.util.Wizard} object.
+     */
+    public Wizard getOwner() {
+        return owner;
+    }
+
+    /**
+     * <p>
+     * isReady.
+     * </p>
+     *
+     * @return a boolean.
+     */
     abstract public boolean isReady();
 
     /**
      * Print an error message to the status bar.
-     * 
+     *
      * @param a error message to show.
      */
     public void showError( String a ) {
@@ -70,7 +93,7 @@ public abstract class WizardStep extends JPanel {
 
     /**
      * Print a message to the status bar.
-     * 
+     *
      * @param a message to show.
      */
     public void showStatus( String a ) {
@@ -78,7 +101,11 @@ public abstract class WizardStep extends JPanel {
     }
 
     /**
-     * @param text
+     * <p>
+     * addHelp.
+     * </p>
+     *
+     * @param text a {@link java.lang.String} object.
      */
     protected void addHelp( String text ) {
         JLabel label = new JLabel( text );
@@ -89,11 +116,25 @@ public abstract class WizardStep extends JPanel {
         this.add( label, BorderLayout.NORTH );
     }
 
+    /**
+     * <p>
+     * addMain.
+     * </p>
+     *
+     * @param panel a {@link javax.swing.JPanel} object.
+     */
     protected void addMain( JPanel panel ) {
         this.add( panel, BorderLayout.CENTER );
     }
 
     // Component initialization
+    /**
+     * <p>
+     * jbInit.
+     * </p>
+     *
+     * @throws java.lang.Exception if any.
+     */
     protected abstract void jbInit() throws Exception;
 
 }

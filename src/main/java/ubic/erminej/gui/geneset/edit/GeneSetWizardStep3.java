@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,7 @@ import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Get ID and description.
- * 
+ *
  * @author Homin K Lee
  * @version $Id$
  */
@@ -44,13 +44,85 @@ public class GeneSetWizardStep3 extends WizardStep {
     private JTextField classIDTF = null;
     private JTextArea classDescTA = null;
 
+    /**
+     * <p>
+     * Constructor for GeneSetWizardStep3.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.geneset.edit.GeneSetWizard} object.
+     */
     public GeneSetWizardStep3( GeneSetWizard wiz ) {
         super( wiz );
         this.jbInit();
         wiz.clearStatus();
     }
 
+    /**
+     * <p>
+     * getGeneSetId.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    public String getGeneSetId() {
+        return classIDTF.getText();
+    }
+
+    /**
+     * <p>
+     * getGeneSetName.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    public String getGeneSetName() {
+        return classDescTA.getText();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isReady() {
+        return StringUtils.isNotBlank( classIDTF.getText() );
+    }
+
+    /**
+     * <p>
+     * setDescText.
+     * </p>
+     *
+     * @param t a {@link java.lang.String} object.
+     */
+    public void setDescText( String t ) {
+        classDescTA.setText( t );
+    }
+
+    /**
+     * <p>
+     * setIdFieldEnabled.
+     * </p>
+     *
+     * @param b a boolean.
+     */
+    public void setIdFieldEnabled( boolean b ) {
+        this.classIDTF.setEnabled( b );
+        this.classIDTF.setEditable( b );
+        this.classDescTA.setEditable( b );
+        this.classDescTA.setEnabled( b );
+    }
+
+    /**
+     * <p>
+     * setIdText.
+     * </p>
+     *
+     * @param t a {@link java.lang.String} object.
+     */
+    public void setIdText( String t ) {
+        classIDTF.setText( t );
+    }
+
     // Component initialization
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         this.setLayout( new BorderLayout() );
@@ -76,7 +148,7 @@ public class GeneSetWizardStep3 extends WizardStep {
         classDescTA.setBorder( BorderFactory.createLoweredBevelBorder() );
         classDescTA.setPreferredSize( new Dimension( 500, 180 ) );
         Font oldFont = classDescTA.getFont();
-        Font newFont = new Font( oldFont.getFontName(), oldFont.getStyle(), 11 /* points */);
+        Font newFont = new Font( oldFont.getFontName(), oldFont.getStyle(), 11 /* points */ );
         classDescTA.setFont( newFont );
 
         descriptionPanel.add( classDescL );
@@ -89,37 +161,6 @@ public class GeneSetWizardStep3 extends WizardStep {
                 + "The custom gene set will automatically be saved on your system"
                 + " to be used again in future analyses." );
         this.addMain( step3Panel );
-    }
-
-    @Override
-    public boolean isReady() {
-        return StringUtils.isNotBlank( classIDTF.getText() );
-    }
-
-    public void setIdText( String t ) {
-        classIDTF.setText( t );
-    }
-
-    public void setDescText( String t ) {
-        classDescTA.setText( t );
-    }
-
-    public String getGeneSetId() {
-        return classIDTF.getText();
-    }
-
-    public String getGeneSetName() {
-        return classDescTA.getText();
-    }
-
-    /**
-     * @param b
-     */
-    public void setIdFieldEnabled( boolean b ) {
-        this.classIDTF.setEnabled( b );
-        this.classIDTF.setEditable( b );
-        this.classDescTA.setEditable( b );
-        this.classDescTA.setEnabled( b );
     }
 
 }

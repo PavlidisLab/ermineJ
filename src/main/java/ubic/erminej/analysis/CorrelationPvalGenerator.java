@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,23 +25,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import ubic.basecode.dataStructure.matrix.DenseDoubleMatrix;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.MatrixStats;
 import ubic.basecode.util.StatusViewer;
 import ubic.basecode.util.StringUtil;
-
-import ubic.basecode.dataStructure.matrix.DenseDoubleMatrix;
-import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.data.Element;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
 import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.Histogram;
-import ubic.erminej.data.Element;
 
 /**
+ * <p>
+ * CorrelationPvalGenerator class.
+ * </p>
+ *
  * @author Shahmil Merchant
  * @author Paul Pavlidis
  * @version $Id$
@@ -58,12 +61,15 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     private double[][] selfSquaredMatrix;
 
     /**
-     * @param settings
-     * @param geneAnnots
-     * @param csc
-     * @param gon
-     * @param rawData
-     * @param hist
+     * <p>
+     * Constructor for CorrelationPvalGenerator.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param geneAnnots a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param rawData a {@link ubic.basecode.dataStructure.matrix.DoubleMatrix} object.
+     * @param hist a {@link ubic.erminej.data.Histogram} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
      */
     public CorrelationPvalGenerator( SettingsHolder settings, GeneAnnotations geneAnnots,
             DoubleMatrix<Element, String> rawData, Histogram hist, StatusViewer messenger ) {
@@ -83,8 +89,12 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * @param geneSetName
-     * @return
+     * <p>
+     * classPval.
+     * </p>
+     *
+     * @param geneSetName a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return a {@link ubic.erminej.data.GeneSetResult} object.
      */
     public GeneSetResult classPval( GeneSetTerm geneSetName ) {
         if ( !super.checkAspectAndRedundancy( geneSetName ) ) return null;
@@ -101,8 +111,8 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
          */
         double sumCorrel = 0.0;
         double nummeas = 0;
-        Map<Long, Double> values = new HashMap<Long, Double>();
-        List<Element> elementList = new ArrayList<Element>( elementsInSet );
+        Map<Long, Double> values = new HashMap<>();
+        List<Element> elementList = new ArrayList<>( elementsInSet );
 
         for ( int i = elementList.size() - 1; i >= 0; i-- ) {
             Element elementi = elementList.get( i );
@@ -182,11 +192,21 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * @param messenger
+     * <p>
+     * containsRow.
+     * </p>
+     *
+     * @param name a {@link ubic.erminej.data.Element} object.
+     * @return a boolean.
      */
+    public boolean containsRow( Element name ) {
+        return data.containsRowName( name );
+    }
+
+    /** {@inheritDoc} */
     @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
-        Map<GeneSetTerm, GeneSetResult> results = new HashMap<GeneSetTerm, GeneSetResult>();
+        Map<GeneSetTerm, GeneSetResult> results = new HashMap<>();
 
         int count = 0;
         setTests( 0 );
@@ -216,18 +236,10 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * @param name
-     * @return
-     */
-    public boolean containsRow( Element name ) {
-        return data.containsRowName( name );
-    }
-
-    /**
      * Note that we don't worry about replicates here - it would slow things down too much.
-     * 
-     * @param correls
-     * @return
+     *
+     * @param correls a {@link ubic.basecode.dataStructure.matrix.DenseDoubleMatrix} object.
+     * @return a double.
      */
     public double geneSetMeanCorrel( DenseDoubleMatrix<String, String> correls ) {
         int classSize = correls.rows();
@@ -244,12 +256,21 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
+     * <p>
+     * get_range.
+     * </p>
+     *
+     * @return a double.
      */
     public double get_range() {
         return histRange;
     }
 
     /**
+     * <p>
+     * Getter for the field <code>cacheHits</code>.
+     * </p>
+     *
      * @return Returns the usedCache.
      */
     public int getCacheHits() {
@@ -257,13 +278,21 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * @return
+     * <p>
+     * Getter for the field <code>data</code>.
+     * </p>
+     *
+     * @return a {@link ubic.basecode.dataStructure.matrix.DoubleMatrix} object.
      */
     public DoubleMatrix<Element, String> getData() {
         return data;
     }
 
     /**
+     * <p>
+     * Getter for the field <code>tests</code>.
+     * </p>
+     *
      * @return Returns the tests.
      */
     public int getTests() {
@@ -271,12 +300,21 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
+     * <p>
+     * set_range.
+     * </p>
+     *
+     * @param range a double.
      */
     public void set_range( double range ) {
         histRange = range;
     }
 
     /**
+     * <p>
+     * Setter for the field <code>cacheHits</code>.
+     * </p>
+     *
      * @param usedCache The usedCache to set.
      */
     public void setCacheHits( int usedCache ) {
@@ -284,20 +322,32 @@ public class CorrelationPvalGenerator extends AbstractGeneSetPvalGenerator {
     }
 
     /**
-     * @param geneRepTreatment
+     * <p>
+     * Setter for the field <code>geneRepTreatment</code>.
+     * </p>
+     *
+     * @param geneRepTreatment a ubic.erminej.Settings$MultiElementHandling object.
      */
     public void setGeneRepTreatment( Settings.MultiElementHandling geneRepTreatment ) {
         this.geneRepTreatment = geneRepTreatment;
     }
 
     /**
-     * @param hist
+     * <p>
+     * setHistogram.
+     * </p>
+     *
+     * @param hist a {@link ubic.erminej.data.Histogram} object.
      */
     public void setHistogram( Histogram hist ) {
         this.hist = hist;
     }
 
     /**
+     * <p>
+     * Setter for the field <code>tests</code>.
+     * </p>
+     *
      * @param tests The tests to set.
      */
     public void setTests( int tests ) {

@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 
 /**
  * Read in the GO XML file provided by the Gene Ontology Consortium.
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
@@ -95,11 +95,27 @@ public class GOParser {
 
     /**
      * Get the graph that was created.
-     * 
+     *
      * @return a DirectedGraph. Nodes contain OntologyEntry instances.
      */
     public DirectedGraph<String, GeneSetTerm> getGraph() {
         return termGraph;
+    }
+
+    /**
+     * Make double-extra sure, recursively.
+     *
+     * @param n
+     * @param aspect
+     */
+    void fillAspect( DirectedGraphNode<String, GeneSetTerm> n ) {
+        String aspect = n.getItem().getAspect();
+        for ( DirectedGraphNode<String, GeneSetTerm> c : n.getChildNodes() ) {
+            GeneSetTerm item = c.getItem();
+            assert StringUtils.isBlank( item.getAspect() ) || item.getAspect().equals( aspect );
+            item.setAspect( aspect );
+            fillAspect( c );
+        }
     }
 
     /**
@@ -155,28 +171,12 @@ public class GOParser {
         }
 
     }
-
-    /**
-     * Make double-extra sure, recursively.
-     * 
-     * @param n
-     * @param aspect
-     */
-    void fillAspect( DirectedGraphNode<String, GeneSetTerm> n ) {
-        String aspect = n.getItem().getAspect();
-        for ( DirectedGraphNode<String, GeneSetTerm> c : n.getChildNodes() ) {
-            GeneSetTerm item = c.getItem();
-            assert StringUtils.isBlank( item.getAspect() ) || item.getAspect().equals( aspect );
-            item.setAspect( aspect );
-            fillAspect( c );
-        }
-    }
 }
 
 class GOHandler extends DefaultHandler {
     protected DirectedGraph<String, GeneSetTerm> termGraph;
 
-    protected Collection<String> forbiddenParents = new HashSet<String>();
+    protected Collection<String> forbiddenParents = new HashSet<>();
 
     protected boolean inTerm = false;
 
@@ -190,7 +190,7 @@ class GOHandler extends DefaultHandler {
 
     public GOHandler() {
         super();
-        termGraph = new DirectedGraph<String, GeneSetTerm>();
+        termGraph = new DirectedGraph<>();
         init();
     }
 
@@ -268,7 +268,7 @@ class GOHandler extends DefaultHandler {
     }
 
     /**
-     * 
+     *
      */
     protected void init() {
         /*
@@ -303,6 +303,47 @@ class OldGOHandler extends GOHandler {
 
     public OldGOHandler() {
         super();
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see ubic.erminej.data.GOHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+     */
+    @Override
+    public void endElement( String uri, String name, String qName ) {
+        if ( name.equals( "term" ) ) {
+            inTerm = false;
+        } else if ( name.equals( "accession" ) ) {
+            inAcc = false;
+            currentTerm = accBuf.toString();
+            initializeNewNode( currentTerm );
+        } else if ( name.equals( "definition" ) ) {
+            if ( StringUtils.isBlank( currentTerm ) ) currentTerm = accBuf.toString();
+            termGraph.getNodeContents( currentTerm ).setDefinition( defBuf.toString() );
+            inDef = false;
+        } else if ( name.equals( "name" ) ) {
+            inName = false;
+
+            if ( StringUtils.isBlank( currentTerm ) ) currentTerm = accBuf.toString();
+            String currentName = nameBuf.toString();
+
+            GeneSetTerm term = termGraph.getNodeContents( currentTerm );
+            assert term != null;
+
+            term.setName( currentName );
+
+            if ( currentName.equalsIgnoreCase( "molecular_function" )
+                    || currentName.equalsIgnoreCase( "biological_process" )
+                    || currentName.equalsIgnoreCase( "cellular_component" )
+                    || currentName.equalsIgnoreCase( "obsolete_molecular_function" )
+                    || currentName.equalsIgnoreCase( "obsolete_biological_process" )
+                    || currentName.equalsIgnoreCase( "obsolete_cellullar_component" ) ) {
+                currentAspect = currentName;
+                termGraph.getNodeContents( currentTerm ).setAspect( currentAspect );
+            }
+
+        }
     }
 
     @Override
@@ -347,47 +388,6 @@ class OldGOHandler extends GOHandler {
         } else if ( name.equals( "name" ) ) {
             nameBuf = new StringBuffer();
             inName = true;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see ubic.erminej.data.GOHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
-     */
-    @Override
-    public void endElement( String uri, String name, String qName ) {
-        if ( name.equals( "term" ) ) {
-            inTerm = false;
-        } else if ( name.equals( "accession" ) ) {
-            inAcc = false;
-            currentTerm = accBuf.toString();
-            initializeNewNode( currentTerm );
-        } else if ( name.equals( "definition" ) ) {
-            if ( StringUtils.isBlank( currentTerm ) ) currentTerm = accBuf.toString();
-            termGraph.getNodeContents( currentTerm ).setDefinition( defBuf.toString() );
-            inDef = false;
-        } else if ( name.equals( "name" ) ) {
-            inName = false;
-
-            if ( StringUtils.isBlank( currentTerm ) ) currentTerm = accBuf.toString();
-            String currentName = nameBuf.toString();
-
-            GeneSetTerm term = termGraph.getNodeContents( currentTerm );
-            assert term != null;
-
-            term.setName( currentName );
-
-            if ( currentName.equalsIgnoreCase( "molecular_function" )
-                    || currentName.equalsIgnoreCase( "biological_process" )
-                    || currentName.equalsIgnoreCase( "cellular_component" )
-                    || currentName.equalsIgnoreCase( "obsolete_molecular_function" )
-                    || currentName.equalsIgnoreCase( "obsolete_biological_process" )
-                    || currentName.equalsIgnoreCase( "obsolete_cellullar_component" ) ) {
-                currentAspect = currentName;
-                termGraph.getNodeContents( currentTerm ).setAspect( currentAspect );
-            }
-
         }
     }
 

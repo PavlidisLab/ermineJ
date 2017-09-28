@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ public class ApiTest {
     @Test
     public final void test() {
         // List of identifiers to be analyzed
-        List<String> elements = new ArrayList<String>();
+        List<String> elements = new ArrayList<>();
         elements.add( "a" );
         elements.add( "b" );
         elements.add( "c" );
@@ -46,22 +46,22 @@ public class ApiTest {
 
         // List of genes corresponding to the elements. Indicates the Many-to-one mapping
         // of elements to genes
-        List<String> genes = new ArrayList<String>();
+        List<String> genes = new ArrayList<>();
         genes.add( "aGene" );
         genes.add( "bGene" );
         genes.add( "cGene" );
         genes.add( "cGene" ); // two elements with the same gene.
 
         // List of Collections of go terms for the elements.
-        List<Collection<String>> goAssociations = new ArrayList<Collection<String>>();
-        Collection<String> gotermsA = new HashSet<String>();
+        List<Collection<String>> goAssociations = new ArrayList<>();
+        Collection<String> gotermsA = new HashSet<>();
         gotermsA.add( "foo" );
         gotermsA.add( "bar" );
-        Collection<String> gotermsB = new HashSet<String>();
+        Collection<String> gotermsB = new HashSet<>();
         gotermsB.add( "foo" );
-        Collection<String> gotermsC = new HashSet<String>();
+        Collection<String> gotermsC = new HashSet<>();
         gotermsC.add( "foo" );
-        Collection<String> gotermsC1 = new HashSet<String>();
+        Collection<String> gotermsC1 = new HashSet<>();
         gotermsC1.add( "foo" );
 
         goAssociations.add( gotermsA );
@@ -70,7 +70,7 @@ public class ApiTest {
         goAssociations.add( gotermsC1 );
 
         // List of Doubles
-        List<Double> geneScores = new ArrayList<Double>();
+        List<Double> geneScores = new ArrayList<>();
         geneScores.add( new Double( "0.1" ) );
         geneScores.add( new Double( "0.1" ) );
         geneScores.add( new Double( "0.01" ) );

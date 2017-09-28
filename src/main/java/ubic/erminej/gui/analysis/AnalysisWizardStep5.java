@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,6 +46,7 @@ import javax.swing.border.TitledBorder;
 
 import org.apache.commons.lang3.StringUtils;
 
+import cern.jet.math.Arithmetic;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
 import ubic.erminej.SettingsHolder.GeneScoreMethod;
@@ -53,11 +54,10 @@ import ubic.erminej.SettingsHolder.Method;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.gui.util.WizardStep;
-import cern.jet.math.Arithmetic;
 
 /**
  * The last step of the analysis wizard, picking method-specific settings.
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  */
@@ -80,7 +80,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     private AtomicInteger numIterations = new AtomicInteger( 10000 );
     private JPanel oraPanel;
 
-    private AtomicReference<Double> oraThreshold = new AtomicReference<Double>( 0.001 );
+    private AtomicReference<Double> oraThreshold = new AtomicReference<>( 0.001 );
 
     private JPanel prPanel;
 
@@ -92,6 +92,14 @@ public class AnalysisWizardStep5 extends WizardStep {
 
     private JPanel step5Panel;
 
+    /**
+     * <p>
+     * Constructor for AnalysisWizardStep5.
+     * </p>
+     *
+     * @param wiz a {@link ubic.erminej.gui.analysis.AnalysisWizard} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public AnalysisWizardStep5( AnalysisWizard wiz, Settings settings ) {
         super( wiz );
         this.settings = settings;
@@ -101,7 +109,12 @@ public class AnalysisWizardStep5 extends WizardStep {
     }
 
     /**
-     * @param analysisType
+     * <p>
+     * addVarPanel.
+     * </p>
+     *
+     * @param analysisType a {@link ubic.erminej.SettingsHolder.Method} object.
+     * @param scoreMethod a {@link ubic.erminej.SettingsHolder.GeneScoreMethod} object.
      */
     public void addVarPanel( Method analysisType, GeneScoreMethod scoreMethod ) {
 
@@ -133,13 +146,18 @@ public class AnalysisWizardStep5 extends WizardStep {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean isReady() {
         return true;
     }
 
     /**
-     * @param analysisType
+     * <p>
+     * removeVarPanel.
+     * </p>
+     *
+     * @param analysisType a ubic.erminej.Settings$Method object.
      */
     public void removeVarPanel( Settings.Method analysisType ) {
         if ( analysisType.equals( SettingsHolder.Method.ORA ) ) {
@@ -183,11 +201,19 @@ public class AnalysisWizardStep5 extends WizardStep {
         setValues();
     }
 
+    /**
+     * <p>
+     * upperTail.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean upperTail() {
         return doLog && !bigIsBetter || !doLog && bigIsBetter;
     }
 
     // Component initialization
+    /** {@inheritDoc} */
     @Override
     protected void jbInit() {
         JPanel topPanel = new JPanel();
@@ -258,7 +284,7 @@ public class AnalysisWizardStep5 extends WizardStep {
 
                     int n = 0;
                     Map<Gene, Double> geneToScoreMap = gs.getGeneToScoreMap();
-                    Collection<Gene> keptGenes = new HashSet<Gene>();
+                    Collection<Gene> keptGenes = new HashSet<>();
                     for ( Gene g : geneToScoreMap.keySet() ) {
                         Double s = geneToScoreMap.get( g );
                         if ( scorePassesThreshold( s, thresh ) ) {
@@ -522,7 +548,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     }
 
     /**
-     * 
+     *
      */
     private JPanel createResamplingSettingsPanel() {
 
@@ -560,7 +586,7 @@ public class AnalysisWizardStep5 extends WizardStep {
     }
 
     /**
-     * 
+     *
      */
     private void createROCSettingsPanel() {
         rocPanel = new JPanel();

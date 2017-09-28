@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,7 +44,7 @@ import ubic.erminej.gui.util.WizardStep;
 
 /**
  * Step to choose a gene set to modify from the a list.
- * 
+ *
  * @author Homin Lee
  * @version $Id$
  */
@@ -58,7 +58,7 @@ public class GeneSetWizardStep1A extends WizardStep {
 
     /**
      * Only show the user's sets
-     * 
+     *
      * @param wiz
      * @param geneData
      */
@@ -186,7 +186,7 @@ public class GeneSetWizardStep1A extends WizardStep {
             model = new SimpleGeneSetListTableModel( geneSets );
             showStatus( "Showing " + geneSets.size() + " user-defined sets" );
         }
-        TableRowSorter<SimpleGeneSetListTableModel> sorter = new TableRowSorter<SimpleGeneSetListTableModel>( model );
+        TableRowSorter<SimpleGeneSetListTableModel> sorter = new TableRowSorter<>( model );
         oldClassTable.setRowSorter( sorter );
         oldClassTable.setModel( model );
         oldClassTable.getColumnModel().getColumn( 0 ).setPreferredWidth( 30 );

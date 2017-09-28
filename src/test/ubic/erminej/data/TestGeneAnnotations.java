@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,11 +85,11 @@ public class TestGeneAnnotations {
     @Before
     public void setUp() throws Exception {
 
-        elements = new ArrayList<String>();
+        elements = new ArrayList<>();
         elements.add( "a" );
         elements.add( "b" );
         elements.add( "c" );
-        geneIds = new ArrayList<Gene>();
+        geneIds = new ArrayList<>();
         Gene agene = new Gene( "aGene" );
         Gene bgene = new Gene( "bGene" );
         Gene cgene = new Gene( "cGene" );
@@ -100,7 +100,7 @@ public class TestGeneAnnotations {
         geneIds.add( agene );
         geneIds.add( bgene );
         geneIds.add( cgene );
-        goIds = new ArrayList<Collection<GeneSetTerm>>();
+        goIds = new ArrayList<>();
         goIds.add( new HashSet<GeneSetTerm>() );
         goIds.add( new HashSet<GeneSetTerm>() );
         goIds.add( new HashSet<GeneSetTerm>() );
@@ -132,7 +132,7 @@ public class TestGeneAnnotations {
 
     @Test
     public void testAddGeneSet() {
-        List<Gene> newGeneSet = new ArrayList<Gene>();
+        List<Gene> newGeneSet = new ArrayList<>();
         Gene g = new Gene( "LARS2" );
         g.addElement( new Element( "34764_at" ) );
         g.addElement( new Element( "32636_f_at" ) );
@@ -146,7 +146,7 @@ public class TestGeneAnnotations {
 
     @Test
     public void testConstructPruned() {
-        Set<Element> keepers = new HashSet<Element>();
+        Set<Element> keepers = new HashSet<>();
         keepers.add( ga.findElement( "36949_at" ) );
         keepers.add( ga.findElement( "41208_at" ) );
         keepers.add( ga.findElement( "34764_at" ) );
@@ -406,14 +406,14 @@ public class TestGeneAnnotations {
 
     /**
      * Check that the GO Terms parsed match ...
-     * 
+     *
      * @param gotr
      * @param id
      */
     private void check( String[] gotr, String id ) {
         Collection<GeneSetTerm> geneSets = ga.findElement( id ).getGeneSets();
 
-        Set<GeneSetTerm> re = new HashSet<GeneSetTerm>();
+        Set<GeneSetTerm> re = new HashSet<>();
         for ( String g : gotr ) {
             GeneSetTerm t = ga.findTerm( g );
 

@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,30 +20,28 @@ package ubic.erminej.analysis;
 
 import java.util.concurrent.CancellationException;
 
+import cern.colt.list.DoubleArrayList;
+import cern.jet.stat.Descriptive;
+import ubic.basecode.dataStructure.matrix.DoubleMatrix;
 import ubic.basecode.math.DescriptiveWithMissing;
 import ubic.basecode.math.MatrixStats;
 import ubic.basecode.math.RandomChooser;
 import ubic.basecode.util.StatusViewer;
-import ubic.basecode.dataStructure.matrix.DoubleMatrix;
-import cern.colt.list.DoubleArrayList;
-import cern.jet.stat.Descriptive;
 import ubic.erminej.SettingsHolder;
-import ubic.erminej.data.Histogram;
 import ubic.erminej.data.Element;
+import ubic.erminej.data.Histogram;
 
 /**
+ * <p>
+ * ResamplingCorrelationGeneSetScore class.
+ * </p>
+ *
  * @author pavlidis
  * @version $Id$
  */
 public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSetScore {
 
     private static final int MIN_STABLE_CHECKS = 3;
-
-    private DoubleMatrix<Element, String> data = null;
-
-    private double[][] dataAsRawMatrix;
-    private double[][] selfSquaredMatrix;
-    private boolean[][] nanStatusMatrix;
 
     /**
      * Never start estimating distributions for gene sets sizes smaller than this.
@@ -54,9 +52,20 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
      * Never estimate distribution with fewer than this many iterations.
      */
     private static final int MIN_ITERATIONS_FOR_ESTIMATION = 2000;
+    private DoubleMatrix<Element, String> data = null;
+    private double[][] dataAsRawMatrix;
+
+    private double[][] selfSquaredMatrix;
+
+    private boolean[][] nanStatusMatrix;
 
     /**
-     * @param dataMatrix
+     * <p>
+     * Constructor for ResamplingCorrelationGeneSetScore.
+     * </p>
+     *
+     * @param dataMatrix a {@link ubic.basecode.dataStructure.matrix.DoubleMatrix} object.
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
      */
     public ResamplingCorrelationGeneSetScore( SettingsHolder settings, DoubleMatrix<Element, String> dataMatrix ) {
         this.classMaxSize = settings.getMaxClassSize();
@@ -71,10 +80,10 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
     /**
      * Generate a null distribution, using a selected random seed.
-     * 
-     * @param m
-     * @param randomSeed
-     * @return
+     *
+     * @param m a {@link ubic.basecode.util.StatusViewer} object.
+     * @param randomSeed a long.
+     * @return a {@link ubic.erminej.data.Histogram} object.
      */
     public Histogram generateNulldistribution( StatusViewer m, long randomSeed ) {
         RandomChooser.init( randomSeed );
@@ -82,10 +91,10 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     }
 
     /**
+     * {@inheritDoc}
+     *
      * Build background distributions of within-gene set mean correlations. This requires computing a lot of
      * correlations.
-     * 
-     * @return histogram containing the random distributions of correlations.
      */
     @Override
     public Histogram generateNullDistribution( StatusViewer messenger ) {
@@ -169,32 +178,8 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
     }
 
     /**
-     * @param oldmean
-     * @param oldvar
-     * @param mean
-     * @param variance
-     * @return
-     */
-    private boolean isConverged( double oldmean, double oldvar, double mean, double variance ) {
-        return Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE;
-    }
-
-    /**
-     * 
-     */
-    private void takeABreak() {
-        ifInterruptedStop();
-
-        try {
-            Thread.sleep( 10 );
-        } catch ( InterruptedException e ) {
-            throw new CancellationException();
-        }
-    }
-
-    /**
      * Compute the average correlation for a set of vectors.
-     * 
+     *
      * @param indicesToSelect - rows of the matrix that will get compared.
      * @return mean correlation within the matrix.
      */
@@ -221,12 +206,37 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
      */
+    /** {@inheritDoc} */
     @Override
     public void setRandomSeed( long randomSeed ) {
         RandomChooser.init( randomSeed );
+    }
+
+    /**
+     * @param oldmean
+     * @param oldvar
+     * @param mean
+     * @param variance
+     * @return
+     */
+    private boolean isConverged( double oldmean, double oldvar, double mean, double variance ) {
+        return Math.abs( oldvar - variance ) <= TOLERANCE && Math.abs( oldmean - mean ) <= TOLERANCE;
+    }
+
+    /**
+     *
+     */
+    private void takeABreak() {
+        ifInterruptedStop();
+
+        try {
+            Thread.sleep( 10 );
+        } catch ( InterruptedException e ) {
+            throw new CancellationException();
+        }
     }
 
 }

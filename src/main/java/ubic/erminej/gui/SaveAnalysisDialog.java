@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * Choose the run and whether the gene symbols should be included in the output.
- * 
+ *
  * @author paul
  * @version $Id$
  */
@@ -45,12 +45,23 @@ public class SaveAnalysisDialog extends JDialog {
 
     private Settings settings;
 
-    private JComboBox<String> runComboBox = new JComboBox<String>();
+    private JComboBox<String> runComboBox = new JComboBox<>();
 
     private JCheckBox saveAllGenes = new JCheckBox();
 
     private MainFrame owner;
 
+    private boolean cancelled = true;
+
+    /**
+     * <p>
+     * Constructor for SaveAnalysisDialog.
+     * </p>
+     *
+     * @param owner a {@link ubic.erminej.gui.MainFrame} object.
+     * @param settings a {@link ubic.erminej.Settings} object.
+     * @param initialSelection a int.
+     */
     public SaveAnalysisDialog( MainFrame owner, Settings settings, int initialSelection ) {
         super( owner );
         this.owner = owner;
@@ -63,19 +74,52 @@ public class SaveAnalysisDialog extends JDialog {
         this.setVisible( true );
     }
 
+    /**
+     * <p>
+     * getSelectedRunNum.
+     * </p>
+     *
+     * @return a int.
+     */
     public int getSelectedRunNum() {
         return runComboBox.getSelectedIndex();
     }
 
+    /**
+     * <p>
+     * isSaveAllGenes.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean isSaveAllGenes() {
         return this.saveAllGenes.isSelected();
     }
 
+    /**
+     * <p>
+     * wasCancelled.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean wasCancelled() {
         return this.cancelled;
     }
 
-    private boolean cancelled = true;
+    void showChoices() {
+
+        this.saveAllGenes.setSelected( settings.getSaveAllGenesInOutput() );
+
+        if ( owner.getNumResultSets() < 1 ) {
+            runComboBox.addItem( "No runs available to save" );
+        } else {
+            for ( int i = 0; i < owner.getNumResultSets(); i++ ) {
+                runComboBox.insertItemAt( owner.getResultSet( i ).getName(), i );
+            }
+            runComboBox.setSelectedIndex( 0 );
+        }
+    }
 
     private void jbInit() {
         this.setTitle( "Set options for saving" );
@@ -142,20 +186,6 @@ public class SaveAnalysisDialog extends JDialog {
             }
         } );
         return buttonPanel;
-    }
-
-    void showChoices() {
-
-        this.saveAllGenes.setSelected( settings.getSaveAllGenesInOutput() );
-
-        if ( owner.getNumResultSets() < 1 ) {
-            runComboBox.addItem( "No runs available to save" );
-        } else {
-            for ( int i = 0; i < owner.getNumResultSets(); i++ ) {
-                runComboBox.insertItemAt( owner.getResultSet( i ).getName(), i );
-            }
-            runComboBox.setSelectedIndex( 0 );
-        }
     }
 
 }

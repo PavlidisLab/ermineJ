@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,13 +29,24 @@ import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetTerm;
 
 /**
- * Does the same thing as {@link GeneSetResamplingPvalGenerator}but is stripped-down for using during resampling.
- * 
+ * Does the same thing as {@link ubic.erminej.analysis.GeneSetResamplingPvalGenerator}but is stripped-down for using
+ * during resampling.
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
 public class ExperimentScoreQuickPvalGenerator extends GeneSetResamplingPvalGenerator {
 
+    /**
+     * <p>
+     * Constructor for ExperimentScoreQuickPvalGenerator.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.SettingsHolder} object.
+     * @param a a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @param geneToScoreMap a {@link java.util.Map} object.
+     * @param messenger a {@link ubic.basecode.util.StatusViewer} object.
+     */
     public ExperimentScoreQuickPvalGenerator( SettingsHolder settings, GeneAnnotations a,
             Map<Gene, Double> geneToScoreMap, StatusViewer messenger ) {
         super( settings, a, geneToScoreMap, messenger );
@@ -43,12 +54,10 @@ public class ExperimentScoreQuickPvalGenerator extends GeneSetResamplingPvalGene
 
     /**
      * This is stripped-down version of classPvalue. We use this when doing permutations, it is much faster.
-     * 
-     * @param class_name String
-     * @param group_pval_map Map
-     * @param probesToPvals Map
-     * @throws IllegalStateException
+     *
+     * @throws java.lang.IllegalStateException
      * @return double
+     * @param geneSetName a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     public double classPvalue( GeneSetTerm geneSetName ) {
 
@@ -64,7 +73,7 @@ public class ExperimentScoreQuickPvalGenerator extends GeneSetResamplingPvalGene
 
         double[] scoresForGenesInSet = new double[numGenesInSet]; // store pvalues for items in
         // the class.
-        Set<Gene> record = new HashSet<Gene>();
+        Set<Gene> record = new HashSet<>();
 
         int v_size = 0;
 

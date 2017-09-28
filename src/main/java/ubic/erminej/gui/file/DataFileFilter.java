@@ -1,8 +1,8 @@
 /*
  * The baseCode project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,11 +23,16 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 /**
+ * <p>
+ * DataFileFilter class.
+ * </p>
+ *
  * @author Will Braynen
  * @version $Id$
  */
 public class DataFileFilter extends FileFilter {
 
+    /** {@inheritDoc} */
     @Override
     public boolean accept( File f ) {
 
@@ -42,6 +47,7 @@ public class DataFileFilter extends FileFilter {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Plain or compressed text files";

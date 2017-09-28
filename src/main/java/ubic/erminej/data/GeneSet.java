@@ -1,13 +1,13 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2011 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
@@ -25,42 +25,55 @@ import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
 
 /**
  * A group of genes, such as those defined by GO annotations or KEGG pathways.
- * 
+ *
  * @author paul
  * @version $Id$
  */
 public class GeneSet {
     private GeneSetTerm term;
 
-    private Set<Gene> genes = new HashSet<Gene>();
+    private Set<Gene> genes = new HashSet<>();
 
     /**
      * Gene sets that have the exact same members.
      */
-    private Set<GeneSet> redundantGroups = new HashSet<GeneSet>();
+    private Set<GeneSet> redundantGroups = new HashSet<>();
 
     // How was it originally represented. This affects how things are stored on disk. Genes is better.
     private boolean isGenes = true;
 
     private String sourceFile;
 
-    private Set<Element> elements = new HashSet<Element>();
+    private Set<Element> elements = new HashSet<>();
 
     private GeneSetFileFormat format = GeneSetFileFormat.DEFAULT;
 
+    /**
+     * <p>
+     * Constructor for GeneSet.
+     * </p>
+     */
     public GeneSet() {
     }
 
     /**
-     * @param name
+     * <p>
+     * Constructor for GeneSet.
+     * </p>
+     *
+     * @param name a {@link ubic.erminej.data.GeneSetTerm} object.
      */
     public GeneSet( GeneSetTerm name ) {
         this.term = name;
     }
 
     /**
-     * @param name
-     * @param items
+     * <p>
+     * Constructor for GeneSet.
+     * </p>
+     *
+     * @param name a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @param items a {@link java.util.Collection} object.
      */
     public GeneSet( GeneSetTerm name, Collection<Gene> items ) {
         this( name );
@@ -70,8 +83,8 @@ public class GeneSet {
 
     /**
      * Add the gene (and its elements)
-     * 
-     * @param g
+     *
+     * @param g a {@link ubic.erminej.data.Gene} object.
      */
     public void addGene( Gene g ) {
         assert g != null;
@@ -94,12 +107,26 @@ public class GeneSet {
         }
     }
 
+    /**
+     * <p>
+     * addGenes.
+     * </p>
+     *
+     * @param gs a {@link java.util.Collection} object.
+     */
     public void addGenes( Collection<Gene> gs ) {
         for ( Gene g : gs ) {
             this.addGene( g );
         }
     }
 
+    /**
+     * <p>
+     * addRedundantGroup.
+     * </p>
+     *
+     * @param redundant a {@link ubic.erminej.data.GeneSet} object.
+     */
     public void addRedundantGroup( GeneSet redundant ) {
         if ( this.equals( redundant ) ) {
             return;
@@ -107,20 +134,38 @@ public class GeneSet {
         this.redundantGroups.add( redundant );
     }
 
+    /**
+     * <p>
+     * clearGenes.
+     * </p>
+     */
     public void clearGenes() {
-        genes = new HashSet<Gene>();
-        elements = new HashSet<Element>();
+        genes = new HashSet<>();
+        elements = new HashSet<>();
         clearRedundancy();
     }
 
+    /**
+     * <p>
+     * clearRedundancy.
+     * </p>
+     */
     public void clearRedundancy() {
         this.redundantGroups.clear();
     }
 
+    /**
+     * <p>
+     * clearRedundancy.
+     * </p>
+     *
+     * @param toclear a {@link ubic.erminej.data.GeneSet} object.
+     */
     public void clearRedundancy( GeneSet toclear ) {
         this.redundantGroups.remove( toclear );
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals( Object obj ) {
         if ( this == obj ) return true;
@@ -134,6 +179,10 @@ public class GeneSet {
     }
 
     /**
+     * <p>
+     * Getter for the field <code>format</code>.
+     * </p>
+     *
      * @return the file format that this group came in (only applies for User-defined groups)
      */
     public GeneSetFileFormat getFormat() {
@@ -142,22 +191,30 @@ public class GeneSet {
 
     /**
      * Do not modify this collection directly! Use 'addGene'.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Set} object.
      */
     public Set<Gene> getGenes() {
         return Collections.unmodifiableSet( genes );
     }
 
     /**
-     * @return
+     * <p>
+     * getId.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
      */
     public String getId() {
         return term.getId();
     }
 
     /**
-     * @return
+     * <p>
+     * getName.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
      */
     public String getName() {
         return term.getName();
@@ -165,8 +222,8 @@ public class GeneSet {
 
     /**
      * FIXME this should return only the *active* Elements? - those which have Scores.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Set} object.
      */
     public Set<Element> getProbes() {
         if ( this.elements.isEmpty() ) {
@@ -179,24 +236,36 @@ public class GeneSet {
 
     /**
      * Can not modify this collection directly; use addRedundantGroup instead.
-     * 
-     * @return
+     *
+     * @return a {@link java.util.Set} object.
      */
     public Set<GeneSet> getRedundantGroups() {
         return Collections.unmodifiableSet( redundantGroups );
     }
 
+    /**
+     * <p>
+     * Getter for the field <code>sourceFile</code>.
+     * </p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getSourceFile() {
         return sourceFile;
     }
 
     /**
+     * <p>
+     * Getter for the field <code>term</code>.
+     * </p>
+     *
      * @return Returns the name.
      */
     public GeneSetTerm getTerm() {
         return term;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -205,27 +274,69 @@ public class GeneSet {
         return result;
     }
 
+    /**
+     * <p>
+     * hasRedundancy.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean hasRedundancy() {
         return !redundantGroups.isEmpty();
     }
 
+    /**
+     * <p>
+     * isGenes.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean isGenes() {
         return isGenes;
     }
 
+    /**
+     * <p>
+     * isUserDefined.
+     * </p>
+     *
+     * @return a boolean.
+     */
     public boolean isUserDefined() {
         return term.isUserDefined();
     }
 
+    /**
+     * <p>
+     * Setter for the field <code>format</code>.
+     * </p>
+     *
+     * @param f a {@link ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat} object.
+     */
     public void setFormat( GeneSetFileFormat f ) {
         this.format = f;
 
     }
 
+    /**
+     * <p>
+     * Setter for the field <code>genes</code>.
+     * </p>
+     *
+     * @param isGenes a boolean.
+     */
     public void setGenes( boolean isGenes ) {
         this.isGenes = isGenes;
     }
 
+    /**
+     * <p>
+     * Setter for the field <code>genes</code>.
+     * </p>
+     *
+     * @param genes a {@link java.util.Collection} object.
+     */
     public void setGenes( Collection<Gene> genes ) {
         if ( genes == null ) {
             throw new IllegalArgumentException( "Genes was null" );
@@ -236,37 +347,74 @@ public class GeneSet {
         }
     }
 
+    /**
+     * <p>
+     * Setter for the field <code>isGenes</code>.
+     * </p>
+     *
+     * @param isGenes a boolean.
+     */
     public void setIsGenes( boolean isGenes ) {
         this.isGenes = isGenes;
     }
 
+    /**
+     * <p>
+     * Setter for the field <code>redundantGroups</code>.
+     * </p>
+     *
+     * @param redundantGroups a {@link java.util.Set} object.
+     */
     public void setRedundantGroups( Set<GeneSet> redundantGroups ) {
         this.redundantGroups = redundantGroups;
     }
 
+    /**
+     * <p>
+     * Setter for the field <code>sourceFile</code>.
+     * </p>
+     *
+     * @param fileName a {@link java.lang.String} object.
+     */
     public void setSourceFile( String fileName ) {
         this.sourceFile = fileName;
     }
 
     /**
+     * <p>
+     * Setter for the field <code>term</code>.
+     * </p>
+     *
      * @param name The name to set.
      */
     public void setTerm( GeneSetTerm name ) {
         this.term = name;
     }
 
+    /**
+     * <p>
+     * setUserDefined.
+     * </p>
+     *
+     * @param isUserDefined a boolean.
+     */
     public void setUserDefined( boolean isUserDefined ) {
         if ( term == null ) return;
         this.term.setUserDefined( isUserDefined );
     }
 
     /**
+     * <p>
+     * size.
+     * </p>
+     *
      * @return how many genes there are.
      */
     public int size() {
         return genes.size();
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return term.getId() + " - " + StringUtils.abbreviate( term.getName(), 40 ) + " (" + this.getGenes().size()

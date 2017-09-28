@@ -1,8 +1,8 @@
 /*
  * The ermineJ project
- * 
+ *
  * Copyright (c) 2006 University of British Columbia
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,11 +25,18 @@ import ubic.erminej.gui.util.GuiUtil;
 
 /**
  * Main for GUI
- * 
+ *
  * @author Paul Pavlidis
  * @version $Id$
  */
 public class ErmineJGui {
+    /**
+     * <p>
+     * main.
+     * </p>
+     *
+     * @param args an array of {@link java.lang.String} objects.
+     */
     public static void main( String[] args ) {
         try {
             UIManager.setLookAndFeel( UIManager.getSystemLookAndFeelClassName() );
@@ -41,6 +48,13 @@ public class ErmineJGui {
         }
     }
 
+    /**
+     * <p>
+     * Constructor for ErmineJGui.
+     * </p>
+     *
+     * @param settings a {@link ubic.erminej.Settings} object.
+     */
     public ErmineJGui( final Settings settings ) {
         MainFrame frame = new MainFrame( settings );
         init( frame );
