@@ -368,6 +368,7 @@ public class ErmineJCli {
         return true;
     }
 
+    @SuppressWarnings("static-access")
     private void buildOptions() {
 
         OptionBuilder.withLongOpt( "help" );
@@ -398,10 +399,10 @@ public class ErmineJCli {
                 .withArgName( "file" );
         options.addOption( OptionBuilder.create( 'a' ) );
 
-        OptionBuilder.withLongOpt( "affy" );
-        OptionBuilder.withDescription( "Annotation file is in Affymetrix format" );
-        options.addOption( OptionBuilder
-                .create( 'A' ) );
+        //        OptionBuilder.withLongOpt( "affy" );
+        //        OptionBuilder.withDescription( "Annotation file is in Affymetrix format" );
+        //        options.addOption( OptionBuilder
+        //                .create( 'A' ) );
 
         OptionBuilder.withDescription(
                 "Sets 'big is better' option for gene scores to true [default = "
@@ -609,6 +610,10 @@ public class ErmineJCli {
         OptionBuilder.withArgName( "value" );
         options.addOption( OptionBuilder
                 .create( 'M' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "GO aspects to include: B, C, M; "
+                + "for example for Biological Process only use B; to add Cellular Component use BC (Default: BCM = all )" )
+                .withArgName( "selections" ).create( "aspects" ) );
 
     }
 
@@ -1022,11 +1027,30 @@ public class ErmineJCli {
                 return false;
             }
         }
-        
-        if (commandLine.hasOption( 'S' )) {
-             // saveconfig
-            arg = commandLine.getOptionValue( 'S' );
-            settings.writeAnalysisSettings( arg );
+
+        if ( commandLine.hasOption( "aspects" ) ) {
+            arg = commandLine.getOptionValue( "aspects" );
+            if ( !arg.matches( "[BCM]{1,3}" ) ) {
+                System.err.println(
+                        "Valid choices for aspect are any of"
+                                + " B (Biological Process), C (Cellular Component) or M ( Molecular function) or a combination" );
+                showHelp();
+                return false;
+            }
+
+            settings.setUseBiologicalProcess( true );
+            settings.setUseMolecularFunction( true );
+            settings.setUseCellularComponent( true );
+
+            if ( !arg.contains( "B" ) ) {
+                settings.setUseBiologicalProcess( false );
+            }
+            if ( !arg.contains( "M" ) ) {
+                settings.setUseMolecularFunction( false );
+            }
+            if ( !arg.contains( "C" ) ) {
+                settings.setUseCellularComponent( false );
+            }
         }
 
         if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR )
@@ -1041,6 +1065,12 @@ public class ErmineJCli {
             System.err.println( "You must supply a gene score file if you are not using the correlation method" );
             showHelp();
             return false;
+        }
+
+        if ( commandLine.hasOption( 'S' ) ) {
+            // saveconfig
+            arg = commandLine.getOptionValue( 'S' );
+            settings.writeAnalysisSettings( arg );
         }
 
         return true;
