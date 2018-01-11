@@ -787,7 +787,7 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * Intended to be used for saving results to the header of an output file.
+     * Intended to be used for saving results to the header of an output file, or when using the commnad line option "saveconfig"
      *
      * @param fileName a {@link java.lang.String} object.
      * @throws java.io.IOException if any.

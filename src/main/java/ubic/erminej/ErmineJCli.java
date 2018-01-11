@@ -1022,6 +1022,12 @@ public class ErmineJCli {
                 return false;
             }
         }
+        
+        if (commandLine.hasOption( 'S' )) {
+             // saveconfig
+            arg = commandLine.getOptionValue( 'S' );
+            settings.writeAnalysisSettings( arg );
+        }
 
         if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR )
                 && settings.getRawDataFileName() == null ) {
