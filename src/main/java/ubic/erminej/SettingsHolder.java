@@ -673,10 +673,13 @@ public class SettingsHolder {
     /**
      * get the random seed if it was set.
      * 
-     * @return
+     * @return seed or null if it wasn't set.
      */
     public Long getSeed() {
-        return config.getLong( SEED );
+        if ( config.containsKey( SEED ) ) {
+            return config.getLong( SEED );
+        }
+        return null;
     }
 
     /**
