@@ -234,7 +234,8 @@ public class GeneAnnotationParser {
                         multigenes.add( g );
                     }
 
-                    if ( multigenes.size() > 1 && settings.getFilterNonSpecific() ) {
+                    // filter non-specific.
+                    if ( multigenes.size() > 1 ) {
                         continue;
                     }
 
@@ -769,7 +770,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAffyAlternateGeneSymbolIndex.</p>
+     * <p>
+     * getAffyAlternateGeneSymbolIndex.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
@@ -910,7 +913,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAgilentGoIndex.</p>
+     * <p>
+     * getAgilentGoIndex.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
@@ -921,7 +926,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAgilentNumFields.</p>
+     * <p>
+     * getAgilentNumFields.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
@@ -932,7 +939,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAgilentProbeIndex.</p>
+     * <p>
+     * getAgilentProbeIndex.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.

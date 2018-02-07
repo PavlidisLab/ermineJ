@@ -468,17 +468,6 @@ public class SettingsHolder {
 
     /**
      * <p>
-     * getFilterNonSpecific.
-     * </p>
-     *
-     * @return a boolean.
-     */
-    public boolean getFilterNonSpecific() {
-        return config.getBoolean( FILTER_NONSPECIFIC, ( Boolean ) getDefault( FILTER_NONSPECIFIC ) );
-    }
-
-    /**
-     * <p>
      * getGeneRepTreatment.
      * </p>
      *
@@ -888,21 +877,21 @@ public class SettingsHolder {
         return this.getDoLog() && !this.getBigIsBetter() || !this.getDoLog() && this.getBigIsBetter();
     }
 
-    /**
-     * <p>
-     * useMultifunctionalityCorrection.
-     * </p>
-     *
-     * @return true if multifunctionality corrections should be applied, if possible.
-     * @deprecated this should always be true
-     */
-    public boolean useMultifunctionalityCorrection() {
-        /*
-         * Note that the intention is that this always be true. The reason to turn it off would be for testing or
-         * performance reasons.
-         */
-        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, true );
-    }
+    //    /**
+    //     * <p>
+    //     * useMultifunctionalityCorrection.
+    //     * </p>
+    //     *
+    //     * @return true if multifunctionality corrections should be applied, if possible.
+    //     * @deprecated this should always be true
+    //     */
+    //    public boolean useMultifunctionalityCorrection() {
+    //        /*
+    //         * Note that the intention is that this always be true. The reason to turn it off would be for testing or
+    //         * performance reasons.
+    //         */
+    //        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, true );
+    //    }
 
     /**
      * <p>

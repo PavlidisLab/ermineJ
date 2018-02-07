@@ -157,9 +157,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
     @Override
     public Map<GeneSetTerm, GeneSetResult> generateGeneSetResults() {
 
-        boolean useMultifunctionalityCorrection = settings.useMultifunctionalityCorrection();
-
-        Map<GeneSetTerm, GeneSetResult> results = generateGeneSetResults( useMultifunctionalityCorrection );
+        Map<GeneSetTerm, GeneSetResult> results = generateGeneSetResults( true );
 
         return results;
     }
