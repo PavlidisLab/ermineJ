@@ -53,7 +53,6 @@ import ubic.erminej.data.GeneSetTerm;
  * @author Kiran Keshav
  * @author Homin Lee
  * @author Will Braynen
- * @version $Id: $Id
  */
 public class Settings extends SettingsHolder {
 
@@ -79,9 +78,11 @@ public class Settings extends SettingsHolder {
     protected static final String[] ANALYSIS_SETTINGS = new String[] { GENE_SCORE_THRESHOLD_KEY, QUANTILE_CONFIG_NAME,
             GENE_SET_RESAMPLING_SCORE_METHOD, MAX_CLASS_SIZE, MIN_CLASS_SIZE, RAW_FILE_CONFIG_NAME, SCORE_FILE,
             SCORE_COL, MTC_CONFIG_NAME, ITERATIONS, CLASS_FILE, BIG_IS_BETTER, DO_LOG, GENE_REP_TREATMENT,
-            ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD, FILTER_NONSPECIFIC,
-            USE_MULTIFUNCTIONALITY_CORRECTION, USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP, USE_USER_DEFINED_GROUPS,
-            CUSTOM_GENESET_FILES, VERSIONPARAM };
+            ALWAYS_USE_EMPIRICAL, ANNOT_FILE, ANNOT_FORMAT, CLASS_SCORE_METHOD,
+            USE_MOL_FUNC, USE_BIOL_PROC, USE_CELL_COMP, USE_USER_DEFINED_GROUPS,
+            CUSTOM_GENESET_FILES, VERSIONPARAM, SEED };
+    //  USE_MULTIFUNCTIONALITY_CORRECTION,
+    // FILTER_NONSPECIFIC,
 
     /**
      * Header for the config file.
@@ -533,17 +534,6 @@ public class Settings extends SettingsHolder {
 
     /**
      * <p>
-     * setFilterNonSpecific.
-     * </p>
-     *
-     * @param val a boolean.
-     */
-    public void setFilterNonSpecific( boolean val ) {
-        this.config.setProperty( FILTER_NONSPECIFIC, new Boolean( val ) );
-    }
-
-    /**
-     * <p>
      * setGeneRepTreatment.
      * </p>
      *
@@ -701,6 +691,13 @@ public class Settings extends SettingsHolder {
     }
 
     /**
+     * @param seed
+     */
+    public void setRandomSeed( Long seed ) {
+        this.config.setProperty( SEED, seed );
+    }
+
+    /**
      * <p>
      * setSelectedCustomGeneSets.
      * </p>
@@ -764,6 +761,7 @@ public class Settings extends SettingsHolder {
      * </p>
      *
      * @param b a boolean.
+     * @deprecated as this can always be true
      */
     public void setUseMultifunctionalityCorrection( boolean b ) {
         this.config.setProperty( USE_MULTIFUNCTIONALITY_CORRECTION, b );
@@ -787,7 +785,8 @@ public class Settings extends SettingsHolder {
     }
 
     /**
-     * Intended to be used for saving results to the header of an output file.
+     * Intended to be used for saving results to the header of an output file, or when using the commnad line option
+     * "saveconfig"
      *
      * @param fileName a {@link java.lang.String} object.
      * @throws java.io.IOException if any.

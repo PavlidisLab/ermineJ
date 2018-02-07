@@ -67,7 +67,7 @@ import ubic.erminej.data.GeneSetTerms;
  */
 public class ErmineJCli {
 
-    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2017 University of British Columbia.\nFor more help go to ermineJ.chibi.ubc.ca";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2018 University of British Columbia.\nFor more help go to ermineJ.chibi.ubc.ca";
     private static final String HEADER = "Options:";
 
     private static Log log = LogFactory.getLog( ErmineJCli.class );
@@ -399,10 +399,10 @@ public class ErmineJCli {
                 .withArgName( "file" );
         options.addOption( OptionBuilder.create( 'a' ) );
 
-        OptionBuilder.withLongOpt( "affy" );
-        OptionBuilder.withDescription( "Annotation file is in Affymetrix format" );
-        options.addOption( OptionBuilder
-                .create( 'A' ) );
+        //        OptionBuilder.withLongOpt( "affy" );
+        //        OptionBuilder.withDescription( "Annotation file is in Affymetrix format" );
+        //        options.addOption( OptionBuilder
+        //                .create( 'A' ) );
 
         OptionBuilder.withDescription(
                 "Sets 'big is better' option for gene scores to true [default = "
@@ -437,11 +437,11 @@ public class ErmineJCli {
                 .withDescription( "Directory where custom gene set are located" );
         options.addOption( OptionBuilder.create( 'f' ) );
 
-        OptionBuilder.withLongOpt( "filterNonSpecific" );
-        OptionBuilder
-                .withDescription( "Filter out non-specific elements (default annotation format only), default=true" );
-        options.addOption( OptionBuilder
-                .create( 'F' ) );
+        //        OptionBuilder.withLongOpt( "filterNonSpecific" );
+        //        OptionBuilder
+        //                .withDescription( "Filter out non-specific elements (default annotation format only), default=true" );
+        //        options.addOption( OptionBuilder
+        //                .create( 'F' ) );
 
         OptionBuilder
                 .hasArg();
@@ -490,7 +490,7 @@ public class ErmineJCli {
                                 + SettingsHolder.GeneScoreMethod.MEAN_ABOVE_QUANTILE + " (mean above quantile), or "
                                 + SettingsHolder.GeneScoreMethod.PRECISIONRECALL
                                 + " (area under the precision-recall curve); default="
-                                + SettingsHolder.getDefault( SettingsHolder.CLASS_SCORE_METHOD ) );
+                                + SettingsHolder.getDefault( SettingsHolder.GENE_SET_RESAMPLING_SCORE_METHOD ) );
         OptionBuilder
                 .withLongOpt( "stats" );
         OptionBuilder.withArgName( "option" );
@@ -517,12 +517,12 @@ public class ErmineJCli {
                 .withArgName( "scoreFileList" );
         options.addOption( OptionBuilder.create( "batch" ) );
 
-        OptionBuilder.withDescription( "Disable multifunctionality correction (default: on)" );
+        //    OptionBuilder.withDescription( "Disable multifunctionality correction (default: on)" );
         /*
          * The intention is that this would be on
          */
-        options.addOption( OptionBuilder
-                .create( "nomf" ) );
+        //        options.addOption( OptionBuilder
+        //                .create( "nomf" ) );
 
         OptionBuilder.hasArg();
         OptionBuilder
@@ -602,14 +602,23 @@ public class ErmineJCli {
         OptionBuilder
                 .withDescription(
                         "Multiple test correction method: " + SettingsHolder.MultiTestCorrMethod.BONFERONNI
-                                + " = Bonferonni FWE, " + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
-                                + " = Westfall-Young (slow), " + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
+                                + " = Bonferonni FWE, "
+                                // + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
+                                //  + " = Westfall-Young (slow), "
+                                + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
                                 + " = Benjamini-Hochberg FDR [default]" );
         OptionBuilder
                 .withLongOpt( "mtc" );
         OptionBuilder.withArgName( "value" );
         options.addOption( OptionBuilder
                 .create( 'M' ) );
+
+        options.addOption( OptionBuilder.hasArg().withDescription( "GO aspects to include: B, C, M; "
+                + "for example for Biological Process only use B; to add Cellular Component use BC (Default: BCM = all )" )
+                .withArgName( "selections" ).create( "aspects" ) );
+
+        options.addOption(
+                OptionBuilder.hasArg().withArgName( "value" ).withDescription( "Seed for random number generation (integer)" ).create( "seed" ) );
 
     }
 
@@ -849,7 +858,7 @@ public class ErmineJCli {
             }
         }
 
-        settings.setFilterNonSpecific( commandLine.hasOption( 'F' ) );
+        //  settings.setFilterNonSpecific( commandLine.hasOption( 'F' ) );
 
         if ( commandLine.hasOption( 'M' ) ) {
             arg = commandLine.getOptionValue( 'M' );
@@ -921,11 +930,11 @@ public class ErmineJCli {
                 return false;
             }
 
-            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) && commandLine.hasOption( "nomf" ) ) {
-                settings.setUseMultifunctionalityCorrection( false );
-            } else {
-                settings.setUseMultifunctionalityCorrection( true );
-            }
+            //            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) && commandLine.hasOption( "nomf" ) ) {
+            //                settings.setUseMultifunctionalityCorrection( false );
+            //            } else {
+            //                settings.setUseMultifunctionalityCorrection( true );
+            //            }
         }
 
         if ( commandLine.hasOption( 'o' ) ) {
@@ -1024,6 +1033,31 @@ public class ErmineJCli {
             }
         }
 
+        if ( commandLine.hasOption( "aspects" ) ) {
+            arg = commandLine.getOptionValue( "aspects" );
+            if ( !arg.matches( "[BCM]{1,3}" ) ) {
+                System.err.println(
+                        "Valid choices for aspect are any of"
+                                + " B (Biological Process), C (Cellular Component) or M ( Molecular function) or a combination" );
+                showHelp();
+                return false;
+            }
+
+            settings.setUseBiologicalProcess( true );
+            settings.setUseMolecularFunction( true );
+            settings.setUseCellularComponent( true );
+
+            if ( !arg.contains( "B" ) ) {
+                settings.setUseBiologicalProcess( false );
+            }
+            if ( !arg.contains( "M" ) ) {
+                settings.setUseMolecularFunction( false );
+            }
+            if ( !arg.contains( "C" ) ) {
+                settings.setUseCellularComponent( false );
+            }
+        }
+
         if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.CORR )
                 && settings.getRawDataFileName() == null ) {
             System.err.println( "You must supply a raw data file if you are using the correlation method" );
@@ -1036,6 +1070,24 @@ public class ErmineJCli {
             System.err.println( "You must supply a gene score file if you are not using the correlation method" );
             showHelp();
             return false;
+        }
+
+        if ( commandLine.hasOption( "seed" ) ) {
+            arg = commandLine.getOptionValue( "seed" );
+            try {
+                Long seed = Long.parseLong( arg );
+                settings.setRandomSeed( seed );
+            } catch ( Exception e ) {
+                System.err.println( "Seed must be an integer value" );
+                showHelp();
+                return false;
+            }
+        }
+
+        if ( commandLine.hasOption( 'S' ) ) {
+            // saveconfig
+            arg = commandLine.getOptionValue( 'S' );
+            settings.writeAnalysisSettings( arg );
         }
 
         return true;

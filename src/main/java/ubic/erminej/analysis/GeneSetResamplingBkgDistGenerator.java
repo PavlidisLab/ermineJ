@@ -84,6 +84,11 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();
 
+        Long randomSeed = settings.getSeed();
+        if ( randomSeed != null ) {
+            RandomChooser.init( randomSeed );
+        }
+
         if ( numRuns <= 0 ) throw new IllegalArgumentException( "Number of iterations must be greater than zero" );
 
         this.setQuantile( settings.getQuantile() );
@@ -150,18 +155,6 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
             throw new IllegalStateException( "Unknown raw score calculation method selected" );
         }
 
-    }
-
-    /**
-     * Generate a null distribution, using a selected random seed.
-     *
-     * @param m a {@link ubic.basecode.util.StatusViewer} object.
-     * @param randomSeed a long.
-     * @return a {@link ubic.erminej.data.Histogram} object.
-     */
-    public Histogram generateNulldistribution( StatusViewer m, long randomSeed ) {
-        RandomChooser.init( randomSeed );
-        return this.generateNullDistribution( m );
     }
 
     /**
@@ -295,17 +288,6 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
     public void setQuantile( int value ) {
         quantile = value;
         quantfract = quantile / 100.0;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
-     */
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed( long randomSeed ) {
-        RandomChooser.init( randomSeed );
     }
 
     /**

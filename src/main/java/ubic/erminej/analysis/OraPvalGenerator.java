@@ -131,8 +131,7 @@ public class OraPvalGenerator extends AbstractGeneSetPvalGenerator {
         this.messenger.showStatus( String.format( "Hit list (%d genes) enrichment for multifunctionality: P = %.3g",
                 genesAboveThreshold.size(), hitListMultifunctionalityBiasPvalue ) );
 
-        boolean useMultifunctionalityCorrection = this.settings.useMultifunctionalityCorrection()
-                && hitListMultifunctionalityBiasPvalue < MF_BIAS_TO_TRIGGER_CORRECTION;
+        boolean useMultifunctionalityCorrection = hitListMultifunctionalityBiasPvalue < MF_BIAS_TO_TRIGGER_CORRECTION;
 
         Map<GeneSetTerm, GeneSetResult> referenceResults = computeResultsForHitList( genesAboveThreshold, false );
 

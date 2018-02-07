@@ -41,13 +41,4 @@ public interface NullDistributionGenerator {
      */
     public Histogram generateNullDistribution( StatusViewer messenger );
 
-    /**
-     * <p>
-     * setRandomSeed.
-     * </p>
-     *
-     * @param randomSeed a long.
-     */
-    public void setRandomSeed( long randomSeed );
-
 }

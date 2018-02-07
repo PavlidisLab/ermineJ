@@ -234,7 +234,8 @@ public class GeneAnnotationParser {
                         multigenes.add( g );
                     }
 
-                    if ( multigenes.size() > 1 && settings.getFilterNonSpecific() ) {
+                    // filter non-specific.
+                    if ( multigenes.size() > 1 ) {
                         continue;
                     }
 
@@ -344,6 +345,7 @@ public class GeneAnnotationParser {
      * @param settings a {@link ubic.erminej.SettingsHolder} object.
      * @return a {@link ubic.erminej.data.GeneAnnotations} object.
      * @throws java.io.IOException if any.
+     * @deprecated we won't support in the future
      */
     protected GeneAnnotations readAffyCsv( InputStream bis, Set<String> activeGenes, SettingsHolder settings )
             throws IOException {
@@ -521,6 +523,7 @@ public class GeneAnnotationParser {
      * @throws java.io.IOException if any.
      * @param activeGenes a {@link java.util.Set} object.
      * @return a {@link ubic.erminej.data.GeneAnnotations} object.
+     * @deprecated we won't support in the future
      */
     protected GeneAnnotations readAgilent( InputStream bis, Set<String> activeGenes, SettingsHolder settings )
             throws IOException {
@@ -711,10 +714,12 @@ public class GeneAnnotationParser {
      * @param sep a {@link java.lang.String} object.
      * @return a int.
      */
+    @Deprecated
     private GeneAnnotations readAffyCsv( InputStream bis, SettingsHolder settings ) throws IOException {
         return this.readAffyCsv( bis, null, settings );
     }
 
+    @Deprecated
     private GeneAnnotations readAgilent( InputStream bis, SettingsHolder settings ) throws IOException {
         return this.readAgilent( bis, null, settings );
     }
@@ -744,6 +749,7 @@ public class GeneAnnotationParser {
     }
 }
 
+@Deprecated
 class ParserHelper {
     private static final String AFFY_FIELD_SEPARATION_REGEX = "[,\t]";
 
@@ -769,7 +775,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAffyAlternateGeneSymbolIndex.</p>
+     * <p>
+     * getAffyAlternateGeneSymbolIndex.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
@@ -910,7 +918,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAgilentGoIndex.</p>
+     * <p>
+     * getAgilentGoIndex.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
@@ -921,7 +931,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAgilentNumFields.</p>
+     * <p>
+     * getAgilentNumFields.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.
@@ -932,7 +944,9 @@ class ParserHelper {
     }
 
     /**
-     * <p>getAgilentProbeIndex.</p>
+     * <p>
+     * getAgilentProbeIndex.
+     * </p>
      *
      * @param header a {@link java.lang.String} object.
      * @return a int.

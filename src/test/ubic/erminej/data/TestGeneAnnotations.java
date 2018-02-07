@@ -221,6 +221,7 @@ public class TestGeneAnnotations {
     }
 
     @Test
+    @Deprecated
     public final void testReadAffyCsv() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
         GeneAnnotations g = p.readAffyCsv( is, null, settings );
@@ -232,6 +233,7 @@ public class TestGeneAnnotations {
      * Updated format @
      */
     @Test
+    @Deprecated
     public final void testReadAffyCsv2() throws Exception {
         // second affytest
         GZIPInputStream isa = new GZIPInputStream(
@@ -244,6 +246,7 @@ public class TestGeneAnnotations {
     }
 
     @Test
+    @Deprecated
     public final void testReadAffyCsv3() throws Exception {
         // second affytest
         InputStream isa = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U95A.affy.2011format.sample.csv" );
@@ -263,6 +266,7 @@ public class TestGeneAnnotations {
     }
 
     @Test
+    @Deprecated
     public void testReadAgilent() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         GeneAnnotations g = p.readAgilent( ia, null, settings );
@@ -271,6 +275,7 @@ public class TestGeneAnnotations {
     }
 
     @Test
+    @Deprecated
     public void testReadAgilent2012() throws Exception {
         GeneAnnotationParser p = new GeneAnnotationParser( goNames );
         InputStream a = TestGeneAnnotations.class.getResourceAsStream( "/data/agilentannots.test2012.txt" );

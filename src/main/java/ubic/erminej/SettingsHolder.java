@@ -110,8 +110,7 @@ public class SettingsHolder {
     protected static final String DEFAULT_USER_DATA_DIR_NAME = "ermineJ.data";
     /** Constant <code>DO_LOG="doLog"</code> */
     protected static final String DO_LOG = "doLog";
-    /** Constant <code>FILTER_NONSPECIFIC="filterNonSpecific"</code> */
-    protected static final String FILTER_NONSPECIFIC = "filterNonSpecific";
+
     /** Constant <code>GENE_REP_TREATMENT="geneRepTreatment"</code> */
     protected static final String GENE_REP_TREATMENT = "geneRepTreatment";
     /** Constant <code>GENE_SCORE_THRESHOLD_KEY="scoreThreshold"</code> */
@@ -147,6 +146,8 @@ public class SettingsHolder {
     protected static final String RAW_FILE_CONFIG_NAME = "rawFile";
     /** Constant <code>SAVE_ALL_GENES_IN_OUTPUT="saveAllGenesInOutput"</code> */
     protected static final String SAVE_ALL_GENES_IN_OUTPUT = "saveAllGenesInOutput";
+    /** Constant <code>SEED="seed"</code> */
+    protected static final String SEED = "seed";
     /** Constant <code>SCORE_COL="scoreCol"</code> */
     protected static final String SCORE_COL = "scoreCol";
     /** Constant <code>SCORE_FILE="scoreFile"</code> */
@@ -159,8 +160,7 @@ public class SettingsHolder {
     protected static final String USE_CELL_COMP = "useGOCellularComponent";
     /** Constant <code>USE_MOL_FUNC="useGOMolecularFunction"</code> */
     protected static final String USE_MOL_FUNC = "useGOMolecularFunction";
-    /** Constant <code>USE_MULTIFUNCTIONALITY_CORRECTION="multifuncCorr"</code> */
-    protected static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
+
     /** Constant <code>USE_USER_DEFINED_GROUPS="useUserDefinedGroups"</code> */
     protected static final String USE_USER_DEFINED_GROUPS = "useUserDefinedGroups";
     /** Constant <code>VERSIONPARAM="softwareVersion"</code> */
@@ -169,6 +169,14 @@ public class SettingsHolder {
     private static final String DEFAULT_GENE_URL_BASE = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=search&term=@@";
 
     private static final String ERMINE_J_LOG_FILE_NAME = "ermineJ.log";
+
+    /** Constant <code>FILTER_NONSPECIFIC="filterNonSpecific"</code> */
+    @Deprecated
+    protected static final String FILTER_NONSPECIFIC = "filterNonSpecific";
+
+    /** Constant <code>USE_MULTIFUNCTIONALITY_CORRECTION="multifuncCorr"</code> */
+    @Deprecated
+    protected static final String USE_MULTIFUNCTIONALITY_CORRECTION = "multifuncCorr";
 
     /**
      * Hard-coded in case of a failure to retrieve the actual version.
@@ -460,17 +468,6 @@ public class SettingsHolder {
 
     /**
      * <p>
-     * getFilterNonSpecific.
-     * </p>
-     *
-     * @return a boolean.
-     */
-    public boolean getFilterNonSpecific() {
-        return config.getBoolean( FILTER_NONSPECIFIC, ( Boolean ) getDefault( FILTER_NONSPECIFIC ) );
-    }
-
-    /**
-     * <p>
      * getGeneRepTreatment.
      * </p>
      *
@@ -674,6 +671,18 @@ public class SettingsHolder {
     }
 
     /**
+     * get the random seed if it was set.
+     * 
+     * @return seed or null if it wasn't set.
+     */
+    public Long getSeed() {
+        if ( config.containsKey( SEED ) ) {
+            return config.getLong( SEED );
+        }
+        return null;
+    }
+
+    /**
      * <p>
      * getSelectedCustomGeneSets.
      * </p>
@@ -871,20 +880,21 @@ public class SettingsHolder {
         return this.getDoLog() && !this.getBigIsBetter() || !this.getDoLog() && this.getBigIsBetter();
     }
 
-    /**
-     * <p>
-     * useMultifunctionalityCorrection.
-     * </p>
-     *
-     * @return true if multifunctionality corrections should be applied, if possible.
-     */
-    public boolean useMultifunctionalityCorrection() {
-        /*
-         * Note that the intention is that this always be true. The reason to turn it off would be for testing or
-         * performance reasons.
-         */
-        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, true );
-    }
+    //    /**
+    //     * <p>
+    //     * useMultifunctionalityCorrection.
+    //     * </p>
+    //     *
+    //     * @return true if multifunctionality corrections should be applied, if possible.
+    //     * @deprecated this should always be true
+    //     */
+    //    public boolean useMultifunctionalityCorrection() {
+    //        /*
+    //         * Note that the intention is that this always be true. The reason to turn it off would be for testing or
+    //         * performance reasons.
+    //         */
+    //        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, true );
+    //    }
 
     /**
      * <p>

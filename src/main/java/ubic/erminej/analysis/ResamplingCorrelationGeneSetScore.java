@@ -71,6 +71,12 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
         this.classMaxSize = settings.getMaxClassSize();
         this.classMinSize = settings.getMinClassSize();
         this.numRuns = settings.getIterations();
+
+        Long randomSeed = settings.getSeed();
+        if ( randomSeed != null ) {
+            RandomChooser.init( randomSeed );
+        }
+
         this.setUseNormalApprox( !settings.getAlwaysUseEmpirical() );
         this.setUseSpeedUp( !settings.getAlwaysUseEmpirical() );
         data = dataMatrix;
@@ -202,17 +208,6 @@ public class ResamplingCorrelationGeneSetScore extends AbstractResamplingGeneSet
             }
         }
         return sumCorrelation / nummeas;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see classScore.analysis.NullDistributionGenerator#setRandomSeed(long)
-     */
-    /** {@inheritDoc} */
-    @Override
-    public void setRandomSeed( long randomSeed ) {
-        RandomChooser.init( randomSeed );
     }
 
     /**
