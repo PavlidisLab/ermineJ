@@ -495,11 +495,11 @@ public class GeneSetPvalRun {
             mt.bonferroni();
         } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
             mt.benjaminihochberg();
-        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG ) ) {
-            if ( !( settings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) )
-                throw new UnsupportedOperationException(
-                        "Westfall-Young correction is not supported for this analysis method" );
-            mt.westfallyoung();
+            //        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG ) ) {
+            //            if ( !( settings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) )
+            //                throw new UnsupportedOperationException(
+            //                        "Westfall-Young correction is not supported for this analysis method" );
+            //            mt.westfallyoung();
         } else {
             throw new IllegalArgumentException( "Unknown multiple test correction method: " + multipleTestCorrMethod );
         }

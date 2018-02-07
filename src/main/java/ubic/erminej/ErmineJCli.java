@@ -602,8 +602,10 @@ public class ErmineJCli {
         OptionBuilder
                 .withDescription(
                         "Multiple test correction method: " + SettingsHolder.MultiTestCorrMethod.BONFERONNI
-                                + " = Bonferonni FWE, " + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
-                                + " = Westfall-Young (slow), " + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
+                                + " = Bonferonni FWE, "
+                                // + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
+                                //  + " = Westfall-Young (slow), "
+                                + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
                                 + " = Benjamini-Hochberg FDR [default]" );
         OptionBuilder
                 .withLongOpt( "mtc" );

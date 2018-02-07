@@ -538,6 +538,7 @@ public class Settings extends SettingsHolder {
      * </p>
      *
      * @param val a boolean.
+     * @deprecated leave as true always
      */
     public void setFilterNonSpecific( boolean val ) {
         this.config.setProperty( FILTER_NONSPECIFIC, new Boolean( val ) );
