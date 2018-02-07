@@ -437,11 +437,11 @@ public class ErmineJCli {
                 .withDescription( "Directory where custom gene set are located" );
         options.addOption( OptionBuilder.create( 'f' ) );
 
-        OptionBuilder.withLongOpt( "filterNonSpecific" );
-        OptionBuilder
-                .withDescription( "Filter out non-specific elements (default annotation format only), default=true" );
-        options.addOption( OptionBuilder
-                .create( 'F' ) );
+        //        OptionBuilder.withLongOpt( "filterNonSpecific" );
+        //        OptionBuilder
+        //                .withDescription( "Filter out non-specific elements (default annotation format only), default=true" );
+        //        options.addOption( OptionBuilder
+        //                .create( 'F' ) );
 
         OptionBuilder
                 .hasArg();
@@ -517,12 +517,12 @@ public class ErmineJCli {
                 .withArgName( "scoreFileList" );
         options.addOption( OptionBuilder.create( "batch" ) );
 
-        OptionBuilder.withDescription( "Disable multifunctionality correction (default: on)" );
+        //    OptionBuilder.withDescription( "Disable multifunctionality correction (default: on)" );
         /*
          * The intention is that this would be on
          */
-        options.addOption( OptionBuilder
-                .create( "nomf" ) );
+        //        options.addOption( OptionBuilder
+        //                .create( "nomf" ) );
 
         OptionBuilder.hasArg();
         OptionBuilder
@@ -614,6 +614,9 @@ public class ErmineJCli {
         options.addOption( OptionBuilder.hasArg().withDescription( "GO aspects to include: B, C, M; "
                 + "for example for Biological Process only use B; to add Cellular Component use BC (Default: BCM = all )" )
                 .withArgName( "selections" ).create( "aspects" ) );
+
+        options.addOption(
+                OptionBuilder.hasArg().withArgName( "value" ).withDescription( "Seed for random number generation (integer)" ).create( "seed" ) );
 
     }
 
@@ -853,7 +856,7 @@ public class ErmineJCli {
             }
         }
 
-        settings.setFilterNonSpecific( commandLine.hasOption( 'F' ) );
+        //  settings.setFilterNonSpecific( commandLine.hasOption( 'F' ) );
 
         if ( commandLine.hasOption( 'M' ) ) {
             arg = commandLine.getOptionValue( 'M' );
@@ -925,11 +928,11 @@ public class ErmineJCli {
                 return false;
             }
 
-            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) && commandLine.hasOption( "nomf" ) ) {
-                settings.setUseMultifunctionalityCorrection( false );
-            } else {
-                settings.setUseMultifunctionalityCorrection( true );
-            }
+            //            if ( settings.getClassScoreMethod().equals( SettingsHolder.Method.ORA ) && commandLine.hasOption( "nomf" ) ) {
+            //                settings.setUseMultifunctionalityCorrection( false );
+            //            } else {
+            //                settings.setUseMultifunctionalityCorrection( true );
+            //            }
         }
 
         if ( commandLine.hasOption( 'o' ) ) {
@@ -1065,6 +1068,18 @@ public class ErmineJCli {
             System.err.println( "You must supply a gene score file if you are not using the correlation method" );
             showHelp();
             return false;
+        }
+
+        if ( commandLine.hasOption( "seed" ) ) {
+            arg = commandLine.getOptionValue( "seed" );
+            try {
+                Long seed = Long.parseLong( arg );
+                settings.setRandomSeed( seed );
+            } catch ( Exception e ) {
+                System.err.println( "Seed must be an integer value" );
+                showHelp();
+                return false;
+            }
         }
 
         if ( commandLine.hasOption( 'S' ) ) {

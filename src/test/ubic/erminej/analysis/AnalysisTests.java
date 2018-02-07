@@ -39,7 +39,6 @@ import ubic.erminej.data.TestGeneAnnotations;
 
 /**
  * @author Paul
- * @version $Id$
  */
 public class AnalysisTests {
 
@@ -55,7 +54,7 @@ public class AnalysisTests {
         s.setMaxClassSize( 200 );
         s.setScoreCol( 2 );
         s.setDataCol( 2 );
-        s.setUseMultifunctionalityCorrection( true );
+        //  s.setUseMultifunctionalityCorrection( true );
         s.setDoLog( true );
         s.setBigIsBetter( false );
         s.setUseBiologicalProcess( true );

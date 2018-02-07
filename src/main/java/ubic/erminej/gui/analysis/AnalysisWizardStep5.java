@@ -189,7 +189,7 @@ public class AnalysisWizardStep5 extends WizardStep {
         settings.setDoLog( doLog );
         settings.setBigIsBetter( bigIsBetter );
         settings.setAlwaysUseEmpirical( doFullEmpirical );
-        settings.setUseMultifunctionalityCorrection( doMfCorr );
+        //  settings.setUseMultifunctionalityCorrection( doMfCorr );
         settings.setIterations( numIterations.get() );
 
     }
@@ -350,17 +350,17 @@ public class AnalysisWizardStep5 extends WizardStep {
         JPanel resampSettingsPanel = createResamplingSettingsPanel();
         corrPanel.add( resampSettingsPanel, null );
         corrPanel.add( corrMetricPanel, null );
-        JCheckBox mfCorrectionCheckBox = getMfCorrectionCheckBox();
+        //    JCheckBox mfCorrectionCheckBox = getMfCorrectionCheckBox();
 
         GroupLayout gl = new GroupLayout( corrPanel );
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );
         corrPanel.setLayout( gl );
         gl.setHorizontalGroup( gl.createParallelGroup().addComponent( resampSettingsPanel )
-                .addComponent( corrMetricPanel ).addComponent( mfCorrectionCheckBox ) );
+                .addComponent( corrMetricPanel ) );//.addComponent( mfCorrectionCheckBox ) );
 
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( resampSettingsPanel )
-                .addComponent( corrMetricPanel ).addComponent( mfCorrectionCheckBox ) );
+                .addComponent( corrMetricPanel ) );//.addComponent( mfCorrectionCheckBox ) );
 
     }
 
@@ -395,18 +395,18 @@ public class AnalysisWizardStep5 extends WizardStep {
 
         final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
         final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
-        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+        //   final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
         GroupLayout gl = new GroupLayout( resampPanel );
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );
         resampPanel.setLayout( gl );
         gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
                 .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanelAnalysisFrameMethods )
-                .addComponent( resamplingSettingsPanel ).addComponent( mfCheckBox ) );
+                .addComponent( resamplingSettingsPanel ) );//.addComponent( mfCheckBox ) );
 
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
                 .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanelAnalysisFrameMethods )
-                .addComponent( resamplingSettingsPanel ).addComponent( mfCheckBox ) );
+                .addComponent( resamplingSettingsPanel ) );//.addComponent( mfCheckBox ) );
 
     }
 
@@ -495,16 +495,16 @@ public class AnalysisWizardStep5 extends WizardStep {
 
         final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
         final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
-        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+        //   final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
         GroupLayout gl = new GroupLayout( oraPanel );
         gl.setAutoCreateContainerGaps( true );
         gl.setAutoCreateGaps( true );
         oraPanel.setLayout( gl );
         gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
-                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanel15 ).addComponent( mfCheckBox ) );
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanel15 ) );//.addComponent( mfCheckBox ) );
 
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
-                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanel15 ).addComponent( mfCheckBox ) );
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( jPanel15 ) );//.addComponent( mfCheckBox ) );
 
         geneScoreThresholdTextField.addKeyListener( new KeyAdapter() {
             @Override
@@ -537,13 +537,13 @@ public class AnalysisWizardStep5 extends WizardStep {
 
         final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
         final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
-        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+        // final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
 
         gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
-                .addComponent( jCheckBoxBigIsBetter ).addComponent( numIterationsPanel ).addComponent( mfCheckBox ) );
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( numIterationsPanel ) );//.addComponent( mfCheckBox ) );
 
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
-                .addComponent( jCheckBoxBigIsBetter ).addComponent( numIterationsPanel ).addComponent( mfCheckBox ) );
+                .addComponent( jCheckBoxBigIsBetter ).addComponent( numIterationsPanel ) );//.addComponent( mfCheckBox ) );
 
     }
 
@@ -598,12 +598,12 @@ public class AnalysisWizardStep5 extends WizardStep {
         rocPanel.setLayout( gl );
         final JCheckBox jCheckBoxDoLog = getDoLogCheckBox();
         final JCheckBox jCheckBoxBigIsBetter = getBigIsBetterCheckBox();
-        final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
+        //   final JCheckBox mfCheckBox = getMfCorrectionCheckBox();
         gl.setHorizontalGroup( gl.createParallelGroup().addComponent( jCheckBoxDoLog )
-                .addComponent( jCheckBoxBigIsBetter ).addComponent( mfCheckBox ) );
+                .addComponent( jCheckBoxBigIsBetter ) );//.addComponent( mfCheckBox ) );
 
         gl.setVerticalGroup( gl.createSequentialGroup().addComponent( jCheckBoxDoLog )
-                .addComponent( jCheckBoxBigIsBetter ).addComponent( mfCheckBox ) );
+                .addComponent( jCheckBoxBigIsBetter ) );//.addComponent( mfCheckBox ) );
 
     }
 
@@ -655,28 +655,28 @@ public class AnalysisWizardStep5 extends WizardStep {
         return jCheckBoxDoLog;
     }
 
-    private JCheckBox getMfCorrectionCheckBox() {
-        final JCheckBox jCheckBoxDoMultiFuncCorr = new JCheckBox();
-        jCheckBoxDoMultiFuncCorr.setSelected( true );
-        jCheckBoxDoMultiFuncCorr.setText( "Test the effect of multifunctional genes" );
-
-        jCheckBoxDoMultiFuncCorr.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent arg0 ) {
-                doMfCorr = jCheckBoxDoMultiFuncCorr.isSelected();
-            }
-        } );
-
-        if ( enableMultifuncCheckbox ) {
-            jCheckBoxDoMultiFuncCorr.setEnabled( true );
-            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
-        } else {
-            jCheckBoxDoMultiFuncCorr.setEnabled( false );
-            jCheckBoxDoMultiFuncCorr.setVisible( false );
-        }
-
-        return jCheckBoxDoMultiFuncCorr;
-    }
+    //    private JCheckBox getMfCorrectionCheckBox() {
+    //        final JCheckBox jCheckBoxDoMultiFuncCorr = new JCheckBox();
+    //        jCheckBoxDoMultiFuncCorr.setSelected( true );
+    //        jCheckBoxDoMultiFuncCorr.setText( "Test the effect of multifunctional genes" );
+    //
+    //        jCheckBoxDoMultiFuncCorr.addActionListener( new ActionListener() {
+    //            @Override
+    //            public void actionPerformed( ActionEvent arg0 ) {
+    //                doMfCorr = jCheckBoxDoMultiFuncCorr.isSelected();
+    //            }
+    //        } );
+    //
+    //        if ( enableMultifuncCheckbox ) {
+    //            jCheckBoxDoMultiFuncCorr.setEnabled( true );
+    //            jCheckBoxDoMultiFuncCorr.setSelected( settings.useMultifunctionalityCorrection() );
+    //        } else {
+    //            jCheckBoxDoMultiFuncCorr.setEnabled( false );
+    //            jCheckBoxDoMultiFuncCorr.setVisible( false );
+    //        }
+    //
+    //        return jCheckBoxDoMultiFuncCorr;
+    //    }
 
     /**
      * @param jTextFieldIterations

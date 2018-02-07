@@ -63,7 +63,7 @@ public abstract class AbstractPvalGeneratorTest {
         s.setMinClassSize( 2 );
         s.setMaxClassSize( 200 );
         s.setScoreCol( 2 );
-        s.setUseMultifunctionalityCorrection( true );
+        // s.setUseMultifunctionalityCorrection( true );
         s.setDoLog( true );
         s.setBigIsBetter( false );
         s.setUseBiologicalProcess( true );

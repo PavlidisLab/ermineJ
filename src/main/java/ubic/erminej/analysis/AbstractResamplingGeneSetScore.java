@@ -29,7 +29,6 @@ import ubic.erminej.data.Histogram;
  * </p>
  *
  * @author pavlidis
- * @version $Id$
  */
 public abstract class AbstractResamplingGeneSetScore extends AbstractLongTask implements NullDistributionGenerator {
 
