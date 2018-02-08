@@ -693,8 +693,8 @@ public class GeneAnnotationParser {
         GeneSetTerm goterm = this.geneSetTerms.get( go );
 
         if ( goterm == null ) {
-            log.warn( "GO term " + go + " not recognized" );
             if ( messenger != null && shouldWarn() ) {
+                log.debug( "GO term " + go + " not recognized" );
                 messenger.showStatus( "GO term " + go + " not recognized in the annotation file" );
                 timesWarned++;
                 maybeNotifyAboutWarningSuppression();
