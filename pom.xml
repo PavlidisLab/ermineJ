@@ -17,15 +17,15 @@
 	</description>
 	<packaging>jar</packaging>
 	<scm>
-		<url>https://github.com/ppavlidis/ermineJ</url>
-		<connection>scm:git:https://github.com/ppavlidis/ermineJ.git</connection>
+		<url>https://github.com/PavlidisLab/ermineJ</url>
+		<connection>scm:git:https://github.com/PavlidisLab/ermineJ.git</connection>
 		<developerConnection>scm:git:https://github.com/PavlidisLab/ermineJ.git</developerConnection>
 	  <tag>HEAD</tag>
   </scm>
 	<issueManagement>
 		<system>GitHub</system>
 		<url>
-			https://github.com/ppavlidis/ermineJ/issues
+			https://github.com/PavlidisLab/ermineJ/issues
 		</url>
 	</issueManagement>
 	<licenses>
