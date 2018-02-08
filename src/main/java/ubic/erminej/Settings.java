@@ -60,13 +60,12 @@ public class Settings extends SettingsHolder {
      * URLS for web services used by the software. Use String.format to replace the %s with the desired platform short
      * name.
      */
-    /** Constant <code>ANNOTATION_FILE_FETCH_RESTURL="http://www.chibi.ubc.ca/Gemma/rest/v2/p"{trunked}</code> */
-    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/%s/annotations";
+    public static final String ANNOTATION_FILE_FETCH_RESTURL = "https://gemma.msl.ubc.ca/rest/v2/platforms/%s/annotations";
 
     // public static final String ANNOTATION_FILE_FETCH_RESTURL =
     // "http://localhost:8080/Gemma/rest/v2/platforms/?offset=0&limit=100000";
     /** Constant <code>ANNOTATION_FILE_LIST_RESTURL="http://www.chibi.ubc.ca/Gemma/rest/v2/p"{trunked}</code> */
-    public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/?offset=0&limit=100000";
+    public static final String ANNOTATION_FILE_LIST_RESTURL = "https://gemma.msl.ubc.ca/rest/v2/platforms/?offset=0&limit=100000";
 
     /** Constant <code>HELPURL="http://erminej.chibi.ubc.ca/help"</code> */
     public static final String HELPURL = "http://erminej.chibi.ubc.ca/help";

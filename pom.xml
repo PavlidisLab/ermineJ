@@ -166,7 +166,7 @@
 		<dependency>
 			<groupId>gemma</groupId>
 			<artifactId>gemma-core</artifactId>
-			<version>1.17.1</version>
+			<version>1.21.0</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
